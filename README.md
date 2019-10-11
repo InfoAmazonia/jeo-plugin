@@ -92,4 +92,4 @@ Simply type this command from the project root folder:
 phpunit
 ```
 
-(Note that `phpunit` accpets several parametrs, for example if you want to run just a specific group of tests).
+(Note that `phpunit` accepts several parameters, for example if you want to run just a specific group of tests).
