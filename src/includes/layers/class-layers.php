@@ -30,7 +30,7 @@ class Layers {
 			'labels' => $labels,
 			'hierarchical' => true,
 			'description' => __('JEO Layers', 'jeo'),
-			'supports' => array('title'),
+			'supports' => array('title', 'custom-fields'),
 			'rewrite' => array('slug' => 'layers'),
 			'show_in_rest' => true,
 			'public' => true,

@@ -42,5 +42,5 @@ function jeo_maps() {
  * @return \Jeo\Layers Layers instance
  */
 function jeo_layers() {
-	return \Jeo\Maps::get_instance();
+	return \Jeo\Layers::get_instance();
 }

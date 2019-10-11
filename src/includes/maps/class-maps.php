@@ -30,7 +30,7 @@ class Maps {
 			'labels' => $labels,
 			'hierarchical' => true,
 			'description' => __('JEO Maps', 'jeo'),
-			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes'),
+			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields'),
 			'rewrite' => array('slug' => 'maps'),
 			'public' => true,
 			'show_in_menu' => true,
@@ -44,16 +44,21 @@ class Maps {
 
 		register_post_type('map', $args);
 
-		register_post_meta('map', 'center', [
+		register_post_meta('map', 'zoom', [
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
+			'sanitize_callback' => [$this, 'sanitize_meta_center'],
 			'type' => 'string',
-			'description' => __('The map center', 'jeo')
+			'description' => __('The map initial zoom level', 'jeo')
 		]);
 
 
 
+	}
+	
+	public function sanitize_meta_center($meta_value, $meta_key, $object_type, $object_subtype) {
+		return intval($meta_value);
 	}
 
 }
