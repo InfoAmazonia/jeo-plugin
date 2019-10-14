@@ -5,9 +5,14 @@ namespace Jeo;
 class Maps {
 
 	use Singleton;
+	use Rest_Validate_Meta;
+	
+	public $post_type = 'map';
 
 	protected function init() {
-		add_action( 'init', [$this, 'register_post_type'] );
+		add_action( 'plugins_loaded', [$this, 'register_post_type'] );
+		$this->register_rest_meta_validation();
+		
 	}
 
 	public function register_post_type() {
@@ -42,23 +47,41 @@ class Maps {
 			'capability_type' => 'page'
 		);
 
-		register_post_type('map', $args);
+		register_post_type($this->post_type, $args);
 
-		register_post_meta('map', 'zoom', [
+		register_post_meta($this->post_type, 'zoom', [
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'sanitize_callback' => [$this, 'sanitize_meta_center'],
-			'type' => 'string',
+			'sanitize_callback' => [$this, 'sanitize_meta_zoom'],
+			'type' => 'number',
 			'description' => __('The map initial zoom level', 'jeo')
 		]);
-
-
 
 	}
 	
 	public function sanitize_meta_center($meta_value, $meta_key, $object_type, $object_subtype) {
 		return intval($meta_value);
 	}
+	
+	public function sanitize_meta_zoom($meta_value, $meta_key, $object_type, $object_subtype) {
+		return intval($meta_value);
+	}
+	
+	/**
+	 * Validates the zoom metadata value 
+	 * @param  mixed $value The value to be validated
+	 * @return void|\WP_Error Returns a \WP_Error object in case the value is invalid
+	 */
+	public function validate_meta_zoom($value) {
+		// WordPress is already validating if it is a number 
+		
+		$val = intval($value);
+		if ( $val < 1 || $val > 14 ) {
+			return new \WP_Error( 'rest_invalid_field', __( 'Map zoom must be between 1 and 14', 'jeo' ), array( 'status' => 400 ) );
+		}
+		
+	}
+
 
 }
