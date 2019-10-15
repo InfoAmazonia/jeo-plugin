@@ -37,10 +37,14 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define( 'JEO_VERSION', '1.0.0' );
 
+define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
+define( 'JEO_BASEURL', plugins_url('', __FILE__) );
+
+
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path( __FILE__ ) . 'includes/loaders.php';
+require JEO_BASEPATH . 'includes/loaders.php';
 
 jeo();
