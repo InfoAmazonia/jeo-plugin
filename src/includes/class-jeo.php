@@ -45,6 +45,8 @@ class Jeo {
 		\jeo_layers();
 
 		add_action('plugins_loaded', [$this, 'load_plugin_textdomain']);
+		add_action('init', [$this, 'register_assets'] );
+		add_action('enqueue_block_editor_assets', [$this, 'enqueue_assets'] );
 	}
 
 	/**
@@ -57,9 +59,24 @@ class Jeo {
 		load_plugin_textdomain(
 			'jeo',
 			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+			JEO_BASEPATH . '/languages/'
 		);
 
+	}
+	
+	public function register_assets() {
+		$asset_file = include( JEO_BASEPATH . '/js/build/index.asset.php');
+
+		wp_register_script(
+			'jeo-js',
+			JEO_BASEURL . '/js/build/index.js',
+			$asset_file['dependencies'],
+			$asset_file['version']
+		);
+	}
+	
+	public function enqueue_assets() {
+		wp_enqueue_script( 'jeo-js' );
 	}
 
 

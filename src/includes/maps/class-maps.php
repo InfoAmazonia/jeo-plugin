@@ -10,7 +10,7 @@ class Maps {
 	public $post_type = 'map';
 
 	protected function init() {
-		add_action( 'plugins_loaded', [$this, 'register_post_type'] );
+		add_action( 'init', [$this, 'register_post_type'] );
 		$this->register_rest_meta_validation();
 		
 	}

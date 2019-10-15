@@ -1,0 +1,30 @@
+{
+  "name": "jeo",
+  "version": "1.0.0",
+  "description": "Jeo plugin",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "start": "wp-scripts start src/js/src/posts-sidebar/index.js --output=src/js/build/index.js",
+    "build": "wp-scripts build src/js/src/posts-sidebar/index.js --output=src/js/build/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EarthJournalismNetwork/jeo-plugin.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/EarthJournalismNetwork/jeo-plugin/issues"
+  },
+  "homepage": "https://github.com/EarthJournalismNetwork/jeo-plugin#readme",
+  "dependencies": {
+    "@wordpress/components": "^8.3.2",
+    "@wordpress/compose": "^3.7.2",
+    "@wordpress/edit-post": "^3.8.2",
+    "@wordpress/i18n": "^3.6.1",
+    "@wordpress/plugins": "^2.7.2"
+  }
+}
