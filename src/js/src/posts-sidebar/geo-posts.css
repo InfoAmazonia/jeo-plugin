@@ -1,0 +1,4 @@
+#geocode-map-container, #geocode-map-container > div  {
+	width: 400px;
+	height: 400px;
+}
