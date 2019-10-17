@@ -2,27 +2,32 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { Map as LeafletMap, Marker, Popup, TileLayer } from 'react-leaflet';
 import JeoGeoAutoComplete from './geo-auto-complete';
+import { Button } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 
 class JeoGeocodePosts extends React.Component {
     constructor() {
-      super()
+      super();
+      const metadata = wp.data.select('core/editor').getCurrentPost().meta;
+    //   console.log(metadata);
+      const marker = metadata._geocode_lat && metadata._geocode_lon ? [ metadata._geocode_lat, metadata._geocode_lon ] : false
       this.state = {
-        lat: 51.505,
-        lng: -0.09,
+        lat: metadata._geocode_lat,
+        lng: metadata._geocode_lon,
         zoom: 13,
-        marker: false
+        marker: marker
       }
       
       this.onLocationFound = this.onLocationFound.bind(this);
       this.onMarkerDragged = this.onMarkerDragged.bind(this);
+      this.save = this.save.bind(this);
       
       this.markerRef = React.createRef();
       
   };
     
     onLocationFound(location) {
-        //console.log(location);
+        console.log(location);
         this.setState({
             marker: [
                 location.lat,
@@ -45,6 +50,18 @@ class JeoGeocodePosts extends React.Component {
             lng: latLng.lng,
         });
         
+    }
+    
+    save() {
+        const lat = this.state.marker[0];
+        const lon = this.state.marker[1];
+        
+        wp.data.dispatch('core/editor').editPost({meta: {
+            _geocode_lat: lat,
+            _geocode_lon: lon,
+        }});
+        
+        //this.props.onSaveLocation();
     }
     
   render() {
@@ -72,7 +89,17 @@ class JeoGeocodePosts extends React.Component {
                 )}
                 
               </LeafletMap>
+              
+              <Button isDefault onClick={ this.save() }>
+                  {__('Save', 'jeo')}
+              </Button>
+              
+              <Button onClick={ this.props.onCancel }>
+                  {__('Cancel', 'jeo')}
+              </Button>
+              
             </div>
+            
         </fragment>
     );
    

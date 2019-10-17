@@ -68,7 +68,7 @@ class Jeo {
 	public function register_assets() {
 		$asset_file = include( JEO_BASEPATH . '/js/build/index.asset.php');
 		
-		$deps = array_merge([], $asset_file['dependencies']);
+		$deps = array_merge(['lodash'], $asset_file['dependencies']);
 		
 		wp_register_script(
 			'jeo-js',
