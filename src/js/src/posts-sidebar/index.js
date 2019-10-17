@@ -2,7 +2,7 @@ import { registerPlugin } from "@wordpress/plugins";
 import { PluginDocumentSettingPanel } from "@wordpress/edit-post";
 import { Modal, Button } from "@wordpress/components";
 import { withState } from "@wordpress/compose";
-import JeoGeocodePosts from "../geo-posts";
+import JeoGeocodePosts from "./geo-posts";
 //const { PluginDocumentSettingPanel } = wp.editPost;
 import { __ } from "@wordpress/i18n";
 
@@ -14,11 +14,11 @@ const MyModal = withState( {
         <Button isDefault onClick={ () => setState( { isOpen: true } ) }>Open Modal</Button>
         { isOpen && (
             <Modal
-                title="This is my modal"
+                title={__('Geolocate this post', 'jeo')}
                 onRequestClose={ () => setState( { isOpen: false } ) }>
                 <JeoGeocodePosts />
                 <Button isDefault onClick={ () => setState( { isOpen: false } ) }>
-                    My custom close button
+                    {__('Done', 'jeo')}
                 </Button>
             </Modal>
         ) }
@@ -30,7 +30,7 @@ registerPlugin( 'myprefix-sidebar', {
   render: () => {
     return (
         <PluginDocumentSettingPanel
-          title={__('Meta Options', 'textdomain')}
+          title={__('Geolocate this post', 'jeo')}
         >
             <MyModal />
         </PluginDocumentSettingPanel>

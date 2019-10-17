@@ -43,6 +43,7 @@ class Jeo {
 	protected function init() {
 		\jeo_maps();
 		\jeo_layers();
+		\jeo_geocode_handler();
 
 		add_action('plugins_loaded', [$this, 'load_plugin_textdomain']);
 		add_action('init', [$this, 'register_assets'] );
@@ -66,17 +67,40 @@ class Jeo {
 	
 	public function register_assets() {
 		$asset_file = include( JEO_BASEPATH . '/js/build/index.asset.php');
-
+		
+		$deps = array_merge([], $asset_file['dependencies']);
+		
 		wp_register_script(
 			'jeo-js',
 			JEO_BASEURL . '/js/build/index.js',
-			$asset_file['dependencies'],
+			$deps,
 			$asset_file['version']
 		);
+		
+		wp_localize_script('jeo-js', 'jeo', [
+			'ajax_url' => admin_url('admin-ajax.php')
+		]);
+		
+		// wp_register_script(
+		// 	'leaflet',
+		// 	JEO_BASEURL . '/libs/leaflet/leaflet.js'
+		// );
+		// 
+		// wp_register_script(
+		// 	'react-leaflet',
+		// 	JEO_BASEURL . '/libs/react-leaflet/react-leaflet.min.js',
+		// 	['react', 'react-dom', 'leaflet']
+		// );
 	}
 	
 	public function enqueue_assets() {
 		wp_enqueue_script( 'jeo-js' );
+		
+		wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css');
+		wp_enqueue_style( 'jeo-ge-posts', JEO_BASEURL . '/js/src/posts-sidebar/geo-posts.css');
+		
+		
+		
 	}
 
 
