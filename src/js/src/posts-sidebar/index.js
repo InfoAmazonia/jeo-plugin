@@ -6,24 +6,35 @@ import JeoGeocodePosts from "./geo-posts";
 //const { PluginDocumentSettingPanel } = wp.editPost;
 import { __ } from "@wordpress/i18n";
 
+const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
+    constructor() {
+      super();
+      this.state = {
+        isOpen: false
+      }
+    }
+    render() {
+          let isOpen = this.state.isOpen;
+          return (
+              <fragment>
+              <Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>Open Modal</Button>
+              { isOpen && (
+                  <Modal
+                      title={__('Geolocate this post', 'jeo')}
+                      onRequestClose={ () => this.setState( { isOpen: false } ) }>
+                      <JeoGeocodePosts 
+                        onSaveLocation={ () => this.setState( { isOpen: false } ) }
+                        onCancel={ () => this.setState( { isOpen: false } ) }
+                        />
+                  </Modal>
+              ) }
+              </fragment>
+          );
+      }
+      
+      
+};
 
-const MyModal = withState( {
-    isOpen: false,
-} )( ( { isOpen, setState } ) => (
-    <div>
-        <Button isDefault onClick={ () => setState( { isOpen: true } ) }>Open Modal</Button>
-        { isOpen && (
-            <Modal
-                title={__('Geolocate this post', 'jeo')}
-                onRequestClose={ () => setState( { isOpen: false } ) }>
-                <JeoGeocodePosts />
-                <Button isDefault onClick={ () => setState( { isOpen: false } ) }>
-                    {__('Done', 'jeo')}
-                </Button>
-            </Modal>
-        ) }
-    </div>
-) );
 
 registerPlugin( 'myprefix-sidebar', {
   icon: 'location-alt',
@@ -32,7 +43,7 @@ registerPlugin( 'myprefix-sidebar', {
         <PluginDocumentSettingPanel
           title={__('Geolocate this post', 'jeo')}
         >
-            <MyModal />
+            <JeoGeocodePanel />
         </PluginDocumentSettingPanel>
     )
   }

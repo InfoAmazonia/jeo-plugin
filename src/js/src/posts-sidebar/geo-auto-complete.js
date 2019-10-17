@@ -1,6 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Autosuggest from 'react-autosuggest';
+import { Spinner } from "@wordpress/components";
+
 
 class JeoGeoAutoComplete extends React.Component {
     
@@ -9,7 +11,8 @@ class JeoGeoAutoComplete extends React.Component {
 		super();
 		this.state = {
 			value: '',
-			suggestions: []
+			suggestions: [],
+            isLoading: false
 		}
         this.onChange = this.onChange.bind(this);
         this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
@@ -19,6 +22,7 @@ class JeoGeoAutoComplete extends React.Component {
         this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
         this.shouldRenderSuggestions = this.shouldRenderSuggestions.bind(this);
         
+        this.debouncedLoadSuggestions = _.debounce(this.onSuggestionsFetchRequested, 500);
         
 	}
     
@@ -44,13 +48,13 @@ class JeoGeoAutoComplete extends React.Component {
     };
     
     onSuggestionsFetchRequested({ value }) {
-        
+        this.setState( { isLoading: true } );
         fetch(jeo.ajax_url + '?action=jeo_geocode&search=' + value)
             .then( response => {
                 return response.json();
             } )
             .then( result => {
-                this.setState( { suggestions: result } );
+                this.setState( { suggestions: result, isLoading: false } );
             } );
     };
     
@@ -66,7 +70,6 @@ class JeoGeoAutoComplete extends React.Component {
     
     render() {
         const { value, suggestions } = this.state;
-        
         // Autosuggest will pass through all these props to the input.
         const inputProps = {
             placeholder: 'Busca por endereço',
@@ -76,9 +79,11 @@ class JeoGeoAutoComplete extends React.Component {
         
         // Finally, render it!
         return (
+            <div>
+            
             <Autosuggest
             suggestions={suggestions}
-            onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+            onSuggestionsFetchRequested={this.debouncedLoadSuggestions}
             onSuggestionsClearRequested={this.onSuggestionsClearRequested}
             getSuggestionValue={this.getSuggestionValue}
             renderSuggestion={this.renderSuggestion}
@@ -86,6 +91,10 @@ class JeoGeoAutoComplete extends React.Component {
             shouldRenderSuggestions={this.shouldRenderSuggestions}
             inputProps={inputProps}
             />
+            { this.state.isLoading && 
+                <Spinner />
+            }
+            </div>
         );
     }
 	
