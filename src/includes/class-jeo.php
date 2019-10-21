@@ -47,7 +47,7 @@ class Jeo {
 
 		add_action('plugins_loaded', [$this, 'load_plugin_textdomain']);
 		add_action('init', [$this, 'register_assets'] );
-		add_action('enqueue_block_editor_assets', [$this, 'enqueue_assets'] );
+		add_action('enqueue_block_editor_assets', [$this, 'enqueue_blocks_assets'] );
 	}
 
 	/**
@@ -66,13 +66,13 @@ class Jeo {
 	}
 	
 	public function register_assets() {
-		$asset_file = include( JEO_BASEPATH . '/js/build/index.asset.php');
+		$asset_file = include( JEO_BASEPATH . '/js/build/postsSidebar.asset.php');
 		
 		$deps = array_merge(['lodash'], $asset_file['dependencies']);
 		
 		wp_register_script(
 			'jeo-js',
-			JEO_BASEURL . '/js/build/index.js',
+			JEO_BASEURL . '/js/build/postsSidebar.js',
 			$deps,
 			$asset_file['version']
 		);
@@ -80,20 +80,10 @@ class Jeo {
 		wp_localize_script('jeo-js', 'jeo', [
 			'ajax_url' => admin_url('admin-ajax.php')
 		]);
-		
-		// wp_register_script(
-		// 	'leaflet',
-		// 	JEO_BASEURL . '/libs/leaflet/leaflet.js'
-		// );
-		// 
-		// wp_register_script(
-		// 	'react-leaflet',
-		// 	JEO_BASEURL . '/libs/react-leaflet/react-leaflet.min.js',
-		// 	['react', 'react-dom', 'leaflet']
-		// );
+
 	}
 	
-	public function enqueue_assets() {
+	public function enqueue_blocks_assets() {
 		wp_enqueue_script( 'jeo-js' );
 		
 		wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css');
