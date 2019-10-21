@@ -7,8 +7,8 @@
     "test": "tests"
   },
   "scripts": {
-    "start": "wp-scripts start src/js/src/posts-sidebar/index.js --output=src/js/build/index.js",
-    "build": "wp-scripts build src/js/src/posts-sidebar/index.js --output=src/js/build/index.js"
+    "start": "wp-scripts start",
+    "build": "wp-scripts build"
   },
   "repository": {
     "type": "git",
@@ -29,5 +29,8 @@
     "leaflet": "^1.5.1",
     "react-autosuggest": "^9.4.3",
     "react-leaflet": "^2.4.0"
+  },
+  "devDependencies": {
+    "@wordpress/scripts": "^5.1.0"
   }
 }
