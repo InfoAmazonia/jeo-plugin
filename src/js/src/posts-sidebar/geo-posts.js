@@ -3,6 +3,7 @@ import { Map as LeafletMap, Marker, Popup, TileLayer } from 'react-leaflet';
 import JeoGeoAutoComplete from './geo-auto-complete';
 import { Button } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
+import './geo-posts.css';
 
 class JeoGeocodePosts extends React.Component {
 	constructor() {
