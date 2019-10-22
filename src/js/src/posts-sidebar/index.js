@@ -1,9 +1,7 @@
 import { registerPlugin } from "@wordpress/plugins";
 import { PluginDocumentSettingPanel } from "@wordpress/edit-post";
 import { Modal, Button } from "@wordpress/components";
-import { withState } from "@wordpress/compose";
 import JeoGeocodePosts from "./geo-posts";
-//const { PluginDocumentSettingPanel } = wp.editPost;
 import { __ } from "@wordpress/i18n";
 
 const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
@@ -16,7 +14,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 	render() {
 		let isOpen = this.state.isOpen;
 		return (
-			<fragment>
+			<Fragment>
 				<Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>Open Modal</Button>
 				{ isOpen && (
 					<Modal
@@ -28,12 +26,13 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 							/>
 					</Modal>
 				) }
-			</fragment>
+			</Fragment>
 		);
 	}
 
 
 };
+
 
 
 registerPlugin( 'myprefix-sidebar', {

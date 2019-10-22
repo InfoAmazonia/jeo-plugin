@@ -10,7 +10,7 @@ class JeoGeocodePosts extends React.Component {
 		super();
 		const metadata = wp.data.select('core/editor').getCurrentPost().meta;
 		// console.log(metadata);
-		const marker = metadata._geocode_lat && metadata._geocode_lon ? [ metadata._geocode_lat, metadata._geocode_lon ] : false
+		const marker = metadata._geocode_lat && metadata._geocode_lon ? [ metadata._geocode_lat, metadata._geocode_lon ] : false;
 		this.state = {
 			lat: metadata._geocode_lat,
 			lng: metadata._geocode_lon,
@@ -67,40 +67,40 @@ class JeoGeocodePosts extends React.Component {
 	render() {
 		const position = [this.state.lat, this.state.lng];
 		return (
-			<fragment>
+			<Fragment>
 				<p>{__('Search your location', 'jeo')}</p>
 				<JeoGeoAutoComplete onSelect={this.onLocationFound} />
 				<div id="geocode-map-container">
 					<LeafletMap center={position} zoom={this.state.zoom}>
-					<TileLayer
-					attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-					url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
-					/>
-					{this.state.marker && (
+						<TileLayer
+								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+								url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
+								/>
+						{this.state.marker && (
 
-						<Marker
-							draggable={true}
-							onDragend={this.onMarkerDragged}
-							position={[this.state.marker[0], this.state.marker[1]]}
-							ref={this.markerRef}
-							>
-						</Marker>
+							<Marker
+									draggable={true}
+									onDragend={this.onMarkerDragged}
+									position={[this.state.marker[0], this.state.marker[1]]}
+									ref={this.markerRef}
+									>
+							</Marker>
 
-					)}
+						)}
 
-				</LeafletMap>
+					</LeafletMap>
 
-				<Button isDefault onClick={ this.save() }>
-					{__('Save', 'jeo')}
-				</Button>
+					<Button isDefault onClick={ this.save() }>
+						{__('Save', 'jeo')}
+					</Button>
 
-				<Button onClick={ this.props.onCancel }>
-					{__('Cancel', 'jeo')}
-				</Button>
+					<Button onClick={ this.props.onCancel }>
+						{__('Cancel', 'jeo')}
+					</Button>
 
 				</div>
 
-			</fragment>
+			</Fragment>
 		);
 
 	}
