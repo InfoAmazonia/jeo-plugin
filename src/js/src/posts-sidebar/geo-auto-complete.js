@@ -33,7 +33,6 @@ class JeoGeoAutoComplete extends React.Component {
 
 	getSuggestionValue(suggestion) {
 		return suggestion.display_name;
-
 	};
 
 	onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
@@ -58,7 +57,7 @@ class JeoGeoAutoComplete extends React.Component {
 	};
 
 	shouldRenderSuggestions(value) {
-	return value.trim().length > 2;
+		return value.trim().length > 2;
 	}
 
 	onSuggestionsClearRequested() {
@@ -79,20 +78,19 @@ class JeoGeoAutoComplete extends React.Component {
 		// Finally, render it!
 		return (
 			<div>
-
-			<Autosuggest
-			suggestions={suggestions}
-			onSuggestionsFetchRequested={this.debouncedLoadSuggestions}
-			onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-			getSuggestionValue={this.getSuggestionValue}
-			renderSuggestion={this.renderSuggestion}
-			onSuggestionSelected={this.onSuggestionSelected}
-			shouldRenderSuggestions={this.shouldRenderSuggestions}
-			inputProps={inputProps}
-			/>
-			{ this.state.isLoading &&
-				<Spinner />
-			}
+				<Autosuggest
+						suggestions={suggestions}
+						onSuggestionsFetchRequested={this.debouncedLoadSuggestions}
+						onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+						getSuggestionValue={this.getSuggestionValue}
+						renderSuggestion={this.renderSuggestion}
+						onSuggestionSelected={this.onSuggestionSelected}
+						shouldRenderSuggestions={this.shouldRenderSuggestions}
+						inputProps={inputProps}
+						/>
+				{ this.state.isLoading &&
+					<Spinner />
+				}
 			</div>
 		);
 	}

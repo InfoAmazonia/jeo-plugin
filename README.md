@@ -38,7 +38,7 @@ When we want to build the plugin, we run `build.sh` that basically installs any 
 
 In order to use it, make a copy of `build-config-sample.cfg` and name it only `build-config.cfg`. Edit and fill in your environment details:
 
-* `wp_plugin_dir`: The directory for your plugin build. Should be a directory inside `wp_base_dir`. e.g `~/develop/wordpress/wp-content/plugins/jeo`
+* `wp_plugin_dir`: The directory for your plugin build. Should be a directory inside the plugins folder of a WordPress instance. e.g `~/develop/wordpress/wp-content/plugins/jeo`
 
 Once you are ready, you can run:
 
