@@ -1,3 +1,4 @@
 build-config.cfg
 tests/bootstrap-config.php
 node_modules
+src/js/build

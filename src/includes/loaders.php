@@ -9,7 +9,7 @@ function jeo_autoload($class_name) {
 
 	$filename = 'class-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
 
-	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode'];
+	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings'];
 
 	foreach ($folders as $folder) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $filename;
@@ -47,8 +47,16 @@ function jeo_layers() {
 
 /**
  * Gets the instance of the main Geocode_Handler Class
- * @return \Jeo\Layers Layers instance
+ * @return \Jeo\Geocode_Handler Geocode_Handler instance
  */
 function jeo_geocode_handler() {
 	return \Jeo\Geocode_Handler::get_instance();
+}
+
+/**
+ * Gets the instance of the main Settings Class
+ * @return \Jeo\Settings Settings instance
+ */
+function jeo_settings() {
+	return \Jeo\Settings::get_instance();
 }

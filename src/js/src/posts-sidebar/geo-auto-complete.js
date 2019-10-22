@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Autosuggest from 'react-autosuggest';
 import { Spinner } from "@wordpress/components";
 
