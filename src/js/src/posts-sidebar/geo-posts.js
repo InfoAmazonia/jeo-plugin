@@ -1,5 +1,4 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import { Map as LeafletMap, Marker, Popup, TileLayer } from 'react-leaflet';
 import JeoGeoAutoComplete from './geo-auto-complete';
 import { Button } from "@wordpress/components";
@@ -67,7 +66,7 @@ class JeoGeocodePosts extends React.Component {
 	render() {
 		const position = [this.state.lat, this.state.lng];
 		return (
-			<Fragment>
+			<>
 				<p>{__('Search your location', 'jeo')}</p>
 				<JeoGeoAutoComplete onSelect={this.onLocationFound} />
 				<div id="geocode-map-container">
@@ -100,7 +99,7 @@ class JeoGeocodePosts extends React.Component {
 
 				</div>
 
-			</Fragment>
+			</>
 		);
 
 	}

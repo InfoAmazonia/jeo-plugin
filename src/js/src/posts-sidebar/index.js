@@ -14,7 +14,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 	render() {
 		let isOpen = this.state.isOpen;
 		return (
-			<Fragment>
+			<>
 				<Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>Open Modal</Button>
 				{ isOpen && (
 					<Modal
@@ -26,7 +26,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 							/>
 					</Modal>
 				) }
-			</Fragment>
+			</>
 		);
 	}
 

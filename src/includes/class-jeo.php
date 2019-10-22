@@ -44,6 +44,7 @@ class Jeo {
 		\jeo_maps();
 		\jeo_layers();
 		\jeo_geocode_handler();
+		\jeo_settings();
 
 		add_action('plugins_loaded', [$this, 'load_plugin_textdomain']);
 		add_action('init', [$this, 'register_assets'] );
@@ -64,33 +65,38 @@ class Jeo {
 		);
 
 	}
-	
+
 	public function register_assets() {
 		$asset_file = include( JEO_BASEPATH . '/js/build/postsSidebar.asset.php');
-		
+
 		$deps = array_merge(['lodash'], $asset_file['dependencies']);
-		
+
 		wp_register_script(
 			'jeo-js',
 			JEO_BASEURL . '/js/build/postsSidebar.js',
 			$deps,
 			$asset_file['version']
 		);
-		
+
 		wp_localize_script('jeo-js', 'jeo', [
 			'ajax_url' => admin_url('admin-ajax.php')
 		]);
 
 	}
-	
+
 	public function enqueue_blocks_assets() {
-		wp_enqueue_script( 'jeo-js' );
-		
-		wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css');
-		wp_enqueue_style( 'jeo-ge-posts', JEO_BASEURL . '/js/src/posts-sidebar/geo-posts.css');
-		
-		
-		
+		global $post;
+
+		$post_types = \jeo_settings()->get_option('enabled_post_types');
+
+		if ( in_array($post->post_type, $post_types) ) {
+			wp_enqueue_script( 'jeo-js' );
+			wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css');
+			wp_enqueue_style( 'jeo-ge-posts', JEO_BASEURL . '/js/src/posts-sidebar/geo-posts.css');
+		}
+
+
+
 	}
 
 
