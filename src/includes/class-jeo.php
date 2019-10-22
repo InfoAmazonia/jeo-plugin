@@ -92,7 +92,6 @@ class Jeo {
 		if ( in_array($post->post_type, $post_types) ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css');
-			wp_enqueue_style( 'jeo-ge-posts', JEO_BASEURL . '/js/src/posts-sidebar/geo-posts.css');
 		}
 
 
