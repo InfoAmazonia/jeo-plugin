@@ -5,6 +5,12 @@ spl_autoload_register('jeo_autoload');
 function jeo_autoload($class_name) {
 
 	$class_path = explode('\\', $class_name);
+
+	$subfolder = '';
+	if ( sizeof($class_path) > 2 ) {
+		$subfolder = strtolower( $class_path[ sizeof($class_path) -2 ] ) . DIRECTORY_SEPARATOR;
+	}
+
 	$class_name = end($class_path);
 
 	$filename = 'class-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
@@ -12,7 +18,7 @@ function jeo_autoload($class_name) {
 	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings'];
 
 	foreach ($folders as $folder) {
-		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $filename;
+		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
 		if ( \file_exists($check) ) {
 			require_once($check);
 			break;
