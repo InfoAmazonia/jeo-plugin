@@ -31,7 +31,7 @@ class JeoGeoAutoComplete extends React.Component {
 	};
 
 	getSuggestionValue(suggestion) {
-		return suggestion.display_name;
+		return suggestion.full_address;
 	};
 
 	onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
@@ -40,7 +40,7 @@ class JeoGeoAutoComplete extends React.Component {
 
 	renderSuggestion(suggestion) {
 		return (
-			<span>{suggestion.display_name}</span>
+			<span>{suggestion.full_address}</span>
 		)
 	};
 

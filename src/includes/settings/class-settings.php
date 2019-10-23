@@ -14,7 +14,7 @@ class Settings {
 			'enabled_post_types' => [
 				'post'
 			],
-			'active_geocode' => 'nominatim'
+			'active_geocoder' => 'nominatim'
 		];
 
 	}
