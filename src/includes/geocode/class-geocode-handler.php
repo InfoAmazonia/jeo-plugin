@@ -214,6 +214,9 @@ class Geocode_Handler {
 	}
 
 	public function get_registered_geocoders() {
+		if ( empty($this->registered_geocoders) ) {
+			$this->_register_geocoders();
+		}
 		return $this->registered_geocoders;
 	}
 
@@ -225,7 +228,7 @@ class Geocode_Handler {
 		return null;
 	}
 
-	public function get_geocoder_by_object(\Jeo\Geocoders $geocoder_object) {
+	public function get_geocoder_by_object(\Jeo\Geocoder $geocoder_object) {
 		$class_name = get_class($geocoder_object);
 		// add first bracket
 		$class_name = '\\' . $class_name;

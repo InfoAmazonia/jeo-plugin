@@ -44,6 +44,23 @@ abstract class Geocoder {
 	abstract public function ajax_geocode($search_string);
 	abstract public function ajax_reverse_geocode($lat, $lon);
 
+	public function get_settings() {
+		return false;
+	}
+
+	public function get_default_options() {
+		return [];
+	}
+
+	public function get_option($option_name) {
+		$geocoder = \jeo_geocode_handler()->get_geocoder_by_object($this);
+		return \jeo_settings()->get_geocoder_option($geocoder['slug'], $option_name);
+	}
+
+	public function get_options() {
+		$geocoder = \jeo_geocode_handler()->get_geocoder_by_object($this);
+		return \jeo_settings()->get_geocoder_options($geocoder['slug']);
+	}
 
 
 }
