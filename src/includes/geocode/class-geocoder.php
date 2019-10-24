@@ -42,6 +42,7 @@ abstract class Geocoder {
 	 * @return array $matches
 	 */
 	abstract public function ajax_geocode($search_string);
+	abstract public function ajax_reverse_geocode($lat, $lon);
 
 
 

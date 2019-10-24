@@ -9,7 +9,6 @@ class JeoGeocodePosts extends React.Component {
 	constructor() {
 		super();
 		const metadata = wp.data.select('core/editor').getCurrentPost().meta;
-console.log(metadata);
 		const lat = this.getProperty(metadata,'_geocode_lat') ? this.getProperty(metadata,'_geocode_lat') : 0;
 		const lon = this.getProperty(metadata,'_geocode_lon') ? this.getProperty(metadata,'_geocode_lon') : 0;
 
@@ -75,6 +74,26 @@ console.log(metadata);
 				lon: latLng.lng
 			}
 		});
+		fetch(jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + latLng.lat + '&lon=' + latLng.lng)
+			.then( response => {
+				return response.json();
+			} )
+			.then( result => {
+				//console.log(result);
+				this.setState({
+					currentLocation: {
+						...this.state.currentLocation,
+						full_address: this.getProperty(result, 'full_address'),
+						country: this.getProperty(result, 'country'),
+						country_code: this.getProperty(result, 'country_code'),
+						region_level_1: this.getProperty(result, 'region_level_1'),
+						region_level_2: this.getProperty(result, 'region_level_2'),
+						region_level_3: this.getProperty(result, 'region_level_3'),
+						city: this.getProperty(result, 'city'),
+						city_level_1: this.getProperty(result, 'city_level_1'),
+					}
+				});
+			} );
 
 	}
 
@@ -92,7 +111,7 @@ console.log(metadata);
 			_geocode_city: this.getProperty(this.state.currentLocation, 'city'),
 			_geocode_city_level_1: this.getProperty(this.state.currentLocation, 'city_level_1'),
 		}});
-		console.log(this.getProperty(this.state.currentLocation, 'country'));
+		//console.log(this.getProperty(this.state.currentLocation, 'country'));
 		//this.props.onSaveLocation();
 	}
 

@@ -8,6 +8,7 @@ class Geocode_Handler {
 
 	protected function init() {
 		add_action( 'wp_ajax_jeo_geocode', [$this, 'ajax_geocode'] );
+		add_action( 'wp_ajax_jeo_reverse_geocode', [$this, 'ajax_reverse_geocode'] );
 		add_action( 'init', [$this, 'register_metadata'], 99 );
 	}
 
@@ -18,7 +19,21 @@ class Geocode_Handler {
 		$geocoder = $this->get_active_geocoder();
 
 		if ($geocoder) {
-			echo json_encode($geocoder->ajax_geocode($_GET['search']));
+			echo json_encode( $geocoder->ajax_geocode( $_GET['search'] ) );
+		} else {
+			echo json_encode([]);
+		}
+
+		die;
+
+	}
+
+	public function ajax_reverse_geocode() {
+
+		$geocoder = $this->get_active_geocoder();
+
+		if ($geocoder) {
+			echo json_encode( $geocoder->ajax_reverse_geocode( $_GET['lat'], $_GET['lon'] ) );
 		} else {
 			echo json_encode([]);
 		}
