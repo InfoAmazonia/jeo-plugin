@@ -64,6 +64,9 @@
 								<?php echo $settings['description']; ?>
 								</p>
 							<?php endforeach; ?>
+
+							<?php $geoObject->settings_footer($this); ?>
+
 						</td>
 					</tr>
 

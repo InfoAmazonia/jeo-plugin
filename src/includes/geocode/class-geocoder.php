@@ -41,8 +41,8 @@ abstract class Geocoder {
 	 * @param string $search_string
 	 * @return array $matches
 	 */
-	abstract public function ajax_geocode($search_string);
-	abstract public function ajax_reverse_geocode($lat, $lon);
+	abstract public function geocode($search_string);
+	abstract public function reverse_geocode($lat, $lon);
 
 	public function get_settings() {
 		return false;
@@ -50,6 +50,10 @@ abstract class Geocoder {
 
 	public function get_default_options() {
 		return [];
+	}
+
+	public function settings_footer($settings) {
+		return;
 	}
 
 	public function get_option($option_name) {

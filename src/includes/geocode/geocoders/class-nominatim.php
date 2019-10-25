@@ -4,7 +4,7 @@ namespace Jeo\Geocoders;
 
 class Nominatim extends \Jeo\Geocoder {
 
-	public function ajax_geocode($search_string) {
+	public function geocode($search_string) {
 
 		$params = [
 			'q' => $search_string,
@@ -32,7 +32,7 @@ class Nominatim extends \Jeo\Geocoder {
 
 	}
 
-	public function ajax_reverse_geocode($lat, $lon) {
+	public function reverse_geocode($lat, $lon) {
 
 		$params = [
 			'lat' => $lat,
