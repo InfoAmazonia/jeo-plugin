@@ -68,7 +68,7 @@ class Settings {
 	}
 
 	public function add_menu_item() {
-		add_menu_page(
+		$page_suffix = add_menu_page(
 			__('Jeo Settings', 'jeo'),
 			'Jeo',
 			'manage_options',
@@ -77,6 +77,22 @@ class Settings {
 			// $icon_url:string,
 			// $position:integer|null
 		);
+		add_action( 'load-' . $page_suffix, array( &$this, 'load_admin_page' ) );
+
+
+	}
+
+	public function load_admin_page() {
+		add_action( 'admin_enqueue_scripts', array( &$this, 'add_admin_assets' ), 90 );
+	}
+
+	public function add_admin_assets() {
+		wp_enqueue_script('jeo-mapboxgl', JEO_BASEURL . '/js/build/mapbox.js', ['jquery']);
+		wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css');
+
+		wp_localize_script('jeo-mapboxgl', "jeo_settings", [
+			'mapbox_key' => $this->get_option('mapbox_key')
+		]);
 	}
 
 	public function admin_page() {
