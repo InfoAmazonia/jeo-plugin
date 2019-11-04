@@ -68,7 +68,7 @@ class Settings {
 	}
 
 	public function add_menu_item() {
-		add_menu_page(
+		$page_suffix = add_menu_page(
 			__('Jeo Settings', 'jeo'),
 			'Jeo',
 			'manage_options',
@@ -77,10 +77,26 @@ class Settings {
 			// $icon_url:string,
 			// $position:integer|null
 		);
+
+		add_action( 'load-' . $page_suffix, array( &$this, 'load_admin_page' ) );
 	}
 
 	public function admin_page() {
 		include 'settings-page.php';
+	}
+
+	public function load_admin_page() {
+		add_action( 'admin_enqueue_scripts', array( &$this, 'add_admin_assets' ), 90 );
+	}
+	public function add_admin_assets() {
+		wp_enqueue_script('cartojs', 'http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js');
+		wp_enqueue_script('mapboxvector', 'http://spatialserver.github.io/Leaflet.MapboxVectorTile/dist/Leaflet.MapboxVectorTile.js', ['cartojs']);
+		wp_enqueue_script('jeo-cartojs', JEO_BASEURL . '/includes/settings/jeo_cartojs.js', ['jquery', 'cartojs']);
+		wp_enqueue_style( 'cartojs', 'http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css', time());
+		wp_localize_script('jeo-cartojs', "jeo_settings", [
+			'mapbox_key' => $this->get_option('mapbox_key'),
+			'carto_key' => $this->get_option('carto_key')
+		]);
 	}
 
 
