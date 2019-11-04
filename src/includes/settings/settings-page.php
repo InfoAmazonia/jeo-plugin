@@ -15,6 +15,7 @@
 
 
 			<div id="test-mapbox" style="width: 500px; height: 500px;"></div>
+			<button id="test">teste</button>
 
 			<table class="form-table">
 			<tbody>
@@ -25,6 +26,13 @@
 					<input name="<?php echo $this->get_field_name('mapbox_key'); ?>" type="text" id="mapbox_key" value="<?php echo htmlspecialchars( $this->get_option('mapbox_key') ); ?>" class="regular-text">
 					</td>
 				</tr>
+				<tr>
+					<th scope="row"><label for="carto_key"><?php _e('Carto API Key', 'jeo'); ?></label></th>
+					<td>
+					<input name="<?php echo $this->get_field_name('carto_key'); ?>" type="text" id="carto_key" value="<?php echo htmlspecialchars( $this->get_option('carto_key') ); ?>" class="regular-text">
+					</td>
+				</tr>
+
 
 
 			</tbody>

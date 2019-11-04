@@ -88,7 +88,7 @@ class Settings {
 
 	public function add_admin_assets() {
 		wp_enqueue_script('jeo-mapboxgl', JEO_BASEURL . '/js/build/mapbox.js', ['jquery']);
-		wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css');
+		wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time());
 
 		wp_localize_script('jeo-mapboxgl', "jeo_settings", [
 			'mapbox_key' => $this->get_option('mapbox_key')

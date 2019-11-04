@@ -31,8 +31,10 @@
     "react-leaflet": "^2.4.0"
   },
   "devDependencies": {
+    "@carto/carto-vl": "^1.4.2",
     "@wordpress/scripts": "^5.1.0",
     "css-loader": "^3.2.0",
+    "mapbox-gl": "^1.5.0",
     "style-loader": "^1.0.0"
   }
 }
