@@ -30,7 +30,7 @@ Note that you can NOT clone it directly in the WordPress `plugins` directory. Cl
 git clone git@github.com:EarthJournalismNetwork/jeo-plugin.git
 ```
 
-Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have.
+* Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have. (Note: This plugin requires WordPress 5.3)
 
 ### Build
 
@@ -47,6 +47,8 @@ Once you are ready, you can run:
 ```
 
 While developing, you might want to run `build-watch.sh`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
+
+**Note:** We still have to work on the build script, for now, it's necessary to manuall run `npm install` once and `npm start` to build the js bundle and listen for changes or `npm run build` to build the bundle for production.
 
 ### Tests
 

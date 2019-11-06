@@ -2,7 +2,7 @@
 Contributors: leogermani
 Donate link: leo.com
 Tags: maps, journalism
-Requires at least: 5.0
+Requires at least: 5.3
 Tested up to: 5.3
 Stable tag: 1.0
 License: GPLv3 or later
