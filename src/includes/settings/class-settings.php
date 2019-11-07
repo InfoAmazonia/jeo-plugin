@@ -91,7 +91,8 @@ class Settings {
 		wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time());
 
 		wp_localize_script('jeo-mapboxgl', "jeo_settings", [
-			'mapbox_key' => $this->get_option('mapbox_key')
+			'mapbox_key' => $this->get_option('mapbox_key'),
+			'carto_key' => $this->get_option('carto_key')
 		]);
 	}
 
