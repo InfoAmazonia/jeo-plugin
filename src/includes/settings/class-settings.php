@@ -91,6 +91,7 @@ class Settings {
 	public function add_admin_assets() {
 		wp_enqueue_script('cartojs', 'http://libs.cartocdn.com/cartodb.js/v3/3.15/cartodb.js');
 		wp_enqueue_script('mapboxvector', 'http://spatialserver.github.io/Leaflet.MapboxVectorTile/dist/Leaflet.MapboxVectorTile.js', ['cartojs']);
+		//wp_enqueue_script('mapboxvector', 'https://unpkg.com/leaflet.vectorgrid@latest/dist/Leaflet.VectorGrid.bundled.js', ['cartojs']);
 		wp_enqueue_script('jeo-cartojs', JEO_BASEURL . '/includes/settings/jeo_cartojs.js', ['jquery', 'cartojs']);
 		wp_enqueue_style( 'cartojs', 'http://libs.cartocdn.com/cartodb.js/v3/3.15/themes/css/cartodb.css', time());
 		wp_localize_script('jeo-cartojs', "jeo_settings", [

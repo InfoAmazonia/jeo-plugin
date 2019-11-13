@@ -12,7 +12,8 @@
 //
 		L.tileLayer('http://tile.stamen.com/toner/{z}/{x}/{y}.png', {
 			attribution: 'Stamen'
-		}).addTo(map);
+		})
+		//.addTo(map);
 
 		//L.tileLayer('https://api.mapbox.com/styles/v1/infoamazonia/cjvwvumyx5i851coa874sx97e/tiles/256/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiaW5mb2FtYXpvbmlhIiwiYSI6InItajRmMGsifQ.JnRnLDiUXSEpgn7bPDzp7g', {
 		//	attribution: 'Stamen'
@@ -20,22 +21,16 @@
 //
 //
 
-		var mvtSource = new L.TileLayer.MVTSource({
-			url: "http://spatialserver.spatialdev.com/services/vector-tiles/GAUL_FSP/{z}/{x}/{y}.pbf",
-			//url: "https://api.mapbox.com/v4/infoamazonia/cjvwvumyx5i851coa874sx97e/{z}/{x}/{y}.vector.pbf?access_token=pk.eyJ1IjoiaW5mb2FtYXpvbmlhIiwiYSI6InItajRmMGsifQ.JnRnLDiUXSEpgn7bPDzp7g",
-			//url: "https://api.mapbox.com/styles/v1/infoamazonia/cjvwvumyx5i851coa874sx97e/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaW5mb2FtYXpvbmlhIiwiYSI6InItajRmMGsifQ.JnRnLDiUXSEpgn7bPDzp7g",
-			debug: false,
-			clickableLayers: ["GAUL0"],
-			getIDForLayerFeature: function(feature) {
-				return feature.properties.id;
-			}
-
-		});
-
-		map.addLayer(mvtSource);
 
 
-		cartodb.createLayer(map, 'https://infoamazonia.carto.com/api/v2/viz/1bf76e3d-e39b-4851-a26b-27883b0ca073/viz.json')
+
+		// Leaflet.MapboxVectorTile.js
+		//L.vectorGrid.protobuf("https://{s}.tiles.mapbox.com/v4/infoamazonia.2h6eni3h/{z}/{x}/{y}.vector.pbf?access_token={token}", {
+		//	token: jeo_settings.mapbox_key
+		//}).addTo(map);
+
+
+		cartodb.createLayer(map, 'https://infoamazonia.carto.com/api/v2/viz/335cfed8-b11d-4f3a-a29b-e7c290c49973/viz.json')
 			.addTo(map)
 			.on('done', function(layer) {
 				//do stuff
@@ -47,7 +42,18 @@
         // this does not work
 		//const viz = new carto.Viz('https://infoamazonia.carto.com/api/v2/viz/66b3adc0-0acf-45cc-9c0f-de6f39e05795/viz.json');
 
-
+		var mvtSource = new L.TileLayer.MVTSource({
+			url: 'https://api.mapbox.com/v4/infoamazonia.0r9dwapm/{z}/{x}/{y}.vector.pbf?access_token=' + jeo_settings.mapbox_key,
+			//url: "http://spatialserver.spatialdev.com/services/vector-tiles/GAUL_FSP/{z}/{x}/{y}.pbf",
+			//url: "https://api.mapbox.com/v4/infoamazonia.cjvwvumyx5i851coa874sx97e/{z}/{x}/{y}.vector.pbf?access_token=pk.eyJ1IjoiaW5mb2FtYXpvbmlhIiwiYSI6InItajRmMGsifQ.JnRnLDiUXSEpgn7bPDzp7g",
+			//url: "https://api.mapbox.com/styles/v1/infoamazonia/cjvwvumyx5i851coa874sx97e/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoiaW5mb2FtYXpvbmlhIiwiYSI6InItajRmMGsifQ.JnRnLDiUXSEpgn7bPDzp7g",
+			debug: false,
+			clickableLayers: ["GAUL0"],
+			getIDForLayerFeature: function(feature) {
+				return feature.properties.id;
+			}
+		});
+		map.addLayer(mvtSource);
 
 
 		// Vis
