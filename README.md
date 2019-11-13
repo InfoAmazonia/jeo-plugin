@@ -2,6 +2,42 @@
 
 Description... 
 
+## Setting up local environment with Lando
+
+[Lando][lando] is a docker-based development tool to set up containerized development environments.
+TLDR: Let's just focus on actual programming :) 
+
+First, make sure `lando` [is installed][lando-install]. Also, ensure docker is running.
+Then in your preferred terminal (Windows users must use powershell) run:
+
+		lando start
+
+It will spin up a few containers with all the tools you need:
+
+- appserver: runs Wordpress with php/apache
+- database: runs Mysql 5.7 for Wordpress default database
+- node: runs Node 10 to build Gutenberg blocks
+- testdb: runs a secondary database for JEO phpunit tests
+
+Now you need to perform Wordpress famous 5-minute install (but in seconds):
+
+		lando wp-configure --path=wordpress # creates wp-config.php
+		lando wp-install --path=wordpress # actual installation (KNOWN ISSUE: DO NOT put spaces in Wordpress title).
+
+Finally, if you're going to touch the PHP side of the plugin, set up Wordpress test environment with one line:
+
+		lando wp-test-setup
+
+You can run PHPUnit tests with `lando phpunit`.
+Tooling includes `lando npm`, `lando composer` and `lando wp`.
+Use them as if they were running in your host (but it actually runs inside the containers).
+
+And when you're done with development, spin down your development environment with: 
+
+		lando stop
+
+Just `lando start` the next day to start working on it again.
+
 ## Setting up local environment 
 
 ### Before you start
@@ -94,4 +130,8 @@ Simply type this command from the project root folder:
 phpunit
 ```
 
-(Note that `phpunit` accpets several parametrs, for example if you want to run just a specific group of tests).
+(Note that `phpunit` accepts several parameters, for example if you want to run just a specific group of tests).
+
+[lando]: https://lando.dev
+[lando-install]: https://docs.lando.dev/basics/installation.html
+
