@@ -1,0 +1,13 @@
+name: jeo-plugin
+recipe: wordpress
+config:
+  webroot: wordpress
+services:
+  node:
+    type: node
+    build:
+      - npm install
+  appserver:
+    overrides:
+      volumes:
+        - build:/app/wordpress/wp-content/plugins/jeo-plugin
