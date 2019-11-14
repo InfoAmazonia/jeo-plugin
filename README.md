@@ -19,17 +19,10 @@ It will spin up a few containers with all the tools you need:
 - node: runs Node 10 to build Gutenberg blocks
 - testdb: runs a secondary database for JEO phpunit tests
 
-Now you need to perform Wordpress famous 5-minute install (but in seconds):
+Visit https://jeo-plugin.lndo.site to see the live site.
+Login with username `admin` and password `admin`.
 
-		lando wp-configure --path=wordpress # creates wp-config.php
-		lando wp-install --path=wordpress # actual installation (KNOWN ISSUE: DO NOT put spaces in Wordpress title).
-
-Finally, if you're going to touch the PHP side of the plugin, set up Wordpress test environment with one line:
-
-		lando wp-test-setup
-
-You can run PHPUnit tests with `lando phpunit`.
-Tooling includes `lando npm`, `lando composer` and `lando wp`.
+Tooling includes `lando npm`, `lando composer`, `lando wp` and `lando phpunit`.
 Use them as if they were running in your host (but it actually runs inside the containers).
 
 And when you're done with development, spin down your development environment with: 
