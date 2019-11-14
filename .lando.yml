@@ -26,7 +26,7 @@ services:
       - ./utils/wp-install.lando.sh
     overrides:
       volumes:
-        - build:/app/wordpress/wp-content/plugins/jeo-plugin
+        - src:/app/wordpress/wp-content/plugins/jeo-plugin
 tooling:
   npm:
     service: node
@@ -36,3 +36,13 @@ tooling:
     service: appserver
     description: Runs phpunit tests
     cmd: ./vendor/bin/phpunit
+  build:
+    description: Builds the plugin
+    service: node
+    cmd:
+      - npm run build
+  watch:
+    description: Builds the plugin
+    service: node
+    cmd:
+      - npm run start
