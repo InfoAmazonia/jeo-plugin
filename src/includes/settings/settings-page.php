@@ -13,9 +13,17 @@
 
 		<div id="tab-general" class="tabs-content">
 
-			<p>
-				Coming soon...
-			</p>
+			<table class="form-table">
+				<tbody>
+
+					<tr>
+						<th scope="row"><label for="mapbox_key"><?php _e('Mapbox API Key', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo $this->get_field_name('mapbox_key'); ?>" type="text" id="mapbox_key" value="<?php echo htmlspecialchars( $this->get_option('mapbox_key') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+			</tbody>
 
 		</div>
 
