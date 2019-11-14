@@ -16,8 +16,14 @@ services:
   appserver:
     build:
       - composer install
+      - wp core download --path=wordpress
+      - wp config create --dbname=wordpress --dbuser=wordpress --dbpass=wordpress --dbhost=database --skip-check --path=wordpress
+      - ./tests/bin/install-wp-tests.sh wptest wptest wptest test-environment testdb latest true
+      - ./utils/wp-test-setup.lando.sh
     build_as_root:
       - apt-get update -y && apt-get install -y subversion
+    run:
+      - ./utils/wp-install.lando.sh
     overrides:
       volumes:
         - build:/app/wordpress/wp-content/plugins/jeo-plugin
@@ -30,54 +36,3 @@ tooling:
     service: appserver
     description: Runs phpunit tests
     cmd: ./vendor/bin/phpunit
-  wp-configure:
-    service: appserver
-    description: Creates wp-config.php with default values (run it before installing for the first time).
-    cmd: wp config create
-    options:
-      dbname:
-        describe: The database name
-        passthrough: true
-        default: wordpress
-      dbuser:
-        describe: The database username
-        passthrough: true
-        default: wordpress
-      dbpass:
-        describe: The database password
-        passthrough: true
-        default: wordpress
-      dbhost:
-        describe: The database host
-        passthrough: true
-        default: database
-  wp-install:
-    service: appserver
-    description: Runs 5-minute install in seconds (sets user/pass to admin/admin)
-    cmd: ./utils/wp-install.lando.sh
-    level: app
-    options:
-      admin_user:
-        describe: The default admin user
-        passthrough: true
-        default: admin
-      admin_password:
-        describe: The default admin password
-        passthrough: true
-        default: admin
-      admin_email:
-        describe: The default admin email
-        passthrough: true
-        default: admin@lndo.site
-      title:
-        describe: The Wordpress site title
-        passthrough: true
-        interactive:
-          type: input
-          message: What is the Wordpress site title going to be?
-  wp-test-setup:
-    service: appserver
-    description: Sets up wordpress testing library
-    cmd:
-      - ./tests/bin/install-wp-tests.sh wptest wptest wptest test-environment testdb latest true
-      - ./utils/wp-test-setup.lando.sh
