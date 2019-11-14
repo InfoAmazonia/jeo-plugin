@@ -19,8 +19,15 @@ It will spin up a few containers with all the tools you need:
 - node: runs Node 10 to build Gutenberg blocks
 - testdb: runs a secondary database for JEO phpunit tests
 
+Make sure to build the plugin with a simple command:
+
+		lando build
+
+Alternatively, you can build automatically in development mode with `lando watch`.
+
 Visit https://jeo-plugin.lndo.site to see the live site.
 Login with username `admin` and password `admin`.
+Enable the JEO plugin.
 
 Tooling includes `lando npm`, `lando composer`, `lando wp` and `lando phpunit`.
 Use them as if they were running in your host (but it actually runs inside the containers).
@@ -41,43 +48,39 @@ You wil also need:
 
 * `WP-Cli` to configure the test environment
 * `Phpunit` to run unit tests
+* `node` to compile js and css files
 
 ```
 sudo apt-get install phpunit
 ```
 
 * To install WP-Cli, check [the official documentation](https://wp-cli.org/#installing).
+* To install node, **@TODO**.
 
 
 ### Setting up
 
 First of all, clone this repository.
-
-Note that you can NOT clone it directly in the WordPress `plugins` directory. Clone it in a folder of its own and configure your build to point to  your local WordPress `plugins` folder.
+Note that you can NOT clone it directly in the WordPress `plugins` directory. 
 
 ```
 git clone git@github.com:EarthJournalismNetwork/jeo-plugin.git
 ```
 
-* Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have. (Note: This plugin requires WordPress 5.3)
+Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have. 
+(Note: This plugin requires WordPress 5.3+)
+
+Then create a symbolic link inside of `wp-content/plugins/jeo` pointing to the `src` folder in this repository.
+
+```
+ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
+```
+
 
 ### Build
 
-When we want to build the plugin, we run `build.sh` that basically installs any dependencies, compiles all the assets (sass and js) and moves the files to the plugin directory. This compiled version of the plugin is the one that will be added to the official WordPress Plugin repository.
-
-In order to use it, make a copy of `build-config-sample.cfg` and name it only `build-config.cfg`. Edit and fill in your environment details:
-
-* `wp_plugin_dir`: The directory for your plugin build. Should be a directory inside the plugins folder of a WordPress instance. e.g `~/develop/wordpress/wp-content/plugins/jeo`
-
-Once you are ready, you can run:
-
-```
-./build.sh
-```
-
-While developing, you might want to run `build-watch.sh`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
-
-**Note:** We still have to work on the build script, for now, it's necessary to manuall run `npm install` once and `npm start` to build the js bundle and listen for changes or `npm run build` to build the bundle for production.
+When we want to build the plugin, we run `npm run build` to compile all the assets (css and js) to `src/js/build`.
+While developing, you might want to run `npm run watch`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
 
 ### Tests
 
