@@ -47,14 +47,14 @@ Jeo is a WordPress plugin, so you will need all the basic dependencies you usual
 You wil also need:
 
 * `WP-Cli` to configure the test environment
-* `Phpunit` to run unit tests
+* `composer` to install the proper phpunit version
+* `phpunit` to run tests
 * `node` to compile js and css files
 
-```
-sudo apt-get install phpunit
-```
 
 * To install WP-Cli, check [the official documentation](https://wp-cli.org/#installing).
+* To install Composer, check [the official instructions](https://getcomposer.org/download/)
+* To install PHPunit, run `composer install` in the repository folder.
 * To install node, **@TODO**.
 
 
@@ -81,6 +81,10 @@ ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
 
 When we want to build the plugin, we run `npm run build` to compile all the assets (css and js) to `src/js/build`.
 While developing, you might want to run `npm run watch`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
+If you're not using lando, you will have to copy the src folder to the plugins folder, like:
+
+		rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
+
 
 ### Tests
 
@@ -123,7 +127,7 @@ You only need to do all this once, and now you are ready to run tests.
 Simply type this command from the project root folder:
 
 ```
-phpunit
+./vendor/bin/phpunit
 ```
 
 (Note that `phpunit` accepts several parameters, for example if you want to run just a specific group of tests).
