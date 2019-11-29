@@ -2,6 +2,42 @@
 
 Description... 
 
+## Setting up local environment with Lando
+
+[Lando][lando] is a docker-based development tool to set up containerized development environments.
+TLDR: Let's just focus on actual programming :) 
+
+First, make sure `lando` [is installed][lando-install]. Also, ensure docker is running.
+Then in your preferred terminal (Windows users must use powershell) run:
+
+		lando start
+
+It will spin up a few containers with all the tools you need:
+
+- appserver: runs Wordpress with php/apache
+- database: runs Mysql 5.7 for Wordpress default database
+- node: runs Node 10 to build Gutenberg blocks
+- testdb: runs a secondary database for JEO phpunit tests
+
+Make sure to build the plugin with a simple command:
+
+		lando build
+
+Alternatively, you can build automatically in development mode with `lando watch`.
+
+Visit https://jeo-plugin.lndo.site to see the live site.
+Login with username `admin` and password `admin`.
+Enable the JEO plugin.
+
+Tooling includes `lando npm`, `lando composer`, `lando wp` and `lando phpunit`.
+Use them as if they were running in your host (but it actually runs inside the containers).
+
+And when you're done with development, spin down your development environment with: 
+
+		lando stop
+
+Just `lando start` the next day to start working on it again.
+
 ## Setting up local environment 
 
 ### Before you start
@@ -11,44 +47,44 @@ Jeo is a WordPress plugin, so you will need all the basic dependencies you usual
 You wil also need:
 
 * `WP-Cli` to configure the test environment
-* `Phpunit` to run unit tests
+* `composer` to install the proper phpunit version
+* `phpunit` to run tests
+* `node` to compile js and css files
 
-```
-sudo apt-get install phpunit
-```
 
 * To install WP-Cli, check [the official documentation](https://wp-cli.org/#installing).
+* To install Composer, check [the official instructions](https://getcomposer.org/download/)
+* To install PHPunit, run `composer install` in the repository folder.
+* To install node, **@TODO**.
 
 
 ### Setting up
 
 First of all, clone this repository.
-
-Note that you can NOT clone it directly in the WordPress `plugins` directory. Clone it in a folder of its own and configure your build to point to  your local WordPress `plugins` folder.
+Note that you can NOT clone it directly in the WordPress `plugins` directory. 
 
 ```
 git clone git@github.com:EarthJournalismNetwork/jeo-plugin.git
 ```
 
-* Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have. (Note: This plugin requires WordPress 5.3)
+Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have. 
+(Note: This plugin requires WordPress 5.3+)
+
+Then create a symbolic link inside of `wp-content/plugins/jeo` pointing to the `src` folder in this repository.
+
+```
+ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
+```
+
 
 ### Build
 
-When we want to build the plugin, we run `build.sh` that basically installs any dependencies, compiles all the assets (sass and js) and moves the files to the plugin directory. This compiled version of the plugin is the one that will be added to the official WordPress Plugin repository.
+When we want to build the plugin, we run `npm run build` to compile all the assets (css and js) to `src/js/build`.
+While developing, you might want to run `npm run watch`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
+If you're not using lando, you will have to copy the src folder to the plugins folder, like:
 
-In order to use it, make a copy of `build-config-sample.cfg` and name it only `build-config.cfg`. Edit and fill in your environment details:
+		rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
 
-* `wp_plugin_dir`: The directory for your plugin build. Should be a directory inside the plugins folder of a WordPress instance. e.g `~/develop/wordpress/wp-content/plugins/jeo`
-
-Once you are ready, you can run:
-
-```
-./build.sh
-```
-
-While developing, you might want to run `build-watch.sh`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
-
-**Note:** We still have to work on the build script, for now, it's necessary to manuall run `npm install` once and `npm start` to build the js bundle and listen for changes or `npm run build` to build the bundle for production.
 
 ### Tests
 
@@ -91,7 +127,11 @@ You only need to do all this once, and now you are ready to run tests.
 Simply type this command from the project root folder:
 
 ```
-phpunit
+./vendor/bin/phpunit
 ```
 
-(Note that `phpunit` accpets several parametrs, for example if you want to run just a specific group of tests).
+(Note that `phpunit` accepts several parameters, for example if you want to run just a specific group of tests).
+
+[lando]: https://lando.dev
+[lando-install]: https://docs.lando.dev/basics/installation.html
+

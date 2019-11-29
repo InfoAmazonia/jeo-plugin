@@ -46,7 +46,6 @@ class JeoGeocodePosts extends React.Component {
 	}
 
 	onLocationFound(location) {
-		console.log(location);
 		this.setState({
 			currentLocation: {
 				lat: this.getProperty(location,'lat'),
@@ -79,7 +78,6 @@ class JeoGeocodePosts extends React.Component {
 				return response.json();
 			} )
 			.then( result => {
-				//console.log(result);
 				this.setState({
 					currentLocation: {
 						...this.state.currentLocation,
@@ -110,9 +108,8 @@ class JeoGeocodePosts extends React.Component {
 			_geocode_region_level_3: this.getProperty(this.state.currentLocation, 'region_level_3'),
 			_geocode_city: this.getProperty(this.state.currentLocation, 'city'),
 			_geocode_city_level_1: this.getProperty(this.state.currentLocation, 'city_level_1'),
-		}});
-		//console.log(this.getProperty(this.state.currentLocation, 'country'));
-		//this.props.onSaveLocation();
+		}}).then(() => this.props.onSaveLocation());
+
 	}
 
 	render() {
@@ -141,7 +138,7 @@ class JeoGeocodePosts extends React.Component {
 
 					</LeafletMap>
 
-					<Button isDefault onClick={ this.save() }>
+					<Button isDefault onClick={ () => this.save() }>
 						{__('Save', 'jeo')}
 					</Button>
 
