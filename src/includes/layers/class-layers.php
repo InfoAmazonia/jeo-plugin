@@ -5,6 +5,8 @@ namespace Jeo;
 class Layers {
 
 	use Singleton;
+	use Rest_Validate_Meta;
+	public $post_type = 'map-layer';
 
 	protected function init() {
 		add_action( 'init', [$this, 'register_post_type'] );
@@ -40,8 +42,34 @@ class Layers {
 			'capability_type' => 'page'
 		);
 
-		register_post_type('map-layer', $args);
+		register_post_type($this->post_type, $args);
 
+		register_post_meta($this->post_type, 'type', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'sanitize_callback' => [$this, 'sanitize_meta_type'],
+			'type' => 'string',
+			'description' => __('The layer type', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'url', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'sanitize_callback' => [$this, 'sanitize_url'],
+			'type' => 'string',
+			'description' => __('The layer url', 'jeo')
+		]);
+	}
+
+	public function sanitize_meta_type($meta_value, $meta_key, $object_type, $object_subtype) {
+		// @TODO: use a layer type registry
+		return in_array($meta_value, ['mapbox']);
+	}
+
+	public function sanitize_meta_url($meta_value, $meta_key, $object_type, $object_subtype) {
+		return filter_var($meta_value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED);
 	}
 
 }
