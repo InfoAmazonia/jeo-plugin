@@ -7,7 +7,7 @@ Description...
 [Lando][lando] is a docker-based development tool to set up containerized development environments.
 TLDR: Let's just focus on actual programming :) 
 
-First, make sure `lando` [is installed][lando-install]. Also, ensure docker is running.
+First, make sure `lando` [is installed](https://docs.lando.dev/basics/installation.html). Also, ensure docker is running.
 Then in your preferred terminal (Windows users must use powershell) run:
 
 		lando start
