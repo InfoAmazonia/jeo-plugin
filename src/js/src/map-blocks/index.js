@@ -6,11 +6,22 @@ import MapDisplay from './map-display';
 registerBlockType( 'jeo/map', {
 	title: __( 'Map' ),
 	description: __( 'Display maps with layers and data' ),
-	category: 'common',
-	edit() {
-		return <MapEditor />;
+	category: 'common', // @TODO: add jeo maps category
+	attributes: {
+		layers: {
+			type: 'array',
+			default: [],
+		},
+		centerLat: {
+			type: 'number',
+		},
+		centerLon: {
+			type: 'number',
+		},
+		initialZoom: {
+			type: 'number',
+		},
 	},
-	save() {
-		return <MapDisplay />;
-	},
+	edit: ( props ) => <MapEditor { ...props } />,
+	save: ( props ) => <MapDisplay { ...props } />,
 } );
