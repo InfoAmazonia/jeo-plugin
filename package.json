@@ -33,6 +33,7 @@
   "devDependencies": {
     "@wordpress/scripts": "^6.0.0",
     "css-loader": "^3.2.0",
-    "style-loader": "^1.0.0"
+    "style-loader": "^1.0.0",
+    "mapbox-gl": "^1.5.0"
   }
 }
