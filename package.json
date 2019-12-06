@@ -28,7 +28,8 @@
     "@wordpress/plugins": "^2.7.2",
     "leaflet": "^1.5.1",
     "react-autosuggest": "^9.4.3",
-    "react-leaflet": "^2.4.0"
+    "react-leaflet": "^2.4.0",
+    "reactabular-table": "^8.14.0"
   },
   "devDependencies": {
     "@wordpress/scripts": "^6.0.0",
