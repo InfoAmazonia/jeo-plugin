@@ -102,6 +102,7 @@ class Jeo {
 		if ( is_singular() ) {
 			wp_enqueue_script('jeo-mapboxgl', JEO_BASEURL . '/js/build/mapbox.js', ['jquery']);
 			wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time());
+			wp_enqueue_style( 'jeo-mapboxgl',  JEO_BASEURL . '/css/mapbox.css', time());
 			wp_localize_script('jeo-mapboxgl', "jeo_settings", [
 				'mapbox_key' => \jeo_settings()->get_option('mapbox_key'),
 			]);
