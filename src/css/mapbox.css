@@ -1,0 +1,37 @@
+
+.jeomap nav {
+	background: #fff;
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 1;
+	border: 1px solid rgba(0,0,0,0.4);
+}
+
+.jeomap nav a {
+	color: #404040;
+	display: block;
+	margin: 0;
+	padding: 2px 10px;
+	text-decoration: none;
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+	text-align: center;
+}
+
+.jeomap nav a.active {
+	font-weight: bold;
+}
+
+.jeomap nav a:hover {
+	background-color: #f8f8f8;
+	color: #404040;
+}
+
+.jeomap nav a.active {
+	background-color: #3887be;
+	color: #ffffff;
+}
+
+.jeomap nav a.active:hover {
+	background: #3074a4;
+}
