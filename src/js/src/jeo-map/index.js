@@ -1,5 +1,5 @@
 //import { __ } from "@wordpress/i18n";
-
+import JeoLayer from '../../../includes/layer-types/JeoLayer'
 /**
  * to test this, add the following div in the singular.php template of the twentytwenty theme
  * <div class="jeomap" data_center_lat="0" data_center_lon="0" data_initial_zoom="1" data_layers="[2,3,4]" style="width:600px; height: 600px;"></div>
@@ -10,7 +10,7 @@
 var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
 mapboxgl.accessToken = jeo_settings.mapbox_key;
 
-class JeoMapbox {
+class JeoMap {
 
 	constructor(element) {
 
@@ -61,10 +61,35 @@ class JeoMapbox {
 
 			// TODO: get layers using API...
 			const layers = [
-				new MapboxLayer('layer-1', 'Layer 1', 'infoamazonia/cjvwvumyx5i851coa874sx97e'),
-				new TileLayer('layer-2', 'Switchable', 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'),
-				new TileLayer('layer-4', 'Swapable 1', 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'),
-				new MapboxLayer('layer-3', 'Swapable 2', 'infoamazonia/ck33yfty30o0s1dqpien3edi4')
+				new JeoLayer('mapbox', {
+					'layer_id': 'layer-1',
+					'layer_name': 'Layer 1',
+					'layer_type_options': {
+						'style_id': 'infoamazonia/cjvwvumyx5i851coa874sx97e'
+					}
+				}),
+				new JeoLayer('mapbox', {
+					'layer_id': 'layer-2',
+					'layer_name': 'Switchable',
+					'layer_type_options': {
+						'url': 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
+					}
+				}),
+				new JeoLayer('tilelayer', {
+					'layer_id': 'layer-4',
+					'layer_name': 'Swapable 1',
+					'layer_type_options': {
+						'url': 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
+					}
+				}),
+				new JeoLayer('mapbox', {
+					'layer_id': 'layer-3',
+					'layer_name': 'Swapable 2',
+					'layer_type_options': {
+						'style_id': 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
+					}
+				}),
+
 			];
 			this.layers = layers;
 			resolve(layers);
@@ -178,80 +203,11 @@ class JeoMapbox {
 
 }
 
-/**
- * The idea here is that each layer type will have its own class implementing
- * addStyle and addLayer methods.
- *
- * In mapboxGL, a map must have a style, which is a sort of base layer, and they are handled differently,
- * that's why we need two methods
- */
-
-class MapboxLayer {
-	constructor (layer_id, layer_name, style_id, access_token) {
-		this.layer_id = layer_id;
-		this.style_id = style_id;
-		this.layer_name = layer_name;
-		this.access_token = access_token ? access_token : mapboxgl.accessToken;
-	}
-
-	addStyle(map) {
-		return map.setStyle( 'mapbox://styles/' + this.style_id );
-	}
-
-	addLayer(map) {
-		return map.addLayer({
-			id: this.layer_id,
-			source: {
-			  type: 'raster',
-			  tiles: ['https://api.mapbox.com/styles/v1/'  + this.style_id + '/tiles/256/{z}/{x}/{y}@2x?access_token=' + this.access_token]
-			},
-			type: 'raster'
-		  });
-	}
-}
-
-class TileLayer {
-	constructor(layer_id, layer_name, url) {
-		this.url = url;
-		this.layer_id = layer_id;
-		this.layer_name = layer_name;
-	}
-
-	addStyle(map) {
-		return map.setStyle({
-			'version': 8,
-			'sources': {
-				'raster-tiles': {
-					'type': 'raster',
-					tiles: [this.url],
-					'tileSize': 256
-				}
-			},
-			'layers': [{
-				id: this.layer_id,
-				type: 'raster',
-				source: 'raster-tiles'
-			}]
-		})
-	}
-
-	addLayer(map) {
-		return map.addLayer({
-			id: this.layer_id,
-			source: {
-			  type: 'raster',
-			  tiles: [this.url],
-			  "tileSize": 256
-			},
-			type: 'raster'
-		  });
-	}
-}
 
 (function($) {
 	$(function(){
 		$('.jeomap').each(function(i) {
-			new JeoMapbox(this);
+			new JeoMap(this);
 		});
 	});
 })(jQuery);

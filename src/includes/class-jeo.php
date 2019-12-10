@@ -45,6 +45,7 @@ class Jeo {
 		\jeo_layers();
 		\jeo_geocode_handler();
 		\jeo_settings();
+		\jeo_layer_types();
 
 		add_action('plugins_loaded', [$this, 'load_plugin_textdomain']);
 		add_action('init', [$this, 'register_assets'] );
@@ -100,10 +101,10 @@ class Jeo {
 	public function enqueue_scripts() {
 
 		if ( is_singular() ) {
-			wp_enqueue_script('jeo-mapboxgl', JEO_BASEURL . '/js/build/mapbox.js', ['jquery']);
+			wp_enqueue_script('jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', ['jquery']);
 			wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time());
-			wp_enqueue_style( 'jeo-mapboxgl',  JEO_BASEURL . '/css/mapbox.css', time());
-			wp_localize_script('jeo-mapboxgl', "jeo_settings", [
+			wp_enqueue_style( 'jeo-map',  JEO_BASEURL . '/css/jeo-map.css', time());
+			wp_localize_script('jeo-map', "jeo_settings", [
 				'mapbox_key' => \jeo_settings()->get_option('mapbox_key'),
 			]);
 		}
