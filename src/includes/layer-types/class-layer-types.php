@@ -25,14 +25,14 @@ class Layer_Types {
 		$this->register_layer_type(
 			'mapbox',
 			[
-				'script_url' => JEO_BASEURL . '/js/build/layerTypeMapbox.js'
+				'script_url' => JEO_BASEURL . '/includes/layer-types/mapbox.js'
 			]
 		);
 
 		$this->register_layer_type(
 			'tilelayer',
 			[
-				'script_url' => JEO_BASEURL . '/js/build/layerTypeTile.js'
+				'script_url' => JEO_BASEURL . '/includes/layer-types/tilelayer.js'
 			]
 		);
 
@@ -92,16 +92,16 @@ class Layer_Types {
 
 	public function register_assets() {
 		$asset_file = include( JEO_BASEPATH . '/js/build/jeoLayerTypes.asset.php');
-		wp_register_script(
-			'jeo-layer-types',
-			JEO_BASEURL . '/js/build/JeoLayerTypes.js',
-			['jquery'],
-			$asset_file['version']
-		);
+		//wp_register_script(
+		//	'jeo-layer-types',
+		//	JEO_BASEURL . '/js/build/JeoLayerTypes.js',
+		//	[],
+		//	$asset_file['version']
+		//);
 		wp_register_script(
 			'jeo-layer',
 			JEO_BASEURL . '/js/build/JeoLayer.js',
-			['jeo-layer-types', 'jquery'],
+			['mapboxgl-loader'],
 			$asset_file['version']
 		);
 	}

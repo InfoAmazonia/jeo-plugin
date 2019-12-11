@@ -1,8 +1,6 @@
-import JeoLayerTypes from './JeoLayerTypes'
+window.JeoLayerTypes.registerLayerType('tilelayer', {
 
-JeoLayerTypes.registerLayerType('tilelayer', {
-
-	addStyle: (map, attributes) => {
+	addStyle: function(map, attributes) {
 		return map.setStyle({
 			'version': 8,
 			'sources': {
@@ -20,7 +18,7 @@ JeoLayerTypes.registerLayerType('tilelayer', {
 		})
 	},
 
-	addLayer: (map, attributes) => {
+	addLayer: function(map, attributes) {
 		return map.addLayer({
 			id: attributes.layer_id,
 			source: {

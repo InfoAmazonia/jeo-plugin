@@ -1,5 +1,4 @@
 //import { __ } from "@wordpress/i18n";
-import JeoLayer from '../../../includes/layer-types/JeoLayer'
 /**
  * to test this, add the following div in the singular.php template of the twentytwenty theme
  * <div class="jeomap" data_center_lat="0" data_center_lon="0" data_initial_zoom="1" data_layers="[2,3,4]" style="width:600px; height: 600px;"></div>
@@ -7,8 +6,6 @@ import JeoLayer from '../../../includes/layer-types/JeoLayer'
  * then visit any page in your site
  */
 
-var mapboxgl = require('mapbox-gl/dist/mapbox-gl.js');
-mapboxgl.accessToken = jeo_settings.mapbox_key;
 
 class JeoMap {
 
@@ -17,7 +14,7 @@ class JeoMap {
 		this.element = element;
 		this.args = element.attributes;
 
-		let map = new mapboxgl.Map({
+		let map = new window.mapboxgl.Map({
 			container: element
 		});
 
@@ -61,28 +58,28 @@ class JeoMap {
 
 			// TODO: get layers using API...
 			const layers = [
-				new JeoLayer('mapbox', {
+				new window.JeoLayer('mapbox', {
 					'layer_id': 'layer-1',
 					'layer_name': 'Layer 1',
 					'layer_type_options': {
 						'style_id': 'infoamazonia/cjvwvumyx5i851coa874sx97e'
 					}
 				}),
-				new JeoLayer('mapbox', {
+				new window.JeoLayer('tilelayer', {
 					'layer_id': 'layer-2',
 					'layer_name': 'Switchable',
 					'layer_type_options': {
 						'url': 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
 					}
 				}),
-				new JeoLayer('tilelayer', {
+				new window.JeoLayer('tilelayer', {
 					'layer_id': 'layer-4',
 					'layer_name': 'Swapable 1',
 					'layer_type_options': {
 						'url': 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
 					}
 				}),
-				new JeoLayer('mapbox', {
+				new window.JeoLayer('mapbox', {
 					'layer_id': 'layer-3',
 					'layer_name': 'Swapable 2',
 					'layer_type_options': {
