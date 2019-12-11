@@ -2,6 +2,7 @@ import { withSelect } from '@wordpress/data';
 import { Fragment, useState } from '@wordpress/element';
 import MapEditorModal from './map-editor-modal';
 import LayersLibrary from './layers-library';
+import LayersSettings from './layers-settings';
 import LayersTable from './layers-table';
 import './map-editor.css';
 
@@ -23,11 +24,18 @@ const MapEditor = ( {
 							case 'map':
 								return <p>Map Settings</p>;
 							case 'layers':
-								return <p>Edit Layers</p>;
+								return (
+									<LayersSettings
+										layers={ loadedLayers }
+										selected={ selectedLayers }
+										setLayers={ ( layers ) => setAttributes( { layers } ) }
+									/>
+								);
 							case 'library':
 								return (
 									<LayersLibrary
 										layers={ loadedLayers }
+										loadingLayers={ loadingLayers }
 										selected={ selectedLayers }
 										setLayers={ ( layers ) => setAttributes( { layers } ) }
 										onCreateLayer={ () => setModal( 'new-layer' ) }
@@ -44,7 +52,7 @@ const MapEditor = ( {
 				layers={ loadedLayers }
 				loadingLayers={ loadingLayers }
 				rows={ selectedLayers }
-				onButtonClick={ () => setModal( 'library' ) }
+				onButtonClick={ () => setModal( 'layers' ) }
 			/>
 		</Fragment>
 	);
