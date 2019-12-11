@@ -8,12 +8,12 @@ class JeoLayerTypes {
 		this.layerTypes[layerTypeSlug] = layerTypeObject;
 	}
 	getLayerType(layerTypeSlug) {
-		console.log(this.layerTypes[layerTypeSlug]);
 		return this.layerTypes[layerTypeSlug];
 	}
 	getLayerTypeSchema(layerTypeSlug) {
 		return this.getLayerType(layerTypeSlug).getSchema();
 	}
 }
-
-export default (new JeoLayerTypes);
+const instance = new JeoLayerTypes();
+window.JeoLayerTypes = instance;
+export default instance;
