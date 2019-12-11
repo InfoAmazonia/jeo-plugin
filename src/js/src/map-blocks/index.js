@@ -11,6 +11,9 @@ registerBlockType( 'jeo/map', {
 		layers: {
 			type: 'array',
 			default: [],
+			items: {
+				type: 'number',
+			},
 		},
 		centerLat: {
 			type: 'number',
