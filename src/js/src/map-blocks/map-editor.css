@@ -1,3 +1,7 @@
+/**
+ * Map Editor Modal
+ */
+
 .jeo-map-editor-modal {
 	position: fixed;
 	top: 30px;
@@ -23,9 +27,21 @@
 .jeo-map-editor-modal .components-tab-panel__tabs {
 	padding: 3px 24px 0; /* Slight padding needed for focus outline */
 	background-color: #fcfcfc;
+	border-bottom: 1px solid #ddd;
 }
+
 .jeo-map-editor-modal .components-tab-panel__tabs .components-button {
 	padding: 8px 10px 8px;
+}
+
+.jeo-map-editor-modal
+	.components-tab-panel__tabs
+	.components-button.active-tab {
+	background-color: white;
+	border: 1px solid #ddd;
+	border-bottom: none;
+	padding-bottom: 9px;
+	margin-bottom: -1px;
 }
 
 .jeo-map-editor-modal
@@ -34,12 +50,83 @@
 	box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
 }
 
-.jeo-map-editor-modal
-	.components-tab-panel__tabs
-	.components-button.active-tab {
-	background-color: white;
-}
-
 .jeo-map-editor-modal .components-tab-panel__tab-content {
 	padding: 0 24px;
+}
+
+/**
+ * Layers Library
+ */
+.jeo-layers-library .library-controls {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1em 0;
+}
+
+.jeo-layers-library .library-controls .components-base-control__field {
+	display: flex;
+	align-items: center;
+	margin: 0;
+}
+
+.jeo-layers-library .library-controls .components-base-control__label {
+	margin: 0 1em 0;
+	flex-basis: 100%;
+}
+
+.jeo-layers-library .library-controls > span {
+	flex-basis: 4em;
+	text-align: center;
+}
+
+.jeo-layers-library .available-layers {
+	display: grid;
+	grid: auto-flow 8em / 1fr 1fr;
+	grid-gap: 1em;
+}
+
+.jeo-layers-library .layer {
+	display: flex;
+	background-color: #f3f3f3;
+}
+
+.jeo-layers-library .layer-button {
+	flex-basis: 4em;
+	font-size: 1.33em;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+}
+
+.jeo-layers-library .layer-button .dashicon {
+	display: block;
+	margin: 0 auto 0.66em;
+}
+
+.jeo-layers-library .layer-add {
+	background-color: #0079c0;
+	color: white;
+}
+
+.jeo-layers-library .layer-add:hover {
+	background-color: #33acf3;
+}
+
+.jeo-layers-library .layer-remove {
+	background-color: #e28f30;
+	color: white;
+}
+
+.jeo-layers-library .layer-remove:hover {
+	background-color: ##ffc263;
+}
+
+.jeo-layers-library .layer-description {
+	padding: 0 1em;
+}
+
+.jeo-layers-library .layer-type {
+	font-size: 0.8em;
+	color: darkgrey;
 }
