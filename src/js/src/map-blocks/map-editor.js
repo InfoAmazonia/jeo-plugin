@@ -1,22 +1,18 @@
-import { Button } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { Fragment, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import MapEditorModal from './map-editor-modal';
+import LayersLibrary from './layers-library';
 import LayersTable from './layers-table';
 import './map-editor.css';
 
-const layerColumns = [
-	{ property: 'type', header: { label: __( 'Layer Type' ) } },
-	{ property: 'title', header: { label: __( 'Layer Name' ) } },
-	{ property: 'url', header: { label: __( 'Layer Source' ) } },
-	{ property: 'use', header: { label: __( 'Layer Options' ) } },
-];
-
-export default ( props ) => {
-	const { attributes, setAttributes } = props;
-	const layers = useSelect( ( select ) => select( 'jeo-layers' ).getLayers() );
+const MapEditor = ( {
+	attributes,
+	setAttributes,
+	loadedLayers,
+	loadingLayers,
+} ) => {
 	const [ modal, setModal ] = useState( false );
+	const selectedLayers = attributes.layers;
 
 	return (
 		<Fragment>
@@ -29,7 +25,14 @@ export default ( props ) => {
 							case 'layers':
 								return <p>Edit Layers</p>;
 							case 'library':
-								return <p>Add From Library</p>;
+								return (
+									<LayersLibrary
+										layers={ loadedLayers }
+										selected={ selectedLayers }
+										setLayers={ ( layers ) => setAttributes( { layers } ) }
+										onCreateLayer={ () => setModal( 'new-layer' ) }
+									/>
+								);
 							case 'new-layer':
 								return <p>New layer</p>;
 						}
@@ -38,14 +41,19 @@ export default ( props ) => {
 			) }
 
 			<LayersTable
-				columns={ layerColumns }
-				rows={ attributes.layers }
-				emptyMessage={ __( 'No layers have been selected for this map.' ) }
-			>
-				<Button isPrimary isLarge onClick={ () => setModal( 'layers' ) }>
-					{ __( 'Add a new layer' ) }
-				</Button>
-			</LayersTable>
+				layers={ loadedLayers }
+				loadingLayers={ loadingLayers }
+				rows={ selectedLayers }
+				onButtonClick={ () => setModal( 'library' ) }
+			/>
 		</Fragment>
 	);
 };
+
+export default withSelect( ( select ) => ( {
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer' ),
+	loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
+		'postType',
+		'map-layer',
+	] ),
+} ) )( MapEditor );
