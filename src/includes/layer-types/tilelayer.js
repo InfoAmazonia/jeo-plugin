@@ -28,6 +28,21 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 			},
 			type: 'raster'
 		});
+	},
+
+	getSchema: function() {
+		return {
+			"type": "object",
+			"required": [
+				"url"
+			],
+			"properties": {
+				"url": {
+					"type": "string",
+					"title": "Style ID"
+				}
+			}
+		}
 	}
 
 });
