@@ -14,6 +14,26 @@ window.JeoLayerTypes.registerLayerType('mapbox', {
 			},
 			type: 'raster'
 		});
+	},
+
+	getSchema: function() {
+		return {
+			"type": "object",
+			"required": [
+				"style_id"
+			],
+			"properties": {
+				"style_id": {
+					"type": "string",
+					"title": "Style ID"
+				},
+				"access_token": {
+					"type": "string",
+					"title": "Access token",
+					"description": "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
+				}
+			}
+		}
 	}
 
 });
