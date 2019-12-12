@@ -4,7 +4,7 @@ window.JeoLayerTypes.registerLayerType('mapbox', {
 		return map.setStyle( 'mapbox://styles/' + attributes.layer_type_options.style_id );
 	},
 
-	addLayer: function(map, attributes, mapboxgl) {
+	addLayer: function(map, attributes) {
 		const access_token = typeof(attributes.layer_type_options.access_token) != 'undefined' ? attributes.layer_type_options.access_token : window.mapboxgl.accessToken;
 		return map.addLayer({
 			id: attributes.layer_id,
