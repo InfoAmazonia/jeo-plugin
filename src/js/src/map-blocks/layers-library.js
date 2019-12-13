@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Button, Dashicon, TextControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+import classNames from 'classnames';
 
 export default ( { layers, selected, setLayers, onCreateLayer } ) => {
 	const [ search, setSearch ] = useState( '' );
@@ -28,23 +29,17 @@ export default ( { layers, selected, setLayers, onCreateLayer } ) => {
 			<div className="available-layers">
 				{ options.map( ( layer ) => (
 					<div className="layer" key={ layer.id }>
-						{ layer.selected ? (
-							<button
-								className="layer-button layer-remove"
-								onClick={ () =>
-									setLayers( selected.filter( ( id ) => id !== layer.id ) )
-								}
-							>
-								<Dashicon icon="dismiss" /> { __( 'Remove' ) }
-							</button>
-						) : (
-							<button
-								className="layer-button layer-add"
-								onClick={ () => setLayers( [ ...selected, layer.id ] ) }
-							>
-								<Dashicon icon="plus-alt" /> { __( 'Add' ) }
-							</button>
-						) }
+						<button
+							className={ classNames( [
+								'layer-button',
+								layer.selected ? 'layer-added' : 'layer-add',
+							] ) }
+							disabled={ layer.selected }
+							onClick={ () => setLayers( [ ...selected, layer.id ] ) }
+						>
+							<Dashicon icon={ layer.selected ? 'yes-alt' : 'plus-alt' } />
+							{ layer.selected ? __( 'Added' ) : __( 'Add' ) }
+						</button>
 						<div className="layer-description">
 							<h3>
 								<span className="layer-name">{ layer.title.rendered }</span>
