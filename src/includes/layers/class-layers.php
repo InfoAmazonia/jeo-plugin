@@ -10,6 +10,7 @@ class Layers {
 
 	protected function init() {
 		add_action( 'init', [$this, 'register_post_type'] );
+		$this->register_rest_meta_validation();
 	}
 
 	public function register_post_type() {
@@ -48,28 +49,25 @@ class Layers {
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'sanitize_callback' => [$this, 'sanitize_meta_type'],
 			'type' => 'string',
 			'description' => __('The layer type', 'jeo')
 		]);
 
-		register_post_meta($this->post_type, 'url', [
-			'show_in_rest' => true,
+		register_post_meta($this->post_type, 'layer_type_options', [
+			'show_in_rest' => ['prepare_callback' => function($value) {return $value;}],
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'sanitize_callback' => [$this, 'sanitize_url'],
-			'type' => 'string',
-			'description' => __('The layer url', 'jeo')
+			//'type' => 'string',
+			'description' => __('Layer type-specific options', 'jeo')
 		]);
 	}
 
-	public function sanitize_meta_type($meta_value, $meta_key, $object_type, $object_subtype) {
-		// @TODO: use a layer type registry
-		return in_array($meta_value, ['mapbox']);
-	}
-
-	public function sanitize_meta_url($meta_value, $meta_key, $object_type, $object_subtype) {
-		return filter_var($meta_value, FILTER_VALIDATE_URL, FILTER_FLAG_SCHEME_REQUIRED);
+	public function validate_meta_type($meta_value) {
+		var_dump($meta_value);
+		if ( ! \jeo_layer_types()->is_layer_type_registered($meta_value) ) {
+			return new \WP_Error( 'rest_invalid_field', __( 'Layer type not registered', 'jeo' ), array( 'status' => 400 ) );
+		}
+		return true;
 	}
 
 }

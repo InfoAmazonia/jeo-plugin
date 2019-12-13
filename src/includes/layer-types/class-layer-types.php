@@ -90,6 +90,10 @@ class Layer_Types {
 		return null;
 	}
 
+	public function is_layer_type_registered($layer_type_slug) {
+		return ! \is_null( $this->get_layer_type($layer_type_slug) );
+	}
+
 	public function register_assets() {
 		$asset_file = include( JEO_BASEPATH . '/js/build/jeoLayerTypes.asset.php');
 		//wp_register_script(

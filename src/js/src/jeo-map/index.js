@@ -20,9 +20,9 @@ class JeoMap {
 
 		this.map = map;
 
-		map.setZoom( this.getArg('data_initial_zoom') );
+		map.setZoom( this.getArg('initial_zoom') );
 
-		map.setCenter( [this.getArg('data_center_lon'), this.getArg('data_center_lat')] );
+		map.setCenter( [this.getArg('center_lon'), this.getArg('center_lat')] );
 
 		this.getLayers().then( layers => {
 
@@ -43,53 +43,51 @@ class JeoMap {
 
 		} );
 
+		window.map = map;
+
 	}
 
 	getArg(argName) {
-		if ( typeof(this.args[argName]) == 'object' ) {
-			return this.args[argName].value;
-		}
+		return jQuery(this.element).data(argName);
 	}
 
 	getLayers() {
-		const layerIds = this.getArg('data_layers');
 
 		return new Promise( (resolve, reject) => {
 
-			// TODO: get layers using API...
-			const layers = [
-				new window.JeoLayer('mapbox', {
-					'layer_id': 'layer-1',
-					'layer_name': 'Layer 1',
-					'layer_type_options': {
-						'style_id': 'infoamazonia/cjvwvumyx5i851coa874sx97e'
-					}
-				}),
-				new window.JeoLayer('tilelayer', {
-					'layer_id': 'layer-2',
-					'layer_name': 'Switchable',
-					'layer_type_options': {
-						'url': 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
-					}
-				}),
-				new window.JeoLayer('tilelayer', {
-					'layer_id': 'layer-4',
-					'layer_name': 'Swapable 1',
-					'layer_type_options': {
-						'url': 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
-					}
-				}),
-				new window.JeoLayer('mapbox', {
-					'layer_id': 'layer-3',
-					'layer_name': 'Swapable 2',
-					'layer_type_options': {
-						'style_id': 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
-					}
-				}),
+			const layersDefinitions = this.getArg('layers');
+			this.layersDefinitions = layersDefinitions;
+			const layersIds = layersDefinitions.map( el => el.id );
 
-			];
-			this.layers = layers;
-			resolve(layers);
+			jQuery.get(
+				jeoMapVars.jsonUrl + 'map-layer',
+				{
+					include: layersIds
+				},
+				data => {
+					let returnLayers = [];
+					let ordered = [];
+					layersIds.forEach( (el, index) => {
+						ordered[index] = data.find( l => l.id == el )
+					});
+
+					ordered.forEach( (layerObject, i) => {
+						returnLayers.push(
+							new window.JeoLayer(layerObject.meta.type, {
+									layer_id: layerObject.slug,
+									layer_name: layerObject.title.rendered,
+									visible: layersDefinitions[i].default,
+									layer_type_options: layerObject.meta.layer_type_options
+							})
+						);
+					} );
+
+					this.layers = returnLayers;
+					resolve(returnLayers);
+
+
+				}
+			);
 
 		});
 
@@ -103,8 +101,14 @@ class JeoMap {
 	 *
 	 * @return array
 	 */
-	getTogglableLayers() {
-		return [1];
+	getSwitchableLayers() {
+		let layers = [];
+		this.layersDefinitions.forEach( (el, index) => {
+			if (el.use == 'switchable') {
+				layers.push(index);
+			}
+		} );
+		return layers;
 	}
 
 	/**
@@ -115,24 +119,39 @@ class JeoMap {
 	 *
 	 * @return array
 	 */
-	getSwitchableLayers() {
-		return [2,3];
+	getSwappableLayers() {
+		let layers = [];
+		this.layersDefinitions.forEach( (el, index) => {
+			if (el.use == 'swappable') {
+				layers.push(index);
+			}
+		} );
+		return layers;
 	}
 
 	/**
 	 * return the index of the switchable layer marked as default
 	 */
-	getDefaultSwitchableLayer() {
-		return 2;
+	getDefaultSwappableLayer() {
+		let layers = [];
+		this.layersDefinitions.forEach( (el, index) => {
+			if (el.use == 'swappable' && el.default) {
+				layers.push(index);
+			}
+		} );
+		return layers;
 	}
 
 	addLayersControl() {
 		let navElement = document.createElement('nav');
 
-		this.getTogglableLayers().forEach(index => {
+		this.getSwitchableLayers().forEach(index => {
 			let link = document.createElement('a');
 			link.href = '#';
-			link.className = 'active';
+			if (this.layersDefinitions[index].default) {
+				link.className = 'active';
+			}
+
 			link.textContent = this.layers[index].layer_name;
 			link.setAttribute('data-layer_id', this.layers[index].layer_id);
 
@@ -157,12 +176,12 @@ class JeoMap {
 
 		});
 
-		this.getSwitchableLayers().forEach(index => {
+		this.getSwappableLayers().forEach(index => {
 			let link = document.createElement('a');
 			link.href = '#';
 			link.classList.add('switchable');
 
-			if ( this.getDefaultSwitchableLayer() == index ) {
+			if ( this.getDefaultSwappableLayer() == index ) {
 				link.classList.add('active');
 			}
 			link.textContent = this.layers[index].layer_name;
@@ -176,7 +195,7 @@ class JeoMap {
 				e.stopPropagation();
 
 				// hide all
-				this.getSwitchableLayers().forEach(i => {
+				this.getSwappableLayers().forEach(i => {
 					this.map.setLayoutProperty(this.layers[i].layer_id, 'visibility', 'none');
 				});
 				jQuery(navElement).children('.switchable').removeClass('active');
