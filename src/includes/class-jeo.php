@@ -115,7 +115,11 @@ class Jeo {
 		if ( is_singular() ) {
 			wp_enqueue_script('jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', ['mapboxgl-loader','jquery']);
 			wp_enqueue_style( 'jeo-map',  JEO_BASEURL . '/css/jeo-map.css', time());
-
+			wp_localize_script(
+				'jeo-map',
+				'jeoMapVars',
+				array('jsonUrl' => rest_url('wp/v2/'))
+			);
 		}
 
 	}

@@ -19,7 +19,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 	},
 
 	addLayer: function(map, attributes) {
-		return map.addLayer({
+		var layer = {
 			id: attributes.layer_id,
 			source: {
 			  type: 'raster',
@@ -27,7 +27,13 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 			  "tileSize": 256
 			},
 			type: 'raster'
-		});
+		};
+		if ( ! attributes.visible ) {
+			layer.layout = {
+				visibility: 'none'
+			};
+		}
+		return map.addLayer(layer);
 	},
 
 	getSchema: function() {
