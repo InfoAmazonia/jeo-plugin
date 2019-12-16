@@ -12,6 +12,10 @@ class JeoLayer {
 		return this.layerType.addLayer(map, this.attributes);
 	}
 
+	getSchema() {
+		return this.layerType.getSchema(this.attributes);
+	}
+
 	get layer_name() {
 		return this.attributes.layer_name;
 	}

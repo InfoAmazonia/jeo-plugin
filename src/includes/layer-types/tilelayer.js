@@ -37,18 +37,22 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 	},
 
 	getSchema: function() {
-		return {
-			"type": "object",
-			"required": [
-				"url"
-			],
-			"properties": {
-				"url": {
-					"type": "string",
-					"title": "Style ID"
+		return new Promise( function(resolve, reject) {
+
+			resolve({
+				"type": "object",
+				"required": [
+					"url"
+				],
+				"properties": {
+					"url": {
+						"type": "string",
+						"title": "Style ID"
+					}
 				}
-			}
-		}
+			});
+
+		});
 	}
 
 });
