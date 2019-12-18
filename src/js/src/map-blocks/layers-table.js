@@ -1,34 +1,52 @@
+import { Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import * as Table from 'reactabular-table';
 
-const columns = [
-	{ property: 'id', header: { label: 'ID' } },
-	{ property: 'title', header: { label: 'Name' } },
+const layerColumns = [
+	{ property: 'type', header: { label: __( 'Layer Type' ) } },
+	{ property: 'title', header: { label: __( 'Layer Name' ) } },
 ];
+
+const loadLayers = ( layers ) => ( id ) => layers.find( ( l ) => l.id === id );
+
+const layerToRow = ( layer ) => ( {
+	id: layer.id,
+	type: layer.meta.type,
+	title: layer.title.rendered,
+} );
 
 export default ( {
 	layers,
 	loadingLayers,
 	selectedLayers,
-	emptyMessage = null,
 	className,
-	children,
+	onButtonClick,
 } ) => {
 	if ( loadingLayers ) {
-		return <p>loading</p>;
+		return <p>{ __( 'Loading Layers Data' ) }</p>;
 	}
-	const rows = layers.map( ( l ) => ( { id: l.id, title: l.title.rendered } ) );
+
+	const emptyMessage = __( 'No layers have been selected for this map.' );
+	const loadLayer = loadLayers( layers );
 
 	return (
-		<Table.Provider columns={ columns } className={ className } rowKey="id">
+		<Table.Provider columns={ layerColumns } className={ className }>
 			<Table.Header />
-			<Table.Body rows={ rows } />
+			<Table.Body
+				rows={ selectedLayers.map( loadLayer ).map( layerToRow ) }
+				rowKey="id"
+			/>
 			<tfoot>
 				<tr>
-					<td colSpan={ columns.length }>
-						{ ! rows.length && emptyMessage && (
+					<td colSpan={ layerColumns.length }>
+						{ ! ( layers && layers.length ) && (
 							<p className="empty">{ emptyMessage }</p>
 						) }
-						{ children }
+						{ ! loadingLayers && (
+							<Button isPrimary isLarge onClick={ onButtonClick }>
+								{ __( 'Add a new layer' ) }
+							</Button>
+						) }
 					</td>
 				</tr>
 			</tfoot>

@@ -49,9 +49,9 @@ const MapEditor = ( {
 			) }
 
 			<LayersTable
-				selected={ selectedLayers }
 				layers={ loadedLayers }
 				loadingLayers={ loadingLayers }
+				selectedLayers={ selectedLayers }
 				onButtonClick={ () => setModal( 'layers' ) }
 			/>
 		</Fragment>
