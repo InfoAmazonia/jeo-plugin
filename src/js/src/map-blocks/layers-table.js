@@ -7,7 +7,8 @@ const layerColumns = [
 	{ property: 'title', header: { label: __( 'Layer Name' ) } },
 ];
 
-const loadLayers = ( layers ) => ( id ) => layers.find( ( l ) => l.id === id );
+const loadLayers = ( layers ) => ( settings ) =>
+	layers.find( ( l ) => l.id === settings.id );
 
 const layerToRow = ( layer ) => ( {
 	id: layer.id,

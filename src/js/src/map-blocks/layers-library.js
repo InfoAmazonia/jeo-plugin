@@ -3,13 +3,18 @@ import { Button, Dashicon, TextControl } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import classNames from 'classnames';
 
+const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
+
 export default ( { layers, selected, setLayers, onCreateLayer } ) => {
 	const [ search, setSearch ] = useState( '' );
 	const options = layers
 		.filter( ( layer ) =>
 			layer.title.rendered.toLowerCase().includes( search.toLowerCase() )
 		)
-		.map( ( layer ) => ( { ...layer, selected: selected.includes( layer.id ) } ) );
+		.map( ( layer ) => ( {
+			...layer,
+			selected: selected.some( ( settings ) => settings.id === layer.id ),
+		} ) );
 
 	return (
 		<div className="jeo-layers-library">
@@ -35,7 +40,7 @@ export default ( { layers, selected, setLayers, onCreateLayer } ) => {
 								layer.selected ? 'layer-added' : 'layer-add',
 							] ) }
 							disabled={ layer.selected }
-							onClick={ () => setLayers( [ ...selected, layer.id ] ) }
+							onClick={ () => setLayers( [ ...selected, setLayer( layer.id ) ] ) }
 						>
 							<Dashicon icon={ layer.selected ? 'yes-alt' : 'plus-alt' } />
 							{ layer.selected ? __( 'Added' ) : __( 'Add' ) }
