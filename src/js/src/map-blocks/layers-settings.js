@@ -3,17 +3,17 @@ import { forwardRef } from '@wordpress/element';
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
 
-const LayerSettings = forwardRef( ( { layer, ...props }, ref ) => {
+const LayerSettings = forwardRef( ( { settings, ...props }, ref ) => {
 	return (
 		<div { ...props } ref={ ref }>
-			{ layer.title.rendered } | { layer.meta.type }
+			{ settings.layer.title.rendered } | { settings.layer.meta.type }
 		</div>
 	);
 } );
 
-const loader = ( layers ) => {
+const layerLoader = ( layers ) => {
 	const layersMap = Object.fromEntries( layers.map( ( l ) => [ l.id, l ] ) );
-	return ( id ) => layersMap[ id ];
+	return ( settings ) => ( { ...settings, layer: layersMap[ settings.id ] } );
 };
 
 export default ( { loadingLayers, layers, selected, setLayers } ) => {
@@ -24,7 +24,7 @@ export default ( { loadingLayers, layers, selected, setLayers } ) => {
 		return <p>{ __( 'No layers have been selected for this map.' ) } </p>;
 	}
 
-	const loadLayer = loader( layers );
+	const loadLayer = layerLoader( layers );
 
 	return (
 		<List
@@ -38,7 +38,13 @@ export default ( { loadingLayers, layers, selected, setLayers } ) => {
 				</div>
 			) }
 			renderItem={ ( { value, isDragged, isSelected, isOutOfBounds, props } ) => (
-				<LayerSettings layer={ loadLayer( value ) } { ...props } />
+				<LayerSettings
+					settings={ loadLayer( value ) }
+					isDragged={ isDragged }
+					isSelected={ isSelected }
+					isOutOfBounds={ isOutOfBounds }
+					{ ...props }
+				/>
 			) }
 		/>
 	);

@@ -12,7 +12,12 @@ registerBlockType( 'jeo/map', {
 			type: 'array',
 			default: [],
 			items: {
-				type: 'number',
+				type: 'object',
+				properties: {
+					id: { type: 'number' },
+					use: { type: 'string' /* enum */ },
+					default: { type: 'boolean' },
+				},
 			},
 		},
 		centerLat: {
