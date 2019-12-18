@@ -113,13 +113,9 @@
 	background-color: #33acf3;
 }
 
-.jeo-layers-library .layer-remove {
-	background-color: #e28f30;
+.jeo-layers-library .layer-added {
+	background-color: #999999;
 	color: white;
-}
-
-.jeo-layers-library .layer-remove:hover {
-	background-color: ##ffc263;
 }
 
 .jeo-layers-library .layer-description {
