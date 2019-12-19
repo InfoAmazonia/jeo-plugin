@@ -36,7 +36,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 		return map.addLayer(layer);
 	},
 
-	getSchema: function() {
+	getSchema: function(attributes) {
 		return new Promise( function(resolve, reject) {
 
 			resolve({
@@ -47,7 +47,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 				"properties": {
 					"url": {
 						"type": "string",
-						"title": "Style ID"
+						"title": "URL"
 					}
 				}
 			});
