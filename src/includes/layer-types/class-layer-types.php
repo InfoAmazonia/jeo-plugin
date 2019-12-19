@@ -95,13 +95,7 @@ class Layer_Types {
 	}
 
 	public function register_assets() {
-		$asset_file = include( JEO_BASEPATH . '/js/build/jeoLayerTypes.asset.php');
-		//wp_register_script(
-		//	'jeo-layer-types',
-		//	JEO_BASEURL . '/js/build/JeoLayerTypes.js',
-		//	[],
-		//	$asset_file['version']
-		//);
+		$asset_file = include( JEO_BASEPATH . '/js/build/JeoLayer.asset.php');
 		wp_register_script(
 			'jeo-layer',
 			JEO_BASEURL . '/js/build/JeoLayer.js',
