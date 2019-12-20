@@ -1,6 +1,7 @@
 import { withSelect } from '@wordpress/data';
 import { Fragment, useState } from '@wordpress/element';
 import MapEditorModal from './map-editor-modal';
+import LayerEditor from './layer-editor';
 import LayersLibrary from './layers-library';
 import LayersSettings from './layers-settings';
 import LayersTable from './layers-table';
@@ -41,7 +42,7 @@ const MapEditor = ( {
 									/>
 								);
 							case 'new-layer':
-								return <p>New layer</p>;
+								return <LayerEditor></LayerEditor>;
 						}
 					} }
 				</MapEditorModal>
@@ -51,7 +52,7 @@ const MapEditor = ( {
 				loadedLayers={ loadedLayers }
 				loadingLayers={ loadingLayers }
 				selectedLayers={ selectedLayers }
-				onButtonClick={ () => setModal( 'layers' ) }
+				onButtonClick={ () => setModal( 'new-layer' ) }
 			/>
 		</Fragment>
 	);
