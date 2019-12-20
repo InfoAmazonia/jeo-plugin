@@ -55,6 +55,62 @@
 }
 
 /**
+ * Layers Settings
+ */
+.jeo-layers-list {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 1em 0;
+}
+
+.jeo-layers-list .layer {
+	border: 1px solid lightgrey;
+	vertical-align: middle;
+}
+
+.jeo-layers-list .layer td {
+	padding: 0.5em;
+}
+
+.jeo-layers-list .components-select-control__input {
+	width: auto;
+	margin-bottom: 0;
+}
+
+.jeo-layers-list .components-base-control__field {
+	margin-bottom: 0;
+}
+
+.jeo-layers-list .components-base-control__label {
+	margin: 0 1em 0 0;
+}
+
+.jeo-layers-list .components-base-control__help {
+	margin: 0;
+}
+
+.jeo-layers-list .drag-handle {
+	vertical-align: middle;
+}
+
+.jeo-layers-list .layer-title {
+	font-weight: bold;
+}
+
+.jeo-layers-list.dragging {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+.jeo-layers-list.dragging * {
+	box-sizing: border-box;
+}
+
+.jeo-layers-list.dragging .layer {
+	background-color: white;
+}
+
+/**
  * Layers Library
  */
 .jeo-layers-library .library-controls {
