@@ -19,7 +19,7 @@ First, let's register a new Layer Type by hooking up in the `jeo_register_layer_
 
 ```PHP
 add_action('jeo_register_layer_types', function($layer_types) {
-	$layer_types->register_layer_type('my-layer-type', plugin_dir_url( __FILE__ ) . '/js/layertype.js');
+	$layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
 });
 
 ```
@@ -27,7 +27,9 @@ add_action('jeo_register_layer_types', function($layer_types) {
 `register_layer_type` method gets 2 parameters. 
 
 * Layer type slug - A unique sanitized string (make sure to make it unique)
-* URL - The absolute URL to your javascript file.
+* Options - An array with the layer type options:
+  * script_url: Required. The absolute URL to your javascript file.
+  * dependecies: Optional. An array of scripts handles registered using [wp_register_script][(](https://developer.wordpress.org/reference/functions/wp_register_script/)) that should be loaded as a dependency to the layer type main script
 
 That's all you need to do in the PHP side. All the magic happens on the javascript.
 
@@ -58,8 +60,11 @@ Your Layer Type object MUST implement at least these three methods.
 
 ### getSchema(attributes)
 
-**params**: attributes - object with the layer attributes (see section below)
-**returns**: Promise with json-schema
+**params**: 
+* attributes - object with the layer attributes (see section below)
+
+**returns**: 
+* Promise with json-schema
 
 This method will tell Jeo which are the options the user have to fill in when creating a new layer of this type.
 
@@ -95,3 +100,101 @@ For example, the "Tile layer" layer type needs only a URL, so that's how its `ge
 	}
 
 ```
+
+## addStyle(map, attributes)
+
+**params**: 
+* map - the initialized Mapbox [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object
+* attributes - object with the layer attributes (See Layer attributes section below)
+
+**returns**: 
+* The return of a call to [`map.setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle)
+
+In MapboxGL, every map has a [Style](https://docs.mapbox.com/mapbox-gl-js/style-spec/) as a base layer. This method will add the layer as the Map Style, using the [setStyle](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) method of the [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object.
+
+This method will be invoked when a layer of this type is added to the map as the base layer.
+
+For example, tha "Tile Layer" layer type sets the style as a raster layer:
+
+
+```Javascript
+
+	// ...
+
+	addStyle: function(map, attributes) {
+		return map.setStyle({
+			'version': 8,
+			'sources': {
+				'raster-tiles': {
+					'type': 'raster',
+					'tiles': [attributes.layer_type_options.url],
+					'tileSize': 256
+				}
+			},
+			'layers': [{
+				id: attributes.layer_id,
+				type: 'raster',
+				source: 'raster-tiles'
+			}]
+		})
+	}
+
+```
+
+**Note**: The `attributes.layer_type_options` object holds all the properties delcared in the `getSchema` method. That's why there is a `url` there! (See Layer attributes section below)
+
+## addLayer(map, attributes)
+
+**params**: 
+* map - the initialized Mapbox [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object
+* attributes - object with the layer attributes (See Layer attributes section below)
+
+**returns**: 
+* The return of a call to [`map.addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer)
+
+This method will add the layer to the map using the [addLayer](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer) method of the [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object.
+
+This method will be invoked when a layer of this type is added to the map.
+
+For example, tha "Tile Layer" layer type adds itself as a raster layer:
+
+
+```Javascript
+
+	// ...
+
+	addLayer: function(map, attributes) {
+		var layer = {
+			id: attributes.layer_id,
+			source: {
+			  type: 'raster',
+			  tiles: [attributes.layer_type_options.url],
+			  "tileSize": 256
+			},
+			type: 'raster'
+		};
+		if ( ! attributes.visible ) {
+			layer.layout = {
+				visibility: 'none'
+			};
+		}
+		return map.addLayer(layer);
+	}
+
+```
+
+**Note:** This method must verify the value of `attributes.visible` to determine whether this layer should be visible when the map is initialized.
+
+## Layer attributes
+
+As you saw, each of the above method gets an argument `attributes` as input. This argument holds all the information of the layer the user is editing or viewing.
+
+There are some attributes that are common to any layer types, and other that are specific to a layer type. Every layer type-specific attribute a layer has is stored under the `layer_type_options` attributes.
+
+So these are the keys available in the `attributes` object:
+
+* **layer_id**: (integer) A unique ID that represents this layer and idenfy it in the database
+* **layer_name**: (string) The layer name, given by the user
+* **visible**: (boolean) A flag indicating whether this layer should be visible when the map initializes
+* **layer_type_options**: (object) A object with all the layer type-specific attributes (those registered in the `getSchema` method)
+
