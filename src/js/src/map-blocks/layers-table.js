@@ -17,7 +17,7 @@ const layerToRow = ( layer ) => ( {
 } );
 
 export default ( {
-	layers,
+	loadedLayers,
 	loadingLayers,
 	selectedLayers,
 	className,
@@ -28,7 +28,7 @@ export default ( {
 	}
 
 	const emptyMessage = __( 'No layers have been selected for this map.' );
-	const loadLayer = loadLayers( layers );
+	const loadLayer = loadLayers( loadedLayers );
 
 	return (
 		<Table.Provider columns={ layerColumns } className={ className }>
@@ -40,7 +40,7 @@ export default ( {
 			<tfoot>
 				<tr>
 					<td colSpan={ layerColumns.length }>
-						{ ! ( layers && layers.length ) && (
+						{ ! ( loadedLayers && loadedLayers.length ) && (
 							<p className="empty">{ emptyMessage }</p>
 						) }
 						{ ! loadingLayers && (

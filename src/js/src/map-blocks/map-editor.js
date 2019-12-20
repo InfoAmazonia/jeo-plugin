@@ -26,7 +26,8 @@ const MapEditor = ( {
 							case 'layers':
 								return (
 									<LayersSettings
-										layers={ loadedLayers }
+										loadedLayers={ loadedLayers }
+										loadingLayers={ loadingLayers }
 										selected={ selectedLayers }
 										setLayers={ ( layers ) => setAttributes( { layers } ) }
 									/>
@@ -34,8 +35,6 @@ const MapEditor = ( {
 							case 'library':
 								return (
 									<LayersLibrary
-										layers={ loadedLayers }
-										loadingLayers={ loadingLayers }
 										selected={ selectedLayers }
 										setLayers={ ( layers ) => setAttributes( { layers } ) }
 										onCreateLayer={ () => setModal( 'new-layer' ) }
@@ -49,7 +48,7 @@ const MapEditor = ( {
 			) }
 
 			<LayersTable
-				layers={ loadedLayers }
+				loadedLayers={ loadedLayers }
 				loadingLayers={ loadingLayers }
 				selectedLayers={ selectedLayers }
 				onButtonClick={ () => setModal( 'layers' ) }
@@ -58,10 +57,18 @@ const MapEditor = ( {
 	);
 };
 
-export default withSelect( ( select ) => ( {
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer' ),
-	loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-		'postType',
-		'map-layer',
-	] ),
-} ) )( MapEditor );
+export default withSelect( ( select, { attributes } ) => {
+	const query = { include: attributes.layers.map( ( layer ) => layer.id ) };
+	return {
+		loadedLayers: select( 'core' ).getEntityRecords(
+			'postType',
+			'map-layer',
+			query
+		),
+		loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
+			'postType',
+			'map-layer',
+			query,
+		] ),
+	};
+} )( MapEditor );
