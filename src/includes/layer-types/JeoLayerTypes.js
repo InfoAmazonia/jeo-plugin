@@ -1,17 +1,20 @@
 class JeoLayerTypes {
-
 	constructor() {
-		this.layerTypes = [];
+		this.layerTypes = {};
 	}
 
-	registerLayerType(layerTypeSlug, layerTypeObject) {
-		this.layerTypes[layerTypeSlug] = layerTypeObject;
+	getLayerTypes() {
+		return Object.keys( this.layerTypes );
 	}
-	getLayerType(layerTypeSlug) {
-		return this.layerTypes[layerTypeSlug];
+
+	registerLayerType( layerTypeSlug, layerTypeObject ) {
+		this.layerTypes[ layerTypeSlug ] = layerTypeObject;
 	}
-	getLayerTypeSchema(layerTypeSlug) {
-		return this.getLayerType(layerTypeSlug).getSchema();
+	getLayerType( layerTypeSlug ) {
+		return this.layerTypes[ layerTypeSlug ];
+	}
+	getLayerTypeSchema( layerTypeSlug ) {
+		return this.getLayerType( layerTypeSlug ).getSchema();
 	}
 }
 const instance = new JeoLayerTypes();
