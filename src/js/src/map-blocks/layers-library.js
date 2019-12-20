@@ -1,13 +1,23 @@
 import { __ } from '@wordpress/i18n';
 import { Button, Dashicon, TextControl } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import classNames from 'classnames';
 
 const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
 
-export default ( { layers, selected, setLayers, onCreateLayer } ) => {
+const LayersLibrary = ( {
+	loadingLayers,
+	loadedLayers,
+	selected,
+	setLayers,
+	onCreateLayer,
+} ) => {
 	const [ search, setSearch ] = useState( '' );
-	const options = layers
+	if ( loadingLayers ) {
+		return <p>{ __( 'Loading layers data...' ) }</p>;
+	}
+	const options = loadedLayers
 		.filter( ( layer ) =>
 			layer.title.rendered.toLowerCase().includes( search.toLowerCase() )
 		)
@@ -58,3 +68,11 @@ export default ( { layers, selected, setLayers, onCreateLayer } ) => {
 		</div>
 	);
 };
+
+export default withSelect( ( select ) => ( {
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer' ),
+	loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
+		'postType',
+		'map-layer',
+	] ),
+} ) )( LayersLibrary );

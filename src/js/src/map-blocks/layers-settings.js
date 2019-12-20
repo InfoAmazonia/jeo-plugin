@@ -80,7 +80,7 @@ const layerLoader = ( layers ) => {
 	return ( settings ) => ( { ...settings, layer: layersMap[ settings.id ] } );
 };
 
-export default ( { loadingLayers, layers, selected, setLayers } ) => {
+export default ( { loadingLayers, loadedLayers, selected, setLayers } ) => {
 	if ( loadingLayers ) {
 		return <p>Loading</p>;
 	}
@@ -88,7 +88,7 @@ export default ( { loadingLayers, layers, selected, setLayers } ) => {
 		return <p>{ __( 'No layers have been selected for this map.' ) } </p>;
 	}
 
-	const loadLayer = layerLoader( layers );
+	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
 
 	return (
