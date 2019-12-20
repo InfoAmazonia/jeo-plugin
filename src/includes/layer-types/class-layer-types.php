@@ -41,7 +41,7 @@ class Layer_Types {
 		 *
 		 * example:
 		 * add_action('jeo_register_layer_types', function($layer_types) {
-		 * 		$layer_types->register_layer_type('my-layer-type', 'http://url.to/layertype.js');
+		 * 		$layer_types->register_layer_type('my-layer-type', [ 'script_url' => 'http://url.to/layertype.js' ] );
 		 * });
 		 *
 		 * @param Jeo\Geocode_Handler The Geocode_Handler instance
@@ -57,7 +57,8 @@ class Layer_Types {
 	 * @param array $options {
 	 *     Required. Array or string of arguments describing the layer_type
 	 * 	   @type string		 $script_url			Full URL to the layer type javascript file
-	 *
+	 * 	   @type array 		 $dependencies 			List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependecies to the layer type main script
+	 * }
 	 */
 	public function register_layer_type($slug, $options) {
 
@@ -108,7 +109,9 @@ class Layer_Types {
 		// TODO: load only when needed
 
 		foreach ( $this->get_registered_layer_types() as $slug => $layer_type ) {
-			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], ['jeo-layer'] );
+			$deps = isset( $layer_type['dependecies'] ) ? $layer_type['dependecies'] : [];
+			$deps = array_merge( ['jeo-layer'], $deps );
+			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps );
 		}
 
 	}
