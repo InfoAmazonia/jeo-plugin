@@ -18,6 +18,7 @@ const LayerSettings = forwardRef(
 	(
 		{
 			isDragged,
+			removeLayer,
 			settings,
 			swapDefault,
 			switchDefault,
@@ -65,6 +66,9 @@ const LayerSettings = forwardRef(
 							onChange={ swapDefault }
 						/>
 					) }
+				</td>
+				<td className="remove-control" style={ setWidth( 4 ) }>
+					<Dashicon icon="dismiss" onClick={ removeLayer } />
 				</td>
 			</tr>
 		);
@@ -139,13 +143,16 @@ export default ( { loadingLayers, layers, selected, setLayers } ) => {
 								settings
 						)
 					);
+				const removeLayer = () =>
+					setLayers( selected.filter( ( settings ) => settings.id !== value.id ) );
 				const row = (
 					<LayerSettings
-						widths={ widths }
+						removeLayer={ removeLayer }
 						settings={ loadLayer( value ) }
 						switchDefault={ switchDefault }
 						swapDefault={ swapDefault }
 						updateUse={ updateUse }
+						widths={ widths }
 						{ ...meta } // includes isDragged
 						{ ...props }
 					/>
