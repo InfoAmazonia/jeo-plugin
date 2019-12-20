@@ -17,7 +17,10 @@ class ApiLayers extends Jeo_UnitApiTestCase {
 			'title' => 'Test layer',
 			'content' => 'Sample content',
 			'meta' => [
-				'type' => 'mapbox'
+				'type' => 'mapbox',
+				'layer_type_options' => [
+					'style_id' => 'infoamazonia/123123123213'
+				]
 			]
 		];
 
