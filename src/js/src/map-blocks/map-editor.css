@@ -1,0 +1,184 @@
+/**
+ * Map Editor Modal
+ */
+
+.jeo-map-editor-modal {
+	position: fixed;
+	top: 30px;
+	right: 30px;
+	bottom: 30px;
+	left: 30px;
+	z-index: 16000;
+	transform: none;
+	max-height: none;
+}
+
+.jeo-map-editor-modal .components-modal__content {
+	padding: 0;
+}
+
+.jeo-map-editor-modal .components-modal__header {
+	padding: 0 24px;
+	background-color: #fcfcfc;
+	margin: 0;
+	border-bottom: none;
+}
+
+.jeo-map-editor-modal .components-tab-panel__tabs {
+	padding: 3px 24px 0; /* Slight padding needed for focus outline */
+	background-color: #fcfcfc;
+	border-bottom: 1px solid #ddd;
+}
+
+.jeo-map-editor-modal .components-tab-panel__tabs .components-button {
+	padding: 8px 10px 8px;
+}
+
+.jeo-map-editor-modal
+	.components-tab-panel__tabs
+	.components-button.active-tab {
+	background-color: white;
+	border: 1px solid #ddd;
+	border-bottom: none;
+	padding-bottom: 9px;
+	margin-bottom: -1px;
+}
+
+.jeo-map-editor-modal
+	.components-tab-panel__tabs
+	.components-button.active-tab:focus:not(:disabled) {
+	box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
+}
+
+.jeo-map-editor-modal .components-tab-panel__tab-content {
+	padding: 0 24px;
+}
+
+/**
+ * Layers Settings
+ */
+.jeo-layers-list {
+	border-collapse: collapse;
+	width: 100%;
+	margin: 1em 0;
+}
+
+.jeo-layers-list .layer {
+	border: 1px solid lightgrey;
+	vertical-align: middle;
+}
+
+.jeo-layers-list .layer td {
+	padding: 0.5em;
+}
+
+.jeo-layers-list .components-select-control__input {
+	width: auto;
+	margin-bottom: 0;
+}
+
+.jeo-layers-list .components-base-control__field {
+	margin-bottom: 0;
+}
+
+.jeo-layers-list .components-base-control__label {
+	margin: 0 1em 0 0;
+}
+
+.jeo-layers-list .components-base-control__help {
+	margin: 0;
+}
+
+.jeo-layers-list .drag-handle {
+	vertical-align: middle;
+}
+
+.jeo-layers-list .layer-title {
+	font-weight: bold;
+}
+
+.jeo-layers-list.dragging {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+.jeo-layers-list.dragging * {
+	box-sizing: border-box;
+}
+
+.jeo-layers-list.dragging .layer {
+	background-color: white;
+}
+
+/**
+ * Layers Library
+ */
+.jeo-layers-library .library-controls {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 1em 0;
+}
+
+.jeo-layers-library .library-controls .components-base-control__field {
+	display: flex;
+	align-items: center;
+	margin: 0;
+}
+
+.jeo-layers-library .library-controls .components-base-control__label {
+	margin: 0 1em 0;
+	flex-basis: 100%;
+}
+
+.jeo-layers-library .library-controls > span {
+	flex-basis: 4em;
+	text-align: center;
+}
+
+.jeo-layers-library .available-layers {
+	display: grid;
+	grid: auto-flow 8em / 1fr 1fr;
+	grid-gap: 1em;
+}
+
+.jeo-layers-library .layer {
+	display: flex;
+	background-color: #f3f3f3;
+}
+
+.jeo-layers-library .layer-button {
+	flex-basis: 4em;
+	font-size: 1.33em;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+}
+
+.jeo-layers-library .layer-button .dashicon {
+	display: block;
+	margin: 0 auto 0.66em;
+}
+
+.jeo-layers-library .layer-add {
+	background-color: #0079c0;
+	color: white;
+}
+
+.jeo-layers-library .layer-add:hover {
+	background-color: #33acf3;
+}
+
+.jeo-layers-library .layer-added {
+	background-color: #999999;
+	color: white;
+}
+
+.jeo-layers-library .layer-description {
+	padding: 0 1em;
+}
+
+.jeo-layers-library .layer-type {
+	font-size: 0.8em;
+	color: darkgrey;
+}
