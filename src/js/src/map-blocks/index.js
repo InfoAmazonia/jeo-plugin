@@ -20,13 +20,13 @@ registerBlockType( 'jeo/map', {
 				},
 			},
 		},
-		centerLat: {
+		center_lat: {
 			type: 'number',
 		},
-		centerLon: {
+		center_lon: {
 			type: 'number',
 		},
-		initialZoom: {
+		initial_zoom: {
 			type: 'number',
 		},
 	},
