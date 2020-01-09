@@ -4,6 +4,7 @@ import MapEditorModal from './map-editor-modal';
 import LayerEditor from './layer-editor';
 import LayersLibrary from './layers-library';
 import LayersSettings from './layers-settings';
+import MapSettings from './map-settings';
 import LayersTable from './layers-table';
 import './map-editor.css';
 
@@ -23,26 +24,36 @@ const MapEditor = ( {
 					{ ( tab ) => {
 						switch ( tab.name ) {
 							case 'map':
-								return <p>Map Settings</p>;
+								return (
+									<MapSettings
+										setMap={ ( settings ) =>
+											setAttributes( { ...attributes, ...settings } )
+										}
+									/>
+								);
 							case 'layers':
 								return (
 									<LayersSettings
 										loadedLayers={ loadedLayers }
 										loadingLayers={ loadingLayers }
 										selected={ selectedLayers }
-										setLayers={ ( layers ) => setAttributes( { layers } ) }
+										setLayers={ ( layers ) =>
+											setAttributes( { ...attributes, layers } )
+										}
 									/>
 								);
 							case 'library':
 								return (
 									<LayersLibrary
 										selected={ selectedLayers }
-										setLayers={ ( layers ) => setAttributes( { layers } ) }
+										setLayers={ ( layers ) =>
+											setAttributes( { ...attributes, layers } )
+										}
 										onCreateLayer={ () => setModal( 'new-layer' ) }
 									/>
 								);
 							case 'new-layer':
-								return <LayerEditor></LayerEditor>;
+								return <LayerEditor />;
 						}
 					} }
 				</MapEditorModal>
