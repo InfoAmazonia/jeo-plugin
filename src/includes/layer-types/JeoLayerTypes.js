@@ -6,7 +6,6 @@ class JeoLayerTypes {
 	getLayerTypes() {
 		return Object.keys( this.layerTypes );
 	}
-
 	registerLayerType( layerTypeSlug, layerTypeObject ) {
 		this.layerTypes[ layerTypeSlug ] = layerTypeObject;
 	}

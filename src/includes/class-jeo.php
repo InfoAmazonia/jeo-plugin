@@ -107,7 +107,7 @@ class Jeo {
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
-			$map_blocks_assets['dependencies'],
+			array_merge( $map_blocks_assets['dependencies'], array( 'jeo-layer' ) ),
 			$map_blocks_version
 		);
 	}
