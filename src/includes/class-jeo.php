@@ -109,7 +109,7 @@ class Jeo {
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
 			array_merge( $map_blocks_assets['dependencies'], array( 'jeo-layer' ) ),
-			$map_blocks_version
+			$map_blocks_assets['version']
 		);
 	}
 
