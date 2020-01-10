@@ -15,7 +15,8 @@ class JeoMap {
 		this.args = element.attributes;
 
 		let map = new window.mapboxgl.Map({
-			container: element
+			container: element,
+			attributionControl: false
 		});
 
 		this.map = map;
@@ -29,8 +30,15 @@ class JeoMap {
 			const baseLayer = layers[0];
 			baseLayer.addStyle(map);
 
+			let custom_attributions = [];
+
 			map.on('load', () => {
 				layers.forEach( (layer, i) => {
+
+					if( layer.attribution ) {
+						custom_attributions.push( layer.attribution );
+					}
+
 					if ( i === 0 ) {
 						return;
 					} else {
@@ -40,6 +48,13 @@ class JeoMap {
 			});
 
 			this.addLayersControl();
+
+			map.addControl(
+				new mapboxgl.AttributionControl({
+					customAttribution: custom_attributions
+				}),
+				'bottom-left'
+			);
 
 		} );
 
@@ -76,6 +91,7 @@ class JeoMap {
 							new window.JeoLayer(layerObject.meta.type, {
 									layer_id: layerObject.slug,
 									layer_name: layerObject.title.rendered,
+									attribution: layerObject.meta.attribution,
 									visible: layersDefinitions[i].default,
 									layer_type_options: layerObject.meta.layer_type_options
 							})

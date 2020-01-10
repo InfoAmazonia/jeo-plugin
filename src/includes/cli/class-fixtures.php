@@ -21,6 +21,7 @@ class Fixtures {
 				'post_status' => 'mapbox',
 				'meta' => [
 					'type' => 'mapbox',
+					'attribution' => 'Sample attribution for this layer',
 					'layer_type_options' => [
 						'style_id' => 'infoamazonia/cjvwvumyx5i851coa874sx97e'
 					]
@@ -32,6 +33,7 @@ class Fixtures {
 				'post_status' => 'publish',
 				'meta' => [
 					'type' => 'tilelayer',
+					'attribution' => 'Copyright the whole world',
 					'layer_type_options' => [
 						'url' => 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
 					]
@@ -43,6 +45,7 @@ class Fixtures {
 				'post_status' => 'publish',
 				'meta' => [
 					'type' => 'tilelayer',
+					'attribution' => 'Sample veryu long super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  attribution for this layer',
 					'layer_type_options' => [
 						'url' => 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
 					]
@@ -54,6 +57,7 @@ class Fixtures {
 				'post_status' => 'publish',
 				'meta' => [
 					'type' => 'mapbox',
+					'attribution' => 'Sample attribution for <a href="http://jeo.com">this layer with a link</a>',
 					'layer_type_options' => [
 						'style_id' => 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
 					]

@@ -24,6 +24,10 @@ class JeoLayer {
 		return this.attributes.layer_id;
 	}
 
+	get attribution() {
+		return this.attributes.attribution;
+	}
+
 	get options() {
 		return this.attributes.layer_type_options;
 	}
