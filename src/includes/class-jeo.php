@@ -52,6 +52,7 @@ class Jeo {
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'cli_init', array($this, 'register_cli_commands') );
 	}
 
 	/**
@@ -141,6 +142,15 @@ class Jeo {
 				array( 'jsonUrl' => rest_url( 'wp/v2/' ) )
 			);
 		}
+	}
+
+	/**
+	 * Registers WP CLI commands
+	 *
+	 * @return void
+	 */
+	public function register_cli_commands() {
+		\WP_CLI::add_command( 'jeo fixtures', 'Jeo\Fixtures' );
 	}
 
 }
