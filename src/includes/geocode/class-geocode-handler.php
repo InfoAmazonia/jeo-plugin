@@ -6,10 +6,28 @@ class Geocode_Handler {
 
 	use Singleton;
 
+	public $geo_attributes = [
+		'_geocode_lat',
+		'_geocode_lon',
+		'_geocode_full_address',
+		'_geocode_city_level_1',
+		'_geocode_city',
+		'_geocode_region_level_3',
+		'_geocode_region_level_2',
+		'_geocode_region_level_1',
+		'_geocode_country_code',
+		'_geocode_country',
+	];
+
 	protected function init() {
 		add_action( 'wp_ajax_jeo_geocode', [$this, 'ajax_geocode'] );
 		add_action( 'wp_ajax_jeo_reverse_geocode', [$this, 'ajax_reverse_geocode'] );
 		add_action( 'init', [$this, 'register_metadata'], 99 );
+
+		add_action( 'init', [$this, 'register_metadata'], 99 );
+
+		$this->add_index_metadata_hooks();
+
 	}
 
 	private $registered_geocoders = [];
@@ -84,9 +102,29 @@ class Geocode_Handler {
 
 	public function register_metadata() {
 
+		register_post_meta('post', '_primary_point', [
+			'show_in_rest' => true,
+			'single' => false,
+			'auth_callback' => function() {
+				return current_user_can('edit_posts');
+			},
+			'type' => 'array',
+			'description' => __('Multiple metadata that holds primary locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo')
+		]);
+
+		register_post_meta('post', '_secondary_point', [
+			'show_in_rest' => true,
+			'single' => false,
+			'auth_callback' => function() {
+				return current_user_can('edit_posts');
+			},
+			'type' => 'array',
+			'description' => __('Multiple metadata that holds secondary locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo')
+		]);
+
 		register_post_meta('post', '_geocode_full_address', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -96,7 +134,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_lat', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -106,7 +144,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_lon', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -116,7 +154,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_country', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -126,7 +164,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_country_code', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -136,7 +174,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_region_level_1', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -146,7 +184,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_region_level_2', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -156,7 +194,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_region_level_3', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -166,7 +204,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_city', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -176,7 +214,7 @@ class Geocode_Handler {
 
 		register_post_meta('post', '_geocode_city_level_1', [
 			'show_in_rest' => true,
-			'single' => true,
+			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -251,6 +289,72 @@ class Geocode_Handler {
 
 		}
 		return false;
+	}
+
+	private function add_index_metadata_hooks() {
+
+		add_filter( 'update_post_metadata', [$this, 'disable_update_post_meta'], 10, 5 );
+		add_filter( 'add_post_metadata', [$this, 'disable_update_post_meta'], 10, 5 );
+
+		add_action( 'updated_postmeta', [$this, 'update_meta_indexes'], 10, 4 );
+		add_action( 'added_post_meta', [$this, 'update_meta_indexes'], 10, 4 );
+
+	}
+
+	private function remove_index_metadata_hooks() {
+
+		remove_filter( 'update_post_metadata', [$this, 'disable_update_post_meta'] );
+		remove_filter( 'add_post_metadata', [$this, 'disable_update_post_meta'] );
+
+		remove_action( 'updated_postmeta', [$this, 'update_meta_indexes'] );
+		remove_action( 'added_post_meta', [$this, 'update_meta_indexes'] );
+
+	}
+
+	/**
+	 * metadata used as indexes are generated automatically when _primary_point and _secondary_point are updated
+	 * and should not be updated directly
+	 */
+	public function disable_update_post_meta($return, $object_id, $meta_key, $meta_value, $prev_value) {
+
+		if ( in_array( $meta_key, $this->geo_attributes ) ) {
+			return false;
+		}
+
+		return $return;
+
+	}
+
+	/**
+	 * When a primary or secondary point is added/updated we extract
+	 * the geocoded information from the point and add it as post meta to the post.
+	 *
+	 * This serves as an index so we can find posts by this information.
+	 *
+	 */
+	public function update_meta_indexes( $meta_id, $object_id, $meta_key, $meta_value ) {
+
+		if ( $meta_key == '_primary_point' || $meta_key == '_secondary_point' ) {
+
+			$this->remove_index_metadata_hooks();
+
+			// get all values
+			$all_points = array_merge( get_post_meta( $object_id, '_primary_point' ),  get_post_meta( $object_id, '_secondary_point' ) );
+
+			foreach( $this->geo_attributes as $attr ) {
+
+				delete_post_meta( $object_id, $attr );
+
+				foreach( $all_points as $point ) {
+					add_post_meta( $object_id, $attr, $point[$attr] );
+				}
+
+			}
+
+			$this->add_index_metadata_hooks();
+
+		}
+
 	}
 
 }
