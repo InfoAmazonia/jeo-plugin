@@ -59,6 +59,18 @@ class Layers {
 
 		register_post_meta(
 			$this->post_type,
+			'attribution',
+			array(
+				'show_in_rest'  => true,
+				'single'        => true,
+				'auth_callback' => '__return_true',
+				'type'          => 'string',
+				'description'   => __( 'The layer attribution. A text or HTML code with a link', 'jeo' ),
+			)
+		);
+
+		register_post_meta(
+			$this->post_type,
 			'layer_type_options',
 			array(
 				'show_in_rest'  => array(
