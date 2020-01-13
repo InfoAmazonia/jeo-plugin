@@ -14,7 +14,7 @@
 		<div id="tab-general" class="tabs-content">
 
 
-			<div id="test-mapbox" style="width: 1000px; height: 1000px;"></div>
+			<div id="test-ol" style="width: 500px; height: 500px;"></div>
 			<div id="map-details"></div>
 			<button id="test">teste</button>
 
