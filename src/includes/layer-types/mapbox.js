@@ -28,7 +28,45 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				visibility: 'none',
 			};
 		}
-		return map.addLayer( layer );
+
+
+		this
+		._getStyleDefinition( attributes )
+		.then( function( styleDefinition ) {
+
+			// let newStyle = map.getStyle();
+			// newStyle.glyphs = styleDefinition.glyphs;
+			map.style.glyphs = styleDefinition.glyphs;
+			//map.setStyle( newStyle );
+			// console.log(map.style.glyphs);
+			// console.log(styleDefinition.glyphs);
+
+			Object.entries(styleDefinition.sources).forEach( ([source_key, source]) => {
+				console.log(attributes.layer_id + '_' + source_key);
+				map.addSource( attributes.layer_id + '_' + source_key, source );
+
+			});
+
+			// //console.log( styleDefinition.layers[1] );
+			styleDefinition.layers.forEach(layer => {
+
+				if ( layer.source ) {
+					layer.source = attributes.layer_id + '_' + layer.source;
+					map.addLayer( layer );
+				}
+			});
+			//console.log(x);
+
+			window.mmap = map;
+
+		} )
+		.catch( function( error ) {
+			console.log( error );
+		} );
+
+
+
+		//return map.addLayer( layer );
 	},
 
 	getSchema( attributes ) {
@@ -73,7 +111,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					}
 
 					// TODO: merge form_layers to the schema
-					console.log( form_layers );
+					// console.log( form_layers );
 
 					resolve( base_schema );
 				} )
@@ -107,6 +145,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					access_token,
 				function( data ) {
 					self._styleDefinitions[ attributes.layer_id ] = data;
+					console.log(data);
 					resolve( data );
 				}
 			);
