@@ -58,6 +58,10 @@ class JeoMap {
 
 		} );
 
+		this.getRelatedPosts().then( posts => {
+
+		} );
+
 		window.map = map;
 
 	}
@@ -106,6 +110,78 @@ class JeoMap {
 			);
 
 		});
+
+	}
+
+	getRelatedPosts() {
+		return new Promise( (resolve, reject) => {
+
+			const relatedPostsCriteria = this.getArg('related_posts');
+			this.relatedPostsCriteria = relatedPostsCriteria;
+			var query = [];
+			query['per_page'] = 100; // TODO handle limit of posts per query
+			if ( relatedPostsCriteria.cat ) {
+				query['categories'] = relatedPostsCriteria.cat
+			} else {
+				resolve( [] );
+			}
+			jQuery.get(
+				jeoMapVars.jsonUrl + 'posts',
+				query,
+				data => {
+
+					if ( data.length ) {
+
+						data.forEach( post => {
+							this.addPostToMap(post);
+						})
+
+					}
+
+
+				}
+			);
+
+		});
+	}
+
+	addPostToMap(post) {
+		if ( post.meta._primary_point ) {
+
+			post.meta._primary_point.forEach( point => {
+				this.addPointToMap(point, post, 'primary')
+			});
+
+		}
+
+		if ( post.meta._secondary_point ) {
+
+			post.meta._secondary_point.forEach( point => {
+				this.addPointToMap(point, post, 'secondary')
+			});
+
+		}
+
+	}
+
+	addPointToMap(point, post, type) {
+		const color = type == 'secondary' ? '#CCCCCC' : '#3FB1CE';
+
+		let marker = new mapboxgl.Marker( {color: color } );
+
+		// TODO use a template file
+		const popupHTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>' + post.excerpt.rendered;
+
+		let popUp = new mapboxgl.Popup().setHTML( popupHTML );
+
+		const LngLat = {
+			lat: parseFloat( point._geocode_lat.replace(',', '.') ),
+			lon: parseFloat( point._geocode_lon.replace(',', '.') )
+		}
+
+		marker.setLngLat( LngLat )
+		.setPopup( popUp )
+		.addTo( this.map );
 
 	}
 
