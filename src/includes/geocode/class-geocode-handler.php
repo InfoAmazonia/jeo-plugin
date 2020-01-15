@@ -103,22 +103,32 @@ class Geocode_Handler {
 	public function register_metadata() {
 
 		register_post_meta('post', '_primary_point', [
-			'show_in_rest' => true,
+			'show_in_rest'  => array(
+					'schema' => array(
+						'properties'           => array(),
+						'additionalProperties' => true,
+					),
+				),
 			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
-			'type' => 'array',
+			'type' => 'object',
 			'description' => __('Multiple metadata that holds primary locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo')
 		]);
 
 		register_post_meta('post', '_secondary_point', [
-			'show_in_rest' => true,
+			'show_in_rest'  => array(
+					'schema' => array(
+						'properties'           => array(),
+						'additionalProperties' => true,
+					),
+				),
 			'single' => false,
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
-			'type' => 'array',
+			'type' => 'object',
 			'description' => __('Multiple metadata that holds secondary locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo')
 		]);
 
