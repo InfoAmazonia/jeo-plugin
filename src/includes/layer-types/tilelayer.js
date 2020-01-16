@@ -4,6 +4,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 		const name = attributes.layer_id
 		return map.setStyle({
 			'version': 8,
+			'glyphs': 'mapbox://fonts/' + jeo_settings.mapbox_username + '/{fontstack}/{range}.pbf',
 			'sources': {
 				[name]: {
 					'type': 'raster',

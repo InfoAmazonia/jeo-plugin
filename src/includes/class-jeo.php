@@ -100,6 +100,7 @@ class Jeo {
 			'jeo_settings',
 			array(
 				'mapbox_key' => \jeo_settings()->get_option( 'mapbox_key' ),
+				'mapbox_username' => \jeo_settings()->get_option( 'mapbox_username' ),
 			)
 		);
 

@@ -1,8 +1,13 @@
 window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addStyle( map, attributes ) {
-		return map.setStyle(
-			'mapbox://styles/' + attributes.layer_type_options.style_id
-		);
+
+		this
+		._getStyleDefinition( attributes )
+		.then( function( styleDefinition ) {
+			styleDefinition.glyphs = 'mapbox://fonts/' + jeo_settings.mapbox_username + '/{fontstack}/{range}.pbf';
+			return map.setStyle( styleDefinition );
+		} );
+
 	},
 
 	addLayer( map, attributes ) {
@@ -34,20 +39,11 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		._getStyleDefinition( attributes )
 		.then( function( styleDefinition ) {
 
-			// let newStyle = map.getStyle();
-			// newStyle.glyphs = styleDefinition.glyphs;
-			map.style.glyphs = styleDefinition.glyphs;
-			//map.setStyle( newStyle );
-			// console.log(map.style.glyphs);
-			// console.log(styleDefinition.glyphs);
-
 			Object.entries(styleDefinition.sources).forEach( ([source_key, source]) => {
-				console.log(attributes.layer_id + '_' + source_key);
 				map.addSource( attributes.layer_id + '_' + source_key, source );
 
 			});
 
-			// //console.log( styleDefinition.layers[1] );
 			styleDefinition.layers.forEach(layer => {
 
 				if ( layer.source ) {
@@ -55,18 +51,12 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					map.addLayer( layer );
 				}
 			});
-			//console.log(x);
-
-			window.mmap = map;
 
 		} )
 		.catch( function( error ) {
 			console.log( error );
 		} );
 
-
-
-		//return map.addLayer( layer );
 	},
 
 	getSchema( attributes ) {
@@ -145,7 +135,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					access_token,
 				function( data ) {
 					self._styleDefinitions[ attributes.layer_id ] = data;
-					console.log(data);
 					resolve( data );
 				}
 			);
@@ -172,7 +161,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 				if ( typeof composite === 'object' ) {
 					const layers = composite.url.replace( 'mapbox://', '' );
-					//console.log(composite);
 					jQuery.get(
 						'https://api.mapbox.com/v4/' +
 							layers +
