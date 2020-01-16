@@ -15,6 +15,12 @@ class Fixtures {
 		 * Once a post was created and the meta schema is changed, it will be updated when you call wp jeo fixtures update
 		 */
 		$posts = [
+
+
+			/**
+			 * Layers
+			 */
+
 			[
 				'post_type' => 'map-layer',
 				'post_title' => 'Layer1',
@@ -63,6 +69,111 @@ class Fixtures {
 					]
 				]
 			],
+
+
+			/**
+			 * Posts
+			 */
+
+			[
+				'post_type' => 'post',
+				'post_title' => 'Post 1',
+				'post_status' => 'publish',
+				'meta' => [
+					'_primary_point' => [
+						'_geocode_lat' => '-22,888889',
+						'_geocode_lon' => '-47,081944',
+						'_geocode_full_address' => 'Jardim Chapadão, Campinas, Região Imediata de Campinas, Região Metropolitana de Campinas, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13069-901, Brasil',
+						'_geocode_country' => 'Brasil',
+						'_geocode_country_code' => '',
+						'_geocode_city' => 'Campinas',
+						'_geocode_region_level_2' => 'São Paulo',
+						'_geocode_region_level_3' => 'Região Intermediária de Campinas',
+						'_geocode_city_level_1' => 'Jardim Chapadão',
+					],
+					'_primary_point' => [
+						'_geocode_lat' => '-23,57458535',
+						'_geocode_lon' => '-46,628883891755',
+						'_geocode_full_address' => 'Parque da Aclimação, Aclimação, Liberdade, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01534-001, Brasil',
+						'_geocode_country' => 'Brasil',
+						'_geocode_country_code' => '',
+						'_geocode_city' => 'São Paulo',
+						'_geocode_region_level_2' => 'São Paulo',
+						'_geocode_region_level_3' => 'Região Intermediária de São Paulo',
+						'_geocode_city_level_1' => 'Aclimação',
+					]
+				],
+				'category' => [
+					'category 1',
+					'category 2'
+				]
+			],
+			[
+				'post_type' => 'post',
+				'post_title' => 'Post 2',
+				'post_status' => 'publish',
+				'meta' => [
+					'_primary_point' => [
+						'_geocode_lat' => '-23,54659435',
+						'_geocode_lon' => '-46,644533061712',
+						'_geocode_full_address' => 'Edifício Copan, Rua Araújo, Vila Buarque, República, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01046-010, Brasil',
+						'_geocode_country' => 'Brasil',
+						'_geocode_country_code' => '',
+						'_geocode_city' => 'São Paulo',
+						'_geocode_region_level_2' => 'São Paulo',
+						'_geocode_region_level_3' => 'Região Intermediária de São Paulo',
+						'_geocode_city_level_1' => 'Vila Buarque',
+					],
+					'_secondary_point' => [
+						'_geocode_lat' => '-23,183525102463',
+						'_geocode_lon' => '-46,898231506348',
+						'_geocode_full_address' => 'Rua Jorge Gebran, Parque do Colégio, Chácara Urbana, Jundiaí, Região Imediata de Jundiaí, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13209-090, Brasil',
+						'_geocode_country' => 'Brasil',
+						'_geocode_country_code' => '',
+						'_geocode_city' => 'Jundiaí',
+						'_geocode_region_level_2' => 'São Paulo',
+						'_geocode_region_level_3' => 'Região Intermediária de Campinas',
+						'_geocode_city_level_1' => 'Parque do Colégio',
+					]
+				],
+				'category' => [
+					'category 2',
+					'category 3'
+				]
+			],
+			[
+				'post_type' => 'post',
+				'post_title' => 'Post 3',
+				'post_status' => 'publish',
+				'meta' => [
+					'_primary_point' => [
+						'_geocode_lat' => '-22,939108160587',
+						'_geocode_lon' => '-46,542205810547',
+						'_geocode_full_address' => 'Rua Belmiro Ramos Franco, Jardim São Lourenço, Bragança Paulista, Região Imediata de Bragança Paulista, Região Intermediária de Campinas, São Paulo, Região Sudeste, 12908-040, Brasil',
+						'_geocode_country' => 'Brasil',
+						'_geocode_country_code' => '',
+						'_geocode_city' => 'Bragança Paulista',
+						'_geocode_region_level_2' => 'São Paulo',
+						'_geocode_region_level_3' => 'Região Intermediária de Campinas',
+						'_geocode_city_level_1' => 'Jardim São Lourenço',
+					],
+					'_secondary_point' => [
+						'_geocode_lat' => '-23,118574871158',
+						'_geocode_lon' => '-46,564693450928',
+						'_geocode_full_address' => 'Rua Clóvis Soares, Vila Lixão, Alvinópolis, Atibaia, Região Imediata de Bragança Paulista, Região Intermediária de Campinas, São Paulo, Região Sudeste, 12942-560, Brasil',
+						'_geocode_country' => 'Brasil',
+						'_geocode_country_code' => '',
+						'_geocode_city' => 'Atibaia',
+						'_geocode_region_level_2' => 'São Paulo',
+						'_geocode_region_level_3' => 'Região Intermediária de Campinas',
+						'_geocode_city_level_1' => 'Vila Lixão',
+					]
+				],
+				'category' => [
+					'category 3'
+				]
+			],
+
 
 		];
 
@@ -138,12 +249,100 @@ class Fixtures {
 			\WP_CLI::success( $message );
 
 			foreach ( $item['meta'] as $key => $value ) {
-				if ( update_post_meta( $post_id, $key, $value ) ) {
+				delete_post_meta( $post_id, $key );
+			}
+
+			foreach ( $item['meta'] as $key => $value ) {
+				if ( add_post_meta( $post_id, $key, $value ) ) {
 					\WP_CLI::success( "$key metadata updated" );
 				}
 			}
 
+			$term1 = term_exists( 'category 1', 'category', 0 );
+			$term2 = term_exists( 'category 2', 'category', 0 );
+			$term3 = term_exists( 'category 3', 'category', 0 );
+
+			if ( ! $term1 ) $term1 = wp_insert_term( 'category 1', 'category' );
+			if ( ! $term2 ) $term2 = wp_insert_term( 'category 2', 'category' );
+			if ( ! $term3 ) $term3 = wp_insert_term( 'category 3', 'category' );
+
+			if ( isset($item['category']) ) {
+
+				$cat_ids = [];
+
+				foreach( $item['category'] as $cat ) {
+
+					$term = get_term_by( 'name', $cat, 'category' );
+
+					if ( ! $term ) $term = wp_insert_term( $cat, 'category' );
+
+					$cat_ids[] = $term->term_id;
+
+				}
+
+				wp_set_post_categories( $post_id, $cat_ids );
+			}
+
 		}
+
+	}
+
+	public function sample_maps() {
+
+		$layers = $this->get_posts();
+
+		$layers = array_filter( $layers, function($el) {
+			return $el['post_type'] == 'map-layer';
+		});
+
+		$specs = [
+			[
+				'use' => 'fixed',
+			],
+			[
+				'use' => 'switchable',
+				'default' => true
+			],
+			[
+				'use' => 'swappable',
+				'default' => true
+			],
+			[
+				'use' => 'swappable',
+				'default' => false
+			]
+		];
+
+		$i = 0;
+
+		foreach ( $layers as $layer ) {
+
+			$specs[$i]['id'] = $layer['ID'];
+			$i++;
+
+		}
+
+		$div = "<div class=\"jeomap\" data-center_lat=\"0\" data-center_lon=\"0\" data-initial_zoom=\"1\" data-layers='" . json_encode($specs) . "' ";
+
+		$cat1 = get_term_by( 'name', 'category 1', 'category' );
+		var_dump($cat1);
+		$cat2 = get_term_by( 'name', 'category 2', 'category' );
+		$cat3 = get_term_by( 'name', 'category 3', 'category' );
+
+		$related = [
+			'cat' => [
+				$cat1->term_id,
+				$cat2->term_id,
+				$cat3->term_id
+			]
+		];
+
+		$div .= "data-related_posts='" . json_encode($related) . "' ";
+
+
+		$div .= " style=\"width:600px; height: 600px;\"></div>";
+
+		\WP_CLI::line( $div );
 
 	}
 }

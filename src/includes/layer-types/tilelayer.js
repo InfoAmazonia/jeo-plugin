@@ -1,10 +1,11 @@
 window.JeoLayerTypes.registerLayerType('tilelayer', {
 
 	addStyle: function(map, attributes) {
+		const name = attributes.layer_id
 		return map.setStyle({
 			'version': 8,
 			'sources': {
-				'raster-tiles': {
+				[name]: {
 					'type': 'raster',
 					tiles: [attributes.layer_type_options.url],
 					'tileSize': 256
@@ -13,7 +14,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 			'layers': [{
 				id: attributes.layer_id,
 				type: 'raster',
-				source: 'raster-tiles'
+				source: attributes.layer_id
 			}]
 		})
 	},
