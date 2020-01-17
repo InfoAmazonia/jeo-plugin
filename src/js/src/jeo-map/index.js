@@ -205,9 +205,9 @@ class JeoMap {
 
 	/**
 	 * return an array with the index of the layers in the
-	 * this.layers list that are marked as switchable.
+	 * this.layers list that are marked as swappable.
 	 *
-	 * If there are no switchable layers, returns an empty array
+	 * If there are no swappable layers, returns an empty array
 	 *
 	 * @return array
 	 */
@@ -222,7 +222,7 @@ class JeoMap {
 	}
 
 	/**
-	 * return the index of the switchable layer marked as default
+	 * return the index of the sappable layer marked as default
 	 */
 	getDefaultSwappableLayer() {
 		let layers = [];
@@ -253,14 +253,14 @@ class JeoMap {
 				e.preventDefault();
 				e.stopPropagation();
 
-				var visibility = this.map.getLayoutProperty(clickedLayer, 'visibility');
+				const visible = clicked.classList.contains( 'active' );
 
-				if (typeof(visibility) == 'undefined' || visibility === 'visible') {
-					this.map.setLayoutProperty(clickedLayer, 'visibility', 'none');
+				if ( visible ) {
+					this.hideLayer( clickedLayer );
 					clicked.className = '';
 				} else {
+					this.showLayer( clickedLayer );
 					clicked.className = 'active';
-					this.map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
 				}
 			};
 
@@ -271,7 +271,7 @@ class JeoMap {
 		this.getSwappableLayers().forEach(index => {
 			let link = document.createElement('a');
 			link.href = '#';
-			link.classList.add('switchable');
+			link.classList.add('swappable');
 
 			if ( this.getDefaultSwappableLayer() == index ) {
 				link.classList.add('active');
@@ -288,16 +288,15 @@ class JeoMap {
 
 				// hide all
 				this.getSwappableLayers().forEach(i => {
-					this.map.setLayoutProperty(this.layers[i].layer_id, 'visibility', 'none');
+					this.hideLayer( this.layers[i].layer_id );
 				});
-				jQuery(navElement).children('.switchable').removeClass('active');
+				jQuery(navElement).children('.swappable').removeClass('active');
 
 				// display current
 				let clicked = e.currentTarget;
 				const clickedLayer = clicked.dataset.layer_id;
-				this.map.setLayoutProperty(clickedLayer, 'visibility', 'visible');
+				this.showLayer( clickedLayer );
 
-				var visibility = this.map.getLayoutProperty(clickedLayer, 'visibility');
 				clicked.classList.add('active');
 
 			};
@@ -307,6 +306,22 @@ class JeoMap {
 		});
 
 		this.element.appendChild(navElement);
+	}
+
+	changeLayerVisibitly( layer_id, visibility ) {
+		this.map.getStyle().layers.forEach( layer => {
+			if ( layer.id == layer_id || layer.id.startsWith( layer_id + '_' ) ) {
+				this.map.setLayoutProperty( layer.id, 'visibility', visibility);
+			}
+		} );
+	}
+
+	showLayer( layer_id ) {
+		this.changeLayerVisibitly( layer_id, 'visible' );
+	}
+
+	hideLayer( layer_id ) {
+		this.changeLayerVisibitly( layer_id, 'none' );
 	}
 
 }

@@ -15,24 +15,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			typeof attributes.layer_type_options.access_token !== 'undefined' ?
 				attributes.layer_type_options.access_token :
 				window.mapboxgl.accessToken;
-		const layer = {
-			id: attributes.layer_id,
-			source: {
-				type: 'raster',
-				tiles: [
-					'https://api.mapbox.com/styles/v1/' +
-						attributes.layer_type_options.style_id +
-						'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
-						access_token,
-				],
-			},
-			type: 'raster',
-		};
-		if ( ! attributes.visible ) {
-			layer.layout = {
-				visibility: 'none',
-			};
-		}
+
+
 
 
 		this
@@ -46,10 +30,19 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 			styleDefinition.layers.forEach(layer => {
 
+				layer.id = attributes.layer_id + '_' + layer.id;
+
+				if ( ! attributes.visible ) {
+					layer.layout = {
+						visibility: 'none',
+					};
+				}
+
 				if ( layer.source ) {
 					layer.source = attributes.layer_id + '_' + layer.source;
 					map.addLayer( layer );
 				}
+
 			});
 
 		} )
