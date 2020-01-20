@@ -356,7 +356,9 @@ class Geocode_Handler {
 				delete_post_meta( $object_id, $attr );
 
 				foreach( $all_points as $point ) {
-					add_post_meta( $object_id, $attr, $point[$attr] );
+					if ( isset( $point[$attr] ) ) {
+						add_post_meta( $object_id, $attr, $point[$attr] );
+					}
 				}
 
 			}
