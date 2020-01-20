@@ -268,73 +268,135 @@ class Fixtures {
 				}
 			}
 
-			$term1 = term_exists( 'category 1', 'category', 0 );
-			$term2 = term_exists( 'category 2', 'category', 0 );
-			$term3 = term_exists( 'category 3', 'category', 0 );
-
-			if ( ! $term1 ) $term1 = wp_insert_term( 'category 1', 'category' );
-			if ( ! $term2 ) $term2 = wp_insert_term( 'category 2', 'category' );
-			if ( ! $term3 ) $term3 = wp_insert_term( 'category 3', 'category' );
-
-			if ( isset($item['category']) ) {
-
-				$cat_ids = [];
-
-				foreach( $item['category'] as $cat ) {
-
-					$term = get_term_by( 'name', $cat, 'category' );
-
-					if ( ! $term ) $term = wp_insert_term( $cat, 'category' );
-
-					$cat_ids[] = $term->term_id;
-
-				}
-
-				wp_set_post_categories( $post_id, $cat_ids );
-			}
-
-
-			// Create MAP post
-			$map = get_page_by_title( 'Map 1', 'OBJECT', 'map');
-
-			if ( $map ) {
-
-				$map_id = $map->ID;
-				$message = "Existing Map found ($map_id): ";
-
-			} else {
-
-				$map = [
-					'post_type' => 'map',
-					'post_title' => 'Map 1',
-					'post_status' => 'publish',
-					'post_content' => 'map content'
-				];
-
-				$map_id = wp_insert_post($map);
-
-				$message = "New map created ($map_id): ";
-			}
-			$this->success_msg( $message );
-
-			$map_layers = $this->get_map_layers();
-
-			update_post_meta( $map_id, 'layers', $map_layers );
-
-			$related = $this->get_map_related_posts();
-
-			update_post_meta( $map_id, 'related_posts', (object) $related );
-
-			update_post_meta( $map_id, 'initial_zoom', 1 );
-			update_post_meta( $map_id, 'center_lat', 0 );
-			update_post_meta( $map_id, 'center_lon', 0 );
-
 		}
+
+		$term1 = term_exists( 'category 1', 'category', 0 );
+		$term2 = term_exists( 'category 2', 'category', 0 );
+		$term3 = term_exists( 'category 3', 'category', 0 );
+
+		if ( ! $term1 ) $term1 = wp_insert_term( 'category 1', 'category' );
+		if ( ! $term2 ) $term2 = wp_insert_term( 'category 2', 'category' );
+		if ( ! $term3 ) $term3 = wp_insert_term( 'category 3', 'category' );
+
+		if ( isset($item['category']) ) {
+
+			$cat_ids = [];
+
+			foreach( $item['category'] as $cat ) {
+
+				$term = get_term_by( 'name', $cat, 'category' );
+
+				if ( ! $term ) $term = wp_insert_term( $cat, 'category' );
+
+				$cat_ids[] = $term->term_id;
+
+			}
+
+			wp_set_post_categories( $post_id, $cat_ids );
+		}
+
+		// Create MAP post
+		$map = get_page_by_title( 'Map 1', 'OBJECT', 'map');
+
+		if ( $map ) {
+
+			$map_id = $map->ID;
+			$message = "Existing Map found ($map_id): ";
+
+		} else {
+
+			$map = [
+				'post_type' => 'map',
+				'post_title' => 'Map 1',
+				'post_status' => 'publish',
+				'post_content' => 'map content'
+			];
+
+			$map_id = wp_insert_post($map);
+
+			$message = "New map created ($map_id): ";
+		}
+		$this->success_msg( $message );
+
+		$map_layers = $this->get_map_layers();
+
+		update_post_meta( $map_id, 'layers', $map_layers );
+
+		$related = $this->get_map_related_posts();
+
+		update_post_meta( $map_id, 'related_posts', (object) $related );
+
+		update_post_meta( $map_id, 'initial_zoom', 1 );
+		update_post_meta( $map_id, 'center_lat', 0 );
+		update_post_meta( $map_id, 'center_lon', 0 );
+
+		// Create MAP post
+		$sample = get_page_by_title( 'Sample One-time Map', 'OBJECT', 'page');
+
+		if ( $sample ) {
+
+			$sample_1_id = $sample->ID;
+			$message = "Existing One-time sample Map found ($sample_1_id): ";
+
+		} else {
+
+			$map = [
+				'post_type' => 'page',
+				'post_title' => 'Sample One-time Map',
+				'post_status' => 'publish',
+				'post_content' => $this->get_sample_onetime_map_div()
+			];
+
+			$sample_1_id = wp_insert_post($map);
+
+			$message = "New map created ($sample_1_id): ";
+		}
+		$this->success_msg( $message );
+
+		$sample = get_page_by_title( 'Sample Map', 'OBJECT', 'page');
+
+		if ( $sample ) {
+
+			$sample_2_id = $sample->ID;
+			$message = "Existing One-time sample Map found ($sample_2_id): ";
+
+		} else {
+
+			$map = [
+				'post_type' => 'page',
+				'post_title' => 'Sample Map',
+				'post_status' => 'publish',
+				'post_content' => $this->get_sample_onetime_map_div()
+			];
+
+			$sample_2_id = wp_insert_post($map);
+
+			$message = "New map created ($sample_2_id): ";
+		}
+		$this->success_msg( $message );
+
+
+		$this->success_msg( '====================================================' );
+
+		$this->success_msg( 'Sample One-time Map: ' . \get_permalink($sample_1_id) );
+		$this->success_msg( 'Sample Map: ' . \get_permalink($sample_2_id) );
+
+
 
 	}
 
 	public function sample_maps() {
 
+
+
+		\WP_CLI::line( 'Sample One time use' );
+		\WP_CLI::line( $this->get_sample_onetime_map_div() );
+		\WP_CLI::line( 'Sanple Map' );
+		\WP_CLI::line( $this->get_sample_map_div() );
+
+	}
+
+	private function get_sample_onetime_map_div() {
 		$specs = $this->get_map_layers();
 
 		$div = "<div class=\"jeomap\" data-center_lat=\"0\" data-center_lon=\"0\" data-initial_zoom=\"1\" data-layers='" . json_encode($specs) . "' ";
@@ -346,7 +408,17 @@ class Fixtures {
 
 		$div .= " style=\"width:600px; height: 600px;\"></div>";
 
-		\WP_CLI::line( $div );
+		return $div;
+	}
+
+	private function get_sample_map_div() {
+		$map = get_page_by_title( 'Map 1', 'OBJECT', 'map');
+
+		$div = "<div class=\"jeomap\" data-map_id=\"" . $map->ID . "\"";
+
+		$div .= " style=\"width:600px; height: 600px;\"></div>";
+
+		return $div;
 
 	}
 
