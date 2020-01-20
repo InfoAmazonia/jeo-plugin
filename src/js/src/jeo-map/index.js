@@ -21,53 +21,85 @@ class JeoMap {
 
 		this.map = map;
 
-		map.setZoom( this.getArg('initial_zoom') );
+		this.initMap()
+		.then( () => {
+			map.setZoom( this.getArg('initial_zoom') );
 
-		map.setCenter( [this.getArg('center_lon'), this.getArg('center_lat')] );
+			map.setCenter( [this.getArg('center_lon'), this.getArg('center_lat')] );
 
-		this.getLayers().then( layers => {
+		})
+		.then( () => {
 
-			const baseLayer = layers[0];
-			baseLayer.addStyle(map);
+			this.getLayers().then( layers => {
 
-			let custom_attributions = [];
+				const baseLayer = layers[0];
+				baseLayer.addStyle(map);
 
-			map.on('load', () => {
-				layers.forEach( (layer, i) => {
+				let custom_attributions = [];
 
-					if( layer.attribution ) {
-						custom_attributions.push( layer.attribution );
-					}
+				map.on('load', () => {
+					layers.forEach( (layer, i) => {
 
-					if ( i === 0 ) {
-						return;
-					} else {
-						layer.addLayer(map);
-					}
+						if( layer.attribution ) {
+							custom_attributions.push( layer.attribution );
+						}
+
+						if ( i === 0 ) {
+							return;
+						} else {
+							layer.addLayer(map);
+						}
+					});
 				});
-			});
 
-			this.addLayersControl();
+				this.addLayersControl();
 
-			map.addControl(
-				new mapboxgl.AttributionControl({
-					customAttribution: custom_attributions
-				}),
-				'bottom-left'
-			);
+				map.addControl(
+					new mapboxgl.AttributionControl({
+						customAttribution: custom_attributions
+					}),
+					'bottom-left'
+				);
 
-		} );
+			} );
 
-		this.getRelatedPosts().then( posts => {
+			this.getRelatedPosts();
 
-		} );
+		});
 
 		window.map = map;
 
 	}
 
+	initMap() {
+		if ( this.getArg('map_id') ) {
+
+			return jQuery.get(
+				jeoMapVars.jsonUrl + 'map/' + this.getArg('map_id')
+			).then( data => {
+
+				this.map_post_object = data;
+
+			});
+
+		} else {
+			return Promise.resolve();
+		}
+	}
+
 	getArg(argName) {
-		return jQuery(this.element).data(argName);
+		let value;
+		if ( this.map_post_object ) {
+			value = this.map_post_object.meta[argName];
+		} else {
+			value = jQuery(this.element).data(argName);
+		}
+
+		if ( value ) {
+			return value;
+		} else {
+			return false;
+		}
 	}
 
 	getLayers() {
