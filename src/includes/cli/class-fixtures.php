@@ -175,10 +175,20 @@ class Fixtures {
 			],
 
 
+
 		];
 
 		return $posts;
 
+	}
+
+	/**
+	 * Allow update to be used in other contexts, such as tests
+	 */
+	private function success_msg($msg) {
+		if( class_exists('WP_CLI') ) {
+			\WP_CLI::success( $msg );
+		}
 	}
 
 	private function get_post_by_schema( $schema ) {
@@ -246,7 +256,7 @@ class Fixtures {
 				$message = "New post created ($post_id): ";
 			}
 
-			\WP_CLI::success( $message );
+			$this->success_msg( $message );
 
 			foreach ( $item['meta'] as $key => $value ) {
 				delete_post_meta( $post_id, $key );
@@ -254,7 +264,7 @@ class Fixtures {
 
 			foreach ( $item['meta'] as $key => $value ) {
 				if ( add_post_meta( $post_id, $key, $value ) ) {
-					\WP_CLI::success( "$key metadata updated" );
+					$this->success_msg( "$key metadata updated" );
 				}
 			}
 
@@ -283,11 +293,64 @@ class Fixtures {
 				wp_set_post_categories( $post_id, $cat_ids );
 			}
 
+
+			// Create MAP post
+			$map = get_page_by_title( 'Map 1', 'OBJECT', 'map');
+
+			if ( $map ) {
+
+				$map_id = $map->ID;
+				$message = "Existing Map found ($map_id): ";
+
+			} else {
+
+				$map = [
+					'post_type' => 'map',
+					'post_title' => 'Map 1',
+					'post_status' => 'publish',
+					'post_content' => 'map content'
+				];
+
+				$map_id = wp_insert_post($map);
+
+				$message = "New map created ($map_id): ";
+			}
+			$this->success_msg( $message );
+
+			$map_layers = $this->get_map_layers();
+
+			update_post_meta( $map_id, 'layers', $map_layers );
+
+			$related = $this->get_map_related_posts();
+
+			update_post_meta( $map_id, 'related_posts', (object) $related );
+
+			update_post_meta( $map_id, 'initial_zoom', 1 );
+			update_post_meta( $map_id, 'center_lat', 0 );
+			update_post_meta( $map_id, 'center_lon', 0 );
+
 		}
 
 	}
 
 	public function sample_maps() {
+
+		$specs = $this->get_map_layers();
+
+		$div = "<div class=\"jeomap\" data-center_lat=\"0\" data-center_lon=\"0\" data-initial_zoom=\"1\" data-layers='" . json_encode($specs) . "' ";
+
+		$related = $this->get_map_related_posts();
+
+		$div .= "data-related_posts='" . json_encode($related) . "' ";
+
+
+		$div .= " style=\"width:600px; height: 600px;\"></div>";
+
+		\WP_CLI::line( $div );
+
+	}
+
+	private function get_map_layers() {
 
 		$layers = $this->get_posts();
 
@@ -322,10 +385,12 @@ class Fixtures {
 
 		}
 
-		$div = "<div class=\"jeomap\" data-center_lat=\"0\" data-center_lon=\"0\" data-initial_zoom=\"1\" data-layers='" . json_encode($specs) . "' ";
+		return $specs;
 
+	}
+
+	private function get_map_related_posts() {
 		$cat1 = get_term_by( 'name', 'category 1', 'category' );
-		var_dump($cat1);
 		$cat2 = get_term_by( 'name', 'category 2', 'category' );
 		$cat3 = get_term_by( 'name', 'category 3', 'category' );
 
@@ -336,13 +401,6 @@ class Fixtures {
 				$cat3->term_id
 			]
 		];
-
-		$div .= "data-related_posts='" . json_encode($related) . "' ";
-
-
-		$div .= " style=\"width:600px; height: 600px;\"></div>";
-
-		\WP_CLI::line( $div );
-
+		return $related;
 	}
 }
