@@ -180,12 +180,21 @@ class Fixtures {
 				'post_title' => 'Map 1', // do not change it. This name is used in update method
 				'post_status' => 'publish',
 				'meta' => [
-					'initial_zoom' => 1,
+					'initial_zoom' => 2,
 					'center_lat' => 0,
 					'center_lon' => 0,
 					'disable_scroll_zoom' => false,
-					'max_bounds_sw' => ['-85.728760', '-38.721678'],
-					'max_bounds_ne' => ['-37.301025', '13.707702'],
+
+					// Brazil
+					// 'max_bounds_sw' => ['-85.728760', '-38.721678'],
+					// 'max_bounds_ne' => ['-37.301025', '13.707702'],
+
+					// South America & Europe
+					'max_bounds_sw' => ['-73.248291', '-43.867948'],
+					'max_bounds_ne' => ['33.714600', '61.958488'],
+
+					'max_zoom' => 10,
+					'min_zoom' => 2,
 
 					// layers and related_posts are dynamically set in the update method
 				]
