@@ -362,7 +362,7 @@ class Fixtures {
 			$message = "New map created ($sample_1_id): ";
 		}
 
-		$wpdb->update( $wpdb->posts, [ 'post_content' => $this->get_sample_map_div() ], [ 'ID' => $sample_1_id] );
+		$wpdb->update( $wpdb->posts, [ 'post_content' => $this->get_sample_onetime_map_div() ], [ 'ID' => $sample_1_id] );
 
 		$this->success_msg( $message );
 
@@ -386,15 +386,15 @@ class Fixtures {
 			$message = "New map created ($sample_2_id): ";
 		}
 
-		$wpdb->update( $wpdb->posts, [ 'post_content' => $this->get_sample_onetime_map_div() ], [ 'ID' => $sample_2_id] );
+		$wpdb->update( $wpdb->posts, [ 'post_content' => $this->get_sample_map_div() ], [ 'ID' => $sample_2_id] );
 
 		$this->success_msg( $message );
 
 
 		$this->success_msg( '====================================================' );
 
-		$this->success_msg( 'Sample Map: ' . \get_permalink($sample_1_id) );
-		$this->success_msg( 'Sample One-time Map: ' . \get_permalink($sample_2_id) );
+		$this->success_msg( 'Sample Map: ' . \get_permalink($sample_2_id) );
+		$this->success_msg( 'Sample One-time Map: ' . \get_permalink($sample_1_id) );
 
 
 
