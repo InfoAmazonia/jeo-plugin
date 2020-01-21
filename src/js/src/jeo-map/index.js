@@ -1,11 +1,4 @@
 //import { __ } from "@wordpress/i18n";
-/**
- * to test this, add the following div in the singular.php template of the twentytwenty theme
- * <div class="jeomap" data_center_lat="0" data_center_lon="0" data_initial_zoom="1" data_layers="[2,3,4]" style="width:600px; height: 600px;"></div>
- *
- * then visit any page in your site
- */
-
 
 class JeoMap {
 
