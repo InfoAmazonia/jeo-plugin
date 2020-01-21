@@ -183,7 +183,11 @@ class Fixtures {
 					'initial_zoom' => 1,
 					'center_lat' => 0,
 					'center_lon' => 0,
-					'disable_scroll_zoom' => false
+					'disable_scroll_zoom' => false,
+					'max_bounds_sw' => ['-85.728760', '-38.721678'],
+					'max_bounds_ne' => ['-37.301025', '13.707702'],
+
+					// layers and related_posts are dynamically set in the update method
 				]
 			],
 

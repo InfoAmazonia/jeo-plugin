@@ -133,6 +133,34 @@ class Maps {
 			'description' => __('Disable scroll zoom', 'jeo')
 		]);
 
+		register_post_meta($this->post_type, 'max_bounds_sw', [
+			'show_in_rest' => [
+				'schema' => [
+					'items' => [
+						'type' => 'string'
+					]
+				]
+			],
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'array',
+			'description' => __('Southwest coordinates pan limit', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'max_bounds_ne', [
+			'show_in_rest' => [
+				'schema' => [
+					'items' => [
+						'type' => 'string'
+					]
+				]
+			],
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'array',
+			'description' => __('Northeast coordinates pan limit', 'jeo')
+		]);
+
 
 	}
 
