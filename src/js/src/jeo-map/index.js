@@ -25,6 +25,21 @@ class JeoMap {
 				map.scrollZoom.disable();
 			}
 
+			if (
+				this.getArg('max_bounds_ne') &&
+				this.getArg('max_bounds_sw') &&
+				this.getArg('max_bounds_ne').length == 2 &&
+				this.getArg('max_bounds_sw').length == 2
+
+			) {
+				map.setMaxBounds(
+					[
+						this.getArg('max_bounds_sw'),
+						this.getArg('max_bounds_ne')
+					]
+				);
+			}
+
 		})
 		.then( () => {
 
