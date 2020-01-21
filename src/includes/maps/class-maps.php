@@ -161,6 +161,22 @@ class Maps {
 			'description' => __('Northeast coordinates pan limit', 'jeo')
 		]);
 
+		register_post_meta($this->post_type, 'min_zoom', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'integer',
+			'description' => __('Minimum Zoom level', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'max_zoom', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'integer',
+			'description' => __('Maximum zoom level', 'jeo')
+		]);
+
 
 	}
 

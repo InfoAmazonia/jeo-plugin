@@ -40,6 +40,13 @@ class JeoMap {
 				);
 			}
 
+			if ( this.getArg('min_zoom') ) {
+				map.setMinZoom( this.getArg('min_zoom') );
+			}
+			if ( this.getArg('max_zoom') ) {
+				map.setMaxZoom( this.getArg('max_zoom') );
+			}
+
 		})
 		.then( () => {
 
