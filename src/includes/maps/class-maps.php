@@ -125,6 +125,14 @@ class Maps {
 			'description' => __('The map criteria to get related posts', 'jeo')
 		]);
 
+		register_post_meta($this->post_type, 'disable_scroll_zoom', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'boolean',
+			'description' => __('Disable scroll zoom', 'jeo')
+		]);
+
 
 	}
 

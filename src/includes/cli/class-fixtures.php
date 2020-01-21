@@ -174,6 +174,19 @@ class Fixtures {
 				]
 			],
 
+			// MAP
+			[
+				'post_type' => 'map',
+				'post_title' => 'Map 1', // do not change it. This name is used in update method
+				'post_status' => 'publish',
+				'meta' => [
+					'initial_zoom' => 1,
+					'center_lat' => 0,
+					'center_lon' => 0,
+					'disable_scroll_zoom' => false
+				]
+			],
+
 
 
 		];
@@ -326,9 +339,7 @@ class Fixtures {
 
 		update_post_meta( $map_id, 'related_posts', (object) $related );
 
-		update_post_meta( $map_id, 'initial_zoom', 1 );
-		update_post_meta( $map_id, 'center_lat', 0 );
-		update_post_meta( $map_id, 'center_lon', 0 );
+		global $wpdb;
 
 		// Create MAP post
 		$sample = get_page_by_title( 'Sample One-time Map', 'OBJECT', 'page');
@@ -343,14 +354,16 @@ class Fixtures {
 			$map = [
 				'post_type' => 'page',
 				'post_title' => 'Sample One-time Map',
-				'post_status' => 'publish',
-				'post_content' => $this->get_sample_onetime_map_div()
+				'post_status' => 'publish'
 			];
 
 			$sample_1_id = wp_insert_post($map);
 
 			$message = "New map created ($sample_1_id): ";
 		}
+
+		$wpdb->update( $wpdb->posts, [ 'post_content' => $this->get_sample_map_div() ], [ 'ID' => $sample_1_id] );
+
 		$this->success_msg( $message );
 
 		$sample = get_page_by_title( 'Sample Map', 'OBJECT', 'page');
@@ -365,21 +378,23 @@ class Fixtures {
 			$map = [
 				'post_type' => 'page',
 				'post_title' => 'Sample Map',
-				'post_status' => 'publish',
-				'post_content' => $this->get_sample_onetime_map_div()
+				'post_status' => 'publish'
 			];
 
 			$sample_2_id = wp_insert_post($map);
 
 			$message = "New map created ($sample_2_id): ";
 		}
+
+		$wpdb->update( $wpdb->posts, [ 'post_content' => $this->get_sample_onetime_map_div() ], [ 'ID' => $sample_2_id] );
+
 		$this->success_msg( $message );
 
 
 		$this->success_msg( '====================================================' );
 
-		$this->success_msg( 'Sample One-time Map: ' . \get_permalink($sample_1_id) );
-		$this->success_msg( 'Sample Map: ' . \get_permalink($sample_2_id) );
+		$this->success_msg( 'Sample Map: ' . \get_permalink($sample_1_id) );
+		$this->success_msg( 'Sample One-time Map: ' . \get_permalink($sample_2_id) );
 
 
 

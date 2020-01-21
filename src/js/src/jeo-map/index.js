@@ -16,9 +16,14 @@ class JeoMap {
 
 		this.initMap()
 		.then( () => {
+
 			map.setZoom( this.getArg('initial_zoom') );
 
 			map.setCenter( [this.getArg('center_lon'), this.getArg('center_lat')] );
+
+			if ( this.getArg('disable_scroll_zoom') ) {
+				map.scrollZoom.disable();
+			}
 
 		})
 		.then( () => {
