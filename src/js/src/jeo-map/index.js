@@ -1,4 +1,4 @@
-//import { __ } from "@wordpress/i18n";
+// import { __ } from "@wordpress/i18n";
 
 class JeoMap {
 
@@ -46,6 +46,8 @@ class JeoMap {
 			if ( this.getArg('max_zoom') ) {
 				map.setMaxZoom( this.getArg('max_zoom') );
 			}
+
+			this.addMoreButton();
 
 		})
 		.then( () => {
@@ -104,6 +106,59 @@ class JeoMap {
 
 		} else {
 			return Promise.resolve();
+		}
+	}
+
+	/**
+	 * Adds the "More" button that will open the Content of the Map post in an overlayer
+	 *
+	 * This will only work for maps stored in the database and not for one-time use maps
+	 */
+	addMoreButton() {
+		if ( this.map_post_object ) {
+			console.log(this.map_post_object);
+			// TODO Use templates
+
+			const moreDiv = document.createElement('div');
+
+			moreDiv.classList.add('more-info-overlayer');
+
+			moreDiv.innerHTML = '<h2>' + this.map_post_object.title.rendered + '</h2>' + this.map_post_object.content.rendered;
+
+			const closeButton = document.createElement('a');
+			closeButton.classList.add('more-info-close');
+			closeButton.innerHTML = 'x';
+
+			closeButton.click( function(e)  {
+
+			});
+
+			closeButton.onclick = e => {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				jQuery(e.currentTarget).parent().hide();
+
+			};
+
+			moreDiv.appendChild( closeButton );
+
+			const moreButton = document.createElement('a');
+			moreButton.classList.add('more-info-button');
+			moreButton.innerHTML = 'Info';
+
+			moreButton.onclick = e => {
+
+				e.preventDefault();
+				e.stopPropagation();
+				jQuery(e.currentTarget).siblings('.more-info-overlayer').show();
+
+			};
+
+			this.element.appendChild( moreDiv );
+			this.element.appendChild( moreButton );
+
 		}
 	}
 
