@@ -212,8 +212,8 @@ class Maps {
 
 		$atts = \shortcode_atts( [
 			'map_id' => 0,
-			'width' => '500px',
-			'height' => '500px'
+			'width' => '',
+			'height' => ''
 		], $atts );
 
 		$map_id = (int) $atts['map_id'];
@@ -223,7 +223,24 @@ class Maps {
 		}
 
 		$div = '<div class="jeomap" data-map_id="' . $map_id . '" ';
-		$div .= 'style="width: ' . $atts['width'] . '; height: ' . $atts['height'] . ';"';
+
+		$w = $atts['width'];
+		$h = $atts['height'];
+		$style = '';
+
+		if ( ! empty($w) ) {
+			$style .= 'style="width: ' . $atts['width'] . '; ';
+		}
+
+		if ( ! empty($h) ) {
+			$style .= 'height: ' . $atts['height'] . ';"';
+		}
+
+		if ( ! empty( $tyle ) ) {
+			$div .= 'style="' . $style . '"';
+		}
+
+
 		$div .= '></div>';
 
 		return $div;
