@@ -431,10 +431,7 @@ class Fixtures {
 
 		$related = $this->get_map_related_posts();
 
-		$div .= "data-related_posts='" . json_encode($related) . "' ";
-
-
-		$div .= " style=\"width:600px; height: 600px;\"></div>";
+		$div .= "data-related_posts='" . json_encode($related) . "' ></div>";
 
 		return $div;
 	}
@@ -442,9 +439,7 @@ class Fixtures {
 	private function get_sample_map_div() {
 		$map = get_page_by_title( 'Map 1', 'OBJECT', 'map');
 
-		$div = "<div class=\"jeomap\" data-map_id=\"" . $map->ID . "\"";
-
-		$div .= " style=\"width:600px; height: 600px;\"></div>";
+		$div = "<div class=\"jeomap\" data-map_id=\"" . $map->ID . "\"></div>";
 
 		return $div;
 

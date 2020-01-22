@@ -1,3 +1,7 @@
+div.jeomap {
+	width: 600px;
+	height: 600px;
+}
 
 .jeomap nav {
 	background: #fff;
