@@ -11,6 +11,7 @@ class Maps {
 
 	protected function init() {
 		add_action( 'init', [$this, 'register_post_type'] );
+		add_action( 'init', [$this, 'register_shortcode'] );
 		$this->register_rest_meta_validation();
 
 	}
@@ -200,6 +201,32 @@ class Maps {
 		if ( $val < 1 || $val > 14 ) {
 			return new \WP_Error( 'rest_invalid_field', __( 'Map zoom must be between 1 and 14', 'jeo' ), array( 'status' => 400 ) );
 		}
+
+	}
+
+	public function register_shortcode() {
+		\add_shortcode( 'jeo-map', array( $this, 'map_shortcode' ) );
+	}
+
+	public function map_shortcode( $atts ) {
+
+		$atts = \shortcode_atts( [
+			'map_id' => 0,
+			'width' => '500px',
+			'height' => '500px'
+		], $atts );
+
+		$map_id = (int) $atts['map_id'];
+
+		if ( $atts['map_id'] < 1 ) {
+			return '';
+		}
+
+		$div = '<div class="jeomap" data-map_id="' . $map_id . '" ';
+		$div .= 'style="width: ' . $atts['width'] . '; height: ' . $atts['height'] . ';"';
+		$div .= '></div>';
+
+		return $div;
 
 	}
 
