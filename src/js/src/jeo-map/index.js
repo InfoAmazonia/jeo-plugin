@@ -188,7 +188,8 @@ class JeoMap {
 			jQuery.get(
 				jeoMapVars.jsonUrl + 'map-layer',
 				{
-					include: layersIds
+                    include: layersIds,
+                    orderby: 'include'
 				},
 				data => {
 					let returnLayers = [];
