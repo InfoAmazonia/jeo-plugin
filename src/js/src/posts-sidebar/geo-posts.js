@@ -26,6 +26,7 @@ class JeoGeocodePosts extends React.Component {
 				city_level_1: this.getProperty(metadata, '_geocode_city_level_1'),
 			},
 			zoom: 1,
+			points: metadata._related_point
 		}
 
 		this.onLocationFound = this.onLocationFound.bind(this);
@@ -114,8 +115,20 @@ class JeoGeocodePosts extends React.Component {
 
 	render() {
 		const position = [this.state.currentLocation.lat, this.state.currentLocation.lon];
+		console.log(this.state.points);
+		this.state.points.map( p => console.log(p._geocode_full_address) );
 		return (
 			<>
+				<div>
+					{__('Current points', 'jeo')}
+					<ul>
+						{this.state.points.map(p => (
+							<li>
+								{p._geocode_full_address}
+							</li>
+						))}
+					</ul>
+				</div>
 				<p>{__('Search your location', 'jeo')}</p>
 				<JeoGeoAutoComplete onSelect={this.onLocationFound} />
 				<div id="geocode-map-container">
@@ -124,17 +137,17 @@ class JeoGeocodePosts extends React.Component {
 								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 								url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
 								/>
-						{this.getProperty(this.state.currentLocation, 'lat') && (
+						{this.state.points.map( p => (
 
 							<Marker
-									draggable={true}
+									draggable={false}
 									onDragend={this.onMarkerDragged}
-									position={[this.state.currentLocation.lat, this.state.currentLocation.lon]}
+									position={[p._geocode_lat.replace(',', '.'), p._geocode_lon.replace(',', '.')]}
 									ref={this.markerRef}
 									>
 							</Marker>
 
-						)}
+						))}
 
 					</LeafletMap>
 
