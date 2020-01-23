@@ -12,6 +12,7 @@ class Maps {
 	protected function init() {
 		add_action( 'init', [$this, 'register_post_type'] );
 		add_action( 'init', [$this, 'register_shortcode'] );
+		add_filter( 'the_content', [$this, 'the_content_filter'] );
 		$this->register_rest_meta_validation();
 
 	}
@@ -244,6 +245,57 @@ class Maps {
 		$div .= '></div>';
 
 		return $div;
+
+	}
+
+	public function the_content_filter( $content ) {
+
+		if ( get_post_type() != 'map' ) {
+			return $content;
+		}
+
+		$layers_def = get_post_meta( get_the_ID(), 'layers', true);
+
+		if ( is_array( $layers_def ) ) {
+
+			$layers_ids = array_map( function($e) { return $e['id']; }, $layers_def );
+
+			if ( ! sizeof($layers_ids) ) {
+				return $content;
+			}
+
+			$layers = new \WP_Query([
+				'post_type' => 'map-layer',
+				'post__in' => $layers_ids,
+				'orderby' => 'post__in',
+				'nopaging' => true
+			]);
+
+			$template = \jeo_get_template( 'map-content-layers-list.php' );
+
+			$return = '<div class="map-content-layers-list">';
+
+			ob_start();
+
+			while ( $layers->have_posts() ) {
+
+				$layers->the_post();
+
+				include( $template );
+
+			}
+
+			$return .= \ob_get_clean();
+
+			\wp_reset_postdata();
+
+			$return .= '</div>';
+
+			$content .= $return;
+
+		}
+
+		return $content;
 
 	}
 

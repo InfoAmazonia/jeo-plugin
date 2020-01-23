@@ -48,6 +48,7 @@ div.jeomap {
 	background-color: white;
 	z-index: 10;
 	display: none;
+	overflow-y: auto;
 }
 
 .jeomap > div > a.more-info-close {
