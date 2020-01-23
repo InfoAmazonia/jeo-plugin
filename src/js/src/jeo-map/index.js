@@ -116,7 +116,6 @@ class JeoMap {
 	 */
 	addMoreButton() {
 		if ( this.map_post_object ) {
-			console.log(this.map_post_object);
 			// TODO Use templates
 
 			const moreDiv = document.createElement('div');
