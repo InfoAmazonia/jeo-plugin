@@ -254,6 +254,12 @@ class Maps {
 			return $content;
 		}
 
+		// Only when visiting the Map single page
+		if ( is_single( get_the_id() ) ) {
+			$div = '<div class="jeomap" data-map_id="' . get_the_ID() . '"></div>';
+			$content = $div . $content;
+		}
+
 		$layers_def = get_post_meta( get_the_ID(), 'layers', true);
 
 		if ( is_array( $layers_def ) ) {
