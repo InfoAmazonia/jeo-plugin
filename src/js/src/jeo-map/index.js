@@ -253,27 +253,18 @@ class JeoMap {
 	}
 
 	addPostToMap(post) {
-		if ( post.meta._primary_point ) {
+		if ( post.meta._related_point ) {
 
-			post.meta._primary_point.forEach( point => {
-				this.addPointToMap(point, post, 'primary')
-			});
-
-		}
-
-		if ( post.meta._secondary_point ) {
-
-			post.meta._secondary_point.forEach( point => {
-				this.addPointToMap(point, post, 'secondary')
+			post.meta._related_point.forEach( point => {
+				this.addPointToMap(point, post)
 			});
 
 		}
 
 	}
 
-	addPointToMap(point, post, type) {
-		const color = type == 'secondary' ? '#CCCCCC' : '#3FB1CE';
-
+	addPointToMap(point, post) {
+		const color = point.relevance == 'secondary' ? '#CCCCCC' : '#3FB1CE';
 		let marker = new mapboxgl.Marker( {color: color } );
 
 		// TODO use a template file

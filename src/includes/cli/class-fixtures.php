@@ -83,7 +83,12 @@ class Fixtures {
 				'post_title' => 'Post 1',
 				'post_status' => 'publish',
 				'meta' => [
-					'_primary_point' => [
+					/**
+					 * We cant have two elements with the same key int the array, so we add a __%d pattern at the beginning
+					 * the update method will igrnore this and add many entries for the same meta
+					 */
+					'__1_related_point' => [
+						'relevance' => 'primary',
 						'_geocode_lat' => '-22,888889',
 						'_geocode_lon' => '-47,081944',
 						'_geocode_full_address' => 'Jardim Chapadão, Campinas, Região Imediata de Campinas, Região Metropolitana de Campinas, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13069-901, Brasil',
@@ -94,7 +99,8 @@ class Fixtures {
 						'_geocode_region_level_3' => 'Região Intermediária de Campinas',
 						'_geocode_city_level_1' => 'Jardim Chapadão',
 					],
-					'_primary_point' => [
+					'__2_related_point' => [
+						'relevance' => 'primary',
 						'_geocode_lat' => '-23,57458535',
 						'_geocode_lon' => '-46,628883891755',
 						'_geocode_full_address' => 'Parque da Aclimação, Aclimação, Liberdade, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01534-001, Brasil',
@@ -116,7 +122,8 @@ class Fixtures {
 				'post_title' => 'Post 2',
 				'post_status' => 'publish',
 				'meta' => [
-					'_primary_point' => [
+					'__1_related_point' => [
+						'relevance' => 'primary',
 						'_geocode_lat' => '-23,54659435',
 						'_geocode_lon' => '-46,644533061712',
 						'_geocode_full_address' => 'Edifício Copan, Rua Araújo, Vila Buarque, República, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01046-010, Brasil',
@@ -127,7 +134,8 @@ class Fixtures {
 						'_geocode_region_level_3' => 'Região Intermediária de São Paulo',
 						'_geocode_city_level_1' => 'Vila Buarque',
 					],
-					'_secondary_point' => [
+					'__2_related_point' => [
+						'relevance' => 'secondary',
 						'_geocode_lat' => '-23,183525102463',
 						'_geocode_lon' => '-46,898231506348',
 						'_geocode_full_address' => 'Rua Jorge Gebran, Parque do Colégio, Chácara Urbana, Jundiaí, Região Imediata de Jundiaí, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13209-090, Brasil',
@@ -149,7 +157,8 @@ class Fixtures {
 				'post_title' => 'Post 3',
 				'post_status' => 'publish',
 				'meta' => [
-					'_primary_point' => [
+					'__1_related_point' => [
+						'relevance' => 'primary',
 						'_geocode_lat' => '-22,939108160587',
 						'_geocode_lon' => '-46,542205810547',
 						'_geocode_full_address' => 'Rua Belmiro Ramos Franco, Jardim São Lourenço, Bragança Paulista, Região Imediata de Bragança Paulista, Região Intermediária de Campinas, São Paulo, Região Sudeste, 12908-040, Brasil',
@@ -160,7 +169,8 @@ class Fixtures {
 						'_geocode_region_level_3' => 'Região Intermediária de Campinas',
 						'_geocode_city_level_1' => 'Jardim São Lourenço',
 					],
-					'_secondary_point' => [
+					'__2_related_point' => [
+						'relevance' => 'secondary',
 						'_geocode_lat' => '-23,118574871158',
 						'_geocode_lon' => '-46,564693450928',
 						'_geocode_full_address' => 'Rua Clóvis Soares, Vila Lixão, Alvinópolis, Atibaia, Região Imediata de Bragança Paulista, Região Intermediária de Campinas, São Paulo, Região Sudeste, 12942-560, Brasil',
@@ -288,12 +298,14 @@ class Fixtures {
 			$this->success_msg( $message );
 
 			foreach ( $item['meta'] as $key => $value ) {
-				delete_post_meta( $post_id, $key );
+				$real_key = preg_replace( '/^__\d(.+)$/', '${1}', $key );
+				delete_post_meta( $post_id, $real_key );
 			}
 
 			foreach ( $item['meta'] as $key => $value ) {
-				if ( add_post_meta( $post_id, $key, $value ) ) {
-					$this->success_msg( "$key metadata updated" );
+				$real_key = preg_replace( '/^__\d(.+)$/', '${1}', $key );
+				if ( add_post_meta( $post_id, $real_key, $value ) ) {
+					$this->success_msg( "$real_key metadata updated" );
 				}
 			}
 
