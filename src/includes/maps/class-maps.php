@@ -287,6 +287,8 @@ class Maps {
 
 				$layers->the_post();
 
+				$source_url = get_post_meta( get_the_ID(), 'source_url', true );
+
 				include( $template );
 
 			}
