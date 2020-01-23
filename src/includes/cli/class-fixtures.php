@@ -40,6 +40,7 @@ class Fixtures {
 				'meta' => [
 					'type' => 'tilelayer',
 					'attribution' => 'Copyright the whole world',
+					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'url' => 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
 					]
@@ -52,6 +53,7 @@ class Fixtures {
 				'meta' => [
 					'type' => 'tilelayer',
 					'attribution' => 'Sample veryu long super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  super extra large  attribution for this layer',
+					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'url' => 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
 					]
@@ -64,6 +66,7 @@ class Fixtures {
 				'meta' => [
 					'type' => 'mapbox',
 					'attribution' => 'Sample attribution for <a href="http://jeo.com">this layer with a link</a>',
+					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'style_id' => 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
 					]

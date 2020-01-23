@@ -85,6 +85,18 @@ class Layers {
 				'description'   => __( 'Layer type-specific options', 'jeo' ),
 			)
 		);
+
+		register_post_meta(
+			$this->post_type,
+			'source_url',
+			array(
+				'show_in_rest'  => true,
+				'single'        => true,
+				'auth_callback' => '__return_true',
+				'type'          => 'string',
+				'description'   => __( 'The URL to download the source data of the layer', 'jeo' ),
+			)
+		);
 	}
 
 	public function validate_meta_type( $meta_value ) {
