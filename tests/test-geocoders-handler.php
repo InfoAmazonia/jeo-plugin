@@ -60,6 +60,7 @@ class GeocodersHandler extends Jeo_UnitTestCase {
 		$p = $this->factory->post->create( array( 'post_title' => 'Test Post' ) );
 
 		$meta1 = [
+			'relevance' => 'primary',
 			'_geocode_lat' => '1111',
 			'_geocode_lon' => '2111',
 			'_geocode_full_address' => 'Super address',
@@ -73,6 +74,7 @@ class GeocodersHandler extends Jeo_UnitTestCase {
 		];
 
 		$meta2 = [
+			'relevance' => 'primary',
 			'_geocode_lat' => '2222',
 			'_geocode_lon' => '1222',
 			'_geocode_full_address' => 'Super address 2',
@@ -86,6 +88,7 @@ class GeocodersHandler extends Jeo_UnitTestCase {
 		];
 
 		$meta3 = [
+			'relevance' => 'secondary',
 			'_geocode_lat' => '3333',
 			'_geocode_lon' => '2333',
 			'_geocode_full_address' => 'Super address 3',
@@ -98,20 +101,26 @@ class GeocodersHandler extends Jeo_UnitTestCase {
 			'_geocode_country' => 'country 3',
 		];
 
-		add_post_meta( $p, '_primary_point', $meta1 );
+		add_post_meta( $p, '_related_point', $meta1 );
 
-		add_post_meta( $p, '_primary_point', $meta2 );
+		add_post_meta( $p, '_related_point', $meta2 );
 
-		add_post_meta( $p, '_secondary_point', $meta3 );
+		add_post_meta( $p, '_related_point', $meta3 );
 
 		foreach ( \jeo_geocode_handler()->geo_attributes as $key ) {
 
-			$meta = get_post_meta( $p, $key );
+			$meta = get_post_meta( $p, $key . '_p' );
 
-			$this->assertEquals( 3, sizeof( $meta ) );
+			$this->assertEquals( 2, sizeof( $meta ) );
 
 			$this->assertContains( $meta1[$key], $meta );
 			$this->assertContains( $meta2[$key], $meta );
+
+
+			$meta = get_post_meta( $p, $key . '_s' );
+
+			$this->assertEquals( 1, sizeof( $meta ) );
+
 			$this->assertContains( $meta3[$key], $meta );
 
 		}
