@@ -25,6 +25,9 @@ class JeoGeocodePosts extends React.Component {
 		this.relevanceClick = this.relevanceClick.bind(this);
 		this.updatePoint = this.updatePoint.bind(this);
 		this.updateCurrentPoint = this.updateCurrentPoint.bind(this);
+		this.newPoint = this.newPoint.bind(this);
+
+		this.refMap = React.createRef();
 
 	};
 
@@ -61,6 +64,24 @@ class JeoGeocodePosts extends React.Component {
 
 	relevanceClick(option) {
 		this.updateCurrentPoint( {relevance: option} );
+	}
+
+	newPoint() {
+
+		const center = this.refMap.current.leafletElement.getCenter();
+
+		this.setState({
+			...this.state,
+			points: [
+				...this.state.points,
+				{
+					_geocode_lat: center.lat,
+					_geocode_lon: center.lng,
+					_geocode_full_address: __('Unknown location', 'jeo')
+				}
+			],
+			currentMarkerIndex: this.state.points.length // sets new marker as current
+		});
 	}
 
 	getProperty(object, property) {
@@ -160,6 +181,11 @@ class JeoGeocodePosts extends React.Component {
 								{p._geocode_full_address}
 							</li>
 						))}
+						<li
+								onClick={this.newPoint}
+								>
+							{__('New point', 'jeo')}
+						</li>
 					</ul>
 				</div>
 				<p>{__('Search your location', 'jeo')}</p>
@@ -181,6 +207,7 @@ class JeoGeocodePosts extends React.Component {
 							center={[0,0]}
 							zoom={this.state.zoom}
 							whenReady={this.mapLoaded}
+							ref={this.refMap}
 							>
 						<TileLayer
 								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
