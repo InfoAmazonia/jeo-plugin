@@ -108,6 +108,11 @@ class JeoGeocodePosts extends React.Component {
 			_geocode_city_level_1: this.getProperty(location, 'city_level_1')
 		} );
 
+		this.refMap.current.leafletElement.flyTo([
+			this.getProperty(location, 'lat'),
+			this.getProperty(location, 'lon')
+		]);
+
 	};
 
 
