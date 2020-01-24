@@ -9,34 +9,26 @@ class JeoGeocodePosts extends React.Component {
 	constructor() {
 		super();
 		const metadata = wp.data.select('core/editor').getCurrentPost().meta;
-		const lat = this.getProperty(metadata,'_geocode_lat') ? this.getProperty(metadata,'_geocode_lat') : 0;
-		const lon = this.getProperty(metadata,'_geocode_lon') ? this.getProperty(metadata,'_geocode_lon') : 0;
 
 		this.state = {
-			currentLocation: {
-				lat: lat,
-				lon: lon,
-				full_address: this.getProperty(metadata, '_geocode_full_address'),
-				country: this.getProperty(metadata, '_geocode_country'),
-				country_code: this.getProperty(metadata, '_geocode_country_code'),
-				region_level_1: this.getProperty(metadata, '_geocode_region_level_1'),
-				region_level_2: this.getProperty(metadata, '_geocode_region_level_2'),
-				region_level_3: this.getProperty(metadata, '_geocode_region_level_3'),
-				city: this.getProperty(metadata, '_geocode_city'),
-				city_level_1: this.getProperty(metadata, '_geocode_city_level_1'),
-			},
 			zoom: 1,
-			points: metadata._related_point
+			points: metadata._related_point,
+			currentMarkerIndex: 0
 		}
 
 		this.onLocationFound = this.onLocationFound.bind(this);
 		this.onMarkerDragged = this.onMarkerDragged.bind(this);
 		this.getProperty = this.getProperty.bind(this);
 		this.save = this.save.bind(this);
-
-		this.markerRef = React.createRef();
+		this.clickMarkerList = this.clickMarkerList.bind(this);
 
 	};
+
+	clickMarkerList(e) {
+		this.setState({
+			currentMarkerIndex: e.target.id
+		})
+	}
 
 	getProperty(object, property) {
 		if ( undefined !== typeof(object[property]) ) {
@@ -47,83 +39,100 @@ class JeoGeocodePosts extends React.Component {
 	}
 
 	onLocationFound(location) {
+
+		const marker_id = this.state.currentMarkerIndex;
+
 		this.setState({
-			currentLocation: {
-				lat: this.getProperty(location,'lat'),
-				lon: this.getProperty(location,'lon'),
-				full_address: this.getProperty(location, 'full_address'),
-				country: this.getProperty(location, 'country'),
-				country_code: this.getProperty(location, 'country_code'),
-				region_level_1: this.getProperty(location, 'region_level_1'),
-				region_level_2: this.getProperty(location, 'region_level_2'),
-				region_level_3: this.getProperty(location, 'region_level_3'),
-				city: this.getProperty(location, 'city'),
-				city_level_1: this.getProperty(location, 'city_level_1'),
-			},
-			zoom: 6
+			...this.state,
+			points: [
+				...this.state.points.slice(0, marker_id),
+				{
+					_geocode_lat: this.getProperty(location, 'lat'),
+					_geocode_lon: this.getProperty(location, 'lon'),
+					_geocode_full_address: this.getProperty(location, 'full_address'),
+					_geocode_country: this.getProperty(location, 'country'),
+					_geocode_country_code: this.getProperty(location, 'country_code'),
+					_geocode_region_level_1: this.getProperty(location, 'region_level_1'),
+					_geocode_region_level_2: this.getProperty(location, 'region_level_2'),
+					_geocode_region_level_3: this.getProperty(location, 'region_level_3'),
+					_geocode_city: this.getProperty(location, 'city'),
+					_geocode_city_level_1: this.getProperty(location, 'city_level_1')
+				},
+				...this.state.points.slice(marker_id + 1),
+			]
 		});
+
 	};
 
-	onMarkerDragged() {
-		const marker = this.markerRef.current;
-		const latLng = marker.leafletElement.getLatLng();
+	onMarkerDragged(e) {
+		const marker = e.target;
+		const latLng = marker.getLatLng();
+		const marker_id = marker.options.id;
+
 		this.setState({
-			currentLocation: {
-				...this.state.currentLocation,
-				lat: latLng.lat,
-				lon: latLng.lng
-			}
+			...this.state,
+			points: [
+				...this.state.points.slice(0, marker_id),
+				{
+					...this.state.points[marker_id],
+					_geocode_lat: latLng.lat,
+					_geocode_lon: latLng.lng
+				},
+				...this.state.points.slice(marker_id + 1),
+			]
 		});
+
 		fetch(jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + latLng.lat + '&lon=' + latLng.lng)
 			.then( response => {
 				return response.json();
 			} )
 			.then( result => {
+
 				this.setState({
-					currentLocation: {
-						...this.state.currentLocation,
-						full_address: this.getProperty(result, 'full_address'),
-						country: this.getProperty(result, 'country'),
-						country_code: this.getProperty(result, 'country_code'),
-						region_level_1: this.getProperty(result, 'region_level_1'),
-						region_level_2: this.getProperty(result, 'region_level_2'),
-						region_level_3: this.getProperty(result, 'region_level_3'),
-						city: this.getProperty(result, 'city'),
-						city_level_1: this.getProperty(result, 'city_level_1'),
-					}
+					...this.state,
+					points: [
+						...this.state.points.slice(0, marker_id),
+						{
+							...this.state.points[marker_id],
+							_geocode_full_address: this.getProperty(result, 'full_address'),
+							_geocode_country: this.getProperty(result, 'country'),
+							_geocode_country_code: this.getProperty(result, 'country_code'),
+							_geocode_region_level_1: this.getProperty(result, 'region_level_1'),
+							_geocode_region_level_2: this.getProperty(result, 'region_level_2'),
+							_geocode_region_level_3: this.getProperty(result, 'region_level_3'),
+							_geocode_city: this.getProperty(result, 'city'),
+							_geocode_city_level_1: this.getProperty(result, 'city_level_1')
+						},
+						...this.state.points.slice(marker_id + 1),
+					]
 				});
+
 			} );
 
 	}
 
 	save() {
-
 		wp.data.dispatch('core/editor').editPost({meta: {
-			_geocode_lat: this.getProperty(this.state.currentLocation,'lat'),
-			_geocode_lon: this.getProperty(this.state.currentLocation,'lon'),
-			_geocode_full_address: this.getProperty(this.state.currentLocation, 'full_address'),
-			_geocode_country: this.getProperty(this.state.currentLocation, 'country'),
-			_geocode_country_code: this.getProperty(this.state.currentLocation, 'country_code'),
-			_geocode_region_level_1: this.getProperty(this.state.currentLocation, 'region_level_1'),
-			_geocode_region_level_2: this.getProperty(this.state.currentLocation, 'region_level_2'),
-			_geocode_region_level_3: this.getProperty(this.state.currentLocation, 'region_level_3'),
-			_geocode_city: this.getProperty(this.state.currentLocation, 'city'),
-			_geocode_city_level_1: this.getProperty(this.state.currentLocation, 'city_level_1'),
-		}}).then(() => this.props.onSaveLocation());
+			_related_point: this.state.points
+
+		}}).then(() => {
+			this.props.onSaveLocation()
+		});
 
 	}
 
 	render() {
-		const position = [this.state.currentLocation.lat, this.state.currentLocation.lon];
-		console.log(this.state.points);
-		this.state.points.map( p => console.log(p._geocode_full_address) );
 		return (
 			<>
 				<div>
 					{__('Current points', 'jeo')}
 					<ul>
-						{this.state.points.map(p => (
-							<li>
+						{this.state.points.map( (p, i) => (
+							<li
+									id={i}
+									onClick={this.clickMarkerList}
+									className={ this.state.currentMarkerIndex == i ? 'active' : ''}
+									>
 								{p._geocode_full_address}
 							</li>
 						))}
@@ -132,18 +141,20 @@ class JeoGeocodePosts extends React.Component {
 				<p>{__('Search your location', 'jeo')}</p>
 				<JeoGeoAutoComplete onSelect={this.onLocationFound} />
 				<div id="geocode-map-container">
-					<LeafletMap center={position} zoom={this.state.zoom}>
+					<LeafletMap center={[0,0]} zoom={this.state.zoom}>
 						<TileLayer
 								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 								url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
 								/>
-						{this.state.points.map( p => (
+						{this.state.points.map( (p, i) => (
 
 							<Marker
-									draggable={false}
+									draggable={ this.state.currentMarkerIndex == i ? true : false }
 									onDragend={this.onMarkerDragged}
-									position={[p._geocode_lat.replace(',', '.'), p._geocode_lon.replace(',', '.')]}
-									ref={this.markerRef}
+									position={[p._geocode_lat, p._geocode_lon]}
+									ref={this.createMarkerRef}
+									id={i}
+									opacity={ this.state.currentMarkerIndex == i ? 1 : 0.3 }
 									>
 							</Marker>
 
