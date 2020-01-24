@@ -1,7 +1,7 @@
 import React from 'react';
 import { Map as LeafletMap, Marker, Popup, TileLayer } from 'react-leaflet';
 import JeoGeoAutoComplete from './geo-auto-complete';
-import { Button } from "@wordpress/components";
+import { Button, RadioControl } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import './geo-posts.css';
 
@@ -22,6 +22,7 @@ class JeoGeocodePosts extends React.Component {
 		this.save = this.save.bind(this);
 		this.clickMarkerList = this.clickMarkerList.bind(this);
 		this.mapLoaded = this.mapLoaded.bind(this);
+		this.relevanceClick = this.relevanceClick.bind(this);
 
 	};
 
@@ -29,6 +30,22 @@ class JeoGeocodePosts extends React.Component {
 		this.setState({
 			currentMarkerIndex: e.target.id
 		})
+	}
+
+	relevanceClick(option) {
+		const marker_id = this.state.currentMarkerIndex;
+
+		this.setState({
+			...this.state,
+			points: [
+				...this.state.points.slice(0, marker_id),
+				{
+					...this.state.points[marker_id],
+					relevance: option,
+				},
+				...this.state.points.slice(marker_id + 1),
+			]
+		});
 	}
 
 	getProperty(object, property) {
@@ -156,6 +173,18 @@ class JeoGeocodePosts extends React.Component {
 				</div>
 				<p>{__('Search your location', 'jeo')}</p>
 				<JeoGeoAutoComplete onSelect={this.onLocationFound} />
+
+				<RadioControl
+						label={ __('Relevance', 'jeo') }
+						//help="The type of the current user"
+						selected={ this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' }
+						options={ [
+							{ label: __('Primary', 'jeo'), value: 'primary' },
+							{ label: __('Secondary', 'jeo'), value: 'secondary' },
+						] }
+						onChange={ this.relevanceClick }
+						/>
+
 				<div id="geocode-map-container">
 					<LeafletMap
 							center={[0,0]}
