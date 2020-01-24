@@ -23,8 +23,35 @@ class JeoGeocodePosts extends React.Component {
 		this.clickMarkerList = this.clickMarkerList.bind(this);
 		this.mapLoaded = this.mapLoaded.bind(this);
 		this.relevanceClick = this.relevanceClick.bind(this);
+		this.updatePoint = this.updatePoint.bind(this);
+		this.updateCurrentPoint = this.updateCurrentPoint.bind(this);
 
 	};
+
+	/**
+	 * Immutably updates info in the point object, inside the array of related points
+	 *
+	 * @param {int} point The Marker Index
+	 * @param {object} data the new data. Only attributes that change
+	 */
+	updatePoint(point, data) {
+		this.setState({
+			...this.state,
+			points: [
+				...this.state.points.slice(0, point),
+				{
+					...this.state.points[point],
+					...data
+				},
+				...this.state.points.slice(point + 1),
+			]
+		});
+	}
+
+	updateCurrentPoint(data) {
+		const marker_id = this.state.currentMarkerIndex;
+		this.updatePoint( marker_id, data );
+	}
 
 	clickMarkerList(e) {
 		this.setState({
@@ -33,19 +60,7 @@ class JeoGeocodePosts extends React.Component {
 	}
 
 	relevanceClick(option) {
-		const marker_id = this.state.currentMarkerIndex;
-
-		this.setState({
-			...this.state,
-			points: [
-				...this.state.points.slice(0, marker_id),
-				{
-					...this.state.points[marker_id],
-					relevance: option,
-				},
-				...this.state.points.slice(marker_id + 1),
-			]
-		});
+		this.updateCurrentPoint( {relevance: option} );
 	}
 
 	getProperty(object, property) {
@@ -56,31 +71,24 @@ class JeoGeocodePosts extends React.Component {
 		}
 	}
 
+
 	onLocationFound(location) {
 
-		const marker_id = this.state.currentMarkerIndex;
-
-		this.setState({
-			...this.state,
-			points: [
-				...this.state.points.slice(0, marker_id),
-				{
-					_geocode_lat: this.getProperty(location, 'lat'),
-					_geocode_lon: this.getProperty(location, 'lon'),
-					_geocode_full_address: this.getProperty(location, 'full_address'),
-					_geocode_country: this.getProperty(location, 'country'),
-					_geocode_country_code: this.getProperty(location, 'country_code'),
-					_geocode_region_level_1: this.getProperty(location, 'region_level_1'),
-					_geocode_region_level_2: this.getProperty(location, 'region_level_2'),
-					_geocode_region_level_3: this.getProperty(location, 'region_level_3'),
-					_geocode_city: this.getProperty(location, 'city'),
-					_geocode_city_level_1: this.getProperty(location, 'city_level_1')
-				},
-				...this.state.points.slice(marker_id + 1),
-			]
-		});
+		this.updateCurrentPoint( {
+			_geocode_lat: this.getProperty(location, 'lat'),
+			_geocode_lon: this.getProperty(location, 'lon'),
+			_geocode_full_address: this.getProperty(location, 'full_address'),
+			_geocode_country: this.getProperty(location, 'country'),
+			_geocode_country_code: this.getProperty(location, 'country_code'),
+			_geocode_region_level_1: this.getProperty(location, 'region_level_1'),
+			_geocode_region_level_2: this.getProperty(location, 'region_level_2'),
+			_geocode_region_level_3: this.getProperty(location, 'region_level_3'),
+			_geocode_city: this.getProperty(location, 'city'),
+			_geocode_city_level_1: this.getProperty(location, 'city_level_1')
+		} );
 
 	};
+
 
 	mapLoaded(e) {
 
@@ -100,20 +108,11 @@ class JeoGeocodePosts extends React.Component {
 	onMarkerDragged(e) {
 		const marker = e.target;
 		const latLng = marker.getLatLng();
-		const marker_id = marker.options.id;
 
-		this.setState({
-			...this.state,
-			points: [
-				...this.state.points.slice(0, marker_id),
-				{
-					...this.state.points[marker_id],
-					_geocode_lat: latLng.lat,
-					_geocode_lon: latLng.lng
-				},
-				...this.state.points.slice(marker_id + 1),
-			]
-		});
+		this.updateCurrentPoint( {
+			_geocode_lat: latLng.lat,
+			_geocode_lon: latLng.lng
+		} );
 
 		fetch(jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + latLng.lat + '&lon=' + latLng.lng)
 			.then( response => {
@@ -121,24 +120,16 @@ class JeoGeocodePosts extends React.Component {
 			} )
 			.then( result => {
 
-				this.setState({
-					...this.state,
-					points: [
-						...this.state.points.slice(0, marker_id),
-						{
-							...this.state.points[marker_id],
-							_geocode_full_address: this.getProperty(result, 'full_address'),
-							_geocode_country: this.getProperty(result, 'country'),
-							_geocode_country_code: this.getProperty(result, 'country_code'),
-							_geocode_region_level_1: this.getProperty(result, 'region_level_1'),
-							_geocode_region_level_2: this.getProperty(result, 'region_level_2'),
-							_geocode_region_level_3: this.getProperty(result, 'region_level_3'),
-							_geocode_city: this.getProperty(result, 'city'),
-							_geocode_city_level_1: this.getProperty(result, 'city_level_1')
-						},
-						...this.state.points.slice(marker_id + 1),
-					]
-				});
+				this.updateCurrentPoint( {
+					_geocode_full_address: this.getProperty(result, 'full_address'),
+					_geocode_country: this.getProperty(result, 'country'),
+					_geocode_country_code: this.getProperty(result, 'country_code'),
+					_geocode_region_level_1: this.getProperty(result, 'region_level_1'),
+					_geocode_region_level_2: this.getProperty(result, 'region_level_2'),
+					_geocode_region_level_3: this.getProperty(result, 'region_level_3'),
+					_geocode_city: this.getProperty(result, 'city'),
+					_geocode_city_level_1: this.getProperty(result, 'city_level_1')
+				} );
 
 			} );
 
