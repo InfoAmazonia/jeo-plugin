@@ -21,6 +21,7 @@ class JeoGeocodePosts extends React.Component {
 		this.getProperty = this.getProperty.bind(this);
 		this.save = this.save.bind(this);
 		this.clickMarkerList = this.clickMarkerList.bind(this);
+		this.mapLoaded = this.mapLoaded.bind(this);
 
 	};
 
@@ -63,6 +64,21 @@ class JeoGeocodePosts extends React.Component {
 		});
 
 	};
+
+	mapLoaded(e) {
+
+		const coords = this.state.points.map( e => {
+			return [
+				e._geocode_lat,
+				e._geocode_lon
+			]
+		} );
+
+		const map = e.target;
+
+		map.fitBounds(coords);
+
+	}
 
 	onMarkerDragged(e) {
 		const marker = e.target;
@@ -141,7 +157,11 @@ class JeoGeocodePosts extends React.Component {
 				<p>{__('Search your location', 'jeo')}</p>
 				<JeoGeoAutoComplete onSelect={this.onLocationFound} />
 				<div id="geocode-map-container">
-					<LeafletMap center={[0,0]} zoom={this.state.zoom}>
+					<LeafletMap
+							center={[0,0]}
+							zoom={this.state.zoom}
+							whenReady={this.mapLoaded}
+							>
 						<TileLayer
 								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 								url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
@@ -152,9 +172,8 @@ class JeoGeocodePosts extends React.Component {
 									draggable={ this.state.currentMarkerIndex == i ? true : false }
 									onDragend={this.onMarkerDragged}
 									position={[p._geocode_lat, p._geocode_lon]}
-									ref={this.createMarkerRef}
 									id={i}
-									opacity={ this.state.currentMarkerIndex == i ? 1 : 0.3 }
+									opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
 									>
 							</Marker>
 
