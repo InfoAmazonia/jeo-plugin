@@ -104,11 +104,50 @@ class Geocode_Handler {
 		register_post_meta('post', '_related_point', [
 			'show_in_rest'  => array(
 					'schema' => array(
-						'properties'           => array(),
-						'additionalProperties' => true,
+						'properties'           => array(
+							'_geocode_lat' => [
+								'type' => 'float'
+							],
+							'_geocode_lon' => [
+								'type' => 'float'
+							],
+							'_geocode_city_level_1' => [
+								'type' => 'string'
+							],
+							'_geocode_city' => [
+								'type' => 'string'
+							],
+							'_geocode_region_level_3' => [
+								'type' => 'string'
+							],
+							'_geocode_region_level_2' => [
+								'type' => 'string'
+							],
+							'_geocode_region_level_1' => [
+								'type' => 'string'
+							],
+							'_geocode_country_code' => [
+								'type' => 'string'
+							],
+							'_geocode_country' => [
+								'type' => 'string'
+							],
+							'_geocode_full_address' => [
+								'type' => 'string'
+							],
+							'relevance' => [
+								'type' => 'string',
+								'enum' => [
+									'primary',
+									'secondary'
+								]
+							],
+						),
+						'additionalProperties' => false,
 					),
 				),
 			'single' => false,
+			//'sanitize_callback' => [$this, 'sanitize_points'],
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -119,7 +158,7 @@ class Geocode_Handler {
 		foreach ( ['p', 's']  as $relevance ) {
 
 			register_post_meta('post', '_geocode_lat_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -129,7 +168,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_lon_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -139,7 +178,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_country_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -149,7 +188,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_country_code_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -159,7 +198,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_region_level_1_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -169,7 +208,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_region_level_2_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -179,7 +218,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_region_level_3_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -189,7 +228,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_city_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -199,7 +238,7 @@ class Geocode_Handler {
 			]);
 
 			register_post_meta('post', '_geocode_city_level_1_' . $relevance, [
-				'show_in_rest' => true,
+				'show_in_rest' => false,
 				'single' => false,
 				'auth_callback' => function() {
 					return current_user_can('edit_posts');
@@ -277,6 +316,28 @@ class Geocode_Handler {
 
 		}
 		return false;
+	}
+
+	public function sanitize_points( $value ) {
+
+		if ( isset($value['_geocode_lat']) ) {
+			$value['_geocode_lat'] = \floatval( $value['_geocode_lat'] );
+		}
+
+		if ( isset($value['_geocode_lon']) ) {
+			$value['_geocode_lon'] = \floatval( $value['_geocode_lon'] );
+		}
+
+		if ( isset($value->_geocode_lat) ) {
+			$value->_geocode_lat = \floatval( $value->_geocode_lat );
+		}
+
+		if ( isset($value->_geocode_lon) ) {
+			$value->_geocode_lon = \floatval( $value->_geocode_lon );
+		}
+
+		return $value;
+
 	}
 
 	private function add_index_metadata_hooks() {
