@@ -273,8 +273,8 @@ class JeoMap {
 		let popUp = new mapboxgl.Popup().setHTML( popupHTML );
 
 		const LngLat = {
-			lat: parseFloat( point._geocode_lat.replace(',', '.') ),
-			lon: parseFloat( point._geocode_lon.replace(',', '.') )
+			lat: parseFloat( point._geocode_lat ),
+			lon: parseFloat( point._geocode_lon )
 		}
 
 		marker.setLngLat( LngLat )
