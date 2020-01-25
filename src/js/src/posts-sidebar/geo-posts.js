@@ -178,7 +178,10 @@ class JeoGeocodePosts extends React.Component {
 
 	save() {
 		wp.data.dispatch('core/editor').editPost({meta: {
-			_related_point: this.state.points
+			_related_point: this.state.points.filter( (el, i) => {
+				console.log(el._geocode_full_address != __('Unknown location', 'jeo'));
+				return el._geocode_full_address != __('Unknown location', 'jeo');
+			})
 
 		}}).then(() => {
 			this.props.onSaveLocation()
