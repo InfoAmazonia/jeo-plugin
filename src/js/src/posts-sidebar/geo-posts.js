@@ -26,6 +26,7 @@ class JeoGeocodePosts extends React.Component {
 		this.updatePoint = this.updatePoint.bind(this);
 		this.updateCurrentPoint = this.updateCurrentPoint.bind(this);
 		this.newPoint = this.newPoint.bind(this);
+		this.deletePoint = this.deletePoint.bind(this);
 
 		this.refMap = React.createRef();
 
@@ -81,6 +82,20 @@ class JeoGeocodePosts extends React.Component {
 				}
 			],
 			currentMarkerIndex: this.state.points.length // sets new marker as current
+		});
+	}
+
+	deletePoint(e) {
+		e.preventDefault();
+		e.stopPropagation();
+
+		const index = e.target.attributes.marker_index.value;
+
+
+		this.setState({
+			...this.state,
+			points: this.state.points.filter( (el, i) => i != index ),
+			currentMarkerIndex: 0
 		});
 	}
 
@@ -184,6 +199,14 @@ class JeoGeocodePosts extends React.Component {
 									className={ this.state.currentMarkerIndex == i ? 'active' : ''}
 									>
 								{p._geocode_full_address}
+								(
+									<a
+											onClick={this.deletePoint}
+											marker_index={i}
+											>
+										{__('delete', 'jeo')}
+									</a>
+								)
 							</li>
 						))}
 						<li
