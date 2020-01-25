@@ -215,7 +215,7 @@ class JeoGeocodePosts extends React.Component {
 						<li
 								onClick={this.newPoint}
 								>
-							{__('New point', 'jeo')}
+							{__('Add new point', 'jeo')}
 						</li>
 					</ul>
 				</div>
