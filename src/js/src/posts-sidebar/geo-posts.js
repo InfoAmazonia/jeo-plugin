@@ -224,19 +224,26 @@ class JeoGeocodePosts extends React.Component {
 						</li>
 					</ul>
 				</div>
-				<p>{__('Search your location', 'jeo')}</p>
-				<JeoGeoAutoComplete onSelect={this.onLocationFound} />
 
-				<RadioControl
-						label={ __('Relevance', 'jeo') }
-						//help="The type of the current user"
-						selected={ this.state.points.length ? this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' : 'primary' }
-						options={ [
-							{ label: __('Primary', 'jeo'), value: 'primary' },
-							{ label: __('Secondary', 'jeo'), value: 'secondary' },
-						] }
-						onChange={ this.relevanceClick }
-						/>
+				{ this.state.points.length > 0 && (
+
+					<div>
+						<p>{__('Search your location', 'jeo')}</p>
+						<JeoGeoAutoComplete onSelect={this.onLocationFound} />
+
+						<RadioControl
+								label={ __('Relevance', 'jeo') }
+								//help="The type of the current user"
+								selected={ this.state.points.length ? this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' : 'primary' }
+								options={ [
+									{ label: __('Primary', 'jeo'), value: 'primary' },
+									{ label: __('Secondary', 'jeo'), value: 'secondary' },
+								] }
+								onChange={ this.relevanceClick }
+								/>
+					</div>
+
+				) /* this.state.points.length */ }
 
 				<div id="geocode-map-container">
 					<LeafletMap
@@ -264,15 +271,20 @@ class JeoGeocodePosts extends React.Component {
 
 					</LeafletMap>
 
-					<Button isDefault onClick={ () => this.save() }>
-						{__('Save', 'jeo')}
-					</Button>
 
-					<Button onClick={ this.props.onCancel }>
-						{__('Cancel', 'jeo')}
-					</Button>
 
 				</div>
+
+
+
+
+				<Button isDefault onClick={ () => this.save() }>
+					{__('Save', 'jeo')}
+				</Button>
+
+				<Button onClick={ this.props.onCancel }>
+					{__('Cancel', 'jeo')}
+				</Button>
 
 			</>
 		);
