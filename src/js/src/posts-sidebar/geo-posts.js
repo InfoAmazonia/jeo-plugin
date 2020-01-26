@@ -135,14 +135,19 @@ class JeoGeocodePosts extends React.Component {
 
 		const coords = this.state.points.map( e => {
 			return [
-				e._geocode_lat,
-				e._geocode_lon
+				parseFloat(e._geocode_lat),
+				parseFloat(e._geocode_lon)
 			]
 		} );
 
 		const map = e.target;
 
-		map.fitBounds(coords);
+		if ( coords.length == 1 ) {
+			map.setZoom(6);
+			map.panTo(coords[0]);
+		} else if ( coords.length > 1 ) {
+			map.fitBounds(coords);
+		}
 
 	}
 
@@ -225,7 +230,7 @@ class JeoGeocodePosts extends React.Component {
 				<RadioControl
 						label={ __('Relevance', 'jeo') }
 						//help="The type of the current user"
-						selected={ this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' }
+						selected={ this.state.points.length ? this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' : 'primary' }
 						options={ [
 							{ label: __('Primary', 'jeo'), value: 'primary' },
 							{ label: __('Secondary', 'jeo'), value: 'secondary' },
