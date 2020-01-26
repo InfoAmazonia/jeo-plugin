@@ -249,7 +249,7 @@ class JeoGeocodePosts extends React.Component {
 							<Marker
 									draggable={ this.state.currentMarkerIndex == i ? true : false }
 									onDragend={this.onMarkerDragged}
-									position={[p._geocode_lat, p._geocode_lon]}
+									position={[ parseFloat(p._geocode_lat), parseFloat(p._geocode_lon) ]}
 									id={i}
 									opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
 									>
