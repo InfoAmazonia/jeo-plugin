@@ -147,7 +147,7 @@ class Geocode_Handler {
 					),
 				),
 			'single' => false,
-			//'sanitize_callback' => [$this, 'sanitize_points'],
+			'sanitize_callback' => [$this, 'sanitize_points'],
 			'auth_callback' => function() {
 				return current_user_can('edit_posts');
 			},
@@ -318,22 +318,32 @@ class Geocode_Handler {
 		return false;
 	}
 
+	/**
+	 * Makes sure coordinates are stores as strings with dots as decimal separator
+	 *
+	 * We dont store them as float because we had problems updating them that way. When
+	 * WordPress API tries to update values, it deletes older occurrences and passes the value
+	 * through wp_slash and coverts float to string. (In WP_REST_Meta_Fields::update_multi_meta_value())
+	 *
+	 * @param object|array $value
+	 * @return object|array $value
+	 */
 	public function sanitize_points( $value ) {
 
 		if ( isset($value['_geocode_lat']) ) {
-			$value['_geocode_lat'] = \floatval( $value['_geocode_lat'] );
+			$value['_geocode_lat'] = str_replace( ',', '.', $value['_geocode_lat'] );
 		}
 
 		if ( isset($value['_geocode_lon']) ) {
-			$value['_geocode_lon'] = \floatval( $value['_geocode_lon'] );
+			$value['_geocode_lon'] = str_replace( ',', '.', $value['_geocode_lon'] );
 		}
 
 		if ( isset($value->_geocode_lat) ) {
-			$value->_geocode_lat = \floatval( $value->_geocode_lat );
+			$value->_geocode_lat = str_replace( ',', '.', $value->_geocode_lat );
 		}
 
 		if ( isset($value->_geocode_lon) ) {
-			$value->_geocode_lon = \floatval( $value->_geocode_lon );
+			$value->_geocode_lon = str_replace( ',', '.', $value->_geocode_lon );
 		}
 
 		return $value;
