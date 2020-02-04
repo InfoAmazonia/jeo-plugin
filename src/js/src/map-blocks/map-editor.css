@@ -72,6 +72,10 @@
 	padding: 0.5em;
 }
 
+.jeo-layers-list .layer .remove-control svg {
+	cursor: pointer;
+}
+
 .jeo-layers-list .components-select-control__input {
 	width: auto;
 	margin-bottom: 0;
@@ -176,11 +180,23 @@
 
 .jeo-layers-library .layer-description {
 	padding: 0 1em;
+	flex-grow: 1;
 }
 
 .jeo-layers-library .layer-type {
 	font-size: 0.8em;
 	color: darkgrey;
+}
+
+.jeo-layers-library .edit-layer {
+	flex-basis: 2em;
+	font-size: 1.3em;
+	text-align: center;
+	margin: 1em 0;
+}
+
+.jeo-layers-library .edit-layer svg {
+	cursor: pointer;
 }
 
 /**
@@ -206,4 +222,8 @@
 }
 .jeo-layer-editor .help-block {
 	margin-top: 0;
+}
+
+.jeo-layer-editor .save-layer {
+	margin-right: 1em;
 }
