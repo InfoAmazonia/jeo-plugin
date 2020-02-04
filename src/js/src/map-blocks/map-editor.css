@@ -202,24 +202,30 @@
 /**
  * Layer Editor
  */
+.jeo-map-settings .form-group,
 .jeo-layer-editor .form-group {
 	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans,
 		Ubuntu, Cantarell, Helvetica Neue, sans-serif;
 	font-size: 13px;
 	margin-bottom: 8px;
 }
+
+.jeo-map-settings .control-label,
 .jeo-layer-editor .control-label {
 	display: inline-block;
 	margin-bottom: 4px;
 }
 
+.jeo-map-settings .form-control,
 .jeo-layer-editor .form-control {
 	display: block;
 	width: 100%;
 }
+.jeo-map-settings .form-control:not(select),
 .jeo-layer-editor .form-control:not(select) {
 	padding: 6px 8px;
 }
+.jeo-map-settings .help-block,
 .jeo-layer-editor .help-block {
 	margin-top: 0;
 }
