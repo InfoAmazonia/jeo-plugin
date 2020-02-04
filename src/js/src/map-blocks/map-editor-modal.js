@@ -5,7 +5,6 @@ const tabs = [
 	{ name: 'map', title: __( 'Map Settings' ), className: 'tab-map' },
 	{ name: 'layers', title: __( 'Map Layers' ), className: 'tab-layers' },
 	{ name: 'library', title: __( 'Layers Library' ), className: 'tab-library' },
-	{ name: 'new-layer', title: __( 'Add New Layer' ), className: 'tab-new-layer' },
 ];
 
 export default ( { modal, setModal, children } ) => (

@@ -1,4 +1,5 @@
 import Form from 'react-jsonschema-form';
+import { Button } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -27,7 +28,7 @@ const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 	setOptions( options );
 };
 
-const LayerEditor = ( { save } ) => {
+const LayerEditor = ( { backToLibrary, save } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
 	const [ formState, setFormState ] = useState( {} );
@@ -61,10 +62,28 @@ const LayerEditor = ( { save } ) => {
 					status: 'publish',
 				};
 				save( 'postType', 'map-layer', query ).then( ( savedLayer ) =>
-					console.log( savedLayer )
+					backToLibrary()
 				);
 			} }
-		/>
+		>
+			<Button
+				className="save-layer"
+				type="submit"
+				isLarge={ true }
+				isPrimary={ true }
+			>
+				{ __( 'Save' ) }
+			</Button>
+			<Button
+				className="cancel-layer"
+				type="button"
+				isLarge={ true }
+				isSecondary={ true }
+				onClick={ backToLibrary }
+			>
+				{ __( 'Cancel' ) }
+			</Button>
+		</Form>
 	);
 };
 
