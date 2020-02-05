@@ -25,6 +25,8 @@ const OnetimeMapEditor = ( {
 							case 'map':
 								return (
 									<MapSettings
+										attributes={attributes}
+										setAttributes={setAttributes}
 										setMap={ ( settings ) =>
 											setAttributes( { ...attributes, ...settings } )
 										}
