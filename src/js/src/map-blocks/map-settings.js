@@ -1,24 +1,89 @@
-import Form from 'react-jsonschema-form';
+import React from 'react';
+import ReactMapboxGl from 'react-mapbox-gl';
+import { TextControl, RangeControl } from '@wordpress/components';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-const mapSchema = {
-	type: 'object',
-	properties: {
-		center_lat: { title: __( 'Center Latitude' ), type: 'number' },
-		center_lon: { title: __( 'Center Longitude' ), type: 'number' },
-		initial_zoom: { title: __( 'Initial Zoom' ), type: 'number' },
-		min_zoom: { title: __( 'Min Zoom' ), type: 'number' },
-		max_zoom: { title: __( 'Max Zoom' ), type: 'number' },
-	},
-};
+const MapboxAPIKey = window.jeo_settings.mapbox_key;
 
-export default ( { setMap } ) => (
-	<Form
-		className="jeo-map-settings"
-		schema={ mapSchema }
-		onSubmit={ ( { formData }, event ) => {
-			event.preventDefault();
-			setMap( formData );
-		} }
-	/>
-);
+const Map = ReactMapboxGl( { accessToken: MapboxAPIKey } );
+
+export default ( { attributes, setAttributes } ) => {
+	const {
+		center_lat: centerLat,
+		center_lon: centerLon,
+		initial_zoom: initialZoom,
+		min_zoom: minZoom,
+		max_zoom: maxZoom,
+	} = attributes;
+
+	const attributeUpdater = ( attribute ) => ( value ) =>
+		setAttributes( { ...attributes, [ attribute ]: value } );
+
+	return (
+		<Fragment>
+			<Map
+				style="mapbox://styles/mapbox/streets-v11"
+				containerStyle={ { height: '20vh' } }
+				zoom={ [ initialZoom || 11 ] }
+				center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
+				onMoveEnd={ ( map ) => {
+					const center = map.getCenter();
+					setAttributes( {
+						...attributes,
+						center_lat: center.lat,
+						center_lon: center.lng,
+						initial_zoom: Math.round( map.getZoom() * 10 ) / 10,
+					} );
+				} }
+			/>
+			<form className="jeo-map-settings">
+				<section className="center">
+					<h3>{ __( 'Center' ) }</h3>
+					<TextControl
+						type="number"
+						label={ __( 'Latitude' ) }
+						value={ centerLat }
+						onChange={ attributeUpdater( 'center_lat' ) }
+					/>
+					<TextControl
+						type="number"
+						label={ __( 'Longitude' ) }
+						value={ centerLon }
+						onChange={ attributeUpdater( 'center_lon' ) }
+					/>
+				</section>
+				<section className="zoom">
+					<h3>{ __( 'Zoom' ) }</h3>
+					<RangeControl
+						label={ __( 'Initial zoom' ) }
+						initialPosition={ 11 }
+						min={ 0 }
+						max={ 20 }
+						step={ 0.1 }
+						value={ initialZoom }
+						onChange={ attributeUpdater( 'initial_zoom' ) }
+					/>
+					<RangeControl
+						label={ __( 'Min zoom' ) }
+						initialPosition={ 0 }
+						min={ 0 }
+						max={ 20 }
+						step={ 0.1 }
+						value={ minZoom }
+						onChange={ attributeUpdater( 'min_zoom' ) }
+					/>
+					<RangeControl
+						label={ __( 'Max zoom' ) }
+						initialPosition={ 20 }
+						min={ 0 }
+						max={ 20 }
+						step={ 0.1 }
+						value={ maxZoom }
+						onChange={ attributeUpdater( 'max_zoom' ) }
+					/>
+				</section>
+			</form>
+		</Fragment>
+	);
+};
