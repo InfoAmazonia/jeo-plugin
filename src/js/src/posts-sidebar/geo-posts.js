@@ -1,5 +1,6 @@
 import React from 'react';
-import { Map as LeafletMap, Marker, Popup, TileLayer } from 'react-leaflet';
+import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
+import classNames from 'classnames';
 import JeoGeoAutoComplete from './geo-auto-complete';
 import { Button, RadioControl } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
@@ -196,97 +197,97 @@ class JeoGeocodePosts extends React.Component {
 
 	render() {
 		return (
-			<>
-				<div>
-					{__('Current points', 'jeo')}
+			<div className="jeo-geocode-posts">
+				<div className="jeo-geocode-posts__column">
+					<h2>{ __( 'Current points', 'jeo' ) }</h2>
 					<ul>
-						{this.state.points.map( (p, i) => (
+						{ this.state.points.map( ( point, i ) => (
 							<li
-									id={i}
-									onClick={this.clickMarkerList}
-									className={ this.state.currentMarkerIndex == i ? 'active' : ''}
+									id={ i }
+									onClick={ this.clickMarkerList }
+									className={ classNames([
+										'jeo-geocode-posts__post',
+										point && point.relevance || 'primary',
+										this.state.currentMarkerIndex == i && 'active'
+									]) }
 									>
-								{p._geocode_full_address}
-								(
-									<a
-											onClick={this.deletePoint}
-											marker_index={i}
-											>
-										{__('delete', 'jeo')}
-									</a>
-								)
+								{ point._geocode_full_address }
+								{ ' ' }
+								<Button
+										isLink
+										onClick={ this.deletePoint }
+										marker_index={ i }
+										>
+									{ __( 'Delete', 'jeo' ) }
+								</Button>
 							</li>
-						))}
-						<li
-								onClick={this.newPoint}
-								>
-							{__('Add new point', 'jeo')}
-						</li>
+						) ) }
 					</ul>
+
+					<div className="jeo-geocode-posts__buttons-list">
+						<Button isPrimary onClick={ this.newPoint }>
+							{ __( 'Add new point', 'jeo' ) }
+						</Button>
+					</div>
 				</div>
 
-				{ this.state.points.length > 0 && (
+				<div className="jeo-geocode-posts__column">
+					{ this.state.points.length > 0 && (
+						<div>
+							<h2>{ __( 'Search your location', 'jeo' ) }</h2>
+							<JeoGeoAutoComplete onSelect={ this.onLocationFound } />
+							<RadioControl
+									label={ __( 'Relevance', 'jeo' ) }
+									//help="The type of the current user"
+									selected={ this.state.points.length ? this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' : 'primary' }
+									options={ [
+										{ label: __( 'Primary', 'jeo' ), value: 'primary' },
+										{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
+									] }
+									onChange={ this.relevanceClick }
+									/>
+						</div>
 
-					<div>
-						<p>{__('Search your location', 'jeo')}</p>
-						<JeoGeoAutoComplete onSelect={this.onLocationFound} />
+					) /* this.state.points.length */ }
 
-						<RadioControl
-								label={ __('Relevance', 'jeo') }
-								//help="The type of the current user"
-								selected={ this.state.points.length ? this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' : 'primary' }
-								options={ [
-									{ label: __('Primary', 'jeo'), value: 'primary' },
-									{ label: __('Secondary', 'jeo'), value: 'secondary' },
-								] }
-								onChange={ this.relevanceClick }
-								/>
+					<div id="geocode-map-container">
+						<LeafletMap
+								center={[0,0]}
+								zoom={this.state.zoom}
+								whenReady={this.mapLoaded}
+								ref={this.refMap}
+								>
+							<TileLayer
+									attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+									url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+									/>
+							{this.state.points.map( (p, i) => (
+
+								<Marker
+										draggable={ this.state.currentMarkerIndex == i ? true : false }
+										onDragend={this.onMarkerDragged}
+										position={[ parseFloat(p._geocode_lat), parseFloat(p._geocode_lon) ]}
+										id={i}
+										opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
+										>
+								</Marker>
+
+							))}
+
+						</LeafletMap>
 					</div>
 
-				) /* this.state.points.length */ }
+					<div className="jeo-geocode-posts__buttons-list">
+						<Button isPrimary onClick={ () => this.save() }>
+							{ __( 'Save', 'jeo' ) }
+						</Button>
 
-				<div id="geocode-map-container">
-					<LeafletMap
-							center={[0,0]}
-							zoom={this.state.zoom}
-							whenReady={this.mapLoaded}
-							ref={this.refMap}
-							>
-						<TileLayer
-								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-								url='https://{s}.tile.osm.org/{z}/{x}/{y}.png'
-								/>
-						{this.state.points.map( (p, i) => (
-
-							<Marker
-									draggable={ this.state.currentMarkerIndex == i ? true : false }
-									onDragend={this.onMarkerDragged}
-									position={[ parseFloat(p._geocode_lat), parseFloat(p._geocode_lon) ]}
-									id={i}
-									opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
-									>
-							</Marker>
-
-						))}
-
-					</LeafletMap>
-
-
-
+						<Button isDefault onClick={ this.props.onCancel }>
+							{ __( 'Cancel', 'jeo' ) }
+						</Button>
+					</div>
 				</div>
-
-
-
-
-				<Button isDefault onClick={ () => this.save() }>
-					{__('Save', 'jeo')}
-				</Button>
-
-				<Button onClick={ this.props.onCancel }>
-					{__('Cancel', 'jeo')}
-				</Button>
-
-			</>
+			</div>
 		);
 
 	}

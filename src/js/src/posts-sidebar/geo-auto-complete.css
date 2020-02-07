@@ -1,0 +1,10 @@
+.jeo-geo-autocomplete {
+	padding: 2px 5px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.jeo-geo-autocomplete:hover {
+	background-color: aliceblue;
+}
