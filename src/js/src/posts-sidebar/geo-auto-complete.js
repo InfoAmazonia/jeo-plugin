@@ -1,7 +1,7 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { Spinner } from "@wordpress/components";
-
+import './geo-auto-complete.css';
 
 class JeoGeoAutoComplete extends React.Component {
 
@@ -40,7 +40,9 @@ class JeoGeoAutoComplete extends React.Component {
 
 	renderSuggestion(suggestion) {
 		return (
-			<span>{suggestion.full_address}</span>
+			<div className="jeo-geo-autocomplete" title={ suggestion.full_address }>
+				{ suggestion.full_address }
+			</div>
 		)
 	};
 
