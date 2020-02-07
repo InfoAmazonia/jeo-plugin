@@ -1,3 +1,8 @@
+div.jeomap {
+	position: relative;
+	width: 600px;
+	height: 600px;
+}
 
 .jeomap nav {
 	background: #fff;
@@ -34,4 +39,39 @@
 
 .jeomap nav a.active:hover {
 	background: #3074a4;
+}
+
+.jeomap div.more-info-overlayer {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: white;
+	z-index: 10;
+	display: none;
+	overflow-y: auto;
+}
+
+.jeomap > div > a.more-info-close {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	z-index: 11;
+	cursor: pointer;
+}
+
+.jeomap a.more-info-button {
+	background: #fff;
+	position: absolute;
+	bottom: 10px;
+	right: 10px;
+	z-index: 1;
+	border: 1px solid rgba(0,0,0,0.4);
+	color: #404040;
+	display: block;
+	margin: 0;
+	padding: 2px 10px;
+	text-decoration: none;
+	border-bottom: 1px solid rgba(0,0,0,0.25);
+	text-align: center;
+	cursor: pointer;
 }

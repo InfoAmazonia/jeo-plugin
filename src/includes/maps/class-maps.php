@@ -6,13 +6,15 @@ class Maps {
 
 	use Singleton;
 	use Rest_Validate_Meta;
-	
+
 	public $post_type = 'map';
 
 	protected function init() {
 		add_action( 'init', [$this, 'register_post_type'] );
+		add_action( 'init', [$this, 'register_shortcode'] );
+		add_filter( 'the_content', [$this, 'the_content_filter'] );
 		$this->register_rest_meta_validation();
-		
+
 	}
 
 	public function register_post_type() {
@@ -49,38 +51,260 @@ class Maps {
 
 		register_post_type($this->post_type, $args);
 
-		register_post_meta($this->post_type, 'zoom', [
+		register_post_meta($this->post_type, 'initial_zoom', [
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'sanitize_callback' => [$this, 'sanitize_meta_zoom'],
+			'sanitize_callback' => [$this, 'sanitize_meta_initial_zoom'],
 			'type' => 'number',
 			'description' => __('The map initial zoom level', 'jeo')
 		]);
 
+		register_post_meta($this->post_type, 'center_lat', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'string',
+			'description' => __('The map initial latitude', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'center_lon', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'string',
+			'description' => __('The map initial longitude', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'layers', [
+			'show_in_rest'  => array(
+				'schema' => array(
+					'items' => [
+						'type' => 'object',
+						'properties' => [
+							'id' => [
+								'description' => __('The Layer ID', 'jeo'),
+								'type' => 'integer'
+							],
+							'use' => [
+								'description' => __('How this layer is used in this map. Can be fixed, switchable or swappable', 'jeo'),
+								'type' => 'string'
+							],
+							'default' => [
+								'description' => __('Indicates whether this layer is visible by default', 'jeo'),
+								'type' => 'boolean'
+							]
+						],
+						'required' => [ 'id', 'use' ]
+					],
+
+				),
+			),
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'array',
+			'description' => __('The map Layers', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'related_posts', [
+			'show_in_rest' => [
+				'schema' => [
+					'properties' => [
+						'cat' => [
+							'description' => __('List of category IDs related posts must have', 'jeo'),
+							'type' => 'array',
+							'items' => [
+								'type' => 'integer'
+							]
+						]
+					]
+				]
+
+			],
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'object',
+			'description' => __('The map criteria to get related posts', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'disable_scroll_zoom', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'boolean',
+			'description' => __('Disable scroll zoom', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'max_bounds_sw', [
+			'show_in_rest' => [
+				'schema' => [
+					'items' => [
+						'type' => 'string'
+					]
+				]
+			],
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'array',
+			'description' => __('Southwest coordinates pan limit', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'max_bounds_ne', [
+			'show_in_rest' => [
+				'schema' => [
+					'items' => [
+						'type' => 'string'
+					]
+				]
+			],
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'array',
+			'description' => __('Northeast coordinates pan limit', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'min_zoom', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'integer',
+			'description' => __('Minimum Zoom level', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'max_zoom', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'integer',
+			'description' => __('Maximum zoom level', 'jeo')
+		]);
+
+
 	}
-	
+
 	public function sanitize_meta_center($meta_value, $meta_key, $object_type, $object_subtype) {
 		return intval($meta_value);
 	}
-	
-	public function sanitize_meta_zoom($meta_value, $meta_key, $object_type, $object_subtype) {
+
+	public function sanitize_meta_initial_zoom($meta_value, $meta_key, $object_type, $object_subtype) {
 		return intval($meta_value);
 	}
-	
+
 	/**
-	 * Validates the zoom metadata value 
+	 * Validates the zoom metadata value
 	 * @param  mixed $value The value to be validated
 	 * @return void|\WP_Error Returns a \WP_Error object in case the value is invalid
 	 */
-	public function validate_meta_zoom($value) {
-		// WordPress is already validating if it is a number 
-		
+	public function validate_meta_initial_zoom($value) {
+		// WordPress is already validating if it is a number
+
 		$val = intval($value);
 		if ( $val < 1 || $val > 14 ) {
 			return new \WP_Error( 'rest_invalid_field', __( 'Map zoom must be between 1 and 14', 'jeo' ), array( 'status' => 400 ) );
 		}
-		
+
+	}
+
+	public function register_shortcode() {
+		\add_shortcode( 'jeo-map', array( $this, 'map_shortcode' ) );
+	}
+
+	public function map_shortcode( $atts ) {
+
+		$atts = \shortcode_atts( [
+			'map_id' => 0,
+			'width' => '',
+			'height' => ''
+		], $atts );
+
+		$map_id = (int) $atts['map_id'];
+
+		if ( $atts['map_id'] < 1 ) {
+			return '';
+		}
+
+		$div = '<div class="jeomap" data-map_id="' . $map_id . '" ';
+
+		$w = $atts['width'];
+		$h = $atts['height'];
+		$style = '';
+
+		if ( ! empty($w) ) {
+			$style .= 'style="width: ' . $atts['width'] . '; ';
+		}
+
+		if ( ! empty($h) ) {
+			$style .= 'height: ' . $atts['height'] . ';"';
+		}
+
+		if ( ! empty( $tyle ) ) {
+			$div .= 'style="' . $style . '"';
+		}
+
+
+		$div .= '></div>';
+
+		return $div;
+
+	}
+
+	public function the_content_filter( $content ) {
+
+		if ( get_post_type() != 'map' ) {
+			return $content;
+		}
+
+		// Only when visiting the Map single page
+		if ( is_single( get_the_id() ) ) {
+			$div = '<div class="jeomap" data-map_id="' . get_the_ID() . '"></div>';
+			$content = $div . $content;
+		}
+
+		$layers_def = get_post_meta( get_the_ID(), 'layers', true);
+
+		if ( is_array( $layers_def ) ) {
+
+			$layers_ids = array_map( function($e) { return $e['id']; }, $layers_def );
+
+			if ( ! sizeof($layers_ids) ) {
+				return $content;
+			}
+
+			$layers = new \WP_Query([
+				'post_type' => 'map-layer',
+				'post__in' => $layers_ids,
+				'orderby' => 'post__in',
+				'nopaging' => true
+			]);
+
+			$template = \jeo_get_template( 'map-content-layers-list.php' );
+
+			$return = '<div class="map-content-layers-list">';
+
+			ob_start();
+
+			while ( $layers->have_posts() ) {
+
+				$layers->the_post();
+
+				$source_url = get_post_meta( get_the_ID(), 'source_url', true );
+
+				include( $template );
+
+			}
+
+			$return .= \ob_get_clean();
+
+			\wp_reset_postdata();
+
+			$return .= '</div>';
+
+			$content .= $return;
+
+		}
+
+		return $content;
+
 	}
 
 

@@ -135,3 +135,23 @@ Simply type this command from the project root folder:
 [lando]: https://lando.dev
 [lando-install]: https://docs.lando.dev/basics/installation.html
 
+## Fixtures
+
+There are few `WP CLI` commands that will generate sample layers and maps useful for development purposes.
+
+(These fixtures uses infoamazonia maps and require infoamazonia Mapbox access token to be configured in the Settings menu)
+
+In order to create or update the fixtures to the latest version, run:
+
+`wp jeo fixtures update`
+
+Using lando, this will be:
+
+`lando wp jeo fixtures update --path='/app/wordpress'`
+
+The last two lines of output in this command will point you to two pages with sample maps added to it. They are identical, with the difference that one of them is a one-time map, and the other one is a map saved in the Maps Library
+
+There are also other 2 commands available
+
+* `wp jeo fixtures list` - List the fixtures saved to the database and their metadata
+* `wp jeo fixtures sample_maps` - Gives you sample DIVs you can use to add the sample maps anywhere you want in your theme. 

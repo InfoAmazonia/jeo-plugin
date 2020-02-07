@@ -1,11 +1,4 @@
-//import { __ } from "@wordpress/i18n";
-/**
- * to test this, add the following div in the singular.php template of the twentytwenty theme
- * <div class="jeomap" data_center_lat="0" data_center_lon="0" data_initial_zoom="1" data_layers="[2,3,4]" style="width:600px; height: 600px;"></div>
- *
- * then visit any page in your site
- */
-
+// import { __ } from "@wordpress/i18n";
 
 class JeoMap {
 
@@ -21,53 +14,168 @@ class JeoMap {
 
 		this.map = map;
 
-		map.setZoom( this.getArg('initial_zoom') );
+		this.initMap()
+		.then( () => {
 
-		map.setCenter( [this.getArg('center_lon'), this.getArg('center_lat')] );
+			map.setZoom( this.getArg('initial_zoom') );
 
-		this.getLayers().then( layers => {
+			map.setCenter( [this.getArg('center_lon'), this.getArg('center_lat')] );
 
-			const baseLayer = layers[0];
-			baseLayer.addStyle(map);
+			if ( this.getArg('disable_scroll_zoom') ) {
+				map.scrollZoom.disable();
+			}
 
-			let custom_attributions = [];
+			if (
+				this.getArg('max_bounds_ne') &&
+				this.getArg('max_bounds_sw') &&
+				this.getArg('max_bounds_ne').length == 2 &&
+				this.getArg('max_bounds_sw').length == 2
 
-			map.on('load', () => {
-				layers.forEach( (layer, i) => {
+			) {
+				map.setMaxBounds(
+					[
+						this.getArg('max_bounds_sw'),
+						this.getArg('max_bounds_ne')
+					]
+				);
+			}
 
-					if( layer.attribution ) {
-						custom_attributions.push( layer.attribution );
-					}
+			if ( this.getArg('min_zoom') ) {
+				map.setMinZoom( this.getArg('min_zoom') );
+			}
+			if ( this.getArg('max_zoom') ) {
+				map.setMaxZoom( this.getArg('max_zoom') );
+			}
 
-					if ( i === 0 ) {
-						return;
-					} else {
-						layer.addLayer(map);
-					}
+			this.addMoreButton();
+
+		})
+		.then( () => {
+
+			this.getLayers().then( layers => {
+
+				const baseLayer = layers[0];
+				baseLayer.addStyle(map);
+
+				let custom_attributions = [];
+
+				map.on('load', () => {
+					layers.forEach( (layer, i) => {
+
+						if( layer.attribution ) {
+							custom_attributions.push( layer.attribution );
+						}
+
+						if ( i > 0 ) {
+							layer.addLayer(map);
+						}
+
+						layer.addInteractions(map);
+
+					});
+
 				});
-			});
 
-			this.addLayersControl();
+				this.addLayersControl();
 
-			map.addControl(
-				new mapboxgl.AttributionControl({
-					customAttribution: custom_attributions
-				}),
-				'bottom-left'
-			);
+				map.addControl(
+					new mapboxgl.AttributionControl({
+						customAttribution: custom_attributions
+					}),
+					'bottom-left'
+				);
 
-		} );
+			} );
 
-		this.getRelatedPosts().then( posts => {
+			this.getRelatedPosts();
 
-		} );
+		});
 
 		window.map = map;
 
 	}
 
+	initMap() {
+		if ( this.getArg('map_id') ) {
+
+			return jQuery.get(
+				jeoMapVars.jsonUrl + 'map/' + this.getArg('map_id')
+			).then( data => {
+
+				this.map_post_object = data;
+
+			});
+
+		} else {
+			return Promise.resolve();
+		}
+	}
+
+	/**
+	 * Adds the "More" button that will open the Content of the Map post in an overlayer
+	 *
+	 * This will only work for maps stored in the database and not for one-time use maps
+	 */
+	addMoreButton() {
+		if ( this.map_post_object ) {
+			// TODO Use templates
+
+			const moreDiv = document.createElement('div');
+
+			moreDiv.classList.add('more-info-overlayer');
+
+			moreDiv.innerHTML = '<h2>' + this.map_post_object.title.rendered + '</h2>' + this.map_post_object.content.rendered;
+
+			const closeButton = document.createElement('a');
+			closeButton.classList.add('more-info-close');
+			closeButton.innerHTML = 'x';
+
+			closeButton.click( function(e)  {
+
+			});
+
+			closeButton.onclick = e => {
+
+				e.preventDefault();
+				e.stopPropagation();
+
+				jQuery(e.currentTarget).parent().hide();
+
+			};
+
+			moreDiv.appendChild( closeButton );
+
+			const moreButton = document.createElement('a');
+			moreButton.classList.add('more-info-button');
+			moreButton.innerHTML = 'Info';
+
+			moreButton.onclick = e => {
+
+				e.preventDefault();
+				e.stopPropagation();
+				jQuery(e.currentTarget).siblings('.more-info-overlayer').show();
+
+			};
+
+			this.element.appendChild( moreDiv );
+			this.element.appendChild( moreButton );
+
+		}
+	}
+
 	getArg(argName) {
-		return jQuery(this.element).data(argName);
+		let value;
+		if ( this.map_post_object ) {
+			value = this.map_post_object.meta[argName];
+		} else {
+			value = jQuery(this.element).data(argName);
+		}
+
+		if ( value ) {
+			return value;
+		} else {
+			return false;
+		}
 	}
 
 	getLayers() {
@@ -81,7 +189,8 @@ class JeoMap {
 			jQuery.get(
 				jeoMapVars.jsonUrl + 'map-layer',
 				{
-					include: layersIds
+                    include: layersIds,
+                    orderby: 'include'
 				},
 				data => {
 					let returnLayers = [];
@@ -146,27 +255,18 @@ class JeoMap {
 	}
 
 	addPostToMap(post) {
-		if ( post.meta._primary_point ) {
+		if ( post.meta._related_point ) {
 
-			post.meta._primary_point.forEach( point => {
-				this.addPointToMap(point, post, 'primary')
-			});
-
-		}
-
-		if ( post.meta._secondary_point ) {
-
-			post.meta._secondary_point.forEach( point => {
-				this.addPointToMap(point, post, 'secondary')
+			post.meta._related_point.forEach( point => {
+				this.addPointToMap(point, post)
 			});
 
 		}
 
 	}
 
-	addPointToMap(point, post, type) {
-		const color = type == 'secondary' ? '#CCCCCC' : '#3FB1CE';
-
+	addPointToMap(point, post) {
+		const color = point.relevance == 'secondary' ? '#CCCCCC' : '#3FB1CE';
 		let marker = new mapboxgl.Marker( {color: color } );
 
 		// TODO use a template file
@@ -175,8 +275,8 @@ class JeoMap {
 		let popUp = new mapboxgl.Popup().setHTML( popupHTML );
 
 		const LngLat = {
-			lat: parseFloat( point._geocode_lat.replace(',', '.') ),
-			lon: parseFloat( point._geocode_lon.replace(',', '.') )
+			lat: parseFloat( point._geocode_lat ),
+			lon: parseFloat( point._geocode_lon )
 		}
 
 		marker.setLngLat( LngLat )

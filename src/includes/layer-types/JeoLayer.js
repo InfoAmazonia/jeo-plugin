@@ -16,6 +16,12 @@ class JeoLayer {
 		return this.layerType.getSchema(this.attributes);
 	}
 
+	addInteractions(map) {
+		if (typeof this.layerType.addInteractions === 'function') {
+			return this.layerType.addInteractions(map, this.attributes);
+		}
+	}
+
 	get layer_name() {
 		return this.attributes.layer_name;
 	}

@@ -74,3 +74,14 @@ function jeo_settings() {
 function jeo_layer_types() {
 	return \Jeo\Layer_Types::get_instance();
 }
+
+
+function jeo_get_template( $template_name ) {
+
+	if ( file_exists( JEO_BASEPATH . '/templates/' . $template_name ) ) {
+		return JEO_BASEPATH . '/templates/' . $template_name;
+	}
+
+	return false;
+
+}

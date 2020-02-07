@@ -4,6 +4,8 @@ import { withSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import classNames from 'classnames';
 
+import LayerEditor from './layer-editor';
+
 const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
 
 const LayersLibrary = ( {
@@ -11,12 +13,23 @@ const LayersLibrary = ( {
 	loadedLayers,
 	selected,
 	setLayers,
-	onCreateLayer,
 } ) => {
+	const [ editing, setEditing ] = useState( false );
 	const [ search, setSearch ] = useState( '' );
+
 	if ( loadingLayers ) {
 		return <p>{ __( 'Loading layers data...' ) }</p>;
 	}
+
+	if ( editing ) {
+		return (
+			<div className="jeo-layers-library">
+				<h3>{ __( 'Create a new Layer' ) }</h3>
+				<LayerEditor layer={ editing } backToLibrary={ () => setEditing( false ) } />
+			</div>
+		);
+	}
+
 	const options = loadedLayers
 		.filter( ( layer ) =>
 			layer.title.rendered.toLowerCase().includes( search.toLowerCase() )
@@ -37,7 +50,7 @@ const LayersLibrary = ( {
 					onChange={ setSearch }
 				/>
 				<span>{ __( 'or' ) }</span>
-				<Button isPrimary isLarge onClick={ onCreateLayer }>
+				<Button isPrimary isLarge onClick={ () => setEditing( true ) }>
 					{ __( 'Create New Layer' ) }
 				</Button>
 			</div>
@@ -61,6 +74,12 @@ const LayersLibrary = ( {
 								<span className="layer-type"> | { layer.meta.type }</span>
 							</h3>
 							<p>{ layer.meta.url }</p>
+						</div>
+						<div className="edit-layer">
+							<Dashicon
+								icon="welcome-write-blog"
+								onClick={ () => setEditing( layer.id ) }
+							/>
 						</div>
 					</div>
 				) ) }
