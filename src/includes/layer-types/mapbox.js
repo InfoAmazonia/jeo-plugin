@@ -31,6 +31,81 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		return map.addLayer( layer );
 	},
 
+	addInteractions( map, attributes ) {
+		if (attributes.layer_type_options.interactions) {
+
+			const int = attributes.layer_type_options.interactions;
+
+			int.forEach( interaction => {
+
+				const vLayers = map.getSource('composite').vectorLayers;
+				const vLayer = vLayers.find(el => { return el.id == interaction.id });
+				let parentLayer = false;
+
+				// find layer
+				Object.keys(map.style._layers).forEach( key => {
+					if ( map.style._layers[key].sourceLayer == interaction.id ) {
+						parentLayer = map.style._layers[key];
+					}
+				});
+
+				if (vLayer && parentLayer) {
+
+					let popUp = new mapboxgl.Popup({
+						closeButton: false,
+						closeOnClick: true
+					});
+
+					const type = interaction.on == 'click' || interaction.on == 'mouseover' ? interaction.on : 'click';
+
+					map.on(type, parentLayer.id, function(e) {
+						// Change the cursor style as a UI indicator.
+						map.getCanvas().style.cursor = 'pointer';
+
+						var feature = e.features[0];
+
+						var coordinates = feature.geometry.coordinates.slice();
+
+						// Ensure that if the map is zoomed out such that multiple
+						// copies of the feature are visible, the popup appears
+						// over the copy being pointed to.
+						while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+							coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+						}
+
+						var html = '';
+
+						// title
+						if ( feature.properties.hasOwnProperty(interaction.title) ) {
+							html += '<h3>' + feature.properties[interaction.title] + '</h3>';
+						}
+
+						interaction.fields.forEach( (field) => {
+							if ( feature.properties.hasOwnProperty(field.field) ) {
+								html += '<p><strong>' + field.label + ': </strong>' + feature.properties[field.field] + '</p>';
+							}
+						});
+
+						// Populate the popup and set its coordinates
+						// based on the feature found.
+						popUp.setLngLat([e.lngLat.lng, e.lngLat.lat])
+							.setHTML(html)
+							.addTo(map);
+					});
+					map.on('mouseenter', parentLayer.id, function () {
+						map.getCanvas().style.cursor = 'pointer';
+					});
+					map.on('mouseleave', parentLayer.id, function() {
+						map.getCanvas().style.cursor = '';
+						//popUp.remove();
+					});
+
+				}
+
+			});
+		}
+	},
+
 	getSchema( attributes ) {
 		const base_schema = {
 			type: 'object',
@@ -65,7 +140,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						//console.log(layers.vector_layers);
 						for ( let l = 0; l < layers.vector_layers.length; l++ ) {
 							const new_layer = {
-								name: layers.vector_layers[ l ].source_name,
+								id: layers.vector_layers[ l ].id,
 								fields: layers.vector_layers[ l ].fields,
 							};
 							form_layers.push( new_layer );
