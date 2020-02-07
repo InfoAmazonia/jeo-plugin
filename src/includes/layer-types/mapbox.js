@@ -19,7 +19,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 
 
-		this
+		return this
 		._getStyleDefinition( attributes )
 		.then( function( styleDefinition ) {
 
@@ -59,9 +59,26 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 			int.forEach( interaction => {
 
-				const vLayers = map.getSource('composite').vectorLayers;
-				const vLayer = vLayers.find(el => { return el.id == interaction.id });
+				let vLayers = map.getSource('composite').vectorLayers;
+				let vLayer = vLayers.find(el => { return el.id == interaction.id });
+
+				if ( ! vLayer ) {
+					// maybe it was added as additional layer, and not as the Style itself
+					// In these cases, we prefixed the source and layer ids (see addLayer())
+					interaction.id = attributes.layer_id + '_' + interaction.id;
+					console.log(map.getSource(attributes.layer_id + '_' + 'composite'));
+					console.log(map.getSource(attributes.layer_id + '_' + 'composite').vectorLayers);
+					vLayers = map.getSource(attributes.layer_id + '_' + 'composite').vectorLayers;
+
+					vLayer = vLayers.find(el => { return el.id == interaction.id });
+				}
+
 				let parentLayer = false;
+
+				console.log(attributes);
+				console.log(vLayers);
+				console.log(vLayer);
+				console.log(map.style._layers);
 
 				// find layer
 				Object.keys(map.style._layers).forEach( key => {

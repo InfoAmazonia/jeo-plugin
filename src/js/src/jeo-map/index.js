@@ -67,10 +67,13 @@ class JeoMap {
 						}
 
 						if ( i > 0 ) {
-							layer.addLayer(map);
+							layer.addLayer(map).then( () => {
+								layer.addInteractions(map);
+							});
+						} else {
+							layer.addInteractions(map);
 						}
 
-						layer.addInteractions(map);
 
 					});
 

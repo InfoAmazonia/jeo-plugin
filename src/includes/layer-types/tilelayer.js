@@ -35,7 +35,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 				visibility: 'none'
 			};
 		}
-		return map.addLayer(layer);
+		return Promise.resolve(map.addLayer(layer));
 	},
 
 	getSchema: function(attributes) {

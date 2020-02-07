@@ -91,7 +91,24 @@ class Fixtures {
 					'attribution' => 'Sample attribution for <a href="http://jeo.com">this layer with a link</a>',
 					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
-						'style_id' => 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
+						'style_id' => 'infoamazonia/ck33yfty30o0s1dqpien3edi4',
+						'interactions' => [
+							[
+								'id' => 'ProdesDeforestation_LegalAmazon_20162018_2convertidok',
+								'on' => 'click', // click or mouseover
+								'title' => 'ANO',
+								'fields' => [
+									[
+										'field' => 'AREAKM',
+										'label' => 'Área'
+									],
+									[
+										'field' => 'VIEW_DATE',
+										'label' => 'Data'
+									],
+								]
+							]
+						]
 					]
 				]
 			],
