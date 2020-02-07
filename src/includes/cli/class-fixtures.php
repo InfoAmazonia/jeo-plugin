@@ -29,7 +29,30 @@ class Fixtures {
 					'type' => 'mapbox',
 					'attribution' => 'Sample attribution for this layer',
 					'layer_type_options' => [
-						'style_id' => 'infoamazonia/cjvwvumyx5i851coa874sx97e'
+						'style_id' => 'infoamazonia/cjvwvumyx5i851coa874sx97e',
+						'interactions' => [
+							[
+								'id' => 'Imazon_Frigorificos_ativo-dvt5tp',
+								'on' => 'click', // click or mouseover
+								'title' => 'RAZAO_SOCI',
+								'fields' => [
+									[
+										'field' => 'MUNIC',
+										'label' => 'Município'
+									],
+									[
+										'field' => 'UF',
+										'label' => 'UF'
+									],
+									[
+										'field' => 'STATUS',
+										'label' => 'Status'
+									],
+
+
+								]
+							]
+						]
 					]
 				]
 			],

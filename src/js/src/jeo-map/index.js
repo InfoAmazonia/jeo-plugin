@@ -66,12 +66,14 @@ class JeoMap {
 							custom_attributions.push( layer.attribution );
 						}
 
-						if ( i === 0 ) {
-							return;
-						} else {
+						if ( i > 0 ) {
 							layer.addLayer(map);
 						}
+
+						layer.addInteractions(map);
+
 					});
+
 				});
 
 				this.addLayersControl();
