@@ -52,6 +52,10 @@ div.jeomap {
 	padding: 0 20px 20px;
 }
 
+.jeomap div.more-info-overlayer .jeomap {
+	display: none;
+}
+
 .jeomap > div > a.more-info-close {
 	position: absolute;
 	top: 10px;
