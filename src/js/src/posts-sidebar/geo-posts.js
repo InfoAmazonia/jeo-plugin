@@ -252,38 +252,38 @@ class JeoGeocodePosts extends React.Component {
 
 					<div id="geocode-map-container">
 						<LeafletMap
-								center={[0,0]}
-								zoom={this.state.zoom}
-								whenReady={this.mapLoaded}
-								ref={this.refMap}
+								center={ [ 0,0 ] }
+								zoom={ this.state.zoom }
+								whenReady={ this.mapLoaded }
+								ref={ this.refMap }
 								>
 							<TileLayer
 									attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 									url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
 									/>
-							{this.state.points.map( (p, i) => (
+							{ this.state.points.map( ( point, i ) => (
 
 								<Marker
-										draggable={ this.state.currentMarkerIndex == i ? true : false }
-										onDragend={this.onMarkerDragged}
-										position={[ parseFloat(p._geocode_lat), parseFloat(p._geocode_lon) ]}
-										id={i}
+										draggable={ this.state.currentMarkerIndex == i }
+										onDragend={ this.onMarkerDragged }
+										position={ [ parseFloat( point._geocode_lat ), parseFloat( point._geocode_lon ) ] }
+										id={ i }
 										opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
 										>
 								</Marker>
 
-							))}
+							)) }
 
 						</LeafletMap>
 					</div>
 
 					<div className="jeo-geocode-posts__buttons-list">
-						<Button isPrimary onClick={ () => this.save() }>
-							{ __( 'Save', 'jeo' ) }
-						</Button>
-
 						<Button isDefault onClick={ this.props.onCancel }>
 							{ __( 'Cancel', 'jeo' ) }
+						</Button>
+
+						<Button isPrimary onClick={ () => this.save() }>
+							{ __( 'Save', 'jeo' ) }
 						</Button>
 					</div>
 				</div>

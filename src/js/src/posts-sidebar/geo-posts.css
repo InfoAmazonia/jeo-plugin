@@ -1,30 +1,12 @@
 #geocode-map-container, #geocode-map-container > div  {
-	width: 350px;
-	height: 350px;
+	width: 400px;
+	height: 400px;
 }
 
 .jeo-geocode-posts {
-	display: flex;
-	flex-wrap: wrap;
-}
-
-.jeo-geocode-posts__column {
-	width: calc(50% - 5px);
-}
-
-.jeo-geocode-posts__column + .jeo-geocode-posts__column {
-	margin-left: 10px;
-}
-
-@media screen and (max-width: 1500px) {
-
-	.jeo-geocode-posts__column {
-		width: 100%;
-	}
-
-	.jeo-geocode-posts__column + .jeo-geocode-posts__column {
-		margin-left: 0;
-	}
+	display: grid;
+	grid-gap: 10px;
+	grid-template-columns: 1fr 410px;
 }
 
 .jeo-geocode-posts__post {
@@ -54,6 +36,7 @@
 
 .jeo-geocode-posts__buttons-list {
 	display: flex;
+	justify-content: flex-end;
 	margin: 10px 0;
 }
 
@@ -67,4 +50,15 @@
 
 .jeo-geocode-posts .components-base-control {
 	margin-top: 10px;
+}
+
+@media screen and (max-width: 1500px) {
+
+	.jeo-geocode-posts {
+		grid-template-columns: 1fr;
+	}
+
+	.jeo-geocode-posts__buttons-list {
+		justify-content: flex-start;
+	}
 }
