@@ -8,8 +8,8 @@ class JeoLayer {
 	addStyle(map) {
 		return this.layerType.addStyle(map, this.attributes);
 	}
-	addLayer(map) {
-		return this.layerType.addLayer(map, this.attributes);
+	addLayer(map, JeoMap) {
+		return this.layerType.addLayer(map, this.attributes, JeoMap);
 	}
 
 	getSchema() {

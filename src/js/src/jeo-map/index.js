@@ -14,6 +14,8 @@ class JeoMap {
 
 		this.map = map;
 
+		this.currentLayerBeingAdded = 0;
+
 		this.initMap()
 		.then( () => {
 
@@ -57,36 +59,32 @@ class JeoMap {
 				const baseLayer = layers[0];
 				baseLayer.addStyle(map);
 
-				let custom_attributions = [];
+
 
 				map.on('load', () => {
+
+					let custom_attributions = [];
+
+					this.addNextLayer();
+
 					layers.forEach( (layer, i) => {
 
 						if( layer.attribution ) {
 							custom_attributions.push( layer.attribution );
 						}
 
-						if ( i > 0 ) {
-							layer.addLayer(map).then( () => {
-								layer.addInteractions(map);
-							});
-						} else {
-							layer.addInteractions(map);
-						}
-
-
 					});
+
+					map.addControl(
+						new mapboxgl.AttributionControl({
+							customAttribution: custom_attributions
+						}),
+						'bottom-left'
+					);
 
 				});
 
 				this.addLayersControl();
-
-				map.addControl(
-					new mapboxgl.AttributionControl({
-						customAttribution: custom_attributions
-					}),
-					'bottom-left'
-				);
 
 			} );
 
@@ -112,6 +110,14 @@ class JeoMap {
 		} else {
 			return Promise.resolve();
 		}
+	}
+
+	addNextLayer() {
+		this.currentLayerBeingAdded ++;
+		if ( this.layers.length > this.currentLayerBeingAdded ) {
+			this.layers[ this.currentLayerBeingAdded ].addLayer(map, this);
+		}
+
 	}
 
 	/**

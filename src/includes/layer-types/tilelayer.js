@@ -20,7 +20,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 		})
 	},
 
-	addLayer: function(map, attributes) {
+	addLayer: function(map, attributes, JeoMap) {
 		var layer = {
 			id: attributes.layer_id,
 			source: {
@@ -35,7 +35,10 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 				visibility: 'none'
 			};
 		}
-		return Promise.resolve(map.addLayer(layer));
+
+		map.addLayer(layer);
+
+		JeoMap.addNextLayer();
 	},
 
 	getSchema: function(attributes) {

@@ -8,18 +8,22 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			return map.setStyle( styleDefinition );
 		} );
 
+		map.on('load', () => {
+			this.addInteractions(map,attributes);
+		});
+
 	},
 
-	addLayer( map, attributes ) {
+	addLayer( map, attributes, JeoMap ) {
 		const access_token =
 			typeof attributes.layer_type_options.access_token !== 'undefined' ?
 				attributes.layer_type_options.access_token :
 				window.mapboxgl.accessToken;
 
 
+		const self = this;
 
-
-		return this
+		this
 		._getStyleDefinition( attributes )
 		.then( function( styleDefinition ) {
 
@@ -44,6 +48,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				}
 
 			});
+
+			self.addInteractions(map, attributes);
+
+			JeoMap.addNextLayer();
 
 		} )
 		.catch( function( error ) {

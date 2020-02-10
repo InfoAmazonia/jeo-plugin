@@ -46,7 +46,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 		// ...
 	},
 
-	addLayer: function(map, attributes) {
+	addLayer: function(map, attributes, JeoMap) {
 		// ...
 	},
 
@@ -143,27 +143,28 @@ For example, tha "Tile Layer" layer type sets the style as a raster layer:
 
 **Note**: The `attributes.layer_type_options` object holds all the properties delcared in the `getSchema` method. That's why there is a `url` there! (See Layer attributes section below)
 
-## addLayer(map, attributes)
+## addLayer(map, attributes, JeoMap)
 
 **params**: 
 * map - the initialized Mapbox [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object
 * attributes - object with the layer attributes (See Layer attributes section below)
+* JeoMap - The Instance of the JeoMap object. This is used to call addNextLayer() method.
 
 **returns**: 
-* The return of a call to [`map.addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer)
+* The return of this method is irrelevant
 
 This method will add the layer to the map using the [addLayer](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer) method of the [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object.
 
 This method will be invoked when a layer of this type is added to the map.
 
-For example, tha "Tile Layer" layer type adds itself as a raster layer:
+For example, the "Tile Layer" layer type adds itself as a raster layer:
 
 
 ```Javascript
 
 	// ...
 
-	addLayer: function(map, attributes) {
+	addLayer: function(map, attributes, JeoMap) {
 		var layer = {
 			id: attributes.layer_id,
 			source: {
@@ -178,12 +179,14 @@ For example, tha "Tile Layer" layer type adds itself as a raster layer:
 				visibility: 'none'
 			};
 		}
-		return map.addLayer(layer);
+		map.addLayer(layer);
+		JeoMap.addNextlayer();
 	}
 
 ```
 
 **Note:** This method must verify the value of `attributes.visible` to determine whether this layer should be visible when the map is initialized.
+**Note:** This method must invoke `JeoMap.addNextlayer();` at the end to tell Jeo to load the next layer in the order.
 
 ## Layer attributes
 
