@@ -13,6 +13,7 @@ class JeoMap {
 		});
 
 		this.map = map;
+		this.options = jQuery(this.element).data('options');
 
 		this.initMap()
 		.then( () => {
@@ -279,10 +280,28 @@ class JeoMap {
 			lon: parseFloat( point._geocode_lon )
 		}
 
-		marker.setLngLat( LngLat )
-		.setPopup( popUp )
-		.addTo( this.map );
+		marker.setLngLat( LngLat );
 
+		if ( this.options && this.options.marker_action == 'embed_preview' ) {
+
+		} else {
+			marker.setPopup( popUp );
+		}
+
+
+		marker.addTo( this.map );
+
+		marker.getElement().addEventListener('click', e => {
+			console.log(post);
+			this.updateEmbedPreview(post);
+		});
+
+	}
+
+	updateEmbedPreview(post) {
+		const HTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>' + post.excerpt.rendered;
+		console.log(HTML);
+		jQuery('#embed-post-preview').html(HTML);
 	}
 
 	/**
