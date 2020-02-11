@@ -1,10 +1,20 @@
-.jeo-geo-autocomplete {
-	padding: 2px 5px;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+.react-autosuggest__suggestions-container {
+	max-height: 200px;
+	overflow-y: scroll;
 }
 
-.jeo-geo-autocomplete:hover {
+.react-autosuggest__suggestion {
+	margin: 0;
+}
+
+.react-autosuggest__suggestion:nth-of-type(even) {
+	background-color: #f9f9f9;
+}
+
+.react-autosuggest__suggestion:hover {
 	background-color: aliceblue;
+}
+
+.jeo-geo-autocomplete {
+	padding: 5px;
 }
