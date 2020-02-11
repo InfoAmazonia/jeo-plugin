@@ -200,29 +200,33 @@ class JeoGeocodePosts extends React.Component {
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
 					<h2>{ __( 'Current points', 'jeo' ) }</h2>
-					<ul>
-						{ this.state.points.map( ( point, i ) => (
-							<li
-									id={ i }
-									onClick={ this.clickMarkerList }
-									className={ classNames([
-										'jeo-geocode-posts__post',
-										point && point.relevance || 'primary',
-										this.state.currentMarkerIndex == i && 'active'
-									]) }
-									>
-								{ point._geocode_full_address }
-								{ ' ' }
-								<Button
-										isLink
-										onClick={ this.deletePoint }
-										marker_index={ i }
+					{ this.state.points.length > 0 ? (
+						<ul>
+							{ this.state.points.map( ( point, i ) => (
+								<li
+										id={ i }
+										onClick={ this.clickMarkerList }
+										className={ classNames([
+											'jeo-geocode-posts__post',
+											point && point.relevance || 'primary',
+											this.state.currentMarkerIndex == i && 'active'
+										]) }
 										>
-									{ __( 'Delete', 'jeo' ) }
-								</Button>
-							</li>
-						) ) }
-					</ul>
+									{ point._geocode_full_address }
+									{ ' ' }
+									<Button
+											isLink
+											onClick={ this.deletePoint }
+											marker_index={ i }
+											>
+										{ __( 'Delete', 'jeo' ) }
+									</Button>
+								</li>
+							) ) }
+						</ul>
+					) : (
+						__( 'No points', 'jeo' )
+					) }
 
 					<div className="jeo-geocode-posts__buttons-list">
 						<Button isPrimary onClick={ this.newPoint }>
@@ -247,7 +251,6 @@ class JeoGeocodePosts extends React.Component {
 									onChange={ this.relevanceClick }
 									/>
 						</div>
-
 					) /* this.state.points.length */ }
 
 					<div id="geocode-map-container">

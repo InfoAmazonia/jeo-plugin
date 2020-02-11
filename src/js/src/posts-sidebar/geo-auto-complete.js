@@ -40,7 +40,7 @@ class JeoGeoAutoComplete extends React.Component {
 
 	renderSuggestion(suggestion) {
 		return (
-			<div className="jeo-geo-autocomplete" title={ suggestion.full_address }>
+			<div className="jeo-geo-autocomplete">
 				{ suggestion.full_address }
 			</div>
 		)
