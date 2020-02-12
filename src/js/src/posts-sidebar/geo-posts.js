@@ -37,19 +37,18 @@ class JeoGeocodePosts extends React.Component {
 	/**
 	 * Immutably updates info in the point object, inside the array of related points
 	 *
-	 * @param {int} point The Marker Index
-	 * @param {object} data the new data. Only attributes that change
+	 * @param {number} point The Marker Index
+	 * @param {Object} data the new data. Only attributes that change
 	 */
 	updatePoint( point, data ) {
-		const updatedPoints = this.state.points.slice( 0 );
-		this.updatedPoints = updatedPoints.splice( point, 1, {
-			...this.state.points[ point ],
-			...data,
-		} );
-
 		this.setState( {
 			...this.state,
-			points: updatedPoints,
+			points: this.state.points.map( ( value, i ) => {
+				if ( i == point ) {
+					return { ...value, ...data };
+				}
+				return value;
+			} ),
 		} );
 	}
 
