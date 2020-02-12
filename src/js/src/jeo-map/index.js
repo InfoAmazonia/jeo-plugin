@@ -228,13 +228,15 @@ class JeoMap {
 
 			const relatedPostsCriteria = this.getArg('related_posts');
 			this.relatedPostsCriteria = relatedPostsCriteria;
-			var query = [];
-			query['per_page'] = 100; // TODO handle limit of posts per query
+			var query = {};
+			query.per_page = 100; // TODO handle limit of posts per query
 			if ( relatedPostsCriteria.cat ) {
-				query['categories'] = relatedPostsCriteria.cat
+				query.categories = relatedPostsCriteria.cat
 			} else {
 				resolve( [] );
 			}
+			query._embed = 1;
+
 			jQuery.get(
 				jeoMapVars.jsonUrl + 'posts',
 				query,
@@ -282,25 +284,31 @@ class JeoMap {
 
 		marker.setLngLat( LngLat );
 
-		if ( this.options && this.options.marker_action == 'embed_preview' ) {
-
-		} else {
+		if ( ! this.options || this.options.marker_action != 'embed_preview' ) {
 			marker.setPopup( popUp );
 		}
 
-
 		marker.addTo( this.map );
 
-		marker.getElement().addEventListener('click', e => {
-			console.log(post);
-			this.updateEmbedPreview(post);
-		});
+		if ( this.options && this.options.marker_action == 'embed_preview' ) {
+
+			marker.getElement().addEventListener('click', e => {
+				this.updateEmbedPreview(post);
+			});
+
+		}
 
 	}
 
 	updateEmbedPreview(post) {
-		const HTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>' + post.excerpt.rendered;
-		console.log(HTML);
+		let HTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>';
+
+		if ( post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0] ) {
+			const thumbUrl = post._embedded['wp:featuredmedia'][0].media_details.sizes.thumbnail.source_url;
+			HTML += '<img src="' + thumbUrl + '" />';
+		}
+
+		HTML += post.excerpt.rendered;
 		jQuery('#embed-post-preview').html(HTML);
 	}
 
