@@ -24,36 +24,6 @@
 	border-bottom: none;
 }
 
-.jeo-map-editor-modal .components-tab-panel__tabs {
-	padding: 3px 24px 0; /* Slight padding needed for focus outline */
-	background-color: #fcfcfc;
-	border-bottom: 1px solid #ddd;
-}
-
-.jeo-map-editor-modal .components-tab-panel__tabs .components-button {
-	padding: 8px 10px 8px;
-}
-
-.jeo-map-editor-modal
-	.components-tab-panel__tabs
-	.components-button.active-tab {
-	background-color: white;
-	border: 1px solid #ddd;
-	border-bottom: none;
-	padding-bottom: 9px;
-	margin-bottom: -1px;
-}
-
-.jeo-map-editor-modal
-	.components-tab-panel__tabs
-	.components-button.active-tab:focus:not(:disabled) {
-	box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
-}
-
-.jeo-map-editor-modal .components-tab-panel__tab-content {
-	padding: 0 24px;
-}
-
 /**
  * Layers Settings
  */
