@@ -80,3 +80,12 @@ div.jeomap {
 	text-align: center;
 	cursor: pointer;
 }
+
+#embed-container div.jeomap {
+	float: left;
+}
+
+#embed-post-preview {
+	float: right;
+	width: 200px;
+}
