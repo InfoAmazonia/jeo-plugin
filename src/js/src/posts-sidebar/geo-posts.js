@@ -187,6 +187,9 @@ class JeoGeocodePosts extends React.Component {
 	}
 
 	render() {
+		const { currentMarkerIndex, points } = this.state;
+		const selectedPoint = points[ currentMarkerIndex ];
+
 		return (
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
@@ -208,20 +211,20 @@ class JeoGeocodePosts extends React.Component {
 								<>
 									{
 										tab.name === 'list' && (
-											this.state.points.length === 0 ?
+											points.length === 0 ?
 												(
 													__( 'No points', 'jeo' )
 												) :
 												(
 													<ul>
-														{ this.state.points.map( ( point, i ) => (
+														{ points.map( ( point, i ) => (
 															<li
 																id={ i }
 																onClick={ this.clickMarkerList }
 																className={ classNames( [
 																	'jeo-geocode-posts__post',
 																	( point && point.relevance ) || 'primary',
-																	this.state.currentMarkerIndex == i && 'active',
+																	currentMarkerIndex == i && 'active',
 																] ) }
 															>
 																{ point._geocode_full_address }
@@ -252,12 +255,12 @@ class JeoGeocodePosts extends React.Component {
 											/>
 											{ this.state.points.map( ( point, i ) => (
 												<Marker
-													draggable={ this.state.currentMarkerIndex == i }
+													draggable={ currentMarkerIndex == i }
 													onDragend={ this.onMarkerDragged }
 													onClick={ this.clickMarkerMap }
 													position={ [ parseFloat( point._geocode_lat ), parseFloat( point._geocode_lon ) ] }
 													id={ i }
-													opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
+													opacity={ currentMarkerIndex == i ? 1 : 0.6 }
 												/>
 											) ) }
 
@@ -276,14 +279,21 @@ class JeoGeocodePosts extends React.Component {
 				</div>
 
 				<div className="jeo-geocode-posts__column">
-					{ this.state.points.length > 0 && (
+					{ points.length > 0 && (
 						<div>
 							<h2>{ __( 'Search your location', 'jeo' ) }</h2>
+							{ selectedPoint && (
+								<p>
+									<b>{ __( 'Selected point', 'jeo' ) }:</b>
+									{ ' ' }
+									{ selectedPoint._geocode_full_address }
+								</p>
+							) }
 							<JeoGeoAutoComplete onSelect={ this.onLocationFound } />
 							<RadioControl
 								label={ __( 'Relevance', 'jeo' ) }
 								//help="The type of the current user"
-								selected={ this.state.points.length ? this.state.points[ this.state.currentMarkerIndex ].relevance || 'primary' : 'primary' }
+								selected={ points.length ? selectedPoint.relevance || 'primary' : 'primary' }
 								options={ [
 									{ label: __( 'Primary', 'jeo' ), value: 'primary' },
 									{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
