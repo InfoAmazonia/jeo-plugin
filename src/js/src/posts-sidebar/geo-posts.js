@@ -2,7 +2,7 @@ import React from 'react';
 import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
 import classNames from 'classnames';
 import JeoGeoAutoComplete from './geo-auto-complete';
-import { Button, RadioControl } from "@wordpress/components";
+import { Button, RadioControl, TabPanel } from "@wordpress/components";
 import { __ } from "@wordpress/i18n";
 import './geo-posts.css';
 
@@ -21,6 +21,7 @@ class JeoGeocodePosts extends React.Component {
 		this.onMarkerDragged = this.onMarkerDragged.bind(this);
 		this.getProperty = this.getProperty.bind(this);
 		this.save = this.save.bind(this);
+		this.clickMarkerMap = this.clickMarkerMap.bind(this);
 		this.clickMarkerList = this.clickMarkerList.bind(this);
 		this.mapLoaded = this.mapLoaded.bind(this);
 		this.relevanceClick = this.relevanceClick.bind(this);
@@ -58,10 +59,16 @@ class JeoGeocodePosts extends React.Component {
 		this.updatePoint( marker_id, data );
 	}
 
-	clickMarkerList(e) {
-		this.setState({
-			currentMarkerIndex: e.target.id
-		})
+	clickMarkerMap( e ) {
+		this.setState( {
+			currentMarkerIndex: e.target.options.id,
+		} );
+	}
+
+	clickMarkerList( e ) {
+		this.setState( {
+			currentMarkerIndex: e.target.id,
+		} );
 	}
 
 	relevanceClick(option) {
@@ -92,7 +99,6 @@ class JeoGeocodePosts extends React.Component {
 
 		const index = e.target.attributes.marker_index.value;
 
-
 		this.setState({
 			...this.state,
 			points: this.state.points.filter( (el, i) => i != index ),
@@ -107,7 +113,6 @@ class JeoGeocodePosts extends React.Component {
 			return null;
 		}
 	}
-
 
 	onLocationFound(location) {
 
@@ -200,33 +205,82 @@ class JeoGeocodePosts extends React.Component {
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
 					<h2>{ __( 'Current points', 'jeo' ) }</h2>
-					{ this.state.points.length > 0 ? (
-						<ul>
-							{ this.state.points.map( ( point, i ) => (
-								<li
-										id={ i }
-										onClick={ this.clickMarkerList }
-										className={ classNames([
-											'jeo-geocode-posts__post',
-											point && point.relevance || 'primary',
-											this.state.currentMarkerIndex == i && 'active'
-										]) }
+					<TabPanel className="jeo-geocode-posts__tab-panel"
+						activeClass="active-tab"
+						tabs={ [
+							{
+								name: 'map',
+								title: 'Map',
+							},
+							{
+								name: 'list',
+								title: 'List',
+							},
+						] }>
+						{
+							( tab ) => (
+								<>
+									{
+										tab.name === 'list' && (
+											this.state.points.length === 0 ?
+												(
+													__( 'No points', 'jeo' )
+												) :
+												(
+													<ul>
+														{ this.state.points.map( ( point, i ) => (
+															<li
+																id={ i }
+																onClick={ this.clickMarkerList }
+																className={ classNames([
+																	'jeo-geocode-posts__post',
+																	point && point.relevance || 'primary',
+																	this.state.currentMarkerIndex == i && 'active'
+																]) }
+															>
+																{ point._geocode_full_address }
+																{ ' ' }
+																<Button
+																	isLink
+																	onClick={ this.deletePoint }
+																	marker_index={ i }
+																>
+																	{ __( 'Delete', 'jeo' ) }
+																</Button>
+															</li>
+														) ) }
+													</ul>
+												)
+										)
+									}
+									<div id="geocode-map-container" style={ { display: tab.name === 'map' ? 'block' : 'none ' } }>
+										<LeafletMap
+											center={ [ 0, 0 ] }
+											zoom={ this.state.zoom }
+											whenReady={ this.mapLoaded }
+											ref={ this.refMap }
 										>
-									{ point._geocode_full_address }
-									{ ' ' }
-									<Button
-											isLink
-											onClick={ this.deletePoint }
-											marker_index={ i }
-											>
-										{ __( 'Delete', 'jeo' ) }
-									</Button>
-								</li>
-							) ) }
-						</ul>
-					) : (
-						__( 'No points', 'jeo' )
-					) }
+											<TileLayer
+												attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+												url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+											/>
+											{ this.state.points.map( ( point, i ) => (
+												<Marker
+													draggable={ this.state.currentMarkerIndex == i }
+													onDragend={ this.onMarkerDragged }
+													onClick={ this.clickMarkerMap }
+													position={ [ parseFloat( point._geocode_lat ), parseFloat( point._geocode_lon ) ] }
+													id={ i }
+													opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
+												/>
+											) ) }
+
+										</LeafletMap>
+									</div>
+								</>
+							)
+						}
+					</TabPanel>
 
 					<div className="jeo-geocode-posts__buttons-list">
 						<Button isPrimary onClick={ this.newPoint }>
@@ -252,34 +306,9 @@ class JeoGeocodePosts extends React.Component {
 									/>
 						</div>
 					) /* this.state.points.length */ }
+				</div>
 
-					<div id="geocode-map-container">
-						<LeafletMap
-								center={ [ 0,0 ] }
-								zoom={ this.state.zoom }
-								whenReady={ this.mapLoaded }
-								ref={ this.refMap }
-								>
-							<TileLayer
-									attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-									url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
-									/>
-							{ this.state.points.map( ( point, i ) => (
-
-								<Marker
-										draggable={ this.state.currentMarkerIndex == i }
-										onDragend={ this.onMarkerDragged }
-										position={ [ parseFloat( point._geocode_lat ), parseFloat( point._geocode_lon ) ] }
-										id={ i }
-										opacity={ this.state.currentMarkerIndex == i ? 1 : 0.6 }
-										>
-								</Marker>
-
-							)) }
-
-						</LeafletMap>
-					</div>
-
+				<div className="jeo-geocode-posts__row">
 					<div className="jeo-geocode-posts__buttons-list">
 						<Button isDefault onClick={ this.props.onCancel }>
 							{ __( 'Cancel', 'jeo' ) }

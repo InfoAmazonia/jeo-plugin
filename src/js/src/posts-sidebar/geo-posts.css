@@ -5,6 +5,7 @@
 
 .jeo-geocode-posts {
 	display: flex;
+	flex-wrap: wrap;
 	max-width: 90vw;
 	width: 1200px;
 }
@@ -41,8 +42,29 @@
 	background-color: #666;
 }
 
+.jeo-geocode-posts__row {
+	width: 100%;
+}
+
+.jeo-geocode-posts__tab-panel .components-tab-panel__tabs {
+	background-color: #F3F4F5;
+	margin-bottom: 10px;
+}
+
+.jeo-geocode-posts__tab-panel .components-tab-panel__tabs .components-button {
+	padding: 10px 20px;
+}
+
+.jeo-geocode-posts__tab-panel .components-tab-panel__tabs .components-button:focus,
+.jeo-geocode-posts__tab-panel .components-tab-panel__tabs .components-button.active-tab {
+	background: transparent;
+	box-shadow: inset 0 -3px #007cba;
+	font-weight: bold;
+}
+
 .jeo-geocode-posts__buttons-list {
 	display: flex;
+	justify-content: flex-end;
 	margin: 10px 0;
 }
 
