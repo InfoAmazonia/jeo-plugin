@@ -40,18 +40,17 @@ class JeoGeocodePosts extends React.Component {
 	 * @param {int} point The Marker Index
 	 * @param {object} data the new data. Only attributes that change
 	 */
-	updatePoint(point, data) {
-		this.setState({
+	updatePoint( point, data ) {
+		const updatedPoints = this.state.points.slice( 0 );
+		this.updatedPoints = updatedPoints.splice( point, 1, {
+			...this.state.points[ point ],
+			...data,
+		} );
+
+		this.setState( {
 			...this.state,
-			points: [
-				...this.state.points.slice(0, point),
-				{
-					...this.state.points[point],
-					...data
-				},
-				...this.state.points.slice(point + 1),
-			]
-		});
+			points: updatedPoints,
+		} );
 	}
 
 	updateCurrentPoint(data) {
