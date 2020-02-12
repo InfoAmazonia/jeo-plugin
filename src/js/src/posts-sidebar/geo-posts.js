@@ -1,9 +1,11 @@
 import React from 'react';
 import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
 import classNames from 'classnames';
-import JeoGeoAutoComplete from './geo-auto-complete';
-import { Button, RadioControl, TabPanel } from '@wordpress/components';
+import { Button, RadioControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+import { TabPanel } from '../common-components';
+import JeoGeoAutoComplete from './geo-auto-complete';
 import './geo-posts.css';
 
 class JeoGeocodePosts extends React.Component {
@@ -194,7 +196,7 @@ class JeoGeocodePosts extends React.Component {
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
 					<h2>{ __( 'Current points', 'jeo' ) }</h2>
-					<TabPanel className="jeo-geocode-posts__tab-panel"
+					<TabPanel
 						activeClass="active-tab"
 						tabs={ [
 							{

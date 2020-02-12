@@ -1,5 +1,7 @@
-import { Modal, TabPanel } from '@wordpress/components';
+import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+
+import { TabPanel } from '../common-components';
 
 const tabs = [
 	{ name: 'map', title: __( 'Map Settings' ), className: 'tab-map' },
