@@ -208,11 +208,11 @@ class JeoGeocodePosts extends React.Component {
 						tabs={ [
 							{
 								name: 'map',
-								title: 'Map',
+								title: __( 'Map', 'jeo' ),
 							},
 							{
 								name: 'list',
-								title: 'List',
+								title: __( 'List', 'jeo' ),
 							},
 						] }>
 						{
