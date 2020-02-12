@@ -146,7 +146,10 @@ class Jeo {
 			wp_localize_script(
 				'jeo-map',
 				'jeoMapVars',
-				array( 'jsonUrl' => rest_url( 'wp/v2/' ) )
+				array(
+					'jsonUrl' => rest_url( 'wp/v2/' ),
+					'string_read_more' => __( 'Read more', 'jeo' ),
+				)
 			);
 		}
 	}
@@ -180,6 +183,13 @@ class Jeo {
 			$map_id = isset( $_GET['map_id'] ) ? $_GET['map_id'] : false;
 
 			if ( $map_id ) {
+
+				$full_width = isset( $_GET['width'] ) ? $_GET['width'] : 820;
+				$map_width = $full_width ? $full_width - 220 : 600;
+				$height = isset( $_GET['height'] ) ? $_GET['height'] : 600;
+
+				$map_style = "width: ${map_width}px; height: ${height}px;";
+				$container_style = "width: ${full_width}px; height: ${height}px;";
 
 				require JEO_BASEPATH . '/templates/embed.php';
 
