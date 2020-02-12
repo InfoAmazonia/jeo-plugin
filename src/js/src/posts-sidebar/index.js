@@ -15,7 +15,9 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 		const isOpen = this.state.isOpen;
 		return (
 			<>
-				<Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>Open Modal</Button>
+				<Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>
+					{ __( 'Geolocate this post', 'jeo' ) }
+				</Button>
 				{ isOpen && (
 					<Modal
 						title={ __( 'Geolocate this post', 'jeo' ) }
@@ -36,7 +38,7 @@ registerPlugin( 'myprefix-sidebar', {
 	render: () => {
 		return (
 			<PluginDocumentSettingPanel
-				title={ __( 'Geolocate this post', 'jeo' ) }
+				title={ __( 'Geolocation', 'jeo' ) }
 			>
 				<JeoGeocodePanel />
 			</PluginDocumentSettingPanel>
