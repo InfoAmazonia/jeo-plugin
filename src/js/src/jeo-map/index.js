@@ -295,6 +295,12 @@ class JeoMap {
 				this.updateEmbedPreview(post);
 			});
 
+			// By default, activate the first post
+			if ( ! this.embedPreviewActive ) {
+				this.updateEmbedPreview(post);
+				this.embedPreviewActive = true;
+			}
+
 		}
 
 	}
