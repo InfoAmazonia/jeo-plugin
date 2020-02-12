@@ -23,13 +23,16 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 		const self = this;
 
+		let currentStyle = map.getStyle();
+		const uniquePrefix = attributes.layer_id;
+
 		this
 		._getStyleDefinition( attributes )
 		.then( function( styleDefinition ) {
-
+			console.log(styleDefinition);
 			Object.entries(styleDefinition.sources).forEach( ([source_key, source]) => {
-				map.addSource( attributes.layer_id + '_' + source_key, source );
-
+				//map.addSource( attributes.layer_id + '_' + source_key, source );
+				currentStyle.sources[uniquePrefix + '_' + source_key] = source;
 			});
 
 			styleDefinition.layers.forEach(layer => {
@@ -44,12 +47,20 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 				if ( layer.source ) {
 					layer.source = attributes.layer_id + '_' + layer.source;
-					map.addLayer( layer );
+					//map.addLayer( layer );
+					currentStyle.layers.push(layer);
 				}
 
 			});
 
-			self.addInteractions(map, attributes);
+			if ( false ) { // TODO: How do we know when to override this? We don't... :/ Make it a layer option?
+				currentStyle.sprite = styleDefinition.sprite;
+			}
+			map.setStyle( currentStyle );
+
+			map.on('styledata', () => {
+				self.addInteractions(map,attributes);
+			});
 
 			JeoMap.addNextLayer();
 
