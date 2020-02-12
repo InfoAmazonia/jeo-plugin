@@ -1,8 +1,3 @@
-.react-autosuggest__suggestions-container {
-	max-height: 200px;
-	overflow-y: scroll;
-}
-
 .react-autosuggest__suggestion {
 	margin: 0;
 }
