@@ -220,7 +220,7 @@ class JeoGeocodePosts extends React.Component {
 																onClick={ this.clickMarkerList }
 																className={ classNames( [
 																	'jeo-geocode-posts__post',
-																	point && point.relevance || 'primary',
+																	( point && point.relevance ) || 'primary',
 																	this.state.currentMarkerIndex == i && 'active',
 																] ) }
 															>
