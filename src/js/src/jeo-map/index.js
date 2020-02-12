@@ -1,4 +1,3 @@
-// import { __ } from "@wordpress/i18n";
 
 class JeoMap {
 
@@ -300,6 +299,9 @@ class JeoMap {
 
 	}
 
+	/**
+	 * Generates the HTML and updates the story box of the Map embed URL
+	 */
 	updateEmbedPreview(post) {
 		let HTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>';
 
@@ -309,6 +311,9 @@ class JeoMap {
 		}
 
 		HTML += post.excerpt.rendered;
+
+		HTML += '<a href="' + post.link + '" target="blank" >' + jeoMapVars.string_read_more + '</a>';
+
 		jQuery('#embed-post-preview').html(HTML);
 	}
 
