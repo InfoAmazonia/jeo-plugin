@@ -2,6 +2,7 @@ import React from 'react';
 import Autosuggest from 'react-autosuggest';
 import { Spinner } from "@wordpress/components";
 import './geo-auto-complete.css';
+import { __ } from '@wordpress/i18n';
 
 class JeoGeoAutoComplete extends React.Component {
 
@@ -71,7 +72,7 @@ class JeoGeoAutoComplete extends React.Component {
 		const { value, suggestions } = this.state;
 		// Autosuggest will pass through all these props to the input.
 		const inputProps = {
-			placeholder: 'Busca por endereço',
+			placeholder: __( 'Busca por endereço', 'jeo' ),
 			value,
 			onChange: this.onChange
 		};
