@@ -146,7 +146,10 @@ class Jeo {
 			wp_localize_script(
 				'jeo-map',
 				'jeoMapVars',
-				array( 'jsonUrl' => rest_url( 'wp/v2/' ) )
+				array(
+					'jsonUrl' => rest_url( 'wp/v2/' ),
+					'string_read_more' => __( 'Read more', 'jeo' ),
+				)
 			);
 		}
 	}
