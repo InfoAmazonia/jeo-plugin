@@ -150,7 +150,8 @@ class Jeo {
 					'jsonUrl' => rest_url( 'wp/v2/' ),
 					'string_read_more' => __( 'Read more', 'jeo' ),
 					'templates' => [
-						'post' => file_get_contents( jeo_get_template( 'post-tooltip.ejs' ) )
+						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
+						'popup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) )
 					]
 				)
 			);

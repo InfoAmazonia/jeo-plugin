@@ -85,12 +85,12 @@ div.jeomap {
 	padding: 1rem 2rem;
 }
 
-.jeomap .tooltip {
+.jeomap .popup {
 	margin-top: 4rem;
 	min-width: 200px;
 }
 
-.jeomap .tooltip h1 {
+.jeomap .popup h1 {
 	font-size: 3rem;
 	margin-top: 0;
 }
