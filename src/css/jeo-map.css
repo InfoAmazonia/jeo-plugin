@@ -81,6 +81,20 @@ div.jeomap {
 	cursor: pointer;
 }
 
+.jeomap .mapboxgl-popup-close-button {
+	padding: 1rem 2rem;
+}
+
+.jeomap .tooltip {
+	margin-top: 4rem;
+	min-width: 200px;
+}
+
+.jeomap .tooltip h1 {
+	font-size: 3rem;
+	margin-top: 0;
+}
+
 #embed-container div.jeomap {
 	float: left;
 }

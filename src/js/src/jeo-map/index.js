@@ -1,3 +1,4 @@
+import template from 'lodash.template';
 
 class JeoMap {
 	constructor( element ) {
@@ -232,8 +233,13 @@ class JeoMap {
 		const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
 		const marker = new mapboxgl.Marker( { color } );
 
-		// TODO use a template file
-		const popupHTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>' + post.excerpt.rendered;
+		const popupTemplate = template( `<article class="tooltip">${ window.jeoMapVars.templates.post }</article>` );
+
+		const popupHTML = popupTemplate( {
+			point,
+			post,
+			read_more: window.jeoMapVars.string_read_more,
+		} );
 
 		const popUp = new mapboxgl.Popup().setHTML( popupHTML );
 

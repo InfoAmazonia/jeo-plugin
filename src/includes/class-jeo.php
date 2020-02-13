@@ -149,6 +149,9 @@ class Jeo {
 				array(
 					'jsonUrl' => rest_url( 'wp/v2/' ),
 					'string_read_more' => __( 'Read more', 'jeo' ),
+					'templates' => [
+						'post' => file_get_contents(JEO_BASEURL . '/templates/post-tooltip.ejs')
+					]
 				)
 			);
 		}
