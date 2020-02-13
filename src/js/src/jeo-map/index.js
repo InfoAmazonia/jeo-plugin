@@ -233,7 +233,11 @@ class JeoMap {
 		const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
 		const marker = new mapboxgl.Marker( { color } );
 
-		const popupTemplate = template( `<article class="tooltip">${ window.jeoMapVars.templates.post }</article>` );
+		const popupTemplate = template(
+			`<article class="tooltip">${
+				window.jeoMapVars.templates.post
+			}</article>`
+		);
 
 		const popupHTML = popupTemplate( {
 			point,
