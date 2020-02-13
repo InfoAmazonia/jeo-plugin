@@ -118,9 +118,9 @@ class JeoMap {
 				map: this.map_post_object,
 			} );
 
-			const closeButton = document.createElement( 'a' );
+			const closeButton = document.createElement( 'div' );
 			closeButton.classList.add( 'more-info-close' );
-			closeButton.innerHTML = 'x';
+			closeButton.innerHTML = '<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup">×</button>';
 
 			closeButton.click( function( e ) {
 
