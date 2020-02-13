@@ -78,6 +78,10 @@ function jeo_layer_types() {
 
 function jeo_get_template( $template_name ) {
 
+	if ( file_exists( get_stylesheet_directory() . '/jeo/templates/' . $template_name ) ) {
+		return get_stylesheet_directory() . '/jeo/templates/' . $template_name;
+	}
+
 	if ( file_exists( JEO_BASEPATH . '/templates/' . $template_name ) ) {
 		return JEO_BASEPATH . '/templates/' . $template_name;
 	}
