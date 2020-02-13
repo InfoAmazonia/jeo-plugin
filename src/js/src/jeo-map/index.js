@@ -13,6 +13,14 @@ class JeoMap {
 		this.map = map;
 		this.options = jQuery( this.element ).data( 'options' );
 
+		this.moreInfoTemplate = template( window.jeoMapVars.templates.moreInfo );
+
+		this.popupTemplate = template(
+			`<article class="popup">${
+				window.jeoMapVars.templates.popup
+			}</article>`,
+		);
+
 		this.initMap()
 			.then( () => {
 				map.setZoom( this.getArg( 'initial_zoom' ) );
@@ -102,13 +110,13 @@ class JeoMap {
 	 */
 	addMoreButton() {
 		if ( this.map_post_object ) {
-			// TODO Use templates
-
 			const moreDiv = document.createElement( 'div' );
 
 			moreDiv.classList.add( 'more-info-overlayer' );
 
-			moreDiv.innerHTML = '<h2>' + this.map_post_object.title.rendered + '</h2>' + this.map_post_object.content.rendered;
+			moreDiv.innerHTML = this.moreInfoTemplate( {
+				map: this.map_post_object,
+			} );
 
 			const closeButton = document.createElement( 'a' );
 			closeButton.classList.add( 'more-info-close' );
@@ -233,13 +241,7 @@ class JeoMap {
 		const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
 		const marker = new mapboxgl.Marker( { color } );
 
-		const popupTemplate = template(
-			`<article class="tooltip">${
-				window.jeoMapVars.templates.post
-			}</article>`
-		);
-
-		const popupHTML = popupTemplate( {
+		const popupHTML = this.popupTemplate( {
 			point,
 			post,
 			read_more: window.jeoMapVars.string_read_more,
