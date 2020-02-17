@@ -24,7 +24,7 @@ class Fixtures {
 			[
 				'post_type' => 'map-layer',
 				'post_title' => 'Layer1',
-				'post_status' => 'mapbox',
+				'post_status' => 'publish',
 				'meta' => [
 					'type' => 'mapbox',
 					'attribution' => 'Sample attribution for this layer',
