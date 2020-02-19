@@ -152,7 +152,8 @@ class Jeo {
 					'string_read_more' => __( 'Read more', 'jeo' ),
 					'templates' => [
 						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
-						'popup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) )
+						'popup' => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
+						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) )
 					]
 				)
 			);
