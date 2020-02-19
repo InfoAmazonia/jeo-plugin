@@ -27,7 +27,7 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 	},
 
 	render( map, attributes ) {
-		console.log(attributes);
+
 		const container = document.createElement( 'div' );
 		container.classList.add( 'barscale-container' );
 
