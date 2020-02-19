@@ -46,6 +46,7 @@ class Jeo {
 		\jeo_geocode_handler();
 		\jeo_settings();
 		\jeo_layer_types();
+		\jeo_legend_types();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'init', array( $this, 'register_assets' ) );

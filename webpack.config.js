@@ -8,6 +8,7 @@ module.exports = {
 		mapboxglLoader: './src/js/src/mapboxgl-loader.js',
 		jeoMap: './src/js/src/jeo-map/index.js',
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
+		JeoLegend: './src/includes/legend-types/JeoLegend.js',
 		mapBlocks: './src/js/src/map-blocks/index.js',
 	},
 	output: {
