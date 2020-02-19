@@ -580,18 +580,22 @@ class Fixtures {
 		$specs = [
 			[
 				'use' => 'fixed',
+				'show_legend' => false,
 			],
 			[
 				'use' => 'switchable',
-				'default' => true
+				'default' => true,
+				'show_legend' => true,
 			],
 			[
 				'use' => 'swappable',
-				'default' => true
+				'default' => true,
+				'show_legend' => true,
 			],
 			[
 				'use' => 'swappable',
-				'default' => false
+				'default' => false,
+				'show_legend' => false,
 			]
 		];
 

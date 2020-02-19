@@ -222,7 +222,7 @@ class JeoMap {
 							} )
 						);
 
-						if ( layerObject.meta.legend_type !== 'none' ) {
+						if ( layerObject.meta.legend_type !== 'none' && layersDefinitions[ i ].show_legend ) {
 							returnLegends.push(
 								new window.JeoLegend( layerObject.meta.legend_type, {
 									layer_id: layerObject.slug,
