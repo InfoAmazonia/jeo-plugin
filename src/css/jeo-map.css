@@ -133,3 +133,16 @@ div.jeomap {
 	justify-content: space-between;
 	width: 100%;
 }
+
+/** Simple color legend **/
+
+.simple-color-item-box {
+	width: 20px;
+	height: 20px;
+	margin-right: 10px;
+	float: left;
+}
+
+.simple-color-item {
+	margin-bottom: 5px;
+}
