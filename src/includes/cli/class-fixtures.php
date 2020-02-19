@@ -80,7 +80,35 @@ class Fixtures {
 					'layer_type_options' => [
 						'url' => 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
 					],
-					'legend_type' => 'none',
+					'legend_type' => 'simple-color',
+					'legend_title' => 'Exemplo cores',
+					'legend_type_options' => [
+						'left_label' => '0',
+						'right_label' => '1000',
+						'colors' => [
+							[
+								'label' => '10',
+								'color' => '#ff0909',
+							],
+							[
+								'label' => '20',
+								'color' => '#ff09f8',
+							],
+							[
+								'label' => '30',
+								'color' => '#0c09ff',
+							],
+							[
+								'label' => '40',
+								'color' => '#09ffe9',
+							],
+							[
+								'label' => '50',
+								'color' => '#ffe709',
+							],
+
+						]
+					],
 				]
 			],
 			[
