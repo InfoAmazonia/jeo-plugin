@@ -83,17 +83,30 @@ function jeo_legend_types() {
 	return \Jeo\Legend_Types::get_instance();
 }
 
-
+/**
+ * Returns the URL to a JEO template file
+ *
+ * It can be overriden by a `jeo_get_template` filter, that receives two parameters:
+ * * The pre-computed `$template_uri`
+ * * The original `$template_name`
+ *
+ * @param string $template_name The name of the template (e.g. `some-template.php`)
+ * @return string The URL for the template file
+ */
 function jeo_get_template( $template_name ) {
+	$template_uri = false;
 
 	if ( file_exists( get_stylesheet_directory() . '/jeo/templates/' . $template_name ) ) {
-		return get_stylesheet_directory() . '/jeo/templates/' . $template_name;
+		$template_uri = get_stylesheet_directory() . '/jeo/templates/' . $template_name;
+	}
+
+	if ( file_exists( get_template_directory() . '/jeo/templates/' . $template_name ) ) {
+		$template_uri = get_template_directory() . '/jeo/templates/' . $template_name;
 	}
 
 	if ( file_exists( JEO_BASEPATH . '/templates/' . $template_name ) ) {
-		return JEO_BASEPATH . '/templates/' . $template_name;
+		$template_uri = JEO_BASEPATH . '/templates/' . $template_name;
 	}
 
-	return false;
-
+	return apply_filters( 'jeo_get_template', $template_uri, $template_name );
 }
