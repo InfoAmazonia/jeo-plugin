@@ -36,6 +36,13 @@ class Legend_Types {
 			]
 		);
 
+		$this->register_legend_type(
+			'icons',
+			[
+				'script_url' => JEO_BASEURL . '/includes/legend-types/icons.js'
+			]
+		);
+
 		/**
 		 * Hook used to register legend_types
 		 *
