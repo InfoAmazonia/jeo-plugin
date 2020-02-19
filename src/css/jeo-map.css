@@ -159,3 +159,13 @@ div.jeomap {
 .icons-item {
 	margin-bottom: 5px;
 }
+
+/** Circles legend **/
+
+.circles-scale-container {
+	width: 100%;
+}
+.circles-item {
+	float: left;
+	border-radius: 50%;
+}

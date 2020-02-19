@@ -43,6 +43,13 @@ class Legend_Types {
 			]
 		);
 
+		$this->register_legend_type(
+			'circles',
+			[
+				'script_url' => JEO_BASEURL . '/includes/legend-types/circles.js'
+			]
+		);
+
 		/**
 		 * Hook used to register legend_types
 		 *
