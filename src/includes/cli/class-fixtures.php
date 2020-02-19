@@ -544,7 +544,7 @@ class Fixtures {
 		$cat3 = get_term_by( 'name', 'category 3', 'category' );
 
 		$related = [
-			'cat' => [
+			'categories' => [
 				$cat1->term_id,
 				$cat2->term_id,
 				$cat3->term_id
