@@ -9,15 +9,16 @@ window.JeoLegendTypes.registerLegendType( 'icons', {
 			properties: {
 				colors: {
 					type: 'array',
-					description: 'An array of labels and colors',
+					description: 'An array of labels and icons',
 					items: {
 						type: 'object',
 						properties: {
 							label: {
 								type: 'string'
 							},
-							color: {
-								type: 'string'
+							icon: {
+								type: 'string',
+								description: 'url'
 							}
 						}
 					}

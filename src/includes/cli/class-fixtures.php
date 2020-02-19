@@ -126,8 +126,6 @@ class Fixtures {
 					'legend_type' => 'icons',
 					'legend_title' => 'Exemplo Icones',
 					'legend_type_options' => [
-						'left_label' => '0',
-						'right_label' => '1000',
 						'icons' => [
 							[
 								'label' => 'Label 1',
@@ -153,7 +151,34 @@ class Fixtures {
 					'layer_type_options' => [
 						'style_id' => 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
 					],
-					'legend_type' => 'none',
+					'legend_type' => 'circles',
+					'legend_title' => 'Exemplo Circulos',
+					'legend_type_options' => [
+						'color' => '#0c09ff',
+						'circles' => [
+							[
+								'label' => '3',
+								'radius' => 4,
+							],
+							[
+								'label' => '6',
+								'radius' => 8,
+							],
+							[
+								'label' => '12',
+								'radius' => 15,
+							],
+							[
+								'label' => '24',
+								'radius' => 20,
+							],
+							[
+								'label' => '48',
+								'radius' => 30,
+							],
+
+						]
+					],
 				]
 			],
 
