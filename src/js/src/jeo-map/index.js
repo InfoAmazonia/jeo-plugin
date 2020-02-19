@@ -119,7 +119,6 @@ class JeoMap {
 		container.classList.add( 'legend-container' );
 
 		this.legends.forEach( legend => {
-			console.log(legend.render());
 			container.appendChild( legend.render() );
 		} );
 

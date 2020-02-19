@@ -29,6 +29,13 @@ class Legend_Types {
 			]
 		);
 
+		$this->register_legend_type(
+			'simple-color',
+			[
+				'script_url' => JEO_BASEURL . '/includes/legend-types/simple-color.js'
+			]
+		);
+
 		/**
 		 * Hook used to register legend_types
 		 *
