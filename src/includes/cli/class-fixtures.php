@@ -123,6 +123,23 @@ class Fixtures {
 						'url' => 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
 					],
 					'legend_type' => 'none',
+					'legend_type' => 'icons',
+					'legend_title' => 'Exemplo cores',
+					'legend_type_options' => [
+						'left_label' => '0',
+						'right_label' => '1000',
+						'icons' => [
+							[
+								'label' => 'Label 1',
+								'icon' => 'http://via.placeholder.com/20x20',
+							],
+							[
+								'label' => 'Label 20',
+								'icon' => 'http://via.placeholder.com/20x20',
+							],
+
+						]
+					],
 				]
 			],
 			[

@@ -146,3 +146,16 @@ div.jeomap {
 .simple-color-item {
 	margin-bottom: 5px;
 }
+
+/** Icons legend **/
+
+.icons-item-img {
+	max-width: 20px;
+	max-height: 20px;
+	margin-right: 10px;
+	float: left;
+}
+
+.icons-item {
+	margin-bottom: 5px;
+}
