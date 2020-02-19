@@ -20,7 +20,7 @@ class JeoMap {
 
 		this.popupTemplate = template(
 			`<article class="popup">${
-				window.jeoMapVars.templates.popup
+				window.jeoMapVars.templates.postPopup
 			}</article>`,
 		);
 
