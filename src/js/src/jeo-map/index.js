@@ -119,7 +119,10 @@ class JeoMap {
 		container.classList.add( 'legend-container' );
 
 		this.legends.forEach( legend => {
-			container.appendChild( legend.render() );
+			const legendContainer = document.createElement( 'div' );
+			legendContainer.classList.add( 'legend-for-' + legend.layer_id );
+			legendContainer.appendChild( legend.render() );
+			container.appendChild( legendContainer );
 		} );
 
 		if ( this.map_post_object ) {
@@ -162,6 +165,16 @@ class JeoMap {
 			container.appendChild( moreButton );
 		}
 		this.element.appendChild( container );
+
+		// hide legends from hidden layers
+		this.layers.forEach( (l, i) => {
+			if ( i == 0 ) {
+				return;
+			}
+			if ( l.attributes.visible !== true ) {
+				jQuery( this.element ).find( '.legend-for-' + l.layer_id ).hide();
+			}
+		})
 	}
 
 	getArg( argName ) {
@@ -393,11 +406,11 @@ class JeoMap {
 				const visibility = this.map.getLayoutProperty( clickedLayer, 'visibility' );
 
 				if ( typeof ( visibility ) === 'undefined' || visibility === 'visible' ) {
-					this.map.setLayoutProperty( clickedLayer, 'visibility', 'none' );
+					this.hideLayer( clickedLayer );
 					clicked.className = '';
 				} else {
 					clicked.className = 'active';
-					this.map.setLayoutProperty( clickedLayer, 'visibility', 'visible' );
+					this.showLayer( clickedLayer );
 				}
 			};
 
@@ -424,16 +437,15 @@ class JeoMap {
 
 				// hide all
 				this.getSwappableLayers().forEach( ( i ) => {
-					this.map.setLayoutProperty( this.layers[ i ].layer_id, 'visibility', 'none' );
+					this.hideLayer( this.layers[ i ].layer_id );
 				} );
 				jQuery( navElement ).children( '.switchable' ).removeClass( 'active' );
 
 				// display current
 				const clicked = e.currentTarget;
 				const clickedLayer = clicked.dataset.layer_id;
-				this.map.setLayoutProperty( clickedLayer, 'visibility', 'visible' );
+				this.showLayer( clickedLayer );
 
-				const visibility = this.map.getLayoutProperty( clickedLayer, 'visibility' );
 				clicked.classList.add( 'active' );
 			};
 
@@ -442,6 +454,25 @@ class JeoMap {
 
 		this.element.appendChild( navElement );
 	}
+
+	changeLayerVisibitly( layer_id, visibility ) {
+		this.map.getStyle().layers.forEach( layer => {
+			if ( layer.id == layer_id ) {
+				this.map.setLayoutProperty( layer.id, 'visibility', visibility);
+			}
+		} );
+	}
+
+	showLayer( layer_id ) {
+		this.changeLayerVisibitly( layer_id, 'visible' );
+		jQuery( this.element ).find( '.legend-for-' + layer_id ).show();
+	}
+
+	hideLayer( layer_id ) {
+		this.changeLayerVisibitly( layer_id, 'none' );
+		jQuery( this.element ).find( '.legend-for-' + layer_id ).hide();
+	}
+
 }
 
 ( function( $ ) {
