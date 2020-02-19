@@ -53,7 +53,20 @@ class Fixtures {
 								]
 							]
 						]
-					]
+					],
+					'legend_type' => 'barscale',
+					'legend_title' => 'Número de árvores',
+					'legend_type_options' => [
+						'left_label' => '0',
+						'right_label' => '1000',
+						'colors' => [
+							'#9fa498',
+							'#858b7d',
+							'#5f645a',
+							'#474a42',
+							'#313629',
+						]
+					],
 				]
 			],
 			[
@@ -66,7 +79,8 @@ class Fixtures {
 					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'url' => 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
-					]
+					],
+					'legend_type' => 'none',
 				]
 			],
 			[
@@ -79,7 +93,8 @@ class Fixtures {
 					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'url' => 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
-					]
+					],
+					'legend_type' => 'none',
 				]
 			],
 			[
@@ -92,7 +107,8 @@ class Fixtures {
 					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'style_id' => 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
-					]
+					],
+					'legend_type' => 'none',
 				]
 			],
 

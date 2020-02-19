@@ -15,7 +15,7 @@ function jeo_autoload($class_name) {
 
 	$filename = 'class-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
 
-	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli'];
+	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types'];
 
 	foreach ($folders as $folder) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -73,6 +73,14 @@ function jeo_settings() {
  */
 function jeo_layer_types() {
 	return \Jeo\Layer_Types::get_instance();
+}
+
+/**
+ * Gets the instance of the Legend Types Class
+ * @return \Jeo\Legend_Types Legend Types instance
+ */
+function jeo_legend_types() {
+	return \Jeo\Legend_Types::get_instance();
 }
 
 

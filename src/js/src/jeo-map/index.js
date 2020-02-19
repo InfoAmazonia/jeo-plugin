@@ -178,6 +178,7 @@ class JeoMap {
 				},
 				( data ) => {
 					const returnLayers = [];
+					const returnLegends = [];
 					const ordered = [];
 					layersIds.forEach( ( el, index ) => {
 						ordered[ index ] = data.find( ( l ) => l.id == el );
@@ -193,9 +194,21 @@ class JeoMap {
 								layer_type_options: layerObject.meta.layer_type_options,
 							} )
 						);
+
+						if ( layerObject.meta.legend_type !== 'none' ) {
+							returnLegends.push(
+								new window.JeoLegend( layerObject.meta.legend_type, {
+									layer_id: layerObject.slug,
+									title: layerObject.meta.legend_title,
+									legend_type_options: layerObject.meta.legend_type_options,
+								} )
+							);
+						}
 					} );
 
+
 					this.layers = returnLayers;
+					this.legends = returnLegends;
 					resolve( returnLayers );
 				}
 			);
