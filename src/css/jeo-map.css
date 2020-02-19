@@ -64,15 +64,21 @@ div.jeomap {
 	cursor: pointer;
 }
 
-.jeomap a.more-info-button {
+.jeomap div.legend-container {
 	background: #fff;
 	position: absolute;
 	bottom: 10px;
 	right: 10px;
 	z-index: 1;
+	display: block;
+	margin: 0;
+	padding: 2px 10px;
+}
+
+.jeomap div.legend-container a.more-info-button {
+	background: #fff;
 	border: 1px solid rgba(0,0,0,0.4);
 	color: #404040;
-	display: block;
 	margin: 0;
 	padding: 2px 10px;
 	text-decoration: none;
@@ -102,4 +108,28 @@ div.jeomap {
 #embed-post-preview {
 	float: right;
 	width: 200px;
+}
+
+/** Bar scale legend **/
+
+.barscale-left-label {
+	float: left;
+}
+.barscale-right-label {
+	float: right;
+}
+.barscale-scale-container {
+	height: 20px;
+	width: 100%;
+	border: 1px solid grey;
+}
+.barscale-color {
+	height: 20px;
+	float: left;
+}
+
+.barscale-labels-container {
+	display: flex;
+	justify-content: space-between;
+	width: 100%;
 }

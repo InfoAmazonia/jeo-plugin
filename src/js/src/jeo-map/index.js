@@ -5,6 +5,9 @@ class JeoMap {
 		this.element = element;
 		this.args = element.attributes;
 
+		this.layers = [];
+		this.legends = [];
+
 		const map = new window.mapboxgl.Map( {
 			container: element,
 			attributionControl: false,
@@ -53,7 +56,6 @@ class JeoMap {
 					map.setMaxZoom( this.getArg( 'max_zoom' ) );
 				}
 
-				this.addMoreButton();
 			} )
 			.then( () => {
 				this.getLayers().then( ( layers ) => {
@@ -84,6 +86,9 @@ class JeoMap {
 						} ),
 						'bottom-left'
 					);
+
+					this.addMoreButtonAndLegends();
+
 				} );
 
 				this.getRelatedPosts();
@@ -108,7 +113,16 @@ class JeoMap {
 	 *
 	 * This will only work for maps stored in the database and not for one-time use maps
 	 */
-	addMoreButton() {
+	addMoreButtonAndLegends() {
+
+		const container = document.createElement( 'div' );
+		container.classList.add( 'legend-container' );
+
+		this.legends.forEach( legend => {
+			console.log(legend.render());
+			container.appendChild( legend.render() );
+		} );
+
 		if ( this.map_post_object ) {
 			const moreDiv = document.createElement( 'div' );
 
@@ -142,12 +156,13 @@ class JeoMap {
 			moreButton.onclick = ( e ) => {
 				e.preventDefault();
 				e.stopPropagation();
-				jQuery( e.currentTarget ).siblings( '.more-info-overlayer' ).show();
+				jQuery( e.currentTarget ).parent().siblings( '.more-info-overlayer' ).show();
 			};
 
 			this.element.appendChild( moreDiv );
-			this.element.appendChild( moreButton );
+			container.appendChild( moreButton );
 		}
+		this.element.appendChild( container );
 	}
 
 	getArg( argName ) {
