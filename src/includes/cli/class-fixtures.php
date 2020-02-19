@@ -124,7 +124,7 @@ class Fixtures {
 					],
 					'legend_type' => 'none',
 					'legend_type' => 'icons',
-					'legend_title' => 'Exemplo cores',
+					'legend_title' => 'Exemplo Icones',
 					'legend_type_options' => [
 						'left_label' => '0',
 						'right_label' => '1000',
