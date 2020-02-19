@@ -221,8 +221,8 @@ class JeoMap {
 			this.relatedPostsCriteria = relatedPostsCriteria;
 			const query = {};
 			query.per_page = 100; // TODO handle limit of posts per query
-			if ( relatedPostsCriteria.cat ) {
-				query.categories = relatedPostsCriteria.cat;
+			if ( relatedPostsCriteria.categories ) {
+				query.categories = relatedPostsCriteria.categories;
 			} else {
 				resolve( [] );
 			}
