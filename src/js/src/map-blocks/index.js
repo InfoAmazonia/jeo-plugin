@@ -1,12 +1,35 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import MapEditor from './map-editor';
 import MapDisplay from './map-display';
+import MapEditor from './map-editor';
+import OnetimeMapDisplay from './onetime-map-display';
+import OnetimeMapEditor from './onetime-map-editor';
 
 registerBlockType( 'jeo/map', {
 	title: __( 'Map' ),
 	description: __( 'Display maps with layers and data' ),
 	category: 'common', // @TODO: add jeo maps category
+	icon: 'location-alt',
+	attributes: {
+		map_id: {
+			type: 'number',
+		},
+		height: {
+			type: 'number',
+		},
+		width: {
+			type: 'number',
+		},
+	},
+	edit: ( props ) => <MapEditor { ...props } />,
+	save: ( props ) => <MapDisplay { ...props } />,
+} );
+
+registerBlockType( 'jeo/onetime-map', {
+	title: __( 'One-time Map' ),
+	description: __( 'Display maps with layers and data' ),
+	category: 'common', // @TODO: add jeo maps category
+	icon: 'location-alt',
 	attributes: {
 		layers: {
 			type: 'array',
@@ -30,6 +53,6 @@ registerBlockType( 'jeo/map', {
 			type: 'number',
 		},
 	},
-	edit: ( props ) => <MapEditor { ...props } />,
-	save: ( props ) => <MapDisplay { ...props } />,
+	edit: ( props ) => <OnetimeMapEditor { ...props } />,
+	save: ( props ) => <OnetimeMapDisplay { ...props } />,
 } );
