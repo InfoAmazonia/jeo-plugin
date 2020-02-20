@@ -43,6 +43,13 @@ class Layer_Types {
 			]
 		);
 
+		$this->register_layer_type(
+			'mapbox-tileset',
+			[
+				'script_url' => JEO_BASEURL . '/includes/layer-types/mapbox-tileset.js'
+			]
+		);
+
 		/**
 		 * Hook used to register layer_types
 		 *
