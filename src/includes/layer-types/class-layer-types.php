@@ -36,6 +36,13 @@ class Layer_Types {
 			]
 		);
 
+		$this->register_layer_type(
+			'mvt',
+			[
+				'script_url' => JEO_BASEURL . '/includes/layer-types/mvt.js'
+			]
+		);
+
 		/**
 		 * Hook used to register layer_types
 		 *
