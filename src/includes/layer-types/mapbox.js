@@ -112,6 +112,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				style_id: {
 					type: 'string',
 					title: 'Style ID',
+					description: 'The mapbox Style ID composes by user name and id. Example: username/cjvwsdfrfx5i23coafd4sx97e'
 				},
 				access_token: {
 					type: 'string',
