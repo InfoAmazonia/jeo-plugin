@@ -93,6 +93,10 @@ class Maps {
 							'default' => [
 								'description' => __('Indicates whether this layer is visible by default', 'jeo'),
 								'type' => 'boolean'
+							],
+							'show_legend' => [
+								'description' => __('Indicates if the legend of this layer should be displayed or not', 'jeo'),
+								'type' => 'boolean'
 							]
 						],
 						'required' => [ 'id', 'use' ]

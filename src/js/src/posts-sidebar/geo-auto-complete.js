@@ -1,99 +1,99 @@
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
-import { Spinner } from "@wordpress/components";
-
+import { Spinner } from '@wordpress/components';
+import './geo-auto-complete.css';
+import { __ } from '@wordpress/i18n';
 
 class JeoGeoAutoComplete extends React.Component {
-
 	constructor() {
 		super();
 		this.state = {
 			value: '',
 			suggestions: [],
-			isLoading: false
-		}
-		this.onChange = this.onChange.bind(this);
-		this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(this);
-		this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(this);
-		this.getSuggestionValue = this.getSuggestionValue.bind(this);
-		this.renderSuggestion = this.renderSuggestion.bind(this);
-		this.onSuggestionSelected = this.onSuggestionSelected.bind(this);
-		this.shouldRenderSuggestions = this.shouldRenderSuggestions.bind(this);
+			isLoading: false,
+		};
+		this.onChange = this.onChange.bind( this );
+		this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind( this );
+		this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind( this );
+		this.getSuggestionValue = this.getSuggestionValue.bind( this );
+		this.renderSuggestion = this.renderSuggestion.bind( this );
+		this.onSuggestionSelected = this.onSuggestionSelected.bind( this );
+		this.shouldRenderSuggestions = this.shouldRenderSuggestions.bind( this );
 
-		this.debouncedLoadSuggestions = _.debounce(this.onSuggestionsFetchRequested, 500);
-
+		this.debouncedLoadSuggestions = _.debounce( this.onSuggestionsFetchRequested, 500 );
 	}
 
-	onChange(event, { newValue }) {
-		this.setState({
-			value: newValue
-		});
-	};
+	onChange( event, { newValue } ) {
+		this.setState( {
+			value: newValue,
+		} );
+	}
 
-	getSuggestionValue(suggestion) {
+	getSuggestionValue( suggestion ) {
 		return suggestion.full_address;
-	};
-
-	onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
-		this.props.onSelect(suggestion);
 	}
 
-	renderSuggestion(suggestion) {
-		return (
-			<span>{suggestion.full_address}</span>
-		)
-	};
+	onSuggestionSelected( event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method } ) {
+		this.props.onSelect( suggestion );
+	}
 
-	onSuggestionsFetchRequested({ value }) {
+	renderSuggestion( suggestion ) {
+		return (
+			<div className="jeo-geo-autocomplete">
+				{ suggestion.full_address }
+			</div>
+		);
+	}
+
+	onSuggestionsFetchRequested( { value } ) {
 		this.setState( { isLoading: true } );
-		fetch(jeo.ajax_url + '?action=jeo_geocode&search=' + value)
-			.then( response => {
+		fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + value )
+			.then( ( response ) => {
 				return response.json();
 			} )
-			.then( result => {
+			.then( ( result ) => {
 				this.setState( { suggestions: result, isLoading: false } );
 			} );
-	};
+	}
 
-	shouldRenderSuggestions(value) {
+	shouldRenderSuggestions( value ) {
 		return value.trim().length > 2;
 	}
 
 	onSuggestionsClearRequested() {
-		this.setState({
-			suggestions: []
-		});
-	};
+		this.setState( {
+			suggestions: [],
+		} );
+	}
 
 	render() {
 		const { value, suggestions } = this.state;
 		// Autosuggest will pass through all these props to the input.
 		const inputProps = {
-			placeholder: 'Busca por endereço',
+			placeholder: __( 'Busca por endereço', 'jeo' ),
 			value,
-			onChange: this.onChange
+			onChange: this.onChange,
 		};
 
 		// Finally, render it!
 		return (
 			<div>
 				<Autosuggest
-						suggestions={suggestions}
-						onSuggestionsFetchRequested={this.debouncedLoadSuggestions}
-						onSuggestionsClearRequested={this.onSuggestionsClearRequested}
-						getSuggestionValue={this.getSuggestionValue}
-						renderSuggestion={this.renderSuggestion}
-						onSuggestionSelected={this.onSuggestionSelected}
-						shouldRenderSuggestions={this.shouldRenderSuggestions}
-						inputProps={inputProps}
-						/>
+					suggestions={ suggestions }
+					onSuggestionsFetchRequested={ this.debouncedLoadSuggestions }
+					onSuggestionsClearRequested={ this.onSuggestionsClearRequested }
+					getSuggestionValue={ this.getSuggestionValue }
+					renderSuggestion={ this.renderSuggestion }
+					onSuggestionSelected={ this.onSuggestionSelected }
+					shouldRenderSuggestions={ this.shouldRenderSuggestions }
+					inputProps={ inputProps }
+				/>
 				{ this.state.isLoading &&
 					<Spinner />
 				}
 			</div>
 		);
 	}
-
 }
 
 export default JeoGeoAutoComplete;

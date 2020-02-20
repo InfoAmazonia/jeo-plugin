@@ -24,7 +24,7 @@ class Fixtures {
 			[
 				'post_type' => 'map-layer',
 				'post_title' => 'Layer1',
-				'post_status' => 'mapbox',
+				'post_status' => 'publish',
 				'meta' => [
 					'type' => 'mapbox',
 					'attribution' => 'Sample attribution for this layer',
@@ -53,7 +53,20 @@ class Fixtures {
 								]
 							]
 						]
-					]
+					],
+					'legend_type' => 'barscale',
+					'legend_title' => 'Número de árvores',
+					'legend_type_options' => [
+						'left_label' => '0',
+						'right_label' => '1000',
+						'colors' => [
+							'#9fa498',
+							'#858b7d',
+							'#5f645a',
+							'#474a42',
+							'#313629',
+						]
+					],
 				]
 			],
 			[
@@ -66,7 +79,36 @@ class Fixtures {
 					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'url' => 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
-					]
+					],
+					'legend_type' => 'simple-color',
+					'legend_title' => 'Exemplo cores',
+					'legend_type_options' => [
+						'left_label' => '0',
+						'right_label' => '1000',
+						'colors' => [
+							[
+								'label' => '10',
+								'color' => '#ff0909',
+							],
+							[
+								'label' => '20',
+								'color' => '#ff09f8',
+							],
+							[
+								'label' => '30',
+								'color' => '#0c09ff',
+							],
+							[
+								'label' => '40',
+								'color' => '#09ffe9',
+							],
+							[
+								'label' => '50',
+								'color' => '#ffe709',
+							],
+
+						]
+					],
 				]
 			],
 			[
@@ -79,7 +121,23 @@ class Fixtures {
 					'source_url' => 'http://domain.com/source.csv',
 					'layer_type_options' => [
 						'url' => 'https://wri-tiles.s3.amazonaws.com/glad_prod/tiles/{z}/{x}/{y}.png'
-					]
+					],
+					'legend_type' => 'none',
+					'legend_type' => 'icons',
+					'legend_title' => 'Exemplo Icones',
+					'legend_type_options' => [
+						'icons' => [
+							[
+								'label' => 'Label 1',
+								'icon' => 'http://via.placeholder.com/20x20',
+							],
+							[
+								'label' => 'Label 20',
+								'icon' => 'http://via.placeholder.com/20x20',
+							],
+
+						]
+					],
 				]
 			],
 			[
@@ -108,8 +166,36 @@ class Fixtures {
 									],
 								]
 							]
+						],
+					],
+					'legend_type' => 'circles',
+					'legend_title' => 'Exemplo Circulos',
+					'legend_type_options' => [
+						'color' => '#0c09ff',
+						'circles' => [
+							[
+								'label' => '3',
+								'radius' => 4,
+							],
+							[
+								'label' => '6',
+								'radius' => 8,
+							],
+							[
+								'label' => '12',
+								'radius' => 15,
+							],
+							[
+								'label' => '24',
+								'radius' => 20,
+							],
+							[
+								'label' => '48',
+								'radius' => 30,
+							],
+
 						]
-					]
+					],
 				]
 			],
 
@@ -511,18 +597,22 @@ class Fixtures {
 		$specs = [
 			[
 				'use' => 'fixed',
+				'show_legend' => false,
 			],
 			[
 				'use' => 'switchable',
-				'default' => true
+				'default' => true,
+				'show_legend' => true,
 			],
 			[
 				'use' => 'swappable',
-				'default' => true
+				'default' => true,
+				'show_legend' => true,
 			],
 			[
 				'use' => 'swappable',
-				'default' => false
+				'default' => false,
+				'show_legend' => false,
 			]
 		];
 
@@ -545,7 +635,7 @@ class Fixtures {
 		$cat3 = get_term_by( 'name', 'category 3', 'category' );
 
 		$related = [
-			'cat' => [
+			'categories' => [
 				$cat1->term_id,
 				$cat2->term_id,
 				$cat3->term_id

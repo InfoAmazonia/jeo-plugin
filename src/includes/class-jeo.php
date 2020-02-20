@@ -46,13 +46,21 @@ class Jeo {
 		\jeo_geocode_handler();
 		\jeo_settings();
 		\jeo_layer_types();
+		\jeo_legend_types();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
+
+		add_action( 'init', array( $this, 'register_embed_rewrite' ) );
+		add_filter( 'query_vars', array( $this, 'register_embed_query_var' ) );
+		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
+
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'cli_init', array($this, 'register_cli_commands') );
+
+
 	}
 
 	/**
@@ -134,13 +142,21 @@ class Jeo {
 		wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time() );
 		wp_enqueue_script( 'mapboxgl-loader' );
 
-		if ( is_singular() ) {
+		if ( is_singular() || get_query_var('jeo_embed') === 'map' ) {
 			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'jquery' ) );
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/css/jeo-map.css', time() );
 			wp_localize_script(
 				'jeo-map',
 				'jeoMapVars',
-				array( 'jsonUrl' => rest_url( 'wp/v2/' ) )
+				array(
+					'jsonUrl' => rest_url( 'wp/v2/' ),
+					'string_read_more' => __( 'Read more', 'jeo' ),
+					'templates' => [
+						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
+						'popup' => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
+						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) )
+					]
+				)
 			);
 		}
 	}
@@ -152,6 +168,44 @@ class Jeo {
 	 */
 	public function register_cli_commands() {
 		\WP_CLI::add_command( 'jeo fixtures', 'Jeo\Fixtures' );
+	}
+
+	public function register_embed_rewrite() {
+		add_rewrite_rule(
+			'^embed/?$',
+			'index.php?jeo_embed=map',
+			'top'
+		);
+	}
+
+	public function register_embed_query_var( $vars ) {
+		$vars[] = 'jeo_embed';
+		return $vars;
+	}
+
+	public function register_embed_template_redirect() {
+
+		if( get_query_var( 'jeo_embed' ) === 'map' ) {
+
+			$map_id = isset( $_GET['map_id'] ) ? $_GET['map_id'] : false;
+
+			if ( $map_id ) {
+
+				$full_width = isset( $_GET['width'] ) ? $_GET['width'] : 820;
+				$map_width = $full_width ? $full_width - 220 : 600;
+				$height = isset( $_GET['height'] ) ? $_GET['height'] : 600;
+
+				$map_style = "width: ${map_width}px; height: ${height}px;";
+				$container_style = "width: ${full_width}px; height: ${height}px;";
+
+				require JEO_BASEPATH . '/templates/embed.php';
+
+				exit();
+
+			}
+
+		}
+
 	}
 
 }

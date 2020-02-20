@@ -1,115 +1,118 @@
-// import { __ } from "@wordpress/i18n";
+import template from 'lodash.template';
 
 class JeoMap {
-
-	constructor(element) {
-
+	constructor( element ) {
 		this.element = element;
 		this.args = element.attributes;
 
-		let map = new window.mapboxgl.Map({
+		this.layers = [];
+		this.legends = [];
+
+		const map = new window.mapboxgl.Map( {
 			container: element,
-			attributionControl: false
-		});
+			attributionControl: false,
+		} );
 
 		this.map = map;
+		this.options = jQuery( this.element ).data( 'options' );
 
 		this.currentLayerBeingAdded = 0;
 
+		this.moreInfoTemplate = template( window.jeoMapVars.templates.moreInfo );
+
+		this.popupTemplate = template(
+			`<article class="popup">${
+				window.jeoMapVars.templates.postPopup
+			}</article>`,
+		);
+
 		this.initMap()
-		.then( () => {
+			.then( () => {
+				map.setZoom( this.getArg( 'initial_zoom' ) );
 
-			map.setZoom( this.getArg('initial_zoom') );
+				map.setCenter( [ this.getArg( 'center_lon' ), this.getArg( 'center_lat' ) ] );
 
-			map.setCenter( [this.getArg('center_lon'), this.getArg('center_lat')] );
+				if ( this.getArg( 'disable_scroll_zoom' ) ) {
+					map.scrollZoom.disable();
+				}
 
-			if ( this.getArg('disable_scroll_zoom') ) {
-				map.scrollZoom.disable();
-			}
+				if (
+					this.getArg( 'max_bounds_ne' ) &&
+					this.getArg( 'max_bounds_sw' ) &&
+					this.getArg( 'max_bounds_ne' ).length === 2 &&
+					this.getArg( 'max_bounds_sw' ).length === 2
 
-			if (
-				this.getArg('max_bounds_ne') &&
-				this.getArg('max_bounds_sw') &&
-				this.getArg('max_bounds_ne').length == 2 &&
-				this.getArg('max_bounds_sw').length == 2
+				) {
+					map.setMaxBounds(
+						[
+							this.getArg( 'max_bounds_sw' ),
+							this.getArg( 'max_bounds_ne' ),
+						]
+					);
+				}
 
-			) {
-				map.setMaxBounds(
-					[
-						this.getArg('max_bounds_sw'),
-						this.getArg('max_bounds_ne')
-					]
-				);
-			}
+				if ( this.getArg( 'min_zoom' ) ) {
+					map.setMinZoom( this.getArg( 'min_zoom' ) );
+				}
+				if ( this.getArg( 'max_zoom' ) ) {
+					map.setMaxZoom( this.getArg( 'max_zoom' ) );
+				}
 
-			if ( this.getArg('min_zoom') ) {
-				map.setMinZoom( this.getArg('min_zoom') );
-			}
-			if ( this.getArg('max_zoom') ) {
-				map.setMaxZoom( this.getArg('max_zoom') );
-			}
+			} )
+			.then( () => {
+				this.getLayers().then( ( layers ) => {
+					const baseLayer = layers[ 0 ];
+					baseLayer.addStyle( map );
 
-			this.addMoreButton();
+					const customAttribution = [];
 
-		})
-		.then( () => {
+					map.on( 'load', () => {
 
-			this.getLayers().then( layers => {
+						let custom_attributions = [];
 
-				const baseLayer = layers[0];
-				baseLayer.addStyle(map);
+						this.addNextLayer();
 
+						layers.forEach( ( layer, i ) => {
+							if ( layer.attribution ) {
+								customAttribution.push( layer.attribution );
+							}
 
+							if ( i > 0 ) {
+								layer.addLayer( map );
+							}
 
-				map.on('load', () => {
+							layer.addInteractions( map );
+						} );
+					} );
 
-					let custom_attributions = [];
-
-					this.addNextLayer();
-
-					layers.forEach( (layer, i) => {
-
-						if( layer.attribution ) {
-							custom_attributions.push( layer.attribution );
-						}
-
-					});
+					this.addLayersControl();
 
 					map.addControl(
-						new mapboxgl.AttributionControl({
-							customAttribution: custom_attributions
-						}),
+						new mapboxgl.AttributionControl( {
+							customAttribution,
+						} ),
 						'bottom-left'
 					);
 
-				});
+					this.addMoreButtonAndLegends();
 
-				this.addLayersControl();
+				} );
 
+				this.getRelatedPosts();
 			} );
 
-			this.getRelatedPosts();
-
-		});
-
 		window.map = map;
-
 	}
 
 	initMap() {
-		if ( this.getArg('map_id') ) {
-
+		if ( this.getArg( 'map_id' ) ) {
 			return jQuery.get(
-				jeoMapVars.jsonUrl + 'map/' + this.getArg('map_id')
-			).then( data => {
-
+				jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' )
+			).then( ( data ) => {
 				this.map_post_object = data;
-
-			});
-
-		} else {
-			return Promise.resolve();
+			} );
 		}
+		return Promise.resolve();
 	}
 
 	addNextLayer() {
@@ -125,173 +128,226 @@ class JeoMap {
 	 *
 	 * This will only work for maps stored in the database and not for one-time use maps
 	 */
-	addMoreButton() {
+	addMoreButtonAndLegends() {
+
+		const container = document.createElement( 'div' );
+		container.classList.add( 'legend-container' );
+
+		this.legends.forEach( legend => {
+			const legendContainer = document.createElement( 'div' );
+			legendContainer.classList.add( 'legend-for-' + legend.layer_id );
+			legendContainer.appendChild( legend.render() );
+			container.appendChild( legendContainer );
+		} );
+
 		if ( this.map_post_object ) {
-			// TODO Use templates
+			const moreDiv = document.createElement( 'div' );
 
-			const moreDiv = document.createElement('div');
+			moreDiv.classList.add( 'more-info-overlayer' );
 
-			moreDiv.classList.add('more-info-overlayer');
+			moreDiv.innerHTML = this.moreInfoTemplate( {
+				map: this.map_post_object,
+			} );
 
-			moreDiv.innerHTML = '<h2>' + this.map_post_object.title.rendered + '</h2>' + this.map_post_object.content.rendered;
+			const closeButton = document.createElement( 'div' );
+			closeButton.classList.add( 'more-info-close' );
+			closeButton.innerHTML = '<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup">×</button>';
 
-			const closeButton = document.createElement('a');
-			closeButton.classList.add('more-info-close');
-			closeButton.innerHTML = 'x';
+			closeButton.click( function( e ) {
 
-			closeButton.click( function(e)  {
+			} );
 
-			});
-
-			closeButton.onclick = e => {
-
+			closeButton.onclick = ( e ) => {
 				e.preventDefault();
 				e.stopPropagation();
 
-				jQuery(e.currentTarget).parent().hide();
-
+				jQuery( e.currentTarget ).parent().hide();
 			};
 
 			moreDiv.appendChild( closeButton );
 
-			const moreButton = document.createElement('a');
-			moreButton.classList.add('more-info-button');
+			const moreButton = document.createElement( 'a' );
+			moreButton.classList.add( 'more-info-button' );
 			moreButton.innerHTML = 'Info';
 
-			moreButton.onclick = e => {
-
+			moreButton.onclick = ( e ) => {
 				e.preventDefault();
 				e.stopPropagation();
-				jQuery(e.currentTarget).siblings('.more-info-overlayer').show();
-
+				jQuery( e.currentTarget ).parent().siblings( '.more-info-overlayer' ).show();
 			};
 
 			this.element.appendChild( moreDiv );
-			this.element.appendChild( moreButton );
-
+			container.appendChild( moreButton );
 		}
+		this.element.appendChild( container );
+
+		// hide legends from hidden layers
+		this.layers.forEach( (l, i) => {
+			if ( i == 0 ) {
+				return;
+			}
+			if ( l.attributes.visible !== true ) {
+				jQuery( this.element ).find( '.legend-for-' + l.layer_id ).hide();
+			}
+		})
 	}
 
-	getArg(argName) {
+	getArg( argName ) {
 		let value;
 		if ( this.map_post_object ) {
-			value = this.map_post_object.meta[argName];
+			value = this.map_post_object.meta[ argName ];
 		} else {
-			value = jQuery(this.element).data(argName);
+			value = jQuery( this.element ).data( argName );
 		}
 
 		if ( value ) {
 			return value;
-		} else {
-			return false;
 		}
+		return false;
 	}
 
 	getLayers() {
-
-		return new Promise( (resolve, reject) => {
-
-			const layersDefinitions = this.getArg('layers');
+		return new Promise( ( resolve, reject ) => {
+			const layersDefinitions = this.getArg( 'layers' );
 			this.layersDefinitions = layersDefinitions;
-			const layersIds = layersDefinitions.map( el => el.id );
+			const layersIds = layersDefinitions.map( ( el ) => el.id );
 
 			jQuery.get(
 				jeoMapVars.jsonUrl + 'map-layer',
 				{
-                    include: layersIds,
-                    orderby: 'include'
+					include: layersIds,
+					orderby: 'include',
 				},
-				data => {
-					let returnLayers = [];
-					let ordered = [];
-					layersIds.forEach( (el, index) => {
-						ordered[index] = data.find( l => l.id == el )
-					});
-
-					ordered.forEach( (layerObject, i) => {
-						returnLayers.push(
-							new window.JeoLayer(layerObject.meta.type, {
-									layer_id: layerObject.slug,
-									layer_name: layerObject.title.rendered,
-									attribution: layerObject.meta.attribution,
-									visible: layersDefinitions[i].default,
-									layer_type_options: layerObject.meta.layer_type_options
-							})
-						);
+				( data ) => {
+					const returnLayers = [];
+					const returnLegends = [];
+					const ordered = [];
+					layersIds.forEach( ( el, index ) => {
+						ordered[ index ] = data.find( ( l ) => l.id == el );
 					} );
 
+					ordered.forEach( ( layerObject, i ) => {
+						returnLayers.push(
+							new window.JeoLayer( layerObject.meta.type, {
+								layer_id: layerObject.slug,
+								layer_name: layerObject.title.rendered,
+								attribution: layerObject.meta.attribution,
+								visible: layersDefinitions[ i ].default,
+								layer_type_options: layerObject.meta.layer_type_options,
+							} )
+						);
+
+						if ( layerObject.meta.legend_type !== 'none' && layersDefinitions[ i ].show_legend ) {
+							returnLegends.push(
+								new window.JeoLegend( layerObject.meta.legend_type, {
+									layer_id: layerObject.slug,
+									title: layerObject.meta.legend_title,
+									legend_type_options: layerObject.meta.legend_type_options,
+								} )
+							);
+						}
+					} );
+
+
 					this.layers = returnLayers;
-					resolve(returnLayers);
-
-
+					this.legends = returnLegends;
+					resolve( returnLayers );
 				}
 			);
-
-		});
-
+		} );
 	}
 
 	getRelatedPosts() {
-		return new Promise( (resolve, reject) => {
-
-			const relatedPostsCriteria = this.getArg('related_posts');
+		return new Promise( ( resolve, reject ) => {
+			const relatedPostsCriteria = this.getArg( 'related_posts' );
 			this.relatedPostsCriteria = relatedPostsCriteria;
-			var query = [];
-			query['per_page'] = 100; // TODO handle limit of posts per query
-			if ( relatedPostsCriteria.cat ) {
-				query['categories'] = relatedPostsCriteria.cat
+			const query = {};
+			query.per_page = 100; // TODO handle limit of posts per query
+			if ( relatedPostsCriteria.categories ) {
+				query.categories = relatedPostsCriteria.categories;
 			} else {
 				resolve( [] );
 			}
+			query._embed = 1;
+
 			jQuery.get(
 				jeoMapVars.jsonUrl + 'posts',
 				query,
-				data => {
-
+				( data ) => {
 					if ( data.length ) {
-
-						data.forEach( post => {
-							this.addPostToMap(post);
-						})
-
+						data.forEach( ( post ) => {
+							this.addPostToMap( post );
+						} );
 					}
-
-
 				}
 			);
-
-		});
+		} );
 	}
 
-	addPostToMap(post) {
+	addPostToMap( post ) {
 		if ( post.meta._related_point ) {
-
-			post.meta._related_point.forEach( point => {
-				this.addPointToMap(point, post)
-			});
-
+			post.meta._related_point.forEach( ( point ) => {
+				this.addPointToMap( point, post );
+			} );
 		}
-
 	}
 
-	addPointToMap(point, post) {
-		const color = point.relevance == 'secondary' ? '#CCCCCC' : '#3FB1CE';
-		let marker = new mapboxgl.Marker( {color: color } );
+	addPointToMap( point, post ) {
+		const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
+		const marker = new mapboxgl.Marker( { color } );
 
-		// TODO use a template file
-		const popupHTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>' + post.excerpt.rendered;
+		const popupHTML = this.popupTemplate( {
+			point,
+			post,
+			read_more: window.jeoMapVars.string_read_more,
+		} );
 
-		let popUp = new mapboxgl.Popup().setHTML( popupHTML );
+		const popUp = new mapboxgl.Popup().setHTML( popupHTML );
 
 		const LngLat = {
 			lat: parseFloat( point._geocode_lat ),
-			lon: parseFloat( point._geocode_lon )
+			lon: parseFloat( point._geocode_lon ),
+		};
+
+		marker.setLngLat( LngLat );
+
+		if ( ! this.options || this.options.marker_action !== 'embed_preview' ) {
+			marker.setPopup( popUp );
 		}
 
-		marker.setLngLat( LngLat )
-		.setPopup( popUp )
-		.addTo( this.map );
+		marker.addTo( this.map );
 
+		if ( this.options && this.options.marker_action === 'embed_preview' ) {
+			marker.getElement().addEventListener( 'click', () => {
+				this.updateEmbedPreview( post );
+			} );
+
+			// By default, activate the first post
+			if ( ! this.embedPreviewActive ) {
+				this.updateEmbedPreview( post );
+				this.embedPreviewActive = true;
+			}
+		}
+	}
+
+	/**
+	 * Generates the HTML and updates the story box of the Map embed URL
+	 *
+	 * @param post
+	 */
+	updateEmbedPreview( post ) {
+		let HTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>';
+
+		if ( post._embedded[ 'wp:featuredmedia' ] && post._embedded[ 'wp:featuredmedia' ][ 0 ] ) {
+			const thumbUrl = post._embedded[ 'wp:featuredmedia' ][ 0 ].media_details.sizes.thumbnail.source_url;
+			HTML += '<img src="' + thumbUrl + '" />';
+		}
+
+		HTML += post.excerpt.rendered;
+
+		HTML += '<a href="' + post.link + '" target="blank" >' + jeoMapVars.string_read_more + '</a>';
+
+		jQuery( '#embed-post-preview' ).html( HTML );
 	}
 
 	/**
@@ -303,10 +359,10 @@ class JeoMap {
 	 * @return array
 	 */
 	getSwitchableLayers() {
-		let layers = [];
-		this.layersDefinitions.forEach( (el, index) => {
-			if (el.use == 'switchable') {
-				layers.push(index);
+		const layers = [];
+		this.layersDefinitions.forEach( ( el, index ) => {
+			if ( el.use === 'switchable' ) {
+				layers.push( index );
 			}
 		} );
 		return layers;
@@ -321,10 +377,10 @@ class JeoMap {
 	 * @return array
 	 */
 	getSwappableLayers() {
-		let layers = [];
-		this.layersDefinitions.forEach( (el, index) => {
-			if (el.use == 'swappable') {
-				layers.push(index);
+		const layers = [];
+		this.layersDefinitions.forEach( ( el, index ) => {
+			if ( el.use === 'swappable' ) {
+				layers.push( index );
 			}
 		} );
 		return layers;
@@ -334,30 +390,30 @@ class JeoMap {
 	 * return the index of the sappable layer marked as default
 	 */
 	getDefaultSwappableLayer() {
-		let layers = [];
-		this.layersDefinitions.forEach( (el, index) => {
-			if (el.use == 'swappable' && el.default) {
-				layers.push(index);
+		const layers = [];
+		this.layersDefinitions.forEach( ( el, index ) => {
+			if ( el.use === 'swappable' && el.default ) {
+				layers.push( index );
 			}
 		} );
 		return layers;
 	}
 
 	addLayersControl() {
-		let navElement = document.createElement('nav');
+		const navElement = document.createElement( 'nav' );
 
-		this.getSwitchableLayers().forEach(index => {
-			let link = document.createElement('a');
+		this.getSwitchableLayers().forEach( ( index ) => {
+			const link = document.createElement( 'a' );
 			link.href = '#';
-			if (this.layersDefinitions[index].default) {
+			if ( this.layersDefinitions[ index ].default ) {
 				link.className = 'active';
 			}
 
-			link.textContent = this.layers[index].layer_name;
-			link.setAttribute('data-layer_id', this.layers[index].layer_id);
+			link.textContent = this.layers[ index ].layer_name;
+			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
-			link.onclick = e => {
-				let clicked = e.currentTarget;
+			link.onclick = ( e ) => {
+				const clicked = e.currentTarget;
 				const clickedLayer = clicked.dataset.layer_id;
 				e.preventDefault();
 				e.stopPropagation();
@@ -373,23 +429,22 @@ class JeoMap {
 				}
 			};
 
-			navElement.appendChild(link);
+			navElement.appendChild( link );
+		} );
 
-		});
-
-		this.getSwappableLayers().forEach(index => {
-			let link = document.createElement('a');
+		this.getSwappableLayers().forEach( ( index ) => {
+			const link = document.createElement( 'a' );
 			link.href = '#';
 			link.classList.add('swappable');
 
 			if ( this.getDefaultSwappableLayer() == index ) {
-				link.classList.add('active');
+				link.classList.add( 'active' );
 			}
-			link.textContent = this.layers[index].layer_name;
-			link.setAttribute('data-layer_id', this.layers[index].layer_id);
+			link.textContent = this.layers[ index ].layer_name;
+			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
-			link.onclick = e => {
-				if ( jQuery(e.currentTarget).hasClass('active') ) {
+			link.onclick = ( e ) => {
+				if ( jQuery( e.currentTarget ).hasClass( 'active' ) ) {
 					return;
 				}
 				e.preventDefault();
@@ -402,19 +457,17 @@ class JeoMap {
 				jQuery(navElement).children('.swappable').removeClass('active');
 
 				// display current
-				let clicked = e.currentTarget;
+				const clicked = e.currentTarget;
 				const clickedLayer = clicked.dataset.layer_id;
 				this.showLayer( clickedLayer );
 
-				clicked.classList.add('active');
-
+				clicked.classList.add( 'active' );
 			};
 
-			navElement.appendChild(link);
+			navElement.appendChild( link );
+		} );
 
-		});
-
-		this.element.appendChild(navElement);
+		this.element.appendChild( navElement );
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
@@ -427,29 +480,20 @@ class JeoMap {
 
 	showLayer( layer_id ) {
 		this.changeLayerVisibitly( layer_id, 'visible' );
+		jQuery( this.element ).find( '.legend-for-' + layer_id ).show();
 	}
 
 	hideLayer( layer_id ) {
 		this.changeLayerVisibitly( layer_id, 'none' );
+		jQuery( this.element ).find( '.legend-for-' + layer_id ).hide();
 	}
 
 }
 
-
-(function($) {
-	$(function(){
-		$('.jeomap').each(function(i) {
-			new JeoMap(this);
-		});
-	});
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
+( function( $ ) {
+	$( function() {
+		$( '.jeomap' ).each( function( i ) {
+			new JeoMap( this );
+		} );
+	} );
+}( jQuery ) );
