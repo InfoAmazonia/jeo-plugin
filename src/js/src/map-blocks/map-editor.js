@@ -47,11 +47,8 @@ const MapEditor = ( {
 		}
 	}
 
-	const setSize = useCallback( ( key ) => ( val ) => {
-		const numVal = Number( val );
-		if ( _.isFinite( numVal ) ) {
-			setAttributes( { ...attributes, [ key ]: numVal } );
-		}
+	const setSize = useCallback( ( key ) => ( size ) => {
+		setAttributes( { ...attributes, [ key ]: size } );
 	}, [ attributes, setAttributes ] );
 
 	const { InspectorControls } = wp.editor;
