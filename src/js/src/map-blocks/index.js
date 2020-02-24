@@ -15,10 +15,10 @@ registerBlockType( 'jeo/map', {
 			type: 'number',
 		},
 		height: {
-			type: 'number',
+			type: 'string',
 		},
 		width: {
-			type: 'number',
+			type: 'string',
 		},
 	},
 	edit: ( props ) => <MapEditor { ...props } />,
