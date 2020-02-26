@@ -15,7 +15,7 @@ function jeo_autoload($class_name) {
 
 	$filename = 'class-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
 
-	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types'];
+	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'posts-selector'];
 
 	foreach ($folders as $folder) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -81,6 +81,14 @@ function jeo_layer_types() {
  */
 function jeo_legend_types() {
 	return \Jeo\Legend_Types::get_instance();
+}
+
+/**
+ * Gets the instance of the Posts Selector Class
+ * @return \Jeo\Posts_Selector Posts Selector instance
+ */
+function jeo_posts_selector() {
+	return \Jeo\Posts_Selector::get_instance();
 }
 
 /**
