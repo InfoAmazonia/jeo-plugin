@@ -47,6 +47,7 @@ class Jeo {
 		\jeo_settings();
 		\jeo_layer_types();
 		\jeo_legend_types();
+		\jeo_posts_selector();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_action( 'init', array( $this, 'register_assets' ) );
