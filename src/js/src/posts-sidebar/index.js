@@ -33,7 +33,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 	}
 };
 
-registerPlugin( 'myprefix-sidebar', {
+registerPlugin( 'jeo-posts-sidebar', {
 	icon: 'location-alt',
 	render: () => {
 		return (
