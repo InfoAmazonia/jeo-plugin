@@ -28,9 +28,6 @@ define( 'JEO_VERSION', '1.0.0' );
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url('', __FILE__) );
 
-
-require JEO_BASEPATH . 'api.php';
-
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
