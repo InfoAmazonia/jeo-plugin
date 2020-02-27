@@ -1,7 +1,10 @@
 import { PanelRow } from '@wordpress/components';
-import { Fragment, useMemo } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
+import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+
+import './interval-selector.css';
 
 export function IntervalSelector( {
 	startDate: _startDate,
@@ -20,9 +23,9 @@ export function IntervalSelector( {
 	}, [ _endDate ] );
 
 	return (
-		<Fragment>
+		<div className="jeo-interval-selector">
 			<PanelRow>
-				<label>
+				<label className={ classNames( [ _startDate || 'empty-selector' ] ) }>
 					{ startLabel }
 					<DatePicker
 						dateFormat="yyyy-MM-dd"
@@ -36,7 +39,7 @@ export function IntervalSelector( {
 			</PanelRow>
 
 			<PanelRow>
-				<label>
+				<label className={ classNames( [ _endDate || 'empty-selector' ] ) }>
 					{ endLabel }
 					<DatePicker
 						dateFormat="yyyy-MM-dd"
@@ -48,6 +51,6 @@ export function IntervalSelector( {
 					/>
 				</label>
 			</PanelRow>
-		</Fragment>
+		</div>
 	);
 }
