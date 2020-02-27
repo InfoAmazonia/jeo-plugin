@@ -136,6 +136,24 @@ class Maps {
 							'description' => __('Minimum date for related posts', 'jeo'),
 							'type' => 'string'
 						],
+						'meta_query' => [
+							'description' => __('List of meta values related posts must have', 'jeo'),
+							'type' => 'array',
+							'items' => [
+								'type' => 'object',
+								'properties' => [
+									'key' => [
+										'type' => 'string'
+									],
+									'compare' => [
+										'type' => 'string'
+									],
+									'value' => [
+										'type' => 'string'
+									]
+								]
+							]
+						]
 					]
 				]
 
