@@ -3,6 +3,7 @@ import { Fragment, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { IntervalSelector } from './interval-selector';
+import { MetaSelector } from './meta-selector';
 import { TokensSelector } from './tokens-selector';
 
 const PostsSelector = ( {
@@ -56,6 +57,14 @@ const PostsSelector = ( {
 				} }
 				onEndChange={ ( date ) => {
 					setRelatedPosts( { ...relatedPosts, before: date ? date.toISOString() : undefined } );
+				} }
+			/>
+
+			<MetaSelector
+				label={ __( 'Meta queries', 'jeo' ) }
+				value={ relatedPosts.meta_query }
+				onChange={ ( queries ) => {
+					setRelatedPosts( { ...relatedPosts, meta_query: queries } );
 				} }
 			/>
 		</Fragment>
