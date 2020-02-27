@@ -1,6 +1,6 @@
 import { FormTokenField } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment, useMemo } from '@wordpress/element';
+import { Fragment, useEffect, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const PostsSelector = ( {
@@ -11,6 +11,13 @@ const PostsSelector = ( {
 	relatedPosts,
 	setRelatedPosts,
 } ) => {
+	useEffect( () => {
+		/* relatedPosts is often nullish if schema doesn't match */
+		if ( relatedPosts == null ) {
+			setRelatedPosts( {} );
+		}
+	}, [ relatedPosts, setRelatedPosts ] );
+
 	const categorySuggestions = useMemo( () => {
 		if ( loadingCategories ) {
 			return [];
@@ -40,24 +47,24 @@ const PostsSelector = ( {
 			{ loadedCategories && (
 				<FormTokenField
 					label={ __( 'Categories' ) }
-					value={ relatedPosts.cat }
+					value={ relatedPosts.categories }
 					suggestions={ categorySuggestions }
 					displayTransform={ displayTransform( loadedCategories ) }
 					saveTransform={ saveTransform( loadedCategories ) }
 					onChange={ ( tokens ) => {
-						setRelatedPosts( { ...relatedPosts, cat: tokens } );
+						setRelatedPosts( { ...relatedPosts, categories: tokens } );
 					} }
 				/>
 			) }
 			{ loadedTags && (
 				<FormTokenField
 					label={ __( 'Tags' ) }
-					value={ relatedPosts.tag }
+					value={ relatedPosts.tags }
 					suggestions={ tagSuggestions }
 					displayTransform={ displayTransform( loadedTags ) }
 					saveTransform={ saveTransform( loadedTags ) }
 					onChange={ ( tokens ) => {
-						setRelatedPosts( { ...relatedPosts, tag: tokens } );
+						setRelatedPosts( { ...relatedPosts, tags: tokens } );
 					} }
 				/>
 			) }

@@ -84,7 +84,7 @@ class ApiMaps extends Jeo_UnitApiTestCase {
 		$this->assertTrue( isset($data['meta']['layers'][0]['id']) );
 		$this->assertTrue( isset($data['meta']['layers'][0]['use']) );
 		$this->assertTrue( isset($data['meta']['related_posts']) );
-		$this->assertTrue( isset($data['meta']['related_posts']['cat']) );
+		$this->assertTrue( isset($data['meta']['related_posts']['categories']) );
 
 
 	}

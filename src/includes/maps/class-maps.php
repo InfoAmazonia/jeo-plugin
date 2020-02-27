@@ -114,8 +114,15 @@ class Maps {
 			'show_in_rest' => [
 				'schema' => [
 					'properties' => [
-						'cat' => [
+						'categories' => [
 							'description' => __('List of category IDs related posts must have', 'jeo'),
+							'type' => 'array',
+							'items' => [
+								'type' => 'integer'
+							]
+						],
+						'tags' => [
+							'description' => __('List of tag IDs related posts must have', 'jeo'),
 							'type' => 'array',
 							'items' => [
 								'type' => 'integer'
