@@ -61,6 +61,7 @@ const PostsSelector = ( {
 			/>
 
 			<MetaSelector
+				label={ __( 'Meta queries', 'jeo' ) }
 				value={ relatedPosts.meta_query }
 				onChange={ ( queries ) => {
 					setRelatedPosts( { ...relatedPosts, meta_query: queries } );

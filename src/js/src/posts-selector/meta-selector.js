@@ -13,14 +13,15 @@ function replace( arr, i, added = [] ) {
 }
 
 export function MetaSelector( {
-	value: _metas,
+	label,
 	onChange,
+	value: _metas,
 } ) {
 	const metas = _metas || [];
 
 	return (
 		<PanelRow className="jeo-meta-selector">
-			<label>{ __( 'Meta queries', 'jeo' ) }</label>
+			<label>{ label }</label>
 
 			{ metas.map( ( meta, i ) => (
 				<fieldset key={ i }>
