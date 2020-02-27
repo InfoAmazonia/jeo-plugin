@@ -5,7 +5,7 @@ export function TokensSelector( {
 	collection,
 	label,
 	loadingCollection,
-	onChange,
+	onChange: _onChange,
 	value,
 } ) {
 	const suggestions = useMemo( () => {
@@ -22,8 +22,12 @@ export function TokensSelector( {
 
 	const saveTransform = useCallback( ( item ) => {
 		const found = collection.find( ( x ) => x.name === item.trim() );
-		return found ? found.id : item;
+		return String( found ? found.id : item );
 	}, [ collection ] );
+
+	const onChange = useCallback( ( e ) => {
+		_onChange( e.map( Number ) );
+	}, [ _onChange ] );
 
 	return (
 		<FormTokenField
