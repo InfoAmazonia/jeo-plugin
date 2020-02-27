@@ -62,8 +62,8 @@ const PostsSelector = ( {
 
 			<MetaSelector
 				value={ relatedPosts.meta_query }
-				onChange={ ( meta ) => {
-					setRelatedPosts( { ...relatedPosts, meta_query: meta } );
+				onChange={ ( queries ) => {
+					setRelatedPosts( { ...relatedPosts, meta_query: queries } );
 				} }
 			/>
 		</Fragment>
