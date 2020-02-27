@@ -1,7 +1,9 @@
-import { FormTokenField } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment, useEffect, useMemo } from '@wordpress/element';
+import { Fragment, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+import { IntervalSelector } from './interval-selector';
+import { TokensSelector } from './tokens-selector';
 
 const PostsSelector = ( {
 	loadedCategories,
@@ -18,56 +20,44 @@ const PostsSelector = ( {
 		}
 	}, [ relatedPosts, setRelatedPosts ] );
 
-	const categorySuggestions = useMemo( () => {
-		if ( loadingCategories ) {
-			return [];
-		}
-		return loadedCategories.map( ( cat ) => cat.name );
-	}, [ loadedCategories, loadingCategories ] );
-
-	const tagSuggestions = useMemo( () => {
-		if ( loadingTags ) {
-			return [];
-		}
-		return loadedTags.map( ( tag ) => tag.name );
-	}, [ loadedTags, loadingTags ] );
-
-	const displayTransform = ( set ) => ( item ) => {
-		const found = set.find( ( x ) => x.id === item );
-		return found ? found.name : item;
-	};
-
-	const saveTransform = ( set ) => ( item ) => {
-		const found = set.find( ( x ) => x.name === item.trim() );
-		return found ? found.id : item;
-	};
-
 	return (
 		<Fragment>
 			{ loadedCategories && (
-				<FormTokenField
+				<TokensSelector
 					label={ __( 'Categories' ) }
+					collection={ loadedCategories }
+					loadingCollection={ loadingCategories }
 					value={ relatedPosts.categories }
-					suggestions={ categorySuggestions }
-					displayTransform={ displayTransform( loadedCategories ) }
-					saveTransform={ saveTransform( loadedCategories ) }
 					onChange={ ( tokens ) => {
 						setRelatedPosts( { ...relatedPosts, categories: tokens } );
 					} }
 				/>
 			) }
+
 			{ loadedTags && (
-				<FormTokenField
+				<TokensSelector
 					label={ __( 'Tags' ) }
+					collection={ loadedTags }
+					loadingCollection={ loadingTags }
 					value={ relatedPosts.tags }
-					suggestions={ tagSuggestions }
-					displayTransform={ displayTransform( loadedTags ) }
-					saveTransform={ saveTransform( loadedTags ) }
 					onChange={ ( tokens ) => {
 						setRelatedPosts( { ...relatedPosts, tags: tokens } );
 					} }
 				/>
 			) }
+
+			<IntervalSelector
+				startDate={ relatedPosts.after }
+				endDate={ relatedPosts.before }
+				startLabel={ __( 'Start date', 'jeo' ) }
+				endLabel={ __( 'End date', 'jeo' ) }
+				onStartChange={ ( date ) => {
+					setRelatedPosts( { ...relatedPosts, after: date ? date.toISOString() : undefined } );
+				} }
+				onEndChange={ ( date ) => {
+					setRelatedPosts( { ...relatedPosts, before: date ? date.toISOString() : undefined } );
+				} }
+			/>
 		</Fragment>
 	);
 };

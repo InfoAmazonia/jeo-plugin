@@ -127,7 +127,15 @@ class Maps {
 							'items' => [
 								'type' => 'integer'
 							]
-						]
+						],
+						'before' => [
+							'description' => __('Maximum date for related posts', 'jeo'),
+							'type' => 'string'
+						],
+						'after' => [
+							'description' => __('Minimum date for related posts', 'jeo'),
+							'type' => 'string'
+						],
 					]
 				]
 
