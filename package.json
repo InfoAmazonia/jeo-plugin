@@ -32,6 +32,7 @@
 		"leaflet": "^1.5.1",
 		"lodash.template": "^4.5.0",
 		"react-autosuggest": "^9.4.3",
+		"react-datepicker": "^2.13.0",
 		"react-jsonschema-form": "^2.0.0-alpha.1",
 		"react-leaflet": "^2.4.0",
 		"react-mapbox-gl": "^4.8.2",
