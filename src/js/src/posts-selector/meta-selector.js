@@ -3,8 +3,8 @@ import { __ } from '@wordpress/i18n';
 
 import './meta-selector.css';
 
-const comparators = [ '=', '!=', '>', '>=', '<', '<=', 'LIKE', 'NOT LIKE', 'IN', 'NOT IN', 'BETWEEN', 'NOT BETWEEN', 'NOT EXISTS', 'REGEXP', 'NOT REGEXP', 'RLIKE' ];
-const compareOptions = comparators.map( ( comp ) => {
+const comparators = '=,!=,>,>=,<,<=,LIKE,NOT LIKE,IN,NOT IN,BETWEEN,NOT BETWEEN,NOT EXISTS,REGEXP,NOT REGEXP,RLIKE';
+const compareOptions = comparators.split( ',' ).map( ( comp ) => {
 	return { label: comp, value: comp };
 } );
 
