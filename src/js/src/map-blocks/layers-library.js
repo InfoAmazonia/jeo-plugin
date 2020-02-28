@@ -11,11 +11,12 @@ const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
 const LayersLibrary = ( {
 	loadingLayers,
 	loadedLayers,
-	selected,
-	setLayers,
+	attributes,
+	setAttributes,
 } ) => {
 	const [ editing, setEditing ] = useState( false );
 	const [ search, setSearch ] = useState( '' );
+	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 
 	if ( loadingLayers ) {
 		return <p>{ __( 'Loading layers data...' ) }</p>;
@@ -36,7 +37,7 @@ const LayersLibrary = ( {
 		)
 		.map( ( layer ) => ( {
 			...layer,
-			selected: selected.some( ( settings ) => settings.id === layer.id ),
+			selected: attributes.layers.some( ( settings ) => settings.id === layer.id ),
 		} ) );
 
 	return (
@@ -63,7 +64,9 @@ const LayersLibrary = ( {
 								layer.selected ? 'layer-added' : 'layer-add',
 							] ) }
 							disabled={ layer.selected }
-							onClick={ () => setLayers( [ ...selected, setLayer( layer.id ) ] ) }
+							onClick={ () =>
+								setLayers( [ ...attributes.layers, setLayer( layer.id ) ] )
+							}
 						>
 							<Dashicon icon={ layer.selected ? 'yes-alt' : 'plus-alt' } />
 							{ layer.selected ? __( 'Added' ) : __( 'Add' ) }
