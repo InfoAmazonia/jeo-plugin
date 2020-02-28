@@ -1,9 +1,10 @@
-import { Dashicon, PanelBody, PanelRow, Spinner, TextControl } from '@wordpress/components';
+import { PanelBody, PanelRow, Spinner, TextControl } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { Fragment, useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import React from 'react';
 import Autosuggest from 'react-autosuggest';
+
 import './map-editor.css';
 
 const MapEditor = ( {
@@ -55,13 +56,7 @@ const MapEditor = ( {
 
 	return (
 		<Fragment>
-			{ currentMap && (
-				<Fragment>
-					<Dashicon icon="location-alt" />
-					{ ' ' }
-					{ currentMap.title.rendered }
-				</Fragment>
-			) }
+			{ currentMap && currentMap.title.rendered }
 			{ loadingMaps ?
 				<Spinner /> :
 				<Autosuggest

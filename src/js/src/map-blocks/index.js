@@ -5,11 +5,13 @@ import MapEditor from './map-editor';
 import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
 
+import MapIcon from '../icons/ion/map';
+
 registerBlockType( 'jeo/map', {
-	title: __( 'Map' ),
+	title: __( 'JEO Map' ),
 	description: __( 'Display maps with layers and data' ),
 	category: 'common', // @TODO: add jeo maps category
-	icon: 'location-alt',
+	icon: MapIcon,
 	attributes: {
 		map_id: {
 			type: 'number',
@@ -26,10 +28,10 @@ registerBlockType( 'jeo/map', {
 } );
 
 registerBlockType( 'jeo/onetime-map', {
-	title: __( 'One-time Map' ),
+	title: __( 'JEO One-time Map' ),
 	description: __( 'Display maps with layers and data' ),
 	category: 'common', // @TODO: add jeo maps category
-	icon: 'location-alt',
+	icon: MapIcon,
 	attributes: {
 		layers: {
 			type: 'array',
