@@ -34,7 +34,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 };
 
 registerPlugin( 'jeo-posts-sidebar', {
-	icon: 'location-alt',
+	icon: null,
 	render: () => {
 		return (
 			<PluginDocumentSettingPanel
