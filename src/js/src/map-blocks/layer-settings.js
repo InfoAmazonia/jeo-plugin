@@ -6,11 +6,12 @@ import {
 } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import classNames from 'classnames';
+import { layerUseLabels } from './utils';
 
 const useOptions = [
-	{ label: __( 'Fixed' ), value: 'fixed' },
-	{ label: __( 'Swappable' ), value: 'swappable' },
-	{ label: __( 'Switchable' ), value: 'switchable' },
+	{ label: layerUseLabels.fixed, value: 'fixed' },
+	{ label: layerUseLabels.swappable, value: 'swappable' },
+	{ label: layerUseLabels.switchable, value: 'switchable' },
 ];
 
 export default forwardRef(
