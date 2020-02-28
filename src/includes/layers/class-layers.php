@@ -38,6 +38,7 @@ class Layers {
 			'show_in_rest'        => true,
 			'public'              => true,
 			'show_in_menu'        => true,
+			'menu_icon' 		  => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/ion/layers.svg')),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
 			'capability_type'     => 'page',
