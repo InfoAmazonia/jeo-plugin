@@ -58,7 +58,7 @@
  * Map Settings
  */
 
- .jeo-map-settings {
+.jeo-map-settings {
 	display: flex;
 	margin: 0 -1em;
 }
@@ -66,6 +66,10 @@
 .jeo-map-settings section {
 	flex-grow: 1;
 	margin: 1em;
+}
+
+.jeo-map-settings .map-preview {
+	flex-grow: 0;
 }
 
 /**
@@ -246,4 +250,24 @@
 
 .jeo-layer-editor .save-layer {
 	margin-right: 1em;
+}
+
+/**
+ * Sidebar Panels
+ */
+.jeo-setting {
+	display: flex;
+	justify-content: space-between;
+}
+.jeo-setting__title {
+	font-weight: bold;
+}
+.jeo-setting + button {
+	margin-top: 1em;
+}
+.jeo-setting-layer h2 {
+	margin-bottom: 0;
+}
+.jeo-layers-panel button + button {
+	margin-top: 1em;
 }

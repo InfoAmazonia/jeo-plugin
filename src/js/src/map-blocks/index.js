@@ -60,6 +60,7 @@ registerBlockType( 'jeo/onetime-map', {
 		max_zoom: {
 			type: 'number',
 		},
+		related_posts: {},
 	},
 	edit: ( props ) => <OnetimeMapEditor { ...props } />,
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,

@@ -22,24 +22,26 @@ export default ( { attributes, setAttributes } ) => {
 
 	return (
 		<Fragment>
-			{ MapboxAPIKey && (
-				<Map
-					style="mapbox://styles/mapbox/streets-v11"
-					containerStyle={ { height: '20vh' } }
-					zoom={ [ initialZoom || 11 ] }
-					center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
-					onMoveEnd={ ( map ) => {
-						const center = map.getCenter();
-						setAttributes( {
-							...attributes,
-							center_lat: center.lat,
-							center_lon: center.lng,
-							initial_zoom: Math.round( map.getZoom() * 10 ) / 10,
-						} );
-					} }
-				/>
-			) }
 			<form className="jeo-map-settings">
+				<section className="map-preview">
+					{ MapboxAPIKey && (
+						<Map
+							style="mapbox://styles/mapbox/streets-v11"
+							containerStyle={ { height: '500px', width: '600px' } }
+							zoom={ [ initialZoom || 11 ] }
+							center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
+							onMoveEnd={ ( map ) => {
+								const center = map.getCenter();
+								setAttributes( {
+									...attributes,
+									center_lat: center.lat,
+									center_lon: center.lng,
+									initial_zoom: Math.round( map.getZoom() * 10 ) / 10,
+								} );
+							} }
+						/>
+					) }
+				</section>
 				<section className="center">
 					<h3>{ __( 'Center' ) }</h3>
 					<TextControl

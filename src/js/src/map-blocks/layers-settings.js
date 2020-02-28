@@ -1,12 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
-import LayerSettings from './layer-settings.js';
-
-const layerLoader = ( layers ) => {
-	const layersMap = Object.fromEntries( layers.map( ( l ) => [ l.id, l ] ) );
-	return ( settings ) => ( { ...settings, layer: layersMap[ settings.id ] } );
-};
+import LayerSettings from './layer-settings';
+import { layerLoader } from './utils';
 
 const anySwapDefault = ( settings ) =>
 	settings.some( ( s ) => s.use === 'swappable' && s.default );
