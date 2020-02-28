@@ -43,7 +43,7 @@ class Maps {
 			'show_in_menu' => true,
 			'show_in_rest' => true,
 			'menu_position' => 4,
-			'menu_icon' => 'dashicons-location-alt',
+			'menu_icon' => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/ion/map.svg')),
 			'has_archive' => true,
 			'exclude_from_search' => true,
 			'capability_type' => 'page'
