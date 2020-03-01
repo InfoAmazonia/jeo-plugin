@@ -1,7 +1,6 @@
 import { Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import LayersLibrary from './layers-library';
 import LayersSettings from './layers-settings';
 import MapSettings from './map-settings';
 import { TabPanel } from '../common-components';
@@ -9,7 +8,6 @@ import { TabPanel } from '../common-components';
 const tabs = [
 	{ name: 'map', title: __( 'Map Settings' ), className: 'tab-map' },
 	{ name: 'layers', title: __( 'Map Layers' ), className: 'tab-layers' },
-	{ name: 'library', title: __( 'Layers Library' ), className: 'tab-library' },
 ];
 
 export default ( {
@@ -47,13 +45,6 @@ export default ( {
 								setAttributes={ setAttributes }
 								loadedLayers={ loadedLayers }
 								loadingLayers={ loadingLayers }
-							/>
-						);
-					case 'library':
-						return (
-							<LayersLibrary
-								attributes={ attributes }
-								setAttributes={ setAttributes }
 							/>
 						);
 				}

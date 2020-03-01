@@ -60,10 +60,6 @@ const OnetimeMapEditor = ( {
 				<Button isPrimary isLarge onClick={ () => setModal( 'layers' ) }>
 					{ __( 'Edit layers settings' ) }
 				</Button>
-
-				<Button isPrimary isLarge onClick={ () => setModal( 'library' ) }>
-					{ __( 'Add or remove layers' ) }
-				</Button>
 			</div>
 		</Fragment>
 	);

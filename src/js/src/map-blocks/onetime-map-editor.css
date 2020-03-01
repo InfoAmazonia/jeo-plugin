@@ -135,6 +135,7 @@
 /**
  * Layers Library
  */
+.jeo-layers-library-controls,
 .jeo-layers-library .library-controls {
 	display: flex;
 	align-items: center;
@@ -142,17 +143,20 @@
 	padding: 1em 0;
 }
 
+.jeo-layers-library-controls .components-base-control__field,
 .jeo-layers-library .library-controls .components-base-control__field {
 	display: flex;
 	align-items: center;
 	margin: 0;
 }
 
+.jeo-layers-library-controls .components-base-control__label,
 .jeo-layers-library .library-controls .components-base-control__label {
 	margin: 0 1em 0;
 	flex-basis: 100%;
 }
 
+.jeo-layers-library-controls > span,
 .jeo-layers-library .library-controls > span {
 	flex-basis: 4em;
 	text-align: center;
