@@ -18,6 +18,8 @@ export default forwardRef(
 	(
 		{
 			isDragged,
+			isOutOfBounds,
+			isSelected,
 			removeLayer,
 			settings,
 			swapDefault,
@@ -28,7 +30,12 @@ export default forwardRef(
 		},
 		ref
 	) => {
-		const classes = classNames( [ 'layer', { dragging: isDragged } ] );
+		const classes = classNames( [
+			'layer',
+			{ dragging: isDragged },
+			{ selected: isSelected },
+			{ isoutofbounds: isOutOfBounds },
+		] );
 		const setWidth = ( index ) =>
 			isDragged && widths.length ? { width: widths[ index ] } : {};
 		props.style.zIndex = isDragged && 320000;
@@ -67,7 +74,10 @@ export default forwardRef(
 						/>
 					) }
 				</td>
-				<td className="remove-control" style={ setWidth( 4 ) }>
+				<td className="layer-actions" style={ setWidth( 4 ) }>
+					<a href={ `/wp-admin/post.php?post=${ settings.id }&action=edit` }>
+						<Dashicon icon="welcome-write-blog" />
+					</a>
 					<Dashicon icon="dismiss" onClick={ removeLayer } />
 				</td>
 			</tr>
