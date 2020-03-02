@@ -2,7 +2,7 @@
 
 namespace Jeo;
 
-class Posts_Selector {
+class Sidebars {
 
 	use Singleton;
 
@@ -25,6 +25,13 @@ class Posts_Selector {
 		wp_enqueue_script(
 			'jeo-posts-selector',
 			JEO_BASEURL . '/js/build/postsSelector.js',
+			$asset_file['dependencies'],
+			$asset_file['version']
+		);
+
+		wp_enqueue_script(
+			'jeo-layer-sidebar',
+			JEO_BASEURL . '/js/build/layerSidebar.js',
 			$asset_file['dependencies'],
 			$asset_file['version']
 		);

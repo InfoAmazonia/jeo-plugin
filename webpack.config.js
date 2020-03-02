@@ -4,6 +4,7 @@ const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack
 module.exports = {
 	...defaultConfig,
 	entry: {
+		layerSidebar: './src/js/src/layer-sidebar/index.js',
 		postsSelector: './src/js/src/posts-selector/index.js',
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
 		mapboxglLoader: './src/js/src/mapboxgl-loader.js',
