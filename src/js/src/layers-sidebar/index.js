@@ -5,7 +5,8 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
-import LayerEditor from './layer-editor';
+import LayerEditor from './components/layer-editor';
+import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 
 domReady( () => {
 	const currentPostType = select( 'core/editor' ).getCurrentPostType();
@@ -16,9 +17,14 @@ domReady( () => {
 			render: () => {
 				return (
 					<Fragment>
-						<PluginDocumentSettingPanel title={ __( 'Settings' ) }>
+						<PluginDocumentSettingPanel name="layer-settings" title={ __( 'Settings' ) }>
 							<LayerEditor />
 						</PluginDocumentSettingPanel>
+
+						<PluginDocumentSettingPanel name="legend-settings" title={ __( 'Legend' ) }>
+							<LegendsEditor />
+						</PluginDocumentSettingPanel>
+
 					</Fragment>
 				);
 			},

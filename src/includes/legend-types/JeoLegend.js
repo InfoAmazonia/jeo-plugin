@@ -1,8 +1,8 @@
-import JeoLegendTypes from './JeoLegendTypes'
+import JeoLegendTypes from './JeoLegendTypes';
 
 class JeoLegend {
-	constructor(legendTypeSlug, attributes) {
-		this.legendType = JeoLegendTypes.getLegendType(legendTypeSlug);
+	constructor( legendTypeSlug, attributes ) {
+		this.legendType = JeoLegendTypes.getLegendType( legendTypeSlug );
 		this.attributes = attributes;
 
 	}
