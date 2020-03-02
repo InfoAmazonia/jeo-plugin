@@ -1,18 +1,15 @@
 import Form from 'react-jsonschema-form';
 import { Button } from '@wordpress/components';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
-const registry = window.JeoLayerTypes;
 
 const layerSchema = {
 	type: 'object',
 	properties: {
-		title: { title: __( 'Title' ), type: 'string' },
 		type: { title: __( 'Type' ), type: 'string' },
 	},
-	required: [ 'title', 'type' ],
+	required: [ 'type' ],
 };
 
 const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
@@ -23,21 +20,23 @@ const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 			delete property.description;
 		}
 	} );
-	options.title = ''; // hides options title
 	setWidgets( widgets );
 	setOptions( options );
 };
 
-const LayerEditor = ( { backToLibrary, save } ) => {
+const LayerSettings = ( {
+	postMeta,
+	setPostMeta,
+} ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
-	const [ formState, setFormState ] = useState( {} );
-	layerSchema.properties.type.enum = registry.getLayerTypes();
-	layerSchema.properties.options = options;
+	const [ formState, setFormState ] = useState( postMeta );
+	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
+	layerSchema.properties.layer_type_options = options;
 
 	useEffect( () => {
 		if ( formState.type ) {
-			registry
+			window.JeoLayerTypes
 				.getLayerTypeSchema( formState.type )
 				.then( formUpdater( setOptions, setWidgets ) );
 		} else {
@@ -55,15 +54,8 @@ const LayerEditor = ( { backToLibrary, save } ) => {
 			onChange={ ( { formData } ) => setFormState( formData ) }
 			onSubmit={ ( { formData }, event ) => {
 				event.preventDefault();
-				const { title, type, options: layerTypeOptions } = formData;
-				const query = {
-					title,
-					meta: { type, layer_type_options: layerTypeOptions },
-					status: 'publish',
-				};
-				save( 'postType', 'map-layer', query ).then( ( savedLayer ) =>
-					backToLibrary()
-				);
+				const { type, layer_type_options } = formData;
+				setPostMeta( { type, layer_type_options } );
 			} }
 		>
 			<Button
@@ -74,19 +66,18 @@ const LayerEditor = ( { backToLibrary, save } ) => {
 			>
 				{ __( 'Save' ) }
 			</Button>
-			<Button
-				className="cancel-layer"
-				type="button"
-				isLarge={ true }
-				isSecondary={ true }
-				onClick={ backToLibrary }
-			>
-				{ __( 'Cancel' ) }
-			</Button>
 		</Form>
 	);
 };
 
-export default withDispatch( ( dispatch ) => ( {
-	save: dispatch( 'core' ).saveEntityRecord,
-} ) )( LayerEditor );
+export default withDispatch(
+	( dispatch ) => ( {
+		setPostMeta: ( meta ) => {
+			dispatch( 'core/editor' ).editPost( { meta } );
+		},
+	} )
+)( withSelect(
+	( select ) => ( {
+		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
+	} )
+)( LayerSettings ) );

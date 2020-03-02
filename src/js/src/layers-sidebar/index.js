@@ -7,6 +7,7 @@ import { registerPlugin } from '@wordpress/plugins';
 
 import LayerEditor from './components/layer-editor';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
+import LayerSettings from './layer-settings';
 
 domReady( () => {
 	const currentPostType = select( 'core/editor' ).getCurrentPostType();
