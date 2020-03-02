@@ -33,7 +33,7 @@ class Layers {
 			'labels'              => $labels,
 			'hierarchical'        => true,
 			'description'         => __( 'JEO Layers', 'jeo' ),
-			'supports'            => array( 'title', 'custom-fields' ),
+			'supports'            => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'layers' ),
 			'show_in_rest'        => true,
 			'public'              => true,
