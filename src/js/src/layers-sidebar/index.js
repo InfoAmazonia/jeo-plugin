@@ -5,7 +5,7 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
-import LayerEditor from './layer-editor';
+import LayerSettings from './layer-settings';
 
 domReady( () => {
 	const currentPostType = select( 'core/editor' ).getCurrentPostType();
@@ -17,7 +17,7 @@ domReady( () => {
 				return (
 					<Fragment>
 						<PluginDocumentSettingPanel title={ __( 'Settings' ) }>
-							<LayerEditor />
+							<LayerSettings />
 						</PluginDocumentSettingPanel>
 					</Fragment>
 				);
