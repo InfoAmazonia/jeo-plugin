@@ -47,7 +47,7 @@ const OnetimeMapEditor = ( {
 				<Map
 					style="mapbox://styles/mapbox/streets-v11"
 					zoom={ [ attributes.initial_zoom || 11 ] }
-					center={ [ attributes.center_lon || 0, attributes.center_lon || 0 ] }
+					center={ [ attributes.center_lon || 0, attributes.center_lat || 0 ] }
 					containerStyle={ { height: '20vh' } }
 				/>
 			</div>
