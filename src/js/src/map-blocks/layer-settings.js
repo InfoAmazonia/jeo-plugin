@@ -75,7 +75,7 @@ export default forwardRef(
 					) }
 				</td>
 				<td className="layer-actions" style={ setWidth( 4 ) }>
-					<a href={ `/wp-admin/post.php?post=${ settings.id }&action=edit` }>
+					<a href={ `/wp-admin/post.php?post=${ settings.id }&action=edit` } target="_blank" rel="noopener noreferrer">
 						<Dashicon icon="welcome-write-blog" />
 					</a>
 					<Dashicon icon="dismiss" onClick={ removeLayer } />

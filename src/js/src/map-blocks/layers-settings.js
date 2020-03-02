@@ -35,6 +35,8 @@ export default ( { attributes, setAttributes, loadingLayers, loadedLayers } ) =>
 					isPrimary
 					isLarge
 					href="/wp-admin/post-new.php?post_type=map-layer"
+					target="_blank"
+					rel="noopener noreferrer"
 				>
 					{ __( 'Create New Layer' ) }
 				</Button>
