@@ -1,3 +1,3 @@
 export default function() {
-	return 'Coming soon...';
+	return '1.61803398875';
 }
