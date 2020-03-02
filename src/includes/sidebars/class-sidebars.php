@@ -31,7 +31,7 @@ class Sidebars {
 
 		wp_enqueue_script(
 			'jeo-layer-sidebar',
-			JEO_BASEURL . '/js/build/layerSidebar.js',
+			JEO_BASEURL . '/js/build/layersSidebar.js',
 			$asset_file['dependencies'],
 			$asset_file['version']
 		);
