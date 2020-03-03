@@ -23,15 +23,15 @@ class Sidebars {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
 		wp_enqueue_script(
-			'jeo-posts-selector',
-			JEO_BASEURL . '/js/build/postsSelector.js',
+			'jeo-layers-sidebar',
+			JEO_BASEURL . '/js/build/layersSidebar.js',
 			$asset_file['dependencies'],
 			$asset_file['version']
 		);
 
 		wp_enqueue_script(
-			'jeo-layers-sidebar',
-			JEO_BASEURL . '/js/build/layersSidebar.js',
+			'jeo-maps-sidebar',
+			JEO_BASEURL . '/js/build/mapsSidebar.js',
 			$asset_file['dependencies'],
 			$asset_file['version']
 		);
