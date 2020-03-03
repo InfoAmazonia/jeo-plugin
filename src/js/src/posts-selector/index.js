@@ -1,4 +1,4 @@
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { Fragment, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -16,7 +16,7 @@ const PostsSelector = ( {
 } ) => {
 	useEffect( () => {
 		/* relatedPosts is often nullish if schema doesn't match */
-		if ( relatedPosts == null ) {
+		if ( ! relatedPosts ) {
 			setRelatedPosts( {} );
 		}
 	}, [ relatedPosts, setRelatedPosts ] );
@@ -71,13 +71,7 @@ const PostsSelector = ( {
 	);
 };
 
-export default withDispatch(
-	( dispatch ) => ( {
-		setRelatedPosts: ( value ) => {
-			dispatch( 'core/editor' ).editPost( { meta: { related_posts: value } } );
-		},
-	} )
-)( withSelect(
+export default withSelect(
 	( select ) => ( {
 		loadedCategories: select( 'core' ).getEntityRecords( 'taxonomy', 'category' ),
 		loadingCategories: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
@@ -89,6 +83,5 @@ export default withDispatch(
 			'taxonomy',
 			'post_tag',
 		] ),
-		relatedPosts: select( 'core/editor' ).getEditedPostAttribute( 'meta' ).related_posts,
 	} )
-)( PostsSelector ) );
+)( PostsSelector );
