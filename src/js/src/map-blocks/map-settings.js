@@ -8,14 +8,23 @@ const MapboxAPIKey = window.jeo_settings.mapbox_key;
 
 const Map = ReactMapboxGl( { accessToken: MapboxAPIKey } );
 
+const mapDefaults = {
+	initial_zoom: jeo_settings.map_defaults.zoom,
+	center_lat: jeo_settings.map_defaults.lat,
+	center_lon: jeo_settings.map_defaults.lng,
+	min_zoom: 0,
+	max_zoom: 20
+};
+
 export default ( { attributes, setAttributes } ) => {
+
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
 		initial_zoom: initialZoom,
 		min_zoom: minZoom,
 		max_zoom: maxZoom,
-	} = attributes;
+	} = { ...mapDefaults, ...attributes };
 
 	const attributeUpdater = ( attribute ) => ( value ) =>
 		setAttributes( { ...attributes, [ attribute ]: value } );
