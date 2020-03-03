@@ -1,5 +1,4 @@
 import Form from 'react-jsonschema-form';
-import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -13,10 +12,10 @@ const layerSchema = {
 };
 
 const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
-	const widgets = { options: {} };
+	const widgets = { layer_type_options: {} };
 	Object.entries( options.properties ).forEach( ( [ key, property ] ) => {
 		if ( property.description ) {
-			widgets.options[ key ] = { 'ui:help': property.description };
+			widgets.layer_type_options[ key ] = { 'ui:help': property.description };
 			delete property.description;
 		}
 	} );
@@ -30,42 +29,30 @@ const LayerSettings = ( {
 } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
-	const [ formState, setFormState ] = useState( postMeta );
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
 	layerSchema.properties.layer_type_options = options;
 
 	useEffect( () => {
-		if ( formState.type ) {
+		if ( postMeta.type ) {
 			window.JeoLayerTypes
-				.getLayerTypeSchema( formState.type )
+				.getLayerTypeSchema( postMeta.type )
 				.then( formUpdater( setOptions, setWidgets ) );
 		} else {
 			setOptions( {} );
 			setWidgets( {} ); // technically unnecessary
 		}
-	}, [ formState.type ] );
+	}, [ postMeta.type ] );
 
 	return (
 		<Form
-			className="jeo-layer-editor"
+			className="jeo-layer-settings"
 			schema={ layerSchema }
 			uiSchema={ widgets }
-			formData={ formState }
-			onChange={ ( { formData } ) => setFormState( formData ) }
-			onSubmit={ ( { formData }, event ) => {
-				event.preventDefault();
-				const { type, layer_type_options } = formData;
-				setPostMeta( { type, layer_type_options } );
-			} }
+			formData={ postMeta }
+			onChange={ ( { formData } ) => setPostMeta( formData ) }
 		>
-			<Button
-				className="save-layer"
-				type="submit"
-				isLarge={ true }
-				isPrimary={ true }
-			>
-				{ __( 'Save' ) }
-			</Button>
+			{ /* Hide submit button */ }
+			<div />
 		</Form>
 	);
 };
