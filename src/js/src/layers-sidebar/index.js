@@ -24,7 +24,6 @@ domReady( () => {
 						<PluginDocumentSettingPanel name="legend-settings" title={ __( 'Legend' ) }>
 							<LegendsEditor />
 						</PluginDocumentSettingPanel>
-
 					</Fragment>
 				);
 			},
