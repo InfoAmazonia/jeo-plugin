@@ -1,10 +1,11 @@
 import { registerPlugin } from '@wordpress/plugins';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { Component, Fragment } from '@wordpress/element';
 import { Modal, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoGeocodePosts from './geo-posts';
 
-const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
+const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 	constructor() {
 		super();
 		this.state = {
@@ -14,7 +15,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 	render() {
 		const isOpen = this.state.isOpen;
 		return (
-			<>
+			<Fragment>
 				<Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>
 					{ __( 'Geolocate this post', 'jeo' ) }
 				</Button>
@@ -28,7 +29,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends React.Component {
 						/>
 					</Modal>
 				) }
-			</>
+			</Fragment>
 		);
 	}
 };

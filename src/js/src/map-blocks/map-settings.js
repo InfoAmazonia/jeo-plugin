@@ -1,4 +1,3 @@
-import React from 'react';
 import ReactMapboxGl from 'react-mapbox-gl';
 import { TextControl, RangeControl } from '@wordpress/components';
 import { Fragment } from '@wordpress/element';
