@@ -17,6 +17,27 @@
 				<tbody>
 
 					<tr>
+						<th scope="row"><label for="map_default_lat"><?php _e('Default map latitute', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo $this->get_field_name('map_default_lat'); ?>" type="number" step=".1" id="map_default_lat" value="<?php echo htmlspecialchars( $this->get_option('map_default_lat') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="map_default_lng"><?php _e('Default map longitude', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo $this->get_field_name('map_default_lng'); ?>" type="number" step=".1" id="map_default_lng" value="<?php echo htmlspecialchars( $this->get_option('map_default_lng') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="map_default_zoom"><?php _e('Default map zoom', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo $this->get_field_name('map_default_zoom'); ?>" type="number" id="map_default_zoom" value="<?php echo htmlspecialchars( $this->get_option('map_default_zoom') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+					<tr>
 						<th scope="row"><label for="mapbox_key"><?php _e('Mapbox API Key', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo $this->get_field_name('mapbox_key'); ?>" type="text" id="mapbox_key" value="<?php echo htmlspecialchars( $this->get_option('mapbox_key') ); ?>" class="regular-text">

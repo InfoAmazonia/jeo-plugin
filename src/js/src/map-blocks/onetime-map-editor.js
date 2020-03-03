@@ -46,8 +46,11 @@ const OnetimeMapEditor = ( {
 			<div className="jeo-preview-area">
 				<Map
 					style="mapbox://styles/mapbox/streets-v11"
-					zoom={ [ attributes.initial_zoom || 11 ] }
-					center={ [ attributes.center_lon || 0, attributes.center_lat || 0 ] }
+					zoom={ [ attributes.initial_zoom || jeo_settings.map_defaults.zoom ] }
+					center={ [
+						attributes.center_lon || jeo_settings.map_defaults.lng,
+						attributes.center_lat || jeo_settings.map_defaults.lat
+					] }
 					containerStyle={ { height: '20vh' } }
 				/>
 			</div>

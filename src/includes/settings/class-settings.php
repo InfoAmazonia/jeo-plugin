@@ -14,7 +14,10 @@ class Settings {
 			'enabled_post_types' => [
 				'post'
 			],
-			'active_geocoder' => 'nominatim'
+			'active_geocoder' => 'nominatim',
+			'map_default_zoom' => 11,
+			'map_default_lat' => -23.54998517,
+			'map_default_lng' => -46.65599340,
 		];
 
 		add_action('admin_menu', [$this, 'add_menu_item']);
