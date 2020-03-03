@@ -4,14 +4,14 @@ const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack
 module.exports = {
 	...defaultConfig,
 	entry: {
-		layersSidebar: './src/js/src/layers-sidebar/index.js',
-		postsSelector: './src/js/src/posts-selector/index.js',
-		postsSidebar: './src/js/src/posts-sidebar/index.js',
 		mapboxglLoader: './src/js/src/mapboxgl-loader.js',
 		jeoMap: './src/js/src/jeo-map/index.js',
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
 		mapBlocks: './src/js/src/map-blocks/index.js',
+		layersSidebar: './src/js/src/layers-sidebar/index.js',
+		mapsSidebar: './src/js/src/maps-sidebar/index.js',
+		postsSidebar: './src/js/src/posts-sidebar/index.js',
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),
