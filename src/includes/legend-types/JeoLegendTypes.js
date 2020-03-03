@@ -17,5 +17,9 @@ class JeoLegendTypes {
 	}
 }
 const instance = new JeoLegendTypes();
-window.JeoLegendTypes = instance;
+
+if ( window.JeoLegendTypes === undefined ) {
+	window.JeoLegendTypes = instance;
+}
+
 export default instance;

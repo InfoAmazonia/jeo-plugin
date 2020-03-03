@@ -4,8 +4,6 @@ import { withSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import classNames from 'classnames';
 
-import LayerEditor from './layer-editor';
-
 const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
 
 const LayersLibrary = ( {
@@ -20,15 +18,6 @@ const LayersLibrary = ( {
 
 	if ( loadingLayers ) {
 		return <p>{ __( 'Loading layers data...' ) }</p>;
-	}
-
-	if ( editing ) {
-		return (
-			<div className="jeo-layers-library">
-				<h3>{ __( 'Create a new Layer' ) }</h3>
-				<LayerEditor layer={ editing } backToLibrary={ () => setEditing( false ) } />
-			</div>
-		);
 	}
 
 	const options = loadedLayers

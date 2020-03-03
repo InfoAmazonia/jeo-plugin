@@ -28,7 +28,7 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 	},
 
 	render( map, attributes ) {
-console.log(attributes);
+		console.log(attributes);
 		const container = document.createElement( 'div' );
 		container.classList.add( 'circles-container' );
 
