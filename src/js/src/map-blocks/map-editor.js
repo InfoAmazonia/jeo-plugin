@@ -2,7 +2,6 @@ import { PanelBody, PanelRow, Spinner, TextControl } from '@wordpress/components
 import { withSelect } from '@wordpress/data';
 import { Fragment, useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import React from 'react';
 import Autosuggest from 'react-autosuggest';
 
 import './map-editor.css';

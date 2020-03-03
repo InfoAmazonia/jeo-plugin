@@ -1,6 +1,6 @@
-import React from 'react';
-import classNames from 'classnames';
 import { TabPanel } from '@wordpress/components';
+import classNames from 'classnames';
+
 import './tab-panel.css';
 
 export default function( { children, className, ...props } ) {

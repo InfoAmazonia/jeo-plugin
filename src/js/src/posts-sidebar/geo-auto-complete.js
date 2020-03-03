@@ -1,10 +1,11 @@
-import React from 'react';
-import Autosuggest from 'react-autosuggest';
 import { Spinner } from '@wordpress/components';
-import './geo-auto-complete.css';
+import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import Autosuggest from 'react-autosuggest';
 
-class JeoGeoAutoComplete extends React.Component {
+import './geo-auto-complete.css';
+
+class JeoGeoAutoComplete extends Component {
 	constructor() {
 		super();
 		this.state = {

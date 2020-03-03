@@ -1,14 +1,14 @@
-import React from 'react';
-import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
-import classNames from 'classnames';
 import { Button, RadioControl } from '@wordpress/components';
+import { Component, createRef, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import classNames from 'classnames';
+import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
 
 import { TabPanel } from '../common-components';
 import JeoGeoAutoComplete from './geo-auto-complete';
 import './geo-posts.css';
 
-class JeoGeocodePosts extends React.Component {
+class JeoGeocodePosts extends Component {
 	constructor() {
 		super();
 		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
@@ -32,7 +32,7 @@ class JeoGeocodePosts extends React.Component {
 		this.newPoint = this.newPoint.bind( this );
 		this.deletePoint = this.deletePoint.bind( this );
 
-		this.refMap = React.createRef();
+		this.refMap = createRef();
 	}
 
 	/**
@@ -210,7 +210,7 @@ class JeoGeocodePosts extends React.Component {
 						] }>
 						{
 							( tab ) => (
-								<>
+								<Fragment>
 									{
 										tab.name === 'list' && (
 											points.length === 0 ?
@@ -268,7 +268,7 @@ class JeoGeocodePosts extends React.Component {
 
 										</LeafletMap>
 									</div>
-								</>
+								</Fragment>
 							)
 						}
 					</TabPanel>
