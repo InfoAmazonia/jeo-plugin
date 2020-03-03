@@ -5,7 +5,7 @@ import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
-import PostsSelector from '../posts-selector';
+import PostsSelector from './posts-selector';
 
 domReady( () => {
 	const currentPostType = select( 'core/editor' ).getCurrentPostType();
