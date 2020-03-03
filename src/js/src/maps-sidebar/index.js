@@ -1,6 +1,7 @@
 import { select } from '@wordpress/data';
 import domReady from '@wordpress/dom-ready';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 
@@ -14,9 +15,11 @@ domReady( () => {
 			icon: null,
 			render: () => {
 				return (
-					<PluginDocumentSettingPanel title={ __( 'Related posts', 'jeo' ) }>
-						<PostsSelector />
-					</PluginDocumentSettingPanel>
+					<Fragment>
+						<PluginDocumentSettingPanel title={ __( 'Related posts', 'jeo' ) }>
+							<PostsSelector />
+						</PluginDocumentSettingPanel>
+					</Fragment>
 				);
 			},
 		} );
