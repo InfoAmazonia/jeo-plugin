@@ -5,6 +5,7 @@ class JeoLegend {
 		this.__legendType = JeoLegendTypes.getLegendType( legendTypeSlug );
 		this.__legendSlug = legendTypeSlug;
 		this.attributes = attributes;
+
 	}
 
 	render( map ) {
