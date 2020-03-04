@@ -1,7 +1,7 @@
 import { withSelect } from '@wordpress/data';
 import { Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
+import { Button, PanelBody } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 
 import Map from './map';
@@ -34,12 +34,16 @@ const OnetimeMapEditor = ( {
 			) }
 
 			<InspectorControls>
-				<MapPanel attributes={ attributes } setModal={ setModal } />
+				<MapPanel
+					attributes={ attributes }
+					setModal={ setModal }
+					panel={ PanelBody } />
 				<LayersPanel
 					attributes={ attributes }
 					setModal={ setModal }
 					loadLayer={ loadLayer }
 					loadingLayers={ loadingLayers }
+					panel={ PanelBody }
 				/>
 			</InspectorControls>
 

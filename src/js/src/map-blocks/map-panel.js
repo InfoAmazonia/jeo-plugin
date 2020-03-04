@@ -1,5 +1,5 @@
 import { __ } from '@wordpress/i18n';
-import { Button, PanelBody } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 
 const SettingDisplay = ( { title, value } ) => (
 	<div className="jeo-setting">
@@ -10,8 +10,8 @@ const SettingDisplay = ( { title, value } ) => (
 	</div>
 );
 
-export default ( { attributes, setModal } ) => (
-	<PanelBody title={ __( 'Map settings' ) } className="jeo-map-panel">
+export default ( { attributes, panel: Panel, setModal } ) => (
+	<Panel title={ __( 'Map settings' ) } className="jeo-map-panel">
 		<h2>{ __( 'Initial map center' ) }</h2>
 		<SettingDisplay title={ __( 'Latitude' ) } value={ attributes.center_lat } />
 		<SettingDisplay title={ __( 'Longitude' ) } value={ attributes.center_lon } />
@@ -25,5 +25,5 @@ export default ( { attributes, setModal } ) => (
 		<Button isPrimary isLarge onClick={ () => setModal( 'map' ) }>
 			{ __( 'Edit map settings' ) }
 		</Button>
-	</PanelBody>
+	</Panel>
 );
