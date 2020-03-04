@@ -1,6 +1,7 @@
 import React from 'react';
-import { ColorPicker, ColorPalette } from '@wordpress/components';
+import { ColorPicker, ColorPalette, TextControl } from '@wordpress/components';
 import { Fragment, setState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 class SimplecolorEditor extends React.Component {
 	constructor( props ) {
@@ -32,6 +33,7 @@ class SimplecolorEditor extends React.Component {
 					} )
 					}
 					disableCustomColors={ true }
+					clearable={ false }
 				/>
 
 				<SelectedColorOptions selectedColorData={ this.state.selectedColor }>
@@ -50,12 +52,11 @@ class SelectedColorOptions extends React.Component {
 
 		this.state = {
 			color: this.props.selectedColorData.color,
-			name: this.props.selectedColorData.name,
+			name: this.props.selectedColorData.label,
 		};
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
-		console.log(nextProps.selectedColorData);
 		return {
 			color: nextProps.selectedColorData.color,
 			name: nextProps.selectedColorData.name,
@@ -64,9 +65,13 @@ class SelectedColorOptions extends React.Component {
 
 	render() {
 		//console.log(this.state.color);
-		console.log(this.state.color);
 		return (
 			<Fragment>
+				<TextControl
+					label={ __( 'Label' ) }
+					value={ this.state.name }
+				/>
+
 				<ColorPicker
 					color={ this.state.color }
 					onChangeComplete={ ( color ) => 'setState( { color } )' }
