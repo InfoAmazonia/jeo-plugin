@@ -1,12 +1,16 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import LayersSettings from '../map-blocks/layers-settings';
-import MapSettings from '../map-blocks/map-settings';
+import LayersPanel from '../map-blocks/layers-panel';
+import MapEditorModal from '../map-blocks/map-editor-modal';
+import MapPanel from '../map-blocks/map-panel';
 import PostsSelector from '../posts-selector';
-import SettingPanelWithModal from './panel-with-modal';
+
+const loadLayers = ( layers ) => ( settings ) => {
+	return layers.find( ( l ) => l.id === settings.id );
+};
 
 function MapsSidebar( {
 	loadedLayers,
@@ -18,40 +22,40 @@ function MapsSidebar( {
 } ) {
 	const [ modal, setModal ] = useState( false );
 
+	const loadLayer = useCallback( loadLayers( loadedLayers ), [ loadedLayers ] );
+
 	return (
 		<Fragment>
-			<SettingPanelWithModal
-				title={ __( 'Settings' ) }
-				buttonLabel={ __( 'Edit map settings' ) }
-				value="map"
-				checked={ modal === 'map' }
-				onChange={ setModal }
-			>
-				<MapSettings
-					attributes={ postMeta }
-					setAttributes={ setPostMeta }
-				/>
-			</SettingPanelWithModal>
-
-			<SettingPanelWithModal
-				title={ __( 'Layers', 'jeo' ) }
-				buttonLabel={ __( 'Edit layers settings' ) }
-				value="layers"
-				checked={ modal === 'layers' }
-				onChange={ setModal }
-			>
-				<LayersSettings title={ __( 'Layers', 'jeo' ) }
+			{ modal && (
+				<MapEditorModal
+					modal={ modal }
+					setModal={ setModal }
 					attributes={ postMeta }
 					setAttributes={ setPostMeta }
 					loadedLayers={ loadedLayers }
 					loadingLayers={ loadingLayers }
 				/>
-			</SettingPanelWithModal>
+			) }
+
+			<MapPanel
+				attributes={ postMeta }
+				setModal={ setModal }
+				panel={ PluginDocumentSettingPanel }
+			/>
+
+			<LayersPanel
+				attributes={ postMeta }
+				setModal={ setModal }
+				loadLayer={ loadLayer }
+				loadingLayers={ loadingLayers }
+				panel={ PluginDocumentSettingPanel }
+			/>
 
 			<PluginDocumentSettingPanel title={ __( 'Related posts', 'jeo' ) }>
 				<PostsSelector
 					relatedPosts={ relatedPosts }
 					setRelatedPosts={ setRelatedPosts }
+					panel={ PluginDocumentSettingPanel }
 				/>
 			</PluginDocumentSettingPanel>
 		</Fragment>
