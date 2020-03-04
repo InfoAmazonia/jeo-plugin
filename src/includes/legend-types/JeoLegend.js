@@ -2,7 +2,7 @@ import JeoLegendTypes from './JeoLegendTypes';
 
 class JeoLegend {
 	constructor( legendTypeSlug, attributes ) {
-		this.legendType = JeoLegendTypes.getLegendType( legendTypeSlug );
+		this.__legendType = JeoLegendTypes.getLegendType( legendTypeSlug );
 		this.__legendSlug = legendTypeSlug;
 		this.attributes = attributes;
 	}
@@ -25,6 +25,19 @@ class JeoLegend {
 
 	get options() {
 		return this.attributes.legend_type_options;
+	}
+
+	set options( legend_type_options ) {
+		this.attributes.legend_type_options = legend_type_options;
+	}
+
+	set legendType( legendTypeSlug ) {
+		this.__legendType = JeoLegendTypes.getLegendType( legendTypeSlug );
+		return this;
+	}
+
+	set setlegengSlug( newSlug ) {
+		this.__legendSlug = newSlug;
 	}
 }
 

@@ -14,7 +14,6 @@ class LegendEditor extends React.Component {
 		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
 
 		this.state = {
-			updatedLegendType: metadata.legend_type,
 			legendObject: new JeoLegend( metadata.legend_type, {
 				title: metadata.legend_title,
 				legend_type_options: metadata.legend_type_options,
@@ -31,21 +30,33 @@ class LegendEditor extends React.Component {
 				<TextControl
 					label={ __( 'Title' ) }
 					value={ this.state.legendObject.title }
+					onChange={ ( input ) => {
+						this.setState( ( prevState ) => {
+							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+							legendObject.attributes.title = input;
+							return { legendObject };
+						} );
+					} }
 				/>
 
 				<SelectControl
 					label={ __( 'Type' ) }
-					value={ this.state.updatedLegendType }
+					value={ this.state.legendObject.legendSlug }
 					options={ [	...this.legendTypes.map( ( item ) => {
 						return { label: item, value: item };
 					} )	] }
 
 					onChange={ ( newLegendType ) => {
-						this.setState( { updatedLegendType: newLegendType } );
+						this.setState( ( prevState ) => {
+							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+							legendObject.legendType = newLegendType;
+							legendObject.setlegengSlug = newLegendType;
+							return { legendObject };
+						} );
 					} }
 				/>
 
-				<LegendTypeEdition legendObject={ this.state.legendObject } updatedLegendType={ this.state.updatedLegendType }>
+				<LegendTypeEdition legendObject={ this.state.legendObject }>
 
 				</LegendTypeEdition>
 

@@ -12,18 +12,17 @@ class LegendTypeEdition extends React.Component {
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
 		this.state = {
 			legendObject: props.legendObject,
-			updatedLegendType: props.updatedLegendType,
 		};
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
 		return {
-			updatedLegendType: nextProps.updatedLegendType,
+			legendObject: nextProps.legendObject,
 		};
 	}
 
 	render() {
-		//console.log(this.state.updatedLegendType, this.state.legendObject.legendSlug);
+		console.log(this.state.legendObject);
 
 		const typesEditorComponents = {
 			circles: <CircleEditor legendObject={ this.state.legendObject } ></CircleEditor>,
@@ -32,7 +31,7 @@ class LegendTypeEdition extends React.Component {
 			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } ></SimplecolorEditor>,
 		};
 
-		const legendTypeEdition = typesEditorComponents[ this.state.updatedLegendType ];
+		const legendTypeEdition = typesEditorComponents[ this.state.legendObject.legendSlug ];
 
 		return (
 			<Fragment>
