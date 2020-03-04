@@ -13,6 +13,9 @@ class LegendTypeEdition extends React.Component {
 		this.state = {
 			legendObject: props.legendObject,
 		};
+
+		this.inicialLegendType = this.state.legendObject.legendSlug;
+
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
@@ -28,7 +31,7 @@ class LegendTypeEdition extends React.Component {
 			circles: <CircleEditor legendObject={ this.state.legendObject } ></CircleEditor>,
 			barscale: <BarscaleEditor legendObject={ this.state.legendObject } ></BarscaleEditor>,
 			icons: <IconsEditor legendObject={ this.state.legendObject } ></IconsEditor>,
-			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } ></SimplecolorEditor>,
+			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType } ></SimplecolorEditor>,
 		};
 
 		const legendTypeEdition = typesEditorComponents[ this.state.legendObject.legendSlug ];
