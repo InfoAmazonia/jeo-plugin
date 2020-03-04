@@ -1,6 +1,6 @@
 import React from 'react';
 import { Fragment } from '@wordpress/element';
-import { TextControl, SelectControl } from '@wordpress/components';
+import { TextControl, SelectControl, Button } from '@wordpress/components';
 import JeoLegend from '../../../../includes/legend-types/JeoLegend';
 import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
@@ -36,6 +36,8 @@ class LegendEditor extends React.Component {
 							legendObject.attributes.title = input;
 							return { legendObject };
 						} );
+
+						//wp.data.dispatch('core/editor').editPost({meta: { 'legend_title': input}});
 					} }
 				/>
 
@@ -56,9 +58,11 @@ class LegendEditor extends React.Component {
 					} }
 				/>
 
-				<LegendTypeEdition legendObject={ this.state.legendObject }>
+				<LegendTypeEdition legendObject={ this.state.legendObject } />
 
-				</LegendTypeEdition>
+				{/* <Button isPrimary isButton isLarge onClick={ 'asd' } className="full-width-button">
+					{ __( 'Save' ) }
+				</Button> */}
 
 			</Fragment>
 
