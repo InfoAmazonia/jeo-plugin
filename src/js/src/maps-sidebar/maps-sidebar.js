@@ -7,10 +7,7 @@ import LayersPanel from '../map-blocks/layers-panel';
 import MapEditorModal from '../map-blocks/map-editor-modal';
 import MapPanel from '../map-blocks/map-panel';
 import PostsSelector from '../posts-selector';
-
-const loadLayers = ( layers ) => ( settings ) => {
-	return layers.find( ( l ) => l.id === settings.id );
-};
+import { layerLoader } from '../map-blocks/utils';
 
 function MapsSidebar( {
 	loadedLayers,
@@ -22,7 +19,7 @@ function MapsSidebar( {
 } ) {
 	const [ modal, setModal ] = useState( false );
 
-	const loadLayer = useCallback( loadLayers( loadedLayers ), [ loadedLayers ] );
+	const loadLayer = useCallback( layerLoader( loadedLayers ), [ loadedLayers ] );
 
 	return (
 		<Fragment>
