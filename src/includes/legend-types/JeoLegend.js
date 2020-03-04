@@ -5,7 +5,6 @@ class JeoLegend {
 		this.__legendType = JeoLegendTypes.getLegendType( legendTypeSlug );
 		this.__legendSlug = legendTypeSlug;
 		this.attributes = attributes;
-
 	}
 
 	render( map ) {
@@ -39,6 +38,25 @@ class JeoLegend {
 
 	set setlegengSlug( newSlug ) {
 		this.__legendSlug = newSlug;
+	}
+
+	static updateLegend( legendObject ) {
+		let legendMeta = {
+			meta: {
+				legend_type: legendObject.legendSlug,
+				legend_title: legendObject.title,
+				legend_type_options: {
+					left_label: 0,
+					right_label: 0,
+					colors: {
+						...legendObject.attributes.legend_type_options.colors,
+					},
+				},
+
+			},
+		};
+
+		console.log( 1 );
 	}
 }
 

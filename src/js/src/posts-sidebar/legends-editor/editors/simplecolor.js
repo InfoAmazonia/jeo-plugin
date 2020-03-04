@@ -65,9 +65,8 @@ class SimplecolorEditor extends React.Component {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors;
 
+			// math random (0 to 1) -> multiply by giant hexadecial -> bit shift -> string conversion
 			const randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
-			console.log(randomColor);
-
 			colors.push(
 				{ label: '', color: randomColor },
 			);
@@ -206,11 +205,11 @@ class SelectedColorOptions extends React.Component {
 					position=""
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<div className="buttons-wrapper">
-							<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+							<Button isLink onClick={ onToggle } aria-expanded={ isOpen }>
 								{ __( 'Select color' ) }
 							</Button>
 
-							<Button isSecondary isDestructive onClick={ this.deleteLabel } aria-expanded={ isOpen }>
+							<Button isDestructive isButton isLink onClick={ this.deleteLabel } aria-expanded={ isOpen }>
 								{ __( 'Remove field' ) }
 							</Button>
 						</div>
@@ -226,7 +225,7 @@ class SelectedColorOptions extends React.Component {
 					) }
 				/>
 
-				<Button isPrimary onClick={ this.addLabel } className="full-width-button">
+				<Button isSecondary isButton isLarge onClick={ this.addLabel } className="full-width-button">
 					{ __( 'Add new label' ) }
 				</Button>
 
