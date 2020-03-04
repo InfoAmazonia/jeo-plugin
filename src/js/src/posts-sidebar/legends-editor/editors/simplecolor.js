@@ -65,8 +65,11 @@ class SimplecolorEditor extends React.Component {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors;
 
+			const randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
+			console.log(randomColor);
+
 			colors.push(
-				{ label: '', color: '#000' },
+				{ label: '', color: randomColor },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
