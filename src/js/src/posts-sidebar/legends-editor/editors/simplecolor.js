@@ -9,6 +9,7 @@ class SimplecolorEditor extends React.Component {
 		super( props );
 		const legendData = this.props.legendObject;
 		this.updateSelectedColor = this.updateSelectedColor.bind( this );
+		this.deleteLabel = this.deleteLabel.bind( this );
 
 		if ( legendData.legendSlug !== 'simple-color' ) {
 			legendData.attributes = {
@@ -53,6 +54,36 @@ class SimplecolorEditor extends React.Component {
 		} } );
 
 		this.updateLegendColor( this.state.selectedColor );
+	}
+
+	deleteLabel( labelData ) {
+		this.setState( ( prevState ) => {
+			let legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			const colors = this.state.legendObject.attributes.legend_type_options.colors.filter( ( item ) => {
+				if ( item.color === labelData.color && item.label === labelData.label ) {
+					return false;
+				}
+
+				return true;
+			} );
+
+			const size = legendObject.attributes.legend_type_options.colors.length;
+
+			if ( size > 1 ) {
+				legendObject.attributes.legend_type_options.colors = colors;
+			}
+
+			let selectedColor = { };
+
+			if ( size > 0 ) {
+				selectedColor = {
+					color: legendObject.attributes.legend_type_options.colors[0].color,
+					label: legendObject.attributes.legend_type_options.colors[0].label,
+				};
+			}
+
+			return { legendObject, selectedColor };
+		} );
 	}
 
 	render() {
@@ -104,7 +135,7 @@ class SimplecolorEditor extends React.Component {
 					} }
 				/>
 
-				<SelectedColorOptions selectedColorData={ this.state.selectedColor } updateSelectedColor={ this.updateSelectedColor } />
+				<SelectedColorOptions selectedColorData={ this.state.selectedColor } updateSelectedColor={ this.updateSelectedColor } deleteLabel={ this.deleteLabel } />
 
 			</Fragment>
 
@@ -115,17 +146,22 @@ class SimplecolorEditor extends React.Component {
 class SelectedColorOptions extends React.Component {
 	constructor( props ) {
 		super( props );
+		this.deleteLabel = this.deleteLabel.bind( this );
 
 		this.state = {
 			color: this.props.selectedColorData.color,
-			name: this.props.selectedColorData.label,
+			label: this.props.selectedColorData.label,
 		};
+	}
+
+	deleteLabel() {
+		this.props.deleteLabel( this.state );
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
 		return {
 			color: nextProps.selectedColorData.color,
-			name: nextProps.selectedColorData.name,
+			label: nextProps.selectedColorData.label,
 		};
 	}
 
@@ -136,9 +172,15 @@ class SelectedColorOptions extends React.Component {
 				<Dropdown
 					position=""
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<Button isSecondary isLarge onClick={ onToggle } aria-expanded={ isOpen }>
-							{ __( 'Select color' ) }
-						</Button>
+						<div>
+							<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
+								{ __( 'Select color' ) }
+							</Button>
+
+							<Button isSecondary isDestructive onClick={ this.deleteLabel } aria-expanded={ isOpen }>
+								{ __( 'Remove label' ) }
+							</Button>
+						</div>
 					) }
 					renderContent={ () => (
 						<div>
