@@ -2,6 +2,8 @@ import { Button, Modal } from '@wordpress/components';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 import { useCallback } from '@wordpress/element';
 
+import './panel-with-modal.css';
+
 export default function SettingPanelWithModal( {
 	buttonLabel,
 	checked,
@@ -30,7 +32,9 @@ export default function SettingPanelWithModal( {
 					title={ title }
 					onRequestClose={ closeModal }
 				>
-					{ children }
+					<div className="jeo-map-editor-modal__content">
+						{ children }
+					</div>
 				</Modal>
 			) }
 		</PluginDocumentSettingPanel>
