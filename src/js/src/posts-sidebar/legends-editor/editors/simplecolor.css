@@ -1,0 +1,9 @@
+.full-width-button {
+	margin-top: 5px;
+	display: block;
+	width: 100%;
+}
+.buttons-wrapper {
+	display: flex;
+	justify-content: space-between;
+}

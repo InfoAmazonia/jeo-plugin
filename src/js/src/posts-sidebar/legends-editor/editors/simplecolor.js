@@ -1,17 +1,21 @@
 import React from 'react';
 import { ColorPicker, ColorPalette, TextControl, Dropdown, Button } from '@wordpress/components';
-import { Fragment, setState } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
+
+import '../editors/simplecolor.css';
 
 class SimplecolorEditor extends React.Component {
 	constructor( props ) {
 		super( props );
-		const legendData = this.props.legendObject;
 		this.updateSelectedColor = this.updateSelectedColor.bind( this );
 		this.deleteLabel = this.deleteLabel.bind( this );
+		this.addLabel = this.addLabel.bind( this );
 
-		if ( legendData.legendSlug !== 'simple-color' ) {
+		const legendData = this.props.legendObject;
+
+		if ( legendData.legendSlug !== 'simple-color' || this.props.initialType !== 'simple-color' ) {
 			legendData.attributes = {
 				legend_type_options: {
 					colors: [ { label: 'Example Color', color: '#ff0909' } ],
@@ -56,9 +60,30 @@ class SimplecolorEditor extends React.Component {
 		this.updateLegendColor( this.state.selectedColor );
 	}
 
+	addLabel() {
+		this.setState( ( prevState ) => {
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			const colors = this.state.legendObject.attributes.legend_type_options.colors;
+
+			colors.push(
+				{ label: '', color: '#000' },
+			);
+
+			legendObject.attributes.legend_type_options.colors = colors;
+			const colorsSize = colors.length;
+
+			const selectedColor = {
+				color: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].color,
+				label: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].label,
+			};
+
+			return { legendObject, selectedColor };
+		} );
+	}
+
 	deleteLabel( labelData ) {
 		this.setState( ( prevState ) => {
-			let legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors.filter( ( item ) => {
 				if ( item.color === labelData.color && item.label === labelData.label ) {
 					return false;
@@ -77,8 +102,8 @@ class SimplecolorEditor extends React.Component {
 
 			if ( size > 0 ) {
 				selectedColor = {
-					color: legendObject.attributes.legend_type_options.colors[0].color,
-					label: legendObject.attributes.legend_type_options.colors[0].label,
+					color: legendObject.attributes.legend_type_options.colors[ 0 ].color,
+					label: legendObject.attributes.legend_type_options.colors[ 0 ].label,
 				};
 			}
 
@@ -135,7 +160,7 @@ class SimplecolorEditor extends React.Component {
 					} }
 				/>
 
-				<SelectedColorOptions selectedColorData={ this.state.selectedColor } updateSelectedColor={ this.updateSelectedColor } deleteLabel={ this.deleteLabel } />
+				<SelectedColorOptions selectedColorData={ this.state.selectedColor } updateSelectedColor={ this.updateSelectedColor } deleteLabel={ this.deleteLabel } addLabel={ this.addLabel } />
 
 			</Fragment>
 
@@ -147,6 +172,7 @@ class SelectedColorOptions extends React.Component {
 	constructor( props ) {
 		super( props );
 		this.deleteLabel = this.deleteLabel.bind( this );
+		this.addLabel = this.addLabel.bind( this );
 
 		this.state = {
 			color: this.props.selectedColorData.color,
@@ -158,6 +184,10 @@ class SelectedColorOptions extends React.Component {
 		this.props.deleteLabel( this.state );
 	}
 
+	addLabel() {
+		this.props.addLabel();
+	}
+
 	static getDerivedStateFromProps( nextProps ) {
 		return {
 			color: nextProps.selectedColorData.color,
@@ -167,18 +197,18 @@ class SelectedColorOptions extends React.Component {
 
 	render() {
 		return (
-			<Fragment>
+			<div>
 
 				<Dropdown
 					position=""
 					renderToggle={ ( { isOpen, onToggle } ) => (
-						<div>
+						<div className="buttons-wrapper">
 							<Button isPrimary onClick={ onToggle } aria-expanded={ isOpen }>
 								{ __( 'Select color' ) }
 							</Button>
 
 							<Button isSecondary isDestructive onClick={ this.deleteLabel } aria-expanded={ isOpen }>
-								{ __( 'Remove label' ) }
+								{ __( 'Remove field' ) }
 							</Button>
 						</div>
 					) }
@@ -193,7 +223,11 @@ class SelectedColorOptions extends React.Component {
 					) }
 				/>
 
-			</Fragment>
+				<Button isPrimary onClick={ this.addLabel } className="full-width-button">
+					{ __( 'Add new label' ) }
+				</Button>
+
+			</div>
 		);
 	}
 }
