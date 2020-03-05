@@ -1,73 +1,72 @@
-import { PanelBody, PanelRow, Spinner, TextControl } from '@wordpress/components';
+import { InspectorControls } from '@wordpress/block-editor';
+import {
+	Button,
+	PanelBody,
+	PanelRow,
+	Spinner,
+	TextControl,
+} from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useState } from '@wordpress/element';
+import { Fragment, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import Autosuggest from 'react-autosuggest';
 
+import Map from './map';
+import JeoAutosuggest from './jeo-autosuggest';
 import './map-editor.css';
 
-const MapEditor = ( {
-	attributes,
-	setAttributes,
-	loadedMaps,
-	loadingMaps,
-} ) => {
-	const [ value, setValue ] = useState( '' );
-	const [ suggestions, setSuggestions ] = useState( [] );
+const { map_defaults: mapDefaults } = window.jeo_settings;
 
-	const onSuggestionsFetchRequested = useCallback( _.debounce( ( { value: val } ) => {
-		const input = val.trim().toLowerCase();
-		if ( input.length === 0 ) {
-			setSuggestions( [] );
-		}
-		setSuggestions( loadedMaps.filter( ( map ) => {
-			return map.title.rendered.toLowerCase().includes( input ) || map.content.rendered.toLowerCase().includes( input );
-		} ) );
-	}, 500 ), [ loadedMaps, setSuggestions ] );
-
-	const onSuggestionsClearRequested = useCallback( () => setSuggestions( [] ), [ setSuggestions ] );
-
-	const onSuggestionSelected = useCallback( ( e, { suggestion } ) => {
-		setAttributes( { ...attributes, map_id: suggestion.id } );
-	}, [ attributes, setAttributes ] );
-
-	const getSuggestionValue = useCallback( ( map ) => map.title.rendered, [] );
-
-	const inputProps = {
-		placeholder: __( 'Type a map name', 'jeo' ),
-		value,
-		onChange: useCallback( ( e, { newValue } ) => setValue( newValue ), [ setValue ] ),
-	};
-
-	let currentMap = '';
-	if ( loadedMaps && attributes.map_id ) {
-		currentMap = loadedMaps.find( ( map ) => map.id == attributes.map_id );
-		if ( value === '' ) {
-			setValue( currentMap.title.rendered );
-		}
-	}
-
-	const setSize = useCallback( ( key ) => ( size ) => {
-		setAttributes( { ...attributes, [ key ]: size } );
-	}, [ attributes, setAttributes ] );
-
-	const { InspectorControls } = wp.editor;
+const MapEditor = ( { attributes, setAttributes, map, loading } ) => {
+	const setSize = useCallback(
+		( key ) => ( size ) => {
+			setAttributes( { ...attributes, [ key ]: size } );
+		},
+		[ attributes, setAttributes ]
+	);
 
 	return (
 		<Fragment>
-			{ currentMap && currentMap.title.rendered }
-			{ loadingMaps ?
-				<Spinner /> :
-				<Autosuggest
-					suggestions={ suggestions }
-					onSuggestionsFetchRequested={ onSuggestionsFetchRequested }
-					onSuggestionsClearRequested={ onSuggestionsClearRequested }
-					onSuggestionSelected={ onSuggestionSelected }
-					getSuggestionValue={ getSuggestionValue }
-					renderSuggestion={ ( map ) => <span>{ map.title.rendered }</span> }
-					inputProps={ inputProps }
+			{ attributes.map_id && loading && <Spinner /> }
+			{ attributes.map_id && ! loading && (
+				<Fragment>
+					<div className="jeo-preview-area">
+						<Map
+							style="mapbox://styles/mapbox/streets-v11"
+							zoom={ [ map.meta.initial_zoom || mapDefaults.zoom ] }
+							center={ [
+								map.meta.center_lon || mapDefaults.lng,
+								map.meta.center_lat || mapDefaults.lat,
+							] }
+							containerStyle={ { height: '20vh' } }
+						/>
+					</div>
+
+					<div className="jeo-preview-controls">
+						<Button
+							isLink
+							isLarge
+							onClick={ () =>
+								setAttributes( { ...attributes, map_id: undefined } )
+							}
+						>
+							{ __( 'Select another map' ) }
+						</Button>
+					</div>
+				</Fragment>
+			) }
+			{ ! attributes.map_id && (
+				<JeoAutosuggest
+					placeholder={ __( 'Type a map name', 'jeo' ) }
+					postType={ 'map' }
+					onSuggestionSelected={ ( e, { suggestion } ) =>
+						setAttributes( { ...attributes, map_id: suggestion.id } )
+					}
+					handleFetchRequest={ ( { value } ) => {
+						const input = value.trim().toLowerCase();
+						return input ? {} : { title: input };
+					} }
 				/>
-			}
+			) }
 			<InspectorControls key={ 'inspector' }>
 				<PanelBody title={ __( 'Size' ) } initialOpen={ true }>
 					<PanelRow>
@@ -90,15 +89,19 @@ const MapEditor = ( {
 	);
 };
 
-export default withSelect( ( select ) => {
-	return {
-		loadedMaps: select( 'core' ).getEntityRecords(
-			'postType',
-			'map',
-		),
-		loadingMaps: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-			'postType',
-			'map',
-		] ),
-	};
-} )( MapEditor );
+export default withSelect( ( select, { attributes } ) =>
+	attributes.map_id ?
+		{
+			map: select( 'core' ).getEntityRecord(
+				'postType',
+				'map',
+				attributes.map_id
+			),
+			loading: select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
+				'postType',
+				'map',
+				attributes.map_id,
+			] ),
+		  } :
+		{}
+)( MapEditor );
