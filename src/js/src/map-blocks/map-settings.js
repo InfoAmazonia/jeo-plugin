@@ -20,7 +20,6 @@ const animationOptions = {
 };
 
 export default ( { attributes, setAttributes } ) => {
-
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
@@ -85,7 +84,7 @@ export default ( { attributes, setAttributes } ) => {
 						label={ __( 'Min zoom' ) }
 						initialPosition={ 0 }
 						min={ 0 }
-						max={ 20  }
+						max={ 20 }
 						step={ 0.1 }
 						value={ minZoom }
 						onChange={ attributeUpdater( 'min_zoom' ) }
