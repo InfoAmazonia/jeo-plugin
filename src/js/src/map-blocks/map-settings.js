@@ -12,7 +12,11 @@ const mapDefaults = {
 	center_lat: jeo_settings.map_defaults.lat,
 	center_lon: jeo_settings.map_defaults.lng,
 	min_zoom: 0,
-	max_zoom: 20
+	max_zoom: 20,
+};
+
+const animationOptions = {
+	animate: false,
 };
 
 export default ( { attributes, setAttributes } ) => {
@@ -38,7 +42,7 @@ export default ( { attributes, setAttributes } ) => {
 							containerStyle={ { height: '500px', width: '600px' } }
 							zoom={ [ initialZoom || 11 ] }
 							center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
-							animationOptions={{ animate:false }}
+							animationOptions={ animationOptions }
 							onMoveEnd={ ( map ) => {
 								const center = map.getCenter();
 								const zoom = Math.round( map.getZoom() * 10 ) / 10;
