@@ -18,14 +18,17 @@ class IconEditor extends React.Component {
 		};
 	}
 
+	componentDidUpdate() {
+		console.log( this.state.legendObject );
+	}
+
 	addLabel() {
-		console.log( this.state );
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const icons = this.state.legendObject.attributes.legend_type_options.icons;
 
 			icons.push(
-				{ label: 'Example Label ' + this.state.newObjCounter, icon: 'http://via.placeholder.com/20x20' },
+				{ label: 'Example Label', icon: 'http://via.placeholder.com/20x20' },
 			);
 
 			legendObject.attributes.legend_type_options.icons = icons;
@@ -35,35 +38,37 @@ class IconEditor extends React.Component {
 		} );
 	}
 
-	removeLabel( id ) {
-		const hash = require( 'object-hash' );
+	removeLabel( obj ) {
+		//console.log("Received id: ", id );
 
-		this.setState( ( prevState ) => {
-			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-			const icons = this.state.legendObject.attributes.legend_type_options.icons.filter( ( item ) => {
-				if ( id === hash( item ) ) {
-					return false;
-				}
+		// this.setState( ( prevState ) => {
+		// 	const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+		// 	const icons = this.state.legendObject.attributes.legend_type_options.icons.filter( ( item ) => {
+		// 		//console.log("Comparing ", id, " with ", hash( item ) );
+		// 		if ( obj === item ) {
+		// 			//console.log("found.");
+		// 			//console.log("titles: ", item.label );
+		// 			return false;
+		// 		}
 
-				return true;
-			} );
+		// 		return true;
+		// 	} );
 
-			legendObject.attributes.legend_type_options.icons = icons;
+		// 	legendObject.attributes.legend_type_options.icons = icons;
 
-			console.log( icons );
+		// 	console.log( icons );
 
-			return { legendObject };
-		} );
+		// 	return { legendObject };
+		// } );
 
 	}
 
 	render() {
 		const icons = [];
-		const hash = require( 'object-hash' );
 
 		for ( const icon of this.state.legendObject.attributes.legend_type_options.icons ) {
 			icons.push(
-				<IconItem iconData={ icon } id={ hash( icon ) } removeLabel={ this.removeLabel } />
+				<IconItem iconData={ icon } removeLabel={ this.removeLabel } />
 			);
 		}
 
@@ -87,12 +92,12 @@ class IconItem extends React.Component {
 
 		this.state = {
 			iconData: this.props.iconData,
-			id: this.props.id,
 		};
 	}
 
 	removeLabel() {
-		this.props.removeLabel( this.state.id );
+		console.log( "Remove label sent id, title: ", this.props.id, this.state.iconData.label );
+		this.props.removeLabel( this.state.iconData );
 	}
 
 	render() {
