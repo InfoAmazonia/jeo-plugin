@@ -38,13 +38,14 @@ export default ( { attributes, setAttributes } ) => {
 							containerStyle={ { height: '500px', width: '600px' } }
 							zoom={ [ initialZoom || 11 ] }
 							center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
+							animationOptions={{ animate:false }}
 							onMoveEnd={ ( map ) => {
 								const center = map.getCenter();
+								const zoom = Math.round( map.getZoom() * 10 ) / 10;
 								setAttributes( {
-									...attributes,
 									center_lat: center.lat,
 									center_lon: center.lng,
-									initial_zoom: Math.round( map.getZoom() * 10 ) / 10,
+									initial_zoom: zoom,
 								} );
 							} }
 						/>
@@ -70,8 +71,8 @@ export default ( { attributes, setAttributes } ) => {
 					<RangeControl
 						label={ __( 'Initial zoom' ) }
 						initialPosition={ 11 }
-						min={ 0 }
-						max={ 20 }
+						min={ attributes.min_zoom }
+						max={ attributes.max_zoom }
 						step={ 0.1 }
 						value={ initialZoom }
 						onChange={ attributeUpdater( 'initial_zoom' ) }
@@ -80,7 +81,7 @@ export default ( { attributes, setAttributes } ) => {
 						label={ __( 'Min zoom' ) }
 						initialPosition={ 0 }
 						min={ 0 }
-						max={ 20 }
+						max={ 20  }
 						step={ 0.1 }
 						value={ minZoom }
 						onChange={ attributeUpdater( 'min_zoom' ) }
