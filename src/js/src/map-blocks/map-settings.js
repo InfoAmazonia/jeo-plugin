@@ -74,8 +74,8 @@ export default ( { attributes, setAttributes } ) => {
 					<RangeControl
 						label={ __( 'Initial zoom' ) }
 						initialPosition={ 11 }
-						min={ attributes.min_zoom }
-						max={ attributes.max_zoom }
+						min={ minZoom }
+						max={ maxZoom }
 						step={ 0.1 }
 						value={ initialZoom }
 						onChange={ attributeUpdater( 'initial_zoom' ) }
