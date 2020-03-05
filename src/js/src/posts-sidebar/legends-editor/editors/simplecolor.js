@@ -32,6 +32,13 @@ class SimplecolorEditor extends React.Component {
 		};
 	}
 
+	componentDidUpdate( prevState ) {
+		// ignores selected color updates
+		if ( ! Object.is( prevState.legendObject, this.state.legendObject ) ) {
+			wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
+		}
+	}
+
 	updateLegendColor( selectedColor ) {
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
