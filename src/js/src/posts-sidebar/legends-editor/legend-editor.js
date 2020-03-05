@@ -37,7 +37,7 @@ class LegendEditor extends React.Component {
 							return { legendObject };
 						} );
 
-						//wp.data.dispatch('core/editor').editPost({meta: { 'legend_title': input}});
+						wp.data.dispatch( 'core/editor' ).editPost( { meta: { 'legend_title': input } } );
 					} }
 				/>
 
@@ -55,6 +55,8 @@ class LegendEditor extends React.Component {
 							legendObject.setlegengSlug = newLegendType;
 							return { legendObject };
 						} );
+
+						wp.data.dispatch( 'core/editor' ).editPost( { meta: { 'legend_type': newLegendType } } );
 					} }
 				/>
 

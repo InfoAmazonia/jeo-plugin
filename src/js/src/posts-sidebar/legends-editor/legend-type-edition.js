@@ -28,9 +28,9 @@ class LegendTypeEdition extends React.Component {
 		console.log(this.state.legendObject);
 
 		const typesEditorComponents = {
-			circles: <CircleEditor legendObject={ this.state.legendObject } ></CircleEditor>,
-			barscale: <BarscaleEditor legendObject={ this.state.legendObject } ></BarscaleEditor>,
-			icons: <IconsEditor legendObject={ this.state.legendObject } ></IconsEditor>,
+			circles: <CircleEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></CircleEditor>,
+			barscale: <BarscaleEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></BarscaleEditor>,
+			icons: <IconsEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></IconsEditor>,
 			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType } ></SimplecolorEditor>,
 		};
 
