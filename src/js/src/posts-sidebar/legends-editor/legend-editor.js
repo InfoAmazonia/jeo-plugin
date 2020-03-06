@@ -23,7 +23,7 @@ class LegendEditor extends Component {
 
 		this.initialType = this.state.legendObject.legendSlug === undefined ? 'barscale' : this.state.legendObject.legendSlug;
 		this.inicialAttrType = this.state.legendObject.attributes.legend_type_options;
-		// console.log( this.state.legendObject );
+		console.log( this.state.legendObject );
 	}
 
 	componentDidUpdate() {
