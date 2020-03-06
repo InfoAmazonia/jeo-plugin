@@ -1,11 +1,10 @@
-import React from 'react';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Component, Fragment, useEffect } from '@wordpress/element';
 import CircleEditor from './editors/circle';
 import BarscaleEditor from './editors/barscale';
 import SimplecolorEditor from './editors/simplecolor';
 import IconsEditor from './editors/icons';
 
-class LegendTypeEdition extends React.Component {
+class LegendTypeEdition extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -28,9 +27,9 @@ class LegendTypeEdition extends React.Component {
 		console.log(this.state.legendObject);
 
 		const typesEditorComponents = {
-			circles: <CircleEditor legendObject={ this.state.legendObject } ></CircleEditor>,
-			barscale: <BarscaleEditor legendObject={ this.state.legendObject } ></BarscaleEditor>,
-			icons: <IconsEditor legendObject={ this.state.legendObject } ></IconsEditor>,
+			circles: <CircleEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></CircleEditor>,
+			barscale: <BarscaleEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></BarscaleEditor>,
+			icons: <IconsEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></IconsEditor>,
 			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType } ></SimplecolorEditor>,
 		};
 

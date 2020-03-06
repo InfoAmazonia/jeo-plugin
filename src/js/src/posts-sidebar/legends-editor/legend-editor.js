@@ -1,12 +1,11 @@
-import React from 'react';
-import { Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { TextControl, SelectControl, Button } from '@wordpress/components';
 import JeoLegend from '../../../../includes/legend-types/JeoLegend';
 import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
 import LegendTypeEdition from './legend-type-edition';
 
-class LegendEditor extends React.Component {
+class LegendEditor extends Component {
 	constructor() {
 		super();
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
@@ -37,7 +36,7 @@ class LegendEditor extends React.Component {
 							return { legendObject };
 						} );
 
-						//wp.data.dispatch('core/editor').editPost({meta: { 'legend_title': input}});
+						wp.data.dispatch( 'core/editor' ).editPost( { meta: { 'legend_title': input } } );
 					} }
 				/>
 
@@ -55,6 +54,8 @@ class LegendEditor extends React.Component {
 							legendObject.setlegengSlug = newLegendType;
 							return { legendObject };
 						} );
+
+						wp.data.dispatch( 'core/editor' ).editPost( { meta: { 'legend_type': newLegendType } } );
 					} }
 				/>
 

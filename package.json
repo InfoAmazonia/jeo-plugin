@@ -36,7 +36,8 @@
 		"react-jsonschema-form": "^2.0.0-alpha.1",
 		"react-leaflet": "^2.4.0",
 		"react-mapbox-gl": "^4.8.2",
-		"react-movable": "^2.3.0"
+		"react-movable": "^2.3.0",
+		"uuid": "^7.0.2"
 	},
 	"devDependencies": {
 		"@wordpress/scripts": "^6.0.0",
