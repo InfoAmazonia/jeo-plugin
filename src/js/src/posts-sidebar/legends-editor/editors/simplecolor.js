@@ -24,7 +24,7 @@ class SimplecolorEditor extends React.Component {
 		}
 
 		this.state = {
-			legendObject: this.props.legendObject,
+			legendObject: Object.assign( new JeoLegend, this.props.legendObject ),
 			selectedColor: {
 				color: legendData.attributes.legend_type_options.colors[ 0 ].color,
 				label: legendData.attributes.legend_type_options.colors[ 0 ].label,
