@@ -68,10 +68,7 @@ class JeoLegend {
 	static updatedLegendMeta( legendObject ) {
 		//console.log({ legendObject.attributes.legend_type_options);
 		// this is necessary because '...' wont turn arrays into objects with the matching index
-		const legendTypeSpec = {
-		};
-
-		console.log(legendObject);
+		//console.log(legendObject);
 
 		const legendMeta = {
 			legend_type: legendObject.legendSlug,

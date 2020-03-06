@@ -12,7 +12,7 @@ class LegendEditor extends Component {
 		this.hasChanged = this.hasChanged.bind( this );
 
 		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
-		console.log(metadata);
+		// console.log(metadata);
 
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
@@ -23,7 +23,7 @@ class LegendEditor extends Component {
 
 		this.initialType = this.state.legendObject.legendSlug === undefined ? 'barscale' : this.state.legendObject.legendSlug;
 		this.inicialAttrType = this.state.legendObject.attributes.legend_type_options;
-		//console.log( this.state.legendObject );
+		// console.log( this.state.legendObject );
 	}
 
 	componentDidUpdate() {
@@ -50,8 +50,6 @@ class LegendEditor extends Component {
 
 							return { legendObject };
 						} );
-
-						//wp.data.dispatch( 'core/editor' ).editPost( { meta: { legend_title: input } } );
 					} }
 				/>
 
@@ -78,16 +76,10 @@ class LegendEditor extends Component {
 
 							return { legendObject };
 						} );
-
-						//wp.data.dispatch( 'core/editor' ).editPost( { meta: { 'legend_type': newLegendType } } );
 					} }
 				/>
 
 				<LegendTypeEdition legendObject={ this.state.legendObject } initialType={ this.initialType } hasChanged={ this.hasChanged } />
-
-				{/* <Button isPrimary isButton isLarge onClick={ 'asd' } className="full-width-button">
-					{ __( 'Save' ) }
-				</Button> */}
 
 			</Fragment>
 

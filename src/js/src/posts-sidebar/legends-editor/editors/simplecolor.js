@@ -21,6 +21,7 @@ class SimplecolorEditor extends Component {
 				label: legendData.attributes.legend_type_options.colors[ 0 ].label,
 			},
 		};
+
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
