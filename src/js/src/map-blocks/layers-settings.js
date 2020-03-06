@@ -65,7 +65,7 @@ const LayersSettings = ( {
 			{ ! loadingLayers && ! attributes.layers.length && (
 				<p>{ __( 'No layers have been added to this map.' ) } </p>
 			) }
-			{ ! loadingLayers && attributes.layers.length && (
+			{ ! loadingLayers && attributes.layers.length > 0 && (
 				<List
 					values={ attributes.layers }
 					beforeDrag={ ( { elements, index } ) => {
