@@ -62,7 +62,7 @@ class IconEditor extends Component {
 			const icons = this.state.legendObject.attributes.legend_type_options.icons;
 
 			icons.push(
-				{ label: 'Example Label', icon: 'http://via.placeholder.com/20x20', id: uuid() },
+				{ label: 'Default Label', icon: 'http://via.placeholder.com/60x60', id: uuid() },
 			);
 
 			legendObject.attributes.legend_type_options.icons = icons;
