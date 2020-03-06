@@ -8,7 +8,7 @@ class JeoLegend {
 	}
 
 	render( map ) {
-		return this.legendType.render( map, this.attributes );
+		return this.__legendType.render( map, this.attributes );
 	}
 
 	get legendSlug() {
@@ -41,15 +41,13 @@ class JeoLegend {
 	}
 
 	static updatedLegendMeta( legendObject ) {
+		//console.log({ legendObject.attributes.legend_type_options);
+
 		const legendMeta = {
 			legend_type: legendObject.legendSlug,
 			legend_title: legendObject.title,
 			legend_type_options: {
-				left_label: 0,
-				right_label: 0,
-				colors: {
-					...legendObject.attributes.legend_type_options.colors,
-				},
+				colors: [...legendObject.attributes.legend_type_options.colors],
 			},
 
 		};

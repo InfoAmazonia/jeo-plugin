@@ -47,8 +47,10 @@ class IconEditor extends React.Component {
 		}
 	}
 
-	componentDidUpdate() {
-
+	componentDidUpdate( prevState ) {
+		if ( ! Object.is( prevState.legendObject, this.state.legendObject ) ) {
+			wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
+		}
 	}
 
 	iconUpdate( iconUpdated ) {
@@ -130,8 +132,8 @@ class IconItem extends React.Component {
 		this.props.removeLabel( this.state.iconData.id );
 	}
 
-	iconUpdate( label ) {
-		this.props.iconUpdate( { label, id: this.state.iconData.id } );
+	iconUpdate( label, icon = this.state.iconData.icon ) {
+		this.props.iconUpdate( { label, id: this.state.iconData.id, icon } );
 	}
 
 	render() {
@@ -146,7 +148,7 @@ class IconItem extends React.Component {
 								...this.state.iconData,
 								icon: value.url,
 							},
-						} );
+						}, this.iconUpdate( this.state.iconData.label, value.url ) );
 					} }
 
 					render={ ( { open } ) => {
@@ -160,7 +162,7 @@ class IconItem extends React.Component {
 										label={ 'Label' }
 										value={ this.state.iconData.label }
 										onChange={ ( label ) => {
-											this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate(label) );
+											this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );
 										} }
 									/>
 
