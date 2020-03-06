@@ -12,6 +12,8 @@ import PostsSelector from '../posts-selector';
 import { layerLoader } from './utils';
 import './onetime-map-editor.css';
 
+const { map_defaults: mapDefaults } = window.jeo_settings;
+
 const OnetimeMapEditor = ( {
 	attributes,
 	setAttributes,
@@ -42,7 +44,8 @@ const OnetimeMapEditor = ( {
 				<MapPanel
 					attributes={ attributes }
 					setModal={ setModal }
-					panel={ PanelBody } />
+					panel={ PanelBody }
+				/>
 
 				<LayersPanel
 					attributes={ attributes }
@@ -64,10 +67,10 @@ const OnetimeMapEditor = ( {
 			<div className="jeo-preview-area">
 				<Map
 					style="mapbox://styles/mapbox/streets-v11"
-					zoom={ [ attributes.initial_zoom || jeo_settings.map_defaults.zoom ] }
+					zoom={ [ attributes.initial_zoom || mapDefaults.zoom ] }
 					center={ [
-						attributes.center_lon || jeo_settings.map_defaults.lng,
-						attributes.center_lat || jeo_settings.map_defaults.lat,
+						attributes.center_lon || mapDefaults.lng,
+						attributes.center_lat || mapDefaults.lat,
 					] }
 					containerStyle={ { height: '20vh' } }
 				/>

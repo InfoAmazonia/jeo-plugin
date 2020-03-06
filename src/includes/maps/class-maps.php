@@ -64,7 +64,7 @@ class Maps {
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'type' => 'string',
+			'type' => 'number',
 			'description' => __('The map initial latitude', 'jeo')
 		]);
 
@@ -72,7 +72,7 @@ class Maps {
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'type' => 'string',
+			'type' => 'number',
 			'description' => __('The map initial longitude', 'jeo')
 		]);
 
@@ -204,7 +204,7 @@ class Maps {
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'type' => 'integer',
+			'type' => 'number',
 			'description' => __('Minimum Zoom level', 'jeo')
 		]);
 
@@ -212,7 +212,7 @@ class Maps {
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
-			'type' => 'integer',
+			'type' => 'number',
 			'description' => __('Maximum zoom level', 'jeo')
 		]);
 
