@@ -1,7 +1,6 @@
-import React from 'react';
-import { Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 
-class CircleEditor extends React.Component {
+class CircleEditor extends Component {
 	render() {
 		return (
 			<Fragment>

@@ -1,12 +1,11 @@
-import React from 'react';
 import { ColorPicker, ColorPalette, TextControl, Dropdown, Button } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 import '../editors/simplecolor.css';
 
-class SimplecolorEditor extends React.Component {
+class SimplecolorEditor extends Component {
 	constructor( props ) {
 		super( props );
 		this.updateSelectedColor = this.updateSelectedColor.bind( this );
@@ -14,14 +13,6 @@ class SimplecolorEditor extends React.Component {
 		this.addLabel = this.addLabel.bind( this );
 
 		const legendData = this.props.legendObject;
-
-		if ( legendData.legendSlug !== 'simple-color' || this.props.initialType !== 'simple-color' ) {
-			legendData.attributes = {
-				legend_type_options: {
-					colors: [ { label: 'Example Color', color: '#ff0909' } ],
-				},
-			};
-		}
 
 		this.state = {
 			legendObject: Object.assign( new JeoLegend, this.props.legendObject ),
@@ -32,11 +23,10 @@ class SimplecolorEditor extends React.Component {
 		};
 	}
 
-	componentDidUpdate( prevState ) {
-		// ignores selected color updates
-		if ( ! Object.is( prevState.legendObject, this.state.legendObject ) ) {
-			wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
-		}
+	static getDerivedStateFromProps( nextProps ) {
+		return {
+			legendObject: nextProps.legendObject,
+		};
 	}
 
 	updateLegendColor( selectedColor ) {
@@ -53,6 +43,8 @@ class SimplecolorEditor extends React.Component {
 			} );
 
 			legendObject.attributes.legend_type_options.colors = colors;
+
+			this.props.hasChanged( legendObject );
 
 			return { legendObject };
 		} );
@@ -86,6 +78,8 @@ class SimplecolorEditor extends React.Component {
 				label: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].label,
 			};
 
+			this.props.hasChanged( legendObject );
+
 			return { legendObject, selectedColor };
 		} );
 	}
@@ -116,6 +110,8 @@ class SimplecolorEditor extends React.Component {
 				};
 			}
 
+			this.props.hasChanged( legendObject );
+
 			return { legendObject, selectedColor };
 		} );
 	}
@@ -137,7 +133,7 @@ class SimplecolorEditor extends React.Component {
 								return colorDataObj.color === color;
 							} ).name,
 						},
-					} )
+					}, )
 					}
 					disableCustomColors={ true }
 					clearable={ false }
@@ -164,6 +160,8 @@ class SimplecolorEditor extends React.Component {
 							const selectedColor = this.state.selectedColor;
 							selectedColor.label = input;
 
+							this.props.hasChanged( legendObject );
+
 							return { legendObject, selectedColor };
 						} );
 					} }
@@ -177,7 +175,7 @@ class SimplecolorEditor extends React.Component {
 	}
 }
 
-class SelectedColorOptions extends React.Component {
+class SelectedColorOptions extends Component {
 	constructor( props ) {
 		super( props );
 		this.deleteLabel = this.deleteLabel.bind( this );

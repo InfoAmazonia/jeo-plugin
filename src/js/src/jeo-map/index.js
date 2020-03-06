@@ -114,16 +114,25 @@ class JeoMap {
 	 * This will only work for maps stored in the database and not for one-time use maps
 	 */
 	addMoreButtonAndLegends() {
+		if ( this.legends.length === 0 || ! this.map_post_object ) {
+			return;
+		}
 
 		const container = document.createElement( 'div' );
 		container.classList.add( 'legend-container' );
 
-		this.legends.forEach( legend => {
-			const legendContainer = document.createElement( 'div' );
-			legendContainer.classList.add( 'legend-for-' + legend.layer_id );
-			legendContainer.appendChild( legend.render() );
-			container.appendChild( legendContainer );
-		} );
+		if ( this.legends.length > 0 ) {
+			const legendsWrapper = document.createElement( 'div' );
+			legendsWrapper.classList.add( 'legends-wrapper' );
+			container.appendChild( legendsWrapper );
+
+			this.legends.forEach( ( legend ) => {
+				const legendContainer = document.createElement( 'div' );
+				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
+				legendContainer.appendChild( legend.render() );
+				legendsWrapper.appendChild( legendContainer );
+			} );
+		}
 
 		if ( this.map_post_object ) {
 			const moreDiv = document.createElement( 'div' );
