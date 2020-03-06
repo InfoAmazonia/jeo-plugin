@@ -1,12 +1,11 @@
-import React from 'react';
 import { ColorPicker, ColorPalette, TextControl, Dropdown, Button } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 import '../editors/simplecolor.css';
 
-class SimplecolorEditor extends React.Component {
+class SimplecolorEditor extends Component {
 	constructor( props ) {
 		super( props );
 		this.updateSelectedColor = this.updateSelectedColor.bind( this );
@@ -177,7 +176,7 @@ class SimplecolorEditor extends React.Component {
 	}
 }
 
-class SelectedColorOptions extends React.Component {
+class SelectedColorOptions extends Component {
 	constructor( props ) {
 		super( props );
 		this.deleteLabel = this.deleteLabel.bind( this );
