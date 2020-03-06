@@ -1,34 +1,53 @@
 import { __ } from '@wordpress/i18n';
-import { Fragment, useState } from '@wordpress/element';
-import { Button, TextControl } from '@wordpress/components';
+import { withInstanceId } from '@wordpress/compose';
+import { Fragment } from '@wordpress/element';
+import { Button, Spinner } from '@wordpress/components';
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
 import LayerSettings from './layer-settings';
 import { layerLoader } from './utils';
+import JeoAutosuggest from './jeo-autosuggest';
+
+const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
 
 const anySwapDefault = ( settings ) =>
 	settings.some( ( s ) => s.use === 'swappable' && s.default );
 
-export default ( { attributes, setAttributes, loadingLayers, loadedLayers } ) => {
-	if ( loadingLayers ) {
-		// @TODO: proper loading spinner
-		return <p>Loading</p>;
-	}
-
+const LayersSettings = ( {
+	instanceId,
+	attributes,
+	setAttributes,
+	loadingLayers,
+	loadedLayers,
+} ) => {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
-	const [ search, setSearch ] = useState( '' );
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
 
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
-				<TextControl
-					type="search"
-					label={ __( 'Search for layers ' ) }
-					placeholder={ __( 'Search layers' ) }
-					value={ search }
-					onChange={ setSearch }
+				<label
+					className="jeo-layers-library-controls__label"
+					htmlFor={ `jeo-layers-autosuggest-${ instanceId }` }
+				>
+					{ __( 'Search for layers' ) }
+				</label>
+				<JeoAutosuggest
+					postType="map-layer"
+					inputProps={ {
+						id: `jeo-layers-autosuggest-${ instanceId }`,
+						placeholder: __( 'Search by layer name', 'jeo' ),
+					} }
+					filterSuggestions={ ( suggestion ) =>
+						! attributes.layers.map( ( l ) => l.id ).includes( suggestion.id )
+					}
+					onSuggestionSelected={ ( e, { suggestion } ) =>
+						setAttributes( {
+							...attributes,
+							layers: [ ...attributes.layers, setLayer( suggestion.id ) ],
+						} )
+					}
 				/>
 				<span>{ __( 'or' ) }</span>
 				<Button
@@ -41,9 +60,12 @@ export default ( { attributes, setAttributes, loadingLayers, loadedLayers } ) =>
 					{ __( 'Create New Layer' ) }
 				</Button>
 			</div>
-			{ ! attributes.layers.length ? (
+
+			{ loadingLayers && <Spinner /> }
+			{ ! loadingLayers && ! attributes.layers.length && (
 				<p>{ __( 'No layers have been added to this map.' ) } </p>
-			) : (
+			) }
+			{ ! loadingLayers && attributes.layers.length && (
 				<List
 					values={ attributes.layers }
 					beforeDrag={ ( { elements, index } ) => {
@@ -123,3 +145,5 @@ export default ( { attributes, setAttributes, loadingLayers, loadedLayers } ) =>
 		</Fragment>
 	);
 };
+
+export default withInstanceId( LayersSettings );
