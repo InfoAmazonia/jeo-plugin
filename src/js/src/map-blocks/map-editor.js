@@ -7,7 +7,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Fragment, useCallback } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -17,12 +17,9 @@ import './map-editor.css';
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 const MapEditor = ( { attributes, setAttributes, map, loading } ) => {
-	const setSize = useCallback(
-		( key ) => ( size ) => {
-			setAttributes( { ...attributes, [ key ]: size } );
-		},
-		[ attributes, setAttributes ]
-	);
+	const setSize = ( key ) => ( size ) => {
+		setAttributes( { ...attributes, [ key ]: size } );
+	};
 
 	return (
 		<Fragment>
@@ -56,15 +53,13 @@ const MapEditor = ( { attributes, setAttributes, map, loading } ) => {
 			) }
 			{ ! attributes.map_id && (
 				<JeoAutosuggest
-					placeholder={ __( 'Type a map name', 'jeo' ) }
-					postType={ 'map' }
+					inputProps={ {
+						placeholder: __( 'Type a map name', 'jeo' ),
+					} }
+					postType="map"
 					onSuggestionSelected={ ( e, { suggestion } ) =>
 						setAttributes( { ...attributes, map_id: suggestion.id } )
 					}
-					handleFetchRequest={ ( { value } ) => {
-						const input = value.trim().toLowerCase();
-						return input ? {} : { title: input };
-					} }
 				/>
 			) }
 			<InspectorControls key={ 'inspector' }>

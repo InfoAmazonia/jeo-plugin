@@ -1,43 +1,68 @@
 import { withSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { withInstanceId } from '@wordpress/compose';
+import { useCallback, useState } from '@wordpress/element';
 import Autosuggest from 'react-autosuggest';
 
-const getSuggestionValue = ( map ) => map.title.rendered;
-const renderSuggestion = ( map ) => <span>{ map.title.rendered }</span>;
-
-const mapStateToProps = ( select, { query, postType } ) => ( {
-	entityRecords: select( 'core' ).getEntityRecords( 'postType', 'map', query ),
+const GutenbergAutosuggest = withSelect( ( select, { query, postType } ) => ( {
+	entityRecords: select( 'core' ).getEntityRecords( 'postType', postType, query ),
 	loading: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
 		'postType',
 		postType,
 		query,
 	] ),
-} );
-
-const GutenbergAutosuggest = withSelect(
-	mapStateToProps
-)( ( { entityRecords, query, ...props } ) => (
-	<Autosuggest suggestions={ entityRecords || [] } { ...props } />
+} ) )( ( { entityRecords, filterSuggestions, ...props } ) => (
+	<Autosuggest
+		suggestions={ ( entityRecords || [] ).filter( filterSuggestions ) }
+		{ ...props }
+	/>
 ) );
 
-export default ( {
-	placeholder,
+const { debounce } = window._;
+const _filterSuggestions = () => true;
+const _getSuggestionValue = ( entityRecord ) => entityRecord.title.rendered;
+const _renderSuggestion = ( entityRecord ) => (
+	<span>{ entityRecord.title.rendered }</span>
+);
+const _handleFetchRequest = ( { value } ) => {
+	const input = value.trim().toLowerCase();
+	return input ? { search: input } : {};
+};
+
+const JeoAutosuggest = ( {
+	instanceId,
+	inputProps,
 	postType,
-	handleFetchRequest,
 	onSuggestionSelected,
+	filterSuggestions = _filterSuggestions,
+	getSuggestionValue = _getSuggestionValue,
+	handleFetchRequest = _handleFetchRequest,
+	renderSuggestion = _renderSuggestion,
 } ) => {
 	const [ query, setQuery ] = useState( {} );
 	const [ value, setValue ] = useState( '' );
-	const onChange = ( e, { newValue } ) => setValue( newValue );
-	const onSuggestionsFetchRequested = ( request ) =>
-		setQuery( handleFetchRequest( request ) );
-	const onSuggestionsClearRequested = () => setQuery( {} );
+	const onChange = useCallback(
+		( e, { newValue } ) => {
+			setValue( newValue );
+		},
+		[ setValue ]
+	);
+	const onSuggestionsFetchRequested = useCallback(
+		debounce( ( request ) => {
+			setQuery( handleFetchRequest( request ) );
+		}, 500 ),
+		[ setQuery, handleFetchRequest ]
+	);
+	const onSuggestionsClearRequested = useCallback( () => {
+		setQuery( {} );
+	}, [ setQuery ] );
 
 	return (
 		<GutenbergAutosuggest
+			id={ `jeo-autosuggest-${ instanceId }` }
 			query={ query }
 			postType={ postType }
-			inputProps={ { placeholder, value, onChange } }
+			inputProps={ { ...inputProps, value, onChange } }
+			filterSuggestions={ filterSuggestions }
 			getSuggestionValue={ getSuggestionValue }
 			renderSuggestion={ renderSuggestion }
 			onSuggestionsFetchRequested={ onSuggestionsFetchRequested }
@@ -46,3 +71,5 @@ export default ( {
 		/>
 	);
 };
+
+export default withInstanceId( JeoAutosuggest );
