@@ -1,5 +1,4 @@
-import React from 'react';
-import { Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { FormFileUpload, Icon, Button, 	IconButton, TextControl, ColorIndicator } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
@@ -7,7 +6,7 @@ import { v4 as uuid } from 'uuid';
 
 import '../editors/icons.css';
 
-class IconEditor extends React.Component {
+class IconEditor extends Component {
 	constructor( props ) {
 		super( props );
 		this.addLabel = this.addLabel.bind( this );
@@ -118,7 +117,7 @@ class IconEditor extends React.Component {
 
 export default IconEditor;
 
-class IconItem extends React.Component {
+class IconItem extends Component {
 	constructor( props ) {
 		super( props );
 		this.removeLabel = this.removeLabel.bind( this );

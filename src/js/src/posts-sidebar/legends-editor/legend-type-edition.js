@@ -1,11 +1,10 @@
-import React from 'react';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Component, Fragment, useEffect } from '@wordpress/element';
 import CircleEditor from './editors/circle';
 import BarscaleEditor from './editors/barscale';
 import SimplecolorEditor from './editors/simplecolor';
 import IconsEditor from './editors/icons';
 
-class LegendTypeEdition extends React.Component {
+class LegendTypeEdition extends Component {
 	constructor( props ) {
 		super( props );
 

@@ -1,12 +1,11 @@
-import React from 'react';
-import { Fragment } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { TextControl, SelectControl, Button } from '@wordpress/components';
 import JeoLegend from '../../../../includes/legend-types/JeoLegend';
 import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
 import LegendTypeEdition from './legend-type-edition';
 
-class LegendEditor extends React.Component {
+class LegendEditor extends Component {
 	constructor() {
 		super();
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
