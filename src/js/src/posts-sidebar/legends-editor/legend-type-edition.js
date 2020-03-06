@@ -1,21 +1,18 @@
-import React from 'react';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Component, Fragment, useEffect } from '@wordpress/element';
 import CircleEditor from './editors/circle';
 import BarscaleEditor from './editors/barscale';
 import SimplecolorEditor from './editors/simplecolor';
 import IconsEditor from './editors/icons';
 
-class LegendTypeEdition extends React.Component {
+class LegendTypeEdition extends Component {
 	constructor( props ) {
 		super( props );
 
+		this.hasChanged = this.hasChanged.bind( this );
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
 		this.state = {
 			legendObject: props.legendObject,
 		};
-
-		this.inicialLegendType = this.state.legendObject.legendSlug;
-
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
@@ -24,14 +21,16 @@ class LegendTypeEdition extends React.Component {
 		};
 	}
 
-	render() {
-		console.log(this.state.legendObject);
+	hasChanged( legendObject ) {
+		this.props.hasChanged( legendObject );
+	}
 
+	render() {
 		const typesEditorComponents = {
-			circles: <CircleEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></CircleEditor>,
-			barscale: <BarscaleEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></BarscaleEditor>,
-			icons: <IconsEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType }></IconsEditor>,
-			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } initialType={ this.inicialLegendType } ></SimplecolorEditor>,
+			circles: <CircleEditor legendObject={ this.state.legendObject } ></CircleEditor>,
+			barscale: <BarscaleEditor legendObject={ this.state.legendObject } ></BarscaleEditor>,
+			icons: <IconsEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></IconsEditor>,
+			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></SimplecolorEditor>,
 		};
 
 		const legendTypeEdition = typesEditorComponents[ this.state.legendObject.legendSlug ];
