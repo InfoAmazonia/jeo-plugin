@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { withInstanceId } from '@wordpress/compose';
 import { Fragment } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
 import LayerSettings from './layer-settings';
@@ -20,11 +20,6 @@ const LayersSettings = ( {
 	loadingLayers,
 	loadedLayers,
 } ) => {
-	if ( loadingLayers ) {
-		// @TODO: proper loading spinner
-		return <p>Loading</p>;
-	}
-
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
@@ -66,9 +61,11 @@ const LayersSettings = ( {
 				</Button>
 			</div>
 
-			{ ! attributes.layers.length ? (
+			{ loadingLayers && <Spinner /> }
+			{ ! loadingLayers && ! attributes.layers.length && (
 				<p>{ __( 'No layers have been added to this map.' ) } </p>
-			) : (
+			) }
+			{ ! loadingLayers && attributes.layers.length && (
 				<List
 					values={ attributes.layers }
 					beforeDrag={ ( { elements, index } ) => {
