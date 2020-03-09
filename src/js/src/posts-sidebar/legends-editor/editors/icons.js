@@ -13,13 +13,15 @@ class IconEditor extends Component {
 		this.removeLabel = this.removeLabel.bind( this );
 		this.iconUpdate = this.iconUpdate.bind( this );
 
+		const legendData = this.props.legendObject;
+
 		this.state = {
 			legendObject: {
-				...this.props.legendObject,
+				...legendData,
 				attributes: {
-					...this.props.legendObject.attributes,
+					...legendData.attributes,
 					legend_type_options: {
-						icons: [ ...this.props.legendObject.attributes.legend_type_options.icons.map( ( item ) => {
+						icons: [ ...legendData.attributes.legend_type_options.icons.map( ( item ) => {
 							return {
 								...item,
 								id: uuid(),
@@ -29,27 +31,12 @@ class IconEditor extends Component {
 				},
 			},
 		};
-
-		if ( this.state.legendObject.attributes.legend_type_options.icons === undefined ) {
-			this.setState( {
-				legendObject: {
-					...this.state.legendObject,
-					attributes: {
-						...this.state.legendObject.attributes,
-						legend_type_options: {
-							...this.state.legendObject.attributes.legend_type_options,
-							icons: [],
-						},
-					},
-				},
-			} );
-		}
 	}
 
-	componentDidUpdate( prevState ) {
-		if ( ! Object.is( prevState.legendObject, this.state.legendObject ) ) {
-			wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
-		}
+	static getDerivedStateFromProps( nextProps ) {
+		return {
+			legendObject: nextProps.legendObject,
+		};
 	}
 
 	iconUpdate( iconUpdated ) {
@@ -63,6 +50,8 @@ class IconEditor extends Component {
 				return item;
 			} );
 
+			this.props.hasChanged( legendObject );
+
 			return { legendObject };
 		} );
 	}
@@ -73,13 +62,16 @@ class IconEditor extends Component {
 			const icons = this.state.legendObject.attributes.legend_type_options.icons;
 
 			icons.push(
-				{ label: 'Example Label', icon: 'http://via.placeholder.com/20x20', id: uuid() },
+				{ label: 'Default Label', icon: 'http://via.placeholder.com/60x60', id: uuid() },
 			);
 
 			legendObject.attributes.legend_type_options.icons = icons;
 
+			this.props.hasChanged( legendObject );
+
 			return { legendObject };
 		} );
+
 	}
 
 	removeLabel( itemId ) {

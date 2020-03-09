@@ -14,14 +14,6 @@ class SimplecolorEditor extends Component {
 
 		const legendData = this.props.legendObject;
 
-		if ( legendData.legendSlug !== 'simple-color' || this.props.initialType !== 'simple-color' ) {
-			legendData.attributes = {
-				legend_type_options: {
-					colors: [ { label: 'Example Color', color: '#ff0909' } ],
-				},
-			};
-		}
-
 		this.state = {
 			legendObject: Object.assign( new JeoLegend, this.props.legendObject ),
 			selectedColor: {
@@ -29,13 +21,13 @@ class SimplecolorEditor extends Component {
 				label: legendData.attributes.legend_type_options.colors[ 0 ].label,
 			},
 		};
+
 	}
 
-	componentDidUpdate( prevState ) {
-		// ignores selected color updates
-		if ( ! Object.is( prevState.legendObject, this.state.legendObject ) ) {
-			wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
-		}
+	static getDerivedStateFromProps( nextProps ) {
+		return {
+			legendObject: nextProps.legendObject,
+		};
 	}
 
 	updateLegendColor( selectedColor ) {
@@ -52,6 +44,8 @@ class SimplecolorEditor extends Component {
 			} );
 
 			legendObject.attributes.legend_type_options.colors = colors;
+
+			this.props.hasChanged( legendObject );
 
 			return { legendObject };
 		} );
@@ -85,6 +79,8 @@ class SimplecolorEditor extends Component {
 				label: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].label,
 			};
 
+			this.props.hasChanged( legendObject );
+
 			return { legendObject, selectedColor };
 		} );
 	}
@@ -115,6 +111,8 @@ class SimplecolorEditor extends Component {
 				};
 			}
 
+			this.props.hasChanged( legendObject );
+
 			return { legendObject, selectedColor };
 		} );
 	}
@@ -136,7 +134,7 @@ class SimplecolorEditor extends Component {
 								return colorDataObj.color === color;
 							} ).name,
 						},
-					} )
+					}, )
 					}
 					disableCustomColors={ true }
 					clearable={ false }
@@ -162,6 +160,8 @@ class SimplecolorEditor extends Component {
 
 							const selectedColor = this.state.selectedColor;
 							selectedColor.label = input;
+
+							this.props.hasChanged( legendObject );
 
 							return { legendObject, selectedColor };
 						} );
