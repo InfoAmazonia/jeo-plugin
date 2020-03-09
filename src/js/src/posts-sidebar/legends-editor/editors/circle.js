@@ -1,16 +1,38 @@
 import { Component, Fragment } from '@wordpress/element';
-import { TextControl, RangeControl, Button, Dropdown } from '@wordpress/components';
+import { TextControl, RangeControl, Button, Dropdown, ColorPicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import '../editors/circle.css';
+import { v4 as uuid } from 'uuid';
+import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 class CircleEditor extends Component {
 	constructor( props ) {
 		super( props );
 
 		//this.hasChanged = this.hasChanged.bind( this );
+		this.updateColor = this.updateColor.bind( this );
+		this.addNew = this.addNew.bind( this );
+		this.removeLabel = this.removeLabel.bind( this );
+		this.itemChanged = this.itemChanged.bind( this );
+
+		const legendData = this.props.legendObject;
 
 		this.state = {
-			legendObject: this.props.legendObject,
+			legendObject: {
+				...legendData,
+				attributes: {
+					...legendData.attributes,
+					legend_type_options: {
+						...legendData.attributes.legend_type_options,
+						circles: [ ...legendData.attributes.legend_type_options.circles.map( ( item ) => {
+							return {
+								...item,
+								id: uuid(),
+							};
+						} ) ],
+					},
+				},
+			},
 		};
 
 		this.maxRadius = 0;
@@ -18,16 +40,98 @@ class CircleEditor extends Component {
 		this.state.legendObject.attributes.legend_type_options.circles.map( ( item ) => {
 			if ( item.radius > this.maxRadius ) this.maxRadius = item.radius;
 		} );
+
+		console.log(this.state);
+	}
+
+	addNew() {
+		this.setState( ( prevState ) => {
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			const circles = this.state.legendObject.attributes.legend_type_options.circles;
+
+			circles.push(
+				{ label: 'Default Label', radius: 50, id: uuid() },
+			);
+
+			legendObject.attributes.legend_type_options.circles = circles;
+
+			this.props.hasChanged( legendObject );
+
+			return { legendObject };
+		} );
+	}
+
+	removeLabel( id ) {
+		this.setState( ( ) => {
+			const legendObject = Object.assign( new JeoLegend, this.state.legendObject );
+			const circles = this.state.legendObject.attributes.legend_type_options.circles.filter( ( item ) => {
+				if ( id === item.id ) {
+					return false;
+				}
+
+				return true;
+			} );
+
+			legendObject.attributes.legend_type_options.circles = circles;
+
+			this.props.hasChanged( legendObject );
+
+			return { legendObject };
+		} );
+	}
+
+	updateColor( color ) {
+		this.setState( ( prevState ) => {
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+
+			legendObject.attributes.legend_type_options.color = color;
+
+			this.props.hasChanged( legendObject );
+
+			return { legendObject };
+		} );
+	}
+
+	itemChanged( itemState ) {
+		this.setState( ( prevState ) => {
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			legendObject.attributes.legend_type_options.circles = legendObject.attributes.legend_type_options.circles.map( ( item ) => {
+				if ( item.id === itemState.id ) {
+					return { ...itemState };
+				}
+
+				return item;
+			} );
+
+			//console.log(legendObject);
+
+			this.props.hasChanged( legendObject );
+
+			return { legendObject };
+		} );
 	}
 
 	render() {
 		return (
 			<Fragment>
+				{ __( 'Circles color' ) }
+				<ColorPicker
+					color={ this.state.legendObject.attributes.legend_type_options.color }
+					onChangeComplete={ ( color ) => {
+						this.updateColor( color.hex );
+					} }
+					disableAlpha
+				/>
+
 				{
 					this.state.legendObject.attributes.legend_type_options.circles.map( ( item ) => {
-						return ( <CircleItem circleItem={ item } key={ item.id } removeLabel={ this.removeLabel } iconUpdate={ this.iconUpdate } color={ this.state.legendObject.attributes.legend_type_options.color } maxRadius={ this.maxRadius }/> );
+						return ( <CircleItem circleItem={ item } key={ item.id } removeLabel={ this.removeLabel } itemChanged={ this.itemChanged } color={ this.state.legendObject.attributes.legend_type_options.color } maxRadius={ this.maxRadius } /> );
 					} )
 				}
+
+				<Button isSecondary isButton isLarge onClick={ this.addNew } className="full-width-button">
+					{ __( 'Add new label' ) }
+				</Button>
 			</Fragment>
 
 		);
@@ -38,13 +142,18 @@ class CircleItem extends Component {
 	constructor( props ) {
 		super( props );
 
+		this.itemChanged = this.itemChanged.bind( this );
+
 		this.state = {
 			label: this.props.circleItem.label,
 			radius: this.props.circleItem.radius,
 			id: this.props.circleItem.id,
 			style: '',
 		};
+	}
 
+	itemChanged() {
+		this.props.itemChanged( this.state );
 	}
 
 	render() {
@@ -74,13 +183,20 @@ class CircleItem extends Component {
 					<TextControl
 						label={ __( 'Label' ) }
 						value={ this.state.label }
-						onChange={ ( label ) => this.setState( { label } ) }
+						onChange={ ( label ) => {
+							this.setState( { label } );
+							this.itemChanged();
+						} }
 					/>
 
 					<RangeControl
 						label={ __( 'Radius' ) }
 						value={ this.state.radius }
-						onChange={ ( radius ) => this.setState( { radius } ) }
+						onChange={ ( radius ) => {
+							this.setState( { radius } );
+							this.itemChanged();
+						} }
+
 						min={ 1 }
 						max={ 100 }
 					/>
@@ -88,9 +204,15 @@ class CircleItem extends Component {
 					<Dropdown
 						position=""
 						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button isSecondary isButton isLarge aria-expanded={ isOpen } onClick={ onToggle } className="full-width-button">
-								{ __( 'See preview' ) }
-							</Button>
+							<div className="buttonsList">
+								<Button isDestructive isButton isLink isSecondary onClick={ () => this.props.removeLabel( this.state.id ) } >
+									{ __( 'Remove' ) }
+								</Button>
+
+								<Button isSecondary isButton isLink aria-expanded={ isOpen } onClick={ onToggle } >
+									{ __( 'See preview' ) }
+								</Button>
+							</div>
 						) }
 						renderContent={ () => (
 							<div className={ 'circle-wrapper' } >
@@ -99,8 +221,6 @@ class CircleItem extends Component {
 							</div>
 						) }
 					/>
-
-
 
 				</div>
 

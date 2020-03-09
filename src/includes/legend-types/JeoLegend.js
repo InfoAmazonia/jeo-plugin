@@ -1,4 +1,5 @@
 import JeoLegendTypes from './JeoLegendTypes';
+import { v4 as uuid } from 'uuid';
 
 class JeoLegend {
 	constructor( legendTypeSlug, attributes ) {
@@ -25,7 +26,7 @@ class JeoLegend {
 			},
 
 			circles: {
-
+				circles: [ { color: '#000', circles: [] } ],
 			},
 
 			barscale: {
@@ -34,6 +35,50 @@ class JeoLegend {
 		};
 
 		return options[ type ];
+	}
+
+	static legendItensIdGenerator( legendObject ) {
+
+		// const slug = legendObject.legendSlug;
+		// const mapping = {};
+		// mapping[ legendObject.legendSlug ] = { :  0 };
+
+		// const mapping = {
+		// 	icons: {
+		// 		icons: [ ...legendObject.attributes.legend_type_options.icons.map( ( item ) => {
+		// 			return {
+		// 				...item,
+		// 				id: uuid(),
+		// 			};
+		// 		} ) ],
+		// 	},
+
+		// 	'simple-color': {
+		// 		colors: [ ...legendObject.attributes.legend_type_options.colors.map( ( item ) => {
+		// 			return {
+		// 				...item,
+		// 				id: uuid(),
+		// 			};
+		// 		} ) ],
+		// 	},
+
+		// 	circles: {
+		// 		circles: [ ...legendObject.attributes.legend_type_options.circles.map( ( item ) => {
+		// 			return {
+		// 				...item,
+		// 				id: uuid(),
+		// 			};
+		// 		} ) ],
+		// 	},
+		// };
+
+		return {
+			...legendObject,
+			attributes: {
+				...legendObject.attributes,
+				legend_type_options: mapping[ legendObject.legendSlug ],
+			},
+		};
 	}
 
 	get legendSlug() {
@@ -69,6 +114,11 @@ class JeoLegend {
 		//console.log({ legendObject.attributes.legend_type_options);
 		// this is necessary because '...' wont turn arrays into objects with the matching index
 		//console.log(legendObject);
+		const adicionalProps = { };
+
+		if ( legendObject.legendSlug === 'circles' ) {
+			adicionalProps.color = legendObject.attributes.legend_type_options.color;
+		}
 
 		const legendMeta = {
 			legend_type: legendObject.legendSlug,
@@ -81,6 +131,12 @@ class JeoLegend {
 				icons: {
 					...legendObject.attributes.legend_type_options.icons,
 				},
+
+				circles: {
+					...legendObject.attributes.legend_type_options.circles,
+				},
+
+				...adicionalProps,
 			},
 		};
 
