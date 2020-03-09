@@ -50,6 +50,7 @@ class Jeo {
 		\jeo_sidebars();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
+		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 
@@ -125,6 +126,19 @@ class Jeo {
 			array_merge( $map_blocks_assets['dependencies'], array( 'jeo-layer' ) ),
 			$map_blocks_assets['version']
 		);
+	}
+
+	public function register_block_category( $categories ) {
+		$slugs = wp_list_pluck( $categories, 'slug' );
+		return in_array( 'jeo', $slugs, true )
+			? $categories
+			: array_merge( $categories, [
+				[
+					'slug' => 'jeo',
+					'title' => 'JEO',
+					'icon' => null
+				]
+			] );
 	}
 
 	public function register_block_types() {
