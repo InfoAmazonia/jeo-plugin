@@ -54,12 +54,12 @@ class SimplecolorEditor extends Component {
 	}
 
 	updateLegendColor( selectedColor ) {
-		//console.log( selectedColor );
+		console.log( selectedColor );
 
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors.map( ( item ) => {
-				if ( item.id === selectedColor.id ) {
+				if ( item.label === selectedColor.label && item.id === selectedColor.id ) {
 					return {
 						color: selectedColor.color, label: item.label, id: selectedColor.id,
 					};
@@ -76,19 +76,19 @@ class SimplecolorEditor extends Component {
 		} );
 	}
 
-	updateSelectedColor( color, id ) {
+	updateSelectedColor( color ) {
 		this.setState( { selectedColor: {
 			label: this.state.selectedColor.label,
 			color,
-			id,
+			id: this.state.selectedColor.id,
 		} } );
 
-		//console.log( 'id', id );
+		console.log( 'id', this.state.selectedColor.id );
 
 		this.updateLegendColor( {
 			label: this.state.selectedColor.label,
 			color,
-			id,
+			id: this.state.selectedColor.id,
 		} );
 	}
 
@@ -221,7 +221,7 @@ class SimplecolorEditor extends Component {
 								color={ this.state.selectedColor.color }
 								onChangeComplete={ ( color ) => {
 									// console.log( "selectedColor.id", this.state.selectedColor.id );
-									this.updateSelectedColor( color.hex, this.state.selectedColor.id );
+									this.updateSelectedColor( color.hex );
 								} }
 								disableAlpha
 							/>
