@@ -9,8 +9,10 @@ class LegendEditor extends Component {
 	constructor() {
 		super();
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
+		this.hasChanged = this.hasChanged.bind( this );
 
 		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+		// console.log(metadata);
 
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
@@ -19,8 +21,18 @@ class LegendEditor extends Component {
 			} ),
 		};
 
-		//console.log( this.state.legendObject );
+		this.initialType = this.state.legendObject.legendSlug === undefined ? 'barscale' : this.state.legendObject.legendSlug;
+		this.inicialAttrType = this.state.legendObject.attributes.legend_type_options;
+		console.log( this.state.legendObject );
+	}
 
+	componentDidUpdate() {
+
+	}
+
+	hasChanged( legendObject ) {
+		this.setState( { legendObject } );
+		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
 	}
 
 	render() {
@@ -28,15 +40,16 @@ class LegendEditor extends Component {
 			<Fragment>
 				<TextControl
 					label={ __( 'Title' ) }
-					value={ this.state.legendObject.title }
+					value={ this.state.legendObject.attributes.title }
 					onChange={ ( input ) => {
 						this.setState( ( prevState ) => {
 							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 							legendObject.attributes.title = input;
+
+							this.hasChanged( legendObject );
+
 							return { legendObject };
 						} );
-
-						wp.data.dispatch( 'core/editor' ).editPost( { meta: { 'legend_title': input } } );
 					} }
 				/>
 
@@ -52,18 +65,21 @@ class LegendEditor extends Component {
 							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 							legendObject.legendType = newLegendType;
 							legendObject.setlegengSlug = newLegendType;
+
+							if ( this.initialType !== newLegendType ) {
+								legendObject.attributes.legend_type_options = JeoLegend.typeOptionsShape( newLegendType );
+							} else {
+								legendObject.attributes.legend_type_options = this.inicialAttrType;
+							}
+
+							this.hasChanged( legendObject );
+
 							return { legendObject };
 						} );
-
-						wp.data.dispatch( 'core/editor' ).editPost( { meta: { 'legend_type': newLegendType } } );
 					} }
 				/>
 
-				<LegendTypeEdition legendObject={ this.state.legendObject } />
-
-				{/* <Button isPrimary isButton isLarge onClick={ 'asd' } className="full-width-button">
-					{ __( 'Save' ) }
-				</Button> */}
+				<LegendTypeEdition legendObject={ this.state.legendObject } initialType={ this.initialType } hasChanged={ this.hasChanged } />
 
 			</Fragment>
 
