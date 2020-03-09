@@ -59,7 +59,7 @@ class SimplecolorEditor extends Component {
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors.map( ( item ) => {
-				if ( item.label === selectedColor.label && item.id === selectedColor.id ) {
+				if ( item.label === selectedColor.label ) {
 					return {
 						color: selectedColor.color, label: item.label, id: selectedColor.id,
 					};
