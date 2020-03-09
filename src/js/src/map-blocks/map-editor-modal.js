@@ -29,8 +29,9 @@ export default function( {
 } ) {
 	useEffect( () => {
 		const isNewMap = [ 'initial_zoom', 'center_lat', 'center_lon', 'min_zoom', 'max_zoom' ].every( ( key ) => {
-			return attributes[ key ] === 0;
+			return ! attributes[ key ];
 		} );
+
 		if ( isNewMap ) {
 			setAttributes( mapDefaults );
 		}
