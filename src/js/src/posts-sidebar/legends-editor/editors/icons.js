@@ -50,7 +50,7 @@ class IconEditor extends Component {
 				return item;
 			} );
 
-			console.log(legendObject);
+			console.log( legendObject );
 
 			this.props.hasChanged( legendObject );
 
