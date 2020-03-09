@@ -2,6 +2,7 @@ import { ColorPicker, ColorPalette, TextControl, Dropdown, Button } from '@wordp
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
+import { v4 as uuid } from 'uuid';
 
 import '../editors/simplecolor.css';
 
@@ -15,13 +16,35 @@ class SimplecolorEditor extends Component {
 		const legendData = this.props.legendObject;
 
 		this.state = {
-			legendObject: Object.assign( new JeoLegend, this.props.legendObject ),
+			legendObject: {
+				...legendData,
+				attributes: {
+					...legendData.attributes,
+					legend_type_options: {
+						colors: [ ...legendData.attributes.legend_type_options.colors.map( ( item ) => {
+							return {
+								...item,
+								id: uuid(),
+							};
+						} ) ],
+					},
+				},
+			},
 			selectedColor: {
 				color: legendData.attributes.legend_type_options.colors[ 0 ].color,
 				label: legendData.attributes.legend_type_options.colors[ 0 ].label,
 			},
 		};
 
+		this.state = {
+			...this.state,
+			selectedColor: {
+				...this.state.selectedColor,
+				id: this.state.legendObject.attributes.legend_type_options.colors[ 0 ].id,
+			},
+		};
+
+		// console.log(this.state);
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
@@ -31,12 +54,14 @@ class SimplecolorEditor extends Component {
 	}
 
 	updateLegendColor( selectedColor ) {
+		//console.log( selectedColor );
+
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors.map( ( item ) => {
-				if ( item.label === selectedColor.label ) {
+				if ( item.id === selectedColor.id ) {
 					return {
-						color: selectedColor.color, label: item.label,
+						color: selectedColor.color, label: item.label, id: selectedColor.id,
 					};
 				}
 
@@ -51,13 +76,20 @@ class SimplecolorEditor extends Component {
 		} );
 	}
 
-	updateSelectedColor( color ) {
+	updateSelectedColor( color, id ) {
 		this.setState( { selectedColor: {
 			label: this.state.selectedColor.label,
 			color,
+			id,
 		} } );
 
-		this.updateLegendColor( this.state.selectedColor );
+		//console.log( 'id', id );
+
+		this.updateLegendColor( {
+			label: this.state.selectedColor.label,
+			color,
+			id,
+		} );
 	}
 
 	addLabel() {
@@ -68,7 +100,7 @@ class SimplecolorEditor extends Component {
 			// math random (0 to 1) -> multiply by giant hexadecial -> bit shift -> string conversion
 			const randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
 			colors.push(
-				{ label: '', color: randomColor },
+				{ label: '', color: randomColor, id: uuid() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
@@ -77,6 +109,7 @@ class SimplecolorEditor extends Component {
 			const selectedColor = {
 				color: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].color,
 				label: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].label,
+				id: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].id,
 			};
 
 			this.props.hasChanged( legendObject );
@@ -89,7 +122,7 @@ class SimplecolorEditor extends Component {
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors.filter( ( item ) => {
-				if ( item.color === labelData.color && item.label === labelData.label ) {
+				if ( item.id === labelData.id ) {
 					return false;
 				}
 
@@ -108,6 +141,7 @@ class SimplecolorEditor extends Component {
 				selectedColor = {
 					color: legendObject.attributes.legend_type_options.colors[ 0 ].color,
 					label: legendObject.attributes.legend_type_options.colors[ 0 ].label,
+					id: legendObject.attributes.legend_type_options.colors[ 0 ].id,
 				};
 			}
 
@@ -119,7 +153,7 @@ class SimplecolorEditor extends Component {
 
 	render() {
 		const colorsData = this.state.legendObject.attributes.legend_type_options.colors.map( ( data ) => {
-			return { name: data.label, color: data.color };
+			return { name: data.label, color: data.color, id: data.id };
 		} );
 
 		return (
@@ -127,15 +161,16 @@ class SimplecolorEditor extends Component {
 				<ColorPalette
 					colors={ colorsData }
 					value={ this.state.selectedColor.color }
-					onChange={ ( color ) => this.setState( {
-						selectedColor: {
-							color,
-							label: colorsData.find( ( colorDataObj ) => {
-								return colorDataObj.color === color;
-							} ).name,
-						},
-					}, )
-					}
+					onChange={ ( color ) => {
+						this.setState( {
+							selectedColor: {
+								color,
+								label: colorsData.find( ( colorDataObj ) => {
+									return colorDataObj.color === color;
+								} ).name,
+							},
+						}, );
+					} }
 					disableCustomColors={ true }
 					clearable={ false }
 				/>
@@ -147,9 +182,9 @@ class SimplecolorEditor extends Component {
 						this.setState( ( prevState ) => {
 							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 							const colors = this.state.legendObject.attributes.legend_type_options.colors.map( ( item ) => {
-								if ( item.color === this.state.selectedColor.color ) {
+								if ( item.id === this.state.selectedColor.id ) {
 									return {
-										label: input, color: item.color,
+										label: input, color: item.color, id: item.id,
 									};
 								}
 
@@ -167,46 +202,6 @@ class SimplecolorEditor extends Component {
 						} );
 					} }
 				/>
-
-				<SelectedColorOptions selectedColorData={ this.state.selectedColor } updateSelectedColor={ this.updateSelectedColor } deleteLabel={ this.deleteLabel } addLabel={ this.addLabel } />
-
-			</Fragment>
-
-		);
-	}
-}
-
-class SelectedColorOptions extends Component {
-	constructor( props ) {
-		super( props );
-		this.deleteLabel = this.deleteLabel.bind( this );
-		this.addLabel = this.addLabel.bind( this );
-
-		this.state = {
-			color: this.props.selectedColorData.color,
-			label: this.props.selectedColorData.label,
-		};
-	}
-
-	deleteLabel() {
-		this.props.deleteLabel( this.state );
-	}
-
-	addLabel() {
-		this.props.addLabel();
-	}
-
-	static getDerivedStateFromProps( nextProps ) {
-		return {
-			color: nextProps.selectedColorData.color,
-			label: nextProps.selectedColorData.label,
-		};
-	}
-
-	render() {
-		return (
-			<div>
-
 				<Dropdown
 					position=""
 					renderToggle={ ( { isOpen, onToggle } ) => (
@@ -223,8 +218,11 @@ class SelectedColorOptions extends Component {
 					renderContent={ () => (
 						<div>
 							<ColorPicker
-								color={ this.state.color }
-								onChangeComplete={ ( color ) => this.props.updateSelectedColor( color.hex ) }
+								color={ this.state.selectedColor.color }
+								onChangeComplete={ ( color ) => {
+									// console.log( "selectedColor.id", this.state.selectedColor.id );
+									this.updateSelectedColor( color.hex, this.state.selectedColor.id );
+								} }
 								disableAlpha
 							/>
 						</div>
@@ -235,7 +233,8 @@ class SelectedColorOptions extends Component {
 					{ __( 'Add new label' ) }
 				</Button>
 
-			</div>
+			</Fragment>
+
 		);
 	}
 }
