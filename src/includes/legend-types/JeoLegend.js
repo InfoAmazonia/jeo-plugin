@@ -26,7 +26,8 @@ class JeoLegend {
 			},
 
 			circles: {
-				circles: [ { color: '#000', circles: [] } ],
+				color: '#000',
+				circles: [ { label: 'Default Item', radius: 8 } ],
 			},
 
 			barscale: {
