@@ -34,14 +34,14 @@ class IconEditor extends Component {
 	}
 
 	static getDerivedStateFromProps( nextProps ) {
-		return {
-			legendObject: nextProps.legendObject,
-		};
+		// return {
+		// 	legendObject: nextProps.legendObject,
+		// };
 	}
 
 	iconUpdate( iconUpdated ) {
-		this.setState( ( ) => {
-			const legendObject = this.state.legendObject;
+		this.setState( ( prevState ) => {
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			legendObject.attributes.legend_type_options.icons = legendObject.attributes.legend_type_options.icons.map( ( item, index ) => {
 				if ( item.id === iconUpdated.id ) {
 					return { ...item, ...iconUpdated };
@@ -49,6 +49,8 @@ class IconEditor extends Component {
 
 				return item;
 			} );
+
+			console.log(legendObject);
 
 			this.props.hasChanged( legendObject );
 
@@ -94,6 +96,7 @@ class IconEditor extends Component {
 	render() {
 		return (
 			<Fragment>
+				{console.log(this.state)}
 				{
 					this.state.legendObject.attributes.legend_type_options.icons.map( ( item ) => {
 						return ( <IconItem iconData={ item } key={ item.id } removeLabel={ this.removeLabel } iconUpdate={ this.iconUpdate } /> );
@@ -117,6 +120,8 @@ class IconItem extends Component {
 		this.state = {
 			iconData: this.props.iconData,
 		};
+
+		console.log( this.state );
 	}
 
 	removeLabel() {
