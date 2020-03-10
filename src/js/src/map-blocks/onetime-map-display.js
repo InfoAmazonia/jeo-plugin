@@ -1,4 +1,12 @@
 export default ( { attributes } ) => {
+	let hasRelatedPosts;
+
+	if ( ! attributes.related_posts ) {
+		hasRelatedPosts = false;
+	} else {
+		hasRelatedPosts = [ 'categories', 'tags', 'before', 'after', 'meta_query' ].some( ( key ) => attributes.related_posts[ key ] );
+	}
+
 	return (
 		<div
 			className="jeomap"
@@ -8,6 +16,7 @@ export default ( { attributes } ) => {
 			data-min_zoom={ attributes.min_zoom }
 			data-max_zoom={ attributes.max_zoom }
 			data-layers={ JSON.stringify( attributes.layers ) }
+			data-related_posts={ hasRelatedPosts ? JSON.stringify( attributes.related_posts ) : undefined }
 		/>
 	);
 };
