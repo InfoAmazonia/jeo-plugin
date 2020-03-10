@@ -43,8 +43,11 @@ export default ( { attributes, setAttributes } ) => {
 							center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
 							animationOptions={ animationOptions }
 							onMoveEnd={ ( map ) => {
+								if(window._editing_map) return;
+
 								const center = map.getCenter();
 								const zoom = Math.round( map.getZoom() * 10 ) / 10;
+
 								setAttributes( {
 									center_lat: center.lat,
 									center_lon: center.lng,
@@ -60,13 +63,23 @@ export default ( { attributes, setAttributes } ) => {
 						type="number"
 						label={ __( 'Latitude' ) }
 						value={ centerLat }
-						onChange={ attributeUpdater( 'center_lat' ) }
+						onChange={ (value) => {
+								window._editing_map = true;
+								setTimeout(() => window._editing_map = false, 50);
+								return attributeUpdater( 'center_lat' )(value);
+							}
+						}
 					/>
 					<TextControl
 						type="number"
 						label={ __( 'Longitude' ) }
 						value={ centerLon }
-						onChange={ attributeUpdater( 'center_lon' ) }
+						onChange={ (value) => {
+								window._editing_map = true;
+								setTimeout(() => window._editing_map = false, 50);
+								return attributeUpdater( 'center_lon' )(value);
+							}
+						}
 					/>
 				</section>
 				<section className="zoom">
