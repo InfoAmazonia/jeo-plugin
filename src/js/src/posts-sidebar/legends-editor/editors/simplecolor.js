@@ -9,9 +9,10 @@ import '../editors/simplecolor.css';
 class SimplecolorEditor extends Component {
 	constructor( props ) {
 		super( props );
-		this.updateSelectedColor = this.updateSelectedColor.bind( this );
-		this.deleteLabel = this.deleteLabel.bind( this );
-		this.addLabel = this.addLabel.bind( this );
+		this.itemChanged = this.itemChanged.bind( this );
+		this.addItem = this.addItem.bind( this );
+		this.removeItem = this.removeItem.bind( this );
+		this.hasChanged = this.hasChanged.bind( this );
 
 		const legendData = this.props.legendObject;
 
@@ -21,108 +22,35 @@ class SimplecolorEditor extends Component {
 				attributes: {
 					...legendData.attributes,
 					legend_type_options: {
+						...legendData.attributes.legend_type_options,
 						colors: [ ...legendData.attributes.legend_type_options.colors.map( ( item ) => {
+							let result = {};
+
+							if ( typeof item === 'string' ) {
+								result = { color: item };
+							} else {
+								result = { ...item };
+							}
 							return {
-								...item,
+								...result,
 								id: uuid(),
 							};
 						} ) ],
 					},
 				},
 			},
-			selectedColor: {
-				color: legendData.attributes.legend_type_options.colors[ 0 ].color,
-				label: legendData.attributes.legend_type_options.colors[ 0 ].label,
-			},
-		};
-
-		this.state = {
-			...this.state,
-			selectedColor: {
-				...this.state.selectedColor,
-				id: this.state.legendObject.attributes.legend_type_options.colors[ 0 ].id,
-			},
-		};
-
-		// console.log(this.state);
-	}
-
-	static getDerivedStateFromProps( nextProps ) {
-		return {
-			legendObject: nextProps.legendObject,
 		};
 	}
 
-	updateLegendColor( selectedColor ) {
-		console.log( selectedColor );
-
-		this.setState( ( prevState ) => {
-			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-			const colors = this.state.legendObject.attributes.legend_type_options.colors.map( ( item ) => {
-				if ( item.label === selectedColor.label ) {
-					return {
-						color: selectedColor.color, label: item.label, id: selectedColor.id,
-					};
-				}
-
-				return item;
-			} );
-
-			legendObject.attributes.legend_type_options.colors = colors;
-
-			this.props.hasChanged( legendObject );
-
-			return { legendObject };
-		} );
+	hasChanged( legendObject ) {
+		this.props.hasChanged( legendObject );
 	}
 
-	updateSelectedColor( color ) {
-		this.setState( { selectedColor: {
-			label: this.state.selectedColor.label,
-			color,
-			id: this.state.selectedColor.id,
-		} } );
-
-		console.log( 'id', this.state.selectedColor.id );
-
-		this.updateLegendColor( {
-			label: this.state.selectedColor.label,
-			color,
-			id: this.state.selectedColor.id,
-		} );
-	}
-
-	addLabel() {
+	removeItem( itemId ) {
 		this.setState( ( prevState ) => {
-			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-			const colors = this.state.legendObject.attributes.legend_type_options.colors;
-
-			// math random (0 to 1) -> multiply by giant hexadecial -> bit shift -> string conversion
-			const randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
-			colors.push(
-				{ label: '', color: randomColor, id: uuid() },
-			);
-
-			legendObject.attributes.legend_type_options.colors = colors;
-			const colorsSize = colors.length;
-
-			const selectedColor = {
-				color: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].color,
-				label: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].label,
-				id: legendObject.attributes.legend_type_options.colors[ colorsSize - 1 ].id,
-			};
-
-			this.props.hasChanged( legendObject );
-
-			return { legendObject, selectedColor };
-		} );
-	}
-
-	deleteLabel( labelData ) {
-		this.setState( ( prevState ) => {
-			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			const legendObject = Object.assign( new JeoLegend, this.state.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors.filter( ( item ) => {
-				if ( item.id === labelData.id ) {
+				if ( itemId === item.id ) {
 					return false;
 				}
 
@@ -135,105 +63,119 @@ class SimplecolorEditor extends Component {
 				legendObject.attributes.legend_type_options.colors = colors;
 			}
 
-			let selectedColor = { };
+			this.hasChanged( legendObject );
 
-			if ( size > 0 ) {
-				selectedColor = {
-					color: legendObject.attributes.legend_type_options.colors[ 0 ].color,
-					label: legendObject.attributes.legend_type_options.colors[ 0 ].label,
-					id: legendObject.attributes.legend_type_options.colors[ 0 ].id,
-				};
+			return { legendObject };
+		} );
+	}
+
+	itemChanged( itemUpdated ) {
+		this.setState( ( prevState ) => {
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			legendObject.attributes.legend_type_options.colors = legendObject.attributes.legend_type_options.colors.map( ( item, index ) => {
+				if ( item.id === itemUpdated.id ) {
+					return { ...item, ...itemUpdated };
+				}
+
+				return item;
+			} );
+
+			this.hasChanged( legendObject );
+
+			return { legendObject };
+		} );
+	}
+
+	addItem() {
+		this.setState( ( prevState ) => {
+			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+			const colors = this.state.legendObject.attributes.legend_type_options.colors;
+
+			// math random (0 to 1) -> multiply by giant hexadecial -> bit shift -> string conversion
+			let randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
+
+			if ( randomColor.length < 7 ) {
+				randomColor = randomColor.substr( 0, 4 );
 			}
 
-			this.props.hasChanged( legendObject );
+			colors.push(
+				{ label: 'Default name', color: randomColor, id: uuid() },
+			);
 
-			return { legendObject, selectedColor };
+			legendObject.attributes.legend_type_options.colors = colors;
+
+			this.hasChanged( legendObject );
+
+			return { legendObject };
 		} );
 	}
 
 	render() {
-		const colorsData = this.state.legendObject.attributes.legend_type_options.colors.map( ( data ) => {
-			return { name: data.label, color: data.color, id: data.id };
-		} );
+		// increment qnty
+		const colors = this.state.legendObject.attributes.legend_type_options.colors;
 
 		return (
 			<Fragment>
-				<ColorPalette
-					colors={ colorsData }
-					value={ this.state.selectedColor.color }
-					onChange={ ( color ) => {
-						this.setState( {
-							selectedColor: {
-								color,
-								label: colorsData.find( ( colorDataObj ) => {
-									return colorDataObj.color === color;
-								} ).name,
-							},
-						}, );
-					} }
-					disableCustomColors={ true }
-					clearable={ false }
-				/>
-
-				<TextControl
-					label={ __( 'Label' ) }
-					value={ this.state.selectedColor.label }
-					onChange={ ( input ) => {
-						this.setState( ( prevState ) => {
-							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-							const colors = this.state.legendObject.attributes.legend_type_options.colors.map( ( item ) => {
-								if ( item.id === this.state.selectedColor.id ) {
-									return {
-										label: input, color: item.color, id: item.id,
-									};
-								}
-
-								return item;
-							} );
-
-							legendObject.attributes.legend_type_options.colors = colors;
-
-							const selectedColor = this.state.selectedColor;
-							selectedColor.label = input;
-
-							this.props.hasChanged( legendObject );
-
-							return { legendObject, selectedColor };
-						} );
-					} }
-				/>
-				<Dropdown
-					position=""
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<div className="buttons-wrapper">
-							<Button isLink onClick={ onToggle } aria-expanded={ isOpen }>
-								{ __( 'Select color' ) }
-							</Button>
-
-							<Button isDestructive isButton isLink onClick={ this.deleteLabel } aria-expanded={ isOpen }>
-								{ __( 'Remove field' ) }
-							</Button>
-						</div>
-					) }
-					renderContent={ () => (
-						<div>
-							<ColorPicker
-								color={ this.state.selectedColor.color }
-								onChangeComplete={ ( color ) => {
-									// console.log( "selectedColor.id", this.state.selectedColor.id );
-									this.updateSelectedColor( color.hex );
-								} }
-								disableAlpha
-							/>
-						</div>
-					) }
-				/>
-
-				<Button isSecondary isButton isLarge onClick={ this.addLabel } className="full-width-button">
-					{ __( 'Add new label' ) }
-				</Button>
-
+				<div className="itens-wrapper">
+					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } /> ) }
+					<div className="color-item-wrapper add-item" onClick={ this.addItem }>
+						<span> + </span>
+					</div>
+				</div>
 			</Fragment>
+
+		);
+	}
+}
+
+class ColorItem extends Component {
+	constructor( props ) {
+		super( props );
+
+		this.state = {
+			...this.props.item,
+		};
+	}
+
+	render() {
+		return (
+			<Dropdown
+				className="color-item-wrapper"
+				contentClassName="item-drop-content"
+				position="bottom center"
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<div className="color-item" onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
+				) }
+				renderContent={ () => (
+					<div>
+						<TextControl
+							className="label-input-wrapper"
+							label={ __( 'Label' ) }
+							value={ this.state.label }
+							onChange={ ( label ) => {
+								// console.log( "selectedColor.id", this.state.selectedColor.id );
+								this.setState( { label } );
+								this.props.itemChanged( { ...this.state, label } );
+							} }
+						/>
+
+						<ColorPicker
+							color={ this.state.color }
+							onChangeComplete={ ( color ) => {
+								// console.log( "selectedColor.id", this.state.selectedColor.id );
+								this.setState( { color: color.hex } );
+								this.props.itemChanged( this.state );
+							} }
+							disableAlpha
+						/>
+
+						<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
+							{ __( 'Remove' ) }
+						</Button>
+					</div>
+
+				) }
+			/>
 
 		);
 	}
