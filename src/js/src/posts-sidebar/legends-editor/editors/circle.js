@@ -41,7 +41,6 @@ class CircleEditor extends Component {
 			if ( item.radius > this.maxRadius ) this.maxRadius = item.radius;
 		} );
 
-		console.log(this.state);
 	}
 
 	addNew() {
@@ -93,6 +92,8 @@ class CircleEditor extends Component {
 	}
 
 	itemChanged( itemState ) {
+		console.log( itemState );
+
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			legendObject.attributes.legend_type_options.circles = legendObject.attributes.legend_type_options.circles.map( ( item ) => {
@@ -152,8 +153,8 @@ class CircleItem extends Component {
 		};
 	}
 
-	itemChanged() {
-		this.props.itemChanged( this.state );
+	itemChanged( changedItem ) {
+		this.props.itemChanged( changedItem );
 	}
 
 	render() {
@@ -184,8 +185,8 @@ class CircleItem extends Component {
 						label={ __( 'Label' ) }
 						value={ this.state.label }
 						onChange={ ( label ) => {
+							this.itemChanged( { ...this.state, label } );
 							this.setState( { label } );
-							this.itemChanged();
 						} }
 					/>
 
@@ -193,8 +194,8 @@ class CircleItem extends Component {
 						label={ __( 'Radius' ) }
 						value={ this.state.radius }
 						onChange={ ( radius ) => {
+							this.itemChanged( { ...this.state, radius } );
 							this.setState( { radius } );
-							this.itemChanged();
 						} }
 
 						min={ 1 }
