@@ -7,6 +7,7 @@ import {
 	TextControl,
 } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
+import { compose, withInstanceId } from '@wordpress/compose';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -16,7 +17,7 @@ import './map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
-const MapEditor = ( { attributes, setAttributes, map, loading } ) => {
+const MapEditor = ( { attributes, setAttributes, map, loading, instanceId } ) => {
 	const setSize = ( key ) => ( size ) => {
 		setAttributes( { ...attributes, [ key ]: size } );
 	};
@@ -52,15 +53,21 @@ const MapEditor = ( { attributes, setAttributes, map, loading } ) => {
 				</Fragment>
 			) }
 			{ ! attributes.map_id && (
-				<JeoAutosuggest
-					inputProps={ {
-						placeholder: __( 'Type a map name', 'jeo' ),
-					} }
-					postType="map"
-					onSuggestionSelected={ ( e, { suggestion } ) =>
-						setAttributes( { ...attributes, map_id: suggestion.id } )
-					}
-				/>
+				<Fragment>
+					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
+						{ __( 'Insert a map from the library' ) + ':' }
+					</label>
+					<JeoAutosuggest
+						inputProps={ {
+							placeholder: __( 'Type a map name', 'jeo' ),
+							id: `jeo-map-autosuggest-${ instanceId }`,
+						} }
+						postType="map"
+						onSuggestionSelected={ ( e, { suggestion } ) =>
+							setAttributes( { ...attributes, map_id: suggestion.id } )
+						}
+					/>
+				</Fragment>
 			) }
 			<InspectorControls key={ 'inspector' }>
 				<PanelBody title={ __( 'Size' ) } initialOpen={ true }>
@@ -84,19 +91,17 @@ const MapEditor = ( { attributes, setAttributes, map, loading } ) => {
 	);
 };
 
-export default withSelect( ( select, { attributes } ) =>
-	attributes.map_id ?
-		{
-			map: select( 'core' ).getEntityRecord(
-				'postType',
-				'map',
-				attributes.map_id
-			),
-			loading: select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
-				'postType',
-				'map',
-				attributes.map_id,
-			] ),
-		  } :
-		{}
-)( MapEditor );
+const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
+	map:
+		attributes.map_id &&
+		select( 'core' ).getEntityRecord( 'postType', 'map', attributes.map_id ),
+	loading:
+		attributes.map_id &&
+		select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
+			'postType',
+			'map',
+			attributes.map_id,
+		] ),
+} ) );
+
+export default compose( withInstanceId, applyWithSelect )( MapEditor );
