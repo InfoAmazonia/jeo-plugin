@@ -116,17 +116,29 @@ class JeoLegend {
 	static updatedLegendMeta( legendObject ) {
 		const adicionalProps = { };
 
-		// if ( legendObject.legendSlug === 'circles' ) {
-		// 	adicionalProps.color = legendObject.attributes.legend_type_options.color;
-		// }
-
 		switch ( legendObject.legendSlug ) {
+			case 'simple-color':
+				adicionalProps.colors = {
+					...legendObject.attributes.legend_type_options.colors,
+				};
+				break;
+			case 'icons':
+				adicionalProps.icons = {
+					...legendObject.attributes.legend_type_options.icons,
+				};
+				break;
 			case 'circles':
+				adicionalProps.circles = {
+					...legendObject.attributes.legend_type_options.circles,
+				};
 				adicionalProps.color = legendObject.attributes.legend_type_options.color;
 				break;
 			case 'barscale':
 				adicionalProps.left_label = legendObject.attributes.legend_type_options.left_label;
 				adicionalProps.right_label = legendObject.attributes.legend_type_options.right_label;
+				adicionalProps.colors = {
+					...legendObject.attributes.legend_type_options.colors,
+				};
 				break;
 		}
 
@@ -134,23 +146,11 @@ class JeoLegend {
 			legend_type: legendObject.legendSlug,
 			legend_title: legendObject.title,
 			legend_type_options: {
-				colors: {
-					...legendObject.attributes.legend_type_options.colors,
-				},
-
-				icons: {
-					...legendObject.attributes.legend_type_options.icons,
-				},
-
-				circles: {
-					...legendObject.attributes.legend_type_options.circles,
-				},
-
 				...adicionalProps,
 			},
 		};
 
-		//console.log(legendMeta,legendMeta2)
+		//console.log(legendMeta)
 
 		return legendMeta;
 	}
