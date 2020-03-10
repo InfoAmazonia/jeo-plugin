@@ -8,8 +8,6 @@ export default ( { attributes } ) => {
 			data-min_zoom={ attributes.min_zoom }
 			data-max_zoom={ attributes.max_zoom }
 			data-layers={ JSON.stringify( attributes.layers ) }
-		>
-			Map goes here.
-		</div>
+		/>
 	);
 };

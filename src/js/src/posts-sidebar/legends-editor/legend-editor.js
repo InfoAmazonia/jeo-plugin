@@ -31,8 +31,8 @@ class LegendEditor extends Component {
 	}
 
 	hasChanged( legendObject ) {
+		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject ) } );
 		this.setState( { legendObject } );
-		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
 	}
 
 	render() {
