@@ -68,7 +68,7 @@ export default ( { attributes, setAttributes } ) => {
 						onChange={ ( value ) => {
 							editingMap.current = true;
 							setTimeout( () => editingMap.current = false, 50 );
-							return attributeUpdater( 'center_lat' )( value );
+							return attributeUpdater( 'center_lat' )( Number( value ) );
 						} }
 					/>
 					<TextControl
@@ -78,7 +78,7 @@ export default ( { attributes, setAttributes } ) => {
 						onChange={ ( value ) => {
 							editingMap.current = true;
 							setTimeout( () => editingMap.current = false, 50 );
-							return attributeUpdater( 'center_lon' )( value );
+							return attributeUpdater( 'center_lon' )( Number( value ) );
 						} }
 					/>
 				</section>
