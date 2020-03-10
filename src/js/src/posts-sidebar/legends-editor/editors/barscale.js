@@ -59,7 +59,7 @@ class BarscaleEditor extends Component {
 
 			const size = legendObject.attributes.legend_type_options.colors.length;
 
-			if ( size > 1 ) {
+			if ( size > 2 ) {
 				legendObject.attributes.legend_type_options.colors = colors;
 			}
 

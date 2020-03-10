@@ -21,9 +21,16 @@ class LegendEditor extends Component {
 			} ),
 		};
 
+		// New post case
+		if ( this.state.legendObject.legendSlug.length === 0 ) {
+			this.initialType = 'barscale';
+			this.state.legendObject.__legendType = this.initialType;
+			this.state.legendObject.__legendSlug = this.initialType;
+			this.state.legendObject.attributes.legend_type_options = JeoLegend.typeOptionsShape( 'barscale' );
+		}
+
 		this.initialType = this.state.legendObject.legendSlug === undefined ? 'barscale' : this.state.legendObject.legendSlug;
 		this.inicialAttrType = this.state.legendObject.attributes.legend_type_options;
-		console.log( this.state.legendObject );
 	}
 
 	componentDidUpdate() {
