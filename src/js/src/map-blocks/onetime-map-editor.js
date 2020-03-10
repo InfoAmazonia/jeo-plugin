@@ -1,5 +1,5 @@
 import { withSelect } from '@wordpress/data';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useCallback, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, PanelBody } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -8,6 +8,7 @@ import Map from './map';
 import MapEditorModal from './map-editor-modal';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
+import PostsSelector from '../posts-selector';
 import { layerLoader } from './utils';
 import './onetime-map-editor.css';
 
@@ -21,6 +22,10 @@ const OnetimeMapEditor = ( {
 } ) => {
 	const [ modal, setModal ] = useState( false );
 	const loadLayer = layerLoader( loadedLayers );
+
+	const setRelatedPosts = useCallback( ( related_posts ) => {
+		setAttributes( { ...attributes, related_posts } );
+	}, [ setAttributes ] );
 
 	return (
 		<Fragment>
@@ -41,6 +46,7 @@ const OnetimeMapEditor = ( {
 					setModal={ setModal }
 					panel={ PanelBody }
 				/>
+
 				<LayersPanel
 					attributes={ attributes }
 					setModal={ setModal }
@@ -48,6 +54,14 @@ const OnetimeMapEditor = ( {
 					loadingLayers={ loadingLayers }
 					panel={ PanelBody }
 				/>
+
+				<PanelBody title={ __( 'Related posts', 'jeo' ) }>
+					<PostsSelector
+						relatedPosts={ attributes.related_posts }
+						setRelatedPosts={ setRelatedPosts }
+						panel={ PanelBody }
+					/>
+				</PanelBody>
 			</InspectorControls>
 
 			<div className="jeo-preview-area">
