@@ -10,7 +10,7 @@ import MapIcon from '../icons/ion/map';
 registerBlockType( 'jeo/map', {
 	title: __( 'JEO Map' ),
 	description: __( 'Display maps with layers and data' ),
-	category: 'common', // @TODO: add jeo maps category
+	category: 'jeo',
 	icon: MapIcon,
 	attributes: {
 		map_id: {
@@ -30,7 +30,7 @@ registerBlockType( 'jeo/map', {
 registerBlockType( 'jeo/onetime-map', {
 	title: __( 'JEO One-time Map' ),
 	description: __( 'Display maps with layers and data' ),
-	category: 'common', // @TODO: add jeo maps category
+	category: 'jeo',
 	icon: MapIcon,
 	attributes: {
 		layers: {

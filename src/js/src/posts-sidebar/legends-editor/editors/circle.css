@@ -30,3 +30,13 @@
 .full-width-button {
 	margin-bottom: 15px;
 }
+
+.buttonsList {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 8px;
+}
+
+.legend-wrapper div {
+	width: 100%;
+}
