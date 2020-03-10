@@ -42,6 +42,7 @@ registerBlockType( 'jeo/onetime-map', {
 					id: { type: 'number' },
 					use: { type: 'string' /* enum */ },
 					default: { type: 'boolean' },
+					show_legend: { type: 'boolean' },
 				},
 			},
 		},
@@ -60,7 +61,37 @@ registerBlockType( 'jeo/onetime-map', {
 		max_zoom: {
 			type: 'number',
 		},
-		related_posts: {},
+		related_posts: {
+			type: 'object',
+			default: {
+				categories: [],
+				tags: [],
+				meta_query: [],
+			},
+			properties: {
+				categories: {
+					type: 'array',
+					items: { type: 'integer' },
+				},
+				tags: {
+					type: 'array',
+					items: { type: 'integer' },
+				},
+				before: { type: 'string' },
+				after: { type: 'string' },
+				meta_query: {
+					type: 'array',
+					items: {
+						type: 'object',
+						properties: {
+							key: { type: 'string' },
+							compare: { type: 'string' },
+							value: { type: 'string' },
+						},
+					},
+				},
+			},
+		},
 	},
 	edit: ( props ) => <OnetimeMapEditor { ...props } />,
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
