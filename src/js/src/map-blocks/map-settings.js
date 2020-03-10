@@ -19,6 +19,15 @@ const animationOptions = {
 	animate: false,
 };
 
+function parseNumber( value ) {
+	if ( value === '' ) {
+		return '';
+	}
+
+	const numValue = Number( value );
+	return isNaN( numValue ) ? value : numValue;
+}
+
 export default ( { attributes, setAttributes } ) => {
 	const {
 		center_lat: centerLat,
@@ -68,7 +77,7 @@ export default ( { attributes, setAttributes } ) => {
 						onChange={ ( value ) => {
 							editingMap.current = true;
 							setTimeout( () => editingMap.current = false, 50 );
-							return attributeUpdater( 'center_lat' )( Number( value ) );
+							return attributeUpdater( 'center_lat' )( parseNumber( value ) );
 						} }
 					/>
 					<TextControl
@@ -78,7 +87,7 @@ export default ( { attributes, setAttributes } ) => {
 						onChange={ ( value ) => {
 							editingMap.current = true;
 							setTimeout( () => editingMap.current = false, 50 );
-							return attributeUpdater( 'center_lon' )( Number( value ) );
+							return attributeUpdater( 'center_lon' )( parseNumber( value ) );
 						} }
 					/>
 				</section>
