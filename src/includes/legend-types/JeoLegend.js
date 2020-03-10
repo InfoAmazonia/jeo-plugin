@@ -31,7 +31,9 @@ class JeoLegend {
 			},
 
 			barscale: {
-
+				left_label: '0',
+				right_label: '100',
+				colors: [ '#ff0909', '#000' ],
 			},
 		};
 
@@ -112,13 +114,20 @@ class JeoLegend {
 	}
 
 	static updatedLegendMeta( legendObject ) {
-		//console.log({ legendObject.attributes.legend_type_options);
-		// this is necessary because '...' wont turn arrays into objects with the matching index
-		//console.log(legendObject);
 		const adicionalProps = { };
 
-		if ( legendObject.legendSlug === 'circles' ) {
-			adicionalProps.color = legendObject.attributes.legend_type_options.color;
+		// if ( legendObject.legendSlug === 'circles' ) {
+		// 	adicionalProps.color = legendObject.attributes.legend_type_options.color;
+		// }
+
+		switch ( legendObject.legendSlug ) {
+			case 'circles':
+				adicionalProps.color = legendObject.attributes.legend_type_options.color;
+				break;
+			case 'barscale':
+				adicionalProps.left_label = legendObject.attributes.legend_type_options.left_label;
+				adicionalProps.right_label = legendObject.attributes.legend_type_options.right_label;
+				break;
 		}
 
 		const legendMeta = {

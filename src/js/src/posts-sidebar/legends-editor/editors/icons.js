@@ -73,7 +73,6 @@ class IconEditor extends Component {
 
 			return { legendObject };
 		} );
-
 	}
 
 	removeLabel( itemId ) {

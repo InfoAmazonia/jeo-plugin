@@ -28,7 +28,7 @@ class LegendTypeEdition extends Component {
 	render() {
 		const typesEditorComponents = {
 			circles: <CircleEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></CircleEditor>,
-			barscale: <BarscaleEditor legendObject={ this.state.legendObject } ></BarscaleEditor>,
+			barscale: <BarscaleEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></BarscaleEditor>,
 			icons: <IconsEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></IconsEditor>,
 			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></SimplecolorEditor>,
 		};
