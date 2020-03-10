@@ -1,6 +1,6 @@
 import ReactMapboxGl from 'react-mapbox-gl';
 import { TextControl, RangeControl } from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const MapboxAPIKey = window.jeo_settings.mapbox_key;
@@ -28,6 +28,10 @@ export default ( { attributes, setAttributes } ) => {
 		max_zoom: maxZoom,
 	} = { ...mapDefaults, ...attributes };
 
+	const [ editingMap, setEditingMap ] = useState( false );
+
+	const setEditingMapRef = useRef( setEditingMap );
+
 	const attributeUpdater = ( attribute ) => ( value ) =>
 		setAttributes( { ...attributes, [ attribute ]: value } );
 
@@ -43,16 +47,16 @@ export default ( { attributes, setAttributes } ) => {
 							center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
 							animationOptions={ animationOptions }
 							onMoveEnd={ ( map ) => {
-								if(window._editing_map) return;
+								if ( ! editingMap ) {
+									const center = map.getCenter();
+									const zoom = Math.round( map.getZoom() * 10 ) / 10;
 
-								const center = map.getCenter();
-								const zoom = Math.round( map.getZoom() * 10 ) / 10;
-
-								setAttributes( {
-									center_lat: center.lat,
-									center_lon: center.lng,
-									initial_zoom: zoom,
-								} );
+									setAttributes( {
+										center_lat: center.lat,
+										center_lon: center.lng,
+										initial_zoom: zoom,
+									} );
+								}
 							} }
 						/>
 					) }
@@ -63,23 +67,21 @@ export default ( { attributes, setAttributes } ) => {
 						type="number"
 						label={ __( 'Latitude' ) }
 						value={ centerLat }
-						onChange={ (value) => {
-								window._editing_map = true;
-								setTimeout(() => window._editing_map = false, 50);
-								return attributeUpdater( 'center_lat' )(value);
-							}
-						}
+						onChange={ ( value ) => {
+							setEditingMap( true );
+							setTimeout( () => setEditingMapRef.current( false ), 50 );
+							return attributeUpdater( 'center_lat' )( value );
+						} }
 					/>
 					<TextControl
 						type="number"
 						label={ __( 'Longitude' ) }
 						value={ centerLon }
-						onChange={ (value) => {
-								window._editing_map = true;
-								setTimeout(() => window._editing_map = false, 50);
-								return attributeUpdater( 'center_lon' )(value);
-							}
-						}
+						onChange={ ( value ) => {
+							setEditingMap( true );
+							setTimeout( () => setEditingMapRef.current( false ), 50 );
+							return attributeUpdater( 'center_lon' )( value );
+						} }
 					/>
 				</section>
 				<section className="zoom">
