@@ -6,6 +6,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 
 import Map from './map';
 import MapEditorModal from './map-editor-modal';
+import SizePanel from './size-panel';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import PostsSelector from '../posts-selector';
@@ -23,9 +24,12 @@ const OnetimeMapEditor = ( {
 	const [ modal, setModal ] = useState( false );
 	const loadLayer = layerLoader( loadedLayers );
 
-	const setRelatedPosts = useCallback( ( related_posts ) => {
-		setAttributes( { ...attributes, related_posts } );
-	}, [ setAttributes ] );
+	const setRelatedPosts = useCallback(
+		( relatedPosts ) => {
+			setAttributes( { ...attributes, related_posts: relatedPosts } );
+		},
+		[ setAttributes ]
+	);
 
 	return (
 		<Fragment>
@@ -41,6 +45,11 @@ const OnetimeMapEditor = ( {
 			) }
 
 			<InspectorControls>
+				<SizePanel
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					panel={ PanelBody }
+				/>
 				<MapPanel
 					attributes={ attributes }
 					setModal={ setModal }

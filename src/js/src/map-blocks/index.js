@@ -46,6 +46,12 @@ registerBlockType( 'jeo/onetime-map', {
 				},
 			},
 		},
+		height: {
+			type: 'string',
+		},
+		width: {
+			type: 'string',
+		},
 		center_lat: {
 			type: 'number',
 		},
