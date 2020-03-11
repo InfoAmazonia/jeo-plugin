@@ -1,11 +1,5 @@
 import { InspectorControls } from '@wordpress/block-editor';
-import {
-	Button,
-	PanelBody,
-	PanelRow,
-	Spinner,
-	TextControl,
-} from '@wordpress/components';
+import { Button, PanelBody, Spinner } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { Fragment } from '@wordpress/element';
@@ -13,15 +7,12 @@ import { __ } from '@wordpress/i18n';
 
 import Map from './map';
 import JeoAutosuggest from './jeo-autosuggest';
+import SizePanel from './size-panel';
 import './map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 const MapEditor = ( { attributes, setAttributes, map, loading, instanceId } ) => {
-	const setSize = ( key ) => ( size ) => {
-		setAttributes( { ...attributes, [ key ]: size } );
-	};
-
 	return (
 		<Fragment>
 			{ attributes.map_id && loading && <Spinner /> }
@@ -70,22 +61,11 @@ const MapEditor = ( { attributes, setAttributes, map, loading, instanceId } ) =>
 				</Fragment>
 			) }
 			<InspectorControls key={ 'inspector' }>
-				<PanelBody title={ __( 'Size' ) } initialOpen={ true }>
-					<PanelRow>
-						<TextControl
-							label={ __( 'Height' ) }
-							value={ attributes.height }
-							onChange={ setSize( 'height' ) }
-						/>
-					</PanelRow>
-					<PanelRow>
-						<TextControl
-							label={ __( 'Width' ) }
-							value={ attributes.width }
-							onChange={ setSize( 'width' ) }
-						/>
-					</PanelRow>
-				</PanelBody>
+				<SizePanel
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					panel={ PanelBody }
+				/>
 			</InspectorControls>
 		</Fragment>
 	);
