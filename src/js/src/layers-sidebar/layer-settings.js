@@ -35,7 +35,7 @@ const LayerSettings = ( {
 	useEffect( () => {
 		if ( postMeta.type ) {
 			window.JeoLayerTypes
-				.getLayerTypeSchema( postMeta.type )
+				.getLayerTypeSchema( postMeta )
 				.then( formUpdater( setOptions, setWidgets ) );
 		} else {
 			setOptions( {} );

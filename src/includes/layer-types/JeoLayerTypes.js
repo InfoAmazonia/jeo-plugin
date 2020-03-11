@@ -12,8 +12,8 @@ class JeoLayerTypes {
 	getLayerType( layerTypeSlug ) {
 		return this.layerTypes[ layerTypeSlug ];
 	}
-	getLayerTypeSchema( layerTypeSlug ) {
-		return this.getLayerType( layerTypeSlug ).getSchema();
+	getLayerTypeSchema( attributes ) {
+		return this.getLayerType( attributes.type ).getSchema( attributes );
 	}
 }
 const instance = new JeoLayerTypes();
