@@ -123,35 +123,33 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			},
 		};
 
-		if ( ! attributes ) {
-			return Promise.resolve( baseSchema );
-		}
+		return new Promise( function( resolve ) {
+			resolve( baseSchema );
+		} );
+	},
 
-		const self = this;
+	getStyleLayers( attributes ) {
+		return new Promise( ( resolve, reject ) => {
+			if ( ! attributes ) {
+				resolve( null );
+			}
 
-		return new Promise( function( resolve, reject ) {
-			const formLayers = [];
+			let formLayers = [];
 
-			self
+			this
 				._getStyleLayers( attributes )
-				.then( function( layers ) {
+				.then( ( layers ) => {
 					if ( layers.vector_layers ) {
-						//console.log(layers.vector_layers);
-						for ( let l = 0; l < layers.vector_layers.length; l++ ) {
-							const newLayer = {
-								id: layers.vector_layers[ l ].id,
-								fields: layers.vector_layers[ l ].fields,
+						formLayers = layers.vector_layers.map( ( layer ) => {
+							return {
+								id: layer.id,
+								fields: layer.fields,
 							};
-							formLayers.push( newLayer );
-						}
+						} );
 					}
 
-					// TODO: merge form_layers to the schema
-					console.log( formLayers );
-
-					resolve( baseSchema );
-				} )
-				.catch( function( error ) {
+					resolve( formLayers );
+				} ).catch( ( error ) => {
 					reject( error );
 				} );
 		} );
