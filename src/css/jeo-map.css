@@ -222,6 +222,10 @@ height: 0px;
 	width: 200px;
 }
 
+.entry-content .legend-container p {
+	font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
 /** Bar scale legend **/
 
 .barscale-left-label {
@@ -284,8 +288,31 @@ height: 0px;
 
 .circles-scale-container {
 	width: 100%;
+	display: flex;
+	flex-flow: column;
 }
-.circles-item {
-	float: left;
+
+.circle-item {
+	display: flex;
+	align-items: center;
+	margin-bottom: 3px;
+
+}
+
+.circle-wrapper {
+	display: flex;
+	justify-content: center;
+	margin-right: 10px;
+}
+
+.circle-item p {
+	margin: 0px;
+	font-size: 14px;
+}
+
+.circle-shape {
 	border-radius: 50%;
+	border: 1px solid #8080801f;
 }
+
+
