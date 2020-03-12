@@ -72,16 +72,20 @@ const LayerSettings = ( {
 				<div />
 			</Form>
 
-			{ ( modalOpen && styleLayers ) && (
-				<InteractionsSettings
-					onCloseModal={ closeModal }
-					layers={ styleLayers }
-				/>
-			) }
+			{ styleLayers && (
+				<Fragment>
+					{ modalOpen && (
+						<InteractionsSettings
+							onCloseModal={ closeModal }
+							layers={ styleLayers }
+						/>
+					) }
 
-			<Button isPrimary onClick={ openModal }>
-				{ __( 'Edit interactions', 'jeo' ) }
-			</Button>
+					<Button isPrimary onClick={ openModal }>
+						{ __( 'Edit interactions', 'jeo' ) }
+					</Button>
+				</Fragment>
+			) }
 		</Fragment>
 	);
 };
