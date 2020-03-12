@@ -1,7 +1,10 @@
-import Form from 'react-jsonschema-form';
+import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import Form from 'react-jsonschema-form';
+
+import InteractionsSettings from './interactions-settings';
 
 const layerSchema = {
 	type: 'object',
@@ -29,6 +32,9 @@ const LayerSettings = ( {
 } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
+	const [ styleLayers, setStyleLayers ] = useState( null );
+	const [ modalOpen, setModalStatus ] = useState( false );
+
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
 	layerSchema.properties.layer_type_options = options;
 
@@ -43,17 +49,40 @@ const LayerSettings = ( {
 		}
 	}, [ postMeta.type ] );
 
+	useEffect( () => {
+		const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
+		if ( layerType.getStyleLayers ) {
+			layerType.getStyleLayers( postMeta ).then( setStyleLayers );
+		}
+	}, [ postMeta, setStyleLayers ] );
+
+	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
+	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
+
 	return (
-		<Form
-			className="jeo-layer-settings"
-			schema={ layerSchema }
-			uiSchema={ widgets }
-			formData={ postMeta }
-			onChange={ ( { formData } ) => setPostMeta( formData ) }
-		>
-			{ /* Hide submit button */ }
-			<div />
-		</Form>
+		<Fragment>
+			<Form
+				className="jeo-layer-settings"
+				schema={ layerSchema }
+				uiSchema={ widgets }
+				formData={ postMeta }
+				onChange={ ( { formData } ) => setPostMeta( formData ) }
+			>
+				{ /* Hide submit button */ }
+				<div />
+			</Form>
+
+			{ ( modalOpen && styleLayers ) && (
+				<InteractionsSettings
+					onCloseModal={ closeModal }
+					layers={ styleLayers }
+				/>
+			) }
+
+			<Button isPrimary onClick={ openModal }>
+				{ __( 'Edit interactions', 'jeo' ) }
+			</Button>
+		</Fragment>
 	);
 };
 
