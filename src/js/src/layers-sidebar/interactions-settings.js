@@ -10,11 +10,12 @@ export default function InteractionsSettings( {
 } ) {
 	return (
 		<Modal title={ __( 'Interactions', 'jeo' ) } onRequestClose={ onCloseModal }>
-			{
-				layers.map( ( layer ) => (
-					<InteractionSettings key={ layer.id } layer={ layer }/>
-				) )
-			}
+			{ layers.map( ( layer ) => (
+				<InteractionSettings
+					key={ layer.id }
+					layer={ layer }
+				/>
+			) ) }
 		</Modal>
 	);
 }
