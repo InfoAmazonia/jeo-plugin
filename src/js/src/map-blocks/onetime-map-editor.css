@@ -82,7 +82,7 @@
 }
 
 .jeo-layers-list .layer {
-	border: 1px solid lightgrey;
+	border: 1px solid lightgray;
 	vertical-align: middle;
 }
 
@@ -207,7 +207,7 @@
 
 .jeo-layers-library .layer-type {
 	font-size: 0.8em;
-	color: darkgrey;
+	color: darkgray;
 }
 
 .jeo-layers-library .edit-layer {
