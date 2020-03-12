@@ -1,11 +1,8 @@
-import { __ } from '@wordpress/i18n';
-import {
-	CheckboxControl,
-	Dashicon,
-	SelectControl,
-} from '@wordpress/components';
+import { CheckboxControl, Dashicon, SelectControl } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
+
 import { layerUseLabels } from './utils';
 
 const useOptions = [
@@ -23,6 +20,7 @@ export default forwardRef(
 			removeLayer,
 			settings,
 			swapDefault,
+			switchShowLegend,
 			switchDefault,
 			updateUse,
 			widths,
@@ -73,6 +71,13 @@ export default forwardRef(
 							onChange={ swapDefault }
 						/>
 					) }
+				</td>
+				<td>
+					<CheckboxControl
+						label={ __( 'Show legend' ) }
+						checked={ settings.show_legend }
+						onChange={ switchShowLegend }
+					/>
 				</td>
 				<td className="layer-actions" style={ setWidth( 4 ) }>
 					<a href={ `/wp-admin/post.php?post=${ settings.id }&action=edit` } target="_blank" rel="noopener noreferrer">

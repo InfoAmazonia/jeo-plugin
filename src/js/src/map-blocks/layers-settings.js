@@ -89,6 +89,15 @@ const LayersSettings = ( {
 										settings
 								)
 							);
+						const switchShowLegend = ( def ) => {
+							setLayers(
+								attributes.layers.map( ( settings ) =>
+									settings.id === value.id ?
+										{ ...settings, show_legend: def } :
+										settings
+								)
+							);
+						};
 						const swapDefault = ( def ) =>
 							def && // radio-like behavior: can only be turned on.
 							setLayers(
@@ -125,6 +134,7 @@ const LayersSettings = ( {
 								removeLayer={ removeLayer }
 								settings={ loadLayer( value ) }
 								switchDefault={ switchDefault }
+								switchShowLegend={ switchShowLegend }
 								swapDefault={ swapDefault }
 								updateUse={ updateUse }
 								widths={ widths }
