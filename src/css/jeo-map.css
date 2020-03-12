@@ -235,9 +235,8 @@ height: 0px;
 	float: right;
 }
 .barscale-scale-container {
-	height: 20px;
+	height: 25px;
 	width: 100%;
-	border: 1px solid grey;
 }
 .barscale-color {
 	height: 20px;
@@ -248,6 +247,13 @@ height: 0px;
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
+	font-size: 14px;
+	position: relative;
+}
+
+.dynamic-label {
+	position: absolute;
+	top: 20px;
 }
 
 /** Simple color legend **/
