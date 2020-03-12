@@ -66,7 +66,7 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 			circle.style.width = ( c.radius * 2 ) + 'px';
 			circle.style.height = ( c.radius * 2 ) + 'px';
 
-			circleWrap.style.width = ( maxRadius * 2 ) + 'px';
+			circleWrap.style.minWidth = ( maxRadius * 2 ) + 'px';
 
 			const circleLabel = document.createElement( 'p' );
 			circleLabel.innerHTML = c.label;
