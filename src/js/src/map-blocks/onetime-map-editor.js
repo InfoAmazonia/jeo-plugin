@@ -6,6 +6,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 
 import Map from './map';
 import MapEditorModal from './map-editor-modal';
+import { renderLayer } from './map-preview-layer';
 import SizePanel from './size-panel';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
@@ -82,7 +83,12 @@ const OnetimeMapEditor = ( {
 						attributes.center_lat || mapDefaults.lat,
 					] }
 					containerStyle={ { height: '20vh' } }
-				/>
+				>
+					{ loadedLayers && attributes.layers.map( ( layer ) => {
+						const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
+						return renderLayer( layerOptions, layer );
+					} ) }
+				</Map>
 			</div>
 
 			<div className="jeo-preview-controls">
