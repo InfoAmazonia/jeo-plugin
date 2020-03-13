@@ -41,28 +41,47 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 		const size = attributes.legend_type_options.circles.length;
 		const eachSize = 100 / size;
 
-		attributes.legend_type_options.circles.forEach( c => {
+		let maxRadius = 0;
+		attributes.legend_type_options.circles.forEach( ( c ) => {
+			if ( c.radius > maxRadius ) {
+				maxRadius = c.radius;
+			}
+		} );
+
+		maxRadius += 6;
+
+		const circles = attributes.legend_type_options.circles;
+		circles.sort( ( a, b ) => a.radius - b.radius );
+
+		circles.forEach( ( c ) => {
 			const circleItem = document.createElement( 'div' );
 			const circle = document.createElement( 'div' );
-			circle.classList.add( 'circles-item' );
+			const circleWrap = document.createElement( 'div' );
+
+			circleWrap.classList.add( 'circle-wrapper' );
+			circleItem.classList.add( 'circle-item' );
+			circle.classList.add( 'circle-shape' );
+
 			circle.style.backgroundColor = attributes.legend_type_options.color;
 			circle.style.width = ( c.radius * 2 ) + 'px';
 			circle.style.height = ( c.radius * 2 ) + 'px';
 
+			circleWrap.style.minWidth = ( maxRadius * 2 ) + 'px';
+
 			const circleLabel = document.createElement( 'p' );
 			circleLabel.innerHTML = c.label;
 
-			circleItem.appendChild(circle);
-			circleItem.appendChild(circleLabel);
+			circleWrap.appendChild( circle );
+			circleItem.appendChild( circleWrap );
 
+			//circleItem.appendChild( circle );
+			circleItem.appendChild( circleLabel );
 
-			barContainer.appendChild(circleItem);
+			barContainer.appendChild( circleItem );
+		} );
 
-
-		});
-
-		container.appendChild(title);
-		container.appendChild(barContainer);
+		container.appendChild( title );
+		container.appendChild( barContainer );
 
 		return container;
 
