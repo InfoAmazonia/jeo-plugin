@@ -199,7 +199,7 @@ class CircleItem extends Component {
 						} }
 
 						min={ 1 }
-						max={ 100 }
+						max={ 50 }
 					/>
 
 					<Dropdown

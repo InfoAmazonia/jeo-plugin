@@ -10,16 +10,19 @@ div.jeomap {
 	top: 10px;
 	right: 10px;
 	z-index: 1;
-	border: 1px solid rgba(0,0,0,0.4);
+}
+
+.jeomap .mapboxgl-popup-close-button:hover {
+	background-color: #bf1e49fa;
+	text-decoration: none;
 }
 
 .jeomap nav a {
 	color: #404040;
 	display: block;
 	margin: 0;
-	padding: 2px 10px;
+	padding: 4px 20px;
 	text-decoration: none;
-	border-bottom: 1px solid rgba(0,0,0,0.25);
 	text-align: center;
 }
 
@@ -73,6 +76,8 @@ div.jeomap {
 	display: block;
 	margin: 0;
 	padding: 0px 0px 23px 19px;
+	max-width: 220px;
+	min-width: 220px;
 }
 
 .jeomap div.legend-container .legends-wrapper {
@@ -125,6 +130,7 @@ height: 0px;
 
 .jeomap div.legend-container .legends-wrapper h4 {
 	margin: 15px 0;
+	font-size: 2.2rem;
 }
 
 .jeomap div.legend-container a.more-info-button {
@@ -216,6 +222,10 @@ height: 0px;
 	width: 200px;
 }
 
+.entry-content .legend-container p {
+	font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
+
 /** Bar scale legend **/
 
 .barscale-left-label {
@@ -225,26 +235,33 @@ height: 0px;
 	float: right;
 }
 .barscale-scale-container {
-	height: 20px;
+	height: 31px;
 	width: 100%;
-	border: 1px solid gray;
 }
 .barscale-color {
 	height: 20px;
 	float: left;
+	border-bottom: 1px solid #00000029;
 }
 
 .barscale-labels-container {
 	display: flex;
 	justify-content: space-between;
 	width: 100%;
+	font-size: 14px;
+	position: relative;
+}
+
+.dynamic-label {
+	position: absolute;
+	top: 20px;
 }
 
 /** Simple color legend **/
 
 .simple-color-item-box {
-	width: 30px;
-	height: 30px;
+	width: 25px;
+	height: 25px;
 	margin-right: 10px;
 	float: left;
 	border-radius: 30px;
@@ -252,10 +269,10 @@ height: 0px;
 }
 
 .simple-color-item {
-	margin-bottom: 12px;
+	margin-bottom: 9px;
 	display: flex;
 	align-items: center;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 /** Icons legend **/
@@ -271,15 +288,38 @@ height: 0px;
 	margin-bottom: 12px;
 	display: flex;
 	align-items: center;
-	font-size: 16px;
+	font-size: 14px;
 }
 
 /** Circles legend **/
 
 .circles-scale-container {
 	width: 100%;
+	display: flex;
+	flex-flow: column;
 }
-.circles-item {
-	float: left;
+
+.circle-item {
+	display: flex;
+	align-items: center;
+	margin-bottom: 3px;
+
+}
+
+.circle-wrapper {
+	display: flex;
+	justify-content: center;
+	margin-right: 10px;
+}
+
+.circle-item p {
+	margin: 0px;
+	font-size: 14px;
+}
+
+.circle-shape {
 	border-radius: 50%;
+	border: 1px solid #8080801f;
 }
+
+
