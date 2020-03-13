@@ -122,6 +122,8 @@ class BarscaleEditor extends Component {
 
 		gradient += ')';
 
+		const eachSize = 100 / colors.length;
+
 		return (
 			<Fragment>
 				<TextControl
@@ -135,7 +137,7 @@ class BarscaleEditor extends Component {
 						this.hasChanged( legendObject );
 						return { legendObject };
 					} ) }
-					type="number"
+					type="text"
 				/>
 
 				<TextControl
@@ -149,10 +151,15 @@ class BarscaleEditor extends Component {
 						this.hasChanged( legendObject );
 						return { legendObject };
 					} ) }
-					type="number"
+					type="text"
 				/>
 
-				<div className="gradient-legend" style={ { background: gradient } }></div>
+				<div className="gradient-legend" style={ { background: gradient } }>
+					{ colors.map( ( c ) => {
+						return ( <div key={ c.id } className="barscale-color" style={ { backgroundColor: c.color, width: eachSize + '%' } }> </div> );
+					} ) }
+
+				</div>
 				<div className="itens-wrapper">
 					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } /> ) }
 					<div className="color-item-wrapper add-item" onClick={ this.addItem }>
