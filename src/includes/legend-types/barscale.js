@@ -47,13 +47,13 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 		right.classList.add( 'barscale-right-label' );
 		right.innerHTML = attributes.legend_type_options.right_label;
 
-		// attributes.legend_type_options.colors.forEach( c => {
-		// 	const color = document.createElement( 'div' );
-		// 	color.classList.add( 'barscale-color' );
-		// 	color.style.backgroundColor = c;
-		// 	color.style.width = eachSize + '%';
-		// 	barContainer.appendChild( color );
-		// } );
+		attributes.legend_type_options.colors.forEach( c => {
+			const color = document.createElement( 'div' );
+			color.classList.add( 'barscale-color' );
+			color.style.backgroundColor = c.color;
+			color.style.width = eachSize + '%';
+			barContainer.appendChild( color );
+		} );
 
 		const colors = attributes.legend_type_options.colors;
 		const step = 100 / ( colors.length - 1 );
@@ -79,8 +79,10 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 		moveableLabel.classList.add( 'dynamic-label' );
 
 		barContainer.addEventListener( 'mousemove', ( event ) => {
-			moveableLabel.innerHTML = Math.round( mapValues( event.offsetX, 0, labelContainer.offsetWidth, parseInt( attributes.legend_type_options.left_label ), parseInt( attributes.legend_type_options.right_label ) ) );
-			moveableLabel.style.left = event.offsetX < labelContainer.offsetWidth / 1.5 ? event.offsetX + 'px' : event.offsetX - moveableLabel.offsetWidth + 'px';
+			if ( event.offsetY > 21 ) {
+				moveableLabel.innerHTML = Math.round( mapValues( event.offsetX, 0, labelContainer.offsetWidth, parseInt( attributes.legend_type_options.left_label ), parseInt( attributes.legend_type_options.right_label ) ) );
+				moveableLabel.style.left = event.offsetX < labelContainer.offsetWidth / 2 ? event.offsetX + 'px' : event.offsetX - moveableLabel.offsetWidth + 'px';
+			}
 		} );
 
 		barContainer.addEventListener( 'mouseout', ( event ) => {
