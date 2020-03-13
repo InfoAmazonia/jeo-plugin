@@ -235,12 +235,13 @@ height: 0px;
 	float: right;
 }
 .barscale-scale-container {
-	height: 25px;
+	height: 31px;
 	width: 100%;
 }
 .barscale-color {
 	height: 20px;
 	float: left;
+	border-bottom: 1px solid #00000029;
 }
 
 .barscale-labels-container {
