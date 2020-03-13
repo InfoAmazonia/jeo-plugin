@@ -1,20 +1,10 @@
 .jeo-interaction-settings {
 	border: 1px solid lightgray;
-	display: grid;
-	grid-template-columns: auto 1fr;
 	padding: 5px;
 }
 
 .jeo-interaction-settings + .jeo-interaction-settings {
 	margin-top: 5px;
-}
-
-.jeo-interaction-settings__header .components-base-control__field {
-	display: flex;
-}
-
-.jeo-interaction-settings :nth-child(3) {
-	grid-column: 1 / span 2;
 }
 
 .jeo-interaction-settings > * {
