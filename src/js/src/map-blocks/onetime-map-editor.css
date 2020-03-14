@@ -54,23 +54,6 @@
 	padding: 0 24px;
 }
 
-/**
- * Map Settings
- */
-
-.jeo-map-settings {
-	display: flex;
-	margin: 0 -1em;
-}
-
-.jeo-map-settings section {
-	flex-grow: 1;
-	margin: 1em;
-}
-
-.jeo-map-settings .map-preview {
-	flex-grow: 0;
-}
 
 /**
  * Layers Settings

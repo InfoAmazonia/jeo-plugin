@@ -52,6 +52,7 @@ const OnetimeMapEditor = ( {
 				/>
 				<MapPanel
 					attributes={ attributes }
+					setAttributes={ setAttributes }
 					setModal={ setModal }
 					panel={ PanelBody }
 				/>
