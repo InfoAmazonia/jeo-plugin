@@ -18,9 +18,11 @@ registerBlockType( 'jeo/map', {
 		},
 		height: {
 			type: 'string',
+			default: 500,
 		},
 		width: {
 			type: 'string',
+			default: 600,
 		},
 	},
 	edit: ( props ) => <MapEditor { ...props } />,
@@ -48,9 +50,11 @@ registerBlockType( 'jeo/onetime-map', {
 		},
 		height: {
 			type: 'string',
+			default: 500,
 		},
 		width: {
 			type: 'string',
+			default: 600,
 		},
 		center_lat: {
 			type: 'number',
