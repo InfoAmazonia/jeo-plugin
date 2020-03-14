@@ -9,6 +9,7 @@ import Map from './map';
 import JeoAutosuggest from './jeo-autosuggest';
 import SizePanel from './size-panel';
 import './map-editor.css';
+import { MapContext } from 'react-mapbox-gl';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
@@ -26,8 +27,18 @@ const MapEditor = ( { attributes, setAttributes, map, loading, instanceId } ) =>
 								map.meta.center_lon || mapDefaults.lng,
 								map.meta.center_lat || mapDefaults.lat,
 							] }
-							containerStyle={ { height: '20vh' } }
-						/>
+							containerStyle={ {
+								height: attributes.height,
+								width: attributes.width,
+							} }
+						>
+							<MapContext.Consumer>
+								{ ( map ) => {
+									console.log( 'resizing' );
+									map.resize();
+								} }
+							</MapContext.Consumer>
+						</Map>
 					</div>
 
 					<div className="jeo-preview-controls">
