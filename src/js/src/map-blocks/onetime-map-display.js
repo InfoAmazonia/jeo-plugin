@@ -1,4 +1,6 @@
-export default ( { attributes } ) => {
+import classNames from 'classnames';
+
+export default ( { attributes, className } ) => {
 	let hasRelatedPosts;
 
 	if ( ! attributes.related_posts ) {
@@ -15,7 +17,7 @@ export default ( { attributes } ) => {
 
 	return (
 		<div
-			className="jeomap"
+			className={ classNames( [ 'jeomap', className ] ) }
 			data-center_lat={ attributes.center_lat }
 			data-center_lon={ attributes.center_lon }
 			data-initial_zoom={ attributes.initial_zoom }

@@ -12,6 +12,9 @@ registerBlockType( 'jeo/map', {
 	description: __( 'Display maps with layers and data' ),
 	category: 'jeo',
 	icon: MapIcon,
+	supports: {
+		align: true,
+	},
 	attributes: {
 		map_id: {
 			type: 'number',
@@ -32,6 +35,9 @@ registerBlockType( 'jeo/onetime-map', {
 	description: __( 'Display maps with layers and data' ),
 	category: 'jeo',
 	icon: MapIcon,
+	supports: {
+		align: true,
+	},
 	attributes: {
 		layers: {
 			type: 'array',
