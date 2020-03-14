@@ -35,7 +35,7 @@ const MapEditor = ( {
 								loadedMap.meta.center_lon || mapDefaults.lng,
 								loadedMap.meta.center_lat || mapDefaults.lat,
 							] }
-							containerStyle={ { height: '20vh' } }
+							containerStyle={ { height: '50vh' } }
 						>
 							{ loadedLayers && loadedMap.meta.layers.map( ( layer ) => {
 								const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;

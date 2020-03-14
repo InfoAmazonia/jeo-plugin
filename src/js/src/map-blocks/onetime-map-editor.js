@@ -82,7 +82,7 @@ const OnetimeMapEditor = ( {
 						attributes.center_lon || mapDefaults.lng,
 						attributes.center_lat || mapDefaults.lat,
 					] }
-					containerStyle={ { height: '20vh' } }
+					containerStyle={ { height: '50vh' } }
 				>
 					{ loadedLayers && attributes.layers.map( ( layer ) => {
 						const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
