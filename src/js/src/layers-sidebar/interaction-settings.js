@@ -4,8 +4,19 @@ import { __ } from '@wordpress/i18n';
 
 import './interaction-settings.css';
 
+const eventOptions = [
+	{ label: __( 'Disabled', 'jeo' ), value: undefined },
+	{ label: __( 'Show on click', 'jeo' ), value: 'click' },
+	{ label: __( 'Show on hover', 'jeo' ), value: 'mouseover' },
+];
+
 export default function InteractionSettings( {
+	interaction,
+	interactionId,
 	layer,
+	onInsert,
+	onUpdate,
+	onDelete,
 } ) {
 	const titleOptions = useMemo( () => {
 		return [
@@ -17,7 +28,8 @@ export default function InteractionSettings( {
 	}, [ layer.fields ] );
 
 	const [ [ firstField, firstPlaceholder ], ...otherFields ] = Object.entries( layer.fields );
-	const numFields = otherFields.length + 1;
+	const interactive = Boolean( interaction.on );
+	const numFields = interaction.on ? otherFields.length + 1 : 1;
 
 	return (
 		<Fragment>
@@ -25,32 +37,38 @@ export default function InteractionSettings( {
 				<td rowSpan={ numFields }>{ layer.id }</td>
 				<td rowSpan={ numFields }>
 					<SelectControl
-						options={ [
-							{ label: __( 'Disabled', 'jeo' ), value: 'none' },
-							{ label: __( 'Show on click', 'jeo' ), value: 'click' },
-							{ label: __( 'Show on hover', 'jeo' ), value: 'mouseover' },
-						] }
+						value={ interaction.on }
+						options={ eventOptions }
 					/>
 				</td>
-				<td rowSpan={ numFields }>
-					<SelectControl
-						options={ titleOptions }
-					/>
-				</td>
-				<td>
-					<label htmlFor={ `i_${ layer.id }_${ firstField }` }>
-						{ firstField }
-					</label>
-				</td>
-				<td>
-					<TextControl
-						id={ `i_${ layer.id }_${ firstField }` }
-						placeholder={ firstPlaceholder }
-					/>
-				</td>
+				{ interactive ? (
+					<Fragment>
+						<td rowSpan={ numFields }>
+							<SelectControl
+								value={ interaction.title }
+								options={ titleOptions }
+							/>
+						</td>
+						<td>
+							<label htmlFor={ `i_${ layer.id }_${ firstField }` }>
+								{ firstField }
+							</label>
+						</td>
+						<td>
+							<TextControl
+								id={ `i_${ layer.id }_${ firstField }` }
+								placeholder={ firstPlaceholder }
+							/>
+						</td>
+					</Fragment>
+				) : (
+					<td rowSpan={ numFields } colSpan={ 3 } />
+				) }
 			</tr>
-			{ otherFields.map( ( [ field, placeholder ] ) => {
+			{ interactive && otherFields.map( ( [ field, placeholder ] ) => {
 				const inputId = `i_${ layer.id }_${ field }`;
+				const fieldEntry = interaction.fields.find( ( entry ) => entry.field === field );
+				const value = fieldEntry ? fieldEntry.label : undefined;
 
 				return (
 					<tr key={ inputId }>
@@ -60,6 +78,7 @@ export default function InteractionSettings( {
 						<td>
 							<TextControl
 								id={ inputId }
+								value={ value }
 								placeholder={ placeholder }
 							/>
 						</td>
