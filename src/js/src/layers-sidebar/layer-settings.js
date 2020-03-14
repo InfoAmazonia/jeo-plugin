@@ -1,6 +1,6 @@
 import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useEffect, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
 
@@ -51,13 +51,26 @@ const LayerSettings = ( {
 
 	useEffect( () => {
 		const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
-		if ( layerType.getStyleLayers ) {
+		if ( layerType && layerType.getStyleLayers ) {
 			layerType.getStyleLayers( postMeta ).then( setStyleLayers );
 		}
 	}, [ postMeta, setStyleLayers ] );
 
 	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
 	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
+
+	const interactions = useMemo( () => {
+		return postMeta.layer_type_options.interactions || [];
+	}, [ postMeta.layer_type_options.interactions ] );
+	const setInteractions = useCallback( ( e ) => {
+		setPostMeta( {
+			...postMeta,
+			layer_type_options: {
+				...postMeta.layer_type_options,
+				interactions: e,
+			},
+		} );
+	}, [ postMeta, setPostMeta ] );
 
 	return (
 		<Fragment>
@@ -76,8 +89,10 @@ const LayerSettings = ( {
 				<Fragment>
 					{ modalOpen && (
 						<InteractionsSettings
-							onCloseModal={ closeModal }
 							layers={ styleLayers }
+							onCloseModal={ closeModal }
+							interactions={ interactions }
+							setInteractions={ setInteractions }
 						/>
 					) }
 

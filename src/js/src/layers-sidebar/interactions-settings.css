@@ -16,3 +16,7 @@
 .jeo-interactions-settings label {
 	line-height: 30px;
 }
+
+.jeo-interactions-settings .components-text-control__input::placeholder {
+	color: #CCC;
+}
