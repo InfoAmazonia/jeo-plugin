@@ -15,10 +15,6 @@ const mapDefaults = {
 	max_zoom: 20,
 };
 
-const animationOptions = {
-	animate: false,
-};
-
 function parseNumber( value ) {
 	if ( value === '' ) {
 		return '';
@@ -45,30 +41,7 @@ export default ( { attributes, setAttributes } ) => {
 	return (
 		<Fragment>
 			<form className="jeo-map-settings">
-				<section className="map-preview">
-					{ MapboxAPIKey && (
-						<Map
-							style="mapbox://styles/mapbox/streets-v11"
-							containerStyle={ { height: '500px', width: '600px' } }
-							zoom={ [ initialZoom || 11 ] }
-							center={ [ centerLon || 0, centerLat || 0 ] } // @TODO: add default center to jeo settings
-							animationOptions={ animationOptions }
-							onMoveEnd={ ( map ) => {
-								if ( ! editingMap.current ) {
-									const center = map.getCenter();
-									const zoom = Math.round( map.getZoom() * 10 ) / 10;
-
-									setAttributes( {
-										center_lat: center.lat,
-										center_lon: center.lng,
-										initial_zoom: zoom,
-									} );
-								}
-							} }
-						/>
-					) }
-				</section>
-				<section className="center">
+			<section className="center">
 					<h3>{ __( 'Center' ) }</h3>
 					<TextControl
 						type="number"
