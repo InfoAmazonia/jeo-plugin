@@ -1,12 +1,4 @@
-.jeo-interaction-settings {
-	border: 1px solid lightgray;
-	padding: 5px;
-}
+.jeo-interaction-header td {
+	border-top: 1px solid lightgray;
 
-.jeo-interaction-settings + .jeo-interaction-settings {
-	margin-top: 5px;
-}
-
-.jeo-interaction-settings > * {
-	padding: 5px;
 }

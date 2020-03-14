@@ -26,6 +26,7 @@ export default function InteractionsSettings( {
 						<th>{ __( 'Layer', 'jeo' ) }</th>
 						<th>{ __( 'Popup', 'jeo' ) }</th>
 						<th>{ __( 'Title' ) }</th>
+						<th colSpan={ 2 }>{ __( 'Fields', 'jeo' ) }</th>
 					</tr>
 				) }
 				{ interactiveLayers.map( ( layer ) => (

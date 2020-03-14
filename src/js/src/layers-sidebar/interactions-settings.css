@@ -1,3 +1,18 @@
-.jeo-interactions-settings__modal {
+
+.jeo-interactions-settings {
+	margin: auto;
 	max-width: 100%;
+}
+
+.jeo-interactions-settings th {
+	text-align: left;
+}
+
+.jeo-interactions-settings td {
+	padding: 5px;
+	vertical-align: top;
+}
+
+.jeo-interactions-settings label {
+	line-height: 30px;
 }
