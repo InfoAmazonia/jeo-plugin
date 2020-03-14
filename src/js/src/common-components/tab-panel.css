@@ -24,3 +24,7 @@
 .jeo-tab-panel .components-tab-panel__tabs .components-tab-panel__tab-content {
 	padding: 0 24px;
 }
+
+#map-preview .mapboxgl-map {
+	margin: auto;
+}
