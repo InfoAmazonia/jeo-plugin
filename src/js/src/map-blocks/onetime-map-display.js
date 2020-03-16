@@ -2,6 +2,11 @@ import classNames from 'classnames';
 
 export default ( { attributes, className } ) => {
 	let hasRelatedPosts;
+	let width = undefined;
+
+	if ( className.includes( 'alignfull' ) ) {
+		width = screen.width;
+	}
 
 	if ( ! attributes.related_posts ) {
 		hasRelatedPosts = false;
@@ -41,8 +46,8 @@ export default ( { attributes, className } ) => {
 				}
 			} }
 			style={ {
-				height: attributes.height,
-				width: attributes.width,
+				height: attributes.height, //undefined
+				width,
 			} }
 		/>
 	);

@@ -1,13 +1,19 @@
-import classNames from 'classnames'
+import classNames from 'classnames';
 
-export default ( { attributes, className } ) => {
+export default ( { className, attributes } ) => {
+	let width = undefined;
+
+	if ( className.includes( 'alignfull' ) ) {
+		width = screen.width;
+	}
+
 	return (
 		<div
 			className={ classNames( [ 'jeomap', className ] ) }
 			data-map_id={ attributes.map_id }
 			style={ {
-				height: attributes.height,
-				width: attributes.width,
+				height: attributes.height, //undefined
+				width,
 			} }
 		/>
 	);
