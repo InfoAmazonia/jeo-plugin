@@ -3,7 +3,7 @@ import { __ } from '@wordpress/i18n';
 
 import LayersSettings from './layers-settings';
 
-export default function LayersModal( {
+export default function LayersSettingsModal( {
 	attributes,
 	setAttributes,
 	closeModal,
