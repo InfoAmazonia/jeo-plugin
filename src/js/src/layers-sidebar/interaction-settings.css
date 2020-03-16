@@ -8,3 +8,14 @@
 .jeo-interaction-fields .components-text-control__input::placeholder {
 	color: #ccc;
 }
+
+.jeo-interaction-fields__grid {
+	align-items: center;
+	display: grid;
+	grid-gap: 10px;
+	grid-template-columns: auto 1fr auto;
+}
+
+.jeo-interaction-fields__grid .components-base-control__field {
+	margin: 0;
+}
