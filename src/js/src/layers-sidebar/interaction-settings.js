@@ -27,7 +27,7 @@ export default function InteractionSettings( {
 		];
 	}, [ layer.fields ] );
 
-	const unusedFieldsOptions = useMemo( () => {
+	const unusedFieldOptions = useMemo( () => {
 		return Object.keys( layer.fields ).flatMap( ( key ) => {
 			const found = interaction.fields.find( ( { field } ) => {
 				return field === key;
@@ -58,7 +58,7 @@ export default function InteractionSettings( {
 
 					<SelectControl
 						label={ __( 'Add field', 'jeo' ) }
-						options={ unusedFieldsOptions }
+						options={ unusedFieldOptions }
 					/>
 					<Button isPrimary>
 						{ __( 'Add' ) }
