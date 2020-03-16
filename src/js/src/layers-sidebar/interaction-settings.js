@@ -32,10 +32,7 @@ export default function InteractionSettings( {
 			const found = interaction.fields.find( ( { field } ) => {
 				return field === key;
 			} );
-			if ( found ) {
-				return [];
-			}
-			return [ { label: key, value: key } ];
+			return found ? [] : [ { label: key, value: key } ];
 		} );
 	}, [ layer.fields, interaction.fields ] );
 
@@ -70,6 +67,24 @@ export default function InteractionSettings( {
 		} );
 	}, [ interaction, onUpdate ] );
 
+	const updateLabel = ( key ) => ( label ) => {
+		onUpdate( interaction.id, {
+			...interaction,
+			fields: interaction.fields.map( ( field ) => {
+				return ( field.field === key ) ? { ...field, label } : field;
+			} ),
+		} );
+	};
+
+	const deleteField = ( key ) => ( ) => {
+		onUpdate( interaction.id, {
+			...interaction,
+			fields: interaction.fields.filter( ( field ) => {
+				return field.field !== key;
+			} ),
+		} );
+	};
+
 	const interactive = interaction.on !== 'none';
 
 	return (
@@ -91,7 +106,6 @@ export default function InteractionSettings( {
 
 					{ ( unusedFieldOptions.length > 0 ) && (
 						<Fragment>
-							{ newField }
 							<SelectControl
 								label={ __( 'Add field', 'jeo' ) }
 								value={ newField }
@@ -108,19 +122,18 @@ export default function InteractionSettings( {
 						<fieldset className="jeo-interaction-fields">
 							<legend>{ __( 'Fields', 'jeo' ) }</legend>
 							<div className="jeo-interaction-fields__grid">
-								{ interaction.fields.map( ( field ) => {
-									const inputId = `${ layer.id }_${ field.field }`;
+								{ interaction.fields.map( ( { field, label } ) => {
+									const inputId = `${ layer.id }_${ field }`;
 									return (
-										<Fragment key={ field.field }>
-											<label htmlFor={ inputId }>
-												{ field.field }
-											</label>
+										<Fragment key={ field }>
+											<label htmlFor={ inputId }>{ field }</label>
 											<TextControl
 												id={ inputId }
-												value={ field.label }
-												placeholder={ layer.fields[ field.field ] }
+												value={ label }
+												placeholder={ layer.fields[ field ] }
+												onChange={ updateLabel( field ) }
 											/>
-											<Button>
+											<Button onClick={ deleteField( field ) }>
 												<Dashicon icon="no-alt" />
 											</Button>
 										</Fragment>
