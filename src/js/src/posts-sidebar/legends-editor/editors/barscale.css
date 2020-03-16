@@ -1,5 +1,9 @@
+.barscale-color {
+	height: 20px;
+}
+
 .gradient-legend {
-	height: 160px;
+	display: flex;
 }
 
 .color-item-wrapper {

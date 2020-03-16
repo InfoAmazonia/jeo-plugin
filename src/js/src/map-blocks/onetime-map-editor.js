@@ -1,5 +1,5 @@
 import { withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useState } from '@wordpress/element';
+import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button, PanelBody } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -32,6 +32,12 @@ const OnetimeMapEditor = ( {
 		[ setAttributes ]
 	);
 
+	const editingMap = useRef( false );
+
+	const animationOptions = {
+		animate: false,
+	};
+
 	return (
 		<Fragment>
 			{ modal && (
@@ -46,6 +52,13 @@ const OnetimeMapEditor = ( {
 			) }
 
 			<InspectorControls>
+				<LayersPanel
+					attributes={ attributes }
+					setModal={ setModal }
+					loadLayer={ loadLayer }
+					loadingLayers={ loadingLayers }
+					panel={ PanelBody }
+				/>
 				<SizePanel
 					attributes={ attributes }
 					setAttributes={ setAttributes }
@@ -53,15 +66,8 @@ const OnetimeMapEditor = ( {
 				/>
 				<MapPanel
 					attributes={ attributes }
+					setAttributes={ setAttributes }
 					setModal={ setModal }
-					panel={ PanelBody }
-				/>
-
-				<LayersPanel
-					attributes={ attributes }
-					setModal={ setModal }
-					loadLayer={ loadLayer }
-					loadingLayers={ loadingLayers }
 					panel={ PanelBody }
 				/>
 
@@ -83,6 +89,21 @@ const OnetimeMapEditor = ( {
 						attributes.center_lat || mapDefaults.lat,
 					] }
 					containerStyle={ { height: '50vh' } }
+
+					animationOptions={ animationOptions }
+
+					onMoveEnd={ ( map ) => {
+						if ( ! editingMap.current ) {
+							const center = map.getCenter();
+							const zoom = Math.round( map.getZoom() * 10 ) / 10;
+
+							setAttributes( {
+								center_lat: center.lat,
+								center_lon: center.lng,
+								initial_zoom: zoom,
+							} );
+						}
+					} }
 				>
 					{ loadedLayers && attributes.layers.map( ( layer ) => {
 						const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
@@ -92,10 +113,6 @@ const OnetimeMapEditor = ( {
 			</div>
 
 			<div className="jeo-preview-controls">
-				<Button isPrimary isLarge onClick={ () => setModal( 'map' ) }>
-					{ __( 'Edit map settings' ) }
-				</Button>
-
 				<Button isPrimary isLarge onClick={ () => setModal( 'layers' ) }>
 					{ __( 'Edit layers settings' ) }
 				</Button>
