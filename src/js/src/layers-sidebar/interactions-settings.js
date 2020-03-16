@@ -6,7 +6,7 @@ import InteractionSettings from './interaction-settings';
 import './interactions-settings.css';
 
 function defaultInteraction( id ) {
-	return { id, fields: [] };
+	return { id, on: 'none', fields: [] };
 }
 
 export default function InteractionsSettings( {

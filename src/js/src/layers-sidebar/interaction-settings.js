@@ -1,11 +1,11 @@
 import { Button, PanelBody, SelectControl, TextControl } from '@wordpress/components';
-import { Fragment, useMemo } from '@wordpress/element';
+import { Fragment, useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import './interaction-settings.css';
 
 const eventOptions = [
-	{ label: __( 'No', 'jeo' ), value: undefined },
+	{ label: __( 'No', 'jeo' ), value: 'none' },
 	{ label: __( 'On click', 'jeo' ), value: 'click' },
 	{ label: __( 'On hover', 'jeo' ), value: 'mouseover' },
 ];
@@ -39,7 +39,31 @@ export default function InteractionSettings( {
 		} );
 	}, [ layer.fields, interaction.fields ] );
 
-	const interactive = Boolean( interaction.on );
+	const [ newField, setNewField ] = useState( unusedFieldOptions[ 0 ].value );
+
+	const changeEvent = useCallback( ( on ) => {
+		if ( on === 'none' && interactionIndex !== -1 ) {
+			onDelete( interaction.id );
+		} else if ( on !== 'none' ) {
+			onInsert( { ...interaction, on } );
+		}
+	} );
+
+	const changeTitle = useCallback( ( title ) => {
+		onUpdate( interaction.id, { ...interaction, title } );
+	} );
+
+	const addField = useCallback( () => {
+		onUpdate( interaction.id, {
+			...interaction,
+			fields: [
+				...interaction.fields,
+				{ field: newField, label: '' },
+			],
+		} );
+	} );
+
+	const interactive = interaction.on !== 'none';
 
 	return (
 		<PanelBody className="jeo-interaction-settings" title={ layer.id } initialOpen={ interactive }>
@@ -47,6 +71,7 @@ export default function InteractionSettings( {
 				label={ __( 'Show popup?', 'jeo' ) }
 				value={ interaction.on }
 				options={ eventOptions }
+				onChange={ changeEvent }
 			/>
 			{ interactive && (
 				<Fragment>
@@ -54,27 +79,32 @@ export default function InteractionSettings( {
 						label={ __( 'Title' ) }
 						value={ interaction.title }
 						options={ titleOptions }
+						onChange={ changeTitle }
 					/>
 
 					<SelectControl
 						label={ __( 'Add field', 'jeo' ) }
+						value={ newField }
 						options={ unusedFieldOptions }
+						onChange={ setNewField }
 					/>
-					<Button isPrimary>
+					<Button isPrimary onClick={ addField }>
 						{ __( 'Add' ) }
 					</Button>
 
-					<fieldset className="jeo-interaction-fields">
-						<legend>{ __( 'Fields', 'jeo' ) }</legend>
-						{ interaction.fields.map( ( field ) => (
-							<TextControl
-								key={ field.field }
-								label={ field.field }
-								value={ field.label }
-								placeholder={ layer.fields[ field.field ] }
-							/>
-						) ) }
-					</fieldset>
+					{ interaction.fields.length > 0 && (
+						<fieldset className="jeo-interaction-fields">
+							<legend>{ __( 'Fields', 'jeo' ) }</legend>
+							{ interaction.fields.map( ( field ) => (
+								<TextControl
+									key={ field.field }
+									label={ field.field }
+									value={ field.label }
+									placeholder={ layer.fields[ field.field ] }
+								/>
+							) ) }
+						</fieldset>
+					) }
 				</Fragment>
 			) }
 		</PanelBody>
