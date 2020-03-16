@@ -1,4 +1,4 @@
-import { PanelBody, SelectControl, TextControl } from '@wordpress/components';
+import { Button, PanelBody, SelectControl, TextControl } from '@wordpress/components';
 import { Fragment, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -27,6 +27,18 @@ export default function InteractionSettings( {
 		];
 	}, [ layer.fields ] );
 
+	const unusedFieldsOptions = useMemo( () => {
+		return Object.keys( layer.fields ).flatMap( ( key ) => {
+			const found = interaction.fields.find( ( { field } ) => {
+				return field === key;
+			} );
+			if ( found ) {
+				return [];
+			}
+			return [ { label: key, value: key } ];
+		} );
+	}, [ layer.fields, interaction.fields ] );
+
 	const interactive = Boolean( interaction.on );
 
 	return (
@@ -43,6 +55,15 @@ export default function InteractionSettings( {
 						value={ interaction.title }
 						options={ titleOptions }
 					/>
+
+					<SelectControl
+						label={ __( 'Add field', 'jeo' ) }
+						options={ unusedFieldsOptions }
+					/>
+					<Button isPrimary>
+						{ __( 'Add' ) }
+					</Button>
+
 					<fieldset className="jeo-interaction-fields">
 						<legend>{ __( 'Fields', 'jeo' ) }</legend>
 						{ interaction.fields.map( ( field ) => (
