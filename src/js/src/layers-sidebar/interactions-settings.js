@@ -3,7 +3,6 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import InteractionSettings from './interaction-settings';
-import './interactions-settings.css';
 
 function defaultInteraction( id ) {
 	return { id, on: 'none', fields: [] };
