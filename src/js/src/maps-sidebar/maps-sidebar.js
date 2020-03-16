@@ -10,6 +10,7 @@ import MapPanel from '../map-blocks/map-panel';
 import MapPreviewPortal from './map-preview-portal';
 import PostsSelector from '../posts-selector';
 import { layerLoader } from '../map-blocks/utils';
+import { renderLayer } from '../map-blocks/map-preview-layer';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -45,6 +46,8 @@ function MapsSidebar( {
 	};
 
 	const editingMap = useRef( false );
+
+	console.log( postMeta.layers );
 
 	return (
 		<Fragment>
@@ -84,7 +87,12 @@ function MapsSidebar( {
 								} );
 							}
 						} }
-					/>
+					>
+						{ loadedLayers && postMeta.layers.map( ( layer ) => {
+							const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
+							return renderLayer( layerOptions, layer );
+						} ) }
+					</Map>
 				</MapPreviewPortal>
 			) }
 
