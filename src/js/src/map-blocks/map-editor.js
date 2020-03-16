@@ -2,7 +2,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import { Button, PanelBody, Spinner } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -22,6 +22,8 @@ const MapEditor = ( {
 	loadedMap,
 	loadingMap,
 } ) => {
+	const [ key, setKey ] = useState( 0 );
+
 	return (
 		<Fragment>
 			{ attributes.map_id && loadingMap && <Spinner /> }
@@ -29,6 +31,7 @@ const MapEditor = ( {
 				<Fragment>
 					<div className="jeo-preview-area">
 						<Map
+							key={ key }
 							style="mapbox://styles/mapbox/streets-v11"
 							zoom={ [ loadedMap.meta.initial_zoom || mapDefaults.zoom ] }
 							center={ [
@@ -53,6 +56,16 @@ const MapEditor = ( {
 							}
 						>
 							{ __( 'Select another map' ) }
+						</Button>
+
+						<Button
+							isLink
+							isLarge
+							onClick={ () => {
+								setKey( key + 1 );
+							} }
+						>
+							{ __( 'Refresh map' ) }
 						</Button>
 					</div>
 				</Fragment>
