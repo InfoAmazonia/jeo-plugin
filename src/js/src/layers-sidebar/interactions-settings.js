@@ -38,7 +38,11 @@ export default function InteractionsSettings( {
 	}, [ interactions, setInteractions ] );
 
 	return (
-		<Modal className="jeo-interactions-settings__modal" title={ __( 'Interactions', 'jeo' ) } onRequestClose={ onCloseModal }>
+		<Modal
+			className="jeo-interactions-settings__modal"
+			title={ __( 'Interactions', 'jeo' ) }
+			onRequestClose={ onCloseModal }
+		>
 			<Panel className="jeo-interactions-settings">
 				{ interactiveLayers.map( ( layer ) => {
 					const index = interactions.findIndex( ( x ) => x.id === layer.id );
