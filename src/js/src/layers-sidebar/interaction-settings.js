@@ -134,7 +134,7 @@ export default function InteractionSettings( {
 												onChange={ updateLabel( field ) }
 											/>
 											<Button onClick={ deleteField( field ) }>
-												<Dashicon icon="no-alt" />
+												<Dashicon icon="dismiss" />
 											</Button>
 										</Fragment>
 									);
