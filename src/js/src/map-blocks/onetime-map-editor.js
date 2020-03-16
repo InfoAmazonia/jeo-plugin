@@ -54,6 +54,11 @@ const OnetimeMapEditor = ( {
 			) }
 
 			<InspectorControls>
+				<MapPanel
+					attributes={ attributes }
+					setAttributes={ setAttributes }
+					panel={ PanelBody }
+				/>
 				<LayersPanel
 					attributes={ attributes }
 					openModal={ openModal }
@@ -62,11 +67,6 @@ const OnetimeMapEditor = ( {
 					panel={ PanelBody }
 				/>
 				<SizePanel
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					panel={ PanelBody }
-				/>
-				<MapPanel
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					panel={ PanelBody }
