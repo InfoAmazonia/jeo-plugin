@@ -2,7 +2,7 @@
  * Map Editor Modal
  */
 
-.jeo-map-editor-modal {
+.jeo-layers-modal {
 	position: fixed;
 	top: 30px;
 	right: 30px;
@@ -13,28 +13,28 @@
 	max-height: none;
 }
 
-.jeo-map-editor-modal .components-modal__content {
+.jeo-layers-modal .components-modal__content {
 	padding: 0;
 }
 
-.jeo-map-editor-modal .components-modal__header {
+.jeo-layers-modal .components-modal__header {
 	padding: 0 24px;
 	background-color: #fcfcfc;
 	margin: 0;
 	border-bottom: none;
 }
 
-.jeo-map-editor-modal .components-tab-panel__tabs {
+.jeo-layers-modal .components-tab-panel__tabs {
 	padding: 3px 24px 0; /* Slight padding needed for focus outline */
 	background-color: #fcfcfc;
 	border-bottom: 1px solid #ddd;
 }
 
-.jeo-map-editor-modal .components-tab-panel__tabs .components-button {
+.jeo-layers-modal .components-tab-panel__tabs .components-button {
 	padding: 8px 10px 8px;
 }
 
-.jeo-map-editor-modal
+.jeo-layers-modal
 	.components-tab-panel__tabs
 	.components-button.active-tab {
 	background-color: white;
@@ -44,24 +44,23 @@
 	margin-bottom: -1px;
 }
 
-.jeo-map-editor-modal
+.jeo-layers-modal
 	.components-tab-panel__tabs
 	.components-button.active-tab:focus:not(:disabled) {
 	box-shadow: 0 0 0 1px #5b9dd9, 0 0 2px 1px rgba(30, 140, 190, 0.8);
 }
 
-.jeo-map-editor-modal .components-tab-panel__tab-content {
+.jeo-layers-modal .components-tab-panel__tab-content {
 	padding: 0 24px;
 }
-
 
 /**
  * Layers Settings
  */
 .jeo-layers-list {
 	border-collapse: collapse;
-	width: 100%;
-	margin: 1em 0;
+	width: calc(100% - 2em);
+	margin: 1em;
 }
 
 .jeo-layers-list .layer {

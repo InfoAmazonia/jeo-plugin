@@ -63,7 +63,9 @@ const LayersSettings = ( {
 
 			{ loadingLayers && <Spinner /> }
 			{ ! loadingLayers && ! attributes.layers.length && (
-				<p>{ __( 'No layers have been added to this map.' ) } </p>
+				<p className="jeo-layers-list">
+					{ __( 'No layers have been added to this map.' ) }
+				</p>
 			) }
 			{ ! loadingLayers && attributes.layers.length > 0 && (
 				<List

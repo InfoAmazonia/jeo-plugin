@@ -5,7 +5,7 @@ import { Button, PanelBody } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 
 import Map from './map';
-import MapEditorModal from './map-editor-modal';
+import LayersModal from './layers-modal';
 import { renderLayer } from './map-preview-layer';
 import SizePanel from './size-panel';
 import MapPanel from './map-panel';
@@ -32,6 +32,9 @@ const OnetimeMapEditor = ( {
 		[ setAttributes ]
 	);
 
+	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
+	const openModal = useCallback( () => setModal( true ), [ setModal ] );
+
 	const editingMap = useRef( false );
 
 	const animationOptions = {
@@ -41,9 +44,8 @@ const OnetimeMapEditor = ( {
 	return (
 		<Fragment>
 			{ modal && (
-				<MapEditorModal
-					modal={ modal }
-					setModal={ setModal }
+				<LayersModal
+					closeModal={ closeModal }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					loadedLayers={ loadedLayers }
@@ -54,7 +56,7 @@ const OnetimeMapEditor = ( {
 			<InspectorControls>
 				<LayersPanel
 					attributes={ attributes }
-					setModal={ setModal }
+					openModal={ openModal }
 					loadLayer={ loadLayer }
 					loadingLayers={ loadingLayers }
 					panel={ PanelBody }
@@ -67,7 +69,6 @@ const OnetimeMapEditor = ( {
 				<MapPanel
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					setModal={ setModal }
 					panel={ PanelBody }
 				/>
 
@@ -113,7 +114,7 @@ const OnetimeMapEditor = ( {
 			</div>
 
 			<div className="jeo-preview-controls">
-				<Button isPrimary isLarge onClick={ () => setModal( 'layers' ) }>
+				<Button isPrimary isLarge onClick={ openModal }>
 					{ __( 'Edit layers settings' ) }
 				</Button>
 			</div>

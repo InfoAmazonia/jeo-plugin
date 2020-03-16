@@ -2,7 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { layerUseLabels } from './utils';
 
-export default function( { attributes, loadLayer, loadingLayers, panel: Panel, setModal } ) {
+export default function( { attributes, loadLayer, loadingLayers, openModal, panel: Panel } ) {
 	const layers = attributes.layers || [];
 
 	return (
@@ -27,7 +27,7 @@ export default function( { attributes, loadLayer, loadingLayers, panel: Panel, s
 					} ) }
 				</ol>
 			) }
-			<Button isPrimary isLarge onClick={ () => setModal( 'layers' ) }>
+			<Button isPrimary isLarge onClick={ openModal }>
 				{ __( 'Edit layers settings' ) }
 			</Button>
 		</Panel>

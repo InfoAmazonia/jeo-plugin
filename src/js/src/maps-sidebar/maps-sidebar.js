@@ -1,16 +1,15 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
+import { createPortal, Fragment, useCallback, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
-import MapEditorModal from '../map-blocks/map-editor-modal';
+import LayersModal from '../map-blocks/layers-modal';
 import MapPanel from '../map-blocks/map-panel';
 import PostsSelector from '../posts-selector';
 import { layerLoader } from '../map-blocks/utils';
 
 import ReactMapboxGl from 'react-mapbox-gl';
-import { createPortal } from '@wordpress/element';
 
 const MapboxAPIKey = window.jeo_settings.mapbox_key;
 
@@ -34,6 +33,9 @@ function MapsSidebar( {
 } ) {
 	const [ modal, setModal ] = useState( false );
 
+	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
+	const openModal = useCallback( () => setModal( true ), [ setModal ] );
+
 	const loadLayer = useCallback( layerLoader( loadedLayers ), [ loadedLayers ] );
 
 	const {
@@ -41,7 +43,6 @@ function MapsSidebar( {
 		center_lon: centerLon,
 		initial_zoom: initialZoom
 	} = { ...mapDefaults, ...postMeta };
-
 
 	const animationOptions = {
 		animate: false,
@@ -52,9 +53,8 @@ function MapsSidebar( {
 	return (
 		<Fragment>
 			{ modal && (
-				<MapEditorModal
-					modal={ modal }
-					setModal={ setModal }
+				<LayersModal
+					closeModal={ closeModal }
 					attributes={ postMeta }
 					setAttributes={ setPostMeta }
 					loadedLayers={ loadedLayers }
@@ -64,7 +64,6 @@ function MapsSidebar( {
 
 			<MapPanel
 				attributes={ postMeta }
-				setModal={ setModal }
 				setAttributes={ setPostMeta }
 				panel={ PluginDocumentSettingPanel }
 			/>
@@ -95,7 +94,7 @@ function MapsSidebar( {
 
 			<LayersPanel
 				attributes={ postMeta }
-				setModal={ setModal }
+				openModal={ openModal }
 				loadLayer={ loadLayer }
 				loadingLayers={ loadingLayers }
 				panel={ PluginDocumentSettingPanel }
