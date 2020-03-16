@@ -1,5 +1,5 @@
-import { Button, PanelBody, SelectControl, TextControl } from '@wordpress/components';
-import { Fragment, useCallback, useMemo, useState } from '@wordpress/element';
+import { Button, Dashicon, PanelBody, SelectControl, TextControl } from '@wordpress/components';
+import { Fragment, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import './interaction-settings.css';
@@ -39,7 +39,14 @@ export default function InteractionSettings( {
 		} );
 	}, [ layer.fields, interaction.fields ] );
 
-	const [ newField, setNewField ] = useState( unusedFieldOptions[ 0 ].value );
+	const [ newField, setNewField ] = useState( null );
+
+	useEffect( () => {
+		setNewField( unusedFieldOptions.length > 0 ?
+			unusedFieldOptions[ 0 ].value :
+			null
+		);
+	}, [ unusedFieldOptions ] );
 
 	const changeEvent = useCallback( ( on ) => {
 		if ( on === 'none' && interactionIndex !== -1 ) {
@@ -61,7 +68,7 @@ export default function InteractionSettings( {
 				{ field: newField, label: '' },
 			],
 		} );
-	} );
+	}, [ interaction, onUpdate ] );
 
 	const interactive = interaction.on !== 'none';
 
@@ -82,27 +89,44 @@ export default function InteractionSettings( {
 						onChange={ changeTitle }
 					/>
 
-					<SelectControl
-						label={ __( 'Add field', 'jeo' ) }
-						value={ newField }
-						options={ unusedFieldOptions }
-						onChange={ setNewField }
-					/>
-					<Button isPrimary onClick={ addField }>
-						{ __( 'Add' ) }
-					</Button>
+					{ ( unusedFieldOptions.length > 0 ) && (
+						<Fragment>
+							{ newField }
+							<SelectControl
+								label={ __( 'Add field', 'jeo' ) }
+								value={ newField }
+								options={ unusedFieldOptions }
+								onChange={ setNewField }
+							/>
+							<Button isPrimary onClick={ addField }>
+								{ __( 'Add' ) }
+							</Button>
+						</Fragment>
+					) }
 
-					{ interaction.fields.length > 0 && (
+					{ ( interaction.fields.length > 0 ) && (
 						<fieldset className="jeo-interaction-fields">
 							<legend>{ __( 'Fields', 'jeo' ) }</legend>
-							{ interaction.fields.map( ( field ) => (
-								<TextControl
-									key={ field.field }
-									label={ field.field }
-									value={ field.label }
-									placeholder={ layer.fields[ field.field ] }
-								/>
-							) ) }
+							<div className="jeo-interaction-fields__grid">
+								{ interaction.fields.map( ( field ) => {
+									const inputId = `${ layer.id }_${ field.field }`;
+									return (
+										<Fragment key={ field.field }>
+											<label htmlFor={ inputId }>
+												{ field.field }
+											</label>
+											<TextControl
+												id={ inputId }
+												value={ field.label }
+												placeholder={ layer.fields[ field.field ] }
+											/>
+											<Button>
+												<Dashicon icon="no-alt" />
+											</Button>
+										</Fragment>
+									);
+								} ) }
+							</div>
 						</fieldset>
 					) }
 				</Fragment>
