@@ -47,8 +47,6 @@ function MapsSidebar( {
 
 	const editingMap = useRef( false );
 
-	console.log( postMeta.layers );
-
 	return (
 		<Fragment>
 			{ modal && (
