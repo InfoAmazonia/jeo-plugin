@@ -1,4 +1,4 @@
-import { Modal } from '@wordpress/components';
+import { Modal, Panel } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -40,15 +40,7 @@ export default function InteractionsSettings( {
 
 	return (
 		<Modal className="jeo-interactions-settings__modal" title={ __( 'Interactions', 'jeo' ) } onRequestClose={ onCloseModal }>
-			<table className="jeo-interactions-settings">
-				{ ( interactiveLayers.length > 0 ) && (
-					<tr>
-						<th>{ __( 'Layer', 'jeo' ) }</th>
-						<th>{ __( 'Popup', 'jeo' ) }</th>
-						<th>{ __( 'Title' ) }</th>
-						<th colSpan={ 2 }>{ __( 'Fields', 'jeo' ) }</th>
-					</tr>
-				) }
+			<Panel className="jeo-interactions-settings">
 				{ interactiveLayers.map( ( layer ) => {
 					const index = interactions.findIndex( ( x ) => x.id === layer.id );
 					const interaction = interactions[ index ];
@@ -56,7 +48,7 @@ export default function InteractionsSettings( {
 					return (
 						<InteractionSettings
 							key={ layer.id }
-							interactionId={ index }
+							interactionIndex={ index }
 							interaction={ interaction || defaultInteraction( layer.id ) }
 							layer={ layer }
 							onInsert={ onInsert }
@@ -65,7 +57,7 @@ export default function InteractionsSettings( {
 						/>
 					);
 				} ) }
-			</table>
+			</Panel>
 		</Modal>
 	);
 }

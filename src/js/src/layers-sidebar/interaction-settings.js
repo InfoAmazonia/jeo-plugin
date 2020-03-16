@@ -1,18 +1,18 @@
-import { SelectControl, TextControl } from '@wordpress/components';
+import { PanelBody, SelectControl, TextControl } from '@wordpress/components';
 import { Fragment, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import './interaction-settings.css';
 
 const eventOptions = [
-	{ label: __( 'Disabled', 'jeo' ), value: undefined },
-	{ label: __( 'Show on click', 'jeo' ), value: 'click' },
-	{ label: __( 'Show on hover', 'jeo' ), value: 'mouseover' },
+	{ label: __( 'No', 'jeo' ), value: undefined },
+	{ label: __( 'On click', 'jeo' ), value: 'click' },
+	{ label: __( 'On hover', 'jeo' ), value: 'mouseover' },
 ];
 
 export default function InteractionSettings( {
 	interaction,
-	interactionId,
+	interactionIndex,
 	layer,
 	onInsert,
 	onUpdate,
@@ -27,64 +27,35 @@ export default function InteractionSettings( {
 		];
 	}, [ layer.fields ] );
 
-	const [ [ firstField, firstPlaceholder ], ...otherFields ] = Object.entries( layer.fields );
 	const interactive = Boolean( interaction.on );
-	const numFields = interaction.on ? otherFields.length + 1 : 1;
 
 	return (
-		<Fragment>
-			<tr className="jeo-interaction-header">
-				<td rowSpan={ numFields }>{ layer.id }</td>
-				<td rowSpan={ numFields }>
+		<PanelBody className="jeo-interaction-settings" title={ layer.id } initialOpen={ interactive }>
+			<SelectControl
+				label={ __( 'Show popup?', 'jeo' ) }
+				value={ interaction.on }
+				options={ eventOptions }
+			/>
+			{ interactive && (
+				<Fragment>
 					<SelectControl
-						value={ interaction.on }
-						options={ eventOptions }
+						label={ __( 'Title' ) }
+						value={ interaction.title }
+						options={ titleOptions }
 					/>
-				</td>
-				{ interactive ? (
-					<Fragment>
-						<td rowSpan={ numFields }>
-							<SelectControl
-								value={ interaction.title }
-								options={ titleOptions }
-							/>
-						</td>
-						<td>
-							<label htmlFor={ `i_${ layer.id }_${ firstField }` }>
-								{ firstField }
-							</label>
-						</td>
-						<td>
+					<fieldset className="jeo-interaction-fields">
+						<legend>{ __( 'Fields', 'jeo' ) }</legend>
+						{ interaction.fields.map( ( field ) => (
 							<TextControl
-								id={ `i_${ layer.id }_${ firstField }` }
-								placeholder={ firstPlaceholder }
+								key={ field.field }
+								label={ field.field }
+								value={ field.label }
+								placeholder={ layer.fields[ field.field ] }
 							/>
-						</td>
-					</Fragment>
-				) : (
-					<td rowSpan={ numFields } colSpan={ 3 } />
-				) }
-			</tr>
-			{ interactive && otherFields.map( ( [ field, placeholder ] ) => {
-				const inputId = `i_${ layer.id }_${ field }`;
-				const fieldEntry = interaction.fields.find( ( entry ) => entry.field === field );
-				const value = fieldEntry ? fieldEntry.label : undefined;
-
-				return (
-					<tr key={ inputId }>
-						<td>
-							<label htmlFor={ inputId }>{ field }</label>
-						</td>
-						<td>
-							<TextControl
-								id={ inputId }
-								value={ value }
-								placeholder={ placeholder }
-							/>
-						</td>
-					</tr>
-				);
-			} ) }
-		</Fragment>
+						) ) }
+					</fieldset>
+				</Fragment>
+			) }
+		</PanelBody>
 	);
 }
