@@ -4,8 +4,8 @@ import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
-import LayersModal from '../map-blocks/layers-modal';
-import Map, { MapboxAPIKey } from '../map-blocks/map'
+import LayersSettingsModal from '../map-blocks/layers-settings-modal';
+import Map, { MapboxAPIKey } from '../map-blocks/map';
 import MapPanel from '../map-blocks/map-panel';
 import MapPreviewPortal from './map-preview-portal';
 import PostsSelector from '../posts-selector';
@@ -50,7 +50,7 @@ function MapsSidebar( {
 	return (
 		<Fragment>
 			{ modal && (
-				<LayersModal
+				<LayersSettingsModal
 					closeModal={ closeModal }
 					attributes={ postMeta }
 					setAttributes={ setPostMeta }
