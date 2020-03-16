@@ -23,6 +23,7 @@ const OnetimeMapEditor = ( {
 	loadingLayers,
 } ) => {
 	const [ modal, setModal ] = useState( false );
+	const [key, setKey] = useState( 0 )
 	const loadLayer = layerLoader( loadedLayers );
 
 	const setRelatedPosts = useCallback(
@@ -83,6 +84,7 @@ const OnetimeMapEditor = ( {
 
 			<div className="jeo-preview-area">
 				<Map
+					key={ key }
 					style="mapbox://styles/mapbox/streets-v11"
 					zoom={ [ attributes.initial_zoom || mapDefaults.zoom ] }
 					center={ [
@@ -116,6 +118,16 @@ const OnetimeMapEditor = ( {
 			<div className="jeo-preview-controls">
 				<Button isPrimary isLarge onClick={ openModal }>
 					{ __( 'Edit layers settings' ) }
+				</Button>
+
+				<Button
+					isPrimary
+					isLarge
+					onClick={ () => {
+						setKey( key + 1 );
+					} }
+				>
+					{ __( 'Refresh map' ) }
 				</Button>
 			</div>
 		</Fragment>
