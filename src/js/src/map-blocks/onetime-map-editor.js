@@ -23,7 +23,7 @@ const OnetimeMapEditor = ( {
 	loadingLayers,
 } ) => {
 	const [ modal, setModal ] = useState( false );
-	const [key, setKey] = useState( 0 )
+	const [ key, setKey ] = useState( 0 );
 	const loadLayer = layerLoader( loadedLayers );
 
 	const setRelatedPosts = useCallback(
