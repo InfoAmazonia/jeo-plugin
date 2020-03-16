@@ -51,11 +51,11 @@ export default function InteractionSettings( {
 		} else if ( on !== 'none' ) {
 			onInsert( { ...interaction, on } );
 		}
-	} );
+	}, [ interaction, interactionIndex, onDelete, onInsert ] );
 
 	const changeTitle = useCallback( ( title ) => {
 		onUpdate( interaction.id, { ...interaction, title } );
-	} );
+	}, [ interaction, onUpdate ] );
 
 	const addField = useCallback( () => {
 		onUpdate( interaction.id, {
@@ -65,7 +65,7 @@ export default function InteractionSettings( {
 				{ field: newField, label: '' },
 			],
 		} );
-	}, [ interaction, onUpdate ] );
+	}, [ interaction, newField, onUpdate ] );
 
 	const updateLabel = ( key ) => ( label ) => {
 		onUpdate( interaction.id, {
