@@ -1,19 +1,15 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-import { createPortal, Fragment, useCallback, useState, useRef } from '@wordpress/element';
+import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
 import LayersModal from '../map-blocks/layers-modal';
+import Map, { MapboxAPIKey } from '../map-blocks/map'
 import MapPanel from '../map-blocks/map-panel';
+import MapPreviewPortal from './map-preview-portal';
 import PostsSelector from '../posts-selector';
 import { layerLoader } from '../map-blocks/utils';
-
-import ReactMapboxGl from 'react-mapbox-gl';
-
-const MapboxAPIKey = window.jeo_settings.mapbox_key;
-
-const Map = ReactMapboxGl( { accessToken: MapboxAPIKey } );
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -41,7 +37,7 @@ function MapsSidebar( {
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
-		initial_zoom: initialZoom
+		initial_zoom: initialZoom,
 	} = { ...mapDefaults, ...postMeta };
 
 	const animationOptions = {
@@ -69,7 +65,8 @@ function MapsSidebar( {
 			/>
 
 			{ MapboxAPIKey && (
-					createPortal(<Map
+				<MapPreviewPortal>
+					<Map
 						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '1000px' } }
 						zoom={ [ initialZoom || 11 ] }
@@ -87,10 +84,9 @@ function MapsSidebar( {
 								} );
 							}
 						} }
-						/>, document.getElementById('map-preview')
-					)
-				)
-			}
+					/>
+				</MapPreviewPortal>
+			) }
 
 			<LayersPanel
 				attributes={ postMeta }
