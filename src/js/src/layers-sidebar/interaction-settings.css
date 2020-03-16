@@ -1,3 +1,10 @@
-.jeo-interaction-header td {
-	border-top: 1px solid lightgray;
+.jeo-interaction-fields {
+	border: 1px solid #e2e4e7;
+	border-radius: 4px;
+	margin-top: 10px;
+	padding: 5px 10px;
+}
+
+.jeo-interaction-fields .components-text-control__input::placeholder {
+	color: #ccc;
 }
