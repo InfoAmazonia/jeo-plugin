@@ -2,6 +2,7 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { layerUseLabels } from './utils';
+import './layers-panel.css';
 
 export default function( {
 	attributes,

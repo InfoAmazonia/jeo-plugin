@@ -213,10 +213,6 @@
 	display: none;
 }
 
-.jeo-layers-panel .components-button {
-	margin: 10px 10px 0;
-}
-
 /**
  * Sidebar Panels
  */
@@ -232,7 +228,4 @@
 }
 .jeo-setting-layer h2 {
 	margin-bottom: 0;
-}
-.jeo-layers-panel button + button {
-	margin-top: 1em;
 }
