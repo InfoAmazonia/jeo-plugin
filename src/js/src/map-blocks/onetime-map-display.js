@@ -2,12 +2,6 @@ import classNames from 'classnames';
 
 export default ( { attributes, className } ) => {
 	let hasRelatedPosts;
-	let width = undefined;
-
-	if ( className.includes( 'alignfull' ) ) {
-		width = screen.width;
-	}
-
 	if ( ! attributes.related_posts ) {
 		hasRelatedPosts = false;
 	} else {
@@ -18,6 +12,11 @@ export default ( { attributes, className } ) => {
 			'after',
 			'meta_query',
 		].some( ( key ) => attributes.related_posts[ key ] );
+	}
+
+	const style = {};
+	if ( className.includes( 'alignfull' ) ) {
+		style.width = '100vw';
 	}
 
 	return (
@@ -32,10 +31,7 @@ export default ( { attributes, className } ) => {
 			data-related_posts={
 				hasRelatedPosts ? JSON.stringify( attributes.related_posts ) : undefined
 			}
-			style={ {
-				height: attributes.height, //undefined
-				width,
-			} }
+			style={ style }
 		/>
 	);
 };

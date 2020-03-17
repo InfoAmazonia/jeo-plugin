@@ -1,20 +1,17 @@
 import classNames from 'classnames';
 
-export default ( { className, attributes } ) => {
-	let width = undefined;
+export default ( { attributes, className } ) => {
+	const style = {};
 
 	if ( className.includes( 'alignfull' ) ) {
-		width = screen.width;
+		style.width = '100vw';
 	}
 
 	return (
 		<div
 			className={ classNames( [ 'jeomap', className ] ) }
 			data-map_id={ attributes.map_id }
-			style={ {
-				height: attributes.height, //undefined
-				width,
-			} }
+			style={ style }
 		/>
 	);
 };
