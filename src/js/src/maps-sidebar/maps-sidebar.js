@@ -1,7 +1,6 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
 import LayersSettingsModal from '../map-blocks/layers-settings-modal';
@@ -62,9 +61,8 @@ function MapsSidebar( {
 			<MapPanel
 				attributes={ postMeta }
 				setAttributes={ setPostMeta }
-				panel={ PluginDocumentSettingPanel }
+				renderPanel={ PluginDocumentSettingPanel }
 			/>
-
 			{ MapboxAPIKey && (
 				<MapPreviewPortal>
 					<Map
@@ -99,16 +97,14 @@ function MapsSidebar( {
 				openModal={ openModal }
 				loadLayer={ loadLayer }
 				loadingLayers={ loadingLayers }
-				panel={ PluginDocumentSettingPanel }
+				renderPanel={ PluginDocumentSettingPanel }
 			/>
 
-			<PluginDocumentSettingPanel title={ __( 'Related posts', 'jeo' ) }>
-				<PostsSelector
-					relatedPosts={ relatedPosts }
-					setRelatedPosts={ setRelatedPosts }
-					panel={ PluginDocumentSettingPanel }
-				/>
-			</PluginDocumentSettingPanel>
+			<PostsSelector
+				relatedPosts={ relatedPosts }
+				setRelatedPosts={ setRelatedPosts }
+				renderPanel={ PluginDocumentSettingPanel }
+			/>
 		</Fragment>
 	);
 }
