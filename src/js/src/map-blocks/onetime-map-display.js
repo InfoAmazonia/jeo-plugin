@@ -32,19 +32,6 @@ export default ( { attributes, className } ) => {
 			data-related_posts={
 				hasRelatedPosts ? JSON.stringify( attributes.related_posts ) : undefined
 			}
-
-			onMoveEnd={ ( map ) => {
-				if ( ! editingMap.current ) {
-					const center = map.getCenter();
-					const zoom = Math.round( map.getZoom() * 10 ) / 10;
-
-					setPostMeta( {
-						center_lat: center.lat,
-						center_lon: center.lng,
-						initial_zoom: zoom,
-					} );
-				}
-			} }
 			style={ {
 				height: attributes.height, //undefined
 				width,

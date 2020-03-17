@@ -19,12 +19,6 @@ registerBlockType( 'jeo/map', {
 		map_id: {
 			type: 'number',
 		},
-		height: {
-			type: 'string',
-		},
-		width: {
-			type: 'string',
-		},
 	},
 	edit: ( props ) => <MapEditor { ...props } />,
 	save: ( props ) => <MapDisplay { ...props } />,
@@ -51,12 +45,6 @@ registerBlockType( 'jeo/onetime-map', {
 					show_legend: { type: 'boolean' },
 				},
 			},
-		},
-		height: {
-			type: 'string',
-		},
-		width: {
-			type: 'string',
 		},
 		center_lat: {
 			type: 'number',

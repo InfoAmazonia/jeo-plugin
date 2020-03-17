@@ -7,7 +7,6 @@ import { InspectorControls } from '@wordpress/block-editor';
 import Map from './map';
 import LayersModal from './layers-modal';
 import { renderLayer } from './map-preview-layer';
-import SizePanel from './size-panel';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import PostsSelector from '../posts-selector';
@@ -67,12 +66,6 @@ const OnetimeMapEditor = ( {
 					loadingLayers={ loadingLayers }
 					panel={ PanelBody }
 				/>
-				<SizePanel
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					panel={ PanelBody }
-				/>
-
 				<PanelBody title={ __( 'Related posts', 'jeo' ) }>
 					<PostsSelector
 						relatedPosts={ attributes.related_posts }

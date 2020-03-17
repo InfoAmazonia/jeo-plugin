@@ -1,5 +1,4 @@
-import { InspectorControls } from '@wordpress/block-editor';
-import { Button, PanelBody, Spinner } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { Fragment, useState } from '@wordpress/element';
@@ -8,7 +7,6 @@ import { __ } from '@wordpress/i18n';
 import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
-import SizePanel from './size-panel';
 import './map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
@@ -87,13 +85,6 @@ const MapEditor = ( {
 					/>
 				</Fragment>
 			) }
-			<InspectorControls key={ 'inspector' }>
-				<SizePanel
-					attributes={ attributes }
-					setAttributes={ setAttributes }
-					panel={ PanelBody }
-				/>
-			</InspectorControls>
 		</Fragment>
 	);
 };
