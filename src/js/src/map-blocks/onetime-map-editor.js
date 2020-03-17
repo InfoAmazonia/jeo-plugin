@@ -1,8 +1,8 @@
-import { withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { Button, PanelBody } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
+import { Button, PanelBody } from '@wordpress/components';
+import { withSelect } from '@wordpress/data';
+import { Fragment, useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 import Map from './map';
 import LayersSettingsModal from './layers-settings-modal';
@@ -24,6 +24,10 @@ const OnetimeMapEditor = ( {
 	const [ modal, setModal ] = useState( false );
 	const [ key, setKey ] = useState( 0 );
 	const loadLayer = layerLoader( loadedLayers );
+
+	useEffect( () => {
+		setKey( key + 1 );
+	}, [ attributes.align, window.screen.width ] );
 
 	const setRelatedPosts = useCallback(
 		( relatedPosts ) => {
@@ -111,16 +115,6 @@ const OnetimeMapEditor = ( {
 			<div className="jeo-preview-controls">
 				<Button isPrimary isLarge onClick={ openModal }>
 					{ __( 'Edit layers settings' ) }
-				</Button>
-
-				<Button
-					isPrimary
-					isLarge
-					onClick={ () => {
-						setKey( key + 1 );
-					} }
-				>
-					{ __( 'Refresh map' ) }
 				</Button>
 			</div>
 		</Fragment>
