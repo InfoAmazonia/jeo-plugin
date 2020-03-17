@@ -11,6 +11,8 @@ import PostsSelector from '../posts-selector';
 import { layerLoader } from '../map-blocks/utils';
 import { renderLayer } from '../map-blocks/map-preview-layer';
 
+import './maps-sidebar.css';
+
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
