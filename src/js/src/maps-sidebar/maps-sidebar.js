@@ -69,7 +69,7 @@ function MapsSidebar( {
 				<MapPreviewPortal>
 					<Map
 						style="mapbox://styles/mapbox/streets-v11"
-						containerStyle={ { height: '500px', width: '1000px' } }
+						containerStyle={ { height: '500px', width: '100%' } }
 						zoom={ [ initialZoom || 11 ] }
 						center={ [ centerLon || 0, centerLat || 0 ] }
 						animationOptions={ animationOptions }
