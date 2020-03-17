@@ -5,7 +5,7 @@ import { Button, PanelBody } from '@wordpress/components';
 import { InspectorControls } from '@wordpress/block-editor';
 
 import Map from './map';
-import LayersModal from './layers-modal';
+import LayersSettingsModal from './layers-settings-modal';
 import { renderLayer } from './map-preview-layer';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
@@ -44,7 +44,7 @@ const OnetimeMapEditor = ( {
 	return (
 		<Fragment>
 			{ modal && (
-				<LayersModal
+				<LayersSettingsModal
 					closeModal={ closeModal }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
