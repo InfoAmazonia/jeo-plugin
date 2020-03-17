@@ -1,12 +1,19 @@
-import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
+
 import { layerUseLabels } from './utils';
 
-export default function( { attributes, loadLayer, loadingLayers, openModal, panel: Panel } ) {
+export default function( {
+	attributes,
+	loadLayer,
+	loadingLayers,
+	openModal,
+	renderPanel: Panel,
+} ) {
 	const layers = attributes.layers || [];
 
 	return (
-		<Panel title={ __( 'Map layers' ) } className="jeo-layers-panel">
+		<Panel name="map-layers" title={ __( 'Map layers' ) } className="jeo-layers-panel">
 			{ loadingLayers ? (
 				<p>{ __( 'Loading layers data...' ) }</p>
 			) : (

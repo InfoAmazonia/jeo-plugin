@@ -61,22 +61,20 @@ const OnetimeMapEditor = ( {
 				<MapPanel
 					attributes={ attributes }
 					setAttributes={ setAttributes }
-					panel={ PanelBody }
+					renderPanel={ PanelBody }
 				/>
 				<LayersPanel
 					attributes={ attributes }
 					openModal={ openModal }
 					loadLayer={ loadLayer }
 					loadingLayers={ loadingLayers }
-					panel={ PanelBody }
+					renderPanel={ PanelBody }
 				/>
-				<PanelBody title={ __( 'Related posts', 'jeo' ) }>
-					<PostsSelector
-						relatedPosts={ attributes.related_posts }
-						setRelatedPosts={ setRelatedPosts }
-						panel={ PanelBody }
-					/>
-				</PanelBody>
+				<PostsSelector
+					relatedPosts={ attributes.related_posts }
+					setRelatedPosts={ setRelatedPosts }
+					renderPanel={ PanelBody }
+				/>
 			</InspectorControls>
 
 			<div className="jeo-preview-area">

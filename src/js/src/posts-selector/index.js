@@ -1,5 +1,5 @@
 import { withSelect } from '@wordpress/data';
-import { Fragment, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { IntervalSelector } from './interval-selector';
@@ -13,6 +13,7 @@ const PostsSelector = ( {
 	loadingTags,
 	relatedPosts,
 	setRelatedPosts,
+	renderPanel: Panel,
 } ) => {
 	useEffect( () => {
 		/* relatedPosts is often nullish if schema doesn't match */
@@ -22,7 +23,7 @@ const PostsSelector = ( {
 	}, [ relatedPosts, setRelatedPosts ] );
 
 	return (
-		<Fragment>
+		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
 			{ loadedCategories && (
 				<TokensSelector
 					label={ __( 'Categories' ) }
@@ -67,7 +68,7 @@ const PostsSelector = ( {
 					setRelatedPosts( { ...relatedPosts, meta_query: queries } );
 				} }
 			/>
-		</Fragment>
+		</Panel>
 	);
 };
 
