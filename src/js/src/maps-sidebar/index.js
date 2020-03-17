@@ -8,7 +8,8 @@ domReady( () => {
 	const currentPostType = select( 'core/editor' ).getCurrentPostType();
 
 	if ( currentPostType === 'map' ) {
-		jQuery('.editor-post-title').after('<div id="map-preview">');
+		jQuery( '.editor-post-title' ).after( '<div id="map-preview">' );
+
 		registerPlugin( 'jeo-maps-sidebar', {
 			icon: null,
 			render: () => {
