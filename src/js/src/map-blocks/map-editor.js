@@ -1,7 +1,7 @@
 import { Button, Spinner } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
 import { compose, withInstanceId } from '@wordpress/compose';
-import { Fragment, useState } from '@wordpress/element';
+import { withSelect } from '@wordpress/data';
+import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -21,6 +21,10 @@ const MapEditor = ( {
 	loadingMap,
 } ) => {
 	const [ key, setKey ] = useState( 0 );
+
+	useEffect( () => {
+		setKey( key + 1 );
+	}, [ attributes.align, window.screen.width ] );
 
 	return (
 		<Fragment>
@@ -54,16 +58,6 @@ const MapEditor = ( {
 							}
 						>
 							{ __( 'Select another map' ) }
-						</Button>
-
-						<Button
-							isLink
-							isLarge
-							onClick={ () => {
-								setKey( key + 1 );
-							} }
-						>
-							{ __( 'Refresh map' ) }
 						</Button>
 					</div>
 				</Fragment>
