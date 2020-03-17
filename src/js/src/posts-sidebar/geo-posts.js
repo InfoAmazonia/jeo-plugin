@@ -1,10 +1,9 @@
-import { Button, RadioControl } from '@wordpress/components';
+import { Button, RadioControl, TabPanel } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
 
-import { TabPanel } from '../common-components';
 import JeoGeoAutoComplete from './geo-auto-complete';
 import './geo-posts.css';
 
