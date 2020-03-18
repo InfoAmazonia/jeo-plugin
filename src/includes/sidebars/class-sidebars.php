@@ -25,7 +25,7 @@ class Sidebars {
 		wp_enqueue_script(
 			'jeo-layers-sidebar',
 			JEO_BASEURL . '/js/build/layersSidebar.js',
-			$asset_file['dependencies'],
+			array_merge($asset_file['dependencies'], ['mapboxgl-loader']),
 			$asset_file['version']
 		);
 
