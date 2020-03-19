@@ -5,6 +5,8 @@ import classNames from 'classnames';
 
 import { layerUseLabels } from './utils';
 
+import './layer-settings.css';
+
 const useOptions = [
 	{ label: layerUseLabels.fixed, value: 'fixed' },
 	{ label: layerUseLabels.swappable, value: 'swappable' },

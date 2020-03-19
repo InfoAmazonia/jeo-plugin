@@ -8,6 +8,8 @@ import LayerSettings from './layer-settings';
 import { layerLoader } from './utils';
 import JeoAutosuggest from './jeo-autosuggest';
 
+import './layers-settings.css';
+
 const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
 
 const anySwapDefault = ( settings ) =>
@@ -19,6 +21,7 @@ const LayersSettings = ( {
 	setAttributes,
 	loadingLayers,
 	loadedLayers,
+	closeModal,
 } ) => {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 	const loadLayer = layerLoader( loadedLayers );
@@ -51,6 +54,7 @@ const LayersSettings = ( {
 				/>
 				<span>{ __( 'or' ) }</span>
 				<Button
+					className="create-layer-button"
 					isPrimary
 					isLarge
 					href="/wp-admin/post-new.php?post_type=map-layer"
@@ -127,10 +131,15 @@ const LayersSettings = ( {
 									};
 								} )
 							);
-						const removeLayer = () =>
-							setLayers(
-								attributes.layers.filter( ( settings ) => settings.id !== value.id )
-							);
+						const removeLayer = () => {
+							const confirmation = confirm( __( 'Do you really want to delete this layer?' ) );
+
+							if ( confirmation ) {
+								return setLayers(
+									attributes.layers.filter( ( settings ) => settings.id !== value.id )
+								);
+							}
+						};
 						const row = (
 							<LayerSettings
 								removeLayer={ removeLayer }
@@ -154,6 +163,16 @@ const LayersSettings = ( {
 					} }
 				/>
 			) }
+			<Button
+				className="done-button"
+				isPrimary
+				isLarge
+				target="_blank"
+				rel="noopener noreferrer"
+				onClick={ closeModal }
+			>
+				{ __( 'Done' ) }
+			</Button>
 		</Fragment>
 	);
 };
