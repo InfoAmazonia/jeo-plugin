@@ -46,7 +46,11 @@ class Maps {
 			'menu_icon' => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/map.svg')),
 			'has_archive' => true,
 			'exclude_from_search' => true,
-			'capability_type' => 'page'
+			'capability_type' => 'page',
+			'show_in_admin_bar' => false,
+			'show_in_nav_menus' => false,
+			'publicly_queryable' => false,
+			'query_var' => false,
 		);
 
 		register_post_type($this->post_type, $args);
