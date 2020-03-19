@@ -213,6 +213,10 @@ height: 0px;
 	margin-top: 0;
 }
 
+.single-map div.jeomap {
+	margin: 20px auto;
+}
+
 #embed-container div.jeomap {
 	float: left;
 }
