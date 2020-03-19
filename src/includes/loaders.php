@@ -134,21 +134,12 @@ function jeo_register_embedder($id, $base_url) {
 		return empty($matches) ? null : $matches[1];
 	};
 
-	$embedder = function ($matches) use ($base_url, $get_param) {
-		$matched_url = $matches[0];
-		$map_id = $get_param($matched_url, 'map_id');
-		$height = $get_param($matched_url, 'height');
-		$width = $get_param($matched_url, 'width');
+	$embedder = function($matches) use ($get_param) {
+		$url = $matches[0];
+		$height = $get_param($url, 'height');
+		$width = $get_param($url, 'width');
 
-		$map_url = $base_url . '/embed/?map_id=' . $map_id;
-		if (!empty($height)) {
-			$map_url .= "&height=$height";
-		}
-		if (!empty($width)) {
-			$map_url .= "&width=$width";
-		}
-
-		$html = "<iframe src='$map_url'";
+		$html = "<iframe src='$url'";
 		if (!empty($height)) {
 			$html .= " height='$height'";
 		}
