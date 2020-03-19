@@ -6,6 +6,7 @@ import LayersPanel from '../map-blocks/layers-panel';
 import LayersSettingsModal from '../map-blocks/layers-settings-modal';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import MapPanel from '../map-blocks/map-panel';
+import MapEmbedUrl from './map-embed-url';
 import MapPreviewPortal from './map-preview-portal';
 import PostsSelector from '../posts-selector';
 import { layerLoader } from '../map-blocks/utils';
@@ -24,6 +25,7 @@ const mapDefaults = {
 function MapsSidebar( {
 	loadedLayers,
 	loadingLayers,
+	postId,
 	postMeta,
 	relatedPosts,
 	setPostMeta,
@@ -35,6 +37,8 @@ function MapsSidebar( {
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
 
 	const loadLayer = useCallback( layerLoader( loadedLayers ), [ loadedLayers ] );
+
+	const embedUrl = postId && `${ jeo_settings.site_url }/embed/?map_id=${ postId }`;
 
 	const {
 		center_lat: centerLat,
@@ -58,6 +62,10 @@ function MapsSidebar( {
 					loadedLayers={ loadedLayers }
 					loadingLayers={ loadingLayers }
 				/>
+			) }
+
+			{ embedUrl && (
+				<MapEmbedUrl url={ embedUrl } />
 			) }
 
 			<MapPanel
@@ -127,6 +135,7 @@ export default withDispatch(
 			'postType',
 			'map-layer',
 		] ),
+		postId: select( 'core/editor' ).getCurrentPostId(),
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
 		relatedPosts: select( 'core/editor' ).getEditedPostAttribute( 'meta' ).related_posts,
 	} )

@@ -109,6 +109,7 @@ class Jeo {
 			'mapboxgl-loader',
 			'jeo_settings',
 			array(
+				'site_url' => get_site_url(),
 				'mapbox_key' => \jeo_settings()->get_option( 'mapbox_key' ),
 				'map_defaults' => [
 					'zoom' => \jeo_settings()->get_option( 'map_default_zoom' ),
