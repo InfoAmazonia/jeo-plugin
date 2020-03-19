@@ -21,6 +21,7 @@ export default function LayersSettingsModal( {
 				setAttributes={ setAttributes }
 				loadedLayers={ loadedLayers }
 				loadingLayers={ loadingLayers }
+				closeModal={ closeModal }
 			/>
 		</Modal>
 	);
