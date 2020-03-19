@@ -12,6 +12,7 @@ class Maps {
 	protected function init() {
 		add_action( 'init', [$this, 'register_post_type'] );
 		add_action( 'init', [$this, 'register_shortcode'] );
+		add_filter( 'single_template', [$this, 'override_template']);
 		add_filter( 'the_content', [$this, 'the_content_filter'] );
 		$this->register_rest_meta_validation();
 
@@ -348,5 +349,13 @@ class Maps {
 
 	}
 
+	public function override_template($template) {
+		global $post;
 
+		if (is_singular('map')) {
+			return JEO_BASEPATH . '/templates/single-map.php';
+		}
+
+		return $template;
+	}
 }
