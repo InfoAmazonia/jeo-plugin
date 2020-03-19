@@ -141,7 +141,6 @@ function jeo_register_embedder($id, $base_url) {
 		$width = $get_param($matched_url, 'width');
 
 		$map_url = $base_url . '/embed/?map_id=' . $map_id;
-
 		if (!empty($height)) {
 			$map_url .= "&height=$height";
 		}
