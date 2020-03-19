@@ -118,3 +118,48 @@ function jeo_get_template( $template_name ) {
 
 	return apply_filters( 'jeo_get_template', $template_uri, $template_name );
 }
+
+/**
+ * Register an embedder for a JEO-capable site
+ *
+ * @param string $id Unique ID for the source
+ * @param string $base_url Site URL (e.g.` http://example.org`)
+ */
+function jeo_register_embedder($id, $base_url) {
+	$regex = '#' . preg_quote($base_url, '/') . '\/embed\/.*#';
+
+	$get_param = function($url, $param) {
+		$matches = [];
+		preg_match("/$param=(\d*)/", $url, $matches);
+		return empty($matches) ? null : $matches[1];
+	};
+
+	$embedder = function ($matches) use ($base_url, $get_param) {
+		$matched_url = $matches[0];
+		$map_id = $get_param($matched_url, 'map_id');
+		$height = $get_param($matched_url, 'height');
+		$width = $get_param($matched_url, 'width');
+
+		$map_url = $base_url . '/embed/?map_id=' . $map_id;
+
+		if (!empty($height)) {
+			$map_url .= "&height=$height";
+		}
+		if (!empty($width)) {
+			$map_url .= "&width=$width";
+		}
+
+		$html = "<iframe src='$map_url'";
+		if (!empty($height)) {
+			$html .= " height='$height'";
+		}
+		if (!empty($width)) {
+			$html .= " width='$width'";
+		}
+		$html .= " frameborder='0'></iframe>";
+
+		return $html;
+	};
+
+	wp_embed_register_handler($id, $regex, $embedder);
+}

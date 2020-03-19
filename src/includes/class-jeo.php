@@ -53,6 +53,7 @@ class Jeo {
 		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
+		add_action( 'init', array( $this, 'register_oembed' ) );
 
 		add_action( 'init', array( $this, 'register_embed_rewrite' ) );
 		add_filter( 'query_vars', array( $this, 'register_embed_query_var' ) );
@@ -188,6 +189,10 @@ class Jeo {
 	 */
 	public function register_cli_commands() {
 		\WP_CLI::add_command( 'jeo fixtures', 'Jeo\Fixtures' );
+	}
+
+	public function register_oembed () {
+		\jeo_register_embedder('local_jeo', get_site_url());
 	}
 
 	public function register_embed_rewrite() {
