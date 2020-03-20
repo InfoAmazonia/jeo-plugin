@@ -1,3 +1,11 @@
 <h1><%= post.title.rendered %></h1>
-<%= post.excerpt.rendered %>
+
+<% if (show_featured_media && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0]) { %>
+	<img src="<%= post._embedded['wp:featuredmedia'][0].media_details.sizes.thumbnail.source_url %>">
+<% } %>
+
+<div>
+	<%= post.excerpt.rendered %>
+</div>
+
 <a href="<%= post.link %>"><%= read_more %></a>
