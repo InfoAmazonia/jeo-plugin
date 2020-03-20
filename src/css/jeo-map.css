@@ -223,7 +223,9 @@ height: 0px;
 
 #embed-post-preview {
 	float: right;
-	width: 200px;
+	height: 100%;
+	padding: 0 10px 10px;
+	width: 220px;
 }
 
 .entry-content .legend-container p {

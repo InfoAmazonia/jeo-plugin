@@ -297,9 +297,9 @@ class JeoMap {
 		const marker = new mapboxgl.Marker( { color } );
 
 		const popupHTML = this.popupTemplate( {
-			point,
 			post,
 			read_more: window.jeoMapVars.string_read_more,
+			show_featured_media: false,
 		} );
 
 		const popUp = new mapboxgl.Popup().setHTML( popupHTML );
@@ -336,18 +336,13 @@ class JeoMap {
 	 * @param post
 	 */
 	updateEmbedPreview( post ) {
-		let HTML = '<h1><a href="' + post.link + '">' + post.title.rendered + '</a></h1>';
+		const html = this.popupTemplate( {
+			post,
+			read_more: window.jeoMapVars.string_read_more,
+			show_featured_media: true,
+		} );
 
-		if ( post._embedded[ 'wp:featuredmedia' ] && post._embedded[ 'wp:featuredmedia' ][ 0 ] ) {
-			const thumbUrl = post._embedded[ 'wp:featuredmedia' ][ 0 ].media_details.sizes.thumbnail.source_url;
-			HTML += '<img src="' + thumbUrl + '" />';
-		}
-
-		HTML += post.excerpt.rendered;
-
-		HTML += '<a href="' + post.link + '" target="blank" >' + jeoMapVars.string_read_more + '</a>';
-
-		jQuery( '#embed-post-preview' ).html( HTML );
+		jQuery( '#embed-post-preview' ).html( html );
 	}
 
 	/**
