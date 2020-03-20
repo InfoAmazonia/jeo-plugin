@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Adding new Layer Types - JEO</title>
+        <link href="../../css/bootstrap-custom.min.css" rel="stylesheet">
+        <link href="../../css/font-awesome.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+
+        <script src="../../js/jquery-1.10.2.min.js" defer></script>
+        <script src="../../js/bootstrap-3.0.3.min.js" defer></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+        <script>hljs.initHighlightingOnLoad();</script> 
+    </head>
+
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="container">
+
+                <!-- Collapsed navigation -->
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="../..">JEO</a>
+                </div>
+
+                <!-- Expanded navigation -->
+                <div class="navbar-collapse collapse">
+
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <a href="#" data-toggle="modal" data-target="#mkdocs_search_modal">
+                                <i class="fa fa-search"></i> Search
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+                <div class="col-md-3"><div class="bs-sidebar hidden-print affix well" role="complementary">
+    <ul class="nav bs-sidenav">
+        <li class="main active"><a href="#adding-new-layer-types">Adding new Layer Types</a></li>
+            <li><a href="#introduction">Introduction</a></li>
+            <li><a href="#creating-a-new-layer-type">Creating a new Layer Type</a></li>
+            <li><a href="#addstylemap-attributes">addStyle(map, attributes)</a></li>
+            <li><a href="#addlayermap-attributes">addLayer(map, attributes)</a></li>
+            <li><a href="#layer-attributes">Layer attributes</a></li>
+    </ul>
+</div></div>
+                <div class="col-md-9" role="main">
+
+<h1 id="adding-new-layer-types">Adding new Layer Types</h1>
+<p>This document describes how to register new Layer Types to be used in maps created with JEO.</p>
+<h2 id="introduction">Introduction</h2>
+<p>In JEO, maps are rendered using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/">Mapbox GL</a> JavaScript library. Any new layer type will have to interact with this library to add the layer to the map.</p>
+<p>Basically, to add a new layer type, there are 2 simple steps:</p>
+<ol>
+<li>Register the new Layer type using a PHP hook, informing where is the main JavaScript file of your Layer Type;</li>
+<li>Create a JavaScript class implementing methods to add the layer to the map and to describe what are the options a layer of this type has.</li>
+</ol>
+<p>In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which is an extension to MapboxGL) to the project.</p>
+<h2 id="creating-a-new-layer-type">Creating a new Layer Type</h2>
+<p>First, let's register a new Layer Type by hooking up in the <code>jeo_register_layer_types</code> action:</p>
+<pre><code class="php">add_action('jeo_register_layer_types', function($layer_types) {
+    $layer_types-&gt;register_layer_type( 'my-layer-type', [ 'script_url' =&gt; plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
+});
+</code></pre>
+
+<p><code>register_layer_type</code> method gets 2 parameters.</p>
+<ul>
+<li>Layer type slug - A unique sanitized string (make sure to make it unique)</li>
+<li>Options - An array with the layer type options:</li>
+<li><code>script_url</code>: Required. The absolute URL to your JavaScript file.</li>
+<li><code>dependecies</code>: Optional. An array of scripts handles registered using [wp_register_script]<a href="https://developer.wordpress.org/reference/functions/wp_register_script/">(</a>) that should be loaded as a dependency to the layer type main script</li>
+</ul>
+<p>That's all you need to do on the PHP side. All the magic happens on the JavaScript.</p>
+<p>Now, let's create our <code>layertype.js</code> file.</p>
+<p>In this file, we are going to register a JavaScript object using the globally available <code>window.JeoLayerTypes.registerLayerType</code>.</p>
+<p>The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.</p>
+<pre><code class="js">window.JeoLayerTypes.registerLayerType('tilelayer', {
+
+    addStyle: function(map, attributes) {
+        // ...
+    },
+
+    addLayer: function(map, attributes) {
+        // ...
+    },
+
+    getSchema: function(attributes) {
+        // ...
+    }
+});
+</code></pre>
+
+<p>Your Layer Type object MUST implement at least these three methods.</p>
+<h3 id="getschemaattributes">getSchema(attributes)</h3>
+<p><strong>params</strong>:</p>
+<ul>
+<li><code>attributes</code> - object with the layer attributes (see the section below)</li>
+</ul>
+<p><strong>returns</strong>:</p>
+<ul>
+<li>Promise with json-schema</li>
+</ul>
+<p>This method will tell JEO which are the options the user has to fill in when creating a new layer of this type.</p>
+<p>For example, a raster tile layer-type might have only a URL. A Mapbox layer has the Style ID and the optional Access token.</p>
+<p>This method must return a Promise with a json-schema representation of the layer type options.</p>
+<p>This schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.</p>
+<p>For example, the "Tile layer" layer type needs only a URL, so that's how its <code>getSchema</code> method will look like.</p>
+<pre><code class="js">    // ...
+
+    getSchema: function(attributes) {
+        return new Promise( function(resolve, reject) {
+
+            resolve({
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;required&quot;: [
+                    &quot;url&quot;
+                ],
+                &quot;properties&quot;: {
+                    &quot;url&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;title&quot;: &quot;URL&quot;
+                    }
+                }
+            });
+
+        });
+    }
+</code></pre>
+
+<h2 id="addstylemap-attributes">addStyle(map, attributes)</h2>
+<p><strong>params</strong>:</p>
+<ul>
+<li><code>map</code> - the initialized Mapbox <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object</li>
+<li><code>attributes</code> - object with the layer attributes (See Layer attributes section below)</li>
+</ul>
+<p><strong>returns</strong>:</p>
+<ul>
+<li>The return of a call to <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle"><code>map.setStyle</code></a></li>
+</ul>
+<p>In MapboxGL, every map has a <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/">Style</a> as a base layer. This method will add the layer as the Map Style, using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle">setStyle</a> method of the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object.</p>
+<p>This method will be invoked when a layer of this type is added to the map as the base layer.</p>
+<p>For example, the "Tile Layer" layer type sets the style as a raster layer:</p>
+<pre><code class="js">    // ...
+
+    addStyle: function(map, attributes) {
+        return map.setStyle({
+            'version': 8,
+            'sources': {
+                'raster-tiles': {
+                    'type': 'raster',
+                    'tiles': [attributes.layer_type_options.url],
+                    'tileSize': 256
+                }
+            },
+            'layers': [{
+                id: attributes.layer_id,
+                type: 'raster',
+                source: 'raster-tiles'
+            }]
+        })
+    }
+</code></pre>
+
+<p><strong>Note</strong>: The <code>attributes.layer_type_options</code> object holds all the properties declared in the <code>getSchema</code> method. That's why there is a <code>url</code> there! (See Layer attributes section below)</p>
+<h2 id="addlayermap-attributes">addLayer(map, attributes)</h2>
+<p><strong>params</strong>:</p>
+<ul>
+<li><code>map</code> - the initialized Mapbox <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object</li>
+<li><code>attributes</code> - object with the layer attributes (See Layer attributes section below)</li>
+</ul>
+<p><strong>returns</strong>:</p>
+<ul>
+<li>The return of a call to <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer"><code>map.addLayer</code></a></li>
+</ul>
+<p>This method will add the layer to the map using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer">addLayer</a> method of the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object.</p>
+<p>This method will be invoked when a layer of this type is added to the map.</p>
+<p>For example, the "Tile Layer" layer type adds itself as a raster layer:</p>
+<pre><code class="js">    // ...
+
+    addLayer: function(map, attributes) {
+        var layer = {
+            id: attributes.layer_id,
+            source: {
+              type: 'raster',
+              tiles: [attributes.layer_type_options.url],
+              &quot;tileSize&quot;: 256
+            },
+            type: 'raster'
+        };
+        if ( ! attributes.visible ) {
+            layer.layout = {
+                visibility: 'none'
+            };
+        }
+        return map.addLayer(layer);
+    }
+
+</code></pre>
+
+<p><strong>Note:</strong> This method must verify the value of <code>attributes.visible</code> to determine whether this layer should be visible when the map is initialized.</p>
+<h2 id="layer-attributes">Layer attributes</h2>
+<p>As you saw, each of the above methods gets an argument <code>attributes</code> as input. This argument holds all the information of the layer the user is editing or viewing.</p>
+<p>Some attributes are common to any layer types, and others that are specific to a layer type. Every layer type-specific attribute a layer has is stored under the <code>layer_type_options</code> attributes.</p>
+<p>So these are the keys available in the <code>attributes</code> object:</p>
+<ul>
+<li><code>layer_id</code>: (integer) A unique ID that represents this layer and identify it in the database</li>
+<li><code>layer_name</code>: (string) The layer name, given by the user</li>
+<li><code>visible</code>: (boolean) A flag indicating whether this layer should be visible when the map initializes</li>
+<li><code>layer_type_options</code>: (object) A object with all the layer type-specific attributes (those registered in the <code>getSchema</code> method)</li>
+</ul></div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js" defer></script>
+        <script src="../../search/main.js" defer></script>
+
+        <div class="modal" id="mkdocs_search_modal" tabindex="-1" role="dialog" aria-labelledby="Search Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Search</h4>
+            </div>
+            <div class="modal-body">
+                <p>
+                    From here you can search these documents. Enter
+                    your search terms below.
+                </p>
+                <form role="form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Search..." id="mkdocs-search-query" title="Type search term here">
+                    </div>
+                </form>
+                <div id="mkdocs-search-results"></div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div><div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="Keyboard Shortcuts Modal" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="exampleModalLabel">Keyboard Shortcuts</h4>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
