@@ -49,7 +49,7 @@ export default ( { attributes, setAttributes } ) => {
 				<section className="center">
 					<h3>{ __( 'Center' ) }</h3>
 					<TextControl
-						type="number"zz
+						type="number"
 						label={ __( 'Latitude' ) }
 						value={ centerLat }
 						onChange={ ( value ) => {
