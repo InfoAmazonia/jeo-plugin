@@ -12,7 +12,7 @@ Selecting **JEO Map** block, you can search for any map you've created.
 
 ![JEO block - Search Bar](img/JEO-block-search-bar.png)
 
-With a map selected, you are able to choose an optional alignment (`Left`, `Right`, `Centre`, `Wide Width` or `Full Width`). `Centre`is the standard alignment.
+With a map selected, you are able to choose an optional alignment (`Left`, `Right`, `Centre`, `Wide Width` or `Full Width`). `Centre` is the standard alignment.
 
 ![Map Alignment](img/map-alignment.png)
 
@@ -37,3 +37,11 @@ With a map selected, you are able to choose an optional alignment (`Left`, `Righ
 Besides the alignment option, there's also a group functionality available to arrange maps.
 
 ![map-group](img/map-group.png)
+
+## Visualizing a map into a post
+
+If your map has more than one layer, you can swap them and select which one do you want to see,depending on the map layer settings. [Check out more about map layers here](layer-post.md)
+
+![Swapping layers - Example 1](img/swapping-layers-example1.png)
+
+![Swapping layers - Example 2](img/swapping-layers-example2.png)
