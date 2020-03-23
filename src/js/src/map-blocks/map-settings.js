@@ -1,5 +1,5 @@
 import ReactMapboxGl from 'react-mapbox-gl';
-import { TextControl, RangeControl } from '@wordpress/components';
+import { TextControl, RangeControl, CheckboxControl } from '@wordpress/components';
 import { Fragment, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -13,6 +13,7 @@ const mapDefaults = {
 	center_lon: jeo_settings.map_defaults.lng,
 	min_zoom: 0,
 	max_zoom: 20,
+	disable_scroll_zoom: jeo_settings.map_defaults.disable_scroll_zoom,
 };
 
 function parseNumber( value ) {
@@ -25,7 +26,7 @@ function parseNumber( value ) {
 }
 
 export default ( { attributes, setAttributes } ) => {
-	const {
+	let {
 		center_lat: centerLat,
 		center_lon: centerLon,
 		initial_zoom: initialZoom,
@@ -33,15 +34,16 @@ export default ( { attributes, setAttributes } ) => {
 		max_zoom: maxZoom,
 	} = { ...mapDefaults, ...attributes };
 
-	const attributeUpdater = ( attribute ) => ( value ) =>
+	const attributeUpdater = ( attribute ) => ( value ) => {
 		setAttributes( { ...attributes, [ attribute ]: value } );
-
+	};
 	const editingMap = useRef( false );
 
+	console.log(attributes)
 	return (
 		<Fragment>
 			<form className="jeo-map-settings">
-			<section className="center">
+				<section className="center">
 					<h3>{ __( 'Center' ) }</h3>
 					<TextControl
 						type="number"
@@ -92,6 +94,13 @@ export default ( { attributes, setAttributes } ) => {
 						step={ 0.1 }
 						value={ maxZoom }
 						onChange={ attributeUpdater( 'max_zoom' ) }
+					/>
+					<CheckboxControl
+						label={ __( 'Disable Zoom on Post' ) }
+						checked={ attributes.disable_scroll_zoom }
+						onChange={ () => {
+							attributeUpdater( 'disable_scroll_zoom' )( ! attributes.disable_scroll_zoom );
+						} }
 					/>
 				</section>
 			</form>
