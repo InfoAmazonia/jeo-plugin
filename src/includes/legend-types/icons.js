@@ -32,11 +32,6 @@ window.JeoLegendTypes.registerLegendType( 'icons', {
 		const container = document.createElement( 'div' );
 		container.classList.add( 'icons-container' );
 
-		const title = document.createElement( 'h4' );
-		title.innerHTML = attributes.title;
-
-		container.appendChild(title);
-
 		attributes.legend_type_options.icons.forEach( c => {
 			const iconItem = document.createElement( 'div' );
 			iconItem.classList.add( 'icons-item' );

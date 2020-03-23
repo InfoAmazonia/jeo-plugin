@@ -28,12 +28,8 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 	},
 
 	render( map, attributes ) {
-		console.log(attributes);
 		const container = document.createElement( 'div' );
 		container.classList.add( 'circles-container' );
-
-		const title = document.createElement( 'h4' );
-		title.innerHTML = attributes.title;
 
 		const barContainer = document.createElement( 'div' );
 		barContainer.classList.add( 'circles-scale-container' );
@@ -80,7 +76,6 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 			barContainer.appendChild( circleItem );
 		} );
 
-		container.appendChild( title );
 		container.appendChild( barContainer );
 
 		return container;
