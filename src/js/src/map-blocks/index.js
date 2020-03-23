@@ -61,6 +61,9 @@ registerBlockType( 'jeo/onetime-map', {
 		max_zoom: {
 			type: 'number',
 		},
+		disable_scroll_zoom: {
+			type: 'boolean',
+		},
 		related_posts: {
 			type: 'object',
 			default: {
