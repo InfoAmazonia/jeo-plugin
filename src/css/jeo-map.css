@@ -210,7 +210,16 @@ height: 0px;
 
 .jeomap .popup h1 {
 	font-size: 3rem;
-	margin-top: 0;
+	margin: 0 0 0.5em;
+}
+
+.jeomap .popup h1 a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.jeomap .popup .popup__date {
+	color: gray;
 }
 
 .single-map div.jeomap {
