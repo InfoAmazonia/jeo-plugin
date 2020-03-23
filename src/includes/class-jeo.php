@@ -115,7 +115,8 @@ class Jeo {
 				'map_defaults' => [
 					'zoom' => \jeo_settings()->get_option( 'map_default_zoom' ),
 					'lat' => \jeo_settings()->get_option( 'map_default_lat' ),
-					'lng' => \jeo_settings()->get_option( 'map_default_lng' )
+					'lng' => \jeo_settings()->get_option( 'map_default_lng' ),
+					'disable_scroll_zoom' => false
 				]
 			)
 		);
