@@ -1,7 +1,9 @@
 import ReactMapboxGl from 'react-mapbox-gl';
-import { TextControl, RangeControl, CheckboxControl } from '@wordpress/components';
+import { TextControl, RangeControl, CheckboxControl, Button } from '@wordpress/components';
 import { Fragment, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+import './map-settings.css';
 
 const MapboxAPIKey = window.jeo_settings.mapbox_key;
 
@@ -27,7 +29,7 @@ function parseNumber( value ) {
 }
 
 export default ( { attributes, setAttributes } ) => {
-	let {
+	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
 		initial_zoom: initialZoom,
@@ -38,7 +40,7 @@ export default ( { attributes, setAttributes } ) => {
 	const attributeUpdater = ( attribute ) => ( value ) => {
 		setAttributes( { ...attributes, [ attribute ]: value } );
 	};
-	
+
 	const editingMap = useRef( false );
 
 	return (
@@ -47,7 +49,7 @@ export default ( { attributes, setAttributes } ) => {
 				<section className="center">
 					<h3>{ __( 'Center' ) }</h3>
 					<TextControl
-						type="number"
+						type="number"zz
 						label={ __( 'Latitude' ) }
 						value={ centerLat }
 						onChange={ ( value ) => {
@@ -96,6 +98,49 @@ export default ( { attributes, setAttributes } ) => {
 						value={ maxZoom }
 						onChange={ attributeUpdater( 'max_zoom' ) }
 					/>
+
+					<div className="zoomButtonsDiv">
+						{ /*
+						<Button
+							className="zoomButtons"
+							isPrimary
+							isLarge
+							onClick={ () => {
+								attributeUpdater( 'initial_zoom' )( initialZoom );
+							} }>
+							{ __( 'Initial Zoom' ) }
+						</Button>
+						*/ }
+						<Button
+							className="zoomButtons"
+							isPrimary
+							isLarge
+							onClick={ () => {
+								let value = maxZoom;
+
+								if ( maxZoom === 0 ) {
+									value = 0.1;
+								}
+								attributeUpdater( 'initial_zoom' )( value );
+							} }>
+							{ __( 'Max Zoom' ) }
+						</Button>
+						<Button
+							className="zoomButtons"
+							isPrimary
+							isLarge
+							onClick={ () => {
+								let value = minZoom;
+
+								if ( minZoom === 0 ) {
+									value = 0.1;
+								}
+								attributeUpdater( 'initial_zoom' )( value );
+							} }>
+							{ __( 'Min Zoom' ) }
+						</Button>
+					</div>
+
 					<CheckboxControl
 						label={ __( 'Disable Zoom on Post' ) }
 						checked={ attributes.disable_scroll_zoom }

@@ -1,0 +1,12 @@
+.zoomButtonsDiv {
+    display: flex;
+    flex-direction: column;
+}
+
+.zoomButtons {
+    width: 50%;
+    margin: 5px 0 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
