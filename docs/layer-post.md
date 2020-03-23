@@ -10,7 +10,7 @@ Entering the Layer post editor, you'll see a preview of the current layer (or a 
 
 ## Layer settings
 
-On the **Layer settings** panel, you can change the layer type (mapbox, tilelayer, mvt or mapbox-tileset). You can also inform an address, following the standard **username/id**, to compose your map style. If an access token is needed for this layer, you can put it into the **Acess token** input.
+On the **Layer settings** panel, you can change the layer type (mapbox, tilelayer, mvt or mapbox-tileset). You can also inform an address, following the standard `username/id`, to compose your map style. If an access token is needed for this layer, you can put it into the `Acess token` input.
 
 ![Layer settings](img/layer-settings.png)
 
