@@ -14,6 +14,7 @@ const mapDefaults = {
 	min_zoom: 0,
 	max_zoom: 20,
 	disable_scroll_zoom: jeo_settings.map_defaults.disable_scroll_zoom,
+	disable_drag_rotate: jeo_settings.map_defaults.disable_drag_rotate,
 };
 
 function parseNumber( value ) {
@@ -100,6 +101,13 @@ export default ( { attributes, setAttributes } ) => {
 						checked={ attributes.disable_scroll_zoom }
 						onChange={ () => {
 							attributeUpdater( 'disable_scroll_zoom' )( ! attributes.disable_scroll_zoom );
+						} }
+					/>
+					<CheckboxControl
+						label={ __( 'Disable Drag Rotation' ) }
+						checked={ attributes.disable_drag_rotate }
+						onChange={ () => {
+							attributeUpdater( 'disable_drag_rotate' )( ! attributes.disable_drag_rotate );
 						} }
 					/>
 				</section>
