@@ -15,3 +15,9 @@ The Map tab allows you to move a point by dragging its marker and dropping it on
 ## List tab
 
 The List tab allows you to visualize all the created points and delete a specific point.
+
+## Visualizing a map with geolocated posts
+
+Map with geolocated posts contain markers on the localization of each post. Clicking on them will open a popup with its title and publication date. Clicking on the title will take you to the post itself.
+
+![Geolocated Posts Popup](img/geolocated-posts-popup.png)

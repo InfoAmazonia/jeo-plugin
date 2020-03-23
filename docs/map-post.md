@@ -14,6 +14,8 @@ On the **Map settings** panel, you can change the initial center of the map sett
 
 ![Map settings](img/map-settings.png)
 
+When visualizing a map in a post, clicking with right button of the mouse and dragging it makes the map rotate. Also, scrolling the mouse wheel changes the map zoom. Both of these options can be enabled or disabled with the checkboxes.
+
 ## Map layers
 
 On the **Map layers** panel, you can visualize all the layers which are part of the map.
