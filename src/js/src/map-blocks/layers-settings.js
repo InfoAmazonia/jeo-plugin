@@ -1,12 +1,13 @@
-import { __ } from '@wordpress/i18n';
+import { Button, Spinner } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { Fragment } from '@wordpress/element';
-import { Button, Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
+
+import JeoAutosuggest from './jeo-autosuggest';
 import LayerSettings from './layer-settings';
 import { layerLoader } from './utils';
-import JeoAutosuggest from './jeo-autosuggest';
 
 import './layers-settings.css';
 
