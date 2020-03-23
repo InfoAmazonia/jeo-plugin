@@ -40,7 +40,7 @@ Besides the alignment option, there's also a group functionality available to ar
 
 ## Visualizing a map into a post
 
-If your map has more than one layer, you can swap them and select which one do you want to see,depending on the map layer settings. [Check out more about map layers here](layer-post.md)
+If your map has more than one layer, you can swap them and select which one do you want to see, depending on the map layer settings. [Check out more about map layers here](layer-post.md)
 
 ![Swapping layers - Example 1](img/swapping-layers-example1.png)
 
