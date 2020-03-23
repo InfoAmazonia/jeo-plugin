@@ -53,6 +53,8 @@ const LayerSettings = ( {
 		const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
 		if ( layerType && layerType.getStyleLayers ) {
 			layerType.getStyleLayers( postMeta ).then( setStyleLayers );
+		} else {
+			setStyleLayers( null );
 		}
 	}, [ postMeta, setStyleLayers ] );
 
