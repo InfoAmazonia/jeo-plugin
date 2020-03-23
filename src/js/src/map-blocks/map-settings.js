@@ -100,7 +100,6 @@ export default ( { attributes, setAttributes } ) => {
 						checked={ attributes.disable_scroll_zoom }
 						onChange={ () => {
 							attributeUpdater( 'disable_scroll_zoom' )( ! attributes.disable_scroll_zoom );
-							console.log(attributes)
 						} }
 					/>
 				</section>
