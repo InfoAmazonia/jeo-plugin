@@ -28,6 +28,7 @@ export default ( { attributes, className } ) => {
 			data-min_zoom={ attributes.min_zoom }
 			data-max_zoom={ attributes.max_zoom }
 			data-disable_scroll_zoom={ attributes.disable_scroll_zoom }
+			data-disable_drag_rotate={ attributes.disable_drag_rotate }
 			data-layers={ JSON.stringify( attributes.layers ) }
 			data-related_posts={
 				hasRelatedPosts ? JSON.stringify( attributes.related_posts ) : undefined

@@ -34,6 +34,11 @@ class JeoMap {
 					map.scrollZoom.disable();
 				}
 
+				if ( this.getArg( 'disable_drag_rotate' ) ) {
+					map.dragRotate.disable();
+					map.touchZoomRotate.disableRotation();
+				}
+
 				if (
 					this.getArg( 'max_bounds_ne' ) &&
 					this.getArg( 'max_bounds_sw' ) &&
