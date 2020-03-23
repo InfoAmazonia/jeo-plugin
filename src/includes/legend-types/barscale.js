@@ -30,9 +30,6 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 		const container = document.createElement( 'div' );
 		container.classList.add( 'barscale-container' );
 
-		const title = document.createElement( 'h4' );
-		title.innerHTML = attributes.title;
-
 		const barContainer = document.createElement( 'div' );
 		barContainer.classList.add( 'barscale-scale-container' );
 
@@ -60,7 +57,6 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 		labelContainer.appendChild( left );
 		labelContainer.appendChild( right );
 
-		container.appendChild( title );
 		container.appendChild( barContainer );
 		container.appendChild( labelContainer );
 

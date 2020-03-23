@@ -16,7 +16,6 @@ class LegendEditor extends Component {
 
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
-				title: metadata.legend_title,
 				legend_type_options: metadata.legend_type_options,
 			} ),
 		};
@@ -45,20 +44,6 @@ class LegendEditor extends Component {
 	render() {
 		return (
 			<Fragment>
-				<TextControl
-					label={ __( 'Title' ) }
-					value={ this.state.legendObject.attributes.title }
-					onChange={ ( input ) => {
-						this.setState( ( prevState ) => {
-							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-							legendObject.attributes.title = input;
-
-							this.hasChanged( legendObject );
-
-							return { legendObject };
-						} );
-					} }
-				/>
 
 				<SelectControl
 					label={ __( 'Type' ) }

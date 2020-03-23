@@ -55,7 +55,6 @@ class Fixtures {
 						]
 					],
 					'legend_type' => 'barscale',
-					'legend_title' => 'Número de árvores',
 					'legend_type_options' => [
 						'left_label' => '0',
 						'right_label' => '1000',
@@ -81,7 +80,6 @@ class Fixtures {
 						'url' => 'https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg'
 					],
 					'legend_type' => 'simple-color',
-					'legend_title' => 'Exemplo cores',
 					'legend_type_options' => [
 						'left_label' => '0',
 						'right_label' => '1000',
@@ -124,7 +122,6 @@ class Fixtures {
 					],
 					'legend_type' => 'none',
 					'legend_type' => 'icons',
-					'legend_title' => 'Exemplo Icones',
 					'legend_type_options' => [
 						'icons' => [
 							[
@@ -152,7 +149,6 @@ class Fixtures {
 						'style_id' => 'infoamazonia/ck33yfty30o0s1dqpien3edi4'
 					],
 					'legend_type' => 'circles',
-					'legend_title' => 'Exemplo Circulos',
 					'legend_type_options' => [
 						'color' => '#0c09ff',
 						'circles' => [

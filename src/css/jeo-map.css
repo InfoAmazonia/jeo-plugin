@@ -82,7 +82,7 @@ div.jeomap {
 
 .jeomap div.legend-container .legends-wrapper {
 	display: block;
-	margin-bottom: 1em;
+	margin: 1em 0;
 	max-height: 250px;
 	overflow-x: auto;
 	padding-right: 22px;

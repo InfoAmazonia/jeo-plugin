@@ -31,13 +31,8 @@ window.JeoLegendTypes.registerLegendType( 'simple-color', {
 		const container = document.createElement( 'div' );
 		container.classList.add( 'simple-color-container' );
 
-		const title = document.createElement( 'h4' );
-		title.innerHTML = attributes.title;
-
 		// const barContainer = document.createElement( 'div' );
 		// barContainer.classList.add( 'simple-color-scale-container' );
-
-		container.appendChild(title);
 
 		attributes.legend_type_options.colors.forEach( c => {
 			const color = document.createElement( 'div' );

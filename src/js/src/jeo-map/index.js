@@ -235,7 +235,6 @@ class JeoMap {
 							returnLegends.push(
 								new window.JeoLegend( layerObject.meta.legend_type, {
 									layer_id: layerObject.slug,
-									title: layerObject.meta.legend_title,
 									legend_type_options: layerObject.meta.legend_type_options,
 								} )
 							);

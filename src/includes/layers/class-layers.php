@@ -131,18 +131,6 @@ class Layers {
 				'description'   => __( 'Legend type-specific options', 'jeo' ),
 			)
 		);
-
-		register_post_meta(
-			$this->post_type,
-			'legend_title',
-			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'string',
-				'description'   => __( 'The legend title', 'jeo' ),
-			)
-		);
 	}
 
 	public function validate_meta_type( $meta_value ) {

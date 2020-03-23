@@ -88,10 +88,6 @@ class JeoLegend {
 		return this.__legendSlug;
 	}
 
-	get title() {
-		return this.attributes.title;
-	}
-
 	get layer_id() {
 		return this.attributes.layer_id;
 	}
@@ -144,7 +140,6 @@ class JeoLegend {
 
 		const legendMeta = {
 			legend_type: legendObject.legendSlug,
-			legend_title: legendObject.title,
 			legend_type_options: {
 				...adicionalProps,
 			},
