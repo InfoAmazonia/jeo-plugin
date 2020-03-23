@@ -3,6 +3,7 @@ import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 
+import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';
 
 import './layer-settings.css';
@@ -66,9 +67,8 @@ export default forwardRef(
 						/>
 					) }
 					{ settings.use === 'swappable' && (
-						<CheckboxControl
+						<RadioControl
 							label={ __( 'Should be displayed by default.' ) }
-							help={ __( 'Only one swappable layer is displayed by default.' ) }
 							checked={ settings.default }
 							onChange={ swapDefault }
 						/>
