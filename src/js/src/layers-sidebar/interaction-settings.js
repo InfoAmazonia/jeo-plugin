@@ -46,8 +46,12 @@ export default function InteractionSettings( {
 	}, [ unusedFieldOptions ] );
 
 	const changeEvent = useCallback( ( on ) => {
-		if ( on === 'none' && interactionIndex !== -1 ) {
-			onDelete( interaction.id );
+		if ( interactionIndex !== -1 ) {
+			if ( on === 'none' ) {
+				onDelete( interaction.id );
+			} else {
+				onUpdate( interaction.id, { ...interaction, on } );
+			}
 		} else if ( on !== 'none' ) {
 			onInsert( { ...interaction, on } );
 		}
