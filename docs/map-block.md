@@ -8,7 +8,7 @@ When creating a new post, note that is available a new block category: **JEO**.
 
 ![JEO block](img/JEO-block.png)
 
-Selecting **JEO Map block**, you can search for any map you've created.
+Selecting **JEO Map** block, you can search for any map you've created.
 
 ![JEO block - Search Bar](img/JEO-block-search-bar.png)
 
