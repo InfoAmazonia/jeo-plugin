@@ -37,9 +37,9 @@ export default ( { attributes, setAttributes } ) => {
 	const attributeUpdater = ( attribute ) => ( value ) => {
 		setAttributes( { ...attributes, [ attribute ]: value } );
 	};
+	
 	const editingMap = useRef( false );
 
-	console.log(attributes)
 	return (
 		<Fragment>
 			<form className="jeo-map-settings">
