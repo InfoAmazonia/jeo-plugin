@@ -6,6 +6,6 @@ When creating a new post, note that is available a new block category: **JEO**.
 
 ![JEO block](img/JEO-block.png)
 
-Selecting **JEO One-time Map** block, a standard map preview will appear. This maps allow all the same customizations of a normal [JEO Map](map-post.md), such as: modifying coordinates, zoom settings, related posts, alignment options and [layers settings](layer-post.md). To know more precisely how to customize all these options, check out [JEO Map](map-post.md) page.
+Selecting **JEO One-time Map** block, a standard map preview will appear. This type of map allow all the same customizations of a normal [JEO Map](map-post.md), such as: modifying coordinates, zoom settings, related posts, alignment options and [layers settings](layer-post.md). To know more precisely how to customize all these options, check out [JEO Map](map-post.md) page.
 
 ![One-time Map Example](img/one-time-map-example.png)
