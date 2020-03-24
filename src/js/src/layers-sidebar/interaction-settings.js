@@ -18,23 +18,27 @@ export default function InteractionSettings( {
 	onUpdate,
 	onDelete,
 } ) {
+	const fieldKeys = useMemo( () => {
+		return Object.keys( layer.fields );
+	}, [ layer.fields ] );
+
 	const titleOptions = useMemo( () => {
 		return [
 			{ label: __( 'None', 'jeo' ), value: undefined },
-			...Object.keys( layer.fields ).map( ( field ) => {
+			...fieldKeys.map( ( field ) => {
 				return { label: field, value: field };
 			} ),
 		];
-	}, [ layer.fields ] );
+	}, [ fieldKeys ] );
 
 	const unusedFieldOptions = useMemo( () => {
-		return Object.keys( layer.fields ).flatMap( ( key ) => {
+		return fieldKeys.flatMap( ( key ) => {
 			const found = interaction.fields.find( ( { field } ) => {
 				return field === key;
 			} );
 			return found ? [] : [ { label: key, value: key } ];
 		} );
-	}, [ layer.fields, interaction.fields ] );
+	}, [ fieldKeys, interaction.fields ] );
 
 	const [ newField, setNewField ] = useState( null );
 
@@ -108,42 +112,48 @@ export default function InteractionSettings( {
 						onChange={ changeTitle }
 					/>
 
-					{ ( unusedFieldOptions.length > 0 ) && (
-						<Fragment>
-							<SelectControl
-								label={ __( 'Add field', 'jeo' ) }
-								value={ newField }
-								options={ unusedFieldOptions }
-								onChange={ setNewField }
-							/>
-							<Button isPrimary onClick={ addField }>
-								{ __( 'Add' ) }
-							</Button>
-						</Fragment>
-					) }
-
-					{ ( interaction.fields.length > 0 ) && (
+					{ ( fieldKeys.length > 0 ) && (
 						<fieldset className="jeo-interaction-fields">
 							<legend>{ __( 'Fields', 'jeo' ) }</legend>
-							<div className="jeo-interaction-fields__grid">
-								{ interaction.fields.map( ( { field, label } ) => {
-									const inputId = `${ layer.id }_${ field }`;
-									return (
-										<Fragment key={ field }>
-											<label htmlFor={ inputId }>{ field }</label>
-											<TextControl
-												id={ inputId }
-												value={ label }
-												placeholder={ layer.fields[ field ] }
-												onChange={ updateLabel( field ) }
-											/>
-											<Button onClick={ deleteField( field ) }>
-												<Dashicon icon="dismiss" />
-											</Button>
-										</Fragment>
-									);
-								} ) }
-							</div>
+
+							{ ( interaction.fields.length > 0 ) && (
+								<div className="jeo-interaction-fields__grid">
+									{ interaction.fields.map( ( { field, label } ) => {
+										const inputId = `${ layer.id }_${ field }`;
+										return (
+											<Fragment key={ field }>
+												<label htmlFor={ inputId }>{ field }</label>
+												<TextControl
+													id={ inputId }
+													value={ label }
+													placeholder={ layer.fields[ field ] }
+													onChange={ updateLabel( field ) }
+												/>
+												<Button onClick={ deleteField( field ) }>
+													<Dashicon icon="dismiss" />
+												</Button>
+											</Fragment>
+										);
+									} ) }
+								</div>
+							) }
+
+							{ ( unusedFieldOptions.length > 0 ) && (
+								<div className="jeo-interaction-add-field">
+									<label htmlFor={ `${ layer.field }__add-field` }>
+										{ __( 'Add field', 'jeo' ) }
+									</label>
+									<SelectControl
+										id={ `${ layer.field }__add-field` }
+										value={ newField }
+										options={ unusedFieldOptions }
+										onChange={ setNewField }
+									/>
+									<Button isPrimary onClick={ addField }>
+										{ __( 'Add', 'jeo' ) }
+									</Button>
+								</div>
+							) }
 						</fieldset>
 					) }
 				</Fragment>
