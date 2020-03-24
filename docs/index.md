@@ -13,7 +13,7 @@ You can post geotagged stories and create richly designed pages for each one of 
 - Geocoding WordPress posts using OpenStreetMaps (Nominatim), suporting the post type `Post`.
 - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
 - Map markers query integrated to posts query.
-
+- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguages plugins
 
 ## User tutorials
 
