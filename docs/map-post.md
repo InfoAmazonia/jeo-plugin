@@ -10,9 +10,11 @@ Entering the Map post editor, you'll see a preview of the current map (or a defa
 
 ## Map settings
 
-On the **Map settings** panel, you can change the initial center of the map setting a latitude and longitude. You can also change the default zoom settings.
+On the **Map settings** panel, you can change the initial center of the map setting a latitude and longitude. You can also change the default zoom settings or even disable it.
 
 ![Map settings](img/map-settings.png)
+
+When visualizing a map in a post, clicking with right button of the mouse and dragging it makes the map rotate. Also, scrolling the mouse wheel changes the map zoom. Both of these options can be enabled or disabled with the checkboxes.
 
 ## Map layers
 
