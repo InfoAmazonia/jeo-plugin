@@ -23,7 +23,7 @@ JEO supports four layer types out-of-the-box:
 
 ![Layer settings](img/layer-settings.png)
 
-There's also an **Edit interactions** button. Here, you can add popups to your layer when specific actions (clicking or hovering the mouse) are made (e.g: Clicking on a building and displaying its height)
+There's also an **Edit interactions** button. Here, you can add popups to your layer when specific actions (clicking or hovering the mouse) are made (e.g.: Clicking on a building and displaying its height)
 
 ![Layer interactions](img/layer-interactions.png)
 
