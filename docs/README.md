@@ -10,29 +10,32 @@ JEO wants to help journalists and NGOs to improve storytelling with maps. Creati
 
 ## Features
 
- - Leaflet map library
- - Custom tile layers
- - [MapBox](http://mapbox.com/) maps
- - [CartoDB](http://cartodb.com/) maps
- - Layer filtering options, allowing you to mix tile layer, MapBox and CartoDB.
- - Geocoding WordPress posts using OpenStreetMaps or Google Maps supporting custom post types.
- - Google Street View support for Google Maps geocoding.
- - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
- - Map markers query integrated to posts query.
- - GeoJSON API (any content /?geojson gives the geojson output). E.g.: yourwebsite.com/category/one/?geojson
- - Support [qTranslate](https://wordpress.org/plugins/qtranslate/) multilanguage plugin
+- Leaflet map library
+- Custom tile layers
+- [MapBox](http://mapbox.com/) maps
+- [CartoDB](http://cartodb.com/) maps
+- Layer filtering options, allowing you to mix tile layer, MapBox and CartoDB.
+- Geocoding WordPress posts using OpenStreetMaps or Google Maps supporting custom post types.
+- Google Street View support for Google Maps geocoding.
+- Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
+- Map markers query integrated to posts query.
+- GeoJSON API (any content /?geojson gives the geojson output). E.g.: yourwebsite.com/category/one/?geojson
+- Support [qTranslate](https://wordpress.org/plugins/qtranslate/) multilanguage plugin
 
 ## User tutorials
 
 - **Layers**
-    - [Creating a layer]()
+
+- [Creating a layer]()
 
 - **Maps**
-    - [Creating maps](creating-maps.md)
-    - [Editing map layers]()
+
+- [Creating maps](creating-maps.md)
+- [Editing map layers]()
 
 - **Posts**
-    - [Geolocating posts](geolocating-posts.md)
+
+- [Geolocating posts](geolocating-posts.md)
 
 ## Developer documentation
 
