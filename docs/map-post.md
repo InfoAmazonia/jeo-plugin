@@ -32,6 +32,8 @@ A legend can be of one of these types:
 
 ![Layers settings](img/layers-settings.png)
 
+[Checkout how to create new layers here](layer-post.md)
+
 ## Related posts
 
 On the **Related posts** panel, you can set which geolocated posts will be used as markers on the post. You can filter the posts by categories, tags, dates interval or, for advanced uses, meta queries using WordPress `post_meta`.

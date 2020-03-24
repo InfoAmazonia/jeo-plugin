@@ -6,7 +6,14 @@ You can post geotagged stories and create richly designed pages for each one of 
 
 ## Features
 
-- TODO
+- [MapBox](http://mapbox.com/) maps
+- [ReactMapBoxGL](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md) library
+- Custom tile layers
+- Layer filtering options, allowing you to mix tile layer.
+- Geocoding WordPress posts using OpenStreetMaps (Nominatim), suporting the post type `Post`.
+- Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
+- Map markers query integrated to posts query.
+- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguages plugins
 
 ## User tutorials
 
