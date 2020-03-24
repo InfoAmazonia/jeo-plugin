@@ -9,6 +9,7 @@ When editing a [Map](map-post.md), one of the setting panels is `Status & Visibi
 Copying this link and pasting on the post editor will result on an embed map.
 
 **Warning**: If your post displays a *Not Found* error, do the following steps:
+
 - Go to Wordpress Dashboard > Settings > Permalinks
 - Change the Common Settings (you may change to a different setting and then changing back to the original) and click on `Save Changes`
 
