@@ -17,6 +17,7 @@ const useOptions = [
 export default forwardRef(
 	(
 		{
+			index: layerIndex,
 			isDragged,
 			isOutOfBounds,
 			isSelected,
@@ -51,12 +52,16 @@ export default forwardRef(
 					{ settings.layer.meta.type }
 				</td>
 				<td className="use-control" style={ setWidth( 2 ) }>
-					<SelectControl
-						label={ __( 'Type' ) }
-						value={ settings.use }
-						options={ useOptions }
-						onChange={ updateUse }
-					/>
+					{ ( layerIndex === 0 ) ? (
+						<span>{ __( 'Base layer should be fixed', 'jeo' ) }</span>
+					) : (
+						<SelectControl
+							label={ __( 'Type' ) }
+							value={ settings.use }
+							options={ useOptions }
+							onChange={ updateUse }
+						/>
+					) }
 				</td>
 				<td className="default-control" style={ setWidth( 3 ) }>
 					{ settings.use === 'switchable' && (
