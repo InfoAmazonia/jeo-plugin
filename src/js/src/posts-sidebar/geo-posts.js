@@ -53,8 +53,8 @@ class JeoGeocodePosts extends Component {
 	}
 
 	updateCurrentPoint( data ) {
-		const marker_id = this.state.currentMarkerIndex;
-		this.updatePoint( marker_id, data );
+		const markerId = this.state.currentMarkerIndex;
+		this.updatePoint( markerId, data );
 	}
 
 	clickMarkerMap( e ) {
@@ -131,16 +131,16 @@ class JeoGeocodePosts extends Component {
 	}
 
 	mapLoaded( e ) {
-		const coords = this.state.points.map( ( e ) => {
+		const coords = this.state.points.map( ( point ) => {
 			return [
-				parseFloat( e._geocode_lat ),
-				parseFloat( e._geocode_lon ),
+				parseFloat( point._geocode_lat ),
+				parseFloat( point._geocode_lon ),
 			];
 		} );
 
 		const map = e.target;
 
-		if ( coords.length == 1 ) {
+		if ( coords.length === 1 ) {
 			map.setZoom( 6 );
 			map.panTo( coords[ 0 ] );
 		} else if ( coords.length > 1 ) {
@@ -157,7 +157,7 @@ class JeoGeocodePosts extends Component {
 			_geocode_lon: latLng.lng,
 		} );
 
-		fetch( jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + latLng.lat + '&lon=' + latLng.lng )
+		window.fetch( jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + latLng.lat + '&lon=' + latLng.lng )
 			.then( ( response ) => {
 				return response.json();
 			} )
@@ -177,9 +177,8 @@ class JeoGeocodePosts extends Component {
 
 	save() {
 		wp.data.dispatch( 'core/editor' ).editPost( { meta: {
-			_related_point: this.state.points.filter( ( el, i ) => {
-				console.log( el._geocode_full_address != __( 'Unknown location', 'jeo' ) );
-				return el._geocode_full_address != __( 'Unknown location', 'jeo' );
+			_related_point: this.state.points.filter( ( el ) => {
+				return el._geocode_full_address !== __( 'Unknown location', 'jeo' );
 			} ),
 
 		} } ).then( () => {

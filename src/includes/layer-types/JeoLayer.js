@@ -1,24 +1,24 @@
-import JeoLayerTypes from './JeoLayerTypes'
+import JeoLayerTypes from './JeoLayerTypes';
 
 class JeoLayer {
-	constructor(layerTypeSlug, attributes) {
-		this.layerType = JeoLayerTypes.getLayerType(layerTypeSlug);
+	constructor( layerTypeSlug, attributes ) {
+		this.layerType = JeoLayerTypes.getLayerType( layerTypeSlug );
 		this.attributes = attributes;
 	}
-	addStyle(map) {
-		return this.layerType.addStyle(map, this.attributes);
+	addStyle( map ) {
+		return this.layerType.addStyle( map, this.attributes );
 	}
-	addLayer(map) {
-		return this.layerType.addLayer(map, this.attributes);
+	addLayer( map ) {
+		return this.layerType.addLayer( map, this.attributes );
 	}
 
 	getSchema() {
-		return this.layerType.getSchema(this.attributes);
+		return this.layerType.getSchema( this.attributes );
 	}
 
-	addInteractions(map) {
-		if (typeof this.layerType.addInteractions === 'function') {
-			return this.layerType.addInteractions(map, this.attributes);
+	addInteractions( map ) {
+		if ( typeof this.layerType.addInteractions === 'function' ) {
+			return this.layerType.addInteractions( map, this.attributes );
 		}
 	}
 

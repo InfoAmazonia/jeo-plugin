@@ -112,7 +112,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				style_id: {
 					type: 'string',
 					title: 'Style ID',
-					description: 'The mapbox Style ID composes by user name and id. Example: username/cjvwsdfrfx5i23coafd4sx97e'
+					description: 'The mapbox Style ID composes by user name and id. Example: username/cjvwsdfrfx5i23coafd4sx97e',
 				},
 				access_token: {
 					type: 'string',
@@ -161,7 +161,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	_getStyleDefinition( attributes ) {
 		const self = this;
 
-		return new Promise( function( resolve, reject ) {
+		return new Promise( function( resolve ) {
 			// cache
 			if ( self._styleDefinitions[ attributes.layer_id ] ) {
 				resolve( self._styleDefinitions[ attributes.layer_id ] );
