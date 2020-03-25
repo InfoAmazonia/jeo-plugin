@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { TextControl, SelectControl, Button } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import JeoLegend from '../../../../includes/legend-types/JeoLegend';
 import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
@@ -12,7 +12,6 @@ class LegendEditor extends Component {
 		this.hasChanged = this.hasChanged.bind( this );
 
 		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
-		// console.log(metadata);
 
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {

@@ -48,7 +48,7 @@ class JeoGeoAutoComplete extends Component {
 
 	onSuggestionsFetchRequested( { value } ) {
 		this.setState( { isLoading: true } );
-		fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + value )
+		window.fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + value )
 			.then( ( response ) => {
 				return response.json();
 			} )

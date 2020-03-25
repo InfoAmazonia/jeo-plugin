@@ -16,7 +16,6 @@ const MapEditor = ( {
 	setAttributes,
 	instanceId,
 	loadedLayers,
-	loadingLayers,
 	loadedMap,
 	loadingMap,
 } ) => {

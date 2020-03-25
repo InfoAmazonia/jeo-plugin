@@ -1,4 +1,4 @@
-import { Component, Fragment, useEffect } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import CircleEditor from './editors/circle';
 import BarscaleEditor from './editors/barscale';
 import SimplecolorEditor from './editors/simplecolor';

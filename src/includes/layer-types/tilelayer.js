@@ -1,59 +1,57 @@
-window.JeoLayerTypes.registerLayerType('tilelayer', {
+window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 
-	addStyle: function(map, attributes) {
-		const name = attributes.layer_id
-		return map.setStyle({
-			'version': 8,
-			'sources': {
-				[name]: {
-					'type': 'raster',
-					tiles: [attributes.layer_type_options.url],
-					'tileSize': 256
-				}
+	addStyle( map, attributes ) {
+		const name = attributes.layer_id;
+		return map.setStyle( {
+			version: 8,
+			sources: {
+				[ name ]: {
+					type: 'raster',
+					tiles: [ attributes.layer_type_options.url ],
+					tileSize: 256,
+				},
 			},
-			'layers': [{
+			layers: [ {
 				id: attributes.layer_id,
 				type: 'raster',
-				source: attributes.layer_id
-			}]
-		})
+				source: attributes.layer_id,
+			} ],
+		} );
 	},
 
-	addLayer: function(map, attributes) {
-		var layer = {
+	addLayer( map, attributes ) {
+		const layer = {
 			id: attributes.layer_id,
 			source: {
-			  type: 'raster',
-			  tiles: [attributes.layer_type_options.url],
-			  "tileSize": 256
+				type: 'raster',
+				tiles: [ attributes.layer_type_options.url ],
+				tileSize: 256,
 			},
-			type: 'raster'
+			type: 'raster',
 		};
 		if ( ! attributes.visible ) {
 			layer.layout = {
-				visibility: 'none'
+				visibility: 'none',
 			};
 		}
-		return map.addLayer(layer);
+		return map.addLayer( layer );
 	},
 
-	getSchema: function(attributes) {
-		return new Promise( function(resolve, reject) {
-
-			resolve({
-				"type": "object",
-				"required": [
-					"url"
+	getSchema( attributes ) {
+		return new Promise( function( resolve ) {
+			resolve( {
+				type: 'object',
+				required: [
+					'url',
 				],
-				"properties": {
-					"url": {
-						"type": "string",
-						"title": "URL"
-					}
-				}
-			});
+				properties: {
+					url: {
+						type: 'string',
+						title: 'URL',
+					},
+				},
+			} );
+		} );
+	},
 
-		});
-	}
-
-});
+} );
