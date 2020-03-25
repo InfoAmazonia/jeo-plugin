@@ -14,16 +14,16 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 						type: 'object',
 						properties: {
 							label: {
-								type: 'string'
+								type: 'string',
 							},
 							circle: {
 								type: 'string',
-								description: 'url'
-							}
-						}
-					}
-				}
-			}
+								description: 'url',
+							},
+						},
+					},
+				},
+			},
 		};
 	},
 
@@ -79,7 +79,6 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 		container.appendChild( barContainer );
 
 		return container;
-
-	}
+	},
 
 } );

@@ -1,13 +1,8 @@
-import ReactMapboxGl from 'react-mapbox-gl';
 import { TextControl, RangeControl, CheckboxControl, Button } from '@wordpress/components';
 import { Fragment, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import './map-settings.css';
-
-const MapboxAPIKey = window.jeo_settings.mapbox_key;
-
-const Map = ReactMapboxGl( { accessToken: MapboxAPIKey } );
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,

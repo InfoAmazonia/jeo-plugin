@@ -1,5 +1,4 @@
 import JeoLegendTypes from './JeoLegendTypes';
-import { v4 as uuid } from 'uuid';
 
 class JeoLegend {
 	constructor( legendTypeSlug, attributes ) {
@@ -38,50 +37,6 @@ class JeoLegend {
 		};
 
 		return options[ type ];
-	}
-
-	static legendItensIdGenerator( legendObject ) {
-
-		// const slug = legendObject.legendSlug;
-		// const mapping = {};
-		// mapping[ legendObject.legendSlug ] = { :  0 };
-
-		// const mapping = {
-		// 	icons: {
-		// 		icons: [ ...legendObject.attributes.legend_type_options.icons.map( ( item ) => {
-		// 			return {
-		// 				...item,
-		// 				id: uuid(),
-		// 			};
-		// 		} ) ],
-		// 	},
-
-		// 	'simple-color': {
-		// 		colors: [ ...legendObject.attributes.legend_type_options.colors.map( ( item ) => {
-		// 			return {
-		// 				...item,
-		// 				id: uuid(),
-		// 			};
-		// 		} ) ],
-		// 	},
-
-		// 	circles: {
-		// 		circles: [ ...legendObject.attributes.legend_type_options.circles.map( ( item ) => {
-		// 			return {
-		// 				...item,
-		// 				id: uuid(),
-		// 			};
-		// 		} ) ],
-		// 	},
-		// };
-
-		return {
-			...legendObject,
-			attributes: {
-				...legendObject.attributes,
-				legend_type_options: mapping[ legendObject.legendSlug ],
-			},
-		};
 	}
 
 	get legendSlug() {

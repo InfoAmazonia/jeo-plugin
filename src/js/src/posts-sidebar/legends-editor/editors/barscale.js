@@ -72,7 +72,7 @@ class BarscaleEditor extends Component {
 	itemChanged( itemUpdated ) {
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-			legendObject.attributes.legend_type_options.colors = legendObject.attributes.legend_type_options.colors.map( ( item, index ) => {
+			legendObject.attributes.legend_type_options.colors = legendObject.attributes.legend_type_options.colors.map( ( item ) => {
 				if ( item.id === itemUpdated.id ) {
 					return { ...item, ...itemUpdated };
 				}

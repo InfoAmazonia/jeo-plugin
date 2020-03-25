@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { FormFileUpload, Icon, Button, 	IconButton, TextControl, ColorIndicator } from '@wordpress/components';
+import { Button, IconButton, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 import { v4 as uuid } from 'uuid';
@@ -33,24 +33,16 @@ class IconEditor extends Component {
 		};
 	}
 
-	static getDerivedStateFromProps( nextProps ) {
-		// return {
-		// 	legendObject: nextProps.legendObject,
-		// };
-	}
-
 	iconUpdate( iconUpdated ) {
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-			legendObject.attributes.legend_type_options.icons = legendObject.attributes.legend_type_options.icons.map( ( item, index ) => {
+			legendObject.attributes.legend_type_options.icons = legendObject.attributes.legend_type_options.icons.map( ( item ) => {
 				if ( item.id === iconUpdated.id ) {
 					return { ...item, ...iconUpdated };
 				}
 
 				return item;
 			} );
-
-			console.log( legendObject );
 
 			this.props.hasChanged( legendObject );
 
@@ -95,7 +87,6 @@ class IconEditor extends Component {
 	render() {
 		return (
 			<Fragment>
-				{console.log(this.state)}
 				{
 					this.state.legendObject.attributes.legend_type_options.icons.map( ( item ) => {
 						return ( <IconItem iconData={ item } key={ item.id } removeLabel={ this.removeLabel } iconUpdate={ this.iconUpdate } /> );
@@ -119,8 +110,6 @@ class IconItem extends Component {
 		this.state = {
 			iconData: this.props.iconData,
 		};
-
-		console.log( this.state );
 	}
 
 	removeLabel() {
@@ -149,7 +138,7 @@ class IconItem extends Component {
 					render={ ( { open } ) => {
 						return (
 							<div className="content-wrapper">
-								<div className="image" onClick={ open }>
+								<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
 									<img src={ this.state.iconData.icon } width="50" height="50" alt="Logo" />
 								</div>
 								<div className="buttons-inputs">

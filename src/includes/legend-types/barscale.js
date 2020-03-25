@@ -44,7 +44,7 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 		right.classList.add( 'barscale-right-label' );
 		right.innerHTML = attributes.legend_type_options.right_label;
 
-		attributes.legend_type_options.colors.forEach( c => {
+		attributes.legend_type_options.colors.forEach( ( c ) => {
 			const color = document.createElement( 'div' );
 			color.classList.add( 'barscale-color' );
 			color.style.backgroundColor = c.color;
@@ -61,5 +61,5 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 		container.appendChild( labelContainer );
 
 		return container;
-	}
+	},
 } );

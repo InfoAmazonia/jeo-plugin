@@ -14,25 +14,24 @@ window.JeoLegendTypes.registerLegendType( 'icons', {
 						type: 'object',
 						properties: {
 							label: {
-								type: 'string'
+								type: 'string',
 							},
 							icon: {
 								type: 'string',
-								description: 'url'
-							}
-						}
-					}
-				}
-			}
+								description: 'url',
+							},
+						},
+					},
+				},
+			},
 		};
 	},
 
 	render( map, attributes ) {
-
 		const container = document.createElement( 'div' );
 		container.classList.add( 'icons-container' );
 
-		attributes.legend_type_options.icons.forEach( c => {
+		attributes.legend_type_options.icons.forEach( ( c ) => {
 			const iconItem = document.createElement( 'div' );
 			iconItem.classList.add( 'icons-item' );
 
@@ -40,18 +39,16 @@ window.JeoLegendTypes.registerLegendType( 'icons', {
 			box.classList.add( 'icons-item-img' );
 			box.src = c.icon;
 
-			const itemLabel = document.createElement('span');
+			const itemLabel = document.createElement( 'span' );
 			itemLabel.innerHTML = c.label;
 
-			iconItem.appendChild(box);
-			iconItem.appendChild(itemLabel);
+			iconItem.appendChild( box );
+			iconItem.appendChild( itemLabel );
 
-
-			container.appendChild(iconItem);
-		});
+			container.appendChild( iconItem );
+		} );
 
 		return container;
-
-	}
+	},
 
 } );
