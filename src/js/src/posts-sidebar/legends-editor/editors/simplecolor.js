@@ -1,8 +1,9 @@
-import { ColorPicker, ColorPalette, TextControl, Dropdown, Button } from '@wordpress/components';
+import { Button, ColorPicker, Dropdown, TextControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 import { v4 as uuid } from 'uuid';
+
+import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 import '../editors/simplecolor.css';
 
@@ -72,7 +73,7 @@ class SimplecolorEditor extends Component {
 	itemChanged( itemUpdated ) {
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-			legendObject.attributes.legend_type_options.colors = legendObject.attributes.legend_type_options.colors.map( ( item, index ) => {
+			legendObject.attributes.legend_type_options.colors = legendObject.attributes.legend_type_options.colors.map( ( item ) => {
 				if ( item.id === itemUpdated.id ) {
 					return { ...item, ...itemUpdated };
 				}
@@ -118,7 +119,7 @@ class SimplecolorEditor extends Component {
 			<Fragment>
 				<div className="itens-wrapper">
 					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } /> ) }
-					<div className="color-item-wrapper add-item" onClick={ this.addItem }>
+					<div className="color-item-wrapper add-item" role="button" tabIndex={ 0 } onClick={ this.addItem }>
 						<span> + </span>
 					</div>
 				</div>
@@ -144,7 +145,7 @@ class ColorItem extends Component {
 				contentClassName="item-drop-content"
 				position="bottom center"
 				renderToggle={ ( { isOpen, onToggle } ) => (
-					<div className="color-item" onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
+					<div className="color-item" role="button" tabIndex={ 0 } onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
 				) }
 				renderContent={ () => (
 					<div>

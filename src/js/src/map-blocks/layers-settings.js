@@ -1,6 +1,6 @@
 import { Button, Spinner } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
@@ -27,6 +27,13 @@ const LayersSettings = ( {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
+
+	useEffect( () => {
+		const [ firstLayer, ...otherLayers ] = attributes.layers;
+		if ( firstLayer && firstLayer.use !== 'fixed' ) {
+			setLayers( [ { ...firstLayer, use: 'fixed', default: false }, ...otherLayers ] );
+		}
+	}, [ attributes, setAttributes ] );
 
 	return (
 		<Fragment>
@@ -87,7 +94,7 @@ const LayersSettings = ( {
 							<tbody { ...props }>{ children }</tbody>
 						</table>
 					) }
-					renderItem={ ( { value, props, ...meta } ) => {
+					renderItem={ ( { value, props, index, ...meta } ) => {
 						const switchDefault = ( def ) =>
 							setLayers(
 								attributes.layers.map( ( settings ) =>
@@ -143,6 +150,7 @@ const LayersSettings = ( {
 						};
 						const row = (
 							<LayerSettings
+								index={ index }
 								removeLayer={ removeLayer }
 								settings={ loadLayer( value ) }
 								switchDefault={ switchDefault }

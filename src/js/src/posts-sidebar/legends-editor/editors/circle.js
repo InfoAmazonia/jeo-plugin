@@ -37,10 +37,11 @@ class CircleEditor extends Component {
 
 		this.maxRadius = 0;
 
-		this.state.legendObject.attributes.legend_type_options.circles.map( ( item ) => {
-			if ( item.radius > this.maxRadius ) this.maxRadius = item.radius;
+		this.state.legendObject.attributes.legend_type_options.circles.forEach( ( item ) => {
+			if ( item.radius > this.maxRadius ) {
+				this.maxRadius = item.radius;
+			}
 		} );
-
 	}
 
 	addNew() {
@@ -92,8 +93,6 @@ class CircleEditor extends Component {
 	}
 
 	itemChanged( itemState ) {
-		console.log( itemState );
-
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			legendObject.attributes.legend_type_options.circles = legendObject.attributes.legend_type_options.circles.map( ( item ) => {

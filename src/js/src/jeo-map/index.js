@@ -60,7 +60,6 @@ class JeoMap {
 				if ( this.getArg( 'max_zoom' ) ) {
 					map.setMaxZoom( this.getArg( 'max_zoom' ) );
 				}
-
 			} )
 			.then( () => {
 				this.getLayers().then( ( layers ) => {
@@ -93,7 +92,6 @@ class JeoMap {
 					);
 
 					this.addMoreButtonAndLegends();
-
 				} );
 
 				this.getRelatedPosts();
@@ -181,14 +179,14 @@ class JeoMap {
 		this.element.appendChild( container );
 
 		// hide legends from hidden layers
-		this.layers.forEach( (l, i) => {
+		this.layers.forEach( ( l, i ) => {
 			if ( i == 0 ) {
 				return;
 			}
 			if ( l.attributes.visible !== true ) {
 				jQuery( this.element ).find( '.legend-for-' + l.layer_id ).hide();
 			}
-		})
+		} );
 	}
 
 	getArg( argName ) {
@@ -246,7 +244,6 @@ class JeoMap {
 						}
 					} );
 
-
 					this.layers = returnLayers;
 					this.legends = returnLegends;
 					resolve( returnLayers );
@@ -262,10 +259,10 @@ class JeoMap {
 			const query = {};
 			query.per_page = 100; // TODO handle limit of posts per query
 
-			let keys = Object.keys(relatedPostsCriteria);
+			const keys = Object.keys( relatedPostsCriteria );
 
-			for(let i in keys){
-				query[keys[i]] =  relatedPostsCriteria[keys[i]];
+			for ( const i in keys ) {
+				query[ keys[ i ] ] = relatedPostsCriteria[ keys[ i ] ];
 			}
 
 			if ( keys.length < 1 ) {
@@ -470,9 +467,9 @@ class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
-		this.map.getStyle().layers.forEach( layer => {
+		this.map.getStyle().layers.forEach( ( layer ) => {
 			if ( layer.id == layer_id ) {
-				this.map.setLayoutProperty( layer.id, 'visibility', visibility);
+				this.map.setLayoutProperty( layer.id, 'visibility', visibility );
 			}
 		} );
 	}
@@ -486,7 +483,6 @@ class JeoMap {
 		this.changeLayerVisibitly( layer_id, 'none' );
 		jQuery( this.element ).find( '.legend-for-' + layer_id ).hide();
 	}
-
 }
 
 ( function( $ ) {
