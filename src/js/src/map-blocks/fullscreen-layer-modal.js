@@ -4,7 +4,8 @@ import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from './map';
 
 export default function LayersSettingsModal( {
-	closeModal,	style,
+	closeModal,
+	style,
 	containerStyle,
 	zoom,
 	center,
