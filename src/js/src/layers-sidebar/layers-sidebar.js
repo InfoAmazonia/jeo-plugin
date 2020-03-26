@@ -2,6 +2,7 @@ import { Fragment, useRef } from '@wordpress/element';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { Dashicon, Button } from '@wordpress/components';
 
 import LayerSettings from './layer-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
@@ -63,6 +64,38 @@ function LayersSidebar( {
 							use: 'fixed',
 						} ) }
 					</Map>
+					<Button
+						isLarge
+						isLink
+						onClick={ () => {
+							let increment = 0.5;
+							if ( initialZoom + 0.5 > 20 ) {
+								increment = initialZoom - 20;
+							}
+
+							setPostMeta( {
+								initial_zoom: initialZoom + increment,
+							} );
+						} }
+					>
+						<Dashicon icon="plus" />
+					</Button>
+					<Button
+						isLarge
+						isLink
+						onClick={ () => {
+							let decrement = 0.5;
+							if ( initialZoom - 0.5 <= 0 ) {
+								decrement = 0;
+							}
+
+							setPostMeta( {
+								initial_zoom: initialZoom - decrement,
+							} );
+						} }
+					>
+						<Dashicon icon="minus" />
+					</Button>
 				</LayerPreviewPortal>
 			) }
 

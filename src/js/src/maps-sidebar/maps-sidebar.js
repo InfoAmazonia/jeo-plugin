@@ -1,6 +1,7 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
+import { Button, Dashicon } from '@wordpress/components';
 
 import LayersPanel from '../map-blocks/layers-panel';
 import LayersSettingsModal from '../map-blocks/layers-settings-modal';
@@ -99,6 +100,38 @@ function MapsSidebar( {
 							return renderLayer( layerOptions, layer );
 						} ) }
 					</Map>
+					<Button
+						isLarge
+						isLink
+						onClick={ () => {
+							let increment = 0.5;
+							if ( initialZoom + 0.5 > 20 ) {
+								increment = initialZoom - 20;
+							}
+
+							setPostMeta( {
+								initial_zoom: initialZoom + increment,
+							} );
+						} }
+					>
+						<Dashicon icon="plus" />
+					</Button>
+					<Button
+						isLarge
+						isLink
+						onClick={ () => {
+							let decrement = 0.5;
+							if ( initialZoom - 0.5 <= 0 ) {
+								decrement = 0;
+							}
+
+							setPostMeta( {
+								initial_zoom: initialZoom - decrement,
+							} );
+						} }
+					>
+						<Dashicon icon="minus" />
+					</Button>
 				</MapPreviewPortal>
 			) }
 
