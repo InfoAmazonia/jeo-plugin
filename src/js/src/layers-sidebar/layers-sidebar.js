@@ -43,7 +43,7 @@ function LayersSidebar( {
 	const editingMap = useRef( false );
 
 	return (
-		<Fragment>]
+		<Fragment>
 			{ fullscreenModal && (
 				<LayerFullscreenModal
 					closeModal={ closeFullscreenModal }
