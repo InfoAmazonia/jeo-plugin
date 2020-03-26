@@ -1,4 +1,4 @@
-import { Fragment, useRef } from '@wordpress/element';
+import { Fragment, useRef, useState, useCallback } from '@wordpress/element';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -9,6 +9,7 @@ import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import LayerPreviewPortal from './layer-preview-portal';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { renderLayer } from '../map-blocks/map-preview-layer';
+import LayerFullscreenModal from '../map-blocks/fullscreen-layer-modal';
 
 import './layers-sidebar.css';
 
@@ -24,6 +25,11 @@ function LayersSidebar( {
 	postMeta,
 	setPostMeta,
 } ) {
+	const [ fullscreenModal, setFullscreenModal ] = useState( false );
+
+	const closeFullscreenModal = useCallback( () => setFullscreenModal( false ), [ setFullscreenModal ] );
+	const openFullscreenModal = useCallback( () => setFullscreenModal( true ), [ setFullscreenModal ] );
+
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
@@ -37,7 +43,32 @@ function LayersSidebar( {
 	const editingMap = useRef( false );
 
 	return (
-		<Fragment>
+		<Fragment>]
+			{ fullscreenModal && (
+				<LayerFullscreenModal
+					closeModal={ closeFullscreenModal }
+					style="mapbox://styles/mapbox/streets-v11"
+					containerStyle={ { height: '90%', width: '100%' } }
+					zoom={ [ initialZoom || 11 ] }
+					center={ [ centerLon || 0, centerLat || 0 ] }
+					animationOptions={ animationOptions }
+					onMoveEnd={ ( map ) => {
+						if ( ! editingMap.current ) {
+							const center = map.getCenter();
+							const zoom = Math.round( map.getZoom() * 10 ) / 10;
+
+							setPostMeta( {
+								center_lat: center.lat,
+								center_lon: center.lng,
+								initial_zoom: zoom,
+							} );
+						}
+					} }
+					renderLayer={ renderLayer }
+					postMeta={ postMeta }
+				/>
+			) }
+
 			{ MapboxAPIKey && (
 				<LayerPreviewPortal>
 					<Map
@@ -95,6 +126,13 @@ function LayersSidebar( {
 						} }
 					>
 						<Dashicon icon="minus" />
+					</Button>
+					<Button
+						isLarge
+						isLink
+						onClick={ openFullscreenModal }
+					>
+						<Dashicon icon="editor-expand" />
 					</Button>
 				</LayerPreviewPortal>
 			) }
