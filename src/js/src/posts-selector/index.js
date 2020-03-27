@@ -1,10 +1,13 @@
 import { withSelect } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { CheckboxControl } from '@wordpress/components';
 
 import { IntervalSelector } from './interval-selector';
 import { MetaSelector } from './meta-selector';
 import { TokensSelector } from './tokens-selector';
+
+import './index.css';
 
 const PostsSelector = ( {
 	loadedCategories,
@@ -15,12 +18,24 @@ const PostsSelector = ( {
 	setRelatedPosts,
 	renderPanel: Panel,
 } ) => {
+	const [ relatedPostsData, setRelatedPostsData ] = useState( [] );
+	const [ showRelatedPosts, setShowRelatedPosts ] = useState( false );
+
 	useEffect( () => {
 		/* relatedPosts is often nullish if schema doesn't match */
 		if ( ! relatedPosts ) {
 			setRelatedPosts( {} );
 		}
 	}, [ relatedPosts, setRelatedPosts ] );
+
+	useEffect( () => {
+		const { categories, after, before, tags } = relatedPosts;
+		jQuery.get(
+			'/wp-json/wp/v2/posts',
+			{ categories, after, before, tags },
+			( response ) => setRelatedPostsData( response )
+		);
+	}, [ showRelatedPosts, relatedPosts ] );
 
 	return (
 		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
@@ -68,6 +83,30 @@ const PostsSelector = ( {
 					setRelatedPosts( { ...relatedPosts, meta_query: queries } );
 				} }
 			/>
+			<CheckboxControl
+				className="related-posts-checkbox"
+				label={ __( 'Show related posts' ) }
+				checked={ showRelatedPosts }
+				onChange={ () => {
+					setShowRelatedPosts( ! showRelatedPosts );
+				} }
+			/>
+
+			{ showRelatedPosts && (
+				<ol>
+					{
+						relatedPostsData.map( ( relatedPost ) => {
+							return (
+								<li className="jeo-setting-related-post" key={ relatedPost.id }>
+									<h2>
+										<a href={ relatedPost.link } rel="noopener noreferrer" target="_blank">{ relatedPost.title.rendered }</a>
+									</h2>
+								</li>
+							);
+						} )
+					}
+				</ol>
+			) }
 		</Panel>
 	);
 };
