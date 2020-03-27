@@ -1,7 +1,7 @@
 import { withSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl, Button } from '@wordpress/components';
 
 import { IntervalSelector } from './interval-selector';
 import { MetaSelector } from './meta-selector';
@@ -21,6 +21,9 @@ const PostsSelector = ( {
 	const [ relatedPostsData, setRelatedPostsData ] = useState( [] );
 	const [ showRelatedPosts, setShowRelatedPosts ] = useState( false );
 
+	const [ showDateInterval, setShowDateInterval ] = useState( true );
+	const [ intervalButtonMessage, setIntervalButtonMessage ] = useState( __( 'Remove Date Interval' ) );
+
 	useEffect( () => {
 		/* relatedPosts is often nullish if schema doesn't match */
 		if ( ! relatedPosts ) {
@@ -30,12 +33,18 @@ const PostsSelector = ( {
 
 	useEffect( () => {
 		const { categories, after, before, tags } = relatedPosts;
+		let data = { categories, after, before, tags };
+
+		if ( ! showDateInterval ) {
+			data = { categories, tags };
+		}
+
 		jQuery.get(
 			'/wp-json/wp/v2/posts',
-			{ categories, after, before, tags },
+			data,
 			( response ) => setRelatedPostsData( response )
 		);
-	}, [ showRelatedPosts, relatedPosts ] );
+	}, [ showDateInterval, showRelatedPosts, relatedPosts ] );
 
 	return (
 		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
@@ -63,18 +72,35 @@ const PostsSelector = ( {
 				/>
 			) }
 
-			<IntervalSelector
-				startDate={ relatedPosts.after }
-				endDate={ relatedPosts.before }
-				startLabel={ __( 'Start date', 'jeo' ) }
-				endLabel={ __( 'End date', 'jeo' ) }
-				onStartChange={ ( date ) => {
-					setRelatedPosts( { ...relatedPosts, after: date ? date.toISOString() : undefined } );
+			{ showDateInterval && (
+				<IntervalSelector
+					startDate={ relatedPosts.after }
+					endDate={ relatedPosts.before }
+					startLabel={ __( 'Start date', 'jeo' ) }
+					endLabel={ __( 'End date', 'jeo' ) }
+					onStartChange={ ( date ) => {
+						setRelatedPosts( { ...relatedPosts, after: date ? date.toISOString() : undefined } );
+					} }
+					onEndChange={ ( date ) => {
+						setRelatedPosts( { ...relatedPosts, before: date ? date.toISOString() : undefined } );
+					} }
+				/>
+			) }
+			<Button
+				className="date-interval-button"
+				isPrimary
+				isLarge
+				onClick={ () => {
+					if ( showDateInterval ) {
+						setIntervalButtonMessage( __( 'Add Date Interval' ) );
+					} else {
+						setIntervalButtonMessage( __( 'Remove Date Interval' ) );
+					}
+					setShowDateInterval( ! showDateInterval );
 				} }
-				onEndChange={ ( date ) => {
-					setRelatedPosts( { ...relatedPosts, before: date ? date.toISOString() : undefined } );
-				} }
-			/>
+			>
+				{ intervalButtonMessage }
+			</Button>
 
 			<MetaSelector
 				label={ __( 'Meta queries', 'jeo' ) }
