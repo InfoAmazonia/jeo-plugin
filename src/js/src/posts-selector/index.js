@@ -33,17 +33,27 @@ const PostsSelector = ( {
 
 	useEffect( () => {
 		const { categories, after, before, tags } = relatedPosts;
-		let data = { categories, after, before, tags };
-
-		if ( ! showDateInterval ) {
-			data = { categories, tags };
+		const data = { categories, after, before, tags };
+		for ( let item in data ) {
+			if ( ! data[ `${ item }` ] || data[ `${ item }` ].length === 0 ) {
+				delete data[ `${ item }` ];
+			}
 		}
 
-		jQuery.get(
-			'/wp-json/wp/v2/posts',
-			data,
-			( response ) => setRelatedPostsData( response )
-		);
+		if ( ! showDateInterval ) {
+			delete data[ 'after' ];
+			delete data[ 'before' ];
+		}
+
+		if ( Object.keys( data ).length === 0 ) {
+			setRelatedPostsData( [] );
+		} else {
+			jQuery.get(
+				'/wp-json/wp/v2/posts',
+				data,
+				( response ) => setRelatedPostsData( response )
+			);
+		}
 	}, [ showDateInterval, showRelatedPosts, relatedPosts ] );
 
 	return (
