@@ -120,17 +120,15 @@ const PostsSelector = ( {
 
 			{ showRelatedPosts && (
 				<ol>
-					{
-						relatedPostsData.map( ( relatedPost ) => {
-							return (
-								<li className="jeo-setting-related-post" key={ relatedPost.id }>
-									<h2>
-										<a href={ relatedPost.link } rel="noopener noreferrer" target="_blank">{ relatedPost.title.rendered }</a>
-									</h2>
-								</li>
-							);
-						} )
-					}
+					{	relatedPostsData.map( ( relatedPost ) => {
+						return (
+							<li className="jeo-setting-related-post" key={ relatedPost.id }>
+								<h2>
+									<a href={ relatedPost.link } rel="noopener noreferrer" target="_blank">{ relatedPost.title.rendered }</a>
+								</h2>
+							</li>
+						);
+					} ) }
 				</ol>
 			) }
 		</Panel>
