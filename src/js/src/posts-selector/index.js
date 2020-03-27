@@ -120,7 +120,7 @@ const PostsSelector = ( {
 
 			{ showRelatedPosts && (
 				<ol>
-					{	relatedPostsData.map( ( relatedPost ) => {
+					{ relatedPostsData.map( ( relatedPost ) => {
 						return (
 							<li className="jeo-setting-related-post" key={ relatedPost.id }>
 								<h2>
