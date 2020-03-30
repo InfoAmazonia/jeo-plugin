@@ -10,8 +10,9 @@ const layerSchema = {
 	type: 'object',
 	properties: {
 		type: { title: __( 'Type' ), type: 'string' },
+		attribution: { title: __( 'Map attribution link' ), type: 'string' },
 	},
-	required: [ 'type' ],
+	required: [ 'type', 'attribution' ],
 };
 
 const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
