@@ -143,7 +143,7 @@ class IconItem extends Component {
 								</div>
 								<div className="buttons-inputs">
 									<TextControl
-										label={ __( 'Label (minimum size: 60x60)' ) }
+										label={ __( 'Label (min. size: 60x60)' ) }
 										value={ this.state.iconData.label }
 										onChange={ ( label ) => {
 											this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );
