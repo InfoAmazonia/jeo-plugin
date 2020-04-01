@@ -9,10 +9,10 @@ import InteractionsSettings from './interactions-settings';
 const layerSchema = {
 	type: 'object',
 	properties: {
-		type: { title: __( 'Type' ), type: 'string' },
 		attribution: { title: __( 'Map attribution link' ), type: 'string' },
+		type: { title: __( 'Type' ), type: 'string' },
 	},
-	required: [ 'type', 'attribution' ],
+	required: [ 'attribution', 'type' ],
 };
 
 const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
