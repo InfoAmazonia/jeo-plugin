@@ -87,6 +87,9 @@ class IconEditor extends Component {
 	render() {
 		return (
 			<Fragment>
+				<div className="size-warning">
+					<span className="warning-character">* </span> <span className="warning-text">Minimum size: 60x60</span>
+				</div>
 				{
 					this.state.legendObject.attributes.legend_type_options.icons.map( ( item ) => {
 						return ( <IconItem iconData={ item } key={ item.id } removeLabel={ this.removeLabel } iconUpdate={ this.iconUpdate } /> );
@@ -143,7 +146,7 @@ class IconItem extends Component {
 								</div>
 								<div className="buttons-inputs">
 									<TextControl
-										label={ __( 'Label (min. size: 60x60)' ) }
+										label={ __( 'Label' ) }
 										value={ this.state.iconData.label }
 										onChange={ ( label ) => {
 											this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );
