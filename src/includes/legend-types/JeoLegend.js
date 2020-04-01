@@ -21,7 +21,7 @@ class JeoLegend {
 			},
 
 			icons: {
-				icons: [ { label: 'Default Item', icon: 'http://via.placeholder.com/60x60' } ],
+				icons: [ { label: 'Default Item', icon: null } ],
 			},
 
 			circles: {
