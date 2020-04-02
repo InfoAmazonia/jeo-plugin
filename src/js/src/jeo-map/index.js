@@ -124,10 +124,33 @@ class JeoMap {
 		const container = document.createElement( 'div' );
 		container.classList.add( 'legend-container' );
 
+		const hideableContent = document.createElement( 'div' );
+		hideableContent.classList.add( 'hideable-content' );
+
 		if ( this.legends.length > 0 ) {
+			const legendsTitle = document.createElement( 'div' );
+			legendsTitle.classList.add( 'legends-title' );
+			legendsTitle.innerHTML = '<span class="text"> Legends </span>';
+
+			const legendsHideIcon = document.createElement( 'i' );
+			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
+
+			legendsTitle.appendChild( legendsHideIcon );
+			container.appendChild( legendsTitle );
+
+			legendsHideIcon.addEventListener( 'click', ( ) => {
+				if ( legendsHideIcon.classList.contains( 'active' ) ) {
+					legendsHideIcon.classList.remove( 'active' );
+					jQuery( '.hideable-content' ).slideToggle( 'slow' );
+				} else {
+					legendsHideIcon.classList.add( 'active' );
+					jQuery( '.hideable-content' ).slideToggle( 'slow' );
+				}
+			} );
+
 			const legendsWrapper = document.createElement( 'div' );
 			legendsWrapper.classList.add( 'legends-wrapper' );
-			container.appendChild( legendsWrapper );
+			hideableContent.appendChild( legendsWrapper );
 
 			this.legends.forEach( ( legend ) => {
 				const legendContainer = document.createElement( 'div' );
@@ -174,8 +197,10 @@ class JeoMap {
 			};
 
 			this.element.appendChild( moreDiv );
-			container.appendChild( moreButton );
+			hideableContent.appendChild( moreButton );
 		}
+
+		container.appendChild( hideableContent );
 		this.element.appendChild( container );
 
 		// hide legends from hidden layers
