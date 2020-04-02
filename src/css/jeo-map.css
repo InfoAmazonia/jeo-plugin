@@ -122,27 +122,27 @@ div.jeomap {
 
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar {
-width: 8px;
-/* height: 6px; */
+	width: 6px;
+	/* height: 6px; */
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-button {
-width: 0px;
-height: 0px;
+	width: 0px;
+	height: 0px;
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb {
-	background: #3b3b3b;
-	border: 0px none #ffffff;
-	border-radius: 0px;
+	background: #ddd;
+	border: 0px none white;
+	border-radius: 3px;
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:hover {
-	background: #3b3b3b;
+	background: #b1b1b1;
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:active {
-	background: #3b3b3b;
+	background: #b1b1b1;
 }
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track {
-	background: #ffffff;
+	background: #eee;
 	border: 0px none #ffffff;
 	border-radius: 0px;
 }
@@ -150,7 +150,7 @@ height: 0px;
 	background: rgba(0,0,0,0.05);
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track:active {
-	background: #333333;
+	background: #eee;
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-corner {
 	background: transparent;
@@ -162,9 +162,10 @@ height: 0px;
 }
 
 .jeomap div.legend-container a.more-info-button {
-	background: #555D66;
-	color: white;
+	background: white;
+	color: #555D66;
 	margin: 20px auto 20px auto;
+	border: 1px solid #555D66;
 	padding: 5px 10px;
 	text-decoration: none;
 	text-align: center;
@@ -173,12 +174,13 @@ height: 0px;
 	display: block;
 	font-size: 16px;
 	font-weight: bold;
-	transition: all .2s ease-in-out;
+	transition: all .1s ease-in-out;
 }
 
 .jeomap div.legend-container a.more-info-button:hover {
-	background-color: rgba(0,0,0,0.5);
-	transition: all .2s ease-in-out;
+	background: #555D66;
+	color: white;
+	transition: all .1s ease-in-out;
 }
 
 .jeomap .mapboxgl-popup-close-button {
@@ -300,11 +302,11 @@ height: 0px;
 /** Simple color legend **/
 
 .simple-color-item-box {
-	width: 25px;
-	height: 25px;
-	margin-right: 10px;
+	width: 21px;
+	height: 21px;
+	margin-right: 16px;
 	float: left;
-	border-radius: 30px;
+	border-radius: 3px;
 	border: 1px solid #8080801f;
 }
 
@@ -313,6 +315,7 @@ height: 0px;
 	display: flex;
 	align-items: center;
 	font-size: 14px;
+	color: #555D66;
 }
 
 /** Icons legend **/
@@ -320,7 +323,7 @@ height: 0px;
 .icons-item-img {
 	max-width: 30px;
 	max-height: 30px;
-	margin-right: 10px;
+	margin-right: 16px;
 	float: left;
 }
 
@@ -329,6 +332,7 @@ height: 0px;
 	display: flex;
 	align-items: center;
 	font-size: 14px;
+	color: #555D66;
 }
 
 /** Circles legend **/
