@@ -23,6 +23,8 @@ function parseNumber( value ) {
 	return isNaN( numValue ) ? value : numValue;
 }
 
+let standardZoom = null;
+
 export default ( { attributes, setAttributes } ) => {
 	const {
 		center_lat: centerLat,
@@ -37,6 +39,10 @@ export default ( { attributes, setAttributes } ) => {
 	};
 
 	const editingMap = useRef( false );
+
+	if ( ! standardZoom ) {
+		standardZoom = initialZoom;
+	}
 
 	return (
 		<Fragment>
@@ -95,17 +101,15 @@ export default ( { attributes, setAttributes } ) => {
 					/>
 
 					<div className="zoomButtonsDiv">
-						{ /*
 						<Button
 							className="zoomButtons"
 							isPrimary
 							isLarge
 							onClick={ () => {
-								attributeUpdater( 'initial_zoom' )( initialZoom );
+								attributeUpdater( 'initial_zoom' )( standardZoom );
 							} }>
 							{ __( 'Initial Zoom' ) }
 						</Button>
-						*/ }
 						<Button
 							className="zoomButtons"
 							isPrimary

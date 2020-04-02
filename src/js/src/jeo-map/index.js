@@ -71,7 +71,7 @@ class JeoMap {
 					map.on( 'load', () => {
 						layers.forEach( ( layer, i ) => {
 							if ( layer.attribution ) {
-								customAttribution.push( layer.attribution );
+								customAttribution.push( `<a href="${ layer.attribution }">${ layer.attribution }</a>` );
 							}
 
 							if ( i > 0 ) {
@@ -164,7 +164,6 @@ class JeoMap {
 			const moreDiv = document.createElement( 'div' );
 
 			moreDiv.classList.add( 'more-info-overlayer' );
-
 			moreDiv.innerHTML = this.moreInfoTemplate( {
 				map: this.map_post_object,
 			} );

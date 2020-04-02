@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { Button, IconButton, TextControl } from '@wordpress/components';
+import { Button, IconButton, TextControl, Dashicon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 import { v4 as uuid } from 'uuid';
@@ -56,7 +56,7 @@ class IconEditor extends Component {
 			const icons = this.state.legendObject.attributes.legend_type_options.icons;
 
 			icons.push(
-				{ label: 'Default Label', icon: 'http://via.placeholder.com/60x60', id: uuid() },
+				{ label: 'Default Label', icon: null, id: uuid() },
 			);
 
 			legendObject.attributes.legend_type_options.icons = icons;
@@ -87,6 +87,9 @@ class IconEditor extends Component {
 	render() {
 		return (
 			<Fragment>
+				<div className="size-warning">
+					<span className="warning-character">* </span> <span className="warning-text">Minimum size: 60x60</span>
+				</div>
 				{
 					this.state.legendObject.attributes.legend_type_options.icons.map( ( item ) => {
 						return ( <IconItem iconData={ item } key={ item.id } removeLabel={ this.removeLabel } iconUpdate={ this.iconUpdate } /> );
@@ -136,14 +139,20 @@ class IconItem extends Component {
 					} }
 
 					render={ ( { open } ) => {
+						console.log(this.state.iconData)
 						return (
 							<div className="content-wrapper">
 								<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
-									<img src={ this.state.iconData.icon } width="50" height="50" alt="Logo" />
+									{ this.state.iconData.icon && (
+										<img src={ this.state.iconData.icon } width="50" height="50" alt="Logo" />
+									) }
+									{ ! this.state.iconData.icon && (
+										<Dashicon icon="format-image" width="50" height="50" />
+									) }
 								</div>
 								<div className="buttons-inputs">
 									<TextControl
-										label={ 'Label' }
+										label={ __( 'Label' ) }
 										value={ this.state.iconData.label }
 										onChange={ ( label ) => {
 											this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );
