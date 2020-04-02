@@ -16,10 +16,13 @@
 	width: 25%;
 	max-width: 25%;
 	cursor: pointer;
+	margin-top: 5px;
 }
 
 .color-item {
 	height: inherit;
+	display: flex;
+	margin-bottom: 5px;
 }
 
 .itens-wrapper {
@@ -44,4 +47,8 @@
 
 .item-drop-content .label-input-wrapper {
 	padding: 16px 16px 12px;
+}
+
+.buttons-inputs {
+	margin-left: 5px;
 }

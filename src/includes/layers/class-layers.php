@@ -27,6 +27,11 @@ class Layers {
 			'not_found'          => __( 'No layer found', 'jeo' ),
 			'not_found_in_trash' => __( 'No layer found in the trash', 'jeo' ),
 			'menu_name'          => __( 'Layers', 'jeo' ),
+			'item_published' => __('Layer published.', 'jeo'),
+			'item_published_privately' => __('Layer published privately.', 'jeo'),
+			'item_reverted_to_draft' => __('Layer reverted to draft.', 'jeo'),
+			'item_scheduled' => __('Layer scheduled.', 'jeo'),
+			'item_updated' => __('Layer updated.', 'jeo'),
 		);
 
 		$args = array(

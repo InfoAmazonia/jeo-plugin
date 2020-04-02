@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Dropdown, TextControl } from '@wordpress/components';
+import { Button, ColorPicker, Dropdown, TextControl, IconButton } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { v4 as uuid } from 'uuid';
@@ -114,14 +114,14 @@ class SimplecolorEditor extends Component {
 	render() {
 		// increment qnty
 		const colors = this.state.legendObject.attributes.legend_type_options.colors;
-
 		return (
 			<Fragment>
 				<div className="itens-wrapper">
-					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } /> ) }
-					<div className="color-item-wrapper add-item" role="button" tabIndex={ 0 } onClick={ this.addItem }>
-						<span> + </span>
-					</div>
+					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } />
+					) }
+					<Button isSecondary isButton isLarge onClick={ this.addItem } className="full-width-button">
+						{ __( 'Add new label' ) }
+					</Button>
 				</div>
 			</Fragment>
 
@@ -140,44 +140,59 @@ class ColorItem extends Component {
 
 	render() {
 		return (
-			<Dropdown
-				className="color-item-wrapper"
-				contentClassName="item-drop-content"
-				position="bottom center"
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<div className="color-item" role="button" tabIndex={ 0 } onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
-				) }
-				renderContent={ () => (
-					<div>
-						<TextControl
-							className="label-input-wrapper"
-							label={ __( 'Label' ) }
-							value={ this.state.label }
-							onChange={ ( label ) => {
-								// console.log( "selectedColor.id", this.state.selectedColor.id );
-								this.setState( { label } );
-								this.props.itemChanged( { ...this.state, label } );
-							} }
-						/>
+			<div className="color-item">
+				<Dropdown
+					className="color-item-wrapper"
+					contentClassName="item-drop-content"
+					position="bottom center"
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<div className="color-item" role="button" tabIndex={ 0 } onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
+					) }
+					renderContent={ () => (
+						<div>
+							<TextControl
+								className="label-input-wrapper"
+								label={ __( 'Label' ) }
+								value={ this.state.label }
+								onChange={ ( label ) => {
+									// console.log( "selectedColor.id", this.state.selectedColor.id );
+									this.setState( { label } );
+									this.props.itemChanged( { ...this.state, label } );
+								} }
+							/>
 
-						<ColorPicker
-							color={ this.state.color }
-							onChangeComplete={ ( color ) => {
-								// console.log( "selectedColor.id", this.state.selectedColor.id );
-								this.setState( { color: color.hex } );
-								this.props.itemChanged( this.state );
-							} }
-							disableAlpha
-						/>
+							<ColorPicker
+								color={ this.state.color }
+								onChangeComplete={ ( color ) => {
+									// console.log( "selectedColor.id", this.state.selectedColor.id );
+									this.setState( { color: color.hex } );
+									this.props.itemChanged( this.state );
+								} }
+								disableAlpha
+							/>
 
-						<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
-							{ __( 'Remove' ) }
-						</Button>
-					</div>
+							<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
+								{ __( 'Remove' ) }
+							</Button>
+						</div>
 
-				) }
-			/>
+					) }
+				/>
+				<div className="buttons-inputs">
+					<TextControl
+						className="label-input-wrapper"
+						label={ __( 'Label' ) }
+						value={ this.state.label }
+						onChange={ ( label ) => {
+							// console.log( "selectedColor.id", this.state.selectedColor.id );
+							this.setState( { label } );
+							this.props.itemChanged( { ...this.state, label } );
+						} }
+					/>
 
+					<IconButton icon="minus" label="Remove" onClick={ () => this.props.removeItem( this.state.id ) } className="remove-button" />
+				</div>
+			</div>
 		);
 	}
 }

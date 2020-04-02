@@ -31,7 +31,12 @@ class Maps {
 			'search_items' => __('Search maps', 'jeo'),
 			'not_found' => __('No map found', 'jeo'),
 			'not_found_in_trash' => __('No map found in the trash', 'jeo'),
-			'menu_name' => __('Maps', 'jeo')
+			'menu_name' => __('Maps', 'jeo'),
+			'item_published' => __('Map published.', 'jeo'),
+			'item_published_privately' => __('Map published privately.', 'jeo'),
+			'item_reverted_to_draft' => __('Map reverted to draft.', 'jeo'),
+			'item_scheduled' => __('Map scheduled.', 'jeo'),
+			'item_updated' => __('Map updated.', 'jeo'),
 		);
 
 		$args = array(

@@ -27,3 +27,15 @@
 	justify-content: space-between;
 	align-items: center;
 }
+
+.size-warning {
+	margin: 10px 0;
+}
+
+.warning-character {
+	color: rgb(255, 0, 0);
+}
+
+.warning-text {
+	font-weight: bold;
+}
