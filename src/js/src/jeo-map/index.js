@@ -421,7 +421,45 @@ class JeoMap {
 	}
 
 	addLayersControl() {
+		const layerSelectionTitle = document.createElement( 'div' );
+		layerSelectionTitle.classList.add( 'layer-selection-title' );
+
+		const legendsTitle = document.createElement( 'div' );
+		legendsTitle.classList.add( 'legends-title' );
+
+		const legendTextIcon = document.createElement( 'div' );
+		legendTextIcon.classList.add( 'text-icon' );
+
+		const layerIcon = document.createElement( 'i' );
+		layerIcon.classList.add( 'layer-icon' );
+
+		legendTextIcon.appendChild( layerIcon );
+		legendTextIcon.innerHTML += '<span class="text"> Layers </span>';
+
+		legendsTitle.appendChild( legendTextIcon );
+
+		const legendsHideIcon = document.createElement( 'i' );
+		legendsHideIcon.classList.add( 'arrow-icon', 'active' );
+
+		legendsTitle.appendChild( legendsHideIcon );
+		layerSelectionTitle.appendChild( legendsTitle );
+
 		const navElement = document.createElement( 'nav' );
+		navElement.classList.add( 'layers-selection' );
+		navElement.appendChild( layerSelectionTitle );
+
+		legendsHideIcon.addEventListener( 'click', ( ) => {
+			if ( legendsHideIcon.classList.contains( 'active' ) ) {
+				legendsHideIcon.classList.remove( 'active' );
+				jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
+			} else {
+				legendsHideIcon.classList.add( 'active' );
+				jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
+			}
+		} );
+
+		const layers = document.createElement( 'div' );
+		layers.classList.add( 'layers-wrapper' );
 
 		this.getSwitchableLayers().forEach( ( index ) => {
 			const link = document.createElement( 'a' );
@@ -450,8 +488,10 @@ class JeoMap {
 				}
 			};
 
-			navElement.appendChild( link );
+			layers.appendChild( link );
 		} );
+
+		navElement.appendChild( layers );
 
 		this.getSwappableLayers().forEach( ( index ) => {
 			const link = document.createElement( 'a' );
@@ -485,8 +525,10 @@ class JeoMap {
 				clicked.classList.add( 'active' );
 			};
 
-			navElement.appendChild( link );
+			layers.appendChild( link );
 		} );
+
+		navElement.appendChild( layers );
 
 		this.element.appendChild( navElement );
 	}
