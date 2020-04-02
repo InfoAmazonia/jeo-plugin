@@ -5,11 +5,11 @@ div.jeomap {
 }
 
 .jeomap nav {
-	background: #fff;
 	position: absolute;
 	top: 10px;
 	right: 10px;
 	z-index: 1;
+	width: 170px;
 }
 
 .jeomap .mapboxgl-popup-close-button:hover {
@@ -21,13 +21,41 @@ div.jeomap {
 	color: #404040;
 	display: block;
 	margin: 0;
-	padding: 4px 20px;
+	padding: 7px 10px;
+	font-size: 13px;
 	text-decoration: none;
-	text-align: center;
+	margin-top: 2px;
+    background: white;
 }
 
-.jeomap nav a.active {
-	font-weight: bold;
+.jeomap nav .arrow-icon {
+	width: 14px;
+    height: 9px;
+    background: url(../src/images/arrow.png);
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0) invert(1);
+    cursor: pointer;
+}
+
+.jeomap nav .arrow-icon.active {
+	transform: rotate(180deg);
+}
+
+.jeomap nav .text-icon {
+	display: flex;
+	align-items: center;
+}
+
+.jeomap nav .text-icon .layer-icon{
+	width: 14px;
+    height: 16px;
+    background: url(../src/images/layers.png);
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0) invert(1);
+	cursor: pointer;
+	margin-right: 12px;
 }
 
 .jeomap nav a:hover {
@@ -35,14 +63,6 @@ div.jeomap {
 	color: #404040;
 }
 
-.jeomap nav a.active {
-	background-color: #3887be;
-	color: #ffffff;
-}
-
-.jeomap nav a.active:hover {
-	background: #3074a4;
-}
 
 .jeomap div.more-info-overlayer {
 	position: absolute;
@@ -165,7 +185,7 @@ div.jeomap {
 	background: white;
 	color: #555D66;
 	margin: 20px auto 20px auto;
-	border: 1px solid #555D66;
+	border: 2px solid #555D66;
 	padding: 5px 10px;
 	text-decoration: none;
 	text-align: center;
@@ -190,6 +210,17 @@ div.jeomap {
 .map-content-layers-list {
 	font-size: 14px;
 	line-height: 25px;
+}
+
+nav .layer-selection-title .legends-title {
+    background: #555D66;
+    font-size: 16px;
+    color: white;
+    font-weight: 600;
+	padding: 9px 10px;
+	display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 .map-content-layers-list a.download-source{
@@ -347,6 +378,7 @@ div.jeomap {
 	display: flex;
 	align-items: center;
 	margin-bottom: 3px;
+	color: #555D66;
 
 }
 
@@ -363,7 +395,7 @@ div.jeomap {
 
 .circle-shape {
 	border-radius: 50%;
-	border: 1px solid #8080801f;
+	border: 2px solid #191E23;
 }
 
 
