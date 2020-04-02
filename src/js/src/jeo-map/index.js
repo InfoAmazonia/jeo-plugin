@@ -130,7 +130,7 @@ class JeoMap {
 		if ( this.legends.length > 0 ) {
 			const legendsTitle = document.createElement( 'div' );
 			legendsTitle.classList.add( 'legends-title' );
-			legendsTitle.innerHTML = '<span class="text"> Legends </span>';
+			legendsTitle.innerHTML = '<span class="text"> Legend </span>';
 
 			const legendsHideIcon = document.createElement( 'i' );
 			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
@@ -171,7 +171,7 @@ class JeoMap {
 
 			const closeButton = document.createElement( 'div' );
 			closeButton.classList.add( 'more-info-close' );
-			closeButton.innerHTML = '<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup">×</button>';
+			closeButton.innerHTML = '<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>';
 
 			closeButton.click( function( e ) {
 
@@ -193,7 +193,7 @@ class JeoMap {
 			moreButton.onclick = ( e ) => {
 				e.preventDefault();
 				e.stopPropagation();
-				jQuery( e.currentTarget ).parent().siblings( '.more-info-overlayer' ).show();
+				jQuery( e.currentTarget ).parent().parent().siblings( '.more-info-overlayer' ).show();
 			};
 
 			this.element.appendChild( moreDiv );
@@ -515,7 +515,7 @@ class JeoMap {
 				this.getSwappableLayers().forEach( ( i ) => {
 					this.hideLayer( this.layers[ i ].layer_id );
 				} );
-				jQuery( navElement ).children( '.switchable' ).removeClass( 'active' );
+				jQuery( layers ).children( '.switchable' ).removeClass( 'active' );
 
 				// display current
 				const clicked = e.currentTarget;
