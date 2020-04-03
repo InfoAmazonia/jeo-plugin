@@ -1,6 +1,6 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-import { Fragment, useCallback, useState, useRef } from '@wordpress/element';
+import { Fragment, useCallback, useState } from '@wordpress/element';
 import { Button, Dashicon } from '@wordpress/components';
 
 import LayersPanel from '../map-blocks/layers-panel';
@@ -55,7 +55,8 @@ function MapsSidebar( {
 		animate: false,
 	};
 
-	const editingMap = useRef( false );
+	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
+	const currentZoom = postMeta[ zoomState ];
 
 	return (
 		<Fragment>
@@ -71,24 +72,23 @@ function MapsSidebar( {
 
 			{ fullscreenModal && (
 				<MapFullscreenModal
+					key={ currentZoom }
 					closeModal={ closeFullscreenModal }
 					loadedLayers={ loadedLayers }
 					style="mapbox://styles/mapbox/streets-v11"
 					containerStyle={ { height: '90%', width: '100%' } }
-					zoom={ [ initialZoom || 11 ] }
+					zoom={ [ currentZoom || 11 ] }
 					center={ [ centerLon || 0, centerLat || 0 ] }
 					animationOptions={ animationOptions }
 					onMoveEnd={ ( map ) => {
-						if ( ! editingMap.current ) {
-							const center = map.getCenter();
-							const zoom = Math.round( map.getZoom() * 10 ) / 10;
+						const center = map.getCenter();
+						const zoom = Math.round( map.getZoom() * 10 ) / 10;
 
-							setPostMeta( {
-								center_lat: center.lat,
-								center_lon: center.lng,
-								initial_zoom: zoom,
-							} );
-						}
+						setPostMeta( {
+							center_lat: center.lat,
+							center_lon: center.lng,
+							[ zoomState ]: zoom,
+						} );
 					} }
 					renderLayer={ renderLayer }
 					postMeta={ postMeta }
@@ -102,27 +102,27 @@ function MapsSidebar( {
 			<MapPanel
 				attributes={ postMeta }
 				setAttributes={ setPostMeta }
+				setZoomState={ setZoomState }
 				renderPanel={ PluginDocumentSettingPanel }
 			/>
 			{ MapboxAPIKey && (
 				<MapPreviewPortal>
 					<Map
+						key={ currentZoom }
 						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '100%' } }
-						zoom={ [ initialZoom || 11 ] }
+						zoom={ [ currentZoom || initialZoom ] }
 						center={ [ centerLon || 0, centerLat || 0 ] }
 						animationOptions={ animationOptions }
 						onMoveEnd={ ( map ) => {
-							if ( ! editingMap.current ) {
-								const center = map.getCenter();
-								const zoom = Math.round( map.getZoom() * 10 ) / 10;
+							const center = map.getCenter();
+							const zoom = Math.round( map.getZoom() * 10 ) / 10;
 
-								setPostMeta( {
-									center_lat: center.lat,
-									center_lon: center.lng,
-									initial_zoom: zoom,
-								} );
-							}
+							setPostMeta( {
+								center_lat: center.lat,
+								center_lon: center.lng,
+								[ zoomState ]: zoom,
+							} );
 						} }
 					>
 						{ loadedLayers && postMeta.layers.map( ( layer ) => {
