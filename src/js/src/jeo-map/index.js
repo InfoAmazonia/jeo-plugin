@@ -117,7 +117,7 @@ class JeoMap {
 	 * This will only work for maps stored in the database and not for one-time use maps
 	 */
 	addMoreButtonAndLegends() {
-		if ( ! this.map_post_object ) {
+		if ( this.legends.length === 0 || ! this.map_post_object ) {
 			return;
 		}
 
@@ -127,31 +127,31 @@ class JeoMap {
 		const hideableContent = document.createElement( 'div' );
 		hideableContent.classList.add( 'hideable-content' );
 
-		const legendsTitle = document.createElement( 'div' );
-		legendsTitle.classList.add( 'legends-title' );
-		legendsTitle.innerHTML = '<span class="text"> Legend </span>';
+		if ( this.legends.length > 0 ) {
+			const legendsTitle = document.createElement( 'div' );
+			legendsTitle.classList.add( 'legends-title' );
+			legendsTitle.innerHTML = '<span class="text"> Legend </span>';
 
-		const legendsHideIcon = document.createElement( 'i' );
-		legendsHideIcon.classList.add( 'arrow-icon', 'active' );
+			const legendsHideIcon = document.createElement( 'i' );
+			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
 
-		legendsTitle.appendChild( legendsHideIcon );
-		container.appendChild( legendsTitle );
+			legendsTitle.appendChild( legendsHideIcon );
+			container.appendChild( legendsTitle );
 
-		legendsHideIcon.addEventListener( 'click', ( ) => {
-			if ( legendsHideIcon.classList.contains( 'active' ) ) {
-				legendsHideIcon.classList.remove( 'active' );
-				jQuery( '.hideable-content' ).slideToggle( 'slow' );
-			} else {
-				legendsHideIcon.classList.add( 'active' );
-				jQuery( '.hideable-content' ).slideToggle( 'slow' );
-			}
-		} );
+			legendsHideIcon.addEventListener( 'click', ( ) => {
+				if ( legendsHideIcon.classList.contains( 'active' ) ) {
+					legendsHideIcon.classList.remove( 'active' );
+					jQuery( '.hideable-content' ).slideToggle( 'slow' );
+				} else {
+					legendsHideIcon.classList.add( 'active' );
+					jQuery( '.hideable-content' ).slideToggle( 'slow' );
+				}
+			} );
 
 			const legendsWrapper = document.createElement( 'div' );
 			legendsWrapper.classList.add( 'legends-wrapper' );
 			hideableContent.appendChild( legendsWrapper );
-			
-		if ( this.legends.length > 0 ) {
+
 			this.legends.forEach( ( legend ) => {
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
