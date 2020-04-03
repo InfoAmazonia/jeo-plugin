@@ -23,9 +23,7 @@ function parseNumber( value ) {
 	return isNaN( numValue ) ? value : numValue;
 }
 
-let standardZoom = null;
-
-export default ( { attributes, setAttributes } ) => {
+export default ( { attributes, setAttributes, setZoomState } ) => {
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
@@ -39,10 +37,6 @@ export default ( { attributes, setAttributes } ) => {
 	};
 
 	const editingMap = useRef( false );
-
-	if ( ! standardZoom ) {
-		standardZoom = initialZoom;
-	}
 
 	return (
 		<Fragment>
@@ -106,7 +100,7 @@ export default ( { attributes, setAttributes } ) => {
 							isPrimary
 							isLarge
 							onClick={ () => {
-								attributeUpdater( 'initial_zoom' )( standardZoom );
+								setZoomState( 'initial_zoom' );
 							} }>
 							{ __( 'Initial Zoom' ) }
 						</Button>
@@ -115,28 +109,24 @@ export default ( { attributes, setAttributes } ) => {
 							isPrimary
 							isLarge
 							onClick={ () => {
-								let value = maxZoom;
-
-								if ( maxZoom === 0 ) {
-									value = 0.1;
+								if ( minZoom === 0 ) {
+									attributeUpdater( 'min_zoom' )( 0.1 );
 								}
-								attributeUpdater( 'initial_zoom' )( value );
+								setZoomState( 'min_zoom' );
 							} }>
-							{ __( 'Max Zoom' ) }
+							{ __( 'Min Zoom' ) }
 						</Button>
 						<Button
 							className="zoomButtons"
 							isPrimary
 							isLarge
 							onClick={ () => {
-								let value = minZoom;
-
-								if ( minZoom === 0 ) {
-									value = 0.1;
+								if ( maxZoom === 0 ) {
+									attributeUpdater( 'max_zoom' )( 0.1 );
 								}
-								attributeUpdater( 'initial_zoom' )( value );
+								setZoomState( 'max_zoom' );
 							} }>
-							{ __( 'Min Zoom' ) }
+							{ __( 'Max Zoom' ) }
 						</Button>
 					</div>
 
