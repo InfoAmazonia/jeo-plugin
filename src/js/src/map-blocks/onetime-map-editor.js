@@ -1,7 +1,7 @@
 import { InspectorControls } from '@wordpress/block-editor';
 import { Button, PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -39,11 +39,12 @@ const OnetimeMapEditor = ( {
 	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
 
-	const editingMap = useRef( false );
-
 	const animationOptions = {
 		animate: false,
 	};
+
+	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
+	const currentZoom = attributes[ zoomState ];
 
 	return (
 		<Fragment>
@@ -62,6 +63,7 @@ const OnetimeMapEditor = ( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					renderPanel={ PanelBody }
+					setZoomState={ setZoomState }
 				/>
 				<LayersPanel
 					attributes={ attributes }
@@ -79,9 +81,9 @@ const OnetimeMapEditor = ( {
 
 			<div className="jeo-preview-area">
 				<Map
-					key={ key }
+					key={ currentZoom }
 					style="mapbox://styles/mapbox/streets-v11"
-					zoom={ [ attributes.initial_zoom || mapDefaults.zoom ] }
+					zoom={ [ currentZoom || mapDefaults.zoom ] }
 					center={ [
 						attributes.center_lon || mapDefaults.lng,
 						attributes.center_lat || mapDefaults.lat,
@@ -91,16 +93,14 @@ const OnetimeMapEditor = ( {
 					animationOptions={ animationOptions }
 
 					onMoveEnd={ ( map ) => {
-						if ( ! editingMap.current ) {
-							const center = map.getCenter();
-							const zoom = Math.round( map.getZoom() * 10 ) / 10;
+						const center = map.getCenter();
+						const zoom = Math.round( map.getZoom() * 10 ) / 10;
 
-							setAttributes( {
-								center_lat: center.lat,
-								center_lon: center.lng,
-								initial_zoom: zoom,
-							} );
-						}
+						setAttributes( {
+							center_lat: center.lat,
+							center_lon: center.lng,
+							[ zoomState ]: zoom,
+						} );
 					} }
 				>
 					{ loadedLayers && attributes.layers.map( ( layer ) => {
