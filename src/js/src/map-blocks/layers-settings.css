@@ -5,3 +5,21 @@
 .create-layer-button {
     margin: 0;
 }
+
+.all-layers-list {
+    display: flex;
+    flex-direction: row;
+}
+
+.all-layers-list-button {
+    margin-top: 5px;
+}
+
+.all-layers-list-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+.all-layers-list-link:hover {
+    letter-spacing: 0.2;
+}

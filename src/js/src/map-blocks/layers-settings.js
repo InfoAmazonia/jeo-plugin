@@ -1,7 +1,9 @@
-import { Button, Spinner } from '@wordpress/components';
+import { Button, Spinner, Dashicon, CheckboxControl } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
-import { Fragment, useEffect } from '@wordpress/element';
+import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { select } from '@wordpress/data';
+
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
 
@@ -27,6 +29,19 @@ const LayersSettings = ( {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
+
+	const allLayers = select( 'core' ).getEntityRecords( 'postType', 'map-layer' );
+	allLayers.sort( function( a, b ) {
+		if ( a.title.rendered.toLowerCase() < b.title.rendered.toLowerCase() ) {
+			return -1;
+		}
+		if ( a.title.rendered.toLowerCase() > b.title.rendered.toLowerCase() ) {
+			return 1;
+		}
+		return 0;
+	} );
+
+	const [ showAllLayers, setShowAllLayers ] = useState( false );
 
 	useEffect( () => {
 		const [ firstLayer, ...otherLayers ] = attributes.layers;
@@ -72,6 +87,68 @@ const LayersSettings = ( {
 					{ __( 'Create New Layer' ) }
 				</Button>
 			</div>
+			<div style={ { marginLeft: '15px' } }>
+				<CheckboxControl
+					label={ __( 'Show all layers' ) }
+					checked={ showAllLayers }
+					onChange={ () => setShowAllLayers( ! showAllLayers ) }
+					className="jeo-layers-panel"
+				/>
+			</div>
+
+			{ showAllLayers && (
+				<div name="map-layers" className="jeo-layers-panel">
+					<ul className="jeo-layers-list">
+						{ allLayers.map( ( layer ) => {
+							let inUse = false;
+							attributes.layers.map( ( l ) => {
+								if ( layer.id === l.id ) {
+									inUse = true;
+								}
+							} );
+
+							return (
+								<li className="jeo-setting-layer all-layers-list" key={ layer.id }>
+									<p>
+										<a
+											className="all-layers-list-link"
+											href={ `/wp-admin/post.php?post=${ layer.id }&action=edit` }
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											<strong>{ layer.title.rendered }</strong> | { layer.meta.type }
+										</a>
+									</p>
+									{ inUse && (
+										<>
+											<Button
+												disabled
+												className="all-layers-list-button"
+											>
+												<Dashicon icon="plus" />
+											</Button>
+											<p> (already added) </p>
+										</>
+									) }
+									{ ! inUse && (
+										<Button
+											className="all-layers-list-button"
+											onClick={ () => {
+												setAttributes( {
+													...attributes,
+													layers: [ ...attributes.layers, setLayer( layer.id ) ],
+												} );
+											} }
+										>
+											<Dashicon icon="plus" />
+										</Button>
+									) }
+								</li>
+							);
+						} ) }
+					</ul>
+				</div>
+			) }
 
 			{ loadingLayers && <Spinner /> }
 			{ ! loadingLayers && ! attributes.layers.length && (
