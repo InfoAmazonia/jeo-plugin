@@ -1,12 +1,20 @@
-.zoomButtonsDiv {
-    display: flex;
-    flex-direction: column;
+.zoom-buttons-div {
+    margin: 5px 0 20px;
 }
 
-.zoomButtons {
+.zoom-button {
     width: 50%;
-    margin: 5px 0 5px;
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 3px;
+    margin: 1px !important;
+}
+
+.button-group-div {
+    display: flex;
+    flex-direction: row;
+    background-color: rgb(165, 165, 165);
+    padding: 1px 1px 2px;
+    border-radius: 3px;
 }
