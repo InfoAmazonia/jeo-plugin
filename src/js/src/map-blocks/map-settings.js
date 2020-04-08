@@ -38,9 +38,13 @@ export default ( { attributes, setAttributes, setZoomState } ) => {
 
 	const editingMap = useRef( false );
 
-	const [ initialButtonColor, setInitialButtonColor ] = useState( [ '#fff', '#007cba' ] );
-	const [ minButtonColor, setMinButtonColor ] = useState( [ '#fff', '#007cba' ] );
-	const [ maxButtonColor, setMaxButtonColor ] = useState( [ '#fff', '#007cba' ] );
+	const [ initialButtonColor, setInitialButtonColor ] = useState( [ '#000', '#fff' ] );
+	const [ minButtonColor, setMinButtonColor ] = useState( [ '#000', '#fff' ] );
+	const [ maxButtonColor, setMaxButtonColor ] = useState( [ '#000', '#fff' ] );
+
+	const [ initialButtonMargin, setInitialButtonMargin ] = useState( 0 );
+	const [ minButtonMargin, setMinButtonMargin ] = useState( 0 );
+	const [ maxButtonMargin, setMaxButtonMargin ] = useState( 0 );
 
 	return (
 		<Fragment>
@@ -98,19 +102,28 @@ export default ( { attributes, setAttributes, setZoomState } ) => {
 						onChange={ attributeUpdater( 'max_zoom' ) }
 					/>
 
-					<div className="zoomButtonsDiv">
+					<div className="zoom-buttons-div">
+						<h3>{ __( 'Zoom preview' ) }</h3>
 						<ButtonGroup
-							style={ { display: 'flex', flexDirection: 'column' } }
+							className="button-group-div"
 						>
 							<Button
+								autoFocus
 								style={ {
 									color: initialButtonColor[ 0 ],
 									backgroundColor: initialButtonColor[ 1 ],
+									margin: initialButtonMargin,
 									border: 0,
 								} }
-								onFocus={ () => setInitialButtonColor( [ '#007cba', '#fff' ] ) }
-								onBlur={ () => setInitialButtonColor( [ '#fff', '#007cba' ] ) }
-								className="zoomButtons"
+								onFocus={ () => {
+									setInitialButtonColor( [ '#fff', '#007cba' ] );
+									setInitialButtonMargin( 1 );
+								} }
+								onBlur={ () => {
+									setInitialButtonColor( [ '#000', '#fff' ] );
+									setInitialButtonMargin( 0 );
+								} }
+								className="zoom-button"
 								isPrimary
 								isLarge
 								onClick={ () => {
@@ -122,11 +135,18 @@ export default ( { attributes, setAttributes, setZoomState } ) => {
 								style={ {
 									color: minButtonColor[ 0 ],
 									backgroundColor: minButtonColor[ 1 ],
+									margin: minButtonMargin,
 									border: 0,
 								} }
-								onFocus={ () => setMinButtonColor( [ '#007cba', '#fff' ] ) }
-								onBlur={ () => setMinButtonColor( [ '#fff', '#007cba' ] ) }
-								className="zoomButtons"
+								onFocus={ () => {
+									setMinButtonColor( [ '#fff', '#007cba' ] );
+									setMinButtonMargin( 1 );
+								} }
+								onBlur={ () => {
+									setMinButtonColor( [ '#000', '#fff' ] );
+									setMinButtonMargin( 0 );
+								} }
+								className="zoom-button"
 								isPrimary
 								isLarge
 								onClick={ () => {
@@ -141,11 +161,18 @@ export default ( { attributes, setAttributes, setZoomState } ) => {
 								style={ {
 									color: maxButtonColor[ 0 ],
 									backgroundColor: maxButtonColor[ 1 ],
+									margin: maxButtonMargin,
 									border: 0,
 								} }
-								onFocus={ () => setMaxButtonColor( [ '#007cba', '#fff' ] ) }
-								onBlur={ () => setMaxButtonColor( [ '#fff', '#007cba' ] ) }
-								className="zoomButtons"
+								onFocus={ () => {
+									setMaxButtonColor( [ '#fff', '#007cba' ] );
+									setMaxButtonMargin( 1 );
+								} }
+								onBlur={ () => {
+									setMaxButtonColor( [ '#000', '#fff' ] );
+									setMaxButtonMargin( 0 );
+								} }
+								className="zoom-button"
 								isPrimary
 								isLarge
 								onClick={ () => {
