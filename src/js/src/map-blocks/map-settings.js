@@ -1,5 +1,5 @@
-import { TextControl, RangeControl, CheckboxControl, Button } from '@wordpress/components';
-import { Fragment, useRef } from '@wordpress/element';
+import { TextControl, RangeControl, CheckboxControl, Button, ButtonGroup } from '@wordpress/components';
+import { Fragment, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import './map-settings.css';
@@ -37,6 +37,10 @@ export default ( { attributes, setAttributes, setZoomState } ) => {
 	};
 
 	const editingMap = useRef( false );
+
+	const [ initialButtonColor, setInitialButtonColor ] = useState( [ '#fff', '#007cba' ] );
+	const [ minButtonColor, setMinButtonColor ] = useState( [ '#fff', '#007cba' ] );
+	const [ maxButtonColor, setMaxButtonColor ] = useState( [ '#fff', '#007cba' ] );
 
 	return (
 		<Fragment>
@@ -95,39 +99,64 @@ export default ( { attributes, setAttributes, setZoomState } ) => {
 					/>
 
 					<div className="zoomButtonsDiv">
-						<Button
-							className="zoomButtons"
-							isPrimary
-							isLarge
-							onClick={ () => {
-								setZoomState( 'initial_zoom' );
-							} }>
-							{ __( 'Initial Zoom' ) }
-						</Button>
-						<Button
-							className="zoomButtons"
-							isPrimary
-							isLarge
-							onClick={ () => {
-								if ( minZoom === 0 ) {
-									attributeUpdater( 'min_zoom' )( 0.1 );
-								}
-								setZoomState( 'min_zoom' );
-							} }>
-							{ __( 'Min Zoom' ) }
-						</Button>
-						<Button
-							className="zoomButtons"
-							isPrimary
-							isLarge
-							onClick={ () => {
-								if ( maxZoom === 0 ) {
-									attributeUpdater( 'max_zoom' )( 0.1 );
-								}
-								setZoomState( 'max_zoom' );
-							} }>
-							{ __( 'Max Zoom' ) }
-						</Button>
+						<ButtonGroup
+							style={ { display: 'flex', flexDirection: 'column' } }
+						>
+							<Button
+								style={ {
+									color: initialButtonColor[ 0 ],
+									backgroundColor: initialButtonColor[ 1 ],
+									border: 0,
+								} }
+								onFocus={ () => setInitialButtonColor( [ '#007cba', '#fff' ] ) }
+								onBlur={ () => setInitialButtonColor( [ '#fff', '#007cba' ] ) }
+								className="zoomButtons"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									setZoomState( 'initial_zoom' );
+								} }>
+								{ __( 'Initial Zoom' ) }
+							</Button>
+							<Button
+								style={ {
+									color: minButtonColor[ 0 ],
+									backgroundColor: minButtonColor[ 1 ],
+									border: 0,
+								} }
+								onFocus={ () => setMinButtonColor( [ '#007cba', '#fff' ] ) }
+								onBlur={ () => setMinButtonColor( [ '#fff', '#007cba' ] ) }
+								className="zoomButtons"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									if ( minZoom === 0 ) {
+										attributeUpdater( 'min_zoom' )( 0.1 );
+									}
+									setZoomState( 'min_zoom' );
+								} }>
+								{ __( 'Min Zoom' ) }
+							</Button>
+							<Button
+								style={ {
+									color: maxButtonColor[ 0 ],
+									backgroundColor: maxButtonColor[ 1 ],
+									border: 0,
+								} }
+								onFocus={ () => setMaxButtonColor( [ '#007cba', '#fff' ] ) }
+								onBlur={ () => setMaxButtonColor( [ '#fff', '#007cba' ] ) }
+								className="zoomButtons"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									if ( maxZoom === 0 ) {
+										attributeUpdater( 'max_zoom' )( 0.1 );
+									}
+									setZoomState( 'max_zoom' );
+								} }>
+								{ __( 'Max Zoom' ) }
+							</Button>
+						</ButtonGroup>
 					</div>
 
 					<CheckboxControl
