@@ -1,7 +1,8 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-import { Fragment, useCallback, useState } from '@wordpress/element';
-import { Button, Dashicon } from '@wordpress/components';
+import { Fragment, useCallback, useState, useEffect } from '@wordpress/element';
+import { Button, Dashicon, ButtonGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
 import LayersSettingsModal from '../map-blocks/layers-settings-modal';
@@ -36,6 +37,26 @@ function MapsSidebar( {
 	const [ modal, setModal ] = useState( false );
 	const [ fullscreenModal, setFullscreenModal ] = useState( false );
 
+	const [ initialButtonSelected, setInitialButtonSelected ] = useState( true );
+	const [ minButtonSelected, setMinButtonSelected ] = useState( false );
+	const [ maxButtonSelected, setMaxButtonSelected ] = useState( false );
+
+	const [ initialButtonStyle, setInitialButtonStyle ] = useState( {
+		color: '#fff',
+		backgroundColor: '#007cba',
+		border: 0,
+	} );
+	const [ minButtonStyle, setMinButtonStyle ] = useState( {
+		color: '#000',
+		backgroundColor: '#fff',
+		border: 0,
+	} );
+	const [ maxButtonStyle, setMaxButtonStyle ] = useState( {
+		color: '#000',
+		backgroundColor: '#fff',
+		border: 0,
+	} );
+
 	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
 	const closeFullscreenModal = useCallback( () => setFullscreenModal( false ), [ setFullscreenModal ] );
@@ -57,6 +78,54 @@ function MapsSidebar( {
 
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = postMeta[ zoomState ];
+
+	useEffect( () => {
+		if ( initialButtonSelected ) {
+			setInitialButtonStyle( {
+				color: '#fff',
+				backgroundColor: '#007cba',
+				border: 0,
+			} );
+		} else {
+			setInitialButtonStyle( {
+				color: '#000',
+				backgroundColor: '#fff',
+				border: 0,
+			} );
+		}
+	}, [ initialButtonSelected ] );
+
+	useEffect( () => {
+		if ( minButtonSelected ) {
+			setMinButtonStyle( {
+				color: '#fff',
+				backgroundColor: '#007cba',
+				border: 0,
+			} );
+		} else {
+			setMinButtonStyle( {
+				color: '#000',
+				backgroundColor: '#fff',
+				border: 0,
+			} );
+		}
+	}, [ minButtonSelected ] );
+
+	useEffect( () => {
+		if ( maxButtonSelected ) {
+			setMaxButtonStyle( {
+				color: '#fff',
+				backgroundColor: '#007cba',
+				border: 0,
+			} );
+		} else {
+			setMaxButtonStyle( {
+				color: '#000',
+				backgroundColor: '#fff',
+				border: 0,
+			} );
+		}
+	}, [ maxButtonSelected ] );
 
 	return (
 		<Fragment>
@@ -102,11 +171,68 @@ function MapsSidebar( {
 			<MapPanel
 				attributes={ postMeta }
 				setAttributes={ setPostMeta }
-				setZoomState={ setZoomState }
 				renderPanel={ PluginDocumentSettingPanel }
 			/>
 			{ MapboxAPIKey && (
 				<MapPreviewPortal>
+					<div className="zoom-buttons-div">
+						<ButtonGroup
+							className="button-group-div"
+						>
+							<Button
+								style={ initialButtonStyle }
+								className="zoom-button"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									setZoomState( 'initial_zoom' );
+									setInitialButtonSelected( true );
+									setMinButtonSelected( false );
+									setMaxButtonSelected( false );
+								} }
+							>
+								{ __( 'Initial Zoom' ) }
+							</Button>
+							<Button
+								style={ minButtonStyle }
+								className="zoom-button"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									if ( postMeta.min_zoom <= 0 ) {
+										setPostMeta( {
+											min_zoom: 0.1,
+										} );
+									}
+									setZoomState( 'min_zoom' );
+									setInitialButtonSelected( false );
+									setMinButtonSelected( true );
+									setMaxButtonSelected( false );
+								} }
+							>
+								{ __( 'Min Zoom' ) }
+							</Button>
+							<Button
+								style={ maxButtonStyle }
+								className="zoom-button"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									if ( postMeta.max_zoom <= 0 ) {
+										setPostMeta( {
+											max_zoom: 0.1,
+										} );
+									}
+									setZoomState( 'max_zoom' );
+									setInitialButtonSelected( false );
+									setMinButtonSelected( false );
+									setMaxButtonSelected( true );
+								} }
+							>
+								{ __( 'Max Zoom' ) }
+							</Button>
+						</ButtonGroup>
+					</div>
 					<Map
 						key={ currentZoom }
 						style="mapbox://styles/mapbox/streets-v11"
