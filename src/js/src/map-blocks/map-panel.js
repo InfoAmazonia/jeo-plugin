@@ -11,7 +11,7 @@ const mapDefaults = {
 	max_zoom: 20,
 };
 
-export default function MapPanel( { attributes, setAttributes, setZoomState, renderPanel: Panel } ) {
+export default function MapPanel( { attributes, setAttributes, renderPanel: Panel } ) {
 	useEffect( () => {
 		const isNewMap = [ 'initial_zoom', 'center_lat', 'center_lon', 'min_zoom', 'max_zoom' ].every( ( key ) => {
 			return ! attributes[ key ];
@@ -24,7 +24,7 @@ export default function MapPanel( { attributes, setAttributes, setZoomState, ren
 
 	return (
 		<Panel name="map-settings" title={ __( 'Map settings' ) } className="jeo-map-panel">
-			<MapSettings attributes={ attributes } setAttributes={ setAttributes } setZoomState={ setZoomState } />
+			<MapSettings attributes={ attributes } setAttributes={ setAttributes } />
 		</Panel>
 	);
 }
