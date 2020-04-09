@@ -1,0 +1,38 @@
+version: '2'
+
+services:
+  wordpress:
+    image: wordpress
+    depends_on:
+      - mariadb
+    ports:
+      - 8001:80
+    environment:
+      WORDPRESS_DB_HOST: mariadb
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+      WORDPRESS_DEBUG: 'true'
+    volumes:
+      - ./src:/var/www/html/wp-content/plugins/wp-jeo
+      - ./jeo-google-geocoder:/var/www/html/wp-content/plugins/jeo-google-geocoder
+
+  mariadb:
+    image: mariadb:10.4
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./docker/mariadb/data:/docker-entrypoint-initdb.d
+    environment:
+      MYSQL_ROOT_PASSWORD: therootpassword
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+
+  watcher:
+    build:
+      context: .
+      dockerfile: ./docker/watcher/Dockerfile
+    volumes:
+      - ./:/app
+
+volumes:
+  mariadb_data:
