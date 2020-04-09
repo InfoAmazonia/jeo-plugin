@@ -30,6 +30,8 @@ class JeoMap {
 
 				map.setCenter( [ this.getArg( 'center_lon' ), this.getArg( 'center_lat' ) ] );
 
+				map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+
 				if ( this.getArg( 'disable_scroll_zoom' ) ) {
 					map.scrollZoom.disable();
 				}
