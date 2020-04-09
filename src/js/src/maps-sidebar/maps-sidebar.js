@@ -6,7 +6,6 @@ import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
 import LayersSettingsModal from '../map-blocks/layers-settings-modal';
-import MapFullscreenModal from '../map-blocks/fullscreen-map-modal';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import MapPanel from '../map-blocks/map-panel';
 import MapEmbedUrl from './map-embed-url';
@@ -35,7 +34,6 @@ function MapsSidebar( {
 	setRelatedPosts,
 } ) {
 	const [ modal, setModal ] = useState( false );
-	const [ fullscreenModal, setFullscreenModal ] = useState( false );
 
 	const [ initialButtonSelected, setInitialButtonSelected ] = useState( true );
 	const [ minButtonSelected, setMinButtonSelected ] = useState( false );
@@ -59,8 +57,6 @@ function MapsSidebar( {
 
 	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
-	const closeFullscreenModal = useCallback( () => setFullscreenModal( false ), [ setFullscreenModal ] );
-	const openFullscreenModal = useCallback( () => setFullscreenModal( true ), [ setFullscreenModal ] );
 
 	const loadLayer = useCallback( layerLoader( loadedLayers ), [ loadedLayers ] );
 
@@ -136,31 +132,6 @@ function MapsSidebar( {
 					setAttributes={ setPostMeta }
 					loadedLayers={ loadedLayers }
 					loadingLayers={ loadingLayers }
-				/>
-			) }
-
-			{ fullscreenModal && (
-				<MapFullscreenModal
-					key={ currentZoom }
-					closeModal={ closeFullscreenModal }
-					loadedLayers={ loadedLayers }
-					style="mapbox://styles/mapbox/streets-v11"
-					containerStyle={ { height: '90%', width: '100%' } }
-					zoom={ [ currentZoom || 11 ] }
-					center={ [ centerLon || 0, centerLat || 0 ] }
-					animationOptions={ animationOptions }
-					onMoveEnd={ ( map ) => {
-						const center = map.getCenter();
-						const zoom = Math.round( map.getZoom() * 10 ) / 10;
-
-						setPostMeta( {
-							center_lat: center.lat,
-							center_lon: center.lng,
-							[ zoomState ]: zoom,
-						} );
-					} }
-					renderLayer={ renderLayer }
-					postMeta={ postMeta }
 				/>
 			) }
 
@@ -287,13 +258,6 @@ function MapsSidebar( {
 						} }
 					>
 						<Dashicon icon="minus" />
-					</Button>
-					<Button
-						isLarge
-						isLink
-						onClick={ openFullscreenModal }
-					>
-						<Dashicon icon="editor-expand" />
 					</Button>
 				</MapPreviewPortal>
 			) }
