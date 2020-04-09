@@ -5,8 +5,6 @@ services:
     image: wordpress
     depends_on:
       - mariadb
-    ports:
-      - 8001:80
     environment:
       WORDPRESS_DB_HOST: mariadb
       WORDPRESS_DB_USER: wordpress
