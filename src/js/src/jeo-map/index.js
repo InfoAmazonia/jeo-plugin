@@ -422,47 +422,54 @@ class JeoMap {
 	}
 
 	addLayersControl() {
-		const layerSelectionTitle = document.createElement( 'div' );
-		layerSelectionTitle.classList.add( 'layer-selection-title' );
-
-		const legendsTitle = document.createElement( 'div' );
-		legendsTitle.classList.add( 'legends-title' );
-
-		const legendTextIcon = document.createElement( 'div' );
-		legendTextIcon.classList.add( 'text-icon' );
-
-		const layerIcon = document.createElement( 'i' );
-		layerIcon.classList.add( 'layer-icon' );
-
-		legendTextIcon.appendChild( layerIcon );
-		legendTextIcon.innerHTML += '<span class="text"> Layers </span>';
-
-		legendsTitle.appendChild( legendTextIcon );
-
-		const legendsHideIcon = document.createElement( 'i' );
-		legendsHideIcon.classList.add( 'arrow-icon', 'active' );
-
-		legendsTitle.appendChild( legendsHideIcon );
-		layerSelectionTitle.appendChild( legendsTitle );
+		const switchableLayers = this.getSwitchableLayers();
+		const swappableLayers = this.getSwappableLayers();
 
 		const navElement = document.createElement( 'nav' );
 		navElement.classList.add( 'layers-selection' );
-		navElement.appendChild( layerSelectionTitle );
 
-		legendsHideIcon.addEventListener( 'click', ( ) => {
-			if ( legendsHideIcon.classList.contains( 'active' ) ) {
-				legendsHideIcon.classList.remove( 'active' );
-				jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
-			} else {
-				legendsHideIcon.classList.add( 'active' );
-				jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
-			}
-		} );
+		console.log(switchableLayers.length + swappableLayers.length >= 0)
+		if ( switchableLayers.length + swappableLayers.length !== 0 ) {
+			const layerSelectionTitle = document.createElement( 'div' );
+			layerSelectionTitle.classList.add( 'layer-selection-title' );
+
+			const legendsTitle = document.createElement( 'div' );
+			legendsTitle.classList.add( 'legends-title' );
+
+			const legendTextIcon = document.createElement( 'div' );
+			legendTextIcon.classList.add( 'text-icon' );
+
+			const layerIcon = document.createElement( 'i' );
+			layerIcon.classList.add( 'layer-icon' );
+
+			legendTextIcon.appendChild( layerIcon );
+			legendTextIcon.innerHTML += '<span class="text"> Layers </span>';
+
+			legendsTitle.appendChild( legendTextIcon );
+
+			const legendsHideIcon = document.createElement( 'i' );
+			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
+
+			legendsTitle.appendChild( legendsHideIcon );
+			layerSelectionTitle.appendChild( legendsTitle );
+
+			legendsHideIcon.addEventListener( 'click', ( ) => {
+				if ( legendsHideIcon.classList.contains( 'active' ) ) {
+					legendsHideIcon.classList.remove( 'active' );
+					jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
+				} else {
+					legendsHideIcon.classList.add( 'active' );
+					jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
+				}
+			} );
+
+			navElement.appendChild( layerSelectionTitle );
+		}
 
 		const layers = document.createElement( 'div' );
 		layers.classList.add( 'layers-wrapper' );
 
-		this.getSwitchableLayers().forEach( ( index ) => {
+		switchableLayers.forEach( ( index ) => {
 			const link = document.createElement( 'a' );
 			link.href = '#';
 			if ( this.layersDefinitions[ index ].default ) {
@@ -494,7 +501,7 @@ class JeoMap {
 
 		navElement.appendChild( layers );
 
-		this.getSwappableLayers().forEach( ( index ) => {
+		swappableLayers.forEach( ( index ) => {
 			const link = document.createElement( 'a' );
 			link.href = '#';
 			link.classList.add( 'switchable' );
