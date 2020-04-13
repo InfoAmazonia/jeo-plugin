@@ -20,9 +20,18 @@ const PostsSelector = ( {
 } ) => {
 	const [ relatedPostsData, setRelatedPostsData ] = useState( [] );
 	const [ showRelatedPosts, setShowRelatedPosts ] = useState( false );
+	const [ showAllPosts, setShowAllPosts ] = useState( false );
+	const [ allPosts, setAllPosts ] = useState( [] );
 
 	const [ showDateInterval, setShowDateInterval ] = useState( true );
 	const [ intervalButtonMessage, setIntervalButtonMessage ] = useState( __( 'Remove Date Interval' ) );
+
+	useEffect( () => {
+		jQuery.get(
+			'/wp-json/wp/v2/posts',
+			( response ) => setAllPosts( response )
+		);
+	}, [] );
 
 	useEffect( () => {
 		/* relatedPosts is often nullish if schema doesn't match */
@@ -119,6 +128,7 @@ const PostsSelector = ( {
 					setRelatedPosts( { ...relatedPosts, meta_query: queries } );
 				} }
 			/>
+
 			<CheckboxControl
 				className="related-posts-checkbox"
 				label={ __( 'Show related posts' ) }
@@ -127,7 +137,6 @@ const PostsSelector = ( {
 					setShowRelatedPosts( ! showRelatedPosts );
 				} }
 			/>
-
 			{ showRelatedPosts && (
 				<ol>
 					{ relatedPostsData.map( ( relatedPost ) => {
@@ -135,6 +144,28 @@ const PostsSelector = ( {
 							<li className="jeo-setting-related-post" key={ relatedPost.id }>
 								<h2>
 									<a href={ relatedPost.link } rel="noopener noreferrer" target="_blank">{ relatedPost.title.rendered }</a>
+								</h2>
+							</li>
+						);
+					} ) }
+				</ol>
+			) }
+
+			<CheckboxControl
+				className="related-posts-checkbox"
+				label={ __( 'Show all posts' ) }
+				checked={ showAllPosts }
+				onChange={ () => {
+					setShowAllPosts( ! showAllPosts );
+				} }
+			/>
+			{ showAllPosts && (
+				<ol>
+					{ allPosts.map( ( post ) => {
+						return (
+							<li className="jeo-setting-related-post" key={ post.id }>
+								<h2>
+									<a href={ post.link } rel="noopener noreferrer" target="_blank">{ post.title.rendered }</a>
 								</h2>
 							</li>
 						);
