@@ -231,14 +231,25 @@ function MapsSidebar( {
 						isLarge
 						isLink
 						onClick={ () => {
-							let increment = 0.5;
-							if ( initialZoom + 0.5 > 20 ) {
-								increment = initialZoom - 20;
+							const increment = 0.5;
+							let newValue = postMeta[ zoomState ] + increment;
+							if ( newValue > 20 ) {
+								newValue = 20;
 							}
 
-							setPostMeta( {
-								initial_zoom: initialZoom + increment,
-							} );
+							if ( zoomState === 'initial_zoom' ) {
+								setPostMeta( {
+									initial_zoom: newValue,
+								} );
+							} else if ( zoomState === 'min_zoom' ) {
+								setPostMeta( {
+									min_zoom: newValue,
+								} );
+							} else if ( zoomState === 'max_zoom' ) {
+								setPostMeta( {
+									max_zoom: newValue,
+								} );
+							}
 						} }
 					>
 						<Dashicon icon="plus" />
@@ -247,14 +258,25 @@ function MapsSidebar( {
 						isLarge
 						isLink
 						onClick={ () => {
-							let decrement = 0.5;
-							if ( initialZoom - 0.5 <= 0 ) {
-								decrement = 0;
+							const decrement = 0.5;
+							let newValue = postMeta[ zoomState ] - decrement;
+							if ( newValue <= 0 ) {
+								newValue = 0.1;
 							}
 
-							setPostMeta( {
-								initial_zoom: initialZoom - decrement,
-							} );
+							if ( zoomState === 'initial_zoom' ) {
+								setPostMeta( {
+									initial_zoom: newValue,
+								} );
+							} else if ( zoomState === 'min_zoom' ) {
+								setPostMeta( {
+									min_zoom: newValue,
+								} );
+							} else if ( zoomState === 'max_zoom' ) {
+								setPostMeta( {
+									max_zoom: newValue,
+								} );
+							}
 						} }
 					>
 						<Dashicon icon="minus" />
