@@ -37,6 +37,11 @@ class JeoLayer {
 	get options() {
 		return this.attributes.layer_type_options;
 	}
+
+	get source_url() {
+		return this.attributes.source_url;
+	}
+
 }
 
 window.JeoLayer = JeoLayer;
