@@ -9,6 +9,7 @@ import InteractionsSettings from './interactions-settings';
 const layerSchema = {
 	type: 'object',
 	properties: {
+		source_url: { title: __( 'Map source url download link' ), type: 'string' },
 		attribution: { title: __( 'Map attribution link' ), type: 'string' },
 		type: { title: __( 'Type' ), type: 'string' },
 	},
