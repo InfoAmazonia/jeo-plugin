@@ -15,13 +15,12 @@ export function IntervalSelector( {
 	onEndChange,
 } ) {
 	const startDate = useMemo( () => {
-		return _startDate ? new Date( _startDate ) : new Date();
+		return _startDate ? new Date( _startDate ) : null;
 	}, [ _startDate ] );
 
 	const endDate = useMemo( () => {
-		return _endDate ? new Date( _endDate ) : new Date();
+		return _endDate ? new Date( _endDate ) : null;
 	}, [ _endDate ] );
-
 	return (
 		<div className="jeo-interval-selector">
 			<PanelRow>
