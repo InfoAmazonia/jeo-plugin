@@ -1,7 +1,7 @@
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl, Button } from '@wordpress/components';
+import { CheckboxControl } from '@wordpress/components';
 
 import { IntervalSelector } from './interval-selector';
 import { MetaSelector } from './meta-selector';
@@ -17,166 +17,113 @@ const PostsSelector = ( {
 	relatedPosts,
 	setRelatedPosts,
 	renderPanel: Panel,
+	postMeta,
+	setPostMeta,
 } ) => {
-	const [ relatedPostsData, setRelatedPostsData ] = useState( [] );
-	const [ showRelatedPosts, setShowRelatedPosts ] = useState( false );
-	const [ showAllPosts, setShowAllPosts ] = useState( false );
-	const [ allPosts, setAllPosts ] = useState( [] );
-
-	const [ showDateInterval, setShowDateInterval ] = useState( true );
-	const [ intervalButtonMessage, setIntervalButtonMessage ] = useState( __( 'Remove Date Interval' ) );
+// { before: '0001-01-01T03:06:28.000Z' }
+	const [ relatedPostsData, setRelatedPostsData ] = useState( relatedPosts );
 
 	useEffect( () => {
-		jQuery.get(
-			'/wp-json/wp/v2/posts',
-			( response ) => setAllPosts( response )
-		);
-	}, [] );
-
-	useEffect( () => {
-		/* relatedPosts is often nullish if schema doesn't match */
-		if ( ! relatedPosts ) {
-			setRelatedPosts( {} );
+		if ( ! postMeta.show_all_posts && ( relatedPosts.length == 0 || ! relatedPosts ) ) {
+			setRelatedPosts( { before: '0001-01-01T03:06:28.000Z' } );
 		}
-	}, [ relatedPosts, setRelatedPosts ] );
-
-	useEffect( () => {
-		const { categories, after, before, tags } = relatedPosts;
-		const data = { categories, after, before, tags };
-		for ( let item in data ) {
-			if ( ! data[ `${ item }` ] || data[ `${ item }` ].length === 0 ) {
-				delete data[ `${ item }` ];
-			}
-		}
-
-		if ( ! showDateInterval ) {
-			delete data[ 'after' ];
-			delete data[ 'before' ];
-		}
-
-		if ( Object.keys( data ).length === 0 ) {
-			setRelatedPostsData( [] );
-		} else {
-			jQuery.get(
-				'/wp-json/wp/v2/posts',
-				data,
-				( response ) => setRelatedPostsData( response )
-			);
-		}
-	}, [ showDateInterval, showRelatedPosts, relatedPosts ] );
+	}, [ relatedPosts ] );
 
 	return (
 		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
-			{ loadedCategories && (
-				<TokensSelector
-					label={ __( 'Categories' ) }
-					collection={ loadedCategories }
-					loadingCollection={ loadingCategories }
-					value={ relatedPosts.categories }
-					onChange={ ( tokens ) => {
-						setRelatedPosts( { ...relatedPosts, categories: tokens } );
-					} }
-				/>
-			) }
+			<CheckboxControl
+				className="related-posts-checkbox"
+				label={ __( 'Relate all posts' ) }
+				checked={ postMeta.show_all_posts }
+				onChange={ () => {
+					setPostMeta( {
+						...postMeta,
+						show_all_posts: ! postMeta.show_all_posts,
+					} );
 
-			{ loadedTags && (
-				<TokensSelector
-					label={ __( 'Tags' ) }
-					collection={ loadedTags }
-					loadingCollection={ loadingTags }
-					value={ relatedPosts.tags }
-					onChange={ ( tokens ) => {
-						setRelatedPosts( { ...relatedPosts, tags: tokens } );
-					} }
-				/>
-			) }
-
-			{ showDateInterval && (
-				<IntervalSelector
-					startDate={ relatedPosts.after }
-					endDate={ relatedPosts.before }
-					startLabel={ __( 'Start date', 'jeo' ) }
-					endLabel={ __( 'End date', 'jeo' ) }
-					onStartChange={ ( date ) => {
-						setRelatedPosts( { ...relatedPosts, after: date ? date.toISOString() : undefined } );
-					} }
-					onEndChange={ ( date ) => {
-						setRelatedPosts( { ...relatedPosts, before: date ? date.toISOString() : undefined } );
-					} }
-				/>
-			) }
-			<Button
-				className="date-interval-button"
-				isPrimary
-				isLarge
-				onClick={ () => {
-					if ( showDateInterval ) {
-						setIntervalButtonMessage( __( 'Add Date Interval' ) );
+					if ( ! postMeta.show_all_posts ) {
+						setRelatedPosts( {} );
 					} else {
-						setIntervalButtonMessage( __( 'Remove Date Interval' ) );
+						setRelatedPosts( relatedPostsData );
 					}
-					setShowDateInterval( ! showDateInterval );
-				} }
-			>
-				{ intervalButtonMessage }
-			</Button>
-
-			<MetaSelector
-				label={ __( 'Meta queries', 'jeo' ) }
-				value={ relatedPosts.meta_query }
-				onChange={ ( queries ) => {
-					setRelatedPosts( { ...relatedPosts, meta_query: queries } );
 				} }
 			/>
 
-			<CheckboxControl
-				className="related-posts-checkbox"
-				label={ __( 'Show related posts' ) }
-				checked={ showRelatedPosts }
-				onChange={ () => {
-					setShowRelatedPosts( ! showRelatedPosts );
-				} }
-			/>
-			{ showRelatedPosts && (
-				<ol>
-					{ relatedPostsData.map( ( relatedPost ) => {
-						return (
-							<li className="jeo-setting-related-post" key={ relatedPost.id }>
-								<h2>
-									<a href={ relatedPost.link } rel="noopener noreferrer" target="_blank">{ relatedPost.title.rendered }</a>
-								</h2>
-							</li>
-						);
-					} ) }
-				</ol>
-			) }
+			{ ! postMeta.show_all_posts && (
+				<>
+					{ loadedCategories && (
+						<TokensSelector
+							label={ __( 'Categories' ) }
+							collection={ loadedCategories }
+							loadingCollection={ loadingCategories }
+							value={ relatedPostsData.categories }
+							onChange={ ( tokens ) => {
+								if ( ! postMeta.show_all_posts ) {
+									setRelatedPosts( { ...relatedPosts, categories: tokens } );
+								}
+								setRelatedPostsData( { ...relatedPostsData, categories: tokens } );
+							} }
+						/>
+					) }
 
-			<CheckboxControl
-				className="related-posts-checkbox"
-				label={ __( 'Show all posts' ) }
-				checked={ showAllPosts }
-				onChange={ () => {
-					setShowAllPosts( ! showAllPosts );
-				} }
-			/>
-			{ showAllPosts && (
-				<ol>
-					{ allPosts.map( ( post ) => {
-						return (
-							<li className="jeo-setting-related-post" key={ post.id }>
-								<h2>
-									<a href={ post.link } rel="noopener noreferrer" target="_blank">{ post.title.rendered }</a>
-								</h2>
-							</li>
-						);
-					} ) }
-				</ol>
+					{ loadedTags && (
+						<TokensSelector
+							label={ __( 'Tags' ) }
+							collection={ loadedTags }
+							loadingCollection={ loadingTags }
+							value={ relatedPostsData.tags }
+							onChange={ ( tokens ) => {
+								if ( ! postMeta.show_all_posts ) {
+									setRelatedPosts( { ...relatedPosts, tags: tokens } );
+								}
+								setRelatedPostsData( { ...relatedPostsData, tags: tokens } );
+							} }
+						/>
+					) }
+
+					<IntervalSelector
+						startDate={ relatedPostsData.after }
+						endDate={ relatedPostsData.before }
+						startLabel={ __( 'Start date', 'jeo' ) }
+						endLabel={ __( 'End date', 'jeo' ) }
+						onStartChange={ ( date ) => {
+							if ( ! postMeta.show_all_posts ) {
+								console.log(relatedPosts)
+								setRelatedPosts( { ...relatedPosts, after: date ? date.toISOString() : undefined } );
+							}
+							setRelatedPostsData( { ...relatedPostsData, after: date ? date.toISOString() : undefined } );
+						} }
+						onEndChange={ ( date ) => {
+							if ( ! postMeta.show_all_posts ) {
+								setRelatedPosts( { ...relatedPosts, before: date ? date.toISOString() : undefined } );
+							}
+							setRelatedPostsData( { ...relatedPostsData, before: date ? date.toISOString() : undefined } );
+						} }
+					/>
+
+					<MetaSelector
+						label={ __( 'Meta queries', 'jeo' ) }
+						value={ relatedPostsData.meta_query }
+						onChange={ ( queries ) => {
+							if ( ! postMeta.show_all_posts ) {
+								setRelatedPosts( { ...relatedPosts, meta_query: queries } );
+							}
+							setRelatedPostsData( { ...relatedPostsData, meta_query: queries } );
+						} }
+					/>
+				</>
 			) }
 		</Panel>
 	);
 };
 
-export default withSelect(
+export default withDispatch(
+	( dispatch ) => ( {
+		setPostMeta: ( meta ) => {
+			dispatch( 'core/editor' ).editPost( { meta } );
+		},
+	} )
+)( withSelect(
 	( select ) => ( {
 		loadedCategories: select( 'core' ).getEntityRecords( 'taxonomy', 'category' ),
 		loadingCategories: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
@@ -188,5 +135,6 @@ export default withSelect(
 			'taxonomy',
 			'post_tag',
 		] ),
+		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
 	} )
-)( PostsSelector );
+)( PostsSelector ) );
