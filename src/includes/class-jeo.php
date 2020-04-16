@@ -111,11 +111,11 @@ class Jeo {
 			'jeo_settings',
 			array(
 				'site_url' => get_site_url(),
-				'mapbox_key' => \jeo_settings()->get_option( 'mapbox_key' ),
+				'mapbox_key' => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' )),
 				'map_defaults' => [
-					'zoom' => \jeo_settings()->get_option( 'map_default_zoom' ),
-					'lat' => \jeo_settings()->get_option( 'map_default_lat' ),
-					'lng' => \jeo_settings()->get_option( 'map_default_lng' ),
+					'zoom' => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
+					'lat' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
+					'lng' => sanitize_text_field ( \jeo_settings()->get_option( 'map_default_lng' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
 				]
@@ -214,13 +214,13 @@ class Jeo {
 
 		if( get_query_var( 'jeo_embed' ) === 'map' ) {
 
-			$map_id = isset( $_GET['map_id'] ) ? $_GET['map_id'] : false;
+			$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( $_GET['map_id'] ) : false;
 
 			if ( $map_id ) {
 
-				$full_width = isset( $_GET['width'] ) ? $_GET['width'] : 820;
+				$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
 				$map_width = $full_width ? $full_width - 220 : 600;
-				$height = isset( $_GET['height'] ) ? $_GET['height'] : 600;
+				$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( $_GET['height'] ) : 600;
 
 				$map_style = "width: ${map_width}px; height: ${height}px;";
 				$container_style = "width: ${full_width}px; height: ${height}px;";

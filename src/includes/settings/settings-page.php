@@ -19,28 +19,28 @@
 					<tr>
 						<th scope="row"><label for="map_default_lat"><?php _e('Default map latitute', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo $this->get_field_name('map_default_lat'); ?>" type="number" step=".1" id="map_default_lat" value="<?php echo htmlspecialchars( $this->get_option('map_default_lat') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('map_default_lat') ); ?>" type="number" step=".1" id="map_default_lat" value="<?php echo esc_html( $this->get_option('map_default_lat') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="map_default_lng"><?php _e('Default map longitude', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo $this->get_field_name('map_default_lng'); ?>" type="number" step=".1" id="map_default_lng" value="<?php echo htmlspecialchars( $this->get_option('map_default_lng') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('map_default_lng') ); ?>" type="number" step=".1" id="map_default_lng" value="<?php echo esc_html( $this->get_option('map_default_lng') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="map_default_zoom"><?php _e('Default map zoom', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo $this->get_field_name('map_default_zoom'); ?>" type="number" id="map_default_zoom" value="<?php echo htmlspecialchars( $this->get_option('map_default_zoom') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('map_default_zoom') ); ?>" type="number" id="map_default_zoom" value="<?php echo esc_html( $this->get_option('map_default_zoom') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="mapbox_key"><?php _e('Mapbox API Key', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo $this->get_field_name('mapbox_key'); ?>" type="text" id="mapbox_key" value="<?php echo htmlspecialchars( $this->get_option('mapbox_key') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('mapbox_key') ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option('mapbox_key') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -58,12 +58,12 @@
 				<tr>
 					<th scope="row"><label for="active_geocoder_select"><?php _e('Active Geocoder', 'jeo'); ?></label></th>
 					<td>
-						<select name="<?php echo $this->get_field_name('active_geocoder'); ?>" id="active_geocoder_select">
+						<select name="<?php echo esc_html( $this->get_field_name('active_geocoder') ); ?>" id="active_geocoder_select">
 
 							<?php foreach ( jeo_geocode_handler()->get_registered_geocoders() as $geocoder ): ?>
 
-								<option selected="<?php selected( $this->get_option('active_geocoder'), $geocoder['slug'] ); ?>" value="<?php echo $geocoder['slug']; ?>">
-									<?php echo $geocoder['name']; ?>
+								<option selected="<?php selected( $this->get_option('active_geocoder'), $geocoder['slug'] ); ?>" value="<?php echo esc_html( $geocoder['slug'] ); ?>">
+									<?php echo esc_html( $geocoder['name']); ?>
 								</option>
 
 							<?php endforeach; ?>
@@ -85,12 +85,12 @@
 						</th>
 						<td>
 							<?php foreach ( $geoObject->get_settings() as $settings ): ?>
-								<label for="<?php echo $settings['slug']; ?>">
-									<strong><?php echo $settings['name']; ?></strong> <br/>
+								<label for="<?php echo esc_html( $settings['slug'] ); ?>">
+									<strong><?php echo esc_html( $settings['name'] ); ?></strong> <br/>
 								</label>
-								<input name="<?php echo $this->get_geocoder_option_field_name($gslug, $settings['slug']); ?>" type="text" id="<?php echo $settings['slug']; ?>" value="<?php echo htmlspecialchars( $this->get_geocoder_option($gslug, $settings['slug']) ); ?>" class="regular-text">
+								<input name="<?php echo esc_html( $this->get_geocoder_option_field_name($gslug, $settings['slug']) ); ?>" type="text" id="<?php echo esc_html( $settings['slug'] ); ?>" value="<?php echo esc_html( $this->get_geocoder_option($gslug, $settings['slug']) ); ?>" class="regular-text">
 								<p class="description">
-								<?php echo $settings['description']; ?>
+								<?php echo esc_html( $settings['description'] ); ?>
 								</p>
 							<?php endforeach; ?>
 
