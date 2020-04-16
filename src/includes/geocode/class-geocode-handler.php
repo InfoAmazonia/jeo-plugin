@@ -36,7 +36,7 @@ class Geocode_Handler {
 		$geocoder = $this->get_active_geocoder();
 
 		if ($geocoder) {
-			echo json_encode( $geocoder->geocode( $_GET['search'] ) );
+			echo json_encode( $geocoder->geocode( sanitize_text_field( $_GET['search'] ) ) );
 		} else {
 			echo json_encode([]);
 		}
@@ -50,7 +50,7 @@ class Geocode_Handler {
 		$geocoder = $this->get_active_geocoder();
 
 		if ($geocoder) {
-			echo json_encode( $geocoder->reverse_geocode( $_GET['lat'], $_GET['lon'] ) );
+			echo json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
 		} else {
 			echo json_encode([]);
 		}
