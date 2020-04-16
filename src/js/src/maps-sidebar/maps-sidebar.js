@@ -72,6 +72,7 @@ function MapsSidebar( {
 		animate: false,
 	};
 
+	const [ key, setKey ] = useState( 0 );
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = postMeta[ zoomState ];
 
@@ -160,6 +161,7 @@ function MapsSidebar( {
 									setInitialButtonSelected( true );
 									setMinButtonSelected( false );
 									setMaxButtonSelected( false );
+									setKey( key + 1 );
 								} }
 							>
 								{ __( 'Initial Zoom' ) }
@@ -179,6 +181,7 @@ function MapsSidebar( {
 									setInitialButtonSelected( false );
 									setMinButtonSelected( true );
 									setMaxButtonSelected( false );
+									setKey( key + 1 );
 								} }
 							>
 								{ __( 'Min Zoom' ) }
@@ -198,6 +201,7 @@ function MapsSidebar( {
 									setInitialButtonSelected( false );
 									setMinButtonSelected( false );
 									setMaxButtonSelected( true );
+									setKey( key + 1 );
 								} }
 							>
 								{ __( 'Max Zoom' ) }
@@ -205,7 +209,10 @@ function MapsSidebar( {
 						</ButtonGroup>
 					</div>
 					<Map
-						key={ currentZoom }
+						onStyleLoad={ ( map ) => {
+							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+						} }
+						key={ key }
 						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '100%' } }
 						zoom={ [ currentZoom || initialZoom ] }
