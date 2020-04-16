@@ -41,6 +41,9 @@ function LayersSidebar( {
 			{ MapboxAPIKey && (
 				<LayerPreviewPortal>
 					<Map
+						onStyleLoad={ ( map ) => {
+							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+						} }
 						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '100%' } }
 						zoom={ [ initialZoom || 11 ] }
