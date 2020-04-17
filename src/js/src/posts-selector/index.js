@@ -20,13 +20,29 @@ const PostsSelector = ( {
 	postMeta,
 	setPostMeta,
 } ) => {
-// { before: '0001-01-01T03:06:28.000Z' }
 	const [ relatedPostsData, setRelatedPostsData ] = useState( relatedPosts );
 
 	useEffect( () => {
-		if ( ! postMeta.show_all_posts && ( relatedPosts.length == 0 || ! relatedPosts ) ) {
-			setRelatedPosts( { before: '0001-01-01T03:06:28.000Z' } );
+		const { categories, tags, meta_query, before, after } = relatedPosts;
+
+		if ( relatedPostsData.before == '0001-01-01T03:06:28.000Z' ) {
+			delete relatedPostsData.before;
 		}
+
+		if ( ! postMeta.show_all_posts && ( ! categories || categories.length == 0 ) && ( ! tags || tags.length == 0 ) && ( ! meta_query || meta_query.length == 0 ) && ( ! after ) ) {
+			if ( ! before ) {
+				setRelatedPosts( { before: '0001-01-01T03:06:28.000Z' } );
+			}
+		} else if ( ! postMeta.show_all_posts ) {
+			const filters = relatedPosts;
+			if ( before == '0001-01-01T03:06:28.000Z' ) {
+				delete filters.before;
+			}
+			if ( relatedPosts != filters ) {
+				setRelatedPosts( filters );
+			}
+		}
+
 	}, [ relatedPosts ] );
 
 	return (
@@ -88,7 +104,6 @@ const PostsSelector = ( {
 						endLabel={ __( 'End date', 'jeo' ) }
 						onStartChange={ ( date ) => {
 							if ( ! postMeta.show_all_posts ) {
-								console.log(relatedPosts)
 								setRelatedPosts( { ...relatedPosts, after: date ? date.toISOString() : undefined } );
 							}
 							setRelatedPostsData( { ...relatedPostsData, after: date ? date.toISOString() : undefined } );
