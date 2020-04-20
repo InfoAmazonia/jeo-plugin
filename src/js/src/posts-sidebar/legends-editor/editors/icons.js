@@ -130,16 +130,24 @@ class IconItem extends Component {
 			<div className="icon-item">
 				<MediaUpload
 					onSelect={ ( value ) => {
-						this.setState( {
-							iconData: {
-								...this.state.iconData,
-								icon: value.url,
-							},
-						}, this.iconUpdate( this.state.iconData.label, value.url ) );
+						let image = new Image();
+						image.src = value.url;
+						image.onload = () => {
+							if ( image.width >= 60 && image.height >= 60 ) {
+								this.setState( {
+									iconData: {
+										...this.state.iconData,
+										icon: value.url,
+									},
+								}, this.iconUpdate( this.state.iconData.label, value.url ) );
+							} else {
+								image = null;
+								alert( __( 'Minimum size: 60x60' ) );
+							}
+						};
 					} }
 
 					render={ ( { open } ) => {
-						console.log(this.state.iconData)
 						return (
 							<div className="content-wrapper">
 								<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
