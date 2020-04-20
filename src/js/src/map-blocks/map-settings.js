@@ -36,6 +36,10 @@ export default ( { attributes, setAttributes } ) => {
 
 	const editingMap = useRef( false );
 
+	window.initial_zoom = initialZoom;
+	window.min_zoom = minZoom;
+	window.max_zoom = maxZoom;
+
 	return (
 		<Fragment>
 			<form className="jeo-map-settings">
@@ -71,25 +75,34 @@ export default ( { attributes, setAttributes } ) => {
 						max={ maxZoom }
 						step={ 0.1 }
 						value={ initialZoom }
-						onChange={ attributeUpdater( 'initial_zoom' ) }
+						onChange={ ( value ) => {
+							window.initial_zoom = value;
+							attributeUpdater( 'initial_zoom' )( value );
+						} }
 					/>
 					<RangeControl
 						label={ __( 'Min zoom' ) }
 						initialPosition={ 0 }
 						min={ 0 }
-						max={ 20 }
+						max={ initialZoom }
 						step={ 0.1 }
 						value={ minZoom }
-						onChange={ attributeUpdater( 'min_zoom' ) }
+						onChange={ ( value ) => {
+							window.min_zoom = value;
+							attributeUpdater( 'min_zoom' )( value );
+						} }
 					/>
 					<RangeControl
 						label={ __( 'Max zoom' ) }
 						initialPosition={ 20 }
-						min={ 0 }
+						min={ initialZoom }
 						max={ 20 }
 						step={ 0.1 }
 						value={ maxZoom }
-						onChange={ attributeUpdater( 'max_zoom' ) }
+						onChange={ ( value ) => {
+							window.max_zoom = value;
+							attributeUpdater( 'max_zoom' )( value );
+						} }
 					/>
 					<CheckboxControl
 						label={ __( 'Disable Zoom on Post' ) }

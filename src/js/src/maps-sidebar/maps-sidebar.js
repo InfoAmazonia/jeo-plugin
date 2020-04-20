@@ -220,13 +220,34 @@ function MapsSidebar( {
 						animationOptions={ animationOptions }
 						onMoveEnd={ ( map ) => {
 							const center = map.getCenter();
-							const zoom = Math.round( map.getZoom() * 10 ) / 10;
+							let zoom = Math.round( map.getZoom() * 10 ) / 10;
+
+							if ( zoomState === 'initial_zoom' ) {
+								if ( window.max_zoom && zoom > window.max_zoom ) {
+									zoom = window.max_zoom;
+								} else if ( window.min_zoom && zoom < window.min_zoom ) {
+									zoom = window.min_zoom;
+								}
+							}
+
+							if ( zoomState === 'min_zoom' && window.initial_zoom ) {
+								if ( zoom > window.initial_zoom ) {
+									zoom = window.initial_zoom;
+								}
+							}
+
+							if ( zoomState === 'max_zoom' && window.initial_zoom ) {
+								if ( zoom < window.initial_zoom ) {
+									zoom = window.initialZoom;
+								}
+							}
 
 							setPostMeta( {
 								center_lat: center.lat,
 								center_lon: center.lng,
 								[ zoomState ]: zoom,
 							} );
+							window[ zoomState ] = zoom;
 						} }
 					>
 						{ loadedLayers && postMeta.layers.map( ( layer ) => {
