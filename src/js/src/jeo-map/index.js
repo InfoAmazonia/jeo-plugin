@@ -73,7 +73,11 @@ class JeoMap {
 					map.on( 'load', () => {
 						layers.forEach( ( layer, i ) => {
 							if ( layer.attribution ) {
-								customAttribution.push( `<a href="${ layer.attribution }">${ layer.attribution }</a>` );
+								if ( ! layer.attribution.includes( 'http://' ) ) {
+									customAttribution.push( `<a href="http://${ layer.attribution }">${ layer.attribution }</a>` );
+								} else {
+									customAttribution.push( `<a href="${ layer.attribution }">${ layer.attribution }</a>` );
+								}
 							}
 
 							if ( i > 0 ) {
