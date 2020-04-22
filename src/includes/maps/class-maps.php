@@ -46,7 +46,7 @@ class Maps {
 			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields'),
 			'rewrite' => array('slug' => 'maps'),
 			'public' => true,
-			'show_in_menu' => true,
+			'show_in_menu' => 'jeo-main-menu',
 			'show_in_rest' => true,
 			'menu_position' => 4,
 			'menu_icon' => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/map.svg')),

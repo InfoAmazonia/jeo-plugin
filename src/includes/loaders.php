@@ -15,7 +15,7 @@ function jeo_autoload($class_name) {
 
 	$filename = 'class-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
 
-	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars'];
+	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu'];
 
 	foreach ($folders as $folder) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -89,6 +89,14 @@ function jeo_legend_types() {
  */
 function jeo_sidebars() {
 	return \Jeo\Sidebars::get_instance();
+}
+
+/**
+ * Gets the instance of the Menu Class
+ * @return \Menu Menu instance
+ */
+function jeo_menu() {
+	return \Jeo\Menu::get_instance();
 }
 
 /**
