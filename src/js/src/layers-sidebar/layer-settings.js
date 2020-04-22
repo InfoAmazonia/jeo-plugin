@@ -13,7 +13,7 @@ const layerSchema = {
 		attribution: { title: __( 'Map attribution link' ), type: 'string' },
 		type: { title: __( 'Type' ), type: 'string' },
 	},
-	required: [ 'attribution', 'type' ],
+	required: [ 'type' ],
 };
 
 const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
@@ -83,7 +83,16 @@ const LayerSettings = ( {
 				schema={ layerSchema }
 				uiSchema={ widgets }
 				formData={ postMeta }
-				onChange={ ( { formData } ) => setPostMeta( formData ) }
+				onChange={ ( { formData } ) => {
+					if ( ! formData.attribution ) {
+						formData.attribution = '';
+					}
+
+					if ( ! formData.source_url ) {
+						formData.source_url = '';
+					}
+					setPostMeta( formData );
+				} }
 			>
 				{ /* Hide submit button */ }
 				<div />
