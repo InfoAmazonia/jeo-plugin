@@ -10,7 +10,7 @@ import './geo-posts.css';
 class JeoGeocodePosts extends Component {
 	constructor() {
 		super();
-		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+		const metadata = wp.data.select( 'core/editor' ).getEditedPostAttribute('meta')
 
 		this.state = {
 			zoom: 1,

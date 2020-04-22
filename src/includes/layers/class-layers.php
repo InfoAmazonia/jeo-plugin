@@ -42,7 +42,7 @@ class Layers {
 			'rewrite'             => array( 'slug' => 'layers' ),
 			'show_in_rest'        => true,
 			'public'              => true,
-			'show_in_menu'        => true,
+			'show_in_menu'        => 'jeo-main-menu',
 			'menu_icon' 		  => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/layers.svg')),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
