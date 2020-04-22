@@ -41,6 +41,7 @@ class Jeo {
 	 * @since    1.0.0
 	 */
 	protected function init() {
+		\jeo_menu();
 		\jeo_maps();
 		\jeo_layers();
 		\jeo_geocode_handler();
