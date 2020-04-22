@@ -65,18 +65,19 @@ class Settings {
 	}
 
 	public function enqueue_admin_scripts($page) {
-		if ($page == 'toplevel_page_jeo-settings') {
+		if ($page == 'jeo_page_jeo-settings') {
 			wp_enqueue_script('jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', ['jquery']);
 		}
 	}
 
 	public function add_menu_item() {
-		add_menu_page(
+		add_submenu_page(
+			'jeo-main-menu',
 			__('Jeo Settings', 'jeo'),
-			'Jeo',
+			'Jeo Settings',
 			'manage_options',
 			'jeo-settings',
-			[$this, 'admin_page'],
+			[$this, 'admin_page']
 			// $icon_url:string,
 			// $position:integer|null
 		);
