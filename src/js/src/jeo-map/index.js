@@ -73,7 +73,7 @@ class JeoMap {
 					map.on( 'load', () => {
 						layers.forEach( ( layer, i ) => {
 							if ( layer.attribution ) {
-								if ( ! layer.attribution.includes( 'http://' ) ) {
+								if ( ! layer.attribution.includes( 'http' ) ) {
 									customAttribution.push( `<a href="http://${ layer.attribution }">${ layer.attribution }</a>` );
 								} else {
 									customAttribution.push( `<a href="${ layer.attribution }">${ layer.attribution }</a>` );
@@ -123,10 +123,6 @@ class JeoMap {
 	 * This will only work for maps stored in the database and not for one-time use maps
 	 */
 	addMoreButtonAndLegends() {
-		if ( ! this.map_post_object ) {
-			return;
-		}
-
 		const container = document.createElement( 'div' );
 		container.classList.add( 'legend-container' );
 
@@ -166,44 +162,82 @@ class JeoMap {
 			} );
 		}
 
-		if ( this.map_post_object ) {
-			const moreDiv = document.createElement( 'div' );
+		const moreDiv = document.createElement( 'div' );
 
-			moreDiv.classList.add( 'more-info-overlayer' );
+		moreDiv.classList.add( 'more-info-overlayer' );
+		if ( this.map_post_object ) {
 			moreDiv.innerHTML = this.moreInfoTemplate( {
 				map: this.map_post_object,
 			} );
+		} else {
+			let innerHTML = '';
+			this.layers.forEach( ( layer ) => {
+				innerHTML += `<h3>${ layer.attributes.layer_name }</h1>`;
 
-			const closeButton = document.createElement( 'div' );
-			closeButton.classList.add( 'more-info-close' );
-			closeButton.innerHTML = '<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>';
+				let attributionLink = layer.attributes.attribution;
+				if ( attributionLink && ! attributionLink.includes( 'http' ) ) {
+					attributionLink = 'http://' + attributionLink;
+				}
+				if ( attributionLink ) {
+					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ layer.attributes.attribution }</a></p>`
+				}
 
-			closeButton.click( function( e ) {
-
+				let downloadSourceLink = layer.source_url;
+				if ( downloadSourceLink && ! downloadSourceLink.includes( 'http' ) ) {
+					downloadSourceLink = 'http://' + downloadSourceLink;
+				}
+				if ( downloadSourceLink ) {
+					innerHTML += `<a
+									style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+									background: #fff;
+									border: 1px solid rgba(0,0,0,0.4);
+									color: #404040;
+									margin-top: 8px;
+									padding: 4px 10px;
+									text-decoration: none;
+									border-bottom: 1px solid rgba(0,0,0,0.25);
+									text-align: center;
+									cursor: pointer;
+									display: inline-block;
+									font-size: 16px;
+									font-weight: bold;
+									transition: all .2 ease-in-out;"
+									href="${ downloadSourceLink }" class="download-source">Download source
+								  </a>`;
+				}
 			} );
-
-			closeButton.onclick = ( e ) => {
-				e.preventDefault();
-				e.stopPropagation();
-
-				jQuery( e.currentTarget ).parent().hide();
-			};
-
-			moreDiv.appendChild( closeButton );
-
-			const moreButton = document.createElement( 'a' );
-			moreButton.classList.add( 'more-info-button' );
-			moreButton.innerHTML = 'Info';
-
-			moreButton.onclick = ( e ) => {
-				e.preventDefault();
-				e.stopPropagation();
-				jQuery( e.currentTarget ).parent().parent().siblings( '.more-info-overlayer' ).show();
-			};
-
-			this.element.appendChild( moreDiv );
-			hideableContent.appendChild( moreButton );
+			moreDiv.innerHTML = innerHTML;
 		}
+
+		const closeButton = document.createElement( 'div' );
+		closeButton.classList.add( 'more-info-close' );
+		closeButton.innerHTML = '<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>';
+
+		closeButton.click( function( e ) {
+
+		} );
+
+		closeButton.onclick = ( e ) => {
+			e.preventDefault();
+			e.stopPropagation();
+
+			jQuery( e.currentTarget ).parent().hide();
+		};
+
+		moreDiv.appendChild( closeButton );
+
+		const moreButton = document.createElement( 'a' );
+		moreButton.classList.add( 'more-info-button' );
+		moreButton.innerHTML = 'Info';
+
+		moreButton.onclick = ( e ) => {
+			e.preventDefault();
+			e.stopPropagation();
+			jQuery( e.currentTarget ).parent().parent().siblings( '.more-info-overlayer' ).show();
+		};
+
+		this.element.appendChild( moreDiv );
+		hideableContent.appendChild( moreButton );
 
 		container.appendChild( hideableContent );
 		this.element.appendChild( container );
@@ -261,6 +295,7 @@ class JeoMap {
 								attribution: layerObject.meta.attribution,
 								visible: layersDefinitions[ i ].default,
 								layer_type_options: layerObject.meta.layer_type_options,
+								source_url: layerObject.meta.source_url,
 							} )
 						);
 
