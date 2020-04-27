@@ -37,7 +37,7 @@ export default function InteractionsSettings( {
 		setInteractions( interactions.filter( ( interaction ) => interaction.id !== interactionId ) );
 	}, [ interactions, setInteractions ] );
 
-	const layersSources = useMemo(()=>{
+	const layersSourceOptions = useMemo( () => {
 		if( ! layers) {
 			return [];
 		}
@@ -45,14 +45,14 @@ export default function InteractionsSettings( {
 			.map( source => {
 				return layers.find( layer => layer.source === source )
 		})
-		let selectors = uniqueSources.map( u => { return { value: u.source, label: u.sourceName } } );
-		if(selectors.length > 1){
-			selectors.push( { value: 'all', label: __('All', 'jeo') } );
+		const options = uniqueSources.map( source => { return { value: source.source, label: source.sourceName } } );
+		if( options.length > 1 ) {
+			options.push( { value: 'all', label: __( 'All', 'jeo' ) } );
 		}
-		return selectors;
-	}, [ layersSources ])
+		return options;
+	}, [ layers ])
 
-	const [ selectedSource, setSelectedSource ] = useState( layersSources.length > 1 ? 'all': layersSources[0].source );
+	const [ selectedSource, setSelectedSource ] = useState( layersSourceOptions.length > 1 ? 'all': layersSourceOptions[0].source );
 
 	return (
 		<Modal
@@ -61,14 +61,14 @@ export default function InteractionsSettings( {
 			onRequestClose={ onCloseModal }
 		>
 			<SelectControl
-				label="selectedSource"
+				label= { __( 'Source', 'jeo' ) }
 				value={ selectedSource }
-				options={ layersSources }
+				options={ layersSourceOptions }
 				onChange={ ( selectedSource ) => { setSelectedSource( selectedSource ) } }
 			/>
 			<Panel className="jeo-interactions-settings">
 				{ interactiveLayers.map( ( layer ) => {
-					if (layer.source === selectedSource || selectedSource === 'all' || layersSources.length <= 1) {
+					if (layer.source === selectedSource || selectedSource === 'all' || layersSourceOptions.length <= 1) {
 						const index = interactions.findIndex( ( x ) => x.id === layer.id );
 						const interaction = interactions[ index ];
 						return (
