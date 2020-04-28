@@ -61,3 +61,11 @@
 	color: #fff;
 }
 
+.jeo-preview-controls {
+	display: flex;
+	flex-direction: row;
+}
+
+.jeo-preview-controls .select-another-map {
+	margin-left: 10px;
+}

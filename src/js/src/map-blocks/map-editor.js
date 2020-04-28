@@ -51,13 +51,14 @@ const MapEditor = ( {
 					<div className="jeo-preview-controls">
 						<p><strong>{ loadedMap.title.rendered }</strong></p>
 						<Button
+							className="select-another-map"
 							isLink
 							isLarge
 							onClick={ () =>
 								setAttributes( { ...attributes, map_id: undefined, previous_map: loadedMap.title.rendered } )
 							}
 						>
-							{ __( 'Select another map' ) }
+							<em>{ __( '(Select another map)' ) }</em>
 						</Button>
 					</div>
 				</Fragment>
