@@ -25,9 +25,6 @@ const MapEditor = ( {
 		setKey( key + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
-	useEffect( () => {
-		console.log( loadedMap );
-	} );
 	return (
 		<Fragment>
 			{ attributes.map_id && loadingMap && <Spinner /> }
