@@ -144,6 +144,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 							return {
 								id: layer.id,
 								fields: layer.fields,
+								source: layer.source,
+								sourceName: layer.source_name
 							};
 						} );
 					}
