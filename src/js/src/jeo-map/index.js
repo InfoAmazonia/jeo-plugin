@@ -34,11 +34,13 @@ class JeoMap {
 
 				if ( this.getArg( 'disable_scroll_zoom' ) ) {
 					map.scrollZoom.disable();
+					map.boxZoom.disable();
+					map.touchZoomRotate.disableRotation();
+					map.doubleClickZoom.disable();
 				}
 
 				if ( this.getArg( 'disable_drag_rotate' ) ) {
 					map.dragRotate.disable();
-					map.touchZoomRotate.disableRotation();
 				}
 
 				if (
