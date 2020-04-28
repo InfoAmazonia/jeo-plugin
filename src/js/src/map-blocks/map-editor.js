@@ -25,6 +25,9 @@ const MapEditor = ( {
 		setKey( key + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
+	useEffect( () => {
+		console.log( loadedMap );
+	} );
 	return (
 		<Fragment>
 			{ attributes.map_id && loadingMap && <Spinner /> }
@@ -49,11 +52,12 @@ const MapEditor = ( {
 					</div>
 
 					<div className="jeo-preview-controls">
+						<p><strong>{ loadedMap.title.rendered }</strong></p>
 						<Button
 							isLink
 							isLarge
 							onClick={ () =>
-								setAttributes( { ...attributes, map_id: undefined } )
+								setAttributes( { ...attributes, map_id: undefined, previous_map: loadedMap.title.rendered } )
 							}
 						>
 							{ __( 'Select another map' ) }
@@ -64,7 +68,7 @@ const MapEditor = ( {
 			{ ! attributes.map_id && (
 				<Fragment>
 					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
-						{ __( 'Insert a map from the library' ) + ':' }
+						{ __( 'Previous map' ) + `: ${ attributes.previous_map }` }
 					</label>
 					<JeoAutosuggest
 						inputProps={ {
