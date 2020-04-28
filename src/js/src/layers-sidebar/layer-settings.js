@@ -84,6 +84,29 @@ const LayerSettings = ( {
 				uiSchema={ widgets }
 				formData={ postMeta }
 				onChange={ ( { formData } ) => {
+					const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+
+					let attributionLink = formData.attribution;
+					let sourceLink = formData.source_url;
+
+					if ( formData.attribution && ! formData.attribution.includes( 'http' ) ) {
+						if ( formData.attribution.match( regex ) ) {
+							attributionLink = `http://${ formData.attribution }`;
+						} else if ( formData.attribution[ 0 ] !== '/' ) {
+							attributionLink = '/' + attributionLink;
+						}
+					}
+					formData.attribution = attributionLink;
+
+					if ( formData.source_url && ! formData.source_url.includes( 'http' ) ) {
+						if ( formData.source_url.match( regex ) ) {
+							sourceLink = `http://${ formData.source_url }`;
+						} else if ( formData.source_url[ 0 ] !== '/' ) {
+							sourceLink = '/' + sourceLink;
+						}
+					}
+					formData.source_url = sourceLink;
+
 					if ( ! formData.attribution ) {
 						formData.attribution = '';
 					}
@@ -91,6 +114,7 @@ const LayerSettings = ( {
 					if ( ! formData.source_url ) {
 						formData.source_url = '';
 					}
+					console.log(formData.source_url)
 					setPostMeta( formData );
 				} }
 			>

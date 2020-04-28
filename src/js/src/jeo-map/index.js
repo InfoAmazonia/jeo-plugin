@@ -73,11 +73,19 @@ class JeoMap {
 					map.on( 'load', () => {
 						layers.forEach( ( layer, i ) => {
 							if ( layer.attribution ) {
+								let attributionLink = layer.attribution;
+
+								const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+
 								if ( ! layer.attribution.includes( 'http' ) ) {
-									customAttribution.push( `<a href="http://${ layer.attribution }">${ layer.attribution }</a>` );
-								} else {
-									customAttribution.push( `<a href="${ layer.attribution }">${ layer.attribution }</a>` );
+									if ( layer.attribution.match( regex ) ) {
+										attributionLink = `http://${ layer.attribution }`;
+									} else if ( layer.attribution[ 0 ] !== '/' ) {
+										attributionLink = '/' + attributionLink;
+									}
 								}
+
+								customAttribution.push( `<a href="${ attributionLink }">${ attributionLink }</a>` );
 							}
 
 							if ( i > 0 ) {
@@ -174,19 +182,31 @@ class JeoMap {
 			this.layers.forEach( ( layer ) => {
 				innerHTML += `<h3>${ layer.attributes.layer_name }</h1>`;
 
+				const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+
 				let attributionLink = layer.attributes.attribution;
-				if ( attributionLink && ! attributionLink.includes( 'http' ) ) {
-					attributionLink = 'http://' + attributionLink;
-				}
-				if ( attributionLink ) {
-					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ layer.attributes.attribution }</a></p>`
+				let sourceLink = layer.source_url;
+
+				if ( layer.attributes.attribution && ! layer.attributes.attribution.includes( 'http' ) ) {
+					if ( layer.attributes.attribution.match( regex ) ) {
+						attributionLink = `http://${ layer.attributes.attribution }`;
+					} else if ( layer.attributes.attribution[ 0 ] !== '/' ) {
+						attributionLink = '/' + attributionLink;
+					}
 				}
 
-				let downloadSourceLink = layer.source_url;
-				if ( downloadSourceLink && ! downloadSourceLink.includes( 'http' ) ) {
-					downloadSourceLink = 'http://' + downloadSourceLink;
+				if ( layer.source_url && ! layer.source_url.includes( 'http' ) ) {
+					if ( layer.source_url.match( regex ) ) {
+						sourceLink = `http://${ layer.source_url }`;
+					} else if ( layer.source_url[ 0 ] !== '/' ) {
+						sourceLink = '/' + sourceLink;
+					}
 				}
-				if ( downloadSourceLink ) {
+
+				if ( attributionLink ) {
+					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ layer.attributes.attribution }</a></p>`;
+				}
+				if ( sourceLink ) {
 					innerHTML += `<a
 									style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
 									background: #fff;
@@ -202,7 +222,7 @@ class JeoMap {
 									font-size: 16px;
 									font-weight: bold;
 									transition: all .2 ease-in-out;"
-									href="${ downloadSourceLink }" class="download-source">Download source
+									href="${ sourceLink }" class="download-source">Download source
 								  </a>`;
 				}
 			} );
