@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { Button, IconButton, TextControl, Dashicon } from '@wordpress/components';
+import { Button, IconButton, TextControl, Dashicon, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 import { v4 as uuid } from 'uuid';
@@ -112,6 +112,7 @@ class IconItem extends Component {
 
 		this.state = {
 			iconData: this.props.iconData,
+			openModal: false,
 		};
 	}
 
@@ -127,53 +128,72 @@ class IconItem extends Component {
 		const { MediaUpload } = wp.blockEditor;
 
 		return (
-			<div className="icon-item">
-				<MediaUpload
-					onSelect={ ( value ) => {
-						let image = new Image();
-						image.src = value.url;
-						image.onload = () => {
-							if ( image.width >= 60 && image.height >= 60 ) {
-								this.setState( {
-									iconData: {
-										...this.state.iconData,
-										icon: value.url,
-									},
-								}, this.iconUpdate( this.state.iconData.label, value.url ) );
-							} else {
-								image = null;
-								alert( __( 'Minimum size: 60x60' ) );
-							}
-						};
-					} }
+			<>
+				{ this.state.openModal && (
+					<Modal
+						className="jeo-interactions-settings__modal"
+						title={ __( 'Icon legend', 'jeo' ) }
+						onRequestClose={ () => { 
+							this.setState( {
+								...this.state,
+								openModal: false,
+							} );
+						} }
+					>
+						<h4>The uploaded icon is too small. The minimum size required is 60x60 pixels.</h4>
+					</Modal>
+				) }
 
-					render={ ( { open } ) => {
-						return (
-							<div className="content-wrapper">
-								<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
-									{ this.state.iconData.icon && (
-										<img src={ this.state.iconData.icon } width="50" height="50" alt="Logo" />
-									) }
-									{ ! this.state.iconData.icon && (
-										<Dashicon icon="format-image" width="50" height="50" />
-									) }
-								</div>
-								<div className="buttons-inputs">
-									<TextControl
-										label={ __( 'Label' ) }
-										value={ this.state.iconData.label }
-										onChange={ ( label ) => {
-											this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );
-										} }
-									/>
+				<div className="icon-item">
+					<MediaUpload
+						onSelect={ ( value ) => {
+							let image = new Image();
+							image.src = value.url;
+							image.onload = () => {
+								if ( image.width >= 60 && image.height >= 60 ) {
+									this.setState( {
+										iconData: {
+											...this.state.iconData,
+											icon: value.url,
+										},
+									}, this.iconUpdate( this.state.iconData.label, value.url ) );
+								} else {
+									this.setState( {
+										...this.state,
+										openModal: true,
+									} );
+								}
+							};
+						} }
 
-									<IconButton icon="minus" label="Remove" onClick={ this.removeLabel } className="remove-button" />
+						render={ ( { open } ) => {
+							return (
+								<div className="content-wrapper">
+									<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
+										{ this.state.iconData.icon && (
+											<img src={ this.state.iconData.icon } width="50" height="50" alt="Logo" />
+										) }
+										{ ! this.state.iconData.icon && (
+											<Dashicon icon="format-image" width="50" height="50" />
+										) }
+									</div>
+									<div className="buttons-inputs">
+										<TextControl
+											label={ __( 'Label' ) }
+											value={ this.state.iconData.label }
+											onChange={ ( label ) => {
+												this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );
+											} }
+										/>
+
+										<IconButton icon="minus" label="Remove" onClick={ this.removeLabel } className="remove-button" />
+									</div>
 								</div>
-							</div>
-						);
-					} }
-				/>
-			</div>
+							);
+						} }
+					/>
+				</div>
+			</>
 		);
 	}
 }
