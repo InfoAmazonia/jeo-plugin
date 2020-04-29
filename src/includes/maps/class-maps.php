@@ -186,6 +186,14 @@ class Maps {
 			'description' => __('Disable drag rotation', 'jeo')
 		]);
 
+		register_post_meta($this->post_type, 'enable_fullscreen', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'boolean',
+			'description' => __('Enable fullscreen button', 'jeo')
+		]);
+
 		register_post_meta($this->post_type, 'show_all_posts', [
 			'show_in_rest' => true,
 			'single' => true,

@@ -10,6 +10,7 @@ const mapDefaults = {
 	max_zoom: 20,
 	disable_scroll_zoom: jeo_settings.map_defaults.disable_scroll_zoom,
 	disable_drag_rotate: jeo_settings.map_defaults.disable_drag_rotate,
+	enable_fullscreen: jeo_settings.map_defaults.enable_fullscreen,
 };
 
 function parseNumber( value ) {
@@ -105,17 +106,24 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable Zoom on Post' ) }
+						label={ __( 'Disable zoom on post' ) }
 						checked={ attributes.disable_scroll_zoom }
 						onChange={ () => {
 							attributeUpdater( 'disable_scroll_zoom' )( ! attributes.disable_scroll_zoom );
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable Drag Rotation' ) }
+						label={ __( 'Disable drag rotation' ) }
 						checked={ attributes.disable_drag_rotate }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_rotate' )( ! attributes.disable_drag_rotate );
+						} }
+					/>
+					<CheckboxControl
+						label={ __( 'Enable fullscreen button' ) }
+						checked={ attributes.enable_fullscreen }
+						onChange={ () => {
+							attributeUpdater( 'enable_fullscreen' )( ! attributes.enable_fullscreen );
 						} }
 					/>
 				</section>

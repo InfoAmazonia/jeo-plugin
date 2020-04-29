@@ -67,6 +67,9 @@ registerBlockType( 'jeo/onetime-map', {
 		disable_drag_rotate: {
 			type: 'boolean',
 		},
+		enable_fullscreen: {
+			type: 'boolean',
+		},
 		related_posts: {
 			type: 'object',
 			default: {
