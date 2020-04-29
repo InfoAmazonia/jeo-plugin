@@ -77,6 +77,7 @@ class ApiMaps extends Jeo_UnitApiTestCase {
 		$this->assertTrue( isset($data['meta']['center_lat']) );
 		$this->assertTrue( isset($data['meta']['disable_scroll_zoom']) );
 		$this->assertTrue( isset($data['meta']['disable_drag_rotate']) );
+		$this->assertTrue( isset($data['meta']['enable_fullscreen']) );
 		$this->assertTrue( isset($data['meta']['max_bounds_ne']) );
 		$this->assertTrue( isset($data['meta']['max_bounds_sw']) );
 		$this->assertTrue( isset($data['meta']['min_zoom']) );

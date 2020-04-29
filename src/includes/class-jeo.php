@@ -119,6 +119,7 @@ class Jeo {
 					'lng' => sanitize_text_field ( \jeo_settings()->get_option( 'map_default_lng' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
+					'enable_fullscreen' => true,
 				]
 			)
 		);

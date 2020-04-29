@@ -30,8 +30,6 @@ class JeoMap {
 
 				map.setCenter( [ this.getArg( 'center_lon' ), this.getArg( 'center_lat' ) ] );
 
-				map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-
 				if ( this.getArg( 'disable_scroll_zoom' ) ) {
 					map.scrollZoom.disable();
 					map.boxZoom.disable();
@@ -41,6 +39,10 @@ class JeoMap {
 
 				if ( this.getArg( 'disable_drag_rotate' ) ) {
 					map.dragRotate.disable();
+				}
+
+				if ( this.getArg( 'enable_fullscreen' ) ) {
+					map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 				}
 
 				if (

@@ -55,7 +55,7 @@ const MapEditor = ( {
 							isLink
 							isLarge
 							onClick={ () =>
-								setAttributes( { ...attributes, map_id: undefined, previous_map: loadedMap.title.rendered } )
+								setAttributes( { ...attributes, map_id: undefined } )
 							}
 						>
 							<em>{ __( '(Select another map)' ) }</em>
@@ -66,7 +66,7 @@ const MapEditor = ( {
 			{ ! attributes.map_id && (
 				<Fragment>
 					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
-						{ __( 'Previous map' ) + `: ${ attributes.previous_map }` }
+						{ __( 'Insert a map from the library' ) + ':' }
 					</label>
 					<JeoAutosuggest
 						inputProps={ {
