@@ -41,6 +41,9 @@ class JeoGeocodePosts extends Component {
 		this.isFormDisabled = this.isFormDisabled.bind( this );
 		this.fetchReverseGeocode = this.fetchReverseGeocode.bind( this );
 		this.flyToLocation = this.flyToLocation.bind( this );
+		this.renderForm = this.renderForm.bind( this );
+		this.onClickNewPoint = this.onClickNewPoint.bind( this );
+		this.onClickCancel = this.onClickCancel.bind( this );
 
 		this.refMap = createRef();
 	}
@@ -48,6 +51,12 @@ class JeoGeocodePosts extends Component {
 	isFormDisabled() {
 		const { searchValue } = this.state;
 		return ! searchValue.replace( /\s/g, '' ).length;
+	}
+
+	onClickCancel( e ) {
+		e.preventDefault();
+		e.stopPropagation();
+		this.resetForm();
 	}
 
 	resetForm() {
@@ -65,6 +74,7 @@ class JeoGeocodePosts extends Component {
 			},
 			() => {
 				const { points, currentMarkerIndex } = this.state;
+				console.log( this.state );
 				if ( points.length > 0 ) {
 					const activePoint = points[ currentMarkerIndex ];
 					if ( activePoint ) {
@@ -96,7 +106,7 @@ class JeoGeocodePosts extends Component {
 		this.setState( {
 			...this.state,
 			points: points.map( ( value, i ) => {
-				if ( i == point ) {
+				if ( i === point ) {
 					return { ...value, ...data };
 				}
 				return value;
@@ -110,26 +120,37 @@ class JeoGeocodePosts extends Component {
 	}
 
 	clickMarkerMap( e ) {
-		this.setState( {
-			currentMarkerIndex: e.target.options.id,
-		} );
+		const index = parseInt(e.target.options.id);
+		this.setState(
+			{
+				currentMarkerIndex: index,
+			},
+			() => {
+				const { currentMarkerIndex, points } = this.state;
+				const currentPoint = points[ currentMarkerIndex ];
+				this.flyToLocation(
+					currentPoint._geocode_lat,
+					currentPoint._geocode_lon
+				);
+			}
+		);
 	}
 
 	clickMarkerList( e ) {
-		e.preventDefault();
-		e.stopPropagation();
-		const { formMode, currentMarkerIndex, points } = this.state;
-		if ( formMode == 'view' ) {
-			this.setState(
-				{
-					currentMarkerIndex: e.target.id,
-				},
-				() => {
-					const point = points[ currentMarkerIndex ];
-					this.flyToLocation( point._geocode_lat, point._geocode_lon );
-				}
-			);
-		}
+		const index = parseInt(e.target.id);
+		this.setState(
+			{
+				currentMarkerIndex: index,
+			},
+			() => {
+				const { currentMarkerIndex, points } = this.state;
+				const currentPoint = points[ currentMarkerIndex ];
+				this.flyToLocation(
+					currentPoint._geocode_lat,
+					currentPoint._geocode_lon
+				);
+			}
+		);
 	}
 
 	relevanceClick( option ) {
@@ -162,12 +183,12 @@ class JeoGeocodePosts extends Component {
 		e.preventDefault();
 		e.stopPropagation();
 
-		const index = e.target.attributes.marker_index.value;
+		const index = parseInt(e.target.attributes.marker_index.value);
 		const { points } = this.state;
 		this.setState(
 			{
 				...this.state,
-				points: points.filter( ( el, i ) => i != index ),
+				points: points.filter( ( el, i ) => i !== index ),
 				currentMarkerIndex: 0,
 			},
 			() => this.save()
@@ -177,8 +198,9 @@ class JeoGeocodePosts extends Component {
 	onClickEdit( e ) {
 		e.preventDefault();
 		e.stopPropagation();
+
 		const { points } = this.state;
-		const index = e.target.attributes.marker_index.value;
+		const index = parseInt(e.target.attributes.marker_index.value);
 		const point = points[ index ];
 		this.setState(
 			{
@@ -191,6 +213,15 @@ class JeoGeocodePosts extends Component {
 				this.flyToLocation( point._geocode_lat, point._geocode_lon );
 			}
 		);
+	}
+
+	onClickNewPoint() {
+		const { points } = this.state;
+
+		this.setState( {
+			formMode: 'new',
+			pointsCheckpoint: points,
+		} );
 	}
 
 	getProperty( object, property ) {
@@ -224,11 +255,9 @@ class JeoGeocodePosts extends Component {
 				searchValue: foundPoint._geocode_full_address,
 			} );
 
-			const { formMode, points } = this.state;
-			if ( formMode === 'view' ) {
+			const { formMode, points, pointsCheckpoint } = this.state;
+			if ( formMode === 'new' && points.length === pointsCheckpoint.length ) {
 				this.setState( {
-					formMode: 'new',
-					pointsCheckpoint: points,
 					points: [ ...points, foundPoint ],
 					currentMarkerIndex: points.length,
 				} );
@@ -279,75 +308,81 @@ class JeoGeocodePosts extends Component {
 		} );
 	}
 
-	render() {
-		const {
-			currentMarkerIndex,
-			points,
-			searchValue,
-			formMode,
-			zoom,
-		} = this.state;
+	renderForm() {
+		const { currentMarkerIndex, points, searchValue, formMode } = this.state;
+
 		const selectedPoint = points[ currentMarkerIndex ];
+		return (
+			<div>
+				<div>
+					<JeoGeoAutoComplete
+						onSelect={ this.onLocationFound }
+						value={ searchValue }
+						onChange={ this.handleSearchValue }
+					/>
+					<span className="jeo-geocode-text">
+						{ __(
+							'You can also drag the marker across the map.',
+							'jeo'
+						) }
+					</span>
+				</div>
+				<div>
+					{ ! this.isFormDisabled() ? (
+						<RadioControl
+							label={ __( 'Relevance', 'jeo' ) }
+							selected={
+								points.length ? selectedPoint.relevance || 'primary' : 'primary'
+							}
+							options={ [
+								{ label: __( 'Primary', 'jeo' ), value: 'primary' },
+								{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
+							] }
+							onChange={ this.relevanceClick }
+						/>
+					) : (
+						false
+					) }
+					<div className="jeo-geocode-posts__row">
+						<div className="jeo-geocode-posts__buttons-list">
+							<Button isSecondary onClick={ this.onClickCancel }>
+								{ __( 'Cancel', 'jeo' ) }
+							</Button>
+							<Button
+								isPrimary
+								onClick={ this.handleClickSave }
+								disabled={ this.isFormDisabled() }
+							>
+								{ formMode === 'edit' ?
+									__( 'Update selected point', 'jeo' ) :
+									__( 'Save new point', 'jeo' ) }
+							</Button>
+						</div>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	render() {
+		const { currentMarkerIndex, points, formMode, zoom } = this.state;
 
 		return (
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
 					<div className="jeo-geocode-posts__row">
-						<h2>{ __( 'Add a point', 'jeo' ) }</h2>
-					</div>
-					<div>
-						<JeoGeoAutoComplete
-							onSelect={ this.onLocationFound }
-							value={ searchValue }
-							onChange={ this.handleSearchValue }
-						/>
-						<span className="jeo-geocode-text">
-							{ __(
-								'Edit a point or search to create a new. You can also drag it once it was selected.',
-								'jeo'
+					<div className="jeo-geocode-posts__buttons-list" style={{'justify-content': 'space-between'}}>
+
+						<h2>{ __( 'Geolocated points', 'jeo' ) }</h2>
+						<div>
+							{ formMode === 'view' && (
+								<Button isPrimary onClick={ this.onClickNewPoint }>
+									{ __( 'Add new point', 'jeo' ) }
+								</Button>
 							) }
-						</span>
-						{ formMode != 'view' && (
-							<div>
-								{ ! this.isFormDisabled() ? (
-									<RadioControl
-										label={ __( 'Relevance', 'jeo' ) }
-										selected={
-											points.length ?
-												selectedPoint.relevance || 'primary' :
-												'primary'
-										}
-										options={ [
-											{ label: __( 'Primary', 'jeo' ), value: 'primary' },
-											{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
-										] }
-										onChange={ this.relevanceClick }
-									/>
-								) : (
-									false
-								) }
-								<div className="jeo-geocode-posts__row">
-									<div className="jeo-geocode-posts__buttons-list">
-										<Button
-											isSecondary
-											onClick={ this.resetForm }
-											disabled={ this.isFormDisabled() }
-										>
-											{ __( 'Cancel', 'jeo' ) }
-										</Button>
-										<Button
-											isPrimary
-											onClick={ this.handleClickSave }
-											disabled={ this.isFormDisabled() }
-										>
-											{ formMode == 'edit' ?
-												__( 'Update selected point', 'jeo' ) :
-												__( 'Save new point', 'jeo' ) }
-										</Button>
-									</div>
-								</div>
-							</div>
-						) }
+						</div>
+						</div>
+						{ formMode === 'new' && this.renderForm() }
 					</div>
 					<div>
 						<h2>{ __( 'Current points', 'jeo' ) }</h2>
@@ -358,15 +393,15 @@ class JeoGeocodePosts extends Component {
 								{ points.map( ( point, i ) => (
 									<li
 										id={ i }
-										onClick={ this.clickMarkerList }
+										onClick={ formMode === 'view' ? this.clickMarkerList : null }
 										className={ classNames( [
 											'jeo-geocode-posts__post',
 											( point && point.relevance ) || 'primary',
-											currentMarkerIndex == i && 'active',
+											currentMarkerIndex === i && 'active',
 										] ) }
 									>
 										{ point._geocode_full_address }{ ' ' }
-										{ formMode == 'view' ? (
+										{ formMode === 'view' ? (
 											<Fragment>
 												<Button
 													isLink
@@ -384,7 +419,11 @@ class JeoGeocodePosts extends Component {
 													{ __( 'Edit', 'jeo' ) }
 												</Button>
 											</Fragment>
-										) : null }
+										) : (
+											formMode === 'edit' &&
+											currentMarkerIndex === i &&
+											this.renderForm()
+										)}
 									</li>
 								) ) }
 							</ul>
@@ -406,15 +445,15 @@ class JeoGeocodePosts extends Component {
 							/>
 							{ points.map( ( point, i ) => (
 								<Marker
-									draggable={ currentMarkerIndex == i && formMode != 'view' }
+									draggable={ currentMarkerIndex === i && formMode !== 'view' }
 									onDragend={ this.onMarkerDragged }
-									onClick={ formMode == 'view' ? this.clickMarkerMap : null }
+									onClick={ formMode === 'view' ? this.clickMarkerMap : null }
 									position={ [
 										parseFloat( point._geocode_lat ),
 										parseFloat( point._geocode_lon ),
 									] }
 									id={ i }
-									opacity={ currentMarkerIndex == i ? 1 : 0.6 }
+									opacity={ currentMarkerIndex === i ? 1 : 0.6 }
 								/>
 							) ) }
 						</LeafletMap>
