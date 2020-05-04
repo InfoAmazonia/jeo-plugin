@@ -1,6 +1,12 @@
 #geocode-map-container, #geocode-map-container > div  {
 	height: 350px;
-	width: 350px;
+	width: 100%;
+}
+
+.jeo-geocode-text {
+	color: #808080;
+	margin: 0;
+    display:inline-block; /*or display:block;*/
 }
 
 .jeo-geocode-posts {
@@ -11,6 +17,7 @@
 }
 
 .jeo-geocode-posts__post {
+	cursor: pointer;
 	margin: 0;
 	padding: 10px;
 }
@@ -48,7 +55,7 @@
 
 .jeo-geocode-posts__buttons-list {
 	display: flex;
-	justify-content: flex-end;
+	justify-content: flex-start;
 	margin: 10px 0;
 }
 
