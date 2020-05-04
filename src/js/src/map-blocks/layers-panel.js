@@ -21,7 +21,7 @@ export default function( {
 				<ol>
 					{ layers.map( ( layerSettings ) => {
 						const settings = loadLayer( layerSettings );
-						return (
+						return settings.layer && (
 							<li className="jeo-setting-layer" key={ settings.id }>
 								<h2>
 									{ settings.layer.title.rendered } - { settings.layer.meta.type }
