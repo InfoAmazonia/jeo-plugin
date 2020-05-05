@@ -252,8 +252,10 @@ function MapsSidebar( {
 						} }
 					>
 						{ loadedLayers && postMeta.layers.map( ( layer ) => {
-							const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
-							return renderLayer( layerOptions, layer );
+							const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id );
+							if ( layerOptions ) {
+								return renderLayer( layerOptions.meta, layer );
+							}
 						} ) }
 					</Map>
 				</MapPreviewPortal>

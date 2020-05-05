@@ -6,10 +6,9 @@ import Autosuggest from 'react-autosuggest';
 import './geo-auto-complete.css';
 
 class JeoGeoAutoComplete extends Component {
-	constructor() {
-		super();
+	constructor( props ) {
+		super( props );
 		this.state = {
-			value: '',
 			suggestions: [],
 			isLoading: false,
 		};
@@ -25,9 +24,7 @@ class JeoGeoAutoComplete extends Component {
 	}
 
 	onChange( event, { newValue } ) {
-		this.setState( {
-			value: newValue,
-		} );
+		this.props.onChange( newValue );
 	}
 
 	getSuggestionValue( suggestion ) {
@@ -68,11 +65,11 @@ class JeoGeoAutoComplete extends Component {
 	}
 
 	render() {
-		const { value, suggestions } = this.state;
+		const { suggestions } = this.state;
 		// Autosuggest will pass through all these props to the input.
 		const inputProps = {
-			placeholder: __( 'Busca por endereço', 'jeo' ),
-			value,
+			placeholder: __( 'Search address', 'jeo' ),
+			value: this.props.value,
 			onChange: this.onChange,
 		};
 
