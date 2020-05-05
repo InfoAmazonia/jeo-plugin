@@ -74,7 +74,6 @@ class JeoGeocodePosts extends Component {
 			},
 			() => {
 				const { points, currentMarkerIndex } = this.state;
-				console.log( this.state );
 				if ( points.length > 0 ) {
 					const activePoint = points[ currentMarkerIndex ];
 					if ( activePoint ) {
