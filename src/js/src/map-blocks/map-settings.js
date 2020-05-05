@@ -106,7 +106,7 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable zoom on post' ) }
+						label={ __( 'Disable scroll zoom on post' ) }
 						checked={ attributes.disable_scroll_zoom }
 						onChange={ () => {
 							attributeUpdater( 'disable_scroll_zoom' )( ! attributes.disable_scroll_zoom );

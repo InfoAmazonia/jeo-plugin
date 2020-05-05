@@ -210,6 +210,7 @@ function MapsSidebar( {
 					</div>
 					<Map
 						onStyleLoad={ ( map ) => {
+							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 						} }
 						key={ key }
@@ -255,60 +256,6 @@ function MapsSidebar( {
 							return renderLayer( layerOptions, layer );
 						} ) }
 					</Map>
-					<Button
-						isLarge
-						isLink
-						onClick={ () => {
-							const increment = 0.5;
-							let newValue = postMeta[ zoomState ] + increment;
-							if ( newValue > 20 ) {
-								newValue = 20;
-							}
-
-							if ( zoomState === 'initial_zoom' ) {
-								setPostMeta( {
-									initial_zoom: newValue,
-								} );
-							} else if ( zoomState === 'min_zoom' ) {
-								setPostMeta( {
-									min_zoom: newValue,
-								} );
-							} else if ( zoomState === 'max_zoom' ) {
-								setPostMeta( {
-									max_zoom: newValue,
-								} );
-							}
-						} }
-					>
-						<Dashicon icon="plus" />
-					</Button>
-					<Button
-						isLarge
-						isLink
-						onClick={ () => {
-							const decrement = 0.5;
-							let newValue = postMeta[ zoomState ] - decrement;
-							if ( newValue <= 0 ) {
-								newValue = 0.1;
-							}
-
-							if ( zoomState === 'initial_zoom' ) {
-								setPostMeta( {
-									initial_zoom: newValue,
-								} );
-							} else if ( zoomState === 'min_zoom' ) {
-								setPostMeta( {
-									min_zoom: newValue,
-								} );
-							} else if ( zoomState === 'max_zoom' ) {
-								setPostMeta( {
-									max_zoom: newValue,
-								} );
-							}
-						} }
-					>
-						<Dashicon icon="minus" />
-					</Button>
 				</MapPreviewPortal>
 			) }
 
