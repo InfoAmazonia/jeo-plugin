@@ -42,6 +42,7 @@ function LayersSidebar( {
 				<LayerPreviewPortal>
 					<Map
 						onStyleLoad={ ( map ) => {
+							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 						} }
 						style="mapbox://styles/mapbox/streets-v11"
@@ -67,38 +68,6 @@ function LayersSidebar( {
 							use: 'fixed',
 						} ) }
 					</Map>
-					<Button
-						isLarge
-						isLink
-						onClick={ () => {
-							let increment = 0.5;
-							if ( initialZoom + 0.5 > 20 ) {
-								increment = initialZoom - 20;
-							}
-
-							setPostMeta( {
-								initial_zoom: initialZoom + increment,
-							} );
-						} }
-					>
-						<Dashicon icon="plus" />
-					</Button>
-					<Button
-						isLarge
-						isLink
-						onClick={ () => {
-							let decrement = 0.5;
-							if ( initialZoom - 0.5 <= 0 ) {
-								decrement = 0;
-							}
-
-							setPostMeta( {
-								initial_zoom: initialZoom - decrement,
-							} );
-						} }
-					>
-						<Dashicon icon="minus" />
-					</Button>
 				</LayerPreviewPortal>
 			) }
 

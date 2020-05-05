@@ -30,11 +30,10 @@ class JeoMap {
 
 				map.setCenter( [ this.getArg( 'center_lon' ), this.getArg( 'center_lat' ) ] );
 
+				map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
+
 				if ( this.getArg( 'disable_scroll_zoom' ) ) {
 					map.scrollZoom.disable();
-					map.boxZoom.disable();
-					map.touchZoomRotate.disableRotation();
-					map.doubleClickZoom.disable();
 				}
 
 				if ( this.getArg( 'disable_drag_rotate' ) ) {
