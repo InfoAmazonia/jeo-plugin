@@ -17,11 +17,17 @@ const GutenbergAutosuggest = withSelect( ( select, { query, postType } ) => ( {
 	/>
 ) );
 
+const decodeHtmlEntity = function( str ) {
+	return str.replace( /&#(\d+);/g, function( match, dec ) {
+		return String.fromCharCode( dec );
+	} );
+};
+
 const { debounce } = window._;
 const _filterSuggestions = () => true;
 const _getSuggestionValue = ( entityRecord ) => entityRecord.title.rendered;
 const _renderSuggestion = ( entityRecord ) => (
-	<span>{ entityRecord.title.rendered }</span>
+	<span>{ decodeHtmlEntity( entityRecord.title.rendered ) }</span>
 );
 const _handleFetchRequest = ( { value } ) => {
 	const input = value.trim().toLowerCase();

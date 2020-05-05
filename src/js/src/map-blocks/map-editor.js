@@ -25,6 +25,12 @@ const MapEditor = ( {
 		setKey( key + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
+	const decodeHtmlEntity = function( str ) {
+		return str.replace( /&#(\d+);/g, function( match, dec ) {
+			return String.fromCharCode( dec );
+		} );
+	};
+
 	return (
 		<Fragment>
 			{ attributes.map_id && loadingMap && <Spinner /> }
@@ -64,7 +70,7 @@ const MapEditor = ( {
 					</div>
 
 					<div className="jeo-preview-controls">
-						<p><strong>{ loadedMap.title.rendered }</strong></p>
+						<p><strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong></p>
 						<Button
 							className="select-another-map"
 							isLink
