@@ -32,6 +32,21 @@ const MapEditor = ( {
 				<Fragment>
 					<div className="jeo-preview-area">
 						<Map
+							onStyleLoad={ ( map ) => {
+								map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
+
+								if ( loadedMap.meta.enable_fullscreen ) {
+									map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+								}
+
+								if ( loadedMap.meta.disable_scroll_zoom ) {
+									map.scrollZoom.disable();
+								}
+
+								if ( loadedMap.meta.disable_drag_rotate ) {
+									map.dragRotate.disable();
+								}
+							} }
 							key={ key }
 							style="mapbox://styles/mapbox/streets-v11"
 							zoom={ [ loadedMap.meta.initial_zoom || mapDefaults.zoom ] }
