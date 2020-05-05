@@ -3,7 +3,13 @@
 	width: 100%;
 }
 
-.jeo-geocode-text {
+.jeo-geocode-title__row {
+	display: flex;
+	justify-content: space-between;
+	margin: 10px 0;
+}
+
+.jeo-geocode-search__hint {
 	color: #808080;
 	margin: 0;
     display:inline-block; /*or display:block;*/

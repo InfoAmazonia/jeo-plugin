@@ -120,7 +120,7 @@ class JeoGeocodePosts extends Component {
 	}
 
 	clickMarkerMap( e ) {
-		const index = parseInt(e.target.options.id);
+		const index = parseInt( e.target.options.id );
 		this.setState(
 			{
 				currentMarkerIndex: index,
@@ -137,7 +137,7 @@ class JeoGeocodePosts extends Component {
 	}
 
 	clickMarkerList( e ) {
-		const index = parseInt(e.target.id);
+		const index = parseInt( e.target.id );
 		this.setState(
 			{
 				currentMarkerIndex: index,
@@ -183,7 +183,7 @@ class JeoGeocodePosts extends Component {
 		e.preventDefault();
 		e.stopPropagation();
 
-		const index = parseInt(e.target.attributes.marker_index.value);
+		const index = parseInt( e.target.attributes.marker_index.value );
 		const { points } = this.state;
 		this.setState(
 			{
@@ -200,7 +200,7 @@ class JeoGeocodePosts extends Component {
 		e.stopPropagation();
 
 		const { points } = this.state;
-		const index = parseInt(e.target.attributes.marker_index.value);
+		const index = parseInt( e.target.attributes.marker_index.value );
 		const point = points[ index ];
 		this.setState(
 			{
@@ -320,11 +320,8 @@ class JeoGeocodePosts extends Component {
 						value={ searchValue }
 						onChange={ this.handleSearchValue }
 					/>
-					<span className="jeo-geocode-text">
-						{ __(
-							'You can also drag the marker across the map.',
-							'jeo'
-						) }
+					<span className="jeo-geocode-search__hint">
+						{ __( 'You can also drag the marker across the map.', 'jeo' ) }
 					</span>
 				</div>
 				<div>
@@ -370,9 +367,7 @@ class JeoGeocodePosts extends Component {
 		return (
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
-					<div className="jeo-geocode-posts__row">
-					<div className="jeo-geocode-posts__buttons-list" style={{'justify-content': 'space-between'}}>
-
+					<div className="jeo-geocode-title__row">
 						<h2>{ __( 'Geolocated points', 'jeo' ) }</h2>
 						<div>
 							{ formMode === 'view' && (
@@ -381,9 +376,13 @@ class JeoGeocodePosts extends Component {
 								</Button>
 							) }
 						</div>
-						</div>
-						{ formMode === 'new' && this.renderForm() }
 					</div>
+					{ formMode === 'new' && (
+						<Fragment>
+							<h2>{ __( 'Add new point', 'jeo' ) }</h2>
+							{ this.renderForm() }
+						</Fragment>
+					) }
 					<div>
 						<h2>{ __( 'Current points', 'jeo' ) }</h2>
 						{ points.length === 0 ? (
@@ -423,7 +422,7 @@ class JeoGeocodePosts extends Component {
 											formMode === 'edit' &&
 											currentMarkerIndex === i &&
 											this.renderForm()
-										)}
+										) }
 									</li>
 								) ) }
 							</ul>
