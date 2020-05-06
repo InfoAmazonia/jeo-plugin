@@ -17,6 +17,19 @@ div.jeomap {
 	text-decoration: none;
 }
 
+.jeomap .marker {
+	cursor: pointer;
+	filter: brightness(85%);
+}
+
+.jeomap .marker:hover {
+	filter: brightness(110%);
+}
+
+.jeomap .marker-active {
+	filter: brightness(110%);
+}
+
 .jeomap nav a {
 	color: #404040;
 	display: block;
@@ -346,7 +359,6 @@ nav .layer-selection-title .legends-title {
 	float: right;
 	height: 100%;
 	padding: 0 10px 10px;
-	width: 220px;
 }
 
 .entry-content .legend-container p {
