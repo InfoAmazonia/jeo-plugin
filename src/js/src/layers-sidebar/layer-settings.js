@@ -91,7 +91,7 @@ const LayerSettings = ( {
 
 					if ( formData.attribution && ! formData.attribution.includes( 'http' ) ) {
 						if ( formData.attribution.match( regex ) ) {
-							attributionLink = `http://${ formData.attribution }`;
+							attributionLink = `https://${ formData.attribution }`;
 						} else if ( formData.attribution[ 0 ] !== '/' ) {
 							attributionLink = '/' + attributionLink;
 						}
@@ -100,7 +100,7 @@ const LayerSettings = ( {
 
 					if ( formData.source_url && ! formData.source_url.includes( 'http' ) ) {
 						if ( formData.source_url.match( regex ) ) {
-							sourceLink = `http://${ formData.source_url }`;
+							sourceLink = `https://${ formData.source_url }`;
 						} else if ( formData.source_url[ 0 ] !== '/' ) {
 							sourceLink = '/' + sourceLink;
 						}
@@ -114,7 +114,6 @@ const LayerSettings = ( {
 					if ( ! formData.source_url ) {
 						formData.source_url = '';
 					}
-					console.log(formData.source_url)
 					setPostMeta( formData );
 				} }
 			>

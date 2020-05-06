@@ -75,9 +75,10 @@ const MapEditor = ( {
 							className="select-another-map"
 							isLink
 							isLarge
-							onClick={ () =>
-								setAttributes( { ...attributes, map_id: undefined } )
-							}
+							onClick={ () => {
+								const previous_map = attributes.map_id;
+								setAttributes( { ...attributes, map_id: undefined, previous_map } );
+							} }
 						>
 							<em>{ __( '(Select another map)' ) }</em>
 						</Button>
@@ -99,6 +100,20 @@ const MapEditor = ( {
 							setAttributes( { ...attributes, map_id: suggestion.id } )
 						}
 					/>
+					{ attributes.previous_map && (
+						<Button
+							className="select-another-map"
+							isLarge
+							isPrimary
+							style={ { marginTop: '10px' } }
+							onClick={ () => {
+								const previous_map = attributes.previous_map;
+								setAttributes( { ...attributes, map_id: previous_map } );
+							} }
+						>
+							{ __( 'Cancel' ) }
+						</Button>
+					) }
 				</Fragment>
 			) }
 		</Fragment>
