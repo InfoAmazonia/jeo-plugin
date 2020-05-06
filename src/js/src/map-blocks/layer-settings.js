@@ -41,8 +41,7 @@ export default forwardRef(
 		const setWidth = ( index ) =>
 			isDragged && widths.length ? { width: widths[ index ] } : {};
 		props.style.zIndex = isDragged && 320000;
-
-		return (
+		return settings.layer && (
 			<tr { ...props } ref={ ref } className={ classes }>
 				<td className="handle" style={ setWidth( 0 ) }>
 					<Dashicon className="drag-handle" icon="move" data-movable-handle />
