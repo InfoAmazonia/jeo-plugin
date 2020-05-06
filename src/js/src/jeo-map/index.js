@@ -4,7 +4,7 @@ class JeoMap {
 	constructor( element ) {
 		this.element = element;
 		this.args = element.attributes;
-
+		this.markers = [];
 		this.layers = [];
 		this.legends = [];
 
@@ -363,6 +363,8 @@ class JeoMap {
 			this.relatedPostsCriteria = relatedPostsCriteria;
 			const query = {};
 			query.per_page = 100; // TODO handle limit of posts per query
+			query.orderby = 'date';
+			query.order = 'desc';
 
 			const keys = Object.keys( relatedPostsCriteria );
 
@@ -384,6 +386,7 @@ class JeoMap {
 						data.forEach( ( post ) => {
 							this.addPostToMap( post );
 						} );
+						
 					}
 				}
 			);
@@ -401,6 +404,7 @@ class JeoMap {
 	addPointToMap( point, post ) {
 		const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
 		const marker = new mapboxgl.Marker( { color } );
+		marker.getElement().classList.add( 'marker' );
 
 		const popupHTML = this.popupTemplate( {
 			post,
@@ -422,18 +426,31 @@ class JeoMap {
 		}
 
 		marker.addTo( this.map );
+		this.markers.push(marker);
 
 		if ( this.options && this.options.marker_action === 'embed_preview' ) {
 			marker.getElement().addEventListener( 'click', () => {
+				this.activateMarker(marker);
+				this.map.flyTo( { center: LngLat, zoom: 5 } )
+				this.embedPreviewActive = true;
 				this.updateEmbedPreview( post );
 			} );
 
-			// By default, activate the first post
+			// By default, fly to the first post and centers it
 			if ( ! this.embedPreviewActive ) {
+				this.activateMarker(marker);
 				this.updateEmbedPreview( post );
 				this.embedPreviewActive = true;
+				this.map.flyTo( { center: LngLat, zoom: 4 } )
 			}
 		}
+	}
+
+	activateMarker(activeMarker) {
+		this.markers.map(marker => {
+			const canToggle = marker._lngLat.lat == activeMarker._lngLat.lat && marker._lngLat.lon == activeMarker._lngLat.lon
+			marker.getElement().classList.toggle('marker-active', canToggle)
+		})
 	}
 
 	/**
