@@ -49,6 +49,10 @@ const MapEditor = ( {
 									map.scrollZoom.disable();
 								}
 
+								if ( loadedMap.meta.disable_drag_pan ) {
+									map.dragPan.disable();
+								}
+
 								if ( loadedMap.meta.disable_drag_rotate ) {
 									map.dragRotate.disable();
 								}

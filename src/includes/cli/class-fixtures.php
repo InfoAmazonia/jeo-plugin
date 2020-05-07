@@ -307,6 +307,7 @@ class Fixtures {
 					'center_lon' => 0,
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
+					'disable_drag_pan' => false,
 
 					// Brazil
 					// 'max_bounds_sw' => ['-85.728760', '-38.721678'],

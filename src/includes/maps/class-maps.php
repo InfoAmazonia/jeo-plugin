@@ -178,6 +178,14 @@ class Maps {
 			'description' => __('Disable scroll zoom', 'jeo')
 		]);
 
+		register_post_meta($this->post_type, 'disable_drag_pan', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'boolean',
+			'description' => __('Disable drag pan', 'jeo')
+		]);
+
 		register_post_meta($this->post_type, 'disable_drag_rotate', [
 			'show_in_rest' => true,
 			'single' => true,
