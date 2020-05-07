@@ -120,6 +120,7 @@ class Jeo {
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
 					'enable_fullscreen' => true,
+					'disable_drag_pan' => false,
 				]
 			)
 		);

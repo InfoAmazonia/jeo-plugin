@@ -9,6 +9,7 @@ const mapDefaults = {
 	min_zoom: 0,
 	max_zoom: 20,
 	disable_scroll_zoom: jeo_settings.map_defaults.disable_scroll_zoom,
+	disable_drag_pan: jeo_settings.map_defaults.disable_drag_pan,
 	disable_drag_rotate: jeo_settings.map_defaults.disable_drag_rotate,
 	enable_fullscreen: jeo_settings.map_defaults.enable_fullscreen,
 };
@@ -117,6 +118,13 @@ export default ( { attributes, setAttributes } ) => {
 						checked={ attributes.disable_drag_rotate }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_rotate' )( ! attributes.disable_drag_rotate );
+						} }
+					/>
+					<CheckboxControl
+						label={ __( 'Disable map movement' ) }
+						checked={ attributes.disable_drag_pan }
+						onChange={ () => {
+							attributeUpdater( 'disable_drag_pan' )( ! attributes.disable_drag_pan );
 						} }
 					/>
 					<CheckboxControl
