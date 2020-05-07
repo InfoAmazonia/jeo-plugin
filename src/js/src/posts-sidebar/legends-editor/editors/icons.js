@@ -133,7 +133,8 @@ class IconItem extends Component {
 					<Modal
 						className="jeo-interactions-settings__modal"
 						title={ __( 'Icon legend', 'jeo' ) }
-						onRequestClose={ () => { 
+						isDismissible={ false }
+						onRequestClose={ () => {
 							this.setState( {
 								...this.state,
 								openModal: false,
@@ -141,6 +142,19 @@ class IconItem extends Component {
 						} }
 					>
 						<h4>The uploaded icon is too small. The minimum size required is 60x60 pixels.</h4>
+						<Button
+							isLarge
+							isPrimary
+							style={ { marginTop: '10px' } }
+							onClick={ () => {
+								this.setState( {
+									...this.state,
+									openModal: false,
+								} );
+							} }
+						>
+							{ __( 'Ok' ) }
+						</Button>
 					</Modal>
 				) }
 
