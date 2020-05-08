@@ -136,12 +136,25 @@ class Layers {
 				'description'   => __( 'Legend type-specific options', 'jeo' ),
 			)
 		);
+
+		register_post_meta(
+			$this->post_type,
+			'use_legend',
+			array(
+				'show_in_rest' => true,
+				'single' => true,
+				'auth_callback' => '__return_true',
+				'type' => 'boolean',
+				'description' => __('Use legend', 'jeo')
+			)
+		);
 	}
 
 	public function validate_meta_type( $meta_value ) {
 		if ( ! \jeo_layer_types()->is_layer_type_registered( $meta_value ) ) {
 			return new \WP_Error( 'rest_invalid_field', __( 'Layer type not registered', 'jeo' ), array( 'status' => 400 ) );
 		}
+
 		return true;
 	}
 

@@ -1,5 +1,5 @@
 import { CheckboxControl, Dashicon, SelectControl } from '@wordpress/components';
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 
@@ -41,6 +41,7 @@ export default forwardRef(
 		const setWidth = ( index ) =>
 			isDragged && widths.length ? { width: widths[ index ] } : {};
 		props.style.zIndex = isDragged && 320000;
+
 		return settings.layer && (
 			<tr { ...props } ref={ ref } className={ classes }>
 				<td className="handle" style={ setWidth( 0 ) }>
@@ -79,11 +80,16 @@ export default forwardRef(
 					) }
 				</td>
 				<td>
-					<CheckboxControl
-						label={ __( 'Show legend' ) }
-						checked={ settings.show_legend }
-						onChange={ switchShowLegend }
-					/>
+					{ ! settings.layer.meta.use_legend && (
+						<p><em>No Legend</em></p>
+					) }
+					{ settings.layer.meta.use_legend && (
+						<CheckboxControl
+							label={ __( 'Show legend' ) }
+							checked={ settings.show_legend }
+							onChange={ switchShowLegend }
+						/>
+					) }
 				</td>
 				<td className="layer-actions" style={ setWidth( 4 ) }>
 					<a href={ `/wp-admin/post.php?post=${ settings.id }&action=edit` } target="_blank" rel="noopener noreferrer">
