@@ -217,17 +217,34 @@ class Jeo {
 
 		if( get_query_var( 'jeo_embed' ) === 'map' ) {
 
-			$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( $_GET['map_id'] ) : false;
-
+			$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( $_GET['map_id'] ) : false;	
 			if ( $map_id ) {
+				$map_meta = get_post_meta($map_id);
+				$args = (array) maybe_unserialize($map_meta['related_posts'][0]);
+				
+				$args['per_page'] = 1;
+				$request = new WP_REST_Request( 'GET', '/wp/v2/posts');
+				$request->set_query_params( $args );
+				$response = rest_do_request( $request );
+				$server = rest_get_server();
+				$data = $server->response_to_data( $response, false );
+
+				$have_related_posts = !empty($data) || !empty($map->show_all_posts);
 
 				$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
-				$map_width = $full_width ? $full_width - 220 : 600;
+				$popup_width = isset( $_GET['popup_width'] ) && is_numeric( $_GET['popup_width'] ) ? intval( $_GET['popup_width'] ) : 220;
+				$map_width = $full_width ? $full_width : 600;
+
+				if($have_related_posts){
+					$map_width = $full_width - $popup_width;
+				}
+
 				$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( $_GET['height'] ) : 600;
 
 				$map_style = "width: ${map_width}px; height: ${height}px;";
 				$container_style = "width: ${full_width}px; height: ${height}px;";
-
+				$popup_style = "width: ${popup_width}px; height: ${height}px;";
+				
 				require JEO_BASEPATH . '/templates/embed.php';
 
 				exit();
