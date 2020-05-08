@@ -42,12 +42,6 @@ export default forwardRef(
 			isDragged && widths.length ? { width: widths[ index ] } : {};
 		props.style.zIndex = isDragged && 320000;
 
-		useEffect( () => {
-			if ( settings.show_legend && ! settings.layer.meta.use_legend) {
-				switchShowLegend();
-			}
-		} );
-
 		return settings.layer && (
 			<tr { ...props } ref={ ref } className={ classes }>
 				<td className="handle" style={ setWidth( 0 ) }>
