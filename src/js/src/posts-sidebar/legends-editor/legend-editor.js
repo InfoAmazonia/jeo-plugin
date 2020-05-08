@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { SelectControl } from '@wordpress/components';
+import { SelectControl, CheckboxControl } from '@wordpress/components';
 import JeoLegend from '../../../../includes/legend-types/JeoLegend';
 import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
@@ -16,6 +16,7 @@ class LegendEditor extends Component {
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
+				use_legend: metadata.use_legend,
 			} ),
 		};
 
@@ -43,34 +44,52 @@ class LegendEditor extends Component {
 	render() {
 		return (
 			<Fragment>
+				<CheckboxControl
+					label={ __( 'Use legend' ) }
+					checked={ this.state.legendObject.attributes.use_legend }
+					onChange={ () => {
+						const newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+						newMeta.use_legend = ! newMeta.use_legend;
+						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
 
-				<SelectControl
-					label={ __( 'Type' ) }
-					value={ this.state.legendObject.legendSlug }
-					options={ [	...this.legendTypes.map( ( item ) => {
-						return { label: item, value: item };
-					} )	] }
-
-					onChange={ ( newLegendType ) => {
 						this.setState( ( prevState ) => {
-							const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-							legendObject.legendType = newLegendType;
-							legendObject.setlegengSlug = newLegendType;
-
-							if ( this.initialType !== newLegendType ) {
-								legendObject.attributes.legend_type_options = JeoLegend.typeOptionsShape( newLegendType );
-							} else {
-								legendObject.attributes.legend_type_options = this.inicialAttrType;
-							}
-
-							this.hasChanged( legendObject );
-
-							return { legendObject };
+							const newState = prevState;
+							newState.legendObject.attributes.use_legend = ! newState.legendObject.attributes.use_legend;
+							return ( newState );
 						} );
 					} }
 				/>
 
-				<LegendTypeEdition legendObject={ this.state.legendObject } initialType={ this.initialType } hasChanged={ this.hasChanged } />
+				{ this.state.legendObject.attributes.use_legend && (
+					<>
+						<SelectControl
+							label={ __( 'Type' ) }
+							value={ this.state.legendObject.legendSlug }
+							options={ [	...this.legendTypes.map( ( item ) => {
+								return { label: item, value: item };
+							} )	] }
+
+							onChange={ ( newLegendType ) => {
+								this.setState( ( prevState ) => {
+									const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
+									legendObject.legendType = newLegendType;
+									legendObject.setlegengSlug = newLegendType;
+
+									if ( this.initialType !== newLegendType ) {
+										legendObject.attributes.legend_type_options = JeoLegend.typeOptionsShape( newLegendType );
+									} else {
+										legendObject.attributes.legend_type_options = this.inicialAttrType;
+									}
+
+									this.hasChanged( legendObject );
+
+									return { legendObject };
+								} );
+							} }
+						/>
+						<LegendTypeEdition legendObject={ this.state.legendObject } initialType={ this.initialType } hasChanged={ this.hasChanged } />
+					</>
+				) }
 
 			</Fragment>
 

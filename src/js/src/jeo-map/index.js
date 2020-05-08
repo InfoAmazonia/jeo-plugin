@@ -144,7 +144,16 @@ class JeoMap {
 		const hideableContent = document.createElement( 'div' );
 		hideableContent.classList.add( 'hideable-content' );
 
-		if ( this.legends.length > 0 ) {
+		let appearingLegends = 0;
+
+		this.legends.forEach( ( legend ) => {
+			if ( ! legend.attributes.use_legend ) {
+				return;
+			}
+			appearingLegends++;
+		} );
+
+		if ( this.legends.length > 0 && appearingLegends > 0 ) {
 			const legendsTitle = document.createElement( 'div' );
 			legendsTitle.classList.add( 'legends-title' );
 			legendsTitle.innerHTML = '<span class="text"> Legend </span>';
@@ -170,6 +179,9 @@ class JeoMap {
 			hideableContent.appendChild( legendsWrapper );
 
 			this.legends.forEach( ( legend ) => {
+				if ( ! legend.attributes.use_legend ) {
+					return;
+				}
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
 				legendContainer.appendChild( legend.render() );
@@ -331,6 +343,7 @@ class JeoMap {
 								new window.JeoLegend( layerObject.meta.legend_type, {
 									layer_id: layerObject.slug,
 									legend_type_options: layerObject.meta.legend_type_options,
+									use_legend: layerObject.meta.use_legend,
 								} )
 							);
 						}
