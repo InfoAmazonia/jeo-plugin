@@ -92,8 +92,9 @@ class JeoMap {
 										attributionLink = '/' + attributionLink;
 									}
 								}
-
-								customAttribution.push( `<a href="${ attributionLink }">${ attributionName }</a>` );
+								
+								let attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink
+								customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
 							}
 
 							if ( i > 0 ) {
@@ -335,7 +336,7 @@ class JeoMap {
 								layer_id: layerObject.slug,
 								layer_name: layerObject.title.rendered,
 								attribution: layerObject.meta.attribution,
-								attribution: layerObject.meta.attribution_name,
+								attribution_name: layerObject.meta.attribution_name,
 								visible: layersDefinitions[ i ].default,
 								layer_type_options: layerObject.meta.layer_type_options,
 								source_url: layerObject.meta.source_url,
