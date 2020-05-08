@@ -81,6 +81,7 @@ class JeoMap {
 						layers.forEach( ( layer, i ) => {
 							if ( layer.attribution ) {
 								let attributionLink = layer.attribution;
+								let attributionName = layer.attribution_name;
 
 								const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
 
@@ -92,7 +93,7 @@ class JeoMap {
 									}
 								}
 
-								customAttribution.push( `<a href="${ attributionLink }">${ attributionLink }</a>` );
+								customAttribution.push( `<a href="${ attributionLink }">${ attributionName }</a>` );
 							}
 
 							if ( i > 0 ) {
@@ -204,6 +205,8 @@ class JeoMap {
 				const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
 
 				let attributionLink = layer.attributes.attribution;
+				let attributionName = layer.attributes.attribution_name;
+
 				let sourceLink = layer.source_url;
 
 				if ( layer.attributes.attribution && ! layer.attributes.attribution.includes( 'http' ) ) {
@@ -223,7 +226,7 @@ class JeoMap {
 				}
 
 				if ( attributionLink ) {
-					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ layer.attributes.attribution }</a></p>`;
+					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ attributionName }</a></p>`;
 				}
 				if ( sourceLink ) {
 					innerHTML += `<a
@@ -332,6 +335,7 @@ class JeoMap {
 								layer_id: layerObject.slug,
 								layer_name: layerObject.title.rendered,
 								attribution: layerObject.meta.attribution,
+								attribution: layerObject.meta.attribution_name,
 								visible: layersDefinitions[ i ].default,
 								layer_type_options: layerObject.meta.layer_type_options,
 								source_url: layerObject.meta.source_url,

@@ -363,6 +363,8 @@ class Maps {
 				$layers->the_post();
 
 				$source_url = get_post_meta( get_the_ID(), 'source_url', true );
+				$attribution = get_post_meta( get_the_ID(), 'attribution', true );
+				$attribution_name = get_post_meta( get_the_ID(), 'attribution_name', true );
 
 				include( $template );
 
