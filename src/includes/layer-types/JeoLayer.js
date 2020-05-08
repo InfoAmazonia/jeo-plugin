@@ -42,6 +42,10 @@ class JeoLayer {
 		return this.attributes.source_url;
 	}
 
+	get attribution_name() {
+		return this.attributes.attribution_name;
+	}
+
 }
 
 window.JeoLayer = JeoLayer;

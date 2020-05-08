@@ -110,6 +110,18 @@ class Layers {
 
 		register_post_meta(
 			$this->post_type,
+			'attribution_name',
+			array(
+				'show_in_rest'  => true,
+				'single'        => true,
+				'auth_callback' => '__return_true',
+				'type'          => 'string',
+				'description'   => __( 'The name of entity of attribution URL link', 'jeo' ),
+			)
+		);
+
+		register_post_meta(
+			$this->post_type,
 			'legend_type',
 			array(
 				'show_in_rest'  => true,

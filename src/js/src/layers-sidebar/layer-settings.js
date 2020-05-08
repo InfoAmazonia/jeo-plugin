@@ -11,6 +11,7 @@ const layerSchema = {
 	properties: {
 		source_url: { title: __( 'Source data download link' ), type: 'string' },
 		attribution: { title: __( 'Data attribution link' ), type: 'string' },
+		attribution_name: { title: __( 'Source name' ), type: 'string' },
 		type: { title: __( 'Type' ), type: 'string' },
 	},
 	required: [ 'type' ],
@@ -107,6 +108,9 @@ const LayerSettings = ( {
 					}
 					formData.source_url = sourceLink;
 
+					if ( ! formData.attribution_name ) {
+						formData.attribution_name = '';
+					}
 					if ( ! formData.attribution ) {
 						formData.attribution = '';
 					}
