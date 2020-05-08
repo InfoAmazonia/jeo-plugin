@@ -229,7 +229,7 @@ class JeoMap {
 									font-size: 16px;
 									font-weight: bold;
 									transition: all .2 ease-in-out;"
-									href="${ sourceLink }" class="download-source">Download source
+									href="${ sourceLink }" class="download-source">Download from source
 								  </a>`;
 				}
 			} );
