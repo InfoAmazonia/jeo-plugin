@@ -125,7 +125,7 @@ const LayerSettings = ( {
 				<div />
 			</Form>
 
-			{ styleLayers && (
+			{ styleLayers && interactions && (
 				<Fragment>
 					{ modalOpen && (
 						<InteractionsSettings
