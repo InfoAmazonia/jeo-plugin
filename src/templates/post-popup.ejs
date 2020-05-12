@@ -1,10 +1,28 @@
+<style>
+	.post-link-popup {
+		font-size: 22px;
+		text-decoration: none !important;
+		color: black !important;
+		
+	}
+
+	.popup__date {
+		font-family: Roboto-Regular;
+		font-size: 14px;
+		color: #999EA3;
+	}
+
+	.header-link-popup {
+		margin: 0 0 10px !important;
+		padding: 0 !important;
+		line-height: 20px;
+	}
+</style>
+<h2 class="header-link-popup"><a class="post-link-popup" href="<%= post.link %>"><%= post.title.rendered %></a></h2>
+
 <div class="popup__date">
 	<%= new Date(post.date).toLocaleDateString() %>
 </div>
-
-<h2><a href="<%= post.link %>"><%= post.title.rendered %></a></h2>
-
-<p><%= post.excerpt.rendered %></p>
 
 <% if (show_featured_media && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0]) { %>
 	<img src="<%= post._embedded['wp:featuredmedia'][0].media_details.sizes.thumbnail.source_url %>">
