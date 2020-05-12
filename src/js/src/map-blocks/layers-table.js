@@ -5,6 +5,12 @@ const loadLayers = ( layers ) => ( settings ) => {
 	return layers.find( ( l ) => l.id === settings.id );
 };
 
+const decodeHtmlEntity = function( str ) {
+	return str.replace( /&#(\d+);/g, function( match, dec ) {
+		return String.fromCharCode( dec );
+	} );
+};
+
 export default ( {
 	loadedLayers,
 	loadingLayers,
@@ -32,7 +38,7 @@ export default ( {
 				{ selectedLayers.map( loadLayer ).map( ( layer ) => (
 					<tr id={ layer.id } key={ layer.id }>
 						<td>{ layer.meta.type }</td>
-						<td>{ layer.title.rendered }</td>
+						<td>{ decodeHtmlEntity( layer.title.rendered ) }</td>
 					</tr>
 				) ) }
 			</tbody>
