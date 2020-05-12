@@ -519,3 +519,8 @@ nav .layer-selection-title .legends-title {
     padding-left: 0;
     margin-left: 0;
 }
+
+.jeomap .layers-wrapper .entry .entry-content a {
+    text-decoration: none;
+}
+
