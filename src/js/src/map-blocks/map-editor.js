@@ -67,8 +67,10 @@ const MapEditor = ( {
 							containerStyle={ { height: '50vh' } }
 						>
 							{ loadedLayers && loadedMap.meta.layers.map( ( layer ) => {
-								const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
-								return renderLayer( layerOptions, layer );
+								const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id );
+								if ( layerOptions ) {
+									return renderLayer( layerOptions.meta, layer );
+								}
 							} ) }
 						</Map>
 					</div>
