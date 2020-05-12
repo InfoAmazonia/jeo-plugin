@@ -4,6 +4,12 @@ import { __ } from '@wordpress/i18n';
 import { layerUseLabels } from './utils';
 import './layers-panel.css';
 
+const decodeHtmlEntity = function( str ) {
+	return str.replace( /&#(\d+);/g, function( match, dec ) {
+		return String.fromCharCode( dec );
+	} );
+};
+
 export default function( {
 	attributes,
 	loadLayer,
@@ -24,7 +30,7 @@ export default function( {
 						return settings.layer && (
 							<li className="jeo-setting-layer" key={ settings.id }>
 								<h2>
-									{ settings.layer.title.rendered } - { settings.layer.meta.type }
+									{ decodeHtmlEntity( settings.layer.title.rendered ) } - { settings.layer.meta.type }
 								</h2>
 								{ layerUseLabels[ settings.use ] }
 								{ settings.use !== 'fixed' &&
