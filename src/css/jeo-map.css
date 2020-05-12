@@ -307,7 +307,11 @@ nav .layer-selection-title .legends-title {
 .jeomap .mapboxgl-popup-close-button span {
     font-size: 49px;
     font-weight: 100;
-    line-height: 23px;
+	line-height: 23px;
+}
+
+.jeomap .mapboxgl-popup-close-button {
+	background: none;
 }
 
 .map-content-layers-list a.download-source:hover{
@@ -341,7 +345,7 @@ nav .layer-selection-title .legends-title {
 
 .popup h2{
 	margin: 0px;
-	margin-top: 15px;
+	line-height: 20px;
 }
 
 .popup h2 a{
