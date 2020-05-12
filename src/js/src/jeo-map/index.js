@@ -1,5 +1,11 @@
 import template from 'lodash.template';
 
+const decodeHtmlEntity = function( str ) {
+	return str.replace( /&#(\d+);/g, function( match, dec ) {
+		return String.fromCharCode( dec );
+	} );
+};
+
 class JeoMap {
 	constructor( element ) {
 		this.element = element;
@@ -576,7 +582,7 @@ class JeoMap {
 				link.className = 'active';
 			}
 
-			link.textContent = this.layers[ index ].layer_name;
+			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
 			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
 			link.onclick = ( e ) => {
@@ -609,7 +615,7 @@ class JeoMap {
 			if ( this.getDefaultSwappableLayer() == index ) {
 				link.classList.add( 'active' );
 			}
-			link.textContent = this.layers[ index ].layer_name;
+			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name);
 			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
 			link.onclick = ( e ) => {
