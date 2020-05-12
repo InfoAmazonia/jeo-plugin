@@ -426,27 +426,22 @@ class JeoMap {
 
 		marker.setLngLat( LngLat );
 		marker.addTo( this.map );
-		this.markers.push(marker);
+		this.markers.push( marker );
 
 		marker.getElement().addEventListener( 'click', () => {
 			this.activateMarker( marker );
-			this.embedPreviewActive = true;
-			if ( ! this.options || this.options.marker_action !== 'embed_preview' ) {
+			if ( !this.options || !this.options.marker_action === 'embed_preview' ) {
 				marker.setPopup( popUp );
 			} else {
-				this.map.flyTo( { center: LngLat, zoom: 5 } );
 				this.embedPreviewActive = true;
 				this.updateEmbedPreview( post );
 			}
+			this.map.flyTo( { center: LngLat, zoom: 5 } );
 		} );
 
 		// By default, fly to the first post and centers it
-		if ( ! this.embedPreviewActive && this.options.marker_action === 'embed_preview') {
-			this.activateMarker( marker );
-			this.updateEmbedPreview( post );
-			this.embedPreviewActive = true;
-			this.map.flyTo( { center: LngLat, zoom: 4 } )
-		}
+		this.activateMarker( marker );
+		this.map.flyTo( { center: LngLat, zoom: 4 } )
 	}
 
 	activateMarker( activeMarker ) {
