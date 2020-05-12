@@ -17,7 +17,7 @@ class JeoMap {
 		const map = new window.mapboxgl.Map( {
 			container: element,
 			attributionControl: false,
-
+		} );
 		this.map = map;
 		this.options = jQuery( this.element ).data( 'options' );
 
