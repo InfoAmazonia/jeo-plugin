@@ -361,7 +361,9 @@ class JeoGeocodePosts extends Component {
 	}
 
 	render() {
-		const { currentMarkerIndex, points, formMode, zoom } = this.state;
+		const { currentMarkerIndex, formMode, zoom } = this.state;
+		const pointsList = formMode !== "new" ? this.state.points : this.state.pointsCheckpoint;
+		const pointsMap = this.state.points;
 
 		return (
 			<div className="jeo-geocode-posts">
@@ -384,11 +386,11 @@ class JeoGeocodePosts extends Component {
 					) }
 					<div>
 						<h2>{ __( 'Current points', 'jeo' ) }</h2>
-						{ points.length === 0 ? (
+						{ pointsList.length === 0 ? (
 							__( 'No points', 'jeo' )
 						) : (
 							<ul>
-								{ points.map( ( point, i ) => (
+								{ pointsList.map( ( point, i ) => (
 									<li
 										id={ i }
 										onClick={ formMode === 'view' ? this.clickMarkerList : null }
@@ -441,7 +443,7 @@ class JeoGeocodePosts extends Component {
 								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 								url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
 							/>
-							{ points.map( ( point, i ) => (
+							{ pointsMap.map( ( point, i ) => (
 								<Marker
 									draggable={ currentMarkerIndex === i && formMode !== 'view' }
 									onDragend={ this.onMarkerDragged }
