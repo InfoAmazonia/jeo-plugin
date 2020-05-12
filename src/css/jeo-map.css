@@ -12,11 +12,6 @@ div.jeomap {
 	width: 170px;
 }
 
-.jeomap .mapboxgl-popup-close-button:hover {
-	background-color: #bf1e49fa;
-	text-decoration: none;
-}
-
 .jeomap .marker {
 	cursor: pointer;
 	filter: brightness(85%);
@@ -249,16 +244,16 @@ div.jeomap {
 }
 
 .jeomap div.legend-container a.more-info-button:hover {
-	background: #555D66;
-	color: white;
+	/* background: #555D66;*/
+	color: #555D66;
 	transition: all .1s ease-in-out;
 }
 
 .jeomap .mapboxgl-popup-close-button {
 	/* padding: 1rem 2rem; */
 	position: absolute;
-    right: 10px;
-    top: 10px;
+    right: 5px;
+    top: 5px;
     border: 0;
     border-radius: 0px;
     cursor: pointer;
@@ -266,7 +261,14 @@ div.jeomap {
     height: 30px;
     display: block;
 	padding: 0px;
-	background: #555D66;
+	color: #555D66;
+	font-size:25px;
+	/* background: #555D66; */
+}
+
+.jeomap .mapboxgl-popup-close-button:hover {
+	/* background-color: #bf1e49fa; */
+	text-decoration: none;
 }
 
 .map-content-layers-list {
@@ -331,6 +333,30 @@ nav .layer-selection-title .legends-title {
 .jeomap .popup {
 	margin-top: 4rem;
 	min-width: 200px;
+}
+
+.popup.popup-wmt{
+	margin-top: 0rem !important;
+}
+
+.popup h2{
+	margin: 0px;
+	margin-top: 15px;
+}
+
+.popup h2 a{
+	font-size: 22px;
+    font-weight: 900;
+    text-decoration: none !important;
+    color: #555d65;
+}
+.popup h1:not(.site-title):before, .popup h2:before {
+    background: #767676;
+    content: '';
+    display: block;
+    height: 0px;
+    margin: 0rem 0;
+    width: 1em;
 }
 
 .jeomap .popup h1 {

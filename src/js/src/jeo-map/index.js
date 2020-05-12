@@ -19,7 +19,7 @@ class JeoMap {
 		this.moreInfoTemplate = template( window.jeoMapVars.templates.moreInfo );
 
 		this.popupTemplate = template(
-			`<article class="popup">${
+			`<article class="popup popup-wmt">${
 				window.jeoMapVars.templates.postPopup
 			}</article>`,
 		);
