@@ -114,21 +114,21 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable drag rotation' ) }
+						label={ __( 'Disable drag rotation on post' ) }
 						checked={ attributes.disable_drag_rotate }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_rotate' )( ! attributes.disable_drag_rotate );
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable map movement' ) }
+						label={ __( 'Disable map navigation on post' ) }
 						checked={ attributes.disable_drag_pan }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_pan' )( ! attributes.disable_drag_pan );
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Enable fullscreen button' ) }
+						label={ __( 'Enable fullscreen button on post' ) }
 						checked={ attributes.enable_fullscreen }
 						onChange={ () => {
 							attributeUpdater( 'enable_fullscreen' )( ! attributes.enable_fullscreen );
