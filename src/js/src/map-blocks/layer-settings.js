@@ -14,6 +14,12 @@ const useOptions = [
 	{ label: layerUseLabels.switchable, value: 'switchable' },
 ];
 
+const decodeHtmlEntity = function( str ) {
+	return str.replace( /&#(\d+);/g, function( match, dec ) {
+		return String.fromCharCode( dec );
+	} );
+};
+
 export default forwardRef(
 	(
 		{
@@ -48,7 +54,7 @@ export default forwardRef(
 					<Dashicon className="drag-handle" icon="move" data-movable-handle />
 				</td>
 				<td className="display" style={ setWidth( 1 ) }>
-					<span className="layer-title">{ settings.layer.title.rendered }</span> |{ ' ' }
+					<span className="layer-title">{ decodeHtmlEntity( settings.layer.title.rendered ) }</span> |{ ' ' }
 					{ settings.layer.meta.type }
 				</td>
 				<td className="use-control" style={ setWidth( 2 ) }>

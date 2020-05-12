@@ -50,6 +50,12 @@ const LayersSettings = ( {
 		}
 	}, [ attributes, setAttributes ] );
 
+	const decodeHtmlEntity = function( str ) {
+		return str.replace( /&#(\d+);/g, function( match, dec ) {
+			return String.fromCharCode( dec );
+		} );
+	};
+
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
@@ -116,7 +122,7 @@ const LayersSettings = ( {
 											target="_blank"
 											rel="noopener noreferrer"
 										>
-											<strong>{ layer.title.rendered }</strong> | { layer.meta.type }
+											<strong>{ decodeHtmlEntity( layer.title.rendered ) }</strong> | { layer.meta.type }
 										</a>
 									</p>
 									{ inUse && (
