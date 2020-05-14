@@ -60,7 +60,19 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 						title: 'Source layer',
 						description: 'Layer to use from a vector tile source. ',
 					},
+					style_source_type: {
+						title: 'Style Source Type',
+						description: 'Which data the map should display',
+						type: 'string',
+						enum: [
+							'vector',
+							'raster',
+							'raster-dem',
+						],
+					},
 					type: {
+						title: 'Layer Type',
+						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
 						type: 'string',
 						enum: [
 							'fill',
@@ -71,6 +83,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 							'fill-extrusion',
 							'hillshade',
 							'background',
+							'raster',
 						],
 					},
 				},
