@@ -38,7 +38,7 @@ export function renderLayer( layer, instance ) {
 					<Source
 						id={ sourceId }
 						tileJsonSource={ {
-							type: 'vector',
+							type: options.style_source_type,
 							url: `mapbox://${ options.tileset_id }`,
 						} }
 					/>
