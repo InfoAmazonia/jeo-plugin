@@ -9,6 +9,9 @@ export function renderLayer( layer, instance ) {
 	const options = layer.layer_type_options;
 	const layerId = `layer_${ instance.id }`;
 	const sourceId = `source_${ instance.id }`;
+	if ( ! options.source_layer || ! options.url ) {
+		return;
+	}
 
 	switch ( layer.type ) {
 		case 'mapbox':
@@ -33,6 +36,7 @@ export function renderLayer( layer, instance ) {
 				</Fragment>
 			);
 		case 'mapbox-tileset':
+			console.log(options.source_layer)
 			return (
 				<Fragment>
 					<Source
