@@ -32,11 +32,12 @@ div.jeomap {
 	padding: 7px 10px;
 	font-size: 13px;
 	text-decoration: none;
-	margin-top: 2px;
+	margin-top: 0px;
 	background: white;
 	display: flex;
 	align-items: center;
 	position: relative;
+	border-bottom: 1px solid #b0b2b4;
 }
 
 .jeomap nav a:before {
@@ -508,4 +509,18 @@ nav .layer-selection-title .legends-title {
 .mapboxgl-ctrl-zoom-out {
 	background-color: white !important;
 	background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='29' height='29' viewBox='0 0 29 29' xmlns='http://www.w3.org/2000/svg' fill='%23333'%3E%3Cpath d='M10 13c-.75 0-1.5.75-1.5 1.5S9.25 16 10 16h9c.75 0 1.5-.75 1.5-1.5S19.75 13 19 13h-9z'/%3E%3C/svg%3E");
+}
+
+.editor-styles-wrapper ul {
+    list-style-type: none;
+}
+
+.editor-styles-wrapper ul, .editor-styles-wrapper ol {
+	margin-bottom: 2px;
+    padding-left: 0;
+    margin-left: 0;
+}
+
+.jeomap .layers-wrapper a {
+    text-decoration: none !important;
 }
