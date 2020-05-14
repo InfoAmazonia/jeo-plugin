@@ -1,5 +1,11 @@
 import template from 'lodash.template';
 
+const decodeHtmlEntity = function( str ) {
+	return str.replace( /&#(\d+);/g, function( match, dec ) {
+		return String.fromCharCode( dec );
+	} );
+};
+
 class JeoMap {
 	constructor( element ) {
 		this.element = element;
@@ -12,7 +18,6 @@ class JeoMap {
 			container: element,
 			attributionControl: false,
 		} );
-
 		this.map = map;
 		this.options = jQuery( this.element ).data( 'options' );
 
@@ -425,37 +430,30 @@ class JeoMap {
 		};
 
 		marker.setLngLat( LngLat );
-
-		if ( ! this.options || this.options.marker_action !== 'embed_preview' ) {
-			marker.setPopup( popUp );
-		}
-
 		marker.addTo( this.map );
-		this.markers.push(marker);
+		this.markers.push( marker );
 
-		if ( this.options && this.options.marker_action === 'embed_preview' ) {
-			marker.getElement().addEventListener( 'click', () => {
-				this.activateMarker(marker);
-				this.map.flyTo( { center: LngLat, zoom: 5 } )
+		marker.getElement().addEventListener( 'click', () => {
+			this.activateMarker( marker );
+			if ( !this.options || !this.options.marker_action === 'embed_preview' ) {
+				marker.setPopup( popUp );
+			} else {
 				this.embedPreviewActive = true;
 				this.updateEmbedPreview( post );
-			} );
-
-			// By default, fly to the first post and centers it
-			if ( ! this.embedPreviewActive ) {
-				this.activateMarker(marker);
-				this.updateEmbedPreview( post );
-				this.embedPreviewActive = true;
-				this.map.flyTo( { center: LngLat, zoom: 4 } )
 			}
-		}
+			this.map.flyTo( { center: LngLat, zoom: 5 } );
+		} );
+
+		// By default, fly to the first post and centers it
+		this.activateMarker( marker );
+		this.map.flyTo( { center: LngLat, zoom: 4 } )
 	}
 
-	activateMarker(activeMarker) {
-		this.markers.map(marker => {
+	activateMarker( activeMarker ) {
+		this.markers.map( marker => {
 			const canToggle = marker._lngLat.lat == activeMarker._lngLat.lat && marker._lngLat.lon == activeMarker._lngLat.lon
-			marker.getElement().classList.toggle('marker-active', canToggle)
-		})
+			marker.getElement().classList.toggle( 'marker-active', canToggle );
+		} )
 	}
 
 	/**
@@ -576,7 +574,7 @@ class JeoMap {
 				link.className = 'active';
 			}
 
-			link.textContent = this.layers[ index ].layer_name;
+			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
 			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
 			link.onclick = ( e ) => {
@@ -609,7 +607,7 @@ class JeoMap {
 			if ( this.getDefaultSwappableLayer() == index ) {
 				link.classList.add( 'active' );
 			}
-			link.textContent = this.layers[ index ].layer_name;
+			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name);
 			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
 			link.onclick = ( e ) => {
