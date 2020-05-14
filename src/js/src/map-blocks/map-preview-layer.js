@@ -14,6 +14,10 @@ export function renderLayer( layer, instance ) {
 		case 'mapbox':
 			const accessToken = options.access_token || window.mapboxgl.accessToken;
 
+			if ( ! sourceId || ! layerId ) {
+				return;
+			}
+
 			return (
 				<Fragment>
 					<Source
@@ -33,6 +37,10 @@ export function renderLayer( layer, instance ) {
 				</Fragment>
 			);
 		case 'mapbox-tileset':
+			if ( ! sourceId || ! layerId || ! options.type || ! options.source_layer ) {
+				return;
+			}
+
 			return (
 				<Fragment>
 					<Source
@@ -51,6 +59,10 @@ export function renderLayer( layer, instance ) {
 				</Fragment>
 			);
 		case 'mvt':
+			if ( ! sourceId || ! options.url || ! layerId || ! options.type || ! options.source_layer ) {
+				return;
+			}
+
 			return (
 				<Fragment>
 					<Source
@@ -69,6 +81,10 @@ export function renderLayer( layer, instance ) {
 				</Fragment>
 			);
 		case 'tilelayer':
+			if ( ! sourceId || ! options.url || ! layerId ) {
+				return;
+			}
+
 			return (
 				<Fragment>
 					<Source

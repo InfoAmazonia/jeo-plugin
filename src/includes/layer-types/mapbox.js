@@ -174,16 +174,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					attributes.layer_type_options.access_token :
 					window.mapboxgl.accessToken;
 
-			jQuery.get(
-				'https://api.mapbox.com/styles/v1/' +
-					attributes.layer_type_options.style_id +
-					'?access_token=' +
-					accessToken,
-				function( data ) {
-					self._styleDefinitions[ attributes.layer_id ] = data;
-					resolve( data );
-				}
-			);
+			if ( accessToken && attributes.layer_type_options.style_id ) {
+				jQuery.get(
+					'https://api.mapbox.com/styles/v1/' +
+						attributes.layer_type_options.style_id +
+						'?access_token=' +
+						accessToken,
+					function( data ) {
+						self._styleDefinitions[ attributes.layer_id ] = data;
+						resolve( data );
+					}
+				);
+			}
 		} );
 	},
 
@@ -207,17 +209,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 				if ( typeof composite === 'object' ) {
 					const layers = composite.url.replace( 'mapbox://', '' );
-					//console.log(composite);
-					jQuery.get(
-						'https://api.mapbox.com/v4/' +
-							layers +
-							'.json?secure&access_token=' +
-							accessToken,
-						function( data ) {
-							self._styleLayers[ attributes.layer_id ] = data;
-							resolve( data );
-						}
-					);
+					if ( layers && accessToken ) {
+						jQuery.get(
+							'https://api.mapbox.com/v4/' +
+								layers +
+								'.json?secure&access_token=' +
+								accessToken,
+							function( data ) {
+								self._styleLayers[ attributes.layer_id ] = data;
+								resolve( data );
+							}
+						);
+					}
 				} else {
 					reject( 'No composite source' );
 				}
