@@ -524,3 +524,15 @@ nav .layer-selection-title .legends-title {
 .jeomap .layers-wrapper a {
     text-decoration: none !important;
 }
+
+.jeomap.wp-block-jeo-map.mapboxgl-map.jeo-without-layers,
+.jeomap.wp-block-jeo-onetime-map.mapboxgl-map.jeo-without-layers {
+    height: auto;
+    width: auto;
+}
+
+p.jeomap-no-layers__text {
+    font-size: 16px;
+    border: 1px solid #e3dfdf;
+    padding: 5px;
+}

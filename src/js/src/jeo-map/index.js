@@ -150,16 +150,15 @@ class JeoMap {
 		}
 		return Promise.resolve();
 	}
-
 	addMapWithoutLayersMessage() {
-		const container = document.createElement( 'div' );
-		container.classList.add( 'jeomap-no-layers' );
-		const message = document.createElement( 'div' );
-		message.classList.add( 'message' );
-		message.innerHTML = '<p class="jeomap-no-layers__text">O mapa não possui layers </p>';
-		container.appendChild( message );
-		this.element.appendChild( container );
+		const layers = document.createElement( 'div' );
+		layers.innerHTML += '<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
+		this.element.appendChild( layers );
+		jQuery(this.element).addClass('jeo-without-layers');
+		jQuery(this.element).find( '.mapboxgl-control-container' ).remove();
+		jQuery(this.element).find( '.mapboxgl-canvas-container' ).remove();
 	}
+
 	/**
 	 * Adds the "More" button that will open the Content of the Map post in an overlayer
 	 *
