@@ -31,100 +31,112 @@ class JeoMap {
 
 		this.initMap()
 			.then( () => {
-				map.setZoom( this.getArg( 'initial_zoom' ) );
 
-				map.setCenter( [ this.getArg( 'center_lon' ), this.getArg( 'center_lat' ) ] );
+				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
+					map.setZoom( this.getArg( 'initial_zoom' ) );
 
-				map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
+					map.setCenter( [ this.getArg( 'center_lon' ), this.getArg( 'center_lat' ) ] );
 
-				if ( this.getArg( 'disable_scroll_zoom' ) ) {
-					map.scrollZoom.disable();
-				}
+					map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 
-				if ( this.getArg( 'disable_drag_pan' ) ) {
-					map.dragPan.disable();
-				}
+					if ( this.getArg( 'disable_scroll_zoom' ) ) {
+						map.scrollZoom.disable();
+					}
 
-				if ( this.getArg( 'disable_drag_rotate' ) ) {
-					map.dragRotate.disable();
-				}
+					if ( this.getArg( 'disable_drag_pan' ) ) {
+						map.dragPan.disable();
+					}
 
-				if ( this.getArg( 'enable_fullscreen' ) ) {
-					map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-				}
+					if ( this.getArg( 'disable_drag_rotate' ) ) {
+						map.dragRotate.disable();
+					}
 
-				if (
-					this.getArg( 'max_bounds_ne' ) &&
+					if ( this.getArg( 'enable_fullscreen' ) ) {
+						map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+					}
+
+					if (
+						this.getArg( 'max_bounds_ne' ) &&
 					this.getArg( 'max_bounds_sw' ) &&
 					this.getArg( 'max_bounds_ne' ).length === 2 &&
 					this.getArg( 'max_bounds_sw' ).length === 2
 
-				) {
-					map.setMaxBounds(
-						[
-							this.getArg( 'max_bounds_sw' ),
-							this.getArg( 'max_bounds_ne' ),
-						]
-					);
-				}
+					) {
+						map.setMaxBounds(
+							[
+								this.getArg( 'max_bounds_sw' ),
+								this.getArg( 'max_bounds_ne' ),
+							]
+						);
+					}
 
-				if ( this.getArg( 'min_zoom' ) ) {
-					map.setMinZoom( this.getArg( 'min_zoom' ) );
-				}
-				if ( this.getArg( 'max_zoom' ) ) {
-					map.setMaxZoom( this.getArg( 'max_zoom' ) );
+					if ( this.getArg( 'min_zoom' ) ) {
+						map.setMinZoom( this.getArg( 'min_zoom' ) );
+					}
+					if ( this.getArg( 'max_zoom' ) ) {
+						map.setMaxZoom( this.getArg( 'max_zoom' ) );
+					}
 				}
 			} )
 			.then( () => {
-				this.getLayers().then( ( layers ) => {
-					const baseLayer = layers[ 0 ];
-					baseLayer.addStyle( map );
+				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
+					this.getLayers().then( ( layers ) => {
+						const baseLayer = layers[ 0 ];
+						baseLayer.addStyle( map );
 
-					const customAttribution = [];
+						const customAttribution = [];
 
-					map.on( 'load', () => {
-						layers.forEach( ( layer, i ) => {
-							if ( layer.attribution ) {
-								let attributionLink = layer.attribution;
-								let attributionName = layer.attribution_name;
+						map.on( 'load', () => {
+							layers.forEach( ( layer, i ) => {
+								if ( layer.attribution ) {
+									let attributionLink = layer.attribution;
+									const attributionName = layer.attribution_name;
 
-								const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+									const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
 
-								if ( ! layer.attribution.includes( 'http' ) ) {
-									if ( layer.attribution.match( regex ) ) {
-										attributionLink = `https://${ layer.attribution }`;
-									} else if ( layer.attribution[ 0 ] !== '/' ) {
-										attributionLink = '/' + attributionLink;
+									if ( ! layer.attribution.includes( 'http' ) ) {
+										if ( layer.attribution.match( regex ) ) {
+											attributionLink = `https://${ layer.attribution }`;
+										} else if ( layer.attribution[ 0 ] !== '/' ) {
+											attributionLink = '/' + attributionLink;
+										}
 									}
+
+									const attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink;
+									customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
 								}
-								
-								let attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink
-								customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
-							}
 
-							if ( i > 0 ) {
-								layer.addLayer( map );
-							}
+								if ( i > 0 ) {
+									layer.addLayer( map );
+								}
 
-							layer.addInteractions( map );
+								layer.addInteractions( map );
+							} );
 						} );
+
+						this.addLayersControl();
+
+						map.addControl(
+							new mapboxgl.AttributionControl( {
+								customAttribution,
+							} ),
+							'bottom-left'
+						);
+
+						this.addMoreButtonAndLegends();
 					} );
 
-					this.addLayersControl();
-
-					map.addControl(
-						new mapboxgl.AttributionControl( {
-							customAttribution,
-						} ),
-						'bottom-left'
-					);
-
-					this.addMoreButtonAndLegends();
-				} );
-
-				this.getRelatedPosts();
+					this.getRelatedPosts();
+				}
+				// Show a message when a map doesn't have layers
+				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length === 0 ) {
+					this.addMapWithoutLayersMessage();
+				}
+			} )
+			.then( () => {
+				// Remove all empty jeo map blocks
+				jQuery( '.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])' ).remove();
 			} );
-
 		window.map = map;
 	}
 
@@ -139,6 +151,15 @@ class JeoMap {
 		return Promise.resolve();
 	}
 
+	addMapWithoutLayersMessage() {
+		const container = document.createElement( 'div' );
+		container.classList.add( 'jeomap-no-layers' );
+		const message = document.createElement( 'div' );
+		message.classList.add( 'message' );
+		message.innerHTML = '<p class="jeomap-no-layers__text">O mapa não possui layers </p>';
+		container.appendChild( message );
+		this.element.appendChild( container );
+	}
 	/**
 	 * Adds the "More" button that will open the Content of the Map post in an overlayer
 	 *
@@ -211,7 +232,7 @@ class JeoMap {
 				const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
 
 				let attributionLink = layer.attributes.attribution;
-				let attributionName = layer.attributes.attribution_name;
+				const attributionName = layer.attributes.attribution_name;
 
 				let sourceLink = layer.source_url;
 
@@ -396,7 +417,6 @@ class JeoMap {
 						data.forEach( ( post ) => {
 							this.addPostToMap( post );
 						} );
-						
 					}
 				}
 			);
@@ -435,7 +455,7 @@ class JeoMap {
 
 		marker.getElement().addEventListener( 'click', () => {
 			this.activateMarker( marker );
-			if ( !this.options || !this.options.marker_action === 'embed_preview' ) {
+			if ( ! this.options || ! this.options.marker_action === 'embed_preview' ) {
 				marker.setPopup( popUp );
 			} else {
 				this.embedPreviewActive = true;
@@ -446,14 +466,14 @@ class JeoMap {
 
 		// By default, fly to the first post and centers it
 		this.activateMarker( marker );
-		this.map.flyTo( { center: LngLat, zoom: 4 } )
+		this.map.flyTo( { center: LngLat, zoom: 4 } );
 	}
 
 	activateMarker( activeMarker ) {
-		this.markers.map( marker => {
-			const canToggle = marker._lngLat.lat == activeMarker._lngLat.lat && marker._lngLat.lon == activeMarker._lngLat.lon
+		this.markers.map( ( marker ) => {
+			const canToggle = marker._lngLat.lat == activeMarker._lngLat.lat && marker._lngLat.lon == activeMarker._lngLat.lon;
 			marker.getElement().classList.toggle( 'marker-active', canToggle );
-		} )
+		} );
 	}
 
 	/**
@@ -607,7 +627,7 @@ class JeoMap {
 			if ( this.getDefaultSwappableLayer() == index ) {
 				link.classList.add( 'active' );
 			}
-			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name);
+			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
 			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
 			link.onclick = ( e ) => {
