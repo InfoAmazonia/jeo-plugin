@@ -37,7 +37,7 @@ export function renderLayer( layer, instance ) {
 				</Fragment>
 			);
 		case 'mapbox-tileset':
-			if ( ! sourceId || ! layerId || ! options.type || ! options.source_layer ) {
+			if ( ! sourceId || ! layerId || ! options.type || ! options.source_layer || ! options.tileset_id ) {
 				return;
 			}
 
