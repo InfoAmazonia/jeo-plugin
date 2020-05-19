@@ -51,6 +51,7 @@ const MapEditor = ( {
 
 								if ( loadedMap.meta.disable_drag_pan ) {
 									map.dragPan.disable();
+									map.touchZoomRotate.disable()
 								}
 
 								if ( loadedMap.meta.disable_drag_rotate ) {

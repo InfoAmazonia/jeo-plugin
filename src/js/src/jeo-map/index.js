@@ -45,6 +45,7 @@ class JeoMap {
 
 					if ( this.getArg( 'disable_drag_pan' ) ) {
 						map.dragPan.disable();
+						map.touchZoomRotate.disable()
 					}
 
 					if ( this.getArg( 'disable_drag_rotate' ) ) {
