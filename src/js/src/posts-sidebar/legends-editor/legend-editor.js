@@ -48,7 +48,10 @@ class LegendEditor extends Component {
 					label={ __( 'Use legend' ) }
 					checked={ this.state.legendObject.attributes.use_legend }
 					onChange={ () => {
-						const newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+						let newMeta = window.layerFormData;
+						if ( ! newMeta ) {
+							newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+						}
 						newMeta.use_legend = ! newMeta.use_legend;
 						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
 
