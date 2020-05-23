@@ -6,7 +6,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			version: 8,
 			sources: {
 				[ name ]: {
-					type: 'vector',
+					type: attributes.layer_type_options.style_source_type,
 					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 				},
 			},
@@ -21,7 +21,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 
 	addLayer( map, attributes ) {
 		map.addSource( attributes.layer_id, {
-			type: 'vector',
+			type: attributes.layer_type_options.style_source_type,
 			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 		} );
 
