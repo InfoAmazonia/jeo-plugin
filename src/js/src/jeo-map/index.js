@@ -594,7 +594,10 @@ class JeoMap {
 				link.className = 'active';
 			}
 
-			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
+			const layerName = document.createElement( 'span' );
+			layerName.classList.add( 'layer-name' );
+			layerName.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
+
 			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
 			link.onclick = ( e ) => {
@@ -613,6 +616,8 @@ class JeoMap {
 					this.showLayer( clickedLayer );
 				}
 			};
+
+			link.appendChild( layerName );
 
 			layers.appendChild( link );
 		} );

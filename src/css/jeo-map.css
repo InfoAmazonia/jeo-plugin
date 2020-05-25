@@ -72,6 +72,11 @@ div.jeomap {
     left: auto;
     top: auto;
 }
+
+.jeomap nav .layers-wrapper .layer-name{
+	overflow-wrap: break-word;
+    min-width: 0;
+}
 /*end*/
 
 .jeomap nav a.active:before {
