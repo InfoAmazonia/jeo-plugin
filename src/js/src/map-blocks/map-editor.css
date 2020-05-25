@@ -50,6 +50,7 @@
 .react-autosuggest__suggestion {
 	cursor: pointer;
 	padding: 10px 20px;
+	overflow-wrap: break-word;
 }
 
 .react-autosuggest__suggestion:not(:first-child) {
