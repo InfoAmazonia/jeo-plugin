@@ -42,7 +42,8 @@ div.jeomap {
 
 .jeomap nav a:before {
     content: "";
-    width: 16px;
+	/* width: 16px;*/
+	min-width: 16px;
     height: 16px;
     border: 2px solid;
     display: inline-block;
@@ -61,6 +62,22 @@ div.jeomap {
     width: 20px;
     height: 20px;
 }
+
+/*ini checkbox in layer section inside map*/
+.jeomap nav .layers-wrapper a:before {
+	min-width: 16px;
+}
+
+.jeomap nav .layers-wrapper a.active:after {
+    left: auto;
+    top: auto;
+}
+
+.jeomap nav .layers-wrapper .layer-name{
+	overflow-wrap: break-word;
+    min-width: 0;
+}
+/*end*/
 
 .jeomap nav a.active:before {
 
