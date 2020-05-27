@@ -18,8 +18,11 @@ export function renderLayer( layer, instance ) {
 				return;
 			}
 
-			const style_id = options.style_id.replace( 'mapbox://styles/', '' );
-
+			let style_id = options.style_id;
+			if ( style_id ) {
+				style_id = style_id.replace( 'mapbox://styles/', '' );
+			}
+ 
 			return (
 				<Fragment>
 					<Source
