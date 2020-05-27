@@ -1,11 +1,18 @@
 window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addStyle( map, attributes ) {
+		if ( attributes.layer_type_options.style_id.includes( 'mapbox://styles/' ) ) {
+			return map.setStyle(
+				attributes.layer_type_options.style_id
+			);
+		}
 		return map.setStyle(
 			'mapbox://styles/' + attributes.layer_type_options.style_id
 		);
 	},
 
 	addLayer( map, attributes ) {
+		let style_id = attributes.layer_type_options.style_id;
+		style_id = style_id.replace( 'mapbox://styles/', '' );
 		const accessToken =
 			typeof attributes.layer_type_options.access_token !== 'undefined' ?
 				attributes.layer_type_options.access_token :
@@ -16,7 +23,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				type: 'raster',
 				tiles: [
 					'https://api.mapbox.com/styles/v1/' +
-						attributes.layer_type_options.style_id +
+						style_id +
 						'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
 						accessToken,
 				],
@@ -112,7 +119,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				style_id: {
 					type: 'string',
 					title: 'Style ID',
-					description: 'The mapbox Style ID composes by user name and id. Example: username/cjvwsdfrfx5i23coafd4sx97e',
+					description: 'The mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
 				},
 				access_token: {
 					type: 'string',
@@ -145,7 +152,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 								id: layer.id,
 								fields: layer.fields,
 								source: layer.source,
-								sourceName: layer.source_name
+								sourceName: layer.source_name,
 							};
 						} );
 					}
@@ -175,9 +182,12 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					window.mapboxgl.accessToken;
 
 			if ( accessToken && attributes.layer_type_options.style_id ) {
+				let style_id = attributes.layer_type_options.style_id;
+				style_id = style_id.replace( 'mapbox://styles/', '' );
+
 				jQuery.get(
 					'https://api.mapbox.com/styles/v1/' +
-						attributes.layer_type_options.style_id +
+						style_id +
 						'?access_token=' +
 						accessToken,
 					function( data ) {

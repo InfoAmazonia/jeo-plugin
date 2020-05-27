@@ -18,6 +18,8 @@ export function renderLayer( layer, instance ) {
 				return;
 			}
 
+			const style_id = options.style_id.replace( 'mapbox://styles/', '' );
+
 			return (
 				<Fragment>
 					<Source
@@ -25,7 +27,7 @@ export function renderLayer( layer, instance ) {
 						tileJsonSource={ {
 							type: 'raster',
 							tiles: [
-								`https://api.mapbox.com/styles/v1/${ options.style_id }/tiles/256/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
+								`https://api.mapbox.com/styles/v1/${ style_id }/tiles/256/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 							],
 						} }
 					/>
@@ -41,13 +43,19 @@ export function renderLayer( layer, instance ) {
 				return;
 			}
 
+			let tileset_id = options.tileset_id;
+
+			if ( ! tileset_id.includes( 'mapbox://' ) ) {
+				tileset_id = 'mapbox://' + tileset_id;
+			}
+
 			return (
 				<Fragment>
 					<Source
 						id={ sourceId }
 						tileJsonSource={ {
 							type: 'vector',
-							url: `mapbox://${ options.tileset_id }`,
+							url: tileset_id,
 						} }
 					/>
 					<Layer
