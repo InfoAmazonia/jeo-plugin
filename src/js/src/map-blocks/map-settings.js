@@ -107,29 +107,29 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable scroll zoom on post' ) }
-						checked={ attributes.disable_scroll_zoom }
+						label={ __( 'Scroll zoom on post' ) }
+						checked={ ! attributes.disable_scroll_zoom }
 						onChange={ () => {
 							attributeUpdater( 'disable_scroll_zoom' )( ! attributes.disable_scroll_zoom );
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable drag rotation on post' ) }
-						checked={ attributes.disable_drag_rotate }
+						label={ __( 'Drag rotation on post' ) }
+						checked={ ! attributes.disable_drag_rotate }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_rotate' )( ! attributes.disable_drag_rotate );
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Disable map navigation on post' ) }
-						checked={ attributes.disable_drag_pan }
+						label={ __( 'Map navigation on post' ) }
+						checked={ ! attributes.disable_drag_pan }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_pan' )( ! attributes.disable_drag_pan );
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Enable fullscreen button on post' ) }
-						checked={ attributes.enable_fullscreen }
+						label={ __( 'Fullscreen button on post' ) }
+						checked={ ! attributes.enable_fullscreen }
 						onChange={ () => {
 							attributeUpdater( 'enable_fullscreen' )( ! attributes.enable_fullscreen );
 						} }
