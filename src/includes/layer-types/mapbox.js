@@ -12,7 +12,9 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 	addLayer( map, attributes ) {
 		let style_id = attributes.layer_type_options.style_id;
-		style_id = style_id.replace( 'mapbox://styles/', '' );
+		if ( style_id ) {
+			style_id = style_id.replace( 'mapbox://styles/', '' );
+		}
 		const accessToken =
 			typeof attributes.layer_type_options.access_token !== 'undefined' ?
 				attributes.layer_type_options.access_token :
@@ -183,7 +185,9 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 			if ( accessToken && attributes.layer_type_options.style_id ) {
 				let style_id = attributes.layer_type_options.style_id;
-				style_id = style_id.replace( 'mapbox://styles/', '' );
+				if ( style_id ) {
+					style_id = style_id.replace( 'mapbox://styles/', '' );
+				}
 
 				jQuery.get(
 					'https://api.mapbox.com/styles/v1/' +
