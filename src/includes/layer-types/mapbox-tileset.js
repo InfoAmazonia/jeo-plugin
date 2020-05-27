@@ -2,12 +2,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
+		let tileset_id = attributes.layer_type_options.tileset_id;
+
+		if ( ! tileset_id.includes( 'mapbox://' ) ) {
+			tileset_id = 'mapbox://' + tileset_id;
+		}
+
 		return map.setStyle( {
 			version: 8,
 			sources: {
 				[ name ]: {
 					type: 'vector',
-					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+					url: tileset_id,
 				},
 			},
 			layers: [ {
@@ -20,9 +26,15 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 	},
 
 	addLayer( map, attributes ) {
+		let tileset_id = attributes.layer_type_options.tileset_id;
+
+		if ( ! tileset_id.includes( 'mapbox://' ) ) {
+			tileset_id = 'mapbox://' + tileset_id;
+		}
+
 		map.addSource( attributes.layer_id, {
 			type: 'vector',
-			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+			url: tileset_id,
 		} );
 
 		return map.addLayer( {
@@ -53,7 +65,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 					tileset_id: {
 						type: 'string',
 						title: 'Tileset ID',
-						description: 'Example: username.tilesetid',
+						description: 'Example: username.tilesetid or mapbox://username.tilesetid',
 					},
 					source_layer: {
 						type: 'string',
