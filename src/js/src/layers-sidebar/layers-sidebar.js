@@ -1,17 +1,17 @@
-import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
 import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
-
-import LayerSettings from './layer-settings';
+import AttributionSettings from './attribution-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
-import LayerPreviewPortal from './layer-preview-portal';
+import { withDispatch, withSelect } from '@wordpress/data';
+import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { renderLayer } from '../map-blocks/map-preview-layer';
-import { useDebounce } from '../map-blocks/utils';
-import isEqual from 'lodash.isequal';
-
+import { isEmpty, isEqual } from 'lodash-es';
+import { useDebounce } from 'use-debounce';
+import LayerPreviewPortal from './layer-preview-portal';
+import LayerSettings from './layer-settings';
 import './layers-sidebar.css';
+import { formUpdater } from './form-updater';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -21,28 +21,51 @@ const mapDefaults = {
 	max_zoom: 20,
 };
 
-function LayersSidebar( {
+const LayersSidebar = ( {
 	postMeta,
 	setPostMeta,
 	sendNotice,
 	removeNotice,
+	lockPostAutoSaving,
 	lockPostSaving,
 	unlockPostSaving,
-} ) {
+} ) => {
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
 		initial_zoom: initialZoom,
 	} = { ...mapDefaults, ...postMeta };
+	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
+
+	const [ key, setKey ] = useState( 0 );
+	const [ hasError, setHasError ] = useState( false );
+
+	const editingMap = useRef( false );
+	const [ debouncedPostMeta ] = useDebounce( postMeta, 1000 );
+	const oldPostMeta = useRef( debouncedPostMeta );
 
 	const animationOptions = {
 		animate: false,
 	};
 
-	const [ key, setKey ] = useState( 0 );
+	useEffect( () => {
+		if ( debouncedPostMeta.type ) {
+			window.JeoLayerTypes
+				.getLayerTypeSchema( debouncedPostMeta )
+				.then( ( schema ) => {
+					setLayerTypeSchema( schema );
+				} );
+		} else {
+			setLayerTypeSchema( {} );
+			sendNotice( 'warning', __( 'No layer configured.', 'jeo' ), {
+				id: 'warning_no_type',
+				isDismissible: true,
+			} );
+			lockPostSaving();
+			lockPostAutoSaving( 'layer_lock_key' );
+		}
+	}, [ debouncedPostMeta.type ] );
 
-	const [ hasError, setHasError ] = useState( false );
-	const debouncedPostMeta = useDebounce( postMeta, 1500 );
 	useEffect( () => {
 		if ( hasError ) {
 			sendNotice( 'error', __( 'Error loading your layer. Please check your settings.', 'jeo' ), {
@@ -50,33 +73,38 @@ function LayersSidebar( {
 				isDismissible: false,
 			} );
 			lockPostSaving();
+			lockPostAutoSaving( 'layer_lock_key' );
 		} else {
-			setHasError( false );
 			removeNotice( 'error_loading_layer' );
-			unlockPostSaving();
+			unlockPostSaving( 'layer_lock_key' );
 		}
 	}, [ hasError ] );
 
-	const editingMap = useRef( false );
-	const oldPostMeta = useRef( debouncedPostMeta );
-
 	useEffect( () => {
-		let anyEmpty = false;
-		for ( const k in debouncedPostMeta.layer_type_options ) {
-			const v = debouncedPostMeta.layer_type_options[ k ];
-			if ( ! v || ! v.trim().length > 0 ) {
-				anyEmpty = true;
+		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
+		const oldLayerTypeOptions = oldPostMeta.current.layer_type_options;
+		if ( layerTypeSchema && layerTypeSchema.properties && debouncedLayerTypeOptions ) {
+			const optionsKeys = Object.keys( layerTypeSchema.properties );
+			let anyEmpty = false;
+			optionsKeys.some( ( k ) => {
+				if ( isEmpty( debouncedLayerTypeOptions[ k ] ) && layerTypeSchema.required.includes( k ) ) {
+					anyEmpty = true;
+					setHasError( true );
+					return anyEmpty;
+				}
+				return false;
+			} );
+			if ( ! isEqual( debouncedLayerTypeOptions, oldLayerTypeOptions ) && ! anyEmpty ) {
+				oldPostMeta.current = debouncedPostMeta;
+				setHasError( false );
+				setKey( key + 1 );
 			}
 		}
+	}, [ debouncedPostMeta, layerTypeSchema ] );
 
-		if ( ! isEqual( oldPostMeta.current.layer_type_options, debouncedPostMeta.layer_type_options ) && ! anyEmpty ) {
-			oldPostMeta.current = debouncedPostMeta;
-			setHasError( false );
-			setKey( key + 1 );
-		}
-	}, [ debouncedPostMeta ] );
-
+	// eslint-disable-next-line no-undef
 	const origOpen = XMLHttpRequest.prototype.open;
+	// eslint-disable-next-line no-undef
 	XMLHttpRequest.prototype.open = function() {
 		this.addEventListener( 'load', function() {
 			if ( this.status >= 400 ) {
@@ -119,16 +147,19 @@ function LayersSidebar( {
 							}
 						} }
 					>
-						{ renderLayer( debouncedPostMeta, {
+						{ ! hasError && renderLayer( debouncedPostMeta, {
 							id: 1,
 							use: 'fixed',
 						} ) }
 					</Map>
 				</LayerPreviewPortal>
 			) }
-
-			<PluginDocumentSettingPanel name="layer-settings" title={ __( 'Settings' ) }>
+			<PluginDocumentSettingPanel name="settings" title={ __( 'Settings' ) }>
 				<LayerSettings />
+			</PluginDocumentSettingPanel>
+
+			<PluginDocumentSettingPanel name="attribution-settings" title={ __( 'Attributions' ) }>
+				<AttributionSettings />
 			</PluginDocumentSettingPanel>
 
 			<PluginDocumentSettingPanel name="legend-settings" title={ __( 'Legend' ) }>
@@ -136,8 +167,7 @@ function LayersSidebar( {
 			</PluginDocumentSettingPanel>
 		</Fragment>
 	);
-}
-
+};
 export default withDispatch(
 	( dispatch ) => ( {
 		setPostMeta: ( meta ) => {
@@ -151,6 +181,9 @@ export default withDispatch(
 		},
 		lockPostSaving: () => {
 			dispatch( 'core/editor' ).lockPostSaving( );
+		},
+		lockPostAutoSaving: ( key ) => {
+			dispatch( 'core/editor' ).lockPostAutosaving( key );
 		},
 		unlockPostSaving: () => {
 			dispatch( 'core/editor' ).unlockPostSaving( );
