@@ -47,18 +47,13 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			resolve( {
 				type: 'object',
 				required: [
-					'url',
+					'tileset_id', 'style_source_type', 'type',
 				],
 				properties: {
 					tileset_id: {
 						type: 'string',
 						title: 'Tileset ID',
 						description: 'Example: username.tilesetid',
-					},
-					source_layer: {
-						type: 'string',
-						title: 'Source layer',
-						description: 'Layer to use from a vector tile source. ',
 					},
 					style_source_type: {
 						title: 'Style Source Type',
@@ -69,6 +64,11 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 							'raster',
 							'raster-dem',
 						],
+					},
+					source_layer: {
+						type: 'string',
+						title: 'Source layer',
+						description: 'Layer to use from a vector tile source. ',
 					},
 					type: {
 						title: 'Layer Type',
