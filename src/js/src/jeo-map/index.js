@@ -31,7 +31,6 @@ class JeoMap {
 
 		this.initMap()
 			.then( () => {
-
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
 					map.setZoom( this.getArg( 'initial_zoom' ) );
 
@@ -45,7 +44,7 @@ class JeoMap {
 
 					if ( this.getArg( 'disable_drag_pan' ) ) {
 						map.dragPan.disable();
-						map.touchZoomRotate.disable()
+						map.touchZoomRotate.disable();
 					}
 
 					if ( this.getArg( 'disable_drag_rotate' ) ) {
@@ -155,9 +154,9 @@ class JeoMap {
 		const layers = document.createElement( 'div' );
 		layers.innerHTML += '<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
 		this.element.appendChild( layers );
-		jQuery(this.element).addClass('jeo-without-layers');
-		jQuery(this.element).find( '.mapboxgl-control-container' ).remove();
-		jQuery(this.element).find( '.mapboxgl-canvas-container' ).remove();
+		jQuery( this.element ).addClass( 'jeo-without-layers' );
+		jQuery( this.element ).find( '.mapboxgl-control-container' ).remove();
+		jQuery( this.element ).find( '.mapboxgl-canvas-container' ).remove();
 	}
 
 	/**

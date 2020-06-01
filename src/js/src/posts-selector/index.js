@@ -42,7 +42,6 @@ const PostsSelector = ( {
 				setRelatedPosts( filters );
 			}
 		}
-
 	}, [ relatedPosts ] );
 
 	return (

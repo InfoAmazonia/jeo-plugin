@@ -362,7 +362,7 @@ class JeoGeocodePosts extends Component {
 
 	render() {
 		const { currentMarkerIndex, formMode, zoom } = this.state;
-		const pointsList = formMode !== "new" ? this.state.points : this.state.pointsCheckpoint;
+		const pointsList = formMode !== 'new' ? this.state.points : this.state.pointsCheckpoint;
 		const pointsMap = this.state.points;
 
 		return (

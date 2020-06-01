@@ -67,7 +67,7 @@ export default function InteractionSettings( {
 
 	const addField = useCallback( () => {
 		if ( interaction.title === 'None' ) {
-			alert( __('A title is required') );
+			alert( __( 'A title is required' ) );
 			return;
 		}
 		onUpdate( interaction.id, {

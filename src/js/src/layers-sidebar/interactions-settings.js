@@ -1,4 +1,4 @@
-import { Modal, Panel, SelectControl} from '@wordpress/components';
+import { Modal, Panel, SelectControl } from '@wordpress/components';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -38,21 +38,23 @@ export default function InteractionsSettings( {
 	}, [ interactions, setInteractions ] );
 
 	const layersSourceOptions = useMemo( () => {
-		if( ! layers) {
+		if ( ! layers ) {
 			return [];
 		}
-		const uniqueSources = Array.from( new Set( layers.map( layer => layer.source ) ) )
-			.map( source => {
-				return layers.find( layer => layer.source === source )
-		})
-		const options = uniqueSources.map( source => { return { value: source.source, label: source.sourceName } } );
-		if( options.length > 1 ) {
+		const uniqueSources = Array.from( new Set( layers.map( ( layer ) => layer.source ) ) )
+			.map( ( source ) => {
+				return layers.find( ( layer ) => layer.source === source );
+			} );
+		const options = uniqueSources.map( ( source ) => {
+			return { value: source.source, label: source.sourceName };
+		} );
+		if ( options.length > 1 ) {
 			options.push( { value: 'all', label: __( 'All', 'jeo' ) } );
 		}
 		return options;
-	}, [ layers ])
+	}, [ layers ] );
 
-	const [ selectedSource, setSelectedSource ] = useState( layersSourceOptions.length > 1 ? 'all': layersSourceOptions[0].source );
+	const [ selectedSource, setSelectedSource ] = useState( layersSourceOptions.length > 1 ? 'all' : layersSourceOptions[ 0 ].source );
 
 	return (
 		<Modal
@@ -61,14 +63,16 @@ export default function InteractionsSettings( {
 			onRequestClose={ onCloseModal }
 		>
 			<SelectControl
-				label= { __( 'Source', 'jeo' ) }
+				label={ __( 'Source', 'jeo' ) }
 				value={ selectedSource }
 				options={ layersSourceOptions }
-				onChange={ ( selectedSource ) => { setSelectedSource( selectedSource ) } }
+				onChange={ ( selectedSource ) => {
+					setSelectedSource( selectedSource );
+				} }
 			/>
 			<Panel className="jeo-interactions-settings">
 				{ interactiveLayers.map( ( layer ) => {
-					if (layer.source === selectedSource || selectedSource === 'all' || layersSourceOptions.length <= 1) {
+					if ( layer.source === selectedSource || selectedSource === 'all' || layersSourceOptions.length <= 1 ) {
 						const index = interactions.findIndex( ( x ) => x.id === layer.id );
 						const interaction = interactions[ index ];
 						return (
