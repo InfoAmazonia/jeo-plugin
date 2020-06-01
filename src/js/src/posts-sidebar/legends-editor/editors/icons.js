@@ -161,7 +161,7 @@ class IconItem extends Component {
 				<div className="icon-item">
 					<MediaUpload
 						onSelect={ ( value ) => {
-							let image = new Image();
+							const image = new Image();
 							image.src = value.url;
 							image.onload = () => {
 								if ( image.width >= 60 && image.height >= 60 ) {

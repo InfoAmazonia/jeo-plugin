@@ -45,7 +45,6 @@ class JeoLayer {
 	get attribution_name() {
 		return this.attributes.attribution_name;
 	}
-
 }
 
 window.JeoLayer = JeoLayer;
