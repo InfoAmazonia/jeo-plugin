@@ -4,7 +4,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 		const name = attributes.layer_id;
 		let tileset_id = attributes.layer_type_options.tileset_id;
 
-		if ( ! tileset_id.includes( 'mapbox://' ) ) {
+		if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
 			tileset_id = 'mapbox://' + tileset_id;
 		}
 
@@ -28,7 +28,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 	addLayer( map, attributes ) {
 		let tileset_id = attributes.layer_type_options.tileset_id;
 
-		if ( ! tileset_id.includes( 'mapbox://' ) ) {
+		if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
 			tileset_id = 'mapbox://' + tileset_id;
 		}
 

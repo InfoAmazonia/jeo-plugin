@@ -41,7 +41,7 @@ export function renderLayer( layer, instance ) {
 
 			let tileset_id = options.tileset_id;
 
-			if ( ! tileset_id.includes( 'mapbox://' ) ) {
+			if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
 				tileset_id = 'mapbox://' + tileset_id;
 			}
 
