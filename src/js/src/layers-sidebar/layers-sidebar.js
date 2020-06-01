@@ -11,7 +11,6 @@ import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
 import './layers-sidebar.css';
-import { formUpdater } from './form-updater';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
