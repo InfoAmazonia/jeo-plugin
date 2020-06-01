@@ -25,7 +25,7 @@ const decodeHtmlEntity = function( str ) {
 
 const { debounce } = window._;
 const _filterSuggestions = () => true;
-const _getSuggestionValue = ( entityRecord ) => entityRecord.title.rendered;
+const _getSuggestionValue = ( entityRecord ) => decodeHtmlEntity( entityRecord.title.rendered );
 const _renderSuggestion = ( entityRecord ) => (
 	<span>{ decodeHtmlEntity( entityRecord.title.rendered ) }</span>
 );
