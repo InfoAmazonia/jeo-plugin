@@ -20,7 +20,6 @@ const MapEditor = ( {
 	loadingMap,
 } ) => {
 	const [ key, setKey ] = useState( 0 );
-
 	useEffect( () => {
 		setKey( key + 1 );
 	}, [ attributes.align, window.screen.width ] );
@@ -32,7 +31,9 @@ const MapEditor = ( {
 	};
 
 	return (
-		<Fragment>
+		<div
+			className="jeo-mapblock"
+		>
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && (
 				<Fragment>
@@ -51,6 +52,7 @@ const MapEditor = ( {
 
 								if ( loadedMap.meta.disable_drag_pan ) {
 									map.dragPan.disable();
+									map.touchZoomRotate.disable();
 								}
 
 								if ( loadedMap.meta.disable_drag_rotate ) {
@@ -74,7 +76,6 @@ const MapEditor = ( {
 							} ) }
 						</Map>
 					</div>
-
 					<div className="jeo-preview-controls">
 						<p><strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong></p>
 						<Button
@@ -89,6 +90,7 @@ const MapEditor = ( {
 							<em>{ __( '(Select another map)' ) }</em>
 						</Button>
 					</div>
+
 				</Fragment>
 			) }
 			{ ! attributes.map_id && (
@@ -122,7 +124,7 @@ const MapEditor = ( {
 					) }
 				</Fragment>
 			) }
-		</Fragment>
+		</div>
 	);
 };
 

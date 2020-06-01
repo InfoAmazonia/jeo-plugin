@@ -14,6 +14,11 @@ export function renderLayer( layer, instance ) {
 		case 'mapbox':
 			const accessToken = options.access_token || window.mapboxgl.accessToken;
 
+			let style_id = options.style_id;
+			if ( style_id ) {
+				style_id = style_id.replace( 'mapbox://styles/', '' );
+			}
+
 			return (
 				<Fragment>
 					<Source
@@ -21,7 +26,7 @@ export function renderLayer( layer, instance ) {
 						tileJsonSource={ {
 							type: 'raster',
 							tiles: [
-								`https://api.mapbox.com/styles/v1/${ options.style_id }/tiles/256/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
+								`https://api.mapbox.com/styles/v1/${ style_id }/tiles/256/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 							],
 						} }
 					/>
@@ -33,6 +38,13 @@ export function renderLayer( layer, instance ) {
 				</Fragment>
 			);
 		case 'mapbox-tileset':
+
+			let tileset_id = options.tileset_id;
+
+			if ( ! tileset_id.includes( 'mapbox://' ) ) {
+				tileset_id = 'mapbox://' + tileset_id;
+			}
+
 			return (
 				<Fragment>
 					<Source

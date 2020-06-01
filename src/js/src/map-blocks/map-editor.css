@@ -50,6 +50,7 @@
 .react-autosuggest__suggestion {
 	cursor: pointer;
 	padding: 10px 20px;
+	overflow-wrap: break-word;
 }
 
 .react-autosuggest__suggestion:not(:first-child) {
@@ -68,4 +69,12 @@
 
 .jeo-preview-controls .select-another-map {
 	margin-left: 10px;
+}
+
+.wp-block[data-type="jeo/map"] .jeo-preview-controls {
+	display: none;
+}
+
+.wp-block[data-type="jeo/map"]:focus-within .jeo-preview-controls {
+	display: flex;
 }

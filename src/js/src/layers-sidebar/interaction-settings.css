@@ -25,3 +25,9 @@
 .jeo-interaction-add-field .components-base-control__field {
 	margin: 0;
 }
+
+.jeo-interactions-settings__modal {
+	min-height: 80%;
+	max-height: 80%;
+	width: 30%;
+}
