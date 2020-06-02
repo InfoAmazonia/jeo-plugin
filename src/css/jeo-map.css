@@ -556,7 +556,7 @@ nav .layer-selection-title .legends-title {
 }
 
 .editor-styles-wrapper ul {
-    list-style-type: none;
+    list-style-type: none !important;
 }
 
 .editor-styles-wrapper ul, .editor-styles-wrapper ol {
