@@ -454,7 +454,7 @@ class JeoMap {
 				this.embedPreviewActive = true;
 				this.updateEmbedPreview( post );
 			}
-			this.map.flyTo( { center: LngLat, zoom: 5 } );
+			this.map.flyTo( { center: LngLat } );
 		} );
 
 		// By default, fly to the first post and centers it
@@ -464,8 +464,8 @@ class JeoMap {
 
 	activateMarker( activeMarker ) {
 		this.markers.map( ( marker ) => {
-			const canToggle = marker._lngLat.lat == activeMarker._lngLat.lat && marker._lngLat.lon == activeMarker._lngLat.lon;
-			marker.getElement().classList.toggle( 'marker-active', canToggle );
+			const canToggle = marker._lngLat.lat === activeMarker._lngLat.lat && marker._lngLat.lon === activeMarker._lngLat.lon;
+			return marker.getElement().classList.toggle( 'marker-active', canToggle );
 		} );
 	}
 
