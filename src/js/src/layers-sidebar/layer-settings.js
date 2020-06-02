@@ -11,7 +11,7 @@ const layerSchema = {
 	properties: {
 		source_url: { title: __( 'Source data download link' ), type: 'string' },
 		attribution: { title: __( 'Data attribution link' ), type: 'string' },
-		attribution_name: { title: __( 'Source name' ), type: 'string' },
+		attribution_name: { title: __( 'Data attribution name' ), type: 'string' },
 		type: { title: __( 'Type' ), type: 'string' },
 	},
 	required: [ 'type' ],
