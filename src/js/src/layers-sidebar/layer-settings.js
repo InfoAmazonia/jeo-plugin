@@ -3,7 +3,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
-
+import { pickBy } from 'lodash-es';
 import InteractionsSettings from './interactions-settings';
 
 const layerSchema = {
@@ -61,7 +61,8 @@ const LayerSettings = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			setPostMeta( { layer_type_options: {} } );
+			const filledTypeOptions = pickBy( postMeta.layer_type_options );
+			setPostMeta( { layer_type_options: filledTypeOptions } );
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
 				.then( formUpdater( setOptions, setWidgets ) );
