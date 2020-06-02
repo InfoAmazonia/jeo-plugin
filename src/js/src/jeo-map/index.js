@@ -94,14 +94,11 @@ class JeoMap {
 
 									const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
 
-									if ( ! layer.attribution.includes( 'http' ) ) {
+									if ( layer.attribution && ! layer.attribution.includes( 'http' ) ) {
 										if ( layer.attribution.match( regex ) ) {
 											attributionLink = `https://${ layer.attribution }`;
-										} else if ( layer.attribution[ 0 ] !== '/' ) {
-											attributionLink = '/' + attributionLink;
 										}
 									}
-
 									const attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink;
 									customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
 								}
@@ -238,16 +235,12 @@ class JeoMap {
 				if ( layer.attributes.attribution && ! layer.attributes.attribution.includes( 'http' ) ) {
 					if ( layer.attributes.attribution.match( regex ) ) {
 						attributionLink = `https://${ layer.attributes.attribution }`;
-					} else if ( layer.attributes.attribution[ 0 ] !== '/' ) {
-						attributionLink = '/' + attributionLink;
 					}
 				}
 
 				if ( layer.source_url && ! layer.source_url.includes( 'http' ) ) {
 					if ( layer.source_url.match( regex ) ) {
 						sourceLink = `https://${ layer.source_url }`;
-					} else if ( layer.source_url[ 0 ] !== '/' ) {
-						sourceLink = '/' + sourceLink;
 					}
 				}
 
@@ -460,7 +453,7 @@ class JeoMap {
 				this.embedPreviewActive = true;
 				this.updateEmbedPreview( post );
 			}
-			this.map.flyTo( { center: LngLat, zoom: 5 } );
+			this.map.flyTo( { center: LngLat } );
 		} );
 
 		// By default, fly to the first post and centers it
@@ -470,8 +463,8 @@ class JeoMap {
 
 	activateMarker( activeMarker ) {
 		this.markers.map( ( marker ) => {
-			const canToggle = marker._lngLat.lat == activeMarker._lngLat.lat && marker._lngLat.lon == activeMarker._lngLat.lon;
-			marker.getElement().classList.toggle( 'marker-active', canToggle );
+			const canToggle = marker._lngLat.lat === activeMarker._lngLat.lat && marker._lngLat.lon === activeMarker._lngLat.lon;
+			return marker.getElement().classList.toggle( 'marker-active', canToggle );
 		} );
 	}
 
