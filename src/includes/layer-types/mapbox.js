@@ -1,6 +1,6 @@
 window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addStyle( map, attributes ) {
-		if ( attributes.layer_type_options.style_id.includes( 'mapbox://styles/' ) ) {
+		if ( attributes.layer_type_options.style_id && attributes.layer_type_options.style_id.includes( 'mapbox://styles/' ) ) {
 			return map.setStyle(
 				attributes.layer_type_options.style_id
 			);
