@@ -56,6 +56,8 @@ const AttributionSettings = ( {
 					if ( ! formData.source_url ) {
 						formData.source_url = '';
 					}
+
+					window.layerFormData = formData;
 					setPostMeta( formData );
 				} }
 			>
