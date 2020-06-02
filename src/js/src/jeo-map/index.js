@@ -98,11 +98,8 @@ class JeoMap {
 									if ( ! layer.attribution.includes( 'http' ) ) {
 										if ( layer.attribution.match( regex ) ) {
 											attributionLink = `https://${ layer.attribution }`;
-										} else if ( layer.attribution[ 0 ] !== '/' ) {
-											attributionLink = '/' + attributionLink;
 										}
 									}
-
 									const attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink;
 									customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
 								}
@@ -239,16 +236,12 @@ class JeoMap {
 				if ( layer.attributes.attribution && ! layer.attributes.attribution.includes( 'http' ) ) {
 					if ( layer.attributes.attribution.match( regex ) ) {
 						attributionLink = `https://${ layer.attributes.attribution }`;
-					} else if ( layer.attributes.attribution[ 0 ] !== '/' ) {
-						attributionLink = '/' + attributionLink;
 					}
 				}
 
 				if ( layer.source_url && ! layer.source_url.includes( 'http' ) ) {
 					if ( layer.source_url.match( regex ) ) {
 						sourceLink = `https://${ layer.source_url }`;
-					} else if ( layer.source_url[ 0 ] !== '/' ) {
-						sourceLink = '/' + sourceLink;
 					}
 				}
 
