@@ -14,12 +14,16 @@ const layerSchema = {
 	required: [ 'type' ],
 };
 
-const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
+const formUpdater = ( setOptions, setWidgets, typeVector = false ) => ( options ) => {
 	const widgets = { layer_type_options: {} };
 	Object.entries( options.properties ).forEach( ( [ key, property ] ) => {
 		if ( property.description ) {
 			widgets.layer_type_options[ key ] = { 'ui:help': property.description };
 			delete property.description;
+		}
+		if ( ! typeVector && key === 'source_layer' ) {
+			delete widgets.layer_type_options[ key ];
+			delete options.properties[ key ];
 		}
 	} );
 	setWidgets( widgets );
@@ -60,11 +64,20 @@ const LayerSettings = ( {
 			setPostMeta( { layer_type_options: {} } );
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
-				.then( formUpdater( setOptions, setWidgets, postMeta, setPostMeta ) );
+				.then( formUpdater( setOptions, setWidgets ) );
 		} else {
 			setOptions( {} );
 		}
 	}, [ postMeta.type ] );
+
+	useEffect( () => {
+		if ( postMeta.type === 'mapbox-tileset' ) {
+			const typeVector = postMeta.layer_type_options.style_source_type === 'vector';
+			window.JeoLayerTypes
+				.getLayerTypeSchema( postMeta )
+				.then( formUpdater( setOptions, setWidgets, typeVector ) );
+		}
+	}, [ postMeta.layer_type_options.style_source_type ] );
 
 	useEffect( () => {
 		const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
