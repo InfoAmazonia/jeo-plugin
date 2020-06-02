@@ -96,6 +96,7 @@ const LayerSettings = ( {
 				uiSchema={ widgets }
 				formData={ postMeta }
 				onChange={ ( { formData } ) => {
+					window.layerFormData = formData;
 					setPostMeta( formData );
 				} }
 			>
