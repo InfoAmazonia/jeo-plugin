@@ -48,6 +48,13 @@ const LayersSidebar = ( {
 	};
 
 	useEffect( () => {
+		if ( postMeta.type ) {
+			setHasError( false );
+			setKey( key + 1 );
+		}
+	}, [ postMeta.type ] );
+
+	useEffect( () => {
 		if ( debouncedPostMeta.type ) {
 			window.JeoLayerTypes
 				.getLayerTypeSchema( debouncedPostMeta )
@@ -101,9 +108,8 @@ const LayersSidebar = ( {
 		}
 	}, [ debouncedPostMeta, layerTypeSchema ] );
 
-	// eslint-disable-next-line no-undef
+	//todo: find a better way to intercept mapbox api requests errors
 	const origOpen = XMLHttpRequest.prototype.open;
-	// eslint-disable-next-line no-undef
 	XMLHttpRequest.prototype.open = function() {
 		this.addEventListener( 'load', function() {
 			if ( this.status >= 400 ) {
