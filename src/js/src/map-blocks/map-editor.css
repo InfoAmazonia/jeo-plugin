@@ -60,6 +60,7 @@
 
 .react-autosuggest__suggestion--focused {
 	background-color: #0C7EAF;
+	/*color: #fff;*/
 	color: #fff;
 }
 
