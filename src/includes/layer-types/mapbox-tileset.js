@@ -65,7 +65,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 					tileset_id: {
 						type: 'string',
 						title: 'Tileset ID',
-						description: 'Example: username.tilesetid or mapbox://username.tilesetid',
+						description: 'Example: username.tilesetid',
 					},
 					style_source_type: {
 						title: 'Style Source Type',

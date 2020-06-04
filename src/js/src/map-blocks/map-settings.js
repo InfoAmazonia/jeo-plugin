@@ -129,7 +129,7 @@ export default ( { attributes, setAttributes } ) => {
 					/>
 					<CheckboxControl
 						label={ __( 'Fullscreen button on post' ) }
-						checked={ ! attributes.enable_fullscreen }
+						checked={ attributes.enable_fullscreen }
 						onChange={ () => {
 							attributeUpdater( 'enable_fullscreen' )( ! attributes.enable_fullscreen );
 						} }
