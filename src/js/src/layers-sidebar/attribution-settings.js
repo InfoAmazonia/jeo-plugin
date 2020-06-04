@@ -31,8 +31,6 @@ const AttributionSettings = ( {
 					if ( formData.attribution && ! formData.attribution.includes( 'http' ) ) {
 						if ( formData.attribution.match( regex ) ) {
 							attributionLink = `https://${ formData.attribution }`;
-						} else if ( formData.attribution[ 0 ] !== '/' ) {
-							attributionLink = '/' + attributionLink;
 						}
 					}
 					formData.attribution = attributionLink;
@@ -40,8 +38,6 @@ const AttributionSettings = ( {
 					if ( formData.source_url && ! formData.source_url.includes( 'http' ) ) {
 						if ( formData.source_url.match( regex ) ) {
 							sourceLink = `https://${ formData.source_url }`;
-						} else if ( formData.source_url[ 0 ] !== '/' ) {
-							sourceLink = '/' + sourceLink;
 						}
 					}
 					formData.source_url = sourceLink;
