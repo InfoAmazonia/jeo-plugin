@@ -1,5 +1,5 @@
 <div class="popup__date">
-	<%= new Date(post.date).toLocaleDateString() %>
+    <%= new Date(post.date).toLocaleDateString() %>
 </div>
 <h2><a href="<%= post.link %>"><%= post.title.rendered %></a></h2>
 <% if (show_featured_media && post._embedded['wp:featuredmedia'] && post._embedded['wp:featuredmedia'][0]) { %>
