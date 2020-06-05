@@ -42,7 +42,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 	addInteractions( map, attributes ) {
 		if ( attributes.layer_type_options.interactions ) {
-			console.log(attributes.layer_type_options)
 			const int = attributes.layer_type_options.interactions;
 
 			int.forEach( ( interaction ) => {
