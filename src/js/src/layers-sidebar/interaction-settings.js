@@ -62,11 +62,15 @@ export default function InteractionSettings( {
 	}, [ interaction, interactionIndex, onDelete, onInsert ] );
 
 	const changeTitle = useCallback( ( title ) => {
+		if ( ( interaction.title !== 'None' || interaction.title ) && ( title === 'None' || ! title ) ) {
+			alert( __( 'A title is required' ) );
+			return;
+		}
 		onUpdate( interaction.id, { ...interaction, title } );
 	}, [ interaction, onUpdate ] );
 
 	const addField = useCallback( () => {
-		if ( interaction.title === 'None' ) {
+		if ( interaction.title === 'None' || ! interaction.title ) {
 			alert( __( 'A title is required' ) );
 			return;
 		}
