@@ -349,26 +349,28 @@ class JeoMap {
 					} );
 
 					ordered.forEach( ( layerObject, i ) => {
-						returnLayers.push(
-							new window.JeoLayer( layerObject.meta.type, {
-								layer_id: layerObject.slug,
-								layer_name: layerObject.title.rendered,
-								attribution: layerObject.meta.attribution,
-								attribution_name: layerObject.meta.attribution_name,
-								visible: layersDefinitions[ i ].default,
-								layer_type_options: layerObject.meta.layer_type_options,
-								source_url: layerObject.meta.source_url,
-							} )
-						);
-
-						if ( layerObject.meta.legend_type !== 'none' && layersDefinitions[ i ].show_legend ) {
-							returnLegends.push(
-								new window.JeoLegend( layerObject.meta.legend_type, {
+						if (layerObject){ 
+							returnLayers.push(
+								new window.JeoLayer( layerObject.meta.type, {
 									layer_id: layerObject.slug,
-									legend_type_options: layerObject.meta.legend_type_options,
-									use_legend: layerObject.meta.use_legend,
+									layer_name: layerObject.title.rendered,
+									attribution: layerObject.meta.attribution,
+									attribution_name: layerObject.meta.attribution_name,
+									visible: layersDefinitions[ i ].default,
+									layer_type_options: layerObject.meta.layer_type_options,
+									source_url: layerObject.meta.source_url,
 								} )
 							);
+
+							if ( layerObject.meta.legend_type !== 'none' && layersDefinitions[ i ].show_legend ) {
+								returnLegends.push(
+									new window.JeoLegend( layerObject.meta.legend_type, {
+										layer_id: layerObject.slug,
+										legend_type_options: layerObject.meta.legend_type_options,
+										use_legend: layerObject.meta.use_legend,
+									} )
+								);
+							}
 						}
 					} );
 
@@ -580,38 +582,41 @@ class JeoMap {
 		layers.classList.add( 'layers-wrapper' );
 
 		switchableLayers.forEach( ( index ) => {
-			const link = document.createElement( 'a' );
-			link.href = '#';
-			if ( this.layersDefinitions[ index ].default ) {
-				link.className = 'active';
-			}
 
-			const layerName = document.createElement( 'span' );
-			layerName.classList.add( 'layer-name' );
-			layerName.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
-
-			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
-
-			link.onclick = ( e ) => {
-				const clicked = e.currentTarget;
-				const clickedLayer = clicked.dataset.layer_id;
-				e.preventDefault();
-				e.stopPropagation();
-
-				const visibility = this.map.getLayoutProperty( clickedLayer, 'visibility' );
-
-				if ( typeof ( visibility ) === 'undefined' || visibility === 'visible' ) {
-					this.hideLayer( clickedLayer );
-					clicked.className = '';
-				} else {
-					clicked.className = 'active';
-					this.showLayer( clickedLayer );
+			if (this.layers[ index ]) {
+				const link = document.createElement( 'a' );
+				link.href = '#';
+				if ( this.layersDefinitions[ index ].default ) {
+					link.className = 'active';
 				}
-			};
 
-			link.appendChild( layerName );
+				const layerName = document.createElement( 'span' );
+				layerName.classList.add( 'layer-name' );
+				layerName.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
 
-			layers.appendChild( link );
+				link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
+
+				link.onclick = ( e ) => {
+					const clicked = e.currentTarget;
+					const clickedLayer = clicked.dataset.layer_id;
+					e.preventDefault();
+					e.stopPropagation();
+
+					const visibility = this.map.getLayoutProperty( clickedLayer, 'visibility' );
+
+					if ( typeof ( visibility ) === 'undefined' || visibility === 'visible' ) {
+						this.hideLayer( clickedLayer );
+						clicked.className = '';
+					} else {
+						clicked.className = 'active';
+						this.showLayer( clickedLayer );
+					}
+				};
+
+				link.appendChild( layerName );
+
+				layers.appendChild( link );
+			}
 		} );
 
 		navElement.appendChild( layers );
