@@ -1,7 +1,7 @@
 === JEO ===
 Contributors: earthjournalism
-Tested up to: 1.0
-Stable tag: 1.0
+Tested up to: 0.1.0
+Stable tag: 0.1.0
 Requires PHP: 7.2
 Requires at least: 5.1
 License: GPL-2.0+
@@ -48,12 +48,12 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 
 == Changelog ==
  
-= 1.0 =
+= 0.1.0 =
 * First release.
 
 == Upgrade Notice ==
 
-= 1.0=
+= 0.1.0=
 * First release.
 
 == Frequently Asked Questions ==
