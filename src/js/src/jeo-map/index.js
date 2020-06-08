@@ -81,11 +81,8 @@ class JeoMap {
 			.then( () => {
 				let amountLayers = 0;
 				this.getLayers().then((value) => {
-
-					console.log("LAYERs QUANTITY")
-					console.log(value.length);
 					amountLayers = value.length
-				  });
+
 
 
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 && amountLayers > 0) {
@@ -135,9 +132,11 @@ class JeoMap {
 					this.getRelatedPosts();
 				}
 				// Show a message when a map doesn't have layers
-				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length === 0 ) {
+				if ( this.getArg( 'layers' ) && (  this.getArg( 'layers' ).length === 0  || amountLayers === 0 )) {
+					console.log("hola");
 					this.addMapWithoutLayersMessage();
 				}
+				});
 			} )
 			.then( () => {
 				// Remove all empty jeo map blocks
