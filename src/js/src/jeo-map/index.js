@@ -129,9 +129,9 @@ class JeoMap {
 								);
 
 								this.addMoreButtonAndLegends();
-
-							this.getRelatedPosts();
 						}
+
+						this.getRelatedPosts();
 						// Show a message when a map doesn't have layers
 						if ( amountLayers === 0 ) {
 							this.addMapWithoutLayersMessage();
