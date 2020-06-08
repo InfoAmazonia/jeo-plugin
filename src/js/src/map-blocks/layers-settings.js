@@ -30,7 +30,17 @@ const LayersSettings = ( {
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
 
-	const allLayers = select( 'core' ).getEntityRecords( 'postType', 'map-layer' );
+	const [ allLayers, setAllLayers ] = useState([]);
+
+	useEffect( () => {
+		const allLayersData = select( 'core' ).getEntityRecords( 'postType', 'map-layer' );
+		if ( ! allLayersData ) {
+			setAllLayers( [] );
+		} else {
+			setAllLayers( allLayersData );
+		}
+	});
+
 	allLayers.sort( function( a, b ) {
 		if ( a.title.rendered.toLowerCase() < b.title.rendered.toLowerCase() ) {
 			return -1;

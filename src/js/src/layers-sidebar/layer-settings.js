@@ -97,6 +97,10 @@ const LayerSettings = ( {
 				uiSchema={ widgets }
 				formData={ postMeta }
 				onChange={ ( { formData } ) => {
+					if ( ! formData.layer_type_options.source_layer ) {
+						formData.layer_type_options.source_layer = '';
+					}
+
 					window.layerFormData = formData;
 					setPostMeta( formData );
 				} }
