@@ -622,43 +622,47 @@ class JeoMap {
 		navElement.appendChild( layers );
 
 		swappableLayers.forEach( ( index ) => {
-			const link = document.createElement( 'a' );
-			link.href = '#';
-			link.classList.add( 'switchable' );
+			
+				if (this.layers[ index ]) {
+					const link = document.createElement( 'a' );
+					link.href = '#';
+					link.classList.add( 'switchable' );
 
-			if ( this.getDefaultSwappableLayer() == index ) {
-				link.classList.add( 'active' );
-			}
-			link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
-			link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
+					if ( this.getDefaultSwappableLayer() == index ) {
+						link.classList.add( 'active' );
+					}
+					link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
+					link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
-			link.onclick = ( e ) => {
-				if ( jQuery( e.currentTarget ).hasClass( 'active' ) ) {
-					return;
+					link.onclick = ( e ) => {
+						if ( jQuery( e.currentTarget ).hasClass( 'active' ) ) {
+							return;
+						}
+						e.preventDefault();
+						e.stopPropagation();
+
+						// hide all
+						this.getSwappableLayers().forEach( ( i ) => {
+							this.hideLayer( this.layers[ i ].layer_id );
+						} );
+						jQuery( layers ).children( '.switchable' ).removeClass( 'active' );
+
+						// display current
+						const clicked = e.currentTarget;
+						const clickedLayer = clicked.dataset.layer_id;
+						this.showLayer( clickedLayer );
+
+						clicked.classList.add( 'active' );
+					};
+
+					layers.appendChild( link );
 				}
-				e.preventDefault();
-				e.stopPropagation();
 
-				// hide all
-				this.getSwappableLayers().forEach( ( i ) => {
-					this.hideLayer( this.layers[ i ].layer_id );
-				} );
-				jQuery( layers ).children( '.switchable' ).removeClass( 'active' );
+			} );
 
-				// display current
-				const clicked = e.currentTarget;
-				const clickedLayer = clicked.dataset.layer_id;
-				this.showLayer( clickedLayer );
+			navElement.appendChild( layers );
 
-				clicked.classList.add( 'active' );
-			};
-
-			layers.appendChild( link );
-		} );
-
-		navElement.appendChild( layers );
-
-		this.element.appendChild( navElement );
+			this.element.appendChild( navElement );
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
