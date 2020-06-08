@@ -82,16 +82,14 @@ class JeoMap {
 
 				// Show a message when a map doesn't have layers
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length === 0 ) {
-					console.log("O mapa não tem layers! Mapa Limpo");
 					this.addMapWithoutLayersMessage();
 				} else {
 					let amountLayers = 0;
 					this.getLayers().then((value) => {
 						amountLayers = value.length
 
-
-
 					if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 && amountLayers > 0) {
+						console.log("UN MAPA!! RENDERIZADO")
 						this.getLayers().then( ( layers ) => {
 							const baseLayer = layers[ 0 ];
 							baseLayer.addStyle( map );
@@ -344,57 +342,59 @@ class JeoMap {
 	}
 
 	getLayers() {
-		console.log("ENTRE A GETLAYERS");
 		return new Promise( ( resolve, reject ) => {
 			const layersDefinitions = this.getArg( 'layers' );
 			this.layersDefinitions = layersDefinitions;
-			const layersIds = layersDefinitions.map( ( el ) => el.id );
 
-			jQuery.get(
-				jeoMapVars.jsonUrl + 'map-layer',
-				{
-					include: layersIds,
-					orderby: 'include',
-				},
-				( data ) => {
-					const returnLayers = [];
-					const returnLegends = [];
-					const ordered = [];
-					layersIds.forEach( ( el, index ) => {
-						ordered[ index ] = data.find( ( l ) => l.id == el );
-					} );
+			if (layersDefinitions) {
+				const layersIds = layersDefinitions.map( ( el ) => el.id );
 
-					ordered.forEach( ( layerObject, i ) => {
-						if (layerObject){ 
-							returnLayers.push(
-								new window.JeoLayer( layerObject.meta.type, {
-									layer_id: layerObject.slug,
-									layer_name: layerObject.title.rendered,
-									attribution: layerObject.meta.attribution,
-									attribution_name: layerObject.meta.attribution_name,
-									visible: layersDefinitions[ i ].default,
-									layer_type_options: layerObject.meta.layer_type_options,
-									source_url: layerObject.meta.source_url,
-								} )
-							);
+				jQuery.get(
+					jeoMapVars.jsonUrl + 'map-layer',
+					{
+						include: layersIds,
+						orderby: 'include',
+					},
+					( data ) => {
+						const returnLayers = [];
+						const returnLegends = [];
+						const ordered = [];
+						layersIds.forEach( ( el, index ) => {
+							ordered[ index ] = data.find( ( l ) => l.id == el );
+						} );
 
-							if ( layerObject.meta.legend_type !== 'none' && layersDefinitions[ i ].show_legend ) {
-								returnLegends.push(
-									new window.JeoLegend( layerObject.meta.legend_type, {
+						ordered.forEach( ( layerObject, i ) => {
+							if (layerObject){ 
+								returnLayers.push(
+									new window.JeoLayer( layerObject.meta.type, {
 										layer_id: layerObject.slug,
-										legend_type_options: layerObject.meta.legend_type_options,
-										use_legend: layerObject.meta.use_legend,
+										layer_name: layerObject.title.rendered,
+										attribution: layerObject.meta.attribution,
+										attribution_name: layerObject.meta.attribution_name,
+										visible: layersDefinitions[ i ].default,
+										layer_type_options: layerObject.meta.layer_type_options,
+										source_url: layerObject.meta.source_url,
 									} )
 								);
-							}
-						}
-					} );
 
-					this.layers = returnLayers;
-					this.legends = returnLegends;
-					resolve( returnLayers );
-				}
-			);
+								if ( layerObject.meta.legend_type !== 'none' && layersDefinitions[ i ].show_legend ) {
+									returnLegends.push(
+										new window.JeoLegend( layerObject.meta.legend_type, {
+											layer_id: layerObject.slug,
+											legend_type_options: layerObject.meta.legend_type_options,
+											use_legend: layerObject.meta.use_legend,
+										} )
+									);
+								}
+							}
+						} );
+
+						this.layers = returnLayers;
+						this.legends = returnLegends;
+						resolve( returnLayers );
+					}
+				);
+			}
 		} );
 	}
 
