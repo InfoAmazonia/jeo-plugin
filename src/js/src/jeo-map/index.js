@@ -79,7 +79,16 @@ class JeoMap {
 				}
 			} )
 			.then( () => {
-				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
+				let amountLayers = 0;
+				this.getLayers().then((value) => {
+
+					console.log("LAYERs QUANTITY")
+					console.log(value.length);
+					amountLayers = value.length
+				  });
+
+
+				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 && amountLayers > 0) {
 					this.getLayers().then( ( layers ) => {
 						const baseLayer = layers[ 0 ];
 						baseLayer.addStyle( map );
@@ -540,7 +549,7 @@ class JeoMap {
 
 		const navElement = document.createElement( 'nav' );
 		navElement.classList.add( 'layers-selection' );
-		
+
 		if ( switchableLayers.length + swappableLayers.length !== 0 ) {
 			const layerSelectionTitle = document.createElement( 'div' );
 			layerSelectionTitle.classList.add( 'layer-selection-title' );
