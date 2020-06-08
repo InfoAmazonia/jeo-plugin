@@ -79,64 +79,71 @@ class JeoMap {
 				}
 			} )
 			.then( () => {
-				let amountLayers = 0;
-				this.getLayers().then((value) => {
-					amountLayers = value.length
+
+				// Show a message when a map doesn't have layers
+				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length === 0 ) {
+					console.log("O mapa não tem layers! Mapa Limpo");
+					this.addMapWithoutLayersMessage();
+				} else {
+					let amountLayers = 0;
+					this.getLayers().then((value) => {
+						amountLayers = value.length
 
 
 
-				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 && amountLayers > 0) {
-					this.getLayers().then( ( layers ) => {
-						const baseLayer = layers[ 0 ];
-						baseLayer.addStyle( map );
+					if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 && amountLayers > 0) {
+						this.getLayers().then( ( layers ) => {
+							const baseLayer = layers[ 0 ];
+							baseLayer.addStyle( map );
 
-						const customAttribution = [];
+							const customAttribution = [];
 
-						map.on( 'load', () => {
-							layers.forEach( ( layer, i ) => {
-								if ( layer.attribution ) {
-									let attributionLink = layer.attribution;
-									const attributionName = layer.attribution_name;
+							map.on( 'load', () => {
+								layers.forEach( ( layer, i ) => {
+									if ( layer.attribution ) {
+										let attributionLink = layer.attribution;
+										const attributionName = layer.attribution_name;
 
-									const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+										const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
 
-									if ( layer.attribution && ! layer.attribution.includes( 'http' ) ) {
-										if ( layer.attribution.match( regex ) ) {
-											attributionLink = `https://${ layer.attribution }`;
+										if ( layer.attribution && ! layer.attribution.includes( 'http' ) ) {
+											if ( layer.attribution.match( regex ) ) {
+												attributionLink = `https://${ layer.attribution }`;
+											}
 										}
+										const attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink;
+										customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
 									}
-									const attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink;
-									customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
-								}
 
-								if ( i > 0 ) {
-									layer.addLayer( map );
-								}
+									if ( i > 0 ) {
+										layer.addLayer( map );
+									}
 
-								layer.addInteractions( map );
+									layer.addInteractions( map );
+								} );
 							} );
+
+							this.addLayersControl();
+
+							map.addControl(
+								new mapboxgl.AttributionControl( {
+									customAttribution,
+								} ),
+								'bottom-left'
+							);
+
+							this.addMoreButtonAndLegends();
 						} );
 
-						this.addLayersControl();
-
-						map.addControl(
-							new mapboxgl.AttributionControl( {
-								customAttribution,
-							} ),
-							'bottom-left'
-						);
-
-						this.addMoreButtonAndLegends();
-					} );
-
-					this.getRelatedPosts();
+						this.getRelatedPosts();
+					}
+					// Show a message when a map doesn't have layers
+					if ( amountLayers === 0 ) {
+						console.log("hola");
+						this.addMapWithoutLayersMessage();
+					}
+					});
 				}
-				// Show a message when a map doesn't have layers
-				if ( this.getArg( 'layers' ) && (  this.getArg( 'layers' ).length === 0  || amountLayers === 0 )) {
-					console.log("hola");
-					this.addMapWithoutLayersMessage();
-				}
-				});
 			} )
 			.then( () => {
 				// Remove all empty jeo map blocks
@@ -337,6 +344,7 @@ class JeoMap {
 	}
 
 	getLayers() {
+		console.log("ENTRE A GETLAYERS");
 		return new Promise( ( resolve, reject ) => {
 			const layersDefinitions = this.getArg( 'layers' );
 			this.layersDefinitions = layersDefinitions;
