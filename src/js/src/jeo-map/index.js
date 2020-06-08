@@ -85,12 +85,11 @@ class JeoMap {
 					this.addMapWithoutLayersMessage();
 				} else {
 					let amountLayers = 0;
-					this.getLayers().then((value) => {
-						amountLayers = value.length
+					this.getLayers().then((layers) => {
+						amountLayers = layers.length
 
 					if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 && amountLayers > 0) {
-						console.log("UN MAPA!! RENDERIZADO")
-						this.getLayers().then( ( layers ) => {
+						//PRS this.getLayers().then( ( layers ) => {
 							const baseLayer = layers[ 0 ];
 							baseLayer.addStyle( map );
 
@@ -131,7 +130,7 @@ class JeoMap {
 							);
 
 							this.addMoreButtonAndLegends();
-						} );
+						//pRS } );
 
 						this.getRelatedPosts();
 					}
