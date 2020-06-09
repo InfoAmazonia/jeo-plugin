@@ -1,6 +1,6 @@
 import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
 import { pickBy } from 'lodash-es';
@@ -30,6 +30,14 @@ const formUpdater = ( setOptions, setWidgets, typeVector = false ) => ( options 
 	setOptions( options );
 };
 
+function usePrevious(value) {
+	const ref = useRef();
+	useEffect(() => {
+	  ref.current = value;
+	}, [value]);
+	return ref.current;
+  }
+
 const LayerSettings = ( {
 	postMeta,
 	setPostMeta,
@@ -37,10 +45,10 @@ const LayerSettings = ( {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
 	const [ styleLayers, setStyleLayers ] = useState( null );
-
 	const [ modalOpen, setModalStatus ] = useState( false );
 	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
 	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
+	const prevPostMeta = usePrevious(postMeta);
 
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
 	layerSchema.properties.layer_type_options = options;
@@ -61,7 +69,10 @@ const LayerSettings = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			const filledTypeOptions = pickBy( postMeta.layer_type_options );
+			let filledTypeOptions = {}
+			if ( ! prevPostMeta ){
+				filledTypeOptions = pickBy(postMeta.layer_type_options)
+			}
 			setPostMeta( { layer_type_options: filledTypeOptions } );
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
