@@ -31,16 +31,10 @@ const formUpdater = ( setOptions, setWidgets, typeVector = false ) => ( options 
 };
 
 function usePrevious(value) {
-	// The ref object is a generic container whose current property is mutable ...
-	// ... and can hold any value, similar to an instance property on a class
 	const ref = useRef();
-	
-	// Store current value in ref
 	useEffect(() => {
 	  ref.current = value;
-	}, [value]); // Only re-run if value changes
-	
-	// Return previous value (happens before update in useEffect above)
+	}, [value]);
 	return ref.current;
   }
 
@@ -51,7 +45,6 @@ const LayerSettings = ( {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
 	const [ styleLayers, setStyleLayers ] = useState( null );
-
 	const [ modalOpen, setModalStatus ] = useState( false );
 	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
 	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
@@ -77,7 +70,7 @@ const LayerSettings = ( {
 	useEffect( () => {
 		if ( postMeta.type ) {
 			let filledTypeOptions = {}
-			if (!prevPostMeta){
+			if ( ! prevPostMeta ){
 				filledTypeOptions = pickBy(postMeta.layer_type_options)
 			}
 			setPostMeta( { layer_type_options: filledTypeOptions } );
