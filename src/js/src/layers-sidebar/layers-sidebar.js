@@ -6,7 +6,7 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { renderLayer } from '../map-blocks/map-preview-layer';
-import { isEmpty, isEqual } from 'lodash-es';
+import { isEmpty, isEqual, every } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
@@ -40,8 +40,8 @@ const LayersSidebar = ( {
 	const [ hasError, setHasError ] = useState( false );
 
 	const editingMap = useRef( false );
-	const [ debouncedPostMeta ] = useDebounce( postMeta, 1000 );
-	const oldPostMeta = useRef( debouncedPostMeta );
+	const [ debouncedPostMeta ] = useDebounce( postMeta, 2000 );
+	const oldPostMeta = useRef( {} );
 
 	const animationOptions = {
 		animate: false,
@@ -61,11 +61,17 @@ const LayersSidebar = ( {
 				.then( ( schema ) => {
 					setLayerTypeSchema( schema );
 				} );
+			if( every(debouncedPostMeta.layer_type_options, isEmpty ) ){
+				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or until that.', 'jeo' ), {
+					id: 'layer_notices',
+					isDismissible: false,
+				} );
+			}
 		} else {
 			setLayerTypeSchema( {} );
 			sendNotice( 'warning', __( 'No layer configured.', 'jeo' ), {
-				id: 'warning_no_type',
-				isDismissible: true,
+				id: 'layer_notices',
+				isDismissible: false,
 			} );
 			lockPostSaving();
 			lockPostAutoSaving( 'layer_lock_key' );
@@ -73,15 +79,17 @@ const LayersSidebar = ( {
 	}, [ debouncedPostMeta.type ] );
 
 	useEffect( () => {
-		if ( hasError ) {
-			sendNotice( 'error', __( 'Error loading your layer. Please check your settings.', 'jeo' ), {
-				id: 'error_loading_layer',
-				isDismissible: false,
-			} );
+		if ( hasError) {
+			if ( ! every(debouncedPostMeta.layer_type_options, isEmpty || oldPostMeta.current.type !== debouncedPostMeta.type)) {
+				sendNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ), {
+					id: 'layer_notices',
+					isDismissible: false,
+				} );
+			}
 			lockPostSaving();
 			lockPostAutoSaving( 'layer_lock_key' );
 		} else {
-			removeNotice( 'error_loading_layer' );
+			removeNotice( 'layer_notices' );
 			unlockPostSaving( 'layer_lock_key' );
 		}
 	}, [ hasError ] );
@@ -101,10 +109,10 @@ const LayersSidebar = ( {
 				return false;
 			} );
 			if ( ! isEqual( debouncedLayerTypeOptions, oldLayerTypeOptions ) && ! anyEmpty ) {
-				oldPostMeta.current = debouncedPostMeta;
 				setHasError( false );
 				setKey( key + 1 );
 			}
+			oldPostMeta.current = debouncedPostMeta;
 		}
 	}, [ debouncedPostMeta, layerTypeSchema ] );
 
