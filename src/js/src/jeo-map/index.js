@@ -641,7 +641,7 @@ class JeoMap {
 				if (this.layers[ index ]) {
 					const link = document.createElement( 'a' );
 					link.href = '#';
-					link.classList.add( 'switchable' );
+					link.classList.add( 'swappable' );
 
 					if ( this.getDefaultSwappableLayer() == index ) {
 						link.classList.add( 'active' );
@@ -660,7 +660,7 @@ class JeoMap {
 						this.getSwappableLayers().forEach( ( i ) => {
 							this.hideLayer( this.layers[ i ].layer_id );
 						} );
-						jQuery( layers ).children( '.switchable' ).removeClass( 'active' );
+						jQuery( layers ).children( '.swappable' ).removeClass( 'active' );
 
 						// display current
 						const clicked = e.currentTarget;

@@ -51,7 +51,7 @@ div.jeomap {
     margin-right: 14px;
 }
 
-.jeomap nav a.switchable:before {
+.jeomap nav a.swappable:before {
     border-radius: 50px;
 }
 
