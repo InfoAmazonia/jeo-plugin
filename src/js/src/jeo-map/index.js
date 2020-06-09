@@ -546,12 +546,16 @@ class JeoMap {
 		return layers;
 	}
 
+	/*
+		amountLayers = new parameter
+	*/
 	addLayersControl(amountLayers) {
 		const switchableLayers = this.getSwitchableLayers();
 		const swappableLayers = this.getSwappableLayers();
 
 		const navElement = document.createElement( 'nav' );
 		navElement.classList.add( 'layers-selection' );
+
 		if ( (switchableLayers.length + swappableLayers.length !== 0) && amountLayers > 1 ) {
 			const layerSelectionTitle = document.createElement( 'div' );
 			layerSelectionTitle.classList.add( 'layer-selection-title' );
