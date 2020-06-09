@@ -51,6 +51,10 @@ div.jeomap {
     margin-right: 14px;
 }
 
+.jeomap nav a.switchable:before {
+    border-radius: 50px;
+}
+
 .jeomap nav a.active:after {
 	content: "";
     background: url(../src/images/check.png);
