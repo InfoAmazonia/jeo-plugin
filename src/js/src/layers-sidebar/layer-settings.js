@@ -1,6 +1,6 @@
 import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useMemo, useState, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
 import { pickBy } from 'lodash-es';
@@ -30,6 +30,20 @@ const formUpdater = ( setOptions, setWidgets, typeVector = false ) => ( options 
 	setOptions( options );
 };
 
+function usePrevious(value) {
+	// The ref object is a generic container whose current property is mutable ...
+	// ... and can hold any value, similar to an instance property on a class
+	const ref = useRef();
+	
+	// Store current value in ref
+	useEffect(() => {
+	  ref.current = value;
+	}, [value]); // Only re-run if value changes
+	
+	// Return previous value (happens before update in useEffect above)
+	return ref.current;
+  }
+
 const LayerSettings = ( {
 	postMeta,
 	setPostMeta,
@@ -41,6 +55,7 @@ const LayerSettings = ( {
 	const [ modalOpen, setModalStatus ] = useState( false );
 	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
 	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
+	const prevPostMeta = usePrevious(postMeta);
 
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
 	layerSchema.properties.layer_type_options = options;
@@ -61,7 +76,10 @@ const LayerSettings = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			const filledTypeOptions = pickBy( postMeta.layer_type_options );
+			let filledTypeOptions = {}
+			if (!prevPostMeta){
+				filledTypeOptions = pickBy(postMeta.layer_type_options)
+			}
 			setPostMeta( { layer_type_options: filledTypeOptions } );
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
