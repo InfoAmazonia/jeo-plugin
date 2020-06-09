@@ -71,8 +71,13 @@ const LayersSettings = ( {
 						id: `jeo-layers-autosuggest-${ instanceId }`,
 						placeholder: __( 'Search by layer name', 'jeo' ),
 					} }
-					filterSuggestions={ ( suggestion ) =>
-						! attributes.layers.map( ( l ) => l.id ).includes( suggestion.id )
+					filterSuggestions={ ( suggestion ) => {
+							if ( suggestion.meta.type ) {
+								return ! attributes.layers.map( ( l ) => { 
+									return l.id 
+								} ).includes( suggestion.id )
+							}
+						}
 					}
 					onSuggestionSelected={ ( e, { suggestion } ) =>
 						setAttributes( {
@@ -112,6 +117,10 @@ const LayersSettings = ( {
 									inUse = true;
 								}
 							} );
+
+							if ( ! layer.meta.type ) {
+								return;
+							}
 
 							return (
 								<li className="jeo-setting-layer all-layers-list" key={ layer.id }>
