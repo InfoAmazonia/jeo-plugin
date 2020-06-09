@@ -119,7 +119,7 @@ class JeoMap {
 									} );
 								} );
 
-								this.addLayersControl();
+								this.addLayersControl(amountLayers);
 
 								map.addControl(
 									new mapboxgl.AttributionControl( {
@@ -546,14 +546,16 @@ class JeoMap {
 		return layers;
 	}
 
-	addLayersControl() {
+	addLayersControl(amountLayers) {
 		const switchableLayers = this.getSwitchableLayers();
 		const swappableLayers = this.getSwappableLayers();
 
 		const navElement = document.createElement( 'nav' );
 		navElement.classList.add( 'layers-selection' );
 
-		if ( switchableLayers.length + swappableLayers.length !== 0 ) {
+		console.log("LAYER CONTROL")
+		console.log(amountLayers)
+		if ( (switchableLayers.length + swappableLayers.length !== 0) && amountLayers > 1 ) {
 			const layerSelectionTitle = document.createElement( 'div' );
 			layerSelectionTitle.classList.add( 'layer-selection-title' );
 
