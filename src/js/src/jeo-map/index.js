@@ -552,9 +552,6 @@ class JeoMap {
 
 		const navElement = document.createElement( 'nav' );
 		navElement.classList.add( 'layers-selection' );
-
-		console.log("LAYER CONTROL")
-		console.log(amountLayers)
 		if ( (switchableLayers.length + swappableLayers.length !== 0) && amountLayers > 1 ) {
 			const layerSelectionTitle = document.createElement( 'div' );
 			layerSelectionTitle.classList.add( 'layer-selection-title' );
