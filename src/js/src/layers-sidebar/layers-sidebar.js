@@ -40,7 +40,7 @@ const LayersSidebar = ( {
 	const [ hasError, setHasError ] = useState( false );
 
 	const editingMap = useRef( false );
-	const [ debouncedPostMeta ] = useDebounce( postMeta, 1000 );
+	const [ debouncedPostMeta ] = useDebounce( postMeta, 2000 );
 	const oldPostMeta = useRef( {} );
 
 	const animationOptions = {
@@ -61,11 +61,16 @@ const LayersSidebar = ( {
 				.then( ( schema ) => {
 					setLayerTypeSchema( schema );
 				} );
-			removeNotice('warning_no_type')
+			if( every(debouncedPostMeta.layer_type_options, isEmpty ) ){
+				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or until that.', 'jeo' ), {
+					id: 'layer_notices',
+					isDismissible: false,
+				} );
+			}
 		} else {
 			setLayerTypeSchema( {} );
 			sendNotice( 'warning', __( 'No layer configured.', 'jeo' ), {
-				id: 'warning_no_type',
+				id: 'layer_notices',
 				isDismissible: false,
 			} );
 			lockPostSaving();
@@ -76,15 +81,15 @@ const LayersSidebar = ( {
 	useEffect( () => {
 		if ( hasError) {
 			if ( ! every(debouncedPostMeta.layer_type_options, isEmpty || oldPostMeta.current.type !== debouncedPostMeta.type)) {
-				sendNotice( 'error', __( 'Error loading your layer. Please check your settings.', 'jeo' ), {
-					id: 'error_loading_layer',
+				sendNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ), {
+					id: 'layer_notices',
 					isDismissible: false,
 				} );
-				lockPostSaving();
-				lockPostAutoSaving( 'layer_lock_key' );
 			}
+			lockPostSaving();
+			lockPostAutoSaving( 'layer_lock_key' );
 		} else {
-			removeNotice( 'error_loading_layer' );
+			removeNotice( 'layer_notices' );
 			unlockPostSaving( 'layer_lock_key' );
 		}
 	}, [ hasError ] );
