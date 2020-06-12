@@ -48,6 +48,19 @@ const LayersSidebar = ( {
 	};
 
 	useEffect( () => {
+		if ( ! MapboxAPIKey ) {
+			sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
+				id: 'layer_notices_no_api_key',
+				isDismissible: true,
+				actions: [{
+					url: '/wp-admin/admin.php?page=jeo-settings',
+					label: 'Check your settings.',
+				}],
+			});	
+		}
+	}, [] );
+
+	useEffect( () => {
 		if ( postMeta.type ) {
 			setHasError( false );
 			setKey( key + 1 );
