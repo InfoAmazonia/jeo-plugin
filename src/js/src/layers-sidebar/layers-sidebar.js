@@ -37,7 +37,7 @@ const LayersSidebar = ( {
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
 
 	const [ key, setKey ] = useState( 0 );
-	const [ hasError, setHasError ] = useState( false );
+	const [ canRenderLayer, setCanRenderLayer ] = useState( false );
 
 	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 2000 );
@@ -49,50 +49,47 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			setHasError( false );
-			setKey( key + 1 );
-		}
-	}, [ postMeta.type ] );
-
-	useEffect( () => {
-		if ( debouncedPostMeta.type ) {
 			window.JeoLayerTypes
-				.getLayerTypeSchema( debouncedPostMeta )
+				.getLayerTypeSchema( postMeta )
 				.then( ( schema ) => {
 					setLayerTypeSchema( schema );
 				} );
-			if( every(debouncedPostMeta.layer_type_options, isEmpty ) ){
-				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or until that.', 'jeo' ), {
+			if( every(postMeta.layer_type_options, isEmpty ) ) {
+				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
 					id: 'layer_notices',
-					isDismissible: false,
+					isDismissible: true,
 				} );
 			}
 		} else {
 			setLayerTypeSchema( {} );
 			sendNotice( 'warning', __( 'No layer configured.', 'jeo' ), {
 				id: 'layer_notices',
-				isDismissible: false,
+				isDismissible: true,
 			} );
-			lockPostSaving();
+			lockPostSaving( 'layer_lock_key' );
 			lockPostAutoSaving( 'layer_lock_key' );
 		}
-	}, [ debouncedPostMeta.type ] );
+	}, [ postMeta.type ] );
 
 	useEffect( () => {
-		if ( hasError) {
-			if ( ! every(debouncedPostMeta.layer_type_options, isEmpty || oldPostMeta.current.type !== debouncedPostMeta.type)) {
+		if ( ! canRenderLayer ) {
+			if ( !every( debouncedPostMeta.layer_type_options, isEmpty ) || oldPostMeta.current.type !== debouncedPostMeta.type ) {
+				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
+					id: 'layer_notices',
+					isDismissible: true,
+				} );
+			} else {
 				sendNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ), {
 					id: 'layer_notices',
-					isDismissible: false,
+					isDismissible: true,
 				} );
 			}
-			lockPostSaving();
+			lockPostSaving( 'layer_lock_key ');
 			lockPostAutoSaving( 'layer_lock_key' );
 		} else {
-			removeNotice( 'layer_notices' );
 			unlockPostSaving( 'layer_lock_key' );
 		}
-	}, [ hasError ] );
+	}, [ canRenderLayer ] );
 
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
@@ -103,13 +100,15 @@ const LayersSidebar = ( {
 			optionsKeys.some( ( k ) => {
 				if ( isEmpty( debouncedLayerTypeOptions[ k ] ) && layerTypeSchema.required.includes( k ) ) {
 					anyEmpty = true;
-					setHasError( true );
+					setCanRenderLayer( false );
 					return anyEmpty;
 				}
 				return false;
 			} );
 			if ( ! isEqual( debouncedLayerTypeOptions, oldLayerTypeOptions ) && ! anyEmpty ) {
-				setHasError( false );
+				setCanRenderLayer( true );
+				removeNotice( 'layer_notices' );
+				unlockPostSaving( 'layer_lock_key' );
 				setKey( key + 1 );
 			}
 			oldPostMeta.current = debouncedPostMeta;
@@ -121,7 +120,7 @@ const LayersSidebar = ( {
 	XMLHttpRequest.prototype.open = function() {
 		this.addEventListener( 'load', function() {
 			if ( this.status >= 400 ) {
-				setHasError( true );
+				setCanRenderLayer( false );
 			}
 		} );
 		origOpen.apply( this, arguments );
@@ -134,8 +133,8 @@ const LayersSidebar = ( {
 					<Map
 						key={ key }
 						onError={ ( ) => {
-							if ( ! hasError ) {
-								setHasError( true );
+							if ( canRenderLayer ) {
+								setCanRenderLayer( false );
 							}
 						} }
 						onStyleLoad={ ( map ) => {
@@ -160,7 +159,7 @@ const LayersSidebar = ( {
 							}
 						} }
 					>
-						{ ! hasError && renderLayer( debouncedPostMeta, {
+						{ canRenderLayer && renderLayer( debouncedPostMeta, {
 							id: 1,
 							use: 'fixed',
 						} ) }
@@ -192,14 +191,14 @@ export default withDispatch(
 		removeNotice: ( id ) => {
 			dispatch( 'core/notices' ).removeNotice( id );
 		},
-		lockPostSaving: () => {
-			dispatch( 'core/editor' ).lockPostSaving( );
+		lockPostSaving: ( key ) => {
+			dispatch( 'core/editor' ).lockPostSaving( key );
 		},
 		lockPostAutoSaving: ( key ) => {
 			dispatch( 'core/editor' ).lockPostAutosaving( key );
 		},
-		unlockPostSaving: () => {
-			dispatch( 'core/editor' ).unlockPostSaving( );
+		unlockPostSaving: (key) => {
+			dispatch( 'core/editor' ).unlockPostSaving( key );
 		},
 	} )
 )( withSelect(
