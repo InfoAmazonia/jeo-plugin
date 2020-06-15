@@ -145,13 +145,13 @@ The shortcode accepts three attributes:
 Examples:
 
 ``
-[jeo-map map_id=99]
+    [jeo-map map_id=99]
 ``
 
 You have to inform at least the ID of the Map you want to insert. By default, it will be inserted with a size of 600&times;600px (or whatever the active theme defines), but you can also change it:
 
 ``
-[jeo-map map_id=99 width="800px" height="800px"]
+    [jeo-map map_id=99 width="800px" height="800px"]
 ``
 
 # Map block
@@ -276,7 +276,7 @@ This method must return a Promise with a json-schema representation of the layer
 
 This schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.
 
-For example, the "Tile layer" layer type needs only a URL, so that's how its `getSchema` method will look like.
+For example, the "Tile layer" layer type needs only a URL.
 
 ``
     // ...
@@ -300,6 +300,8 @@ For example, the "Tile layer" layer type needs only a URL, so that's how its `ge
         });
     }
 ``
+
+That's how its `getSchema` method will look like.
 
 ## addStyle(map, attributes)
 
@@ -438,6 +440,7 @@ Here is an example of two entries related to the same post, that could be get us
         '_geocode_city_level_1' => 'Parque do Colégio',
     ]
 ``
+.
 
 ## How to search for posts by geoinformation? (indexes)
 
@@ -506,6 +509,7 @@ Give me all the posts whose city is `'Manaus'`:
         ]
     ]);
 ``
+.
 # Writing a Geocoder
 
 A Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on the geographical coordinates, which is called Reverse Geocoding.
@@ -732,7 +736,7 @@ Example:
 
     // ...
 ``
-
+.
 ## Declaring default values
 
 You can also add the `get_default_options()` method to your class to set default values for each setting. This is optional and is done like this:
@@ -757,7 +761,7 @@ You can also add the `get_default_options()` method to your class to set default
 
     });
 ``
-
+.
 ## Advanced: Even further settings customization
 
 If your geocoder needs some special settings that a simple text input won't handle, there is yet another method you can declare to add arbitrary HTML code to the Settings page.
