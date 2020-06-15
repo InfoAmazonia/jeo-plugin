@@ -38,6 +38,8 @@ const LayersSidebar = ( {
 
 	const [ key, setKey ] = useState( 0 );
 	const [ hasError, setHasError ] = useState( false );
+	const [ statusCode, setStatusCode ] = useState( null );
+
 
 	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 2000 );
@@ -46,6 +48,19 @@ const LayersSidebar = ( {
 	const animationOptions = {
 		animate: false,
 	};
+
+	useEffect( () => {
+		if ( ! MapboxAPIKey ) {
+			sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
+				id: 'layer_notices_no_api_key',
+				isDismissible: true,
+				actions: [{
+					url: '/wp-admin/admin.php?page=jeo-settings',
+					label: 'Check your settings.',
+				}],
+			});	
+		}
+	}, [] );
 
 	useEffect( () => {
 		if ( postMeta.type ) {
@@ -116,11 +131,29 @@ const LayersSidebar = ( {
 		}
 	}, [ debouncedPostMeta, layerTypeSchema ] );
 
-	//todo: find a better way to intercept mapbox api requests errors
+	useEffect( () => {
+		switch ( statusCode ) {
+			case 401:
+				sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
+					id: 'layer_notices_no_api_key',
+					isDismissible: true,
+				});
+
+				break;
+			
+			case 404:
+				sendNotice( 'error', __( "Your layer was not found.", 'jeo' ), {
+					id: 'layer_notices_no_api_key',
+					isDismissible: true,
+				});
+		}
+	}, [ statusCode ] )
+
 	const origOpen = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function() {
 		this.addEventListener( 'load', function() {
 			if ( this.status >= 400 ) {
+				setStatusCode( this.status );
 				setHasError( true );
 			}
 		} );
