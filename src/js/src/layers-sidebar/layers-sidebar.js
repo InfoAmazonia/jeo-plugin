@@ -59,6 +59,7 @@ const LayersSidebar = ( {
 					label: 'Check your settings.',
 				}],
 			});	
+			lockPostSaving();
 		}
 	}, [] );
 
@@ -102,7 +103,10 @@ const LayersSidebar = ( {
 			lockPostSaving( 'layer_lock_key ');
 			lockPostAutoSaving( 'layer_lock_key' );
 		} else {
-			unlockPostSaving( 'layer_lock_key' );
+			removeNotice( 'layer_notices' );
+			if ( MapboxAPIKey ) {
+				unlockPostSaving( 'layer_lock_key' );
+			}
 		}
 	}, [ canRenderLayer ] );
 
