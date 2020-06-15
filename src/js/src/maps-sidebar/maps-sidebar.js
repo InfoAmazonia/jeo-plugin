@@ -245,7 +245,8 @@ function MapsSidebar( {
 							sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
 								id: 'layer_notices_no_api_key',
 								isDismissible: true,
-							});							lockPostSaving();
+							});
+							lockPostSaving();
 						} }
 						onStyleLoad={ ( map ) => {
 							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
