@@ -32,6 +32,7 @@ function MapsSidebar( {
 	relatedPosts,
 	setPostMeta,
 	setRelatedPosts,
+	sendNotice,
 } ) {
 	const [ modal, setModal ] = useState( false );
 
@@ -75,6 +76,19 @@ function MapsSidebar( {
 	const [ key, setKey ] = useState( 0 );
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = postMeta[ zoomState ];
+
+	useEffect( () => {
+		if ( ! MapboxAPIKey ) {
+			sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
+				id: 'layer_notices_no_api_key',
+				isDismissible: true,
+				actions: [{
+					url: '/wp-admin/admin.php?page=jeo-settings',
+					label: 'Check your settings.',
+				}],
+			});	
+		}
+	}, [] );
 
 	useEffect( () => {
 		if ( initialButtonSelected ) {
@@ -285,6 +299,9 @@ export default withDispatch(
 		},
 		setRelatedPosts: ( value ) => {
 			dispatch( 'core/editor' ).editPost( { meta: { related_posts: value } } );
+		},
+		sendNotice: ( type, message, options ) => {
+			dispatch( 'core/notices' ).createNotice( type, message, options );
 		},
 	} )
 )( withSelect(
