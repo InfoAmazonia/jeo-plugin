@@ -53,7 +53,7 @@ const LayersSidebar = ( {
 		if ( ! MapboxAPIKey ) {
 			sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
 				id: 'layer_notices_no_api_key',
-				isDismissible: true,
+				isDismissible: false,
 				actions: [{
 					url: '/wp-admin/admin.php?page=jeo-settings',
 					label: 'Check your settings.',
@@ -70,43 +70,31 @@ const LayersSidebar = ( {
 				.then( ( schema ) => {
 					setLayerTypeSchema( schema );
 				} );
-			if( every(postMeta.layer_type_options, isEmpty ) ) {
-				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
-					id: 'layer_notices',
-					isDismissible: true,
-				} );
-			}
 		} else {
 			setLayerTypeSchema( {} );
-			sendNotice( 'warning', __( 'No layer configured.', 'jeo' ), {
-				id: 'layer_notices',
-				isDismissible: true,
-			} );
-			lockPostSaving( 'layer_lock_key' );
-			lockPostAutoSaving( 'layer_lock_key' );
-		}
+		} sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
+			id: 'layer_notices',
+			isDismissible: false,
+		} );
 	}, [ postMeta.type ] );
 
 	useEffect( () => {
 		if ( ! canRenderLayer ) {
-			if ( !every( debouncedPostMeta.layer_type_options, isEmpty ) || oldPostMeta.current.type !== debouncedPostMeta.type ) {
+			if ( every( postMeta.layer_type_options, isEmpty ) || oldPostMeta.current.type !== debouncedPostMeta.type ) {
 				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
 					id: 'layer_notices',
-					isDismissible: true,
+					isDismissible: false,
 				} );
 			} else {
 				sendNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ), {
 					id: 'layer_notices',
-					isDismissible: true,
+					isDismissible: false,
 				} );
 			}
-			lockPostSaving( 'layer_lock_key ');
+			lockPostSaving( 'layer_lock_key' );
 			lockPostAutoSaving( 'layer_lock_key' );
 		} else {
 			removeNotice( 'layer_notices' );
-			if ( MapboxAPIKey ) {
-				unlockPostSaving( 'layer_lock_key' );
-			}
 		}
 	}, [ canRenderLayer ] );
 
@@ -127,7 +115,6 @@ const LayersSidebar = ( {
 			if ( ! isEqual( debouncedLayerTypeOptions, oldLayerTypeOptions ) && ! anyEmpty ) {
 				setCanRenderLayer( true );
 				removeNotice( 'layer_notices' );
-				unlockPostSaving( 'layer_lock_key' );
 				setKey( key + 1 );
 			}
 			oldPostMeta.current = debouncedPostMeta;
@@ -150,7 +137,7 @@ const LayersSidebar = ( {
 					isDismissible: true,
 				});
 		}
-	}, [ statusCode ] )
+	}, [ statusCode ] );
 
 	const origOpen = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function() {
@@ -169,12 +156,17 @@ const LayersSidebar = ( {
 				<LayerPreviewPortal>
 					<Map
 						key={ key }
-						onError={ ( ) => {
+						onError={ ( map ) => {
 							if ( canRenderLayer ) {
+								map.removeLayer( 'layer_1' );
 								setCanRenderLayer( false );
 							}
 						} }
 						onStyleLoad={ ( map ) => {
+							const layer = map.getLayer( 'layer_1' );
+							if ( layer ) {
+								unlockPostSaving( 'layer_lock_key' );
+							}
 							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 						} }
