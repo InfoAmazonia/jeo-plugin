@@ -60,6 +60,7 @@ const LayersSidebar = ( {
 				}],
 			});	
 		}
+		lockPostSaving();
 	}, [] );
 
 	useEffect( () => {
@@ -105,7 +106,9 @@ const LayersSidebar = ( {
 			lockPostAutoSaving( 'layer_lock_key' );
 		} else {
 			removeNotice( 'layer_notices' );
-			unlockPostSaving( 'layer_lock_key' );
+			if ( MapboxAPIKey ) {
+				unlockPostSaving( 'layer_lock_key' );
+			}
 		}
 	}, [ hasError ] );
 

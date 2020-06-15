@@ -33,6 +33,8 @@ function MapsSidebar( {
 	setPostMeta,
 	setRelatedPosts,
 	sendNotice,
+	lockPostSaving,
+	lockPostAutoSaving,
 } ) {
 	const [ modal, setModal ] = useState( false );
 
@@ -86,7 +88,23 @@ function MapsSidebar( {
 					url: '/wp-admin/admin.php?page=jeo-settings',
 					label: 'Check your settings.',
 				}],
-			});	
+			});
+
+			
+			lockPostSaving();
+		} else {
+			async function verifyAPIKey() {
+				const response = await fetch(`https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=${ MapboxAPIKey }`);
+				if ( response.status >= 400 ) {
+					sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
+						id: 'layer_notices_no_api_key',
+						isDismissible: true,
+					});
+					lockPostSaving();
+				}
+			}
+
+			verifyAPIKey();
 		}
 	}, [] );
 
@@ -136,7 +154,7 @@ function MapsSidebar( {
 				border: 0,
 			} );
 		}
-	}, [ maxButtonSelected ] );
+	}, [ maxButtonSelected ] );	
 
 	return (
 		<Fragment>
@@ -223,6 +241,12 @@ function MapsSidebar( {
 						</ButtonGroup>
 					</div>
 					<Map
+						onError={ () => {
+							sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
+								id: 'layer_notices_no_api_key',
+								isDismissible: true,
+							});							lockPostSaving();
+						} }
 						onStyleLoad={ ( map ) => {
 							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
@@ -302,6 +326,12 @@ export default withDispatch(
 		},
 		sendNotice: ( type, message, options ) => {
 			dispatch( 'core/notices' ).createNotice( type, message, options );
+		},
+		lockPostSaving: () => {
+			dispatch( 'core/editor' ).lockPostSaving( );
+		},
+		lockPostAutoSaving: ( key ) => {
+			dispatch( 'core/editor' ).lockPostAutosaving( key );
 		},
 	} )
 )( withSelect(
