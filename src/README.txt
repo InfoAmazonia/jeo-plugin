@@ -22,7 +22,7 @@ With JEO, creating the interaction between data layers and contextual informatio
 * Geocoding WordPress posts using OpenStreetMaps(Nominatim), supporting the post type **Post**;
 * Customizable marker icons that can be associated to categories, custom taxonomies or posts directly;
 * Map markers query integrated to posts query;
-* Support (WPML)[https://wpml.org/pt-br/] and (Polylang)[https://br.wordpress.org/plugins/polylang/] multilanguages plugins.
+* Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguages plugins.
 
 == Installation ==
 
@@ -144,15 +144,15 @@ The shortcode accepts three attributes:
 
 Examples:
 
-```html
+``
 [jeo-map map_id=99]
-```
+``
 
 You have to inform at least the ID of the Map you want to insert. By default, it will be inserted with a size of 600&times;600px (or whatever the active theme defines), but you can also change it:
 
-```html
+``
 [jeo-map map_id=99 width="800px" height="800px"]
-```
+``
 
 # Map block
 
@@ -218,11 +218,11 @@ In short, this is all that is needed to do. In some cases, however, you might ne
 
 First, let's register a new Layer Type by hooking up in the `jeo_register_layer_types` action:
 
-```php
+``
 add_action('jeo_register_layer_types', function($layer_types) {
     $layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
 });
-```
+``
 
 `register_layer_type` method gets 2 parameters.
 
@@ -239,7 +239,7 @@ In this file, we are going to register a JavaScript object using the globally av
 
 The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.
 
-```js
+``
 window.JeoLayerTypes.registerLayerType('tilelayer', {
 
     addStyle: function(map, attributes) {
@@ -254,7 +254,7 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
         // ...
     }
 });
-```
+``
 
 Your Layer Type object MUST implement at least these three methods.
 
@@ -278,7 +278,7 @@ This schema must only include layer-type specific information. Every layer, desp
 
 For example, the "Tile layer" layer type needs only a URL, so that's how its `getSchema` method will look like.
 
-```js
+``
     // ...
 
     getSchema: function(attributes) {
@@ -299,7 +299,7 @@ For example, the "Tile layer" layer type needs only a URL, so that's how its `ge
 
         });
     }
-```
+``
 
 ## addStyle(map, attributes)
 
@@ -318,7 +318,7 @@ This method will be invoked when a layer of this type is added to the map as the
 
 For example, the "Tile Layer" layer type sets the style as a raster layer:
 
-```js
+``
     // ...
 
     addStyle: function(map, attributes) {
@@ -338,7 +338,7 @@ For example, the "Tile Layer" layer type sets the style as a raster layer:
             }]
         })
     }
-```
+``
 
 **Note**: The `attributes.layer_type_options` object holds all the properties declared in the `getSchema` method. That's why there is a `url` there! (See Layer attributes section below)
 
@@ -359,7 +359,7 @@ This method will be invoked when a layer of this type is added to the map.
 
 For example, the "Tile Layer" layer type adds itself as a raster layer:
 
-```js
+``
     // ...
 
     addLayer: function(map, attributes) {
@@ -379,8 +379,7 @@ For example, the "Tile Layer" layer type adds itself as a raster layer:
         }
         return map.addLayer(layer);
     }
-
-```
+``
 
 **Note:** This method must verify the value of `attributes.visible` to determine whether this layer should be visible when the map is initialized.
 
@@ -409,11 +408,11 @@ Each related point is stored as one entry of the `_related_point` metadata key. 
 
 Here is an example of two entries related to the same post, that could be get using:
 
-```php
+``
 get_post_meta( $post_id, '_related_point' );
-```
+``
 
-```php
+``
 '_related_point' => [
     'relevance' => 'primary',
     '_geocode_lat' => '-23,54659435',
@@ -438,7 +437,7 @@ get_post_meta( $post_id, '_related_point' );
     '_geocode_region_level_3' => 'Região Intermediária de Campinas',
     '_geocode_city_level_1' => 'Parque do Colégio',
 ]
-```
+``
 
 ## How to search for posts by geoinformation? (indexes)
 
@@ -448,7 +447,7 @@ Since each point is stored as a serialized data in the database, this would not 
 
 For the example above, this post would also have one individual metadata entry for each information, like this:
 
-```php
+``
 [
     '_geocode_lat_p' => '-23,54659435',
     '_geocode_lon_p' => '-46,644533061712',
@@ -467,7 +466,7 @@ For the example above, this post would also have one individual metadata entry f
     '_geocode_region_level_3_s' => 'Região Intermediária de Campinas',
     '_geocode_city_level_1_s' => 'Parque do Colégio',
 ]
-```
+``
 
 Note: `_s` and `_p` suffixes indicate if the relevance of that information is primary or secondary.
 
@@ -479,7 +478,7 @@ Now we have all the information as individual metadata and this allows me to que
 
 Give me all the posts that have primary points with the country code `'BR'`:
 
-```php
+``
 $posts = new WP_Query([
     'meta_query' => [
         [
@@ -488,11 +487,11 @@ $posts = new WP_Query([
         ]
     ]
 ]);
-```
+``
 
 Give me all the posts whose city is `'Manaus'`:
 
-```PHP
+``
 $posts = new WP_Query([
     'meta_query' => [
         [
@@ -506,7 +505,7 @@ $posts = new WP_Query([
         'relation' => 'OR'
     ]
 ]);
-```
+``
 # Writing a Geocoder
 
 A Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on the geographical coordinates, which is called Reverse Geocoding.
@@ -519,7 +518,7 @@ JEO comes with two native geocoder services users can choose from: Nominatim and
 
 Hook a function to the `jeo_register_geocoders` action and call the register with the following code:
 
-```php
+``
 add_action('jeo_register_geocoders', function($geocoders) {
 
     $geocoders->register_geocoder([
@@ -530,7 +529,7 @@ add_action('jeo_register_geocoders', function($geocoders) {
     ]);
 
 });
-```
+``
 
 This will tell JEO that there is a new Geocoder service available and give some information about it.
 
@@ -555,7 +554,7 @@ Note: Only `lat` and `lon` are required.
 
 Sample response with all accepted fields:
 
-```php
+``
 [
         [
             'lat' => '',
@@ -570,11 +569,11 @@ Sample response with all accepted fields:
             'city_level_1' => '',
         ]
 ]
-```
+``
 
 Here is a simple example:
 
-```php
+``
 add_action('jeo_register_geocoders', function($geocoders) {
 
     $geocoders->register_geocoder([
@@ -655,7 +654,7 @@ add_action('jeo_register_geocoders', function($geocoders) {
     }
 
 });
-```
+``
 
 And that's it! Your new Geocoder is ready!
 
@@ -675,7 +674,7 @@ Each setting is described by an array with the following keys:
 
 Let's see an example only with the relevant code:
 
-```php
+``
 add_action('jeo_register_geocoders', function($geocoders) {
 
     // ...
@@ -699,7 +698,7 @@ add_action('jeo_register_geocoders', function($geocoders) {
     }
 
 });
-```
+``
 
 And this is what you will see in the admin panel:
 
@@ -711,7 +710,7 @@ To get its value, simply call `$this->get_option($option_name)`.
 
 Example:
 
-```php
+``
 // ...
 
         // ...
@@ -732,13 +731,13 @@ Example:
         }
 
 // ...
-```
+``
 
 ## Declaring default values
 
 You can also add the `get_default_options()` method to your class to set default values for each setting. This is optional and is done like this:
 
-```php
+``
 add_action('jeo_register_geocoders', function($geocoders) {
 
     // ...
@@ -757,7 +756,7 @@ add_action('jeo_register_geocoders', function($geocoders) {
     }
 
 });
-```
+``
 
 ## Advanced: Even further settings customization
 
@@ -773,7 +772,7 @@ To get the right field name use `$settings->get_geocoder_option_field_name($name
 
 Example:
 
-```php
+``
 // ...
 
         // ...
@@ -796,7 +795,7 @@ Example:
         }
 
 // ...
-```
+``
 
 Note: `selected()` is a native WordPress function. See the [official documentation](https://developer.wordpress.org/reference/functions/selected/)
 
