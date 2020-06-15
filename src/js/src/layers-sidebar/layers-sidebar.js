@@ -59,8 +59,8 @@ const LayersSidebar = ( {
 					label: 'Check your settings.',
 				}],
 			});	
+			lockPostSaving();
 		}
-		lockPostSaving();
 	}, [] );
 
 	useEffect( () => {
