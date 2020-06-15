@@ -219,9 +219,9 @@ In short, this is all that is needed to do. In some cases, however, you might ne
 First, let's register a new Layer Type by hooking up in the `jeo_register_layer_types` action:
 
 ``
-add_action('jeo_register_layer_types', function($layer_types) {
-    $layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
-});
+    add_action('jeo_register_layer_types', function($layer_types) {
+        $layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
+    });
 ``
 
 `register_layer_type` method gets 2 parameters.
@@ -240,20 +240,20 @@ In this file, we are going to register a JavaScript object using the globally av
 The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.
 
 ``
-window.JeoLayerTypes.registerLayerType('tilelayer', {
+    window.JeoLayerTypes.registerLayerType('tilelayer', {
 
-    addStyle: function(map, attributes) {
-        // ...
-    },
+        addStyle: function(map, attributes) {
+            // ...
+        },
 
-    addLayer: function(map, attributes) {
-        // ...
-    },
+        addLayer: function(map, attributes) {
+            // ...
+        },
 
-    getSchema: function(attributes) {
-        // ...
-    }
-});
+        getSchema: function(attributes) {
+            // ...
+        }
+    });
 ``
 
 Your Layer Type object MUST implement at least these three methods.
@@ -409,34 +409,34 @@ Each related point is stored as one entry of the `_related_point` metadata key. 
 Here is an example of two entries related to the same post, that could be get using:
 
 ``
-get_post_meta( $post_id, '_related_point' );
+    get_post_meta( $post_id, '_related_point' );
 ``
 
 ``
-'_related_point' => [
-    'relevance' => 'primary',
-    '_geocode_lat' => '-23,54659435',
-    '_geocode_lon' => '-46,644533061712',
-    '_geocode_full_address' => 'Edifício Copan, Rua Araújo, Vila Buarque, República, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01046-010, Brasil',
-    '_geocode_country' => 'Brasil',
-    '_geocode_country_code' => '',
-    '_geocode_city' => 'São Paulo',
-    '_geocode_region_level_2' => 'São Paulo',
-    '_geocode_region_level_3' => 'Região Intermediária de São Paulo',
-    '_geocode_city_level_1' => 'Vila Buarque',
-],
-'_related_point' => [
-    'relevance' => 'secondary',
-    '_geocode_lat' => '-23,183525102463',
-    '_geocode_lon' => '-46,898231506348',
-    '_geocode_full_address' => 'Rua Jorge Gebran, Parque do Colégio, Chácara Urbana, Jundiaí, Região Imediata de Jundiaí, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13209-090, Brasil',
-    '_geocode_country' => 'Brasil',
-    '_geocode_country_code' => '',
-    '_geocode_city' => 'Jundiaí',
-    '_geocode_region_level_2' => 'São Paulo',
-    '_geocode_region_level_3' => 'Região Intermediária de Campinas',
-    '_geocode_city_level_1' => 'Parque do Colégio',
-]
+    '_related_point' => [
+        'relevance' => 'primary',
+        '_geocode_lat' => '-23,54659435',
+        '_geocode_lon' => '-46,644533061712',
+        '_geocode_full_address' => 'Edifício Copan, Rua Araújo, Vila Buarque, República, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01046-010, Brasil',
+        '_geocode_country' => 'Brasil',
+        '_geocode_country_code' => '',
+        '_geocode_city' => 'São Paulo',
+        '_geocode_region_level_2' => 'São Paulo',
+        '_geocode_region_level_3' => 'Região Intermediária de São Paulo',
+        '_geocode_city_level_1' => 'Vila Buarque',
+    ],
+    '_related_point' => [
+        'relevance' => 'secondary',
+        '_geocode_lat' => '-23,183525102463',
+        '_geocode_lon' => '-46,898231506348',
+        '_geocode_full_address' => 'Rua Jorge Gebran, Parque do Colégio, Chácara Urbana, Jundiaí, Região Imediata de Jundiaí, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13209-090, Brasil',
+        '_geocode_country' => 'Brasil',
+        '_geocode_country_code' => '',
+        '_geocode_city' => 'Jundiaí',
+        '_geocode_region_level_2' => 'São Paulo',
+        '_geocode_region_level_3' => 'Região Intermediária de Campinas',
+        '_geocode_city_level_1' => 'Parque do Colégio',
+    ]
 ``
 
 ## How to search for posts by geoinformation? (indexes)
@@ -448,24 +448,24 @@ Since each point is stored as a serialized data in the database, this would not 
 For the example above, this post would also have one individual metadata entry for each information, like this:
 
 ``
-[
-    '_geocode_lat_p' => '-23,54659435',
-    '_geocode_lon_p' => '-46,644533061712',
-    '_geocode_country_p' => 'Brasil',
-    '_geocode_country_code_p' => '',
-    '_geocode_city_p' => 'São Paulo',
-    '_geocode_region_level_2_p' => 'São Paulo',
-    '_geocode_region_level_3_p' => 'Região Intermediária de São Paulo',
-    '_geocode_city_level_1_p' => 'Vila Buarque',
-    '_geocode_lat_s' => '-23,183525102463',
-    '_geocode_lon_s' => '-46,898231506348',
-    '_geocode_country_s' => 'Brasil',
-    '_geocode_country_code_s' => '',
-    '_geocode_city_s' => 'Jundiaí',
-    '_geocode_region_level_2_s' => 'São Paulo',
-    '_geocode_region_level_3_s' => 'Região Intermediária de Campinas',
-    '_geocode_city_level_1_s' => 'Parque do Colégio',
-]
+    [
+        '_geocode_lat_p' => '-23,54659435',
+        '_geocode_lon_p' => '-46,644533061712',
+        '_geocode_country_p' => 'Brasil',
+        '_geocode_country_code_p' => '',
+        '_geocode_city_p' => 'São Paulo',
+        '_geocode_region_level_2_p' => 'São Paulo',
+        '_geocode_region_level_3_p' => 'Região Intermediária de São Paulo',
+        '_geocode_city_level_1_p' => 'Vila Buarque',
+        '_geocode_lat_s' => '-23,183525102463',
+        '_geocode_lon_s' => '-46,898231506348',
+        '_geocode_country_s' => 'Brasil',
+        '_geocode_country_code_s' => '',
+        '_geocode_city_s' => 'Jundiaí',
+        '_geocode_region_level_2_s' => 'São Paulo',
+        '_geocode_region_level_3_s' => 'Região Intermediária de Campinas',
+        '_geocode_city_level_1_s' => 'Parque do Colégio',
+    ]
 ``
 
 Note: `_s` and `_p` suffixes indicate if the relevance of that information is primary or secondary.
@@ -479,32 +479,32 @@ Now we have all the information as individual metadata and this allows me to que
 Give me all the posts that have primary points with the country code `'BR'`:
 
 ``
-$posts = new WP_Query([
-    'meta_query' => [
-        [
-            'key' => '_geocode_country_code_p',
-            'value' => 'BR'
+    $posts = new WP_Query([
+        'meta_query' => [
+            [
+                'key' => '_geocode_country_code_p',
+                'value' => 'BR'
+            ]
         ]
-    ]
-]);
+    ]);
 ``
 
 Give me all the posts whose city is `'Manaus'`:
 
 ``
-$posts = new WP_Query([
-    'meta_query' => [
-        [
-            'key' => '_geocode_city_s',
-            'value' => 'Manaus'
-        ],
-        [
-            'key' => '_geocode_city_p',
-            'value' => 'Manaus'
-        ],
-        'relation' => 'OR'
-    ]
-]);
+    $posts = new WP_Query([
+        'meta_query' => [
+            [
+                'key' => '_geocode_city_s',
+                'value' => 'Manaus'
+            ],
+            [
+                'key' => '_geocode_city_p',
+                'value' => 'Manaus'
+            ],
+            'relation' => 'OR'
+        ]
+    ]);
 ``
 # Writing a Geocoder
 
@@ -519,16 +519,16 @@ JEO comes with two native geocoder services users can choose from: Nominatim and
 Hook a function to the `jeo_register_geocoders` action and call the register with the following code:
 
 ``
-add_action('jeo_register_geocoders', function($geocoders) {
+    add_action('jeo_register_geocoders', function($geocoders) {
 
-    $geocoders->register_geocoder([
-        'slug' => 'my-geocoder',
-        'name' => 'My Geocoder',
-        'description' => __('My Geocoder description', 'my-textdomain'),
-        'class_name' => 'MyGeocoderClass'
-    ]);
+        $geocoders->register_geocoder([
+            'slug' => 'my-geocoder',
+            'name' => 'My Geocoder',
+            'description' => __('My Geocoder description', 'my-textdomain'),
+            'class_name' => 'MyGeocoderClass'
+        ]);
 
-});
+    });
 ``
 
 This will tell JEO that there is a new Geocoder service available and give some information about it.
@@ -555,105 +555,105 @@ Note: Only `lat` and `lon` are required.
 Sample response with all accepted fields:
 
 ``
-[
-        [
-            'lat' => '',
-            'lon' => '',
-            'full_address' => '',
-            'country' => '',
-            'country_code' => '',
-            'region_level_1' => '',
-            'region_level_2' => '', // State goes here
-            'region_level_3' => '',
-            'city' => '',
-            'city_level_1' => '',
-        ]
-]
+    [
+            [
+                'lat' => '',
+                'lon' => '',
+                'full_address' => '',
+                'country' => '',
+                'country_code' => '',
+                'region_level_1' => '',
+                'region_level_2' => '', // State goes here
+                'region_level_3' => '',
+                'city' => '',
+                'city_level_1' => '',
+            ]
+    ]
 ``
 
 Here is a simple example:
 
 ``
-add_action('jeo_register_geocoders', function($geocoders) {
+    add_action('jeo_register_geocoders', function($geocoders) {
 
-    $geocoders->register_geocoder([
-        'slug' => 'my-geocoder',
-        'name' => 'My Geocoder',
-        'description' => __('My Geocoder description', 'my-textdomain'),
-        'class_name' => 'MyGeocoderClass'
-    ]);
+        $geocoders->register_geocoder([
+            'slug' => 'my-geocoder',
+            'name' => 'My Geocoder',
+            'description' => __('My Geocoder description', 'my-textdomain'),
+            'class_name' => 'MyGeocoderClass'
+        ]);
 
-    class MyGeocoderClass extends \Jeo\Geocoder {
+        class MyGeocoderClass extends \Jeo\Geocoder {
 
-        public function geocode($search_string) {
+            public function geocode($search_string) {
 
-            $params = [
-                'q' => $search_string,
-                'format' => 'json',
-                'addressdetails' => 1
-            ];
+                $params = [
+                    'q' => $search_string,
+                    'format' => 'json',
+                    'addressdetails' => 1
+                ];
 
-            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/search') );
+                $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/search') );
 
-            $data = wp_remote_retrieve_body( $r );
+                $data = wp_remote_retrieve_body( $r );
 
-            $data = \json_decode($data);
-            $response = [];
+                $data = \json_decode($data);
+                $response = [];
 
-            if (\is_array($data)) {
+                if (\is_array($data)) {
 
-                foreach ($data as $match) {
-                    $r = $this->format_response_item( (array) $match );
-                    if ($r) $response[] = $r;
+                    foreach ($data as $match) {
+                        $r = $this->format_response_item( (array) $match );
+                        if ($r) $response[] = $r;
+                    }
+
                 }
+
+                return $response;
 
             }
 
-            return $response;
+            public function reverse_geocode($lat, $lon) {
+
+                $params = [
+                    'lat' => $lat,
+                    'lon' => $lon,
+                    'format' => 'json',
+                    'addressdetails' => 1
+                ];
+
+                $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/reverse') );
+
+                $data = wp_remote_retrieve_body( $r );
+
+                $data = \json_decode($data);
+
+                return $this->format_response_item( (array) $data );
+
+            }
+
+            private function format_response_item($match) {
+
+                $response = [
+                    'lat' => $match['lat'],
+                    'lon' => $match['lon'],
+                    'full_address' => $match['display_name'],
+                    'country' => $match['country'],
+                    'country_code' => $match['country_code'],
+                    'region_level_1' => $match['region_level_1'],
+                    'region_level_2' => $match['region_level_2'], // State goes here
+                    'region_level_3' => $match['region_level_3'],
+                    'city' => $match['city'],
+                    'city_level_1' => $match['city_level_1'],
+                ];
+
+                return $response;
+
+            }
 
         }
 
-        public function reverse_geocode($lat, $lon) {
-
-            $params = [
-                'lat' => $lat,
-                'lon' => $lon,
-                'format' => 'json',
-                'addressdetails' => 1
-            ];
-
-            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/reverse') );
-
-            $data = wp_remote_retrieve_body( $r );
-
-            $data = \json_decode($data);
-
-            return $this->format_response_item( (array) $data );
-
-        }
-
-        private function format_response_item($match) {
-
-            $response = [
-                'lat' => $match['lat'],
-                'lon' => $match['lon'],
-                'full_address' => $match['display_name'],
-                'country' => $match['country'],
-                'country_code' => $match['country_code'],
-                'region_level_1' => $match['region_level_1'],
-                'region_level_2' => $match['region_level_2'], // State goes here
-                'region_level_3' => $match['region_level_3'],
-                'city' => $match['city'],
-                'city_level_1' => $match['city_level_1'],
-            ];
-
-            return $response;
-
-        }
-
-    }
-
-});
+    });
 ``
 
 And that's it! Your new Geocoder is ready!
@@ -675,29 +675,29 @@ Each setting is described by an array with the following keys:
 Let's see an example only with the relevant code:
 
 ``
-add_action('jeo_register_geocoders', function($geocoders) {
-
-    // ...
-    class MyGeocoderClass extends \Jeo\Geocoder {
+    add_action('jeo_register_geocoders', function($geocoders) {
 
         // ...
+        class MyGeocoderClass extends \Jeo\Geocoder {
 
-        public function get_settings() {
+            // ...
 
-            // Note it is an array of arrays
-            return [
-                [
-                    'slug' => 'api_key',
-                    'name' => __('API Key', 'my-text-domain'),
-                    'description' => __('Enter the API key you can get visiting your panel at my-gecoder.org/panel', 'my-text-domain')
-                ]
-            ];
+            public function get_settings() {
+
+                // Note it is an array of arrays
+                return [
+                    [
+                        'slug' => 'api_key',
+                        'name' => __('API Key', 'my-text-domain'),
+                        'description' => __('Enter the API key you can get visiting your panel at my-gecoder.org/panel', 'my-text-domain')
+                    ]
+                ];
+
+            }
 
         }
 
-    }
-
-});
+    });
 ``
 
 And this is what you will see in the admin panel:
@@ -711,26 +711,26 @@ To get its value, simply call `$this->get_option($option_name)`.
 Example:
 
 ``
-// ...
-
-        // ...
-
-        public function geocode($search_string) {
-
-            $params = [
-                'q' => $search_string,
-                'format' => 'json',
-                'addressdetails' => 1,
-                'api_key' => $this->get_option('api_key')
-            ];
+    // ...
 
             // ...
 
-            return $response;
+            public function geocode($search_string) {
 
-        }
+                $params = [
+                    'q' => $search_string,
+                    'format' => 'json',
+                    'addressdetails' => 1,
+                    'api_key' => $this->get_option('api_key')
+                ];
 
-// ...
+                // ...
+
+                return $response;
+
+            }
+
+    // ...
 ``
 
 ## Declaring default values
@@ -738,24 +738,24 @@ Example:
 You can also add the `get_default_options()` method to your class to set default values for each setting. This is optional and is done like this:
 
 ``
-add_action('jeo_register_geocoders', function($geocoders) {
-
-    // ...
-    class MyGeocoderClass extends \Jeo\Geocoder {
+    add_action('jeo_register_geocoders', function($geocoders) {
 
         // ...
+        class MyGeocoderClass extends \Jeo\Geocoder {
 
-        public function get_default_options() {
+            // ...
 
-            return [
-                'api_key' => 'sand-box-api-key' // the key must match the slug of the setting registered in get_settings()
-            ];
+            public function get_default_options() {
+
+                return [
+                    'api_key' => 'sand-box-api-key' // the key must match the slug of the setting registered in get_settings()
+                ];
+
+            }
 
         }
 
-    }
-
-});
+    });
 ``
 
 ## Advanced: Even further settings customization
@@ -773,28 +773,28 @@ To get the right field name use `$settings->get_geocoder_option_field_name($name
 Example:
 
 ``
-// ...
+    // ...
 
-        // ...
+            // ...
 
-        public function settings_footer($settings) {
+            public function settings_footer($settings) {
 
-            ?>
-            <p><strong>My Select option</strong></p>
+                ?>
+                <p><strong>My Select option</strong></p>
 
-            <select name="<?php echo $settings->get_geocoder_option_field_name('new_option'); ?>">
-                <option value="yes" <?php selected( $this->get_option('new_option'), 'yes' ); ?> >
-                    Yes
+                <select name="<?php echo $settings->get_geocoder_option_field_name('new_option'); ?>">
+                    <option value="yes" <?php selected( $this->get_option('new_option'), 'yes' ); ?> >
+                        Yes
+                    </select>
+                    <option value="no" <?php selected( $this->get_option('new_option'), 'no' ); ?> >
+                        No
+                    </select>
                 </select>
-                <option value="no" <?php selected( $this->get_option('new_option'), 'no' ); ?> >
-                    No
-                </select>
-            </select>
-            <?php
+                <?php
 
-        }
+            }
 
-// ...
+    // ...
 ``
 
 Note: `selected()` is a native WordPress function. See the [official documentation](https://developer.wordpress.org/reference/functions/selected/)
