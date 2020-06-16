@@ -42,7 +42,7 @@ const LayersSidebar = ( {
 
 
 	const editingMap = useRef( false );
-	const [ debouncedPostMeta ] = useDebounce( postMeta, 2000 );
+	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const oldPostMeta = useRef( {} );
 
 	const animationOptions = {
@@ -86,10 +86,26 @@ const LayersSidebar = ( {
 					isDismissible: false,
 				} );
 			} else {
-				sendNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ), {
-					id: 'layer_notices',
-					isDismissible: false,
-				} );
+				switch ( statusCode ) {
+					case 401:
+						sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
+							id: 'layer_notices',
+							isDismissible: false,
+						});
+						break;
+					case 404:
+						sendNotice( 'error', __( "Your layer was not found.", 'jeo' ), {
+							id: 'layer_notices',
+							isDismissible: false,
+						});
+						break;
+					default:
+						sendNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ), {
+							id: 'layer_notices',
+							isDismissible: false,
+						} );
+					break;
+				}
 			}
 			lockPostSaving( 'layer_lock_key' );
 			lockPostAutoSaving( 'layer_lock_key' );
@@ -120,24 +136,6 @@ const LayersSidebar = ( {
 			oldPostMeta.current = debouncedPostMeta;
 		}
 	}, [ debouncedPostMeta, layerTypeSchema ] );
-
-	useEffect( () => {
-		switch ( statusCode ) {
-			case 401:
-				sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
-					id: 'layer_notices_no_api_key',
-					isDismissible: true,
-				});
-
-				break;
-			
-			case 404:
-				sendNotice( 'error', __( "Your layer was not found.", 'jeo' ), {
-					id: 'layer_notices_no_api_key',
-					isDismissible: true,
-				});
-		}
-	}, [ statusCode ] );
 
 	const origOpen = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function() {
