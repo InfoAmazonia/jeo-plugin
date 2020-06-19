@@ -450,12 +450,14 @@ class JeoGeocodePosts extends Component {
 								if ( ! point.relevance || point.relevance === 'primary' ) {
 									icon = new L.Icon({
 										iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-										iconSize:     [25, 41], // size of the icon
-										iconAnchor:   [12, 41], // point of the icon which will correspond to marker's location
+										iconSize:     [25, 41],
+										iconAnchor:   [12, 41],
 									})
 								} else {
 									icon = new L.Icon({
 										iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+										iconSize:     [25, 41],
+										iconAnchor:   [12, 41],
 									})
 								}
 
