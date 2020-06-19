@@ -28,6 +28,7 @@ class Maps {
 			'edit_item' => __('Edit map', 'jeo'),
 			'new_item' => __('New map', 'jeo'),
 			'view_item' => __('View map', 'jeo'),
+			'view_items' => __( 'View maps', 'jeo' ),
 			'search_items' => __('Search maps', 'jeo'),
 			'not_found' => __('No map found', 'jeo'),
 			'not_found_in_trash' => __('No map found in the trash', 'jeo'),

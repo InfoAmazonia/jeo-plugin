@@ -23,6 +23,7 @@ class Layers {
 			'edit_item'          => __( 'Edit layer', 'jeo' ),
 			'new_item'           => __( 'New layer', 'jeo' ),
 			'view_item'          => __( 'View layer', 'jeo' ),
+			'view_items'         => __( 'View layers', 'jeo' ),
 			'search_items'       => __( 'Search layers', 'jeo' ),
 			'not_found'          => __( 'No layer found', 'jeo' ),
 			'not_found_in_trash' => __( 'No layer found in the trash', 'jeo' ),
