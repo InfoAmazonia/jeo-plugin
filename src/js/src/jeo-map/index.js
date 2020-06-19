@@ -344,12 +344,15 @@ class JeoMap {
 
 			if (layersDefinitions) {
 				const layersIds = layersDefinitions.map( ( el ) => el.id );
+				const urlRoutes = window.location.pathname.split('/');
+				const lang = urlRoutes[1];
 
 				jQuery.get(
 					jeoMapVars.jsonUrl + 'map-layer',
 					{
 						include: layersIds,
 						orderby: 'include',
+						lang: lang ? lang : ''
 					},
 					( data ) => {
 						const returnLayers = [];
