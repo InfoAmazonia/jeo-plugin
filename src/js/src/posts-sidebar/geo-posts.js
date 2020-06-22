@@ -3,6 +3,7 @@ import { Component, createRef, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
+import L from 'leaflet';
 
 import JeoGeoAutoComplete from './geo-auto-complete';
 import './geo-posts.css';
@@ -443,19 +444,38 @@ class JeoGeocodePosts extends Component {
 								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 								url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
 							/>
-							{ pointsMap.map( ( point, i ) => (
-								<Marker
-									draggable={ currentMarkerIndex === i && formMode !== 'view' }
-									onDragend={ this.onMarkerDragged }
-									onClick={ formMode === 'view' ? this.clickMarkerMap : null }
-									position={ [
-										parseFloat( point._geocode_lat ),
-										parseFloat( point._geocode_lon ),
-									] }
-									id={ i }
-									opacity={ currentMarkerIndex === i ? 1 : 0.6 }
-								/>
-							) ) }
+							{ pointsMap.map( ( point, i ) => {
+								let icon;
+
+								if ( ! point.relevance || point.relevance === 'primary' ) {
+									icon = new L.Icon({
+										iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+										iconSize:     [25, 41],
+										iconAnchor:   [12, 41],
+									})
+								} else {
+									icon = new L.Icon({
+										iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+										iconSize:     [25, 41],
+										iconAnchor:   [12, 41],
+									})
+								}
+
+								return (
+									<Marker
+										icon={ icon }
+										draggable={ currentMarkerIndex === i && formMode !== 'view' }
+										onDragend={ this.onMarkerDragged }
+										onClick={ formMode === 'view' ? this.clickMarkerMap : null }
+										position={ [
+											parseFloat( point._geocode_lat ),
+											parseFloat( point._geocode_lon ),
+										] }
+										id={ i }
+										opacity={ currentMarkerIndex === i ? 1 : 0.6 }
+									/>
+								)
+							} ) }
 						</LeafletMap>
 					</div>
 				</div>
