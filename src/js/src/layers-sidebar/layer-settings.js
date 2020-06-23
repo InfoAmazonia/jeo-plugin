@@ -21,9 +21,25 @@ const formUpdater = ( setOptions, setWidgets, typeVector = false ) => ( options 
 			widgets.layer_type_options[ key ] = { 'ui:help': property.description };
 			delete property.description;
 		}
-		if ( ! typeVector && key === 'source_layer' ) {
-			delete widgets.layer_type_options[ key ];
-			delete options.properties[ key ];
+		switch ( key ) {
+			case 'type':
+				if ( ! typeVector ) {
+					options.properties[ key ].enum = [ 'raster' ];
+					break;
+				}
+				let typeEnum = [];
+				typeEnum = options.properties[ key ].enum.filter( type => type !== 'raster' );
+				options.properties[ key ].enum = typeEnum;
+				break;
+			case 'source_layer':
+				if ( ! typeVector ) {
+					delete widgets.layer_type_options[ key ];
+					delete options.properties[ key ];
+					break;
+				}
+				break;
+			default: 
+				break;
 		}
 	} );
 	setWidgets( widgets );
