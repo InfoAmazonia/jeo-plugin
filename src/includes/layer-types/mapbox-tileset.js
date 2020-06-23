@@ -20,7 +20,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 				id: attributes.layer_id,
 				type: attributes.layer_type_options.type,
 				source: attributes.layer_id,
-				'source-layer': attributes.layer_type_options.source_layer,
+				'source-layer': attributes.layer_type_options.source_layer ? attributes.layer_type_options.source_layer : ' ',
 			} ],
 		} );
 	},
@@ -41,7 +41,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': attributes.layer_type_options.source_layer,
+			'source-layer': attributes.layer_type_options.source_layer ? attributes.layer_type_options.source_layer : ' ',
 			// 'layout': {
 			// 	'line-cap': 'round',
 			// 	'line-join': 'round'
@@ -59,7 +59,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			resolve( {
 				type: 'object',
 				required: [
-					'tileset_id', 'style_source_type', 'type',
+					'tileset_id', 'style_source_type', 'type', 'source_layer'
 				],
 				properties: {
 					tileset_id: {
