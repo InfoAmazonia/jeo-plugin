@@ -155,10 +155,11 @@ const LayersSidebar = ( {
 					<Map
 						key={ key }
 						onError={ ( map ) => {
-							if ( canRenderLayer ) {
+							const layer = map.getLayer( 'layer_1' );
+							if ( layer ) {
 								map.removeLayer( 'layer_1' );
-								setCanRenderLayer( false );
 							}
+							setCanRenderLayer( false );
 						} }
 						onStyleLoad={ ( map ) => {
 							const layer = map.getLayer( 'layer_1' );
