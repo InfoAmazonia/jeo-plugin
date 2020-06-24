@@ -23,3 +23,11 @@
 .all-layers-list-link:hover {
     letter-spacing: 0.2;
 }
+
+.jeo-layers-library-filters {
+    margin-right: 5px;
+}
+
+.jeo-layers-library-filters-button {
+    margin-right: 10%;
+}
