@@ -89,9 +89,9 @@
  */
 .jeo-layers-library-controls,
 .jeo-layers-library .library-controls {
+	margin-left: 12px;
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	padding: 1em 0;
 }
 
