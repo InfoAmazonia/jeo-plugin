@@ -1,4 +1,4 @@
-import { Button, Spinner, Dashicon, CheckboxControl } from '@wordpress/components';
+import { Button, Spinner, Dashicon, CheckboxControl, SelectControl, TextControl } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -31,6 +31,7 @@ const LayersSettings = ( {
 	let widths = [];
 
 	const [ allLayers, setAllLayers ] = useState([]);
+	const [ filteredLayers, setFilteredLayers ] = useState([]);
 
 	useEffect( () => {
 		const allLayersData = select( 'core' ).getEntityRecords( 'postType', 'map-layer' );
@@ -52,6 +53,25 @@ const LayersSettings = ( {
 	} );
 
 	const [ showAllLayers, setShowAllLayers ] = useState( false );
+	const [ layerTypeFilter, setLayerTypeFilter ] = useState( null );
+	const [ layerLegendFilter, setLayerLegendFilter ] = useState( null );
+	const [ layerNameFilter, setLayerNameFilter ] = useState('');
+
+	const layerTypeOptions = [
+		{ label: 'Select a layer type', value: '' },
+		{ label: 'Mapbox', value: 'mapbox' },
+		{ label: 'Mapbox-tileset', value: 'mapbox-tileset' },
+		{ label: 'Tilelayer', value: 'tilelayer' },
+		{ label: 'MVT', value: 'mvt' },
+	];
+
+	const legendTypeOptions = [
+		{ label: 'Select a layer\'s legend type', value: '' },
+		{ label: 'Barscale', value: 'barscale' },
+		{ label: 'Simple-color', value: 'simple-color' },
+		{ label: 'Icons', value: 'icons' },
+		{ label: 'Circles', value: 'circles' },
+	];
 
 	useEffect( () => {
 		const [ firstLayer, ...otherLayers ] = attributes.layers;
@@ -66,35 +86,69 @@ const LayersSettings = ( {
 		} );
 	};
 
+	function filterLayers() {
+		const layers = []
+		allLayers.map( ( layer ) => {
+			if ( layerTypeFilter && layerTypeFilter != layer.meta.type ) {
+				return;
+			}
+
+			if ( layerLegendFilter && layerLegendFilter != layer.meta.legend_type ) {
+				return;
+			}
+
+			if ( layerNameFilter && ! layer.title.raw.toLowerCase().contains( layerNameFilter.toLowerCase() ) ) {
+				return;
+			}
+
+			layers.push( layer );
+		} )
+		setFilteredLayers( layers );
+		setAllLayers( layers )
+	}
+
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
+				<SelectControl
+					className="jeo-layers-library-filters"
+					hideLabelFromVision={ true }
+					label={ __( 'Layer type' ) }
+					options={ layerTypeOptions }
+					value={ layerTypeFilter }
+					onChange={ ( value ) => {
+						setLayerTypeFilter( value )
+					} }
+				/>
+				<SelectControl
+					className="jeo-layers-library-filters"
+					hideLabelFromVision={ true }
+					label={ __( 'Legend type' ) }
+					options={ legendTypeOptions }
+					value={ layerLegendFilter }
+					onChange={ ( value ) => {
+						setLayerLegendFilter( value )
+					} }
+				/>
+				<Button
+					className="jeo-layers-library-filters-button"
+					isPrimary
+					isLarge
+					onClick={ filterLayers }
+				>
+					{ __( 'Filter' ) }
+				</Button>
 				<label
 					className="jeo-layers-library-controls__label"
 					htmlFor={ `jeo-layers-autosuggest-${ instanceId }` }
 				>
 					{ __( 'Search for layers' ) }
 				</label>
-				<JeoAutosuggest
-					postType="map-layer"
-					inputProps={ {
-						id: `jeo-layers-autosuggest-${ instanceId }`,
-						placeholder: __( 'Search by layer name', 'jeo' ),
+				<TextControl
+					value={ layerNameFilter }
+					onChange={ ( value ) => {
+						setLayerNameFilter( value );
 					} }
-					filterSuggestions={ ( suggestion ) => {
-							if ( suggestion.meta.type ) {
-								return ! attributes.layers.map( ( l ) => { 
-									return l.id 
-								} ).includes( suggestion.id )
-							}
-						}
-					}
-					onSuggestionSelected={ ( e, { suggestion } ) =>
-						setAttributes( {
-							...attributes,
-							layers: [ ...attributes.layers, setLayer( suggestion.id ) ],
-						} )
-					}
 				/>
 				<span>{ __( 'or' ) }</span>
 				<Button
@@ -120,7 +174,7 @@ const LayersSettings = ( {
 			{ showAllLayers && (
 				<div name="map-layers" className="jeo-layers-panel">
 					<ul className="jeo-layers-list">
-						{ allLayers.map( ( layer ) => {
+						{ filteredLayers.map( ( layer ) => {
 							let inUse = false;
 							attributes.layers.map( ( l ) => {
 								if ( layer.id === l.id ) {
