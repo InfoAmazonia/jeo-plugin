@@ -1,4 +1,4 @@
-window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
+window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -20,7 +20,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 				id: attributes.layer_id,
 				type: attributes.layer_type_options.type,
 				source: attributes.layer_id,
-				'source-layer': attributes.layer_type_options.source_layer ? attributes.layer_type_options.source_layer : ' ',
+				'source-layer': 'vector'
 			} ],
 		} );
 	},
@@ -41,7 +41,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': attributes.layer_type_options.source_layer ? attributes.layer_type_options.source_layer : ' ',
+			'source-layer': 'vector'
 			// 'layout': {
 			// 	'line-cap': 'round',
 			// 	'line-join': 'round'
@@ -59,7 +59,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			resolve( {
 				type: 'object',
 				required: [
-					'tileset_id', 'style_source_type', 'type', 'source_layer'
+                    'tileset_id', 
+                    'style_source_type', 
+					'type', 
+					'source_layer'
 				],
 				properties: {
 					tileset_id: {
@@ -73,8 +76,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 						type: 'string',
 						enum: [
 							'vector',
-							'raster',
-							'raster-dem',
 						],
 					},
 					source_layer: {
@@ -95,7 +96,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 							'fill-extrusion',
 							'hillshade',
 							'background',
-							'raster',
 						],
 					},
 				},
