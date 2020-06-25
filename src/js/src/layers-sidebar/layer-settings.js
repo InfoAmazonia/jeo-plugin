@@ -14,32 +14,12 @@ const layerSchema = {
 	required: [ 'type' ],
 };
 
-const formUpdater = ( setOptions, setWidgets, typeVector = false ) => ( options ) => {
+const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 	const widgets = { layer_type_options: {} };
 	Object.entries( options.properties ).forEach( ( [ key, property ] ) => {
 		if ( property.description ) {
 			widgets.layer_type_options[ key ] = { 'ui:help': property.description };
 			delete property.description;
-		}
-		switch ( key ) {
-			case 'type':
-				if ( ! typeVector ) {
-					options.properties[ key ].enum = [ 'raster' ];
-					break;
-				}
-				let typeEnum = [];
-				typeEnum = options.properties[ key ].enum.filter( type => type !== 'raster' );
-				options.properties[ key ].enum = typeEnum;
-				break;
-			case 'source_layer':
-				if ( ! typeVector ) {
-					delete widgets.layer_type_options[ key ];
-					delete options.properties[ key ];
-					break;
-				}
-				break;
-			default: 
-				break;
 		}
 	} );
 	setWidgets( widgets );
@@ -52,7 +32,7 @@ function usePrevious(value) {
 	  ref.current = value;
 	}, [value]);
 	return ref.current;
-  }
+};
 
 const LayerSettings = ( {
 	postMeta,
@@ -87,7 +67,7 @@ const LayerSettings = ( {
 		if ( postMeta.type ) {
 			let filledTypeOptions = {}
 			if ( ! prevPostMeta ){
-				filledTypeOptions = pickBy(postMeta.layer_type_options)
+				filledTypeOptions = pickBy( postMeta.layer_type_options );
 			}
 			setPostMeta( { layer_type_options: filledTypeOptions } );
 			window.JeoLayerTypes
@@ -97,15 +77,6 @@ const LayerSettings = ( {
 			setOptions( {} );
 		}
 	}, [ postMeta.type ] );
-
-	useEffect( () => {
-		if ( postMeta.type === 'mapbox-tileset' ) {
-			const typeVector = postMeta.layer_type_options.style_source_type === 'vector';
-			window.JeoLayerTypes
-				.getLayerTypeSchema( postMeta )
-				.then( formUpdater( setOptions, setWidgets, typeVector ) );
-		}
-	}, [ postMeta.layer_type_options.style_source_type ] );
 
 	useEffect( () => {
 		const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
@@ -124,9 +95,6 @@ const LayerSettings = ( {
 				uiSchema={ widgets }
 				formData={ postMeta }
 				onChange={ ( { formData } ) => {
-					if ( ! formData.layer_type_options.source_layer ) {
-						formData.layer_type_options.source_layer = '';
-					}
 
 					window.layerFormData = formData;
 					setPostMeta( formData );

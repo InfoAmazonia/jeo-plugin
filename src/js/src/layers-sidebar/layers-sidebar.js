@@ -6,7 +6,7 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { renderLayer } from '../map-blocks/map-preview-layer';
-import { isEmpty, isEqual, every } from 'lodash-es';
+import { isEmpty, isEqual, every, matches } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
@@ -80,7 +80,7 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		if ( ! canRenderLayer ) {
-			if ( every( postMeta.layer_type_options, isEmpty ) || oldPostMeta.current.type !== debouncedPostMeta.type ) {
+			if ( every( postMeta.layer_type_options, isEmpty ) || prevPostMeta.current.type !== postMeta.type ) {
 				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
 					id: 'layer_notices',
 					isDismissible: false,
@@ -116,8 +116,9 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
-		const oldLayerTypeOptions = oldPostMeta.current.layer_type_options;
-		if ( layerTypeSchema && layerTypeSchema.properties && debouncedLayerTypeOptions ) {
+		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
+
+		if ( Object.keys(debouncedLayerTypeOptions).length && Object.keys(layerTypeSchema).length ) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;
 			optionsKeys.some( ( k ) => {
@@ -128,14 +129,15 @@ const LayersSidebar = ( {
 				}
 				return false;
 			} );
-			if ( ! isEqual( debouncedLayerTypeOptions, oldLayerTypeOptions ) && ! anyEmpty ) {
+			if ( ! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions ) && ! anyEmpty ) {
+				console.log('here?');
 				setCanRenderLayer( true );
 				removeNotice( 'layer_notices' );
 				setKey( key + 1 );
 			}
 			oldPostMeta.current = debouncedPostMeta;
 		}
-	}, [ debouncedPostMeta, layerTypeSchema ] );
+	}, [ debouncedPostMeta ] );
 
 	const origOpen = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function() {
@@ -187,7 +189,9 @@ const LayersSidebar = ( {
 							}
 						} }
 					>
-						{ canRenderLayer && renderLayer( debouncedPostMeta, {
+						{ canRenderLayer && 
+						Object.keys( debouncedPostMeta.layer_type_options ).length > 0
+						&& renderLayer( debouncedPostMeta, {
 							id: 1,
 							use: 'fixed',
 						} ) }

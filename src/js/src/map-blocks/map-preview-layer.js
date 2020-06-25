@@ -37,8 +37,9 @@ export function renderLayer( layer, instance ) {
 					/>
 				</Fragment>
 			);
-		case 'mapbox-tileset':
-
+		case 'mapbox-tileset-vector':
+		case 'mapbox-tileset-raster':
+			console.log(layer);
 			let tileset_id = options.tileset_id;
 
 			if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
