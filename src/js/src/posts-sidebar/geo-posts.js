@@ -22,6 +22,7 @@ class JeoGeocodePosts extends Component {
 			zoom: 1,
 			points: metadata._related_point,
 			currentMarkerIndex: 0,
+			loadStatus: 'pending',
 		};
 
 		this.onLocationFound = this.onLocationFound.bind( this );
@@ -39,7 +40,6 @@ class JeoGeocodePosts extends Component {
 		this.onClickEdit = this.onClickEdit.bind( this );
 		this.handleSearchValue = this.handleSearchValue.bind( this );
 		this.resetForm = this.resetForm.bind( this );
-		this.isFormDisabled = this.isFormDisabled.bind( this );
 		this.fetchReverseGeocode = this.fetchReverseGeocode.bind( this );
 		this.flyToLocation = this.flyToLocation.bind( this );
 		this.renderForm = this.renderForm.bind( this );
@@ -47,11 +47,6 @@ class JeoGeocodePosts extends Component {
 		this.onClickCancel = this.onClickCancel.bind( this );
 
 		this.refMap = createRef();
-	}
-
-	isFormDisabled() {
-		const { searchValue } = this.state;
-		return ! searchValue.replace( /\s/g, '' ).length;
 	}
 
 	onClickCancel( e ) {
@@ -92,6 +87,7 @@ class JeoGeocodePosts extends Component {
 	handleSearchValue( newValue ) {
 		this.setState( {
 			searchValue: newValue,
+			loadStatus: 'pending',
 		} );
 	}
 
@@ -174,6 +170,7 @@ class JeoGeocodePosts extends Component {
 				formMode: 'view',
 				searchValue: '',
 				pointsCheckpoint: [],
+				loadStatus: 'pending',
 			},
 			() => this.save()
 		);
@@ -208,6 +205,7 @@ class JeoGeocodePosts extends Component {
 				currentMarkerIndex: index,
 				searchValue: point._geocode_full_address,
 				formMode: 'edit',
+				loadStatus: 'resolved',
 			},
 			() => {
 				this.flyToLocation( point._geocode_lat, point._geocode_lon );
@@ -221,6 +219,7 @@ class JeoGeocodePosts extends Component {
 		this.setState( {
 			formMode: 'new',
 			pointsCheckpoint: points,
+			loadStatus: 'pending',
 		} );
 	}
 
@@ -253,6 +252,7 @@ class JeoGeocodePosts extends Component {
 
 			this.setState( {
 				searchValue: foundPoint._geocode_full_address,
+				loadStatus: 'resolved',
 			} );
 
 			const { formMode, points, pointsCheckpoint } = this.state;
@@ -295,6 +295,7 @@ class JeoGeocodePosts extends Component {
 		const marker = e.target;
 		const latLng = marker.getLatLng();
 		this.onLocationFound( { lat: latLng.lat, lon: latLng.lng } );
+		this.setState( { loadStatus: 'pending' } );
 	}
 
 	save() {
@@ -308,8 +309,17 @@ class JeoGeocodePosts extends Component {
 		} );
 	}
 
+	componentDidUpdate(prevProps, prevState){
+		if ( ( prevState.searchValue !== this.state.searchValue ) 
+			&& this.state.loadStatus !== 'resolved' ) {
+				this.setState( { loadStatus: 'pending' } );
+		}
+	}
+
 	renderForm() {
-		const { currentMarkerIndex, points, searchValue, formMode } = this.state;
+		const { currentMarkerIndex, points, searchValue, formMode, loadStatus } = this.state;
+		let isDisabled = ! ( loadStatus === 'resolved' && 
+			searchValue.replace( /\s/g, '' ).length );
 
 		const selectedPoint = points[ currentMarkerIndex ];
 		return (
@@ -325,7 +335,7 @@ class JeoGeocodePosts extends Component {
 					</span>
 				</div>
 				<div>
-					{ ! this.isFormDisabled() ? (
+					{ ! isDisabled && (
 						<RadioControl
 							label={ __( 'Relevance', 'jeo' ) }
 							selected={
@@ -337,9 +347,7 @@ class JeoGeocodePosts extends Component {
 							] }
 							onChange={ this.relevanceClick }
 						/>
-					) : (
-						false
-					) }
+					)  }
 					<div className="jeo-geocode-posts__row">
 						<div className="jeo-geocode-posts__buttons-list">
 							<Button isSecondary onClick={ this.onClickCancel }>
@@ -348,7 +356,7 @@ class JeoGeocodePosts extends Component {
 							<Button
 								isPrimary
 								onClick={ this.handleClickSave }
-								disabled={ this.isFormDisabled() }
+								disabled={ isDisabled }
 							>
 								{ formMode === 'edit' ?
 									__( 'Update selected point', 'jeo' ) :
