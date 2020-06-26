@@ -43,7 +43,7 @@ const LayersSidebar = ( {
 
 	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
-	const oldPostMeta = useRef( {} );
+	const prevPostMeta = useRef( {} );
 
 	const animationOptions = {
 		animate: false,
@@ -135,7 +135,7 @@ const LayersSidebar = ( {
 				removeNotice( 'layer_notices' );
 				setKey( key + 1 );
 			}
-			oldPostMeta.current = debouncedPostMeta;
+			prevPostMeta.current = debouncedPostMeta;
 		}
 	}, [ debouncedPostMeta ] );
 
