@@ -64,7 +64,7 @@ const LayersSettings = ( {
 	];
 
 	const legendTypeOptions = [
-		{ label: 'Select a layer\'s legend type', value: '' },
+		{ label: 'Select a legend type', value: '' },
 		{ label: 'Barscale', value: 'barscale' },
 		{ label: 'Simple-color', value: 'simple-color' },
 		{ label: 'Icons', value: 'icons' },
@@ -108,7 +108,15 @@ const LayersSettings = ( {
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
+				<h1 className="layer-settings-title" >{ __( 'Layer settings' ) }</h1>
 				<div className="left">
+					<TextControl
+						placeholder="Enter keywords to search layers"
+						value={ layerNameFilter }
+						onChange={ ( value ) => {
+							setLayerNameFilter( value );
+						} }
+					/>
 					<SelectControl
 						className="jeo-layers-library-filters"
 						hideLabelFromVision={ true }
@@ -147,19 +155,6 @@ const LayersSettings = ( {
 					</Button>
 				</div>
 				<div className="right">
-					<label
-						className="jeo-layers-library-controls__label"
-						htmlFor={ `jeo-layers-autosuggest-${ instanceId }` }
-					>
-						{ __( 'Search for layers' ) }
-					</label>
-					<TextControl
-						value={ layerNameFilter }
-						onChange={ ( value ) => {
-							setLayerNameFilter( value );
-						} }
-					/>
-					<span className="jeo-layers-library-controls__label">{ __( 'or' ) }</span>
 					<Button
 						className="create-layer-button"
 						isPrimary
@@ -168,10 +163,11 @@ const LayersSettings = ( {
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						{ __( 'Create New Layer' ) }
+						{ __( 'New Layer' ) }
 					</Button>
 				</div>
 			</div>
+			<h1 className="selected-layers-title" >{ __( 'Selected layers' ) }</h1>
 			<div name="map-layers" className="jeo-layers-panel">
 				<ul className="jeo-layers-list">
 					{ filteredLayers.map( ( layer, i ) => {
@@ -214,37 +210,22 @@ const LayersSettings = ( {
 												</a>
 											</p>
 											<div className="layer-buttons">
-												<p
-													onClick={ () => {
-														if ( ! inUse ) {
+												{ ! inUse && (
+													<p
+														onClick={ () => {
 															setAttributes( {
 																...attributes,
 																layers: [ ...attributes.layers, setLayer( layer.id ) ],
 															} );
-														}
-													} }
-													className="add-button"
-												>
-													Add to map
-												</p>
-												<p className="button-divider">|</p>
-												<p
-													onClick={ () => {
-														if ( ! inUse ) {
-															setAttributes( {
-																...attributes,
-																layers: [ ...attributes.layers, setLayer( layer.id ) ],
-															} );
-														}
-													} }
-													className="add-button"
-												>
-													<a className="edit-button" href={ `/wp-admin/post.php?post=${ layer.id }&action=edit` } target="_blank" rel="noopener noreferrer" >Edit Layer</a>
-												</p>
-												<p className="button-divider">|</p>
-												<p
-													onClick={ () => {
-														if ( inUse ) {
+														} }
+														className="add-button"
+													>
+														Add to map
+													</p>
+												) }
+												{ inUse && (
+													<p
+														onClick={ () => {
 															const confirmation = confirm( __( 'Do you really want to delete this layer?' ) );
 
 															if ( confirmation ) {
@@ -252,12 +233,12 @@ const LayersSettings = ( {
 																	attributes.layers.filter( ( settings ) => settings.id !== layer.id )
 																);
 															}
-														}
-													} }
-													className="remove-button"
-												>
-													Remove from map
-												</p>
+														} }
+														className="remove-button"
+													>
+														Remove from map
+													</p>
+												) }
 											</div>
 										</div>
 									</li>
