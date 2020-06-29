@@ -1,4 +1,6 @@
 import JeoLegendTypes from './JeoLegendTypes';
+import { v4 as uuid } from 'uuid';
+
 
 class JeoLegend {
 	constructor( legendTypeSlug, attributes ) {
@@ -32,7 +34,15 @@ class JeoLegend {
 			barscale: {
 				left_label: '0',
 				right_label: '100',
-				colors: [ '#ff0909', '#000' ],
+				colors: [ {
+					color: '#ff0909',
+					id: uuid(),
+					},
+					{
+					color:'#000',
+					id: uuid(),
+					} 
+				],
 			},
 		};
 
@@ -67,7 +77,7 @@ class JeoLegend {
 	static updatedLegendMeta( legendObject ) {
 		const adicionalProps = { };
 
-		switch ( legendObject.legendSlug ) {
+		switch ( legendObject.__legendSlug ) {
 			case 'simple-color':
 				adicionalProps.colors = {
 					...legendObject.attributes.legend_type_options.colors,
