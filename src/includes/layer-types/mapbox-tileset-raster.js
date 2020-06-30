@@ -62,6 +62,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 						title: 'Style Source Type',
 						description: 'Which data the map should display',
 						type: 'string',
+						default: 'raster',
 						enum: [
 							'raster',
 							'raster-dem',
@@ -69,11 +70,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 					},
 					type: {
 						title: 'Layer Type',
-						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
+						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
 						type: 'string',
-						enum: [
-							'raster',
-						],
+						default: 'raster',
+						disabled: true
 					},
 				},
 			} );
