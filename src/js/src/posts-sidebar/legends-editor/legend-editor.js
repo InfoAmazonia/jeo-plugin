@@ -12,7 +12,6 @@ class LegendEditor extends Component {
 		this.hasChanged = this.hasChanged.bind( this );
 
 		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
-
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
@@ -30,6 +29,9 @@ class LegendEditor extends Component {
 
 		this.initialType = this.state.legendObject.legendSlug === undefined ? 'barscale' : this.state.legendObject.legendSlug;
 		this.inicialAttrType = this.state.legendObject.attributes.legend_type_options;
+
+		// Update layer with the initialized legend
+		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
 	}
 
 	componentDidUpdate() {
