@@ -21,6 +21,10 @@ const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 			widgets.layer_type_options[ key ] = { 'ui:help': property.description };
 			delete property.description;
 		}
+		if ( property.disabled ) {
+			widgets.layer_type_options[key] = { 'ui:disabled': true }
+			delete property.disabled;
+		}
 	} );
 	setWidgets( widgets );
 	setOptions( options );
@@ -44,7 +48,7 @@ const LayerSettings = ( {
 	const [ modalOpen, setModalStatus ] = useState( false );
 	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
 	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
-	const prevPostMeta = usePrevious(postMeta);
+	const prevPostMeta = usePrevious( postMeta );
 
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
 	layerSchema.properties.layer_type_options = options;
@@ -66,13 +70,18 @@ const LayerSettings = ( {
 	useEffect( () => {
 		if ( postMeta.type ) {
 			let filledTypeOptions = {}
-			if ( ! prevPostMeta ){
+			if ( ! prevPostMeta ) {
 				filledTypeOptions = pickBy( postMeta.layer_type_options );
 			}
-			setPostMeta( { layer_type_options: filledTypeOptions } );
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
-				.then( formUpdater( setOptions, setWidgets ) );
+				.then( formUpdater( setOptions, setWidgets ) )
+				.then(() => {
+					setPostMeta( {
+						...postMeta,
+						layer_type_options: filledTypeOptions,
+						} );
+				});
 		} else {
 			setOptions( {} );
 		}
