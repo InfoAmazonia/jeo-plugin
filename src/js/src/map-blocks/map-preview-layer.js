@@ -39,7 +39,6 @@ export function renderLayer( layer, instance ) {
 			);
 		case 'mapbox-tileset-vector':
 		case 'mapbox-tileset-raster':
-			console.log(layer);
 			let tileset_id = options.tileset_id;
 
 			if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
@@ -69,7 +68,7 @@ export function renderLayer( layer, instance ) {
 					<Source
 						id={ sourceId }
 						tileJsonSource={ {
-							type: 'vector',
+							type: options.style_source_type,
 							tiles: [ options.url ],
 						} }
 					/>

@@ -6,7 +6,7 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { renderLayer } from '../map-blocks/map-preview-layer';
-import { isEmpty, isEqual, every, matches } from 'lodash-es';
+import { isEmpty, isEqual, every, matches, some } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
@@ -37,10 +37,7 @@ const LayersSidebar = ( {
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
 
 	const [ key, setKey ] = useState( 0 );
-	const [ canRenderLayer, setCanRenderLayer ] = useState( false );
-	const [ statusCode, setStatusCode ] = useState( null );
-
-
+	const [ renderControl, setRenderControl ] = useState( { } );
 	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
@@ -51,15 +48,7 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		if ( ! MapboxAPIKey ) {
-			sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
-				id: 'layer_notices_no_api_key',
-				isDismissible: false,
-				actions: [{
-					url: '/wp-admin/admin.php?page=jeo-settings',
-					label: 'Check your settings.',
-				}],
-			});	
-			lockPostSaving();
+			setRenderControl( { status: 'incomplete_settings'} );
 		}
 	}, [] );
 
@@ -72,21 +61,24 @@ const LayersSidebar = ( {
 				} );
 		} else {
 			setLayerTypeSchema( {} );
-		} sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
-			id: 'layer_notices',
-			isDismissible: false,
-		} );
+		}
 	}, [ postMeta.type ] );
 
 	useEffect( () => {
-		if ( ! canRenderLayer ) {
-			if ( every( postMeta.layer_type_options, isEmpty ) || prevPostMeta.current.type !== postMeta.type ) {
-				sendNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
-					id: 'layer_notices',
-					isDismissible: false,
-				} );
-			} else {
-				switch ( statusCode ) {
+		console.log(renderControl)
+		switch( renderControl.status ) {
+			case 'incomplete_form':
+				sendNotice( 'warning', 
+					__( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
+						id: 'layer_notices',
+						isDismissible: false,
+					} 
+				);
+				lockPostSaving( 'layer_lock_key' );
+				lockPostAutoSaving( 'layer_lock_key' );
+				break;
+			case 'request_error':
+				switch ( renderControl.statusCode ) {
 					case 401:
 						sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
 							id: 'layer_notices',
@@ -106,33 +98,47 @@ const LayersSidebar = ( {
 						} );
 					break;
 				}
-			}
-			lockPostSaving( 'layer_lock_key' );
-			lockPostAutoSaving( 'layer_lock_key' );
-		} else {
-			removeNotice( 'layer_notices' );
+				lockPostSaving( 'layer_lock_key' );
+				lockPostAutoSaving( 'layer_lock_key' );
+				break;
+			case 'incomplete_settings':
+				sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
+					id: 'layer_notices_no_api_key',
+					isDismissible: false,
+					actions: [{
+						url: '/wp-admin/admin.php?page=jeo-settings',
+						label: 'Check your settings.',
+					}],
+				});	
+				lockPostSaving( 'layer_lock_key' );
+				lockPostAutoSaving( 'layer_lock_key' );
+				break;
+			case 'ready':
+				removeNotice( 'layer_notices' );
+				break;
 		}
-	}, [ canRenderLayer ] );
+	}, [ renderControl.status ] );
 
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
 		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
-
-		if ( Object.keys(debouncedLayerTypeOptions).length && Object.keys(layerTypeSchema).length ) {
+		if ( Object.keys(debouncedLayerTypeOptions).length && Object.keys(layerTypeSchema).length && MapboxAPIKey) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;
 			optionsKeys.some( ( k ) => {
 				if ( isEmpty( debouncedLayerTypeOptions[ k ] ) && layerTypeSchema.required.includes( k ) ) {
 					anyEmpty = true;
-					setCanRenderLayer( false );
+					setRenderControl( {
+						status: 'incomplete_form',
+					} );
 					return anyEmpty;
 				}
 				return false;
 			} );
 			if ( ! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions ) && ! anyEmpty ) {
-				console.log('here?');
-				setCanRenderLayer( true );
-				removeNotice( 'layer_notices' );
+				setRenderControl( { 
+					status: 'ready',
+				} );
 				setKey( key + 1 );
 			}
 			prevPostMeta.current = debouncedPostMeta;
@@ -143,8 +149,10 @@ const LayersSidebar = ( {
 	XMLHttpRequest.prototype.open = function() {
 		this.addEventListener( 'load', function() {
 			if ( this.status >= 400 ) {
-				setCanRenderLayer( false );
-				setStatusCode( this.status );
+				setRenderControl( {
+					status: 'request_error',
+					statusCode: this.status,
+				} );
 			}
 		} );
 		origOpen.apply( this, arguments );
@@ -156,17 +164,25 @@ const LayersSidebar = ( {
 				<LayerPreviewPortal>
 					<Map
 						key={ key }
-						onError={ ( map ) => {
-							const layer = map.getLayer( 'layer_1' );
-							if ( layer ) {
-								map.removeLayer( 'layer_1' );
+						onError={ ( map, e ) => {
+							try {
+								const layer = map.getLayer( 'layer_1' );
+								if ( layer ) {
+									map.removeLayer( 'layer_1' );
+								}
+								setRenderControl( { canRender: false, status: 'request_error', statusCode: 400 } );
+							} catch (e) {
+								setRenderControl( { canRender: false, status: 'request_error', statusCode: 400 } );
 							}
-							setCanRenderLayer( false );
 						} }
 						onStyleLoad={ ( map ) => {
-							const layer = map.getLayer( 'layer_1' );
-							if ( layer ) {
-								unlockPostSaving( 'layer_lock_key' );
+							try {
+								const layer = map.getLayer( 'layer_1' );
+								if ( layer ) {
+									unlockPostSaving( 'layer_lock_key' );
+								}
+							} catch (e) {
+								setRenderControl( { canRender: false, status: 'request_error', statusCode: 400 } );
 							}
 							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
@@ -189,7 +205,7 @@ const LayersSidebar = ( {
 							}
 						} }
 					>
-						{ canRenderLayer && 
+						{ renderControl.status === 'ready' && 
 						Object.keys( debouncedPostMeta.layer_type_options ).length > 0
 						&& renderLayer( debouncedPostMeta, {
 							id: 1,
