@@ -20,7 +20,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 				id: attributes.layer_id,
 				type: attributes.layer_type_options.type,
 				source: attributes.layer_id,
-				'source-layer': 'vector'
+				'source-layer': attributes.source_layer
 			} ],
 		} );
 	},
@@ -41,7 +41,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': 'vector'
+			'source-layer': attributes.source_layer
 			// 'layout': {
 			// 	'line-cap': 'round',
 			// 	'line-join': 'round'
@@ -70,23 +70,16 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 						title: 'Tileset ID',
 						description: 'Example: username.tilesetid',
 					},
-					style_source_type: {
-						title: 'Style Source Type',
-						description: 'Which data the map should display',
-						type: 'string',
-						enum: [
-							'vector',
-						],
-					},
 					source_layer: {
 						type: 'string',
 						title: 'Source layer',
-						description: 'Layer to use from a vector tile source. ',
+						description: 'Which data the map should display.',
 					},
 					type: {
 						title: 'Layer Type',
 						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
 						type: 'string',
+						default: 'fill',
 						enum: [
 							'fill',
 							'line',
@@ -97,6 +90,13 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 							'hillshade',
 							'background',
 						],
+					},
+					style_source_type: {
+						title: 'Style Source Type',
+						description: 'The layer source type style',
+						type: 'string',
+						default: 'vector',
+						disabled: true
 					},
 				},
 			} );

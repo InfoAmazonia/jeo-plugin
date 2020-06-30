@@ -6,14 +6,14 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 			version: 8,
 			sources: {
 				[ name ]: {
-					type: 'raster',
+					type: 'vector',
 					tiles: [ attributes.layer_type_options.url ],
 					tileSize: 256,
 				},
 			},
 			layers: [ {
 				id: attributes.layer_id,
-				type: 'raster',
+				type: 'vector',
 				source: attributes.layer_id,
 			} ],
 		} );
@@ -23,11 +23,11 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 		const layer = {
 			id: attributes.layer_id,
 			source: {
-				type: 'raster',
+				type: 'vector',
 				tiles: [ attributes.layer_type_options.url ],
 				tileSize: 256,
 			},
-			type: 'raster',
+			type: 'vector',
 		};
 		if ( ! attributes.visible ) {
 			layer.layout = {

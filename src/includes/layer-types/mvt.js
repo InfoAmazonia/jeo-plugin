@@ -49,7 +49,7 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 			resolve( {
 				type: 'object',
 				required: [
-					'url',
+					'url', 'type', 'source_layer'
 				],
 				properties: {
 					url: {
@@ -63,6 +63,7 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 					},
 					type: {
 						type: 'string',
+						default: 'fill',
 						enum: [
 							'fill',
 							'line',
@@ -73,6 +74,13 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 							'hillshade',
 							'background',
 						],
+					},
+					style_source_type: {
+						title: 'Style Source Type',
+						description: 'Which data the map should display',
+						type: 'string',
+						default: 'vector',
+						disabled: true
 					},
 				},
 			} );
