@@ -6,7 +6,7 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { renderLayer } from '../map-blocks/map-preview-layer';
-import { isEmpty, isEqual, every, matches, some } from 'lodash-es';
+import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
@@ -37,7 +37,7 @@ const LayersSidebar = ( {
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
 
 	const [ key, setKey ] = useState( 0 );
-	const [ renderControl, setRenderControl ] = useState( { } );
+	const [ renderControl, setRenderControl ] = useState( { status: 'incomplete_form' } );
 	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
@@ -62,10 +62,10 @@ const LayersSidebar = ( {
 		} else {
 			setLayerTypeSchema( {} );
 		}
+		setRenderControl( { status: 'incomplete_form'} );
 	}, [ postMeta.type ] );
 
 	useEffect( () => {
-		console.log(renderControl)
 		switch( renderControl.status ) {
 			case 'incomplete_form':
 				sendNotice( 'warning', 
@@ -80,13 +80,13 @@ const LayersSidebar = ( {
 			case 'request_error':
 				switch ( renderControl.statusCode ) {
 					case 401:
-						sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
+						sendNotice( 'error', __( "Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings", 'jeo' ), {
 							id: 'layer_notices',
 							isDismissible: false,
 						});
 						break;
 					case 404:
-						sendNotice( 'error', __( "Your layer was not found.", 'jeo' ), {
+						sendNotice( 'error', __( "Your layer was not found. You will not be able to publish or update. Please check your settings", 'jeo' ), {
 							id: 'layer_notices',
 							isDismissible: false,
 						});
@@ -135,7 +135,7 @@ const LayersSidebar = ( {
 				}
 				return false;
 			} );
-			if ( ! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions ) && ! anyEmpty ) {
+			if ( ! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions ) && ! anyEmpty &&  !['ready', 'loaded'].includes(renderControl.status) ) {
 				setRenderControl( { 
 					status: 'ready',
 				} );
@@ -143,7 +143,7 @@ const LayersSidebar = ( {
 			}
 			prevPostMeta.current = debouncedPostMeta;
 		}
-	}, [ debouncedPostMeta ] );
+	}, [ debouncedPostMeta.layer_type_options ] );
 
 	const origOpen = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function() {
@@ -170,23 +170,27 @@ const LayersSidebar = ( {
 								if ( layer ) {
 									map.removeLayer( 'layer_1' );
 								}
-								setRenderControl( { canRender: false, status: 'request_error', statusCode: 400 } );
+								setRenderControl( { status: 'request_error', statusCode: 400 } );
 							} catch (e) {
-								setRenderControl( { canRender: false, status: 'request_error', statusCode: 400 } );
+								setRenderControl( { status: 'request_error', statusCode: 400 } );
 							}
 						} }
 						onStyleLoad={ ( map ) => {
 							try {
 								const layer = map.getLayer( 'layer_1' );
-								if ( layer ) {
+								if ( layer && renderControl.status === 'loading' ) {
+									setRenderControl( { status: 'loaded' } );
 									unlockPostSaving( 'layer_lock_key' );
 								}
 							} catch (e) {
-								setRenderControl( { canRender: false, status: 'request_error', statusCode: 400 } );
+								setRenderControl( { status: 'request_error', statusCode: 400 } );
 							}
 							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 						} }
+						onStyleDataLoading={()=>{
+							setRenderControl( { status: 'loading' } );
+						}}
 						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '100%' } }
 						zoom={ [ initialZoom || 11 ] }
@@ -205,8 +209,7 @@ const LayersSidebar = ( {
 							}
 						} }
 					>
-						{ renderControl.status === 'ready' && 
-						Object.keys( debouncedPostMeta.layer_type_options ).length > 0
+						{ [ 'ready', 'loading' ].includes(renderControl.status)
 						&& renderLayer( debouncedPostMeta, {
 							id: 1,
 							use: 'fixed',
