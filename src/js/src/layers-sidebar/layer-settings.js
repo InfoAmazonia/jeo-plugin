@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
 import { pickBy } from 'lodash-es';
 import InteractionsSettings from './interactions-settings';
+import { useDebounce } from 'use-debounce';
 
 const layerSchema = {
 	type: 'object',
@@ -49,6 +50,7 @@ const LayerSettings = ( {
 	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
 	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
 	const prevPostMeta = usePrevious( postMeta );
+	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
 	layerSchema.properties.layer_type_options = options;
@@ -69,32 +71,43 @@ const LayerSettings = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			let filledTypeOptions = {}
-			if ( ! prevPostMeta ) {
-				filledTypeOptions = pickBy( postMeta.layer_type_options );
+			let layerTypeOptions = {}
+			if ( ! prevPostMeta || prevPostMeta && prevPostMeta.type === postMeta.type ) {
+				layerTypeOptions = postMeta.layer_type_options;
 			}
+			setPostMeta( {
+				...postMeta,
+				layer_type_options: layerTypeOptions,
+			} );
+		}
+	}, [ options, widgets, postMeta.type ] );
+
+	useEffect( () => {
+		if ( postMeta.type ) {
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
 				.then( formUpdater( setOptions, setWidgets ) )
-				.then(() => {
-					setPostMeta( {
-						...postMeta,
-						layer_type_options: filledTypeOptions,
-						} );
-				});
+				// .then(() => {
+				// 	const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
+				// 	if ( layerType && layerType.getStyleLayers ) {
+				// 		layerType.getStyleLayers( postMeta ).then( setStyleLayers );
+				// 	} else {
+				// 		setStyleLayers( null );
+				// 	}
+				// })
 		} else {
 			setOptions( {} );
 		}
-	}, [ postMeta.type ] );
+	}, [ postMeta.type ])
 
 	useEffect( () => {
-		const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
+		const layerType = window.JeoLayerTypes.getLayerType( debouncedPostMeta.type );
 		if ( layerType && layerType.getStyleLayers ) {
-			layerType.getStyleLayers( postMeta ).then( setStyleLayers );
+			layerType.getStyleLayers( debouncedPostMeta ).then( setStyleLayers );
 		} else {
 			setStyleLayers( null );
 		}
-	}, [ postMeta, setStyleLayers ] );
+	}, [ postMeta.type ] );
 
 	return (
 		<Fragment>
@@ -104,7 +117,6 @@ const LayerSettings = ( {
 				uiSchema={ widgets }
 				formData={ postMeta }
 				onChange={ ( { formData } ) => {
-
 					window.layerFormData = formData;
 					setPostMeta( formData );
 				} }
