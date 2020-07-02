@@ -6,7 +6,7 @@ import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import {  MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
-import { isEmpty } from 'lodash-es';
+import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
@@ -119,6 +119,7 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
+		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
 		if ( Object.keys( debouncedLayerTypeOptions ).length && Object.keys( layerTypeSchema ).length && MapboxAPIKey ) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;
@@ -132,7 +133,9 @@ const LayersSidebar = ( {
 				}
 				return false;
 			} );
-			if ( ! anyEmpty && renderControl != 'ready' ) {
+			if ( ! anyEmpty && 
+				renderControl != 'ready' && 
+				! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions ) ) {
 				setRenderControl( { 
 					status: 'ready',
 				} );
