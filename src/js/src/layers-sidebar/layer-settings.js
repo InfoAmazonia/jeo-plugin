@@ -79,6 +79,7 @@ const LayerSettings = ( {
 				...postMeta,
 				layer_type_options: layerTypeOptions,
 			} );
+			setStyleLayers( null );
 		}
 	}, [ options, widgets, postMeta.type ] );
 
@@ -87,14 +88,7 @@ const LayerSettings = ( {
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
 				.then( formUpdater( setOptions, setWidgets ) )
-				// .then(() => {
-				// 	const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
-				// 	if ( layerType && layerType.getStyleLayers ) {
-				// 		layerType.getStyleLayers( postMeta ).then( setStyleLayers );
-				// 	} else {
-				// 		setStyleLayers( null );
-				// 	}
-				// })
+				// .then( setStyleLayers( null ) );
 		} else {
 			setOptions( {} );
 		}
@@ -107,7 +101,7 @@ const LayerSettings = ( {
 		} else {
 			setStyleLayers( null );
 		}
-	}, [ postMeta.type ] );
+	}, [ debouncedPostMeta ] );
 
 	return (
 		<Fragment>
