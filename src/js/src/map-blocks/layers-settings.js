@@ -1,4 +1,4 @@
-import { Button, Spinner, Dashicon, CheckboxControl } from '@wordpress/components';
+import { Button, Spinner, SelectControl, TextControl, Card, CardBody, CardHeader, CardDivider, CardFooter } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -7,7 +7,6 @@ import { select } from '@wordpress/data';
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
 
-import JeoAutosuggest from './jeo-autosuggest';
 import LayerSettings from './layer-settings';
 import { layerLoader } from './utils';
 
@@ -31,6 +30,7 @@ const LayersSettings = ( {
 	let widths = [];
 
 	const [ allLayers, setAllLayers ] = useState([]);
+	const [ filteredLayers, setFilteredLayers ] = useState([]);
 
 	useEffect( () => {
 		const allLayersData = select( 'core' ).getEntityRecords( 'postType', 'map-layer' );
@@ -51,7 +51,25 @@ const LayersSettings = ( {
 		return 0;
 	} );
 
-	const [ showAllLayers, setShowAllLayers ] = useState( false );
+	const [ layerTypeFilter, setLayerTypeFilter ] = useState( null );
+	const [ layerLegendFilter, setLayerLegendFilter ] = useState( null );
+	const [ layerNameFilter, setLayerNameFilter ] = useState('');
+
+	const layerTypeOptions = [
+		{ label: 'Select a layer type', value: '' },
+		{ label: 'Mapbox', value: 'mapbox' },
+		{ label: 'Mapbox-tileset', value: 'mapbox-tileset' },
+		{ label: 'Tilelayer', value: 'tilelayer' },
+		{ label: 'MVT', value: 'mvt' },
+	];
+
+	const legendTypeOptions = [
+		{ label: 'Select a legend type', value: '' },
+		{ label: 'Barscale', value: 'barscale' },
+		{ label: 'Simple-color', value: 'simple-color' },
+		{ label: 'Icons', value: 'icons' },
+		{ label: 'Circles', value: 'circles' },
+	];
 
 	useEffect( () => {
 		const [ firstLayer, ...otherLayers ] = attributes.layers;
@@ -66,114 +84,170 @@ const LayersSettings = ( {
 		} );
 	};
 
+	function filterLayers() {
+		const layers = []
+
+		allLayers.map( ( layer ) => {
+			if ( layerTypeFilter && layerTypeFilter !== layer.meta.type ) {
+				return;
+			}
+
+			if ( layerLegendFilter && layerLegendFilter !== layer.meta.legend_type ) {
+				return;
+			}
+
+			if ( layerNameFilter && ! layer.title.raw.toLowerCase().includes( layerNameFilter.toLowerCase() ) ) {
+				return;
+			}
+
+			return layers.push( layer );
+		} );
+		setFilteredLayers( layers );
+	}
+
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
-				<label
-					className="jeo-layers-library-controls__label"
-					htmlFor={ `jeo-layers-autosuggest-${ instanceId }` }
-				>
-					{ __( 'Search for layers' ) }
-				</label>
-				<JeoAutosuggest
-					postType="map-layer"
-					inputProps={ {
-						id: `jeo-layers-autosuggest-${ instanceId }`,
-						placeholder: __( 'Search by layer name', 'jeo' ),
-					} }
-					filterSuggestions={ ( suggestion ) => {
-							if ( suggestion.meta.type ) {
-								return ! attributes.layers.map( ( l ) => { 
-									return l.id 
-								} ).includes( suggestion.id )
-							}
-						}
-					}
-					onSuggestionSelected={ ( e, { suggestion } ) =>
-						setAttributes( {
-							...attributes,
-							layers: [ ...attributes.layers, setLayer( suggestion.id ) ],
-						} )
-					}
-				/>
-				<span>{ __( 'or' ) }</span>
-				<Button
-					className="create-layer-button"
-					isPrimary
-					isLarge
-					href="/wp-admin/post-new.php?post_type=map-layer"
-					target="_blank"
-					rel="noopener noreferrer"
-				>
-					{ __( 'Create New Layer' ) }
-				</Button>
-			</div>
-			<div style={ { marginLeft: '15px' } }>
-				<CheckboxControl
-					label={ __( 'Show all layers' ) }
-					checked={ showAllLayers }
-					onChange={ () => setShowAllLayers( ! showAllLayers ) }
-					className="jeo-layers-panel"
-				/>
-			</div>
-
-			{ showAllLayers && (
-				<div name="map-layers" className="jeo-layers-panel">
-					<ul className="jeo-layers-list">
-						{ allLayers.map( ( layer ) => {
-							let inUse = false;
-							attributes.layers.map( ( l ) => {
-								if ( layer.id === l.id ) {
-									inUse = true;
-								}
-							} );
-
-							if ( ! layer.meta.type ) {
-								return;
-							}
-
-							return (
-								<li className="jeo-setting-layer all-layers-list" key={ layer.id }>
-									<p>
-										<a
-											className="all-layers-list-link"
-											href={ `/wp-admin/post.php?post=${ layer.id }&action=edit` }
-											target="_blank"
-											rel="noopener noreferrer"
-										>
-											<strong>{ decodeHtmlEntity( layer.title.rendered ) }</strong> | { layer.meta.type }
-										</a>
-									</p>
-									{ inUse && (
-										<>
-											<Button
-												disabled
-												className="all-layers-list-button"
-											>
-												<Dashicon icon="plus" />
-											</Button>
-											<p> (already added) </p>
-										</>
-									) }
-									{ ! inUse && (
-										<Button
-											className="all-layers-list-button"
-											onClick={ () => {
-												setAttributes( {
-													...attributes,
-													layers: [ ...attributes.layers, setLayer( layer.id ) ],
-												} );
-											} }
-										>
-											<Dashicon icon="plus" />
-										</Button>
-									) }
-								</li>
-							);
-						} ) }
-					</ul>
+				<h1 className="layer-settings-title" >{ __( 'Layer settings' ) }</h1>
+				<div className="left">
+					<TextControl
+						placeholder="Enter keywords to search layers"
+						value={ layerNameFilter }
+						onChange={ ( value ) => {
+							setLayerNameFilter( value );
+						} }
+					/>
+					<SelectControl
+						className="jeo-layers-library-filters"
+						hideLabelFromVision={ true }
+						label={ __( 'Layer type' ) }
+						options={ layerTypeOptions }
+						value={ layerTypeFilter }
+						onChange={ ( value ) => {
+							setLayerTypeFilter( value )
+						} }
+					/>
+					<SelectControl
+						className="jeo-layers-library-filters"
+						hideLabelFromVision={ true }
+						label={ __( 'Legend type' ) }
+						options={ legendTypeOptions }
+						value={ layerLegendFilter }
+						onChange={ ( value ) => {
+							setLayerLegendFilter( value )
+						} }
+					/>
+					<Button
+						className="jeo-layers-library-filters-button-filter"
+						isPrimary
+						isLarge
+						onClick={ filterLayers }
+					>
+						{ __( 'Filter' ) }
+					</Button>
+					<Button
+						className="jeo-layers-library-filters-button-clear"
+						isPrimary
+						isLarge
+						onClick={ () => { setFilteredLayers([]); } }
+					>
+						{ __( 'Clear' ) }
+					</Button>
 				</div>
-			) }
+				<div className="right">
+					<Button
+						className="create-layer-button"
+						isPrimary
+						isLarge
+						href="/wp-admin/post-new.php?post_type=map-layer"
+						target="_blank"
+						rel="noopener noreferrer"
+					>
+						{ __( 'New Layer' ) }
+					</Button>
+				</div>
+			</div>
+			<h1 className="selected-layers-title" >{ __( 'Selected layers' ) }</h1>
+			<div name="map-layers" className="jeo-layers-panel">
+				<ul className="jeo-layers-list">
+					{ filteredLayers.map( ( layer, i ) => {
+						let inUse = false;
+						attributes.layers.map( ( l ) => {
+							if ( layer.id === l.id ) {
+								inUse = true;
+							}
+						} );
+
+						if ( ! layer.meta.type ) {
+							return;
+						}
+
+						let background;
+						if ( i % 2 !== 0 ) {
+							background = '#white';
+						} else {
+							background = '#f9f9f9';
+						}
+
+						return (
+							<Card
+								key={ layer.id }
+								style={ { background } }
+								size="small"
+								className="layer-card"
+							>
+								<CardBody>
+									<li className="jeo-setting-layer all-layers-list">
+										<div className="layer-info">
+											<p>
+												<a
+													className="all-layers-list-link"
+													href={ `/wp-admin/post.php?post=${ layer.id }&action=edit` }
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													<strong className="layer-title">{ decodeHtmlEntity( layer.title.rendered ) }</strong> | { layer.meta.type }
+												</a>
+											</p>
+											<div className="layer-buttons">
+												{ ! inUse && (
+													<p
+														onClick={ () => {
+															setAttributes( {
+																...attributes,
+																layers: [ ...attributes.layers, setLayer( layer.id ) ],
+															} );
+														} }
+														className="add-button"
+													>
+														Add to map
+													</p>
+												) }
+												{ inUse && (
+													<p
+														onClick={ () => {
+															const confirmation = confirm( __( 'Do you really want to delete this layer?' ) );
+
+															if ( confirmation ) {
+																return setLayers(
+																	attributes.layers.filter( ( settings ) => settings.id !== layer.id )
+																);
+															}
+														} }
+														className="remove-button"
+													>
+														Remove from map
+													</p>
+												) }
+											</div>
+										</div>
+									</li>
+								</CardBody>
+							</Card>
+						);
+					} ) }
+				</ul>
+			</div>
 
 			{ loadingLayers && <Spinner /> }
 			{ ! loadingLayers && ! attributes.layers.length && (
