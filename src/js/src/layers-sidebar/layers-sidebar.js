@@ -5,8 +5,8 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
-import { renderLayer } from '../map-blocks/map-preview-layer';
-import { isEmpty, isEqual } from 'lodash-es';
+import {  MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
+import { isEmpty } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
@@ -59,8 +59,6 @@ const LayersSidebar = ( {
 				.then( ( schema ) => {
 					setLayerTypeSchema( schema );
 				} );
-		} else {
-			setLayerTypeSchema( {} );
 		}
 		setRenderControl( { status: 'incomplete_form'} );
 	}, [ postMeta.type ] );
@@ -121,8 +119,7 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
-		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
-		if ( Object.keys(debouncedLayerTypeOptions).length && Object.keys(layerTypeSchema).length && MapboxAPIKey) {
+		if ( Object.keys( debouncedLayerTypeOptions ).length && Object.keys( layerTypeSchema ).length && MapboxAPIKey ) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;
 			optionsKeys.some( ( k ) => {
@@ -135,7 +132,7 @@ const LayersSidebar = ( {
 				}
 				return false;
 			} );
-			if ( ! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions ) && ! anyEmpty &&  !['ready', 'loaded'].includes(renderControl.status) ) {
+			if ( ! anyEmpty && renderControl != 'ready' ) {
 				setRenderControl( { 
 					status: 'ready',
 				} );
@@ -143,7 +140,7 @@ const LayersSidebar = ( {
 			}
 			prevPostMeta.current = debouncedPostMeta;
 		}
-	}, [ debouncedPostMeta.layer_type_options ] );
+	}, [ debouncedPostMeta.layer_type_options, layerTypeSchema ] );
 
 	const origOpen = XMLHttpRequest.prototype.open;
 	XMLHttpRequest.prototype.open = function() {
@@ -176,21 +173,9 @@ const LayersSidebar = ( {
 							}
 						} }
 						onStyleLoad={ ( map ) => {
-							try {
-								const layer = map.getLayer( 'layer_1' );
-								if ( layer && renderControl.status === 'loading' ) {
-									setRenderControl( { status: 'loaded' } );
-									unlockPostSaving( 'layer_lock_key' );
-								}
-							} catch (e) {
-								setRenderControl( { status: 'request_error', statusCode: 400 } );
-							}
 							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 						} }
-						onStyleDataLoading={()=>{
-							setRenderControl( { status: 'loading' } );
-						}}
 						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '100%' } }
 						zoom={ [ initialZoom || 11 ] }
@@ -209,11 +194,16 @@ const LayersSidebar = ( {
 							}
 						} }
 					>
-						{ [ 'ready', 'loading' ].includes(renderControl.status)
-						&& renderLayer( debouncedPostMeta, {
-							id: 1,
-							use: 'fixed',
-						} ) }
+						{ ( [ 'ready', 'loaded' ].includes( renderControl.status ) ) &&
+							<MemoizedRenderLayer
+								layer={ debouncedPostMeta }
+								instance={ { id: 1, use: 'fixed' } }
+								onSourceLoadedCallback={ ( ) => {
+									setRenderControl( { status: 'loaded' } );
+									unlockPostSaving( 'layer_lock_key' );		
+								} }
+							/>
+						}
 					</Map>
 				</LayerPreviewPortal>
 			) }
