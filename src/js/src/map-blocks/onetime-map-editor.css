@@ -125,6 +125,10 @@ li.jeo-setting-layer.all-layers-list {
 ul.jeo-layers-list .components-card {
     height: auto;
 }
+
+.jeo-layers-modal .done-button {
+    margin: 15px;
+}
 /**/
 
 .jeo-layers-library-controls .components-base-control__field,
