@@ -95,6 +95,15 @@
 	padding: 1em 0;
 }
 
+.jeo-layers-modal .jeo-layers-library-controls {
+    margin-left: 0px;
+    padding: 1em;
+}
+
+.jeo-layers-library-controls button.components-button {
+    height: 30px;
+}
+
 .jeo-layers-library-controls .components-base-control__field,
 .jeo-layers-library .library-controls .components-base-control__field {
 	display: flex;
