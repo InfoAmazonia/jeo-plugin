@@ -108,7 +108,6 @@ const LayersSettings = ( {
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
-				<h1 className="layer-settings-title" >{ __( 'Layer settings' ) }</h1>
 				<div className="left">
 					<TextControl
 						placeholder="Enter keywords to search layers"
@@ -167,7 +166,6 @@ const LayersSettings = ( {
 					</Button>
 				</div>
 			</div>
-			<h1 className="selected-layers-title" >{ __( 'Selected layers' ) }</h1>
 			<div name="map-layers" className="jeo-layers-panel">
 				<ul className="jeo-layers-list">
 					{ filteredLayers.map( ( layer, i ) => {
@@ -199,7 +197,7 @@ const LayersSettings = ( {
 								<CardBody>
 									<li className="jeo-setting-layer all-layers-list">
 										<div className="layer-info">
-											<p>
+											<p className="layer-info__single-row">
 												<a
 													className="all-layers-list-link"
 													href={ `/wp-admin/post.php?post=${ layer.id }&action=edit` }
@@ -248,7 +246,7 @@ const LayersSettings = ( {
 					} ) }
 				</ul>
 			</div>
-
+			<h2 className="selected-layers-title" >{ __( 'Selected layers' ) }</h2>
 			{ loadingLayers && <Spinner /> }
 			{ ! loadingLayers && ! attributes.layers.length && (
 				<p className="jeo-layers-list">
