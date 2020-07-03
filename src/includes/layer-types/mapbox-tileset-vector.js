@@ -20,7 +20,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 				id: attributes.layer_id,
 				type: attributes.layer_type_options.type,
 				source: attributes.layer_id,
-				'source-layer': attributes.source_layer
+				'source-layer': attributes.layer_type_options.source_layer
 			} ],
 		} );
 	},
@@ -41,7 +41,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': attributes.source_layer
+			'source-layer': attributes.layer_type_options.source_layer
 			// 'layout': {
 			// 	'line-cap': 'round',
 			// 	'line-join': 'round'
