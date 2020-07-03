@@ -3,7 +3,7 @@ import { Layer, Source } from 'react-mapbox-gl';
 import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
 
-export function renderLayer( {layer, instance, onSourceLoadedCallback } ) {
+export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {
 		return null;
 	}

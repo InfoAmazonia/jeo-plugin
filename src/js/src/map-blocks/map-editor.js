@@ -71,7 +71,7 @@ const MapEditor = ( {
 							{ loadedLayers && loadedMap.meta.layers.map( ( layer ) => {
 								const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id );
 								if ( layerOptions ) {
-									return renderLayer( layerOptions.meta, layer );
+									return renderLayer( { layer: layerOptions.meta, instance: layer } );
 								}
 							} ) }
 						</Map>

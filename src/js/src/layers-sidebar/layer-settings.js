@@ -71,24 +71,22 @@ const LayerSettings = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			let layerTypeOptions = {}
-			if ( ! prevPostMeta || prevPostMeta && prevPostMeta.type === postMeta.type ) {
-				layerTypeOptions = postMeta.layer_type_options;
-			}
-			setPostMeta( {
-				...postMeta,
-				layer_type_options: layerTypeOptions,
-			} );
-			setStyleLayers( null );
-		}
-	}, [ options, widgets, postMeta.type ] );
-
-	useEffect( () => {
-		if ( postMeta.type ) {
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
 				.then( formUpdater( setOptions, setWidgets ) )
-				// .then( setStyleLayers( null ) );
+				.then( () => {
+					if ( postMeta.type ) {
+						let layerTypeOptions = {};
+						if ( ! prevPostMeta || prevPostMeta && prevPostMeta.type === postMeta.type ) {
+							layerTypeOptions = postMeta.layer_type_options;
+						}
+						setPostMeta( {
+							...postMeta,
+							layer_type_options: layerTypeOptions,
+						} );
+						setStyleLayers( null );
+					}
+				} );
 		} else {
 			setOptions( {} );
 		}
