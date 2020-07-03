@@ -109,7 +109,7 @@ const OnetimeMapEditor = ( {
 				>
 					{ loadedLayers && attributes.layers.map( ( layer ) => {
 						const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
-						return renderLayer( layerOptions, layer );
+						return renderLayer( { layer: layerOptions, instance: layer } );
 					} ) }
 				</Map>
 			</div>
