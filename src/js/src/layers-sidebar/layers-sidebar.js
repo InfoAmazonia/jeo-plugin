@@ -60,7 +60,9 @@ const LayersSidebar = ( {
 					setLayerTypeSchema( schema );
 				} );
 		}
-		setRenderControl( { status: 'incomplete_form'} );
+		if ( MapboxAPIKey ) {
+			setRenderControl( { status: 'incomplete_form' } );
+		}
 	}, [ postMeta.type ] );
 
 	useEffect( () => {
@@ -100,12 +102,12 @@ const LayersSidebar = ( {
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;
 			case 'incomplete_settings':
-				sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
-					id: 'layer_notices_no_api_key',
+				sendNotice( 'warning', __( "Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update.", 'jeo' ), {
+					id: 'layer_notices',
 					isDismissible: false,
 					actions: [{
 						url: '/wp-admin/admin.php?page=jeo-settings',
-						label: 'Check your settings.',
+						label: 'Please, check your settings.',
 					}],
 				});	
 				lockPostSaving( 'layer_lock_key' );
@@ -161,6 +163,7 @@ const LayersSidebar = ( {
 	return (
 		<Fragment>
 			{ MapboxAPIKey && (
+				<>
 				<LayerPreviewPortal>
 					<Map
 						key={ key }
@@ -209,7 +212,7 @@ const LayersSidebar = ( {
 						}
 					</Map>
 				</LayerPreviewPortal>
-			) }
+
 			<PluginDocumentSettingPanel name="settings" title={ __( 'Settings' ) }>
 				<LayerSettings />
 			</PluginDocumentSettingPanel>
@@ -221,6 +224,8 @@ const LayersSidebar = ( {
 			<PluginDocumentSettingPanel name="legend-settings" title={ __( 'Legend' ) }>
 				<LegendsEditor />
 			</PluginDocumentSettingPanel>
+			</>
+		) }
 		</Fragment>
 	);
 };
