@@ -92,9 +92,11 @@ const LayersSettings = ( {
 				return;
 			}
 
+			/* TODO: Make layers that don't use legend to not be shown when filtering by legend
 			if ( layerLegendFilter && layerLegendFilter !== layer.meta.legend_type ) {
 				return;
 			}
+			*/
 
 			if ( layerNameFilter && ! layer.title.raw.toLowerCase().includes( layerNameFilter.toLowerCase() ) ) {
 				return;
@@ -126,16 +128,20 @@ const LayersSettings = ( {
 							setLayerTypeFilter( value )
 						} }
 					/>
-					<SelectControl
-						className="jeo-layers-library-filters"
-						hideLabelFromVision={ true }
-						label={ __( 'Legend type' ) }
-						options={ legendTypeOptions }
-						value={ layerLegendFilter }
-						onChange={ ( value ) => {
-							setLayerLegendFilter( value )
-						} }
-					/>
+					{
+						/* TODO: Make layers that don't use legend to not be shown when filtering by legend
+							<SelectControl
+								className="jeo-layers-library-filters"
+								hideLabelFromVision={ true }
+								label={ __( 'Legend type' ) }
+								options={ legendTypeOptions }
+								value={ layerLegendFilter }
+								onChange={ ( value ) => {
+									setLayerLegendFilter( value )
+								} }
+							/>
+						*/
+					}
 					<Button
 						className="jeo-layers-library-filters-button-filter"
 						isPrimary
