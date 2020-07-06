@@ -1,9 +1,15 @@
-import { Button, PanelRow, SelectControl, TextControl } from '@wordpress/components';
+import {
+	Button,
+	PanelRow,
+	SelectControl,
+	TextControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import './meta-selector.css';
 
-const comparators = '=,!=,>,>=,<,<=,LIKE,NOT LIKE,IN,NOT IN,BETWEEN,NOT BETWEEN,NOT EXISTS,REGEXP,NOT REGEXP,RLIKE';
+const comparators =
+	'=,!=,>,>=,<,<=,LIKE,NOT LIKE,IN,NOT IN,BETWEEN,NOT BETWEEN,NOT EXISTS,REGEXP,NOT REGEXP,RLIKE';
 const compareOptions = comparators.split( ',' ).map( ( comp ) => {
 	return { label: comp, value: comp };
 } );
@@ -12,11 +18,7 @@ function replace( arr, i, added = [] ) {
 	return [ ...arr.slice( 0, i ), ...added, ...arr.slice( i + 1 ) ];
 }
 
-export function MetaSelector( {
-	label,
-	onChange,
-	value: _metas,
-} ) {
+export function MetaSelector( { label, onChange, value: _metas } ) {
 	const metas = _metas || [];
 
 	return (

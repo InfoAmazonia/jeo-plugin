@@ -5,7 +5,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
-import {  MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
+import { MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
@@ -37,7 +37,9 @@ const LayersSidebar = ( {
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
 
 	const [ key, setKey ] = useState( 0 );
-	const [ renderControl, setRenderControl ] = useState( { status: 'incomplete_form' } );
+	const [ renderControl, setRenderControl ] = useState( {
+		status: 'incomplete_form',
+	} );
 	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
@@ -48,17 +50,15 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		if ( ! MapboxAPIKey ) {
-			setRenderControl( { status: 'incomplete_settings'} );
+			setRenderControl( { status: 'incomplete_settings' } );
 		}
 	}, [] );
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			window.JeoLayerTypes
-				.getLayerTypeSchema( postMeta )
-				.then( ( schema ) => {
-					setLayerTypeSchema( schema );
-				} );
+			window.JeoLayerTypes.getLayerTypeSchema( postMeta ).then( ( schema ) => {
+				setLayerTypeSchema( schema );
+			} );
 		}
 		if ( MapboxAPIKey ) {
 			setRenderControl( { status: 'incomplete_form' } );
@@ -66,13 +66,18 @@ const LayersSidebar = ( {
 	}, [ postMeta.type ] );
 
 	useEffect( () => {
-		switch( renderControl.status ) {
+		switch ( renderControl.status ) {
 			case 'incomplete_form':
-				sendNotice( 'warning', 
-					__( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ), {
+				sendNotice(
+					'warning',
+					__(
+						'Please fill all required fields, you will not be able to publish or update until that.',
+						'jeo'
+					),
+					{
 						id: 'layer_notices',
 						isDismissible: false,
-					} 
+					}
 				);
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
@@ -80,36 +85,66 @@ const LayersSidebar = ( {
 			case 'request_error':
 				switch ( renderControl.statusCode ) {
 					case 401:
-						sendNotice( 'error', __( "Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings", 'jeo' ), {
-							id: 'layer_notices',
-							isDismissible: false,
-						});
+						sendNotice(
+							'error',
+							__(
+								'Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings',
+								'jeo'
+							),
+							{
+								id: 'layer_notices',
+								isDismissible: false,
+							}
+						);
 						break;
 					case 404:
-						sendNotice( 'error', __( "Your layer was not found. You will not be able to publish or update. Please check your settings", 'jeo' ), {
-							id: 'layer_notices',
-							isDismissible: false,
-						});
+						sendNotice(
+							'error',
+							__(
+								'Your layer was not found. You will not be able to publish or update. Please check your settings',
+								'jeo'
+							),
+							{
+								id: 'layer_notices',
+								isDismissible: false,
+							}
+						);
 						break;
 					default:
-						sendNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ), {
-							id: 'layer_notices',
-							isDismissible: false,
-						} );
-					break;
+						sendNotice(
+							'error',
+							__(
+								'Error loading your layer, you will not be able to publish or update. Please check your settings.',
+								'jeo'
+							),
+							{
+								id: 'layer_notices',
+								isDismissible: false,
+							}
+						);
+						break;
 				}
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;
 			case 'incomplete_settings':
-				sendNotice( 'warning', __( "Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update.", 'jeo' ), {
-					id: 'layer_notices',
-					isDismissible: false,
-					actions: [{
-						url: '/wp-admin/admin.php?page=jeo-settings',
-						label: 'Please, check your settings.',
-					}],
-				});	
+				sendNotice(
+					'warning',
+					__(
+						'Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update.',
+						'jeo'
+					),
+					{
+						id: 'layer_notices',
+						isDismissible: false,
+						actions: [
+							{
+								url: '/wp-admin/admin.php?page=jeo-settings',
+								label: 'Please, check your settings.',
+							},
+						],
+					}
+				);
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;
@@ -122,11 +157,18 @@ const LayersSidebar = ( {
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
 		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
-		if ( Object.keys( debouncedLayerTypeOptions ).length && Object.keys( layerTypeSchema ).length && MapboxAPIKey ) {
+		if (
+			Object.keys( debouncedLayerTypeOptions ).length &&
+			Object.keys( layerTypeSchema ).length &&
+			MapboxAPIKey
+		) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;
 			optionsKeys.some( ( k ) => {
-				if ( isEmpty( debouncedLayerTypeOptions[ k ] ) && layerTypeSchema.required.includes( k ) ) {
+				if (
+					isEmpty( debouncedLayerTypeOptions[ k ] ) &&
+					layerTypeSchema.required.includes( k )
+				) {
 					anyEmpty = true;
 					setRenderControl( {
 						status: 'incomplete_form',
@@ -135,10 +177,12 @@ const LayersSidebar = ( {
 				}
 				return false;
 			} );
-			if ( ! anyEmpty && 
-				renderControl != 'ready' && 
-				! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions ) ) {
-				setRenderControl( { 
+			if (
+				! anyEmpty &&
+				renderControl != 'ready' &&
+				! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions )
+			) {
+				setRenderControl( {
 					status: 'ready',
 				} );
 				setKey( key + 1 );
@@ -148,8 +192,8 @@ const LayersSidebar = ( {
 	}, [ debouncedPostMeta.layer_type_options, layerTypeSchema ] );
 
 	const origOpen = XMLHttpRequest.prototype.open;
-	XMLHttpRequest.prototype.open = function() {
-		this.addEventListener( 'load', function() {
+	XMLHttpRequest.prototype.open = function () {
+		this.addEventListener( 'load', function () {
 			if ( this.status >= 400 ) {
 				setRenderControl( {
 					status: 'request_error',
@@ -164,94 +208,110 @@ const LayersSidebar = ( {
 		<Fragment>
 			{ MapboxAPIKey && (
 				<>
-				<LayerPreviewPortal>
-					<Map
-						key={ key }
-						onError={ ( map, e ) => {
-							try {
-								const layer = map.getLayer( 'layer_1' );
-								if ( layer ) {
-									map.removeLayer( 'layer_1' );
+					<LayerPreviewPortal>
+						<Map
+							key={ key }
+							onError={ ( map, e ) => {
+								try {
+									const layer = map.getLayer( 'layer_1' );
+									if ( layer ) {
+										map.removeLayer( 'layer_1' );
+									}
+									setRenderControl( {
+										status: 'request_error',
+										statusCode: 400,
+									} );
+								} catch ( e ) {
+									setRenderControl( {
+										status: 'request_error',
+										statusCode: 400,
+									} );
 								}
-								setRenderControl( { status: 'request_error', statusCode: 400 } );
-							} catch (e) {
-								setRenderControl( { status: 'request_error', statusCode: 400 } );
-							}
-						} }
-						onStyleLoad={ ( map ) => {
-							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
-							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-						} }
-						style="mapbox://styles/mapbox/streets-v11"
-						containerStyle={ { height: '500px', width: '100%' } }
-						zoom={ [ initialZoom || 11 ] }
-						center={ [ centerLon || 0, centerLat || 0 ] }
-						animationOptions={ animationOptions }
-						onMoveEnd={ ( map ) => {
-							if ( ! editingMap.current ) {
-								const center = map.getCenter();
-								const zoom = Math.round( map.getZoom() * 10 ) / 10;
+							} }
+							onStyleLoad={ ( map ) => {
+								map.addControl(
+									new mapboxgl.NavigationControl( { showCompass: false } ),
+									'top-left'
+								);
+								map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+							} }
+							style="mapbox://styles/mapbox/streets-v11"
+							containerStyle={ { height: '500px', width: '100%' } }
+							zoom={ [ initialZoom || 11 ] }
+							center={ [ centerLon || 0, centerLat || 0 ] }
+							animationOptions={ animationOptions }
+							onMoveEnd={ ( map ) => {
+								if ( ! editingMap.current ) {
+									const center = map.getCenter();
+									const zoom = Math.round( map.getZoom() * 10 ) / 10;
 
-								setPostMeta( {
-									center_lat: center.lat,
-									center_lon: center.lng,
-									initial_zoom: zoom,
-								} );
-							}
-						} }
+									setPostMeta( {
+										center_lat: center.lat,
+										center_lon: center.lng,
+										initial_zoom: zoom,
+									} );
+								}
+							} }
+						>
+							{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
+								<MemoizedRenderLayer
+									layer={ debouncedPostMeta }
+									instance={ { id: 1, use: 'fixed' } }
+									onSourceLoadedCallback={ () => {
+										setRenderControl( { status: 'loaded' } );
+										unlockPostSaving( 'layer_lock_key' );
+									} }
+								/>
+							) }
+						</Map>
+					</LayerPreviewPortal>
+
+					<PluginDocumentSettingPanel
+						name="settings"
+						title={ __( 'Settings' ) }
 					>
-						{ ( [ 'ready', 'loaded' ].includes( renderControl.status ) ) &&
-							<MemoizedRenderLayer
-								layer={ debouncedPostMeta }
-								instance={ { id: 1, use: 'fixed' } }
-								onSourceLoadedCallback={ ( ) => {
-									setRenderControl( { status: 'loaded' } );
-									unlockPostSaving( 'layer_lock_key' );		
-								} }
-							/>
-						}
-					</Map>
-				</LayerPreviewPortal>
+						<LayerSettings />
+					</PluginDocumentSettingPanel>
 
-			<PluginDocumentSettingPanel name="settings" title={ __( 'Settings' ) }>
-				<LayerSettings />
-			</PluginDocumentSettingPanel>
+					<PluginDocumentSettingPanel
+						name="attribution-settings"
+						title={ __( 'Attributions' ) }
+					>
+						<AttributionSettings />
+					</PluginDocumentSettingPanel>
 
-			<PluginDocumentSettingPanel name="attribution-settings" title={ __( 'Attributions' ) }>
-				<AttributionSettings />
-			</PluginDocumentSettingPanel>
-
-			<PluginDocumentSettingPanel name="legend-settings" title={ __( 'Legend' ) }>
-				<LegendsEditor />
-			</PluginDocumentSettingPanel>
-			</>
-		) }
+					<PluginDocumentSettingPanel
+						name="legend-settings"
+						title={ __( 'Legend' ) }
+					>
+						<LegendsEditor />
+					</PluginDocumentSettingPanel>
+				</>
+			) }
 		</Fragment>
 	);
 };
-export default withDispatch(
-	( dispatch ) => ( {
-		setPostMeta: ( meta ) => {
-			dispatch( 'core/editor' ).editPost( { meta } );
-		},
-		sendNotice: ( type, message, options ) => {
-			dispatch( 'core/notices' ).createNotice( type, message, options );
-		},
-		removeNotice: ( id ) => {
-			dispatch( 'core/notices' ).removeNotice( id );
-		},
-		lockPostSaving: ( key ) => {
-			dispatch( 'core/editor' ).lockPostSaving( key );
-		},
-		lockPostAutoSaving: ( key ) => {
-			dispatch( 'core/editor' ).lockPostAutosaving( key );
-		},
-		unlockPostSaving: (key) => {
-			dispatch( 'core/editor' ).unlockPostSaving( key );
-		},
-	} )
-)( withSelect(
-	( select ) => ( {
+export default withDispatch( ( dispatch ) => ( {
+	setPostMeta: ( meta ) => {
+		dispatch( 'core/editor' ).editPost( { meta } );
+	},
+	sendNotice: ( type, message, options ) => {
+		dispatch( 'core/notices' ).createNotice( type, message, options );
+	},
+	removeNotice: ( id ) => {
+		dispatch( 'core/notices' ).removeNotice( id );
+	},
+	lockPostSaving: ( key ) => {
+		dispatch( 'core/editor' ).lockPostSaving( key );
+	},
+	lockPostAutoSaving: ( key ) => {
+		dispatch( 'core/editor' ).lockPostAutosaving( key );
+	},
+	unlockPostSaving: ( key ) => {
+		dispatch( 'core/editor' ).unlockPostSaving( key );
+	},
+} ) )(
+	withSelect( ( select ) => ( {
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-	} )
-)( LayersSidebar ) );
+	} ) )( LayersSidebar )
+);

@@ -29,7 +29,13 @@ const PostsSelector = ( {
 			delete relatedPostsData.before;
 		}
 
-		if ( ! postMeta.show_all_posts && ( ! categories || categories.length == 0 ) && ( ! tags || tags.length == 0 ) && ( ! meta_query || meta_query.length == 0 ) && ( ! after ) ) {
+		if (
+			! postMeta.show_all_posts &&
+			( ! categories || categories.length == 0 ) &&
+			( ! tags || tags.length == 0 ) &&
+			( ! meta_query || meta_query.length == 0 ) &&
+			! after
+		) {
 			if ( ! before ) {
 				setRelatedPosts( { before: '0001-01-01T03:06:28.000Z' } );
 			}
@@ -76,7 +82,10 @@ const PostsSelector = ( {
 								if ( ! postMeta.show_all_posts ) {
 									setRelatedPosts( { ...relatedPosts, categories: tokens } );
 								}
-								setRelatedPostsData( { ...relatedPostsData, categories: tokens } );
+								setRelatedPostsData( {
+									...relatedPostsData,
+									categories: tokens,
+								} );
 							} }
 						/>
 					) }
@@ -103,15 +112,27 @@ const PostsSelector = ( {
 						endLabel={ __( 'End date', 'jeo' ) }
 						onStartChange={ ( date ) => {
 							if ( ! postMeta.show_all_posts ) {
-								setRelatedPosts( { ...relatedPosts, after: date ? date.toISOString() : undefined } );
+								setRelatedPosts( {
+									...relatedPosts,
+									after: date ? date.toISOString() : undefined,
+								} );
 							}
-							setRelatedPostsData( { ...relatedPostsData, after: date ? date.toISOString() : undefined } );
+							setRelatedPostsData( {
+								...relatedPostsData,
+								after: date ? date.toISOString() : undefined,
+							} );
 						} }
 						onEndChange={ ( date ) => {
 							if ( ! postMeta.show_all_posts ) {
-								setRelatedPosts( { ...relatedPosts, before: date ? date.toISOString() : undefined } );
+								setRelatedPosts( {
+									...relatedPosts,
+									before: date ? date.toISOString() : undefined,
+								} );
 							}
-							setRelatedPostsData( { ...relatedPostsData, before: date ? date.toISOString() : undefined } );
+							setRelatedPostsData( {
+								...relatedPostsData,
+								before: date ? date.toISOString() : undefined,
+							} );
 						} }
 					/>
 
@@ -122,7 +143,10 @@ const PostsSelector = ( {
 							if ( ! postMeta.show_all_posts ) {
 								setRelatedPosts( { ...relatedPosts, meta_query: queries } );
 							}
-							setRelatedPostsData( { ...relatedPostsData, meta_query: queries } );
+							setRelatedPostsData( {
+								...relatedPostsData,
+								meta_query: queries,
+							} );
 						} }
 					/>
 				</>
@@ -131,24 +155,27 @@ const PostsSelector = ( {
 	);
 };
 
-export default withDispatch(
-	( dispatch ) => ( {
-		setPostMeta: ( meta ) => {
-			dispatch( 'core/editor' ).editPost( { meta } );
-		},
-	} )
-)( withSelect(
-	( select ) => ( {
-		loadedCategories: select( 'core' ).getEntityRecords( 'taxonomy', 'category' ),
-		loadingCategories: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
+export default withDispatch( ( dispatch ) => ( {
+	setPostMeta: ( meta ) => {
+		dispatch( 'core/editor' ).editPost( { meta } );
+	},
+} ) )(
+	withSelect( ( select ) => ( {
+		loadedCategories: select( 'core' ).getEntityRecords(
 			'taxonomy',
-			'category',
-		] ),
+			'category'
+		),
+		loadingCategories: select( 'core/data' ).isResolving(
+			'core',
+			'getEntityRecords',
+			[ 'taxonomy', 'category' ]
+		),
 		loadedTags: select( 'core' ).getEntityRecords( 'taxonomy', 'post_tag' ),
-		loadingTags: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-			'taxonomy',
-			'post_tag',
-		] ),
+		loadingTags: select( 'core/data' ).isResolving(
+			'core',
+			'getEntityRecords',
+			[ 'taxonomy', 'post_tag' ]
+		),
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-	} )
-)( PostsSelector ) );
+	} ) )( PostsSelector )
+);

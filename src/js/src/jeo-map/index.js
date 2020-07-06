@@ -1,7 +1,7 @@
 import template from 'lodash.template';
 
-const decodeHtmlEntity = function( str ) {
-	return str.replace( /&#(\d+);/g, function( match, dec ) {
+const decodeHtmlEntity = function ( str ) {
+	return str.replace( /&#(\d+);/g, function ( match, dec ) {
 		return String.fromCharCode( dec );
 	} );
 };
@@ -24,9 +24,7 @@ class JeoMap {
 		this.moreInfoTemplate = template( window.jeoMapVars.templates.moreInfo );
 
 		this.popupTemplate = template(
-			`<article class="popup popup-wmt">${
-				window.jeoMapVars.templates.postPopup
-			}</article>`,
+			`<article class="popup popup-wmt">${ window.jeoMapVars.templates.postPopup }</article>`
 		);
 
 		this.initMap()
@@ -34,9 +32,15 @@ class JeoMap {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
 					map.setZoom( this.getArg( 'initial_zoom' ) );
 
-					map.setCenter( [ this.getArg( 'center_lon' ), this.getArg( 'center_lat' ) ] );
+					map.setCenter( [
+						this.getArg( 'center_lon' ),
+						this.getArg( 'center_lat' ),
+					] );
 
-					map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
+					map.addControl(
+						new mapboxgl.NavigationControl( { showCompass: false } ),
+						'top-left'
+					);
 
 					if ( this.getArg( 'disable_scroll_zoom' ) ) {
 						map.scrollZoom.disable();
@@ -57,17 +61,14 @@ class JeoMap {
 
 					if (
 						this.getArg( 'max_bounds_ne' ) &&
-					this.getArg( 'max_bounds_sw' ) &&
-					this.getArg( 'max_bounds_ne' ).length === 2 &&
-					this.getArg( 'max_bounds_sw' ).length === 2
-
+						this.getArg( 'max_bounds_sw' ) &&
+						this.getArg( 'max_bounds_ne' ).length === 2 &&
+						this.getArg( 'max_bounds_sw' ).length === 2
 					) {
-						map.setMaxBounds(
-							[
-								this.getArg( 'max_bounds_sw' ),
-								this.getArg( 'max_bounds_ne' ),
-							]
-						);
+						map.setMaxBounds( [
+							this.getArg( 'max_bounds_sw' ),
+							this.getArg( 'max_bounds_ne' ),
+						] );
 					}
 
 					if ( this.getArg( 'min_zoom' ) ) {
@@ -79,56 +80,71 @@ class JeoMap {
 				}
 			} )
 			.then( () => {
-
 				// Show a message when a map doesn't have layers
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length === 0 ) {
 					this.addMapWithoutLayersMessage();
 				} else {
 					let amountLayers = 0;
-					this.getLayers().then((layers) => {
-						amountLayers = layers.length
+					this.getLayers().then( ( layers ) => {
+						amountLayers = layers.length;
 
-						if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 && amountLayers > 0) {
-								const baseLayer = layers[ 0 ];
-								baseLayer.addStyle( map );
+						if (
+							this.getArg( 'layers' ) &&
+							this.getArg( 'layers' ).length > 0 &&
+							amountLayers > 0
+						) {
+							const baseLayer = layers[ 0 ];
+							baseLayer.addStyle( map );
 
-								const customAttribution = [];
+							const customAttribution = [];
 
-								map.on( 'load', () => {
-									layers.forEach( ( layer, i ) => {
-										if ( layer.attribution ) {
-											let attributionLink = layer.attribution;
-											const attributionName = layer.attribution_name;
+							map.on( 'load', () => {
+								layers.forEach( ( layer, i ) => {
+									if ( layer.attribution ) {
+										let attributionLink = layer.attribution;
+										const attributionName = layer.attribution_name;
 
-											const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+										const regex = new RegExp(
+											/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+										);
 
-											if ( layer.attribution && ! layer.attribution.includes( 'http' ) ) {
-												if ( layer.attribution.match( regex ) ) {
-													attributionLink = `https://${ layer.attribution }`;
-												}
+										if (
+											layer.attribution &&
+											! layer.attribution.includes( 'http' )
+										) {
+											if ( layer.attribution.match( regex ) ) {
+												attributionLink = `https://${ layer.attribution }`;
 											}
-											const attributionLabel = attributionName.replace( /\s/g, '' ).length ? attributionName : attributionLink;
-											customAttribution.push( `<a href="${ attributionLink }">${ attributionLabel }</a>` );
 										}
+										const attributionLabel = attributionName.replace(
+											/\s/g,
+											''
+										).length
+											? attributionName
+											: attributionLink;
+										customAttribution.push(
+											`<a href="${ attributionLink }">${ attributionLabel }</a>`
+										);
+									}
 
-										if ( i > 0 ) {
-											layer.addLayer( map );
-										}
+									if ( i > 0 ) {
+										layer.addLayer( map );
+									}
 
-										layer.addInteractions( map );
-									} );
+									layer.addInteractions( map );
 								} );
+							} );
 
-								this.addLayersControl(amountLayers);
+							this.addLayersControl( amountLayers );
 
-								map.addControl(
-									new mapboxgl.AttributionControl( {
-										customAttribution,
-									} ),
-									'bottom-left'
-								);
+							map.addControl(
+								new mapboxgl.AttributionControl( {
+									customAttribution,
+								} ),
+								'bottom-left'
+							);
 
-								this.addMoreButtonAndLegends();
+							this.addMoreButtonAndLegends();
 						}
 
 						this.getRelatedPosts();
@@ -136,29 +152,32 @@ class JeoMap {
 						if ( amountLayers === 0 ) {
 							this.addMapWithoutLayersMessage();
 						}
-					});
+					} );
 				}
 			} )
 			.then( () => {
 				// Remove all empty jeo map blocks
-				jQuery( '.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])' ).remove();
+				jQuery(
+					'.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])'
+				).remove();
 			} );
 		window.map = map;
 	}
 
 	initMap() {
 		if ( this.getArg( 'map_id' ) ) {
-			return jQuery.get(
-				jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' )
-			).then( ( data ) => {
-				this.map_post_object = data;
-			} );
+			return jQuery
+				.get( jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' ) )
+				.then( ( data ) => {
+					this.map_post_object = data;
+				} );
 		}
 		return Promise.resolve();
 	}
 	addMapWithoutLayersMessage() {
 		const layers = document.createElement( 'div' );
-		layers.innerHTML += '<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
+		layers.innerHTML +=
+			'<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
 		this.element.appendChild( layers );
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
 		jQuery( this.element ).find( '.mapboxgl-control-container' ).remove();
@@ -197,7 +216,7 @@ class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			container.appendChild( legendsTitle );
 
-			legendsHideIcon.addEventListener( 'click', ( ) => {
+			legendsHideIcon.addEventListener( 'click', () => {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
 					legendsHideIcon.classList.remove( 'active' );
 					jQuery( '.hideable-content' ).slideToggle( 'slow' );
@@ -234,14 +253,19 @@ class JeoMap {
 			this.layers.forEach( ( layer ) => {
 				innerHTML += `<h3>${ layer.attributes.layer_name }</h1>`;
 
-				const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+				const regex = new RegExp(
+					/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+				);
 
 				let attributionLink = layer.attributes.attribution;
 				const attributionName = layer.attributes.attribution_name;
 
 				let sourceLink = layer.source_url;
 
-				if ( layer.attributes.attribution && ! layer.attributes.attribution.includes( 'http' ) ) {
+				if (
+					layer.attributes.attribution &&
+					! layer.attributes.attribution.includes( 'http' )
+				) {
 					if ( layer.attributes.attribution.match( regex ) ) {
 						attributionLink = `https://${ layer.attributes.attribution }`;
 					}
@@ -281,11 +305,10 @@ class JeoMap {
 
 		const closeButton = document.createElement( 'div' );
 		closeButton.classList.add( 'more-info-close' );
-		closeButton.innerHTML = '<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>';
+		closeButton.innerHTML =
+			'<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>';
 
-		closeButton.click( function( e ) {
-
-		} );
+		closeButton.click( function ( e ) {} );
 
 		closeButton.onclick = ( e ) => {
 			e.preventDefault();
@@ -303,7 +326,11 @@ class JeoMap {
 		moreButton.onclick = ( e ) => {
 			e.preventDefault();
 			e.stopPropagation();
-			jQuery( e.currentTarget ).parent().parent().siblings( '.more-info-overlayer' ).show();
+			jQuery( e.currentTarget )
+				.parent()
+				.parent()
+				.siblings( '.more-info-overlayer' )
+				.show();
 		};
 
 		this.element.appendChild( moreDiv );
@@ -318,7 +345,9 @@ class JeoMap {
 				return;
 			}
 			if ( l.attributes.visible !== true ) {
-				jQuery( this.element ).find( '.legend-for-' + l.layer_id ).hide();
+				jQuery( this.element )
+					.find( '.legend-for-' + l.layer_id )
+					.hide();
 			}
 		} );
 	}
@@ -342,17 +371,17 @@ class JeoMap {
 			const layersDefinitions = this.getArg( 'layers' );
 			this.layersDefinitions = layersDefinitions;
 
-			if (layersDefinitions) {
+			if ( layersDefinitions ) {
 				const layersIds = layersDefinitions.map( ( el ) => el.id );
-				const urlRoutes = window.location.pathname.split('/');
-				const lang = urlRoutes[1];
+				const urlRoutes = window.location.pathname.split( '/' );
+				const lang = urlRoutes[ 1 ];
 
 				jQuery.get(
 					jeoMapVars.jsonUrl + 'map-layer',
 					{
 						include: layersIds,
 						orderby: 'include',
-						lang: lang ? lang : ''
+						lang: lang ? lang : '',
 					},
 					( data ) => {
 						const returnLayers = [];
@@ -363,7 +392,7 @@ class JeoMap {
 						} );
 
 						ordered.forEach( ( layerObject, i ) => {
-							if (layerObject){ 
+							if ( layerObject ) {
 								returnLayers.push(
 									new window.JeoLayer( layerObject.meta.type, {
 										layer_id: layerObject.slug,
@@ -376,7 +405,10 @@ class JeoMap {
 									} )
 								);
 
-								if ( layerObject.meta.legend_type !== 'none' && layersDefinitions[ i ].show_legend ) {
+								if (
+									layerObject.meta.legend_type !== 'none' &&
+									layersDefinitions[ i ].show_legend
+								) {
 									returnLegends.push(
 										new window.JeoLegend( layerObject.meta.legend_type, {
 											layer_id: layerObject.slug,
@@ -418,17 +450,13 @@ class JeoMap {
 
 			query._embed = 1;
 
-			jQuery.get(
-				jeoMapVars.jsonUrl + 'posts',
-				query,
-				( data ) => {
-					if ( data.length ) {
-						data.forEach( ( post ) => {
-							this.addPostToMap( post );
-						} );
-					}
+			jQuery.get( jeoMapVars.jsonUrl + 'posts', query, ( data ) => {
+				if ( data.length ) {
+					data.forEach( ( post ) => {
+						this.addPostToMap( post );
+					} );
 				}
-			);
+			} );
 		} );
 	}
 
@@ -464,7 +492,10 @@ class JeoMap {
 
 		marker.getElement().addEventListener( 'click', () => {
 			this.activateMarker( marker );
-			if ( ! this.options || ! this.options.marker_action === 'embed_preview' ) {
+			if (
+				! this.options ||
+				! this.options.marker_action === 'embed_preview'
+			) {
 				marker.setPopup( popUp );
 			} else {
 				this.embedPreviewActive = true;
@@ -480,7 +511,9 @@ class JeoMap {
 
 	activateMarker( activeMarker ) {
 		this.markers.map( ( marker ) => {
-			const canToggle = marker._lngLat.lat === activeMarker._lngLat.lat && marker._lngLat.lon === activeMarker._lngLat.lon;
+			const canToggle =
+				marker._lngLat.lat === activeMarker._lngLat.lat &&
+				marker._lngLat.lon === activeMarker._lngLat.lon;
 			return marker.getElement().classList.toggle( 'marker-active', canToggle );
 		} );
 	}
@@ -552,14 +585,17 @@ class JeoMap {
 	/*
 		amountLayers = new parameter
 	*/
-	addLayersControl(amountLayers) {
+	addLayersControl( amountLayers ) {
 		const switchableLayers = this.getSwitchableLayers();
 		const swappableLayers = this.getSwappableLayers();
 
 		const navElement = document.createElement( 'nav' );
 		navElement.classList.add( 'layers-selection' );
 
-		if ( (switchableLayers.length + swappableLayers.length !== 0) && amountLayers > 1 ) {
+		if (
+			switchableLayers.length + swappableLayers.length !== 0 &&
+			amountLayers > 1
+		) {
 			const layerSelectionTitle = document.createElement( 'div' );
 			layerSelectionTitle.classList.add( 'layer-selection-title' );
 
@@ -583,7 +619,7 @@ class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			layerSelectionTitle.appendChild( legendsTitle );
 
-			legendsHideIcon.addEventListener( 'click', ( ) => {
+			legendsHideIcon.addEventListener( 'click', () => {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
 					legendsHideIcon.classList.remove( 'active' );
 					jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
@@ -600,8 +636,7 @@ class JeoMap {
 		layers.classList.add( 'layers-wrapper' );
 
 		switchableLayers.forEach( ( index ) => {
-
-			if (this.layers[ index ]) {
+			if ( this.layers[ index ] ) {
 				const link = document.createElement( 'a' );
 				link.href = '#';
 				if ( this.layersDefinitions[ index ].default ) {
@@ -610,7 +645,9 @@ class JeoMap {
 
 				const layerName = document.createElement( 'span' );
 				layerName.classList.add( 'layer-name' );
-				layerName.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
+				layerName.textContent = decodeHtmlEntity(
+					this.layers[ index ].layer_name
+				);
 
 				link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
@@ -620,9 +657,12 @@ class JeoMap {
 					e.preventDefault();
 					e.stopPropagation();
 
-					const visibility = this.map.getLayoutProperty( clickedLayer, 'visibility' );
+					const visibility = this.map.getLayoutProperty(
+						clickedLayer,
+						'visibility'
+					);
 
-					if ( typeof ( visibility ) === 'undefined' || visibility === 'visible' ) {
+					if ( typeof visibility === 'undefined' || visibility === 'visible' ) {
 						this.hideLayer( clickedLayer );
 						clicked.className = '';
 					} else {
@@ -640,47 +680,45 @@ class JeoMap {
 		navElement.appendChild( layers );
 
 		swappableLayers.forEach( ( index ) => {
-			
-				if (this.layers[ index ]) {
-					const link = document.createElement( 'a' );
-					link.href = '#';
-					link.classList.add( 'swappable' );
+			if ( this.layers[ index ] ) {
+				const link = document.createElement( 'a' );
+				link.href = '#';
+				link.classList.add( 'swappable' );
 
-					if ( this.getDefaultSwappableLayer() == index ) {
-						link.classList.add( 'active' );
-					}
-					link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
-					link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
-
-					link.onclick = ( e ) => {
-						if ( jQuery( e.currentTarget ).hasClass( 'active' ) ) {
-							return;
-						}
-						e.preventDefault();
-						e.stopPropagation();
-
-						// hide all
-						this.getSwappableLayers().forEach( ( i ) => {
-							this.hideLayer( this.layers[ i ].layer_id );
-						} );
-						jQuery( layers ).children( '.swappable' ).removeClass( 'active' );
-
-						// display current
-						const clicked = e.currentTarget;
-						const clickedLayer = clicked.dataset.layer_id;
-						this.showLayer( clickedLayer );
-
-						clicked.classList.add( 'active' );
-					};
-
-					layers.appendChild( link );
+				if ( this.getDefaultSwappableLayer() == index ) {
+					link.classList.add( 'active' );
 				}
+				link.textContent = decodeHtmlEntity( this.layers[ index ].layer_name );
+				link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
-			} );
+				link.onclick = ( e ) => {
+					if ( jQuery( e.currentTarget ).hasClass( 'active' ) ) {
+						return;
+					}
+					e.preventDefault();
+					e.stopPropagation();
 
-			navElement.appendChild( layers );
+					// hide all
+					this.getSwappableLayers().forEach( ( i ) => {
+						this.hideLayer( this.layers[ i ].layer_id );
+					} );
+					jQuery( layers ).children( '.swappable' ).removeClass( 'active' );
 
-			this.element.appendChild( navElement );
+					// display current
+					const clicked = e.currentTarget;
+					const clickedLayer = clicked.dataset.layer_id;
+					this.showLayer( clickedLayer );
+
+					clicked.classList.add( 'active' );
+				};
+
+				layers.appendChild( link );
+			}
+		} );
+
+		navElement.appendChild( layers );
+
+		this.element.appendChild( navElement );
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
@@ -693,19 +731,23 @@ class JeoMap {
 
 	showLayer( layer_id ) {
 		this.changeLayerVisibitly( layer_id, 'visible' );
-		jQuery( this.element ).find( '.legend-for-' + layer_id ).show();
+		jQuery( this.element )
+			.find( '.legend-for-' + layer_id )
+			.show();
 	}
 
 	hideLayer( layer_id ) {
 		this.changeLayerVisibitly( layer_id, 'none' );
-		jQuery( this.element ).find( '.legend-for-' + layer_id ).hide();
+		jQuery( this.element )
+			.find( '.legend-for-' + layer_id )
+			.hide();
 	}
 }
 
-( function( $ ) {
-	$( function() {
-		$( '.jeomap' ).each( function( i ) {
+( function ( $ ) {
+	$( function () {
+		$( '.jeomap' ).each( function ( i ) {
 			new JeoMap( this );
 		} );
 	} );
-}( jQuery ) );
+} )( jQuery );

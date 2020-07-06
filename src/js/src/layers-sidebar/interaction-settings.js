@@ -1,5 +1,17 @@
-import { Button, Dashicon, PanelBody, SelectControl, TextControl } from '@wordpress/components';
-import { Fragment, useCallback, useEffect, useMemo, useState } from '@wordpress/element';
+import {
+	Button,
+	Dashicon,
+	PanelBody,
+	SelectControl,
+	TextControl,
+} from '@wordpress/components';
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import './interaction-settings.css';
@@ -43,31 +55,39 @@ export default function InteractionSettings( {
 	const [ newField, setNewField ] = useState( null );
 
 	useEffect( () => {
-		setNewField( unusedFieldOptions.length > 0 ?
-			unusedFieldOptions[ 0 ].value :
-			null
+		setNewField(
+			unusedFieldOptions.length > 0 ? unusedFieldOptions[ 0 ].value : null
 		);
 	}, [ unusedFieldOptions ] );
 
-	const changeEvent = useCallback( ( on ) => {
-		if ( interactionIndex !== -1 ) {
-			if ( on === 'none' ) {
-				onDelete( interaction.id );
-			} else {
-				onUpdate( interaction.id, { ...interaction, on } );
+	const changeEvent = useCallback(
+		( on ) => {
+			if ( interactionIndex !== -1 ) {
+				if ( on === 'none' ) {
+					onDelete( interaction.id );
+				} else {
+					onUpdate( interaction.id, { ...interaction, on } );
+				}
+			} else if ( on !== 'none' ) {
+				onInsert( { ...interaction, on } );
 			}
-		} else if ( on !== 'none' ) {
-			onInsert( { ...interaction, on } );
-		}
-	}, [ interaction, interactionIndex, onDelete, onInsert ] );
+		},
+		[ interaction, interactionIndex, onDelete, onInsert ]
+	);
 
-	const changeTitle = useCallback( ( title ) => {
-		if ( ( interaction.title !== 'None' || interaction.title ) && ( title === 'None' || ! title ) ) {
-			alert( __( 'A title is required' ) );
-			return;
-		}
-		onUpdate( interaction.id, { ...interaction, title } );
-	}, [ interaction, onUpdate ] );
+	const changeTitle = useCallback(
+		( title ) => {
+			if (
+				( interaction.title !== 'None' || interaction.title ) &&
+				( title === 'None' || ! title )
+			) {
+				alert( __( 'A title is required' ) );
+				return;
+			}
+			onUpdate( interaction.id, { ...interaction, title } );
+		},
+		[ interaction, onUpdate ]
+	);
 
 	const addField = useCallback( () => {
 		if ( interaction.title === 'None' || ! interaction.title ) {
@@ -76,10 +96,7 @@ export default function InteractionSettings( {
 		}
 		onUpdate( interaction.id, {
 			...interaction,
-			fields: [
-				...interaction.fields,
-				{ field: newField, label: '' },
-			],
+			fields: [ ...interaction.fields, { field: newField, label: '' } ],
 		} );
 	}, [ interaction, newField, onUpdate ] );
 
@@ -87,12 +104,12 @@ export default function InteractionSettings( {
 		onUpdate( interaction.id, {
 			...interaction,
 			fields: interaction.fields.map( ( field ) => {
-				return ( field.field === key ) ? { ...field, label } : field;
+				return field.field === key ? { ...field, label } : field;
 			} ),
 		} );
 	};
 
-	const deleteField = ( key ) => ( ) => {
+	const deleteField = ( key ) => () => {
 		onUpdate( interaction.id, {
 			...interaction,
 			fields: interaction.fields.filter( ( field ) => {
@@ -104,7 +121,11 @@ export default function InteractionSettings( {
 	const interactive = interaction.on !== 'none';
 
 	return (
-		<PanelBody className="jeo-interaction-settings" title={ layer.id } initialOpen={ interactive }>
+		<PanelBody
+			className="jeo-interaction-settings"
+			title={ layer.id }
+			initialOpen={ interactive }
+		>
 			<SelectControl
 				label={ __( 'Show popup?', 'jeo' ) }
 				value={ interaction.on }
@@ -120,11 +141,11 @@ export default function InteractionSettings( {
 						onChange={ changeTitle }
 					/>
 
-					{ ( fieldKeys.length > 0 ) && (
+					{ fieldKeys.length > 0 && (
 						<fieldset className="jeo-interaction-fields">
 							<legend>{ __( 'Fields', 'jeo' ) }</legend>
 
-							{ ( interaction.fields.length > 0 ) && (
+							{ interaction.fields.length > 0 && (
 								<div className="jeo-interaction-fields__grid">
 									{ interaction.fields.map( ( { field, label } ) => {
 										const inputId = `${ layer.id }_${ field }`;
@@ -146,7 +167,7 @@ export default function InteractionSettings( {
 								</div>
 							) }
 
-							{ ( unusedFieldOptions.length > 0 ) && (
+							{ unusedFieldOptions.length > 0 && (
 								<div className="jeo-interaction-add-field">
 									<label htmlFor={ `${ layer.field }__add-field` }>
 										{ __( 'Add field', 'jeo' ) }
