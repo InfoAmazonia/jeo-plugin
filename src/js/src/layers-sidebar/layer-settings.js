@@ -1,6 +1,13 @@
 import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useEffect, useMemo, useState, useRef } from '@wordpress/element';
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+	useRef,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
 import { pickBy } from 'lodash-es';
@@ -23,7 +30,7 @@ const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 			delete property.description;
 		}
 		if ( property.disabled ) {
-			widgets.layer_type_options[key] = { 'ui:disabled': true }
+			widgets.layer_type_options[ key ] = { 'ui:disabled': true };
 			delete property.disabled;
 		}
 	} );
@@ -31,24 +38,25 @@ const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 	setOptions( options );
 };
 
-function usePrevious(value) {
+function usePrevious( value ) {
 	const ref = useRef();
-	useEffect(() => {
-	  ref.current = value;
-	}, [value]);
+	useEffect( () => {
+		ref.current = value;
+	}, [ value ] );
 	return ref.current;
-};
+}
 
-const LayerSettings = ( {
-	postMeta,
-	setPostMeta,
-} ) => {
+const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
 	const [ styleLayers, setStyleLayers ] = useState( null );
 	const [ modalOpen, setModalStatus ] = useState( false );
-	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
-	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
+	const closeModal = useCallback( () => setModalStatus( false ), [
+		setModalStatus,
+	] );
+	const openModal = useCallback( () => setModalStatus( true ), [
+		setModalStatus,
+	] );
 	const prevPostMeta = usePrevious( postMeta );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 
@@ -59,25 +67,30 @@ const LayerSettings = ( {
 		return postMeta.layer_type_options.interactions || [];
 	}, [ postMeta.layer_type_options.interactions ] );
 
-	const setInteractions = useCallback( ( e ) => {
-		setPostMeta( {
-			...postMeta,
-			layer_type_options: {
-				...postMeta.layer_type_options,
-				interactions: e,
-			},
-		} );
-	}, [ postMeta, setPostMeta ] );
+	const setInteractions = useCallback(
+		( e ) => {
+			setPostMeta( {
+				...postMeta,
+				layer_type_options: {
+					...postMeta.layer_type_options,
+					interactions: e,
+				},
+			} );
+		},
+		[ postMeta, setPostMeta ]
+	);
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			window.JeoLayerTypes
-				.getLayerTypeSchema( postMeta )
+			window.JeoLayerTypes.getLayerTypeSchema( postMeta )
 				.then( formUpdater( setOptions, setWidgets ) )
 				.then( () => {
 					if ( postMeta.type ) {
 						let layerTypeOptions = {};
-						if ( ! prevPostMeta || prevPostMeta && prevPostMeta.type === postMeta.type ) {
+						if (
+							! prevPostMeta ||
+							( prevPostMeta && prevPostMeta.type === postMeta.type )
+						) {
 							layerTypeOptions = postMeta.layer_type_options;
 						}
 						setPostMeta( {
@@ -90,10 +103,12 @@ const LayerSettings = ( {
 		} else {
 			setOptions( {} );
 		}
-	}, [ postMeta.type ])
+	}, [ postMeta.type ] );
 
 	useEffect( () => {
-		const layerType = window.JeoLayerTypes.getLayerType( debouncedPostMeta.type );
+		const layerType = window.JeoLayerTypes.getLayerType(
+			debouncedPostMeta.type
+		);
 		if ( layerType && layerType.getStyleLayers ) {
 			layerType.getStyleLayers( debouncedPostMeta ).then( setStyleLayers );
 		} else {
@@ -137,14 +152,12 @@ const LayerSettings = ( {
 	);
 };
 
-export default withDispatch(
-	( dispatch ) => ( {
-		setPostMeta: ( meta ) => {
-			dispatch( 'core/editor' ).editPost( { meta } );
-		},
-	} )
-)( withSelect(
-	( select ) => ( {
+export default withDispatch( ( dispatch ) => ( {
+	setPostMeta: ( meta ) => {
+		dispatch( 'core/editor' ).editPost( { meta } );
+	},
+} ) )(
+	withSelect( ( select ) => ( {
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-	} )
-)( LayerSettings ) );
+	} ) )( LayerSettings )
+);

@@ -4,7 +4,10 @@ import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
 
 export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
-	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {
+	if (
+		[ 'swappable', 'switchable' ].includes( instance.use ) &&
+		! instance.default
+	) {
 		return null;
 	}
 
@@ -32,16 +35,12 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 							],
 						} }
 						onSourceLoaded={ () => {
-							if( onSourceLoadedCallback ) {
+							if ( onSourceLoadedCallback ) {
 								onSourceLoadedCallback();
 							}
-						} }		
+						} }
 					/>
-					<Layer
-						id={ layerId }
-						type="raster"
-						sourceId={ sourceId }
-					/>
+					<Layer id={ layerId } type="raster" sourceId={ sourceId } />
 				</Fragment>
 			);
 		case 'mapbox-tileset-vector':
@@ -61,7 +60,7 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 							url: `mapbox://${ options.tileset_id }`,
 						} }
 						onSourceLoaded={ () => {
-							if( onSourceLoadedCallback ) {
+							if ( onSourceLoadedCallback ) {
 								onSourceLoadedCallback();
 							}
 						} }
@@ -84,7 +83,7 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 							tiles: [ options.url ],
 						} }
 						onSourceLoaded={ () => {
-							if( onSourceLoadedCallback ) {
+							if ( onSourceLoadedCallback ) {
 								onSourceLoadedCallback();
 							}
 						} }
@@ -108,16 +107,12 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 							tileSize: 256,
 						} }
 						onSourceLoaded={ () => {
-							if( onSourceLoadedCallback ) {
+							if ( onSourceLoadedCallback ) {
 								onSourceLoadedCallback();
 							}
 						} }
 					/>
-					<Layer
-						id={ layerId }
-						type="raster"
-						sourceId={ sourceId }
-					/>
+					<Layer id={ layerId } type="raster" sourceId={ sourceId } />
 				</Fragment>
 			);
 		default:
@@ -126,5 +121,8 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 }
 
 export const MemoizedRenderLayer = memo( renderLayer, ( props, prevProps ) => {
-	return isEqual(props.layer.layer_type_options, prevProps.layer.layer_type_options);
+	return isEqual(
+		props.layer.layer_type_options,
+		prevProps.layer.layer_type_options
+	);
 } );

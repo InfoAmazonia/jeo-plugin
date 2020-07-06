@@ -13,14 +13,21 @@ class JeoGeoAutoComplete extends Component {
 			isLoading: false,
 		};
 		this.onChange = this.onChange.bind( this );
-		this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind( this );
-		this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind( this );
+		this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(
+			this
+		);
+		this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(
+			this
+		);
 		this.getSuggestionValue = this.getSuggestionValue.bind( this );
 		this.renderSuggestion = this.renderSuggestion.bind( this );
 		this.onSuggestionSelected = this.onSuggestionSelected.bind( this );
 		this.shouldRenderSuggestions = this.shouldRenderSuggestions.bind( this );
 
-		this.debouncedLoadSuggestions = _.debounce( this.onSuggestionsFetchRequested, 500 );
+		this.debouncedLoadSuggestions = _.debounce(
+			this.onSuggestionsFetchRequested,
+			500
+		);
 	}
 
 	onChange( event, { newValue } ) {
@@ -31,21 +38,23 @@ class JeoGeoAutoComplete extends Component {
 		return suggestion.full_address;
 	}
 
-	onSuggestionSelected( event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method } ) {
+	onSuggestionSelected(
+		event,
+		{ suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+	) {
 		this.props.onSelect( suggestion );
 	}
 
 	renderSuggestion( suggestion ) {
 		return (
-			<div className="jeo-geo-autocomplete">
-				{ suggestion.full_address }
-			</div>
+			<div className="jeo-geo-autocomplete">{ suggestion.full_address }</div>
 		);
 	}
 
 	onSuggestionsFetchRequested( { value } ) {
 		this.setState( { isLoading: true } );
-		window.fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + value )
+		window
+			.fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + value )
 			.then( ( response ) => {
 				return response.json();
 			} )
@@ -86,9 +95,7 @@ class JeoGeoAutoComplete extends Component {
 					shouldRenderSuggestions={ this.shouldRenderSuggestions }
 					inputProps={ inputProps }
 				/>
-				{ this.state.isLoading &&
-					<Spinner />
-				}
+				{ this.state.isLoading && <Spinner /> }
 			</div>
 		);
 	}

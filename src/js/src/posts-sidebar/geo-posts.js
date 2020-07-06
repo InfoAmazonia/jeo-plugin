@@ -278,7 +278,10 @@ class JeoGeocodePosts extends Component {
 		const { points } = this.state;
 
 		const coords = points.map( ( point ) => {
-			return [ parseFloat( point._geocode_lat ), parseFloat( point._geocode_lon ) ];
+			return [
+				parseFloat( point._geocode_lat ),
+				parseFloat( point._geocode_lon ),
+			];
 		} );
 
 		const map = e.target;
@@ -309,17 +312,26 @@ class JeoGeocodePosts extends Component {
 		} );
 	}
 
-	componentDidUpdate(prevProps, prevState){
-		if ( ( prevState.searchValue !== this.state.searchValue ) 
-			&& this.state.loadStatus !== 'resolved' ) {
-				this.setState( { loadStatus: 'pending' } );
+	componentDidUpdate( prevProps, prevState ) {
+		if (
+			prevState.searchValue !== this.state.searchValue &&
+			this.state.loadStatus !== 'resolved'
+		) {
+			this.setState( { loadStatus: 'pending' } );
 		}
 	}
 
 	renderForm() {
-		const { currentMarkerIndex, points, searchValue, formMode, loadStatus } = this.state;
-		let isDisabled = ! ( loadStatus === 'resolved' && 
-			searchValue.replace( /\s/g, '' ).length );
+		const {
+			currentMarkerIndex,
+			points,
+			searchValue,
+			formMode,
+			loadStatus,
+		} = this.state;
+		let isDisabled = ! (
+			loadStatus === 'resolved' && searchValue.replace( /\s/g, '' ).length
+		);
 
 		const selectedPoint = points[ currentMarkerIndex ];
 		return (
@@ -347,7 +359,7 @@ class JeoGeocodePosts extends Component {
 							] }
 							onChange={ this.relevanceClick }
 						/>
-					)  }
+					) }
 					<div className="jeo-geocode-posts__row">
 						<div className="jeo-geocode-posts__buttons-list">
 							<Button isSecondary onClick={ this.onClickCancel }>
@@ -358,9 +370,9 @@ class JeoGeocodePosts extends Component {
 								onClick={ this.handleClickSave }
 								disabled={ isDisabled }
 							>
-								{ formMode === 'edit' ?
-									__( 'Update selected point', 'jeo' ) :
-									__( 'Save new point', 'jeo' ) }
+								{ formMode === 'edit'
+									? __( 'Update selected point', 'jeo' )
+									: __( 'Save new point', 'jeo' ) }
 							</Button>
 						</div>
 					</div>
@@ -371,7 +383,8 @@ class JeoGeocodePosts extends Component {
 
 	render() {
 		const { currentMarkerIndex, formMode, zoom } = this.state;
-		const pointsList = formMode !== 'new' ? this.state.points : this.state.pointsCheckpoint;
+		const pointsList =
+			formMode !== 'new' ? this.state.points : this.state.pointsCheckpoint;
 		const pointsMap = this.state.points;
 
 		return (
@@ -402,7 +415,9 @@ class JeoGeocodePosts extends Component {
 								{ pointsList.map( ( point, i ) => (
 									<li
 										id={ i }
-										onClick={ formMode === 'view' ? this.clickMarkerList : null }
+										onClick={
+											formMode === 'view' ? this.clickMarkerList : null
+										}
 										className={ classNames( [
 											'jeo-geocode-posts__post',
 											( point && point.relevance ) || 'primary',
@@ -456,23 +471,27 @@ class JeoGeocodePosts extends Component {
 								let icon;
 
 								if ( ! point.relevance || point.relevance === 'primary' ) {
-									icon = new L.Icon({
-										iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-										iconSize:     [25, 41],
-										iconAnchor:   [12, 41],
-									})
+									icon = new L.Icon( {
+										iconUrl:
+											'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+										iconSize: [ 25, 41 ],
+										iconAnchor: [ 12, 41 ],
+									} );
 								} else {
-									icon = new L.Icon({
-										iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
-										iconSize:     [25, 41],
-										iconAnchor:   [12, 41],
-									})
+									icon = new L.Icon( {
+										iconUrl:
+											'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+										iconSize: [ 25, 41 ],
+										iconAnchor: [ 12, 41 ],
+									} );
 								}
 
 								return (
 									<Marker
 										icon={ icon }
-										draggable={ currentMarkerIndex === i && formMode !== 'view' }
+										draggable={
+											currentMarkerIndex === i && formMode !== 'view'
+										}
 										onDragend={ this.onMarkerDragged }
 										onClick={ formMode === 'view' ? this.clickMarkerMap : null }
 										position={ [
@@ -482,7 +501,7 @@ class JeoGeocodePosts extends Component {
 										id={ i }
 										opacity={ currentMarkerIndex === i ? 1 : 0.6 }
 									/>
-								)
+								);
 							} ) }
 						</LeafletMap>
 					</div>
