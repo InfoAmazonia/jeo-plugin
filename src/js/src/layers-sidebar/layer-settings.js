@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
 import { pickBy } from 'lodash-es';
 import InteractionsSettings from './interactions-settings';
+import { useDebounce } from 'use-debounce';
 
 const layerSchema = {
 	type: 'object',
@@ -14,32 +15,16 @@ const layerSchema = {
 	required: [ 'type' ],
 };
 
-const formUpdater = ( setOptions, setWidgets, typeVector = false ) => ( options ) => {
+const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 	const widgets = { layer_type_options: {} };
 	Object.entries( options.properties ).forEach( ( [ key, property ] ) => {
 		if ( property.description ) {
 			widgets.layer_type_options[ key ] = { 'ui:help': property.description };
 			delete property.description;
 		}
-		switch ( key ) {
-			case 'type':
-				if ( ! typeVector ) {
-					options.properties[ key ].enum = [ 'raster' ];
-					break;
-				}
-				let typeEnum = [];
-				typeEnum = options.properties[ key ].enum.filter( type => type !== 'raster' );
-				options.properties[ key ].enum = typeEnum;
-				break;
-			case 'source_layer':
-				if ( ! typeVector ) {
-					delete widgets.layer_type_options[ key ];
-					delete options.properties[ key ];
-					break;
-				}
-				break;
-			default: 
-				break;
+		if ( property.disabled ) {
+			widgets.layer_type_options[key] = { 'ui:disabled': true }
+			delete property.disabled;
 		}
 	} );
 	setWidgets( widgets );
@@ -52,7 +37,7 @@ function usePrevious(value) {
 	  ref.current = value;
 	}, [value]);
 	return ref.current;
-  }
+};
 
 const LayerSettings = ( {
 	postMeta,
@@ -64,7 +49,8 @@ const LayerSettings = ( {
 	const [ modalOpen, setModalStatus ] = useState( false );
 	const closeModal = useCallback( () => setModalStatus( false ), [ setModalStatus ] );
 	const openModal = useCallback( () => setModalStatus( true ), [ setModalStatus ] );
-	const prevPostMeta = usePrevious(postMeta);
+	const prevPostMeta = usePrevious( postMeta );
+	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
 	layerSchema.properties.layer_type_options = options;
@@ -85,36 +71,35 @@ const LayerSettings = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			let filledTypeOptions = {}
-			if ( ! prevPostMeta ){
-				filledTypeOptions = pickBy(postMeta.layer_type_options)
-			}
-			setPostMeta( { layer_type_options: filledTypeOptions } );
 			window.JeoLayerTypes
 				.getLayerTypeSchema( postMeta )
-				.then( formUpdater( setOptions, setWidgets ) );
+				.then( formUpdater( setOptions, setWidgets ) )
+				.then( () => {
+					if ( postMeta.type ) {
+						let layerTypeOptions = {};
+						if ( ! prevPostMeta || prevPostMeta && prevPostMeta.type === postMeta.type ) {
+							layerTypeOptions = postMeta.layer_type_options;
+						}
+						setPostMeta( {
+							...postMeta,
+							layer_type_options: layerTypeOptions,
+						} );
+						setStyleLayers( null );
+					}
+				} );
 		} else {
 			setOptions( {} );
 		}
-	}, [ postMeta.type ] );
+	}, [ postMeta.type ])
 
 	useEffect( () => {
-		if ( postMeta.type === 'mapbox-tileset' ) {
-			const typeVector = postMeta.layer_type_options.style_source_type === 'vector';
-			window.JeoLayerTypes
-				.getLayerTypeSchema( postMeta )
-				.then( formUpdater( setOptions, setWidgets, typeVector ) );
-		}
-	}, [ postMeta.layer_type_options.style_source_type ] );
-
-	useEffect( () => {
-		const layerType = window.JeoLayerTypes.getLayerType( postMeta.type );
+		const layerType = window.JeoLayerTypes.getLayerType( debouncedPostMeta.type );
 		if ( layerType && layerType.getStyleLayers ) {
-			layerType.getStyleLayers( postMeta ).then( setStyleLayers );
+			layerType.getStyleLayers( debouncedPostMeta ).then( setStyleLayers );
 		} else {
 			setStyleLayers( null );
 		}
-	}, [ postMeta, setStyleLayers ] );
+	}, [ debouncedPostMeta ] );
 
 	return (
 		<Fragment>
@@ -124,10 +109,6 @@ const LayerSettings = ( {
 				uiSchema={ widgets }
 				formData={ postMeta }
 				onChange={ ( { formData } ) => {
-					if ( ! formData.layer_type_options.source_layer ) {
-						formData.layer_type_options.source_layer = '';
-					}
-
 					window.layerFormData = formData;
 					setPostMeta( formData );
 				} }

@@ -1,4 +1,4 @@
-window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
+window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -20,7 +20,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 				id: attributes.layer_id,
 				type: attributes.layer_type_options.type,
 				source: attributes.layer_id,
-				'source-layer': attributes.layer_type_options.source_layer ? attributes.layer_type_options.source_layer : ' ',
+				'source-layer': ''
 			} ],
 		} );
 	},
@@ -41,16 +41,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': attributes.layer_type_options.source_layer ? attributes.layer_type_options.source_layer : ' ',
-			// 'layout': {
-			// 	'line-cap': 'round',
-			// 	'line-join': 'round'
-			// },
-			// 'paint': {
-			// 	'line-opacity': 0.6,
-			// 	'line-color': 'rgb(53, 175, 109)',
-			// 	'line-width': 2
-			// }
+			'source-layer': ''
 		} );
 	},
 
@@ -59,7 +50,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 			resolve( {
 				type: 'object',
 				required: [
-					'tileset_id', 'style_source_type', 'type', 'source_layer'
+					'tileset_id', 'style_source_type', 'type'
 				],
 				properties: {
 					tileset_id: {
@@ -71,32 +62,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset', {
 						title: 'Style Source Type',
 						description: 'Which data the map should display',
 						type: 'string',
+						default: 'raster',
 						enum: [
-							'vector',
 							'raster',
 							'raster-dem',
 						],
 					},
-					source_layer: {
-						type: 'string',
-						title: 'Source layer',
-						description: 'Layer to use from a vector tile source. ',
-					},
 					type: {
 						title: 'Layer Type',
-						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
+						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
 						type: 'string',
-						enum: [
-							'fill',
-							'line',
-							'symbol',
-							'circle',
-							'heatmap',
-							'fill-extrusion',
-							'hillshade',
-							'background',
-							'raster',
-						],
+						default: 'raster',
+						disabled: true
 					},
 				},
 			} );
