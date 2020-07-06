@@ -1,4 +1,9 @@
-import { Button, Spinner, Dashicon, CheckboxControl } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	Dashicon,
+	CheckboxControl,
+} from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -30,18 +35,21 @@ const LayersSettings = ( {
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
 
-	const [ allLayers, setAllLayers ] = useState([]);
+	const [ allLayers, setAllLayers ] = useState( [] );
 
 	useEffect( () => {
-		const allLayersData = select( 'core' ).getEntityRecords( 'postType', 'map-layer' );
+		const allLayersData = select( 'core' ).getEntityRecords(
+			'postType',
+			'map-layer'
+		);
 		if ( ! allLayersData ) {
 			setAllLayers( [] );
 		} else {
 			setAllLayers( allLayersData );
 		}
-	});
+	} );
 
-	allLayers.sort( function( a, b ) {
+	allLayers.sort( function ( a, b ) {
 		if ( a.title.rendered.toLowerCase() < b.title.rendered.toLowerCase() ) {
 			return -1;
 		}
@@ -56,12 +64,15 @@ const LayersSettings = ( {
 	useEffect( () => {
 		const [ firstLayer, ...otherLayers ] = attributes.layers;
 		if ( firstLayer && firstLayer.use !== 'fixed' ) {
-			setLayers( [ { ...firstLayer, use: 'fixed', default: false }, ...otherLayers ] );
+			setLayers( [
+				{ ...firstLayer, use: 'fixed', default: false },
+				...otherLayers,
+			] );
 		}
 	}, [ attributes, setAttributes ] );
 
-	const decodeHtmlEntity = function( str ) {
-		return str.replace( /&#(\d+);/g, function( match, dec ) {
+	const decodeHtmlEntity = function ( str ) {
+		return str.replace( /&#(\d+);/g, function ( match, dec ) {
 			return String.fromCharCode( dec );
 		} );
 	};
@@ -82,13 +93,14 @@ const LayersSettings = ( {
 						placeholder: __( 'Search by layer name', 'jeo' ),
 					} }
 					filterSuggestions={ ( suggestion ) => {
-							if ( suggestion.meta.type ) {
-								return ! attributes.layers.map( ( l ) => { 
-									return l.id 
-								} ).includes( suggestion.id )
-							}
+						if ( suggestion.meta.type ) {
+							return ! attributes.layers
+								.map( ( l ) => {
+									return l.id;
+								} )
+								.includes( suggestion.id );
 						}
-					}
+					} }
 					onSuggestionSelected={ ( e, { suggestion } ) =>
 						setAttributes( {
 							...attributes,
@@ -133,7 +145,10 @@ const LayersSettings = ( {
 							}
 
 							return (
-								<li className="jeo-setting-layer all-layers-list" key={ layer.id }>
+								<li
+									className="jeo-setting-layer all-layers-list"
+									key={ layer.id }
+								>
 									<p>
 										<a
 											className="all-layers-list-link"
@@ -141,15 +156,15 @@ const LayersSettings = ( {
 											target="_blank"
 											rel="noopener noreferrer"
 										>
-											<strong>{ decodeHtmlEntity( layer.title.rendered ) }</strong> | { layer.meta.type }
+											<strong>
+												{ decodeHtmlEntity( layer.title.rendered ) }
+											</strong>{ ' ' }
+											| { layer.meta.type }
 										</a>
 									</p>
 									{ inUse && (
 										<>
-											<Button
-												disabled
-												className="all-layers-list-button"
-											>
+											<Button disabled className="all-layers-list-button">
 												<Dashicon icon="plus" />
 											</Button>
 											<p> (already added) </p>
@@ -161,7 +176,10 @@ const LayersSettings = ( {
 											onClick={ () => {
 												setAttributes( {
 													...attributes,
-													layers: [ ...attributes.layers, setLayer( layer.id ) ],
+													layers: [
+														...attributes.layers,
+														setLayer( layer.id ),
+													],
 												} );
 											} }
 										>
@@ -186,13 +204,17 @@ const LayersSettings = ( {
 					values={ attributes.layers }
 					beforeDrag={ ( { elements, index } ) => {
 						const cells = Array.from( elements[ index ].children );
-						widths = cells.map( ( cell ) => window.getComputedStyle( cell ).width );
+						widths = cells.map(
+							( cell ) => window.getComputedStyle( cell ).width
+						);
 					} }
 					onChange={ ( { oldIndex, newIndex } ) =>
 						setLayers( arrayMove( attributes.layers, oldIndex, newIndex ) )
 					}
 					renderList={ ( { children, isDragged, props } ) => (
-						<table className={ classNames( [ 'jeo-layers-list', { isDragged } ] ) }>
+						<table
+							className={ classNames( [ 'jeo-layers-list', { isDragged } ] ) }
+						>
 							<tbody { ...props }>{ children }</tbody>
 						</table>
 					) }
@@ -200,17 +222,17 @@ const LayersSettings = ( {
 						const switchDefault = ( def ) =>
 							setLayers(
 								attributes.layers.map( ( settings ) =>
-									settings.id === value.id ?
-										{ ...settings, default: def } :
-										settings
+									settings.id === value.id
+										? { ...settings, default: def }
+										: settings
 								)
 							);
 						const switchShowLegend = ( def ) => {
 							setLayers(
 								attributes.layers.map( ( settings ) =>
-									settings.id === value.id ?
-										{ ...settings, show_legend: def } :
-										settings
+									settings.id === value.id
+										? { ...settings, show_legend: def }
+										: settings
 								)
 							);
 						};
@@ -220,9 +242,9 @@ const LayersSettings = ( {
 								attributes.layers.map( ( settings ) => ( {
 									...settings,
 									default:
-										settings.use === 'swappable' ? // update only the swappable layers
-											settings.id === value.id : // radio-like behavior: turn off all other swappable layers
-											settings.default,
+										settings.use === 'swappable' // update only the swappable layers
+											? settings.id === value.id // radio-like behavior: turn off all other swappable layers
+											: settings.default,
 								} ) )
 							);
 						const updateUse = ( use ) =>
@@ -235,18 +257,22 @@ const LayersSettings = ( {
 										...settings,
 										use,
 										default:
-											use === 'swappable' ?
-												! anySwapDefault( attributes.layers ) :
-												settings.default,
+											use === 'swappable'
+												? ! anySwapDefault( attributes.layers )
+												: settings.default,
 									};
 								} )
 							);
 						const removeLayer = () => {
-							const confirmation = confirm( __( 'Do you really want to delete this layer?' ) );
+							const confirmation = confirm(
+								__( 'Do you really want to delete this layer?' )
+							);
 
 							if ( confirmation ) {
 								return setLayers(
-									attributes.layers.filter( ( settings ) => settings.id !== value.id )
+									attributes.layers.filter(
+										( settings ) => settings.id !== value.id
+									)
 								);
 							}
 						};

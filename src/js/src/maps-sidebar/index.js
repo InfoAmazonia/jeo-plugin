@@ -8,14 +8,14 @@ domReady( () => {
 	const currentPostType = select( 'core/editor' ).getCurrentPostType();
 
 	if ( currentPostType === 'map' ) {
-		jQuery( '.editor-post-title' ).after( '<div id="map-preview" style="margin: 0 10%">' );
+		jQuery( '.editor-post-title' ).after(
+			'<div id="map-preview" style="margin: 0 10%">'
+		);
 
 		registerPlugin( 'jeo-maps-sidebar', {
 			icon: null,
 			render: () => {
-				return (
-					<MapsSidebar />
-				);
+				return <MapsSidebar />;
 			},
 		} );
 	}

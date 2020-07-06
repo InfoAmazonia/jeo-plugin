@@ -23,28 +23,46 @@ export default function InteractionsSettings( {
 		} );
 	}, [ layers ] );
 
-	const onInsert = useCallback( ( newInteraction ) => {
-		setInteractions( [ ...interactions, newInteraction ] );
-	}, [ interactions, setInteractions ] );
+	const onInsert = useCallback(
+		( newInteraction ) => {
+			setInteractions( [ ...interactions, newInteraction ] );
+		},
+		[ interactions, setInteractions ]
+	);
 
-	const onUpdate = useCallback( ( interactionId, newInteraction ) => {
-		setInteractions( interactions.map( ( interaction ) => {
-			return interaction.id === interactionId ? newInteraction : interaction;
-		} ) );
-	}, [ interactions, setInteractions ] );
+	const onUpdate = useCallback(
+		( interactionId, newInteraction ) => {
+			setInteractions(
+				interactions.map( ( interaction ) => {
+					return interaction.id === interactionId
+						? newInteraction
+						: interaction;
+				} )
+			);
+		},
+		[ interactions, setInteractions ]
+	);
 
-	const onDelete = useCallback( ( interactionId ) => {
-		setInteractions( interactions.filter( ( interaction ) => interaction.id !== interactionId ) );
-	}, [ interactions, setInteractions ] );
+	const onDelete = useCallback(
+		( interactionId ) => {
+			setInteractions(
+				interactions.filter(
+					( interaction ) => interaction.id !== interactionId
+				)
+			);
+		},
+		[ interactions, setInteractions ]
+	);
 
 	const layersSourceOptions = useMemo( () => {
 		if ( ! layers ) {
 			return [];
 		}
-		const uniqueSources = Array.from( new Set( layers.map( ( layer ) => layer.source ) ) )
-			.map( ( source ) => {
-				return layers.find( ( layer ) => layer.source === source );
-			} );
+		const uniqueSources = Array.from(
+			new Set( layers.map( ( layer ) => layer.source ) )
+		).map( ( source ) => {
+			return layers.find( ( layer ) => layer.source === source );
+		} );
 		const options = uniqueSources.map( ( source ) => {
 			return { value: source.source, label: source.sourceName };
 		} );
@@ -54,7 +72,9 @@ export default function InteractionsSettings( {
 		return options;
 	}, [ layers ] );
 
-	const [ selectedSource, setSelectedSource ] = useState( layersSourceOptions.length > 1 ? 'all' : layersSourceOptions[ 0 ].source );
+	const [ selectedSource, setSelectedSource ] = useState(
+		layersSourceOptions.length > 1 ? 'all' : layersSourceOptions[ 0 ].source
+	);
 
 	return (
 		<Modal
@@ -72,7 +92,11 @@ export default function InteractionsSettings( {
 			/>
 			<Panel className="jeo-interactions-settings">
 				{ interactiveLayers.map( ( layer ) => {
-					if ( layer.source === selectedSource || selectedSource === 'all' || layersSourceOptions.length <= 1 ) {
+					if (
+						layer.source === selectedSource ||
+						selectedSource === 'all' ||
+						layersSourceOptions.length <= 1
+					) {
 						const index = interactions.findIndex( ( x ) => x.id === layer.id );
 						const interaction = interactions[ index ];
 						return (

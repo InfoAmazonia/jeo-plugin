@@ -82,7 +82,10 @@ const OnetimeMapEditor = ( {
 			<div className="jeo-preview-area">
 				<Map
 					onStyleLoad={ ( map ) => {
-						map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
+						map.addControl(
+							new mapboxgl.NavigationControl( { showCompass: false } ),
+							'top-left'
+						);
 						map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 					} }
 					key={ currentZoom }
@@ -93,9 +96,7 @@ const OnetimeMapEditor = ( {
 						attributes.center_lat || mapDefaults.lat,
 					] }
 					containerStyle={ { height: '50vh' } }
-
 					animationOptions={ animationOptions }
-
 					onMoveEnd={ ( map ) => {
 						const center = map.getCenter();
 						const zoom = Math.round( map.getZoom() * 10 ) / 10;
@@ -107,10 +108,13 @@ const OnetimeMapEditor = ( {
 						} );
 					} }
 				>
-					{ loadedLayers && attributes.layers.map( ( layer ) => {
-						const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id ).meta;
-						return renderLayer( { layer: layerOptions, instance: layer } );
-					} ) }
+					{ loadedLayers &&
+						attributes.layers.map( ( layer ) => {
+							const layerOptions = loadedLayers.find(
+								( { id } ) => id === layer.id
+							).meta;
+							return renderLayer( { layer: layerOptions, instance: layer } );
+						} ) }
 				</Map>
 			</div>
 
@@ -131,10 +135,10 @@ export default withSelect( ( select, { attributes } ) => {
 			'map-layer',
 			query
 		),
-		loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-			'postType',
-			'map-layer',
-			query,
-		] ),
+		loadingLayers: select( 'core/data' ).isResolving(
+			'core',
+			'getEntityRecords',
+			[ 'postType', 'map-layer', query ]
+		),
 	};
 } )( OnetimeMapEditor );

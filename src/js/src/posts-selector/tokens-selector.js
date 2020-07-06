@@ -15,19 +15,28 @@ export function TokensSelector( {
 		return collection.map( ( item ) => item.name );
 	}, [ collection, loadingCollection ] );
 
-	const displayTransform = useCallback( ( item ) => {
-		const found = collection.find( ( x ) => x.id === item );
-		return found ? found.name : item;
-	}, [ collection ] );
+	const displayTransform = useCallback(
+		( item ) => {
+			const found = collection.find( ( x ) => x.id === item );
+			return found ? found.name : item;
+		},
+		[ collection ]
+	);
 
-	const saveTransform = useCallback( ( item ) => {
-		const found = collection.find( ( x ) => x.name === item.trim() );
-		return String( found ? found.id : item );
-	}, [ collection ] );
+	const saveTransform = useCallback(
+		( item ) => {
+			const found = collection.find( ( x ) => x.name === item.trim() );
+			return String( found ? found.id : item );
+		},
+		[ collection ]
+	);
 
-	const onChange = useCallback( ( e ) => {
-		_onChange( e.map( Number ) );
-	}, [ _onChange ] );
+	const onChange = useCallback(
+		( e ) => {
+			_onChange( e.map( Number ) );
+		},
+		[ _onChange ]
+	);
 
 	return (
 		<FormTokenField

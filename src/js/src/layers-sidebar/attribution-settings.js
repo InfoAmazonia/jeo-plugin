@@ -12,10 +12,7 @@ const layerSchema = {
 	},
 };
 
-const AttributionSettings = ( {
-	postMeta,
-	setPostMeta,
-} ) => {
+const AttributionSettings = ( { postMeta, setPostMeta } ) => {
 	return (
 		<Fragment>
 			<Form
@@ -23,19 +20,27 @@ const AttributionSettings = ( {
 				schema={ layerSchema }
 				formData={ postMeta }
 				onChange={ ( { formData } ) => {
-					const regex = new RegExp( /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi );
+					const regex = new RegExp(
+						/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+					);
 
 					let attributionLink = formData.attribution;
 					let sourceLink = formData.source_url;
 
-					if ( formData.attribution && ! formData.attribution.includes( 'http' ) ) {
+					if (
+						formData.attribution &&
+						! formData.attribution.includes( 'http' )
+					) {
 						if ( formData.attribution.match( regex ) ) {
 							attributionLink = `https://${ formData.attribution }`;
 						}
 					}
 					formData.attribution = attributionLink;
 
-					if ( formData.source_url && ! formData.source_url.includes( 'http' ) ) {
+					if (
+						formData.source_url &&
+						! formData.source_url.includes( 'http' )
+					) {
 						if ( formData.source_url.match( regex ) ) {
 							sourceLink = `https://${ formData.source_url }`;
 						}
@@ -64,14 +69,12 @@ const AttributionSettings = ( {
 	);
 };
 
-export default withDispatch(
-	( dispatch ) => ( {
-		setPostMeta: ( meta ) => {
-			dispatch( 'core/editor' ).editPost( { meta } );
-		},
-	} )
-)( withSelect(
-	( select ) => ( {
+export default withDispatch( ( dispatch ) => ( {
+	setPostMeta: ( meta ) => {
+		dispatch( 'core/editor' ).editPost( { meta } );
+	},
+} ) )(
+	withSelect( ( select ) => ( {
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-	} )
-)( AttributionSettings ) );
+	} ) )( AttributionSettings )
+);
