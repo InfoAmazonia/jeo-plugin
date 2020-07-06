@@ -5,8 +5,8 @@ const loadLayers = ( layers ) => ( settings ) => {
 	return layers.find( ( l ) => l.id === settings.id );
 };
 
-const decodeHtmlEntity = function( str ) {
-	return str.replace( /&#(\d+);/g, function( match, dec ) {
+const decodeHtmlEntity = function ( str ) {
+	return str.replace( /&#(\d+);/g, function ( match, dec ) {
 		return String.fromCharCode( dec );
 	} );
 };

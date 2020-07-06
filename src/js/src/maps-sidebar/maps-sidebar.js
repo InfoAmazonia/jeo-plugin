@@ -61,9 +61,12 @@ function MapsSidebar( {
 	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
 
-	const loadLayer = useCallback( layerLoader( loadedLayers ), [ loadedLayers ] );
+	const loadLayer = useCallback( layerLoader( loadedLayers ), [
+		loadedLayers,
+	] );
 
-	const embedUrl = postId && `${ jeo_settings.site_url }/embed/?map_id=${ postId }`;
+	const embedUrl =
+		postId && `${ jeo_settings.site_url }/embed/?map_id=${ postId }`;
 
 	const {
 		center_lat: centerLat,
@@ -81,25 +84,36 @@ function MapsSidebar( {
 
 	useEffect( () => {
 		if ( ! MapboxAPIKey ) {
-			sendNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
-				id: 'layer_notices_no_api_key',
-				isDismissible: true,
-				actions: [{
-					url: '/wp-admin/admin.php?page=jeo-settings',
-					label: 'Check your settings.',
-				}],
-			});
+			sendNotice(
+				'warning',
+				__( "There's no API Key found in your JEO Settings.", 'jeo' ),
+				{
+					id: 'layer_notices_no_api_key',
+					isDismissible: true,
+					actions: [
+						{
+							url: '/wp-admin/admin.php?page=jeo-settings',
+							label: 'Check your settings.',
+						},
+					],
+				}
+			);
 
-			
 			lockPostSaving();
 		} else {
 			async function verifyAPIKey() {
-				const response = await fetch(`https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=${ MapboxAPIKey }`);
+				const response = await fetch(
+					`https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=${ MapboxAPIKey }`
+				);
 				if ( response.status >= 400 ) {
-					sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
-						id: 'layer_notices_no_api_key',
-						isDismissible: true,
-					});
+					sendNotice(
+						'warning',
+						__( 'Your Mapbox access token may be invalid.', 'jeo' ),
+						{
+							id: 'layer_notices_no_api_key',
+							isDismissible: true,
+						}
+					);
 					lockPostSaving();
 				}
 			}
@@ -154,7 +168,7 @@ function MapsSidebar( {
 				border: 0,
 			} );
 		}
-	}, [ maxButtonSelected ] );	
+	}, [ maxButtonSelected ] );
 
 	return (
 		<Fragment>
@@ -168,9 +182,7 @@ function MapsSidebar( {
 				/>
 			) }
 
-			{ embedUrl && (
-				<MapEmbedUrl url={ embedUrl } />
-			) }
+			{ embedUrl && <MapEmbedUrl url={ embedUrl } /> }
 
 			<MapPanel
 				attributes={ postMeta }
@@ -180,9 +192,7 @@ function MapsSidebar( {
 			{ MapboxAPIKey && (
 				<MapPreviewPortal>
 					<div className="zoom-buttons-div">
-						<ButtonGroup
-							className="button-group-div"
-						>
+						<ButtonGroup className="button-group-div">
 							<Button
 								style={ initialButtonStyle }
 								className="zoom-button"
@@ -242,14 +252,21 @@ function MapsSidebar( {
 					</div>
 					<Map
 						onError={ () => {
-							sendNotice( 'warning', __( "Your Mapbox access token may be invalid.", 'jeo' ), {
-								id: 'layer_notices_no_api_key',
-								isDismissible: true,
-							});
+							sendNotice(
+								'warning',
+								__( 'Your Mapbox access token may be invalid.', 'jeo' ),
+								{
+									id: 'layer_notices_no_api_key',
+									isDismissible: true,
+								}
+							);
 							lockPostSaving();
 						} }
 						onStyleLoad={ ( map ) => {
-							map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
+							map.addControl(
+								new mapboxgl.NavigationControl( { showCompass: false } ),
+								'top-left'
+							);
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 						} }
 						key={ key }
@@ -290,12 +307,18 @@ function MapsSidebar( {
 							window[ zoomState ] = zoom;
 						} }
 					>
-						{ loadedLayers && postMeta.layers.map( ( layer ) => {
-							const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id );
-							if ( layerOptions ) {
-								return renderLayer( { layer: layerOptions.meta, instance: layer } );
-							}
-						} ) }
+						{ loadedLayers &&
+							postMeta.layers.map( ( layer ) => {
+								const layerOptions = loadedLayers.find(
+									( { id } ) => id === layer.id
+								);
+								if ( layerOptions ) {
+									return renderLayer( {
+										layer: layerOptions.meta,
+										instance: layer,
+									} );
+								}
+							} ) }
 					</Map>
 				</MapPreviewPortal>
 			) }
@@ -317,33 +340,33 @@ function MapsSidebar( {
 	);
 }
 
-export default withDispatch(
-	( dispatch ) => ( {
-		setPostMeta: ( meta ) => {
-			dispatch( 'core/editor' ).editPost( { meta } );
-		},
-		setRelatedPosts: ( value ) => {
-			dispatch( 'core/editor' ).editPost( { meta: { related_posts: value } } );
-		},
-		sendNotice: ( type, message, options ) => {
-			dispatch( 'core/notices' ).createNotice( type, message, options );
-		},
-		lockPostSaving: () => {
-			dispatch( 'core/editor' ).lockPostSaving( );
-		},
-		lockPostAutoSaving: ( key ) => {
-			dispatch( 'core/editor' ).lockPostAutosaving( key );
-		},
-	} )
-)( withSelect(
-	( select ) => ( {
+export default withDispatch( ( dispatch ) => ( {
+	setPostMeta: ( meta ) => {
+		dispatch( 'core/editor' ).editPost( { meta } );
+	},
+	setRelatedPosts: ( value ) => {
+		dispatch( 'core/editor' ).editPost( { meta: { related_posts: value } } );
+	},
+	sendNotice: ( type, message, options ) => {
+		dispatch( 'core/notices' ).createNotice( type, message, options );
+	},
+	lockPostSaving: () => {
+		dispatch( 'core/editor' ).lockPostSaving();
+	},
+	lockPostAutoSaving: ( key ) => {
+		dispatch( 'core/editor' ).lockPostAutosaving( key );
+	},
+} ) )(
+	withSelect( ( select ) => ( {
 		loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer' ),
-		loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-			'postType',
-			'map-layer',
-		] ),
+		loadingLayers: select( 'core/data' ).isResolving(
+			'core',
+			'getEntityRecords',
+			[ 'postType', 'map-layer' ]
+		),
 		postId: select( 'core/editor' ).getCurrentPostId(),
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-		relatedPosts: select( 'core/editor' ).getEditedPostAttribute( 'meta' ).related_posts,
-	} )
-)( MapsSidebar ) );
+		relatedPosts: select( 'core/editor' ).getEditedPostAttribute( 'meta' )
+			.related_posts,
+	} ) )( MapsSidebar )
+);

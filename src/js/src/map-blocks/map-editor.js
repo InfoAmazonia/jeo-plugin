@@ -24,26 +24,30 @@ const MapEditor = ( {
 		setKey( key + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
-	const decodeHtmlEntity = function( str ) {
-		return str.replace( /&#(\d+);/g, function( match, dec ) {
+	const decodeHtmlEntity = function ( str ) {
+		return str.replace( /&#(\d+);/g, function ( match, dec ) {
 			return String.fromCharCode( dec );
 		} );
 	};
 
 	return (
-		<div
-			className="jeo-mapblock"
-		>
+		<div className="jeo-mapblock">
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && (
 				<Fragment>
 					<div className="jeo-preview-area">
 						<Map
 							onStyleLoad={ ( map ) => {
-								map.addControl( new mapboxgl.NavigationControl( { showCompass: false } ), 'top-left' );
+								map.addControl(
+									new mapboxgl.NavigationControl( { showCompass: false } ),
+									'top-left'
+								);
 
 								if ( loadedMap.meta.enable_fullscreen ) {
-									map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+									map.addControl(
+										new mapboxgl.FullscreenControl(),
+										'top-left'
+									);
 								}
 
 								if ( loadedMap.meta.disable_scroll_zoom ) {
@@ -68,29 +72,40 @@ const MapEditor = ( {
 							] }
 							containerStyle={ { height: '50vh' } }
 						>
-							{ loadedLayers && loadedMap.meta.layers.map( ( layer ) => {
-								const layerOptions = loadedLayers.find( ( { id } ) => id === layer.id );
-								if ( layerOptions ) {
-									return renderLayer( { layer: layerOptions.meta, instance: layer } );
-								}
-							} ) }
+							{ loadedLayers &&
+								loadedMap.meta.layers.map( ( layer ) => {
+									const layerOptions = loadedLayers.find(
+										( { id } ) => id === layer.id
+									);
+									if ( layerOptions ) {
+										return renderLayer( {
+											layer: layerOptions.meta,
+											instance: layer,
+										} );
+									}
+								} ) }
 						</Map>
 					</div>
 					<div className="jeo-preview-controls">
-						<p><strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong></p>
+						<p>
+							<strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
+						</p>
 						<Button
 							className="select-another-map"
 							isLink
 							isLarge
 							onClick={ () => {
 								const previous_map = attributes.map_id;
-								setAttributes( { ...attributes, map_id: undefined, previous_map } );
+								setAttributes( {
+									...attributes,
+									map_id: undefined,
+									previous_map,
+								} );
 							} }
 						>
 							<em>{ __( '(Select another map)' ) }</em>
 						</Button>
 					</div>
-
 				</Fragment>
 			) }
 			{ ! attributes.map_id && (
@@ -140,10 +155,11 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 			attributes.map_id,
 		] ),
 	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer' ),
-	loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-		'postType',
-		'map-layer',
-	] ),
+	loadingLayers: select( 'core/data' ).isResolving(
+		'core',
+		'getEntityRecords',
+		[ 'postType', 'map-layer' ]
+	),
 } ) );
 
 export default compose( withInstanceId, applyWithSelect )( MapEditor );

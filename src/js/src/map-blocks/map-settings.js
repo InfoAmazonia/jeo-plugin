@@ -1,4 +1,10 @@
-import { TextControl, RangeControl, CheckboxControl, Button, ButtonGroup } from '@wordpress/components';
+import {
+	TextControl,
+	RangeControl,
+	CheckboxControl,
+	Button,
+	ButtonGroup,
+} from '@wordpress/components';
 import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -53,7 +59,7 @@ export default ( { attributes, setAttributes } ) => {
 						value={ centerLat }
 						onChange={ ( value ) => {
 							editingMap.current = true;
-							setTimeout( () => editingMap.current = false, 50 );
+							setTimeout( () => ( editingMap.current = false ), 50 );
 							return attributeUpdater( 'center_lat' )( parseNumber( value ) );
 						} }
 					/>
@@ -63,7 +69,7 @@ export default ( { attributes, setAttributes } ) => {
 						value={ centerLon }
 						onChange={ ( value ) => {
 							editingMap.current = true;
-							setTimeout( () => editingMap.current = false, 50 );
+							setTimeout( () => ( editingMap.current = false ), 50 );
 							return attributeUpdater( 'center_lon' )( parseNumber( value ) );
 						} }
 					/>
@@ -110,28 +116,36 @@ export default ( { attributes, setAttributes } ) => {
 						label={ __( 'Scroll zoom on post' ) }
 						checked={ ! attributes.disable_scroll_zoom }
 						onChange={ () => {
-							attributeUpdater( 'disable_scroll_zoom' )( ! attributes.disable_scroll_zoom );
+							attributeUpdater( 'disable_scroll_zoom' )(
+								! attributes.disable_scroll_zoom
+							);
 						} }
 					/>
 					<CheckboxControl
 						label={ __( 'Drag rotation on post' ) }
 						checked={ ! attributes.disable_drag_rotate }
 						onChange={ () => {
-							attributeUpdater( 'disable_drag_rotate' )( ! attributes.disable_drag_rotate );
+							attributeUpdater( 'disable_drag_rotate' )(
+								! attributes.disable_drag_rotate
+							);
 						} }
 					/>
 					<CheckboxControl
 						label={ __( 'Map navigation on post' ) }
 						checked={ ! attributes.disable_drag_pan }
 						onChange={ () => {
-							attributeUpdater( 'disable_drag_pan' )( ! attributes.disable_drag_pan );
+							attributeUpdater( 'disable_drag_pan' )(
+								! attributes.disable_drag_pan
+							);
 						} }
 					/>
 					<CheckboxControl
 						label={ __( 'Fullscreen button on post' ) }
 						checked={ attributes.enable_fullscreen }
 						onChange={ () => {
-							attributeUpdater( 'enable_fullscreen' )( ! attributes.enable_fullscreen );
+							attributeUpdater( 'enable_fullscreen' )(
+								! attributes.enable_fullscreen
+							);
 						} }
 					/>
 				</section>

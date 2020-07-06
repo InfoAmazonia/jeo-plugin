@@ -8,10 +8,7 @@ export default function MapEmbedUrl( { url } ) {
 	return (
 		<PluginPostStatusInfo className="jeo-embed-url">
 			<span>{ __( 'Embed URL', 'jeo' ) } </span>
-			<TextControl
-				readOnly
-				value={ url }
-			/>
+			<TextControl readOnly value={ url } />
 		</PluginPostStatusInfo>
 	);
 }
