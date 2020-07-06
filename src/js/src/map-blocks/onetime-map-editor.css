@@ -89,11 +89,47 @@
  */
 .jeo-layers-library-controls,
 .jeo-layers-library .library-controls {
+	margin-left: 12px;
 	display: flex;
 	align-items: center;
-	justify-content: center;
 	padding: 1em 0;
 }
+
+/*new layer settings modal*/
+.jeo-layers-modal .jeo-layers-library-controls {
+    margin-left: 0px;
+    padding: 1em;
+}
+
+.jeo-layers-library-controls button.components-button {
+    height: 30px;
+}
+
+.layer-info__single-row {
+	margin: 0px;
+	margin-bottom: 3px;
+}
+
+li.jeo-setting-layer.all-layers-list {
+    margin-bottom: 0px;
+}
+
+.layer-buttons .add-button, .layer-buttons .remove-button{
+	margin-bottom: 0px;
+}
+
+.jeo-layers-list .layer-card .layer-info {
+    margin-top: 0px;
+}
+
+ul.jeo-layers-list .components-card {
+    height: auto;
+}
+
+.jeo-layers-modal .done-button {
+    margin: 15px;
+}
+/**/
 
 .jeo-layers-library-controls .components-base-control__field,
 .jeo-layers-library .library-controls .components-base-control__field {
