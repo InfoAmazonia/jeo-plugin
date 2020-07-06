@@ -7,6 +7,7 @@ import L from 'leaflet';
 
 import JeoGeoAutoComplete from './geo-auto-complete';
 import './geo-posts.css';
+import { isEqual } from 'lodash-es';
 
 class JeoGeocodePosts extends Component {
 	constructor() {
@@ -257,10 +258,15 @@ class JeoGeocodePosts extends Component {
 
 			const { formMode, points, pointsCheckpoint } = this.state;
 			if ( formMode === 'new' && points.length === pointsCheckpoint.length ) {
-				this.setState( {
-					points: [ ...points, foundPoint ],
-					currentMarkerIndex: points.length,
-				} );
+				const existingPoint = points.filter( ( p ) =>
+					isEqual( p, foundPoint )
+				);
+				if ( ! existingPoint.length ) {
+					this.setState( {
+						points: [ ...points, foundPoint ],
+						currentMarkerIndex: points.length,
+					} );
+				}
 			} else {
 				this.updateCurrentPoint( foundPoint );
 			}
