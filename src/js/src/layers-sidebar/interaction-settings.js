@@ -35,9 +35,10 @@ export default function InteractionSettings( {
 	}, [ layer.fields ] );
 
 	const titleOptions = useMemo( () => {
+		const newFieldKeys = fieldKeys.slice(1);
 		return [
-			{ label: __( 'None', 'jeo' ), value: undefined },
-			...fieldKeys.map( ( field ) => {
+			{ label: fieldKeys[0], value: fieldKeys[0] },
+			...newFieldKeys.map( ( field ) => {
 				return { label: field, value: field };
 			} ),
 		];
