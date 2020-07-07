@@ -26,7 +26,9 @@ const LayersLibrary = ( {
 		)
 		.map( ( layer ) => ( {
 			...layer,
-			selected: attributes.layers.some( ( settings ) => settings.id === layer.id ),
+			selected: attributes.layers.some(
+				( settings ) => settings.id === layer.id
+			),
 		} ) );
 
 	return (
@@ -82,8 +84,9 @@ const LayersLibrary = ( {
 
 export default withSelect( ( select ) => ( {
 	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer' ),
-	loadingLayers: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-		'postType',
-		'map-layer',
-	] ),
+	loadingLayers: select( 'core/data' ).isResolving(
+		'core',
+		'getEntityRecords',
+		[ 'postType', 'map-layer' ]
+	),
 } ) )( LayersLibrary );

@@ -1,4 +1,5 @@
 {
 	"singleQuote": true,
-	"bracketSpacing": true
+	"bracketSpacing": true,
+	"parenSpacing": true
 }

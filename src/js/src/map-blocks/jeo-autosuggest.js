@@ -4,7 +4,11 @@ import { useCallback, useState } from '@wordpress/element';
 import Autosuggest from 'react-autosuggest';
 
 const GutenbergAutosuggest = withSelect( ( select, { query, postType } ) => ( {
-	entityRecords: select( 'core' ).getEntityRecords( 'postType', postType, query ),
+	entityRecords: select( 'core' ).getEntityRecords(
+		'postType',
+		postType,
+		query
+	),
 	loading: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
 		'postType',
 		postType,
@@ -17,15 +21,16 @@ const GutenbergAutosuggest = withSelect( ( select, { query, postType } ) => ( {
 	/>
 ) );
 
-const decodeHtmlEntity = function( str ) {
-	return str.replace( /&#(\d+);/g, function( match, dec ) {
+const decodeHtmlEntity = function ( str ) {
+	return str.replace( /&#(\d+);/g, function ( match, dec ) {
 		return String.fromCharCode( dec );
 	} );
 };
 
 const { debounce } = window._;
 const _filterSuggestions = () => true;
-const _getSuggestionValue = ( entityRecord ) => decodeHtmlEntity( entityRecord.title.rendered );
+const _getSuggestionValue = ( entityRecord ) =>
+	decodeHtmlEntity( entityRecord.title.rendered );
 const _renderSuggestion = ( entityRecord ) => (
 	<span>{ decodeHtmlEntity( entityRecord.title.rendered ) }</span>
 );

@@ -44,9 +44,16 @@ class Layer_Types {
 		);
 
 		$this->register_layer_type(
-			'mapbox-tileset',
+			'mapbox-tileset-raster',
 			[
-				'script_url' => JEO_BASEURL . '/includes/layer-types/mapbox-tileset.js'
+				'script_url' => JEO_BASEURL . '/includes/layer-types/mapbox-tileset-raster.js'
+			]
+		);
+
+		$this->register_layer_type(
+			'mapbox-tileset-vector',
+			[
+				'script_url' => JEO_BASEURL . '/includes/layer-types/mapbox-tileset-vector.js'
 			]
 		);
 

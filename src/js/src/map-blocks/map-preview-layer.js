@@ -1,8 +1,13 @@
 import { Fragment } from '@wordpress/element';
 import { Layer, Source } from 'react-mapbox-gl';
+import { memo } from '@wordpress/element';
+import { isEqual } from 'lodash-es';
 
-export function renderLayer( layer, instance ) {
-	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {
+export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
+	if (
+		[ 'swappable', 'switchable' ].includes( instance.use ) &&
+		! instance.default
+	) {
 		return null;
 	}
 
@@ -29,16 +34,17 @@ export function renderLayer( layer, instance ) {
 								`https://api.mapbox.com/styles/v1/${ style_id }/tiles/256/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 							],
 						} }
+						onSourceLoaded={ () => {
+							if ( onSourceLoadedCallback ) {
+								onSourceLoadedCallback();
+							}
+						} }
 					/>
-					<Layer
-						id={ layerId }
-						type="raster"
-						sourceId={ sourceId }
-					/>
+					<Layer id={ layerId } type="raster" sourceId={ sourceId } />
 				</Fragment>
 			);
-		case 'mapbox-tileset':
-
+		case 'mapbox-tileset-vector':
+		case 'mapbox-tileset-raster':
 			let tileset_id = options.tileset_id;
 
 			if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
@@ -52,6 +58,11 @@ export function renderLayer( layer, instance ) {
 						tileJsonSource={ {
 							type: options.style_source_type,
 							url: `mapbox://${ options.tileset_id }`,
+						} }
+						onSourceLoaded={ () => {
+							if ( onSourceLoadedCallback ) {
+								onSourceLoadedCallback();
+							}
 						} }
 					/>
 					<Layer
@@ -68,8 +79,13 @@ export function renderLayer( layer, instance ) {
 					<Source
 						id={ sourceId }
 						tileJsonSource={ {
-							type: 'vector',
+							type: options.style_source_type,
 							tiles: [ options.url ],
+						} }
+						onSourceLoaded={ () => {
+							if ( onSourceLoadedCallback ) {
+								onSourceLoadedCallback();
+							}
 						} }
 					/>
 					<Layer
@@ -90,15 +106,23 @@ export function renderLayer( layer, instance ) {
 							tiles: [ options.url ],
 							tileSize: 256,
 						} }
+						onSourceLoaded={ () => {
+							if ( onSourceLoadedCallback ) {
+								onSourceLoadedCallback();
+							}
+						} }
 					/>
-					<Layer
-						id={ layerId }
-						type="raster"
-						sourceId={ sourceId }
-					/>
+					<Layer id={ layerId } type="raster" sourceId={ sourceId } />
 				</Fragment>
 			);
 		default:
 			return null;
 	}
 }
+
+export const MemoizedRenderLayer = memo( renderLayer, ( props, prevProps ) => {
+	return isEqual(
+		props.layer.layer_type_options,
+		prevProps.layer.layer_type_options
+	);
+} );

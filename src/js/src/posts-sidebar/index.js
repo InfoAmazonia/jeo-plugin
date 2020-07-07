@@ -22,7 +22,8 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 				{ isOpen && (
 					<Modal
 						title={ __( 'Geolocate this post', 'jeo' ) }
-						onRequestClose={ () => this.setState( { isOpen: false } ) }>
+						onRequestClose={ () => this.setState( { isOpen: false } ) }
+					>
 						<JeoGeocodePosts
 							onSaveLocation={ () => this.setState( { isOpen: false } ) }
 							onCancel={ () => this.setState( { isOpen: false } ) }
@@ -38,9 +39,7 @@ registerPlugin( 'jeo-posts-sidebar', {
 	icon: null,
 	render: () => {
 		return (
-			<PluginDocumentSettingPanel
-				title={ __( 'Geolocation', 'jeo' ) }
-			>
+			<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
 				<JeoGeocodePanel />
 			</PluginDocumentSettingPanel>
 		);

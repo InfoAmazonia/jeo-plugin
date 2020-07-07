@@ -1,37 +1,47 @@
-window.JeoLayerTypes.registerLayerType( 'mvt', {
+window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
+		let tileset_id = attributes.layer_type_options.tileset_id;
+
+		if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
+			tileset_id = 'mapbox://' + tileset_id;
+		}
+
 		return map.setStyle( {
 			version: 8,
 			sources: {
 				[ name ]: {
-					type: 'vector',
-					tiles: [ attributes.layer_type_options.url ],
+					type: attributes.layer_type_options.style_source_type,
+					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 				},
 			},
 			layers: [ {
 				id: attributes.layer_id,
 				type: attributes.layer_type_options.type,
 				source: attributes.layer_id,
-				'source-layer': attributes.layer_type_options.source_layer,
+				'source-layer': attributes.layer_type_options.source_layer
 			} ],
 		} );
 	},
 
 	addLayer( map, attributes ) {
+		let tileset_id = attributes.layer_type_options.tileset_id;
+
+		if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
+			tileset_id = 'mapbox://' + tileset_id;
+		}
+
 		map.addSource( attributes.layer_id, {
-			type: 'vector',
-			tiles: [
-				attributes.layer_type_options.url,
-			],
+			type: attributes.layer_type_options.style_source_type,
+			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 		} );
 
 		return map.addLayer( {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': attributes.layer_type_options.source_layer,
+			'source-layer': attributes.layer_type_options.source_layer
 			// 'layout': {
 			// 	'line-cap': 'round',
 			// 	'line-join': 'round'
@@ -49,19 +59,25 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 			resolve( {
 				type: 'object',
 				required: [
-					'url', 'type', 'source_layer'
+                    'tileset_id', 
+                    'style_source_type', 
+					'type', 
+					'source_layer'
 				],
 				properties: {
-					url: {
+					tileset_id: {
 						type: 'string',
-						title: 'URL',
+						title: 'Tileset ID',
+						description: 'Example: username.tilesetid',
 					},
 					source_layer: {
 						type: 'string',
 						title: 'Source layer',
-						description: 'Layer to use from a vector tile source. ',
+						description: 'Which data the map should display.',
 					},
 					type: {
+						title: 'Layer Type',
+						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
 						type: 'string',
 						default: 'fill',
 						enum: [
@@ -77,7 +93,7 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 					},
 					style_source_type: {
 						title: 'Style Source Type',
-						description: 'Which data the map should display',
+						description: 'The layer source type style',
 						type: 'string',
 						default: 'vector',
 						disabled: true
