@@ -78,23 +78,12 @@ export default function InteractionSettings( {
 
 	const changeTitle = useCallback(
 		( title ) => {
-			if (
-				( interaction.title !== 'None' || interaction.title ) &&
-				( title === 'None' || ! title )
-			) {
-				alert( __( 'A title is required' ) );
-				return;
-			}
 			onUpdate( interaction.id, { ...interaction, title } );
 		},
 		[ interaction, onUpdate ]
 	);
 
 	const addField = useCallback( () => {
-		if ( interaction.title === 'None' || ! interaction.title ) {
-			alert( __( 'A title is required' ) );
-			return;
-		}
 		onUpdate( interaction.id, {
 			...interaction,
 			fields: [ ...interaction.fields, { field: newField, label: '' } ],
@@ -136,7 +125,7 @@ export default function InteractionSettings( {
 			{ interactive && (
 				<Fragment>
 					<SelectControl
-						label={ __( 'Title' ) }
+						label={ __( 'Title *' ) }
 						value={ interaction.title }
 						options={ titleOptions }
 						onChange={ changeTitle }
