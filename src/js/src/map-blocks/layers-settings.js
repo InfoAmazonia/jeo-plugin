@@ -73,7 +73,8 @@ const LayersSettings = ( {
 	const layerTypeOptions = [
 		{ label: 'Select a layer type', value: '' },
 		{ label: 'Mapbox', value: 'mapbox' },
-		{ label: 'Mapbox-tileset', value: 'mapbox-tileset' },
+		{ label: 'Mapbox-tileset-vector', value: 'mapbox-tileset-vector' },
+		{ label: 'Mapbox-tileset-raster', value: 'mapbox-tileset-raster' },
 		{ label: 'Tilelayer', value: 'tilelayer' },
 		{ label: 'MVT', value: 'mvt' },
 	];
@@ -172,7 +173,12 @@ const LayersSettings = ( {
 						className="jeo-layers-library-filters-button-clear"
 						isPrimary
 						isLarge
-						onClick={ () => { setFilteredLayers([]); } }
+						onClick={ () => { 
+							setFilteredLayers([]); 
+							setLayerTypeFilter( '' );
+							setLayerLegendFilter( '' );
+							setLayerNameFilter('');
+						} }
 					>
 						{ __( 'Clear' ) }
 					</Button>
