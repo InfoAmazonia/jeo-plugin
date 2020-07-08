@@ -1,4 +1,16 @@
-import { Button, Spinner, SelectControl, TextControl, Card, CardBody, CardHeader, CardDivider, CardFooter } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	Dashicon,
+	CheckboxControl,
+    SelectControl,
+    TextControl,
+    Card,
+    CardBody,
+    CardHeader,
+    CardDivider,
+    CardFooter,
+} from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -61,7 +73,8 @@ const LayersSettings = ( {
 	const layerTypeOptions = [
 		{ label: 'Select a layer type', value: '' },
 		{ label: 'Mapbox', value: 'mapbox' },
-		{ label: 'Mapbox-tileset', value: 'mapbox-tileset' },
+		{ label: 'Mapbox-tileset-vector', value: 'mapbox-tileset-vector' },
+		{ label: 'Mapbox-tileset-raster', value: 'mapbox-tileset-raster' },
 		{ label: 'Tilelayer', value: 'tilelayer' },
 		{ label: 'MVT', value: 'mvt' },
 	];
@@ -160,7 +173,12 @@ const LayersSettings = ( {
 						className="jeo-layers-library-filters-button-clear"
 						isPrimary
 						isLarge
-						onClick={ () => { setFilteredLayers([]); } }
+						onClick={ () => { 
+							setFilteredLayers([]); 
+							setLayerTypeFilter( '' );
+							setLayerLegendFilter( '' );
+							setLayerNameFilter('');
+						} }
 					>
 						{ __( 'Clear' ) }
 					</Button>
