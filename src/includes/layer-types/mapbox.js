@@ -59,13 +59,12 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				} );
 
 				if ( vLayer && parentLayer ) {
+					const type = interaction.on;
 					const popUp = new mapboxgl.Popup( {
 						className: 'jeo-popup',
-						closeButton: false,
+						closeButton: type === 'click',
 						closeOnClick: true,
 					} );
-
-					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
 
 					map.on( type, parentLayer.id, function( e ) {
 						// Change the cursor style as a UI indicator.
@@ -104,10 +103,13 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					map.on( 'mouseenter', parentLayer.id, function() {
 						map.getCanvas().style.cursor = 'pointer';
 					} );
-					map.on( 'mouseleave', parentLayer.id, function() {
-						map.getCanvas().style.cursor = '';
-						//popUp.remove();
-					} );
+					console.log(type)
+					if( type === 'hover' ) {
+						map.on( 'mouseleave', parentLayer.id, function() {
+							map.getCanvas().style.cursor = '';
+							popUp.remove();
+						} );
+					}
 				}
 			} );
 		}
