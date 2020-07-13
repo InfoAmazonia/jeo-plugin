@@ -31,3 +31,7 @@
 	max-height: 80%;
 	width: 30%;
 }
+
+.jeo-interaction-fields__field_required {
+	color: red
+}
