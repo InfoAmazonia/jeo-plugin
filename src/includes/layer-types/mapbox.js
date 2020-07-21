@@ -61,9 +61,11 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				if ( vLayer && parentLayer ) {
 					const type = interaction.on;
 					const popUp = new mapboxgl.Popup( {
-						className: 'jeo-popup',
+						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
 						closeButton: type === 'click',
 						closeOnClick: true,
+						maxWidth: '300px',
+						// anchor: 'right' // parameter to anchor direction 'bottom' default
 					} );
 
 					map.on( type, parentLayer.id, function( e ) {
@@ -103,8 +105,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					map.on( 'mouseenter', parentLayer.id, function() {
 						map.getCanvas().style.cursor = 'pointer';
 					} );
-					console.log(type)
-					if( type === 'hover' ) {
+					if( type === 'mouseover' ) {
 						map.on( 'mouseleave', parentLayer.id, function() {
 							map.getCanvas().style.cursor = '';
 							popUp.remove();
