@@ -91,7 +91,7 @@ export default function InteractionsSettings( {
 		<Modal
 			className="jeo-interactions-settings__modal"
 			title={ __( 'Interactions', 'jeo' ) }
-			onRequestClose={ onCloseModal }
+			onRequestClose={ onDone }
 		>
 			<SelectControl
 				label={ __( 'Source', 'jeo' ) }
