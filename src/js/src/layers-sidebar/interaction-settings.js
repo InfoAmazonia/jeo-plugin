@@ -35,9 +35,10 @@ export default function InteractionSettings( {
 	}, [ layer.fields ] );
 
 	const titleOptions = useMemo( () => {
+		const newFieldKeys = fieldKeys.slice(1);
 		return [
-			{ label: __( 'None', 'jeo' ), value: undefined },
-			...fieldKeys.map( ( field ) => {
+			{ label: fieldKeys[0], value: fieldKeys[0] },
+			...newFieldKeys.map( ( field ) => {
 				return { label: field, value: field };
 			} ),
 		];
@@ -77,23 +78,12 @@ export default function InteractionSettings( {
 
 	const changeTitle = useCallback(
 		( title ) => {
-			if (
-				( interaction.title !== 'None' || interaction.title ) &&
-				( title === 'None' || ! title )
-			) {
-				alert( __( 'A title is required' ) );
-				return;
-			}
 			onUpdate( interaction.id, { ...interaction, title } );
 		},
 		[ interaction, onUpdate ]
 	);
 
 	const addField = useCallback( () => {
-		if ( interaction.title === 'None' || ! interaction.title ) {
-			alert( __( 'A title is required' ) );
-			return;
-		}
 		onUpdate( interaction.id, {
 			...interaction,
 			fields: [ ...interaction.fields, { field: newField, label: '' } ],
