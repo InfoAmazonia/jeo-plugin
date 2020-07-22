@@ -419,8 +419,8 @@ nav .layer-selection-title .legends-title {
 
 .jeo-popup__mouseover {
     transform: none !important;
-    top: 10%;
-    left: 90%;
+	left: auto;
+	right: 0;
 }
 
 .jeo-popup__mouseover.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
