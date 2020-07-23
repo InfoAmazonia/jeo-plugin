@@ -59,7 +59,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				} );
 
 				if ( vLayer && parentLayer ) {
-					const type = interaction.on;
+					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
 					const popUp = new mapboxgl.Popup( {
 						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
 						closeButton: type === 'click',
@@ -107,8 +107,11 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					} );
 					if( type === 'mouseover' ) {
 						map.on( 'mouseleave', parentLayer.id, function() {
-							map.getCanvas().style.cursor = '';
 							popUp.remove();
+						} );
+					} else {
+						map.on( 'mouseleave', parentLayer.id, function() {
+							map.getCanvas().style.cursor = '';
 						} );
 					}
 				}
