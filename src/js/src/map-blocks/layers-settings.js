@@ -45,9 +45,11 @@ const LayersSettings = ( {
 	const [ filteredLayers, setFilteredLayers ] = useState([]);
 
 	useEffect( () => {
+		// TODO paginate this results. getEntityRecords accept 'page' parameter
 		const allLayersData = select( 'core' ).getEntityRecords(
 			'postType',
-			'map-layer'
+			'map-layer',
+			{ per_page: 100, order: 'asc', orderby: 'menu_order' }
 		);
 		if ( ! allLayersData ) {
 			setAllLayers( [] );
@@ -210,17 +212,10 @@ const LayersSettings = ( {
 							return;
 						}
 
-						let background;
-						if ( i % 2 !== 0 ) {
-							background = '#white';
-						} else {
-							background = '#f9f9f9';
-						}
-
 						return (
 							<Card
 								key={ layer.id }
-								style={ { background } }
+								style={ { background: i % 2 !== 0 ? "white": "#f9f9f9" } }
 								size="small"
 								className="layer-card"
 							>
