@@ -108,6 +108,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					if( type === 'mouseover' ) {
 						map.on( 'mouseleave', parentLayer.id, function() {
 							popUp.remove();
+							map.getCanvas().style.cursor = '';
 						} );
 					} else {
 						map.on( 'mouseleave', parentLayer.id, function() {
