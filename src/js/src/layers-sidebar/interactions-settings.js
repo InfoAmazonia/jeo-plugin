@@ -1,4 +1,4 @@
-import { Modal, Panel, SelectControl } from '@wordpress/components';
+import { Modal, Panel, SelectControl, Button } from '@wordpress/components';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -14,6 +14,9 @@ export default function InteractionsSettings( {
 	layers,
 	onCloseModal,
 } ) {
+	
+	const [localInteractions, setLocalInteractions] = useState(interactions);
+
 	const interactiveLayers = useMemo( () => {
 		if ( ! layers ) {
 			return [];
@@ -25,33 +28,41 @@ export default function InteractionsSettings( {
 
 	const onInsert = useCallback(
 		( newInteraction ) => {
-			setInteractions( [ ...interactions, newInteraction ] );
+			setLocalInteractions( [ ...localInteractions, newInteraction ] );
 		},
-		[ interactions, setInteractions ]
+		[ localInteractions, setLocalInteractions ]
 	);
 
 	const onUpdate = useCallback(
 		( interactionId, newInteraction ) => {
-			setInteractions(
-				interactions.map( ( interaction ) => {
+			setLocalInteractions(
+				localInteractions.map( ( interaction ) => {
 					return interaction.id === interactionId
 						? newInteraction
 						: interaction;
 				} )
 			);
 		},
-		[ interactions, setInteractions ]
+		[ localInteractions, setLocalInteractions ]
 	);
 
 	const onDelete = useCallback(
 		( interactionId ) => {
-			setInteractions(
-				interactions.filter(
+			setLocalInteractions(
+				localInteractions.filter(
 					( interaction ) => interaction.id !== interactionId
 				)
 			);
 		},
-		[ interactions, setInteractions ]
+		[ localInteractions, setLocalInteractions ]
+	);
+
+	const onDone = useCallback(
+		( ) => {
+			setInteractions( localInteractions );
+			onCloseModal();
+		},
+		[ localInteractions, setLocalInteractions ]
 	);
 
 	const layersSourceOptions = useMemo( () => {
@@ -80,7 +91,7 @@ export default function InteractionsSettings( {
 		<Modal
 			className="jeo-interactions-settings__modal"
 			title={ __( 'Interactions', 'jeo' ) }
-			onRequestClose={ onCloseModal }
+			onRequestClose={ onDone }
 		>
 			<SelectControl
 				label={ __( 'Source', 'jeo' ) }
@@ -97,8 +108,8 @@ export default function InteractionsSettings( {
 						selectedSource === 'all' ||
 						layersSourceOptions.length <= 1
 					) {
-						const index = interactions.findIndex( ( x ) => x.id === layer.id );
-						const interaction = interactions[ index ];
+						const index = localInteractions.findIndex( ( x ) => x.id === layer.id );
+						const interaction = localInteractions[ index ];
 						return (
 							<InteractionSettings
 								key={ layer.id }
@@ -113,6 +124,7 @@ export default function InteractionsSettings( {
 					}
 				} ) }
 			</Panel>
+			<Button style={{'float': 'left', 'margin': '8px 0'}} isPrimary onClick={onDone}>{ __( 'Done', 'jeo' )}</Button>
 		</Modal>
 	);
 }

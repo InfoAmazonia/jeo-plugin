@@ -59,13 +59,14 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				} );
 
 				if ( vLayer && parentLayer ) {
-					const popUp = new mapboxgl.Popup( {
-						className: 'jeo-popup',
-						closeButton: false,
-						closeOnClick: true,
-					} );
-
 					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
+					const popUp = new mapboxgl.Popup( {
+						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
+						closeButton: type === 'click',
+						closeOnClick: true,
+						maxWidth: '300px',
+						// anchor: 'right' // parameter to anchor direction 'bottom' default
+					} );
 
 					map.on( type, parentLayer.id, function( e ) {
 						// Change the cursor style as a UI indicator.
@@ -104,10 +105,15 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					map.on( 'mouseenter', parentLayer.id, function() {
 						map.getCanvas().style.cursor = 'pointer';
 					} );
-					map.on( 'mouseleave', parentLayer.id, function() {
-						map.getCanvas().style.cursor = '';
-						//popUp.remove();
-					} );
+					if( type === 'mouseover' ) {
+						map.on( 'mouseleave', parentLayer.id, function() {
+							popUp.remove();
+						} );
+					} else {
+						map.on( 'mouseleave', parentLayer.id, function() {
+							map.getCanvas().style.cursor = '';
+						} );
+					}
 				}
 			} );
 		}
