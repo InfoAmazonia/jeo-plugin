@@ -43,6 +43,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addInteractions( map, attributes ) {
 		if ( attributes.layer_type_options.interactions ) {
 			const int = attributes.layer_type_options.interactions;
+			const interactionsIds = int.map( i => i.id );
 
 			int.forEach( ( interaction ) => {
 				const vLayers = map.getSource( 'composite' ).vectorLayers;
@@ -102,19 +103,22 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 							.setHTML( html )
 							.addTo( map );
 					} );
-					map.on( 'mouseenter', parentLayer.id, function() {
+					let isOverlapping = false;
+					map.on( 'mouseenter', parentLayer.id, function ( e ) {
+						const features = map.queryRenderedFeatures( e.point );
+						isOverlapping = features.some( 
+							f => interactionsIds.includes( f.sourceLayer ) && 
+							f.sourceLayer != interaction.id );
 						map.getCanvas().style.cursor = 'pointer';
 					} );
-					if( type === 'mouseover' ) {
-						map.on( 'mouseleave', parentLayer.id, function() {
+					map.on( 'mouseleave', parentLayer.id, function() {
+						if ( ! isOverlapping ) {
+							map.getCanvas().style.cursor = '';
+						}
+						if( type === 'mouseover' ) {
 							popUp.remove();
-							map.getCanvas().style.cursor = '';
-						} );
-					} else {
-						map.on( 'mouseleave', parentLayer.id, function() {
-							map.getCanvas().style.cursor = '';
-						} );
-					}
+						}
+					} );
 				}
 			} );
 		}
