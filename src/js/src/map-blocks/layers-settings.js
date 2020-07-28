@@ -24,7 +24,7 @@ import { layerLoader } from './utils';
 
 import './layers-settings.css';
 
-const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
+const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
 
 const anySwapDefault = ( settings ) =>
 	settings.some( ( s ) => s.use === 'swappable' && s.default );
@@ -336,9 +336,9 @@ const LayersSettings = ( {
 										...settings,
 										use,
 										default:
-											use === 'swappable'
-												? ! anySwapDefault( attributes.layers )
-												: settings.default,
+											use === 'swappable' ? ! anySwapDefault( attributes.layers ) : 
+											use === 'fixed' ? true :
+											settings.default,
 									};
 								} )
 							);
