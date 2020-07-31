@@ -177,6 +177,7 @@ class Jeo {
 				array(
 					'jsonUrl' => rest_url( 'wp/v2/' ),
 					'string_read_more' => __( 'Read more', 'jeo' ),
+					'nonce' => wp_create_nonce('wp_rest'),
 					'templates' => [
 						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup' => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
