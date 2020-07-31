@@ -124,12 +124,15 @@ export default function InteractionSettings( {
 			/>
 			{ interactive && (
 				<Fragment>
-					<SelectControl
-						label={ __( 'Title *' ) }
-						value={ interaction.title }
-						options={ titleOptions }
-						onChange={ changeTitle }
-					/>
+					<div>
+					<span>{ __( 'Title', 'jeo' ) }</span>
+					<span className="jeo-interaction-fields__field_required"> * </span>
+						<SelectControl
+							value={ interaction.title }
+							options={ titleOptions }
+							onChange={ changeTitle }
+						/>
+					</div>
 
 					{ fieldKeys.length > 0 && (
 						<fieldset className="jeo-interaction-fields">

@@ -43,6 +43,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addInteractions( map, attributes ) {
 		if ( attributes.layer_type_options.interactions ) {
 			const int = attributes.layer_type_options.interactions;
+			const interactionsIds = int.map( i => i.id );
 
 			int.forEach( ( interaction ) => {
 				const vLayers = map.getSource( 'composite' ).vectorLayers;
@@ -59,13 +60,14 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				} );
 
 				if ( vLayer && parentLayer ) {
-					const popUp = new mapboxgl.Popup( {
-						className: 'jeo-popup',
-						closeButton: false,
-						closeOnClick: true,
-					} );
-
 					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
+					const popUp = new mapboxgl.Popup( {
+						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
+						closeButton: type === 'click',
+						closeOnClick: true,
+						maxWidth: '300px',
+						// anchor: 'right' // parameter to anchor direction 'bottom' default
+					} );
 
 					map.on( type, parentLayer.id, function( e ) {
 						// Change the cursor style as a UI indicator.
@@ -101,12 +103,21 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 							.setHTML( html )
 							.addTo( map );
 					} );
-					map.on( 'mouseenter', parentLayer.id, function() {
+					let isOverlapping = false;
+					map.on( 'mouseenter', parentLayer.id, function ( e ) {
+						const features = map.queryRenderedFeatures( e.point );
+						isOverlapping = features.some( 
+							f => interactionsIds.includes( f.sourceLayer ) && 
+							f.sourceLayer != interaction.id );
 						map.getCanvas().style.cursor = 'pointer';
 					} );
 					map.on( 'mouseleave', parentLayer.id, function() {
-						map.getCanvas().style.cursor = '';
-						//popUp.remove();
+						if ( ! isOverlapping ) {
+							map.getCanvas().style.cursor = '';
+						}
+						if( type === 'mouseover' ) {
+							popUp.remove();
+						}
 					} );
 				}
 			} );
