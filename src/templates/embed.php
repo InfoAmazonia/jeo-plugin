@@ -8,7 +8,7 @@
 <body style="margin: 0px !important;">
 
 <div id="embed-container" style="<?php echo esc_html( $container_style ); ?>">
-	<div class="jeomap" data-map_id="<?php echo esc_html( $map_id ); ?>" data-options='{"marker_action": "embed_preview"}' style="<?php echo esc_html( $map_style ); ?>"></div>
+	<div class="jeomap map_id_<?php echo esc_html( $map_id ); ?>" data-options='{"marker_action": "embed_preview"}' style="<?php echo esc_html( $map_style ); ?>"></div>
 
 	<?php if($have_related_posts): ?>
 		<div id="embed-post-preview" style="<?php echo esc_html( $popup_style ); ?>"></div>

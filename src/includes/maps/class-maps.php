@@ -14,6 +14,7 @@ class Maps {
 		add_action( 'init', [$this, 'register_shortcode'] );
 		add_filter( 'single_template', [$this, 'override_template']);
 		add_filter( 'the_content', [$this, 'the_content_filter'] );
+		add_action('admin_init', [$this, 'add_cappabilities']);
 		$this->register_rest_meta_validation();
 
 	}
@@ -53,7 +54,19 @@ class Maps {
 			'menu_icon' => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/map.svg')),
 			'has_archive' => true,
 			'exclude_from_search' => true,
-			'capability_type' => 'page',
+			'capabilities' => array(
+				'edit_post' => 'edit_map',
+				'edit_posts' => 'edit_maps',
+				'edit_others_posts' => 'edit_others_maps',
+				
+				'publish_posts' => 'publish_maps',
+				'read_post' => 'read_map',
+				'read_private_posts' => 'read_private_maps',
+				
+				'delete_post' => 'delete_map',
+			),
+			// 'map_meta_cap' => true,		
+			// 'capability_type' => 'post',
 		);
 
 		register_post_type($this->post_type, $args);
@@ -299,7 +312,7 @@ class Maps {
 			return '';
 		}
 
-		$div = '<div class="jeomap" data-map_id="' . $map_id . '" ';
+		$div = '<div class="jeomap map_id_"' . $map_id . '" ';
 
 		$w = $atts['width'];
 		$h = $atts['height'];
@@ -332,7 +345,8 @@ class Maps {
 
 		// Only when visiting the Map single page
 		if ( is_single( get_the_id() ) ) {
-			$div = '<div class="jeomap" data-map_id="' . get_the_ID() . '"></div>';
+			$map_id = get_the_ID();
+			$div = "<div class='jeomap map_id_'{$map_id}'";
 			$content = $div . $content;
 		}
 
@@ -383,6 +397,23 @@ class Maps {
 
 		return $content;
 
+	}
+
+	public function add_cappabilities(){
+		$roles = ['author', 'editor', 'administrator'];
+		foreach ($roles as $role) {
+			// var_dump($role);
+			$role_obj = get_role($role);
+			
+			$role_obj->add_cap( 'edit_map' ); 
+			$role_obj->add_cap( 'edit_maps' ); 
+			$role_obj->add_cap( 'edit_others_maps' ); 
+			$role_obj->add_cap( 'publish_maps' ); 
+			$role_obj->add_cap( 'read_map' ); 
+			$role_obj->add_cap( 'read_private_maps' ); 
+			$role_obj->add_cap( 'delete_map' ); 
+			$role_obj->add_cap( 'edit_published_blocks' ); 
+		}
 	}
 
 	public function override_template($template) {

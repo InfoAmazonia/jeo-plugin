@@ -562,7 +562,7 @@ class Fixtures {
 	private function get_sample_map_div() {
 		$map = get_page_by_title( 'Map 1', 'OBJECT', 'map');
 
-		$div = "<div class=\"jeomap\" data-map_id=\"" . $map->ID . "\"></div>";
+		$div = "<div class=\"jeomap\ map_id_" . $map->ID . "\"></div>";
 
 		return $div;
 

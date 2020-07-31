@@ -17,7 +17,7 @@
 	</head>
 	<body style="margin: 0 !important">
 		<div id="embed-container" style="<?= $container_style ?>">
-			<div class="jeomap" data-map_id="<?= $post->ID ?>" data-options='{"marker_action": "embed_preview"}' style="<?= $map_style ?>"></div>
+			<div class="jeomap map_id_<?= $post->ID ?>" data-options='{"marker_action": "embed_preview"}' style="<?= $map_style ?>"></div>
 		</div>
 	</body>
 </html>
@@ -26,7 +26,7 @@
 	<?php get_header(); ?>
 	<main id="site-content" role="main">
 		<?php get_the_title() ?>
-		<div class="jeomap" data-map_id="<?= $post->ID ?>"></div>
+		<div class="jeomap map_id_<?= $post->ID ?>"></div>
 	</main>
 	<?php get_footer(); ?>
 <?php endif; ?>
