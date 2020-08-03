@@ -14,7 +14,7 @@ class Maps {
 		add_action( 'init', [$this, 'register_shortcode'] );
 		add_filter( 'single_template', [$this, 'override_template']);
 		add_filter( 'the_content', [$this, 'the_content_filter'] );
-		add_action('admin_init', [$this, 'add_cappabilities']);
+		add_action('admin_init', [ $this, 'add_capabilities' ]);
 		$this->register_rest_meta_validation();
 
 	}
@@ -399,7 +399,7 @@ class Maps {
 
 	}
 
-	public function add_cappabilities(){
+	public function add_capabilities() {
 		$roles = ['author', 'editor', 'administrator'];
 		foreach ($roles as $role) {
 			// var_dump($role);
