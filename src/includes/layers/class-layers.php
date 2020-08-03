@@ -10,7 +10,7 @@ class Layers {
 
 	protected function init() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
-		add_action('admin_init', [$this, 'add_cappabilities']);
+		add_action('admin_init', [ $this, 'add_capabilities' ]) ;
 		$this->register_rest_meta_validation();
 	}
 
@@ -176,7 +176,7 @@ class Layers {
 		);
 	}
 
-	public function add_cappabilities(){
+	public function add_capabilities() {
 		$roles = ['author', 'editor', 'administrator'];
 		foreach ($roles as $role) {
 			// var_dump($role);
