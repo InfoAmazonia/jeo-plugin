@@ -1,7 +1,6 @@
 import classNames from 'classnames';
 
 export default ( { attributes, className } ) => {
-	console.log(attributes)
 	const style = {};
 
 	if ( className.includes( 'alignfull' ) ) {
