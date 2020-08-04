@@ -10,6 +10,7 @@ class Layers {
 
 	protected function init() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action('admin_init', [ $this, 'add_capabilities' ]) ;
 		$this->register_rest_meta_validation();
 	}
 
@@ -47,7 +48,19 @@ class Layers {
 			'menu_icon' 		  => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/layers.svg')),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
-			'capability_type'     => 'page',
+			'capabilities' => array(
+				'edit_post' => 'edit_map-layer',
+				'edit_posts' => 'edit_map-layers',
+				'edit_others_posts' => 'edit_others_map-layers',
+				
+				'publish_posts' => 'publish_map-layers',
+				'read_post' => 'read_map-layer',
+				'read_private_posts' => 'read_private_map-layers',
+				
+				'delete_post' => 'delete_map-layer',
+			),
+			// 'map_meta_cap' => true,		
+			// 'capability_type' => 'post',
 			'show_in_admin_bar'   => false,
 			'show_in_nav_menus'   => false,
 			'publicly_queryable'  => false,
@@ -161,6 +174,24 @@ class Layers {
 				'description' => __('Use legend', 'jeo')
 			)
 		);
+	}
+
+	public function add_capabilities() {
+		$roles = ['author', 'editor', 'administrator'];
+		foreach ($roles as $role) {
+			// var_dump($role);
+			$role_obj = get_role($role);
+			
+			$role_obj->add_cap( 'edit_map-layer' ); 
+			$role_obj->add_cap( 'edit_map-layers' ); 
+			$role_obj->add_cap( 'edit_others_map-layers' ); 
+			
+			$role_obj->add_cap( 'publish_map-layers' ); 
+			$role_obj->add_cap( 'read_map-layer' ); 
+			$role_obj->add_cap( 'read_private_map-layers' ); 
+			
+			$role_obj->add_cap( 'delete_map-layer' ); 
+		}
 	}
 
 	public function validate_meta_type( $meta_value ) {
