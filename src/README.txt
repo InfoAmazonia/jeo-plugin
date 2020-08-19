@@ -48,8 +48,8 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 
 == Changelog ==
  
-= 0.1.0 =
-* First release.
+= 0.2.0 =
+* Second release.
 
 = 0.1.0 =
 * Fix layer default legend bug.
