@@ -1,0 +1,41 @@
+.icon-item {
+	display: flex;
+	margin-bottom: 5px;
+}
+
+.icon-item img {
+	height: 50px;
+    margin-right: 5px;
+}
+
+.remove-button {
+	margin-top: 14px;
+}
+
+.image {
+	cursor: pointer;
+}
+
+.content-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.buttons-inputs {
+	display: flex;
+    flex: 1;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.size-warning {
+	margin: 10px 0;
+}
+
+.warning-character {
+	color: rgb(255, 0, 0);
+}
+
+.warning-text {
+	font-weight: bold;
+}

@@ -1,0 +1,267 @@
+/**
+ * Map Editor Modal
+ */
+
+.jeo-layers-modal {
+	position: fixed;
+	top: 30px;
+	right: 30px;
+	bottom: 30px;
+	left: 30px;
+	z-index: 16000;
+	transform: none;
+	max-height: none;
+}
+
+.jeo-layers-modal .components-modal__content {
+	padding: 0;
+}
+
+.jeo-layers-modal .components-modal__header {
+	padding: 0 24px;
+	background-color: #fcfcfc;
+	margin: 0;
+	border-bottom: none;
+}
+
+/**
+ * Layers Settings
+ */
+.jeo-layers-list {
+	border-collapse: collapse;
+	width: calc(100% - 2em);
+	margin: 1em;
+}
+
+.jeo-layers-list .layer {
+	border: 1px solid lightgray;
+	vertical-align: middle;
+}
+
+.jeo-layers-list .layer td {
+	padding: 0.5em;
+}
+
+.jeo-layers-list .layer .remove-control svg {
+	cursor: pointer;
+}
+
+.jeo-layers-list .components-select-control__input {
+	width: auto;
+	margin-bottom: 0;
+}
+
+.jeo-layers-list .components-base-control__field {
+	margin-bottom: 0;
+}
+
+.jeo-layers-list .components-base-control__label {
+	margin: 0 1em 0 0;
+}
+
+.jeo-layers-list .components-base-control__help {
+	margin: 0;
+}
+
+.jeo-layers-list .drag-handle {
+	vertical-align: middle;
+}
+
+.jeo-layers-list .layer-title {
+	font-weight: bold;
+}
+
+.jeo-layers-list.dragging {
+	box-sizing: border-box;
+	margin: 0;
+}
+
+.jeo-layers-list.dragging * {
+	box-sizing: border-box;
+}
+
+.jeo-layers-list.dragging .layer {
+	background-color: white;
+}
+
+/**
+ * Layers Library
+ */
+.jeo-layers-library-controls,
+.jeo-layers-library .library-controls {
+	margin-left: 12px;
+	display: flex;
+	align-items: center;
+	padding: 1em 0;
+}
+
+/*new layer settings modal*/
+.jeo-layers-modal .jeo-layers-library-controls {
+    margin-left: 0px;
+    padding: 1em;
+}
+
+.jeo-layers-library-controls button.components-button {
+    height: 30px;
+}
+
+.layer-info__single-row {
+	margin: 0px;
+	margin-bottom: 3px;
+}
+
+li.jeo-setting-layer.all-layers-list {
+    margin-bottom: 0px;
+}
+
+.layer-buttons .add-button, .layer-buttons .remove-button{
+	margin-bottom: 0px;
+}
+
+.jeo-layers-list .layer-card .layer-info {
+    margin-top: 0px;
+}
+
+ul.jeo-layers-list .components-card {
+    height: auto;
+}
+
+.jeo-layers-modal .done-button {
+    margin: 15px;
+}
+/**/
+
+.jeo-layers-library-controls .components-base-control__field,
+.jeo-layers-library .library-controls .components-base-control__field {
+	display: flex;
+	align-items: center;
+	margin: 0;
+}
+
+.jeo-layers-library-controls .components-base-control__label,
+.jeo-layers-library .library-controls .components-base-control__label {
+	margin: 0 1em 0;
+	flex-basis: 100%;
+}
+
+.jeo-layers-library-controls > span,
+.jeo-layers-library .library-controls > span {
+	flex-basis: 4em;
+	text-align: center;
+}
+
+.jeo-layers-library .available-layers {
+	display: grid;
+	grid: auto-flow 8em / 1fr 1fr;
+	grid-gap: 1em;
+}
+
+.jeo-layers-library .layer {
+	display: flex;
+	background-color: #f3f3f3;
+}
+
+.jeo-layers-library .layer-button {
+	flex-basis: 4em;
+	font-size: 1.33em;
+	text-align: center;
+	border: none;
+	cursor: pointer;
+}
+
+.jeo-layers-library .layer-button .dashicon {
+	display: block;
+	margin: 0 auto 0.66em;
+}
+
+.jeo-layers-library .layer-add {
+	background-color: #0079c0;
+	color: white;
+}
+
+.jeo-layers-library .layer-add:hover {
+	background-color: #33acf3;
+}
+
+.jeo-layers-library .layer-added {
+	background-color: #999999;
+	color: white;
+}
+
+.jeo-layers-library .layer-description {
+	padding: 0 1em;
+	flex-grow: 1;
+}
+
+.jeo-layers-library .layer-type {
+	font-size: 0.8em;
+	color: darkgray;
+}
+
+.jeo-layers-library .edit-layer {
+	flex-basis: 2em;
+	font-size: 1.3em;
+	text-align: center;
+	margin: 1em 0;
+}
+
+.jeo-layers-library .edit-layer svg {
+	cursor: pointer;
+}
+
+/**
+ * Layer Editor
+ */
+.jeo-map-settings .form-group,
+.jeo-layer-settings .form-group {
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen-Sans,
+		Ubuntu, Cantarell, Helvetica Neue, sans-serif;
+	font-size: 13px;
+	margin-bottom: 8px;
+}
+
+.jeo-map-settings .control-label,
+.jeo-layer-settings .control-label {
+	display: inline-block;
+	margin-bottom: 4px;
+}
+
+.jeo-map-settings .form-control,
+.jeo-layer-settings .form-control {
+	display: block;
+	width: 100%;
+}
+.jeo-map-settings .form-control:not(select),
+.jeo-layer-settings .form-control:not(select) {
+	padding: 6px 8px;
+}
+.jeo-map-settings .help-block,
+.jeo-layer-settings .help-block {
+	color: gray;
+	margin-top: 0;
+}
+
+.jeo-layer-settings .save-layer {
+	margin-right: 1em;
+}
+
+.jeo-layer-settings fieldset legend {
+	display: none;
+}
+
+/**
+ * Sidebar Panels
+ */
+.jeo-setting {
+	display: flex;
+	justify-content: space-between;
+}
+.jeo-setting__title {
+	font-weight: bold;
+}
+.jeo-setting + button {
+	margin-top: 1em;
+}
+.jeo-setting-layer h2 {
+	margin-bottom: 0;
+}
