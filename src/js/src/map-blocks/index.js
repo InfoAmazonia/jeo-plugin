@@ -132,6 +132,9 @@ registerBlockType( 'jeo/storymap', {
 		navigateButton: {
 			type: 'boolean',
 		},
+		hasIntroduction: {
+			type: 'boolean',
+		},
 	},
 	edit: ( props ) => <StorymapEditor { ...props } />,
 	save: ( props ) => <StorymapDisplay { ...props } />,

@@ -1,7 +1,7 @@
-import { Button, Spinner, TextControl, TextareaControl, SelectControl, CheckboxControl } from '@wordpress/components';
+import { Button, Spinner, TextControl, TextareaControl, CheckboxControl, Dashicon, Panel, PanelBody,  } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
-import { Fragment, useEffect, useState } from '@wordpress/element';
+import { withSelect, select } from '@wordpress/data';
+import { Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -20,16 +20,30 @@ const MapEditor = ( {
 	loadedMap,
 	loadingMap,
 } ) => {
-	const [ key, setKey ] = useState( 0 );
-	useEffect( () => {
-		setKey( key + 1 );
-	}, [ attributes.align, window.screen.width ] );
 
 	const decodeHtmlEntity = function ( str ) {
 		return str.replace( /&#(\d+);/g, function ( match, dec ) {
 			return String.fromCharCode( dec );
 		} );
-    };
+	};
+	
+	const [ showStorySettings, setShowStorySettings ] = useState( false );
+	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
+
+	//Only for visual
+	const [ slides, setSlides ] = useState( [ {
+		content: null,
+		selectedLayers: [],
+	} ] );
+
+	let rawLayers = [];
+	if ( ! loadingMap && attributes.map_id ) {
+		rawLayers = loadedMap.meta.layers;
+	}
+	const layersContent = [];
+	rawLayers.map( ( rawLayer ) => {
+		layersContent.push( select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id ) );
+	} );
     
 	return (
 		<div className="jeo-mapblock">
@@ -64,14 +78,13 @@ const MapEditor = ( {
 									map.dragRotate.disable();
 								}
 							} }
-							key={ key }
 							style="mapbox://styles/mapbox/streets-v11"
 							zoom={ [ loadedMap.meta.initial_zoom || mapDefaults.zoom ] }
 							center={ [
 								loadedMap.meta.center_lon || mapDefaults.lng,
 								loadedMap.meta.center_lat || mapDefaults.lat,
 							] }
-							containerStyle={ { height: '80vh' } }
+							containerStyle={ { height: '70vh' } }
 						>
 							{ /* loadedLayers &&
 								loadedMap.meta.layers.map( ( layer ) => {
@@ -88,41 +101,168 @@ const MapEditor = ( {
 						</Map>
 					</div>
 					<div className="storymap-controls">
-						<div className="story-settings">
-							<TextControl
-								className="title"
-								label={ __( 'Title' ) }
-								value={ attributes.title }
-								onChange={ ( newTitle ) => {
-                                    setAttributes( {
-                                        ...attributes,
-                                       title: newTitle,
-                                    } );
-                                } }
-                            />
-							<TextareaControl
-								className="description"
-								label={ __( 'Story brief description' ) }
-								value={ attributes.description }
-								onChange={ ( newDescription ) => {
-                                    setAttributes( {
-                                        ...attributes,
-                                       description: newDescription,
-                                    } );
-                                } }
-                            />
-							<CheckboxControl
-								className="navigate-button"
-								label={ __( 'Navigate map button' ) }
-								checked={ attributes.navigateButton }
-								onChange={ ( newNavigateButton ) => {
-                                    setAttributes( {
-                                        ...attributes,
-                                       navigateButton: newNavigateButton,
-                                    } );
-                                } }
-                            />
-						</div>
+						{ showStorySettings && (
+							<div className="story-settings">
+								<Button
+									className="hide-button"
+									onClick={ () => {
+										setShowStorySettings(false);
+									} }
+								>
+									<Dashicon icon="minus" />
+								</Button>
+								<p className="section-title">{ __( 'Story settings' ) }</p>
+								<TextControl
+									className="title"
+									label={ __( 'Title' ) }
+									value={ attributes.title }
+									onChange={ ( newTitle ) => {
+										setAttributes( {
+											...attributes,
+										title: newTitle,
+										} );
+									} }
+								/>
+								<TextareaControl
+									className="description"
+									label={ __( 'Story brief description' ) }
+									value={ attributes.description }
+									onChange={ ( newDescription ) => {
+										setAttributes( {
+											...attributes,
+										description: newDescription,
+										} );
+									} }
+								/>
+								<CheckboxControl
+									className="introduction-button"
+									label={ __( 'Storymap Introduction' ) }
+									checked={ attributes.hasIntroduction }
+									onChange={ ( newHasIntroduction ) => {
+										setAttributes( {
+											...attributes,
+											hasIntroduction: newHasIntroduction,
+										} );
+									} }
+								/>
+								<CheckboxControl
+									className="navigate-button"
+									label={ __( 'Navigate map button' ) }
+									checked={ attributes.navigateButton }
+									onChange={ ( newNavigateButton ) => {
+										setAttributes( {
+											...attributes,
+										navigateButton: newNavigateButton,
+										} );
+									} }
+								/>
+							</div>
+						) }
+						{ ! showStorySettings && (
+							<div className="story-settings-hide">
+								<p className="section-title">{ __( 'Story settings' ) }</p>
+								<Button 
+									className="show-button"
+									onClick={ () => {
+										setShowStorySettings(true);
+									} }
+								>
+									<Dashicon icon="plus" />
+								</Button>
+							</div>
+						) }
+						{ showSlidesSettings && (
+							<div className="slides-settings">
+								<Button
+									className="hide-button"
+									onClick={ () => {
+										setShowSlidesSettings(false);
+									} }
+								>
+									<Dashicon icon="minus" />
+								</Button>
+								<p className="section-title">{ __( 'Slides settings' ) }</p>
+								{ slides.map( ( slide, index ) => {
+									return(
+										<div key={ slide.content } className="slide">
+											<Panel className="slide-panel">
+												<PanelBody title={ __( 'Slide' ) } initialOpen={ false }>
+													<TextareaControl 
+														className="content"
+														label={ __( 'Content (allowed to use HTML tags)' ) }
+														value={ slide.content }
+														onChange={ ( newContent ) => {
+															const oldSlides = slides;
+															oldSlides[ index ].content = newContent;
+															setSlides( oldSlides );
+														} }
+													/>
+													<p>Layers</p>
+													<div className="layers">
+														{ layersContent.map( ( layer ) => {
+															let layerButtonStyle = null;
+															if ( slides[ index ].selectedLayers.includes( layer ) ) {
+																layerButtonStyle = { background: 'black' }
+															} else {
+																layerButtonStyle = { background: 'grey' }
+															}
+
+															return(
+																<Button
+																	className="layer"
+																	key={ layer.id }
+																	onClick={ () => {
+																		const oldSlides = slides;
+
+																		if ( oldSlides[ index ].selectedLayers.includes( layer ) ) {
+																		oldSlides[ index ].selectedLayers.pop( layer );
+																			
+																		} else {
+																			oldSlides[ index ].selectedLayers.push( layer );
+																		}
+
+																		setSlides( oldSlides );
+																	} }
+																>
+																	<p>{ decodeHtmlEntity( layer.title.rendered ) }</p>
+																</Button>
+															);
+														} ) }
+													</div>
+												</PanelBody>
+											</Panel>
+										</div>
+									);
+								} ) }
+								<Button
+									className="add-button"
+									onClick={ () => {
+										setSlides( [ ...slides, {
+											content: null,
+											selectedLayers: [],
+										} ] )
+									} }
+								>	
+									<div>
+										<Dashicon icon="plus" />
+										<p>{ __( 'Add' ) }</p>
+									</div>
+								</Button>
+							</div>
+						) }
+						{ ! showSlidesSettings && (
+							<div className="slides-settings-hide">
+								<p className="section-title">{ __( 'Slides settings' ) }</p>
+								<Button 
+									className="show-button"
+									onClick={ () => {
+										setShowSlidesSettings(true);
+									} }
+								>
+									<Dashicon icon="plus" />
+								</Button>
+							</div>
+						) }
 					</div>
 					<div className="jeo-preview-controls">
 						<p>
