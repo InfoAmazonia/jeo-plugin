@@ -1,7 +1,7 @@
 import { Button, Spinner, TextControl, TextareaControl, CheckboxControl, Dashicon, Panel, PanelBody,  } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
-import { Fragment, useState } from '@wordpress/element';
+import { Fragment, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -9,6 +9,7 @@ import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import './map-editor.css';
 import './storymap-editor.css';
+import { List, arrayMove } from 'react-movable';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
@@ -29,12 +30,22 @@ const MapEditor = ( {
 	
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
+	const [ selectedMap, setSelectedMap ] = useState( null );
 
-	//Only for visual
-	const [ slides, setSlides ] = useState( [ {
-		content: null,
-		selectedLayers: [],
-	} ] );
+	const [ v, setV ] = useState(['a', 'b']);
+
+	useEffect( () => {
+		if ( ! attributes.slides ) {
+			setAttributes( { ...attributes, slides: [ {
+				content: null,
+				selectedLayers: [],
+			} ] } );
+		}
+
+		if ( ! window.currentSlideIndex ) {
+			window.currentSlideIndex = 0;
+		}
+	} );
 
 	let rawLayers = [];
 	if ( ! loadingMap && attributes.map_id ) {
@@ -42,7 +53,7 @@ const MapEditor = ( {
 	}
 	const layersContent = [];
 	rawLayers.map( ( rawLayer ) => {
-		layersContent.push( select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id ) );
+		return layersContent.push( select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id ) );
 	} );
     
 	return (
@@ -53,6 +64,8 @@ const MapEditor = ( {
 					<div className="jeo-preview-area">
 						<Map
 							onStyleLoad={ ( map ) => {
+								setSelectedMap(map);
+
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
 									'top-right'
@@ -79,15 +92,15 @@ const MapEditor = ( {
 								}
 							} }
 							style="mapbox://styles/mapbox/streets-v11"
-							zoom={ [ loadedMap.meta.initial_zoom || mapDefaults.zoom ] }
+							zoom={ [ attributes.slides[ window.currentSlideIndex ].zoom || mapDefaults.zoom ] }
 							center={ [
-								loadedMap.meta.center_lon || mapDefaults.lng,
-								loadedMap.meta.center_lat || mapDefaults.lat,
+								attributes.slides[ window.currentSlideIndex ].longitude || mapDefaults.lng,
+								attributes.slides[ window.currentSlideIndex ].latitude || mapDefaults.lat,
 							] }
 							containerStyle={ { height: '70vh' } }
 						>
-							{ /* loadedLayers &&
-								loadedMap.meta.layers.map( ( layer ) => {
+							{ 
+								attributes.slides[ window.currentSlideIndex ].selectedLayers.map( ( layer ) => {
 									const layerOptions = loadedLayers.find(
 										( { id } ) => id === layer.id
 									);
@@ -97,7 +110,8 @@ const MapEditor = ( {
 											instance: layer,
 										} );
 									}
-								} ) */ }
+								} )
+							}
 						</Map>
 					</div>
 					<div className="storymap-controls">
@@ -109,7 +123,7 @@ const MapEditor = ( {
 										setShowStorySettings(false);
 									} }
 								>
-									<Dashicon icon="minus" />
+									<Dashicon icon="hidden" />
 								</Button>
 								<p className="section-title">{ __( 'Story settings' ) }</p>
 								<TextControl
@@ -167,7 +181,7 @@ const MapEditor = ( {
 										setShowStorySettings(true);
 									} }
 								>
-									<Dashicon icon="plus" />
+									<Dashicon icon="visibility" />
 								</Button>
 							</div>
 						) }
@@ -179,68 +193,175 @@ const MapEditor = ( {
 										setShowSlidesSettings(false);
 									} }
 								>
-									<Dashicon icon="minus" />
+									<Dashicon icon="hidden" />
 								</Button>
 								<p className="section-title">{ __( 'Slides settings' ) }</p>
-								{ slides.map( ( slide, index ) => {
-									return(
-										<div key={ slide.content } className="slide">
-											<Panel className="slide-panel">
-												<PanelBody title={ __( 'Slide' ) } initialOpen={ false }>
-													<TextareaControl 
-														className="content"
-														label={ __( 'Content (allowed to use HTML tags)' ) }
-														value={ slide.content }
-														onChange={ ( newContent ) => {
-															const oldSlides = slides;
-															oldSlides[ index ].content = newContent;
-															setSlides( oldSlides );
-														} }
-													/>
-													<p>Layers</p>
-													<div className="layers">
-														{ layersContent.map( ( layer ) => {
-															let layerButtonStyle = null;
-															if ( slides[ index ].selectedLayers.includes( layer ) ) {
-																layerButtonStyle = { background: 'black' }
-															} else {
-																layerButtonStyle = { background: 'grey' }
-															}
+								<List
+									values={ v }
+									onChange={ ( { oldIndex, newIndex } ) => {
+										let newSlides = v;
+										newSlides = arrayMove( newSlides, oldIndex, newIndex );
+										setV(newSlides);
+									} }
+									renderList={ ( { children, props } ) => {
+										return (
+											<div
+												className="slides-container"
+												{ ...props }
+											>
+												{ children }
+											</div>
+										)
+									} }
+									renderItem={ ( { value, props } ) => {
+										return (
+										<h1>{value}</h1>
+										)
+										/*
+										const slide = value;
+										const index = props.key;
+										return (
+											<div
+												key={ slide.content }
+												className="slide"
+												{ ...props }
+											>
+												<Panel className="slide-panel">
+													<PanelBody title={ __( 'Slide ' ) + ( index + 1 ) } initialOpen={ index === window.currentSlideIndex ? true : false }>
+														<TextareaControl
+															autoFocus={ index === window.currentSlideIndex ? true : false }
+															onFocus={ ( e ) => {
+																//Move cursor to the end of the input
+																const val = e.target.value;
+																e.target.value = '';
+																e.target.value = val;
+															} }
+															className="content"
+															label={ __( 'Content (allowed to use HTML tags)' ) }
+															value={ slide.content }
+															onChange={ ( newContent ) => {
+																window.currentSlideIndex = index;
 
-															return(
-																<Button
-																	className="layer"
-																	key={ layer.id }
-																	onClick={ () => {
-																		const oldSlides = slides;
+																const oldSlides = [...attributes.slides ];
+																oldSlides[ index ].content = newContent;
 
-																		if ( oldSlides[ index ].selectedLayers.includes( layer ) ) {
-																		oldSlides[ index ].selectedLayers.pop( layer );
-																			
-																		} else {
-																			oldSlides[ index ].selectedLayers.push( layer );
-																		}
+																setAttributes( { ...attributes, slides: oldSlides } );
+															} }
+														/>
+														<p>Layers</p>
+														<div className="layers">
+															{ layersContent.map( ( layer, layerIndex ) => {
+																let layerButtonStyle = null;
+																if ( attributes.slides[ index ].selectedLayers.includes( layer ) ) {
+																	layerButtonStyle = { background: 'rgb(200, 200, 200)' }
+																} else {
+																	layerButtonStyle = { background: 'rgb(240, 240, 240)' }
+																}
+																
+																return(
+																	<Button
+																		style={ layerButtonStyle }
+																		className="layer"
+																		key={ layer.id }
+																		onClick={ () => {
+																			window.currentSlideIndex = index;
+																			const oldSlides = [ ...attributes.slides ];
 
-																		setSlides( oldSlides );
-																	} }
-																>
-																	<p>{ decodeHtmlEntity( layer.title.rendered ) }</p>
-																</Button>
-															);
-														} ) }
-													</div>
-												</PanelBody>
-											</Panel>
-										</div>
-									);
-								} ) }
+																			if ( oldSlides[ index ].selectedLayers.includes( layer ) ) {
+																				oldSlides[ index ].selectedLayers.splice( oldSlides[ index ].selectedLayers.indexOf( layer ) , 1 );
+																			} else {
+																				oldSlides[ index ].selectedLayers.push( layer );
+																			}
+
+																			setAttributes( { ...attributes, slides: oldSlides } );
+																		} }
+																	>
+																		<p>{ decodeHtmlEntity( layer.title.rendered ) }</p>
+																	</Button>
+																);
+															} ) }
+														</div>
+														<Button
+															className="lock-location-button"
+															onClick={ () => {
+																window.currentSlideIndex = index;
+																const latitude = selectedMap.getCenter().lat;
+																const longitude = selectedMap.getCenter().lng;
+																const zoom = selectedMap.getZoom();
+																const pitch = selectedMap.getPitch();
+																const bearing = selectedMap.getBearing();
+
+																const newSlides = [ ...attributes.slides ];
+																newSlides[ index ].latitude = latitude;
+																newSlides[ index ].longitude = longitude;
+																newSlides[ index ].zoom = zoom;
+																newSlides[ index ].pitch = pitch;
+																newSlides[ index ].bearing = bearing;
+																
+																setAttributes( { ...attributes, slides: newSlides  } );
+															} }
+														>
+															<div>
+																<Dashicon icon="lock" />
+																<p>{ __( 'Lock current spot' ) }</p>
+															</div>
+														</Button>
+														<Button
+															className="preview-button"
+															onClick={ () => {
+																window.currentSlideIndex = index;
+																// Verify is a spot had been locked
+																if ( attributes.slides[ index ].latitude ) {
+																	selectedMap.flyTo( {
+																		center: [ attributes.slides[ index ].longitude, attributes.slides[ index ].latitude ],
+																		zoom: attributes.slides[ index ].zoom,
+																		bearing: attributes.slides[ index ].bearing,
+																		pitch: attributes.slides[ index ].pitch,
+																		speed: 4,
+																		curve: 1,
+																		easing: ( t ) => {
+																			return t;
+																		},
+																		essential: true,
+																	} );
+																}
+															} }
+														>
+															<div>
+																<Dashicon icon="visibility" />
+																<p>{ __( 'Preview' ) }</p>
+															</div>
+														</Button>
+														<Button
+															className="remove-button"
+															onClick={ () => {
+																const confirmation = confirm( __( 'Do you really want to remove this slide?' ) )
+																if ( confirmation ) {
+																	const oldSlides = [ ...attributes.slides ];
+																	oldSlides.splice( index, 1 );
+																	setAttributes( { ...attributes, slides: oldSlides } );
+																}
+															} }
+														>
+															<div>
+																<Dashicon icon="trash" />
+																<p>{ __( 'Remove' ) }</p>
+															</div>
+														</Button>
+													</PanelBody>
+												</Panel>
+											</div>
+										)
+										*/
+									} }
+								/>
 								<Button
 									className="add-button"
 									onClick={ () => {
-										setSlides( [ ...slides, {
+										setAttributes( { ...attributes, slides: [ ...attributes.slides, {
 											content: null,
 											selectedLayers: [],
-										} ] )
+										} ] } );
 									} }
 								>	
 									<div>
@@ -259,7 +380,7 @@ const MapEditor = ( {
 										setShowSlidesSettings(true);
 									} }
 								>
-									<Dashicon icon="plus" />
+									<Dashicon icon="visibility" />
 								</Button>
 							</div>
 						) }
