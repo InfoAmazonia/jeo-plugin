@@ -1,4 +1,4 @@
-import { Button, Spinner, TextControl, TextareaControl, CheckboxControl, Dashicon, Panel, PanelBody,  } from '@wordpress/components';
+import { Button, Spinner, TextControl, TextareaControl, CheckboxControl, Dashicon, Panel, PanelBody, Modal } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
 import { Fragment, useState, useEffect } from '@wordpress/element';
@@ -10,6 +10,7 @@ import JeoAutosuggest from './jeo-autosuggest';
 import './map-editor.css';
 import './storymap-editor.css';
 import { List, arrayMove } from 'react-movable';
+import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
@@ -31,19 +32,21 @@ const MapEditor = ( {
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
 	const [ selectedMap, setSelectedMap ] = useState( null );
-
-	const [ v, setV ] = useState(['a', 'b']);
+	const [ currentSlideIndex, setCurrentSlideIndex ] = useState( 0 );
+	const [ searchValue, setSearchValue ] = useState( '' );
+	const [ key, setKey ] = useState( 0 );
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
 			setAttributes( { ...attributes, slides: [ {
 				content: null,
 				selectedLayers: [],
+				latitude: mapDefaults.lat,
+				longitude: mapDefaults.lng,
+				zoom: mapDefaults.zoom,
+				pitch: 0,
+				bearing: 0,
 			} ] } );
-		}
-
-		if ( ! window.currentSlideIndex ) {
-			window.currentSlideIndex = 0;
 		}
 	} );
 
@@ -58,13 +61,16 @@ const MapEditor = ( {
     
 	return (
 		<div className="jeo-mapblock">
+			{ /* Import geocoder control */ }
+			
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && (
 				<Fragment>
 					<div className="jeo-preview-area">
 						<Map
+							key={ key }
 							onStyleLoad={ ( map ) => {
-								setSelectedMap(map);
+								setSelectedMap( map );
 
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -92,15 +98,17 @@ const MapEditor = ( {
 								}
 							} }
 							style="mapbox://styles/mapbox/streets-v11"
-							zoom={ [ attributes.slides[ window.currentSlideIndex ].zoom || mapDefaults.zoom ] }
+							zoom={ [ attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom ] }
 							center={ [
-								attributes.slides[ window.currentSlideIndex ].longitude || mapDefaults.lng,
-								attributes.slides[ window.currentSlideIndex ].latitude || mapDefaults.lat,
+								attributes.slides[ currentSlideIndex ].longitude || mapDefaults.lng,
+								attributes.slides[ currentSlideIndex ].latitude || mapDefaults.lat,
 							] }
+							bearing={ [ attributes.slides[ currentSlideIndex ].bearing ] || 0 }
+							pitch={ [ attributes.slides[ currentSlideIndex ].pitch ] || 0 }
 							containerStyle={ { height: '70vh' } }
 						>
 							{ 
-								attributes.slides[ window.currentSlideIndex ].selectedLayers.map( ( layer ) => {
+								attributes.slides[ currentSlideIndex ].selectedLayers.map( ( layer ) => {
 									const layerOptions = loadedLayers.find(
 										( { id } ) => id === layer.id
 									);
@@ -139,7 +147,7 @@ const MapEditor = ( {
 								/>
 								<TextareaControl
 									className="description"
-									label={ __( 'Story brief description' ) }
+									label={ __( 'Story brief description (allowed to use HTML tags)' ) }
 									value={ attributes.description }
 									onChange={ ( newDescription ) => {
 										setAttributes( {
@@ -197,11 +205,10 @@ const MapEditor = ( {
 								</Button>
 								<p className="section-title">{ __( 'Slides settings' ) }</p>
 								<List
-									values={ v }
+									values={ attributes.slides }
 									onChange={ ( { oldIndex, newIndex } ) => {
-										let newSlides = v;
-										newSlides = arrayMove( newSlides, oldIndex, newIndex );
-										setV(newSlides);
+										const newSLides = [ ...attributes.slides ];
+										setAttributes( { ...attributes, slides: arrayMove( newSLides, oldIndex, newIndex ) } );
 									} }
 									renderList={ ( { children, props } ) => {
 										return (
@@ -214,22 +221,18 @@ const MapEditor = ( {
 										)
 									} }
 									renderItem={ ( { value, props } ) => {
-										return (
-										<h1>{value}</h1>
-										)
-										/*
 										const slide = value;
-										const index = props.key;
+										const index = attributes.slides.indexOf( value );
 										return (
 											<div
 												key={ slide.content }
 												className="slide"
 												{ ...props }
 											>
-												<Panel className="slide-panel">
-													<PanelBody title={ __( 'Slide ' ) + ( index + 1 ) } initialOpen={ index === window.currentSlideIndex ? true : false }>
+												<Panel key={ key } className="slide-panel">
+													<PanelBody title={ __( 'Slide ' ) + ( index + 1 ) } initialOpen={ index === currentSlideIndex ? true : false }>
 														<TextareaControl
-															autoFocus={ index === window.currentSlideIndex ? true : false }
+															autoFocus={ index === currentSlideIndex ? true : false }
 															onFocus={ ( e ) => {
 																//Move cursor to the end of the input
 																const val = e.target.value;
@@ -240,7 +243,7 @@ const MapEditor = ( {
 															label={ __( 'Content (allowed to use HTML tags)' ) }
 															value={ slide.content }
 															onChange={ ( newContent ) => {
-																window.currentSlideIndex = index;
+																setCurrentSlideIndex( index );
 
 																const oldSlides = [...attributes.slides ];
 																oldSlides[ index ].content = newContent;
@@ -251,12 +254,14 @@ const MapEditor = ( {
 														<p>Layers</p>
 														<div className="layers">
 															{ layersContent.map( ( layer, layerIndex ) => {
-																let layerButtonStyle = null;
-																if ( attributes.slides[ index ].selectedLayers.includes( layer ) ) {
-																	layerButtonStyle = { background: 'rgb(200, 200, 200)' }
-																} else {
-																	layerButtonStyle = { background: 'rgb(240, 240, 240)' }
-																}
+																let layerButtonStyle = { background: 'rgb(240, 240, 240)' };
+
+																attributes.slides[ index ].selectedLayers.map( selectedLayer => {
+																	if ( selectedLayer.id === layer.id ) {
+																		layerButtonStyle = { background: 'rgb(200, 200, 200)' };
+
+																	}
+																} );
 																
 																return(
 																	<Button
@@ -264,15 +269,21 @@ const MapEditor = ( {
 																		className="layer"
 																		key={ layer.id }
 																		onClick={ () => {
-																			window.currentSlideIndex = index;
+																			setCurrentSlideIndex( index );
 																			const oldSlides = [ ...attributes.slides ];
+																			let hasBeenRemoved = false;
 
-																			if ( oldSlides[ index ].selectedLayers.includes( layer ) ) {
-																				oldSlides[ index ].selectedLayers.splice( oldSlides[ index ].selectedLayers.indexOf( layer ) , 1 );
-																			} else {
+
+																			oldSlides[ index ].selectedLayers.map( ( selectedLayer, indexOfLayer ) => {
+																				if ( selectedLayer.id === layer.id ) {
+																					oldSlides[ index ].selectedLayers.splice( indexOfLayer , 1 );
+																					hasBeenRemoved = true;			
+																				}
+																			} );
+
+																			if ( ! hasBeenRemoved ) {
 																				oldSlides[ index ].selectedLayers.push( layer );
 																			}
-
 																			setAttributes( { ...attributes, slides: oldSlides } );
 																		} }
 																	>
@@ -281,50 +292,50 @@ const MapEditor = ( {
 																);
 															} ) }
 														</div>
-														<Button
-															className="lock-location-button"
-															onClick={ () => {
-																window.currentSlideIndex = index;
-																const latitude = selectedMap.getCenter().lat;
-																const longitude = selectedMap.getCenter().lng;
-																const zoom = selectedMap.getZoom();
-																const pitch = selectedMap.getPitch();
-																const bearing = selectedMap.getBearing();
+														{ /*
+														{ attributes.slides[ index ].selectedLayers.length < 1 && (
+															<Button
+																disabled
+																className="lock-location-button"
+															>
+																<div>
+																	<Dashicon icon="lock" />
+																	<p>{ __( 'Lock current spot' ) }</p>
+																</div>
+															</Button>
+														) } */ }
+														{ true && (
+															<Button
+																className="lock-location-button"
+																onClick={ () => {
+																	setCurrentSlideIndex( index );
+																	const latitude = selectedMap.getCenter().lat;
+																	const longitude = selectedMap.getCenter().lng;
+																	const zoom = Math.round( selectedMap.getZoom() * 10 ) / 10;
+																	const pitch = selectedMap.getPitch();
+																	const bearing = selectedMap.getBearing();
 
-																const newSlides = [ ...attributes.slides ];
-																newSlides[ index ].latitude = latitude;
-																newSlides[ index ].longitude = longitude;
-																newSlides[ index ].zoom = zoom;
-																newSlides[ index ].pitch = pitch;
-																newSlides[ index ].bearing = bearing;
-																
-																setAttributes( { ...attributes, slides: newSlides  } );
-															} }
-														>
-															<div>
-																<Dashicon icon="lock" />
-																<p>{ __( 'Lock current spot' ) }</p>
-															</div>
-														</Button>
+																	const newSlides = [ ...attributes.slides ];
+																	newSlides[ index ].latitude = latitude;
+																	newSlides[ index ].longitude = longitude;
+																	newSlides[ index ].zoom = zoom;
+																	newSlides[ index ].pitch = pitch;
+																	newSlides[ index ].bearing = bearing;
+																	
+																	setAttributes( { ...attributes, slides: newSlides  } );
+																} }
+															>
+																<div>
+																	<Dashicon icon="lock" />
+																	<p>{ __( 'Lock current spot' ) }</p>
+																</div>
+															</Button>
+														) }
 														<Button
 															className="preview-button"
-															onClick={ () => {
-																window.currentSlideIndex = index;
-																// Verify is a spot had been locked
-																if ( attributes.slides[ index ].latitude ) {
-																	selectedMap.flyTo( {
-																		center: [ attributes.slides[ index ].longitude, attributes.slides[ index ].latitude ],
-																		zoom: attributes.slides[ index ].zoom,
-																		bearing: attributes.slides[ index ].bearing,
-																		pitch: attributes.slides[ index ].pitch,
-																		speed: 4,
-																		curve: 1,
-																		easing: ( t ) => {
-																			return t;
-																		},
-																		essential: true,
-																	} );
-																}
+															onClick={ ( ) => {
+																setCurrentSlideIndex( index );
+																setKey( key + 1 );
 															} }
 														>
 															<div>
@@ -335,8 +346,16 @@ const MapEditor = ( {
 														<Button
 															className="remove-button"
 															onClick={ () => {
+																if (  attributes.slides.length <= 1 ) {
+																	alert('The minimum number of slides is 1.')
+
+																	return;
+																}
+																
 																const confirmation = confirm( __( 'Do you really want to remove this slide?' ) )
-																if ( confirmation ) {
+																if ( confirmation && attributes.slides.length >= 2 ) {
+																	setCurrentSlideIndex( 0 );
+
 																	const oldSlides = [ ...attributes.slides ];
 																	oldSlides.splice( index, 1 );
 																	setAttributes( { ...attributes, slides: oldSlides } );
@@ -352,7 +371,6 @@ const MapEditor = ( {
 												</Panel>
 											</div>
 										)
-										*/
 									} }
 								/>
 								<Button
@@ -361,7 +379,14 @@ const MapEditor = ( {
 										setAttributes( { ...attributes, slides: [ ...attributes.slides, {
 											content: null,
 											selectedLayers: [],
+											latitude: window.jeo_settings.map_defaults.lat,
+											longitude: window.jeo_settings.map_defaults.lng,
+											zoom: window.jeo_settings.map_defaults.zoom,
+											pitch: 0,
+											bearing: 0,
 										} ] } );
+										setCurrentSlideIndex( attributes.slides.length );
+										setKey( key + 1 );
 									} }
 								>	
 									<div>
@@ -384,6 +409,27 @@ const MapEditor = ( {
 								</Button>
 							</div>
 						) }
+						<div className="current-slide-box">
+							<div>
+								<strong>{ __( 'Current slide: ' + ( currentSlideIndex + 1 ) ) }</strong>
+							</div>
+						</div>
+						<JeoGeoAutoComplete
+							className="search-adress-input"
+							onSelect={ ( location ) => {
+								selectedMap.flyTo( {
+									center: [ parseInt( location.lon ), parseInt( location.lat ) ],
+									zoom: parseInt( attributes.slides[ currentSlideIndex ].zoom ),
+									bearing: parseInt( attributes.slides[ currentSlideIndex ].bearing ),
+									pitch: parseInt( attributes.slides[ currentSlideIndex ].pitch ),
+									essential: true,
+								} );
+							} }
+							value={ searchValue }
+							onChange={ ( newSearchValue ) => {
+								setSearchValue( newSearchValue );
+							} }
+						/>
 					</div>
 					<div className="jeo-preview-controls">
 						<p>
