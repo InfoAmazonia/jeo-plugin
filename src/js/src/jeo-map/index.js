@@ -81,7 +81,7 @@ class JeoMap {
 			} )
 			.then( () => {
 				// Show a message when a map doesn't have layers
-				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length === 0 ) {
+				if ( this.getArg( 's' ) && this.getArg( 'layers' ).length === 0 ) {
 					this.addMapWithoutLayersMessage();
 				} else {
 					let amountLayers = 0;
@@ -752,7 +752,7 @@ class JeoMap {
 ( function ( $ ) {
 	$( function () {
 		$( '.jeomap' ).each( function ( i ) {
-			/* 
+			/*
 				before pass this element to JeoMap constructor
 				we need to get the bypassed wp unfiltered_html permission
 				getting map_id as a class and creating it as an data element

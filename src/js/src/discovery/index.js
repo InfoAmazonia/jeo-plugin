@@ -34,15 +34,85 @@ class Discorevy extends Component {
 		// });
 
 		this.fetchStories().then( ( stories ) => {
-			stories.forEach( ( story ) => {
-				const storyPoints = story.meta._related_point;
+			const sourceData = this.buildPostsGeoJson(stories);
 
-				if ( storyPoints.length ) {
-					storyPoints.forEach( ( point ) => {
-						this.addMarkerToMap( point );
-					} );
-				}
-			} );
+			map.on('load', function() {
+				// Add a new source from our GeoJSON data and set the
+				// 'cluster' option to true.
+				map.addSource("storiesSource", {
+					type: "geojson",
+					// Point to GeoJSON data. This example visualizes all M1.0+ storiesSource
+					// from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
+					data: sourceData,
+					cluster: true,
+					clusterMaxZoom: 14, // Max zoom to cluster points on
+					clusterRadius: 40 // Radius of each cluster when clustering points (defaults to 50)
+				});
+
+				// Use the storiesSource source to create five layers:
+				// One for unclustered points, three for each cluster category,
+				// and one for cluster labels.
+				map.addLayer({
+					"id": "unclustered-points",
+					"type": "symbol",
+					"source": "storiesSource",
+					"filter": ["!has", "point_count"],
+					"layout": {
+						"icon-image": "marker-15"
+					}
+				});
+
+				// Display the earthquake data in three layers, each filtered to a range of
+				// count values. Each range gets a different fill color.
+				const layers = [
+					[20, '#f28cb1'],
+					[10, '#f1f075'],
+					[0, '#ffffff']
+				];
+
+				layers.forEach(function (layer, i) {
+					map.addLayer({
+						"id": "cluster-" + i,
+						"type": "circle",
+						"source": "storiesSource",
+						"paint": {
+							"circle-color": layer[1],
+							"circle-radius": 18 + layer[0]
+						},
+						"filter": i === 0 ?
+							[">=", "point_count", layer[0]] :
+							["all",
+								[">=", "point_count", layer[0]],
+								["<", "point_count", layers[i - 1][0]]]
+					});
+				});
+
+				// Add a layer for the clusters' count labels
+				map.addLayer({
+					"id": "cluster-count",
+					"type": "symbol",
+					"source": "storiesSource",
+					"layout": {
+						"text-field": "{point_count}",
+						"text-font": [
+							"DIN Offc Pro Medium",
+							"Arial Unicode MS Bold"
+						],
+						"text-size": 12
+					}
+				});
+			});
+
+
+			// stories.forEach( ( story ) => {
+			// 	const storyPoints = story.meta._related_point;
+
+			// 	if ( storyPoints.length ) {
+			// 		storyPoints.forEach( ( point ) => {
+			// 			this.addMarkerToMap( point );
+			// 		} );
+			// 	}
+			// } );
 		} );
 	}
 
@@ -68,45 +138,55 @@ class Discorevy extends Component {
 			);
 	}
 
-	addMarkerToMap( point ) {
-		const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
-		const marker = new mapboxgl.Marker( { color } );
+	// addMarkerToMap( point ) {
+	// 	const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
+	// 	const marker = new mapboxgl.Marker( { color } );
 
-		// marker.getElement().classList.add( 'marker' );
-		// const popupHTML = this.popupTemplate( {
-		// 	post,
-		// 	read_more: window.jeoMapVars.string_read_more,
-		// 	show_featured_media: false,
-		// } );
+	// 	// marker.getElement().classList.add( 'marker' );
+	// 	// const popupHTML = this.popupTemplate( {
+	// 	// 	post,
+	// 	// 	read_more: window.jeoMapVars.string_read_more,
+	// 	// 	show_featured_media: false,
+	// 	// } );
 
-		//const popUp = new mapboxgl.Popup().setHTML(popupHTML);
+	// 	//const popUp = new mapboxgl.Popup().setHTML(popupHTML);
 
-		const LngLat = {
-			lat: parseFloat( point._geocode_lat ),
-			lon: parseFloat( point._geocode_lon ),
+	// 	const LngLat = {
+	// 		lat: parseFloat( point._geocode_lat ),
+	// 		lon: parseFloat( point._geocode_lon ),
+	// 	};
+
+	// 	marker.setLngLat( LngLat );
+	// 	marker.addTo( this.state.map );
+	// 	this.state.map.flyTo( { center: LngLat, zoom: 4 } );
+	// }
+
+	buildPostsGeoJson(stories) {
+		const finalFeatures = {
+			'type': 'FeatureCollection',
+			'features': []
 		};
 
-		marker.setLngLat( LngLat );
-		marker.addTo( this.state.map );
+		stories.map( (storie) => {
+			const storieRelatedPoints = storie.meta._related_point?? [];
+			const storiePoints = storieRelatedPoints.map(( point ) => {
+				return [ point._geocode_lon, point._geocode_lat ]
+			});
 
-		// marker.getElement().addEventListener( 'click', () => {
-		// 	this.activateMarker(marker);
-		// 	if (
-		// 		!this.options ||
-		// 		!this.options.marker_action === 'embed_preview'
-		// 	) {
-		// 		marker.setPopup(popUp);
-		// 	} else {
-		// 		this.embedPreviewActive = true;
-		// 		this.updateEmbedPreview(post);
-		// 	}
-		// 	this.map.flyTo({ center: LngLat });
-		// });
+			finalFeatures.features.push(...storiePoints.map( point => {
+				return {
+					'type': 'Feature',
+					'properties': storie,
+					'geometry': {
+						'type': 'Point',
+						'coordinates': point,
+					}
+				};
+			}));
 
-		// By default, fly to the first post and centers it
-		// this.activateMarker(marker);
+		} );
 
-		this.state.map.flyTo( { center: LngLat, zoom: 4 } );
+		return finalFeatures;
 	}
 
 	render() {
