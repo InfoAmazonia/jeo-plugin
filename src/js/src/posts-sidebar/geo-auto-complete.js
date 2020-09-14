@@ -84,7 +84,7 @@ class JeoGeoAutoComplete extends Component {
 
 		// Finally, render it!
 		return (
-			<div>
+			<div className={ this.props.className }>
 				<Autosuggest
 					suggestions={ suggestions }
 					onSuggestionsFetchRequested={ this.debouncedLoadSuggestions }

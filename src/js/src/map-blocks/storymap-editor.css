@@ -1,9 +1,10 @@
 .story-settings {
+    max-width: 40%;
     margin: 10px;
     background-color: #fff;
     border-radius: 10px;
     position: absolute;
-    top: 0;
+    top: 50px;
     padding: 10px;
 }
 
@@ -15,6 +16,23 @@
     position: absolute;
     bottom: 15%;
     padding: 10px;
+}
+
+.current-slide-box {
+    display: flex;
+    flex-direction: row;
+    width: 28%;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    position: absolute;
+    left: 70%;
+    bottom: 15%;
+    padding: 10px;
+}
+.current-slide-box div {
+    margin: auto;
+    display: flex;
 }
 
 .slides-settings {
@@ -153,4 +171,10 @@
 .slides-settings .slides-container {
     height: 400px;
     overflow-y: scroll;
+}
+
+.search-adress-input {
+    position: absolute;
+    top: 0;
+    left: 10px;
 }
