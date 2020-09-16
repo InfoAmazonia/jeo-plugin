@@ -38,15 +38,19 @@ const MapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
-			setAttributes( { ...attributes, slides: [ {
-				content: null,
-				selectedLayers: [],
-				latitude: mapDefaults.lat,
-				longitude: mapDefaults.lng,
-				zoom: mapDefaults.zoom,
-				pitch: 0,
-				bearing: 0,
-			} ] } );
+			setAttributes( { ...attributes,
+					slides: [ {
+						title: null,
+						content: null,
+						selectedLayers: [],
+						latitude: mapDefaults.lat,
+						longitude: mapDefaults.lng,
+						zoom: mapDefaults.zoom,
+						pitch: 0,
+						bearing: 0,
+					} ],
+					loadedLayers,
+				} );	
 		}
 	} );
 
@@ -61,8 +65,6 @@ const MapEditor = ( {
     
 	return (
 		<div className="jeo-mapblock">
-			{ /* Import geocoder control */ }
-			
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && (
 				<Fragment>
@@ -71,6 +73,7 @@ const MapEditor = ( {
 							key={ key }
 							onStyleLoad={ ( map ) => {
 								setSelectedMap( map );
+								setAttributes( { ...attributes, loadedLayers } ); 
 
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -234,6 +237,26 @@ const MapEditor = ( {
 														<TextareaControl
 															autoFocus={ index === currentSlideIndex ? true : false }
 															onFocus={ ( e ) => {
+																	//Move cursor to the end of the input
+																	const val = e.target.value;
+																	e.target.value = '';
+																	e.target.value = val;
+																} }
+															className="content"
+															label={ __( 'Title' ) }
+															value={ slide.title }
+															onChange={ ( newTitle ) => {
+																	setCurrentSlideIndex( index );
+
+																	const oldSlides = [...attributes.slides ];
+																	oldSlides[ index ].title = newTitle;
+
+																	setAttributes( { ...attributes, slides: oldSlides } );
+																} }
+														/>
+														<TextareaControl
+															autoFocus={ index === currentSlideIndex ? true : false }
+															onFocus={ ( e ) => {
 																//Move cursor to the end of the input
 																const val = e.target.value;
 																e.target.value = '';
@@ -377,6 +400,7 @@ const MapEditor = ( {
 									className="add-button"
 									onClick={ () => {
 										setAttributes( { ...attributes, slides: [ ...attributes.slides, {
+											title: null,
 											content: null,
 											selectedLayers: [],
 											latitude: window.jeo_settings.map_defaults.lat,
