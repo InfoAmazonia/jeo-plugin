@@ -1,4 +1,5 @@
 import template from 'lodash.template';
+import './../map-blocks/storymap-display';
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, function ( match, dec ) {
@@ -752,7 +753,7 @@ class JeoMap {
 ( function ( $ ) {
 	$( function () {
 		$( '.jeomap' ).each( function ( i ) {
-			/* 
+			/*
 				before pass this element to JeoMap constructor
 				we need to get the bypassed wp unfiltered_html permission
 				getting map_id as a class and creating it as an data element

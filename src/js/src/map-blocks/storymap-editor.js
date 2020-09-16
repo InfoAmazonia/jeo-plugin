@@ -1,4 +1,14 @@
-import { Button, Spinner, TextControl, TextareaControl, CheckboxControl, Dashicon, Panel, PanelBody, Modal } from '@wordpress/components';
+import {
+	Button,
+	Spinner,
+	TextControl,
+	TextareaControl,
+	CheckboxControl,
+	Dashicon,
+	Panel,
+	PanelBody,
+	Modal,
+} from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
 import { Fragment, useState, useEffect } from '@wordpress/element';
@@ -22,13 +32,12 @@ const MapEditor = ( {
 	loadedMap,
 	loadingMap,
 } ) => {
-
 	const decodeHtmlEntity = function ( str ) {
 		return str.replace( /&#(\d+);/g, function ( match, dec ) {
 			return String.fromCharCode( dec );
 		} );
 	};
-	
+
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
 	const [ selectedMap, setSelectedMap ] = useState( null );
@@ -38,8 +47,10 @@ const MapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
-			setAttributes( { ...attributes,
-					slides: [ {
+			setAttributes( {
+				...attributes,
+				slides: [
+					{
 						title: null,
 						content: null,
 						selectedLayers: [],
@@ -48,9 +59,10 @@ const MapEditor = ( {
 						zoom: mapDefaults.zoom,
 						pitch: 0,
 						bearing: 0,
-					} ],
-					loadedLayers,
-				} );	
+					},
+				],
+				loadedLayers,
+			} );
 		}
 	} );
 
@@ -60,9 +72,11 @@ const MapEditor = ( {
 	}
 	const layersContent = [];
 	rawLayers.map( ( rawLayer ) => {
-		return layersContent.push( select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id ) );
+		return layersContent.push(
+			select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id )
+		);
 	} );
-    
+
 	return (
 		<div className="jeo-mapblock">
 			{ attributes.map_id && loadingMap && <Spinner /> }
@@ -73,7 +87,7 @@ const MapEditor = ( {
 							key={ key }
 							onStyleLoad={ ( map ) => {
 								setSelectedMap( map );
-								setAttributes( { ...attributes, loadedLayers } ); 
+								setAttributes( { ...attributes, loadedLayers } );
 
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -101,17 +115,23 @@ const MapEditor = ( {
 								}
 							} }
 							style="mapbox://styles/mapbox/streets-v11"
-							zoom={ [ attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom ] }
-							center={ [
-								attributes.slides[ currentSlideIndex ].longitude || mapDefaults.lng,
-								attributes.slides[ currentSlideIndex ].latitude || mapDefaults.lat,
+							zoom={ [
+								attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom,
 							] }
-							bearing={ [ attributes.slides[ currentSlideIndex ].bearing ] || 0 }
+							center={ [
+								attributes.slides[ currentSlideIndex ].longitude ||
+									mapDefaults.lng,
+								attributes.slides[ currentSlideIndex ].latitude ||
+									mapDefaults.lat,
+							] }
+							bearing={
+								[ attributes.slides[ currentSlideIndex ].bearing ] || 0
+							}
 							pitch={ [ attributes.slides[ currentSlideIndex ].pitch ] || 0 }
 							containerStyle={ { height: '70vh' } }
 						>
-							{ 
-								attributes.slides[ currentSlideIndex ].selectedLayers.map( ( layer ) => {
+							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
+								( layer ) => {
 									const layerOptions = loadedLayers.find(
 										( { id } ) => id === layer.id
 									);
@@ -121,8 +141,8 @@ const MapEditor = ( {
 											instance: layer,
 										} );
 									}
-								} )
-							}
+								}
+							) }
 						</Map>
 					</div>
 					<div className="storymap-controls">
@@ -131,7 +151,7 @@ const MapEditor = ( {
 								<Button
 									className="hide-button"
 									onClick={ () => {
-										setShowStorySettings(false);
+										setShowStorySettings( false );
 									} }
 								>
 									<Dashicon icon="hidden" />
@@ -144,18 +164,20 @@ const MapEditor = ( {
 									onChange={ ( newTitle ) => {
 										setAttributes( {
 											...attributes,
-										title: newTitle,
+											title: newTitle,
 										} );
 									} }
 								/>
 								<TextareaControl
 									className="description"
-									label={ __( 'Story brief description (allowed to use HTML tags)' ) }
+									label={ __(
+										'Story brief description (allowed to use HTML tags)'
+									) }
 									value={ attributes.description }
 									onChange={ ( newDescription ) => {
 										setAttributes( {
 											...attributes,
-										description: newDescription,
+											description: newDescription,
 										} );
 									} }
 								/>
@@ -177,7 +199,7 @@ const MapEditor = ( {
 									onChange={ ( newNavigateButton ) => {
 										setAttributes( {
 											...attributes,
-										navigateButton: newNavigateButton,
+											navigateButton: newNavigateButton,
 										} );
 									} }
 								/>
@@ -186,10 +208,10 @@ const MapEditor = ( {
 						{ ! showStorySettings && (
 							<div className="story-settings-hide">
 								<p className="section-title">{ __( 'Story settings' ) }</p>
-								<Button 
+								<Button
 									className="show-button"
 									onClick={ () => {
-										setShowStorySettings(true);
+										setShowStorySettings( true );
 									} }
 								>
 									<Dashicon icon="visibility" />
@@ -201,7 +223,7 @@ const MapEditor = ( {
 								<Button
 									className="hide-button"
 									onClick={ () => {
-										setShowSlidesSettings(false);
+										setShowSlidesSettings( false );
 									} }
 								>
 									<Dashicon icon="hidden" />
@@ -211,51 +233,34 @@ const MapEditor = ( {
 									values={ attributes.slides }
 									onChange={ ( { oldIndex, newIndex } ) => {
 										const newSLides = [ ...attributes.slides ];
-										setAttributes( { ...attributes, slides: arrayMove( newSLides, oldIndex, newIndex ) } );
+										setAttributes( {
+											...attributes,
+											slides: arrayMove( newSLides, oldIndex, newIndex ),
+										} );
 									} }
 									renderList={ ( { children, props } ) => {
 										return (
-											<div
-												className="slides-container"
-												{ ...props }
-											>
+											<div className="slides-container" { ...props }>
 												{ children }
 											</div>
-										)
+										);
 									} }
 									renderItem={ ( { value, props } ) => {
 										const slide = value;
 										const index = attributes.slides.indexOf( value );
 										return (
-											<div
-												key={ slide.content }
-												className="slide"
-												{ ...props }
-											>
+											<div key={ slide.content } className="slide" { ...props }>
 												<Panel key={ key } className="slide-panel">
-													<PanelBody title={ __( 'Slide ' ) + ( index + 1 ) } initialOpen={ index === currentSlideIndex ? true : false }>
+													<PanelBody
+														title={ __( 'Slide ' ) + ( index + 1 ) }
+														initialOpen={
+															index === currentSlideIndex ? true : false
+														}
+													>
 														<TextareaControl
-															autoFocus={ index === currentSlideIndex ? true : false }
-															onFocus={ ( e ) => {
-																	//Move cursor to the end of the input
-																	const val = e.target.value;
-																	e.target.value = '';
-																	e.target.value = val;
-																} }
-															className="content"
-															label={ __( 'Title' ) }
-															value={ slide.title }
-															onChange={ ( newTitle ) => {
-																	setCurrentSlideIndex( index );
-
-																	const oldSlides = [...attributes.slides ];
-																	oldSlides[ index ].title = newTitle;
-
-																	setAttributes( { ...attributes, slides: oldSlides } );
-																} }
-														/>
-														<TextareaControl
-															autoFocus={ index === currentSlideIndex ? true : false }
+															autoFocus={
+																index === currentSlideIndex ? true : false
+															}
 															onFocus={ ( e ) => {
 																//Move cursor to the end of the input
 																const val = e.target.value;
@@ -263,54 +268,106 @@ const MapEditor = ( {
 																e.target.value = val;
 															} }
 															className="content"
-															label={ __( 'Content (allowed to use HTML tags)' ) }
+															label={ __( 'Title' ) }
+															value={ slide.title }
+															onChange={ ( newTitle ) => {
+																setCurrentSlideIndex( index );
+
+																const oldSlides = [ ...attributes.slides ];
+																oldSlides[ index ].title = newTitle;
+
+																setAttributes( {
+																	...attributes,
+																	slides: oldSlides,
+																} );
+															} }
+														/>
+														<TextareaControl
+															autoFocus={
+																index === currentSlideIndex ? true : false
+															}
+															onFocus={ ( e ) => {
+																//Move cursor to the end of the input
+																const val = e.target.value;
+																e.target.value = '';
+																e.target.value = val;
+															} }
+															className="content"
+															label={ __(
+																'Content (allowed to use HTML tags)'
+															) }
 															value={ slide.content }
 															onChange={ ( newContent ) => {
 																setCurrentSlideIndex( index );
 
-																const oldSlides = [...attributes.slides ];
+																const oldSlides = [ ...attributes.slides ];
 																oldSlides[ index ].content = newContent;
 
-																setAttributes( { ...attributes, slides: oldSlides } );
+																setAttributes( {
+																	...attributes,
+																	slides: oldSlides,
+																} );
 															} }
 														/>
 														<p>Layers</p>
 														<div className="layers">
 															{ layersContent.map( ( layer, layerIndex ) => {
-																let layerButtonStyle = { background: 'rgb(240, 240, 240)' };
+																let layerButtonStyle = {
+																	background: 'rgb(240, 240, 240)',
+																};
 
-																attributes.slides[ index ].selectedLayers.map( selectedLayer => {
-																	if ( selectedLayer.id === layer.id ) {
-																		layerButtonStyle = { background: 'rgb(200, 200, 200)' };
-
+																attributes.slides[ index ].selectedLayers.map(
+																	( selectedLayer ) => {
+																		if ( selectedLayer.id === layer.id ) {
+																			layerButtonStyle = {
+																				background: 'rgb(200, 200, 200)',
+																			};
+																		}
 																	}
-																} );
-																
-																return(
+																);
+
+																return (
 																	<Button
 																		style={ layerButtonStyle }
 																		className="layer"
 																		key={ layer.id }
 																		onClick={ () => {
 																			setCurrentSlideIndex( index );
-																			const oldSlides = [ ...attributes.slides ];
+																			const oldSlides = [
+																				...attributes.slides,
+																			];
 																			let hasBeenRemoved = false;
 
-
-																			oldSlides[ index ].selectedLayers.map( ( selectedLayer, indexOfLayer ) => {
-																				if ( selectedLayer.id === layer.id ) {
-																					oldSlides[ index ].selectedLayers.splice( indexOfLayer , 1 );
-																					hasBeenRemoved = true;			
+																			oldSlides[ index ].selectedLayers.map(
+																				( selectedLayer, indexOfLayer ) => {
+																					if ( selectedLayer.id === layer.id ) {
+																						oldSlides[
+																							index
+																						].selectedLayers.splice(
+																							indexOfLayer,
+																							1
+																						);
+																						hasBeenRemoved = true;
+																					}
 																				}
-																			} );
+																			);
 
 																			if ( ! hasBeenRemoved ) {
-																				oldSlides[ index ].selectedLayers.push( layer );
+																				oldSlides[ index ].selectedLayers.push(
+																					layer
+																				);
 																			}
-																			setAttributes( { ...attributes, slides: oldSlides } );
+																			setAttributes( {
+																				...attributes,
+																				slides: oldSlides,
+																			} );
 																		} }
 																	>
-																		<p>{ decodeHtmlEntity( layer.title.rendered ) }</p>
+																		<p>
+																			{ decodeHtmlEntity(
+																				layer.title.rendered
+																			) }
+																		</p>
 																	</Button>
 																);
 															} ) }
@@ -334,7 +391,9 @@ const MapEditor = ( {
 																	setCurrentSlideIndex( index );
 																	const latitude = selectedMap.getCenter().lat;
 																	const longitude = selectedMap.getCenter().lng;
-																	const zoom = Math.round( selectedMap.getZoom() * 10 ) / 10;
+																	const zoom =
+																		Math.round( selectedMap.getZoom() * 10 ) /
+																		10;
 																	const pitch = selectedMap.getPitch();
 																	const bearing = selectedMap.getBearing();
 
@@ -344,8 +403,11 @@ const MapEditor = ( {
 																	newSlides[ index ].zoom = zoom;
 																	newSlides[ index ].pitch = pitch;
 																	newSlides[ index ].bearing = bearing;
-																	
-																	setAttributes( { ...attributes, slides: newSlides  } );
+
+																	setAttributes( {
+																		...attributes,
+																		slides: newSlides,
+																	} );
 																} }
 															>
 																<div>
@@ -356,7 +418,7 @@ const MapEditor = ( {
 														) }
 														<Button
 															className="preview-button"
-															onClick={ ( ) => {
+															onClick={ () => {
 																setCurrentSlideIndex( index );
 																setKey( key + 1 );
 															} }
@@ -369,19 +431,29 @@ const MapEditor = ( {
 														<Button
 															className="remove-button"
 															onClick={ () => {
-																if (  attributes.slides.length <= 1 ) {
-																	alert('The minimum number of slides is 1.')
+																if ( attributes.slides.length <= 1 ) {
+																	alert( 'The minimum number of slides is 1.' );
 
 																	return;
 																}
-																
-																const confirmation = confirm( __( 'Do you really want to remove this slide?' ) )
-																if ( confirmation && attributes.slides.length >= 2 ) {
+
+																const confirmation = confirm(
+																	__(
+																		'Do you really want to remove this slide?'
+																	)
+																);
+																if (
+																	confirmation &&
+																	attributes.slides.length >= 2
+																) {
 																	setCurrentSlideIndex( 0 );
 
 																	const oldSlides = [ ...attributes.slides ];
 																	oldSlides.splice( index, 1 );
-																	setAttributes( { ...attributes, slides: oldSlides } );
+																	setAttributes( {
+																		...attributes,
+																		slides: oldSlides,
+																	} );
 																}
 															} }
 														>
@@ -393,26 +465,32 @@ const MapEditor = ( {
 													</PanelBody>
 												</Panel>
 											</div>
-										)
+										);
 									} }
 								/>
 								<Button
 									className="add-button"
 									onClick={ () => {
-										setAttributes( { ...attributes, slides: [ ...attributes.slides, {
-											title: null,
-											content: null,
-											selectedLayers: [],
-											latitude: window.jeo_settings.map_defaults.lat,
-											longitude: window.jeo_settings.map_defaults.lng,
-											zoom: window.jeo_settings.map_defaults.zoom,
-											pitch: 0,
-											bearing: 0,
-										} ] } );
+										setAttributes( {
+											...attributes,
+											slides: [
+												...attributes.slides,
+												{
+													title: null,
+													content: null,
+													selectedLayers: [],
+													latitude: window.jeo_settings.map_defaults.lat,
+													longitude: window.jeo_settings.map_defaults.lng,
+													zoom: window.jeo_settings.map_defaults.zoom,
+													pitch: 0,
+													bearing: 0,
+												},
+											],
+										} );
 										setCurrentSlideIndex( attributes.slides.length );
 										setKey( key + 1 );
 									} }
-								>	
+								>
 									<div>
 										<Dashicon icon="plus" />
 										<p>{ __( 'Add' ) }</p>
@@ -423,10 +501,10 @@ const MapEditor = ( {
 						{ ! showSlidesSettings && (
 							<div className="slides-settings-hide">
 								<p className="section-title">{ __( 'Slides settings' ) }</p>
-								<Button 
+								<Button
 									className="show-button"
 									onClick={ () => {
-										setShowSlidesSettings(true);
+										setShowSlidesSettings( true );
 									} }
 								>
 									<Dashicon icon="visibility" />
@@ -435,17 +513,26 @@ const MapEditor = ( {
 						) }
 						<div className="current-slide-box">
 							<div>
-								<strong>{ __( 'Current slide: ' + ( currentSlideIndex + 1 ) ) }</strong>
+								<strong>
+									{ __( 'Current slide: ' + ( currentSlideIndex + 1 ) ) }
+								</strong>
 							</div>
 						</div>
 						<JeoGeoAutoComplete
 							className="search-adress-input"
 							onSelect={ ( location ) => {
 								selectedMap.flyTo( {
-									center: [ parseInt( location.lon ), parseInt( location.lat ) ],
+									center: [
+										parseInt( location.lon ),
+										parseInt( location.lat ),
+									],
 									zoom: parseInt( attributes.slides[ currentSlideIndex ].zoom ),
-									bearing: parseInt( attributes.slides[ currentSlideIndex ].bearing ),
-									pitch: parseInt( attributes.slides[ currentSlideIndex ].pitch ),
+									bearing: parseInt(
+										attributes.slides[ currentSlideIndex ].bearing
+									),
+									pitch: parseInt(
+										attributes.slides[ currentSlideIndex ].pitch
+									),
 									essential: true,
 								} );
 							} }
@@ -523,7 +610,11 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 			'map',
 			attributes.map_id,
 		] ),
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: 100, order: 'asc', orderby: 'menu_order' } ),
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
+		per_page: 100,
+		order: 'asc',
+		orderby: 'menu_order',
+	} ),
 	loadingLayers: select( 'core/data' ).isResolving(
 		'core',
 		'getEntityRecords',
