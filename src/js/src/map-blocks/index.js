@@ -4,9 +4,7 @@ import MapDisplay from './map-display';
 import MapEditor from './map-editor';
 import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
-import StorymapDisplay from './storymap-display';
 import StorymapEditor from './storymap-editor'
-
 import MapIcon from '../icons/ion/map';
 
 registerBlockType( 'jeo/map', {
@@ -140,5 +138,5 @@ registerBlockType( 'jeo/storymap', {
 		},
 	},
 	edit: ( props ) => <StorymapEditor { ...props } />,
-	save: ( props ) => <StorymapDisplay { ...props } />,
+	save: ( props ) => <div id="story-map" data-properties={ JSON.stringify(props.attributes) } />,
 } );

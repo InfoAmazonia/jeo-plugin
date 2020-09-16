@@ -5,8 +5,9 @@ class StoryMapDisplay extends Component {
 	constructor( props ) {
 		super( props );
 
+
 		this.state = {
-			currentChapter: this.props.attributes.slides[ 0 ],
+			currentChapter: this.props.slides[ 0 ],
 		}
 	}
 
@@ -20,16 +21,19 @@ class StoryMapDisplay extends Component {
 					map.dragRotate.disable();
 				} }
 				style="mapbox://styles/mapbox/streets-v11"
-				zoom={ [ this.state.currentChapter.zoom ] }
+				zoom={ [ this.state.currentChapter.zoom || 1 ] }
 				center={ [
 					this.state.currentChapter.longitude,
 					this.state.currentChapter.latitude,
 				] }
-				containerStyle={ { height: '50vh' } }
+				containerStyle={ { width: '100%', height: '300px', marginLeft: 'auto', marginRight: 'auto' } }
 			>
 			</Map>
 		)
 	}
 }
 
-export default StoryMapDisplay;
+const storyMapElement = document.getElementById('story-map');
+const storyMapProps = JSON.parse(storyMapElement.getAttribute('data-properties'));
+
+wp.element.render(<StoryMapDisplay { ...storyMapProps } />, storyMapElement);
