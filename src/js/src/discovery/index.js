@@ -60,9 +60,9 @@ class Discorevy extends Component {
 						filter: ['!', ['has', 'point_count']],
 						layout: {
 							'icon-image': 'news-marker',
-							'icon-size': 0.15,
+							'icon-size': 0.10,
 							'icon-allow-overlap': true,
-							'text-field': 'storie',
+							// 'text-field': 'storie',
 							'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
 							'text-size': 11,
 							'text-transform': 'uppercase',
@@ -103,7 +103,7 @@ class Discorevy extends Component {
 								[17, [0, -90]]
 							]},
 							'text-field': '{point_count}',
-							'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+							'text-font': ['Open Sans Regular', 'Arial Unicode MS Regular'],
 							'text-size': 12,
 							'text-transform': 'uppercase',
 							'text-letter-spacing': 0.05,
@@ -138,6 +138,9 @@ class Discorevy extends Component {
 						paint: {
 							'circle-color': layer[1],
 							'circle-radius': 20 + layer[0],
+							'circle-stroke-color': '#ffffff',
+							'circle-stroke-opacity': 0.4,
+							'circle-stroke-width': 9,
 						},
 						filter:
 							i === 0
