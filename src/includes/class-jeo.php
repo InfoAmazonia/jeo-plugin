@@ -181,6 +181,7 @@ class Jeo {
 				array(
 					'jsonUrl' => rest_url( 'wp/v2/' ),
 					'string_read_more' => __( 'Read more', 'jeo' ),
+					'jeoUrl' => JEO_BASEURL,
 					'nonce' => wp_create_nonce('wp_rest'),
 					'templates' => [
 						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
