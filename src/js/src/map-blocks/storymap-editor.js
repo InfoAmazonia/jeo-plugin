@@ -7,7 +7,6 @@ import {
 	Dashicon,
 	Panel,
 	PanelBody,
-	Modal,
 } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
@@ -61,7 +60,6 @@ const MapEditor = ( {
 						bearing: 0,
 					},
 				],
-				loadedLayers,
 			} );
 		}
 	} );
@@ -87,7 +85,6 @@ const MapEditor = ( {
 							key={ key }
 							onStyleLoad={ ( map ) => {
 								setSelectedMap( map );
-								setAttributes( { ...attributes, loadedLayers } );
 
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
