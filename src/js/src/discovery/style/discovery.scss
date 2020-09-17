@@ -1,0 +1,72 @@
+$primary: #191E23;
+
+.discovery {
+	.togable-panel {
+		.components-tab-panel {
+			&__tabs {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				border-bottom: 1px solid opacify($primary, 0.8);
+
+				button {
+					background: none;
+					color: #191E23;
+					// font-family: "Open Sans";
+					font-size: 1.125rem;
+					font-weight: bold;
+					letter-spacing: 0;
+					line-height: 1.5rem;
+					padding: 10px;
+					text-decoration: none;
+					outline: none;
+
+					&:after {
+						transition: all .2s ease-in-out;
+						content: "";
+						display: block;
+						height: 0px;
+						width: 100%;
+						position: absolute;
+						bottom: 0px;
+						left: 0;
+						background: $primary;
+					}
+
+					&.active-tab {
+						position: relative;
+
+						&:after {
+							height: 3px;
+							transition: all .2s ease-in-out;
+						}
+					}
+
+					.tab-toggle {
+						display: flex;
+						justify-content: center;
+						align-items: center;
+
+						svg {
+							height: 18px;
+							  width: 21px;
+							  margin-right: 10px;
+						}
+					}
+				}
+			}
+		}
+
+		.search-area {
+			display: flex;
+			border-radius: 0 10px 10px 0;
+
+			input {
+				flex: 0 0 calc(100% - 77px);
+			}
+
+			button {
+				flex: 0 0 77px;
+			}
+		}
+	}
+}
