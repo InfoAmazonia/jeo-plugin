@@ -133,9 +133,6 @@ registerBlockType( 'jeo/storymap', {
 		hasIntroduction: {
 			type: 'boolean',
 		},
-		loadedLyaers : {
-			type: 'array'
-		},
 	},
 	edit: ( props ) => <StorymapEditor { ...props } />,
 	save: ( props ) => <div id="story-map" data-properties={ JSON.stringify(props.attributes) } />,
