@@ -1,4 +1,6 @@
 import { Component } from '@wordpress/element';
+import Sidebar from './blocks/sidebar';
+import './style/discovery.scss';
 
 // mapboxgl.accessToken = 'MAPBOX_ACCESS_TOKEN';
 
@@ -10,6 +12,8 @@ class Discorevy extends Component {
 			// map
 			map: null,
 
+			// layers
+			selectedLayers: [],
 			// stories
 			storiesLoaded: false,
 			stories: [],
@@ -33,21 +37,13 @@ class Discorevy extends Component {
 			const sourceData = this.buildPostsGeoJson(stories);
 
 			map.on('load', function () {
-				// Add a new source from our GeoJSON data and set the
-				// 'cluster' option to true.
 				map.addSource('storiesSource', {
 					type: 'geojson',
-					// Point to GeoJSON data. This example visualizes all M1.0+ storiesSource
-					// from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
 					data: sourceData,
 					cluster: true,
-					clusterMaxZoom: 40, // Max zoom to cluster points on
-					clusterRadius: 40, // Radius of each cluster when clustering points (defaults to 50)
+					clusterMaxZoom: 40,
+					clusterRadius: 40,
 				});
-
-				// Use the storiesSource source to create five layers:
-				// One for unclustered points, three for each cluster category,
-				// and one for cluster labels.
 
 				map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png', function (error, image) {
 					if (error) throw error;
@@ -77,22 +73,15 @@ class Discorevy extends Component {
 					});
 				});
 
-
 				map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news.png', function (error, image) {
 					if (error) throw error;
 
 					map.addImage('news', image);
 
-					// Add a layer for the clusters' count labels
 					map.addLayer({
 						id: 'cluster-count',
 						type: 'symbol',
 						source: 'storiesSource',
-						// layout: {
-						// 	'text-field': '{point_count}',
-						// 	'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-						// 	'text-size': 12,
-						// },
 
 						layout: {
 							'icon-image': 'news',
@@ -112,21 +101,16 @@ class Discorevy extends Component {
 
 						paint: {
 							'text-color': '#202',
-							// 'text-halo-color': '#fff',
-							// 'text-halo-width': 2,
 						},
 
 						filter: ['has', 'point_count'],
 					});
 				});
 
-
-
-				// Display the earthquake data in three layers, each filtered to a range of
-				// count values. Each range gets a different fill color.
 				const layers = [
-					[20, '#f28cb1'],
-					[10, '#f1f075'],
+					// [6, '#000000'],
+					// [5, '#f28cb1'],
+					// [2, '#f1f075'],
 					[0, '#ffffff'],
 				];
 
@@ -242,12 +226,12 @@ class Discorevy extends Component {
 
 	render() {
 		return (
-			<div>
-				<div className="stories"></div>
+			<div className="discovery">
+				<Sidebar />
 				<div
-					ref={(el) => (this.mapContainer = el)}
-					style={{ height: 'calc(100vh - 200px)' }}
-					className=""
+					ref={ (el) => (this.mapContainer = el) }
+					style={ { height: 'calc(100vh - 200px)' } }
+					className="discovery-map"
 				/>
 			</div>
 		);
