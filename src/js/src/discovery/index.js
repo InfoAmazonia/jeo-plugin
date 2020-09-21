@@ -174,10 +174,10 @@ class Discovery extends Component {
 		}
 
 
-		const url = new URL(jeoMapVars.jsonUrl + 'posts/');
-		Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+		const postsUrl = new URL(jeoMapVars.jsonUrl + 'posts/');
+		Object.keys(params).forEach(key => postsUrl.searchParams.append(key, params[key]))
 
-		return fetch(url)
+		return fetch(postsUrl)
 			.then((response) => {
 				this.setState(( state ) => ({
 					...state,
@@ -190,14 +190,62 @@ class Discovery extends Component {
 			.then((response) => response.json())
 			.then((stories) => {
 					const geolocatedStories = stories.filter( ( story ) => story.meta._related_point.length > 0);
-					const storiesCumulative = params.cumulative? [ ...this.state.stories, ...geolocatedStories ] : geolocatedStories;
+					let storiesCumulative = params.cumulative? [ ...this.state.stories, ...geolocatedStories ] : geolocatedStories;
 
-					this.setState( ( state ) => ( {
-						...state,
-						storiesLoaded: true,
-						stories: storiesCumulative,
+					// Fetch medias
+					const storiesMediasPromises = geolocatedStories.map( async ( story ) => {
+						const mediaApiUrl = new URL(jeoMapVars.jsonUrl + 'media/' + story.featured_media);
+
+						// If featured media is not set
+						if(!story.featured_media) {
+							return;
+						}
+
+						return fetch(mediaApiUrl).then( data => data.json() ).then( ( media ) => {
+							story.queriedFeaturedImage = media;
+							return media;
+						});
+					} )
+
+					// Fetch categories
+					const storiesCategoriesPromises = geolocatedStories.map( ( story ) => {
+						return story.categories.map ( async ( category ) => {
+							const categoriesApiUrl = new URL(jeoMapVars.jsonUrl + 'categories/' + category);
+
+
+							// If category is not set
+							// if( !category ) {
+							// 	return;
+							// }
+
+							return fetch(categoriesApiUrl).then( data => data.json()).then( ( category ) => {
+								if ( story.queriedCategories && story.queriedCategories.length ) {
+									story.queriedCategories = [ ...story.queriedCategories, category];
+								} else {
+									story.queriedCategories = [ category ];
+								}
+
+								return category;
+							});
+						})
+					} )
+
+
+					// When its all resolved, update state
+					Promise.all(storiesMediasPromises)
+					.then( () => Promise.all(storiesCategoriesPromises)
+					.then( () => {
+						storiesCumulative = params.cumulative? [ ...this.state.stories, ...geolocatedStories ] : geolocatedStories;
+
+						this.setState( ( state ) => ( {
+							...state,
+							storiesLoaded: true,
+							stories: storiesCumulative,
+						} ) );
+
 					} ) );
 
+					// Dosen't matter if we return before media and categories are done.
 					return Promise.resolve(storiesCumulative);
 				},
 				(error) => {
@@ -235,6 +283,7 @@ class Discovery extends Component {
 	// }
 
 	buildPostsGeoJson(stories) {
+		console.log(stories);
 		const finalFeatures = {
 			type: 'FeatureCollection',
 			features: [],

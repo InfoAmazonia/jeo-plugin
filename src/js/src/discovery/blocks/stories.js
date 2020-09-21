@@ -1,5 +1,6 @@
 import { Component } from '@wordpress/element';
 import LazyImage from "./lazy-image";
+import styled from 'styled-components';
 
 class Stories extends Component {
 	constructor(props) {
@@ -69,8 +70,8 @@ class Storie extends Component {
 		super(props);
 
 		this.state = {
-			featuredImage: {},
-			categories: {},
+			queriedFeaturedImage: {},
+			categories: [],
 			doneLoading: false,
 		}
 	}
@@ -78,65 +79,78 @@ class Storie extends Component {
 	componentDidMount() {
 		const story = this.props.story;
 
-		if(!this.state.doneLoading) {
-			// Fetch post image
-			if(story.featured_media) {
-				const url = new URL(jeoMapVars.jsonUrl + 'media/' + story.featured_media);
-				fetch(url)
-					.then((response) => response.json())
-					.then((media) => {
-							this.setState({
-								featuredImage: media,
-								doneLoading: true,
-							});
-						},
-						(error) => {
-							console.log(error);
+		// if(!this.state.doneLoading) {
+		// 	// Fetch post image
+		// 	if(story.featured_media) {
+		// 		const url = new URL(jeoMapVars.jsonUrl + 'media/' + story.featured_media);
+		// 		fetch(url)
+		// 			.then((response) => response.json())
+		// 			.then((media) => {
+		// 					this.setState( ( state ) => ( {
+		// 						...state,
+		// 						featuredImage: media,
+		// 						doneLoading: true,
+		// 					} ) );
+		// 				},
+		// 				(error) => {
+		// 					console.log(error);
 
-							this.setState({
-								...this.state,
-								doneLoading: false,
-							});
-						}
-					);
+		// 					this.setState( ( state ) => ( {
+		// 						...state,
+		// 						doneLoading: false,
+		// 					} ) );
+		// 				}
+		// 			);
+		// 	}
 
-			}
 
-			// const url = new URL(jeoMapVars.jsonUrl + 'media/' + story.featured_media);
-			// fetch(url)
-			// 	.then((response) => response.json())
-			// 	.then((media) => {
-			// 			this.setState({
-			// 				featuredImage: media,
-			// 				doneLoading: true,
-			// 			});
-			// 		},
-			// 		(error) => {
-			// 			console.log(error);
+		// 	// Fetch categories
+		// 	story.categories.forEach (( category ) => {
+		// 		const url = new URL(jeoMapVars.jsonUrl + 'categories/' + category);
+		// 		fetch(url)
+		// 			.then((response) => response.json())
+		// 			.then(( categoryObj ) => {
+		// 					this.setState( ( state ) => ( {
+		// 						...state,
+		// 						categories: [ ...state.categories, categoryObj],
+		// 						doneLoading: true,
+		// 					} ) );
+		// 				},
+		// 				(error) => {
+		// 					console.log(error);
 
-			// 			this.setState({
-			// 				...this.state,
-			// 				doneLoading: false,
-			// 			});
-			// 		}
-			// 	);
-
-		}
+		// 					this.setState( ( state ) => ( {
+		// 						...state,
+		// 						doneLoading: false,
+		// 					} ) );
+		// 				}
+		// 			);
+		// 	} )
+		// }
 	}
 
 	render() {
 		const story = this.props.story;
 
+		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+		const storyDate = new Date( story.date_gmt ).toLocaleDateString( undefined, dateOptions );
+
+		// const categoriesRender = story.queriedCategories.reduce( ( accumulator, category ) => {
+		// 	return accumulator + category.name
+		// }, '')
+
+		// console.log(this.state.categories);
+
 		return (
-			<div className="card">
-				{ story.featured_media ?
-					<LazyImage src={ this.state.featuredImage.source_url } alt={ this.state.featuredImage.alt_text } />
+			<div className={ "card" + ( !story.queriedFeaturedImage ? ' no-thumb' : '' ) }>
+				{ story.queriedFeaturedImage ?
+					<LazyImage src={ story.queriedFeaturedImage.source_url } alt={ story.queriedFeaturedImage.alt_text } />
 				: null }
 
 
 				<div className="sideway">
 					<div className="categories">
-
+						{  }
 					</div>
 
 					<div className="title">
@@ -144,7 +158,7 @@ class Storie extends Component {
 					</div>
 
 					<div className="date">
-
+						{ storyDate }
 					</div>
 				</div>
 			</div>

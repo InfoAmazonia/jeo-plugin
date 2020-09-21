@@ -1,7 +1,6 @@
 import React from 'react';
 import styled, { keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
-import LazyLoad from 'react-lazyload';
 
 const ImageWrapper = styled.div`
 
@@ -39,6 +38,7 @@ const StyledImage = styled.img`
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+	top: 0;
 `;
 
 const Wrapper = styled.div`
@@ -58,15 +58,12 @@ const LazyImage = ( { src, alt } ) => {
 	return (
 		<Wrapper>
 			<Placeholder ref={ refPlaceholder } />
-
-			<LazyLoad>
-				<StyledImage
-					onLoad={ removePlaceholder }
-					onError={ removePlaceholder }
-					src={ src }
-					alt={ alt }
-				/>
-			</LazyLoad>
+			<StyledImage
+				onLoad={ removePlaceholder }
+				onError={ removePlaceholder }
+				src={ src }
+				alt={ alt }
+			/>
 		</Wrapper>
 	);
 };
