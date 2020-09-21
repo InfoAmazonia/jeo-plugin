@@ -7,13 +7,13 @@ Requires at least: 5.4
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
-The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
+The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news storys as layers of information on digital maps.
 
 == Description ==
 
-With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All direct at the WordPress dashboard.
+With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged storys and create richly designed pages for each one of the featured storys. At the same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All direct at the WordPress dashboard.
 
-= Features = 
+= Features =
 
 * [Mapbox](https://www.mapbox.com) maps;
 * [ReactMapBoxGL](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md) library;
@@ -47,7 +47,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
- 
+
 = 0.2.0 =
 * Second release.
 
