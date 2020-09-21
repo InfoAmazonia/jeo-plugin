@@ -11,13 +11,16 @@ class Sidebar extends Component {
 	}
 
 	displayTab(tab) {
-		return tab.name === 'stories'? <Stories stories={ this.props.stories } updateStories={ this.props.updateStories } /> : <MapLayers />;
+		return tab.name === 'stories'? <Stories storiesLoaded={ this.props.storiesLoaded } stories={ this.props.stories } updateStories={ this.props.updateStories } /> : <MapLayers />;
 	}
 
 	handleScroll(e) {
-		const element = e.target
-		if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-			this.props.updateStories({ cumulative: true })
+		// Only send parent update if the previuos one is done
+		if (this.props.storiesLoaded) {
+			const element = e.target
+			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+				this.props.updateStories( { cumulative: true } )
+			}
 		}
 	};
 

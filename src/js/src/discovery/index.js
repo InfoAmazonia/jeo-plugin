@@ -40,7 +40,7 @@ class Discovery extends Component {
 		this.map = map;
 
 		if (this.state.firstLoad) {
-			this.fetchStories().then((stories) => {
+			this.fetchStories({ page: 1 }).then((stories) => {
 				const sourceData = this.buildPostsGeoJson(stories);
 
 				map.on('load', function () {
@@ -154,25 +154,40 @@ class Discovery extends Component {
 	}
 
 	fetchStories(params = {}) {
+		const defaultParams = { cumulative: false };
+		params = { ...defaultParams, ...params }
+
 		// Use constant POSTS_PER_PAGE if param per_page is not set
 		if(!params.hasOwnProperty('per_page')) params.per_page = POSTS_PER_PAGE;
 
-		// Update using cumulative param for stories infinit scrolling
-		if(params.hasOwnProperty('cumulative') && params.cumulative) {
+		// Set or use param page
+		if( !params.hasOwnProperty('page') ) {
 			params.page = this.state.currentPage;
-			params.page++;
 
-			this.setState(( state ) => ( {
-				...state,
-				currentPage: params.page,
-			} ))
-		};
-
-		// Cancel request if page exceed the max page;
-		if ( params.page > this.state.totalPages ) {
-			return Promise.reject();
+			if ( !( params.page > this.state.totalPages ) ) {
+				params.page++;
+			}
+		} else {
+			params.page = 1;
 		}
 
+		// Update storiesLoaded to display loading & set current page to param
+		this.setState(( state ) => ( {
+			...state,
+			currentPage: params.page,
+			storiesLoaded: false,
+
+		} ))
+
+		// Update using cumulative param for stories - infinite scrolling
+		if(params.hasOwnProperty('cumulative') && params.cumulative) {
+			// console.log( params.page, this.state.totalPages );
+
+			// Cancel request if page exceed the max page;
+			if ( params.page > this.state.totalPages ) {
+				return Promise.reject();
+			}
+		};
 
 		const postsUrl = new URL(jeoMapVars.jsonUrl + 'posts/');
 		Object.keys(params).forEach(key => postsUrl.searchParams.append(key, params[key]))
@@ -181,8 +196,8 @@ class Discovery extends Component {
 			.then((response) => {
 				this.setState(( state ) => ({
 					...state,
-					totalPages: response.headers.get('X-WP-TotalPages'),
-					totalPosts: response.headers.get('X-WP-Total'),
+					totalPages: parseInt(response.headers.get('X-WP-TotalPages')),
+					totalPosts: parseInt(response.headers.get('X-WP-Total')),
 				} ) );
 
 				return response;
@@ -212,8 +227,7 @@ class Discovery extends Component {
 						return story.categories.map ( async ( category ) => {
 							const categoriesApiUrl = new URL(jeoMapVars.jsonUrl + 'categories/' + category);
 
-
-							// If category is not set
+							// If category is not set (remove Uncategorized)
 							// if( !category ) {
 							// 	return;
 							// }
@@ -253,7 +267,7 @@ class Discovery extends Component {
 
 					this.setState( ( state ) => ({
 						...state,
-						storiesLoaded: false,
+						storiesLoaded: true,
 					} ) );
 				}
 			);
@@ -283,7 +297,6 @@ class Discovery extends Component {
 	// }
 
 	buildPostsGeoJson(stories) {
-		console.log(stories);
 		const finalFeatures = {
 			type: 'FeatureCollection',
 			features: [],
@@ -318,13 +331,13 @@ class Discovery extends Component {
 		this.fetchStories({ ...params }).then((stories) => {
 			const sourceData = this.buildPostsGeoJson(stories);
 			this.map.getSource('storiesSource').setData(sourceData);
-		}).catch( () => "")
+		}).catch( () => null )
 	}
 
 	render() {
 		return (
 			<div className="discovery">
-				<Sidebar stories={ this.state.stories } updateStories={ this.updateStories } />
+				<Sidebar stories={ this.state.stories } storiesLoaded={ this.state.storiesLoaded } updateStories={ this.updateStories } />
 
 				<div
 					ref={ (el) => (this.mapContainer = el) }
