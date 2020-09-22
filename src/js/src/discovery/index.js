@@ -42,6 +42,7 @@ class Discovery extends Component {
 		if (this.state.firstLoad) {
 			this.fetchStories({ page: 1 }).then((stories) => {
 				const sourceData = this.buildPostsGeoJson(stories);
+				console.log("Build posts source GEOJSON!")
 
 				map.on('load', function () {
 					map.addSource('storiesSource', {
@@ -224,7 +225,7 @@ class Discovery extends Component {
 
 					// Fetch categories
 					const storiesCategoriesPromises = geolocatedStories.map( ( story ) => {
-						return story.categories.map ( async ( category ) => {
+						return Promise.all(story.categories.map ( async ( category ) => {
 							const categoriesApiUrl = new URL(jeoMapVars.jsonUrl + 'categories/' + category);
 
 							// If category is not set (remove Uncategorized)
@@ -241,15 +242,21 @@ class Discovery extends Component {
 
 								return category;
 							});
-						})
+						}))
 					} )
 
 
 					// When its all resolved, update state
-					Promise.all(storiesMediasPromises)
+					return Promise.all(storiesMediasPromises)
 					.then( () => Promise.all(storiesCategoriesPromises)
 					.then( () => {
 						storiesCumulative = params.cumulative? [ ...this.state.stories, ...geolocatedStories ] : geolocatedStories;
+						console.log("All fetched.");
+						storiesCumulative.forEach(element => {
+							if(element.queriedCategories && element.queriedCategories.length) {
+								element.queriedCategories.forEach(el => console.log(el))
+							}
+						});
 
 						this.setState( ( state ) => ( {
 							...state,
@@ -257,10 +264,11 @@ class Discovery extends Component {
 							stories: storiesCumulative,
 						} ) );
 
+						return Promise.resolve(storiesCumulative);
+
 					} ) );
 
-					// Dosen't matter if we return before media and categories are done.
-					return Promise.resolve(storiesCumulative);
+
 				},
 				(error) => {
 					console.log(error);
@@ -331,7 +339,11 @@ class Discovery extends Component {
 		this.fetchStories({ ...params }).then((stories) => {
 			const sourceData = this.buildPostsGeoJson(stories);
 			this.map.getSource('storiesSource').setData(sourceData);
-		}).catch( () => null )
+		}).catch( () =>
+			this.setState( ( state ) => ( {
+				...state,
+				storiesLoaded: true,
+		} ) ) )
 	}
 
 	render() {
