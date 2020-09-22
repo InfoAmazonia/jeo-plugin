@@ -17,6 +17,9 @@ class Discovery extends Component {
 			totalPages: null,
 			totalPosts: null,
 
+			// markers
+			markers: [],
+
 			// layers
 			selectedLayers: [],
 
@@ -26,6 +29,9 @@ class Discovery extends Component {
 		};
 
 		this.updateStories = this.updateStories.bind(this);
+		this.storyHovered = this.storyHovered.bind(this);
+		this.storyUnhover = this.storyUnhover.bind(this);
+
 
 	}
 
@@ -42,7 +48,6 @@ class Discovery extends Component {
 		if (this.state.firstLoad) {
 			this.fetchStories({ page: 1 }).then((stories) => {
 				const sourceData = this.buildPostsGeoJson(stories);
-				console.log("Build posts source GEOJSON!")
 
 				map.on('load', function () {
 					map.addSource('storiesSource', {
@@ -53,39 +58,75 @@ class Discovery extends Component {
 						clusterRadius: 40,
 					});
 
+
+
 					map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png', function (error, image) {
 						if (error) throw error;
 
 						map.addImage('news-marker', image);
+						// Single markers layer
 						map.addLayer({
 							id: 'unclustered-points',
 							type: 'symbol',
 							source: 'storiesSource',
-							filter: ['!', ['has', 'point_count']],
+							// filter: ['!', ['has', 'point_count']],
 							layout: {
 								'icon-image': 'news-marker',
 								'icon-size': 0.10,
 								'icon-allow-overlap': true,
 								// 'text-field': 'story',
-								'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-								'text-size': 11,
-								'text-transform': 'uppercase',
-								'text-letter-spacing': 0.05,
-								'text-offset': [0, 3],
+								// 'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+								// 'text-size': 11,
+								// 'text-transform': 'uppercase',
+								// 'text-letter-spacing': 0.05,
+								// 'text-offset': [0, 3],
 							},
-							paint: {
-								'text-color': '#202',
-								'text-halo-color': '#fff',
-								'text-halo-width': 2,
-							},
+
+							// paint : {
+							// 	'icon-opacity': 1,
+							// }
 						});
 					});
+
+					map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png', function (error, image) {
+						if (error) throw error;
+
+						map.addImage('news-marker-hover', image);
+
+						map.addLayer({
+							id: 'hover-unclustered-points',
+							type: 'symbol',
+							source: 'storiesSource',
+							// filter: ['!', ['has', 'point_count']],
+							layout: {
+								'icon-image': 'news-marker-hover',
+								'icon-size': 0.10,
+								'icon-allow-overlap': true,
+							},
+
+							paint : {
+								'icon-opacity': [
+									'case',
+									['boolean', ['feature-state', 'hover'], false],
+									1,
+									0
+								],
+							}
+
+
+						});
+
+
+					});
+
+
 
 					map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news.png', function (error, image) {
 						if (error) throw error;
 
 						map.addImage('news', image);
 
+						// cluster number layer
 						map.addLayer({
 							id: 'cluster-count',
 							type: 'symbol',
@@ -122,6 +163,7 @@ class Discovery extends Component {
 						[0, '#ffffff'],
 					];
 
+					// cluster circle layer
 					layers.forEach(function (layer, i) {
 						map.addLayer({
 							id: 'cluster-' + i,
@@ -251,12 +293,6 @@ class Discovery extends Component {
 					.then( () => Promise.all(storiesCategoriesPromises)
 					.then( () => {
 						storiesCumulative = params.cumulative? [ ...this.state.stories, ...geolocatedStories ] : geolocatedStories;
-						console.log("All fetched.");
-						storiesCumulative.forEach(element => {
-							if(element.queriedCategories && element.queriedCategories.length) {
-								element.queriedCategories.forEach(el => console.log(el))
-							}
-						});
 
 						this.setState( ( state ) => ( {
 							...state,
@@ -265,7 +301,6 @@ class Discovery extends Component {
 						} ) );
 
 						return Promise.resolve(storiesCumulative);
-
 					} ) );
 
 
@@ -300,8 +335,10 @@ class Discovery extends Component {
 	// 	};
 
 	// 	marker.setLngLat( LngLat );
-	// 	marker.addTo( this.state.map );
-	// 	this.state.map.flyTo( { center: LngLat, zoom: 4 } );
+	// 	marker.addTo( this.map );
+	// 	this.map.flyTo( { center: LngLat } );
+
+	// 	return marker;
 	// }
 
 	buildPostsGeoJson(stories) {
@@ -319,6 +356,7 @@ class Discovery extends Component {
 			finalFeatures.features.push(
 				...storyPoints.map((point) => {
 					return {
+						id: story.id,
 						type: 'Feature',
 						properties: story,
 						geometry: {
@@ -346,10 +384,43 @@ class Discovery extends Component {
 		} ) ) )
 	}
 
+	storyHovered(story) {
+		const average = { lat: 0, lon: 0 };
+
+		story.meta._related_point.forEach( point => {
+			const LngLat = {
+				lat: parseFloat( point._geocode_lat ),
+				lon: parseFloat( point._geocode_lon ),
+			};
+
+			// average.lat += LngLat.lat/story.meta._related_point.length
+			// average.lon += LngLat.lon/story.meta._related_point.length
+
+			average.lat = LngLat.lat;
+			average.lon = LngLat.lon;
+		})
+
+		this.map.flyTo( { center: average, zoom: 7 } );
+
+		this.map.setFeatureState(
+			{ source: 'storiesSource', id: story.id },
+			{ hover: true }
+		);
+	}
+
+	storyUnhover(story) {
+		this.map.setFeatureState(
+			{ source: 'storiesSource', id: story.id },
+			{ hover: false }
+		);
+	}
+
+
+
 	render() {
 		return (
 			<div className="discovery">
-				<Sidebar stories={ this.state.stories } storiesLoaded={ this.state.storiesLoaded } updateStories={ this.updateStories } />
+				<Sidebar stories={ this.state.stories } storiesLoaded={ this.state.storiesLoaded } updateStories={ this.updateStories } storyHovered={ this.storyHovered } storyUnhover={ this.storyUnhover } />
 
 				<div
 					ref={ (el) => (this.mapContainer = el) }
