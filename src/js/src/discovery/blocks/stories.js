@@ -12,6 +12,17 @@ class Stories extends Component {
 		};
 
 		// console.log(this.props);
+		this.storyHovered = this.storyHovered.bind(this);
+		this.storyUnhover = this.storyUnhover.bind(this);
+	}
+
+	storyHovered(story) {
+		this.props.storyHovered(story);
+	}
+
+	storyUnhover(story) {
+		this.props.storyUnhover(story);
+
 	}
 
 	render() {
@@ -26,7 +37,7 @@ class Stories extends Component {
 				<div className="stories">
 					{
 						this.props.stories.map( (story, index ) => {
-							return ( <Storie story={ story } key={ index } /> )
+							return ( <Storie story={ story } key={ index } storyHovered={ this.storyHovered } storyUnhover={ this.storyUnhover } /> )
 						} )
 					}
 				</div>
@@ -82,12 +93,23 @@ class Search extends Component {
 
 
 class Storie extends Component {
-	// constructor(props) {
-	// 	super(props);
-	// }
+	constructor(props) {
+		super(props);
+
+		this.storyHovered = this.storyHovered.bind(this);
+		this.storyUnhover = this.storyUnhover.bind(this);
+	}
 
 	componentDidMount() {
 
+	}
+
+	storyHovered() {
+		this.props.storyHovered(this.props.story);
+	}
+
+	storyUnhover() {
+		this.props.storyUnhover(this.props.story);
 	}
 
 	render() {
@@ -108,7 +130,7 @@ class Storie extends Component {
 
 
 		return (
-			<div className={ "card" + ( !story.queriedFeaturedImage ? ' no-thumb' : '' ) }>
+			<div className={ "card" + ( !story.queriedFeaturedImage ? ' no-thumb' : '' ) } onMouseEnter={ this.storyHovered } onMouseLeave={ this.storyUnhover }>
 				{ story.queriedFeaturedImage ?
 					<LazyImage src={ story.queriedFeaturedImage.source_url } alt={ story.queriedFeaturedImage.alt_text } />
 				: null }
@@ -131,3 +153,4 @@ class Storie extends Component {
 		);
 	}
 }
+

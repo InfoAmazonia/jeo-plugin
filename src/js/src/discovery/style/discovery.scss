@@ -128,6 +128,14 @@ $primary: green;
 					.sideway {
 						color: #0A0A0A;
 
+						.categories {
+							font-size: 14px;
+							color: #555D66;
+							margin-bottom: 7px;
+							text-transform: uppercase;
+							font-weight: bold;
+						}
+
 						.title {
 							font-weight: bold;
 							font-size: 18px;

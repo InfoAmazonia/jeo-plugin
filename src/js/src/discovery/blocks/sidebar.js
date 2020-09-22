@@ -11,7 +11,7 @@ class Sidebar extends Component {
 	}
 
 	displayTab(tab) {
-		return tab.name === 'stories'? <Stories storiesLoaded={ this.props.storiesLoaded } stories={ this.props.stories } updateStories={ this.props.updateStories } /> : <MapLayers />;
+		return tab.name === 'stories'? <Stories storiesLoaded={ this.props.storiesLoaded } stories={ this.props.stories } updateStories={ this.props.updateStories } storyHovered={ this.props.storyHovered } storyUnhover={ this.props.storyUnhover } /> : <MapLayers />;
 	}
 
 	handleScroll(e) {
