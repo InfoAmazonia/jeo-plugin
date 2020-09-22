@@ -82,15 +82,9 @@ class Search extends Component {
 
 
 class Storie extends Component {
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			queriedFeaturedImage: {},
-			categories: [],
-			doneLoading: false,
-		}
-	}
+	// constructor(props) {
+	// 	super(props);
+	// }
 
 	componentDidMount() {
 
@@ -102,11 +96,16 @@ class Storie extends Component {
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 		const storyDate = new Date( story.date_gmt ).toLocaleDateString( undefined, dateOptions );
 
-		// const categoriesRender = story.queriedCategories.reduce( ( accumulator, category ) => {
-		// 	return accumulator + category.name
-		// }, '')
+		let finalCategories = "";
 
-		// console.log(this.state.categories);
+		if(story.queriedCategories) {
+			const categoriesRender = story.queriedCategories.reduce( ( accumulator, category, index ) => {
+				return index + 1 !== story.queriedCategories.length ? accumulator + category.name + ', ' : accumulator + category.name
+			}, '')
+
+			finalCategories = categoriesRender;
+		}
+
 
 		return (
 			<div className={ "card" + ( !story.queriedFeaturedImage ? ' no-thumb' : '' ) }>
@@ -117,7 +116,7 @@ class Storie extends Component {
 
 				<div className="sideway">
 					<div className="categories">
-						{  }
+						{ finalCategories }
 					</div>
 
 					<div className="title">
