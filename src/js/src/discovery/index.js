@@ -7,6 +7,7 @@ const POSTS_PER_PAGE = 4;
 class Discovery extends Component {
 	constructor(props) {
 		super(props);
+
 		// map can't be a state, trust me.
 		this.map = null;
 
@@ -16,6 +17,10 @@ class Discovery extends Component {
 			currentPage: 1,
 			totalPages: null,
 			totalPosts: null,
+
+			// maps
+			maps: [],
+			mapsLoaded: false,
 
 			// markers
 			markers: [],
@@ -31,6 +36,8 @@ class Discovery extends Component {
 		this.updateStories = this.updateStories.bind(this);
 		this.storyHovered = this.storyHovered.bind(this);
 		this.storyUnhover = this.storyUnhover.bind(this);
+		this.setMapsState = this.setMapsState.bind(this);
+
 
 
 	}
@@ -57,8 +64,6 @@ class Discovery extends Component {
 						clusterMaxZoom: 40,
 						clusterRadius: 40,
 					});
-
-
 
 					map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png', function (error, image) {
 						if (error) throw error;
@@ -118,8 +123,6 @@ class Discovery extends Component {
 
 
 					});
-
-
 
 					map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news.png', function (error, image) {
 						if (error) throw error;
@@ -194,6 +197,15 @@ class Discovery extends Component {
 				firstLoad: false
 			})
 		}
+	}
+
+	setMapsState(maps) {
+		this.setState( ( state ) => ( {
+			...state,
+			maps,
+			mapsLoaded: true,
+		} ))
+
 	}
 
 	fetchStories(params = {}) {
@@ -290,18 +302,18 @@ class Discovery extends Component {
 
 					// When its all resolved, update state
 					return Promise.all(storiesMediasPromises)
-					.then( () => Promise.all(storiesCategoriesPromises)
-					.then( () => {
-						storiesCumulative = params.cumulative? [ ...this.state.stories, ...geolocatedStories ] : geolocatedStories;
+						.then( () => Promise.all(storiesCategoriesPromises)
+						.then( () => {
+							storiesCumulative = params.cumulative? [ ...this.state.stories, ...geolocatedStories ] : geolocatedStories;
 
-						this.setState( ( state ) => ( {
-							...state,
-							storiesLoaded: true,
-							stories: storiesCumulative,
+							this.setState( ( state ) => ( {
+								...state,
+								storiesLoaded: true,
+								stories: storiesCumulative,
+							} ) );
+
+							return Promise.resolve(storiesCumulative);
 						} ) );
-
-						return Promise.resolve(storiesCumulative);
-					} ) );
 
 
 				},
@@ -418,9 +430,21 @@ class Discovery extends Component {
 
 
 	render() {
+		const props = {
+			stories: this.state.stories,
+			storiesLoaded: this.state.storiesLoaded,
+			updateStories: this.updateStories,
+			storyHovered: this.storyHovered,
+			storyUnhover: this.storyUnhover,
+
+			setMapsState: this.setMapsState,
+			mapsLoaded: this.state.mapsLoaded,
+			maps: this.state.maps,
+		}
+
 		return (
 			<div className="discovery">
-				<Sidebar stories={ this.state.stories } storiesLoaded={ this.state.storiesLoaded } updateStories={ this.updateStories } storyHovered={ this.storyHovered } storyUnhover={ this.storyUnhover } />
+				<Sidebar  { ...props } />
 
 				<div
 					ref={ (el) => (this.mapContainer = el) }
