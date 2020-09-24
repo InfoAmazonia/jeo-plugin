@@ -20,6 +20,7 @@ import './map-editor.css';
 import './storymap-editor.css';
 import { List, arrayMove } from 'react-movable';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
@@ -37,12 +38,36 @@ const MapEditor = ( {
 		} );
 	};
 
+	const reorder = ( list, startIndex, endIndex ) => {
+		const result = Array.from( list );
+		const [ removed ] = result.splice( startIndex, 1 );
+		result.splice( endIndex, 0, removed );
+	  
+		return result;
+	};
+
+	const onDragEndLayers = ( result ) => {
+		// dropped outside the list
+		if ( !result.destination ) {
+		  return;
+		}
+	
+		const newItems = reorder(
+		  storymapLayers,
+		  result.source.index,
+		  result.destination.index
+		);
+
+		setStorymapLayers( newItems );
+	}
+
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
 	const [ selectedMap, setSelectedMap ] = useState( null );
 	const [ currentSlideIndex, setCurrentSlideIndex ] = useState( 0 );
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ key, setKey ] = useState( 0 );
+	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
@@ -60,8 +85,13 @@ const MapEditor = ( {
 						bearing: 0,
 					},
 				],
+				loadedLayers,
+				navigateMapLayers: [],
 			} );
 		}
+
+		const postID = wp.data.select( "core/editor" ).getCurrentPostId();
+		setAttributes( { ...attributes, postID } );
 	} );
 
 	let rawLayers = [];
@@ -84,7 +114,9 @@ const MapEditor = ( {
 						<Map
 							key={ key }
 							onStyleLoad={ ( map ) => {
+								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers } );
 								setSelectedMap( map );
+								setStorymapLayers( layersContent )
 
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -96,19 +128,6 @@ const MapEditor = ( {
 										new mapboxgl.FullscreenControl(),
 										'top-left'
 									);
-								}
-
-								if ( loadedMap.meta.disable_scroll_zoom ) {
-									map.scrollZoom.disable();
-								}
-
-								if ( loadedMap.meta.disable_drag_pan ) {
-									map.dragPan.disable();
-									map.touchZoomRotate.disable();
-								}
-
-								if ( loadedMap.meta.disable_drag_rotate ) {
-									map.dragRotate.disable();
 								}
 							} }
 							style="mapbox://styles/mapbox/streets-v11"
@@ -307,6 +326,91 @@ const MapEditor = ( {
 															} }
 														/>
 														<p>Layers</p>
+														<DragDropContext onDragEnd={ onDragEndLayers }>
+															<Droppable droppableId="droppable">
+																{ ( provided, snapshot ) => (
+																	<div
+																		{ ...provided.droppableProps }
+																		ref={ provided.innerRef }
+																		className="layers"
+																>
+																		{ storymapLayers.map( ( item, index_ ) => (
+																			<Draggable key={ `${ index_ }` } draggableId={ `${ index_ }` } index={ index_ }>
+																				{ ( provided, snapshot ) => {
+																					let layerButtonStyle = {
+																						background: 'rgb(240, 240, 240)',
+																					};
+					
+																					attributes.slides[ index ].selectedLayers.map(
+																						( selectedLayer ) => {
+																							if ( selectedLayer.id === item.id ) {
+																								layerButtonStyle = {
+																									background: 'rgb(200, 200, 200)',
+																								};
+																							}
+																						}
+																					);
+
+																					return (
+																						<div
+																							ref={ provided.innerRef }
+																							{ ...provided.draggableProps }
+																							{ ...provided.dragHandleProps }
+																						>
+																							<div
+																								
+																								style={ layerButtonStyle }
+																								className="layer"
+																								key={ item.id }
+																								onClick={ () => {
+																									setCurrentSlideIndex( index );
+																									const oldSlides = [
+																										...attributes.slides,
+																									];
+																									let hasBeenRemoved = false;
+						
+																									oldSlides[ index ].selectedLayers.map(
+																										( selectedLayer, indexOfLayer ) => {
+																											if ( selectedLayer.id === item.id ) {
+																												oldSlides[
+																													index
+																												].selectedLayers.splice(
+																													indexOfLayer,
+																													1
+																												);
+																												hasBeenRemoved = true;
+																											}
+																										}
+																									);
+						
+																									if ( ! hasBeenRemoved ) {
+																										oldSlides[ index ].selectedLayers.push(
+																											item
+																										);
+																									}
+																									setAttributes( {
+																										...attributes,
+																										slides: oldSlides,
+																									} );
+																								} }
+																							>
+																								<p>
+																									{ decodeHtmlEntity(
+																										item.title.rendered
+																									) }
+																								</p>
+																							</div>
+																						</div>
+																					);
+																				} }
+																			</Draggable>
+																	) ) }
+																		{ provided.placeholder }
+																	</div>
+															) }
+															</Droppable>
+														</DragDropContext>
+														{ /*
 														<div className="layers">
 															{ layersContent.map( ( layer, layerIndex ) => {
 																let layerButtonStyle = {
@@ -369,6 +473,7 @@ const MapEditor = ( {
 																);
 															} ) }
 														</div>
+														*/ }
 														{ /*
 														{ attributes.slides[ index ].selectedLayers.length < 1 && (
 															<Button

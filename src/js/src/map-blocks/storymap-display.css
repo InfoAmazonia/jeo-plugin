@@ -10,17 +10,49 @@ a, a:hover, a:visited {
 
 .mapboxgl-map {
     top:0; 
-    height: 100vh;
-    width:100vw;
+    height: 100%;
+    width:100%;
     position: fixed;
+    left: 0;
     z-index: -5;
 }
 
 #header {
-    margin: 3vh auto;
-    width: 90vw;
+    position: absolute;
+    left: 50%;
+    width: 55vw;
     padding: 2vh;
     text-align: center;
+    background: none;
+    color: white;
+}
+
+#header .post-info {
+    position: relative;
+    left: -50%;
+    display: flex;
+    flex-direction: row;
+}
+
+#header .post-info .author {
+    margin-right: auto
+}
+
+#header .post-info .date {
+    margin-left: auto;
+}
+
+#header .storymap-title {
+    position: relative;
+    left: -50%;
+    font-weight: bold;
+    font-size: 35px;
+}
+
+#header .storymap-description{
+    font-size: 25px;
+    position: relative;
+    left: -50%;
 }
 
 #footer {
@@ -55,8 +87,9 @@ a, a:hover, a:visited {
 }
 
 .light {
-    color: #444;
-    background-color: #fafafa;
+    color: #0A0A0A;
+    background-color: #FFFFFF;
+    border-radius: 10px;
 }
 
 .dark {
@@ -71,7 +104,7 @@ a, a:hover, a:visited {
 }
 
 .step.active {
-    opacity: 0.9;
+    opacity: 0.99;
 }
 
 .step div {
@@ -89,4 +122,85 @@ a, a:hover, a:visited {
         width: 90vw;
         margin: 0 auto;
     }
+}
+
+.navigate-button-display, .storymap-start-button {
+    background-color: #59811A;
+    color: white;
+    border-radius: 10px;
+    width: 237px;
+    height: 62px;
+    font-weight: bold;
+    font-size: 14px;
+    margin-top: 25%;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.storymap-start-button {
+    position: relative;
+    left: -50%;
+    margin-top: 20px;
+}
+
+.storymap-page-title {
+    font-weight: bold;
+    font-size: 50px;
+    position: relative;
+    left: -50%;
+}
+
+.skip-intro-link {
+    position: relative;
+    font-weight: bold;
+    left: -50%;
+    margin-top: 5px;
+    color: white;
+    opacity: 30%;
+    font-size: 18px;
+    text-decoration: underline;
+}
+
+.skip-intro-link:hover {
+    cursor: pointer;
+    text-decoration: unset;
+}
+
+.return-to-slides-container {
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    bottom: 0;
+}
+
+.return-to-slides-container p {
+    text-decoration: underline;
+    color: black;
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.return-to-slides-container p:hover {
+    text-decoration: unset;
+    cursor: pointer
+}
+
+.return-to-slides-container .icon, .skip-intro-icon {
+    width: 30px;
+    position: absolute;
+    left: 0;
+    right: 0;
+}
+
+.return-to-slides-container .icon {
+    margin: auto;
+}
+
+.return-to-slides-container .icon:hover, .skip-intro-icon:hover {
+    opacity: 0.7;
+    cursor: pointer
 }

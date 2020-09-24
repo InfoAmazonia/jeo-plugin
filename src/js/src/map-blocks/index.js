@@ -133,10 +133,18 @@ registerBlockType( 'jeo/storymap', {
 		hasIntroduction: {
 			type: 'boolean',
 		},
+		loadedLayers: {
+			type: 'array',
+		},
+		navigateMapLayers: {
+			type: 'array'
+		},
+		postID : {
+			type: 'number',
+		},
 	},
 	edit: ( props ) => <StorymapEditor { ...props } />,
 	save: ( props ) => {
-		// console.log(JSON.stringify(props.attributes));
 		const attributesStructure = {
 			map_id: null,
 			title: null,
@@ -144,6 +152,9 @@ registerBlockType( 'jeo/storymap', {
 			slides: null,
 			navigateButton: null,
 			hasIntroduction: null,
+			loadedLayers: null,
+			navigateMapLayers: null,
+			postID: null,
 		};
 
 		for (const key in attributesStructure) {
@@ -151,8 +162,6 @@ registerBlockType( 'jeo/storymap', {
 				attributesStructure[key] = props.attributes[key];
 			}
 		}
-
-		// console.log(attributesStructure);
 
 		return <div id="story-map" data-properties={ JSON.stringify(attributesStructure) } />
 	},
