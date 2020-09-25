@@ -116,7 +116,7 @@ class StoryMapDisplay extends Component {
 			if ( element.classList.contains( 'post' ) ) {
 				URL = `${ window.jeoMapVars.jsonUrl }posts/${ this.props.postID }`;
 				
-			} else if ( element.classList.containsf( 'page' ) ) {
+			} else if ( element.classList.contains( 'page' ) ) {
 				URL = `${ window.jeoMapVars.jsonUrl }pages/${ this.props.postID }`;
 			}
 
