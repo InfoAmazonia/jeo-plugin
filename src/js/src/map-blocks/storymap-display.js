@@ -62,8 +62,9 @@ class StoryMapDisplay extends Component {
 			} );
 
 			if ( index == props.slides.length -1 ) {
-				const lastSlide = slides[ slides.length - 1 ];
+				const lastSlide = { ...slides[ slides.length - 1 ] };
 				lastSlide.selectedLayers = this.props.navigateMapLayers;
+				lastSlide.id += 1;
 				slides.push( lastSlide );
 			}
 		} );
@@ -175,11 +176,14 @@ class StoryMapDisplay extends Component {
 										progress: true
 									})
 									.onStepEnter(response => {
-										const chapter = config.chapters.find(chap => {
-											console.log(chap)
-											console.log(response)
+										const chapter = config.chapters.find( ( chap, index ) => {
+											if ( response.element.id == config.chapters.length && index == config.chapters.length - 1 ) {
+												return true
+											}
+
 											return chap.id == response.element.id
 										});
+										console.log(chapter)
 										setState({ ...this.state, currentChapter: chapter });
 										map.flyTo(chapter.location);
 										if (config.showMarkers) {
@@ -266,7 +270,7 @@ class StoryMapDisplay extends Component {
 
 												lastChapter = { ...chapter };
 												lastChapter.selectedLayers = this.props.navigateMapLayers
-												lastChapter.id = chapter.id + 1
+												lastChapter.id = chapter.id
 												
 												if ( index == config.chapters.length - 1 ) {
 													return(
@@ -384,7 +388,10 @@ class StoryMapDisplay extends Component {
 }
 
 function Chapter({ index, id, theme, title, image, description, currentChapterID, isLastChapter, onClickFunction, props}) {
-    const classList = id === currentChapterID ? "step active" : "step";
+	let classList = id === currentChapterID ? "step active" : "step";
+	
+	console.log(id)
+	console.log(currentChapterID)
     return (
 		<>
 			{ ! isLastChapter && (
