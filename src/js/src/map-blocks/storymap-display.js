@@ -16,12 +16,13 @@ const alignments = {
 
 let config = null;
 
+let lastChapter;
+
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 const scroller = scrollama();
 
 const cleanPage = () => {
-	console.log('ois')
 	for( const element of document.querySelector( '#page' ).children ) {
 		if ( element.className != 'site-content' ) {
 			element.style.display = 'none';
@@ -47,7 +48,7 @@ class StoryMapDisplay extends Component {
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
 			slides.push( {
-				id: slide.title || index,
+				id: index,
 				title: slide.title || '',
 				image: '',
 				description: slide.content || '',
@@ -59,7 +60,14 @@ class StoryMapDisplay extends Component {
 				},
 				selectedLayers: slide.selectedLayers || [],
 			} );
+
+			if ( index == props.slides.length -1 ) {
+				const lastSlide = slides[ slides.length - 1 ];
+				lastSlide.selectedLayers = this.props.navigateMapLayers;
+				slides.push( lastSlide );
+			}
 		} );
+
 
 		config = {
 			style: 'mapbox://styles/mapbox/streets-v11',
@@ -101,14 +109,27 @@ class StoryMapDisplay extends Component {
         mapboxgl.accessToken = config.accessToken;
 		window.addEventListener('resize', scroller.resize);
 		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+
+		let URL;
+
+		for ( const element of document.querySelector( '#main' ).children ) {
+			if ( element.classList.contains( 'post' ) ) {
+				URL = `${ window.jeoMapVars.jsonUrl }posts/${ this.props.postID }`;
+				
+			} else if ( element.classList.containsf( 'page' ) ) {
+				URL = `${ window.jeoMapVars.jsonUrl }pages/${ this.props.postID }`;
+			}
+
+			
+		}
 	
-		const URL = `${ window.jeoMapVars.jsonUrl }pages/${ this.props.postID }`;
 	
 		fetch( URL )
 			.then( ( response ) => {
 				return response.json();
 			} )
 			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
+
 	}
 	
 	componentDidUpdate() {
@@ -155,10 +176,11 @@ class StoryMapDisplay extends Component {
 									})
 									.onStepEnter(response => {
 										const chapter = config.chapters.find(chap => {
+											console.log(chap)
+											console.log(response)
 											return chap.id == response.element.id
 										});
-										
-										setState({ ...this.state, currentChapter:chapter });
+										setState({ ...this.state, currentChapter: chapter });
 										map.flyTo(chapter.location);
 										if (config.showMarkers) {
 											marker.setLngLat(chapter.location.center);
@@ -188,7 +210,7 @@ class StoryMapDisplay extends Component {
 										<>
 											<p className="storymap-page-title">{ this.state.postData.title.rendered }</p>
 											<div className="post-info">
-												<p className="author">oi</p>
+												<p className="author">Authors</p>
 												<p className="date">{ this.state.postData.date }</p>
 											</div>
 										</>
@@ -241,15 +263,32 @@ class StoryMapDisplay extends Component {
 												if( config.chapters.indexOf( this.state.currentChapter ) == config.chapters.length -1 && this.state.currentChapter == chapter ) {
 													isLastChapter = true;
 												}
+
+												lastChapter = { ...chapter };
+												lastChapter.selectedLayers = this.props.navigateMapLayers
+												lastChapter.id = chapter.id + 1
 												
+												if ( index == config.chapters.length - 1 ) {
+													return(
+														<Chapter
+															index={ config.chapters.length }
+															props={ this.props }
+															onClickFunction={ () => {
+																this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } );
+															} }
+															isLastChapter={ true }
+															{ ...lastChapter }
+															theme={ theme }
+															currentChapterID={ currentChapterID }
+														/>
+													);
+												}
+
 												return (
 													<Chapter
 														index={ index }
 														props={ this.props }
-														onClickFunction={ () => {
-															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } );
-														} }
-														isLastChapter={ isLastChapter }
+														isLastChapter={ false }
 														key={ chapter.id }
 														theme={ theme }
 														{ ...chapter }
@@ -257,7 +296,8 @@ class StoryMapDisplay extends Component {
 													/>
 													
 												);
-											} ) 
+											} )
+
 										}
 									</div>
 								</>
@@ -347,30 +387,34 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
     const classList = id === currentChapterID ? "step active" : "step";
     return (
 		<>
-			<div id={ id } className={ classList }>
-				<div className={ theme }>
-					{ title &&
-						<h3 className="title">{ title }</h3>
-					}
-					{ image &&
-						<img src={ image } alt={ title }></img>
-					}
-					{ description &&
-						<p>{ description }</p>
-					}
-					{ ! title && ! description &&
-						<h3 className="title">{ `Slide ${ index + 1 }` }</h3>
-					}
+			{ ! isLastChapter && (
+				<div id={ id } className={ classList }>
+					<div className={ theme }>
+						{ title &&
+							<h3 className="title">{ title }</h3>
+						}
+						{ image &&
+							<img src={ image } alt={ title }></img>
+						}
+						{ description &&
+							<p>{ description }</p>
+						}
+						{ ! title && ! description &&
+							<h3 className="title">{ `Slide ${ index + 1 }` }</h3>
+						}
+					</div>
 				</div>
-				{ isLastChapter && props.navigateButton && (
+			) }
+			{ isLastChapter && props.navigateButton && (
+				<div id={ id } className={ classList }>
 					<button
 						className="navigate-button-display"
 						onClick={ onClickFunction }
 					>
 						NAVIGATE THE MAP
 					</button>
-				) }
-			</div>
+				</div>
+			) }
 		</>
     );
 }

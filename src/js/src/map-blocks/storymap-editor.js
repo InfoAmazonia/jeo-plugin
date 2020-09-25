@@ -266,7 +266,7 @@ const MapEditor = ( {
 										const index = attributes.slides.indexOf( value );
 										return (
 											<div key={ slide.content } className="slide" { ...props }>
-												<Panel key={ key } className="slide-panel">
+												<Panel key={ key } className="slide-panel"  >
 													<PanelBody
 														title={ __( 'Slide ' ) + ( index + 1 ) }
 														initialOpen={
