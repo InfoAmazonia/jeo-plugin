@@ -208,6 +208,25 @@ class StoryMapDisplay extends Component {
 									}
 								}
 							) }
+							{
+								this.props.navigateMapLayers.map(
+									( layer ) => {
+										if ( this.state.slidesDisplay == 'block' ) {
+											return;
+										}
+
+										const layerOptions = this.props.loadedLayers.find(
+											( { id } ) => id === layer.id
+										);
+										if ( layerOptions ) {
+											return renderLayer( {
+												layer: layerOptions.meta,
+												instance: layer,
+											} );
+										}
+									}
+								)
+							}
 						</Map>
 						<div id="story">
 							{ this.props.hasIntroduction && this.state.slidesDisplay == 'none' &&
