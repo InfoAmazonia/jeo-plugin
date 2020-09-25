@@ -177,15 +177,17 @@ class StoryMapDisplay extends Component {
 									})
 									.onStepEnter(response => {
 										const chapter = config.chapters.find( ( chap, index ) => {
+											
 											if ( response.element.id == config.chapters.length && index == config.chapters.length - 1 ) {
 												return true
 											}
 
 											return chap.id == response.element.id
 										});
-										console.log(chapter)
+
 										setState({ ...this.state, currentChapter: chapter });
 										map.flyTo(chapter.location);
+
 										if (config.showMarkers) {
 											marker.setLngLat(chapter.location.center);
 										}
