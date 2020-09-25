@@ -390,8 +390,6 @@ class StoryMapDisplay extends Component {
 function Chapter({ index, id, theme, title, image, description, currentChapterID, isLastChapter, onClickFunction, props}) {
 	let classList = id === currentChapterID ? "step active" : "step";
 	
-	console.log(id)
-	console.log(currentChapterID)
     return (
 		<>
 			{ ! isLastChapter && (
