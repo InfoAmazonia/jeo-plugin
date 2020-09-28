@@ -118,9 +118,6 @@ registerBlockType( 'jeo/storymap', {
 		map_id: {
 			type: 'number',
 		},
-		title: {
-			type: 'string',
-		},
 		description: {
 			type: 'string',
 		},
@@ -147,7 +144,6 @@ registerBlockType( 'jeo/storymap', {
 	save: ( props ) => {
 		const attributesStructure = {
 			map_id: null,
-			title: null,
 			description: null,
 			slides: null,
 			navigateButton: null,

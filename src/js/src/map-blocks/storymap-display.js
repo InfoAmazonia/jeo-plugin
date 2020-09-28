@@ -76,7 +76,6 @@ class StoryMapDisplay extends Component {
 			showMarkers: false,
 			theme: 'light',
 			alignment: 'left',
-			title: props.title || '',
 			subtitle: props.description || '',
 			byline: '',
 			footer: '',
@@ -240,7 +239,6 @@ class StoryMapDisplay extends Component {
 											</div>
 										</>
 									) }
-									<p className="storymap-title">{ config.title }</p>
 									{ config.subtitle &&
 										<p className="storymap-description">{ config.subtitle }</p>
 									}
