@@ -173,17 +173,6 @@ const MapEditor = ( {
 									<Dashicon icon="hidden" />
 								</Button>
 								<p className="section-title">{ __( 'Story settings' ) }</p>
-								<TextControl
-									className="title"
-									label={ __( 'Title' ) }
-									value={ attributes.title }
-									onChange={ ( newTitle ) => {
-										setAttributes( {
-											...attributes,
-											title: newTitle,
-										} );
-									} }
-								/>
 								<TextareaControl
 									className="description"
 									label={ __(
