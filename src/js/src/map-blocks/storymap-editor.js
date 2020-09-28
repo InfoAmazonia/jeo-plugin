@@ -410,114 +410,89 @@ const MapEditor = ( {
 															) }
 															</Droppable>
 														</DragDropContext>
-														{ /*
-														<div className="layers">
-															{ layersContent.map( ( layer, layerIndex ) => {
-																let layerButtonStyle = {
-																	background: 'rgb(240, 240, 240)',
-																};
-
-																attributes.slides[ index ].selectedLayers.map(
-																	( selectedLayer ) => {
-																		if ( selectedLayer.id === layer.id ) {
-																			layerButtonStyle = {
-																				background: 'rgb(200, 200, 200)',
-																			};
-																		}
-																	}
-																);
-
-																return (
+														<div style={ { display: 'flex' } }>
+															{ 
+																attributes.slides[ index ].latitude == mapDefaults.lat &&
+																attributes.slides[ index ].longitude == mapDefaults.lng &&
+																attributes.slides[ index ].zoom == mapDefaults.zoom &&
+																attributes.slides[ index ].bearing == 0 &&
+																attributes.slides[ index ].pitch == 0 && (
 																	<Button
-																		style={ layerButtonStyle }
-																		className="layer"
-																		key={ layer.id }
+																		className="lock-location-button"
 																		onClick={ () => {
 																			setCurrentSlideIndex( index );
-																			const oldSlides = [
-																				...attributes.slides,
-																			];
-																			let hasBeenRemoved = false;
+																			const latitude = selectedMap.getCenter().lat;
+																			const longitude = selectedMap.getCenter().lng;
+																			const zoom =
+																				Math.round( selectedMap.getZoom() * 10 ) /
+																				10;
+																			const pitch = selectedMap.getPitch();
+																			const bearing = selectedMap.getBearing();
 
-																			oldSlides[ index ].selectedLayers.map(
-																				( selectedLayer, indexOfLayer ) => {
-																					if ( selectedLayer.id === layer.id ) {
-																						oldSlides[
-																							index
-																						].selectedLayers.splice(
-																							indexOfLayer,
-																							1
-																						);
-																						hasBeenRemoved = true;
-																					}
-																				}
-																			);
+																			const newSlides = [ ...attributes.slides ];
+																			newSlides[ index ].latitude = latitude;
+																			newSlides[ index ].longitude = longitude;
+																			newSlides[ index ].zoom = zoom;
+																			newSlides[ index ].pitch = pitch;
+																			newSlides[ index ].bearing = bearing;
 
-																			if ( ! hasBeenRemoved ) {
-																				oldSlides[ index ].selectedLayers.push(
-																					layer
-																				);
-																			}
 																			setAttributes( {
 																				...attributes,
-																				slides: oldSlides,
+																				slides: newSlides,
 																			} );
 																		} }
 																	>
-																		<p>
-																			{ decodeHtmlEntity(
-																				layer.title.rendered
-																			) }
-																		</p>
+																		<div>
+																			<Dashicon icon="unlock" />
+																			<p>{ __( 'Lock current spot' ) }</p>
+																		</div>
 																	</Button>
-																);
-															} ) }
+																)
+															}
+															{ 
+																! ( attributes.slides[ index ].latitude == mapDefaults.lat &&
+																attributes.slides[ index ].longitude == mapDefaults.lng &&
+																attributes.slides[ index ].zoom == mapDefaults.zoom &&
+																attributes.slides[ index ].bearing == 0 &&
+																attributes.slides[ index ].pitch == 0 ) && (
+																	<Button
+																		className="lock-location-button"
+																		onClick={ () => {
+																			setCurrentSlideIndex( index );
+																			const latitude = selectedMap.getCenter().lat;
+																			const longitude = selectedMap.getCenter().lng;
+																			const zoom =
+																				Math.round( selectedMap.getZoom() * 10 ) /
+																				10;
+																			const pitch = selectedMap.getPitch();
+																			const bearing = selectedMap.getBearing();
+
+																			const newSlides = [ ...attributes.slides ];
+																			newSlides[ index ].latitude = latitude;
+																			newSlides[ index ].longitude = longitude;
+																			newSlides[ index ].zoom = zoom;
+																			newSlides[ index ].pitch = pitch;
+																			newSlides[ index ].bearing = bearing;
+
+																			setAttributes( {
+																				...attributes,
+																				slides: newSlides,
+																			} );
+																		} }
+																	>
+																		<div>
+																			<Dashicon icon="lock" />
+																			<p>{ __( 'Lock current spot' ) }</p>
+																		</div>
+																	</Button>
+																)
+															}
+															{ /*
+															<div className="tooltip">
+																<p>lalala</p>
+															</div>
+															*/ }
 														</div>
-														*/ }
-														{ /*
-														{ attributes.slides[ index ].selectedLayers.length < 1 && (
-															<Button
-																disabled
-																className="lock-location-button"
-															>
-																<div>
-																	<Dashicon icon="lock" />
-																	<p>{ __( 'Lock current spot' ) }</p>
-																</div>
-															</Button>
-														) } */ }
-														{ true && (
-															<Button
-																className="lock-location-button"
-																onClick={ () => {
-																	setCurrentSlideIndex( index );
-																	const latitude = selectedMap.getCenter().lat;
-																	const longitude = selectedMap.getCenter().lng;
-																	const zoom =
-																		Math.round( selectedMap.getZoom() * 10 ) /
-																		10;
-																	const pitch = selectedMap.getPitch();
-																	const bearing = selectedMap.getBearing();
-
-																	const newSlides = [ ...attributes.slides ];
-																	newSlides[ index ].latitude = latitude;
-																	newSlides[ index ].longitude = longitude;
-																	newSlides[ index ].zoom = zoom;
-																	newSlides[ index ].pitch = pitch;
-																	newSlides[ index ].bearing = bearing;
-
-																	setAttributes( {
-																		...attributes,
-																		slides: newSlides,
-																	} );
-																} }
-															>
-																<div>
-																	<Dashicon icon="lock" />
-																	<p>{ __( 'Lock current spot' ) }</p>
-																</div>
-															</Button>
-														) }
 														<Button
 															className="preview-button"
 															onClick={ () => {
