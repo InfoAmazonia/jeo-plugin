@@ -10,7 +10,24 @@ class Sidebar extends Component {
 	}
 
 	displayTab(tab) {
-		return tab.name === 'stories'? <Stories storiesLoaded={ this.props.storiesLoaded } stories={ this.props.stories } updateStories={ this.props.updateStories } storyHovered={ this.props.storyHovered } storyUnhover={ this.props.storyUnhover } /> : <MapLayers setMapsState={ this.props.setMapsState } mapsLoaded={ this.props.mapsLoaded } maps={ this.props.maps } />;
+		const storiesProps = {
+			setStoriesState: this.props.setStoriesState,
+			storiesLoaded: this.props.storiesLoaded,
+			stories: this.props.stories,
+			updateStories: this.props.updateStories,
+			storyHovered: this.props.storyHovered,
+			storyUnhover: this.props.storyUnhover,
+		}
+
+		const mapLayersProps = {
+			setMapsState: this.props.setMapsState,
+			mapsLoaded: this.props.mapsLoaded,
+			maps: this.props.maps,
+			toggleLayer: this.props.toggleLayer,
+			selectedLayers: this.props.selectedLayers,
+		}
+
+		return tab.name === 'stories'? <Stories  { ...storiesProps } /> : <MapLayers { ...mapLayersProps } />;
 	}
 
 	handleScroll(e) {

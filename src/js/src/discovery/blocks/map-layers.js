@@ -1,5 +1,7 @@
 import { Component } from '@wordpress/element';
 import Search from './search';
+import MapItem from './map-item';
+import { __ } from '@wordpress/i18n';
 
 class MapLayers extends Component {
 	constructor(props) {
@@ -59,17 +61,40 @@ class MapLayers extends Component {
 	}
 
 	render() {
-		let testMapLayers = "";
-
-		this.props.maps.forEach( map => {
-			testMapLayers = map.queriedLayers.map( layer => {
-				return ( <div> { layer.meta.attribution } <br/><br/></div> )
-			});
+		const mapItens = this.props.maps.map( ( map, index ) => {
+			return <MapItem map={ map } key={ index } toggleLayer={ this.props.toggleLayer } selectedLayers={ this.props.selectedLayers } />;
 		} )
+
+		const selectedLayersRender = Object.keys(this.props.selectedLayers).map( ( key, index ) => {
+			const layer = this.props.selectedLayers[key];
+
+			return (
+				<div className="layer-item" key={ index }>
+					<span>
+						{ layer.title.rendered }
+					</span>
+				</div>
+			)
+		} )
+
+
 		return (
-			<div className="stories-tab">
-				{ testMapLayers }
+			<div className="maps-tab">
 				<Search searchPlaceholder="Search map" updateStories={ this.props.updateStories } />
+
+				<div className="selected-layers">
+					<div className="selected-layers--title"> { __("Selected layers") } </div>
+					<div className="selected-layers--content">
+						{ Object.keys(this.props.selectedLayers).length > 0?
+						selectedLayersRender : __("There are no selected layers")
+						}
+					</div>
+
+				</div>
+
+				<div className="map-itens">
+					{ mapItens }
+				</div>
 			</div>
 		)
 	}

@@ -1,194 +1,290 @@
 $primary: green;
 
+button {
+    background: none;
+    text-transform: none;
+    padding: 0;
+    font-weight: 400;
+    text-decoration: none;
+    color: #555D66;
+
+    &:hover {
+        text-decoration: none;
+    }
+}
+
 .discovery {
-	position: relative;
+    position: relative;
 
-	.togable-panel {
-		background-color: #FFFFFF;
-		width: 30%;
-		position: absolute;
-		left: 0;
-		top: 0;
-		z-index: 1;
-		min-height: 100%;
-		max-height: 100%;
-		overflow-y: auto;
+    .togable-panel {
+        background-color: #FFFFFF;
+        width: 30%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        z-index: 1;
+        min-height: 100%;
+        max-height: 100%;
+        overflow-y: auto;
 
-		div[role=tabpanel] {
-			padding: 30px;
-		}
+        div[role=tabpanel] {
+            padding: 30px;
+        }
 
-		.components-tab-panel {
-			&__tabs {
-				display: grid;
-				grid-template-columns: repeat(2, 1fr);
-				border-bottom: 1px solid opacify($primary, 0.8);
-				position: sticky;
-				top: 0;
-				background: white;
-				z-index: 1;
+        .components-tab-panel {
+            &__tabs {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                border-bottom: 1px solid opacify($primary, 0.8);
+                position: sticky;
+                top: 0;
+                background: white;
+                z-index: 1;
 
-				button {
-					background: none;
-					color: #191E23;
-					// font-family: "Open Sans";
-					font-size: 1.125rem;
-					font-weight: bold;
-					letter-spacing: 0;
-					line-height: 1.5rem;
-					padding: 10px;
-					text-decoration: none;
-					outline: none;
+                button {
+                    background: none;
+                    color: #191E23;
+                    // font-family: "Open Sans";
+                    font-size: 1.125rem;
+                    font-weight: bold;
+                    letter-spacing: 0;
+                    line-height: 1.5rem;
+                    padding: 10px;
+                    text-decoration: none;
+                    outline: none;
 
-					&:after {
-						transition: all .2s ease-in-out;
-						content: "";
-						display: block;
-						height: 0px;
-						width: 100%;
-						position: absolute;
-						bottom: 0px;
-						left: 0;
-						background: $primary;
-					}
+                    &:after {
+                        transition: all .2s ease-in-out;
+                        content: "";
+                        display: block;
+                        height: 0px;
+                        width: 100%;
+                        position: absolute;
+                        bottom: 0px;
+                        left: 0;
+                        background: $primary;
+                    }
 
-					&.active-tab {
-						position: relative;
+                    &.active-tab {
+                        position: relative;
 
-						&:after {
-							height: 3px;
-							transition: all .2s ease-in-out;
-						}
-					}
+                        &:after {
+                            height: 3px;
+                            transition: all .2s ease-in-out;
+                        }
+                    }
 
-					.tab-toggle {
-						display: flex;
-						justify-content: center;
-						align-items: center;
+                    .tab-toggle {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
 
-						svg {
-							height: 18px;
-							width: 21px;
-							margin-right: 10px;
-						}
-					}
-				}
-			}
-		}
+                        svg {
+                            height: 18px;
+                            width: 21px;
+                            margin-right: 10px;
+                        }
+                    }
+                }
+            }
+        }
 
-		.search-area {
-			display: flex;
-			border-radius: 0 10px 10px 0;
-			margin-bottom: 15px;
+        .search-area {
+            display: flex;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 15px;
 
-			input {
-				flex: 0 0 calc(100% - 77px);
+            input {
+                flex: 0 0 calc(100% - 77px);
+                border: 2px solid #DDDDDD;
+                border-radius: 10px 0 0 10px;
+                height: 50px;
+                border-right: 0px;
+            }
+
+            button {
+                flex: 0 0 77px;
+                height: 50px;
+                padding: 0;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                border-radius: 0 10px 10px 0;
+                background-color: $primary;
+                color: white;
+
+                svg {
+                    width: 19px;
+                    height: 20px;
+                }
+            }
+        }
+
+        .stories-tab {
+            .stories {
+                .card {
+                    width: calc(100% + 60px);
+                    margin-left: -30px;
+                    padding: 16px 30px;
+                    transition: all .2s ease-in-out;
+
+                    &:not(.no-thumb) {
+                        display: grid;
+                        grid-template-columns: 37.5% auto;
+                        grid-column-gap: 30px;
+                    }
+
+                    &:hover {
+                        background-color: #F5F5F5;
+                        transition: all .2s ease-in-out;
+                    }
+
+                    .sideway {
+                        color: #0A0A0A;
+
+                        .categories {
+                            font-size: 14px;
+                            color: #555D66;
+                            margin-bottom: 7px;
+                            text-transform: uppercase;
+                            font-weight: bold;
+                        }
+
+                        .title {
+                            font-weight: bold;
+                            font-size: 18px;
+                            padding-bottom: 5px;
+                        }
+
+                        .date {
+                            opacity: 0.5;
+                            font-size: 14px;
+                        }
+                    }
+
+                    .lazyload-wrapper {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+            }
+        }
+
+
+        .maps-tab {
+            .selected-layers {
+				padding: 1.5rem 1.8rem;
 				border: 2px solid #DDDDDD;
-				border-radius: 10px 0 0 10px;
-				height: 50px;
-				border-right: 0px;
-			}
+				border-radius: 10px;
+				margin-bottom: 30px;
 
-			button {
-				flex: 0 0 77px;
-				height: 50px;
-				padding: 0;
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				border-radius: 0 10px 10px 0;
-				background-color: $primary;
+				&--title {
+					font-weight: bold;
+					font-size: 18px;
+				}
 
-				svg {
-					width: 19px;
-					height: 20px;
+				&--content {
+
 				}
 			}
-		}
 
-		.stories-tab {
-			.stories {
-				.card {
-					width: calc(100% + 60px);
-					margin-left: -30px;
-					padding: 16px 30px;
-					transition: all .2s ease-in-out;
+            .map-itens {
+                .map-item {
+                    margin-bottom: 33px;
 
-					&:not(.no-thumb) {
-						display: grid;
-						grid-template-columns: 37.5% auto;
-						grid-column-gap: 30px;
-					}
+                    .title {
+                        font-weight: bold;
+                        font-size: 18px;
+                        padding-bottom: 5px;
+                        // margin-bottom: 13px;
+                    }
 
-					&:hover {
-						background-color: #F5F5F5;
-						transition: all .2s ease-in-out;
-					}
+                    .description {
+                        opacity: 0.5;
+                        color: #0A0A0A;
+                        font-size: 14px;
+                        letter-spacing: 0;
+                        line-height: 19px;
+                        margin-bottom: 7px;
+                    }
 
-					.sideway {
-						color: #0A0A0A;
+                    .layers-toggle {
+                        font-size: 14px;
+                        display: flex;
+                        color: #555D66;
+                        cursor: pointer;
 
-						.categories {
-							font-size: 14px;
-							color: #555D66;
-							margin-bottom: 7px;
-							text-transform: uppercase;
-							font-weight: bold;
-						}
+                        svg {
+                            width: 16px;
+                            margin-right: 5px;
+                        }
+                    }
 
-						.title {
-							font-weight: bold;
-							font-size: 18px;
-							padding-bottom: 5px;
-						}
+                    .layers-toggles {
+                        display: flex;
+                        flex-direction: column;
 
-						.date {
-							opacity: 0.5;
-							font-size: 14px;
-						}
-					}
+                        .layer-toggle {
+                            display: flex;
+                            color: #0A0A0A;
+                            font-size: 14px;
+                            text-align: left;
 
-					.lazyload-wrapper {
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 100%;
-						height: 100%;
-					}
-				}
-			}
-		}
-	}
+                            &:first-child {
+                                margin-top: 13px;
+                            }
 
-	@keyframes placeHolderShimmer{
-		0%{
-			background-position: -468px 0
-		}
-		100%{
-			background-position: 468px 0
-		}
-	}
+                            span {
+                                margin-left: 8px;
+                            }
 
-	.animated-background {
-		animation-duration: 1s;
-		animation-fill-mode: forwards;
-		animation-iteration-count: infinite;
-		animation-name: placeHolderShimmer;
-		animation-timing-function: linear;
-		background: #f6f7f8;
-		background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
-		background-size: 800px 104px;
-		height: 96px;
-		position: relative;
-	}
+                            svg {
+                                width: 21px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-	@keyframes spin { 100% { transform:rotate(360deg); } }
+    @keyframes placeHolderShimmer {
+        0% {
+            background-position: -468px 0
+        }
 
-	svg[data-icon="spinner"] {
-		width: 30px;
-		margin: 0 auto;
-		animation: spin 1s linear infinite;
-		margin-top: 30px;
-		margin-bottom: 15px;
-	}
+        100% {
+            background-position: 468px 0
+        }
+    }
+
+    .animated-background {
+        animation-duration: 1s;
+        animation-fill-mode: forwards;
+        animation-iteration-count: infinite;
+        animation-name: placeHolderShimmer;
+        animation-timing-function: linear;
+        background: #f6f7f8;
+        background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
+        background-size: 800px 104px;
+        height: 96px;
+        position: relative;
+    }
+
+    @keyframes spin {
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+
+    svg[data-icon="spinner"] {
+        width: 30px;
+        margin: 0 auto;
+        animation: spin 1s linear infinite;
+        margin-top: 30px;
+        margin-bottom: 15px;
+    }
 }
