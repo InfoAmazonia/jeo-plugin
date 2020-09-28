@@ -26,7 +26,8 @@ class Discovery extends Component {
 			markers: [],
 
 			// layers
-			selectedLayers: [],
+			selectedLayers: {},
+			appliedLayers: {},
 
 			// stories
 			storiesLoaded: false,
@@ -37,9 +38,7 @@ class Discovery extends Component {
 		this.storyHovered = this.storyHovered.bind(this);
 		this.storyUnhover = this.storyUnhover.bind(this);
 		this.setMapsState = this.setMapsState.bind(this);
-
-
-
+		this.toggleLayer = this.toggleLayer.bind(this);
 	}
 
 	componentDidMount() {
@@ -74,7 +73,7 @@ class Discovery extends Component {
 							id: 'unclustered-points',
 							type: 'symbol',
 							source: 'storiesSource',
-							// filter: ['!', ['has', 'point_count']],
+							filter: ['!', ['has', 'point_count']],
 							layout: {
 								'icon-image': 'news-marker',
 								'icon-size': 0.10,
@@ -102,7 +101,7 @@ class Discovery extends Component {
 							id: 'hover-unclustered-points',
 							type: 'symbol',
 							source: 'storiesSource',
-							// filter: ['!', ['has', 'point_count']],
+							filter: ['!', ['has', 'point_count']],
 							layout: {
 								'icon-image': 'news-marker-hover',
 								'icon-size': 0.10,
@@ -121,13 +120,43 @@ class Discovery extends Component {
 
 						});
 
-
 					});
 
 					map.loadImage(jeoMapVars.jeoUrl + '/js/src/icons/news.png', function (error, image) {
 						if (error) throw error;
 
-						map.addImage('news', image);
+						map.addImage('news-no-marker', image);
+
+						const layers = [
+							// [6, '#000000'],
+							// [5, '#f28cb1'],
+							// [2, '#f1f075'],
+							[0, '#ffffff'],
+						];
+
+						// cluster circle layer
+						layers.forEach(function (layer, i) {
+							map.addLayer({
+								id: 'cluster-' + i,
+								type: 'circle',
+								source: 'storiesSource',
+								paint: {
+									'circle-color': layer[1],
+									'circle-radius': 20 + layer[0],
+									'circle-stroke-color': '#ffffff',
+									'circle-stroke-opacity': 0.4,
+									'circle-stroke-width': 9,
+								},
+								filter:
+									i === 0
+										? ['>=', 'point_count', layer[0]]
+										: [
+											'all',
+											['>=', 'point_count', layer[0]],
+											['<', 'point_count', layers[i - 1][0]],
+										],
+							});
+						});
 
 						// cluster number layer
 						map.addLayer({
@@ -136,9 +165,9 @@ class Discovery extends Component {
 							source: 'storiesSource',
 
 							layout: {
-								'icon-image': 'news',
+								'icon-image': 'news-no-marker',
 								'icon-size': 0.13,
-								'icon-allow-overlap': true,
+								'icon-allow-overlap': false,
 								'icon-offset':  { stops: [
 									[13, [0, -30]],
 									[17, [0, -90]]
@@ -152,41 +181,10 @@ class Discovery extends Component {
 							},
 
 							paint: {
-								'text-color': '#202',
+								'text-color': '#202202',
 							},
 
 							filter: ['has', 'point_count'],
-						});
-					});
-
-					const layers = [
-						// [6, '#000000'],
-						// [5, '#f28cb1'],
-						// [2, '#f1f075'],
-						[0, '#ffffff'],
-					];
-
-					// cluster circle layer
-					layers.forEach(function (layer, i) {
-						map.addLayer({
-							id: 'cluster-' + i,
-							type: 'circle',
-							source: 'storiesSource',
-							paint: {
-								'circle-color': layer[1],
-								'circle-radius': 20 + layer[0],
-								'circle-stroke-color': '#ffffff',
-								'circle-stroke-opacity': 0.4,
-								'circle-stroke-width': 9,
-							},
-							filter:
-								i === 0
-									? ['>=', 'point_count', layer[0]]
-									: [
-										'all',
-										['>=', 'point_count', layer[0]],
-										['<', 'point_count', layers[i - 1][0]],
-									],
 						});
 					});
 				});
@@ -197,15 +195,6 @@ class Discovery extends Component {
 				firstLoad: false
 			})
 		}
-	}
-
-	setMapsState(maps) {
-		this.setState( ( state ) => ( {
-			...state,
-			maps,
-			mapsLoaded: true,
-		} ))
-
 	}
 
 	fetchStories(params = {}) {
@@ -328,31 +317,6 @@ class Discovery extends Component {
 			);
 	}
 
-	// addMarkerToMap( point ) {
-	// 	const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
-	// 	const marker = new mapboxgl.Marker( { color } );
-
-	// 	// marker.getElement().classList.add( 'marker' );
-	// 	// const popupHTML = this.popupTemplate( {
-	// 	// 	post,
-	// 	// 	read_more: window.jeoMapVars.string_read_more,
-	// 	// 	show_featured_media: false,
-	// 	// } );
-
-	// 	//const popUp = new mapboxgl.Popup().setHTML(popupHTML);
-
-	// 	const LngLat = {
-	// 		lat: parseFloat( point._geocode_lat ),
-	// 		lon: parseFloat( point._geocode_lon ),
-	// 	};
-
-	// 	marker.setLngLat( LngLat );
-	// 	marker.addTo( this.map );
-	// 	this.map.flyTo( { center: LngLat } );
-
-	// 	return marker;
-	// }
-
 	buildPostsGeoJson(stories) {
 		const finalFeatures = {
 			type: 'FeatureCollection',
@@ -427,7 +391,40 @@ class Discovery extends Component {
 		);
 	}
 
+	setMapsState(maps) {
+		// console.log("Set maps");
+		// console.log(maps);
 
+		this.setState( ( state ) => ( {
+			...state,
+			maps,
+			mapsLoaded: true,
+		} ))
+	}
+
+	toggleLayer(layer) {
+		const selectedLayers = Object.assign({}, this.state.selectedLayers);
+
+		// If layer does not exist
+		if(!selectedLayers.hasOwnProperty(layer.id)) {
+			selectedLayers[ layer.id ] = layer;
+
+			this.setState( ( state ) => ( {
+				...state,
+				selectedLayers,
+			} ) );
+		} else {
+			delete selectedLayers[ layer.id ];
+
+			this.setState( ( state ) => ( {
+				...state,
+				selectedLayers,
+			} ) );
+
+			// console.log(selectedLayers);
+		}
+
+	}
 
 	render() {
 		const props = {
@@ -440,7 +437,11 @@ class Discovery extends Component {
 			setMapsState: this.setMapsState,
 			mapsLoaded: this.state.mapsLoaded,
 			maps: this.state.maps,
+			toggleLayer: this.toggleLayer,
+			selectedLayers: this.state.selectedLayers,
 		}
+
+		//console.log(this.state.selectedLayers);
 
 		return (
 			<div className="discovery">
