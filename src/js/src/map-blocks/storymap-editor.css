@@ -178,3 +178,14 @@
     top: 0;
     left: 10px;
 }
+
+.tooltip {
+    border-radius: 10px;
+    background-color: white;
+    padding: 10px;
+    display: none !important;
+}
+
+.lock-location-button:hover ~ .tooltip {
+    display: block !important;
+}
