@@ -180,6 +180,8 @@ button {
 				border: 2px solid #DDDDDD;
 				border-radius: 10px;
 				margin-bottom: 30px;
+				position: relative;
+				padding-right: 100px;
 
 				&--title {
 					font-weight: bold;
@@ -188,6 +190,28 @@ button {
 
 				&--content {
 
+				}
+
+				.status {
+					position: absolute;
+					right: 1.8rem;
+					top: 1.5rem;
+					width: 100px;
+					display: flex;
+					justify-content: center;
+					align-items: flex-end;
+					flex-direction: column;
+					text-align: right;
+
+					&-icon {
+						width: 15px;
+						margin-bottom: 4px;
+					}
+
+					&-message {
+						font-size: 12px;
+						text-transform: uppercase;
+					}
 				}
 			}
 
