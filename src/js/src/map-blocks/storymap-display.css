@@ -203,3 +203,28 @@ a, a:hover, a:visited {
     opacity: 0.7;
     cursor: pointer
 }
+
+.layers-selection {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    width: 170px;
+}
+
+.layers-selection .layers-wrapper .layer {
+    display: flex;
+    background-color: white;
+    border-bottom: 1px solid #b0b2b4;
+    padding: 7px;
+    font-size: 13px;
+    color: #404040;
+    align-items: center;
+}
+
+.layers-selection .layers-wrapper .layer input {
+    margin-right: 10px;
+}
+
+.layers-selection-icon {
+    width: 20px;
+}
