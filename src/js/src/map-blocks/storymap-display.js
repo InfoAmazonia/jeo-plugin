@@ -31,11 +31,11 @@ const cleanPage = () => {
 	}
 
 	for ( const element of document.querySelector( '#main' ).children ) {
-		if ( ! element.classList.contains( 'post' ) && ! element.classList.contains( 'page' ) ) {
+		if ( ! element.classList.contains( 'post' ) && ! element.classList.contains( 'page' ) && element.tagName != 'HEADER' ) {
 			element.style.display = 'none';
 		} else {
 			for ( const element_ of element.children ) {
-				if ( element_.className != 'entry-content' ) {
+				if ( element_.className != 'entry-content' && element_.tagName != 'HEADER' ) {
 					element_.style.display = 'none';						
 				}
 			}
@@ -185,6 +185,10 @@ class StoryMapDisplay extends Component {
 									.onStepEnter(response => {
 										if ( response.index == config.chapters.length - 1 ) {
 											setState({ ...this.state, mapBrightness: 0.5 })
+										} else {
+											if ( this.state.mapBrightness == 0.5 ) {
+												setState({ ...this.state, mapBrightness: 1 })
+											}
 										}
 
 										const chapter = config.chapters.find( ( chap, index ) => {
