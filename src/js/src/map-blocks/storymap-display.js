@@ -66,6 +66,12 @@ class StoryMapDisplay extends Component {
 				const lastSlide = { ...slides[ slides.length - 1 ] };
 				lastSlide.selectedLayers = this.props.navigateMapLayers;
 				lastSlide.id += 1;
+				lastSlide.location = {
+					center: [ mapDefaults.lng, mapDefaults.lat ],
+					zoom: mapDefaults.zoom,
+					pitch: 0,
+					bearing: 0,
+				};
 				slides.push( lastSlide );
 			}
 		} );
@@ -178,8 +184,11 @@ class StoryMapDisplay extends Component {
 										progress: true
 									})
 									.onStepEnter(response => {
+										if ( response.index == config.chapters.length - 1 ) {
+											setState({ ...this.state, mapBrightness: 0.5 })
+										}
+
 										const chapter = config.chapters.find( ( chap, index ) => {
-											
 											if ( response.element.id == config.chapters.length && index == config.chapters.length - 1 ) {
 												return true
 											}
@@ -269,7 +278,8 @@ class StoryMapDisplay extends Component {
 												alt="icon"
 												className="skip-intro-icon"
 												onClick={ () => {
-													this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } );
+													this.setState( { ...this.state, slidesDisplay: 'block', mapBrightness: 1 } );
+													window.scrollTo(0, 0);
 												} }
 												src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/PjxzdmcgaWQ9IkxheWVyXzEiIHN0eWxlPSJlbmFibGUtYmFja2dyb3VuZDpuZXcgMCAwIDUwIDUwOyIgdmVyc2lvbj0iMS4xIiB2aWV3Qm94PSIwIDAgNTAgNTAiIHhtbDpzcGFjZT0icHJlc2VydmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiPjxnIGlkPSJMYXllcl8xXzFfIj48cG9seWdvbiBwb2ludHM9IjQ4LjcwNywxOS4zNTMgNDcuMjkzLDE3Ljk0IDI1LDQwLjIzMiAyLjcwNywxNy45NCAxLjI5MywxOS4zNTMgMjUsNDMuMDYgICIvPjxwb2x5Z29uIHBvaW50cz0iNDguNzA3LDguMzUzIDQ3LjI5Myw2Ljk0IDI1LDI5LjIzMiAyLjcwNyw2Ljk0IDEuMjkzLDguMzUzIDI1LDMyLjA2ICAiLz48L2c+PC9zdmc+"
 											>
@@ -334,9 +344,9 @@ class StoryMapDisplay extends Component {
 				{ this.state.isNavigating && (
 					<>
 						<Map
-							zoom={ [ mapStart.zoom ] }
-							pitch={ [ mapStart.pitch ] }
-							bearing={ [ mapStart.bearing ] }
+							zoom={ [ mapDefaults.zoom ] }
+							pitch={ [ 0 ] }
+							bearing={ [ 0 ] }
 							style={ config.style }
 							containerStyle={ { height: '100vh', width: '100vw' } }
 							onStyleLoad={ ( map ) => {
