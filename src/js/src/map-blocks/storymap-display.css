@@ -228,3 +228,11 @@ a, a:hover, a:visited {
 .layers-selection-icon {
     width: 20px;
 }
+
+.angle-up-icon {
+    display: none;
+}
+
+.angle-down-icon {
+    display: block;
+}
