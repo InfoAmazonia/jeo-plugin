@@ -8,13 +8,18 @@ a, a:hover, a:visited {
     color: #0071bc;
 }
 
-.story-map .mapboxgl-map {
+.story-map .mapboxgl-map, .navigate-map {
     top:0; 
     height: 100%;
     width:100%;
     position: fixed;
     left: 0;
     z-index: -5;
+}
+
+.navigate-map .jeomap .mapboxgl-canvas-container canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 #header {
