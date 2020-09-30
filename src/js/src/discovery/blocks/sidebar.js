@@ -25,9 +25,11 @@ class Sidebar extends Component {
 			maps: this.props.maps,
 			toggleLayer: this.props.toggleLayer,
 			selectedLayers: this.props.selectedLayers,
+			applyLayersChanges: this.props.applyLayersChanges,
+			layersQueue: this.props.layersQueue,
 		}
 
-		return tab.name === 'stories'? <Stories  { ...storiesProps } /> : <MapLayers { ...mapLayersProps } />;
+		return tab.name === 'stories'? <MapLayers { ...mapLayersProps } /> : <Stories  { ...storiesProps } />;
 	}
 
 	handleScroll(e) {
