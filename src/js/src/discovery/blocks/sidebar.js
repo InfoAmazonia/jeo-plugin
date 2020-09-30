@@ -27,6 +27,7 @@ class Sidebar extends Component {
 			selectedLayers: this.props.selectedLayers,
 			applyLayersChanges: this.props.applyLayersChanges,
 			layersQueue: this.props.layersQueue,
+			appliedLayers: this.props.appliedLayers,
 		}
 
 		return tab.name === 'stories'? <MapLayers { ...mapLayersProps } /> : <Stories  { ...storiesProps } />;

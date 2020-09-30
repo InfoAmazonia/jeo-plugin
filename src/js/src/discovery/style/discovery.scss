@@ -178,10 +178,9 @@ button {
             .selected-layers {
 				padding: 1.5rem 1.8rem;
 				border: 2px solid #DDDDDD;
-				border-radius: 10px;
-				margin-bottom: 30px;
+				border-radius: 10px 10px 0 0;
 				position: relative;
-				padding-right: 100px;
+				border-bottom: 0;
 
 				&--title {
 					font-weight: bold;
@@ -195,14 +194,14 @@ button {
 
 				.status {
 					position: absolute;
-					right: 1.8rem;
+					right: 0;
 					top: 1.5rem;
 					width: 100px;
 					display: flex;
 					justify-content: center;
-					align-items: flex-end;
+					align-items: center;
 					flex-direction: column;
-					text-align: right;
+					text-align: center;
 
 					&-icon {
 						width: 15px;
@@ -213,6 +212,24 @@ button {
 						font-size: 12px;
 						text-transform: uppercase;
 					}
+				}
+			}
+
+			.apply-changes {
+				width: 100%;
+				background: $primary;
+				color: white;
+				padding: 10px;
+				border-radius: 0 0 10px 10px;
+				margin-bottom: 30px;
+				font-size: 16px;
+				letter-spacing: 0px;
+				text-decoration: none;
+				font-weight: bold;
+
+				&.disabled {
+					opacity: 0.7;
+					cursor: not-allowed;
 				}
 			}
 
