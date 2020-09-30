@@ -8,7 +8,7 @@ a, a:hover, a:visited {
     color: #0071bc;
 }
 
-.mapboxgl-map {
+.story-map .mapboxgl-map {
     top:0; 
     height: 100%;
     width:100%;
@@ -20,7 +20,7 @@ a, a:hover, a:visited {
 #header {
     position: absolute;
     left: 50%;
-    width: 55vw;
+    width: 45vw;
     padding: 2vh;
     text-align: center;
     background: none;
