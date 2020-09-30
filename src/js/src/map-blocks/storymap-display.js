@@ -5,6 +5,7 @@ import { renderLayer } from './map-preview-layer';
 import mapboxgl from 'mapbox-gl';
 import scrollama from 'scrollama';
 import Map from './map';
+import { JeoMap } from '../jeo-map/index';
 
 import './storymap-display.css';
 
@@ -21,29 +22,6 @@ let lastChapter;
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 const scroller = scrollama();
-
-
-const cleanPage = () => {
-	/*
-	for( const element of document.querySelector( '#page' ).children ) {
-		if ( element.className != 'site-content' && element.tagName != 'HEADER' ) {
-			element.style.display = 'none';
-		}
-	}
-
-	for ( const element of document.querySelector( '#main' ).children ) {
-		if ( ! element.classList.contains( 'post' ) && ! element.classList.contains( 'page' ) && element.tagName != 'HEADER' ) {
-			element.style.display = 'none';
-		} else {
-			for ( const element_ of element.children ) {
-				if ( element_.className != 'entry-content' && element_.tagName != 'HEADER' ) {
-					element_.style.display = 'none';						
-				}
-			}
-		}
-	}
-	*/
-}
 
 class StoryMapDisplay extends Component {
     constructor(props) {
@@ -115,7 +93,8 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
-		cleanPage();
+		console.log( JeoMap );
+
         mapboxgl.accessToken = config.accessToken;
 		window.addEventListener('resize', scroller.resize);
 		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
@@ -132,8 +111,7 @@ class StoryMapDisplay extends Component {
 
 			
 		}
-	
-	
+
 		fetch( URL )
 			.then( ( response ) => {
 				return response.json();
