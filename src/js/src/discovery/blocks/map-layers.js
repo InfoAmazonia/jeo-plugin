@@ -65,8 +65,8 @@ class MapLayers extends Component {
 			return <MapItem map={ map } key={ index } toggleLayer={ this.props.toggleLayer } selectedLayers={ this.props.selectedLayers } />;
 		} )
 
-		const selectedLayersRender = Object.keys(this.props.selectedLayers).map( ( key, index ) => {
-			const layer = this.props.selectedLayers[key];
+		const selectedLayersRender = this.props.layersQueue.map( ( layerId, index ) => {
+			const layer = this.props.selectedLayers[layerId];
 
 			return (
 				<div className="layer-item" key={ index }>
@@ -96,9 +96,13 @@ class MapLayers extends Component {
 					<div className="selected-layers--title"> { __("Selected layers") } </div>
 					<div className="selected-layers--content">
 						{ Object.keys(this.props.selectedLayers).length > 0?
-						selectedLayersRender : __("There are no selected layers")
+						selectedLayersRender : __("No layers selected")
 						}
 					</div>
+
+					<button className="apply-changes" onClick={ this.props.applyLayersChanges }>
+						Apply changes
+					</button>
 
 				</div>
 

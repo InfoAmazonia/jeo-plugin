@@ -27,7 +27,8 @@ class Discovery extends Component {
 
 			// layers
 			selectedLayers: {},
-			appliedLayers: {},
+			appliedLayers: [],
+			layersQueue: [],
 
 			// stories
 			storiesLoaded: false,
@@ -39,6 +40,8 @@ class Discovery extends Component {
 		this.storyUnhover = this.storyUnhover.bind(this);
 		this.setMapsState = this.setMapsState.bind(this);
 		this.toggleLayer = this.toggleLayer.bind(this);
+		this.applyLayersChanges = this.applyLayersChanges.bind(this);
+
 	}
 
 	componentDidMount() {
@@ -402,26 +405,112 @@ class Discovery extends Component {
 		} ))
 	}
 
+	applyLayersChanges() {
+		const batch = this.state.layersQueue;
+		let appliedLayers = this.state.appliedLayers;
+
+		appliedLayers.forEach( layer => {
+			const layerId = String(layer.id);
+			// If layer is not requested
+			if(!batch.includes(layer.id)) {
+				if( this.map.getLayer( layerId ) ) {
+					this.map.removeLayer( layerId );
+				}
+			}
+		} )
+
+		batch.forEach( layerID => {
+			const layerId = String( layerID );
+			const layer = this.state.selectedLayers[ layerId ];
+
+			console.log(layer.meta.type);
+
+			if(layer.meta.type === "tilelayer") {
+				if(!this.map.getSource( layerId ) ) {
+					this.map.addSource( layerId, {
+						type: 'raster',
+						tiles: [ layer.meta.layer_type_options.url ],
+						tileSize: 256,
+					});
+				}
+
+				if(this.map.getLayer( layerId ) === undefined) {
+					this.map.addLayer( {
+						id: layerId,
+						type: 'raster',
+						source: layerId,
+						layout: {
+							'visibility': 'visible',
+						}
+					} );
+
+					this.map.moveLayer(layerId, 'unclustered-points');
+				}
+			} else if(layer.meta.type === "mapbox") {
+				if(this.map.getLayer( layerId ) === undefined) {
+					if(!this.map.getSource( layerId ) ) {
+						this.map.addSource( layerId, {
+							type: 'raster',
+							tiles: [
+								'https://api.mapbox.com/styles/v1/' +
+									layer.meta.layer_type_options.style_id +
+									'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
+									window.mapboxgl.accessToken,
+							],
+						});
+					}
+
+					const newLayer = {
+						id: layerId,
+						source: layerId,
+						type: 'raster',
+					};
+
+					this.map.addLayer(newLayer);
+					this.map.moveLayer(layerId, 'unclustered-points');
+				}
+			}
+		} );
+
+
+
+
+		appliedLayers = batch.map( layerId => {
+			return this.state.selectedLayers[layerId];
+		});
+
+		this.setState( ( state ) => ( {
+			...state,
+			appliedLayers,
+		} ) )
+	}
+
 	toggleLayer(layer) {
 		const selectedLayers = Object.assign({}, this.state.selectedLayers);
+		let layersQueue = [...this.state.layersQueue];
 
 		// If layer does not exist
 		if(!selectedLayers.hasOwnProperty(layer.id)) {
 			selectedLayers[ layer.id ] = layer;
+			layersQueue = [ ...layersQueue, layer.id ];
 
 			this.setState( ( state ) => ( {
 				...state,
 				selectedLayers,
+				layersQueue,
 			} ) );
+
+			// push to layers queue
+
 		} else {
+			layersQueue = layersQueue.filter( id => id !== layer.id)
 			delete selectedLayers[ layer.id ];
 
 			this.setState( ( state ) => ( {
 				...state,
 				selectedLayers,
+				layersQueue ,
 			} ) );
-
-			// console.log(selectedLayers);
 		}
 
 	}
@@ -434,11 +523,13 @@ class Discovery extends Component {
 			storyHovered: this.storyHovered,
 			storyUnhover: this.storyUnhover,
 
-			setMapsState: this.setMapsState,
 			mapsLoaded: this.state.mapsLoaded,
 			maps: this.state.maps,
-			toggleLayer: this.toggleLayer,
 			selectedLayers: this.state.selectedLayers,
+			layersQueue: this.state.layersQueue,
+			setMapsState: this.setMapsState,
+			toggleLayer: this.toggleLayer,
+			applyLayersChanges: this.applyLayersChanges,
 		}
 
 		//console.log(this.state.selectedLayers);
