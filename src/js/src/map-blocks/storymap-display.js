@@ -24,6 +24,7 @@ const scroller = scrollama();
 
 
 const cleanPage = () => {
+	/*
 	for( const element of document.querySelector( '#page' ).children ) {
 		if ( element.className != 'site-content' && element.tagName != 'HEADER' ) {
 			element.style.display = 'none';
@@ -41,6 +42,7 @@ const cleanPage = () => {
 			}
 		}
 	}
+	*/
 }
 
 class StoryMapDisplay extends Component {
@@ -151,7 +153,7 @@ class StoryMapDisplay extends Component {
 		const currentChapterID = this.state.currentChapter.id;
 
         return(
-			<>
+			<div className="story-map">
 				{ ! this.state.isNavigating && (
 					<div>
 						<Map
@@ -486,7 +488,7 @@ class StoryMapDisplay extends Component {
 						</div>
 					</>
 				) }
-			</>
+			</div>
         );
     }
 
