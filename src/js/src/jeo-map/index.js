@@ -7,7 +7,7 @@ const decodeHtmlEntity = function ( str ) {
 	} );
 };
 
-class JeoMap {
+export default class JeoMap {
 	constructor( element ) {
 		this.element = element;
 		this.args = element.attributes;
@@ -771,6 +771,7 @@ class JeoMap {
 			if ( map_id ) {
 				this.dataset['map_id'] = map_id;
 			}
+
 			new JeoMap( this );
 		} );
 	} );
