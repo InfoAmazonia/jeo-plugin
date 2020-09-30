@@ -1,8 +1,13 @@
 import { Component } from '@wordpress/element';
 import Sidebar from './blocks/sidebar';
 import './style/discovery.scss';
+import JeoMap from './../jeo-map/index.js';
+import './../jeo-map/index.js';
+
 
 const POSTS_PER_PAGE = 4;
+
+alert(JeoMap);
 
 class Discovery extends Component {
 	constructor(props) {
@@ -11,6 +16,7 @@ class Discovery extends Component {
 		// map can't be a state, trust me.
 		this.map = null;
 
+		// general state
 		this.state = {
 			// component
 			firstLoad: true,
@@ -35,6 +41,7 @@ class Discovery extends Component {
 			stories: [],
 		};
 
+		// methods bindings
 		this.updateStories = this.updateStories.bind(this);
 		this.storyHovered = this.storyHovered.bind(this);
 		this.storyUnhover = this.storyUnhover.bind(this);
@@ -526,6 +533,7 @@ class Discovery extends Component {
 			mapsLoaded: this.state.mapsLoaded,
 			maps: this.state.maps,
 			selectedLayers: this.state.selectedLayers,
+			appliedLayers: this.state.appliedLayers,
 			layersQueue: this.state.layersQueue,
 			setMapsState: this.setMapsState,
 			toggleLayer: this.toggleLayer,
