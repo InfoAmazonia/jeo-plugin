@@ -101,16 +101,25 @@ class StoryMapDisplay extends Component {
 
 		if ( document.querySelector( '.single-post' ) ) {
 			URL = `${ window.jeoMapVars.jsonUrl }posts/${ this.props.postID }`;
-			
+
 		} else if ( document.querySelector( '.page' ) ) {
 			URL = `${ window.jeoMapVars.jsonUrl }pages/${ this.props.postID }`;
+
+		} else if ( document.querySelector( '.single-storymap' ) ) {
+
+			if ( document.querySelector( '#content' ) ) {
+				document.querySelector( '#content' ).style.marginTop = 0;
+
+			}
+			
+			URL = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`
 		}
 
 		const navigateMapDiv = document.createElement('div');
 		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map');
 		navigateMapDiv.dataset.map_id = this.props.map_id;
 
-		const navigateMap = new JeoMap( navigateMapDiv );
+		new JeoMap( navigateMapDiv );
 		document.querySelector('.navigate-map').append( navigateMapDiv );
 
 		fetch( URL )
@@ -118,6 +127,7 @@ class StoryMapDisplay extends Component {
 				return response.json();
 			} )
 			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
+
 
 	}
 	

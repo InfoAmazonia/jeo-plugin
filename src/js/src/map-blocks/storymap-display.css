@@ -9,7 +9,6 @@ a, a:hover, a:visited {
 }
 
 .story-map .mapboxgl-map, .navigate-map {
-    top:0; 
     height: 100%;
     width:100%;
     position: fixed;
@@ -18,8 +17,8 @@ a, a:hover, a:visited {
 }
 
 .navigate-map .jeomap .mapboxgl-canvas-container canvas {
-    width: 100% !important;
-    height: 100% !important;
+    width: 100vw !important;
+    height: 100vh !important;
 }
 
 #header {
@@ -232,12 +231,4 @@ a, a:hover, a:visited {
 
 .layers-selection-icon {
     width: 20px;
-}
-
-.angle-up-icon {
-    display: none;
-}
-
-.angle-down-icon {
-    display: block;
 }
