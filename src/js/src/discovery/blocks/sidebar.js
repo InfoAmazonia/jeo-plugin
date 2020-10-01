@@ -15,15 +15,15 @@ class Sidebar extends Component {
 			storiesLoaded: this.props.storiesLoaded,
 			stories: this.props.stories,
 			updateStories: this.props.updateStories,
-			storyHovered: this.props.storyHovered,
-			storyUnhover: this.props.storyUnhover,
+			map: this.props.map,
 		}
 
 		const mapLayersProps = {
+			map: this.props.map,
+			updateState: this.props.updateState,
 			setMapsState: this.props.setMapsState,
 			mapsLoaded: this.props.mapsLoaded,
 			maps: this.props.maps,
-			toggleLayer: this.props.toggleLayer,
 			selectedLayers: this.props.selectedLayers,
 			applyLayersChanges: this.props.applyLayersChanges,
 			layersQueue: this.props.layersQueue,
