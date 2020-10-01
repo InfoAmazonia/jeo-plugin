@@ -1,13 +1,9 @@
 import { Component } from '@wordpress/element';
 import Sidebar from './blocks/sidebar';
 import './style/discovery.scss';
-import JeoMap from './../jeo-map/index.js';
-import './../jeo-map/index.js';
-
 
 const POSTS_PER_PAGE = 4;
 
-alert(JeoMap);
 
 class Discovery extends Component {
 	constructor(props) {
@@ -43,11 +39,7 @@ class Discovery extends Component {
 
 		// methods bindings
 		this.updateStories = this.updateStories.bind(this);
-		this.storyHovered = this.storyHovered.bind(this);
-		this.storyUnhover = this.storyUnhover.bind(this);
-		this.setMapsState = this.setMapsState.bind(this);
-		this.toggleLayer = this.toggleLayer.bind(this);
-		this.applyLayersChanges = this.applyLayersChanges.bind(this);
+		this.updateState = this.updateState.bind(this);
 
 	}
 
@@ -370,174 +362,28 @@ class Discovery extends Component {
 		} ) ) )
 	}
 
-	storyHovered(story) {
-		const average = { lat: 0, lon: 0 };
-
-		story.meta._related_point.forEach( point => {
-			const LngLat = {
-				lat: parseFloat( point._geocode_lat ),
-				lon: parseFloat( point._geocode_lon ),
-			};
-
-			// average.lat += LngLat.lat/story.meta._related_point.length
-			// average.lon += LngLat.lon/story.meta._related_point.length
-
-			average.lat = LngLat.lat;
-			average.lon = LngLat.lon;
-		})
-
-		this.map.flyTo( { center: average, zoom: 7 } );
-
-		this.map.setFeatureState(
-			{ source: 'storiesSource', id: story.id },
-			{ hover: true }
-		);
-	}
-
-	storyUnhover(story) {
-		this.map.setFeatureState(
-			{ source: 'storiesSource', id: story.id },
-			{ hover: false }
-		);
-	}
-
-	setMapsState(maps) {
-		// console.log("Set maps");
-		// console.log(maps);
-
-		this.setState( ( state ) => ( {
+	updateState( state ) {
+		this.setState( ( currentState ) => ( {
+			...currentState,
 			...state,
-			maps,
-			mapsLoaded: true,
 		} ))
-	}
-
-	applyLayersChanges() {
-		const batch = this.state.layersQueue;
-		let appliedLayers = this.state.appliedLayers;
-
-		appliedLayers.forEach( layer => {
-			const layerId = String(layer.id);
-			// If layer is not requested
-			if(!batch.includes(layer.id)) {
-				if( this.map.getLayer( layerId ) ) {
-					this.map.removeLayer( layerId );
-				}
-			}
-		} )
-
-		batch.forEach( layerID => {
-			const layerId = String( layerID );
-			const layer = this.state.selectedLayers[ layerId ];
-
-			console.log(layer.meta.type);
-
-			if(layer.meta.type === "tilelayer") {
-				if(!this.map.getSource( layerId ) ) {
-					this.map.addSource( layerId, {
-						type: 'raster',
-						tiles: [ layer.meta.layer_type_options.url ],
-						tileSize: 256,
-					});
-				}
-
-				if(this.map.getLayer( layerId ) === undefined) {
-					this.map.addLayer( {
-						id: layerId,
-						type: 'raster',
-						source: layerId,
-						layout: {
-							'visibility': 'visible',
-						}
-					} );
-
-					this.map.moveLayer(layerId, 'unclustered-points');
-				}
-			} else if(layer.meta.type === "mapbox") {
-				if(this.map.getLayer( layerId ) === undefined) {
-					if(!this.map.getSource( layerId ) ) {
-						this.map.addSource( layerId, {
-							type: 'raster',
-							tiles: [
-								'https://api.mapbox.com/styles/v1/' +
-									layer.meta.layer_type_options.style_id +
-									'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
-									window.mapboxgl.accessToken,
-							],
-						});
-					}
-
-					const newLayer = {
-						id: layerId,
-						source: layerId,
-						type: 'raster',
-					};
-
-					this.map.addLayer(newLayer);
-					this.map.moveLayer(layerId, 'unclustered-points');
-				}
-			}
-		} );
-
-
-
-
-		appliedLayers = batch.map( layerId => {
-			return this.state.selectedLayers[layerId];
-		});
-
-		this.setState( ( state ) => ( {
-			...state,
-			appliedLayers,
-		} ) )
-	}
-
-	toggleLayer(layer) {
-		const selectedLayers = Object.assign({}, this.state.selectedLayers);
-		let layersQueue = [...this.state.layersQueue];
-
-		// If layer does not exist
-		if(!selectedLayers.hasOwnProperty(layer.id)) {
-			selectedLayers[ layer.id ] = layer;
-			layersQueue = [ ...layersQueue, layer.id ];
-
-			this.setState( ( state ) => ( {
-				...state,
-				selectedLayers,
-				layersQueue,
-			} ) );
-
-			// push to layers queue
-
-		} else {
-			layersQueue = layersQueue.filter( id => id !== layer.id)
-			delete selectedLayers[ layer.id ];
-
-			this.setState( ( state ) => ( {
-				...state,
-				selectedLayers,
-				layersQueue ,
-			} ) );
-		}
-
 	}
 
 	render() {
 		const props = {
+			map: this.map,
 			stories: this.state.stories,
 			storiesLoaded: this.state.storiesLoaded,
 			updateStories: this.updateStories,
-			storyHovered: this.storyHovered,
-			storyUnhover: this.storyUnhover,
 
 			mapsLoaded: this.state.mapsLoaded,
 			maps: this.state.maps,
 			selectedLayers: this.state.selectedLayers,
 			appliedLayers: this.state.appliedLayers,
 			layersQueue: this.state.layersQueue,
-			setMapsState: this.setMapsState,
-			toggleLayer: this.toggleLayer,
 			applyLayersChanges: this.applyLayersChanges,
+
+			updateState: this.updateState,
 		}
 
 		//console.log(this.state.selectedLayers);

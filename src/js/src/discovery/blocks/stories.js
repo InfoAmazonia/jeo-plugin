@@ -38,7 +38,7 @@ class Stories extends Component {
 				<div className="stories">
 					{
 						this.props.stories.map( (story, index ) => {
-							return ( <Storie story={ story } key={ index } storyHovered={ this.storyHovered } storyUnhover={ this.storyUnhover } /> )
+							return ( <Storie story={ story } key={ index } map={ this.props.map } /> )
 						} )
 					}
 				</div>
@@ -66,11 +66,39 @@ class Storie extends Component {
 	}
 
 	storyHovered() {
-		this.props.storyHovered(this.props.story);
+		const map = this.props.map;
+		const story = this.props.story;
+		const average = { lat: 0, lon: 0 };
+
+		story.meta._related_point.forEach( point => {
+			const LngLat = {
+				lat: parseFloat( point._geocode_lat ),
+				lon: parseFloat( point._geocode_lon ),
+			};
+
+			// average.lat += LngLat.lat/story.meta._related_point.length
+			// average.lon += LngLat.lon/story.meta._related_point.length
+
+			average.lat = LngLat.lat;
+			average.lon = LngLat.lon;
+		})
+
+		map.flyTo( { center: average, zoom: 7 } );
+
+		map.setFeatureState(
+			{ source: 'storiesSource', id: story.id },
+			{ hover: true }
+		);
 	}
 
 	storyUnhover() {
-		this.props.storyUnhover(this.props.story);
+		const story = this.props.story;
+		const map = this.props.map;
+
+		map.setFeatureState(
+			{ source: 'storiesSource', id: story.id },
+			{ hover: false }
+		);
 	}
 
 	render() {
