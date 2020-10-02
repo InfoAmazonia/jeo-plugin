@@ -64,6 +64,8 @@ class Discovery extends Component {
 	}
 
 	render() {
+		console.log(JSON.stringify(this.state));
+
 		const props = {
 			map: this.map,
 			stories: this.state.stories,
