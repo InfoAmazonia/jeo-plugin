@@ -46,8 +46,6 @@ class Discovery extends Component {
 		const map = new mapboxgl.Map({
 			container: this.mapContainer,
 			style: 'mapbox://styles/mapbox/streets-v11',
-			// center: [this.state.lng, this.state.lat],
-			// zoom: this.state.zoom
 		});
 
 		this.map = map;
@@ -64,7 +62,7 @@ class Discovery extends Component {
 	}
 
 	render() {
-		console.log(JSON.stringify(this.state));
+		// console.log(JSON.stringify(this.state));
 
 		const props = {
 			map: this.map,
