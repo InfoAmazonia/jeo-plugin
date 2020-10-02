@@ -17,7 +17,7 @@ class Stories extends Component {
 		// console.log(this.props);
 		this.storyHovered = this.storyHovered.bind(this);
 		this.storyUnhover = this.storyUnhover.bind(this);
-
+		this.updateStories = this.updateStories.bind(this);
 
 		const map = this.props.map;
 
@@ -164,10 +164,6 @@ class Stories extends Component {
 
 	}
 
-	componentDidUpdate() {
-		console.log(this.props);
-	}
-
 	buildPostsGeoJson(stories) {
 		const finalFeatures = {
 			type: 'FeatureCollection',
@@ -294,7 +290,6 @@ class Stories extends Component {
 						.then( () => {
 							storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
 
-							console.log("geolocatedStories", geolocatedStories);
 							this.props.updateState({
 								storiesLoaded: true,
 								stories: storiesCumulative,
@@ -344,7 +339,7 @@ class Stories extends Component {
 
 		return (
 			<div className="stories-tab">
-				<Search searchPlaceholder="Search story" updateStories={ this.updateStories } />
+				<Search searchPlaceholder="Search story" update={ this.updateStories } />
 
 				<div className="stories">
 					{

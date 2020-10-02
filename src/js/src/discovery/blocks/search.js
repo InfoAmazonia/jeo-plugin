@@ -19,9 +19,9 @@ class Search extends Component {
 
 	handleSubmit()  {
 		if( !this.state.value.length ) {
-			this.props.updateStories( { search: '', cumulative: false,  page: 1 } )
+			this.props.update( { search: '', cumulative: false,  page: 1 } )
 		} else {
-			this.props.updateStories( { search: this.state.value, page: 1 } )
+			this.props.update( { search: this.state.value, page: 1 } )
 		}
 
 	}

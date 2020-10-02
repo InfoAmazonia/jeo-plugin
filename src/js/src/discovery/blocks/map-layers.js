@@ -15,6 +15,7 @@ class MapLayers extends Component {
 
 		this.toggleLayer = this.toggleLayer.bind(this);
 		this.applyLayersChanges = this.applyLayersChanges.bind(this);
+		this.updateMaps = this.updateMaps.bind(this);
 
 
 		if ( ! this.props.mapsLoaded ) {
@@ -27,6 +28,7 @@ class MapLayers extends Component {
 		params = { ...defaultParams, ...params };
 
 		const mapsUrl = new URL( jeoMapVars.jsonUrl + 'map/' );
+
 		Object.keys( params ).forEach( ( key ) =>
 			mapsUrl.searchParams.append( key, params[ key ] )
 		);
@@ -171,6 +173,10 @@ class MapLayers extends Component {
 		} )
 	}
 
+	updateMaps(params) {
+		this.fetchMaps({ ...params }).catch( (err) => console.log( err ));
+	}
+
 
 	render() {
 		const mapItens = this.props.maps.map( ( map, index ) => {
@@ -183,22 +189,6 @@ class MapLayers extends Component {
 				/>
 			);
 		} );
-
-		// { ( { oldIndex, newIndex } ) =>
-		// 			setItems( arrayMove( items, oldIndex, newIndex ) )
-		// 		}
-
-		const coisa = () =>
-			(<List
-				values={ this.state.testItens }
-				onChange={ ( { oldIndex, newIndex } ) => this.setState({ testItens: arrayMove( this.state.testItens, oldIndex, newIndex ) }) }
-				renderList={ ( { children, props } ) => (
-					<ul { ...props }>{ children }</ul>
-				) }
-				lockVertically="true"
-				renderItem={ ( { value, props } ) => <li { ...props }>{ value }</li> }
-			/>)
-		;
 
 		const selectedLayersRender = (
 			<List
@@ -247,7 +237,7 @@ class MapLayers extends Component {
 			<div className="maps-tab">
 				<Search
 					searchPlaceholder="Search map"
-					updateStories={ this.props.updateStories }
+					update={ this.updateMaps }
 				/>
 
 				<div className="selected-layers">
