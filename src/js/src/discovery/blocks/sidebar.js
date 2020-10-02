@@ -42,8 +42,9 @@ class Sidebar extends Component {
 		if (this.props.storiesLoaded) {
 			const element = e.target
 			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-				// this.props.updateStories( { cumulative: true } )
-				this.storiesRef.current.updateStories( { cumulative: true }  );
+				if(this.storiesRef.current) {
+					this.storiesRef.current.updateStories( { cumulative: true }  );
+				}
 			}
 		}
 	};
