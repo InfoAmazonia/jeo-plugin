@@ -1,4 +1,4 @@
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { TabPanel, Icon } from '@wordpress/components';
 import Stories from './stories';
 import MapLayers from './map-layers';
@@ -6,16 +6,20 @@ import MapLayers from './map-layers';
 class Sidebar extends Component {
 	constructor( props ) {
 		super( props );
+
+		this.storiesRef = createRef();
 		this.handleScroll = this.handleScroll.bind(this);
 	}
 
 	displayTab(tab) {
 		const storiesProps = {
-			setStoriesState: this.props.setStoriesState,
 			storiesLoaded: this.props.storiesLoaded,
 			stories: this.props.stories,
-			updateStories: this.props.updateStories,
 			map: this.props.map,
+			firstLoad: this.props.firstLoad,
+			updateState: this.props.updateState,
+			pageInfo: this.props.pageInfo,
+			ref: this.storiesRef,
 		}
 
 		const mapLayersProps = {
@@ -30,7 +34,7 @@ class Sidebar extends Component {
 			appliedLayers: this.props.appliedLayers,
 		}
 
-		return tab.name === 'stories'? <MapLayers { ...mapLayersProps } /> : <Stories  { ...storiesProps } />;
+		return tab.name === 'stories'? <Stories  { ...storiesProps } /> : <MapLayers { ...mapLayersProps } />;
 	}
 
 	handleScroll(e) {
@@ -38,7 +42,8 @@ class Sidebar extends Component {
 		if (this.props.storiesLoaded) {
 			const element = e.target
 			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-				this.props.updateStories( { cumulative: true } )
+				// this.props.updateStories( { cumulative: true } )
+				this.storiesRef.current.updateStories( { cumulative: true }  );
 			}
 		}
 	};

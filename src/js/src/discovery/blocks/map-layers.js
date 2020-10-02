@@ -78,7 +78,7 @@ class MapLayers extends Component {
 		// If layer does not exist
 		if(!selectedLayers.hasOwnProperty(layer.id)) {
 			selectedLayers[ layer.id ] = layer;
-			layersQueue = [ ...layersQueue, layer.id ];
+			layersQueue = [ layer.id, ...layersQueue ];
 
 		} else {
 			layersQueue = layersQueue.filter( id => id !== layer.id)
@@ -107,11 +107,12 @@ class MapLayers extends Component {
 			}
 		} )
 
-		batch.forEach( layerID => {
+		const reverseBatch = [ ...batch ].reverse();
+		reverseBatch.forEach( layerID => {
 			const layerId = String( layerID );
 			const layer = this.props.selectedLayers[ layerId ];
 
-			console.log(layer.meta.type);
+			// console.log(layer.meta.type);
 
 			if(layer.meta.type === "tilelayer") {
 				if(!map.getSource( layerId ) ) {
@@ -131,9 +132,9 @@ class MapLayers extends Component {
 							'visibility': 'visible',
 						}
 					} );
-
-					map.moveLayer(layerId, 'unclustered-points');
 				}
+
+				map.moveLayer(layerId, 'unclustered-points');
 			} else if(layer.meta.type === "mapbox") {
 				if(map.getLayer( layerId ) === undefined) {
 					if(!map.getSource( layerId ) ) {
@@ -155,8 +156,9 @@ class MapLayers extends Component {
 					};
 
 					map.addLayer(newLayer);
-					map.moveLayer(layerId, 'unclustered-points');
 				}
+
+				map.moveLayer(layerId, 'unclustered-points');
 			}
 		} );
 
@@ -198,19 +200,34 @@ class MapLayers extends Component {
 			/>)
 		;
 
-		const selectedLayersRender = this.props.layersQueue.map(
-			( layerId, index ) => {
-				const layer = this.props.selectedLayers[ layerId ];
+		const selectedLayersRender = (
+			<List
+				values={ this.props.layersQueue }
+				onChange={ ( { oldIndex, newIndex } ) => this.props.updateState( { layersQueue: arrayMove( [ ...this.props.layersQueue ], oldIndex, newIndex ) } ) }
+				renderList={ ( { children, props } ) => (
+					<div { ...props }>{ children }</div>
+				) }
+				lockVertically="true"
+				renderItem={ ( { value, props, isDragged } ) => {
+					const layer = this.props.selectedLayers[ value ];
 
-				return (
-					<div className="layer-item" key={ index }>
-						<span>
-							{ layer.map.title.rendered + ' - ' + layer.title.rendered }
-						</span>
-					</div>
-				);
-			}
-		);
+					return (
+						<div { ...props } className={ "layer-item" + (isDragged? " dragged" : "") } >
+							<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="grip-vertical" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="svg-inline--fa fa-grip-vertical fa-w-10 fa-3x"><path fill="currentColor" d="M96 32H32C14.33 32 0 46.33 0 64v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zM288 32h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32z"></path></svg>
+							<div className="layer-item--content">
+								<div className="layer-item--map">
+									{ layer.map.title.rendered }
+								</div>
+								<div className="layer-item--layer">
+									{ layer.title.rendered }
+								</div>
+							</div>
+						</div>
+					);
+					}
+				}
+			/>
+		)
 
 		function arrayEquals( a, b ) {
 			return (
@@ -228,8 +245,6 @@ class MapLayers extends Component {
 
 		return (
 			<div className="maps-tab">
-				{ coisa() }
-
 				<Search
 					searchPlaceholder="Search map"
 					updateStories={ this.props.updateStories }
