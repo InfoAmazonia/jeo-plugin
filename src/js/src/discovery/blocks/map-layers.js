@@ -137,6 +137,7 @@ class MapLayers extends Component {
 		reverseBatch.forEach( layerID => {
 			const layerId = String( layerID );
 			const layer = this.props.selectedLayers[ layerId ];
+			const attributes = layer.meta;
 
 			// console.log(layer.meta.type);
 
@@ -144,7 +145,7 @@ class MapLayers extends Component {
 				if(!map.getSource( layerId ) ) {
 					map.addSource( layerId, {
 						type: 'raster',
-						tiles: [ layer.meta.layer_type_options.url ],
+						tiles: [ attributes.layer_type_options.url ],
 						tileSize: 256,
 					});
 				}
@@ -161,6 +162,7 @@ class MapLayers extends Component {
 				}
 
 				map.moveLayer(layerId, 'unclustered-points');
+
 			} else if(layer.meta.type === "mapbox") {
 				if(map.getLayer( layerId ) === undefined) {
 					if(!map.getSource( layerId ) ) {
@@ -168,7 +170,7 @@ class MapLayers extends Component {
 							type: 'raster',
 							tiles: [
 								'https://api.mapbox.com/styles/v1/' +
-									layer.meta.layer_type_options.style_id +
+									attributes.layer_type_options.style_id +
 									'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
 									window.mapboxgl.accessToken,
 							],
@@ -179,6 +181,69 @@ class MapLayers extends Component {
 						id: layerId,
 						source: layerId,
 						type: 'raster',
+					};
+
+					map.addLayer(newLayer);
+				}
+
+				map.moveLayer(layerId, 'unclustered-points');
+
+			} else if(layer.meta.type === "mvt") {
+				if(map.getLayer( layerId ) === undefined) {
+					if(!map.getSource( layerId ) ) {
+						map.addSource( layerId, {
+							type: 'vector',
+							tiles: [ attributes.layer_type_options.url ],
+						});
+					}
+
+					const newLayer = {
+						id: layerId,
+						type: attributes.layer_type_options.type,
+						source: layerId,
+						'source-layer': attributes.source_layer,
+					};
+
+					map.addLayer(newLayer);
+				}
+
+				map.moveLayer(layerId, 'unclustered-points');
+
+			} else if(layer.meta.type === "mapbox-tileset-vector") {
+				if(map.getLayer( layerId ) === undefined) {
+					if(!map.getSource( layerId ) ) {
+						map.addSource( layerId, {
+							type: attributes.layer_type_options.style_source_type,
+							url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+						});
+					}
+
+					const newLayer = {
+						id: attributes.layer_id,
+						type: attributes.layer_type_options.type,
+						source: attributes.layer_id,
+						'source-layer': attributes.layer_type_options.source_layer
+					};
+
+					map.addLayer(newLayer);
+				}
+
+				map.moveLayer(layerId, 'unclustered-points');
+
+			} else if(layer.meta.type === "mapbox-tileset-raster") {
+				if(map.getLayer( layerId ) === undefined) {
+					if(!map.getSource( layerId ) ) {
+						map.addSource( layerId, {
+							type: attributes.layer_type_options.style_source_type,
+							url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+						});
+					}
+
+					const newLayer = {
+						id: attributes.layer_id,
+						type: attributes.layer_type_options.type,
+						source: attributes.layer_id,
+						'source-layer': ''
 					};
 
 					map.addLayer(newLayer);
