@@ -188,10 +188,8 @@ a, a:hover, a:visited {
     cursor: pointer
 }
 
-.return-to-slides-container .icon, .skip-intro-icon {
-    width: 30px;
-    left: 0;
-    right: 0;
+.skip-intro-icon svg, .return-to-slides-container .icon svg {
+    width: 20px;
 }
 
 .return-to-slides-container .icon {
