@@ -2,7 +2,7 @@ import { Component } from '@wordpress/element';
 import Search from './search';
 import MapItem from './map-item';
 import { __ } from '@wordpress/i18n';
-import { List, arrayMove } from 'react-movable';
+import { List, arrayMove, arrayRemove} from 'react-movable';
 
 class MapLayers extends Component {
 	constructor( props ) {
@@ -10,12 +10,13 @@ class MapLayers extends Component {
 
 		this.state = {
 			maps: [],
-			testItens: [ 1, 2, 3, 4 ]
 		};
 
 		this.toggleLayer = this.toggleLayer.bind(this);
 		this.applyLayersChanges = this.applyLayersChanges.bind(this);
 		this.updateMaps = this.updateMaps.bind(this);
+		this.toggleLayersBatch = this.toggleLayersBatch.bind(this);
+
 
 
 		if ( ! this.props.mapsLoaded ) {
@@ -77,6 +78,7 @@ class MapLayers extends Component {
 		const selectedLayers = Object.assign({}, this.props.selectedLayers);
 		let layersQueue = [...this.props.layersQueue];
 
+
 		// If layer does not exist
 		if(!selectedLayers.hasOwnProperty(layer.id)) {
 			selectedLayers[ layer.id ] = layer;
@@ -92,6 +94,28 @@ class MapLayers extends Component {
 			layersQueue,
 		} );
 
+	}
+
+	toggleLayersBatch(layers) {
+		const selectedLayers = Object.assign({}, this.props.selectedLayers);
+		let layersQueue = [...this.props.layersQueue];
+
+		layers.forEach(layer => {
+			// If layer does not exist
+			if(!selectedLayers.hasOwnProperty(layer.id)) {
+				selectedLayers[ layer.id ] = layer;
+				layersQueue = [ layer.id, ...layersQueue ];
+
+			} else {
+				layersQueue = layersQueue.filter( id => id !== layer.id)
+				delete selectedLayers[ layer.id ];
+			}
+		})
+
+		this.props.updateState( {
+			selectedLayers,
+			layersQueue,
+		} );
 	}
 
 	applyLayersChanges() {
@@ -186,6 +210,7 @@ class MapLayers extends Component {
 					key={ index }
 					toggleLayer={ this.toggleLayer }
 					selectedLayers={ this.props.selectedLayers }
+					toggleLayersBatch={ this.toggleLayersBatch }
 				/>
 			);
 		} );
@@ -193,17 +218,26 @@ class MapLayers extends Component {
 		const selectedLayersRender = (
 			<List
 				values={ this.props.layersQueue }
-				onChange={ ( { oldIndex, newIndex } ) => this.props.updateState( { layersQueue: arrayMove( [ ...this.props.layersQueue ], oldIndex, newIndex ) } ) }
+				onChange={ ( { oldIndex, newIndex } ) => {
+					// if(newIndex < 0) {
+					// 	this.props.updateState( { layersQueue: arrayRemove( [ ...this.props.layersQueue ], oldIndex ) })
+					// 	return;
+					// }
+
+					this.props.updateState( { layersQueue: arrayMove( [ ...this.props.layersQueue ], oldIndex, newIndex )
+
+				} )}  }
 				renderList={ ( { children, props } ) => (
 					<div { ...props }>{ children }</div>
 				) }
-				lockVertically="true"
+				lockVertically
+				// removableByMove
 				renderItem={ ( { value, props, isDragged } ) => {
 					const layer = this.props.selectedLayers[ value ];
 
 					return (
 						<div { ...props } className={ "layer-item" + (isDragged? " dragged" : "") } >
-							<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="grip-vertical" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" class="svg-inline--fa fa-grip-vertical fa-w-10 fa-3x"><path fill="currentColor" d="M96 32H32C14.33 32 0 46.33 0 64v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zM288 32h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32z"></path></svg>
+							<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="grip-vertical" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" className="drag-icon"><path fill="currentColor" d="M96 32H32C14.33 32 0 46.33 0 64v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zM288 32h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32z"></path></svg>
 							<div className="layer-item--content">
 								<div className="layer-item--map">
 									{ layer.map.title.rendered }
@@ -212,6 +246,9 @@ class MapLayers extends Component {
 									{ layer.title.rendered }
 								</div>
 							</div>
+							<button onClick={ () => this.toggleLayer(layer) } className="remove-layer">
+								<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
+							</button>
 						</div>
 					);
 					}
@@ -252,12 +289,10 @@ class MapLayers extends Component {
 									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 352 512"
-									class="svg-inline--fa fa-times fa-w-11 fa-3x"
 								>
 									<path
 										fill="currentColor"
 										d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
-										class=""
 									></path>
 								</svg>
 							) : (
@@ -269,12 +304,10 @@ class MapLayers extends Component {
 									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 512 512"
-									class="svg-inline--fa fa-check fa-w-16 fa-3x"
 								>
 									<path
 										fill="currentColor"
 										d="M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z"
-										class=""
 									></path>
 								</svg>
 							) }

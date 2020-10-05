@@ -186,10 +186,12 @@ button {
 					font-weight: bold;
 					font-size: 18px;
 					margin-bottom: 10px;
+					padding: 9px 0;
 				}
 
 				&--content {
 					font-size: 14px;
+					padding-top: 13px;
 				}
 
 				.status {
@@ -235,12 +237,14 @@ button {
 
             .map-itens {
                 .map-item {
-                    margin-bottom: 33px;
+					position: relative;
+					margin-bottom: 33px;
 
                     .title {
                         font-weight: bold;
                         font-size: 18px;
-                        padding-bottom: 5px;
+						padding-bottom: 5px;
+						padding-right: 80px;
                         // margin-bottom: 13px;
                     }
 
@@ -263,7 +267,34 @@ button {
                             width: 16px;
                             margin-right: 5px;
                         }
-                    }
+					}
+
+					.apply-remove-all {
+						position: absolute;
+						top: 0;
+						right: 0;
+						background-color: $primary;
+						padding: 5px 10px;
+						color: white;
+						display: flex;
+						justify-content: center;
+						align-items: center;
+						border-radius: 5px;
+						letter-spacing: 0;
+						font-size: 14px;
+						font-weight: bold;
+
+						&.clear {
+							background: none;
+							border: 1px solid $primary;
+							color: $primary;
+						}
+
+						svg {
+							width: 13px;
+							margin-right: 7px;
+						}
+					}
 
                     .layers-toggles {
                         display: flex;
@@ -342,6 +373,7 @@ button {
 	z-index: 1;
 	cursor: grab;
 	display: flex;
+	position: relative;
 
 	// &:not(:last-child) {
 		margin-bottom: 15px;
@@ -354,11 +386,24 @@ button {
 	}
 
 	svg {
-		width: 8px;
-		opacity: 0.5;
-		margin-right: 5px;
-		height: 15px;
-		margin-top: 2px;
+		&.drag-icon {
+			width: 8px;
+			opacity: 0.5;
+			margin-right: 5px;
+			height: 15px;
+			margin-top: 2px;
+		}
+	}
+
+	.remove-layer {
+		position: absolute;
+		right: 0;
+		opacity: 0.7;
+		cursor: pointer;
+
+		svg {
+			width: 10px;
+		}
 	}
 
 	&.dragged {
