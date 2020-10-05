@@ -3,7 +3,7 @@ import JeoMap from './class-jeo-map';
 
 ( function ( $ ) {
 	$( function () {
-		$( '.jeomap' ).each( function ( i ) {
+		$( '.jeomap:not(.storymap)' ).each( function ( i ) {
 			/*
 				before pass this element to JeoMap constructor
 				we need to get the bypassed wp unfiltered_html permission
