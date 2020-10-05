@@ -23,7 +23,7 @@ a, a:hover, a:visited {
     text-align: center;
     background: none;
     color: white;
-    margin: auto auto 150px auto;
+    margin: auto auto 0px auto;
 }
 
 @media(max-width: 650px) {
