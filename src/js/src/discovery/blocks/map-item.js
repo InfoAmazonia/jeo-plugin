@@ -10,7 +10,21 @@ class MapItem extends Component {
 			displayLayers: false,
 		}
 
+		this.clearAllLayers = this.clearAllLayers.bind(this);
+		this.applyAllLayers = this.applyAllLayers.bind(this);
+	}
 
+	clearAllLayers() {
+		const map = this.props.map;
+		const selectedLayers = this.props.selectedLayers;
+
+		const layersBatch = Object.keys(selectedLayers).map( layerId => selectedLayers[layerId] ).filter(layer => selectedLayers[ layer.id ].map.id === map.id)
+		this.props.toggleLayersBatch(layersBatch)
+	}
+
+	applyAllLayers() {
+		const { queriedLayers } = this.props.map;
+		this.props.toggleLayersBatch(queriedLayers)
 	}
 
 	render() {
@@ -44,15 +58,15 @@ class MapItem extends Component {
 			)
 		}): []
 
+		const applyRemoveButton = map.queriedLayers.some( ( layer ) => Object.keys(selectedLayers).map( layerId => parseInt(layerId) ).includes( layer.id ) );
+
 		return (
 			<div className="map-item">
 				<div className="title">
 					{ decodeEntities(map.title.rendered) }
 				</div>
 
-				<div className="description">
-					{ decodeEntities(map.excerpt.rendered) }
-				</div>
+				<div className="description" dangerouslySetInnerHTML={ {"__html": map.excerpt.rendered } }></div>
 
 				<button className="layers-toggle" onClick={ () => this.setState( ( state ) => ({
 					displayLayers: !state.displayLayers,
@@ -67,6 +81,11 @@ class MapItem extends Component {
 					{ __("layers", "jeo") }
 					{ this.state.displayLayers? " ▴" : " ▾" }
 
+				</button>
+
+				<button className={ "apply-remove-all" + (applyRemoveButton? " clear" : "" ) } onClick={  applyRemoveButton? this.clearAllLayers : this.applyAllLayers  }>
+					{  applyRemoveButton?  <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="minus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path></svg>	: <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" class=""></path></svg>  }
+					{  applyRemoveButton?  __("Clear", "jeo")	: __("Apply", "jeo")  }
 				</button>
 
 				<div className="layers-toggles">
