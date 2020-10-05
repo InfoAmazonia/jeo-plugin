@@ -8,32 +8,32 @@ a, a:hover, a:visited {
     color: #0071bc;
 }
 
-.story-map .mapboxgl-map, .navigate-map {
+.story-map .not-navigating-map .mapboxgl-map {
     height: 100%;
     width:100%;
     position: fixed;
     left: 0;
     z-index: -5;
-}
-
-.navigate-map .jeomap .mapboxgl-canvas-container canvas {
-    width: 100vw !important;
-    height: 100vh !important;
+    top: 0;
 }
 
 #header {
-    position: absolute;
-    left: 50%;
-    width: 45vw;
+    width: 600px;
     padding: 2vh;
     text-align: center;
     background: none;
     color: white;
+    margin: auto auto 150px auto;
+}
+
+@media(max-width: 650px) {
+    #header {
+        width: unset;
+    }  
 }
 
 #header .post-info {
     position: relative;
-    left: -50%;
     display: flex;
     flex-direction: row;
 }
@@ -48,7 +48,6 @@ a, a:hover, a:visited {
 
 #header .storymap-title {
     position: relative;
-    left: -50%;
     font-weight: bold;
     font-size: 35px;
 }
@@ -56,7 +55,6 @@ a, a:hover, a:visited {
 #header .storymap-description{
     font-size: 25px;
     position: relative;
-    left: -50%;
 }
 
 #footer {
@@ -145,7 +143,6 @@ a, a:hover, a:visited {
 
 .storymap-start-button {
     position: relative;
-    left: -50%;
     margin-top: 20px;
 }
 
@@ -153,13 +150,11 @@ a, a:hover, a:visited {
     font-weight: bold;
     font-size: 50px;
     position: relative;
-    left: -50%;
 }
 
 .skip-intro-link {
     position: relative;
     font-weight: bold;
-    left: -50%;
     margin-top: 5px;
     color: white;
     opacity: 30%;
@@ -177,6 +172,7 @@ a, a:hover, a:visited {
     left: 50%;
     transform: translate(-50%, -50%);
     bottom: 0;
+    z-index: 1;
 }
 
 .return-to-slides-container p {
@@ -194,7 +190,6 @@ a, a:hover, a:visited {
 
 .return-to-slides-container .icon, .skip-intro-icon {
     width: 30px;
-    position: absolute;
     left: 0;
     right: 0;
 }
@@ -231,4 +226,9 @@ a, a:hover, a:visited {
 
 .layers-selection-icon {
     width: 20px;
+}
+
+.navigate-map .mapboxgl-map .mapboxgl-canvas-container canvas, .navigate-map .mapboxgl-map {
+    width: 100vw !important;
+    height: 95vh !important; 
 }

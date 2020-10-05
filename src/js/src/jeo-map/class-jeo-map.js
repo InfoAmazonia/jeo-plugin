@@ -162,6 +162,7 @@ export default class JeoMap {
 					'.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])'
 				).remove();
 			} );
+
 		window.map = map;
 	}
 
@@ -747,5 +748,9 @@ export default class JeoMap {
 		jQuery( this.element )
 			.find( '.legend-for-' + layer_id )
 			.hide();
+	}
+
+	forceUpdate() {
+		this.map.resize();
 	}
 }
