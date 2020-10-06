@@ -2,6 +2,9 @@ import { Component } from '@wordpress/element';
 import Search from './search';
 import LazyImage from "./lazy-image";
 import styled from 'styled-components';
+import DateRangePicker from 'react-bootstrap-daterangepicker';
+import 'bootstrap-daterangepicker/daterangepicker.css';
+import { __ } from '@wordpress/i18n';
 
 const POSTS_PER_PAGE = 4;
 
@@ -12,16 +15,39 @@ class Stories extends Component {
 		this.state = {
 			stories: [],
 			searchQuery: {},
+			showFilters: false,
+			dateRangeInputValue: "",
 		};
 
-		// console.log(this.props);
+		// Story bindings
 		this.storyHovered = this.storyHovered.bind(this);
 		this.storyUnhover = this.storyUnhover.bind(this);
 		this.updateStories = this.updateStories.bind(this);
 
+		// Datapicker bind
+		this.dateRangePickerApply = this.dateRangePickerApply.bind(this);
+
+
 		const map = this.props.map;
 
-		if (this.props.firstLoad) {
+		if (this.props.firstLoad && this.props.useStories) {
+			// Future optimization - fetching all categories is faster than getting them one by one
+			// this.fetchCategories().then( categories => {
+			// 	// console.log(categories);
+			// 	this.props.updateState( {
+			// 		categories
+			// 	} )
+			// } );
+
+			this.fetchTags().then( tags => {
+				// console.log(tags);
+				this.props.updateState( {
+					tags
+				} )
+			}
+
+			)
+
 			this.fetchStories({ page: 1 }).then((stories) => {
 				const sourceData = this.buildPostsGeoJson(stories);
 				map.addSource('storiesSource', {
@@ -310,6 +336,22 @@ class Stories extends Component {
 			);
 	}
 
+	fetchCategories() {
+		const categoriesApiUrl = new URL(jeoMapVars.jsonUrl + 'categories/');
+
+		return fetch(categoriesApiUrl).then( data => data.json()).then( ( categories ) => {
+			return categories;
+		});
+	}
+
+	fetchTags() {
+		const tagsApiUrl = new URL(jeoMapVars.jsonUrl + 'tags/');
+
+		return fetch(tagsApiUrl).then( data => data.json()).then( ( tags ) => {
+			return tags;
+		});
+	}
+
 	updateStories(params) {
 		const map = this.props.map;
 
@@ -332,6 +374,17 @@ class Stories extends Component {
 
 	}
 
+	dateRangePickerApply(ev, picker) {
+		console.log(picker.startDate.format("MM/DD/YYYY") + " - " + picker.endDate.format("MM/DD/YYYY"));
+		this.setState( {
+			...this.state,
+			dateRangeInputValue: picker.startDate.format("MM/DD/YYYY") + " - " + picker.endDate.format("MM/DD/YYYY")
+		})
+
+	}
+
+
+
 	render() {
 		const loading = !this.props.storiesLoaded?
 			<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="spinner" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-spinner fa-w-16 fa-3x"><path fill="currentColor" d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z" class=""></path></svg> :
@@ -340,6 +393,40 @@ class Stories extends Component {
 		return (
 			<div className="stories-tab">
 				<Search searchPlaceholder="Search story" update={ this.updateStories } />
+
+				<button className="toggle-filters" onClick={ () => this.setState( {
+					...this.state,
+					showFilters: !this.state.showFilters,
+				} ) }>
+					{ this.state.showFilters?
+						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-times-circle fa-w-16 fa-3x"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z" class=""></path></svg>
+						:
+						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus-circle" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="svg-inline--fa fa-plus-circle fa-w-16 fa-3x"><path fill="currentColor" d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z" class=""></path></svg>
+					}
+
+					{ this.state.showFilters?
+						__("Hide filters")
+							:
+						__("Show filters")
+					}
+				</button>
+				{ this.state.showFilters?
+					<div className="filters">
+						<DateRangePicker onApply={ this.dateRangePickerApply }>
+							<input placeholder={ __("Date range") } readOnly="true" value={ this.state.dateRangeInputValue }></input>
+						</DateRangePicker>
+						<select name="tags">
+							<option value="default">{ __("Tags") }</option>
+							{
+								this.props.tags.map( tag => <option value={ tag.slug } key={ tag.id }> { tag.name } </option>)
+							}
+						</select>
+
+						<div></div>
+					</div>
+					:
+					''
+				}
 
 				<div className="stories">
 					{

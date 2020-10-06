@@ -3,7 +3,6 @@ import Sidebar from './blocks/sidebar';
 import './style/discovery.scss';
 
 
-
 class Discovery extends Component {
 	constructor(props) {
 		super(props);
@@ -14,6 +13,7 @@ class Discovery extends Component {
 		// general state
 		this.state = {
 			// component
+			embedUrl: "",
 			firstLoad: true,
 			currentPage: 1,
 			totalPages: null,
@@ -35,6 +35,10 @@ class Discovery extends Component {
 			// stories
 			storiesLoaded: false,
 			stories: [],
+
+			// filter data
+			categories: [],
+			tags: [],
 		};
 
 		// methods bindings
@@ -54,6 +58,21 @@ class Discovery extends Component {
 		})
 	}
 
+	buildUrlParamsString(params) {
+		const url = new URL(`${ jeo_settings.site_url }/embed/?discovery=true`);
+		const searchParams = url.searchParams;
+		let newUrl = "";
+
+		Object.keys(params).forEach( paramKey => {
+			const paramValue = params[paramKey];
+			searchParams.set(paramKey, JSON.stringify(paramValue));
+		})
+
+		url.search = searchParams.toString();
+		newUrl = url.toString();
+		return newUrl;
+	}
+
 	updateState( state ) {
 		this.setState( ( currentState ) => ( {
 			...currentState,
@@ -69,6 +88,8 @@ class Discovery extends Component {
 			stories: this.state.stories,
 			storiesLoaded: this.state.storiesLoaded,
 			firstLoad: this.state.firstLoad,
+			categories: this.state.categories,
+			tags: this.state.tags,
 			updateStories: this.updateStories,
 
 			mapsLoaded: this.state.mapsLoaded,
@@ -83,10 +104,17 @@ class Discovery extends Component {
 				currentPage: this.state.currentPage,
 				totalPages: this.state.totalPages,
 				totalPosts: this.state.totalPosts,
-			}
+			},
+
+			isEmbed: this.props.embed,
+			useStories: this.props.useStories,
 		}
 
-		//console.log(this.state.selectedLayers);
+		const generatedUrl = this.buildUrlParamsString({
+			'selected-layers': this.state.appliedLayers.map( layer => layer.id ),
+		});
+
+		// console.log(generatedUrl);
 
 		return (
 			<div className="discovery">
@@ -102,4 +130,12 @@ class Discovery extends Component {
 	}
 }
 
-wp.element.render(<Discovery />, document.getElementById('post-10'));
+
+if(document.querySelector('.discovery-embed')) {
+	document.querySelectorAll('.discovery-embed').forEach(element => {
+		wp.element.render(<Discovery embed={ true } useStories={ false } />, element);
+	});
+} else {
+	wp.element.render(<Discovery useStories={ true } />, document.getElementById('post-10'));
+}
+

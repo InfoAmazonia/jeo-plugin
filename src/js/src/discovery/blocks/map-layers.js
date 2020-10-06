@@ -19,8 +19,18 @@ class MapLayers extends Component {
 
 
 
-		if ( ! this.props.mapsLoaded ) {
-			this.fetchMaps();
+		if ( !this.props.mapsLoaded ) {
+			if( this.props.isEmbed ) {
+				const requestedLayerIds = this.getLayerIdsFromUrl();
+				this.fetchLayers(requestedLayerIds).then(layers => {
+					console.log(layers);
+					this.toggleLayersBatch(layers.reverse());
+					this.applyLayersChanges();
+				})
+
+			} else {
+				this.fetchMaps();
+			}
 		}
 	}
 
@@ -72,6 +82,27 @@ class MapLayers extends Component {
 
 				// Build layers legends using legacy strategy (based on active layers)
 			} );
+	}
+
+
+	fetchLayers(layersIds) {
+		return Promise.all(layersIds.map( layerId => {
+			const mapLayerApiUrl = new URL(
+				jeoMapVars.jsonUrl + 'map-layer/' + layerId
+			);
+
+			return fetch( mapLayerApiUrl )
+				.then( ( data ) => data.json() )
+				.then( ( layer ) => {
+					return layer;
+				} );
+		}))
+
+	}
+
+	getLayerIdsFromUrl() {
+		const urlParams = new URLSearchParams(window.location.search);
+		return  JSON.parse(urlParams.get('selected-layers'));
 	}
 
 	toggleLayer(layer) {
@@ -161,7 +192,9 @@ class MapLayers extends Component {
 					} );
 				}
 
-				map.moveLayer(layerId, 'unclustered-points');
+				if(map.getLayer( "unclustered-points" )) {
+					map.moveLayer(layerId, 'unclustered-points');
+				}
 
 			} else if(layer.meta.type === "mapbox") {
 				if(map.getLayer( layerId ) === undefined) {
@@ -186,7 +219,9 @@ class MapLayers extends Component {
 					map.addLayer(newLayer);
 				}
 
-				map.moveLayer(layerId, 'unclustered-points');
+				if(map.getLayer( "unclustered-points" )) {
+					map.moveLayer(layerId, 'unclustered-points');
+				}
 
 			} else if(layer.meta.type === "mvt") {
 				if(map.getLayer( layerId ) === undefined) {
@@ -207,7 +242,9 @@ class MapLayers extends Component {
 					map.addLayer(newLayer);
 				}
 
-				map.moveLayer(layerId, 'unclustered-points');
+				if(map.getLayer( "unclustered-points" )) {
+					map.moveLayer(layerId, 'unclustered-points');
+				}
 
 			} else if(layer.meta.type === "mapbox-tileset-vector") {
 				if(map.getLayer( layerId ) === undefined) {
@@ -228,7 +265,9 @@ class MapLayers extends Component {
 					map.addLayer(newLayer);
 				}
 
-				map.moveLayer(layerId, 'unclustered-points');
+				if(map.getLayer( "unclustered-points" )) {
+					map.moveLayer(layerId, 'unclustered-points');
+				}
 
 			} else if(layer.meta.type === "mapbox-tileset-raster") {
 				if(map.getLayer( layerId ) === undefined) {
@@ -249,7 +288,9 @@ class MapLayers extends Component {
 					map.addLayer(newLayer);
 				}
 
-				map.moveLayer(layerId, 'unclustered-points');
+				if(map.getLayer( "unclustered-points" )) {
+					map.moveLayer(layerId, 'unclustered-points');
+				}
 			}
 		} );
 
@@ -268,6 +309,10 @@ class MapLayers extends Component {
 
 
 	render() {
+		if(this.props.isEmbed) {
+			return ( <div></div> );
+		}
+
 		const mapItens = this.props.maps.map( ( map, index ) => {
 			return (
 				<MapItem

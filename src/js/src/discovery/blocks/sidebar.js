@@ -19,7 +19,11 @@ class Sidebar extends Component {
 			firstLoad: this.props.firstLoad,
 			updateState: this.props.updateState,
 			pageInfo: this.props.pageInfo,
+			categories: this.props.categories,
+			tags: this.props.tags,
 			ref: this.storiesRef,
+
+			useStories: this.props.useStories,
 		}
 
 		const mapLayersProps = {
@@ -32,9 +36,28 @@ class Sidebar extends Component {
 			applyLayersChanges: this.props.applyLayersChanges,
 			layersQueue: this.props.layersQueue,
 			appliedLayers: this.props.appliedLayers,
+
+			isEmbed: this.props.isEmbed,
 		}
 
-		return tab.name === 'stories'? <Stories  { ...storiesProps } /> : <MapLayers { ...mapLayersProps } />;
+		let tabRenderer;
+
+		if(mapLayersProps.isEmbed) {
+			tabRenderer = (
+				<div>
+					<Stories  { ...storiesProps } />
+					<MapLayers { ...mapLayersProps } />
+				</div>
+			);
+		} else {
+			if(tab.name === 'stories') {
+				tabRenderer = <Stories  { ...storiesProps } />;
+			} else {
+				tabRenderer = <MapLayers { ...mapLayersProps } />;
+			}
+		}
+
+		return tabRenderer;
 	}
 
 	handleScroll(e) {
@@ -51,7 +74,7 @@ class Sidebar extends Component {
 
 	render() {
 		return (
-			<div onScroll={ this.handleScroll }>
+			<div onScroll={ this.handleScroll } className={ this.props.isEmbed? "is-embed" : "" }>
 				<TabPanel
 					className="togable-panel"
 					activeClass="active-tab"
