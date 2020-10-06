@@ -74,7 +74,7 @@ class Sidebar extends Component {
 
 	render() {
 		return (
-			<div onScroll={ this.handleScroll } className={ this.props.isEmbed? "is-embed" : "" }>
+			<div onScroll={ this.handleScroll } className={ this.props.isEmbed? "is-embed" : "default-sidebar" }>
 				<TabPanel
 					className="togable-panel"
 					activeClass="active-tab"
