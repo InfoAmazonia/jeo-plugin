@@ -402,6 +402,139 @@ $primary: green;
 	.is-embed {
 		display: none;
 	}
+
+
+	div.legend-container {
+		background: #fff;
+		position: absolute;
+		bottom: 30px;
+		right: 10px;
+		z-index: 1;
+		display: block;
+		margin: 0;
+		max-width: 220px;
+		min-width: 220px;
+
+		.legends-wrapper {
+			display: block;
+			margin: 0px 0px 0px 20px;
+			padding-top: 25px;
+			padding-right: 28px;
+			max-height: 250px;
+			overflow-x: auto;
+
+			&::-webkit-scrollbar {
+				width: 6px;
+			}
+
+			&::-webkit-scrollbar-button {
+				width: 0px;
+				height: 0px;
+			}
+
+			&::-webkit-scrollbar-thumb {
+				background: #ddd;
+				border: 0px none white;
+				border-radius: 3px;
+
+				&:hover {
+					background: #b1b1b1;
+				}
+
+				&:active {
+					background: #b1b1b1;
+				}
+			}
+
+			&::-webkit-scrollbar-track {
+				background: #eee;
+				border: 0px none #ffffff;
+				border-radius: 0px;
+
+				&:hover {
+					background: rgba(0,0,0,0.05);
+				}
+
+				&:active {
+					background: #eee;
+				}
+			}
+
+			&::-webkit-scrollbar-corner {
+				background: transparent;
+			}
+
+			h4 {
+				margin: 15px 0;
+				font-size: 2.2rem;
+			}
+		}
+
+		.legends-title {
+			background: #191E23;
+			padding: 9px 20px;
+			color: white;
+			font-size: 16px;
+			font-weight: 600;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		i.arrow-icon {
+			width: 14px;
+			color: white;
+			cursor: pointer;
+		}
+
+		i.arrow-icon.active {
+			transform: rotate(180deg);
+		}
+
+		a.more-info-button {
+			background: white;
+			color: #555D66;
+			margin: 20px auto 20px auto;
+			border: 2px solid #555D66;
+			padding: 5px 10px;
+			text-decoration: none;
+			text-align: center;
+			cursor: pointer;
+			width: calc(100% - 40px);
+			display: block;
+			font-size: 16px;
+			font-weight: bold;
+			transition: all .1s ease-in-out;
+
+			&:hover {
+				color: #555D66;
+				transition: all .1s ease-in-out;
+			}
+		}
+
+		.hideable-content {
+			height: 250px;
+			transition: all .3s ease-in-out;
+			overflow: hidden;
+		}
+
+		&.active {
+			.hideable-content {
+				height: 0;
+				transition: all .3s ease-in-out;
+			}
+		}
+	}
+
+	.layers-wrapper {
+		a {
+			text-decoration: none !important;
+		}
+
+		> div {
+			margin-bottom: 27px;
+		}
+	}
 }
 
 

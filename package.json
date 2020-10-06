@@ -30,6 +30,7 @@
 		"@wordpress/plugins": "^2.16.0",
 		"bootstrap-daterangepicker": "^3.1.0",
 		"classnames": "^2.2.6",
+		"html-react-parser": "^0.14.0",
 		"leaflet": "^1.5.1",
 		"lodash-es": "^4.17.15",
 		"lodash.isequal": "^4.5.0",
