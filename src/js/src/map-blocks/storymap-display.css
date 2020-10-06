@@ -33,6 +33,7 @@ a, a:hover, a:visited {
 }
 
 #header .post-info {
+    filter: drop-shadow(0px 0px 4px black);
     position: relative;
     display: flex;
     flex-direction: row;
@@ -53,6 +54,7 @@ a, a:hover, a:visited {
 }
 
 #header .storymap-description{
+    filter: drop-shadow(0px 0px 4px black);
     font-size: 25px;
     position: relative;
 }
@@ -147,12 +149,15 @@ a, a:hover, a:visited {
 }
 
 .storymap-page-title {
+    filter: drop-shadow(0px 0px 4px black);
+
     font-weight: bold;
     font-size: 50px;
     position: relative;
 }
 
 .skip-intro-link {
+    filter: drop-shadow(0px 0px 4px black);
     position: relative;
     font-weight: bold;
     margin-top: 5px;
@@ -168,6 +173,7 @@ a, a:hover, a:visited {
 }
 
 .return-to-slides-container {
+    filter: drop-shadow(0px 0px 4px black);
     position: fixed;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -177,7 +183,7 @@ a, a:hover, a:visited {
 
 .return-to-slides-container p {
     text-decoration: underline;
-    color: black;
+    color: white;
     text-align: center;
     font-size: 21px;
     font-weight: bold;
@@ -188,12 +194,24 @@ a, a:hover, a:visited {
     cursor: pointer
 }
 
+.skip-intro-icon {
+    filter: drop-shadow(0px 0px 4px black);
+}
+
 .skip-intro-icon svg, .return-to-slides-container .icon svg {
-    width: 20px;
+    display: block;
+    margin: auto;
+    width: 11px;
 }
 
 .return-to-slides-container .icon {
+    display: flex;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border: 1px solid white;
     margin: auto;
+    background-color: rgba(255,255,255,0.3);
 }
 
 .return-to-slides-container .icon:hover, .skip-intro-icon:hover {
@@ -223,10 +241,13 @@ a, a:hover, a:visited {
 }
 
 .layers-selection-icon {
-    width: 20px;
+    width: 11px;
 }
 
 .navigate-map .mapboxgl-map .mapboxgl-canvas-container canvas, .navigate-map .mapboxgl-map {
     width: 100vw !important;
     height: 95vh !important; 
+}
+.single-storymap  #content {
+    margin: 0;
 }

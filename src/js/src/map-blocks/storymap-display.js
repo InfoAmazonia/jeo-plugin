@@ -128,6 +128,12 @@ class StoryMapDisplay extends Component {
 		document.querySelector('.navigate-map .jeomap').appendChild(document.querySelector('.return-to-slides-container'))
 
 		document.addEventListener("fullscreenchange", function() {
+			if ( document.fullscreenElement ) {
+				document.querySelector( '.return-to-slides-container' ).style.display = 'none';
+			} else {
+				document.querySelector( '.return-to-slides-container' ).style.display = 'block';
+			}
+
 			window.scrollTo ( 0, document.body.scrollHeight );
 		});
 	}
@@ -138,7 +144,7 @@ class StoryMapDisplay extends Component {
 
 
     render() {
-		const mapStart = config.chapters[0].location;
+		const mapStart = config.chapters[ 0 ].location;
         const theme = config.theme;
 		const currentChapterID = this.state.currentChapter.id;
 
@@ -152,10 +158,9 @@ class StoryMapDisplay extends Component {
 						bearing={ [ 0 ] }
 						style={ config.style }
 						center={ [ mapDefaults.lng, mapDefaults.lat ] }
-						onStyleDataLoading={ ( map ) => {
-							this.setState( { ...this.state, map } );
-						} }
 						onStyleLoad={ ( map ) => {
+							this.setState( { ...this.state, map } );
+
 							map.scrollZoom.disable();
 							map.dragPan.disable();
 							map.touchZoomRotate.disable();
@@ -356,6 +361,12 @@ class StoryMapDisplay extends Component {
 							<div
 								className="icon"
 								onClick={ () => {
+									if ( document.fullscreenElement ) {
+										document.exitFullscreen();
+									}
+
+									sleep(1000)
+
 									let mapBrightness;
 
 									if ( this.props.hasIntroduction ) {
@@ -368,13 +379,19 @@ class StoryMapDisplay extends Component {
 									window.scrollTo(0, 0);
 									document.querySelector('.navigate-map').style.display = 'none';
 									document.querySelector('.not-navigating-map').style.display = 'block';
+
+									this.state.map.resize();
 								} }
 							>
 								<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-up" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="white" d="M177 255.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 351.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 425.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1zm-34-192L7 199.7c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l96.4-96.4 96.4 96.4c9.4 9.4 24.6 9.4 33.9 0l22.6-22.6c9.4-9.4 9.4-24.6 0-33.9l-136-136c-9.2-9.4-24.4-9.4-33.8 0z"></path></svg>
 							</div>
 						</p>
 						<p
-							onClick={ () => {
+							onClick={ async () => {
+								if ( document.fullscreenElement ) {
+									document.exitFullscreen();
+								}
+
 								let mapBrightness;
 
 								if ( this.props.hasIntroduction ) {
@@ -384,10 +401,13 @@ class StoryMapDisplay extends Component {
 								}
 
 								this.setState( { ...this.state, isNavigating: false, mapBrightness } )
-								window.scrollTo(0, 0);
-
+								
 								document.querySelector('.navigate-map').style.display = 'none';
 								document.querySelector('.not-navigating-map').style.display = 'block';
+								
+								this.state.map.resize();
+
+								window.scrollTo(0, 0);
 							} }
 						>
 							Voltar ao topo
