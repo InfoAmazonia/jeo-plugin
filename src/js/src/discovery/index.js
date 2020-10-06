@@ -1,7 +1,7 @@
 import { Component } from '@wordpress/element';
 import Sidebar from './blocks/sidebar';
+import parse from 'html-react-parser';
 import './style/discovery.scss';
-
 
 class Discovery extends Component {
 	constructor(props) {
@@ -19,6 +19,7 @@ class Discovery extends Component {
 			totalPages: null,
 			totalPosts: null,
 			mapLoaded: false,
+			showLegends: false,
 
 			// maps
 			maps: [],
@@ -81,8 +82,6 @@ class Discovery extends Component {
 	}
 
 	render() {
-		// console.log(JSON.stringify(this.state));
-
 		const props = {
 			map: this.map,
 			stories: this.state.stories,
@@ -110,11 +109,22 @@ class Discovery extends Component {
 			useStories: this.props.useStories,
 		}
 
-		const generatedUrl = this.buildUrlParamsString({
-			'selected-layers': this.state.appliedLayers.map( layer => layer.id ),
-		});
+		const legends = this.state.appliedLayers.map( layer => {
+			return new window.JeoLegend( layer.meta.legend_type, {
+				layer_id: layer.slug,
+				legend_type_options: layer.meta.legend_type_options,
+				use_legend: layer.meta.use_legend,
+			} )
+		} );
 
-		// console.log(generatedUrl);
+		let renderedLegends = legends.map( legendObj => legendObj.render());
+		renderedLegends = renderedLegends.map(legendRender => parse(legendRender.outerHTML));
+
+
+		// const generatedUrl = this.buildUrlParamsString({
+		// 	'selected-layers': this.state.appliedLayers.map( layer => layer.id ),
+		// });
+
 
 		return (
 			<div className="discovery">
@@ -123,8 +133,26 @@ class Discovery extends Component {
 				<div
 					ref={ (el) => (this.mapContainer = el) }
 					style={ { height: 'calc(100vh - 100px)' } }
-					className="discovery-map"
-				/>
+					className="discovery-map">
+				</div>
+
+				{
+					renderedLegends.length?
+						<div className={ "legend-container" + (this.state.showLegends? ' active' : '' ) }>
+							<div className="legends-title">
+								<span className="text"> Legend </span>
+								<i onClick={ () => this.setState({ ...this.state, showLegends: !this.state.showLegends }) } className={ "arrow-icon" + (this.state.showLegends? ' active' : '' ) }>
+									<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-chevron-down fa-w-14 fa-3x"><path fill="currentColor" d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z" class=""></path></svg>
+								</i>
+							</div>
+							<div className="hideable-content">
+								<div className="legends-wrapper">
+									{ renderedLegends }
+								</div>
+							</div>
+						</div>
+					: ""
+				}
 			</div>
 		);
 	}

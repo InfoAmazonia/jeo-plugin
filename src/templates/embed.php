@@ -13,6 +13,8 @@
 	<?php if($have_related_posts): ?>
 		<div id="embed-post-preview" style="<?php echo esc_html( $popup_style ); ?>"></div>
 	<?php endif; ?>
+	<?php wp_footer(); ?>
+
 </div>
 
 </body>
