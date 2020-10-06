@@ -2,6 +2,7 @@ import { Component } from '@wordpress/element';
 import Sidebar from './blocks/sidebar';
 import parse from 'html-react-parser';
 import './style/discovery.scss';
+import { __ } from '@wordpress/i18n';
 
 class Discovery extends Component {
 	constructor(props) {
@@ -19,7 +20,11 @@ class Discovery extends Component {
 			totalPages: null,
 			totalPosts: null,
 			mapLoaded: false,
+
+			// toggles
 			showLegends: false,
+			showShareOptions: false,
+			showEmbedTooltip: false,
 
 			// maps
 			maps: [],
@@ -140,17 +145,35 @@ class Discovery extends Component {
 				{ !this.state.mapLoaded && !this.props.embed? <div className="placeholder animated-background" /> : '' }
 				{ this.state.mapLoaded? <Sidebar  { ...props } /> : '' }
 
-				<div
-					ref={ (el) => (this.mapContainer = el) }
-					// style={ { height: 'calc(100vh - 100px)' } }
-					className="discovery-map">
+				<div ref={ (el) => (this.mapContainer = el) } className="discovery-map">
+					<div className={ "share-toolbar" + (this.state.showShareOptions? ' active' : '' ) } >
+						<div className="options">
+							<button onClick={ () => this.setState( { ...this.state, showEmbedTooltip: !this.state.showEmbedTooltip } ) }>
+								{ __("embed") }
+
+								{
+									this.state.showEmbedTooltip  &&
+									<div className="embed-tooltip">
+										<input disabled readOnly value={ generatedUrl }></input>
+									</div>
+								}
+							</button>
+						</div>
+
+						<button className="share" onClick={ () => this.setState( { ...this.state,  showShareOptions: !this.state.showShareOptions } ) }>
+							<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="share-alt" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" className="share-icon"><path fill="currentColor" d="M352 320c-22.608 0-43.387 7.819-59.79 20.895l-102.486-64.054a96.551 96.551 0 0 0 0-41.683l102.486-64.054C308.613 184.181 329.392 192 352 192c53.019 0 96-42.981 96-96S405.019 0 352 0s-96 42.981-96 96c0 7.158.79 14.13 2.276 20.841L155.79 180.895C139.387 167.819 118.608 160 96 160c-53.019 0-96 42.981-96 96s42.981 96 96 96c22.608 0 43.387-7.819 59.79-20.895l102.486 64.054A96.301 96.301 0 0 0 256 416c0 53.019 42.981 96 96 96s96-42.981 96-96-42.981-96-96-96z" class=""></path></svg>
+						</button>
+
+					</div>
 				</div>
 
 				{
 					renderedLegends.length?
 						<div className={ "legend-container" + (this.state.showLegends? ' active' : '' ) }>
 							<div className="legends-title">
-								<span className="text"> Legend </span>
+								<span className="text">
+									{ __("Legend") }
+								</span>
 								<i onClick={ () => this.setState({ ...this.state, showLegends: !this.state.showLegends }) } className={ "arrow-icon" + (this.state.showLegends? ' active' : '' ) }>
 									<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="chevron-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-chevron-down fa-w-14 fa-3x"><path fill="currentColor" d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z" class=""></path></svg>
 								</i>
