@@ -55,6 +55,10 @@ class Discovery extends Component {
 
 		this.map = map;
 		this.map.on('load', () => {
+			this.map.addControl(
+				new mapboxgl.NavigationControl( { showCompass: false } ),
+				'top-left'
+			);
 			this.setState({ ...this.state, mapLoaded: true } )
 		})
 	}
