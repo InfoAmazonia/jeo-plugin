@@ -59,6 +59,9 @@ class Discovery extends Component {
 				new mapboxgl.NavigationControl( { showCompass: false } ),
 				'top-left'
 			);
+
+			this.map.addControl(new mapboxgl.FullscreenControl(), 'top-left');
+
 			this.setState({ ...this.state, mapLoaded: true } )
 		})
 	}
@@ -125,18 +128,21 @@ class Discovery extends Component {
 		renderedLegends = renderedLegends.map(legendRender => parse(legendRender.outerHTML));
 
 
-		// const generatedUrl = this.buildUrlParamsString({
-		// 	'selected-layers': this.state.appliedLayers.map( layer => layer.id ),
-		// });
+		const generatedUrl = this.buildUrlParamsString({
+			'selected-layers': this.state.appliedLayers.map( layer => layer.id ),
+		});
+
+		console.log(generatedUrl);
 
 
 		return (
-			<div className="discovery">
+			<div className={ "discovery" + (this.props.embed? ' embed' : '' ) } >
+				{ !this.state.mapLoaded && !this.props.embed? <div className="placeholder animated-background" /> : '' }
 				{ this.state.mapLoaded? <Sidebar  { ...props } /> : '' }
 
 				<div
 					ref={ (el) => (this.mapContainer = el) }
-					style={ { height: 'calc(100vh - 100px)' } }
+					// style={ { height: 'calc(100vh - 100px)' } }
 					className="discovery-map">
 				</div>
 

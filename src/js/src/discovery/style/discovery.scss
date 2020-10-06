@@ -2,9 +2,22 @@ $primary: green;
 
 .discovery {
 	position: relative;
+	display: grid;
+	grid-template-columns: 30% 70%;
+	height: calc(100vh - 130px);
+
+	// discovery embed class is parent of current reference (&)
+	.discovery-embed & {
+		display: block;
+		height: 100%;
+
+		.mapboxgl-map {
+			height: 100%;
+		}
+	}
 
 	button {
-		background: none;
+		background-color: transparent;
 		text-transform: none;
 		padding: 0;
 		font-weight: 400;
@@ -16,12 +29,34 @@ $primary: green;
 		}
 	}
 
+	.discovery-map {
+		button.mapboxgl-ctrl{
+			&-zoom-out, &-zoom-in, &-fullscreen  {
+				background-color: #555D66;
+			}
+		}
+
+		.mapboxgl-control-container {
+			.mapboxgl-ctrl-top-left {
+				display: flex;
+				align-items: flex-start;
+				padding: 15px;
+
+				.mapboxgl-ctrl-group:not(:empty) {
+					display: flex;
+				}
+			}
+		}
+	}
+
+	.default-sidebar, .is-embed {
+		max-height: 100%;
+		overflow: hidden;
+	}
+
+
     .togable-panel {
         background-color: #FFFFFF;
-        width: 30%;
-        position: absolute;
-        left: 0;
-        top: 0;
         z-index: 1;
         min-height: 100%;
         max-height: 100%;
@@ -382,7 +417,11 @@ $primary: green;
         background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
         background-size: 800px 104px;
         height: 96px;
-        position: relative;
+		position: relative;
+
+		&.placeholder {
+			height: 100%;
+		}
     }
 
     @keyframes spin {
