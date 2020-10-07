@@ -5,7 +5,7 @@ import DateRangePicker from 'react-bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import { __ } from '@wordpress/i18n';
 
-const POSTS_PER_PAGE = 2;
+const POSTS_PER_PAGE = 5;
 
 class Stories extends Component {
 	constructor( props ) {
@@ -16,6 +16,7 @@ class Stories extends Component {
 			searchQuery: {},
 			showFilters: false,
 			dateRangeInputValue: '',
+			dateRangeObject: { after: new Date(), before: new Date() }
 		};
 
 		// Story bindings
@@ -24,7 +25,10 @@ class Stories extends Component {
 		this.updateStories = this.updateStories.bind( this );
 
 		// Filters bind
+		// DateRangePicker
 		this.dateRangePickerApply = this.dateRangePickerApply.bind( this );
+		this.dateRangePickerCancel = this.dateRangePickerCancel.bind( this );
+
 		this.handleTagChange = this.handleTagChange.bind( this );
 
 		const map = this.props.map;
@@ -254,7 +258,6 @@ class Stories extends Component {
 		// Update using cumulative param for stories - infinite scrolling
 		if ( params.hasOwnProperty( 'cumulative' ) && params.cumulative ) {
 			// Cancel request if page exceed the max page;
-			console.log(params.page, pageInfo.totalPages)
 			if ( params.page > pageInfo.totalPages ) {
 				return Promise.reject();
 			}
@@ -318,9 +321,9 @@ class Stories extends Component {
 									);
 
 									// If category is not set (remove Uncategorized)
-									// if( !category ) {
-									// 	return;
-									// }
+									if( !category || category === 1 ) {
+										return;
+									}
 
 									return fetch( categoriesApiUrl )
 										.then( ( data ) => data.json() )
@@ -399,11 +402,16 @@ class Stories extends Component {
 		const map = this.props.map;
 		const prevQueryParams = this.props.queryParams;
 
+		if(params.clearDate) {
+			delete prevQueryParams.after;
+			delete prevQueryParams.before;
+			params.clearDate = false;
+		}
+
 		params = {
 			...prevQueryParams,
 			...params,
 		}
-		console.log(params);
 
 		this.fetchStories( { ...params } )
 			.then( ( stories ) => {
@@ -426,18 +434,26 @@ class Stories extends Component {
 	}
 
 	dateRangePickerApply( ev, picker ) {
-		console.log(
-			picker.startDate.format( 'MM/DD/YYYY' ) +
-				' - ' +
-				picker.endDate.format( 'MM/DD/YYYY' )
-		);
+		const dateOptions = [ undefined, { year:"2-digit", month:"2-digit", day:"2-digit" } ];
+
 		this.setState( {
 			...this.state,
 			dateRangeInputValue:
-				picker.startDate.format( 'MM/DD/YYYY' ) +
+				picker.startDate.toDate().toLocaleDateString( ...dateOptions ) +
 				' - ' +
-				picker.endDate.format( 'MM/DD/YYYY' ),
+				picker.endDate.toDate().toLocaleDateString( ...dateOptions ),
 		} );
+
+		this.updateStories( { cumulative: false, after: picker.startDate.toISOString(), before: picker.endDate.toISOString(), page: 1 } );
+	}
+
+	dateRangePickerCancel(ev, picker) {
+		this.setState( {
+			...this.state,
+			dateRangeInputValue: '',
+		} );
+
+		this.updateStories( { cumulative: false, page: 1, clearDate: true } );
 	}
 
 	handleTagChange( event ) {
@@ -523,7 +539,7 @@ class Stories extends Component {
 				</button>
 				{ this.state.showFilters && (
 					<div className="filters">
-						<DateRangePicker onApply={ this.dateRangePickerApply }>
+						<DateRangePicker initialSettings={ { autoUpdateInput: false } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
 							<input
 								placeholder={ __( 'Date range' ) }
 								readOnly="true"
@@ -589,6 +605,7 @@ class Storie extends Component {
 		} );
 
 		// map.flyTo( { center: average, zoom: 7 } );
+		map.flyTo( { center: average } );
 
 		map.setFeatureState(
 			{ source: 'storiesSource', id: story.id },
