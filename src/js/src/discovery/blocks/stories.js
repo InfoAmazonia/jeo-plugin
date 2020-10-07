@@ -1,7 +1,6 @@
 import { Component } from '@wordpress/element';
 import Search from './search';
 import LazyImage from './lazy-image';
-import styled from 'styled-components';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import { __ } from '@wordpress/i18n';
@@ -255,6 +254,7 @@ class Stories extends Component {
 		// Update using cumulative param for stories - infinite scrolling
 		if ( params.hasOwnProperty( 'cumulative' ) && params.cumulative ) {
 			// Cancel request if page exceed the max page;
+			console.log(params.page, pageInfo.totalPages)
 			if ( params.page > pageInfo.totalPages ) {
 				return Promise.reject();
 			}
@@ -280,6 +280,7 @@ class Stories extends Component {
 					const geolocatedStories = stories.filter(
 						( story ) => story.meta._related_point.length > 0
 					);
+
 					// console.log("stories", stories);
 
 					let storiesCumulative = params.cumulative
@@ -346,14 +347,19 @@ class Stories extends Component {
 					// When its all resolved, update state
 					return Promise.all( storiesMediasPromises ).then( () =>
 						Promise.all( storiesCategoriesPromises ).then( () => {
-							storiesCumulative = params.cumulative
-								? [ ...this.props.stories, ...geolocatedStories ]
-								: geolocatedStories;
+							storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
+
+							const reusableParams = {...params};
+
+							// These params are not reusable, they refer directly to a episodic state
+							delete reusableParams.cumulative;
+							delete reusableParams.page;
+							delete reusableParams.per_page;
 
 							this.props.updateState( {
 								storiesLoaded: true,
 								stories: storiesCumulative,
-								queryParams: params,
+								queryParams: reusableParams,
 							} );
 
 							return Promise.resolve( storiesCumulative );
@@ -393,12 +399,11 @@ class Stories extends Component {
 		const map = this.props.map;
 		const prevQueryParams = this.props.queryParams;
 
-		if ( params.cumulative ) {
-			params = {
-				...prevQueryParams,
-				...params,
-			}
+		params = {
+			...prevQueryParams,
+			...params,
 		}
+		console.log(params);
 
 		this.fetchStories( { ...params } )
 			.then( ( stories ) => {
@@ -583,7 +588,7 @@ class Storie extends Component {
 			average.lon = LngLat.lon;
 		} );
 
-		map.flyTo( { center: average, zoom: 7 } );
+		// map.flyTo( { center: average, zoom: 7 } );
 
 		map.setFeatureState(
 			{ source: 'storiesSource', id: story.id },
