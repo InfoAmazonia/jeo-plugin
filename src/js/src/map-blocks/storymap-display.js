@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { __ } from '@wordpress/i18n';
 
 import { renderLayer } from './map-preview-layer';
 import mapboxgl from 'mapbox-gl';
@@ -250,7 +251,7 @@ class StoryMapDisplay extends Component {
 									<>
 										<p className="storymap-page-title">{ this.state.postData.title.rendered }</p>
 										<div className="post-info">
-											<p className="author">Authors</p>
+											<p className="author">{ __( 'Authors' ) }</p>
 											<p className="date">{ this.state.postData.date }</p>
 										</div>
 									</>
@@ -267,7 +268,7 @@ class StoryMapDisplay extends Component {
 										document.querySelector( '#features' ).scrollIntoView();
 									} }
 								>
-									START
+									{ __( 'START' ) }
 								</button>
 								
 								{ this.props.navigateButton && (
@@ -281,7 +282,7 @@ class StoryMapDisplay extends Component {
 												document.querySelector('.navigate-button-display').click();
 											} }
 										>
-											skip intro
+											{ __( 'skip intro' ) }
 										</p>
 										<div
 											className="skip-intro-icon"
@@ -410,7 +411,7 @@ class StoryMapDisplay extends Component {
 								window.scrollTo(0, 0);
 							} }
 						>
-							Voltar ao topo
+							{ __( 'Voltar ao topo' ) }
 						</p>
 					</div>
 				</>
@@ -421,7 +422,7 @@ class StoryMapDisplay extends Component {
 }
 
 function Chapter({ index, id, theme, title, image, description, currentChapterID, isLastChapter, onClickFunction, props}) {
-	let classList = id === currentChapterID ? "step active" : "step";
+	const classList = id === currentChapterID ? "step active" : "step";
 	
     return (
 		<>
@@ -449,7 +450,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 						className="navigate-button-display"
 						onClick={ onClickFunction }
 					>
-						NAVIGATE THE MAP
+						{ __( 'NAVIGATE THE MAP' ) }
 					</button>
 				</div>
 			) }
