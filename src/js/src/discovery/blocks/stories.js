@@ -319,6 +319,7 @@ class Stories extends Component {
 							this.props.updateState({
 								storiesLoaded: true,
 								stories: storiesCumulative,
+								queryParams: params,
 							} );
 
 							return Promise.resolve(storiesCumulative);
