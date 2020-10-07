@@ -1,7 +1,6 @@
 import {
 	Button,
 	Spinner,
-	TextControl,
 	TextareaControl,
 	CheckboxControl,
 	Dashicon,
@@ -498,7 +497,7 @@ const MapEditor = ( {
 															className="remove-button"
 															onClick={ () => {
 																if ( attributes.slides.length <= 1 ) {
-																	alert( 'The minimum number of slides is 1.' );
+																	alert( __( 'The minimum number of slides is 1.' ) );
 
 																	return;
 																}
@@ -580,7 +579,7 @@ const MapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-									{ __( 'Current slide: ' + ( currentSlideIndex + 1 ) ) }
+									{ __( 'Current slide: ' ) + `${ currentSlideIndex + 1 }` }
 								</strong>
 							</div>
 						</div>
