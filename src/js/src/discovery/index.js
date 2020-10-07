@@ -158,7 +158,7 @@ class Discovery extends Component {
 			'center': this.state.mapLoaded? this.map.getCenter() : 0,
 		});
 
-		console.log(generatedUrl);
+		// console.log(generatedUrl);
 
 
 		return (
