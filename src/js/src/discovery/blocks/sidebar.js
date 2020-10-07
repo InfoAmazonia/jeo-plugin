@@ -67,11 +67,23 @@ class Sidebar extends Component {
 			const element = e.target
 			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
 				if(this.storiesRef.current) {
-					if( this.props.queryParams.search ) {
-						this.storiesRef.current.updateStories( { cumulative: true, search: this.props.queryParams.search}  );
-					} else {
-						this.storiesRef.current.updateStories( { cumulative: true }  );
-					}
+					// if( this.props.queryParams.search ) {
+					// 	if( this.props.queryParams.tags ) {
+					// 		this.storiesRef.current.updateStories( { cumulative: true, search: this.props.queryParams.search, tags: this.props.queryParams.tags }  );
+					// 	} else {
+					// 		this.storiesRef.current.updateStories( { cumulative: true, search: this.props.queryParams.search }  );
+					// 	}
+
+					// } else {
+					// 	if( this.props.queryParams.tags ) {
+					// 		this.storiesRef.current.updateStories( { cumulative: true, tags: this.props.queryParams.tags }  );
+					// 	} else {
+					// 		this.storiesRef.current.updateStories( { cumulative: true }  );
+
+					// 	}
+					// }
+
+					this.storiesRef.current.updateStories( { cumulative: true }  );
 
 
 				}
