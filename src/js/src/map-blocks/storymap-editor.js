@@ -338,58 +338,60 @@ const MapEditor = ( {
 																							}
 																						}
 																					);
-
-																					return (
-																						<div
-																							ref={ provided.innerRef }
-																							{ ...provided.draggableProps }
-																							{ ...provided.dragHandleProps }
-																						>
+																				
+																					if ( item ) {
+																						return (
 																							<div
-																								
-																								style={ layerButtonStyle }
-																								className="layer"
-																								key={ item.id }
-																								onClick={ () => {
-																									setCurrentSlideIndex( index );
-																									const oldSlides = [
-																										...attributes.slides,
-																									];
-																									let hasBeenRemoved = false;
-						
-																									oldSlides[ index ].selectedLayers.map(
-																										( selectedLayer, indexOfLayer ) => {
-																											if ( selectedLayer.id === item.id ) {
-																												oldSlides[
-																													index
-																												].selectedLayers.splice(
-																													indexOfLayer,
-																													1
-																												);
-																												hasBeenRemoved = true;
-																											}
-																										}
-																									);
-						
-																									if ( ! hasBeenRemoved ) {
-																										oldSlides[ index ].selectedLayers.push(
-																											item
-																										);
-																									}
-																									setAttributes( {
-																										...attributes,
-																										slides: oldSlides,
-																									} );
-																								} }
+																								ref={ provided.innerRef }
+																								{ ...provided.draggableProps }
+																								{ ...provided.dragHandleProps }
 																							>
-																								<p>
-																									{ decodeHtmlEntity(
-																										item.title.rendered
-																									) }
-																								</p>
+																								<div
+																									
+																									style={ layerButtonStyle }
+																									className="layer"
+																									key={ item.id }
+																									onClick={ () => {
+																										setCurrentSlideIndex( index );
+																										const oldSlides = [
+																											...attributes.slides,
+																										];
+																										let hasBeenRemoved = false;
+							
+																										oldSlides[ index ].selectedLayers.map(
+																											( selectedLayer, indexOfLayer ) => {
+																												if ( selectedLayer.id === item.id ) {
+																													oldSlides[
+																														index
+																													].selectedLayers.splice(
+																														indexOfLayer,
+																														1
+																													);
+																													hasBeenRemoved = true;
+																												}
+																											}
+																										);
+							
+																										if ( ! hasBeenRemoved ) {
+																											oldSlides[ index ].selectedLayers.push(
+																												item
+																											);
+																										}
+																										setAttributes( {
+																											...attributes,
+																											slides: oldSlides,
+																										} );
+																									} }
+																								>
+																									<p>
+																										{ decodeHtmlEntity(
+																											item.title.rendered
+																										) }
+																									</p>
+																								</div>
 																							</div>
-																						</div>
-																					);
+																						);
+																					}
 																				} }
 																			</Draggable>
 																	) ) }
