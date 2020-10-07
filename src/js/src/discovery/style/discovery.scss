@@ -3,7 +3,7 @@ $primary: green;
 .discovery {
 	position: relative;
 	display: grid;
-	grid-template-columns: 30% 70%;
+	grid-template-columns: 30% auto;
 	height: calc( 100vh - 130px );
 
 	// discovery embed class is parent of current reference (&)
@@ -80,9 +80,6 @@ $primary: green;
 					width: 105px;
 					overflow: visible;
 
-					& > button {
-					}
-
 					.embed-tooltip {
 						position: absolute;
 						top: 50px;
@@ -132,6 +129,11 @@ $primary: green;
 					display: flex;
 					justify-content: center;
 					align-items: center;
+				}
+
+				.embed-tooltip {
+					width: 0;
+					overflow: hidden;
 				}
 			}
 		}
