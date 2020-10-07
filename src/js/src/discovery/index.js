@@ -44,6 +44,9 @@ class Discovery extends Component {
 
 			// filter data
 			queryParams: {},
+			dateRangeInputValue: "",
+			searchField: { searchStorie: "", searchMap: ""},
+			selectedTag: -1,
 			tags: [],
 			categories: [], // future api improvement (single api call)
 		};
@@ -118,7 +121,10 @@ class Discovery extends Component {
 			firstLoad: this.state.firstLoad,
 			categories: this.state.categories,
 			tags: this.state.tags,
+			dateRangeInputValue: this.state.dateRangeInputValue,
+			selectedTag: this.state.selectedTag,
 			queryParams: this.state.queryParams,
+			searchField: this.state.searchField,
 			updateStories: this.updateStories,
 
 			mapsLoaded: this.state.mapsLoaded,
@@ -127,6 +133,7 @@ class Discovery extends Component {
 			appliedLayers: this.state.appliedLayers,
 			layersQueue: this.state.layersQueue,
 			applyLayersChanges: this.applyLayersChanges,
+
 
 			updateState: this.updateState,
 			pageInfo: {

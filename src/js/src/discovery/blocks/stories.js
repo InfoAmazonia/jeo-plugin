@@ -15,7 +15,6 @@ class Stories extends Component {
 			stories: [],
 			searchQuery: {},
 			showFilters: false,
-			dateRangeInputValue: '',
 			dateRangeObject: { after: new Date(), before: new Date() }
 		};
 
@@ -436,8 +435,7 @@ class Stories extends Component {
 	dateRangePickerApply( ev, picker ) {
 		const dateOptions = [ undefined, { year:"2-digit", month:"2-digit", day:"2-digit" } ];
 
-		this.setState( {
-			...this.state,
+		this.props.updateState( {
 			dateRangeInputValue:
 				picker.startDate.toDate().toLocaleDateString( ...dateOptions ) +
 				' - ' +
@@ -448,8 +446,7 @@ class Stories extends Component {
 	}
 
 	dateRangePickerCancel(ev, picker) {
-		this.setState( {
-			...this.state,
+		this.props.updateState( {
 			dateRangeInputValue: '',
 		} );
 
@@ -458,6 +455,9 @@ class Stories extends Component {
 
 	handleTagChange( event ) {
 		const value = event.target.value;
+		this.props.updateState( {
+			selectedTag: value,
+		} );
 		this.updateStories( { cumulative: false, tags: value, page: 1 } );
 	}
 
@@ -471,12 +471,11 @@ class Stories extends Component {
 				role="img"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 512 512"
-				class="svg-inline--fa fa-spinner fa-w-16 fa-3x"
+				className="svg-inline--fa fa-spinner fa-w-16 fa-3x"
 			>
 				<path
 					fill="currentColor"
 					d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-					class=""
 				></path>
 			</svg>
 		) : null;
@@ -486,6 +485,7 @@ class Stories extends Component {
 				<Search
 					searchPlaceholder="Search story"
 					update={ this.updateStories }
+					searchField={ this.props.queryParams.search }
 				/>
 
 				<button
@@ -506,12 +506,10 @@ class Stories extends Component {
 							role="img"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 512 512"
-							class="svg-inline--fa fa-times-circle fa-w-16 fa-3x"
 						>
 							<path
 								fill="currentColor"
 								d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm121.6 313.1c4.7 4.7 4.7 12.3 0 17L338 377.6c-4.7 4.7-12.3 4.7-17 0L256 312l-65.1 65.6c-4.7 4.7-12.3 4.7-17 0L134.4 338c-4.7-4.7-4.7-12.3 0-17l65.6-65-65.6-65.1c-4.7-4.7-4.7-12.3 0-17l39.6-39.6c4.7-4.7 12.3-4.7 17 0l65 65.7 65.1-65.6c4.7-4.7 12.3-4.7 17 0l39.6 39.6c4.7 4.7 4.7 12.3 0 17L312 256l65.6 65.1z"
-								class=""
 							></path>
 						</svg>
 					) : (
@@ -523,12 +521,10 @@ class Stories extends Component {
 							role="img"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 512 512"
-							class="svg-inline--fa fa-plus-circle fa-w-16 fa-3x"
 						>
 							<path
 								fill="currentColor"
 								d="M256 8C119 8 8 119 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm144 276c0 6.6-5.4 12-12 12h-92v92c0 6.6-5.4 12-12 12h-56c-6.6 0-12-5.4-12-12v-92h-92c-6.6 0-12-5.4-12-12v-56c0-6.6 5.4-12 12-12h92v-92c0-6.6 5.4-12 12-12h56c6.6 0 12 5.4 12 12v92h92c6.6 0 12 5.4 12 12v56z"
-								class=""
 							></path>
 						</svg>
 					) }
@@ -543,13 +539,13 @@ class Stories extends Component {
 							<input
 								placeholder={ __( 'Date range' ) }
 								readOnly="true"
-								value={ this.state.dateRangeInputValue }
+								value={ this.props.dateRangeInputValue }
 							></input>
 						</DateRangePicker>
 						<select name="tags" onChange={ this.handleTagChange }>
 							<option value="">{ __( 'Tags' ) }</option>
 							{ this.props.tags.map( ( tag ) => (
-								<option value={ tag.id } key={ tag.id }>
+								<option value={ tag.id } key={ tag.id } selected={ this.props.selectedTag == tag.id? "selected" : "" }>
 									{ ' ' }
 									{ tag.name }{ ' ' }
 								</option>

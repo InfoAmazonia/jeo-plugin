@@ -22,6 +22,9 @@ class Sidebar extends Component {
 			categories: this.props.categories,
 			tags: this.props.tags,
 			queryParams: this.props.queryParams,
+			dateRangeInputValue: this.props.dateRangeInputValue,
+			searchField: this.props.searchField,
+			selectedTag: this.props.selectedTag,
 			ref: this.storiesRef,
 
 			useStories: this.props.useStories,
