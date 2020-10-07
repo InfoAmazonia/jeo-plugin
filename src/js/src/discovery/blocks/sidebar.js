@@ -65,27 +65,9 @@ class Sidebar extends Component {
 		// Only send parent update if the previuos one is done
 		if (this.props.storiesLoaded) {
 			const element = e.target
-			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+			if (element.scrollHeight - element.scrollTop >= element.clientHeight - 30) {
 				if(this.storiesRef.current) {
-					// if( this.props.queryParams.search ) {
-					// 	if( this.props.queryParams.tags ) {
-					// 		this.storiesRef.current.updateStories( { cumulative: true, search: this.props.queryParams.search, tags: this.props.queryParams.tags }  );
-					// 	} else {
-					// 		this.storiesRef.current.updateStories( { cumulative: true, search: this.props.queryParams.search }  );
-					// 	}
-
-					// } else {
-					// 	if( this.props.queryParams.tags ) {
-					// 		this.storiesRef.current.updateStories( { cumulative: true, tags: this.props.queryParams.tags }  );
-					// 	} else {
-					// 		this.storiesRef.current.updateStories( { cumulative: true }  );
-
-					// 	}
-					// }
-
 					this.storiesRef.current.updateStories( { cumulative: true }  );
-
-
 				}
 			}
 		}
