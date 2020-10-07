@@ -29,6 +29,12 @@ function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
 }
 
+const decodeHtmlEntity = function ( str ) {
+	return str.replace( /&#(\d+);/g, function ( match, dec ) {
+		return String.fromCharCode( dec );
+	} );
+};
+
 class StoryMapDisplay extends Component {
     constructor( props ) {
 		super( props );
@@ -251,13 +257,13 @@ class StoryMapDisplay extends Component {
 									<>
 										<p className="storymap-page-title">{ this.state.postData.title.rendered }</p>
 										<div className="post-info">
-											<p className="author">{ __( 'Authors' ) }</p>
+											<p className="author">{ 'Authors' }</p>
 											<p className="date">{ this.state.postData.date }</p>
 										</div>
 									</>
 								) }
 								{ config.subtitle &&
-									<p className="storymap-description">{ config.subtitle }</p>
+									<p className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( config.subtitle ) } }></p>
 								}
 
 								<button
@@ -268,7 +274,7 @@ class StoryMapDisplay extends Component {
 										document.querySelector( '#features' ).scrollIntoView();
 									} }
 								>
-									{ __( 'START' ) }
+									{ 'START' }
 								</button>
 								
 								{ this.props.navigateButton && (
@@ -282,7 +288,7 @@ class StoryMapDisplay extends Component {
 												document.querySelector('.navigate-button-display').click();
 											} }
 										>
-											{ __( 'skip intro' ) }
+											{ 'skip intro' }
 										</p>
 										<div
 											className="skip-intro-icon"
@@ -411,7 +417,7 @@ class StoryMapDisplay extends Component {
 								window.scrollTo(0, 0);
 							} }
 						>
-							{ __( 'Voltar ao topo' ) }
+							{ 'Voltar ao topo' }
 						</p>
 					</div>
 				</>
@@ -436,7 +442,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 							<img src={ image } alt={ title }></img>
 						}
 						{ description &&
-							<p>{ description }</p>
+							<p dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } }></p>
 						}
 						{ ! title && ! description &&
 							<h3 className="title">{ `Slide ${ index + 1 }` }</h3>
@@ -450,7 +456,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 						className="navigate-button-display"
 						onClick={ onClickFunction }
 					>
-						{ __( 'NAVIGATE THE MAP' ) }
+						{ 'NAVIGATE THE MAP' }
 					</button>
 				</div>
 			) }
