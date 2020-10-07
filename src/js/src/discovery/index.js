@@ -43,8 +43,9 @@ class Discovery extends Component {
 			stories: [],
 
 			// filter data
-			categories: [],
+			queryParams: {},
 			tags: [],
+			categories: [], // future api improvement (single api call)
 		};
 
 		// methods bindings
@@ -118,6 +119,7 @@ class Discovery extends Component {
 			firstLoad: this.state.firstLoad,
 			categories: this.state.categories,
 			tags: this.state.tags,
+			queryParams: this.state.queryParams,
 			updateStories: this.updateStories,
 
 			mapsLoaded: this.state.mapsLoaded,

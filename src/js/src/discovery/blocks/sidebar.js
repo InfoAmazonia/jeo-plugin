@@ -21,6 +21,7 @@ class Sidebar extends Component {
 			pageInfo: this.props.pageInfo,
 			categories: this.props.categories,
 			tags: this.props.tags,
+			queryParams: this.props.queryParams,
 			ref: this.storiesRef,
 
 			useStories: this.props.useStories,
@@ -66,7 +67,13 @@ class Sidebar extends Component {
 			const element = e.target
 			if (element.scrollHeight - element.scrollTop === element.clientHeight) {
 				if(this.storiesRef.current) {
-					this.storiesRef.current.updateStories( { cumulative: true }  );
+					if( this.props.queryParams.search ) {
+						this.storiesRef.current.updateStories( { cumulative: true, search: this.props.queryParams.search}  );
+					} else {
+						this.storiesRef.current.updateStories( { cumulative: true }  );
+					}
+
+
 				}
 			}
 		}
