@@ -212,7 +212,7 @@ function jeo_custom_settings_css() {
 		$colorMoreBkg =\jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff');
 		
 		$color_css = '--jeo_more-bkg-color: '. $colorMoreBkg . ';';
-		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance($colorMoreBkg, -0.15) . ';';
+		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo($colorMoreBkg, -0.15) . ';';
 		$css_variables .= $color_css . ' ' . $color_css_hover;
 	}
 
@@ -264,7 +264,7 @@ function jeo_scripts_typography() {
 add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );
 
 if (!function_exists("color_luminance")){
-	function color_luminance($hexcolor, $percent) {
+	function color_luminance_jeo($hexcolor, $percent) {
 		if (strlen($hexcolor) < 6) {
 			$hexcolor = $hexcolor[0] . $hexcolor[0] . $hexcolor[1] . $hexcolor[1] . $hexcolor[2] . $hexcolor[2];
 		}
