@@ -188,46 +188,7 @@ $primary: green;
 		max-height: 100%;
 		overflow-y: auto;
 
-		&::-webkit-scrollbar {
-			width: 6px;
-		}
-
-		&::-webkit-scrollbar-button {
-			width: 0px;
-			height: 0px;
-		}
-
-		&::-webkit-scrollbar-thumb {
-			background: #ddd;
-			border: 0px none white;
-			border-radius: 3px;
-
-			&:hover {
-				background: #b1b1b1;
-			}
-
-			&:active {
-				background: #b1b1b1;
-			}
-		}
-
-		&::-webkit-scrollbar-track {
-			background: #eee;
-			border: 0px none #ffffff;
-			border-radius: 0px;
-
-			&:hover {
-				background: rgba( 0, 0, 0, 0.05 );
-			}
-
-			&:active {
-				background: #eee;
-			}
-		}
-
-		&::-webkit-scrollbar-corner {
-			background: transparent;
-		}
+		@extend .scroll-bar-style;
 
 		div[role='tabpanel'] {
 			padding: 30px;
@@ -635,46 +596,7 @@ $primary: green;
 			max-height: 250px;
 			overflow-x: auto;
 
-			&::-webkit-scrollbar {
-				width: 6px;
-			}
-
-			&::-webkit-scrollbar-button {
-				width: 0px;
-				height: 0px;
-			}
-
-			&::-webkit-scrollbar-thumb {
-				background: #ddd;
-				border: 0px none white;
-				border-radius: 3px;
-
-				&:hover {
-					background: #b1b1b1;
-				}
-
-				&:active {
-					background: #b1b1b1;
-				}
-			}
-
-			&::-webkit-scrollbar-track {
-				background: #eee;
-				border: 0px none #ffffff;
-				border-radius: 0px;
-
-				&:hover {
-					background: rgba( 0, 0, 0, 0.05 );
-				}
-
-				&:active {
-					background: #eee;
-				}
-			}
-
-			&::-webkit-scrollbar-corner {
-				background: transparent;
-			}
+			@extend .scroll-bar-style;
 
 			h4 {
 				margin: 15px 0;
@@ -824,5 +746,49 @@ $primary: green;
 		&:hover {
 			text-decoration: none;
 		}
+	}
+}
+
+
+.scroll-bar-style {
+	&::-webkit-scrollbar {
+		width: 6px;
+	}
+
+	&::-webkit-scrollbar-button {
+		width: 0px;
+		height: 0px;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background: #ddd;
+		border: 0px none white;
+		border-radius: 3px;
+
+		&:hover {
+			background: #b1b1b1;
+		}
+
+		&:active {
+			background: #b1b1b1;
+		}
+	}
+
+	&::-webkit-scrollbar-track {
+		background: #eee;
+		border: 0px none #ffffff;
+		border-radius: 0px;
+
+		&:hover {
+			background: rgba( 0, 0, 0, 0.05 );
+		}
+
+		&:active {
+			background: #eee;
+		}
+	}
+
+	&::-webkit-scrollbar-corner {
+		background: transparent;
 	}
 }
