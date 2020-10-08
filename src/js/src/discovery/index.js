@@ -25,6 +25,7 @@ class Discovery extends Component {
 			showLegends: false,
 			showShareOptions: false,
 			showEmbedTooltip: false,
+			showSidebar: true,
 
 			// maps
 			maps: [],
@@ -80,7 +81,6 @@ class Discovery extends Component {
 			);
 
 			this.map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 	}
@@ -125,6 +125,7 @@ class Discovery extends Component {
 			selectedTag: this.state.selectedTag,
 			queryParams: this.state.queryParams,
 			searchField: this.state.searchField,
+			showSidebar: this.state.showSidebar,
 			updateStories: this.updateStories,
 
 			mapsLoaded: this.state.mapsLoaded,
@@ -168,7 +169,7 @@ class Discovery extends Component {
 		// console.log(generatedUrl);
 
 		return (
-			<div className={ 'discovery-block' + ( this.props.embed ? ' embed' : '' ) }>
+			<div className={ 'discovery-block' + ( this.props.embed ? ' embed' : '' ) + ( this.state.showSidebar ? ' active' : '' ) }>
 				{ ! this.state.mapLoaded && ! this.props.embed ? (
 					<div className="placeholder animated-background" />
 				) : (
@@ -230,7 +231,6 @@ class Discovery extends Component {
 									<path
 										fill="currentColor"
 										d="M352 320c-22.608 0-43.387 7.819-59.79 20.895l-102.486-64.054a96.551 96.551 0 0 0 0-41.683l102.486-64.054C308.613 184.181 329.392 192 352 192c53.019 0 96-42.981 96-96S405.019 0 352 0s-96 42.981-96 96c0 7.158.79 14.13 2.276 20.841L155.79 180.895C139.387 167.819 118.608 160 96 160c-53.019 0-96 42.981-96 96s42.981 96 96 96c22.608 0 43.387-7.819 59.79-20.895l102.486 64.054A96.301 96.301 0 0 0 256 416c0 53.019 42.981 96 96 96s96-42.981 96-96-42.981-96-96-96z"
-										class=""
 									></path>
 								</svg>
 							</button>
@@ -265,12 +265,10 @@ class Discovery extends Component {
 									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 448 512"
-									class="svg-inline--fa fa-chevron-down fa-w-14 fa-3x"
 								>
 									<path
 										fill="currentColor"
 										d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"
-										class=""
 									></path>
 								</svg>
 							</i>
