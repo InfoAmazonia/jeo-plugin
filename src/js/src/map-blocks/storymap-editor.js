@@ -60,6 +60,16 @@ const MapEditor = ( {
 		setStorymapLayers( newItems );
 	}
 
+	const flyTo = ( map, location ) => {
+
+		map.flyTo({
+			center: [
+				parseFloat( location.lon ),
+				parseFloat( location.lat ),
+			]
+		});
+	}
+
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
 	const [ selectedMap, setSelectedMap ] = useState( null );
@@ -588,20 +598,24 @@ const MapEditor = ( {
 						<JeoGeoAutoComplete
 							className="search-adress-input"
 							onSelect={ ( location ) => {
+								flyTo( selectedMap, location );
+								
+								/*
 								selectedMap.flyTo( {
 									center: [
-										parseInt( location.lon ),
-										parseInt( location.lat ),
+										parseFloat( location.lat ),
+										parseFloat( location.lon ),
 									],
-									zoom: parseInt( attributes.slides[ currentSlideIndex ].zoom ),
-									bearing: parseInt(
+									zoom: parseFloat( attributes.slides[ currentSlideIndex ].zoom ),
+									bearing: parseFloat(
 										attributes.slides[ currentSlideIndex ].bearing
 									),
-									pitch: parseInt(
+									pitch: parseFloat(
 										attributes.slides[ currentSlideIndex ].pitch
 									),
 									essential: true,
 								} );
+								*/
 							} }
 							value={ searchValue }
 							onChange={ ( newSearchValue ) => {
