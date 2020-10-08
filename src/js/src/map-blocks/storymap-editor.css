@@ -1,0 +1,20 @@
+.story-settings {
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    position: absolute;
+    top: 0;
+    padding: 10px;
+}
+
+.story-settings .title label, .story-settings .description label, .story-settings .navigate-button label {
+    font-weight: bold;
+}
+
+.story-settings .navigate-button {
+    text-align: center;
+}
+
+.story-settings .description textarea {
+    height: 150px;
+}

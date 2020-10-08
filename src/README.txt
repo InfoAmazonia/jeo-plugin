@@ -51,6 +51,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
  
 = 0.2.0 =
 * Second release.
+<<<<<<< HEAD
 
 = 0.1.0 =
 * Fix layer default legend bug.
@@ -62,6 +63,8 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 * Improve the interface of adding layers to maps.
 * Fix some bugs that were happening when geolocating posts.
 * Change the color of secondary pins.
+=======
+>>>>>>> 24178976426f1112d8a7f669fa7276af46387aba
 
 == Upgrade Notice ==
 
