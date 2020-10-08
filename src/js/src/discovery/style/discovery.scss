@@ -188,6 +188,47 @@ $primary: green;
 		max-height: 100%;
 		overflow-y: auto;
 
+		&::-webkit-scrollbar {
+			width: 6px;
+		}
+
+		&::-webkit-scrollbar-button {
+			width: 0px;
+			height: 0px;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			background: #ddd;
+			border: 0px none white;
+			border-radius: 3px;
+
+			&:hover {
+				background: #b1b1b1;
+			}
+
+			&:active {
+				background: #b1b1b1;
+			}
+		}
+
+		&::-webkit-scrollbar-track {
+			background: #eee;
+			border: 0px none #ffffff;
+			border-radius: 0px;
+
+			&:hover {
+				background: rgba( 0, 0, 0, 0.05 );
+			}
+
+			&:active {
+				background: #eee;
+			}
+		}
+
+		&::-webkit-scrollbar-corner {
+			background: transparent;
+		}
+
 		div[role='tabpanel'] {
 			padding: 30px;
 		}
