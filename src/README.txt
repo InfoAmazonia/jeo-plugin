@@ -1,11 +1,12 @@
 === JEO ===
 Contributors: earthjournalism
-Tested up to: 0.1.0
-Stable tag: 0.1.0
+Tested up to: 0.2.0
+Stable tag: 0.2.0
 Requires PHP: 7.2
 Requires at least: 5.4
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+Version: 0.2.0
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -50,11 +51,28 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
  
 = 0.2.0 =
 * Second release.
+<<<<<<< HEAD
+
+= 0.1.0 =
+* Fix layer default legend bug.
+* Layers weren't being updated in maps sometimes.
+* Improve compatibility with WPML plugin.
+* Prevent errors if a layer or map is created with wrong settings.
+* Give a warning to the user if there is an API key that doesn't match.
+* Prevent errors in maps that use deleted layers.
+* Improve the interface of adding layers to maps.
+* Fix some bugs that were happening when geolocating posts.
+* Change the color of secondary pins.
+=======
+>>>>>>> 24178976426f1112d8a7f669fa7276af46387aba
 
 == Upgrade Notice ==
 
 = 0.1.0=
 * First release.
+
+= 0.1.0=
+* New version available.
 
 == Frequently Asked Questions ==
 
