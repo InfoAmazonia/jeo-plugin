@@ -131,7 +131,7 @@
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_more-font-size"><?php _e('Info button font-size', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_more-font-size"><?php _e('Info button font-size (rem)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_more-font-size') ); ?>" type="text" id="jeo_more-font-size" value="<?php echo esc_html( $this->get_option('jeo_more-font-size') ); ?>" class="regular-text">
 						</td>
