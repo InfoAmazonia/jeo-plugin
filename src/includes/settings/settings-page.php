@@ -119,13 +119,13 @@
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row"><label for="jeo_typography"><?php _e('Typography URL', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_typography"><?php _e('Typography URL (Ex. https://fonts.googleapis.com/css2?family=Open+Sans&display=swap)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography') ); ?>" type="text" id="jeo_typography" value="<?php echo esc_html( $this->get_option('jeo_typography') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_typography-name"><?php _e('Typography name', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_typography-name"><?php _e('Typography name (Ex. Open Sans)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography-name') ); ?>" type="text" id="jeo_typography-name" value="<?php echo esc_html( $this->get_option('jeo_typography-name') ); ?>" class="regular-text">
 						</td>
@@ -137,25 +137,25 @@
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_more-bkg-color"><?php _e('Info button background color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_more-bkg-color"><?php _e('Info button background color (Ex. #fff)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_more-bkg-color') ); ?>" type="text" id="jeo_more-bkg-color" value="<?php echo esc_html( $this->get_option('jeo_more-bkg-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_more-color"><?php _e('Info button color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_more-color"><?php _e('Info button color (Ex. #fff)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_more-color') ); ?>" type="text" id="jeo_more-color" value="<?php echo esc_html( $this->get_option('jeo_more-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_close-bkg-color"><?php _e('Close button background color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_close-bkg-color"><?php _e('Close button background color (Ex. #fff)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_close-bkg-color') ); ?>" type="text" id="jeo_close-bkg-color" value="<?php echo esc_html( $this->get_option('jeo_close-bkg-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_close-color"><?php _e('Close button color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_close-color"><?php _e('Close button color (Ex. #fff)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_close-color') ); ?>" type="text" id="jeo_close-color" value="<?php echo esc_html( $this->get_option('jeo_close-color') ); ?>" class="regular-text">
 						</td>
