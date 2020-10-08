@@ -2,6 +2,7 @@ import { Component, createRef } from '@wordpress/element';
 import { TabPanel, Icon } from '@wordpress/components';
 import Stories from './stories';
 import MapLayers from './map-layers';
+import { __ } from '@wordpress/i18n';
 
 class Sidebar extends Component {
 	constructor( props ) {
@@ -79,6 +80,9 @@ class Sidebar extends Component {
 	render() {
 		return (
 			<div onScroll={ this.handleScroll } className={ this.props.isEmbed? "is-embed" : "default-sidebar" }>
+				<div className="discovery-title">
+					{ __("Discovery", "jeo") }
+				</div>
 				<TabPanel
 					className="togable-panel"
 					activeClass="active-tab"

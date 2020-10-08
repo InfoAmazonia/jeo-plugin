@@ -6,6 +6,7 @@ $primary: green;
 	grid-template-columns: 30% auto;
 	height: calc( 100vh );
 	overflow: hidden;
+	background-color: white;
 
 	// discovery embed class is parent of current reference (&)
 	.discovery-embed & {
@@ -15,6 +16,16 @@ $primary: green;
 		.mapboxgl-map {
 			height: 100%;
 		}
+	}
+
+	.discovery-title {
+		text-transform: uppercase;
+		border-left: 3px solid $primary;
+		font-weight: bold;
+		padding-left: 13px;
+		font-size: 16px;
+		margin-bottom: 25px;
+		margin-left: 20px;
 	}
 
 	button {
@@ -194,14 +205,14 @@ $primary: green;
 				button {
 					background: none;
 					color: #191e23;
-					// font-family: "Open Sans";
-					font-size: 1.125rem;
+					font-size: 16px;
 					font-weight: bold;
 					letter-spacing: 0;
 					line-height: 1.5rem;
 					padding: 10px;
 					text-decoration: none;
 					outline: none;
+					text-transform: uppercase;
 
 					&:after {
 						transition: all 0.2s ease-in-out;
