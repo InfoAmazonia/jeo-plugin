@@ -17,16 +17,6 @@ $primary: green;
 		}
 	}
 
-	.discovery-title {
-		text-transform: uppercase;
-		border-left: 3px solid $primary;
-		font-weight: bold;
-		padding-left: 13px;
-		font-size: 16px;
-		margin-bottom: 25px;
-		margin-left: 20px;
-	}
-
 	&.active:not(.embed) {
 		.discovery-map {
 			margin-left: 30%;
@@ -48,9 +38,19 @@ $primary: green;
 		position: absolute;
 		width: 30%;
 		left: -30%;
-		transition: all .2s ease-in-out;
 		max-height: 100%;
 		height: 100%;
+		transition: all .2s ease-in-out;
+
+		.discovery-title {
+			text-transform: uppercase;
+			border-left: 3px solid $primary;
+			font-weight: bold;
+			padding-left: 13px;
+			font-size: 16px;
+			margin-bottom: 25px;
+			margin-left: 20px;
+		}
 	}
 
 	button {
@@ -218,6 +218,12 @@ $primary: green;
 			align-items: center;
 			border-radius: 0 10px 10px 0;
 			box-shadow: 2px 0 6px 0 rgba(0,0,0,0.3);
+			transition: all .2s ease-in-out;
+
+			&:hover {
+				width: 60px;
+				transition: all .2s ease-in-out;
+			}
 
 			svg {
 				width: 12px;
