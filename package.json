@@ -23,6 +23,7 @@
 	},
 	"homepage": "https://github.com/EarthJournalismNetwork/jeo-plugin#readme",
 	"dependencies": {
+		"@mapbox/mapbox-gl-geocoder": "^4.7.0",
 		"@wordpress/components": "^8.5.0",
 		"@wordpress/compose": "^3.15.0",
 		"@wordpress/edit-post": "^3.17.0",
@@ -33,12 +34,15 @@
 		"lodash-es": "^4.17.15",
 		"lodash.isequal": "^4.5.0",
 		"lodash.template": "^4.5.0",
+		"react-async": "^10.0.1",
 		"react-autosuggest": "^9.4.3",
+		"react-beautiful-dnd": "^13.0.0",
 		"react-datepicker": "^2.16.0",
 		"react-jsonschema-form": "^2.0.0-alpha.1",
 		"react-leaflet": "^2.7.0",
 		"react-mapbox-gl": "^4.8.6",
 		"react-movable": "^2.5.0",
+		"scrollama": "^2.2.1",
 		"use-debounce": "^3.4.2",
 		"uuid": "^7.0.3"
 	},

@@ -12,7 +12,8 @@ class Settings {
 
 		$this->default_options = [
 			'enabled_post_types' => [
-				'post'
+				'post',
+				'storymap'
 			],
 			'active_geocoder' => 'nominatim',
 			'map_default_zoom' => 11,
