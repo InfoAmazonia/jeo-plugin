@@ -4,6 +4,8 @@ import MapDisplay from './map-display';
 import MapEditor from './map-editor';
 import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
+import StorymapDisplay from './storymap-display';
+import StorymapEditor from './storymap-editor'
 
 import MapIcon from '../icons/ion/map';
 
@@ -107,4 +109,30 @@ registerBlockType( 'jeo/onetime-map', {
 	},
 	edit: ( props ) => <OnetimeMapEditor { ...props } />,
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
+} );
+
+registerBlockType( 'jeo/storymap', {
+	title: __( 'Story Map' ),
+	description: __( 'Display maps with storytelling' ),
+	category: 'jeo',
+	icon: MapIcon,
+	attributes: {
+		map_id: {
+			type: 'number',
+		},
+		title: {
+			type: 'string',
+		},
+		description: {
+			type: 'string',
+		},
+		slides: {
+			type: 'array'
+		},
+		navigateButton: {
+			type: 'boolean',
+		},
+	},
+	edit: ( props ) => <StorymapEditor { ...props } />,
+	save: ( props ) => <StorymapDisplay { ...props } />,
 } );
