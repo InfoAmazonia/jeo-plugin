@@ -27,7 +27,7 @@ $primary: green;
 		margin-left: 20px;
 	}
 
-	&.active {
+	&.active:not(.embed) {
 		.discovery-map {
 			margin-left: 30%;
 		}
