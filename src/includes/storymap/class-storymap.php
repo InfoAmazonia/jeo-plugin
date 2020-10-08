@@ -6,7 +6,7 @@ class Storymap{
 
 	use Singleton;
 	use Rest_Validate_Meta;
-	
+
 	public $post_type = 'storymap';
 
 	protected function init() {
@@ -45,7 +45,7 @@ class Storymap{
 			'hierarchical' => true,
 			'description' => __('JEO Storymap', 'jeo'),
 			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields'),
-			'rewrite' => array('slug' => 'Storymap'),
+			'rewrite' => array('slug' => 'storymap'),
 			'public' => true,
 			'show_in_menu' => 'jeo-main-menu',
 			'show_in_rest' => true,
@@ -56,11 +56,11 @@ class Storymap{
 				'edit_post' => 'edit_storymap',
 				'edit_posts' => 'edit_storymap',
 				'edit_others_posts' => 'edit_others_storymap',
-				
+
 				'publish_posts' => 'publish_storymap',
 				'read_post' => 'read_storymap',
 				'read_private_posts' => 'read_private_storymap',
-				
+
 				'delete_post' => 'delete_storymap',
 			),
 			'template' => array(
@@ -71,21 +71,21 @@ class Storymap{
 		register_post_type($this->post_type, $args);
 
     }
-    
+
     public function add_capabilities() {
 		$roles = ['author', 'editor', 'administrator'];
 		foreach ($roles as $role) {
 			// var_dump($role);
 			$role_obj = get_role($role);
-			
-			$role_obj->add_cap( 'edit_storymap' ); 
-			$role_obj->add_cap( 'edit_storymap' ); 
-			$role_obj->add_cap( 'edit_others_storymap' ); 
-			$role_obj->add_cap( 'publish_storymap' ); 
-			$role_obj->add_cap( 'read_storymap' ); 
-			$role_obj->add_cap( 'read_private_storymap' ); 
-			$role_obj->add_cap( 'delete_storymap' ); 
-			$role_obj->add_cap( 'edit_published_blocks' ); 
+
+			$role_obj->add_cap( 'edit_storymap' );
+			$role_obj->add_cap( 'edit_storymap' );
+			$role_obj->add_cap( 'edit_others_storymap' );
+			$role_obj->add_cap( 'publish_storymap' );
+			$role_obj->add_cap( 'read_storymap' );
+			$role_obj->add_cap( 'read_private_storymap' );
+			$role_obj->add_cap( 'delete_storymap' );
+			$role_obj->add_cap( 'edit_published_blocks' );
 		}
 	}
 
