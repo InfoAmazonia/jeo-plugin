@@ -213,6 +213,7 @@ $primary: green;
 					text-decoration: none;
 					outline: none;
 					text-transform: uppercase;
+					opacity: 0.5;
 
 					&:after {
 						transition: all 0.2s ease-in-out;
@@ -228,6 +229,7 @@ $primary: green;
 
 					&.active-tab {
 						position: relative;
+						opacity: 1;
 
 						&:after {
 							height: 3px;
@@ -306,7 +308,7 @@ $primary: green;
 
 				select,
 				input {
-					padding: 9px 6px;
+					padding: 7px 6px;
 					font-size: 14px;
 					border-radius: 5px;
 					background: transparent;
