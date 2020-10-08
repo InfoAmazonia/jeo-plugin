@@ -5,7 +5,7 @@ import DateRangePicker from 'react-bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
 import { __ } from '@wordpress/i18n';
 
-const POSTS_PER_PAGE = 5;
+const POSTS_PER_PAGE = 10;
 
 class Stories extends Component {
 	constructor( props ) {
@@ -490,11 +490,12 @@ class Stories extends Component {
 
 				<button
 					className="toggle-filters"
-					onClick={ () =>
-						this.setState( {
-							...this.state,
-							showFilters: ! this.state.showFilters,
-						} )
+					onClick={ () => {
+							this.setState( {
+								...this.state,
+								showFilters: ! this.state.showFilters,
+							} );
+						}
 					}
 				>
 					{ this.state.showFilters ? (
