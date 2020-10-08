@@ -161,3 +161,25 @@ function jeo_register_embedder($id, $base_url) {
 
 	wp_embed_register_handler($id, $regex, $embedder);
 }
+
+// Load template for discovery
+add_filter( 'page_template', 'template_page_discovery' );
+function template_page_discovery( $page_template ){
+
+    if ( get_page_template_slug() == 'discovery.php' ) {
+        $page_template = JEO_BASEPATH . '/templates/' . 'discovery.php';
+    }
+    return $page_template;
+}
+
+/**
+ * Add "Discovery" template to page attirbute template section.
+ */
+add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 4 );
+function add_template_page_discovery( $post_templates, $wp_theme, $post, $post_type ) {
+
+    // Add custom template named template-custom.php to select dropdown
+    $post_templates['discovery.php'] = __('Discovery', 'jeo');
+
+    return $post_templates;
+}
