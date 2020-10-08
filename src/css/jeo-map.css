@@ -296,7 +296,6 @@ div.jeomap {
 	position: absolute;
     right: 5px;
     top: 5px;
-    border: 0;
     border-radius: 0px;
     cursor: pointer;
     width: 30px;
