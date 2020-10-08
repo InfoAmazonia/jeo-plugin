@@ -285,7 +285,7 @@ div.jeomap {
 
 /* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container a.more-info-button:hover {
-	/* background: #555D66;*/
+	background-color: var(--jeo_more-bkg-color-darker-15);
 	color: var(--jeo_more-color);
 	transition: all .1s ease-in-out;
 }

@@ -202,8 +202,10 @@ function jeo_custom_settings_css() {
 	$css_variables = "";
 	if (!empty(\jeo_settings()->get_option( 'jeo_more-bkg-color', ''))) {
 		$colorMoreBkg =\jeo_settings()->get_option( 'jeo_more-bkg-color');
+		
 		$color_css = '--jeo_more-bkg-color: '. $colorMoreBkg . ';';
-		$css_variables .= $color_css;
+		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance($colorMoreBkg, -0.15) . ';';
+		$css_variables .= $color_css . ' ' . $color_css_hover;
 	}
 
 	if (!empty(\jeo_settings()->get_option( 'jeo_more-color', ''))) {
@@ -228,9 +230,9 @@ function jeo_custom_settings_css() {
 	$theme_css .= '
 		:root {'.
 			$css_variables; '
-			--primary-darker-15: ' . color_luminance($colorMoreBkg, -0.15) . ';
 		}
 	';
+
 	return $theme_css;
 }
 function jeo_custom_settings_css_wrap() {
