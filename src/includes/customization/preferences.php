@@ -18,7 +18,6 @@ function jeo_custom_settings_css() {
 		';
 	}
 
-
 	if (!empty(sanitize_text_field(\jeo_settings()->get_option( 'jeo_typography-name' ) ))) {
 		$jeo_font = wp_kses(\jeo_settings()->get_option( 'jeo_typography-name'), null );
 

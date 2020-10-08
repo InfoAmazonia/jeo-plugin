@@ -189,8 +189,8 @@ function jeo_custom_settings_css() {
 		';
 	}
 
-	if (!empty(\jeo_settings()->get_option( 'jeo_more-font-size', ''))) {
-		$jeo_info_font_size = \jeo_settings()->get_option('jeo_more-font-size', '');
+	if (!empty(\jeo_settings()->get_option( 'jeo_more-font-size', '1'))) {
+		$jeo_info_font_size = \jeo_settings()->get_option('jeo_more-font-size', '1');
 		$font_unit = 'rem';
 
 		$theme_css .= '
@@ -200,29 +200,29 @@ function jeo_custom_settings_css() {
 	}
 
 	$css_variables = "";
-	if (!empty(\jeo_settings()->get_option( 'jeo_more-bkg-color', ''))) {
-		$colorMoreBkg =\jeo_settings()->get_option( 'jeo_more-bkg-color');
+	if (!empty(\jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff'))) {
+		$colorMoreBkg =\jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff');
 		
 		$color_css = '--jeo_more-bkg-color: '. $colorMoreBkg . ';';
 		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance($colorMoreBkg, -0.15) . ';';
 		$css_variables .= $color_css . ' ' . $color_css_hover;
 	}
 
-	if (!empty(\jeo_settings()->get_option( 'jeo_more-color', ''))) {
-		$color =\jeo_settings()->get_option( 'jeo_more-color');
+	if (!empty(\jeo_settings()->get_option( 'jeo_more-color', '#555D66'))) {
+		$color =\jeo_settings()->get_option( 'jeo_more-color', '#555D66');
 		$color_css = '--jeo_more-color: '. $color . ';';
 		$css_variables .= $color_css;
 	}
 
 
-	if (!empty(\jeo_settings()->get_option( 'jeo_close-bkg-color', ''))) {
-		$color =\jeo_settings()->get_option('jeo_close-bkg-color');
+	if (!empty(\jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff'))) {
+		$color =\jeo_settings()->get_option('jeo_close-bkg-color', '#fff');
 		$color_css = '--jeo_close-bkg-color: '. $color . ';';
 		$css_variables .= $color_css;
 	}
 
-	if (!empty(\jeo_settings()->get_option( 'jeo_close-color', ''))) {
-		$color =\jeo_settings()->get_option('jeo_close-color');
+	if (!empty(\jeo_settings()->get_option( 'jeo_close-color', '#555D66'))) {
+		$color =\jeo_settings()->get_option('jeo_close-color', '#555D66');
 		$color_css = '--jeo_close-color: '. $color . ';';
 		$css_variables .= $color_css;
 	}
