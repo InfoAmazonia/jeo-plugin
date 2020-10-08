@@ -151,7 +151,6 @@ class Sidebar extends Component {
 				<button className="collapse-toolbar" onClick={ () => {
 						this.props.updateState( { showSidebar: !this.props.showSidebar } )
 						window.setTimeout( () => {
-							console.log("Passou um tempoii")
 							this.props.map.resize();
 						}, 200 )
 					} }>
