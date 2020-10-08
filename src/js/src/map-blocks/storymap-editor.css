@@ -1,20 +1,191 @@
 .story-settings {
+    max-width: 40%;
     margin: 10px;
     background-color: #fff;
     border-radius: 10px;
     position: absolute;
-    top: 0;
+    top: 50px;
     padding: 10px;
 }
 
-.story-settings .title label, .story-settings .description label, .story-settings .navigate-button label {
-    font-weight: bold;
+.story-settings-hide {
+    width: 30%;
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 15%;
+    padding: 10px;
 }
 
-.story-settings .navigate-button {
-    text-align: center;
+.current-slide-box {
+    display: flex;
+    flex-direction: row;
+    width: 28%;
+    margin-bottom: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    position: absolute;
+    left: 70%;
+    bottom: 15%;
+    padding: 10px;
+}
+.current-slide-box div {
+    margin: auto;
+    display: flex;
+}
+
+.slides-settings {
+    width: 40%;
+    margin: 10px;
+    border-radius: 10px;
+    padding: 10px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    background-color: #fff;
+}
+
+.slides-settings-hide {
+    display: flex;
+    width: 30%;
+    left: 35%;
+    margin: 10px;
+    background-color: #fff;
+    border-radius: 10px;
+    position: absolute;
+    bottom: 15%;
+    padding: 10px;
+}
+
+.story-settings .title label, .story-settings .description label {
+    font-weight: bold;
 }
 
 .story-settings .description textarea {
     height: 150px;
+}
+
+.storymap-controls .hide-button {
+    position: absolute;
+    left: 89%;
+    top: 1%;
+}
+
+.storymap-controls .section-title {
+    margin: 0 0 15px 0;
+}
+
+.story-settings-hide {
+    display: flex;
+}
+
+.story-settings-hide .section-title, .slides-settings-hide .section-title {
+    margin: 0 0 0 15px;
+}
+
+.story-settings-hide .show-button, .slides-settings-hide .show-button {
+    margin-left: auto;
+}
+
+.slides-settings .slide-panel {
+    width: 100%;
+}
+
+.slides-settings .slide h2::before {
+    background: none;
+    content: none;
+}
+
+.slides-settings .slide-panel .layer {
+    border-radius: 10px;
+    padding: 10px;
+    margin: 0 0 5px 0;
+    cursor: pointer;
+}
+
+.slides-settings .slide-panel .layers {
+    display: flex;
+    flex-direction: column;
+}
+
+.slides-settings .slide-panel .layer p {
+    font-size: 12px;
+    margin: 2px 10px;
+}
+
+.slides-settings .add-button, .slides-settings .lock-location-button, .slides-settings .preview-button {
+    margin-top: 15px;
+    width: 100%;
+    background: rgb(240, 240, 240);
+}
+
+.slides-settings .add-button:focus, .slides-settings .lock-location-button:focus, .slides-settings .preview-button:focus {
+    background: rgb(240, 240, 240);
+}
+
+.slides-settings .add-button div, .slides-settings .lock-location-button div, .slides-settings .preview-button div {
+    margin: auto;
+    display: flex;
+}
+
+.slides-settings .add-button svg, .slides-settings .lock-location-button svg, .slides-settings .preview-button svg {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 5px;
+}
+
+.slides-settings .add-button p, .slides-settings .lock-location-button p, .slides-settings .preview-button p {
+    margin: 0 0 0 5px;
+}
+
+.slides-settings .remove-button {
+    margin-top: 15px;
+    width: 100%;
+    background: rgb(255, 116, 116);
+}
+
+.slides-settings .remove-button:focus {
+    background: rgb(255, 116, 116);
+}
+
+.slides-settings .remove-button div {
+    margin: auto;
+    display: flex;
+}
+
+.slides-settings .remove-button svg {
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-right: 5px;
+}
+
+.slides-settings .remove-button p {
+    margin: 0 0 0 5px;
+}
+
+.slides-settings .lock-location-button {
+    margin-top: 40px;
+}
+
+.slides-settings .slides-container {
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.search-adress-input {
+    position: absolute;
+    top: 0;
+    left: 10px;
+}
+
+.tooltip {
+    border-radius: 10px;
+    background-color: white;
+    padding: 10px;
+    display: none !important;
+}
+
+.lock-location-button:hover ~ .tooltip {
+    display: block !important;
 }

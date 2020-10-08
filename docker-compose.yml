@@ -17,6 +17,7 @@ services:
     volumes:
       - ./wp-content:/var/www/html/wp-content
       - ./src:/var/www/html/wp-content/plugins/jeo
+      - ./wp-content:/var/www/html/wp-content/
 
   mariadb:
     image: mariadb:10.4

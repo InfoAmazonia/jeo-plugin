@@ -9,7 +9,6 @@ module.exports = {
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
 		mapBlocks: './src/js/src/map-blocks/index.js',
-		storymap: './src/js/src/map-blocks/storymap.js',
 		layersSidebar: './src/js/src/layers-sidebar/index.js',
 		mapsSidebar: './src/js/src/maps-sidebar/index.js',
 		postsSidebar: './src/js/src/posts-sidebar/index.js',

@@ -49,6 +49,7 @@ class Jeo {
 		\jeo_layer_types();
 		\jeo_legend_types();
 		\jeo_sidebars();
+		\jeo_storymap();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
@@ -169,7 +170,7 @@ class Jeo {
 		wp_enqueue_script( 'mapboxgl-loader' );
 
 		if ( is_singular() || get_query_var('jeo_embed') === 'map' ) {
-			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'jquery' ) );
+			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'jquery', 'wp-element' ), false, true);
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/css/jeo-map.css', time() );
 			wp_localize_script(
 				'jeo-map',
@@ -218,11 +219,11 @@ class Jeo {
 
 		if( get_query_var( 'jeo_embed' ) === 'map' ) {
 
-			$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( $_GET['map_id'] ) : false;	
+			$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( $_GET['map_id'] ) : false;
 			if ( $map_id ) {
 				$map_meta = get_post_meta($map_id);
 				$args = (array) maybe_unserialize($map_meta['related_posts'][0]);
-				
+
 				$args['per_page'] = 1;
 				$request = new WP_REST_Request( 'GET', '/wp/v2/posts');
 				$request->set_query_params( $args );
@@ -245,7 +246,7 @@ class Jeo {
 				$map_style = "width: ${map_width}px; height: ${height}px;";
 				$container_style = "width: ${full_width}px; height: ${height}px;";
 				$popup_style = "width: ${popup_width}px; height: ${height}px;";
-				
+
 				require JEO_BASEPATH . '/templates/embed.php';
 
 				exit();
