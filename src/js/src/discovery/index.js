@@ -168,7 +168,7 @@ class Discovery extends Component {
 		// console.log(generatedUrl);
 
 		return (
-			<div className={ 'discovery' + ( this.props.embed ? ' embed' : '' ) }>
+			<div className={ 'discovery-block' + ( this.props.embed ? ' embed' : '' ) }>
 				{ ! this.state.mapLoaded && ! this.props.embed ? (
 					<div className="placeholder animated-background" />
 				) : (
@@ -297,6 +297,6 @@ if ( document.querySelector( '.discovery-embed' ) ) {
 } else {
 	wp.element.render(
 		<Discovery useStories={ true } />,
-		document.getElementById( 'post-10' )
+		document.getElementById( 'discovery' )
 	);
 }

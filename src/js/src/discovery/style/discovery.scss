@@ -1,10 +1,11 @@
 $primary: green;
 
-.discovery {
+.discovery-block {
 	position: relative;
 	display: grid;
 	grid-template-columns: 30% auto;
-	height: calc( 100vh - 130px );
+	height: calc( 100vh );
+	overflow: hidden;
 
 	// discovery embed class is parent of current reference (&)
 	.discovery-embed & {
