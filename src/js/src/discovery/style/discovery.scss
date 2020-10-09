@@ -398,6 +398,8 @@ $primary: green;
 					margin-left: -30px;
 					padding: 16px 30px;
 					transition: all 0.2s ease-in-out;
+					display: block;
+    				text-decoration: none;
 
 					&:not( .no-thumb ) {
 						display: grid;

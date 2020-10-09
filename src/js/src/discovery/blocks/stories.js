@@ -644,8 +644,13 @@ class Storie extends Component {
 			finalCategories = categoriesRender;
 		}
 
+		console.log(story);
+
 		return (
-			<div
+			<a
+				href={ story.link }
+				target="_blank"
+				rel="noreferrer"
 				className={
 					'card' + ( ! story.queriedFeaturedImage ? ' no-thumb' : '' )
 				}
@@ -666,7 +671,7 @@ class Storie extends Component {
 
 					<div className="date">{ storyDate }</div>
 				</div>
-			</div>
+			</a>
 		);
 	}
 }
