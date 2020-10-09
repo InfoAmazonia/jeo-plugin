@@ -263,61 +263,48 @@ div.jeomap {
 	font-size: 2.2rem;
 }
 
-/* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container a.more-info-button {
-	/*background: white;*/
-	background: var(--jeo_more-bkg-color);
-	/*color: #555D66;*/
-	color: var(--jeo_more-color);
+	background: white;
+	color: #555D66;
 	margin: 20px auto 20px auto;
-	/* padding: 5px 10px;*/
-	padding: 3px;
-	border-radius: 5px;
+	border: 2px solid #555D66;
+	padding: 5px 10px;
 	text-decoration: none;
 	text-align: center;
 	cursor: pointer;
 	width: calc(100% - 40px);
 	display: block;
+	font-size: 16px;
 	font-weight: bold;
 	transition: all .1s ease-in-out;
-	text-transform: uppercase;
 }
 
-/* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container a.more-info-button:hover {
-	background-color: var(--jeo_more-bkg-color-darker-15);
-	color: var(--jeo_more-color);
+	/* background: #555D66;*/
+	color: #555D66;
 	transition: all .1s ease-in-out;
 }
 
-/* JEO SETTINGS: This css use jeo settings*/
 .jeomap .mapboxgl-popup-close-button {
 	/* padding: 1rem 2rem; */
 	position: absolute;
     right: 5px;
     top: 5px;
+    border: 0;
     border-radius: 0px;
     cursor: pointer;
     width: 30px;
     height: 30px;
     display: block;
 	padding: 0px;
+	color: #555D66;
 	font-size:25px;
-	/* background: #555D66;*/
-	background: var(--jeo_close-bkg-color);
-	/*color: #555D66;*/
-	color: var(--jeo_close-color);
+	/* background: #555D66; */
 }
 
 .jeomap .mapboxgl-popup-close-button:hover {
+	/* background-color: #bf1e49fa; */
 	text-decoration: none;
-}
-
-
-.jeomap .mapboxgl-popup-close-button span {
-    font-size: 35px;
-    font-weight: 100;
-	line-height: 25px;
 }
 
 .map-content-layers-list {
@@ -351,6 +338,16 @@ nav .layer-selection-title .legends-title {
 	font-size: 16px;
 	font-weight: bold;
 	transition: all .2 ease-in-out;
+}
+
+.jeomap .mapboxgl-popup-close-button span {
+    font-size: 49px;
+    font-weight: 100;
+	line-height: 23px;
+}
+
+.jeomap .mapboxgl-popup-close-button {
+	background: none;
 }
 
 .map-content-layers-list a.download-source:hover{

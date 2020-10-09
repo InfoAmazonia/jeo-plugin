@@ -23,7 +23,7 @@ class Settings {
 		add_action('admin_menu', [$this, 'add_menu_item']);
 		add_action('admin_init', [$this, 'admin_init']);
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
-		add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );
+
 	}
 
 	public function get_option( $option_name ) {
@@ -86,5 +86,10 @@ class Settings {
 	public function admin_page() {
 		include 'settings-page.php';
 	}
+
+
+
+
+
 
 }
