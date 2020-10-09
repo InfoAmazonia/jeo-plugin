@@ -259,7 +259,7 @@ class StoryMapDisplay extends Component {
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
 								{ this.state.postData && (
 									<>
-										<p className="storymap-page-title">{ this.state.postData.title.rendered }</p>
+										<h1 className="storymap-page-title">{ this.state.postData.title.rendered }</h1>
 										<div className="post-info">
 											{ /*<p className="author" >{ 'Authors' }</p> */ }
 											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDay() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
