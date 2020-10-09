@@ -38,6 +38,7 @@ const decodeHtmlEntity = function ( str ) {
 class StoryMapDisplay extends Component {
     constructor( props ) {
 		super( props );
+
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
 			slides.push( {
@@ -431,30 +432,27 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 	
     return (
 		<>
-			{ ! isLastChapter && (
-				<>
-					{ title || description && (
-						<div id={ id } className={ classList }>
-							<div className={ theme }>
-								{ title &&
-									<h3 className="title">{ title }</h3>
-								}
-								{ image &&
-									<img src={ image } alt={ title }></img>
-								}
-								{ description &&
-									<p dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } }></p>
-								}
-							</div>
-						</div>
-					) }
-					{ ! title && ! description && (
-						<div id={ id } className={ classList } style={ { visibility: 'hidden' } }>
-							<div className={ theme }>
-							</div>
-						</div>
-					) }
-				</>
+			{ ! isLastChapter && ( title || description ) && (
+				<div id={ id } className={ classList }>
+					<div className={ theme }>
+						{ title &&
+							<h3 className="title">{ title }</h3>
+						}
+						{ image &&
+							<img src={ image } alt={ title }></img>
+						}
+						{ description &&
+							<p dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } }></p>
+						}
+					</div>
+				</div>
+			) }
+			{ ! isLastChapter && ! title && ! description && (
+				<div id={ id } className={ classList } style={ { visibility: 'hidden' } }>
+					<div className={ theme }>
+						<h3 className="title">{ `Slide ${ index + 1 }` }</h3>
+					</div>
+				</div>
 			) }
 			{ isLastChapter && props.navigateButton && (
 				<div id={ id } className={ classList }>
