@@ -6,8 +6,7 @@ const decodeHtmlEntity = function ( str ) {
 	} );
 };
 
-
-class JeoMap {
+export default class JeoMap {
 	constructor( element ) {
 		this.element = element;
 		this.args = element.attributes;
@@ -162,6 +161,10 @@ class JeoMap {
 					'.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])'
 				).remove();
 			} );
+<<<<<<< HEAD
+=======
+
+>>>>>>> 70b1527aa84457d2876ba627791efeb03d3f54f3
 		window.map = map;
 	}
 
@@ -748,4 +751,12 @@ class JeoMap {
 			.find( '.legend-for-' + layer_id )
 			.hide();
 	}
+<<<<<<< HEAD
 }
+=======
+
+	forceUpdate() {
+		this.map.resize();
+	}
+}
+>>>>>>> 70b1527aa84457d2876ba627791efeb03d3f54f3

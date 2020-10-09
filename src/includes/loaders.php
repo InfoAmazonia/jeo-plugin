@@ -15,7 +15,7 @@ function jeo_autoload($class_name) {
 
 	$filename = 'class-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
 
-	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu'];
+	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization'];
 
 	foreach ($folders as $folder) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -100,6 +100,14 @@ function jeo_menu() {
 }
 
 /**
+ * Gets the instance of the Storymap
+ * @return \Storymap Storymap instance
+ */
+function jeo_storymap() {
+	return \Jeo\Storymap::get_instance();
+}
+
+/**
  * Returns the URL to a JEO template file
  *
  * It can be overriden by a `jeo_get_template` filter, that receives two parameters:
@@ -160,6 +168,117 @@ function jeo_register_embedder($id, $base_url) {
 	};
 
 	wp_embed_register_handler($id, $regex, $embedder);
+}
+
+/* New JEO Plugin Settings */
+function jeo_custom_settings_css() {
+	$theme_css = '';
+	if (!empty(sanitize_text_field(\jeo_settings()->get_option( 'jeo_typography-name' ) ))) {
+		$jeo_font = wp_kses(\jeo_settings()->get_option( 'jeo_typography-name'), null );
+
+		$theme_css .= '
+		.jeomap .legend-container a.more-info-button  {
+			font-family: "' . $jeo_font . '", "sans-serif";
+		}
+		:root {
+			--jeo-font: "' . $jeo_font . '", "sans-serif";
+		}
+		';
+	}
+
+
+	if (!empty(sanitize_text_field(\jeo_settings()->get_option( 'jeo_typography-name' ) ))) {
+		$jeo_font = wp_kses(\jeo_settings()->get_option( 'jeo_typography-name'), null );
+
+		$theme_css .= '
+		.jeomap .legend-container a.more-info-button  {
+			font-family: "' . $jeo_font . '", "sans-serif";
+		}
+		';
+	}
+
+	if (!empty(\jeo_settings()->get_option( 'jeo_more-font-size', '1'))) {
+		$jeo_info_font_size = \jeo_settings()->get_option('jeo_more-font-size', '1');
+		$font_unit = 'rem';
+
+		$theme_css .= '
+		.jeomap div.legend-container a.more-info-button {
+			font-size: ' . $jeo_info_font_size . $font_unit . ';
+		}';
+	}
+
+	$css_variables = "";
+	if (!empty(\jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff'))) {
+		$colorMoreBkg =\jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff');
+
+		$color_css = '--jeo_more-bkg-color: '. $colorMoreBkg . ';';
+		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo($colorMoreBkg, -0.15) . ';';
+		$css_variables .= $color_css . ' ' . $color_css_hover;
+	}
+
+	if (!empty(\jeo_settings()->get_option( 'jeo_more-color', '#555D66'))) {
+		$color =\jeo_settings()->get_option( 'jeo_more-color', '#555D66');
+		$color_css = '--jeo_more-color: '. $color . ';';
+		$css_variables .= $color_css;
+	}
+
+
+	if (!empty(\jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff'))) {
+		$color =\jeo_settings()->get_option('jeo_close-bkg-color', '#fff');
+		$color_css = '--jeo_close-bkg-color: '. $color . ';';
+		$css_variables .= $color_css;
+	}
+
+	if (!empty(\jeo_settings()->get_option( 'jeo_close-color', '#555D66'))) {
+		$color =\jeo_settings()->get_option('jeo_close-color', '#555D66');
+		$color_css = '--jeo_close-color: '. $color . ';';
+		$css_variables .= $color_css;
+	}
+
+	$theme_css .= '
+		:root {'.
+			$css_variables; '
+		}
+	';
+
+	return $theme_css;
+}
+function jeo_custom_settings_css_wrap() {
+	/*if (is_admin() || (!\jeo_settings()->get_option( 'jeo_typography') ) {
+		return;
+	}*/
+?>
+	<style type="text/css" id="custom-jeo-css">
+		<?php echo jeo_custom_settings_css(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		?>
+	</style>
+<?php
+}
+add_action('wp_head', 'jeo_custom_settings_css_wrap');
+
+function jeo_scripts_typography() {
+	if ( \jeo_settings()->get_option( 'jeo_typography' ) ) {
+		wp_enqueue_style( 'jeo-font', \jeo_settings()->get_option( 'jeo_typography' ) , array(), null );
+    }
+}
+add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );
+
+if (!function_exists("color_luminance_jeo")){
+	function color_luminance_jeo($hexcolor, $percent) {
+		if (strlen($hexcolor) < 6) {
+			$hexcolor = $hexcolor[0] . $hexcolor[0] . $hexcolor[1] . $hexcolor[1] . $hexcolor[2] . $hexcolor[2];
+		}
+		$hexcolor = array_map('hexdec', str_split(str_pad(str_replace('#', '', $hexcolor), 6, '0'), 2));
+
+		foreach ($hexcolor as $i => $color) {
+			$from = $percent < 0 ? 0 : $color;
+			$to = $percent < 0 ? $color : 255;
+			$pvalue = ceil(($to - $from) * $percent);
+			$hexcolor[$i] = str_pad(dechex($color + $pvalue), 2, '0', STR_PAD_LEFT);
+		}
+
+		return '#' . implode($hexcolor);
+	}
 }
 
 // Load template for discovery

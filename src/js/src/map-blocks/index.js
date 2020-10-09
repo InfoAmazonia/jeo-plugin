@@ -4,9 +4,7 @@ import MapDisplay from './map-display';
 import MapEditor from './map-editor';
 import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
-import StorymapDisplay from './storymap-display';
 import StorymapEditor from './storymap-editor'
-
 import MapIcon from '../icons/ion/map';
 
 registerBlockType( 'jeo/map', {
@@ -120,9 +118,6 @@ registerBlockType( 'jeo/storymap', {
 		map_id: {
 			type: 'number',
 		},
-		title: {
-			type: 'string',
-		},
 		description: {
 			type: 'string',
 		},
@@ -132,7 +127,38 @@ registerBlockType( 'jeo/storymap', {
 		navigateButton: {
 			type: 'boolean',
 		},
+		hasIntroduction: {
+			type: 'boolean',
+		},
+		loadedLayers: {
+			type: 'array',
+		},
+		navigateMapLayers: {
+			type: 'array'
+		},
+		postID : {
+			type: 'number',
+		},
 	},
 	edit: ( props ) => <StorymapEditor { ...props } />,
-	save: ( props ) => <StorymapDisplay { ...props } />,
+	save: ( props ) => {
+		const attributesStructure = {
+			map_id: null,
+			description: null,
+			slides: null,
+			navigateButton: null,
+			hasIntroduction: null,
+			loadedLayers: null,
+			navigateMapLayers: null,
+			postID: null,
+		};
+
+		for (const key in attributesStructure) {
+			if(props.attributes[key]) {
+				attributesStructure[key] = props.attributes[key];
+			}
+		}
+
+		return <div id="story-map" data-properties={ JSON.stringify(attributesStructure) } />
+	},
 } );
