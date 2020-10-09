@@ -61,6 +61,8 @@ const MapEditor = ( {
 	}
 
 	const flyTo = ( map, location ) => {
+		console.log(location.lon)
+		console.log(location.lat)
 
 		map.flyTo({
 			center: [
