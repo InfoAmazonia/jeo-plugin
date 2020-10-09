@@ -1,0 +1,257 @@
+body {
+    margin:0; 
+    padding:0; 
+    font-family: sans-serif;
+}
+
+a, a:hover, a:visited {
+    color: #0071bc;
+}
+
+.story-map .not-navigating-map .mapboxgl-map {
+    height: 100%;
+    width:100%;
+    position: fixed;
+    left: 0;
+    z-index: -5;
+    top: 0;
+}
+
+#header {
+    width: 600px;
+    padding: 2vh;
+    text-align: center;
+    background: none;
+    color: white;
+    margin: auto auto 0px auto;
+}
+
+@media(max-width: 650px) {
+    #header {
+        width: unset;
+    }  
+}
+
+#header .post-info {
+    filter: drop-shadow(0px 0px 4px black);
+    position: relative;
+    display: flex;
+    flex-direction: row;
+}
+
+#header .post-info .author {
+    margin-right: auto
+}
+
+#header .post-info .date {
+    margin-left: auto;
+}
+
+#header .storymap-title {
+    position: relative;
+    font-weight: bold;
+    font-size: 35px;
+}
+
+#header .storymap-description{
+    filter: drop-shadow(0px 0px 4px black);
+    font-size: 25px;
+    position: relative;
+}
+
+#footer {
+    width: 100%;
+    min-height: 5vh;
+    padding-top: 2vh;
+    padding-bottom: 2vh;
+    text-align: center;
+    line-height: 25px;
+    font-size: 13px;
+}
+
+#features {
+    padding-top: 10vh;
+    padding-bottom: 10vh;
+    z-index: 100;
+}
+
+.centered {
+    width: 50vw;
+    margin: 0 auto;
+}
+
+.lefty {
+    width: 33vw;
+    margin-left: 5vw;
+}
+
+.righty {
+    width: 33vw;
+    margin-left: 62vw;
+}
+
+.light {
+    color: #0A0A0A;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+}
+
+.dark {
+    color: #fafafa;
+    background-color: #444;
+}
+
+.step {
+    padding-bottom: 50vh;
+    /* margin-bottom: 10vh; */
+    opacity: 0.25;
+}
+
+.step.active {
+    opacity: 0.99;
+}
+
+.step div {
+    padding:  25px 50px;
+    line-height: 25px;
+    font-size: 13px;
+}
+
+.step img {
+    width: 100%;
+}
+
+@media (max-width: 750px) {
+    #features {
+        width: 90vw;
+        margin: 0 auto;
+    }
+}
+
+.navigate-button-display, .storymap-start-button {
+    background-color: #59811A;
+    color: white;
+    border-radius: 10px;
+    width: 237px;
+    height: 62px;
+    font-weight: bold;
+    font-size: 14px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.storymap-start-button {
+    position: relative;
+    margin-top: 20px;
+}
+
+.storymap-page-title {
+    filter: drop-shadow(0px 0px 4px black);
+
+    font-weight: bold;
+    font-size: 50px;
+    position: relative;
+}
+
+.skip-intro-link {
+    filter: drop-shadow(0px 0px 4px black);
+    position: relative;
+    font-weight: bold;
+    margin-top: 5px;
+    color: white;
+    opacity: 30%;
+    font-size: 18px;
+    text-decoration: underline;
+}
+
+.skip-intro-link:hover {
+    cursor: pointer;
+    text-decoration: unset;
+}
+
+.return-to-slides-container {
+    filter: drop-shadow(0px 0px 4px black);
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    bottom: 0;
+    z-index: 1;
+}
+
+.return-to-slides-container p {
+    text-decoration: underline;
+    color: white;
+    text-align: center;
+    font-size: 21px;
+    font-weight: bold;
+}
+
+.return-to-slides-container p:hover {
+    text-decoration: unset;
+    cursor: pointer
+}
+
+.skip-intro-icon {
+    filter: drop-shadow(0px 0px 4px black);
+}
+
+.skip-intro-icon svg, .return-to-slides-container .icon svg {
+    display: block;
+    margin: auto;
+    width: 11px;
+}
+
+.return-to-slides-container .icon {
+    display: flex;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    border: 1px solid white;
+    margin: auto;
+    background-color: rgba(255,255,255,0.3);
+}
+
+.return-to-slides-container .icon:hover, .skip-intro-icon:hover {
+    opacity: 0.7;
+    cursor: pointer
+}
+
+.layers-selection {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    width: 170px;
+}
+
+.layers-selection .layers-wrapper .layer {
+    display: flex;
+    background-color: white;
+    border-bottom: 1px solid #b0b2b4;
+    padding: 7px;
+    font-size: 13px;
+    color: #404040;
+    align-items: center;
+}
+
+.layers-selection .layers-wrapper .layer input {
+    margin-right: 10px;
+}
+
+.layers-selection-icon {
+    width: 11px;
+}
+
+.navigate-map .mapboxgl-map .mapboxgl-canvas-container canvas, .navigate-map .mapboxgl-map {
+    width: 100vw !important;
+    height: 95vh !important; 
+}
+.single-storymap  #content {
+    margin: 0;
+}
+
+.story-map #features .title {
+    margin-top: 0;
+}
