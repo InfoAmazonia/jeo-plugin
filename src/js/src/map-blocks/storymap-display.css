@@ -251,3 +251,7 @@ a, a:hover, a:visited {
 .single-storymap  #content {
     margin: 0;
 }
+
+.story-map #features .title {
+    margin-top: 0;
+}
