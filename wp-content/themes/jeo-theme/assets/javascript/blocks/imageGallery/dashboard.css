@@ -1,0 +1,85 @@
+.image-gallery {
+
+}
+
+.image-gallery .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 0.625rem;
+}
+
+.image-gallery .gallery-item-container {
+    display: block;
+    height: 0;
+    padding-top: 56.25%;
+    overflow: hidden;
+    position: relative;
+    border-radius: 5px;
+}
+
+.image-gallery .gallery-item-container img {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+}
+
+.image-gallery .remove-item {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: white;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+.image-gallery .select-images-button.is-button.is-default.is-large {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid #00000021;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.image-gallery .dashicons.dashicons-plus {
+    background: #333;
+    width: 25px;
+    height: 25px;
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border-radius: 50%;
+    padding-right: 2px;
+    padding-top: 2px;
+    transition: all .2s ease;
+}
+
+.image-gallery span.rich-text.description-field {
+    top: 0;
+    left: 0;
+    position: absolute;
+    padding: 10px 45px 10px 15px;
+    width: 100%;
+    color: white;
+    background:  rgba(0, 0, 0, 0.6);
+    font-size:14px;
+}
+
+.image-gallery span.rich-text.credit-field {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    color: white;
+    padding: 10px 15px;
+    background:  rgba(0, 0, 0, 0.6);
+    font-size: 14px;
+}

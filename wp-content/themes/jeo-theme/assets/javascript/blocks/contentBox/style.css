@@ -1,0 +1,10 @@
+.content-box--text {
+    background-color: #f5f5f5;
+    border: 1px solid #f5f5f5;
+    padding: 1px 25px;
+}
+
+.content-box--text h3 {
+    text-transform: uppercase;
+}
+

@@ -1,0 +1,54 @@
+.post-type-archive  {
+    header.page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+
+        @include tablet {
+            flex-direction: column;
+        }
+
+        .taxonomy-description {
+            max-width: 427px;
+            color: #0A0A0A;
+            font-size: size(18);
+            letter-spacing: 0;
+            line-height: size(22);
+            font-style: normal;
+            text-align: right;
+
+            @include tablet {
+                text-align: left;
+            }
+        }
+    }
+
+    main#main.site-main {
+        width: 100%;
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 31px;
+
+            @include tablet {
+                grid-template-columns: auto;
+            }
+
+            .project-card {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.dark-theme {
+    &.post-type-archive  {
+        header.page-header {    
+            .taxonomy-description {
+                color: white;
+                opacity: 0.7;
+            }
+        }
+    }
+}

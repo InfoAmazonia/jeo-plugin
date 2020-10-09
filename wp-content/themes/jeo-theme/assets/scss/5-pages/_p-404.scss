@@ -1,0 +1,23 @@
+.error-404 {
+    margin: 40px 20px;
+    text-align: center;
+
+    .button {
+        font-size: size(14);
+        text-transform: uppercase;
+        background: #333;
+        color: #fff;
+
+        &:hover {
+            background: #0A0A0A;
+            color: #fff
+        }
+    }
+}
+
+.dark-theme {
+    .error-404 {
+        color: white;
+
+    }
+}

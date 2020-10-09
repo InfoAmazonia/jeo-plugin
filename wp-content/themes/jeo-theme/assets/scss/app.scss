@@ -1,0 +1,63 @@
+@import '2-atoms/a-mixins';
+
+
+/* ----- 1: SETTINGS ------- */
+@import '1-settings/s-variables';
+@import '1-settings/s-typography';
+@import '1-settings/s-globals';
+
+
+/* ----- 2: ATOMS ------- */
+@import '2-atoms/a-spacing';
+@import '2-atoms/a-typography';
+
+
+/* ----- 3: LAYOUT ------- */
+@import '3-layout/l-header';
+@import '3-layout/l-footer';
+@import '3-layout/l-pagination';
+@import '3-layout/l-comments';
+
+/* ----- 4: COMPONENTS ------- */
+//@import '4-components/c-forms';
+@import '4-components/c-sorry-said-wrong';
+@import '4-components/c-pullquote-block';
+@import '4-components/c-credited-image-block';
+@import '4-components/c-audio-player';
+@import '4-components/c-jeomap';
+@import '4-components/c-cookies';
+@import '4-components/c-article-block';
+@import '4-components/c-project-card';
+
+
+/* ----- 5: PAGES ------- */
+@import '5-pages/p-single';
+@import '5-pages/p-search';
+@import '5-pages/p-author';
+@import '5-pages/p-archive';
+@import '5-pages/p-archive-project';
+@import '5-pages/p-404';
+@import '5-pages/p-home';
+@import '5-pages/p-page';
+@import '5-pages/p-category';
+@import '5-pages/p-contact';
+@import '5-pages/p-about-us';
+
+
+/* ----- 6: WIDGETS ------- */
+@import '6-widgets/w-most-read';
+@import '6-widgets/w-story-maps';
+@import '6-widgets/w-newsletter';
+@import '6-widgets/w-image-gallery';
+@import '6-widgets/w-video-gallery';
+@import '6-widgets/w-embed-template';
+@import '6-widgets/w-credited-image-block';
+@import '6-widgets/w-team-block';
+@import '6-widgets/w-link-dropdown';
+@import '6-widgets/w-content-box';
+@import '6-widgets/w-tooltip';
+
+
+/* ----- 7: VENDORS ------- */
+@import './../vendor/sss/sss.css';
+@import './../vendor/select2/select2.min.css'
