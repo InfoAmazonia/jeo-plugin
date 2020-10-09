@@ -1,0 +1,114 @@
+@keyframes scaleItUp {
+    0% {
+        transform: scale(0);
+        -webkit-transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1.0);
+        -webkit-transform: scale(1.0);
+    }
+}
+
+
+.credited-image-block {
+    .image-block-container {
+        position: relative;
+    }
+
+    .margin-auto {
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+
+    .image-wrapper {
+        img {
+            width: 100%;
+        }
+
+        position: relative;
+    }
+
+    .image-button {
+        margin-bottom: 30px;
+    }
+
+    .image-description {
+        opacity: 0.5;
+        font-size: 14px;
+        letter-spacing: 0;
+        line-height: 18px;
+        text-align: center;
+        font-family: var(--primary-font);
+        margin-top: 11px;
+    }
+
+    .image-icon {
+        color: rgba(25, 30, 35, 0.7);
+        background: rgba(255, 255, 255, 0.7);
+        padding: 6px;
+        display: flex;
+        border-radius: 50%;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        transition: all .2s ease-in-out;
+        cursor: pointer;
+        width: fit-content;
+    }
+
+    .image-meta {
+        display: flex;
+        flex: 1;
+        font-size: 14px;
+        letter-spacing: 0;
+        padding-right: 20px;
+        align-items: center;
+        font-family: var(--primary-font);
+        animation: scaleItUp 0.2s ease-in-out 1 alternate;
+    }
+
+    .image-info-wrapper {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+        transition: all .2s ease-in-out;
+        border-radius: 20px;
+        padding: 0 0px 0 20px;
+        margin-bottom: 8px;
+        margin-right: 5px;
+    }
+}
+
+.image-description-toggle {
+    color: rgba(25, 30, 35, 0.7);
+    background: rgba(255, 255, 255, 0.7);
+    padding: 6px;
+    display: flex;
+    border-radius: 50%;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    transition: all .2s ease-in-out;
+    cursor: pointer;
+    width: fit-content;
+}
+
+.credited-image-block.active {
+    .image-info-wrapper {
+        color: rgba(25, 30, 35, 0.70);
+        background: rgba(255, 255, 255, 0.7);
+    }
+
+    .image-icon {
+        background: transparent;
+    }
+
+    .image-description-toggle {
+        background: transparent;
+    }
+}

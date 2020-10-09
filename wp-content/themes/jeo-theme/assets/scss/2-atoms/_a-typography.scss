@@ -1,0 +1,58 @@
+@each $font-size in (8,11,13,14,15,16,17,18,20,24,26,30,32,40,42,50,60) {
+    .fz-#{$font-size} {
+        font-size: #{$font-size}px !important;
+    }
+}
+
+@each $font-weight in (300, 400, 500, 600, 700, 800, 90) {
+    .fw-#{$font-weight} {
+        font-weight: #{$font-weight};
+    }
+}
+
+@each $line-height, $val in ("1-2":1.2,"1-6":1.6,"2":2) {
+    .lh-#{$line-height} {
+        line-height: #{$val}em;
+    }
+}
+
+@each $line-height in (17,21,38) {
+    .lh-#{$line-height} {
+        line-height: #{$line-height}px;
+    }
+}
+
+@each $letter-spacing in (1,2,3,4,5,6) {
+    .ls-#{$letter-spacing} {
+        letter-spacing: #{$letter-spacing}px;
+    }
+}
+
+.ta-r {text-align: right;}
+.ta-c {text-align: center;}
+.ta-l {text-align: left;}
+
+.ff-text {font-family: $f_body;}
+.ff-title{ font-family: $f_title !important }
+
+.bold, b {font-weight: 600;}
+.bolder {font-weight: 900;}
+.light {font-weight: 200;}
+.italic, i {font-style: italic;}
+
+.underline { text-decoration: underline; }
+.lowercase {text-transform: lowercase;}
+.uppercase {text-transform: uppercase !important;}
+.nocase {text-transform: none;}
+
+.text-primary{
+    color: $c_primary;
+}
+
+.text-white, .text-white:hover{
+    color: white;
+}
+
+.text-lightgray{
+    color: #888888 !important;  
+}

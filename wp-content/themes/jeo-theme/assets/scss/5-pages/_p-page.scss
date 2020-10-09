@@ -1,0 +1,38 @@
+.page-template {
+    header.entry-header {
+        display: none;
+    }
+
+    .site-content {
+        @include desktop{
+            margin-top: 0px;
+        }
+
+
+        @include tablet{
+            margin-top: 0px;
+        }
+    }
+
+    .entry .entry-content .wp-block-cover:first-child {
+        margin-top: 0px;
+    }
+}
+
+.dark-theme {
+    &.page:not(.home) {
+        h1, h2, h3, h4, h5 {
+            color: white;
+        }
+
+        #content {
+            .entry-content {
+                a {
+                    color: white;
+                    opacity: 0.6;
+                }
+            }
+        }
+    }
+}
+

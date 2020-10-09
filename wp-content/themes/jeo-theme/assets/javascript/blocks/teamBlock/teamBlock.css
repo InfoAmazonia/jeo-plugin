@@ -1,0 +1,8 @@
+.team-members > div  > .editor-block-list__layout.block-editor-block-list__layout {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.team-members .wp-block.editor-block-list__block.block-editor-block-list__block {
+    margin: initial;
+}

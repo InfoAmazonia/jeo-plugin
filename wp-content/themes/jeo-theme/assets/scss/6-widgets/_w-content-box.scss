@@ -1,0 +1,39 @@
+.content-box {
+    background-color: #F5F5F5;
+    border-radius: 20px;
+    padding: 28px 30px;
+    font-size: size(18);
+
+    &--title {
+        color: #555D66;
+        font-size: size(18);
+        font-weight: bold;
+        letter-spacing: 0;
+        line-height: size(24);
+        text-transform: uppercase;
+        margin-top: 0;
+        margin-bottom: 30px;
+    }
+
+    &--text {
+        color: #0A0A0A;
+        font-size: size(18);
+        letter-spacing: 0;
+        line-height: 32px;
+    }
+}
+
+.dark-theme {
+    .content-box {
+        background-color: rgba(238, 238, 238, 0.2);
+
+        &--title {
+            color: #F5F5F5;
+            opacity: 0.60;
+        }
+
+        &--text {
+            color: #F5F5F5;
+        }
+    }
+}

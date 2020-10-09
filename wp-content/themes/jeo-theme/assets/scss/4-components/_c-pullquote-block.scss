@@ -1,0 +1,118 @@
+.single {
+    .wp-block-pullquote {
+        blockquote {
+            text-align: left;
+        }
+    }
+
+    .wp-block-pullquote,
+    .wp-block-pullquote cite {
+        font-family: var(--featured_font);
+        color: inherit;
+    }
+}
+
+.wp-block-pullquote.alignleft.is-style-jeo,
+.wp-block-pullquote.alignleft.is-style-solid-color {
+
+    /* margin-left: 0px !important; */
+    p {
+        line-height: inherit;
+    }
+
+
+    @include mobile {
+        max-width: 100%;
+        /*float: none;
+        margin: 0px;*/
+    }
+}
+
+.wp-block-pullquote.alignright.is-style-jeo,
+.wp-block-pullquote.alignright.is-style-solid-color {
+
+    /* margin-right: 0px !important; */
+    p {
+        line-height: inherit;
+    }
+
+
+    @include mobile {
+        max-width: 100%;
+        /*float: none;
+        margin: 0px;*/
+    }
+}
+
+figure.wp-block-pullquote.alignright.has-background.is-style-solid-color,
+figure.wp-block-pullquote.alignright.is-style-solid-color {
+
+    /* margin-right: 0px; */
+    p {
+        padding: 90px 0px 30px !important;
+    }
+
+    @include mobile {
+        max-width: 100%;
+        /* float: none;
+        margin: 0px; */
+    }
+}
+
+figure.wp-block-pullquote.alignleft.has-background.is-style-solid-color,
+figure.wp-block-pullquote.alignleft.is-style-solid-color {
+
+    /* margin-left: 0px; */
+    p {
+        padding: 90px 0px 30px !important;
+    }
+
+    @include mobile {
+        max-width: 100%;
+        /* float: none;
+        margin: 0px; */
+    }
+}
+
+
+/* JEO STYLE */
+
+.wp-block-pullquote.is-style-jeo,
+.wp-block-pullquote.is-style-solid-color {
+    font-family: var(--featured_font);
+    /* padding: 1rem calc(2 * 1rem); */
+    padding: 30px !important;
+
+    blockquote {
+        margin: 0px;
+
+        p {
+            font-style: normal;
+            padding: 90px 0px 30px;
+            font-weight: normal;
+
+            &:first-of-type::before {
+                content: '\f10d';
+                font-family: 'Font Awesome 5 Free';
+                font-weight: 600;
+                font-size: size(60);
+                left: 2rem !important;
+                top: 40px;
+            }
+        }
+
+        cite {
+            font-family: var(--featured_font);
+            text-transform: none;
+
+            &::before {
+                margin-right: 1.875rem;
+            }
+        }
+
+        &::before,
+        &::after {
+            content: none;
+        }
+    }
+}

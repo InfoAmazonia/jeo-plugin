@@ -1,0 +1,609 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"POT-Creation-Date: 2020-08-18 13:02-0300\n"
+"PO-Revision-Date: 2020-08-18 13:03-0300\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: en_US\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 2.4.1\n"
+"X-Poedit-Basepath: ..\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Poedit-KeywordsList: __;_e;esc_html__;esc_html_e\n"
+"X-Poedit-SearchPath-0: languages\n"
+"X-Poedit-SearchPath-1: .\n"
+
+#: 404.php:17
+msgid "Error"
+msgstr ""
+
+#: 404.php:21
+msgid "Oops! That page can&rsquo;t be found."
+msgstr ""
+
+#: 404.php:24
+msgid "Back to the home"
+msgstr ""
+
+#: archive.php:15 archive.php:44
+msgid "Author"
+msgstr ""
+
+#: archive.php:86
+msgid "ABOUT THE AUTHOR"
+msgstr ""
+
+#: assets/javascript/blocks/imageBlock/index.js:82
+msgid "Upload Image"
+msgstr ""
+
+#: assets/javascript/blocks/imageBlock/index.js:82
+msgid "Replace image"
+msgstr ""
+
+#: assets/javascript/blocks/imageBlock/index.js:94
+msgid "Write a info here."
+msgstr ""
+
+#: assets/javascript/blocks/imageBlock/index.js:112
+msgid "Write a description here."
+msgstr ""
+
+#: assets/javascript/blocks/imageGallery/index.js:11
+msgid "Image Gallery"
+msgstr ""
+
+#: assets/javascript/blocks/imageGallery/index.js:15
+msgid "materialtheme"
+msgstr ""
+
+#: assets/javascript/blocks/imageGallery/index.js:16
+msgid "photos"
+msgstr ""
+
+#: assets/javascript/blocks/imageGallery/index.js:17
+msgid "images"
+msgstr ""
+
+#: assets/javascript/blocks/imageGallery/index.js:91
+msgid "Type here your description"
+msgstr ""
+
+#: assets/javascript/blocks/imageGallery/index.js:108
+msgid "Type the credits here"
+msgstr ""
+
+#: assets/javascript/blocks/imageGallery/index.js:128
+msgid "Type a title"
+msgstr ""
+
+#: assets/javascript/blocks/newsletter/index.js:66
+msgid "Select newsletter type:"
+msgstr ""
+
+#: assets/javascript/blocks/newsletter/index.js:76
+msgid "Add custom css:"
+msgstr ""
+
+#: assets/javascript/blocks/newsletter/index.js:87
+msgid "Title"
+msgstr ""
+
+#: assets/javascript/blocks/newsletter/index.js:98
+msgid "Subtitle"
+msgstr ""
+
+#: assets/javascript/blocks/newsletter/index.js:114
+msgid "Adicional Information"
+msgstr ""
+
+#: classes/class-newspack-style-packs-core.php:178
+msgid "Style Packs"
+msgstr ""
+
+#: classes/class-newspack-style-packs-core.php:194
+#: classes/class-newspack-style-packs-core.php:366
+msgid "Default"
+msgstr ""
+
+#: classes/class-newspack-style-packs-core.php:199
+msgid "Active Style"
+msgstr ""
+
+#: classes/class-newspack-walker-comment.php:52
+#, php-format
+msgid "%s <span class=\"screen-reader-text says\">says:</span>"
+msgstr ""
+
+#: classes/class-newspack-walker-comment.php:64
+msgid "Article author"
+msgstr ""
+
+#: classes/class-newspack-walker-comment.php:77
+#, php-format
+msgid "%1$s at %2$s"
+msgstr ""
+
+#: classes/class-newspack-walker-comment.php:85
+msgid "Edit"
+msgstr ""
+
+#: classes/class-newspack-walker-comment.php:90
+msgid "Your comment is awaiting moderation."
+msgstr ""
+
+#: classes/library_related-posts.php:13
+msgid "Posts Relacionados"
+msgstr ""
+
+#: classes/library_related-posts.php:28
+msgid "Usar posts relacionados"
+msgstr ""
+
+#: classes/library_related-posts.php:33
+msgid "Peso das tags"
+msgstr ""
+
+#: classes/library_related-posts.php:39
+msgid "Peso das categorias"
+msgstr ""
+
+#: classes/library_related-posts.php:45
+msgid "Peso das datas"
+msgstr ""
+
+#: comments.php:33
+msgid "1 comment found. See comment"
+msgstr ""
+
+#: comments.php:33
+#, php-format
+msgid "%s comments found. See comments"
+msgstr ""
+
+#: comments.php:35
+msgid "There are no comments yet. Leave a comment!"
+msgstr ""
+
+#: comments.php:44 comments.php:69 comments.php:124
+msgid "Leave a comment"
+msgstr ""
+
+#: comments.php:111
+msgid "Comments"
+msgstr ""
+
+#: comments.php:114
+msgid "Previous"
+msgstr ""
+
+#: comments.php:115
+msgid "Next"
+msgstr ""
+
+#: comments.php:140
+msgid "Comments are closed."
+msgstr ""
+
+#: footer.php:39
+msgid "https://wordpress.org/"
+msgstr ""
+
+#: footer.php:42
+#, php-format
+msgid "Proudly powered by %s."
+msgstr ""
+
+#: header-single.php:41 header.php:42
+msgid "Skip to content"
+msgstr ""
+
+#: header-single.php:55 header-single.php:63 header-single.php:76
+#: header-single.php:110 header-single.php:144 header-single.php:225
+#: header-single.php:260 header.php:63 header.php:96 header.php:106
+#: header.php:142 header.php:176 header.php:257 header.php:293
+msgid "Menu"
+msgstr ""
+
+#: header.php:51 template-parts/header/header-search.php:20
+msgid "What are you looking for?"
+msgstr ""
+
+#: header.php:320 template-parts/header/header-search.php:11
+msgid "Close Search"
+msgstr ""
+
+#: header.php:320 header.php:321 template-parts/header/header-search.php:11
+#: template-parts/header/header-search.php:12
+msgid "Open Search"
+msgstr ""
+
+#: inc/child-customizer.php:29
+msgid "Background color"
+msgstr ""
+
+#: inc/child-customizer.php:30
+msgid "Leave empty to use default"
+msgstr ""
+
+#: inc/child-customizer.php:40
+msgid "Display Author Social Media links"
+msgstr ""
+
+#: inc/child-customizer.php:41
+msgid ""
+"Display social media links with the author bio on individual posts and "
+"author archives (this option requires the Yoast plugin)."
+msgstr ""
+
+#: inc/child-customizer.php:60
+msgid "Background image"
+msgstr ""
+
+#: inc/child-customizer.php:61
+msgid ""
+"Upload an image to be used as header background. Choosing a background image "
+"and background color causes overlap."
+msgstr ""
+
+#: inc/child-customizer.php:84
+msgid "Use backgroud image in dark mode?"
+msgstr ""
+
+#: inc/child-customizer.php:85
+msgid ""
+"By disabling this, the header will use the default background with some "
+"opacity applied."
+msgstr ""
+
+#: inc/child-customizer.php:104
+msgid "Logo sticky image"
+msgstr ""
+
+#: inc/child-customizer.php:105
+msgid ""
+"Upload an image to be used as sticky logo. If there are no sticky logo, the "
+"main logo will be used instead"
+msgstr ""
+
+#: inc/child-customizer.php:130
+msgid "Logo dark image"
+msgstr ""
+
+#: inc/child-customizer.php:131
+msgid ""
+"Dark logo to be displayed. The default dark mode logo is your logo masked "
+"with white."
+msgstr ""
+
+#: inc/child-customizer.php:156
+msgid "Discovery button style"
+msgstr ""
+
+#: inc/child-customizer.php:176
+msgid "Discovery button link"
+msgstr ""
+
+#: inc/child-customizer.php:177
+msgid "Leave it empty to hide."
+msgstr ""
+
+#: inc/child-customizer.php:197
+msgid "Site description color"
+msgstr ""
+
+#: inc/child-customizer.php:216
+msgid "Search icon color"
+msgstr ""
+
+#: inc/child-customizer.php:234
+msgid "Search dark icon color"
+msgstr ""
+
+#: inc/child-customizer.php:253
+msgid "Social dark icon color "
+msgstr ""
+
+#: inc/child-customizer.php:271
+msgid "Search icon background"
+msgstr ""
+
+#: inc/child-customizer.php:294
+msgid "Search icon background color"
+msgstr ""
+
+#: inc/child-customizer.php:314
+msgid "Decoration marker style"
+msgstr ""
+
+#: inc/child-customizer.php:337
+msgid "Pagination style"
+msgstr ""
+
+#: inc/child-customizer.php:349
+msgid "Font sizes"
+msgstr ""
+
+#: inc/child-customizer.php:367
+msgid "Unit"
+msgstr ""
+
+#: inc/child-customizer.php:396
+msgid "Force font-size by using !important"
+msgstr ""
+
+#: inc/child-customizer.php:413
+msgid "p"
+msgstr ""
+
+#: inc/child-customizer.php:431
+msgid "H1"
+msgstr ""
+
+#: inc/child-customizer.php:448
+msgid "H2"
+msgstr ""
+
+#: inc/child-customizer.php:465
+msgid "H3"
+msgstr ""
+
+#: inc/child-customizer.php:482
+msgid "H4"
+msgstr ""
+
+#: inc/child-customizer.php:499
+msgid "H5"
+msgstr ""
+
+#: inc/child-customizer.php:517
+msgid "H6"
+msgstr ""
+
+#: inc/child-customizer.php:533
+msgid "Featured Font"
+msgstr ""
+
+#: inc/child-customizer.php:534
+msgid "Example: Libre Basquesville"
+msgstr ""
+
+#: inc/child-customizer.php:551
+msgid "Accent Font Provider Import Code or URL"
+msgstr ""
+
+#: inc/child-customizer.php:567
+msgid "Accent font"
+msgstr ""
+
+#: inc/child-customizer.php:568
+msgid "Example: Dosis"
+msgstr ""
+
+#: inc/menus.php:3
+msgid "More"
+msgstr ""
+
+#: inc/metaboxes.php:14
+msgid "Sorry, we said wrong"
+msgstr ""
+
+#: inc/metaboxes.php:35
+msgid "Check to enable the author info: "
+msgstr ""
+
+#: inc/metaboxes.php:39
+msgid "Author bio"
+msgstr ""
+
+#: inc/metaboxes.php:54
+msgid "Check to enable the \"sorry we said wrong: "
+msgstr ""
+
+#: inc/metaboxes.php:58
+msgid "Sorry we said wrong"
+msgstr ""
+
+#: inc/metaboxes.php:80
+msgid "Original Publisher name"
+msgstr ""
+
+#: inc/metaboxes.php:87
+msgid "Original Publisher link"
+msgstr ""
+
+#: inc/template-tags.php:94
+msgid "By"
+msgstr ""
+
+#: inc/template-tags.php:101
+msgid " and "
+msgstr ""
+
+#: inc/template-tags.php:104
+msgid ", "
+msgstr ""
+
+#: inc/template-tags.php:125
+msgid "by"
+msgstr ""
+
+#: inc/template-tags.php:245
+msgid ","
+msgstr ""
+
+#: inc/template-tags.php:252
+msgid "Posted in"
+msgstr ""
+
+#: inc/widgets.php:46
+msgid "Newsletter"
+msgstr ""
+
+#: inc/widgets.php:47
+msgid "Newsletter widget"
+msgstr ""
+
+#: inc/widgets.php:91
+msgid "vertical"
+msgstr ""
+
+#: inc/widgets.php:95
+msgid "You are not allowed to add HTML in any of those fields"
+msgstr ""
+
+#: inc/widgets.php:100
+msgid "Horizontal"
+msgstr ""
+
+#: inc/widgets.php:101
+msgid "Vertical"
+msgstr ""
+
+#: inc/widgets.php:146
+msgid "Most Read"
+msgstr ""
+
+#: inc/widgets.php:147
+msgid "Most Read Widget"
+msgstr ""
+
+#: inc/widgets.php:224
+msgid "show"
+msgstr ""
+
+#: inc/widgets.php:256 inc/widgets.php:257
+msgid "Story Maps"
+msgstr ""
+
+#: inc/widgets.php:366
+msgid "See more URL (requires https://)"
+msgstr ""
+
+#: search.php:17
+msgid "Search results"
+msgstr ""
+
+#: searchform.php:28
+msgid "Filters"
+msgstr ""
+
+#: searchform.php:46
+msgid "Topics"
+msgstr ""
+
+#: searchform.php:68
+msgid "Regions"
+msgstr ""
+
+#: searchform.php:94 searchform.php:103
+msgid "Latest"
+msgstr ""
+
+#: searchform.php:100
+msgid "Oldest"
+msgstr ""
+
+#: template-parts/content/content-none.php:14
+msgid "Nothing Found"
+msgstr ""
+
+#: template-parts/content/content-none.php:24
+#, php-format
+msgid ""
+"Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
+msgstr ""
+
+#: template-parts/content/content-none.php:37
+msgid ""
+"Sorry, but nothing matched your search terms. Please try again with some "
+"different keywords."
+msgstr ""
+
+#: template-parts/content/content-none.php:44
+msgid ""
+"It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps "
+"searching can help."
+msgstr ""
+
+#: template-parts/content/content-page.php:21
+#: template-parts/content/content-single.php:48
+#: template-parts/content/content.php:38
+msgid "Pages:"
+msgstr ""
+
+#: template-parts/content/content-page.php:35
+#, php-format
+msgid "Edit <span class=\"screen-reader-text\">%s</span>"
+msgstr ""
+
+#: template-parts/content/content-related-posts.php:17
+msgid "Related Posts"
+msgstr ""
+
+#: template-parts/content/content-single.php:24
+#: template-parts/content/content.php:25
+#, php-format
+msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
+msgstr ""
+
+#: template-parts/content/content-single.php:38
+msgid "Sorry, We said wrong"
+msgstr ""
+
+#: template-parts/header/desktop-sidebar.php:12
+#: template-parts/header/desktop-sidebar.php:18
+#: template-parts/header/mobile-sidebar.php:13
+#: template-parts/header/subpage-sidebar.php:12
+#: template-parts/header/subpage-sidebar.php:18
+msgid "Close"
+msgstr ""
+
+#: template-parts/header/mobile-sidebar.php:33
+msgid "Discovery"
+msgstr ""
+
+#: template-parts/header/mobile-sidebar.php:47
+msgid "MORE"
+msgstr ""
+
+#: template-parts/header/mobile-sidebar.php:69
+#: template-parts/header/mobile-sidebar.php:144
+msgid "Language"
+msgstr ""
+
+#: template-parts/header/mobile-sidebar.php:79
+#: template-parts/header/mobile-sidebar.php:197
+msgid "Dark mode"
+msgstr ""
+
+#: template-parts/header/mobile-sidebar.php:95
+#: template-parts/header/mobile-sidebar.php:167
+msgid "Type size"
+msgstr ""
+
+#: template-parts/header/mobile-sidebar.php:123
+msgid "Follow us"
+msgstr ""
+
+#: template-parts/header/mobile-sidebar.php:187
+msgid "Share"
+msgstr ""
+
+#: template-parts/post/author-bio.php:42
+msgid "About the writer"
+msgstr ""
+
+#: template-parts/post/author-bio.php:95 template-parts/post/author-bio.php:105
+#: template-parts/post/author-bio.php:155
+#: template-parts/post/author-bio.php:165
+#, php-format
+msgid "More by %s"
+msgstr ""
+
+#: template-parts/post/discussion-meta.php:21
+msgid "No comments"
+msgstr ""

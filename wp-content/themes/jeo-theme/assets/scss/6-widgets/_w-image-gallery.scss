@@ -1,0 +1,363 @@
+.image-gallery:not(.wp-block-jeo-theme-custom-image-gallery-block) {
+    margin-bottom: 3em;
+    background-color: #f5f5f5;
+    border-radius: 10px 10px 0 0;
+
+    button {
+        padding: 0;
+        border-radius: 10px;
+        background-color: var(--primary);
+
+        a {
+            color: white;
+            display: inline-block;
+            width: 90%;
+            height: 100%;
+            padding: 5%;
+        }
+
+        width: 90%;
+        margin: 15px 20px 30px;
+    }
+
+    .image-gallery-content {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+
+        .image {
+            width: 30%;
+            height: 0;
+            padding-bottom: 30%;
+            overflow: hidden;
+            position: relative;
+
+            img {
+                width: 100%;
+                min-height: 100%;
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+        }
+    }
+
+    .image-gallery-content-block {
+        padding: 20px 20px 0px;
+    }
+
+    .image-gallery-header {
+        background-color: var(--primary);
+        border-radius: 10px 10px 0 0;
+        margin-bottom: 5px;
+
+        p {
+            padding: 20px 30px;
+            color: white;
+            text-align: center;
+            margin-bottom: 0px;
+            letter-spacing: 0;
+            line-height: 19px;
+            font-weight: bold;
+        }
+    }
+}
+
+.image-gallery.wp-block-jeo-theme-custom-image-gallery-block {
+    position: relative;
+    min-width: 100%;
+
+    &:before {
+        content: "";
+        display: block;
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 100%;
+        background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(255,255,255,0) 100%);
+        z-index: 1;
+    }
+
+    &.fullscreen {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 999999;
+        margin-top: 0;
+
+        &:not(.grid-display) {
+            .sss {
+                max-height: 100vh;
+            }
+    
+            .gallery-item-container {
+                position: initial;
+    
+            }
+
+            .image-gallery-wrapper {
+                background: black;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+
+                @include tablet {
+                    height: 100%;
+                    
+                    .dots-wrapper {
+                        display: none;
+                    }
+                }
+                
+            }
+        }
+
+        
+    }
+
+    &.grid-display {
+        background: linear-gradient(180deg,
+                rgba(0, 0, 0, 0.6) 0%,
+                rgba(255, 255, 255, 0) 100%);
+        background-color: #191e23;
+        padding: 5px 21px 21px 21px;
+
+        &:not(.fullscreen) {
+            position: relative;
+            height: 0;
+            overflow: hidden;
+            padding-top: 56.25%;
+
+            .gallery-grid {
+                .sss {
+                    @include tablet {
+                        writing-mode: vertical-lr;
+                        grid-auto-rows: size(100);
+                        grid-template-columns: repeat(1, 17.6vh);
+                    }
+                }
+            }
+    
+        }
+
+        &.fullscreen {
+            position: fixed;
+
+            @include tablet {
+                .image-gallery-wrapper {
+                    overflow-y: auto;
+                }
+
+                .gallery-grid {
+                    .sss {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                }
+            }
+        }
+
+        .dots-wrapper {
+            display: none;
+        }
+
+        .image-gallery-wrapper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            padding: 5px 21px 21px 21px;
+            max-height: 100%;
+            z-index: 2;
+            width: 100%;
+
+            .gallery-grid {
+                overflow-y: auto;
+                padding-bottom: 20px;
+            }
+        }
+
+        .gallery-title {
+            position: relative;
+            left: unset;
+            top: unset;
+        }
+
+        .gallery-grid {
+            margin-top: 35px;
+
+            .sss {
+                display: grid;
+                grid-template-columns: repeat(7, 1fr);
+                grid-gap: 23px;
+            }
+        }
+
+        .gallery-item-container {
+            padding-top: 100%;
+            display: block !important;
+            cursor: pointer;
+            z-index: 2;
+
+            .image-meta {
+                display: none;
+            }
+        }
+
+        .sssprev,
+        .sssnext {
+            display: none;
+        }
+    }
+
+    .sssprev,
+    .sssnext {
+        z-index: 2;
+        width: 50px;
+    }
+
+    .sssnext {
+        background-position: -50px 50%;
+    }
+
+    .gallery-title {
+        position: absolute;
+        top: 5px;
+        left: 20px;
+        z-index: 1;
+        width: calc(100% - 100px);
+
+        h2 {
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 0;
+            font-family: var(--primary-font);
+
+            a {
+                color: white;
+            }
+        }
+    }
+
+    .dots-wrapper {
+        display: flex;
+        justify-content: center;
+        z-index: 2;
+        position: absolute;
+        bottom: 68px;
+        margin: auto;
+        width: 100%;
+
+        .dot {
+            width: 11px;
+            height: 11px;
+            background-color: #fff;
+            opacity: 0.3;
+            border-radius: 50%;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease-in;
+
+            &:hover {
+                transition: all 0.2s ease-in;
+                opacity: 1;
+            }
+
+            &.active {
+                opacity: 1;
+            }
+        }
+    }
+
+    .actions {
+        position: absolute;
+        top: 10px;
+        right: 20px;
+        z-index: 3;
+
+        button {
+            height: 20px;
+            width: 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            margin-left: 15px;
+            color: #ffffff;
+            opacity: 0.7;
+            transition: all 0.2s ease-in-out;
+            font-size: size(16);
+
+            &:hover {
+                opacity: 1;
+                transition: all 0.2s ease-out;
+            }
+        }
+    }
+
+    .gallery-item-container {
+        position: relative;
+        padding-top: 56.25%;
+        height: 0;
+        overflow: hidden;
+
+        img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+        }
+
+        .image-meta {
+            position: absolute;
+            bottom: 0;
+            background-color: rgba(25, 30, 35, 0.8);
+            color: white;
+            padding: 17px 20px;
+            width: 100%;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0;
+            line-height: 0;
+            display: flex;
+            align-items: center;
+            z-index: 99;
+            font-family: var(--primary-font);
+
+            .image-description{
+                line-height: 15px;
+            }
+
+            i {
+                color: white;
+                opacity: 0.7;
+                margin: 0 20px;
+            }
+
+            .image-credit {
+                opacity: 0.5;
+                line-height: 15px;
+            }
+        }
+    }
+}
+
+
+.wp-block-cover.has-image-gallery .wp-block-cover__inner-container{
+    z-index: auto;
+}
+
+.wp-block-cover .wp-block-jeo-theme-custom-image-gallery-block {
+    z-index: 2;
+}
+
+.dark-theme {
+    .image-gallery:not(.wp-block-jeo-theme-custom-image-gallery-block) {
+        background-color: #23282d;
+    }
+}

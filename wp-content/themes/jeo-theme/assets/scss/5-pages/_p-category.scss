@@ -1,0 +1,19 @@
+header.page-header.category {
+    background-color: unset;
+
+    .mobile-author-label,
+    .desktop-author-label {
+        font-size: size(18);
+    }
+}
+
+aside.category-page-sidebar {
+
+    /* desktop / tablet*/
+    /*
+    782px because newspack is breaking at that point
+    */
+    @media only screen and (min-width: 782px) {
+        width: 25%;
+    }
+}
