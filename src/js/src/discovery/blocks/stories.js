@@ -485,7 +485,7 @@ class Stories extends Component {
 				<Search
 					searchPlaceholder="Search story"
 					update={ this.updateStories }
-					searchField={ this.props.queryParams.search }
+					searchField={ this.props.queryParams.search?? "" }
 				/>
 
 				<button
