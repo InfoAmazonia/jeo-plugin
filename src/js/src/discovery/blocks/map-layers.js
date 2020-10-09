@@ -199,11 +199,17 @@ class MapLayers extends Component {
 			} else if(layer.meta.type === "mapbox") {
 				if(map.getLayer( layerId ) === undefined) {
 					if(!map.getSource( layerId ) ) {
+						let styleId = attributes.layer_type_options.style_id
+
+						if ( styleId) {
+							styleId = styleId.replace( 'mapbox://styles/', '' );
+						}
+
 						map.addSource( layerId, {
 							type: 'raster',
 							tiles: [
 								'https://api.mapbox.com/styles/v1/' +
-									attributes.layer_type_options.style_id +
+									styleId +
 									'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
 									window.mapboxgl.accessToken,
 							],
