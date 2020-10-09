@@ -6,3 +6,4 @@ src/js/build
 /wordpress/
 /test-environment/
 /vendor/
+wpcontent/*
