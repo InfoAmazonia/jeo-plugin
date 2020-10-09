@@ -232,6 +232,7 @@ class JeoGeocodePosts extends Component {
 	}
 
 	onLocationFound( location ) {
+		console.log(location)
 		this.flyToLocation( location.lat, location.lon );
 		this.fetchReverseGeocode( location.lat, location.lon ).then( ( result ) => {
 			if ( result.raw.error ) {
@@ -274,6 +275,10 @@ class JeoGeocodePosts extends Component {
 	}
 
 	flyToLocation( lat, lon ) {
+		console.log([
+			parseFloat( lat ),
+			parseFloat( lon ),
+		])
 		this.refMap.current.leafletElement.flyTo( [
 			parseFloat( lat ),
 			parseFloat( lon ),
