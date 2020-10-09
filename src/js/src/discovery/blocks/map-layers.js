@@ -49,30 +49,36 @@ class MapLayers extends Component {
 			.then( ( maps ) => {
 				// Fetch layers
 				const mapsLayersPromises = maps.map( ( singleMap ) => {
+					const result = singleMap.meta.layers.map( async ( layer ) => {
+						const mapLayerApiUrl = new URL(
+							jeoMapVars.jsonUrl + 'map-layer/' + layer.id
+						);
+
+						return fetch( mapLayerApiUrl )
+							.then( ( data ) => data.json() )
+							.then( ( layer ) => {
+								if (
+									singleMap.queriedLayers &&
+									singleMap.queriedLayers.length
+								) {
+									singleMap.queriedLayers = [
+										...singleMap.queriedLayers,
+										{ ...layer, map: singleMap },
+									];
+								} else {
+									singleMap.queriedLayers = [ { ...layer, map: singleMap } ];
+								}
+
+								return layer;
+							} );
+					} )
+
+					if(!singleMap.meta.layers.length) {
+						singleMap.queriedLayers = []
+					}
+
 					return Promise.all(
-						singleMap.meta.layers.map( async ( layer ) => {
-							const mapLayerApiUrl = new URL(
-								jeoMapVars.jsonUrl + 'map-layer/' + layer.id
-							);
-
-							return fetch( mapLayerApiUrl )
-								.then( ( data ) => data.json() )
-								.then( ( layer ) => {
-									if (
-										singleMap.queriedLayers &&
-										singleMap.queriedLayers.length
-									) {
-										singleMap.queriedLayers = [
-											...singleMap.queriedLayers,
-											{ ...layer, map: singleMap },
-										];
-									} else {
-										singleMap.queriedLayers = [ { ...layer, map: singleMap } ];
-									}
-
-									return layer;
-								} );
-						} )
+						result
 					);
 				} );
 
