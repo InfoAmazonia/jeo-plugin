@@ -3,6 +3,7 @@ import Search from './search';
 import LazyImage from './lazy-image';
 import DateRangePicker from 'react-bootstrap-daterangepicker';
 import 'bootstrap-daterangepicker/daterangepicker.css';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
 const POSTS_PER_PAGE = 10;
@@ -665,7 +666,7 @@ class Storie extends Component {
 				<div className="sideway">
 					<div className="categories">{ finalCategories }</div>
 
-					<div className="title">{ story.title.rendered }</div>
+					<div className="title">{ decodeEntities(story.title.rendered) }</div>
 
 					<div className="date">{ storyDate }</div>
 				</div>
