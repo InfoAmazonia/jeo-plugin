@@ -9,11 +9,8 @@ module.exports = {
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
 		mapBlocks: './src/js/src/map-blocks/index.js',
-<<<<<<< HEAD
 		discovery: './src/js/src/discovery/index.js',
 		// storymap: './src/js/src/map-blocks/storymap.js',
-=======
->>>>>>> 70b1527aa84457d2876ba627791efeb03d3f54f3
 		layersSidebar: './src/js/src/layers-sidebar/index.js',
 		mapsSidebar: './src/js/src/maps-sidebar/index.js',
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
