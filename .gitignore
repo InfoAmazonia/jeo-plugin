@@ -2,8 +2,17 @@ build-config.cfg
 tests/bootstrap-config.php
 node_modules
 src/js/build
+jeo.zip
 
 /wordpress/
 /test-environment/
 /vendor/
-wpcontent/*
+wp-content
+
+wp-content/*
+wp-content/themes/*
+wp-content/plugins/*
+wp-content/upgrade/*
+wp-content/uploads/*
+wp-content/mu-plugins/*
+wp-content/languages/*
