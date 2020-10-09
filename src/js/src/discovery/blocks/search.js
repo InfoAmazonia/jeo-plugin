@@ -5,7 +5,7 @@ class Search extends Component {
 		super(props);
 
 		this.state = {
-			value: this.props.searchField,
+			value: this.props.searchField?? "",
 		}
 
 		this.handleChange = this.handleChange.bind(this);
