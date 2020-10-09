@@ -86,38 +86,39 @@ class Stories extends Component {
 							// 	'icon-opacity': 1,
 							// }
 						} );
+
+						map.loadImage(
+							jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png',
+							function ( error, image ) {
+								if ( error ) throw error;
+
+								map.addImage( 'news-marker-hover', image );
+
+								map.addLayer( {
+									id: 'hover-unclustered-points',
+									type: 'symbol',
+									source: 'storiesSource',
+									filter: [ '!', [ 'has', 'point_count' ] ],
+									layout: {
+										'icon-image': 'news-marker-hover',
+										'icon-size': 0.1,
+										'icon-allow-overlap': true,
+									},
+
+									paint: {
+										'icon-opacity': [
+											'case',
+											[ 'boolean', [ 'feature-state', 'hover' ], false ],
+											1,
+											0,
+										],
+									},
+								} );
+							}
+						);
 					}
 				);
 
-				map.loadImage(
-					jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png',
-					function ( error, image ) {
-						if ( error ) throw error;
-
-						map.addImage( 'news-marker-hover', image );
-
-						map.addLayer( {
-							id: 'hover-unclustered-points',
-							type: 'symbol',
-							source: 'storiesSource',
-							filter: [ '!', [ 'has', 'point_count' ] ],
-							layout: {
-								'icon-image': 'news-marker-hover',
-								'icon-size': 0.1,
-								'icon-allow-overlap': true,
-							},
-
-							paint: {
-								'icon-opacity': [
-									'case',
-									[ 'boolean', [ 'feature-state', 'hover' ], false ],
-									1,
-									0,
-								],
-							},
-						} );
-					}
-				);
 
 				map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', function (
 					error,
