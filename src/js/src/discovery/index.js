@@ -155,7 +155,7 @@ class Discovery extends Component {
 			useStories: this.props.useStories,
 		};
 
-		const legends = this.state.appliedLayers.map( ( layer ) => {
+		const legends = this.state.appliedLayers.filter(layer => layer.meta.use_legend).map( ( layer ) => {
 			return new window.JeoLegend( layer.meta.legend_type, {
 				layer_id: layer.slug,
 				legend_type_options: layer.meta.legend_type_options,
