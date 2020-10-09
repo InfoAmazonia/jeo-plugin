@@ -21,6 +21,10 @@ let lastChapter;
 
 let navigateMap;
 
+const monthNames = ["January", "February", "March", "April", "May", "June",
+  "July", "August", "September", "October", "November", "December"
+];
+
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 const scroller = scrollama();
@@ -257,8 +261,8 @@ class StoryMapDisplay extends Component {
 									<>
 										<p className="storymap-page-title">{ this.state.postData.title.rendered }</p>
 										<div className="post-info">
-											<p className="author">{ 'Authors' }</p>
-											<p className="date">{ this.state.postData.date }</p>
+											{ /*<p className="author" >{ 'Authors' }</p> */ }
+											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDay() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
 										</div>
 									</>
 								) }
