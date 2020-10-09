@@ -644,8 +644,6 @@ class Storie extends Component {
 			finalCategories = categoriesRender;
 		}
 
-		console.log(story);
-
 		return (
 			<a
 				href={ story.link }
