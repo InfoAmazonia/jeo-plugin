@@ -135,7 +135,7 @@ const MapEditor = ( {
 								if ( loadedMap.meta.enable_fullscreen ) {
 									map.addControl(
 										new mapboxgl.FullscreenControl(),
-										'top-left'
+										'top-right'
 									);
 								}
 							} }
