@@ -589,12 +589,15 @@ class Storie extends Component {
 		const map = this.props.map;
 		const story = this.props.story;
 		const average = { lat: 0, lon: 0 };
+		const bounds = [];
 
 		story.meta._related_point.forEach( ( point ) => {
 			const LngLat = {
 				lat: parseFloat( point._geocode_lat ),
 				lon: parseFloat( point._geocode_lon ),
 			};
+
+			bounds.push([parseFloat( point._geocode_lon ), parseFloat( point._geocode_lat )])
 
 			// average.lat += LngLat.lat/story.meta._related_point.length
 			// average.lon += LngLat.lon/story.meta._related_point.length
@@ -603,8 +606,12 @@ class Storie extends Component {
 			average.lon = LngLat.lon;
 		} );
 
-		// map.flyTo( { center: average, zoom: 7 } );
-		map.flyTo( { center: average } );
+
+		if(bounds.length === 1){
+			map.flyTo( { center: average, zoom: 7 } );
+		} else {
+			map.fitBounds( bounds, { padding: 100} );
+		}
 
 		map.setFeatureState(
 			{ source: 'storiesSource', id: story.id },
