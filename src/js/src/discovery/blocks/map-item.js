@@ -60,6 +60,10 @@ class MapItem extends Component {
 
 		const applyRemoveButton = map.queriedLayers.some( ( layer ) => Object.keys(selectedLayers).map( layerId => parseInt(layerId) ).includes( layer.id ) );
 
+		if(!map.queriedLayers.length) {
+			return "";
+		}
+
 		return (
 			<div className="map-item">
 				<div className="title">
