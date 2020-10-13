@@ -726,7 +726,8 @@ $primary: var(--jeo-primary-color);
 		}
 
 		.hideable-content {
-			height: 250px;
+			min-height: 110px;
+			max-height: 250px;
 			transition: all 0.3s ease-in-out;
 			overflow: hidden;
 		}
