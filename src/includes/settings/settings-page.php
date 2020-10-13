@@ -151,12 +151,12 @@
 						</td>
 					</tr>
 
-					<tr>
+					<!-- <tr>
 						<th scope="row"><label for="jeo_text-over-primary-color"><?php _e('Text over primary color', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_text-over-primary-color') ); ?>" placeholder="Ex. #000000" type="text" id="jeo_text-over-primary-color" value="<?php echo esc_html( $this->get_option('jeo_text-over-primary-color') ); ?>" class="regular-text">
 						</td>
-					</tr>
+					</tr> -->
 
 					<tr>
 						<th scope="row"><label for="jeo_more-bkg-color"><?php _e('Info button background color', 'jeo'); ?></label></th>

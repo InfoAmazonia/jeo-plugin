@@ -1,4 +1,4 @@
-$primary: green;
+$primary: var(--jeo-primary-color);
 
 .discovery-block {
 	position: relative;
@@ -80,6 +80,7 @@ $primary: green;
 			border-radius: 5px;
 			box-shadow: 0 0 0 2px rgba( 0, 0, 0, 0.01 );
 			overflow: hidden;
+			z-index: 999;
 
 			button {
 				transition: all 0.2s ease-in-out;
@@ -270,7 +271,7 @@ $primary: green;
 			&__tabs {
 				display: grid;
 				grid-template-columns: repeat( 2, 1fr );
-				border-bottom: 1px solid opacify( $primary, 0.8 );
+				border-bottom: 1px solid $primary;
 				position: sticky;
 				top: 0;
 				background: white;
@@ -629,6 +630,9 @@ $primary: green;
 		position: relative;
 
 		&.placeholder {
+			position: absolute;
+			left: 0;
+			width: 30%;
 			height: 100%;
 		}
 	}
