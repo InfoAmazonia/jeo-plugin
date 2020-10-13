@@ -216,6 +216,18 @@ function jeo_custom_settings_css() {
 		$css_variables .= $color_css . ' ' . $color_css_hover;
 	}
 
+	if(!empty(\jeo_settings()->get_option( 'jeo_primary-color', '#ffffff'))) {
+		$primary_color =\jeo_settings()->get_option( 'jeo_primary-color', '#0073aa');
+		$color_css = '--jeo-primary-color: '. $primary_color . ';';
+		$css_variables .= $color_css;
+	}
+
+	if(!empty(\jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000'))) {
+		$over_primary_color =\jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000');
+		$color_css = '--jeo-text-over-primary-color: '. $over_primary_color . ';';
+		$css_variables .= $color_css;
+	}
+
 	if (!empty(\jeo_settings()->get_option( 'jeo_more-color', '#555D66'))) {
 		$color =\jeo_settings()->get_option( 'jeo_more-color', '#555D66');
 		$color_css = '--jeo_more-color: '. $color . ';';
