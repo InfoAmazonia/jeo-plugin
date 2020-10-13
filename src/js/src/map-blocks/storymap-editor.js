@@ -61,8 +61,6 @@ const MapEditor = ( {
 	}
 
 	const flyTo = ( map, location ) => {
-		console.log(location.lon)
-		console.log(location.lat)
 
 		map.flyTo({
 			center: [
@@ -404,6 +402,8 @@ const MapEditor = ( {
 																							</div>
 																						);
 																					}
+
+																					return null;
 																				} }
 																			</Draggable>
 																	) ) }
@@ -659,7 +659,24 @@ const MapEditor = ( {
 						} }
 						postType="map"
 						onSuggestionSelected={ ( e, { suggestion } ) =>
-							setAttributes( { ...attributes, map_id: suggestion.id } )
+							setAttributes( {
+								...attributes,
+								map_id: suggestion.id, 
+								slides: [
+									{
+										title: null,
+										content: null,
+										selectedLayers: [],
+										latitude: mapDefaults.lat,
+										longitude: mapDefaults.lng,
+										zoom: mapDefaults.zoom,
+										pitch: 0,
+										bearing: 0,
+									},
+								],
+								loadedLayers,
+								navigateMapLayers: [],
+							} )
 						}
 					/>
 					{ attributes.previous_map && (
