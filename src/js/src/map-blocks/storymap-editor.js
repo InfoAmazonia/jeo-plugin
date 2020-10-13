@@ -61,6 +61,8 @@ const MapEditor = ( {
 	}
 
 	const flyTo = ( map, location ) => {
+		console.log(location.lon)
+		console.log(location.lat)
 
 		map.flyTo({
 			center: [
@@ -135,7 +137,7 @@ const MapEditor = ( {
 								if ( loadedMap.meta.enable_fullscreen ) {
 									map.addControl(
 										new mapboxgl.FullscreenControl(),
-										'top-left'
+										'top-right'
 									);
 								}
 							} }
