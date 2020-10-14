@@ -1,17 +1,14 @@
 <?php
 ?>
 
-<!DOCTYPE html>
-<html>
-	<?php
-		get_header(); 
-		the_post();
-	?>
+<?php
+	get_header(); 
+	the_post();
+?>
 
-	<body style="margin: 0 !important">
-		<?php the_content(); ?>
-	</body>
+<div class="content">
+	<?php the_content(); ?>
+</div>
 
-	<?php wp_footer(); ?>
-</html>
+<?php get_footer(); ?>
 
