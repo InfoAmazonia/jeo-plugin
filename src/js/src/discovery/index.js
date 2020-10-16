@@ -320,7 +320,7 @@ if ( document.querySelector( '.discovery-embed' ) ) {
 			element
 		);
 	} );
-} else {
+} else if( document.getElementById( 'discovery' )) {
 	wp.element.render(
 		<Discovery useStories={ true } />,
 		document.getElementById( 'discovery' )

@@ -47,18 +47,31 @@ class MapItem extends Component {
 
 		const layersToggle = map.queriedLayers? map.queriedLayers.map( ( layer, index ) => {
 			return (
-				<button key={ index } className={ layerToggleClassName( layer ) } onClick={ ( ) => this.props.toggleLayer(layer) }>
+				<button key={ index } className={ layerToggleClassName( layer ) } onClick={ ( ) => {
+					if(selectedLayers.hasOwnProperty( layer.id )) {
+						if(isCurrentMapLayer( layer )) {
+							this.props.toggleLayer(layer);
+						}
+					} else {
+						this.props.toggleLayer(layer);
+					}
+
+				} }>
 					{ !selectedLayers.hasOwnProperty( layer.id )?
 						 <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="toggle-off" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-toggle-off fa-w-18 fa-3x"><path fill="currentColor" d="M384 64H192C85.961 64 0 149.961 0 256s85.961 192 192 192h192c106.039 0 192-85.961 192-192S490.039 64 384 64zM64 256c0-70.741 57.249-128 128-128 70.741 0 128 57.249 128 128 0 70.741-57.249 128-128 128-70.741 0-128-57.249-128-128zm320 128h-48.905c65.217-72.858 65.236-183.12 0-256H384c70.741 0 128 57.249 128 128 0 70.74-57.249 128-128 128z"></path></svg> :
 						 <svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="toggle-on" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="svg-inline--fa fa-toggle-on fa-w-18 fa-3x"><path fill="currentColor" d="M384 64H192C86 64 0 150 0 256s86 192 192 192h192c106 0 192-86 192-192S490 64 384 64zm0 320c-70.8 0-128-57.3-128-128 0-70.8 57.3-128 128-128 70.8 0 128 57.3 128 128 0 70.8-57.3 128-128 128z"></path></svg>
 					}
 
-					<span> { layer.title.rendered } </span>
+					<span> { decodeEntities(layer.title.rendered) } </span>
 				</button>
 			)
 		}): []
 
 		const applyRemoveButton = map.queriedLayers.some( ( layer ) => Object.keys(selectedLayers).map( layerId => parseInt(layerId) ).includes( layer.id ) );
+
+		if(!map.queriedLayers.length) {
+			return "";
+		}
 
 		return (
 			<div className="map-item">

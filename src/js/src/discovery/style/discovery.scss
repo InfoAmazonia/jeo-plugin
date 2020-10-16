@@ -1,4 +1,5 @@
-$primary: green;
+$primary: var(--jeo-primary-color);
+$font: var(--jeo-font);
 
 .discovery-block {
 	position: relative;
@@ -6,6 +7,10 @@ $primary: green;
 	height: calc( 100vh );
 	overflow: hidden;
 	background-color: white;
+
+	> *, button, input, select, textarea {
+		font-family: $font;
+	}
 
 	// discovery embed class is parent of current reference (&)
 	.discovery-embed & {
@@ -50,6 +55,7 @@ $primary: green;
 			font-size: 16px;
 			margin-bottom: 25px;
 			margin-left: 20px;
+			margin-top: 25px;
 		}
 	}
 
@@ -80,6 +86,7 @@ $primary: green;
 			border-radius: 5px;
 			box-shadow: 0 0 0 2px rgba( 0, 0, 0, 0.01 );
 			overflow: hidden;
+			z-index: 999;
 
 			button {
 				transition: all 0.2s ease-in-out;
@@ -200,7 +207,7 @@ $primary: green;
 			&-zoom-out,
 			&-zoom-in,
 			&-fullscreen {
-				background-color: #555d66;
+				// background-color: #555d66;
 				border-radius: 0;
 				border-top: 0;
 			}
@@ -256,8 +263,8 @@ $primary: green;
 	.togable-panel {
 		background-color: #ffffff;
 		z-index: 1;
-		min-height: 100%;
-		max-height: 100%;
+		min-height: calc(100% - 68px);
+    	max-height: calc(100% - 68px);
 		overflow-y: auto;
 
 		@extend .scroll-bar-style;
@@ -270,7 +277,7 @@ $primary: green;
 			&__tabs {
 				display: grid;
 				grid-template-columns: repeat( 2, 1fr );
-				border-bottom: 1px solid opacify( $primary, 0.8 );
+				border-bottom: 1px solid $primary;
 				position: sticky;
 				top: 0;
 				background: white;
@@ -337,6 +344,7 @@ $primary: green;
 				border-radius: 10px 0 0 10px;
 				height: 50px;
 				border-right: 0px;
+				font-weight: bold;
 			}
 
 			button {
@@ -484,6 +492,7 @@ $primary: green;
 
 					&-message {
 						font-size: 12px;
+						line-height: 14px;
 						text-transform: uppercase;
 					}
 				}
@@ -629,6 +638,9 @@ $primary: green;
 		position: relative;
 
 		&.placeholder {
+			position: absolute;
+			left: 0;
+			width: 30%;
 			height: 100%;
 		}
 	}
@@ -721,15 +733,17 @@ $primary: green;
 		}
 
 		.hideable-content {
-			height: 250px;
+			min-height: 110px;
+			max-height: 250px;
 			transition: all 0.3s ease-in-out;
 			overflow: hidden;
 		}
 
 		&.active {
 			.hideable-content {
-				height: 0;
+				max-height: 0;
 				transition: all 0.3s ease-in-out;
+				min-height: 0;
 			}
 		}
 	}
@@ -874,13 +888,31 @@ $primary: green;
 @media (max-width: 820px) {
 	.discovery-mobile-warning {
 		width: 100%;
-		text-align: center;
 		display: flex;
 		flex-direction: column;
 		height: 100vh;
 		background: #fbfbfb;
 		justify-content: center;
 		padding: 0 30px;
+
+		h1 {
+			text-transform: uppercase;
+			font-weight: bold;
+			font-size: 60px;
+			margin: 0;
+			text-align: left;
+		}
+
+		h4 {
+			margin: 0;
+			padding: 23px 0;
+			padding-top: 10px;
+		}
+
+		a {
+			text-decoration: none;
+			color: $primary;
+		}
 	}
 
 	#discovery {
