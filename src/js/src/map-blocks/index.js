@@ -148,7 +148,7 @@ registerBlockType( 'jeo/storymap', {
 			slides: null,
 			navigateButton: null,
 			hasIntroduction: null,
-			loadedLayers: null,
+			// loadedLayers: null,
 			navigateMapLayers: null,
 			postID: null,
 		};
@@ -158,6 +158,28 @@ registerBlockType( 'jeo/storymap', {
 				attributesStructure[key] = props.attributes[key];
 			}
 		}
+
+		function removeYoastTagsFromObject(object) {
+			if( object && object.hasOwnProperty('yoast_head') ) {
+				delete object.yoast_head;
+				return true;
+			}
+
+			return false;
+		}
+
+		attributesStructure.navigateMapLayers.forEach( item => {
+			removeYoastTagsFromObject(item);
+		})
+
+		attributesStructure.slides.forEach( slide => {
+			slide.selectedLayers.forEach( layer => {
+				removeYoastTagsFromObject(layer);
+			} )
+		})
+
+		// Loaded layers isn't used propperly.
+		attributesStructure.loadedLayers = [];
 
 		return <div id="story-map" data-properties={ JSON.stringify(attributesStructure) } />
 	},
