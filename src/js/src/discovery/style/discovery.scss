@@ -415,7 +415,7 @@ $font: var(--jeo-font);
 						grid-column-gap: 30px;
 					}
 
-					&:hover {
+					&:hover, &.active {
 						background-color: #f5f5f5;
 						transition: all 0.2s ease-in-out;
 					}
