@@ -25,7 +25,7 @@ class MapLayers extends Component {
 			if( this.props.isEmbed ) {
 				const requestedLayerIds = this.getLayerIdsFromUrl();
 				this.fetchLayers(requestedLayerIds).then(layers => {
-					console.log(layers);
+					// console.log(layers);
 					this.toggleLayersBatch(layers.reverse());
 					this.applyLayersChanges();
 				})

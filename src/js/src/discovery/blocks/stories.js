@@ -63,7 +63,7 @@ class Stories extends Component {
 
 				map.loadImage(
 					jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png',
-					function ( error, image ) {
+					( error, image ) => {
 						if ( error ) throw error;
 
 						map.addImage( 'news-marker', image );
@@ -119,152 +119,159 @@ class Stories extends Component {
 								} );
 							}
 						);
+
+
+						map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', (
+							error,
+							image
+						) => {
+							if ( error ) throw error;
+
+							map.addImage( 'news-no-marker', image );
+
+							const layers = [
+								// [6, '#000000'],
+								// [5, '#f28cb1'],
+								// [2, '#f1f075'],
+								[ 0, '#ffffff' ],
+							];
+
+							// cluster circle layer
+							layers.forEach( ( layer, i ) => {
+								map.addLayer( {
+									id: 'cluster-' + i,
+									type: 'circle',
+									source: 'storiesSource',
+									paint: {
+										'circle-color': layer[ 1 ],
+										'circle-radius': 20 + layer[ 0 ],
+										'circle-stroke-color': '#ffffff',
+										'circle-stroke-opacity': 0.4,
+										'circle-stroke-width': 9,
+									},
+									filter:
+										i === 0
+											? [ '>=', 'point_count', layer[ 0 ] ]
+											: [
+													'all',
+													[ '>=', 'point_count', layer[ 0 ] ],
+													[ '<', 'point_count', layers[ i - 1 ][ 0 ] ],
+											  ],
+								} );
+							} );
+
+							// cluster number layer
+							map.addLayer( {
+								id: 'cluster-count',
+								type: 'symbol',
+								source: 'storiesSource',
+
+								layout: {
+									'icon-image': 'news-no-marker',
+									'icon-size': 0.13,
+									'icon-allow-overlap': false,
+									'icon-offset': {
+										stops: [
+											[ 13, [ 0, -30 ] ],
+											[ 17, [ 0, -90 ] ],
+										],
+									},
+									'text-field': '{point_count}',
+									'text-font': [ 'Open Sans Regular', 'Arial Unicode MS Regular' ],
+									'text-size': 12,
+									'text-transform': 'uppercase',
+									'text-letter-spacing': 0.05,
+									'text-offset': [ 0, 0.8 ],
+								},
+
+								paint: {
+									'text-color': '#202202',
+								},
+
+								filter: [ 'has', 'point_count' ],
+							} );
+
+						} );
 					}
 				);
-
-
-				map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', (
-					error,
-					image
-				) => {
-					if ( error ) throw error;
-
-					map.addImage( 'news-no-marker', image );
-
-					const layers = [
-						// [6, '#000000'],
-						// [5, '#f28cb1'],
-						// [2, '#f1f075'],
-						[ 0, '#ffffff' ],
-					];
-
-					// cluster circle layer
-					layers.forEach( ( layer, i ) => {
-						map.addLayer( {
-							id: 'cluster-' + i,
-							type: 'circle',
-							source: 'storiesSource',
-							paint: {
-								'circle-color': layer[ 1 ],
-								'circle-radius': 20 + layer[ 0 ],
-								'circle-stroke-color': '#ffffff',
-								'circle-stroke-opacity': 0.4,
-								'circle-stroke-width': 9,
-							},
-							filter:
-								i === 0
-									? [ '>=', 'point_count', layer[ 0 ] ]
-									: [
-											'all',
-											[ '>=', 'point_count', layer[ 0 ] ],
-											[ '<', 'point_count', layers[ i - 1 ][ 0 ] ],
-									  ],
-						} );
-					} );
-
-					// cluster number layer
-					map.addLayer( {
-						id: 'cluster-count',
-						type: 'symbol',
-						source: 'storiesSource',
-
-						layout: {
-							'icon-image': 'news-no-marker',
-							'icon-size': 0.13,
-							'icon-allow-overlap': false,
-							'icon-offset': {
-								stops: [
-									[ 13, [ 0, -30 ] ],
-									[ 17, [ 0, -90 ] ],
-								],
-							},
-							'text-field': '{point_count}',
-							'text-font': [ 'Open Sans Regular', 'Arial Unicode MS Regular' ],
-							'text-size': 12,
-							'text-transform': 'uppercase',
-							'text-letter-spacing': 0.05,
-							'text-offset': [ 0, 0.8 ],
-						},
-
-						paint: {
-							'text-color': '#202202',
-						},
-
-						filter: [ 'has', 'point_count' ],
-					} );
-
-
-					map.on('mousemove', 'unclustered-points', (e) => {
-						if (e.features.length > 0) {
-							if (this.state.hoveredPostId) {
-								map.setFeatureState(
-									{ source: 'storiesSource', id: this.state.hoveredPostId },
-									{ hover: false }
-								);
-							}
-
-							this.setState({
-								...this.state,
-								hoveredPostId: e.features[0].id,
-							})
-
-
-							map.setFeatureState(
-								{ source: 'storiesSource', id: this.state.hoveredPostId },
-								{ hover: true }
-							);
-						}
-					});
-
-					map.on('mouseleave', 'unclustered-points', () => {
-						if (this.state.hoveredPostId) {
-							map.setFeatureState(
-								{ source: 'storiesSource', id: this.state.hoveredPostId },
-								{ hover: false }
-							);
-						}
-
-						this.setState({
-							...this.state,
-							hoveredPostId: null,
-						})
-					});
-
-					map.on('mousemove', 'cluster-0', (e) => {
-						const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-0'] });
-						const clusterId = features[0].properties.cluster_id,
-						pointCount = features[0].properties.point_count,
-						clusterSource = map.getSource('storiesSource');
-
-						// Get all points under a cluster
-						clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
-							console.log('getClusterLeaves', aFeatures);
-							const postsIds = aFeatures.map( ( post ) => post.id)
-
-							this.setState( {
-								...this.state,
-								hoveredClusterPostsId: postsIds
-							} )
-						})
-					});
-
-
-					map.on('mouseleave', 'cluster-0', () => {
-						this.setState( {
-							...this.state,
-							hoveredClusterPostsId: []
-						} )
-					});
-
-
-
-				} );
 			} );
 
 			this.props.updateState( {
 				firstLoad: false,
 			} );
 		}
+
+
+		map.on('mousemove', 'unclustered-points', (e) => {
+			if (e.features.length > 0 && map.selectedTab.name === "stories") {
+				// if (this.state.hoveredPostId) {
+				// 	map.setFeatureState(
+				// 		{ source: 'storiesSource', id: this.state.hoveredPostId },
+				// 		{ hover: false }
+				// 	);
+				// }
+				console.log( this.state.hoveredPostId,  e.features[0].id  );
+
+				this.setState({
+					// ...this.state,
+					hoveredPostId: e.features[0].id,
+				}, () => console.log("Terminou de setar estado"))
+
+				map.setFeatureState(
+					{ source: 'storiesSource', id: e.features[0].id },
+					{ hover: true }
+				);
+
+
+
+
+			}
+		});
+
+		map.on('mouseleave', 'unclustered-points', () => {
+			if(map.selectedTab.name === "stories"){
+				console.log("mouseleave", this.state.hoveredPostId);
+				if (this.state.hoveredPostId) {
+					map.setFeatureState(
+						{ source: 'storiesSource', id: this.state.hoveredPostId },
+						{ hover: false }
+					);
+				}
+
+				this.setState({
+					...this.state,
+					hoveredPostId: null,
+				})
+
+
+			}
+		});
+
+		map.on('mousemove', 'cluster-0', (e) => {
+			const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-0'] });
+			const clusterId = features[0].properties.cluster_id,
+			pointCount = features[0].properties.point_count,
+			clusterSource = map.getSource('storiesSource');
+
+			// Get all points under a cluster
+			clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
+				// console.log('getClusterLeaves', aFeatures);
+				const postsIds = aFeatures.map( ( post ) => post.id)
+
+				this.setState( {
+					...this.state,
+					hoveredClusterPostsId: postsIds
+				} )
+			})
+		});
+
+
+		map.on('mouseleave', 'cluster-0', () => {
+			this.setState( {
+				...this.state,
+				hoveredClusterPostsId: []
+			} )
+		});
 	}
 
 	buildPostsGeoJson( stories ) {
