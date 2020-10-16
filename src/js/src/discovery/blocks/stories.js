@@ -18,6 +18,7 @@ class Stories extends Component {
 			showFilters: false,
 			dateRangeObject: { after: new Date(), before: new Date() },
 			hoveredPostId: null,
+			hoveredClusterPostsId: [],
 		};
 
 		// Story bindings
@@ -229,7 +230,31 @@ class Stories extends Component {
 						})
 					});
 
+					map.on('mousemove', 'cluster-0', (e) => {
+						const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-0'] });
+						const clusterId = features[0].properties.cluster_id,
+						pointCount = features[0].properties.point_count,
+						clusterSource = map.getSource('storiesSource');
 
+						// Get all points under a cluster
+						clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
+							console.log('getClusterLeaves', aFeatures);
+							const postsIds = aFeatures.map( ( post ) => post.id)
+
+							this.setState( {
+								...this.state,
+								hoveredClusterPostsId: postsIds
+							} )
+						})
+					});
+
+
+					map.on('mouseleave', 'cluster-0', () => {
+						this.setState( {
+							...this.state,
+							hoveredClusterPostsId: []
+						} )
+					});
 
 
 
@@ -605,7 +630,7 @@ class Stories extends Component {
 				<div className="stories">
 					{ this.props.stories.map( ( story, index ) => {
 						return (
-							<Storie className={ (story.id === this.state.hoveredPostId? 'active' : '') } story={ story } key={ index } map={ this.props.map } />
+							<Storie className={ (story.id === this.state.hoveredPostId || this.state.hoveredClusterPostsId.includes(story.id) ? 'active' : '') } story={ story } key={ index } map={ this.props.map } />
 						);
 					} ) }
 				</div>
