@@ -21,15 +21,15 @@ class Storymap{
 
 
 		$labels = array(
-			'name' => __('Story Map', 'jeo'),
+			'name' => __('Story Maps', 'jeo'),
 			'singular_name' => __('Story Map', 'jeo'),
 			'add_new' => __('Add new Story Map', 'jeo'),
 			'add_new_item' => __('Add new Story Map', 'jeo'),
 			'edit_item' => __('Edit Story Map', 'jeo'),
 			'new_item' => __('New Story Map', 'jeo'),
 			'view_item' => __('View Story Map', 'jeo'),
-			'view_items' => __( 'View Story Map', 'jeo' ),
-			'search_items' => __('Search Story Map', 'jeo'),
+			'view_items' => __( 'View Story Maps', 'jeo' ),
+			'search_items' => __('Search Story Maps', 'jeo'),
 			'not_found' => __('No Story Map found', 'jeo'),
 			'not_found_in_trash' => __('No Story Map found in the trash', 'jeo'),
 			'menu_name' => __('Story Map', 'jeo'),

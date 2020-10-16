@@ -197,7 +197,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="introduction-button"
-									label={ __( 'Storymap Introduction' ) }
+									label={ __( 'Story map Introduction' ) }
 									checked={ attributes.hasIntroduction }
 									onChange={ ( newHasIntroduction ) => {
 										setAttributes( {
@@ -629,21 +629,6 @@ const MapEditor = ( {
 						<p>
 							<strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
 						</p>
-						<Button
-							className="select-another-map"
-							isLink
-							isLarge
-							onClick={ () => {
-								const previous_map = attributes.map_id;
-								setAttributes( {
-									...attributes,
-									map_id: undefined,
-									previous_map,
-								} );
-							} }
-						>
-							<em>{ __( '(Select another map)' ) }</em>
-						</Button>
 					</div>
 				</Fragment>
 			) }
