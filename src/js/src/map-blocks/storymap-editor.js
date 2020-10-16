@@ -61,8 +61,6 @@ const MapEditor = ( {
 	}
 
 	const flyTo = ( map, location ) => {
-		console.log(location.lon)
-		console.log(location.lat)
 
 		map.flyTo({
 			center: [
@@ -199,7 +197,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="introduction-button"
-									label={ __( 'Storymap Introduction' ) }
+									label={ __( 'Story map Introduction' ) }
 									checked={ attributes.hasIntroduction }
 									onChange={ ( newHasIntroduction ) => {
 										setAttributes( {
@@ -404,6 +402,8 @@ const MapEditor = ( {
 																							</div>
 																						);
 																					}
+
+																					return null;
 																				} }
 																			</Draggable>
 																	) ) }
@@ -629,21 +629,6 @@ const MapEditor = ( {
 						<p>
 							<strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
 						</p>
-						<Button
-							className="select-another-map"
-							isLink
-							isLarge
-							onClick={ () => {
-								const previous_map = attributes.map_id;
-								setAttributes( {
-									...attributes,
-									map_id: undefined,
-									previous_map,
-								} );
-							} }
-						>
-							<em>{ __( '(Select another map)' ) }</em>
-						</Button>
 					</div>
 				</Fragment>
 			) }
@@ -659,7 +644,24 @@ const MapEditor = ( {
 						} }
 						postType="map"
 						onSuggestionSelected={ ( e, { suggestion } ) =>
-							setAttributes( { ...attributes, map_id: suggestion.id } )
+							setAttributes( {
+								...attributes,
+								map_id: suggestion.id, 
+								slides: [
+									{
+										title: null,
+										content: null,
+										selectedLayers: [],
+										latitude: mapDefaults.lat,
+										longitude: mapDefaults.lng,
+										zoom: mapDefaults.zoom,
+										pitch: 0,
+										bearing: 0,
+									},
+								],
+								loadedLayers,
+								navigateMapLayers: [],
+							} )
 						}
 					/>
 					{ attributes.previous_map && (

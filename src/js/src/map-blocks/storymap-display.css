@@ -18,7 +18,7 @@ a, a:hover, a:visited {
 }
 
 #header {
-    width: 600px;
+    width: 700px;
     padding: 2vh;
     text-align: center;
     background: none;
@@ -250,6 +250,10 @@ a, a:hover, a:visited {
 }
 .single-storymap  #content {
     margin: 0;
+}
+
+.single-storymap footer {
+    display: none;
 }
 
 .story-map #features .title {

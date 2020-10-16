@@ -259,10 +259,10 @@ class StoryMapDisplay extends Component {
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
 								{ this.state.postData && (
 									<>
-										<h1 className="storymap-page-title">{ this.state.postData.title.rendered }</h1>
+										<h1 className="storymap-page-title">{ decodeHtmlEntity( this.state.postData.title.rendered ) }</h1>
 										<div className="post-info">
 											{ /*<p className="author" >{ 'Authors' }</p> */ }
-											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDay() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
+											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDate() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
 										</div>
 									</>
 								) }
@@ -478,4 +478,3 @@ if(storyMapElement) {
 	storyMapProps = JSON.parse(storyMapElement.getAttribute('data-properties'));
 	wp.element.render(<StoryMapDisplay { ...storyMapProps } />, storyMapElement);
 }
-
