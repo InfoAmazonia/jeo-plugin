@@ -16,7 +16,8 @@ class Stories extends Component {
 			stories: [],
 			searchQuery: {},
 			showFilters: false,
-			dateRangeObject: { after: new Date(), before: new Date() }
+			dateRangeObject: { after: new Date(), before: new Date() },
+			hoveredPostId: null,
 		};
 
 		// Story bindings
@@ -121,10 +122,10 @@ class Stories extends Component {
 				);
 
 
-				map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', function (
+				map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', (
 					error,
 					image
-				) {
+				) => {
 					if ( error ) throw error;
 
 					map.addImage( 'news-no-marker', image );
@@ -137,7 +138,7 @@ class Stories extends Component {
 					];
 
 					// cluster circle layer
-					layers.forEach( function ( layer, i ) {
+					layers.forEach( ( layer, i ) => {
 						map.addLayer( {
 							id: 'cluster-' + i,
 							type: 'circle',
@@ -190,6 +191,48 @@ class Stories extends Component {
 
 						filter: [ 'has', 'point_count' ],
 					} );
+
+
+					map.on('mousemove', 'unclustered-points', (e) => {
+						if (e.features.length > 0) {
+							if (this.state.hoveredPostId) {
+								map.setFeatureState(
+									{ source: 'storiesSource', id: this.state.hoveredPostId },
+									{ hover: false }
+								);
+							}
+
+							this.setState({
+								...this.state,
+								hoveredPostId: e.features[0].id,
+							})
+
+
+							map.setFeatureState(
+								{ source: 'storiesSource', id: this.state.hoveredPostId },
+								{ hover: true }
+							);
+						}
+					});
+
+					map.on('mouseleave', 'unclustered-points', () => {
+						if (this.state.hoveredPostId) {
+							map.setFeatureState(
+								{ source: 'storiesSource', id: this.state.hoveredPostId },
+								{ hover: false }
+							);
+						}
+
+						this.setState({
+							...this.state,
+							hoveredPostId: null,
+						})
+					});
+
+
+
+
+
 				} );
 			} );
 
@@ -562,7 +605,7 @@ class Stories extends Component {
 				<div className="stories">
 					{ this.props.stories.map( ( story, index ) => {
 						return (
-							<Storie story={ story } key={ index } map={ this.props.map } />
+							<Storie className={ (story.id === this.state.hoveredPostId? 'active' : '') } story={ story } key={ index } map={ this.props.map } />
 						);
 					} ) }
 				</div>
@@ -658,7 +701,7 @@ class Storie extends Component {
 				target="_blank"
 				rel="noreferrer"
 				className={
-					'card' + ( ! story.queriedFeaturedImage ? ' no-thumb' : '' )
+					'card' + ( ! story.queriedFeaturedImage ? ' no-thumb' : '' ) + (this.props.className.length? (' ' + this.props.className) : '')
 				}
 				onMouseEnter={ this.storyHovered }
 				onMouseLeave={ this.storyUnhover }
