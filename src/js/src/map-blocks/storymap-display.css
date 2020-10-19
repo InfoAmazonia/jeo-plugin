@@ -129,7 +129,7 @@ a, a:hover, a:visited {
 }
 
 .navigate-button-display, .storymap-start-button {
-    background-color: #59811A;
+    background-color: var(--jeo-primary-color); 
     color: white;
     border-radius: 10px;
     width: 237px;
@@ -141,6 +141,12 @@ a, a:hover, a:visited {
     right: 0;
     margin-left: auto;
     margin-right: auto;
+}
+
+.storymap-template-default .navigate-button-display, .storymap-start-button:hover,
+.storymap-template-default .navigate-button-display, .storymap-start-button:active,
+.storymap-template-default .navigate-button-display, .storymap-start-button:focus {
+    background-color: var(--jeo-primary-color);
 }
 
 .storymap-start-button {
