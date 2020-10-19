@@ -61,8 +61,6 @@ const MapEditor = ( {
 	}
 
 	const flyTo = ( map, location ) => {
-		console.log(location.lon)
-		console.log(location.lat)
 
 		map.flyTo({
 			center: [
@@ -82,6 +80,7 @@ const MapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
+			console.log(loadedLayers)
 			setAttributes( {
 				...attributes,
 				slides: [
@@ -125,7 +124,8 @@ const MapEditor = ( {
 						<Map
 							key={ key }
 							onStyleLoad={ ( map ) => {
-								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers } );
+								console.log(loadedLayers)
+								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
 								setSelectedMap( map );
 								setStorymapLayers( layersContent )
 
@@ -159,7 +159,7 @@ const MapEditor = ( {
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
-									const layerOptions = loadedLayers.find(
+									const layerOptions = attributes.navigateMapLayers.find(
 										( { id } ) => id === layer.id
 									);
 									if ( layerOptions ) {
@@ -199,7 +199,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="introduction-button"
-									label={ __( 'Storymap Introduction' ) }
+									label={ __( 'Story map Introduction' ) }
 									checked={ attributes.hasIntroduction }
 									onChange={ ( newHasIntroduction ) => {
 										setAttributes( {
@@ -334,7 +334,7 @@ const MapEditor = ( {
 																		ref={ provided.innerRef }
 																		className="layers"
 																>
-																		{ storymapLayers.map( ( item, index_ ) => (
+																		{ attributes.navigateMapLayers.map( ( item, index_ ) => (
 																			<Draggable key={ `${ index_ }` } draggableId={ `${ index_ }` } index={ index_ }>
 																				{ ( provided, snapshot ) => {
 																					let layerButtonStyle = {
@@ -404,6 +404,8 @@ const MapEditor = ( {
 																							</div>
 																						);
 																					}
+
+																					return null;
 																				} }
 																			</Draggable>
 																	) ) }
@@ -629,21 +631,6 @@ const MapEditor = ( {
 						<p>
 							<strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
 						</p>
-						<Button
-							className="select-another-map"
-							isLink
-							isLarge
-							onClick={ () => {
-								const previous_map = attributes.map_id;
-								setAttributes( {
-									...attributes,
-									map_id: undefined,
-									previous_map,
-								} );
-							} }
-						>
-							<em>{ __( '(Select another map)' ) }</em>
-						</Button>
 					</div>
 				</Fragment>
 			) }
@@ -659,7 +646,24 @@ const MapEditor = ( {
 						} }
 						postType="map"
 						onSuggestionSelected={ ( e, { suggestion } ) =>
-							setAttributes( { ...attributes, map_id: suggestion.id } )
+							setAttributes( {
+								...attributes,
+								map_id: suggestion.id, 
+								slides: [
+									{
+										title: null,
+										content: null,
+										selectedLayers: [],
+										latitude: mapDefaults.lat,
+										longitude: mapDefaults.lng,
+										zoom: mapDefaults.zoom,
+										pitch: 0,
+										bearing: 0,
+									},
+								],
+								loadedLayers,
+								navigateMapLayers: [],
+							} )
 						}
 					/>
 					{ attributes.previous_map && (

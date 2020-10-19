@@ -16,6 +16,7 @@ services:
       WORDPRESS_DEBUG: 'true'
     volumes:
       - ./src:/var/www/html/wp-content/plugins/jeo
+      - ./wp-content:/var/www/html/wp-content
 
   mariadb:
     image: mariadb:10.4
