@@ -42,7 +42,7 @@ const decodeHtmlEntity = function ( str ) {
 class StoryMapDisplay extends Component {
     constructor( props ) {
 		super( props );
-
+		console.log(this.props)
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
 			slides.push( {
@@ -158,7 +158,6 @@ class StoryMapDisplay extends Component {
 		const mapStart = config.chapters[ 0 ].location;
         const theme = config.theme;
 		const currentChapterID = this.state.currentChapter.id;
-
         return(
 			<div className="story-map">
 				<div className="not-navigating-map">
@@ -223,7 +222,7 @@ class StoryMapDisplay extends Component {
 					>
 						{ this.state.currentChapter.selectedLayers.map(
 							( layer ) => {
-								const layerOptions = this.props.loadedLayers.find(
+								const layerOptions = this.props.navigateMapLayers.find(
 									( { id } ) => id === layer.id
 								);
 								if ( layerOptions ) {
@@ -241,7 +240,7 @@ class StoryMapDisplay extends Component {
 										return;
 									}
 
-									const layerOptions = this.props.loadedLayers.find(
+									const layerOptions = this.props.navigateMapLayers.find(
 										( { id } ) => id === layer.id
 									);
 									if ( layerOptions ) {
@@ -259,10 +258,10 @@ class StoryMapDisplay extends Component {
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
 								{ this.state.postData && (
 									<>
-										<h1 className="storymap-page-title">{ this.state.postData.title.rendered }</h1>
+										<h1 className="storymap-page-title">{ decodeHtmlEntity( this.state.postData.title.rendered ) }</h1>
 										<div className="post-info">
 											{ /*<p className="author" >{ 'Authors' }</p> */ }
-											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDay() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
+											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDate() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
 										</div>
 									</>
 								) }
@@ -478,4 +477,3 @@ if(storyMapElement) {
 	storyMapProps = JSON.parse(storyMapElement.getAttribute('data-properties'));
 	wp.element.render(<StoryMapDisplay { ...storyMapProps } />, storyMapElement);
 }
-
