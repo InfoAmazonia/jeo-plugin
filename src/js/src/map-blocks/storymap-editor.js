@@ -80,6 +80,7 @@ const MapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
+			console.log(loadedLayers)
 			setAttributes( {
 				...attributes,
 				slides: [
@@ -123,7 +124,8 @@ const MapEditor = ( {
 						<Map
 							key={ key }
 							onStyleLoad={ ( map ) => {
-								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers } );
+								console.log(loadedLayers)
+								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
 								setSelectedMap( map );
 								setStorymapLayers( layersContent )
 
@@ -157,7 +159,7 @@ const MapEditor = ( {
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
-									const layerOptions = loadedLayers.find(
+									const layerOptions = attributes.navigateMapLayers.find(
 										( { id } ) => id === layer.id
 									);
 									if ( layerOptions ) {
@@ -332,7 +334,7 @@ const MapEditor = ( {
 																		ref={ provided.innerRef }
 																		className="layers"
 																>
-																		{ storymapLayers.map( ( item, index_ ) => (
+																		{ attributes.navigateMapLayers.map( ( item, index_ ) => (
 																			<Draggable key={ `${ index_ }` } draggableId={ `${ index_ }` } index={ index_ }>
 																				{ ( provided, snapshot ) => {
 																					let layerButtonStyle = {
