@@ -42,6 +42,8 @@ class Discovery extends Component {
 			// stories
 			storiesLoaded: false,
 			stories: [],
+			hoveredPostId: null,
+			hoveredClusterPostsId: [],
 
 			// filter data
 			queryParams: {},
@@ -134,6 +136,8 @@ class Discovery extends Component {
 			queryParams: this.state.queryParams,
 			searchField: this.state.searchField,
 			showSidebar: this.state.showSidebar,
+			// hoveredClusterPostsId: this.state.hoveredClusterPostsId,
+			// hoveredPostId: this.state.hoveredPostId,
 			updateStories: this.updateStories,
 
 			mapsLoaded: this.state.mapsLoaded,
@@ -174,7 +178,6 @@ class Discovery extends Component {
 			center: this.state.mapLoaded ? this.map.getCenter() : 0,
 		} );
 
-		// console.log(generatedUrl);
 
 		return (
 			<div className={ 'discovery-block' + ( this.props.embed ? ' embed' : '' ) + ( this.state.showSidebar ? ' active' : '' ) }>

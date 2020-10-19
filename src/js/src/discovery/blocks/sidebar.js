@@ -13,6 +13,8 @@ class Sidebar extends Component {
 	}
 
 	displayTab(tab) {
+		this.props.map.selectedTab = tab;
+
 		const storiesProps = {
 			storiesLoaded: this.props.storiesLoaded,
 			stories: this.props.stories,
@@ -26,6 +28,8 @@ class Sidebar extends Component {
 			dateRangeInputValue: this.props.dateRangeInputValue,
 			searchField: this.props.searchField,
 			selectedTag: this.props.selectedTag,
+			// hoveredClusterPostsId: this.props.hoveredClusterPostsId,
+			// hoveredPostId: this.props.hoveredPostId,
 			ref: this.storiesRef,
 
 			useStories: this.props.useStories,
