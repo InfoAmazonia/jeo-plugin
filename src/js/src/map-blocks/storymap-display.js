@@ -42,7 +42,7 @@ const decodeHtmlEntity = function ( str ) {
 class StoryMapDisplay extends Component {
     constructor( props ) {
 		super( props );
-
+		console.log(this.props)
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
 			slides.push( {
@@ -158,7 +158,6 @@ class StoryMapDisplay extends Component {
 		const mapStart = config.chapters[ 0 ].location;
         const theme = config.theme;
 		const currentChapterID = this.state.currentChapter.id;
-
         return(
 			<div className="story-map">
 				<div className="not-navigating-map">
@@ -223,7 +222,7 @@ class StoryMapDisplay extends Component {
 					>
 						{ this.state.currentChapter.selectedLayers.map(
 							( layer ) => {
-								const layerOptions = this.props.loadedLayers.find(
+								const layerOptions = this.props.navigateMapLayers.find(
 									( { id } ) => id === layer.id
 								);
 								if ( layerOptions ) {
@@ -241,7 +240,7 @@ class StoryMapDisplay extends Component {
 										return;
 									}
 
-									const layerOptions = this.props.loadedLayers.find(
+									const layerOptions = this.props.navigateMapLayers.find(
 										( { id } ) => id === layer.id
 									);
 									if ( layerOptions ) {
