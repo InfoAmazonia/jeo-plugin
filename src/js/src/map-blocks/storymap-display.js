@@ -7,7 +7,7 @@ import scrollama from 'scrollama';
 import Map from './map';
 import JeoMap from '../jeo-map/class-jeo-map';
 
-import './storymap-display.css';
+import './storymap-display.scss';
 
 const alignments = {
     'left': 'lefty',
