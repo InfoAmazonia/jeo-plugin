@@ -728,15 +728,10 @@ class Storie extends Component {
 		}
 
 		return (
-			<a
-				href={ story.link }
-				target="_blank"
-				rel="noreferrer"
+			<div
 				className={
 					'card' + ( ! story.queriedFeaturedImage ? ' no-thumb' : '' ) + (this.props.className.length? (' ' + this.props.className) : '')
 				}
-				onMouseEnter={ this.storyHovered }
-				onMouseLeave={ this.storyUnhover }
 			>
 				{ story.queriedFeaturedImage ? (
 					<LazyImage
@@ -751,8 +746,19 @@ class Storie extends Component {
 					<div className="title">{ decodeEntities(story.title.rendered) }</div>
 
 					<div className="date">{ storyDate }</div>
+					<div>
+						<a
+							href={ story.link }
+							target="_blank"
+							rel="noreferrer"
+							onMouseEnter={ this.storyHovered }
+							onMouseLeave={ this.storyUnhover }
+						>
+							<small>{ __( 'View in map' ) }</small>
+						</a>
+					</div>
 				</div>
-			</a>
+			</div>
 		);
 	}
 }
