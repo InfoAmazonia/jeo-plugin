@@ -113,9 +113,6 @@ class Discovery extends Component {
 
 		url.search = searchParams.toString();
 		newUrl = url.toString();
-		console.log(newUrl);
-		console.log("pame");
-		console.log(encodeURIComponent(newUrl));
 		return encodeURIComponent(newUrl);
 	}
 
