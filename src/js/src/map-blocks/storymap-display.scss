@@ -320,8 +320,8 @@ $font-stories: var(--jeo-font-stories);
     .layers-selection {
         position: absolute;
         top: 40px;
-        right: 10px;
-        width: 170px;
+        right: 20px;
+        width: 220px;
 
         .layers-wrapper {
             .layer {
@@ -342,6 +342,10 @@ $font-stories: var(--jeo-font-stories);
 
     .layers-selection-icon {
         width: 11px;
+    }
+
+    .jeomap div.legend-container{
+        right: 20px;
     }
 
     .navigate-map {
@@ -369,5 +373,29 @@ $font-stories: var(--jeo-font-stories);
             width: 90vw;
             margin: 0 auto;
         }
+
+        .return-to-slides-container {
+            left: 85px;
+            bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            .icon-return{
+                margin-right: 10px;
+            }
+        }
+
+        .jeomap div.legend-container {
+            right: 5px;
+            bottom: 75px;
+        }
+
+        .layers-selection {
+            right: 5px;
+        }
+
     }
+   
+   
 }

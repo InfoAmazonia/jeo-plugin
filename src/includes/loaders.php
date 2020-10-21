@@ -252,9 +252,11 @@ function jeo_custom_settings_css() {
 	}
 
 	if (!empty(\jeo_settings()->get_option( 'jeo_close-color', '#555D66'))) {
-		$color =\jeo_settings()->get_option('jeo_close-color', '#555D66');
-		$color_css = '--jeo_close-color: '. $color . ';';
-		$css_variables .= $color_css;
+		$colorCloseBkg =\jeo_settings()->get_option('jeo_close-color', '#555D66');
+
+		$color_css = '--jeo_close-color: '. $colorCloseBkg . ';';
+		$color_css_hover = '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo($colorCloseBkg, -0.15) . ';';
+		$css_variables .= $color_css . ' ' . $color_css_hover;
 	}
 
 	$theme_css .= '
