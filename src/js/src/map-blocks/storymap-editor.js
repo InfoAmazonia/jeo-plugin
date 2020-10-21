@@ -16,7 +16,7 @@ import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import './map-editor.css';
-import './storymap-editor.css';
+import './storymap-editor.scss';
 import { List, arrayMove } from 'react-movable';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
