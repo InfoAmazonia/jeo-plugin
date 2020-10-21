@@ -441,6 +441,10 @@ $font: var(--jeo-font);
 							opacity: 0.5;
 							font-size: 14px;
 						}
+
+						a {
+							text-decoration: none;
+						}
 					}
 
 					.lazyload-wrapper {
