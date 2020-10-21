@@ -91,9 +91,11 @@ div.jeomap {
     top: auto;
 }
 
+/* JEO SETTINGS: This css use jeo settings*/
 .jeomap nav .layers-wrapper .layer-name{
 	overflow-wrap: break-word;
-    min-width: 0;
+	min-width: 0;
+	font-family: var(--jeo-font);
 }
 /*end*/
 
@@ -195,6 +197,7 @@ div.jeomap {
 	margin-bottom: 27px;
 }
 
+/* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container .legends-title {
     background: #555D66;
     padding: 9px 20px;
@@ -204,7 +207,9 @@ div.jeomap {
     display: flex;
 	justify-content: space-between;
 	align-items: center;
+	font-family: var(--jeo-font);
 }
+/*END*/
 
 .jeomap div.legend-container i.arrow-icon {
 	width: 14px;
@@ -265,12 +270,9 @@ div.jeomap {
 
 /* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container a.more-info-button {
-	/*background: white;*/
 	background: var(--jeo_more-bkg-color);
-	/*color: #555D66;*/
 	color: var(--jeo_more-color);
 	margin: 20px auto 20px auto;
-	/* padding: 5px 10px;*/
 	padding: 3px;
 	border-radius: 5px;
 	text-decoration: none;
@@ -284,15 +286,27 @@ div.jeomap {
 }
 
 /* JEO SETTINGS: This css use jeo settings*/
+.jeomap.mapboxgl-map .more-info-overlayer h2,
+.jeomap.mapboxgl-map .map-content-layers-list h3,
+.mapboxgl-popup .mapboxgl-popup-content h2 {
+	font-family: var(--jeo-font);
+}
+
+
+.jeomap.mapboxgl-map .map-content-layers-list h3{
+	font-weight: normal;
+}
+
+/* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container a.more-info-button:hover {
 	background-color: var(--jeo_more-bkg-color-darker-15);
 	color: var(--jeo_more-color);
 	transition: all .1s ease-in-out;
 }
 
+
 /* JEO SETTINGS: This css use jeo settings*/
 .jeomap .mapboxgl-popup-close-button {
-	/* padding: 1rem 2rem; */
 	position: absolute;
     right: 5px;
     top: 5px;
@@ -303,16 +317,15 @@ div.jeomap {
     display: block;
 	padding: 0px;
 	font-size:25px;
-	/* background: #555D66;*/
 	background: var(--jeo_close-bkg-color);
-	/*color: #555D66;*/
 	color: var(--jeo_close-color);
 }
 
+/* JEO SETTINGS: This css use jeo settings*/
 .jeomap .mapboxgl-popup-close-button:hover {
 	text-decoration: none;
+	background-color: var(--jeo_more-bkg-color-darker-15);
 }
-
 
 .jeomap .mapboxgl-popup-close-button span {
     font-size: 35px;
@@ -325,6 +338,7 @@ div.jeomap {
 	line-height: 25px;
 }
 
+/* JEO SETTINGS: This css use jeo settings*/
 nav .layer-selection-title .legends-title {
     background: #555D66;
     font-size: 16px;
@@ -333,8 +347,10 @@ nav .layer-selection-title .legends-title {
 	padding: 9px 10px;
 	display: flex;
     align-items: center;
-    justify-content: space-between;
+	justify-content: space-between;
+	font-family: var(--jeo-font);
 }
+/*END*/
 
 .map-content-layers-list a.download-source{
 	font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
@@ -362,11 +378,20 @@ nav .layer-selection-title .legends-title {
 	margin-top: 1.3em;
 	margin-bottom: 10px;
 }
+/* INI - JEO SETTINGS: This css use jeo settings*/
+.more-info-overlayer h2{
+	font-family: var(--jeo-font);
+}
 
 .entry-content .map-content-layers-list h3 {
 	margin-top: 25px;
 	margin-bottom: 10px;
+	font-family: var(--jeo-font);
 }
+.map-content-layers-list h3 {
+	font-family: var(--jeo-font);
+}
+/* END */
 
 .entry-content .more-info-overlayer  p{
 	font-size: 14px;

@@ -367,7 +367,7 @@ class StoryMapDisplay extends Component {
 				<div style={ { display: 'none' } } className="navigate-map"></div>						
 				<>
 					<div className="return-to-slides-container">
-						<p>
+						<p className="icon-return">
 							<div
 								className="icon"
 								onClick={ () => {
