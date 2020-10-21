@@ -134,6 +134,18 @@
 						</td>
 					</tr>
 					<tr>
+						<th scope="row"><label for="jeo_typography-stories"><?php _e('Secondary Typography URL', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography-stories') ); ?>" type="text" id="jeo_typography-stories" value="<?php echo esc_html( $this->get_option('jeo_typography-stories') ); ?>" placeholder="Ex. https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" class="regular-text">
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="jeo_typography-name-stories"><?php _e('Secondary Typography name', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography-name-stories') ); ?>" placeholder="Ex. Libre Baskerville" type="text" id="jeo_typography-name-stories" value="<?php echo esc_html( $this->get_option('jeo_typography-name-stories') ); ?>" class="regular-text">
+						</td>
+					</tr>
+					<tr>
 						<th scope="row"><label for="jeo_more-font-size"><?php _e('Info button font-size (rem)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_more-font-size') ); ?>" type="text" id="jeo_more-font-size" value="<?php echo esc_html( $this->get_option('jeo_more-font-size') ); ?>" class="regular-text">
