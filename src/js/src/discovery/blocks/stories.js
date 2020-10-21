@@ -728,7 +728,10 @@ class Storie extends Component {
 		}
 
 		return (
-			<div
+			<a
+				href={ story.link }
+				target="_blank"
+				rel="noreferrer"
 				className={
 					'card' + ( ! story.queriedFeaturedImage ? ' no-thumb' : '' ) + (this.props.className.length? (' ' + this.props.className) : '')
 				}
@@ -743,22 +746,17 @@ class Storie extends Component {
 				<div className="sideway">
 					<div className="categories">{ finalCategories }</div>
 
-					<div className="title">{ decodeEntities(story.title.rendered) }</div>
+					<div className="title">
+						{ decodeEntities(story.title.rendered) }
+					</div>
 
 					<div className="date">{ storyDate }</div>
 					<div>
-						<a
-							href={ story.link }
-							target="_blank"
-							rel="noreferrer"
-							onMouseEnter={ this.storyHovered }
-							onMouseLeave={ this.storyUnhover }
-						>
-							<small>{ __( 'View in map' ) }</small>
-						</a>
+						<small onMouseEnter={ this.storyHovered }
+							onMouseLeave={ this.storyUnhover }>{ __( 'View in map' ) }</small>
 					</div>
 				</div>
-			</div>
+			</a>
 		);
 	}
 }
