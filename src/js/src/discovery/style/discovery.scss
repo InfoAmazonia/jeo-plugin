@@ -435,6 +435,7 @@ $font: var(--jeo-font);
 							font-weight: bold;
 							font-size: 18px;
 							padding-bottom: 5px;
+							line-height: 22px;
 						}
 
 						.date {
@@ -444,6 +445,10 @@ $font: var(--jeo-font);
 
 						a {
 							text-decoration: none;
+						}
+
+						small.view-in-map {
+							cursor: pointer;
 						}
 					}
 
@@ -471,6 +476,7 @@ $font: var(--jeo-font);
 					font-size: 18px;
 					margin-bottom: 10px;
 					padding: 9px 0;
+					line-height: 22px;
 				}
 
 				&--content {
@@ -530,6 +536,7 @@ $font: var(--jeo-font);
 						font-size: 18px;
 						padding-bottom: 5px;
 						padding-right: 80px;
+						line-height: 22px;
 						// margin-bottom: 13px;
 					}
 
