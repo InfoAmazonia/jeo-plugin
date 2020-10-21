@@ -185,6 +185,15 @@ function jeo_custom_settings_css() {
 		}
 		';
 	}
+	if (!empty(sanitize_text_field(\jeo_settings()->get_option( 'jeo_typography-name-stories' ) ))) {
+		$jeo_font_stories = wp_kses(\jeo_settings()->get_option( 'jeo_typography-name-stories'), null );
+
+		$theme_css .= '
+		:root {
+			--jeo-font-stories: "' . $jeo_font_stories . '", "sans-serif";
+		}
+		';
+	}
 
 
 	if (!empty(sanitize_text_field(\jeo_settings()->get_option( 'jeo_typography-name' ) ))) {
@@ -218,8 +227,9 @@ function jeo_custom_settings_css() {
 
 	if(!empty(\jeo_settings()->get_option( 'jeo_primary-color', '#ffffff'))) {
 		$primary_color =\jeo_settings()->get_option( 'jeo_primary-color', '#0073aa');
-		$color_css = '--jeo-primary-color: '. $primary_color . ';';
-		$css_variables .= $color_css;
+		$color_css_primary = '--jeo-primary-color: '. $primary_color . ';';
+		$color_css_primary_dark = '--jeo-primary-color-darker-15: ' . color_luminance_jeo($primary_color, -0.15) . ';';
+		$css_variables .= $color_css_primary . ' ' . $color_css_primary_dark;
 	}
 
 	if(!empty(\jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000'))) {
@@ -271,6 +281,9 @@ add_action('wp_head', 'jeo_custom_settings_css_wrap');
 function jeo_scripts_typography() {
 	if ( \jeo_settings()->get_option( 'jeo_typography' ) ) {
 		wp_enqueue_style( 'jeo-font', \jeo_settings()->get_option( 'jeo_typography' ) , array(), null );
+    }
+	if ( \jeo_settings()->get_option( 'jeo_typography-stories' ) ) {
+		wp_enqueue_style( 'jeo-font-stories', \jeo_settings()->get_option( 'jeo_typography-stories' ) , array(), null );
     }
 }
 add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );

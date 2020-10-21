@@ -266,7 +266,7 @@ class StoryMapDisplay extends Component {
 									</>
 								) }
 								{ config.subtitle &&
-									<p className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( config.subtitle ) } }></p>
+									<h3 className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( config.subtitle ) } }></h3>
 								}
 
 								<button
@@ -445,7 +445,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 							<img src={ image } alt={ title }></img>
 						}
 						{ description &&
-							<p dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } }></p>
+							<p className="slide-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } }></p>
 						}
 					</div>
 				</div>
