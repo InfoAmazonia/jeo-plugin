@@ -358,7 +358,8 @@ $font-stories: var(--jeo-font-stories);
             }
 
             width: 100vw !important;
-            height: 95vh !important;
+			height: 95vh !important;
+			max-width: 100%;
         }
     }
 
