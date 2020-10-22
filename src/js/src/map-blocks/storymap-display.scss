@@ -357,6 +357,10 @@ $font-stories: var( --jeo-font-stories );
 			width: 100vw !important;
 			height: 95vh !important;
 			max-width: 100%;
+
+			@media ( max-width: 800px ) {
+				height: 94vh !important;	
+			}
 		}
 	}
 
