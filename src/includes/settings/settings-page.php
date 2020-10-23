@@ -46,6 +46,13 @@
 						</td>
 					</tr>
 
+					<tr>
+						<th scope="row"><label for="mapbox_private_key"><?php _e('Mapbox Private API Key', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo esc_html( $this->get_field_name('mapbox_private_key') ); ?>" type="text" id="mapbox_private_key" value="<?php echo esc_html( $this->get_option('mapbox_private_key') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
 			</tbody>
 			</table>
 		</div>
