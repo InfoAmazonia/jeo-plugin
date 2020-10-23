@@ -52,14 +52,14 @@ class Layers {
 				'edit_post' => 'edit_map-layer',
 				'edit_posts' => 'edit_map-layers',
 				'edit_others_posts' => 'edit_others_map-layers',
-				
+
 				'publish_posts' => 'publish_map-layers',
 				'read_post' => 'read_map-layer',
 				'read_private_posts' => 'read_private_map-layers',
-				
+
 				'delete_post' => 'delete_map-layer',
 			),
-			// 'map_meta_cap' => true,		
+			// 'map_meta_cap' => true,
 			// 'capability_type' => 'post',
 			'show_in_admin_bar'   => false,
 			'show_in_nav_menus'   => false,
@@ -174,6 +174,30 @@ class Layers {
 				'description' => __('Use legend', 'jeo')
 			)
 		);
+
+		register_post_meta(
+			$this->post_type,
+			'use_carto_integration',
+			array(
+				'show_in_rest' => true,
+				'single' => true,
+				'auth_callback' => '__return_true',
+				'type' => 'boolean',
+				'description' => __('Use Carto Integration', 'jeo')
+			)
+		);
+
+		register_post_meta(
+			$this->post_type,
+			'carto_integration_sql',
+			array(
+				'show_in_rest' => true,
+				'single' => true,
+				'auth_callback' => '__return_true',
+				'type' => 'string',
+				'description' => __('SQL query', 'jeo')
+			)
+		);
 	}
 
 	public function add_capabilities() {
@@ -181,16 +205,16 @@ class Layers {
 		foreach ($roles as $role) {
 			// var_dump($role);
 			$role_obj = get_role($role);
-			
-			$role_obj->add_cap( 'edit_map-layer' ); 
-			$role_obj->add_cap( 'edit_map-layers' ); 
-			$role_obj->add_cap( 'edit_others_map-layers' ); 
-			
-			$role_obj->add_cap( 'publish_map-layers' ); 
-			$role_obj->add_cap( 'read_map-layer' ); 
-			$role_obj->add_cap( 'read_private_map-layers' ); 
-			
-			$role_obj->add_cap( 'delete_map-layer' ); 
+
+			$role_obj->add_cap( 'edit_map-layer' );
+			$role_obj->add_cap( 'edit_map-layers' );
+			$role_obj->add_cap( 'edit_others_map-layers' );
+
+			$role_obj->add_cap( 'publish_map-layers' );
+			$role_obj->add_cap( 'read_map-layer' );
+			$role_obj->add_cap( 'read_private_map-layers' );
+
+			$role_obj->add_cap( 'delete_map-layer' );
 		}
 	}
 

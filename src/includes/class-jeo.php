@@ -64,7 +64,7 @@ class Jeo {
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'cli_init', array($this, 'register_cli_commands') );
-
+		add_action( 'rest_api_init', array($this, 'register_endpoints') );
 
 	}
 
@@ -122,7 +122,8 @@ class Jeo {
 					'disable_drag_rotate' => false,
 					'enable_fullscreen' => true,
 					'disable_drag_pan' => false,
-				]
+				],
+				'nonce' => wp_create_nonce('wp_rest')
 			)
 		);
 
@@ -267,5 +268,19 @@ class Jeo {
 
 		}
 
+	}
+
+	public function register_endpoints() {
+		register_rest_route( 'jeowp', '/carto_integrate', array(
+			'methods' => 'POST',
+			'callback' => '\Jeo\Integrations\Carto::carto_integrate_api_callback',
+			'args' => [
+				'sql_query' => array(
+					'required' => true,
+				),
+			],
+
+			'permission_callback' => function () { return is_user_logged_in(); }
+		));
 	}
 }
