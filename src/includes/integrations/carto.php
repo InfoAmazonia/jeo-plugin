@@ -34,38 +34,36 @@ class Carto {
 	public static function carto_integrate_api_callback($params) {
 		$api_settings = self::add_api_keys();
 
-		return ['asdasdasd' => $api_settings];
-		// $sql_query = $params['sql_query'];
-		// // $sql_query = "";
+		$sql_query = $params['sql_query'];
 
-		// $carto_geojson = self::get_geojson_from_sql($sql_query);
-		// if(self::check_for_errors($carto_geojson)) return $carto_geojson;
+		$carto_geojson = self::get_geojson_from_sql($sql_query);
+		if(self::check_for_errors($carto_geojson)) return $carto_geojson;
 
-		// // var_dump($carto_geojson);
+		$file_carto_geojson = $carto_geojson['content'];
 
-		// $file_carto_geojson = $carto_geojson['content'];
+		$credentials = self::generate_s3_credentials();
+		if(self::check_for_errors($credentials)) return $credentials;
 
-		// $credentials = self::generate_s3_credentials();
-		// if(self::check_for_errors($credentials)) return $credentials;
+		$credentials = json_decode($credentials['content']);
 
-		// $credentials = json_decode($credentials['content']);
+		$uploud_file_state = self::uploud_file_to_s3($credentials, $file_carto_geojson);
+		if(self::check_for_errors($uploud_file_state)) return $uploud_file_state;
 
-		// $uploud_file_state = self::uploud_file_to_s3($credentials, $file_carto_geojson);
-		// if(self::check_for_errors($uploud_file_state)) return $uploud_file_state;
+		$uploud_status = self::uploud_to_mapbox($credentials);
+		if(self::check_for_errors($uploud_status)) return $uploud_status;
 
-		// return $credentials;
-		//return $carto_geojson;
+		return $uploud_status;
 	}
 
 	private static function generate_s3_credentials() {
 		$mapbox_settings = self::$mapbox_settings;
 		$mapbox_credentials_url = "https://api.mapbox.com/uploads/v1/$mapbox_settings[username]/credentials?access_token=$mapbox_settings[api_key]";
 
-		//$credentials = self::get_file_content($mapbox_credentials_url, 'POST');
+		$credentials = self::get_file_content($mapbox_credentials_url, 'POST');
 
-		$credentials = [
-			'content' => '{"bucket":"tilestream-tilesets-production","key":"2d/_pending/gv8pp35tyq52gf1094ph5lgkc/isaquegmelo","accessKeyId":"ASIATNLVGLR2L7AE3YHR","secretAccessKey":"0bommMQgLt7/45nChZp3zwMPuQINdjMN81k6+GHT","sessionToken":"FwoGZXIvYXdzEFwaDLgOiEZxaKXFMu+xwSKcAv+W0ts94s5tiSAVuqJNvaCX6T51vwdJpYDgZgpo68iKJnVFPChUtdYY35LV7qJ0WoACxF9kRdyodrI+2nzT2VBHl0K+sFUZHq9Lt9a7tTGxh87iPBCEnDwMi9Ol6GOqyZPNlAjl70g9Mz8ZzkW1C+WGMSsqPkGbX8nW3LumITy0qiiB+PnVQPLaFsYtOwkKO1kRVjfhgbcGMO6tcd1bpXCBCWeQBEwgRydwiHP8/B6EBuytv8QZxN/GttZnqVFsLbrMrXMdAqXffyPYGKgbJk7TuXogF+/GtiVAj+iQnn+eTe2+Mucw+z52365RxRRnbu7YQYhmuD1FViDMgRKKreiK4IdjaRUrCpsSykW9J9t7FNPM/bvA1NbOnagxKNyax/wFMinM8JNd6VKU0sMQAhNv8hNuo6rp3NG6TfeNFM7BINL62KeP8MWPbyZY0g==","url":"https: //tilestream-tilesets-production.s3.amazonaws.com/2d/_pending/gv8pp35tyq52gf1094ph5lgkc/isaquegmelo"}'
-		];
+		// $credentials = [
+		// 	'content' => '{"bucket":"tilestream-tilesets-production","key":"2d/_pending/gv8pp35tyq52gf1094ph5lgkc/isaquegmelo","accessKeyId":"ASIATNLVGLR2L7AE3YHR","secretAccessKey":"0bommMQgLt7/45nChZp3zwMPuQINdjMN81k6+GHT","sessionToken":"FwoGZXIvYXdzEFwaDLgOiEZxaKXFMu+xwSKcAv+W0ts94s5tiSAVuqJNvaCX6T51vwdJpYDgZgpo68iKJnVFPChUtdYY35LV7qJ0WoACxF9kRdyodrI+2nzT2VBHl0K+sFUZHq9Lt9a7tTGxh87iPBCEnDwMi9Ol6GOqyZPNlAjl70g9Mz8ZzkW1C+WGMSsqPkGbX8nW3LumITy0qiiB+PnVQPLaFsYtOwkKO1kRVjfhgbcGMO6tcd1bpXCBCWeQBEwgRydwiHP8/B6EBuytv8QZxN/GttZnqVFsLbrMrXMdAqXffyPYGKgbJk7TuXogF+/GtiVAj+iQnn+eTe2+Mucw+z52365RxRRnbu7YQYhmuD1FViDMgRKKreiK4IdjaRUrCpsSykW9J9t7FNPM/bvA1NbOnagxKNyax/wFMinM8JNd6VKU0sMQAhNv8hNuo6rp3NG6TfeNFM7BINL62KeP8MWPbyZY0g==","url":"https: //tilestream-tilesets-production.s3.amazonaws.com/2d/_pending/gv8pp35tyq52gf1094ph5lgkc/isaquegmelo"}'
+		// ];
 
 		return $credentials;
 	}
@@ -95,15 +93,38 @@ class Carto {
 				'Body'   => $geo_json_file,
 			]);
 
-			// Print the URL to the object.
-			return [];
+			return ['url' => $result['ObjectURL']];
 		} catch (S3Exception $e) {
 			return ['error' => $e ];
 		}
 	}
 
-	private static function uploud_to_mapbox() {
+	private static function uploud_to_mapbox($credentials) {
+		$stage_file_url = $credentials->url;
 
+		$username = self::$mapbox_settings['username'];
+		$api_key = self::$mapbox_settings['api_key'];
+
+		$url = "https://api.mapbox.com/uploads/v1/{$username}?access_token={$api_key}";
+		$random_string = self::generate_string(8);
+
+		return self::get_file_content($url, 'POST', [
+			CURLOPT_POSTFIELDS => json_encode([
+				"url" => $stage_file_url,
+				"tileset" => $username . "." . $random_string,
+				"name" => "automated-tileset-{$random_string}",
+			]),
+			CURLOPT_URL => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => "",
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 30,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => "POST",
+			CURLOPT_HTTPHEADER => [
+			  "content-type: application/json"
+			],
+		]);
 	}
 
 	private static function get_geojson_from_sql($sql_query) {
@@ -116,12 +137,12 @@ class Carto {
 		return $result;
 	}
 
-	private static function get_file_content($url, $method = 'GET') {
+	private static function get_file_content($url, $method = 'GET', $args = NULL) {
 		$GET_FILE_CONTENT_REDIRECTS = self::$GET_FILE_CONTENT_REDIRECTS;
 		$GET_FILE_CONTENT_TIMEOUT = self::$GET_FILE_CONTENT_TIMEOUT;
 		$curl = curl_init();
 
-		curl_setopt_array($curl, [
+		$default_args = [
 			CURLOPT_URL => $url,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_ENCODING => "",
@@ -129,8 +150,13 @@ class Carto {
 			CURLOPT_TIMEOUT => $GET_FILE_CONTENT_TIMEOUT,
 			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
 			CURLOPT_CUSTOMREQUEST => $method,
-			CURLOPT_POSTFIELDS => "",
-		]);
+		];
+
+		if(!isset($args)) {
+			$args = $default_args;
+		}
+
+		curl_setopt_array($curl, $args);
 
 		$response = curl_exec($curl);
 		$err = curl_error($curl);
@@ -157,5 +183,17 @@ class Carto {
 
 	private static function check_for_errors($get_file_content_return) {
 		return isset($get_file_content_return['error']);
+	}
+
+	private static function generate_string($strength = 16) {
+		$input = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+		$input_length = strlen($input);
+		$random_string = '';
+		for($i = 0; $i < $strength; $i++) {
+			$random_character = $input[mt_rand(0, $input_length - 1)];
+			$random_string .= $random_character;
+		}
+
+		return $random_string;
 	}
 }
