@@ -80,7 +80,6 @@ const MapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
-			console.log(loadedLayers)
 			setAttributes( {
 				...attributes,
 				slides: [
@@ -124,7 +123,6 @@ const MapEditor = ( {
 						<Map
 							key={ key }
 							onStyleLoad={ ( map ) => {
-								console.log(loadedLayers)
 								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
 								setSelectedMap( map );
 								setStorymapLayers( layersContent )
