@@ -140,9 +140,10 @@ div.jeomap {
 
 
 .jeomap div.more-info-overlayer {
+	margin-top: 50px;
 	position: absolute;
     width: calc(100% - 250px);
-    height: calc(100% - 20px);
+    height: calc(100% - 70px);
     background-color: white;
     z-index: 10;
     top: 10px;
@@ -155,7 +156,7 @@ div.jeomap {
 @media (max-width: 800px) {
 	.jeomap div.more-info-overlayer {
 		width: calc(100% - 20px);
-
+		height: calc(100% - 150px);
 	}
 }
 
