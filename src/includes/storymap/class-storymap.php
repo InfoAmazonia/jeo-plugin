@@ -18,8 +18,6 @@ class Storymap{
 
 
     public function register_post_type() {
-
-
 		$labels = array(
 			'name' => __('Story Map', 'jeo'),
 			'singular_name' => __('Story Map', 'jeo'),
