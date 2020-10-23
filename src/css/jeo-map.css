@@ -4,11 +4,6 @@ div.jeomap {
 	height: 600px;
 }
 
-.single-storymap .jeomap {
-	position: absolute;
-	top: 50px;
-}
-
 .jeomap nav {
 	position: absolute;
 	top: 10px;
