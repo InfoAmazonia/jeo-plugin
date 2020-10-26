@@ -56,6 +56,7 @@ class Jeo {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'init', array( $this, 'register_oembed' ) );
+		// add_action( 'init', '\Jeo\Integrations\Carto::carto_integration_cron_task');
 
 		add_action( 'init', array( $this, 'register_embed_rewrite' ) );
 		add_filter( 'query_vars', array( $this, 'register_embed_query_var' ) );
@@ -65,7 +66,6 @@ class Jeo {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'cli_init', array($this, 'register_cli_commands') );
 		add_action( 'rest_api_init', array($this, 'register_endpoints') );
-
 	}
 
 	/**
