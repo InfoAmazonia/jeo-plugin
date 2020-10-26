@@ -49,7 +49,13 @@ class Carto {
 		$uploud_file_state = self::uploud_file_to_s3($credentials, $file_carto_geojson);
 		if(self::check_for_errors($uploud_file_state)) return $uploud_file_state;
 
-		$uploud_status = self::uploud_to_mapbox($credentials);
+		// recurrent (wp cron)
+		if(isset($params['tileset'])) {
+			$uploud_status = self::uploud_to_mapbox($credentials, ['tileset' => $params['tileset'], 'title' => $params['title' ] ] );
+		} else {
+			$uploud_status = self::uploud_to_mapbox($credentials);
+		}
+
 		if(self::check_for_errors($uploud_status)) return $uploud_status;
 
 		return $uploud_status;
@@ -99,7 +105,7 @@ class Carto {
 		}
 	}
 
-	private static function uploud_to_mapbox($credentials) {
+	private static function uploud_to_mapbox($credentials, $args = null) {
 		$stage_file_url = $credentials->url;
 
 		$username = self::$mapbox_settings['username'];
@@ -111,8 +117,8 @@ class Carto {
 		return self::get_file_content($url, 'POST', [
 			CURLOPT_POSTFIELDS => json_encode([
 				"url" => $stage_file_url,
-				"tileset" => $username . "." . $random_string,
-				"name" => "automated-tileset-{$random_string}",
+				"tileset" => (isset($args)? $args['tileset'] : $username . "." . $random_string),
+				"name" => (isset($args)? $args['title'] : "automated-tileset-{$random_string}"),
 			]),
 			CURLOPT_URL => $url,
 			CURLOPT_RETURNTRANSFER => true,
@@ -196,4 +202,63 @@ class Carto {
 
 		return $random_string;
 	}
+
+}
+
+function carto_integration_cron_scheduler() {
+	if (!wp_next_scheduled ( 'carto_update_layers' )) {
+		wp_schedule_event(time(), 'five_minutes', 'carto_update_layers');
+	}
+
+	// wp_clear_scheduled_hook('Jeo\Integrations\carto_integration_update_task');
+
+}
+
+add_action( 'carto_update_layers', 'Jeo\Integrations\carto_integration_update_task' );
+
+function carto_integration_update_task() {
+	$args = [
+		'post_type' => 'map-layer',
+		'meta_key'   => 'use_carto_integration',
+		'meta_value' => true
+	];
+
+	$required_posts = new \WP_Query($args);
+	//var_dump($required_posts->post_count);
+
+	if ( $required_posts->have_posts() ) {
+		while ( $required_posts->have_posts() ) {
+			$required_posts->the_post();
+			$carto_integration_sql = get_post_meta( get_the_ID(), 'carto_integration_sql', true );
+			$layer_type_options = get_post_meta( get_the_ID(), 'layer_type_options', true );
+
+			if(empty($carto_integration_sql) || (isset($layer_type_options['tileset_id']) && empty($layer_type_options['tileset_id']))) {
+				return;
+			}
+
+			$params = [
+				'sql_query' => $carto_integration_sql,
+				'tileset' => $layer_type_options['tileset_id'],
+				'title' => $layer_type_options['source_layer'],
+			];
+
+			\Jeo\Integrations\Carto::carto_integrate_api_callback($params);
+		}
+	}
+	/* Restore original Post Data */
+	wp_reset_postdata();
+
+	// echo "Esse e o resultado do cron";
+}
+
+add_action('init', 'Jeo\Integrations\carto_integration_cron_scheduler');
+
+
+add_filter( 'cron_schedules', 'Jeo\Integrations\add_custom_invervals' );
+
+function add_custom_invervals( $schedules ) {
+    $schedules['five_minutes'] = array(
+        'interval' => 160,
+        'display'  => esc_html__( 'Every Five Minutes' ), );
+    return $schedules;
 }
