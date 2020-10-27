@@ -18,8 +18,12 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 	const [ uploudingToMabbox, setUploudingToMabbox ] = useState( false );
 
 	const cartoIntegrationProcess = () => {
-		const sure = confirm(__("This action will overwrite current layer settings"));
+		const sure = confirm(__("This action will overwrite current layer settings and rewrite tileset if set"));
 		const url = `${window.location.origin}/wp-json/jeowp/carto_integrate`;
+		let currentTileset = {
+			tileset: false,
+			title: false,
+		};;
 
 		if(!sure) {
 			return;
@@ -27,6 +31,14 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 
 		setProcessingGeoJsonStatus({ doneGeoJsonStage: false, doingGeoJsonStage: true, error: false })
 		setPostMeta( { ...postMeta, type: "mapbox-tileset-vector"} );
+
+		if(postMeta.layer_type_options.tileset_id) {
+			currentTileset = {
+				tileset: postMeta.layer_type_options.tileset_id,
+				title: postMeta.layer_type_options.source_layer
+			};
+		}
+		console.log(currentTileset);
 
 		fetch(url, {
 			method: 'POST',
@@ -36,6 +48,8 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 			},
 			body: JSON.stringify({
 				sql_query: cartoSQLQuery,
+				tileset: currentTileset.tileset,
+				title:  currentTileset.title,
 			})
 		}).then(response => response.json()).then(data => {
 			// console.log("Done, data bellow:");
@@ -75,7 +89,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 							// console.log(uploudData);
 						}
 					})
-				}, 5000);
+				}, 3000);
 			}
 		})
 		;
@@ -124,7 +138,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 						}
 
 						{ (!processingGeoJsonStatus.doneGeoJsonStage && !processingGeoJsonStatus.doingGeoJsonStage && processingGeoJsonStatus.error) &&
-							<span> Error: { processingGeoJsonStatus.error } </span>
+							<span> <br/> <strong>Error:</strong> <pre>{ JSON.stringify(JSON.parse(processingGeoJsonStatus.error), null, 2) }</pre></span>
 						}
 
 						{ processingGeoJsonStatus.doneGeoJsonStage &&  !uploudingToMabbox &&

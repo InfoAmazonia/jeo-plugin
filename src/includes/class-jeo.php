@@ -278,6 +278,14 @@ class Jeo {
 				'sql_query' => array(
 					'required' => true,
 				),
+
+				'tileset' => array(
+					'required' => false,
+				),
+
+				'title' => array(
+					'required' => false,
+				),
 			],
 
 			'permission_callback' => function () { return is_user_logged_in(); }
