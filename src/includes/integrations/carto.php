@@ -52,6 +52,11 @@ class Carto {
 		$api_settings = self::setup_settings();
 
 		$sql_query = $params['sql_query'];
+		$previous_tileset_id = $params['tileset_id'];
+
+		if(isset($previous_tileset_id) && !$previous_tileset_id) {
+
+		}
 
 		$carto_geojson = self::get_geojson_from_sql($sql_query);
 		if(self::check_for_errors($carto_geojson)) return $carto_geojson;
@@ -67,7 +72,7 @@ class Carto {
 		if(self::check_for_errors($uploud_file_state)) return $uploud_file_state;
 
 		// recurrent (wp cron)
-		if(isset($params['tileset'])) {
+		if(isset($params['tileset']) && $params['tileset']) {
 			$uploud_status = self::uploud_to_mapbox($credentials, ['tileset' => $params['tileset'], 'title' => $params['title' ] ] );
 		} else {
 			$uploud_status = self::uploud_to_mapbox($credentials);
