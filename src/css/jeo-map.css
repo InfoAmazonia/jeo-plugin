@@ -450,6 +450,7 @@ nav .layer-selection-title .legends-title {
     transform: none !important;
 	left: auto;
 	right: 0;
+	top: 70px !important;
 	padding: 5px;
 }
 
