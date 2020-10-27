@@ -74,8 +74,8 @@ class Settings {
 	public function add_menu_item() {
 		add_submenu_page(
 			'jeo-main-menu',
-			__('Jeo Settings', 'jeo'),
-			'Jeo Settings',
+			__('Settings', 'jeo'),
+			'Settings',
 			'manage_options',
 			'jeo-settings',
 			[$this, 'admin_page']

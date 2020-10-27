@@ -71,8 +71,8 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 								},
 							} )
 
-							console.log(postMeta);
-							console.log(uploudData);
+							// console.log(postMeta);
+							// console.log(uploudData);
 						}
 					})
 				}, 5000);
