@@ -8,31 +8,48 @@ use Aws\S3\S3Client;
 use Aws\S3\Exception\S3Exception;
 
 class Carto {
-	static $GET_FILE_CONTENT_TIMEOUT = 30;
+	static $GET_FILE_CONTENT_TIMEOUT = 160;
 	static $GET_FILE_CONTENT_REDIRECTS = 5;
 
 	// API settings
 	static $carto_settings = [
-		'username' => 'infoamazonia',
+		'username' => '',
 		'api_key' => '',
 		'format' => 'GeoJSON'
 	];
 
 	static $mapbox_settings = [
-		'username' => 'isaquegmelo',
+		'username' => '',
 		'api_key' => '',
 	];
 
 	private static function add_api_keys() {
 		// This will be retrieved from wp options
-		self::$carto_settings['api_key'] = getenv("INFOAMAZONIAAPIKEY");
-		self::$mapbox_settings['api_key'] = getenv("MAPBOXAPIKEY");
+		// self::$carto_settings['api_key'] = getenv("INFOAMAZONIAAPIKEY");
+		// self::$mapbox_settings['api_key'] = getenv("MAPBOXAPIKEY");
+
+		self::$carto_settings['api_key'] = \jeo_settings()->get_option( 'carto_key' );
+		self::$mapbox_settings['api_key'] = \jeo_settings()->get_option( 'mapbox_private_key' );
+
+		return [self::$carto_settings, self::$mapbox_settings];
+	}
+
+	private static function add_api_usernames() {
+		self::$carto_settings['username'] = \jeo_settings()->get_option( 'carto_username' );
+		self::$mapbox_settings['username'] = \jeo_settings()->get_option( 'mapbox_username' );
+
+		return [self::$carto_settings, self::$mapbox_settings];
+	}
+
+	private static function setup_settings() {
+		self::add_api_keys();
+		self::add_api_usernames();
 
 		return [self::$carto_settings, self::$mapbox_settings];
 	}
 
 	public static function carto_integrate_api_callback($params) {
-		$api_settings = self::add_api_keys();
+		$api_settings = self::setup_settings();
 
 		$sql_query = $params['sql_query'];
 
@@ -207,7 +224,7 @@ class Carto {
 
 function carto_integration_cron_scheduler() {
 	if (!wp_next_scheduled ( 'carto_update_layers' )) {
-		wp_schedule_event(time(), 'five_minutes', 'carto_update_layers');
+		wp_schedule_event(time(), 'daily', 'carto_update_layers');
 	}
 
 	// wp_clear_scheduled_hook('Jeo\Integrations\carto_integration_update_task');
