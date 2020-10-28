@@ -3,13 +3,17 @@ $font-stories: var( --jeo-font-stories );
 
 .single-storymap {
 	@media (max-width: 829px) {
-		.storymap-page-title, .mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
+		.storymap-page-title {
 			margin-top: 70px;
 		}
 
 		.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
 			margin-top: 40px;
 		}
+	}
+	
+	.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
+		margin-top: 30px;
 	}
 
 	margin: 0;
