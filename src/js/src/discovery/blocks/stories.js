@@ -210,12 +210,12 @@ class Stories extends Component {
 				// 		{ hover: false }
 				// 	);
 				// }
-				console.log( this.state.hoveredPostId,  e.features[0].id  );
+				// console.log( this.state.hoveredPostId,  e.features[0].id  );
 
 				this.setState({
 					// ...this.state,
 					hoveredPostId: e.features[0].id,
-				}, () => console.log("Terminou de setar estado"))
+				})
 
 				map.setFeatureState(
 					{ source: 'storiesSource', id: e.features[0].id },
@@ -230,7 +230,7 @@ class Stories extends Component {
 
 		map.on('mouseleave', 'unclustered-points', () => {
 			if(map.selectedTab.name === "stories"){
-				console.log("mouseleave", this.state.hoveredPostId);
+				// console.log("mouseleave", this.state.hoveredPostId);
 				if (this.state.hoveredPostId) {
 					map.setFeatureState(
 						{ source: 'storiesSource', id: this.state.hoveredPostId },
