@@ -2,8 +2,22 @@ $font: var( --jeo-font );
 $font-stories: var( --jeo-font-stories );
 
 .single-storymap {
+	@media (max-width: 829px) {
+		.storymap-page-title, .mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
+			margin-top: 70px;
+		}
+
+		.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
+			margin-top: 40px;
+		}
+	}
+
 	margin: 0;
 	padding: 0;
+	
+	.jeomap {
+		position: absolute;
+	}
 
 	#content {
 		margin: 0;
@@ -355,8 +369,12 @@ $font-stories: var( --jeo-font-stories );
 			}
 
 			width: 100vw !important;
-			height: 95vh !important;
+			height: 96vh !important;
 			max-width: 100%;
+
+			@media ( max-width: 800px ) {
+				height: 94vh !important;	
+			}
 		}
 	}
 
