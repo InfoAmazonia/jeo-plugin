@@ -280,7 +280,7 @@ add_filter( 'cron_schedules', 'Jeo\Integrations\add_custom_invervals' );
 
 function add_custom_invervals( $schedules ) {
     $schedules['five_minutes'] = array(
-        'interval' => 160,
+        'interval' => 100,
         'display'  => esc_html__( 'Every Five Minutes' ), );
     return $schedules;
 }
