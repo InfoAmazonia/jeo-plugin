@@ -270,9 +270,9 @@ class MapLayers extends Component {
 					}
 
 					const newLayer = {
-						id: attributes.layer_id,
+						id: layerId,
 						type: attributes.layer_type_options.type,
-						source: attributes.layer_id,
+						source: layerId,
 						'source-layer': attributes.layer_type_options.source_layer
 					};
 
@@ -292,10 +292,12 @@ class MapLayers extends Component {
 						});
 					}
 
+					// console.log(layerId);
+
 					const newLayer = {
-						id: attributes.layer_id,
+						id: layerId,
 						type: attributes.layer_type_options.type,
-						source: attributes.layer_id,
+						source: layerId,
 						'source-layer': ''
 					};
 
