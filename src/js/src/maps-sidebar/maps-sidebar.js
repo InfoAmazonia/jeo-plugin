@@ -108,7 +108,7 @@ function MapsSidebar( {
 				if ( response.status >= 400 ) {
 					sendNotice(
 						'warning',
-						__( 'Your Mapbox access token may be invalid.', 'jeo' ),
+						__( '1 - Your Mapbox access token may be invalid.', 'jeo' ),
 						{
 							id: 'layer_notices_no_api_key',
 							isDismissible: true,
@@ -251,17 +251,6 @@ function MapsSidebar( {
 						</ButtonGroup>
 					</div>
 					<Map
-						onError={ () => {
-							sendNotice(
-								'warning',
-								__( 'Your Mapbox access token may be invalid.', 'jeo' ),
-								{
-									id: 'layer_notices_no_api_key',
-									isDismissible: true,
-								}
-							);
-							lockPostSaving();
-						} }
 						onStyleLoad={ ( map ) => {
 							map.addControl(
 								new mapboxgl.NavigationControl( { showCompass: false } ),
