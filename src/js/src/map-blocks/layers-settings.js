@@ -175,8 +175,8 @@ const LayersSettings = ( {
 						className="jeo-layers-library-filters-button-clear"
 						isPrimary
 						isLarge
-						onClick={ () => { 
-							setFilteredLayers([]); 
+						onClick={ () => {
+							setFilteredLayers([]);
 							setLayerTypeFilter( '' );
 							setLayerLegendFilter( '' );
 							setLayerNameFilter('');
@@ -336,7 +336,7 @@ const LayersSettings = ( {
 										...settings,
 										use,
 										default:
-											use === 'swappable' ? ! anySwapDefault( attributes.layers ) : 
+											use === 'swappable' ? ! anySwapDefault( attributes.layers ) :
 											use === 'fixed' ? true :
 											settings.default,
 									};
