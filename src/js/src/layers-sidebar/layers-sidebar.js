@@ -10,6 +10,7 @@ import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
+import CartoIntegration from './carto-integration';
 import './layers-sidebar.css';
 
 const mapDefaults = {
@@ -271,6 +272,13 @@ const LayersSidebar = ( {
 						title={ __( 'Settings' ) }
 					>
 						<LayerSettings />
+					</PluginDocumentSettingPanel>
+
+					<PluginDocumentSettingPanel
+						name="carto-integration"
+						title={ __( 'Carto Integration' ) }
+					>
+						<CartoIntegration />
 					</PluginDocumentSettingPanel>
 
 					<PluginDocumentSettingPanel

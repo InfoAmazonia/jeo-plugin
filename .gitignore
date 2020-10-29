@@ -3,6 +3,7 @@ tests/bootstrap-config.php
 node_modules
 src/js/build
 jeo.zip
+.env
 
 /wordpress/
 /test-environment/

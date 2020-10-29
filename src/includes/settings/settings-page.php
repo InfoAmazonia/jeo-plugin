@@ -17,6 +17,11 @@
 		<div id="tab-general" class="tabs-content">
 			<table class="form-table">
 				<tbody>
+					<tr>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php _e('Map', 'jeo'); ?></h2></th>
+						<td>
+						</td>
+					</tr>
 
 					<tr>
 						<th scope="row"><label for="map_default_lat"><?php _e('Default map latitute', 'jeo'); ?></label></th>
@@ -40,9 +45,60 @@
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="mapbox_key"><?php _e('Mapbox API Key', 'jeo'); ?></label></th>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php _e('API', 'jeo'); ?></h2></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('mapbox_key') ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option('mapbox_key') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+					<tr>
+						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php _e('Mapbox', 'jeo'); ?></h3></th>
+						<td>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="mapbox_key"><?php _e('API Key*', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo esc_html( $this->get_field_name('mapbox_key') ); ?>" placeholder="<?= __("Ex. pk.eyJ3...", "jeo") ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option('mapbox_key') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="mapbox_username"><?php _e('Username', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo esc_html( $this->get_field_name('mapbox_username') ); ?>" placeholder="<?= __("", "jeo") ?>" type="text" id="mapbox_username" value="<?php echo esc_html( $this->get_option('mapbox_username') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="mapbox_private_key"><?php _e('Private API Key', 'jeo'); ?></label></th>
+						<td>
+							<input name="<?php echo esc_html( $this->get_field_name('mapbox_private_key') ); ?>" type="text" placeholder="<?= __("Ex. sk.eyJ1Ij...", "jeo") ?>"  id="mapbox_private_key" value="<?php echo esc_html( $this->get_option('mapbox_private_key') ); ?>" class="regular-text">
+							<p><?php _e('This is used for Carto integration only. ', 'jeo'); ?></p>
+							<p><?php _e('If you will not use, don\'t worry about it. ', 'jeo'); ?></p>
+
+						</td>
+					</tr>
+
+
+
+					<tr>
+						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php _e('Carto (oppicional)', 'jeo'); ?></h3></th>
+						<td>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="carto_username"><?php _e('Username', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo esc_html( $this->get_field_name('carto_username') ); ?>" placeholder="<?= __("", "jeo") ?>" type="text" id="carto_username" value="<?php echo esc_html( $this->get_option('carto_username') ); ?>" class="regular-text">
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="carto_key"><?php _e('API Key', 'jeo'); ?></label></th>
+						<td>
+						<input name="<?php echo esc_html( $this->get_field_name('carto_key') ); ?>" placeholder="<?= __("Ex. 5a03fe2...", "jeo") ?>" type="text" id="carto_key" value="<?php echo esc_html( $this->get_option('carto_key') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
