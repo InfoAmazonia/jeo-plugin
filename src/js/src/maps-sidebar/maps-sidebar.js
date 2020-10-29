@@ -251,6 +251,9 @@ function MapsSidebar( {
 						</ButtonGroup>
 					</div>
 					<Map
+						onError={ (map, error) => {
+
+						} }
 						onStyleLoad={ ( map ) => {
 							map.addControl(
 								new mapboxgl.NavigationControl( { showCompass: false } ),
