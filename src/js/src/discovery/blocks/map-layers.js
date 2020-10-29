@@ -85,7 +85,7 @@ class MapLayers extends Component {
 				} );
 
 				return Promise.all( mapsLayersPromises ).then( () => {
-					this.props.updateState( { maps } );
+					this.props.updateState( { maps,  mapsLoaded: true } );
 				} );
 
 				// Build layers legends using legacy strategy (based on active layers)
@@ -396,6 +396,24 @@ class MapLayers extends Component {
 			this.props.layersQueue
 		);
 
+		const loading = ! this.props.mapsLoaded ? (
+			<svg
+				aria-hidden="true"
+				focusable="false"
+				data-prefix="fas"
+				data-icon="spinner"
+				role="img"
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 512 512"
+				className="svg-inline--fa fa-spinner fa-w-16 fa-3x"
+			>
+				<path
+					fill="currentColor"
+					d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
+				></path>
+			</svg>
+		) : null;
+
 		return (
 			<div className="maps-tab">
 				<Search
@@ -467,7 +485,7 @@ class MapLayers extends Component {
 						{ __( 'Apply changes' ) }
 					</button>
 				) }
-
+				{ loading }
 				<div className="map-itens">{ mapItens }</div>
 			</div>
 		);
