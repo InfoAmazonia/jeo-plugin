@@ -1,7 +1,7 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 5.5.0
-Stable tag: 1.0.0
+Stable tag: 1.1.0
 Requires PHP: 7.2
 Requires at least: 5.4
 License: GPL-2.0+
@@ -48,6 +48,8 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+= 1.1.0 =
+* Fourth release. New feature: Carto Integration
 
 = 1.0.0 =
 * Third release.
