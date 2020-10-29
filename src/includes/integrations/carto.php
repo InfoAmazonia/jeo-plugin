@@ -80,7 +80,35 @@ class Carto {
 
 		if(self::check_for_errors($uploud_status)) return $uploud_status;
 
+
+		$change_tileset_privacy = self::change_tileset_status($uploud_status['tileset']);
+		if(self::check_for_errors($change_tileset_privacy)) return $change_tileset_privacy;
+
 		return $uploud_status;
+	}
+
+	private static function change_tileset_status($tileset_id) {
+		$mapbox_settings = self::$mapbox_settings;
+		$legacy_api_url = "https://api.mapbox.com/api/Map/$tileset_id?access_token=$mapbox_settings[api_key]";
+
+		self::get_file_content($legacy_api_url, 'POST', [
+			CURLOPT_POSTFIELDS => json_encode([
+				"tileset" => $tileset_id,
+				"private" => false,
+				"status" => "available",
+				"_type" => "tileset",
+			]),
+			CURLOPT_URL => $legacy_api_url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_ENCODING => "",
+			CURLOPT_MAXREDIRS => 10,
+			CURLOPT_TIMEOUT => 30,
+			CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+			CURLOPT_CUSTOMREQUEST => "POST",
+			CURLOPT_HTTPHEADER => [
+			  "content-type: application/json"
+			],
+		]);
 	}
 
 	private static function generate_s3_credentials() {
@@ -141,6 +169,7 @@ class Carto {
 				"url" => $stage_file_url,
 				"tileset" => (isset($args)? $args['tileset'] : $username . "." . $random_string),
 				"name" => (isset($args)? $args['title'] : "automated-tileset-{$random_string}"),
+				// "private" => false, ENDPOINT BUG
 			]),
 			CURLOPT_URL => $url,
 			CURLOPT_RETURNTRANSFER => true,
