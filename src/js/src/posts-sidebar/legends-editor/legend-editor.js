@@ -16,7 +16,7 @@ class LegendEditor extends Component {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
 				use_legend: metadata.use_legend,
-				legend_title: metadata.legend_title? metadata.legend_title : "default",
+				legend_title: metadata.legend_title? metadata.legend_title : "",
 			} ),
 		};
 
@@ -77,7 +77,10 @@ class LegendEditor extends Component {
 
 						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
 
-						this.setState( { legendObject: {...this.state.legendObject, attributes: { ...this.state.legendObject.attributes, legend_title: value }  } } );
+						const newLegendObject = Object.assign( new JeoLegend, this.state.legendObject );
+						newLegendObject.attributes.legend_title = value;
+
+						this.setState( { legendObject: newLegendObject });
 					} }
 				/> }
 

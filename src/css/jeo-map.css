@@ -647,3 +647,10 @@ p.jeomap-no-layers__text {
     border: 1px solid #e3dfdf;
     padding: 5px;
 }
+
+.jeomap .legends-wrapper .legend-single-title {
+	margin-bottom: 15px;
+	font-size: 16px;
+	color: #333;
+	font-weight: bold;
+}
