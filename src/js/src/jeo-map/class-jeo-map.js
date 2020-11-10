@@ -252,6 +252,17 @@ export default class JeoMap {
 				}
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
+
+				console.log(legend);
+
+				if(legend.attributes.legend_title) {
+					const legendTitle = document.createElement('div');
+					legendTitle.classList.add('legend-single-title');
+					legendTitle.innerText = legend.attributes.legend_title;
+
+					legendContainer.appendChild( legendTitle );
+				}
+
 				legendContainer.appendChild( legend.render() );
 				legendsWrapper.appendChild( legendContainer );
 			} );
@@ -430,6 +441,7 @@ export default class JeoMap {
 											layer_id: layerObject.slug,
 											legend_type_options: layerObject.meta.legend_type_options,
 											use_legend: layerObject.meta.use_legend,
+											legend_title: layerObject.meta.legend_title,
 										} )
 									);
 								}
