@@ -933,7 +933,7 @@ $font: var(--jeo-font);
 
 .embed-footer {
     position: absolute;
-    bottom: 20px;
+    bottom: 27px;
 	width: 130px;
     background: white;
 	padding: 5px;
@@ -941,5 +941,6 @@ $font: var(--jeo-font);
 
 	&.discovery {
 		left: 25px;
+		bottom: 20px;
 	}
 }
