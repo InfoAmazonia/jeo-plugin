@@ -29,6 +29,14 @@ class Sidebars {
 			$asset_file['version']
 		);
 
+		wp_localize_script(
+			'jeo-layers-sidebar',
+			'jeo_private_options',
+			array(
+				'mapbox_private_key' => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_private_key' )),
+			)
+		);
+
 		wp_enqueue_script(
 			'jeo-maps-sidebar',
 			JEO_BASEURL . '/js/build/mapsSidebar.js',
