@@ -930,3 +930,16 @@ $font: var(--jeo-font);
 		display: none;
 	}
 }
+
+.embed-footer {
+    position: absolute;
+    bottom: 20px;
+	width: 130px;
+    background: white;
+	padding: 5px;
+	left: 10px;
+
+	&.discovery {
+		left: 25px;
+	}
+}
