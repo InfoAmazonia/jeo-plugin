@@ -8,9 +8,12 @@
 	<div class="discovery-embed">
 	</div>
 
-	<div class="embed-footer discovery">
-		<?php echo the_custom_logo() ?>
-	</div>
+
+	<?php if(has_custom_logo()): ?>
+		<div class="embed-footer discovery">
+			<?php echo the_custom_logo() ?>
+		</div>
+	<?php endif; ?>
 
 
 	<?php wp_footer(); ?>
