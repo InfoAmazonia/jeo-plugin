@@ -14,9 +14,11 @@
 		<div id="embed-post-preview" style="<?php echo esc_html( $popup_style ); ?>"></div>
 	<?php endif; ?>
 
-	<div class="embed-footer">
-		<?php echo the_custom_logo() ?>
-	</div>
+	<?php if(has_custom_logo()): ?>
+		<div class="embed-footer">
+			<?php echo the_custom_logo() ?>
+		</div>
+	<?php endif; ?>
 
 	<?php wp_footer(); ?>
 
