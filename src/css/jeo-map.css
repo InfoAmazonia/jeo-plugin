@@ -99,8 +99,9 @@ div.jeomap {
 }
 /*end*/
 
-.jeomap nav a.active:before {
-
+.jeomap nav.layers-selection {
+    max-width: 220px;
+    min-width: 220px;
 }
 
 .jeomap nav .arrow-icon {
@@ -125,12 +126,28 @@ div.jeomap {
 .jeomap nav .text-icon .layer-icon{
 	width: 14px;
     height: 16px;
-    background: url(../src/images/layers.png);
-    background-size: cover;
+   	background: url(../src/images/layers.png);
+	background-size: cover;
     background-position: center;
     filter: brightness(0) invert(1);
 	cursor: pointer;
 	margin-right: 12px;
+}
+
+.jeomap .legend-container .text-icon {
+	display: flex;
+    align-items: center;
+}
+
+.jeomap .text-icon .legend-icon{
+	width: 14px;
+    height: 16px;
+	background-size: cover;
+	background-image: url("data:image/svg+xml,%3Csvg aria-hidden='true' focusable='false' data-prefix='fas' data-icon='list' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' class='svg-inline--fa fa-list fa-w-16 fa-3x'%3E%3Cpath fill='%23333' d='M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z' class=''%3E%3C/path%3E%3C/svg%3E");
+    background-position: center;
+	cursor: pointer;
+	margin-right: 12px;
+	filter: brightness(0) invert(1);
 }
 
 .jeomap nav a:hover {
@@ -201,7 +218,7 @@ div.jeomap {
 /* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container .legends-title {
     background: #191e23;
-    padding: 9px 20px;
+    padding: 9px 10px;
     color: white;
     font-size: 16px;
     font-weight: 600;
@@ -289,7 +306,8 @@ div.jeomap {
 /* JEO SETTINGS: This css use jeo settings*/
 .jeomap.mapboxgl-map .more-info-overlayer h2,
 .jeomap.mapboxgl-map .map-content-layers-list h3,
-.mapboxgl-popup .mapboxgl-popup-content h2 {
+.mapboxgl-popup .mapboxgl-popup-content h2,
+.jeomap.mapboxgl-map p {
 	font-family: var(--jeo-font);
 }
 
@@ -341,7 +359,7 @@ div.jeomap {
 
 /* JEO SETTINGS: This css use jeo settings*/
 nav .layer-selection-title .legends-title {
-    background: #555D66;
+    background: #191e23;
     font-size: 16px;
     color: white;
     font-weight: 600;
@@ -529,6 +547,7 @@ nav .layer-selection-title .legends-title {
 	align-items: center;
 	font-size: 14px;
 	color: #555D66;
+	font-family: var(--jeo-font);
 }
 
 /** Icons legend **/
@@ -654,4 +673,5 @@ p.jeomap-no-layers__text {
 	color: #333;
 	font-weight: bold;
 	display: block;
+	font-family: var(--jeo-font);
 }
