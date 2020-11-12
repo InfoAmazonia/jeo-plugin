@@ -14,10 +14,13 @@ export default class JeoMap {
 		this.layers = [];
 		this.legends = [];
 
+		this.isEmbed = this.element.getAttribute('data-embed');
+
 		const map = new window.mapboxgl.Map( {
 			container: element,
 			attributionControl: false,
 		} );
+
 		this.map = map;
 		this.options = jQuery( this.element ).data( 'options' );
 
@@ -30,12 +33,18 @@ export default class JeoMap {
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
-					map.setZoom( this.getArg( 'initial_zoom' ) );
+					map.on('load', () => {
+						if(this.isEmbed) {
+							map.flyTo({ center: [this.getArg( 'center_lon' ), this.getArg( 'center_lat' )], zoom: this.getArg( 'initial_zoom' ) });
+						} else {
+							map.setCenter( [
+								this.getArg( 'center_lon' ),
+								this.getArg( 'center_lat' ),
+							] );
 
-					map.setCenter( [
-						this.getArg( 'center_lon' ),
-						this.getArg( 'center_lat' ),
-					] );
+							map.setZoom( this.getArg( 'initial_zoom' ) );
+						}
+					});
 
 					map.addControl(
 						new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -77,6 +86,7 @@ export default class JeoMap {
 					if ( this.getArg( 'max_zoom' ) ) {
 						map.setMaxZoom( this.getArg( 'max_zoom' ) );
 					}
+
 				}
 			} )
 			.then( () => {
@@ -242,6 +252,17 @@ export default class JeoMap {
 				}
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
+
+				console.log(legend);
+
+				if(legend.attributes.legend_title) {
+					const legendTitle = document.createElement('div');
+					legendTitle.classList.add('legend-single-title');
+					legendTitle.innerText = legend.attributes.legend_title;
+
+					legendContainer.appendChild( legendTitle );
+				}
+
 				legendContainer.appendChild( legend.render() );
 				legendsWrapper.appendChild( legendContainer );
 			} );
@@ -420,6 +441,7 @@ export default class JeoMap {
 											layer_id: layerObject.slug,
 											legend_type_options: layerObject.meta.legend_type_options,
 											use_legend: layerObject.meta.use_legend,
+											legend_title: layerObject.meta.legend_title,
 										} )
 									);
 								}
@@ -512,7 +534,11 @@ export default class JeoMap {
 
 		// By default, fly to the first post and centers it
 		this.activateMarker( marker );
-		this.map.flyTo( { center: LngLat, zoom: 4 } );
+
+		if(!this.isEmbed) {
+				// alert("asdasd");
+			this.map.flyTo( { center: LngLat, zoom: 4 } );
+		}
 	}
 
 	activateMarker( activeMarker ) {

@@ -177,6 +177,18 @@ class Layers {
 
 		register_post_meta(
 			$this->post_type,
+			'legend_title',
+			array(
+				'show_in_rest' => true,
+				'single' => true,
+				'auth_callback' => '__return_true',
+				'type' => 'string',
+				'description' => __('Legend title', 'jeo')
+			)
+		);
+
+		register_post_meta(
+			$this->post_type,
 			'use_carto_integration',
 			array(
 				'show_in_rest' => true,
