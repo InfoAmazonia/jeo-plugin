@@ -56,9 +56,14 @@ class MapLayers extends Component {
 							jeoMapVars.jsonUrl + 'map-layer/' + layer.id
 						);
 
+
 						return fetch( mapLayerApiUrl )
 							.then( ( data ) => data.json() )
 							.then( ( layer ) => {
+								if(layer.code && layer.code === "rest_forbidden") {
+									return;
+								}
+
 								if (
 									singleMap.queriedLayers &&
 									singleMap.queriedLayers.length

@@ -165,12 +165,22 @@ class Discovery extends Component {
 				layer_id: layer.slug,
 				legend_type_options: layer.meta.legend_type_options,
 				use_legend: layer.meta.use_legend,
+				legend_title: layer.meta.legend_title,
 			} );
 		} );
 
 		let renderedLegends = legends.map( ( legendObj ) => legendObj.render() );
-		renderedLegends = renderedLegends.map( ( legendRender ) =>
-			parse( legendRender.outerHTML )
+		renderedLegends = renderedLegends.map( ( legendRender, index ) => {
+				console.log(legends[index]);
+				return (
+					<>
+						<div className="legend-single-title">
+							{ legends[index].attributes.legend_title }
+						</div>
+						{ parse( legendRender.outerHTML ) }
+					</>
+				);
+			}
 		);
 
 		const buildURLParams = {
