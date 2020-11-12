@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { SelectControl, CheckboxControl } from '@wordpress/components';
+import { SelectControl, CheckboxControl, TextControl } from '@wordpress/components';
 import JeoLegend from '../../../../includes/legend-types/JeoLegend';
 import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
@@ -16,6 +16,7 @@ class LegendEditor extends Component {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
 				use_legend: metadata.use_legend,
+				legend_title: metadata.legend_title? metadata.legend_title : "",
 			} ),
 		};
 
@@ -65,6 +66,24 @@ class LegendEditor extends Component {
 					} }
 				/>
 
+				{ this.state.legendObject.attributes.use_legend && <TextControl
+					className="label-input-wrapper"
+					label={ __( 'Legend title' ) }
+					value={ this.state.legendObject.attributes.legend_title }
+					onChange={ ( value ) => {
+						const newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+						// console.log(newMeta);
+						newMeta.legend_title = value;
+
+						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
+
+						const newLegendObject = Object.assign( new JeoLegend, this.state.legendObject );
+						newLegendObject.attributes.legend_title = value;
+
+						this.setState( { legendObject: newLegendObject });
+					} }
+				/> }
+
 				{ this.state.legendObject.attributes.use_legend && (
 					<>
 						<SelectControl
@@ -73,7 +92,6 @@ class LegendEditor extends Component {
 							options={ [	...this.legendTypes.map( ( item ) => {
 								return { label: item, value: item };
 							} )	] }
-
 							onChange={ ( newLegendType ) => {
 								this.setState( ( prevState ) => {
 									const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
