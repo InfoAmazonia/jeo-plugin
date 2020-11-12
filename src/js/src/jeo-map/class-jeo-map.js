@@ -222,9 +222,29 @@ export default class JeoMap {
 		} );
 
 		if ( this.legends.length > 0 && appearingLegends > 0 ) {
-			const legendsTitle = document.createElement( 'div' );
+			/*const legendsTitle = document.createElement( 'div' );
 			legendsTitle.classList.add( 'legends-title' );
-			legendsTitle.innerHTML = '<span class="text"> Legend </span>';
+			legendsTitle.innerHTML = '<span class="text"> Legend </span>';*/
+
+
+			
+
+				const legendsTitle = document.createElement( 'div' );
+				legendsTitle.classList.add( 'legends-title' );
+
+				const legendTextIcon = document.createElement( 'div' );
+				legendTextIcon.classList.add( 'text-icon' );
+
+				const layerIcon = document.createElement( 'i' );
+				layerIcon.classList.add( 'legend-icon' );
+
+				legendTextIcon.appendChild( layerIcon );
+				legendTextIcon.innerHTML += '<span class="text"> Legend </span>';
+
+				legendsTitle.appendChild( legendTextIcon );
+
+
+		
 
 			const legendsHideIcon = document.createElement( 'i' );
 			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
