@@ -565,6 +565,7 @@ nav .layer-selection-title .legends-title {
 	align-items: center;
 	font-size: 14px;
 	color: #555D66;
+	font-family: var(--jeo-font);
 }
 
 /** Circles legend **/
