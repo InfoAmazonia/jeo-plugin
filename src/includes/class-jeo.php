@@ -241,19 +241,33 @@ class Jeo {
 
 					$have_related_posts = !empty($data) || !empty($map->show_all_posts);
 
-					$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
-					$popup_width = isset( $_GET['popup_width'] ) && is_numeric( $_GET['popup_width'] ) ? intval( $_GET['popup_width'] ) : 220;
-					$map_width = $full_width ? $full_width : 600;
+					if(isset($_GET['width']) ) {
+						$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
+						$popup_width = isset( $_GET['popup_width'] ) && is_numeric( $_GET['popup_width'] ) ? intval( $_GET['popup_width'] ) : 220;
+						$map_width = $full_width ? $full_width : 600;
 
-					if($have_related_posts){
-						$map_width = $full_width - $popup_width;
+						if($have_related_posts){
+							$map_width = $full_width - $popup_width;
+						}
+
+						$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( $_GET['height'] ) : 600;
+
+						$map_style = "width: ${map_width}px; height: ${height}px;";
+						$container_style = "width: ${full_width}px; height: ${height}px;";
+						$popup_style = "width: ${popup_width}px; height: ${height}px;";
+					} else {
+						$have_related_posts = !empty($data) || !empty($map->show_all_posts);
+						$container_style = "width: 100%; height: 100%;";
+
+						if($have_related_posts) {
+							$map_style = "width: 70%; height: 100%;";
+							$popup_style = "width: 30%; height: 100%;";
+						} else {
+							$map_style = $container_style;
+							$popup_style = $container_style;
+						}
+
 					}
-
-					$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( $_GET['height'] ) : 600;
-
-					$map_style = "width: ${map_width}px; height: ${height}px;";
-					$container_style = "width: ${full_width}px; height: ${height}px;";
-					$popup_style = "width: ${popup_width}px; height: ${height}px;";
 
 					require JEO_BASEPATH . '/templates/embed.php';
 
