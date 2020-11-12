@@ -200,7 +200,7 @@ div.jeomap {
 
 /* JEO SETTINGS: This css use jeo settings*/
 .jeomap div.legend-container .legends-title {
-    background: #555D66;
+    background: #191e23;
     padding: 9px 20px;
     color: white;
     font-size: 16px;
@@ -648,9 +648,10 @@ p.jeomap-no-layers__text {
     padding: 5px;
 }
 
-.jeomap .legends-wrapper .legend-single-title {
+.jeomap .legends-wrapper .legend-single-title, .discovery .legends-wrapper .legend-single-title  {
 	margin-bottom: 15px;
 	font-size: 16px;
 	color: #333;
 	font-weight: bold;
+	display: block;
 }

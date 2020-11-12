@@ -256,7 +256,7 @@ export default class JeoMap {
 				console.log(legend);
 
 				if(legend.attributes.legend_title) {
-					const legendTitle = document.createElement('div');
+					const legendTitle = document.createElement('span');
 					legendTitle.classList.add('legend-single-title');
 					legendTitle.innerText = legend.attributes.legend_title;
 
