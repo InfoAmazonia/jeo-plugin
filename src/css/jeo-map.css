@@ -669,7 +669,7 @@ p.jeomap-no-layers__text {
     padding: 5px;
 }
 
-.jeomap .legends-wrapper .legend-single-title, .discovery .legends-wrapper .legend-single-title  {
+.jeomap .legends-wrapper .legend-single-title, #discovery .legends-wrapper .legend-single-title  {
 	margin-bottom: 15px;
 	font-size: 16px;
 	color: #333;
@@ -678,6 +678,3 @@ p.jeomap-no-layers__text {
 	font-family: var(--jeo-font);
 }
 
-.legends-wrapper .legend-single-title {
-    margin-bottom: 10px;
-}
