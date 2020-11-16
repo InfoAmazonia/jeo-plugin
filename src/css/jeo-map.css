@@ -534,6 +534,7 @@ nav .layer-selection-title .legends-title {
 
 .simple-color-item-box {
 	width: 21px;
+	min-width: 21px;
 	height: 21px;
 	margin-right: 16px;
 	float: left;
