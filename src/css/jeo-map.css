@@ -134,12 +134,14 @@ div.jeomap {
 	margin-right: 12px;
 }
 
-.jeomap .legend-container .text-icon {
+.jeomap .legend-container .text-icon,
+#discovery .legend-container .text-icon  {
 	display: flex;
     align-items: center;
 }
 
-.jeomap .text-icon .legend-icon{
+.jeomap .text-icon .legend-icon,
+#discovery .text-icon .legend-icon {
 	width: 14px;
     height: 16px;
 	background-size: cover;

@@ -290,7 +290,10 @@ class Discovery extends Component {
 						}
 					>
 						<div className="legends-title">
-							<span className="text">{ __( 'Legend' ) }</span>
+							<div className="text-icon">
+								<i className="legend-icon"></i>
+								<span className="text">{ __( 'Legend' ) }</span>
+							</div>
 							<i
 								onClick={ () =>
 									this.setState( {
