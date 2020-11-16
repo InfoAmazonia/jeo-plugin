@@ -677,3 +677,7 @@ p.jeomap-no-layers__text {
 	display: block;
 	font-family: var(--jeo-font);
 }
+
+.legends-wrapper .legend-single-title {
+    margin-bottom: 10px;
+}
