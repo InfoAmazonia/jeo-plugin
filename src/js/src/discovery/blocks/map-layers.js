@@ -60,7 +60,7 @@ class MapLayers extends Component {
 						return fetch( mapLayerApiUrl )
 							.then( ( data ) => data.json() )
 							.then( ( layer ) => {
-								if(layer.code && layer.code === "rest_forbidden") {
+								if(layer.code && (layer.code === "rest_forbidden" || layer.code === "rest_post_invalid_id")) {
 									return;
 								}
 
