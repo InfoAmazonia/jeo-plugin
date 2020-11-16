@@ -381,7 +381,9 @@ class Maps {
 				$attribution = get_post_meta( get_the_ID(), 'attribution', true );
 				$attribution_name = get_post_meta( get_the_ID(), 'attribution_name', true );
 
-				include( $template );
+				if ($source_url || $attribution || $attribution_name){
+					include( $template );
+				}
 
 			}
 
