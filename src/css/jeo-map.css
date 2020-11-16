@@ -375,6 +375,7 @@ div.jeomap {
 .map-content-layers-list {
 	font-size: 16px;
 	line-height: 25px;
+	font-family: var(--jeo-font);
 }
 
 /* JEO SETTINGS: This css use jeo settings*/
@@ -392,7 +393,7 @@ nav .layer-selection-title .legends-title {
 /*END*/
 
 .map-content-layers-list a.download-source{
-	font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+	font-family: var(--jeo-font);
 	background: #fff;
 	border: 1px solid rgba(0,0,0,0.4);
 	color: #404040;
