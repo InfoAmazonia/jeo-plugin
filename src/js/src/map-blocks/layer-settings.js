@@ -33,6 +33,7 @@ export default forwardRef(
 			isSelected,
 			removeLayer,
 			settings,
+			switchUseStyle,
 			swapDefault,
 			switchShowLegend,
 			switchDefault,
@@ -48,6 +49,8 @@ export default forwardRef(
 			{ selected: isSelected },
 			{ isoutofbounds: isOutOfBounds },
 		] );
+
+		console.log("settings", settings);
 
 		const setWidth = ( index ) =>
 			isDragged && widths.length ? { width: widths[ index ] } : {};
@@ -93,6 +96,17 @@ export default forwardRef(
 							/>
 						) }
 					</td>
+
+					<td className="default-control" style={ setWidth( 3 ) }>
+						{ settings.layer.meta.type === 'mapbox' &&
+							<CheckboxControl
+								label={ __( 'Load as style' ) }
+								checked={ settings.load_as_style }
+								onChange={ switchUseStyle }
+							/>
+						}
+					</td>
+
 					<td>
 						{ ! settings.layer.meta.use_legend && (
 							<p>

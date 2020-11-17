@@ -58,14 +58,14 @@ class Maps {
 				'edit_post' => 'edit_map',
 				'edit_posts' => 'edit_maps',
 				'edit_others_posts' => 'edit_others_maps',
-				
+
 				'publish_posts' => 'publish_maps',
 				'read_post' => 'read_map',
 				'read_private_posts' => 'read_private_maps',
-				
+
 				'delete_post' => 'delete_map',
 			),
-			// 'map_meta_cap' => true,		
+			// 'map_meta_cap' => true,
 			// 'capability_type' => 'post',
 		);
 
@@ -109,6 +109,10 @@ class Maps {
 							'use' => [
 								'description' => __('How this layer is used in this map. Can be fixed, switchable or swappable', 'jeo'),
 								'type' => 'string'
+							],
+							'load_as_style' => [
+								'description' => __('If the layer is loaded into the mapbox as a style (setStyle) or layer (addLayer)', 'jeo'),
+								'type' => 'boolean'
 							],
 							'default' => [
 								'description' => __('Indicates whether this layer is visible by default', 'jeo'),
@@ -404,15 +408,15 @@ class Maps {
 		foreach ($roles as $role) {
 			// var_dump($role);
 			$role_obj = get_role($role);
-			
-			$role_obj->add_cap( 'edit_map' ); 
-			$role_obj->add_cap( 'edit_maps' ); 
-			$role_obj->add_cap( 'edit_others_maps' ); 
-			$role_obj->add_cap( 'publish_maps' ); 
-			$role_obj->add_cap( 'read_map' ); 
-			$role_obj->add_cap( 'read_private_maps' ); 
-			$role_obj->add_cap( 'delete_map' ); 
-			$role_obj->add_cap( 'edit_published_blocks' ); 
+
+			$role_obj->add_cap( 'edit_map' );
+			$role_obj->add_cap( 'edit_maps' );
+			$role_obj->add_cap( 'edit_others_maps' );
+			$role_obj->add_cap( 'publish_maps' );
+			$role_obj->add_cap( 'read_map' );
+			$role_obj->add_cap( 'read_private_maps' );
+			$role_obj->add_cap( 'delete_map' );
+			$role_obj->add_cap( 'edit_published_blocks' );
 		}
 	}
 

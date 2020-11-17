@@ -297,6 +297,7 @@ const LayersSettings = ( {
 							<tbody { ...props }>{ children }</tbody>
 						</table>
 					) }
+
 					renderItem={ ( { value, props, index, ...meta } ) => {
 						const switchDefault = ( def ) =>
 							setLayers(
@@ -306,6 +307,7 @@ const LayersSettings = ( {
 										: settings
 								)
 							);
+
 						const switchShowLegend = ( def ) => {
 							setLayers(
 								attributes.layers.map( ( settings ) =>
@@ -315,6 +317,35 @@ const LayersSettings = ( {
 								)
 							);
 						};
+
+						const switchUseStyle = ( def ) => {
+							let count = 0;
+							let limitCount = true;
+							const currentLayer = attributes.layers.find((layer)  => layer.id === value.id);
+
+							attributes.layers.forEach((layer) => {
+								if( layer.load_as_style ) {
+									count++;
+								}
+							});
+
+							if(count >= 1) {
+								if(!currentLayer.load_as_style) {
+									limitCount = confirm( __("Loading more than one style in a single map instance may cause unexpected behaviour.") );
+								}
+							}
+
+							if(limitCount) {
+								setLayers(
+									attributes.layers.map( ( settings ) => {
+										return settings.id === value.id?
+											{ ...settings, load_as_style: def }
+											: settings
+									} )
+								);
+							}
+						};
+
 						const swapDefault = ( def ) =>
 							def && // radio-like behavior: can only be turned on.
 							setLayers(
@@ -326,6 +357,7 @@ const LayersSettings = ( {
 											: settings.default,
 								} ) )
 							);
+
 						const updateUse = ( use ) =>
 							setLayers(
 								attributes.layers.map( ( settings ) => {
@@ -342,6 +374,7 @@ const LayersSettings = ( {
 									};
 								} )
 							);
+
 						const removeLayer = () => {
 							const confirmation = confirm(
 								__( 'Do you really want to delete this layer?' )
@@ -360,6 +393,7 @@ const LayersSettings = ( {
 								index={ index }
 								removeLayer={ removeLayer }
 								settings={ loadLayer( value ) }
+								switchUseStyle={ switchUseStyle }
 								switchDefault={ switchDefault }
 								switchShowLegend={ switchShowLegend }
 								swapDefault={ swapDefault }
