@@ -33,6 +33,7 @@ export default class JeoMap {
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
+					console.log(this.getArg( 'layers' ) );
 					map.on('load', () => {
 						if(this.isEmbed) {
 							map.flyTo({ center: [this.getArg( 'center_lon' ), this.getArg( 'center_lat' )], zoom: this.getArg( 'initial_zoom' ) });
@@ -103,13 +104,29 @@ export default class JeoMap {
 							this.getArg( 'layers' ).length > 0 &&
 							amountLayers > 0
 						) {
-							const baseLayer = layers[ 0 ];
-							baseLayer.addStyle( map );
+							const mapLayersSettings = this.getArg( 'layers' );
+
+							// const baseLayer = layers[ 0 ];
+							// baseLayer.addStyle( map );
+
+							// Add styles to map
+							layers.forEach( ( layer ) => {
+								const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
+
+								if ( currentLayerSettings.load_as_style ) {
+									layer.addStyle( map );
+								} else {
+									layer.addLayer( map );
+								}
+							} );
+
 
 							const customAttribution = [];
 
 							map.on( 'load', () => {
-								layers.forEach( ( layer, i ) => {
+								layers.forEach( ( layer ) => {
+									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
+
 									if ( layer.attribution ) {
 										let attributionLink = layer.attribution;
 										const attributionName = layer.attribution_name;
@@ -135,10 +152,6 @@ export default class JeoMap {
 										customAttribution.push(
 											`<a href="${ attributionLink }">${ attributionLabel }</a>`
 										);
-									}
-
-									if ( i > 0 ) {
-										layer.addLayer( map );
 									}
 
 									layer.addInteractions( map );
@@ -227,7 +240,7 @@ export default class JeoMap {
 			legendsTitle.innerHTML = '<span class="text"> Legend </span>';*/
 
 
-			
+
 
 				const legendsTitle = document.createElement( 'div' );
 				legendsTitle.classList.add( 'legends-title' );
@@ -244,7 +257,7 @@ export default class JeoMap {
 				legendsTitle.appendChild( legendTextIcon );
 
 
-		
+
 
 			const legendsHideIcon = document.createElement( 'i' );
 			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
@@ -438,10 +451,12 @@ export default class JeoMap {
 							ordered[ index ] = data.find( ( l ) => l.id == el );
 						} );
 
+
 						ordered.forEach( ( layerObject, i ) => {
 							if ( layerObject ) {
 								returnLayers.push(
 									new window.JeoLayer( layerObject.meta.type, {
+										layer_post_id: layerObject.id,
 										layer_id: layerObject.slug,
 										layer_name: layerObject.title.rendered,
 										attribution: layerObject.meta.attribution,
@@ -458,6 +473,7 @@ export default class JeoMap {
 								) {
 									returnLegends.push(
 										new window.JeoLegend( layerObject.meta.legend_type, {
+											layer_post_id: layerObject.id,
 											layer_id: layerObject.slug,
 											legend_type_options: layerObject.meta.legend_type_options,
 											use_legend: layerObject.meta.use_legend,
