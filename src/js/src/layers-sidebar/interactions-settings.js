@@ -11,20 +11,38 @@ function defaultInteraction( id ) {
 export default function InteractionsSettings( {
 	interactions,
 	setInteractions,
-	layers,
+	sources,
+	styleDefinition,
 	onCloseModal,
 } ) {
-	
-	const [localInteractions, setLocalInteractions] = useState(interactions);
+	const [ localInteractions, setLocalInteractions ] = useState( interactions );
+	// console.log(styleDefinition.layers.filter(item => item.source));
+	// layers = styleDefinition.layers;
 
 	const interactiveLayers = useMemo( () => {
-		if ( ! layers ) {
+		if ( ! sources ) {
 			return [];
 		}
-		return layers.filter( ( layer ) => {
-			return layer.fields && Object.keys( layer.fields ).length > 0;
+
+		let layersWithSource = styleDefinition.layers.filter( ( layer ) => {
+			return layer.source && layer['source-layer'];
 		} );
-	}, [ layers ] );
+
+		// console.log("1", layersWithSource);
+
+		layersWithSource = layersWithSource.map( ( layer ) => {
+			const source = sources.find(( sourceLayer ) => sourceLayer.id === layer[ 'source-layer' ]);
+			layer.fields = source.fields;
+			layer.source = source;
+			return layer;
+		} );
+
+		console.log(layersWithSource);
+
+
+		return layersWithSource;
+	}, [ sources, styleDefinition ] );
+
 
 	const onInsert = useCallback(
 		( newInteraction ) => {
@@ -35,6 +53,7 @@ export default function InteractionsSettings( {
 
 	const onUpdate = useCallback(
 		( interactionId, newInteraction ) => {
+			console.log( interactionId, newInteraction );
 			setLocalInteractions(
 				localInteractions.map( ( interaction ) => {
 					return interaction.id === interactionId
@@ -57,35 +76,10 @@ export default function InteractionsSettings( {
 		[ localInteractions, setLocalInteractions ]
 	);
 
-	const onDone = useCallback(
-		( ) => {
-			setInteractions( localInteractions );
-			onCloseModal();
-		},
-		[ localInteractions, setLocalInteractions ]
-	);
-
-	const layersSourceOptions = useMemo( () => {
-		if ( ! layers ) {
-			return [];
-		}
-		const uniqueSources = Array.from(
-			new Set( layers.map( ( layer ) => layer.source ) )
-		).map( ( source ) => {
-			return layers.find( ( layer ) => layer.source === source );
-		} );
-		const options = uniqueSources.map( ( source ) => {
-			return { value: source.source, label: source.sourceName };
-		} );
-		if ( options.length > 1 ) {
-			options.push( { value: 'all', label: __( 'All', 'jeo' ) } );
-		}
-		return options;
-	}, [ layers ] );
-
-	const [ selectedSource, setSelectedSource ] = useState(
-		layersSourceOptions.length > 1 ? 'all' : layersSourceOptions[ 0 ].source
-	);
+	const onDone = useCallback( () => {
+		setInteractions( localInteractions );
+		onCloseModal();
+	}, [ localInteractions, setLocalInteractions ] );
 
 	return (
 		<Modal
@@ -93,38 +87,33 @@ export default function InteractionsSettings( {
 			title={ __( 'Interactions', 'jeo' ) }
 			onRequestClose={ onDone }
 		>
-			<SelectControl
-				label={ __( 'Source', 'jeo' ) }
-				value={ selectedSource }
-				options={ layersSourceOptions }
-				onChange={ ( selectedSource ) => {
-					setSelectedSource( selectedSource );
-				} }
-			/>
 			<Panel className="jeo-interactions-settings">
 				{ interactiveLayers.map( ( layer ) => {
-					if (
-						layer.source === selectedSource ||
-						selectedSource === 'all' ||
-						layersSourceOptions.length <= 1
-					) {
-						const index = localInteractions.findIndex( ( x ) => x.id === layer.id );
-						const interaction = localInteractions[ index ];
-						return (
-							<InteractionSettings
-								key={ layer.id }
-								interactionIndex={ index }
-								interaction={ interaction || defaultInteraction( layer.id ) }
-								layer={ layer }
-								onInsert={ onInsert }
-								onUpdate={ onUpdate }
-								onDelete={ onDelete }
-							/>
-						);
-					}
+					const index = localInteractions.findIndex(
+						( x ) => x.id === layer.id
+					);
+					const interaction = localInteractions[ index ];
+					return (
+						<InteractionSettings
+							key={ layer.id }
+							interactionIndex={ index }
+							interaction={ interaction || defaultInteraction( layer.id ) }
+							layer={ layer }
+							onInsert={ onInsert }
+							onUpdate={ onUpdate }
+							onDelete={ onDelete }
+						/>
+					);
+					// }
 				} ) }
 			</Panel>
-			<Button style={{'float': 'left', 'margin': '8px 0'}} isPrimary onClick={onDone}>{ __( 'Done', 'jeo' )}</Button>
+			<Button
+				style={ { float: 'left', margin: '8px 0' } }
+				isPrimary
+				onClick={ onDone }
+			>
+				{ __( 'Done', 'jeo' ) }
+			</Button>
 		</Modal>
 	);
 }
