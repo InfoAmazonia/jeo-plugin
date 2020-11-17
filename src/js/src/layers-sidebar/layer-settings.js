@@ -50,6 +50,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
 	const [ styleLayers, setStyleLayers ] = useState( null );
+	const [ styleDefinition, setStyleDefinition ]= useState( null );
 	const [ modalOpen, setModalStatus ] = useState( false );
 	const closeModal = useCallback( () => setModalStatus( false ), [
 		setModalStatus,
@@ -110,6 +111,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 			debouncedPostMeta.type
 		);
 		if ( layerType && layerType.getStyleLayers ) {
+			layerType._getStyleDefinition( debouncedPostMeta ).then( setStyleDefinition );
 			layerType.getStyleLayers( debouncedPostMeta ).then( setStyleLayers );
 		} else {
 			setStyleLayers( null );
@@ -136,7 +138,8 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 				<Fragment>
 					{ modalOpen && (
 						<InteractionsSettings
-							layers={ styleLayers }
+							sources={ styleLayers }
+							styleDefinition={ styleDefinition }
 							onCloseModal={ closeModal }
 							interactions={ interactions }
 							setInteractions={ setInteractions }
