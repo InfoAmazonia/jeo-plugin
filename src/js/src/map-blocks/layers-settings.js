@@ -132,58 +132,62 @@ const LayersSettings = ( {
 		<Fragment>
 			<div className="jeo-layers-library-controls">
 				<div className="left">
-					<TextControl
-						placeholder="Enter keywords to search layers"
-						value={ layerNameFilter }
-						onChange={ ( value ) => {
-							setLayerNameFilter( value );
-						} }
-					/>
-					<SelectControl
-						className="jeo-layers-library-filters"
-						hideLabelFromVision={ true }
-						label={ __( 'Layer type' ) }
-						options={ layerTypeOptions }
-						value={ layerTypeFilter }
-						onChange={ ( value ) => {
-							setLayerTypeFilter( value )
-						} }
-					/>
-					{
-						/* TODO: Make layers that don't use legend to not be shown when filtering by legend
+					<div>
+						<form onSubmit={ filterLayers } action="javascript:void(0);" style={ { display: "flex" }}>
+							<TextControl
+								placeholder="Enter keywords to search layers"
+								value={ layerNameFilter }
+								onChange={ ( value ) => {
+									setLayerNameFilter( value );
+								} }
+							/>
 							<SelectControl
 								className="jeo-layers-library-filters"
 								hideLabelFromVision={ true }
-								label={ __( 'Legend type' ) }
-								options={ legendTypeOptions }
-								value={ layerLegendFilter }
+								label={ __( 'Layer type' ) }
+								options={ layerTypeOptions }
+								value={ layerTypeFilter }
 								onChange={ ( value ) => {
-									setLayerLegendFilter( value )
+									setLayerTypeFilter( value )
 								} }
 							/>
-						*/
-					}
-					<Button
-						className="jeo-layers-library-filters-button-filter"
-						isPrimary
-						isLarge
-						onClick={ filterLayers }
-					>
-						{ __( 'Filter' ) }
-					</Button>
-					<Button
-						className="jeo-layers-library-filters-button-clear"
-						isPrimary
-						isLarge
-						onClick={ () => {
-							setFilteredLayers([]);
-							setLayerTypeFilter( '' );
-							setLayerLegendFilter( '' );
-							setLayerNameFilter('');
-						} }
-					>
-						{ __( 'Clear' ) }
-					</Button>
+							{
+								/* TODO: Make layers that don't use legend to not be shown when filtering by legend
+									<SelectControl
+										className="jeo-layers-library-filters"
+										hideLabelFromVision={ true }
+										label={ __( 'Legend type' ) }
+										options={ legendTypeOptions }
+										value={ layerLegendFilter }
+										onChange={ ( value ) => {
+											setLayerLegendFilter( value )
+										} }
+									/>
+								*/
+							}
+							<Button
+								className="jeo-layers-library-filters-button-filter"
+								isPrimary
+								isLarge
+								onClick={ filterLayers }
+							>
+								{ __( 'Filter' ) }
+							</Button>
+							<Button
+								className="jeo-layers-library-filters-button-clear"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									setFilteredLayers([]);
+									setLayerTypeFilter( '' );
+									setLayerLegendFilter( '' );
+									setLayerNameFilter('');
+								} }
+							>
+								{ __( 'Clear' ) }
+							</Button>
+						</form>
+					</div>
 				</div>
 				<div className="right">
 					<Button
@@ -291,11 +295,11 @@ const LayersSettings = ( {
 						setLayers( arrayMove( attributes.layers, oldIndex, newIndex ) )
 					}
 					renderList={ ( { children, isDragged, props } ) => (
-						<table
+						<div
 							className={ classNames( [ 'jeo-layers-list', { isDragged } ] ) }
 						>
-							<tbody { ...props }>{ children }</tbody>
-						</table>
+							<div { ...props }>{ children }</div>
+						</div>
 					) }
 
 					renderItem={ ( { value, props, index, ...meta } ) => {
@@ -318,9 +322,22 @@ const LayersSettings = ( {
 							);
 						};
 
+						const updateStyleLayers = (def) => {
+							console.log("updateStyleLayers");
+							console.log(def);
+							setLayers(
+								attributes.layers.map( ( settings ) =>
+									settings.id === value.id
+										? { ...settings, style_layers: def }
+										: settings
+								)
+							);
+						}
+
 						const switchUseStyle = ( def ) => {
 							let count = 0;
 							let limitCount = true;
+
 							const currentLayer = attributes.layers.find((layer)  => layer.id === value.id);
 
 							attributes.layers.forEach((layer) => {
@@ -335,14 +352,59 @@ const LayersSettings = ( {
 								}
 							}
 
+							const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === value.id);
+							const layerType = window.JeoLayerTypes.getLayerType(
+								currentJeoLayerProps.meta.type
+							);
+
 							if(limitCount) {
-								setLayers(
-									attributes.layers.map( ( settings ) => {
-										return settings.id === value.id?
-											{ ...settings, load_as_style: def }
-											: settings
-									} )
-								);
+								if(def) {
+									layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
+										if(!response) {
+											return;
+										}
+
+										let styleLayers = response.layers;
+
+										styleLayers = styleLayers.map(layer => {
+											if(layer.layout && typeof layer.layout.visibility !== 'undefined' && layer.layout.visibility === 'none') {
+												return {
+													id: layer.id,
+													show: false,
+												}
+											}
+
+											return {
+												id: layer.id,
+												show: true,
+											}
+										})
+
+										setLayers(
+											attributes.layers.map( ( settings ) => {
+												return settings.id === value.id?
+													{ ...settings, load_as_style: def, style_layers: styleLayers }
+													: settings
+											} )
+										);
+									} );
+
+									setLayers(
+										attributes.layers.map( ( settings ) => {
+											return settings.id === value.id?
+												{ ...settings, load_as_style: def, style_layers: false }
+												: settings
+										} )
+									);
+								} else {
+									setLayers(
+										attributes.layers.map( ( settings ) => {
+											return settings.id === value.id?
+												{ ...settings, load_as_style: def }
+												: settings
+										} )
+									);
+								}
 							}
 						};
 
@@ -399,14 +461,15 @@ const LayersSettings = ( {
 								swapDefault={ swapDefault }
 								updateUse={ updateUse }
 								widths={ widths }
+								updateStyleLayers={ updateStyleLayers }
 								{ ...meta } // includes isDragged
 								{ ...props }
 							/>
 						);
 						return meta.isDragged ? (
-							<table className="jeo-layers-list dragging" style={ props.style }>
-								<tbody>{ row }</tbody>
-							</table>
+							<div className="jeo-layers-list dragging" style={ props.style }>
+								<div>{ row }</div>
+							</div>
 						) : (
 							row
 						);

@@ -2,3 +2,35 @@ tr .dashicon:hover {
     cursor: pointer;
     opacity: 0.7;
 }
+
+.jeo-layers-list .layer > div {
+	display: inline-block;
+}
+
+.jeo-layers-list .layer {
+	display: grid;
+	align-items: center;
+    grid-template-columns: 40px 3fr 2fr 3fr 2fr 3fr 1fr;
+    grid-template-rows: repeat(2, auto);
+    grid-template-areas:
+        "a b c d e f g"
+        "h h h h h h h";
+}
+
+.jeo-layers-list .layers-selector {
+	grid-area: h;
+}
+
+.jeo-layers-list .layers-selector button.toggle-button {
+	width: 26px;
+	border: none;
+	padding: 0;
+	background: unset;
+	margin-right: 15px;
+}
+
+.jeo-layers-list .layers-selector .style-layer {
+	display: flex;
+	align-items: center;
+}
+
