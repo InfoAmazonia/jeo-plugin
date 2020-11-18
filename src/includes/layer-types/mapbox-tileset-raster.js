@@ -1,5 +1,4 @@
 window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
-
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		let tileset_id = attributes.layer_type_options.tileset_id;
@@ -16,16 +15,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 				},
 			},
-			layers: [ {
-				id: attributes.layer_id,
-				type: attributes.layer_type_options.type,
-				source: attributes.layer_id,
-				'source-layer': ''
-			} ],
+			layers: [
+				{
+					id: attributes.layer_id,
+					type: attributes.layer_type_options.type,
+					source: attributes.layer_id,
+					'source-layer': '',
+				},
+			],
 		} );
 	},
 
-	addLayer( map, attributes ) {
+	addLayer( map, attributes, addLayerParams ) {
 		let tileset_id = attributes.layer_type_options.tileset_id;
 
 		if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
@@ -37,21 +38,31 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 		} );
 
+		if ( addLayerParams ) {
+			return map.addLayer(
+				{
+					id: attributes.layer_id,
+					type: attributes.layer_type_options.type,
+					source: attributes.layer_id,
+					'source-layer': '',
+				},
+				...addLayerParams
+			);
+		}
+
 		return map.addLayer( {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': ''
+			'source-layer': '',
 		} );
 	},
 
 	getSchema( attributes ) {
-		return new Promise( function( resolve ) {
+		return new Promise( function ( resolve ) {
 			resolve( {
 				type: 'object',
-				required: [
-					'tileset_id', 'style_source_type', 'type'
-				],
+				required: [ 'tileset_id', 'style_source_type', 'type' ],
 				properties: {
 					tileset_id: {
 						type: 'string',
@@ -63,21 +74,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 						description: 'Which data the map should display',
 						type: 'string',
 						default: 'raster',
-						enum: [
-							'raster',
-							'raster-dem',
-						],
+						enum: [ 'raster', 'raster-dem' ],
 					},
 					type: {
 						title: 'Layer Type',
-						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
+						description:
+							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
 						type: 'string',
 						default: 'raster',
-						disabled: true
+						disabled: true,
 					},
 				},
 			} );
 		} );
 	},
-
 } );
