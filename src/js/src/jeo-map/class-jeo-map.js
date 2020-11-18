@@ -106,20 +106,55 @@ export default class JeoMap {
 						) {
 							const mapLayersSettings = this.getArg( 'layers' );
 
-							// const baseLayer = layers[ 0 ];
-							// baseLayer.addStyle( map );
+							// Add an empty style to allow any layer insesion even if a mapbox style layer is not present. If you don't have a style set you can't add new layers
+							const hasStyle = mapLayersSettings.some( ( layerSetting ) => layerSetting.load_as_style );
+
+							if( !hasStyle ) {
+								map.setStyle('mapbox://styles/mapbox/empty-v9');
+							}
 
 							// Add styles to map
-							layers.forEach( ( layer ) => {
+							let firstStyleLayerId;
+							let lastStyleLayerId;
+							let styleLayerIndex;
+
+							layers.forEach( ( layer, index ) => {
 								const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
 
 								if ( currentLayerSettings.load_as_style ) {
 									layer.addStyle( map );
-								} else {
-									layer.addLayer( map );
+									styleLayerIndex = index;
 								}
 							} );
 
+							// When style is done loading (don't try adding layers before style is not read, its messy)
+							map.on('load', () => {
+								// Remove not selected layers
+
+								// Select reference pointers
+								firstStyleLayerId = map.style._order[0];
+								lastStyleLayerId = map.style._order[map.style._order.length - 1];
+
+								console.log(layers);
+								console.log(firstStyleLayerId, lastStyleLayerId);
+
+								// Add layers to map
+								layers.forEach( ( layer, index ) => {
+									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
+
+									if (!currentLayerSettings.load_as_style ) {
+										// If the current layer is bellow the style, add using fisrt syle layer reference
+										if(index < styleLayerIndex) {
+											layer.addLayer( map, [ firstStyleLayerId ]);
+										} else {
+											layer.addLayer( map, [ lastStyleLayerId ]);
+										}
+									}
+								} );
+
+								console.log(map.style._order)
+
+							});
 
 							const customAttribution = [];
 
@@ -154,7 +189,7 @@ export default class JeoMap {
 										);
 									}
 
-									layer.addInteractions( map );
+									// layer.addInteractions( map );
 								} );
 							} );
 
