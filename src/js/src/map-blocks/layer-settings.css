@@ -20,17 +20,50 @@ tr .dashicon:hover {
 .jeo-layers-list .layers-selector {
 	grid-area: h;
 }
+.jeo-layers-list .layers-selector button.toggle-button svg {
+	width: 26px;
+	margin-right: 15px;
+}
 
 .jeo-layers-list .layers-selector button.toggle-button {
-	width: 26px;
 	border: none;
 	padding: 0;
 	background: unset;
-	margin-right: 15px;
+	width: 100%;
+    display: flex;
+    align-items: center;
+}
+
+.jeo-layers-list .layers-selector button.toggle-button.active {
+	font-weight: bold;
+}
+
+.jeo-layers-list button.show-style-layers {
+	background: none;
+    border: 0;
+    width: 34px;
+    padding: 0 10px;
+    cursor: pointer;
+    color: #444;
+}
+
+
+.jeo-layers-list .layer > .layers-selector {
+	column-count: 4;
+	border-top: 2px solid #0000002e;
+    padding-top: 15px;
+    margin: 0.5rem
+}
+
+.jeo-layers-list .layer .layer-actions {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .jeo-layers-list .layers-selector .style-layer {
 	display: flex;
 	align-items: center;
+	break-inside: avoid-column;
+    padding: 5px 0;
 }
 

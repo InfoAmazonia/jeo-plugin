@@ -114,6 +114,23 @@ class Maps {
 								'description' => __('If the layer is loaded into the mapbox as a style (setStyle) or layer (addLayer)', 'jeo'),
 								'type' => 'boolean'
 							],
+							'style_layers' => [
+								'description' => __('Mapbox style layers', 'jeo'),
+								'type' => 'array',
+								'items' => array(
+									'type' => 'object',
+									'properties' => [
+										'id' => [
+											'description' => __('The Layer ID', 'jeo'),
+											'type' => 'string'
+										],
+										'show' => [
+											'description' => __('If the style should render the layer', 'jeo'),
+											'type' => 'boolean'
+										],
+									]
+								)
+							],
 							'default' => [
 								'description' => __('Indicates whether this layer is visible by default', 'jeo'),
 								'type' => 'boolean'
