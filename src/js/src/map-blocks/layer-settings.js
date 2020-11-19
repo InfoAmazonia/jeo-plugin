@@ -53,6 +53,8 @@ const LayerSettings = (
 
 	// console.log("settings", settings);
 	const [ showStyleLayers, setshowStyleLayers ] = useState( false );
+	// const [ forceStateUpdate, useForceStateUpdate ] = useState( false );
+	// const [ innnerSettings, setInnerSettings ] = useState( settings );
 
 	const setWidth = ( index ) =>
 		isDragged && widths.length ? { width: widths[ index ] } : {};
@@ -60,13 +62,12 @@ const LayerSettings = (
 	// props.style.zIndex = isDragged && 320000;
 
 	const toggleStyleLayerDisplay = ( layerId ) => {
-		console.log( 'toggleStyleLayerDisplay' );
 		const newStyleLayers = settings.style_layers.map( ( styleLayer ) => {
 			if ( styleLayer.id === layerId ) {
-				styleLayer.show = ! styleLayer.show;
+				const show = !styleLayer.show;
+				return { ...styleLayer, show };
 			}
-
-			return styleLayer;
+			return { ...styleLayer };
 		} );
 
 		updateStyleLayers( newStyleLayers );
