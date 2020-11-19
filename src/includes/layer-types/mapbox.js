@@ -49,27 +49,21 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addInteractions( map, attributes ) {
 		if ( attributes.layer_type_options.interactions ) {
 			const int = attributes.layer_type_options.interactions;
-			const interactionsIds = int.map( ( i ) => i.id );
+			const interactionsIds = int.map( i => i.id );
 
 			int.forEach( ( interaction ) => {
-				const vLayers = map.getSource( 'composite' ).vectorLayers;
+				const vLayers = map.getStyle().layers;
+				console.log("A - Interation found (loop)", interaction);
+				console.log("vLayers", vLayers);
+
 				const vLayer = vLayers.find( ( el ) => {
 					return el.id == interaction.id;
 				} );
-				let parentLayer = false;
 
-				// find layer
-				Object.keys( map.style._layers ).forEach( ( key ) => {
-					if ( map.style._layers[ key ].sourceLayer == interaction.id ) {
-						parentLayer = map.style._layers[ key ];
-					}
-				} );
+				console.log("vLayer", vLayer);
 
-				if ( vLayer && parentLayer ) {
-					const type =
-						interaction.on === 'click' || interaction.on === 'mouseover'
-							? interaction.on
-							: 'click';
+				if ( vLayer ) {
+					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
 					const popUp = new mapboxgl.Popup( {
 						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
 						closeButton: type === 'click',
@@ -78,9 +72,12 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						// anchor: 'right' // parameter to anchor direction 'bottom' default
 					} );
 
-					map.on( type, parentLayer.id, function ( e ) {
+					console.log("Conditional passed", vLayer.id);
+
+					map.on( type, vLayer.id, function( e ) {
 						// Change the cursor style as a UI indicator.
 						map.getCanvas().style.cursor = 'pointer';
+						console.log(vLayer.id);
 
 						const feature = e.features[ 0 ];
 
@@ -97,43 +94,37 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 						// title
 						if ( feature.properties.hasOwnProperty( interaction.title ) ) {
-							html +=
-								'<h3>' + feature.properties[ interaction.title ] + '</h3>';
+							html += '<h3>' + feature.properties[ interaction.title ] + '</h3>';
 						}
 
 						interaction.fields.forEach( ( field ) => {
 							if ( feature.properties.hasOwnProperty( field.field ) ) {
-								html +=
-									'<p><strong>' +
-									field.label +
-									': </strong>' +
-									feature.properties[ field.field ] +
-									'</p>';
+								html += '<p><strong>' + field.label + ': </strong>' + feature.properties[ field.field ] + '</p>';
 							}
 						} );
 
 						// Populate the popup and set its coordinates
 						// based on the feature found.
-						popUp
-							.setLngLat( [ e.lngLat.lng, e.lngLat.lat ] )
+						popUp.setLngLat( [ e.lngLat.lng, e.lngLat.lat ] )
 							.setHTML( html )
 							.addTo( map );
 					} );
+
 					let isOverlapping = false;
-					map.on( 'mouseenter', parentLayer.id, function ( e ) {
+
+					map.on( 'mouseenter', vLayer.id, function ( e ) {
 						const features = map.queryRenderedFeatures( e.point );
 						isOverlapping = features.some(
-							( f ) =>
-								interactionsIds.includes( f.sourceLayer ) &&
-								f.sourceLayer != interaction.id
-						);
+							f => interactionsIds.includes( f.sourceLayer ) &&
+							f.sourceLayer != interaction.id );
 						map.getCanvas().style.cursor = 'pointer';
 					} );
-					map.on( 'mouseleave', parentLayer.id, function () {
+
+					map.on( 'mouseleave', vLayer.id, function() {
 						if ( ! isOverlapping ) {
 							map.getCanvas().style.cursor = '';
 						}
-						if ( type === 'mouseover' ) {
+						if( type === 'mouseover' ) {
 							popUp.remove();
 						}
 					} );
