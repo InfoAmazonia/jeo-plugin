@@ -33,7 +33,7 @@ export default class JeoMap {
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
-					console.log(this.getArg( 'layers' ) );
+					// console.log( );
 					map.on('load', () => {
 						if(this.isEmbed) {
 							map.flyTo({ center: [this.getArg( 'center_lon' ), this.getArg( 'center_lat' )], zoom: this.getArg( 'initial_zoom' ) });
@@ -130,13 +130,35 @@ export default class JeoMap {
 							// When style is done loading (don't try adding layers before style is not read, its messy)
 							map.on('load', () => {
 								// Remove not selected layers
+								mapLayersSettings.forEach( layer => {
+									if(layer.load_as_style) {
+										const styleLayers = layer.style_layers;
+
+										styleLayers.forEach( styleLayer => {
+											if(!styleLayer.show) {
+												if(map.getLayer( styleLayer.id )) {
+													map.removeLayer( styleLayer.id );
+												}
+											}
+										} )
+									}
+								} )
+
+								// Add interactions
+								layers.forEach(layer => {
+									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
+									if(currentLayerSettings.load_as_style ) {
+										layer.addInteractions( map );
+									}
+								})
+
 
 								// Select reference pointers
 								firstStyleLayerId = map.style._order[0];
 								lastStyleLayerId = map.style._order[map.style._order.length - 1];
 
-								console.log(layers);
-								console.log(firstStyleLayerId, lastStyleLayerId);
+								// console.log(layers);
+								// console.log(firstStyleLayerId, lastStyleLayerId);
 
 								// Add layers to map
 								layers.forEach( ( layer, index ) => {
@@ -152,7 +174,7 @@ export default class JeoMap {
 									}
 								} );
 
-								console.log(map.style._order)
+								console.log(map.style)
 
 							});
 
