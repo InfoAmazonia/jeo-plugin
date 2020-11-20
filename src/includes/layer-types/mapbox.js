@@ -53,14 +53,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 			int.forEach( ( interaction ) => {
 				const vLayers = map.getStyle().layers;
-				console.log("A - Interation found (loop)", interaction);
-				console.log("vLayers", vLayers);
 
 				const vLayer = vLayers.find( ( el ) => {
 					return el.id == interaction.id;
 				} );
-
-				console.log("vLayer", vLayer);
 
 				if ( vLayer ) {
 					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
@@ -72,12 +68,9 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						// anchor: 'right' // parameter to anchor direction 'bottom' default
 					} );
 
-					console.log("Conditional passed", vLayer.id);
-
 					map.on( type, vLayer.id, function( e ) {
 						// Change the cursor style as a UI indicator.
 						map.getCanvas().style.cursor = 'pointer';
-						console.log(vLayer.id);
 
 						const feature = e.features[ 0 ];
 
@@ -112,7 +105,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 					let isOverlapping = false;
 
-					map.on( 'mouseenter', vLayer.id, function ( e ) {
+					map.on( 'mousemove', vLayer.id, function ( e ) {
 						const features = map.queryRenderedFeatures( e.point );
 						isOverlapping = features.some(
 							f => interactionsIds.includes( f.sourceLayer ) &&
