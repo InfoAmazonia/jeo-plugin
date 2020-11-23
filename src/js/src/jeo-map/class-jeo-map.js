@@ -151,7 +151,7 @@ export default class JeoMap {
 									}
 								} )
 
-								// Add interactions
+								// Add interactions to style layers
 								layers.forEach(layer => {
 									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
 									if(currentLayerSettings.load_as_style ) {
@@ -176,7 +176,7 @@ export default class JeoMap {
 										if(index < styleLayerIndex) {
 											layer.addLayer( map, [ firstStyleLayerId ]);
 										} else {
-											layer.addLayer( map, [ lastStyleLayerId ]);
+											layer.addLayer( map );
 										}
 									}
 								} );
