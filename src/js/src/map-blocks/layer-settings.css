@@ -31,7 +31,8 @@ tr .dashicon:hover {
 	background: unset;
 	width: 100%;
     display: flex;
-    align-items: center;
+	align-items: center;
+    text-align: left;
 }
 
 .jeo-layers-list .layers-selector button.toggle-button.active {
