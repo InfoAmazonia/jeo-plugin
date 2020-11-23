@@ -129,7 +129,7 @@ export default class JeoMap {
 
 							// When style is done loading (don't try adding layers before style is not read, its messy)
 							map.on('load', () => {
-								// Remove not selected layers
+								// Remove not selected layers and toggle vissibility
 								mapLayersSettings.forEach( layer => {
 									if(layer.load_as_style) {
 										const styleLayers = layer.style_layers;
@@ -138,6 +138,13 @@ export default class JeoMap {
 											if(!styleLayer.show) {
 												if(map.getLayer( styleLayer.id )) {
 													map.removeLayer( styleLayer.id );
+												}
+											}
+
+											// In the fucture individual style layers will have their own toggles/swaps
+											if(!layer.default) {
+												if(map.getLayer( styleLayer.id )) {
+													map.setLayoutProperty( styleLayer.id, 'visibility', 'none' );
 												}
 											}
 										} )
