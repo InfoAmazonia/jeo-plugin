@@ -33,6 +33,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			},
 			type: 'raster',
 		};
+
 		if ( ! attributes.visible ) {
 			layer.layout = {
 				visibility: 'none',

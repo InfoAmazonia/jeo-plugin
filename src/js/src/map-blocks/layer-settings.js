@@ -197,6 +197,7 @@ const LayerSettings = (
 						</a>
 						<Dashicon icon="dismiss" onClick={ removeLayer } />
 					</div>
+
 					{ settings.load_as_style && showStyleLayers && (
 						<div className="layers-selector">
 							{ settings.style_layers &&

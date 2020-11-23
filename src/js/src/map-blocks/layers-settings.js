@@ -137,8 +137,25 @@ const LayersSettings = ( {
 		if (result.destination.index === result.source.index) {
 			return;
 		}
+
+
 		const resultLayers = arrayMove( attributes.layers, result.source.index, result.destination.index );
+
+		// Set base layer always as fixed
+		if(resultLayers.length) {
+			resultLayers[0].use = "fixed";
+		}
+
+		// Reset fixed default param
+		resultLayers.forEach(setting => {
+			if(setting.use === "fixed") {
+				setting.default = true;
+			}
+		})
+
 		console.log(resultLayers);
+		// console.log(resultLayers);
+
 		setLayers( resultLayers )
 	}
 

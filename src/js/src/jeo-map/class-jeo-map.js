@@ -160,7 +160,7 @@ export default class JeoMap {
 								// console.log(layers);
 								// console.log(firstStyleLayerId, lastStyleLayerId);
 
-								// Add layers to map
+								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
 									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
 
@@ -174,7 +174,7 @@ export default class JeoMap {
 									}
 								} );
 
-								console.log(map.style)
+								console.log(this.map);
 
 							});
 
@@ -760,6 +760,8 @@ export default class JeoMap {
 		const layers = document.createElement( 'div' );
 		layers.classList.add( 'layers-wrapper' );
 
+		const mapLayersSettings = this.getArg( 'layers' );
+
 		switchableLayers.forEach( ( index ) => {
 			if ( this.layers[ index ] ) {
 				const link = document.createElement( 'a' );
@@ -776,16 +778,34 @@ export default class JeoMap {
 
 				link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
+				const layerSetting = mapLayersSettings.find( layerSetting =>  layerSetting.id === this.layers[ index ].attributes.layer_post_id)
+
 				link.onclick = ( e ) => {
 					const clicked = e.currentTarget;
 					const clickedLayer = clicked.dataset.layer_id;
 					e.preventDefault();
 					e.stopPropagation();
 
-					const visibility = this.map.getLayoutProperty(
-						clickedLayer,
-						'visibility'
-					);
+					let visibility = false;
+
+					if(layerSetting.load_as_style) {
+						if(layerSetting.style_layers && layerSetting.style_layers.length) {
+							layerSetting.style_layers.forEach(styleLayer => {
+								if(this.map.getLayer(styleLayer.id)) {
+									visibility = this.map.getLayoutProperty(
+										styleLayer.id,
+										'visibility'
+									);
+								}
+							});
+						}
+
+					} else {
+						visibility = this.map.getLayoutProperty(
+							clickedLayer,
+							'visibility'
+						);
+					}
 
 					if ( typeof visibility === 'undefined' || visibility === 'visible' ) {
 						this.hideLayer( clickedLayer );
@@ -847,11 +867,32 @@ export default class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
-		this.map.getStyle().layers.forEach( ( layer ) => {
-			if ( layer.id == layer_id ) {
-				this.map.setLayoutProperty( layer.id, 'visibility', visibility );
+		console.log("changeLayerVisibitly");
+
+		const mapLayersSettings = this.getArg( 'layers' );
+		const layers = this.layers;
+
+		layers.forEach(layer => {
+			const layerSlug = layer.attributes.layer_id;
+			const layerId = layer.attributes.layer_post_id;
+
+			if(layer_id === layerSlug) {
+				mapLayersSettings.forEach(layerSetting => {
+
+					if(layerId === layerSetting.id) {
+						if(layerSetting.load_as_style && layerSetting.style_layers && layerSetting.style_layers.length) {
+							layerSetting.style_layers.forEach(styleLayer => {
+								if(this.map.getLayer(styleLayer.id)) {
+									this.map.setLayoutProperty( styleLayer.id, 'visibility', visibility );
+								}
+							})
+						} else {
+							this.map.setLayoutProperty( layer_id, 'visibility', visibility );
+						}
+					}
+				})
 			}
-		} );
+		})
 	}
 
 	showLayer( layer_id ) {
