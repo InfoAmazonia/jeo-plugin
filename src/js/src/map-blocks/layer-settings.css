@@ -11,10 +11,16 @@ tr .dashicon:hover {
 	display: grid;
 	align-items: center;
     grid-template-columns: 40px 3fr 2fr 3fr 2fr 3fr 1fr;
-    grid-template-rows: repeat(2, auto);
+    grid-template-rows: repeat(3, auto);
     grid-template-areas:
         "a b c d e f g"
-        "h h h h h h h";
+		"h h h h h h h"
+		"i i i i i i i";
+}
+
+.informative-message {
+    grid-area: i;
+    margin: 0.5rem;
 }
 
 .jeo-layers-list .layers-selector {
