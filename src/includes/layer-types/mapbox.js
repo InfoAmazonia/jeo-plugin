@@ -1,24 +1,25 @@
 window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addStyle( map, attributes ) {
-		if ( attributes.layer_type_options.style_id && attributes.layer_type_options.style_id.includes( 'mapbox://styles/' ) ) {
-			return map.setStyle(
-				attributes.layer_type_options.style_id
-			);
+		if (
+			attributes.layer_type_options.style_id &&
+			attributes.layer_type_options.style_id.includes( 'mapbox://styles/' )
+		) {
+			return map.setStyle( attributes.layer_type_options.style_id );
 		}
 		return map.setStyle(
 			'mapbox://styles/' + attributes.layer_type_options.style_id
 		);
 	},
 
-	addLayer( map, attributes ) {
+	addLayer( map, attributes, addLayerParams ) {
 		let style_id = attributes.layer_type_options.style_id;
 		if ( style_id ) {
 			style_id = style_id.replace( 'mapbox://styles/', '' );
 		}
 		const accessToken =
-			typeof attributes.layer_type_options.access_token !== 'undefined' ?
-				attributes.layer_type_options.access_token :
-				window.mapboxgl.accessToken;
+			typeof attributes.layer_type_options.access_token !== 'undefined'
+				? attributes.layer_type_options.access_token
+				: window.mapboxgl.accessToken;
 		const layer = {
 			id: attributes.layer_id,
 			source: {
@@ -32,11 +33,17 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			},
 			type: 'raster',
 		};
+
 		if ( ! attributes.visible ) {
 			layer.layout = {
 				visibility: 'none',
 			};
 		}
+
+		if ( addLayerParams ) {
+			return map.addLayer( layer, ...addLayerParams );
+		}
+
 		return map.addLayer( layer );
 	},
 
@@ -46,20 +53,13 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			const interactionsIds = int.map( i => i.id );
 
 			int.forEach( ( interaction ) => {
-				const vLayers = map.getSource( 'composite' ).vectorLayers;
+				const vLayers = map.getStyle().layers;
+
 				const vLayer = vLayers.find( ( el ) => {
 					return el.id == interaction.id;
 				} );
-				let parentLayer = false;
 
-				// find layer
-				Object.keys( map.style._layers ).forEach( ( key ) => {
-					if ( map.style._layers[ key ].sourceLayer == interaction.id ) {
-						parentLayer = map.style._layers[ key ];
-					}
-				} );
-
-				if ( vLayer && parentLayer ) {
+				if ( vLayer ) {
 					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
 					const popUp = new mapboxgl.Popup( {
 						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
@@ -69,7 +69,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						// anchor: 'right' // parameter to anchor direction 'bottom' default
 					} );
 
-					map.on( type, parentLayer.id, function( e ) {
+					map.on( type, vLayer.id, function( e ) {
 						// Change the cursor style as a UI indicator.
 						map.getCanvas().style.cursor = 'pointer';
 
@@ -103,15 +103,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 							.setHTML( html )
 							.addTo( map );
 					} );
+
 					let isOverlapping = false;
-					map.on( 'mouseenter', parentLayer.id, function ( e ) {
+
+					map.on( 'mousemove', vLayer.id, function ( e ) {
 						const features = map.queryRenderedFeatures( e.point );
-						isOverlapping = features.some( 
-							f => interactionsIds.includes( f.sourceLayer ) && 
+						isOverlapping = features.some(
+							f => interactionsIds.includes( f.sourceLayer ) &&
 							f.sourceLayer != interaction.id );
 						map.getCanvas().style.cursor = 'pointer';
 					} );
-					map.on( 'mouseleave', parentLayer.id, function() {
+
+					map.on( 'mouseleave', vLayer.id, function() {
 						if ( ! isOverlapping ) {
 							map.getCanvas().style.cursor = '';
 						}
@@ -132,7 +135,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				style_id: {
 					type: 'string',
 					title: 'Style ID',
-					description: 'The mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
+					description:
+						'The mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
 				},
 				access_token: {
 					type: 'string',
@@ -143,7 +147,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			},
 		};
 
-		return new Promise( function( resolve ) {
+		return new Promise( function ( resolve ) {
 			resolve( baseSchema );
 		} );
 	},
@@ -156,8 +160,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 			let formLayers = [];
 
-			this
-				._getStyleLayers( attributes )
+			this._getStyleLayers( attributes )
 				.then( ( layers ) => {
 					if ( layers.vector_layers ) {
 						formLayers = layers.vector_layers.map( ( layer ) => {
@@ -171,7 +174,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					}
 
 					resolve( formLayers );
-				} ).catch( ( error ) => {
+				} )
+				.catch( ( error ) => {
 					reject( error );
 				} );
 		} );
@@ -183,16 +187,16 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	_getStyleDefinition( attributes ) {
 		const self = this;
 
-		return new Promise( function( resolve ) {
+		return new Promise( function ( resolve ) {
 			// cache
 			if ( self._styleDefinitions[ attributes.layer_id ] ) {
 				resolve( self._styleDefinitions[ attributes.layer_id ] );
 			}
 
 			const accessToken =
-				typeof attributes.layer_type_options.access_token !== 'undefined' ?
-					attributes.layer_type_options.access_token :
-					window.mapboxgl.accessToken;
+				typeof attributes.layer_type_options.access_token !== 'undefined'
+					? attributes.layer_type_options.access_token
+					: window.mapboxgl.accessToken;
 
 			if ( accessToken && attributes.layer_type_options.style_id ) {
 				let style_id = attributes.layer_type_options.style_id;
@@ -205,7 +209,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						style_id +
 						'?access_token=' +
 						accessToken,
-					function( data ) {
+					function ( data ) {
 						self._styleDefinitions[ attributes.layer_id ] = data;
 						resolve( data );
 					}
@@ -217,39 +221,41 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	_getStyleLayers( attributes ) {
 		const self = this;
 
-		return new Promise( function( resolve, reject ) {
+		return new Promise( function ( resolve, reject ) {
 			// cache
 			if ( self._styleLayers[ attributes.layer_id ] ) {
 				resolve( self._styleLayers[ attributes.layer_id ] );
 			}
 
 			const accessToken =
-				typeof attributes.layer_type_options.access_token !== 'undefined' ?
-					attributes.layer_type_options.access_token :
-					window.mapboxgl.accessToken;
+				typeof attributes.layer_type_options.access_token !== 'undefined'
+					? attributes.layer_type_options.access_token
+					: window.mapboxgl.accessToken;
 
-			self._getStyleDefinition( attributes ).then( function( styleDefinition ) {
-				const composite =
-					self._styleDefinitions[ attributes.layer_id ].sources.composite;
+			self
+				._getStyleDefinition( attributes )
+				.then( function ( styleDefinition ) {
+					const composite =
+						self._styleDefinitions[ attributes.layer_id ].sources.composite;
 
-				if ( typeof composite === 'object' ) {
-					const layers = composite.url.replace( 'mapbox://', '' );
-					if ( layers && accessToken ) {
-						jQuery.get(
-							'https://api.mapbox.com/v4/' +
-								layers +
-								'.json?secure&access_token=' +
-								accessToken,
-							function( data ) {
-								self._styleLayers[ attributes.layer_id ] = data;
-								resolve( data );
-							}
-						);
+					if ( typeof composite === 'object' ) {
+						const layers = composite.url.replace( 'mapbox://', '' );
+						if ( layers && accessToken ) {
+							jQuery.get(
+								'https://api.mapbox.com/v4/' +
+									layers +
+									'.json?secure&access_token=' +
+									accessToken,
+								function ( data ) {
+									self._styleLayers[ attributes.layer_id ] = data;
+									resolve( data );
+								}
+							);
+						}
+					} else {
+						reject( 'No composite source' );
 					}
-				} else {
-					reject( 'No composite source' );
-				}
-			} );
+				} );
 		} );
 	},
 } );

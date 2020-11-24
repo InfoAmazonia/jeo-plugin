@@ -1,5 +1,4 @@
 window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
-
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		let tileset_id = attributes.layer_type_options.tileset_id;
@@ -16,16 +15,18 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 				},
 			},
-			layers: [ {
-				id: attributes.layer_id,
-				type: attributes.layer_type_options.type,
-				source: attributes.layer_id,
-				'source-layer': attributes.layer_type_options.source_layer
-			} ],
+			layers: [
+				{
+					id: attributes.layer_id,
+					type: attributes.layer_type_options.type,
+					source: attributes.layer_id,
+					'source-layer': attributes.layer_type_options.source_layer,
+				},
+			],
 		} );
 	},
 
-	addLayer( map, attributes ) {
+	addLayer( map, attributes, addLayerParams ) {
 		let tileset_id = attributes.layer_type_options.tileset_id;
 
 		if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
@@ -37,11 +38,32 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 		} );
 
+		if ( addLayerParams ) {
+			return map.addLayer(
+				{
+					id: attributes.layer_id,
+					type: attributes.layer_type_options.type,
+					source: attributes.layer_id,
+					'source-layer': attributes.layer_type_options.source_layer,
+					// 'layout': {
+					// 	'line-cap': 'round',
+					// 	'line-join': 'round'
+					// },
+					// 'paint': {
+					// 	'line-opacity': 0.6,
+					// 	'line-color': 'rgb(53, 175, 109)',
+					// 	'line-width': 2
+					// }
+				},
+				...addLayerParams
+			);
+		}
+
 		return map.addLayer( {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': attributes.layer_type_options.source_layer
+			'source-layer': attributes.layer_type_options.source_layer,
 			// 'layout': {
 			// 	'line-cap': 'round',
 			// 	'line-join': 'round'
@@ -55,15 +77,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 	},
 
 	getSchema( attributes ) {
-		return new Promise( function( resolve ) {
+		return new Promise( function ( resolve ) {
 			resolve( {
 				type: 'object',
-				required: [
-                    'tileset_id', 
-                    'style_source_type', 
-					'type', 
-					'source_layer'
-				],
+				required: [ 'tileset_id', 'style_source_type', 'type', 'source_layer' ],
 				properties: {
 					tileset_id: {
 						type: 'string',
@@ -77,7 +94,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 					},
 					type: {
 						title: 'Layer Type',
-						description: 'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
+						description:
+							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
 						type: 'string',
 						default: 'fill',
 						enum: [
@@ -96,11 +114,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 						description: 'The layer source type style',
 						type: 'string',
 						default: 'vector',
-						disabled: true
+						disabled: true,
 					},
 				},
 			} );
 		} );
 	},
-
 } );
