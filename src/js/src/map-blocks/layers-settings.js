@@ -18,6 +18,7 @@ import { select } from '@wordpress/data';
 
 import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 import LayerSettings from './layer-settings';
 import { layerLoader } from './utils';
@@ -128,62 +129,96 @@ const LayersSettings = ( {
 		setFilteredLayers( layers );
 	}
 
+	const onDragEnd = (result) => {
+		if (!result.destination) {
+			return;
+		}
+
+		if (result.destination.index === result.source.index) {
+			return;
+		}
+
+
+		const resultLayers = arrayMove( attributes.layers, result.source.index, result.destination.index );
+
+		// Set base layer always as fixed
+		if(resultLayers.length) {
+			resultLayers[0].use = "fixed";
+		}
+
+		// Reset fixed default param
+		resultLayers.forEach(setting => {
+			if(setting.use === "fixed") {
+				setting.default = true;
+			}
+		})
+
+		console.log(resultLayers);
+		// console.log(resultLayers);
+
+		setLayers( resultLayers )
+	}
+
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
 				<div className="left">
-					<TextControl
-						placeholder="Enter keywords to search layers"
-						value={ layerNameFilter }
-						onChange={ ( value ) => {
-							setLayerNameFilter( value );
-						} }
-					/>
-					<SelectControl
-						className="jeo-layers-library-filters"
-						hideLabelFromVision={ true }
-						label={ __( 'Layer type' ) }
-						options={ layerTypeOptions }
-						value={ layerTypeFilter }
-						onChange={ ( value ) => {
-							setLayerTypeFilter( value )
-						} }
-					/>
-					{
-						/* TODO: Make layers that don't use legend to not be shown when filtering by legend
+					<div>
+						<form onSubmit={ filterLayers } action="javascript:void(0);" style={ { display: "flex" }}>
+							<TextControl
+								placeholder="Enter keywords to search layers"
+								value={ layerNameFilter }
+								onChange={ ( value ) => {
+									setLayerNameFilter( value );
+								} }
+							/>
 							<SelectControl
 								className="jeo-layers-library-filters"
 								hideLabelFromVision={ true }
-								label={ __( 'Legend type' ) }
-								options={ legendTypeOptions }
-								value={ layerLegendFilter }
+								label={ __( 'Layer type' ) }
+								options={ layerTypeOptions }
+								value={ layerTypeFilter }
 								onChange={ ( value ) => {
-									setLayerLegendFilter( value )
+									setLayerTypeFilter( value )
 								} }
 							/>
-						*/
-					}
-					<Button
-						className="jeo-layers-library-filters-button-filter"
-						isPrimary
-						isLarge
-						onClick={ filterLayers }
-					>
-						{ __( 'Filter' ) }
-					</Button>
-					<Button
-						className="jeo-layers-library-filters-button-clear"
-						isPrimary
-						isLarge
-						onClick={ () => {
-							setFilteredLayers([]);
-							setLayerTypeFilter( '' );
-							setLayerLegendFilter( '' );
-							setLayerNameFilter('');
-						} }
-					>
-						{ __( 'Clear' ) }
-					</Button>
+							{
+								/* TODO: Make layers that don't use legend to not be shown when filtering by legend
+									<SelectControl
+										className="jeo-layers-library-filters"
+										hideLabelFromVision={ true }
+										label={ __( 'Legend type' ) }
+										options={ legendTypeOptions }
+										value={ layerLegendFilter }
+										onChange={ ( value ) => {
+											setLayerLegendFilter( value )
+										} }
+									/>
+								*/
+							}
+							<Button
+								className="jeo-layers-library-filters-button-filter"
+								isPrimary
+								isLarge
+								onClick={ filterLayers }
+							>
+								{ __( 'Filter' ) }
+							</Button>
+							<Button
+								className="jeo-layers-library-filters-button-clear"
+								isPrimary
+								isLarge
+								onClick={ () => {
+									setFilteredLayers([]);
+									setLayerTypeFilter( '' );
+									setLayerLegendFilter( '' );
+									setLayerNameFilter('');
+								} }
+							>
+								{ __( 'Clear' ) }
+							</Button>
+						</form>
+					</div>
 				</div>
 				<div className="right">
 					<Button
@@ -278,106 +313,180 @@ const LayersSettings = ( {
 					{ __( 'No layers have been added to this map.' ) }
 				</p>
 			) }
-			{ ! loadingLayers && attributes.layers.length > 0 && (
-				<List
-					values={ attributes.layers }
-					beforeDrag={ ( { elements, index } ) => {
-						const cells = Array.from( elements[ index ].children );
-						widths = cells.map(
-							( cell ) => window.getComputedStyle( cell ).width
-						);
-					} }
-					onChange={ ( { oldIndex, newIndex } ) =>
-						setLayers( arrayMove( attributes.layers, oldIndex, newIndex ) )
-					}
-					renderList={ ( { children, isDragged, props } ) => (
-						<table
-							className={ classNames( [ 'jeo-layers-list', { isDragged } ] ) }
-						>
-							<tbody { ...props }>{ children }</tbody>
-						</table>
-					) }
-					renderItem={ ( { value, props, index, ...meta } ) => {
-						const switchDefault = ( def ) =>
-							setLayers(
-								attributes.layers.map( ( settings ) =>
-									settings.id === value.id
-										? { ...settings, default: def }
-										: settings
-								)
-							);
-						const switchShowLegend = ( def ) => {
-							setLayers(
-								attributes.layers.map( ( settings ) =>
-									settings.id === value.id
-										? { ...settings, show_legend: def }
-										: settings
-								)
-							);
-						};
-						const swapDefault = ( def ) =>
-							def && // radio-like behavior: can only be turned on.
-							setLayers(
-								attributes.layers.map( ( settings ) => ( {
-									...settings,
-									default:
-										settings.use === 'swappable' // update only the swappable layers
-											? settings.id === value.id // radio-like behavior: turn off all other swappable layers
-											: settings.default,
-								} ) )
-							);
-						const updateUse = ( use ) =>
-							setLayers(
-								attributes.layers.map( ( settings ) => {
-									if ( settings.id !== value.id ) {
-										return settings;
-									}
-									return {
-										...settings,
-										use,
-										default:
-											use === 'swappable' ? ! anySwapDefault( attributes.layers ) :
-											use === 'fixed' ? true :
-											settings.default,
-									};
-								} )
-							);
-						const removeLayer = () => {
-							const confirmation = confirm(
-								__( 'Do you really want to delete this layer?' )
-							);
 
-							if ( confirmation ) {
-								return setLayers(
-									attributes.layers.filter(
-										( settings ) => settings.id !== value.id
-									)
-								);
-							}
-						};
-						const row = (
-							<LayerSettings
-								index={ index }
-								removeLayer={ removeLayer }
-								settings={ loadLayer( value ) }
-								switchDefault={ switchDefault }
-								switchShowLegend={ switchShowLegend }
-								swapDefault={ swapDefault }
-								updateUse={ updateUse }
-								widths={ widths }
-								{ ...meta } // includes isDragged
-								{ ...props }
-							/>
-						);
-						return meta.isDragged ? (
-							<table className="jeo-layers-list dragging" style={ props.style }>
-								<tbody>{ row }</tbody>
-							</table>
-						) : (
-							row
-						);
-					} }
-				/>
+			{ ! loadingLayers && attributes.layers.length > 0 && (
+				<DragDropContext onDragEnd={ onDragEnd }>
+					<Droppable droppableId="list">
+						{ provided => (
+							<div className="jeo-layers-list" ref={ provided.innerRef } { ...provided.droppableProps }>
+								{ attributes.layers.map((layer, index) => {
+									const switchDefault = ( def ) =>
+										setLayers(
+											attributes.layers.map( ( settings ) =>
+												settings.id === layer.id
+													? { ...settings, default: def }
+													: settings
+											)
+										);
+
+									const switchShowLegend = ( def ) => {
+										setLayers(
+											attributes.layers.map( ( settings ) =>
+												settings.id === layer.id
+													? { ...settings, show_legend: def }
+													: settings
+											)
+										);
+									};
+
+									const updateStyleLayers = (def) => {
+										//console.log("updateStyleLayers");
+
+										setLayers(
+											attributes.layers.map( ( settings ) =>
+												settings.id === layer.id
+													? { ...settings, style_layers: def }
+													: settings
+											)
+										);
+									}
+
+									const switchUseStyle = ( def ) => {
+										let count = 0;
+										let limitCount = true;
+
+										const currentLayer = attributes.layers.find((alayer)  => alayer.id === layer.id);
+
+										attributes.layers.forEach((layer) => {
+											if( layer.load_as_style ) {
+												count++;
+											}
+										});
+
+										if(count >= 1) {
+											if(!currentLayer.load_as_style) {
+												limitCount = confirm( __("Loading more than one style in a single map instance may cause unexpected behaviour.") );
+											}
+										}
+
+										const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === layer.id);
+										const layerType = window.JeoLayerTypes.getLayerType(
+											currentJeoLayerProps.meta.type
+										);
+
+										if(limitCount) {
+											if(def) {
+												layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
+													if(!response) {
+														return;
+													}
+
+													let styleLayers = response.layers;
+
+													styleLayers = styleLayers.map(layer => {
+														if(layer.layout && typeof layer.layout.visibility !== 'undefined' && layer.layout.visibility === 'none') {
+															return {
+																id: layer.id,
+																show: false,
+															}
+														}
+
+														return {
+															id: layer.id,
+															show: true,
+														}
+													})
+
+													setLayers(
+														attributes.layers.map( ( settings ) => {
+															return settings.id === layer.id?
+																{ ...settings, load_as_style: def, style_layers: styleLayers }
+																: settings
+														} )
+													);
+												} );
+
+												setLayers(
+													attributes.layers.map( ( settings ) => {
+														return settings.id === layer.id?
+															{ ...settings, load_as_style: def, style_layers: [] }
+															: settings
+													} )
+												);
+											} else {
+												setLayers(
+													attributes.layers.map( ( settings ) => {
+														return settings.id === layer.id?
+															{ ...settings, load_as_style: def, style_layers: [] }
+															: settings
+													} )
+												);
+											}
+										}
+									};
+
+									const swapDefault = ( def ) =>
+										def && // radio-like behavior: can only be turned on.
+										setLayers(
+											attributes.layers.map( ( settings ) => ( {
+												...settings,
+												default:
+													settings.use === 'swappable' // update only the swappable layers
+														? settings.id === layer.id // radio-like behavior: turn off all other swappable layers
+														: settings.default,
+											} ) )
+										);
+
+									const updateUse = ( use ) =>
+										setLayers(
+											attributes.layers.map( ( settings ) => {
+												if ( settings.id !== layer.id ) {
+													return settings;
+												}
+												return {
+													...settings,
+													use,
+													default:
+														use === 'swappable' ? ! anySwapDefault( attributes.layers ) :
+														use === 'fixed' ? true :
+														settings.default,
+												};
+											} )
+										);
+
+									const removeLayer = () => {
+										const confirmation = confirm(
+											__( 'Do you really want to delete this layer?' )
+										);
+
+										if ( confirmation ) {
+											return setLayers(
+												attributes.layers.filter(
+													( settings ) => settings.id !== layer.id
+												)
+											);
+										}
+									};
+
+									return <LayerSettings
+										index={ index }
+										removeLayer={ removeLayer }
+										settings={ loadLayer( layer ) }
+										switchUseStyle={ switchUseStyle }
+										switchDefault={ switchDefault }
+										switchShowLegend={ switchShowLegend }
+										swapDefault={ swapDefault }
+										updateUse={ updateUse }
+										widths={ widths }
+										updateStyleLayers={ updateStyleLayers }
+										key={ index }
+									/>;
+								} ) }
+								{ provided.placeholder }
+							</div>
+						) }
+					</Droppable>
+				</DragDropContext>
 			) }
 			<Button
 				className="done-button"

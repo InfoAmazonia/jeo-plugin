@@ -1,5 +1,4 @@
 window.JeoLayerTypes.registerLayerType( 'mvt', {
-
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		return map.setStyle( {
@@ -10,22 +9,43 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 					tiles: [ attributes.layer_type_options.url ],
 				},
 			},
-			layers: [ {
-				id: attributes.layer_id,
-				type: attributes.layer_type_options.type,
-				source: attributes.layer_id,
-				'source-layer': attributes.layer_type_options.source_layer,
-			} ],
+			layers: [
+				{
+					id: attributes.layer_id,
+					type: attributes.layer_type_options.type,
+					source: attributes.layer_id,
+					'source-layer': attributes.layer_type_options.source_layer,
+				},
+			],
 		} );
 	},
 
-	addLayer( map, attributes ) {
+	addLayer( map, attributes, addLayerParams ) {
 		map.addSource( attributes.layer_id, {
 			type: 'vector',
-			tiles: [
-				attributes.layer_type_options.url,
-			],
+			tiles: [ attributes.layer_type_options.url ],
 		} );
+
+		if ( addLayerParams ) {
+			return map.addLayer(
+				{
+					id: attributes.layer_id,
+					type: attributes.layer_type_options.type,
+					source: attributes.layer_id,
+					'source-layer': attributes.layer_type_options.source_layer,
+					// 'layout': {
+					// 	'line-cap': 'round',
+					// 	'line-join': 'round'
+					// },
+					// 'paint': {
+					// 	'line-opacity': 0.6,
+					// 	'line-color': 'rgb(53, 175, 109)',
+					// 	'line-width': 2
+					// }
+				},
+				...addLayerParams
+			);
+		}
 
 		return map.addLayer( {
 			id: attributes.layer_id,
@@ -45,12 +65,10 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 	},
 
 	getSchema( attributes ) {
-		return new Promise( function( resolve ) {
+		return new Promise( function ( resolve ) {
 			resolve( {
 				type: 'object',
-				required: [
-					'url', 'type', 'source_layer'
-				],
+				required: [ 'url', 'type', 'source_layer' ],
 				properties: {
 					url: {
 						type: 'string',
@@ -80,11 +98,10 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 						description: 'Which data the map should display',
 						type: 'string',
 						default: 'vector',
-						disabled: true
+						disabled: true,
 					},
 				},
 			} );
 		} );
 	},
-
 } );
