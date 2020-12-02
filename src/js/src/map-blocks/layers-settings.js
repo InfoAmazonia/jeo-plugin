@@ -153,7 +153,7 @@ const LayersSettings = ( {
 			}
 		})
 
-		console.log(resultLayers);
+		// console.log(resultLayers);
 		// console.log(resultLayers);
 
 		setLayers( resultLayers )
@@ -352,29 +352,29 @@ const LayersSettings = ( {
 									}
 
 									const switchUseStyle = ( def ) => {
-										let count = 0;
-										let limitCount = true;
+										// let count = 0;
+										// let limitCount = true;
 
 										const currentLayer = attributes.layers.find((alayer)  => alayer.id === layer.id);
 
-										attributes.layers.forEach((layer) => {
-											if( layer.load_as_style ) {
-												count++;
-											}
-										});
+										// attributes.layers.forEach((layer) => {
+										// 	if( layer.load_as_style ) {
+										// 		count++;
+										// 	}
+										// });
 
-										if(count >= 1) {
-											if(!currentLayer.load_as_style) {
-												limitCount = confirm( __("Loading more than one style in a single map instance may cause unexpected behaviour.") );
-											}
-										}
+										// if(count >= 1) {
+										// 	if(!currentLayer.load_as_style) {
+										// 		limitCount = confirm( __("Loading more than one style in a single map instance may cause unexpected behaviour.") );
+										// 	}
+										// }
 
 										const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === layer.id);
 										const layerType = window.JeoLayerTypes.getLayerType(
 											currentJeoLayerProps.meta.type
 										);
 
-										if(limitCount) {
+										// if(limitCount) {
 											if(def) {
 												layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
 													if(!response) {
@@ -400,29 +400,32 @@ const LayersSettings = ( {
 													setLayers(
 														attributes.layers.map( ( settings ) => {
 															return settings.id === layer.id?
-																{ ...settings, load_as_style: def, style_layers: styleLayers }
-																: settings
+																{ ...settings, load_as_style: true, style_layers: styleLayers }
+																: { ...settings, load_as_style: false, style_layers: [] }
 														} )
 													);
+
+													// console.log(def);
 												} );
 
 												setLayers(
 													attributes.layers.map( ( settings ) => {
 														return settings.id === layer.id?
-															{ ...settings, load_as_style: def, style_layers: [] }
-															: settings
-													} )
-												);
-											} else {
-												setLayers(
-													attributes.layers.map( ( settings ) => {
-														return settings.id === layer.id?
-															{ ...settings, load_as_style: def, style_layers: [] }
-															: settings
+															{ ...settings, load_as_style: true, style_layers: [] }
+															: { ...settings, load_as_style: false, style_layers: [] }
 													} )
 												);
 											}
-										}
+											// else {
+											// 	setLayers(
+											// 		attributes.layers.map( ( settings ) => {
+											// 			return settings.id === layer.id?
+											// 				{ ...settings, load_as_style: def, style_layers: [] }
+											// 				: { ...settings, load_as_style: false, style_layers: [] }
+											// 		} )
+											// 	);
+											// }
+										// }
 									};
 
 									const swapDefault = ( def ) =>
