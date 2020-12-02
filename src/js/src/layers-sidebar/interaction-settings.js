@@ -30,6 +30,8 @@ export default function InteractionSettings( {
 	onUpdate,
 	onDelete,
 } ) {
+	console.log(layer);
+
 	const fieldKeys = useMemo( () => {
 		return Object.keys( layer.fields );
 	}, [ layer.fields ] );
@@ -125,8 +127,8 @@ export default function InteractionSettings( {
 			{ interactive && (
 				<Fragment>
 					<div>
-					<span>{ __( 'Title', 'jeo' ) }</span>
-					<span className="jeo-interaction-fields__field_required"> * </span>
+						<span>{ __( 'Title', 'jeo' ) }</span>
+						<span className="jeo-interaction-fields__field_required"> * </span>
 						<SelectControl
 							value={ interaction.title }
 							options={ titleOptions }
