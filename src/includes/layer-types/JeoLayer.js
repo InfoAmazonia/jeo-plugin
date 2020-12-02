@@ -5,11 +5,13 @@ class JeoLayer {
 		this.layerType = JeoLayerTypes.getLayerType( layerTypeSlug );
 		this.attributes = attributes;
 	}
+
 	addStyle( map ) {
 		return this.layerType.addStyle( map, this.attributes );
 	}
-	addLayer( map ) {
-		return this.layerType.addLayer( map, this.attributes );
+
+	addLayer( map, addLayerParams = false ) {
+		return this.layerType.addLayer( map, this.attributes, addLayerParams );
 	}
 
 	getSchema() {

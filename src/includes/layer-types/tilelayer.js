@@ -1,5 +1,4 @@
 window.JeoLayerTypes.registerLayerType( 'tilelayer', {
-
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		return map.setStyle( {
@@ -11,15 +10,17 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 					tileSize: 256,
 				},
 			},
-			layers: [ {
-				id: attributes.layer_id,
-				type: 'raster',
-				source: attributes.layer_id,
-			} ],
+			layers: [
+				{
+					id: attributes.layer_id,
+					type: 'raster',
+					source: attributes.layer_id,
+				},
+			],
 		} );
 	},
 
-	addLayer( map, attributes ) {
+	addLayer( map, attributes, addLayerParams ) {
 		const layer = {
 			id: attributes.layer_id,
 			source: {
@@ -34,16 +35,19 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 				visibility: 'none',
 			};
 		}
+
+		if ( addLayerParams ) {
+			return map.addLayer( layer, ...addLayerParams );
+		}
+
 		return map.addLayer( layer );
 	},
 
 	getSchema( attributes ) {
-		return new Promise( function( resolve ) {
+		return new Promise( function ( resolve ) {
 			resolve( {
 				type: 'object',
-				required: [
-					'url',
-				],
+				required: [ 'url' ],
 				properties: {
 					url: {
 						type: 'string',
@@ -53,5 +57,4 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 			} );
 		} );
 	},
-
 } );

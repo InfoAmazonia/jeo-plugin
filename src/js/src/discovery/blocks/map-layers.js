@@ -37,7 +37,7 @@ class MapLayers extends Component {
 	}
 
 	fetchMaps( params = {} ) {
-		const defaultParams = { posts_per_page: -1 };
+		const defaultParams = { per_page: 99 };
 		params = { ...defaultParams, ...params };
 
 		const mapsUrl = new URL( jeoMapVars.jsonUrl + 'map/' );
@@ -60,7 +60,7 @@ class MapLayers extends Component {
 						return fetch( mapLayerApiUrl )
 							.then( ( data ) => data.json() )
 							.then( ( layer ) => {
-								if(layer.code && layer.code === "rest_forbidden") {
+								if(layer.code && (layer.code === "rest_forbidden" || layer.code === "rest_post_invalid_id")) {
 									return;
 								}
 

@@ -134,12 +134,14 @@ div.jeomap {
 	margin-right: 12px;
 }
 
-.jeomap .legend-container .text-icon {
+.jeomap .legend-container .text-icon,
+#discovery .legend-container .text-icon  {
 	display: flex;
     align-items: center;
 }
 
-.jeomap .text-icon .legend-icon{
+.jeomap .text-icon .legend-icon,
+#discovery .text-icon .legend-icon {
 	width: 14px;
     height: 16px;
 	background-size: cover;
@@ -202,11 +204,16 @@ div.jeomap {
 	min-width: 220px;
 }
 
-.jeomap div.legend-container .legends-wrapper {
+.jeomap div.legend-container .legends-wrapper{
 	display: block;
 	margin: 0px 0px 0px 20px;
 	padding-top: 25px;
     padding-right: 28px;
+	max-height: 250px;
+	overflow-x: auto;
+}
+
+.jeomap nav.layers-selection .layers-wrapper {
 	max-height: 250px;
 	overflow-x: auto;
 }
@@ -246,38 +253,51 @@ div.jeomap {
 
 
 
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar {
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar,
+.jeomap nav.layers-selection .layers-wrapper::-webkit-scrollbar {
 	width: 6px;
 	/* height: 6px; */
 }
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-button {
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-button,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-button{
 	width: 0px;
 	height: 0px;
 }
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb {
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb {
 	background: #ddd;
 	border: 0px none white;
 	border-radius: 3px;
 }
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:hover {
-	background: #b1b1b1;
-}
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:active {
+
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:hover,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb:hover {
 	background: #b1b1b1;
 }
 
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track {
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:active,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb:active {
+	background: #b1b1b1;
+}
+
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track {
 	background: #eee;
 	border: 0px none #ffffff;
 	border-radius: 0px;
 }
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track:hover {
+
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track:hover,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track:hover{
 	background: rgba(0,0,0,0.05);
 }
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track:active {
+
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track:active,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track:active {
 	background: #eee;
 }
-.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-corner {
+.jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-corner,
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-corner  {
 	background: transparent;
 }
 
@@ -355,6 +375,7 @@ div.jeomap {
 .map-content-layers-list {
 	font-size: 16px;
 	line-height: 25px;
+	font-family: var(--jeo-font);
 }
 
 /* JEO SETTINGS: This css use jeo settings*/
@@ -372,7 +393,7 @@ nav .layer-selection-title .legends-title {
 /*END*/
 
 .map-content-layers-list a.download-source{
-	font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+	font-family: var(--jeo-font);
 	background: #fff;
 	border: 1px solid rgba(0,0,0,0.4);
 	color: #404040;
@@ -534,6 +555,7 @@ nav .layer-selection-title .legends-title {
 
 .simple-color-item-box {
 	width: 21px;
+	min-width: 21px;
 	height: 21px;
 	margin-right: 16px;
 	float: left;
@@ -668,7 +690,7 @@ p.jeomap-no-layers__text {
     padding: 5px;
 }
 
-.jeomap .legends-wrapper .legend-single-title, .discovery .legends-wrapper .legend-single-title  {
+.jeomap .legends-wrapper .legend-single-title, #discovery .legends-wrapper .legend-single-title  {
 	margin-bottom: 15px;
 	font-size: 16px;
 	color: #333;
@@ -676,3 +698,4 @@ p.jeomap-no-layers__text {
 	display: block;
 	font-family: var(--jeo-font);
 }
+

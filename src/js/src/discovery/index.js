@@ -171,12 +171,11 @@ class Discovery extends Component {
 
 		let renderedLegends = legends.map( ( legendObj ) => legendObj.render() );
 		renderedLegends = renderedLegends.map( ( legendRender, index ) => {
-				console.log(legends[index]);
 				return (
 					<>
-						<div className="legend-single-title">
+						{ legends[index].attributes.legend_title && (<div className="legend-single-title">
 							{ legends[index].attributes.legend_title }
-						</div>
+						</div>) }
 						{ parse( legendRender.outerHTML ) }
 					</>
 				);
@@ -291,7 +290,10 @@ class Discovery extends Component {
 						}
 					>
 						<div className="legends-title">
-							<span className="text">{ __( 'Legend' ) }</span>
+							<div className="text-icon">
+								<i className="legend-icon"></i>
+								<span className="text">{ __( 'Legend' ) }</span>
+							</div>
 							<i
 								onClick={ () =>
 									this.setState( {
