@@ -126,8 +126,8 @@ const LayerSettings = (
 
 					<div className="default-control" style={ setWidth( 4 ) }>
 						{ settings.layer.meta.type === 'mapbox' && (
-							<CheckboxControl
-								label={ __( 'Load as style' ) }
+							<RadioControl
+								label={ __( 'Load interactions' ) }
 								checked={ settings.load_as_style }
 								onChange={ switchUseStyle }
 							/>

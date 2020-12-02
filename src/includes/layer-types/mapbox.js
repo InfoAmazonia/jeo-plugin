@@ -60,7 +60,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				} );
 
 				if ( vLayer ) {
-					const type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
+					let type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
 					const popUp = new mapboxgl.Popup( {
 						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
 						closeButton: type === 'click',
@@ -68,6 +68,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						maxWidth: '300px',
 						// anchor: 'right' // parameter to anchor direction 'bottom' default
 					} );
+
+					if (type === 'mouseover') {
+						type = 'mousemove';
+					}
 
 					map.on( type, vLayer.id, function( e ) {
 						// Change the cursor style as a UI indicator.
@@ -118,7 +122,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						if ( ! isOverlapping ) {
 							map.getCanvas().style.cursor = '';
 						}
-						if( type === 'mouseover' ) {
+						if( type === 'mousemove' ) {
 							popUp.remove();
 						}
 					} );
