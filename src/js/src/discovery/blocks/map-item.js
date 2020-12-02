@@ -67,9 +67,10 @@ class MapItem extends Component {
 			)
 		}): []
 
-		const applyRemoveButton = map.queriedLayers.some( ( layer ) => Object.keys(selectedLayers).map( layerId => parseInt(layerId) ).includes( layer.id ) );
+		const applyRemoveButton = map.queriedLayers ? 
+			map.queriedLayers.some( ( layer ) => Object.keys(selectedLayers).map( layerId => parseInt(layerId) ).includes( layer.id ) ) : null ;
 
-		if(!map.queriedLayers.length) {
+		if(!map.queriedLayers || !map.queriedLayers.length) {
 			return "";
 		}
 
