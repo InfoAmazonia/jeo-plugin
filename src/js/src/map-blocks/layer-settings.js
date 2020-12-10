@@ -79,8 +79,12 @@ const LayerSettings = (
 			draggableId={ String( settings.id ) }
 			index={ layerIndex }
 		>
-			{ ( provided ) => (
-				<div
+			{ ( provided ) => {
+				if(!settings.layer) {
+					return <></>;
+				}
+
+				return (settings.layer && <div
 					ref={ provided.innerRef }
 					{ ...provided.draggableProps }
 					{ ...provided.dragHandleProps }
@@ -261,7 +265,8 @@ const LayerSettings = (
 						</>
 					) }
 				</div>
-			) }
+			)
+			} }
 		</Draggable>
 	);
 };
