@@ -101,7 +101,57 @@ div.jeomap {
 
 .jeomap nav.layers-selection {
     max-width: 220px;
-    min-width: 220px;
+	min-width: 220px;
+	transition: all .2s ease-in-out;
+}
+
+@media (max-width: 800px) {
+	.jeomap nav.layers-selection.hidden {
+		max-width: 40px;
+		min-width: 40px;
+		transition: all .2s ease-in-out;
+	}
+
+	.jeomap nav.layers-selection.hidden .layer-selection-title .legends-title .text{
+		display: none;
+	}
+
+	.jeomap nav.layers-selection.hidden .layer-selection-title  .legends-title {
+		padding: 12px 10px;
+		justify-content: center;
+	}
+
+	.jeomap nav.layers-selection.hidden .text-icon .layer-icon {
+		margin-right: 0;
+	}
+
+	.jeomap nav.layers-selection.hidden .layer-selection-title .arrow-icon {
+		display: none;
+	}
+
+
+	.jeomap .legend-container {
+		max-height: 230px;
+		transition: all .2s ease-in-out;
+	}
+
+	.jeomap .legend-container.hidden {
+		min-width: 40px;
+		max-width: 40px;
+		transition: all .2s ease-in-out;
+	}
+
+	.jeomap .legend-container.hidden .legends-title {
+		padding: 12px 10px;
+	}
+
+	.jeomap .legend-container.hidden .legends-title .text-icon .text{
+		display: none;
+	}
+
+	.jeomap .legend-container.hidden .legends-title .text-icon .arrow-icon{
+		display: none;
+	}
 }
 
 .jeomap nav .arrow-icon {

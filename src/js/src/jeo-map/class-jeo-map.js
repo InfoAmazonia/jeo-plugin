@@ -302,10 +302,6 @@ export default class JeoMap {
 			/*const legendsTitle = document.createElement( 'div' );
 			legendsTitle.classList.add( 'legends-title' );
 			legendsTitle.innerHTML = '<span class="text"> Legend </span>';*/
-
-
-
-
 				const legendsTitle = document.createElement( 'div' );
 				legendsTitle.classList.add( 'legends-title' );
 
@@ -329,11 +325,13 @@ export default class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			container.appendChild( legendsTitle );
 
-			legendsHideIcon.addEventListener( 'click', () => {
+			legendsTitle.addEventListener( 'click', () => {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
+					container.classList.add('hidden');
 					legendsHideIcon.classList.remove( 'active' );
 					jQuery( '.hideable-content' ).slideToggle( 'slow' );
 				} else {
+					container.classList.remove('hidden');
 					legendsHideIcon.classList.add( 'active' );
 					jQuery( '.hideable-content' ).slideToggle( 'slow' );
 				}
@@ -751,11 +749,13 @@ export default class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			layerSelectionTitle.appendChild( legendsTitle );
 
-			legendsHideIcon.addEventListener( 'click', () => {
+			layerSelectionTitle.addEventListener( 'click', () => {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
+					navElement.classList.add( 'hidden' );
 					legendsHideIcon.classList.remove( 'active' );
 					jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
 				} else {
+					navElement.classList.remove( 'hidden' );
 					legendsHideIcon.classList.add( 'active' );
 					jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
 				}
