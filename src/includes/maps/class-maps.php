@@ -237,7 +237,7 @@ class Maps {
 			'description' => __('Enable fullscreen button', 'jeo')
 		]);
 
-		register_post_meta($this->post_type, 'show_all_posts', [
+		register_post_meta($this->post_type, 'relate_posts', [
 			'show_in_rest' => true,
 			'single' => true,
 			'auth_callback' => '__return_true',
