@@ -561,10 +561,24 @@ export default class JeoMap {
 		return new Promise( ( resolve, reject ) => {
 			const relatedPostsCriteria = this.getArg( 'related_posts' );
 			this.relatedPostsCriteria = relatedPostsCriteria;
+
+			const relatePosts = this.getArg( 'relate_posts' );
+
+			// console.log("relatedPostsCriteria", relatedPostsCriteria);
+			// console.log("relate_posts", this.getArg( 'relate_posts' ));
+
+			if(!relatePosts) {
+				resolve( [] );
+				return;
+			}
+
 			const query = {};
 			query.per_page = 100; // TODO handle limit of posts per query
-			query.orderby = 'date';
-			query.order = 'desc';
+
+			if(this.relatedPostsCriteria.after || this.relatedPostsCriteria.before) {
+				query.orderby = 'date';
+				query.order = 'desc';
+			}
 
 			const keys = Object.keys( relatedPostsCriteria );
 
@@ -579,6 +593,7 @@ export default class JeoMap {
 			query._embed = 1;
 
 			jQuery.get( jeoMapVars.jsonUrl + 'posts', query, ( data ) => {
+				// console.log( data.length);
 				if ( data.length ) {
 					data.forEach( ( post ) => {
 						this.addPostToMap( post );
