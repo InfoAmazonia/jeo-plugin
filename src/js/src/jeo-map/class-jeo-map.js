@@ -181,7 +181,7 @@ export default class JeoMap {
 									}
 								} );
 
-								console.log(this.map);
+								// console.log(this.map);
 
 							});
 
@@ -874,7 +874,7 @@ export default class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
-		console.log("changeLayerVisibitly");
+		// console.log("changeLayerVisibitly");
 
 		const mapLayersSettings = this.getArg( 'layers' );
 		const layers = this.layers;

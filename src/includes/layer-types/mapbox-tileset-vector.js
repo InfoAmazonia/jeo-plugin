@@ -38,42 +38,26 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 		} );
 
-		if ( addLayerParams ) {
-			return map.addLayer(
-				{
-					id: attributes.layer_id,
-					type: attributes.layer_type_options.type,
-					source: attributes.layer_id,
-					'source-layer': attributes.layer_type_options.source_layer,
-					// 'layout': {
-					// 	'line-cap': 'round',
-					// 	'line-join': 'round'
-					// },
-					// 'paint': {
-					// 	'line-opacity': 0.6,
-					// 	'line-color': 'rgb(53, 175, 109)',
-					// 	'line-width': 2
-					// }
-				},
-				...addLayerParams
-			);
-		}
-
-		return map.addLayer( {
+		const layer = {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
 			'source-layer': attributes.layer_type_options.source_layer,
-			// 'layout': {
-			// 	'line-cap': 'round',
-			// 	'line-join': 'round'
-			// },
-			// 'paint': {
-			// 	'line-opacity': 0.6,
-			// 	'line-color': 'rgb(53, 175, 109)',
-			// 	'line-width': 2
-			// }
-		} );
+		};
+
+		if ( ! attributes.visible ) {
+			layer.layout = {
+				visibility: 'none',
+			};
+		}
+
+		if ( addLayerParams ) {
+			return map.addLayer(
+				layer, ...addLayerParams
+			);
+		}
+
+		return map.addLayer(layer);
 	},
 
 	getSchema( attributes ) {
