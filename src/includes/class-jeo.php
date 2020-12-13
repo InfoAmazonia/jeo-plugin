@@ -239,7 +239,7 @@ class Jeo {
 					$server = rest_get_server();
 					$data = $server->response_to_data( $response, false );
 
-					$have_related_posts = !empty($data) || !empty($map->show_all_posts);
+					$have_related_posts = !empty($data) || !empty($map->relate_posts);
 
 					if(isset($_GET['width']) ) {
 						$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
@@ -256,7 +256,7 @@ class Jeo {
 						$container_style = "width: ${full_width}px; height: ${height}px;";
 						$popup_style = "width: ${popup_width}px; height: ${height}px;";
 					} else {
-						$have_related_posts = !empty($data) || !empty($map->show_all_posts);
+						$have_related_posts = !empty($data) || !empty($map->relate_posts);
 						$container_style = "width: 100%; height: 100%;";
 
 						if($have_related_posts) {

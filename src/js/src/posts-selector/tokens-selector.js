@@ -33,6 +33,8 @@ export function TokensSelector( {
 
 	const onChange = useCallback(
 		( e ) => {
+			// remove invalid ids
+			e = e.filter(id => !isNaN(id));
 			_onChange( e.map( Number ) );
 		},
 		[ _onChange ]
