@@ -101,7 +101,62 @@ div.jeomap {
 
 .jeomap nav.layers-selection {
     max-width: 220px;
-    min-width: 220px;
+	min-width: 220px;
+	transition: all .2s ease-in-out;
+}
+
+.jeomap .hideable-content {
+    max-height: 192px;
+    overflow-x: auto;
+}
+
+@media (max-width: 800px) {
+	.jeomap nav.layers-selection.hidden {
+		max-width: 40px;
+		min-width: 40px;
+		transition: all .2s ease-in-out;
+	}
+
+	.jeomap nav.layers-selection.hidden .layer-selection-title .legends-title .text{
+		display: none;
+	}
+
+	.jeomap nav.layers-selection.hidden .layer-selection-title  .legends-title {
+		padding: 12px 10px;
+		justify-content: center;
+	}
+
+	.jeomap nav.layers-selection.hidden .text-icon .layer-icon {
+		margin-right: 0;
+	}
+
+	.jeomap nav.layers-selection.hidden .layer-selection-title .arrow-icon {
+		display: none;
+	}
+
+
+	.jeomap .legend-container {
+		max-height: 230px;
+		transition: all .2s ease-in-out;
+	}
+
+	.jeomap .legend-container.hidden {
+		min-width: 40px;
+		max-width: 40px;
+		transition: all .2s ease-in-out;
+	}
+
+	.jeomap .legend-container.hidden .legends-title {
+		padding: 12px 10px;
+	}
+
+	.jeomap .legend-container.hidden .legends-title .text-icon .text{
+		display: none;
+	}
+
+	.jeomap .legend-container.hidden .legends-title .text-icon .arrow-icon{
+		display: none;
+	}
 }
 
 .jeomap nav .arrow-icon {
@@ -202,6 +257,7 @@ div.jeomap {
 	/* padding: 0px 0px 23px 0px; */
 	max-width: 220px;
 	min-width: 220px;
+	max-height: 230px;
 }
 
 .jeomap div.legend-container .legends-wrapper{
@@ -209,8 +265,8 @@ div.jeomap {
 	margin: 0px 0px 0px 20px;
 	padding-top: 25px;
     padding-right: 28px;
-	max-height: 250px;
-	overflow-x: auto;
+	/* max-height: 250px; */
+	/* overflow-x: auto; */
 }
 
 .jeomap nav.layers-selection .layers-wrapper {
@@ -254,50 +310,59 @@ div.jeomap {
 
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar,
-.jeomap nav.layers-selection .layers-wrapper::-webkit-scrollbar {
+.jeomap nav.layers-selection .layers-wrapper::-webkit-scrollbar,
+.jeomap .hideable-content::-webkit-scrollbar {
 	width: 6px;
 	/* height: 6px; */
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-button,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-button{
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-button,
+.jeomap .hideable-content::-webkit-scrollbar-button{
 	width: 0px;
 	height: 0px;
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb {
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb,
+.jeomap .hideable-content::-webkit-scrollbar-thumb {
 	background: #ddd;
 	border: 0px none white;
 	border-radius: 3px;
 }
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:hover,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb:hover {
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb:hover,
+.jeomap .hideable-content::-webkit-scrollbar-thumb:hover {
 	background: #b1b1b1;
 }
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-thumb:active,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb:active {
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-thumb:active,
+.jeomap .hideable-content::-webkit-scrollbar-thumb:active {
 	background: #b1b1b1;
 }
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track {
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track,
+.jeomap .hideable-content::-webkit-scrollbar-track {
 	background: #eee;
 	border: 0px none #ffffff;
 	border-radius: 0px;
 }
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track:hover,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track:hover{
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track:hover,
+.jeomap .hideable-content::-webkit-scrollbar-track:hover {
 	background: rgba(0,0,0,0.05);
 }
 
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-track:active,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track:active {
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-track:active,
+.jeomap .hideable-content::-webkit-scrollbar-track:active {
 	background: #eee;
 }
 .jeomap div.legend-container .legends-wrapper::-webkit-scrollbar-corner,
-.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-corner  {
+.jeomap nav.layers-selection  .layers-wrapper::-webkit-scrollbar-corner,
+.jeomap .hideable-content::-webkit-scrollbar-corner  {
 	background: transparent;
 }
 
