@@ -181,13 +181,8 @@ export default class JeoMap {
 									}
 								} );
 
-								// console.log(this.map);
-
-							});
-
-							const customAttribution = [];
-
-							map.on( 'load', () => {
+								// Add attributions
+								const customAttribution = [];
 								layers.forEach( ( layer ) => {
 									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
 
@@ -220,17 +215,22 @@ export default class JeoMap {
 
 									// layer.addInteractions( map );
 								} );
-							} );
+
+								// alert("asdasdas");
+								// console.log(customAttribution);
+
+								map.addControl(
+									new mapboxgl.AttributionControl( {
+										compact: true,
+										customAttribution,
+									} ),
+									'bottom-left'
+								);
+
+
+							});
 
 							this.addLayersControl( amountLayers );
-
-							map.addControl(
-								new mapboxgl.AttributionControl( {
-									customAttribution,
-								} ),
-								'bottom-left'
-							);
-
 							this.addMoreButtonAndLegends();
 						}
 
