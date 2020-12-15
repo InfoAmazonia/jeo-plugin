@@ -471,10 +471,20 @@ const LayersSettings = ( {
 										}
 									};
 
+									const loadedLayer = loadLayer( layer );
+
+									if(!loadedLayer.layer) {
+										return setLayers(
+											attributes.layers.filter(
+												( settings ) => settings.id !== loadedLayer.id
+											)
+										);
+									}
+
 									return <LayerSettings
 										index={ index }
 										removeLayer={ removeLayer }
-										settings={ loadLayer( layer ) }
+										settings={ loadedLayer }
 										switchUseStyle={ switchUseStyle }
 										switchDefault={ switchDefault }
 										switchShowLegend={ switchShowLegend }

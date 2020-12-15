@@ -1,7 +1,7 @@
 <html style="margin: 0px !important;">
 
 	<head>
-		<title></title>
+		<title><?= get_the_title( $map_id ) ?> </title>
 		<?php wp_head(); ?>
 	</head>
 
