@@ -181,13 +181,8 @@ export default class JeoMap {
 									}
 								} );
 
-								console.log(this.map);
-
-							});
-
-							const customAttribution = [];
-
-							map.on( 'load', () => {
+								// Add attributions
+								const customAttribution = [];
 								layers.forEach( ( layer ) => {
 									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
 
@@ -220,17 +215,22 @@ export default class JeoMap {
 
 									// layer.addInteractions( map );
 								} );
-							} );
+
+								// alert("asdasdas");
+								// console.log(customAttribution);
+
+								map.addControl(
+									new mapboxgl.AttributionControl( {
+										compact: true,
+										customAttribution,
+									} ),
+									'bottom-left'
+								);
+
+
+							});
 
 							this.addLayersControl( amountLayers );
-
-							map.addControl(
-								new mapboxgl.AttributionControl( {
-									customAttribution,
-								} ),
-								'bottom-left'
-							);
-
 							this.addMoreButtonAndLegends();
 						}
 
@@ -302,10 +302,6 @@ export default class JeoMap {
 			/*const legendsTitle = document.createElement( 'div' );
 			legendsTitle.classList.add( 'legends-title' );
 			legendsTitle.innerHTML = '<span class="text"> Legend </span>';*/
-
-
-
-
 				const legendsTitle = document.createElement( 'div' );
 				legendsTitle.classList.add( 'legends-title' );
 
@@ -329,13 +325,15 @@ export default class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			container.appendChild( legendsTitle );
 
-			legendsHideIcon.addEventListener( 'click', () => {
+			legendsTitle.addEventListener( 'click', function() {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
+					container.classList.add('hidden');
 					legendsHideIcon.classList.remove( 'active' );
-					jQuery( '.hideable-content' ).slideToggle( 'slow' );
+					jQuery( this.parentNode.querySelector('.hideable-content') ).slideToggle( 'slow' );
 				} else {
+					container.classList.remove('hidden');
 					legendsHideIcon.classList.add( 'active' );
-					jQuery( '.hideable-content' ).slideToggle( 'slow' );
+					jQuery( this.parentNode.querySelector('.hideable-content') ).slideToggle( 'slow' );
 				}
 			} );
 
@@ -561,10 +559,24 @@ export default class JeoMap {
 		return new Promise( ( resolve, reject ) => {
 			const relatedPostsCriteria = this.getArg( 'related_posts' );
 			this.relatedPostsCriteria = relatedPostsCriteria;
+
+			const relatePosts = this.getArg( 'relate_posts' );
+
+			// console.log("relatedPostsCriteria", relatedPostsCriteria);
+			// console.log("relate_posts", this.getArg( 'relate_posts' ));
+
+			if(!relatePosts) {
+				resolve( [] );
+				return;
+			}
+
 			const query = {};
 			query.per_page = 100; // TODO handle limit of posts per query
-			query.orderby = 'date';
-			query.order = 'desc';
+
+			if(this.relatedPostsCriteria.after || this.relatedPostsCriteria.before) {
+				query.orderby = 'date';
+				query.order = 'desc';
+			}
 
 			const keys = Object.keys( relatedPostsCriteria );
 
@@ -579,6 +591,7 @@ export default class JeoMap {
 			query._embed = 1;
 
 			jQuery.get( jeoMapVars.jsonUrl + 'posts', query, ( data ) => {
+				// console.log( data.length);
 				if ( data.length ) {
 					data.forEach( ( post ) => {
 						this.addPostToMap( post );
@@ -751,13 +764,15 @@ export default class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			layerSelectionTitle.appendChild( legendsTitle );
 
-			legendsHideIcon.addEventListener( 'click', () => {
+			layerSelectionTitle.addEventListener( 'click', function() {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
+					navElement.classList.add( 'hidden' );
 					legendsHideIcon.classList.remove( 'active' );
-					jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
+					jQuery( this.parentNode.querySelector('.layers-wrapper') ).slideToggle( 'slow' );
 				} else {
+					navElement.classList.remove( 'hidden' );
 					legendsHideIcon.classList.add( 'active' );
-					jQuery( '.layers-wrapper' ).slideToggle( 'slow' );
+					jQuery( this.parentNode.querySelector('.layers-wrapper') ).slideToggle( 'slow' );
 				}
 			} );
 
@@ -874,7 +889,7 @@ export default class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
-		console.log("changeLayerVisibitly");
+		// console.log("changeLayerVisibitly");
 
 		const mapLayersSettings = this.getArg( 'layers' );
 		const layers = this.layers;
