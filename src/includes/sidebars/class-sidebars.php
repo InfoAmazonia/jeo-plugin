@@ -37,6 +37,15 @@ class Sidebars {
 			)
 		);
 
+		wp_localize_script(
+			'jeo-layers-sidebar',
+			'carto_options',
+			array(
+				'carto_username' => sanitize_text_field( \jeo_settings()->get_option( 'carto_username' )),
+				'carto_key' => sanitize_text_field( \jeo_settings()->get_option( 'carto_key' )),
+			)
+		);
+
 		wp_enqueue_script(
 			'jeo-maps-sidebar',
 			JEO_BASEURL . '/js/build/mapsSidebar.js',

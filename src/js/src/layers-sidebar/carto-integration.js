@@ -97,17 +97,24 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 
 	return (
 		<>
-			<CheckboxControl
-				label={ __( 'Use integration' ) }
-				checked={ useCartoIntegration }
-				onChange={ () => {
-					setUseCartoInteration(!postMeta.use_carto_integration);
-					setPostMeta( {
-						...postMeta,
-						use_carto_integration: !postMeta.use_carto_integration
-					 } )
-				} }
-			/>
+			{ ( ! carto_options.carto_key || ! carto_options.carto_username ) && (
+				<>
+					<p> { __("Configure your Carto options in Jeo settings") } </p>
+				</>
+			) } 
+			{ ( carto_options.carto_key && carto_options.carto_username ) && (
+				<CheckboxControl
+					label={ __( 'Use integration' ) }
+					checked={ useCartoIntegration }
+					onChange={ () => {
+						setUseCartoInteration(!postMeta.use_carto_integration);
+						setPostMeta( {
+							...postMeta,
+							use_carto_integration: !postMeta.use_carto_integration
+						} )
+					} }
+				/>
+			) } 
 
 			{ useCartoIntegration &&
 				<>
