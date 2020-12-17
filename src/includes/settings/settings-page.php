@@ -83,7 +83,7 @@
 
 
 					<tr>
-						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php _e('Carto (oppicional)', 'jeo'); ?></h3></th>
+						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php _e('Carto (optional)', 'jeo'); ?></h3></th>
 						<td>
 						</td>
 					</tr>
