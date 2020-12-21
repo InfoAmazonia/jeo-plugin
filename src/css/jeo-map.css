@@ -504,7 +504,7 @@ nav .layer-selection-title .legends-title {
 }
 
 .jeomap .popup {
-	margin-top: 4rem;
+	margin-top: 5rem;
 	min-width: 200px;
 }
 
@@ -554,7 +554,7 @@ nav .layer-selection-title .legends-title {
     transform: none !important;
 	left: auto;
 	right: 0;
-	top: 90px !important;
+	top: 110px !important;
 	padding: 5px;
 }
 
