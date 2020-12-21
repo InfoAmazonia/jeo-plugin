@@ -518,7 +518,7 @@ nav .layer-selection-title .legends-title {
 }
 
 .popup h2 a{
-	font-size: 22px;
+	font-size: px;
     font-weight: 900;
     text-decoration: none !important;
     color: #555d65;
@@ -551,11 +551,16 @@ nav .layer-selection-title .legends-title {
 }
 
 .jeo-popup__mouseover {
+	font-size: 16px;
     transform: none !important;
 	left: auto;
 	right: 0;
 	top: 110px !important;
 	padding: 5px;
+}
+
+.jeo-popup__mouseover * {
+	font-size: 16px;
 }
 
 .jeo-popup__mouseover.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
