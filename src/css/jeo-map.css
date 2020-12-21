@@ -516,12 +516,12 @@ nav .layer-selection-title .legends-title {
 }
 
 .popup h2{
-	margin: 0px;
+	margin: 10px 0 0 0;
 	line-height: 20px;
 }
 
 .popup h2 a{
-	font-size: px;
+	font-size: 22px;
     font-weight: 900;
     text-decoration: none !important;
     color: #555d65;
