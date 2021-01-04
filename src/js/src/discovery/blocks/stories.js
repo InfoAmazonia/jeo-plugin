@@ -7,6 +7,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
 const POSTS_PER_PAGE = 10;
+const MEMOIZED_CATEGORIES = {};
 
 class Stories extends Component {
 	constructor( props ) {
@@ -390,6 +391,7 @@ class Stories extends Component {
 					// Fetch categories
 					const storiesCategoriesPromises = geolocatedStories.map(
 						( story ) => {
+							console.log(MEMOIZED_CATEGORIES);
 							return Promise.all(
 								story.categories.map( async ( category ) => {
 									const categoriesApiUrl = new URL(
@@ -401,7 +403,27 @@ class Stories extends Component {
 										return;
 									}
 
-									return fetch( categoriesApiUrl )
+									const categoryId = category;
+
+									if(MEMOIZED_CATEGORIES[categoryId]) {
+										category = await MEMOIZED_CATEGORIES[categoryId];
+
+										if (
+											story.queriedCategories &&
+											story.queriedCategories.length
+										) {
+											story.queriedCategories = [
+												...story.queriedCategories,
+												category,
+											];
+										} else {
+											story.queriedCategories = [ category ];
+										}
+
+										return MEMOIZED_CATEGORIES[categoryId];
+									}
+
+									const categoryPromisse = fetch( categoriesApiUrl )
 										.then( ( data ) => data.json() )
 										.then( ( category ) => {
 											if (
@@ -417,15 +439,25 @@ class Stories extends Component {
 											}
 
 											return category;
-										} );
+									} );
+
+									MEMOIZED_CATEGORIES[categoryId] = categoryPromisse;
+									return categoryPromisse;
 								} )
 							);
 						}
 					);
 
 					// When its all resolved, update state
-					return Promise.all( storiesMediasPromises ).then( () =>
-						Promise.all( storiesCategoriesPromises ).then( () => {
+					return Promise.all( storiesMediasPromises ).then( () => {
+						console.log(storiesCategoriesPromises);
+
+						// Use reduce stategy to force series processing to make memoization possible
+						storiesCategoriesPromises.reduce(
+							(accumulator, currentValue) =>
+								accumulator.then(_ => currentValue),
+							Promise.resolve()
+						).then( () => {
 							storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
 
 							const reusableParams = {...params};
@@ -442,7 +474,27 @@ class Stories extends Component {
 							} );
 
 							return Promise.resolve( storiesCumulative );
-						} )
+						})
+
+						// Promise.all( storiesCategoriesPromises ).then( () => {
+						// 	storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
+
+						// 	const reusableParams = {...params};
+
+						// 	// These params are not reusable, they refer directly to a episodic state
+						// 	delete reusableParams.cumulative;
+						// 	delete reusableParams.page;
+						// 	delete reusableParams.per_page;
+
+						// 	this.props.updateState( {
+						// 		storiesLoaded: true,
+						// 		stories: storiesCumulative,
+						// 		queryParams: reusableParams,
+						// 	} );
+
+						// 	return Promise.resolve( storiesCumulative );
+						// } )
+					}
 					);
 				},
 				( error ) => {
