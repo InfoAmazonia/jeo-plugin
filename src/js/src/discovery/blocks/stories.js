@@ -391,7 +391,7 @@ class Stories extends Component {
 					// Fetch categories
 					const storiesCategoriesPromises = geolocatedStories.map(
 						( story ) => {
-							console.log(MEMOIZED_CATEGORIES);
+							// console.log(MEMOIZED_CATEGORIES);
 							return Promise.all(
 								story.categories.map( async ( category ) => {
 									const categoriesApiUrl = new URL(
@@ -449,9 +449,7 @@ class Stories extends Component {
 					);
 
 					// When its all resolved, update state
-					return Promise.all( storiesMediasPromises ).then( () => {
-						console.log(storiesCategoriesPromises);
-
+					return Promise.all( storiesMediasPromises ).then( () =>
 						// Use reduce stategy to force series processing to make memoization possible
 						storiesCategoriesPromises.reduce(
 							(accumulator, currentValue) =>
@@ -494,7 +492,7 @@ class Stories extends Component {
 
 						// 	return Promise.resolve( storiesCumulative );
 						// } )
-					}
+
 					);
 				},
 				( error ) => {
