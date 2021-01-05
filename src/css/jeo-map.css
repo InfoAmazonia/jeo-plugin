@@ -14,11 +14,11 @@ div.jeomap {
 
 .jeomap .marker {
 	cursor: pointer;
-	filter: brightness(85%);
+	/*filter: brightness(85%);*/
 }
 
 .jeomap .marker:hover {
-	filter: brightness(110%);
+	filter: brightness(85%);
 }
 
 .jeomap .marker-active {
@@ -521,10 +521,11 @@ nav .layer-selection-title .legends-title {
 }
 
 .popup h2 a{
-	font-size: 22px;
+	font-size: 16px;
     font-weight: 900;
     text-decoration: none !important;
-    color: #555d65;
+	color: #555d65;
+	line-height: 16px;
 }
 .popup h1:not(.site-title):before, .popup h2:before {
     background: #767676;
