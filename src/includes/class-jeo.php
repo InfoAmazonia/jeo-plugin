@@ -176,6 +176,14 @@ class Jeo {
 			$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
 			wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'], array( 'wp-element', 'mapboxgl-loader', 'jquery', 'jeo-map' ) ), false, true);
 
+
+			// Check if sites uses WPML
+			if ( function_exists('icl_object_id') ) {
+				wp_localize_script('discovery-map', 'languageParams', array(
+					'currentLang' => ICL_LANGUAGE_CODE,
+				));
+		   	}
+
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/css/jeo-map.css', time() );
 			wp_localize_script(
 				'jeo-map',
