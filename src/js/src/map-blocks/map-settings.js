@@ -84,8 +84,13 @@ export default ( { attributes, setAttributes } ) => {
 						step={ 0.1 }
 						value={ initialZoom }
 						onChange={ ( value ) => {
-							window.initial_zoom = value;
-							attributeUpdater( 'initial_zoom' )( value );
+							let newValue = value;
+							if ( ! newValue ) {
+								newValue = minZoom
+							}
+
+							window.initial_zoom = newValue;
+							attributeUpdater( 'initial_zoom' )( newValue );
 						} }
 					/>
 					<RangeControl
@@ -96,8 +101,13 @@ export default ( { attributes, setAttributes } ) => {
 						step={ 0.1 }
 						value={ minZoom }
 						onChange={ ( value ) => {
-							window.min_zoom = value;
-							attributeUpdater( 'min_zoom' )( value );
+							let newValue = value;
+							if ( ! newValue ) {
+								newValue = 0;
+							}
+
+							window.min_zoom = newValue;
+							attributeUpdater( 'min_zoom' )( newValue );
 						} }
 					/>
 					<RangeControl
@@ -108,8 +118,13 @@ export default ( { attributes, setAttributes } ) => {
 						step={ 0.1 }
 						value={ maxZoom }
 						onChange={ ( value ) => {
-							window.max_zoom = value;
-							attributeUpdater( 'max_zoom' )( value );
+							let newValue = value;
+							if ( ! newValue ) {
+								newValue = initialZoom;
+							}
+							
+							window.max_zoom = newValue;
+							attributeUpdater( 'max_zoom' )( newValue );
 						} }
 					/>
 					<CheckboxControl
