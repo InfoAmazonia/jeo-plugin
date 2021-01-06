@@ -21,7 +21,7 @@ class MapLayers extends Component {
 		if ( ! this.props.mapsLoaded ) {
 			if ( this.props.isEmbed ) {
 				const requestedLayerIds = this.getLayerIdsFromUrl().map(
-					( data ) => data.id
+					( data ) => data[ 0 ]
 				);
 				this.fetchLayers( requestedLayerIds ).then( ( layers ) => {
 					// console.log(layers);
@@ -33,7 +33,9 @@ class MapLayers extends Component {
 				const isShare = urlParams.get( 'share' );
 				if ( isShare ) {
 					this.fetchMaps().then( ( _ ) => {
-						const requestedLayerIds = this.getLayerIdsFromUrl();
+						let requestedLayerIds = this.getLayerIdsFromUrl().map(
+							( item ) => ( { id: item[ 0 ], map: item[ 1 ] } )
+						);
 						let layersBatch = [];
 
 						this.props.maps.map( ( aMap ) => {
@@ -46,8 +48,15 @@ class MapLayers extends Component {
 								}
 							} );
 						} );
+
 						console.log( layersBatch );
-						this.toggleLayersBatch( layersBatch.reverse() );
+						requestedLayerIds = requestedLayerIds.map( ( item ) => item.id );
+
+						const sortedLayerBatch = requestedLayerIds.map( ( id ) => {
+							return layersBatch.find( ( layer ) => layer.id === id );
+						} );
+
+						this.toggleLayersBatch( sortedLayerBatch.reverse() );
 						this.applyLayersChanges();
 					} );
 				} else {
