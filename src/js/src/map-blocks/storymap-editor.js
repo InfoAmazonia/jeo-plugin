@@ -113,8 +113,16 @@ const MapEditor = ( {
 		);
 	} );
 
+	let globalFontFamily = window.jeo_settings.jeo_typography-name;
+
+	if ( ! globalFontFamily ) {
+		globalFontFamily =  'sans-serif';
+	}
+	
+	document.body.style.setProperty('--globalFontFamily', globalFontFamily);
+	
 	return (
-		<div className="jeo-mapblock">
+		<div className="jeo-mapblock storymap">
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && (
 				<Fragment>
