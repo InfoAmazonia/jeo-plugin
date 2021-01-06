@@ -8,12 +8,14 @@ $font-stories: var( --jeo-font-stories );
 		}
 
 		.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
-			margin-top: 40px;
+			margin-top: 45px;
 		}
 	}
 	
-	.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
-		margin-top: 30px;
+	@media (min-width: 830px) {
+		.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
+			margin-top: 30px;
+		}
 	}
 
 	margin: 0;
