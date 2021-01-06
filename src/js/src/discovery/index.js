@@ -208,6 +208,11 @@ class Discovery extends Component {
 		};
 
 		const generatedEmbedUrl = this.buildUrlParamsString( buildURLParams );
+		const notEncodedUrlEmbed = this.buildUrlParamsString(
+			buildURLParams,
+			false,
+		);
+
 		const notEncodedUrl = this.buildUrlParamsString(
 			buildURLParams,
 			false,
@@ -350,7 +355,7 @@ class Discovery extends Component {
 								{ this.state.showEmbedTooltip && (
 									<div className="embed-tooltip">
 										<textarea disabled readOnly>
-											{ `<iframe src="${ notEncodedUrl }" frameborder="0"></iframe>` }
+											{ `<iframe src="${ notEncodedUrlEmbed }" frameborder="0"></iframe>` }
 										</textarea>
 									</div>
 								) }
