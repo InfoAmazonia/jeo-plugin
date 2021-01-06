@@ -37,7 +37,7 @@ export default function InteractionsSettings( {
 			return layer;
 		} );
 
-		console.log(layersWithSource);
+		//console.log(layersWithSource);
 
 
 		return layersWithSource;
@@ -53,7 +53,7 @@ export default function InteractionsSettings( {
 
 	const onUpdate = useCallback(
 		( interactionId, newInteraction ) => {
-			console.log( interactionId, newInteraction );
+			//console.log( interactionId, newInteraction );
 			setLocalInteractions(
 				localInteractions.map( ( interaction ) => {
 					return interaction.id === interactionId

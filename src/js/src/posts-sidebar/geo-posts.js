@@ -232,7 +232,7 @@ class JeoGeocodePosts extends Component {
 	}
 
 	onLocationFound( location ) {
-		console.log(location)
+		//console.log(location)
 		this.flyToLocation( location.lat, location.lon );
 		this.fetchReverseGeocode( location.lat, location.lon ).then( ( result ) => {
 			if ( result.raw.error ) {
