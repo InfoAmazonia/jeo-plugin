@@ -357,7 +357,7 @@ const MapEditor = ( {
 																								{ ...provided.draggableProps }
 																								{ ...provided.dragHandleProps }
 																							>
-																								<div
+																								<Button
 
 																									style={ layerButtonStyle }
 																									className="layer"
@@ -399,7 +399,7 @@ const MapEditor = ( {
 																											item.title.rendered
 																										) }
 																									</p>
-																								</div>
+																								</Button>
 																							</div>
 																						);
 																					}
