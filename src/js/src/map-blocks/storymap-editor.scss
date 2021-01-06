@@ -219,3 +219,22 @@
 		}
 	}
 }
+
+.slides-container h2.components-panel__body-title:before {
+	display: block;
+   content: "=";
+   font-size: 22px;
+   cursor: grabbing;
+}
+
+.slides-container h2.components-panel__body-title {
+   display: flex;
+   margin-top: 0px;
+   margin-bottom: 0px;
+   padding: 13px 4px;
+}
+
+
+.editor-styles-wrapper .wp-block[data-type="jeo/storymap"] {
+   max-width: 97%;
+}
