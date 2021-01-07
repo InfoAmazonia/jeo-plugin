@@ -258,7 +258,7 @@ class Carto {
 
 function carto_integration_cron_scheduler() {
 	if (!wp_next_scheduled ( 'carto_update_layers' )) {
-		wp_schedule_event(time(), 'daily', 'carto_update_layers');
+		wp_schedule_event(time(), \jeo_settings()->get_option( 'carto_update_time' ), 'carto_update_layers');
 	}
 
 	// wp_clear_scheduled_hook('Jeo\Integrations\carto_integration_update_task');
@@ -310,6 +310,10 @@ add_filter( 'cron_schedules', 'Jeo\Integrations\add_custom_invervals' );
 function add_custom_invervals( $schedules ) {
     $schedules['five_minutes'] = array(
         'interval' => 100,
-        'display'  => esc_html__( 'Every Five Minutes' ), );
+		'display'  => esc_html__( 'Every Five Minutes' ), );
+
+	$schedules['monthly'] = array(
+		'interval' => 2678400,
+		'display'  => esc_html__( 'Monthly' ), );
     return $schedules;
 }

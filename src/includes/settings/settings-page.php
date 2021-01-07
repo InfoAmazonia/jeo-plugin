@@ -101,14 +101,13 @@
 						<input name="<?php echo esc_html( $this->get_field_name('carto_key') ); ?>" placeholder="<?= __("Ex. 5a03fe2...", "jeo") ?>" type="text" id="carto_key" value="<?php echo esc_html( $this->get_option('carto_key') ); ?>" class="regular-text">
 						</td>
 					</tr>
-
 					<tr>
 						<th scope="row"><label for="carto_update_time"><?php _e('Update Interval', 'jeo'); ?></label></th>
 						<td>
-						<select name="carto_update_time" id="carto_update_time">
+						<select name="<?php echo esc_html( $this->get_field_name('carto_update_time') ); ?>" id="carto_update_time">
 							<option value="daily" <?= $this->get_option('carto_update_time') ===  'daily'? 'selected' : '' ?>>Daily</option>
 							<option value="weekly" <?= $this->get_option('carto_update_time') ===  'weekly'? ' selected' : '' ?> <?= empty($this->get_option('carto_update_time'))? ' selected' : '' ?>>Weekly</option>
-							<option value="montly" <?= $this->get_option('carto_update_time') ===  'montly'? 'selected' : '' ?>>Montly</option>
+							<option value="monthly" <?= $this->get_option('carto_update_time') ===  'monthly'? 'selected' : '' ?>>Monthly</option>
 						</select>
 						</td>
 					</tr>
