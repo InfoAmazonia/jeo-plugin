@@ -345,8 +345,8 @@ class Stories extends Component {
 			postsUrl.searchParams.append( key, params[ key ] )
 		);
 
-		if(languageParams.currentLang) {
-			postsUrl.searchParams.append( 'lang',  languageParams.currentLang );
+		if("languageParams" in window){
+			postsUrl.searchParams.append( 'lang', languageParams.currentLang );
 		}
 
 		return fetch( postsUrl )
