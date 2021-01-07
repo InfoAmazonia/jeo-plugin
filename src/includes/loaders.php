@@ -290,6 +290,7 @@ function jeo_scripts_typography() {
     }
 }
 add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );
+add_action( 'admin_enqueue_scripts', 'jeo_scripts_typography' );
 
 if (!function_exists("color_luminance_jeo")){
 	function color_luminance_jeo($hexcolor, $percent) {
