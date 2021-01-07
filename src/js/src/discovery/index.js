@@ -220,7 +220,7 @@ class Discovery extends Component {
 		);
 		const shareStateUrl = this.buildUrlParamsString(
 			buildURLParams,
-			false,
+			true,
 			document.location.pathname + '?share=true'
 		);
 
