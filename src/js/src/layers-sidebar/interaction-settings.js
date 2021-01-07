@@ -30,7 +30,7 @@ export default function InteractionSettings( {
 	onUpdate,
 	onDelete,
 } ) {
-	console.log(layer);
+	//console.log(layer);
 
 	const fieldKeys = useMemo( () => {
 		return Object.keys( layer.fields );

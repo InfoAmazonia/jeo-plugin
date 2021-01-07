@@ -41,7 +41,7 @@ const MapEditor = ( {
 		const result = Array.from( list );
 		const [ removed ] = result.splice( startIndex, 1 );
 		result.splice( endIndex, 0, removed );
-	  
+
 		return result;
 	};
 
@@ -50,7 +50,7 @@ const MapEditor = ( {
 		if ( !result.destination ) {
 		  return;
 		}
-	
+
 		const newItems = reorder(
 		  storymapLayers,
 		  result.source.index,
@@ -98,7 +98,6 @@ const MapEditor = ( {
 				navigateMapLayers: [],
 			} );
 		}
-
 		const postID = wp.data.select( "core/editor" ).getCurrentPostId();
 		setAttributes( { ...attributes, postID } );
 	} );
@@ -114,8 +113,16 @@ const MapEditor = ( {
 		);
 	} );
 
+	let globalFontFamily = window.jeo_settings.jeo_typography-name;
+
+	if ( ! globalFontFamily ) {
+		globalFontFamily =  'sans-serif';
+	}
+	
+	document.body.style.setProperty('--globalFontFamily', globalFontFamily);
+	
 	return (
-		<div className="jeo-mapblock">
+		<div className="jeo-mapblock storymap">
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && (
 				<Fragment>
@@ -246,10 +253,12 @@ const MapEditor = ( {
 								<List
 									values={ attributes.slides }
 									onChange={ ( { oldIndex, newIndex } ) => {
-										const newSLides = [ ...attributes.slides ];
+										let newSlides = JSON.parse(JSON.stringify(attributes.slides));
+										newSlides = arrayMove( newSlides, oldIndex, newIndex );
+
 										setAttributes( {
 											...attributes,
-											slides: arrayMove( newSLides, oldIndex, newIndex ),
+											slides: newSlides,
 										} );
 									} }
 									renderList={ ( { children, props } ) => {
@@ -259,16 +268,16 @@ const MapEditor = ( {
 											</div>
 										);
 									} }
-									renderItem={ ( { value, props } ) => {
+									renderItem={ ( { value, isDragged, props } ) => {
 										const slide = value;
 										const index = attributes.slides.indexOf( value );
 										return (
 											<div key={ slide.content } className="slide" { ...props }>
 												<Panel key={ key } className="slide-panel"  >
 													<PanelBody
-														title={ __( 'Slide ' ) + ( index + 1 ) }
+														title={ slide.title? slide.title : __( 'Slide ' ) + ( index + 1 ) }
 														initialOpen={
-															index === currentSlideIndex ? true : false
+															(index === currentSlideIndex ? true : false) && !isDragged
 														}
 													>
 														<TextareaControl
@@ -338,7 +347,7 @@ const MapEditor = ( {
 																					let layerButtonStyle = {
 																						background: 'rgb(240, 240, 240)',
 																					};
-					
+
 																					attributes.slides[ index ].selectedLayers.map(
 																						( selectedLayer ) => {
 																							if ( selectedLayer.id === item.id ) {
@@ -348,7 +357,7 @@ const MapEditor = ( {
 																							}
 																						}
 																					);
-																				
+
 																					if ( item ) {
 																						return (
 																							<div
@@ -356,8 +365,8 @@ const MapEditor = ( {
 																								{ ...provided.draggableProps }
 																								{ ...provided.dragHandleProps }
 																							>
-																								<div
-																									
+																								<Button
+
 																									style={ layerButtonStyle }
 																									className="layer"
 																									key={ item.id }
@@ -367,7 +376,7 @@ const MapEditor = ( {
 																											...attributes.slides,
 																										];
 																										let hasBeenRemoved = false;
-							
+
 																										oldSlides[ index ].selectedLayers.map(
 																											( selectedLayer, indexOfLayer ) => {
 																												if ( selectedLayer.id === item.id ) {
@@ -381,7 +390,7 @@ const MapEditor = ( {
 																												}
 																											}
 																										);
-							
+
 																										if ( ! hasBeenRemoved ) {
 																											oldSlides[ index ].selectedLayers.push(
 																												item
@@ -398,7 +407,7 @@ const MapEditor = ( {
 																											item.title.rendered
 																										) }
 																									</p>
-																								</div>
+																								</Button>
 																							</div>
 																						);
 																					}
@@ -413,7 +422,7 @@ const MapEditor = ( {
 															</Droppable>
 														</DragDropContext>
 														<div style={ { display: 'flex' } }>
-															{ 
+															{
 																attributes.slides[ index ].latitude == mapDefaults.lat &&
 																attributes.slides[ index ].longitude == mapDefaults.lng &&
 																attributes.slides[ index ].zoom == mapDefaults.zoom &&
@@ -451,7 +460,7 @@ const MapEditor = ( {
 																	</Button>
 																)
 															}
-															{ 
+															{
 																! ( attributes.slides[ index ].latitude == mapDefaults.lat &&
 																attributes.slides[ index ].longitude == mapDefaults.lng &&
 																attributes.slides[ index ].zoom == mapDefaults.zoom &&
@@ -601,7 +610,7 @@ const MapEditor = ( {
 							className="search-adress-input"
 							onSelect={ ( location ) => {
 								flyTo( selectedMap, location );
-								
+
 								/*
 								selectedMap.flyTo( {
 									center: [
@@ -646,7 +655,7 @@ const MapEditor = ( {
 						onSuggestionSelected={ ( e, { suggestion } ) =>
 							setAttributes( {
 								...attributes,
-								map_id: suggestion.id, 
+								map_id: suggestion.id,
 								slides: [
 									{
 										title: null,
