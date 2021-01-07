@@ -47,8 +47,8 @@ class Discovery extends Component {
 
 			// filter data
 			queryParams: {},
-			dateRangeInputValue: "",
-			searchField: { searchStorie: "", searchMap: ""},
+			dateRangeInputValue: '',
+			searchField: { searchStorie: '', searchMap: '' },
 			selectedTag: -1,
 			tags: [],
 			categories: [], // future api improvement (single api call)
@@ -61,7 +61,10 @@ class Discovery extends Component {
 	componentDidMount() {
 		let adicionalMapOptions = {};
 
-		if ( this.getParamFromUrl( 'discovery' ) ) {
+		if (
+			this.getParamFromUrl( 'discovery' ) ||
+			this.getParamFromUrl( 'share' )
+		) {
 			adicionalMapOptions = {
 				...adicionalMapOptions,
 				center: this.getParamFromUrl( 'center' ),
@@ -101,8 +104,12 @@ class Discovery extends Component {
 		return value ?? false;
 	}
 
-	buildUrlParamsString( params, encodeParamsToURL = true ) {
-		const url = new URL( `${ jeo_settings.site_url }/embed/?discovery=true` );
+	buildUrlParamsString(
+		params,
+		encodeParamsToURL = true,
+		urlConcatString = '/embed/?discovery=true'
+	) {
+		const url = new URL( `${ jeo_settings.site_url }${ urlConcatString }` );
 		const searchParams = url.searchParams;
 		let newUrl = '';
 
@@ -111,7 +118,9 @@ class Discovery extends Component {
 			searchParams.set( paramKey, JSON.stringify( paramValue ) );
 		} );
 
-		url.search = encodeParamsToURL? encodeURIComponent(searchParams.toString()) : searchParams.toString();
+		url.search = encodeParamsToURL
+			? encodeURIComponent( searchParams.toString() )
+			: searchParams.toString();
 
 		newUrl = url.toString();
 		return newUrl;
@@ -148,7 +157,6 @@ class Discovery extends Component {
 			layersQueue: this.state.layersQueue,
 			applyLayersChanges: this.applyLayersChanges,
 
-
 			updateState: this.updateState,
 			pageInfo: {
 				currentPage: this.state.currentPage,
@@ -158,43 +166,72 @@ class Discovery extends Component {
 
 			isEmbed: this.props.embed,
 			useStories: this.props.useStories,
+
+			share: this.getParamFromUrl( 'share' ),
 		};
 
-		const legends = this.state.appliedLayers.filter(layer => layer.meta.use_legend).map( ( layer ) => {
-			return new window.JeoLegend( layer.meta.legend_type, {
-				layer_id: layer.slug,
-				legend_type_options: layer.meta.legend_type_options,
-				use_legend: layer.meta.use_legend,
-				legend_title: layer.meta.legend_title,
+		const legends = this.state.appliedLayers
+			.filter( ( layer ) => layer.meta.use_legend )
+			.map( ( layer ) => {
+				return new window.JeoLegend( layer.meta.legend_type, {
+					layer_id: layer.slug,
+					legend_type_options: layer.meta.legend_type_options,
+					use_legend: layer.meta.use_legend,
+					legend_title: layer.meta.legend_title,
+				} );
 			} );
-		} );
 
 		let renderedLegends = legends.map( ( legendObj ) => legendObj.render() );
 		renderedLegends = renderedLegends.map( ( legendRender, index ) => {
-				return (
-					<>
-						{ legends[index].attributes.legend_title && (<div className="legend-single-title">
-							{ legends[index].attributes.legend_title }
-						</div>) }
-						{ parse( legendRender.outerHTML ) }
-					</>
-				);
-			}
-		);
+			return (
+				<>
+					{ legends[ index ].attributes.legend_title && (
+						<div className="legend-single-title">
+							{ legends[ index ].attributes.legend_title }
+						</div>
+					) }
+					{ parse( legendRender.outerHTML ) }
+				</>
+			);
+		} );
 
 		const buildURLParams = {
-			'selected-layers': this.state.appliedLayers.map( ( layer ) => layer.id ),
+			'selected-layers': this.state.appliedLayers.map( ( layer ) => {
+				if ( layer.map ) {
+					return [ layer.id, layer.map.id ];
+				}
+
+				return [ layer.id ];
+			} ),
 			zoom: this.state.mapLoaded ? this.map.getZoom() : 0,
 			center: this.state.mapLoaded ? this.map.getCenter() : 0,
 		};
 
-		const generatedUrl = this.buildUrlParamsString(buildURLParams);
-		const notEncodedUrl = this.buildUrlParamsString(buildURLParams, false);
+		const generatedEmbedUrl = this.buildUrlParamsString( buildURLParams );
+		const notEncodedUrlEmbed = this.buildUrlParamsString(
+			buildURLParams,
+			false,
+		);
 
-
+		const notEncodedUrl = this.buildUrlParamsString(
+			buildURLParams,
+			false,
+			document.location.pathname + '?share=true'
+		);
+		const shareStateUrl = this.buildUrlParamsString(
+			buildURLParams,
+			true,
+			document.location.pathname + '?share=true'
+		);
 
 		return (
-			<div className={ 'discovery-block' + ( this.props.embed ? ' embed' : '' ) + ( this.state.showSidebar ? ' active' : '' ) }>
+			<div
+				className={
+					'discovery-block' +
+					( this.props.embed ? ' embed' : '' ) +
+					( this.state.showSidebar ? ' active' : '' )
+				}
+			>
 				{ ! this.state.mapLoaded && ! this.props.embed ? (
 					<div className="placeholder animated-background" />
 				) : (
@@ -214,24 +251,94 @@ class Discovery extends Component {
 							}
 						>
 							<div className="options">
-								<a href={ "https://twitter.com/intent/tweet?text=" + generatedUrl } target="_blank" rel="noreferrer">
-									<svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="twitter" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z" class=""></path></svg>
+								<a
+									href={
+										'https://twitter.com/intent/tweet?text=' + generatedEmbedUrl
+									}
+									target="_blank"
+									rel="noreferrer"
+								>
+									<svg
+										aria-hidden="true"
+										focusable="false"
+										data-prefix="fab"
+										data-icon="twitter"
+										role="img"
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 512 512"
+									>
+										<path
+											fill="currentColor"
+											d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
+											class=""
+										></path>
+									</svg>
 								</a>
 
-								<a href={ "https://www.facebook.com/sharer/sharer.php?u=" + generatedUrl }  target="_blank" rel="noreferrer">
-									<svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="facebook-f" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"></path></svg>
+								<a
+									href={
+										'https://www.facebook.com/sharer/sharer.php?u=' +
+										generatedEmbedUrl
+									}
+									target="_blank"
+									rel="noreferrer"
+								>
+									<svg
+										aria-hidden="true"
+										focusable="false"
+										data-prefix="fab"
+										data-icon="facebook-f"
+										role="img"
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 320 512"
+									>
+										<path
+											fill="currentColor"
+											d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"
+										></path>
+									</svg>
 								</a>
 
-								{/* <a href={ "weixin://dl/moments" }  target="_blank" rel="noreferrer">
+								{ /* <a href={ "weixin://dl/moments" }  target="_blank" rel="noreferrer">
 									<svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="weixin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M385.2 167.6c6.4 0 12.6.3 18.8 1.1C387.4 90.3 303.3 32 207.7 32 100.5 32 13 104.8 13 197.4c0 53.4 29.3 97.5 77.9 131.6l-19.3 58.6 68-34.1c24.4 4.8 43.8 9.7 68.2 9.7 6.2 0 12.1-.3 18.3-.8-4-12.9-6.2-26.6-6.2-40.8-.1-84.9 72.9-154 165.3-154zm-104.5-52.9c14.5 0 24.2 9.7 24.2 24.4 0 14.5-9.7 24.2-24.2 24.2-14.8 0-29.3-9.7-29.3-24.2.1-14.7 14.6-24.4 29.3-24.4zm-136.4 48.6c-14.5 0-29.3-9.7-29.3-24.2 0-14.8 14.8-24.4 29.3-24.4 14.8 0 24.4 9.7 24.4 24.4 0 14.6-9.6 24.2-24.4 24.2zM563 319.4c0-77.9-77.9-141.3-165.4-141.3-92.7 0-165.4 63.4-165.4 141.3S305 460.7 397.6 460.7c19.3 0 38.9-5.1 58.6-9.9l53.4 29.3-14.8-48.6C534 402.1 563 363.2 563 319.4zm-219.1-24.5c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.8 0 24.4 9.7 24.4 19.3 0 10-9.7 19.6-24.4 19.6zm107.1 0c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.5 0 24.4 9.7 24.4 19.3.1 10-9.9 19.6-24.4 19.6z"></path></svg>
-								</a> */}
+								</a> */ }
 
-								<a href={ notEncodedUrl }  target="_blank" rel="noreferrer">
-									<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="link" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"></path></svg>
+								<a href={ notEncodedUrl } target="_blank" rel="noreferrer">
+									<svg
+										aria-hidden="true"
+										focusable="false"
+										data-prefix="fas"
+										data-icon="link"
+										role="img"
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 512 512"
+									>
+										<path
+											fill="currentColor"
+											d="M326.612 185.391c59.747 59.809 58.927 155.698.36 214.59-.11.12-.24.25-.36.37l-67.2 67.2c-59.27 59.27-155.699 59.262-214.96 0-59.27-59.26-59.27-155.7 0-214.96l37.106-37.106c9.84-9.84 26.786-3.3 27.294 10.606.648 17.722 3.826 35.527 9.69 52.721 1.986 5.822.567 12.262-3.783 16.612l-13.087 13.087c-28.026 28.026-28.905 73.66-1.155 101.96 28.024 28.579 74.086 28.749 102.325.51l67.2-67.19c28.191-28.191 28.073-73.757 0-101.83-3.701-3.694-7.429-6.564-10.341-8.569a16.037 16.037 0 0 1-6.947-12.606c-.396-10.567 3.348-21.456 11.698-29.806l21.054-21.055c5.521-5.521 14.182-6.199 20.584-1.731a152.482 152.482 0 0 1 20.522 17.197zM467.547 44.449c-59.261-59.262-155.69-59.27-214.96 0l-67.2 67.2c-.12.12-.25.25-.36.37-58.566 58.892-59.387 154.781.36 214.59a152.454 152.454 0 0 0 20.521 17.196c6.402 4.468 15.064 3.789 20.584-1.731l21.054-21.055c8.35-8.35 12.094-19.239 11.698-29.806a16.037 16.037 0 0 0-6.947-12.606c-2.912-2.005-6.64-4.875-10.341-8.569-28.073-28.073-28.191-73.639 0-101.83l67.2-67.19c28.239-28.239 74.3-28.069 102.325.51 27.75 28.3 26.872 73.934-1.155 101.96l-13.087 13.087c-4.35 4.35-5.769 10.79-3.783 16.612 5.864 17.194 9.042 34.999 9.69 52.721.509 13.906 17.454 20.446 27.294 10.606l37.106-37.106c59.271-59.259 59.271-155.699.001-214.959z"
+										></path>
+									</svg>
 								</a>
 
-								<a href={ "mailto:?subject=Discovery&body=" + generatedUrl }  target="_blank" rel="noreferrer">
-									<svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="envelope" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M464 64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm0 48v40.805c-22.422 18.259-58.168 46.651-134.587 106.49-16.841 13.247-50.201 45.072-73.413 44.701-23.208.375-56.579-31.459-73.413-44.701C106.18 199.465 70.425 171.067 48 152.805V112h416zM48 400V214.398c22.914 18.251 55.409 43.862 104.938 82.646 21.857 17.205 60.134 55.186 103.062 54.955 42.717.231 80.509-37.199 103.053-54.947 49.528-38.783 82.032-64.401 104.947-82.653V400H48z"></path></svg>
+								<a
+									href={ 'mailto:?subject=Discovery&body=' + shareStateUrl }
+									target="_blank"
+									rel="noreferrer"
+								>
+									<svg
+										aria-hidden="true"
+										focusable="false"
+										data-prefix="fab"
+										data-icon="envelope"
+										role="img"
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 512 512"
+									>
+										<path
+											fill="currentColor"
+											d="M464 64H48C21.49 64 0 85.49 0 112v288c0 26.51 21.49 48 48 48h416c26.51 0 48-21.49 48-48V112c0-26.51-21.49-48-48-48zm0 48v40.805c-22.422 18.259-58.168 46.651-134.587 106.49-16.841 13.247-50.201 45.072-73.413 44.701-23.208.375-56.579-31.459-73.413-44.701C106.18 199.465 70.425 171.067 48 152.805V112h416zM48 400V214.398c22.914 18.251 55.409 43.862 104.938 82.646 21.857 17.205 60.134 55.186 103.062 54.955 42.717.231 80.509-37.199 103.053-54.947 49.528-38.783 82.032-64.401 104.947-82.653V400H48z"
+										></path>
+									</svg>
 								</a>
 
 								<button
@@ -248,7 +355,7 @@ class Discovery extends Component {
 								{ this.state.showEmbedTooltip && (
 									<div className="embed-tooltip">
 										<textarea disabled readOnly>
-											{ `<iframe src="${ notEncodedUrl }" frameborder="0"></iframe>` }
+											{ `<iframe src="${ notEncodedUrlEmbed }" frameborder="0"></iframe>` }
 										</textarea>
 									</div>
 								) }
@@ -340,7 +447,7 @@ if ( document.querySelector( '.discovery-embed' ) ) {
 			element
 		);
 	} );
-} else if( document.getElementById( 'discovery' )) {
+} else if ( document.getElementById( 'discovery' ) ) {
 	wp.element.render(
 		<Discovery useStories={ true } />,
 		document.getElementById( 'discovery' )
