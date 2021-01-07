@@ -113,14 +113,14 @@ const MapEditor = ( {
 		);
 	} );
 
-	let globalFontFamily = window.jeo_settings.jeo_typography-name;
+	let globalFontFamily = window.jeo_settings.jeo_typography_name;
 
 	if ( ! globalFontFamily ) {
 		globalFontFamily =  'sans-serif';
 	}
-	
+
 	document.body.style.setProperty('--globalFontFamily', globalFontFamily);
-	
+
 	return (
 		<div className="jeo-mapblock storymap">
 			{ attributes.map_id && loadingMap && <Spinner /> }
@@ -167,12 +167,13 @@ const MapEditor = ( {
 									const layerOptions = attributes.navigateMapLayers.find(
 										( { id } ) => id === layer.id
 									);
-									if ( layerOptions ) {
+									// if ( layerOptions ) {
+
 										return renderLayer( {
 											layer: layerOptions.meta,
 											instance: layer,
 										} );
-									}
+									// }
 								}
 							) }
 						</Map>
@@ -281,15 +282,6 @@ const MapEditor = ( {
 														}
 													>
 														<TextareaControl
-															autoFocus={
-																index === currentSlideIndex ? true : false
-															}
-															onFocus={ ( e ) => {
-																//Move cursor to the end of the input
-																const val = e.target.value;
-																e.target.value = '';
-																e.target.value = val;
-															} }
 															className="content"
 															label={ __( 'Title' ) }
 															value={ slide.title }
@@ -306,15 +298,6 @@ const MapEditor = ( {
 															} }
 														/>
 														<TextareaControl
-															autoFocus={
-																index === currentSlideIndex ? true : false
-															}
-															onFocus={ ( e ) => {
-																//Move cursor to the end of the input
-																const val = e.target.value;
-																e.target.value = '';
-																e.target.value = val;
-															} }
 															className="content"
 															label={ __(
 																'Content (allowed to use HTML tags)'
@@ -372,9 +355,8 @@ const MapEditor = ( {
 																									key={ item.id }
 																									onClick={ () => {
 																										setCurrentSlideIndex( index );
-																										const oldSlides = [
-																											...attributes.slides,
-																										];
+
+																										const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
 																										let hasBeenRemoved = false;
 
 																										oldSlides[ index ].selectedLayers.map(
@@ -392,10 +374,39 @@ const MapEditor = ( {
 																										);
 
 																										if ( ! hasBeenRemoved ) {
-																											oldSlides[ index ].selectedLayers.push(
-																												item
-																											);
+
+																											let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
+																											let itemPosition = false;
+
+																											const findItemPostion = (item) => {
+																												let itemPosition = -1;
+
+																												loadedMap.meta.layers.forEach( (layer, index) => {
+																													if( item.id === layer.id ) {
+																														itemPosition = index;
+																													}
+																												})
+
+																												return itemPosition;
+																											}
+
+																											oldSlides[ index ].selectedLayers.map( (layer) => {
+																												const position = findItemPostion(layer);
+																												if(position >= 0) {
+																													defaultOrder[ position ] = layer;
+																												}
+																											})
+
+																											itemPosition = findItemPostion(item)
+																											defaultOrder[itemPosition] = item;
+
+																											defaultOrder = defaultOrder.filter(slot => slot !== null);
+
+																											oldSlides[ index ].selectedLayers = defaultOrder;
 																										}
+
+																										setKey(key + 1);
+
 																										setAttributes( {
 																											...attributes,
 																											slides: oldSlides,
@@ -602,7 +613,7 @@ const MapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-									{ __( 'Current slide: ' ) + `${ currentSlideIndex + 1 }` }
+								{ __('Current slide: ') }{ attributes.slides[ currentSlideIndex ].title ? attributes.slides[ currentSlideIndex ].title : __( 'Slide ' ) + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
