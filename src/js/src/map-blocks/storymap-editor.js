@@ -114,7 +114,6 @@ const MapEditor = ( {
 	} );
 
 	let globalFontFamily = window.jeo_settings.jeo_typography_name;
-	console.log(globalFontFamily)
 
 	if ( ! globalFontFamily ) {
 		globalFontFamily =  'sans-serif';
@@ -614,7 +613,7 @@ const MapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-									{ __( 'Current slide: ' ) + `${ currentSlideIndex + 1 }` }
+								{ __('Current slide: ') }{ attributes.slides[ currentSlideIndex ].title ? attributes.slides[ currentSlideIndex ].title : __( 'Slide ' ) + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
