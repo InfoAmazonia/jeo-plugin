@@ -124,7 +124,7 @@ class Jeo {
 					'disable_drag_pan' => false,
 				],
 				'nonce' => wp_create_nonce('wp_rest'),
-				'jeo_typography-name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
+				'jeo_typography_name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
 			)
 		);
 
