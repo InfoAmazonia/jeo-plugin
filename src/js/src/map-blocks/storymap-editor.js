@@ -113,7 +113,8 @@ const MapEditor = ( {
 		);
 	} );
 
-	let globalFontFamily = window.jeo_settings.jeo_typography-name;
+	let globalFontFamily = window.jeo_settings.jeo_typography_name;
+	console.log(globalFontFamily)
 
 	if ( ! globalFontFamily ) {
 		globalFontFamily =  'sans-serif';
