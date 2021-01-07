@@ -66,6 +66,8 @@ class Jeo {
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'cli_init', array($this, 'register_cli_commands') );
 		add_action( 'rest_api_init', array($this, 'register_endpoints') );
+
+		add_action( 'init', array($this, 'restrict_story_map_block_count' ) );
 	}
 
 	/**
@@ -313,5 +315,44 @@ class Jeo {
 
 			'permission_callback' => function () { return is_user_logged_in(); }
 		));
+	}
+
+	function restrict_story_map_block_count() {
+		global $post, $parent_file, $typenow, $current_screen, $pagenow;
+	
+		$post_type = NULL;
+	
+		if($post && (property_exists($post, 'post_type') || method_exists($post, 'post_type')))
+			$post_type = $post->post_type;
+	
+		if(empty($post_type) && !empty($current_screen) && (property_exists($current_screen, 'post_type') || method_exists($current_screen, 'post_type')) && !empty($current_screen->post_type))
+			$post_type = $current_screen->post_type;
+	
+		if(empty($post_type) && !empty($typenow))
+			$post_type = $typenow;
+	
+		if(empty($post_type) && function_exists('get_current_screen'))
+			$post_type = get_current_screen();
+	
+		if(empty($post_type) && isset($_REQUEST['post']) && !empty($_REQUEST['post']) && function_exists('get_post_type') && $get_post_type = get_post_type((int)$_REQUEST['post']))
+			$post_type = $get_post_type;
+	
+		if(empty($post_type) && isset($_REQUEST['post_type']) && !empty($_REQUEST['post_type']))
+			$post_type = sanitize_key($_REQUEST['post_type']);
+	
+		if(empty($post_type) && 'edit.php' == $pagenow)
+			$post_type = 'post';
+
+
+		if ( ! is_admin() || 'storymap' != $post_type ) {
+			// This is not the post/page we want to limit things to.
+			return false;
+		}
+
+		$post_type_object = get_post_type_object( 'storymap' );
+		$post_type_object->template = array(
+			array( 'jeo/storymap'),
+		);
+		$post_type_object->template_lock = 'all';
 	}
 }
