@@ -23,6 +23,8 @@
 	},
 	"homepage": "https://github.com/EarthJournalismNetwork/jeo-plugin#readme",
 	"dependencies": {
+		"@ckeditor/ckeditor5-build-classic": "^24.0.0",
+		"@ckeditor/ckeditor5-react": "^3.0.0",
 		"@mapbox/mapbox-gl-geocoder": "^4.7.0",
 		"@wordpress/components": "^8.5.0",
 		"@wordpress/compose": "^3.15.0",
