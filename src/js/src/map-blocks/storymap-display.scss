@@ -18,6 +18,14 @@ $font-stories: var( --jeo-font-stories );
 		}
 	}
 
+	strong {
+		font-weight: bold;
+	}
+
+	a:hover {
+		opacity: 0.7;
+	}
+
 	margin: 0;
 	padding: 0;
 	
