@@ -19,12 +19,20 @@ class Settings {
 			'map_default_zoom' => 11,
 			'map_default_lat' => -23.54998517,
 			'map_default_lng' => -46.65599340,
+			'carto_update_time' => 'weekly'
 		];
 
 		add_action('admin_menu', [$this, 'add_menu_item']);
 		add_action('admin_init', [$this, 'admin_init']);
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
+		add_action('update_option', [$this, 'update_carto_update_interval'], 10, 3);
+	}
 
+	public function update_carto_update_interval($option, $old_value, $value) {
+		if($option == "jeo-settings") {
+			wp_clear_scheduled_hook('carto_update_layers');
+			wp_schedule_event(time(), json_decode(json_encode($value), true)['carto_update_time'], 'carto_update_layers');
+		}
 	}
 
 	public function get_option( $option_name ) {
