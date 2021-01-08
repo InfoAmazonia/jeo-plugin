@@ -102,7 +102,6 @@ const MapEditor = ( {
 						zoom: mapDefaults.zoom,
 						pitch: 0,
 						bearing: 0,
-						disabled: true,
 					},
 				],
 				loadedLayers,
