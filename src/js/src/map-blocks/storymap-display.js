@@ -257,7 +257,7 @@ class StoryMapDisplay extends Component {
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
 								{ this.state.postData && (
 									<>
-										<h1 className="storymap-page-title">{ decodeHtmlEntity( this.state.postData.title.rendered ) }</h1>
+										<h1 className="storymap-page-title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( this.state.postData.title.rendered ) } }></h1>
 										<div className="post-info">
 											{ /*<p className="author" >{ 'Authors' }</p> */ }
 											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDate() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
@@ -438,7 +438,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 				<div id={ id } className={ classList }>
 					<div className={ theme }>
 						{ title &&
-							<h3 className="title">{ title }</h3>
+							<h3 className="title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( title ) } }></h3>
 						}
 						{ image &&
 							<img src={ image } alt={ title }></img>
