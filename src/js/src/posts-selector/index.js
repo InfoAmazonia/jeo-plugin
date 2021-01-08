@@ -95,7 +95,6 @@ const PostsSelector = ( {
 
 export default withDispatch( ( dispatch ) => ( {
 	setPostMeta: ( meta ) => {
-		//console.log("setPostMeta", meta);
 		dispatch( 'core/editor' ).editPost( { meta } );
 	},
 } ) )(

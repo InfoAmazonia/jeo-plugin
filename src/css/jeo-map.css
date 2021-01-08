@@ -14,11 +14,11 @@ div.jeomap {
 
 .jeomap .marker {
 	cursor: pointer;
-	filter: brightness(85%);
+	/*filter: brightness(85%);*/
 }
 
 .jeomap .marker:hover {
-	filter: brightness(110%);
+	filter: brightness(85%);
 }
 
 .jeomap .marker-active {
@@ -396,6 +396,9 @@ div.jeomap {
 	font-family: var(--jeo-font);
 }
 
+.mapboxgl-popup.mapboxgl-popup-anchor-bottom:not(.jeo-popup__mouseover) {
+	margin-top: -36px;
+}
 
 .jeomap.mapboxgl-map .map-content-layers-list h3{
 	font-weight: normal;
@@ -504,7 +507,7 @@ nav .layer-selection-title .legends-title {
 }
 
 .jeomap .popup {
-	margin-top: 4rem;
+	margin-top: 5rem;
 	min-width: 200px;
 }
 
@@ -513,15 +516,16 @@ nav .layer-selection-title .legends-title {
 }
 
 .popup h2{
-	margin: 0px;
+	margin: 10px 0 0 0;
 	line-height: 20px;
 }
 
 .popup h2 a{
-	font-size: 22px;
+	font-size: 16px;
     font-weight: 900;
     text-decoration: none !important;
-    color: #555d65;
+	color: #555d65;
+	line-height: 16px;
 }
 .popup h1:not(.site-title):before, .popup h2:before {
     background: #767676;
@@ -551,11 +555,16 @@ nav .layer-selection-title .legends-title {
 }
 
 .jeo-popup__mouseover {
+	font-size: 16px;
     transform: none !important;
 	left: auto;
 	right: 0;
-	top: 90px !important;
+	top: 110px !important;
 	padding: 5px;
+}
+
+.jeo-popup__mouseover * {
+	font-size: 16px;
 }
 
 .jeo-popup__mouseover.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,

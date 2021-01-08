@@ -610,9 +610,8 @@ export default class JeoMap {
 	}
 
 	addPointToMap( point, post ) {
-		const color = point.relevance === 'secondary' ? '#CCCCCC' : '#3FB1CE';
-		const marker = new mapboxgl.Marker( { color } );
-		marker.getElement().classList.add( 'marker' );
+		const url = point.relevance === 'secondary' ? `url(${jeoMapVars.jeoUrl}/js/src/icons/news-marker-hover.png`: `url(${jeoMapVars.jeoUrl}/js/src/icons/news-marker.png`;
+
 
 		const popupHTML = this.popupTemplate( {
 			post,
@@ -627,8 +626,17 @@ export default class JeoMap {
 			lon: parseFloat( point._geocode_lon ),
 		};
 
-		marker.setLngLat( LngLat );
-		marker.addTo( this.map );
+		var el = document.createElement('div');
+		el.className = 'marker';
+		el.style.background = url;
+		el.style.width = '27px';
+		el.style.height = '36px';
+		el.style.backgroundSize = 'cover';
+
+		const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+			.setLngLat( LngLat )
+			.addTo( this.map );
+
 		this.markers.push( marker );
 
 		marker.getElement().addEventListener( 'click', () => {
