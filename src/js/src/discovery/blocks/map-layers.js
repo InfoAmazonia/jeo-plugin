@@ -2,9 +2,8 @@ import { Component } from '@wordpress/element';
 import Search from './search';
 import MapItem from './map-item';
 import { __ } from '@wordpress/i18n';
-import { List, arrayMove, arrayRemove} from 'react-movable';
+import { List, arrayMove, arrayRemove } from 'react-movable';
 import { decodeEntities } from '@wordpress/html-entities';
-
 
 class MapLayers extends Component {
 	constructor( props ) {
@@ -14,24 +13,55 @@ class MapLayers extends Component {
 			maps: [],
 		};
 
-		this.toggleLayer = this.toggleLayer.bind(this);
-		this.applyLayersChanges = this.applyLayersChanges.bind(this);
-		this.updateMaps = this.updateMaps.bind(this);
-		this.toggleLayersBatch = this.toggleLayersBatch.bind(this);
+		this.toggleLayer = this.toggleLayer.bind( this );
+		this.applyLayersChanges = this.applyLayersChanges.bind( this );
+		this.updateMaps = this.updateMaps.bind( this );
+		this.toggleLayersBatch = this.toggleLayersBatch.bind( this );
 
-
-
-		if ( !this.props.mapsLoaded ) {
-			if( this.props.isEmbed ) {
-				const requestedLayerIds = this.getLayerIdsFromUrl();
-				this.fetchLayers(requestedLayerIds).then(layers => {
+		if ( ! this.props.mapsLoaded ) {
+			if ( this.props.isEmbed ) {
+				const requestedLayerIds = this.getLayerIdsFromUrl().map(
+					( data ) => data[ 0 ]
+				);
+				this.fetchLayers( requestedLayerIds ).then( ( layers ) => {
 					// console.log(layers);
-					this.toggleLayersBatch(layers.reverse());
+					this.toggleLayersBatch( layers.reverse() );
 					this.applyLayersChanges();
-				})
-
+				} );
 			} else {
-				this.fetchMaps();
+				const urlParams = new URLSearchParams( window.location.search );
+				const isShare = urlParams.get( 'share' );
+				if ( isShare ) {
+					this.fetchMaps().then( ( _ ) => {
+						let requestedLayerIds = this.getLayerIdsFromUrl().map(
+							( item ) => ( { id: item[ 0 ], map: item[ 1 ] } )
+						);
+						let layersBatch = [];
+
+						this.props.maps.map( ( aMap ) => {
+							requestedLayerIds.map( ( layer ) => {
+								if ( layer.map === aMap.id ) {
+									layersBatch = [
+										...layersBatch,
+										aMap.queriedLayers.find( ( item ) => item.id === layer.id ),
+									];
+								}
+							} );
+						} );
+
+						console.log( layersBatch );
+						requestedLayerIds = requestedLayerIds.map( ( item ) => item.id );
+
+						const sortedLayerBatch = requestedLayerIds.map( ( id ) => {
+							return layersBatch.find( ( layer ) => layer.id === id );
+						} );
+
+						this.toggleLayersBatch( sortedLayerBatch.reverse() );
+						this.applyLayersChanges();
+					} );
+				} else {
+					this.fetchMaps();
+				}
 			}
 		}
 	}
@@ -56,11 +86,14 @@ class MapLayers extends Component {
 							jeoMapVars.jsonUrl + 'map-layer/' + layer.id
 						);
 
-
 						return fetch( mapLayerApiUrl )
 							.then( ( data ) => data.json() )
 							.then( ( layer ) => {
-								if(layer.code && (layer.code === "rest_forbidden" || layer.code === "rest_post_invalid_id")) {
+								if (
+									layer.code &&
+									( layer.code === 'rest_forbidden' ||
+										layer.code === 'rest_post_invalid_id' )
+								) {
 									return;
 								}
 
@@ -78,58 +111,54 @@ class MapLayers extends Component {
 
 								return layer;
 							} );
-					} )
+					} );
 
-					if(!singleMap.meta.layers.length) {
-						singleMap.queriedLayers = []
+					if ( ! singleMap.meta.layers.length ) {
+						singleMap.queriedLayers = [];
 					}
 
-					return Promise.all(
-						result
-					);
+					return Promise.all( result );
 				} );
 
 				return Promise.all( mapsLayersPromises ).then( () => {
-					this.props.updateState( { maps,  mapsLoaded: true } );
+					this.props.updateState( { maps, mapsLoaded: true } );
 				} );
 
 				// Build layers legends using legacy strategy (based on active layers)
 			} );
 	}
 
+	fetchLayers( layersIds ) {
+		return Promise.all(
+			layersIds.map( ( layerId ) => {
+				const mapLayerApiUrl = new URL(
+					jeoMapVars.jsonUrl + 'map-layer/' + layerId
+				);
 
-	fetchLayers(layersIds) {
-		return Promise.all(layersIds.map( layerId => {
-			const mapLayerApiUrl = new URL(
-				jeoMapVars.jsonUrl + 'map-layer/' + layerId
-			);
-
-			return fetch( mapLayerApiUrl )
-				.then( ( data ) => data.json() )
-				.then( ( layer ) => {
-					return layer;
-				} );
-		}))
-
+				return fetch( mapLayerApiUrl )
+					.then( ( data ) => data.json() )
+					.then( ( layer ) => {
+						return layer;
+					} );
+			} )
+		);
 	}
 
 	getLayerIdsFromUrl() {
-		const urlParams = new URLSearchParams(window.location.search);
-		return  JSON.parse(urlParams.get('selected-layers'));
+		const urlParams = new URLSearchParams( window.location.search );
+		return JSON.parse( urlParams.get( 'selected-layers' ) );
 	}
 
-	toggleLayer(layer) {
-		const selectedLayers = Object.assign({}, this.props.selectedLayers);
-		let layersQueue = [...this.props.layersQueue];
-
+	toggleLayer( layer ) {
+		const selectedLayers = Object.assign( {}, this.props.selectedLayers );
+		let layersQueue = [ ...this.props.layersQueue ];
 
 		// If layer does not exist
-		if(!selectedLayers.hasOwnProperty(layer.id)) {
+		if ( ! selectedLayers.hasOwnProperty( layer.id ) ) {
 			selectedLayers[ layer.id ] = layer;
 			layersQueue = [ layer.id, ...layersQueue ];
-
 		} else {
-			layersQueue = layersQueue.filter( id => id !== layer.id)
+			layersQueue = layersQueue.filter( ( id ) => id !== layer.id );
 			delete selectedLayers[ layer.id ];
 		}
 
@@ -137,24 +166,22 @@ class MapLayers extends Component {
 			selectedLayers,
 			layersQueue,
 		} );
-
 	}
 
-	toggleLayersBatch(layers) {
-		const selectedLayers = Object.assign({}, this.props.selectedLayers);
-		let layersQueue = [...this.props.layersQueue];
+	toggleLayersBatch( layers ) {
+		const selectedLayers = Object.assign( {}, this.props.selectedLayers );
+		let layersQueue = [ ...this.props.layersQueue ];
 
-		layers.forEach(layer => {
+		layers.forEach( ( layer ) => {
 			// If layer does not exist
-			if(!selectedLayers.hasOwnProperty(layer.id)) {
+			if ( ! selectedLayers.hasOwnProperty( layer.id ) ) {
 				selectedLayers[ layer.id ] = layer;
 				layersQueue = [ layer.id, ...layersQueue ];
-
 			} else {
-				layersQueue = layersQueue.filter( id => id !== layer.id)
+				layersQueue = layersQueue.filter( ( id ) => id !== layer.id );
 				delete selectedLayers[ layer.id ];
 			}
-		})
+		} );
 
 		this.props.updateState( {
 			selectedLayers,
@@ -167,54 +194,53 @@ class MapLayers extends Component {
 		const map = this.props.map;
 		let appliedLayers = this.props.appliedLayers;
 
-		appliedLayers.forEach( layer => {
-			const layerId = String(layer.id);
+		appliedLayers.forEach( ( layer ) => {
+			const layerId = String( layer.id );
 			// If layer is not requested
-			if(!batch.includes(layer.id)) {
-				if( map.getLayer( layerId ) ) {
+			if ( ! batch.includes( layer.id ) ) {
+				if ( map.getLayer( layerId ) ) {
 					map.removeLayer( layerId );
 				}
 			}
-		} )
+		} );
 
 		const reverseBatch = [ ...batch ].reverse();
-		reverseBatch.forEach( layerID => {
+		reverseBatch.forEach( ( layerID ) => {
 			const layerId = String( layerID );
 			const layer = this.props.selectedLayers[ layerId ];
 			const attributes = layer.meta;
 
 			// console.log(layer.meta.type);
 
-			if(layer.meta.type === "tilelayer") {
-				if(!map.getSource( layerId ) ) {
+			if ( layer.meta.type === 'tilelayer' ) {
+				if ( ! map.getSource( layerId ) ) {
 					map.addSource( layerId, {
 						type: 'raster',
 						tiles: [ attributes.layer_type_options.url ],
 						tileSize: 256,
-					});
+					} );
 				}
 
-				if(map.getLayer( layerId ) === undefined) {
+				if ( map.getLayer( layerId ) === undefined ) {
 					map.addLayer( {
 						id: layerId,
 						type: 'raster',
 						source: layerId,
 						layout: {
-							'visibility': 'visible',
-						}
+							visibility: 'visible',
+						},
 					} );
 				}
 
-				if(map.getLayer( "unclustered-points" )) {
-					map.moveLayer(layerId, 'unclustered-points');
+				if ( map.getLayer( 'unclustered-points' ) ) {
+					map.moveLayer( layerId, 'unclustered-points' );
 				}
+			} else if ( layer.meta.type === 'mapbox' ) {
+				if ( map.getLayer( layerId ) === undefined ) {
+					if ( ! map.getSource( layerId ) ) {
+						let styleId = attributes.layer_type_options.style_id;
 
-			} else if(layer.meta.type === "mapbox") {
-				if(map.getLayer( layerId ) === undefined) {
-					if(!map.getSource( layerId ) ) {
-						let styleId = attributes.layer_type_options.style_id
-
-						if ( styleId) {
+						if ( styleId ) {
 							styleId = styleId.replace( 'mapbox://styles/', '' );
 						}
 
@@ -226,7 +252,7 @@ class MapLayers extends Component {
 									'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
 									window.mapboxgl.accessToken,
 							],
-						});
+						} );
 					}
 
 					const newLayer = {
@@ -235,20 +261,19 @@ class MapLayers extends Component {
 						type: 'raster',
 					};
 
-					map.addLayer(newLayer);
+					map.addLayer( newLayer );
 				}
 
-				if(map.getLayer( "unclustered-points" )) {
-					map.moveLayer(layerId, 'unclustered-points');
+				if ( map.getLayer( 'unclustered-points' ) ) {
+					map.moveLayer( layerId, 'unclustered-points' );
 				}
-
-			} else if(layer.meta.type === "mvt") {
-				if(map.getLayer( layerId ) === undefined) {
-					if(!map.getSource( layerId ) ) {
+			} else if ( layer.meta.type === 'mvt' ) {
+				if ( map.getLayer( layerId ) === undefined ) {
+					if ( ! map.getSource( layerId ) ) {
 						map.addSource( layerId, {
 							type: 'vector',
 							tiles: [ attributes.layer_type_options.url ],
-						});
+						} );
 					}
 
 					const newLayer = {
@@ -258,43 +283,41 @@ class MapLayers extends Component {
 						'source-layer': attributes.source_layer,
 					};
 
-					map.addLayer(newLayer);
+					map.addLayer( newLayer );
 				}
 
-				if(map.getLayer( "unclustered-points" )) {
-					map.moveLayer(layerId, 'unclustered-points');
+				if ( map.getLayer( 'unclustered-points' ) ) {
+					map.moveLayer( layerId, 'unclustered-points' );
 				}
-
-			} else if(layer.meta.type === "mapbox-tileset-vector") {
-				if(map.getLayer( layerId ) === undefined) {
-					if(!map.getSource( layerId ) ) {
+			} else if ( layer.meta.type === 'mapbox-tileset-vector' ) {
+				if ( map.getLayer( layerId ) === undefined ) {
+					if ( ! map.getSource( layerId ) ) {
 						map.addSource( layerId, {
 							type: attributes.layer_type_options.style_source_type,
 							url: 'mapbox://' + attributes.layer_type_options.tileset_id,
-						});
+						} );
 					}
 
 					const newLayer = {
 						id: layerId,
 						type: attributes.layer_type_options.type,
 						source: layerId,
-						'source-layer': attributes.layer_type_options.source_layer
+						'source-layer': attributes.layer_type_options.source_layer,
 					};
 
-					map.addLayer(newLayer);
+					map.addLayer( newLayer );
 				}
 
-				if(map.getLayer( "unclustered-points" )) {
-					map.moveLayer(layerId, 'unclustered-points');
+				if ( map.getLayer( 'unclustered-points' ) ) {
+					map.moveLayer( layerId, 'unclustered-points' );
 				}
-
-			} else if(layer.meta.type === "mapbox-tileset-raster") {
-				if(map.getLayer( layerId ) === undefined) {
-					if(!map.getSource( layerId ) ) {
+			} else if ( layer.meta.type === 'mapbox-tileset-raster' ) {
+				if ( map.getLayer( layerId ) === undefined ) {
+					if ( ! map.getSource( layerId ) ) {
 						map.addSource( layerId, {
 							type: attributes.layer_type_options.style_source_type,
 							url: 'mapbox://' + attributes.layer_type_options.tileset_id,
-						});
+						} );
 					}
 
 					// console.log(layerId);
@@ -303,35 +326,34 @@ class MapLayers extends Component {
 						id: layerId,
 						type: attributes.layer_type_options.type,
 						source: layerId,
-						'source-layer': ''
+						'source-layer': '',
 					};
 
-					map.addLayer(newLayer);
+					map.addLayer( newLayer );
 				}
 
-				if(map.getLayer( "unclustered-points" )) {
-					map.moveLayer(layerId, 'unclustered-points');
+				if ( map.getLayer( 'unclustered-points' ) ) {
+					map.moveLayer( layerId, 'unclustered-points' );
 				}
 			}
 		} );
 
-		appliedLayers = batch.map( layerId => {
-			return this.props.selectedLayers[layerId];
-		});
+		appliedLayers = batch.map( ( layerId ) => {
+			return this.props.selectedLayers[ layerId ];
+		} );
 
 		this.props.updateState( {
-			appliedLayers
-		} )
+			appliedLayers,
+		} );
 	}
 
-	updateMaps(params) {
-		this.fetchMaps({ ...params }).catch( (err) => console.log( err ));
+	updateMaps( params ) {
+		this.fetchMaps( { ...params } ).catch( ( err ) => console.log( err ) );
 	}
-
 
 	render() {
-		if(this.props.isEmbed) {
-			return ( <div></div> );
+		if ( this.props.isEmbed ) {
+			return <div></div>;
 		}
 
 		const mapItens = this.props.maps.map( ( map, index ) => {
@@ -355,9 +377,14 @@ class MapLayers extends Component {
 					// 	return;
 					// }
 
-					this.props.updateState( { layersQueue: arrayMove( [ ...this.props.layersQueue ], oldIndex, newIndex )
-
-				} )}  }
+					this.props.updateState( {
+						layersQueue: arrayMove(
+							[ ...this.props.layersQueue ],
+							oldIndex,
+							newIndex
+						),
+					} );
+				} }
 				renderList={ ( { children, props } ) => (
 					<div { ...props }>{ children }</div>
 				) }
@@ -367,25 +394,57 @@ class MapLayers extends Component {
 					const layer = this.props.selectedLayers[ value ];
 
 					return (
-						<div { ...props } className={ "layer-item" + (isDragged? " dragged" : "") } >
-							<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="grip-vertical" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" className="drag-icon"><path fill="currentColor" d="M96 32H32C14.33 32 0 46.33 0 64v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zM288 32h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32z"></path></svg>
+						<div
+							{ ...props }
+							className={ 'layer-item' + ( isDragged ? ' dragged' : '' ) }
+						>
+							<svg
+								aria-hidden="true"
+								focusable="false"
+								data-prefix="fas"
+								data-icon="grip-vertical"
+								role="img"
+								xmlns="http://www.w3.org/2000/svg"
+								viewBox="0 0 320 512"
+								className="drag-icon"
+							>
+								<path
+									fill="currentColor"
+									d="M96 32H32C14.33 32 0 46.33 0 64v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160H32c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zM288 32h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32V64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32zm0 160h-64c-17.67 0-32 14.33-32 32v64c0 17.67 14.33 32 32 32h64c17.67 0 32-14.33 32-32v-64c0-17.67-14.33-32-32-32z"
+								></path>
+							</svg>
 							<div className="layer-item--content">
 								<div className="layer-item--map">
-									{ decodeEntities(layer.map.title.rendered) }
+									{ decodeEntities( layer.map.title.rendered ) }
 								</div>
 								<div className="layer-item--layer">
-									{ decodeEntities(layer.title.rendered) }
+									{ decodeEntities( layer.title.rendered ) }
 								</div>
 							</div>
-							<button onClick={ () => this.toggleLayer(layer) } className="remove-layer">
-								<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="times" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512"><path fill="currentColor" d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"></path></svg>
+							<button
+								onClick={ () => this.toggleLayer( layer ) }
+								className="remove-layer"
+							>
+								<svg
+									aria-hidden="true"
+									focusable="false"
+									data-prefix="fas"
+									data-icon="times"
+									role="img"
+									xmlns="http://www.w3.org/2000/svg"
+									viewBox="0 0 352 512"
+								>
+									<path
+										fill="currentColor"
+										d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"
+									></path>
+								</svg>
 							</button>
 						</div>
 					);
-					}
-				}
+				} }
 			/>
-		)
+		);
 
 		function arrayEquals( a, b ) {
 			return (
@@ -421,10 +480,7 @@ class MapLayers extends Component {
 
 		return (
 			<div className="maps-tab">
-				<Search
-					searchPlaceholder="Search map"
-					update={ this.updateMaps }
-				/>
+				<Search searchPlaceholder="Search map" update={ this.updateMaps } />
 
 				<div className="selected-layers">
 					<div className="status">
@@ -483,10 +539,7 @@ class MapLayers extends Component {
 						{ __( 'Changes applied' ) }
 					</button>
 				) : (
-					<button
-						className="apply-changes"
-						onClick={ this.applyLayersChanges }
-					>
+					<button className="apply-changes" onClick={ this.applyLayersChanges }>
 						{ __( 'Apply changes' ) }
 					</button>
 				) }
