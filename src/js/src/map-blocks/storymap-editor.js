@@ -1,7 +1,6 @@
 import {
 	Button,
 	Spinner,
-	TextareaControl,
 	CheckboxControl,
 	Dashicon,
 	Panel,
@@ -20,6 +19,8 @@ import './storymap-editor.scss';
 import { List, arrayMove } from 'react-movable';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
@@ -36,6 +37,15 @@ const MapEditor = ( {
 			return String.fromCharCode( dec );
 		} );
 	};
+
+	function removeTags(str) {
+		if ((str===null) || (str===''))
+			return false;
+	   else
+		str = str.toString();
+
+	   return str.replace(/<[^>]*>/g, '');
+	 } 
 
 	const reorder = ( list, startIndex, endIndex ) => {
 		const result = Array.from( list );
@@ -190,16 +200,14 @@ const MapEditor = ( {
 									<Dashicon icon="hidden" />
 								</Button>
 								<p className="section-title">{ __( 'Story settings' ) }</p>
-								<TextareaControl
-									className="description"
-									label={ __(
-										'Story brief description (allowed to use HTML tags)'
-									) }
-									value={ attributes.description }
-									onChange={ ( newDescription ) => {
+								<p className="input-label">{ __('Story brief description') }</p>
+								<CKEditor
+									editor={ ClassicEditor }
+									data={ attributes.description }
+									onChange={ ( event, editor ) =>  {
 										setAttributes( {
 											...attributes,
-											description: newDescription,
+											description: editor.getData(),
 										} );
 									} }
 								/>
@@ -274,22 +282,32 @@ const MapEditor = ( {
 										const index = attributes.slides.indexOf( value );
 										return (
 											<div key={ slide.content } className="slide" { ...props }>
+												 <button
+													data-movable-handle
+													tabIndex={-1}
+													>
+													=
+												</button>
 												<Panel key={ key } className="slide-panel"  >
 													<PanelBody
-														title={ slide.title? slide.title : __( 'Slide ' ) + ( index + 1 ) }
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ' ) + ( index + 1 ) }
 														initialOpen={
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
 													>
-														<TextareaControl
-															className="content"
-															label={ __( 'Title' ) }
-															value={ slide.title }
-															onChange={ ( newTitle ) => {
+														<p className="input-label">{ __( 'Title' ) }</p>
+														<CKEditor
+															atributo="meuatributo"
+															editor={ ClassicEditor }
+															data={ slide.title }
+															onChange={ ( event, editor ) => {
+																// Set role 'button' to editor element so it isn't affected by drag and drop events
+																editor.ui.getEditableElement().setAttribute('role', 'button')
+
 																setCurrentSlideIndex( index );
 
 																const oldSlides = [ ...attributes.slides ];
-																oldSlides[ index ].title = newTitle;
+																oldSlides[ index ].title = editor.getData();
 
 																setAttributes( {
 																	...attributes,
@@ -297,17 +315,20 @@ const MapEditor = ( {
 																} );
 															} }
 														/>
-														<TextareaControl
-															className="content"
-															label={ __(
-																'Content (allowed to use HTML tags)'
-															) }
-															value={ slide.content }
-															onChange={ ( newContent ) => {
+														<p className="input-label">{ __(
+																'Content'
+														) }</p>
+														<CKEditor
+															editor={ ClassicEditor }
+															data={ slide.content }
+															onChange={ ( event, editor ) => {
+																// Set role 'button' to editor element so it isn't affected by drag and drop events
+																editor.ui.getEditableElement().setAttribute('role', 'button')
+																
 																setCurrentSlideIndex( index );
 
 																const oldSlides = [ ...attributes.slides ];
-																oldSlides[ index ].content = newContent;
+																oldSlides[ index ].content = editor.getData();
 
 																setAttributes( {
 																	...attributes,
@@ -613,7 +634,7 @@ const MapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-								{ __('Current slide: ') }{ attributes.slides[ currentSlideIndex ].title ? attributes.slides[ currentSlideIndex ].title : __( 'Slide ' ) + ( currentSlideIndex + 1 ) }
+								{ __('Current slide: ') }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide ' ) + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
