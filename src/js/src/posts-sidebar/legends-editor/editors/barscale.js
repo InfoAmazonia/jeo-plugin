@@ -42,6 +42,12 @@ class BarscaleEditor extends Component {
 		};
 	}
 
+	static getDerivedStateFromProps( nextProps ) {
+		return {
+			legendObject: nextProps.legendObject,
+		};
+	}
+
 	hasChanged( legendObject ) {
 		this.props.hasChanged( legendObject );
 	}
