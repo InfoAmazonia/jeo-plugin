@@ -41,7 +41,7 @@ class JeoLegend {
 					{
 					color:'#000',
 					id: uuid(),
-					} 
+					}
 				],
 			},
 		};
@@ -79,27 +79,27 @@ class JeoLegend {
 
 		switch ( legendObject.__legendSlug ) {
 			case 'simple-color':
-				adicionalProps.colors = {
+				adicionalProps.colors = [
 					...legendObject.attributes.legend_type_options.colors,
-				};
+				];
 				break;
 			case 'icons':
-				adicionalProps.icons = {
+				adicionalProps.icons = [
 					...legendObject.attributes.legend_type_options.icons,
-				};
+				];
 				break;
 			case 'circles':
-				adicionalProps.circles = {
+				adicionalProps.circles = [
 					...legendObject.attributes.legend_type_options.circles,
-				};
+				];
 				adicionalProps.color = legendObject.attributes.legend_type_options.color;
 				break;
 			case 'barscale':
 				adicionalProps.left_label = legendObject.attributes.legend_type_options.left_label;
 				adicionalProps.right_label = legendObject.attributes.legend_type_options.right_label;
-				adicionalProps.colors = {
+				adicionalProps.colors = [
 					...legendObject.attributes.legend_type_options.colors,
-				};
+				];
 				break;
 		}
 
