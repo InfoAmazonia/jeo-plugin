@@ -13,6 +13,8 @@ class LegendEditor extends Component {
 
 		const metadata = wp.data.select('core/editor').getEditedPostAttribute('meta');
 
+		console.log("META INI", metadata);
+
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
@@ -22,6 +24,7 @@ class LegendEditor extends Component {
 		};
 
 		// New post case
+		console.log(this.state.legendObject);
 		if ( this.state.legendObject.legendSlug.length === 0 ) {
 			this.initialType = 'barscale';
 			this.state.legendObject.__legendType = this.initialType;
@@ -41,11 +44,13 @@ class LegendEditor extends Component {
 	}
 
 	hasChanged( legendObject ) {
+		console.log('has changed', legendObject);
 		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject) } );
 		this.setState( { legendObject } );
 	}
 
 	render() {
+		// console.log("Rerender called");
 		return (
 			<Fragment>
 				<CheckboxControl
@@ -54,7 +59,7 @@ class LegendEditor extends Component {
 					onChange={ () => {
 						let newMeta = window.layerFormData;
 						if ( ! newMeta ) {
-							newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+							newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
 						}
 						newMeta.use_legend = ! newMeta.use_legend;
 						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
@@ -72,7 +77,7 @@ class LegendEditor extends Component {
 					label={ __( 'Legend title' ) }
 					value={ this.state.legendObject.attributes.legend_title }
 					onChange={ ( value ) => {
-						const newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+						const newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
 						// console.log(newMeta);
 						newMeta.legend_title = value;
 
@@ -82,6 +87,7 @@ class LegendEditor extends Component {
 						newLegendObject.attributes.legend_title = value;
 
 						this.setState( { legendObject: newLegendObject });
+						console.log("CHANGED TEXTCONTROL");
 					} }
 				/> }
 
