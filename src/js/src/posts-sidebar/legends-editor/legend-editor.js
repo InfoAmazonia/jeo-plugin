@@ -13,8 +13,6 @@ class LegendEditor extends Component {
 
 		const metadata = wp.data.select('core/editor').getEditedPostAttribute('meta');
 
-		console.log("META INI", metadata);
-
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
@@ -24,7 +22,6 @@ class LegendEditor extends Component {
 		};
 
 		// New post case
-		console.log(this.state.legendObject);
 		if ( this.state.legendObject.legendSlug.length === 0 ) {
 			this.initialType = 'barscale';
 			this.state.legendObject.__legendType = this.initialType;
@@ -44,7 +41,6 @@ class LegendEditor extends Component {
 	}
 
 	hasChanged( legendObject ) {
-		console.log('has changed', legendObject);
 		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject) } );
 		this.setState( { legendObject } );
 	}
@@ -87,7 +83,6 @@ class LegendEditor extends Component {
 						newLegendObject.attributes.legend_title = value;
 
 						this.setState( { legendObject: newLegendObject });
-						console.log("CHANGED TEXTCONTROL");
 					} }
 				/> }
 

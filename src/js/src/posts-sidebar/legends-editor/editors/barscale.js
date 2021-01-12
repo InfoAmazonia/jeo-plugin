@@ -14,8 +14,6 @@ class BarscaleEditor extends Component {
 		this.removeItem = this.removeItem.bind( this );
 		this.hasChanged = this.hasChanged.bind( this );
 
-		console.log("--------------------------");
-
 		const legendData = this.props.legendObject;
 
 		this.state = {
@@ -95,7 +93,6 @@ class BarscaleEditor extends Component {
 	}
 
 	addItem() {
-		console.log("ITEM", this.state.legendObject);
 		this.setState( ( prevState ) => {
 			const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
 			const colors = this.state.legendObject.attributes.legend_type_options.colors;

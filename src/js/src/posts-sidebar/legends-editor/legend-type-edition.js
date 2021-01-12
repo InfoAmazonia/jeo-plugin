@@ -26,7 +26,6 @@ class LegendTypeEdition extends Component {
 	}
 
 	render() {
-		console.log("CHILD RENDER", this.props.legendObject );
 		const typesEditorComponents = {
 			circles: <CircleEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></CircleEditor>,
 			barscale: <BarscaleEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></BarscaleEditor>,
