@@ -10,30 +10,31 @@ class LegendTypeEdition extends Component {
 
 		this.hasChanged = this.hasChanged.bind( this );
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
-		this.state = {
-			legendObject: props.legendObject,
-		};
+		// this.state = {
+		// 	legendObject: props.legendObject,
+		// };
 	}
 
-	static getDerivedStateFromProps( nextProps ) {
-		return {
-			legendObject: nextProps.legendObject,
-		};
-	}
+	// static getDerivedStateFromProps( nextProps ) {
+	// 	return {
+	// 		legendObject: nextProps.legendObject,
+	// 	};
+	// }
 
 	hasChanged( legendObject ) {
 		this.props.hasChanged( legendObject );
 	}
 
 	render() {
+		console.log("CHILD RENDER", this.props.legendObject );
 		const typesEditorComponents = {
-			circles: <CircleEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></CircleEditor>,
-			barscale: <BarscaleEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></BarscaleEditor>,
-			icons: <IconsEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></IconsEditor>,
-			'simple-color': <SimplecolorEditor legendObject={ this.state.legendObject } hasChanged={ this.hasChanged } ></SimplecolorEditor>,
+			circles: <CircleEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></CircleEditor>,
+			barscale: <BarscaleEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></BarscaleEditor>,
+			icons: <IconsEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></IconsEditor>,
+			'simple-color': <SimplecolorEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></SimplecolorEditor>,
 		};
 
-		const legendTypeEdition = typesEditorComponents[ this.state.legendObject.legendSlug ];
+		const legendTypeEdition = typesEditorComponents[ this.props.legendObject.legendSlug ];
 
 		return (
 			<Fragment>
