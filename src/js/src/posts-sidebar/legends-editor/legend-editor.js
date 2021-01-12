@@ -11,7 +11,8 @@ class LegendEditor extends Component {
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
 		this.hasChanged = this.hasChanged.bind( this );
 
-		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+		const metadata = wp.data.select('core/editor').getEditedPostAttribute('meta');
+
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
@@ -40,7 +41,7 @@ class LegendEditor extends Component {
 	}
 
 	hasChanged( legendObject ) {
-		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject ) } );
+		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject) } );
 		this.setState( { legendObject } );
 	}
 
