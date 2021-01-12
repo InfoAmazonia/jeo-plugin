@@ -32,8 +32,15 @@ export default function InteractionsSettings( {
 
 		layersWithSource = layersWithSource.map( ( layer ) => {
 			const source = sources.find(( sourceLayer ) => sourceLayer.id === layer[ 'source-layer' ]);
-			layer.fields = source.fields;
-			layer.source = source;
+
+			if(source) {
+				layer.fields = source.fields;
+				layer.source = source;
+			} else {
+				layer.fields = []
+				layer.source = [];
+			}
+
 			return layer;
 		} );
 
