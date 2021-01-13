@@ -51,7 +51,7 @@ class Jeo {
 		\jeo_sidebars();
 		\jeo_storymap();
 
-		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
+		add_action( 'plugins_loaded', array( $this, 'jeo_load_plugin_textdomain' ) );
 		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
@@ -75,14 +75,13 @@ class Jeo {
 	 *
 	 * @since    1.0.0
 	 */
-	public function load_plugin_textdomain() {
-
+	public function jeo_load_plugin_textdomain() {
 		load_plugin_textdomain(
 			'jeo',
 			false,
-			JEO_BASEPATH . '/languages/'
+			// this fixes the plugin renaming problem
+			basename( plugin_dir_path(  dirname( __FILE__ , 1 ) ) ) . '/languages',
 		);
-
 	}
 
 	public function register_assets() {
@@ -319,27 +318,27 @@ class Jeo {
 
 	function restrict_story_map_block_count() {
 		global $post, $parent_file, $typenow, $current_screen, $pagenow;
-	
+
 		$post_type = NULL;
-	
+
 		if($post && (property_exists($post, 'post_type') || method_exists($post, 'post_type')))
 			$post_type = $post->post_type;
-	
+
 		if(empty($post_type) && !empty($current_screen) && (property_exists($current_screen, 'post_type') || method_exists($current_screen, 'post_type')) && !empty($current_screen->post_type))
 			$post_type = $current_screen->post_type;
-	
+
 		if(empty($post_type) && !empty($typenow))
 			$post_type = $typenow;
-	
+
 		if(empty($post_type) && function_exists('get_current_screen'))
 			$post_type = get_current_screen();
-	
+
 		if(empty($post_type) && isset($_REQUEST['post']) && !empty($_REQUEST['post']) && function_exists('get_post_type') && $get_post_type = get_post_type((int)$_REQUEST['post']))
 			$post_type = $get_post_type;
-	
+
 		if(empty($post_type) && isset($_REQUEST['post_type']) && !empty($_REQUEST['post_type']))
 			$post_type = sanitize_key($_REQUEST['post_type']);
-	
+
 		if(empty($post_type) && 'edit.php' == $pagenow)
 			$post_type = 'post';
 
