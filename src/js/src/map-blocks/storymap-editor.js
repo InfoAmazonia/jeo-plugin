@@ -45,7 +45,7 @@ const MapEditor = ( {
 		str = str.toString();
 
 	   return str.replace(/<[^>]*>/g, '');
-	 } 
+	 }
 
 	const reorder = ( list, startIndex, endIndex ) => {
 		const result = Array.from( list );
@@ -191,16 +191,18 @@ const MapEditor = ( {
 					<div className="storymap-controls">
 						{ showStorySettings && (
 							<div className="story-settings">
-								<Button
-									className="hide-button"
-									onClick={ () => {
-										setShowStorySettings( false );
-									} }
-								>
-									<Dashicon icon="hidden" />
-								</Button>
-								<p className="section-title">{ __( 'Story settings' ) }</p>
-								<p className="input-label">{ __('Story brief description') }</p>
+								<div className="heading">
+									<span className="section-title">{ __( 'Story settings' ) }</span>
+									<Button
+										className="hide-button"
+										onClick={ () => {
+											setShowStorySettings( false );
+										} }
+									>
+										<Dashicon icon="hidden" />
+									</Button>
+								</div>
+								<label className="input-label">{ __('Brief description') }</label>
 								<CKEditor
 									editor={ ClassicEditor }
 									data={ attributes.description }
@@ -213,7 +215,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="introduction-button"
-									label={ __( 'Story map Introduction' ) }
+									label={ __( 'Show story map introduction' ) }
 									checked={ attributes.hasIntroduction }
 									onChange={ ( newHasIntroduction ) => {
 										setAttributes( {
@@ -224,7 +226,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="navigate-button"
-									label={ __( 'Navigate map button' ) }
+									label={ __( 'Use "Navigate to map" button' ) }
 									checked={ attributes.navigateButton }
 									onChange={ ( newNavigateButton ) => {
 										setAttributes( {
@@ -237,7 +239,7 @@ const MapEditor = ( {
 						) }
 						{ ! showStorySettings && (
 							<div className="story-settings-hide">
-								<p className="section-title">{ __( 'Story settings' ) }</p>
+								<span className="section-title">{ __( 'Story settings' ) }</span>
 								<Button
 									className="show-button"
 									onClick={ () => {
@@ -250,15 +252,17 @@ const MapEditor = ( {
 						) }
 						{ showSlidesSettings && (
 							<div className="slides-settings">
-								<Button
-									className="hide-button"
-									onClick={ () => {
-										setShowSlidesSettings( false );
-									} }
-								>
-									<Dashicon icon="hidden" />
-								</Button>
-								<p className="section-title">{ __( 'Slides settings' ) }</p>
+								<div className="heading">
+									<span className="section-title">{ __( 'Slides settings' ) }</span>
+									<Button
+										className="hide-button"
+										onClick={ () => {
+											setShowSlidesSettings( false );
+										} }
+									>
+										<Dashicon icon="hidden" />
+									</Button>
+								</div>
 								<List
 									values={ attributes.slides }
 									onChange={ ( { oldIndex, newIndex } ) => {
@@ -295,7 +299,7 @@ const MapEditor = ( {
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
 													>
-														<p className="input-label">{ __( 'Title' ) }</p>
+														<span className="input-label">{ __( 'Title' ) }</span>
 														<CKEditor
 															atributo="meuatributo"
 															editor={ ClassicEditor }
@@ -315,16 +319,16 @@ const MapEditor = ( {
 																} );
 															} }
 														/>
-														<p className="input-label">{ __(
+														<span className="input-label">{ __(
 																'Content'
-														) }</p>
+														) }</span>
 														<CKEditor
 															editor={ ClassicEditor }
 															data={ slide.content }
 															onChange={ ( event, editor ) => {
 																// Set role 'button' to editor element so it isn't affected by drag and drop events
 																editor.ui.getEditableElement().setAttribute('role', 'button')
-																
+
 																setCurrentSlideIndex( index );
 
 																const oldSlides = [ ...attributes.slides ];
@@ -336,7 +340,7 @@ const MapEditor = ( {
 																} );
 															} }
 														/>
-														<p>Layers</p>
+														<span className="input-label">Layers</span>
 														<DragDropContext onDragEnd={ onDragEndLayers }>
 															<Droppable droppableId="droppable">
 																{ ( provided, snapshot ) => (
@@ -434,11 +438,11 @@ const MapEditor = ( {
 																										} );
 																									} }
 																								>
-																									<p>
+																									<span>
 																										{ decodeHtmlEntity(
 																											item.title.rendered
 																										) }
-																									</p>
+																									</span>
 																								</Button>
 																							</div>
 																						);
@@ -485,9 +489,9 @@ const MapEditor = ( {
 																			} );
 																		} }
 																	>
-																		<div>
+																		<div className="flex-center">
 																			<Dashicon icon="unlock" />
-																			<p>{ __( 'Lock current spot' ) }</p>
+																			<span>{ __( 'Lock current spot' ) }</span>
 																		</div>
 																	</Button>
 																)
@@ -525,7 +529,7 @@ const MapEditor = ( {
 																	>
 																		<div>
 																			<Dashicon icon="lock" />
-																			<p>{ __( 'Lock current spot' ) }</p>
+																			<span>{ __( 'Lock current spot' ) }</span>
 																		</div>
 																	</Button>
 																)
@@ -543,9 +547,9 @@ const MapEditor = ( {
 																setKey( key + 1 );
 															} }
 														>
-															<div>
+															<div className="flex-center">
 																<Dashicon icon="visibility" />
-																<p>{ __( 'Preview' ) }</p>
+																<span>{ __( 'Preview' ) }</span>
 															</div>
 														</Button>
 														<Button
@@ -577,9 +581,9 @@ const MapEditor = ( {
 																}
 															} }
 														>
-															<div>
+															<div className="flex-center">
 																<Dashicon icon="trash" />
-																<p>{ __( 'Remove' ) }</p>
+																<span>{ __( 'Remove' ) }</span>
 															</div>
 														</Button>
 													</PanelBody>
@@ -611,16 +615,16 @@ const MapEditor = ( {
 										setKey( key + 1 );
 									} }
 								>
-									<div>
+									<div className="flex-center">
 										<Dashicon icon="plus" />
-										<p>{ __( 'Add' ) }</p>
+										<span>{ __( 'Add' ) }</span>
 									</div>
 								</Button>
 							</div>
 						) }
 						{ ! showSlidesSettings && (
 							<div className="slides-settings-hide">
-								<p className="section-title">{ __( 'Slides settings' ) }</p>
+								<span className="section-title">{ __( 'Slides settings' ) }</span>
 								<Button
 									className="show-button"
 									onClick={ () => {
@@ -667,9 +671,11 @@ const MapEditor = ( {
 						/>
 					</div>
 					<div className="jeo-preview-controls">
-						<p>
-							<strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
-						</p>
+						<span>
+							<strong>
+								{ __("Map: ", "jeo") }
+								{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
+						</span>
 					</div>
 				</Fragment>
 			) }
