@@ -255,7 +255,7 @@ class StoryMapDisplay extends Component {
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
 								{ this.state.postData && (
 									<>
-										<h1 className="storymap-page-title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( this.state.postData.title.rendered ) } }></h1>
+										<h1 className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</h1>
 										<div className="post-info">
 											{ /*<p className="author" >{ 'Authors' }</p> */ }
 											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDate() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
@@ -263,7 +263,7 @@ class StoryMapDisplay extends Component {
 									</>
 								) }
 								{ config.subtitle &&
-									<h3 className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( config.subtitle ) } }></h3>
+									<h3 className="storymap-description">{ parse(decodeHtmlEntity( config.subtitle )) }</h3>
 								}
 
 								<button
@@ -436,13 +436,13 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 				<div id={ id } className={ classList }>
 					<div className={ theme }>
 						{ title &&
-							<h3 className="title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( title ) } }></h3>
+							<h3 className="title">{ parse(decodeHtmlEntity( title )) }</h3>
 						}
 						{ image &&
 							<img src={ image } alt={ title }></img>
 						}
 						{ description &&
-							<p className="slide-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } }></p>
+							<p className="slide-description">{ parse(decodeHtmlEntity( description )) }</p>
 						}
 					</div>
 				</div>
