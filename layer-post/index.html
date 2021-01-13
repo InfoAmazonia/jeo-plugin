@@ -86,7 +86,7 @@
                 <h1 id="creating-a-layer">Creating a layer</h1>
 <p>One of the custom post types that JEO plugin provides is <strong>Layer</strong>. Is in the layer where you will be able to add legend and color to your map. A map may contain one or more layers.</p>
 <p><img alt="Post Type Layers" src="../img/post-type-layers.png" /></p>
-<p>Entering the Layer post editor, you'll see a preview of the current layer (or a default layer if the current layer haven't been edited yet) and two sidebar panels: <strong>Settings</strong> and <strong>Legend</strong>.</p>
+<p>Entering the Layer post editor, you'll see a preview of the current layer (or a default layer if the current layer haven't been edited yet) and four sidebar panels: <strong>Settings</strong>, <strong>Carto Integration</strong>, <strong>Attributions</strong> and <strong>Legend</strong>.</p>
 <p><img alt="Layer Sidebar" src="../img/layer-sidebar.png" /></p>
 <h2 id="layer-settings">Layer settings</h2>
 <p>On the <strong>Layer settings</strong> panel, you can change the layer type.</p>
@@ -103,8 +103,19 @@
 <p><img alt="Layer interactions" src="../img/layer-interactions.png" /></p>
 <h2 id="layer-legend">Layer legend</h2>
 <p>On the <strong>Layer legend</strong> panel, you can add legends to your layer (barscale, simple-color, icons or circles and colorize them.</p>
-<p>TODO: layer legend</p>
 <p><img alt="Layer legend" src="../img/layer-legend.png" /></p>
+<h2 id="creating-a-carto-integrated-layer">Creating a Carto integrated Layer</h2>
+<p>When the checkbox <code>Use integration</code> is selected, the following field shows up:
+    - SQL Query: Code that'll be used to retrieve layer data from Carto.</p>
+<p><img alt="Carto Layer Settings" src="../img/carto-layer-settings.png" />
+<img alt="Carto Layer Settings" src="../img/carto-layer-settings2.png" /></p>
+<p>To get this SQL Query, go to your Carto Dashboard page and click on the map which has the layer to be used in the plugin.
+<img alt="Carto Layer Settings" src="../img/carto-layer-settings3.png" /></p>
+<p>Inside the map page, a layer list will be shown.
+<img alt="Carto Layer Settings" src="../img/carto-layer-settings4.png" /></p>
+<p>Select a layer and go to Data tab. At the sidebar's bottom, change from <code>Values</code> to <code>SQL</code>. The code that will be shown is the SQL Query.
+<img alt="Carto Layer Settings" src="../img/carto-layer-settings5.png" />
+<img alt="Carto Layer Settings" src="../img/carto-layer-settings6.png" /></p>
               
             </div>
           </div>
