@@ -8,8 +8,8 @@ import StorymapEditor from './storymap-editor'
 import MapIcon from '../icons/ion/map';
 
 registerBlockType( 'jeo/map', {
-	title: __( 'JEO Map' ),
-	description: __( 'Display maps with layers and data' ),
+	title: __( 'JEO Map', 'jeo' ),
+	description: __( 'Display maps with layers and data', 'jeo' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -25,8 +25,8 @@ registerBlockType( 'jeo/map', {
 } );
 
 registerBlockType( 'jeo/onetime-map', {
-	title: __( 'JEO One-time Map' ),
-	description: __( 'Display maps with layers and data' ),
+	title: __( 'JEO One-time Map', 'jeo' ),
+	description: __( 'Display maps with layers and data', 'jeo' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -110,8 +110,8 @@ registerBlockType( 'jeo/onetime-map', {
 } );
 
 registerBlockType( 'jeo/storymap', {
-	title: __( 'Story Map' ),
-	description: __( 'Display maps with storytelling' ),
+	title: __( 'Story Map', 'jeo' ),
+	description: __( 'Display maps with storytelling', 'jeo' ),
 	category: 'jeo',
 	icon: MapIcon,
 	attributes: {

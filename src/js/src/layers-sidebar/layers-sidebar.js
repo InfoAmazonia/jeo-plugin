@@ -269,28 +269,28 @@ const LayersSidebar = ( {
 
 					<PluginDocumentSettingPanel
 						name="settings"
-						title={ __( 'Settings' ) }
+						title={ __( 'Settings', 'jeo' ) }
 					>
 						<LayerSettings />
 					</PluginDocumentSettingPanel>
 
 					<PluginDocumentSettingPanel
 						name="carto-integration"
-						title={ __( 'Carto Integration' ) }
+						title={ __( 'Carto Integration', 'jeo' ) }
 					>
 						<CartoIntegration />
 					</PluginDocumentSettingPanel>
 
 					<PluginDocumentSettingPanel
 						name="attribution-settings"
-						title={ __( 'Attributions' ) }
+						title={ __( 'Attributions', 'jeo' ) }
 					>
 						<AttributionSettings />
 					</PluginDocumentSettingPanel>
 
 					<PluginDocumentSettingPanel
 						name="legend-settings"
-						title={ __( 'Legend' ) }
+						title={ __( 'Legend', 'jeo' ) }
 					>
 						<LegendsEditor />
 					</PluginDocumentSettingPanel>

@@ -6,9 +6,9 @@ import Form from 'react-jsonschema-form';
 const layerSchema = {
 	type: 'object',
 	properties: {
-		source_url: { title: __( 'Source data download link' ), type: 'string' },
-		attribution: { title: __( 'Data attribution link' ), type: 'string' },
-		attribution_name: { title: __( 'Data attribution name' ), type: 'string' },
+		source_url: { title: __( 'Source data download link', 'jeo' ), type: 'string' },
+		attribution: { title: __( 'Data attribution link', 'jeo' ), type: 'string' },
+		attribution_name: { title: __( 'Data attribution name', 'jeo' ), type: 'string' },
 	},
 };
 

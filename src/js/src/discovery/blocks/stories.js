@@ -662,20 +662,20 @@ class Stories extends Component {
 					) }
 
 					{ this.state.showFilters
-						? __( 'Hide filters' )
-						: __( 'Show filters' ) }
+						? __( 'Hide filters', 'jeo' )
+						: __( 'Show filters', 'jeo' ) }
 				</button>
 				{ this.state.showFilters && (
 					<div className="filters">
 						<DateRangePicker initialSettings={ { autoUpdateInput: false } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
 							<input
-								placeholder={ __( 'Date range' ) }
+								placeholder={ __( 'Date range', 'jeo' ) }
 								readOnly="true"
 								value={ this.props.dateRangeInputValue }
 							></input>
 						</DateRangePicker>
 						<select name="tags" onChange={ this.handleTagChange }>
-							<option value="">{ __( 'Tags' ) }</option>
+							<option value="">{ __( 'Tags', 'jeo' ) }</option>
 							{ this.props.tags.map( ( tag ) => (
 								<option value={ tag.id } key={ tag.id } selected={ this.props.selectedTag == tag.id? "selected" : "" }>
 									{ ' ' }
@@ -807,7 +807,7 @@ class Storie extends Component {
 					<div className="date">{ storyDate }</div>
 					<div>
 						<small onMouseEnter={ this.storyHovered }
-							onMouseLeave={ this.storyUnhover }>{ __( 'View in map' ) }</small>
+							onMouseLeave={ this.storyUnhover }>{ __( 'View in map', 'jeo' ) }</small>
 					</div>
 				</div>
 			</a>

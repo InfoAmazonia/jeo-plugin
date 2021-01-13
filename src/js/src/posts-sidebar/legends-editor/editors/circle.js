@@ -114,7 +114,7 @@ class CircleEditor extends Component {
 	render() {
 		return (
 			<Fragment>
-				{ __( 'Circles color' ) }
+				{ __( 'Circles color', 'jeo' ) }
 				<ColorPicker
 					color={ this.state.legendObject.attributes.legend_type_options.color }
 					onChangeComplete={ ( color ) => {
@@ -130,7 +130,7 @@ class CircleEditor extends Component {
 				}
 
 				<Button isSecondary isButton isLarge onClick={ this.addNew } className="full-width-button">
-					{ __( 'Add new label' ) }
+					{ __( 'Add new label', 'jeo' ) }
 				</Button>
 			</Fragment>
 
@@ -181,7 +181,7 @@ class CircleItem extends Component {
 				<div className={ 'legend-wrapper' } >
 
 					<TextControl
-						label={ __( 'Label' ) }
+						label={ __( 'Label', 'jeo' ) }
 						value={ this.state.label }
 						onChange={ ( label ) => {
 							this.itemChanged( { ...this.state, label } );
@@ -190,7 +190,7 @@ class CircleItem extends Component {
 					/>
 
 					<RangeControl
-						label={ __( 'Radius' ) }
+						label={ __( 'Radius', 'jeo' ) }
 						value={ this.state.radius }
 						onChange={ ( radius ) => {
 							this.itemChanged( { ...this.state, radius } );
@@ -206,17 +206,17 @@ class CircleItem extends Component {
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<div className="buttonsList">
 								<Button isDestructive isButton isLink isSecondary onClick={ () => this.props.removeLabel( this.state.id ) } >
-									{ __( 'Remove' ) }
+									{ __( 'Remove', 'jeo' ) }
 								</Button>
 
 								<Button isSecondary isButton isLink aria-expanded={ isOpen } onClick={ onToggle } >
-									{ __( 'See preview' ) }
+									{ __( 'See preview', 'jeo' ) }
 								</Button>
 							</div>
 						) }
 						renderContent={ () => (
 							<div className={ 'circle-wrapper' } >
-								{ __( 'Preview' ) }
+								{ __( 'Preview', 'jeo' ) }
 								<div className="circle" style={ styles.circle } />
 							</div>
 						) }

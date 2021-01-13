@@ -9,7 +9,7 @@ export const layerLoader = ( layers ) => {
 };
 
 export const layerUseLabels = {
-	fixed: __( 'Fixed' ),
-	swappable: __( 'Swappable' ),
-	switchable: __( 'Switchable' ),
+	fixed: __( 'Fixed', 'jeo' ),
+	swappable: __( 'Swappable', 'jeo' ),
+	switchable: __( 'Switchable', 'jeo' ),
 };
