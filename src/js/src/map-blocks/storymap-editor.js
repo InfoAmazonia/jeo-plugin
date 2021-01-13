@@ -45,7 +45,7 @@ const MapEditor = ( {
 		str = str.toString();
 
 	   return str.replace(/<[^>]*>/g, '');
-	 } 
+	 }
 
 	const reorder = ( list, startIndex, endIndex ) => {
 		const result = Array.from( list );
@@ -288,12 +288,17 @@ const MapEditor = ( {
 													>
 													=
 												</button>
-												<Panel key={ key } className="slide-panel"  >
+												<Panel key={ key } className="slide-panel">
 													<PanelBody
 														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ' ) + ( index + 1 ) }
 														initialOpen={
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
+														onToggle={ (props) => {
+															if(index !== currentSlideIndex) {
+																setCurrentSlideIndex(index);
+															}
+														} }
 													>
 														<p className="input-label">{ __( 'Title' ) }</p>
 														<CKEditor
@@ -324,7 +329,7 @@ const MapEditor = ( {
 															onChange={ ( event, editor ) => {
 																// Set role 'button' to editor element so it isn't affected by drag and drop events
 																editor.ui.getEditableElement().setAttribute('role', 'button')
-																
+
 																setCurrentSlideIndex( index );
 
 																const oldSlides = [ ...attributes.slides ];
