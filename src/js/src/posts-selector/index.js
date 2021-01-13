@@ -25,7 +25,7 @@ const PostsSelector = ( {
 		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
 			<CheckboxControl
 				className="related-posts-checkbox"
-				label={ __( 'Use related posts' ) }
+				label={ __( 'Use related posts', 'jeo' ) }
 				checked={ postMeta.relate_posts }
 				onChange={ () => {
 					setPostMeta( {
@@ -39,7 +39,7 @@ const PostsSelector = ( {
 				<>
 					{ loadedCategories && (
 						<TokensSelector
-							label={ __( 'Categories' ) }
+							label={ __( 'Categories', 'jeo' ) }
 							collection={ loadedCategories }
 							loadingCollection={ loadingCategories }
 							value={ relatedPosts.categories }
@@ -51,7 +51,7 @@ const PostsSelector = ( {
 
 					{ loadedTags && (
 						<TokensSelector
-							label={ __( 'Tags' ) }
+							label={ __( 'Tags', 'jeo' ) }
 							collection={ loadedTags }
 							loadingCollection={ loadingTags }
 							value={ relatedPosts.tags }

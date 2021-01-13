@@ -45,7 +45,7 @@ const MapEditor = ( {
 		str = str.toString();
 
 	   return str.replace(/<[^>]*>/g, '');
-	 } 
+	 }
 
 	const reorder = ( list, startIndex, endIndex ) => {
 		const result = Array.from( list );
@@ -199,8 +199,8 @@ const MapEditor = ( {
 								>
 									<Dashicon icon="hidden" />
 								</Button>
-								<p className="section-title">{ __( 'Story settings' ) }</p>
-								<p className="input-label">{ __('Story brief description') }</p>
+								<p className="section-title">{ __( 'Story settings', 'jeo' ) }</p>
+								<p className="input-label">{ __('Story brief description', 'jeo') }</p>
 								<CKEditor
 									editor={ ClassicEditor }
 									data={ attributes.description }
@@ -213,7 +213,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="introduction-button"
-									label={ __( 'Story map Introduction' ) }
+									label={ __( 'Story map Introduction', 'jeo' ) }
 									checked={ attributes.hasIntroduction }
 									onChange={ ( newHasIntroduction ) => {
 										setAttributes( {
@@ -224,7 +224,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="navigate-button"
-									label={ __( 'Navigate map button' ) }
+									label={ __( 'Navigate map button', 'jeo' ) }
 									checked={ attributes.navigateButton }
 									onChange={ ( newNavigateButton ) => {
 										setAttributes( {
@@ -237,7 +237,7 @@ const MapEditor = ( {
 						) }
 						{ ! showStorySettings && (
 							<div className="story-settings-hide">
-								<p className="section-title">{ __( 'Story settings' ) }</p>
+								<p className="section-title">{ __( 'Story settings', 'jeo' ) }</p>
 								<Button
 									className="show-button"
 									onClick={ () => {
@@ -258,7 +258,7 @@ const MapEditor = ( {
 								>
 									<Dashicon icon="hidden" />
 								</Button>
-								<p className="section-title">{ __( 'Slides settings' ) }</p>
+								<p className="section-title">{ __( 'Slides settings', 'jeo' ) }</p>
 								<List
 									values={ attributes.slides }
 									onChange={ ( { oldIndex, newIndex } ) => {
@@ -290,12 +290,12 @@ const MapEditor = ( {
 												</button>
 												<Panel key={ key } className="slide-panel"  >
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ' ) + ( index + 1 ) }
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( index + 1 ) }
 														initialOpen={
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
 													>
-														<p className="input-label">{ __( 'Title' ) }</p>
+														<p className="input-label">{ __( 'Title' , 'jeo') }</p>
 														<CKEditor
 															atributo="meuatributo"
 															editor={ ClassicEditor }
@@ -324,7 +324,7 @@ const MapEditor = ( {
 															onChange={ ( event, editor ) => {
 																// Set role 'button' to editor element so it isn't affected by drag and drop events
 																editor.ui.getEditableElement().setAttribute('role', 'button')
-																
+
 																setCurrentSlideIndex( index );
 
 																const oldSlides = [ ...attributes.slides ];
@@ -487,7 +487,7 @@ const MapEditor = ( {
 																	>
 																		<div>
 																			<Dashicon icon="unlock" />
-																			<p>{ __( 'Lock current spot' ) }</p>
+																			<p>{ __( 'Lock current spot', 'jeo' ) }</p>
 																		</div>
 																	</Button>
 																)
@@ -525,7 +525,7 @@ const MapEditor = ( {
 																	>
 																		<div>
 																			<Dashicon icon="lock" />
-																			<p>{ __( 'Lock current spot' ) }</p>
+																			<p>{ __( 'Lock current spot', 'jeo' ) }</p>
 																		</div>
 																	</Button>
 																)
@@ -545,14 +545,14 @@ const MapEditor = ( {
 														>
 															<div>
 																<Dashicon icon="visibility" />
-																<p>{ __( 'Preview' ) }</p>
+																<p>{ __( 'Preview', 'jeo' ) }</p>
 															</div>
 														</Button>
 														<Button
 															className="remove-button"
 															onClick={ () => {
 																if ( attributes.slides.length <= 1 ) {
-																	alert( __( 'The minimum number of slides is 1.' ) );
+																	alert( __( 'The minimum number of slides is 1.', 'jeo' ) );
 
 																	return;
 																}
@@ -579,7 +579,7 @@ const MapEditor = ( {
 														>
 															<div>
 																<Dashicon icon="trash" />
-																<p>{ __( 'Remove' ) }</p>
+																<p>{ __( 'Remove', 'jeo') }</p>
 															</div>
 														</Button>
 													</PanelBody>
@@ -613,14 +613,14 @@ const MapEditor = ( {
 								>
 									<div>
 										<Dashicon icon="plus" />
-										<p>{ __( 'Add' ) }</p>
+										<p>{ __( 'Add', 'jeo' ) }</p>
 									</div>
 								</Button>
 							</div>
 						) }
 						{ ! showSlidesSettings && (
 							<div className="slides-settings-hide">
-								<p className="section-title">{ __( 'Slides settings' ) }</p>
+								<p className="section-title">{ __( 'Slides settings', 'jeo' ) }</p>
 								<Button
 									className="show-button"
 									onClick={ () => {
@@ -634,7 +634,7 @@ const MapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-								{ __('Current slide: ') }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide ' ) + ( currentSlideIndex + 1 ) }
+								{ __('Current slide: ') }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
@@ -676,7 +676,7 @@ const MapEditor = ( {
 			{ ! attributes.map_id && (
 				<Fragment>
 					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
-						{ __( 'Insert a map from the library' ) + ':' }
+						{ __( 'Insert a map from the library', 'jeo' ) + ':' }
 					</label>
 					<JeoAutosuggest
 						inputProps={ {
@@ -716,7 +716,7 @@ const MapEditor = ( {
 								setAttributes( { ...attributes, map_id: previous_map } );
 							} }
 						>
-							{ __( 'Cancel' ) }
+							{ __( 'Cancel', 'jeo' ) }
 						</Button>
 					) }
 				</Fragment>

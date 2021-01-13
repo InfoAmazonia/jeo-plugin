@@ -152,7 +152,7 @@ const LayerSettings = (
 							<span>{ __( 'Base layer should be fixed', 'jeo' ) }</span>
 						) : (
 							<SelectControl
-								label={ __( 'Type' ) }
+								label={ __( 'Type', 'jeo' ) }
 								value={ settings.use }
 								options={ useOptions }
 								onChange={ updateUse }
@@ -162,14 +162,14 @@ const LayerSettings = (
 					<div className="default-control" style={ setWidth( 3 ) }>
 						{ settings.use === 'switchable' && (
 							<CheckboxControl
-								label={ __( 'Should be displayed by default.' ) }
+								label={ __( 'Should be displayed by default.', 'jeo' ) }
 								checked={ settings.default }
 								onChange={ switchDefault }
 							/>
 						) }
 						{ settings.use === 'swappable' && (
 							<RadioControl
-								label={ __( 'Should be displayed by default.' ) }
+								label={ __( 'Should be displayed by default.', 'jeo' ) }
 								checked={ settings.default }
 								onChange={ swapDefault }
 							/>
@@ -179,7 +179,7 @@ const LayerSettings = (
 					<div className="default-control" style={ setWidth( 4 ) }>
 						{ settings.layer.meta.type === 'mapbox' && (
 							<RadioControl
-								label={ __( 'Load interactions' ) }
+								label={ __( 'Load interactions', 'jeo' ) }
 								checked={ settings.load_as_style }
 								onChange={ switchUseStyle }
 							/>
@@ -194,7 +194,7 @@ const LayerSettings = (
 						) }
 						{ settings.layer.meta.use_legend && (
 							<CheckboxControl
-								label={ __( 'Show legend' ) }
+								label={ __( 'Show legend', 'jeo' ) }
 								checked={ settings.show_legend }
 								onChange={ switchShowLegend }
 							/>

@@ -101,10 +101,10 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 				<>
 					<p> { __("Configure your Carto options in Jeo settings") } </p>
 				</>
-			) } 
+			) }
 			{ ( carto_options.carto_key && carto_options.carto_username ) && (
 				<CheckboxControl
-					label={ __( 'Use integration' ) }
+					label={ __( 'Use integration', 'jeo' ) }
 					checked={ useCartoIntegration }
 					onChange={ () => {
 						setUseCartoInteration(!postMeta.use_carto_integration);
@@ -114,12 +114,12 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 						} )
 					} }
 				/>
-			) } 
+			) }
 
 			{ useCartoIntegration &&
 				<>
 					<TextareaControl
-						label={ __( 'SQL Query' ) }
+						label={ __( 'SQL Query', 'jeo' ) }
 						value={ cartoSQLQuery }
 						onChange={ ( value ) => {
 							setCartoSQLQuery(value);
