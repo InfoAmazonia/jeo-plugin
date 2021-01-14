@@ -479,7 +479,7 @@ class MapLayers extends Component {
 		) : null;
 
 		return (
-			<div className="maps-tab">
+			<div className="maps-tab" style={ this.props.style }>
 				<Search searchPlaceholder="Search map" update={ this.updateMaps } />
 
 				<div className="selected-layers">

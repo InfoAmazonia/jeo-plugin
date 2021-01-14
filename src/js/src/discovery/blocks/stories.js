@@ -612,7 +612,7 @@ class Stories extends Component {
 		) : null;
 
 		return (
-			<div className="stories-tab">
+			<div className="stories-tab" style={ this.props.style }>
 				<Search
 					searchPlaceholder="Search story"
 					update={ this.updateStories }
