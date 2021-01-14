@@ -250,7 +250,11 @@ class Jeo {
 					$server = rest_get_server();
 					$data = $server->response_to_data( $response, false );
 
-					$have_related_posts = !empty($data) || !empty($map->relate_posts);
+					// var_dump(empty($map_meta['relate_posts'][0]));
+
+					$have_related_posts = !empty($map_meta['relate_posts'][0]) && !empty($data) || !empty($map->relate_posts);
+
+					// var_dump($have_related_posts);
 
 					if(isset($_GET['width']) ) {
 						$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
@@ -267,14 +271,13 @@ class Jeo {
 						$container_style = "width: ${full_width}px; height: ${height}px;";
 						$popup_style = "width: ${popup_width}px; height: ${height}px;";
 					} else {
-						$have_related_posts = !empty($data) || !empty($map->relate_posts);
 						$container_style = "width: 100%; height: 100%;";
 
 						if($have_related_posts) {
-							$map_style = "width: 70%; height: 100%;";
-							$popup_style = "width: 30%; height: 100%;";
+							$map_style = "width: 70%; height: calc(100% - 60px);";
+							$popup_style = "width: 30%; height: calc(100% - 60px);";
 						} else {
-							$map_style = $container_style;
+							$map_style = "width: 100%; height: calc(100% - 60px);";
 							$popup_style = $container_style;
 						}
 
@@ -319,27 +322,27 @@ class Jeo {
 
 	function restrict_story_map_block_count() {
 		global $post, $parent_file, $typenow, $current_screen, $pagenow;
-	
+
 		$post_type = NULL;
-	
+
 		if($post && (property_exists($post, 'post_type') || method_exists($post, 'post_type')))
 			$post_type = $post->post_type;
-	
+
 		if(empty($post_type) && !empty($current_screen) && (property_exists($current_screen, 'post_type') || method_exists($current_screen, 'post_type')) && !empty($current_screen->post_type))
 			$post_type = $current_screen->post_type;
-	
+
 		if(empty($post_type) && !empty($typenow))
 			$post_type = $typenow;
-	
+
 		if(empty($post_type) && function_exists('get_current_screen'))
 			$post_type = get_current_screen();
-	
+
 		if(empty($post_type) && isset($_REQUEST['post']) && !empty($_REQUEST['post']) && function_exists('get_post_type') && $get_post_type = get_post_type((int)$_REQUEST['post']))
 			$post_type = $get_post_type;
-	
+
 		if(empty($post_type) && isset($_REQUEST['post_type']) && !empty($_REQUEST['post_type']))
 			$post_type = sanitize_key($_REQUEST['post_type']);
-	
+
 		if(empty($post_type) && 'edit.php' == $pagenow)
 			$post_type = 'post';
 
