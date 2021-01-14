@@ -15,7 +15,7 @@ $font: var(--jeo-font);
 	// discovery embed class is parent of current reference (&)
 	.discovery-embed & {
 		display: block;
-		height: 100%;
+		height: calc(100% - 60px);
 
 		.mapboxgl-map {
 			height: 100%;
