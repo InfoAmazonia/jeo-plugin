@@ -9,10 +9,14 @@
 	</div>
 
 
-	<?php if(has_custom_logo()): ?>
-		<div class="embed-footer discovery">
-			<?php echo the_custom_logo() ?>
-		</div>
+	<?php
+		$img = \jeo_settings()->get_option( 'jeo_footer-logo' );
+		if(!empty($img)): ?>
+			<div class="embed-footer">
+				<a href="/">
+					<img src="<?= $img ?>">
+				</a>
+			</div>
 	<?php endif; ?>
 
 	<?php wp_footer(); ?>
