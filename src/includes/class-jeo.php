@@ -274,10 +274,10 @@ class Jeo {
 						$container_style = "width: 100%; height: 100%;";
 
 						if($have_related_posts) {
-							$map_style = "width: 70%; height: calc(100% - 60px);";
-							$popup_style = "width: 30%; height: calc(100% - 60px);";
+							$map_style = "width: 70%; height: calc(100% - 35px);";
+							$popup_style = "width: 30%; height: calc(100% - 35px);";
 						} else {
-							$map_style = "width: 100%; height: calc(100% - 60px);";
+							$map_style = "width: 100%; height: calc(100% - 35px);";
 							$popup_style = $container_style;
 						}
 
