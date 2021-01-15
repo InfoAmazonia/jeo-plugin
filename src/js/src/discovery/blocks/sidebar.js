@@ -60,9 +60,15 @@ class Sidebar extends Component {
 			);
 		} else {
 			if ( tab.name === 'stories' ) {
-				tabRenderer = <Stories { ...storiesProps } />;
+				tabRenderer = 	(<>
+									<Stories { ...storiesProps }  />
+									<MapLayers { ...mapLayersProps } style={ { display: "none" } } />
+								</>);
 			} else {
-				tabRenderer = <MapLayers { ...mapLayersProps } />;
+				tabRenderer = 	(<>
+									<Stories { ...storiesProps }  style={ { display: "none" } }  />
+									<MapLayers { ...mapLayersProps } />
+								</>);
 			}
 		}
 
@@ -155,7 +161,8 @@ class Sidebar extends Component {
 					activeClass="active-tab"
 					// onSelect={ }
 					tabs={ tabs }
-					initialTabName={ this.props.share ? 'mapLayers' : 'stories' }
+					// initialTabName={ this.props.share ? 'mapLayers' : 'stories' }
+					initialTabName={ 'stories' }
 				>
 					{ ( tab ) => this.displayTab( tab ) }
 				</TabPanel>
