@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Writing a Geocoder - JEO</title>
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Writing a Geocoder";
+    var mkdocs_page_input_path = "dev/geocoders.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> JEO</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">JEO</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Writing a Geocoder</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="writing-a-geocoder">Writing a Geocoder</h1>
+<p>A Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on the geographical coordinates, which is called Reverse Geocoding.</p>
+<p>JEO needs a geocoder service in a few situations, such as when users indicate to where on a map a story (posts) is related.</p>
+<p>JEO comes with two native geocoder services users can choose from: Nominatim and Google. But new services can easily be added by plugins. This page documents how to do this.</p>
+<h2 id="registering-a-geocoder">Registering a Geocoder</h2>
+<p>Hook a function to the <code>jeo_register_geocoders</code> action and call the register with the following code:</p>
+<pre><code class="php">add_action('jeo_register_geocoders', function($geocoders) {
+
+    $geocoders-&gt;register_geocoder([
+        'slug' =&gt; 'my-geocoder',
+        'name' =&gt; 'My Geocoder',
+        'description' =&gt; __('My Geocoder description', 'my-textdomain'),
+        'class_name' =&gt; 'MyGeocoderClass'
+    ]);
+
+});
+</code></pre>
+
+<p>This will tell JEO that there is a new Geocoder service available and give some information about it.</p>
+<ul>
+<li>Name and description will be used in the Administration panel so the admin can recognize and choose from the available Geocoders which one is to be used.</li>
+<li>slug needs to be a unique identifier for the geocoder</li>
+<li>class_name is the name of the Geocoder class</li>
+</ul>
+<h2 id="creating-the-geocoder-class">Creating the Geocoder class</h2>
+<p>Now we need to create the geocoder class. This will be a class that extends <code>\Jeo\Geocoder</code> and implement some methods that do the actual geocoding.</p>
+<p>Inside the same hook, declare the class and two required methods:</p>
+<ul>
+<li><code>geocode($search_string)</code> The method that receives the search string, does the request to the geocoder servers and returns the coordinates and address details;</li>
+<li><code>reverse_geocode($lat, $lon)</code> The method that receives latitude and longitude, requests the geocoder server, and returns the full location details in the same format as the <code>geocode</code> method does.</li>
+</ul>
+<p>While <code>geocode()</code> returns an array of search results, <code>reverse_geocode()</code> returns only one result.</p>
+<p>Each result is an array that must have only the keys expected by the JEO plugin, so each Geocoder must find the best correspondence between each field and the fields expected by JEO.</p>
+<p>Note: Only <code>lat</code> and <code>lon</code> are required.</p>
+<p>Sample response with all accepted fields:</p>
+<pre><code class="php">[
+        [
+            'lat' =&gt; '',
+            'lon' =&gt; '',
+            'full_address' =&gt; '',
+            'country' =&gt; '',
+            'country_code' =&gt; '',
+            'region_level_1' =&gt; '',
+            'region_level_2' =&gt; '', // State goes here
+            'region_level_3' =&gt; '',
+            'city' =&gt; '',
+            'city_level_1' =&gt; '',
+        ]
+]
+</code></pre>
+
+<p>Here is a simple example:</p>
+<pre><code class="php">add_action('jeo_register_geocoders', function($geocoders) {
+
+    $geocoders-&gt;register_geocoder([
+        'slug' =&gt; 'my-geocoder',
+        'name' =&gt; 'My Geocoder',
+        'description' =&gt; __('My Geocoder description', 'my-textdomain'),
+        'class_name' =&gt; 'MyGeocoderClass'
+    ]);
+
+    class MyGeocoderClass extends \Jeo\Geocoder {
+
+        public function geocode($search_string) {
+
+            $params = [
+                'q' =&gt; $search_string,
+                'format' =&gt; 'json',
+                'addressdetails' =&gt; 1
+            ];
+
+            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/search') );
+
+            $data = wp_remote_retrieve_body( $r );
+
+            $data = \json_decode($data);
+            $response = [];
+
+            if (\is_array($data)) {
+
+                foreach ($data as $match) {
+                    $r = $this-&gt;format_response_item( (array) $match );
+                    if ($r) $response[] = $r;
+                }
+
+            }
+
+            return $response;
+
+        }
+
+        public function reverse_geocode($lat, $lon) {
+
+            $params = [
+                'lat' =&gt; $lat,
+                'lon' =&gt; $lon,
+                'format' =&gt; 'json',
+                'addressdetails' =&gt; 1
+            ];
+
+            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/reverse') );
+
+            $data = wp_remote_retrieve_body( $r );
+
+            $data = \json_decode($data);
+
+            return $this-&gt;format_response_item( (array) $data );
+
+        }
+
+        private function format_response_item($match) {
+
+            $response = [
+                'lat' =&gt; $match['lat'],
+                'lon' =&gt; $match['lon'],
+                'full_address' =&gt; $match['display_name'],
+                'country' =&gt; $match['country'],
+                'country_code' =&gt; $match['country_code'],
+                'region_level_1' =&gt; $match['region_level_1'],
+                'region_level_2' =&gt; $match['region_level_2'], // State goes here
+                'region_level_3' =&gt; $match['region_level_3'],
+                'city' =&gt; $match['city'],
+                'city_level_1' =&gt; $match['city_level_1'],
+            ];
+
+            return $response;
+
+        }
+
+    }
+
+});
+</code></pre>
+
+<p>And that's it! Your new Geocoder is ready!</p>
+<h2 id="adding-additional-settings-to-the-geocoder">Adding additional Settings to the Geocoder</h2>
+<p>Some geocoder services might need or offer additional settings. Some might require the user to enter its API key, others might let the users restrict the search to a specific country to get better results when searching.</p>
+<p>You can also easily add new settings to your Geocoder that will automatically be presented to the user on the Settings page.</p>
+<p>Declare a method <code>get_settings()</code> in your class that will return an array of all the settings your Geocoder accepts.</p>
+<p>Each setting is described by an array with the following keys:</p>
+<ul>
+<li><code>slug</code>: a slug for your option. You don't have to worry about naming conflicts, it will be stored inside your geocoders options;</li>
+<li><code>name</code>: a human-readable name;</li>
+<li><code>description</code>: an explanation to the user of what this setting is.</li>
+</ul>
+<p>Let's see an example only with the relevant code:</p>
+<pre><code class="php">add_action('jeo_register_geocoders', function($geocoders) {
+
+    // ...
+    class MyGeocoderClass extends \Jeo\Geocoder {
+
+        // ...
+
+        public function get_settings() {
+
+            // Note it is an array of arrays
+            return [
+                [
+                    'slug' =&gt; 'api_key',
+                    'name' =&gt; __('API Key', 'my-text-domain'),
+                    'description' =&gt; __('Enter the API key you can get visiting your panel at my-gecoder.org/panel', 'my-text-domain')
+                ]
+            ];
+
+        }
+
+    }
+
+});
+</code></pre>
+
+<p>And this is what you will see in the admin panel:</p>
+<p><img alt="Geocoder Settings" src="../../img/geocoder-settings.png" /></p>
+<h2 id="accessing-settings-values">Accessing Settings values</h2>
+<p>Now that you have registered a setting and the user can change its value in the admin panel, you can use it in your geocoder.</p>
+<p>To get its value, simply call <code>$this-&gt;get_option($option_name)</code>.</p>
+<p>Example:</p>
+<pre><code class="php">// ...
+
+        // ...
+
+        public function geocode($search_string) {
+
+            $params = [
+                'q' =&gt; $search_string,
+                'format' =&gt; 'json',
+                'addressdetails' =&gt; 1,
+                'api_key' =&gt; $this-&gt;get_option('api_key')
+            ];
+
+            // ...
+
+            return $response;
+
+        }
+
+// ...
+</code></pre>
+
+<h2 id="declaring-default-values">Declaring default values</h2>
+<p>You can also add the <code>get_default_options()</code> method to your class to set default values for each setting. This is optional and is done like this:</p>
+<pre><code class="php">add_action('jeo_register_geocoders', function($geocoders) {
+
+    // ...
+    class MyGeocoderClass extends \Jeo\Geocoder {
+
+        // ...
+
+        public function get_default_options() {
+
+            return [
+                'api_key' =&gt; 'sand-box-api-key' // the key must match the slug of the setting registered in get_settings()
+            ];
+
+        }
+
+    }
+
+});
+</code></pre>
+
+<h2 id="advanced-even-further-settings-customization">Advanced: Even further settings customization</h2>
+<p>If your geocoder needs some special settings that a simple text input won't handle, there is yet another method you can declare to add arbitrary HTML code to the Settings page.</p>
+<p><code>settings_footer($settings)</code> must echo HTML code that will be rendered at the end of your Geocoder settings page.</p>
+<p>It received the <code>$settings</code> object, which is an instance of <code>\Jeo\Settings</code> and have some helpers you can use.</p>
+<p>You only need to print form fields with the right names and JEO will take care of saving them for you.</p>
+<p>To get the right field name use <code>$settings-&gt;get_geocoder_option_field_name($name)</code>.</p>
+<p>Example:</p>
+<pre><code class="php">// ...
+
+        // ...
+
+        public function settings_footer($settings) {
+
+            ?&gt;
+            &lt;p&gt;&lt;strong&gt;My Select option&lt;/strong&gt;&lt;/p&gt;
+
+            &lt;select name=&quot;&lt;?php echo $settings-&gt;get_geocoder_option_field_name('new_option'); ?&gt;&quot;&gt;
+                &lt;option value=&quot;yes&quot; &lt;?php selected( $this-&gt;get_option('new_option'), 'yes' ); ?&gt; &gt;
+                    Yes
+                &lt;/select&gt;
+                &lt;option value=&quot;no&quot; &lt;?php selected( $this-&gt;get_option('new_option'), 'no' ); ?&gt; &gt;
+                    No
+                &lt;/select&gt;
+            &lt;/select&gt;
+            &lt;?php
+
+        }
+
+// ...
+</code></pre>
+
+<p>Note: <code>selected()</code> is a native WordPress function. See the <a href="https://developer.wordpress.org/reference/functions/selected/">official documentation</a></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

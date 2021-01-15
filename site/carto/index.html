@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Create an association with Carto dataset (dynamic) and Mapbox tileset (static) - JEO</title>
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Create an association with Carto dataset (dynamic) and Mapbox tileset (static)";
+    var mkdocs_page_input_path = "carto.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> JEO</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">JEO</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Create an association with Carto dataset (dynamic) and Mapbox tileset (static)</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="create-an-association-with-carto-dataset-dynamic-and-mapbox-tileset-static">Create an association with Carto dataset (dynamic) and Mapbox tileset (static)</h1>
+<h2 id="user-process">User process:</h2>
+<ul>
+<li>Configure API keys / Access token / Usernames (JEO -&gt; Settings)</li>
+<li>Create a layer (see: <a href="../layer-post/">Creating layers</a>): </li>
+<li>This will generate a tileset on mapbox. </li>
+<li>The generated titeset will replace current layer settings.</li>
+<li>User goes to mapbox editor and uses the automatically generated titleset to build the layers/map/style/interations</li>
+<li>Create a new layer inside plugin using the previously built layer (this layer usually is an mapbox style, not the tileset layer itself, since tileset dosen't have any styles)</li>
+<li>New layer can now be used inside the JEO MAPS</li>
+<li>WP-cron task will update all tilesets daily.</li>
+</ul>
+<h2 id="integrated-layer-creation-process">Integrated layer creation process:</h2>
+<ul>
+<li>Create new layer (JEO -&gt; Layers -&gt; Add new)</li>
+<li>Check "Use integration" box located at the right sidebar</li>
+<li>Add reference SQL query</li>
+<li>Click "Syncronize"</li>
+<li>Accept the risks of getting the current layer overwritten</li>
+<li>Wait until the process is complete and check the "Setting" tab</li>
+<li>The "Settings" tab gets the new generated tileset settings (you can check mapbox studio tilesets and your automated tileset should be there.</li>
+<li>Save</li>
+</ul>
+<h2 id="integration-structural-information">Integration structural information:</h2>
+<ul>
+<li>map_layer (post_type): 
+    metas: { ...base_metas: object, use_carto_integration: bool, sql_query: string }</li>
+</ul>
+<h2 id="backstage-process">Backstage Process:</h2>
+<ul>
+<li>Layer post is created (see: Integrated layer creation process) - "Syncronize" calls endpoint <code>/wp-json/carto_integrate</code> (see: Endpoints specs)<ul>
+<li>Endpoint work:<ul>
+<li>Fetch GeoJSON from Carto using <code>sql_query</code> (https://carto.com/developers/sql-api/reference/#tag/Single-SQL-Statement) - <strong>network consumption may be noticed</strong></li>
+<li>The fetched GeoJSON is stored in memory for next step - <strong>memory consumption may be noted during batch update</strong></li>
+<li>Request AWS S3 credentials for stating file (https://api.mapbox.com/uploads/v1/$username/credentials?access_token=$api_key)</li>
+<li>Uploud file to S3  </li>
+<li>Uploud staged file to Mapbox (https://api.mapbox.com/uploads/v1/$username?access_token=$api_key):<ul>
+<li>the response contains the tileset properties and uploud status;</li>
+</ul>
+</li>
+<li>Endpoint responses success for step 1 </li>
+<li>Front-end will keep doing periodic request to check if the uploud is done (step 2) using  https://api.mapbox.com/uploads/v1/${owner}/${id}?access_token=${jeo_private_options.mapbox_private_key}<ul>
+<li>Check response <code>complete</code>? and then set layer settings using the response</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="endpoint-specs">Endpoint specs</h2>
+<ul>
+<li>[ POST ] <code>/wp-json/carto_integrate</code><ul>
+<li>headers:<ul>
+<li>X-WP-Nonce: worpdress nonce (string),</li>
+<li>Content-Type: application/json (string)</li>
+</ul>
+</li>
+<li>body:<ul>
+<li>sql_query: Carto query (string)</li>
+<li>If those are passed will replace mapbox tileset (recurrente update):<ul>
+<li>tileset: <code>tileset.id</code> or <code>false</code>, (string)</li>
+<li>title: <code>tileset.name</code> or <code>false</code>, (string)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="important-notices">Important notices:</h2>
+<ul>
+<li>Server consuption mostly depends on GeoJson size.</li>
+<li>If the wp cron has a lot of tasks, it's important to keep in mind if those are not exeeding the server php maximum execution time. </li>
+<li>Mapbox file uploud is async, but Carto SQL GeoJSON download and uploud to AWS S3 stage isn't.</li>
+<li>WP cron isn't like a OS cron. (https://developer.wordpress.org/plugins/cron/understanding-wp-cron-scheduling/)</li>
+<li>If your site don't get many hits a better way to garantee the mapbox tilesets update is using a system cron to call wp cron. (https://developer.wordpress.org/plugins/cron/hooking-wp-cron-into-the-system-task-scheduler/)</li>
+<li>If a sync is already made clicking at "Syncronize" button will overwrite the tileset (a new one will not be created).</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

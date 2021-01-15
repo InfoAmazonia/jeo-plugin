@@ -22,7 +22,7 @@ On the **Map layers** panel, you can visualize all the layers which are part of 
 
 ![Map Layers](img/map-layers.png)
 
-Clicking on the **Edit layers settings**, a popup will open. There, you can add, remove and rearrange layers, define their types and whether its legends will be shown on the map.
+Clicking on the **Edit layers settings**, a popup will open. There, you can add, remove and rearrange layers, define their types and whether its legends will be shown on the map. Also, you can selec which specific interactions you want to work with this especific map by clicking on `Load interactions`.
 
 A legend can be of one of these types:
 
@@ -30,7 +30,7 @@ A legend can be of one of these types:
 - **Switchable**: the layer visibility can be toggled on and off;
 - **Swappable**: only one swappable layer can be visible at a time.
 
-![Layers settings](img/layers-settings.png)
+![Layer settings](img/layer-settings.png)
 
 [Checkout how to create new layers here](layer-post.md)
 
