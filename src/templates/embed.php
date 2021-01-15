@@ -14,10 +14,14 @@
 		<div id="embed-post-preview" style="<?php echo esc_html( $popup_style ); ?>"></div>
 	<?php endif; ?>
 
-	<?php if(has_custom_logo()): ?>
-		<div class="embed-footer">
-			<?php echo the_custom_logo() ?>
-		</div>
+	<?php
+		$img = \jeo_settings()->get_option( 'jeo_footer-logo' );
+		if(!empty($img)): ?>
+			<div class="embed-footer">
+				<a href="/">
+					<img src="<?= $img ?>">
+				</a>
+			</div>
 	<?php endif; ?>
 
 	<?php wp_footer(); ?>
