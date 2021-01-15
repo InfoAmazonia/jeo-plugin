@@ -6,6 +6,7 @@ import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
 import StorymapEditor from './storymap-editor'
 import MapIcon from '../icons/ion/map';
+import { cloneDeep } from 'lodash';
 
 registerBlockType( 'jeo/map', {
 	title: __( 'JEO Map' ),
@@ -109,6 +110,59 @@ registerBlockType( 'jeo/onetime-map', {
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
 } );
 
+const storyMapCleanUp = (props) => {
+	const propsCopy = cloneDeep(props);
+
+	const attributesStructure = {
+		map_id: null,
+		description: null,
+		slides: null,
+		navigateButton: null,
+		hasIntroduction: null,
+		// loadedLayers: null,
+		navigateMapLayers: null,
+		postID: null,
+	};
+
+	// console.log(propsCopy);
+
+	for (const key in attributesStructure) {
+		if(propsCopy.attributes[key]) {
+			attributesStructure[key] = propsCopy.attributes[key];
+		}
+	}
+
+	function removeYoastTagsFromObject(object) {
+		if( object && object.hasOwnProperty('yoast_head') ) {
+			delete object.yoast_head;
+			return true;
+		}
+
+		return false;
+	}
+
+	attributesStructure.navigateMapLayers.forEach( item => {
+		removeYoastTagsFromObject(item);
+	})
+
+	attributesStructure.slides.forEach( slide => {
+		slide.selectedLayers.forEach( layer => {
+			// Remove yoast tags that are unecessary
+			removeYoastTagsFromObject(layer);
+
+			// Remove slide content from future JSON
+			if(layer.content) {
+				delete layer.content;
+			}
+		} )
+	})
+
+	// Loaded layers isn't used propperly.
+	attributesStructure.loadedLayers = [];
+
+	return attributesStructure;
+}
+
 registerBlockType( 'jeo/storymap', {
 	title: __( 'Story Map' ),
 	description: __( 'Display maps with storytelling' ),
@@ -142,45 +196,86 @@ registerBlockType( 'jeo/storymap', {
 	},
 	edit: ( props ) => <StorymapEditor { ...props } />,
 	save: ( props ) => {
-		const attributesStructure = {
-			map_id: null,
-			description: null,
-			slides: null,
-			navigateButton: null,
-			hasIntroduction: null,
-			// loadedLayers: null,
-			navigateMapLayers: null,
-			postID: null,
-		};
-
-		for (const key in attributesStructure) {
-			if(props.attributes[key]) {
-				attributesStructure[key] = props.attributes[key];
-			}
-		}
-
-		function removeYoastTagsFromObject(object) {
-			if( object && object.hasOwnProperty('yoast_head') ) {
-				delete object.yoast_head;
-				return true;
-			}
-
-			return false;
-		}
-
-		attributesStructure.navigateMapLayers.forEach( item => {
-			removeYoastTagsFromObject(item);
-		})
-
-		attributesStructure.slides.forEach( slide => {
-			slide.selectedLayers.forEach( layer => {
-				removeYoastTagsFromObject(layer);
-			} )
-		})
-
-		// Loaded layers isn't used propperly.
-		attributesStructure.loadedLayers = [];
-
-		return <div id="story-map" data-properties={ JSON.stringify(attributesStructure) } />
+		const attributesStructure = storyMapCleanUp(props);
+		return <div id="story-map" data-properties={ JSON.stringify(attributesStructure) }/>
 	},
+
+	deprecated: [
+		{
+			attributes: {
+                map_id: {
+					type: 'number',
+				},
+				description: {
+					type: 'string',
+				},
+				slides: {
+					type: 'array'
+				},
+				navigateButton: {
+					type: 'boolean',
+				},
+				hasIntroduction: {
+					type: 'boolean',
+				},
+				loadedLayers: {
+					type: 'array',
+				},
+				navigateMapLayers: {
+					type: 'array'
+				},
+				postID : {
+					type: 'number',
+				},
+			},
+
+			supports: {},
+
+			save(props) {
+				const attributesStructure = {
+					map_id: null,
+					description: null,
+					slides: null,
+					navigateButton: null,
+					hasIntroduction: null,
+					// loadedLayers: null,
+					navigateMapLayers: null,
+					postID: null,
+				};
+
+				// console.log(props);
+
+				for (const key in attributesStructure) {
+					if(props.attributes[key]) {
+						attributesStructure[key] = props.attributes[key];
+					}
+				}
+
+				function removeYoastTagsFromObject(object) {
+					if( object && object.hasOwnProperty('yoast_head') ) {
+						delete object.yoast_head;
+						return true;
+					}
+
+					return false;
+				}
+
+				attributesStructure.navigateMapLayers.forEach( item => {
+					removeYoastTagsFromObject(item);
+				})
+
+				attributesStructure.slides.forEach( slide => {
+					slide.selectedLayers.forEach( layer => {
+						removeYoastTagsFromObject(layer);
+					} )
+				})
+
+				// Loaded layers isn't used propperly.
+				attributesStructure.loadedLayers = [];
+
+				return <div id="story-map" data-properties={ JSON.stringify(attributesStructure) } />
+
+			}
+		}
+	]
 } );
