@@ -143,6 +143,7 @@ const storyMapCleanUp = (props) => {
 
 	attributesStructure.navigateMapLayers.forEach( item => {
 		removeYoastTagsFromObject(item);
+		delete item.content;
 	})
 
 	attributesStructure.slides.forEach( slide => {
