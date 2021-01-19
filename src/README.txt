@@ -1,7 +1,7 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 5.5.3
-Stable tag: 1.1.1
+Stable tag: 1.2.1
 Requires PHP: 7.2
 Requires at least: 5.4
 License: GPL-2.0+
