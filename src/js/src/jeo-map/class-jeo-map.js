@@ -221,10 +221,10 @@ export default class JeoMap {
 
 								map.addControl(
 									new mapboxgl.AttributionControl( {
-										compact: true,
+										compact: false,
 										customAttribution,
 									} ),
-									'bottom-left'
+									'bottom-right'
 								);
 
 
