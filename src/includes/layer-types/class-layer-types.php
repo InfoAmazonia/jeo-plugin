@@ -127,7 +127,10 @@ class Layer_Types {
 	}
 
 	public function enqueue_scripts() {
-		// TODO: load only when needed
+		// TODO: load only when needed (non-generic way)
+		if(!$this->should_load_assets()) {
+			return;
+		}
 
 		foreach ( $this->get_registered_layer_types() as $slug => $layer_type ) {
 			$deps = isset( $layer_type['dependecies'] ) ? $layer_type['dependecies'] : [];
@@ -136,5 +139,4 @@ class Layer_Types {
 		}
 
 	}
-
 }
