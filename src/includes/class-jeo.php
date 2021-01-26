@@ -155,6 +155,15 @@ class Jeo {
 
 	public function register_block_types() {
 		register_block_type( 'jeo/map-blocks', array( 'editor_script' => 'jeo-map-blocks' ) );
+		register_block_type( 'jeo/storymap', array(
+			'render_callback' => [$this, 'gutenberg_examples_dynamic_render_callback'],
+			'editor_script' => 'jeo-map-blocks' )
+		);
+	}
+
+	public function gutenberg_examples_dynamic_render_callback( $block_attributes, $content ) {
+		// This is needed because StoryMap content may change if the map or layers are updated
+		return $content;
 	}
 
 	public function enqueue_blocks_assets() {
