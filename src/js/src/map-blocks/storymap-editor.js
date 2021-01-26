@@ -89,7 +89,46 @@ const MapEditor = ( {
 	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 
 	useEffect( () => {
+		// console.log(attributes.navigateMapLayers);
+		// Post the already exsists
+		// console.log(loadedLayers);
+		if(attributes.slides && loadedMap) {
+			const newSlides = attributes.slides.map(slide => {
+				slide.selectedLayers.forEach((selectedLayer, index) => {
+					console.log(loadedMap);
+					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id )) {
+						console.log("Remove index", index);
+						slide.selectedLayers.splice(index, 1);
+					}
+				})
+
+				return slide;
+			})
+
+			setAttributes( {
+				...attributes,
+				slides: newSlides,
+				loadedLayers,
+				navigateMapLayers: loadedLayers.filter(layer => loadedMap.meta.layers.some(mapLayer => mapLayer.id === layer.id )),
+			} );
+
+			return;
+
+		}
+
+		setAttributes( {
+			...attributes,
+			loadedLayers,
+			navigateMapLayers: loadedLayers,
+		} );
+
+		// console.log(attributes);
+
+	}, [loadingMap, loadedLayers] );
+
+	useEffect( () => {
 		if ( ! attributes.slides ) {
+			alert("! attributes.slides");
 			setAttributes( {
 				...attributes,
 				slides: [
@@ -110,7 +149,7 @@ const MapEditor = ( {
 		}
 		const postID = wp.data.select( "core/editor" ).getCurrentPostId();
 		setAttributes( { ...attributes, postID } );
-	} );
+	}, [] );
 
 	let rawLayers = [];
 	if ( ! loadingMap && attributes.map_id ) {
@@ -122,6 +161,7 @@ const MapEditor = ( {
 			select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id )
 		);
 	} );
+
 
 	let globalFontFamily = window.jeo_settings.jeo_typography_name;
 
