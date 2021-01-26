@@ -53,7 +53,6 @@ class Jeo {
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
-		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'init', array( $this, 'register_oembed' ) );
 		// add_action( 'init', '\Jeo\Integrations\Carto::carto_integration_cron_task');
@@ -63,11 +62,14 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'cli_init', array($this, 'register_cli_commands') );
 		add_action( 'rest_api_init', array($this, 'register_endpoints') );
 
 		add_action( 'init', array($this, 'restrict_story_map_block_count' ) );
+
+
+		add_action( 'init', array( $this, 'register_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
 
 	/**
@@ -162,18 +164,16 @@ class Jeo {
 
 		$post_types = \jeo_settings()->get_option( 'enabled_post_types' );
 
-		if ( in_array( $post->post_type, $post_types ) ) {
+		if ( in_array( $post->post_type, $post_types ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css' );
 		}
 	}
 
 	public function enqueue_scripts() {
-
-		wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time() );
-		wp_enqueue_script( 'mapboxgl-loader' );
-
-		if ( is_singular() || get_query_var('jeo_embed') === 'map' ) {
+		if ( $this->should_load_assets() || get_query_var('jeo_embed') === 'map') {
+			wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time() );
+			wp_enqueue_script( 'mapboxgl-loader' );
 			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'jquery', 'wp-element' ), false, true );
 
 			$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
