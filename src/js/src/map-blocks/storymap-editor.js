@@ -95,9 +95,9 @@ const MapEditor = ( {
 		if(attributes.slides && loadedMap) {
 			const newSlides = attributes.slides.map(slide => {
 				slide.selectedLayers.forEach((selectedLayer, index) => {
-					console.log(loadedMap);
+					// console.log(loadedMap);
 					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id )) {
-						console.log("Remove index", index);
+						// console.log("Remove index", index);
 						slide.selectedLayers.splice(index, 1);
 					}
 				})
@@ -128,7 +128,7 @@ const MapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
-			alert("! attributes.slides");
+			// alert("! attributes.slides");
 			setAttributes( {
 				...attributes,
 				slides: [
