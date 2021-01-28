@@ -177,7 +177,6 @@ class Jeo {
 			function layer_still_exists($map_layers, $selected_layer) {
 				foreach($map_layers as $layer) {
 					if(in_array($layer["id"], (array) $selected_layer)) {
-						$updated_post_meta = get_post_meta($layer['id']);
 						$selected_layer->meta->type = get_post_meta($layer['id'], 'type', true);
 						$selected_layer->meta->layer_type_options = (object) get_post_meta($layer['id'], 'layer_type_options', true);
 
@@ -217,12 +216,18 @@ class Jeo {
 		foreach ($map_layers as $layer) {
 			foreach($saved_data->navigateMapLayers as $navigate_layer) {
 				if($navigate_layer->id == $layer['id']) {
+					// Update meta / types
+					layer_still_exists($map_layers, $navigate_layer);
 					$final_navigate_map_layers[] = $navigate_layer;
 				}
 			}
 		}
 
 		$saved_data->navigateMapLayers = $final_navigate_map_layers;
+
+		// echo "<pre> <code>";
+		// var_dump($saved_data->navigateMapLayers);
+		// echo "</code></pre> ";
 
 		return '<div id="story-map" data-properties="' . htmlentities(json_encode($saved_data)) . '" />';
 	}
