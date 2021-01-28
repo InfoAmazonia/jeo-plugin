@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
+"POT-Creation-Date: 2021-01-28T19:04:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: jeo\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Interactive Map blocks for Wordpress Gutenberg"
 msgstr ""
 
-#: includes/class-jeo.php:206
+#: includes/class-jeo.php:207
 msgid "Read more"
 msgstr ""
 
@@ -649,14 +649,56 @@ msgstr ""
 msgid "Apply"
 msgstr ""
 
+#: js/build/discovery.js:8363
+#: js/src/discovery/blocks/map-layers.js:491
+msgid "Search map"
+msgstr ""
+
 #: js/build/discovery.js:8395
+#: js/build/discovery.js:8401
 #: js/src/discovery/blocks/map-layers.js:530
+#: js/src/discovery/blocks/map-layers.js:547
 msgid "Changes applied"
 msgstr ""
 
 #: js/build/discovery.js:8395
 #: js/src/discovery/blocks/map-layers.js:530
 msgid "Not applied"
+msgstr ""
+
+#: js/build/discovery.js:8397
+#: js/build/mapBlocks.js:36951
+#: js/build/mapsSidebar.js:34172
+#: js/src/discovery/blocks/map-layers.js:536
+#: js/src/map-blocks/layers-settings.js:309
+msgid "Selected layers"
+msgstr ""
+
+#: js/build/discovery.js:8399
+#: js/src/discovery/blocks/map-layers.js:541
+msgid "No layers selected"
+msgstr ""
+
+#: js/build/discovery.js:8404
+#: js/src/discovery/blocks/map-layers.js:551
+msgid "Apply changes"
+msgstr ""
+
+#: js/build/discovery.js:8697
+#: js/src/discovery/blocks/sidebar.js:118
+msgid "Stories"
+msgstr ""
+
+#: js/build/discovery.js:8718
+#: js/build/mapBlocks.js:36509
+#: js/build/mapsSidebar.js:33730
+#: js/src/discovery/blocks/sidebar.js:146
+#: js/src/map-blocks/layers-panel.js:25
+msgid "Map layers"
+msgstr ""
+
+#: js/build/discovery.js:9442
+msgid "Search story"
 msgstr ""
 
 #: js/build/discovery.js:9474
@@ -957,12 +999,6 @@ msgstr ""
 msgid "If the layer is not visible inside Mapbox Studio we will not be able to control the displayment. "
 msgstr ""
 
-#: js/build/mapBlocks.js:36509
-#: js/build/mapsSidebar.js:33730
-#: js/src/map-blocks/layers-panel.js:25
-msgid "Map layers"
-msgstr ""
-
 #: js/build/mapBlocks.js:36511
 #: js/build/mapsSidebar.js:33732
 #: js/src/map-blocks/layers-library.js:20
@@ -1015,12 +1051,6 @@ msgstr ""
 #: js/src/map-blocks/layers-settings.js:287
 #: js/src/map-blocks/layers-settings.js:462
 msgid "Do you really want to delete this layer?"
-msgstr ""
-
-#: js/build/mapBlocks.js:36951
-#: js/build/mapsSidebar.js:34172
-#: js/src/map-blocks/layers-settings.js:309
-msgid "Selected layers"
 msgstr ""
 
 #: js/build/mapBlocks.js:36953
