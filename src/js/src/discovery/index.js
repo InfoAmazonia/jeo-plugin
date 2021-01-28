@@ -253,7 +253,7 @@ class Discovery extends Component {
 							<div className="options">
 								<a
 									href={
-										'https://twitter.com/intent/tweet?text=' + generatedEmbedUrl
+										'https://twitter.com/intent/tweet?text=' + shareStateUrl
 									}
 									target="_blank"
 									rel="noreferrer"
@@ -278,7 +278,7 @@ class Discovery extends Component {
 								<a
 									href={
 										'https://www.facebook.com/sharer/sharer.php?u=' +
-										generatedEmbedUrl
+										shareStateUrl
 									}
 									target="_blank"
 									rel="noreferrer"

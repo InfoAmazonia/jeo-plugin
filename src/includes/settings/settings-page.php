@@ -260,6 +260,18 @@
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_close-color') ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_close-color" value="<?php echo esc_html( $this->get_option('jeo_close-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
+
+					<tr>
+						<th > <h3 style="margin: 0"> <?= __("Embed", "jeo") ?> </h3> </th>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="background_image"><?php _e('Company logo', 'jeo'); ?></label></th>
+						<td>
+							<input id="background_image" type="text" name="<?php echo esc_html( $this->get_field_name('jeo_footer-logo') ); ?>" value="<?php echo esc_html( $this->get_option('jeo_footer-logo') ); ?>" />
+							<input id="upload_image_button" type="button" class="button-primary" value="Insert Image" />
+						</td>
+					</tr>
 			</tbody>
 			</table>
 		</div>

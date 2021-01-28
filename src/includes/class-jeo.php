@@ -53,7 +53,6 @@ class Jeo {
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
-		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'init', array( $this, 'register_oembed' ) );
 		// add_action( 'init', '\Jeo\Integrations\Carto::carto_integration_cron_task');
@@ -63,11 +62,14 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'cli_init', array($this, 'register_cli_commands') );
 		add_action( 'rest_api_init', array($this, 'register_endpoints') );
 
 		add_action( 'init', array($this, 'restrict_story_map_block_count' ) );
+
+
+		add_action( 'init', array( $this, 'register_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 	}
 
 	/**
@@ -162,18 +164,16 @@ class Jeo {
 
 		$post_types = \jeo_settings()->get_option( 'enabled_post_types' );
 
-		if ( in_array( $post->post_type, $post_types ) ) {
+		if ( in_array( $post->post_type, $post_types ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css' );
 		}
 	}
 
 	public function enqueue_scripts() {
-
-		wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time() );
-		wp_enqueue_script( 'mapboxgl-loader' );
-
-		if ( is_singular() || get_query_var('jeo_embed') === 'map' ) {
+		if ( $this->should_load_assets() || get_query_var('jeo_embed') === 'map') {
+			wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time() );
+			wp_enqueue_script( 'mapboxgl-loader' );
 			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'jquery', 'wp-element' ), false, true );
 
 			$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
@@ -250,7 +250,11 @@ class Jeo {
 					$server = rest_get_server();
 					$data = $server->response_to_data( $response, false );
 
-					$have_related_posts = !empty($data) || !empty($map->relate_posts);
+					// var_dump(empty($map_meta['relate_posts'][0]));
+
+					$have_related_posts = !empty($map_meta['relate_posts'][0]) && !empty($data) || !empty($map->relate_posts);
+
+					// var_dump($have_related_posts);
 
 					if(isset($_GET['width']) ) {
 						$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
@@ -267,14 +271,13 @@ class Jeo {
 						$container_style = "width: ${full_width}px; height: ${height}px;";
 						$popup_style = "width: ${popup_width}px; height: ${height}px;";
 					} else {
-						$have_related_posts = !empty($data) || !empty($map->relate_posts);
 						$container_style = "width: 100%; height: 100%;";
 
 						if($have_related_posts) {
-							$map_style = "width: 70%; height: 100%;";
-							$popup_style = "width: 30%; height: 100%;";
+							$map_style = "width: 70%; height: calc(100% - 35px);";
+							$popup_style = "width: 30%; height: calc(100% - 35px);";
 						} else {
-							$map_style = $container_style;
+							$map_style = "width: 100%; height: calc(100% - 35px);";
 							$popup_style = $container_style;
 						}
 
@@ -319,27 +322,27 @@ class Jeo {
 
 	function restrict_story_map_block_count() {
 		global $post, $parent_file, $typenow, $current_screen, $pagenow;
-	
+
 		$post_type = NULL;
-	
+
 		if($post && (property_exists($post, 'post_type') || method_exists($post, 'post_type')))
 			$post_type = $post->post_type;
-	
+
 		if(empty($post_type) && !empty($current_screen) && (property_exists($current_screen, 'post_type') || method_exists($current_screen, 'post_type')) && !empty($current_screen->post_type))
 			$post_type = $current_screen->post_type;
-	
+
 		if(empty($post_type) && !empty($typenow))
 			$post_type = $typenow;
-	
+
 		if(empty($post_type) && function_exists('get_current_screen'))
 			$post_type = get_current_screen();
-	
+
 		if(empty($post_type) && isset($_REQUEST['post']) && !empty($_REQUEST['post']) && function_exists('get_post_type') && $get_post_type = get_post_type((int)$_REQUEST['post']))
 			$post_type = $get_post_type;
-	
+
 		if(empty($post_type) && isset($_REQUEST['post_type']) && !empty($_REQUEST['post_type']))
 			$post_type = sanitize_key($_REQUEST['post_type']);
-	
+
 		if(empty($post_type) && 'edit.php' == $pagenow)
 			$post_type = 'post';
 

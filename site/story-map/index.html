@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>Story Map - JEO</title>
+  <link rel="stylesheet" href="../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Story Map";
+    var mkdocs_page_input_path = "story-map.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> JEO</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="..">Home</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">JEO</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Story Map</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="story-map">Story Map</h1>
+<p>Story Map is a way of making an interactive storytelling with customized maps and layers. You are able to select specific locations and related layers and texts to these locations. This will generate a map that, when the page is scrolled, will change from one location/layer/text to another. This group of location, layer and text are called <strong>Slide</strong>.</p>
+<h2 id="creating-a-story-map">Creating a Story Map</h2>
+<p>Story Map is a custom post type in JEO Plugin. When creating one, you'll be asked for a map. All of the layers that you are going to use in your Story Map come from this previous selected map. Also, Story Map has a <code>Navigate function</code>, which we will talk about later. This Navigate function also uses this selected map to work.</p>
+<p><img alt="Story Map edit" src="../img/story-map-edit.png" /></p>
+<h3 id="story-settings">Story settings</h3>
+<p>Here you can set a description for your story map which will be shown at the beginning of the post, with the title and publish date. You can also define whether or not your story map will have an introduction and a <code>Navigate map button</code>.</p>
+<p><strong>All the text fields has a buit-in Rich Text Editor. This means that you can put bold text, links, lists, etc inside your text field.</strong></p>
+<p><code>Navigate map button</code> appears at the end of a Story Map and allows the user to navigate through the map. This map will follow all the settings of the previous selected.</p>
+<p><img alt="Story Map edit" src="../img/story-map-edit2.png" /></p>
+<h3 id="slides-settings">Slides settings</h3>
+<p>A Story Map slide contains a title, content, location and selected layers (The order of the layers will always follow the map layers order that were defined when creating this map). You can remove a slide by clicking on <strong>Remove</strong> button, preview the map in a slide clicking on <strong>Preview</strong> button, and set the location to the current slide clicking on <strong>Lock current spot</strong> button. You can see what's the current slide at the top-right side of the block.</p>
+<p>You can pick a location to a slide by dragging the map with left mouse button and changing its peaching and bearing by dragging the map with right mouse button.</p>
+<p><img alt="Story Map edit" src="../img/story-map-edit3.png" /></p>
+<p><img alt="Story Map edit" src="../img/story-map-edit4.png" /></p>
+<p>Slides can be rearranged by clicking on <code>=</code> icon and dragging it to put the slide in another position.</p>
+<p><img alt="Story Map edit" src="../img/story-map-edit5.png" /></p>
+<h2 id="looking-at-a-story-map">Looking at a Story Map</h2>
+<p>This is how a Story Map look in a post:</p>
+<p><img alt="Story Map edit" src="../img/story-map-edit6.png" /></p>
+<p>Clicking on <strong>START</strong> will take the user to the first slide. Clicking on <strong>skip intro</strong> will take the user to the map itself so they can navigate through it (this button is only available if the navigate setting is enabled in story map settings). These buttons, the title, description and publish date only appears if <code>Shows story map introduction</code> is enabled. If it isn't, the story map starts on the first slide.</p>
+<p><img alt="Story Map edit" src="../img/story-map-edit7.png" /></p>
+<p>While the page is scrolled, the current slide changes to the next one and the map do a transition to the next location and change its layers. At the end of the storytelling, if the correct setting is enabled, a <strong>NAVIGATE THE MAP</strong> button will shows up. Clicking on it will take the user to the map itself and allowing they to interact with it.</p>
+<p><img alt="Story Map edit" src="../img/story-map-edit8.png" /></p>
+<p><img alt="Story Map edit" src="../img/story-map-edit9.png" /></p>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+
+</body>
+</html>

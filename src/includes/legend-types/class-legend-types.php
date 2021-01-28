@@ -121,6 +121,9 @@ class Legend_Types {
 
 	public function enqueue_scripts() {
 		// TODO: load only when needed
+		if(!$this->should_load_assets()) {
+			return;
+		}
 
 		foreach ( $this->get_registered_legend_types() as $slug => $legend_type ) {
 			$deps = isset( $legend_type['dependecies'] ) ? $legend_type['dependecies'] : [];

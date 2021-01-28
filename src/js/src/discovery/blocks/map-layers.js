@@ -76,6 +76,10 @@ class MapLayers extends Component {
 			mapsUrl.searchParams.append( key, params[ key ] )
 		);
 
+		if("languageParams" in window){
+			mapsUrl.searchParams.append( 'lang', languageParams.currentLang );
+		}
+
 		return fetch( mapsUrl )
 			.then( ( response ) => response.json() )
 			.then( ( maps ) => {
@@ -85,6 +89,10 @@ class MapLayers extends Component {
 						const mapLayerApiUrl = new URL(
 							jeoMapVars.jsonUrl + 'map-layer/' + layer.id
 						);
+
+						if("languageParams" in window){
+							mapLayerApiUrl.searchParams.append( 'lang', languageParams.currentLang );
+						}
 
 						return fetch( mapLayerApiUrl )
 							.then( ( data ) => data.json() )
@@ -479,7 +487,7 @@ class MapLayers extends Component {
 		) : null;
 
 		return (
-			<div className="maps-tab">
+			<div className="maps-tab" style={ this.props.style }>
 				<Search searchPlaceholder="Search map" update={ this.updateMaps } />
 
 				<div className="selected-layers">
