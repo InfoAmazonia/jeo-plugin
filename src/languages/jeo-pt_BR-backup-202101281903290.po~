@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-01-28 19:06+0000\n"
+"PO-Revision-Date: 2021-01-28 19:01+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
@@ -93,10 +93,6 @@ msgstr "Chave de API*"
 msgid "Apply"
 msgstr "Aplicar"
 
-#: js/build/discovery.js:8404 js/src/discovery/blocks/map-layers.js:551
-msgid "Apply changes"
-msgstr ""
-
 #: templates/map-content-layers-list.php:6
 #: templates/map-content-layers-list.php:8
 msgid "Attribution: "
@@ -142,9 +138,7 @@ msgstr "Categorias"
 msgid "Center"
 msgstr "Centro"
 
-#: js/build/discovery.js:8395 js/build/discovery.js:8401
-#: js/src/discovery/blocks/map-layers.js:530
-#: js/src/discovery/blocks/map-layers.js:547
+#: js/build/discovery.js:8395 js/src/discovery/blocks/map-layers.js:530
 msgid "Changes applied"
 msgstr "Mundanças aplicadas"
 
@@ -807,10 +801,6 @@ msgstr ""
 msgid "No layers have been selected for this map."
 msgstr ""
 
-#: js/build/discovery.js:8399 js/src/discovery/blocks/map-layers.js:541
-msgid "No layers selected"
-msgstr "Nenhuma camada selecionada"
-
 #: includes/maps/class-maps.php:34
 msgid "No map found"
 msgstr ""
@@ -930,7 +920,7 @@ msgstr ""
 
 #: includes/settings/settings-page.php:282
 msgid "Save Changes"
-msgstr "Salvar mudanças"
+msgstr ""
 
 #: js/build/postsSidebar.js:22145 js/src/posts-sidebar/geo-posts.js:386
 msgid "Save new point"
@@ -954,17 +944,9 @@ msgstr ""
 msgid "Search layers"
 msgstr ""
 
-#: js/build/discovery.js:8363 js/src/discovery/blocks/map-layers.js:491
-msgid "Search map"
-msgstr "Buscar mapa"
-
 #: includes/maps/class-maps.php:33
 msgid "Search maps"
 msgstr ""
-
-#: js/build/discovery.js:9442
-msgid "Search story"
-msgstr "Buscar história"
 
 #: includes/storymap/class-storymap.php:30
 msgid "Search Story Maps"
@@ -987,11 +969,10 @@ msgstr ""
 msgid "See preview"
 msgstr ""
 
-#: js/build/discovery.js:8397 js/build/mapBlocks.js:36951
-#: js/build/mapsSidebar.js:34172 js/src/discovery/blocks/map-layers.js:536
+#: js/build/mapBlocks.js:36951 js/build/mapsSidebar.js:34172
 #: js/src/map-blocks/layers-settings.js:309
 msgid "Selected layers"
-msgstr "Camadas selecionadas"
+msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:73
 msgid ""
