@@ -84,6 +84,7 @@ class Jeo {
 			// this fixes the plugin renaming problem
 			basename( plugin_dir_path(  dirname( __FILE__ , 1 ) ) ) . '/languages',
 		);
+
 	}
 
 	public function register_assets() {
@@ -98,7 +99,7 @@ class Jeo {
 			$asset_file['version']
 		);
 
-		wp_set_script_translations('jeo-js', 'jeo');
+		wp_set_script_translations('jeo-js', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
 
 		wp_localize_script(
@@ -143,7 +144,7 @@ class Jeo {
 			$map_blocks_assets['version']
 		);
 
-		wp_set_script_translations('jeo-map-blocks', 'jeo');
+		wp_set_script_translations('jeo-map-blocks', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
 	}
 
@@ -181,13 +182,13 @@ class Jeo {
 			wp_enqueue_script( 'mapboxgl-loader' );
 			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'jquery', 'wp-element' ), false, true );
 
-			wp_set_script_translations('jeo-map', 'jeo');
+			wp_set_script_translations('jeo-map', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
 
 			$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
 			wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'], array( 'wp-element', 'mapboxgl-loader', 'jquery', 'jeo-map' ) ), false, true);
-			wp_set_script_translations('discovery-map', 'jeo');
 
+			wp_set_script_translations('discovery-map', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
 
 			// Check if sites uses WPML
