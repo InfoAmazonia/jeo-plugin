@@ -35,7 +35,7 @@ export default function MapPanel( {
 	return (
 		<Panel
 			name="map-settings"
-			title={ __( 'Map settings' ) }
+			title={ __( 'Map settings', 'jeo' ) }
 			className="jeo-map-panel"
 		>
 			<MapSettings attributes={ attributes } setAttributes={ setAttributes } />

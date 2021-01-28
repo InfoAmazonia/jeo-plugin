@@ -527,7 +527,7 @@ class MapLayers extends Component {
 						</div>
 
 						<div className="status-message">
-							{ isApplied ? __( 'Changes applied' ) : __( 'Not applied' ) }
+							{ isApplied ? __( 'Changes applied', 'jeo' ) : __( 'Not applied', 'jeo' ) }
 						</div>
 					</div>
 
