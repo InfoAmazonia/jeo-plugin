@@ -614,7 +614,7 @@ class Stories extends Component {
 		return (
 			<div className="stories-tab" style={ this.props.style }>
 				<Search
-					searchPlaceholder="Search story"
+					searchPlaceholder={ __("Search story", "jeo") }
 					update={ this.updateStories }
 					searchField={ this.props.queryParams.search?? "" }
 				/>
