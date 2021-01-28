@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-01-28 19:06+0000\n"
+"PO-Revision-Date: 2021-01-28 19:24+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
@@ -95,7 +95,7 @@ msgstr "Aplicar"
 
 #: js/build/discovery.js:8404 js/src/discovery/blocks/map-layers.js:551
 msgid "Apply changes"
-msgstr ""
+msgstr "Aplicar mudanças"
 
 #: templates/map-content-layers-list.php:6
 #: templates/map-content-layers-list.php:8
@@ -361,15 +361,15 @@ msgstr ""
 
 #: includes/settings/settings-page.php:101
 msgid "Ex. 5a03fe2..."
-msgstr ""
+msgstr "Ex. 5a03fe2..."
 
 #: includes/settings/settings-page.php:62
 msgid "Ex. pk.eyJ3..."
-msgstr ""
+msgstr "Ex. pk.eyJ3..."
 
 #: includes/settings/settings-page.php:76
 msgid "Ex. sk.eyJ1Ij..."
-msgstr ""
+msgstr "Ex. sk.eyJ1Ij..."
 
 #: js/build/layersSidebar.js:31749
 #: js/src/layers-sidebar/interaction-settings.js:140
@@ -479,42 +479,42 @@ msgstr ""
 
 #: js/build/mapsSidebar.js:35245 js/src/maps-sidebar/maps-sidebar.js:209
 msgid "Initial Zoom"
-msgstr ""
+msgstr "Zoom inicial"
 
 #: js/build/mapBlocks.js:37657 js/build/mapsSidebar.js:34637
 #: js/src/map-blocks/map-settings.js:80
 msgid "Initial zoom"
-msgstr ""
+msgstr "Zoom inicial"
 
 #: js/build/mapBlocks.js:37329 js/build/mapBlocks.js:38655
 #: js/src/map-blocks/map-editor.js:114 js/src/map-blocks/storymap-editor.js:688
 msgid "Insert a map from the library"
-msgstr ""
+msgstr "Insira um mapa da biblioteca"
 
 #: js/build/layersSidebar.js:31884
 #: js/src/layers-sidebar/interactions-settings.js:94
 msgid "Interactions"
-msgstr ""
+msgstr "Interações"
 
 #. Description of the plugin
 msgid "Interactive Map blocks for Wordpress Gutenberg"
-msgstr ""
+msgstr "Mapas interativos para Wordpress"
 
 #: includes/menu/class-menu.php:15
 msgid "Jeo"
-msgstr ""
+msgstr "Jeo"
 
 #: includes/layers/class-layers.php:42
 msgid "JEO Layers"
-msgstr ""
+msgstr "Camadas JEO"
 
 #: js/build/mapBlocks.js:35677 js/src/map-blocks/index.js:12
 msgid "JEO Map"
-msgstr ""
+msgstr "Mapa JEO"
 
 #: includes/maps/class-maps.php:47
 msgid "JEO Maps"
-msgstr ""
+msgstr "Mapas JEO"
 
 #: js/build/mapBlocks.js:35697 js/src/map-blocks/index.js:29
 msgid "JEO One-time Map"
@@ -522,20 +522,20 @@ msgstr ""
 
 #: includes/settings/settings-page.php:4
 msgid "Jeo Settings"
-msgstr ""
+msgstr "Configurações do JEO"
 
 #: includes/storymap/class-storymap.php:44
 msgid "JEO Story Map"
-msgstr ""
+msgstr "Mapa de História do JEO"
 
 #. Plugin Name of the plugin
 msgid "JEO WP"
-msgstr ""
+msgstr "JEO WP"
 
 #: js/build/mapBlocks.js:39123 js/build/mapsSidebar.js:35732
 #: js/src/posts-selector/meta-selector.js:32
 msgid "Key"
-msgstr ""
+msgstr "Chave"
 
 #: js/build/layersSidebar.js:33326 js/build/layersSidebar.js:33714
 #: js/build/layersSidebar.js:34027 js/build/layersSidebar.js:34064
@@ -544,49 +544,49 @@ msgstr ""
 #: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:155
 #: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:184
 msgid "Label"
-msgstr ""
+msgstr "Rótulo"
 
 #: includes/geocode/class-geocode-handler.php:167 js/build/mapBlocks.js:37634
 #: js/build/mapsSidebar.js:34614 js/src/map-blocks/map-settings.js:58
 msgid "Latitude"
-msgstr ""
+msgstr "Latitude"
 
 #: includes/layers/class-layers.php:21
 msgid "Layer"
-msgstr ""
+msgstr "Camada"
 
 #: js/src/map-blocks/layers-table.js:33
 msgid "Layer Name"
-msgstr ""
+msgstr "Nome da camada"
 
 #: includes/layers/class-layers.php:33
 msgid "Layer published privately."
-msgstr ""
+msgstr "Camada publicada em privado."
 
 #: includes/layers/class-layers.php:32
 msgid "Layer published."
-msgstr ""
+msgstr "Camada publicada."
 
 #: includes/layers/class-layers.php:34
 msgid "Layer reverted to draft."
-msgstr ""
+msgstr "Camada movida para rascunho."
 
 #: includes/layers/class-layers.php:35
 msgid "Layer scheduled."
-msgstr ""
+msgstr "Camada agendada."
 
 #: js/src/map-blocks/layers-table.js:32
 msgid "Layer Type"
-msgstr ""
+msgstr "Tipo da camada"
 
 #: js/build/mapBlocks.js:36861 js/build/mapsSidebar.js:34082
 #: js/src/map-blocks/layers-settings.js:178
 msgid "Layer type"
-msgstr ""
+msgstr "Tipo da camada"
 
 #: includes/layers/class-layers.php:235
 msgid "Layer type not registered"
-msgstr ""
+msgstr "Tipo de camada não registrado"
 
 #: includes/layers/class-layers.php:109
 msgid "Layer type-specific options"
@@ -594,35 +594,35 @@ msgstr ""
 
 #: includes/layers/class-layers.php:36
 msgid "Layer updated."
-msgstr ""
+msgstr "Camada atualizada."
 
 #: includes/layers/class-layers.php:20 includes/layers/class-layers.php:31
 msgid "Layers"
-msgstr ""
+msgstr "Camadas"
 
 #: js/build/discovery.js:7763 js/src/discovery/blocks/map-item.js:95
 msgid "layers"
-msgstr ""
+msgstr "camadas"
 
 #: js/build/mapBlocks.js:36555 js/build/mapsSidebar.js:33776
 #: js/src/map-blocks/layers-settings-modal.js:16
 msgid "Layers settings"
-msgstr ""
+msgstr "Configuração de camadas"
 
 #: js/build/layersSidebar.js:32890
 #: js/src/posts-sidebar/legends-editor/editors/barscale.js:136
 msgid "Left Label"
-msgstr ""
+msgstr "Rótulo direito"
 
 #: js/build/discovery.js:9997 js/build/layersSidebar.js:32470
 #: js/src/layers-sidebar/layers-sidebar.js:293
 msgid "Legend"
-msgstr ""
+msgstr "Legenda"
 
 #: includes/layers/class-layers.php:186 js/build/layersSidebar.js:34226
 #: js/src/posts-sidebar/legends-editor/legend-editor.js:73
 msgid "Legend title"
-msgstr ""
+msgstr "Título da legenda"
 
 #: includes/layers/class-layers.php:162
 msgid "Legend type-specific options"
@@ -643,29 +643,29 @@ msgstr ""
 #: js/build/mapBlocks.js:36346 js/build/mapsSidebar.js:33567
 #: js/src/map-blocks/layer-settings.js:182
 msgid "Load interactions"
-msgstr ""
+msgstr "Carregar interações"
 
 #: js/src/map-blocks/layers-table.js:22
 msgid "Loading Layers Data"
-msgstr ""
+msgstr "Carregando dados das camadas"
 
 #: js/build/mapBlocks.js:36511 js/build/mapsSidebar.js:33732
 #: js/src/map-blocks/layers-library.js:20 js/src/map-blocks/layers-panel.js:29
 msgid "Loading layers data..."
-msgstr ""
+msgstr "Carregando dados das camadas"
 
 #: js/build/mapBlocks.js:38554 js/src/map-blocks/storymap-editor.js:537
 msgid "Lock current spot"
-msgstr ""
+msgstr "Marcar ponto atual"
 
 #: includes/geocode/class-geocode-handler.php:177 js/build/mapBlocks.js:37645
 #: js/build/mapsSidebar.js:34625 js/src/map-blocks/map-settings.js:68
 msgid "Longitude"
-msgstr ""
+msgstr "Longitude"
 
 #: includes/maps/class-maps.php:26 includes/settings/settings-page.php:21
 msgid "Map"
-msgstr ""
+msgstr "Mapa"
 
 #: js/build/discovery.js:8718 js/build/mapBlocks.js:36509
 #: js/build/mapsSidebar.js:33730 js/src/discovery/blocks/sidebar.js:146
@@ -709,7 +709,7 @@ msgstr ""
 
 #: js/build/mapBlocks.js:38653 js/src/map-blocks/storymap-editor.js:679
 msgid "Map: "
-msgstr ""
+msgstr "Mapa:"
 
 #: includes/settings/settings-page.php:54
 msgid "Mapbox"
@@ -725,42 +725,42 @@ msgstr ""
 
 #: js/build/mapsSidebar.js:35281 js/src/maps-sidebar/maps-sidebar.js:249
 msgid "Max Zoom"
-msgstr ""
+msgstr "Zoom máximo"
 
 #: js/build/mapBlocks.js:37691 js/build/mapsSidebar.js:34671
 #: js/src/map-blocks/map-settings.js:114
 msgid "Max zoom"
-msgstr ""
+msgstr "Zoom máximo"
 
 #: includes/maps/class-maps.php:173
 msgid "Maximum date for related posts"
-msgstr ""
+msgstr "Data máxima para posts relacionados"
 
 #: includes/maps/class-maps.php:289
 msgid "Maximum zoom level"
-msgstr ""
+msgstr "Nível máximo de zoom"
 
 #: js/build/mapBlocks.js:38911 js/build/mapsSidebar.js:35520
 #: js/src/posts-selector/index.js:84
 msgid "Meta queries"
-msgstr ""
+msgstr "Meta queries"
 
 #: js/build/mapsSidebar.js:35263 js/src/maps-sidebar/maps-sidebar.js:229
 msgid "Min Zoom"
-msgstr ""
+msgstr "Zoom mínimo"
 
 #: js/build/mapBlocks.js:37674 js/build/mapsSidebar.js:34654
 #: js/src/map-blocks/map-settings.js:97
 msgid "Min zoom"
-msgstr ""
+msgstr "Zoom mínimo"
 
 #: includes/maps/class-maps.php:177
 msgid "Minimum date for related posts"
-msgstr ""
+msgstr "Data mínima para posts relacionados"
 
 #: includes/maps/class-maps.php:281
 msgid "Minimum Zoom level"
-msgstr ""
+msgstr "Nível mínimo de zoom"
 
 #: includes/geocode/class-geocode-handler.php:155
 msgid ""
@@ -771,41 +771,41 @@ msgstr ""
 #: js/build/mapBlocks.js:36891 js/build/mapsSidebar.js:34112
 #: js/src/map-blocks/layers-settings.js:232
 msgid "New Layer"
-msgstr ""
+msgstr "Nova camada"
 
 #: includes/layers/class-layers.php:25
 msgid "New layer"
-msgstr ""
+msgstr "Nova camada"
 
 #: includes/maps/class-maps.php:30
 msgid "New map"
-msgstr ""
+msgstr "Novo mapa"
 
 #: includes/storymap/class-storymap.php:27
 msgid "New Story Map"
-msgstr ""
+msgstr "Novo Mapa de História"
 
 #: js/build/layersSidebar.js:31628
 #: js/src/layers-sidebar/interaction-settings.js:20
 msgid "No"
-msgstr ""
+msgstr "Não"
 
 #: includes/layers/class-layers.php:29
 msgid "No layer found"
-msgstr ""
+msgstr "Nenhuma camada encontrada"
 
 #: includes/layers/class-layers.php:30
 msgid "No layer found in the trash"
-msgstr ""
+msgstr "Nenhuma camada encontrada na lixeira"
 
 #: js/build/mapBlocks.js:36953 js/build/mapsSidebar.js:34174
 #: js/src/map-blocks/layers-settings.js:313
 msgid "No layers have been added to this map."
-msgstr ""
+msgstr "Nenhuma layer foi adicionada para esse mapa."
 
 #: js/src/map-blocks/layers-table.js:25
 msgid "No layers have been selected for this map."
-msgstr ""
+msgstr "Nenhuma layer foi selecionada para esse mapa."
 
 #: js/build/discovery.js:8399 js/src/discovery/blocks/map-layers.js:541
 msgid "No layers selected"
@@ -813,15 +813,15 @@ msgstr "Nenhuma camada selecionada"
 
 #: includes/maps/class-maps.php:34
 msgid "No map found"
-msgstr ""
+msgstr "Nenhum mapa encontrado"
 
 #: includes/maps/class-maps.php:35
 msgid "No map found in the trash"
-msgstr ""
+msgstr "Nenhum mapa encontrado na lixeira"
 
 #: js/build/postsSidebar.js:22167 js/src/posts-sidebar/geo-posts.js:423
 msgid "No points"
-msgstr ""
+msgstr "Nenhum pontos"
 
 #: includes/storymap/class-storymap.php:31
 msgid "No Story Map found"
@@ -837,59 +837,61 @@ msgstr ""
 
 #: js/build/discovery.js:8395 js/src/discovery/blocks/map-layers.js:530
 msgid "Not applied"
-msgstr ""
+msgstr "Não aplicado"
 
 #: js/build/layersSidebar.js:33672
 #: js/src/posts-sidebar/legends-editor/editors/icons.js:156
 msgid "Ok"
-msgstr ""
+msgstr "Ok"
 
 #: js/build/layersSidebar.js:31631
 #: js/src/layers-sidebar/interaction-settings.js:21
 msgid "On click"
-msgstr ""
+msgstr "No clique"
 
 #: js/build/layersSidebar.js:31634
 #: js/src/layers-sidebar/interaction-settings.js:22
 msgid "On hover"
-msgstr ""
+msgstr "No hover"
 
 #: js/src/map-blocks/layers-library.js:44
 msgid "or"
-msgstr ""
+msgstr "ou"
 
 #: js/build/layersSidebar.js:32304 js/src/layers-sidebar/layers-sidebar.js:74
 msgid ""
 "Please fill all required fields, you will not be able to publish or update "
 "until that."
 msgstr ""
+"Por favor preencha os campos requeridos, você não poderá publicar ou "
+"atualizar até lá."
 
 #: js/build/layersSidebar.js:33377 js/build/mapBlocks.js:38564
 #: js/src/map-blocks/storymap-editor.js:557
 #: js/src/posts-sidebar/legends-editor/editors/circle.js:219
 msgid "Preview"
-msgstr ""
+msgstr "Previsualização"
 
 #: js/build/postsSidebar.js:22127 js/src/posts-sidebar/geo-posts.js:368
 msgid "Primary"
-msgstr ""
+msgstr "Primário"
 
 #: includes/settings/settings-page.php:226
 msgid "Primary color"
-msgstr ""
+msgstr "Cor primária"
 
 #: includes/settings/settings-page.php:74
 msgid "Private API Key"
-msgstr ""
+msgstr "Chave de API privada"
 
 #: js/build/layersSidebar.js:33338
 #: js/src/posts-sidebar/legends-editor/editors/circle.js:193
 msgid "Radius"
-msgstr ""
+msgstr "Raio"
 
 #: includes/class-jeo.php:207
 msgid "Read more"
-msgstr ""
+msgstr "Ler mais"
 
 #: includes/geocode/class-geocode-handler.php:207
 msgid "Region level 1"
@@ -906,11 +908,11 @@ msgstr ""
 #: js/build/mapBlocks.js:38865 js/build/mapsSidebar.js:35474
 #: js/src/posts-selector/index.js:25
 msgid "Related posts"
-msgstr ""
+msgstr "Posts relacionados"
 
 #: js/build/postsSidebar.js:22124 js/src/posts-sidebar/geo-posts.js:363
 msgid "Relevance"
-msgstr ""
+msgstr "Relevância"
 
 #: js/build/layersSidebar.js:33016 js/build/layersSidebar.js:33366
 #: js/build/layersSidebar.js:34058 js/build/mapBlocks.js:38589
@@ -921,12 +923,12 @@ msgstr ""
 #: js/src/posts-sidebar/legends-editor/editors/circle.js:209
 #: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:175
 msgid "Remove"
-msgstr ""
+msgstr "Remover"
 
 #: js/build/layersSidebar.js:32906
 #: js/src/posts-sidebar/legends-editor/editors/barscale.js:150
 msgid "Right Label"
-msgstr ""
+msgstr "Rótulo direito"
 
 #: includes/settings/settings-page.php:282
 msgid "Save Changes"
@@ -934,7 +936,7 @@ msgstr "Salvar mudanças"
 
 #: js/build/postsSidebar.js:22145 js/src/posts-sidebar/geo-posts.js:386
 msgid "Save new point"
-msgstr ""
+msgstr "Salvar novo ponto"
 
 #: js/build/mapBlocks.js:37708 js/build/mapsSidebar.js:34688
 #: js/src/map-blocks/map-settings.js:131
@@ -944,15 +946,15 @@ msgstr ""
 #: js/build/mapBlocks.js:39400 js/build/postsSidebar.js:21631
 #: js/src/posts-sidebar/geo-auto-complete.js:80
 msgid "Search address"
-msgstr ""
+msgstr "Procurar endereço"
 
 #: js/src/map-blocks/layers-library.js:39
 msgid "Search for layers "
-msgstr ""
+msgstr "Procurar por camadas"
 
 #: includes/layers/class-layers.php:28 js/src/map-blocks/layers-library.js:40
 msgid "Search layers"
-msgstr ""
+msgstr "Procurar camadas"
 
 #: js/build/discovery.js:8363 js/src/discovery/blocks/map-layers.js:491
 msgid "Search map"
@@ -960,7 +962,7 @@ msgstr "Buscar mapa"
 
 #: includes/maps/class-maps.php:33
 msgid "Search maps"
-msgstr ""
+msgstr "Procurar mapas"
 
 #: js/build/discovery.js:9442
 msgid "Search story"
@@ -968,11 +970,11 @@ msgstr "Buscar história"
 
 #: includes/storymap/class-storymap.php:30
 msgid "Search Story Maps"
-msgstr ""
+msgstr "Procurar Mapas de História "
 
 #: js/build/postsSidebar.js:22130 js/src/posts-sidebar/geo-posts.js:369
 msgid "Secondary"
-msgstr ""
+msgstr "Secundário"
 
 #: includes/settings/settings-page.php:209
 msgid "Secondary Typography name"
@@ -985,7 +987,7 @@ msgstr ""
 #: js/build/layersSidebar.js:33372
 #: js/src/posts-sidebar/legends-editor/editors/circle.js:213
 msgid "See preview"
-msgstr ""
+msgstr "Ver prévisualização"
 
 #: js/build/discovery.js:8397 js/build/mapBlocks.js:36951
 #: js/build/mapsSidebar.js:34172 js/src/discovery/blocks/map-layers.js:536
@@ -1001,18 +1003,18 @@ msgstr ""
 #: includes/settings/class-settings.php:89 js/build/layersSidebar.js:32461
 #: js/src/layers-sidebar/layers-sidebar.js:272
 msgid "Settings"
-msgstr ""
+msgstr "Configurações"
 
 #: js/build/mapBlocks.js:36335 js/build/mapBlocks.js:36339
 #: js/build/mapsSidebar.js:33556 js/build/mapsSidebar.js:33560
 #: js/src/map-blocks/layer-settings.js:165
 #: js/src/map-blocks/layer-settings.js:172
 msgid "Should be displayed by default."
-msgstr ""
+msgstr "Deve ser exibido por padrão"
 
 #: includes/maps/class-maps.php:245
 msgid "Show all posts on map"
-msgstr ""
+msgstr "Mostrar todos os posts no mapa"
 
 #: js/build/discovery.js:9474
 msgid "Show filters"
@@ -1021,30 +1023,30 @@ msgstr "Exibir filtros"
 #: js/build/mapBlocks.js:36353 js/build/mapsSidebar.js:33574
 #: js/src/map-blocks/layer-settings.js:197
 msgid "Show legend"
-msgstr ""
+msgstr "Motrar legenda"
 
 #: js/build/layersSidebar.js:31737
 #: js/src/layers-sidebar/interaction-settings.js:121
 msgid "Show popup?"
-msgstr ""
+msgstr "Mostrar popup?"
 
 #: js/build/mapBlocks.js:38301 js/src/map-blocks/storymap-editor.js:218
 msgid "Show story map introduction"
-msgstr ""
+msgstr "Mostrar introdução da história"
 
 #: js/build/mapBlocks.js:38626 js/src/map-blocks/storymap-editor.js:644
 msgid "Slide "
-msgstr ""
+msgstr "Slide"
 
 #: js/build/mapBlocks.js:38334 js/build/mapBlocks.js:38617
 #: js/src/map-blocks/storymap-editor.js:256
 #: js/src/map-blocks/storymap-editor.js:630
 msgid "Slides settings"
-msgstr ""
+msgstr "Configuração de slides"
 
 #: templates/discovery.php:9
 msgid "Sorry!"
-msgstr ""
+msgstr "Desculpe!"
 
 #: js/build/layersSidebar.js:31249
 #: js/src/layers-sidebar/attribution-settings.js:9
@@ -1058,16 +1060,16 @@ msgstr ""
 #: js/build/layersSidebar.js:31488
 #: js/src/layers-sidebar/carto-integration.js:122
 msgid "SQL Query"
-msgstr ""
+msgstr "Query SQL"
 
 #: includes/layers/class-layers.php:210
 msgid "SQL query"
-msgstr ""
+msgstr "Query SQL"
 
 #: js/build/mapBlocks.js:38898 js/build/mapsSidebar.js:35507
 #: js/src/posts-selector/index.js:67
 msgid "Start date"
-msgstr ""
+msgstr "Data de início"
 
 #: js/build/discovery.js:8697 js/src/discovery/blocks/sidebar.js:118
 msgid "Stories"
@@ -1077,7 +1079,7 @@ msgstr "Histórias"
 #: includes/storymap/class-storymap.php:23 js/build/mapBlocks.js:35857
 #: js/src/map-blocks/index.js:168
 msgid "Story Map"
-msgstr ""
+msgstr "Mapa de História"
 
 #: includes/storymap/class-storymap.php:35
 msgid "Story Map published privately."
@@ -1101,23 +1103,23 @@ msgstr ""
 
 #: includes/storymap/class-storymap.php:33
 msgid "Story Maps"
-msgstr ""
+msgstr "Mapas de História"
 
 #: js/build/mapBlocks.js:38282 js/build/mapBlocks.js:38321
 #: js/src/map-blocks/storymap-editor.js:195
 #: js/src/map-blocks/storymap-editor.js:242
 msgid "Story settings"
-msgstr ""
+msgstr "Configurações da história"
 
 #: js/build/mapBlocks.js:38778 js/build/mapsSidebar.js:34802
 #: js/src/map-blocks/utils.js:13
 msgid "Swappable"
-msgstr ""
+msgstr "Trocável"
 
 #: js/build/mapBlocks.js:38779 js/build/mapsSidebar.js:34803
 #: js/src/map-blocks/utils.js:14
 msgid "Switchable"
-msgstr ""
+msgstr "Comutável"
 
 #: js/build/discovery.js:9491 js/build/mapBlocks.js:38886
 #: js/build/mapsSidebar.js:35495 js/src/posts-selector/index.js:54
@@ -1126,7 +1128,7 @@ msgstr "Tags"
 
 #: includes/settings/settings-page.php:233
 msgid "Text over primary color"
-msgstr ""
+msgstr "Texto sob cor primária"
 
 #: includes/layers/class-layers.php:92
 msgid "The layer attribution. A text or HTML code with a link"
@@ -1134,7 +1136,7 @@ msgstr ""
 
 #: includes/maps/class-maps.php:106 includes/maps/class-maps.php:124
 msgid "The Layer ID"
-msgstr ""
+msgstr "ID da camada"
 
 #: includes/layers/class-layers.php:80
 msgid "The layer type"
