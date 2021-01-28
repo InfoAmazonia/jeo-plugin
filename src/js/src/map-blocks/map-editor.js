@@ -103,7 +103,7 @@ const MapEditor = ( {
 								} );
 							} }
 						>
-							<em>{ __( '(Select another map)' ) }</em>
+							<em>{ __( '(Select another map)', 'jeo' ) }</em>
 						</Button>
 					</div>
 				</Fragment>
@@ -111,7 +111,7 @@ const MapEditor = ( {
 			{ ! attributes.map_id && (
 				<Fragment>
 					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
-						{ __( 'Insert a map from the library' ) + ':' }
+						{ __( 'Insert a map from the library', 'jeo' ) + ':' }
 					</label>
 					<JeoAutosuggest
 						inputProps={ {
@@ -134,7 +134,7 @@ const MapEditor = ( {
 								setAttributes( { ...attributes, map_id: previous_map } );
 							} }
 						>
-							{ __( 'Cancel' ) }
+							{ __( 'Cancel', 'jeo' ) }
 						</Button>
 					) }
 				</Fragment>

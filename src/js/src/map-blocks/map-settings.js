@@ -52,10 +52,10 @@ export default ( { attributes, setAttributes } ) => {
 		<Fragment>
 			<form className="jeo-map-settings">
 				<section className="center">
-					<h3>{ __( 'Center' ) }</h3>
+					<h3>{ __( 'Center', 'jeo' ) }</h3>
 					<TextControl
 						type="number"
-						label={ __( 'Latitude' ) }
+						label={ __( 'Latitude', 'jeo' ) }
 						value={ centerLat }
 						onChange={ ( value ) => {
 							editingMap.current = true;
@@ -65,7 +65,7 @@ export default ( { attributes, setAttributes } ) => {
 					/>
 					<TextControl
 						type="number"
-						label={ __( 'Longitude' ) }
+						label={ __( 'Longitude', 'jeo' ) }
 						value={ centerLon }
 						onChange={ ( value ) => {
 							editingMap.current = true;
@@ -75,9 +75,9 @@ export default ( { attributes, setAttributes } ) => {
 					/>
 				</section>
 				<section className="zoom">
-					<h3>{ __( 'Zoom' ) }</h3>
+					<h3>{ __( 'Zoom', 'jeo' ) }</h3>
 					<RangeControl
-						label={ __( 'Initial zoom' ) }
+						label={ __( 'Initial zoom', 'jeo' ) }
 						initialPosition={ 11 }
 						min={ minZoom }
 						max={ maxZoom }
@@ -94,7 +94,7 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<RangeControl
-						label={ __( 'Min zoom' ) }
+						label={ __( 'Min zoom', 'jeo' ) }
 						initialPosition={ 0 }
 						min={ 0 }
 						max={ initialZoom }
@@ -111,7 +111,7 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<RangeControl
-						label={ __( 'Max zoom' ) }
+						label={ __( 'Max zoom', 'jeo' ) }
 						initialPosition={ 20 }
 						min={ initialZoom }
 						max={ 20 }
@@ -122,13 +122,13 @@ export default ( { attributes, setAttributes } ) => {
 							if ( ! newValue ) {
 								newValue = initialZoom;
 							}
-							
+
 							window.max_zoom = newValue;
 							attributeUpdater( 'max_zoom' )( newValue );
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Scroll zoom on post' ) }
+						label={ __( 'Scroll zoom on post', 'jeo' ) }
 						checked={ ! attributes.disable_scroll_zoom }
 						onChange={ () => {
 							attributeUpdater( 'disable_scroll_zoom' )(
@@ -137,7 +137,7 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Drag rotation on post' ) }
+						label={ __( 'Drag rotation on post', 'jeo' ) }
 						checked={ ! attributes.disable_drag_rotate }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_rotate' )(
@@ -146,7 +146,7 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Map navigation on post' ) }
+						label={ __( 'Map navigation on post', 'jeo' ) }
 						checked={ ! attributes.disable_drag_pan }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_pan' )(
@@ -155,7 +155,7 @@ export default ( { attributes, setAttributes } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Fullscreen button on post' ) }
+						label={ __( 'Fullscreen button on post', 'jeo' ) }
 						checked={ attributes.enable_fullscreen }
 						onChange={ () => {
 							attributeUpdater( 'enable_fullscreen' )(

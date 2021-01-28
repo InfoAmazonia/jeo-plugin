@@ -96,7 +96,7 @@ class IconEditor extends Component {
 					} )
 				}
 				<Button isSecondary isButton isLarge onClick={ this.addLabel } className="full-width-button">
-					{ __( 'Add new label' ) }
+					{ __( 'Add new label', 'jeo' ) }
 				</Button>
 			</Fragment>
 		);
@@ -153,7 +153,7 @@ class IconItem extends Component {
 								} );
 							} }
 						>
-							{ __( 'Ok' ) }
+							{ __( 'Ok', 'jeo' ) }
 						</Button>
 					</Modal>
 				) }
@@ -193,7 +193,7 @@ class IconItem extends Component {
 									</div>
 									<div className="buttons-inputs">
 										<TextControl
-											label={ __( 'Label' ) }
+											label={ __( 'Label', 'jeo' ) }
 											value={ this.state.iconData.label }
 											onChange={ ( label ) => {
 												this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );

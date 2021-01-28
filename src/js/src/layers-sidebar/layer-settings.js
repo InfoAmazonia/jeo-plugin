@@ -17,7 +17,7 @@ import { useDebounce } from 'use-debounce';
 const layerSchema = {
 	type: 'object',
 	properties: {
-		type: { title: __( 'Type' ), type: 'string' },
+		type: { title: __( 'Type', 'jeo' ), type: 'string' },
 	},
 	required: [ 'type' ],
 };

@@ -17,7 +17,7 @@ const LayersLibrary = ( {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 
 	if ( loadingLayers ) {
-		return <p>{ __( 'Loading layers data...' ) }</p>;
+		return <p>{ __( 'Loading layers data...', 'jeo' ) }</p>;
 	}
 
 	const options = loadedLayers
@@ -36,14 +36,14 @@ const LayersLibrary = ( {
 			<div className="library-controls">
 				<TextControl
 					type="search"
-					label={ __( 'Search for layers ' ) }
-					placeholder={ __( 'Search layers' ) }
+					label={ __( 'Search for layers ', 'jeo' ) }
+					placeholder={ __( 'Search layers', 'jeo' ) }
 					value={ search }
 					onChange={ setSearch }
 				/>
-				<span>{ __( 'or' ) }</span>
+				<span>{ __( 'or', 'jeo' ) }</span>
 				<Button isPrimary isLarge onClick={ () => setEditing( true ) }>
-					{ __( 'Create New Layer' ) }
+					{ __( 'Create New Layer', 'jeo' ) }
 				</Button>
 			</div>
 			<div className="available-layers">
@@ -60,7 +60,7 @@ const LayersLibrary = ( {
 							}
 						>
 							<Dashicon icon={ layer.selected ? 'yes-alt' : 'plus-alt' } />
-							{ layer.selected ? __( 'Added' ) : __( 'Add' ) }
+							{ layer.selected ? __( 'Added', 'jeo' ) : __( 'Add', 'jeo' ) }
 						</button>
 						<div className="layer-description">
 							<h3>
