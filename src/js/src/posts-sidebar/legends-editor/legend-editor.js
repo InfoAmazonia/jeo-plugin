@@ -11,7 +11,8 @@ class LegendEditor extends Component {
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
 		this.hasChanged = this.hasChanged.bind( this );
 
-		const metadata = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+		const metadata = wp.data.select('core/editor').getEditedPostAttribute('meta');
+
 		this.state = {
 			legendObject: new JeoLegend( metadata.legend_type, {
 				legend_type_options: metadata.legend_type_options,
@@ -40,11 +41,12 @@ class LegendEditor extends Component {
 	}
 
 	hasChanged( legendObject ) {
-		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject ) } );
+		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject) } );
 		this.setState( { legendObject } );
 	}
 
 	render() {
+		// console.log("Rerender called");
 		return (
 			<Fragment>
 				<CheckboxControl
@@ -53,7 +55,7 @@ class LegendEditor extends Component {
 					onChange={ () => {
 						let newMeta = window.layerFormData;
 						if ( ! newMeta ) {
-							newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+							newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
 						}
 						newMeta.use_legend = ! newMeta.use_legend;
 						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
@@ -71,7 +73,7 @@ class LegendEditor extends Component {
 					label={ __( 'Legend title', 'jeo' ) }
 					value={ this.state.legendObject.attributes.legend_title }
 					onChange={ ( value ) => {
-						const newMeta = wp.data.select( 'core/editor' ).getCurrentPost().meta;
+						const newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
 						// console.log(newMeta);
 						newMeta.legend_title = value;
 

@@ -275,10 +275,10 @@ class JeoGeocodePosts extends Component {
 	}
 
 	flyToLocation( lat, lon ) {
-		console.log([
-			parseFloat( lat ),
-			parseFloat( lon ),
-		])
+		// console.log([
+		// 	parseFloat( lat ),
+		// 	parseFloat( lon ),
+		// ])
 		this.refMap.current.leafletElement.flyTo( [
 			parseFloat( lat ),
 			parseFloat( lon ),

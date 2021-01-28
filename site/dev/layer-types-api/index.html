@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Mapbox Sources, Layers and JEO - JEO</title>
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Mapbox Sources, Layers and JEO";
+    var mkdocs_page_input_path = "dev/layer-types-api.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> JEO</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">JEO</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Mapbox Sources, Layers and JEO</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="mapbox-sources-layers-and-jeo">Mapbox Sources, Layers and JEO</h1>
+<p>How sources and layers settings works at Mapbox API and how JEO deals with them</p>
+<h2 id="table-of-contents"><a href="#table-of-contents">Table of Contents</a></h2>
+<ul>
+<li><a href="#mapbox-sources-layers-and-jeo">Mapbox Sources, Layers and JEO</a></li>
+<li><a href="#table-of-contents">Table of Contents</a></li>
+<li><a href="#introduction">Introduction</a></li>
+<li><a href="#mapbox-styles">Mapbox Styles</a></li>
+<li><a href="#mapbox-layers">Mapbox Layers</a><ul>
+<li><a href="#types-and-sources-of-a-layer">Types and Sources of a Layer</a></li>
+</ul>
+</li>
+<li><a href="#mapbox-sources">Mapbox Sources</a><ul>
+<li><a href="#on-sourcelayer-attribute-of-a-source-component">On <code>sourceLayer</code> attribute of a Source component</a></li>
+</ul>
+</li>
+<li><a href="#how-the-layer-settings-page-of-jeo-plugin-works">How the Layer Settings page of JEO Plugin works</a></li>
+<li><a href="#corner-cases-and-other-observations">Corner cases and other observations</a></li>
+</ul>
+<h2 id="introduction"><a href="#introduction">Introduction</a></h2>
+<p>This document describes how to interact with Mapbox, MapboxGL and React MapboxGL APIs. It is organised in a way that summarize key infos of those tools docs and gives examples of we are using them at our code.</p>
+<h2 id="mapbox-styles"><a href="#mapbox-styles">Mapbox Styles</a></h2>
+<p>Mapbox Maps service is composed of several APIs and every type of layer has some particularities which we must pay attention.</p>
+<p>Accordingly which Mapbox docs, a Mapbox style consists of a set of root properties, some of which describe a single global propertie and some of which contain nested properties, like version, and name and metadata and does not influence over the appearance or behavior of your map. Others, like layers and sources determine our map features and what they will look like. </p>
+<p>Those are the particularities that we will further discuss from now.</p>
+<p>More at <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec//">Mapbox Style Specification</a>.</p>
+<h2 id="mapbox-layers"><a href="#mapbox-layers">Mapbox Layers</a></h2>
+<p>A style's layers property lists all the layers available in that style.  </p>
+<h3 id="types-and-sources-of-a-layer"><a href="#types-and-sources-of-a-layer">Types and Sources of a Layer</a></h3>
+<p>The type of layer is specified by the "type" property and must be one of:</p>
+<p>For type <code>vector</code>:
+-  background;
+-  fill;
+-  line;
+-  symbol; 
+-  circle; 
+-  fill-extrusion;
+-  heatmap; 
+-  hillshade.</p>
+<p>For type <code>raster</code>:
+-  raster;</p>
+<p><strong>Except for layers of the <code>background</code> type, each layer needs to refer to a source.</strong></p>
+<p>The <code>source</code> of a layer is the name of a source description to be user for this layer.</p>
+<ul>
+<li><strong>JSON settings</strong></li>
+</ul>
+<p>Your settings of a layer should be something like:</p>
+<pre><code>    &quot;layers&quot;: [{
+        &quot;id&quot;: &quot;water&quot;,
+        &quot;source&quot;: &quot;mapbox-streets&quot;,
+        &quot;source-layer&quot;: &quot;water&quot;,
+        &quot;type&quot;: &quot;fill&quot;,
+        &quot;paint&quot;: {
+        &quot;fill-color&quot;: &quot;#00ffff&quot;
+        }
+    }]
+</code></pre>
+
+<p>More at <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/">Mapbox Spec Layers</a>.</p>
+<ul>
+<li><strong>MapboxGL React</strong></li>
+</ul>
+<p>We can set a <code>&lt;Layer&gt;</code> component like:</p>
+<pre><code>    import { Layer } from &quot;react-mapbox-gl&quot;;
+
+    ...
+
+    &lt;Layer
+        type=&quot;symbol&quot;
+        id=&quot;water&quot;,
+        source=&quot;mapbox-streets&quot;,
+        sourceLayer=&quot;water&quot;, // by definition, the source type must be vector type
+        type=&quot;fill&quot;,
+        paint={{ &quot;fill-color&quot;: &quot;#00ffff&quot; }}&gt;
+    &lt;/Layer&gt;
+
+</code></pre>
+
+<p>More at <a href="https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md#layer">react-mapbox-gl <Layer> docs</a>.</p>
+<h2 id="mapbox-sources"><a href="#mapbox-sources">Mapbox Sources</a></h2>
+<p>Sources state which data the map should display. Specify the type of source with the <code>type</code> property, which must be one of: </p>
+<ul>
+<li>vector; </li>
+<li>raster; </li>
+<li>raster-dem; </li>
+<li>geojson; </li>
+<li>image; </li>
+<li>video. </li>
+</ul>
+<p><strong>Please note that a <code>Layer</code> can have a <code>type</code> and a <code>source</code>. And a <code>Source</code> is not the same as the <code>layer source</code> and this <code>Source</code> has a <code>type</code>.</strong> </p>
+<p>Adding a <em>source isn't enough to make data appear on the map</em> because <strong>sources don't contain styling</strong> details like color or width. </p>
+<p><strong>Tiled sources, vector and raster, must specify their details according to the TileJSON specification</strong>.</p>
+<p>At JEO plugin you can supply those infos as <code>tiles</code> or as <code>url</code>.</p>
+<p>Note that the following exams is based on a <code>source vector type</code>.</p>
+<ul>
+<li><strong>JSON settings</strong></li>
+</ul>
+<p>Your settings of a source should be something like:</p>
+<ul>
+<li>
+<p><code>tiles</code>:</p>
+<pre><code>```
+    "mapbox-streets": {
+        "type": "vector",
+        "tiles": [
+            "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
+            "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
+        ],
+        "maxzoom": 14
+    }
+```
+</code></pre>
+<ul>
+<li>
+<p><code>url</code>: </p>
+<p><code>"mapbox-streets": {
+        "type": "vector",
+        "url": "http://api.example.com/tilejson.json"
+    }</code>
+More at <a href="https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md#layer">react-mapbox-gl docs</a>.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>MapboxGL React</strong></p>
+<p>We can set up a <code>&lt;Source/&gt;</code> component like:</p>
+<ul>
+<li>
+<p><code>tiles</code>:</p>
+<p>```
+    import { Source } from "react-mapbox-gl";</p>
+<pre><code>...
+
+const SOURCE_OPTIONS = {
+    "type": "vector",  // note this line
+    "tiles": [
+            "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
+            "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
+    ],
+    "maxzoom": 14
+};
+
+&lt;Source 
+    id="source_id" 
+    tileJsonSource={SOURCE_OPTIONS} 
+/&gt;
+&lt;Layer 
+    type="vector" // note this line
+    id="layer_id" 
+    sourceId="source_id" 
+/&gt;
+</code></pre>
+<p><code>``
+    -</code>url`:</p>
+<p>```
+    import { Source } from "react-mapbox-gl";</p>
+<pre><code>...
+
+const SOURCE_OPTIONS = {
+    "url": "http://api.example.com/tilejson.json",
+    "type": "vector", // note this line
+};
+
+&lt;Source 
+    id="source_id" 
+    tileJsonSource={SOURCE_OPTIONS} 
+/&gt;
+&lt;Layer 
+    type="vector" // note this line
+    id="layer_id"
+    sourceId="source_id" 
+    sourceLayer={ source_layer } // see onSource section for more info
+/&gt;
+</code></pre>
+<p>```</p>
+</li>
+</ul>
+<p>For a <code>raster</code> source, we can define like this:</p>
+<p>```
+    import { Source } from "react-mapbox-gl";</p>
+<pre><code>...
+
+const RASTER_SOURCE_OPTIONS = {
+    "type": "raster", // note this line
+    "tiles": [
+        "https://someurl.com/512/{z}/{x}/{y}",
+    ],
+    "tileSize": 512
+};
+
+&lt;Source 
+    id="source_id" 
+    tileJsonSource={RASTER_SOURCE_OPTIONS} 
+/&gt;
+&lt;Layer 
+    type="raster" // note this line
+    id="layer_id" 
+    sourceId="source_id"   
+/&gt;
+</code></pre>
+<p>```
+More about how to configure a Source component at <a href="https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md#source">react-mapbox-gl docs</a>.</p>
+</li>
+</ul>
+<h3 id="on-sourcelayer-attribute-of-a-source-component"><a href="#on-sourcelayer-attribute-of-a-source-component">On <code>sourceLayer</code> attribute of a Source component</a></h3>
+<p>If your <code>Layer</code> is of the <code>vector</code> type, your <code>sourceLayer</code> will indicate an <em>individual layer of data</em> within your <code>vector source</code>. You can learn more info on where you can find the name of this property at Mapbox <a href="https://docs.mapbox.com/help/glossary/source-layer/">source-layer glossary</a>.</p>
+<p>Otherwise, if your <code>Layer</code> have a <code>raster</code> type, this property <strong>will be ignored</strong>.</p>
+<pre><code>    &lt;Source 
+        id=&quot;source_id&quot; 
+        tileJsonSource={{
+            type: &quot;raster&quot; // note this line
+        }} 
+    /&gt;
+    &lt;Layer 
+        type=&quot;raster&quot; // note this line
+        sourceLayer=&quot;anything&quot; // this info will be ignored
+        id=&quot;layer_id&quot; 
+        sourceId=&quot;source_id&quot;   
+    /&gt;
+</code></pre>
+
+<h2 id="how-the-layer-settings-page-of-jeo-plugin-works">How the Layer Settings page of JEO Plugin works</h2>
+<h2 id="corner-cases-and-other-observations">Corner cases and other observations</h2>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>

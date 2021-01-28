@@ -19,7 +19,8 @@ class Settings {
 			'map_default_zoom' => 11,
 			'map_default_lat' => -23.54998517,
 			'map_default_lng' => -46.65599340,
-			'carto_update_time' => 'weekly'
+			'carto_update_time' => 'weekly',
+			'jeo_footer-logo' => '',
 		];
 
 		add_action('admin_menu', [$this, 'add_menu_item']);
@@ -75,6 +76,7 @@ class Settings {
 
 	public function enqueue_admin_scripts($page) {
 		if ($page == 'jeo_page_jeo-settings') {
+			wp_enqueue_media();
 			wp_enqueue_script('jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', ['jquery']);
 		}
 	}

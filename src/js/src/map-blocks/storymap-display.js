@@ -6,6 +6,8 @@ import mapboxgl from 'mapbox-gl';
 import scrollama from 'scrollama';
 import Map from './map';
 import JeoMap from '../jeo-map/class-jeo-map';
+import parse from 'html-react-parser';
+
 
 import './storymap-display.scss';
 
@@ -147,10 +149,10 @@ class StoryMapDisplay extends Component {
 			window.scrollTo ( 0, document.body.scrollHeight );
 		});
 	}
-	
+
 	componentDidUpdate() {
 		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
-	}		
+	}
 
 
     render() {
@@ -210,7 +212,7 @@ class StoryMapDisplay extends Component {
 									if ( config.showMarkers ) {
 										marker.setLngLat( chapter.location.center );
 									}
-									
+
 							})
 							.onStepExit(response => {
 								if ( response.index == 0 && response.direction == 'up' ) {
@@ -219,11 +221,12 @@ class StoryMapDisplay extends Component {
 							})
 						} }
 					>
-						{ this.state.currentChapter.selectedLayers.map(
+						{ this.state.inSlides && this.state.currentChapter.selectedLayers.map(
 							( layer ) => {
 								const layerOptions = this.props.navigateMapLayers.find(
 									( { id } ) => id === layer.id
 								);
+
 								if ( layerOptions ) {
 									return renderLayer( {
 										layer: layerOptions.meta,
@@ -232,22 +235,17 @@ class StoryMapDisplay extends Component {
 								}
 							}
 						) }
-						{
+						{ !this.state.inSlides &&
 							this.props.navigateMapLayers.map(
 								( layer ) => {
-									if ( this.state.inSlides ) {
-										return;
-									}
+									// This is will force layer reordering to invalidate applied layers cache
+									const layerCopy = {...layer};
+									layerCopy.id = layerCopy.id + `_final_batch`;
 
-									const layerOptions = this.props.navigateMapLayers.find(
-										( { id } ) => id === layer.id
-									);
-									if ( layerOptions ) {
-										return renderLayer( {
-											layer: layerOptions.meta,
-											instance: layer,
-										} );
-									}
+									return renderLayer( {
+										layer: layerCopy.meta,
+										instance: layerCopy,
+									} );
 								}
 							)
 						}
@@ -257,7 +255,7 @@ class StoryMapDisplay extends Component {
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
 								{ this.state.postData && (
 									<>
-										<h1 className="storymap-page-title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( this.state.postData.title.rendered ) } }></h1>
+										<h1 className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</h1>
 										<div className="post-info">
 											{ /*<p className="author" >{ 'Authors' }</p> */ }
 											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDate() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
@@ -265,7 +263,7 @@ class StoryMapDisplay extends Component {
 									</>
 								) }
 								{ config.subtitle &&
-									<h3 className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( config.subtitle ) } }></h3>
+									<h3 className="storymap-description">{ parse(decodeHtmlEntity( config.subtitle )) }</h3>
 								}
 
 								<button
@@ -278,7 +276,7 @@ class StoryMapDisplay extends Component {
 								>
 									{ 'START' }
 								</button>
-								
+
 								{ this.props.navigateButton && (
 									<>
 										<p
@@ -321,7 +319,7 @@ class StoryMapDisplay extends Component {
 											lastChapter = { ...chapter };
 											lastChapter.selectedLayers = this.props.navigateMapLayers
 											lastChapter.id = chapter.id
-											
+
 											if ( index == config.chapters.length - 1 ) {
 												return(
 													<Chapter
@@ -353,7 +351,7 @@ class StoryMapDisplay extends Component {
 													{ ...chapter }
 													currentChapterID={ currentChapterID }
 												/>
-												
+
 											);
 										} )
 
@@ -363,7 +361,7 @@ class StoryMapDisplay extends Component {
 						) }
 					</div>
 				</div>
-				<div style={ { display: 'none' } } className="navigate-map"></div>						
+				<div style={ { display: 'none' } } className="navigate-map"></div>
 				<>
 					<div className="return-to-slides-container">
 						<p className="icon-return">
@@ -410,10 +408,10 @@ class StoryMapDisplay extends Component {
 								}
 
 								this.setState( { ...this.state, isNavigating: false, mapBrightness } )
-								
+
 								document.querySelector('.navigate-map').style.display = 'none';
 								document.querySelector('.not-navigating-map').style.display = 'block';
-								
+
 								this.state.map.resize();
 
 								window.scrollTo(0, 0);
@@ -431,20 +429,20 @@ class StoryMapDisplay extends Component {
 
 function Chapter({ index, id, theme, title, image, description, currentChapterID, isLastChapter, onClickFunction, props}) {
 	const classList = id === currentChapterID ? "step active" : "step";
-	
+
     return (
 		<>
 			{ ! isLastChapter && ( title || description ) && (
 				<div id={ id } className={ classList }>
 					<div className={ theme }>
 						{ title &&
-							<h3 className="title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( title ) } }></h3>
+							<h3 className="title">{ parse(decodeHtmlEntity( title )) }</h3>
 						}
 						{ image &&
 							<img src={ image } alt={ title }></img>
 						}
 						{ description &&
-							<p className="slide-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } }></p>
+							<p className="slide-description">{ parse(decodeHtmlEntity( description )) }</p>
 						}
 					</div>
 				</div>

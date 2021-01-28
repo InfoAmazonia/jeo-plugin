@@ -396,6 +396,14 @@ div.jeomap {
 	font-family: var(--jeo-font);
 }
 
+/* Interaction - onClick */
+.mapboxgl-popup-content h3, .mapboxgl-popup-content p {
+	font-size: 16px;
+}
+.mapboxgl-popup.mapboxgl-popup-anchor-bottom:not(.jeo-popup__mouseover) .mapboxgl-popup-content h3 {
+    margin-top: 1.2rem;
+}
+
 .mapboxgl-popup.mapboxgl-popup-anchor-bottom:not(.jeo-popup__mouseover) {
 	margin-top: -36px;
 }
@@ -773,3 +781,7 @@ p.jeomap-no-layers__text {
 	font-family: var(--jeo-font);
 }
 
+
+.jeomap .mapboxgl-ctrl-attrib.mapboxgl-compact-show .mapboxgl-ctrl-attrib-inner, .mapboxgl-ctrl-attrib.mapboxgl-compact .mapboxgl-ctrl-attrib-button {
+    visibility: hidden;
+}

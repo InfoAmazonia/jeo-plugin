@@ -1,4 +1,6 @@
-import React from 'react';
+import {
+	useRef,
+} from '@wordpress/element';
 import styled, { keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
 
@@ -49,7 +51,7 @@ const Wrapper = styled.div`
 `;
 
 const LazyImage = ( { src, alt } ) => {
-	const refPlaceholder = React.useRef();
+	const refPlaceholder = useRef();
 
 	const removePlaceholder = () => {
 		refPlaceholder.current.remove();

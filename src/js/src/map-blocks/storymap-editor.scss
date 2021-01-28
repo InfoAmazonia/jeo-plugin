@@ -1,4 +1,69 @@
 .jeo-mapblock.storymap {
+	.storymap-controls {
+		.story-settings, .slides-settings, .story-settings-hide, .slides-settings-hide  {
+			border-radius: 7px;
+			box-shadow: 1px 3px 4px 0 rgba(0,0,0,.1);
+
+			.heading {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+			}
+
+			.section-title {
+				font-weight: bold;
+			}
+
+			label.components-checkbox-control__label {
+				font-weight: normal;
+			}
+		}
+
+		.story-settings {
+			.ck-editor {
+				margin-bottom: 15px;
+			}
+		}
+
+		.slides-settings {
+			.heading {
+				margin-bottom: 15px;
+			}
+
+			.slide-panel {
+				.input-label {
+					font-size: 14px;
+					font-weight: bold;
+				}
+
+				.ck-editor {
+					margin-bottom: 15px;
+				}
+
+				.flex-center {
+					display: flex;
+					justify-content: center;
+					align-items: center;
+				}
+			}
+		}
+
+		.story-settings-hide {
+
+		}
+
+		.slides-settings-hide {
+
+		}
+	}
+}
+
+
+
+
+// Legacy code downhere
+
+.jeo-mapblock.storymap {
 	font-family: var(--globalFontFamily), sans-serif;;
 }
 
@@ -17,10 +82,9 @@
 
 
 .story-settings {
-	max-width: 40%;
+	max-width: 30%;
 	margin: 10px;
 	background-color: #fff;
-	border-radius: 10px;
 	position: absolute;
 	top: 50px;
 	padding: 10px;
@@ -42,52 +106,53 @@
 		font-weight: bold;
 	}
 }
+
 .story-settings-hide {
 	width: 30%;
 	margin: 10px;
 	background-color: #fff;
-	border-radius: 10px;
 	position: absolute;
 	bottom: 15%;
 	padding: 10px;
 	display: flex;
-	.section-title {
-		margin: 0 0 0 15px;
-	}
+
+	// .section-title {
+	// 	margin: 0 0 0 15px;
+	// }
 	.show-button {
 		margin-left: auto;
 	}
 }
+
 .current-slide-box {
 	display: flex;
 	flex-direction: row;
-	width: 28%;
+	width: 140px;
 	margin-bottom: 10px;
 	background-color: #fff;
-	border-radius: 10px;
 	position: absolute;
-	left: 70%;
-	bottom: 15%;
+	right: 50px;
+    top: 10px;
 	padding: 10px;
+	font-size: 14px;
+
 	div {
 		margin: auto;
 		display: flex;
 	}
 }
 .slides-settings {
-	width: 40%;
+	width: 45%;
 	margin: 10px;
-	border-radius: 10px;
 	padding: 10px;
 	position: absolute;
-	top: 0;
-	left: 50%;
+	top: 50px;
+	left: calc(30% + 15px);
 	background-color: #fff;
 	.slide-panel {
 		border-left: none;
 		width: 100%;
 		.layer {
-			border-radius: 10px;
 			padding: 10px;
 			margin: 0 0 5px 0;
 			cursor: pointer;
@@ -207,30 +272,25 @@
 }
 .slides-settings-hide {
 	display: flex;
-	width: 30%;
-	left: 35%;
+	width: 45%;
+	left: calc(30% + 15px);
 	margin: 10px;
 	background-color: #fff;
-	border-radius: 10px;
 	position: absolute;
 	bottom: 15%;
 	padding: 10px;
-	.section-title {
-		margin: 0 0 0 15px;
-	}
+
+	// .section-title {
+	// 	margin: 0 0 0 15px;
+	// }
 	.show-button {
 		margin-left: auto;
 	}
 }
 .storymap-controls {
-	.hide-button {
-		position: absolute;
-		left: 89%;
-		top: 1%;
-	}
-	.section-title {
-		margin: 0 0 15px 0;
-	}
+	// .section-title {
+	// 	margin: 0 0 15px 0;
+	// }
 }
 .search-adress-input {
 	position: absolute;
@@ -238,7 +298,6 @@
 	left: 10px;
 }
 .tooltip {
-	border-radius: 10px;
 	background-color: white;
 	padding: 10px;
 	display: none !important;

@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  
+  <link rel="shortcut icon" href="../../img/favicon.ico">
+  <title>Adding new Layer Types - JEO</title>
+  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "Adding new Layer Types";
+    var mkdocs_page_input_path = "dev/layer-types.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+      <div class="wy-side-nav-search">
+        <a href="../.." class="icon icon-home"> JEO</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+	<ul class="current">
+	  
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../..">Home</a>
+	    </li>
+          
+        </ul>
+      </div>
+      &nbsp;
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="../..">JEO</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>Adding new Layer Types</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="adding-new-layer-types">Adding new Layer Types</h1>
+<p>This document describes how to register new Layer Types to be used in maps created with JEO.</p>
+<h2 id="introduction">Introduction</h2>
+<p>In JEO, maps are rendered using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/">Mapbox GL</a> JavaScript library. Any new layer type will have to interact with this library to add the layer to the map.</p>
+<p>Basically, to add a new layer type, there are 2 simple steps:</p>
+<ol>
+<li>Register the new Layer type using a PHP hook, informing where is the main JavaScript file of your Layer Type;</li>
+<li>Create a JavaScript class implementing methods to add the layer to the map and to describe what are the options a layer of this type has.</li>
+</ol>
+<p>In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which is an extension to MapboxGL) to the project.</p>
+<h2 id="creating-a-new-layer-type">Creating a new Layer Type</h2>
+<p>First, let's register a new Layer Type by hooking up in the <code>jeo_register_layer_types</code> action:</p>
+<pre><code class="php">add_action('jeo_register_layer_types', function($layer_types) {
+    $layer_types-&gt;register_layer_type( 'my-layer-type', [ 'script_url' =&gt; plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
+});
+</code></pre>
+
+<p><code>register_layer_type</code> method gets 2 parameters.</p>
+<ul>
+<li>Layer type slug - A unique sanitized string (make sure to make it unique)</li>
+<li>Options - An array with the layer type options:</li>
+<li><code>script_url</code>: Required. The absolute URL to your JavaScript file.</li>
+<li><code>dependecies</code>: Optional. An array of scripts handles registered using [wp_register_script]<a href="https://developer.wordpress.org/reference/functions/wp_register_script/">(</a>) that should be loaded as a dependency to the layer type main script</li>
+</ul>
+<p>That's all you need to do on the PHP side. All the magic happens on the JavaScript.</p>
+<p>Now, let's create our <code>layertype.js</code> file.</p>
+<p>In this file, we are going to register a JavaScript object using the globally available <code>window.JeoLayerTypes.registerLayerType</code>.</p>
+<p>The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.</p>
+<pre><code class="js">window.JeoLayerTypes.registerLayerType('tilelayer', {
+
+    addStyle: function(map, attributes) {
+        // ...
+    },
+
+    addLayer: function(map, attributes) {
+        // ...
+    },
+
+    getSchema: function(attributes) {
+        // ...
+    }
+});
+</code></pre>
+
+<p>Your Layer Type object MUST implement at least these three methods.</p>
+<h3 id="getschemaattributes">getSchema(attributes)</h3>
+<p><strong>params</strong>:</p>
+<ul>
+<li><code>attributes</code> - object with the layer attributes (see the section below)</li>
+</ul>
+<p><strong>returns</strong>:</p>
+<ul>
+<li>Promise with json-schema</li>
+</ul>
+<p>This method will tell JEO which are the options the user has to fill in when creating a new layer of this type.</p>
+<p>For example, a raster tile layer-type might have only a URL. A Mapbox layer has the Style ID and the optional Access token.</p>
+<p>This method must return a Promise with a json-schema representation of the layer type options.</p>
+<p>This schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.</p>
+<p>For example, the "Tile layer" layer type needs only a URL, so that's how its <code>getSchema</code> method will look like.</p>
+<pre><code class="js">    // ...
+
+    getSchema: function(attributes) {
+        return new Promise( function(resolve, reject) {
+
+            resolve({
+                &quot;type&quot;: &quot;object&quot;,
+                &quot;required&quot;: [
+                    &quot;url&quot;
+                ],
+                &quot;properties&quot;: {
+                    &quot;url&quot;: {
+                        &quot;type&quot;: &quot;string&quot;,
+                        &quot;title&quot;: &quot;URL&quot;
+                    }
+                }
+            });
+
+        });
+    }
+</code></pre>
+
+<h2 id="addstylemap-attributes">addStyle(map, attributes)</h2>
+<p><strong>params</strong>:</p>
+<ul>
+<li><code>map</code> - the initialized Mapbox <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object</li>
+<li><code>attributes</code> - object with the layer attributes (See Layer attributes section below)</li>
+</ul>
+<p><strong>returns</strong>:</p>
+<ul>
+<li>The return of a call to <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle"><code>map.setStyle</code></a></li>
+</ul>
+<p>In MapboxGL, every map has a <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/">Style</a> as a base layer. This method will add the layer as the Map Style, using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle">setStyle</a> method of the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object.</p>
+<p>This method will be invoked when a layer of this type is added to the map as the base layer.</p>
+<p>For example, the "Tile Layer" layer type sets the style as a raster layer:</p>
+<pre><code class="js">    // ...
+
+    addStyle: function(map, attributes) {
+        return map.setStyle({
+            'version': 8,
+            'sources': {
+                'raster-tiles': {
+                    'type': 'raster',
+                    'tiles': [attributes.layer_type_options.url],
+                    'tileSize': 256
+                }
+            },
+            'layers': [{
+                id: attributes.layer_id,
+                type: 'raster',
+                source: 'raster-tiles'
+            }]
+        })
+    }
+</code></pre>
+
+<p><strong>Note</strong>: The <code>attributes.layer_type_options</code> object holds all the properties declared in the <code>getSchema</code> method. That's why there is a <code>url</code> there! (See Layer attributes section below)</p>
+<h2 id="addlayermap-attributes">addLayer(map, attributes)</h2>
+<p><strong>params</strong>:</p>
+<ul>
+<li><code>map</code> - the initialized Mapbox <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object</li>
+<li><code>attributes</code> - object with the layer attributes (See Layer attributes section below)</li>
+</ul>
+<p><strong>returns</strong>:</p>
+<ul>
+<li>The return of a call to <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer"><code>map.addLayer</code></a></li>
+</ul>
+<p>This method will add the layer to the map using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer">addLayer</a> method of the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object.</p>
+<p>This method will be invoked when a layer of this type is added to the map.</p>
+<p>For example, the "Tile Layer" layer type adds itself as a raster layer:</p>
+<pre><code class="js">    // ...
+
+    addLayer: function(map, attributes) {
+        var layer = {
+            id: attributes.layer_id,
+            source: {
+              type: 'raster',
+              tiles: [attributes.layer_type_options.url],
+              &quot;tileSize&quot;: 256
+            },
+            type: 'raster'
+        };
+        if ( ! attributes.visible ) {
+            layer.layout = {
+                visibility: 'none'
+            };
+        }
+        return map.addLayer(layer);
+    }
+
+</code></pre>
+
+<p><strong>Note:</strong> This method must verify the value of <code>attributes.visible</code> to determine whether this layer should be visible when the map is initialized.</p>
+<h2 id="layer-attributes">Layer attributes</h2>
+<p>As you saw, each of the above methods gets an argument <code>attributes</code> as input. This argument holds all the information of the layer the user is editing or viewing.</p>
+<p>Some attributes are common to any layer types, and others that are specific to a layer type. Every layer type-specific attribute a layer has is stored under the <code>layer_type_options</code> attributes.</p>
+<p>So these are the keys available in the <code>attributes</code> object:</p>
+<ul>
+<li><code>layer_id</code>: (integer) A unique ID that represents this layer and identify it in the database</li>
+<li><code>layer_name</code>: (string) The layer name, given by the user</li>
+<li><code>visible</code>: (boolean) A flag indicating whether this layer should be visible when the map initializes</li>
+<li><code>layer_type_options</code>: (object) A object with all the layer type-specific attributes (those registered in the <code>getSchema</code> method)</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" style="cursor: pointer">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '../..';</script>
+    <script src="../../js/theme.js" defer></script>
+      <script src="../../search/main.js" defer></script>
+
+</body>
+</html>
