@@ -191,16 +191,18 @@ const MapEditor = ( {
 					<div className="storymap-controls">
 						{ showStorySettings && (
 							<div className="story-settings">
-								<Button
-									className="hide-button"
-									onClick={ () => {
-										setShowStorySettings( false );
-									} }
-								>
-									<Dashicon icon="hidden" />
-								</Button>
-								<p className="section-title">{ __( 'Story settings', 'jeo' ) }</p>
-								<p className="input-label">{ __('Story brief description', 'jeo') }</p>
+								<div className="heading">
+									<span className="section-title">{ __( 'Story settings', 'jeo' ) }</span>
+									<Button
+										className="hide-button"
+										onClick={ () => {
+											setShowStorySettings( false );
+										} }
+									>
+										<Dashicon icon="hidden" />
+									</Button>
+								</div>
+								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
 								<CKEditor
 									editor={ ClassicEditor }
 									data={ attributes.description }
@@ -213,7 +215,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="introduction-button"
-									label={ __( 'Story map Introduction', 'jeo' ) }
+									label={ __( 'Show story map introduction', 'jeo'  ) }
 									checked={ attributes.hasIntroduction }
 									onChange={ ( newHasIntroduction ) => {
 										setAttributes( {
@@ -224,7 +226,7 @@ const MapEditor = ( {
 								/>
 								<CheckboxControl
 									className="navigate-button"
-									label={ __( 'Navigate map button', 'jeo' ) }
+									label={ __( 'Use "Navigate to map" button', 'jeo'  ) }
 									checked={ attributes.navigateButton }
 									onChange={ ( newNavigateButton ) => {
 										setAttributes( {
@@ -237,7 +239,7 @@ const MapEditor = ( {
 						) }
 						{ ! showStorySettings && (
 							<div className="story-settings-hide">
-								<p className="section-title">{ __( 'Story settings', 'jeo' ) }</p>
+								<span className="section-title">{ __( 'Story settings', 'jeo'  ) }</span>
 								<Button
 									className="show-button"
 									onClick={ () => {
@@ -250,15 +252,17 @@ const MapEditor = ( {
 						) }
 						{ showSlidesSettings && (
 							<div className="slides-settings">
-								<Button
-									className="hide-button"
-									onClick={ () => {
-										setShowSlidesSettings( false );
-									} }
-								>
-									<Dashicon icon="hidden" />
-								</Button>
-								<p className="section-title">{ __( 'Slides settings', 'jeo' ) }</p>
+								<div className="heading">
+									<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
+									<Button
+										className="hide-button"
+										onClick={ () => {
+											setShowSlidesSettings( false );
+										} }
+									>
+										<Dashicon icon="hidden" />
+									</Button>
+								</div>
 								<List
 									values={ attributes.slides }
 									onChange={ ( { oldIndex, newIndex } ) => {
@@ -288,14 +292,19 @@ const MapEditor = ( {
 													>
 													=
 												</button>
-												<Panel key={ key } className="slide-panel"  >
+												<Panel key={ key } className="slide-panel">
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( index + 1 ) }
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ' ) + ( index + 1 ) }
 														initialOpen={
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
+														onToggle={ (props) => {
+															if(index !== currentSlideIndex) {
+																setCurrentSlideIndex(index);
+															}
+														} }
 													>
-														<p className="input-label">{ __( 'Title' , 'jeo') }</p>
+														<span className="input-label">{ __( 'Title' ) }</span>
 														<CKEditor
 															atributo="meuatributo"
 															editor={ ClassicEditor }
@@ -315,9 +324,9 @@ const MapEditor = ( {
 																} );
 															} }
 														/>
-														<p className="input-label">{ __(
-																'Content'
-														) }</p>
+														<span className="input-label">{ __(
+																'Content', 'jeo'
+														) }</span>
 														<CKEditor
 															editor={ ClassicEditor }
 															data={ slide.content }
@@ -336,7 +345,7 @@ const MapEditor = ( {
 																} );
 															} }
 														/>
-														<p>Layers</p>
+														<span className="input-label">Layers</span>
 														<DragDropContext onDragEnd={ onDragEndLayers }>
 															<Droppable droppableId="droppable">
 																{ ( provided, snapshot ) => (
@@ -434,11 +443,11 @@ const MapEditor = ( {
 																										} );
 																									} }
 																								>
-																									<p>
+																									<span>
 																										{ decodeHtmlEntity(
 																											item.title.rendered
 																										) }
-																									</p>
+																									</span>
 																								</Button>
 																							</div>
 																						);
@@ -485,9 +494,9 @@ const MapEditor = ( {
 																			} );
 																		} }
 																	>
-																		<div>
+																		<div className="flex-center">
 																			<Dashicon icon="unlock" />
-																			<p>{ __( 'Lock current spot', 'jeo' ) }</p>
+																			<span>{ __( 'Lock current spot' ) }</span>
 																		</div>
 																	</Button>
 																)
@@ -525,7 +534,7 @@ const MapEditor = ( {
 																	>
 																		<div>
 																			<Dashicon icon="lock" />
-																			<p>{ __( 'Lock current spot', 'jeo' ) }</p>
+																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
 																		</div>
 																	</Button>
 																)
@@ -543,9 +552,9 @@ const MapEditor = ( {
 																setKey( key + 1 );
 															} }
 														>
-															<div>
+															<div className="flex-center">
 																<Dashicon icon="visibility" />
-																<p>{ __( 'Preview', 'jeo' ) }</p>
+																<span>{ __( 'Preview', 'jeo'  ) }</span>
 															</div>
 														</Button>
 														<Button
@@ -558,9 +567,7 @@ const MapEditor = ( {
 																}
 
 																const confirmation = confirm(
-																	__(
-																		'Do you really want to remove this slide?'
-																	)
+																	__( 'Do you really want to remove this slide?', 'jeo' )
 																);
 																if (
 																	confirmation &&
@@ -577,9 +584,9 @@ const MapEditor = ( {
 																}
 															} }
 														>
-															<div>
+															<div className="flex-center">
 																<Dashicon icon="trash" />
-																<p>{ __( 'Remove', 'jeo') }</p>
+																<span>{ __( 'Remove', 'jeo' ) }</span>
 															</div>
 														</Button>
 													</PanelBody>
@@ -611,16 +618,16 @@ const MapEditor = ( {
 										setKey( key + 1 );
 									} }
 								>
-									<div>
+									<div className="flex-center">
 										<Dashicon icon="plus" />
-										<p>{ __( 'Add', 'jeo' ) }</p>
+										<span>{ __( 'Add', 'jeo' ) }</span>
 									</div>
 								</Button>
 							</div>
 						) }
 						{ ! showSlidesSettings && (
 							<div className="slides-settings-hide">
-								<p className="section-title">{ __( 'Slides settings', 'jeo' ) }</p>
+								<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
 								<Button
 									className="show-button"
 									onClick={ () => {
@@ -634,7 +641,7 @@ const MapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-								{ __('Current slide: ') }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( currentSlideIndex + 1 ) }
+								{ __('Current slide: ', 'jeo' ) }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
@@ -667,9 +674,11 @@ const MapEditor = ( {
 						/>
 					</div>
 					<div className="jeo-preview-controls">
-						<p>
-							<strong>{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
-						</p>
+						<span>
+							<strong>
+								{ __("Map: ", "jeo") }
+								{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
+						</span>
 					</div>
 				</Fragment>
 			) }
@@ -716,7 +725,7 @@ const MapEditor = ( {
 								setAttributes( { ...attributes, map_id: previous_map } );
 							} }
 						>
-							{ __( 'Cancel', 'jeo' ) }
+							{ __( 'Cancel' ) }
 						</Button>
 					) }
 				</Fragment>
