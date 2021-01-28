@@ -1,18 +1,22 @@
-# Copyright (C) 2021 
+# Copyright (C) 2021
 # This file is distributed under the same license as the JEO WP plugin.
 msgid ""
 msgstr ""
 "Project-Id-Version: JEO WP 1.2.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeo\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Last-Translator: \n"
+"Language-Team: Portuguese (Brazil)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:21:21+00:00\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"X-Generator: WP-CLI 2.4.0\n"
+"PO-Revision-Date: 2021-01-28 16:27+0000\n"
+"X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
+"\n"
+"Language: pt_BR\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Loco-Version: 2.5.0; wp-5.5.3"
 
 #. Plugin Name of the plugin
 msgid "JEO WP"
@@ -27,11 +31,14 @@ msgid "Read more"
 msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:73
-msgid "Service provided by Open Street Maps at https://nominatim.openstreetmap.org/"
+msgid ""
+"Service provided by Open Street Maps at https://nominatim.openstreetmap.org/"
 msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:155
-msgid "Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes"
+msgid ""
+"Multiple metadata that holds locations related to the post. Each location is "
+"an object composed of lat, lon and geocode attributes"
 msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:167
@@ -70,8 +77,7 @@ msgstr ""
 msgid "City sub-level 1"
 msgstr ""
 
-#: includes/layers/class-layers.php:20
-#: includes/layers/class-layers.php:31
+#: includes/layers/class-layers.php:20 includes/layers/class-layers.php:31
 msgid "Layers"
 msgstr ""
 
@@ -79,8 +85,7 @@ msgstr ""
 msgid "Layer"
 msgstr ""
 
-#: includes/layers/class-layers.php:22
-#: includes/layers/class-layers.php:23
+#: includes/layers/class-layers.php:22 includes/layers/class-layers.php:23
 msgid "Add new layer"
 msgstr ""
 
@@ -184,24 +189,20 @@ msgstr ""
 msgid "Layer type not registered"
 msgstr ""
 
-#: includes/loaders.php:330
-#: js/build/discovery.js:8726
+#: includes/loaders.php:330 js/build/discovery.js:8726
 #: js/src/discovery/blocks/sidebar.js:158
 msgid "Discovery"
 msgstr ""
 
-#: includes/maps/class-maps.php:25
-#: includes/maps/class-maps.php:36
+#: includes/maps/class-maps.php:25 includes/maps/class-maps.php:36
 msgid "Maps"
 msgstr ""
 
-#: includes/maps/class-maps.php:26
-#: includes/settings/settings-page.php:21
+#: includes/maps/class-maps.php:26 includes/settings/settings-page.php:21
 msgid "Map"
 msgstr ""
 
-#: includes/maps/class-maps.php:27
-#: includes/maps/class-maps.php:28
+#: includes/maps/class-maps.php:27 includes/maps/class-maps.php:28
 msgid "Add new map"
 msgstr ""
 
@@ -269,17 +270,19 @@ msgstr ""
 msgid "The map initial longitude"
 msgstr ""
 
-#: includes/maps/class-maps.php:106
-#: includes/maps/class-maps.php:124
+#: includes/maps/class-maps.php:106 includes/maps/class-maps.php:124
 msgid "The Layer ID"
 msgstr ""
 
 #: includes/maps/class-maps.php:110
-msgid "How this layer is used in this map. Can be fixed, switchable or swappable"
+msgid ""
+"How this layer is used in this map. Can be fixed, switchable or swappable"
 msgstr ""
 
 #: includes/maps/class-maps.php:114
-msgid "If the layer is loaded into the mapbox as a style (setStyle) or layer (addLayer)"
+msgid ""
+"If the layer is loaded into the mapbox as a style (setStyle) or layer "
+"(addLayer)"
 msgstr ""
 
 #: includes/maps/class-maps.php:118
@@ -616,18 +619,15 @@ msgstr ""
 msgid "Download from source"
 msgstr ""
 
-#: js/build/discovery.js:7763
-#: js/src/discovery/blocks/map-item.js:95
+#: js/build/discovery.js:7763 js/src/discovery/blocks/map-item.js:95
 msgid "layers"
 msgstr ""
 
-#: js/build/discovery.js:7789
-#: js/src/discovery/blocks/map-item.js:102
+#: js/build/discovery.js:7789 js/src/discovery/blocks/map-item.js:102
 msgid "Clear"
 msgstr ""
 
-#: js/build/discovery.js:7789
-#: js/src/discovery/blocks/map-item.js:102
+#: js/build/discovery.js:7789 js/src/discovery/blocks/map-item.js:102
 msgid "Apply"
 msgstr ""
 
@@ -686,185 +686,162 @@ msgstr ""
 msgid "Done"
 msgstr ""
 
-#: js/build/layersSidebar.js:11
-#: js/src/layers-sidebar/layer-settings.js:150
+#: js/build/layersSidebar.js:11 js/src/layers-sidebar/layer-settings.js:150
 msgid "Edit interactions"
 msgstr ""
 
-#: js/build/layersSidebar.js:11
-#: js/src/layers-sidebar/layers-sidebar.js:74
-msgid "Please fill all required fields, you will not be able to publish or update until that."
+#: js/build/layersSidebar.js:11 js/src/layers-sidebar/layers-sidebar.js:74
+msgid ""
+"Please fill all required fields, you will not be able to publish or update "
+"until that."
 msgstr ""
 
-#: js/build/layersSidebar.js:11
-#: js/src/layers-sidebar/layers-sidebar.js:91
-msgid "Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings"
+#: js/build/layersSidebar.js:11 js/src/layers-sidebar/layers-sidebar.js:91
+msgid ""
+"Your Mapbox access token may be invalid. You will not be able to publish or "
+"update. Please check your settings"
 msgstr ""
 
-#: js/build/layersSidebar.js:11
-#: js/src/layers-sidebar/layers-sidebar.js:104
-msgid "Your layer was not found. You will not be able to publish or update. Please check your settings"
+#: js/build/layersSidebar.js:11 js/src/layers-sidebar/layers-sidebar.js:104
+msgid ""
+"Your layer was not found. You will not be able to publish or update. Please "
+"check your settings"
 msgstr ""
 
-#: js/build/layersSidebar.js:11
-#: js/src/layers-sidebar/layers-sidebar.js:117
-msgid "Error loading your layer, you will not be able to publish or update. Please check your settings."
+#: js/build/layersSidebar.js:11 js/src/layers-sidebar/layers-sidebar.js:117
+msgid ""
+"Error loading your layer, you will not be able to publish or update. Please "
+"check your settings."
 msgstr ""
 
-#: js/build/layersSidebar.js:11
-#: js/src/layers-sidebar/layers-sidebar.js:134
-msgid "Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update."
+#: js/build/layersSidebar.js:11 js/src/layers-sidebar/layers-sidebar.js:134
+msgid ""
+"Your Mapbox API Key was not found in your JEO Settings. You will not be able "
+"to publish or update."
 msgstr ""
 
-#: js/build/mapBlocks.js:36326
-#: js/build/mapsSidebar.js:39
+#: js/build/mapBlocks.js:36326 js/build/mapsSidebar.js:39
 #: js/src/map-blocks/layer-settings.js:152
 msgid "Base layer should be fixed"
 msgstr ""
 
-#: js/build/mapBlocks.js:36397
-#: js/build/mapsSidebar.js:39
+#: js/build/mapBlocks.js:36397 js/build/mapsSidebar.js:39
 #: js/src/map-blocks/layer-settings.js:256
-msgid "If the layer is not visible inside Mapbox Studio we will not be able to control the displayment. "
+msgid ""
+"If the layer is not visible inside Mapbox Studio we will not be able to "
+"control the displayment. "
 msgstr ""
 
-#: js/build/mapBlocks.js:36555
-#: js/build/mapsSidebar.js:39
+#: js/build/mapBlocks.js:36555 js/build/mapsSidebar.js:39
 #: js/src/map-blocks/layers-settings-modal.js:16
 msgid "Layers settings"
 msgstr ""
 
-#: js/build/mapBlocks.js:37331
-#: js/build/mapBlocks.js:38657
-#: js/src/map-blocks/map-editor.js:118
-#: js/src/map-blocks/storymap-editor.js:694
+#: js/build/mapBlocks.js:37331 js/build/mapBlocks.js:38657
+#: js/src/map-blocks/map-editor.js:118 js/src/map-blocks/storymap-editor.js:694
 msgid "Type a map name"
 msgstr ""
 
-#: js/build/mapBlocks.js:38653
-#: js/src/map-blocks/storymap-editor.js:681
+#: js/build/mapBlocks.js:38653 js/src/map-blocks/storymap-editor.js:681
 msgid "Map: "
 msgstr ""
 
-#: js/build/mapBlocks.js:38865
-#: js/build/mapsSidebar.js:39
+#: js/build/mapBlocks.js:38865 js/build/mapsSidebar.js:39
 #: js/src/posts-selector/index.js:25
 msgid "Related posts"
 msgstr ""
 
-#: js/build/mapBlocks.js:38898
-#: js/build/mapsSidebar.js:39
+#: js/build/mapBlocks.js:38898 js/build/mapsSidebar.js:39
 #: js/src/posts-selector/index.js:67
 msgid "Start date"
 msgstr ""
 
-#: js/build/mapBlocks.js:38899
-#: js/build/mapsSidebar.js:39
+#: js/build/mapBlocks.js:38899 js/build/mapsSidebar.js:39
 #: js/src/posts-selector/index.js:68
 msgid "End date"
 msgstr ""
 
-#: js/build/mapBlocks.js:38911
-#: js/build/mapsSidebar.js:39
+#: js/build/mapBlocks.js:38911 js/build/mapsSidebar.js:39
 #: js/src/posts-selector/index.js:84
 msgid "Meta queries"
 msgstr ""
 
-#: js/build/mapBlocks.js:39400
-#: js/build/postsSidebar.js:1
+#: js/build/mapBlocks.js:39400 js/build/postsSidebar.js:1
 #: js/src/posts-sidebar/geo-auto-complete.js:80
 msgid "Search address"
 msgstr ""
 
-#: js/build/mapsSidebar.js:39
-#: js/src/maps-sidebar/map-embed-url.js:10
+#: js/build/mapsSidebar.js:39 js/src/maps-sidebar/map-embed-url.js:10
 msgid "Embed URL"
 msgstr ""
 
-#: js/build/mapsSidebar.js:39
-#: js/src/maps-sidebar/maps-sidebar.js:111
+#: js/build/mapsSidebar.js:39 js/src/maps-sidebar/maps-sidebar.js:111
 msgid "1 - Your Mapbox access token may be invalid."
 msgstr ""
 
-#: js/build/mapsSidebar.js:39
-#: js/src/maps-sidebar/maps-sidebar.js:89
+#: js/build/mapsSidebar.js:39 js/src/maps-sidebar/maps-sidebar.js:89
 msgid "There's no API Key found in your JEO Settings."
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:357
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:357
 msgid "You can also drag the marker across the map."
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:363
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:363
 msgid "Relevance"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:368
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:368
 msgid "Primary"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:369
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:369
 msgid "Secondary"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:377
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:377
 msgid "Cancel"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:385
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:385
 msgid "Update selected point"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:386
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:386
 msgid "Save new point"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:405
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:405
 msgid "Geolocated points"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:409
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:409
 #: js/src/posts-sidebar/geo-posts.js:416
 msgid "Add new point"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:421
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:421
 msgid "Current points"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:423
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:423
 msgid "No points"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:446
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:446
 msgid "Delete"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/geo-posts.js:454
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/geo-posts.js:454
 msgid "Edit"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/index.js:20
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/index.js:20
 #: js/src/posts-sidebar/index.js:24
 msgid "Geolocate this post"
 msgstr ""
 
-#: js/build/postsSidebar.js:11
-#: js/src/posts-sidebar/index.js:42
+#: js/build/postsSidebar.js:11 js/src/posts-sidebar/index.js:42
 msgid "Geolocation"
 msgstr ""
 

@@ -78,6 +78,8 @@ class Settings {
 		if ($page == 'jeo_page_jeo-settings') {
 			wp_enqueue_media();
 			wp_enqueue_script('jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', ['jquery']);
+			wp_set_script_translations( 'jeo-settings', 'jeo' );
+
 		}
 	}
 
