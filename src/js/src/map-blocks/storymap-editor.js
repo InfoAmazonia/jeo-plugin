@@ -92,11 +92,13 @@ const MapEditor = ( {
 		// console.log(attributes.navigateMapLayers);
 		// Post the already exsists
 		// console.log(loadedLayers);
+		console.log(attributes.navigateMapLayers);
 		if(attributes.slides && loadedMap) {
+			console.log(loadedLayers);
 			const newSlides = attributes.slides.map(slide => {
 				slide.selectedLayers.forEach((selectedLayer, index) => {
 					// console.log(loadedMap);
-					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id )) {
+					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id ) || !loadedLayers.some(layer => layer.id === selectedLayer.id )) {
 						// console.log("Remove index", index);
 						slide.selectedLayers.splice(index, 1);
 					}
@@ -180,7 +182,7 @@ const MapEditor = ( {
 						<Map
 							key={ key }
 							onStyleLoad={ ( map ) => {
-								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
+								// setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
 								setSelectedMap( map );
 								setStorymapLayers( layersContent )
 
@@ -218,11 +220,10 @@ const MapEditor = ( {
 										( { id } ) => id === layer.id
 									);
 									// if ( layerOptions ) {
-
-										return renderLayer( {
-											layer: layerOptions.meta,
-											instance: layer,
-										} );
+									return renderLayer( {
+										layer: layerOptions.meta,
+										instance: layer,
+									} );
 									// }
 								}
 							) }

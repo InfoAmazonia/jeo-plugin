@@ -175,6 +175,11 @@ class Jeo {
 
 		if(!function_exists('layer_still_exists')) {
 			function layer_still_exists($map_layers, $selected_layer) {
+				$layer_status = get_post_status($selected_layer->id);
+				if($layer_status == "trash" || $layer_status == false ||  $layer_status == "private" ) {
+					return false;
+				}
+
 				foreach($map_layers as $layer) {
 					if(in_array($layer["id"], (array) $selected_layer)) {
 						$selected_layer->meta->type = get_post_meta($layer['id'], 'type', true);
@@ -214,11 +219,14 @@ class Jeo {
 		$final_navigate_map_layers = [];
 
 		foreach ($map_layers as $layer) {
-			foreach($saved_data->navigateMapLayers as $navigate_layer) {
+			foreach($saved_data->navigateMapLayers as $index => $navigate_layer) {
 				if($navigate_layer->id == $layer['id']) {
 					// Update meta / types
-					layer_still_exists($map_layers, $navigate_layer);
-					$final_navigate_map_layers[] = $navigate_layer;
+					if(!layer_still_exists($map_layers, $navigate_layer)) {
+						array_splice($saved_data->navigateMapLayers, $index, 1);
+					} else {
+						$final_navigate_map_layers[] = $navigate_layer;
+					}
 				}
 			}
 		}
