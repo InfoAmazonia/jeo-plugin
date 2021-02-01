@@ -24,6 +24,8 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
+alert("This is a test 2");
+
 const MapEditor = ( {
 	attributes,
 	setAttributes,
@@ -92,9 +94,9 @@ const MapEditor = ( {
 		// console.log(attributes.navigateMapLayers);
 		// Post the already exsists
 		// console.log(loadedLayers);
-		console.log(attributes.navigateMapLayers);
+		// console.log(attributes.navigateMapLayers);
 		if(attributes.slides && loadedMap) {
-			console.log(loadedLayers);
+			// console.log(loadedLayers, loadedMap);
 			const newSlides = attributes.slides.map(slide => {
 				slide.selectedLayers.forEach((selectedLayer, index) => {
 					// console.log(loadedMap);
@@ -219,12 +221,13 @@ const MapEditor = ( {
 									const layerOptions = attributes.navigateMapLayers.find(
 										( { id } ) => id === layer.id
 									);
-									// if ( layerOptions ) {
-									return renderLayer( {
-										layer: layerOptions.meta,
-										instance: layer,
-									} );
-									// }
+									// console.log(layerOptions);
+									if ( layerOptions ) {
+										return renderLayer( {
+											layer: layerOptions.meta,
+											instance: layer,
+										} );
+									}
 								}
 							) }
 						</Map>
