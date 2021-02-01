@@ -24,7 +24,6 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
-alert("This is a test 2");
 
 const MapEditor = ( {
 	attributes,
