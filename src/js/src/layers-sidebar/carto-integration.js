@@ -18,7 +18,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 	const [ uploudingToMabbox, setUploudingToMabbox ] = useState( false );
 
 	const cartoIntegrationProcess = () => {
-		const sure = confirm(__("This action will overwrite current layer settings and rewrite tileset if set"));
+		const sure = confirm(__("This action will overwrite current layer settings and rewrite tileset if set", "jeo"));
 		const url = `${window.location.origin}/wp-json/jeowp/carto_integrate`;
 		let currentTileset = {
 			tileset: false,
@@ -99,7 +99,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 		<>
 			{ ( ! carto_options.carto_key || ! carto_options.carto_username ) && (
 				<>
-					<p> { __("Configure your Carto options in Jeo settings") } </p>
+					<p> { __("Configure your Carto options in Jeo settings", "jeo") } </p>
 				</>
 			) }
 			{ ( carto_options.carto_key && carto_options.carto_username ) && (
@@ -132,7 +132,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 					/>
 					{ cartoSQLQuery.length > 0 &&
 						<Button isSecondary onClick={ cartoIntegrationProcess } disabled={ processingGeoJsonStatus.doingGeoJsonStage || processingGeoJsonStatus.doneGeoJsonStage ||  uploudingToMabbox }>
-							{ __("Syncronize") }
+							{ __("Syncronize", "jeo") }
 						</Button>
 					}
 					<div className="migration-status">
@@ -140,7 +140,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 						{ processingGeoJsonStatus.doneGeoJsonStage && !processingGeoJsonStatus.doingGeoJsonStage &&
 							<>
 								<br />
-								<p> { __("Succesfull tileset migration") } </p>
+								<p> { __("Succesfull tileset migration", "jeo") } </p>
 							</>
 						}
 
@@ -152,7 +152,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 							<>
 								<p>
 									<Spinner />
-									{ __("Uploading staged file to Mapbox") }
+									{ __("Uploading staged file to Mapbox", "jeo") }
 								</p>
 							</>
 						}
@@ -160,9 +160,9 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 						{ processingGeoJsonStatus.doneGeoJsonStage &&  uploudingToMabbox &&
 							<>
 								<p>
-									{ __("All set! Check") }
-									<strong> { __("\"Settings\"") } </strong>
-									{ __("panel above.") }
+									{ __("All set! Check", "jeo") }
+									<strong> { __("\"Settings\"", "jeo") } </strong>
+									{ __("panel above.", "jeo") }
 								</p>
 							</>
 						}

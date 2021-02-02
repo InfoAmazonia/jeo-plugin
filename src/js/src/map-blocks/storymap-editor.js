@@ -294,7 +294,7 @@ const MapEditor = ( {
 												</button>
 												<Panel key={ key } className="slide-panel">
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ' ) + ( index + 1 ) }
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( index + 1 ) }
 														initialOpen={
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
@@ -304,7 +304,7 @@ const MapEditor = ( {
 															}
 														} }
 													>
-														<span className="input-label">{ __( 'Title' ) }</span>
+														<span className="input-label">{ __( 'Title', 'jeo' ) }</span>
 														<CKEditor
 															atributo="meuatributo"
 															editor={ ClassicEditor }
@@ -496,7 +496,7 @@ const MapEditor = ( {
 																	>
 																		<div className="flex-center">
 																			<Dashicon icon="unlock" />
-																			<span>{ __( 'Lock current spot' ) }</span>
+																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
 																		</div>
 																	</Button>
 																)
@@ -725,7 +725,7 @@ const MapEditor = ( {
 								setAttributes( { ...attributes, map_id: previous_map } );
 							} }
 						>
-							{ __( 'Cancel' ) }
+							{ __( 'Cancel', 'jeo' ) }
 						</Button>
 					) }
 				</Fragment>
