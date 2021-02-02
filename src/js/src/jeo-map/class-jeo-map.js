@@ -1,4 +1,6 @@
 import template from 'lodash.template';
+import { __ } from '@wordpress/i18n';
+
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, function ( match, dec ) {
@@ -312,7 +314,7 @@ export default class JeoMap {
 				layerIcon.classList.add( 'legend-icon' );
 
 				legendTextIcon.appendChild( layerIcon );
-				legendTextIcon.innerHTML += '<span class="text"> Legend </span>';
+				legendTextIcon.innerHTML += `<span class="text"> ${ __("Legend", "jeo") } </span>`;
 
 				legendsTitle.appendChild( legendTextIcon );
 
@@ -443,7 +445,7 @@ export default class JeoMap {
 
 		const moreButton = document.createElement( 'a' );
 		moreButton.classList.add( 'more-info-button' );
-		moreButton.innerHTML = 'Info';
+		moreButton.innerHTML = __('Info', 'jeo');
 
 		moreButton.onclick = ( e ) => {
 			e.preventDefault();
@@ -762,7 +764,7 @@ export default class JeoMap {
 			layerIcon.classList.add( 'layer-icon' );
 
 			legendTextIcon.appendChild( layerIcon );
-			legendTextIcon.innerHTML += '<span class="text"> Layers </span>';
+			legendTextIcon.innerHTML += `<span class="text"> ${ __( "Layers", "jeo" ) } </span>`;
 
 			legendsTitle.appendChild( legendTextIcon );
 
