@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-01-28T19:04:11+00:00\n"
+"POT-Creation-Date: 2021-02-02T19:14:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: jeo\n"
@@ -78,6 +78,10 @@ msgstr ""
 
 #: includes/layers/class-layers.php:20
 #: includes/layers/class-layers.php:31
+#: js/build/jeoMap.js:11179
+#: js/build/mapBlocks.js:38419
+#: js/src/jeo-map/class-jeo-map.js:792
+#: js/src/map-blocks/storymap-editor.js:348
 msgid "Layers"
 msgstr ""
 
@@ -729,9 +733,28 @@ msgid "embed"
 msgstr ""
 
 #: js/build/discovery.js:9997
+#: js/build/jeoMap.js:10770
 #: js/build/layersSidebar.js:32470
+#: js/src/jeo-map/class-jeo-map.js:334
 #: js/src/layers-sidebar/layers-sidebar.js:293
 msgid "Legend"
+msgstr ""
+
+#: js/build/jeoMap.js:10864
+#: js/src/jeo-map/class-jeo-map.js:469
+msgid "Info"
+msgstr ""
+
+#: js/build/jeoMap.js:11895
+msgid "START"
+msgstr ""
+
+#: js/build/jeoMap.js:11917
+msgid "skip intro"
+msgstr ""
+
+#: js/build/jeoMap.js:12081
+msgid "Back to top"
 msgstr ""
 
 #: js/build/layersSidebar.js:31249
@@ -749,6 +772,16 @@ msgstr ""
 msgid "Data attribution name"
 msgstr ""
 
+#: js/build/layersSidebar.js:31389
+#: js/src/layers-sidebar/carto-integration.js:21
+msgid "This action will overwrite current layer settings and rewrite tileset if set"
+msgstr ""
+
+#: js/build/layersSidebar.js:31478
+#: js/src/layers-sidebar/carto-integration.js:102
+msgid "Configure your Carto options in Jeo settings"
+msgstr ""
+
 #: js/build/layersSidebar.js:31479
 #: js/src/layers-sidebar/carto-integration.js:107
 msgid "Use integration"
@@ -757,6 +790,36 @@ msgstr ""
 #: js/build/layersSidebar.js:31488
 #: js/src/layers-sidebar/carto-integration.js:122
 msgid "SQL Query"
+msgstr ""
+
+#: js/build/layersSidebar.js:31501
+#: js/src/layers-sidebar/carto-integration.js:135
+msgid "Syncronize"
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:143
+msgid "Succesfull tileset migration"
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:155
+msgid "Uploading staged file to Mapbox"
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:163
+msgid "All set! Check"
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:164
+msgid "\"Settings\""
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:165
+msgid "panel above."
 msgstr ""
 
 #: js/build/layersSidebar.js:31628
@@ -780,7 +843,9 @@ msgid "Show popup?"
 msgstr ""
 
 #: js/build/layersSidebar.js:31741
+#: js/build/mapBlocks.js:38384
 #: js/src/layers-sidebar/interaction-settings.js:129
+#: js/src/map-blocks/storymap-editor.js:307
 msgid "Title"
 msgstr ""
 
@@ -1079,8 +1144,10 @@ msgid "Type a map name"
 msgstr ""
 
 #: js/build/mapBlocks.js:37354
+#: js/build/mapBlocks.js:38692
 #: js/build/postsSidebar.js:22141
 #: js/src/map-blocks/map-editor.js:137
+#: js/src/map-blocks/storymap-editor.js:728
 #: js/src/posts-sidebar/geo-posts.js:377
 msgid "Cancel"
 msgstr ""
@@ -1174,12 +1241,21 @@ msgstr ""
 msgid "Slides settings"
 msgstr ""
 
+#: js/build/mapBlocks.js:38375
+#: js/build/mapBlocks.js:38626
+#: js/src/map-blocks/storymap-editor.js:297
+#: js/src/map-blocks/storymap-editor.js:644
+msgid "Slide "
+msgstr ""
+
 #: js/build/mapBlocks.js:38402
 #: js/src/map-blocks/storymap-editor.js:327
 msgid "Content"
 msgstr ""
 
+#: js/build/mapBlocks.js:38531
 #: js/build/mapBlocks.js:38554
+#: js/src/map-blocks/storymap-editor.js:499
 #: js/src/map-blocks/storymap-editor.js:537
 msgid "Lock current spot"
 msgstr ""
@@ -1197,11 +1273,6 @@ msgstr ""
 #: js/build/mapBlocks.js:38626
 #: js/src/map-blocks/storymap-editor.js:644
 msgid "Current slide: "
-msgstr ""
-
-#: js/build/mapBlocks.js:38626
-#: js/src/map-blocks/storymap-editor.js:644
-msgid "Slide "
 msgstr ""
 
 #: js/build/mapBlocks.js:38653
