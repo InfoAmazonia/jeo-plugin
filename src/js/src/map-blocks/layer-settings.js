@@ -102,7 +102,7 @@ const LayerSettings = (
 						// 			<span>{ __( 'Base layer should be fixed', 'jeo' ) }</span>
 						// 		) : (
 						// 			<SelectControl
-						// 				label={ __( 'Type' ) }
+						// 				label={ __( 'Type', 'jeo ) }
 						// 				value={ settings.use }
 						// 				options={ useOptions }
 						// 				onChange={ updateUse }
