@@ -345,7 +345,7 @@ const MapEditor = ( {
 																} );
 															} }
 														/>
-														<span className="input-label">Layers</span>
+														<span className="input-label">{ __("Layers", "jeo") }</span>
 														<DragDropContext onDragEnd={ onDragEndLayers }>
 															<Droppable droppableId="droppable">
 																{ ( provided, snapshot ) => (
