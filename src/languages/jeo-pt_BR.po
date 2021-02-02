@@ -10,12 +10,17 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-01-28 19:24+0000\n"
+"PO-Revision-Date: 2021-02-02 19:16+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Loco-Version: 2.5.0; wp-5.5.3"
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:164
+msgid "\"Settings\""
+msgstr ""
 
 #: js/build/mapBlocks.js:37327 js/src/map-blocks/map-editor.js:106
 msgid "(Select another map)"
@@ -77,6 +82,11 @@ msgstr "Adicionar novo Mapa de História"
 msgid "Added"
 msgstr "Adicionado"
 
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:163
+msgid "All set! Check"
+msgstr ""
+
 #: includes/settings/settings-page.php:48
 msgid "API"
 msgstr "API"
@@ -110,6 +120,10 @@ msgstr "Atribuições:"
 msgid "Back to homepage"
 msgstr "Voltar para página inicial"
 
+#: js/build/jeoMap.js:12081
+msgid "Back to top"
+msgstr ""
+
 #: js/build/mapBlocks.js:36326 js/build/mapsSidebar.js:33547
 #: js/src/map-blocks/layer-settings.js:152
 msgid "Base layer should be fixed"
@@ -119,8 +133,10 @@ msgstr "A camada base deve ser fixada"
 msgid "Brief description"
 msgstr "Descrição breve"
 
-#: js/build/mapBlocks.js:37354 js/build/postsSidebar.js:22141
-#: js/src/map-blocks/map-editor.js:137 js/src/posts-sidebar/geo-posts.js:377
+#: js/build/mapBlocks.js:37354 js/build/mapBlocks.js:38692
+#: js/build/postsSidebar.js:22141 js/src/map-blocks/map-editor.js:137
+#: js/src/map-blocks/storymap-editor.js:728
+#: js/src/posts-sidebar/geo-posts.js:377
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -187,6 +203,11 @@ msgstr "Logotipo da compania"
 #: js/src/posts-selector/meta-selector.js:42
 msgid "Comparator"
 msgstr "Comparador"
+
+#: js/build/layersSidebar.js:31478
+#: js/src/layers-sidebar/carto-integration.js:102
+msgid "Configure your Carto options in Jeo settings"
+msgstr ""
 
 #: js/build/mapBlocks.js:38402 js/src/map-blocks/storymap-editor.js:327
 msgid "Content"
@@ -465,6 +486,10 @@ msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 msgid "Indicates whether this layer is visible by default"
 msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 
+#: js/build/jeoMap.js:10864 js/src/jeo-map/class-jeo-map.js:469
+msgid "Info"
+msgstr ""
+
 #: includes/settings/settings-page.php:240
 msgid "Info button background color"
 msgstr "Cor de fundo do botão informativo"
@@ -597,6 +622,8 @@ msgid "Layer updated."
 msgstr "Camada atualizada."
 
 #: includes/layers/class-layers.php:20 includes/layers/class-layers.php:31
+#: js/build/jeoMap.js:11179 js/build/mapBlocks.js:38419
+#: js/src/jeo-map/class-jeo-map.js:792 js/src/map-blocks/storymap-editor.js:348
 msgid "Layers"
 msgstr "Camadas"
 
@@ -614,7 +641,8 @@ msgstr "Configuração de camadas"
 msgid "Left Label"
 msgstr "Rótulo direito"
 
-#: js/build/discovery.js:9997 js/build/layersSidebar.js:32470
+#: js/build/discovery.js:9997 js/build/jeoMap.js:10770
+#: js/build/layersSidebar.js:32470 js/src/jeo-map/class-jeo-map.js:334
 #: js/src/layers-sidebar/layers-sidebar.js:293
 msgid "Legend"
 msgstr "Legenda"
@@ -654,7 +682,9 @@ msgstr "Carregando dados das camadas"
 msgid "Loading layers data..."
 msgstr "Carregando dados das camadas"
 
-#: js/build/mapBlocks.js:38554 js/src/map-blocks/storymap-editor.js:537
+#: js/build/mapBlocks.js:38531 js/build/mapBlocks.js:38554
+#: js/src/map-blocks/storymap-editor.js:499
+#: js/src/map-blocks/storymap-editor.js:537
 msgid "Lock current spot"
 msgstr "Marcar ponto atual"
 
@@ -858,6 +888,11 @@ msgstr "No hover"
 msgid "or"
 msgstr "ou"
 
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:165
+msgid "panel above."
+msgstr ""
+
 #: js/build/layersSidebar.js:32304 js/src/layers-sidebar/layers-sidebar.js:74
 msgid ""
 "Please fill all required fields, you will not be able to publish or update "
@@ -1034,7 +1069,13 @@ msgstr "Mostrar popup?"
 msgid "Show story map introduction"
 msgstr "Mostrar introdução da história"
 
-#: js/build/mapBlocks.js:38626 js/src/map-blocks/storymap-editor.js:644
+#: js/build/jeoMap.js:11917
+msgid "skip intro"
+msgstr ""
+
+#: js/build/mapBlocks.js:38375 js/build/mapBlocks.js:38626
+#: js/src/map-blocks/storymap-editor.js:297
+#: js/src/map-blocks/storymap-editor.js:644
 msgid "Slide "
 msgstr "Slide"
 
@@ -1065,6 +1106,10 @@ msgstr "Query SQL"
 #: includes/layers/class-layers.php:210
 msgid "SQL query"
 msgstr "Query SQL"
+
+#: js/build/jeoMap.js:11895
+msgid "START"
+msgstr ""
 
 #: js/build/mapBlocks.js:38898 js/build/mapsSidebar.js:35507
 #: js/src/posts-selector/index.js:67
@@ -1111,6 +1156,11 @@ msgstr "Mapas de História"
 msgid "Story settings"
 msgstr "Configurações da história"
 
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:143
+msgid "Succesfull tileset migration"
+msgstr ""
+
 #: js/build/mapBlocks.js:38778 js/build/mapsSidebar.js:34802
 #: js/src/map-blocks/utils.js:13
 msgid "Swappable"
@@ -1120,6 +1170,11 @@ msgstr "Trocável"
 #: js/src/map-blocks/utils.js:14
 msgid "Switchable"
 msgstr "Comutável"
+
+#: js/build/layersSidebar.js:31501
+#: js/src/layers-sidebar/carto-integration.js:135
+msgid "Syncronize"
+msgstr ""
 
 #: js/build/discovery.js:9491 js/build/mapBlocks.js:38886
 #: js/build/mapsSidebar.js:35495 js/src/posts-selector/index.js:54
@@ -1182,6 +1237,12 @@ msgstr ""
 msgid "There's no API Key found in your JEO Settings."
 msgstr ""
 
+#: js/build/layersSidebar.js:31389
+#: js/src/layers-sidebar/carto-integration.js:21
+msgid ""
+"This action will overwrite current layer settings and rewrite tileset if set"
+msgstr ""
+
 #: includes/settings/settings-page.php:77
 msgid "This is used for Carto integration only. "
 msgstr ""
@@ -1190,8 +1251,9 @@ msgstr ""
 msgid "This page can't be viewed on mobiles."
 msgstr ""
 
-#: js/build/layersSidebar.js:31741
+#: js/build/layersSidebar.js:31741 js/build/mapBlocks.js:38384
 #: js/src/layers-sidebar/interaction-settings.js:129
+#: js/src/map-blocks/storymap-editor.js:307
 msgid "Title"
 msgstr ""
 
@@ -1226,6 +1288,11 @@ msgstr ""
 
 #: js/build/postsSidebar.js:22145 js/src/posts-sidebar/geo-posts.js:385
 msgid "Update selected point"
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:155
+msgid "Uploading staged file to Mapbox"
 msgstr ""
 
 #: js/build/mapBlocks.js:38310 js/src/map-blocks/storymap-editor.js:229
