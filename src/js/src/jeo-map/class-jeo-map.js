@@ -219,15 +219,26 @@ export default class JeoMap {
 								// alert("asdasdas");
 								// console.log(customAttribution);
 
-								map.addControl(
-									new mapboxgl.AttributionControl( {
+								let controlPostion = 'bottom-right';
+
+								let attributionControl = new mapboxgl.AttributionControl( {
+									compact: false,
+									customAttribution,
+								} );
+
+								if(window.innerWidth < 600) {
+									attributionControl = new mapboxgl.AttributionControl( {
 										compact: true,
 										customAttribution,
-									} ),
-									'bottom-left'
+									} )
+
+									controlPostion = 'bottom-left';
+								}
+
+								map.addControl(
+									attributionControl,
+									controlPostion
 								);
-
-
 							});
 
 							this.addLayersControl( amountLayers );
