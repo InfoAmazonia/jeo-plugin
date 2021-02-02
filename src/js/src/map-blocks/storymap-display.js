@@ -274,7 +274,7 @@ class StoryMapDisplay extends Component {
 										document.querySelector( '#features' ).scrollIntoView();
 									} }
 								>
-									{ 'START' }
+									{ __('START', 'jeo') }
 								</button>
 
 								{ this.props.navigateButton && (
@@ -288,7 +288,7 @@ class StoryMapDisplay extends Component {
 												document.querySelector('.navigate-button-display').click();
 											} }
 										>
-											{ 'skip intro' }
+											{ __('skip intro', 'jeo') }
 										</p>
 										<div
 											className="skip-intro-icon"
@@ -417,7 +417,7 @@ class StoryMapDisplay extends Component {
 								window.scrollTo(0, 0);
 							} }
 						>
-							{ 'Voltar ao topo' }
+							{ __('Back to top', 'jeo') }
 						</p>
 					</div>
 				</>
