@@ -24,6 +24,7 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
+
 const MapEditor = ( {
 	attributes,
 	setAttributes,
@@ -89,7 +90,48 @@ const MapEditor = ( {
 	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 
 	useEffect( () => {
+		// console.log(attributes.navigateMapLayers);
+		// Post the already exsists
+		// console.log(loadedLayers);
+		// console.log(attributes.navigateMapLayers);
+		if(attributes.slides && loadedMap) {
+			// console.log(loadedLayers, loadedMap);
+			const newSlides = attributes.slides.map(slide => {
+				slide.selectedLayers.forEach((selectedLayer, index) => {
+					// console.log(loadedMap);
+					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id ) || !loadedLayers.some(layer => layer.id === selectedLayer.id )) {
+						// console.log("Remove index", index);
+						slide.selectedLayers.splice(index, 1);
+					}
+				})
+
+				return slide;
+			})
+
+			setAttributes( {
+				...attributes,
+				slides: newSlides,
+				loadedLayers,
+				navigateMapLayers: loadedLayers.filter(layer => loadedMap.meta.layers.some(mapLayer => mapLayer.id === layer.id )),
+			} );
+
+			return;
+
+		}
+
+		setAttributes( {
+			...attributes,
+			loadedLayers,
+			navigateMapLayers: loadedLayers,
+		} );
+
+		// console.log(attributes);
+
+	}, [loadingMap, loadedLayers] );
+
+	useEffect( () => {
 		if ( ! attributes.slides ) {
+			// alert("! attributes.slides");
 			setAttributes( {
 				...attributes,
 				slides: [
@@ -110,7 +152,7 @@ const MapEditor = ( {
 		}
 		const postID = wp.data.select( "core/editor" ).getCurrentPostId();
 		setAttributes( { ...attributes, postID } );
-	} );
+	}, [] );
 
 	let rawLayers = [];
 	if ( ! loadingMap && attributes.map_id ) {
@@ -122,6 +164,7 @@ const MapEditor = ( {
 			select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id )
 		);
 	} );
+
 
 	let globalFontFamily = window.jeo_settings.jeo_typography_name;
 
@@ -140,7 +183,7 @@ const MapEditor = ( {
 						<Map
 							key={ key }
 							onStyleLoad={ ( map ) => {
-								setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
+								// setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
 								setSelectedMap( map );
 								setStorymapLayers( layersContent )
 
@@ -177,13 +220,13 @@ const MapEditor = ( {
 									const layerOptions = attributes.navigateMapLayers.find(
 										( { id } ) => id === layer.id
 									);
-									// if ( layerOptions ) {
-
+									// console.log(layerOptions);
+									if ( layerOptions ) {
 										return renderLayer( {
 											layer: layerOptions.meta,
 											instance: layer,
 										} );
-									// }
+									}
 								}
 							) }
 						</Map>

@@ -481,6 +481,12 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 const storyMapElement = document.getElementById('story-map');
 let storyMapProps = null;
 if(storyMapElement) {
-	storyMapProps = JSON.parse(storyMapElement.getAttribute('data-properties'));
+	function decodeHtml(html) {
+		const txt = document.createElement("textarea");
+		txt.innerHTML = html;
+		return txt.value;
+	}
+
+	storyMapProps = JSON.parse(decodeHtml(storyMapElement.getAttribute('data-properties')));
 	wp.element.render(<StoryMapDisplay { ...storyMapProps } />, storyMapElement);
 }
