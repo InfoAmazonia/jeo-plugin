@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-02-02T19:14:01+00:00\n"
+"POT-Creation-Date: 2021-02-03T11:28:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: jeo\n"
@@ -649,6 +649,7 @@ msgid "Clear"
 msgstr ""
 
 #: js/build/discovery.js:7789
+#: js/build/discovery.js:8885
 #: js/src/discovery/blocks/map-item.js:102
 msgid "Apply"
 msgstr ""
@@ -701,38 +702,144 @@ msgstr ""
 msgid "Map layers"
 msgstr ""
 
-#: js/build/discovery.js:9442
+#: js/build/discovery.js:8883
+msgid "MM/DD/YYYY"
+msgstr ""
+
+#: js/build/discovery.js:8884
+msgid " - "
+msgstr ""
+
+#: js/build/discovery.js:8886
+#: js/build/mapBlocks.js:37354
+#: js/build/mapBlocks.js:38692
+#: js/build/postsSidebar.js:22141
+#: js/src/map-blocks/map-editor.js:137
+#: js/src/map-blocks/storymap-editor.js:728
+#: js/src/posts-sidebar/geo-posts.js:377
+msgid "Cancel"
+msgstr ""
+
+#: js/build/discovery.js:8887
+msgid "From"
+msgstr ""
+
+#: js/build/discovery.js:8888
+msgid "To"
+msgstr ""
+
+#: js/build/discovery.js:8889
+msgid "Custom"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "Su"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "Mo"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "Tu"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "We"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "Th"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "Fr"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "Sa"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "January"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "February"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "March"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "April"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "May"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "June"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "July"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "August"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "September"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "October"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "November"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "December"
+msgstr ""
+
+#: js/build/discovery.js:9454
 msgid "Search story"
 msgstr ""
 
-#: js/build/discovery.js:9474
+#: js/build/discovery.js:9486
 msgid "Hide filters"
 msgstr ""
 
-#: js/build/discovery.js:9474
+#: js/build/discovery.js:9486
 msgid "Show filters"
 msgstr ""
 
-#: js/build/discovery.js:9483
+#: js/build/discovery.js:9496
 msgid "Date range"
 msgstr ""
 
-#: js/build/discovery.js:9491
+#: js/build/discovery.js:9504
 #: js/build/mapBlocks.js:38886
 #: js/build/mapsSidebar.js:35495
 #: js/src/posts-selector/index.js:54
 msgid "Tags"
 msgstr ""
 
-#: js/build/discovery.js:9625
+#: js/build/discovery.js:9638
 msgid "View in map"
 msgstr ""
 
-#: js/build/discovery.js:9963
+#: js/build/discovery.js:9976
 msgid "embed"
 msgstr ""
 
-#: js/build/discovery.js:9997
+#: js/build/discovery.js:10010
 #: js/build/jeoMap.js:10770
 #: js/build/layersSidebar.js:32470
 #: js/src/jeo-map/class-jeo-map.js:334
@@ -1141,15 +1248,6 @@ msgstr ""
 #: js/src/map-blocks/map-editor.js:118
 #: js/src/map-blocks/storymap-editor.js:692
 msgid "Type a map name"
-msgstr ""
-
-#: js/build/mapBlocks.js:37354
-#: js/build/mapBlocks.js:38692
-#: js/build/postsSidebar.js:22141
-#: js/src/map-blocks/map-editor.js:137
-#: js/src/map-blocks/storymap-editor.js:728
-#: js/src/posts-sidebar/geo-posts.js:377
-msgid "Cancel"
 msgstr ""
 
 #: js/build/mapBlocks.js:37415
