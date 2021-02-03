@@ -133,7 +133,7 @@ class BarscaleEditor extends Component {
 		return (
 			<Fragment>
 				<TextControl
-					label={ __( 'Left Label' ) }
+					label={ __( 'Left Label', 'jeo' ) }
 					value={ this.state.legendObject.attributes.legend_type_options.left_label }
 					onChange={ ( value ) => this.setState( ( prevState ) => {
 						const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
@@ -147,7 +147,7 @@ class BarscaleEditor extends Component {
 				/>
 
 				<TextControl
-					label={ __( 'Right Label' ) }
+					label={ __( 'Right Label', 'jeo' ) }
 					value={ this.state.legendObject.attributes.legend_type_options.right_label }
 					onChange={ ( value ) => this.setState( ( prevState ) => {
 						const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
@@ -208,7 +208,7 @@ class ColorItem extends Component {
 						/>
 
 						<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
-							{ __( 'Remove' ) }
+							{ __( 'Remove', 'jeo' ) }
 						</Button>
 					</div>
 

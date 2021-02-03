@@ -175,7 +175,7 @@ const LayersSettings = ( {
 							<SelectControl
 								className="jeo-layers-library-filters"
 								hideLabelFromVision={ true }
-								label={ __( 'Layer type' ) }
+								label={ __( 'Layer type', 'jeo' ) }
 								options={ layerTypeOptions }
 								value={ layerTypeFilter }
 								onChange={ ( value ) => {
@@ -202,7 +202,7 @@ const LayersSettings = ( {
 								isLarge
 								onClick={ filterLayers }
 							>
-								{ __( 'Filter' ) }
+								{ __( 'Filter', 'jeo' ) }
 							</Button>
 							<Button
 								className="jeo-layers-library-filters-button-clear"
@@ -215,7 +215,7 @@ const LayersSettings = ( {
 									setLayerNameFilter('');
 								} }
 							>
-								{ __( 'Clear' ) }
+								{ __( 'Clear', 'jeo' ) }
 							</Button>
 						</form>
 					</div>
@@ -229,7 +229,7 @@ const LayersSettings = ( {
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						{ __( 'New Layer' ) }
+						{ __( 'New Layer', 'jeo' ) }
 					</Button>
 				</div>
 			</div>
@@ -284,7 +284,7 @@ const LayersSettings = ( {
 												{ inUse && (
 													<p
 														onClick={ () => {
-															const confirmation = confirm( __( 'Do you really want to delete this layer?' ) );
+															const confirmation = confirm( __( 'Do you really want to delete this layer?', 'jeo' ) );
 
 															if ( confirmation ) {
 																return setLayers(
@@ -306,11 +306,11 @@ const LayersSettings = ( {
 					} ) }
 				</ul>
 			</div>
-			<h2 className="selected-layers-title" >{ __( 'Selected layers' ) }</h2>
+			<h2 className="selected-layers-title" >{ __( 'Selected layers', 'jeo' ) }</h2>
 			{ loadingLayers && <Spinner /> }
 			{ ! loadingLayers && ! attributes.layers.length && (
 				<p className="jeo-layers-list">
-					{ __( 'No layers have been added to this map.' ) }
+					{ __( 'No layers have been added to this map.', 'jeo' ) }
 				</p>
 			) }
 
@@ -459,7 +459,7 @@ const LayersSettings = ( {
 
 									const removeLayer = () => {
 										const confirmation = confirm(
-											__( 'Do you really want to delete this layer?' )
+											__( 'Do you really want to delete this layer?', 'jeo' )
 										);
 
 										if ( confirmation ) {
@@ -509,7 +509,7 @@ const LayersSettings = ( {
 				rel="noopener noreferrer"
 				onClick={ closeModal }
 			>
-				{ __( 'Done' ) }
+				{ __( 'Done', 'jeo' ) }
 			</Button>
 		</Fragment>
 	);

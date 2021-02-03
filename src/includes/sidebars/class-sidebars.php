@@ -29,6 +29,9 @@ class Sidebars {
 			$asset_file['version']
 		);
 
+		wp_set_script_translations( 'jeo-layers-sidebar', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+
+
 		wp_localize_script(
 			'jeo-layers-sidebar',
 			'jeo_private_options',
@@ -52,5 +55,8 @@ class Sidebars {
 			array_merge($asset_file['dependencies'], ['mapboxgl-loader']),
 			$asset_file['version']
 		);
+
+		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+
 	}
 }

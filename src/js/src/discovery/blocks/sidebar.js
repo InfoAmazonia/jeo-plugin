@@ -115,7 +115,7 @@ class Sidebar extends Component {
 							) }
 						/>
 
-						<span>Stories</span>
+						<span>{ __('Stories', 'jeo') }</span>
 					</div>
 				),
 				className: 'stories-tab',
@@ -143,7 +143,7 @@ class Sidebar extends Component {
 							) }
 						/>
 
-						<span>Map layers</span>
+						<span>{ __('Map layers', 'jeo') }</span>
 					</div>
 				),
 				className: 'stories-tab',

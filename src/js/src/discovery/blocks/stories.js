@@ -33,6 +33,39 @@ class Stories extends Component {
 		this.dateRangePickerCancel = this.dateRangePickerCancel.bind( this );
 
 		this.handleTagChange = this.handleTagChange.bind( this );
+		this.localeInfo = {
+			"format": __("MM/DD/YYYY", "jeo"),
+			"separator": __(" - ", "jeo"),
+			"applyLabel": __("Apply", "jeo"),
+			"cancelLabel": __("Cancel", "jeo"),
+			"fromLabel": __("From", "jeo"),
+			"toLabel": __("To", "jeo"),
+			"customRangeLabel": __("Custom", "jeo"),
+			"daysOfWeek": [
+				__("Su", "jeo"),
+				__("Mo", "jeo"),
+				__("Tu", "jeo"),
+				__("We", "jeo"),
+				__("Th", "jeo"),
+				__("Fr", "jeo"),
+				__("Sa", "jeo")
+			],
+			"monthNames": [
+				__("January", "jeo"),
+				__("February", "jeo"),
+				__("March", "jeo"),
+				__("April", "jeo"),
+				__("May", "jeo"),
+				__("June", "jeo"),
+				__("July", "jeo"),
+				__("August", "jeo"),
+				__("September", "jeo"),
+				__("October", "jeo"),
+				__("November", "jeo"),
+				__("December", "jeo")
+			],
+			"firstDay": 1
+		};
 
 		const map = this.props.map;
 
@@ -614,7 +647,7 @@ class Stories extends Component {
 		return (
 			<div className="stories-tab" style={ this.props.style }>
 				<Search
-					searchPlaceholder="Search story"
+					searchPlaceholder={ __("Search story", "jeo") }
 					update={ this.updateStories }
 					searchField={ this.props.queryParams.search?? "" }
 				/>
@@ -662,20 +695,20 @@ class Stories extends Component {
 					) }
 
 					{ this.state.showFilters
-						? __( 'Hide filters' )
-						: __( 'Show filters' ) }
+						? __( 'Hide filters', 'jeo' )
+						: __( 'Show filters', 'jeo' ) }
 				</button>
 				{ this.state.showFilters && (
 					<div className="filters">
-						<DateRangePicker initialSettings={ { autoUpdateInput: false } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
+						<DateRangePicker initialSettings={ { autoUpdateInput: false, locale: this.localeInfo } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
 							<input
-								placeholder={ __( 'Date range' ) }
+								placeholder={ __( 'Date range', 'jeo' ) }
 								readOnly="true"
 								value={ this.props.dateRangeInputValue }
 							></input>
 						</DateRangePicker>
 						<select name="tags" onChange={ this.handleTagChange }>
-							<option value="">{ __( 'Tags' ) }</option>
+							<option value="">{ __( 'Tags', 'jeo' ) }</option>
 							{ this.props.tags.map( ( tag ) => (
 								<option value={ tag.id } key={ tag.id } selected={ this.props.selectedTag == tag.id? "selected" : "" }>
 									{ ' ' }
@@ -762,7 +795,7 @@ class Storie extends Component {
 		const story = this.props.story;
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 		const storyDate = new Date( story.date_gmt ).toLocaleDateString(
-			undefined,
+			navigator.language? navigator.language : undefined,
 			dateOptions
 		);
 
@@ -807,7 +840,7 @@ class Storie extends Component {
 					<div className="date">{ storyDate }</div>
 					<div>
 						<small onMouseEnter={ this.storyHovered }
-							onMouseLeave={ this.storyUnhover }>{ __( 'View in map' ) }</small>
+							onMouseLeave={ this.storyUnhover }>{ __( 'View in map', 'jeo' ) }</small>
 					</div>
 				</div>
 			</a>

@@ -120,7 +120,7 @@ const OnetimeMapEditor = ( {
 
 			<div className="jeo-preview-controls">
 				<Button isPrimary isLarge onClick={ openModal }>
-					{ __( 'Edit layers settings' ) }
+					{ __( 'Edit layers settings', 'jeo' ) }
 				</Button>
 			</div>
 		</Fragment>
@@ -128,9 +128,9 @@ const OnetimeMapEditor = ( {
 };
 
 export default withSelect( ( select, { attributes } ) => {
-	const query = { 
-		include: attributes.layers.map( ( layer ) => layer.id ), 
-		per_page: 100, order: 'asc', orderby: 'menu_order' 
+	const query = {
+		include: attributes.layers.map( ( layer ) => layer.id ),
+		per_page: 100, order: 'asc', orderby: 'menu_order'
 	};
 	return {
 		loadedLayers: select( 'core' ).getEntityRecords(
