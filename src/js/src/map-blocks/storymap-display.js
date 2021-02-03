@@ -159,6 +159,16 @@ class StoryMapDisplay extends Component {
 		const mapStart = config.chapters[ 0 ].location;
         const theme = config.theme;
 		const currentChapterID = this.state.currentChapter.id;
+		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+
+		let storyDate;
+		if(this.state.postData) {
+			storyDate = new Date( this.state.postData.date ).toLocaleDateString(
+				navigator.language? navigator.language : undefined,
+				dateOptions
+			);
+		}
+
         return(
 			<div className="story-map">
 				<div className="not-navigating-map">
@@ -258,7 +268,7 @@ class StoryMapDisplay extends Component {
 										<h1 className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</h1>
 										<div className="post-info">
 											{ /*<p className="author" >{ 'Authors' }</p> */ }
-											<p className="date">{ `${ monthNames[ new Date( this.state.postData.date ).getMonth() ] } ${ new Date( this.state.postData.date ).getDate() }, ${ new Date( this.state.postData.date ).getFullYear() } at ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
+											<p className="date">{ `${storyDate} ${ __("at", "jeo") } ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
 										</div>
 									</>
 								) }
@@ -460,7 +470,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 						className="navigate-button-display"
 						onClick={ onClickFunction }
 					>
-						{ 'NAVIGATE THE MAP' }
+						{ __('NAVIGATE THE MAP', 'jeo') }
 					</button>
 				</div>
 			) }
