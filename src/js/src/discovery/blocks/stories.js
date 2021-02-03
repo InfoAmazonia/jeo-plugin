@@ -795,7 +795,7 @@ class Storie extends Component {
 		const story = this.props.story;
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 		const storyDate = new Date( story.date_gmt ).toLocaleDateString(
-			undefined,
+			navigator.language? navigator.language : undefined,
 			dateOptions
 		);
 
