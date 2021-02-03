@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-02-03 11:31+0000\n"
+"PO-Revision-Date: 2021-02-03 11:34+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
@@ -114,7 +114,7 @@ msgstr "Aplicar mudanças"
 
 #: js/build/discovery.js:8891
 msgid "April"
-msgstr ""
+msgstr "Abril"
 
 #: templates/map-content-layers-list.php:6
 #: templates/map-content-layers-list.php:8
@@ -127,7 +127,7 @@ msgstr "Atribuições:"
 
 #: js/build/discovery.js:8891
 msgid "August"
-msgstr ""
+msgstr "Agosto"
 
 #: templates/discovery.php:16
 msgid "Back to homepage"
@@ -270,7 +270,7 @@ msgstr "Intervalo de data"
 
 #: js/build/discovery.js:8891
 msgid "December"
-msgstr ""
+msgstr "Dezembro"
 
 #: js/build/mapBlocks.js:36516 js/build/mapsSidebar.js:33737
 #: js/src/map-blocks/layers-panel.js:44
@@ -415,7 +415,7 @@ msgstr "Ex. sk.eyJ1Ij..."
 
 #: js/build/discovery.js:8891
 msgid "February"
-msgstr ""
+msgstr "Fevereiro"
 
 #: js/build/layersSidebar.js:31749
 #: js/src/layers-sidebar/interaction-settings.js:140
@@ -560,7 +560,7 @@ msgstr "Mapas interativos para Wordpress"
 
 #: js/build/discovery.js:8891
 msgid "January"
-msgstr ""
+msgstr "Janeiro"
 
 #: includes/menu/class-menu.php:15
 msgid "Jeo"
@@ -596,11 +596,11 @@ msgstr "JEO WP"
 
 #: js/build/discovery.js:8891
 msgid "July"
-msgstr ""
+msgstr "Julho"
 
 #: js/build/discovery.js:8891
 msgid "June"
-msgstr ""
+msgstr "Junho"
 
 #: js/build/mapBlocks.js:39123 js/build/mapsSidebar.js:35732
 #: js/src/posts-selector/meta-selector.js:32
@@ -800,7 +800,7 @@ msgstr ""
 
 #: js/build/discovery.js:8891
 msgid "March"
-msgstr ""
+msgstr "Março"
 
 #: js/build/mapsSidebar.js:35281 js/src/maps-sidebar/maps-sidebar.js:249
 msgid "Max Zoom"
@@ -821,7 +821,7 @@ msgstr "Nível máximo de zoom"
 
 #: js/build/discovery.js:8891
 msgid "May"
-msgstr ""
+msgstr "Maio"
 
 #: js/build/mapBlocks.js:38911 js/build/mapsSidebar.js:35520
 #: js/src/posts-selector/index.js:84
@@ -847,7 +847,7 @@ msgstr "Nível mínimo de zoom"
 
 #: js/build/discovery.js:8883
 msgid "MM/DD/YYYY"
-msgstr ""
+msgstr "DD/MM/YYYY"
 
 #: js/build/discovery.js:8890
 msgid "Mo"
@@ -932,11 +932,11 @@ msgstr "Não aplicado"
 
 #: js/build/discovery.js:8891
 msgid "November"
-msgstr ""
+msgstr "Novembro"
 
 #: js/build/discovery.js:8891
 msgid "October"
-msgstr ""
+msgstr "Outubro"
 
 #: js/build/layersSidebar.js:33672
 #: js/src/posts-sidebar/legends-editor/editors/icons.js:156
@@ -1105,7 +1105,7 @@ msgstr "Camadas selecionadas"
 
 #: js/build/discovery.js:8891
 msgid "September"
-msgstr ""
+msgstr "Setembro"
 
 #: includes/geocode/class-geocode-handler.php:73
 msgid ""
