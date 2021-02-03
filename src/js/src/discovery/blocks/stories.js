@@ -33,6 +33,39 @@ class Stories extends Component {
 		this.dateRangePickerCancel = this.dateRangePickerCancel.bind( this );
 
 		this.handleTagChange = this.handleTagChange.bind( this );
+		this.localeInfo = {
+			"format": __("MM/DD/YYYY", "jeo"),
+			"separator": __(" - ", "jeo"),
+			"applyLabel": __("Apply", "jeo"),
+			"cancelLabel": __("Cancel", "jeo"),
+			"fromLabel": __("From", "jeo"),
+			"toLabel": __("To", "jeo"),
+			"customRangeLabel": __("Custom", "jeo"),
+			"daysOfWeek": [
+				__("Su", "jeo"),
+				__("Mo", "jeo"),
+				__("Tu", "jeo"),
+				__("We", "jeo"),
+				__("Th", "jeo"),
+				__("Fr", "jeo"),
+				__("Sa", "jeo")
+			],
+			"monthNames": [
+				__("January", "jeo"),
+				__("February", "jeo"),
+				__("March", "jeo"),
+				__("April", "jeo"),
+				__("May", "jeo"),
+				__("June", "jeo"),
+				__("July", "jeo"),
+				__("August", "jeo"),
+				__("September", "jeo"),
+				__("October", "jeo"),
+				__("November", "jeo"),
+				__("December", "jeo")
+			],
+			"firstDay": 1
+		};
 
 		const map = this.props.map;
 
@@ -667,7 +700,7 @@ class Stories extends Component {
 				</button>
 				{ this.state.showFilters && (
 					<div className="filters">
-						<DateRangePicker initialSettings={ { autoUpdateInput: false } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
+						<DateRangePicker initialSettings={ { autoUpdateInput: false, locale: this.localeInfo } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
 							<input
 								placeholder={ __( 'Date range', 'jeo' ) }
 								readOnly="true"
