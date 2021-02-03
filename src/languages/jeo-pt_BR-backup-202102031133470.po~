@@ -10,16 +10,25 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-01-28 19:24+0000\n"
+"PO-Revision-Date: 2021-02-03 11:31+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Loco-Version: 2.5.0; wp-5.5.3"
 
+#: js/build/discovery.js:8884
+msgid " - "
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:164
+msgid "\"Settings\""
+msgstr "\"Configurações\""
+
 #: js/build/mapBlocks.js:37327 js/src/map-blocks/map-editor.js:106
 msgid "(Select another map)"
-msgstr ""
+msgstr "(Selecionar outro mapa)"
 
 #: js/build/mapsSidebar.js:35152 js/src/maps-sidebar/maps-sidebar.js:111
 msgid "1 - Your Mapbox access token may be invalid."
@@ -77,6 +86,11 @@ msgstr "Adicionar novo Mapa de História"
 msgid "Added"
 msgstr "Adicionado"
 
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:163
+msgid "All set! Check"
+msgstr "Tudo pronto! Verifique"
+
 #: includes/settings/settings-page.php:48
 msgid "API"
 msgstr "API"
@@ -89,13 +103,18 @@ msgstr "Chave de API"
 msgid "API Key*"
 msgstr "Chave de API*"
 
-#: js/build/discovery.js:7789 js/src/discovery/blocks/map-item.js:102
+#: js/build/discovery.js:7789 js/build/discovery.js:8885
+#: js/src/discovery/blocks/map-item.js:102
 msgid "Apply"
 msgstr "Aplicar"
 
 #: js/build/discovery.js:8404 js/src/discovery/blocks/map-layers.js:551
 msgid "Apply changes"
 msgstr "Aplicar mudanças"
+
+#: js/build/discovery.js:8891
+msgid "April"
+msgstr ""
 
 #: templates/map-content-layers-list.php:6
 #: templates/map-content-layers-list.php:8
@@ -106,9 +125,17 @@ msgstr "Atribuição:"
 msgid "Attributions"
 msgstr "Atribuições:"
 
+#: js/build/discovery.js:8891
+msgid "August"
+msgstr ""
+
 #: templates/discovery.php:16
 msgid "Back to homepage"
 msgstr "Voltar para página inicial"
+
+#: js/build/jeoMap.js:12081
+msgid "Back to top"
+msgstr "Voltar ao topo"
 
 #: js/build/mapBlocks.js:36326 js/build/mapsSidebar.js:33547
 #: js/src/map-blocks/layer-settings.js:152
@@ -119,8 +146,10 @@ msgstr "A camada base deve ser fixada"
 msgid "Brief description"
 msgstr "Descrição breve"
 
-#: js/build/mapBlocks.js:37354 js/build/postsSidebar.js:22141
-#: js/src/map-blocks/map-editor.js:137 js/src/posts-sidebar/geo-posts.js:377
+#: js/build/discovery.js:8886 js/build/mapBlocks.js:37354
+#: js/build/mapBlocks.js:38692 js/build/postsSidebar.js:22141
+#: js/src/map-blocks/map-editor.js:137 js/src/map-blocks/storymap-editor.js:728
+#: js/src/posts-sidebar/geo-posts.js:377
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -188,6 +217,11 @@ msgstr "Logotipo da compania"
 msgid "Comparator"
 msgstr "Comparador"
 
+#: js/build/layersSidebar.js:31478
+#: js/src/layers-sidebar/carto-integration.js:102
+msgid "Configure your Carto options in Jeo settings"
+msgstr "Configure as opções do Carto nas configurações do JEO"
+
 #: js/build/mapBlocks.js:38402 js/src/map-blocks/storymap-editor.js:327
 msgid "Content"
 msgstr "Conteúdo"
@@ -212,6 +246,10 @@ msgstr "Pontos atuais"
 msgid "Current slide: "
 msgstr "Slide atual:"
 
+#: js/build/discovery.js:8889
+msgid "Custom"
+msgstr ""
+
 #: includes/settings/settings-page.php:13
 msgid "Customize"
 msgstr "Customizar"
@@ -226,9 +264,13 @@ msgstr "Link de atribuição de dados"
 msgid "Data attribution name"
 msgstr "Nome da atribuição de dados"
 
-#: js/build/discovery.js:9483
+#: js/build/discovery.js:9496
 msgid "Date range"
 msgstr "Intervalo de data"
+
+#: js/build/discovery.js:8891
+msgid "December"
+msgstr ""
 
 #: js/build/mapBlocks.js:36516 js/build/mapsSidebar.js:33737
 #: js/src/map-blocks/layers-panel.js:44
@@ -334,7 +376,7 @@ msgstr "Editar Mapa de História "
 msgid "Embed"
 msgstr "Embed"
 
-#: js/build/discovery.js:9963
+#: js/build/discovery.js:9976
 msgid "embed"
 msgstr "embed"
 
@@ -371,6 +413,10 @@ msgstr "Ex. pk.eyJ3..."
 msgid "Ex. sk.eyJ1Ij..."
 msgstr "Ex. sk.eyJ1Ij..."
 
+#: js/build/discovery.js:8891
+msgid "February"
+msgstr ""
+
 #: js/build/layersSidebar.js:31749
 #: js/src/layers-sidebar/interaction-settings.js:140
 msgid "Fields"
@@ -385,6 +431,14 @@ msgstr "Filtro"
 #: js/src/map-blocks/utils.js:12
 msgid "Fixed"
 msgstr "Fixado"
+
+#: js/build/discovery.js:8890
+msgid "Fr"
+msgstr ""
+
+#: js/build/discovery.js:8887
+msgid "From"
+msgstr "De"
 
 #: js/build/mapBlocks.js:37726 js/build/mapsSidebar.js:34706
 #: js/src/map-blocks/map-settings.js:158
@@ -418,7 +472,7 @@ msgstr "Geolocalizar pontos"
 msgid "Geolocation"
 msgstr "Geolocalização"
 
-#: js/build/discovery.js:9474
+#: js/build/discovery.js:9486
 msgid "Hide filters"
 msgstr "Ocultar filtros"
 
@@ -465,6 +519,10 @@ msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 msgid "Indicates whether this layer is visible by default"
 msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 
+#: js/build/jeoMap.js:10864 js/src/jeo-map/class-jeo-map.js:469
+msgid "Info"
+msgstr "Informações"
+
 #: includes/settings/settings-page.php:240
 msgid "Info button background color"
 msgstr "Cor de fundo do botão informativo"
@@ -500,6 +558,10 @@ msgstr "Interações"
 msgid "Interactive Map blocks for Wordpress Gutenberg"
 msgstr "Mapas interativos para Wordpress"
 
+#: js/build/discovery.js:8891
+msgid "January"
+msgstr ""
+
 #: includes/menu/class-menu.php:15
 msgid "Jeo"
 msgstr "Jeo"
@@ -531,6 +593,14 @@ msgstr "Mapa de História do JEO"
 #. Plugin Name of the plugin
 msgid "JEO WP"
 msgstr "JEO WP"
+
+#: js/build/discovery.js:8891
+msgid "July"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "June"
+msgstr ""
 
 #: js/build/mapBlocks.js:39123 js/build/mapsSidebar.js:35732
 #: js/src/posts-selector/meta-selector.js:32
@@ -597,6 +667,8 @@ msgid "Layer updated."
 msgstr "Camada atualizada."
 
 #: includes/layers/class-layers.php:20 includes/layers/class-layers.php:31
+#: js/build/jeoMap.js:11179 js/build/mapBlocks.js:38419
+#: js/src/jeo-map/class-jeo-map.js:792 js/src/map-blocks/storymap-editor.js:348
 msgid "Layers"
 msgstr "Camadas"
 
@@ -614,7 +686,8 @@ msgstr "Configuração de camadas"
 msgid "Left Label"
 msgstr "Rótulo direito"
 
-#: js/build/discovery.js:9997 js/build/layersSidebar.js:32470
+#: js/build/discovery.js:10010 js/build/jeoMap.js:10770
+#: js/build/layersSidebar.js:32470 js/src/jeo-map/class-jeo-map.js:334
 #: js/src/layers-sidebar/layers-sidebar.js:293
 msgid "Legend"
 msgstr "Legenda"
@@ -654,7 +727,9 @@ msgstr "Carregando dados das camadas"
 msgid "Loading layers data..."
 msgstr "Carregando dados das camadas"
 
-#: js/build/mapBlocks.js:38554 js/src/map-blocks/storymap-editor.js:537
+#: js/build/mapBlocks.js:38531 js/build/mapBlocks.js:38554
+#: js/src/map-blocks/storymap-editor.js:499
+#: js/src/map-blocks/storymap-editor.js:537
 msgid "Lock current spot"
 msgstr "Marcar ponto atual"
 
@@ -723,6 +798,10 @@ msgstr ""
 msgid "Maps"
 msgstr ""
 
+#: js/build/discovery.js:8891
+msgid "March"
+msgstr ""
+
 #: js/build/mapsSidebar.js:35281 js/src/maps-sidebar/maps-sidebar.js:249
 msgid "Max Zoom"
 msgstr "Zoom máximo"
@@ -739,6 +818,10 @@ msgstr "Data máxima para posts relacionados"
 #: includes/maps/class-maps.php:289
 msgid "Maximum zoom level"
 msgstr "Nível máximo de zoom"
+
+#: js/build/discovery.js:8891
+msgid "May"
+msgstr ""
 
 #: js/build/mapBlocks.js:38911 js/build/mapsSidebar.js:35520
 #: js/src/posts-selector/index.js:84
@@ -761,6 +844,14 @@ msgstr "Data mínima para posts relacionados"
 #: includes/maps/class-maps.php:281
 msgid "Minimum Zoom level"
 msgstr "Nível mínimo de zoom"
+
+#: js/build/discovery.js:8883
+msgid "MM/DD/YYYY"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "Mo"
+msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:155
 msgid ""
@@ -839,6 +930,14 @@ msgstr ""
 msgid "Not applied"
 msgstr "Não aplicado"
 
+#: js/build/discovery.js:8891
+msgid "November"
+msgstr ""
+
+#: js/build/discovery.js:8891
+msgid "October"
+msgstr ""
+
 #: js/build/layersSidebar.js:33672
 #: js/src/posts-sidebar/legends-editor/editors/icons.js:156
 msgid "Ok"
@@ -857,6 +956,11 @@ msgstr "No hover"
 #: js/src/map-blocks/layers-library.js:44
 msgid "or"
 msgstr "ou"
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:165
+msgid "panel above."
+msgstr ""
 
 #: js/build/layersSidebar.js:32304 js/src/layers-sidebar/layers-sidebar.js:74
 msgid ""
@@ -930,6 +1034,10 @@ msgstr "Remover"
 msgid "Right Label"
 msgstr "Rótulo direito"
 
+#: js/build/discovery.js:8890
+msgid "Sa"
+msgstr ""
+
 #: includes/settings/settings-page.php:282
 msgid "Save Changes"
 msgstr "Salvar mudanças"
@@ -964,7 +1072,7 @@ msgstr "Buscar mapa"
 msgid "Search maps"
 msgstr "Procurar mapas"
 
-#: js/build/discovery.js:9442
+#: js/build/discovery.js:9454
 msgid "Search story"
 msgstr "Buscar história"
 
@@ -995,6 +1103,10 @@ msgstr "Ver prévisualização"
 msgid "Selected layers"
 msgstr "Camadas selecionadas"
 
+#: js/build/discovery.js:8891
+msgid "September"
+msgstr ""
+
 #: includes/geocode/class-geocode-handler.php:73
 msgid ""
 "Service provided by Open Street Maps at https://nominatim.openstreetmap.org/"
@@ -1016,7 +1128,7 @@ msgstr "Deve ser exibido por padrão"
 msgid "Show all posts on map"
 msgstr "Mostrar todos os posts no mapa"
 
-#: js/build/discovery.js:9474
+#: js/build/discovery.js:9486
 msgid "Show filters"
 msgstr "Exibir filtros"
 
@@ -1034,7 +1146,13 @@ msgstr "Mostrar popup?"
 msgid "Show story map introduction"
 msgstr "Mostrar introdução da história"
 
-#: js/build/mapBlocks.js:38626 js/src/map-blocks/storymap-editor.js:644
+#: js/build/jeoMap.js:11917
+msgid "skip intro"
+msgstr ""
+
+#: js/build/mapBlocks.js:38375 js/build/mapBlocks.js:38626
+#: js/src/map-blocks/storymap-editor.js:297
+#: js/src/map-blocks/storymap-editor.js:644
 msgid "Slide "
 msgstr "Slide"
 
@@ -1065,6 +1183,10 @@ msgstr "Query SQL"
 #: includes/layers/class-layers.php:210
 msgid "SQL query"
 msgstr "Query SQL"
+
+#: js/build/jeoMap.js:11895
+msgid "START"
+msgstr ""
 
 #: js/build/mapBlocks.js:38898 js/build/mapsSidebar.js:35507
 #: js/src/posts-selector/index.js:67
@@ -1111,6 +1233,15 @@ msgstr "Mapas de História"
 msgid "Story settings"
 msgstr "Configurações da história"
 
+#: js/build/discovery.js:8890
+msgid "Su"
+msgstr ""
+
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:143
+msgid "Succesfull tileset migration"
+msgstr ""
+
 #: js/build/mapBlocks.js:38778 js/build/mapsSidebar.js:34802
 #: js/src/map-blocks/utils.js:13
 msgid "Swappable"
@@ -1121,7 +1252,12 @@ msgstr "Trocável"
 msgid "Switchable"
 msgstr "Comutável"
 
-#: js/build/discovery.js:9491 js/build/mapBlocks.js:38886
+#: js/build/layersSidebar.js:31501
+#: js/src/layers-sidebar/carto-integration.js:135
+msgid "Syncronize"
+msgstr ""
+
+#: js/build/discovery.js:9504 js/build/mapBlocks.js:38886
 #: js/build/mapsSidebar.js:35495 js/src/posts-selector/index.js:54
 msgid "Tags"
 msgstr "Tags"
@@ -1129,6 +1265,10 @@ msgstr "Tags"
 #: includes/settings/settings-page.php:233
 msgid "Text over primary color"
 msgstr "Texto sob cor primária"
+
+#: js/build/discovery.js:8890
+msgid "Th"
+msgstr ""
 
 #: includes/layers/class-layers.php:92
 msgid "The layer attribution. A text or HTML code with a link"
@@ -1182,6 +1322,12 @@ msgstr ""
 msgid "There's no API Key found in your JEO Settings."
 msgstr ""
 
+#: js/build/layersSidebar.js:31389
+#: js/src/layers-sidebar/carto-integration.js:21
+msgid ""
+"This action will overwrite current layer settings and rewrite tileset if set"
+msgstr ""
+
 #: includes/settings/settings-page.php:77
 msgid "This is used for Carto integration only. "
 msgstr ""
@@ -1190,9 +1336,18 @@ msgstr ""
 msgid "This page can't be viewed on mobiles."
 msgstr ""
 
-#: js/build/layersSidebar.js:31741
+#: js/build/layersSidebar.js:31741 js/build/mapBlocks.js:38384
 #: js/src/layers-sidebar/interaction-settings.js:129
+#: js/src/map-blocks/storymap-editor.js:307
 msgid "Title"
+msgstr ""
+
+#: js/build/discovery.js:8888
+msgid "To"
+msgstr "Até"
+
+#: js/build/discovery.js:8890
+msgid "Tu"
 msgstr ""
 
 #: js/build/layersSidebar.js:31982 js/build/layersSidebar.js:34243
@@ -1228,6 +1383,11 @@ msgstr ""
 msgid "Update selected point"
 msgstr ""
 
+#: js/build/layersSidebar.js:31503
+#: js/src/layers-sidebar/carto-integration.js:155
+msgid "Uploading staged file to Mapbox"
+msgstr ""
+
 #: js/build/mapBlocks.js:38310 js/src/map-blocks/storymap-editor.js:229
 msgid "Use \"Navigate to map\" button"
 msgstr ""
@@ -1261,7 +1421,7 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: js/build/discovery.js:9625
+#: js/build/discovery.js:9638
 msgid "View in map"
 msgstr "Ver no mapa"
 
@@ -1287,6 +1447,10 @@ msgstr ""
 
 #: includes/storymap/class-storymap.php:29
 msgid "View Story Maps"
+msgstr ""
+
+#: js/build/discovery.js:8890
+msgid "We"
 msgstr ""
 
 #: js/build/postsSidebar.js:22123 js/src/posts-sidebar/geo-posts.js:357
