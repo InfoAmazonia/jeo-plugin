@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-02-03 11:33+0000\n"
+"PO-Revision-Date: 2021-02-03 12:06+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
@@ -847,7 +847,7 @@ msgstr "Nível mínimo de zoom"
 
 #: js/build/discovery.js:8883
 msgid "MM/DD/YYYY"
-msgstr ""
+msgstr "DD/MM/YYYY"
 
 #: js/build/discovery.js:8890
 msgid "Mo"
@@ -1148,7 +1148,7 @@ msgstr "Mostrar introdução da história"
 
 #: js/build/jeoMap.js:11917
 msgid "skip intro"
-msgstr ""
+msgstr "Pular introdução"
 
 #: js/build/mapBlocks.js:38375 js/build/mapBlocks.js:38626
 #: js/src/map-blocks/storymap-editor.js:297
@@ -1186,7 +1186,7 @@ msgstr "Query SQL"
 
 #: js/build/jeoMap.js:11895
 msgid "START"
-msgstr ""
+msgstr "INICIAR"
 
 #: js/build/mapBlocks.js:38898 js/build/mapsSidebar.js:35507
 #: js/src/posts-selector/index.js:67
@@ -1390,7 +1390,7 @@ msgstr ""
 
 #: js/build/mapBlocks.js:38310 js/src/map-blocks/storymap-editor.js:229
 msgid "Use \"Navigate to map\" button"
-msgstr ""
+msgstr "Usar botão \"Navegar no mapa\""
 
 #: includes/layers/class-layers.php:198
 msgid "Use Carto Integration"

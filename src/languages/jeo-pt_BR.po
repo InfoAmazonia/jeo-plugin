@@ -10,7 +10,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-02-03 11:34+0000\n"
+"PO-Revision-Date: 2021-02-03 12:10+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
@@ -116,6 +116,10 @@ msgstr "Aplicar mudanças"
 msgid "April"
 msgstr "Abril"
 
+#: js/build/jeoMap.js:11894
+msgid "at"
+msgstr ""
+
 #: templates/map-content-layers-list.php:6
 #: templates/map-content-layers-list.php:8
 msgid "Attribution: "
@@ -133,7 +137,7 @@ msgstr "Agosto"
 msgid "Back to homepage"
 msgstr "Voltar para página inicial"
 
-#: js/build/jeoMap.js:12081
+#: js/build/jeoMap.js:12092
 msgid "Back to top"
 msgstr "Voltar ao topo"
 
@@ -859,6 +863,10 @@ msgid ""
 "an object composed of lat, lon and geocode attributes"
 msgstr ""
 
+#: js/build/jeoMap.js:12139
+msgid "NAVIGATE THE MAP"
+msgstr "Navegar no mapa"
+
 #: js/build/mapBlocks.js:36891 js/build/mapsSidebar.js:34112
 #: js/src/map-blocks/layers-settings.js:232
 msgid "New Layer"
@@ -1146,9 +1154,9 @@ msgstr "Mostrar popup?"
 msgid "Show story map introduction"
 msgstr "Mostrar introdução da história"
 
-#: js/build/jeoMap.js:11917
+#: js/build/jeoMap.js:11928
 msgid "skip intro"
-msgstr ""
+msgstr "Pular introdução"
 
 #: js/build/mapBlocks.js:38375 js/build/mapBlocks.js:38626
 #: js/src/map-blocks/storymap-editor.js:297
@@ -1184,9 +1192,9 @@ msgstr "Query SQL"
 msgid "SQL query"
 msgstr "Query SQL"
 
-#: js/build/jeoMap.js:11895
+#: js/build/jeoMap.js:11906
 msgid "START"
-msgstr ""
+msgstr "INICIAR"
 
 #: js/build/mapBlocks.js:38898 js/build/mapsSidebar.js:35507
 #: js/src/posts-selector/index.js:67
@@ -1390,7 +1398,7 @@ msgstr ""
 
 #: js/build/mapBlocks.js:38310 js/src/map-blocks/storymap-editor.js:229
 msgid "Use \"Navigate to map\" button"
-msgstr ""
+msgstr "Usar botão \"Navegar no mapa\""
 
 #: includes/layers/class-layers.php:198
 msgid "Use Carto Integration"
