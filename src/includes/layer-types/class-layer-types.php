@@ -124,6 +124,9 @@ class Layer_Types {
 			['mapboxgl-loader'],
 			$asset_file['version']
 		);
+
+		wp_set_script_translations('jeo-layer', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages');
+
 	}
 
 	public function enqueue_scripts() {
@@ -136,6 +139,7 @@ class Layer_Types {
 			$deps = isset( $layer_type['dependecies'] ) ? $layer_type['dependecies'] : [];
 			$deps = array_merge( ['jeo-layer'], $deps );
 			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps );
+			wp_set_script_translations('layer-type-' . $slug, 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages');
 		}
 
 	}

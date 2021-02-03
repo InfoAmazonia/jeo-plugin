@@ -488,7 +488,7 @@ class MapLayers extends Component {
 
 		return (
 			<div className="maps-tab" style={ this.props.style }>
-				<Search searchPlaceholder="Search map" update={ this.updateMaps } />
+				<Search searchPlaceholder={ __("Search map", "jeo") } update={ this.updateMaps } />
 
 				<div className="selected-layers">
 					<div className="status">
@@ -527,28 +527,28 @@ class MapLayers extends Component {
 						</div>
 
 						<div className="status-message">
-							{ isApplied ? __( 'Changes applied' ) : __( 'Not applied' ) }
+							{ isApplied ? __( 'Changes applied', 'jeo' ) : __( 'Not applied', 'jeo' ) }
 						</div>
 					</div>
 
 					<div className="selected-layers--title">
 						{ ' ' }
-						{ __( 'Selected layers' ) }{ ' ' }
+						{ __( 'Selected layers', 'jeo' ) }{ ' ' }
 					</div>
 					<div className="selected-layers--content">
 						{ Object.keys( this.props.selectedLayers ).length > 0
 							? selectedLayersRender
-							: __( 'No layers selected' ) }
+							: __( 'No layers selected', 'jeo' ) }
 					</div>
 				</div>
 
 				{ isApplied ? (
 					<button className="apply-changes disabled">
-						{ __( 'Changes applied' ) }
+						{ __( 'Changes applied', 'jeo' ) }
 					</button>
 				) : (
 					<button className="apply-changes" onClick={ this.applyLayersChanges }>
-						{ __( 'Apply changes' ) }
+						{ __( 'Apply changes', 'jeo' ) }
 					</button>
 				) }
 				{ loading }

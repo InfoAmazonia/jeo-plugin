@@ -120,7 +120,7 @@ class SimplecolorEditor extends Component {
 					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } />
 					) }
 					<Button isSecondary isButton isLarge onClick={ this.addItem } className="full-width-button">
-						{ __( 'Add new label' ) }
+						{ __( 'Add new label', 'jeo' ) }
 					</Button>
 				</div>
 			</Fragment>
@@ -152,7 +152,7 @@ class ColorItem extends Component {
 						<div>
 							<TextControl
 								className="label-input-wrapper"
-								label={ __( 'Label' ) }
+								label={ __( 'Label', 'jeo' ) }
 								value={ this.state.label }
 								onChange={ ( label ) => {
 									// console.log( "selectedColor.id", this.state.selectedColor.id );
@@ -172,7 +172,7 @@ class ColorItem extends Component {
 							/>
 
 							<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
-								{ __( 'Remove' ) }
+								{ __( 'Remove', 'jeo' ) }
 							</Button>
 						</div>
 
@@ -181,7 +181,7 @@ class ColorItem extends Component {
 				<div className="buttons-inputs">
 					<TextControl
 						className="label-input-wrapper"
-						label={ __( 'Label' ) }
+						label={ __( 'Label', 'jeo') }
 						value={ this.state.label }
 						onChange={ ( label ) => {
 							// console.log( "selectedColor.id", this.state.selectedColor.id );

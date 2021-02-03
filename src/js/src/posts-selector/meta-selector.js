@@ -29,7 +29,7 @@ export function MetaSelector( { label, onChange, value: _metas } ) {
 				<fieldset key={ i }>
 					<PanelRow>
 						<TextControl
-							label={ __( 'Key' ) }
+							label={ __( 'Key', 'jeo' ) }
 							value={ meta.key }
 							onChange={ ( key ) => {
 								onChange( replace( metas, i, [ { ...metas[ i ], key } ] ) );
@@ -39,7 +39,7 @@ export function MetaSelector( { label, onChange, value: _metas } ) {
 
 					<PanelRow>
 						<SelectControl
-							label={ __( 'Comparator' ) }
+							label={ __( 'Comparator', 'jeo' ) }
 							options={ compareOptions }
 							value={ meta.compare }
 							onChange={ ( compare ) => {
@@ -50,7 +50,7 @@ export function MetaSelector( { label, onChange, value: _metas } ) {
 
 					<PanelRow>
 						<TextControl
-							label={ __( 'Value' ) }
+							label={ __( 'Value', 'jeo' ) }
 							value={ meta.value }
 							onChange={ ( value ) => {
 								onChange( replace( metas, i, [ { ...metas[ i ], value } ] ) );
@@ -65,7 +65,7 @@ export function MetaSelector( { label, onChange, value: _metas } ) {
 							onChange( replace( metas, i ) );
 						} }
 					>
-						{ __( 'Remove' ) }
+						{ __( 'Remove', 'jeo' ) }
 					</Button>
 				</fieldset>
 			) ) }
@@ -77,7 +77,7 @@ export function MetaSelector( { label, onChange, value: _metas } ) {
 						onChange( [ ...metas, { key: '', value: '', compare: '=' } ] );
 					} }
 				>
-					{ __( 'Add' ) }
+					{ __( 'Add', 'jeo' ) }
 				</Button>
 			</div>
 		</PanelRow>

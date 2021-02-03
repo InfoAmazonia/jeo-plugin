@@ -50,7 +50,7 @@ class LegendEditor extends Component {
 		return (
 			<Fragment>
 				<CheckboxControl
-					label={ __( 'Use legend' ) }
+					label={ __( 'Use legend', 'jeo' ) }
 					checked={ this.state.legendObject.attributes.use_legend }
 					onChange={ () => {
 						let newMeta = window.layerFormData;
@@ -70,7 +70,7 @@ class LegendEditor extends Component {
 
 				{ this.state.legendObject.attributes.use_legend && <TextControl
 					className="label-input-wrapper"
-					label={ __( 'Legend title' ) }
+					label={ __( 'Legend title', 'jeo' ) }
 					value={ this.state.legendObject.attributes.legend_title }
 					onChange={ ( value ) => {
 						const newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
@@ -89,7 +89,7 @@ class LegendEditor extends Component {
 				{ this.state.legendObject.attributes.use_legend && (
 					<>
 						<SelectControl
-							label={ __( 'Type' ) }
+							label={ __( 'Type', 'jeo' ) }
 							value={ this.state.legendObject.legendSlug }
 							options={ [	...this.legendTypes.map( ( item ) => {
 								return { label: item, value: item };

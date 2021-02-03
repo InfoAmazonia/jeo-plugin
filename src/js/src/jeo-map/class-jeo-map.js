@@ -1,4 +1,5 @@
 import template from 'lodash.template';
+import { __ } from '@wordpress/i18n';
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, function ( match, dec ) {
@@ -14,7 +15,7 @@ export default class JeoMap {
 		this.layers = [];
 		this.legends = [];
 
-		this.isEmbed = this.element.getAttribute('data-embed');
+		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
 		const map = new window.mapboxgl.Map( {
 			container: element,
@@ -34,9 +35,15 @@ export default class JeoMap {
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
 					// console.log( );
-					map.on('load', () => {
-						if(this.isEmbed) {
-							map.flyTo({ center: [this.getArg( 'center_lon' ), this.getArg( 'center_lat' )], zoom: this.getArg( 'initial_zoom' ) });
+					map.on( 'load', () => {
+						if ( this.isEmbed ) {
+							map.flyTo( {
+								center: [
+									this.getArg( 'center_lon' ),
+									this.getArg( 'center_lat' ),
+								],
+								zoom: this.getArg( 'initial_zoom' ),
+							} );
 						} else {
 							map.setCenter( [
 								this.getArg( 'center_lon' ),
@@ -45,7 +52,7 @@ export default class JeoMap {
 
 							map.setZoom( this.getArg( 'initial_zoom' ) );
 						}
-					});
+					} );
 
 					map.addControl(
 						new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -87,7 +94,6 @@ export default class JeoMap {
 					if ( this.getArg( 'max_zoom' ) ) {
 						map.setMaxZoom( this.getArg( 'max_zoom' ) );
 					}
-
 				}
 			} )
 			.then( () => {
@@ -107,10 +113,12 @@ export default class JeoMap {
 							const mapLayersSettings = this.getArg( 'layers' );
 
 							// Add an empty style to allow any layer insesion even if a mapbox style layer is not present. If you don't have a style set you can't add new layers
-							const hasStyle = mapLayersSettings.some( ( layerSetting ) => layerSetting.load_as_style );
+							const hasStyle = mapLayersSettings.some(
+								( layerSetting ) => layerSetting.load_as_style
+							);
 
-							if( !hasStyle ) {
-								map.setStyle('mapbox://styles/mapbox/empty-v9');
+							if ( ! hasStyle ) {
+								map.setStyle( 'mapbox://styles/mapbox/empty-v9' );
 							}
 
 							// Add styles to map
@@ -119,7 +127,9 @@ export default class JeoMap {
 							let styleLayerIndex;
 
 							layers.forEach( ( layer, index ) => {
-								const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
+								const currentLayerSettings = mapLayersSettings.find(
+									( item ) => item.id === layer.attributes.layer_post_id
+								);
 
 								if ( currentLayerSettings.load_as_style ) {
 									layer.addStyle( map );
@@ -128,53 +138,61 @@ export default class JeoMap {
 							} );
 
 							// When style is done loading (don't try adding layers before style is not read, its messy)
-							map.on('load', () => {
+							map.on( 'load', () => {
 								// Remove not selected layers and toggle vissibility
-								mapLayersSettings.forEach( layer => {
-									if(layer.load_as_style) {
+								mapLayersSettings.forEach( ( layer ) => {
+									if ( layer.load_as_style ) {
 										const styleLayers = layer.style_layers;
 
-										styleLayers.forEach( styleLayer => {
-											if(!styleLayer.show) {
-												if(map.getLayer( styleLayer.id )) {
+										styleLayers.forEach( ( styleLayer ) => {
+											if ( ! styleLayer.show ) {
+												if ( map.getLayer( styleLayer.id ) ) {
 													map.removeLayer( styleLayer.id );
 												}
 											}
 
 											// In the fucture individual style layers will have their own toggles/swaps
-											if(!layer.default) {
-												if(map.getLayer( styleLayer.id )) {
-													map.setLayoutProperty( styleLayer.id, 'visibility', 'none' );
+											if ( ! layer.default ) {
+												if ( map.getLayer( styleLayer.id ) ) {
+													map.setLayoutProperty(
+														styleLayer.id,
+														'visibility',
+														'none'
+													);
 												}
 											}
-										} )
+										} );
 									}
-								} )
+								} );
 
 								// Add interactions to style layers
-								layers.forEach(layer => {
-									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
-									if(currentLayerSettings.load_as_style ) {
+								layers.forEach( ( layer ) => {
+									const currentLayerSettings = mapLayersSettings.find(
+										( item ) => item.id === layer.attributes.layer_post_id
+									);
+									if ( currentLayerSettings.load_as_style ) {
 										layer.addInteractions( map );
 									}
-								})
-
+								} );
 
 								// Select reference pointers
-								firstStyleLayerId = map.style._order[0];
-								lastStyleLayerId = map.style._order[map.style._order.length - 1];
+								firstStyleLayerId = map.style._order[ 0 ];
+								lastStyleLayerId =
+									map.style._order[ map.style._order.length - 1 ];
 
 								// console.log(layers);
 								// console.log(firstStyleLayerId, lastStyleLayerId);
 
 								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
-									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
+									const currentLayerSettings = mapLayersSettings.find(
+										( item ) => item.id === layer.attributes.layer_post_id
+									);
 
-									if (!currentLayerSettings.load_as_style ) {
+									if ( ! currentLayerSettings.load_as_style ) {
 										// If the current layer is bellow the style, add using fisrt syle layer reference
-										if(index < styleLayerIndex) {
-											layer.addLayer( map, [ firstStyleLayerId ]);
+										if ( index < styleLayerIndex ) {
+											layer.addLayer( map, [ firstStyleLayerId ] );
 										} else {
 											layer.addLayer( map );
 										}
@@ -184,7 +202,9 @@ export default class JeoMap {
 								// Add attributions
 								const customAttribution = [];
 								layers.forEach( ( layer ) => {
-									const currentLayerSettings = mapLayersSettings.find( ( item ) => item.id === layer.attributes.layer_post_id);
+									const currentLayerSettings = mapLayersSettings.find(
+										( item ) => item.id === layer.attributes.layer_post_id
+									);
 
 									if ( layer.attribution ) {
 										let attributionLink = layer.attribution;
@@ -265,16 +285,17 @@ export default class JeoMap {
 
 	initMap() {
 		if ( this.getArg( 'map_id' ) ) {
-			return jQuery.ajax({
-				type: 'GET',
-				beforeSend: function (request) {
-					request.setRequestHeader('X-WP-Nonce', jeoMapVars.nonce)
-				},
-				url: jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' )
-			}
-			).then( ( data ) => {
-				this.map_post_object = data;
-			} );
+			return jQuery
+				.ajax( {
+					type: 'GET',
+					beforeSend: function ( request ) {
+						request.setRequestHeader( 'X-WP-Nonce', jeoMapVars.nonce );
+					},
+					url: jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' ),
+				} )
+				.then( ( data ) => {
+					this.map_post_object = data;
+				} );
 		}
 		return Promise.resolve();
 	}
@@ -313,22 +334,22 @@ export default class JeoMap {
 			/*const legendsTitle = document.createElement( 'div' );
 			legendsTitle.classList.add( 'legends-title' );
 			legendsTitle.innerHTML = '<span class="text"> Legend </span>';*/
-				const legendsTitle = document.createElement( 'div' );
-				legendsTitle.classList.add( 'legends-title' );
+			const legendsTitle = document.createElement( 'div' );
+			legendsTitle.classList.add( 'legends-title' );
 
-				const legendTextIcon = document.createElement( 'div' );
-				legendTextIcon.classList.add( 'text-icon' );
+			const legendTextIcon = document.createElement( 'div' );
+			legendTextIcon.classList.add( 'text-icon' );
 
-				const layerIcon = document.createElement( 'i' );
-				layerIcon.classList.add( 'legend-icon' );
+			const layerIcon = document.createElement( 'i' );
+			layerIcon.classList.add( 'legend-icon' );
 
-				legendTextIcon.appendChild( layerIcon );
-				legendTextIcon.innerHTML += '<span class="text"> Legend </span>';
+			legendTextIcon.appendChild( layerIcon );
+			legendTextIcon.innerHTML += `<span class="text"> ${ __(
+				'Legend',
+				'jeo'
+			) } </span>`;
 
-				legendsTitle.appendChild( legendTextIcon );
-
-
-
+			legendsTitle.appendChild( legendTextIcon );
 
 			const legendsHideIcon = document.createElement( 'i' );
 			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
@@ -336,15 +357,19 @@ export default class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			container.appendChild( legendsTitle );
 
-			legendsTitle.addEventListener( 'click', function() {
+			legendsTitle.addEventListener( 'click', function () {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
-					container.classList.add('hidden');
+					container.classList.add( 'hidden' );
 					legendsHideIcon.classList.remove( 'active' );
-					jQuery( this.parentNode.querySelector('.hideable-content') ).slideToggle( 'slow' );
+					jQuery(
+						this.parentNode.querySelector( '.hideable-content' )
+					).slideToggle( 'slow' );
 				} else {
-					container.classList.remove('hidden');
+					container.classList.remove( 'hidden' );
 					legendsHideIcon.classList.add( 'active' );
-					jQuery( this.parentNode.querySelector('.hideable-content') ).slideToggle( 'slow' );
+					jQuery(
+						this.parentNode.querySelector( '.hideable-content' )
+					).slideToggle( 'slow' );
 				}
 			} );
 
@@ -359,11 +384,11 @@ export default class JeoMap {
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
 
-				console.log(legend);
+				console.log( legend );
 
-				if(legend.attributes.legend_title) {
-					const legendTitle = document.createElement('span');
-					legendTitle.classList.add('legend-single-title');
+				if ( legend.attributes.legend_title ) {
+					const legendTitle = document.createElement( 'span' );
+					legendTitle.classList.add( 'legend-single-title' );
 					legendTitle.innerText = legend.attributes.legend_title;
 
 					legendContainer.appendChild( legendTitle );
@@ -454,7 +479,7 @@ export default class JeoMap {
 
 		const moreButton = document.createElement( 'a' );
 		moreButton.classList.add( 'more-info-button' );
-		moreButton.innerHTML = 'Info';
+		moreButton.innerHTML = __( 'Info', 'jeo' );
 
 		moreButton.onclick = ( e ) => {
 			e.preventDefault();
@@ -524,7 +549,6 @@ export default class JeoMap {
 							ordered[ index ] = data.find( ( l ) => l.id == el );
 						} );
 
-
 						ordered.forEach( ( layerObject, i ) => {
 							if ( layerObject ) {
 								returnLayers.push(
@@ -576,7 +600,7 @@ export default class JeoMap {
 			// console.log("relatedPostsCriteria", relatedPostsCriteria);
 			// console.log("relate_posts", this.getArg( 'relate_posts' ));
 
-			if(!relatePosts) {
+			if ( ! relatePosts ) {
 				resolve( [] );
 				return;
 			}
@@ -584,7 +608,10 @@ export default class JeoMap {
 			const query = {};
 			query.per_page = 100; // TODO handle limit of posts per query
 
-			if(this.relatedPostsCriteria.after || this.relatedPostsCriteria.before) {
+			if (
+				this.relatedPostsCriteria.after ||
+				this.relatedPostsCriteria.before
+			) {
 				query.orderby = 'date';
 				query.order = 'desc';
 			}
@@ -621,8 +648,10 @@ export default class JeoMap {
 	}
 
 	addPointToMap( point, post ) {
-		const url = point.relevance === 'secondary' ? `url(${jeoMapVars.jeoUrl}/js/src/icons/news-marker-hover.png`: `url(${jeoMapVars.jeoUrl}/js/src/icons/news-marker.png`;
-
+		const url =
+			point.relevance === 'secondary'
+				? `url(${ jeoMapVars.jeoUrl }/js/src/icons/news-marker-hover.png`
+				: `url(${ jeoMapVars.jeoUrl }/js/src/icons/news-marker.png`;
 
 		const popupHTML = this.popupTemplate( {
 			post,
@@ -637,14 +666,14 @@ export default class JeoMap {
 			lon: parseFloat( point._geocode_lon ),
 		};
 
-		var el = document.createElement('div');
+		var el = document.createElement( 'div' );
 		el.className = 'marker';
 		el.style.background = url;
 		el.style.width = '27px';
 		el.style.height = '36px';
 		el.style.backgroundSize = 'cover';
 
-		const marker = new mapboxgl.Marker({ element: el, anchor: 'bottom' })
+		const marker = new mapboxgl.Marker( { element: el, anchor: 'bottom' } )
 			.setLngLat( LngLat )
 			.addTo( this.map );
 
@@ -667,8 +696,8 @@ export default class JeoMap {
 		// By default, fly to the first post and centers it
 		this.activateMarker( marker );
 
-		if(!this.isEmbed) {
-				// alert("asdasd");
+		if ( ! this.isEmbed ) {
+			// alert("asdasd");
 			this.map.flyTo( { center: LngLat, zoom: 4 } );
 		}
 	}
@@ -773,7 +802,10 @@ export default class JeoMap {
 			layerIcon.classList.add( 'layer-icon' );
 
 			legendTextIcon.appendChild( layerIcon );
-			legendTextIcon.innerHTML += '<span class="text"> Layers </span>';
+			legendTextIcon.innerHTML += `<span class="text"> ${ __(
+				'Layers',
+				'jeo'
+			) } </span>`;
 
 			legendsTitle.appendChild( legendTextIcon );
 
@@ -783,15 +815,19 @@ export default class JeoMap {
 			legendsTitle.appendChild( legendsHideIcon );
 			layerSelectionTitle.appendChild( legendsTitle );
 
-			layerSelectionTitle.addEventListener( 'click', function() {
+			layerSelectionTitle.addEventListener( 'click', function () {
 				if ( legendsHideIcon.classList.contains( 'active' ) ) {
 					navElement.classList.add( 'hidden' );
 					legendsHideIcon.classList.remove( 'active' );
-					jQuery( this.parentNode.querySelector('.layers-wrapper') ).slideToggle( 'slow' );
+					jQuery(
+						this.parentNode.querySelector( '.layers-wrapper' )
+					).slideToggle( 'slow' );
 				} else {
 					navElement.classList.remove( 'hidden' );
 					legendsHideIcon.classList.add( 'active' );
-					jQuery( this.parentNode.querySelector('.layers-wrapper') ).slideToggle( 'slow' );
+					jQuery(
+						this.parentNode.querySelector( '.layers-wrapper' )
+					).slideToggle( 'slow' );
 				}
 			} );
 
@@ -819,7 +855,10 @@ export default class JeoMap {
 
 				link.setAttribute( 'data-layer_id', this.layers[ index ].layer_id );
 
-				const layerSetting = mapLayersSettings.find( layerSetting =>  layerSetting.id === this.layers[ index ].attributes.layer_post_id)
+				const layerSetting = mapLayersSettings.find(
+					( layerSetting ) =>
+						layerSetting.id === this.layers[ index ].attributes.layer_post_id
+				);
 
 				link.onclick = ( e ) => {
 					const clicked = e.currentTarget;
@@ -829,18 +868,20 @@ export default class JeoMap {
 
 					let visibility = false;
 
-					if(layerSetting.load_as_style) {
-						if(layerSetting.style_layers && layerSetting.style_layers.length) {
-							layerSetting.style_layers.forEach(styleLayer => {
-								if(this.map.getLayer(styleLayer.id)) {
+					if ( layerSetting.load_as_style ) {
+						if (
+							layerSetting.style_layers &&
+							layerSetting.style_layers.length
+						) {
+							layerSetting.style_layers.forEach( ( styleLayer ) => {
+								if ( this.map.getLayer( styleLayer.id ) ) {
 									visibility = this.map.getLayoutProperty(
 										styleLayer.id,
 										'visibility'
 									);
 								}
-							});
+							} );
 						}
-
 					} else {
 						visibility = this.map.getLayoutProperty(
 							clickedLayer,
@@ -913,27 +954,34 @@ export default class JeoMap {
 		const mapLayersSettings = this.getArg( 'layers' );
 		const layers = this.layers;
 
-		layers.forEach(layer => {
+		layers.forEach( ( layer ) => {
 			const layerSlug = layer.attributes.layer_id;
 			const layerId = layer.attributes.layer_post_id;
 
-			if(layer_id === layerSlug) {
-				mapLayersSettings.forEach(layerSetting => {
-
-					if(layerId === layerSetting.id) {
-						if(layerSetting.load_as_style && layerSetting.style_layers && layerSetting.style_layers.length) {
-							layerSetting.style_layers.forEach(styleLayer => {
-								if(this.map.getLayer(styleLayer.id)) {
-									this.map.setLayoutProperty( styleLayer.id, 'visibility', visibility );
+			if ( layer_id === layerSlug ) {
+				mapLayersSettings.forEach( ( layerSetting ) => {
+					if ( layerId === layerSetting.id ) {
+						if (
+							layerSetting.load_as_style &&
+							layerSetting.style_layers &&
+							layerSetting.style_layers.length
+						) {
+							layerSetting.style_layers.forEach( ( styleLayer ) => {
+								if ( this.map.getLayer( styleLayer.id ) ) {
+									this.map.setLayoutProperty(
+										styleLayer.id,
+										'visibility',
+										visibility
+									);
 								}
-							})
+							} );
 						} else {
 							this.map.setLayoutProperty( layer_id, 'visibility', visibility );
 						}
 					}
-				})
+				} );
 			}
-		})
+		} );
 	}
 
 	showLayer( layer_id ) {

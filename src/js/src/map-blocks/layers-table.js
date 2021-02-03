@@ -19,10 +19,10 @@ export default ( {
 	onButtonClick,
 } ) => {
 	if ( loadingLayers ) {
-		return <p>{ __( 'Loading Layers Data' ) }</p>;
+		return <p>{ __( 'Loading Layers Data', 'jeo' ) }</p>;
 	}
 
-	const emptyMessage = __( 'No layers have been selected for this map.' );
+	const emptyMessage = __( 'No layers have been selected for this map.', 'jeo' );
 	const loadLayer = loadLayers( loadedLayers );
 
 	return (
@@ -51,7 +51,7 @@ export default ( {
 						) }
 						{ ! loadingLayers && (
 							<Button isPrimary isLarge onClick={ onButtonClick }>
-								{ __( 'Add a new layer' ) }
+								{ __( 'Add a new layer', 'jeo' ) }
 							</Button>
 						) }
 					</td>
