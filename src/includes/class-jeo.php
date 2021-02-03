@@ -13,6 +13,8 @@
  * @subpackage Jeo/includes
  */
 
+use function GuzzleHttp\json_decode;
+
 /**
  * The core plugin class.
  *
@@ -163,6 +165,87 @@ class Jeo {
 
 	public function register_block_types() {
 		register_block_type( 'jeo/map-blocks', array( 'editor_script' => 'jeo-map-blocks' ) );
+		register_block_type( 'jeo/storymap', array(
+			'render_callback' => [$this, 'story_map_dynamic_render_callback'],
+			'editor_script' => 'jeo-map-blocks' )
+		);
+	}
+
+	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
+		try {
+			$saved_data = json_decode($content);
+		} catch (Exception $e) {
+			// Old block
+		}
+
+		$map_id = $saved_data->map_id;
+		$map_layers = get_post_meta( $map_id, 'layers', true );
+
+		if(!function_exists('layer_still_exists')) {
+			function layer_still_exists($map_layers, $selected_layer) {
+				$layer_status = get_post_status($selected_layer->id);
+				if($layer_status == "trash" || $layer_status == false ||  $layer_status == "private" ) {
+					return false;
+				}
+
+				foreach($map_layers as $layer) {
+					if(in_array($layer["id"], (array) $selected_layer)) {
+						$selected_layer->meta->type = get_post_meta($layer['id'], 'type', true);
+						$selected_layer->meta->layer_type_options = (object) get_post_meta($layer['id'], 'layer_type_options', true);
+
+						return true;
+					}
+				}
+
+				return false;
+			}
+		}
+
+		// Remove not present layers from selectedLayers -- Fix selected layers order
+		foreach($saved_data->slides as $slide) {
+			foreach($slide->selectedLayers as $index => $selected_layer) {
+				// Check if the selected layers exists in the map
+				if(!layer_still_exists($map_layers, $selected_layer)) {
+					array_splice($slide->selectedLayers, $index, 1);
+				}
+			}
+
+			$selected_layers_order = [];
+
+			foreach ($map_layers as $layer) {
+				foreach($slide->selectedLayers as $index => $selected_layer) {
+					if($selected_layer->id == $layer['id']) {
+						$selected_layers_order[] = $selected_layer;
+					}
+				}
+			}
+
+			$slide->selectedLayers = $selected_layers_order;
+		}
+
+		// Remove not present layers from navigateMapLayers and create new ordr
+		$final_navigate_map_layers = [];
+
+		foreach ($map_layers as $layer) {
+			foreach($saved_data->navigateMapLayers as $index => $navigate_layer) {
+				if($navigate_layer->id == $layer['id']) {
+					// Update meta / types
+					if(!layer_still_exists($map_layers, $navigate_layer)) {
+						array_splice($saved_data->navigateMapLayers, $index, 1);
+					} else {
+						$final_navigate_map_layers[] = $navigate_layer;
+					}
+				}
+			}
+		}
+
+		$saved_data->navigateMapLayers = $final_navigate_map_layers;
+
+		// echo "<pre> <code>";
+		// var_dump($saved_data->navigateMapLayers);
+		// echo "</code></pre> ";
+
+		return '<div id="story-map" data-properties="' . htmlentities(json_encode($saved_data)) . '" />';
 	}
 
 	public function enqueue_blocks_assets() {

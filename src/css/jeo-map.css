@@ -249,7 +249,7 @@ div.jeomap {
 .jeomap div.legend-container {
 	background: #fff;
 	position: absolute;
-	bottom: 10px;
+	bottom: 22px;
 	right: 10px;
 	z-index: 1;
 	display: block;
