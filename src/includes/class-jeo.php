@@ -93,7 +93,9 @@ class Jeo {
 	}
 
 	public function order_rest_post_by_post_title($args, $request) {
-		$args['suppress_filters'] = true;
+		if(isset($args['post__in']) && sizeof($args['post__in'])) {
+			$args['suppress_filters'] = true;
+		}
 
 		return $args;
 	}
