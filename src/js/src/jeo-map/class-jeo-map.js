@@ -45,12 +45,18 @@ export default class JeoMap {
 								zoom: this.getArg( 'initial_zoom' ),
 							} );
 						} else {
-							map.setCenter( [
-								this.getArg( 'center_lon' ),
-								this.getArg( 'center_lat' ),
-							] );
-
-							map.setZoom( this.getArg( 'initial_zoom' ) );
+							// map.setZoom( this.getArg( 'initial_zoom' ) );
+							// map.setCenter( [
+							// 	this.getArg( 'center_lon' ),
+							// 	this.getArg( 'center_lat' ),
+							// ] );
+							map.flyTo( {
+								center: [
+									this.getArg( 'center_lon' ),
+									this.getArg( 'center_lat' ),
+								],
+								zoom: this.getArg( 'initial_zoom' ),
+							} );
 						}
 					} );
 
@@ -539,7 +545,7 @@ export default class JeoMap {
 					{
 						include: layersIds,
 						orderby: 'include',
-						lang: lang ? lang : '',
+						// lang: lang ? lang : '',
 					},
 					( data ) => {
 						const returnLayers = [];
