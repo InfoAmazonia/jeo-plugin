@@ -385,7 +385,8 @@ class Maps {
 				'post_type' => 'map-layer',
 				'post__in' => $layers_ids,
 				'orderby' => 'post__in',
-				'nopaging' => true
+				'nopaging' => true,
+				'suppress_filters' => true,
 			]);
 
 			$template = \jeo_get_template( 'map-content-layers-list.php' );

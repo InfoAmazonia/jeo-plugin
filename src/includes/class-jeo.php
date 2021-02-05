@@ -72,6 +72,9 @@ class Jeo {
 
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+
+		add_filter('rest_map-layer_query', array( $this, 'order_rest_post_by_post_title'), 10, 2);
+
 	}
 
 	/**
@@ -87,6 +90,14 @@ class Jeo {
 			basename( plugin_dir_path(  dirname( __FILE__ , 1 ) ) ) . '/languages',
 		);
 
+	}
+
+	public function order_rest_post_by_post_title($args, $request) {
+		if(isset($args['post__in']) && sizeof($args['post__in'])) {
+			$args['suppress_filters'] = true;
+		}
+
+		return $args;
 	}
 
 	public function register_assets() {
@@ -246,6 +257,12 @@ class Jeo {
 		// echo "</code></pre> ";
 
 		return '<div id="story-map" data-properties="' . htmlentities(json_encode($saved_data)) . '" />';
+	}
+
+	public function filter_rest_query_by_zone($args, $request) {
+		error_log("hsaduashduashdus");
+		$args['suppress_filters'] = true;
+		return $args;
 	}
 
 	public function enqueue_blocks_assets() {
