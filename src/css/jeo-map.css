@@ -657,9 +657,9 @@ nav .layer-selection-title .legends-title {
 /** Icons legend **/
 
 .icons-item-img {
-	max-width: 30px;
-	max-height: 30px;
-	margin-right: 16px;
+	max-width: 22px;
+	max-height: 22px;
+	margin-right: 15px;
 	float: left;
 }
 
@@ -688,6 +688,7 @@ nav .layer-selection-title .legends-title {
 
 }
 
+/* Fixes 2021 - Legend / spaces */
 .circles-scale-container .circle-item:last-child {
     margin-bottom: 0px;
 }
