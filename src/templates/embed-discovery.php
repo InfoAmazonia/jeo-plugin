@@ -4,7 +4,7 @@
 		<?php wp_head(); ?>
 	</head>
 
-<body>
+<body style="margin: 0px !important; padding: 0!important">
 	<div class="discovery-embed">
 	</div>
 
