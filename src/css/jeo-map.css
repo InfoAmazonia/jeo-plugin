@@ -688,6 +688,10 @@ nav .layer-selection-title .legends-title {
 
 }
 
+.circles-scale-container .circle-item:last-child {
+    margin-bottom: 0px;
+}
+
 .circle-wrapper {
 	display: flex;
 	justify-content: center;
