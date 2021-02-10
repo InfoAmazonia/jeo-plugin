@@ -5,7 +5,7 @@
 		<?php wp_head(); ?>
 	</head>
 
-<body style="margin: 0px !important;">
+<body style="margin: 0px !important; padding: 0!important">
 
 <div id="embed-container" style="<?php echo esc_html( $container_style ); ?>">
 	<div class="jeomap map_id_<?php echo esc_html( $map_id ); ?>" data-embed="true" data-options='{"marker_action": "embed_preview"}' style="<?php echo esc_html( $map_style ); ?>"></div>
