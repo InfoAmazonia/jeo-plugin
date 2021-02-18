@@ -794,3 +794,7 @@ p.jeomap-no-layers__text {
 .jeomap.mapboxgl-map .mapboxgl-popup:not(:last-child) {
     display: none;
 }
+
+.jeomap .mapboxgl-ctrl-attrib.mapboxgl-compact {
+	min-height: 24px;
+}
