@@ -1,6 +1,7 @@
 <html style="margin: 0px !important;">
 
 	<head>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title><?= get_the_title( $map_id ) ?> </title>
 		<?php wp_head(); ?>
 	</head>
