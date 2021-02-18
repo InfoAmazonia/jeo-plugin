@@ -94,7 +94,7 @@ const MapEditor = ( {
 		// Post the already exsists
 		// console.log(loadedLayers);
 		// console.log(attributes.navigateMapLayers);
-		if(attributes.slides && loadedMap) {
+		if(attributes.slides && loadedMap && loadedLayers) {
 			// console.log(loadedLayers, loadedMap);
 			const newSlides = attributes.slides.map(slide => {
 				slide.selectedLayers.forEach((selectedLayer, index) => {
