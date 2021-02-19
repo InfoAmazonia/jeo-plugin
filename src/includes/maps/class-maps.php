@@ -45,7 +45,7 @@ class Maps {
 			'labels' => $labels,
 			'hierarchical' => true,
 			'description' => __('JEO Maps', 'jeo'),
-			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields'),
+			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks'),
 			'rewrite' => array('slug' => 'maps'),
 			'public' => true,
 			'show_in_menu' => 'jeo-main-menu',
