@@ -545,6 +545,7 @@ export default class JeoMap {
 					{
 						include: layersIds,
 						orderby: 'include',
+						per_page: 100,
 						// lang: lang ? lang : '',
 					},
 					( data ) => {
