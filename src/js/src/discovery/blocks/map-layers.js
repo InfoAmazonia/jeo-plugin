@@ -257,7 +257,7 @@ class MapLayers extends Component {
 							tiles: [
 								'https://api.mapbox.com/styles/v1/' +
 									styleId +
-									'/tiles/256/{z}/{x}/{y}@2x?access_token=' +
+									'/tiles/512/{z}/{x}/{y}@2x?access_token=' +
 									window.mapboxgl.accessToken,
 							],
 						} );
