@@ -390,7 +390,7 @@ export default class JeoMap {
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
 
-				console.log( legend );
+				// console.log( legend );
 
 				if ( legend.attributes.legend_title ) {
 					const legendTitle = document.createElement( 'span' );
