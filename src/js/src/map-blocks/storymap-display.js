@@ -170,13 +170,20 @@ class StoryMapDisplay extends Component {
 					setState( { ...this.state, currentChapter: chapter } );
 					map.flyTo(chapter.location);
 
-					// hide the ones we dont need and show the ones we need
+					// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
 					this.props.navigateMapLayers.forEach(layer => {
 						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 						if( isLayerUsed || response.index == config.chapters.length - 1) {
 							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
-						} else if ( !isLayerUsed ) {
+						}
+					})
+
+
+					this.props.navigateMapLayers.forEach(layer => {
+						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+						if ( !isLayerUsed ) {
 							map.setPaintProperty(String(layer.id), 'raster-opacity', 0)
 						}
 					})
