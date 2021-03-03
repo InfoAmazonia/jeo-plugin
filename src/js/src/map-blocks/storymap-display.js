@@ -80,7 +80,7 @@ class StoryMapDisplay extends Component {
 
 
 		config = {
-			style: 'mapbox://styles/mapbox/streets-v11',
+			style: 'mapbox://styles/mapbox/empty-v9',
 			accessToken: window.jeo_settings.mapbox_key,
 			showMarkers: false,
 			theme: 'light',
@@ -116,7 +116,6 @@ class StoryMapDisplay extends Component {
     componentDidMount() {
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
-			style: 'mapbox://styles/mapbox/streets-v11',
 			center: [ mapDefaults.lng, mapDefaults.lat ],
 			zoom: mapDefaults.zoom,
 			...config,
