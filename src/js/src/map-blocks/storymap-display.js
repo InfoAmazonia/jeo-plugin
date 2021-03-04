@@ -291,7 +291,6 @@ class StoryMapDisplay extends Component {
 
     render() {
 		const mapStart = config.chapters[ 0 ].location;
-		console.log("mapStart", mapStart);
         const theme = config.theme;
 		const currentChapterID = this.state.currentChapter.id;
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
