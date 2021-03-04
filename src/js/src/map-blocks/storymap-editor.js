@@ -243,15 +243,16 @@ const MapEditor = ( {
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
-									const layerOptions = attributes.navigateMapLayers.find(
-										( { id } ) => id === layer.id
-									);
-									// console.log(layerOptions);
-									if ( layerOptions ) {
-										return renderLayer( {
-											layer: layerOptions.meta,
-											instance: layer,
-										} );
+									if(attributes.navigateMapLayers) {
+										const layerOptions = attributes.navigateMapLayers.find(
+											( { id } ) => id === layer.id
+										);
+										if ( layerOptions ) {
+											return renderLayer( {
+												layer: layerOptions.meta,
+												instance: layer,
+											} );
+										}
 									}
 								}
 							) }
