@@ -108,11 +108,26 @@ const MapEditor = ( {
 				return slide;
 			})
 
+			let navigateMapLayers = loadedLayers.filter(layer => loadedMap.meta.layers.some(mapLayer => mapLayer.id === layer.id ))
+			const newLayers = []
+
+			loadedMap.meta.layers.forEach(mapLayer => {
+				const foundLayer = navigateMapLayers.find(layer => layer.id === mapLayer.id );
+				if( foundLayer ) {
+					newLayers.push(foundLayer);
+				}
+			})
+
+			// console.log("newLayers", JSON.parse(JSON.stringify(newLayers)));
+			// console.log("navigateMapLayers", navigateMapLayers);
+
+			navigateMapLayers = newLayers;
+
 			setAttributes( {
 				...attributes,
 				slides: newSlides,
 				loadedLayers,
-				navigateMapLayers: loadedLayers.filter(layer => loadedMap.meta.layers.some(mapLayer => mapLayer.id === layer.id )),
+				navigateMapLayers,
 			} );
 
 			return;
