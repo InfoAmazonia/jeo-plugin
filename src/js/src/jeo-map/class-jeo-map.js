@@ -34,36 +34,11 @@ export default class JeoMap {
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
-					// console.log( );
-					map.on( 'load', () => {
-						if ( this.isEmbed ) {
-							map.setZoom( this.getArg( 'initial_zoom' ) );
-							map.setCenter( [
-								this.getArg( 'center_lon' ),
-								this.getArg( 'center_lat' ),
-							] );
-							// map.flyTo( {
-							// 	center: [
-							// 		this.getArg( 'center_lon' ),
-							// 		this.getArg( 'center_lat' ),
-							// 	],
-							// 	zoom: this.getArg( 'initial_zoom' ),
-							// } );
-						} else {
-							map.setZoom( this.getArg( 'initial_zoom' ) );
-							map.setCenter( [
-								this.getArg( 'center_lon' ),
-								this.getArg( 'center_lat' ),
-							] );
-							// map.flyTo( {
-							// 	center: [
-							// 		this.getArg( 'center_lon' ),
-							// 		this.getArg( 'center_lat' ),
-							// 	],
-							// 	zoom: this.getArg( 'initial_zoom' ),
-							// } );
-						}
-					} );
+					map.setZoom( this.getArg( 'initial_zoom' ) );
+					map.setCenter( [
+						this.getArg( 'center_lon' ),
+						this.getArg( 'center_lat' ),
+					] );
 
 					map.addControl(
 						new mapboxgl.NavigationControl( { showCompass: false } ),
