@@ -44,6 +44,10 @@ const decodeHtmlEntity = function ( str ) {
 class StoryMapDisplay extends Component {
     constructor( props ) {
 		super( props );
+
+		this.map = null;
+		this.mapContainer = null;
+
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
 			slides.push( {
@@ -76,7 +80,7 @@ class StoryMapDisplay extends Component {
 
 
 		config = {
-			style: 'mapbox://styles/mapbox/streets-v11',
+			style: 'mapbox://styles/mapbox/empty-v9',
 			accessToken: window.jeo_settings.mapbox_key,
 			showMarkers: false,
 			theme: 'light',
@@ -100,7 +104,7 @@ class StoryMapDisplay extends Component {
 
         this.state = {
 			currentChapter: config.chapters[0],
-			map: null,
+			// map: null,
 			isNavigating: false,
 			mapBrightness,
 			postData: null,
@@ -110,7 +114,102 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
-        mapboxgl.accessToken = config.accessToken;
+		const map = new mapboxgl.Map( {
+			container: this.mapContainer,
+			center: [ mapDefaults.lng, mapDefaults.lat ],
+			zoom: mapDefaults.zoom,
+			...config,
+		} );
+		mapboxgl.accessToken = config.accessToken;
+
+		this.map = map;
+		this.map.on( 'load', () => {
+			map.scrollZoom.disable();
+			map.dragPan.disable();
+			map.touchZoomRotate.disable();
+			map.dragRotate.disable();
+
+			const setState = this.setState.bind(this);
+			const marker = new mapboxgl.Marker();
+			if (config.showMarkers) {
+				marker.setLngLat(mapStart.center).addTo(map);
+			}
+
+			this.props.navigateMapLayers.forEach(layer => {
+				// console.log(layer);
+				const jeoLayer = new JeoLayer(layer.meta.type, {...layer.meta, layer_id: String(layer.id), visible: true});
+				jeoLayer.addLayer(map);
+			})
+
+			scroller
+				.setup({
+					step: '.step',
+					offset: 0.5,
+					progress: true
+				})
+				.onStepEnter(response => {
+					if ( response.index == config.chapters.length - 1 ) {
+						setState({ ...this.state, mapBrightness: 0.5, inSlides: false })
+						map.flyTo({
+							center: [ mapDefaults.lng, mapDefaults.lat ]
+						});
+					} else if ( this.state.mapBrightness == 0.5 ) {
+						setState( { ...this.state, mapBrightness: 1, inSlides: true } )
+						// console.log(response);
+					}
+
+					const chapter = config.chapters.find( ( chap, index ) => {
+						if ( response.element.id == config.chapters.length && index == config.chapters.length - 1 ) {
+							return true
+						}
+
+						return chap.id == response.element.id
+					});
+
+					setState( { ...this.state, currentChapter: chapter } );
+					map.flyTo(chapter.location);
+
+					// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
+					this.props.navigateMapLayers.forEach(layer => {
+						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+						if( isLayerUsed || response.index == config.chapters.length - 1) {
+							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						}
+					})
+
+
+					this.props.navigateMapLayers.forEach(layer => {
+						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+						if ( !isLayerUsed ) {
+							map.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+						}
+					})
+
+					if ( config.showMarkers ) {
+						marker.setLngLat( chapter.location.center );
+					}
+
+			})
+			.onStepExit(response => {
+				// console.log(response);
+				if ( response.index == 0 && response.direction == 'up' ) {
+					setState( { ...this.state, inSlides: false, mapBrightness: 0.5 } );
+
+					this.props.navigateMapLayers.forEach(layer => {
+						map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+					})
+
+					map.flyTo({
+						center: [ mapDefaults.lng, mapDefaults.lat ]
+					});
+				}
+			})
+		});
+
+
+
 		window.addEventListener('resize', scroller.resize);
 		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
 
@@ -151,12 +250,48 @@ class StoryMapDisplay extends Component {
 	}
 
 	componentDidUpdate() {
+		// console.log("componentDidUpdate");
 		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+
+
+
+		if(this.state.inSlides) {
+			this.state.currentChapter.selectedLayers.map(
+				( layer ) => {
+					const layerOptions = this.props.navigateMapLayers.find(
+						( { id } ) => id === layer.id
+					);
+
+					if ( layerOptions ) {
+						return renderLayer( {
+							layer: layerOptions.meta,
+							instance: layer,
+						} );
+					}
+				}
+			);
+		}
+
+		if(!this.state.inSlides){
+			this.props.navigateMapLayers.map(
+				( layer ) => {
+					// This is will force layer reordering to invalidate applied layers cache
+					const layerCopy = {...layer};
+					layerCopy.id = layerCopy.id + `_final_batch`;
+
+					return renderLayer( {
+						layer: layerCopy.meta,
+						instance: layerCopy,
+					} );
+				}
+			)
+		}
 	}
 
 
     render() {
 		const mapStart = config.chapters[ 0 ].location;
+		console.log("mapStart", mapStart);
         const theme = config.theme;
 		const currentChapterID = this.state.currentChapter.id;
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -172,94 +307,12 @@ class StoryMapDisplay extends Component {
         return(
 			<div className="story-map">
 				<div className="not-navigating-map">
-					<Map
-						zoom={ [ mapDefaults.zoom ] }
-						containerStyle={ { height: '100vh', width: '100vw' } }
-						pitch={ [ 0 ] }
-						bearing={ [ 0 ] }
-						style={ config.style }
-						center={ [ mapDefaults.lng, mapDefaults.lat ] }
-						onStyleLoad={ ( map ) => {
-							this.setState( { ...this.state, map } );
-
-							map.scrollZoom.disable();
-							map.dragPan.disable();
-							map.touchZoomRotate.disable();
-							map.dragRotate.disable();
-
-							const setState = this.setState.bind(this);
-							const marker = new mapboxgl.Marker();
-							if (config.showMarkers) {
-								marker.setLngLat(mapStart.center).addTo(map);
-							}
-
-							scroller
-								.setup({
-									step: '.step',
-									offset: 0.5,
-									progress: true
-								})
-								.onStepEnter(response => {
-									if ( response.index == config.chapters.length - 1 ) {
-										setState({ ...this.state, mapBrightness: 0.5, inSlides: false })
-									} else {
-										if ( this.state.mapBrightness == 0.5 ) {
-											setState( { ...this.state, mapBrightness: 1, inSlides: true } )
-										}
-									}
-
-									const chapter = config.chapters.find( ( chap, index ) => {
-										if ( response.element.id == config.chapters.length && index == config.chapters.length - 1 ) {
-											return true
-										}
-
-										return chap.id == response.element.id
-									});
-
-									setState( { ...this.state, currentChapter: chapter } );
-									map.flyTo(chapter.location);
-
-									if ( config.showMarkers ) {
-										marker.setLngLat( chapter.location.center );
-									}
-
-							})
-							.onStepExit(response => {
-								if ( response.index == 0 && response.direction == 'up' ) {
-									setState( { ...this.state, inSlides: false, mapBrightness: 0.5 } );
-								}
-							})
-						} }
+					<div
+						ref={ ( el ) => ( this.mapContainer = el ) }
+						className="story-map-element"
 					>
-						{ this.state.inSlides && this.state.currentChapter.selectedLayers.map(
-							( layer ) => {
-								const layerOptions = this.props.navigateMapLayers.find(
-									( { id } ) => id === layer.id
-								);
+					</div>
 
-								if ( layerOptions ) {
-									return renderLayer( {
-										layer: layerOptions.meta,
-										instance: layer,
-									} );
-								}
-							}
-						) }
-						{ !this.state.inSlides &&
-							this.props.navigateMapLayers.map(
-								( layer ) => {
-									// This is will force layer reordering to invalidate applied layers cache
-									const layerCopy = {...layer};
-									layerCopy.id = layerCopy.id + `_final_batch`;
-
-									return renderLayer( {
-										layer: layerCopy.meta,
-										instance: layerCopy,
-									} );
-								}
-							)
-						}
-					</Map>
 					<div id="story">
 						{ this.props.hasIntroduction &&
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
@@ -422,7 +475,7 @@ class StoryMapDisplay extends Component {
 								document.querySelector('.navigate-map').style.display = 'none';
 								document.querySelector('.not-navigating-map').style.display = 'block';
 
-								this.state.map.resize();
+								this.map.resize();
 
 								window.scrollTo(0, 0);
 							} }
