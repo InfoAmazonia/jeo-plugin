@@ -105,14 +105,40 @@ const MapEditor = ( {
 					}
 				})
 
+				const newOrder = [];
+
+				loadedMap.meta.layers.forEach(mapLayer => {
+					const foundLayer = slide.selectedLayers.find(layer => layer.id === mapLayer.id );
+					if( foundLayer ) {
+						newOrder.push(foundLayer);
+					}
+				})
+
+				slide.selectedLayers = newOrder;
+
 				return slide;
 			})
+
+			let navigateMapLayers = loadedLayers.filter(layer => loadedMap.meta.layers.some(mapLayer => mapLayer.id === layer.id ))
+			const newLayers = []
+
+			loadedMap.meta.layers.forEach(mapLayer => {
+				const foundLayer = navigateMapLayers.find(layer => layer.id === mapLayer.id );
+				if( foundLayer ) {
+					newLayers.push(foundLayer);
+				}
+			})
+
+			// console.log("newLayers", JSON.parse(JSON.stringify(newLayers)));
+			// console.log("navigateMapLayers", navigateMapLayers);
+
+			navigateMapLayers = newLayers;
 
 			setAttributes( {
 				...attributes,
 				slides: newSlides,
 				loadedLayers,
-				navigateMapLayers: loadedLayers.filter(layer => loadedMap.meta.layers.some(mapLayer => mapLayer.id === layer.id )),
+				navigateMapLayers,
 			} );
 
 			return;
@@ -217,15 +243,16 @@ const MapEditor = ( {
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
-									const layerOptions = attributes.navigateMapLayers.find(
-										( { id } ) => id === layer.id
-									);
-									// console.log(layerOptions);
-									if ( layerOptions ) {
-										return renderLayer( {
-											layer: layerOptions.meta,
-											instance: layer,
-										} );
+									if(attributes.navigateMapLayers) {
+										const layerOptions = attributes.navigateMapLayers.find(
+											( { id } ) => id === layer.id
+										);
+										if ( layerOptions ) {
+											return renderLayer( {
+												layer: layerOptions.meta,
+												instance: layer,
+											} );
+										}
 									}
 								}
 							) }
