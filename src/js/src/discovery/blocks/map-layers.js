@@ -49,7 +49,7 @@ class MapLayers extends Component {
 							} );
 						} );
 
-						console.log( layersBatch );
+						// console.log( layersBatch );
 						requestedLayerIds = requestedLayerIds.map( ( item ) => item.id );
 
 						const sortedLayerBatch = requestedLayerIds.map( ( id ) => {
@@ -125,7 +125,18 @@ class MapLayers extends Component {
 						singleMap.queriedLayers = [];
 					}
 
-					return Promise.all( result );
+					return Promise.all( result ).then(response => {
+						// console.log(response, singleMap);
+
+						const fixedLayersOrder = singleMap.meta.layers.map(mapLayer => {
+							const currentLayerId = mapLayer.id;
+							return singleMap.queriedLayers.find(layer => layer.id == currentLayerId)
+						});
+
+						singleMap.queriedLayers = fixedLayersOrder;
+
+						return response;
+					});
 				} );
 
 				return Promise.all( mapsLayersPromises ).then( () => {
