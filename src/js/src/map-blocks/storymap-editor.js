@@ -105,6 +105,17 @@ const MapEditor = ( {
 					}
 				})
 
+				const newOrder = [];
+
+				loadedMap.meta.layers.forEach(mapLayer => {
+					const foundLayer = slide.selectedLayers.find(layer => layer.id === mapLayer.id );
+					if( foundLayer ) {
+						newOrder.push(foundLayer);
+					}
+				})
+
+				slide.selectedLayers = newOrder;
+
 				return slide;
 			})
 
