@@ -1,22 +1,35 @@
-import { select } from '@wordpress/data';
+import { useSelect, AsyncModeProvider } from '@wordpress/data';
 import domReady from '@wordpress/dom-ready';
 import { registerPlugin } from '@wordpress/plugins';
 
 import LayersSidebar from './layers-sidebar';
 
 domReady( () => {
-	const currentPostType = select( 'core/editor' ).getCurrentPostType();
+	registerPlugin( 'jeo-layers-sidebar', {
+		icon: null,
+		render: () => {
+			const currentPostType = useSelect( ( select ) => {
+				return select( 'core/editor' ).getCurrentPostType()
+			}, [] );
 
-	if ( currentPostType === 'map-layer' ) {
-		jQuery( '.editor-post-title' ).after(
-			'<div id="layer-preview" style="margin: 0 10%">'
-		);
+			const postTitleElement = document.querySelector('.editor-post-title');
 
-		registerPlugin( 'jeo-layers-sidebar', {
-			icon: null,
-			render: () => {
-				return <LayersSidebar />;
-			},
-		} );
-	}
+			if(!postTitleElement) {
+				return null;
+			}
+
+			if(currentPostType === "map-layer") {
+				const preview = document.createElement('div');
+				preview.setAttribute('id', 'layer-preview');
+				postTitleElement.parentNode.appendChild(preview);
+			}
+
+			return (
+				<AsyncModeProvider value={ true }>
+					{ currentPostType === "map-layer"? <LayersSidebar /> : null };
+				</AsyncModeProvider>
+			)
+
+		},
+	} );
 } );
