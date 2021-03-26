@@ -30,6 +30,10 @@ const MapEditor = ( {
 		} );
 	};
 
+	if(!loadedMap) {
+		return null;
+	}
+
 	return (
 		<div className="jeo-mapblock">
 			{ attributes.map_id && loadingMap && <Spinner /> }
