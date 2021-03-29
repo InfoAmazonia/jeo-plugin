@@ -18,6 +18,12 @@ tr .dashicon:hover {
 		"i i i i i i i";
 }
 
+
+.jeo-layers-list .use-control > .components-base-control > div > div {
+	flex-direction: row;
+    align-items: center;
+}
+
 .informative-message {
     grid-area: i;
     margin: 0.5rem;
