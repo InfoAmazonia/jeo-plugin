@@ -24,6 +24,10 @@ tr .dashicon:hover {
     align-items: center;
 }
 
+.jeo-layers-list .layer-actions a {
+	text-decoration: none;
+}
+
 .informative-message {
     grid-area: i;
     margin: 0.5rem;
