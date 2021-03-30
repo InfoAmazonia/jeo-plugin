@@ -180,8 +180,8 @@ const StoryMapEditor = ( {
 		setAttributes( { ...attributes, postID } );
 	}, [] );
 
-	if(!loadedMap) {
-		return null;
+	if(attributes.map_id && !loadedMap) {
+		return <div>Esse aqui é o loadedMap</div>;
 	}
 
 	let rawLayers = [];
