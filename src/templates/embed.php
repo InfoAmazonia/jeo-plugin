@@ -25,11 +25,8 @@
 			</div>
 	<?php endif; ?>
 
-	<?php wp_footer(); ?>
 
 </div>
-
-</body>
 <?php wp_footer(); ?>
-
+</body>
 </html>
