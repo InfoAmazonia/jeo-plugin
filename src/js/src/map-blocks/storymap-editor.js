@@ -28,7 +28,7 @@ const { map_defaults: mapDefaults } = window.jeo_settings;
 const editorConfig =  {
 	// plugins: [ 'Paragraph', 'Bold', 'Italic', 'Essentials' ],
 	plugins: [ 'Essentials', 'Autoformat', 'Bold', 'Italic', 'BlockQuote', 'Heading', 'Indent', 'Link', 'List', 'Paragraph', 'TextTransformation' ],
-	toolbar: [ 'undo', 'redo','|', 'bold', 'italic', '|', 'heading', 'paragraph', 'link', 'numberedList', '|', 'blockQuote']
+	toolbar: [ 'undo', 'redo','|', 'bold', 'italic', '|', 'heading', 'paragraph', 'link', 'bulletedList', 'numberedList']
 }
 
 const MapEditor = ( {
