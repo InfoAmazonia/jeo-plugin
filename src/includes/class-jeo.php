@@ -394,8 +394,14 @@ class Jeo {
 
 					}
 
-					require JEO_BASEPATH . '/templates/embed.php';
+					if(function_exists('wpml_get_language_information')) {
+						global $sitepress;
+						$post_language_information = wpml_get_language_information(null, $map_id);
+						$sitepress->switch_lang($post_language_information['language_code'], true);
+						switch_to_locale($post_language_information['locale']);
+					}
 
+					require JEO_BASEPATH . '/templates/embed.php';
 					exit();
 
 				}
