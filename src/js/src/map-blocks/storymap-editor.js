@@ -24,6 +24,11 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
+const editorConfig =  {
+	// plugins: [ 'Paragraph', 'Bold', 'Italic', 'Essentials' ],
+	plugins: [ 'Essentials', 'Autoformat', 'Bold', 'Italic', 'BlockQuote', 'Heading', 'Indent', 'Link', 'List', 'Paragraph', 'TextTransformation' ],
+	toolbar: [ 'undo', 'redo','|', 'bold', 'italic', '|', 'heading', 'paragraph', 'link', 'bulletedList', 'numberedList']
+}
 
 const StoryMapEditor = ( {
 	attributes,
@@ -280,6 +285,7 @@ const StoryMapEditor = ( {
 								<CKEditor
 									editor={ ClassicEditor }
 									data={ attributes.description }
+									config={ editorConfig }
 									onChange={ ( event, editor ) =>  {
 										setAttributes( {
 											...attributes,
@@ -383,6 +389,7 @@ const StoryMapEditor = ( {
 															atributo="meuatributo"
 															editor={ ClassicEditor }
 															data={ slide.title }
+															config={ editorConfig }
 															onChange={ ( event, editor ) => {
 																// Set role 'button' to editor element so it isn't affected by drag and drop events
 																editor.ui.getEditableElement().setAttribute('role', 'button')
@@ -404,6 +411,7 @@ const StoryMapEditor = ( {
 														<CKEditor
 															editor={ ClassicEditor }
 															data={ slide.content }
+															config={ editorConfig }
 															onChange={ ( event, editor ) => {
 																// Set role 'button' to editor element so it isn't affected by drag and drop events
 																editor.ui.getEditableElement().setAttribute('role', 'button')
