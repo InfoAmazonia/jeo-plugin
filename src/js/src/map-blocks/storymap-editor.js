@@ -24,14 +24,13 @@ import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
-
 const editorConfig =  {
 	// plugins: [ 'Paragraph', 'Bold', 'Italic', 'Essentials' ],
 	plugins: [ 'Essentials', 'Autoformat', 'Bold', 'Italic', 'BlockQuote', 'Heading', 'Indent', 'Link', 'List', 'Paragraph', 'TextTransformation' ],
 	toolbar: [ 'undo', 'redo','|', 'bold', 'italic', '|', 'heading', 'paragraph', 'link', 'bulletedList', 'numberedList']
 }
 
-const MapEditor = ( {
+const StoryMapEditor = ( {
 	attributes,
 	setAttributes,
 	instanceId,
@@ -186,8 +185,12 @@ const MapEditor = ( {
 		setAttributes( { ...attributes, postID } );
 	}, [] );
 
+	if(attributes.map_id && !loadedMap) {
+		return <div>Esse aqui é o loadedMap</div>;
+	}
+
 	let rawLayers = [];
-	if ( ! loadingMap && attributes.map_id ) {
+	if ( ! loadingMap && attributes.map_id) {
 		rawLayers = loadedMap.meta.layers;
 	}
 	const layersContent = [];
@@ -824,11 +827,7 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 			'map',
 			attributes.map_id,
 		] ),
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
-		per_page: 100,
-		order: 'asc',
-		orderby: 'menu_order',
-	} ),
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: 100, order: 'asc', orderby: 'menu_order' } ),
 	loadingLayers: select( 'core/data' ).isResolving(
 		'core',
 		'getEntityRecords',
@@ -836,4 +835,4 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 	),
 } ) );
 
-export default compose( withInstanceId, applyWithSelect )( MapEditor );
+export default compose( withInstanceId, applyWithSelect )( StoryMapEditor );

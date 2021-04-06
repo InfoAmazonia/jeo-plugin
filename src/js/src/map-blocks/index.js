@@ -7,6 +7,7 @@ import OnetimeMapEditor from './onetime-map-editor';
 import StorymapEditor from './storymap-editor'
 import MapIcon from '../icons/ion/map';
 import { cloneDeep } from 'lodash';
+import { AsyncModeProvider } from '@wordpress/data';
 
 registerBlockType( 'jeo/map', {
 	title: __( 'JEO Map', 'jeo' ),
@@ -21,7 +22,11 @@ registerBlockType( 'jeo/map', {
 			type: 'number',
 		},
 	},
-	edit: ( props ) => <MapEditor { ...props } />,
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<MapEditor { ...props } />
+		</AsyncModeProvider>
+	),
 	save: ( props ) => <MapDisplay { ...props } />,
 } );
 
@@ -106,7 +111,11 @@ registerBlockType( 'jeo/onetime-map', {
 			},
 		},
 	},
-	edit: ( props ) => <OnetimeMapEditor { ...props } />,
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<OnetimeMapEditor { ...props } />
+		</AsyncModeProvider>
+	),
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
 } );
 
@@ -195,7 +204,11 @@ registerBlockType( 'jeo/storymap', {
 			type: 'number',
 		},
 	},
-	edit: ( props ) => <StorymapEditor { ...props } />,
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<StorymapEditor { ...props } />
+		</AsyncModeProvider>
+	),
 	save: ( props ) => {
 		const attributesStructure = storyMapCleanUp(props);
 		return JSON.stringify(attributesStructure)
