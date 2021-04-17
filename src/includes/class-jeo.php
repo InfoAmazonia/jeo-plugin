@@ -268,7 +268,7 @@ class Jeo {
 	public function enqueue_blocks_assets() {
 		global $post;
 
-		$post_types = \jeo_settings()->get_option( 'enabled_post_types' );
+		$post_types = apply_filters('jeo_enabled_post_types', \jeo_settings()->get_option( 'enabled_post_types' ));
 
 		if ( in_array( $post->post_type, $post_types ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
