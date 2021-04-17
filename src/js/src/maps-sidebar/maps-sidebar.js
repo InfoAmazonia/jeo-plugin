@@ -182,7 +182,7 @@ function MapsSidebar( {
 				/>
 			) }
 
-			{ embedUrl && <MapEmbedUrl url={ embedUrl } /> }
+			{ embedUrl && !postMeta.disable_embed && <MapEmbedUrl url={ embedUrl } /> }
 
 			<MapPanel
 				attributes={ postMeta }

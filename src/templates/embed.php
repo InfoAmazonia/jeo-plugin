@@ -1,3 +1,11 @@
+<?php
+	$disable_embed = get_post_meta($map_id, 'disable_embed', true) == '1'? true : false;
+
+	if($disable_embed) {
+		wp_redirect(home_url());
+		exit();
+	}
+?>
 <html style="margin: 0px !important;">
 
 	<head>

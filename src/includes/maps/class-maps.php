@@ -289,6 +289,21 @@ class Maps {
 			'description' => __('Maximum zoom level', 'jeo')
 		]);
 
+		register_post_meta($this->post_type, 'hide_in_discovery', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'boolean',
+			'description' => __('Hide in discovery', 'jeo')
+		]);
+
+		register_post_meta($this->post_type, 'disable_embed', [
+			'show_in_rest' => true,
+			'single' => true,
+			'auth_callback' => '__return_true',
+			'type' => 'boolean',
+			'description' => __('Disable embed', 'jeo')
+		]);
 
 	}
 
