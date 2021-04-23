@@ -163,6 +163,31 @@ export default ( { attributes, setAttributes } ) => {
 							);
 						} }
 					/>
+
+				</section>
+
+				<section className="public-maps">
+					<h3>{ __( 'For public maps only', 'jeo' ) }</h3>
+
+					<CheckboxControl
+						label={ __( 'Hide in discovery', 'jeo' ) }
+						checked={ attributes.hide_in_discovery }
+						onChange={ () => {
+							attributeUpdater( 'hide_in_discovery' )(
+								! attributes.hide_in_discovery
+							);
+						} }
+					/>
+
+					<CheckboxControl
+						label={ __( 'Disable embed map', 'jeo' ) }
+						checked={ attributes.disable_embed }
+						onChange={ () => {
+							attributeUpdater( 'disable_embed' )(
+								! attributes.disable_embed
+							);
+						} }
+					/>
 				</section>
 			</form>
 		</Fragment>

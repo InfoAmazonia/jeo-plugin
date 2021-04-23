@@ -83,8 +83,11 @@ class MapLayers extends Component {
 		return fetch( mapsUrl )
 			.then( ( response ) => response.json() )
 			.then( ( maps ) => {
+				// Filter the ones that shoudnt be listed
+				const filteredMaps = maps.filter(map => !map.meta.hide_in_discovery);
+
 				// Fetch layers
-				const mapsLayersPromises = maps.map( ( singleMap ) => {
+				const mapsLayersPromises = filteredMaps.map( ( singleMap ) => {
 					const result = singleMap.meta.layers.map( async ( layer ) => {
 						const mapLayerApiUrl = new URL(
 							jeoMapVars.jsonUrl + 'map-layer/' + layer.id
