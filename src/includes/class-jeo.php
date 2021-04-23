@@ -268,7 +268,7 @@ class Jeo {
 	public function enqueue_blocks_assets() {
 		global $post;
 
-		$post_types = \jeo_settings()->get_option( 'enabled_post_types' );
+		$post_types = apply_filters('jeo_enabled_post_types', \jeo_settings()->get_option( 'enabled_post_types' ));
 
 		if ( in_array( $post->post_type, $post_types ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
@@ -394,8 +394,14 @@ class Jeo {
 
 					}
 
-					require JEO_BASEPATH . '/templates/embed.php';
+					if(function_exists('wpml_get_language_information')) {
+						global $sitepress;
+						$post_language_information = wpml_get_language_information(null, $map_id);
+						$sitepress->switch_lang($post_language_information['language_code'], true);
+						switch_to_locale($post_language_information['locale']);
+					}
 
+					require JEO_BASEPATH . '/templates/embed.php';
 					exit();
 
 				}
