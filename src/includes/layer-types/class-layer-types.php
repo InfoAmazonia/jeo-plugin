@@ -1,5 +1,5 @@
 <?php
-// comentario test
+
 namespace Jeo;
 
 class Layer_Types {
