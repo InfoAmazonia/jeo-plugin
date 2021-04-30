@@ -19,6 +19,8 @@ services:
     volumes:
       - ./src:/var/www/html/wp-content/plugins/jeo
       - ./wp-content:/var/www/html/wp-content
+      - ./docker/mariadb/data:/docker-entrypoint-initdb.d
+      - ./docker/wordpress/.htaccess:/var/www/html/.htaccess
 
   mariadb:
     image: mariadb:10.4

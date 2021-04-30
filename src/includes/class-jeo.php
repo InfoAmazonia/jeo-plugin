@@ -307,6 +307,7 @@ class Jeo {
 					'string_read_more' => __( 'Read more', 'jeo' ),
 					'jeoUrl' => JEO_BASEURL,
 					'nonce' => wp_create_nonce('wp_rest'),
+					'currentLang' => ICL_LANGUAGE_CODE,
 					'templates' => [
 						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup' => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
