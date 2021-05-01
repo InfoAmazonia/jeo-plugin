@@ -10,16 +10,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2021-01-28T16:56:40+00:00\n"
-"PO-Revision-Date: 2021-02-03 12:10+0000\n"
+"PO-Revision-Date: 2021-05-01 22:24+0000\n"
 "X-Generator: Loco https://localise.biz/\n"
 "X-Domain: jeo\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
-"X-Loco-Version: 2.5.0; wp-5.5.3"
+"X-Loco-Version: 2.5.0; wp-5.7"
 
 #: js/build/discovery.js:8884
 msgid " - "
-msgstr ""
+msgstr "-"
 
 #: js/build/layersSidebar.js:31503
 #: js/src/layers-sidebar/carto-integration.js:164
@@ -118,7 +118,7 @@ msgstr "Abril"
 
 #: js/build/jeoMap.js:11894
 msgid "at"
-msgstr ""
+msgstr "em"
 
 #: templates/map-content-layers-list.php:6
 #: templates/map-content-layers-list.php:8
@@ -252,7 +252,7 @@ msgstr "Slide atual:"
 
 #: js/build/discovery.js:8889
 msgid "Custom"
-msgstr ""
+msgstr "Personalizado"
 
 #: includes/settings/settings-page.php:13
 msgid "Customize"
@@ -438,7 +438,7 @@ msgstr "Fixado"
 
 #: js/build/discovery.js:8890
 msgid "Fr"
-msgstr ""
+msgstr "Se"
 
 #: js/build/discovery.js:8887
 msgid "From"
@@ -497,6 +497,8 @@ msgid ""
 "If the layer is loaded into the mapbox as a style (setStyle) or layer "
 "(addLayer)"
 msgstr ""
+"Se a camada for carregada no Mapbox como um estilo (setStyle) ou camada "
+"(addLayer)\n"
 
 #: js/build/mapBlocks.js:36397 js/build/mapsSidebar.js:33618
 #: js/src/map-blocks/layer-settings.js:256
@@ -537,7 +539,7 @@ msgstr "Cor do texto do botão informativo"
 
 #: includes/settings/settings-page.php:215
 msgid "Info button font-size (rem)"
-msgstr ""
+msgstr "Tamanho de fonte do botáo Info (rem)"
 
 #: js/build/mapsSidebar.js:35245 js/src/maps-sidebar/maps-sidebar.js:209
 msgid "Initial Zoom"
@@ -584,7 +586,7 @@ msgstr "Mapas JEO"
 
 #: js/build/mapBlocks.js:35697 js/src/map-blocks/index.js:29
 msgid "JEO One-time Map"
-msgstr ""
+msgstr "JEO One-time Map"
 
 #: includes/settings/settings-page.php:4
 msgid "Jeo Settings"
@@ -664,7 +666,7 @@ msgstr "Tipo de camada não registrado"
 
 #: includes/layers/class-layers.php:109
 msgid "Layer type-specific options"
-msgstr ""
+msgstr "Opções da camada de tipo específico"
 
 #: includes/layers/class-layers.php:36
 msgid "Layer updated."
@@ -703,19 +705,22 @@ msgstr "Título da legenda"
 
 #: includes/layers/class-layers.php:162
 msgid "Legend type-specific options"
-msgstr ""
+msgstr "Opções da leyenda de tipo específico"
 
 #: includes/maps/class-maps.php:159
 msgid "List of category IDs related posts must have"
 msgstr ""
+"Lista de IDs das categorias que os posts relacionados devem ter\n"
 
 #: includes/maps/class-maps.php:181
 msgid "List of meta values related posts must have"
 msgstr ""
+"Lista de IDs dos meta-values que os posts relacionados devem ter\n"
 
 #: includes/maps/class-maps.php:166
 msgid "List of tag IDs related posts must have"
 msgstr ""
+"Lista de IDs das etiquetas que os posts relacionados devem ter\n"
 
 #: js/build/mapBlocks.js:36346 js/build/mapsSidebar.js:33567
 #: js/src/map-blocks/layer-settings.js:182
@@ -755,36 +760,36 @@ msgstr "Camadas do mapa"
 #: js/build/mapBlocks.js:37720 js/build/mapsSidebar.js:34700
 #: js/src/map-blocks/map-settings.js:149
 msgid "Map navigation on post"
-msgstr ""
+msgstr "Navegação do mapa no post"
 
 #: includes/maps/class-maps.php:38
 msgid "Map published privately."
-msgstr ""
+msgstr "Mapa publicado como privado."
 
 #: includes/maps/class-maps.php:37
 msgid "Map published."
-msgstr ""
+msgstr "Mapa privado"
 
 #: includes/maps/class-maps.php:39
 msgid "Map reverted to draft."
-msgstr ""
+msgstr "Mapa revertido para rascunho"
 
 #: includes/maps/class-maps.php:40
 msgid "Map scheduled."
-msgstr ""
+msgstr "Mapa agendado."
 
 #: js/build/mapBlocks.js:37415 js/build/mapsSidebar.js:34395
 #: js/src/map-blocks/map-panel.js:38
 msgid "Map settings"
-msgstr ""
+msgstr "Configurações do mapa"
 
 #: includes/maps/class-maps.php:41
 msgid "Map updated."
-msgstr ""
+msgstr "Mapa atualizado"
 
 #: includes/maps/class-maps.php:313
 msgid "Map zoom must be between 1 and 14"
-msgstr ""
+msgstr "O Zoom do mapa deve estar entre 1 e 14"
 
 #: js/build/mapBlocks.js:38653 js/src/map-blocks/storymap-editor.js:679
 msgid "Map: "
@@ -792,15 +797,15 @@ msgstr "Mapa:"
 
 #: includes/settings/settings-page.php:54
 msgid "Mapbox"
-msgstr ""
+msgstr "Mapbox"
 
 #: includes/maps/class-maps.php:118
 msgid "Mapbox style layers"
-msgstr ""
+msgstr "Camadas style Mapbox"
 
 #: includes/maps/class-maps.php:25 includes/maps/class-maps.php:36
 msgid "Maps"
-msgstr ""
+msgstr "Mapas"
 
 #: js/build/discovery.js:8891
 msgid "March"
@@ -855,13 +860,15 @@ msgstr "DD/MM/YYYY"
 
 #: js/build/discovery.js:8890
 msgid "Mo"
-msgstr ""
+msgstr "Se"
 
 #: includes/geocode/class-geocode-handler.php:155
 msgid ""
 "Multiple metadata that holds locations related to the post. Each location is "
 "an object composed of lat, lon and geocode attributes"
 msgstr ""
+"Múltiplos metadados que contêm locais relacionados ao post. Cada localização "
+"é um objeto composto de atributos lat, lon e geocode\n"
 
 #: js/build/jeoMap.js:12139
 msgid "NAVIGATE THE MAP"
@@ -924,15 +931,16 @@ msgstr "Nenhum pontos"
 
 #: includes/storymap/class-storymap.php:31
 msgid "No Story Map found"
-msgstr ""
+msgstr "Nenhum Mapa de História encontrado"
 
 #: includes/storymap/class-storymap.php:32
 msgid "No Story Map found in the trash"
-msgstr ""
+msgstr "Nenhum Mapa de História encontrado na lixeira"
 
 #: includes/maps/class-maps.php:273
 msgid "Northeast coordinates pan limit"
 msgstr ""
+"Limite de pan das coordenadas nordeste\n"
 
 #: js/build/discovery.js:8395 js/src/discovery/blocks/map-layers.js:530
 msgid "Not applied"
@@ -968,7 +976,7 @@ msgstr "ou"
 #: js/build/layersSidebar.js:31503
 #: js/src/layers-sidebar/carto-integration.js:165
 msgid "panel above."
-msgstr ""
+msgstr "Painel acima."
 
 #: js/build/layersSidebar.js:32304 js/src/layers-sidebar/layers-sidebar.js:74
 msgid ""
@@ -1007,15 +1015,15 @@ msgstr "Ler mais"
 
 #: includes/geocode/class-geocode-handler.php:207
 msgid "Region level 1"
-msgstr ""
+msgstr "Região nível 1"
 
 #: includes/geocode/class-geocode-handler.php:217
 msgid "Region level 2"
-msgstr ""
+msgstr "Região nível 2"
 
 #: includes/geocode/class-geocode-handler.php:227
 msgid "Region level 3"
-msgstr ""
+msgstr "Região nível 3"
 
 #: js/build/mapBlocks.js:38865 js/build/mapsSidebar.js:35474
 #: js/src/posts-selector/index.js:25
@@ -1044,7 +1052,7 @@ msgstr "Rótulo direito"
 
 #: js/build/discovery.js:8890
 msgid "Sa"
-msgstr ""
+msgstr "Sá"
 
 #: includes/settings/settings-page.php:282
 msgid "Save Changes"
@@ -1057,7 +1065,7 @@ msgstr "Salvar novo ponto"
 #: js/build/mapBlocks.js:37708 js/build/mapsSidebar.js:34688
 #: js/src/map-blocks/map-settings.js:131
 msgid "Scroll zoom on post"
-msgstr ""
+msgstr "Scroll zoom no post"
 
 #: js/build/mapBlocks.js:39400 js/build/postsSidebar.js:21631
 #: js/src/posts-sidebar/geo-auto-complete.js:80
@@ -1094,11 +1102,11 @@ msgstr "Secundário"
 
 #: includes/settings/settings-page.php:209
 msgid "Secondary Typography name"
-msgstr ""
+msgstr "Nome da tipografia secondária"
 
 #: includes/settings/settings-page.php:203
 msgid "Secondary Typography URL"
-msgstr ""
+msgstr "URL da tipografia secondária"
 
 #: js/build/layersSidebar.js:33372
 #: js/src/posts-sidebar/legends-editor/editors/circle.js:213
@@ -1119,6 +1127,8 @@ msgstr "Setembro"
 msgid ""
 "Service provided by Open Street Maps at https://nominatim.openstreetmap.org/"
 msgstr ""
+"Serviço fornecido pelo Open Street Maps at https://nominatim.openstreetmap."
+"org/"
 
 #: includes/settings/class-settings.php:89 js/build/layersSidebar.js:32461
 #: js/src/layers-sidebar/layers-sidebar.js:272
@@ -1143,7 +1153,7 @@ msgstr "Exibir filtros"
 #: js/build/mapBlocks.js:36353 js/build/mapsSidebar.js:33574
 #: js/src/map-blocks/layer-settings.js:197
 msgid "Show legend"
-msgstr "Motrar legenda"
+msgstr "Mostrar legenda"
 
 #: js/build/layersSidebar.js:31737
 #: js/src/layers-sidebar/interaction-settings.js:121
@@ -1177,11 +1187,12 @@ msgstr "Desculpe!"
 #: js/build/layersSidebar.js:31249
 #: js/src/layers-sidebar/attribution-settings.js:9
 msgid "Source data download link"
-msgstr ""
+msgstr "Link para baixar os dados da fonte"
 
 #: includes/maps/class-maps.php:259
 msgid "Southwest coordinates pan limit"
 msgstr ""
+"Limite de panorâmica das coordenadas sudoeste\n"
 
 #: js/build/layersSidebar.js:31488
 #: js/src/layers-sidebar/carto-integration.js:122
@@ -1213,23 +1224,23 @@ msgstr "Mapa de História"
 
 #: includes/storymap/class-storymap.php:35
 msgid "Story Map published privately."
-msgstr ""
+msgstr "Mapa de História publicado como privado."
 
 #: includes/storymap/class-storymap.php:34
 msgid "Story Map published."
-msgstr ""
+msgstr "Mapa de História publicado."
 
 #: includes/storymap/class-storymap.php:36
 msgid "Story Map reverted to draft."
-msgstr ""
+msgstr "Mapa de História revertido para rascunho."
 
 #: includes/storymap/class-storymap.php:37
 msgid "Story Map scheduled."
-msgstr ""
+msgstr "Mapa de História agendado."
 
 #: includes/storymap/class-storymap.php:38
 msgid "Story Map updated."
-msgstr ""
+msgstr "Mapa de História atualizado."
 
 #: includes/storymap/class-storymap.php:33
 msgid "Story Maps"
@@ -1243,12 +1254,12 @@ msgstr "Configurações da história"
 
 #: js/build/discovery.js:8890
 msgid "Su"
-msgstr ""
+msgstr "Do"
 
 #: js/build/layersSidebar.js:31503
 #: js/src/layers-sidebar/carto-integration.js:143
 msgid "Succesfull tileset migration"
-msgstr ""
+msgstr "Migração tileset com sucesso"
 
 #: js/build/mapBlocks.js:38778 js/build/mapsSidebar.js:34802
 #: js/src/map-blocks/utils.js:13
@@ -1263,7 +1274,7 @@ msgstr "Comutável"
 #: js/build/layersSidebar.js:31501
 #: js/src/layers-sidebar/carto-integration.js:135
 msgid "Syncronize"
-msgstr ""
+msgstr "Sincronizar"
 
 #: js/build/discovery.js:9504 js/build/mapBlocks.js:38886
 #: js/build/mapsSidebar.js:35495 js/src/posts-selector/index.js:54
@@ -1276,11 +1287,11 @@ msgstr "Texto sob cor primária"
 
 #: js/build/discovery.js:8890
 msgid "Th"
-msgstr ""
+msgstr "Qu"
 
 #: includes/layers/class-layers.php:92
 msgid "The layer attribution. A text or HTML code with a link"
-msgstr ""
+msgstr "The layer attribution. A text or HTML code with a link"
 
 #: includes/maps/class-maps.php:106 includes/maps/class-maps.php:124
 msgid "The Layer ID"
@@ -1288,67 +1299,74 @@ msgstr "ID da camada"
 
 #: includes/layers/class-layers.php:80
 msgid "The layer type"
-msgstr ""
+msgstr "Tipo da camada"
 
 #: includes/layers/class-layers.php:145
 msgid "The legend type"
-msgstr ""
+msgstr "Tipo da legenda"
 
 #: includes/maps/class-maps.php:205
 msgid "The map criteria to get related posts"
 msgstr ""
+"Os critérios do mapa para obter posts relacionados\n"
 
 #: includes/maps/class-maps.php:88
 msgid "The map initial latitude"
-msgstr ""
+msgstr "Nível inicial da latitude do mapa"
 
 #: includes/maps/class-maps.php:96
 msgid "The map initial longitude"
-msgstr ""
+msgstr "Nível inicial da longitude do mapa"
 
 #: includes/maps/class-maps.php:80
 msgid "The map initial zoom level"
-msgstr ""
+msgstr "Nível inicial do zoom do mapa"
 
 #: includes/maps/class-maps.php:151
 msgid "The map Layers"
-msgstr ""
+msgstr "Camadas do mapa"
 
 #: js/build/mapBlocks.js:38568 js/src/map-blocks/storymap-editor.js:564
 msgid "The minimum number of slides is 1."
-msgstr ""
+msgstr "O número mínimo de slides é 1"
 
 #: includes/layers/class-layers.php:133
 msgid "The name of entity of attribution URL link"
-msgstr ""
+msgstr "O nome da entidade do link URL da atribuição"
 
 #: includes/layers/class-layers.php:121
 msgid "The URL to download the source data of the layer"
 msgstr ""
+"O URL para baixar os dados de origem da camada\n"
 
 #: js/build/mapsSidebar.js:35124 js/src/maps-sidebar/maps-sidebar.js:89
 msgid "There's no API Key found in your JEO Settings."
 msgstr ""
+"Não há nenhuma chave API encontrada nas configurações do JEO.\n"
 
 #: js/build/layersSidebar.js:31389
 #: js/src/layers-sidebar/carto-integration.js:21
 msgid ""
 "This action will overwrite current layer settings and rewrite tileset if set"
 msgstr ""
+"Esta ação irá sobrescrever as configurações da camada atual e reescrever o "
+"tileset se configurado\n"
 
 #: includes/settings/settings-page.php:77
 msgid "This is used for Carto integration only. "
 msgstr ""
+"Isso é usado apenas para integração com o Carto.\n"
 
 #: templates/discovery.php:12
 msgid "This page can't be viewed on mobiles."
 msgstr ""
+"Esta página não pode ser visualizada em celulares.\n"
 
 #: js/build/layersSidebar.js:31741 js/build/mapBlocks.js:38384
 #: js/src/layers-sidebar/interaction-settings.js:129
 #: js/src/map-blocks/storymap-editor.js:307
 msgid "Title"
-msgstr ""
+msgstr "Título"
 
 #: js/build/discovery.js:8888
 msgid "To"
@@ -1356,7 +1374,7 @@ msgstr "Até"
 
 #: js/build/discovery.js:8890
 msgid "Tu"
-msgstr ""
+msgstr "Te"
 
 #: js/build/layersSidebar.js:31982 js/build/layersSidebar.js:34243
 #: js/build/mapBlocks.js:36327 js/build/mapsSidebar.js:33548
@@ -1364,37 +1382,37 @@ msgstr ""
 #: js/src/map-blocks/layer-settings.js:155
 #: js/src/posts-sidebar/legends-editor/legend-editor.js:92
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #: js/build/mapBlocks.js:37331 js/build/mapBlocks.js:38657
 #: js/src/map-blocks/map-editor.js:118 js/src/map-blocks/storymap-editor.js:692
 msgid "Type a map name"
-msgstr ""
+msgstr "Insira o nome do mapa"
 
 #: includes/settings/settings-page.php:188
 msgid "Typography"
-msgstr ""
+msgstr "Tipografia"
 
 #: includes/settings/settings-page.php:197
 msgid "Typography name"
-msgstr ""
+msgstr "Nome da tipografia"
 
 #: includes/settings/settings-page.php:191
 msgid "Typography URL"
-msgstr ""
+msgstr "URL da tipografia"
 
 #: includes/settings/settings-page.php:105
 msgid "Update Interval"
-msgstr ""
+msgstr "Atualizar intervalo"
 
 #: js/build/postsSidebar.js:22145 js/src/posts-sidebar/geo-posts.js:385
 msgid "Update selected point"
-msgstr ""
+msgstr "Atualizar ponto selecionado"
 
 #: js/build/layersSidebar.js:31503
 #: js/src/layers-sidebar/carto-integration.js:155
 msgid "Uploading staged file to Mapbox"
-msgstr ""
+msgstr "Carregando arquivo staged para o Mapbox"
 
 #: js/build/mapBlocks.js:38310 js/src/map-blocks/storymap-editor.js:229
 msgid "Use \"Navigate to map\" button"
@@ -1402,32 +1420,32 @@ msgstr "Usar botão \"Navegar no mapa\""
 
 #: includes/layers/class-layers.php:198
 msgid "Use Carto Integration"
-msgstr ""
+msgstr "Usar integração Carto"
 
 #: js/build/layersSidebar.js:31479
 #: js/src/layers-sidebar/carto-integration.js:107
 msgid "Use integration"
-msgstr ""
+msgstr "Usar integração"
 
 #: includes/layers/class-layers.php:174 js/build/layersSidebar.js:34204
 #: js/src/posts-sidebar/legends-editor/legend-editor.js:53
 msgid "Use legend"
-msgstr ""
+msgstr "Usar legenda"
 
 #: js/build/mapBlocks.js:38868 js/build/mapsSidebar.js:35477
 #: js/src/posts-selector/index.js:28
 msgid "Use related posts"
-msgstr ""
+msgstr "Usar posts relacionados"
 
 #: includes/settings/settings-page.php:67
 #: includes/settings/settings-page.php:92
 msgid "Username"
-msgstr ""
+msgstr "Nome do usuário"
 
 #: js/build/mapBlocks.js:39140 js/build/mapsSidebar.js:35749
 #: js/src/posts-selector/meta-selector.js:53
 msgid "Value"
-msgstr ""
+msgstr "Valor"
 
 #: js/build/discovery.js:9638
 msgid "View in map"
@@ -1435,55 +1453,62 @@ msgstr "Ver no mapa"
 
 #: includes/layers/class-layers.php:26
 msgid "View layer"
-msgstr ""
+msgstr "Ver camada"
 
 #: includes/layers/class-layers.php:27
 msgid "View layers"
-msgstr ""
+msgstr "Ver camadas"
 
 #: includes/maps/class-maps.php:31
 msgid "View map"
-msgstr ""
+msgstr "Ver mapa"
 
 #: includes/maps/class-maps.php:32
 msgid "View maps"
-msgstr ""
+msgstr "Ver mapas"
 
 #: includes/storymap/class-storymap.php:28
 msgid "View Story Map"
-msgstr ""
+msgstr "Ver Mapa de História"
 
 #: includes/storymap/class-storymap.php:29
 msgid "View Story Maps"
-msgstr ""
+msgstr "Ver Mapa de Histórias"
 
 #: js/build/discovery.js:8890
 msgid "We"
-msgstr ""
+msgstr "Qu"
 
 #: js/build/postsSidebar.js:22123 js/src/posts-sidebar/geo-posts.js:357
 msgid "You can also drag the marker across the map."
 msgstr ""
+"Você também pode arrastar o marcador pelo mapa.\n"
 
 #: js/build/layersSidebar.js:32322 js/src/layers-sidebar/layers-sidebar.js:104
 msgid ""
 "Your layer was not found. You will not be able to publish or update. Please "
 "check your settings"
 msgstr ""
+"Sua camada não foi encontrada. Você não poderá publicar ou atualizar. Por "
+"favor, verifique suas configurações\n"
 
 #: js/build/layersSidebar.js:32315 js/src/layers-sidebar/layers-sidebar.js:91
 msgid ""
 "Your Mapbox access token may be invalid. You will not be able to publish or "
 "update. Please check your settings"
 msgstr ""
+"Seu token de acesso do Mapbox pode ser inválido. Você não poderá publicar ou "
+"atualizar. Por favor, verifique suas configurações\n"
 
 #: js/build/layersSidebar.js:32341 js/src/layers-sidebar/layers-sidebar.js:134
 msgid ""
 "Your Mapbox API Key was not found in your JEO Settings. You will not be able "
 "to publish or update."
 msgstr ""
+"Sua chave API do Mapbox não foi encontrada nas configurações do JEO. Você "
+"não poderá publicar ou atualizar.\n"
 
 #: js/build/mapBlocks.js:37656 js/build/mapsSidebar.js:34636
 #: js/src/map-blocks/map-settings.js:78
 msgid "Zoom"
-msgstr ""
+msgstr "Zoom"
