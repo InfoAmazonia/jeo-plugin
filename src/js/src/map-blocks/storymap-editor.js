@@ -384,49 +384,6 @@ const StoryMapEditor = ( {
 															}
 														} }
 													>
-														<span className="input-label">{ __( 'Title', 'jeo' ) }</span>
-														<CKEditor
-															atributo="meuatributo"
-															editor={ ClassicEditor }
-															data={ slide.title }
-															config={ editorConfig }
-															onChange={ ( event, editor ) => {
-																// Set role 'button' to editor element so it isn't affected by drag and drop events
-																editor.ui.getEditableElement().setAttribute('role', 'button')
-
-																setCurrentSlideIndex( index );
-
-																const oldSlides = [ ...attributes.slides ];
-																oldSlides[ index ].title = editor.getData();
-
-																setAttributes( {
-																	...attributes,
-																	slides: oldSlides,
-																} );
-															} }
-														/>
-														<span className="input-label">{ __(
-																'Content', 'jeo'
-														) }</span>
-														<CKEditor
-															editor={ ClassicEditor }
-															data={ slide.content }
-															config={ editorConfig }
-															onChange={ ( event, editor ) => {
-																// Set role 'button' to editor element so it isn't affected by drag and drop events
-																editor.ui.getEditableElement().setAttribute('role', 'button')
-
-																setCurrentSlideIndex( index );
-
-																const oldSlides = [ ...attributes.slides ];
-																oldSlides[ index ].content = editor.getData();
-
-																setAttributes( {
-																	...attributes,
-																	slides: oldSlides,
-																} );
-															} }
-														/>
 														<span className="input-label">{ __("Layers", "jeo") }</span>
 														<DragDropContext onDragEnd={ onDragEndLayers }>
 															<Droppable droppableId="droppable">
@@ -639,6 +596,50 @@ const StoryMapEditor = ( {
 																<span>{ __( 'Preview', 'jeo'  ) }</span>
 															</div>
 														</Button>
+
+														<span className="input-label">{ __( 'Title', 'jeo' ) }</span>
+														<CKEditor
+															atributo="meuatributo"
+															editor={ ClassicEditor }
+															data={ slide.title }
+															config={ editorConfig }
+															onChange={ ( event, editor ) => {
+																// Set role 'button' to editor element so it isn't affected by drag and drop events
+																editor.ui.getEditableElement().setAttribute('role', 'button')
+
+																setCurrentSlideIndex( index );
+
+																const oldSlides = [ ...attributes.slides ];
+																oldSlides[ index ].title = editor.getData();
+
+																setAttributes( {
+																	...attributes,
+																	slides: oldSlides,
+																} );
+															} }
+														/>
+														<span className="input-label">{ __(
+																'Content', 'jeo'
+														) }</span>
+														<CKEditor
+															editor={ ClassicEditor }
+															data={ slide.content }
+															config={ editorConfig }
+															onChange={ ( event, editor ) => {
+																// Set role 'button' to editor element so it isn't affected by drag and drop events
+																editor.ui.getEditableElement().setAttribute('role', 'button')
+
+																setCurrentSlideIndex( index );
+
+																const oldSlides = [ ...attributes.slides ];
+																oldSlides[ index ].content = editor.getData();
+
+																setAttributes( {
+																	...attributes,
+																	slides: oldSlides,
+																} );
+															} }
+														/>
 														<Button
 															className="remove-button"
 															onClick={ () => {
