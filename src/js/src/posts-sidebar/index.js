@@ -4,6 +4,8 @@ import { Component, Fragment } from '@wordpress/element';
 import { Modal, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoGeocodePosts from './geo-posts';
+import { useSelect } from '@wordpress/data';
+
 
 const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 	constructor() {
@@ -38,10 +40,19 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 registerPlugin( 'jeo-posts-sidebar', {
 	icon: null,
 	render: () => {
-		return (
-			<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
-				<JeoGeocodePanel />
-			</PluginDocumentSettingPanel>
-		);
+
+	const currentPostType = useSelect( ( select ) => {
+		return select( 'core/editor' ).getCurrentPostType()
+	}, [] );
+
+	return (
+		<div>
+			{ currentPostType === "post" ? 
+				<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
+					<JeoGeocodePanel />
+				</PluginDocumentSettingPanel>
+			: null };
+		</div>
+	)
 	},
 } );
