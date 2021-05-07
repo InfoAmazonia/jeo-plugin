@@ -17,3 +17,4 @@ wp-content/upgrade/*
 wp-content/uploads/*
 wp-content/mu-plugins/*
 wp-content/languages/*
+mariadb_data/
