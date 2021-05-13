@@ -125,6 +125,7 @@ export default class JeoMap {
 
 							// When style is done loading (don't try adding layers before style is not read, its messy)
 							map.on( 'load', () => {
+								console.log("Map loaded 1")
 								// Remove not selected layers and toggle vissibility
 								mapLayersSettings.forEach( ( layer ) => {
 									if ( layer.load_as_style ) {
@@ -245,13 +246,14 @@ export default class JeoMap {
 									attributionControl,
 									controlPostion
 								);
+
+								this.getRelatedPosts();
 							});
 
 							this.addLayersControl( amountLayers );
 							this.addMoreButtonAndLegends();
 						}
 
-						this.getRelatedPosts();
 						// Show a message when a map doesn't have layers
 						if ( amountLayers === 0 ) {
 							this.addMapWithoutLayersMessage();
@@ -613,7 +615,7 @@ export default class JeoMap {
 				resolve( [] );
 			}
 
-			query._embed = 1;
+			query._fields = ['id', 'meta', 'title', 'link', 'date'];
 
 			const targetURL = new URL(jeoMapVars.jsonUrl + 'posts');
 			Object.keys(query).forEach(key => targetURL.searchParams.append(key, query[key]));
@@ -632,211 +634,256 @@ export default class JeoMap {
 					if (totalPages == 1) {
 						return cumulativePosts;
 					}
+					console.log("Before load 2")
 
-					const map = this.map;
-					const sourceData = this.buildPostsGeoJson(cumulativePosts);
 
-					map.addSource( 'storiesSource', {
-						type: 'geojson',
-						data: sourceData,
-						cluster: true,
-						clusterMaxZoom: 40,
-						clusterRadius: 40,
-					} );
 
-					map.loadImage(
-						jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png',
-						( error, image ) => {
-							if ( error ) throw error;
+					const buildRelatedPosts = (map) => {
+						const sourceData = this.buildPostsGeoJson(cumulativePosts);
 
-							map.addImage( 'news-marker', image );
-							// Single markers layer
-							map.addLayer( {
-								id: 'unclustered-points',
-								type: 'symbol',
-								source: 'storiesSource',
-								filter: [ '!', [ 'has', 'point_count' ] ],
-								layout: {
-									'icon-image': 'news-marker',
-									'icon-size': 0.1,
-									'icon-allow-overlap': true,
-									// 'text-field': 'story',
-									// 'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-									// 'text-size': 11,
-									// 'text-transform': 'uppercase',
-									// 'text-letter-spacing': 0.05,
-									// 'text-offset': [0, 3],
-								},
+						map.addSource( 'storiesSource', {
+							type: 'geojson',
+							data: sourceData,
+							cluster: true,
+							clusterMaxZoom: 40,
+							clusterRadius: 40,
+						} );
 
-								// paint : {
-								// 	'icon-opacity': 1,
-								// }
-							} );
-
-							map.on('click', 'unclustered-points', (e) => {
-								const post = {
-									date: e.features[0].properties.date,
-									link: e.features[0].properties.link,
-									title: {
-										rendered: JSON.parse(e.features[0].properties.title)?.rendered,
-									}
-								}
-
-								const popupHTML = this.popupTemplate( {
-									post,
-									read_more: window.jeoMapVars.string_read_more,
-									show_featured_media: false,
-								} );
-
-								new mapboxgl.Popup()
-									.setLngLat(e.lngLat)
-									.setHTML( popupHTML )
-									.addTo(map);
-							});
-
-							map.loadImage(
-								jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png',
-								function ( error, image ) {
-									if ( error ) throw error;
-
-									map.addImage( 'news-marker-hover', image );
-
-									map.addLayer( {
-										id: 'hover-unclustered-points',
-										type: 'symbol',
-										source: 'storiesSource',
-										filter: [ '!', [ 'has', 'point_count' ] ],
-										layout: {
-											'icon-image': 'news-marker-hover',
-											'icon-size': 0.1,
-											'icon-allow-overlap': true,
-										},
-
-										paint: {
-											'icon-opacity': [
-												'case',
-												[ 'boolean', [ 'feature-state', 'hover' ], false ],
-												1,
-												0,
-											],
-										},
-									} );
-								}
-							);
-
-							map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', (
-								error,
-								image
-							) => {
+						map.loadImage(
+							jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png',
+							( error, image ) => {
 								if ( error ) throw error;
 
-								map.addImage( 'news-no-marker', image );
-
-								const layers = [
-									// [6, '#000000'],
-									// [5, '#f28cb1'],
-									// [2, '#f1f075'],
-									[ 0, '#ffffff' ],
-								];
-
-								// cluster circle layer
-								layers.forEach( ( layer, i ) => {
-									map.addLayer( {
-										id: 'cluster-layer',
-										type: 'circle',
-										source: 'storiesSource',
-										paint: {
-											'circle-color': layer[ 1 ],
-											'circle-radius': 20 + layer[ 0 ],
-											'circle-stroke-color': '#ffffff',
-											'circle-stroke-opacity': 0.4,
-											'circle-stroke-width': 9,
-										},
-										filter:
-											i === 0
-												? [ '>=', 'point_count', layer[ 0 ] ]
-												: [
-														'all',
-														[ '>=', 'point_count', layer[ 0 ] ],
-														[ '<', 'point_count', layers[ i - 1 ][ 0 ] ],
-												],
-									} );
-								} );
-
-								const flyIntoCluster = (map, coordinates) => {
-									const maxZoom = 13;
-
-									map.flyTo({
-										center: coordinates,
-										zoom: maxZoom,
-										bearing: 0,
-										speed: 1,
-										curve: 1,
-									});
-								}
-
-								map.on('click', 'cluster-layer', function (e) {
-									const cluster = map.queryRenderedFeatures(e.point, { layers: ["cluster-layer"] });
-									const coordinates = cluster[0].geometry.coordinates;
-									const currentZoom = map.getZoom();
-
-									flyIntoCluster(map, coordinates, currentZoom);
-								})
-
-								// cluster number layer
+								map.addImage( 'news-marker', image );
+								// Single markers layer
 								map.addLayer( {
-									id: 'cluster-count',
+									id: 'unclustered-points',
 									type: 'symbol',
 									source: 'storiesSource',
-
+									filter: [ '!', [ 'has', 'point_count' ] ],
 									layout: {
-										'icon-image': 'news-no-marker',
-										'icon-size': 0.13,
-										'icon-allow-overlap': false,
-										'icon-offset': {
-											stops: [
-												[ 13, [ 0, -30 ] ],
-												[ 17, [ 0, -90 ] ],
-											],
-										},
-										'text-field': '{point_count}',
-										'text-font': [ 'Open Sans Regular', 'Arial Unicode MS Regular' ],
-										'text-size': 12,
-										'text-transform': 'uppercase',
-										'text-letter-spacing': 0.05,
-										'text-offset': [ 0, 0.8 ],
+										'icon-image': 'news-marker',
+										'icon-size': 0.1,
+										'icon-allow-overlap': true,
+										// 'text-field': 'story',
+										// 'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
+										// 'text-size': 11,
+										// 'text-transform': 'uppercase',
+										// 'text-letter-spacing': 0.05,
+										// 'text-offset': [0, 3],
 									},
 
-									paint: {
-										'text-color': '#202202',
-									},
-
-									filter: [ 'has', 'point_count' ],
+									// paint : {
+									// 	'icon-opacity': 1,
+									// }
 								} );
 
-							} );
+								map.on('click', 'unclustered-points', (e) => {
+									const post = {
+										date: e.features[0].properties.date,
+										link: e.features[0].properties.link,
+										title: {
+											rendered: JSON.parse(e.features[0].properties.title)?.rendered,
+										}
+									}
+
+									const popupHTML = this.popupTemplate( {
+										post,
+										read_more: window.jeoMapVars.string_read_more,
+										show_featured_media: false,
+									} );
+
+									new mapboxgl.Popup()
+										.setLngLat(e.lngLat)
+										.setHTML( popupHTML )
+										.addTo(map);
+								});
+
+								map.loadImage(
+									jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png',
+									function ( error, image ) {
+										if ( error ) throw error;
+
+										map.addImage( 'news-marker-hover', image );
+
+										map.addLayer( {
+											id: 'hover-unclustered-points',
+											type: 'symbol',
+											source: 'storiesSource',
+											filter: [ '!', [ 'has', 'point_count' ] ],
+											layout: {
+												'icon-image': 'news-marker-hover',
+												'icon-size': 0.1,
+												'icon-allow-overlap': true,
+											},
+
+											paint: {
+												'icon-opacity': [
+													'case',
+													[ 'boolean', [ 'feature-state', 'hover' ], false ],
+													1,
+													0,
+												],
+											},
+										} );
+									}
+								);
+
+								map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', (
+									error,
+									image
+								) => {
+									if ( error ) throw error;
+
+									map.addImage( 'news-no-marker', image );
+
+									const layers = [
+										// [6, '#000000'],
+										// [5, '#f28cb1'],
+										// [2, '#f1f075'],
+										[ 0, '#ffffff' ],
+									];
+
+									// cluster circle layer
+									layers.forEach( ( layer, i ) => {
+										map.addLayer( {
+											id: 'cluster-layer',
+											type: 'circle',
+											source: 'storiesSource',
+											paint: {
+												'circle-color': layer[ 1 ],
+												'circle-radius': 20 + layer[ 0 ],
+												'circle-stroke-color': '#ffffff',
+												'circle-stroke-opacity': 0.4,
+												'circle-stroke-width': 9,
+											},
+											filter:
+												i === 0
+													? [ '>=', 'point_count', layer[ 0 ] ]
+													: [
+															'all',
+															[ '>=', 'point_count', layer[ 0 ] ],
+															[ '<', 'point_count', layers[ i - 1 ][ 0 ] ],
+													],
+										} );
+									} );
+
+									const flyIntoCluster = (map, coordinates) => {
+										const maxZoom = 13;
+
+										map.flyTo({
+											center: coordinates,
+											zoom: maxZoom,
+											bearing: 0,
+											speed: 1,
+											curve: 1,
+										});
+									}
+
+									map.on('click', 'cluster-layer', function (e) {
+										const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-layer'] });
+										const clusterId = features[0].properties.cluster_id
+										const pointCount = features[0].properties.point_count
+										const clusterSource = map.getSource('storiesSource');
+
+										function multiDimensionalUnique(arr) {
+											var uniques = [];
+											var itemsFound = {};
+											for(var i = 0, l = arr.length; i < l; i++) {
+												var stringified = JSON.stringify(arr[i]);
+												if(itemsFound[stringified]) { continue; }
+												uniques.push(arr[i]);
+												itemsFound[stringified] = true;
+											}
+											return uniques;
+										}
+
+
+										// Get all points under a cluster
+										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
+											const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val))));
+
+											if(nextFeatures.length >= 2) {
+												map.fitBounds([
+													...nextFeatures
+												], { padding: 300});
+											} else {
+												console.log("These points are registered at the exactly same coordinates.")
+											}
+										})
+
+
+										// flyIntoCluster(map, coordinates, currentZoom);
+
+									})
+
+									// cluster number layer
+									map.addLayer( {
+										id: 'cluster-count',
+										type: 'symbol',
+										source: 'storiesSource',
+
+										layout: {
+											'icon-image': 'news-no-marker',
+											'icon-size': 0.13,
+											'icon-allow-overlap': false,
+											'icon-offset': {
+												stops: [
+													[ 13, [ 0, -30 ] ],
+													[ 17, [ 0, -90 ] ],
+												],
+											},
+											'text-field': '{point_count}',
+											'text-font': [ 'Open Sans Regular', 'Arial Unicode MS Regular' ],
+											'text-size': 12,
+											'text-transform': 'uppercase',
+											'text-letter-spacing': 0.05,
+											'text-offset': [ 0, 0.8 ],
+										},
+
+										paint: {
+											'text-color': '#202202',
+										},
+
+										filter: [ 'has', 'point_count' ],
+									} );
+
+								} );
+							}
+						);
+
+
+						// Keep requesting to get to the last page
+						for (let i = 2; i <= totalPages; i++) {
+							// Break to avoid respect page limiting
+							if (i >= 100) {
+								break;
+							}
+
+							targetURL.searchParams.set('page', i);
+
+							fetch(targetURL)
+								.then(response => { return response.json() })
+								.then(moreresults => {
+									cumulativePosts = [...cumulativePosts, ...moreresults];
+
+									const sourceData = this.buildPostsGeoJson(cumulativePosts);
+									map.getSource('storiesSource').setData(sourceData);
+								});
 						}
-					);
 
-
-					// Keep requesting to get to the last page
-					for (let i = 2; i <= totalPages; i++) {
-						// Break to avoid respect page limiting
-						if (i >= 100) {
-							break;
-						}
-
-						targetURL.searchParams.set('page', i);
-
-						fetch(targetURL)
-							.then(response => { return response.json() })
-							.then(moreresults => {
-								cumulativePosts = [...cumulativePosts, ...moreresults];
-
-								const sourceData = this.buildPostsGeoJson(cumulativePosts);
-								map.getSource('storiesSource').setData(sourceData);
-							});
 					}
+
+					// if(this.map.loaded()) {
+					// 	console.log("Map loaded")
+					buildRelatedPosts(this.map)
+					// } else {
+						// console.log("Load event")
+						// this.map.on( 'load', () => {
+							// console.log("Load event confirmed")
+							// buildRelatedPosts(this.map)
+						// })
+					// }
 				})
 				.catch(err => {
 					// Remove: Too noisy
