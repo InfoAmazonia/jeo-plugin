@@ -634,9 +634,6 @@ export default class JeoMap {
 					if (totalPages == 1) {
 						return cumulativePosts;
 					}
-					console.log("Before load 2")
-
-
 
 					const buildRelatedPosts = (map) => {
 						const sourceData = this.buildPostsGeoJson(cumulativePosts);
