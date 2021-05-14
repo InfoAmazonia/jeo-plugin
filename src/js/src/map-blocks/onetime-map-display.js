@@ -15,9 +15,9 @@ export default ( { attributes, className } ) => {
 	}
 
 	const style = {};
-	if ( className.includes( 'alignfull' ) ) {
-		style.width = '100vw';
-	}
+	// if ( className.includes( 'alignfull' ) ) {
+	// 	style.width = '100vw';
+	// }
 
 	return (
 		<div

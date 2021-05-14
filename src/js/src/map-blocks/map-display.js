@@ -3,9 +3,9 @@ import classNames from 'classnames';
 export default ( { attributes, className } ) => {
 	const style = {};
 
-	if ( className.includes( 'alignfull' ) ) {
-		style.width = '100vw';
-	}
+	// if ( className.includes( 'alignfull' ) ) {
+	// 	style.width = '100vw';
+	// }
 
 	return (
 		<div
@@ -13,7 +13,7 @@ export default ( { attributes, className } ) => {
 			// bypassing wp unfiltered_html permission
 			className={ classNames( [ 'jeomap', className, 'map_id_'+attributes.map_id ] ) }
 			// this element block validation error with roles without unfiltered_html capability
-			// data-map_id={ attributes.map_id } 
+			// data-map_id={ attributes.map_id }
 			style={ style }
 		/>
 	);
