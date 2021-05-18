@@ -300,7 +300,7 @@ class Jeo {
 
 			wp_localize_script('discovery-map', 'mapPreferences', array(
 				'map_defaults' => [
-					'zoom' => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
+					'zoom' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
 					'lng' => sanitize_text_field ( \jeo_settings()->get_option( 'map_default_lng' ) ),
 				]
