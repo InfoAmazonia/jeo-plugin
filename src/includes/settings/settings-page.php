@@ -26,21 +26,21 @@
 					<tr>
 						<th scope="row"><label for="map_default_lat"><?php _e('Default map latitute', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('map_default_lat') ); ?>" type="number" step=".1" id="map_default_lat" value="<?php echo esc_html( $this->get_option('map_default_lat') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('map_default_lat') ); ?>" type="number" step=".00000000000001" id="map_default_lat" value="<?php echo esc_html( $this->get_option('map_default_lat') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="map_default_lng"><?php _e('Default map longitude', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('map_default_lng') ); ?>" type="number" step=".1" id="map_default_lng" value="<?php echo esc_html( $this->get_option('map_default_lng') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('map_default_lng') ); ?>" type="number" step=".00000000000001" id="map_default_lng" value="<?php echo esc_html( $this->get_option('map_default_lng') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="map_default_zoom"><?php _e('Default map zoom', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('map_default_zoom') ); ?>" type="number" id="map_default_zoom" value="<?php echo esc_html( $this->get_option('map_default_zoom') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('map_default_zoom') ); ?>" type="number" step=".00000000000001" id="map_default_zoom" value="<?php echo esc_html( $this->get_option('map_default_zoom') ); ?>" class="regular-text">
 						</td>
 					</tr>
 

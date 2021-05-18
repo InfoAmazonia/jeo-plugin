@@ -298,6 +298,14 @@ class Jeo {
 				));
 		   	}
 
+			wp_localize_script('discovery-map', 'mapPreferences', array(
+				'map_defaults' => [
+					'zoom' => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
+					'lat' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
+					'lng' => sanitize_text_field ( \jeo_settings()->get_option( 'map_default_lng' ) ),
+				]
+			));
+
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/css/jeo-map.css', time() );
 			wp_localize_script(
 				'jeo-map',
