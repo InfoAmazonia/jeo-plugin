@@ -73,6 +73,9 @@ class Jeo {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
+		add_filter('rest_post_tag_query', array( $this, 'maximum_terms_api_filter'), 10, 1 );
+
+
 		add_filter('rest_map-layer_query', array( $this, 'order_rest_post_by_post_title'), 10, 2);
 
 	}
@@ -90,6 +93,11 @@ class Jeo {
 			basename( plugin_dir_path(  dirname( __FILE__ , 1 ) ) ) . '/languages',
 		);
 
+	}
+
+	function maximum_terms_api_filter( $prepared_args ) {
+		$prepared_args['number'] = 1000;
+		return $prepared_args;
 	}
 
 	public function order_rest_post_by_post_title($args, $request) {
