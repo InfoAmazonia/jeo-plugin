@@ -60,7 +60,7 @@ class Discovery extends Component {
 
 	componentDidMount() {
 		let adicionalMapOptions = {
-			center: [mapPreferences.map_defaults.lat, mapPreferences.map_defaults.lng],
+			center: [ mapPreferences.map_defaults.lng, mapPreferences.map_defaults.lat],
 			zoom: mapPreferences.map_defaults.zoom,
 		};
 
