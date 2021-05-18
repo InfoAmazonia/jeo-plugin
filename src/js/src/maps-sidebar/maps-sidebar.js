@@ -170,6 +170,7 @@ function MapsSidebar( {
 		}
 	}, [ maxButtonSelected ] );
 
+
 	return (
 		<Fragment>
 			{ modal && (
@@ -264,7 +265,7 @@ function MapsSidebar( {
 						key={ key }
 						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '100%' } }
-						zoom={ [ currentZoom || initialZoom ] }
+						zoom={ [ currentZoom || initialZoom || 0 ] }
 						center={ [ centerLon || 0, centerLat || 0 ] }
 						animationOptions={ animationOptions }
 						onMoveEnd={ ( map ) => {
