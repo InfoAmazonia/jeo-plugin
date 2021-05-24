@@ -59,7 +59,10 @@ class Discovery extends Component {
 	}
 
 	componentDidMount() {
-		let adicionalMapOptions = {};
+		let adicionalMapOptions = {
+			center: [ mapPreferences.map_defaults.lng, mapPreferences.map_defaults.lat],
+			zoom: mapPreferences.map_defaults.zoom,
+		};
 
 		if (
 			this.getParamFromUrl( 'discovery' ) ||
