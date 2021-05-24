@@ -109,9 +109,19 @@
 							<option value="weekly" <?= $this->get_option('carto_update_time') ===  'weekly'? ' selected' : '' ?> <?= empty($this->get_option('carto_update_time'))? ' selected' : '' ?>>Weekly</option>
 							<option value="monthly" <?= $this->get_option('carto_update_time') ===  'monthly'? 'selected' : '' ?>>Monthly</option>
 						</select>
+
+
 						</td>
 					</tr>
 
+					<tr>
+						<th scope="row"></th>
+						<td>
+							<?= __('After saving the setting, the update will only be made from the current date plus the interval selected. <br> For instance, if the selected interval is "Weekly" and a update is made to "Monthly" the next update will be made only from the current date plus one month.') ?>
+							<br>
+							<?= __('We recommend the plugin WP Crontrol, that allows you to run cron tasks whenever you want.') ?>
+						</td>
+					</tr>
 			</tbody>
 			</table>
 		</div>
