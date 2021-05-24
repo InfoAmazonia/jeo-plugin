@@ -553,6 +553,13 @@ class Stories extends Component {
 
 	fetchTags() {
 		const tagsApiUrl = new URL( jeoMapVars.jsonUrl + 'tags/' );
+		tagsApiUrl.searchParams.set('custom_per_page', '1000');
+		tagsApiUrl.searchParams.set('orderby', 'count');
+		tagsApiUrl.searchParams.set('order', 'desc');
+
+		if("languageParams" in window){
+			tagsApiUrl.searchParams.append( 'lang', languageParams.currentLang );
+		}
 
 		return fetch( tagsApiUrl )
 			.then( ( data ) => data.json() )
