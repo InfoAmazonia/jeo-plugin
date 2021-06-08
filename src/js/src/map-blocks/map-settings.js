@@ -176,55 +176,42 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					<h3>{ __( 'Pan limits', 'jeo' ) }</h3>
 					<p>
 					<div className="pan-wrapper">
-						<div className="pan-limit" style={ panLimitStyle }>
-							{/* <span>
-								<strong>{ __( 'North', 'jeo' ) }</strong>
-							</span>
+						<TextControl
+							type="number"
+							label={ __( 'North', 'jeo' ) }
+							value={ attributes.pan_limits.north }
+							onChange={ ( value ) => {
+								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, north: parseNumber(value) }});
+							} }
+						/>
 
-							<span>
+						<TextControl
+							type="number"
+							label={ __( 'East', 'jeo' ) }
+							value={ attributes.pan_limits.east }
+							onChange={ ( value ) => {
+								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, east: parseNumber(value) }});
+							} }
+						/>
 
-								{ attributes.pan_limits.north || "__" }
-							</span> */}
 
-							<TextControl
-								type="number"
-								label={ __( 'North', 'jeo' ) }
-								value={ attributes.pan_limits.north }
-								onChange={ ( value ) => {
-									return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, north: parseNumber(value) }});
-								} }
-							/>
-						</div>
+						<TextControl
+							type="number"
+							label={ __( 'South', 'jeo' ) }
+							value={ attributes.pan_limits.south }
+							onChange={ ( value ) => {
+								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, south: parseNumber(value) }});
+							} }
+						/>
 
-						<div className="pan-limit" style={ panLimitStyle }>
-							<span>
-								<strong>{ __( 'East', 'jeo' ) }</strong>
-							</span>
-
-							<span>
-								{ attributes.pan_limits.east || "__" }
-							</span>
-						</div>
-
-						<div className="pan-limit" style={ panLimitStyle }>
-							<span>
-								<strong>{ __( 'South', 'jeo' ) }</strong>
-							</span>
-
-							<span>
-								{ attributes.pan_limits.south || "__" }
-							</span>
-						</div>
-
-						<div className="pan-limit" style={ panLimitStyle }>
-							<span>
-								<strong>{ __( 'West', 'jeo' ) }</strong>
-							</span>
-
-							<span>
-								{ attributes.pan_limits.west || "__" }
-							</span>
-						</div>
+						<TextControl
+							type="number"
+							label={ __( 'West', 'jeo' ) }
+							value={ attributes.pan_limits.west }
+							onChange={ ( value ) => {
+								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, west: parseNumber(value) }});
+							} }
+						/>
 					</div>
 					</p>
 					<p>
