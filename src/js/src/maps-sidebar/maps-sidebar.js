@@ -279,7 +279,6 @@ function MapsSidebar( {
 								'top-left'
 							);
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-
 							setMap(map);
 						} }
 						key={ key }

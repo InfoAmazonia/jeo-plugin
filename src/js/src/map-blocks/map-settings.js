@@ -179,7 +179,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						<TextControl
 							type="number"
 							label={ __( 'North', 'jeo' ) }
-							value={ attributes.pan_limits.north }
+							value={ attributes.pan_limits?.north || "__"}
 							onChange={ ( value ) => {
 								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, north: parseNumber(value) }});
 							} }
@@ -188,7 +188,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						<TextControl
 							type="number"
 							label={ __( 'East', 'jeo' ) }
-							value={ attributes.pan_limits.east }
+							value={ attributes.pan_limits?.east || "__" }
 							onChange={ ( value ) => {
 								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, east: parseNumber(value) }});
 							} }
@@ -198,7 +198,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						<TextControl
 							type="number"
 							label={ __( 'South', 'jeo' ) }
-							value={ attributes.pan_limits.south }
+							value={ attributes.pan_limits?.south || "__"}
 							onChange={ ( value ) => {
 								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, south: parseNumber(value) }});
 							} }
@@ -207,7 +207,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						<TextControl
 							type="number"
 							label={ __( 'West', 'jeo' ) }
-							value={ attributes.pan_limits.west }
+							value={ attributes.pan_limits?.west || "__"}
 							onChange={ ( value ) => {
 								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, west: parseNumber(value) }});
 							} }
