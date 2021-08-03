@@ -49,6 +49,9 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 
 == Changelog ==
 
+= 2.1.0 =
+* Tenth Release
+
 = 2.0.0 =
 * Ninth release.
 JEO Plugin was updated to be compatible with Wordpress version > 5.6.0.
