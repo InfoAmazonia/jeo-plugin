@@ -48,6 +48,8 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+= 2.2.0 =
+* Add window.jeomaps global for third party plugins/themes to be able to manipulate map object
 
 = 2.1.1 =
 * Tenth Release
