@@ -6,7 +6,7 @@ Requires PHP: 7.2
 Requires at least: 5.4
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.1.5
+Version: 2.2.1
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news storys as layers of information on digital maps.
 
