@@ -22,7 +22,12 @@ import JeoMap from './class-jeo-map';
 			if ( map_id ) {
 				this.dataset['map_id'] = map_id;
 			}
-			new JeoMap( this );
+			let uuid = Math.floor(Math.random() * 100);
+			this.dataset['uui_id'] = uuid;
+			if ( ! window.jeomaps ) {
+				window.jeomaps = [];
+			}
+			window.jeomaps[ uuid ] = new JeoMap( this );
 		} );
 	} );
 } )( jQuery );
