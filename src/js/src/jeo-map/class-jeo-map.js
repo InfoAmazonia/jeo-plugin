@@ -631,11 +631,6 @@ export default class JeoMap {
 					// Save first page results
 					let cumulativePosts = data;
 
-					// If we only have one page we can return right here
-					if (totalPages == 1) {
-						return cumulativePosts;
-					}
-
 					const buildRelatedPosts = (map) => {
 						const sourceData = this.buildPostsGeoJson(cumulativePosts);
 
