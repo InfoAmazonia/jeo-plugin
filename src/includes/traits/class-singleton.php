@@ -60,7 +60,7 @@ trait Singleton {
 			$should_load_assets = true;
 		}
 
-		return $should_load_assets;
+		return apply_filters( 'jeo_should_load_assets' , $should_load_assets );
 	}
 
 	final public static function get_instance() {

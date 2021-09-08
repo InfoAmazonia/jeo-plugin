@@ -41,6 +41,11 @@ class Settings {
 		if (!$options) {
 			$options = [];
 		}
+		if( isset( $options[ 'enabled_post_types'] ) && ! empty( $options[ 'enabled_post_types'] ) ) {
+			if ( ! is_array( $options[ 'enabled_post_types'] ) ) {
+				$options[ 'enabled_post_types'] = explode( ',', trim( esc_textarea( $options[ 'enabled_post_types'] ) ) );
+			}
+		}
 		$options = array_merge($this->default_options, $options);
 		if ( isset($options[$option_name]) ) {
 			return $options[$option_name];
