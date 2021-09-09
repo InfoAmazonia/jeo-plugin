@@ -101,152 +101,159 @@ class Geocode_Handler {
 
 	public function register_metadata() {
 
-		register_post_meta('post', '_related_point', [
-			'show_in_rest'  => array(
-					'schema' => array(
-						'properties'           => array(
-							'_geocode_lat' => [
-								'type' => 'float'
-							],
-							'_geocode_lon' => [
-								'type' => 'float'
-							],
-							'_geocode_city_level_1' => [
-								'type' => 'string'
-							],
-							'_geocode_city' => [
-								'type' => 'string'
-							],
-							'_geocode_region_level_3' => [
-								'type' => 'string'
-							],
-							'_geocode_region_level_2' => [
-								'type' => 'string'
-							],
-							'_geocode_region_level_1' => [
-								'type' => 'string'
-							],
-							'_geocode_country_code' => [
-								'type' => 'string'
-							],
-							'_geocode_country' => [
-								'type' => 'string'
-							],
-							'_geocode_full_address' => [
-								'type' => 'string'
-							],
-							'relevance' => [
-								'type' => 'string',
-								'enum' => [
-									'primary',
-									'secondary'
-								]
-							],
+		$post_types = \jeo_settings()->get_option( 'enabled_post_types' );
+
+		if ( ! $post_types || ! is_array( $post_types ) || empty ( $post_types ) ) {
+			$post_types = [ 'post' ];
+		}
+		foreach( $post_types as $type ) {
+				register_post_meta($type, '_related_point', [
+					'show_in_rest'  => array(
+							'schema' => array(
+								'properties'           => array(
+									'_geocode_lat' => [
+										'type' => 'float'
+									],
+									'_geocode_lon' => [
+										'type' => 'float'
+									],
+									'_geocode_city_level_1' => [
+										'type' => 'string'
+									],
+									'_geocode_city' => [
+										'type' => 'string'
+									],
+									'_geocode_region_level_3' => [
+										'type' => 'string'
+									],
+									'_geocode_region_level_2' => [
+										'type' => 'string'
+									],
+									'_geocode_region_level_1' => [
+										'type' => 'string'
+									],
+									'_geocode_country_code' => [
+										'type' => 'string'
+									],
+									'_geocode_country' => [
+										'type' => 'string'
+									],
+									'_geocode_full_address' => [
+										'type' => 'string'
+									],
+									'relevance' => [
+										'type' => 'string',
+										'enum' => [
+											'primary',
+											'secondary'
+										]
+									],
+								),
+								'additionalProperties' => false,
+							),
 						),
-						'additionalProperties' => false,
-					),
-				),
-			'single' => false,
-			'sanitize_callback' => [$this, 'sanitize_points'],
-			'auth_callback' => function() {
-				return current_user_can('edit_posts');
-			},
-			'type' => 'object',
-			'description' => __('Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo')
-		]);
-
-		foreach ( ['p', 's']  as $relevance ) {
-
-			register_post_meta('post', '_geocode_lat_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'number',
-				'description' => __('Latitude', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_lon_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'number',
-				'description' => __('Longitude', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_country_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'string',
-				'description' => __('Country', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_country_code_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'string',
-				'description' => __('Country code', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_region_level_1_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'string',
-				'description' => __('Region level 1', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_region_level_2_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'string',
-				'description' => __('Region level 2', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_region_level_3_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'string',
-				'description' => __('Region level 3', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_city_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'string',
-				'description' => __('City', 'jeo')
-			]);
-
-			register_post_meta('post', '_geocode_city_level_1_' . $relevance, [
-				'show_in_rest' => false,
-				'single' => false,
-				'auth_callback' => function() {
-					return current_user_can('edit_posts');
-				},
-				'type' => 'string',
-				'description' => __('City sub-level 1', 'jeo')
-			]);
-
+					'single' => false,
+					'sanitize_callback' => [$this, 'sanitize_points'],
+					'auth_callback' => function() {
+						return current_user_can('edit_posts');
+					},
+					'type' => 'object',
+					'description' => __('Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo')
+				]);
+		
+				foreach ( ['p', 's']  as $relevance ) {
+		
+					register_post_meta('post', '_geocode_lat_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'number',
+						'description' => __('Latitude', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_lon_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'number',
+						'description' => __('Longitude', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_country_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'string',
+						'description' => __('Country', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_country_code_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'string',
+						'description' => __('Country code', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_region_level_1_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'string',
+						'description' => __('Region level 1', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_region_level_2_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'string',
+						'description' => __('Region level 2', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_region_level_3_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'string',
+						'description' => __('Region level 3', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_city_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'string',
+						'description' => __('City', 'jeo')
+					]);
+		
+					register_post_meta('post', '_geocode_city_level_1_' . $relevance, [
+						'show_in_rest' => false,
+						'single' => false,
+						'auth_callback' => function() {
+							return current_user_can('edit_posts');
+						},
+						'type' => 'string',
+						'description' => __('City sub-level 1', 'jeo')
+					]);
+		
+			}
 		}
 
 	}
