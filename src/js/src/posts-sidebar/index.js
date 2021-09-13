@@ -44,10 +44,11 @@ registerPlugin( 'jeo-posts-sidebar', {
 	const currentPostType = useSelect( ( select ) => {
 		return select( 'core/editor' ).getCurrentPostType()
 	}, [] );
+	console.log( currentPostType );
 
 	return (
 		<div>
-			{ currentPostType === "post" ? 
+			{ currentPostType ? 
 				<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
 					<JeoGeocodePanel />
 				</PluginDocumentSettingPanel>
