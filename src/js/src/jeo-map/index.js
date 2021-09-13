@@ -2,7 +2,7 @@ import './../map-blocks/storymap-display';
 import JeoMap from './class-jeo-map';
 
 ( function ( $ ) {
-	$( function () {
+	window.JeoInitMaps = function() {
 		$( '.jeomap:not(.storymap)' ).each( function ( i ) {
 			/*
 				before pass this element to JeoMap constructor
@@ -29,6 +29,9 @@ import JeoMap from './class-jeo-map';
 			}
 			window.jeomaps[ uuid ] = new JeoMap( this );
 		} );
+	}
+	$( function () {
+		window.JeoInitMaps();
 	} );
 } )( jQuery );
 
