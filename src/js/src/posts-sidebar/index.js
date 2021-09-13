@@ -44,7 +44,6 @@ registerPlugin( 'jeo-posts-sidebar', {
 	const currentPostType = useSelect( ( select ) => {
 		return select( 'core/editor' ).getCurrentPostType()
 	}, [] );
-	console.log( currentPostType );
 
 	return (
 		<div>
