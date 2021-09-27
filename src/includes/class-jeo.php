@@ -328,7 +328,24 @@ class Jeo {
 						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup' => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
 						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) )
-					]
+					],
+					'cluster' => apply_filters( 'jeomap_js_cluster', [
+						'circle_color' => '#ffffff'
+					] ),
+					'images' => apply_filters( 'jeomap_js_images', [
+						'/js/src/icons/news-marker' => [
+							'url' => JEO_BASEURL . '/js/src/icons/news-marker.png',
+							'icon_size' => 0.1,
+						],
+						'/js/src/icons/news-marker-hover' => [
+							'url' => JEO_BASEURL . '/js/src/icons/news-marker-hover.png',
+							'icon_size' => 0.1,
+						],
+						'/js/src/icons/news' => [
+							'url' => JEO_BASEURL . '/js/src/icons/news.png',
+							'icon_size' => 0.13,
+						],
+					] )
 				)
 			);
 		}

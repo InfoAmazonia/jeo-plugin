@@ -641,9 +641,8 @@ export default class JeoMap {
 							clusterMaxZoom: 40,
 							clusterRadius: 40,
 						} );
-
 						map.loadImage(
-							jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png',
+							jeoMapVars.images['/js/src/icons/news-marker'].url,
 							( error, image ) => {
 								if ( error ) throw error;
 
@@ -656,7 +655,7 @@ export default class JeoMap {
 									filter: [ '!', [ 'has', 'point_count' ] ],
 									layout: {
 										'icon-image': 'news-marker',
-										'icon-size': 0.1,
+										'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
 										'icon-allow-overlap': true,
 										// 'text-field': 'story',
 										// 'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
@@ -691,9 +690,9 @@ export default class JeoMap {
 										.setHTML( popupHTML )
 										.addTo(map);
 								});
-
+								console.log( jeoMapVars.images['/js/src/icons/news-marker'] );
 								map.loadImage(
-									jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png',
+									jeoMapVars.images['/js/src/icons/news-marker-hover'].url,
 									function ( error, image ) {
 										if ( error ) throw error;
 
@@ -706,7 +705,7 @@ export default class JeoMap {
 											filter: [ '!', [ 'has', 'point_count' ] ],
 											layout: {
 												'icon-image': 'news-marker-hover',
-												'icon-size': 0.1,
+												'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker-hover'].icon_size ),
 												'icon-allow-overlap': true,
 											},
 
@@ -722,7 +721,7 @@ export default class JeoMap {
 									}
 								);
 
-								map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', (
+								map.loadImage( jeoMapVars.images['/js/src/icons/news'].url, (
 									error,
 									image
 								) => {
@@ -734,7 +733,7 @@ export default class JeoMap {
 										// [6, '#000000'],
 										// [5, '#f28cb1'],
 										// [2, '#f1f075'],
-										[ 0, '#ffffff' ],
+										[ 0, jeoMapVars.cluster.circle_color ],
 									];
 
 									// cluster circle layer
@@ -818,7 +817,7 @@ export default class JeoMap {
 
 										layout: {
 											'icon-image': 'news-no-marker',
-											'icon-size': 0.13,
+											'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
 											'icon-allow-overlap': false,
 											'icon-offset': {
 												stops: [
@@ -835,7 +834,7 @@ export default class JeoMap {
 										},
 
 										paint: {
-											'text-color': '#202202',
+											'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
 										},
 
 										filter: [ 'has', 'point_count' ],
