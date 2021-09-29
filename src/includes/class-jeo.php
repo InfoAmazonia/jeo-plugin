@@ -344,6 +344,7 @@ class Jeo {
 						'/js/src/icons/news' => [
 							'url' => JEO_BASEURL . '/js/src/icons/news.png',
 							'icon_size' => 0.13,
+							'text_color' => '#202202'
 						],
 					] )
 				)
