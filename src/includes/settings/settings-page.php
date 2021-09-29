@@ -45,11 +45,25 @@
 					</tr>
 
 					<tr>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php _e('Post types', 'jeo'); ?></h2></th>
+						<td>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="show_storymaps_on_post_archives"><?php _e('Show story maps on post archives pages', 'jeo'); ?></label></th>
+						<td>
+						<input type="checkbox" name="<?php echo esc_html( $this->get_field_name('show_storymaps_on_post_archives') ); ?>" value="1" <?php checked(1, $this->get_option('show_storymaps_on_post_archives'), true); ?> />
+						</td>
+					</tr>
+
+					<tr>
 						<th scope="row"><label for="enabled_post_types"><?php _e('Enabled Post Types. Default: post,storymap', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('enabled_post_types') ); ?>" placeholder="<?= __("Post types separated by comma, Ex: map,post,page ", "jeo") ?>" type="text" id="enabled_post_types" value="<?php echo esc_textarea( implode( ',' , $this->get_option('enabled_post_types') ) ); ?>" class="regular-text">
 						</td>
 					</tr>
+
 
 					<tr>
 						<th scope="row"><h2 style="padding: 0; margin: 0"><?php _e('API', 'jeo'); ?></h2></th>

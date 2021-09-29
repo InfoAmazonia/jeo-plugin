@@ -21,6 +21,7 @@ class Settings {
 			'map_default_lng' => -46.65599340,
 			'carto_update_time' => 'weekly',
 			'jeo_footer-logo' => '',
+			'show_storymaps_on_post_archives' => 0,
 		];
 
 		add_action('admin_menu', [$this, 'add_menu_item']);

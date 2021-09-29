@@ -13,9 +13,10 @@ class Storymap{
 		add_action( 'init', [$this, 'register_post_type'] );
 		add_filter( 'single_template', [$this, 'override_template']);
 		add_action('admin_init', [ $this, 'add_capabilities' ]);
+
+		add_action( 'pre_get_posts', [ $this, 'show_on_archives' ] );
 		$this->register_rest_meta_validation();
 	}
-
 
     public function register_post_type() {
 		$labels = array(
@@ -65,6 +66,10 @@ class Storymap{
 				array( 'jeo/storymap' ),
 			),
 		);
+		if( \jeo_settings()->get_option( 'show_storymaps_on_post_archives' ) == 1 ) {
+			$args[ 'taxonomies' ] = [ 'category', 'post_tag' ];
+		}
+
 
 		register_post_type($this->post_type, $args);
 
@@ -95,6 +100,28 @@ class Storymap{
 		}
 
 		return $template;
+	}
+
+	public function show_on_archives( $query ) {
+		if ( ! $query->is_main_query() ) {
+			return;
+		}
+		if ( ! is_home() && ! is_category() && ! is_tag() && ! is_search() && ! is_date() ) {
+			return;
+		}
+		if( \jeo_settings()->get_option( 'show_storymaps_on_post_archives' ) != 1 ) {
+			return;
+		}
+
+		if ( empty( $query->get( 'post_type' ) ) ) {
+			$query->set( 'post_type', ['post', $this->post_type ] );
+		} else {
+			if ( is_array( $query->get( 'post_type' ) ) ) {
+				$types = $query->get( 'post_type' );
+				$types[] = $this->post_type;
+				$query->set( 'post_types', $types );
+			}
+		}
 	}
 }
 
