@@ -5,7 +5,7 @@
  * @wordpress-plugin
  * Plugin Name:       JEO WP
  * Description:       Interactive Map blocks for Wordpress Gutenberg
- * Version:           2.3.0
+ * Version:           2.3.1
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       jeo
