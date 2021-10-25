@@ -807,6 +807,7 @@ export default class JeoMap {
 															center: features[0].geometry.coordinates,
 															zoom
 														});
+														
 													}
 												});		
 											} else {
@@ -852,8 +853,26 @@ export default class JeoMap {
 								} );
 							}
 						);
+						map.on('mouseenter', 'cluster-layer', () => {
+							map.getCanvas().style.cursor = 'pointer'
+						})
+						map.on('mouseleave', 'cluster-layer', () => {
+							map.getCanvas().style.cursor = ''
+						})
+						map.on('mouseenter', 'unclustered-points', () => {
+							map.getCanvas().style.cursor = 'pointer'
+						})
+						map.on('mouseleave', 'unclustered-points', () => {
+							map.getCanvas().style.cursor = ''
+						})
+						map.on('mouseenter', 'cluster-count', () => {
+							map.getCanvas().style.cursor = 'pointer'
+						})
+						map.on('mouseleave', 'cluster-count', () => {
+							map.getCanvas().style.cursor = ''
+						})
 
-
+						
 						// Keep requesting to get to the last page
 						for (let i = 2; i <= totalPages; i++) {
 							// Break to avoid respect page limiting
