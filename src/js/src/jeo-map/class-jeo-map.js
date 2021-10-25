@@ -23,6 +23,7 @@ export default class JeoMap {
 		} );
 
 		this.map = map;
+
 		this.options = jQuery( this.element ).data( 'options' );
 
 		this.moreInfoTemplate = template( window.jeoMapVars.templates.moreInfo );
@@ -582,6 +583,7 @@ export default class JeoMap {
 
 	getRelatedPosts() {
 		return new Promise( ( resolve, reject ) => {
+			const self = this;
 			const relatedPostsCriteria = this.getArg( 'related_posts' );
 			this.relatedPostsCriteria = relatedPostsCriteria;
 
@@ -789,21 +791,28 @@ export default class JeoMap {
 											}
 											return uniques;
 										}
-
+											
 
 										// Get all points under a cluster
 										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
-											const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val))));
+											const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val)) ));
+
 
 											if(nextFeatures.length >= 2) {
-												map.fitBounds([
-													...nextFeatures
-												], { padding: 300});
+												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
+													if (!err) {
+														
+			
+														map.easeTo({
+															center: features[0].geometry.coordinates,
+															zoom
+														});
+													}
+												});		
 											} else {
 												console.log("These points are registered at the exactly same coordinates.")
 											}
 										})
-
 
 										// flyIntoCluster(map, coordinates, currentZoom);
 
