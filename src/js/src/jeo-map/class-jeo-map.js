@@ -801,7 +801,6 @@ export default class JeoMap {
 											if(nextFeatures.length >= 2) {
 												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
 													if (!err) {
-														const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val)) ));
 														
 			
 														map.easeTo({
