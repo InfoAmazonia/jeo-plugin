@@ -36,7 +36,6 @@ export default class JeoMap {
 
         this.spiderifier = new MapboxglSpiderifier(this.map, {
 			initializeLeg: (spiderLeg) => {
-				console.log( spiderLeg );
 				let post = {
 					date: spiderLeg.feature.date,
 					link: spiderLeg.feature.link,
@@ -56,15 +55,16 @@ export default class JeoMap {
 				})					
 				.setLngLat(spiderLeg.mapboxMarker._lngLat)
 				.setHTML( popupHTML )
+				const jeoOpenSpiderifierPinEvent = new CustomEvent('jeo-open-spiderifier-pin', { detail: spiderLeg.feature })
 
 				spiderLeg.elements.pin.style.backgroundImage = `url("${jeoMapVars.images['/js/src/icons/news-marker'].url})"`
 				spiderLeg.elements.container.addEventListener( 'click', () => {
 					popUp.addTo( self.map )
+					document.body.dispatchEvent( jeoOpenSpiderifierPinEvent )
 				} )
 				
 			}
 		})
-
 
 		this.initMap()
 			.then( () => {
@@ -853,10 +853,8 @@ export default class JeoMap {
  */												let markers = aFeatures.map( ( eachFeature ) => {
 													return eachFeature.properties;
 												})
-												console.log( markers );
 												self.spiderifier.spiderfy(features[0].geometry.coordinates, markers);
 									
-												console.log("These points are registered at the exactly same coordinates.")
 											}
 										})
 
