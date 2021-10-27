@@ -32,6 +32,40 @@ export default class JeoMap {
 			`<article class="popup popup-wmt">${ window.jeoMapVars.templates.postPopup }</article>`
 		);
 
+		const self = this;
+
+        this.spiderifier = new MapboxglSpiderifier(this.map, {
+			initializeLeg: (spiderLeg) => {
+				console.log( spiderLeg );
+				let post = {
+					date: spiderLeg.feature.date,
+					link: spiderLeg.feature.link,
+					title: {
+						rendered: spiderLeg.feature.title.rendered,
+					}
+				}
+				//adicionando comentario
+				const popupHTML = self.popupTemplate( {
+					post,
+					read_more: window.jeoMapVars.string_read_more,
+					show_featured_media: false,
+				} )
+				let popUp = new mapboxgl.Popup({
+					closeOnClick: false,
+					offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
+				})					
+				.setLngLat(spiderLeg.mapboxMarker._lngLat)
+				.setHTML( popupHTML )
+
+				spiderLeg.elements.pin.style.backgroundImage = `url("${jeoMapVars.images['/js/src/icons/news-marker'].url})"`
+				spiderLeg.elements.container.addEventListener( 'click', () => {
+					popUp.addTo( self.map )
+				} )
+				
+			}
+		})
+
+
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
@@ -692,7 +726,6 @@ export default class JeoMap {
 										.setHTML( popupHTML )
 										.addTo(map);
 								});
-								console.log( jeoMapVars.images['/js/src/icons/news-marker'] );
 								map.loadImage(
 									jeoMapVars.images['/js/src/icons/news-marker-hover'].url,
 									function ( error, image ) {
@@ -779,6 +812,8 @@ export default class JeoMap {
 										const clusterId = features[0].properties.cluster_id
 										const pointCount = features[0].properties.point_count
 										const clusterSource = map.getSource('storiesSource');
+										//const self = this;
+										self.spiderifier.unspiderfy();
 
 										function multiDimensionalUnique(arr) {
 											var uniques = [];
@@ -811,6 +846,16 @@ export default class JeoMap {
 													}
 												});		
 											} else {
+												// implements spiderifier
+/* 												let markers = _.map(leafFeatures, function(leafFeature){
+													return leafFeature.properties;
+												});
+ */												let markers = aFeatures.map( ( eachFeature ) => {
+													return eachFeature.properties;
+												})
+												console.log( markers );
+												self.spiderifier.spiderfy(features[0].geometry.coordinates, markers);
+									
 												console.log("These points are registered at the exactly same coordinates.")
 											}
 										})

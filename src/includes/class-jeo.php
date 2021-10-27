@@ -135,6 +135,13 @@ class Jeo {
 			'mapboxgl-loader',
 			JEO_BASEURL . '/js/build/mapboxglLoader.js'
 		);
+		wp_register_script(
+			'mapboxgl-spiderifier',
+			JEO_BASEURL . '/js/src/mapboxgl-spiderifier/index.js',
+			'mapboxgl-loader',
+			null,
+			false
+		);
 
 		wp_localize_script(
 			'mapboxgl-loader',
@@ -288,7 +295,8 @@ class Jeo {
 		if ( $this->should_load_assets() || get_query_var('jeo_embed') === 'map') {
 			wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time() );
 			wp_enqueue_script( 'mapboxgl-loader' );
-			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'jquery', 'wp-element' ), false, true );
+			wp_enqueue_script( 'mapboxgl-spiderifier' );
+			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'mapboxgl-spiderifier', 'jquery', 'wp-element' ), false, true );
 
 			wp_set_script_translations('jeo-map', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
