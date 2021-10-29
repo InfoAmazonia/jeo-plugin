@@ -1,7 +1,7 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 5.7.0
-Stable tag: 2.3.1
+Stable tag: 2.4.0
 Requires PHP: 7.2
 Requires at least: 5.4
 License: GPL-2.0+
@@ -48,6 +48,10 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+
+= 2.4.0 =
+* feature: add spiderifier effect to open clusters with features with same coordinates
+
 = 2.3.1 =
 * bugfix: cluster zoom on click
 * feature: pin/cluster mouse over effect (change cursor style)
