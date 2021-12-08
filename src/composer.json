@@ -1,0 +1,22 @@
+{
+    "name": "jeo/jeo",
+    "description": "A WordPress plugin for interactive maps and journalism.",
+    "type": "wordpress-plugin",
+    "require-dev": {
+        "phpunit/phpunit": "^7"
+    },
+    "require": {
+        "cmb2/cmb2": "dev-master"
+    },
+    "autoload": {
+        "files": ["vendor/cmb2/cmb2/init.php"]
+    },    
+    "license": "GPL-3.0-or-later",
+    "authors": [
+        {
+            "name": "Leo Germani",
+            "email": "leogermani@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}

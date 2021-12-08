@@ -1,6 +1,13 @@
 <?php
 require __DIR__ . '/integrations/carto.php';
 
+/**
+ *  Composer Autoload
+ */
+if ( is_readable( JEO_BASEPATH . '/vendor/autoload.php' ) ) {
+    require JEO_BASEPATH . '/vendor/autoload.php';
+}
+
 spl_autoload_register('jeo_autoload');
 
 function jeo_autoload($class_name) {
@@ -16,7 +23,7 @@ function jeo_autoload($class_name) {
 
 	$filename = 'class-'. strtolower(str_replace('_', '-' , $class_name)) . '.php';
 
-	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization'];
+	$folders = ['.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization', 'partners-posts'];
 
 	foreach ($folders as $folder) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -107,6 +114,14 @@ function jeo_menu() {
 function jeo_storymap() {
 	return \Jeo\Storymap::get_instance();
 }
+/**
+ * Gets the instance of the Storymap
+ * @return \Storymap Storymap instance
+ */
+function jeo_partners_sites() {
+	return \Jeo\Partners_Sites::get_instance();
+}
+
 
 /**
  * Returns the URL to a JEO template file

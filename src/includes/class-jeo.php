@@ -52,6 +52,7 @@ class Jeo {
 		\jeo_legend_types();
 		\jeo_sidebars();
 		\jeo_storymap();
+		\jeo_partners_sites();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
 		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
