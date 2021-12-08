@@ -18,7 +18,7 @@ class Partners_Sites {
 		$this->register_rest_meta_validation();
 
 	}
-
+	
 	public function register_post_type() {
 
 		$labels = array(
@@ -34,7 +34,8 @@ class Partners_Sites {
 			'not_found' => __('No site found', 'jeo'),
 			'not_found_in_trash' => __('No site found in the trash', 'jeo'),
 			'menu_name' => __('Partners Sites', 'jeo'),
-			'item_published' => __('Integration added.', 'jeo'),
+			'item_published' => __('Site added.', 'jeo'),
+			'item_updated'	=> __( 'Site updated', 'jeo' )
 		);
 
 		$args = array(
@@ -42,7 +43,7 @@ class Partners_Sites {
 			'hierarchical' => true,
 			'description' => __('JEO Partners Sites', 'jeo'),
 			'supports' => array( 'title'),
-			'rewrite' => array('slug' => 'sites'),
+			'rewrite' => false,
 			'public' => true,
 			'show_in_menu' => 'jeo-main-menu',
 			'show_in_rest' => false,
@@ -89,6 +90,10 @@ class Partners_Sites {
 	}
 	public function add_cmb2_fields() {
 		$prefix = $this->post_type;
+		$post_id = false;
+		if ( isset( $_GET[ 'post'] ) && ! empty( $_GET[ 'post'] ) ) {
+			$post_id = $_GET[ 'post'];
+		}
 
 		$site_info_box = \new_cmb2_box( array(
 			'id'           => $prefix . '_site_info',
@@ -110,17 +115,24 @@ class Partners_Sites {
 			'show_option_none' 	=> true,
 			'options'			=> [],
 		) );
+		if ( $post_id ) {
+			$site_info_box->add_field( array(
+				'id'   		=> $prefix . '_remote_categorie_value',
+				'type' 		=> 'hidden',
+				'default' 	=> get_post_meta( $post_id, $prefix . '_remote_category', true ),
+			) );	
+		}
 
 		$post_config_box = \new_cmb2_box( array(
 			'id'           => $prefix . '_post_config',
-			'title'        => __( 'Site information', 'jeo' ),
+			'title'        => __( 'Post configuration', 'jeo' ),
 			'object_types' => array( $this->post_type ),
 			'context'      => 'advanced',
 			'priority'     => 'high',
 		) );
 
 		$post_config_box->add_field( array(
-			'name' 				=> __( 'Post category after import', 'jeo' ),
+			'name' 				=> __( 'Post category on your site', 'jeo' ),
 			'id' 				=> $prefix . '_local_category',
 			'taxonomy'			=> 'category',
 			'type'				=> 'taxonomy_select',
