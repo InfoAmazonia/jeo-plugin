@@ -1,11 +1,11 @@
 <?php
-
 namespace Jeo;
+
+require 'class-import-posts.php';
 
 class Partners_Sites {
 
 	use Singleton;
-	use Rest_Validate_Meta;
 
 	public $post_type = '_partners_sites';
 
@@ -16,7 +16,6 @@ class Partners_Sites {
 		add_action( 'cmb2_init', [ $this, 'add_cmb2_fields'] );
 		add_action( 'admin_head', [ $this, 'remove_metaboxes'], 9999 );
 
-		$this->register_rest_meta_validation();
 
 	}
 
@@ -27,7 +26,7 @@ class Partners_Sites {
 			return;
 		}
 		
-		if( $wp_meta_boxes[$this->post_type] && is_array( $wp_meta_boxes[$this->post_type] ) ) {
+		if( isset( $wp_meta_boxes[$this->post_type] ) && is_array( $wp_meta_boxes[$this->post_type] ) ) {
 			foreach( $wp_meta_boxes[$this->post_type] as $position => $content ) {
 				if( $wp_meta_boxes[$this->post_type][ $position ] && is_array( $wp_meta_boxes[$this->post_type][ $position ] ) && ! empty( $wp_meta_boxes[$this->post_type][ $position ] ) ) {
 					foreach( $wp_meta_boxes[$this->post_type][ $position ] as $priority => $content ) {
@@ -78,7 +77,7 @@ class Partners_Sites {
 		$args = array(
 			'labels' => $labels,
 			'hierarchical' => true,
-			'description' => __('JEO Partners Sites', 'jeo'),
+			'description' => __('JEO Partners Sites Sync', 'jeo'),
 			'supports' => array( 'title'),
 			'rewrite' => false,
 			'public' => true,
@@ -152,6 +151,12 @@ class Partners_Sites {
 			'show_option_none' 	=> true,
 			'options'			=> [],
 		) );
+        $site_info_box->add_field( array(
+            'name' => __( 'Import posts published from date', 'jeo' ),
+            'id'   => $prefix . '_date',
+            'type' => 'text_date_timestamp',
+            'date_format' => get_option( 'date_format', 'd/m/Y' ),
+        ) );        
 		$current_remote_category = '';
 		if ( $post_id ) {
 			$current_remote_category = get_post_meta( $post_id, '_remote_category', true );

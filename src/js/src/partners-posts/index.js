@@ -106,6 +106,7 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
     }
     loadTest() {
         let selectField = document.getElementById('_partners_sites_remote_category' );
+        let dateField = document.getElementById('_partners_sites_date' );
         this.setState( { btnText: __( 'Loading..', 'jeo' ), btnDisabled: true } );
         let URL = this.siteURLInput.value;
         if ( ! isValidHttpURL( URL ) ) {
@@ -115,10 +116,16 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
         if ( URL.substr(URL.length - 1) == '/' ) {
             URL = URL.slice(0, -1);
         }
-        URL = URL + '/wp-json/wp/v2/posts/?per_page=4&_embed';
+        URL = URL + '/wp-json/wp/v2/posts/?per_page=10&_embed';
         if ( selectField.value && selectField.value != '' ) {
             URL = URL + '&categories[]=' + selectField.value;
         }
+        if ( dateField.value && dateField.value != '' ) {
+            let format = JSON.parse( dateField.dataset.datepicker );
+            let date = new Date( dateField.value );
+
+            URL = URL + '&after=' + date.toISOString();
+        } 
 
         fetch( URL )
         .then( (response) => {
@@ -129,7 +136,11 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
             return response.json();
           })
         .then( ( data ) =>{
-            this.setState( { btnDisabled: false, httpResponse: false, isOpen: true, btnText: __( 'Preview Import', 'jeo' ), responseData: data } );
+            if ( data.length > 0 ) {
+                this.setState( { btnDisabled: false, httpResponse: false, isOpen: true, btnText: __( 'Preview Import', 'jeo' ), responseData: data } );
+            } else {
+                this.setState( { btnDisabled: false, httpResponse: __( 'The request to the partner site with these settings returned 0 posts ', 'jeo' ), isOpen: true, btnText: __( 'Preview Import', 'jeo' ) } );
+            }
         } )
         .catch( (error) => {
             this.setState( { btnDisabled: false, httpResponse: __( 'The request for that partner is not ok: ' ) + error.message, isOpen: true, btnText: __( 'Preview Import', 'jeo' ) } );
@@ -178,10 +189,12 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
                                             <h4>{ __( 'Title', 'jeo' ) }</h4>
                                             <p>{item.title.rendered}</p>
                                         </div>
-                                        <div className="preview-post__image" style={{width:'100%',textAlign:'center'}}>
-                                            <h4>{ __( 'Featured Image', 'jeo' ) }</h4>
-                                            <img style={{width:'20vw', display:'inline'}} src={ item['_embedded']['wp:featuredmedia'][0]['source_url'] } />
-                                        </div>
+                                        { typeof item['_embedded']['wp:featuredmedia'] !== 'undefined' && (
+                                            <div className="preview-post__image" style={{width:'100%',textAlign:'center'}}>
+                                                <h4>{ __( 'Featured Image', 'jeo' ) }</h4>
+                                                <img style={{width:'20vw', display:'inline'}} src={ item['_embedded']['wp:featuredmedia'][0]['source_url'] } />
+                                            </div>
+                                        )}
                                     </Fragment>
                                 )) }
                             </div>
