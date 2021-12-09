@@ -14,9 +14,46 @@ class Partners_Sites {
 		add_action('admin_init', [ $this, 'add_capabilities' ]);
 		add_action( 'admin_init', [ $this, 'load_assets' ] );
 		add_action( 'cmb2_init', [ $this, 'add_cmb2_fields'] );
+		add_action( 'admin_head', [ $this, 'remove_metaboxes'], 9999 );
 
 		$this->register_rest_meta_validation();
 
+	}
+
+	public function remove_metaboxes() {
+		global $wp_meta_boxes;
+
+		if( ! is_array( $wp_meta_boxes ) ) {
+			return;
+		}
+		
+		if( $wp_meta_boxes[$this->post_type] && is_array( $wp_meta_boxes[$this->post_type] ) ) {
+			foreach( $wp_meta_boxes[$this->post_type] as $position => $content ) {
+				if( $wp_meta_boxes[$this->post_type][ $position ] && is_array( $wp_meta_boxes[$this->post_type][ $position ] ) && ! empty( $wp_meta_boxes[$this->post_type][ $position ] ) ) {
+					foreach( $wp_meta_boxes[$this->post_type][ $position ] as $priority => $content ) {
+						if ( ! $wp_meta_boxes[$this->post_type][ $position ][ $priority ] ) {
+							continue;
+						}
+						if ( ! is_array( $wp_meta_boxes[$this->post_type][ $position ][ $priority ] ) ) {
+							continue;
+						}
+						if ( empty( $wp_meta_boxes[$this->post_type][ $position ][ $priority ] ) ) {
+							continue;
+						}
+						foreach( $wp_meta_boxes[$this->post_type][ $position ][ $priority ] as $metabox => $content ) {
+							if ( 'submitdiv' == $metabox ) {
+								continue;
+							}
+							if ( strpos( $metabox, $this->post_type ) !== false ) {
+								continue;
+							}
+							unset( $wp_meta_boxes[$this->post_type][ $position ][ $priority ][ $metabox ] );
+
+						}
+					}
+				}
+			}
+		}
 	}
 	
 	public function register_post_type() {
@@ -115,13 +152,15 @@ class Partners_Sites {
 			'show_option_none' 	=> true,
 			'options'			=> [],
 		) );
+		$current_remote_category = '';
 		if ( $post_id ) {
-			$site_info_box->add_field( array(
-				'id'   		=> $prefix . '_remote_categorie_value',
-				'type' 		=> 'hidden',
-				'default' 	=> get_post_meta( $post_id, $prefix . '_remote_category', true ),
-			) );	
+			$current_remote_category = get_post_meta( $post_id, '_remote_category', true );
 		}
+		$site_info_box->add_field( array(
+			'id'   		=> $prefix . '_remote_categorie_value',
+			'type' 		=> 'hidden',
+			'default' 	=> $current_remote_category,
+		) );	
 
 		$post_config_box = \new_cmb2_box( array(
 			'id'           => $prefix . '_post_config',

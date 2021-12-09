@@ -15,7 +15,6 @@ const isValidHttpURL = ( siteURL ) => {
     try {
         testURL = new URL(siteURL);
     } catch (_) {
-        alert( _ );
         return false;  
     }
 
