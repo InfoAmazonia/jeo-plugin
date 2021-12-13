@@ -48,13 +48,16 @@ class Importer {
         $args = [
             'id' => $id
         ];
+        // get time interval
+        $interval = ( isset( $_POST[ $this->post_type . '_interval' ] ) && ! empty( $_POST[ $this->post_type . '_interval' ] ) ) ? $_POST[ $this->post_type . '_interval' ] : 'hourly';
+        
         if ( ! wp_next_scheduled( $this->event, $args ) ) {
-            wp_schedule_event( time(), '30min', $this->event, $args );
+            wp_schedule_event( time(), $interval, $this->event, $args );
         } else {
             $time = wp_next_scheduled( $this->event, $args );
             wp_unschedule_event( $time, $this->event, $args );
 
-            wp_schedule_event( time(), '30min', $this->event, $args );
+            wp_schedule_event( time(), $interval, $this->event, $args );
         }
         // Run first import after save first time
         if ( ! $update ) {
@@ -117,7 +120,7 @@ class Importer {
             $URL = substr( $URL, 0, -1);
         }
         $URL = $URL . '/wp-json/wp/v2/posts/?' . http_build_query( $request_params );
-        
+
         $response = wp_remote_get( $URL, [] );
 
 

@@ -167,6 +167,20 @@ class Partners_Sites {
 			'type' 		=> 'hidden',
 			'default' 	=> $current_remote_category,
 		) );	
+		$site_info_box->add_field( array(
+			'name' 				=> __( 'Time interval for search new posts', 'jeo' ),
+			'id' 				=> $prefix . '_interval',
+			'type' 				=> 'select',
+			'show_option_none' 	=> true,
+			'default'			=> 'hourly',
+			'options'			=> [
+				'30min' 			=> __( 'Every 30 minutes', 'jeo' ),
+				'hourly' 			=> __( 'Every hour', 'jeo' ),
+				'twicedaily'		=> __( 'Twice a day', 'jeo' ),
+				'daily'				=> __( 'Every day', 'jeo' ),
+				'weekly'			=> __( 'Every Week', 'jeo' )
+			],
+		) );
 
 		$post_config_box = \new_cmb2_box( array(
 			'id'           => $prefix . '_post_config',
