@@ -46,6 +46,12 @@ const fetchCategories = () => {
         return response.json()
     })
     .then( data => {
+        let opt = document.createElement('option');
+        opt.value = '';
+        opt.innerHTML = __( 'None', 'jeo' );
+        opt.setAttribute( 'default', 'default' );        
+        selectField.appendChild(opt);
+        
         data.forEach( ( term ) => {
             let opt = document.createElement('option');
             opt.value = term.id;
@@ -61,6 +67,13 @@ const fetchCategories = () => {
             fetch( url + '&page=' + i)
             .then( response => { return response.json() } )
             .then( data => {
+                let opt = document.createElement('option');
+                opt.value = '';
+                opt.innerHTML = __( 'None', 'jeo' );
+                opt.setAttribute( 'default', 'default' );        
+        
+                selectField.appendChild(opt);
+                
                 data.forEach( ( term ) => {
                     let opt = document.createElement('option');
                     opt.value = term.id;
@@ -123,6 +136,7 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
         if ( dateField.value && dateField.value != '' ) {
             let format = JSON.parse( dateField.dataset.datepicker );
             let date = new Date( dateField.value );
+            
 
             URL = URL + '&after=' + date.toISOString();
         } 
@@ -139,18 +153,13 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
             if ( data.length > 0 ) {
                 this.setState( { btnDisabled: false, httpResponse: false, isOpen: true, btnText: __( 'Preview Import', 'jeo' ), responseData: data } );
             } else {
-                this.setState( { btnDisabled: false, httpResponse: __( 'The request to the partner site with these settings returned 0 posts ', 'jeo' ), isOpen: true, btnText: __( 'Preview Import', 'jeo' ) } );
+                this.setState( { btnDisabled: false, httpResponse: __( 'The request to the partner site with these settings returned 0 posts ', 'jeo' ), isOpen: true, btnText: __( 'Preview Import', 'jeo' ), responseData: false } );
             }
         } )
         .catch( (error) => {
             this.setState( { btnDisabled: false, httpResponse: __( 'The request for that partner is not ok: ' ) + error.message, isOpen: true, btnText: __( 'Preview Import', 'jeo' ) } );
         });
           
-    }
-    componentDidMount() {
-
-    }
-    componentDidUpdate() {
     }
 	render() {
 		const isOpen = this.state.isOpen;
