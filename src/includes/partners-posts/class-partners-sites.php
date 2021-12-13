@@ -155,8 +155,9 @@ class Partners_Sites {
             'name' => __( 'Import posts published from date', 'jeo' ),
             'id'   => $prefix . '_date',
             'type' => 'text_date_timestamp',
-            'date_format' => get_option( 'date_format', 'd/m/Y' ),
-        ) );        
+            'date_format' => 'Y-m-d',
+			'default' => time()
+        ) );
 		$current_remote_category = '';
 		if ( $post_id ) {
 			$current_remote_category = get_post_meta( $post_id, '_remote_category', true );
@@ -191,15 +192,6 @@ class Partners_Sites {
 		) );
 
 	}
-
-	public function sanitize_meta_center($meta_value, $meta_key, $object_type, $object_subtype) {
-		return intval($meta_value);
-	}
-
-	public function sanitize_meta_initial_zoom($meta_value, $meta_key, $object_type, $object_subtype) {
-		return intval($meta_value);
-	}
-
 
 	public function add_capabilities() {
 		$roles = ['editor', 'administrator'];
