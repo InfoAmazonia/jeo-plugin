@@ -18,9 +18,6 @@ class Importer {
         
         //add_action( 'admin_init', [ $this, 'admin_init'] );
     }
-    public function admin_init() {
-        do_action( $this->event, 430 );
-    }
     /**
      * Add custom schedules interval
      *
