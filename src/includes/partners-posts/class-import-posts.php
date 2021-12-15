@@ -107,9 +107,9 @@ class Importer {
         //print_r( $iso_date );
         //echo '</pre>';
         
-        if( isset( $data[ "{$this->post_type}_remote_category" ] ) ) {
-            if( $data[ "{$this->post_type}_remote_category" ][0] && is_numeric( $data[ "{$this->post_type}_remote_category" ][0] ) ) {
-                $request_params[ 'categories' ] = [ $data[ "{$this->post_type}_remote_category" ][0] ];
+        if( isset( $data[ "{$this->post_type}_remote_category_value" ] ) ) {
+            if( $data[ "{$this->post_type}_remote_category_value" ][0] && is_numeric( $data[ "{$this->post_type}_remote_category_value" ][0] ) ) {
+                $request_params[ 'categories' ] = [ $data[ "{$this->post_type}_remote_category_value" ][0] ];
             }
         }
         $URL = $data[ "{$this->post_type}_site_url" ][0];
