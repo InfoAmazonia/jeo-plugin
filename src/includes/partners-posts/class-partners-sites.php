@@ -160,10 +160,10 @@ class Partners_Sites {
         ) );
 		$current_remote_category = '';
 		if ( $post_id ) {
-			$current_remote_category = get_post_meta( $post_id, '_remote_category', true );
+			$current_remote_category = wp_get_post_categories( $post_id, [ 'fields' => 'ids' ] ); 
 		}
 		$site_info_box->add_field( array(
-			'id'   		=> $prefix . '_remote_categorie_value',
+			'id'   		=> $prefix . '_remote_category_value',
 			'type' 		=> 'hidden',
 			'default' 	=> $current_remote_category,
 		) );	

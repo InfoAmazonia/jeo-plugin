@@ -26,7 +26,7 @@ const fetchCategories = () => {
     let URL = siteURLInput.value;
     let categories = [];
     let selectField = document.getElementById('_partners_sites_remote_category' );
-    let hiddenValueField = document.getElementById('_partners_sites_remote_categorie_value' );
+    let hiddenValueField = document.getElementById('_partners_sites_remote_category_value' );
     let selectedValueId = hiddenValueField.value;
     let totalPages = 1;
 
@@ -48,8 +48,7 @@ const fetchCategories = () => {
     .then( data => {
         let opt = document.createElement('option');
         opt.value = '';
-        opt.innerHTML = __( 'None', 'jeo' );
-        opt.setAttribute( 'default', 'default' );        
+        opt.innerHTML = __( 'All Categories', 'jeo' );
         selectField.appendChild(opt);
         
         data.forEach( ( term ) => {
@@ -66,14 +65,7 @@ const fetchCategories = () => {
         for (let i = 2; i <= totalPages ; i++){
             fetch( url + '&page=' + i)
             .then( response => { return response.json() } )
-            .then( data => {
-                let opt = document.createElement('option');
-                opt.value = '';
-                opt.innerHTML = __( 'None', 'jeo' );
-                opt.setAttribute( 'default', 'default' );        
-        
-                selectField.appendChild(opt);
-                
+            .then( data => {                
                 data.forEach( ( term ) => {
                     let opt = document.createElement('option');
                     opt.value = term.id;
@@ -86,8 +78,6 @@ const fetchCategories = () => {
             });
         }
     });
-    
-    
 
 }
 
@@ -233,4 +223,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
     siteURLInput.addEventListener( 'change', () => {
         fetchCategories();
     })
+    document.getElementById('_partners_sites_remote_category' ).addEventListener( 'change', () => {
+        document.getElementById( '_partners_sites_remote_category_value' ).value = document.getElementById('_partners_sites_remote_category' ).value;
+    })    
 });
