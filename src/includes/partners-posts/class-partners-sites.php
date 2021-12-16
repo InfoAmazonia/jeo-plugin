@@ -15,8 +15,6 @@ class Partners_Sites {
 		add_action( 'admin_init', [ $this, 'load_assets' ] );
 		add_action( 'cmb2_init', [ $this, 'add_cmb2_fields'] );
 		add_action( 'admin_head', [ $this, 'remove_metaboxes'], 9999 );
-
-
 	}
 
 	public function remove_metaboxes() {
@@ -40,9 +38,6 @@ class Partners_Sites {
 							continue;
 						}
 						foreach( $wp_meta_boxes[$this->post_type][ $position ][ $priority ] as $metabox => $content ) {
-							if ( 'submitdiv' == $metabox ) {
-								continue;
-							}
 							if ( strpos( $metabox, $this->post_type ) !== false ) {
 								continue;
 							}
@@ -166,7 +161,15 @@ class Partners_Sites {
 			'id'   		=> $prefix . '_remote_category_value',
 			'type' 		=> 'hidden',
 			'default' 	=> $current_remote_category,
-		) );	
+		) );
+
+
+		$site_info_box->add_field( array(
+			'id'   		=> 'run_import_now',
+			'type' 		=> 'hidden',
+			'default' 	=> 'false',
+		) );
+
 		$site_info_box->add_field( array(
 			'name' 				=> __( 'Time interval for search new posts', 'jeo' ),
 			'id' 				=> $prefix . '_interval',
@@ -196,6 +199,15 @@ class Partners_Sites {
 			'taxonomy'			=> 'category',
 			'type'				=> 'taxonomy_select',
 		) );
+		if ( taxonomy_exists( 'partner' ) ) {
+			$post_config_box->add_field( array(
+				'name' 				=> __( 'Newspack Media Partner', 'jeo' ),
+				'id' 				=> $prefix . '_newspack_partner',
+				'taxonomy'			=> 'partner',
+				'type'				=> 'taxonomy_select',
+			) );	
+		}
+
 
 		$test_api = \new_cmb2_box( array(
 			'id'           => $prefix . '_test_api',

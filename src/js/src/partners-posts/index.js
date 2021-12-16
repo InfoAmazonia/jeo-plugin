@@ -59,7 +59,9 @@ const fetchCategories = () => {
                 opt.setAttribute( 'selected', 'selected' );
             }
             selectField.appendChild(opt);
+            hiddenValueField.value = selectedValueId;
         } )
+        hiddenValueField.value = selectedValueId;
         categories = categories.concat( data ); 
 
         for (let i = 2; i <= totalPages ; i++){
@@ -74,9 +76,11 @@ const fetchCategories = () => {
                         opt.setAttribute( 'selected', 'selected' );
                     }        
                     selectField.appendChild(opt);
-                } )        
+                } )
+                hiddenValueField.value = selectedValueId;
             });
         }
+
     });
 
 }
@@ -96,10 +100,11 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
 		this.state = {
 			isOpen: false,
             btnDisabled: btnDisabled,
-            btnText: __( 'Preview Import', 'jeo' ),
+            btnText: __( 'Preview Import and Save', 'jeo' ),
             html: '',
             httpResponse: false,
             responseData: false,
+            modalTitle: __('Preview Import', 'jeo' )
 		};
         this.siteURLInput.addEventListener( 'change', () => { JeoPartnersPreviewButtonObj.changeURL() } );
     }
@@ -134,14 +139,15 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
         fetch( URL )
         .then( (response) => {
             if( ! response.ok) {
-                this.setState( { btnDisabled: false, httpResponse: __( 'The request for that partner is not ok', 'jeo' ), isOpen: true, btnText: __( 'Preview Import', 'jeo' ) } );
+                this.setState( { btnDisabled: false, httpResponse: __( 'The request for that partner is not ok', 'jeo' ), isOpen: true, btnText: __( 'Preview Import', 'jeo' ), modalTitle: __('Preview Import', 'jeo' ) } );
                 return;
             }
+            this.setState( { modalTitle: __( 'Preview Import - Posts found: ', 'jeo' ) + response.headers.get('x-wp-total')  } );
             return response.json();
           })
         .then( ( data ) =>{
             if ( data.length > 0 ) {
-                this.setState( { btnDisabled: false, httpResponse: false, isOpen: true, btnText: __( 'Preview Import', 'jeo' ), responseData: data } );
+                this.setState( { btnDisabled: false, httpResponse: false, isOpen: true, responseData: data } );
             } else {
                 this.setState( { btnDisabled: false, httpResponse: __( 'The request to the partner site with these settings returned 0 posts ', 'jeo' ), isOpen: true, btnText: __( 'Preview Import', 'jeo' ), responseData: false } );
             }
@@ -150,6 +156,14 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
             this.setState( { btnDisabled: false, httpResponse: __( 'The request for that partner is not ok: ' ) + error.message, isOpen: true, btnText: __( 'Preview Import', 'jeo' ) } );
         });
           
+    }
+    save() {
+        document.getElementById( 'run_import_now' ).value = 'false';
+        document.getElementById( 'post' ).submit();
+    }
+    runNow(){
+        document.getElementById( 'run_import_now' ).value = 'true';
+        document.getElementById( 'post' ).submit();
     }
 	render() {
 		const isOpen = this.state.isOpen;
@@ -174,7 +188,7 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
 
 				{ isOpen && (
 					<Modal
-						title={ __( 'Preview Import - Latest Posts', 'jeo' ) }
+						title={ this.state.modalTitle }
 						onRequestClose={ () => this.setState( { isOpen: false } ) }
 					>   
                         { httpResponse && (
@@ -182,6 +196,14 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
                         ) }
                         { responseData && (
                             <div className="preview-post">
+                                <div className="preview-save">
+                                    <Button isPrimary disable onClick={ () => this.save()  }>
+                                        { __( 'Save and schedule', 'jeo' )}
+                                    </Button>&nbsp;
+                                    <Button isSecondary disable onClick={ () => this.runNow() }>
+                                        { __( 'Save and run now', 'jeo' )}
+                                    </Button>
+                                </div>
                                 { responseData.map(item => (
                                     <Fragment>
                                         <div className="preview-post__title">
@@ -194,8 +216,17 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
                                                 <img style={{width:'20vw', display:'inline'}} src={ item['_embedded']['wp:featuredmedia'][0]['source_url'] } />
                                             </div>
                                         )}
+
                                     </Fragment>
                                 )) }
+                                <div className="preview-save">
+                                    <Button isPrimary disable onClick={ () => this.save()  }>
+                                        { __( 'Save and schedule', 'jeo' )}
+                                    </Button>&nbsp;
+                                    <Button isSecondary disable onClick={ () => this.runNow() }>
+                                        { __( 'Save and run now', 'jeo' )}
+                                    </Button>
+                                </div>
                             </div>
                         )}
 
@@ -208,8 +239,6 @@ const JeoPartnersPreviewButton = class JeoPartnersPreviewButton extends Componen
 document.addEventListener( 'DOMContentLoaded', () => {
     // remove unused wordpress ui things
     document.getElementById( 'edit-slug-box' ).remove();
-    document.getElementById( 'misc-publishing-actions' ).remove();
-    document.getElementById( 'minor-publishing-actions' ).remove();
 
     const siteURLInput = document.querySelector( 'input[name="_partners_sites_site_url"]' );
 
@@ -223,6 +252,8 @@ document.addEventListener( 'DOMContentLoaded', () => {
     siteURLInput.addEventListener( 'change', () => {
         fetchCategories();
     })
+    document.getElementById( '_partners_sites_remote_category_value' ).value = document.getElementById('_partners_sites_remote_category' ).value;
+    
     document.getElementById('_partners_sites_remote_category' ).addEventListener( 'change', () => {
         document.getElementById( '_partners_sites_remote_category_value' ).value = document.getElementById('_partners_sites_remote_category' ).value;
     })    

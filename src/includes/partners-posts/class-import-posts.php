@@ -47,7 +47,6 @@ class Importer {
         ];
         // get time interval
         $interval = ( isset( $_POST[ $this->post_type . '_interval' ] ) && ! empty( $_POST[ $this->post_type . '_interval' ] ) ) ? $_POST[ $this->post_type . '_interval' ] : 'hourly';
-        
         if ( ! wp_next_scheduled( $this->event, $args ) ) {
             wp_schedule_event( time(), $interval, $this->event, $args );
         } else {
@@ -56,8 +55,9 @@ class Importer {
 
             wp_schedule_event( time(), $interval, $this->event, $args );
         }
-        // Run first import after save first time
-        if ( ! $update ) {
+        // Run first import after save first time 
+        // Run now if button Save and Run Now is clicked
+        if ( ! $update || ( isset( $_POST[ 'run_import_now'] ) && 'true' == $_POST[ 'run_import_now'] )  ) {
             do_action( $this->event, $args[ 'id'] );
         }
     }
@@ -88,9 +88,12 @@ class Importer {
      */
     public function run_cron( $id, $page = '1' ) {
         global $wpdb;
+        //var_dump( $id );
 
         $request_params = [ 'per_page' => 5, 'page' => $page, '_embed' => true ];
         $data = get_post_meta( $id );
+
+
         if ( ! isset( $data[ "{$this->post_type}_site_url" ] ) || ! filter_var( $data[ "{$this->post_type}_site_url" ][0], FILTER_VALIDATE_URL ) ) {
             return;
         }
@@ -120,13 +123,12 @@ class Importer {
 
         $response = wp_remote_get( $URL, [] );
 
-
-
         if ( ! is_wp_error( $response ) && is_array( $response ) ) {
             $max_pages = absint( $response[ 'headers' ][ 'x-wp-totalpages' ] );
             //echo "n/r";
             //var_dump( $max_pages );
             //var_dump( $response[ 'body'] );
+
             $this->insert_posts( $response[ 'body'], $id );
             if( '1' == $page && $max_pages > 1 ) {
                 for ($i = 2; $i <= $max_pages; $i++) {
@@ -146,6 +148,12 @@ class Importer {
 
         $posts = json_decode( $posts, true );
         $category = wp_get_post_categories( $id );
+        if( taxonomy_exists( 'partner' ) ) {
+            $partner_terms = wp_get_object_terms( $id, 'partner' );
+            if( is_wp_error( $partner_terms ) || empty( $partner_terms ) ) {
+                $partner_terms = false;
+            }
+        }
 
         foreach( $posts as $post ) {
             $partner_post_id = absint( $post[ 'id' ] );
@@ -153,6 +161,7 @@ class Importer {
 
             $post_exists = $wpdb->get_var( "SELECT COUNT(*) FROM {$wpdb->postmeta} WHERE meta_key = 'partner-link' AND meta_value = '{$link}'");
             if ( $post_exists ) {
+                echo 'aqui';
                 continue;
             }
 
@@ -160,7 +169,9 @@ class Importer {
                 'partner-link'          => esc_textarea( $post[ 'link'] ),
                 'external-source-link'  => esc_textarea( $post[ 'link' ] ),
                 'partner_post_id'       => $partner_post_id,
+                'importer_site_id'      => $id
             ];
+            
             // check if have jeo installed on target site
 
             if ( isset( $post['meta'][ '_related_point' ] ) && isset( $post['meta'][ '_related_point' ][0] ) ) {
@@ -184,10 +195,14 @@ class Importer {
                 if ( isset( $post['_embedded'] ) && isset( $post['_embedded']['wp:featuredmedia'] ) ){
                     $this->upload_thumbnail( $post_inserted, $post['_embedded']['wp:featuredmedia'][0]['source_url'] );
                 }
-
+                if( taxonomy_exists( 'partner' ) ) {
+                    if( $partner_terms ) {
+                        wp_set_object_terms( $post_inserted, [ $partner_terms[0]->term_id ], 'partner', true );
+                    }
+                }
             }
-
         }
+        //die();
     }
 }
 $importer = \Jeo\Importer::get_instance();
