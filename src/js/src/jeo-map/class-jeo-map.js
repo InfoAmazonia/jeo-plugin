@@ -52,7 +52,7 @@ export default class JeoMap {
 				let popUp = new mapboxgl.Popup({
 					closeOnClick: false,
 					offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
-				})					
+				})
 				.setLngLat(spiderLeg.mapboxMarker._lngLat)
 				.setHTML( popupHTML )
 				const jeoOpenSpiderifierPinEvent = new CustomEvent('jeo-open-spiderifier-pin', { detail: spiderLeg.feature })
@@ -62,7 +62,7 @@ export default class JeoMap {
 					popUp.addTo( self.map )
 					document.body.dispatchEvent( jeoOpenSpiderifierPinEvent )
 				} )
-				
+
 			}
 		})
 
@@ -161,7 +161,6 @@ export default class JeoMap {
 
 							// When style is done loading (don't try adding layers before style is not read, its messy)
 							map.on( 'load', () => {
-								console.log("Map loaded 1")
 								// Remove not selected layers and toggle vissibility
 								mapLayersSettings.forEach( ( layer ) => {
 									if ( layer.load_as_style ) {
@@ -202,9 +201,6 @@ export default class JeoMap {
 								firstStyleLayerId = map.style._order[ 0 ];
 								lastStyleLayerId =
 									map.style._order[ map.style._order.length - 1 ];
-
-								// console.log(layers);
-								// console.log(firstStyleLayerId, lastStyleLayerId);
 
 								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
@@ -258,9 +254,6 @@ export default class JeoMap {
 
 									// layer.addInteractions( map );
 								} );
-
-								// alert("asdasdas");
-								// console.log(customAttribution);
 
 								let controlPostion = 'bottom-right';
 
@@ -407,8 +400,6 @@ export default class JeoMap {
 				}
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
-
-				// console.log( legend );
 
 				if ( legend.attributes.legend_title ) {
 					const legendTitle = document.createElement( 'span' );
@@ -623,9 +614,6 @@ export default class JeoMap {
 
 			const relatePosts = this.getArg( 'relate_posts' );
 
-			// console.log("relatedPostsCriteria", relatedPostsCriteria);
-			// console.log("relate_posts", this.getArg( 'relate_posts' ));
-
 			if ( ! relatePosts ) {
 				resolve( [] );
 				return;
@@ -826,7 +814,7 @@ export default class JeoMap {
 											}
 											return uniques;
 										}
-											
+
 
 										// Get all points under a cluster
 										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
@@ -836,15 +824,15 @@ export default class JeoMap {
 											if(nextFeatures.length >= 2) {
 												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
 													if (!err) {
-														
-			
+
+
 														map.easeTo({
 															center: features[0].geometry.coordinates,
 															zoom
 														});
-														
+
 													}
-												});		
+												});
 											} else {
 												// implements spiderifier
 /* 												let markers = _.map(leafFeatures, function(leafFeature){
@@ -854,7 +842,7 @@ export default class JeoMap {
 													return eachFeature.properties;
 												})
 												self.spiderifier.spiderfy(features[0].geometry.coordinates, markers);
-									
+
 											}
 										})
 
@@ -915,7 +903,7 @@ export default class JeoMap {
 							map.getCanvas().style.cursor = ''
 						})
 
-						
+
 						// Keep requesting to get to the last page
 						for (let i = 2; i <= totalPages; i++) {
 							// Break to avoid respect page limiting
@@ -938,25 +926,19 @@ export default class JeoMap {
 					}
 
 					// if(this.map.loaded()) {
-					// 	console.log("Map loaded")
 					buildRelatedPosts(this.map)
 					// } else {
-						// console.log("Load event")
 						// this.map.on( 'load', () => {
-							// console.log("Load event confirmed")
 							// buildRelatedPosts(this.map)
 						// })
 					// }
 				})
 				.catch(err => {
 					// Remove: Too noisy
-					// alert("Error while loading posts check console");
-					// console.log(err);
 				})
 				.then(() => {
 					// Add ready state (animation flag)
 					// Set done status anyway error or success ()
-
 				});
 		} );
 	}
@@ -1049,7 +1031,6 @@ export default class JeoMap {
 		this.activateMarker( marker );
 
 		if ( ! this.isEmbed ) {
-			// alert("asdasd");
 			this.map.flyTo( { center: LngLat, zoom: 4 } );
 		}
 	}
@@ -1301,8 +1282,6 @@ export default class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
-		// console.log("changeLayerVisibitly");
-
 		const mapLayersSettings = this.getArg( 'layers' );
 		const layers = this.layers;
 
