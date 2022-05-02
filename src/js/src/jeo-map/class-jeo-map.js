@@ -312,8 +312,8 @@ export default class JeoMap {
 			return jQuery
 				.ajax( {
 					type: 'GET',
-					beforeSend: function ( request ) {
-						request.setRequestHeader( 'X-WP-Nonce', jeoMapVars.nonce );
+					beforeSend ( request ) {
+						// request.setRequestHeader( 'X-WP-Nonce', jeoMapVars.nonce );
 					},
 					url: jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' ),
 				} )
