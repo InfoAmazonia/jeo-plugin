@@ -54,7 +54,7 @@ class Jeo {
 		\jeo_storymap();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
-		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
+		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'init', array( $this, 'register_oembed' ) );
 		// add_action( 'init', '\Jeo\Integrations\Carto::carto_integration_cron_task');
