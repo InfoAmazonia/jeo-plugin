@@ -441,20 +441,27 @@ class Maps {
 	}
 
 	public function add_capabilities() {
-		$roles = ['author', 'editor', 'administrator'];
+		$roles = ['author', 'editor', 'administrator', 'contributor'];
+		$types = [ 'map', 'map-layer', 'storymap' ];
 		foreach ($roles as $role) {
 			// var_dump($role);
 			$role_obj = get_role($role);
 
-			$role_obj->add_cap( 'edit_map' );
-			$role_obj->add_cap( 'edit_maps' );
-			$role_obj->add_cap( 'edit_others_maps' );
-			$role_obj->add_cap( 'publish_maps' );
-			$role_obj->add_cap( 'read_map' );
-			$role_obj->add_cap( 'read_private_maps' );
-			$role_obj->add_cap( 'delete_map' );
-			$role_obj->add_cap( 'edit_published_blocks' );
+			foreach( $types as $type ) {
+				$role_obj->add_cap( "edit_{$type}" );
+				$role_obj->add_cap( "edit_{$type}s" );
+				$role_obj->add_cap( "delete_{$type}" );
+				$role_obj->add_cap( "read_{$type}" );
+				$role_obj->add_cap( "read_{$type}s" );
+				if ( 'contributor' != $type ) {
+					$role_obj->add_cap( "edit_others_{$type}s" );
+					$role_obj->add_cap( "publish_{$type}s" );
+					$role_obj->add_cap( "read_private_{$type}s" );
+					$role_obj->add_cap( 'edit_published_blocks' );
+				}	
+			}
 		}
+		
 	}
 
 	public function override_template($template) {

@@ -480,6 +480,28 @@ class Jeo {
 		));
 	}
 
+	function storymap_content( $content ) {
+		// Check if we're inside the main loop in a single Post.
+		if ( is_singular() && in_the_loop() && is_main_query() ) {
+			global $post, $wpdb;
+
+			// daqui para frente a logica é muito louca-> MESMO <- 
+			// por algum motivo o post_content estava vindo vazio em alguns casos, então, em determinado 
+			// caso, vai pegar o objeto global $post, o ID dentro desse objeto e fazer uma nova query no banco.
+			// não sei o pq 
+
+			$post_id = $post->ID;
+			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
+				$post_id = $_GET[ 'preview_id' ];
+			}
+			$post_content = $wpdb->get_results( 
+				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) ) 
+			);
+			return do_blocks( $post_content[0]->post_content );
+		}
+
+	}
+
 	function restrict_story_map_block_count() {
 		global $post, $parent_file, $typenow, $current_screen, $pagenow;
 
@@ -506,16 +528,26 @@ class Jeo {
 		if(empty($post_type) && 'edit.php' == $pagenow)
 			$post_type = 'post';
 
-
-		if ( ! is_admin() || 'storymap' != $post_type ) {
-			// This is not the post/page we want to limit things to.
-			return false;
+		if( isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
+			$post_id = $post->ID;
+			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
+				$post_id = $_GET[ 'preview_id' ];
+			}
+			$post = get_post( absint( $post_id ) );
+			if ( is_object( $post ) && $post instanceof WP_Post && 'storymap' == $post->post_type ) {
+				$post_type = $post->post_type;
+				add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
+			}
 		}
 
-		$post_type_object = get_post_type_object( 'storymap' );
-		$post_type_object->template = array(
+		if ( ! is_admin() || 'storymap' != $post_type ) {
+			return false;
+		}
+		global $wp_post_types;
+
+		$wp_post_types[ 'storymap' ]->template = array(
 			array( 'jeo/storymap'),
 		);
-		$post_type_object->template_lock = 'all';
+		$wp_post_types[ 'storymap' ]->template_lock = 'all';
 	}
 }
