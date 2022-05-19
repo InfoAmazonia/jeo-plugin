@@ -215,10 +215,9 @@ class Jeo {
 				}
 
 				foreach($map_layers as $layer) {
-					if(in_array($layer["id"], (array) $selected_layer)) {
+					if($layer["id"] == $selected_layer->id) {
 						$selected_layer->meta->type = get_post_meta($layer['id'], 'type', true);
 						$selected_layer->meta->layer_type_options = (object) get_post_meta($layer['id'], 'layer_type_options', true);
-
 						return true;
 					}
 				}
