@@ -13,7 +13,6 @@
  * @subpackage Jeo/includes
  */
 
-use function GuzzleHttp\json_decode;
 
 /**
  * The core plugin class.
@@ -198,11 +197,7 @@ class Jeo {
 	}
 
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
-		try {
-			$saved_data = json_decode($content);
-		} catch (Exception $e) {
-			// Old block
-		}
+		$saved_data = json_decode($content);
 
 		$map_id = $saved_data->map_id;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
@@ -248,7 +243,7 @@ class Jeo {
 			$slide->selectedLayers = $selected_layers_order;
 		}
 
-		// Remove not present layers from navigateMapLayers and create new ordr
+		// Remove not present layers from navigateMapLayers and create new order
 		$final_navigate_map_layers = [];
 
 		foreach ($map_layers as $layer) {
