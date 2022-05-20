@@ -1,5 +1,6 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+import EmbeddedStorymapEditor from './embedded-story-map-editor';
 import MapDisplay from './map-display';
 import MapEditor from './map-editor';
 import OnetimeMapDisplay from './onetime-map-display';
@@ -237,3 +238,23 @@ registerBlockType( 'jeo/storymap', {
 		return JSON.stringify(attributesStructure)
 	},
 } );
+
+registerBlockType( 'jeo/embedded-storymap', {
+	title: __( 'Embedded Story Map', 'jeo' ),
+	description: __( 'Display maps with storytelling', 'jeo' ),
+	category: 'jeo',
+	icon: MapIcon,
+	attributes: {
+		storyID: {
+			type: 'number',
+		},
+	},
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<EmbeddedStorymapEditor { ...props } />
+		</AsyncModeProvider>
+	),
+	save: ( props ) => {
+		return JSON.stringify(props);
+	},
+});
