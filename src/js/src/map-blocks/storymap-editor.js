@@ -162,7 +162,6 @@ const StoryMapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
-			// alert("! attributes.slides");
 			setAttributes( {
 				...attributes,
 				slides: [
