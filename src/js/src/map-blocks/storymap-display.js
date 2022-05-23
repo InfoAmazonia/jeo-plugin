@@ -112,7 +112,8 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
-		const initialLocation = config.chapters[0].location;
+		const firstChapter = config.chapters[0];
+		const initialLocation = firstChapter.location;
 
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
@@ -132,9 +133,11 @@ class StoryMapDisplay extends Component {
 			const setState = this.setState.bind(this);
 
 			this.props.navigateMapLayers.forEach(layer => {
-				// console.log(layer);
-				const jeoLayer = new window.JeoLayer(layer.meta.type, {...layer.meta, layer_id: String(layer.id), visible: true});
+				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: String(layer.id), visible: true });
 				jeoLayer.addLayer(map);
+				map.setPaintProperty(String(layer.id), 'raster-opacity', isInitialLayer ? 1 : 0);
 			})
 
 			scroller
@@ -187,9 +190,26 @@ class StoryMapDisplay extends Component {
 				if ( response.index === 0 && response.direction === 'up' ) {
 					setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
 
-					this.props.navigateMapLayers.forEach((layer) => {
-						map.setPaintProperty(String(layer.id), 'raster-opacity', 1);
-					});
+					// this.props.navigateMapLayers.forEach((layer) => {
+					// 	map.setPaintProperty(String(layer.id), 'raster-opacity', 1);
+					// });
+
+					// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
+					this.props.navigateMapLayers.forEach(layer => {
+						const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+						if( isLayerUsed ) {
+							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						}
+					})
+
+					this.props.navigateMapLayers.forEach(layer => {
+						const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+						if ( !isLayerUsed ) {
+							map.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+						}
+					})
 				}
 			})
 		});
