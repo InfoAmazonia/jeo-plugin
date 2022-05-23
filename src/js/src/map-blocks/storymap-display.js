@@ -7,8 +7,10 @@ import scrollama from 'scrollama';
 import JeoMap from '../jeo-map/class-jeo-map';
 import parse from 'html-react-parser';
 
-
 import './storymap-display.scss';
+
+const dateFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { year: 'numeric', month: 'long', day: 'numeric' } );
+const hourFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { hour: '2-digit', minute: '2-digit' } );
 
 const alignments = {
     'left': 'lefty',
@@ -259,18 +261,9 @@ class StoryMapDisplay extends Component {
 
 
     render() {
-		const mapStart = config.chapters[ 0 ].location;
         const theme = config.theme;
 		const currentChapterID = this.state.currentChapter.id;
-		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
-
-		let storyDate;
-		if(this.state.postData) {
-			storyDate = new Date( this.state.postData.date ).toLocaleDateString(
-				navigator.language? navigator.language : undefined,
-				dateOptions
-			);
-		}
+		const storyDate = this.state.postData ? new Date( this.state.postData.date ) : null;
 
         return(
 			<div className="story-map">
@@ -288,7 +281,7 @@ class StoryMapDisplay extends Component {
 									<>
 										<h1 className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</h1>
 										<div className="post-info">
-											<p className="date">{ `${storyDate} ${ __("at", "jeo") } ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
+											<p className="date">{ `${dateFormat.format(storyDate)} ${ __("at", "jeo") } ${hourFormat.format(storyDate)}` }</p>
 										</div>
 									</>
 								) }
