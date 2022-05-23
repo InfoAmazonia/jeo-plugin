@@ -73,7 +73,6 @@ class StoryMapDisplay extends Component {
 			}
 		} );
 
-
 		config = {
 			style: 'mapbox://styles/mapbox/empty-v9',
 			accessToken: window.jeo_settings.mapbox_key,
@@ -108,10 +107,12 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
+		const initialLocation = config.chapters[0].location;
+
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
-			center: [ mapDefaults.lng, mapDefaults.lat ],
-			zoom: mapDefaults.zoom,
+			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],
+			zoom: initialLocation.zoom || mapDefaults.zoom,
 			...config,
 		} );
 		mapboxgl.accessToken = config.accessToken;
@@ -127,7 +128,7 @@ class StoryMapDisplay extends Component {
 
 			this.props.navigateMapLayers.forEach(layer => {
 				// console.log(layer);
-				const jeoLayer = new JeoLayer(layer.meta.type, {...layer.meta, layer_id: String(layer.id), visible: true});
+				const jeoLayer = new window.JeoLayer(layer.meta.type, {...layer.meta, layer_id: String(layer.id), visible: true});
 				jeoLayer.addLayer(map);
 			})
 
@@ -138,7 +139,7 @@ class StoryMapDisplay extends Component {
 					progress: true
 				})
 				.onStepEnter(response => {
-					if ( response.index == config.chapters.length - 1 ) {
+					if ( response.index === config.chapters.length - 1 ) {
 						setState({ ...this.state, mapBrightness: 0.5, inSlides: false })
 						map.flyTo({
 							center: [ mapDefaults.lng, mapDefaults.lat ]
@@ -149,11 +150,11 @@ class StoryMapDisplay extends Component {
 					}
 
 					const chapter = config.chapters.find( ( chap, index ) => {
-						if ( response.element.id == config.chapters.length && index === config.chapters.length - 1 ) {
+						if ( response.element.id === config.chapters.length && index === config.chapters.length - 1 ) {
 							return true
 						}
 
-						return chap.id == response.element.id
+						return chap.id == response.element.id;
 					});
 
 					setState( { ...this.state, currentChapter: chapter } );
@@ -163,7 +164,7 @@ class StoryMapDisplay extends Component {
 					this.props.navigateMapLayers.forEach(layer => {
 						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
-						if( isLayerUsed || response.index == config.chapters.length - 1) {
+						if( isLayerUsed || response.index === config.chapters.length - 1) {
 							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
 						}
 					})
@@ -178,16 +179,11 @@ class StoryMapDisplay extends Component {
 					})
 			})
 			.onStepExit(response => {
-				// console.log(response);
-				if ( response.index == 0 && response.direction === 'up' ) {
+				if ( response.index === 0 && response.direction === 'up' ) {
 					setState( { ...this.state, inSlides: false, mapBrightness: 0.5 } );
 
 					this.props.navigateMapLayers.forEach(layer => {
 						map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
-					})
-
-					map.flyTo({
-						center: [ mapDefaults.lng, mapDefaults.lat ]
 					});
 				}
 			})
