@@ -276,9 +276,11 @@ class Jeo {
 
 		$saved_data->navigateMapLayers = $final_navigate_map_layers;
 
-		// echo "<pre> <code>";
-		// var_dump($saved_data->navigateMapLayers);
-		// echo "</code></pre> ";
+
+		// Option `use_smilies` breaks returned HTML :'-(
+		add_filter('option_use_smilies', function ($value) {
+			return false;
+		});
 
 		return '<div id="story-map" data-properties="' . htmlentities(json_encode($saved_data)) . '" />';
 	}
