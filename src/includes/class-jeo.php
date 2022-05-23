@@ -494,17 +494,17 @@ class Jeo {
 		if ( is_singular() && in_the_loop() && is_main_query() ) {
 			global $post, $wpdb;
 
-			// daqui para frente a logica é muito louca-> MESMO <- 
-			// por algum motivo o post_content estava vindo vazio em alguns casos, então, em determinado 
+			// daqui para frente a logica é muito louca-> MESMO <-
+			// por algum motivo o post_content estava vindo vazio em alguns casos, então, em determinado
 			// caso, vai pegar o objeto global $post, o ID dentro desse objeto e fazer uma nova query no banco.
-			// não sei o pq 
+			// não sei o pq
 
 			$post_id = $post->ID;
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
 				$post_id = $_GET[ 'preview_id' ];
 			}
-			$post_content = $wpdb->get_results( 
-				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) ) 
+			$post_content = $wpdb->get_results(
+				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) )
 			);
 			return do_blocks( $post_content[0]->post_content );
 		}
@@ -537,7 +537,7 @@ class Jeo {
 		if(empty($post_type) && 'edit.php' == $pagenow)
 			$post_type = 'post';
 
-		if( isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
+		if( !empty($post) && isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
 			$post_id = $post->ID;
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
 				$post_id = $_GET[ 'preview_id' ];
