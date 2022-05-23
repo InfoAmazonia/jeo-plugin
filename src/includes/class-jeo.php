@@ -76,7 +76,17 @@ class Jeo {
 
 
 		add_filter('rest_map-layer_query', array( $this, 'order_rest_post_by_post_title'), 10, 2);
+		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
+	}
 
+	public function rest_authenticate_by_cookie( $response, $handler, $request ) {
+		if ( preg_match( '/\/wp\/v2\/(map|map-layer|storymap)/', $request->get_route() ) === 1 ) {
+			$user_id = wp_validate_auth_cookie( '', 'logged_in' );
+			if ( !empty( $user_id ) ) {
+				wp_set_current_user( $user_id );
+			}
+		}
+		return $response;
 	}
 
 	/**
