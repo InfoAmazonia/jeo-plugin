@@ -9,6 +9,9 @@ import parse from 'html-react-parser';
 
 import './storymap-display.scss';
 
+/* Map brightness percentage when not fully brightness */
+const MAP_DIM = 0.5;
+
 const dateFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { year: 'numeric', month: 'long', day: 'numeric' } );
 const hourFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { hour: '2-digit', minute: '2-digit' } );
 
@@ -91,7 +94,7 @@ class StoryMapDisplay extends Component {
 
 		if ( this.props.hasIntroduction ) {
 			inSlides = false;
-			mapBrightness = 0.5;
+			mapBrightness = MAP_DIM;
 		} else {
 			inSlides = true;
 			mapBrightness = 1;
@@ -142,11 +145,11 @@ class StoryMapDisplay extends Component {
 				})
 				.onStepEnter(response => {
 					if ( response.index === config.chapters.length - 1 ) {
-						setState({ ...this.state, mapBrightness: 0.5, inSlides: false })
+						setState({ ...this.state, mapBrightness: MAP_DIM, inSlides: false })
 						map.flyTo({
 							center: [ mapDefaults.lng, mapDefaults.lat ]
 						});
-					} else if ( this.state.mapBrightness === 0.5 ) {
+					} else if ( this.state.mapBrightness === MAP_DIM ) {
 						setState( { ...this.state, mapBrightness: 1, inSlides: true } )
 						// console.log(response);
 					}
@@ -182,10 +185,10 @@ class StoryMapDisplay extends Component {
 			})
 			.onStepExit(response => {
 				if ( response.index === 0 && response.direction === 'up' ) {
-					setState( { ...this.state, inSlides: false, mapBrightness: 0.5 } );
+					setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
 
-					this.props.navigateMapLayers.forEach(layer => {
-						map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+					this.props.navigateMapLayers.forEach((layer) => {
+						map.setPaintProperty(String(layer.id), 'raster-opacity', 1);
 					});
 				}
 			})
@@ -400,7 +403,7 @@ class StoryMapDisplay extends Component {
 									let mapBrightness;
 
 									if ( this.props.hasIntroduction ) {
-										mapBrightness = 0.5;
+										mapBrightness = MAP_DIM;
 									} else {
 										mapBrightness = 1;
 									}
@@ -425,7 +428,7 @@ class StoryMapDisplay extends Component {
 								let mapBrightness;
 
 								if ( this.props.hasIntroduction ) {
-									mapBrightness = 0.5;
+									mapBrightness = MAP_DIM;
 								} else {
 									mapBrightness = 1;
 								}
