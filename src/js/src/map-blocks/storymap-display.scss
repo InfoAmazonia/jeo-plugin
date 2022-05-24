@@ -201,6 +201,10 @@ $font-stories: var( --jeo-font-stories );
 		img {
 			width: 100%;
 		}
+
+		p {
+			color: inherit;
+		}
 	}
 
 	.step.active {
