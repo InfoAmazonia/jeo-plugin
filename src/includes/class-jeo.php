@@ -549,15 +549,20 @@ class Jeo {
 		if(empty($post_type) && 'edit.php' == $pagenow)
 			$post_type = 'post';
 
-		if( !empty($post) && isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
-			$post_id = $post->ID;
+		if( isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
+			$post_id = false;
+			if ( ! empty($post) ) { 
+				$post_id = $post->ID; 
+			}
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
 				$post_id = $_GET[ 'preview_id' ];
 			}
-			$post = get_post( absint( $post_id ) );
-			if ( is_object( $post ) && $post instanceof WP_Post && 'storymap' == $post->post_type ) {
-				$post_type = $post->post_type;
-				add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
+			if ( $post_id ) {
+				$post = get_post( absint( $post_id ) );
+				if ( is_object( $post ) && $post instanceof WP_Post && 'storymap' == $post->post_type ) {
+					$post_type = $post->post_type;
+					add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
+				}
 			}
 		}
 
