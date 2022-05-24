@@ -162,7 +162,6 @@ const StoryMapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
-			// alert("! attributes.slides");
 			setAttributes( {
 				...attributes,
 				slides: [
@@ -278,7 +277,7 @@ const StoryMapEditor = ( {
 											setShowStorySettings( false );
 										} }
 									>
-										<Dashicon icon="hidden" />
+										<Dashicon icon="arrow-down-alt2" />
 									</Button>
 								</div>
 								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
@@ -326,7 +325,7 @@ const StoryMapEditor = ( {
 										setShowStorySettings( true );
 									} }
 								>
-									<Dashicon icon="visibility" />
+									<Dashicon icon="arrow-up-alt2" />
 								</Button>
 							</div>
 						) }
@@ -340,7 +339,7 @@ const StoryMapEditor = ( {
 											setShowSlidesSettings( false );
 										} }
 									>
-										<Dashicon icon="hidden" />
+										<Dashicon icon="arrow-down-alt2" />
 									</Button>
 								</div>
 								<List
@@ -718,7 +717,7 @@ const StoryMapEditor = ( {
 										setShowSlidesSettings( true );
 									} }
 								>
-									<Dashicon icon="visibility" />
+									<Dashicon icon="arrow-up-alt2" />
 								</Button>
 							</div>
 						) }

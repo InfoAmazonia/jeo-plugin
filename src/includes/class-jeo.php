@@ -13,7 +13,6 @@
  * @subpackage Jeo/includes
  */
 
-use function GuzzleHttp\json_decode;
 
 /**
  * The core plugin class.
@@ -54,7 +53,7 @@ class Jeo {
 		\jeo_storymap();
 
 		add_action( 'plugins_loaded', array( $this, 'load_plugin_textdomain' ) );
-		add_filter( 'block_categories', array( $this, 'register_block_category' ) );
+		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'init', array( $this, 'register_oembed' ) );
 		// add_action( 'init', '\Jeo\Integrations\Carto::carto_integration_cron_task');
@@ -77,7 +76,17 @@ class Jeo {
 
 
 		add_filter('rest_map-layer_query', array( $this, 'order_rest_post_by_post_title'), 10, 2);
+		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
+	}
 
+	public function rest_authenticate_by_cookie( $response, $handler, $request ) {
+		if ( preg_match( '/\/wp\/v2\/(map|map-layer|storymap)/', $request->get_route() ) === 1 ) {
+			$user_id = wp_validate_auth_cookie( '', 'logged_in' );
+			if ( !empty( $user_id ) ) {
+				wp_set_current_user( $user_id );
+			}
+		}
+		return $response;
 	}
 
 	/**
@@ -195,14 +204,25 @@ class Jeo {
 			'render_callback' => [$this, 'story_map_dynamic_render_callback'],
 			'editor_script' => 'jeo-map-blocks' )
 		);
+		register_block_type( 'jeo/embedded-storymap', array(
+			'render_callback' => [$this, 'embedded_story_map_dynamic_render_callback'],
+			'editor_script' => 'jeo-map-blocks' )
+		);
+	}
+
+	public function embedded_story_map_dynamic_render_callback ( $block_attributes, $content ) {
+		$content = json_decode( $content );
+
+		$story_id = $content->attributes->storyID;
+		$story = get_post( $story_id );
+		$story_block = parse_blocks( $story->post_content )[0];
+		$story_block['attrs']['postID'] = $story_id;
+
+		return $this->story_map_dynamic_render_callback( $block_attributes, json_encode( $story_block['attrs'] ) );
 	}
 
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
-		try {
-			$saved_data = json_decode($content);
-		} catch (Exception $e) {
-			// Old block
-		}
+		$saved_data = json_decode($content);
 
 		$map_id = $saved_data->map_id;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
@@ -215,10 +235,9 @@ class Jeo {
 				}
 
 				foreach($map_layers as $layer) {
-					if(in_array($layer["id"], (array) $selected_layer)) {
+					if($layer["id"] == $selected_layer->id) {
 						$selected_layer->meta->type = get_post_meta($layer['id'], 'type', true);
 						$selected_layer->meta->layer_type_options = (object) get_post_meta($layer['id'], 'layer_type_options', true);
-
 						return true;
 					}
 				}
@@ -249,7 +268,7 @@ class Jeo {
 			$slide->selectedLayers = $selected_layers_order;
 		}
 
-		// Remove not present layers from navigateMapLayers and create new ordr
+		// Remove not present layers from navigateMapLayers and create new order
 		$final_navigate_map_layers = [];
 
 		foreach ($map_layers as $layer) {
@@ -267,9 +286,11 @@ class Jeo {
 
 		$saved_data->navigateMapLayers = $final_navigate_map_layers;
 
-		// echo "<pre> <code>";
-		// var_dump($saved_data->navigateMapLayers);
-		// echo "</code></pre> ";
+
+		// Option `use_smilies` breaks returned HTML :'-(
+		add_filter('option_use_smilies', function ($value) {
+			return false;
+		});
 
 		return '<div id="story-map" data-properties="' . htmlentities(json_encode($saved_data)) . '" />';
 	}
@@ -485,17 +506,17 @@ class Jeo {
 		if ( is_singular() && in_the_loop() && is_main_query() ) {
 			global $post, $wpdb;
 
-			// daqui para frente a logica é muito louca-> MESMO <- 
-			// por algum motivo o post_content estava vindo vazio em alguns casos, então, em determinado 
+			// daqui para frente a logica é muito louca-> MESMO <-
+			// por algum motivo o post_content estava vindo vazio em alguns casos, então, em determinado
 			// caso, vai pegar o objeto global $post, o ID dentro desse objeto e fazer uma nova query no banco.
-			// não sei o pq 
+			// não sei o pq
 
 			$post_id = $post->ID;
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
 				$post_id = $_GET[ 'preview_id' ];
 			}
-			$post_content = $wpdb->get_results( 
-				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) ) 
+			$post_content = $wpdb->get_results(
+				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) )
 			);
 			return do_blocks( $post_content[0]->post_content );
 		}
@@ -528,7 +549,7 @@ class Jeo {
 		if(empty($post_type) && 'edit.php' == $pagenow)
 			$post_type = 'post';
 
-		if( isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
+		if( !empty($post) && isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
 			$post_id = $post->ID;
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
 				$post_id = $_GET[ 'preview_id' ];
