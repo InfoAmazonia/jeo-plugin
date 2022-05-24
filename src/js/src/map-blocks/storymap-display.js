@@ -12,6 +12,8 @@ import './storymap-display.scss';
 /* Map brightness percentage when not fully brightness */
 const MAP_DIM = 0.5;
 
+const isSingle = !!document.querySelector('.single-storymap');
+
 const dateFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { year: 'numeric', month: 'long', day: 'numeric' } );
 const hourFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { hour: '2-digit', minute: '2-digit' } );
 
@@ -288,8 +290,10 @@ class StoryMapDisplay extends Component {
 		const currentChapterID = this.state.currentChapter.id;
 		const storyDate = this.state.postData ? new Date( this.state.postData.date ) : null;
 
+		const Heading = isSingle ? 'h1' : 'h2';
+
         return(
-			<div className="story-map">
+			<section className="story-map">
 				<div className="not-navigating-map">
 					<div
 						ref={ ( el ) => ( this.mapContainer = el ) }
@@ -302,7 +306,7 @@ class StoryMapDisplay extends Component {
 							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
 								{ this.state.postData && (
 									<>
-										<h1 className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</h1>
+										<Heading className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</Heading>
 										<div className="post-info">
 											<p className="date">{ `${dateFormat.format(storyDate)} ${ __("at", "jeo") } ${hourFormat.format(storyDate)}` }</p>
 										</div>
@@ -467,7 +471,7 @@ class StoryMapDisplay extends Component {
 						</p>
 					</div>
 				</>
-			</div>
+			</section>
         );
     }
 
