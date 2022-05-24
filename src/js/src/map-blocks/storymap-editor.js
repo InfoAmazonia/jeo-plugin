@@ -681,6 +681,7 @@ const StoryMapEditor = ( {
 								<Button
 									className="add-button"
 									onClick={ () => {
+										let lastSlide = attributes.slides.slice(-1);
 										setAttributes( {
 											...attributes,
 											slides: [
@@ -688,12 +689,12 @@ const StoryMapEditor = ( {
 												{
 													title: null,
 													content: null,
-													selectedLayers: [],
-													latitude: window.jeo_settings.map_defaults.lat,
-													longitude: window.jeo_settings.map_defaults.lng,
-													zoom: window.jeo_settings.map_defaults.zoom,
-													pitch: 0,
-													bearing: 0,
+													selectedLayers: lastSlide[0].selectedLayers,
+													latitude: lastSlide[0].latitude,
+													longitude: lastSlide[0].longitude,
+													zoom: lastSlide[0].zoom,
+													pitch: lastSlide[0].pitch,
+													bearing: lastSlide[0].bearing,
 												},
 											],
 										} );
