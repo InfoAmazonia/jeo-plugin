@@ -5,6 +5,8 @@ import { registerPlugin } from '@wordpress/plugins';
 
 import MapsSidebar from './maps-sidebar';
 
+import StoryMapSidebar from './storymap-sidebar';
+
 domReady( () => {
 	registerPlugin( 'jeo-maps-sidebar', {
 		icon: null,
@@ -28,6 +30,7 @@ domReady( () => {
 			return (
 				<AsyncModeProvider value={ true }>
 					{ currentPostType === "map"? <MapsSidebar /> : null };
+					{ currentPostType === "storymap"? <StoryMapSidebar /> : null };
 				</AsyncModeProvider>
 			)
 

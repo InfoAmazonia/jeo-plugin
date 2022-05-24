@@ -410,6 +410,15 @@ class Jeo {
 	public function register_embed_template_redirect() {
 
 		if( get_query_var( 'jeo_embed' ) === 'map' ) {
+			add_filter( 'show_admin_bar', '__return_false' );
+			if( isset( $_GET[ 'storymap_id' ] ) ) {
+				$post = get_post( absint( $_GET[ 'storymap_id' ] ) );
+				setup_postdata( $post );
+				add_filter( 'the_content', [ $this, 'storymap_content' ], 1 );
+
+				require JEO_BASEPATH . '/templates/embed-storymap.php';
+				exit();
+			}
 			$discovery = isset($_GET['discovery'])? $_GET['discovery'] : false;
 
 			if( !$discovery ) {
@@ -503,7 +512,7 @@ class Jeo {
 
 	function storymap_content( $content ) {
 		// Check if we're inside the main loop in a single Post.
-		if ( is_singular() && in_the_loop() && is_main_query() ) {
+		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && isset( $_GET[ 'storymap_id' ] ) ) ) {
 			global $post, $wpdb;
 
 			// daqui para frente a logica é muito louca-> MESMO <-
@@ -514,6 +523,9 @@ class Jeo {
 			$post_id = $post->ID;
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
 				$post_id = $_GET[ 'preview_id' ];
+			}
+			if ( isset( $_GET[ 'storymap_id' ] ) && ! empty( $_GET[ 'storymap_id'] ) ) {
+				$post_id = $_GET[ 'storymap_id' ];
 			}
 			$post_content = $wpdb->get_results(
 				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) )
