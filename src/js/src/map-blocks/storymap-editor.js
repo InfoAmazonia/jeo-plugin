@@ -247,7 +247,7 @@ const StoryMapEditor = ( {
 								[ attributes.slides[ currentSlideIndex ].bearing ] || 0
 							}
 							pitch={ [ attributes.slides[ currentSlideIndex ].pitch ] || 0 }
-							containerStyle={ { height: '70vh' } }
+							containerStyle={ { height: '85vh' } }
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
