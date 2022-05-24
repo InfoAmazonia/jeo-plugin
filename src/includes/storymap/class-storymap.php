@@ -15,6 +15,7 @@ class Storymap{
 		add_action('admin_init', [ $this, 'add_capabilities' ]);
 
 		add_action( 'pre_get_posts', [ $this, 'show_on_archives' ] );
+
 		$this->register_rest_meta_validation();
 	}
 
@@ -123,6 +124,7 @@ class Storymap{
 			}
 		}
 	}
+
 }
 
 ?>
