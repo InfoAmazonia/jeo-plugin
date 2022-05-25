@@ -164,7 +164,7 @@ function jeo_register_embedder($id, $base_url) {
 			$html .= " width='$width'";
 		}
 		if (!empty($get_param($url, 'storymap_id'))) {
-			$html .= " class='embed-storymap'";
+			$html .= " class='embed-storymap' seamless scrolling='yes'";
 		}
 		$html .= " frameborder='0'></iframe>";
 
