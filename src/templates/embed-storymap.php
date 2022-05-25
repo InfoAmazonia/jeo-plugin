@@ -1,7 +1,8 @@
 <?php
 	$disable_embed = get_post_meta( get_the_ID(), 'disable_embed', true) == '1'? true : false;
+	$storymap_id = $_GET['storymap_id'];
 
-	if($disable_embed) {
+	if ($disable_embed) {
 		wp_redirect(home_url());
 		exit();
 	}
@@ -10,7 +11,7 @@
 
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title><?= get_the_title( $map_id ) ?> </title>
+		<title><?= get_the_title( $storymap_id ) ?> </title>
 		<?php wp_head(); ?>
 	</head>
 
