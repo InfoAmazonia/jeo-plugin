@@ -442,10 +442,10 @@ $font-stories: var( --jeo-font-stories );
 
 .embed-storymap {
 	border: none;
-	height: 100vh;
 	left: 50%;
 	margin: 40px -50vw;
-	max-width: 100vw;
+	max-width: unset !important;
+	min-height: 100vh;
 	overflow: hidden;
 	position: relative;
 	right: 50%;
