@@ -205,8 +205,20 @@ class Jeo {
 			'editor_script' => 'jeo-map-blocks',
 		) );
 		register_block_type( 'jeo/embedded-storymap', array(
+			'render_callback' => [$this, 'embedded_story_map_dynamic_render_callback'],
 			'editor_script' => 'jeo-map-blocks',
 		) );
+	}
+
+	public function embedded_story_map_dynamic_render_callback ( $block_attributes, $content ) {
+		$content = json_decode( $content );
+
+		$story_id = $content->attributes->storyID;
+		$story = get_post( $story_id );
+		$story_block = parse_blocks( $story->post_content )[0];
+		$story_block['attrs']['postID'] = $story_id;
+
+		return $this->story_map_dynamic_render_callback( $block_attributes, json_encode( $story_block['attrs'] ) );
 	}
 
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {

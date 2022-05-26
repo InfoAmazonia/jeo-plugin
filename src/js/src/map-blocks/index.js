@@ -1,6 +1,5 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import EmbeddedStorymapDisplay from './embedded-story-map-display';
 import EmbeddedStorymapEditor from './embedded-story-map-editor';
 import MapDisplay from './map-display';
 import MapEditor from './map-editor';
@@ -256,6 +255,6 @@ registerBlockType( 'jeo/embedded-storymap', {
 		</AsyncModeProvider>
 	),
 	save: ( props ) => {
-		return <EmbeddedStorymapDisplay { ...props } />
+		return JSON.stringify(props);
 	},
 });
