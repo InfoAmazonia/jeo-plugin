@@ -7,7 +7,7 @@ function StoryMapSidebar( {
 } ) {
 
 	const embedUrl =
-		postId && `${ jeo_settings.site_url }/embed/?storymap_id=${ postId }`;
+		postId && `${ window.jeo_settings.site_url }/embed/?storymap_id=${ postId }`;
 
 	return (
 		<Fragment>
