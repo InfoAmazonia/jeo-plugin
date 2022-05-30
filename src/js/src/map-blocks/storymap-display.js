@@ -13,6 +13,8 @@ import './storymap-display.scss';
 /* Map brightness percentage when not fully brightness */
 const MAP_DIM = 0.5;
 
+const { map_defaults: mapDefaults } = window.jeo_settings;
+
 const isSingle = !!document.querySelector('.single-storymap');
 
 const dateFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { year: 'numeric', month: 'long', day: 'numeric' } );
@@ -23,16 +25,6 @@ const alignments = {
     'center': 'centered',
     'right': 'righty'
 }
-
-let config = null;
-
-let lastChapter;
-
-let navigateMap;
-
-const { map_defaults: mapDefaults } = window.jeo_settings;
-
-const scroller = scrollama();
 
 function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
@@ -51,6 +43,7 @@ class StoryMapDisplay extends Component {
 		this.map = null;
 		this.el = null;
 		this.mapContainer = null;
+		this.navigateMap = null;
 
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
@@ -82,7 +75,7 @@ class StoryMapDisplay extends Component {
 			}
 		} );
 
-		config = {
+		const config = {
 			style: 'mapbox://styles/mapbox/empty-v9',
 			accessToken: window.jeo_settings.mapbox_key,
 			theme: 'light',
@@ -91,7 +84,10 @@ class StoryMapDisplay extends Component {
 			byline: '',
 			footer: '',
 			chapters: slides,
-		}
+		};
+		this.config = config;
+
+		this.scroller = scrollama();
 
 		let mapBrightness;
 		let inSlides;
@@ -116,6 +112,7 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
+		const config = this.config;
 		const firstChapter = config.chapters[0];
 		const initialLocation = firstChapter.location;
 
@@ -144,7 +141,7 @@ class StoryMapDisplay extends Component {
 				map.setPaintProperty(String(layer.id), 'raster-opacity', isInitialLayer ? 1 : 0);
 			})
 
-			scroller
+			this.scroller
 				.setup({
 					step: '.step',
 					offset: 0.5,
@@ -216,14 +213,14 @@ class StoryMapDisplay extends Component {
 
 
 
-		window.addEventListener('resize', scroller.resize);
+		window.addEventListener('resize', this.scroller.resize);
 		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
 
 		const navigateMapDiv = document.createElement('div');
 		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
 		navigateMapDiv.dataset.map_id = this.props.map_id;
 
-		navigateMap = new JeoMap( navigateMapDiv );
+		this.navigateMap = new JeoMap( navigateMapDiv );
 		document.querySelector('.navigate-map').append( navigateMapDiv );
 
 		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
@@ -284,7 +281,7 @@ class StoryMapDisplay extends Component {
 
 
     render() {
-        const theme = config.theme;
+        const theme = this.config.theme;
 		const currentChapterID = this.state.currentChapter.id;
 		const storyDate = this.state.postData ? new Date( this.state.postData.date ) : null;
 
@@ -310,8 +307,8 @@ class StoryMapDisplay extends Component {
 										</div>
 									</>
 								) }
-								{ config.subtitle &&
-									<h3 className="storymap-description">{ parse(decodeHtmlEntity( config.subtitle )) }</h3>
+								{ this.config.subtitle &&
+									<h3 className="storymap-description">{ parse(decodeHtmlEntity( this.config.subtitle )) }</h3>
 								}
 
 								<button
@@ -354,35 +351,35 @@ class StoryMapDisplay extends Component {
 						}
 						{ ! this.state.inHeader && (
 							<>
-								<div className={ classNames( [ 'storymap-features', alignments[ config.alignment ] ] ) } style={ { display: 'block' } }>
+								<div className={ classNames( [ 'storymap-features', alignments[ this.config.alignment ] ] ) } style={ { display: 'block' } }>
 									{
-										config.chapters.map( ( chapter, index ) => {
+										this.config.chapters.map( ( chapter, index ) => {
 											let isLastChapter = false;
 
 											// If is the last chapter:
-											if( config.chapters.indexOf( this.state.currentChapter ) === config.chapters.length -1 && this.state.currentChapter === chapter ) {
+											if( this.config.chapters.indexOf( this.state.currentChapter ) === this.config.chapters.length -1 && this.state.currentChapter === chapter ) {
 												isLastChapter = true;
 											}
 
-											lastChapter = { ...chapter };
-											lastChapter.selectedLayers = this.props.navigateMapLayers
-											lastChapter.id = chapter.id
+											this.lastChapter = { ...chapter };
+											this.lastChapter.selectedLayers = this.props.navigateMapLayers
+											this.lastChapter.id = chapter.id
 
-											if ( index === config.chapters.length - 1 ) {
+											if ( index === this.config.chapters.length - 1 ) {
 												return(
 													<Chapter
-														index={ config.chapters.length }
+														index={ this.config.chapters.length }
 														props={ this.props }
 														onClickFunction={ () => {
 															this.el.querySelector( '.navigate-map' ).style.display = 'block';
 															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } )
-															navigateMap.forceUpdate();
+															this.navigateMap.forceUpdate();
 															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
 
 															window.scrollTo( 0,document.body.scrollHeight );
 														} }
 														isLastChapter={ true }
-														{ ...lastChapter }
+														{ ...this.lastChapter }
 														theme={ theme }
 														currentChapterID={ currentChapterID }
 													/>
