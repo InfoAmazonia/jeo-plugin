@@ -21,6 +21,10 @@ $font-stories: var( --jeo-font-stories );
 		display: none;
 	}
 
+	#content {
+		margin: 0;
+	}
+
 	footer {
 		display: none;
 	}
@@ -61,13 +65,9 @@ $font-stories: var( --jeo-font-stories );
 		position: absolute;
 	}
 
-	#story {
+	.the-story {
 		position: relative;
 		top: -100vh;
-	}
-
-	#content {
-		margin: 0;
 	}
 
 	.not-navigating-map {
@@ -87,7 +87,7 @@ $font-stories: var( --jeo-font-stories );
 		}
 	}
 
-	#features {
+	.storymap-features {
 		padding-top: 10vh;
 		padding-bottom: 10vh;
 		z-index: 100;
@@ -120,7 +120,33 @@ $font-stories: var( --jeo-font-stories );
 		}
 	}
 
-	#header {
+	.centered {
+		width: 50vw;
+		margin: 0 auto;
+	}
+
+	.lefty {
+		width: 33vw;
+		margin-left: 5vw;
+	}
+
+	.righty {
+		width: 33vw;
+		margin-left: 62vw;
+	}
+
+	.light {
+		color: #0a0a0a;
+		background-color: #ffffff;
+		border-radius: 10px;
+	}
+
+	.dark {
+		color: #fafafa;
+		background-color: #444;
+	}
+
+	.storymap-header {
 		width: 700px;
 		padding: 2vh;
 		text-align: center;
@@ -174,32 +200,6 @@ $font-stories: var( --jeo-font-stories );
 				}
 			}
 		}
-	}
-
-	.centered {
-		width: 50vw;
-		margin: 0 auto;
-	}
-
-	.lefty {
-		width: 33vw;
-		margin-left: 5vw;
-	}
-
-	.righty {
-		width: 33vw;
-		margin-left: 62vw;
-	}
-
-	.light {
-		color: #0a0a0a;
-		background-color: #ffffff;
-		border-radius: 10px;
-	}
-
-	.dark {
-		color: #fafafa;
-		background-color: #444;
 	}
 
 	.step {
@@ -419,13 +419,13 @@ $font-stories: var( --jeo-font-stories );
 	}
 
 	@media ( max-width: 650px ) {
-		#header {
+		.storymap-header {
 			width: unset;
 		}
 	}
 
 	@media ( max-width: 750px ) {
-		#features {
+		.storymap-features {
 			width: 90vw;
 			margin: 0 auto;
 		}

@@ -1,5 +1,6 @@
-import React, { Component } from 'react';
 import { __ } from '@wordpress/i18n';
+import classNames from 'classnames';
+import React, { Component } from 'react';
 
 import { renderLayer } from './map-preview-layer';
 import mapboxgl from 'mapbox-gl';
@@ -48,6 +49,7 @@ class StoryMapDisplay extends Component {
 		super( props );
 
 		this.map = null;
+		this.el = null;
 		this.mapContainer = null;
 
 		const slides = [];
@@ -192,10 +194,6 @@ class StoryMapDisplay extends Component {
 				if ( response.index === 0 && response.direction === 'up' ) {
 					setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
 
-					// this.props.navigateMapLayers.forEach((layer) => {
-					// 	map.setPaintProperty(String(layer.id), 'raster-opacity', 1);
-					// });
-
 					// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
 					this.props.navigateMapLayers.forEach(layer => {
 						const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
@@ -293,7 +291,7 @@ class StoryMapDisplay extends Component {
 		const Heading = isSingle ? 'h1' : 'h2';
 
         return(
-			<section className="story-map">
+			<section className="story-map" ref={ ( el ) => ( this.el = el ) }>
 				<div className="not-navigating-map">
 					<div
 						ref={ ( el ) => ( this.mapContainer = el ) }
@@ -301,9 +299,9 @@ class StoryMapDisplay extends Component {
 					>
 					</div>
 
-					<div id="story">
+					<div className="the-story">
 						{ this.props.hasIntroduction &&
-							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
+							<div className={ classNames( [ 'storymap-header', theme ] ) } style={ { marginBottom: window.innerHeight / 3 } }>
 								{ this.state.postData && (
 									<>
 										<Heading className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</Heading>
@@ -321,7 +319,7 @@ class StoryMapDisplay extends Component {
 									onClick={ () => {
 										this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
-										document.querySelector( '#features' ).scrollIntoView();
+										this.el.querySelector( '.storymap-features' ).scrollIntoView();
 									} }
 								>
 									{ __('START', 'jeo') }
@@ -332,10 +330,10 @@ class StoryMapDisplay extends Component {
 										<p
 											className="skip-intro-link"
 											onClick={ async () => {
-												document.querySelector('.storymap-start-button').click();
+												this.el.querySelector('.storymap-start-button').click();
 												await sleep(1);
 												window.scrollTo( 0, document.body.scrollHeight );
-												document.querySelector('.navigate-button-display').click();
+												this.el.querySelector('.navigate-button-display').click();
 											} }
 										>
 											{ __('skip intro', 'jeo') }
@@ -345,7 +343,7 @@ class StoryMapDisplay extends Component {
 											onClick={ async () => {
 												this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
-												document.querySelector( '#features' ).scrollIntoView();
+												this.el.querySelector( '.storymap-features' ).scrollIntoView();
 											} }
 										>
 											<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" ><path fill="currentColor" d="M143 256.3L7 120.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0L313 86.3c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.4 9.5-24.6 9.5-34 .1zm34 192l136-136c9.4-9.4 9.4-24.6 0-33.9l-22.6-22.6c-9.4-9.4-24.6-9.4-33.9 0L160 352.1l-96.4-96.4c-9.4-9.4-24.6-9.4-33.9 0L7 278.3c-9.4 9.4-9.4 24.6 0 33.9l136 136c9.4 9.5 24.6 9.5 34 .1z"></path></svg>
@@ -356,7 +354,7 @@ class StoryMapDisplay extends Component {
 						}
 						{ ! this.state.inHeader && (
 							<>
-								<div id="features" style={ { display: 'block' } } className={ alignments[config.alignment] }>
+								<div className={ classNames( [ 'storymap-features', alignments[ config.alignment ] ] ) } style={ { display: 'block' } }>
 									{
 										config.chapters.map( ( chapter, index ) => {
 											let isLastChapter = false;
@@ -376,10 +374,10 @@ class StoryMapDisplay extends Component {
 														index={ config.chapters.length }
 														props={ this.props }
 														onClickFunction={ () => {
-															document.querySelector( '.navigate-map' ).style.display = 'block';
+															this.el.querySelector( '.navigate-map' ).style.display = 'block';
 															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } )
 															navigateMap.forceUpdate();
-															document.querySelector( '.not-navigating-map' ).style.display = ' none ';
+															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
 
 															window.scrollTo( 0,document.body.scrollHeight );
 														} }
@@ -434,8 +432,8 @@ class StoryMapDisplay extends Component {
 
 									this.setState( { ...this.state, isNavigating: false, mapBrightness } )
 									window.scrollTo(0, 0);
-									document.querySelector('.navigate-map').style.display = 'none';
-									document.querySelector('.not-navigating-map').style.display = 'block';
+									this.el.querySelector('.navigate-map').style.display = 'none';
+									this.el.querySelector('.not-navigating-map').style.display = 'block';
 
 									this.state.map.resize();
 								} }
@@ -459,8 +457,8 @@ class StoryMapDisplay extends Component {
 
 								this.setState( { ...this.state, isNavigating: false, mapBrightness } )
 
-								document.querySelector('.navigate-map').style.display = 'none';
-								document.querySelector('.not-navigating-map').style.display = 'block';
+								this.el.querySelector('.navigate-map').style.display = 'none';
+								this.el.querySelector('.not-navigating-map').style.display = 'block';
 
 								this.map.resize();
 
@@ -518,15 +516,13 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
     );
 }
 
-const storyMapElement = document.getElementById('story-map');
-let storyMapProps = null;
-if(storyMapElement) {
-	function decodeHtml(html) {
-		const txt = document.createElement("textarea");
-		txt.innerHTML = html;
-		return txt.value;
-	}
-
-	storyMapProps = JSON.parse(decodeHtml(storyMapElement.getAttribute('data-properties')));
-	wp.element.render(<StoryMapDisplay { ...storyMapProps } />, storyMapElement);
+function decodeHtml( html ) {
+	const txt = document.createElement( 'textarea' );
+	txt.innerHTML = html;
+	return txt.value;
 }
+
+document.querySelectorAll( '.story-map-container' ).forEach( ( storyMapElement ) => {
+	const storyMapProps = JSON.parse( decodeHtml( storyMapElement.getAttribute( 'data-properties' ) ) );
+	wp.element.render( <StoryMapDisplay { ...storyMapProps } />, storyMapElement );
+} );
