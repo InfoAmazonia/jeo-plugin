@@ -145,7 +145,8 @@ class StoryMapDisplay extends Component {
 				.setup({
 					step: '.step',
 					offset: 0.5,
-					progress: true
+					progress: true,
+					parent: this.el,
 				})
 				.onStepEnter(response => {
 					if ( response.index === config.chapters.length - 1 ) {
@@ -214,14 +215,14 @@ class StoryMapDisplay extends Component {
 
 
 		window.addEventListener('resize', this.scroller.resize);
-		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
 
 		const navigateMapDiv = document.createElement('div');
 		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
 		navigateMapDiv.dataset.map_id = this.props.map_id;
 
 		this.navigateMap = new JeoMap( navigateMapDiv );
-		document.querySelector('.navigate-map').append( navigateMapDiv );
+		this.el.querySelector('.navigate-map').append( navigateMapDiv );
 
 		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
 		window.fetch( url )
@@ -230,13 +231,13 @@ class StoryMapDisplay extends Component {
 			} )
 			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
 
-		document.querySelector('.navigate-map .jeomap').appendChild(document.querySelector('.return-to-slides-container'))
+		this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
 
 		document.addEventListener("fullscreenchange", function() {
 			if ( document.fullscreenElement ) {
-				document.querySelector( '.return-to-slides-container' ).style.display = 'none';
+				this.el.querySelector( '.return-to-slides-container' ).style.display = 'none';
 			} else {
-				document.querySelector( '.return-to-slides-container' ).style.display = 'block';
+				this.el.querySelector( '.return-to-slides-container' ).style.display = 'block';
 			}
 
 			window.scrollTo ( 0, document.body.scrollHeight );
@@ -244,7 +245,7 @@ class StoryMapDisplay extends Component {
 	}
 
 	componentDidUpdate() {
-		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
 
 		if(this.state.inSlides) {
 			this.state.currentChapter.selectedLayers.map(
@@ -329,7 +330,7 @@ class StoryMapDisplay extends Component {
 											onClick={ async () => {
 												this.el.querySelector('.storymap-start-button').click();
 												await sleep(1);
-												window.scrollTo( 0, document.body.scrollHeight );
+												window.scrollTo( 0, this.el.scrollHeight );
 												this.el.querySelector('.navigate-button-display').click();
 											} }
 										>
@@ -376,7 +377,7 @@ class StoryMapDisplay extends Component {
 															this.navigateMap.forceUpdate();
 															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
 
-															window.scrollTo( 0,document.body.scrollHeight );
+															window.scrollTo( 0,this.el.scrollHeight );
 														} }
 														isLastChapter={ true }
 														{ ...this.lastChapter }
