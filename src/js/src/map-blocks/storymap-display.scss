@@ -66,8 +66,12 @@ $font-stories: var( --jeo-font-stories );
 	}
 
 	.the-story {
+		left: 50%;
+		margin: 0 -50vw;
 		position: relative;
+		right: 50%;
 		top: -100vh;
+		width: 100vw;
 	}
 
 	.not-navigating-map {
