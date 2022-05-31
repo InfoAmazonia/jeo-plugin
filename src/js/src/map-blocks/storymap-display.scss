@@ -146,6 +146,13 @@ $font-stories: var( --jeo-font-stories );
 		background-color: #444;
 	}
 
+	.light, .dark {
+
+		p {
+			color: inherit !important;
+		}
+	}
+
 	.storymap-header {
 		width: 700px;
 		padding: 2vh;
