@@ -210,7 +210,7 @@ class StoryMapDisplay extends Component {
 						}
 					})
 				}
-			})
+			});
 		});
 
 		window.addEventListener('resize', this.scroller.resize);
@@ -278,7 +278,6 @@ class StoryMapDisplay extends Component {
 			)
 		}
 	}
-
 
     render() {
         const theme = this.config.theme;
