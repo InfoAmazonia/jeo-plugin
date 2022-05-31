@@ -292,7 +292,7 @@ class Jeo {
 			return false;
 		});
 
-		return '<div class="story-map-container" data-properties="' . htmlentities(json_encode($saved_data)) . '" />';
+		return '<div class="story-map-container" data-properties="' . htmlentities(json_encode($saved_data)) . '" ></div>';
 	}
 
 	public function filter_rest_query_by_zone($args, $request) {
