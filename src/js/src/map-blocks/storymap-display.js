@@ -26,6 +26,8 @@ const alignments = {
     'right': 'righty'
 }
 
+let storyCounter = 0;
+
 function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
 }
@@ -44,6 +46,7 @@ class StoryMapDisplay extends Component {
 		this.el = null;
 		this.mapContainer = null;
 		this.navigateMap = null;
+		this.id = ++storyCounter;
 
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
@@ -143,10 +146,9 @@ class StoryMapDisplay extends Component {
 
 			this.scroller
 				.setup({
-					step: '.step',
+					step: `#story-map-${this.id} .step`,
 					offset: 0.5,
 					progress: true,
-					parent: this.el,
 				})
 				.onStepEnter(response => {
 					if ( response.index === config.chapters.length - 1 ) {
@@ -211,8 +213,6 @@ class StoryMapDisplay extends Component {
 				}
 			})
 		});
-
-
 
 		window.addEventListener('resize', this.scroller.resize);
 		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
@@ -289,7 +289,7 @@ class StoryMapDisplay extends Component {
 		const Heading = isSingle ? 'h1' : 'h2';
 
         return(
-			<section className="story-map" ref={ ( el ) => ( this.el = el ) }>
+			<section id={ `story-map-${this.id}` } className="story-map" ref={ ( el ) => ( this.el = el ) }>
 				<div className="not-navigating-map">
 					<div
 						ref={ ( el ) => ( this.mapContainer = el ) }
