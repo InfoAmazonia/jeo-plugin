@@ -1,12 +1,12 @@
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
+import parse from 'html-react-parser';
+import mapboxgl from 'mapbox-gl';
 import React, { Component } from 'react';
+import scrollama from 'scrollama';
 
 import { renderLayer } from './map-preview-layer';
-import mapboxgl from 'mapbox-gl';
-import scrollama from 'scrollama';
 import JeoMap from '../jeo-map/class-jeo-map';
-import parse from 'html-react-parser';
 
 import './storymap-display.scss';
 
@@ -46,7 +46,7 @@ class StoryMapDisplay extends Component {
 		this.el = null;
 		this.mapContainer = null;
 		this.navigateMap = null;
-		this.id = ++storyCounter;
+		this.cid = ++storyCounter;
 
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
@@ -146,7 +146,7 @@ class StoryMapDisplay extends Component {
 
 			this.scroller
 				.setup({
-					step: `#story-map-${this.id} .step`,
+					step: `#story-map-${this.cid} .step`,
 					offset: 0.5,
 					progress: true,
 				})
@@ -158,15 +158,14 @@ class StoryMapDisplay extends Component {
 						});
 					} else if ( this.state.mapBrightness === MAP_DIM ) {
 						setState( { ...this.state, mapBrightness: 1, inSlides: true } )
-						// console.log(response);
 					}
 
 					const chapter = config.chapters.find( ( chap, index ) => {
-						if ( response.element.id === config.chapters.length && index === config.chapters.length - 1 ) {
+						if ( response.element.dataset.id === config.chapters.length && index === config.chapters.length - 1 ) {
 							return true
 						}
 
-						return chap.id == response.element.id;
+						return chap.id == response.element.dataset.id;
 					});
 
 					setState( { ...this.state, currentChapter: chapter } );
@@ -289,7 +288,7 @@ class StoryMapDisplay extends Component {
 		const Heading = isSingle ? 'h1' : 'h2';
 
         return(
-			<section id={ `story-map-${this.id}` } className="story-map" ref={ ( el ) => ( this.el = el ) }>
+			<section id={ `story-map-${this.cid}` } className="story-map" ref={ ( el ) => ( this.el = el ) }>
 				<div className="not-navigating-map">
 					<div
 						ref={ ( el ) => ( this.mapContainer = el ) }
@@ -479,7 +478,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
     return (
 		<>
 			{ ! isLastChapter && ( title || description ) && (
-				<div id={ id } className={ classList }>
+				<div data-id={ id } className={ classList }>
 					<div className={ theme }>
 						{ title &&
 							<h3 className="title">{ parse(decodeHtmlEntity( title )) }</h3>
@@ -494,14 +493,14 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 				</div>
 			) }
 			{ ! isLastChapter && ! title && ! description && (
-				<div id={ id } className={ classList } style={ { visibility: 'hidden' } }>
+				<div data-id={ id } className={ classList } style={ { visibility: 'hidden' } }>
 					<div className={ theme }>
 						<h3 className="title">{ `Slide ${ index + 1 }` }</h3>
 					</div>
 				</div>
 			) }
 			{ isLastChapter && props.navigateButton && (
-				<div id={ id } className={ classList }>
+				<div data-id={ id } className={ classList }>
 					<button
 						className="navigate-button-display"
 						onClick={ onClickFunction }
@@ -521,6 +520,6 @@ function decodeHtml( html ) {
 }
 
 document.querySelectorAll( '.story-map-container' ).forEach( ( storyMapElement ) => {
-	const storyMapProps = JSON.parse( decodeHtml( storyMapElement.getAttribute( 'data-properties' ) ) );
+	const storyMapProps = JSON.parse( decodeHtml( storyMapElement.dataset.properties ) );
 	wp.element.render( <StoryMapDisplay { ...storyMapProps } />, storyMapElement );
 } );
