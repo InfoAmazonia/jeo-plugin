@@ -52,7 +52,7 @@ export default class JeoMap {
 				let popUp = new mapboxgl.Popup({
 					closeOnClick: false,
 					offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
-				})					
+				})
 				.setLngLat(spiderLeg.mapboxMarker._lngLat)
 				.setHTML( popupHTML )
 				const jeoOpenSpiderifierPinEvent = new CustomEvent('jeo-open-spiderifier-pin', { detail: spiderLeg.feature })
@@ -62,7 +62,7 @@ export default class JeoMap {
 					popUp.addTo( self.map )
 					document.body.dispatchEvent( jeoOpenSpiderifierPinEvent )
 				} )
-				
+
 			}
 		})
 
@@ -161,7 +161,6 @@ export default class JeoMap {
 
 							// When style is done loading (don't try adding layers before style is not read, its messy)
 							map.on( 'load', () => {
-								console.log("Map loaded 1")
 								// Remove not selected layers and toggle vissibility
 								mapLayersSettings.forEach( ( layer ) => {
 									if ( layer.load_as_style ) {
@@ -826,7 +825,7 @@ export default class JeoMap {
 											}
 											return uniques;
 										}
-											
+
 
 										// Get all points under a cluster
 										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
@@ -836,15 +835,15 @@ export default class JeoMap {
 											if(nextFeatures.length >= 2) {
 												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
 													if (!err) {
-														
-			
+
+
 														map.easeTo({
 															center: features[0].geometry.coordinates,
 															zoom
 														});
-														
+
 													}
-												});		
+												});
 											} else {
 												// implements spiderifier
 /* 												let markers = _.map(leafFeatures, function(leafFeature){
@@ -854,7 +853,7 @@ export default class JeoMap {
 													return eachFeature.properties;
 												})
 												self.spiderifier.spiderfy(features[0].geometry.coordinates, markers);
-									
+
 											}
 										})
 
@@ -915,7 +914,7 @@ export default class JeoMap {
 							map.getCanvas().style.cursor = ''
 						})
 
-						
+
 						// Keep requesting to get to the last page
 						for (let i = 2; i <= totalPages; i++) {
 							// Break to avoid respect page limiting
@@ -938,7 +937,6 @@ export default class JeoMap {
 					}
 
 					// if(this.map.loaded()) {
-					// 	console.log("Map loaded")
 					buildRelatedPosts(this.map)
 					// } else {
 						// console.log("Load event")
