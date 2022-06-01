@@ -521,4 +521,15 @@ function decodeHtml( html ) {
 document.querySelectorAll( '.story-map-container' ).forEach( ( storyMapElement ) => {
 	const storyMapProps = JSON.parse( decodeHtml( storyMapElement.dataset.properties ) );
 	wp.element.render( <StoryMapDisplay { ...storyMapProps } />, storyMapElement );
+
+	// `overflow` avoids `position:sticky`
+	let parent = storyMapElement.parentElement;
+	while ( parent ) {
+		const problematicOverflowValues = [ 'auto', 'hidden', 'overlay', 'scroll' ];
+		const overflow = window.getComputedStyle( parent ).overflow;
+		if ( problematicOverflowValues.includes( overflow ) ) {
+			parent.style.cssText += 'overflow: initial !important';
+		}
+		parent = parent.parentElement;
+	}
 } );
