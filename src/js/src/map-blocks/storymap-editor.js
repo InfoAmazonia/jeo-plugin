@@ -1,34 +1,21 @@
-import {
-	Button,
-	Spinner,
-	CheckboxControl,
-	Dashicon,
-	Panel,
-	PanelBody,
-} from '@wordpress/components';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { List, arrayMove } from 'react-movable';
 
+import ClassicEditor from './ckeditor-custom-build';
 import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
+import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import './map-editor.css';
 import './storymap-editor.scss';
-import { List, arrayMove } from 'react-movable';
-import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
-
-const editorConfig =  {
-	// plugins: [ 'Paragraph', 'Bold', 'Italic', 'Essentials' ],
-	plugins: [ 'Essentials', 'Autoformat', 'Bold', 'Italic', 'BlockQuote', 'Heading', 'Indent', 'Link', 'List', 'Paragraph', 'TextTransformation' ],
-	toolbar: [ 'undo', 'redo','|', 'bold', 'italic', '|', 'heading', 'paragraph', 'link', 'bulletedList', 'numberedList']
-}
 
 const StoryMapEditor = ( {
 	attributes,
@@ -37,7 +24,17 @@ const StoryMapEditor = ( {
 	loadedLayers,
 	loadedMap,
 	loadingMap,
+	themeColors,
 } ) => {
+	const colors = ( themeColors || [] ).map( ( color ) => ( {
+		label: color.name,
+		color: color.color,
+	} ) );
+	const editorConfig = {
+		fontBackgroundColor: { colors },
+		fontColor: { colors },
+	};
+
 	const decodeHtmlEntity = function ( str ) {
 		return str.replace( /&#(\d+);/g, function ( match, dec ) {
 			return String.fromCharCode( dec );
@@ -834,6 +831,7 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 		'getEntityRecords',
 		[ 'postType', 'map-layer' ]
 	),
+	themeColors: select( 'core/editor' ).getEditorSettings().colors,
 } ) );
 
 export default compose( withInstanceId, applyWithSelect )( StoryMapEditor );
