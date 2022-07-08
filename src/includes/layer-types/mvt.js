@@ -1,4 +1,6 @@
 window.JeoLayerTypes.registerLayerType( 'mvt', {
+	label: 'Mapbox Vector Tiles (MVT)',
+
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		return map.setStyle( {
