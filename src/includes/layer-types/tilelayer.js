@@ -1,4 +1,6 @@
 window.JeoLayerTypes.registerLayerType( 'tilelayer', {
+	label: 'Raster Tiled Source',
+
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		return map.setStyle( {
