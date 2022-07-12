@@ -33,6 +33,7 @@
 		"@ckeditor/ckeditor5-list": "^34.1.0",
 		"@ckeditor/ckeditor5-paragraph": "^34.1.0",
 		"@ckeditor/ckeditor5-react": "^5.0.2",
+		"@ckeditor/ckeditor5-theme-lark": "^34.2.0",
 		"@ckeditor/ckeditor5-ui": "^34.1.0",
 		"@mapbox/mapbox-gl-geocoder": "^4.7.0",
 		"@wordpress/components": "^8.5.0",
@@ -47,6 +48,7 @@
 		"lodash-es": "^4.17.21",
 		"lodash.isequal": "^4.5.0",
 		"lodash.template": "^4.5.0",
+		"raw-loader": "^4.0.2",
 		"react-async": "^10.0.1",
 		"react-autosuggest": "^9.4.3",
 		"react-beautiful-dnd": "^13.1.0",
@@ -63,6 +65,8 @@
 		"uuid": "^7.0.3"
 	},
 	"devDependencies": {
+		"@ckeditor/ckeditor5-dev-utils": "^30.3.2",
+		"@ckeditor/ckeditor5-dev-webpack-plugin": "^30.3.2",
 		"@wordpress/scripts": "^6.2.0",
 		"css-loader": "^3.5.3",
 		"eslint": "^6.8.0",
