@@ -105,6 +105,7 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 							type: 'raster',
 							tiles: [ options.url ],
 							tileSize: 256,
+							scheme: options.scheme || 'xyz',
 						} }
 						onSourceLoaded={ () => {
 							if ( onSourceLoadedCallback ) {
