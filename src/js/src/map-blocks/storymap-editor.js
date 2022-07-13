@@ -4,10 +4,10 @@ import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import ClassicEditor from 'ckeditor5-build-full';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { List, arrayMove } from 'react-movable';
 
-import ClassicEditor from './ckeditor-custom-build';
 import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
@@ -31,6 +31,12 @@ const StoryMapEditor = ( {
 		color: color.color,
 	} ) );
 	const editorConfig = {
+		toolbar: [
+			'undo', 'redo', '|',
+			'bold', 'italic', '|',
+			'heading', 'paragraph', 'link', 'bulletedList', 'numberedList', '|',
+			'fontColor', 'fontBackgroundColor',
+		],
 		fontBackgroundColor: { colors },
 		fontColor: { colors },
 	};

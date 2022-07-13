@@ -42,6 +42,7 @@
 		"@wordpress/i18n": "^3.19.0",
 		"@wordpress/plugins": "^2.25.0",
 		"bootstrap-daterangepicker": "^3.1.0",
+		"ckeditor5-build-full": "^25.0.0",
 		"classnames": "^2.2.6",
 		"html-react-parser": "^0.14.0",
 		"leaflet": "^1.5.1",

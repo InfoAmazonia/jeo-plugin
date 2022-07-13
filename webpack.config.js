@@ -1,5 +1,3 @@
-const CKEditorPlugin = require( '@ckeditor/ckeditor5-dev-webpack-plugin' );
-const { styles } = require( '@ckeditor/ckeditor5-dev-utils' );
 const path = require( 'path' );
 const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack.config' );
 
@@ -22,47 +20,10 @@ module.exports = {
 		publicPath: './src/js/build/',
 		filename: '[name].js',
 	},
-	plugins: [
-		...defaultConfig.plugins,
-		new CKEditorPlugin( {
-			language: 'en',
-			additionalLanguages: [ 'es', 'pt-br' ],
-		} ),
-	],
 	module: {
 		...defaultConfig.module,
 		rules: [
 			...defaultConfig.module.rules,
-			{
-                test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
-                use: [ 'raw-loader' ]
-            },
-			{
-                test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
-                use: [
-                    {
-                        loader: 'style-loader',
-                        options: {
-                            injectType: 'singletonStyleTag',
-                            attributes: {
-                                'data-cke': true
-                            }
-                        }
-                    },
-                    'css-loader',
-                    {
-                        loader: 'postcss-loader',
-                        options: {
-                            postcssOptions: styles.getPostCssConfig( {
-                                themeImporter: {
-                                    themePath: require.resolve( '@ckeditor/ckeditor5-theme-lark' )
-                                },
-                                minify: true
-                            } )
-                        }
-                    }
-                ]
-            },
 			{
 				test: /\.css$/,
 				use: [ 'style-loader', 'css-loader' ],
