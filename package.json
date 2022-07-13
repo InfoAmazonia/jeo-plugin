@@ -72,12 +72,13 @@
 		"eslint": "^6.8.0",
 		"mapbox-gl": "^1.13.1",
 		"node-sass": "^4.14.1",
+		"postcss": "^8.4.14",
+		"postcss-loader": "^4.3.0",
 		"prettier": "npm:wp-prettier@^2.0.5",
 		"prettier-eslint-cli": "^5.0.1",
 		"sass": "^1.32.8",
 		"sass-loader": "^10.1.1",
 		"style-loader": "^1.2.1",
-		"svg-inline-loader": "^0.8.2",
 		"webpack": "^4.46.0"
 	}
 }
