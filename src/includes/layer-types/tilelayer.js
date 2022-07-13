@@ -1,4 +1,6 @@
 window.JeoLayerTypes.registerLayerType( 'tilelayer', {
+	label: 'Raster Tiled Source',
+
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		return map.setStyle( {
@@ -27,6 +29,7 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 				type: 'raster',
 				tiles: [ attributes.layer_type_options.url ],
 				tileSize: 256,
+				scheme: attributes.layer_type_options.scheme || 'xyz',
 			},
 			type: 'raster',
 		};
@@ -53,6 +56,14 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 						type: 'string',
 						title: 'URL',
 					},
+					scheme: {
+						type: 'string',
+						title: 'Scheme',
+						description: 'Influences the Y direction of the tile coordinates.',
+						enum: ['xyz', 'tms'],
+						enumNames: ['Slippy Map tilenames (XYZ)', 'OSGeo spec (TMS)'],
+						default: 'xyz',
+					}
 				},
 			} );
 		} );

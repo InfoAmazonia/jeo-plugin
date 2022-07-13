@@ -327,11 +327,15 @@ class Jeo {
 
 			wp_set_script_translations('discovery-map', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
+			$currentLang = get_bloginfo( 'language' );
+			if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
+				$currentLang = ICL_LANGUAGE_CODE;
+			}
 
 			// Check if sites uses WPML
 			if ( function_exists('icl_object_id') ) {
 				wp_localize_script('discovery-map', 'languageParams', array(
-					'currentLang' => ICL_LANGUAGE_CODE,
+					'currentLang' => $currentLang,
 				));
 		   	}
 
@@ -352,7 +356,7 @@ class Jeo {
 					'string_read_more' => __( 'Read more', 'jeo' ),
 					'jeoUrl' => JEO_BASEURL,
 					'nonce' => wp_create_nonce('wp_rest'),
-					'currentLang' => ICL_LANGUAGE_CODE,
+					'currentLang' => $currentLang,
 					'templates' => [
 						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup' => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),

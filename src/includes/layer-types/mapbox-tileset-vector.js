@@ -1,4 +1,6 @@
 window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
+	label: 'Vector Mapbox Tiled Source',
+
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		let tileset_id = attributes.layer_type_options.tileset_id;
