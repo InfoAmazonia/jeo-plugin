@@ -53,7 +53,7 @@ const StoryMapEditor = ( {
 		} ) )
 	];
 	const editorConfig = {
-		toolbar: [ 'undo', 'redo', '|', 'bold', 'italic', '|', 'heading', 'paragraph', 'link', 'bulletedList', 'numberedList', '|', 'fontColor', 'fontBackgroundColor' ],
+		toolbar: 'undo redo | bold italic underline | heading paragraph link bulletedList numberedList | fontColor fontBackgroundColor'.split( ' ' ),
 		fontBackgroundColor: { colors },
 		fontColor: { colors },
 	};
