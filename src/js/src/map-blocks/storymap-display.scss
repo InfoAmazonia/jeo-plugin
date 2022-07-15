@@ -2,6 +2,49 @@ $font: var( --jeo-font );
 $font-stories: var( --jeo-font-stories );
 
 .single-storymap {
+	margin: 0;
+	padding: 0;
+
+	.embed-footer {
+		position: fixed;
+	}
+
+	strong {
+		font-weight: bold;
+	}
+
+	a:hover {
+		opacity: 0.7;
+	}
+
+	&::-webkit-scrollbar {
+		display: none;
+	}
+
+	#content {
+		margin: 0;
+	}
+
+	footer {
+		display: none;
+	}
+
+	#footer {
+		width: 100%;
+		min-height: 5vh;
+		padding-top: 2vh;
+		padding-bottom: 2vh;
+		text-align: center;
+		line-height: 25px;
+		font-size: 13px;
+	}
+}
+
+.story-map {
+	margin: 0;
+	padding: 0;
+	position: relative;
+
 	@media (max-width: 829px) {
 		.storymap-page-title {
 			margin-top: 70px;
@@ -18,73 +61,103 @@ $font-stories: var( --jeo-font-stories );
 		}
 	}
 
-	strong {
-		font-weight: bold;
-	}
-
-	a:hover {
-		opacity: 0.7;
-	}
-
-	margin: 0;
-	padding: 0;
-
 	.jeomap {
 		position: absolute;
 	}
 
-	#content {
-		margin: 0;
+	.the-story {
+		left: 50%;
+		margin: 0 -50vw;
+		position: relative;
+		right: 50%;
+		top: -100vh;
+		width: 100vw;
 	}
 
-	footer {
-		display: none;
+	.not-navigating-map {
+		.mapboxgl-map {
+			border: none;
+			height: 100vh;
+			left: 0;
+			margin-left: -50vw;
+			margin-right: -50vw;
+			max-width: unset;
+			position: sticky;
+			right: 50%;
+			top: 0;
+			transition: filter 0.7s ease;
+			width: 100vw;
+			z-index: -5;
+		}
 	}
 
-	.story-map {
-		.not-navigating-map {
-			.mapboxgl-map {
-				height: 100%;
-				width: 100%;
-				position: fixed;
-				left: 0;
-				z-index: -5;
-				top: 0;
-				transition: filter 0.7s ease;
-			}
+	.storymap-features {
+		padding-top: 10vh;
+		padding-bottom: 10vh;
+		z-index: 100;
+
+		.title {
+			margin-top: 0;
+			font-family: $font-stories;
 		}
 
-		#features {
-			.title {
-				margin-top: 0;
-				font-family: $font-stories;
+		p.slide-description {
+			letter-spacing: 0;
+			line-height: 32px;
+			font-family: $font-stories;
+
+			&:last-of-type {
+				margin-bottom: 0px;
 			}
 
-			p.slide-description {
-				letter-spacing: 0;
-				line-height: 32px;
-				font-family: $font-stories;
+			a {
+				color: var( --jeo-primary-color );
 
-				&:last-of-type {
-					margin-bottom: 0px;
+				&:hover {
+					color: var( --jeo-primary-color-darker-15 );
 				}
 
-				a {
+				&:visited {
 					color: var( --jeo-primary-color );
-
-					&:hover {
-						color: var( --jeo-primary-color-darker-15 );
-					}
-
-					&:visited {
-						color: var( --jeo-primary-color );
-					}
 				}
 			}
 		}
 	}
 
-	#header {
+	.centered {
+		width: 50vw;
+		margin: 0 auto;
+	}
+
+	.lefty {
+		width: 33vw;
+		margin-left: 5vw;
+	}
+
+	.righty {
+		width: 33vw;
+		margin-left: 62vw;
+	}
+
+	.light {
+		color: #0a0a0a;
+		background-color: #ffffff;
+		border-radius: 10px;
+	}
+
+	.dark {
+		color: #fafafa;
+		background-color: #444;
+	}
+
+	.light, .dark {
+
+		p {
+			color: inherit !important;
+		}
+	}
+
+	.storymap-header {
 		width: 700px;
 		padding: 2vh;
 		text-align: center;
@@ -140,48 +213,6 @@ $font-stories: var( --jeo-font-stories );
 		}
 	}
 
-	#footer {
-		width: 100%;
-		min-height: 5vh;
-		padding-top: 2vh;
-		padding-bottom: 2vh;
-		text-align: center;
-		line-height: 25px;
-		font-size: 13px;
-	}
-
-	#features {
-		padding-top: 10vh;
-		padding-bottom: 10vh;
-		z-index: 100;
-	}
-
-	.centered {
-		width: 50vw;
-		margin: 0 auto;
-	}
-
-	.lefty {
-		width: 33vw;
-		margin-left: 5vw;
-	}
-
-	.righty {
-		width: 33vw;
-		margin-left: 62vw;
-	}
-
-	.light {
-		color: #0a0a0a;
-		background-color: #ffffff;
-		border-radius: 10px;
-	}
-
-	.dark {
-		color: #fafafa;
-		background-color: #444;
-	}
-
 	.step {
 		padding-bottom: 50vh;
 		opacity: 0.25;
@@ -197,6 +228,22 @@ $font-stories: var( --jeo-font-stories );
 
 		img {
 			width: 100%;
+		}
+
+		h2 {
+			font-size: 36px;
+		}
+
+		h3 {
+			font-size: 27px;
+		}
+
+		h4 {
+			font-size: 18px;
+		}
+
+		p {
+			color: inherit;
 		}
 	}
 
@@ -395,13 +442,13 @@ $font-stories: var( --jeo-font-stories );
 	}
 
 	@media ( max-width: 650px ) {
-		#header {
+		.storymap-header {
 			width: unset;
 		}
 	}
 
 	@media ( max-width: 750px ) {
-		#features {
+		.storymap-features {
 			width: 90vw;
 			margin: 0 auto;
 		}
@@ -427,4 +474,16 @@ $font-stories: var( --jeo-font-stories );
 			right: 5px;
 		}
 	}
+}
+
+.embed-storymap {
+	border: none;
+	left: 50%;
+	margin: 40px -50vw;
+	max-width: unset !important;
+	min-height: 100vh;
+	overflow: hidden;
+	position: relative;
+	right: 50%;
+	width: 100vw;
 }

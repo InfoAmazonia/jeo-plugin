@@ -10,7 +10,6 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Form from 'react-jsonschema-form';
-import { pickBy } from 'lodash-es';
 import InteractionsSettings from './interactions-settings';
 import { useDebounce } from 'use-debounce';
 
@@ -62,6 +61,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 
 	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
+	layerSchema.properties.type.enumNames = window.JeoLayerTypes.getLayerTypesLabels();
 	layerSchema.properties.layer_type_options = options;
 
 	const interactions = useMemo( () => {

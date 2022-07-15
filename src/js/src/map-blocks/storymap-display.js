@@ -1,15 +1,24 @@
-import React, { Component } from 'react';
 import { __ } from '@wordpress/i18n';
+import classNames from 'classnames';
+import parse from 'html-react-parser';
+import mapboxgl from 'mapbox-gl';
+import React, { Component } from 'react';
+import scrollama from 'scrollama';
 
 import { renderLayer } from './map-preview-layer';
-import mapboxgl from 'mapbox-gl';
-import scrollama from 'scrollama';
-import Map from './map';
 import JeoMap from '../jeo-map/class-jeo-map';
-import parse from 'html-react-parser';
-
 
 import './storymap-display.scss';
+
+/* Map brightness percentage when not fully brightness */
+const MAP_DIM = 0.5;
+
+const { map_defaults: mapDefaults } = window.jeo_settings;
+
+const isSingle = !!document.querySelector('.single-storymap');
+
+const dateFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { year: 'numeric', month: 'long', day: 'numeric' } );
+const hourFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { hour: '2-digit', minute: '2-digit' } );
 
 const alignments = {
     'left': 'lefty',
@@ -17,19 +26,7 @@ const alignments = {
     'right': 'righty'
 }
 
-let config = null;
-
-let lastChapter;
-
-let navigateMap;
-
-const monthNames = ["January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December"
-];
-
-const { map_defaults: mapDefaults } = window.jeo_settings;
-
-const scroller = scrollama();
+let storyCounter = 0;
 
 function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
@@ -46,7 +43,10 @@ class StoryMapDisplay extends Component {
 		super( props );
 
 		this.map = null;
+		this.el = null;
 		this.mapContainer = null;
+		this.navigateMap = null;
+		this.cid = ++storyCounter;
 
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
@@ -64,7 +64,7 @@ class StoryMapDisplay extends Component {
 				selectedLayers: slide.selectedLayers || [],
 			} );
 
-			if ( index == props.slides.length -1 ) {
+			if ( index === props.slides.length -1 ) {
 				const lastSlide = { ...slides[ slides.length - 1 ] };
 				lastSlide.selectedLayers = this.props.navigateMapLayers;
 				lastSlide.id += 1;
@@ -78,25 +78,26 @@ class StoryMapDisplay extends Component {
 			}
 		} );
 
-
-		config = {
+		const config = {
 			style: 'mapbox://styles/mapbox/empty-v9',
 			accessToken: window.jeo_settings.mapbox_key,
-			showMarkers: false,
 			theme: 'light',
 			alignment: 'left',
 			subtitle: props.description || '',
 			byline: '',
 			footer: '',
 			chapters: slides,
-		}
+		};
+		this.config = config;
+
+		this.scroller = scrollama();
 
 		let mapBrightness;
 		let inSlides;
 
 		if ( this.props.hasIntroduction ) {
 			inSlides = false;
-			mapBrightness = 0.5;
+			mapBrightness = MAP_DIM;
 		} else {
 			inSlides = true;
 			mapBrightness = 1;
@@ -114,10 +115,14 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
+		const config = this.config;
+		const firstChapter = config.chapters[0];
+		const initialLocation = firstChapter.location;
+
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
-			center: [ mapDefaults.lng, mapDefaults.lat ],
-			zoom: mapDefaults.zoom,
+			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],
+			zoom: initialLocation.zoom || mapDefaults.zoom,
 			...config,
 		} );
 		mapboxgl.accessToken = config.accessToken;
@@ -130,40 +135,37 @@ class StoryMapDisplay extends Component {
 			map.dragRotate.disable();
 
 			const setState = this.setState.bind(this);
-			const marker = new mapboxgl.Marker();
-			if (config.showMarkers) {
-				marker.setLngLat(mapStart.center).addTo(map);
-			}
 
 			this.props.navigateMapLayers.forEach(layer => {
-				// console.log(layer);
-				const jeoLayer = new JeoLayer(layer.meta.type, {...layer.meta, layer_id: String(layer.id), visible: true});
+				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: String(layer.id), visible: true });
 				jeoLayer.addLayer(map);
+				map.setPaintProperty(String(layer.id), 'raster-opacity', isInitialLayer ? 1 : 0);
 			})
 
-			scroller
+			this.scroller
 				.setup({
-					step: '.step',
+					step: `#story-map-${this.cid} .step`,
 					offset: 0.5,
-					progress: true
+					progress: true,
 				})
 				.onStepEnter(response => {
-					if ( response.index == config.chapters.length - 1 ) {
-						setState({ ...this.state, mapBrightness: 0.5, inSlides: false })
+					if ( response.index === config.chapters.length - 1 ) {
+						setState({ ...this.state, mapBrightness: MAP_DIM, inSlides: false })
 						map.flyTo({
 							center: [ mapDefaults.lng, mapDefaults.lat ]
 						});
-					} else if ( this.state.mapBrightness == 0.5 ) {
+					} else if ( this.state.mapBrightness === MAP_DIM ) {
 						setState( { ...this.state, mapBrightness: 1, inSlides: true } )
-						// console.log(response);
 					}
 
 					const chapter = config.chapters.find( ( chap, index ) => {
-						if ( response.element.id == config.chapters.length && index == config.chapters.length - 1 ) {
+						if ( response.element.dataset.id === config.chapters.length && index === config.chapters.length - 1 ) {
 							return true
 						}
 
-						return chap.id == response.element.id
+						return chap.id == response.element.dataset.id;
 					});
 
 					setState( { ...this.state, currentChapter: chapter } );
@@ -173,7 +175,7 @@ class StoryMapDisplay extends Component {
 					this.props.navigateMapLayers.forEach(layer => {
 						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
-						if( isLayerUsed || response.index == config.chapters.length - 1) {
+						if( isLayerUsed || response.index === config.chapters.length - 1) {
 							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
 						}
 					})
@@ -186,63 +188,55 @@ class StoryMapDisplay extends Component {
 							map.setPaintProperty(String(layer.id), 'raster-opacity', 0)
 						}
 					})
-
-					if ( config.showMarkers ) {
-						marker.setLngLat( chapter.location.center );
-					}
-
 			})
 			.onStepExit(response => {
-				// console.log(response);
-				if ( response.index == 0 && response.direction == 'up' ) {
-					setState( { ...this.state, inSlides: false, mapBrightness: 0.5 } );
+				if ( response.index === 0 && response.direction === 'up' ) {
+					setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
 
+					// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
 					this.props.navigateMapLayers.forEach(layer => {
-						map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+						if( isLayerUsed ) {
+							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						}
 					})
 
-					map.flyTo({
-						center: [ mapDefaults.lng, mapDefaults.lat ]
-					});
+					this.props.navigateMapLayers.forEach(layer => {
+						const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+						if ( !isLayerUsed ) {
+							map.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+						}
+					})
 				}
-			})
+			});
 		});
 
-
-
-		window.addEventListener('resize', scroller.resize);
-		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
-
-		let URL;
-
-		if ( document.querySelector( '.single-post' ) ) {
-			URL = `${ window.jeoMapVars.jsonUrl }posts/${ this.props.postID }`;
-		} else if ( document.querySelector( '.page' ) ) {
-			URL = `${ window.jeoMapVars.jsonUrl }pages/${ this.props.postID }`;
-		} else if ( document.querySelector( '.single-storymap' ) ) {
-			URL = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`
-		}
+		window.addEventListener('resize', this.scroller.resize);
+		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
 
 		const navigateMapDiv = document.createElement('div');
 		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
 		navigateMapDiv.dataset.map_id = this.props.map_id;
 
-		navigateMap = new JeoMap( navigateMapDiv );
-		document.querySelector('.navigate-map').append( navigateMapDiv );
+		this.navigateMap = new JeoMap( navigateMapDiv );
+		this.el.querySelector('.navigate-map').append( navigateMapDiv );
 
-		fetch( URL )
+		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
+		window.fetch( url )
 			.then( ( response ) => {
 				return response.json();
 			} )
 			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
 
-		document.querySelector('.navigate-map .jeomap').appendChild(document.querySelector('.return-to-slides-container'))
+		this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
 
 		document.addEventListener("fullscreenchange", function() {
 			if ( document.fullscreenElement ) {
-				document.querySelector( '.return-to-slides-container' ).style.display = 'none';
+				this.el.querySelector( '.return-to-slides-container' ).style.display = 'none';
 			} else {
-				document.querySelector( '.return-to-slides-container' ).style.display = 'block';
+				this.el.querySelector( '.return-to-slides-container' ).style.display = 'block';
 			}
 
 			window.scrollTo ( 0, document.body.scrollHeight );
@@ -250,10 +244,7 @@ class StoryMapDisplay extends Component {
 	}
 
 	componentDidUpdate() {
-		// console.log("componentDidUpdate");
-		document.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
-
-
+		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
 
 		if(this.state.inSlides) {
 			this.state.currentChapter.selectedLayers.map(
@@ -288,23 +279,15 @@ class StoryMapDisplay extends Component {
 		}
 	}
 
-
     render() {
-		const mapStart = config.chapters[ 0 ].location;
-        const theme = config.theme;
+        const theme = this.config.theme;
 		const currentChapterID = this.state.currentChapter.id;
-		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
+		const storyDate = this.state.postData ? new Date( this.state.postData.date ) : null;
 
-		let storyDate;
-		if(this.state.postData) {
-			storyDate = new Date( this.state.postData.date ).toLocaleDateString(
-				navigator.language? navigator.language : undefined,
-				dateOptions
-			);
-		}
+		const Heading = isSingle ? 'h1' : 'h2';
 
         return(
-			<div className="story-map">
+			<section id={ `story-map-${this.cid}` } className="story-map" ref={ ( el ) => ( this.el = el ) }>
 				<div className="not-navigating-map">
 					<div
 						ref={ ( el ) => ( this.mapContainer = el ) }
@@ -312,20 +295,19 @@ class StoryMapDisplay extends Component {
 					>
 					</div>
 
-					<div id="story">
+					<div className="the-story">
 						{ this.props.hasIntroduction &&
-							<div id="header" style={ { marginBottom: window.innerHeight / 3 } } className={ theme }>
+							<div className={ classNames( [ 'storymap-header', theme ] ) } style={ { marginBottom: window.innerHeight / 3 } }>
 								{ this.state.postData && (
 									<>
-										<h1 className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</h1>
+										<Heading className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</Heading>
 										<div className="post-info">
-											{ /*<p className="author" >{ 'Authors' }</p> */ }
-											<p className="date">{ `${storyDate} ${ __("at", "jeo") } ${ new Date( this.state.postData.date ).getHours() }:${ new Date( this.state.postData.date ).getMinutes() }` }</p>
+											<p className="date">{ `${dateFormat.format(storyDate)} ${ __("at", "jeo") } ${hourFormat.format(storyDate)}` }</p>
 										</div>
 									</>
 								) }
-								{ config.subtitle &&
-									<h3 className="storymap-description">{ parse(decodeHtmlEntity( config.subtitle )) }</h3>
+								{ this.config.subtitle &&
+									<h3 className="storymap-description">{ parse(decodeHtmlEntity( this.config.subtitle )) }</h3>
 								}
 
 								<button
@@ -333,7 +315,7 @@ class StoryMapDisplay extends Component {
 									onClick={ () => {
 										this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
-										document.querySelector( '#features' ).scrollIntoView();
+										this.el.querySelector( '.storymap-features' ).scrollIntoView();
 									} }
 								>
 									{ __('START', 'jeo') }
@@ -344,10 +326,10 @@ class StoryMapDisplay extends Component {
 										<p
 											className="skip-intro-link"
 											onClick={ async () => {
-												document.querySelector('.storymap-start-button').click();
+												this.el.querySelector('.storymap-start-button').click();
 												await sleep(1);
-												window.scrollTo( 0, document.body.scrollHeight );
-												document.querySelector('.navigate-button-display').click();
+												window.scrollTo( 0, this.el.scrollHeight );
+												this.el.querySelector('.navigate-button-display').click();
 											} }
 										>
 											{ __('skip intro', 'jeo') }
@@ -357,7 +339,7 @@ class StoryMapDisplay extends Component {
 											onClick={ async () => {
 												this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
-												document.querySelector( '#features' ).scrollIntoView();
+												this.el.querySelector( '.storymap-features' ).scrollIntoView();
 											} }
 										>
 											<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" ><path fill="currentColor" d="M143 256.3L7 120.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0L313 86.3c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.4 9.5-24.6 9.5-34 .1zm34 192l136-136c9.4-9.4 9.4-24.6 0-33.9l-22.6-22.6c-9.4-9.4-24.6-9.4-33.9 0L160 352.1l-96.4-96.4c-9.4-9.4-24.6-9.4-33.9 0L7 278.3c-9.4 9.4-9.4 24.6 0 33.9l136 136c9.4 9.5 24.6 9.5 34 .1z"></path></svg>
@@ -368,35 +350,35 @@ class StoryMapDisplay extends Component {
 						}
 						{ ! this.state.inHeader && (
 							<>
-								<div id="features" style={ { display: 'block' } } className={ alignments[config.alignment] }>
+								<div className={ classNames( [ 'storymap-features', alignments[ this.config.alignment ] ] ) } style={ { display: 'block' } }>
 									{
-										config.chapters.map( ( chapter, index ) => {
+										this.config.chapters.map( ( chapter, index ) => {
 											let isLastChapter = false;
 
 											// If is the last chapter:
-											if( config.chapters.indexOf( this.state.currentChapter ) == config.chapters.length -1 && this.state.currentChapter == chapter ) {
+											if( this.config.chapters.indexOf( this.state.currentChapter ) === this.config.chapters.length -1 && this.state.currentChapter === chapter ) {
 												isLastChapter = true;
 											}
 
-											lastChapter = { ...chapter };
-											lastChapter.selectedLayers = this.props.navigateMapLayers
-											lastChapter.id = chapter.id
+											this.lastChapter = { ...chapter };
+											this.lastChapter.selectedLayers = this.props.navigateMapLayers
+											this.lastChapter.id = chapter.id
 
-											if ( index == config.chapters.length - 1 ) {
+											if ( index === this.config.chapters.length - 1 ) {
 												return(
 													<Chapter
-														index={ config.chapters.length }
+														index={ this.config.chapters.length }
 														props={ this.props }
 														onClickFunction={ () => {
-															document.querySelector( '.navigate-map' ).style.display = 'block';
+															this.el.querySelector( '.navigate-map' ).style.display = 'block';
 															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } )
-															navigateMap.forceUpdate();
-															document.querySelector( '.not-navigating-map' ).style.display = ' none ';
+															this.navigateMap.forceUpdate();
+															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
 
-															window.scrollTo( 0,document.body.scrollHeight );
+															window.scrollTo( 0,this.el.scrollHeight );
 														} }
 														isLastChapter={ true }
-														{ ...lastChapter }
+														{ ...this.lastChapter }
 														theme={ theme }
 														currentChapterID={ currentChapterID }
 													/>
@@ -439,15 +421,15 @@ class StoryMapDisplay extends Component {
 									let mapBrightness;
 
 									if ( this.props.hasIntroduction ) {
-										mapBrightness = 0.5;
+										mapBrightness = MAP_DIM;
 									} else {
 										mapBrightness = 1;
 									}
 
 									this.setState( { ...this.state, isNavigating: false, mapBrightness } )
 									window.scrollTo(0, 0);
-									document.querySelector('.navigate-map').style.display = 'none';
-									document.querySelector('.not-navigating-map').style.display = 'block';
+									this.el.querySelector('.navigate-map').style.display = 'none';
+									this.el.querySelector('.not-navigating-map').style.display = 'block';
 
 									this.state.map.resize();
 								} }
@@ -464,15 +446,15 @@ class StoryMapDisplay extends Component {
 								let mapBrightness;
 
 								if ( this.props.hasIntroduction ) {
-									mapBrightness = 0.5;
+									mapBrightness = MAP_DIM;
 								} else {
 									mapBrightness = 1;
 								}
 
 								this.setState( { ...this.state, isNavigating: false, mapBrightness } )
 
-								document.querySelector('.navigate-map').style.display = 'none';
-								document.querySelector('.not-navigating-map').style.display = 'block';
+								this.el.querySelector('.navigate-map').style.display = 'none';
+								this.el.querySelector('.not-navigating-map').style.display = 'block';
 
 								this.map.resize();
 
@@ -483,7 +465,7 @@ class StoryMapDisplay extends Component {
 						</p>
 					</div>
 				</>
-			</div>
+			</section>
         );
     }
 
@@ -495,7 +477,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
     return (
 		<>
 			{ ! isLastChapter && ( title || description ) && (
-				<div id={ id } className={ classList }>
+				<div data-id={ id } className={ classList }>
 					<div className={ theme }>
 						{ title &&
 							<h3 className="title">{ parse(decodeHtmlEntity( title )) }</h3>
@@ -510,14 +492,14 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 				</div>
 			) }
 			{ ! isLastChapter && ! title && ! description && (
-				<div id={ id } className={ classList } style={ { visibility: 'hidden' } }>
+				<div data-id={ id } className={ classList } style={ { visibility: 'hidden' } }>
 					<div className={ theme }>
 						<h3 className="title">{ `Slide ${ index + 1 }` }</h3>
 					</div>
 				</div>
 			) }
 			{ isLastChapter && props.navigateButton && (
-				<div id={ id } className={ classList }>
+				<div data-id={ id } className={ classList }>
 					<button
 						className="navigate-button-display"
 						onClick={ onClickFunction }
@@ -530,15 +512,24 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
     );
 }
 
-const storyMapElement = document.getElementById('story-map');
-let storyMapProps = null;
-if(storyMapElement) {
-	function decodeHtml(html) {
-		const txt = document.createElement("textarea");
-		txt.innerHTML = html;
-		return txt.value;
-	}
-
-	storyMapProps = JSON.parse(decodeHtml(storyMapElement.getAttribute('data-properties')));
-	wp.element.render(<StoryMapDisplay { ...storyMapProps } />, storyMapElement);
+function decodeHtml( html ) {
+	const txt = document.createElement( 'textarea' );
+	txt.innerHTML = html;
+	return txt.value;
 }
+
+document.querySelectorAll( '.story-map-container' ).forEach( ( storyMapElement ) => {
+	const storyMapProps = JSON.parse( decodeHtml( storyMapElement.dataset.properties ) );
+	wp.element.render( <StoryMapDisplay { ...storyMapProps } />, storyMapElement );
+
+	// `overflow` avoids `position:sticky`
+	let parent = storyMapElement.parentElement;
+	while ( parent ) {
+		const problematicOverflowValues = [ 'auto', 'hidden', 'overlay', 'scroll' ];
+		const overflow = window.getComputedStyle( parent ).overflow;
+		if ( problematicOverflowValues.includes( overflow ) ) {
+			parent.style.cssText += 'overflow: initial !important';
+		}
+		parent = parent.parentElement;
+	}
+} );

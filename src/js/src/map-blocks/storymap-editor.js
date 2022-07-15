@@ -1,34 +1,39 @@
-import {
-	Button,
-	Spinner,
-	CheckboxControl,
-	Dashicon,
-	Panel,
-	PanelBody,
-} from '@wordpress/components';
+import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import ClassicEditor from 'ckeditor5-build-full';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { List, arrayMove } from 'react-movable';
 
 import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
+import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import './map-editor.css';
 import './storymap-editor.scss';
-import { List, arrayMove } from 'react-movable';
-import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { CKEditor } from '@ckeditor/ckeditor5-react';
-import ClassicEditor from '@ckeditor/ckeditor5-build-classic';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
-const editorConfig =  {
-	// plugins: [ 'Paragraph', 'Bold', 'Italic', 'Essentials' ],
-	plugins: [ 'Essentials', 'Autoformat', 'Bold', 'Italic', 'BlockQuote', 'Heading', 'Indent', 'Link', 'List', 'Paragraph', 'TextTransformation' ],
-	toolbar: [ 'undo', 'redo','|', 'bold', 'italic', '|', 'heading', 'paragraph', 'link', 'bulletedList', 'numberedList']
-}
+const baseColors = [
+	{ color: 'hsl(0, 0%, 0%)', label: 'Black' },
+	{ color: 'hsl(0, 0%, 30%)', label: 'Dim grey' },
+	{ color: 'hsl(0, 0%, 60%)', label: 'Grey' },
+	{ color: 'hsl(0, 0%, 90%)', label: 'Light grey' },
+	{ color: 'hsl(0, 0%, 100%)', label: 'White', hasBorder: true },
+	{ color: 'hsl(0, 75%, 60%)', label: 'Red' },
+	{ color: 'hsl(30, 75%, 60%)', label: 'Orange' },
+	{ color: 'hsl(60, 75%, 60%)', label: 'Yellow' },
+	{ color: 'hsl(90, 75%, 60%)', label: 'Light green' },
+	{ color: 'hsl(120, 75%, 60%)', label: 'Green' },
+	{ color: 'hsl(150, 75%, 60%)', label: 'Aquamarine' },
+	{ color: 'hsl(180, 75%, 60%)', label: 'Turquoise' },
+	{ color: 'hsl(210, 75%, 60%)', label: 'Light blue' },
+	{ color: 'hsl(240, 75%, 60%)', label: 'Blue' },
+	{ color: 'hsl(270, 75%, 60%)', label: 'Purple' },
+]
 
 const StoryMapEditor = ( {
 	attributes,
@@ -37,7 +42,22 @@ const StoryMapEditor = ( {
 	loadedLayers,
 	loadedMap,
 	loadingMap,
+	themeColors,
 } ) => {
+	const colors = [
+		...baseColors,
+		...( themeColors || [] ).map( ( color ) => ( {
+			label: color.name,
+			color: color.color,
+			hasBorder: true,
+		} ) )
+	];
+	const editorConfig = {
+		toolbar: 'undo redo | bold italic underline | heading paragraph link bulletedList numberedList | fontColor fontBackgroundColor'.split( ' ' ),
+		fontBackgroundColor: { colors },
+		fontColor: { colors },
+	};
+
 	const decodeHtmlEntity = function ( str ) {
 		return str.replace( /&#(\d+);/g, function ( match, dec ) {
 			return String.fromCharCode( dec );
@@ -162,7 +182,6 @@ const StoryMapEditor = ( {
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
-			// alert("! attributes.slides");
 			setAttributes( {
 				...attributes,
 				slides: [
@@ -248,7 +267,7 @@ const StoryMapEditor = ( {
 								[ attributes.slides[ currentSlideIndex ].bearing ] || 0
 							}
 							pitch={ [ attributes.slides[ currentSlideIndex ].pitch ] || 0 }
-							containerStyle={ { height: '70vh' } }
+							containerStyle={ { height: '85vh' } }
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
@@ -278,7 +297,7 @@ const StoryMapEditor = ( {
 											setShowStorySettings( false );
 										} }
 									>
-										<Dashicon icon="hidden" />
+										<Dashicon icon="arrow-down-alt2" />
 									</Button>
 								</div>
 								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
@@ -326,7 +345,7 @@ const StoryMapEditor = ( {
 										setShowStorySettings( true );
 									} }
 								>
-									<Dashicon icon="visibility" />
+									<Dashicon icon="arrow-up-alt2" />
 								</Button>
 							</div>
 						) }
@@ -340,7 +359,7 @@ const StoryMapEditor = ( {
 											setShowSlidesSettings( false );
 										} }
 									>
-										<Dashicon icon="hidden" />
+										<Dashicon icon="arrow-down-alt2" />
 									</Button>
 								</div>
 								<List
@@ -681,6 +700,7 @@ const StoryMapEditor = ( {
 								<Button
 									className="add-button"
 									onClick={ () => {
+										let lastSlide = attributes.slides.slice(-1);
 										setAttributes( {
 											...attributes,
 											slides: [
@@ -688,12 +708,12 @@ const StoryMapEditor = ( {
 												{
 													title: null,
 													content: null,
-													selectedLayers: [],
-													latitude: window.jeo_settings.map_defaults.lat,
-													longitude: window.jeo_settings.map_defaults.lng,
-													zoom: window.jeo_settings.map_defaults.zoom,
-													pitch: 0,
-													bearing: 0,
+													selectedLayers: lastSlide[0].selectedLayers,
+													latitude: lastSlide[0].latitude,
+													longitude: lastSlide[0].longitude,
+													zoom: lastSlide[0].zoom,
+													pitch: lastSlide[0].pitch,
+													bearing: lastSlide[0].bearing,
 												},
 											],
 										} );
@@ -717,7 +737,7 @@ const StoryMapEditor = ( {
 										setShowSlidesSettings( true );
 									} }
 								>
-									<Dashicon icon="visibility" />
+									<Dashicon icon="arrow-up-alt2" />
 								</Button>
 							</div>
 						) }
@@ -834,6 +854,7 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 		'getEntityRecords',
 		[ 'postType', 'map-layer' ]
 	),
+	themeColors: select( 'core/editor' ).getEditorSettings().colors,
 } ) );
 
 export default compose( withInstanceId, applyWithSelect )( StoryMapEditor );

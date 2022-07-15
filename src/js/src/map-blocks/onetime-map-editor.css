@@ -238,6 +238,7 @@ ul.jeo-layers-list .components-card {
 .jeo-map-settings .help-block,
 .jeo-layer-settings .help-block {
 	color: gray;
+	font-size: 1.125em;
 	margin-top: 0;
 }
 
