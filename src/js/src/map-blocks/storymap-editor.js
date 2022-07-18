@@ -59,7 +59,8 @@ const StoryMapEditor = ( {
 		fontColor: { colors },
 		image: {
 			toolbar: 'toggleImageCaption imageTextAlternative'.split( ' ' ),
-		}
+		},
+		mediaEmbed: { previewsInData: true },
 	};
 
 	const decodeHtmlEntity = function ( str ) {
