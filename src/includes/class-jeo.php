@@ -314,7 +314,7 @@ class Jeo {
 
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() || get_query_var('jeo_embed') === 'map') {
-			wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css', time() );
+			wp_enqueue_style( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v1.13.1/mapbox-gl.css', time() );
 			wp_enqueue_script( 'mapboxgl-loader' );
 			wp_enqueue_script( 'mapboxgl-spiderifier' );
 			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapboxgl-loader', 'mapboxgl-spiderifier', 'jquery', 'wp-element' ), false, true );
