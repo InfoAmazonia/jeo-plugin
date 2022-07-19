@@ -57,9 +57,7 @@ const StoryMapEditor = ( {
 		toolbar: 'undo redo | bold italic underline | heading link imageUpload bulletedList numberedList | fontColor fontBackgroundColor'.split( ' ' ),
 		fontBackgroundColor: { colors },
 		fontColor: { colors },
-		image: {
-			toolbar: 'toggleImageCaption imageTextAlternative'.split( ' ' ),
-		},
+		image: { toolbar: [ 'imageTextAlternative' ] },
 		mediaEmbed: { previewsInData: true },
 	};
 
