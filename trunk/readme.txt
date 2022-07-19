@@ -1,12 +1,12 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 5.9.3
-Stable tag: 2.5.4
+Stable tag: 2.6.0
 Requires PHP: 7.2
 Requires at least: 5.8
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.5.4
+Version: 2.6.0
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news storys as layers of information on digital maps.
 
@@ -49,9 +49,12 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 
 == Changelog ==
 
+= 2.6.0 =
+* permite upload de imagens e embed de vídeos ao editor de story maps
+
 = 2.5.4 =
 * adiciona suporte a camadas raster TMS
-* adiciona mais customizações de texto ao editor dos story maps
+* adiciona mais customizações de texto ao editor de story maps
 
 = 2.5.2 =
 * bugfix: remove warning caso plugin WPML não esteja ativo
@@ -849,4 +852,4 @@ On old JEO, some `meta_key`s are prefixed by an underscore (`_`) and others aren
 - `_geocode_country`
 - `geocode_viewport`
 
-Let's have them all with a underscore at the beginning.
+Let's have them all with an underscore at the beginning.
