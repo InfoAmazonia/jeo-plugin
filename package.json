@@ -29,6 +29,7 @@
 		"@wordpress/compose": "^3.25.0",
 		"@wordpress/edit-post": "^3.27.0",
 		"@wordpress/i18n": "^3.19.0",
+		"@wordpress/media-utils": "^4.4.0",
 		"@wordpress/plugins": "^2.25.0",
 		"bootstrap-daterangepicker": "^3.1.0",
 		"ckeditor5-build-full": "^25.0.0",

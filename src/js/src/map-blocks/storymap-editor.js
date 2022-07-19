@@ -8,6 +8,7 @@ import ClassicEditor from 'ckeditor5-build-full';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { List, arrayMove } from 'react-movable';
 
+import { createUploadAdapter } from './cke5-image-upload';
 import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
@@ -53,9 +54,11 @@ const StoryMapEditor = ( {
 		} ) )
 	];
 	const editorConfig = {
-		toolbar: 'undo redo | bold italic underline | heading paragraph link bulletedList numberedList | fontColor fontBackgroundColor'.split( ' ' ),
+		toolbar: 'undo redo | bold italic underline | heading link imageUpload bulletedList numberedList | fontColor fontBackgroundColor'.split( ' ' ),
 		fontBackgroundColor: { colors },
 		fontColor: { colors },
+		image: { toolbar: [ 'imageTextAlternative' ] },
+		mediaEmbed: { previewsInData: true },
 	};
 
 	const decodeHtmlEntity = function ( str ) {
@@ -305,6 +308,9 @@ const StoryMapEditor = ( {
 									editor={ ClassicEditor }
 									data={ attributes.description }
 									config={ editorConfig }
+									onReady={ ( editor ) => {
+										editor.plugins.get( 'FileRepository' ).createUploadAdapter = createUploadAdapter;
+									} }
 									onChange={ ( event, editor ) =>  {
 										setAttributes( {
 											...attributes,
@@ -622,6 +628,9 @@ const StoryMapEditor = ( {
 															editor={ ClassicEditor }
 															data={ slide.title }
 															config={ editorConfig }
+															onReady={ ( editor ) => {
+																editor.plugins.get( 'FileRepository' ).createUploadAdapter = createUploadAdapter;
+															} }
 															onChange={ ( event, editor ) => {
 																// Set role 'button' to editor element so it isn't affected by drag and drop events
 																editor.ui.getEditableElement().setAttribute('role', 'button')
@@ -644,6 +653,9 @@ const StoryMapEditor = ( {
 															editor={ ClassicEditor }
 															data={ slide.content }
 															config={ editorConfig }
+															onReady={ ( editor ) => {
+																editor.plugins.get( 'FileRepository' ).createUploadAdapter = createUploadAdapter;
+															} }
 															onChange={ ( event, editor ) => {
 																// Set role 'button' to editor element so it isn't affected by drag and drop events
 																editor.ui.getEditableElement().setAttribute('role', 'button')

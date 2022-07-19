@@ -217,7 +217,7 @@ $font-stories: var( --jeo-font-stories );
 		padding-bottom: 50vh;
 		opacity: 0.25;
 
-		div {
+		& > div {
 			padding: 35px;
 			line-height: 25px;
 			opacity: 0.87;
