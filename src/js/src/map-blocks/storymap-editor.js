@@ -4,7 +4,7 @@ import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import ClassicEditor from 'ckeditor5-build-full';
+import ClassicEditor from '../../../libs/ckeditor5/build/ckeditor';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { List, arrayMove } from 'react-movable';
 
