@@ -371,7 +371,7 @@ export default withDispatch( ( dispatch ) => ( {
 	},
 } ) )(
 	withSelect( ( select ) => ( {
-		loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: 100, order: 'asc', orderby: 'menu_order' } ),
+		loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'menu_order' } ),
 		loadingLayers: select( 'core/data' ).isResolving(
 			'core',
 			'getEntityRecords',

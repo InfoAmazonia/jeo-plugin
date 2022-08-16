@@ -50,7 +50,7 @@ const LayersSettings = ( {
 		const allLayersData = select( 'core' ).getEntityRecords(
 			'postType',
 			'map-layer',
-			{ per_page: 100, order: 'asc', orderby: 'menu_order' }
+			{ per_page: -1, order: 'asc', orderby: 'menu_order' }
 		);
 		if ( ! allLayersData ) {
 			setAllLayers( [] );

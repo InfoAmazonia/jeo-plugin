@@ -158,7 +158,7 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 			'map',
 			attributes.map_id,
 		] ),
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: 100, order: 'asc', orderby: 'menu_order' } ),
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'menu_order' } ),
 	loadingLayers: select( 'core/data' ).isResolving(
 		'core',
 		'getEntityRecords',
