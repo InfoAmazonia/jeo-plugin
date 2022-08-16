@@ -245,6 +245,11 @@ $font-stories: var( --jeo-font-stories );
 		p {
 			color: inherit;
 		}
+
+		span[style*="background-color"] {
+			border-radius: 3px;
+			padding: 0 3px;
+		}
 	}
 
 	.step.active {
