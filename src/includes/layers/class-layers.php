@@ -9,8 +9,9 @@ class Layers {
 	public $post_type = 'map-layer';
 
 	protected function init() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', [ $this, 'register_post_type' ] );
 		add_action('admin_init', [ $this, 'add_capabilities' ]) ;
+		add_filter("rest_{$this->post_type}_collection_params", [ $this, 'rest_collection_params' ] );
 		$this->register_rest_meta_validation();
 	}
 
@@ -228,6 +229,12 @@ class Layers {
 
 			$role_obj->add_cap( 'delete_map-layer' );
 		}
+	}
+
+	public function rest_collection_params( $params ) {
+		$params[ 'per_page' ][ 'minimum' ] = -1;
+		unset( $params[ 'per_page' ][ 'maximum' ] );
+		return $params;
 	}
 
 	public function validate_meta_type( $meta_value ) {
