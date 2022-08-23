@@ -330,6 +330,7 @@ const StoryMapEditor = ( {
 								<span className="section-title">{ __( 'Story settings', 'jeo'  ) }</span>
 								<Button
 									className="show-button"
+									disabled={ !( loadedMap && loadedLayers ) }
 									onClick={ () => {
 										setShowStorySettings( true );
 									} }
@@ -728,6 +729,7 @@ const StoryMapEditor = ( {
 								<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
 								<Button
 									className="show-button"
+									disabled={ !( loadedMap && loadedLayers ) }
 									onClick={ () => {
 										setShowSlidesSettings( true );
 									} }
