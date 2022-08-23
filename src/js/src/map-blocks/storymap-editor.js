@@ -148,14 +148,14 @@ const StoryMapEditor = ( {
 
 	const layersContent = useMemo(() => {
 		let rawLayers = [];
-		if ( loadedMap && attributes.map_id ) {
+		if ( attributes.map_id && loadedMap ) {
 			rawLayers = loadedMap.meta.layers;
 		}
 
 		return rawLayers.map( ( rawLayer ) => {
 			return select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id );
 		} );
-	}, [ loadedMap, attributes.map_id ]);
+	}, [ loadedMap, loadedLayers, attributes.map_id ]);
 
 	const editorConfig = useMemo( () => {
 		const layerColors = layersContent.flatMap( ( layer ) => {
