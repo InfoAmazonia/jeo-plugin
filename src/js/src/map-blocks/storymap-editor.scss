@@ -19,6 +19,12 @@
 			}
 		}
 
+		.story-settings, .slides-settings {
+			.ck-color-grid {
+				--ck-color-grid-tile-size: 16px;
+			}
+		}
+
 		.story-settings {
 			.ck-editor {
 				margin-bottom: 15px;
@@ -46,14 +52,6 @@
 					align-items: center;
 				}
 			}
-		}
-
-		.story-settings-hide {
-
-		}
-
-		.slides-settings-hide {
-
 		}
 	}
 }
