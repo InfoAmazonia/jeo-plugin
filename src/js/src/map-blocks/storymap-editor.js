@@ -146,19 +146,20 @@ const StoryMapEditor = ( {
 		} );
 	}, [ loadingMap, loadedLayers ] );
 
-	const mapLayers = useMemo( () => {
-		if ( loadedMap && loadedLayers ) {
-			const usedLayers = loadedMap.meta?.layers || [];
-			const layerIds = new Set( usedLayers.map( ( layer ) => layer.id ) );
-			return loadedLayers.filter( ( layer ) => layerIds.has( layer.id ) );
-		} else {
-			return [];
+	const layersContent = useMemo(() => {
+		let rawLayers = [];
+		if ( loadedMap && attributes.map_id ) {
+			rawLayers = loadedMap.meta.layers;
 		}
-	}, [ loadedLayers, loadedMap ] );
+
+		return rawLayers.map( ( rawLayer ) => {
+			return select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id );
+		} );
+	}, [ loadedMap, attributes.map_id ]);
 
 	const editorConfig = useMemo( () => {
-		const layerColors = mapLayers.flatMap( ( layer ) => {
-			return layer.meta.legend_type_options?.colors?.map( ( color, i, colors ) => {
+		const layerColors = layersContent.flatMap( ( layer ) => {
+			return layer?.meta.legend_type_options?.colors?.map( ( color, i, colors ) => {
 				const label = `${layer.title.raw} — ${color.label || percentage( i / ( colors.length - 1 ) )}`
 				return { label, color: color.color, hasBorder: true };
 			} ) || [];
@@ -182,7 +183,7 @@ const StoryMapEditor = ( {
 			image: { toolbar: [ 'imageTextAlternative' ] },
 			mediaEmbed: { previewsInData: true },
 		};
-	}, [ mapLayers, themeColors ] );
+	}, [ layersContent, themeColors ] );
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
@@ -211,18 +212,6 @@ const StoryMapEditor = ( {
 	if(attributes.map_id && !loadedMap) {
 		return <div>Esse aqui é o loadedMap</div>;
 	}
-
-	let rawLayers = [];
-	if ( ! loadingMap && attributes.map_id) {
-		rawLayers = loadedMap.meta.layers;
-	}
-	const layersContent = [];
-	rawLayers.map( ( rawLayer ) => {
-		return layersContent.push(
-			select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id )
-		);
-	} );
-
 
 	let globalFontFamily = window.jeo_settings.jeo_typography_name;
 
