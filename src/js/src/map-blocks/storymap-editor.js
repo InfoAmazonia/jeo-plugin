@@ -27,6 +27,24 @@ function percentage ( number ) {
 	return percentageFormatter.format( number );
 }
 
+const baseColors = [
+	{ label: 'Red', color: 'hsl(0, 75%, 60%)', hasBorder: true },
+	{ label: 'Orange', color: 'hsl(30, 75%, 60%)', hasBorder: true },
+	{ label: 'Yellow', color: 'hsl(60, 75%, 60%)', hasBorder: true },
+	{ label: 'Light Green', color: 'hsl(90, 75%, 60%)', hasBorder: true },
+	{ label: 'Green', color: 'hsl(120, 75%, 60%)', hasBorder: true },
+	{ label: 'Aquamarine', color: 'hsl(150, 75%, 60%)', hasBorder: true },
+	{ label: 'Turquoise', color: 'hsl(180, 75%, 60%)', hasBorder: true },
+	{ label: 'Light Blue', color: 'hsl(210, 75%, 60%)', hasBorder: true },
+	{ label: 'Blue', color: 'hsl(240, 75%, 60%)', hasBorder: true },
+	{ label: 'Purple', color: 'hsl(270, 75%, 60%)', hasBorder: true },
+	{ label: 'Black', color: 'hsl(0, 0%, 0%)', hasBorder: true },
+	{ label: 'Dim Gray', color: 'hsl(0, 0%, 30%)', hasBorder: true },
+	{ label: 'Gray', color: 'hsl(0, 0%, 60%)', hasBorder: true },
+	{ label: 'Light Gray', color: 'hsl(0, 0%, 90%)', hasBorder: true },
+	{ label: 'White', color: 'hsl(0, 0%, 100%)', hasBorder: true },
+];
+
 const StoryMapEditor = ( {
 	attributes,
 	setAttributes,
@@ -166,8 +184,7 @@ const StoryMapEditor = ( {
 		} );
 
 		const colors = [
-			{ label: 'Black', color: '#000', hasBorder: true },
-			{ label: 'White', color: '#fff', hasBorder: true },
+			...baseColors,
 			...( themeColors || [] ).map( ( color ) => ( {
 				label: color.name,
 				color: color.color,
