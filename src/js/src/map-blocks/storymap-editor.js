@@ -2,14 +2,13 @@ import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect, select } from '@wordpress/data';
-import { Fragment, useState, useEffect } from '@wordpress/element';
+import { Fragment, useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import ClassicEditor from 'ckeditor5-build-full';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { List, arrayMove } from 'react-movable';
 
 import { createUploadAdapter } from './cke5-image-upload';
-import { baseColors } from './color-palette';
 import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
@@ -18,6 +17,33 @@ import './map-editor.css';
 import './storymap-editor.scss';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
+
+const percentageFormatter = new Intl.NumberFormat( 'en-US', {
+	style: 'percent',
+	minimumFractionDigits: 0,
+	maximumFractionDigits: 2,
+} );
+function percentage ( number ) {
+	return percentageFormatter.format( number );
+}
+
+const baseColors = [
+	{ label: 'Red', color: 'hsl(0, 75%, 60%)', hasBorder: true },
+	{ label: 'Orange', color: 'hsl(30, 75%, 60%)', hasBorder: true },
+	{ label: 'Yellow', color: 'hsl(60, 75%, 60%)', hasBorder: true },
+	{ label: 'Light Green', color: 'hsl(90, 75%, 60%)', hasBorder: true },
+	{ label: 'Green', color: 'hsl(120, 75%, 60%)', hasBorder: true },
+	{ label: 'Aquamarine', color: 'hsl(150, 75%, 60%)', hasBorder: true },
+	{ label: 'Turquoise', color: 'hsl(180, 75%, 60%)', hasBorder: true },
+	{ label: 'Light Blue', color: 'hsl(210, 75%, 60%)', hasBorder: true },
+	{ label: 'Blue', color: 'hsl(240, 75%, 60%)', hasBorder: true },
+	{ label: 'Purple', color: 'hsl(270, 75%, 60%)', hasBorder: true },
+	{ label: 'Black', color: 'hsl(0, 0%, 0%)', hasBorder: true },
+	{ label: 'Dim Gray', color: 'hsl(0, 0%, 30%)', hasBorder: true },
+	{ label: 'Gray', color: 'hsl(0, 0%, 60%)', hasBorder: true },
+	{ label: 'Light Gray', color: 'hsl(0, 0%, 90%)', hasBorder: true },
+	{ label: 'White', color: 'hsl(0, 0%, 100%)', hasBorder: true },
+];
 
 const StoryMapEditor = ( {
 	attributes,
@@ -28,22 +54,6 @@ const StoryMapEditor = ( {
 	loadingMap,
 	themeColors,
 } ) => {
-	const colors = [
-		...baseColors,
-		...( themeColors || [] ).map( ( color ) => ( {
-			label: color.name,
-			color: color.color,
-			hasBorder: true,
-		} ) )
-	];
-	const editorConfig = {
-		toolbar: 'undo redo | bold italic underline fontColor fontBackgroundColor | heading bulletedList numberedList | link imageUpload htmlEmbed'.split( ' ' ),
-		fontBackgroundColor: { colors, columns: 9 },
-		fontColor: { colors, columns: 9 },
-		image: { toolbar: [ 'imageTextAlternative' ] },
-		mediaEmbed: { previewsInData: true },
-	};
-
 	const decodeHtmlEntity = function ( str ) {
 		return str.replace( /&#(\d+);/g, function ( match, dec ) {
 			return String.fromCharCode( dec );
@@ -101,17 +111,11 @@ const StoryMapEditor = ( {
 	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 
 	useEffect( () => {
-		// console.log(attributes.navigateMapLayers);
 		// Post the already exsists
-		// console.log(loadedLayers);
-		// console.log(attributes.navigateMapLayers);
 		if(attributes.slides && loadedMap && loadedLayers) {
-			// console.log(loadedLayers, loadedMap);
 			const newSlides = attributes.slides.map(slide => {
 				slide.selectedLayers.forEach((selectedLayer, index) => {
-					// console.log(loadedMap);
 					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id ) || !loadedLayers.some(layer => layer.id === selectedLayer.id )) {
-						// console.log("Remove index", index);
 						slide.selectedLayers.splice(index, 1);
 					}
 				})
@@ -140,9 +144,6 @@ const StoryMapEditor = ( {
 				}
 			})
 
-			// console.log("newLayers", JSON.parse(JSON.stringify(newLayers)));
-			// console.log("navigateMapLayers", navigateMapLayers);
-
 			navigateMapLayers = newLayers;
 
 			setAttributes( {
@@ -161,10 +162,45 @@ const StoryMapEditor = ( {
 			loadedLayers,
 			navigateMapLayers: loadedLayers,
 		} );
+	}, [ loadingMap, loadedLayers ] );
 
-		// console.log(attributes);
+	const layersContent = useMemo(() => {
+		let rawLayers = [];
+		if ( attributes.map_id && loadedMap ) {
+			rawLayers = loadedMap.meta.layers;
+		}
 
-	}, [loadingMap, loadedLayers] );
+		return rawLayers.map( ( rawLayer ) => {
+			return select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id );
+		} );
+	}, [ loadedMap, loadedLayers, attributes.map_id ]);
+
+	const editorConfig = useMemo( () => {
+		const layerColors = layersContent.flatMap( ( layer ) => {
+			return layer?.meta.legend_type_options?.colors?.map( ( color, i, colors ) => {
+				const label = `${layer.title.raw} — ${color.label || percentage( i / ( colors.length - 1 ) )}`
+				return { label, color: color.color, hasBorder: true };
+			} ) || [];
+		} );
+
+		const colors = [
+			...baseColors,
+			...( themeColors || [] ).map( ( color ) => ( {
+				label: color.name,
+				color: color.color,
+				hasBorder: true,
+			} ) ),
+			...layerColors,
+		];
+
+		return {
+			toolbar: 'undo redo | bold italic underline fontColor fontBackgroundColor | heading bulletedList numberedList | link imageUpload htmlEmbed'.split( ' ' ),
+			fontBackgroundColor: { colors, columns: 10 },
+			fontColor: { colors, columns: 10 },
+			image: { toolbar: [ 'imageTextAlternative' ] },
+			mediaEmbed: { previewsInData: true },
+		};
+	}, [ layersContent, themeColors ] );
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
@@ -193,18 +229,6 @@ const StoryMapEditor = ( {
 	if(attributes.map_id && !loadedMap) {
 		return <div>Esse aqui é o loadedMap</div>;
 	}
-
-	let rawLayers = [];
-	if ( ! loadingMap && attributes.map_id) {
-		rawLayers = loadedMap.meta.layers;
-	}
-	const layersContent = [];
-	rawLayers.map( ( rawLayer ) => {
-		return layersContent.push(
-			select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id )
-		);
-	} );
-
 
 	let globalFontFamily = window.jeo_settings.jeo_typography_name;
 
@@ -330,6 +354,7 @@ const StoryMapEditor = ( {
 								<span className="section-title">{ __( 'Story settings', 'jeo'  ) }</span>
 								<Button
 									className="show-button"
+									disabled={ !( loadedMap && loadedLayers ) }
 									onClick={ () => {
 										setShowStorySettings( true );
 									} }
@@ -728,6 +753,7 @@ const StoryMapEditor = ( {
 								<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
 								<Button
 									className="show-button"
+									disabled={ !( loadedMap && loadedLayers ) }
 									onClick={ () => {
 										setShowSlidesSettings( true );
 									} }
@@ -843,7 +869,7 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 			'map',
 			attributes.map_id,
 		] ),
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: 100, order: 'asc', orderby: 'menu_order' } ),
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'menu_order', ID: 122820 } ),
 	loadingLayers: select( 'core/data' ).isResolving(
 		'core',
 		'getEntityRecords',
