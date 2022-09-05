@@ -9,6 +9,7 @@ import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { List, arrayMove } from 'react-movable';
 
 import { createUploadAdapter } from './cke5-image-upload';
+import { baseColors } from './color-palettes';
 import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
@@ -27,23 +28,12 @@ function percentage ( number ) {
 	return percentageFormatter.format( number );
 }
 
-const baseColors = [
-	{ label: 'Red', color: 'hsl(0, 75%, 60%)', hasBorder: true },
-	{ label: 'Orange', color: 'hsl(30, 75%, 60%)', hasBorder: true },
-	{ label: 'Yellow', color: 'hsl(60, 75%, 60%)', hasBorder: true },
-	{ label: 'Light Green', color: 'hsl(90, 75%, 60%)', hasBorder: true },
-	{ label: 'Green', color: 'hsl(120, 75%, 60%)', hasBorder: true },
-	{ label: 'Aquamarine', color: 'hsl(150, 75%, 60%)', hasBorder: true },
-	{ label: 'Turquoise', color: 'hsl(180, 75%, 60%)', hasBorder: true },
-	{ label: 'Light Blue', color: 'hsl(210, 75%, 60%)', hasBorder: true },
-	{ label: 'Blue', color: 'hsl(240, 75%, 60%)', hasBorder: true },
-	{ label: 'Purple', color: 'hsl(270, 75%, 60%)', hasBorder: true },
-	{ label: 'Black', color: 'hsl(0, 0%, 0%)', hasBorder: true },
-	{ label: 'Dim Gray', color: 'hsl(0, 0%, 30%)', hasBorder: true },
-	{ label: 'Gray', color: 'hsl(0, 0%, 60%)', hasBorder: true },
-	{ label: 'Light Gray', color: 'hsl(0, 0%, 90%)', hasBorder: true },
-	{ label: 'White', color: 'hsl(0, 0%, 100%)', hasBorder: true },
-];
+for (const color of baseColors) {
+	if (!color.label) {
+		color.label = color.color
+	}
+	color.hasBorder = true
+}
 
 const StoryMapEditor = ( {
 	attributes,
@@ -184,19 +174,19 @@ const StoryMapEditor = ( {
 		} );
 
 		const colors = [
-			...baseColors,
+			...layerColors,
 			...( themeColors || [] ).map( ( color ) => ( {
 				label: color.name,
 				color: color.color,
 				hasBorder: true,
 			} ) ),
-			...layerColors,
+			...baseColors,
 		];
 
 		return {
 			toolbar: 'undo redo | bold italic underline fontColor fontBackgroundColor | heading bulletedList numberedList | link imageUpload htmlEmbed'.split( ' ' ),
-			fontBackgroundColor: { colors, columns: 10 },
-			fontColor: { colors, columns: 10 },
+			fontBackgroundColor: { colors, columns: 14 },
+			fontColor: { colors, columns: 14 },
 			image: { toolbar: [ 'imageTextAlternative' ] },
 			mediaEmbed: { previewsInData: true },
 		};
