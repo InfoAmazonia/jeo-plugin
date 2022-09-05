@@ -1,4 +1,6 @@
 site_name: JEO
 nav:
   - 'Home': index.md
+  - 'Home': index-plugin.md
+
 theme: readthedocs
