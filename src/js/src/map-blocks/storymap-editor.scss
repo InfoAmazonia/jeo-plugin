@@ -22,6 +22,8 @@
 		.story-settings, .slides-settings {
 			.ck-color-grid {
 				--ck-color-grid-tile-size: 18px;
+				max-height: 250px;
+				overflow: hidden auto;
 			}
 		}
 
