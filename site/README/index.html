@@ -8,7 +8,7 @@
   
   
   <link rel="shortcut icon" href="../img/favicon.ico">
-  <title>Layer post - JEO</title>
+  <title>README - JEO</title>
   <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
 
   <link rel="stylesheet" href="../css/theme.css" type="text/css" />
@@ -17,9 +17,9 @@
   
   <script>
     // Current page data
-    var mkdocs_page_name = "Layer post";
-    var mkdocs_page_input_path = "layer-post.md";
-    var mkdocs_page_url = "/layer-post/";
+    var mkdocs_page_name = "README";
+    var mkdocs_page_input_path = "README.md";
+    var mkdocs_page_url = "/README/";
   </script>
   
   <script src="../js/jquery-2.1.1.min.js"></script>
@@ -52,9 +52,27 @@
     <a class="" href="..">Home</a>
 	    </li>
           
-            <li class="toctree-l1">
+            <li class="toctree-l1 current">
 		
-    <a class="" href="../README/">README</a>
+    <a class="current" href="./">README</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l2"><a href="#jeo-wordpress-theme">JEO WordPress Theme</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l3" href="#get-started">Get Started</a></li>
+        
+            <li><a class="toctree-l3" href="#features">Features</a></li>
+        
+            <li><a class="toctree-l3" href="#user-tutorials">User tutorials</a></li>
+        
+            <li><a class="toctree-l3" href="#developer-documentation">Developer documentation</a></li>
+        
+        </ul>
+    
+
+    </ul>
 	    </li>
           
             <li class="toctree-l1">
@@ -87,27 +105,9 @@
     <a class="" href="../index-plugin/">Index plugin</a>
 	    </li>
           
-            <li class="toctree-l1 current">
+            <li class="toctree-l1">
 		
-    <a class="current" href="./">Layer post</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l2"><a href="#creating-a-layer">Creating a layer</a></li>
-    
-        <ul>
-        
-            <li><a class="toctree-l3" href="#layer-settings">Layer settings</a></li>
-        
-            <li><a class="toctree-l3" href="#layer-legend">Layer legend</a></li>
-        
-            <li><a class="toctree-l3" href="#creating-a-carto-integrated-layer">Creating a Carto integrated Layer</a></li>
-        
-            <li><a class="toctree-l3" href="#attributions">Attributions</a></li>
-        
-        </ul>
-    
-
-    </ul>
+    <a class="" href="../layer-post/">Layer post</a>
 	    </li>
           
             <li class="toctree-l1">
@@ -189,7 +189,7 @@
     
       
     
-    <li>Layer post</li>
+    <li>README</li>
     <li class="wy-breadcrumbs-aside">
       
     </li>
@@ -199,43 +199,64 @@
           <div role="main">
             <div class="section">
               
-                <h1 id="creating-a-layer">Creating a layer</h1>
-<p>One of the custom post types that JEO plugin provides is <strong>Layer</strong>. Is in the layer where you will be able to add legend and color to your map. A map may contain one or more layers.</p>
-<p><img alt="Post Type Layers" src="../img/post-type-layers.png" /></p>
-<p>Entering the Layer post editor, you'll see a preview of the current layer (or a default layer if the current layer haven't been edited yet) and four sidebar panels: <strong>Settings</strong>, <strong>Carto Integration</strong>, <strong>Attributions</strong> and <strong>Legend</strong>.</p>
-<p><img alt="Layer Sidebar" src="../img/layer-sidebar.png" /></p>
-<h2 id="layer-settings">Layer settings</h2>
-<p>On the <strong>Layer settings</strong> panel, you can change the layer type.</p>
-<p>JEO supports four layer types out-of-the-box:</p>
+                <h1 id="jeo-wordpress-theme">JEO WordPress Theme</h1>
+<p>JEO WordPress Theme acts as a geojournalism platform which allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is much more intuitive and interactive. The theme is ready for multilingual content and facilitates the publishing tasks.</p>
+<p>You can post geotagged stories and create richly designed pages for each one of the featured stories. At same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without loosing perfomance, add legends directly with HTML and set the map paramethers. All direct at the WordPress dashboard.</p>
+<p>JEO wants to help journalists and NGOs to improve storytelling with maps. Creating a child theme with all its functionality is easy since it contains all the necessary hooks to customize layouts and data visualization.</p>
+<h3 id="get-started"><a href="">Get Started</a></h3>
+<h2 id="features">Features</h2>
 <ul>
-<li><a href="https://docs.mapbox.com/studio-manual/overview/map-styling/">Mapbox styles</a></li>
-<li><a href="https://docs.mapbox.com/help/glossary/tileset/">Mapbox tilesets</a></li>
-<li><a href="https://docs.mapbox.com/vector-tiles/reference/">Mapbox vector tiles</a> (MVTs)</li>
-<li><a href="https://en.wikipedia.org/wiki/Tiled_web_map">TileLayers</a></li>
+<li>Leaflet map library</li>
+<li>Custom tile layers</li>
+<li><a href="http://mapbox.com/">MapBox</a> maps</li>
+<li><a href="http://cartodb.com/">CartoDB</a> maps</li>
+<li>Layer filtering options, allowing you to mix tile layer, MapBox and CartoDB.</li>
+<li>Geocoding WordPress posts using OpenStreetMaps or Google Maps supporting custom post types.</li>
+<li>Google Street View support for Google Maps geocoding.</li>
+<li>Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.</li>
+<li>Map markers query integrated to posts query.</li>
+<li>GeoJSON API (any content /?geojson gives the geojson output). E.g.: yourwebsite.com/category/one/?geojson</li>
+<li>Support <a href="https://wordpress.org/plugins/qtranslate/">qTranslate</a> multilanguage plugin</li>
 </ul>
-<p>You can also inform an address, following the standard <code>username/id</code>, to compose your map style. If an access token is needed for this layer, you can put it into the <code>Acess token</code> input.</p>
-<p><img alt="Layer settings" src="../img/layer-settings.png" /></p>
-<p>There's also an <strong>Edit interactions</strong> button. Here, you can add popups to your layer when specific actions (clicking or hovering the mouse) are made (e.g.: Clicking on a building and displaying its height)</p>
-<p><img alt="Layer interactions" src="../img/layer-interactions.png" /></p>
-<h2 id="layer-legend">Layer legend</h2>
-<p>On the <strong>Layer legend</strong> panel, you can add legends to your layer (barscale, simple-color, icons or circles and colorize them.</p>
-<p><img alt="Layer legend" src="../img/layer-legend.png" /></p>
-<h2 id="creating-a-carto-integrated-layer">Creating a Carto integrated Layer</h2>
-<p>When the checkbox <code>Use integration</code> is selected, the following field shows up: </p>
+<h2 id="user-tutorials">User tutorials</h2>
 <ul>
-<li>SQL Query: Code that'll be used to retrieve layer data from Carto.</li>
+<li>
+<p><strong>Layers</strong></p>
+</li>
+<li>
+<p><a href="">Creating a layer</a></p>
+</li>
+<li>
+<p><strong>Maps</strong></p>
+</li>
+<li>
+<p><a href="creating-maps.md">Creating maps</a></p>
+</li>
+<li>
+<p><a href="">Editing map layers</a></p>
+</li>
+<li>
+<p><strong>Posts</strong></p>
+</li>
+<li>
+<p><a href="../geolocating-posts/">Geolocating posts</a></p>
+</li>
 </ul>
-<p>To get this SQL Query, go to your Carto Dashboard page and click on the map which has the layer to be used in the plugin.</p>
-<p>Inside the map page, a layer list will be shown.</p>
-<p>Select a layer and go to Data tab. At the sidebar's bottom, change from <code>Values</code> to <code>SQL</code>. The code that will be shown is the SQL Query.</p>
-<p><img alt="Carto Layer Settings" src="../img/carto-layer-settings.png" />
-<img alt="Carto Layer Settings" src="../img/carto-layer-settings2.png" />
-<img alt="Carto Layer Settings" src="../img/carto-layer-settings3.png" />
-<img alt="Carto Layer Settings" src="../img/carto-layer-settings4.png" />
-<img alt="Carto Layer Settings" src="../img/carto-layer-settings5.png" />
-<img alt="Carto Layer Settings" src="../img/carto-layer-settings6.png" /></p>
-<h2 id="attributions">Attributions</h2>
-<p>Here is where you can give layer credits, setting a link to download it or access more information about it. These attributions will be shown on the bottom of the map and inside the popup that shows up when the <code>INFO</code> button is clicked in a map.</p>
+<h2 id="developer-documentation">Developer documentation</h2>
+<h3 id="tutorials">Tutorials</h3>
+<ul>
+<li><a href="layer-types.md">Adding new Layer Types</a></li>
+<li><a href="geo-information.md">Geographical Information of a post</a></li>
+<li><a href="geocoders.md">Writing a Geocoder</a></li>
+</ul>
+<h3 id="features_1">Features</h3>
+<ul>
+<li><a href="../map-shortcode/">Map Shortcode</a></li>
+</ul>
+<h3 id="differences-between-the-old-and-the-present-jeo">Differences between the old and the present JEO</h3>
+<ul>
+<li><a href="migration.md">Migration</a></li>
+</ul>
               
             </div>
           </div>
@@ -243,10 +264,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../map-block/" class="btn btn-neutral float-right" title="Map block">Next <span class="icon icon-circle-arrow-right"></span></a>
+        <a href="../carto/" class="btn btn-neutral float-right" title="Carto">Next <span class="icon icon-circle-arrow-right"></span></a>
       
       
-        <a href="../index-plugin/" class="btn btn-neutral" title="Index plugin"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href=".." class="btn btn-neutral" title="Home"><span class="icon icon-circle-arrow-left"></span> Previous</a>
       
     </div>
   
@@ -272,10 +293,10 @@
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
-        <span><a href="../index-plugin/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
-        <span style="margin-left: 15px"><a href="../map-block/" style="color: #fcfcfc">Next &raquo;</a></span>
+        <span style="margin-left: 15px"><a href="../carto/" style="color: #fcfcfc">Next &raquo;</a></span>
       
     </span>
 </div>
