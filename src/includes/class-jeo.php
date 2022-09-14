@@ -296,7 +296,6 @@ class Jeo {
 	}
 
 	public function filter_rest_query_by_zone($args, $request) {
-		error_log("hsaduashduashdus");
 		$args['suppress_filters'] = true;
 		return $args;
 	}
