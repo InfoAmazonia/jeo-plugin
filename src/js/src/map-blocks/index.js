@@ -157,8 +157,6 @@ const storyMapCleanUp = (props) => {
 		postID: null,
 	};
 
-	// console.log(propsCopy);
-
 	for (const key in attributesStructure) {
 		if(propsCopy.attributes[key]) {
 			attributesStructure[key] = propsCopy.attributes[key];
@@ -168,10 +166,7 @@ const storyMapCleanUp = (props) => {
 	function removeYoastTagsFromObject(object) {
 		if( object && object.hasOwnProperty('yoast_head') ) {
 			delete object.yoast_head;
-			return true;
 		}
-
-		return false;
 	}
 
 	attributesStructure.navigateMapLayers.forEach( item => {
@@ -191,7 +186,7 @@ const storyMapCleanUp = (props) => {
 		} )
 	})
 
-	// Loaded layers isn't used propperly.
+	// Loaded layers aren't used properly
 	attributesStructure.loadedLayers = [];
 
 	return attributesStructure;
