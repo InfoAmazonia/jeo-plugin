@@ -7,15 +7,17 @@
 		exit();
 	}
 ?>
+<!DOCTYPE html>
 <html style="margin: 0px !important;">
-
 	<head>
+		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title><?= get_the_title( $storymap_id ) ?> </title>
 		<?php wp_head(); ?>
 	</head>
 
 <body style="margin: 0px !important; padding: 0!important" class="single-storymap">
+<?php wp_body_open(); ?>
 
 <div id="embed-container">
     <div id="page" class="site">
@@ -33,7 +35,6 @@
 				</a>
 			</div>
 	<?php endif; ?>
-
 
 </div>
 <?php wp_footer(); ?>

@@ -6,16 +6,18 @@
 		exit();
 	}
 ?>
+<!DOCTYPE html>
 <html style="margin: 0px !important;">
 
 	<head>
+		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<title><?= get_the_title( $map_id ) ?> </title>
 		<?php wp_head(); ?>
 	</head>
 
-<body style="margin: 0px !important; padding: 0!important">
-
+<body style="margin: 0px !important; padding: 0 !important; overflow: hidden">
+<?php wp_body_open(); ?>
 <div id="embed-container" style="<?php echo esc_html( $container_style ); ?>">
 	<div class="jeomap map_id_<?php echo esc_html( $map_id ); ?>" data-embed="true" data-options='{"marker_action": "embed_preview"}' style="<?php echo esc_html( $map_style ); ?>"></div>
 
@@ -32,7 +34,6 @@
 				</a>
 			</div>
 	<?php endif; ?>
-
 
 </div>
 <?php wp_footer(); ?>
