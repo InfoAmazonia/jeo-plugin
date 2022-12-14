@@ -9,21 +9,22 @@
   
   <link rel="shortcut icon" href="../../img/favicon.ico">
   <title>Migration - JEO</title>
+  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
+
   <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css">
+  <link rel="stylesheet" href="../../css/highlight.css">
   
   <script>
     // Current page data
     var mkdocs_page_name = "Migration";
     var mkdocs_page_input_path = "dev/migration.md";
-    var mkdocs_page_url = null;
+    var mkdocs_page_url = "/dev/migration/";
   </script>
   
-  <script src="../../js/jquery-2.1.1.min.js" defer></script>
-  <script src="../../js/modernizr-2.8.3.min.js" defer></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
-  <script>hljs.initHighlightingOnLoad();</script> 
+  <script src="../../js/jquery-2.1.1.min.js"></script>
+  <script src="../../js/modernizr-2.8.3.min.js"></script>
+  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
   
 </head>
 
@@ -37,7 +38,7 @@
         <a href="../.." class="icon icon-home"> JEO</a>
         <div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+    <input type="text" name="q" placeholder="Search docs" />
   </form>
 </div>
       </div>
@@ -49,6 +50,115 @@
             <li class="toctree-l1">
 		
     <a class="" href="../..">Home</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../README/">README</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../carto/">Carto</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../concepts/">Concepts</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../discovery/">Discovery</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../geolocating-posts/">Geolocating posts</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../getting-started/">Getting started</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../index-plugin/">Index plugin</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../layer-post/">Layer post</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../map-block/">Map block</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../map-embed/">Map embed</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../map-post/">Map post</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../map-shortcode/">Map shortcode</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../one-time-map-block/">One time map block</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <a class="" href="../../story-map/">Story map</a>
+	    </li>
+          
+            <li class="toctree-l1">
+		
+    <span class="caption-text">Dev</span>
+    <ul class="subnav">
+                <li class="">
+                    
+    <a class="" href="../geo-information/">Geo information</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../geocoders/">Geocoders</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../layer-types-api/">Layer types api</a>
+                </li>
+                <li class="">
+                    
+    <a class="" href="../layer-types/">Layer types</a>
+                </li>
+                <li class=" current">
+                    
+    <a class="current" href="./">Migration</a>
+    <ul class="subnav">
+            
+    <li class="toctree-l3"><a href="#migration">Migration</a></li>
+    
+        <ul>
+        
+            <li><a class="toctree-l4" href="#geocode-post_meta">Geocode post_meta</a></li>
+        
+        </ul>
+    
+
+    </ul>
+                </li>
+    </ul>
 	    </li>
           
         </ul>
@@ -71,6 +181,10 @@
   <ul class="wy-breadcrumbs">
     <li><a href="../..">Docs</a> &raquo;</li>
     
+      
+        
+          <li>Dev &raquo;</li>
+        
       
     
     <li>Migration</li>
@@ -101,6 +215,13 @@
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../layer-types/" class="btn btn-neutral" title="Layer types"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
@@ -111,24 +232,24 @@
 
   Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-      
+	  
         </div>
       </div>
 
     </section>
-
+    
   </div>
 
   <div class="rst-versions" role="note" style="cursor: pointer">
     <span class="rst-current-version" data-toggle="rst-current-version">
       
       
+        <span><a href="../layer-types/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
       
     </span>
 </div>
-    <script>var base_url = '../..';</script>
-    <script src="../../js/theme.js" defer></script>
-      <script src="../../search/main.js" defer></script>
+    <script src="../../js/theme.js"></script>
 
 </body>
 </html>

@@ -112,10 +112,10 @@ class Geocode_Handler {
 							'schema' => array(
 								'properties'           => array(
 									'_geocode_lat' => [
-										'type' => 'float'
+										'type' => 'number'
 									],
 									'_geocode_lon' => [
-										'type' => 'float'
+										'type' => 'number'
 									],
 									'_geocode_city_level_1' => [
 										'type' => 'string'
@@ -160,9 +160,9 @@ class Geocode_Handler {
 					'type' => 'object',
 					'description' => __('Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo')
 				]);
-		
+
 				foreach ( ['p', 's']  as $relevance ) {
-		
+
 					register_post_meta('post', '_geocode_lat_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -172,7 +172,7 @@ class Geocode_Handler {
 						'type' => 'number',
 						'description' => __('Latitude', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_lon_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -182,7 +182,7 @@ class Geocode_Handler {
 						'type' => 'number',
 						'description' => __('Longitude', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_country_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -192,7 +192,7 @@ class Geocode_Handler {
 						'type' => 'string',
 						'description' => __('Country', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_country_code_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -202,7 +202,7 @@ class Geocode_Handler {
 						'type' => 'string',
 						'description' => __('Country code', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_region_level_1_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -212,7 +212,7 @@ class Geocode_Handler {
 						'type' => 'string',
 						'description' => __('Region level 1', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_region_level_2_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -222,7 +222,7 @@ class Geocode_Handler {
 						'type' => 'string',
 						'description' => __('Region level 2', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_region_level_3_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -232,7 +232,7 @@ class Geocode_Handler {
 						'type' => 'string',
 						'description' => __('Region level 3', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_city_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -242,7 +242,7 @@ class Geocode_Handler {
 						'type' => 'string',
 						'description' => __('City', 'jeo')
 					]);
-		
+
 					register_post_meta('post', '_geocode_city_level_1_' . $relevance, [
 						'show_in_rest' => false,
 						'single' => false,
@@ -252,7 +252,7 @@ class Geocode_Handler {
 						'type' => 'string',
 						'description' => __('City sub-level 1', 'jeo')
 					]);
-		
+
 			}
 		}
 

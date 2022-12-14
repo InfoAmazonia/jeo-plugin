@@ -221,6 +221,17 @@ class Jeo {
 		return $this->story_map_dynamic_render_callback( $block_attributes, json_encode( $story_block['attrs'] ) );
 	}
 
+	private function cleanup_layers ($layers) {
+		foreach ($layers as $layer) {
+			if (property_exists($layer, 'yoast_head')) {
+				unset($layer->yoast_head);
+			}
+			if (property_exists($layer, 'yoast_head_json')) {
+				unset($layer->yoast_head_json);
+			}
+		}
+	}
+
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
 		$saved_data = json_decode($content);
 
@@ -266,6 +277,7 @@ class Jeo {
 			}
 
 			$slide->selectedLayers = $selected_layers_order;
+			$this->cleanup_layers($slide->selectedLayers);
 		}
 
 		// Remove not present layers from navigateMapLayers and create new order
@@ -285,7 +297,8 @@ class Jeo {
 		}
 
 		$saved_data->navigateMapLayers = $final_navigate_map_layers;
-
+		$this->cleanup_layers($saved_data->navigateMapLayers);
+		$this->cleanup_layers($saved_data->loadedLayers);
 
 		// Option `use_smilies` breaks returned HTML :'-(
 		add_filter('option_use_smilies', function ($value) {
@@ -296,7 +309,6 @@ class Jeo {
 	}
 
 	public function filter_rest_query_by_zone($args, $request) {
-		error_log("hsaduashduashdus");
 		$args['suppress_filters'] = true;
 		return $args;
 	}

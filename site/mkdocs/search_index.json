@@ -1,0 +1,594 @@
+{
+    "docs": [
+        {
+            "location": "/",
+            "text": "The JEO WordPress geojournalism platform allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is intuitive and interactive.\n\n\nJEO WordPress Plugin\n\n\nFeatures:\n\n\n\n\nMapBox\n maps\n\n\nReactMapBoxGL\n library\n\n\nCustom tile layers\n\n\nLayer filtering options, allowing you to mix tile layer.\n\n\nGeocoding WordPress posts using OpenStreetMaps (Nominatim), suporting the post type \nPost\n.\n\n\nCustomizable marker icons that can be associated to categories, custom taxonomies or posts directly.\n\n\nMap markers query integrated to posts query.\n\n\nSupport \nWPML\n and \nPolylang\n multilanguages plugins\n\n\n\n\nProjects using JEO:\n\n\n\n\nPlenamata\n\n\nInfoAmazonia\n\n\nPasifika EnviroNews\n\n\nEkuatorial\n\n\nMekongEye\n\n\nCaci\n\n\n\n\nRead documentation\n or \nSee in Wordpress store\n\n\nJEO WordPress Theme\n\n\nRead the documentation",
+            "title": "Home"
+        },
+        {
+            "location": "/#jeo-wordpress-plugin",
+            "text": "Features:   MapBox  maps  ReactMapBoxGL  library  Custom tile layers  Layer filtering options, allowing you to mix tile layer.  Geocoding WordPress posts using OpenStreetMaps (Nominatim), suporting the post type  Post .  Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.  Map markers query integrated to posts query.  Support  WPML  and  Polylang  multilanguages plugins   Projects using JEO:   Plenamata  InfoAmazonia  Pasifika EnviroNews  Ekuatorial  MekongEye  Caci   Read documentation  or  See in Wordpress store",
+            "title": "JEO WordPress Plugin"
+        },
+        {
+            "location": "/#jeo-wordpress-theme",
+            "text": "Read the documentation",
+            "title": "JEO WordPress Theme"
+        },
+        {
+            "location": "/README/",
+            "text": "JEO WordPress Theme\n\n\nJEO WordPress Theme acts as a geojournalism platform which allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is much more intuitive and interactive. The theme is ready for multilingual content and facilitates the publishing tasks.\n\n\nYou can post geotagged stories and create richly designed pages for each one of the featured stories. At same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without loosing perfomance, add legends directly with HTML and set the map paramethers. All direct at the WordPress dashboard.\n\n\nJEO wants to help journalists and NGOs to improve storytelling with maps. Creating a child theme with all its functionality is easy since it contains all the necessary hooks to customize layouts and data visualization.\n\n\nGet Started\n\n\nFeatures\n\n\n\n\nLeaflet map library\n\n\nCustom tile layers\n\n\nMapBox\n maps\n\n\nCartoDB\n maps\n\n\nLayer filtering options, allowing you to mix tile layer, MapBox and CartoDB.\n\n\nGeocoding WordPress posts using OpenStreetMaps or Google Maps supporting custom post types.\n\n\nGoogle Street View support for Google Maps geocoding.\n\n\nCustomizable marker icons that can be associated to categories, custom taxonomies or posts directly.\n\n\nMap markers query integrated to posts query.\n\n\nGeoJSON API (any content /?geojson gives the geojson output). E.g.: yourwebsite.com/category/one/?geojson\n\n\nSupport \nqTranslate\n multilanguage plugin\n\n\n\n\nUser tutorials\n\n\n\n\n\n\nLayers\n\n\n\n\n\n\nCreating a layer\n\n\n\n\n\n\nMaps\n\n\n\n\n\n\nCreating maps\n\n\n\n\n\n\nEditing map layers\n\n\n\n\n\n\nPosts\n\n\n\n\n\n\nGeolocating posts\n\n\n\n\n\n\nDeveloper documentation\n\n\nTutorials\n\n\n\n\nAdding new Layer Types\n\n\nGeographical Information of a post\n\n\nWriting a Geocoder\n\n\n\n\nFeatures\n\n\n\n\nMap Shortcode\n\n\n\n\nDifferences between the old and the present JEO\n\n\n\n\nMigration",
+            "title": "README"
+        },
+        {
+            "location": "/README/#jeo-wordpress-theme",
+            "text": "JEO WordPress Theme acts as a geojournalism platform which allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is much more intuitive and interactive. The theme is ready for multilingual content and facilitates the publishing tasks.  You can post geotagged stories and create richly designed pages for each one of the featured stories. At same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without loosing perfomance, add legends directly with HTML and set the map paramethers. All direct at the WordPress dashboard.  JEO wants to help journalists and NGOs to improve storytelling with maps. Creating a child theme with all its functionality is easy since it contains all the necessary hooks to customize layouts and data visualization.",
+            "title": "JEO WordPress Theme"
+        },
+        {
+            "location": "/README/#get-started",
+            "text": "",
+            "title": "Get Started"
+        },
+        {
+            "location": "/README/#features",
+            "text": "Leaflet map library  Custom tile layers  MapBox  maps  CartoDB  maps  Layer filtering options, allowing you to mix tile layer, MapBox and CartoDB.  Geocoding WordPress posts using OpenStreetMaps or Google Maps supporting custom post types.  Google Street View support for Google Maps geocoding.  Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.  Map markers query integrated to posts query.  GeoJSON API (any content /?geojson gives the geojson output). E.g.: yourwebsite.com/category/one/?geojson  Support  qTranslate  multilanguage plugin",
+            "title": "Features"
+        },
+        {
+            "location": "/README/#user-tutorials",
+            "text": "Layers    Creating a layer    Maps    Creating maps    Editing map layers    Posts    Geolocating posts",
+            "title": "User tutorials"
+        },
+        {
+            "location": "/README/#developer-documentation",
+            "text": "",
+            "title": "Developer documentation"
+        },
+        {
+            "location": "/README/#tutorials",
+            "text": "Adding new Layer Types  Geographical Information of a post  Writing a Geocoder",
+            "title": "Tutorials"
+        },
+        {
+            "location": "/README/#features_1",
+            "text": "Map Shortcode",
+            "title": "Features"
+        },
+        {
+            "location": "/README/#differences-between-the-old-and-the-present-jeo",
+            "text": "Migration",
+            "title": "Differences between the old and the present JEO"
+        },
+        {
+            "location": "/carto/",
+            "text": "Create an association with Carto dataset (dynamic) and Mapbox tileset (static)\n\n\nUser process:\n\n\n\n\nConfigure API keys / Access token / Usernames (JEO -> Settings)\n\n\nCreate a layer (see: \nCreating layers\n): \n\n\nThis will generate a tileset on mapbox. \n\n\nThe generated titeset will replace current layer settings.\n\n\nUser goes to mapbox editor and uses the automatically generated titleset to build the layers/map/style/interations\n\n\nCreate a new layer inside plugin using the previously built layer (this layer usually is an mapbox style, not the tileset layer itself, since tileset dosen't have any styles)\n\n\nNew layer can now be used inside the JEO MAPS\n\n\nWP-cron task will update all tilesets daily.\n\n\n\n\nIntegrated layer creation process:\n\n\n\n\nCreate new layer (JEO -> Layers -> Add new)\n\n\nCheck \"Use integration\" box located at the right sidebar\n\n\nAdd reference SQL query\n\n\nClick \"Syncronize\"\n\n\nAccept the risks of getting the current layer overwritten\n\n\nWait until the process is complete and check the \"Setting\" tab\n\n\nThe \"Settings\" tab gets the new generated tileset settings (you can check mapbox studio tilesets and your automated tileset should be there.\n\n\nSave\n\n\n\n\nIntegration structural information:\n\n\n\n\nmap_layer (post_type): \n    metas: { ...base_metas: object, use_carto_integration: bool, sql_query: string }\n\n\n\n\nBackstage Process:\n\n\n\n\nLayer post is created (see: Integrated layer creation process) - \"Syncronize\" calls endpoint \n/wp-json/carto_integrate\n (see: Endpoints specs)\n\n\nEndpoint work:\n\n\nFetch GeoJSON from Carto using \nsql_query\n (https://carto.com/developers/sql-api/reference/#tag/Single-SQL-Statement) - \nnetwork consumption may be noticed\n\n\nThe fetched GeoJSON is stored in memory for next step - \nmemory consumption may be noted during batch update\n\n\nRequest AWS S3 credentials for stating file (https://api.mapbox.com/uploads/v1/$username/credentials?access_token=$api_key)\n\n\nUploud file to S3  \n\n\nUploud staged file to Mapbox (https://api.mapbox.com/uploads/v1/$username?access_token=$api_key):\n\n\nthe response contains the tileset properties and uploud status;\n\n\n\n\n\n\nEndpoint responses success for step 1 \n\n\nFront-end will keep doing periodic request to check if the uploud is done (step 2) using  https://api.mapbox.com/uploads/v1/${owner}/${id}?access_token=${jeo_private_options.mapbox_private_key}\n\n\nCheck response \ncomplete\n? and then set layer settings using the response\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nEndpoint specs\n\n\n\n\n[ POST ] \n/wp-json/carto_integrate\n\n\nheaders:\n\n\nX-WP-Nonce: worpdress nonce (string),\n\n\nContent-Type: application/json (string)\n\n\n\n\n\n\nbody:\n\n\nsql_query: Carto query (string)\n\n\nIf those are passed will replace mapbox tileset (recurrente update):\n\n\ntileset: \ntileset.id\n or \nfalse\n, (string)\n\n\ntitle: \ntileset.name\n or \nfalse\n, (string)\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nImportant notices:\n\n\n\n\nServer consuption mostly depends on GeoJson size.\n\n\nIf the wp cron has a lot of tasks, it's important to keep in mind if those are not exeeding the server php maximum execution time. \n\n\nMapbox file uploud is async, but Carto SQL GeoJSON download and uploud to AWS S3 stage isn't.\n\n\nWP cron isn't like a OS cron. (https://developer.wordpress.org/plugins/cron/understanding-wp-cron-scheduling/)\n\n\nIf your site don't get many hits a better way to garantee the mapbox tilesets update is using a system cron to call wp cron. (https://developer.wordpress.org/plugins/cron/hooking-wp-cron-into-the-system-task-scheduler/)\n\n\nIf a sync is already made clicking at \"Syncronize\" button will overwrite the tileset (a new one will not be created).",
+            "title": "Carto"
+        },
+        {
+            "location": "/carto/#create-an-association-with-carto-dataset-dynamic-and-mapbox-tileset-static",
+            "text": "",
+            "title": "Create an association with Carto dataset (dynamic) and Mapbox tileset (static)"
+        },
+        {
+            "location": "/carto/#user-process",
+            "text": "Configure API keys / Access token / Usernames (JEO -> Settings)  Create a layer (see:  Creating layers ):   This will generate a tileset on mapbox.   The generated titeset will replace current layer settings.  User goes to mapbox editor and uses the automatically generated titleset to build the layers/map/style/interations  Create a new layer inside plugin using the previously built layer (this layer usually is an mapbox style, not the tileset layer itself, since tileset dosen't have any styles)  New layer can now be used inside the JEO MAPS  WP-cron task will update all tilesets daily.",
+            "title": "User process:"
+        },
+        {
+            "location": "/carto/#integrated-layer-creation-process",
+            "text": "Create new layer (JEO -> Layers -> Add new)  Check \"Use integration\" box located at the right sidebar  Add reference SQL query  Click \"Syncronize\"  Accept the risks of getting the current layer overwritten  Wait until the process is complete and check the \"Setting\" tab  The \"Settings\" tab gets the new generated tileset settings (you can check mapbox studio tilesets and your automated tileset should be there.  Save",
+            "title": "Integrated layer creation process:"
+        },
+        {
+            "location": "/carto/#integration-structural-information",
+            "text": "map_layer (post_type): \n    metas: { ...base_metas: object, use_carto_integration: bool, sql_query: string }",
+            "title": "Integration structural information:"
+        },
+        {
+            "location": "/carto/#backstage-process",
+            "text": "Layer post is created (see: Integrated layer creation process) - \"Syncronize\" calls endpoint  /wp-json/carto_integrate  (see: Endpoints specs)  Endpoint work:  Fetch GeoJSON from Carto using  sql_query  (https://carto.com/developers/sql-api/reference/#tag/Single-SQL-Statement) -  network consumption may be noticed  The fetched GeoJSON is stored in memory for next step -  memory consumption may be noted during batch update  Request AWS S3 credentials for stating file (https://api.mapbox.com/uploads/v1/$username/credentials?access_token=$api_key)  Uploud file to S3    Uploud staged file to Mapbox (https://api.mapbox.com/uploads/v1/$username?access_token=$api_key):  the response contains the tileset properties and uploud status;    Endpoint responses success for step 1   Front-end will keep doing periodic request to check if the uploud is done (step 2) using  https://api.mapbox.com/uploads/v1/${owner}/${id}?access_token=${jeo_private_options.mapbox_private_key}  Check response  complete ? and then set layer settings using the response",
+            "title": "Backstage Process:"
+        },
+        {
+            "location": "/carto/#endpoint-specs",
+            "text": "[ POST ]  /wp-json/carto_integrate  headers:  X-WP-Nonce: worpdress nonce (string),  Content-Type: application/json (string)    body:  sql_query: Carto query (string)  If those are passed will replace mapbox tileset (recurrente update):  tileset:  tileset.id  or  false , (string)  title:  tileset.name  or  false , (string)",
+            "title": "Endpoint specs"
+        },
+        {
+            "location": "/carto/#important-notices",
+            "text": "Server consuption mostly depends on GeoJson size.  If the wp cron has a lot of tasks, it's important to keep in mind if those are not exeeding the server php maximum execution time.   Mapbox file uploud is async, but Carto SQL GeoJSON download and uploud to AWS S3 stage isn't.  WP cron isn't like a OS cron. (https://developer.wordpress.org/plugins/cron/understanding-wp-cron-scheduling/)  If your site don't get many hits a better way to garantee the mapbox tilesets update is using a system cron to call wp cron. (https://developer.wordpress.org/plugins/cron/hooking-wp-cron-into-the-system-task-scheduler/)  If a sync is already made clicking at \"Syncronize\" button will overwrite the tileset (a new one will not be created).",
+            "title": "Important notices:"
+        },
+        {
+            "location": "/concepts/",
+            "text": "Concepts\n\n\nLayer\n\n\nA layer is the basic building block for map interactions. Each layer can have its legends, attributions, etc.\n\n\nJEO supports four layer types out-of-the-box:\n\n\n\n\nMapbox styles\n\n\nMapbox tilesets\n\n\nMapbox vector tiles\n (MVTs)\n\n\nTileLayers\n\n\n\n\nMap\n\n\nA map is composed of one or more layers and can be associated with related geolocated posts, that'll be rendered as markers on the map.\n\n\nA map post is used for reusable map interactions, that can be embedded in any post as a \nshortcode\n or \nGutenberg block\n.\n\n\nOne-time Map\n\n\nInstead of creating a reusable map any time you want to add a map interaction, you can create and configure an inline single-use map via the \nOne-Time Map block\n for Gutenberg.",
+            "title": "Concepts"
+        },
+        {
+            "location": "/concepts/#concepts",
+            "text": "",
+            "title": "Concepts"
+        },
+        {
+            "location": "/concepts/#layer",
+            "text": "A layer is the basic building block for map interactions. Each layer can have its legends, attributions, etc.  JEO supports four layer types out-of-the-box:   Mapbox styles  Mapbox tilesets  Mapbox vector tiles  (MVTs)  TileLayers",
+            "title": "Layer"
+        },
+        {
+            "location": "/concepts/#map",
+            "text": "A map is composed of one or more layers and can be associated with related geolocated posts, that'll be rendered as markers on the map.  A map post is used for reusable map interactions, that can be embedded in any post as a  shortcode  or  Gutenberg block .",
+            "title": "Map"
+        },
+        {
+            "location": "/concepts/#one-time-map",
+            "text": "Instead of creating a reusable map any time you want to add a map interaction, you can create and configure an inline single-use map via the  One-Time Map block  for Gutenberg.",
+            "title": "One-time Map"
+        },
+        {
+            "location": "/discovery/",
+            "text": "Discovery\n\n\nDiscovery page is an interactive map where the user can add layers, see stories based on published geolocated posts and share it's own customized map with others.\nDiscovery page has a left sidebar with two tabs: \nSTORIES\n and \nMAP LAYERS\n. You can hide this sidebar by clicking on the two left arrow icon, at the right of the sidebar.\n\n\nHow to create a Discovery page\n\n\nTo create a discovery page, you only need to create a normal Wordpress page and select \nDiscovery\n in the Model settings.\n\n\n\n\nAny content that is added to that page will be ignored and the page will only display the Discovery feature.\n\n\nStories\n\n\nStories are the geolocated posts that are shown on the map. Clicking on \nSHOW FILTERS\n allows you to filter these stories by date and tags. Below these filters, a list with the result will be shown. Each result is also a link to the story itself. Also, hovering the mouse on a map marker will highlight the related story int the left sidebar. In the same way, hovering the mouse on \nView in map\n text will highlight the map marker realted to it.\n\n\n\n\nMap Layers\n\n\nIn Map Layers tab you can search for maps and apply its layers to your interactive map. You can filter maps by name and select different layers from different maps. After selecting at least one layer from a map, you can click on \nClear\n to remove all the selected layers from this map before applying the changes. It is also possible to add all layers from a map with one single click when selecting \nApply\n next to a map result.\n\n\nAt the top of the sidebar, you will be able to see all the selected layers, allowing you to remove some of them. These layers always have a drag and drop function, so that you can re-order them. After reviewing these layers, you need to click on \nApply changes\n to show them on discovery map.\n\n\n\n\nSharing\n\n\nAt the right-top side of the map, there's a share button where you can share the content on \nTwitter\n, \nFacebook\n, \nE-mail\n or even generate a custom link for your map. Also, clicking on \nembed\n makes a popup appears with a HTML code to have your custom map embed into another website.",
+            "title": "Discovery"
+        },
+        {
+            "location": "/discovery/#discovery",
+            "text": "Discovery page is an interactive map where the user can add layers, see stories based on published geolocated posts and share it's own customized map with others.\nDiscovery page has a left sidebar with two tabs:  STORIES  and  MAP LAYERS . You can hide this sidebar by clicking on the two left arrow icon, at the right of the sidebar.",
+            "title": "Discovery"
+        },
+        {
+            "location": "/discovery/#how-to-create-a-discovery-page",
+            "text": "To create a discovery page, you only need to create a normal Wordpress page and select  Discovery  in the Model settings.   Any content that is added to that page will be ignored and the page will only display the Discovery feature.",
+            "title": "How to create a Discovery page"
+        },
+        {
+            "location": "/discovery/#stories",
+            "text": "Stories are the geolocated posts that are shown on the map. Clicking on  SHOW FILTERS  allows you to filter these stories by date and tags. Below these filters, a list with the result will be shown. Each result is also a link to the story itself. Also, hovering the mouse on a map marker will highlight the related story int the left sidebar. In the same way, hovering the mouse on  View in map  text will highlight the map marker realted to it.",
+            "title": "Stories"
+        },
+        {
+            "location": "/discovery/#map-layers",
+            "text": "In Map Layers tab you can search for maps and apply its layers to your interactive map. You can filter maps by name and select different layers from different maps. After selecting at least one layer from a map, you can click on  Clear  to remove all the selected layers from this map before applying the changes. It is also possible to add all layers from a map with one single click when selecting  Apply  next to a map result.  At the top of the sidebar, you will be able to see all the selected layers, allowing you to remove some of them. These layers always have a drag and drop function, so that you can re-order them. After reviewing these layers, you need to click on  Apply changes  to show them on discovery map.",
+            "title": "Map Layers"
+        },
+        {
+            "location": "/discovery/#sharing",
+            "text": "At the right-top side of the map, there's a share button where you can share the content on  Twitter ,  Facebook ,  E-mail  or even generate a custom link for your map. Also, clicking on  embed  makes a popup appears with a HTML code to have your custom map embed into another website.",
+            "title": "Sharing"
+        },
+        {
+            "location": "/geolocating-posts/",
+            "text": "Geolocating posts\n\n\nWhen editing a post, JEO will add an extra panel to the sidebar: \nGeolocation\n. Clicking on \nGeolocate this post\n, a popup will then be displayed.\n\n\n\n\nNew points can be added to the post by clicking on \nAdd new point\n button. You can search for a specific location in the search bar.\n\n\nIt's also possible to choose the relevance of each point, which is useful when you have more than one point.\n\n\nVisualizing a map with geolocated posts\n\n\nMap with geolocated posts contain markers on the localization of each post. Clicking on them will open a popup with its title and publication date. Clicking on the title will take you to the post itself.",
+            "title": "Geolocating posts"
+        },
+        {
+            "location": "/geolocating-posts/#geolocating-posts",
+            "text": "When editing a post, JEO will add an extra panel to the sidebar:  Geolocation . Clicking on  Geolocate this post , a popup will then be displayed.   New points can be added to the post by clicking on  Add new point  button. You can search for a specific location in the search bar.  It's also possible to choose the relevance of each point, which is useful when you have more than one point.",
+            "title": "Geolocating posts"
+        },
+        {
+            "location": "/geolocating-posts/#visualizing-a-map-with-geolocated-posts",
+            "text": "Map with geolocated posts contain markers on the localization of each post. Clicking on them will open a popup with its title and publication date. Clicking on the title will take you to the post itself.",
+            "title": "Visualizing a map with geolocated posts"
+        },
+        {
+            "location": "/getting-started/",
+            "text": "Getting started\n\n\nInstalling\n\n\nAfter activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the \nMaps\n, \nLayers\n and \nStory Maps\n post types, and the JEO settings menus.\n\n\nConfiguring the plugin\n\n\nUnder JEO main menu, at Jeo Settings page, you can configure:\n\n\n\n\nthe default latitude, longitude, and zoom for your maps;\n\n\nthe \nMapbox API settings\n and \nCarto API settings\n that'll be used by the plugin;\n\n\nthe update interval related to carto layers data (if carto layers are being used);\n\n\nthe geocoder that'll be used by the plugin -- currently only \nNominatim\n is available.7\n\n\nthe style of some functionalities of the plugin, such as fonts ans colors.",
+            "title": "Getting started"
+        },
+        {
+            "location": "/getting-started/#getting-started",
+            "text": "",
+            "title": "Getting started"
+        },
+        {
+            "location": "/getting-started/#installing",
+            "text": "After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the  Maps ,  Layers  and  Story Maps  post types, and the JEO settings menus.",
+            "title": "Installing"
+        },
+        {
+            "location": "/getting-started/#configuring-the-plugin",
+            "text": "Under JEO main menu, at Jeo Settings page, you can configure:   the default latitude, longitude, and zoom for your maps;  the  Mapbox API settings  and  Carto API settings  that'll be used by the plugin;  the update interval related to carto layers data (if carto layers are being used);  the geocoder that'll be used by the plugin -- currently only  Nominatim  is available.7  the style of some functionalities of the plugin, such as fonts ans colors.",
+            "title": "Configuring the plugin"
+        },
+        {
+            "location": "/index-plugin/",
+            "text": "JEO Plugin\n\n\nThe JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is intuitive and interactive.\n\n\nYou can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All direct at the WordPress dashboard.\n\n\nFeatures\n\n\n\n\nMapBox\n maps\n\n\nReactMapBoxGL\n library\n\n\nCustom tile layers\n\n\nLayer filtering options, allowing you to mix tile layer.\n\n\nGeocoding WordPress posts using OpenStreetMaps (Nominatim), suporting the post type \nPost\n.\n\n\nCustomizable marker icons that can be associated to categories, custom taxonomies or posts directly.\n\n\nMap markers query integrated to posts query.\n\n\nSupport \nWPML\n and \nPolylang\n multilanguages plugins\n\n\n\n\nUser tutorials\n\n\nGetting started\n\n\n\n\nConcepts\n\n\nInstalling and configuring the plugin\n\n\n\n\nLayers\n\n\n\n\nCreating layers\n\n\nCarto integration process\n\n\n\n\nMaps\n\n\n\n\nCreating maps\n\n\n\n\nDiscovery\n\n\n\n\nUsing discovery\n\n\n\n\nStory Map\n\n\n\n\nCreating and using Story Map\n\n\n\n\nPosts\n\n\n\n\nGeolocating posts\n\n\nUsing a map shortcode\n\n\nUsing a map block\n\n\nUsing an one-time map block\n\n\nUsing a map embed\n\n\n\n\nDeveloper documentation\n\n\nTutorials\n\n\n\n\nAdding new Layer Types\n\n\nGeographical Information of a post\n\n\nWriting a Geocoder\n\n\n\n\nDifferences between the old and the present JEO\n\n\n\n\nMigration",
+            "title": "Index plugin"
+        },
+        {
+            "location": "/index-plugin/#jeo-plugin",
+            "text": "The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is intuitive and interactive.  You can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All direct at the WordPress dashboard.",
+            "title": "JEO Plugin"
+        },
+        {
+            "location": "/index-plugin/#features",
+            "text": "MapBox  maps  ReactMapBoxGL  library  Custom tile layers  Layer filtering options, allowing you to mix tile layer.  Geocoding WordPress posts using OpenStreetMaps (Nominatim), suporting the post type  Post .  Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.  Map markers query integrated to posts query.  Support  WPML  and  Polylang  multilanguages plugins",
+            "title": "Features"
+        },
+        {
+            "location": "/index-plugin/#user-tutorials",
+            "text": "",
+            "title": "User tutorials"
+        },
+        {
+            "location": "/index-plugin/#getting-started",
+            "text": "Concepts  Installing and configuring the plugin",
+            "title": "Getting started"
+        },
+        {
+            "location": "/index-plugin/#layers",
+            "text": "Creating layers  Carto integration process",
+            "title": "Layers"
+        },
+        {
+            "location": "/index-plugin/#maps",
+            "text": "Creating maps",
+            "title": "Maps"
+        },
+        {
+            "location": "/index-plugin/#discovery",
+            "text": "Using discovery",
+            "title": "Discovery"
+        },
+        {
+            "location": "/index-plugin/#story-map",
+            "text": "Creating and using Story Map",
+            "title": "Story Map"
+        },
+        {
+            "location": "/index-plugin/#posts",
+            "text": "Geolocating posts  Using a map shortcode  Using a map block  Using an one-time map block  Using a map embed",
+            "title": "Posts"
+        },
+        {
+            "location": "/index-plugin/#developer-documentation",
+            "text": "",
+            "title": "Developer documentation"
+        },
+        {
+            "location": "/index-plugin/#tutorials",
+            "text": "Adding new Layer Types  Geographical Information of a post  Writing a Geocoder",
+            "title": "Tutorials"
+        },
+        {
+            "location": "/index-plugin/#differences-between-the-old-and-the-present-jeo",
+            "text": "Migration",
+            "title": "Differences between the old and the present JEO"
+        },
+        {
+            "location": "/layer-post/",
+            "text": "Creating a layer\n\n\nOne of the custom post types that JEO plugin provides is \nLayer\n. Is in the layer where you will be able to add legend and color to your map. A map may contain one or more layers.\n\n\n\n\nEntering the Layer post editor, you'll see a preview of the current layer (or a default layer if the current layer haven't been edited yet) and four sidebar panels: \nSettings\n, \nCarto Integration\n, \nAttributions\n and \nLegend\n.\n\n\n\n\nLayer settings\n\n\nOn the \nLayer settings\n panel, you can change the layer type.\n\n\nJEO supports four layer types out-of-the-box:\n\n\n\n\nMapbox styles\n\n\nMapbox tilesets\n\n\nMapbox vector tiles\n (MVTs)\n\n\nTileLayers\n\n\n\n\nYou can also inform an address, following the standard \nusername/id\n, to compose your map style. If an access token is needed for this layer, you can put it into the \nAcess token\n input.\n\n\n\n\nThere's also an \nEdit interactions\n button. Here, you can add popups to your layer when specific actions (clicking or hovering the mouse) are made (e.g.: Clicking on a building and displaying its height)\n\n\n\n\nLayer legend\n\n\nOn the \nLayer legend\n panel, you can add legends to your layer (barscale, simple-color, icons or circles and colorize them.\n\n\n\n\nCreating a Carto integrated Layer\n\n\nWhen the checkbox \nUse integration\n is selected, the following field shows up: \n\n\n\n\nSQL Query: Code that'll be used to retrieve layer data from Carto.\n\n\n\n\nTo get this SQL Query, go to your Carto Dashboard page and click on the map which has the layer to be used in the plugin.\n\n\nInside the map page, a layer list will be shown.\n\n\nSelect a layer and go to Data tab. At the sidebar's bottom, change from \nValues\n to \nSQL\n. The code that will be shown is the SQL Query.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nAttributions\n\n\nHere is where you can give layer credits, setting a link to download it or access more information about it. These attributions will be shown on the bottom of the map and inside the popup that shows up when the \nINFO\n button is clicked in a map.",
+            "title": "Layer post"
+        },
+        {
+            "location": "/layer-post/#creating-a-layer",
+            "text": "One of the custom post types that JEO plugin provides is  Layer . Is in the layer where you will be able to add legend and color to your map. A map may contain one or more layers.   Entering the Layer post editor, you'll see a preview of the current layer (or a default layer if the current layer haven't been edited yet) and four sidebar panels:  Settings ,  Carto Integration ,  Attributions  and  Legend .",
+            "title": "Creating a layer"
+        },
+        {
+            "location": "/layer-post/#layer-settings",
+            "text": "On the  Layer settings  panel, you can change the layer type.  JEO supports four layer types out-of-the-box:   Mapbox styles  Mapbox tilesets  Mapbox vector tiles  (MVTs)  TileLayers   You can also inform an address, following the standard  username/id , to compose your map style. If an access token is needed for this layer, you can put it into the  Acess token  input.   There's also an  Edit interactions  button. Here, you can add popups to your layer when specific actions (clicking or hovering the mouse) are made (e.g.: Clicking on a building and displaying its height)",
+            "title": "Layer settings"
+        },
+        {
+            "location": "/layer-post/#layer-legend",
+            "text": "On the  Layer legend  panel, you can add legends to your layer (barscale, simple-color, icons or circles and colorize them.",
+            "title": "Layer legend"
+        },
+        {
+            "location": "/layer-post/#creating-a-carto-integrated-layer",
+            "text": "When the checkbox  Use integration  is selected, the following field shows up:    SQL Query: Code that'll be used to retrieve layer data from Carto.   To get this SQL Query, go to your Carto Dashboard page and click on the map which has the layer to be used in the plugin.  Inside the map page, a layer list will be shown.  Select a layer and go to Data tab. At the sidebar's bottom, change from  Values  to  SQL . The code that will be shown is the SQL Query.",
+            "title": "Creating a Carto integrated Layer"
+        },
+        {
+            "location": "/layer-post/#attributions",
+            "text": "Here is where you can give layer credits, setting a link to download it or access more information about it. These attributions will be shown on the bottom of the map and inside the popup that shows up when the  INFO  button is clicked in a map.",
+            "title": "Attributions"
+        },
+        {
+            "location": "/map-block/",
+            "text": "Map block\n\n\nAfter \ncreating maps\n, it is possible to display them apart or inside a block. This functionality makes possible to group maps, increasing your post organization.\n\n\nDisplaying a map apart\n\n\nWhen creating a new post, note that is available a new block category: \nJEO\n.\n\n\n\n\nSelecting \nJEO Map\n block, you can search for any map you've created.\n\n\n\n\nWith a map selected, you are able to choose an optional alignment (\nLeft\n, \nRight\n, \nCentre\n, \nWide Width\n or \nFull Width\n). \nCentre\n is the standard alignment.\n\n\n\n\nLeft\n\n\n\n\nRight\n\n\n\n\nWide Width\n\n\n\n\nFull Width\n\n\n\n\nDisplaying grouped maps\n\n\nBesides the alignment option, there's also a group functionality available to arrange maps.\n\n\n\n\nVisualizing a map into a post\n\n\nIf your map has more than one layer, you can swap them and select which one do you want to see, depending on the map layer settings. \nCheck out more about map layers here",
+            "title": "Map block"
+        },
+        {
+            "location": "/map-block/#map-block",
+            "text": "After  creating maps , it is possible to display them apart or inside a block. This functionality makes possible to group maps, increasing your post organization.",
+            "title": "Map block"
+        },
+        {
+            "location": "/map-block/#displaying-a-map-apart",
+            "text": "When creating a new post, note that is available a new block category:  JEO .   Selecting  JEO Map  block, you can search for any map you've created.   With a map selected, you are able to choose an optional alignment ( Left ,  Right ,  Centre ,  Wide Width  or  Full Width ).  Centre  is the standard alignment.",
+            "title": "Displaying a map apart"
+        },
+        {
+            "location": "/map-block/#left",
+            "text": "",
+            "title": "Left"
+        },
+        {
+            "location": "/map-block/#right",
+            "text": "",
+            "title": "Right"
+        },
+        {
+            "location": "/map-block/#wide-width",
+            "text": "",
+            "title": "Wide Width"
+        },
+        {
+            "location": "/map-block/#full-width",
+            "text": "",
+            "title": "Full Width"
+        },
+        {
+            "location": "/map-block/#displaying-grouped-maps",
+            "text": "Besides the alignment option, there's also a group functionality available to arrange maps.",
+            "title": "Displaying grouped maps"
+        },
+        {
+            "location": "/map-block/#visualizing-a-map-into-a-post",
+            "text": "If your map has more than one layer, you can swap them and select which one do you want to see, depending on the map layer settings.  Check out more about map layers here",
+            "title": "Visualizing a map into a post"
+        },
+        {
+            "location": "/map-embed/",
+            "text": "Embedding a map\n\n\nJEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called \nEmbed map\n and it's very easy to be done.\n\n\nWhen editing a \nMap\n, one of the setting panels is \nStatus & Visibility\n. There you can find the \nembed URL\n of that specific map.\n\n\n\n\nCopying this link and pasting on the post editor will result on an embed map.\n\n\nWarning\n: If your post displays a \nNot Found\n error, do the following steps:\n\n\n\n\nGo to Wordpress Dashboard > Settings > Permalinks\n\n\nChange the Common Settings (you may change to a different setting and then change back to the original) and click on \nSave Changes\n\n\n\n\n\n\nNow you should be able to see the embed maps with no problems.",
+            "title": "Map embed"
+        },
+        {
+            "location": "/map-embed/#embedding-a-map",
+            "text": "JEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called  Embed map  and it's very easy to be done.  When editing a  Map , one of the setting panels is  Status & Visibility . There you can find the  embed URL  of that specific map.   Copying this link and pasting on the post editor will result on an embed map.  Warning : If your post displays a  Not Found  error, do the following steps:   Go to Wordpress Dashboard > Settings > Permalinks  Change the Common Settings (you may change to a different setting and then change back to the original) and click on  Save Changes    Now you should be able to see the embed maps with no problems.",
+            "title": "Embedding a map"
+        },
+        {
+            "location": "/map-post/",
+            "text": "Creating maps\n\n\nOne of the custom post types that JEO plugin provides is \nMap\n.\n\n\n\n\nEntering the Map post editor, you'll see a preview of the current map (or a default map, if no layers are selected) and three sidebar panels: \nMap settings\n, \nMap layers\n, and \nRelated posts\n.\n\n\n\n\nMap settings\n\n\nOn the \nMap settings\n panel, you can change the initial center of the map setting a latitude and longitude. You can also change the default zoom settings or even disable it.\n\n\n\n\nWhen visualizing a map in a post, clicking with right button of the mouse and dragging it makes the map rotate. Also, scrolling the mouse wheel changes the map zoom. Both of these options can be enabled or disabled with the checkboxes.\n\n\nMap layers\n\n\nOn the \nMap layers\n panel, you can visualize all the layers which are part of the map.\n\n\n\n\nClicking on the \nEdit layers settings\n, a popup will open. There, you can add, remove and rearrange layers, define their types and whether its legends will be shown on the map. Also, you can selec which specific interactions you want to work with this especific map by clicking on \nLoad interactions\n.\n\n\nA legend can be of one of these types:\n\n\n\n\nFixed\n: the layer will always be shown in the map;\n\n\nSwitchable\n: the layer visibility can be toggled on and off;\n\n\nSwappable\n: only one swappable layer can be visible at a time.\n\n\n\n\n\n\nCheckout how to create new layers here\n\n\nRelated posts\n\n\nOn the \nRelated posts\n panel, you can set which geolocated posts will be used as markers on the post. You can filter the posts by categories, tags, dates interval or, for advanced uses, meta queries using WordPress \npost_meta\n.",
+            "title": "Map post"
+        },
+        {
+            "location": "/map-post/#creating-maps",
+            "text": "One of the custom post types that JEO plugin provides is  Map .   Entering the Map post editor, you'll see a preview of the current map (or a default map, if no layers are selected) and three sidebar panels:  Map settings ,  Map layers , and  Related posts .",
+            "title": "Creating maps"
+        },
+        {
+            "location": "/map-post/#map-settings",
+            "text": "On the  Map settings  panel, you can change the initial center of the map setting a latitude and longitude. You can also change the default zoom settings or even disable it.   When visualizing a map in a post, clicking with right button of the mouse and dragging it makes the map rotate. Also, scrolling the mouse wheel changes the map zoom. Both of these options can be enabled or disabled with the checkboxes.",
+            "title": "Map settings"
+        },
+        {
+            "location": "/map-post/#map-layers",
+            "text": "On the  Map layers  panel, you can visualize all the layers which are part of the map.   Clicking on the  Edit layers settings , a popup will open. There, you can add, remove and rearrange layers, define their types and whether its legends will be shown on the map. Also, you can selec which specific interactions you want to work with this especific map by clicking on  Load interactions .  A legend can be of one of these types:   Fixed : the layer will always be shown in the map;  Switchable : the layer visibility can be toggled on and off;  Swappable : only one swappable layer can be visible at a time.    Checkout how to create new layers here",
+            "title": "Map layers"
+        },
+        {
+            "location": "/map-post/#related-posts",
+            "text": "On the  Related posts  panel, you can set which geolocated posts will be used as markers on the post. You can filter the posts by categories, tags, dates interval or, for advanced uses, meta queries using WordPress  post_meta .",
+            "title": "Related posts"
+        },
+        {
+            "location": "/map-shortcode/",
+            "text": "Map shortcode\n\n\nA map can be inserted on any page or post using the \njeo-map\n shortcode.\n\n\nThe shortcode accepts three attributes:\n\n\n\n\nmap_id\n (required): The ID of the map you want to insert;\n\n\nwidth\n (optional): The width of the map. It'll default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class;\n\n\nheight\n (optional): The height of the map. Will default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class.\n\n\n\n\nExamples:\n\n\n[jeo-map map_id=99]\n\n\n\n\nYou have to inform at least the ID of the Map you want to insert. By default, it will be inserted with a size of 600\u00d7600px (or whatever the active theme defines), but you can also change it:\n\n\n[jeo-map map_id=99 width=\"800px\" height=\"800px\"]",
+            "title": "Map shortcode"
+        },
+        {
+            "location": "/map-shortcode/#map-shortcode",
+            "text": "A map can be inserted on any page or post using the  jeo-map  shortcode.  The shortcode accepts three attributes:   map_id  (required): The ID of the map you want to insert;  width  (optional): The width of the map. It'll default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class;  height  (optional): The height of the map. Will default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class.   Examples:  [jeo-map map_id=99]  You have to inform at least the ID of the Map you want to insert. By default, it will be inserted with a size of 600\u00d7600px (or whatever the active theme defines), but you can also change it:  [jeo-map map_id=99 width=\"800px\" height=\"800px\"]",
+            "title": "Map shortcode"
+        },
+        {
+            "location": "/one-time-map-block/",
+            "text": "One-time map block\n\n\nIt is possible to use maps into posts without having to create a new map or using an existing one. For this, JEO plugin makes availabe another type of block: \nOne-time map\n.\n\n\nWhen creating a new post, note that is available a new block category: \nJEO\n.\n\n\n\n\nSelecting \nJEO One-time Map\n block, a standard map preview will appear. This type of map allow all the same customizations of a normal \nJEO Map\n, such as: modifying coordinates, zoom settings, related posts, alignment options and \nlayers settings\n. To know more precisely how to customize all these options, check out \nJEO Map\n page.",
+            "title": "One time map block"
+        },
+        {
+            "location": "/one-time-map-block/#one-time-map-block",
+            "text": "It is possible to use maps into posts without having to create a new map or using an existing one. For this, JEO plugin makes availabe another type of block:  One-time map .  When creating a new post, note that is available a new block category:  JEO .   Selecting  JEO One-time Map  block, a standard map preview will appear. This type of map allow all the same customizations of a normal  JEO Map , such as: modifying coordinates, zoom settings, related posts, alignment options and  layers settings . To know more precisely how to customize all these options, check out  JEO Map  page.",
+            "title": "One-time map block"
+        },
+        {
+            "location": "/story-map/",
+            "text": "Story Map\n\n\nStory Map is a way of making an interactive storytelling with customized maps and layers. You are able to select specific locations and related layers and texts to these locations. This will generate a map that, when the page is scrolled, will change from one location/layer/text to another. This group of location, layer and text are called \nSlide\n.\n\n\nCreating a Story Map\n\n\nStory Map is a custom post type in JEO Plugin. When creating one, you'll be asked for a map. All of the layers that you are going to use in your Story Map come from this previous selected map. Also, Story Map has a \nNavigate function\n, which we will talk about later. This Navigate function also uses this selected map to work.\n\n\n\n\nStory settings\n\n\nHere you can set a description for your story map which will be shown at the beginning of the post, with the title and publish date. You can also define whether or not your story map will have an introduction and a \nNavigate map button\n.\n\n\nAll the text fields has a buit-in Rich Text Editor. This means that you can put bold text, links, lists, etc inside your text field.\n\n\nNavigate map button\n appears at the end of a Story Map and allows the user to navigate through the map. This map will follow all the settings of the previous selected.\n\n\n\n\nSlides settings\n\n\nA Story Map slide contains a title, content, location and selected layers (The order of the layers will always follow the map layers order that were defined when creating this map). You can remove a slide by clicking on \nRemove\n button, preview the map in a slide clicking on \nPreview\n button, and set the location to the current slide clicking on \nLock current spot\n button. You can see what's the current slide at the top-right side of the block.\n\n\nYou can pick a location to a slide by dragging the map with left mouse button and changing its peaching and bearing by dragging the map with right mouse button.\n\n\n\n\n\n\nSlides can be rearranged by clicking on \n=\n icon and dragging it to put the slide in another position.\n\n\n\n\nLooking at a Story Map\n\n\nThis is how a Story Map look in a post:\n\n\n\n\nClicking on \nSTART\n will take the user to the first slide. Clicking on \nskip intro\n will take the user to the map itself so they can navigate through it (this button is only available if the navigate setting is enabled in story map settings). These buttons, the title, description and publish date only appears if \nShows story map introduction\n is enabled. If it isn't, the story map starts on the first slide.\n\n\n\n\nWhile the page is scrolled, the current slide changes to the next one and the map do a transition to the next location and change its layers. At the end of the storytelling, if the correct setting is enabled, a \nNAVIGATE THE MAP\n button will shows up. Clicking on it will take the user to the map itself and allowing they to interact with it.",
+            "title": "Story map"
+        },
+        {
+            "location": "/story-map/#story-map",
+            "text": "Story Map is a way of making an interactive storytelling with customized maps and layers. You are able to select specific locations and related layers and texts to these locations. This will generate a map that, when the page is scrolled, will change from one location/layer/text to another. This group of location, layer and text are called  Slide .",
+            "title": "Story Map"
+        },
+        {
+            "location": "/story-map/#creating-a-story-map",
+            "text": "Story Map is a custom post type in JEO Plugin. When creating one, you'll be asked for a map. All of the layers that you are going to use in your Story Map come from this previous selected map. Also, Story Map has a  Navigate function , which we will talk about later. This Navigate function also uses this selected map to work.",
+            "title": "Creating a Story Map"
+        },
+        {
+            "location": "/story-map/#story-settings",
+            "text": "Here you can set a description for your story map which will be shown at the beginning of the post, with the title and publish date. You can also define whether or not your story map will have an introduction and a  Navigate map button .  All the text fields has a buit-in Rich Text Editor. This means that you can put bold text, links, lists, etc inside your text field.  Navigate map button  appears at the end of a Story Map and allows the user to navigate through the map. This map will follow all the settings of the previous selected.",
+            "title": "Story settings"
+        },
+        {
+            "location": "/story-map/#slides-settings",
+            "text": "A Story Map slide contains a title, content, location and selected layers (The order of the layers will always follow the map layers order that were defined when creating this map). You can remove a slide by clicking on  Remove  button, preview the map in a slide clicking on  Preview  button, and set the location to the current slide clicking on  Lock current spot  button. You can see what's the current slide at the top-right side of the block.  You can pick a location to a slide by dragging the map with left mouse button and changing its peaching and bearing by dragging the map with right mouse button.    Slides can be rearranged by clicking on  =  icon and dragging it to put the slide in another position.",
+            "title": "Slides settings"
+        },
+        {
+            "location": "/story-map/#looking-at-a-story-map",
+            "text": "This is how a Story Map look in a post:   Clicking on  START  will take the user to the first slide. Clicking on  skip intro  will take the user to the map itself so they can navigate through it (this button is only available if the navigate setting is enabled in story map settings). These buttons, the title, description and publish date only appears if  Shows story map introduction  is enabled. If it isn't, the story map starts on the first slide.   While the page is scrolled, the current slide changes to the next one and the map do a transition to the next location and change its layers. At the end of the storytelling, if the correct setting is enabled, a  NAVIGATE THE MAP  button will shows up. Clicking on it will take the user to the map itself and allowing they to interact with it.",
+            "title": "Looking at a Story Map"
+        },
+        {
+            "location": "/dev/geo-information/",
+            "text": "Geographical Information of a post\n\n\nEach post can be related to one or more points on the map.\n\n\nFor each point, JEO collects geographical information such as city and country names. For complete information on this, see \nGeocoders\n.\n\n\nHow geographical information is stored\n\n\nEach related point is stored as one entry of the \n_related_point\n metadata key. Each entry is an object with all the information retrieved by the geocoder.\n\n\nHere is an example of two entries related to the same post, that could be get using:\n\n\nget_post_meta( $post_id, '_related_point' );\n\n\n\n\n'_related_point' => [\n    'relevance' => 'primary',\n    '_geocode_lat' => '-23,54659435',\n    '_geocode_lon' => '-46,644533061712',\n    '_geocode_full_address' => 'Edif\u00edcio Copan, Rua Ara\u00fajo, Vila Buarque, Rep\u00fablica, S\u00e3o Paulo, Regi\u00e3o Imediata de S\u00e3o Paulo, Regi\u00e3o Metropolitana de S\u00e3o Paulo, Regi\u00e3o Intermedi\u00e1ria de S\u00e3o Paulo, S\u00e3o Paulo, Regi\u00e3o Sudeste, 01046-010, Brasil',\n    '_geocode_country' => 'Brasil',\n    '_geocode_country_code' => '',\n    '_geocode_city' => 'S\u00e3o Paulo',\n    '_geocode_region_level_2' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3' => 'Regi\u00e3o Intermedi\u00e1ria de S\u00e3o Paulo',\n    '_geocode_city_level_1' => 'Vila Buarque',\n],\n'_related_point' => [\n    'relevance' => 'secondary',\n    '_geocode_lat' => '-23,183525102463',\n    '_geocode_lon' => '-46,898231506348',\n    '_geocode_full_address' => 'Rua Jorge Gebran, Parque do Col\u00e9gio, Ch\u00e1cara Urbana, Jundia\u00ed, Regi\u00e3o Imediata de Jundia\u00ed, Regi\u00e3o Intermedi\u00e1ria de Campinas, S\u00e3o Paulo, Regi\u00e3o Sudeste, 13209-090, Brasil',\n    '_geocode_country' => 'Brasil',\n    '_geocode_country_code' => '',\n    '_geocode_city' => 'Jundia\u00ed',\n    '_geocode_region_level_2' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3' => 'Regi\u00e3o Intermedi\u00e1ria de Campinas',\n    '_geocode_city_level_1' => 'Parque do Col\u00e9gio',\n]\n\n\n\n\nHow to search for posts by geoinformation? (indexes)\n\n\nWhen you save geographical information of the points, JEO also creates other metadata that will allow developers to query posts by specific geographical information.\n\n\nSince each point is stored as a serialized data in the database, this would not allow us to filter posts by \ncountry_code\n for example. That's why we create indexes.\n\n\nFor the example above, this post would also have one individual metadata entry for each information, like this:\n\n\n[\n    '_geocode_lat_p' => '-23,54659435',\n    '_geocode_lon_p' => '-46,644533061712',\n    '_geocode_country_p' => 'Brasil',\n    '_geocode_country_code_p' => '',\n    '_geocode_city_p' => 'S\u00e3o Paulo',\n    '_geocode_region_level_2_p' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3_p' => 'Regi\u00e3o Intermedi\u00e1ria de S\u00e3o Paulo',\n    '_geocode_city_level_1_p' => 'Vila Buarque',\n    '_geocode_lat_s' => '-23,183525102463',\n    '_geocode_lon_s' => '-46,898231506348',\n    '_geocode_country_s' => 'Brasil',\n    '_geocode_country_code_s' => '',\n    '_geocode_city_s' => 'Jundia\u00ed',\n    '_geocode_region_level_2_s' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3_s' => 'Regi\u00e3o Intermedi\u00e1ria de Campinas',\n    '_geocode_city_level_1_s' => 'Parque do Col\u00e9gio',\n]\n\n\n\n\nNote: \n_s\n and \n_p\n suffixes indicate if the relevance of that information is primary or secondary.\n\n\nNote 2: Full addresses are not indexed\n\n\nNow we have all the information as individual metadata and this allows me to query by them, however, the pairs are disconnected (if I had more than one primary point, it would be impossible to know what are the latitude-longitude pairs. That's why the information we actually use is the serialized object).\n\n\nFetching posts by geoinformation\n\n\nGive me all the posts that have primary points with the country code \n'BR'\n:\n\n\n$posts = new WP_Query([\n    'meta_query' => [\n        [\n            'key' => '_geocode_country_code_p',\n            'value' => 'BR'\n        ]\n    ]\n]);\n\n\n\n\nGive me all the posts whose city is \n'Manaus'\n:\n\n\n$posts = new WP_Query([\n    'meta_query' => [\n        [\n            'key' => '_geocode_city_s',\n            'value' => 'Manaus'\n        ],\n        [\n            'key' => '_geocode_city_p',\n            'value' => 'Manaus'\n        ],\n        'relation' => 'OR'\n    ]\n]);",
+            "title": "Geo information"
+        },
+        {
+            "location": "/dev/geo-information/#geographical-information-of-a-post",
+            "text": "Each post can be related to one or more points on the map.  For each point, JEO collects geographical information such as city and country names. For complete information on this, see  Geocoders .",
+            "title": "Geographical Information of a post"
+        },
+        {
+            "location": "/dev/geo-information/#how-geographical-information-is-stored",
+            "text": "Each related point is stored as one entry of the  _related_point  metadata key. Each entry is an object with all the information retrieved by the geocoder.  Here is an example of two entries related to the same post, that could be get using:  get_post_meta( $post_id, '_related_point' );  '_related_point' => [\n    'relevance' => 'primary',\n    '_geocode_lat' => '-23,54659435',\n    '_geocode_lon' => '-46,644533061712',\n    '_geocode_full_address' => 'Edif\u00edcio Copan, Rua Ara\u00fajo, Vila Buarque, Rep\u00fablica, S\u00e3o Paulo, Regi\u00e3o Imediata de S\u00e3o Paulo, Regi\u00e3o Metropolitana de S\u00e3o Paulo, Regi\u00e3o Intermedi\u00e1ria de S\u00e3o Paulo, S\u00e3o Paulo, Regi\u00e3o Sudeste, 01046-010, Brasil',\n    '_geocode_country' => 'Brasil',\n    '_geocode_country_code' => '',\n    '_geocode_city' => 'S\u00e3o Paulo',\n    '_geocode_region_level_2' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3' => 'Regi\u00e3o Intermedi\u00e1ria de S\u00e3o Paulo',\n    '_geocode_city_level_1' => 'Vila Buarque',\n],\n'_related_point' => [\n    'relevance' => 'secondary',\n    '_geocode_lat' => '-23,183525102463',\n    '_geocode_lon' => '-46,898231506348',\n    '_geocode_full_address' => 'Rua Jorge Gebran, Parque do Col\u00e9gio, Ch\u00e1cara Urbana, Jundia\u00ed, Regi\u00e3o Imediata de Jundia\u00ed, Regi\u00e3o Intermedi\u00e1ria de Campinas, S\u00e3o Paulo, Regi\u00e3o Sudeste, 13209-090, Brasil',\n    '_geocode_country' => 'Brasil',\n    '_geocode_country_code' => '',\n    '_geocode_city' => 'Jundia\u00ed',\n    '_geocode_region_level_2' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3' => 'Regi\u00e3o Intermedi\u00e1ria de Campinas',\n    '_geocode_city_level_1' => 'Parque do Col\u00e9gio',\n]",
+            "title": "How geographical information is stored"
+        },
+        {
+            "location": "/dev/geo-information/#how-to-search-for-posts-by-geoinformation-indexes",
+            "text": "When you save geographical information of the points, JEO also creates other metadata that will allow developers to query posts by specific geographical information.  Since each point is stored as a serialized data in the database, this would not allow us to filter posts by  country_code  for example. That's why we create indexes.  For the example above, this post would also have one individual metadata entry for each information, like this:  [\n    '_geocode_lat_p' => '-23,54659435',\n    '_geocode_lon_p' => '-46,644533061712',\n    '_geocode_country_p' => 'Brasil',\n    '_geocode_country_code_p' => '',\n    '_geocode_city_p' => 'S\u00e3o Paulo',\n    '_geocode_region_level_2_p' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3_p' => 'Regi\u00e3o Intermedi\u00e1ria de S\u00e3o Paulo',\n    '_geocode_city_level_1_p' => 'Vila Buarque',\n    '_geocode_lat_s' => '-23,183525102463',\n    '_geocode_lon_s' => '-46,898231506348',\n    '_geocode_country_s' => 'Brasil',\n    '_geocode_country_code_s' => '',\n    '_geocode_city_s' => 'Jundia\u00ed',\n    '_geocode_region_level_2_s' => 'S\u00e3o Paulo',\n    '_geocode_region_level_3_s' => 'Regi\u00e3o Intermedi\u00e1ria de Campinas',\n    '_geocode_city_level_1_s' => 'Parque do Col\u00e9gio',\n]  Note:  _s  and  _p  suffixes indicate if the relevance of that information is primary or secondary.  Note 2: Full addresses are not indexed  Now we have all the information as individual metadata and this allows me to query by them, however, the pairs are disconnected (if I had more than one primary point, it would be impossible to know what are the latitude-longitude pairs. That's why the information we actually use is the serialized object).",
+            "title": "How to search for posts by geoinformation? (indexes)"
+        },
+        {
+            "location": "/dev/geo-information/#fetching-posts-by-geoinformation",
+            "text": "Give me all the posts that have primary points with the country code  'BR' :  $posts = new WP_Query([\n    'meta_query' => [\n        [\n            'key' => '_geocode_country_code_p',\n            'value' => 'BR'\n        ]\n    ]\n]);  Give me all the posts whose city is  'Manaus' :  $posts = new WP_Query([\n    'meta_query' => [\n        [\n            'key' => '_geocode_city_s',\n            'value' => 'Manaus'\n        ],\n        [\n            'key' => '_geocode_city_p',\n            'value' => 'Manaus'\n        ],\n        'relation' => 'OR'\n    ]\n]);",
+            "title": "Fetching posts by geoinformation"
+        },
+        {
+            "location": "/dev/geocoders/",
+            "text": "Writing a Geocoder\n\n\nA Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on the geographical coordinates, which is called Reverse Geocoding.\n\n\nJEO needs a geocoder service in a few situations, such as when users indicate to where on a map a story (posts) is related.\n\n\nJEO comes with two native geocoder services users can choose from: Nominatim and Google. But new services can easily be added by plugins. This page documents how to do this.\n\n\nRegistering a Geocoder\n\n\nHook a function to the \njeo_register_geocoders\n action and call the register with the following code:\n\n\nadd_action('jeo_register_geocoders', function($geocoders) {\n\n    $geocoders->register_geocoder([\n        'slug' => 'my-geocoder',\n        'name' => 'My Geocoder',\n        'description' => __('My Geocoder description', 'my-textdomain'),\n        'class_name' => 'MyGeocoderClass'\n    ]);\n\n});\n\n\n\n\nThis will tell JEO that there is a new Geocoder service available and give some information about it.\n\n\n\n\nName and description will be used in the Administration panel so the admin can recognize and choose from the available Geocoders which one is to be used.\n\n\nslug needs to be a unique identifier for the geocoder\n\n\nclass_name is the name of the Geocoder class\n\n\n\n\nCreating the Geocoder class\n\n\nNow we need to create the geocoder class. This will be a class that extends \n\\Jeo\\Geocoder\n and implement some methods that do the actual geocoding.\n\n\nInside the same hook, declare the class and two required methods:\n\n\n\n\ngeocode($search_string)\n The method that receives the search string, does the request to the geocoder servers and returns the coordinates and address details;\n\n\nreverse_geocode($lat, $lon)\n The method that receives latitude and longitude, requests the geocoder server, and returns the full location details in the same format as the \ngeocode\n method does.\n\n\n\n\nWhile \ngeocode()\n returns an array of search results, \nreverse_geocode()\n returns only one result.\n\n\nEach result is an array that must have only the keys expected by the JEO plugin, so each Geocoder must find the best correspondence between each field and the fields expected by JEO.\n\n\nNote: Only \nlat\n and \nlon\n are required.\n\n\nSample response with all accepted fields:\n\n\n[\n        [\n            'lat' => '',\n            'lon' => '',\n            'full_address' => '',\n            'country' => '',\n            'country_code' => '',\n            'region_level_1' => '',\n            'region_level_2' => '', // State goes here\n            'region_level_3' => '',\n            'city' => '',\n            'city_level_1' => '',\n        ]\n]\n\n\n\n\nHere is a simple example:\n\n\nadd_action('jeo_register_geocoders', function($geocoders) {\n\n    $geocoders->register_geocoder([\n        'slug' => 'my-geocoder',\n        'name' => 'My Geocoder',\n        'description' => __('My Geocoder description', 'my-textdomain'),\n        'class_name' => 'MyGeocoderClass'\n    ]);\n\n    class MyGeocoderClass extends \\Jeo\\Geocoder {\n\n        public function geocode($search_string) {\n\n            $params = [\n                'q' => $search_string,\n                'format' => 'json',\n                'addressdetails' => 1\n            ];\n\n            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/search') );\n\n            $data = wp_remote_retrieve_body( $r );\n\n            $data = \\json_decode($data);\n            $response = [];\n\n            if (\\is_array($data)) {\n\n                foreach ($data as $match) {\n                    $r = $this->format_response_item( (array) $match );\n                    if ($r) $response[] = $r;\n                }\n\n            }\n\n            return $response;\n\n        }\n\n        public function reverse_geocode($lat, $lon) {\n\n            $params = [\n                'lat' => $lat,\n                'lon' => $lon,\n                'format' => 'json',\n                'addressdetails' => 1\n            ];\n\n            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/reverse') );\n\n            $data = wp_remote_retrieve_body( $r );\n\n            $data = \\json_decode($data);\n\n            return $this->format_response_item( (array) $data );\n\n        }\n\n        private function format_response_item($match) {\n\n            $response = [\n                'lat' => $match['lat'],\n                'lon' => $match['lon'],\n                'full_address' => $match['display_name'],\n                'country' => $match['country'],\n                'country_code' => $match['country_code'],\n                'region_level_1' => $match['region_level_1'],\n                'region_level_2' => $match['region_level_2'], // State goes here\n                'region_level_3' => $match['region_level_3'],\n                'city' => $match['city'],\n                'city_level_1' => $match['city_level_1'],\n            ];\n\n            return $response;\n\n        }\n\n    }\n\n});\n\n\n\n\nAnd that's it! Your new Geocoder is ready!\n\n\nAdding additional Settings to the Geocoder\n\n\nSome geocoder services might need or offer additional settings. Some might require the user to enter its API key, others might let the users restrict the search to a specific country to get better results when searching.\n\n\nYou can also easily add new settings to your Geocoder that will automatically be presented to the user on the Settings page.\n\n\nDeclare a method \nget_settings()\n in your class that will return an array of all the settings your Geocoder accepts.\n\n\nEach setting is described by an array with the following keys:\n\n\n\n\nslug\n: a slug for your option. You don't have to worry about naming conflicts, it will be stored inside your geocoders options;\n\n\nname\n: a human-readable name;\n\n\ndescription\n: an explanation to the user of what this setting is.\n\n\n\n\nLet's see an example only with the relevant code:\n\n\nadd_action('jeo_register_geocoders', function($geocoders) {\n\n    // ...\n    class MyGeocoderClass extends \\Jeo\\Geocoder {\n\n        // ...\n\n        public function get_settings() {\n\n            // Note it is an array of arrays\n            return [\n                [\n                    'slug' => 'api_key',\n                    'name' => __('API Key', 'my-text-domain'),\n                    'description' => __('Enter the API key you can get visiting your panel at my-gecoder.org/panel', 'my-text-domain')\n                ]\n            ];\n\n        }\n\n    }\n\n});\n\n\n\n\nAnd this is what you will see in the admin panel:\n\n\n\n\nAccessing Settings values\n\n\nNow that you have registered a setting and the user can change its value in the admin panel, you can use it in your geocoder.\n\n\nTo get its value, simply call \n$this->get_option($option_name)\n.\n\n\nExample:\n\n\n// ...\n\n        // ...\n\n        public function geocode($search_string) {\n\n            $params = [\n                'q' => $search_string,\n                'format' => 'json',\n                'addressdetails' => 1,\n                'api_key' => $this->get_option('api_key')\n            ];\n\n            // ...\n\n            return $response;\n\n        }\n\n// ...\n\n\n\n\nDeclaring default values\n\n\nYou can also add the \nget_default_options()\n method to your class to set default values for each setting. This is optional and is done like this:\n\n\nadd_action('jeo_register_geocoders', function($geocoders) {\n\n    // ...\n    class MyGeocoderClass extends \\Jeo\\Geocoder {\n\n        // ...\n\n        public function get_default_options() {\n\n            return [\n                'api_key' => 'sand-box-api-key' // the key must match the slug of the setting registered in get_settings()\n            ];\n\n        }\n\n    }\n\n});\n\n\n\n\nAdvanced: Even further settings customization\n\n\nIf your geocoder needs some special settings that a simple text input won't handle, there is yet another method you can declare to add arbitrary HTML code to the Settings page.\n\n\nsettings_footer($settings)\n must echo HTML code that will be rendered at the end of your Geocoder settings page.\n\n\nIt received the \n$settings\n object, which is an instance of \n\\Jeo\\Settings\n and have some helpers you can use.\n\n\nYou only need to print form fields with the right names and JEO will take care of saving them for you.\n\n\nTo get the right field name use \n$settings->get_geocoder_option_field_name($name)\n.\n\n\nExample:\n\n\n// ...\n\n        // ...\n\n        public function settings_footer($settings) {\n\n            ?>\n            <p><strong>My Select option</strong></p>\n\n            <select name=\"<?php echo $settings->get_geocoder_option_field_name('new_option'); ?>\">\n                <option value=\"yes\" <?php selected( $this->get_option('new_option'), 'yes' ); ?> >\n                    Yes\n                </select>\n                <option value=\"no\" <?php selected( $this->get_option('new_option'), 'no' ); ?> >\n                    No\n                </select>\n            </select>\n            <?php\n\n        }\n\n// ...\n\n\n\n\nNote: \nselected()\n is a native WordPress function. See the \nofficial documentation",
+            "title": "Geocoders"
+        },
+        {
+            "location": "/dev/geocoders/#writing-a-geocoder",
+            "text": "A Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on the geographical coordinates, which is called Reverse Geocoding.  JEO needs a geocoder service in a few situations, such as when users indicate to where on a map a story (posts) is related.  JEO comes with two native geocoder services users can choose from: Nominatim and Google. But new services can easily be added by plugins. This page documents how to do this.",
+            "title": "Writing a Geocoder"
+        },
+        {
+            "location": "/dev/geocoders/#registering-a-geocoder",
+            "text": "Hook a function to the  jeo_register_geocoders  action and call the register with the following code:  add_action('jeo_register_geocoders', function($geocoders) {\n\n    $geocoders->register_geocoder([\n        'slug' => 'my-geocoder',\n        'name' => 'My Geocoder',\n        'description' => __('My Geocoder description', 'my-textdomain'),\n        'class_name' => 'MyGeocoderClass'\n    ]);\n\n});  This will tell JEO that there is a new Geocoder service available and give some information about it.   Name and description will be used in the Administration panel so the admin can recognize and choose from the available Geocoders which one is to be used.  slug needs to be a unique identifier for the geocoder  class_name is the name of the Geocoder class",
+            "title": "Registering a Geocoder"
+        },
+        {
+            "location": "/dev/geocoders/#creating-the-geocoder-class",
+            "text": "Now we need to create the geocoder class. This will be a class that extends  \\Jeo\\Geocoder  and implement some methods that do the actual geocoding.  Inside the same hook, declare the class and two required methods:   geocode($search_string)  The method that receives the search string, does the request to the geocoder servers and returns the coordinates and address details;  reverse_geocode($lat, $lon)  The method that receives latitude and longitude, requests the geocoder server, and returns the full location details in the same format as the  geocode  method does.   While  geocode()  returns an array of search results,  reverse_geocode()  returns only one result.  Each result is an array that must have only the keys expected by the JEO plugin, so each Geocoder must find the best correspondence between each field and the fields expected by JEO.  Note: Only  lat  and  lon  are required.  Sample response with all accepted fields:  [\n        [\n            'lat' => '',\n            'lon' => '',\n            'full_address' => '',\n            'country' => '',\n            'country_code' => '',\n            'region_level_1' => '',\n            'region_level_2' => '', // State goes here\n            'region_level_3' => '',\n            'city' => '',\n            'city_level_1' => '',\n        ]\n]  Here is a simple example:  add_action('jeo_register_geocoders', function($geocoders) {\n\n    $geocoders->register_geocoder([\n        'slug' => 'my-geocoder',\n        'name' => 'My Geocoder',\n        'description' => __('My Geocoder description', 'my-textdomain'),\n        'class_name' => 'MyGeocoderClass'\n    ]);\n\n    class MyGeocoderClass extends \\Jeo\\Geocoder {\n\n        public function geocode($search_string) {\n\n            $params = [\n                'q' => $search_string,\n                'format' => 'json',\n                'addressdetails' => 1\n            ];\n\n            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/search') );\n\n            $data = wp_remote_retrieve_body( $r );\n\n            $data = \\json_decode($data);\n            $response = [];\n\n            if (\\is_array($data)) {\n\n                foreach ($data as $match) {\n                    $r = $this->format_response_item( (array) $match );\n                    if ($r) $response[] = $r;\n                }\n\n            }\n\n            return $response;\n\n        }\n\n        public function reverse_geocode($lat, $lon) {\n\n            $params = [\n                'lat' => $lat,\n                'lon' => $lon,\n                'format' => 'json',\n                'addressdetails' => 1\n            ];\n\n            $r = wp_remote_get( add_query_arg($params, 'https://my-geocoder-server.org/reverse') );\n\n            $data = wp_remote_retrieve_body( $r );\n\n            $data = \\json_decode($data);\n\n            return $this->format_response_item( (array) $data );\n\n        }\n\n        private function format_response_item($match) {\n\n            $response = [\n                'lat' => $match['lat'],\n                'lon' => $match['lon'],\n                'full_address' => $match['display_name'],\n                'country' => $match['country'],\n                'country_code' => $match['country_code'],\n                'region_level_1' => $match['region_level_1'],\n                'region_level_2' => $match['region_level_2'], // State goes here\n                'region_level_3' => $match['region_level_3'],\n                'city' => $match['city'],\n                'city_level_1' => $match['city_level_1'],\n            ];\n\n            return $response;\n\n        }\n\n    }\n\n});  And that's it! Your new Geocoder is ready!",
+            "title": "Creating the Geocoder class"
+        },
+        {
+            "location": "/dev/geocoders/#adding-additional-settings-to-the-geocoder",
+            "text": "Some geocoder services might need or offer additional settings. Some might require the user to enter its API key, others might let the users restrict the search to a specific country to get better results when searching.  You can also easily add new settings to your Geocoder that will automatically be presented to the user on the Settings page.  Declare a method  get_settings()  in your class that will return an array of all the settings your Geocoder accepts.  Each setting is described by an array with the following keys:   slug : a slug for your option. You don't have to worry about naming conflicts, it will be stored inside your geocoders options;  name : a human-readable name;  description : an explanation to the user of what this setting is.   Let's see an example only with the relevant code:  add_action('jeo_register_geocoders', function($geocoders) {\n\n    // ...\n    class MyGeocoderClass extends \\Jeo\\Geocoder {\n\n        // ...\n\n        public function get_settings() {\n\n            // Note it is an array of arrays\n            return [\n                [\n                    'slug' => 'api_key',\n                    'name' => __('API Key', 'my-text-domain'),\n                    'description' => __('Enter the API key you can get visiting your panel at my-gecoder.org/panel', 'my-text-domain')\n                ]\n            ];\n\n        }\n\n    }\n\n});  And this is what you will see in the admin panel:",
+            "title": "Adding additional Settings to the Geocoder"
+        },
+        {
+            "location": "/dev/geocoders/#accessing-settings-values",
+            "text": "Now that you have registered a setting and the user can change its value in the admin panel, you can use it in your geocoder.  To get its value, simply call  $this->get_option($option_name) .  Example:  // ...\n\n        // ...\n\n        public function geocode($search_string) {\n\n            $params = [\n                'q' => $search_string,\n                'format' => 'json',\n                'addressdetails' => 1,\n                'api_key' => $this->get_option('api_key')\n            ];\n\n            // ...\n\n            return $response;\n\n        }\n\n// ...",
+            "title": "Accessing Settings values"
+        },
+        {
+            "location": "/dev/geocoders/#declaring-default-values",
+            "text": "You can also add the  get_default_options()  method to your class to set default values for each setting. This is optional and is done like this:  add_action('jeo_register_geocoders', function($geocoders) {\n\n    // ...\n    class MyGeocoderClass extends \\Jeo\\Geocoder {\n\n        // ...\n\n        public function get_default_options() {\n\n            return [\n                'api_key' => 'sand-box-api-key' // the key must match the slug of the setting registered in get_settings()\n            ];\n\n        }\n\n    }\n\n});",
+            "title": "Declaring default values"
+        },
+        {
+            "location": "/dev/geocoders/#advanced-even-further-settings-customization",
+            "text": "If your geocoder needs some special settings that a simple text input won't handle, there is yet another method you can declare to add arbitrary HTML code to the Settings page.  settings_footer($settings)  must echo HTML code that will be rendered at the end of your Geocoder settings page.  It received the  $settings  object, which is an instance of  \\Jeo\\Settings  and have some helpers you can use.  You only need to print form fields with the right names and JEO will take care of saving them for you.  To get the right field name use  $settings->get_geocoder_option_field_name($name) .  Example:  // ...\n\n        // ...\n\n        public function settings_footer($settings) {\n\n            ?>\n            <p><strong>My Select option</strong></p>\n\n            <select name=\"<?php echo $settings->get_geocoder_option_field_name('new_option'); ?>\">\n                <option value=\"yes\" <?php selected( $this->get_option('new_option'), 'yes' ); ?> >\n                    Yes\n                </select>\n                <option value=\"no\" <?php selected( $this->get_option('new_option'), 'no' ); ?> >\n                    No\n                </select>\n            </select>\n            <?php\n\n        }\n\n// ...  Note:  selected()  is a native WordPress function. See the  official documentation",
+            "title": "Advanced: Even further settings customization"
+        },
+        {
+            "location": "/dev/layer-types-api/",
+            "text": "Mapbox Sources, Layers and JEO\n\n\nHow sources and layers settings works at Mapbox API and how JEO deals with them\n\n\nTable of Contents\n\n\n\n\nMapbox Sources, Layers and JEO\n\n\nTable of Contents\n\n\nIntroduction\n\n\nMapbox Styles\n\n\nMapbox Layers\n\n\nTypes and Sources of a Layer\n\n\n\n\n\n\nMapbox Sources\n\n\nOn \nsourceLayer\n attribute of a Source component\n\n\n\n\n\n\nHow the Layer Settings page of JEO Plugin works\n\n\nCorner cases and other observations\n\n\n\n\nIntroduction\n\n\nThis document describes how to interact with Mapbox, MapboxGL and React MapboxGL APIs. It is organised in a way that summarize key infos of those tools docs and gives examples of we are using them at our code.\n\n\nMapbox Styles\n\n\nMapbox Maps service is composed of several APIs and every type of layer has some particularities which we must pay attention.\n\n\nAccordingly which Mapbox docs, a Mapbox style consists of a set of root properties, some of which describe a single global propertie and some of which contain nested properties, like version, and name and metadata and does not influence over the appearance or behavior of your map. Others, like layers and sources determine our map features and what they will look like. \n\n\nThose are the particularities that we will further discuss from now.\n\n\nMore at \nMapbox Style Specification\n.\n\n\nMapbox Layers\n\n\nA style's layers property lists all the layers available in that style.  \n\n\nTypes and Sources of a Layer\n\n\nThe type of layer is specified by the \"type\" property and must be one of:\n\n\nFor type \nvector\n:\n-  background;\n-  fill;\n-  line;\n-  symbol; \n-  circle; \n-  fill-extrusion;\n-  heatmap; \n-  hillshade.\n\n\nFor type \nraster\n:\n-  raster;\n\n\nExcept for layers of the \nbackground\n type, each layer needs to refer to a source.\n\n\nThe \nsource\n of a layer is the name of a source description to be user for this layer.\n\n\n\n\nJSON settings\n\n\n\n\nYour settings of a layer should be something like:\n\n\n    \"layers\": [{\n        \"id\": \"water\",\n        \"source\": \"mapbox-streets\",\n        \"source-layer\": \"water\",\n        \"type\": \"fill\",\n        \"paint\": {\n        \"fill-color\": \"#00ffff\"\n        }\n    }]\n\n\n\n\nMore at \nMapbox Spec Layers\n.\n\n\n\n\nMapboxGL React\n\n\n\n\nWe can set a \n<Layer>\n component like:\n\n\n    import { Layer } from \"react-mapbox-gl\";\n\n    ...\n\n    <Layer\n        type=\"symbol\"\n        id=\"water\",\n        source=\"mapbox-streets\",\n        sourceLayer=\"water\", // by definition, the source type must be vector type\n        type=\"fill\",\n        paint={{ \"fill-color\": \"#00ffff\" }}>\n    </Layer>\n\n\n\n\n\nMore at \nreact-mapbox-gl \n docs\n.\n\n\nMapbox Sources\n\n\nSources state which data the map should display. Specify the type of source with the \ntype\n property, which must be one of: \n\n\n\n\nvector; \n\n\nraster; \n\n\nraster-dem; \n\n\ngeojson; \n\n\nimage; \n\n\nvideo. \n\n\n\n\nPlease note that a \nLayer\n can have a \ntype\n and a \nsource\n. And a \nSource\n is not the same as the \nlayer source\n and this \nSource\n has a \ntype\n.\n \n\n\nAdding a \nsource isn't enough to make data appear on the map\n because \nsources don't contain styling\n details like color or width. \n\n\nTiled sources, vector and raster, must specify their details according to the TileJSON specification\n.\n\n\nAt JEO plugin you can supply those infos as \ntiles\n or as \nurl\n.\n\n\nNote that the following exams is based on a \nsource vector type\n.\n\n\n\n\nJSON settings\n\n\n\n\nYour settings of a source should be something like:\n\n\n\n\n\n\ntiles\n:\n\n\n```\n    \"mapbox-streets\": {\n        \"type\": \"vector\",\n        \"tiles\": [\n            \"http://a.example.com/tiles/{z}/{x}/{y}.pbf\",\n            \"http://b.example.com/tiles/{z}/{x}/{y}.pbf\"\n        ],\n        \"maxzoom\": 14\n    }\n```\n\n\n\n\n\n\n\nurl\n: \n\n\n\"mapbox-streets\": {\n        \"type\": \"vector\",\n        \"url\": \"http://api.example.com/tilejson.json\"\n    }\n\nMore at \nreact-mapbox-gl docs\n.\n\n\n\n\n\n\n\n\n\n\nMapboxGL React\n\n\nWe can set up a \n<Source/>\n component like:\n\n\n\n\n\n\ntiles\n:\n\n\n```\n    import { Source } from \"react-mapbox-gl\";\n\n\n...\n\nconst SOURCE_OPTIONS = {\n    \"type\": \"vector\",  // note this line\n    \"tiles\": [\n            \"http://a.example.com/tiles/{z}/{x}/{y}.pbf\",\n            \"http://b.example.com/tiles/{z}/{x}/{y}.pbf\"\n    ],\n    \"maxzoom\": 14\n};\n\n<Source \n    id=\"source_id\" \n    tileJsonSource={SOURCE_OPTIONS} \n/>\n<Layer \n    type=\"vector\" // note this line\n    id=\"layer_id\" \n    sourceId=\"source_id\" \n/>\n\n\n\n``\n    -\nurl`:\n\n\n```\n    import { Source } from \"react-mapbox-gl\";\n\n\n...\n\nconst SOURCE_OPTIONS = {\n    \"url\": \"http://api.example.com/tilejson.json\",\n    \"type\": \"vector\", // note this line\n};\n\n<Source \n    id=\"source_id\" \n    tileJsonSource={SOURCE_OPTIONS} \n/>\n<Layer \n    type=\"vector\" // note this line\n    id=\"layer_id\"\n    sourceId=\"source_id\" \n    sourceLayer={ source_layer } // see onSource section for more info\n/>\n\n\n\n```\n\n\n\n\n\n\nFor a \nraster\n source, we can define like this:\n\n\n```\n    import { Source } from \"react-mapbox-gl\";\n\n\n...\n\nconst RASTER_SOURCE_OPTIONS = {\n    \"type\": \"raster\", // note this line\n    \"tiles\": [\n        \"https://someurl.com/512/{z}/{x}/{y}\",\n    ],\n    \"tileSize\": 512\n};\n\n<Source \n    id=\"source_id\" \n    tileJsonSource={RASTER_SOURCE_OPTIONS} \n/>\n<Layer \n    type=\"raster\" // note this line\n    id=\"layer_id\" \n    sourceId=\"source_id\"   \n/>\n\n\n\n```\nMore about how to configure a Source component at \nreact-mapbox-gl docs\n.\n\n\n\n\n\n\nOn \nsourceLayer\n attribute of a Source component\n\n\nIf your \nLayer\n is of the \nvector\n type, your \nsourceLayer\n will indicate an \nindividual layer of data\n within your \nvector source\n. You can learn more info on where you can find the name of this property at Mapbox \nsource-layer glossary\n.\n\n\nOtherwise, if your \nLayer\n have a \nraster\n type, this property \nwill be ignored\n.\n\n\n    <Source \n        id=\"source_id\" \n        tileJsonSource={{\n            type: \"raster\" // note this line\n        }} \n    />\n    <Layer \n        type=\"raster\" // note this line\n        sourceLayer=\"anything\" // this info will be ignored\n        id=\"layer_id\" \n        sourceId=\"source_id\"   \n    />\n\n\n\n\nHow the Layer Settings page of JEO Plugin works\n\n\nCorner cases and other observations",
+            "title": "Layer types api"
+        },
+        {
+            "location": "/dev/layer-types-api/#mapbox-sources-layers-and-jeo",
+            "text": "How sources and layers settings works at Mapbox API and how JEO deals with them",
+            "title": "Mapbox Sources, Layers and JEO"
+        },
+        {
+            "location": "/dev/layer-types-api/#table-of-contents",
+            "text": "Mapbox Sources, Layers and JEO  Table of Contents  Introduction  Mapbox Styles  Mapbox Layers  Types and Sources of a Layer    Mapbox Sources  On  sourceLayer  attribute of a Source component    How the Layer Settings page of JEO Plugin works  Corner cases and other observations",
+            "title": "Table of Contents"
+        },
+        {
+            "location": "/dev/layer-types-api/#introduction",
+            "text": "This document describes how to interact with Mapbox, MapboxGL and React MapboxGL APIs. It is organised in a way that summarize key infos of those tools docs and gives examples of we are using them at our code.",
+            "title": "Introduction"
+        },
+        {
+            "location": "/dev/layer-types-api/#mapbox-styles",
+            "text": "Mapbox Maps service is composed of several APIs and every type of layer has some particularities which we must pay attention.  Accordingly which Mapbox docs, a Mapbox style consists of a set of root properties, some of which describe a single global propertie and some of which contain nested properties, like version, and name and metadata and does not influence over the appearance or behavior of your map. Others, like layers and sources determine our map features and what they will look like.   Those are the particularities that we will further discuss from now.  More at  Mapbox Style Specification .",
+            "title": "Mapbox Styles"
+        },
+        {
+            "location": "/dev/layer-types-api/#mapbox-layers",
+            "text": "A style's layers property lists all the layers available in that style.",
+            "title": "Mapbox Layers"
+        },
+        {
+            "location": "/dev/layer-types-api/#types-and-sources-of-a-layer",
+            "text": "The type of layer is specified by the \"type\" property and must be one of:  For type  vector :\n-  background;\n-  fill;\n-  line;\n-  symbol; \n-  circle; \n-  fill-extrusion;\n-  heatmap; \n-  hillshade.  For type  raster :\n-  raster;  Except for layers of the  background  type, each layer needs to refer to a source.  The  source  of a layer is the name of a source description to be user for this layer.   JSON settings   Your settings of a layer should be something like:      \"layers\": [{\n        \"id\": \"water\",\n        \"source\": \"mapbox-streets\",\n        \"source-layer\": \"water\",\n        \"type\": \"fill\",\n        \"paint\": {\n        \"fill-color\": \"#00ffff\"\n        }\n    }]  More at  Mapbox Spec Layers .   MapboxGL React   We can set a  <Layer>  component like:      import { Layer } from \"react-mapbox-gl\";\n\n    ...\n\n    <Layer\n        type=\"symbol\"\n        id=\"water\",\n        source=\"mapbox-streets\",\n        sourceLayer=\"water\", // by definition, the source type must be vector type\n        type=\"fill\",\n        paint={{ \"fill-color\": \"#00ffff\" }}>\n    </Layer>  More at  react-mapbox-gl   docs .",
+            "title": "Types and Sources of a Layer"
+        },
+        {
+            "location": "/dev/layer-types-api/#mapbox-sources",
+            "text": "Sources state which data the map should display. Specify the type of source with the  type  property, which must be one of:    vector;   raster;   raster-dem;   geojson;   image;   video.    Please note that a  Layer  can have a  type  and a  source . And a  Source  is not the same as the  layer source  and this  Source  has a  type .    Adding a  source isn't enough to make data appear on the map  because  sources don't contain styling  details like color or width.   Tiled sources, vector and raster, must specify their details according to the TileJSON specification .  At JEO plugin you can supply those infos as  tiles  or as  url .  Note that the following exams is based on a  source vector type .   JSON settings   Your settings of a source should be something like:    tiles :  ```\n    \"mapbox-streets\": {\n        \"type\": \"vector\",\n        \"tiles\": [\n            \"http://a.example.com/tiles/{z}/{x}/{y}.pbf\",\n            \"http://b.example.com/tiles/{z}/{x}/{y}.pbf\"\n        ],\n        \"maxzoom\": 14\n    }\n```    url :   \"mapbox-streets\": {\n        \"type\": \"vector\",\n        \"url\": \"http://api.example.com/tilejson.json\"\n    } \nMore at  react-mapbox-gl docs .      MapboxGL React  We can set up a  <Source/>  component like:    tiles :  ```\n    import { Source } from \"react-mapbox-gl\";  ...\n\nconst SOURCE_OPTIONS = {\n    \"type\": \"vector\",  // note this line\n    \"tiles\": [\n            \"http://a.example.com/tiles/{z}/{x}/{y}.pbf\",\n            \"http://b.example.com/tiles/{z}/{x}/{y}.pbf\"\n    ],\n    \"maxzoom\": 14\n};\n\n<Source \n    id=\"source_id\" \n    tileJsonSource={SOURCE_OPTIONS} \n/>\n<Layer \n    type=\"vector\" // note this line\n    id=\"layer_id\" \n    sourceId=\"source_id\" \n/>  ``\n    - url`:  ```\n    import { Source } from \"react-mapbox-gl\";  ...\n\nconst SOURCE_OPTIONS = {\n    \"url\": \"http://api.example.com/tilejson.json\",\n    \"type\": \"vector\", // note this line\n};\n\n<Source \n    id=\"source_id\" \n    tileJsonSource={SOURCE_OPTIONS} \n/>\n<Layer \n    type=\"vector\" // note this line\n    id=\"layer_id\"\n    sourceId=\"source_id\" \n    sourceLayer={ source_layer } // see onSource section for more info\n/>  ```    For a  raster  source, we can define like this:  ```\n    import { Source } from \"react-mapbox-gl\";  ...\n\nconst RASTER_SOURCE_OPTIONS = {\n    \"type\": \"raster\", // note this line\n    \"tiles\": [\n        \"https://someurl.com/512/{z}/{x}/{y}\",\n    ],\n    \"tileSize\": 512\n};\n\n<Source \n    id=\"source_id\" \n    tileJsonSource={RASTER_SOURCE_OPTIONS} \n/>\n<Layer \n    type=\"raster\" // note this line\n    id=\"layer_id\" \n    sourceId=\"source_id\"   \n/>  ```\nMore about how to configure a Source component at  react-mapbox-gl docs .",
+            "title": "Mapbox Sources"
+        },
+        {
+            "location": "/dev/layer-types-api/#on-sourcelayer-attribute-of-a-source-component",
+            "text": "If your  Layer  is of the  vector  type, your  sourceLayer  will indicate an  individual layer of data  within your  vector source . You can learn more info on where you can find the name of this property at Mapbox  source-layer glossary .  Otherwise, if your  Layer  have a  raster  type, this property  will be ignored .      <Source \n        id=\"source_id\" \n        tileJsonSource={{\n            type: \"raster\" // note this line\n        }} \n    />\n    <Layer \n        type=\"raster\" // note this line\n        sourceLayer=\"anything\" // this info will be ignored\n        id=\"layer_id\" \n        sourceId=\"source_id\"   \n    />",
+            "title": "On sourceLayer attribute of a Source component"
+        },
+        {
+            "location": "/dev/layer-types-api/#how-the-layer-settings-page-of-jeo-plugin-works",
+            "text": "",
+            "title": "How the Layer Settings page of JEO Plugin works"
+        },
+        {
+            "location": "/dev/layer-types-api/#corner-cases-and-other-observations",
+            "text": "",
+            "title": "Corner cases and other observations"
+        },
+        {
+            "location": "/dev/layer-types/",
+            "text": "Adding new Layer Types\n\n\nThis document describes how to register new Layer Types to be used in maps created with JEO.\n\n\nIntroduction\n\n\nIn JEO, maps are rendered using the \nMapbox GL\n JavaScript library. Any new layer type will have to interact with this library to add the layer to the map.\n\n\nBasically, to add a new layer type, there are 2 simple steps:\n\n\n\n\nRegister the new Layer type using a PHP hook, informing where is the main JavaScript file of your Layer Type;\n\n\nCreate a JavaScript class implementing methods to add the layer to the map and to describe what are the options a layer of this type has.\n\n\n\n\nIn short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which is an extension to MapboxGL) to the project.\n\n\nCreating a new Layer Type\n\n\nFirst, let's register a new Layer Type by hooking up in the \njeo_register_layer_types\n action:\n\n\nadd_action('jeo_register_layer_types', function($layer_types) {\n    $layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );\n});\n\n\n\n\nregister_layer_type\n method gets 2 parameters.\n\n\n\n\nLayer type slug - A unique sanitized string (make sure to make it unique)\n\n\nOptions - An array with the layer type options:\n\n\nscript_url\n: Required. The absolute URL to your JavaScript file.\n\n\ndependecies\n: Optional. An array of scripts handles registered using [wp_register_script]\n(\n) that should be loaded as a dependency to the layer type main script\n\n\n\n\nThat's all you need to do on the PHP side. All the magic happens on the JavaScript.\n\n\nNow, let's create our \nlayertype.js\n file.\n\n\nIn this file, we are going to register a JavaScript object using the globally available \nwindow.JeoLayerTypes.registerLayerType\n.\n\n\nThe first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.\n\n\nwindow.JeoLayerTypes.registerLayerType('tilelayer', {\n\n    addStyle: function(map, attributes) {\n        // ...\n    },\n\n    addLayer: function(map, attributes) {\n        // ...\n    },\n\n    getSchema: function(attributes) {\n        // ...\n    }\n});\n\n\n\n\nYour Layer Type object MUST implement at least these three methods.\n\n\ngetSchema(attributes)\n\n\nparams\n:\n\n\n\n\nattributes\n - object with the layer attributes (see the section below)\n\n\n\n\nreturns\n:\n\n\n\n\nPromise with json-schema\n\n\n\n\nThis method will tell JEO which are the options the user has to fill in when creating a new layer of this type.\n\n\nFor example, a raster tile layer-type might have only a URL. A Mapbox layer has the Style ID and the optional Access token.\n\n\nThis method must return a Promise with a json-schema representation of the layer type options.\n\n\nThis schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.\n\n\nFor example, the \"Tile layer\" layer type needs only a URL, so that's how its \ngetSchema\n method will look like.\n\n\n    // ...\n\n    getSchema: function(attributes) {\n        return new Promise( function(resolve, reject) {\n\n            resolve({\n                \"type\": \"object\",\n                \"required\": [\n                    \"url\"\n                ],\n                \"properties\": {\n                    \"url\": {\n                        \"type\": \"string\",\n                        \"title\": \"URL\"\n                    }\n                }\n            });\n\n        });\n    }\n\n\n\n\naddStyle(map, attributes)\n\n\nparams\n:\n\n\n\n\nmap\n - the initialized Mapbox \nMap\n object\n\n\nattributes\n - object with the layer attributes (See Layer attributes section below)\n\n\n\n\nreturns\n:\n\n\n\n\nThe return of a call to \nmap.setStyle\n\n\n\n\nIn MapboxGL, every map has a \nStyle\n as a base layer. This method will add the layer as the Map Style, using the \nsetStyle\n method of the \nMap\n object.\n\n\nThis method will be invoked when a layer of this type is added to the map as the base layer.\n\n\nFor example, the \"Tile Layer\" layer type sets the style as a raster layer:\n\n\n    // ...\n\n    addStyle: function(map, attributes) {\n        return map.setStyle({\n            'version': 8,\n            'sources': {\n                'raster-tiles': {\n                    'type': 'raster',\n                    'tiles': [attributes.layer_type_options.url],\n                    'tileSize': 256\n                }\n            },\n            'layers': [{\n                id: attributes.layer_id,\n                type: 'raster',\n                source: 'raster-tiles'\n            }]\n        })\n    }\n\n\n\n\nNote\n: The \nattributes.layer_type_options\n object holds all the properties declared in the \ngetSchema\n method. That's why there is a \nurl\n there! (See Layer attributes section below)\n\n\naddLayer(map, attributes)\n\n\nparams\n:\n\n\n\n\nmap\n - the initialized Mapbox \nMap\n object\n\n\nattributes\n - object with the layer attributes (See Layer attributes section below)\n\n\n\n\nreturns\n:\n\n\n\n\nThe return of a call to \nmap.addLayer\n\n\n\n\nThis method will add the layer to the map using the \naddLayer\n method of the \nMap\n object.\n\n\nThis method will be invoked when a layer of this type is added to the map.\n\n\nFor example, the \"Tile Layer\" layer type adds itself as a raster layer:\n\n\n    // ...\n\n    addLayer: function(map, attributes) {\n        var layer = {\n            id: attributes.layer_id,\n            source: {\n              type: 'raster',\n              tiles: [attributes.layer_type_options.url],\n              \"tileSize\": 256\n            },\n            type: 'raster'\n        };\n        if ( ! attributes.visible ) {\n            layer.layout = {\n                visibility: 'none'\n            };\n        }\n        return map.addLayer(layer);\n    }\n\n\n\n\n\nNote:\n This method must verify the value of \nattributes.visible\n to determine whether this layer should be visible when the map is initialized.\n\n\nLayer attributes\n\n\nAs you saw, each of the above methods gets an argument \nattributes\n as input. This argument holds all the information of the layer the user is editing or viewing.\n\n\nSome attributes are common to any layer types, and others that are specific to a layer type. Every layer type-specific attribute a layer has is stored under the \nlayer_type_options\n attributes.\n\n\nSo these are the keys available in the \nattributes\n object:\n\n\n\n\nlayer_id\n: (integer) A unique ID that represents this layer and identify it in the database\n\n\nlayer_name\n: (string) The layer name, given by the user\n\n\nvisible\n: (boolean) A flag indicating whether this layer should be visible when the map initializes\n\n\nlayer_type_options\n: (object) A object with all the layer type-specific attributes (those registered in the \ngetSchema\n method)",
+            "title": "Layer types"
+        },
+        {
+            "location": "/dev/layer-types/#adding-new-layer-types",
+            "text": "This document describes how to register new Layer Types to be used in maps created with JEO.",
+            "title": "Adding new Layer Types"
+        },
+        {
+            "location": "/dev/layer-types/#introduction",
+            "text": "In JEO, maps are rendered using the  Mapbox GL  JavaScript library. Any new layer type will have to interact with this library to add the layer to the map.  Basically, to add a new layer type, there are 2 simple steps:   Register the new Layer type using a PHP hook, informing where is the main JavaScript file of your Layer Type;  Create a JavaScript class implementing methods to add the layer to the map and to describe what are the options a layer of this type has.   In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which is an extension to MapboxGL) to the project.",
+            "title": "Introduction"
+        },
+        {
+            "location": "/dev/layer-types/#creating-a-new-layer-type",
+            "text": "First, let's register a new Layer Type by hooking up in the  jeo_register_layer_types  action:  add_action('jeo_register_layer_types', function($layer_types) {\n    $layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );\n});  register_layer_type  method gets 2 parameters.   Layer type slug - A unique sanitized string (make sure to make it unique)  Options - An array with the layer type options:  script_url : Required. The absolute URL to your JavaScript file.  dependecies : Optional. An array of scripts handles registered using [wp_register_script] ( ) that should be loaded as a dependency to the layer type main script   That's all you need to do on the PHP side. All the magic happens on the JavaScript.  Now, let's create our  layertype.js  file.  In this file, we are going to register a JavaScript object using the globally available  window.JeoLayerTypes.registerLayerType .  The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.  window.JeoLayerTypes.registerLayerType('tilelayer', {\n\n    addStyle: function(map, attributes) {\n        // ...\n    },\n\n    addLayer: function(map, attributes) {\n        // ...\n    },\n\n    getSchema: function(attributes) {\n        // ...\n    }\n});  Your Layer Type object MUST implement at least these three methods.",
+            "title": "Creating a new Layer Type"
+        },
+        {
+            "location": "/dev/layer-types/#getschemaattributes",
+            "text": "params :   attributes  - object with the layer attributes (see the section below)   returns :   Promise with json-schema   This method will tell JEO which are the options the user has to fill in when creating a new layer of this type.  For example, a raster tile layer-type might have only a URL. A Mapbox layer has the Style ID and the optional Access token.  This method must return a Promise with a json-schema representation of the layer type options.  This schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.  For example, the \"Tile layer\" layer type needs only a URL, so that's how its  getSchema  method will look like.      // ...\n\n    getSchema: function(attributes) {\n        return new Promise( function(resolve, reject) {\n\n            resolve({\n                \"type\": \"object\",\n                \"required\": [\n                    \"url\"\n                ],\n                \"properties\": {\n                    \"url\": {\n                        \"type\": \"string\",\n                        \"title\": \"URL\"\n                    }\n                }\n            });\n\n        });\n    }",
+            "title": "getSchema(attributes)"
+        },
+        {
+            "location": "/dev/layer-types/#addstylemap-attributes",
+            "text": "params :   map  - the initialized Mapbox  Map  object  attributes  - object with the layer attributes (See Layer attributes section below)   returns :   The return of a call to  map.setStyle   In MapboxGL, every map has a  Style  as a base layer. This method will add the layer as the Map Style, using the  setStyle  method of the  Map  object.  This method will be invoked when a layer of this type is added to the map as the base layer.  For example, the \"Tile Layer\" layer type sets the style as a raster layer:      // ...\n\n    addStyle: function(map, attributes) {\n        return map.setStyle({\n            'version': 8,\n            'sources': {\n                'raster-tiles': {\n                    'type': 'raster',\n                    'tiles': [attributes.layer_type_options.url],\n                    'tileSize': 256\n                }\n            },\n            'layers': [{\n                id: attributes.layer_id,\n                type: 'raster',\n                source: 'raster-tiles'\n            }]\n        })\n    }  Note : The  attributes.layer_type_options  object holds all the properties declared in the  getSchema  method. That's why there is a  url  there! (See Layer attributes section below)",
+            "title": "addStyle(map, attributes)"
+        },
+        {
+            "location": "/dev/layer-types/#addlayermap-attributes",
+            "text": "params :   map  - the initialized Mapbox  Map  object  attributes  - object with the layer attributes (See Layer attributes section below)   returns :   The return of a call to  map.addLayer   This method will add the layer to the map using the  addLayer  method of the  Map  object.  This method will be invoked when a layer of this type is added to the map.  For example, the \"Tile Layer\" layer type adds itself as a raster layer:      // ...\n\n    addLayer: function(map, attributes) {\n        var layer = {\n            id: attributes.layer_id,\n            source: {\n              type: 'raster',\n              tiles: [attributes.layer_type_options.url],\n              \"tileSize\": 256\n            },\n            type: 'raster'\n        };\n        if ( ! attributes.visible ) {\n            layer.layout = {\n                visibility: 'none'\n            };\n        }\n        return map.addLayer(layer);\n    }  Note:  This method must verify the value of  attributes.visible  to determine whether this layer should be visible when the map is initialized.",
+            "title": "addLayer(map, attributes)"
+        },
+        {
+            "location": "/dev/layer-types/#layer-attributes",
+            "text": "As you saw, each of the above methods gets an argument  attributes  as input. This argument holds all the information of the layer the user is editing or viewing.  Some attributes are common to any layer types, and others that are specific to a layer type. Every layer type-specific attribute a layer has is stored under the  layer_type_options  attributes.  So these are the keys available in the  attributes  object:   layer_id : (integer) A unique ID that represents this layer and identify it in the database  layer_name : (string) The layer name, given by the user  visible : (boolean) A flag indicating whether this layer should be visible when the map initializes  layer_type_options : (object) A object with all the layer type-specific attributes (those registered in the  getSchema  method)",
+            "title": "Layer attributes"
+        },
+        {
+            "location": "/dev/migration/",
+            "text": "Migration\n\n\nNotes on changes in DB structure from old JEO that will need to have migrations written.\n\n\nGeocode \npost_meta\n\n\nOn old JEO, some \nmeta_key\ns are prefixed by an underscore (\n_\n) and others aren't:\n\n\n\n\ngeocode_address\n\n\ngeocode_latitude\n\n\ngeocode_longitude\n\n\n_geocode_city\n\n\n_geocode_country\n\n\ngeocode_viewport\n\n\n\n\nLet's have them all with a underscore at the beginning.",
+            "title": "Migration"
+        },
+        {
+            "location": "/dev/migration/#migration",
+            "text": "Notes on changes in DB structure from old JEO that will need to have migrations written.",
+            "title": "Migration"
+        },
+        {
+            "location": "/dev/migration/#geocode-post_meta",
+            "text": "On old JEO, some  meta_key s are prefixed by an underscore ( _ ) and others aren't:   geocode_address  geocode_latitude  geocode_longitude  _geocode_city  _geocode_country  geocode_viewport   Let's have them all with a underscore at the beginning.",
+            "title": "Geocode post_meta"
+        }
+    ]
+}
