@@ -468,10 +468,10 @@ class Jeo {
 						$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( $_GET['height'] ) : 600;
 
 						$map_style = "width: ${map_width}px; height: ${height}px;";
-						$container_style = "width: ${full_width}px; height: ${height}px;";
+						$container_style = "position: fixed; width: ${full_width}px; height: ${height}px;";
 						$popup_style = "width: ${popup_width}px; height: ${height}px;";
 					} else {
-						$container_style = "width: 100%; height: 100%;";
+						$container_style = "position: fixed; width: 100%; height: 100%;";
 
 						if($have_related_posts) {
 							$map_style = "width: 70%; height: calc(100% - 35px);";
