@@ -6,6 +6,7 @@
 		exit();
 	}
 ?>
+<!DOCTYPE html>
 <html style="margin: 0px !important;">
 
 	<head>
