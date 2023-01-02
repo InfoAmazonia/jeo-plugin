@@ -1,6 +1,6 @@
 <?php
 	$disable_embed = get_post_meta( get_the_ID(), 'disable_embed', true) == '1'? true : false;
-	$storymap_id = $_GET['storymap_id'];
+	$storymap_id = sanitize_text_field( $_GET['storymap_id'] );
 
 	if ($disable_embed) {
 		wp_redirect(home_url());

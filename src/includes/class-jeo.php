@@ -428,17 +428,17 @@ class Jeo {
 		if( get_query_var( 'jeo_embed' ) === 'map' ) {
 			add_filter( 'show_admin_bar', '__return_false' );
 			if( isset( $_GET[ 'storymap_id' ] ) ) {
-				$post = get_post( absint( $_GET[ 'storymap_id' ] ) );
+				$post = get_post( absint( sanitize_text_field( $_GET[ 'storymap_id' ] ) ) );
 				setup_postdata( $post );
 				add_filter( 'the_content', [ $this, 'storymap_content' ], 1 );
 
 				require JEO_BASEPATH . '/templates/embed-storymap.php';
 				exit();
 			}
-			$discovery = isset($_GET['discovery'])? $_GET['discovery'] : false;
+			$discovery = isset($_GET['discovery'])? sanitize_text_field( $_GET['discovery'] ) : false;
 
 			if( !$discovery ) {
-				$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( $_GET['map_id'] ) : false;
+				$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( sanitize_text_field( $_GET['map_id'] ) ) : false;
 				if ( $map_id ) {
 					$map_meta = get_post_meta($map_id);
 					$args = (array) maybe_unserialize($map_meta['related_posts'][0]);
@@ -457,15 +457,15 @@ class Jeo {
 					// var_dump($have_related_posts);
 
 					if(isset($_GET['width']) ) {
-						$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( $_GET['width'] ) : 820;
-						$popup_width = isset( $_GET['popup_width'] ) && is_numeric( $_GET['popup_width'] ) ? intval( $_GET['popup_width'] ) : 220;
+						$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( sanitize_text_field( $_GET['width'] ) ) : 820;
+						$popup_width = isset( $_GET['popup_width'] ) && is_numeric( $_GET['popup_width'] ) ? intval( sanitize_text_field( $_GET['popup_width'] ) ) : 220;
 						$map_width = $full_width ? $full_width : 600;
 
 						if($have_related_posts){
 							$map_width = $full_width - $popup_width;
 						}
 
-						$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( $_GET['height'] ) : 600;
+						$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( sanitize_text_field( $_GET['height'] ) ) : 600;
 
 						$map_style = "width: {$map_width}px; height: {$height}px;";
 						$container_style = "position: fixed; width: {$full_width}px; height: {$height}px;";
@@ -495,7 +495,7 @@ class Jeo {
 
 				}
 			} else {
-				$selected_layers = $_GET['selected-layers'];
+				$selected_layers = sanitize_text_field( $_GET['selected-layers'] );
 				require JEO_BASEPATH . '/templates/embed-discovery.php';
 				exit();
 			}
@@ -538,10 +538,10 @@ class Jeo {
 
 			$post_id = $post->ID;
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
-				$post_id = $_GET[ 'preview_id' ];
+				$post_id = sanitize_text_field( $_GET[ 'preview_id' ] );
 			}
 			if ( isset( $_GET[ 'storymap_id' ] ) && ! empty( $_GET[ 'storymap_id'] ) ) {
-				$post_id = $_GET[ 'storymap_id' ];
+				$post_id = sanitize_text_field( $_GET[ 'storymap_id' ] );
 			}
 			$post_content = $wpdb->get_results(
 				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) )
@@ -583,7 +583,7 @@ class Jeo {
 				$post_id = $post->ID;
 			}
 			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
-				$post_id = $_GET[ 'preview_id' ];
+				$post_id = sanitize_text_field( $_GET[ 'preview_id' ] );
 			}
 			if ( $post_id ) {
 				$post = get_post( absint( $post_id ) );
