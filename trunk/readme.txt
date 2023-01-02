@@ -1,6 +1,6 @@
 === JEO ===
 Contributors: earthjournalism
-Tested up to: 6.0.1
+Tested up to: 6.1.1
 Stable tag: 2.7.3
 Requires PHP: 7.2
 Requires at least: 5.8
