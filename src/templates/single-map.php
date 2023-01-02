@@ -5,8 +5,8 @@
 	$map_width = $full_width ? $full_width - 220 : 600;
 	$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval( $_GET['height'] ) : 600;
 
-	$map_style = "width: ${map_width}px; height: ${height}px;";
-	$container_style = "width: ${full_width}px; height: ${height}px;";
+	$map_style = "width: {$map_width}px; height: {$height}px;";
+	$container_style = "width: {$full_width}px; height: {$height}px;";
 ?>
 
 <?php if ($is_embed): ?>
