@@ -55,8 +55,8 @@
 		"uuid": "^7.0.3"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^6.2.0",
-		"css-loader": "^3.5.3",
+		"@wordpress/scripts": "^25.1.0",
+		"css-loader": "^6.7.3",
 		"eslint": "^6.8.0",
 		"mapbox-gl": "^1.13.1",
 		"node-sass": "^4.14.1",
@@ -65,6 +65,6 @@
 		"sass": "^1.32.8",
 		"sass-loader": "^10.1.1",
 		"style-loader": "^1.2.1",
-		"webpack": "^4.46.0"
+		"webpack": "^5.75.0"
 	}
 }
