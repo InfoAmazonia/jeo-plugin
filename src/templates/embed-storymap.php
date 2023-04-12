@@ -29,7 +29,7 @@
 		if(!empty($img)): ?>
 			<div class="embed-footer">
 				<a href="/">
-					<img src="<?= $img ?>">
+					<img src="<?= esc_url($img) ?>">
 				</a>
 			</div>
 	<?php endif; ?>
