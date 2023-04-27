@@ -79,6 +79,13 @@ class Jeo {
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
 	}
 
+	private function get_rest_nonce() {
+		if ( is_user_logged_in() ) {
+			return wp_create_nonce( 'wp_rest' );
+		}
+		return null;
+	}
+
 	public function rest_authenticate_by_cookie( $response, $handler, $request ) {
 		if ( preg_match( '/\/wp\/v2\/(map|map-layer|storymap)/', $request->get_route() ) === 1 ) {
 			$user_id = wp_validate_auth_cookie( '', 'logged_in' );
@@ -167,7 +174,7 @@ class Jeo {
 					'enable_fullscreen' => true,
 					'disable_drag_pan' => false,
 				],
-				'nonce' => wp_create_nonce('wp_rest'),
+				'nonce' => $this->get_rest_nonce(),
 				'jeo_typography_name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
 			)
 		);
@@ -367,7 +374,7 @@ class Jeo {
 					'jsonUrl' => rest_url( 'wp/v2/' ),
 					'string_read_more' => __( 'Read more', 'jeo' ),
 					'jeoUrl' => JEO_BASEURL,
-					'nonce' => wp_create_nonce('wp_rest'),
+					'nonce' => $this->get_rest_nonce(),
 					'currentLang' => $currentLang,
 					'templates' => [
 						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
