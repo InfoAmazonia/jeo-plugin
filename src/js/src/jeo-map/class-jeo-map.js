@@ -14,6 +14,7 @@ export default class JeoMap {
 		this.markers = [];
 		this.layers = [];
 		this.legends = [];
+		this.initialized = false;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
@@ -66,6 +67,17 @@ export default class JeoMap {
 			}
 		})
 
+		const observer = new IntersectionObserver(this.lazyInitMap.bind(this), { threshold: 0 });
+		observer.observe(element);
+	}
+
+	lazyInitMap() {
+		if (this.initialized) {
+			return;
+		}
+		this.initialized = true;
+
+		const map = this.map;
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
