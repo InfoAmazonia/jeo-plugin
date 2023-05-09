@@ -149,11 +149,11 @@ const storyMapCleanUp = (props) => {
 	const attributesStructure = {
 		map_id: null,
 		description: null,
-		slides: null,
+		slides: [],
 		navigateButton: null,
 		hasIntroduction: null,
 		// loadedLayers: null,
-		navigateMapLayers: null,
+		navigateMapLayers: [],
 		postID: null,
 	};
 
