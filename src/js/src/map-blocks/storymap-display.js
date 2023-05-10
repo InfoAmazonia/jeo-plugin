@@ -103,6 +103,8 @@ class StoryMapDisplay extends Component {
 			mapBrightness = 1;
 		}
 
+		this.initialized = false;
+
         this.state = {
 			currentChapter: config.chapters[0],
 			// map: null,
@@ -115,6 +117,16 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
+		const observer = new IntersectionObserver(this.lazyInitStorymap.bind(this), { threshold: 0 });
+		observer.observe(this.el);
+	}
+
+	lazyInitStorymap([intersectionEntry]) {
+		if (this.initialized || !(intersectionEntry?.isIntersecting)) {
+			return;
+		}
+		this.initialized = true;
+
 		const config = this.config;
 		const firstChapter = config.chapters[0];
 		const initialLocation = firstChapter.location;
