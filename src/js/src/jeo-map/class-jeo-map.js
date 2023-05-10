@@ -71,8 +71,8 @@ export default class JeoMap {
 		observer.observe(element);
 	}
 
-	lazyInitMap() {
-		if (this.initialized) {
+	lazyInitMap([intersectionEntry]) {
+		if (this.initialized || !(intersectionEntry?.isIntersecting)) {
 			return;
 		}
 		this.initialized = true;
