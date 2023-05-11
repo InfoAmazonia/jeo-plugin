@@ -125,6 +125,7 @@ class StoryMapDisplay extends Component {
 
 	eagerInitStorymap() {
 		const config = this.config;
+		const firstChapter = config.chapters[0];
 
 		this.scroller
 			.setup({
@@ -173,7 +174,7 @@ class StoryMapDisplay extends Component {
 		})
 		.onStepExit(response => {
 			if ( response.index === 0 && response.direction === 'up' ) {
-				setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
+				this.setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
 
 				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
 				this.props.navigateMapLayers.forEach(layer => {
