@@ -66,6 +66,7 @@ $font-stories: var( --jeo-font-stories );
 	}
 
 	.the-story {
+		background-color: rgba(128, 128, 128, 0.1);
 		left: 50%;
 		margin: 0 -50vw;
 		position: relative;
