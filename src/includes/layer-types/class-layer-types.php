@@ -78,7 +78,7 @@ class Layer_Types {
 	 * @param array $options {
 	 *     Required. Array or string of arguments describing the layer_type
 	 * 	   @type string		 $script_url			Full URL to the layer type javascript file
-	 * 	   @type array 		 $dependencies 			List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependecies to the layer type main script
+	 * 	   @type array 		 $dependencies 			List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependencies to the layer type main script
 	 * }
 	 */
 	public function register_layer_type($slug, $options) {
@@ -136,7 +136,7 @@ class Layer_Types {
 		}
 
 		foreach ( $this->get_registered_layer_types() as $slug => $layer_type ) {
-			$deps = isset( $layer_type['dependecies'] ) ? $layer_type['dependecies'] : [];
+			$deps = isset( $layer_type['dependencies'] ) ? $layer_type['dependencies'] : [];
 			$deps = array_merge( ['jeo-layer'], $deps );
 			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps );
 			wp_set_script_translations('layer-type-' . $slug, 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages');
