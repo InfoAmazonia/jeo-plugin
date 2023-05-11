@@ -55,7 +55,7 @@
 		"uuid": "^7.0.3"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^6.2.0",
+		"@wordpress/scripts": "^26.4.0",
 		"css-loader": "^3.5.3",
 		"eslint": "^6.8.0",
 		"mapbox-gl": "^1.13.1",
