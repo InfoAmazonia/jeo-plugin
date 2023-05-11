@@ -1,12 +1,12 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 6.1.1
-Stable tag: 2.7.8
+Stable tag: 2.8.0
 Requires PHP: 7.2
 Requires at least: 5.8
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.7.8
+Version: 2.8.0
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -32,9 +32,9 @@ With JEO, creating the interaction between data layers and contextual informatio
 3. Select Jeo on the admin menu.
 
 There, you can configure:
-* the default latitude, longitude, and zoom for your maps;
-* the [Mapbox API key](https://docs.mapbox.com/help/how-mapbox-works/access-tokens) that'll be used by the plugin;
-* the geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available.
+* The default latitude, longitude, and zoom for your maps;
+* The [Mapbox API key](https://docs.mapbox.com/help/how-mapbox-works/access-tokens) that'll be used by the plugin;
+* The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available.
 
 After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
 
@@ -48,6 +48,13 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+
+= 2.8.0 =
+* Initialize lazily maps and story maps
+
+= 2.7.8 =
+* bugfix: Don't send nonces for unlogged requests
+* bugfix: Admin menu icon
 
 = 2.7.3 =
 * bugfix: Map embeds not working on Firefox
@@ -84,7 +91,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 = 2.5.0 =
 * Add a new block for embedded story maps
 * Generate URLs for embedding story maps inside posts
-* Many improvements on editing and viewing story maps
+* Many improvements in editing and viewing story maps
 
 = 2.4.1 =
 * bugfix: Remove PHP short tag open in templates/map-content-layers-list.php (<? instead <?php )
@@ -106,7 +113,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 * Show geolocate sidebar to another post types
 
 = 2.2.5 =
-* Improve custom post type geo localization
+* Improve custom post-type geo localization
 
 = 2.2.4 =
 * Fix related posts pin when the site has less than 101 posts
@@ -126,7 +133,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 JEO Plugin was updated to be compatible with WordPress version > 5.6.0.
 
 = 1.3.0 =
-* Eight release.
+* Eighth release.
 
 = 1.2.1 =
 * Seventh release.
@@ -164,7 +171,7 @@ Entering the Layer post editor, you'll see a preview of the current layer (or a 
 
 On the **Layer settings** panel, you can change the layer type.
 
-JEO supports four layer types out-of-the-box:
+JEO supports for layer types out-of-the-box:
 
 * [Mapbox styles](https://docs.mapbox.com/studio-manual/overview/map-styling/);
 * [Mapbox tilesets](https://docs.mapbox.com/help/glossary/tileset/);
@@ -175,7 +182,7 @@ You can also inform an address, following the standard `username/id`, to compose
 
 There's also an **Edit interactions** button. Here, you can add popups to your layer when specific actions (clicking or hovering the mouse) are made (e.g.: Clicking on a building and displaying its height)
 
-On the **Layer legend** panel, you can add legends to your layer (barscale, simple-color, icons or circles) and colorize them.
+On the **Layer legend** panel, you can add legends to your layer (bar scale, simple color, icons or circles) and colorize them.
 
 = How to create a map? =
 # Creating maps
@@ -225,7 +232,7 @@ The List tab allows you to visualize all the created points and delete a specifi
 
 ## Visualizing a map with geolocated posts
 
-Map with geolocated posts contain markers on the localization of each post. Clicking on them will open a popup with its title and publication date. Clicking on the title will take you to the post itself.
+Maps with geolocated posts contain markers on the localization of each post. Clicking on them will open a popup with their title and publication date. Clicking on the title will take you to the post itself.
 
 # Map shortcode
 
@@ -275,7 +282,7 @@ Selecting the **JEO One-time Map** block, a standard map preview will appear. Th
 
 # Embedding a map
 
-JEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called `Embed map` and it's very easy to be done.
+The JEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called `Embed map` and it's very easy to be done.
 
 When editing a Map, one of the setting panels is `Status & Visibility`. There you can find the `embed URL` of that specific map.
 
@@ -313,14 +320,14 @@ First, let's register a new Layer Type by hooking up in the `jeo_register_layer_
         $layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
     });
 
-`register_layer_type` method gets 2 parameters.
+The `register_layer_type` method gets 2 parameters.
 
 * Layer type slug - A unique sanitized string (make sure to make it unique)
 * Options - An array with the layer type options:
   * `script_url`: Required. The absolute URL to your JavaScript file.
-  * `dependecies`: Optional. An array of script handles registered using [wp_register_script][(](https://developer.wordpress.org/reference/functions/wp_register_script/)) that should be loaded as a dependency to the layer type main script
+  * `dependencies`: Optional. An array of script handles registered using [wp_register_script](https://developer.wordpress.org/reference/functions/wp_register_script/) that should be loaded as a dependency to the layer type main script
 
-That's all you need to do on the PHP side. All the magic happens on JavaScript.
+That's all you need to do on the PHP side. All the magic happens in JavaScript.
 
 Now, let's create our `layertype.js` file.
 
@@ -353,15 +360,15 @@ Your Layer Type object MUST implement at least these three methods.
 
 **returns**:
 
-* Promise with json-schema
+* Promise with JSON-schema
 
-This method will tell JEO which are the options the user has to fill in when creating a new layer of this type.
+This method will tell JEO which options the user has to fill in when creating a new layer of this type.
 
 For example, a raster tile layer type might have only a URL. A Mapbox layer has the Style ID and the optional Access token.
 
 This method must return a Promise with a JSON Schema representation of the layer type options.
 
-This schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.
+This schema must only include layer-type-specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.
 
 For example, the "Tile layer" layer type needs only a URL, so that's how its `getSchema` method will look like.
 
@@ -472,7 +479,7 @@ Some attributes are common to any layer type, and others are specific to a layer
 
 So these are the keys available in the `attributes` object:
 
-* `layer_id`: (integer) A unique ID that represents this layer and identify it in the database
+* `layer_id`: (integer) A unique ID that represents this layer and identifies it in the database
 * `layer_name`: (string) The layer name, given by the user
 * `visible`: (boolean) A flag indicating whether this layer should be visible when the map initializes
 * `layer_type_options`: (object) A object with all the layer type-specific attributes (those registered in the `getSchema` method)
@@ -522,7 +529,7 @@ When you save geographical information of the points, JEO also creates other met
 
 Since each point is stored as serialized data in the database, this would not allow us to filter posts by `country_code` for example. That's why we create indexes.
 
-For the example above, this post would also have one individual metadata entry for each information, like this:
+For the example above, this post would also have one individual metadata entry for each piece of information, like this:
 
     [
         '_geocode_lat_p' => '-23,54659435',
@@ -580,7 +587,7 @@ Give me all the posts whose city is `'Manaus'`:
 
 # Writing a Geocoder
 
-A Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on the geographical coordinates, which is called Reverse Geocoding.
+A Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on geographical coordinates, which is called Reverse Geocoding.
 
 JEO needs a geocoder service in a few situations, such as when users indicate to where on a map a story (posts) is related.
 
@@ -809,7 +816,7 @@ You can also add the `get_default_options()` method to your class to set default
             public function get_default_options() {
 
                 return [
-                    'api_key' => 'sand-box-api-key' // the key must match the slug of the setting registered in get_settings()
+                    'api_key' => 'sand-box-api-key' // The key must match the slug of the setting registered in get_settings()
                 ];
 
             }

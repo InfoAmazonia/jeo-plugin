@@ -71,7 +71,7 @@ class Legend_Types {
 	 * @param array $options {
 	 *     Required. Array or string of arguments describing the legend_type
 	 * 	   @type string		 $script_url			Full URL to the legend type javascript file
-	 * 	   @type array 		 $dependencies 			List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependecies to the legend type main script
+	 * 	   @type array 		 $dependencies 			List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependencies to the legend type main script
 	 * }
 	 */
 	public function register_legend_type($slug, $options) {
@@ -128,7 +128,7 @@ class Legend_Types {
 		}
 
 		foreach ( $this->get_registered_legend_types() as $slug => $legend_type ) {
-			$deps = isset( $legend_type['dependecies'] ) ? $legend_type['dependecies'] : [];
+			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : [];
 			$deps = array_merge( ['jeo-legend'], $deps );
 			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps );
 			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );

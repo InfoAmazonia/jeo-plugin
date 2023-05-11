@@ -28,7 +28,7 @@ add_action('jeo_register_layer_types', function($layer_types) {
 - Layer type slug - A unique sanitized string (make sure to make it unique)
 - Options - An array with the layer type options:
   - `script_url`: Required. The absolute URL to your JavaScript file.
-  - `dependecies`: Optional. An array of scripts handles registered using [wp_register_script][(](https://developer.wordpress.org/reference/functions/wp_register_script/)) that should be loaded as a dependency to the layer type main script
+  - `dependencies`: Optional. An array of scripts handles registered using [wp_register_script](https://developer.wordpress.org/reference/functions/wp_register_script/) that should be loaded as a dependency to the layer type main script
 
 That's all you need to do on the PHP side. All the magic happens on the JavaScript.
 
