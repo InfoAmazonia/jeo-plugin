@@ -117,8 +117,110 @@ class StoryMapDisplay extends Component {
     }
 
     componentDidMount() {
+		this.eagerInitStorymap();
+
 		const observer = new IntersectionObserver(this.lazyInitStorymap.bind(this), { threshold: 0 });
 		observer.observe(this.el);
+	}
+
+	eagerInitStorymap() {
+		const config = this.config;
+
+		this.scroller
+			.setup({
+				step: `#story-map-${this.cid} .step`,
+				offset: 0.5,
+				progress: true,
+			})
+			.onStepEnter(response => {
+				if ( response.index === config.chapters.length - 1 ) {
+					this.setState({ ...this.state, mapBrightness: MAP_DIM, inSlides: false })
+					this.map?.flyTo({
+						center: [ mapDefaults.lng, mapDefaults.lat ]
+					});
+				} else if ( this.state.mapBrightness === MAP_DIM ) {
+					this.setState( { ...this.state, mapBrightness: 1, inSlides: true } )
+				}
+
+				const chapter = config.chapters.find( ( chap, index ) => {
+					if ( response.element.dataset.id === config.chapters.length && index === config.chapters.length - 1 ) {
+						return true
+					}
+
+					return chap.id == response.element.dataset.id;
+				});
+
+				this.setState( { ...this.state, currentChapter: chapter } );
+				this.map?.flyTo(chapter.location);
+
+				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
+				this.props.navigateMapLayers.forEach(layer => {
+					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+					if( isLayerUsed || response.index === config.chapters.length - 1) {
+						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+					}
+				})
+
+
+				this.props.navigateMapLayers.forEach(layer => {
+					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+					if ( !isLayerUsed ) {
+						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+					}
+				})
+		})
+		.onStepExit(response => {
+			if ( response.index === 0 && response.direction === 'up' ) {
+				setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
+
+				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
+				this.props.navigateMapLayers.forEach(layer => {
+					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+					if( isLayerUsed ) {
+						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+					}
+				})
+
+				this.props.navigateMapLayers.forEach(layer => {
+					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+
+					if ( !isLayerUsed ) {
+						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+					}
+				})
+			}
+		});
+
+		window.addEventListener('resize', this.scroller.resize);
+
+		const navigateMapDiv = document.createElement('div');
+		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
+		navigateMapDiv.dataset.map_id = this.props.map_id;
+
+		this.navigateMap = new JeoMap( navigateMapDiv );
+		this.el.querySelector('.navigate-map').append( navigateMapDiv );
+
+		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
+		window.fetch( url )
+			.then( ( response ) => {
+				return response.json();
+			} )
+			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
+
+		this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
+
+		document.addEventListener('fullscreenchange', function() {
+			if ( document.fullscreenElement ) {
+				this.el.querySelector( '.return-to-slides-container' ).style.display = 'none';
+			} else {
+				this.el.querySelector( '.return-to-slides-container' ).style.display = 'block';
+			}
+
+			window.scrollTo ( 0, document.body.scrollHeight );
+		});
 	}
 
 	lazyInitStorymap([intersectionEntry]) {
@@ -146,112 +248,15 @@ class StoryMapDisplay extends Component {
 			map.touchZoomRotate.disable();
 			map.dragRotate.disable();
 
-			const setState = this.setState.bind(this);
-
 			this.props.navigateMapLayers.forEach(layer => {
 				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: String(layer.id), visible: true });
 				jeoLayer.addLayer(map);
 				map.setPaintProperty(String(layer.id), 'raster-opacity', isInitialLayer ? 1 : 0);
-			})
-
-			this.scroller
-				.setup({
-					step: `#story-map-${this.cid} .step`,
-					offset: 0.5,
-					progress: true,
-				})
-				.onStepEnter(response => {
-					if ( response.index === config.chapters.length - 1 ) {
-						setState({ ...this.state, mapBrightness: MAP_DIM, inSlides: false })
-						map.flyTo({
-							center: [ mapDefaults.lng, mapDefaults.lat ]
-						});
-					} else if ( this.state.mapBrightness === MAP_DIM ) {
-						setState( { ...this.state, mapBrightness: 1, inSlides: true } )
-					}
-
-					const chapter = config.chapters.find( ( chap, index ) => {
-						if ( response.element.dataset.id === config.chapters.length && index === config.chapters.length - 1 ) {
-							return true
-						}
-
-						return chap.id == response.element.dataset.id;
-					});
-
-					setState( { ...this.state, currentChapter: chapter } );
-					map.flyTo(chapter.location);
-
-					// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
-					this.props.navigateMapLayers.forEach(layer => {
-						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
-
-						if( isLayerUsed || response.index === config.chapters.length - 1) {
-							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
-						}
-					})
-
-
-					this.props.navigateMapLayers.forEach(layer => {
-						const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
-
-						if ( !isLayerUsed ) {
-							map.setPaintProperty(String(layer.id), 'raster-opacity', 0)
-						}
-					})
-			})
-			.onStepExit(response => {
-				if ( response.index === 0 && response.direction === 'up' ) {
-					setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
-
-					// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
-					this.props.navigateMapLayers.forEach(layer => {
-						const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
-
-						if( isLayerUsed ) {
-							map.setPaintProperty(String(layer.id), 'raster-opacity', 1)
-						}
-					})
-
-					this.props.navigateMapLayers.forEach(layer => {
-						const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
-
-						if ( !isLayerUsed ) {
-							map.setPaintProperty(String(layer.id), 'raster-opacity', 0)
-						}
-					})
-				}
 			});
-		});
 
-		window.addEventListener('resize', this.scroller.resize);
-		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
-
-		const navigateMapDiv = document.createElement('div');
-		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
-		navigateMapDiv.dataset.map_id = this.props.map_id;
-
-		this.navigateMap = new JeoMap( navigateMapDiv );
-		this.el.querySelector('.navigate-map').append( navigateMapDiv );
-
-		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
-		window.fetch( url )
-			.then( ( response ) => {
-				return response.json();
-			} )
-			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
-
-		this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
-
-		document.addEventListener("fullscreenchange", function() {
-			if ( document.fullscreenElement ) {
-				this.el.querySelector( '.return-to-slides-container' ).style.display = 'none';
-			} else {
-				this.el.querySelector( '.return-to-slides-container' ).style.display = 'block';
-			}
-
-			window.scrollTo ( 0, document.body.scrollHeight );
+			this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
 		});
 	}
 
