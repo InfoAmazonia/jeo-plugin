@@ -71,11 +71,18 @@ $font-stories: var( --jeo-font-stories );
 		margin: 0 -50vw;
 		position: relative;
 		right: 50%;
-		top: -100vh;
+		top: 0;
 		width: 100vw;
+
+		&.loaded {
+			background-color: transparent;
+			top: -100vh;
+		}
 	}
 
 	.not-navigating-map {
+		position: relative;
+
 		.mapboxgl-map {
 			border: none;
 			height: 100vh;

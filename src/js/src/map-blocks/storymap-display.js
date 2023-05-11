@@ -258,6 +258,7 @@ class StoryMapDisplay extends Component {
 			});
 
 			this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+			this.el.querySelector('.the-story').classList.add('loaded');
 		});
 	}
 
