@@ -1143,7 +1143,6 @@ export default class JeoMap {
 		amountLayers = new parameter
 	*/
 	addLayersControl( amountLayers ) {
-		console.log(this.layersDefinitions);
 		const switchableLayers = this.getSwitchableLayers();
 		const swappableLayers = this.getSwappableLayers();
 
