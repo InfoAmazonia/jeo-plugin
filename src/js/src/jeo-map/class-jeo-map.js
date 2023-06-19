@@ -589,7 +589,7 @@ export default class JeoMap {
 
 						ordered.forEach( ( layerObject, i ) => {
 							if ( layerObject ) {
-								returnLayers.push(
+								returnLayers[ i ] = (
 									new window.JeoLayer( layerObject.meta.type, {
 										layer_post_id: layerObject.id,
 										layer_id: layerObject.slug,
@@ -606,7 +606,7 @@ export default class JeoMap {
 									layerObject.meta.legend_type !== 'none' &&
 									layersDefinitions[ i ].show_legend
 								) {
-									returnLegends.push(
+									returnLegends[ i ] = (
 										new window.JeoLegend( layerObject.meta.legend_type, {
 											layer_post_id: layerObject.id,
 											layer_id: layerObject.slug,
@@ -1143,6 +1143,7 @@ export default class JeoMap {
 		amountLayers = new parameter
 	*/
 	addLayersControl( amountLayers ) {
+		console.log(this.layersDefinitions);
 		const switchableLayers = this.getSwitchableLayers();
 		const swappableLayers = this.getSwappableLayers();
 
