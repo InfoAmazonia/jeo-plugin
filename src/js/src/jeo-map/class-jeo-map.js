@@ -845,7 +845,6 @@ export default class JeoMap {
 										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
 											const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val)) ));
 
-
 											if(nextFeatures.length >= 2) {
 												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
 													if (!err) {
@@ -860,10 +859,7 @@ export default class JeoMap {
 												});
 											} else {
 												// implements spiderifier
-/* 												let markers = _.map(leafFeatures, function(leafFeature){
-													return leafFeature.properties;
-												});
- */												let markers = aFeatures.map( ( eachFeature ) => {
+												let markers = aFeatures.map( ( eachFeature ) => {
 													return eachFeature.properties;
 												})
 												self.spiderifier.spiderfy(features[0].geometry.coordinates, markers);
