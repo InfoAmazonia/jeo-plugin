@@ -840,30 +840,28 @@ export default class JeoMap {
 											return uniques;
 										}
 
+										function getMarkers ( features ) {
+											return features.map( ( feature ) => feature.properties );
+										}
 
 										// Get all points under a cluster
 										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
 											const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val)) ));
-
-											if(nextFeatures.length >= 2) {
+											if (nextFeatures.length >= 2) {
 												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
 													if (!err) {
-
-
-														map.easeTo({
-															center: features[0].geometry.coordinates,
-															zoom
-														});
-
+														if (zoom > self.getArg('max_zoom')) {
+															self.spiderifier.spiderfy(features[0].geometry.coordinates, getMarkers(aFeatures));
+														} else {
+															map.easeTo({
+																center: features[0].geometry.coordinates,
+																zoom
+															});
+														}
 													}
 												});
 											} else {
-												// implements spiderifier
-												let markers = aFeatures.map( ( eachFeature ) => {
-													return eachFeature.properties;
-												})
-												self.spiderifier.spiderfy(features[0].geometry.coordinates, markers);
-
+												self.spiderifier.spiderfy(features[0].geometry.coordinates, getMarkers(aFeatures));
 											}
 										})
 
