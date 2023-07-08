@@ -55,11 +55,11 @@
 		"uuid": "^7.0.3"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^6.2.0",
+		"@wordpress/scripts": "^26.8.0",
 		"css-loader": "^3.5.3",
 		"eslint": "^6.8.0",
 		"mapbox-gl": "^1.13.1",
-		"node-sass": "^4.14.1",
+		"node-sass": "^9.0.0",
 		"prettier": "npm:wp-prettier@^2.0.5",
 		"prettier-eslint-cli": "^5.0.1",
 		"sass": "^1.32.8",
