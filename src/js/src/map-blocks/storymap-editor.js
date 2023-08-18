@@ -101,7 +101,6 @@ const StoryMapEditor = ( {
 	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 
 	useEffect( () => {
-		// Post the already exsists
 		if(attributes.slides && loadedMap && loadedLayers) {
 			const newSlides = attributes.slides.map(slide => {
 				slide.selectedLayers.forEach((selectedLayer, index) => {
@@ -139,7 +138,6 @@ const StoryMapEditor = ( {
 			setAttributes( {
 				...attributes,
 				slides: newSlides,
-				loadedLayers,
 				navigateMapLayers,
 			} );
 
@@ -149,7 +147,6 @@ const StoryMapEditor = ( {
 
 		setAttributes( {
 			...attributes,
-			loadedLayers,
 			navigateMapLayers: loadedLayers,
 		} );
 	}, [ loadingMap, loadedLayers ] );
@@ -208,7 +205,6 @@ const StoryMapEditor = ( {
 						bearing: 0,
 					},
 				],
-				loadedLayers,
 				navigateMapLayers: [],
 			} );
 		}
@@ -237,7 +233,6 @@ const StoryMapEditor = ( {
 						<Map
 							key={ key }
 							onStyleLoad={ ( map ) => {
-								// setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
 								setSelectedMap( map );
 								setStorymapLayers( layersContent )
 
@@ -823,7 +818,6 @@ const StoryMapEditor = ( {
 										bearing: 0,
 									},
 								],
-								loadedLayers,
 								navigateMapLayers: [],
 							} )
 						}

@@ -143,7 +143,17 @@ registerBlockType( 'jeo/onetime-map', {
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
 } );
 
-const storyMapCleanUp = (props) => {
+function removeYoastTagsFromObject(object) {
+	if( object && object.hasOwnProperty('yoast_head') ) {
+		delete object.yoast_head;
+	}
+
+	if( object && object.hasOwnProperty('yoast_head_json') ) {
+		delete object.yoast_head_json;
+	}
+}
+
+function storyMapCleanUp (props) {
 	const propsCopy = cloneDeep(props);
 
 	const attributesStructure = {
@@ -152,7 +162,6 @@ const storyMapCleanUp = (props) => {
 		slides: [],
 		navigateButton: null,
 		hasIntroduction: null,
-		// loadedLayers: null,
 		navigateMapLayers: [],
 		postID: null,
 	};
@@ -160,12 +169,6 @@ const storyMapCleanUp = (props) => {
 	for (const key in attributesStructure) {
 		if(propsCopy.attributes[key]) {
 			attributesStructure[key] = propsCopy.attributes[key];
-		}
-	}
-
-	function removeYoastTagsFromObject(object) {
-		if( object && object.hasOwnProperty('yoast_head') ) {
-			delete object.yoast_head;
 		}
 	}
 
