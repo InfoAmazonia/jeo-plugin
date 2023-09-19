@@ -8,6 +8,8 @@ class Settings {
 
 	public $option_key = 'jeo-settings';
 
+	private $default_options = [];
+
 	protected function init() {
 
 		$this->default_options = [
