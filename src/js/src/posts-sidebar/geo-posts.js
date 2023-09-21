@@ -1,4 +1,4 @@
-import { Button, RadioControl } from '@wordpress/components';
+import { Button, CheckboxControl, RadioControl } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
@@ -24,6 +24,7 @@ class JeoGeocodePosts extends Component {
 			points: metadata._related_point,
 			currentMarkerIndex: 0,
 			loadStatus: 'pending',
+			magneticMarkers: true,
 		};
 
 		this.onLocationFound = this.onLocationFound.bind( this );
@@ -46,6 +47,7 @@ class JeoGeocodePosts extends Component {
 		this.renderForm = this.renderForm.bind( this );
 		this.onClickNewPoint = this.onClickNewPoint.bind( this );
 		this.onClickCancel = this.onClickCancel.bind( this );
+		this.toggleMagnet = this.toggleMagnet.bind( this );
 
 		this.refMap = createRef();
 	}
@@ -89,6 +91,12 @@ class JeoGeocodePosts extends Component {
 		this.setState( {
 			searchValue: newValue,
 			loadStatus: 'pending',
+		} );
+	}
+
+	toggleMagnet () {
+		this.setState( {
+			magneticMarkers: !this.state.magneticMarkers,
 		} );
 	}
 
@@ -239,8 +247,8 @@ class JeoGeocodePosts extends Component {
 			}
 
 			const foundPoint = {
-				_geocode_lat: this.getProperty( result, 'lat' ),
-				_geocode_lon: this.getProperty( result, 'lon' ),
+				_geocode_lat: this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : String( location.lat ),
+				_geocode_lon: this.state.magneticMarkers ? this.getProperty( result, 'lon' ) : String( location.lon ),
 				_geocode_full_address: this.getProperty( result, 'full_address' ),
 				_geocode_country: this.getProperty( result, 'country' ),
 				_geocode_country_code: this.getProperty( result, 'country_code' ),
@@ -338,6 +346,7 @@ class JeoGeocodePosts extends Component {
 			searchValue,
 			formMode,
 			loadStatus,
+			magneticMarkers,
 		} = this.state;
 		const isDisabled = ! (
 			loadStatus === 'resolved' && searchValue.replace( /\s/g, '' ).length
@@ -358,17 +367,24 @@ class JeoGeocodePosts extends Component {
 				</div>
 				<div>
 					{ ! isDisabled && (
-						<RadioControl
-							label={ __( 'Relevance', 'jeo' ) }
-							selected={
-								points.length ? selectedPoint.relevance || 'primary' : 'primary'
-							}
-							options={ [
-								{ label: __( 'Primary', 'jeo' ), value: 'primary' },
-								{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
-							] }
-							onChange={ this.relevanceClick }
-						/>
+						<Fragment>
+							<CheckboxControl
+								label={ __( 'Move marker to nearest found point.', 'jeo' ) }
+								checked={ magneticMarkers }
+								onChange={ this.toggleMagnet }
+							/>
+							<RadioControl
+								label={ __( 'Relevance', 'jeo' ) }
+								selected={
+									points.length ? selectedPoint.relevance || 'primary' : 'primary'
+								}
+								options={ [
+									{ label: __( 'Primary', 'jeo' ), value: 'primary' },
+									{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
+								] }
+								onChange={ this.relevanceClick }
+							/>
+						</Fragment>
 					) }
 					<div className="jeo-geocode-posts__row">
 						<div className="jeo-geocode-posts__buttons-list">
@@ -424,6 +440,7 @@ class JeoGeocodePosts extends Component {
 							<ul>
 								{ pointsList.map( ( point, i ) => (
 									<li
+										key={ i }
 										id={ i }
 										onClick={
 											formMode === 'view' ? this.clickMarkerList : null
@@ -498,6 +515,7 @@ class JeoGeocodePosts extends Component {
 
 								return (
 									<Marker
+										key={ i }
 										icon={ icon }
 										draggable={
 											currentMarkerIndex === i && formMode !== 'view'
