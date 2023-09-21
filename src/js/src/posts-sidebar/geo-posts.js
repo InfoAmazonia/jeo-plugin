@@ -155,14 +155,13 @@ class JeoGeocodePosts extends Component {
 	}
 
 	fetchReverseGeocode( lat, lng ) {
-		const response = window
+		return window
 			.fetch(
 				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lng
 			)
 			.then( ( response ) => {
 				return response.json();
 			} );
-		return response;
 	}
 
 	handleClickSave() {
@@ -340,7 +339,7 @@ class JeoGeocodePosts extends Component {
 			formMode,
 			loadStatus,
 		} = this.state;
-		let isDisabled = ! (
+		const isDisabled = ! (
 			loadStatus === 'resolved' && searchValue.replace( /\s/g, '' ).length
 		);
 
@@ -373,11 +372,11 @@ class JeoGeocodePosts extends Component {
 					) }
 					<div className="jeo-geocode-posts__row">
 						<div className="jeo-geocode-posts__buttons-list">
-							<Button isSecondary onClick={ this.onClickCancel }>
+							<Button variant="secondary" onClick={ this.onClickCancel }>
 								{ __( 'Cancel', 'jeo' ) }
 							</Button>
 							<Button
-								isPrimary
+								variant="primary"
 								onClick={ this.handleClickSave }
 								disabled={ isDisabled }
 							>
@@ -405,7 +404,7 @@ class JeoGeocodePosts extends Component {
 						<h2>{ __( 'Geolocated points', 'jeo' ) }</h2>
 						<div>
 							{ formMode === 'view' && (
-								<Button isPrimary onClick={ this.onClickNewPoint }>
+								<Button variant="primary" onClick={ this.onClickNewPoint }>
 									{ __( 'Add new point', 'jeo' ) }
 								</Button>
 							) }
@@ -439,7 +438,7 @@ class JeoGeocodePosts extends Component {
 										{ formMode === 'view' ? (
 											<Fragment>
 												<Button
-													isLink
+													variant="link"
 													onClick={ this.onClickDelete }
 													marker_index={ i }
 												>
@@ -447,7 +446,7 @@ class JeoGeocodePosts extends Component {
 												</Button>
 												<span> | </span>
 												<Button
-													isLink
+													variant="link"
 													onClick={ this.onClickEdit }
 													marker_index={ i }
 												>

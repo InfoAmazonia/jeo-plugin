@@ -146,7 +146,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 						/>
 					) }
 
-					<Button isPrimary onClick={ openModal }>
+					<Button variant="primary" onClick={ openModal }>
 						{ __( 'Edit interactions', 'jeo' ) }
 					</Button>
 				</Fragment>

@@ -42,7 +42,7 @@ const LayersLibrary = ( {
 					onChange={ setSearch }
 				/>
 				<span>{ __( 'or', 'jeo' ) }</span>
-				<Button isPrimary isLarge onClick={ () => setEditing( true ) }>
+				<Button variant="primary" isLarge onClick={ () => setEditing( true ) }>
 					{ __( 'Create New Layer', 'jeo' ) }
 				</Button>
 			</div>

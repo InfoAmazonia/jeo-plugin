@@ -50,7 +50,7 @@ export default ( {
 							<p className="empty">{ emptyMessage }</p>
 						) }
 						{ ! loadingLayers && (
-							<Button isPrimary isLarge onClick={ onButtonClick }>
+							<Button variant="primary" isLarge onClick={ onButtonClick }>
 								{ __( 'Add a new layer', 'jeo' ) }
 							</Button>
 						) }

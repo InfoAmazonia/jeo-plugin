@@ -129,7 +129,7 @@ class CircleEditor extends Component {
 					} )
 				}
 
-				<Button isSecondary isButton isLarge onClick={ this.addNew } className="full-width-button">
+				<Button variant="secondary" isButton isLarge onClick={ this.addNew } className="full-width-button">
 					{ __( 'Add new label', 'jeo' ) }
 				</Button>
 			</Fragment>
@@ -205,11 +205,11 @@ class CircleItem extends Component {
 						position=""
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<div className="buttonsList">
-								<Button isDestructive isButton isLink isSecondary onClick={ () => this.props.removeLabel( this.state.id ) } >
+								<Button isDestructive isButton variant="secondary" onClick={ () => this.props.removeLabel( this.state.id ) } >
 									{ __( 'Remove', 'jeo' ) }
 								</Button>
 
-								<Button isSecondary isButton isLink aria-expanded={ isOpen } onClick={ onToggle } >
+								<Button variant="secondary" isButton aria-expanded={ isOpen } onClick={ onToggle } >
 									{ __( 'See preview', 'jeo' ) }
 								</Button>
 							</div>

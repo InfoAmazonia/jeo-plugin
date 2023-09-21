@@ -18,7 +18,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 		const isOpen = this.state.isOpen;
 		return (
 			<Fragment>
-				<Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>
+				<Button variant="secondary" onClick={ () => this.setState( { isOpen: true } ) }>
 					{ __( 'Geolocate this post', 'jeo' ) }
 				</Button>
 				{ isOpen && (
@@ -47,7 +47,7 @@ registerPlugin( 'jeo-posts-sidebar', {
 
 	return (
 		<div>
-			{ currentPostType ? 
+			{ currentPostType ?
 				<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
 					<JeoGeocodePanel />
 				</PluginDocumentSettingPanel>

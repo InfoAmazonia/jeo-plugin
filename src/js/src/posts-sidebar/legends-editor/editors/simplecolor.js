@@ -119,7 +119,7 @@ class SimplecolorEditor extends Component {
 				<div className="itens-wrapper">
 					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } />
 					) }
-					<Button isSecondary isButton isLarge onClick={ this.addItem } className="full-width-button">
+					<Button variant="secondary" isButton isLarge onClick={ this.addItem } className="full-width-button">
 						{ __( 'Add new label', 'jeo' ) }
 					</Button>
 				</div>
@@ -171,7 +171,7 @@ class ColorItem extends Component {
 								disableAlpha
 							/>
 
-							<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
+							<Button className="full-width-button" isDestructive isButton variant="secondary" onClick={ () => this.props.removeItem( this.state.id ) } >
 								{ __( 'Remove', 'jeo' ) }
 							</Button>
 						</div>

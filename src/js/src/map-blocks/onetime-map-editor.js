@@ -139,7 +139,7 @@ const OnetimeMapEditor = ( {
 			</div>
 
 			<div className="jeo-preview-controls">
-				<Button isPrimary isLarge onClick={ openModal }>
+				<Button variant="primary" isLarge onClick={ openModal }>
 					{ __( 'Edit layers settings', 'jeo' ) }
 				</Button>
 			</div>

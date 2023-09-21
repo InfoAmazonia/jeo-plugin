@@ -832,7 +832,7 @@ const StoryMapEditor = ( {
 						<Button
 							className="select-another-map"
 							isLarge
-							isPrimary
+							variant="primary"
 							style={ { marginTop: '10px' } }
 							onClick={ () => {
 								const previous_map = attributes.previous_map;
