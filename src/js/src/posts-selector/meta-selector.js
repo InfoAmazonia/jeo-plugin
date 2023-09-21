@@ -59,7 +59,7 @@ export function MetaSelector( { label, onChange, value: _metas } ) {
 					</PanelRow>
 
 					<Button
-						isPrimary
+						variant="primary"
 						isDestructive
 						onClick={ () => {
 							onChange( replace( metas, i ) );
@@ -72,7 +72,7 @@ export function MetaSelector( { label, onChange, value: _metas } ) {
 
 			<div>
 				<Button
-					isPrimary
+					variant="primary"
 					onClick={ () => {
 						onChange( [ ...metas, { key: '', value: '', compare: '=' } ] );
 					} }

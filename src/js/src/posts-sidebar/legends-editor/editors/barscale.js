@@ -207,7 +207,7 @@ class ColorItem extends Component {
 							disableAlpha
 						/>
 
-						<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
+						<Button className="full-width-button" isDestructive isButton variant="secondary" onClick={ () => this.props.removeItem( this.state.id ) } >
 							{ __( 'Remove', 'jeo' ) }
 						</Button>
 					</div>

@@ -198,7 +198,7 @@ const LayersSettings = ( {
 							}
 							<Button
 								className="jeo-layers-library-filters-button-filter"
-								isPrimary
+								variant="primary"
 								isLarge
 								onClick={ filterLayers }
 							>
@@ -206,7 +206,7 @@ const LayersSettings = ( {
 							</Button>
 							<Button
 								className="jeo-layers-library-filters-button-clear"
-								isPrimary
+								variant="primary"
 								isLarge
 								onClick={ () => {
 									setFilteredLayers([]);
@@ -223,7 +223,7 @@ const LayersSettings = ( {
 				<div className="right">
 					<Button
 						className="create-layer-button"
-						isPrimary
+						variant="primary"
 						isLarge
 						href="/wp-admin/post-new.php?post_type=map-layer"
 						target="_blank"
@@ -503,7 +503,7 @@ const LayersSettings = ( {
 			) }
 			<Button
 				className="done-button"
-				isPrimary
+				variant="primary"
 				isLarge
 				target="_blank"
 				rel="noopener noreferrer"

@@ -131,7 +131,7 @@ const CartoIntegration = ( { postMeta, setPostMeta }) => {
 						type="textarea"
 					/>
 					{ cartoSQLQuery.length > 0 &&
-						<Button isSecondary onClick={ cartoIntegrationProcess } disabled={ processingGeoJsonStatus.doingGeoJsonStage || processingGeoJsonStatus.doneGeoJsonStage ||  uploudingToMabbox }>
+						<Button variant="secondary" onClick={ cartoIntegrationProcess } disabled={ processingGeoJsonStatus.doingGeoJsonStage || processingGeoJsonStatus.doneGeoJsonStage ||  uploudingToMabbox }>
 							{ __("Syncronize", "jeo") }
 						</Button>
 					}

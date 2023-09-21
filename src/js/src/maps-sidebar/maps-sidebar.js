@@ -215,7 +215,7 @@ function MapsSidebar( {
 							<Button
 								style={ initialButtonStyle }
 								className="zoom-button"
-								isPrimary
+								variant="primary"
 								isLarge
 								onClick={ () => {
 									setZoomState( 'initial_zoom' );
@@ -230,7 +230,7 @@ function MapsSidebar( {
 							<Button
 								style={ minButtonStyle }
 								className="zoom-button"
-								isPrimary
+								variant="primary"
 								isLarge
 								onClick={ () => {
 									if ( postMeta.min_zoom <= 0 ) {
@@ -250,7 +250,7 @@ function MapsSidebar( {
 							<Button
 								style={ maxButtonStyle }
 								className="zoom-button"
-								isPrimary
+								variant="primary"
 								isLarge
 								onClick={ () => {
 									if ( postMeta.max_zoom <= 0 ) {

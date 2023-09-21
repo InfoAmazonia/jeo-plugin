@@ -95,7 +95,7 @@ class IconEditor extends Component {
 						return ( <IconItem iconData={ item } key={ item.id } removeLabel={ this.removeLabel } iconUpdate={ this.iconUpdate } /> );
 					} )
 				}
-				<Button isSecondary isButton isLarge onClick={ this.addLabel } className="full-width-button">
+				<Button variant="secondary" isButton isLarge onClick={ this.addLabel } className="full-width-button">
 					{ __( 'Add new label', 'jeo' ) }
 				</Button>
 			</Fragment>
@@ -144,7 +144,7 @@ class IconItem extends Component {
 						<h4>The uploaded icon is too small. The minimum size required is 60x60 pixels.</h4>
 						<Button
 							isLarge
-							isPrimary
+							variant="primary"
 							style={ { marginTop: '10px' } }
 							onClick={ () => {
 								this.setState( {

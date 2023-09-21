@@ -116,7 +116,7 @@ export default function InteractionsSettings( {
 			</Panel>
 			<Button
 				style={ { float: 'left', margin: '8px 0' } }
-				isPrimary
+				variant="primary"
 				onClick={ onDone }
 			>
 				{ __( 'Done', 'jeo' ) }
