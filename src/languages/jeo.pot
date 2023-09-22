@@ -1,4 +1,4 @@
-# Copyright (C) 2021 
+# Copyright (C) 2021
 # This file is distributed under the same license as the JEO WP plugin.
 msgid ""
 msgstr ""
@@ -1502,6 +1502,9 @@ msgstr ""
 #: js/build/postsSidebar.js:22124
 #: js/src/posts-sidebar/geo-posts.js:363
 msgid "Relevance"
+msgstr ""
+
+msgid "Move marker to nearest address"
 msgstr ""
 
 #: js/build/postsSidebar.js:22127

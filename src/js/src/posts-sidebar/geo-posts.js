@@ -369,7 +369,7 @@ class JeoGeocodePosts extends Component {
 					{ ! isDisabled && (
 						<Fragment>
 							<CheckboxControl
-								label={ __( 'Move marker to nearest found point.', 'jeo' ) }
+								label={ __( 'Move marker to nearest address', 'jeo' ) }
 								checked={ magneticMarkers }
 								onChange={ this.toggleMagnet }
 							/>
