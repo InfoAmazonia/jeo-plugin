@@ -1034,6 +1034,9 @@ msgstr "Posts relacionados"
 msgid "Relevance"
 msgstr "Relevância"
 
+msgid "Move marker to nearest address"
+msgstr "Mover marcador para o logradouro mais próximo"
+
 #: js/build/layersSidebar.js:33016 js/build/layersSidebar.js:33366
 #: js/build/layersSidebar.js:34058 js/build/mapBlocks.js:38589
 #: js/build/mapBlocks.js:39153 js/build/mapsSidebar.js:35762
