@@ -253,7 +253,7 @@ const LayerSettings = (
 					{ settings.load_as_style && showStyleLayers && (
 						<>
 							<div className="informative-message">
-								{ __("If the layer is not visible inside Mapbox Studio we will not be able to control the displayment. ", "jeo") }
+								{ __("If the layer is not visible inside Mapbox Studio we will not be able to control the displayment.", "jeo") }
 							</div>
 
 							<div className="layers-selector">
