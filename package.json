@@ -8,9 +8,7 @@
 	},
 	"scripts": {
 		"start": "wp-scripts start",
-		"build": "wp-scripts build",
-		"lint": "eslint --ext .js --ext .jsx src/",
-		"lint:fix": "eslint --fix --ext .js --ext .jsx src/"
+		"build": "wp-scripts build"
 	},
 	"repository": {
 		"type": "git",
@@ -27,7 +25,7 @@
 		"@mapbox/mapbox-gl-geocoder": "^4.7.0",
 		"@wordpress/components": "^8.5.0",
 		"@wordpress/compose": "^3.25.0",
-		"@wordpress/edit-post": "^3.27.0",
+		"@wordpress/edit-post": "^8.5.0",
 		"@wordpress/i18n": "^3.19.0",
 		"@wordpress/media-utils": "^4.4.0",
 		"@wordpress/plugins": "^2.25.0",
@@ -55,16 +53,13 @@
 		"uuid": "^7.0.3"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^6.2.0",
-		"css-loader": "^3.5.3",
-		"eslint": "^6.8.0",
+		"@wordpress/scripts": "^28.5.0",
+		"css-loader": "^7.1.2",
 		"mapbox-gl": "^1.13.1",
-		"node-sass": "^4.14.1",
-		"prettier": "npm:wp-prettier@^2.0.5",
-		"prettier-eslint-cli": "^5.0.1",
+		"postcss": "^8.4.41",
 		"sass": "^1.32.8",
-		"sass-loader": "^10.1.1",
-		"style-loader": "^1.2.1",
-		"webpack": "^4.46.0"
+		"sass-loader": "^16.0.1",
+		"style-loader": "^4.0.0",
+		"webpack": "^5.93.0"
 	}
 }
