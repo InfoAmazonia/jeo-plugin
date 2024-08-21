@@ -1,5 +1,5 @@
 import { withDispatch, withSelect } from '@wordpress/data';
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { Fragment, useCallback, useState, useEffect } from '@wordpress/element';
 import { Button, Dashicon, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
