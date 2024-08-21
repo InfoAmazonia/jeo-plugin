@@ -1,4 +1,4 @@
-import template from 'lodash.template';
+import { template } from 'lodash-es';
 import { __ } from '@wordpress/i18n';
 
 const decodeHtmlEntity = function ( str ) {
