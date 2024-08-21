@@ -60,7 +60,7 @@
 					<tr>
 						<th scope="row"><label for="enabled_post_types"><?php esc_html_e('Enabled Post Types. Default: post,storymap', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('enabled_post_types') ); ?>" placeholder="<?php esc_attr_e("Post types separated by comma, Ex: map,post,page ", "jeo") ?>" type="text" id="enabled_post_types" value="<?php echo esc_textarea( implode( ',' , $this->get_option('enabled_post_types') ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('enabled_post_types') ); ?>" placeholder="<?php esc_attr_e("Post types separated by comma, Ex: map,post,page", "jeo") ?>" type="text" id="enabled_post_types" value="<?php echo esc_textarea( implode( ',' , $this->get_option('enabled_post_types') ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -95,8 +95,8 @@
 						<th scope="row"><label for="mapbox_private_key"><?php esc_html_e('Private API Key', 'jeo'); ?></label></th>
 						<td>
 							<input name="<?php echo esc_html( $this->get_field_name('mapbox_private_key') ); ?>" type="text" placeholder="<?php esc_attr_e("Ex. sk.eyJ1Ij...", "jeo") ?>"  id="mapbox_private_key" value="<?php echo esc_html( $this->get_option('mapbox_private_key') ); ?>" class="regular-text">
-							<p><?php esc_html_e('This is used for Carto integration only. ', 'jeo'); ?></p>
-							<p><?php esc_html_e('If you will not use, don\'t worry about it. ', 'jeo'); ?></p>
+							<p><?php esc_html_e('This is used for Carto integration only.', 'jeo'); ?></p>
+							<p><?php esc_html_e('If you will not use, don\'t worry about it.', 'jeo'); ?></p>
 
 						</td>
 					</tr>
