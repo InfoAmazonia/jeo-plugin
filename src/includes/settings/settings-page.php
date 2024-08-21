@@ -1,16 +1,16 @@
 <form action="options.php" method="post" class="clear prepend-top">
 	<?php settings_fields($this->option_key); ?>
 	<div class="wrap">
-		<h1><?php _e('Jeo Settings', 'jeo'); ?></h1>
+		<h1><?php esc_html_e('Jeo Settings', 'jeo'); ?></h1>
 		<h2 id="tabs" class="nav-tab-wrapper">
 			<a href="#" class="nav-tab" data-target="general">
-				<?php _e('General', 'jeo'); ?>
+				<?php esc_html_e('General', 'jeo'); ?>
 			</a>
 			<a href="#" class="nav-tab" data-target="geocoders">
-				<?php _e('Geocoders', 'jeo'); ?>
+				<?php esc_html_e('Geocoders', 'jeo'); ?>
 			</a>
 			<a href="#" class="nav-tab" data-target="customize">
-				<?php _e('Customize', 'jeo'); ?>
+				<?php esc_html_e('Customize', 'jeo'); ?>
 			</a>
 		</h2>
 
@@ -18,85 +18,85 @@
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row"><h2 style="padding: 0; margin: 0"><?php _e('Map', 'jeo'); ?></h2></th>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Map', 'jeo'); ?></h2></th>
 						<td>
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="map_default_lat"><?php _e('Default map latitute', 'jeo'); ?></label></th>
+						<th scope="row"><label for="map_default_lat"><?php esc_html_e('Default map latitute', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('map_default_lat') ); ?>" type="number" step=".00000000000001" id="map_default_lat" value="<?php echo esc_html( $this->get_option('map_default_lat') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="map_default_lng"><?php _e('Default map longitude', 'jeo'); ?></label></th>
+						<th scope="row"><label for="map_default_lng"><?php esc_html_e('Default map longitude', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('map_default_lng') ); ?>" type="number" step=".00000000000001" id="map_default_lng" value="<?php echo esc_html( $this->get_option('map_default_lng') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="map_default_zoom"><?php _e('Default map zoom', 'jeo'); ?></label></th>
+						<th scope="row"><label for="map_default_zoom"><?php esc_html_e('Default map zoom', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('map_default_zoom') ); ?>" type="number" step=".00000000000001" id="map_default_zoom" value="<?php echo esc_html( $this->get_option('map_default_zoom') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><h2 style="padding: 0; margin: 0"><?php _e('Post types', 'jeo'); ?></h2></th>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Post types', 'jeo'); ?></h2></th>
 						<td>
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="show_storymaps_on_post_archives"><?php _e('Show story maps on post archives pages', 'jeo'); ?></label></th>
+						<th scope="row"><label for="show_storymaps_on_post_archives"><?php esc_html_e('Show story maps on post archives pages', 'jeo'); ?></label></th>
 						<td>
 						<input type="checkbox" name="<?php echo esc_html( $this->get_field_name('show_storymaps_on_post_archives') ); ?>" value="1" <?php checked(1, $this->get_option('show_storymaps_on_post_archives'), true); ?> />
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="enabled_post_types"><?php _e('Enabled Post Types. Default: post,storymap', 'jeo'); ?></label></th>
+						<th scope="row"><label for="enabled_post_types"><?php esc_html_e('Enabled Post Types. Default: post,storymap', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('enabled_post_types') ); ?>" placeholder="<?= __("Post types separated by comma, Ex: map,post,page ", "jeo") ?>" type="text" id="enabled_post_types" value="<?php echo esc_textarea( implode( ',' , $this->get_option('enabled_post_types') ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('enabled_post_types') ); ?>" placeholder="<?php esc_attr_e("Post types separated by comma, Ex: map,post,page ", "jeo") ?>" type="text" id="enabled_post_types" value="<?php echo esc_textarea( implode( ',' , $this->get_option('enabled_post_types') ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 
 					<tr>
-						<th scope="row"><h2 style="padding: 0; margin: 0"><?php _e('API', 'jeo'); ?></h2></th>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('API', 'jeo'); ?></h2></th>
 						<td>
 						</td>
 					</tr>
 
 					<tr>
-						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php _e('Mapbox', 'jeo'); ?></h3></th>
+						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php esc_html_e('Mapbox', 'jeo'); ?></h3></th>
 						<td>
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="mapbox_key"><?php _e('API Key*', 'jeo'); ?></label></th>
+						<th scope="row"><label for="mapbox_key"><?php esc_html_e('API Key*', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('mapbox_key') ); ?>" placeholder="<?= __("Ex. pk.eyJ3...", "jeo") ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option('mapbox_key') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('mapbox_key') ); ?>" placeholder="<?php esc_attr_e("Ex. pk.eyJ3...", "jeo") ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option('mapbox_key') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="mapbox_username"><?php _e('Username', 'jeo'); ?></label></th>
+						<th scope="row"><label for="mapbox_username"><?php esc_html_e('Username', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('mapbox_username') ); ?>" placeholder="<?= __("", "jeo") ?>" type="text" id="mapbox_username" value="<?php echo esc_html( $this->get_option('mapbox_username') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('mapbox_username') ); ?>" placeholder="" type="text" id="mapbox_username" value="<?php echo esc_html( $this->get_option('mapbox_username') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="mapbox_private_key"><?php _e('Private API Key', 'jeo'); ?></label></th>
+						<th scope="row"><label for="mapbox_private_key"><?php esc_html_e('Private API Key', 'jeo'); ?></label></th>
 						<td>
-							<input name="<?php echo esc_html( $this->get_field_name('mapbox_private_key') ); ?>" type="text" placeholder="<?= __("Ex. sk.eyJ1Ij...", "jeo") ?>"  id="mapbox_private_key" value="<?php echo esc_html( $this->get_option('mapbox_private_key') ); ?>" class="regular-text">
-							<p><?php _e('This is used for Carto integration only. ', 'jeo'); ?></p>
-							<p><?php _e('If you will not use, don\'t worry about it. ', 'jeo'); ?></p>
+							<input name="<?php echo esc_html( $this->get_field_name('mapbox_private_key') ); ?>" type="text" placeholder="<?php esc_attr_e("Ex. sk.eyJ1Ij...", "jeo") ?>"  id="mapbox_private_key" value="<?php echo esc_html( $this->get_option('mapbox_private_key') ); ?>" class="regular-text">
+							<p><?php esc_html_e('This is used for Carto integration only. ', 'jeo'); ?></p>
+							<p><?php esc_html_e('If you will not use, don\'t worry about it. ', 'jeo'); ?></p>
 
 						</td>
 					</tr>
@@ -104,26 +104,26 @@
 
 
 					<tr>
-						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php _e('Carto (optional)', 'jeo'); ?></h3></th>
+						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php esc_html_e('Carto (optional)', 'jeo'); ?></h3></th>
 						<td>
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="carto_username"><?php _e('Username', 'jeo'); ?></label></th>
+						<th scope="row"><label for="carto_username"><?php esc_html_e('Username', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('carto_username') ); ?>" placeholder="<?= __("", "jeo") ?>" type="text" id="carto_username" value="<?php echo esc_html( $this->get_option('carto_username') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('carto_username') ); ?>" placeholder="" type="text" id="carto_username" value="<?php echo esc_html( $this->get_option('carto_username') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="carto_key"><?php _e('API Key', 'jeo'); ?></label></th>
+						<th scope="row"><label for="carto_key"><?php esc_html_e('API Key', 'jeo'); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('carto_key') ); ?>" placeholder="<?= __("Ex. 5a03fe2...", "jeo") ?>" type="text" id="carto_key" value="<?php echo esc_html( $this->get_option('carto_key') ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name('carto_key') ); ?>" placeholder="<?php esc_attr_e("Ex. 5a03fe2...", "jeo") ?>" type="text" id="carto_key" value="<?php echo esc_html( $this->get_option('carto_key') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="carto_update_time"><?php _e('Update Interval', 'jeo'); ?></label></th>
+						<th scope="row"><label for="carto_update_time"><?php esc_html_e('Update Interval', 'jeo'); ?></label></th>
 						<td>
 						<select name="<?php echo esc_html( $this->get_field_name('carto_update_time') ); ?>" id="carto_update_time">
 							<option value="daily" <?= $this->get_option('carto_update_time') ===  'daily'? 'selected' : '' ?>>Daily</option>
@@ -138,9 +138,9 @@
 					<tr>
 						<th scope="row"></th>
 						<td>
-							<?= __('After saving the setting, the update will only be made from the current date plus the interval selected. <br> For instance, if the selected interval is "Weekly" and a update is made to "Monthly" the next update will be made only from the current date plus one month.') ?>
+							<?php esc_html_e('After saving the setting, the update will only be made from the current date plus the interval selected. <br> For instance, if the selected interval is "Weekly" and a update is made to "Monthly" the next update will be made only from the current date plus one month.') ?>
 							<br>
-							<?= __('We recommend the plugin WP Crontrol, that allows you to run cron tasks whenever you want.') ?>
+							<?php esc_html_e('We recommend the plugin WP Crontrol, that allows you to run cron tasks whenever you want.') ?>
 						</td>
 					</tr>
 			</tbody>
@@ -153,7 +153,7 @@
 				<tbody>
 
 					<tr>
-						<th scope="row"><label for="active_geocoder_select"><?php _e('Active Geocoder', 'jeo'); ?></label></th>
+						<th scope="row"><label for="active_geocoder_select"><?php esc_html_e('Active Geocoder', 'jeo'); ?></label></th>
 						<td>
 							<select name="<?php echo esc_html( $this->get_field_name('active_geocoder') ); ?>" id="active_geocoder_select">
 
@@ -177,7 +177,7 @@
 							<th scope="row">
 								<label for="input_id">
 									<?php // translators: %s is the geocoder name. Ex: Nominatim options ?>
-									<?php printf( _x('%s options', 'geocoder_options', 'jeo'), $geocoder['name'] ); ?>
+									<?php printf( esc_html_x('%s options', 'geocoder_options', 'jeo'), $geocoder['name'] ); ?>
 								</label>
 							</th>
 							<td>
@@ -216,88 +216,88 @@
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th > <h3 style="margin: 0"> <?= __("Typography", "jeo") ?> </h3> </th>
+						<th > <h3 style="margin: 0"> <?php esc_html_e('Typography', 'jeo') ?> </h3> </th>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_typography"><?php _e('Typography URL', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_typography"><?php esc_html_e('Typography URL', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography') ); ?>" type="text" id="jeo_typography" value="<?php echo esc_html( $this->get_option('jeo_typography') ); ?>" placeholder="Ex. https://fonts.googleapis.com/css2?family=Open+Sans" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_typography-name"><?php _e('Typography name', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_typography-name"><?php esc_html_e('Typography name', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography-name') ); ?>" placeholder="Ex. Open Sans" type="text" id="jeo_typography-name" value="<?php echo esc_html( $this->get_option('jeo_typography-name') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_typography-stories"><?php _e('Secondary Typography URL', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_typography-stories"><?php esc_html_e('Secondary Typography URL', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography-stories') ); ?>" type="text" id="jeo_typography-stories" value="<?php echo esc_html( $this->get_option('jeo_typography-stories') ); ?>" placeholder="Ex. https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_typography-name-stories"><?php _e('Secondary Typography name', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_typography-name-stories"><?php esc_html_e('Secondary Typography name', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_typography-name-stories') ); ?>" placeholder="Ex. Libre Baskerville" type="text" id="jeo_typography-name-stories" value="<?php echo esc_html( $this->get_option('jeo_typography-name-stories') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_more-font-size"><?php _e('Info button font-size (rem)', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_more-font-size"><?php esc_html_e('Info button font-size (rem)', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_more-font-size') ); ?>" type="text" id="jeo_more-font-size" value="<?php echo esc_html( $this->get_option('jeo_more-font-size') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th > <h3 style="margin: 0"> <?= __("Colors", "jeo") ?> </h3> </th>
+						<th > <h3 style="margin: 0"> <?php esc_html_e('Colors', 'jeo') ?> </h3> </th>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="jeo_primary-color"><?php _e('Primary color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_primary-color"><?php esc_html_e('Primary color', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_primary-color') ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_primary-color" value="<?php echo esc_html( $this->get_option('jeo_primary-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<!-- <tr>
-						<th scope="row"><label for="jeo_text-over-primary-color"><?php _e('Text over primary color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_text-over-primary-color"><?php esc_html_e('Text over primary color', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_text-over-primary-color') ); ?>" placeholder="Ex. #000000" type="text" id="jeo_text-over-primary-color" value="<?php echo esc_html( $this->get_option('jeo_text-over-primary-color') ); ?>" class="regular-text">
 						</td>
 					</tr> -->
 
 					<tr>
-						<th scope="row"><label for="jeo_more-bkg-color"><?php _e('Info button background color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_more-bkg-color"><?php esc_html_e('Info button background color', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_more-bkg-color') ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_more-bkg-color" value="<?php echo esc_html( $this->get_option('jeo_more-bkg-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_more-color"><?php _e('Info button color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_more-color"><?php esc_html_e('Info button color', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_more-color') ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_more-color" value="<?php echo esc_html( $this->get_option('jeo_more-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_close-bkg-color"><?php _e('Close button background color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_close-bkg-color"><?php esc_html_e('Close button background color', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_close-bkg-color') ); ?>" type="text" id="jeo_close-bkg-color" value="<?php echo esc_html( $this->get_option('jeo_close-bkg-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><label for="jeo_close-color"><?php _e('Close button color', 'jeo'); ?></label></th>
+						<th scope="row"><label for="jeo_close-color"><?php esc_html_e('Close button color', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('jeo_close-color') ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_close-color" value="<?php echo esc_html( $this->get_option('jeo_close-color') ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
-						<th > <h3 style="margin: 0"> <?= __("Embed", "jeo") ?> </h3> </th>
+						<th><h3 style="margin: 0"><?php esc_html_e("Embed", "jeo") ?></h3></th>
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="background_image"><?php _e('Company logo', 'jeo'); ?></label></th>
+						<th scope="row"><label for="background_image"><?php esc_html_e('Company logo', 'jeo'); ?></label></th>
 						<td>
 							<input id="background_image" type="text" name="<?php echo esc_html( $this->get_field_name('jeo_footer-logo') ); ?>" value="<?php echo esc_html( $this->get_option('jeo_footer-logo') ); ?>" />
 							<input id="upload_image_button" type="button" class="button-primary" value="Insert Image" />
@@ -310,6 +310,6 @@
 
 	</div>
 
-	<input type="submit" class="button-primary" value="<?php _e('Save Changes', 'jeo'); ?>" />
+	<input type="submit" class="button-primary" value="<?php esc_attr_e('Save Changes', 'jeo'); ?>" />
 
 </form>

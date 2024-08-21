@@ -372,7 +372,7 @@ class Jeo {
 				'jeoMapVars',
 				array(
 					'jsonUrl' => rest_url( 'wp/v2/' ),
-					'string_read_more' => __( 'Read more', 'jeo' ),
+					'string_read_more' => esc_html__( 'Read more', 'jeo' ),
 					'jeoUrl' => JEO_BASEURL,
 					'nonce' => $this->get_rest_nonce(),
 					'currentLang' => $currentLang,
