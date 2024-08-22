@@ -2,7 +2,6 @@ import { Component, Fragment } from '@wordpress/element';
 import { Button, IconButton, TextControl, Dashicon, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
-import { v4 as uuid } from 'uuid';
 
 import '../editors/icons.css';
 
@@ -24,7 +23,7 @@ class IconEditor extends Component {
 						icons: [ ...legendData.attributes.legend_type_options.icons.map( ( item ) => {
 							return {
 								...item,
-								id: uuid(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -56,7 +55,7 @@ class IconEditor extends Component {
 			const icons = this.state.legendObject.attributes.legend_type_options.icons;
 
 			icons.push(
-				{ label: 'Default Label', icon: null, id: uuid() },
+				{ label: 'Default Label', icon: null, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.icons = icons;

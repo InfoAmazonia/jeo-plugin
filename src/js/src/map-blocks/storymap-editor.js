@@ -397,7 +397,7 @@ const StoryMapEditor = ( {
 												</button>
 												<Panel key={ key } className="slide-panel">
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( index + 1 ) }
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( index + 1 ) }
 														initialOpen={
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
@@ -755,7 +755,7 @@ const StoryMapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-								{ __('Current slide: ', 'jeo' ) }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( currentSlideIndex + 1 ) }
+								{ __('Current slide:', 'jeo' ) + ' ' }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
@@ -790,7 +790,7 @@ const StoryMapEditor = ( {
 					<div className="jeo-preview-controls">
 						<span>
 							<strong>
-								{ __("Map: ", "jeo") }
+								{ __("Map:", "jeo") + ' ' }
 								{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
 						</span>
 					</div>

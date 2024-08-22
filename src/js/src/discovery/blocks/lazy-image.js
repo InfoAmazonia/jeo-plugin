@@ -4,10 +4,6 @@ import {
 import styled, { keyframes } from 'styled-components';
 import PropTypes from 'prop-types';
 
-const ImageWrapper = styled.div`
-
-`;
-
 const loadingAnimation = keyframes`
 	0%{
 		background-position: -468px 0
@@ -68,11 +64,6 @@ const LazyImage = ( { src, alt } ) => {
 			/>
 		</Wrapper>
 	);
-};
-
-LazyImage.propTypes = {
-	src: PropTypes.string.isRequired,
-	alt: PropTypes.string.isRequired,
 };
 
 export default LazyImage;

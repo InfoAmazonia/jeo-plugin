@@ -1,6 +1,5 @@
 import { Component } from '@wordpress/element';
 import Sidebar from './blocks/sidebar';
-import parse from 'html-react-parser';
 import './style/discovery.scss';
 import { __ } from '@wordpress/i18n';
 
@@ -193,7 +192,7 @@ class Discovery extends Component {
 							{ legends[ index ].attributes.legend_title }
 						</div>
 					) }
-					{ parse( legendRender.outerHTML ) }
+					<span dangerouslySetInnerHTML={ { __html: legendRender.outerHTML } } />
 				</>
 			);
 		} );

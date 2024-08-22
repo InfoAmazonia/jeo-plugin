@@ -1,4 +1,4 @@
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import AttributionSettings from './attribution-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { withDispatch, withSelect } from '@wordpress/data';

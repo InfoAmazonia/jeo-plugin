@@ -36,7 +36,7 @@ const LayersLibrary = ( {
 			<div className="library-controls">
 				<TextControl
 					type="search"
-					label={ __( 'Search for layers ', 'jeo' ) }
+					label={ __( 'Search for layers', 'jeo' ) }
 					placeholder={ __( 'Search layers', 'jeo' ) }
 					value={ search }
 					onChange={ setSearch }

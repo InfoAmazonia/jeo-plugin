@@ -1,6 +1,7 @@
 import { withSelect } from '@wordpress/data';
 import { withInstanceId } from '@wordpress/compose';
 import { useCallback, useState } from '@wordpress/element';
+import { debounce } from 'lodash-es';
 import Autosuggest from 'react-autosuggest';
 
 const GutenbergAutosuggest = withSelect( ( select, { query, postType } ) => ( {
@@ -27,7 +28,6 @@ const decodeHtmlEntity = function ( str ) {
 	} );
 };
 
-const { debounce } = window._;
 const _filterSuggestions = () => true;
 const _getSuggestionValue = ( entityRecord ) =>
 	decodeHtmlEntity( entityRecord.title.rendered );
