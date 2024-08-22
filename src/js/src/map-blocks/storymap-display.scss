@@ -367,12 +367,6 @@ $font-stories: var( --jeo-font-stories );
 		}
 
 		.icon {
-			svg {
-				display: block;
-				margin: auto;
-				width: 11px;
-			}
-
 			display: flex;
 			border-radius: 50%;
 			width: 40px;
@@ -380,6 +374,12 @@ $font-stories: var( --jeo-font-stories );
 			border: 1px solid white;
 			margin: auto;
 			background-color: rgba( 255, 255, 255, 0.3 );
+
+			svg {
+				display: block;
+				margin: auto;
+				width: 11px;
+			}
 
 			&:hover {
 				opacity: 0.7;
@@ -437,16 +437,16 @@ $font-stories: var( --jeo-font-stories );
 	.navigate-map {
 		.mapboxgl-map {
 			transition: filter 0.7s ease;
+			width: 100vw !important;
+			height: 96vh !important;
+			max-width: 100%;
+
 			.mapboxgl-canvas-container {
 				canvas {
 					width: 100vw !important;
 					height: 95vh !important;
 				}
 			}
-
-			width: 100vw !important;
-			height: 96vh !important;
-			max-width: 100%;
 
 			@media ( max-width: 800px ) {
 				height: 94vh !important;

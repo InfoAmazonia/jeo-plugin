@@ -1,7 +1,6 @@
 import { Component, Fragment } from '@wordpress/element';
 import { ColorPicker, Dropdown, Button, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { v4 as uuid } from 'uuid';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 import '../editors/barscale.css';
@@ -33,7 +32,7 @@ class BarscaleEditor extends Component {
 							}
 							return {
 								...result,
-								id: uuid(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -101,11 +100,11 @@ class BarscaleEditor extends Component {
 			let randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
 
 			if ( randomColor.length < 7 ) {
-				randomColor = randomColor.substr( 0, 4 );
+				randomColor = randomColor.slice( 0, 4 );
 			}
 
 			colors.push(
-				{ color: randomColor, id: uuid() },
+				{ color: randomColor, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;

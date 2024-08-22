@@ -1,6 +1,5 @@
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
-import parse from 'html-react-parser';
 import mapboxgl from 'mapbox-gl';
 import React, { Component } from 'react';
 import scrollama from 'scrollama';
@@ -319,14 +318,14 @@ class StoryMapDisplay extends Component {
 							<div className={ classNames( [ 'storymap-header', theme ] ) } style={ { marginBottom: window.innerHeight / 3 } }>
 								{ this.state.postData && (
 									<>
-										<Heading className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</Heading>
+										<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: this.state.postData.title.rendered } } />
 										<div className="post-info">
 											<p className="date">{ `${dateFormat.format(storyDate)} ${ __("at", "jeo") } ${hourFormat.format(storyDate)}` }</p>
 										</div>
 									</>
 								) }
 								{ this.config.subtitle &&
-									<h3 className="storymap-description">{ parse(decodeHtmlEntity( this.config.subtitle )) }</h3>
+									<h3 className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( this.config.subtitle ) } } />
 								}
 
 								<button
@@ -499,13 +498,13 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 				<div data-id={ id } className={ classList }>
 					<div className={ theme }>
 						{ title &&
-							<h3 className="title">{ parse(decodeHtmlEntity( title )) }</h3>
+							<h3 className="title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( title ) } } />
 						}
 						{ image &&
 							<img src={ image } alt={ title }></img>
 						}
 						{ description &&
-							<p className="slide-description">{ parse(decodeHtmlEntity( description )) }</p>
+							<p className="slide-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } } />
 						}
 					</div>
 				</div>

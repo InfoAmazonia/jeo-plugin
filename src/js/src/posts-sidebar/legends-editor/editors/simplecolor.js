@@ -1,7 +1,6 @@
 import { Button, ColorPicker, Dropdown, TextControl, IconButton } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { v4 as uuid } from 'uuid';
 
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
@@ -34,7 +33,7 @@ class SimplecolorEditor extends Component {
 							}
 							return {
 								...result,
-								id: uuid(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -96,11 +95,11 @@ class SimplecolorEditor extends Component {
 			let randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
 
 			if ( randomColor.length < 7 ) {
-				randomColor = randomColor.substr( 0, 4 );
+				randomColor = randomColor.slice( 0, 4 );
 			}
 
 			colors.push(
-				{ label: 'Default name', color: randomColor, id: uuid() },
+				{ label: 'Default name', color: randomColor, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
