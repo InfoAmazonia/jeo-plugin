@@ -8,10 +8,7 @@ const decodeHtmlEntity = function ( str ) {
 };
 
 function compileTemplate ( template, config = {} ) {
-	const eta = new Eta( {
-		...config,
-		escapeFunction: decodeHtmlEntity,
-	} );
+	const eta = new Eta( config );
 	return eta.compile( template ).bind( eta );
 }
 
