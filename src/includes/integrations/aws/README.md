@@ -25,7 +25,7 @@ Jump To:
 1. **Sign up for AWS** – Before you begin, you need to
    sign up for an AWS account and retrieve your [AWS credentials][docs-signup].
 2. **Minimum requirements** – To run the SDK, your system will need to meet the
-   [minimum requirements][docs-requirements], including having **PHP >= 5.5**.
+   [minimum requirements][docs-requirements], including having **PHP >= 7.2.5**.
    We highly recommend having it compiled with the cURL extension and cURL
    7.16.2+ compiled with a TLS backend (e.g., NSS or OpenSSL).
 3. **Install the SDK** – Using [Composer] is the recommended way to install the
@@ -174,7 +174,7 @@ We work hard to provide a high-quality and useful SDK for our AWS services, and 
 [docs-guide-v2]: http://docs.aws.amazon.com/aws-sdk-php/v2/guide/index.html
 [docs-contribution]: https://github.com/aws/aws-sdk-php/blob/master/CONTRIBUTING.md
 [docs-migration]: https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/getting-started_migration.html
-[docs-signup]: http://aws.amazon.com/developers/access-keys/
+[docs-signup]: https://aws.amazon.com/premiumsupport/knowledge-center/create-access-key/
 [docs-requirements]: https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/getting-started_requirements.html
 [docs-installation]: https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/getting-started_installation.html
 [docs-quickstart]: https://docs.aws.amazon.com/sdk-for-php/v3/developer-guide/welcome.html#getting-started
