@@ -1,12 +1,12 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 6.6.1
-Stable tag: 2.9.2
+Stable tag: 2.9.3
 Requires PHP: 7.2
 Requires at least: 5.8
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.9.2
+Version: 2.9.3
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -23,7 +23,7 @@ With JEO, creating the interaction between data layers and contextual informatio
 * Geocoding WordPress posts using OpenStreetMaps(Nominatim), supporting the post type **Post**;
 * Customizable marker icons that can be associated with categories, custom taxonomies or posts directly;
 * Map markers query integrated to posts query;
-* Support (WPML)[https://wpml.org/pt-br/] and (Polylang)[https://br.wordpress.org/plugins/polylang/] multilanguage plugins.
+* Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguage plugins.
 
 == Installation ==
 
@@ -48,6 +48,11 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+
+= 2.9.3 =
+* Add support for more syntax in EJS templates, via [eta](https://eta.js.org/docs/intro/template-syntax)
+* bugfix: Fix a regression that made popup template compilation fail
+* bugfix: Fix a warning on some wp-admin pages
 
 = 2.9.2 =
 * Update dependencies
