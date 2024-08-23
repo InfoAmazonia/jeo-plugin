@@ -1,44 +1,10 @@
-# JEO 
+# JEO
 
-Description... 
+The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
-## Setting up local environment with Lando
+With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
 
-[Lando][lando] is a docker-based development tool to set up containerized development environments.
-TLDR: Let's just focus on actual programming :) 
-
-First, make sure `lando` [is installed](https://docs.lando.dev/basics/installation.html). Also, ensure docker is running.
-Then in your preferred terminal (Windows users must use powershell) run:
-
-		lando start
-
-It will spin up a few containers with all the tools you need:
-
-- appserver: runs Wordpress with php/apache
-- database: runs Mysql 5.7 for Wordpress default database
-- node: runs Node 10 to build Gutenberg blocks
-- testdb: runs a secondary database for JEO phpunit tests
-
-Make sure to build the plugin with a simple command:
-
-		lando build
-
-Alternatively, you can build automatically in development mode with `lando watch`.
-
-Visit https://jeo-plugin.lndo.site to see the live site.
-Login with username `admin` and password `admin`.
-Enable the JEO plugin.
-
-Tooling includes `lando npm`, `lando composer`, `lando wp` and `lando phpunit`.
-Use them as if they were running in your host (but it actually runs inside the containers).
-
-And when you're done with development, spin down your development environment with: 
-
-		lando stop
-
-Just `lando start` the next day to start working on it again.
-
-## Setting up local environment 
+## Setting up local environment
 
 ### Before you start
 
@@ -51,40 +17,37 @@ You wil also need:
 * `phpunit` to run tests
 * `node` to compile js and css files
 
-
 * To install WP-Cli, check [the official documentation](https://wp-cli.org/#installing).
-* To install Composer, check [the official instructions](https://getcomposer.org/download/)
+* To install Composer, check [the official instructions](https://getcomposer.org/download/).
 * To install PHPunit, run `composer install` in the repository folder.
-* To install node, **@TODO**.
-
+* To install node, we suggest using [n](https://github.com/tj/n).
 
 ### Setting up
 
 First of all, clone this repository.
-Note that you can NOT clone it directly in the WordPress `plugins` directory. 
+Note that you can NOT clone it directly in the WordPress `plugins` directory.
 
-```
+```bash
 git clone git@github.com:EarthJournalismNetwork/jeo-plugin.git
 ```
 
-Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have. 
+Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have.
 (Note: This plugin requires WordPress 5.3+)
 
 Then create a symbolic link inside of `wp-content/plugins/jeo` pointing to the `src` folder in this repository.
 
-```
+```bash
 ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
 ```
-
 
 ### Build
 
 When we want to build the plugin, we run `npm run build` to compile all the assets (css and js) to `src/js/build`.
 While developing, you might want to run `npm run watch`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
-If you're not using lando, you will have to copy the src folder to the plugins folder, like:
 
-		rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
-
+```bash
+rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
+```
 
 ### Tests
 
@@ -98,9 +61,10 @@ To run the unit tests it is necessary to create a new MySQL database for your un
 
 Install the WordPress test library by running the script provided in the `tests/bin` folder, by running the following command:
 
-```
+```bash
 tests/bin/install-wp-tests.sh wordpress_test root root /path/to/wordpress-test-folder localhost latest
 ```
+
 The parameters are:
 
 * Database name
@@ -126,14 +90,11 @@ You only need to do all this once, and now you are ready to run tests.
 
 Simply type this command from the project root folder:
 
-```
+```bash
 ./vendor/bin/phpunit
 ```
 
 (Note that `phpunit` accepts several parameters, for example if you want to run just a specific group of tests).
-
-[lando]: https://lando.dev
-[lando-install]: https://docs.lando.dev/basics/installation.html
 
 ## Fixtures
 
@@ -143,15 +104,13 @@ There are few `WP CLI` commands that will generate sample layers and maps useful
 
 In order to create or update the fixtures to the latest version, run:
 
-`wp jeo fixtures update`
-
-Using lando, this will be:
-
-`lando wp jeo fixtures update --path='/app/wordpress'`
+```bash
+wp jeo fixtures update
+```
 
 The last two lines of output in this command will point you to two pages with sample maps added to it. They are identical, with the difference that one of them is a one-time map, and the other one is a map saved in the Maps Library
 
 There are also other 2 commands available
 
 * `wp jeo fixtures list` - List the fixtures saved to the database and their metadata
-* `wp jeo fixtures sample_maps` - Gives you sample DIVs you can use to add the sample maps anywhere you want in your theme. 
+* `wp jeo fixtures sample_maps` - Gives you sample DIVs you can use to add the sample maps anywhere you want in your theme.
