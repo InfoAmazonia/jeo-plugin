@@ -1,11 +1,19 @@
-import { template } from 'lodash-es';
 import { __ } from '@wordpress/i18n';
+import { Eta } from 'eta';
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, function ( match, dec ) {
 		return String.fromCharCode( dec );
 	} );
 };
+
+function compileTemplate ( template, config = {} ) {
+	const eta = new Eta( {
+		...config,
+		escapeFunction: decodeHtmlEntity,
+	} );
+	return eta.compile( template ).bind( eta );
+}
 
 export default class JeoMap {
 	constructor( element ) {
@@ -27,11 +35,13 @@ export default class JeoMap {
 
 		this.options = jQuery( this.element ).data( 'options' );
 
-		this.moreInfoTemplate = template( window.jeoMapVars.templates.moreInfo );
+		this.moreInfoTemplate = compileTemplate( window.jeoMapVars.templates.moreInfo, {
+			functionHeader: 'const { map } = it;',
+		} );
 
-		this.popupTemplate = template(
-			`<article class="popup popup-wmt">${ window.jeoMapVars.templates.postPopup }</article>`
-		);
+		this.popupTemplate = compileTemplate( `<article class="popup popup-wmt">${ window.jeoMapVars.templates.postPopup }</article>`, {
+			functionHeader: 'const { post, read_more, show_featured_media } = it;',
+		} );
 
 		const self = this;
 
