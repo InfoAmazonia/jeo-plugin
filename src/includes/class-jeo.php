@@ -210,17 +210,17 @@ class Jeo {
 	public function register_block_types() {
 		register_block_type( 'jeo/map-blocks', array(
 			'editor_script' => 'jeo-map-blocks',
-			'style' => 'jeo-map-blocks',
+			'editor_style' => 'jeo-map-blocks',
 		) );
 		register_block_type( 'jeo/storymap', array(
 			'render_callback' => [$this, 'story_map_dynamic_render_callback'],
 			'editor_script' => 'jeo-map-blocks',
-			'style' => 'jeo-map-blocks',
+			'editor_style' => 'jeo-map-blocks',
 		) );
 		register_block_type( 'jeo/embedded-storymap', array(
 			'render_callback' => [$this, 'embedded_story_map_dynamic_render_callback'],
 			'editor_script' => 'jeo-map-blocks',
-			'style' => 'jeo-map-blocks',
+			'editor_style' => 'jeo-map-blocks',
 		) );
 	}
 
@@ -379,7 +379,7 @@ class Jeo {
 				]
 			));
 
-			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/css/jeo-map.css', time() );
+			wp_enqueue_style( 'jeo-map-css', JEO_BASEURL . '/css/jeo-map.css', time() );
 			wp_localize_script(
 				'jeo-map',
 				'jeoMapVars',
