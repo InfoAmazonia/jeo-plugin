@@ -229,7 +229,10 @@ const LayersSidebar = ( {
 									} );
 								}
 							} }
-							onStyleLoad={ ( map ) => {
+							onLoad={ ( map ) => {
+								setRenderControl( { status: 'loaded' } );
+								unlockPostSaving( 'layer_lock_key' );
+
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
 									'top-left'
@@ -255,14 +258,7 @@ const LayersSidebar = ( {
 							} }
 						>
 							{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
-								<MemoizedRenderLayer
-									layer={ debouncedPostMeta }
-									instance={ { id: 1, use: 'fixed' } }
-									onSourceLoadedCallback={ () => {
-										setRenderControl( { status: 'loaded' } );
-										unlockPostSaving( 'layer_lock_key' );
-									} }
-								/>
+								<MemoizedRenderLayer layer={ debouncedPostMeta } instance={ { id: 1, use: 'fixed' } } />
 							) }
 						</Map>
 					</LayerPreviewPortal>
