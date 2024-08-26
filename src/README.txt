@@ -1,12 +1,12 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 6.6.1
-Stable tag: 2.9.3
+Stable tag: 2.10.0
 Requires PHP: 7.2
 Requires at least: 5.8
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.9.3
+Version: 2.10.0
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -48,6 +48,9 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+
+= 2.10.0 =
+* Update dependencies
 
 = 2.9.3 =
 * Add support for more syntax in EJS templates, via [eta](https://eta.js.org/docs/intro/template-syntax)
