@@ -39,11 +39,11 @@
 		"react-mapbox-gl": "^4.8.6",
 		"react-movable": "^2.5.0",
 		"scrollama": "^2.2.2",
-		"styled-components": "^5.2.0",
-		"use-debounce": "^3.4.2"
+		"styled-components": "^6.1.12",
+		"use-debounce": "^10.0.3"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^28.5.0",
+		"@wordpress/scripts": "^27.9.0",
 		"css-loader": "^7.1.2",
 		"mapbox-gl": "^1.13.1",
 		"postcss": "^8.4.41",
