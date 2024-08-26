@@ -1,4 +1,4 @@
-import { Component } from '@wordpress/element';
+import { Component, createRoot } from '@wordpress/element';
 import Sidebar from './blocks/sidebar';
 import './style/discovery.scss';
 import { __ } from '@wordpress/i18n';
@@ -444,14 +444,10 @@ class Discovery extends Component {
 
 if ( document.querySelector( '.discovery-embed' ) ) {
 	document.querySelectorAll( '.discovery-embed' ).forEach( ( element ) => {
-		wp.element.render(
-			<Discovery embed={ true } useStories={ false } />,
-			element
-		);
+		const root = createRoot( element );
+		root.render( <Discovery embed={ true } useStories={ false } /> );
 	} );
-} else if ( document.getElementById( 'discovery' ) ) {
-	wp.element.render(
-		<Discovery useStories={ true } />,
-		document.getElementById( 'discovery' )
-	);
+} else if ( document.querySelector( '#discovery' ) ) {
+	const root = createRoot( document.querySelector( '#discovery' ) );
+	root.render( <Discovery useStories={ true } /> );
 }
