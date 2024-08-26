@@ -1,7 +1,7 @@
+import { Component, createRoot } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import mapboxgl from 'mapbox-gl';
-import React, { Component } from 'react';
 import scrollama from 'scrollama';
 
 import { renderLayer } from './map-preview-layer';
@@ -537,8 +537,9 @@ function decodeHtml( html ) {
 }
 
 document.querySelectorAll( '.story-map-container' ).forEach( ( storyMapElement ) => {
+	const root = createRoot( storyMapElement );
 	const storyMapProps = JSON.parse( decodeHtml( storyMapElement.dataset.properties ) );
-	wp.element.render( <StoryMapDisplay { ...storyMapProps } />, storyMapElement );
+	root.render( <StoryMapDisplay { ...storyMapProps } /> );
 
 	// `overflow` avoids `position:sticky`
 	let parent = storyMapElement.parentElement;
