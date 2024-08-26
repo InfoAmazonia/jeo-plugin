@@ -1,8 +1,5 @@
-import {
-	useRef,
-} from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import styled, { keyframes } from 'styled-components';
-import PropTypes from 'prop-types';
 
 const loadingAnimation = keyframes`
 	0%{
