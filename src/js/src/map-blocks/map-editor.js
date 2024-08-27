@@ -41,6 +41,7 @@ const MapEditor = ( {
 				<Fragment>
 					<div className="jeo-preview-area">
 						<Map
+							key={ key }
 							onStyleLoad={ ( map ) => {
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -67,8 +68,6 @@ const MapEditor = ( {
 									map.dragRotate.disable();
 								}
 							} }
-							key={ key }
-							style="mapbox://styles/mapbox/streets-v11"
 							zoom={ [ loadedMap.meta.initial_zoom || mapDefaults.zoom ] }
 							center={ [
 								loadedMap.meta.center_lon || mapDefaults.lng,

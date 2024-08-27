@@ -253,7 +253,6 @@ const StoryMapEditor = ( {
 									);
 								}
 							} }
-							style="mapbox://styles/mapbox/streets-v11"
 							zoom={ [
 								attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom,
 							] }

@@ -100,6 +100,7 @@ const OnetimeMapEditor = ( {
 
 			<div className="jeo-preview-area">
 				<Map
+					key={ currentZoom }
 					onStyleLoad={ ( map ) => {
 						map.addControl(
 							new mapboxgl.NavigationControl( { showCompass: false } ),
@@ -108,8 +109,6 @@ const OnetimeMapEditor = ( {
 						map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 						setMap(map);
 					} }
-					key={ currentZoom }
-					style="mapbox://styles/mapbox/streets-v11"
 					zoom={ [ currentZoom || mapDefaults.zoom ] }
 					center={ [
 						attributes.center_lon || mapDefaults.lng,

@@ -2,7 +2,7 @@ import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import AttributionSettings from './attribution-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
@@ -44,10 +44,6 @@ const LayersSidebar = ( {
 	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
-
-	const animationOptions = {
-		animate: false,
-	};
 
 	useEffect( () => {
 		if ( ! MapboxAPIKey ) {
@@ -206,13 +202,13 @@ const LayersSidebar = ( {
 	};
 
 	return (
-		<Fragment>
+		<>
 			{ MapboxAPIKey && (
 				<>
 					<LayerPreviewPortal>
 						<Map
 							key={ key }
-							onError={ ( map, e ) => {
+							onError={ ( { target: map, error } ) => {
 								try {
 									const layer = map.getLayer( 'layer_1' );
 									if ( layer ) {
@@ -222,29 +218,31 @@ const LayersSidebar = ( {
 										status: 'request_error',
 										statusCode: 400,
 									} );
-								} catch ( e ) {
+								} catch ( err ) {
 									setRenderControl( {
 										status: 'request_error',
 										statusCode: 400,
 									} );
 								}
 							} }
-							onLoad={ ( map ) => {
+							onSourceData={ () => {
 								setRenderControl( { status: 'loaded' } );
 								unlockPostSaving( 'layer_lock_key' );
-
+							} }
+							onLoad={ ( { target: map } ) => {
 								map.addControl(
 									new mapboxgl.NavigationControl( { showCompass: false } ),
 									'top-left'
 								);
 								map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 							} }
-							style="mapbox://styles/mapbox/streets-v11"
-							containerStyle={ { height: '500px', width: '100%' } }
-							zoom={ [ initialZoom || 11 ] }
-							center={ [ centerLon || 0, centerLat || 0 ] }
-							animationOptions={ animationOptions }
-							onMoveEnd={ ( map ) => {
+							style={ { height: '500px', width: '100%' } }
+							initialViewState={ {
+								latitude: centerLat || 0,
+								longitude: centerLon || 0,
+								zoom: initialZoom || 11,
+							} }
+							onMoveEnd={ ( { target: map } ) => {
 								if ( ! editingMap.current ) {
 									const center = map.getCenter();
 									const zoom = Math.round( map.getZoom() * 10 ) / 10;
@@ -292,7 +290,7 @@ const LayersSidebar = ( {
 					</PluginDocumentSettingPanel>
 				</>
 			) }
-		</Fragment>
+		</>
 	);
 };
 export default withDispatch( ( dispatch ) => ( {

@@ -1,5 +1,5 @@
 
-const mapboxgl = require( 'mapbox-gl/dist/mapbox-gl.js' );
+import mapboxgl from 'mapbox-gl';
 
 mapboxgl.accessToken = jeo_settings.mapbox_key;
 
