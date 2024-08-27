@@ -270,6 +270,7 @@ function MapsSidebar( {
 						</ButtonGroup>
 					</div>
 					<Map
+						key={ key }
 						onError={ (map, error) => {
 
 						} }
@@ -281,8 +282,6 @@ function MapsSidebar( {
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
 							setMap(map);
 						} }
-						key={ key }
-						style="mapbox://styles/mapbox/streets-v11"
 						containerStyle={ { height: '500px', width: '100%' } }
 						zoom={ [ currentZoom || initialZoom || 0 ] }
 						center={ [ centerLon || 0, centerLat || 0 ] }
