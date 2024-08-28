@@ -236,37 +236,18 @@ const StoryMapEditor = ( {
 					<div className="jeo-preview-area">
 						<Map
 							key={ key }
+							controls="top-right"
+							fullscreen={ loadedMap.meta.enable_fullscreen }
 							onStyleLoad={ ( map ) => {
-								// setAttributes( { ...attributes, navigateMapLayers: layersContent, loadedLayers: layersContent } );
 								setSelectedMap( map );
-								setStorymapLayers( layersContent )
-
-								map.addControl(
-									new mapboxgl.NavigationControl( { showCompass: false } ),
-									'top-right'
-								);
-
-								if ( loadedMap.meta.enable_fullscreen ) {
-									map.addControl(
-										new mapboxgl.FullscreenControl(),
-										'top-right'
-									);
-								}
+								setStorymapLayers( layersContent );
 							} }
-							zoom={ [
-								attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom,
-							] }
-							center={ [
-								attributes.slides[ currentSlideIndex ].longitude ||
-									mapDefaults.lng,
-								attributes.slides[ currentSlideIndex ].latitude ||
-									mapDefaults.lat,
-							] }
-							bearing={
-								[ attributes.slides[ currentSlideIndex ].bearing ] || 0
-							}
-							pitch={ [ attributes.slides[ currentSlideIndex ].pitch ] || 0 }
-							containerStyle={ { height: '85vh' } }
+							style={ { height: '85vh' } }
+							latitude={ attributes.slides[ currentSlideIndex ].latitude || mapDefaults.lat }
+							longitude={ attributes.slides[ currentSlideIndex ].longitude || mapDefaults.lng }
+							zoom={ attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom }
+							bearing={ attributes.slides[ currentSlideIndex ].bearing || 0 }
+							pitch={ attributes.slides[ currentSlideIndex ].pitch || 0 }
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {

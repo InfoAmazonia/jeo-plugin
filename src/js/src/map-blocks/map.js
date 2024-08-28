@@ -10,7 +10,7 @@ export const MapboxAPIKey = window.jeo_settings.mapbox_key;
  * @typedef {import('react-map-gl').MapProps} MapProps
  * @param {MapProps} props
  */
-function Map( { children, controls = 'top-left', ...props }, ref ) {
+function Map( { children, controls = 'top-left', fullscreen = true, ...props }, ref ) {
 	return (
 		<MapGL
 			ref={ ref }
@@ -21,7 +21,9 @@ function Map( { children, controls = 'top-left', ...props }, ref ) {
 			{ ...props }
 		>
 			{children}
-			<FullscreenControl position={ controls } />
+			{ fullscreen ? (
+				<FullscreenControl position={ controls } />
+			) : null }
 			<NavigationControl position={ controls } showCompass={ false } />
 		</MapGL>
 	);
