@@ -1,6 +1,6 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
-import { Fragment, useCallback, useState, useEffect } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { Button, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -58,9 +58,10 @@ function MapsSidebar( {
 		border: 0,
 	} );
 
-	const [ map, setMap ] = useState(false);
+	const mapRef = useRef();
 
 	const setPanLimitsFromMap = () => {
+		const { current: map } = mapRef;
 		if ( map ) {
 			const boundries = map.getBounds();
 			setPostMeta( {	...postMeta,
@@ -90,13 +91,8 @@ function MapsSidebar( {
 		initial_zoom: initialZoom,
 	} = { ...mapDefaults, ...postMeta };
 
-	const animationOptions = {
-		animate: false,
-	};
-
 	const [ key, setKey ] = useState( 0 );
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
-	const currentZoom = postMeta[ zoomState ];
 
 	const createNotice = useCallback( ( type, message, options = {} ) => {
 		sendNotice( type, message, { id: 'layer_notices_no_api_key', isDismissible: true, ...options } );
@@ -180,7 +176,7 @@ function MapsSidebar( {
 
 
 	return (
-		<Fragment>
+		<>
 			{ modal && (
 				<LayersSettingsModal
 					closeModal={ closeModal }
@@ -262,23 +258,21 @@ function MapsSidebar( {
 					</div>
 					<Map
 						key={ key }
-						onError={ (map, error) => {
-
-						} }
-						onStyleLoad={ ( map ) => {
+						ref={ mapRef }
+						onStyleData={ ( { target: map } ) => {
 							map.addControl(
 								new mapboxgl.NavigationControl( { showCompass: false } ),
 								'top-left'
 							);
 							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-							setMap(map);
 						} }
-						containerStyle={ { height: '500px', width: '100%' } }
-						zoom={ [ currentZoom || initialZoom || 0 ] }
-						center={ [ centerLon || 0, centerLat || 0 ] }
-						animationOptions={ animationOptions }
-						onMoveEnd={ ( map ) => {
-							console.log(map.getBounds())
+						style={ { height: '500px', width: '100%' } }
+						initialViewState={ {
+							latitude: centerLat || 0,
+							longitude: centerLon || 0,
+							zoom: initialZoom || 11,
+						} }
+						onMoveEnd={ ( { target: map } ) => {
 							const center = map.getCenter();
 							let zoom = Math.round( map.getZoom() * 10 ) / 10;
 
@@ -339,7 +333,7 @@ function MapsSidebar( {
 				setRelatedPosts={ setRelatedPosts }
 				renderPanel={ PluginDocumentSettingPanel }
 			/>
-		</Fragment>
+		</>
 	);
 }
 
