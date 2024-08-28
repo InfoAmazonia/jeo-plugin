@@ -1,7 +1,7 @@
 import { InspectorControls } from '@wordpress/block-editor';
 import { Button, PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
-import { Fragment, useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -39,18 +39,14 @@ const OnetimeMapEditor = ( {
 	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
 
-	const animationOptions = {
-		animate: false,
-	};
-
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = attributes[ zoomState ];
 
-
-	const [ map, setMap ] = useState(false);
+	const mapRef = useRef();
 
 	const setPanLimitsFromMap = () => {
-		if(map) {
+		const { current: map } = mapRef;
+		if ( map ) {
 			const boundries = map.getBounds();
 			setAttributes(
 				{	...attributes,
@@ -65,7 +61,7 @@ const OnetimeMapEditor = ( {
 	}
 
 	return (
-		<Fragment>
+		<>
 			{ modal && (
 				<LayersSettingsModal
 					closeModal={ closeModal }
@@ -101,22 +97,12 @@ const OnetimeMapEditor = ( {
 			<div className="jeo-preview-area">
 				<Map
 					key={ currentZoom }
-					onStyleLoad={ ( map ) => {
-						map.addControl(
-							new mapboxgl.NavigationControl( { showCompass: false } ),
-							'top-left'
-						);
-						map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-						setMap(map);
-					} }
-					zoom={ [ currentZoom || mapDefaults.zoom ] }
-					center={ [
-						attributes.center_lon || mapDefaults.lng,
-						attributes.center_lat || mapDefaults.lat,
-					] }
-					containerStyle={ { height: '50vh' } }
-					animationOptions={ animationOptions }
-					onMoveEnd={ ( map ) => {
+					ref={ mapRef }
+					style={ { height: '50vh' } }
+					latitude={ attributes.center_lat || mapDefaults.lat }
+					longitude={ attributes.center_lon || mapDefaults.lng }
+					zoom={ currentZoom || mapDefaults.zoom }
+					onMoveEnd={ ( { target: map } ) => {
 						const center = map.getCenter();
 						const zoom = Math.round( map.getZoom() * 10 ) / 10;
 
@@ -142,7 +128,7 @@ const OnetimeMapEditor = ( {
 					{ __( 'Edit layers settings', 'jeo' ) }
 				</Button>
 			</div>
-		</Fragment>
+		</>
 	);
 };
 
