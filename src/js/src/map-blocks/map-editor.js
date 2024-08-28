@@ -1,7 +1,7 @@
 import { Button, Spinner } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { Fragment, useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -30,7 +30,9 @@ const MapEditor = ( {
 		} );
 	};
 
-	if(attributes.map_id && !loadedMap) {
+	const mapRef = useRef();
+
+	if ( attributes.map_id && !loadedMap ) {
 		return null;
 	}
 
@@ -38,42 +40,32 @@ const MapEditor = ( {
 		<div className="jeo-mapblock">
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && (
-				<Fragment>
+				<>
 					<div className="jeo-preview-area">
 						<Map
 							key={ key }
-							onStyleLoad={ ( map ) => {
-								map.addControl(
-									new mapboxgl.NavigationControl( { showCompass: false } ),
-									'top-left'
-								);
+							ref={ mapRef }
+							onStyleData={ () => {
+								const { current: map } = mapRef;
+								if ( map ) {
+									if ( loadedMap.meta.disable_scroll_zoom ) {
+										map.scrollZoom.disable();
+									}
 
-								if ( loadedMap.meta.enable_fullscreen ) {
-									map.addControl(
-										new mapboxgl.FullscreenControl(),
-										'top-left'
-									);
-								}
+									if ( loadedMap.meta.disable_drag_pan ) {
+										map.dragPan.disable();
+										map.touchZoomRotate.disable();
+									}
 
-								if ( loadedMap.meta.disable_scroll_zoom ) {
-									map.scrollZoom.disable();
-								}
-
-								if ( loadedMap.meta.disable_drag_pan ) {
-									map.dragPan.disable();
-									map.touchZoomRotate.disable();
-								}
-
-								if ( loadedMap.meta.disable_drag_rotate ) {
-									map.dragRotate.disable();
+									if ( loadedMap.meta.disable_drag_rotate ) {
+										map.dragRotate.disable();
+									}
 								}
 							} }
-							zoom={ [ loadedMap.meta.initial_zoom || mapDefaults.zoom ] }
-							center={ [
-								loadedMap.meta.center_lon || mapDefaults.lng,
-								loadedMap.meta.center_lat || mapDefaults.lat,
-							] }
-							containerStyle={ { height: '50vh' } }
+							style={ { height: '50vh' } }
+							latitude={ loadedMap.meta.center_lat || mapDefaults.lat }
+							longitude={ loadedMap.meta.center_lon || mapDefaults.lng }
+							zoom={ loadedMap.meta.initial_zoom || mapDefaults.zoom }
 						>
 							{ loadedLayers &&
 								loadedMap.meta.layers.map( ( layer ) => {
@@ -109,10 +101,10 @@ const MapEditor = ( {
 							<em>{ __( '(Select another map)', 'jeo' ) }</em>
 						</Button>
 					</div>
-				</Fragment>
+				</>
 			) }
 			{ ! attributes.map_id && (
-				<Fragment>
+				<>
 					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
 						{ __( 'Insert a map from the library', 'jeo' ) + ':' }
 					</label>
@@ -140,7 +132,7 @@ const MapEditor = ( {
 							{ __( 'Cancel', 'jeo' ) }
 						</Button>
 					) }
-				</Fragment>
+				</>
 			) }
 		</div>
 	);
