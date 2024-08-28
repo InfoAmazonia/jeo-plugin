@@ -184,19 +184,10 @@ const LayersSidebar = ( {
 								setRenderControl( { status: 'loaded' } );
 								unlockPostSaving( 'layer_lock_key' );
 							} }
-							onLoad={ ( { target: map } ) => {
-								map.addControl(
-									new mapboxgl.NavigationControl( { showCompass: false } ),
-									'top-left'
-								);
-								map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-							} }
 							style={ { height: '500px', width: '100%' } }
-							initialViewState={ {
-								latitude: centerLat || 0,
-								longitude: centerLon || 0,
-								zoom: initialZoom || 11,
-							} }
+							latitude={ centerLat || 0 }
+							longitude={ centerLon || 0 }
+							zoom={ initialZoom || 0 }
 							onMoveEnd={ ( { target: map } ) => {
 								if ( ! editingMap.current ) {
 									const center = map.getCenter();
