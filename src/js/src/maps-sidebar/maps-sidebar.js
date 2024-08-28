@@ -93,6 +93,7 @@ function MapsSidebar( {
 
 	const [ key, setKey ] = useState( 0 );
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
+	const currentZoom = postMeta[ zoomState ];
 
 	const createNotice = useCallback( ( type, message, options = {} ) => {
 		sendNotice( type, message, { id: 'layer_notices_no_api_key', isDismissible: true, ...options } );
@@ -259,19 +260,10 @@ function MapsSidebar( {
 					<Map
 						key={ key }
 						ref={ mapRef }
-						onStyleData={ ( { target: map } ) => {
-							map.addControl(
-								new mapboxgl.NavigationControl( { showCompass: false } ),
-								'top-left'
-							);
-							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-						} }
 						style={ { height: '500px', width: '100%' } }
-						initialViewState={ {
-							latitude: centerLat || 0,
-							longitude: centerLon || 0,
-							zoom: initialZoom || 11,
-						} }
+						latitude={ centerLat || 0 }
+						longitude={ centerLon || 0 }
+						zoom={ currentZoom || initialZoom || 11 }
 						onMoveEnd={ ( { target: map } ) => {
 							const center = map.getCenter();
 							let zoom = Math.round( map.getZoom() * 10 ) / 10;
