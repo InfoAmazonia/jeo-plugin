@@ -2,7 +2,7 @@ import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import AttributionSettings from './attribution-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import Map, { MapboxAPIKey } from '../map-blocks/map';
 import { MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
@@ -45,6 +45,10 @@ const LayersSidebar = ( {
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
 
+	const createNotice = useCallback( ( type, message, options = {} ) => {
+		sendNotice( type, message, { id: 'layer_notices', isDismissible: false, ...options } );
+	}, [ sendNotice ] );
+
 	useEffect( () => {
 		if ( ! MapboxAPIKey ) {
 			setRenderControl( { status: 'incomplete_settings' } );
@@ -65,83 +69,34 @@ const LayersSidebar = ( {
 	useEffect( () => {
 		switch ( renderControl.status ) {
 			case 'incomplete_form':
-				sendNotice(
-					'warning',
-					__(
-						'Please fill all required fields, you will not be able to publish or update until that.',
-						'jeo'
-					),
-					{
-						id: 'layer_notices',
-						isDismissible: false,
-					}
-				);
+				createNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ) );
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;
 			case 'request_error':
 				switch ( renderControl.statusCode ) {
 					case 401:
-						sendNotice(
-							'error',
-							__(
-								'Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings',
-								'jeo'
-							),
-							{
-								id: 'layer_notices',
-								isDismissible: false,
-							}
-						);
+						createNotice( 'error', __( 'Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings.', 'jeo' ) );
 						break;
 					case 404:
-						sendNotice(
-							'error',
-							__(
-								'Your layer was not found. You will not be able to publish or update. Please check your settings',
-								'jeo'
-							),
-							{
-								id: 'layer_notices',
-								isDismissible: false,
-							}
-						);
+						createNotice( 'error', __( 'Your layer was not found. You will not be able to publish or update. Please check your settings.', 'jeo' ) );
 						break;
 					default:
-						sendNotice(
-							'error',
-							__(
-								'Error loading your layer, you will not be able to publish or update. Please check your settings.',
-								'jeo'
-							),
-							{
-								id: 'layer_notices',
-								isDismissible: false,
-							}
-						);
+						createNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ) );
 						break;
 				}
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;
 			case 'incomplete_settings':
-				sendNotice(
-					'warning',
-					__(
-						'Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update.',
-						'jeo'
-					),
-					{
-						id: 'layer_notices',
-						isDismissible: false,
-						actions: [
-							{
-								url: '/wp-admin/admin.php?page=jeo-settings',
-								label: 'Please, check your settings.',
-							},
-						],
-					}
-				);
+				createNotice( 'warning', __( 'Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update.', 'jeo' ), {
+					actions: [
+						{
+							url: '/wp-admin/admin.php?page=jeo-settings',
+							label: __( 'Please, check your settings.', 'jeo' ),
+						},
+					],
+				} );
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;

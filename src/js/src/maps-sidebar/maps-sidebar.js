@@ -1,7 +1,7 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { Fragment, useCallback, useState, useEffect } from '@wordpress/element';
-import { Button, Dashicon, ButtonGroup } from '@wordpress/components';
+import { Button, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
@@ -61,17 +61,16 @@ function MapsSidebar( {
 	const [ map, setMap ] = useState(false);
 
 	const setPanLimitsFromMap = () => {
-		if(map) {
+		if ( map ) {
 			const boundries = map.getBounds();
-			setPostMeta(
-				{	...postMeta,
-					'pan_limits': {
-						east: boundries._ne.lat,
-						north: boundries._ne.lng,
-						south: boundries._sw.lng,
-						west: boundries._sw.lat,
-					}
-				} )
+			setPostMeta( {	...postMeta,
+				'pan_limits': {
+					east: boundries._ne.lat,
+					north: boundries._ne.lng,
+					south: boundries._sw.lng,
+					west: boundries._sw.lat,
+				}
+			} );
 		}
 	}
 
@@ -99,39 +98,31 @@ function MapsSidebar( {
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = postMeta[ zoomState ];
 
+	const createNotice = useCallback( ( type, message, options = {} ) => {
+		sendNotice( type, message, { id: 'layer_notices_no_api_key', isDismissible: true, ...options } );
+	}, [ sendNotice ] );
+
 	useEffect( () => {
 		if ( ! MapboxAPIKey ) {
-			sendNotice(
-				'warning',
-				__( "There's no API Key found in your JEO Settings.", 'jeo' ),
-				{
-					id: 'layer_notices_no_api_key',
-					isDismissible: true,
-					actions: [
-						{
-							url: '/wp-admin/admin.php?page=jeo-settings',
-							label: 'Check your settings.',
-						},
-					],
-				}
-			);
-
+			createNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
+				actions: [
+					{
+						url: '/wp-admin/admin.php?page=jeo-settings',
+						label: __( 'Please, check your settings.', 'jeo' ),
+					},
+				],
+			} );
 			lockPostSaving();
+			lockPostAutoSaving();
 		} else {
 			async function verifyAPIKey() {
 				const response = await fetch(
 					`https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=${ MapboxAPIKey }`
 				);
 				if ( response.status >= 400 ) {
-					sendNotice(
-						'warning',
-						__( '1 - Your Mapbox access token may be invalid.', 'jeo' ),
-						{
-							id: 'layer_notices_no_api_key',
-							isDismissible: true,
-						}
-					);
+					createNotice( 'warning', __( '1 - Your Mapbox access token may be invalid.', 'jeo' ) );
 					lockPostSaving();
+					lockPostAutoSaving();
 				}
 			}
 
