@@ -58,7 +58,7 @@ function MapsSidebar( {
 		border: 0,
 	} );
 
-	const mapRef = useRef();
+	const mapRef = useRef(undefined);
 
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
