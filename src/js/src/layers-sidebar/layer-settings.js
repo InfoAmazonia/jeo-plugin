@@ -38,7 +38,7 @@ const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 };
 
 function usePrevious( value ) {
-	const ref = useRef(undefined);
+	const ref = useRef( undefined );
 	useEffect( () => {
 		ref.current = value;
 	}, [ value ] );
