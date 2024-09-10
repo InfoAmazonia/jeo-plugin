@@ -19,10 +19,7 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 		case 'mapbox':
 			const accessToken = options.access_token || window.mapboxgl.accessToken;
 
-			let style_id = options.style_id;
-			if ( style_id ) {
-				style_id = style_id.replace( 'mapbox://styles/', '' );
-			}
+			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
 
 			return (
 				<Fragment>
@@ -31,7 +28,7 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 						tileJsonSource={ {
 							type: 'raster',
 							tiles: [
-								`https://api.mapbox.com/styles/v1/${ style_id }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
+								`https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 							],
 						} }
 						onSourceLoaded={ () => {
