@@ -30,7 +30,7 @@ const MapEditor = ( {
 		} );
 	};
 
-	const mapRef = useRef(undefined);
+	const mapRef = useRef( undefined );
 
 	if ( attributes.map_id && !loadedMap ) {
 		return null;
