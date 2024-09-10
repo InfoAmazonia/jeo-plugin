@@ -14,23 +14,16 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	},
 
 	addLayer( map, attributes, addLayerParams ) {
-		let style_id = attributes.layer_type_options.style_id;
-		if ( style_id ) {
-			style_id = style_id.replace( 'mapbox://styles/', '' );
-		}
-		const accessToken =
-			typeof attributes.layer_type_options.access_token !== 'undefined'
-				? attributes.layer_type_options.access_token
-				: window.mapboxgl.accessToken;
+		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+
+		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+
 		const layer = {
 			id: attributes.layer_id,
 			source: {
 				type: 'raster',
 				tiles: [
-					'https://api.mapbox.com/styles/v1/' +
-						style_id +
-						'/tiles/512/{z}/{x}/{y}@2x?access_token=' +
-						accessToken,
+					`https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 				],
 			},
 			type: 'raster',
@@ -199,22 +192,13 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleDefinitions[ attributes.layer_id ] );
 			}
 
-			const accessToken =
-				typeof attributes.layer_type_options.access_token !== 'undefined'
-					? attributes.layer_type_options.access_token
-					: window.mapboxgl.accessToken;
+			const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
 
 			if ( accessToken && attributes.layer_type_options.style_id ) {
-				let style_id = attributes.layer_type_options.style_id;
-				if ( style_id ) {
-					style_id = style_id.replace( 'mapbox://styles/', '' );
-				}
+				const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
 				jQuery.get(
-					'https://api.mapbox.com/styles/v1/' +
-						style_id +
-						'?access_token=' +
-						accessToken,
+					`https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }`,
 					function ( data ) {
 						self._styleDefinitions[ attributes.layer_id ] = data;
 						resolve( data );
@@ -233,10 +217,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleLayers[ attributes.layer_id ] );
 			}
 
-			const accessToken =
-				typeof attributes.layer_type_options.access_token !== 'undefined'
-					? attributes.layer_type_options.access_token
-					: window.mapboxgl.accessToken;
+			const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
 
 			self
 				._getStyleDefinition( attributes )
@@ -248,10 +229,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						const layers = composite.url.replace( 'mapbox://', '' );
 						if ( layers && accessToken ) {
 							jQuery.get(
-								'https://api.mapbox.com/v4/' +
-									layers +
-									'.json?secure&access_token=' +
-									accessToken,
+								`https://api.mapbox.com/v4/${ layers }.json?secure&access_token=${ accessToken }`,
 								function ( data ) {
 									self._styleLayers[ attributes.layer_id ] = data;
 									resolve( data );
