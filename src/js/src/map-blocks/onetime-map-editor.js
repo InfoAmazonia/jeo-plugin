@@ -42,7 +42,7 @@ const OnetimeMapEditor = ( {
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = attributes[ zoomState ];
 
-	const mapRef = useRef();
+	const mapRef = useRef(undefined);
 
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
