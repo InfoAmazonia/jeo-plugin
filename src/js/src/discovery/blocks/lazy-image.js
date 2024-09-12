@@ -58,6 +58,7 @@ const LazyImage = ( { src, alt } ) => {
 				onError={ removePlaceholder }
 				src={ src }
 				alt={ alt }
+				loading="lazy"
 			/>
 		</Wrapper>
 	);
