@@ -135,7 +135,7 @@ const OnetimeMapEditor = ( {
 export default withSelect( ( select, { attributes } ) => {
 	const query = {
 		include: attributes.layers.map( ( layer ) => layer.id ),
-		per_page: -1, order: 'asc', orderby: 'menu_order'
+		per_page: -1, order: 'asc', orderby: 'title'
 	};
 	return {
 		loadedLayers: select( 'core' ).getEntityRecords(
