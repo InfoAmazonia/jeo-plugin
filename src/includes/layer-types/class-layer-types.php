@@ -138,7 +138,7 @@ class Layer_Types {
 		foreach ( $this->get_registered_layer_types() as $slug => $layer_type ) {
 			$deps = isset( $layer_type['dependencies'] ) ? $layer_type['dependencies'] : [];
 			$deps = array_merge( ['jeo-layer'], $deps );
-			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps );
+			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps, JEO_VERSION );
 			wp_set_script_translations('layer-type-' . $slug, 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages');
 		}
 

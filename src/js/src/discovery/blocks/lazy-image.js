@@ -44,7 +44,7 @@ const Wrapper = styled.div`
 `;
 
 const LazyImage = ( { src, alt } ) => {
-	const refPlaceholder = useRef();
+	const refPlaceholder = useRef( undefined );
 
 	const removePlaceholder = () => {
 		refPlaceholder.current.remove();

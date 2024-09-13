@@ -2,15 +2,13 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	label: 'Mapbox Style',
 
 	addStyle( map, attributes ) {
-		if (
-			attributes.layer_type_options.style_id &&
-			attributes.layer_type_options.style_id.includes( 'mapbox://styles/' )
-		) {
-			return map.setStyle( attributes.layer_type_options.style_id );
+		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+
+		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+
+		if ( styleId ) {
+			return map.setStyle( `https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }` );
 		}
-		return map.setStyle(
-			'mapbox://styles/' + attributes.layer_type_options.style_id
-		);
 	},
 
 	addLayer( map, attributes, addLayerParams ) {
