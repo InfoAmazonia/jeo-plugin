@@ -37,6 +37,11 @@ $font: var(--jeo-font);
 		width: 100%;
 		margin-left: 0;
 		transition: all .2s ease-in-out;
+
+		&__container {
+			height: 100%;
+			width: 100%;
+		}
 	}
 
 	.default-sidebar {

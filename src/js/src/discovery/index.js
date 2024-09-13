@@ -241,10 +241,10 @@ class Discovery extends Component {
 				) }
 				{ this.state.mapLoaded ? <Sidebar { ...props } /> : '' }
 
-				<div
-					ref={ ( el ) => ( this.mapContainer = el ) }
-					className="discovery-map"
-				>
+				<div className="discovery-map">
+					<div className="discovery-map__container" ref={ ( el ) => ( this.mapContainer = el ) }>
+						{ /* Map container should be empty */ }
+					</div>
 					{ ! this.props.embed && (
 						<div
 							className={
