@@ -37,7 +37,7 @@ const LayersSettings = ( {
 		const allLayersData = select( 'core' ).getEntityRecords(
 			'postType',
 			'map-layer',
-			{ per_page: -1, order: 'asc', orderby: 'menu_order' }
+			{ per_page: -1, order: 'asc', orderby: 'title' }
 		);
 		if ( ! allLayersData ) {
 			setAllLayers( [] );
@@ -94,11 +94,9 @@ const LayersSettings = ( {
 	};
 
 	function filterLayers() {
-		const layers = []
-
-		allLayers.map( ( layer ) => {
+		const layers = allLayers.filter( ( layer ) => {
 			if ( layerTypeFilter && layerTypeFilter !== layer.meta.type ) {
-				return;
+				return false;
 			}
 
 			/* TODO: Make layers that don't use legend to not be shown when filtering by legend
@@ -108,10 +106,10 @@ const LayersSettings = ( {
 			*/
 
 			if ( layerNameFilter && ! layer.title.raw.toLowerCase().includes( layerNameFilter.toLowerCase() ) ) {
-				return;
+				return false;
 			}
 
-			return layers.push( layer );
+			return true;
 		} );
 		setFilteredLayers( layers );
 	}
