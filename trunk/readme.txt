@@ -17,7 +17,7 @@ With JEO, creating the interaction between data layers and contextual informatio
 = Features =
 
 * [Mapbox](https://www.mapbox.com) maps;
-* [ReactMapBoxGL](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md) library;
+* [react-map-gl](https://visgl.github.io/react-map-gl/) library;
 * Custom tile layers;
 * Layer filtering options, allowing you to mix tile layers;
 * Geocoding WordPress posts using OpenStreetMaps(Nominatim), supporting the post type **Post**;
