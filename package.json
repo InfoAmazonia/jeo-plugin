@@ -22,6 +22,7 @@
 	"homepage": "https://github.com/EarthJournalismNetwork/jeo-plugin#readme",
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "^5.0.2",
+		"@wordpress/edit-post": "^8.8.3",
 		"@wordpress/editor": "^14.5.0",
 		"@wordpress/plugins": "^7.5.0",
 		"bootstrap-daterangepicker": "^3.1.0",
