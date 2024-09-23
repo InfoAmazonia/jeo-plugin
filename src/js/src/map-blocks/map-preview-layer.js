@@ -31,14 +31,14 @@ export function renderLayer( { layer, instance } ) {
 
 			return (
 				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+					<Layer id={ layerId } type={ options.type } />
 				</Source>
 			);
 
 		case 'mvt':
 			return (
 				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+					<Layer id={ layerId } type={ options.type } />
 				</Source>
 			);
 

@@ -180,7 +180,7 @@ export default class JeoMap {
 
 							// When style is done loading (don't try adding layers before style is not ready)
 							this.mapLoaded().then(() => {
-								// Remove not selected layers and toggle vissibility
+								// Remove not selected layers and toggle visibility
 								mapLayersSettings.forEach( ( layer ) => {
 									if ( layer.load_as_style ) {
 										const styleLayers = layer.style_layers;
@@ -192,7 +192,7 @@ export default class JeoMap {
 												}
 											}
 
-											// In the fucture individual style layers will have their own toggles/swaps
+											// In the future individual style layers will have their own toggles/swaps
 											if ( ! layer.default ) {
 												if ( map.getLayer( styleLayer.id ) ) {
 													map.setLayoutProperty(
@@ -220,9 +220,6 @@ export default class JeoMap {
 								firstStyleLayerId = map.style._order[ 0 ];
 								lastStyleLayerId =
 									map.style._order[ map.style._order.length - 1 ];
-
-								// console.log(layers);
-								// console.log(firstStyleLayerId, lastStyleLayerId);
 
 								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
@@ -1310,8 +1307,6 @@ export default class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
-		// console.log("changeLayerVisibitly");
-
 		const mapLayersSettings = this.getArg( 'layers' );
 		const layers = this.layers;
 
@@ -1346,7 +1341,6 @@ export default class JeoMap {
 	}
 
 	mapLoaded() {
-		console.log(this.map._loaded);
 		return new Promise((resolve) => {
 			if (this.map._loaded) {
 				resolve();
