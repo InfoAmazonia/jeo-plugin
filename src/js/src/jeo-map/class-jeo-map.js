@@ -178,8 +178,8 @@ export default class JeoMap {
 								}
 							} );
 
-							// When style is done loading (don't try adding layers before style is not read, its messy)
-							map.on( 'load', () => {
+							// When style is done loading (don't try adding layers before style is not ready)
+							this.mapLoaded().then(() => {
 								// Remove not selected layers and toggle vissibility
 								mapLayersSettings.forEach( ( layer ) => {
 									if ( layer.load_as_style ) {
@@ -231,7 +231,7 @@ export default class JeoMap {
 									);
 
 									if ( ! currentLayerSettings.load_as_style ) {
-										// If the current layer is bellow the style, add using fisrt syle layer reference
+										// If the current layer is below the style, add using fisrt syle layer reference
 										if ( index < styleLayerIndex ) {
 											layer.addLayer( map, [ firstStyleLayerId ] );
 										} else {
@@ -276,9 +276,6 @@ export default class JeoMap {
 
 									// layer.addInteractions( map );
 								} );
-
-								// alert("asdasdas");
-								// console.log(customAttribution);
 
 								let controlPostion = 'bottom-right';
 
@@ -1062,7 +1059,6 @@ export default class JeoMap {
 		this.activateMarker( marker );
 
 		if ( ! this.isEmbed ) {
-			// alert("asdasd");
 			this.map.flyTo( { center: LngLat, zoom: 4 } );
 		}
 	}
@@ -1347,6 +1343,16 @@ export default class JeoMap {
 				} );
 			}
 		} );
+	}
+
+	mapLoaded() {
+		console.log(this.map._loaded);
+		return new Promise((resolve) => {
+			if (this.map._loaded) {
+				resolve();
+			}
+			this.map.on('load', resolve);
+		});
 	}
 
 	showLayer( layer_id ) {
