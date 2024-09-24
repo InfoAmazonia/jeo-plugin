@@ -12,14 +12,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/EarthJournalismNetwork/jeo-plugin.git"
+		"url": "git+https://github.com/InfoAmazonia/jeo-plugin.git"
 	},
 	"author": "",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/EarthJournalismNetwork/jeo-plugin/issues"
+		"url": "https://github.com/InfoAmazonia/jeo-plugin/issues"
 	},
-	"homepage": "https://github.com/EarthJournalismNetwork/jeo-plugin#readme",
+	"homepage": "https://github.com/InfoAmazonia/jeo-plugin#readme",
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "^5.0.2",
 		"@wordpress/edit-post": "^8.8.3",
