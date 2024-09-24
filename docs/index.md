@@ -29,4 +29,4 @@ Projects using JEO:
 
 ## JEO WordPress Theme
 
-[Read the documentation](https://earthjournalismnetwork.github.io/jeo-theme/)
+[Read the documentation](https://infoamazonia.github.io/jeo-theme/)
