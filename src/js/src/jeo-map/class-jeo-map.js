@@ -29,6 +29,9 @@ export default class JeoMap {
 		} );
 
 		this.map = map;
+		this.mapLoaded = new Promise((resolve) => {
+			map.on('load', resolve);
+		});
 
 		this.options = jQuery( this.element ).data( 'options' );
 
@@ -179,7 +182,7 @@ export default class JeoMap {
 							} );
 
 							// When style is done loading (don't try adding layers before style is not ready)
-							this.mapLoaded().then(() => {
+							this.mapLoaded.then(() => {
 								// Remove not selected layers and toggle visibility
 								mapLayersSettings.forEach( ( layer ) => {
 									if ( layer.load_as_style ) {
@@ -1338,15 +1341,6 @@ export default class JeoMap {
 				} );
 			}
 		} );
-	}
-
-	mapLoaded() {
-		return new Promise((resolve) => {
-			if (this.map._loaded) {
-				resolve();
-			}
-			this.map.on('load', resolve);
-		});
 	}
 
 	showLayer( layer_id ) {
