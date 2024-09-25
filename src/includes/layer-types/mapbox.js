@@ -4,8 +4,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addStyle( map, attributes ) {
 		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
 
-		map._requestManager._customAccessToken = accessToken;
-
 		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
 		if ( styleId ) {
