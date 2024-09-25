@@ -337,8 +337,6 @@ class MapLayers extends Component {
 						} );
 					}
 
-					// console.log(layerId);
-
 					const newLayer = {
 						id: layerId,
 						type: attributes.layer_type_options.type,

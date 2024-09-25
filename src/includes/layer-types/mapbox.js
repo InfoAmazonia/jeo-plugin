@@ -4,6 +4,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	addStyle( map, attributes ) {
 		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
 
+		map._requestManager._customAccessToken = accessToken;
+
 		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
 		if ( styleId ) {
@@ -12,18 +14,24 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	},
 
 	addLayer( map, attributes, addLayerParams ) {
-		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+		const layerId = attributes.layer_id;
 
-		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+		if ( ! map.getSource( layerId ) ) {
+			const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
 
-		const layer = {
-			id: attributes.layer_id,
-			source: {
+			const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+
+			map.addSource( layerId, {
 				type: 'raster',
 				tiles: [
 					`https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 				],
-			},
+			} );
+		}
+
+		const layer = {
+			id: layerId,
+			source: layerId,
 			type: 'raster',
 		};
 
