@@ -77,6 +77,7 @@ class Discovery extends Component {
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
 			style: 'mapbox://styles/mapbox/streets-v11',
+			projection: 'equirectangular',
 			...adicionalMapOptions,
 		} );
 
