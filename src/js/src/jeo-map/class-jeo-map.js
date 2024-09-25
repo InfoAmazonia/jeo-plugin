@@ -16,6 +16,7 @@ export default class JeoMap {
 	constructor( element ) {
 		this.element = element;
 		this.args = element.attributes;
+		this.customTokens = new Map();
 		this.markers = [];
 		this.layers = [];
 		this.legends = [];
@@ -27,6 +28,7 @@ export default class JeoMap {
 			container: element,
 			projection: 'equirectangular',
 			attributionControl: false,
+			transformRequest: this.transformRequestUrl.bind( this ),
 		} );
 
 		this.map = map;
@@ -166,15 +168,16 @@ export default class JeoMap {
 								map.setStyle( 'mapbox://styles/mapbox/empty-v9' );
 							}
 
-							// Add styles to map
 							let firstStyleLayerId;
-							let lastStyleLayerId;
 							let styleLayerIndex;
 
 							layers.forEach( ( layer, index ) => {
 								const currentLayerSettings = mapLayersSettings.find(
 									( item ) => item.id === layer.attributes.layer_post_id
 								);
+
+								// Register custom accessTokens, if found, to request transformer
+								this.checkCustomToken( layer.attributes );
 
 								if ( currentLayerSettings.load_as_style ) {
 									layer.addStyle( map );
@@ -222,8 +225,6 @@ export default class JeoMap {
 
 								// Select reference pointers
 								firstStyleLayerId = map.style._order[ 0 ];
-								lastStyleLayerId =
-									map.style._order[ map.style._order.length - 1 ];
 
 								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
@@ -1227,7 +1228,6 @@ export default class JeoMap {
 					const clickedLayer = clicked.dataset.layer_id;
 					e.preventDefault();
 					e.stopPropagation();
-					this.restoreContext();
 
 					let visibility = false;
 
@@ -1345,9 +1345,17 @@ export default class JeoMap {
 		} );
 	}
 
-	restoreContext() {
-		const gl = this.map?._canvas.getContext( 'webgl' );
-		gl?.getExtension( 'WEBGL_lose_context' )?.restoreContext();
+	checkCustomToken( attributes ) {
+		if ( attributes.layer_type_options.access_token ) {
+			if ( attributes.layer_type_options.style_id ) {
+				const accessToken = attributes.layer_type_options.access_token;
+
+				const styleId = attributes.layer_type_options.style_id.replace( 'mapbox://styles/', '' );
+				const mapboxUser = styleId.split( '/' )[0];
+
+				this.customTokens.set( new RegExp(`${mapboxUser}[\\/\\.]`), accessToken );
+			}
+		}
 	}
 
 	showLayer( layer_id ) {
@@ -1367,5 +1375,18 @@ export default class JeoMap {
 	forceUpdate() {
 		this.map.resize();
 	}
+
+	transformRequestUrl( url, resourceType ) {
+		for ( const regexp of this.customTokens.keys() ) {
+			if ( regexp.test( url ) ) {
+				const parsedUrl = new URL( url );
+				const parsedParams = new URLSearchParams( parsedUrl.search );
+				parsedParams.set( 'access_token', this.customTokens.get( regexp ) );
+				parsedUrl.search = '?' + parsedParams.toString();
+				return { url: parsedUrl.toString() };
+			}
+		}
+
+		return { url };
+	}
 }
-;
