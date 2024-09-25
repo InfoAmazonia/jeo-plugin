@@ -235,6 +235,7 @@ class StoryMapDisplay extends Component {
 
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
+			projection: 'equirectangular',
 			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],
 			zoom: initialLocation.zoom || mapDefaults.zoom,
 			...config,

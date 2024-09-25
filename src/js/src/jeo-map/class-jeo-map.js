@@ -25,6 +25,7 @@ export default class JeoMap {
 
 		const map = new window.mapboxgl.Map( {
 			container: element,
+			projection: 'equirectangular',
 			attributionControl: false,
 		} );
 
@@ -1226,6 +1227,7 @@ export default class JeoMap {
 					const clickedLayer = clicked.dataset.layer_id;
 					e.preventDefault();
 					e.stopPropagation();
+					this.restoreContext();
 
 					let visibility = false;
 
@@ -1341,6 +1343,11 @@ export default class JeoMap {
 				} );
 			}
 		} );
+	}
+
+	restoreContext() {
+		const gl = this.map?._canvas.getContext( 'webgl' );
+		gl?.getExtension( 'WEBGL_lose_context' )?.restoreContext();
 	}
 
 	showLayer( layer_id ) {
