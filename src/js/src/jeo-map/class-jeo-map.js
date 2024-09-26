@@ -16,7 +16,7 @@ export default class JeoMap {
 	constructor( element ) {
 		this.element = element;
 		this.args = element.attributes;
-		this.customTokens = new Map();
+		this.customTokens = {};
 		this.markers = [];
 		this.layers = [];
 		this.legends = [];
@@ -1353,7 +1353,7 @@ export default class JeoMap {
 				const styleId = attributes.layer_type_options.style_id.replace( 'mapbox://styles/', '' );
 				const mapboxUser = styleId.split( '/' )[0];
 
-				this.customTokens.set( new RegExp(`${mapboxUser}[\\/\\.]`), accessToken );
+				this.customTokens[ mapboxUser ] = accessToken;
 			}
 		}
 	}
@@ -1377,13 +1377,18 @@ export default class JeoMap {
 	}
 
 	transformRequestUrl( url, resourceType ) {
-		for ( const regexp of this.customTokens.keys() ) {
-			if ( regexp.test( url ) ) {
+		for ( const user of Object.keys( this.customTokens ) ) {
+			if ( url.includes( `${user}/` ) || url.includes( `${user}.` ) ) {
+				const accessToken = this.customTokens[ user ];
+
 				const parsedUrl = new URL( url );
 				const parsedParams = new URLSearchParams( parsedUrl.search );
-				parsedParams.set( 'access_token', this.customTokens.get( regexp ) );
-				parsedUrl.search = '?' + parsedParams.toString();
-				return { url: parsedUrl.toString() };
+
+				if ( parsedParams.get( 'access_token' ) !== accessToken ) {
+					parsedParams.set( 'access_token', accessToken );
+					parsedUrl.search = '?' + parsedParams.toString();
+					return { url: parsedUrl.toString() };
+				}
 			}
 		}
 
