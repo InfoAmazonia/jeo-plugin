@@ -322,6 +322,7 @@ export default class JeoMap {
 				).remove();
 			} );
 
+		// Only used for manipulating the map from outside Jeo
 		window.map = map;
 	}
 
