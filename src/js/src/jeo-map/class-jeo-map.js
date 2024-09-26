@@ -4,7 +4,7 @@ import { Eta } from 'eta';
 import { onFirstIntersection } from '../shared/intersect';
 
 const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
+	return str.replace( /&#(\d+);/g, ( match, dec ) => {
 		return String.fromCharCode( dec );
 	} );
 };
@@ -26,18 +26,6 @@ export default class JeoMap {
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
-		const map = new window.mapboxgl.Map( {
-			container: element,
-			projection: 'equirectangular',
-			attributionControl: false,
-			transformRequest: this.transformRequestUrl.bind( this ),
-		} );
-
-		this.map = map;
-		this.mapLoaded = new Promise((resolve) => {
-			map.on('load', resolve);
-		});
-
 		this.options = jQuery( this.element ).data( 'options' );
 
 		this.moreInfoTemplate = compileTemplate( window.jeoMapVars.templates.moreInfo, {
@@ -47,6 +35,27 @@ export default class JeoMap {
 		this.popupTemplate = compileTemplate( `<article class="popup popup-wmt">${ window.jeoMapVars.templates.postPopup }</article>`, {
 			functionHeader: 'const { post, read_more, show_featured_media } = it;',
 		} );
+
+		onFirstIntersection( element, this.lazyInitMap.bind( this ) );
+	}
+
+	lazyInitMap() {
+		if ( this.initialized ) {
+			return;
+		}
+		this.initialized = true;
+
+		const map = new window.mapboxgl.Map( {
+			container: this.element,
+			projection: 'equirectangular',
+			attributionControl: false,
+			transformRequest: this.transformRequestUrl.bind( this ),
+		} );
+
+		this.map = map;
+		this.mapLoaded = new Promise((resolve) => {
+			map.on('load', resolve);
+		});
 
 		const self = this;
 
@@ -80,18 +89,8 @@ export default class JeoMap {
 				} )
 
 			}
-		})
+		});
 
-		onFirstIntersection( element, this.lazyInitMap.bind( this ) );
-	}
-
-	lazyInitMap() {
-		if ( this.initialized ) {
-			return;
-		}
-		this.initialized = true;
-
-		const map = this.map;
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
@@ -107,16 +106,16 @@ export default class JeoMap {
 					);
 
 					if ( this.getArg( 'disable_scroll_zoom' ) ) {
-						map.scrollZoom.disable();
+						map.scrollZoom?.disable();
 					}
 
 					if ( this.getArg( 'disable_drag_pan' ) ) {
-						map.dragPan.disable();
-						map.touchZoomRotate.disable();
+						map.dragPan?.disable();
+						map.touchZoomRotate?.disable();
 					}
 
 					if ( this.getArg( 'disable_drag_rotate' ) ) {
-						map.dragRotate.disable();
+						map.dragRotate?.disable();
 					}
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
