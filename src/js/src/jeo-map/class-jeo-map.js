@@ -1,6 +1,8 @@
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
+import { onFirstIntersection } from '../shared/intersect';
+
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, function ( match, dec ) {
 		return String.fromCharCode( dec );
@@ -80,12 +82,11 @@ export default class JeoMap {
 			}
 		})
 
-		const observer = new IntersectionObserver(this.lazyInitMap.bind(this), { threshold: 0 });
-		observer.observe(element);
+		onFirstIntersection( element, this.lazyInitMap.bind( this ) );
 	}
 
-	lazyInitMap([intersectionEntry]) {
-		if (this.initialized || !(intersectionEntry?.isIntersecting)) {
+	lazyInitMap() {
+		if ( this.initialized ) {
 			return;
 		}
 		this.initialized = true;

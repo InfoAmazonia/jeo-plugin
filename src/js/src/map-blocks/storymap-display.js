@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import mapboxgl from 'mapbox-gl';
 import scrollama from 'scrollama';
 
+import { onFirstIntersection } from '../shared/intersect';
 import { renderLayer } from './map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
 
@@ -118,8 +119,7 @@ class StoryMapDisplay extends Component {
     componentDidMount() {
 		this.eagerInitStorymap();
 
-		const observer = new IntersectionObserver(this.lazyInitStorymap.bind(this), { threshold: 0 });
-		observer.observe(this.el);
+		onFirstIntersection( this.el, this.lazyInitStorymap.bind( this ) );
 	}
 
 	eagerInitStorymap() {
@@ -223,8 +223,8 @@ class StoryMapDisplay extends Component {
 		});
 	}
 
-	lazyInitStorymap([intersectionEntry]) {
-		if (this.initialized || !(intersectionEntry?.isIntersecting)) {
+	lazyInitStorymap() {
+		if ( this.initialized ) {
 			return;
 		}
 		this.initialized = true;
