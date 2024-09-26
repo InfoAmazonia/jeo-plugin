@@ -49,16 +49,16 @@ const MapEditor = ( {
 								const { current: map } = mapRef;
 								if ( map ) {
 									if ( loadedMap.meta.disable_scroll_zoom ) {
-										map.scrollZoom.disable();
+										map.scrollZoom?.disable();
 									}
 
 									if ( loadedMap.meta.disable_drag_pan ) {
 										map.dragPan.disable();
-										map.touchZoomRotate.disable();
+										map.touchZoomRotate?.disable();
 									}
 
 									if ( loadedMap.meta.disable_drag_rotate ) {
-										map.dragRotate.disable();
+										map.dragRotate?.disable();
 									}
 								}
 							} }
