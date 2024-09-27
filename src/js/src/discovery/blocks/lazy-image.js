@@ -44,7 +44,7 @@ const Wrapper = styled.div`
 `;
 
 const LazyImage = ( { src, alt } ) => {
-	const refPlaceholder = useRef();
+	const refPlaceholder = useRef( undefined );
 
 	const removePlaceholder = () => {
 		refPlaceholder.current.remove();
@@ -58,6 +58,7 @@ const LazyImage = ( { src, alt } ) => {
 				onError={ removePlaceholder }
 				src={ src }
 				alt={ alt }
+				loading="lazy"
 			/>
 		</Wrapper>
 	);

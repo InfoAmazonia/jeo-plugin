@@ -28,7 +28,7 @@ First of all, clone this repository.
 Note that you can NOT clone it directly in the WordPress `plugins` directory.
 
 ```bash
-git clone git@github.com:EarthJournalismNetwork/jeo-plugin.git
+git clone git@github.com:InfoAmazonia/jeo-plugin.git
 ```
 
 Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have.

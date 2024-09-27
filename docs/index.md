@@ -7,7 +7,7 @@ The JEO WordPress geojournalism platform allows news organizations, bloggers and
 Features:
 
 - [MapBox](http://mapbox.com/) maps
-- [ReactMapBoxGL](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md) library
+- [react-map-gl](https://visgl.github.io/react-map-gl/) library
 - Custom tile layers
 - Layer filtering options, allowing you to mix tile layer.
 - Geocoding WordPress posts using OpenStreetMaps (Nominatim), suporting the post type `Post`.
@@ -29,4 +29,4 @@ Projects using JEO:
 
 ## JEO WordPress Theme
 
-[Read the documentation](https://earthjournalismnetwork.github.io/jeo-theme/)
+[Read the documentation](https://infoamazonia.github.io/jeo-theme/)
