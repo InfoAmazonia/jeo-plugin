@@ -1,7 +1,7 @@
 import { withDispatch, withSelect } from '@wordpress/data';
-import { PluginDocumentSettingPanel } from '@wordpress/editor';
-import { Fragment, useCallback, useState, useEffect } from '@wordpress/element';
-import { Button, Dashicon, ButtonGroup } from '@wordpress/components';
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { Button, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
@@ -58,20 +58,20 @@ function MapsSidebar( {
 		border: 0,
 	} );
 
-	const [ map, setMap ] = useState(false);
+	const mapRef = useRef( undefined );
 
 	const setPanLimitsFromMap = () => {
-		if(map) {
+		const { current: map } = mapRef;
+		if ( map ) {
 			const boundries = map.getBounds();
-			setPostMeta(
-				{	...postMeta,
-					'pan_limits': {
-						east: boundries._ne.lat,
-						north: boundries._ne.lng,
-						south: boundries._sw.lng,
-						west: boundries._sw.lat,
-					}
-				} )
+			setPostMeta( {	...postMeta,
+				'pan_limits': {
+					east: boundries._ne.lat,
+					north: boundries._ne.lng,
+					south: boundries._sw.lng,
+					west: boundries._sw.lat,
+				}
+			} );
 		}
 	}
 
@@ -91,47 +91,35 @@ function MapsSidebar( {
 		initial_zoom: initialZoom,
 	} = { ...mapDefaults, ...postMeta };
 
-	const animationOptions = {
-		animate: false,
-	};
-
 	const [ key, setKey ] = useState( 0 );
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = postMeta[ zoomState ];
 
+	const createNotice = useCallback( ( type, message, options = {} ) => {
+		sendNotice( type, message, { id: 'layer_notices_no_api_key', isDismissible: true, ...options } );
+	}, [ sendNotice ] );
+
 	useEffect( () => {
 		if ( ! MapboxAPIKey ) {
-			sendNotice(
-				'warning',
-				__( "There's no API Key found in your JEO Settings.", 'jeo' ),
-				{
-					id: 'layer_notices_no_api_key',
-					isDismissible: true,
-					actions: [
-						{
-							url: '/wp-admin/admin.php?page=jeo-settings',
-							label: 'Check your settings.',
-						},
-					],
-				}
-			);
-
+			createNotice( 'warning', __( "There's no API Key found in your JEO Settings.", 'jeo' ), {
+				actions: [
+					{
+						url: '/wp-admin/admin.php?page=jeo-settings',
+						label: __( 'Please, check your settings.', 'jeo' ),
+					},
+				],
+			} );
 			lockPostSaving();
+			lockPostAutoSaving();
 		} else {
 			async function verifyAPIKey() {
 				const response = await fetch(
 					`https://api.mapbox.com/styles/v1/mapbox/streets-v11?access_token=${ MapboxAPIKey }`
 				);
 				if ( response.status >= 400 ) {
-					sendNotice(
-						'warning',
-						__( '1 - Your Mapbox access token may be invalid.', 'jeo' ),
-						{
-							id: 'layer_notices_no_api_key',
-							isDismissible: true,
-						}
-					);
+					createNotice( 'warning', __( '1 - Your Mapbox access token may be invalid.', 'jeo' ) );
 					lockPostSaving();
+					lockPostAutoSaving();
 				}
 			}
 
@@ -189,7 +177,7 @@ function MapsSidebar( {
 
 
 	return (
-		<Fragment>
+		<>
 			{ modal && (
 				<LayersSettingsModal
 					closeModal={ closeModal }
@@ -270,25 +258,13 @@ function MapsSidebar( {
 						</ButtonGroup>
 					</div>
 					<Map
-						onError={ (map, error) => {
-
-						} }
-						onStyleLoad={ ( map ) => {
-							map.addControl(
-								new mapboxgl.NavigationControl( { showCompass: false } ),
-								'top-left'
-							);
-							map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
-							setMap(map);
-						} }
 						key={ key }
-						style="mapbox://styles/mapbox/streets-v11"
-						containerStyle={ { height: '500px', width: '100%' } }
-						zoom={ [ currentZoom || initialZoom || 0 ] }
-						center={ [ centerLon || 0, centerLat || 0 ] }
-						animationOptions={ animationOptions }
-						onMoveEnd={ ( map ) => {
-							console.log(map.getBounds())
+						ref={ mapRef }
+						style={ { height: '500px', width: '100%' } }
+						latitude={ centerLat || 0 }
+						longitude={ centerLon || 0 }
+						zoom={ currentZoom || initialZoom || 11 }
+						onMoveEnd={ ( { target: map } ) => {
 							const center = map.getCenter();
 							let zoom = Math.round( map.getZoom() * 10 ) / 10;
 
@@ -349,7 +325,7 @@ function MapsSidebar( {
 				setRelatedPosts={ setRelatedPosts }
 				renderPanel={ PluginDocumentSettingPanel }
 			/>
-		</Fragment>
+		</>
 	);
 }
 
@@ -371,7 +347,7 @@ export default withDispatch( ( dispatch ) => ( {
 	},
 } ) )(
 	withSelect( ( select ) => ( {
-		loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'menu_order' } ),
+		loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'title' } ),
 		loadingLayers: select( 'core/data' ).isResolving(
 			'core',
 			'getEntityRecords',

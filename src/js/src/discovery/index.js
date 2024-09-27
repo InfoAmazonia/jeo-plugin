@@ -77,6 +77,7 @@ class Discovery extends Component {
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
 			style: 'mapbox://styles/mapbox/streets-v11',
+			projection: 'equirectangular',
 			...adicionalMapOptions,
 		} );
 
@@ -241,10 +242,10 @@ class Discovery extends Component {
 				) }
 				{ this.state.mapLoaded ? <Sidebar { ...props } /> : '' }
 
-				<div
-					ref={ ( el ) => ( this.mapContainer = el ) }
-					className="discovery-map"
-				>
+				<div className="discovery-map">
+					<div className="discovery-map__container" ref={ ( el ) => ( this.mapContainer = el ) }>
+						{ /* Map container should be empty */ }
+					</div>
 					{ ! this.props.embed && (
 						<div
 							className={

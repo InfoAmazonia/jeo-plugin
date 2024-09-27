@@ -4,6 +4,7 @@ import classNames from 'classnames';
 import mapboxgl from 'mapbox-gl';
 import scrollama from 'scrollama';
 
+import { onFirstIntersection } from '../shared/intersect';
 import { renderLayer } from './map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
 
@@ -118,8 +119,7 @@ class StoryMapDisplay extends Component {
     componentDidMount() {
 		this.eagerInitStorymap();
 
-		const observer = new IntersectionObserver(this.lazyInitStorymap.bind(this), { threshold: 0 });
-		observer.observe(this.el);
+		onFirstIntersection( this.el, this.lazyInitStorymap.bind( this ) );
 	}
 
 	eagerInitStorymap() {
@@ -158,7 +158,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 					if( isLayerUsed || response.index === config.chapters.length - 1) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 1)
 					}
 				})
 
@@ -167,7 +167,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 					if ( !isLayerUsed ) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 0)
 					}
 				})
 		})
@@ -177,18 +177,18 @@ class StoryMapDisplay extends Component {
 
 				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
 				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
 					if( isLayerUsed ) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 1)
 					}
 				})
 
 				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
 					if ( !isLayerUsed ) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 0)
 					}
 				})
 			}
@@ -223,8 +223,8 @@ class StoryMapDisplay extends Component {
 		});
 	}
 
-	lazyInitStorymap([intersectionEntry]) {
-		if (this.initialized || !(intersectionEntry?.isIntersecting)) {
+	lazyInitStorymap() {
+		if ( this.initialized ) {
 			return;
 		}
 		this.initialized = true;
@@ -235,6 +235,7 @@ class StoryMapDisplay extends Component {
 
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
+			projection: 'equirectangular',
 			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],
 			zoom: initialLocation.zoom || mapDefaults.zoom,
 			...config,
@@ -249,11 +250,11 @@ class StoryMapDisplay extends Component {
 			map.dragRotate.disable();
 
 			this.props.navigateMapLayers.forEach(layer => {
-				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
-				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: String(layer.id), visible: true });
+				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: layer.slug, visible: true });
 				jeoLayer.addLayer(map);
-				map.setPaintProperty(String(layer.id), 'raster-opacity', isInitialLayer ? 1 : 0);
+				map.setPaintProperty(layer.slug, 'raster-opacity', isInitialLayer ? 1 : 0);
 			});
 
 			this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
@@ -268,7 +269,7 @@ class StoryMapDisplay extends Component {
 			this.state.currentChapter.selectedLayers.map(
 				( layer ) => {
 					const layerOptions = this.props.navigateMapLayers.find(
-						( { id } ) => id === layer.id
+						( { slug } ) => slug === layer.slug
 					);
 
 					if ( layerOptions ) {
@@ -285,8 +286,7 @@ class StoryMapDisplay extends Component {
 			this.props.navigateMapLayers.map(
 				( layer ) => {
 					// This is will force layer reordering to invalidate applied layers cache
-					const layerCopy = {...layer};
-					layerCopy.id = layerCopy.id + `_final_batch`;
+					const layerCopy = { ...layer, slug: layer.slug + '_final_batch' };
 
 					return renderLayer( {
 						layer: layerCopy.meta,
@@ -389,7 +389,7 @@ class StoryMapDisplay extends Component {
 														props={ this.props }
 														onClickFunction={ () => {
 															this.el.querySelector( '.navigate-map' ).style.display = 'block';
-															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } )
+															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } );
 															this.navigateMap.forceUpdate();
 															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
 

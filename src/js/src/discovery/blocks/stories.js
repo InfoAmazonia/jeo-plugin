@@ -289,8 +289,7 @@ class Stories extends Component {
 
 			// Get all points under a cluster
 			clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
-				// console.log('getClusterLeaves', aFeatures);
-				const postsIds = aFeatures.map( ( post ) => post.id)
+				const postsIds = ( aFeatures ?? [] ).map( ( post ) => post.id)
 
 				this.setState( {
 					...this.state,

@@ -1,24 +1,11 @@
-import {
-	Button,
-	Spinner,
-	Dashicon,
-	CheckboxControl,
-    SelectControl,
-    TextControl,
-    Card,
-    CardBody,
-    CardHeader,
-    CardDivider,
-    CardFooter,
-} from '@wordpress/components';
+import { Button, Card, CardBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
 import { withInstanceId } from '@wordpress/compose';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { select } from '@wordpress/data';
 
-import classNames from 'classnames';
 import { List, arrayMove } from 'react-movable';
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 import LayerSettings from './layer-settings';
 import { layerLoader } from './utils';
@@ -50,7 +37,7 @@ const LayersSettings = ( {
 		const allLayersData = select( 'core' ).getEntityRecords(
 			'postType',
 			'map-layer',
-			{ per_page: -1, order: 'asc', orderby: 'menu_order' }
+			{ per_page: -1, order: 'asc', orderby: 'title' }
 		);
 		if ( ! allLayersData ) {
 			setAllLayers( [] );
@@ -107,11 +94,9 @@ const LayersSettings = ( {
 	};
 
 	function filterLayers() {
-		const layers = []
-
-		allLayers.map( ( layer ) => {
+		const layers = allLayers.filter( ( layer ) => {
 			if ( layerTypeFilter && layerTypeFilter !== layer.meta.type ) {
-				return;
+				return false;
 			}
 
 			/* TODO: Make layers that don't use legend to not be shown when filtering by legend
@@ -121,10 +106,10 @@ const LayersSettings = ( {
 			*/
 
 			if ( layerNameFilter && ! layer.title.raw.toLowerCase().includes( layerNameFilter.toLowerCase() ) ) {
-				return;
+				return false;
 			}
 
-			return layers.push( layer );
+			return true;
 		} );
 		setFilteredLayers( layers );
 	}
@@ -153,10 +138,7 @@ const LayersSettings = ( {
 			}
 		})
 
-		// console.log(resultLayers);
-		// console.log(resultLayers);
-
-		setLayers( resultLayers )
+		setLayers( resultLayers );
 	}
 
 	return (
@@ -166,7 +148,7 @@ const LayersSettings = ( {
 					<div>
 						<form onSubmit={ filterLayers } action="javascript:void(0);" style={ { display: "flex" }}>
 							<TextControl
-								placeholder="Enter keywords to search layers"
+								placeholder={ __( 'Enter keywords to search layers', 'jeo' ) }
 								value={ layerNameFilter }
 								onChange={ ( value ) => {
 									setLayerNameFilter( value );
@@ -187,7 +169,7 @@ const LayersSettings = ( {
 									<SelectControl
 										className="jeo-layers-library-filters"
 										hideLabelFromVision={ true }
-										label={ __( 'Legend type' ) }
+										label={ __( 'Legend type', 'jeo ) }
 										options={ legendTypeOptions }
 										value={ layerLegendFilter }
 										onChange={ ( value ) => {
@@ -278,7 +260,7 @@ const LayersSettings = ( {
 														} }
 														className="add-button"
 													>
-														Add to map
+														{ __( 'Add to map', 'jeo' ) }
 													</p>
 												) }
 												{ inUse && (
@@ -294,7 +276,7 @@ const LayersSettings = ( {
 														} }
 														className="remove-button"
 													>
-														Remove from map
+														{ __( 'Remove from map', 'jeo' ) }
 													</p>
 												) }
 											</div>
@@ -340,8 +322,6 @@ const LayersSettings = ( {
 									};
 
 									const updateStyleLayers = (def) => {
-										//console.log("updateStyleLayers");
-
 										setLayers(
 											attributes.layers.map( ( settings ) =>
 												settings.id === layer.id
@@ -404,8 +384,6 @@ const LayersSettings = ( {
 																: { ...settings, load_as_style: false, style_layers: [] }
 														} )
 													);
-
-													// console.log(def);
 												} );
 
 												setLayers(

@@ -76,12 +76,12 @@ class Sidebar extends Component {
 	}
 
 	handleScroll( e ) {
-		// Only send parent update if the previuos one is done
+		// Only send parent update if the previous one is done
 		if ( this.props.storiesLoaded ) {
 			const element = e.target;
 			if (
-				element.scrollHeight - element.scrollTop >=
-				element.clientHeight - 30
+				( element.scrollHeight - element.scrollTop - 100) <=
+				element.clientHeight
 			) {
 				if ( this.storiesRef.current ) {
 					this.storiesRef.current.updateStories( { cumulative: true } );
@@ -152,7 +152,7 @@ class Sidebar extends Component {
 
 		return (
 			<div
-				onScroll={ this.handleScroll }
+				onScrollCapture={ this.handleScroll }
 				className={ this.props.isEmbed ? 'is-embed' : 'default-sidebar' }
 			>
 				<div className="discovery-title">{ __( 'Discovery', 'jeo' ) }</div>

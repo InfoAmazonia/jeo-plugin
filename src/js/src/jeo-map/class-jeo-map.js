@@ -1,8 +1,10 @@
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
+import { onFirstIntersection } from '../shared/intersect';
+
 const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
+	return str.replace( /&#(\d+);/g, ( match, dec ) => {
 		return String.fromCharCode( dec );
 	} );
 };
@@ -16,19 +18,13 @@ export default class JeoMap {
 	constructor( element ) {
 		this.element = element;
 		this.args = element.attributes;
+		this.customTokens = {};
 		this.markers = [];
 		this.layers = [];
 		this.legends = [];
 		this.initialized = false;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
-
-		const map = new window.mapboxgl.Map( {
-			container: element,
-			attributionControl: false,
-		} );
-
-		this.map = map;
 
 		this.options = jQuery( this.element ).data( 'options' );
 
@@ -39,6 +35,27 @@ export default class JeoMap {
 		this.popupTemplate = compileTemplate( `<article class="popup popup-wmt">${ window.jeoMapVars.templates.postPopup }</article>`, {
 			functionHeader: 'const { post, read_more, show_featured_media } = it;',
 		} );
+
+		onFirstIntersection( element, this.lazyInitMap.bind( this ) );
+	}
+
+	lazyInitMap() {
+		if ( this.initialized ) {
+			return;
+		}
+		this.initialized = true;
+
+		const map = new window.mapboxgl.Map( {
+			container: this.element,
+			projection: 'equirectangular',
+			attributionControl: false,
+			transformRequest: this.transformRequestUrl.bind( this ),
+		} );
+
+		this.map = map;
+		this.mapLoaded = new Promise((resolve) => {
+			map.on('load', resolve);
+		});
 
 		const self = this;
 
@@ -72,19 +89,8 @@ export default class JeoMap {
 				} )
 
 			}
-		})
+		});
 
-		const observer = new IntersectionObserver(this.lazyInitMap.bind(this), { threshold: 0 });
-		observer.observe(element);
-	}
-
-	lazyInitMap([intersectionEntry]) {
-		if (this.initialized || !(intersectionEntry?.isIntersecting)) {
-			return;
-		}
-		this.initialized = true;
-
-		const map = this.map;
 		this.initMap()
 			.then( () => {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
@@ -100,16 +106,16 @@ export default class JeoMap {
 					);
 
 					if ( this.getArg( 'disable_scroll_zoom' ) ) {
-						map.scrollZoom.disable();
+						map.scrollZoom?.disable();
 					}
 
 					if ( this.getArg( 'disable_drag_pan' ) ) {
-						map.dragPan.disable();
-						map.touchZoomRotate.disable();
+						map.dragPan?.disable();
+						map.touchZoomRotate?.disable();
 					}
 
 					if ( this.getArg( 'disable_drag_rotate' ) ) {
-						map.dragRotate.disable();
+						map.dragRotate?.disable();
 					}
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
@@ -162,9 +168,7 @@ export default class JeoMap {
 								map.setStyle( 'mapbox://styles/mapbox/empty-v9' );
 							}
 
-							// Add styles to map
 							let firstStyleLayerId;
-							let lastStyleLayerId;
 							let styleLayerIndex;
 
 							layers.forEach( ( layer, index ) => {
@@ -172,15 +176,18 @@ export default class JeoMap {
 									( item ) => item.id === layer.attributes.layer_post_id
 								);
 
+								// Register custom accessTokens, if found, to request transformer
+								this.checkCustomToken( layer.attributes );
+
 								if ( currentLayerSettings.load_as_style ) {
 									layer.addStyle( map );
 									styleLayerIndex = index;
 								}
 							} );
 
-							// When style is done loading (don't try adding layers before style is not read, its messy)
-							map.on( 'load', () => {
-								// Remove not selected layers and toggle vissibility
+							// When style is done loading (don't try adding layers before style is not ready)
+							this.mapLoaded.then(() => {
+								// Remove not selected layers and toggle visibility
 								mapLayersSettings.forEach( ( layer ) => {
 									if ( layer.load_as_style ) {
 										const styleLayers = layer.style_layers;
@@ -192,7 +199,7 @@ export default class JeoMap {
 												}
 											}
 
-											// In the fucture individual style layers will have their own toggles/swaps
+											// In the future individual style layers will have their own toggles/swaps
 											if ( ! layer.default ) {
 												if ( map.getLayer( styleLayer.id ) ) {
 													map.setLayoutProperty(
@@ -218,11 +225,6 @@ export default class JeoMap {
 
 								// Select reference pointers
 								firstStyleLayerId = map.style._order[ 0 ];
-								lastStyleLayerId =
-									map.style._order[ map.style._order.length - 1 ];
-
-								// console.log(layers);
-								// console.log(firstStyleLayerId, lastStyleLayerId);
 
 								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
@@ -231,7 +233,7 @@ export default class JeoMap {
 									);
 
 									if ( ! currentLayerSettings.load_as_style ) {
-										// If the current layer is bellow the style, add using fisrt syle layer reference
+										// If the current layer is below the style, add using fisrt syle layer reference
 										if ( index < styleLayerIndex ) {
 											layer.addLayer( map, [ firstStyleLayerId ] );
 										} else {
@@ -277,9 +279,6 @@ export default class JeoMap {
 									// layer.addInteractions( map );
 								} );
 
-								// alert("asdasdas");
-								// console.log(customAttribution);
-
 								let controlPostion = 'bottom-right';
 
 								let attributionControl = new mapboxgl.AttributionControl( {
@@ -322,6 +321,7 @@ export default class JeoMap {
 				).remove();
 			} );
 
+		// Only used for manipulating the map from outside Jeo
 		window.map = map;
 	}
 
@@ -1062,7 +1062,6 @@ export default class JeoMap {
 		this.activateMarker( marker );
 
 		if ( ! this.isEmbed ) {
-			// alert("asdasd");
 			this.map.flyTo( { center: LngLat, zoom: 4 } );
 		}
 	}
@@ -1314,8 +1313,6 @@ export default class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
-		// console.log("changeLayerVisibitly");
-
 		const mapLayersSettings = this.getArg( 'layers' );
 		const layers = this.layers;
 
@@ -1349,6 +1346,19 @@ export default class JeoMap {
 		} );
 	}
 
+	checkCustomToken( attributes ) {
+		if ( attributes.layer_type_options.access_token ) {
+			if ( attributes.layer_type_options.style_id ) {
+				const accessToken = attributes.layer_type_options.access_token;
+
+				const styleId = attributes.layer_type_options.style_id.replace( 'mapbox://styles/', '' );
+				const mapboxUser = styleId.split( '/' )[0];
+
+				this.customTokens[ mapboxUser ] = accessToken;
+			}
+		}
+	}
+
 	showLayer( layer_id ) {
 		this.changeLayerVisibitly( layer_id, 'visible' );
 		jQuery( this.element )
@@ -1366,5 +1376,23 @@ export default class JeoMap {
 	forceUpdate() {
 		this.map.resize();
 	}
+
+	transformRequestUrl( url, resourceType ) {
+		for ( const user of Object.keys( this.customTokens ) ) {
+			if ( url.includes( `${user}/` ) || url.includes( `${user}.` ) ) {
+				const accessToken = this.customTokens[ user ];
+
+				const parsedUrl = new URL( url );
+				const parsedParams = new URLSearchParams( parsedUrl.search );
+
+				if ( parsedParams.get( 'access_token' ) !== accessToken ) {
+					parsedParams.set( 'access_token', accessToken );
+					parsedUrl.search = '?' + parsedParams.toString();
+					return { url: parsedUrl.toString() };
+				}
+			}
+		}
+
+		return { url };
+	}
 }
-;
