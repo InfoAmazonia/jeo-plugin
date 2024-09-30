@@ -45,6 +45,7 @@ class StoryMapDisplay extends Component {
 		this.map = null;
 		this.el = null;
 		this.mapContainer = null;
+		this.navigable = Boolean(this.props.navigateButton);
 		this.navigateMap = null;
 		this.cid = ++storyCounter;
 
@@ -196,12 +197,15 @@ class StoryMapDisplay extends Component {
 
 		window.addEventListener('resize', this.scroller.resize);
 
-		const navigateMapDiv = document.createElement('div');
-		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
-		navigateMapDiv.dataset.map_id = this.props.map_id;
+		if (this.navigable) {
+			const navigateMapDiv = document.createElement('div');
+			navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
+			navigateMapDiv.dataset.map_id = this.props.map_id;
 
-		this.navigateMap = new JeoMap( navigateMapDiv );
-		this.el.querySelector('.navigate-map').append( navigateMapDiv );
+			this.navigateMap = new JeoMap( navigateMapDiv );
+			this.el.querySelector('.navigate-map').append( navigateMapDiv );
+			this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
+		}
 
 		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
 		window.fetch( url )
@@ -209,8 +213,6 @@ class StoryMapDisplay extends Component {
 				return response.json();
 			} )
 			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
-
-		this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
 
 		document.addEventListener('fullscreenchange', function() {
 			if ( document.fullscreenElement ) {
@@ -263,7 +265,10 @@ class StoryMapDisplay extends Component {
 	}
 
 	componentDidUpdate() {
-		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+		const mapEl = this.el.querySelector('.mapboxgl-map');
+		if (mapEl) {
+			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
+		}
 
 		if(this.state.inSlides) {
 			this.state.currentChapter.selectedLayers.map(
@@ -390,7 +395,7 @@ class StoryMapDisplay extends Component {
 														onClickFunction={ () => {
 															this.el.querySelector( '.navigate-map' ).style.display = 'block';
 															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } );
-															this.navigateMap.forceUpdate();
+															this.navigateMap?.forceUpdate();
 															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
 
 															window.scrollTo( 0,this.el.scrollHeight );
@@ -423,8 +428,7 @@ class StoryMapDisplay extends Component {
 						) }
 					</div>
 				</div>
-				<div style={ { display: 'none' } } className="navigate-map"></div>
-				<>
+				<div style={ { display: 'none' } } className="navigate-map">
 					<div className="return-to-slides-container">
 						<p className="icon-return">
 							<div
@@ -482,7 +486,7 @@ class StoryMapDisplay extends Component {
 							{ __('Back to top', 'jeo') }
 						</p>
 					</div>
-				</>
+				</div>
 			</section>
         );
     }
