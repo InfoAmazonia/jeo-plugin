@@ -24,6 +24,12 @@ class JeoLayer {
 		}
 	}
 
+	getStyleUrl() {
+		if ( typeof this.layerType.getStyleUrl === 'function' ) {
+			return this.layerType.getStyleUrl( this.attributes );
+		}
+	}
+
 	get layer_name() {
 		return this.attributes.layer_name;
 	}
