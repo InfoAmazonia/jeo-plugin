@@ -1,3 +1,9 @@
+export function waitMapEvent( target, event ) {
+	return new Promise( ( resolve ) => {
+		target.once( event, resolve );
+	} );
+}
+
 export function waitUntil ( condition, callback, intervalMs = 50, timeoutMs = 30_000 ) {
 	const initialValue = condition();
 	if ( initialValue ) {
