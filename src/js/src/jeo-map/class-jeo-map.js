@@ -46,7 +46,7 @@ export default class JeoMap {
 		}
 		this.initialized = true;
 
-		this.initMap()
+		this.fetchMapData()
 			.then( () => {
 				const map = new mapboxgl.Map( {
 					container: this.element,
@@ -311,7 +311,7 @@ export default class JeoMap {
 			} );
 	}
 
-	async initMap() {
+	async fetchMapData() {
 		if ( this.getArg( 'map_id' ) ) {
 			const data = await jQuery.ajax( {
 				type: 'GET',
