@@ -2,12 +2,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	label: 'Mapbox Style',
 
 	addStyle( map, attributes ) {
-		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+		const styleUrl = this.getStyleUrl( attributes );
 
-		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
-
-		if ( styleId ) {
-			return map.setStyle( `https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }` );
+		if ( styleUrl ) {
+			return map.setStyle( styleUrl );
 		}
 	},
 
@@ -153,6 +151,16 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		return new Promise( function ( resolve ) {
 			resolve( baseSchema );
 		} );
+	},
+
+	getStyleUrl( attributes ) {
+		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+
+		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+
+		if ( styleId ) {
+			return `https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }`;
+		}
 	},
 
 	getStyleLayers( attributes ) {

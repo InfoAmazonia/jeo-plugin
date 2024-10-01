@@ -2,6 +2,7 @@ import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
 import { onFirstIntersection } from '../shared/intersect';
+import { waitMapEvent } from '../shared/wait';
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, ( match, dec ) => {
@@ -45,54 +46,52 @@ export default class JeoMap {
 		}
 		this.initialized = true;
 
-		const map = new window.mapboxgl.Map( {
-			container: this.element,
-			projection: 'equirectangular',
-			attributionControl: false,
-			transformRequest: this.transformRequestUrl.bind( this ),
-		} );
-
-		this.map = map;
-		this.mapLoaded = new Promise((resolve) => {
-			map.on('load', resolve);
-		});
-
-		const self = this;
-
-        this.spiderifier = new MapboxglSpiderifier(this.map, {
-			initializeLeg: (spiderLeg) => {
-				let post = {
-					date: spiderLeg.feature.date,
-					link: spiderLeg.feature.link,
-					title: {
-						rendered: spiderLeg.feature.title.rendered,
-					}
-				}
-				//adicionando comentario
-				const popupHTML = self.popupTemplate( {
-					post,
-					read_more: window.jeoMapVars.string_read_more,
-					show_featured_media: false,
-				} )
-				let popUp = new mapboxgl.Popup({
-					closeOnClick: false,
-					offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
-				})
-				.setLngLat(spiderLeg.mapboxMarker._lngLat)
-				.setHTML( popupHTML )
-				const jeoOpenSpiderifierPinEvent = new CustomEvent('jeo-open-spiderifier-pin', { detail: spiderLeg.feature })
-
-				spiderLeg.elements.pin.style.backgroundImage = `url("${jeoMapVars.images['/js/src/icons/news-marker'].url})"`
-				spiderLeg.elements.container.addEventListener( 'click', () => {
-					popUp.addTo( self.map )
-					document.body.dispatchEvent( jeoOpenSpiderifierPinEvent )
-				} )
-
-			}
-		});
-
 		this.initMap()
 			.then( () => {
+				const map = new mapboxgl.Map( {
+					container: this.element,
+					projection: 'equirectangular',
+					attributionControl: false,
+					style: this.getStyleLayer(),
+					transformRequest: this.transformRequestUrl.bind( this ),
+				} );
+
+				this.map = map;
+				this.mapLoaded = waitMapEvent( map, 'load' );
+				this.styleLoaded = waitMapEvent( map, 'style.load' );
+
+				this.spiderifier = new MapboxglSpiderifier(this.map, {
+					initializeLeg: (spiderLeg) => {
+						let post = {
+							date: spiderLeg.feature.date,
+							link: spiderLeg.feature.link,
+							title: {
+								rendered: spiderLeg.feature.title.rendered,
+							}
+						}
+						//adicionando comentario
+						const popupHTML = this.popupTemplate( {
+							post,
+							read_more: window.jeoMapVars.string_read_more,
+							show_featured_media: false,
+						} )
+						let popUp = new mapboxgl.Popup({
+							closeOnClick: false,
+							offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
+						})
+						.setLngLat(spiderLeg.mapboxMarker._lngLat)
+						.setHTML( popupHTML )
+						const jeoOpenSpiderifierPinEvent = new CustomEvent('jeo-open-spiderifier-pin', { detail: spiderLeg.feature })
+
+						spiderLeg.elements.pin.style.backgroundImage = `url("${jeoMapVars.images['/js/src/icons/news-marker'].url})"`
+						spiderLeg.elements.container.addEventListener( 'click', () => {
+							popUp.addTo( this.map )
+							document.body.dispatchEvent( jeoOpenSpiderifierPinEvent )
+						} )
+
+					}
+				});
+
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
 					map.setZoom( this.getArg( 'initial_zoom' ) );
 					map.setCenter( [
@@ -141,91 +140,87 @@ export default class JeoMap {
 					if ( this.getArg( 'max_zoom' ) ) {
 						map.setMaxZoom( this.getArg( 'max_zoom' ) );
 					}
+
+					// Only used for manipulating the map from outside Jeo
+					window.map = map;
 				}
 			} )
 			.then( () => {
+				const map = this.map;
+
 				// Show a message when a map doesn't have layers
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length === 0 ) {
 					this.addMapWithoutLayersMessage();
 				} else {
-					let amountLayers = 0;
-					this.getLayers().then( ( layers ) => {
-						amountLayers = layers.length;
+					const layers = this.layers;
+					const amountLayers = layers.length;
 
-						if (
-							this.getArg( 'layers' ) &&
-							this.getArg( 'layers' ).length > 0 &&
-							amountLayers > 0
-						) {
-							const mapLayersSettings = this.getArg( 'layers' );
+					if (
+						this.getArg( 'layers' ) &&
+						this.getArg( 'layers' ).length > 0 &&
+						amountLayers > 0
+					) {
+						const mapLayersSettings = this.getArg( 'layers' );
 
-							// Add an empty style to allow any layer insesion even if a mapbox style layer is not present. If you don't have a style set you can't add new layers
-							const hasStyle = mapLayersSettings.some(
-								( layerSetting ) => layerSetting.load_as_style
+						let firstStyleLayerId;
+						let styleLayerIndex;
+
+						layers.forEach( ( layer, index ) => {
+							const currentLayerSettings = mapLayersSettings.find(
+								( item ) => item.id === layer.attributes.layer_post_id
 							);
 
-							if ( ! hasStyle ) {
-								map.setStyle( 'mapbox://styles/mapbox/empty-v9' );
+							// Register custom accessTokens, if found, to request transformer
+							this.checkCustomToken( layer.attributes );
+
+							if ( currentLayerSettings.load_as_style ) {
+								layer.addStyle( map );
+								styleLayerIndex = index;
 							}
+						} );
 
-							let firstStyleLayerId;
-							let styleLayerIndex;
+						// When style is done loading (don't try adding layers before style is not ready)
+						this.mapLoaded.then(() => {
+							// Remove not selected layers and toggle visibility
+							mapLayersSettings.forEach( ( layer ) => {
+								if ( layer.load_as_style ) {
+									const styleLayers = layer.style_layers;
 
-							layers.forEach( ( layer, index ) => {
-								const currentLayerSettings = mapLayersSettings.find(
-									( item ) => item.id === layer.attributes.layer_post_id
-								);
+									styleLayers.forEach( ( styleLayer ) => {
+										if ( ! styleLayer.show ) {
+											if ( map.getLayer( styleLayer.id ) ) {
+												map.removeLayer( styleLayer.id );
+											}
+										}
 
-								// Register custom accessTokens, if found, to request transformer
-								this.checkCustomToken( layer.attributes );
-
-								if ( currentLayerSettings.load_as_style ) {
-									layer.addStyle( map );
-									styleLayerIndex = index;
+										// In the future individual style layers will have their own toggles/swaps
+										if ( ! layer.default ) {
+											if ( map.getLayer( styleLayer.id ) ) {
+												map.setLayoutProperty(
+													styleLayer.id,
+													'visibility',
+													'none'
+												);
+											}
+										}
+									} );
 								}
 							} );
 
-							// When style is done loading (don't try adding layers before style is not ready)
-							this.mapLoaded.then(() => {
-								// Remove not selected layers and toggle visibility
-								mapLayersSettings.forEach( ( layer ) => {
-									if ( layer.load_as_style ) {
-										const styleLayers = layer.style_layers;
+							// Add interactions to style layers
+							layers.forEach( ( layer ) => {
+								const currentLayerSettings = mapLayersSettings.find(
+									( item ) => item.id === layer.attributes.layer_post_id
+								);
+								if ( currentLayerSettings.load_as_style ) {
+									layer.addInteractions( map );
+								}
+							} );
 
-										styleLayers.forEach( ( styleLayer ) => {
-											if ( ! styleLayer.show ) {
-												if ( map.getLayer( styleLayer.id ) ) {
-													map.removeLayer( styleLayer.id );
-												}
-											}
+							// Select reference pointers
+							firstStyleLayerId = map.style._order[ 0 ];
 
-											// In the future individual style layers will have their own toggles/swaps
-											if ( ! layer.default ) {
-												if ( map.getLayer( styleLayer.id ) ) {
-													map.setLayoutProperty(
-														styleLayer.id,
-														'visibility',
-														'none'
-													);
-												}
-											}
-										} );
-									}
-								} );
-
-								// Add interactions to style layers
-								layers.forEach( ( layer ) => {
-									const currentLayerSettings = mapLayersSettings.find(
-										( item ) => item.id === layer.attributes.layer_post_id
-									);
-									if ( currentLayerSettings.load_as_style ) {
-										layer.addInteractions( map );
-									}
-								} );
-
-								// Select reference pointers
-								firstStyleLayerId = map.style._order[ 0 ];
-
+							this.styleLoaded.then( () => {
 								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
 									const currentLayerSettings = mapLayersSettings.find(
@@ -241,77 +236,71 @@ export default class JeoMap {
 										}
 									}
 								} );
+							} );
 
-								// Add attributions
-								const customAttribution = [];
-								layers.forEach( ( layer ) => {
-									const currentLayerSettings = mapLayersSettings.find(
-										( item ) => item.id === layer.attributes.layer_post_id
+							// Add attributions
+							const customAttribution = [];
+							layers.forEach( ( layer ) => {
+								if ( layer.attribution ) {
+									let attributionLink = layer.attribution;
+									const attributionName = layer.attribution_name;
+
+									const regex = new RegExp(
+										/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
 									);
 
-									if ( layer.attribution ) {
-										let attributionLink = layer.attribution;
-										const attributionName = layer.attribution_name;
-
-										const regex = new RegExp(
-											/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
-										);
-
-										if (
-											layer.attribution &&
-											! layer.attribution.includes( 'http' )
-										) {
-											if ( layer.attribution.match( regex ) ) {
-												attributionLink = `https://${ layer.attribution }`;
-											}
+									if (
+										layer.attribution &&
+										! layer.attribution.includes( 'http' )
+									) {
+										if ( layer.attribution.match( regex ) ) {
+											attributionLink = `https://${ layer.attribution }`;
 										}
-										const attributionLabel = attributionName.replace(
-											/\s/g,
-											''
-										).length
-											? attributionName
-											: attributionLink;
-										customAttribution.push(
-											`<a href="${ attributionLink }">${ attributionLabel }</a>`
-										);
 									}
-
-									// layer.addInteractions( map );
-								} );
-
-								let controlPostion = 'bottom-right';
-
-								let attributionControl = new mapboxgl.AttributionControl( {
-									compact: false,
-									customAttribution,
-								} );
-
-								if(window.innerWidth < 600) {
-									attributionControl = new mapboxgl.AttributionControl( {
-										compact: true,
-										customAttribution,
-									} )
-
-									controlPostion = 'bottom-left';
+									const attributionLabel = attributionName.replace(
+										/\s/g,
+										''
+									).length
+										? attributionName
+										: attributionLink;
+									customAttribution.push(
+										`<a href="${ attributionLink }">${ attributionLabel }</a>`
+									);
 								}
+							} );
 
-								map.addControl(
-									attributionControl,
-									controlPostion
-								);
+							let controlPostion = 'bottom-right';
 
-								this.getRelatedPosts();
-							});
+							let attributionControl = new mapboxgl.AttributionControl( {
+								compact: false,
+								customAttribution,
+							} );
 
-							this.addLayersControl( amountLayers );
-							this.addMoreButtonAndLegends();
-						}
+							if(window.innerWidth < 600) {
+								attributionControl = new mapboxgl.AttributionControl( {
+									compact: true,
+									customAttribution,
+								} )
 
-						// Show a message when a map doesn't have layers
-						if ( amountLayers === 0 ) {
-							this.addMapWithoutLayersMessage();
-						}
-					} );
+								controlPostion = 'bottom-left';
+							}
+
+							map.addControl(
+								attributionControl,
+								controlPostion
+							);
+
+							this.getRelatedPosts();
+						});
+
+						this.addLayersControl( amountLayers );
+						this.addMoreButtonAndLegends();
+					}
+
+					// Show a message when a map doesn't have layers
+					if ( amountLayers === 0 ) {
+						this.addMapWithoutLayersMessage();
+					}
 				}
 			} )
 			.then( () => {
@@ -320,29 +309,26 @@ export default class JeoMap {
 					'.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])'
 				).remove();
 			} );
-
-		// Only used for manipulating the map from outside Jeo
-		window.map = map;
 	}
 
-	initMap() {
+	async initMap() {
 		if ( this.getArg( 'map_id' ) ) {
-			return jQuery
-				.ajax( {
-					type: 'GET',
-					beforeSend: function ( request ) {
-						if ( jeoMapVars.nonce ) {
-							request.setRequestHeader( 'X-WP-Nonce', jeoMapVars.nonce );
-						}
-					},
-					url: jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' ),
-				} )
-				.then( ( data ) => {
-					this.map_post_object = data;
-				} );
+			const data = await jQuery.ajax( {
+				type: 'GET',
+				beforeSend: function ( request ) {
+					if ( jeoMapVars.nonce ) {
+						request.setRequestHeader( 'X-WP-Nonce', jeoMapVars.nonce );
+					}
+				},
+				url: jeoMapVars.jsonUrl + 'map/' + this.getArg( 'map_id' ),
+			} );
+
+			this.map_post_object = data;
+
+			await this.getLayers();
 		}
-		return Promise.resolve();
 	}
+
 	addMapWithoutLayersMessage() {
 		const layers = document.createElement( 'div' );
 		layers.innerHTML +=
@@ -633,6 +619,26 @@ export default class JeoMap {
 				);
 			}
 		} );
+	}
+
+	getStyleLayer() {
+		const mapLayersSettings = this.getArg( 'layers' );
+		const layers = this.layers;
+
+		for ( const layerSettings of mapLayersSettings ) {
+			if ( layerSettings.load_as_style ) {
+				const layer = layers.find(
+					( layer ) => layer.attributes.layer_post_id = layerSettings.id
+				);
+
+				const styleUrl = layer.getStyleUrl();
+				if ( styleUrl ) {
+					return styleUrl;
+				}
+			}
+		}
+
+		return 'mapbox://styles/mapbox/empty-v9';
 	}
 
 	getRelatedPosts() {
