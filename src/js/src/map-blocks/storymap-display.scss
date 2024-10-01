@@ -92,7 +92,7 @@ $font-stories: var( --jeo-font-stories );
 			max-width: unset;
 			position: sticky;
 			right: 50%;
-			top: 0;
+			top: 0 !important;
 			transition: filter 0.7s ease;
 			width: 100vw;
 			z-index: -5;
