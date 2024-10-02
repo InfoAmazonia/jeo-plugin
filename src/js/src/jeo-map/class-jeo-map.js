@@ -209,27 +209,18 @@ export default class JeoMap {
 								}
 							} );
 
-							// Add interactions to style layers
-							layers.forEach( ( layer ) => {
-								const currentLayerSettings = mapLayersSettings.find(
-									( item ) => item.id === layer.attributes.layer_post_id
-								);
-								if ( currentLayerSettings.load_as_style ) {
-									layer.addInteractions( map );
-								}
-							} );
-
 							// Select reference pointers
 							firstStyleLayerId = map.style._order[ 0 ];
 
 							this.styleLoaded.then( () => {
-								// Add non-style layers to map (rasters)
 								layers.forEach( ( layer, index ) => {
 									const currentLayerSettings = mapLayersSettings.find(
 										( item ) => item.id === layer.attributes.layer_post_id
 									);
 
-									if ( ! currentLayerSettings.load_as_style ) {
+									if ( currentLayerSettings.load_as_style ) {
+										layer.addInteractions( map );
+									} else {
 										// If the current layer is below the style, add using fisrt syle layer reference
 										if ( index < styleLayerIndex ) {
 											layer.addLayer( map, [ firstStyleLayerId ] );
