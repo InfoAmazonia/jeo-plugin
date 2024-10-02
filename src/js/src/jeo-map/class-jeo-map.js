@@ -37,6 +37,8 @@ export default class JeoMap {
 			functionHeader: 'const { post, read_more, show_featured_media } = it;',
 		} );
 
+		this.dataFetched = this.fetchMapData();
+
 		onFirstIntersection( element, this.lazyInitMap.bind( this ) );
 	}
 
@@ -46,7 +48,7 @@ export default class JeoMap {
 		}
 		this.initialized = true;
 
-		this.fetchMapData()
+		this.dataFetched
 			.then( () => {
 				const map = new mapboxgl.Map( {
 					container: this.element,
