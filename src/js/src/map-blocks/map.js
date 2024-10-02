@@ -2,8 +2,6 @@ import { forwardRef } from '@wordpress/element';
 import mapboxgl from 'mapbox-gl'
 import MapGL, { FullscreenControl, NavigationControl } from 'react-map-gl';
 
-import 'mapbox-gl/dist/mapbox-gl.css';
-
 export const MapboxAPIKey = window.jeo_settings.mapbox_key;
 
 /**
