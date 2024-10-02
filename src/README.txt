@@ -50,7 +50,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 == Changelog ==
 
 = 2.11.2 =
-*bugfix: Fix regression in interactions loading
+* bugfix: Fix regression on interactions loading
 
 = 2.11.1 =
 * Improve rendering of maps and storymaps
