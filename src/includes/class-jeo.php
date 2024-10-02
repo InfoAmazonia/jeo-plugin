@@ -150,14 +150,14 @@ class Jeo {
 
 		wp_register_style(
 			'mapboxgl',
-			'https://cdn.jsdelivr.net/npm/mapbox-gl@3.7.0/dist/mapbox-gl.css',
+			'https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css',
 			array(),
 			false,
 		);
 
 		wp_register_script(
 			'mapboxgl',
-			'https://cdn.jsdelivr.net/npm/mapbox-gl@3.7.0/dist/mapbox-gl.js',
+			'https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js',
 			array(),
 			false,
 		);
