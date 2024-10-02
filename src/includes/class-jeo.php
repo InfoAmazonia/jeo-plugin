@@ -150,21 +150,23 @@ class Jeo {
 
 		wp_register_style(
 			'mapboxgl',
-			JEO_BASEURL . '/js/build/mapboxglLoader.css',
+			'https://cdn.jsdelivr.net/npm/mapbox-gl@3.7.0/dist/mapbox-gl.css',
 			array(),
-			JEO_VERSION
+			false,
+		);
+
+		wp_register_script(
+			'mapboxgl',
+			'https://cdn.jsdelivr.net/npm/mapbox-gl@3.7.0/dist/mapbox-gl.js',
+			array(),
+			false,
 		);
 
 		wp_register_script(
 			'mapboxgl-loader',
-			JEO_BASEURL . '/js/build/mapboxglLoader.js'
-		);
-		wp_register_script(
-			'mapboxgl-spiderifier',
-			JEO_BASEURL . '/js/src/mapboxgl-spiderifier/index.js',
-			array( 'mapboxgl-loader' ),
+			JEO_BASEURL . '/js/build/mapboxglLoader.js',
+			array( 'mapboxgl' ),
 			JEO_VERSION,
-			false
 		);
 
 		wp_localize_script(
@@ -187,9 +189,21 @@ class Jeo {
 			)
 		);
 
+		wp_register_script(
+			'mapboxgl-spiderifier',
+			JEO_BASEURL . '/js/src/mapboxgl-spiderifier/index.js',
+			array( 'mapboxgl-loader' ),
+			JEO_VERSION,
+			false
+		);
+
 		$map_blocks_assets = include JEO_BASEPATH . '/js/build/mapBlocks.asset.php';
 
-		wp_register_style( 'jeo-map-blocks', JEO_BASEURL . '/js/build/mapBlocks.css' );
+		wp_register_style(
+			'jeo-map-blocks',
+			JEO_BASEURL . '/js/build/mapBlocks.css',
+			array( 'mapboxgl' )
+		);
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
