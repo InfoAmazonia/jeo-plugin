@@ -397,8 +397,15 @@ div.jeomap {
 	font-family: var(--jeo-font);
 }
 
+.mapboxgl-popup .mapboxgl-popup-content {
+	background-color: white;
+	border-radius: 5px;
+	box-shadow: 0 0 0 2px rgba(0,0,0,.1);
+}
+
 /* Interaction - onClick */
 .mapboxgl-popup-content h3, .mapboxgl-popup-content p {
+	color: #111 !important;
 	font-size: 16px;
 }
 .mapboxgl-popup.mapboxgl-popup-anchor-bottom:not(.jeo-popup__mouseover) .mapboxgl-popup-content h3 {
