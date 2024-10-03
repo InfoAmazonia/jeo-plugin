@@ -27,6 +27,9 @@ module.exports = {
 		},
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
 	},
+	externals: {
+		'mapbox-gl': 'mapboxgl',
+	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),
 		publicPath: './src/js/build/',
