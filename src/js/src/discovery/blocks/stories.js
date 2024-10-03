@@ -91,7 +91,7 @@ class Stories extends Component {
 					type: 'geojson',
 					data: sourceData,
 					cluster: true,
-					clusterMaxZoom: 40,
+					clusterMaxZoom: 30,
 					clusterRadius: 40,
 				} );
 
