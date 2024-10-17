@@ -177,45 +177,31 @@ class BarscaleEditor extends Component {
 	}
 }
 
-class ColorItem extends Component {
-	constructor( props ) {
-		super( props );
+function ColorItem( { item, itemChanged, removeItem } ) {
+	return (
+		<Dropdown
+			className="color-item-wrapper"
+			popoverProps={ { placement: 'bottom' } }
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<div className="color-item" onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: item.color } }> </div>
+			) }
+			renderContent={ () => (
+				<div>
+					<ColorPicker
+						color={ item.color }
+						onChangeComplete={ ( color ) => itemChanged( { ...item, color: color.hex } ) }
+						disableAlpha
+					/>
 
-		this.state = {
-			...this.props.item,
-		};
-	}
+					<Button className="full-width-button" isDestructive isButton variant="secondary" onClick={ () => removeItem( item.id ) } >
+						{ __( 'Remove', 'jeo' ) }
+					</Button>
+				</div>
 
-	render() {
-		return (
-			<Dropdown
-				className="color-item-wrapper"
-				popoverProps={ { placement: 'bottom' } }
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<div className="color-item" onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
-				) }
-				renderContent={ () => (
-					<div>
-						<ColorPicker
-							color={ this.state.color }
-							onChangeComplete={ ( color ) => {
-								// console.log( "selectedColor.id", this.state.selectedColor.id );
-								this.setState( { color: color.hex } );
-								this.props.itemChanged( this.state );
-							} }
-							disableAlpha
-						/>
+			) }
+		/>
 
-						<Button className="full-width-button" isDestructive isButton variant="secondary" onClick={ () => this.props.removeItem( this.state.id ) } >
-							{ __( 'Remove', 'jeo' ) }
-						</Button>
-					</div>
-
-				) }
-			/>
-
-		);
-	}
+	);
 }
 
 export default BarscaleEditor;
