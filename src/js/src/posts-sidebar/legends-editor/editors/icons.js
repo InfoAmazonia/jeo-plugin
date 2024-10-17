@@ -1,5 +1,6 @@
-import { Component, Fragment } from '@wordpress/element';
+import { MediaUpload } from '@wordpress/block-editor';
 import { Button, Dashicon, Modal, TextControl } from '@wordpress/components';
+import { Component, Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
@@ -91,7 +92,7 @@ class IconEditor extends Component {
 				</div>
 				{
 					this.state.legendObject.attributes.legend_type_options.icons.map( ( item ) => {
-						return ( <IconItem iconData={ item } key={ item.id } removeLabel={ this.removeLabel } iconUpdate={ this.iconUpdate } /> );
+						return ( <IconItem item={ item } key={ item.id } removeLabel={ this.removeLabel } itemChanged={ this.iconUpdate } /> );
 					} )
 				}
 				<Button variant="secondary" isButton isLarge onClick={ this.addLabel } className="full-width-button">
@@ -104,109 +105,68 @@ class IconEditor extends Component {
 
 export default IconEditor;
 
-class IconItem extends Component {
-	constructor( props ) {
-		super( props );
-		this.removeLabel = this.removeLabel.bind( this );
+function IconItem( { item, itemChanged, removeLabel } ) {
+	const [ openModal, setOpenModal ] = useState( false );
 
-		this.state = {
-			iconData: this.props.iconData,
-			openModal: false,
-		};
-	}
-
-	removeLabel() {
-		this.props.removeLabel( this.state.iconData.id );
-	}
-
-	iconUpdate( label, icon = this.state.iconData.icon ) {
-		this.props.iconUpdate( { label, id: this.state.iconData.id, icon } );
-	}
-
-	render() {
-		const { MediaUpload } = wp.blockEditor;
-
-		return (
-			<>
-				{ this.state.openModal && (
-					<Modal
-						className="jeo-interactions-settings__modal"
-						title={ __( 'Icon legend', 'jeo' ) }
-						isDismissible={ false }
-						onRequestClose={ () => {
-							this.setState( {
-								...this.state,
-								openModal: false,
-							} );
-						} }
+	return (
+		<>
+			{ openModal && (
+				<Modal
+					className="jeo-interactions-settings__modal"
+					title={ __( 'Icon legend', 'jeo' ) }
+					isDismissible={ false }
+					onRequestClose={ () => setOpenModal( false ) }
+				>
+					<h4>The uploaded icon is too small. The minimum size required is 60x60 pixels.</h4>
+					<Button
+						isLarge
+						variant="primary"
+						style={ { marginTop: '10px' } }
+						onClick={ () => setOpenModal( false ) }
 					>
-						<h4>The uploaded icon is too small. The minimum size required is 60x60 pixels.</h4>
-						<Button
-							isLarge
-							variant="primary"
-							style={ { marginTop: '10px' } }
-							onClick={ () => {
-								this.setState( {
-									...this.state,
-									openModal: false,
-								} );
-							} }
-						>
-							{ __( 'Ok', 'jeo' ) }
-						</Button>
-					</Modal>
-				) }
+						{ __( 'Ok', 'jeo' ) }
+					</Button>
+				</Modal>
+			) }
 
-				<div className="icon-item">
-					<MediaUpload
-						onSelect={ ( value ) => {
-							const image = new Image();
-							image.src = value.url;
-							image.onload = () => {
-								if ( image.width >= 60 && image.height >= 60 ) {
-									this.setState( {
-										iconData: {
-											...this.state.iconData,
-											icon: value.url,
-										},
-									}, this.iconUpdate( this.state.iconData.label, value.url ) );
-								} else {
-									this.setState( {
-										...this.state,
-										openModal: true,
-									} );
-								}
-							};
-						} }
+			<div className="icon-item">
+				<MediaUpload
+					onSelect={ ( value ) => {
+						const image = new Image();
+						image.src = value.url;
+						image.onload = () => {
+							if ( image.width >= 60 && image.height >= 60 ) {
+								itemChanged( { ...item, icon: value.url } );
+							} else {
+								setOpenModal( true );
+							}
+						};
+					} }
 
-						render={ ( { open } ) => {
-							return (
-								<div className="content-wrapper">
-									<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
-										{ this.state.iconData.icon && (
-											<img src={ this.state.iconData.icon } width="50" height="50" alt="Logo" />
-										) }
-										{ ! this.state.iconData.icon && (
-											<Dashicon icon="format-image" width="50" height="50" />
-										) }
-									</div>
-									<div className="buttons-inputs">
-										<TextControl
-											label={ __( 'Label', 'jeo' ) }
-											value={ this.state.iconData.label }
-											onChange={ ( label ) => {
-												this.setState( { iconData: { ...this.state.iconData, label } }, this.iconUpdate( label ) );
-											} }
-										/>
-
-										<Button icon="minus" label="Remove" onClick={ this.removeLabel } className="remove-button" />
-									</div>
+					render={ ( { open } ) => {
+						return (
+							<div className="content-wrapper">
+								<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
+									{ item.icon ? (
+										<img src={ item.icon } width="50" height="50" alt="Logo" />
+									) : (
+										<Dashicon icon="format-image" width="50" height="50" />
+									) }
 								</div>
-							);
-						} }
-					/>
-				</div>
-			</>
-		);
-	}
+								<div className="buttons-inputs">
+									<TextControl
+										label={ __( 'Label', 'jeo' ) }
+										value={ item.label }
+										onChange={ ( label ) => itemChanged( { ...item, label } ) }
+									/>
+
+									<Button icon="minus" label="Remove" onClick={ removeLabel( item.id ) } className="remove-button" />
+								</div>
+							</div>
+						);
+					} }
+				/>
+			</div>
+		</>
+	);
 }
