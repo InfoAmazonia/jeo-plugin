@@ -80,6 +80,8 @@ class IconEditor extends Component {
 
 			legendObject.attributes.legend_type_options.icons = icons;
 
+			this.props.hasChanged( legendObject );
+
 			return { legendObject };
 		} );
 	}
@@ -160,7 +162,7 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 										onChange={ ( label ) => itemChanged( { ...item, label } ) }
 									/>
 
-									<Button icon="minus" label="Remove" onClick={ removeLabel( item.id ) } className="remove-button" />
+									<Button icon="minus" label="Remove" onClick={ () => removeLabel( item.id ) } className="remove-button" />
 								</div>
 							</div>
 						);
