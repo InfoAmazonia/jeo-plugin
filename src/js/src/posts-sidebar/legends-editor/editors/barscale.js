@@ -190,7 +190,7 @@ class ColorItem extends Component {
 		return (
 			<Dropdown
 				className="color-item-wrapper"
-				position="bottom center"
+				popoverProps={ { placement: 'bottom' } }
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<div className="color-item" onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
 				) }

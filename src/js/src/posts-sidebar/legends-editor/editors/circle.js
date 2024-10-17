@@ -201,7 +201,6 @@ class CircleItem extends Component {
 					/>
 
 					<Dropdown
-						position=""
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<div className="buttonsList">
 								<Button isDestructive isButton variant="secondary" onClick={ () => this.props.removeLabel( this.state.id ) } >

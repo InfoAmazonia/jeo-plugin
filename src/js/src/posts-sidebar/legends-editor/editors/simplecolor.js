@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Dropdown, TextControl, IconButton } from '@wordpress/components';
+import { Button, ColorPicker, Dropdown, TextControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -143,7 +143,7 @@ class ColorItem extends Component {
 				<Dropdown
 					className="color-item-wrapper"
 					contentClassName="item-drop-content"
-					position="bottom center"
+					popoverProps={ { placement: 'bottom' } }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<div className="color-item" role="button" tabIndex={ 0 } onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
 					) }
@@ -189,7 +189,7 @@ class ColorItem extends Component {
 						} }
 					/>
 
-					<IconButton icon="minus" label="Remove" onClick={ () => this.props.removeItem( this.state.id ) } className="remove-button" />
+					<Button icon="minus" label="Remove" onClick={ () => this.props.removeItem( this.state.id ) } className="remove-button" />
 				</div>
 			</div>
 		);

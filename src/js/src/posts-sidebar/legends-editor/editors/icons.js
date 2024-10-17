@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { Button, IconButton, TextControl, Dashicon, Modal } from '@wordpress/components';
+import { Button, Dashicon, Modal, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
@@ -199,7 +199,7 @@ class IconItem extends Component {
 											} }
 										/>
 
-										<IconButton icon="minus" label="Remove" onClick={ this.removeLabel } className="remove-button" />
+										<Button icon="minus" label="Remove" onClick={ this.removeLabel } className="remove-button" />
 									</div>
 								</div>
 							);
