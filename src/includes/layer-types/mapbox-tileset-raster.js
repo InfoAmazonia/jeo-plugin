@@ -22,7 +22,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 					id: attributes.layer_id,
 					type: attributes.layer_type_options.type,
 					source: attributes.layer_id,
-					'source-layer': '',
 				},
 			],
 		} );
@@ -44,7 +43,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
-			'source-layer': '',
 		};
 
 		if ( ! attributes.visible ) {

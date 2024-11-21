@@ -12,7 +12,7 @@ export function renderLayer( { layer, instance } ) {
 	const sourceId = `source_${ instance.id }`;
 
 	switch ( layer.type ) {
-		case 'mapbox':
+		case 'mapbox': {
 			const accessToken = options.access_token || window.mapboxgl.accessToken;
 
 			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
@@ -23,9 +23,9 @@ export function renderLayer( { layer, instance } ) {
 					<Layer id={ layerId } type="raster" />
 				</Source>
 			);
+		}
 
-		case 'mapbox-tileset-vector':
-		case 'mapbox-tileset-raster':
+		case 'mapbox-tileset-raster': {
 			const tilesetId = options.tileset_id;
 			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
 
@@ -34,20 +34,34 @@ export function renderLayer( { layer, instance } ) {
 					<Layer id={ layerId } type={ options.type } />
 				</Source>
 			);
+		}
 
-		case 'mvt':
+		case 'mapbox-tileset-vector': {
+			const tilesetId = options.tileset_id;
+			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
+
 			return (
-				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
-					<Layer id={ layerId } type={ options.type } />
+				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
 				</Source>
 			);
+		}
 
-		case 'tilelayer':
+		case 'mvt': {
+			return (
+				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+				</Source>
+			);
+		}
+
+		case 'tilelayer': {
 			return (
 				<Source id={ sourceId } type="raster" tiles={ [ options.url ] } tileSize={ 256 } scheme={ options.scheme || 'xyz' }>
 					<Layer id={ layerId } type="raster" />
 				</Source>
 			);
+		}
 
 		default:
 			return null;

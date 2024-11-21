@@ -297,7 +297,7 @@ class MapLayers extends Component {
 						id: layerId,
 						type: attributes.layer_type_options.type,
 						source: layerId,
-						'source-layer': attributes.source_layer,
+						'source-layer': attributes.layer_type_options.source_layer,
 					};
 
 					map.addLayer( newLayer );
@@ -341,7 +341,6 @@ class MapLayers extends Component {
 						id: layerId,
 						type: attributes.layer_type_options.type,
 						source: layerId,
-						'source-layer': '',
 					};
 
 					map.addLayer( newLayer );
