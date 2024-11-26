@@ -35,6 +35,16 @@ for (const color of baseColors) {
 	color.hasBorder = true
 }
 
+function createInitialViewState () {
+	return {
+		latitude: mapDefaults.lat,
+		longitude: mapDefaults.lng,
+		zoom: mapDefaults.zoom,
+		bearing: 0,
+		pitch: 0,
+	};
+}
+
 const StoryMapEditor = ( {
 	attributes,
 	setAttributes,
@@ -99,6 +109,18 @@ const StoryMapEditor = ( {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ key, setKey ] = useState( 0 );
 	const [ storymapLayers, setStorymapLayers ] = useState( [] );
+	const [ viewState, setViewState ] = useState( createInitialViewState );
+
+	useEffect( () => {
+		const currentSlide = attributes.slides[ currentSlideIndex ];
+		setViewState( {
+			latitude: currentSlide.latitude || mapDefaults.lat,
+			longitude: currentSlide.longitude || mapDefaults.lng,
+			zoom: currentSlide.zoom || mapDefaults.zoom,
+			bearing: currentSlide.bearing || 0,
+			pitch: currentSlide.pitch || 0,
+		} );
+	}, [ attributes.slides, currentSlideIndex, setViewState ] );
 
 	useEffect( () => {
 		// Post the already exsists
@@ -238,16 +260,22 @@ const StoryMapEditor = ( {
 							key={ key }
 							controls="top-right"
 							fullscreen={ loadedMap.meta.enable_fullscreen }
-							onStyleLoad={ ( map ) => {
-								setSelectedMap( map );
-								setStorymapLayers( layersContent );
-							} }
 							style={ { height: '85vh' } }
-							latitude={ attributes.slides[ currentSlideIndex ].latitude || mapDefaults.lat }
-							longitude={ attributes.slides[ currentSlideIndex ].longitude || mapDefaults.lng }
-							zoom={ attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom }
-							bearing={ attributes.slides[ currentSlideIndex ].bearing || 0 }
-							pitch={ attributes.slides[ currentSlideIndex ].pitch || 0 }
+							latitude={ viewState.latitude }
+							longitude={ viewState.longitude }
+							zoom={ viewState.zoom }
+							bearing={ viewState.bearing }
+							pitch={ viewState.pitch }
+							onStyleData={ ( event ) => {
+								const map = event.style?.map ?? null;
+								if ( ! selectedMap && map ) {
+									setSelectedMap( map );
+									setStorymapLayers( layersContent );
+								}
+							} }
+							onMove={ ( event ) => {
+								setViewState( event.viewState );
+							} }
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
