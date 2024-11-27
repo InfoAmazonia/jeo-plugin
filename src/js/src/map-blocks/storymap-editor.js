@@ -114,11 +114,11 @@ const StoryMapEditor = ( {
 	useEffect( () => {
 		const currentSlide = attributes.slides[ currentSlideIndex ];
 		setViewState( {
-			latitude: currentSlide.latitude || mapDefaults.lat,
-			longitude: currentSlide.longitude || mapDefaults.lng,
-			zoom: currentSlide.zoom || mapDefaults.zoom,
-			bearing: currentSlide.bearing || 0,
-			pitch: currentSlide.pitch || 0,
+			latitude: currentSlide?.latitude || mapDefaults.lat,
+			longitude: currentSlide?.longitude || mapDefaults.lng,
+			zoom: currentSlide?.zoom || mapDefaults.zoom,
+			bearing: currentSlide?.bearing || 0,
+			pitch: currentSlide?.pitch || 0,
 		} );
 	}, [ attributes.slides, currentSlideIndex, setViewState ] );
 
