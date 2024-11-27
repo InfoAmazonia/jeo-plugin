@@ -112,7 +112,7 @@ const StoryMapEditor = ( {
 	const [ viewState, setViewState ] = useState( createInitialViewState );
 
 	useEffect( () => {
-		const currentSlide = attributes.slides[ currentSlideIndex ];
+		const currentSlide = attributes.slides?.[ currentSlideIndex ];
 		setViewState( {
 			latitude: currentSlide?.latitude || mapDefaults.lat,
 			longitude: currentSlide?.longitude || mapDefaults.lng,
