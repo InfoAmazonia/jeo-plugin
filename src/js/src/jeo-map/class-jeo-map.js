@@ -214,11 +214,7 @@ export default class JeoMap {
 
 							this.styleLoaded.then( () => {
 								layers.forEach( ( layer, index ) => {
-									const currentLayerSettings = mapLayersSettings.find(
-										( item ) => item.id === layer.attributes.layer_post_id
-									);
-
-									if ( currentLayerSettings.load_as_style ) {
+									if ( index === styleLayerIndex ) {
 										layer.addInteractions( map );
 									} else {
 										// If the current layer is below the style, add using fisrt syle layer reference
