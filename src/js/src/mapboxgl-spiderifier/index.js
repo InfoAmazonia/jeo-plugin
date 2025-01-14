@@ -163,7 +163,7 @@
       containerElem.appendChild(lineElem);
       containerElem.appendChild(pinElem);
 
-      containerElem.style['margin-left'] = spiderLegParam.x + 'px';
+      containerElem.style['margin-inline-start'] = spiderLegParam.x + 'px';
       containerElem.style['margin-top'] = spiderLegParam.y + 'px';
 
       lineElem.style.height = spiderLegParam.legLength + 'px';
