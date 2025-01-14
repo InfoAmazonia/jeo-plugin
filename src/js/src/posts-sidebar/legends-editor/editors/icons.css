@@ -5,7 +5,7 @@
 
 .icon-item img {
 	height: 50px;
-    margin-right: 5px;
+    margin-inline-end: 5px;
 }
 
 .remove-button {

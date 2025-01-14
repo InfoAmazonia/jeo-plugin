@@ -4,10 +4,7 @@
 
 .jeo-layers-modal {
 	position: fixed;
-	top: 30px;
-	right: 30px;
-	bottom: 30px;
-	left: 30px;
+	inset: 30px;
 	z-index: 16000;
 	transform: none;
 	max-height: none;
@@ -89,7 +86,7 @@
  */
 .jeo-layers-library-controls,
 .jeo-layers-library .library-controls {
-	margin-left: 12px;
+	margin-inline-start: 12px;
 	display: flex;
 	align-items: center;
 	padding: 1em 0;
@@ -97,7 +94,7 @@
 
 /*new layer settings modal*/
 .jeo-layers-modal .jeo-layers-library-controls {
-    margin-left: 0px;
+    margin-inline-start: 0px;
     padding: 1em;
 }
 
@@ -243,7 +240,7 @@ ul.jeo-layers-list .components-card {
 }
 
 .jeo-layer-settings .save-layer {
-	margin-right: 1em;
+	margin-inline-end: 1em;
 }
 
 .jeo-layer-settings fieldset legend {

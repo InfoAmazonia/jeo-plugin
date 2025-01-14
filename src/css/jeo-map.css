@@ -8,7 +8,7 @@ div.jeomap {
 .jeomap nav {
 	position: absolute;
 	top: 10px;
-	right: 10px;
+	inset-inline-end: 10px;
 	z-index: 1;
 	width: 170px;
 }
@@ -49,7 +49,7 @@ div.jeomap {
     border: 2px solid;
     display: inline-block;
     border-radius: 2px;
-    margin-right: 14px;
+    margin-inline-end: 14px;
 }
 
 .jeomap nav a.swappable:before {
@@ -63,8 +63,8 @@ div.jeomap {
     background: url(../src/images/circle.png);
     background-size: 18px;
     background-repeat: no-repeat;
+    inset-inline-start: 13px;
     position: absolute;
-    left: 13px;
     top: 8px;
     width: 20px;
     height: 20px;
@@ -75,8 +75,8 @@ div.jeomap {
     background: url(../src/images/check.png);
     background-size: 18px;
     background-repeat: no-repeat;
+    inset-inline-start: 13px;
     position: absolute;
-    left: 13px;
     top: 8px;
     width: 20px;
     height: 20px;
@@ -88,7 +88,7 @@ div.jeomap {
 }
 
 .jeomap nav .layers-wrapper a.active:after {
-    left: auto;
+    inset-inline-start: auto;
     top: auto;
 }
 
@@ -128,7 +128,7 @@ div.jeomap {
 	}
 
 	.jeomap nav.layers-selection.hidden .text-icon .layer-icon {
-		margin-right: 0;
+		margin-inline-end: 0;
 	}
 
 	.jeomap nav.layers-selection.hidden .layer-selection-title .arrow-icon {
@@ -187,7 +187,7 @@ div.jeomap {
     background-position: center;
     filter: brightness(0) invert(1);
 	cursor: pointer;
-	margin-right: 12px;
+	margin-inline-end: 12px;
 }
 
 .jeomap .legend-container .text-icon,
@@ -204,7 +204,7 @@ div.jeomap {
 	background-image: url("data:image/svg+xml,%3Csvg aria-hidden='true' focusable='false' data-prefix='fas' data-icon='list' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' class='svg-inline--fa fa-list fa-w-16 fa-3x'%3E%3Cpath fill='%23333' d='M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z' class=''%3E%3C/path%3E%3C/svg%3E");
     background-position: center;
 	cursor: pointer;
-	margin-right: 12px;
+	margin-inline-end: 12px;
 	filter: brightness(0) invert(1);
 }
 
@@ -222,7 +222,7 @@ div.jeomap {
     background-color: white;
     z-index: 10;
     top: 10px;
-    left: 10px;
+    inset-inline-start: 10px;
     display: none;
     overflow-y: auto;
     padding: 0 20px 20px;
@@ -242,7 +242,7 @@ div.jeomap {
 .jeomap > div > a.more-info-close {
 	position: absolute;
 	top: 10px;
-	right: 10px;
+	inset-inline-end: 10px;
 	z-index: 11;
 	cursor: pointer;
 }
@@ -251,7 +251,7 @@ div.jeomap {
 	background: #fff;
 	position: absolute;
 	bottom: 22px;
-	right: 10px;
+	inset-inline-end: 10px;
 	z-index: 1;
 	display: block;
 	margin: 0;
@@ -265,7 +265,7 @@ div.jeomap {
 	display: block;
 	margin: 0px 0px 0px 20px;
 	padding-top: 25px;
-    padding-right: 28px;
+    padding-inline-end: 28px;
 	/* max-height: 250px; */
 	/* overflow-x: auto; */
 }
@@ -431,7 +431,7 @@ div.jeomap {
 /* JEO SETTINGS: This css use jeo settings*/
 .jeomap .mapboxgl-popup-close-button {
 	position: absolute;
-    right: 5px;
+    inset-inline-end: 5px;
     top: 5px;
     border-radius: 0px;
     cursor: pointer;
@@ -573,8 +573,8 @@ nav .layer-selection-title .legends-title {
 .jeo-popup__mouseover {
 	font-size: 16px;
     transform: none !important;
-	left: 5px;
-	right: auto;
+	inset-inline-start: 5px;
+	inset-inline-end: auto;
 	top: 110px !important;
 	padding: 5px;
 }
@@ -596,11 +596,11 @@ nav .layer-selection-title .legends-title {
 }
 
 #embed-container div.jeomap {
-	float: left;
+	float: inline-start;
 }
 
 #embed-post-preview {
-	float: right;
+	float: inline-end;
 	height: 100%;
 	padding: 0 10px 10px;
 }
@@ -612,10 +612,10 @@ nav .layer-selection-title .legends-title {
 /** Bar scale legend **/
 
 .barscale-left-label {
-	float: left;
+	float: inline-start;
 }
 .barscale-right-label {
-	float: right;
+	float: inline-end;
 }
 .barscale-scale-container {
 	height: 20px;
@@ -623,7 +623,7 @@ nav .layer-selection-title .legends-title {
 }
 .barscale-color {
 	height: 20px;
-	float: left;
+	float: inline-start;
 	border-bottom: 1px solid #00000029;
 }
 
@@ -647,8 +647,8 @@ nav .layer-selection-title .legends-title {
 	width: 21px;
 	min-width: 21px;
 	height: 21px;
-	margin-right: 16px;
-	float: left;
+	margin-inline-end: 16px;
+	float: inline-start;
 	border-radius: 3px;
 	border: 1px solid #8080801f;
 }
@@ -667,8 +667,8 @@ nav .layer-selection-title .legends-title {
 .icons-item-img {
 	max-width: 22px;
 	max-height: 22px;
-	margin-right: 15px;
-	float: left;
+	margin-inline-end: 15px;
+	float: inline-start;
 }
 
 .icons-item {
@@ -704,7 +704,7 @@ nav .layer-selection-title .legends-title {
 .circle-wrapper {
 	display: flex;
 	justify-content: center;
-	margin-right: 10px;
+	margin-inline-end: 10px;
 }
 
 .circle-item p {
@@ -765,8 +765,8 @@ nav .layer-selection-title .legends-title {
 
 .editor-styles-wrapper ul, .editor-styles-wrapper ol {
 	margin-bottom: 2px;
-    padding-left: 0;
-    margin-left: 0;
+    padding-inline-start: 0;
+    margin-inline-start: 0;
 }
 
 .jeomap .layers-wrapper a {
@@ -834,7 +834,7 @@ div.jeomap.alignwide {
 	position: relative;
 	width: 31px;
 	height: 41px;
-	margin-left: -11.5px;
+	margin-inline-start: -11.5px;
 	margin-top: -38.5px;
 	background-size:cover;
   }
@@ -842,7 +842,7 @@ div.jeomap.alignwide {
   .spider-leg-container .spider-leg-line {
 	position: absolute;
 	bottom: 0;
-	left: 0;
+	inset-inline-start: 0;
 	width: 2px;
 	background-color: #343434;
 	opacity: 0.45;
@@ -865,7 +865,7 @@ div.jeomap.alignwide {
 
   .spider-leg-container.initial,
   .spider-leg-container.exit {
-	margin-left: 0 !important;
+	margin-inline-start: 0 !important;
 	margin-top: 0 !important;
 	height: 0;
   }
