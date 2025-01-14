@@ -60,7 +60,7 @@
 
 .react-autosuggest__suggestion--focused {
 	/* background-color: #0C7EAF; */
-	background-color: blueviolet; 
+	background-color: blueviolet;
 	color: #fff;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .jeo-preview-controls .select-another-map {
-	margin-left: 10px;
+	margin-inline-start: 10px;
 }
 
 .wp-block[data-type="jeo/map"] .jeo-preview-controls {

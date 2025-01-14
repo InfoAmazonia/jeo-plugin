@@ -67,10 +67,9 @@ $font-stories: var( --jeo-font-stories );
 
 	.the-story {
 		background-color: rgba(128, 128, 128, 0.1);
-		left: 50%;
+		inset-inline: 50%;
 		margin: 0 -50vw;
 		position: relative;
-		right: 50%;
 		top: 0;
 		width: 100vw;
 
@@ -86,12 +85,11 @@ $font-stories: var( --jeo-font-stories );
 		.mapboxgl-map {
 			border: none;
 			height: 100vh;
-			left: 0;
-			margin-left: calc(-50vw + 50%);
-			margin-right: calc(-50vw + 50%);
+			inset-inline-start: 0;
+			inset-inline-end: 50%;
+			margin-inline: calc(-50vw + 50%);
 			max-width: unset;
 			position: sticky;
-			right: 50%;
 			top: 0 !important;
 			transition: filter 0.7s ease;
 			width: 100vw;
@@ -139,12 +137,12 @@ $font-stories: var( --jeo-font-stories );
 
 	.lefty {
 		width: 33vw;
-		margin-left: 5vw;
+		margin-inline-start: 5vw;
 	}
 
 	.righty {
 		width: 33vw;
-		margin-left: 62vw;
+		margin-inline-start: 62vw;
 	}
 
 	.light {
@@ -180,11 +178,11 @@ $font-stories: var( --jeo-font-stories );
 			flex-direction: row;
 
 			.author {
-				margin-right: auto;
+				margin-inline-end: auto;
 			}
 
 			.date {
-				margin-left: auto;
+				margin-inline-start: auto;
 				font-size: 14px;
 				line-height: 33px;
 				opacity: 0.5;
@@ -273,10 +271,8 @@ $font-stories: var( --jeo-font-stories );
 		font-weight: bold;
 		font-size: 14px;
 		position: absolute;
-		left: 0;
-		right: 0;
-		margin-left: auto;
-		margin-right: auto;
+		inset-inline: 0;
+		margin-inline: auto;
 		box-shadow: 0 2px 6px 0 rgba( 0, 0, 0, 0.3 );
 		font-family: $font;
 	}
@@ -290,10 +286,8 @@ $font-stories: var( --jeo-font-stories );
 		font-weight: bold;
 		font-size: 14px;
 		position: absolute;
-		left: 0;
-		right: 0;
-		margin-left: auto;
-		margin-right: auto;
+		inset-inline: 0;
+		margin-inline: auto;
 		position: relative;
 		margin-top: 20px;
 		box-shadow: 0 2px 6px 0 rgba( 0, 0, 0, 0.3 );
@@ -347,7 +341,7 @@ $font-stories: var( --jeo-font-stories );
 	.return-to-slides-container {
 		filter: drop-shadow( 0px 0px 4px black );
 		position: fixed;
-		left: 50%;
+		inset-inline-start: 50%;
 		transform: translate( -50%, -50% );
 		bottom: 0;
 		z-index: 1;
@@ -406,7 +400,7 @@ $font-stories: var( --jeo-font-stories );
 	.layers-selection {
 		position: absolute;
 		top: 40px;
-		right: 20px;
+		inset-inline-end: 20px;
 		width: 220px;
 
 		.layers-wrapper {
@@ -420,7 +414,7 @@ $font-stories: var( --jeo-font-stories );
 				align-items: center;
 
 				input {
-					margin-right: 10px;
+					margin-inline-end: 10px;
 				}
 			}
 		}
@@ -431,7 +425,7 @@ $font-stories: var( --jeo-font-stories );
 	}
 
 	.jeomap div.legend-container {
-		right: 20px;
+		inset-inline-end: 20px;
 	}
 
 	.navigate-map {
@@ -467,36 +461,35 @@ $font-stories: var( --jeo-font-stories );
 		}
 
 		.return-to-slides-container {
-			left: 85px;
+			inset-inline-start: 85px;
 			bottom: 30px;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 
 			.icon-return {
-				margin-right: 10px;
+				margin-inline-end: 10px;
 			}
 		}
 
 		.jeomap div.legend-container {
-			right: 5px;
+			inset-inline-end: 5px;
 			bottom: 75px;
 		}
 
 		.layers-selection {
-			right: 5px;
+			inset-inline-end: 5px;
 		}
 	}
 }
 
 .embed-storymap {
 	border: none;
-	left: 50%;
+	inset-inline: 50%;
 	margin: 40px -50vw;
 	max-width: unset !important;
 	min-height: 100vh;
 	overflow: hidden;
 	position: relative;
-	right: 50%;
 	width: 100vw;
 }

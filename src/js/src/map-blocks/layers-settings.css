@@ -25,7 +25,7 @@
 }
 
 .jeo-layers-library-filters, .jeo-layers-library-filters-button-filter {
-    margin-right: 5px;
+    margin-inline-end: 5px;
 }
 
 .all-layers-list p a {
@@ -90,12 +90,12 @@
 }
 
 .jeo-layers-library-controls .right {
-    margin-right: 24px;
-    float: right;
+    margin-inline-end: 24px;
+    float: inline-end;
 }
 
 .jeo-layers-library-controls .left {
-    float: left;
+    float: inline-start;
 }
 
 .jeo-layers-library-controls {
@@ -109,7 +109,7 @@
 }
 
 .selected-layers-title {
-    margin-left: 12px;
+    margin-inline-start: 12px;
 }
 
 
