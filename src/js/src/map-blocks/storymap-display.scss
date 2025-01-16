@@ -177,12 +177,7 @@ $font-stories: var( --jeo-font-stories );
 			display: flex;
 			flex-direction: row;
 
-			.author {
-				margin-inline-end: auto;
-			}
-
-			.date {
-				margin-inline-start: auto;
+			& > * {
 				font-size: 14px;
 				line-height: 33px;
 				opacity: 0.5;
@@ -190,6 +185,14 @@ $font-stories: var( --jeo-font-stories );
 				letter-spacing: 0;
 				line-height: 19px;
 				font-family: $font;
+			}
+
+			.author {
+				margin-inline-end: auto;
+			}
+
+			.date {
+				margin-inline-start: auto;
 			}
 		}
 
