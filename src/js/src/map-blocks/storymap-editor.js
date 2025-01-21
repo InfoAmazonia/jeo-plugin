@@ -14,6 +14,7 @@ import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
+import { computeInlineEnd } from '../shared/direction';
 import './map-editor.css';
 import './storymap-editor.scss';
 
@@ -110,6 +111,7 @@ const StoryMapEditor = ( {
 	const [ key, setKey ] = useState( 0 );
 	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 	const [ viewState, setViewState ] = useState( createInitialViewState );
+	const [ inlineEnd ] = useState( computeInlineEnd );
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
@@ -258,7 +260,7 @@ const StoryMapEditor = ( {
 					<div className="jeo-preview-area">
 						<Map
 							key={ key }
-							controls="top-right"
+							controls={ `top-${inlineEnd}` }
 							fullscreen={ loadedMap.meta.enable_fullscreen }
 							style={ { height: '85vh' } }
 							latitude={ viewState.latitude }

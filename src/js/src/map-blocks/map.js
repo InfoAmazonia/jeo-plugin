@@ -1,6 +1,7 @@
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useState } from '@wordpress/element';
 import mapboxgl from 'mapbox-gl'
 import MapGL, { FullscreenControl, NavigationControl } from 'react-map-gl';
+import { computeInlineStart } from '../shared/direction';
 
 export const MapboxAPIKey = window.jeo_settings.mapbox_key;
 
@@ -8,7 +9,10 @@ export const MapboxAPIKey = window.jeo_settings.mapbox_key;
  * @typedef {import('react-map-gl').MapProps} MapProps
  * @param {MapProps} props
  */
-function Map( { children, controls = 'top-left', fullscreen = true, ...props }, ref ) {
+function Map( { children, controls = undefined, fullscreen = true, ...props }, ref ) {
+	const [ inlineStart ] = useState( computeInlineStart );
+	const controlsPosition = controls ?? `top-${inlineStart}`;
+
 	return (
 		<MapGL
 			ref={ ref }
@@ -20,9 +24,9 @@ function Map( { children, controls = 'top-left', fullscreen = true, ...props }, 
 		>
 			{children}
 			{ fullscreen ? (
-				<FullscreenControl position={ controls } />
+				<FullscreenControl position={ controlsPosition } />
 			) : null }
-			<NavigationControl position={ controls } showCompass={ false } />
+			<NavigationControl position={ controlsPosition } showCompass={ false } />
 		</MapGL>
 	);
 }
