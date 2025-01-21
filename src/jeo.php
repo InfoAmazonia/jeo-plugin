@@ -5,7 +5,7 @@
  * @wordpress-plugin
  * Plugin Name:       JEO WP
  * Description:       Interactive Map blocks for Wordpress Gutenberg
- * Version:           2.12.6
+ * Version:           2.13.0
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       jeo
@@ -22,7 +22,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'JEO_VERSION', '2.12.6' );
+define( 'JEO_VERSION', '2.13.0' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url('', __FILE__) );
