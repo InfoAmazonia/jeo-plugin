@@ -47,7 +47,7 @@
 	font-size: 1em;
 	height: 1.2em;
 	justify-content: center;
-	margin-right: 5px;
+	margin-inline-end: 5px;
 	width: 1.2em;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .jeo-geocode-posts__buttons-list .components-button {
-	margin-right: 6px;
+	margin-inline-end: 6px;
 }
 
 .jeo-geocode-posts .components-base-control {
@@ -125,6 +125,6 @@
 	}
 
 	.jeo-geocode-posts__column:nth-child(2) {
-		margin-left: 10px;
+		margin-inline-start: 10px;
 	}
 }

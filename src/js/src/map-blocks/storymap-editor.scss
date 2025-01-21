@@ -88,7 +88,7 @@
 	position: absolute;
 	top: 50px;
 	padding: 10px;
-	left: calc(45% + 15px);
+	inset-inline-start: calc(45% + 15px);
 
 	.title {
 		label {
@@ -117,13 +117,13 @@
 	bottom: 15%;
 	padding: 10px;
 	display: flex;
-	left: calc(45% + 15px);
+	inset-inline-start: calc(45% + 15px);
 
 	// .section-title {
 	// 	margin: 0 0 0 15px;
 	// }
 	.show-button {
-		margin-left: auto;
+		margin-inline-start: auto;
 	}
 }
 
@@ -134,7 +134,7 @@
 	margin-bottom: 10px;
 	background-color: #fff;
 	position: absolute;
-	right: 50px;
+	inset-inline-end: 50px;
     top: 10px;
 	padding: 10px;
 	font-size: 14px;
@@ -150,10 +150,10 @@
 	padding: 10px;
 	position: absolute;
 	top: 50px;
-	// left: calc(30% + 15px);
+	// inset-inline-start: calc(30% + 15px);
 	background-color: #fff;
 	.slide-panel {
-		border-left: none;
+		border-inline-start: none;
 		width: 100%;
 		.layer {
 			padding: 10px;
@@ -175,7 +175,7 @@
 		flex-direction: row;
 		& > button {
 			border: 1px solid #f0f0f0;
-			border-right: none;
+			border-inline-end: none;
 			background: transparent;
 			height: 56px;
 		}
@@ -200,7 +200,7 @@
 		svg {
 			margin-top: auto;
 			margin-bottom: auto;
-			margin-right: 5px;
+			margin-inline-end: 5px;
 		}
 		p {
 			margin: 0 0 0 5px;
@@ -221,7 +221,7 @@
 		svg {
 			margin-top: auto;
 			margin-bottom: auto;
-			margin-right: 5px;
+			margin-inline-end: 5px;
 		}
 		p {
 			margin: 0 0 0 5px;
@@ -241,7 +241,7 @@
 		svg {
 			margin-top: auto;
 			margin-bottom: auto;
-			margin-right: 5px;
+			margin-inline-end: 5px;
 		}
 		p {
 			margin: 0 0 0 5px;
@@ -261,7 +261,7 @@
 		svg {
 			margin-top: auto;
 			margin-bottom: auto;
-			margin-right: 5px;
+			margin-inline-end: 5px;
 		}
 		p {
 			margin: 0 0 0 5px;
@@ -276,7 +276,7 @@
 .slides-settings-hide {
 	display: flex;
 	width: 45%;
-	// left: calc(30% + 15px);
+	// inset-inline-style: calc(30% + 15px);
 	margin: 10px;
 	background-color: #fff;
 	position: absolute;
@@ -287,7 +287,7 @@
 	// 	margin: 0 0 0 15px;
 	// }
 	.show-button {
-		margin-left: auto;
+		margin-inline-start: auto;
 	}
 }
 .storymap-controls {
@@ -298,7 +298,7 @@
 .search-adress-input {
 	position: absolute;
 	top: 0;
-	left: 10px;
+	inset-inline-start: 10px;
 }
 .tooltip {
 	background-color: white;

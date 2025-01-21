@@ -24,18 +24,18 @@ $font: var(--jeo-font);
 
 	&.active:not(.embed) {
 		.discovery-map {
-			margin-left: 30%;
+			margin-inline-start: 30%;
 		}
 
 		.default-sidebar {
-			left: 0;
+			inset-inline-start: 0;
 		}
 
 	}
 
 	.discovery-map {
 		width: 100%;
-		margin-left: 0;
+		margin-inline-start: 0;
 		transition: all .2s ease-in-out;
 
 		&__container {
@@ -47,19 +47,19 @@ $font: var(--jeo-font);
 	.default-sidebar {
 		position: absolute;
 		width: 30%;
-		left: -30%;
+		inset-inline-start: -30%;
 		max-height: 100%;
 		height: 100%;
 		transition: all .2s ease-in-out;
 
 		.discovery-title {
 			text-transform: uppercase;
-			border-left: 3px solid $primary;
+			border-inline-start: 3px solid $primary;
 			font-weight: bold;
-			padding-left: 13px;
+			padding-inline-start: 13px;
 			font-size: 16px;
 			margin-bottom: 25px;
-			margin-left: 20px;
+			margin-inline-start: 20px;
 			margin-top: 25px;
 		}
 	}
@@ -86,7 +86,7 @@ $font: var(--jeo-font);
 			align-items: center;
 			justify-content: flex-start;
 			position: absolute;
-			right: 25px;
+			inset-inline-end: 25px;
 			top: 25px;
 			border-radius: 5px;
 			box-shadow: 0 0 0 2px rgba( 0, 0, 0, 0.01 );
@@ -114,7 +114,7 @@ $font: var(--jeo-font);
 
 					.share-icon {
 						width: 13px;
-						margin-left: -1px;
+						margin-inline-start: -1px;
 					}
 				}
 			}
@@ -125,14 +125,14 @@ $font: var(--jeo-font);
 				.options {
 					transform: translate( 0, 0 ) scaleX( 1 );
 					transition: all 0.4s ease-in-out;
-					padding-right: 8px;
+					padding-inline-end: 8px;
 					width: 265px;
 					overflow: visible;
 
 					.embed-tooltip {
 						position: absolute;
 						top: 50px;
-						right: 0px;
+						inset-inline-end: 0px;
 						padding: 13px;
 						background: white;
 						border-radius: 7px;
@@ -142,11 +142,11 @@ $font: var(--jeo-font);
 							content: '';
 							position: absolute;
 							top: -5px;
-							right: 50px;
+							inset-inline-end: 50px;
 							width: 0px;
 							height: 0px;
-							border-left: 5px solid transparent;
-							border-right: 5px solid transparent;
+							border-inline-start: 5px solid transparent;
+							border-inline-end: 5px solid transparent;
 							border-bottom: 5px solid white;
 						}
 
@@ -190,7 +190,7 @@ $font: var(--jeo-font);
 					width: 30px;
 					height: 30px;
 					border-radius: 50%;
-					margin-right: 9px;
+					margin-inline-end: 9px;
 
 					&:hover {
 						transform: scale(1.07);
@@ -244,7 +244,7 @@ $font: var(--jeo-font);
 			background: white;
 			position: absolute;
 			top: 114px;
-			left: 100%;
+			inset-inline-start: 100%;
 			z-index: 25;
 			display: flex;
 			justify-content: center;
@@ -309,7 +309,7 @@ $font: var(--jeo-font);
 						width: 100%;
 						position: absolute;
 						bottom: 0px;
-						left: 0;
+						inset-inline-start: 0;
 						background: $primary;
 					}
 
@@ -331,7 +331,7 @@ $font: var(--jeo-font);
 						svg {
 							height: 18px;
 							width: 21px;
-							margin-right: 10px;
+							margin-inline-end: 10px;
 						}
 					}
 				}
@@ -348,7 +348,7 @@ $font: var(--jeo-font);
 				border: 2px solid #dddddd;
 				border-radius: 10px 0 0 10px;
 				height: 50px;
-				border-right: 0px;
+				border-inline-end: 0px;
 				font-weight: bold;
 			}
 
@@ -383,7 +383,7 @@ $font: var(--jeo-font);
 
 				svg {
 					width: 16px;
-					margin-right: 9px;
+					margin-inline-end: 9px;
 				}
 			}
 
@@ -408,7 +408,7 @@ $font: var(--jeo-font);
 			.stories {
 				.card {
 					width: calc( 100% + 60px );
-					margin-left: -30px;
+					margin-inline-start: -30px;
 					padding: 16px 30px;
 					transition: all 0.2s ease-in-out;
 					display: block;
@@ -460,7 +460,7 @@ $font: var(--jeo-font);
 					.lazyload-wrapper {
 						position: absolute;
 						top: 0;
-						left: 0;
+						inset-inline-start: 0;
 						width: 100%;
 						height: 100%;
 					}
@@ -491,7 +491,7 @@ $font: var(--jeo-font);
 
 				.status {
 					position: absolute;
-					right: 0;
+					inset-inline-end: 0;
 					top: 1.5rem;
 					width: 100px;
 					display: flex;
@@ -540,7 +540,7 @@ $font: var(--jeo-font);
 						font-weight: bold;
 						font-size: 18px;
 						padding-bottom: 5px;
-						padding-right: 80px;
+						padding-inline-end: 80px;
 						line-height: 22px;
 						// margin-bottom: 13px;
 					}
@@ -562,14 +562,14 @@ $font: var(--jeo-font);
 
 						svg {
 							width: 16px;
-							margin-right: 5px;
+							margin-inline-end: 5px;
 						}
 					}
 
 					.apply-remove-all {
 						position: absolute;
 						top: 0;
-						right: 0;
+						inset-inline-end: 0;
 						background-color: $primary;
 						padding: 5px 10px;
 						color: white;
@@ -589,7 +589,7 @@ $font: var(--jeo-font);
 
 						svg {
 							width: 13px;
-							margin-right: 7px;
+							margin-inline-end: 7px;
 						}
 					}
 
@@ -601,7 +601,7 @@ $font: var(--jeo-font);
 							display: flex;
 							color: #0a0a0a;
 							font-size: 14px;
-							text-align: left;
+							text-align: inline-start;
 
 							&:first-child {
 								margin-top: 13px;
@@ -613,7 +613,7 @@ $font: var(--jeo-font);
 							}
 
 							span {
-								margin-left: 8px;
+								margin-inline-start: 8px;
 							}
 
 							svg {
@@ -655,7 +655,7 @@ $font: var(--jeo-font);
 
 		&.placeholder {
 			position: absolute;
-			left: 0;
+			inset-inline-start: 0;
 			width: 30%;
 			height: 100%;
 		}
@@ -684,7 +684,7 @@ $font: var(--jeo-font);
 		background: #fff;
 		position: absolute;
 		bottom: 30px;
-		right: 10px;
+		inset-inline-end: 10px;
 		z-index: 1;
 		display: block;
 		margin: 0;
@@ -693,9 +693,8 @@ $font: var(--jeo-font);
 
 		.legends-wrapper {
 			display: block;
-			margin: 0px 0px 0px 20px;
 			padding-top: 25px;
-			padding-right: 28px;
+			padding-inline: 20px;
 			max-height: 250px;
 			overflow-x: auto;
 
@@ -794,7 +793,7 @@ $font: var(--jeo-font);
 		&.drag-icon {
 			width: 8px;
 			opacity: 0.5;
-			margin-right: 5px;
+			margin-inline-end: 5px;
 			height: 15px;
 			margin-top: 2px;
 		}
@@ -815,7 +814,7 @@ $font: var(--jeo-font);
 
 	.remove-layer {
 		position: absolute;
-		right: 0;
+		inset-inline-end: 0;
 		opacity: 0.7;
 		cursor: pointer;
 
@@ -917,7 +916,7 @@ $font: var(--jeo-font);
 			font-weight: bold;
 			font-size: 60px;
 			margin: 0;
-			text-align: left;
+			text-align: inline-start;
 		}
 
 		h4 {
@@ -944,7 +943,7 @@ $font: var(--jeo-font);
 	height: 35px;
     background: #242424;
     padding: 5px;
-	left: 0px;
+	inset-inline-start: 0px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
@@ -954,7 +953,7 @@ $font: var(--jeo-font);
 	}
 
 	&.discovery {
-		left: 0;
+		inset-inline-start: 0;
 		bottom: 0;
 	}
 }

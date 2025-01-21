@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
+import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
 import { waitMapEvent } from '../shared/wait';
 
@@ -43,6 +44,9 @@ export default class JeoMap {
 	}
 
 	lazyInitMap() {
+		const inlineStart = computeInlineStart();
+		const inlineEnd = computeInlineEnd();
+
 		if ( this.initialized ) {
 			return;
 		}
@@ -103,7 +107,7 @@ export default class JeoMap {
 
 					map.addControl(
 						new mapboxgl.NavigationControl( { showCompass: false } ),
-						'top-left'
+						`top-${inlineStart}`
 					);
 
 					if ( this.getArg( 'disable_scroll_zoom' ) ) {
@@ -120,7 +124,7 @@ export default class JeoMap {
 					}
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
-						map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+						map.addControl( new mapboxgl.FullscreenControl(), `top-${inlineStart}` );
 					}
 
 					if (
@@ -258,7 +262,7 @@ export default class JeoMap {
 								}
 							} );
 
-							let controlPostion = 'bottom-right';
+							let controlPostion = `bottom-${inlineEnd}`;
 
 							let attributionControl = new mapboxgl.AttributionControl( {
 								compact: false,
@@ -271,7 +275,7 @@ export default class JeoMap {
 									customAttribution,
 								} )
 
-								controlPostion = 'bottom-left';
+								controlPostion = `bottom-${inlineStart}`;
 							}
 
 							map.addControl(

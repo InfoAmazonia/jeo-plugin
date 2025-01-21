@@ -1,5 +1,5 @@
 import { Component, createRoot } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import classNames from 'classnames';
 import mapboxgl from 'mapbox-gl';
 import scrollama from 'scrollama';
@@ -7,6 +7,7 @@ import scrollama from 'scrollama';
 import { onFirstIntersection } from '../shared/intersect';
 import { renderLayer } from './map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
+import { formatDate, formatHour, joinList } from '../shared/intl';
 
 import './storymap-display.scss';
 
@@ -17,9 +18,6 @@ const { map_defaults: mapDefaults } = window.jeo_settings;
 
 const isSingle = !!document.querySelector('.single-storymap');
 
-const dateFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { year: 'numeric', month: 'long', day: 'numeric' } );
-const hourFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { hour: '2-digit', minute: '2-digit' } );
-
 const alignments = {
     'left': 'lefty',
     'center': 'centered',
@@ -27,6 +25,14 @@ const alignments = {
 }
 
 let storyCounter = 0;
+
+function getAuthorsLinks( storymap ) {
+	if ( storymap?.jeo_authors ) {
+		return sprintf( __( 'By %s' ), joinList( storymap.jeo_authors.map( ( author ) => `<a href="${author.permalink}">${author.name}</a>` ) ) );
+	} else {
+		return '';
+	}
+}
 
 function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
@@ -325,7 +331,8 @@ class StoryMapDisplay extends Component {
 									<>
 										<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: this.state.postData.title.rendered } } />
 										<div className="post-info">
-											<p className="date">{ `${dateFormat.format(storyDate)} ${ __("at", "jeo") } ${hourFormat.format(storyDate)}` }</p>
+											<p className="author" dangerouslySetInnerHTML={ { __html: getAuthorsLinks( this.state.postData ) } } />
+											<p className="date">{ `${formatDate(storyDate)} ${ __("at", "jeo") } ${formatHour(storyDate)}` }</p>
 										</div>
 									</>
 								) }

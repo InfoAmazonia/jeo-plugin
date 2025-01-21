@@ -16,6 +16,8 @@ class Storymap{
 
 		add_action( 'pre_get_posts', [ $this, 'show_on_archives' ] );
 
+		add_filter( 'rest_prepare_storymap', [ $this, 'prepare_rest_response' ], 10, 3 );
+
 		$this->register_rest_meta_validation();
 	}
 
@@ -44,7 +46,7 @@ class Storymap{
 			'labels' => $labels,
 			'hierarchical' => true,
 			'description' => __('JEO Story Map', 'jeo'),
-			'supports' => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks'),
+			'supports' => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks'),
 			'rewrite' => array('slug' => 'storymap'),
 			'public' => true,
 			'show_in_menu' => 'jeo-main-menu',
@@ -123,6 +125,29 @@ class Storymap{
 				$query->set( 'post_types', $types );
 			}
 		}
+	}
+
+	public function prepare_rest_response( $response, $post, $request ) {
+		if ( function_exists( 'get_coauthors' ) ) {
+			$authors = \get_coauthors( $post->ID );
+
+			if ( ! empty( $authors ) ) {
+				$response_authors = [];
+
+				foreach ( $authors as $author ) {
+					if ( $author instanceof \WP_User ) {
+						$response_authors[] = [
+							'ID' => $author->ID,
+							'name' => $author->display_name,
+							'permalink' => get_author_posts_url( $author->ID ),
+						];
+					}
+				}
+
+				$response->data['jeo_authors'] = $response_authors;
+			}
+		}
+		return $response;
 	}
 
 }
