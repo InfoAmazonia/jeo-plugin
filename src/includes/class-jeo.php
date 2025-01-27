@@ -150,14 +150,14 @@ class Jeo {
 
 		wp_register_style(
 			'mapboxgl',
-			'https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.css',
+			'https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.css',
 			array(),
 			false,
 		);
 
 		wp_register_script(
 			'mapboxgl',
-			'https://api.mapbox.com/mapbox-gl-js/v3.7.0/mapbox-gl.js',
+			'https://api.mapbox.com/mapbox-gl-js/v3.9.4/mapbox-gl.js',
 			array(),
 			false,
 		);
@@ -359,7 +359,7 @@ class Jeo {
 
 		if ( in_array( $post->post_type, $post_types ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
-			wp_enqueue_style( 'leaflet', JEO_BASEURL . '/libs/leaflet/leaflet.css' );
+			wp_enqueue_style( 'jeo-js' );
 		}
 	}
 
