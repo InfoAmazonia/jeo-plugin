@@ -3,12 +3,6 @@
 	width: 100%;
 }
 
-.jeo-geocode-title__row {
-	display: flex;
-	justify-content: space-between;
-	margin: 10px 0;
-}
-
 .jeo-geocode-search__hint {
 	color: #808080;
 	margin: 0;
@@ -20,6 +14,10 @@
 	flex-wrap: wrap;
 	max-width: 90vw;
 	width: 1200px;
+}
+
+.jeo-geocode-posts h2 {
+	font-size: 1.5rem;
 }
 
 .jeo-geocode-posts__post {
