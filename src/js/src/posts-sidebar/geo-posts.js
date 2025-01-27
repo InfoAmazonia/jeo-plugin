@@ -2,10 +2,11 @@ import { Button, CheckboxControl, RadioControl } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
-import { Map as LeafletMap, Marker, TileLayer } from 'react-leaflet';
+import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 
 import JeoGeoAutoComplete from './geo-auto-complete';
+import 'leaflet/dist/leaflet.css';
 import './geo-posts.css';
 import { isEqual } from 'lodash-es';
 
@@ -33,6 +34,7 @@ class JeoGeocodePosts extends Component {
 		this.save = this.save.bind( this );
 		this.clickMarkerMap = this.clickMarkerMap.bind( this );
 		this.clickMarkerList = this.clickMarkerList.bind( this );
+		this.mapCreated = this.mapCreated.bind( this );
 		this.mapLoaded = this.mapLoaded.bind( this );
 		this.relevanceClick = this.relevanceClick.bind( this );
 		this.updatePoint = this.updatePoint.bind( this );
@@ -239,7 +241,6 @@ class JeoGeocodePosts extends Component {
 	}
 
 	onLocationFound( location ) {
-		//console.log(location)
 		this.flyToLocation( location.lat, location.lon );
 		this.fetchReverseGeocode( location.lat, location.lon ).then( ( result ) => {
 			if ( result.raw.error ) {
@@ -282,14 +283,14 @@ class JeoGeocodePosts extends Component {
 	}
 
 	flyToLocation( lat, lon ) {
-		// console.log([
-		// 	parseFloat( lat ),
-		// 	parseFloat( lon ),
-		// ])
-		this.refMap.current.leafletElement.flyTo( [
+		this.refMap.current.flyTo( [
 			parseFloat( lat ),
 			parseFloat( lon ),
 		] );
+	}
+
+	mapCreated( mapInstance ) {
+		this.refMap.current = mapInstance;
 	}
 
 	mapLoaded( e ) {
@@ -416,22 +417,18 @@ class JeoGeocodePosts extends Component {
 		return (
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
-					<div className="jeo-geocode-title__row">
-						<h2>{ __( 'Geolocated points', 'jeo' ) }</h2>
+					<div>
+						<h2>{ __( 'Add new point', 'jeo' ) }</h2>
 						<div>
-							{ formMode === 'view' && (
+							{ formMode === 'view' ? (
 								<Button variant="primary" onClick={ this.onClickNewPoint }>
 									{ __( 'Add new point', 'jeo' ) }
 								</Button>
-							) }
+							) : formMode === 'new' ? (
+								this.renderForm()
+							) : null }
 						</div>
 					</div>
-					{ formMode === 'new' && (
-						<Fragment>
-							<h2>{ __( 'Add new point', 'jeo' ) }</h2>
-							{ this.renderForm() }
-						</Fragment>
-					) }
 					<div>
 						<h2>{ __( 'Current points', 'jeo' ) }</h2>
 						{ pointsList.length === 0 ? (
@@ -484,9 +481,10 @@ class JeoGeocodePosts extends Component {
 
 				<div className="jeo-geocode-posts__column">
 					<div id="geocode-map-container" style={ { display: 'block' } }>
-						<LeafletMap
+						<MapContainer
 							center={ [ 0, 0 ] }
 							zoom={ zoom }
+							whenCreated={ this.mapCreated }
 							whenReady={ this.mapLoaded }
 							ref={ this.refMap }
 						>
@@ -531,7 +529,7 @@ class JeoGeocodePosts extends Component {
 									/>
 								);
 							} ) }
-						</LeafletMap>
+						</MapContainer>
 					</div>
 				</div>
 			</div>
