@@ -10,16 +10,7 @@ class LegendTypeEdition extends Component {
 
 		this.hasChanged = this.hasChanged.bind( this );
 		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
-		// this.state = {
-		// 	legendObject: props.legendObject,
-		// };
 	}
-
-	// static getDerivedStateFromProps( nextProps ) {
-	// 	return {
-	// 		legendObject: nextProps.legendObject,
-	// 	};
-	// }
 
 	hasChanged( legendObject ) {
 		this.props.hasChanged( legendObject );

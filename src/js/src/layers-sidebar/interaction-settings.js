@@ -172,7 +172,7 @@ export default function InteractionSettings( {
 										options={ unusedFieldOptions }
 										onChange={ setNewField }
 									/>
-									<Button isPrimary onClick={ addField }>
+									<Button variant="primary" onClick={ addField }>
 										{ __( 'Add', 'jeo' ) }
 									</Button>
 								</div>

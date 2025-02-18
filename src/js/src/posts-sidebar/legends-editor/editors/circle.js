@@ -2,7 +2,6 @@ import { Component, Fragment } from '@wordpress/element';
 import { TextControl, RangeControl, Button, Dropdown, ColorPicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import '../editors/circle.css';
-import { v4 as uuid } from 'uuid';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 class CircleEditor extends Component {
@@ -27,7 +26,7 @@ class CircleEditor extends Component {
 						circles: [ ...legendData.attributes.legend_type_options.circles.map( ( item ) => {
 							return {
 								...item,
-								id: uuid(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -50,7 +49,7 @@ class CircleEditor extends Component {
 			const circles = this.state.legendObject.attributes.legend_type_options.circles;
 
 			circles.push(
-				{ label: 'Default Label', radius: 50, id: uuid() },
+				{ label: 'Default Label', radius: 50, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.circles = circles;
@@ -125,11 +124,11 @@ class CircleEditor extends Component {
 
 				{
 					this.state.legendObject.attributes.legend_type_options.circles.map( ( item ) => {
-						return ( <CircleItem circleItem={ item } key={ item.id } removeLabel={ this.removeLabel } itemChanged={ this.itemChanged } color={ this.state.legendObject.attributes.legend_type_options.color } maxRadius={ this.maxRadius } /> );
+						return ( <CircleItem item={ item } key={ item.id } removeLabel={ this.removeLabel } itemChanged={ this.itemChanged } color={ this.state.legendObject.attributes.legend_type_options.color } /> );
 					} )
 				}
 
-				<Button isSecondary isButton isLarge onClick={ this.addNew } className="full-width-button">
+				<Button variant="secondary" isButton isLarge onClick={ this.addNew } className="full-width-button">
 					{ __( 'Add new label', 'jeo' ) }
 				</Button>
 			</Fragment>
@@ -138,95 +137,55 @@ class CircleEditor extends Component {
 	}
 }
 
-class CircleItem extends Component {
-	constructor( props ) {
-		super( props );
+function CircleItem( { color, item, itemChanged, removeLabel } ) {
+	const styles = {
+		circle: {
+			width: item.radius * 2,
+			height: item.radius * 2,
+			backgroundColor: color,
+			borderRadius: item.radius * 2,
+		},
+	};
 
-		this.itemChanged = this.itemChanged.bind( this );
+	return (
+		<div className={ 'legend-wrapper' } >
 
-		this.state = {
-			label: this.props.circleItem.label,
-			radius: this.props.circleItem.radius,
-			id: this.props.circleItem.id,
-			style: '',
-		};
-	}
+			<TextControl
+				label={ __( 'Label', 'jeo' ) }
+				value={ item.label }
+				onChange={ ( label ) => itemChanged( { ...item, label } ) }
+			/>
 
-	itemChanged( changedItem ) {
-		this.props.itemChanged( changedItem );
-	}
+			<RangeControl
+				label={ __( 'Radius', 'jeo' ) }
+				value={ item.radius }
+				onChange={ ( radius ) => itemChanged( { ...item, radius } ) }
+				min={ 1 }
+				max={ 50 }
+			/>
 
-	render() {
-		const dynamicStyle = {
-			radius: this.state.radius,
-			color: this.props.color,
-		};
+			<Dropdown
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<div className="buttonsList">
+						<Button isDestructive isButton variant="secondary" onClick={ () => removeLabel( item.id ) } >
+							{ __( 'Remove', 'jeo' ) }
+						</Button>
 
-		const styles = {
-			circle: {
-				width: dynamicStyle.radius * 2,
-				height: dynamicStyle.radius * 2,
-				backgroundColor: dynamicStyle.color,
-				borderRadius: dynamicStyle.radius * 2,
-			},
+						<Button variant="secondary" isButton aria-expanded={ isOpen } onClick={ onToggle } >
+							{ __( 'See preview', 'jeo' ) }
+						</Button>
+					</div>
+				) }
+				renderContent={ () => (
+					<div className={ 'circle-wrapper' } >
+						{ __( 'Preview', 'jeo' ) }
+						<div className="circle" style={ styles.circle } />
+					</div>
+				) }
+			/>
 
-			circleWrapper: {
-				width: this.props.maxRadius * 2,
-			},
-		};
-
-		return (
-			<Fragment>
-
-				<div className={ 'legend-wrapper' } >
-
-					<TextControl
-						label={ __( 'Label', 'jeo' ) }
-						value={ this.state.label }
-						onChange={ ( label ) => {
-							this.itemChanged( { ...this.state, label } );
-							this.setState( { label } );
-						} }
-					/>
-
-					<RangeControl
-						label={ __( 'Radius', 'jeo' ) }
-						value={ this.state.radius }
-						onChange={ ( radius ) => {
-							this.itemChanged( { ...this.state, radius } );
-							this.setState( { radius } );
-						} }
-
-						min={ 1 }
-						max={ 50 }
-					/>
-
-					<Dropdown
-						position=""
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<div className="buttonsList">
-								<Button isDestructive isButton isLink isSecondary onClick={ () => this.props.removeLabel( this.state.id ) } >
-									{ __( 'Remove', 'jeo' ) }
-								</Button>
-
-								<Button isSecondary isButton isLink aria-expanded={ isOpen } onClick={ onToggle } >
-									{ __( 'See preview', 'jeo' ) }
-								</Button>
-							</div>
-						) }
-						renderContent={ () => (
-							<div className={ 'circle-wrapper' } >
-								{ __( 'Preview', 'jeo' ) }
-								<div className="circle" style={ styles.circle } />
-							</div>
-						) }
-					/>
-
-				</div>
-
-			</Fragment>
-		);
-	}
+		</div>
+	);
 }
 
 export default CircleEditor;

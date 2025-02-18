@@ -13,7 +13,7 @@ import JeoMap from './class-jeo-map';
 			let map_id;
 			this.classList.forEach( ( cls ) => {
 				if ( cls.indexOf( 'map_id_' ) === 0 ) {
-					map_id = cls.substr( 7 );
+					map_id = cls.slice( 7 );
 				}
 			} );
 			// creating data-map_id if class exists

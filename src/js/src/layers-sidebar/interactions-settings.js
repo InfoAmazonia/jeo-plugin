@@ -115,8 +115,8 @@ export default function InteractionsSettings( {
 				} ) }
 			</Panel>
 			<Button
-				style={ { float: 'left', margin: '8px 0' } }
-				isPrimary
+				style={ { float: 'inline-start', margin: '8px 0' } }
+				variant="primary"
 				onClick={ onDone }
 			>
 				{ __( 'Done', 'jeo' ) }

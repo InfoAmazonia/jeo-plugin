@@ -18,7 +18,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 		const isOpen = this.state.isOpen;
 		return (
 			<Fragment>
-				<Button isDefault onClick={ () => this.setState( { isOpen: true } ) }>
+				<Button variant="secondary" onClick={ () => this.setState( { isOpen: true } ) }>
 					{ __( 'Geolocate this post', 'jeo' ) }
 				</Button>
 				{ isOpen && (
@@ -40,19 +40,18 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 registerPlugin( 'jeo-posts-sidebar', {
 	icon: null,
 	render: () => {
+		const currentPostType = useSelect( ( select ) => {
+			return select( 'core/editor' ).getCurrentPostType();
+		}, [] );
 
-	const currentPostType = useSelect( ( select ) => {
-		return select( 'core/editor' ).getCurrentPostType()
-	}, [] );
-
-	return (
-		<div>
-			{ currentPostType ? 
-				<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
-					<JeoGeocodePanel />
-				</PluginDocumentSettingPanel>
-			: null };
-		</div>
-	)
+		return (
+			<div>
+				{ currentPostType ?
+					<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
+						<JeoGeocodePanel />
+					</PluginDocumentSettingPanel>
+				: null };
+			</div>
+		);
 	},
 } );

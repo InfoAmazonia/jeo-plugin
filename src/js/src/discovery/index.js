@@ -1,8 +1,9 @@
-import { Component } from '@wordpress/element';
-import Sidebar from './blocks/sidebar';
-import parse from 'html-react-parser';
-import './style/discovery.scss';
+import { Component, createRoot } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+
+import Sidebar from './blocks/sidebar';
+import { computeInlineStart } from '../shared/direction';
+import './style/discovery.scss';
 
 class Discovery extends Component {
 	constructor( props ) {
@@ -78,17 +79,20 @@ class Discovery extends Component {
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
 			style: 'mapbox://styles/mapbox/streets-v11',
+			projection: 'equirectangular',
 			...adicionalMapOptions,
 		} );
 
 		this.map = map;
+		const inlineStart = computeInlineStart();
+
 		this.map.on( 'load', () => {
 			this.map.addControl(
 				new mapboxgl.NavigationControl( { showCompass: false } ),
-				'top-left'
+				`top-${inlineStart}`
 			);
 
-			this.map.addControl( new mapboxgl.FullscreenControl(), 'top-left' );
+			this.map.addControl( new mapboxgl.FullscreenControl(), `top-${inlineStart}` );
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 
@@ -193,7 +197,7 @@ class Discovery extends Component {
 							{ legends[ index ].attributes.legend_title }
 						</div>
 					) }
-					{ parse( legendRender.outerHTML ) }
+					<span dangerouslySetInnerHTML={ { __html: legendRender.outerHTML } } />
 				</>
 			);
 		} );
@@ -242,10 +246,10 @@ class Discovery extends Component {
 				) }
 				{ this.state.mapLoaded ? <Sidebar { ...props } /> : '' }
 
-				<div
-					ref={ ( el ) => ( this.mapContainer = el ) }
-					className="discovery-map"
-				>
+				<div className="discovery-map">
+					<div className="discovery-map__container" ref={ ( el ) => ( this.mapContainer = el ) }>
+						{ /* Map container should be empty */ }
+					</div>
 					{ ! this.props.embed && (
 						<div
 							className={
@@ -445,14 +449,10 @@ class Discovery extends Component {
 
 if ( document.querySelector( '.discovery-embed' ) ) {
 	document.querySelectorAll( '.discovery-embed' ).forEach( ( element ) => {
-		wp.element.render(
-			<Discovery embed={ true } useStories={ false } />,
-			element
-		);
+		const root = createRoot( element );
+		root.render( <Discovery embed={ true } useStories={ false } /> );
 	} );
-} else if ( document.getElementById( 'discovery' ) ) {
-	wp.element.render(
-		<Discovery useStories={ true } />,
-		document.getElementById( 'discovery' )
-	);
+} else if ( document.querySelector( '#discovery' ) ) {
+	const root = createRoot( document.querySelector( '#discovery' ) );
+	root.render( <Discovery useStories={ true } /> );
 }

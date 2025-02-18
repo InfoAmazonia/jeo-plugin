@@ -1,12 +1,13 @@
-import { __ } from '@wordpress/i18n';
+import { Component, createRoot } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import classNames from 'classnames';
-import parse from 'html-react-parser';
 import mapboxgl from 'mapbox-gl';
-import React, { Component } from 'react';
 import scrollama from 'scrollama';
 
+import { onFirstIntersection } from '../shared/intersect';
 import { renderLayer } from './map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
+import { formatDate, formatHour, joinList } from '../shared/intl';
 
 import './storymap-display.scss';
 
@@ -17,9 +18,6 @@ const { map_defaults: mapDefaults } = window.jeo_settings;
 
 const isSingle = !!document.querySelector('.single-storymap');
 
-const dateFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { year: 'numeric', month: 'long', day: 'numeric' } );
-const hourFormat = new Intl.DateTimeFormat( window.jeoMapVars.currentLang, { hour: '2-digit', minute: '2-digit' } );
-
 const alignments = {
     'left': 'lefty',
     'center': 'centered',
@@ -27,6 +25,14 @@ const alignments = {
 }
 
 let storyCounter = 0;
+
+function getAuthorsLinks( storymap ) {
+	if ( storymap?.jeo_authors ) {
+		return sprintf( __( 'By %s' ), joinList( storymap.jeo_authors.map( ( author ) => `<a href="${author.permalink}">${author.name}</a>` ) ) );
+	} else {
+		return '';
+	}
+}
 
 function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
@@ -45,6 +51,7 @@ class StoryMapDisplay extends Component {
 		this.map = null;
 		this.el = null;
 		this.mapContainer = null;
+		this.navigable = Boolean(this.props.navigateButton);
 		this.navigateMap = null;
 		this.cid = ++storyCounter;
 
@@ -119,8 +126,7 @@ class StoryMapDisplay extends Component {
     componentDidMount() {
 		this.eagerInitStorymap();
 
-		const observer = new IntersectionObserver(this.lazyInitStorymap.bind(this), { threshold: 0 });
-		observer.observe(this.el);
+		onFirstIntersection( this.el, this.lazyInitStorymap.bind( this ) );
 	}
 
 	eagerInitStorymap() {
@@ -159,7 +165,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 					if( isLayerUsed || response.index === config.chapters.length - 1) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 1)
 					}
 				})
 
@@ -168,7 +174,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 					if ( !isLayerUsed ) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 0)
 					}
 				})
 		})
@@ -178,18 +184,18 @@ class StoryMapDisplay extends Component {
 
 				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
 				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
 					if( isLayerUsed ) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 1)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 1)
 					}
 				})
 
 				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
 					if ( !isLayerUsed ) {
-						this.map?.setPaintProperty(String(layer.id), 'raster-opacity', 0)
+						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 0)
 					}
 				})
 			}
@@ -197,12 +203,15 @@ class StoryMapDisplay extends Component {
 
 		window.addEventListener('resize', this.scroller.resize);
 
-		const navigateMapDiv = document.createElement('div');
-		navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
-		navigateMapDiv.dataset.map_id = this.props.map_id;
+		if (this.navigable) {
+			const navigateMapDiv = document.createElement('div');
+			navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
+			navigateMapDiv.dataset.map_id = this.props.map_id;
 
-		this.navigateMap = new JeoMap( navigateMapDiv );
-		this.el.querySelector('.navigate-map').append( navigateMapDiv );
+			this.navigateMap = new JeoMap( navigateMapDiv );
+			this.el.querySelector('.navigate-map').append( navigateMapDiv );
+			this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
+		}
 
 		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
 		window.fetch( url )
@@ -210,8 +219,6 @@ class StoryMapDisplay extends Component {
 				return response.json();
 			} )
 			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
-
-		this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
 
 		document.addEventListener('fullscreenchange', function() {
 			if ( document.fullscreenElement ) {
@@ -224,8 +231,8 @@ class StoryMapDisplay extends Component {
 		});
 	}
 
-	lazyInitStorymap([intersectionEntry]) {
-		if (this.initialized || !(intersectionEntry?.isIntersecting)) {
+	lazyInitStorymap() {
+		if ( this.initialized ) {
 			return;
 		}
 		this.initialized = true;
@@ -236,6 +243,7 @@ class StoryMapDisplay extends Component {
 
 		const map = new mapboxgl.Map( {
 			container: this.mapContainer,
+			projection: 'equirectangular',
 			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],
 			zoom: initialLocation.zoom || mapDefaults.zoom,
 			...config,
@@ -250,11 +258,11 @@ class StoryMapDisplay extends Component {
 			map.dragRotate.disable();
 
 			this.props.navigateMapLayers.forEach(layer => {
-				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
+				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
-				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: String(layer.id), visible: true });
+				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: layer.slug, visible: true });
 				jeoLayer.addLayer(map);
-				map.setPaintProperty(String(layer.id), 'raster-opacity', isInitialLayer ? 1 : 0);
+				map.setPaintProperty(layer.slug, 'raster-opacity', isInitialLayer ? 1 : 0);
 			});
 
 			this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
@@ -263,13 +271,16 @@ class StoryMapDisplay extends Component {
 	}
 
 	componentDidUpdate() {
-		this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+		const mapEl = this.el.querySelector('.mapboxgl-map');
+		if (mapEl) {
+			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
+		}
 
 		if(this.state.inSlides) {
 			this.state.currentChapter.selectedLayers.map(
 				( layer ) => {
 					const layerOptions = this.props.navigateMapLayers.find(
-						( { id } ) => id === layer.id
+						( { slug } ) => slug === layer.slug
 					);
 
 					if ( layerOptions ) {
@@ -286,8 +297,7 @@ class StoryMapDisplay extends Component {
 			this.props.navigateMapLayers.map(
 				( layer ) => {
 					// This is will force layer reordering to invalidate applied layers cache
-					const layerCopy = {...layer};
-					layerCopy.id = layerCopy.id + `_final_batch`;
+					const layerCopy = { ...layer, slug: layer.slug + '_final_batch' };
 
 					return renderLayer( {
 						layer: layerCopy.meta,
@@ -319,14 +329,15 @@ class StoryMapDisplay extends Component {
 							<div className={ classNames( [ 'storymap-header', theme ] ) } style={ { marginBottom: window.innerHeight / 3 } }>
 								{ this.state.postData && (
 									<>
-										<Heading className="storymap-page-title"> { parse(this.state.postData.title.rendered) }</Heading>
+										<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: this.state.postData.title.rendered } } />
 										<div className="post-info">
-											<p className="date">{ `${dateFormat.format(storyDate)} ${ __("at", "jeo") } ${hourFormat.format(storyDate)}` }</p>
+											<p className="author" dangerouslySetInnerHTML={ { __html: getAuthorsLinks( this.state.postData ) } } />
+											<p className="date">{ `${formatDate(storyDate)} ${ __("at", "jeo") } ${formatHour(storyDate)}` }</p>
 										</div>
 									</>
 								) }
 								{ this.config.subtitle &&
-									<h3 className="storymap-description">{ parse(decodeHtmlEntity( this.config.subtitle )) }</h3>
+									<h3 className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( this.config.subtitle ) } } />
 								}
 
 								<button
@@ -390,8 +401,8 @@ class StoryMapDisplay extends Component {
 														props={ this.props }
 														onClickFunction={ () => {
 															this.el.querySelector( '.navigate-map' ).style.display = 'block';
-															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } )
-															this.navigateMap.forceUpdate();
+															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } );
+															this.navigateMap?.forceUpdate();
 															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
 
 															window.scrollTo( 0,this.el.scrollHeight );
@@ -424,8 +435,7 @@ class StoryMapDisplay extends Component {
 						) }
 					</div>
 				</div>
-				<div style={ { display: 'none' } } className="navigate-map"></div>
-				<>
+				<div style={ { display: 'none' } } className="navigate-map">
 					<div className="return-to-slides-container">
 						<p className="icon-return">
 							<div
@@ -483,7 +493,7 @@ class StoryMapDisplay extends Component {
 							{ __('Back to top', 'jeo') }
 						</p>
 					</div>
-				</>
+				</div>
 			</section>
         );
     }
@@ -499,13 +509,13 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 				<div data-id={ id } className={ classList }>
 					<div className={ theme }>
 						{ title &&
-							<h3 className="title">{ parse(decodeHtmlEntity( title )) }</h3>
+							<h3 className="title" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( title ) } } />
 						}
 						{ image &&
 							<img src={ image } alt={ title }></img>
 						}
 						{ description &&
-							<p className="slide-description">{ parse(decodeHtmlEntity( description )) }</p>
+							<p className="slide-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( description ) } } />
 						}
 					</div>
 				</div>
@@ -538,8 +548,9 @@ function decodeHtml( html ) {
 }
 
 document.querySelectorAll( '.story-map-container' ).forEach( ( storyMapElement ) => {
+	const root = createRoot( storyMapElement );
 	const storyMapProps = JSON.parse( decodeHtml( storyMapElement.dataset.properties ) );
-	wp.element.render( <StoryMapDisplay { ...storyMapProps } />, storyMapElement );
+	root.render( <StoryMapDisplay { ...storyMapProps } /> );
 
 	// `overflow` avoids `position:sticky`
 	let parent = storyMapElement.parentElement;

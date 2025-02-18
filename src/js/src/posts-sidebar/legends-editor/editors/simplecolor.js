@@ -1,7 +1,6 @@
-import { Button, ColorPicker, Dropdown, TextControl, IconButton } from '@wordpress/components';
+import { Button, ColorPicker, Dropdown, TextControl } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { v4 as uuid } from 'uuid';
 
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
@@ -34,7 +33,7 @@ class SimplecolorEditor extends Component {
 							}
 							return {
 								...result,
-								id: uuid(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -96,11 +95,11 @@ class SimplecolorEditor extends Component {
 			let randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
 
 			if ( randomColor.length < 7 ) {
-				randomColor = randomColor.substr( 0, 4 );
+				randomColor = randomColor.slice( 0, 4 );
 			}
 
 			colors.push(
-				{ label: 'Default name', color: randomColor, id: uuid() },
+				{ label: 'Default name', color: randomColor, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
@@ -119,7 +118,7 @@ class SimplecolorEditor extends Component {
 				<div className="itens-wrapper">
 					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } />
 					) }
-					<Button isSecondary isButton isLarge onClick={ this.addItem } className="full-width-button">
+					<Button variant="secondary" isButton isLarge onClick={ this.addItem } className="full-width-button">
 						{ __( 'Add new label', 'jeo' ) }
 					</Button>
 				</div>
@@ -129,72 +128,50 @@ class SimplecolorEditor extends Component {
 	}
 }
 
-class ColorItem extends Component {
-	constructor( props ) {
-		super( props );
+function ColorItem( { item, itemChanged, removeItem } ) {
+	return (
+		<div className="color-item">
+			<Dropdown
+				className="color-item-wrapper"
+				contentClassName="item-drop-content"
+				popoverProps={ { placement: 'bottom' } }
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<div className="color-item" role="button" tabIndex={ 0 } onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: item.color } }> </div>
+				) }
+				renderContent={ () => (
+					<div>
+						<TextControl
+							className="label-input-wrapper"
+							label={ __( 'Label', 'jeo' ) }
+							value={ item.label }
+							onChange={ ( label ) => itemChanged( { ...item, label } ) }
+						/>
 
-		this.state = {
-			...this.props.item,
-		};
-	}
+						<ColorPicker
+							color={ item.color }
+							onChangeComplete={ ( color ) => itemChanged( { ...item, color: color.hex } ) }
+							disableAlpha
+						/>
 
-	render() {
-		return (
-			<div className="color-item">
-				<Dropdown
-					className="color-item-wrapper"
-					contentClassName="item-drop-content"
-					position="bottom center"
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<div className="color-item" role="button" tabIndex={ 0 } onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
-					) }
-					renderContent={ () => (
-						<div>
-							<TextControl
-								className="label-input-wrapper"
-								label={ __( 'Label', 'jeo' ) }
-								value={ this.state.label }
-								onChange={ ( label ) => {
-									// console.log( "selectedColor.id", this.state.selectedColor.id );
-									this.setState( { label } );
-									this.props.itemChanged( { ...this.state, label } );
-								} }
-							/>
+						<Button className="full-width-button" isDestructive isButton variant="secondary" onClick={ () => removeItem( item.id ) } >
+							{ __( 'Remove', 'jeo' ) }
+						</Button>
+					</div>
 
-							<ColorPicker
-								color={ this.state.color }
-								onChangeComplete={ ( color ) => {
-									// console.log( "selectedColor.id", this.state.selectedColor.id );
-									this.setState( { color: color.hex } );
-									this.props.itemChanged( this.state );
-								} }
-								disableAlpha
-							/>
-
-							<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
-								{ __( 'Remove', 'jeo' ) }
-							</Button>
-						</div>
-
-					) }
+				) }
+			/>
+			<div className="buttons-inputs">
+				<TextControl
+					className="label-input-wrapper"
+					label={ __( 'Label', 'jeo') }
+					value={ item.label }
+					onChange={ ( label ) => itemChanged( { ...item, label } ) }
 				/>
-				<div className="buttons-inputs">
-					<TextControl
-						className="label-input-wrapper"
-						label={ __( 'Label', 'jeo') }
-						value={ this.state.label }
-						onChange={ ( label ) => {
-							// console.log( "selectedColor.id", this.state.selectedColor.id );
-							this.setState( { label } );
-							this.props.itemChanged( { ...this.state, label } );
-						} }
-					/>
 
-					<IconButton icon="minus" label="Remove" onClick={ () => this.props.removeItem( this.state.id ) } className="remove-button" />
-				</div>
+				<Button icon="minus" label="Remove" onClick={ () => removeItem( item.id ) } className="remove-button" />
 			</div>
-		);
-	}
+		</div>
+	);
 }
 
 export default SimplecolorEditor;

@@ -1,12 +1,12 @@
 === JEO ===
 Contributors: earthjournalism
-Tested up to: 6.2.2
-Stable tag: 2.8.2
+Tested up to: 6.7.1
+Stable tag: 2.13.1
 Requires PHP: 7.2
-Requires at least: 5.8
+Requires at least: 6.2
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.8.2
+Version: 2.13.1
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -17,13 +17,13 @@ With JEO, creating the interaction between data layers and contextual informatio
 = Features =
 
 * [Mapbox](https://www.mapbox.com) maps;
-* [ReactMapBoxGL](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md) library;
+* [react-map-gl](https://visgl.github.io/react-map-gl/) library;
 * Custom tile layers;
 * Layer filtering options, allowing you to mix tile layers;
 * Geocoding WordPress posts using OpenStreetMaps(Nominatim), supporting the post type **Post**;
 * Customizable marker icons that can be associated with categories, custom taxonomies or posts directly;
 * Map markers query integrated to posts query;
-* Support (WPML)[https://wpml.org/pt-br/] and (Polylang)[https://br.wordpress.org/plugins/polylang/] multilanguage plugins.
+* Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguage plugins.
 
 == Installation ==
 
@@ -48,6 +48,61 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+
+= 2.13.1 =
+* Fix preview on posts geolocation
+
+= 2.13.0 =
+* Support for Co-Authors for `map` and `postmap` post types
+* Initial support for right-to-left UIs
+
+= 2.12.6 =
+* bugfix: Fix layer insertion bug when interactive style is not bottommost style layer
+
+= 2.12.5 =
+* bugfix: Fix position handling on storymap editor
+
+= 2.12.2 =
+* bugfix: Fix regression on updating `mapbox-tileset-vector` layers
+
+= 2.12.1 =
+* bugfix: Fix bugs on saving legends changes
+
+= 2.12.0 =
+* Consume MapboxGL from CDN
+* bugfix: Fix max zoom for cluster layer
+
+= 2.11.2 =
+* bugfix: Fix regression on interactions loading
+
+= 2.11.1 =
+* Improve rendering of maps and storymaps
+
+= 2.11.0 =
+* Upgrade to MapboxGL v3
+* Replace react-mapbox-gl with react-map-gl
+* Improve rendering of pages with many maps
+* bugfix: Improve rendering of maps that require custom Mapbox access tokens
+* bugfix: Fix pagination of stories on discovery page
+
+= 2.10.0 =
+* Update dependencies
+
+= 2.9.3 =
+* Add support for more syntax in EJS templates, via [eta](https://eta.js.org/docs/intro/template-syntax)
+* bugfix: Fix a regression that made popup template compilation fail
+* bugfix: Fix a warning on some wp-admin pages
+
+= 2.9.2 =
+* Update dependencies
+* Add missing translations
+
+= 2.9.1 =
+* bugfix: Fix story map size on new Chrome browsers
+
+= 2.9.0 =
+* Add support for PHP 8.2
+* Allow moving markers away from a found address
 
 = 2.8.2 =
 * bugfix: Always show spiderifier on max zoom

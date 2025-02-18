@@ -14,6 +14,7 @@ import Map from './map';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
+import { computeInlineEnd } from '../shared/direction';
 import './map-editor.css';
 import './storymap-editor.scss';
 
@@ -33,6 +34,16 @@ for (const color of baseColors) {
 		color.label = color.color
 	}
 	color.hasBorder = true
+}
+
+function createInitialViewState () {
+	return {
+		latitude: mapDefaults.lat,
+		longitude: mapDefaults.lng,
+		zoom: mapDefaults.zoom,
+		bearing: 0,
+		pitch: 0,
+	};
 }
 
 const StoryMapEditor = ( {
@@ -99,6 +110,19 @@ const StoryMapEditor = ( {
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ key, setKey ] = useState( 0 );
 	const [ storymapLayers, setStorymapLayers ] = useState( [] );
+	const [ viewState, setViewState ] = useState( createInitialViewState );
+	const [ inlineEnd ] = useState( computeInlineEnd );
+
+	useEffect( () => {
+		const currentSlide = attributes.slides?.[ currentSlideIndex ];
+		setViewState( {
+			latitude: currentSlide?.latitude || mapDefaults.lat,
+			longitude: currentSlide?.longitude || mapDefaults.lng,
+			zoom: currentSlide?.zoom || mapDefaults.zoom,
+			bearing: currentSlide?.bearing || 0,
+			pitch: currentSlide?.pitch || 0,
+		} );
+	}, [ attributes.slides, currentSlideIndex, setViewState ] );
 
 	useEffect( () => {
 		if(attributes.slides && loadedMap && loadedLayers) {
@@ -232,37 +256,24 @@ const StoryMapEditor = ( {
 					<div className="jeo-preview-area">
 						<Map
 							key={ key }
-							onStyleLoad={ ( map ) => {
-								setSelectedMap( map );
-								setStorymapLayers( layersContent )
-
-								map.addControl(
-									new mapboxgl.NavigationControl( { showCompass: false } ),
-									'top-right'
-								);
-
-								if ( loadedMap.meta.enable_fullscreen ) {
-									map.addControl(
-										new mapboxgl.FullscreenControl(),
-										'top-right'
-									);
+							controls={ `top-${inlineEnd}` }
+							fullscreen={ loadedMap.meta.enable_fullscreen }
+							style={ { height: '85vh' } }
+							latitude={ viewState.latitude }
+							longitude={ viewState.longitude }
+							zoom={ viewState.zoom }
+							bearing={ viewState.bearing }
+							pitch={ viewState.pitch }
+							onStyleData={ ( event ) => {
+								const map = event.style?.map ?? null;
+								if ( ! selectedMap && map ) {
+									setSelectedMap( map );
+									setStorymapLayers( layersContent );
 								}
 							} }
-							style="mapbox://styles/mapbox/streets-v11"
-							zoom={ [
-								attributes.slides[ currentSlideIndex ].zoom || mapDefaults.zoom,
-							] }
-							center={ [
-								attributes.slides[ currentSlideIndex ].longitude ||
-									mapDefaults.lng,
-								attributes.slides[ currentSlideIndex ].latitude ||
-									mapDefaults.lat,
-							] }
-							bearing={
-								[ attributes.slides[ currentSlideIndex ].bearing ] || 0
-							}
-							pitch={ [ attributes.slides[ currentSlideIndex ].pitch ] || 0 }
-							containerStyle={ { height: '85vh' } }
+							onMove={ ( event ) => {
+								setViewState( event.viewState );
+							} }
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(
 								( layer ) => {
@@ -392,7 +403,7 @@ const StoryMapEditor = ( {
 												</button>
 												<Panel key={ key } className="slide-panel">
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( index + 1 ) }
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( index + 1 ) }
 														initialOpen={
 															(index === currentSlideIndex ? true : false) && !isDragged
 														}
@@ -750,7 +761,7 @@ const StoryMapEditor = ( {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-								{ __('Current slide: ', 'jeo' ) }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide ', 'jeo' ) + ( currentSlideIndex + 1 ) }
+								{ __('Current slide:', 'jeo' ) + ' ' }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
@@ -785,7 +796,7 @@ const StoryMapEditor = ( {
 					<div className="jeo-preview-controls">
 						<span>
 							<strong>
-								{ __("Map: ", "jeo") }
+								{ __("Map:", "jeo") + ' ' }
 								{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
 						</span>
 					</div>
@@ -826,7 +837,7 @@ const StoryMapEditor = ( {
 						<Button
 							className="select-another-map"
 							isLarge
-							isPrimary
+							variant="primary"
 							style={ { marginTop: '10px' } }
 							onClick={ () => {
 								const previous_map = attributes.previous_map;
@@ -853,7 +864,7 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 			'map',
 			attributes.map_id,
 		] ),
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'menu_order', ID: 122820 } ),
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'title' } ),
 	loadingLayers: select( 'core/data' ).isResolving(
 		'core',
 		'getEntityRecords',

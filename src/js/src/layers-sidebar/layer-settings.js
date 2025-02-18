@@ -38,7 +38,7 @@ const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
 };
 
 function usePrevious( value ) {
-	const ref = useRef();
+	const ref = useRef( undefined );
 	useEffect( () => {
 		ref.current = value;
 	}, [ value ] );
@@ -146,7 +146,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 						/>
 					) }
 
-					<Button isPrimary onClick={ openModal }>
+					<Button variant="primary" onClick={ openModal }>
 						{ __( 'Edit interactions', 'jeo' ) }
 					</Button>
 				</Fragment>

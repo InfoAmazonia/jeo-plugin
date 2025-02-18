@@ -215,7 +215,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					</div>
 					</p>
 					<p>
-						<Button isPrimary isLarge onClick={ setPanLimitsFromMap }>
+						<Button variant="primary" isLarge onClick={ setPanLimitsFromMap }>
 							{ __( 'Set current as map settings', 'jeo' ) }
 						</Button>
 					</p>

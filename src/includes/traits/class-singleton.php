@@ -19,17 +19,9 @@ trait Singleton {
 		$this->init();
 	}
 
-	private function __clone() {
-
-	}
-
-	private function __wakeup() {
-
-	}
-
 	public function should_load_assets() {
-		// This is a workarround! The right way is to refractor all enqueues to have their individuals enqueues for admin and a custom condicioned one to front-end
-		if(is_admin( )) {
+		// This is a workaround! The right way is to refactor all enqueues to have their individuals enqueues for admin and a custom conditional one to front-end
+		if ( is_admin() ) {
 			return true;
 		}
 
@@ -39,24 +31,22 @@ trait Singleton {
 			'jeo/storymap'
 		];
 
-		$use_any_block = false;
+		$should_load_assets = false;
 		$post_id = get_the_ID();
+		$post_type = get_post_type();
 
-		foreach($mapblocks as $block) {
-			// echo $block;
-			if(has_block( $block, $post_id )) {
-				$use_any_block = true;
+		foreach ( $mapblocks as $block ) {
+			if ( has_block( $block, $post_id ) ) {
+				$should_load_assets = true;
 				break;
 			}
 		}
 
-		$should_load_assets = $use_any_block;
-
-		if(in_array(get_post_type(), array_merge(\jeo_settings()->get_option( 'enabled_post_types' ), [ 'map' ]))) {
+		if ( in_array( $post_type, array_merge( \jeo_settings()->get_option( 'enabled_post_types' ), [ 'map' ] ) ) ) {
 			$should_load_assets = true;
 		}
 
-		if(get_page_template_slug() === 'discovery.php') {
+		if ( get_page_template_slug() === 'discovery.php' ) {
 			$should_load_assets = true;
 		}
 

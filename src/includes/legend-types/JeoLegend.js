@@ -1,6 +1,4 @@
 import JeoLegendTypes from './JeoLegendTypes';
-import { v4 as uuid } from 'uuid';
-
 
 class JeoLegend {
 	constructor( legendTypeSlug, attributes ) {
@@ -36,11 +34,11 @@ class JeoLegend {
 				right_label: '100',
 				colors: [ {
 					color: '#ff0909',
-					id: uuid(),
+					id: crypto.randomUUID(),
 					},
 					{
 					color:'#000',
-					id: uuid(),
+					id: crypto.randomUUID(),
 					}
 				],
 			},

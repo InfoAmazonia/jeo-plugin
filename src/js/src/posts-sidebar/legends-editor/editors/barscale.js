@@ -1,7 +1,6 @@
 import { Component, Fragment } from '@wordpress/element';
 import { ColorPicker, Dropdown, Button, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { v4 as uuid } from 'uuid';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 import '../editors/barscale.css';
@@ -33,7 +32,7 @@ class BarscaleEditor extends Component {
 							}
 							return {
 								...result,
-								id: uuid(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -101,11 +100,11 @@ class BarscaleEditor extends Component {
 			let randomColor = '#' + ( Math.random() * 0xFFFFFF << 0 ).toString( 16 );
 
 			if ( randomColor.length < 7 ) {
-				randomColor = randomColor.substr( 0, 4 );
+				randomColor = randomColor.slice( 0, 4 );
 			}
 
 			colors.push(
-				{ color: randomColor, id: uuid() },
+				{ color: randomColor, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
@@ -178,45 +177,31 @@ class BarscaleEditor extends Component {
 	}
 }
 
-class ColorItem extends Component {
-	constructor( props ) {
-		super( props );
+function ColorItem( { item, itemChanged, removeItem } ) {
+	return (
+		<Dropdown
+			className="color-item-wrapper"
+			popoverProps={ { placement: 'bottom' } }
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<div className="color-item" onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: item.color } }> </div>
+			) }
+			renderContent={ () => (
+				<div>
+					<ColorPicker
+						color={ item.color }
+						onChangeComplete={ ( color ) => itemChanged( { ...item, color: color.hex } ) }
+						disableAlpha
+					/>
 
-		this.state = {
-			...this.props.item,
-		};
-	}
+					<Button className="full-width-button" isDestructive isButton variant="secondary" onClick={ () => removeItem( item.id ) } >
+						{ __( 'Remove', 'jeo' ) }
+					</Button>
+				</div>
 
-	render() {
-		return (
-			<Dropdown
-				className="color-item-wrapper"
-				position="bottom center"
-				renderToggle={ ( { isOpen, onToggle } ) => (
-					<div className="color-item" onClick={ onToggle } aria-expanded={ isOpen } style={ { backgroundColor: this.state.color } }> </div>
-				) }
-				renderContent={ () => (
-					<div>
-						<ColorPicker
-							color={ this.state.color }
-							onChangeComplete={ ( color ) => {
-								// console.log( "selectedColor.id", this.state.selectedColor.id );
-								this.setState( { color: color.hex } );
-								this.props.itemChanged( this.state );
-							} }
-							disableAlpha
-						/>
+			) }
+		/>
 
-						<Button className="full-width-button" isDestructive isButton isSecondary onClick={ () => this.props.removeItem( this.state.id ) } >
-							{ __( 'Remove', 'jeo' ) }
-						</Button>
-					</div>
-
-				) }
-			/>
-
-		);
-	}
+	);
 }
 
 export default BarscaleEditor;

@@ -260,19 +260,14 @@ class MapLayers extends Component {
 			} else if ( layer.meta.type === 'mapbox' ) {
 				if ( map.getLayer( layerId ) === undefined ) {
 					if ( ! map.getSource( layerId ) ) {
-						let styleId = attributes.layer_type_options.style_id;
+						const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
 
-						if ( styleId ) {
-							styleId = styleId.replace( 'mapbox://styles/', '' );
-						}
+						const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
 						map.addSource( layerId, {
 							type: 'raster',
 							tiles: [
-								'https://api.mapbox.com/styles/v1/' +
-									styleId +
-									'/tiles/512/{z}/{x}/{y}@2x?access_token=' +
-									window.mapboxgl.accessToken,
+								`https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 							],
 						} );
 					}
@@ -302,7 +297,7 @@ class MapLayers extends Component {
 						id: layerId,
 						type: attributes.layer_type_options.type,
 						source: layerId,
-						'source-layer': attributes.source_layer,
+						'source-layer': attributes.layer_type_options.source_layer,
 					};
 
 					map.addLayer( newLayer );
@@ -342,13 +337,10 @@ class MapLayers extends Component {
 						} );
 					}
 
-					// console.log(layerId);
-
 					const newLayer = {
 						id: layerId,
 						type: attributes.layer_type_options.type,
 						source: layerId,
-						'source-layer': '',
 					};
 
 					map.addLayer( newLayer );

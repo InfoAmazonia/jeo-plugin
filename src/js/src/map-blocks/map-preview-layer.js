@@ -1,13 +1,9 @@
-import { Fragment } from '@wordpress/element';
-import { Layer, Source } from 'react-mapbox-gl';
+import { Layer, Source } from 'react-map-gl';
 import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
 
-export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
-	if (
-		[ 'swappable', 'switchable' ].includes( instance.use ) &&
-		! instance.default
-	) {
+export function renderLayer( { layer, instance } ) {
+	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {
 		return null;
 	}
 
@@ -16,106 +12,57 @@ export function renderLayer( { layer, instance, onSourceLoadedCallback } ) {
 	const sourceId = `source_${ instance.id }`;
 
 	switch ( layer.type ) {
-		case 'mapbox':
+		case 'mapbox': {
 			const accessToken = options.access_token || window.mapboxgl.accessToken;
 
-			let style_id = options.style_id;
-			if ( style_id ) {
-				style_id = style_id.replace( 'mapbox://styles/', '' );
-			}
+			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
+			const styleUrl = `https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`
 
 			return (
-				<Fragment>
-					<Source
-						id={ sourceId }
-						tileJsonSource={ {
-							type: 'raster',
-							tiles: [
-								`https://api.mapbox.com/styles/v1/${ style_id }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
-							],
-						} }
-						onSourceLoaded={ () => {
-							if ( onSourceLoadedCallback ) {
-								onSourceLoadedCallback();
-							}
-						} }
-					/>
-					<Layer id={ layerId } type="raster" sourceId={ sourceId } />
-				</Fragment>
+				<Source key={ styleUrl } id={ sourceId } type="raster" tiles={ [ styleUrl ] }>
+					<Layer id={ layerId } type="raster" />
+				</Source>
 			);
-		case 'mapbox-tileset-vector':
-		case 'mapbox-tileset-raster':
-			let tileset_id = options.tileset_id;
+		}
 
-			if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
-				tileset_id = 'mapbox://' + tileset_id;
-			}
+		case 'mapbox-tileset-raster': {
+			const tilesetId = options.tileset_id;
+			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
 
 			return (
-				<Fragment>
-					<Source
-						id={ sourceId }
-						tileJsonSource={ {
-							type: options.style_source_type,
-							url: `mapbox://${ options.tileset_id }`,
-						} }
-						onSourceLoaded={ () => {
-							if ( onSourceLoadedCallback ) {
-								onSourceLoadedCallback();
-							}
-						} }
-					/>
-					<Layer
-						id={ layerId }
-						type={ options.type }
-						sourceId={ sourceId }
-						sourceLayer={ options.source_layer }
-					/>
-				</Fragment>
+				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
+					<Layer id={ layerId } type={ options.type } />
+				</Source>
 			);
-		case 'mvt':
+		}
+
+		case 'mapbox-tileset-vector': {
+			const tilesetId = options.tileset_id;
+			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
+
 			return (
-				<Fragment>
-					<Source
-						id={ sourceId }
-						tileJsonSource={ {
-							type: options.style_source_type,
-							tiles: [ options.url ],
-						} }
-						onSourceLoaded={ () => {
-							if ( onSourceLoadedCallback ) {
-								onSourceLoadedCallback();
-							}
-						} }
-					/>
-					<Layer
-						id={ layerId }
-						type={ options.type }
-						source={ sourceId }
-						sourceLayer={ options.source_layer }
-					/>
-				</Fragment>
+				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+				</Source>
 			);
-		case 'tilelayer':
+		}
+
+		case 'mvt': {
 			return (
-				<Fragment>
-					<Source
-						id={ sourceId }
-						tileJsonSource={ {
-							type: 'raster',
-							tiles: [ options.url ],
-							tileSize: 256,
-							scheme: options.scheme || 'xyz',
-						} }
-						onSourceLoaded={ () => {
-							if ( onSourceLoadedCallback ) {
-								onSourceLoadedCallback();
-							}
-						} }
-					/>
-					<Layer id={ layerId } type="raster" sourceId={ sourceId } />
-				</Fragment>
+				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+				</Source>
 			);
+		}
+
+		case 'tilelayer': {
+			return (
+				<Source id={ sourceId } type="raster" tiles={ [ options.url ] } tileSize={ 256 } scheme={ options.scheme || 'xyz' }>
+					<Layer id={ layerId } type="raster" />
+				</Source>
+			);
+		}
+
 		default:
 			return null;
 	}

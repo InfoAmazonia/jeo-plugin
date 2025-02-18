@@ -1,12 +1,5 @@
-import {
-	useRef,
-} from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import styled, { keyframes } from 'styled-components';
-import PropTypes from 'prop-types';
-
-const ImageWrapper = styled.div`
-
-`;
 
 const loadingAnimation = keyframes`
 	0%{
@@ -19,8 +12,8 @@ const loadingAnimation = keyframes`
 
 const Placeholder = styled.div`
 	position: absolute;
+	inset-inline-start: 0;
 	top: 0;
-	left: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
@@ -36,7 +29,7 @@ const Placeholder = styled.div`
 
 const StyledImage = styled.img`
 	position: absolute;
-	left: 0;
+	inset-inline-start: 0;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
@@ -51,7 +44,7 @@ const Wrapper = styled.div`
 `;
 
 const LazyImage = ( { src, alt } ) => {
-	const refPlaceholder = useRef();
+	const refPlaceholder = useRef( undefined );
 
 	const removePlaceholder = () => {
 		refPlaceholder.current.remove();
@@ -65,14 +58,10 @@ const LazyImage = ( { src, alt } ) => {
 				onError={ removePlaceholder }
 				src={ src }
 				alt={ alt }
+				loading="lazy"
 			/>
 		</Wrapper>
 	);
-};
-
-LazyImage.propTypes = {
-	src: PropTypes.string.isRequired,
-	alt: PropTypes.string.isRequired,
 };
 
 export default LazyImage;

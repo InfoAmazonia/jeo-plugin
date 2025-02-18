@@ -8,6 +8,8 @@ class Settings {
 
 	public $option_key = 'jeo-settings';
 
+	private $default_options = [];
+
 	protected function init() {
 
 		$this->default_options = [
@@ -83,7 +85,7 @@ class Settings {
 	public function enqueue_admin_scripts($page) {
 		if ($page == 'jeo_page_jeo-settings') {
 			wp_enqueue_media();
-			wp_enqueue_script('jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', ['jquery']);
+			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery' ), JEO_VERSION );
 			wp_set_script_translations( 'jeo-settings', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
 
 		}
