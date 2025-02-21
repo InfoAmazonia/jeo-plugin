@@ -1,5 +1,4 @@
 import { Button, Card, CardBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
-import { withInstanceId } from '@wordpress/compose';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { select } from '@wordpress/data';
@@ -17,14 +16,7 @@ const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
 const anySwapDefault = ( settings ) =>
 	settings.some( ( s ) => s.use === 'swappable' && s.default );
 
-const LayersSettings = ( {
-	instanceId,
-	attributes,
-	setAttributes,
-	loadingLayers,
-	loadedLayers,
-	closeModal,
-} ) => {
+export default function LayersSettings ( { attributes, setAttributes, loadingLayers, loadedLayers, closeModal } ) {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
@@ -492,5 +484,3 @@ const LayersSettings = ( {
 		</Fragment>
 	);
 };
-
-export default withInstanceId( LayersSettings );
