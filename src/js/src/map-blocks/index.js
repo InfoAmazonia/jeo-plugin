@@ -143,10 +143,26 @@ registerBlockType( 'jeo/onetime-map', {
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
 } );
 
-const storyMapCleanUp = (props) => {
-	const propsCopy = cloneDeep(props);
+function cleanupLayer( object, version = 2 ) {
+	if ( object ) {
+		if ( object.yoast_head ) {
+			delete object.yoast_head;
+		}
+		if ( version >= 2 ) {
+			const keys = [ 'yoast_head_json', '_links', 'content' ];
+			for ( const key of keys ) {
+				if ( object[ key ] ) {
+					delete object[ key ];
+				}
+			}
+		}
+	}
+}
 
-	const attributesStructure = {
+function cleanupStorymap( attributes, version = 2 ) {
+	const attributesCopy = cloneDeep( attributes );
+
+	const cleanAttributes = {
 		map_id: null,
 		description: null,
 		slides: [],
@@ -157,42 +173,33 @@ const storyMapCleanUp = (props) => {
 		postID: null,
 	};
 
-	for (const key in attributesStructure) {
-		if(propsCopy.attributes[key]) {
-			attributesStructure[key] = propsCopy.attributes[key];
+	for ( const key in cleanAttributes ) {
+		if ( attributesCopy[ key] ) {
+			cleanAttributes[ key ] = attributesCopy[ key ];
 		}
 	}
 
-	function removeYoastTagsFromObject(object) {
-		if( object && object.hasOwnProperty('yoast_head') ) {
-			delete object.yoast_head;
-		}
+	for ( const layer of cleanAttributes.navigateMapLayers ) {
+		cleanupLayer( layer );
 	}
 
-	attributesStructure.navigateMapLayers.forEach( item => {
-		removeYoastTagsFromObject(item);
-		delete item.content;
-	})
-
-	attributesStructure.slides.forEach( slide => {
-		slide.selectedLayers.forEach( layer => {
-			// Remove yoast tags that are unecessary
-			removeYoastTagsFromObject(layer);
-
-			// Remove slide content from future JSON
-			if(layer.content) {
-				delete layer.content;
-			}
-		} )
-	})
+	for ( const slide of cleanAttributes.slides ) {
+		for ( const layer of slide.selectedLayers ) {
+			cleanupLayer( layer, version );
+		}
+	}
 
 	// Loaded layers aren't used properly
-	attributesStructure.loadedLayers = [];
+	if ( version === 1 ) {
+		cleanAttributes.loadedLayers = [];
+	} else {
+		cleanAttributes.loadedLayers = undefined;
+	}
 
-	return attributesStructure;
+	return cleanAttributes;
 }
 
-registerBlockType( 'jeo/storymap', {
+const baseStorymapBlock = {
 	title: __( 'Story Map', 'jeo' ),
 	description: __( 'Display maps with storytelling', 'jeo' ),
 	category: 'jeo',
@@ -213,9 +220,6 @@ registerBlockType( 'jeo/storymap', {
 		hasIntroduction: {
 			type: 'boolean',
 		},
-		loadedLayers: {
-			type: 'array',
-		},
 		navigateMapLayers: {
 			type: 'array'
 		},
@@ -228,10 +232,39 @@ registerBlockType( 'jeo/storymap', {
 			<StorymapEditor { ...props } />
 		</AsyncModeProvider>
 	),
-	save: ( props ) => {
-		const attributesStructure = storyMapCleanUp(props);
-		return JSON.stringify(attributesStructure)
+};
+
+registerBlockType( 'jeo/storymap', {
+	...baseStorymapBlock,
+	save: ( { attributes } ) => {
+		const cleanAttributes = cleanupStorymap( attributes, 2 );
+		console.log( 2.2, cleanAttributes );
+		return JSON.stringify(cleanAttributes)
 	},
+	deprecated: [
+		{
+			...baseStorymapBlock,
+			attributes: {
+				...baseStorymapBlock.attributes,
+				loadedLayers: {
+					type: 'array',
+				},
+			},
+			isEligible: ( attributes ) => {
+				console.log( 'testing eligibility', attributes );
+				return true;
+			},
+			migrate: ( attributes ) => {
+				console.log( 2.1, cleanupStorymap( attributes, 2 ));
+				return cleanupStorymap( attributes, 2 );
+			},
+			save: ( { attributes } ) => {
+				const cleanAttributes = cleanupStorymap( attributes, 1 );
+				console.log( 1, cleanAttributes );
+				return JSON.stringify(cleanAttributes)
+			},
+		},
+	],
 } );
 
 registerBlockType( 'jeo/embedded-storymap', {
