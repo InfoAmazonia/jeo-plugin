@@ -152,7 +152,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			setAttributes( {
 				...attributes,
 				slides: newSlides,
-				loadedLayers,
+				loadedLayers: [],
 				navigateMapLayers: [ ...loadedLayers ],
 			} );
 
@@ -162,7 +162,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 		setAttributes( {
 			...attributes,
-			loadedLayers,
+			loadedLayers: [],
 			navigateMapLayers: loadedLayers,
 		} );
 	}, [ loadedMap, loadedLayers ] );
@@ -210,7 +210,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 						bearing: 0,
 					},
 				],
-				loadedLayers,
+				loadedLayers: [],
 				navigateMapLayers: [],
 			} );
 		}
@@ -811,7 +811,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 										bearing: 0,
 									},
 								],
-								loadedLayers,
+								loadedLayers: [],
 								navigateMapLayers: [],
 							} )
 						}
