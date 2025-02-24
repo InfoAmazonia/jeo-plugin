@@ -143,44 +143,40 @@ registerBlockType( 'jeo/onetime-map', {
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
 } );
 
-function cleanupLayer( object, version = 2 ) {
-	if ( object ) {
-		if ( object.yoast_head ) {
-			delete object.yoast_head;
-		}
-		if ( version >= 2 ) {
-			const keys = [ 'yoast_head_json', '_links', 'content' ];
-			for ( const key of keys ) {
-				if ( object[ key ] ) {
-					delete object[ key ];
-				}
+function cleanupLayer( object, version = 1 ) {
+	if ( object && version >= 2 ) {
+		const keys = [ 'yoast_head', 'yoast_head_json', '_links', 'content' ];
+		for ( const key of keys ) {
+			if ( object[ key ] ) {
+				delete object[ key ];
 			}
 		}
 	}
 }
 
-function cleanupStorymap( attributes, version = 2 ) {
+export function cleanupStorymap( attributes, version = 1 ) {
 	const attributesCopy = cloneDeep( attributes );
 
 	const cleanAttributes = {
+		version: undefined,
 		map_id: null,
-		description: null,
+		description: undefined,
 		slides: [],
-		navigateButton: null,
-		hasIntroduction: null,
-		// loadedLayers: null,
+		navigateButton: undefined,
+		hasIntroduction: undefined,
+		loadedLayers: [],
 		navigateMapLayers: [],
 		postID: null,
 	};
 
-	for ( const key in cleanAttributes ) {
+	for ( const key in attributes ) {
 		if ( attributesCopy[ key] ) {
 			cleanAttributes[ key ] = attributesCopy[ key ];
 		}
 	}
 
 	for ( const layer of cleanAttributes.navigateMapLayers ) {
-		cleanupLayer( layer );
+		cleanupLayer( layer, version );
 	}
 
 	for ( const slide of cleanAttributes.slides ) {
@@ -189,11 +185,8 @@ function cleanupStorymap( attributes, version = 2 ) {
 		}
 	}
 
-	// Loaded layers aren't used properly
-	if ( version === 1 ) {
+	if (version >= 2) {
 		cleanAttributes.loadedLayers = [];
-	} else {
-		cleanAttributes.loadedLayers = undefined;
 	}
 
 	return cleanAttributes;
