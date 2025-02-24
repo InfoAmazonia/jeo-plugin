@@ -258,32 +258,35 @@ class Jeo {
 
 	private function cleanup_layers ($layers) {
 		foreach ($layers as $layer) {
-			if (isset($layer['yoast_head'])) {
-				unset($layer['yoast_head']);
+			if (property_exists($layer, 'yoast_head')) {
+				unset($layer->yoast_head);
 			}
-			if (isset($layer['yoast_head_json'])) {
-				unset($layer['yoast_head_json']);
+			if (property_exists($layer, 'yoast_head_json')) {
+				unset($layer->yoast_head_json);
+			}
+			if (property_exists($layer, '_links')) {
+				unset($layer->_links);
 			}
 		}
 	}
 
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
-		$saved_data = $block_attributes;
+		$saved_data = json_decode($content);
 
-		$map_id = $saved_data['map_id'];
+		$map_id = $saved_data->map_id;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
 
 		if(!function_exists('layer_still_exists')) {
 			function layer_still_exists($map_layers, $selected_layer) {
-				$layer_status = get_post_status($selected_layer['id']);
+				$layer_status = get_post_status($selected_layer->id);
 				if($layer_status == "trash" || $layer_status == false ||  $layer_status == "private" ) {
 					return false;
 				}
 
 				foreach($map_layers as $layer) {
-					if($layer["id"] == $selected_layer['id']) {
-						$selected_layer['meta']['type'] = get_post_meta($layer['id'], 'type', true);
-						$selected_layer['meta']['layer_type_options'] = (object) get_post_meta($layer['id'], 'layer_type_options', true);
+					if($layer["id"] == $selected_layer->id) {
+						$selected_layer->meta->type = get_post_meta($layer['id'], 'type', true);
+						$selected_layer->meta->layer_type_options = (object) get_post_meta($layer['id'], 'layer_type_options', true);
 						return true;
 					}
 				}
@@ -293,37 +296,37 @@ class Jeo {
 		}
 
 		// Remove not present layers from selectedLayers -- Fix selected layers order
-		foreach($saved_data['slides'] as $slide) {
-			foreach($slide['selectedLayers'] as $index => $selected_layer) {
+		foreach($saved_data->slides as $slide) {
+			foreach($slide->selectedLayers as $index => $selected_layer) {
 				// Check if the selected layers exists in the map
 				if(!layer_still_exists($map_layers, $selected_layer)) {
-					array_splice($slide['selectedLayers'], $index, 1);
+					array_splice($slide->selectedLayers, $index, 1);
 				}
 			}
 
 			$selected_layers_order = [];
 
 			foreach ($map_layers as $layer) {
-				foreach($slide['selectedLayers'] as $index => $selected_layer) {
-					if($selected_layer['id'] == $layer['id']) {
+				foreach($slide->selectedLayers as $index => $selected_layer) {
+					if($selected_layer->id == $layer['id']) {
 						$selected_layers_order[] = $selected_layer;
 					}
 				}
 			}
 
-			$slide['selectedLayers'] = $selected_layers_order;
-			$this->cleanup_layers($slide['selectedLayers']);
+			$slide->selectedLayers = $selected_layers_order;
+			$this->cleanup_layers($slide->selectedLayers);
 		}
 
 		// Remove not present layers from navigateMapLayers and create new order
 		$final_navigate_map_layers = [];
 
 		foreach ($map_layers as $layer) {
-			foreach($saved_data['navigateMapLayers'] as $index => $navigate_layer) {
-				if($navigate_layer['id'] == $layer['id']) {
+			foreach($saved_data->navigateMapLayers as $index => $navigate_layer) {
+				if($navigate_layer->id == $layer['id']) {
 					// Update meta / types
 					if(!layer_still_exists($map_layers, $navigate_layer)) {
-						array_splice($saved_data['navigateMapLayers'], $index, 1);
+						array_splice($saved_data->navigateMapLayers, $index, 1);
 					} else {
 						$final_navigate_map_layers[] = $navigate_layer;
 					}
@@ -331,9 +334,9 @@ class Jeo {
 			}
 		}
 
-		$saved_data['navigateMapLayers'] = $final_navigate_map_layers;
-		$this->cleanup_layers($saved_data['navigateMapLayers']);
-		$saved_data['loadedLayers'] = [];
+		$saved_data->navigateMapLayers = $final_navigate_map_layers;
+		$this->cleanup_layers($saved_data->navigateMapLayers);
+		$saved_data->loadedLayers = [];
 
 		// Option `use_smilies` breaks returned HTML :'-(
 		add_filter('option_use_smilies', function ($value) {

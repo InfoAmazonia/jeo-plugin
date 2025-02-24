@@ -192,7 +192,7 @@ export function cleanupStorymap( attributes, version = 1 ) {
 	return cleanAttributes;
 }
 
-const baseStorymapBlock = {
+registerBlockType( 'jeo/storymap', {
 	title: __( 'Story Map', 'jeo' ),
 	description: __( 'Display maps with storytelling', 'jeo' ),
 	category: 'jeo',
@@ -219,45 +219,19 @@ const baseStorymapBlock = {
 		postID : {
 			type: 'number',
 		},
+		version: {
+			type: 'number',
+		},
 	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>
 			<StorymapEditor { ...props } />
 		</AsyncModeProvider>
 	),
-};
-
-registerBlockType( 'jeo/storymap', {
-	...baseStorymapBlock,
 	save: ( { attributes } ) => {
-		const cleanAttributes = cleanupStorymap( attributes, 2 );
-		console.log( 2.2, cleanAttributes );
+		const cleanAttributes = cleanupStorymap( attributes, attributes.version ?? 1 );
 		return JSON.stringify(cleanAttributes)
 	},
-	deprecated: [
-		{
-			...baseStorymapBlock,
-			attributes: {
-				...baseStorymapBlock.attributes,
-				loadedLayers: {
-					type: 'array',
-				},
-			},
-			isEligible: ( attributes ) => {
-				console.log( 'testing eligibility', attributes );
-				return true;
-			},
-			migrate: ( attributes ) => {
-				console.log( 2.1, cleanupStorymap( attributes, 2 ));
-				return cleanupStorymap( attributes, 2 );
-			},
-			save: ( { attributes } ) => {
-				const cleanAttributes = cleanupStorymap( attributes, 1 );
-				console.log( 1, cleanAttributes );
-				return JSON.stringify(cleanAttributes)
-			},
-		},
-	],
 } );
 
 registerBlockType( 'jeo/embedded-storymap', {
