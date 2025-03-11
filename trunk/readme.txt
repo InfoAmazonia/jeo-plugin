@@ -1,12 +1,12 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 6.7.1
-Stable tag: 2.13.1
+Stable tag: 2.14.0
 Requires PHP: 7.2
 Requires at least: 6.2
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.13.1
+Version: 2.14.0
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -48,6 +48,10 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+
+= 2.14.0 =
+* Optimize the loading speed of storymaps editor
+* Optimize the size of saved storymaps (up to ~50%)
 
 = 2.13.1 =
 * Fix preview on posts geolocation
@@ -355,6 +359,14 @@ Copying this link and pasting it on the post editor will result in an embedded m
 2. Change the Common Settings (you may change to a different setting and then change back to the original) and click on `Save Changes`.
 
 Now you should be able to see the embedded maps with no problems.
+
+== Troubleshooting ==
+
+= Why do I see a "memory exhausted" fatal error when editing a storymap? =
+
+One likely reason is that the Gutenberg editor is failing to load all revisions to your post.
+
+We recommend keeping only the last 5 (five) revisions for each storymap -- see [Jetpack documentation](https://jetpack.com/resources/wordpress-revisions/) for more details.
 
 == Developer documentation ==
 
