@@ -23,7 +23,7 @@
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "^5.1.0",
 		"@wordpress/edit-post": "^8.16.0",
-		"@wordpress/editor": "^14.16.0",
+		"@wordpress/editor": "^14.18.0",
 		"@wordpress/plugins": "^7.16.0",
 		"bootstrap-daterangepicker": "^3.1.0",
 		"ckeditor5-build-full": "^25.0.0",

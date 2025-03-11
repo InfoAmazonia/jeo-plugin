@@ -1,11 +1,12 @@
-import { compose, withInstanceId } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { Fragment } from '@wordpress/element';
+import { Fragment, useId } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import JeoAutosuggest from './jeo-autosuggest';
 
-function EmbeddedStorymapEditor ({ attributes, instanceId, loadedStory, setAttributes }) {
+function EmbeddedStorymapEditor ({ attributes, loadedStory, setAttributes }) {
+	const instanceId = useId();
 	const inputId = `jeo-storymap-autosuggest-${ instanceId }`
 
 	return (
@@ -31,4 +32,4 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 	loadedStory: attributes.storyID && select( 'core' ).getEntityRecord( 'postType', 'storymap', attributes.storyID ),
 } ) );
 
-export default compose( withInstanceId, applyWithSelect )( EmbeddedStorymapEditor );
+export default compose( applyWithSelect )( EmbeddedStorymapEditor );

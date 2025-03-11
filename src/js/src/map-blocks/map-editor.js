@@ -1,7 +1,7 @@
 import { Button, Spinner } from '@wordpress/components';
-import { compose, withInstanceId } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useId, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Map from './map';
@@ -14,11 +14,11 @@ const { map_defaults: mapDefaults } = window.jeo_settings;
 const MapEditor = ( {
 	attributes,
 	setAttributes,
-	instanceId,
 	loadedLayers,
 	loadedMap,
 	loadingMap,
 } ) => {
+	const instanceId = useId();
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
 		setKey( key + 1 );
@@ -157,4 +157,4 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 	),
 } ) );
 
-export default compose( withInstanceId, applyWithSelect )( MapEditor );
+export default compose( applyWithSelect )( MapEditor );
