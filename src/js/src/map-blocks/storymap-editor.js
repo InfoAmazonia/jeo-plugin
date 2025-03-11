@@ -1,8 +1,7 @@
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
-import { compose, withInstanceId } from '@wordpress/compose';
-import { withSelect, select } from '@wordpress/data';
-import { Fragment, useEffect, useMemo, useState } from '@wordpress/element';
+import { useSelect, select } from '@wordpress/data';
+import { Fragment, useEffect, useId, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import ClassicEditor from 'ckeditor5-build-full';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
@@ -46,37 +45,45 @@ function createInitialViewState () {
 	};
 }
 
-const StoryMapEditor = ( {
-	attributes,
-	setAttributes,
-	instanceId,
-	loadedLayers,
-	loadedMap,
-	loadingMap,
-	themeColors,
-} ) => {
-	const decodeHtmlEntity = function ( str ) {
-		return str.replace( /&#(\d+);/g, function ( match, dec ) {
-			return String.fromCharCode( dec );
-		} );
-	};
+function decodeHtmlEntity ( str ) {
+	return str.replace( /&#(\d+);/g, ( match, dec ) => String.fromCharCode( dec ) );
+};
 
-	function removeTags(str) {
-		if ((str===null) || (str===''))
-			return false;
-	   else
-		str = str.toString();
+function removeTags(str) {
+	if ((str == null) || (str === '')) {
+		return false;
+	}
+	str = str.toString();
+   return str.replace(/<[^>]*>/g, '');
+ }
 
-	   return str.replace(/<[^>]*>/g, '');
-	 }
+function reorder ( list, startIndex, endIndex ) {
+	const result = Array.from( list );
+	const [ removed ] = result.splice( startIndex, 1 );
+	result.splice( endIndex, 0, removed );
+	return result;
+};
 
-	const reorder = ( list, startIndex, endIndex ) => {
-		const result = Array.from( list );
-		const [ removed ] = result.splice( startIndex, 1 );
-		result.splice( endIndex, 0, removed );
+function flyTo ( map, location ) {
+	map.flyTo({
+		center: [
+			parseFloat( location.lon ),
+			parseFloat( location.lat ),
+		]
+	});
+}
 
-		return result;
-	};
+export default function StoryMapEditor ( { attributes, setAttributes } ) {
+	const instanceId = useId();
+	const [ showStorySettings, setShowStorySettings ] = useState( false );
+	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
+	const [ selectedMap, setSelectedMap ] = useState( null );
+	const [ currentSlideIndex, setCurrentSlideIndex ] = useState( 0 );
+	const [ searchValue, setSearchValue ] = useState( '' );
+	const [ key, setKey ] = useState( 0 );
+	const [ storymapLayers, setStorymapLayers ] = useState( [] );
+	const [ viewState, setViewState ] = useState( createInitialViewState );
+	const [ inlineEnd ] = useState( computeInlineEnd );
 
 	const onDragEndLayers = ( result ) => {
 		// dropped outside the list
@@ -93,25 +100,19 @@ const StoryMapEditor = ( {
 		setStorymapLayers( newItems );
 	}
 
-	const flyTo = ( map, location ) => {
+	const themeColors = useSelect( ( select ) => select( 'core/editor' ).getEditorSettings().colors, [] );
 
-		map.flyTo({
-			center: [
-				parseFloat( location.lon ),
-				parseFloat( location.lat ),
-			]
-		});
-	}
+	const loadedMap = useSelect( ( select ) => attributes.map_id && (
+		select( 'core' ).getEntityRecord( 'postType', 'map', attributes.map_id )
+	), [ attributes.map_id ] );
 
-	const [ showStorySettings, setShowStorySettings ] = useState( false );
-	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
-	const [ selectedMap, setSelectedMap ] = useState( null );
-	const [ currentSlideIndex, setCurrentSlideIndex ] = useState( 0 );
-	const [ searchValue, setSearchValue ] = useState( '' );
-	const [ key, setKey ] = useState( 0 );
-	const [ storymapLayers, setStorymapLayers ] = useState( [] );
-	const [ viewState, setViewState ] = useState( createInitialViewState );
-	const [ inlineEnd ] = useState( computeInlineEnd );
+	const loadedLayers = useSelect( ( select ) => {
+		if ( ! loadedMap ) {
+			return null;
+		};
+		const layerIds = loadedMap.meta.layers.map( ( layer ) => layer.id );
+		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', { include: layerIds } );
+	}, [ loadedMap ]);
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
@@ -125,7 +126,7 @@ const StoryMapEditor = ( {
 	}, [ attributes.slides, currentSlideIndex, setViewState ] );
 
 	useEffect( () => {
-		// Post the already exsists
+		// Post already exists
 		if(attributes.slides && loadedMap && loadedLayers) {
 			const newSlides = attributes.slides.map(slide => {
 				slide.selectedLayers.forEach((selectedLayer, index) => {
@@ -148,23 +149,11 @@ const StoryMapEditor = ( {
 				return slide;
 			})
 
-			let navigateMapLayers = loadedLayers.filter(layer => loadedMap.meta.layers.some(mapLayer => mapLayer.id === layer.id ))
-			const newLayers = []
-
-			loadedMap.meta.layers.forEach(mapLayer => {
-				const foundLayer = navigateMapLayers.find(layer => layer.id === mapLayer.id );
-				if( foundLayer ) {
-					newLayers.push(foundLayer);
-				}
-			})
-
-			navigateMapLayers = newLayers;
-
 			setAttributes( {
 				...attributes,
 				slides: newSlides,
-				loadedLayers,
-				navigateMapLayers,
+				loadedLayers: [],
+				navigateMapLayers: [ ...loadedLayers ],
 			} );
 
 			return;
@@ -173,24 +162,13 @@ const StoryMapEditor = ( {
 
 		setAttributes( {
 			...attributes,
-			loadedLayers,
+			loadedLayers: [],
 			navigateMapLayers: loadedLayers,
 		} );
-	}, [ loadingMap, loadedLayers ] );
-
-	const layersContent = useMemo(() => {
-		let rawLayers = [];
-		if ( attributes.map_id && loadedMap ) {
-			rawLayers = loadedMap.meta.layers;
-		}
-
-		return rawLayers.map( ( rawLayer ) => {
-			return select( 'core' ).getEntityRecord( 'postType', 'map-layer', rawLayer.id );
-		} );
-	}, [ loadedMap, loadedLayers, attributes.map_id ]);
+	}, [ loadedMap, loadedLayers ] );
 
 	const editorConfig = useMemo( () => {
-		const layerColors = layersContent.flatMap( ( layer ) => {
+		const layerColors = (loadedLayers ?? []).flatMap( ( layer ) => {
 			return layer?.meta.legend_type_options?.colors?.map( ( color, i, colors ) => {
 				const label = `${layer.title.raw} — ${color.label || percentage( i / ( colors.length - 1 ) )}`
 				return { label, color: color.color, hasBorder: true };
@@ -214,7 +192,7 @@ const StoryMapEditor = ( {
 			image: { toolbar: [ 'imageTextAlternative' ] },
 			mediaEmbed: { previewsInData: true },
 		};
-	}, [ layersContent, themeColors ] );
+	}, [ loadedLayers, themeColors ] );
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
@@ -232,11 +210,11 @@ const StoryMapEditor = ( {
 						bearing: 0,
 					},
 				],
-				loadedLayers,
+				loadedLayers: [],
 				navigateMapLayers: [],
 			} );
 		}
-		const postID = wp.data.select( "core/editor" ).getCurrentPostId();
+		const postID = select( 'core/editor' ).getCurrentPostId();
 		setAttributes( { ...attributes, postID } );
 	}, [] );
 
@@ -254,8 +232,8 @@ const StoryMapEditor = ( {
 
 	return (
 		<div className="jeo-mapblock storymap">
-			{ attributes.map_id && loadingMap && <Spinner /> }
-			{ attributes.map_id && ! loadingMap && (
+			{ attributes.map_id && !loadedMap && <Spinner /> }
+			{ attributes.map_id && loadedMap && (
 				<Fragment>
 					<div className="jeo-preview-area">
 						<Map
@@ -272,7 +250,7 @@ const StoryMapEditor = ( {
 								const map = event.style?.map ?? null;
 								if ( ! selectedMap && map ) {
 									setSelectedMap( map );
-									setStorymapLayers( layersContent );
+									setStorymapLayers( loadedLayers );
 								}
 							} }
 							onMove={ ( event ) => {
@@ -833,7 +811,7 @@ const StoryMapEditor = ( {
 										bearing: 0,
 									},
 								],
-								loadedLayers,
+								loadedLayers: [],
 								navigateMapLayers: [],
 							} )
 						}
@@ -857,25 +835,3 @@ const StoryMapEditor = ( {
 		</div>
 	);
 };
-
-const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
-	loadedMap:
-		attributes.map_id &&
-		select( 'core' ).getEntityRecord( 'postType', 'map', attributes.map_id ),
-	loadingMap:
-		attributes.map_id &&
-		select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
-			'postType',
-			'map',
-			attributes.map_id,
-		] ),
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'title' } ),
-	loadingLayers: select( 'core/data' ).isResolving(
-		'core',
-		'getEntityRecords',
-		[ 'postType', 'map-layer' ]
-	),
-	themeColors: select( 'core/editor' ).getEditorSettings().colors,
-} ) );
-
-export default compose( withInstanceId, applyWithSelect )( StoryMapEditor );

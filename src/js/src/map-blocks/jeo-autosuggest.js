@@ -1,6 +1,5 @@
 import { withSelect } from '@wordpress/data';
-import { withInstanceId } from '@wordpress/compose';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useId, useState } from '@wordpress/element';
 import { debounce } from 'lodash-es';
 import Autosuggest from 'react-autosuggest';
 
@@ -39,8 +38,7 @@ const _handleFetchRequest = ( { value } ) => {
 	return input ? { search: input } : {};
 };
 
-const JeoAutosuggest = ( {
-	instanceId,
+export default function JeoAutosuggest ( {
 	inputProps,
 	postType,
 	onSuggestionSelected,
@@ -48,7 +46,8 @@ const JeoAutosuggest = ( {
 	getSuggestionValue = _getSuggestionValue,
 	handleFetchRequest = _handleFetchRequest,
 	renderSuggestion = _renderSuggestion,
-} ) => {
+} ) {
+	const instanceId = useId();
 	const [ query, setQuery ] = useState( {} );
 	const [ value, setValue ] = useState( '' );
 	const onChange = useCallback(
@@ -82,5 +81,3 @@ const JeoAutosuggest = ( {
 		/>
 	);
 };
-
-export default withInstanceId( JeoAutosuggest );
