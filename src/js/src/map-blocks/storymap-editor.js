@@ -111,7 +111,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			return null;
 		};
 		const layerIds = loadedMap.meta.layers.map( ( layer ) => layer.id );
-		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', { include: layerIds } );
+		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', { include: layerIds, per_page: -1 } );
 	}, [ loadedMap ]);
 
 	useEffect( () => {
