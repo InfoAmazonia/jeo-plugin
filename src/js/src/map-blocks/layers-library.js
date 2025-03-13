@@ -83,10 +83,10 @@ const LayersLibrary = ( {
 };
 
 export default withSelect( ( select ) => ( {
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer' ),
+	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1 } ),
 	loadingLayers: select( 'core/data' ).isResolving(
 		'core',
 		'getEntityRecords',
-		[ 'postType', 'map-layer' ]
+		[ 'postType', 'map-layer', { per_page: -1 } ],
 	),
 } ) )( LayersLibrary );
