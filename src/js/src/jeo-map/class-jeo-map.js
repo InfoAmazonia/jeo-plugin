@@ -185,7 +185,7 @@ export default class JeoMap {
 							}
 						} );
 
-						// When style is done loading (don't try adding layers before style is not ready)
+						// When style is done loading (don't try to add layers before style is ready)
 						this.mapLoaded.then(() => {
 							// Remove not selected layers and toggle visibility
 							mapLayersSettings.forEach( ( layer ) => {
@@ -221,7 +221,7 @@ export default class JeoMap {
 									if ( index === styleLayerIndex ) {
 										layer.addInteractions( map );
 									} else {
-										// If the current layer is below the style, add using fisrt syle layer reference
+										// If the current layer is below the style, add using first syle layer reference
 										if ( index < styleLayerIndex ) {
 											layer.addLayer( map, [ firstStyleLayerId ] );
 										} else {
@@ -621,7 +621,7 @@ export default class JeoMap {
 		for ( const layerSettings of mapLayersSettings ) {
 			if ( layerSettings.load_as_style ) {
 				const layer = layers.find(
-					( layer ) => layer.attributes.layer_post_id = layerSettings.id
+					( layer ) => layer.attributes.layer_post_id === layerSettings.id
 				);
 
 				const styleUrl = layer.getStyleUrl();
