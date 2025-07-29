@@ -73,7 +73,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 					const popUp = new mapboxgl.Popup( {
 						className: interactionType === 'mouseover' ? 'jeo-popup__mouseover' : '',
 						closeButton: interactionType === 'click',
-						closeOnClick: true,
+						closeOnClick: interactionType === 'click',
 						maxWidth: '300px',
 						// anchor: 'right' // parameter to anchor direction 'bottom' default
 					} );
