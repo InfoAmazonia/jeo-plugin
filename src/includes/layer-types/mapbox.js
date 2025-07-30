@@ -121,11 +121,9 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 							.addTo( map );
 					} );
 
-					let isOverlapping = false;
-
 					map.on( 'mousemove', function ( e ) {
 						const features = map.queryRenderedFeatures( e.point );
-						isOverlapping = features.some( f => interactionsIds.includes( f.layer.id ) );
+						const isOverlapping = features.some( f => interactionsIds.includes( f.layer.id ) );
 						if ( isOverlapping ) {
 							map.getCanvas().style.cursor = 'pointer';
 						} else {
