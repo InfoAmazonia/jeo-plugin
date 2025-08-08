@@ -76,7 +76,7 @@ class Discovery extends Component {
 			};
 		}
 
-		const map = new mapboxgl.Map( {
+		const map = new maplibregl.Map( {
 			container: this.mapContainer,
 			style: 'mapbox://styles/mapbox/streets-v11',
 			projection: 'equirectangular',
@@ -88,11 +88,11 @@ class Discovery extends Component {
 
 		this.map.on( 'load', () => {
 			this.map.addControl(
-				new mapboxgl.NavigationControl( { showCompass: false } ),
+				new maplibregl.NavigationControl( { showCompass: false } ),
 				`top-${inlineStart}`
 			);
 
-			this.map.addControl( new mapboxgl.FullscreenControl(), `top-${inlineStart}` );
+			this.map.addControl( new maplibregl.FullscreenControl(), `top-${inlineStart}` );
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 

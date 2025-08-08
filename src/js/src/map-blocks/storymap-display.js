@@ -8,6 +8,7 @@ import { onFirstIntersection } from '../shared/intersect';
 import { renderLayer } from './map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
 import { formatDate, formatHour, joinList } from '../shared/intl';
+import { EMPTY_STYLE } from '../shared/styles';
 
 import './storymap-display.scss';
 
@@ -86,7 +87,7 @@ class StoryMapDisplay extends Component {
 		} );
 
 		const config = {
-			style: 'mapbox://styles/mapbox/empty-v9',
+			style: EMPTY_STYLE,
 			accessToken: window.jeo_settings.mapbox_key,
 			theme: 'light',
 			alignment: 'left',
@@ -241,7 +242,7 @@ class StoryMapDisplay extends Component {
 		const firstChapter = config.chapters[0];
 		const initialLocation = firstChapter.location;
 
-		const map = new mapboxgl.Map( {
+		const map = new maplibregl.Map( {
 			container: this.mapContainer,
 			projection: 'equirectangular',
 			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],

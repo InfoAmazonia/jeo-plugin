@@ -121,7 +121,7 @@ class Layer_Types {
 		wp_register_script(
 			'jeo-layer',
 			JEO_BASEURL . '/js/build/JeoLayer.js',
-			['mapboxgl-loader'],
+			['mapgl-loader'],
 			$asset_file['version']
 		);
 

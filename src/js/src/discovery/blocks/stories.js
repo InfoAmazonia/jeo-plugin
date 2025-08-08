@@ -211,7 +211,7 @@ class Stories extends Component {
 										],
 									},
 									'text-field': '{point_count}',
-									'text-font': [ 'Open Sans Regular', 'Arial Unicode MS Regular' ],
+									'text-font': [ 'Noto Sans Regular', 'Arial Unicode MS Regular' ],
 									'text-size': 12,
 									'text-transform': 'uppercase',
 									'text-letter-spacing': 0.05,

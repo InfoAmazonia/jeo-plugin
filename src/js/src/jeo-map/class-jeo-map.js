@@ -3,6 +3,7 @@ import { Eta } from 'eta';
 
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
+import { EMPTY_STYLE } from '../shared/styles';
 import { waitMapEvent } from '../shared/wait';
 
 const decodeHtmlEntity = function ( str ) {
@@ -54,7 +55,7 @@ export default class JeoMap {
 
 		this.dataFetched
 			.then( () => {
-				const map = new mapboxgl.Map( {
+				const map = new maplibregl.Map( {
 					container: this.element,
 					projection: 'equirectangular',
 					attributionControl: false,
@@ -81,7 +82,7 @@ export default class JeoMap {
 							read_more: window.jeoMapVars.string_read_more,
 							show_featured_media: false,
 						} )
-						let popUp = new mapboxgl.Popup({
+						let popUp = new maplibregl.Popup({
 							closeOnClick: false,
 							offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
 						})
@@ -106,7 +107,7 @@ export default class JeoMap {
 					] );
 
 					map.addControl(
-						new mapboxgl.NavigationControl( { showCompass: false } ),
+						new maplibregl.NavigationControl( { showCompass: false } ),
 						`top-${inlineStart}`
 					);
 
@@ -124,7 +125,7 @@ export default class JeoMap {
 					}
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
-						map.addControl( new mapboxgl.FullscreenControl(), `top-${inlineStart}` );
+						map.addControl( new maplibregl.FullscreenControl(), `top-${inlineStart}` );
 					}
 
 					if (
@@ -264,13 +265,13 @@ export default class JeoMap {
 
 							let controlPostion = `bottom-${inlineEnd}`;
 
-							let attributionControl = new mapboxgl.AttributionControl( {
+							let attributionControl = new maplibregl.AttributionControl( {
 								compact: false,
 								customAttribution,
 							} );
 
 							if(window.innerWidth < 600) {
-								attributionControl = new mapboxgl.AttributionControl( {
+								attributionControl = new maplibregl.AttributionControl( {
 									compact: true,
 									customAttribution,
 								} )
@@ -631,7 +632,7 @@ export default class JeoMap {
 			}
 		}
 
-		return 'mapbox://styles/mapbox/empty-v9';
+		return EMPTY_STYLE;
 	}
 
 	getRelatedPosts() {
@@ -740,7 +741,7 @@ export default class JeoMap {
 										show_featured_media: false,
 									} );
 
-									new mapboxgl.Popup()
+									new maplibregl.Popup()
 										.setLngLat(e.lngLat)
 										.setHTML( popupHTML )
 										.addTo(map);
@@ -892,7 +893,7 @@ export default class JeoMap {
 												],
 											},
 											'text-field': '{point_count}',
-											'text-font': [ 'Open Sans Regular', 'Arial Unicode MS Regular' ],
+											'text-font': [ 'Noto Sans Regular', 'Arial Unicode MS Regular' ],
 											'text-size': 12,
 											'text-transform': 'uppercase',
 											'text-letter-spacing': 0.05,
@@ -1023,7 +1024,7 @@ export default class JeoMap {
 			show_featured_media: false,
 		} );
 
-		const popUp = new mapboxgl.Popup().setHTML( popupHTML );
+		const popUp = new maplibregl.Popup().setHTML( popupHTML );
 
 		const LngLat = {
 			lat: parseFloat( point._geocode_lat ),
@@ -1037,7 +1038,7 @@ export default class JeoMap {
 		el.style.height = '36px';
 		el.style.backgroundSize = 'cover';
 
-		const marker = new mapboxgl.Marker( { element: el, anchor: 'bottom' } )
+		const marker = new maplibregl.Marker( { element: el, anchor: 'bottom' } )
 			.setLngLat( LngLat )
 			.addTo( this.map );
 
