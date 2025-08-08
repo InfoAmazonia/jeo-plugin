@@ -32,6 +32,8 @@
 		"leaflet": "^1.9.4",
 		"lodash-es": "^4.17.21",
 		"mapbox-gl": "^3.9.4",
+		"maplibre-gl": "^4.7.1",
+		"maplibregl-mapbox-request-transformer": "^0.0.3",
 		"react-autosuggest": "^10.1.0",
 		"react-beautiful-dnd": "^13.1.1",
 		"react-bootstrap-daterangepicker": "^8.0.0",

@@ -58,7 +58,7 @@
         var mapboxMarker;
         var spiderLeg;
 
-        mapboxMarker = new mapboxgl.Marker(elements.container)
+        mapboxMarker = new maplibregl.Marker(elements.container)
           .setLngLat(latLng);
 
         spiderLeg = {

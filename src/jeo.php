@@ -3,7 +3,7 @@
  * @package           Jeo
  *
  * @wordpress-plugin
- * Plugin Name:       JEO WP
+ * Plugin Name:       JEO WP (Libre)
  * Description:       Interactive Map blocks for Wordpress Gutenberg
  * Version:           2.15.2
  * License:           GPL-2.0+
