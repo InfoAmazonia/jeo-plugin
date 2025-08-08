@@ -70,7 +70,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				const filteredLayers = allLayers.filter( layer => interactionsIds.includes( layer.id ) );
 
 				if ( filteredLayers.length > 0 ) {
-					const popUp = new mapboxgl.Popup( {
+					const popUp = new maplibregl.Popup( {
 						className: interactionType === 'mouseover' ? 'jeo-popup__mouseover' : '',
 						closeButton: interactionType === 'click',
 						closeOnClick: interactionType === 'click',

@@ -22,11 +22,11 @@ class Sidebars {
 	public function load_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
-		wp_enqueue_style( 'jeo-layers-sidebar', JEO_BASEURL . '/js/build/layersSidebar.css', array( 'mapboxgl' ), JEO_VERSION );
+		wp_enqueue_style( 'jeo-layers-sidebar', JEO_BASEURL . '/js/build/layersSidebar.css', array( 'mapgl' ), JEO_VERSION );
 		wp_enqueue_script(
 			'jeo-layers-sidebar',
 			JEO_BASEURL . '/js/build/layersSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapboxgl-loader']),
+			array_merge($asset_file['dependencies'], ['mapgl-loader']),
 			$asset_file['version']
 		);
 
@@ -50,11 +50,11 @@ class Sidebars {
 			)
 		);
 
-		wp_enqueue_style( 'jeo-maps-sidebar', JEO_BASEURL . '/js/build/mapsSidebar.css', array( 'mapboxgl' ) );
+		wp_enqueue_style( 'jeo-maps-sidebar', JEO_BASEURL . '/js/build/mapsSidebar.css', array( 'mapgl' ) );
 		wp_enqueue_script(
 			'jeo-maps-sidebar',
 			JEO_BASEURL . '/js/build/mapsSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapboxgl-loader']),
+			array_merge($asset_file['dependencies'], ['mapgl-loader']),
 			$asset_file['version']
 		);
 
