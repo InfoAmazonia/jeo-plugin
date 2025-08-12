@@ -13,7 +13,7 @@ export function renderLayer( { layer, instance } ) {
 
 	switch ( layer.type ) {
 		case 'mapbox': {
-			const accessToken = options.access_token || window.mapboxgl.accessToken;
+			const accessToken = options.access_token || globalThis.mapglLoader.mapboxToken;
 
 			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
 			const styleUrl = `https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`

@@ -1,4 +1,4 @@
-import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
+import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import AttributionSettings from './attribution-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -50,19 +50,10 @@ const LayersSidebar = ( {
 	}, [ sendNotice ] );
 
 	useEffect( () => {
-		if ( ! MapboxAPIKey ) {
-			setRenderControl( { status: 'incomplete_settings' } );
-		}
-	}, [] );
-
-	useEffect( () => {
 		if ( postMeta.type ) {
 			window.JeoLayerTypes.getLayerTypeSchema( postMeta ).then( ( schema ) => {
 				setLayerTypeSchema( schema );
 			} );
-		}
-		if ( MapboxAPIKey ) {
-			setRenderControl( { status: 'incomplete_form' } );
 		}
 	}, [ postMeta.type ] );
 

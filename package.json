@@ -31,6 +31,7 @@
 		"eta": "^3.5.0",
 		"leaflet": "^1.9.4",
 		"lodash-es": "^4.17.21",
+		"map-gl-utils": "^0.50.4",
 		"mapbox-gl": "^3.9.4",
 		"maplibre-gl": "^4.7.1",
 		"maplibregl-mapbox-request-transformer": "^0.0.3",

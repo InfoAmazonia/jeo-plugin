@@ -1,9 +1,6 @@
 import { forwardRef, useState } from '@wordpress/element';
-import mapboxgl from 'mapbox-gl'
 import MapGL, { FullscreenControl, NavigationControl } from 'react-map-gl';
 import { computeInlineStart } from '../shared/direction';
-
-export const MapboxAPIKey = window.jeo_settings.mapbox_key;
 
 /**
  * @typedef {import('react-map-gl').MapProps} MapProps
@@ -16,9 +13,9 @@ function Map( { children, controls = undefined, fullscreen = true, ...props }, r
 	return (
 		<MapGL
 			ref={ ref }
-			mapboxAccessToken={ MapboxAPIKey }
-			mapLib={ mapboxgl }
-			mapStyle="mapbox://styles/mapbox/streets-v11"
+			mapboxAccessToken={ globalThis.mapglLoader.mapboxToken }
+			mapLib={ globalThis.mapgl }
+			mapStyle={ globalThis.mapglLoader.defaultStyle }
 			reuseMaps={ true }
 			{ ...props }
 		>
