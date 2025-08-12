@@ -60,39 +60,31 @@ class Discovery extends Component {
 	}
 
 	componentDidMount() {
-		let adicionalMapOptions = {
+		const additionalMapOptions = {
 			center: [ mapPreferences.map_defaults.lng, mapPreferences.map_defaults.lat],
 			zoom: mapPreferences.map_defaults.zoom,
 		};
 
-		if (
-			this.getParamFromUrl( 'discovery' ) ||
-			this.getParamFromUrl( 'share' )
-		) {
-			adicionalMapOptions = {
-				...adicionalMapOptions,
-				center: this.getParamFromUrl( 'center' ),
-				zoom: this.getParamFromUrl( 'zoom' ),
-			};
+		if ( this.getParamFromUrl( 'discovery' ) || this.getParamFromUrl( 'share' ) ) {
+			additionalMapOptions.center = this.getParamFromUrl( 'center' );
+			additionalMapOptions.zoom = this.getParamFromUrl( 'zoom' );
 		}
 
-		const map = new maplibregl.Map( {
+		const map = globalThis.mapglLoader.createMap({
 			container: this.mapContainer,
-			style: 'mapbox://styles/mapbox/streets-v11',
-			projection: 'equirectangular',
-			...adicionalMapOptions,
-		} );
+			...additionalMapOptions,
+		});
 
 		this.map = map;
 		const inlineStart = computeInlineStart();
 
 		this.map.on( 'load', () => {
 			this.map.addControl(
-				new maplibregl.NavigationControl( { showCompass: false } ),
+				new globalThis.mapgl.NavigationControl( { showCompass: false } ),
 				`top-${inlineStart}`
 			);
 
-			this.map.addControl( new maplibregl.FullscreenControl(), `top-${inlineStart}` );
+			this.map.addControl( new globalThis.mapgl.FullscreenControl(), `top-${inlineStart}` );
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 

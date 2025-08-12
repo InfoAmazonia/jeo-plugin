@@ -260,7 +260,7 @@ class MapLayers extends Component {
 			} else if ( layer.meta.type === 'mapbox' ) {
 				if ( map.getLayer( layerId ) === undefined ) {
 					if ( ! map.getSource( layerId ) ) {
-						const accessToken = attributes.layer_type_options.access_token || window.maplibregl.accessToken;
+						const accessToken = attributes.layer_type_options.access_token || globalThis.mapglLoader.mapboxToken;
 
 						const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
