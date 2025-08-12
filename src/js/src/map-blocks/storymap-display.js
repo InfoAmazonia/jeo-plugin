@@ -1,7 +1,6 @@
 import { Component, createRoot } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import classNames from 'classnames';
-import mapboxgl from 'mapbox-gl';
 import scrollama from 'scrollama';
 
 import { onFirstIntersection } from '../shared/intersect';
@@ -88,7 +87,6 @@ class StoryMapDisplay extends Component {
 
 		const config = {
 			style: EMPTY_STYLE,
-			accessToken: window.jeo_settings.mapbox_key,
 			theme: 'light',
 			alignment: 'left',
 			subtitle: props.description || '',
@@ -242,14 +240,12 @@ class StoryMapDisplay extends Component {
 		const firstChapter = config.chapters[0];
 		const initialLocation = firstChapter.location;
 
-		const map = new maplibregl.Map( {
+		const map = globalThis.mapglLoader.createMap( {
 			container: this.mapContainer,
-			projection: 'equirectangular',
 			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],
 			zoom: initialLocation.zoom || mapDefaults.zoom,
 			...config,
 		} );
-		mapboxgl.accessToken = config.accessToken;
 
 		this.map = map;
 		this.map.on( 'load', () => {

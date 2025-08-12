@@ -124,6 +124,10 @@ class Jeo {
 		return $args;
 	}
 
+	public function get_map_runtime() {
+		return apply_filters( 'jeo_map_runtime', 'maplibregl' );
+	}
+
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
@@ -139,6 +143,13 @@ class Jeo {
 
 		wp_set_script_translations('jeo-js', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
+		$map_runtime = $this->get_map_runtime();
+
+		if ( $map_runtime === 'maplibregl' ) {
+			$map_gl_loader = 'maplibreglLoader';
+		} else {
+			$map_gl_loader = 'mapboxglLoader';
+		}
 
 		wp_localize_script(
 			'jeo-js',
@@ -148,24 +159,17 @@ class Jeo {
 			)
 		);
 
-		wp_register_style(
-			'mapgl',
-			'https://unpkg.com/maplibre-gl@^5.6.2/dist/maplibre-gl.css',
-			array(),
-			false,
-		);
-
-		wp_register_script(
-			'mapgl',
-			'https://unpkg.com/maplibre-gl@^5.6.2/dist/maplibre-gl.js',
-			array(),
-			false,
-		);
-
 		wp_register_script(
 			'mapgl-loader',
-			JEO_BASEURL . '/js/build/mapglLoader.js',
-			array( 'mapgl' ),
+			JEO_BASEURL . "/js/build/{$map_gl_loader}.js",
+			array(),
+			JEO_VERSION,
+		);
+
+		wp_register_style(
+			'mapgl-loader',
+			JEO_BASEURL . "/js/build/{$map_gl_loader}.css",
+			array(),
 			JEO_VERSION,
 		);
 
@@ -184,6 +188,7 @@ class Jeo {
 					'enable_fullscreen' => true,
 					'disable_drag_pan' => false,
 				],
+				'map_runtime' => $map_runtime,
 				'nonce' => $this->get_rest_nonce(),
 				'jeo_typography_name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
 			)
@@ -202,7 +207,7 @@ class Jeo {
 		wp_register_style(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
-			array( 'mapgl' )
+			array( 'mapgl-loader' )
 		);
 		wp_register_script(
 			'jeo-map-blocks',
@@ -365,7 +370,7 @@ class Jeo {
 
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() || get_query_var('jeo_embed') === 'map') {
-			wp_enqueue_style( 'mapgl' );
+			wp_enqueue_style( 'mapgl-loader' );
 			wp_enqueue_script( 'mapgl-loader' );
 			wp_enqueue_script( 'mapboxgl-spiderifier' );
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array(), JEO_VERSION );

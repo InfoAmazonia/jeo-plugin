@@ -55,13 +55,12 @@ export default class JeoMap {
 
 		this.dataFetched
 			.then( () => {
-				const map = new maplibregl.Map( {
+				const map = globalThis.mapglLoader.createMap({
 					container: this.element,
-					projection: 'equirectangular',
 					attributionControl: false,
 					style: this.getStyleLayer(),
 					transformRequest: this.transformRequestUrl.bind( this ),
-				} );
+				});
 
 				this.map = map;
 				this.mapLoaded = waitMapEvent( map, 'load' );
@@ -82,7 +81,7 @@ export default class JeoMap {
 							read_more: window.jeoMapVars.string_read_more,
 							show_featured_media: false,
 						} )
-						let popUp = new maplibregl.Popup({
+						let popUp = new globalThis.mapgl.Popup({
 							closeOnClick: false,
 							offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
 						})
@@ -107,7 +106,7 @@ export default class JeoMap {
 					] );
 
 					map.addControl(
-						new maplibregl.NavigationControl( { showCompass: false } ),
+						new globalThis.mapgl.NavigationControl( { showCompass: false } ),
 						`top-${inlineStart}`
 					);
 
@@ -125,7 +124,7 @@ export default class JeoMap {
 					}
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
-						map.addControl( new maplibregl.FullscreenControl(), `top-${inlineStart}` );
+						map.addControl( new globalThis.mapgl.FullscreenControl(), `top-${inlineStart}` );
 					}
 
 					if (
@@ -265,13 +264,13 @@ export default class JeoMap {
 
 							let controlPostion = `bottom-${inlineEnd}`;
 
-							let attributionControl = new maplibregl.AttributionControl( {
+							let attributionControl = new globalThis.mapgl.AttributionControl( {
 								compact: false,
 								customAttribution,
 							} );
 
 							if(window.innerWidth < 600) {
-								attributionControl = new maplibregl.AttributionControl( {
+								attributionControl = new globalThis.mapgl.AttributionControl( {
 									compact: true,
 									customAttribution,
 								} )
@@ -741,7 +740,7 @@ export default class JeoMap {
 										show_featured_media: false,
 									} );
 
-									new maplibregl.Popup()
+									new globalThis.mapgl.Popup()
 										.setLngLat(e.lngLat)
 										.setHTML( popupHTML )
 										.addTo(map);
@@ -1024,7 +1023,7 @@ export default class JeoMap {
 			show_featured_media: false,
 		} );
 
-		const popUp = new maplibregl.Popup().setHTML( popupHTML );
+		const popUp = new globalThis.mapgl.Popup().setHTML( popupHTML );
 
 		const LngLat = {
 			lat: parseFloat( point._geocode_lat ),
@@ -1038,7 +1037,7 @@ export default class JeoMap {
 		el.style.height = '36px';
 		el.style.backgroundSize = 'cover';
 
-		const marker = new maplibregl.Marker( { element: el, anchor: 'bottom' } )
+		const marker = new globalThis.mapgl.Marker( { element: el, anchor: 'bottom' } )
 			.setLngLat( LngLat )
 			.addTo( this.map );
 

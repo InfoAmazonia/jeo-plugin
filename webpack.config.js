@@ -4,31 +4,26 @@ const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack
 module.exports = {
 	...defaultConfig,
 	entry: {
-		mapglLoader: './src/js/src/mapgl-loader.js',
-		jeoMap: {
-			import: './src/js/src/jeo-map/index.js',
-			dependOn: ['mapglLoader'],
-		},
+		mapboxglLoader: './src/js/src/mapboxgl-loader.js',
+		maplibreglLoader: './src/js/src/maplibregl-loader.js',
+		jeoMap: './src/js/src/jeo-map/index.js',
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
 		mapBlocks: {
 			import: './src/js/src/map-blocks/index.js',
-			dependOn: ['mapglLoader'],
+			dependOn: ['mapboxglLoader'],
 		},
 		discovery: './src/js/src/discovery/index.js',
 		// storymap: './src/js/src/map-blocks/storymap.js',
 		layersSidebar: {
 			import: './src/js/src/layers-sidebar/index.js',
-			dependOn: ['mapglLoader'],
+			dependOn: ['mapboxglLoader'],
 		},
 		mapsSidebar: {
 			import: './src/js/src/maps-sidebar/index.js',
-			dependOn: ['mapglLoader'],
+			dependOn: ['mapboxglLoader'],
 		},
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
-	},
-	externals: {
-		'maplibre-gl': 'maplibregl',
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),
