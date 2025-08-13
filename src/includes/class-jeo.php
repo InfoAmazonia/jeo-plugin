@@ -146,9 +146,11 @@ class Jeo {
 		$map_runtime = $this->get_map_runtime();
 
 		if ( $map_runtime === 'maplibregl' ) {
-			$map_gl_loader = 'maplibreglLoader';
+			$mapgl_loader = 'maplibreglLoader';
+			$mapgl_react = 'maplibreglReact';
 		} else {
-			$map_gl_loader = 'mapboxglLoader';
+			$mapgl_loader = 'mapboxglLoader';
+			$mapgl_react = 'mapboxglReact';
 		}
 
 		wp_localize_script(
@@ -160,21 +162,21 @@ class Jeo {
 		);
 
 		wp_register_script(
-			'mapgl-loader',
-			JEO_BASEURL . "/js/build/{$map_gl_loader}.js",
+			'mapgl',
+			JEO_BASEURL . "/js/build/{$mapgl_loader}.js",
 			array(),
 			JEO_VERSION,
 		);
 
 		wp_register_style(
-			'mapgl-loader',
-			JEO_BASEURL . "/js/build/{$map_gl_loader}.css",
+			'mapgl',
+			JEO_BASEURL . "/js/build/{$mapgl_loader}.css",
 			array(),
 			JEO_VERSION,
 		);
 
 		wp_localize_script(
-			'mapgl-loader',
+			'mapgl',
 			'jeo_settings',
 			array(
 				'site_url' => get_site_url(),
@@ -197,9 +199,16 @@ class Jeo {
 		wp_register_script(
 			'mapboxgl-spiderifier',
 			JEO_BASEURL . '/js/src/mapboxgl-spiderifier/index.js',
-			array( 'mapgl-loader' ),
+			array( 'mapgl' ),
 			JEO_VERSION,
 			false
+		);
+
+		wp_register_script(
+			'mapgl-react',
+			JEO_BASEURL . "/js/build/{$mapgl_react}.js",
+			array('mapgl'),
+			JEO_VERSION,
 		);
 
 		$map_blocks_assets = include JEO_BASEPATH . '/js/build/mapBlocks.asset.php';
@@ -207,12 +216,12 @@ class Jeo {
 		wp_register_style(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
-			array( 'mapgl-loader' )
+			array( 'mapgl' )
 		);
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
-			array_merge( $map_blocks_assets['dependencies'], array( 'jeo-layer' ) ),
+			array_merge( $map_blocks_assets['dependencies'], array( 'jeo-layer', 'mapgl-react' ) ),
 			$map_blocks_assets['version']
 		);
 
@@ -370,18 +379,18 @@ class Jeo {
 
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() || get_query_var('jeo_embed') === 'map') {
-			wp_enqueue_style( 'mapgl-loader' );
-			wp_enqueue_script( 'mapgl-loader' );
+			wp_enqueue_style( 'mapgl' );
+			wp_enqueue_script( 'mapgl' );
 			wp_enqueue_script( 'mapboxgl-spiderifier' );
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array(), JEO_VERSION );
-			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapgl-loader', 'mapboxgl-spiderifier', 'jquery', 'wp-element' ), JEO_VERSION, true );
+			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapgl', 'mapboxgl-spiderifier', 'jquery', 'wp-element' ), JEO_VERSION, true );
 
 			wp_set_script_translations('jeo-map', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
 
 			$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
 			wp_enqueue_style( 'discovery-map', JEO_BASEURL . '/js/build/discovery.css', array(), JEO_VERSION );
-			wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'], array( 'wp-element', 'mapgl-loader', 'jquery', 'jeo-map' ) ), JEO_VERSION, true);
+			wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'], array( 'wp-element', 'mapgl', 'jquery', 'jeo-map' ) ), JEO_VERSION, true);
 
 			wp_set_script_translations('discovery-map', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 

@@ -4,7 +4,7 @@ import { withSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import Map from './map';
+import { Map } from './map';
 import LayersSettingsModal from './layers-settings-modal';
 import { renderLayer } from './map-preview-layer';
 import MapPanel from './map-panel';

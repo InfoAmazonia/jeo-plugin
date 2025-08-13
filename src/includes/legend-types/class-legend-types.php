@@ -114,7 +114,7 @@ class Legend_Types {
 		wp_register_script(
 			'jeo-legend',
 			JEO_BASEURL . '/js/build/JeoLegend.js',
-			['mapgl-loader'],
+			['mapgl'],
 			$asset_file['version']
 		);
 
