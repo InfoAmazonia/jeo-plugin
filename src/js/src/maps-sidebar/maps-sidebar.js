@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
 import LayersSettingsModal from '../map-blocks/layers-settings-modal';
-import Map from '../map-blocks/map';
+import { Map } from '../map-blocks/map';
 import MapPanel from '../map-blocks/map-panel';
 import MapEmbedUrl from './map-embed-url';
 import MapPreviewPortal from './map-preview-portal';

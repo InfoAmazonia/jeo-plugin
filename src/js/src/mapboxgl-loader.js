@@ -1,5 +1,5 @@
-import MapboxGL from 'mapbox-gl'
 import U from 'map-gl-utils'
+import MapboxGL from 'mapbox-gl'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
@@ -9,8 +9,8 @@ globalThis.mapgl = MapboxGL
 globalThis.mapboxgl = MapboxGL // compat
 
 globalThis.mapglLoader = {
-	mapboxToken: jeo_settings.mapbox_key,
 	defaultStyle: 'mapbox://styles/mapbox/streets-v11',
+	mapboxToken: jeo_settings.mapbox_key,
 	createMap ({ container, style, ...options }) {
 		const map = new MapboxGL.Map({
 			accessToken: this.mapboxToken,
