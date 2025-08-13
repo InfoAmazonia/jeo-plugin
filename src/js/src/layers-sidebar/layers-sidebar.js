@@ -4,7 +4,7 @@ import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import Map, { MapboxAPIKey } from '../map-blocks/map';
+import { Map } from '../map-blocks/map';
 import { MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
@@ -100,11 +100,7 @@ const LayersSidebar = ( {
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
 		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
-		if (
-			Object.keys( debouncedLayerTypeOptions ).length &&
-			Object.keys( layerTypeSchema ).length &&
-			MapboxAPIKey
-		) {
+		if ( Object.keys( debouncedLayerTypeOptions ).length && Object.keys( layerTypeSchema ).length ) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;
 			optionsKeys.some( ( k ) => {
@@ -149,84 +145,80 @@ const LayersSidebar = ( {
 
 	return (
 		<>
-			{ MapboxAPIKey && (
-				<>
-					<LayerPreviewPortal>
-						<Map
-							key={ key }
-							onError={ ( { target: map, error } ) => {
-								try {
-									const layer = map.getLayer( 'layer_1' );
-									if ( layer ) {
-										map.removeLayer( 'layer_1' );
-									}
-									setRenderControl( {
-										status: 'request_error',
-										statusCode: 400,
-									} );
-								} catch ( err ) {
-									setRenderControl( {
-										status: 'request_error',
-										statusCode: 400,
-									} );
-								}
-							} }
-							onSourceData={ () => {
-								setRenderControl( { status: 'loaded' } );
-								unlockPostSaving( 'layer_lock_key' );
-							} }
-							style={ { height: '500px', width: '100%' } }
-							latitude={ centerLat || 0 }
-							longitude={ centerLon || 0 }
-							zoom={ initialZoom || 0 }
-							onMoveEnd={ ( { target: map } ) => {
-								if ( ! editingMap.current ) {
-									const center = map.getCenter();
-									const zoom = Math.round( map.getZoom() * 10 ) / 10;
+			<LayerPreviewPortal>
+				<Map
+					key={ key }
+					onError={ ( { target: map, error } ) => {
+						try {
+							const layer = map.getLayer( 'layer_1' );
+							if ( layer ) {
+								map.removeLayer( 'layer_1' );
+							}
+							setRenderControl( {
+								status: 'request_error',
+								statusCode: 400,
+							} );
+						} catch ( err ) {
+							setRenderControl( {
+								status: 'request_error',
+								statusCode: 400,
+							} );
+						}
+					} }
+					onSourceData={ () => {
+						setRenderControl( { status: 'loaded' } );
+						unlockPostSaving( 'layer_lock_key' );
+					} }
+					style={ { height: '500px', width: '100%' } }
+					latitude={ centerLat || 0 }
+					longitude={ centerLon || 0 }
+					zoom={ initialZoom || 0 }
+					onMoveEnd={ ( { target: map } ) => {
+						if ( ! editingMap.current ) {
+							const center = map.getCenter();
+							const zoom = Math.round( map.getZoom() * 10 ) / 10;
 
-									setPostMeta( {
-										center_lat: center.lat,
-										center_lon: center.lng,
-										initial_zoom: zoom,
-									} );
-								}
-							} }
-						>
-							{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
-								<MemoizedRenderLayer layer={ debouncedPostMeta } instance={ { id: 1, use: 'fixed' } } />
-							) }
-						</Map>
-					</LayerPreviewPortal>
+							setPostMeta( {
+								center_lat: center.lat,
+								center_lon: center.lng,
+								initial_zoom: zoom,
+							} );
+						}
+					} }
+				>
+					{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
+						<MemoizedRenderLayer layer={ debouncedPostMeta } instance={ { id: 1, use: 'fixed' } } />
+					) }
+				</Map>
+			</LayerPreviewPortal>
 
-					<PluginDocumentSettingPanel
-						name="settings"
-						title={ __( 'Settings', 'jeo' ) }
-					>
-						<LayerSettings />
-					</PluginDocumentSettingPanel>
+			<PluginDocumentSettingPanel
+				name="settings"
+				title={ __( 'Settings', 'jeo' ) }
+			>
+				<LayerSettings />
+			</PluginDocumentSettingPanel>
 
-					<PluginDocumentSettingPanel
-						name="carto-integration"
-						title={ __( 'Carto Integration', 'jeo' ) }
-					>
-						<CartoIntegration />
-					</PluginDocumentSettingPanel>
+			<PluginDocumentSettingPanel
+				name="carto-integration"
+				title={ __( 'Carto Integration', 'jeo' ) }
+			>
+				<CartoIntegration />
+			</PluginDocumentSettingPanel>
 
-					<PluginDocumentSettingPanel
-						name="attribution-settings"
-						title={ __( 'Attributions', 'jeo' ) }
-					>
-						<AttributionSettings />
-					</PluginDocumentSettingPanel>
+			<PluginDocumentSettingPanel
+				name="attribution-settings"
+				title={ __( 'Attributions', 'jeo' ) }
+			>
+				<AttributionSettings />
+			</PluginDocumentSettingPanel>
 
-					<PluginDocumentSettingPanel
-						name="legend-settings"
-						title={ __( 'Legend', 'jeo' ) }
-					>
-						<LegendsEditor />
-					</PluginDocumentSettingPanel>
-				</>
-			) }
+			<PluginDocumentSettingPanel
+				name="legend-settings"
+				title={ __( 'Legend', 'jeo' ) }
+			>
+				<LegendsEditor />
+			</PluginDocumentSettingPanel>
 		</>
 	);
 };

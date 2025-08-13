@@ -26,7 +26,7 @@ class Sidebars {
 		wp_enqueue_script(
 			'jeo-layers-sidebar',
 			JEO_BASEURL . '/js/build/layersSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapgl-loader']),
+			array_merge($asset_file['dependencies'], ['mapgl-react']),
 			$asset_file['version']
 		);
 
@@ -54,7 +54,7 @@ class Sidebars {
 		wp_enqueue_script(
 			'jeo-maps-sidebar',
 			JEO_BASEURL . '/js/build/mapsSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapgl-loader']),
+			array_merge($asset_file['dependencies'], ['mapgl-react']),
 			$asset_file['version']
 		);
 

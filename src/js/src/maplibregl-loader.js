@@ -16,7 +16,7 @@ const defaultStyle = {
 				'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
 			],
 			tileSize: 256,
-			attribution: '&copy OpenStreetMap Contributors',
+			attribution: '© OpenStreetMap Contributors',
 			maxzoom: 19,
 		},
 	},

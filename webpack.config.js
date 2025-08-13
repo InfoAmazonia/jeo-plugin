@@ -6,24 +6,19 @@ module.exports = {
 	entry: {
 		mapboxglLoader: './src/js/src/mapboxgl-loader.js',
 		maplibreglLoader: './src/js/src/maplibregl-loader.js',
+
 		jeoMap: './src/js/src/jeo-map/index.js',
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
-		mapBlocks: {
-			import: './src/js/src/map-blocks/index.js',
-			dependOn: ['mapboxglLoader'],
-		},
 		discovery: './src/js/src/discovery/index.js',
-		// storymap: './src/js/src/map-blocks/storymap.js',
-		layersSidebar: {
-			import: './src/js/src/layers-sidebar/index.js',
-			dependOn: ['mapboxglLoader'],
-		},
-		mapsSidebar: {
-			import: './src/js/src/maps-sidebar/index.js',
-			dependOn: ['mapboxglLoader'],
-		},
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
+
+		mapboxglReact: './src/js/src/mapboxgl-react.js',
+		maplibreglReact: './src/js/src/maplibregl-react.js',
+
+		mapBlocks: './src/js/src/map-blocks/index.js',
+		layersSidebar: './src/js/src/layers-sidebar/index.js',
+		mapsSidebar: './src/js/src/maps-sidebar/index.js',
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),
