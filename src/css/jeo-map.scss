@@ -626,11 +626,11 @@
 		display: inline-block;
 		font-size: 16px;
 		font-weight: bold;
-		transition: all .2 ease-in-out;
+		transition: all .2s ease-in-out;
 
 		&:hover {
 			background: rgba(0, 0, 0, 0.05);
-			transition: all .2 ease-in-out;
+			transition: all .2s ease-in-out;
 		}
 	}
 
@@ -954,7 +954,7 @@ div.jeomap.alignwide {
 .spider-leg-container {
 	width: 1px;
 	height: 1px;
-	overflow: display;
+	overflow: auto;
 	will-change: transform;
 
 	&:hover {
