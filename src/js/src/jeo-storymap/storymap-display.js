@@ -14,7 +14,7 @@ import './storymap-display.scss';
 /* Map brightness percentage when not fully brightness */
 const MAP_DIM = 0.5;
 
-const { map_defaults: mapDefaults } = window.jeo_settings;
+const { map_defaults: mapDefaults, map_runtime: mapRuntime } = globalThis.jeo_settings;
 
 const isSingle = !!document.querySelector('.single-storymap');
 
@@ -204,7 +204,7 @@ class StoryMapDisplay extends Component {
 
 		if (this.navigable) {
 			const navigateMapDiv = document.createElement('div');
-			navigateMapDiv.classList.add('jeomap', 'mapboxgl-map', 'storymap');
+			navigateMapDiv.classList.add('jeomap', `${mapRuntime}-map`, 'storymap');
 			navigateMapDiv.dataset.map_id = this.props.map_id;
 
 			this.navigateMap = new JeoMap( navigateMapDiv );
@@ -262,13 +262,13 @@ class StoryMapDisplay extends Component {
 				map.setPaintProperty(layer.slug, 'raster-opacity', isInitialLayer ? 1 : 0);
 			});
 
-			this.el.querySelector('.mapboxgl-map').style.filter = `brightness(${ this.state.mapBrightness })`;
+			this.el.querySelector(`.${mapRuntime}l-map`).style.filter = `brightness(${ this.state.mapBrightness })`;
 			this.el.querySelector('.the-story').classList.add('loaded');
 		});
 	}
 
 	componentDidUpdate() {
-		const mapEl = this.el.querySelector('.mapboxgl-map');
+		const mapEl = this.el.querySelector(`.${mapRuntime}-map`);
 		if (mapEl) {
 			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
 		}

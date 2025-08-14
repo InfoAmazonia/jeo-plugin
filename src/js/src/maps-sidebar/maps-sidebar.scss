@@ -1,5 +1,8 @@
-#map-preview .mapboxgl-map {
-	margin: auto;
+#map-preview {
+
+	.mapboxgl-map, .maplibregl-map {
+		margin: auto;
+	}
 }
 
 .zoom-button {

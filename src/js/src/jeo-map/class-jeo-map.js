@@ -6,11 +6,15 @@ import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE } from '../shared/styles';
 import { waitMapEvent } from '../shared/wait';
 
+import '../../../css/jeo-map.scss';
+
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, ( match, dec ) => {
 		return String.fromCharCode( dec );
 	} );
 };
+
+const { map_runtime: mapRuntime } = globalThis.jeo_settings;
 
 function compileTemplate ( template, config = {} ) {
 	const eta = new Eta( config );
@@ -299,7 +303,7 @@ export default class JeoMap {
 			.then( () => {
 				// Remove all empty jeo map blocks
 				jQuery(
-					'.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])'
+					`.jeomap.wp-block-jeo-map.${mapRuntime}-map:not([data-map_id])`
 				).remove();
 			} );
 	}
@@ -328,8 +332,8 @@ export default class JeoMap {
 			'<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
 		this.element.appendChild( layers );
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
-		jQuery( this.element ).find( '.mapboxgl-control-container' ).remove();
-		jQuery( this.element ).find( '.mapboxgl-canvas-container' ).remove();
+		jQuery( this.element ).find( '.mapboxgl-control-container, .maplibregl-control-container' ).remove();
+		jQuery( this.element ).find( '.mapboxgl-canvas-container, .maplibregl-canvas-container' ).remove();
 	}
 
 	/**
@@ -487,7 +491,7 @@ export default class JeoMap {
 		const closeButton = document.createElement( 'div' );
 		closeButton.classList.add( 'more-info-close' );
 		closeButton.innerHTML =
-			'<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>';
+			`<button class="${mapRuntime}-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>`;
 
 		closeButton.click( function ( e ) {} );
 

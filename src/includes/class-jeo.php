@@ -392,13 +392,13 @@ class Jeo {
 			wp_enqueue_style( 'mapgl' );
 			wp_enqueue_script( 'mapgl' );
 			wp_enqueue_script( 'mapboxgl-spiderifier' );
+			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), JEO_VERSION );
 			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapgl', 'mapboxgl-spiderifier', 'jquery' ), JEO_VERSION, true );
 
 			wp_set_script_translations('jeo-map', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
 			$current_language = $this->get_current_language();
 
-			wp_enqueue_style( 'jeo-map-css', JEO_BASEURL . '/css/jeo-map.css', array(), JEO_VERSION );
 			wp_localize_script(
 				'jeo-map',
 				'jeoMapVars',
@@ -471,7 +471,7 @@ class Jeo {
 
 	public function enqueue_storymap_scripts() {
 		$storymap_assets = include JEO_BASEPATH . '/js/build/jeoStorymap.asset.php';
-		wp_enqueue_style( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.css', array( 'jeo-map-css' ), JEO_VERSION );
+		wp_enqueue_style( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.css', array( 'jeo-map' ), JEO_VERSION );
 		wp_enqueue_script( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.js', array_merge( $storymap_assets['dependencies'], array( 'jeo-map', 'mapgl-react' ) ), JEO_VERSION );
 
 		wp_set_script_translations( 'jeo-storymap', 'jeo', plugin_dir_path( __DIR__ ) . 'languages' );
