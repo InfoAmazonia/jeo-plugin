@@ -1,4 +1,4 @@
-import { forwardRef, useState } from '@wordpress/element';
+import { forwardRef, useState } from 'react';
 import MapGL, { FullscreenControl, Layer, NavigationControl, Source } from 'react-map-gl/mapbox';
 import { computeInlineStart } from './shared/direction';
 

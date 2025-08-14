@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import scrollama from 'scrollama';
 
 import { onFirstIntersection } from '../shared/intersect';
-import { renderLayer } from './map-preview-layer';
+import { renderLayer } from '../map-blocks/map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
 import { formatDate, formatHour, joinList } from '../shared/intl';
 import { EMPTY_STYLE } from '../shared/styles';
