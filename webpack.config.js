@@ -13,12 +13,23 @@ module.exports = {
 		discovery: './src/js/src/discovery/index.js',
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
 
-		mapboxglReact: './src/js/src/mapboxgl-react.js',
-		maplibreglReact: './src/js/src/maplibregl-react.js',
+		mapboxglReact: {
+			import: './src/js/src/mapboxgl-react.js',
+			dependOn: ['mapboxglLoader'],
+		},
+		maplibreglReact: {
+			import: './src/js/src/maplibregl-react.js',
+			dependOn: ['maplibreglLoader'],
+		},
 
 		mapBlocks: './src/js/src/map-blocks/index.js',
 		layersSidebar: './src/js/src/layers-sidebar/index.js',
 		mapsSidebar: './src/js/src/maps-sidebar/index.js',
+
+		jeoStorymap: {
+			import: './src/js/src/jeo-storymap/storymap-display.js',
+			dependOn: ['jeoMap'],
+		},
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),
