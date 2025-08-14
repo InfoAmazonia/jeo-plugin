@@ -1,47 +1,6 @@
 import { useRef } from '@wordpress/element';
-import styled, { keyframes } from 'styled-components';
 
-const loadingAnimation = keyframes`
-	0%{
-		background-position: -468px 0
-	}
-	100%{
-		background-position: 468px 0
-	}
-`;
-
-const Placeholder = styled.div`
-	position: absolute;
-	inset-inline-start: 0;
-	top: 0;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	animation-duration: 1s;
-	animation-fill-mode: forwards;
-	animation-iteration-count: infinite;
-	animation-name: ${ loadingAnimation };
-	animation-timing-function: linear;
-	background: #f6f7f8;
-	background: linear-gradient(to right, #eeeeee 8%, #dddddd 18%, #eeeeee 33%);
-	background-size: 800px 104px;
-`;
-
-const StyledImage = styled.img`
-	position: absolute;
-	inset-inline-start: 0;
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	top: 0;
-`;
-
-const Wrapper = styled.div`
-	position: relative;
-	padding-top: 56.25%;
-	height: 0;
-	overflow: hidden;
-`;
+import '../style/lazy-image.scss';
 
 const LazyImage = ( { src, alt } ) => {
 	const refPlaceholder = useRef( undefined );
@@ -51,16 +10,16 @@ const LazyImage = ( { src, alt } ) => {
 	};
 
 	return (
-		<Wrapper>
-			<Placeholder ref={ refPlaceholder } />
-			<StyledImage
+		<div className="jeo-lazy-image__wrapper">
+			<div className="jeo-lazy-image__placeholder" ref={ refPlaceholder } />
+			<div className="jeo-lazy-image"
 				onLoad={ removePlaceholder }
 				onError={ removePlaceholder }
 				src={ src }
 				alt={ alt }
 				loading="lazy"
 			/>
-		</Wrapper>
+		</div>
 	);
 };
 
