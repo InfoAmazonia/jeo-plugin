@@ -44,7 +44,6 @@
 		"react-map-gl": "^8.0.4",
 		"react-movable": "^3.4.0",
 		"scrollama": "^3.2.0",
-		"styled-components": "^6.1.14",
 		"use-debounce": "^10.0.4"
 	},
 	"devDependencies": {
