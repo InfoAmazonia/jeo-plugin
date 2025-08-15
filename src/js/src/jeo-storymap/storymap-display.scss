@@ -50,16 +50,15 @@ $font-stories: var( --jeo-font-stories );
 			margin-top: 70px;
 		}
 
-		.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
+		:is(.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type, .maplibregl-ctrl-top-left .maplibregl-ctrl:first-of-type) {
 			margin-top: 45px;
+
+			@media (min-width: 830px) {
+				margin-top: 30px;
+			}
 		}
 	}
 
-	@media (min-width: 830px) {
-		.mapboxgl-ctrl-top-left .mapboxgl-ctrl:first-of-type {
-			margin-top: 30px;
-		}
-	}
 
 	.jeomap {
 		position: absolute;
@@ -82,7 +81,7 @@ $font-stories: var( --jeo-font-stories );
 	.not-navigating-map {
 		position: relative;
 
-		.mapboxgl-map {
+		.mapboxgl-map, .maplibregl-map {
 			border: none;
 			height: 100vh;
 			inset-inline-start: 0;
@@ -432,13 +431,13 @@ $font-stories: var( --jeo-font-stories );
 	}
 
 	.navigate-map {
-		.mapboxgl-map {
+		:is(.mapboxgl-map, .maplibregl-map) {
 			transition: filter 0.7s ease;
 			width: 100vw !important;
 			height: 96vh !important;
 			max-width: 100%;
 
-			.mapboxgl-canvas-container {
+			:is(.mapboxgl-canvas-container, .maplibregl-canvas-container) {
 				canvas {
 					width: 100vw !important;
 					height: 95vh !important;
