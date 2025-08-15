@@ -4,7 +4,7 @@ import { withSelect } from '@wordpress/data';
 import { useEffect, useId, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
-import { Map } from './map';
+import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import './map-editor.css';

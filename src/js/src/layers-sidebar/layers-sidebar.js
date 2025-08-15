@@ -4,7 +4,7 @@ import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Map } from '../map-blocks/map';
+import { Map } from '../lib/mapgl-react';
 import { MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';

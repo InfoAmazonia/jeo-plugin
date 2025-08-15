@@ -1,6 +1,6 @@
 import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
-import { Layer, Source } from './map';
+import { Layer, Source } from '../lib/mapgl-react';
 
 export function renderLayer( { layer, instance } ) {
 	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {

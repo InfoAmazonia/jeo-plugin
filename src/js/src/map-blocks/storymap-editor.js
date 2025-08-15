@@ -9,7 +9,7 @@ import { List, arrayMove } from 'react-movable';
 
 import { createUploadAdapter } from './cke5-image-upload';
 import { baseColors } from './color-palettes';
-import { Map } from './map';
+import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
