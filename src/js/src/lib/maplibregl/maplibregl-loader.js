@@ -3,10 +3,13 @@ import MapLibreGL from 'maplibre-gl'
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 
-globalThis.mapgl = MapLibreGL
+/** @type string */
+export const mapboxToken = jeo_settings.mapbox_key
+
+export const mapgl = MapLibreGL
 globalThis.mapboxgl = MapLibreGL // compat
 
-const defaultStyle = {
+export const defaultStyle = {
 	version: 8,
 	sources: {
 		osm: {
@@ -29,19 +32,15 @@ const defaultStyle = {
 	],
 }
 
-globalThis.mapglLoader = {
-	defaultStyle,
-	mapboxToken: jeo_settings.mapbox_key,
-	createMap({ container, style, ...options }) {
-		const map = new MapLibreGL.Map({
-			container: container,
-			projection: 'equirectangular',
-			style: style ?? this.defaultStyle,
-			...options,
-		})
+export function createMap({ container, style, ...options }) {
+	const map = new MapLibreGL.Map({
+		container: container,
+		projection: 'equirectangular',
+		style: style ?? this.defaultStyle,
+		...options,
+	})
 
-		U.init(map, MapLibreGL)
+	U.init(map, MapLibreGL)
 
-		return map
-	},
+	return map
 }
