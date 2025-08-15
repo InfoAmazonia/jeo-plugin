@@ -170,9 +170,16 @@ class Jeo {
 		);
 
 		wp_register_script(
-			'mapgl',
+			'mapgl-vendor',
 			JEO_BASEURL . "/js/build/{$mapgl_loader}.js",
 			array(),
+			JEO_VERSION,
+		);
+
+		wp_register_script(
+			'mapgl',
+			JEO_BASEURL . "/js/build/mapglLoader.js",
+			array( 'mapgl-vendor' ),
 			JEO_VERSION,
 		);
 
@@ -212,12 +219,19 @@ class Jeo {
 			false
 		);
 
-		$mapgl_react_assets = include JEO_BASEPATH . "/js/build/{$mapgl_react}.asset.php";
+		$mapgl_react_assets = include JEO_BASEPATH . "/js/build/mapglReact.asset.php";
+
+		wp_register_script(
+			'mapgl-react-vendor',
+			JEO_BASEURL . "/js/build/{$mapgl_react}.js",
+			array( 'mapgl' ),
+			JEO_VERSION,
+		);
 
 		wp_register_script(
 			'mapgl-react',
-			JEO_BASEURL . "/js/build/{$mapgl_react}.js",
-			array_merge( $mapgl_react_assets['dependencies'], array( 'mapgl' ) ),
+			JEO_BASEURL . "/js/build/mapglReact.js",
+			array_merge( $mapgl_react_assets['dependencies'], array( 'mapgl-react-vendor' ) ),
 			JEO_VERSION,
 		);
 
