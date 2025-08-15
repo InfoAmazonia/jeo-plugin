@@ -262,7 +262,7 @@ class StoryMapDisplay extends Component {
 				map.setPaintProperty(layer.slug, 'raster-opacity', isInitialLayer ? 1 : 0);
 			});
 
-			this.el.querySelector(`.${mapRuntime}l-map`).style.filter = `brightness(${ this.state.mapBrightness })`;
+			this.el.querySelector(`.${mapRuntime}-map`).style.filter = `brightness(${ this.state.mapBrightness })`;
 			this.el.querySelector('.the-story').classList.add('loaded');
 		});
 	}
