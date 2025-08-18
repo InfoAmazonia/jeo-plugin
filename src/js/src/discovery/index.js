@@ -2,6 +2,7 @@ import { Component, createRoot } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Sidebar from './blocks/sidebar';
+import { createMap, mapgl } from '../lib/mapgl-loader';
 import { computeInlineStart } from '../shared/direction';
 import './style/discovery.scss';
 
@@ -70,7 +71,7 @@ class Discovery extends Component {
 			additionalMapOptions.zoom = this.getParamFromUrl( 'zoom' );
 		}
 
-		const map = globalThis.mapglLoader.createMap({
+		const map = createMap({
 			container: this.mapContainer,
 			...additionalMapOptions,
 		});
@@ -80,11 +81,11 @@ class Discovery extends Component {
 
 		this.map.on( 'load', () => {
 			this.map.addControl(
-				new globalThis.mapgl.NavigationControl( { showCompass: false } ),
+				new mapgl.NavigationControl( { showCompass: false } ),
 				`top-${inlineStart}`
 			);
 
-			this.map.addControl( new globalThis.mapgl.FullscreenControl(), `top-${inlineStart}` );
+			this.map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 

@@ -3,6 +3,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import classNames from 'classnames';
 import scrollama from 'scrollama';
 
+import { createMap, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { onFirstIntersection } from '../shared/intersect';
 import { renderLayer } from '../map-blocks/map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
@@ -14,7 +15,7 @@ import './storymap-display.scss';
 /* Map brightness percentage when not fully brightness */
 const MAP_DIM = 0.5;
 
-const { map_defaults: mapDefaults, map_runtime: mapRuntime } = globalThis.jeo_settings;
+const { map_defaults: mapDefaults } = jeo_settings;
 
 const isSingle = !!document.querySelector('.single-storymap');
 
@@ -204,7 +205,7 @@ class StoryMapDisplay extends Component {
 
 		if (this.navigable) {
 			const navigateMapDiv = document.createElement('div');
-			navigateMapDiv.classList.add('jeomap', `${mapRuntime}-map`, 'storymap');
+			navigateMapDiv.classList.add('jeomap', `${MAP_RUNTIME}-map`, 'storymap');
 			navigateMapDiv.dataset.map_id = this.props.map_id;
 
 			this.navigateMap = new JeoMap( navigateMapDiv );
@@ -240,7 +241,7 @@ class StoryMapDisplay extends Component {
 		const firstChapter = config.chapters[0];
 		const initialLocation = firstChapter.location;
 
-		const map = globalThis.mapglLoader.createMap( {
+		const map = createMap( {
 			container: this.mapContainer,
 			center: [ initialLocation.center[0] || mapDefaults.lng, initialLocation.center[1] || mapDefaults.lat ],
 			zoom: initialLocation.zoom || mapDefaults.zoom,
@@ -262,13 +263,13 @@ class StoryMapDisplay extends Component {
 				map.setPaintProperty(layer.slug, 'raster-opacity', isInitialLayer ? 1 : 0);
 			});
 
-			this.el.querySelector(`.${mapRuntime}-map`).style.filter = `brightness(${ this.state.mapBrightness })`;
+			this.el.querySelector(`.${MAP_RUNTIME}-map`).style.filter = `brightness(${ this.state.mapBrightness })`;
 			this.el.querySelector('.the-story').classList.add('loaded');
 		});
 	}
 
 	componentDidUpdate() {
-		const mapEl = this.el.querySelector(`.${mapRuntime}-map`);
+		const mapEl = this.el.querySelector(`.${MAP_RUNTIME}-map`);
 		if (mapEl) {
 			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
 		}

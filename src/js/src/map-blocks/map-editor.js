@@ -4,6 +4,7 @@ import { withSelect } from '@wordpress/data';
 import { useEffect, useId, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
+import { mapboxToken } from '../lib/mapgl-loader';
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
@@ -74,6 +75,7 @@ const MapEditor = ( {
 									);
 									if ( layerOptions ) {
 										return renderLayer( {
+											mapboxToken,
 											layer: layerOptions.meta,
 											instance: layer,
 										} );
