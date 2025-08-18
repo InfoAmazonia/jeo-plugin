@@ -208,6 +208,7 @@ class Jeo {
 				'map_runtime' => $map_runtime,
 				'nonce' => $this->get_rest_nonce(),
 				'jeo_typography_name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
+				'public_path' => JEO_BASEURL . '/js/build/',
 			)
 		);
 

@@ -1,3 +1,5 @@
+__webpack_public_path__ = jeo_settings.public_path
+
 /** @type string */
 export const MAP_RUNTIME = jeo_settings.map_runtime
 
