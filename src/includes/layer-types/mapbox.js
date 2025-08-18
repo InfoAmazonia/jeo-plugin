@@ -13,7 +13,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		const layerId = attributes.layer_id;
 
 		if ( ! map.getSource( layerId ) ) {
-			const accessToken = attributes.layer_type_options.access_token || globalThis.mapglLoader.mapboxToken;
+			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 			const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
@@ -70,7 +70,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				const filteredLayers = allLayers.filter( layer => interactionsIds.includes( layer.id ) );
 
 				if ( filteredLayers.length > 0 ) {
-					const popUp = new globalThis.mapgl.Popup( {
+					const popUp = new globalThis.mapboxgl.Popup( {
 						className: interactionType === 'mouseover' ? 'jeo-popup__mouseover' : '',
 						closeButton: interactionType === 'click',
 						closeOnClick: interactionType === 'click',
@@ -164,7 +164,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	},
 
 	getStyleUrl( attributes ) {
-		const accessToken = attributes.layer_type_options.access_token || globalThis.mapglLoader.mapboxToken;
+		const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
@@ -214,7 +214,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleDefinitions[ attributes.layer_id ] );
 			}
 
-			const accessToken = attributes.layer_type_options.access_token || globalThis.mapglLoader.mapboxToken;
+			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 			if ( accessToken && attributes.layer_type_options.style_id ) {
 				const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
@@ -239,7 +239,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleLayers[ attributes.layer_id ] );
 			}
 
-			const accessToken = attributes.layer_type_options.access_token || globalThis.mapglLoader.mapboxToken;
+			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 			self
 				._getStyleDefinition( attributes )

@@ -1,6 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
+import { createMap, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE } from '../shared/styles';
@@ -13,8 +14,6 @@ const decodeHtmlEntity = function ( str ) {
 		return String.fromCharCode( dec );
 	} );
 };
-
-const { map_runtime: mapRuntime } = globalThis.jeo_settings;
 
 function compileTemplate ( template, config = {} ) {
 	const eta = new Eta( config );
@@ -59,7 +58,7 @@ export default class JeoMap {
 
 		this.dataFetched
 			.then( () => {
-				const map = globalThis.mapglLoader.createMap({
+				const map = createMap({
 					container: this.element,
 					attributionControl: false,
 					style: this.getStyleLayer(),
@@ -85,7 +84,7 @@ export default class JeoMap {
 							read_more: window.jeoMapVars.string_read_more,
 							show_featured_media: false,
 						} )
-						let popUp = new globalThis.mapgl.Popup({
+						let popUp = new mapgl.Popup({
 							closeOnClick: false,
 							offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
 						})
@@ -110,7 +109,7 @@ export default class JeoMap {
 					] );
 
 					map.addControl(
-						new globalThis.mapgl.NavigationControl( { showCompass: false } ),
+						new mapgl.NavigationControl( { showCompass: false } ),
 						`top-${inlineStart}`
 					);
 
@@ -128,7 +127,7 @@ export default class JeoMap {
 					}
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
-						map.addControl( new globalThis.mapgl.FullscreenControl(), `top-${inlineStart}` );
+						map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
 					}
 
 					if (
@@ -268,13 +267,13 @@ export default class JeoMap {
 
 							let controlPostion = `bottom-${inlineEnd}`;
 
-							let attributionControl = new globalThis.mapgl.AttributionControl( {
+							let attributionControl = new mapgl.AttributionControl( {
 								compact: false,
 								customAttribution,
 							} );
 
 							if(window.innerWidth < 600) {
-								attributionControl = new globalThis.mapgl.AttributionControl( {
+								attributionControl = new mapgl.AttributionControl( {
 									compact: true,
 									customAttribution,
 								} )
@@ -303,7 +302,7 @@ export default class JeoMap {
 			.then( () => {
 				// Remove all empty jeo map blocks
 				jQuery(
-					`.jeomap.wp-block-jeo-map.${mapRuntime}-map:not([data-map_id])`
+					`.jeomap.wp-block-jeo-map.${MAP_RUNTIME}-map:not([data-map_id])`
 				).remove();
 			} );
 	}
@@ -491,7 +490,7 @@ export default class JeoMap {
 		const closeButton = document.createElement( 'div' );
 		closeButton.classList.add( 'more-info-close' );
 		closeButton.innerHTML =
-			`<button class="${mapRuntime}-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>`;
+			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>`;
 
 		closeButton.click( function ( e ) {} );
 
@@ -744,7 +743,7 @@ export default class JeoMap {
 										show_featured_media: false,
 									} );
 
-									new globalThis.mapgl.Popup()
+									new mapgl.Popup()
 										.setLngLat(e.lngLat)
 										.setHTML( popupHTML )
 										.addTo(map);
@@ -1027,7 +1026,7 @@ export default class JeoMap {
 			show_featured_media: false,
 		} );
 
-		const popUp = new globalThis.mapgl.Popup().setHTML( popupHTML );
+		const popUp = new mapgl.Popup().setHTML( popupHTML );
 
 		const LngLat = {
 			lat: parseFloat( point._geocode_lat ),
@@ -1041,7 +1040,7 @@ export default class JeoMap {
 		el.style.height = '36px';
 		el.style.backgroundSize = 'cover';
 
-		const marker = new globalThis.mapgl.Marker( { element: el, anchor: 'bottom' } )
+		const marker = new mapgl.Marker( { element: el, anchor: 'bottom' } )
 			.setLngLat( LngLat )
 			.addTo( this.map );
 
