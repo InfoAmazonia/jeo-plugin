@@ -1,6 +1,8 @@
 import { forwardRef, useState } from 'react';
 import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/maplibre';
+
 import { computeInlineStart } from '../../shared/direction';
+import { defaultStyle, mapgl } from './maplibregl-loader'
 
 /**
  * @typedef {import('react-map-gl/maplibre').MapProps} MapProps
@@ -13,8 +15,8 @@ function MapGL( { children, controls = undefined, fullscreen = true, ...props },
 	return (
 		<MapLibre
 			ref={ ref }
-			mapLib={ globalThis.mapgl }
-			mapStyle={ globalThis.mapglLoader.defaultStyle }
+			mapLib={ mapgl }
+			mapStyle={ defaultStyle }
 			reuseMaps={ true }
 			{ ...props }
 		>

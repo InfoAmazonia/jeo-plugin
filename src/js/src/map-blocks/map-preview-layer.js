@@ -1,5 +1,7 @@
 import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
+
+import { mapboxToken } from '../lib/mapgl-loader';
 import { Layer, Source } from '../lib/mapgl-react';
 
 export function renderLayer( { layer, instance } ) {
@@ -13,7 +15,7 @@ export function renderLayer( { layer, instance } ) {
 
 	switch ( layer.type ) {
 		case 'mapbox': {
-			const accessToken = options.access_token || globalThis.mapglLoader.mapboxToken;
+			const accessToken = options.access_token || mapboxToken;
 
 			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
 			const styleUrl = `https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`

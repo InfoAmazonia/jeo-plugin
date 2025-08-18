@@ -1,6 +1,8 @@
 import { forwardRef, useState } from 'react';
 import Mapbox, { FullscreenControl, NavigationControl } from 'react-map-gl/mapbox';
+
 import { computeInlineStart } from '../../shared/direction';
+import { defaultStyle, mapboxToken, mapgl } from './mapboxgl-loader'
 
 /**
  * @typedef {import('react-map-gl/mapbox').MapProps} MapProps
@@ -13,9 +15,9 @@ function MapGL( { children, controls = undefined, fullscreen = true, ...props },
 	return (
 		<Mapbox
 			ref={ ref }
-			mapboxAccessToken={ globalThis.mapglLoader.mapboxToken }
-			mapLib={ globalThis.mapgl }
-			mapStyle={ globalThis.mapglLoader.defaultStyle }
+			mapboxAccessToken={ mapboxToken }
+			mapLib={ mapgl }
+			mapStyle={ defaultStyle }
 			reuseMaps={ true }
 			{ ...props }
 		>
