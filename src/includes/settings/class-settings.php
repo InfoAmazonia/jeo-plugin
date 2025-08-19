@@ -13,6 +13,7 @@ class Settings {
 	protected function init() {
 
 		$this->default_options = [
+			'map_runtime' => 'mapboxgl',
 			'enabled_post_types' => [
 				'post',
 				'storymap'
@@ -21,6 +22,7 @@ class Settings {
 			'map_default_zoom' => 11,
 			'map_default_lat' => -23.54998517,
 			'map_default_lng' => -46.65599340,
+			'mapbox_key' => '',
 			'carto_update_time' => 'weekly',
 			'jeo_footer-logo' => '',
 			'show_storymaps_on_post_archives' => 0,

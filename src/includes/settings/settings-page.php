@@ -18,6 +18,22 @@
 			<table class="form-table">
 				<tbody>
 					<tr>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Libraries', 'jeo'); ?></h2></th>
+						<td>
+						</td>
+					</tr>
+
+					<tr>
+						<th scope="row"><label for="map_runtime"><?php esc_html_e('Rendering library', 'jeo'); ?></label></th>
+						<td>
+							<select name="<?php echo esc_html( $this->get_field_name('map_runtime') ); ?>" id="map_runtime">
+								<option value="mapboxgl" <?php selected( $this->get_option('map_runtime'), 'mapboxgl' ) ?>>MapboxGL</option>
+								<option value="maplibregl" <?php selected( $this->get_option('map_runtime'), 'maplibregl' ) ?>>MapLibreGL</option>
+							</select>
+						</td>
+					</tr>
+
+					<tr>
 						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Map', 'jeo'); ?></h2></th>
 						<td>
 						</td>
@@ -78,7 +94,7 @@
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="mapbox_key"><?php esc_html_e('API Key*', 'jeo'); ?></label></th>
+						<th scope="row"><label for="mapbox_key"><?php esc_html_e('API Key', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('mapbox_key') ); ?>" placeholder="<?php esc_attr_e("Ex. pk.eyJ3...", "jeo") ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option('mapbox_key') ); ?>" class="regular-text">
 						</td>
@@ -126,9 +142,9 @@
 						<th scope="row"><label for="carto_update_time"><?php esc_html_e('Update Interval', 'jeo'); ?></label></th>
 						<td>
 						<select name="<?php echo esc_html( $this->get_field_name('carto_update_time') ); ?>" id="carto_update_time">
-							<option value="daily" <?= $this->get_option('carto_update_time') ===  'daily'? 'selected' : '' ?>>Daily</option>
-							<option value="weekly" <?= $this->get_option('carto_update_time') ===  'weekly'? ' selected' : '' ?> <?= empty($this->get_option('carto_update_time'))? ' selected' : '' ?>>Weekly</option>
-							<option value="monthly" <?= $this->get_option('carto_update_time') ===  'monthly'? 'selected' : '' ?>>Monthly</option>
+							<option value="daily" <?php selected( $this->get_option('carto_update_time'), 'daily' ) ?>><?php _e( 'Daily', 'jeo' ) ?></option>
+							<option value="weekly" <?php selected( $this->get_option('carto_update_time'), 'weekly' ) ?>><?php _e( 'Weekly', 'jeo' ) ?></option>
+							<option value="monthly" <?php selected( $this->get_option('carto_update_time'), 'monthly' ) ?>><?php _e( 'Monthly', 'jeo' ) ?></option>
 						</select>
 
 
