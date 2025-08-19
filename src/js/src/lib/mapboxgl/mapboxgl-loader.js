@@ -15,10 +15,10 @@ export const defaultStyle = 'mapbox://styles/mapbox/streets-v11'
 
 export function createMap ({ container, style, ...options }) {
 	const map = new MapboxGL.Map({
-		accessToken: this.mapboxToken,
+		accessToken: mapboxToken,
 		container: container,
 		projection: 'equirectangular',
-		style: style ?? this.defaultStyle,
+		style: style ?? defaultStyle,
 		...options,
 	})
 
