@@ -18,7 +18,7 @@
 			<table class="form-table">
 				<tbody>
 					<tr>
-						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Libraries', 'jeo'); ?></h2></th>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Map', 'jeo'); ?></h2></th>
 						<td>
 						</td>
 					</tr>
@@ -30,12 +30,6 @@
 								<option value="mapboxgl" <?php selected( $this->get_option('map_runtime'), 'mapboxgl' ) ?>>MapboxGL</option>
 								<option value="maplibregl" <?php selected( $this->get_option('map_runtime'), 'maplibregl' ) ?>>MapLibreGL</option>
 							</select>
-						</td>
-					</tr>
-
-					<tr>
-						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Map', 'jeo'); ?></h2></th>
-						<td>
 						</td>
 					</tr>
 
