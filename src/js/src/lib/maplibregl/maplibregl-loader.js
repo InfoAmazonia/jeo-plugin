@@ -44,7 +44,7 @@ export function createMap({ container, style, ...options }) {
 	const map = new MapLibreGL.Map({
 		container: container,
 		projection: 'equirectangular',
-		style: style ?? this.defaultStyle,
+		style: style ?? defaultStyle,
 		validateStyle: false,
 		transformRequest,
 		...options,

@@ -132,10 +132,6 @@ class Jeo {
 		return $args;
 	}
 
-	public function get_map_runtime() {
-		return apply_filters( 'jeo_map_runtime', 'maplibregl' );
-	}
-
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
@@ -151,7 +147,7 @@ class Jeo {
 
 		wp_set_script_translations('jeo-js', 'jeo', plugin_dir_path( __DIR__ ) . 'languages');
 
-		$map_runtime = $this->get_map_runtime();
+		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
 
 		if ( $map_runtime === 'maplibregl' ) {
 			$mapgl_loader = 'maplibreglLoader';
