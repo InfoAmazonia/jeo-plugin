@@ -10,7 +10,6 @@ import { renderLayer } from './map-preview-layer';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import PostsSelector from '../posts-selector';
-import { layerLoader } from './utils';
 import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
@@ -22,7 +21,6 @@ const OnetimeMapEditor = ( {
 } ) => {
 	const [ modal, setModal ] = useState( false );
 	const [ key, setKey ] = useState( 0 );
-	const loadLayer = layerLoader( loadedLayers );
 
 	useEffect( () => {
 		setKey( key + 1 );
@@ -81,7 +79,6 @@ const OnetimeMapEditor = ( {
 				<LayersPanel
 					attributes={ attributes }
 					openModal={ openModal }
-					loadLayer={ loadLayer }
 					renderPanel={ PanelBody }
 				/>
 				<PostsSelector
