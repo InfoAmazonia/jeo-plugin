@@ -91,12 +91,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 				return false;
 			}
 
-			/* TODO: Make layers that don't use legend to not be shown when filtering by legend
-			if ( layerLegendFilter && layerLegendFilter !== layer.meta.legend_type ) {
-				return;
-			}
-			*/
-
 			if ( layerNameFilter && ! layer.title.raw.toLowerCase().includes( layerNameFilter.toLowerCase() ) ) {
 				return false;
 			}
@@ -156,20 +150,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 									setLayerTypeFilter( value )
 								} }
 							/>
-							{
-								/* TODO: Make layers that don't use legend to not be shown when filtering by legend
-									<SelectControl
-										className="jeo-layers-library-filters"
-										hideLabelFromVision={ true }
-										label={ __( 'Legend type', 'jeo ) }
-										options={ legendTypeOptions }
-										value={ layerLegendFilter }
-										onChange={ ( value ) => {
-											setLayerLegendFilter( value )
-										} }
-									/>
-								*/
-							}
 							<Button
 								className="jeo-layers-library-filters-button-filter"
 								variant="primary"
@@ -324,78 +304,50 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 									}
 
 									const switchUseStyle = ( def ) => {
-										// let count = 0;
-										// let limitCount = true;
-
-										const currentLayer = attributes.layers.find((alayer)  => alayer.id === layer.id);
-
-										// attributes.layers.forEach((layer) => {
-										// 	if( layer.load_as_style ) {
-										// 		count++;
-										// 	}
-										// });
-
-										// if(count >= 1) {
-										// 	if(!currentLayer.load_as_style) {
-										// 		limitCount = confirm( __("Loading more than one style in a single map instance may cause unexpected behaviour.") );
-										// 	}
-										// }
-
 										const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === layer.id);
 										const layerType = window.JeoLayerTypes.getLayerType(
 											currentJeoLayerProps.meta.type
 										);
 
-										// if(limitCount) {
-											if(def) {
-												layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
-													if(!response) {
-														return;
-													}
+										if(def) {
+											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
+												if(!response) {
+													return;
+												}
 
-													let styleLayers = response.layers;
+												let styleLayers = response.layers;
 
-													styleLayers = styleLayers.map(layer => {
-														if(layer.layout && typeof layer.layout.visibility !== 'undefined' && layer.layout.visibility === 'none') {
-															return {
-																id: layer.id,
-																show: false,
-															}
-														}
-
+												styleLayers = styleLayers.map(layer => {
+													if(layer.layout && typeof layer.layout.visibility !== 'undefined' && layer.layout.visibility === 'none') {
 														return {
 															id: layer.id,
-															show: true,
+															show: false,
 														}
-													})
+													}
 
-													setLayers(
-														attributes.layers.map( ( settings ) => {
-															return settings.id === layer.id?
-																{ ...settings, load_as_style: true, style_layers: styleLayers }
-																: { ...settings, load_as_style: false, style_layers: [] }
-														} )
-													);
-												} );
+													return {
+														id: layer.id,
+														show: true,
+													}
+												})
 
 												setLayers(
 													attributes.layers.map( ( settings ) => {
 														return settings.id === layer.id?
-															{ ...settings, load_as_style: true, style_layers: [] }
+															{ ...settings, load_as_style: true, style_layers: styleLayers }
 															: { ...settings, load_as_style: false, style_layers: [] }
 													} )
 												);
-											}
-											// else {
-											// 	setLayers(
-											// 		attributes.layers.map( ( settings ) => {
-											// 			return settings.id === layer.id?
-											// 				{ ...settings, load_as_style: def, style_layers: [] }
-											// 				: { ...settings, load_as_style: false, style_layers: [] }
-											// 		} )
-											// 	);
-											// }
-										// }
+											} );
+
+											setLayers(
+												attributes.layers.map( ( settings ) => {
+													return settings.id === layer.id?
+														{ ...settings, load_as_style: true, style_layers: [] }
+														: { ...settings, load_as_style: false, style_layers: [] }
+												} )
+											);
+										}
 									};
 
 									const swapDefault = ( def ) =>
