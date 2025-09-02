@@ -28,7 +28,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 		} );
 	},
 
-	addLayer( map, attributes, addLayerParams ) {
+	addLayer( map, attributes, addLayerParams = null ) {
 		let tileset_id = attributes.layer_type_options.tileset_id;
 
 		if ( tileset_id && ! tileset_id.includes( 'mapbox://' ) ) {
@@ -45,18 +45,13 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
 			'source-layer': attributes.layer_type_options.source_layer,
+			layout: {
+				visibility: attributes.visible ? 'visible' : 'none',
+			},
 		};
 
-		if ( ! attributes.visible ) {
-			layer.layout = {
-				visibility: 'none',
-			};
-		}
-
 		if ( addLayerParams ) {
-			return map.addLayer(
-				layer, ...addLayerParams
-			);
+			return map.addLayer( layer, ...addLayerParams );
 		}
 
 		return map.addLayer(layer);
