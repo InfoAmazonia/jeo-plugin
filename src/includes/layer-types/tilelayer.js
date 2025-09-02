@@ -47,25 +47,23 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 	},
 
 	getSchema( attributes ) {
-		return new Promise( function ( resolve ) {
-			resolve( {
-				type: 'object',
-				required: [ 'url' ],
-				properties: {
-					url: {
-						type: 'string',
-						title: 'URL',
-					},
-					scheme: {
-						type: 'string',
-						title: 'Scheme',
-						description: 'Influences the Y direction of the tile coordinates.',
-						enum: ['xyz', 'tms'],
-						enumNames: ['Slippy Map tilenames (XYZ)', 'OSGeo spec (TMS)'],
-						default: 'xyz',
-					}
+		return {
+			type: 'object',
+			required: [ 'url' ],
+			properties: {
+				url: {
+					type: 'string',
+					title: 'URL',
 				},
-			} );
-		} );
+				scheme: {
+					type: 'string',
+					title: 'Scheme',
+					description: 'Influences the Y direction of the tile coordinates.',
+					enum: ['xyz', 'tms'],
+					enumNames: ['Slippy Map tilenames (XYZ)', 'OSGeo spec (TMS)'],
+					default: 'xyz',
+				}
+			},
+		};
 	},
 } );
