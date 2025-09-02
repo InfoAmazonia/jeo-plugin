@@ -47,37 +47,32 @@
 
 		a.swappable.active:after {
 			content: "";
-			background: url(../src/images/circle.png);
 			background-size: 18px;
 			background-repeat: no-repeat;
-			inset-inline-start: 13px;
+			background-color: #195f93;
+			border-radius: 50%;
+			inset-inline-start: 14px;
 			position: absolute;
-			top: 8px;
-			width: 20px;
-			height: 20px;
+			top: 11px;
+			width: 8px;
+			height: 8px;
 		}
 
 		a.active:after {
 			content: "";
-			background: url(../src/images/check.png);
-			background-size: 18px;
-			background-repeat: no-repeat;
-			inset-inline-start: 13px;
-			position: absolute;
+			background-image: url("data:image/svg+xml;charset=utf-8,<svg width='18' height='18' version='1.1' viewBox='0 0 18 18' xmlns='http://www.w3.org/2000/svg'><path d='m18 4.796q0 .46452-.32516.7897l-9.9872 9.9872q-.32517.32516-.7897.32516-.46452 0-.7897-.32516l-5.7831-5.7831q-.32516-.32516-.32516-.7897 0-.46452.32516-.7897l1.5793-1.5793q.32517-.32516.7897-.32516.46452 0 .7897.32516l3.4142 3.4258 7.618-7.6298q.32516-.32516.7897-.32516.46454 0 .7897.32516l1.5793 1.5793q.32516.32516.32516.7897' fill='%23195f93'/></svg>");
+			background-size: contain;
+			inset-inline-start: 12px;
 			top: 8px;
-			width: 20px;
-			height: 20px;
+			position: absolute;
+			width: 14px;
+			height: 14px;
 		}
 
 		.layers-wrapper {
 			// ini checkbox in layer section inside map
 			a:before {
 				min-width: 16px;
-			}
-
-			a.active:after {
-				inset-inline-start: auto;
-				top: auto;
 			}
 
 			.layer-name {
@@ -90,7 +85,7 @@
 		.arrow-icon {
 			width: 14px;
 			height: 9px;
-			background: url(../src/images/arrow.png);
+			background: url("data:image/svg+xml;charset=utf-8,<svg width='12' height='12' version='1.1' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'><path d='m.32981 9.2403a1.1277 1.1277 0 001.5939 0l4.09-4.09 4.0899 4.09a1.1277 1.1277 0 001.5939-1.5939l-4.8868-4.8868a1.1277 1.1277 0 00-1.5939 0l-4.8868 4.8868a1.1277 1.1277 0 000 1.5939'/></svg>");
 			background-size: cover;
 			background-position: center;
 			filter: brightness(0) invert(1);
@@ -108,7 +103,7 @@
 			.layer-icon {
 				width: 14px;
 				height: 16px;
-				background: url(../src/images/layers.png);
+				background-image: url("data:image/svg+xml;charset=utf-8,<svg width='512' height='512' version='1.1' viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'><path d='m256 18.285-256 116.57 256 118.86 256-118.86-256-116.57zm-169.91 199.35-86.092 38.365 256 116.57 256-116.57-86.32-38.32-169.56 77.863-170.02-77.908zm335.98 119.17-166.4 75.713-165.5-75.656-90.172 40.285 256 116.57 256-116.57-89.932-40.342z'/></svg>");
 				background-size: cover;
 				background-position: center;
 				filter: brightness(0) invert(1);
@@ -353,7 +348,7 @@
 		i.arrow-icon {
 			width: 14px;
 			height: 9px;
-			background: url(../src/images/arrow.png );
+			background: url("data:image/svg+xml;charset=utf-8,<svg width='12' height='12' version='1.1' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'><path d='m.32981 9.2403a1.1277 1.1277 0 001.5939 0l4.09-4.09 4.0899 4.09a1.1277 1.1277 0 001.5939-1.5939l-4.8868-4.8868a1.1277 1.1277 0 00-1.5939 0l-4.8868 4.8868a1.1277 1.1277 0 000 1.5939'/></svg>");
 			background-size: cover;
 			background-position: center;
 			filter: brightness(0) invert(1);
@@ -639,7 +634,7 @@
 	}
 }
 
-nav.layer-selection-title {
+.layer-selection-title {
 
 	.legends-title {
 		background: #191e23;
