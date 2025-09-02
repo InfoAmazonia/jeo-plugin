@@ -21,7 +21,7 @@ const layerSchema = {
 	required: [ 'type' ],
 };
 
-const formUpdater = ( setOptions, setWidgets ) => ( options ) => {
+const formUpdater = ( setOptions, setWidgets, options ) => {
 	const widgets = { layer_type_options: {} };
 	Object.entries( options.properties ).forEach( ( [ key, property ] ) => {
 		if ( property.description ) {
@@ -83,24 +83,23 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			window.JeoLayerTypes.getLayerTypeSchema( postMeta )
-				.then( formUpdater( setOptions, setWidgets ) )
-				.then( () => {
-					if ( postMeta.type ) {
-						let layerTypeOptions = {};
-						if (
-							! prevPostMeta ||
-							( prevPostMeta && prevPostMeta.type === postMeta.type )
-						) {
-							layerTypeOptions = postMeta.layer_type_options;
-						}
-						setPostMeta( {
-							...postMeta,
-							layer_type_options: layerTypeOptions,
-						} );
-						setStyleLayers( null );
-					}
+			const schema = window.JeoLayerTypes.getLayerTypeSchema( postMeta );
+			formUpdater( setOptions, setWidgets, schema );
+
+			if ( postMeta.type ) {
+				let layerTypeOptions = {};
+				if (
+					! prevPostMeta ||
+					( prevPostMeta && prevPostMeta.type === postMeta.type )
+				) {
+					layerTypeOptions = postMeta.layer_type_options;
+				}
+				setPostMeta( {
+					...postMeta,
+					layer_type_options: layerTypeOptions,
 				} );
+				setStyleLayers( null );
+			}
 		} else {
 			setOptions( {} );
 		}
