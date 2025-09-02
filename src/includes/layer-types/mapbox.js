@@ -139,7 +139,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	},
 
 	getSchema( attributes ) {
-		const baseSchema = {
+		return {
 			type: 'object',
 			required: [ 'style_id' ],
 			properties: {
@@ -157,10 +157,6 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				},
 			},
 		};
-
-		return new Promise( function ( resolve ) {
-			resolve( baseSchema );
-		} );
 	},
 
 	getStyleUrl( attributes ) {
