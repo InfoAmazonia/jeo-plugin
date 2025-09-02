@@ -7,7 +7,6 @@ import classNames from 'classnames';
 const setLayer = ( id ) => ( { id, use: 'fixed', default: false } );
 
 const LayersLibrary = ( {
-	loadingLayers,
 	loadedLayers,
 	attributes,
 	setAttributes,
@@ -15,10 +14,6 @@ const LayersLibrary = ( {
 	const [ editing, setEditing ] = useState( false );
 	const [ search, setSearch ] = useState( '' );
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
-
-	if ( loadingLayers ) {
-		return <p>{ __( 'Loading layers data...', 'jeo' ) }</p>;
-	}
 
 	const options = loadedLayers
 		.filter( ( layer ) =>
@@ -84,9 +79,4 @@ const LayersLibrary = ( {
 
 export default withSelect( ( select ) => ( {
 	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1 } ),
-	loadingLayers: select( 'core/data' ).isResolving(
-		'core',
-		'getEntityRecords',
-		[ 'postType', 'map-layer', { per_page: -1 } ],
-	),
 } ) )( LayersLibrary );

@@ -13,15 +13,10 @@ const decodeHtmlEntity = function ( str ) {
 
 export default ( {
 	loadedLayers,
-	loadingLayers,
 	selectedLayers,
 	className,
 	onButtonClick,
 } ) => {
-	if ( loadingLayers ) {
-		return <p>{ __( 'Loading Layers Data', 'jeo' ) }</p>;
-	}
-
 	const emptyMessage = __( 'No layers have been selected for this map.', 'jeo' );
 	const loadLayer = loadLayers( loadedLayers );
 
@@ -49,7 +44,7 @@ export default ( {
 						{ ! ( loadedLayers && loadedLayers.length ) && (
 							<p className="empty">{ emptyMessage }</p>
 						) }
-						{ ! loadingLayers && (
+						{ (
 							<Button variant="primary" isLarge onClick={ onButtonClick }>
 								{ __( 'Add a new layer', 'jeo' ) }
 							</Button>
