@@ -1,7 +1,7 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { layerUseLabels } from './utils';
+import { layerUseLabels, loadLayer } from './utils';
 import './layers-panel.css';
 
 const decodeHtmlEntity = function ( str ) {
@@ -12,7 +12,6 @@ const decodeHtmlEntity = function ( str ) {
 
 export default function ( {
 	attributes,
-	loadLayer,
 	openModal,
 	renderPanel: Panel,
 } ) {

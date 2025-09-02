@@ -7,7 +7,7 @@ import { arrayMove } from 'react-movable';
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 import LayerSettings from './layer-settings';
-import { layerLoader } from './utils';
+import { loadLayer } from './utils';
 
 import './layers-settings.css';
 
@@ -18,13 +18,16 @@ const anySwapDefault = ( settings ) =>
 
 export default function LayersSettings ( { attributes, setAttributes, loadedLayers, closeModal } ) {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
-	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
 
 	const [ layerTypeFilter, setLayerTypeFilter ] = useState( null );
 	const [ layerNameFilter, setLayerNameFilter ] = useState('');
 
 	const searchedLayers = useSelect((select) => {
+		if ( ! layerNameFilter && ! layerTypeFilter ) {
+			return [];
+		}
+
 		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
 			// per_page: -1,
 			order: 'asc',

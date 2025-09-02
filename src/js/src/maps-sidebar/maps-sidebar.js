@@ -1,4 +1,4 @@
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useSelect, withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { Button, ButtonGroup } from '@wordpress/components';
@@ -11,7 +11,6 @@ import MapPanel from '../map-blocks/map-panel';
 import MapEmbedUrl from './map-embed-url';
 import MapPreviewPortal from './map-preview-portal';
 import PostsSelector from '../posts-selector';
-import { layerLoader } from '../map-blocks/utils';
 import { renderLayer } from '../map-blocks/map-preview-layer';
 
 import './maps-sidebar.scss';
@@ -25,7 +24,6 @@ const mapDefaults = {
 };
 
 function MapsSidebar( {
-	loadedLayers,
 	postId,
 	postMeta,
 	relatedPosts,
@@ -56,6 +54,11 @@ function MapsSidebar( {
 
 	const mapRef = useRef( undefined );
 
+	const loadedLayers = useSelect( ( select ) => {
+		const layerIds = postMeta.layers.map( ( layer ) => layer.id );
+		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', { include: layerIds, per_page: -1 } );
+	}, [ postMeta.layers ]);
+
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
 		if ( map ) {
@@ -73,10 +76,6 @@ function MapsSidebar( {
 
 	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
-
-	const loadLayer = useCallback( layerLoader( loadedLayers ), [
-		loadedLayers,
-	] );
 
 	const embedUrl =
 		postId && `${ jeo_settings.site_url }/embed/?map_id=${ postId }`;
@@ -279,7 +278,6 @@ function MapsSidebar( {
 			<LayersPanel
 				attributes={ postMeta }
 				openModal={ openModal }
-				loadLayer={ loadLayer }
 				renderPanel={ PluginDocumentSettingPanel }
 			/>
 
@@ -301,7 +299,6 @@ export default withDispatch( ( dispatch ) => ( {
 	},
 } ) )(
 	withSelect( ( select ) => ( {
-		loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'title' } ),
 		postId: select( 'core/editor' ).getCurrentPostId(),
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
 		relatedPosts: select( 'core/editor' ).getEditedPostAttribute( 'meta' )
