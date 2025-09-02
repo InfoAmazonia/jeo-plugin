@@ -1,9 +1,7 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const loadLayers = ( layers ) => ( settings ) => {
-	return layers.find( ( l ) => l.id === settings.id );
-};
+import { loadLayer } from './utils';
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, function ( match, dec ) {
@@ -18,7 +16,6 @@ export default ( {
 	onButtonClick,
 } ) => {
 	const emptyMessage = __( 'No layers have been selected for this map.', 'jeo' );
-	const loadLayer = loadLayers( loadedLayers );
 
 	return (
 		<table className={ className }>

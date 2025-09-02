@@ -1,12 +1,13 @@
+import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
 
-export const layerLoader = ( layers ) => {
-	const layersMap = Object.fromEntries(
-		( layers || [] ).map( ( l ) => [ l.id, l ] )
-	);
-	return ( settings ) => ( { ...settings, layer: layersMap[ settings.id ] } );
-};
+export function loadLayer ( settings ) {
+	const layers = select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
+		include: [settings.id],
+	} );
+	const layer = layers?.[0];
+	return { ...settings, layer };
+}
 
 export const layerUseLabels = {
 	fixed: __( 'Fixed', 'jeo' ),
