@@ -165,7 +165,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 					if( isLayerUsed || response.index === config.chapters.length - 1) {
-						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 1)
+						this.map?.setLayoutProperty(layer.slug, 'visibility', 'visible');
 					}
 				})
 
@@ -174,7 +174,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
 
 					if ( !isLayerUsed ) {
-						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 0)
+						this.map?.setLayoutProperty(layer.slug, 'visibility', 'none');
 					}
 				})
 		})
@@ -187,7 +187,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
 					if( isLayerUsed ) {
-						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 1)
+						this.map?.setLayoutProperty(layer.slug, 'visibility', 'visible');
 					}
 				})
 
@@ -195,7 +195,7 @@ class StoryMapDisplay extends Component {
 					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
 					if ( !isLayerUsed ) {
-						this.map?.setPaintProperty(layer.slug, 'raster-opacity', 0)
+						this.map?.setLayoutProperty(layer.slug, 'visibility', 'none');
 					}
 				})
 			}
@@ -258,9 +258,8 @@ class StoryMapDisplay extends Component {
 			this.props.navigateMapLayers.forEach(layer => {
 				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
-				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: layer.slug, visible: true });
+				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: layer.slug, visible: isInitialLayer });
 				jeoLayer.addLayer(map);
-				map.setPaintProperty(layer.slug, 'raster-opacity', isInitialLayer ? 1 : 0);
 			});
 
 			this.el.querySelector(`.${MAP_RUNTIME}-map`).style.filter = `brightness(${ this.state.mapBrightness })`;

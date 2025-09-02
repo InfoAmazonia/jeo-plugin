@@ -9,7 +9,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		}
 	},
 
-	addLayer( map, attributes, addLayerParams ) {
+	addLayer( map, attributes, addLayerParams = null ) {
 		const layerId = attributes.layer_id;
 
 		if ( ! map.getSource( layerId ) ) {
@@ -29,13 +29,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			id: layerId,
 			source: layerId,
 			type: 'raster',
+			layout: {
+				visibility: attributes.visible ? 'visible' : 'none',
+			},
 		};
-
-		if ( ! attributes.visible ) {
-			layer.layout = {
-				visibility: 'none',
-			};
-		}
 
 		if ( addLayerParams ) {
 			return map.addLayer( layer, ...addLayerParams );

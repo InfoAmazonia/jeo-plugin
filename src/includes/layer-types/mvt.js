@@ -22,7 +22,7 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 		} );
 	},
 
-	addLayer( map, attributes, addLayerParams ) {
+	addLayer( map, attributes, addLayerParams = null ) {
 		map.addSource( attributes.layer_id, {
 			type: 'vector',
 			tiles: [ attributes.layer_type_options.url ],
