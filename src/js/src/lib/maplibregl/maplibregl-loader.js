@@ -1,6 +1,6 @@
 import U from 'map-gl-utils'
 import MapLibreGL from 'maplibre-gl'
-import { isMapboxURL, transformMapboxUrl } from 'maplibregl-mapbox-request-transformer'
+import { isMapboxURL, transformMapboxStyle, transformMapboxUrl } from 'maplibregl-mapbox-request-transformer'
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 
@@ -44,10 +44,12 @@ export function createMap({ container, style, ...options }) {
 	const map = new MapLibreGL.Map({
 		container: container,
 		projection: 'equirectangular',
-		style: style ?? defaultStyle,
 		validateStyle: false,
 		transformRequest,
-		...options,
+	})
+
+	map.setStyle(style ?? defaultStyle, {
+		transformStyle: transformMapboxStyle,
 	})
 
 	U.init(map, MapLibreGL)
