@@ -1,9 +1,9 @@
 import { Button, Card, CardBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-import { List, arrayMove } from 'react-movable';
+import { arrayMove } from 'react-movable';
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 import LayerSettings from './layer-settings';
@@ -21,36 +21,19 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
 
-	const [ allLayers, setAllLayers ] = useState([]);
-	const [ filteredLayers, setFilteredLayers ] = useState([]);
-
-	useEffect( () => {
-		// TODO paginate this results. getEntityRecords accept 'page' parameter
-		const allLayersData = select( 'core' ).getEntityRecords(
-			'postType',
-			'map-layer',
-			{ per_page: -1, order: 'asc', orderby: 'title' }
-		);
-		if ( ! allLayersData ) {
-			setAllLayers( [] );
-		} else {
-			setAllLayers( allLayersData );
-		}
-	} );
-
-	allLayers.sort( function ( a, b ) {
-		if ( a.title.rendered.toLowerCase() < b.title.rendered.toLowerCase() ) {
-			return -1;
-		}
-		if ( a.title.rendered.toLowerCase() > b.title.rendered.toLowerCase() ) {
-			return 1;
-		}
-		return 0;
-	} );
-
 	const [ layerTypeFilter, setLayerTypeFilter ] = useState( null );
-	const [ layerLegendFilter, setLayerLegendFilter ] = useState( null );
 	const [ layerNameFilter, setLayerNameFilter ] = useState('');
+
+	const searchedLayers = useSelect((select) => {
+		console.log([ layerNameFilter, layerTypeFilter ]);
+		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
+			// per_page: -1,
+			order: 'asc',
+			orderby: 'title',
+			layer_name: layerNameFilter,
+			layer_type: layerTypeFilter ?? undefined,
+		} ) ?? [];
+	}, [layerNameFilter, layerTypeFilter]);
 
 	const layerTypeOptions = [
 		{ label: 'Select a layer type', value: '' },
@@ -59,14 +42,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 		{ label: 'Mapbox-tileset-raster', value: 'mapbox-tileset-raster' },
 		{ label: 'Tilelayer', value: 'tilelayer' },
 		{ label: 'MVT', value: 'mvt' },
-	];
-
-	const legendTypeOptions = [
-		{ label: 'Select a legend type', value: '' },
-		{ label: 'Barscale', value: 'barscale' },
-		{ label: 'Simple-color', value: 'simple-color' },
-		{ label: 'Icons', value: 'icons' },
-		{ label: 'Circles', value: 'circles' },
 	];
 
 	useEffect( () => {
@@ -84,21 +59,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 			return String.fromCharCode( dec );
 		} );
 	};
-
-	function filterLayers() {
-		const layers = allLayers.filter( ( layer ) => {
-			if ( layerTypeFilter && layerTypeFilter !== layer.meta.type ) {
-				return false;
-			}
-
-			if ( layerNameFilter && ! layer.title.raw.toLowerCase().includes( layerNameFilter.toLowerCase() ) ) {
-				return false;
-			}
-
-			return true;
-		} );
-		setFilteredLayers( layers );
-	}
 
 	const onDragEnd = (result) => {
 		if (!result.destination) {
@@ -132,7 +92,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 			<div className="jeo-layers-library-controls">
 				<div className="left">
 					<div>
-						<form onSubmit={ filterLayers } action="javascript:void(0);" style={ { display: "flex" }}>
+						<form action="javascript:void(0);" style={ { display: "flex" }}>
 							<TextControl
 								placeholder={ __( 'Enter keywords to search layers', 'jeo' ) }
 								value={ layerNameFilter }
@@ -151,21 +111,11 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 								} }
 							/>
 							<Button
-								className="jeo-layers-library-filters-button-filter"
-								variant="primary"
-								isLarge
-								onClick={ filterLayers }
-							>
-								{ __( 'Filter', 'jeo' ) }
-							</Button>
-							<Button
 								className="jeo-layers-library-filters-button-clear"
 								variant="primary"
 								isLarge
 								onClick={ () => {
-									setFilteredLayers([]);
 									setLayerTypeFilter( '' );
-									setLayerLegendFilter( '' );
 									setLayerNameFilter('');
 								} }
 							>
@@ -189,7 +139,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 			</div>
 			<div name="map-layers" className="jeo-layers-panel">
 				<ul className="jeo-layers-list">
-					{ filteredLayers.map( ( layer, i ) => {
+					{ searchedLayers.map( ( layer, i ) => {
 						let inUse = false;
 						attributes.layers.map( ( l ) => {
 							if ( layer.id === l.id ) {
