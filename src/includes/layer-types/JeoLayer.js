@@ -10,7 +10,7 @@ class JeoLayer {
 		return this.layerType.addStyle( map, this.attributes );
 	}
 
-	addLayer( map, addLayerParams = false ) {
+	addLayer( map, addLayerParams = null ) {
 		return this.layerType.addLayer( map, this.attributes, addLayerParams );
 	}
 
