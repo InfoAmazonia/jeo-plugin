@@ -51,9 +51,8 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			window.JeoLayerTypes.getLayerTypeSchema( postMeta ).then( ( schema ) => {
-				setLayerTypeSchema( schema );
-			} );
+			const schema = window.JeoLayerTypes.getLayerTypeSchema( postMeta );
+			setLayerTypeSchema( schema );
 		}
 	}, [ postMeta.type ] );
 
