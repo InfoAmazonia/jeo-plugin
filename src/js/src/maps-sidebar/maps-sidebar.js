@@ -228,9 +228,16 @@ function MapsSidebar( {
 					latitude={ centerLat || 0 }
 					longitude={ centerLon || 0 }
 					zoom={ currentZoom || initialZoom || 11 }
-					onMoveEnd={ ( { target: map } ) => {
-						const center = map.getCenter();
-						let zoom = Math.round( map.getZoom() * 10 ) / 10;
+					onMove={ ( { target: map, viewState } ) => {
+						const { latitude, longitude } = viewState;
+
+						setPostMeta( {
+							center_lat: latitude,
+							center_lon: longitude,
+						} );
+					} }
+					onZoom={ ( { viewState } ) => {
+						let zoom = Math.round( viewState.zoom * 10 ) / 10;
 
 						if ( zoomState === 'initial_zoom' ) {
 							if ( window.max_zoom && zoom > window.max_zoom ) {
@@ -252,11 +259,7 @@ function MapsSidebar( {
 							}
 						}
 
-						setPostMeta( {
-							center_lat: center.lat,
-							center_lon: center.lng,
-							[ zoomState ]: zoom,
-						} );
+						setPostMeta( { [ zoomState ]: zoom } );
 						window[ zoomState ] = zoom;
 					} }
 				>
