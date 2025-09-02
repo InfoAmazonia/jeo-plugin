@@ -75,6 +75,7 @@ class Jeo {
 		add_filter('rest_post_tag_query', array( $this, 'maximum_terms_api_filter'), 10, 1 );
 
 
+		add_filter('rest_map-layer_query', array( $this, 'custom_layer_search_filters'), 10, 2);
 		add_filter('rest_map-layer_query', array( $this, 'order_rest_post_by_post_title'), 10, 2);
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
 	}
@@ -130,6 +131,22 @@ class Jeo {
 		}
 
 		return $args;
+	}
+
+	public function custom_layer_search_filters(array $query, \WP_REST_Request $request) {
+		if ($layer_type = $request->get_param('layer_type')) {
+			if (!isset($query['meta_query'])) {
+				$query['meta_query'] = [];
+			}
+
+			$query['meta_query'][] = [ 'key' => 'type', 'value' => $layer_type ];
+		}
+
+		if ($layer_name = $request->get_param('layer_name')) {
+			$query['s'] = $layer_name;
+		}
+
+		return $query;
 	}
 
 	public function register_assets() {
