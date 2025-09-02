@@ -150,11 +150,6 @@ const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
 			attributes.map_id,
 		] ),
 	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'title' } ),
-	loadingLayers: select( 'core/data' ).isResolving(
-		'core',
-		'getEntityRecords',
-		[ 'postType', 'map-layer' ]
-	),
 } ) );
 
 export default compose( applyWithSelect )( MapEditor );

@@ -19,7 +19,6 @@ const OnetimeMapEditor = ( {
 	attributes,
 	setAttributes,
 	loadedLayers,
-	loadingLayers,
 } ) => {
 	const [ modal, setModal ] = useState( false );
 	const [ key, setKey ] = useState( 0 );
@@ -68,7 +67,6 @@ const OnetimeMapEditor = ( {
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					loadedLayers={ loadedLayers }
-					loadingLayers={ loadingLayers }
 				/>
 			) }
 
@@ -84,7 +82,6 @@ const OnetimeMapEditor = ( {
 					attributes={ attributes }
 					openModal={ openModal }
 					loadLayer={ loadLayer }
-					loadingLayers={ loadingLayers }
 					renderPanel={ PanelBody }
 				/>
 				<PostsSelector
@@ -142,11 +139,6 @@ export default withSelect( ( select, { attributes } ) => {
 			'postType',
 			'map-layer',
 			query
-		),
-		loadingLayers: select( 'core/data' ).isResolving(
-			'core',
-			'getEntityRecords',
-			[ 'postType', 'map-layer', query ]
 		),
 	};
 } )( OnetimeMapEditor );

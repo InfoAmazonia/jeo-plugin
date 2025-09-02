@@ -26,7 +26,6 @@ const mapDefaults = {
 
 function MapsSidebar( {
 	loadedLayers,
-	loadingLayers,
 	postId,
 	postMeta,
 	relatedPosts,
@@ -149,7 +148,6 @@ function MapsSidebar( {
 					attributes={ postMeta }
 					setAttributes={ setPostMeta }
 					loadedLayers={ loadedLayers }
-					loadingLayers={ loadingLayers }
 				/>
 			) }
 
@@ -282,7 +280,6 @@ function MapsSidebar( {
 				attributes={ postMeta }
 				openModal={ openModal }
 				loadLayer={ loadLayer }
-				loadingLayers={ loadingLayers }
 				renderPanel={ PluginDocumentSettingPanel }
 			/>
 
@@ -305,11 +302,6 @@ export default withDispatch( ( dispatch ) => ( {
 } ) )(
 	withSelect( ( select ) => ( {
 		loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'title' } ),
-		loadingLayers: select( 'core/data' ).isResolving(
-			'core',
-			'getEntityRecords',
-			[ 'postType', 'map-layer' ]
-		),
 		postId: select( 'core/editor' ).getCurrentPostId(),
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
 		relatedPosts: select( 'core/editor' ).getEditedPostAttribute( 'meta' )
