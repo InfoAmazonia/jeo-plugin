@@ -25,7 +25,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 	const [ layerNameFilter, setLayerNameFilter ] = useState('');
 
 	const searchedLayers = useSelect((select) => {
-		console.log([ layerNameFilter, layerTypeFilter ]);
 		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
 			// per_page: -1,
 			order: 'asc',
