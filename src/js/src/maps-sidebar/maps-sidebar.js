@@ -231,12 +231,10 @@ function MapsSidebar( {
 					latitude={ centerLat || 0 }
 					longitude={ centerLon || 0 }
 					zoom={ currentZoom || initialZoom || 11 }
-					onMove={ ( { target: map, viewState } ) => {
-						const { latitude, longitude } = viewState;
-
+					onMove={ ( { viewState } ) => {
 						setPostMeta( {
-							center_lat: latitude,
-							center_lon: longitude,
+							center_lat: viewState.latitude,
+							center_lon: viewState.longitude,
 						} );
 					} }
 					onZoom={ ( { viewState } ) => {
