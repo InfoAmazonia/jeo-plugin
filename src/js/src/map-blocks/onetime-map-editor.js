@@ -1,7 +1,7 @@
 import { InspectorControls } from '@wordpress/block-editor';
 import { Button, PanelBody } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useEntityRecords } from '@wordpress/core-data';
+import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
@@ -14,12 +14,7 @@ import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
-const OnetimeMapEditor = ( {
-	attributes,
-	setAttributes,
-	loadedLayers,
-	loadingLayers,
-} ) => {
+export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 	const [ modal, setModal ] = useState( false );
 	const [ key, setKey ] = useState( 0 );
 
@@ -41,6 +36,15 @@ const OnetimeMapEditor = ( {
 	const currentZoom = attributes[ zoomState ];
 
 	const mapRef = useRef( undefined );
+
+	const layerIds = useMemo( () => {
+		return attributes.layers.map( ( layer ) => layer.id );
+	}, [ attributes.layers ] );
+
+	const { records: loadedLayers, isResolving: loadingLayers } = useEntityRecords( 'postType', 'map-layer', {
+		include: layerIds,
+		per_page: -1,
+	} );
 
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
@@ -100,15 +104,15 @@ const OnetimeMapEditor = ( {
 					latitude={ attributes.center_lat || mapDefaults.lat }
 					longitude={ attributes.center_lon || mapDefaults.lng }
 					zoom={ currentZoom || mapDefaults.zoom }
-					onMoveEnd={ ( { target: map } ) => {
-						const center = map.getCenter();
-						const zoom = Math.round( map.getZoom() * 10 ) / 10;
-
+					onMove={ ( { viewState } ) => {
 						setAttributes( {
-							center_lat: center.lat,
-							center_lon: center.lng,
-							[ zoomState ]: zoom,
+							center_lat: viewState.latitude,
+							center_lon: viewState.longitude,
 						} );
+					} }
+					onZoom={ ( { viewState } ) => {
+						const zoom = Math.round( viewState.zoom * 10 ) / 10;
+						setAttributes( { [ zoomState ]: zoom } );
 					} }
 				>
 					{ loadedLayers &&
@@ -129,24 +133,3 @@ const OnetimeMapEditor = ( {
 		</>
 	);
 };
-
-export default withSelect( ( select, { attributes } ) => {
-	const query = {
-		include: attributes.layers.map( ( layer ) => layer.id ),
-		per_page: -1, order: 'asc', orderby: 'title'
-	};
-	return {
-		loadedLayers: select( 'core' ).getEntityRecords(
-			'postType',
-			'map-layer',
-			query
-		),
-		loadingLayers: select( 'core/data' ).isResolving(
-			'core',
-			'getEntityRecords',
-			'postType',
-			'map-layer',
-			query
-		),
-	};
-} )( OnetimeMapEditor );
