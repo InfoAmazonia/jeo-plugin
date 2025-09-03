@@ -172,17 +172,15 @@ const LayersSidebar = ( {
 					latitude={ centerLat || 0 }
 					longitude={ centerLon || 0 }
 					zoom={ initialZoom || 0 }
-					onMoveEnd={ ( { target: map } ) => {
-						if ( ! editingMap.current ) {
-							const center = map.getCenter();
-							const zoom = Math.round( map.getZoom() * 10 ) / 10;
-
-							setPostMeta( {
-								center_lat: center.lat,
-								center_lon: center.lng,
-								initial_zoom: zoom,
-							} );
-						}
+					onMove={ ( { viewState } ) => {
+						setPostMeta( {
+							center_lat: viewState.latitude,
+							center_lon: viewState.longitude,
+						} );
+					} }
+					onZoom={ ( { viewState } ) => {
+						const zoom = Math.round( viewState.zoom * 10 ) / 10;
+						setPostMeta( { initial_zoom: zoom } );
 					} }
 				>
 					{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
