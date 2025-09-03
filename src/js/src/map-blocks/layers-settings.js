@@ -344,7 +344,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										}
 									};
 
-									const loadedLayer = loadLayer( loadingLayers, layer );
+									const loadedLayer = loadLayer( loadedLayers, layer );
 
 									if(!loadedLayer.layer) {
 										return setLayers(
