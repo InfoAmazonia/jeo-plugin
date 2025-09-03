@@ -1,11 +1,7 @@
-import { select } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
-export function loadLayer ( settings ) {
-	const layers = select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
-		include: [settings.id],
-	} );
-	const layer = layers?.[0];
+export function loadLayer ( layers, settings ) {
+	const layer = ( layers || [] ).find( ( layer ) => layer.id === settings.id );
 	return { ...settings, layer };
 }
 

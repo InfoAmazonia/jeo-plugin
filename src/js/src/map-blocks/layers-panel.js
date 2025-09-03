@@ -12,6 +12,8 @@ const decodeHtmlEntity = function ( str ) {
 
 export default function ( {
 	attributes,
+	loadedLayers,
+	loadingLayers,
 	openModal,
 	renderPanel: Panel,
 } ) {
@@ -23,25 +25,29 @@ export default function ( {
 			title={ __( 'Map layers', 'jeo' ) }
 			className="jeo-layers-panel"
 		>
-			<ol>
-				{ layers.map( ( layerSettings ) => {
-					const settings = loadLayer( layerSettings );
-					return (
-						settings.layer && (
-							<li className="jeo-setting-layer" key={ settings.id }>
-								<h2>
-									{ decodeHtmlEntity( settings.layer.title.rendered ) } -{ ' ' }
-									{ settings.layer.meta.type }
-								</h2>
-								{ layerUseLabels[ settings.use ] }
-								{ settings.use !== 'fixed' &&
-									settings.default &&
-									' - ' + __( 'Default', 'jeo' ) }
-							</li>
-						)
-					);
-				} ) }
-			</ol>
+			{ loadingLayers ? (
+				<p>{ __( 'Loading layers data...', 'jeo' ) }</p>
+			) : (
+				<ol>
+					{ layers.map( ( layerSettings ) => {
+						const settings = loadLayer( loadedLayers, layerSettings );
+						return (
+							settings.layer && (
+								<li className="jeo-setting-layer" key={ settings.id }>
+									<h2>
+										{ decodeHtmlEntity( settings.layer.title.rendered ) } -{ ' ' }
+										{ settings.layer.meta.type }
+									</h2>
+									{ layerUseLabels[ settings.use ] }
+									{ settings.use !== 'fixed' &&
+										settings.default &&
+										' - ' + __( 'Default', 'jeo' ) }
+								</li>
+							)
+						);
+					} ) }
+				</ol>
+			) }
 			<Button variant="primary" isLarge onClick={ openModal }>
 				{ __( 'Edit layers settings', 'jeo' ) }
 			</Button>

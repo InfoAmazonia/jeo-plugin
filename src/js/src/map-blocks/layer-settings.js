@@ -1,10 +1,6 @@
-import {
-	CheckboxControl,
-	Dashicon,
-	SelectControl,
-} from '@wordpress/components';
-import { forwardRef, useEffect, useState } from '@wordpress/element';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { CheckboxControl, Dashicon, SelectControl } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { Draggable } from 'react-beautiful-dnd';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 
@@ -40,9 +36,7 @@ const LayerSettings = (
 		switchDefault,
 		updateUse,
 		widths,
-		...props
-	},
-	ref
+	}
 ) => {
 	const classes = classNames( [
 		'layer',
@@ -51,15 +45,10 @@ const LayerSettings = (
 		{ isoutofbounds: isOutOfBounds },
 	] );
 
-	// console.log("settings", settings);
 	const [ showStyleLayers, setshowStyleLayers ] = useState( false );
-	// const [ forceStateUpdate, useForceStateUpdate ] = useState( false );
-	// const [ innnerSettings, setInnerSettings ] = useState( settings );
 
 	const setWidth = ( index ) =>
 		isDragged && widths.length ? { width: widths[ index ] } : {};
-
-	// props.style.zIndex = isDragged && 320000;
 
 	const toggleStyleLayerDisplay = ( layerId ) => {
 		const newStyleLayers = settings.style_layers.map( ( styleLayer ) => {
@@ -81,55 +70,7 @@ const LayerSettings = (
 		>
 			{ ( provided ) => {
 				if(!settings.layer) {
-					return (
-						// TODO: Show private layer
-						// <div ref={ provided.innerRef }
-						// 	{ ...provided.draggableProps }
-						// 	{ ...provided.dragHandleProps }
-						// 	className={ classes }>
-
-						// 	<div className="handle" style={ setWidth( 0 ) }>
-						// 		<Dashicon className="drag-handle" icon="move" data-movable-handle />
-						// 	</div>
-
-						// 	<div className="display" style={ setWidth( 1 ) }>
-						// 		<span className="layer-title">
-						// 			{ __( '(private layer)', 'jeo' ) }
-						// 		</span>
-						// 	</div>
-						// 	<div className="use-control" style={ setWidth( 2 ) }>
-						// 		{ layerIndex === 0 ? (
-						// 			<span>{ __( 'Base layer should be fixed', 'jeo' ) }</span>
-						// 		) : (
-						// 			<SelectControl
-						// 				label={ __( 'Type', 'jeo ) }
-						// 				value={ settings.use }
-						// 				options={ useOptions }
-						// 				onChange={ updateUse }
-						// 			/>
-						// 		) }
-						// 	</div>
-						// 	<div className="default-control" style={ setWidth( 3 ) }>
-
-						// 	</div>
-
-						// 	<div className="default-control" style={ setWidth( 4 ) }></div>
-
-						// 	<div className="default-control" style={ setWidth( 5 ) }></div>
-
-						// 	<div className="layer-actions" style={ setWidth( 6 ) }>
-						// 		<a
-						// 			href={ `/wp-admin/post.php?post=${ settings.id }&action=edit` }
-						// 			target="_blank"
-						// 			rel="noopener noreferrer"
-						// 		>
-						// 			<Dashicon icon="welcome-write-blog" />
-						// 		</a>
-						// 		<Dashicon icon="dismiss" onClick={ removeLayer } />
-						// 	</div>
-						// </div>);
-						<></>
-					);
+					return null;
 				}
 
 				return (settings.layer && <div
