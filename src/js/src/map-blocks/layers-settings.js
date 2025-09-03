@@ -347,11 +347,8 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 									const loadedLayer = loadLayer( loadedLayers, layer );
 
 									if(!loadedLayer.layer) {
-										return setLayers(
-											attributes.layers.filter(
-												( settings ) => settings.id !== loadedLayer.id
-											)
-										);
+										// TODO: Remove deleted layers
+										return null;
 									}
 
 									return <LayerSettings
