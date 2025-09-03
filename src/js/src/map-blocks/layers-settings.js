@@ -16,7 +16,7 @@ const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
 const anySwapDefault = ( settings ) =>
 	settings.some( ( s ) => s.use === 'swappable' && s.default );
 
-export default function LayersSettings ( { attributes, setAttributes, loadedLayers, closeModal } ) {
+export default function LayersSettings ( { attributes, setAttributes, loadedLayers, loadingLayers, closeModal } ) {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 	let widths = [];
 
@@ -29,7 +29,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		}
 
 		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
-			// per_page: -1,
+			per_page: -1,
 			order: 'asc',
 			orderby: 'title',
 			layer_name: layerNameFilter,
@@ -213,13 +213,13 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 				</ul>
 			</div>
 			<h2 className="selected-layers-title" >{ __( 'Selected layers', 'jeo' ) }</h2>
-			{ ! attributes.layers.length && (
+			{ ! loadingLayers && ! attributes.layers.length && (
 				<p className="jeo-layers-list">
 					{ __( 'No layers have been added to this map.', 'jeo' ) }
 				</p>
 			) }
 
-			{ attributes.layers.length > 0 && (
+			{ ! loadingLayers && attributes.layers.length > 0 && (
 				<DragDropContext onDragEnd={ onDragEnd }>
 					<Droppable droppableId="list">
 						{ provided => (
@@ -344,7 +344,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										}
 									};
 
-									const loadedLayer = loadLayer( layer );
+									const loadedLayer = loadLayer( loadingLayers, layer );
 
 									if(!loadedLayer.layer) {
 										return setLayers(

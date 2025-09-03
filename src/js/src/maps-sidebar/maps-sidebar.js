@@ -1,6 +1,7 @@
-import { useSelect, withDispatch, withSelect } from '@wordpress/data';
+import { useEntityRecords } from '@wordpress/core-data';
+import { withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { Button, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -54,10 +55,14 @@ function MapsSidebar( {
 
 	const mapRef = useRef( undefined );
 
-	const loadedLayers = useSelect( ( select ) => {
-		const layerIds = postMeta.layers.map( ( layer ) => layer.id );
-		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', { include: layerIds, per_page: -1 } );
-	}, [ postMeta.layers ]);
+	const layerIds = useMemo( () => {
+		return postMeta.layers.map( ( layer ) => layer.id );
+	}, [ postMeta.layers ] );
+
+	const { records: loadedLayers, isResolving: loadingLayers } = useEntityRecords( 'postType', 'map-layer', {
+		include: layerIds,
+		per_page: -1,
+	} );
 
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
@@ -147,6 +152,7 @@ function MapsSidebar( {
 					attributes={ postMeta }
 					setAttributes={ setPostMeta }
 					loadedLayers={ loadedLayers }
+					loadingLayers={ loadingLayers }
 				/>
 			) }
 
@@ -277,6 +283,8 @@ function MapsSidebar( {
 
 			<LayersPanel
 				attributes={ postMeta }
+				loadedLayers={ loadedLayers }
+				loadingLayers={ loadingLayers }
 				openModal={ openModal }
 				renderPanel={ PluginDocumentSettingPanel }
 			/>

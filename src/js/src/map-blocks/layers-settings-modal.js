@@ -8,6 +8,7 @@ export default function LayersSettingsModal( {
 	setAttributes,
 	closeModal,
 	loadedLayers,
+	loadingLayers,
 } ) {
 	return (
 		<Modal
@@ -19,6 +20,7 @@ export default function LayersSettingsModal( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				loadedLayers={ loadedLayers }
+				loadingLayers={ loadingLayers }
 				closeModal={ closeModal }
 			/>
 		</Modal>
