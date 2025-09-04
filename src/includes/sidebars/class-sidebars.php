@@ -30,7 +30,7 @@ class Sidebars {
 			$asset_file['version']
 		);
 
-		wp_set_script_translations( 'jeo-layers-sidebar', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+		wp_set_script_translations( 'jeo-layers-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
 
 		wp_enqueue_style( 'jeo-maps-sidebar', JEO_BASEURL . '/js/build/mapsSidebar.css', array( 'mapgl' ) );
 		wp_enqueue_script(
@@ -40,7 +40,7 @@ class Sidebars {
 			$asset_file['version']
 		);
 
-		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
 
 	}
 }
