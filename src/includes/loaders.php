@@ -1,6 +1,4 @@
 <?php
-require __DIR__ . '/integrations/carto.php';
-
 spl_autoload_register('jeo_autoload');
 
 function jeo_autoload($class_name) {

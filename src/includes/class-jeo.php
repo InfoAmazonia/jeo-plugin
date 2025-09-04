@@ -56,7 +56,6 @@ class Jeo {
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'init', array( $this, 'register_oembed' ) );
-		// add_action( 'init', '\Jeo\Integrations\Carto::carto_integration_cron_task');
 
 		add_action( 'init', array( $this, 'register_embed_rewrite' ) );
 		add_filter( 'query_vars', array( $this, 'register_embed_query_var' ) );
@@ -64,7 +63,6 @@ class Jeo {
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
 		add_action( 'cli_init', array($this, 'register_cli_commands') );
-		add_action( 'rest_api_init', array($this, 'register_endpoints') );
 
 		add_action( 'init', array($this, 'restrict_story_map_block_count' ) );
 
@@ -612,28 +610,6 @@ class Jeo {
 
 		}
 
-	}
-
-	public function register_endpoints() {
-		register_rest_route( 'jeowp', '/carto_integrate', array(
-			'methods' => 'POST',
-			'callback' => '\Jeo\Integrations\Carto::carto_integrate_api_callback',
-			'args' => [
-				'sql_query' => array(
-					'required' => true,
-				),
-
-				'tileset' => array(
-					'required' => false,
-				),
-
-				'title' => array(
-					'required' => false,
-				),
-			],
-
-			'permission_callback' => function () { return is_user_logged_in(); }
-		));
 	}
 
 	function storymap_content( $content ) {
