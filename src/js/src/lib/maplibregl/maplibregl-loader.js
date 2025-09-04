@@ -33,19 +33,31 @@ export const defaultStyle = {
 	],
 }
 
-function transformRequest(url, resourceType) {
+function mapboxTransformRequest(url, resourceType) {
 	if (isMapboxURL(url)) {
 		return transformMapboxUrl(url, resourceType, mapboxToken)
   	}
     return { url }
 }
 
-export function createMap({ container, style, ...options }) {
+function createTransformRequest(baseTransformRequest) {
+	if (baseTransformRequest) {
+		return (url, resourceType) => {
+			const { url: baseUrl } = baseTransformRequest(url, resourceType)
+			return mapboxTransformRequest(baseUrl, resourceType)
+		}
+	} else {
+		return mapboxTransformRequest
+	}
+}
+
+export function createMap({ container, style, transformRequest, ...options }) {
 	const map = new MapLibreGL.Map({
 		container: container,
 		projection: 'equirectangular',
 		validateStyle: false,
-		transformRequest,
+		transformRequest: createTransformRequest(transformRequest),
+		...options,
 	})
 
 	map.setStyle(style ?? defaultStyle, {
