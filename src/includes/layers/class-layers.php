@@ -187,30 +187,6 @@ class Layers {
 				'description' => __('Legend title', 'jeo')
 			)
 		);
-
-		register_post_meta(
-			$this->post_type,
-			'use_carto_integration',
-			array(
-				'show_in_rest' => true,
-				'single' => true,
-				'auth_callback' => '__return_true',
-				'type' => 'boolean',
-				'description' => __('Use Carto Integration', 'jeo')
-			)
-		);
-
-		register_post_meta(
-			$this->post_type,
-			'carto_integration_sql',
-			array(
-				'show_in_rest' => true,
-				'single' => true,
-				'auth_callback' => '__return_true',
-				'type' => 'string',
-				'description' => __('SQL query', 'jeo')
-			)
-		);
 	}
 
 	public function add_capabilities() {
