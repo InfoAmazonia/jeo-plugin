@@ -42,8 +42,6 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 		per_page: -1,
 	}, { enabled: layerIds.length > 0 } );
 
-	console.log( { loadedMap, loadingMap, loadedLayers, layerIds } );
-
 	if ( attributes.map_id && !loadedMap ) {
 		return null;
 	}
