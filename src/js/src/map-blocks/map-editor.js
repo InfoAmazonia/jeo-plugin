@@ -1,7 +1,6 @@
 import { Button, Spinner } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
-import { useEffect, useId, useRef, useState } from '@wordpress/element';
+import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
+import { useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
@@ -11,14 +10,9 @@ import './map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
-const MapEditor = ( {
-	attributes,
-	setAttributes,
-	loadedLayers,
-	loadedMap,
-	loadingMap,
-} ) => {
+export default function MapEditor ( {attributes, setAttributes } ) {
 	const instanceId = useId();
+	console.log({ instanceId });
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
 		setKey( key + 1 );
@@ -31,6 +25,24 @@ const MapEditor = ( {
 	};
 
 	const mapRef = useRef( undefined );
+
+	const { record: loadedMap, isResolving: loadingMap } = useEntityRecord( 'postType', 'map', attributes.map_id, {
+		enabled: Boolean( attributes.map_id ),
+	} );
+
+	const layerIds = useMemo( () => {
+		if ( ! loadedMap?.meta.layers ) {
+			return [];
+		}
+		return loadedMap.meta.layers.map( ( layer ) => layer.id );
+	}, [ loadedMap?.meta.layers ] );
+
+	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
+		include: layerIds,
+		per_page: -1,
+	}, { enabled: layerIds.length > 0 } );
+
+	console.log( { loadedMap, loadingMap, loadedLayers, layerIds } );
 
 	if ( attributes.map_id && !loadedMap ) {
 		return null;
@@ -137,19 +149,3 @@ const MapEditor = ( {
 		</div>
 	);
 };
-
-const applyWithSelect = withSelect( ( select, { attributes } ) => ( {
-	loadedMap:
-		attributes.map_id &&
-		select( 'core' ).getEntityRecord( 'postType', 'map', attributes.map_id ),
-	loadingMap:
-		attributes.map_id &&
-		select( 'core/data' ).isResolving( 'core', 'getEntityRecord', [
-			'postType',
-			'map',
-			attributes.map_id,
-		] ),
-	loadedLayers: select( 'core' ).getEntityRecords( 'postType', 'map-layer', { per_page: -1, order: 'asc', orderby: 'title' } ),
-} ) );
-
-export default compose( applyWithSelect )( MapEditor );

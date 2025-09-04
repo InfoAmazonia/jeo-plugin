@@ -1,5 +1,6 @@
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
+import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
 import { Fragment, useEffect, useId, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -102,17 +103,21 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 	const themeColors = useSelect( ( select ) => select( 'core/editor' ).getEditorSettings().colors, [] );
 
-	const loadedMap = useSelect( ( select ) => attributes.map_id && (
-		select( 'core' ).getEntityRecord( 'postType', 'map', attributes.map_id )
-	), [ attributes.map_id ] );
+	const { record: loadedMap, isResolving: loadingMap } = useEntityRecord( 'postType', 'map', attributes.map_id, {
+		enabled: Boolean( attributes.map_id ),
+	} );
 
-	const loadedLayers = useSelect( ( select ) => {
-		if ( ! loadedMap ) {
-			return null;
-		};
-		const layerIds = loadedMap.meta.layers.map( ( layer ) => layer.id );
-		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', { include: layerIds, per_page: -1 } );
-	}, [ loadedMap ]);
+	const layerIds = useMemo( () => {
+		if ( ! loadedMap?.meta.layers ) {
+			return [];
+		}
+		return loadedMap.meta.layers.map( ( layer ) => layer.id );
+	}, [ loadedMap?.meta.layers ] );
+
+	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
+		include: layerIds,
+		per_page: -1,
+	}, { enabled: layerIds.length > 0 } );
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
@@ -218,10 +223,6 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		setAttributes( { ...attributes, postID } );
 	}, [] );
 
-	if(attributes.map_id && !loadedMap) {
-		return <div>Esse aqui é o loadedMap</div>;
-	}
-
 	let globalFontFamily = window.jeo_settings.jeo_typography_name;
 
 	if ( ! globalFontFamily ) {
@@ -232,7 +233,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 	return (
 		<div className="jeo-mapblock storymap">
-			{ attributes.map_id && !loadedMap && <Spinner /> }
+			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && loadedMap && (
 				<Fragment>
 					<div className="jeo-preview-area">

@@ -62,7 +62,7 @@ function MapsSidebar( {
 	const { records: loadedLayers, isResolving: loadingLayers } = useEntityRecords( 'postType', 'map-layer', {
 		include: layerIds,
 		per_page: -1,
-	} );
+	}, { enabled: layerIds.length > 0 } );
 
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
