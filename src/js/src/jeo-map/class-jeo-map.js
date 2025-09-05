@@ -696,7 +696,7 @@ export default class JeoMap {
 							type: 'geojson',
 							data: sourceData,
 							cluster: true,
-							clusterMaxZoom: 30,
+							clusterMaxZoom: this.getArg('max_zoom') - 1,
 							clusterRadius: 40,
 						} );
 						map.loadImage(
