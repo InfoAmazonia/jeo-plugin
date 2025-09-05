@@ -45,4 +45,9 @@ module.exports = {
 		publicPath: './src/js/build/',
 		filename: '[name].js',
 	},
+	optimization: {
+		...defaultConfig.optimization,
+		chunkIds: 'named',
+		splitChunks: false,
+	},
 };
