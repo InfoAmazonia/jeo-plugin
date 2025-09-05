@@ -6,7 +6,7 @@ import 'bootstrap-daterangepicker/daterangepicker.css';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
-import { loadImage } from '../../lib/mapgl-loader';
+import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
 
 const POSTS_PER_PAGE = 10;
 const MEMOIZED_CATEGORIES = {};
@@ -274,7 +274,7 @@ class Stories extends Component {
 			clusterSource = map.getSource('storiesSource');
 
 			// Get all points under a cluster
-			clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
+			getClusterLeaves(clusterSource, clusterId, pointCount, 0).then((aFeatures) => {
 				const postsIds = ( aFeatures ?? [] ).map( ( post ) => post.id)
 
 				this.setState( {

@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
-import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
+import { createMap, getClusterExpansionZoom, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE } from '../shared/styles';
@@ -838,19 +838,14 @@ export default class JeoMap {
 										}
 
 										// Get all points under a cluster
-										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
+										getClusterLeaves(clusterSource, clusterId, pointCount, 0).then((aFeatures) => {
 											const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val)) ));
 											if (nextFeatures.length >= 2) {
-												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
-													if (!err) {
-														if (zoom > self.getArg('max_zoom')) {
-															self.spiderifier.spiderfy(features[0].geometry.coordinates, getMarkers(aFeatures));
-														} else {
-															map.easeTo({
-																center: features[0].geometry.coordinates,
-																zoom
-															});
-														}
+												getClusterExpansionZoom(clusterSource, clusterId).then((zoom) => {
+													if (zoom > self.getArg('max_zoom')) {
+														self.spiderifier.spiderfy(features[0].geometry.coordinates, getMarkers(aFeatures));
+													} else {
+														map.easeTo({ center: features[0].geometry.coordinates, zoom });
 													}
 												});
 											} else {

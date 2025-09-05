@@ -71,6 +71,20 @@ export function createMap({ container, style, transformRequest, ...options }) {
 }
 
 /**
+ * @param {import('maplibre-gl').GeoJSONSource} source
+ */
+export function getClusterExpansionZoom(source, cluster) {
+	return source.getClusterExpansionZoom(cluster)
+}
+
+/**
+ * @param {import('maplibre-gl').GeoJSONSource} source
+ */
+export function getClusterLeaves(source, cluster, limit, offset) {
+	return source.getClusterLeaves(cluster, limit, offset)
+}
+
+/**
  * @param {import('maplibre-gl').Map} map
  */
 export function loadImage(map, id, url) {
@@ -78,9 +92,6 @@ export function loadImage(map, id, url) {
 		map.loadImage(url).then((image) => {
 			map.addImage(id, image.data)
 			resolve(id)
-		}).catch((err) => {
-			console.error(err)
-			reject(err)
-		})
+		}).catch(reject)
 	})
 }
