@@ -6,6 +6,8 @@ import 'bootstrap-daterangepicker/daterangepicker.css';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
+import { loadImage } from '../../lib/mapgl-loader';
+
 const POSTS_PER_PAGE = 10;
 const MEMOIZED_CATEGORIES = {};
 
@@ -95,12 +97,8 @@ class Stories extends Component {
 					clusterRadius: 40,
 				} );
 
-				map.loadImage(
-					jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png',
-					( error, image ) => {
-						if ( error ) throw error;
-
-						map.addImage( 'news-marker', image );
+				loadImage( map, 'news-marker', jeoMapVars.jeoUrl + '/js/src/icons/news-marker.png' )
+					.then( () => {
 						// Single markers layer
 						map.addLayer( {
 							id: 'unclustered-points',
@@ -124,13 +122,8 @@ class Stories extends Component {
 							// }
 						} );
 
-						map.loadImage(
-							jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png',
-							function ( error, image ) {
-								if ( error ) throw error;
-
-								map.addImage( 'news-marker-hover', image );
-
+						loadImage( map, 'news-marker-hover', jeoMapVars.jeoUrl + '/js/src/icons/news-marker-hover.png' )
+							.then( () => {
 								map.addLayer( {
 									id: 'hover-unclustered-points',
 									type: 'symbol',
@@ -155,14 +148,7 @@ class Stories extends Component {
 						);
 
 
-						map.loadImage( jeoMapVars.jeoUrl + '/js/src/icons/news.png', (
-							error,
-							image
-						) => {
-							if ( error ) throw error;
-
-							map.addImage( 'news-no-marker', image );
-
+						loadImage( map, 'news-no-marker', jeoMapVars.jeoUrl + '/js/src/icons/news.png' ).then( () => {
 							const layers = [
 								// [6, '#000000'],
 								// [5, '#f28cb1'],
