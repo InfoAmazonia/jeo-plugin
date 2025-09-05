@@ -75,13 +75,12 @@ export function createMap({ container, style, transformRequest, ...options }) {
  */
 export function loadImage(map, id, url) {
 	return new Promise((resolve, reject) => {
-		map.loadImage(url)
-			.then((image) => {
-				map.addImage(id, image.data)
-				resolve(id)
-			}).catch((err) => {
-				console.error(err)
-				reject(err)
-			})
+		map.loadImage(url).then((image) => {
+			map.addImage(id, image.data)
+			resolve(id)
+		}).catch((err) => {
+			console.error(err)
+			reject(err)
+		})
 	})
 }
