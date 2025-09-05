@@ -34,7 +34,7 @@ export const defaultStyle = {
 	],
 }
 
-function mapboxTransformRequest(url, resourceType) {
+export function mapboxTransformRequest(url, resourceType) {
 	if (isMapboxURL(url)) {
 		return transformMapboxUrl(url, resourceType, mapboxToken)
   	}
