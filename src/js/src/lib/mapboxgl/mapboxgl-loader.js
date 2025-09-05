@@ -26,3 +26,20 @@ export function createMap ({ container, style, ...options }) {
 
 	return map
 }
+
+/**
+ * @param {import('mapbox-gl').Map} map
+ */
+export function loadImage(map, id, url) {
+	return new Promise((resolve, reject) => {
+		map.loadImage(url, (err, image) => {
+			if (err) {
+				console.error(err)
+				reject(err)
+			} else {
+				map.addImage(id, image)
+				resolve(id)
+			}
+		})
+	})
+}

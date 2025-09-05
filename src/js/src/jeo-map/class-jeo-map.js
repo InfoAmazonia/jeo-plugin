@@ -1,7 +1,7 @@
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
-import { createMap, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
+import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE } from '../shared/styles';
@@ -699,12 +699,8 @@ export default class JeoMap {
 							clusterMaxZoom: this.getArg('max_zoom') - 1,
 							clusterRadius: 40,
 						} );
-						map.loadImage(
-							jeoMapVars.images['/js/src/icons/news-marker'].url,
-							( error, image ) => {
-								if ( error ) throw error;
-
-								map.addImage( 'news-marker', image );
+						loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url )
+							.then( () => {
 								// Single markers layer
 								map.addLayer( {
 									id: 'unclustered-points',
@@ -748,13 +744,8 @@ export default class JeoMap {
 										.setHTML( popupHTML )
 										.addTo(map);
 								});
-								map.loadImage(
-									jeoMapVars.images['/js/src/icons/news-marker-hover'].url,
-									function ( error, image ) {
-										if ( error ) throw error;
-
-										map.addImage( 'news-marker-hover', image );
-
+								loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url )
+									.then( () => {
 										map.addLayer( {
 											id: 'hover-unclustered-points',
 											type: 'symbol',
@@ -778,14 +769,7 @@ export default class JeoMap {
 									}
 								);
 
-								map.loadImage( jeoMapVars.images['/js/src/icons/news'].url, (
-									error,
-									image
-								) => {
-									if ( error ) throw error;
-
-									map.addImage( 'news-no-marker', image );
-
+								loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url ).then( () => {
 									const layers = [
 										// [6, '#000000'],
 										// [5, '#f28cb1'],

@@ -12,6 +12,7 @@ globalThis.mapboxgl = MapLibreGL // compat
 
 export const defaultStyle = {
 	version: 8,
+	glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
 	sources: {
 		osm: {
 			type: 'raster',
@@ -67,4 +68,20 @@ export function createMap({ container, style, transformRequest, ...options }) {
 	U.init(map, MapLibreGL)
 
 	return map
+}
+
+/**
+ * @param {import('maplibre-gl').Map} map
+ */
+export function loadImage(map, id, url) {
+	return new Promise((resolve, reject) => {
+		map.loadImage(url)
+			.then((image) => {
+				map.addImage(id, image.data)
+				resolve(id)
+			}).catch((err) => {
+				console.error(err)
+				reject(err)
+			})
+	})
 }
