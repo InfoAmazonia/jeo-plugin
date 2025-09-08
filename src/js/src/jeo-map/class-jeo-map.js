@@ -792,11 +792,11 @@ export default class JeoMap {
 											},
 											filter:
 												i === 0
-													? [ '>=', 'point_count', layer[ 0 ] ]
+													? [ '>=', [ 'get', 'point_count' ], layer[ 0 ] ]
 													: [
 															'all',
-															[ '>=', 'point_count', layer[ 0 ] ],
-															[ '<', 'point_count', layers[ i - 1 ][ 0 ] ],
+															[ '>=', [ 'get', 'point_count' ], layer[ 0 ] ],
+															[ '<', [ 'get', 'point_count' ], layers[ i - 1 ][ 0 ] ],
 													],
 										} );
 									} );
@@ -873,7 +873,7 @@ export default class JeoMap {
 													[ 17, [ 0, -90 ] ],
 												],
 											},
-											'text-field': '{point_count}',
+											'text-field': [ 'get', 'point_count' ],
 											'text-font': [ 'Open Sans Bold' ],
 											'text-size': 12,
 											'text-transform': 'uppercase',
