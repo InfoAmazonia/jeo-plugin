@@ -711,17 +711,7 @@ export default class JeoMap {
 										'icon-image': 'news-marker',
 										'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
 										'icon-allow-overlap': true,
-										// 'text-field': 'story',
-										// 'text-font': ['Open Sans Bold'],
-										// 'text-size': 11,
-										// 'text-transform': 'uppercase',
-										// 'text-letter-spacing': 0.05,
-										// 'text-offset': [0, 3],
 									},
-
-									// paint : {
-									// 	'icon-opacity': 1,
-									// }
 								} );
 
 								map.on('click', 'unclustered-points', (e) => {
@@ -770,48 +760,20 @@ export default class JeoMap {
 								);
 
 								loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url ).then( () => {
-									const layers = [
-										// [6, '#000000'],
-										// [5, '#f28cb1'],
-										// [2, '#f1f075'],
-										[ 0, jeoMapVars.cluster.circle_color ],
-									];
-
 									// cluster circle layer
-									layers.forEach( ( layer, i ) => {
-										map.addLayer( {
-											id: 'cluster-layer',
-											type: 'circle',
-											source: 'storiesSource',
-											paint: {
-												'circle-color': layer[ 1 ],
-												'circle-radius': 20 + layer[ 0 ],
-												'circle-stroke-color': '#ffffff',
-												'circle-stroke-opacity': 0.4,
-												'circle-stroke-width': 9,
-											},
-											filter:
-												i === 0
-													? [ '>=', [ 'get', 'point_count' ], layer[ 0 ] ]
-													: [
-															'all',
-															[ '>=', [ 'get', 'point_count' ], layer[ 0 ] ],
-															[ '<', [ 'get', 'point_count' ], layers[ i - 1 ][ 0 ] ],
-													],
-										} );
+									map.addLayer( {
+										id: 'cluster-layer',
+										type: 'circle',
+										source: 'storiesSource',
+										filter: [ 'has', 'point_count' ],
+										paint: {
+											'circle-color': jeoMapVars.cluster.circle_color,
+											'circle-radius': 20,
+											'circle-stroke-color': '#ffffff',
+											'circle-stroke-opacity': 0.4,
+											'circle-stroke-width': 9,
+										},
 									} );
-
-									const flyIntoCluster = (map, coordinates) => {
-										const maxZoom = 13;
-
-										map.flyTo({
-											center: coordinates,
-											zoom: maxZoom,
-											bearing: 0,
-											speed: 1,
-											curve: 1,
-										});
-									}
 
 									map.on('click', 'cluster-layer', function (e) {
 										const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-layer'] });
@@ -852,9 +814,6 @@ export default class JeoMap {
 												self.spiderifier.spiderfy(features[0].geometry.coordinates, getMarkers(aFeatures));
 											}
 										})
-
-										// flyIntoCluster(map, coordinates, currentZoom);
-
 									})
 
 									// cluster number layer
@@ -862,7 +821,7 @@ export default class JeoMap {
 										id: 'cluster-count',
 										type: 'symbol',
 										source: 'storiesSource',
-
+										filter: [ 'has', 'point_count' ],
 										layout: {
 											'icon-image': 'news-no-marker',
 											'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
@@ -880,14 +839,10 @@ export default class JeoMap {
 											'text-letter-spacing': 0.05,
 											'text-offset': [ 0, 0.8 ],
 										},
-
 										paint: {
 											'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
 										},
-
-										filter: [ 'has', 'point_count' ],
 									} );
-
 								} );
 							}
 						);
