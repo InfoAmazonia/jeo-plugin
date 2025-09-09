@@ -32,6 +32,7 @@ export default class JeoMap {
 		this.layers = [];
 		this.legends = [];
 		this.initialized = false;
+		this.popup = null;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
@@ -73,13 +74,11 @@ export default class JeoMap {
 				this.styleLoaded = waitMapEvent( map, 'style.load' );
 
 				this.spiderifier = new Spiderfy(map, {
+					renderMethod: '3D',
 					// minZoomLevel: this.getArg( 'max_zoom' ) - 2,
 					minZoomLevel: 12,
-					spiderLeavesLayout: {
-						'icon-image': 'news-marker',
-						'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
-					},
-					spiderLeavesPaint: {},
+					zoomIncrement: 2,
+					closeOnLeafClick: false,
 					onLeafClick: (feature) => {
 						this.showPostPopup( feature );
 					},
@@ -684,7 +683,7 @@ export default class JeoMap {
 								id: 'unclustered-points',
 								type: 'symbol',
 								source: 'storiesSource',
-								filter: [ '!', [ 'has', 'point_count' ] ],
+								// filter: [ '!', [ 'has', 'point_count' ] ],
 								layout: {
 									'icon-image': 'news-marker',
 									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
@@ -693,7 +692,10 @@ export default class JeoMap {
 							} );
 
 							map.on('click', 'unclustered-points', (e) => {
-								this.showPostPopup(e.features[0]);
+								const feature = e.features[0];
+								if (!feature?.properties.cluster) {
+									this.showPostPopup(feature);
+								}
 							});
 
 							// cluster circle layer
@@ -734,7 +736,7 @@ export default class JeoMap {
 								},
 							} );
 
-							this.spiderifier.applyTo('cluster-count');
+							this.spiderifier.applyTo('unclustered-points');
 
 							map.on('mouseenter', ['unclustered-points', 'cluster-layer', 'cluster-count'], () => {
 								map.getCanvas().style.cursor = 'pointer';
@@ -807,6 +809,8 @@ export default class JeoMap {
 	}
 
 	showPostPopup( feature ) {
+		this.popup?.remove();
+
 		const title = typeof feature.properties.title === 'string'
 			? JSON.parse( feature.properties.title )
 			: feature.properties.title;
@@ -825,7 +829,7 @@ export default class JeoMap {
 			show_featured_media: false,
 		} );
 
-		new mapgl.Popup( { closeOnClick: false } )
+		this.popup = new mapgl.Popup( { closeOnClick: false } )
 			.setLngLat( feature.geometry.coordinates )
 			.setHTML( popupHTML )
 			.addTo( this.map );
