@@ -22,6 +22,7 @@
 	"homepage": "https://github.com/InfoAmazonia/jeo-plugin#readme",
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "^5.1.0",
+		"@nazka/map-gl-js-spiderfy": "^1.2.10",
 		"@wordpress/edit-post": "^8.16.0",
 		"@wordpress/editor": "^14.18.0",
 		"@wordpress/plugins": "^7.16.0",
