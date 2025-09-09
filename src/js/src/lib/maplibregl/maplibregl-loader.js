@@ -73,13 +73,6 @@ export function createMap({ container, style, transformRequest, ...options }) {
 /**
  * @param {import('maplibre-gl').GeoJSONSource} source
  */
-export function getClusterExpansionZoom(source, cluster) {
-	return source.getClusterExpansionZoom(cluster)
-}
-
-/**
- * @param {import('maplibre-gl').GeoJSONSource} source
- */
 export function getClusterLeaves(source, cluster, limit, offset) {
 	return source.getClusterLeaves(cluster, limit, offset)
 }
