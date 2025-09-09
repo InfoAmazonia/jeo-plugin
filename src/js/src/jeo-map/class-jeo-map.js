@@ -79,8 +79,8 @@ export default class JeoMap {
 					minZoomLevel: 12,
 					zoomIncrement: 2,
 					closeOnLeafClick: false,
-					onLeafClick: (feature) => {
-						this.showPostPopup( feature );
+					onLeafClick: (feature, e) => {
+						this.showPostPopup(feature, e.lngLat);
 					},
 				});
 
@@ -694,7 +694,7 @@ export default class JeoMap {
 							map.on('click', 'unclustered-points', (e) => {
 								const feature = e.features[0];
 								if (!feature?.properties.cluster) {
-									this.showPostPopup(feature);
+									this.showPostPopup(feature, feature.geometry.coordinates);
 								}
 							});
 
@@ -808,7 +808,7 @@ export default class JeoMap {
 		return finalFeatures;
 	}
 
-	showPostPopup( feature ) {
+	showPostPopup( feature, lngLat ) {
 		this.popup?.remove();
 
 		const title = typeof feature.properties.title === 'string'
@@ -830,7 +830,7 @@ export default class JeoMap {
 		} );
 
 		this.popup = new mapgl.Popup( { closeOnClick: false } )
-			.setLngLat( feature.geometry.coordinates )
+			.setLngLat( lngLat )
 			.setHTML( popupHTML )
 			.addTo( this.map );
 	}
