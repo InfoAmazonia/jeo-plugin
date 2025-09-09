@@ -6,7 +6,6 @@ export const MAP_RUNTIME = jeo_settings.map_runtime
 const {
 	createMap,
 	defaultStyle,
-	getClusterExpansionZoom,
 	getClusterLeaves,
 	loadImage,
 	mapboxToken,
@@ -20,7 +19,6 @@ const {
 export {
 	createMap,
 	defaultStyle,
-	getClusterExpansionZoom,
 	getClusterLeaves,
 	loadImage,
 	mapboxToken,
