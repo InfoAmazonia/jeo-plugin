@@ -164,12 +164,7 @@ class Stories extends Component {
 									'icon-image': 'news-no-marker',
 									'icon-size': 0.13,
 									'icon-allow-overlap': false,
-									'icon-offset': {
-										stops: [
-											[ 13, [ 0, -30 ] ],
-											[ 17, [ 0, -90 ] ],
-										],
-									},
+									'icon-offset': [ 0, -30 ],
 									'text-field': '{point_count}',
 									'text-font': [ 'Open Sans Bold' ],
 									'text-size': 12,

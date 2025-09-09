@@ -2,7 +2,7 @@ import Spiderfy from '@nazka/map-gl-js-spiderfy';
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
-import { createMap, getClusterExpansionZoom, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
+import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE } from '../shared/styles';
@@ -73,31 +73,15 @@ export default class JeoMap {
 				this.styleLoaded = waitMapEvent( map, 'style.load' );
 
 				this.spiderifier = new Spiderfy(map, {
-					minZoomLevel: this.getArg( 'max_zoom' ) - 2,
+					// minZoomLevel: this.getArg( 'max_zoom' ) - 2,
+					minZoomLevel: 12,
 					spiderLeavesLayout: {
 						'icon-image': 'news-marker',
 						'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
 					},
 					spiderLeavesPaint: {},
 					onLeafClick: (feature) => {
-						const post = {
-							date: feature.properties.date,
-							link: feature.properties.link,
-							title: {
-								rendered: feature.properties.title.rendered,
-							},
-						};
-
-						const popupHTML = this.popupTemplate( {
-							post,
-							read_more: window.jeoMapVars.string_read_more,
-							show_featured_media: false,
-						} );
-
-						new mapgl.Popup({ closeOnClick: false })
-							.setLngLat( feature.geometry.coordinates )
-							.setHTML( popupHTML )
-							.addTo( map );
+						this.showPostPopup( feature );
 					},
 				});
 
@@ -709,24 +693,7 @@ export default class JeoMap {
 							} );
 
 							map.on('click', 'unclustered-points', (e) => {
-								const post = {
-									date: e.features[0].properties.date,
-									link: e.features[0].properties.link,
-									title: {
-										rendered: JSON.parse(e.features[0].properties.title)?.rendered,
-									}
-								};
-
-								const popupHTML = this.popupTemplate( {
-									post,
-									read_more: window.jeoMapVars.string_read_more,
-									show_featured_media: false,
-								} );
-
-								new mapgl.Popup()
-									.setLngLat( e.lngLat )
-									.setHTML( popupHTML )
-									.addTo( map );
+								this.showPostPopup(e.features[0]);
 							});
 
 							// cluster circle layer
@@ -754,12 +721,7 @@ export default class JeoMap {
 									'icon-image': 'news-no-marker',
 									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
 									'icon-allow-overlap': false,
-									'icon-offset': {
-										stops: [
-											[ 13, [ 0, -30 ] ],
-											[ 17, [ 0, -90 ] ],
-										],
-									},
+									'icon-offset': [ 0, -30 ],
 									'text-field': [ 'get', 'point_count' ],
 									'text-font': [ 'Open Sans Bold' ],
 									'text-size': 12,
@@ -842,6 +804,31 @@ export default class JeoMap {
 		} );
 
 		return finalFeatures;
+	}
+
+	showPostPopup( feature ) {
+		const title = typeof feature.properties.title === 'string'
+			? JSON.parse( feature.properties.title )
+			: feature.properties.title;
+
+		const post = {
+			date: feature.properties.date,
+			link: feature.properties.link,
+			title: {
+				rendered: title?.rendered,
+			},
+		};
+
+		const popupHTML = this.popupTemplate( {
+			post,
+			read_more: jeoMapVars.string_read_more,
+			show_featured_media: false,
+		} );
+
+		new mapgl.Popup( { closeOnClick: false } )
+			.setLngLat( feature.geometry.coordinates )
+			.setHTML( popupHTML )
+			.addTo( this.map );
 	}
 
 	addPostToMap( post ) {
