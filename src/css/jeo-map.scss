@@ -577,6 +577,13 @@
 	h2 {
 		font-family: var(--jeo-font);
 	}
+
+	&:not(.jeo-popup__mouseover) {
+
+		h3 {
+			margin-top: 1.2rem;
+		}
+	}
 }
 
 // Interaction - onClick
@@ -591,14 +598,14 @@
 :is(.mapboxgl-popup.mapboxgl-popup-anchor-bottom, .maplibregl-popup.maplibregl-popup-anchor-bottom) {
 
 	&:not(.jeo-popup__mouseover) {
-		margin-top: -36px;
+		margin-top: -28px;
+	}
+}
 
-		:is(.mapboxgl-popup-content, .maplibregl-popup-content) {
+:is(.mapboxgl-popup.mapboxgl-popup-anchor-top, .maplibregl-popup.maplibregl-popup-anchor-top) {
 
-			h3 {
-				margin-top: 1.2rem;
-			}
-		}
+	&:not(.jeo-popup__mouseover) {
+		margin-top: 28px;
 	}
 }
 
