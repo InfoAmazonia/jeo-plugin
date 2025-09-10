@@ -445,6 +445,9 @@ class Jeo {
 							'icon_size' => 0.13,
 							'text_color' => '#202202'
 						],
+						'/js/src/icons/cluster' => [
+							'url' => JEO_BASEURL . '/js/src/icons/cluster.png',
+						],
 					] )
 				)
 			);
