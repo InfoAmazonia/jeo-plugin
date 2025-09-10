@@ -79,6 +79,11 @@ export default class JeoMap {
 					minZoomLevel: 12,
 					zoomIncrement: 2,
 					closeOnLeafClick: false,
+					spiderLeavesLayout: {
+						'icon-allow-overlap': true,
+            			'icon-image': 'news-marker',
+						'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
+        			},
 					onLeafClick: (feature, e) => {
 						this.showPostPopup(feature, e.lngLat);
 					},
@@ -674,6 +679,7 @@ export default class JeoMap {
 						} );
 
 						Promise.all([
+							loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
 							loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
 							loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
 							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url ),
@@ -683,11 +689,15 @@ export default class JeoMap {
 								id: 'unclustered-points',
 								type: 'symbol',
 								source: 'storiesSource',
-								// filter: [ '!', [ 'has', 'point_count' ] ],
 								layout: {
-									'icon-image': 'news-marker',
-									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
 									'icon-allow-overlap': true,
+									'icon-image': [
+										'case',
+										['boolean', ['has', 'point_count'], false],
+										'cluster',
+										'news-marker',
+									],
+									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
 								},
 							} );
 
