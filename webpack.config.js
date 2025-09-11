@@ -4,35 +4,50 @@ const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack
 module.exports = {
 	...defaultConfig,
 	entry: {
-		mapboxglLoader: './src/js/src/mapboxgl-loader.js',
-		jeoMap: {
-			import: './src/js/src/jeo-map/index.js',
-			dependOn: ['mapboxglLoader'],
+		mapglLoader: './src/js/src/lib/mapgl-loader.js',
+		mapglReact: {
+			import: './src/js/src/lib/mapgl-react.js',
+			dependOn: ['mapglLoader'],
 		},
+
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
+		postsSidebar: './src/js/src/posts-sidebar/index.js',
+
+		jeoMap: {
+			import: './src/js/src/jeo-map/index.js',
+			dependOn: ['mapglLoader'],
+		},
+		jeoStorymap: {
+			import: './src/js/src/jeo-storymap/storymap-display.js',
+			dependOn: ['jeoMap'],
+		},
+		discovery: {
+			import: './src/js/src/discovery/index.js',
+			dependOn: ['jeoMap'],
+		},
+
 		mapBlocks: {
 			import: './src/js/src/map-blocks/index.js',
-			dependOn: ['mapboxglLoader'],
+			dependOn: ['mapglReact'],
 		},
-		discovery: './src/js/src/discovery/index.js',
-		// storymap: './src/js/src/map-blocks/storymap.js',
 		layersSidebar: {
 			import: './src/js/src/layers-sidebar/index.js',
-			dependOn: ['mapboxglLoader'],
+			dependOn: ['mapglReact'],
 		},
 		mapsSidebar: {
 			import: './src/js/src/maps-sidebar/index.js',
-			dependOn: ['mapboxglLoader'],
+			dependOn: ['mapglReact'],
 		},
-		postsSidebar: './src/js/src/posts-sidebar/index.js',
-	},
-	externals: {
-		'mapbox-gl': 'mapboxgl',
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),
 		publicPath: './src/js/build/',
 		filename: '[name].js',
+	},
+	optimization: {
+		...defaultConfig.optimization,
+		chunkIds: 'named',
+		splitChunks: false,
 	},
 };

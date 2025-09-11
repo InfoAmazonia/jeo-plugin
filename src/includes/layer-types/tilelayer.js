@@ -22,7 +22,7 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 		} );
 	},
 
-	addLayer( map, attributes, addLayerParams ) {
+	addLayer( map, attributes, addLayerParams = null ) {
 		const layer = {
 			id: attributes.layer_id,
 			source: {
@@ -32,12 +32,10 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 				scheme: attributes.layer_type_options.scheme || 'xyz',
 			},
 			type: 'raster',
+			layout: {
+				visibility: attributes.visible ? 'visible' : 'none',
+			},
 		};
-		if ( ! attributes.visible ) {
-			layer.layout = {
-				visibility: 'none',
-			};
-		}
 
 		if ( addLayerParams ) {
 			return map.addLayer( layer, ...addLayerParams );
@@ -47,25 +45,23 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 	},
 
 	getSchema( attributes ) {
-		return new Promise( function ( resolve ) {
-			resolve( {
-				type: 'object',
-				required: [ 'url' ],
-				properties: {
-					url: {
-						type: 'string',
-						title: 'URL',
-					},
-					scheme: {
-						type: 'string',
-						title: 'Scheme',
-						description: 'Influences the Y direction of the tile coordinates.',
-						enum: ['xyz', 'tms'],
-						enumNames: ['Slippy Map tilenames (XYZ)', 'OSGeo spec (TMS)'],
-						default: 'xyz',
-					}
+		return {
+			type: 'object',
+			required: [ 'url' ],
+			properties: {
+				url: {
+					type: 'string',
+					title: 'URL',
 				},
-			} );
-		} );
+				scheme: {
+					type: 'string',
+					title: 'Scheme',
+					description: 'Influences the Y direction of the tile coordinates.',
+					enum: ['xyz', 'tms'],
+					enumNames: ['Slippy Map tilenames (XYZ)', 'OSGeo spec (TMS)'],
+					default: 'xyz',
+				}
+			},
+		};
 	},
 } );

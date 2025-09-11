@@ -9,11 +9,11 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		}
 	},
 
-	addLayer( map, attributes, addLayerParams ) {
+	addLayer( map, attributes, addLayerParams = null ) {
 		const layerId = attributes.layer_id;
 
 		if ( ! map.getSource( layerId ) ) {
-			const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 			const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
@@ -29,13 +29,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			id: layerId,
 			source: layerId,
 			type: 'raster',
+			layout: {
+				visibility: attributes.visible ? 'visible' : 'none',
+			},
 		};
-
-		if ( ! attributes.visible ) {
-			layer.layout = {
-				visibility: 'none',
-			};
-		}
 
 		if ( addLayerParams ) {
 			return map.addLayer( layer, ...addLayerParams );
@@ -44,33 +41,43 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		return map.addLayer( layer );
 	},
 
+	_groupInteractionsByEventType( interactions ) {
+		const groups = {};
+		for ( const interaction of interactions ) {
+			const interactionType = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
+			if ( groups[ interactionType ] ) {
+				groups[ interactionType ].push( interaction );
+			} else {
+				groups[ interactionType ] = [ interaction ];
+			}
+		}
+		return groups;
+	},
+
 	addInteractions( map, attributes ) {
 		if ( attributes.layer_type_options.interactions ) {
-			const int = attributes.layer_type_options.interactions;
-			const interactionsIds = int.map( i => i.id );
+			const interactions = attributes.layer_type_options.interactions;
+			const interactionsGroups = this._groupInteractionsByEventType( interactions );
 
-			int.forEach( ( interaction ) => {
-				const vLayers = map.getStyle().layers;
+			const allLayers = map.getStyle().layers;
 
-				const vLayer = vLayers.find( ( el ) => {
-					return el.id == interaction.id;
-				} );
+			for ( const [ interactionType, interactionsGroup ] of Object.entries( interactionsGroups ) ) {
+				const interactionsIds = interactionsGroup.map( i => i.id );
 
-				if ( vLayer ) {
-					let type = interaction.on === 'click' || interaction.on === 'mouseover' ? interaction.on : 'click';
-					const popUp = new mapboxgl.Popup( {
-						className: type === 'mouseover' ? 'jeo-popup__mouseover' : '',
-						closeButton: type === 'click',
-						closeOnClick: true,
+				const filteredLayers = allLayers.filter( layer => interactionsIds.includes( layer.id ) );
+
+				if ( filteredLayers.length > 0 ) {
+					const popUp = new globalThis.mapboxgl.Popup( {
+						className: interactionType === 'mouseover' ? 'jeo-popup__mouseover' : '',
+						closeButton: interactionType === 'click',
+						closeOnClick: interactionType === 'click',
 						maxWidth: '300px',
 						// anchor: 'right' // parameter to anchor direction 'bottom' default
 					} );
 
-					if (type === 'mouseover') {
-						type = 'mousemove';
-					}
+					const eventType = interactionType === 'mouseover' ? 'mousemove' : interactionType;
 
-					map.on( type, vLayer.id, function( e ) {
+					map.on( eventType, interactionsIds, function( e ) {
 						// Change the cursor style as a UI indicator.
 						map.getCanvas().style.cursor = 'pointer';
 
@@ -87,16 +94,22 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 						let html = '';
 
-						// title
-						if ( feature.properties.hasOwnProperty( interaction.title ) ) {
-							html += '<h3>' + feature.properties[ interaction.title ] + '</h3>';
+						for ( const interaction of interactionsGroup ) {
+							if ( feature.properties.hasOwnProperty( interaction.title ) ) {
+								html += '<h3>' + feature.properties[ interaction.title ] + '</h3>';
+								break;
+							}
 						}
 
-						interaction.fields.forEach( ( field ) => {
-							if ( feature.properties.hasOwnProperty( field.field ) ) {
-								html += '<p><strong>' + field.label + ': </strong>' + feature.properties[ field.field ] + '</p>';
-							}
-						} );
+						const fieldsSet = new Set();
+						for ( const interaction of interactionsGroup ) {
+							interaction.fields.forEach( ( { field, label } ) => {
+								if ( ! fieldsSet.has( field ) && feature.properties.hasOwnProperty( field ) ) {
+									fieldsSet.add( field );
+									html += '<p><strong>' + label + ': </strong>' + feature.properties[ field ] + '</p>';
+								}
+							} );
+						}
 
 						// Populate the popup and set its coordinates
 						// based on the feature found.
@@ -105,31 +118,25 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 							.addTo( map );
 					} );
 
-					let isOverlapping = false;
-
-					map.on( 'mousemove', vLayer.id, function ( e ) {
+					map.on( 'mousemove', function ( e ) {
 						const features = map.queryRenderedFeatures( e.point );
-						isOverlapping = features.some(
-							f => interactionsIds.includes( f.sourceLayer ) &&
-							f.sourceLayer != interaction.id );
-						map.getCanvas().style.cursor = 'pointer';
-					} );
-
-					map.on( 'mouseleave', vLayer.id, function() {
-						if ( ! isOverlapping ) {
+						const isOverlapping = features.some( f => interactionsIds.includes( f.layer.id ) );
+						if ( isOverlapping ) {
+							map.getCanvas().style.cursor = 'pointer';
+						} else {
 							map.getCanvas().style.cursor = '';
-						}
-						if( type === 'mousemove' ) {
-							popUp.remove();
+							if( eventType === 'mousemove' ) {
+								popUp.remove();
+							}
 						}
 					} );
 				}
-			} );
+			}
 		}
 	},
 
 	getSchema( attributes ) {
-		const baseSchema = {
+		return {
 			type: 'object',
 			required: [ 'style_id' ],
 			properties: {
@@ -147,14 +154,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				},
 			},
 		};
-
-		return new Promise( function ( resolve ) {
-			resolve( baseSchema );
-		} );
 	},
 
 	getStyleUrl( attributes ) {
-		const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+		const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 
@@ -204,7 +207,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleDefinitions[ attributes.layer_id ] );
 			}
 
-			const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 			if ( accessToken && attributes.layer_type_options.style_id ) {
 				const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
@@ -229,7 +232,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleLayers[ attributes.layer_id ] );
 			}
 
-			const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
 
 			self
 				._getStyleDefinition( attributes )

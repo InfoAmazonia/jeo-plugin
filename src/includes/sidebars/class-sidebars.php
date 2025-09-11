@@ -22,43 +22,25 @@ class Sidebars {
 	public function load_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
-		wp_enqueue_style( 'jeo-layers-sidebar', JEO_BASEURL . '/js/build/layersSidebar.css', array( 'mapboxgl' ), JEO_VERSION );
+		wp_enqueue_style( 'jeo-layers-sidebar', JEO_BASEURL . '/js/build/layersSidebar.css', array( 'mapgl' ), JEO_VERSION );
 		wp_enqueue_script(
 			'jeo-layers-sidebar',
 			JEO_BASEURL . '/js/build/layersSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapboxgl-loader']),
+			array_merge($asset_file['dependencies'], ['mapgl-react']),
 			$asset_file['version']
 		);
 
-		wp_set_script_translations( 'jeo-layers-sidebar', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+		wp_set_script_translations( 'jeo-layers-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
 
-
-		wp_localize_script(
-			'jeo-layers-sidebar',
-			'jeo_private_options',
-			array(
-				'mapbox_private_key' => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_private_key' )),
-			)
-		);
-
-		wp_localize_script(
-			'jeo-layers-sidebar',
-			'carto_options',
-			array(
-				'carto_username' => sanitize_text_field( \jeo_settings()->get_option( 'carto_username' )),
-				'carto_key' => sanitize_text_field( \jeo_settings()->get_option( 'carto_key' )),
-			)
-		);
-
-		wp_enqueue_style( 'jeo-maps-sidebar', JEO_BASEURL . '/js/build/mapsSidebar.css', array( 'mapboxgl' ) );
+		wp_enqueue_style( 'jeo-maps-sidebar', JEO_BASEURL . '/js/build/mapsSidebar.css', array( 'mapgl' ) );
 		wp_enqueue_script(
 			'jeo-maps-sidebar',
 			JEO_BASEURL . '/js/build/mapsSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapboxgl-loader']),
+			array_merge($asset_file['dependencies'], ['mapgl-react']),
 			$asset_file['version']
 		);
 
-		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
 
 	}
 }

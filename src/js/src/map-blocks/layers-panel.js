@@ -1,7 +1,7 @@
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-import { layerUseLabels } from './utils';
+import { layerUseLabels, loadLayer } from './utils';
 import './layers-panel.css';
 
 const decodeHtmlEntity = function ( str ) {
@@ -12,7 +12,7 @@ const decodeHtmlEntity = function ( str ) {
 
 export default function ( {
 	attributes,
-	loadLayer,
+	loadedLayers,
 	loadingLayers,
 	openModal,
 	renderPanel: Panel,
@@ -30,7 +30,7 @@ export default function ( {
 			) : (
 				<ol>
 					{ layers.map( ( layerSettings ) => {
-						const settings = loadLayer( layerSettings );
+						const settings = loadLayer( loadedLayers, layerSettings );
 						return (
 							settings.layer && (
 								<li className="jeo-setting-layer" key={ settings.id }>

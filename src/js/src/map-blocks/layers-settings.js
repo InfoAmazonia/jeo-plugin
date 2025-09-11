@@ -1,13 +1,13 @@
 import { Button, Card, CardBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { select } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 
-import { List, arrayMove } from 'react-movable';
+import { arrayMove } from 'react-movable';
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 
 import LayerSettings from './layer-settings';
-import { layerLoader } from './utils';
+import { loadLayer } from './utils';
 
 import './layers-settings.css';
 
@@ -16,41 +16,26 @@ const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
 const anySwapDefault = ( settings ) =>
 	settings.some( ( s ) => s.use === 'swappable' && s.default );
 
-export default function LayersSettings ( { attributes, setAttributes, loadingLayers, loadedLayers, closeModal } ) {
+export default function LayersSettings ( { attributes, setAttributes, loadedLayers, loadingLayers, closeModal } ) {
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
-	const loadLayer = layerLoader( loadedLayers );
 	let widths = [];
 
-	const [ allLayers, setAllLayers ] = useState([]);
-	const [ filteredLayers, setFilteredLayers ] = useState([]);
-
-	useEffect( () => {
-		// TODO paginate this results. getEntityRecords accept 'page' parameter
-		const allLayersData = select( 'core' ).getEntityRecords(
-			'postType',
-			'map-layer',
-			{ per_page: -1, order: 'asc', orderby: 'title' }
-		);
-		if ( ! allLayersData ) {
-			setAllLayers( [] );
-		} else {
-			setAllLayers( allLayersData );
-		}
-	} );
-
-	allLayers.sort( function ( a, b ) {
-		if ( a.title.rendered.toLowerCase() < b.title.rendered.toLowerCase() ) {
-			return -1;
-		}
-		if ( a.title.rendered.toLowerCase() > b.title.rendered.toLowerCase() ) {
-			return 1;
-		}
-		return 0;
-	} );
-
 	const [ layerTypeFilter, setLayerTypeFilter ] = useState( null );
-	const [ layerLegendFilter, setLayerLegendFilter ] = useState( null );
 	const [ layerNameFilter, setLayerNameFilter ] = useState('');
+
+	const searchedLayers = useSelect((select) => {
+		if ( ! layerNameFilter && ! layerTypeFilter ) {
+			return [];
+		}
+
+		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
+			per_page: -1,
+			order: 'asc',
+			orderby: 'title',
+			layer_name: layerNameFilter,
+			layer_type: layerTypeFilter ?? undefined,
+		} ) ?? [];
+	}, [layerNameFilter, layerTypeFilter]);
 
 	const layerTypeOptions = [
 		{ label: 'Select a layer type', value: '' },
@@ -59,14 +44,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 		{ label: 'Mapbox-tileset-raster', value: 'mapbox-tileset-raster' },
 		{ label: 'Tilelayer', value: 'tilelayer' },
 		{ label: 'MVT', value: 'mvt' },
-	];
-
-	const legendTypeOptions = [
-		{ label: 'Select a legend type', value: '' },
-		{ label: 'Barscale', value: 'barscale' },
-		{ label: 'Simple-color', value: 'simple-color' },
-		{ label: 'Icons', value: 'icons' },
-		{ label: 'Circles', value: 'circles' },
 	];
 
 	useEffect( () => {
@@ -84,27 +61,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 			return String.fromCharCode( dec );
 		} );
 	};
-
-	function filterLayers() {
-		const layers = allLayers.filter( ( layer ) => {
-			if ( layerTypeFilter && layerTypeFilter !== layer.meta.type ) {
-				return false;
-			}
-
-			/* TODO: Make layers that don't use legend to not be shown when filtering by legend
-			if ( layerLegendFilter && layerLegendFilter !== layer.meta.legend_type ) {
-				return;
-			}
-			*/
-
-			if ( layerNameFilter && ! layer.title.raw.toLowerCase().includes( layerNameFilter.toLowerCase() ) ) {
-				return false;
-			}
-
-			return true;
-		} );
-		setFilteredLayers( layers );
-	}
 
 	const onDragEnd = (result) => {
 		if (!result.destination) {
@@ -138,7 +94,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 			<div className="jeo-layers-library-controls">
 				<div className="left">
 					<div>
-						<form onSubmit={ filterLayers } action="javascript:void(0);" style={ { display: "flex" }}>
+						<form action="javascript:void(0);" style={ { display: "flex" }}>
 							<TextControl
 								placeholder={ __( 'Enter keywords to search layers', 'jeo' ) }
 								value={ layerNameFilter }
@@ -156,36 +112,12 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 									setLayerTypeFilter( value )
 								} }
 							/>
-							{
-								/* TODO: Make layers that don't use legend to not be shown when filtering by legend
-									<SelectControl
-										className="jeo-layers-library-filters"
-										hideLabelFromVision={ true }
-										label={ __( 'Legend type', 'jeo ) }
-										options={ legendTypeOptions }
-										value={ layerLegendFilter }
-										onChange={ ( value ) => {
-											setLayerLegendFilter( value )
-										} }
-									/>
-								*/
-							}
-							<Button
-								className="jeo-layers-library-filters-button-filter"
-								variant="primary"
-								isLarge
-								onClick={ filterLayers }
-							>
-								{ __( 'Filter', 'jeo' ) }
-							</Button>
 							<Button
 								className="jeo-layers-library-filters-button-clear"
 								variant="primary"
 								isLarge
 								onClick={ () => {
-									setFilteredLayers([]);
 									setLayerTypeFilter( '' );
-									setLayerLegendFilter( '' );
 									setLayerNameFilter('');
 								} }
 							>
@@ -209,7 +141,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 			</div>
 			<div name="map-layers" className="jeo-layers-panel">
 				<ul className="jeo-layers-list">
-					{ filteredLayers.map( ( layer, i ) => {
+					{ searchedLayers.map( ( layer, i ) => {
 						let inUse = false;
 						attributes.layers.map( ( l ) => {
 							if ( layer.id === l.id ) {
@@ -281,7 +213,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 				</ul>
 			</div>
 			<h2 className="selected-layers-title" >{ __( 'Selected layers', 'jeo' ) }</h2>
-			{ loadingLayers && <Spinner /> }
 			{ ! loadingLayers && ! attributes.layers.length && (
 				<p className="jeo-layers-list">
 					{ __( 'No layers have been added to this map.', 'jeo' ) }
@@ -324,78 +255,50 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 									}
 
 									const switchUseStyle = ( def ) => {
-										// let count = 0;
-										// let limitCount = true;
-
-										const currentLayer = attributes.layers.find((alayer)  => alayer.id === layer.id);
-
-										// attributes.layers.forEach((layer) => {
-										// 	if( layer.load_as_style ) {
-										// 		count++;
-										// 	}
-										// });
-
-										// if(count >= 1) {
-										// 	if(!currentLayer.load_as_style) {
-										// 		limitCount = confirm( __("Loading more than one style in a single map instance may cause unexpected behaviour.") );
-										// 	}
-										// }
-
 										const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === layer.id);
 										const layerType = window.JeoLayerTypes.getLayerType(
 											currentJeoLayerProps.meta.type
 										);
 
-										// if(limitCount) {
-											if(def) {
-												layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
-													if(!response) {
-														return;
-													}
+										if(def) {
+											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
+												if(!response) {
+													return;
+												}
 
-													let styleLayers = response.layers;
+												let styleLayers = response.layers;
 
-													styleLayers = styleLayers.map(layer => {
-														if(layer.layout && typeof layer.layout.visibility !== 'undefined' && layer.layout.visibility === 'none') {
-															return {
-																id: layer.id,
-																show: false,
-															}
-														}
-
+												styleLayers = styleLayers.map(layer => {
+													if(layer.layout && typeof layer.layout.visibility !== 'undefined' && layer.layout.visibility === 'none') {
 														return {
 															id: layer.id,
-															show: true,
+															show: false,
 														}
-													})
+													}
 
-													setLayers(
-														attributes.layers.map( ( settings ) => {
-															return settings.id === layer.id?
-																{ ...settings, load_as_style: true, style_layers: styleLayers }
-																: { ...settings, load_as_style: false, style_layers: [] }
-														} )
-													);
-												} );
+													return {
+														id: layer.id,
+														show: true,
+													}
+												})
 
 												setLayers(
 													attributes.layers.map( ( settings ) => {
 														return settings.id === layer.id?
-															{ ...settings, load_as_style: true, style_layers: [] }
+															{ ...settings, load_as_style: true, style_layers: styleLayers }
 															: { ...settings, load_as_style: false, style_layers: [] }
 													} )
 												);
-											}
-											// else {
-											// 	setLayers(
-											// 		attributes.layers.map( ( settings ) => {
-											// 			return settings.id === layer.id?
-											// 				{ ...settings, load_as_style: def, style_layers: [] }
-											// 				: { ...settings, load_as_style: false, style_layers: [] }
-											// 		} )
-											// 	);
-											// }
-										// }
+											} );
+
+											setLayers(
+												attributes.layers.map( ( settings ) => {
+													return settings.id === layer.id?
+														{ ...settings, load_as_style: true, style_layers: [] }
+														: { ...settings, load_as_style: false, style_layers: [] }
+												} )
+											);
+										}
 									};
 
 									const swapDefault = ( def ) =>
@@ -441,14 +344,11 @@ export default function LayersSettings ( { attributes, setAttributes, loadingLay
 										}
 									};
 
-									const loadedLayer = loadLayer( layer );
+									const loadedLayer = loadLayer( loadedLayers, layer );
 
 									if(!loadedLayer.layer) {
-										return setLayers(
-											attributes.layers.filter(
-												( settings ) => settings.id !== loadedLayer.id
-											)
-										);
+										// TODO: Remove deleted layers
+										return null;
 									}
 
 									return <LayerSettings

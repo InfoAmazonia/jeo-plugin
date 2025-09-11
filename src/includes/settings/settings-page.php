@@ -24,6 +24,16 @@
 					</tr>
 
 					<tr>
+						<th scope="row"><label for="map_runtime"><?php esc_html_e('Rendering library', 'jeo'); ?></label></th>
+						<td>
+							<select name="<?php echo esc_html( $this->get_field_name('map_runtime') ); ?>" id="map_runtime">
+								<option value="mapboxgl" <?php selected( $this->get_option('map_runtime'), 'mapboxgl' ) ?>>MapboxGL</option>
+								<option value="maplibregl" <?php selected( $this->get_option('map_runtime'), 'maplibregl' ) ?>>MapLibreGL</option>
+							</select>
+						</td>
+					</tr>
+
+					<tr>
 						<th scope="row"><label for="map_default_lat"><?php esc_html_e('Default map latitute', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('map_default_lat') ); ?>" type="number" step=".00000000000001" id="map_default_lat" value="<?php echo esc_html( $this->get_option('map_default_lat') ); ?>" class="regular-text">
@@ -64,86 +74,19 @@
 						</td>
 					</tr>
 
-
 					<tr>
-						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('API', 'jeo'); ?></h2></th>
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e('Mapbox', 'jeo'); ?></h2></th>
 						<td>
 						</td>
 					</tr>
 
 					<tr>
-						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php esc_html_e('Mapbox', 'jeo'); ?></h3></th>
-						<td>
-						</td>
-					</tr>
-
-					<tr>
-						<th scope="row"><label for="mapbox_key"><?php esc_html_e('API Key*', 'jeo'); ?></label></th>
+						<th scope="row"><label for="mapbox_key"><?php esc_html_e('API Key', 'jeo'); ?></label></th>
 						<td>
 						<input name="<?php echo esc_html( $this->get_field_name('mapbox_key') ); ?>" placeholder="<?php esc_attr_e("Ex. pk.eyJ3...", "jeo") ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option('mapbox_key') ); ?>" class="regular-text">
 						</td>
 					</tr>
-
-					<tr>
-						<th scope="row"><label for="mapbox_username"><?php esc_html_e('Username', 'jeo'); ?></label></th>
-						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('mapbox_username') ); ?>" placeholder="" type="text" id="mapbox_username" value="<?php echo esc_html( $this->get_option('mapbox_username') ); ?>" class="regular-text">
-						</td>
-					</tr>
-
-					<tr>
-						<th scope="row"><label for="mapbox_private_key"><?php esc_html_e('Private API Key', 'jeo'); ?></label></th>
-						<td>
-							<input name="<?php echo esc_html( $this->get_field_name('mapbox_private_key') ); ?>" type="text" placeholder="<?php esc_attr_e("Ex. sk.eyJ1Ij...", "jeo") ?>"  id="mapbox_private_key" value="<?php echo esc_html( $this->get_option('mapbox_private_key') ); ?>" class="regular-text">
-							<p><?php esc_html_e('This is used for Carto integration only.', 'jeo'); ?></p>
-							<p><?php esc_html_e('If you will not use, don\'t worry about it.', 'jeo'); ?></p>
-
-						</td>
-					</tr>
-
-
-
-					<tr>
-						<th style="padding: 0; margin: 0" scope="row"><h3 style="padding: 0; margin: 0"><?php esc_html_e('Carto (optional)', 'jeo'); ?></h3></th>
-						<td>
-						</td>
-					</tr>
-
-					<tr>
-						<th scope="row"><label for="carto_username"><?php esc_html_e('Username', 'jeo'); ?></label></th>
-						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('carto_username') ); ?>" placeholder="" type="text" id="carto_username" value="<?php echo esc_html( $this->get_option('carto_username') ); ?>" class="regular-text">
-						</td>
-					</tr>
-
-					<tr>
-						<th scope="row"><label for="carto_key"><?php esc_html_e('API Key', 'jeo'); ?></label></th>
-						<td>
-						<input name="<?php echo esc_html( $this->get_field_name('carto_key') ); ?>" placeholder="<?php esc_attr_e("Ex. 5a03fe2...", "jeo") ?>" type="text" id="carto_key" value="<?php echo esc_html( $this->get_option('carto_key') ); ?>" class="regular-text">
-						</td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="carto_update_time"><?php esc_html_e('Update Interval', 'jeo'); ?></label></th>
-						<td>
-						<select name="<?php echo esc_html( $this->get_field_name('carto_update_time') ); ?>" id="carto_update_time">
-							<option value="daily" <?= $this->get_option('carto_update_time') ===  'daily'? 'selected' : '' ?>>Daily</option>
-							<option value="weekly" <?= $this->get_option('carto_update_time') ===  'weekly'? ' selected' : '' ?> <?= empty($this->get_option('carto_update_time'))? ' selected' : '' ?>>Weekly</option>
-							<option value="monthly" <?= $this->get_option('carto_update_time') ===  'monthly'? 'selected' : '' ?>>Monthly</option>
-						</select>
-
-
-						</td>
-					</tr>
-
-					<tr>
-						<th scope="row"></th>
-						<td>
-							<?php esc_html_e('After saving the setting, the update will only be made from the current date plus the interval selected. <br> For instance, if the selected interval is "Weekly" and a update is made to "Monthly" the next update will be made only from the current date plus one month.') ?>
-							<br>
-							<?php esc_html_e('We recommend the plugin WP Crontrol, that allows you to run cron tasks whenever you want.') ?>
-						</td>
-					</tr>
-			</tbody>
+				</tbody>
 			</table>
 		</div>
 

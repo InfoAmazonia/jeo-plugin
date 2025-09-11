@@ -2,6 +2,7 @@ import { Component, createRoot } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Sidebar from './blocks/sidebar';
+import { createMap, mapgl } from '../lib/mapgl-loader';
 import { computeInlineStart } from '../shared/direction';
 import './style/discovery.scss';
 
@@ -60,39 +61,31 @@ class Discovery extends Component {
 	}
 
 	componentDidMount() {
-		let adicionalMapOptions = {
+		const additionalMapOptions = {
 			center: [ mapPreferences.map_defaults.lng, mapPreferences.map_defaults.lat],
 			zoom: mapPreferences.map_defaults.zoom,
 		};
 
-		if (
-			this.getParamFromUrl( 'discovery' ) ||
-			this.getParamFromUrl( 'share' )
-		) {
-			adicionalMapOptions = {
-				...adicionalMapOptions,
-				center: this.getParamFromUrl( 'center' ),
-				zoom: this.getParamFromUrl( 'zoom' ),
-			};
+		if ( this.getParamFromUrl( 'discovery' ) || this.getParamFromUrl( 'share' ) ) {
+			additionalMapOptions.center = this.getParamFromUrl( 'center' );
+			additionalMapOptions.zoom = this.getParamFromUrl( 'zoom' );
 		}
 
-		const map = new mapboxgl.Map( {
+		const map = createMap({
 			container: this.mapContainer,
-			style: 'mapbox://styles/mapbox/streets-v11',
-			projection: 'equirectangular',
-			...adicionalMapOptions,
-		} );
+			...additionalMapOptions,
+		});
 
 		this.map = map;
 		const inlineStart = computeInlineStart();
 
 		this.map.on( 'load', () => {
 			this.map.addControl(
-				new mapboxgl.NavigationControl( { showCompass: false } ),
+				new mapgl.NavigationControl( { showCompass: false } ),
 				`top-${inlineStart}`
 			);
 
-			this.map.addControl( new mapboxgl.FullscreenControl(), `top-${inlineStart}` );
+			this.map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 
