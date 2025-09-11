@@ -1,26 +1,28 @@
 === JEO ===
 Contributors: earthjournalism
-Tested up to: 6.7.1
+Tested up to: 6.8.2
 Stable tag: 2.15.2
-Requires PHP: 7.2
-Requires at least: 6.2
+Requires PHP: 8.0
+Requires at least: 6.6
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 2.15.2
+Version: 3.0.0-rc.1
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
 == Description ==
 
-With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
+With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories.
+
+At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
 
 = Features =
 
-* [Mapbox](https://www.mapbox.com) maps;
-* [react-map-gl](https://visgl.github.io/react-map-gl/) library;
+* Support for [MapboxGL](https://docs.mapbox.com/mapbox-gl-js/) and [MapLibreGL](https://maplibre.org/maplibre-gl-js/docs/);
+* Support for [Mapbox](https://www.mapbox.com) maps (requires a Mapbox API key);
 * Custom tile layers;
 * Layer filtering options, allowing you to mix tile layers;
-* Geocoding WordPress posts using OpenStreetMaps(Nominatim), supporting the post type **Post**;
+* Geocoding WordPress posts using [Nominatim](https://nominatim.org/), supporting the post type **Post**;
 * Customizable marker icons that can be associated with categories, custom taxonomies or posts directly;
 * Map markers query integrated to posts query;
 * Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguage plugins.
@@ -32,9 +34,10 @@ With JEO, creating the interaction between data layers and contextual informatio
 3. Select Jeo on the admin menu.
 
 There, you can configure:
+* The map rendering library (either MapboxGL or MapLibreGL);
 * The default latitude, longitude, and zoom for your maps;
-* The [Mapbox API key](https://docs.mapbox.com/help/how-mapbox-works/access-tokens) that'll be used by the plugin;
-* The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available.
+* The [Mapbox API key](https://docs.mapbox.com/help/how-mapbox-works/access-tokens), only required if you need MapboxGL or Mapbox layers;
+* The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available by default;
 
 After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
 
@@ -48,6 +51,22 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 7. Map post type
 
 == Changelog ==
+
+= 3.0.0 =
+This is a major release. Here are some highlights:
+* Support for MapLibreGL as an alternative rendering library (for compatibility, MapboxGL is still the default library)
+* When using MapLibreGL without Mapbox-hosted layers, the use of Mapbox API key is not required anymore
+* Removed support for Carto integration (reducing plugin size in ~90%)
+
+Full changelog:
+* Support for MapLibreGL  as an alternative rendering library
+* When using MapLibreGL without Mapbox-hosted layers, the use of Mapbox API key is not required anymore
+* Improved performance in Gutenberg editors
+* Upgraded `react-map-gl` library
+* BREAKING: Removed support for Carto integrations
+* BREAKING: Replaced [`mapboxgl-spiderifier`](https://github.com/bewithjonam/mapboxgl-spiderifier) with more modern [`map-gl-js-spiderfy`](https://github.com/nazka/map-gl-js-spiderfy) as default spiderifier library; `MapboxGLMapboxglSpiderifier` global variable is not available anymore, being replaced by `Spiderfy` global variable (with different API)
+* BREAKING: Some JS and CSS assets had their handles renamed to better reflect the new architecture
+* BREAKING: When using MapLibreGL, some CSS classes use the `maplibregl-` instead of the `mapboxgl-` prefix
 
 = 2.15.2 =
 * bugfix: Popup behavior when there's more than one mouseover interaction
@@ -949,22 +968,3 @@ Example:
     // ...
 
 Note: `selected()` is a native WordPress function. See the [official documentation](https://developer.wordpress.org/reference/functions/selected/)
-
-= Differences between the old and the present JEO =
-
-# Migration
-
-Notes on changes in DB structure from old JEO that will need to have migrations written.
-
-## Geocode `post_meta`
-
-On old JEO, some `meta_key`s are prefixed by an underscore (`_`) and others aren't:
-
-- `geocode_address`
-- `geocode_latitude`
-- `geocode_longitude`
-- `_geocode_city`
-- `_geocode_country`
-- `geocode_viewport`
-
-Let's have them all with an underscore at the beginning.
