@@ -1,9 +1,11 @@
 import { Component } from '@wordpress/element';
-import Search from './search';
-import MapItem from './map-item';
+import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 import { List, arrayMove, arrayRemove } from 'react-movable';
-import { decodeEntities } from '@wordpress/html-entities';
+
+import { mapboxToken } from '../../lib/mapgl-loader';
+import MapItem from './map-item';
+import Search from './search';
 
 class MapLayers extends Component {
 	constructor( props ) {
@@ -260,7 +262,7 @@ class MapLayers extends Component {
 			} else if ( layer.meta.type === 'mapbox' ) {
 				if ( map.getLayer( layerId ) === undefined ) {
 					if ( ! map.getSource( layerId ) ) {
-						const accessToken = attributes.layer_type_options.access_token || window.mapboxgl.accessToken;
+						const accessToken = attributes.layer_type_options.access_token || mapboxToken;
 
 						const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
 

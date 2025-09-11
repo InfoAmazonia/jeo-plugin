@@ -1,12 +1,9 @@
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
 
-export const layerLoader = ( layers ) => {
-	const layersMap = Object.fromEntries(
-		( layers || [] ).map( ( l ) => [ l.id, l ] )
-	);
-	return ( settings ) => ( { ...settings, layer: layersMap[ settings.id ] } );
-};
+export function loadLayer ( layers, settings ) {
+	const layer = ( layers || [] ).find( ( layer ) => layer.id === settings.id );
+	return { ...settings, layer };
+}
 
 export const layerUseLabels = {
 	fixed: __( 'Fixed', 'jeo' ),

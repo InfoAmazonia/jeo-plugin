@@ -114,11 +114,11 @@ class Legend_Types {
 		wp_register_script(
 			'jeo-legend',
 			JEO_BASEURL . '/js/build/JeoLegend.js',
-			['mapboxgl-loader'],
+			['mapgl'],
 			$asset_file['version']
 		);
 
-		wp_set_script_translations('jeo-legend', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages');
+		wp_set_script_translations('jeo-legend', 'jeo', JEO_BASEPATH . 'languages');
 	}
 
 	public function enqueue_scripts() {
@@ -131,7 +131,7 @@ class Legend_Types {
 			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : [];
 			$deps = array_merge( ['jeo-legend'], $deps );
 			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps, JEO_VERSION );
-			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
 
 		}
 

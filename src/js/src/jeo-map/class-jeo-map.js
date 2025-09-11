@@ -1,9 +1,14 @@
+import Spiderfy from '@nazka/map-gl-js-spiderfy';
 import { __ } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
+import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
+import { EMPTY_STYLE } from '../shared/styles';
 import { waitMapEvent } from '../shared/wait';
+
+import '../../../css/jeo-map.scss';
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, ( match, dec ) => {
@@ -16,6 +21,8 @@ function compileTemplate ( template, config = {} ) {
 	return eta.compile( template ).bind( eta );
 }
 
+globalThis.Spiderfy = Spiderfy;
+
 export default class JeoMap {
 	constructor( element ) {
 		this.element = element;
@@ -25,6 +32,7 @@ export default class JeoMap {
 		this.layers = [];
 		this.legends = [];
 		this.initialized = false;
+		this.popup = null;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
@@ -54,48 +62,31 @@ export default class JeoMap {
 
 		this.dataFetched
 			.then( () => {
-				const map = new mapboxgl.Map( {
+				const map = createMap({
 					container: this.element,
-					projection: 'equirectangular',
 					attributionControl: false,
 					style: this.getStyleLayer(),
 					transformRequest: this.transformRequestUrl.bind( this ),
-				} );
+				});
 
 				this.map = map;
 				this.mapLoaded = waitMapEvent( map, 'load' );
 				this.styleLoaded = waitMapEvent( map, 'style.load' );
 
-				this.spiderifier = new MapboxglSpiderifier(this.map, {
-					initializeLeg: (spiderLeg) => {
-						let post = {
-							date: spiderLeg.feature.date,
-							link: spiderLeg.feature.link,
-							title: {
-								rendered: spiderLeg.feature.title.rendered,
-							}
-						}
-						//adicionando comentario
-						const popupHTML = this.popupTemplate( {
-							post,
-							read_more: window.jeoMapVars.string_read_more,
-							show_featured_media: false,
-						} )
-						let popUp = new mapboxgl.Popup({
-							closeOnClick: false,
-							offset: MapboxglSpiderifier.popupOffsetForSpiderLeg(spiderLeg)
-						})
-						.setLngLat(spiderLeg.mapboxMarker._lngLat)
-						.setHTML( popupHTML )
-						const jeoOpenSpiderifierPinEvent = new CustomEvent('jeo-open-spiderifier-pin', { detail: spiderLeg.feature })
-
-						spiderLeg.elements.pin.style.backgroundImage = `url("${jeoMapVars.images['/js/src/icons/news-marker'].url})"`
-						spiderLeg.elements.container.addEventListener( 'click', () => {
-							popUp.addTo( this.map )
-							document.body.dispatchEvent( jeoOpenSpiderifierPinEvent )
-						} )
-
-					}
+				this.spiderifier = new Spiderfy(map, {
+					renderMethod: '3D',
+					// minZoomLevel: this.getArg( 'max_zoom' ) - 2,
+					minZoomLevel: 12,
+					zoomIncrement: 2,
+					closeOnLeafClick: false,
+					spiderLeavesLayout: {
+						'icon-allow-overlap': true,
+            			'icon-image': 'news-marker',
+						'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
+        			},
+					onLeafClick: (feature, e) => {
+						this.showPostPopup(feature, e.lngLat);
+					},
 				});
 
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
@@ -106,7 +97,7 @@ export default class JeoMap {
 					] );
 
 					map.addControl(
-						new mapboxgl.NavigationControl( { showCompass: false } ),
+						new mapgl.NavigationControl( { showCompass: false } ),
 						`top-${inlineStart}`
 					);
 
@@ -124,7 +115,7 @@ export default class JeoMap {
 					}
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
-						map.addControl( new mapboxgl.FullscreenControl(), `top-${inlineStart}` );
+						map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
 					}
 
 					if (
@@ -148,7 +139,7 @@ export default class JeoMap {
 					}
 
 					// Only used for manipulating the map from outside Jeo
-					window.map = map;
+					globalThis.map = map;
 				}
 			} )
 			.then( () => {
@@ -264,13 +255,13 @@ export default class JeoMap {
 
 							let controlPostion = `bottom-${inlineEnd}`;
 
-							let attributionControl = new mapboxgl.AttributionControl( {
+							let attributionControl = new mapgl.AttributionControl( {
 								compact: false,
 								customAttribution,
 							} );
 
 							if(window.innerWidth < 600) {
-								attributionControl = new mapboxgl.AttributionControl( {
+								attributionControl = new mapgl.AttributionControl( {
 									compact: true,
 									customAttribution,
 								} )
@@ -299,7 +290,7 @@ export default class JeoMap {
 			.then( () => {
 				// Remove all empty jeo map blocks
 				jQuery(
-					'.jeomap.wp-block-jeo-map.mapboxgl-map:not([data-map_id])'
+					`.jeomap.wp-block-jeo-map.${MAP_RUNTIME}-map:not([data-map_id])`
 				).remove();
 			} );
 	}
@@ -328,8 +319,8 @@ export default class JeoMap {
 			'<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
 		this.element.appendChild( layers );
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
-		jQuery( this.element ).find( '.mapboxgl-control-container' ).remove();
-		jQuery( this.element ).find( '.mapboxgl-canvas-container' ).remove();
+		jQuery( this.element ).find( '.mapboxgl-control-container, .maplibregl-control-container' ).remove();
+		jQuery( this.element ).find( '.mapboxgl-canvas-container, .maplibregl-canvas-container' ).remove();
 	}
 
 	/**
@@ -406,8 +397,6 @@ export default class JeoMap {
 				}
 				const legendContainer = document.createElement( 'div' );
 				legendContainer.classList.add( 'legend-for-' + legend.layer_id );
-
-				// console.log( legend );
 
 				if ( legend.attributes.legend_title ) {
 					const legendTitle = document.createElement( 'span' );
@@ -487,7 +476,7 @@ export default class JeoMap {
 		const closeButton = document.createElement( 'div' );
 		closeButton.classList.add( 'more-info-close' );
 		closeButton.innerHTML =
-			'<button class="mapboxgl-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>';
+			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>`;
 
 		closeButton.click( function ( e ) {} );
 
@@ -631,7 +620,7 @@ export default class JeoMap {
 			}
 		}
 
-		return 'mapbox://styles/mapbox/empty-v9';
+		return EMPTY_STYLE;
 	}
 
 	getRelatedPosts() {
@@ -641,22 +630,15 @@ export default class JeoMap {
 			this.relatedPostsCriteria = relatedPostsCriteria;
 
 			const relatePosts = this.getArg( 'relate_posts' );
-
-			// console.log("relatedPostsCriteria", relatedPostsCriteria);
-			// console.log("relate_posts", this.getArg( 'relate_posts' ));
-
 			if ( ! relatePosts ) {
 				resolve( [] );
 				return;
 			}
 
 			const query = {};
-			query.per_page = 100; // TODO handle limit of posts per query
+			query.per_page = 100;
 
-			if (
-				this.relatedPostsCriteria.after ||
-				this.relatedPostsCriteria.before
-			) {
+			if ( this.relatedPostsCriteria.after || this.relatedPostsCriteria.before ) {
 				query.orderby = 'date';
 				query.order = 'desc';
 			}
@@ -693,241 +675,86 @@ export default class JeoMap {
 							type: 'geojson',
 							data: sourceData,
 							cluster: true,
-							clusterMaxZoom: 30,
 							clusterRadius: 40,
 						} );
-						map.loadImage(
-							jeoMapVars.images['/js/src/icons/news-marker'].url,
-							( error, image ) => {
-								if ( error ) throw error;
 
-								map.addImage( 'news-marker', image );
-								// Single markers layer
-								map.addLayer( {
-									id: 'unclustered-points',
-									type: 'symbol',
-									source: 'storiesSource',
-									filter: [ '!', [ 'has', 'point_count' ] ],
-									layout: {
-										'icon-image': 'news-marker',
-										'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
-										'icon-allow-overlap': true,
-										// 'text-field': 'story',
-										// 'text-font': ['Open Sans Bold', 'Arial Unicode MS Bold'],
-										// 'text-size': 11,
-										// 'text-transform': 'uppercase',
-										// 'text-letter-spacing': 0.05,
-										// 'text-offset': [0, 3],
-									},
+						Promise.all([
+							loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
+							loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
+							loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
+							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url ),
+						]).then( () => {
+							// Single markers layer
+							map.addLayer( {
+								id: 'unclustered-points',
+								type: 'symbol',
+								source: 'storiesSource',
+								layout: {
+									'icon-allow-overlap': true,
+									'icon-image': [
+										'case',
+										['boolean', ['has', 'point_count'], false],
+										'cluster',
+										'news-marker',
+									],
+									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
+								},
+							} );
 
-									// paint : {
-									// 	'icon-opacity': 1,
-									// }
-								} );
+							map.on('click', 'unclustered-points', (e) => {
+								const feature = e.features[0];
+								if (!feature?.properties.cluster) {
+									this.showPostPopup(feature, feature.geometry.coordinates);
+								}
+							});
 
-								map.on('click', 'unclustered-points', (e) => {
-									const post = {
-										date: e.features[0].properties.date,
-										link: e.features[0].properties.link,
-										title: {
-											rendered: JSON.parse(e.features[0].properties.title)?.rendered,
-										}
-									}
+							// cluster circle layer
+							map.addLayer( {
+								id: 'cluster-layer',
+								type: 'circle',
+								source: 'storiesSource',
+								filter: [ 'has', 'point_count' ],
+								paint: {
+									'circle-color': jeoMapVars.cluster.circle_color,
+									'circle-radius': 20,
+									'circle-stroke-color': '#ffffff',
+									'circle-stroke-opacity': 0.4,
+									'circle-stroke-width': 9,
+								},
+							} );
 
-									const popupHTML = this.popupTemplate( {
-										post,
-										read_more: window.jeoMapVars.string_read_more,
-										show_featured_media: false,
-									} );
+							// cluster number layer
+							map.addLayer( {
+								id: 'cluster-count',
+								type: 'symbol',
+								source: 'storiesSource',
+								filter: [ 'has', 'point_count' ],
+								layout: {
+									'icon-image': 'news-no-marker',
+									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
+									'icon-allow-overlap': false,
+									'icon-offset': [ 0, -30 ],
+									'text-field': [ 'get', 'point_count' ],
+									'text-font': [ 'Open Sans Bold' ],
+									'text-size': 12,
+									'text-transform': 'uppercase',
+									'text-letter-spacing': 0.05,
+									'text-offset': [ 0, 0.8 ],
+								},
+								paint: {
+									'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
+								},
+							} );
 
-									new mapboxgl.Popup()
-										.setLngLat(e.lngLat)
-										.setHTML( popupHTML )
-										.addTo(map);
-								});
-								map.loadImage(
-									jeoMapVars.images['/js/src/icons/news-marker-hover'].url,
-									function ( error, image ) {
-										if ( error ) throw error;
+							this.spiderifier.applyTo('unclustered-points');
 
-										map.addImage( 'news-marker-hover', image );
-
-										map.addLayer( {
-											id: 'hover-unclustered-points',
-											type: 'symbol',
-											source: 'storiesSource',
-											filter: [ '!', [ 'has', 'point_count' ] ],
-											layout: {
-												'icon-image': 'news-marker-hover',
-												'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker-hover'].icon_size ),
-												'icon-allow-overlap': true,
-											},
-
-											paint: {
-												'icon-opacity': [
-													'case',
-													[ 'boolean', [ 'feature-state', 'hover' ], false ],
-													1,
-													0,
-												],
-											},
-										} );
-									}
-								);
-
-								map.loadImage( jeoMapVars.images['/js/src/icons/news'].url, (
-									error,
-									image
-								) => {
-									if ( error ) throw error;
-
-									map.addImage( 'news-no-marker', image );
-
-									const layers = [
-										// [6, '#000000'],
-										// [5, '#f28cb1'],
-										// [2, '#f1f075'],
-										[ 0, jeoMapVars.cluster.circle_color ],
-									];
-
-									// cluster circle layer
-									layers.forEach( ( layer, i ) => {
-										map.addLayer( {
-											id: 'cluster-layer',
-											type: 'circle',
-											source: 'storiesSource',
-											paint: {
-												'circle-color': layer[ 1 ],
-												'circle-radius': 20 + layer[ 0 ],
-												'circle-stroke-color': '#ffffff',
-												'circle-stroke-opacity': 0.4,
-												'circle-stroke-width': 9,
-											},
-											filter:
-												i === 0
-													? [ '>=', 'point_count', layer[ 0 ] ]
-													: [
-															'all',
-															[ '>=', 'point_count', layer[ 0 ] ],
-															[ '<', 'point_count', layers[ i - 1 ][ 0 ] ],
-													],
-										} );
-									} );
-
-									const flyIntoCluster = (map, coordinates) => {
-										const maxZoom = 13;
-
-										map.flyTo({
-											center: coordinates,
-											zoom: maxZoom,
-											bearing: 0,
-											speed: 1,
-											curve: 1,
-										});
-									}
-
-									map.on('click', 'cluster-layer', function (e) {
-										const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-layer'] });
-										const clusterId = features[0].properties.cluster_id
-										const pointCount = features[0].properties.point_count
-										const clusterSource = map.getSource('storiesSource');
-										//const self = this;
-										self.spiderifier.unspiderfy();
-
-										function multiDimensionalUnique(arr) {
-											var uniques = [];
-											var itemsFound = {};
-											for(var i = 0, l = arr.length; i < l; i++) {
-												var stringified = JSON.stringify(arr[i]);
-												if(itemsFound[stringified]) { continue; }
-												uniques.push(arr[i]);
-												itemsFound[stringified] = true;
-											}
-											return uniques;
-										}
-
-										function getMarkers ( features ) {
-											return features.map( ( feature ) => feature.properties );
-										}
-
-										// Get all points under a cluster
-										clusterSource.getClusterLeaves(clusterId, pointCount, 0, (err, aFeatures) => {
-											const nextFeatures = multiDimensionalUnique(aFeatures.map( ( post ) => post.geometry.coordinates.map(val => parseFloat(val)) ));
-											if (nextFeatures.length >= 2) {
-												clusterSource.getClusterExpansionZoom( clusterId, (err, zoom) => {
-													if (!err) {
-														if (zoom > self.getArg('max_zoom')) {
-															self.spiderifier.spiderfy(features[0].geometry.coordinates, getMarkers(aFeatures));
-														} else {
-															map.easeTo({
-																center: features[0].geometry.coordinates,
-																zoom
-															});
-														}
-													}
-												});
-											} else {
-												self.spiderifier.spiderfy(features[0].geometry.coordinates, getMarkers(aFeatures));
-											}
-										})
-
-										// flyIntoCluster(map, coordinates, currentZoom);
-
-									})
-
-									// cluster number layer
-									map.addLayer( {
-										id: 'cluster-count',
-										type: 'symbol',
-										source: 'storiesSource',
-
-										layout: {
-											'icon-image': 'news-no-marker',
-											'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
-											'icon-allow-overlap': false,
-											'icon-offset': {
-												stops: [
-													[ 13, [ 0, -30 ] ],
-													[ 17, [ 0, -90 ] ],
-												],
-											},
-											'text-field': '{point_count}',
-											'text-font': [ 'Open Sans Regular', 'Arial Unicode MS Regular' ],
-											'text-size': 12,
-											'text-transform': 'uppercase',
-											'text-letter-spacing': 0.05,
-											'text-offset': [ 0, 0.8 ],
-										},
-
-										paint: {
-											'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
-										},
-
-										filter: [ 'has', 'point_count' ],
-									} );
-
-								} );
-							}
-						);
-						map.on('mouseenter', 'cluster-layer', () => {
-							map.getCanvas().style.cursor = 'pointer'
-						})
-						map.on('mouseleave', 'cluster-layer', () => {
-							map.getCanvas().style.cursor = ''
-						})
-						map.on('mouseenter', 'unclustered-points', () => {
-							map.getCanvas().style.cursor = 'pointer'
-						})
-						map.on('mouseleave', 'unclustered-points', () => {
-							map.getCanvas().style.cursor = ''
-						})
-						map.on('mouseenter', 'cluster-count', () => {
-							map.getCanvas().style.cursor = 'pointer'
-						})
-						map.on('mouseleave', 'cluster-count', () => {
-							map.getCanvas().style.cursor = ''
-						})
-
+							map.on('mouseenter', ['unclustered-points', 'cluster-layer', 'cluster-count'], () => {
+								map.getCanvas().style.cursor = 'pointer';
+							});
+							map.on('mouseleave', ['unclustered-points', 'cluster-layer', 'cluster-count'], () => {
+								map.getCanvas().style.cursor = '';
+							});
+						} );
 
 						// Keep requesting to get to the last page
 						for (let i = 2; i <= totalPages; i++) {
@@ -947,30 +774,18 @@ export default class JeoMap {
 									map.getSource('storiesSource').setData(sourceData);
 								});
 						}
-
 					}
 
-					// if(this.map.loaded()) {
-					buildRelatedPosts(this.map)
-					// } else {
-						// console.log("Load event")
-						// this.map.on( 'load', () => {
-							// console.log("Load event confirmed")
-							// buildRelatedPosts(this.map)
-						// })
-					// }
-				})
-				.catch(err => {
-					// Remove: Too noisy
-					// alert("Error while loading posts check console");
-					// console.log(err);
-				})
-				.then(() => {
-					// Add ready state (animation flag)
-					// Set done status anyway error or success ()
-
-				});
+					buildRelatedPosts(this.map);
+			});
 		} );
+	}
+
+	getCircleSvg( { fill, radius = 20 } ) {
+		const width = 2 * radius
+		return `data:image/svg+xml;charset=utf-8,<svg width='${width}' height='${width}' version='1.1' viewBox='0 0 ${width} ${width}' xmlns='http://www.w3.org/2000/svg'>
+			<circle cx='${radius}' cy='${radius}' r='${radius}' fill='${fill}'/>
+		</svg>`
 	}
 
 	buildPostsGeoJson( stories ) {
@@ -1003,6 +818,33 @@ export default class JeoMap {
 		return finalFeatures;
 	}
 
+	showPostPopup( feature, lngLat ) {
+		this.popup?.remove();
+
+		const title = typeof feature.properties.title === 'string'
+			? JSON.parse( feature.properties.title )
+			: feature.properties.title;
+
+		const post = {
+			date: feature.properties.date,
+			link: feature.properties.link,
+			title: {
+				rendered: title?.rendered,
+			},
+		};
+
+		const popupHTML = this.popupTemplate( {
+			post,
+			read_more: jeoMapVars.string_read_more,
+			show_featured_media: false,
+		} );
+
+		this.popup = new mapgl.Popup( { closeOnClick: false } )
+			.setLngLat( lngLat )
+			.setHTML( popupHTML )
+			.addTo( this.map );
+	}
+
 	addPostToMap( post ) {
 		if ( post.meta._related_point ) {
 			post.meta._related_point.forEach( ( point ) => {
@@ -1014,8 +856,8 @@ export default class JeoMap {
 	addPointToMap( point, post ) {
 		const url =
 			point.relevance === 'secondary'
-				? `url(${ jeoMapVars.jeoUrl }/js/src/icons/news-marker-hover.png`
-				: `url(${ jeoMapVars.jeoUrl }/js/src/icons/news-marker.png`;
+				? `url(${ jeoMapVars.images['/js/src/icons/news-marker-hover'].url })`
+				: `url(${ jeoMapVars.images['/js/src/icons/news-marker'].url })`;
 
 		const popupHTML = this.popupTemplate( {
 			post,
@@ -1023,7 +865,7 @@ export default class JeoMap {
 			show_featured_media: false,
 		} );
 
-		const popUp = new mapboxgl.Popup().setHTML( popupHTML );
+		const popUp = new mapgl.Popup().setHTML( popupHTML );
 
 		const LngLat = {
 			lat: parseFloat( point._geocode_lat ),
@@ -1037,7 +879,7 @@ export default class JeoMap {
 		el.style.height = '36px';
 		el.style.backgroundSize = 'cover';
 
-		const marker = new mapboxgl.Marker( { element: el, anchor: 'bottom' } )
+		const marker = new mapgl.Marker( { element: el, anchor: 'bottom' } )
 			.setLngLat( LngLat )
 			.addTo( this.map );
 

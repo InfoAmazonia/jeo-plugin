@@ -1,6 +1,8 @@
-import { Layer, Source } from 'react-map-gl';
 import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
+
+import { mapboxToken } from '../lib/mapgl-loader';
+import { Layer, Source } from '../lib/mapgl-react';
 
 export function renderLayer( { layer, instance } ) {
 	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {
@@ -13,7 +15,7 @@ export function renderLayer( { layer, instance } ) {
 
 	switch ( layer.type ) {
 		case 'mapbox': {
-			const accessToken = options.access_token || window.mapboxgl.accessToken;
+			const accessToken = options.access_token || mapboxToken;
 
 			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
 			const styleUrl = `https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`
@@ -26,7 +28,7 @@ export function renderLayer( { layer, instance } ) {
 		}
 
 		case 'mapbox-tileset-raster': {
-			const tilesetId = options.tileset_id;
+			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
 
 			return (
@@ -37,7 +39,7 @@ export function renderLayer( { layer, instance } ) {
 		}
 
 		case 'mapbox-tileset-vector': {
-			const tilesetId = options.tileset_id;
+			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
 
 			return (

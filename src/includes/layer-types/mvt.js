@@ -22,7 +22,7 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 		} );
 	},
 
-	addLayer( map, attributes, addLayerParams ) {
+	addLayer( map, attributes, addLayerParams = null ) {
 		map.addSource( attributes.layer_id, {
 			type: 'vector',
 			tiles: [ attributes.layer_type_options.url ],
@@ -67,43 +67,41 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 	},
 
 	getSchema( attributes ) {
-		return new Promise( function ( resolve ) {
-			resolve( {
-				type: 'object',
-				required: [ 'url', 'type', 'source_layer' ],
-				properties: {
-					url: {
-						type: 'string',
-						title: 'URL',
-					},
-					source_layer: {
-						type: 'string',
-						title: 'Source layer',
-						description: 'Layer to use from a vector tile source. ',
-					},
-					type: {
-						type: 'string',
-						default: 'fill',
-						enum: [
-							'fill',
-							'line',
-							'symbol',
-							'circle',
-							'heatmap',
-							'fill-extrusion',
-							'hillshade',
-							'background',
-						],
-					},
-					style_source_type: {
-						title: 'Style Source Type',
-						description: 'Which data the map should display',
-						type: 'string',
-						default: 'vector',
-						disabled: true,
-					},
+		return {
+			type: 'object',
+			required: [ 'url', 'type', 'source_layer' ],
+			properties: {
+				url: {
+					type: 'string',
+					title: 'URL',
 				},
-			} );
-		} );
+				source_layer: {
+					type: 'string',
+					title: 'Source layer',
+					description: 'Layer to use from a vector tile source. ',
+				},
+				type: {
+					type: 'string',
+					default: 'fill',
+					enum: [
+						'fill',
+						'line',
+						'symbol',
+						'circle',
+						'heatmap',
+						'fill-extrusion',
+						'hillshade',
+						'background',
+					],
+				},
+				style_source_type: {
+					title: 'Style Source Type',
+					description: 'Which data the map should display',
+					type: 'string',
+					default: 'vector',
+					disabled: true,
+				},
+			},
+		};
 	},
 } );

@@ -13,6 +13,7 @@ class Settings {
 	protected function init() {
 
 		$this->default_options = [
+			'map_runtime' => 'mapboxgl',
 			'enabled_post_types' => [
 				'post',
 				'storymap'
@@ -21,7 +22,7 @@ class Settings {
 			'map_default_zoom' => 11,
 			'map_default_lat' => -23.54998517,
 			'map_default_lng' => -46.65599340,
-			'carto_update_time' => 'weekly',
+			'mapbox_key' => '',
 			'jeo_footer-logo' => '',
 			'show_storymaps_on_post_archives' => 0,
 		];
@@ -29,14 +30,6 @@ class Settings {
 		add_action('admin_menu', [$this, 'add_menu_item']);
 		add_action('admin_init', [$this, 'admin_init']);
 		add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
-		add_action('update_option', [$this, 'update_carto_update_interval'], 10, 3);
-	}
-
-	public function update_carto_update_interval($option, $old_value, $value) {
-		if($option == "jeo-settings") {
-			wp_clear_scheduled_hook('carto_update_layers');
-			wp_schedule_event(time(), json_decode(json_encode($value), true)['carto_update_time'], 'carto_update_layers');
-		}
 	}
 
 	public function get_option( $option_name ) {
@@ -86,7 +79,7 @@ class Settings {
 		if ($page == 'jeo_page_jeo-settings') {
 			wp_enqueue_media();
 			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery' ), JEO_VERSION );
-			wp_set_script_translations( 'jeo-settings', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages' );
+			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
 
 		}
 	}

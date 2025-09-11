@@ -3,9 +3,8 @@ import {
 	RangeControl,
 	CheckboxControl,
 	Button,
-	ButtonGroup,
 } from '@wordpress/components';
-import { Fragment, useRef, useState, useEffect } from '@wordpress/element';
+import { Fragment, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const mapDefaults = {
@@ -19,12 +18,6 @@ const mapDefaults = {
 	disable_drag_rotate: jeo_settings.map_defaults.disable_drag_rotate,
 	enable_fullscreen: jeo_settings.map_defaults.enable_fullscreen,
 };
-
-
-const panLimitStyle = {
-	display: "flex",
-	justifyContent: "space-between"
-}
 
 function parseNumber( value ) {
 	if ( value === '' ) {

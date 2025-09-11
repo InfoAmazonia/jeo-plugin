@@ -1,4 +1,3 @@
-import './../map-blocks/storymap-display';
 import JeoMap from './class-jeo-map';
 
 ( function ( $ ) {

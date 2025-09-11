@@ -121,11 +121,11 @@ class Layer_Types {
 		wp_register_script(
 			'jeo-layer',
 			JEO_BASEURL . '/js/build/JeoLayer.js',
-			['mapboxgl-loader'],
+			['mapgl'],
 			$asset_file['version']
 		);
 
-		wp_set_script_translations('jeo-layer', 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages');
+		wp_set_script_translations('jeo-layer', 'jeo', JEO_BASEPATH . 'languages');
 
 	}
 
@@ -139,7 +139,7 @@ class Layer_Types {
 			$deps = isset( $layer_type['dependencies'] ) ? $layer_type['dependencies'] : [];
 			$deps = array_merge( ['jeo-layer'], $deps );
 			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps, JEO_VERSION );
-			wp_set_script_translations('layer-type-' . $slug, 'jeo', plugin_dir_path(  dirname( __FILE__ , 2 ) ) . 'languages');
+			wp_set_script_translations('layer-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages');
 		}
 
 	}

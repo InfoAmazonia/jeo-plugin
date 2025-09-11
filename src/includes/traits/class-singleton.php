@@ -47,11 +47,38 @@ trait Singleton {
 			$should_load_assets = true;
 		}
 
-		if ( get_page_template_slug() === 'discovery.php' ) {
+		if ( $this->should_load_discovery_assets() ) {
+			$should_load_assets = true;
+		}
+
+		if (get_query_var('jeo_embed') === 'map') {
 			$should_load_assets = true;
 		}
 
 		return apply_filters( 'jeo_should_load_assets' , $should_load_assets );
+	}
+
+	public function should_load_discovery_assets() {
+		return is_page_template( 'discovery.php' );
+	}
+
+	public function should_log_storymap_assets() {
+		$mapblocks = [
+			'jeo/storymap',
+			'jeo/embedded-storymap',
+		];
+
+		$should_load_assets = false;
+		$post_id = get_the_ID();
+
+		foreach ( $mapblocks as $block ) {
+			if ( has_block( $block, $post_id ) ) {
+				$should_load_assets = true;
+				break;
+			}
+		}
+
+		return apply_filters( 'jeo_should_load_storymap_assets' , $should_load_assets );
 	}
 
 	final public static function get_instance() {
