@@ -56,7 +56,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 This is a major release. Here are some highlights:
 * Support for MapLibreGL as an alternative rendering library (for compatibility, MapboxGL is still the default library)
 * When using MapLibreGL without Mapbox-hosted layers, the use of Mapbox API key is not required anymore
-* Removed support for Carto integration (reducing plugin size in ~90%)
+* Removed support for Carto integration (reducing plugin size in ~60%)
 
 Full changelog:
 * Support for MapLibreGL  as an alternative rendering library
