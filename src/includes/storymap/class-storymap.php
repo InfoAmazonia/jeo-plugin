@@ -16,7 +16,7 @@ class Storymap {
 
 		add_action( 'pre_get_posts', array( $this, 'show_on_archives' ) );
 
-		add_filter( 'rest_prepare_storymap', array( $this, 'prepare_rest_response' ), 10, 3 );
+		add_filter( 'rest_prepare_storymap', array( $this, 'prepare_rest_response' ), 10, 2 );
 
 		$this->register_rest_meta_validation();
 	}
@@ -79,7 +79,6 @@ class Storymap {
 	public function add_capabilities() {
 		$roles = array( 'author', 'editor', 'administrator' );
 		foreach ( $roles as $role ) {
-			// var_dump($role);
 			$role_obj = get_role( $role );
 
 			$role_obj->add_cap( 'edit_storymap' );
@@ -116,16 +115,14 @@ class Storymap {
 
 		if ( empty( $query->get( 'post_type' ) ) ) {
 			$query->set( 'post_type', array( 'post', $this->post_type ) );
-		} else {
-			if ( is_array( $query->get( 'post_type' ) ) ) {
+		} elseif ( is_array( $query->get( 'post_type' ) ) ) {
 				$types   = $query->get( 'post_type' );
 				$types[] = $this->post_type;
 				$query->set( 'post_types', $types );
-			}
 		}
 	}
 
-	public function prepare_rest_response( $response, $post, $request ) {
+	public function prepare_rest_response( $response, $post ) {
 		if ( function_exists( 'get_coauthors' ) ) {
 			$authors = \get_coauthors( $post->ID );
 

@@ -72,7 +72,7 @@ class Jeo {
 		add_filter( 'rest_post_tag_query', array( $this, 'maximum_terms_api_filter' ), 10, 1 );
 
 		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
-		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 2 );
+		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
 	}
 
@@ -114,13 +114,13 @@ class Jeo {
 		);
 	}
 
-	function maximum_terms_api_filter( $prepared_args ) {
+	public function maximum_terms_api_filter( $prepared_args ) {
 		$prepared_args['number'] = 1000;
 		return $prepared_args;
 	}
 
-	public function order_rest_post_by_post_title( $args, $request ) {
-		if ( isset( $args['post__in'] ) && sizeof( $args['post__in'] ) ) {
+	public function order_rest_post_by_post_title( $args ) {
+		if ( isset( $args['post__in'] ) && ! empty( $args['post__in'] ) ) {
 			$args['suppress_filters'] = true;
 		}
 
@@ -149,7 +149,7 @@ class Jeo {
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
-		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] );
+		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] ?? array() );
 
 		wp_register_style( 'jeo-js', JEO_BASEURL . '/js/build/postsSidebar.css', array(), JEO_VERSION );
 		wp_register_script(
@@ -163,7 +163,7 @@ class Jeo {
 
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
 
-		if ( $map_runtime === 'maplibregl' ) {
+		if ( 'maplibregl' === $map_runtime ) {
 			$mapgl_loader = 'maplibreglLoader';
 			$mapgl_react  = 'maplibreglReact';
 		} else {
@@ -234,7 +234,7 @@ class Jeo {
 		wp_register_script(
 			'mapgl-react',
 			JEO_BASEURL . '/js/build/mapglReact.js',
-			array_merge( $mapgl_react_assets['dependencies'], array( 'mapgl-react-vendor' ) ),
+			array_merge( $mapgl_react_assets['dependencies'] ?? array(), array( 'mapgl-react-vendor' ) ),
 			JEO_VERSION,
 		);
 
@@ -243,12 +243,13 @@ class Jeo {
 		wp_register_style(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
-			array( 'mapgl' )
+			array( 'mapgl' ),
+			JEO_VERSION,
 		);
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
-			array_merge( $map_blocks_assets['dependencies'], array( 'jeo-layer', 'mapgl-react' ) ),
+			array_merge( $map_blocks_assets['dependencies'] ?? array(), array( 'jeo-layer', 'mapgl-react' ) ),
 			$map_blocks_assets['version']
 		);
 
@@ -305,7 +306,7 @@ class Jeo {
 		$story_block                    = parse_blocks( $story->post_content )[0];
 		$story_block['attrs']['postID'] = $story_id;
 
-		return $this->story_map_dynamic_render_callback( $block_attributes, json_encode( $story_block['attrs'] ) );
+		return $this->story_map_dynamic_render_callback( $block_attributes, wp_json_encode( $story_block['attrs'] ) );
 	}
 
 	private function cleanup_layers( $layers ) {
@@ -328,7 +329,7 @@ class Jeo {
 		if ( ! function_exists( 'layer_still_exists' ) ) {
 			function layer_still_exists( $map_layers, $selected_layer ) {
 				$layer_status = get_post_status( $selected_layer->id );
-				if ( $layer_status === 'trash' || $layer_status === false || $layer_status === 'private' ) {
+				if ( 'trash' === $layer_status || false === $layer_status || 'private' === $layer_status ) {
 					return false;
 				}
 
@@ -395,7 +396,7 @@ class Jeo {
 			}
 		);
 
-		return '<div class="story-map-container" data-properties="' . htmlentities( json_encode( $saved_data ) ) . '" ></div>';
+		return '<div class="story-map-container" data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
 	}
 
 	public function filter_rest_query_by_zone( $args, $request ) {
@@ -412,7 +413,7 @@ class Jeo {
 
 		$post_types = apply_filters( 'jeo_enabled_post_types', \jeo_settings()->get_option( 'enabled_post_types' ) );
 
-		if ( in_array( $post->post_type, $post_types ) && $this->should_load_assets() ) {
+		if ( in_array( $post->post_type, $post_types, true ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
 		}
@@ -488,7 +489,7 @@ class Jeo {
 
 		$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
 		wp_enqueue_style( 'discovery-map', JEO_BASEURL . '/js/build/discovery.css', array(), JEO_VERSION );
-		wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'], array( 'jeo-map' ) ), JEO_VERSION, true );
+		wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'] ?? array(), array( 'jeo-map' ) ), JEO_VERSION, true );
 
 		wp_set_script_translations( 'discovery-map', 'jeo', JEO_BASEPATH . 'languages' );
 
@@ -519,18 +520,9 @@ class Jeo {
 	public function enqueue_storymap_scripts() {
 		$storymap_assets = include JEO_BASEPATH . '/js/build/jeoStorymap.asset.php';
 		wp_enqueue_style( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.css', array( 'jeo-map' ), JEO_VERSION );
-		wp_enqueue_script( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.js', array_merge( $storymap_assets['dependencies'], array( 'jeo-map', 'mapgl-react' ) ), JEO_VERSION );
+		wp_enqueue_script( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.js', array_merge( $storymap_assets['dependencies'] ?? array(), array( 'jeo-map', 'mapgl-react' ) ), JEO_VERSION );
 
 		wp_set_script_translations( 'jeo-storymap', 'jeo', JEO_BASEPATH . 'languages' );
-	}
-
-	/**
-	 * Registers WP CLI commands
-	 *
-	 * @return void
-	 */
-	public function register_cli_commands() {
-		\WP_CLI::add_command( 'jeo fixtures', 'Jeo\Fixtures' );
 	}
 
 	public function register_oembed() {
@@ -577,11 +569,7 @@ class Jeo {
 					$server   = rest_get_server();
 					$data     = $server->response_to_data( $response, false );
 
-					// var_dump(empty($map_meta['relate_posts'][0]));
-
 					$have_related_posts = ! empty( $map_meta['relate_posts'][0] ) && ! empty( $data ) || ! empty( $map->relate_posts );
-
-					// var_dump($have_related_posts);
 
 					if ( isset( $_GET['width'] ) ) {
 						$full_width  = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( sanitize_text_field( $_GET['width'] ) ) : 820;
@@ -630,7 +618,7 @@ class Jeo {
 		}
 	}
 
-	function storymap_content( $content ) {
+	public function storymap_content( $content ) {
 		// Check if we're inside the main loop in a single Post.
 		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && isset( $_GET['storymap_id'] ) ) ) {
 			global $post, $wpdb;
@@ -654,8 +642,8 @@ class Jeo {
 		}
 	}
 
-	function restrict_story_map_block_count() {
-		global $post, $parent_file, $typenow, $current_screen, $pagenow;
+	public function restrict_story_map_block_count() {
+		global $post, $typenow, $current_screen, $pagenow;
 
 		$post_type = null;
 

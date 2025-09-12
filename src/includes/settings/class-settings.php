@@ -54,15 +54,14 @@ class Settings {
 	}
 
 	public function get_geocoder_option_field_name( $geocoder, $name ) {
-		return $this->get_field_name( 'geocoders' ) . '[' . $geocoder . ']' . '[' . $name . ']';
+		return $this->get_field_name( 'geocoders' ) . '[' . $geocoder . '][' . $name . ']';
 	}
 
 	public function get_geocoder_options( $geocoder_slug ) {
 		$options  = $this->get_option( 'geocoders' );
-		$geoObj   = \jeo_geocode_handler()->initialize_geocoder( $geocoder_slug );
-		$defaults = $geoObj->get_default_options();
+		$geocoder = \jeo_geocode_handler()->initialize_geocoder( $geocoder_slug );
+		$defaults = $geocoder->get_default_options();
 		$current  = isset( $options[ $geocoder_slug ] ) ? $options[ $geocoder_slug ] : array();
-		// var_dump($options); die;
 		return array_merge( $defaults, $current );
 	}
 
@@ -76,7 +75,7 @@ class Settings {
 	}
 
 	public function enqueue_admin_scripts( $page ) {
-		if ( $page === 'jeo_page_jeo-settings' ) {
+		if ( 'jeo_page_jeo-settings' === $page ) {
 			wp_enqueue_media();
 			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery' ), JEO_VERSION );
 			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
@@ -91,9 +90,7 @@ class Settings {
 			'Settings',
 			'manage_options',
 			'jeo-settings',
-			array( $this, 'admin_page' )
-			// $icon_url:string,
-			// $position:integer|null
+			array( $this, 'admin_page' ),
 		);
 	}
 

@@ -20,7 +20,7 @@ class Layer_Types {
 	 *
 	 * @return void
 	 */
-	private function _register_layer_types() {
+	private function register_layer_types() {
 
 		$this->register_layer_type(
 			'mapbox',
@@ -97,7 +97,7 @@ class Layer_Types {
 
 	public function get_registered_layer_types() {
 		if ( empty( $this->registered_layer_types ) ) {
-			$this->_register_layer_types();
+			$this->register_layer_types();
 		}
 
 		return $this->registered_layer_types;

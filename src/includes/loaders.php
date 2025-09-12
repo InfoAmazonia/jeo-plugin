@@ -6,8 +6,8 @@ function jeo_autoload( $class_name ) {
 	$class_path = explode( '\\', $class_name );
 
 	$subfolder = '';
-	if ( sizeof( $class_path ) > 2 ) {
-		$subfolder = strtolower( $class_path[ sizeof( $class_path ) - 2 ] ) . DIRECTORY_SEPARATOR;
+	if ( count( $class_path ) > 2 ) {
+		$subfolder = strtolower( $class_path[ count( $class_path ) - 2 ] ) . DIRECTORY_SEPARATOR;
 	}
 
 	$class_name = end( $class_path );
@@ -228,10 +228,10 @@ function jeo_custom_settings_css() {
 
 	$css_variables = '';
 	if ( ! empty( \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' ) ) ) {
-		$colorMoreBkg = \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' );
+		$color_more_bkg = \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' );
 
-		$color_css       = '--jeo_more-bkg-color: ' . $colorMoreBkg . ';';
-		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo( $colorMoreBkg, -0.15 ) . ';';
+		$color_css       = '--jeo_more-bkg-color: ' . $color_more_bkg . ';';
+		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo( $color_more_bkg, -0.15 ) . ';';
 		$css_variables  .= $color_css . ' ' . $color_css_hover;
 	}
 
@@ -261,10 +261,10 @@ function jeo_custom_settings_css() {
 	}
 
 	if ( ! empty( \jeo_settings()->get_option( 'jeo_close-color', '#555D66' ) ) ) {
-		$colorCloseBkg = \jeo_settings()->get_option( 'jeo_close-color', '#555D66' );
+		$color_close_bkg = \jeo_settings()->get_option( 'jeo_close-color', '#555D66' );
 
-		$color_css       = '--jeo_close-color: ' . $colorCloseBkg . ';';
-		$color_css_hover = '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo( $colorCloseBkg, -0.15 ) . ';';
+		$color_css       = '--jeo_close-color: ' . $color_close_bkg . ';';
+		$color_css_hover = '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo( $color_close_bkg, -0.15 ) . ';';
 		$css_variables  .= $color_css . ' ' . $color_css_hover;
 	}
 
@@ -277,10 +277,6 @@ function jeo_custom_settings_css() {
 	return $theme_css;
 }
 function jeo_custom_settings_css_wrap() {
-	/*
-	if (is_admin() || (!\jeo_settings()->get_option( 'jeo_typography') ) {
-		return;
-	}*/
 	?>
 	<style type="text/css" id="custom-jeo-css">
 		<?php
@@ -293,10 +289,10 @@ add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
 
 function jeo_scripts_typography() {
 	if ( \jeo_settings()->get_option( 'jeo_typography' ) ) {
-		wp_enqueue_style( 'jeo-font', \jeo_settings()->get_option( 'jeo_typography' ), array(), null );
+		wp_enqueue_style( 'jeo-font', \jeo_settings()->get_option( 'jeo_typography' ), array(), JEO_VERSION );
 	}
 	if ( \jeo_settings()->get_option( 'jeo_typography-stories' ) ) {
-		wp_enqueue_style( 'jeo-font-stories', \jeo_settings()->get_option( 'jeo_typography-stories' ), array(), null );
+		wp_enqueue_style( 'jeo-font-stories', \jeo_settings()->get_option( 'jeo_typography-stories' ), array(), JEO_VERSION );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );
@@ -325,7 +321,7 @@ add_filter( 'page_template', 'template_page_discovery' );
 function template_page_discovery( $page_template ) {
 
 	if ( get_page_template_slug() === 'discovery.php' ) {
-		$page_template = JEO_BASEPATH . '/templates/' . 'discovery.php';
+		$page_template = JEO_BASEPATH . '/templates/discovery.php';
 	}
 	return $page_template;
 }
@@ -333,8 +329,8 @@ function template_page_discovery( $page_template ) {
 /**
  * Add "Discovery" template to page attirbute template section.
  */
-add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 4 );
-function add_template_page_discovery( $post_templates, $wp_theme, $post, $post_type ) {
+add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
+function add_template_page_discovery( $post_templates ) {
 
 	// Add custom template named template-custom.php to select dropdown
 	$post_templates['discovery.php'] = __( 'Discovery', 'jeo' );

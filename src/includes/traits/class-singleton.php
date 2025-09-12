@@ -43,7 +43,7 @@ trait Singleton {
 			}
 		}
 
-		if ( in_array( $post_type, array_merge( \jeo_settings()->get_option( 'enabled_post_types' ), array( 'map' ) ) ) ) {
+		if ( in_array( $post_type, array_merge( \jeo_settings()->get_option( 'enabled_post_types' ), array( 'map' ) ), true ) ) {
 			$should_load_assets = true;
 		}
 

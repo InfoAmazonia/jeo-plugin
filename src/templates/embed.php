@@ -2,7 +2,7 @@
 	$disable_embed = get_post_meta( $map_id, 'disable_embed', true ) === '1' ? true : false;
 
 if ( $disable_embed ) {
-	wp_redirect( home_url() );
+	wp_safe_redirect( home_url() );
 	exit();
 }
 ?>
@@ -11,7 +11,7 @@ if ( $disable_embed ) {
 
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title><?php echo get_the_title( $map_id ); ?> </title>
+		<title><?php echo esc_html( get_the_title( $map_id ) ); ?> </title>
 		<?php wp_head(); ?>
 	</head>
 

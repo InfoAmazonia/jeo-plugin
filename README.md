@@ -32,22 +32,3 @@ While developing, you might want to run `npm run watch`. This script will watch 
 ```bash
 rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
 ```
-
-## Fixtures
-
-There are few `WP CLI` commands that will generate sample layers and maps useful for development purposes.
-
-(These fixtures uses infoamazonia maps and require infoamazonia Mapbox access token to be configured in the Settings menu)
-
-In order to create or update the fixtures to the latest version, run:
-
-```bash
-wp jeo fixtures update
-```
-
-The last two lines of output in this command will point you to two pages with sample maps added to it. They are identical, with the difference that one of them is a one-time map, and the other one is a map saved in the Maps Library
-
-There are also other 2 commands available
-
-* `wp jeo fixtures list` - List the fixtures saved to the database and their metadata
-* `wp jeo fixtures sample_maps` - Gives you sample DIVs you can use to add the sample maps anywhere you want in your theme.

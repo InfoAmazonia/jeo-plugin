@@ -16,8 +16,8 @@
 		<?php wp_head(); ?>
 	</head>
 	<body style="margin: 0 !important">
-		<div id="embed-container" style="<?php echo $container_style; ?>">
-			<div class="jeomap map_id_<?php echo $post->ID; ?>" data-options='{"marker_action": "embed_preview"}' style="<?php echo $map_style; ?>"></div>
+		<div id="embed-container" style="<?php echo esc_attr( $container_style ); ?>">
+			<div class="jeomap map_id_<?php echo esc_attr( $post->ID ); ?>" data-options='{"marker_action": "embed_preview"}' style="<?php echo esc_attr( $map_style ); ?>"></div>
 		</div>
 	</body>
 </html>
@@ -26,7 +26,7 @@
 	<?php get_header(); ?>
 	<main id="site-content" role="main">
 		<?php get_the_title(); ?>
-		<div class="jeomap map_id_<?php echo $post->ID; ?>"></div>
+		<div class="jeomap map_id_<?php echo esc_attr( $post->ID ); ?>"></div>
 	</main>
 	<?php get_footer(); ?>
 <?php endif; ?>
