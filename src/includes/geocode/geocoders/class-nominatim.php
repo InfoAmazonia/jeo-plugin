@@ -50,14 +50,14 @@ class Nominatim extends \Jeo\Geocoder {
 		return $this->format_response_item( (array) $data );
 	}
 
-	private function format_response_item( $match ) {
+	private function format_response_item( $item ) {
 
-		if ( isset( $match['lat'] ) && isset( $match['lon'] ) && isset( $match['display_name'] ) ) {
+		if ( isset( $item['lat'] ) && isset( $item['lon'] ) && isset( $item['display_name'] ) ) {
 
 			$response = array(
-				'lat'          => $match['lat'],
-				'lon'          => $match['lon'],
-				'full_address' => $match['display_name'],
+				'lat'          => $item['lat'],
+				'lon'          => $item['lon'],
+				'full_address' => $item['display_name'],
 			);
 		}
 
@@ -108,14 +108,14 @@ class Nominatim extends \Jeo\Geocoder {
 		foreach ( $correspondences as $jeo_field => $nominatim_fields ) {
 
 			foreach ( $nominatim_fields as $field ) {
-				if ( isset( $match['address']->$field ) ) {
-					$response[ $jeo_field ] = $match['address']->$field;
+				if ( isset( $item['address']->$field ) ) {
+					$response[ $jeo_field ] = $item['address']->$field;
 					break;
 				}
 			}
 		}
 
-		$response['raw'] = $match;
+		$response['raw'] = $item;
 
 		return $response;
 	}

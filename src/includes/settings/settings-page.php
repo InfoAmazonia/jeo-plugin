@@ -114,23 +114,23 @@
 
 					<?php
 					foreach ( jeo_geocode_handler()->get_registered_geocoders() as $gslug => $geocoder ) :
-						$geoObject = jeo_geocode_handler()->initialize_geocoder( $gslug );
+						$geo_object = jeo_geocode_handler()->initialize_geocoder( $gslug );
 						?>
 
 						<?php
-						if ( false === $geoObject->get_settings() ) {
+						if ( false === $geo_object->get_settings() ) {
 							continue;}
 						?>
 
-						<tr class="geocoder_options" id="geocoder_options_<?php echo $gslug; ?>">
+						<tr class="geocoder_options" id="geocoder_options_<?php echo esc_attr( $gslug ); ?>">
 							<th scope="row">
 								<label for="input_id">
 									<?php // translators: %s is the geocoder name. Ex: Nominatim options ?>
-									<?php printf( esc_html_x( '%s options', 'geocoder_options', 'jeo' ), $geocoder['name'] ); ?>
+									<?php printf( esc_html_x( '%s options', 'geocoder_options', 'jeo' ), esc_attr( $geocoder['name'] ) ); ?>
 								</label>
 							</th>
 							<td>
-								<?php foreach ( $geoObject->get_settings() as $settings ) : ?>
+								<?php foreach ( $geo_object->get_settings() as $settings ) : ?>
 									<label for="<?php echo esc_html( $settings['slug'] ); ?>">
 										<strong><?php echo esc_html( $settings['name'] ); ?></strong> <br/>
 									</label>
@@ -140,7 +140,7 @@
 									</p>
 								<?php endforeach; ?>
 
-								<?php $geoObject->settings_footer( $this ); ?>
+								<?php $geo_object->settings_footer( $this ); ?>
 
 							</td>
 						</tr>

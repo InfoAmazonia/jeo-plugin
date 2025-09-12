@@ -458,7 +458,7 @@ class Maps {
 				$layers_def
 			);
 
-			if ( ! sizeof( $layers_ids ) ) {
+			if ( empty( $layers_ids ) ) {
 				return $content;
 			}
 
@@ -508,7 +508,6 @@ class Maps {
 		$roles = array( 'author', 'editor', 'administrator', 'contributor' );
 		$types = array( 'map', 'map-layer', 'storymap' );
 		foreach ( $roles as $role ) {
-			// var_dump($role);
 			$role_obj = get_role( $role );
 
 			foreach ( $types as $type ) {

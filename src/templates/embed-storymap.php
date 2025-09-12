@@ -3,15 +3,16 @@
 	$storymap_id   = sanitize_text_field( $_GET['storymap_id'] );
 
 if ( $disable_embed ) {
-	wp_redirect( home_url() );
+	wp_safe_redirect( home_url() );
 	exit();
 }
 ?>
+<!DOCTYPE html>
 <html style="margin: 0px !important;">
 
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title><?php echo get_the_title( $storymap_id ); ?> </title>
+		<title><?php echo esc_html( get_the_title( $storymap_id ) ); ?> </title>
 		<?php wp_head(); ?>
 	</head>
 

@@ -53,7 +53,6 @@ abstract class Geocoder {
 	}
 
 	public function settings_footer( $settings ) {
-		return;
 	}
 
 	public function get_option( $option_name ) {

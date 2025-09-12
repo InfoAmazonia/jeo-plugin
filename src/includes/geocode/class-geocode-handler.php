@@ -35,9 +35,9 @@ class Geocode_Handler {
 		$geocoder = $this->get_active_geocoder();
 
 		if ( $geocoder ) {
-			echo json_encode( $geocoder->geocode( sanitize_text_field( $_GET['search'] ) ) );
+			echo wp_json_encode( $geocoder->geocode( sanitize_text_field( $_GET['search'] ) ) );
 		} else {
-			echo json_encode( array() );
+			echo wp_json_encode( array() );
 		}
 
 		die;
@@ -48,9 +48,9 @@ class Geocode_Handler {
 		$geocoder = $this->get_active_geocoder();
 
 		if ( $geocoder ) {
-			echo json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
+			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
 		} else {
-			echo json_encode( array() );
+			echo wp_json_encode( array() );
 		}
 
 		die;
@@ -62,7 +62,7 @@ class Geocode_Handler {
 	 *
 	 * @return void
 	 */
-	private function _register_geocoders() {
+	private function register_geocoders() {
 
 		$this->register_geocoder(
 			array(
@@ -92,7 +92,7 @@ class Geocode_Handler {
 	}
 
 	public function get_active_geocoder() {
-		$this->_register_geocoders();
+		$this->register_geocoders();
 		$active_geocoder = jeo_settings()->get_option( 'active_geocoder' );
 		return $this->initialize_geocoder( $active_geocoder );
 	}
@@ -323,7 +323,7 @@ class Geocode_Handler {
 
 	public function get_registered_geocoders() {
 		if ( empty( $this->registered_geocoders ) ) {
-			$this->_register_geocoders();
+			$this->register_geocoders();
 		}
 		return $this->registered_geocoders;
 	}
@@ -394,11 +394,11 @@ class Geocode_Handler {
 
 	private function add_index_metadata_hooks() {
 
-		add_filter( 'update_post_metadata', array( $this, 'disable_update_post_meta' ), 10, 5 );
-		add_filter( 'add_post_metadata', array( $this, 'disable_update_post_meta' ), 10, 5 );
+		add_filter( 'update_post_metadata', array( $this, 'disable_update_post_meta' ), 10, 3 );
+		add_filter( 'add_post_metadata', array( $this, 'disable_update_post_meta' ), 10, 3 );
 
-		add_action( 'updated_postmeta', array( $this, 'update_meta_indexes' ), 10, 4 );
-		add_action( 'added_post_meta', array( $this, 'update_meta_indexes' ), 10, 4 );
+		add_action( 'updated_postmeta', array( $this, 'update_meta_indexes' ), 10, 3 );
+		add_action( 'added_post_meta', array( $this, 'update_meta_indexes' ), 10, 3 );
 	}
 
 	private function remove_index_metadata_hooks() {
@@ -414,15 +414,15 @@ class Geocode_Handler {
 	 * metadata used as indexes are generated automatically when _primary_point and _secondary_point are updated
 	 * and should not be updated directly
 	 */
-	public function disable_update_post_meta( $return, $object_id, $meta_key, $meta_value, $prev_value ) {
+	public function disable_update_post_meta( $check, $object_id, $meta_key ) {
 
 		// the name of the meta without the last _s or _p suffix
 		$raw_key = substr( $meta_key, 0, strlen( $meta_key ) );
-		if ( in_array( $raw_key, $this->geo_attributes ) ) {
+		if ( in_array( $raw_key, $this->geo_attributes, true ) ) {
 			return false;
 		}
 
-		return $return;
+		return $check;
 	}
 
 	/**
@@ -431,14 +431,14 @@ class Geocode_Handler {
 	 *
 	 * This serves as an index so we can find posts by this information.
 	 */
-	public function update_meta_indexes( $meta_id, $object_id, $meta_key, $meta_value ) {
+	public function update_meta_indexes( $meta_id, $object_id, $meta_key ) {
 
-		if ( $meta_key === '_related_point' ) {
+		if ( '_related_point' === $meta_key ) {
 
 			$this->remove_index_metadata_hooks();
 
 			// get all values
-			$all_points = get_post_meta( $object_id, '_related_point' );
+			$all_points = get_post_meta( $object_id, '_related_point', false );
 
 			foreach ( $this->geo_attributes as $attr ) {
 
@@ -447,7 +447,7 @@ class Geocode_Handler {
 
 				foreach ( $all_points as $point ) {
 
-					$suffix = $point['relevance'] === 'primary' ? '_p' : '_s';
+					$suffix = 'primary' === $point['relevance'] ? '_p' : '_s';
 
 					if ( isset( $point[ $attr ] ) ) {
 						add_post_meta( $object_id, $attr . $suffix, $point[ $attr ] );

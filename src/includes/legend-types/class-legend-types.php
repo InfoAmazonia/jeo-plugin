@@ -20,7 +20,7 @@ class Legend_Types {
 	 *
 	 * @return void
 	 */
-	private function _register_legend_types() {
+	private function register_legend_types() {
 
 		$this->register_legend_type(
 			'barscale',
@@ -90,7 +90,7 @@ class Legend_Types {
 
 	public function get_registered_legend_types() {
 		if ( empty( $this->registered_legend_types ) ) {
-			$this->_register_legend_types();
+			$this->register_legend_types();
 		}
 
 		return $this->registered_legend_types;

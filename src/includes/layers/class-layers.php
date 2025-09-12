@@ -193,7 +193,6 @@ class Layers {
 	public function add_capabilities() {
 		$roles = array( 'author', 'editor', 'administrator' );
 		foreach ( $roles as $role ) {
-			// var_dump($role);
 			$role_obj = get_role( $role );
 
 			$role_obj->add_cap( 'edit_map-layer' );
