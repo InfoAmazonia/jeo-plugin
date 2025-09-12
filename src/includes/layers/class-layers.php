@@ -6,35 +6,36 @@ class Layers {
 
 	use Singleton;
 	use Rest_Validate_Meta;
+
 	public $post_type = 'map-layer';
 
 	protected function init() {
-		add_action( 'init', [ $this, 'register_post_type' ] );
-		add_action('admin_init', [ $this, 'add_capabilities' ]) ;
-		add_filter("rest_{$this->post_type}_collection_params", [ $this, 'rest_collection_params' ] );
+		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
+		add_filter( "rest_{$this->post_type}_collection_params", array( $this, 'rest_collection_params' ) );
 		$this->register_rest_meta_validation();
 	}
 
 	public function register_post_type() {
 
 		$labels = array(
-			'name'               => __( 'Layers', 'jeo' ),
-			'singular_name'      => __( 'Layer', 'jeo' ),
-			'add_new'            => __( 'Add new layer', 'jeo' ),
-			'add_new_item'       => __( 'Add new layer', 'jeo' ),
-			'edit_item'          => __( 'Edit layer', 'jeo' ),
-			'new_item'           => __( 'New layer', 'jeo' ),
-			'view_item'          => __( 'View layer', 'jeo' ),
-			'view_items'         => __( 'View layers', 'jeo' ),
-			'search_items'       => __( 'Search layers', 'jeo' ),
-			'not_found'          => __( 'No layer found', 'jeo' ),
-			'not_found_in_trash' => __( 'No layer found in the trash', 'jeo' ),
-			'menu_name'          => __( 'Layers', 'jeo' ),
-			'item_published' => __('Layer published.', 'jeo'),
-			'item_published_privately' => __('Layer published privately.', 'jeo'),
-			'item_reverted_to_draft' => __('Layer reverted to draft.', 'jeo'),
-			'item_scheduled' => __('Layer scheduled.', 'jeo'),
-			'item_updated' => __('Layer updated.', 'jeo'),
+			'name'                     => __( 'Layers', 'jeo' ),
+			'singular_name'            => __( 'Layer', 'jeo' ),
+			'add_new'                  => __( 'Add new layer', 'jeo' ),
+			'add_new_item'             => __( 'Add new layer', 'jeo' ),
+			'edit_item'                => __( 'Edit layer', 'jeo' ),
+			'new_item'                 => __( 'New layer', 'jeo' ),
+			'view_item'                => __( 'View layer', 'jeo' ),
+			'view_items'               => __( 'View layers', 'jeo' ),
+			'search_items'             => __( 'Search layers', 'jeo' ),
+			'not_found'                => __( 'No layer found', 'jeo' ),
+			'not_found_in_trash'       => __( 'No layer found in the trash', 'jeo' ),
+			'menu_name'                => __( 'Layers', 'jeo' ),
+			'item_published'           => __( 'Layer published.', 'jeo' ),
+			'item_published_privately' => __( 'Layer published privately.', 'jeo' ),
+			'item_reverted_to_draft'   => __( 'Layer reverted to draft.', 'jeo' ),
+			'item_scheduled'           => __( 'Layer scheduled.', 'jeo' ),
+			'item_updated'             => __( 'Layer updated.', 'jeo' ),
 		);
 
 		$args = array(
@@ -46,19 +47,19 @@ class Layers {
 			'show_in_rest'        => true,
 			'public'              => true,
 			'show_in_menu'        => 'jeo-main-menu',
-			'menu_icon' 		  => 'data:image/svg+xml;base64,' . base64_encode(file_get_contents(JEO_BASEPATH . '/js/src/icons/layers.svg')),
+			'menu_icon'           => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( JEO_BASEPATH . '/js/src/icons/layers.svg' ) ),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
-			'capabilities' => array(
-				'edit_post' => 'edit_map-layer',
-				'edit_posts' => 'edit_map-layers',
-				'edit_others_posts' => 'edit_others_map-layers',
+			'capabilities'        => array(
+				'edit_post'          => 'edit_map-layer',
+				'edit_posts'         => 'edit_map-layers',
+				'edit_others_posts'  => 'edit_others_map-layers',
 
-				'publish_posts' => 'publish_map-layers',
-				'read_post' => 'read_map-layer',
+				'publish_posts'      => 'publish_map-layers',
+				'read_post'          => 'read_map-layer',
 				'read_private_posts' => 'read_private_map-layers',
 
-				'delete_post' => 'delete_map-layer',
+				'delete_post'        => 'delete_map-layer',
 			),
 			// 'map_meta_cap' => true,
 			// 'capability_type' => 'post',
@@ -168,11 +169,11 @@ class Layers {
 			$this->post_type,
 			'use_legend',
 			array(
-				'show_in_rest' => true,
-				'single' => true,
+				'show_in_rest'  => true,
+				'single'        => true,
 				'auth_callback' => '__return_true',
-				'type' => 'boolean',
-				'description' => __('Use legend', 'jeo')
+				'type'          => 'boolean',
+				'description'   => __( 'Use legend', 'jeo' ),
 			)
 		);
 
@@ -180,20 +181,20 @@ class Layers {
 			$this->post_type,
 			'legend_title',
 			array(
-				'show_in_rest' => true,
-				'single' => true,
+				'show_in_rest'  => true,
+				'single'        => true,
 				'auth_callback' => '__return_true',
-				'type' => 'string',
-				'description' => __('Legend title', 'jeo')
+				'type'          => 'string',
+				'description'   => __( 'Legend title', 'jeo' ),
 			)
 		);
 	}
 
 	public function add_capabilities() {
-		$roles = ['author', 'editor', 'administrator'];
-		foreach ($roles as $role) {
+		$roles = array( 'author', 'editor', 'administrator' );
+		foreach ( $roles as $role ) {
 			// var_dump($role);
-			$role_obj = get_role($role);
+			$role_obj = get_role( $role );
 
 			$role_obj->add_cap( 'edit_map-layer' );
 			$role_obj->add_cap( 'edit_map-layers' );
@@ -208,8 +209,8 @@ class Layers {
 	}
 
 	public function rest_collection_params( $params ) {
-		$params[ 'per_page' ][ 'minimum' ] = -1;
-		unset( $params[ 'per_page' ][ 'maximum' ] );
+		$params['per_page']['minimum'] = -1;
+		unset( $params['per_page']['maximum'] );
 		return $params;
 	}
 
@@ -220,5 +221,4 @@ class Layers {
 
 		return true;
 	}
-
 }

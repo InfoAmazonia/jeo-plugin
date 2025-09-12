@@ -25,16 +25,16 @@ trait Singleton {
 			return true;
 		}
 
-		$mapblocks = [
+		$mapblocks = array(
 			'jeo/map',
 			'jeo/onetime-map',
 			'jeo/storymap',
 			'jeo/embedded-storymap',
-		];
+		);
 
 		$should_load_assets = false;
-		$post_id = get_the_ID();
-		$post_type = get_post_type();
+		$post_id            = get_the_ID();
+		$post_type          = get_post_type();
 
 		foreach ( $mapblocks as $block ) {
 			if ( has_block( $block, $post_id ) ) {
@@ -43,7 +43,7 @@ trait Singleton {
 			}
 		}
 
-		if ( in_array( $post_type, array_merge( \jeo_settings()->get_option( 'enabled_post_types' ), [ 'map' ] ) ) ) {
+		if ( in_array( $post_type, array_merge( \jeo_settings()->get_option( 'enabled_post_types' ), array( 'map' ) ) ) ) {
 			$should_load_assets = true;
 		}
 
@@ -51,11 +51,11 @@ trait Singleton {
 			$should_load_assets = true;
 		}
 
-		if (get_query_var('jeo_embed') === 'map') {
+		if ( get_query_var( 'jeo_embed' ) === 'map' ) {
 			$should_load_assets = true;
 		}
 
-		return apply_filters( 'jeo_should_load_assets' , $should_load_assets );
+		return apply_filters( 'jeo_should_load_assets', $should_load_assets );
 	}
 
 	public function should_load_discovery_assets() {
@@ -63,13 +63,13 @@ trait Singleton {
 	}
 
 	public function should_log_storymap_assets() {
-		$mapblocks = [
+		$mapblocks = array(
 			'jeo/storymap',
 			'jeo/embedded-storymap',
-		];
+		);
 
 		$should_load_assets = false;
-		$post_id = get_the_ID();
+		$post_id            = get_the_ID();
 
 		foreach ( $mapblocks as $block ) {
 			if ( has_block( $block, $post_id ) ) {
@@ -78,7 +78,7 @@ trait Singleton {
 			}
 		}
 
-		return apply_filters( 'jeo_should_load_storymap_assets' , $should_load_assets );
+		return apply_filters( 'jeo_should_load_storymap_assets', $should_load_assets );
 	}
 
 	final public static function get_instance() {
@@ -89,6 +89,5 @@ trait Singleton {
 		return self::$instance;
 	}
 
-	protected abstract function init();
-
+	abstract protected function init();
 }

@@ -4,7 +4,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       JEO WP
- * Description:       Interactive Map blocks for Wordpress Gutenberg
+ * Description:       Interactive Map blocks for WordPress Gutenberg
  * Version:           3.0.0-rc.1
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
@@ -25,7 +25,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'JEO_VERSION', '3.0.0-rc.1' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
-define( 'JEO_BASEURL', plugins_url('', __FILE__) );
+define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );
 
 /**
  * The core plugin class that is used to define internationalization,

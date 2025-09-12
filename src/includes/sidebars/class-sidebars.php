@@ -7,12 +7,12 @@ class Sidebars {
 	use Singleton;
 
 	protected function init() {
-		add_action('admin_init', [$this, 'load_assets']);
-		add_action('rest_post_query', [$this, 'rest_post_query'], 10, 2);
+		add_action( 'admin_init', array( $this, 'load_assets' ) );
+		add_action( 'rest_post_query', array( $this, 'rest_post_query' ), 10, 2 );
 	}
 
-	public function rest_post_query($args, $request) {
-		if ($request['meta_query']) {
+	public function rest_post_query( $args, $request ) {
+		if ( $request['meta_query'] ) {
 			$args['meta_query'] = $request['meta_query'];
 		}
 
@@ -26,7 +26,7 @@ class Sidebars {
 		wp_enqueue_script(
 			'jeo-layers-sidebar',
 			JEO_BASEURL . '/js/build/layersSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapgl-react']),
+			array_merge( $asset_file['dependencies'], array( 'mapgl-react' ) ),
 			$asset_file['version']
 		);
 
@@ -36,11 +36,10 @@ class Sidebars {
 		wp_enqueue_script(
 			'jeo-maps-sidebar',
 			JEO_BASEURL . '/js/build/mapsSidebar.js',
-			array_merge($asset_file['dependencies'], ['mapgl-react']),
+			array_merge( $asset_file['dependencies'], array( 'mapgl-react' ) ),
 			$asset_file['version']
 		);
 
 		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
-
 	}
 }
