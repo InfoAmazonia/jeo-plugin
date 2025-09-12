@@ -1,0 +1,14 @@
+{
+    "name": "infoamazonia/jeo-plugin",
+    "type": "project",
+    "require-dev": {
+        "squizlabs/php_codesniffer": "*",
+        "wp-coding-standards/wpcs": "*"
+    },
+    "license": "GPL-2.0",
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
