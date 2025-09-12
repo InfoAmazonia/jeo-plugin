@@ -619,87 +619,55 @@ class Jeo {
 	}
 
 	public function storymap_content( $content ) {
-		// Check if we're inside the main loop in a single Post.
 		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && isset( $_GET['storymap_id'] ) ) ) {
 			global $post, $wpdb;
 
-			// daqui para frente a logica é muito louca-> MESMO <-
-			// por algum motivo o post_content estava vindo vazio em alguns casos, então, em determinado
-			// caso, vai pegar o objeto global $post, o ID dentro desse objeto e fazer uma nova query no banco.
-			// não sei o pq
-
+			// Sometimes, content is empty
 			$post_id = $post->ID;
-			if ( isset( $_GET['preview_id'] ) && ! empty( $_GET['preview_id'] ) ) {
-				$post_id = sanitize_text_field( $_GET['preview_id'] );
+			if ( ! empty( $_GET['preview_id'] ) ) {
+				$post_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
 			}
-			if ( isset( $_GET['storymap_id'] ) && ! empty( $_GET['storymap_id'] ) ) {
-				$post_id = sanitize_text_field( $_GET['storymap_id'] );
+			if ( ! empty( $_GET['storymap_id'] ) ) {
+				$post_id = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
 			}
 			$post_content = $wpdb->get_results(
-				$wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) )
+				$wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", $post_id )
 			);
+
 			return do_blocks( $post_content[0]->post_content );
 		}
 	}
 
 	public function restrict_story_map_block_count() {
-		global $post, $typenow, $current_screen, $pagenow;
+		global $post;
 
-		$post_type = null;
-
-		if ( $post && ( property_exists( $post, 'post_type' ) || method_exists( $post, 'post_type' ) ) ) {
-			$post_type = $post->post_type;
-		}
-
-		if ( empty( $post_type ) && ! empty( $current_screen ) && ( property_exists( $current_screen, 'post_type' ) || method_exists( $current_screen, 'post_type' ) ) && ! empty( $current_screen->post_type ) ) {
-			$post_type = $current_screen->post_type;
-		}
-
-		if ( empty( $post_type ) && ! empty( $typenow ) ) {
-			$post_type = $typenow;
-		}
-
-		if ( empty( $post_type ) && function_exists( 'get_current_screen' ) ) {
-			$post_type = get_current_screen();
-		}
-
-		if ( empty( $post_type ) && isset( $_REQUEST['post'] ) && ! empty( $_REQUEST['post'] ) && function_exists( 'get_post_type' ) && $get_post_type = get_post_type( (int) $_REQUEST['post'] ) ) {
-			$post_type = $get_post_type;
-		}
-
-		if ( empty( $post_type ) && isset( $_REQUEST['post_type'] ) && ! empty( $_REQUEST['post_type'] ) ) {
-			$post_type = sanitize_key( $_REQUEST['post_type'] );
-		}
-
-		if ( empty( $post_type ) && 'edit.php' === $pagenow ) {
-			$post_type = 'post';
-		}
-
-		if ( isset( $_GET['preview'] ) && true === $_GET['preview'] ) {
-			$post_id = false;
+		$preview = filter_input( INPUT_GET, 'preview', FILTER_VALIDATE_BOOL );
+		if ( $preview ) {
 			if ( ! empty( $post ) ) {
 				$post_id = $post->ID;
+			} else {
+				$preview_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
+				if ( $preview_id ) {
+					$post_id = $preview_id;
+				}
 			}
-			if ( isset( $_GET['preview_id'] ) && ! empty( $_GET['preview_id'] ) ) {
-				$post_id = sanitize_text_field( $_GET['preview_id'] );
-			}
-			if ( $post_id ) {
-				$post = get_post( absint( $post_id ) );
-				if ( is_object( $post ) && $post instanceof WP_Post && 'storymap' === $post->post_type ) {
-					$post_type = $post->post_type;
+
+			if ( ! empty( $post_id ) ) {
+				$wp_post = get_post( $post_id );
+
+				if ( is_object( $wp_post ) && $wp_post instanceof WP_Post && 'storymap' === $wp_post->post_type ) {
 					add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 				}
 			}
 		}
 
-		if ( ! is_admin() || 'storymap' !== $post_type ) {
-			return false;
-		}
-		global $wp_post_types;
+		if ( is_admin() ) {
+			global $wp_post_types;
 
-		$wp_post_types['storymap']->template      = array(
-			array( 'jeo/storymap' ),
-		);
-		$wp_post_types['storymap']->template_lock = 'all';
+			$wp_post_types['storymap']->template      = array(
+				array( 'jeo/storymap' ),
+			);
+			$wp_post_types['storymap']->template_lock = 'all';
+		}
 	}
 }
