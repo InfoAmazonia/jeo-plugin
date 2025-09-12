@@ -2,31 +2,31 @@
 	$is_embed = isset( $_GET['embed'] );
 
 	$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['height'] ) ? intval( sanitize_text_field( $_GET['width'] ) ) : 820;
-	$map_width = $full_width ? $full_width - 220 : 600;
-	$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval( sanitize_text_field( $_GET['height'] ) ) : 600;
+	$map_width  = $full_width ? $full_width - 220 : 600;
+	$height     = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval( sanitize_text_field( $_GET['height'] ) ) : 600;
 
-	$map_style = "width: {$map_width}px; height: {$height}px;";
+	$map_style       = "width: {$map_width}px; height: {$height}px;";
 	$container_style = "width: {$full_width}px; height: {$height}px;";
 ?>
 
-<?php if ($is_embed): ?>
+<?php if ( $is_embed ) : ?>
 <!DOCTYPE html>
 <html style="margin: 0 !important">
 	<head>
 		<?php wp_head(); ?>
 	</head>
 	<body style="margin: 0 !important">
-		<div id="embed-container" style="<?= $container_style ?>">
-			<div class="jeomap map_id_<?= $post->ID ?>" data-options='{"marker_action": "embed_preview"}' style="<?= $map_style ?>"></div>
+		<div id="embed-container" style="<?php echo $container_style; ?>">
+			<div class="jeomap map_id_<?php echo $post->ID; ?>" data-options='{"marker_action": "embed_preview"}' style="<?php echo $map_style; ?>"></div>
 		</div>
 	</body>
 </html>
 
-<?php else: ?>
+<?php else : ?>
 	<?php get_header(); ?>
 	<main id="site-content" role="main">
-		<?php get_the_title() ?>
-		<div class="jeomap map_id_<?= $post->ID ?>"></div>
+		<?php get_the_title(); ?>
+		<div class="jeomap map_id_<?php echo $post->ID; ?>"></div>
 	</main>
 	<?php get_footer(); ?>
 <?php endif; ?>

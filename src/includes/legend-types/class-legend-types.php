@@ -6,12 +6,12 @@ class Legend_Types {
 
 	use Singleton;
 
-	private $registered_legend_types = [];
+	private $registered_legend_types = array();
 
 	protected function init() {
-		add_action('init', [$this, 'register_assets'] );
-		add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts'] );
-		add_action('admin_print_scripts', [$this, 'enqueue_scripts'] );
+		add_action( 'init', array( $this, 'register_assets' ) );
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'admin_print_scripts', array( $this, 'enqueue_scripts' ) );
 	}
 
 	/**
@@ -24,30 +24,30 @@ class Legend_Types {
 
 		$this->register_legend_type(
 			'barscale',
-			[
-				'script_url' => JEO_BASEURL . '/includes/legend-types/barscale.js'
-			]
+			array(
+				'script_url' => JEO_BASEURL . '/includes/legend-types/barscale.js',
+			)
 		);
 
 		$this->register_legend_type(
 			'simple-color',
-			[
-				'script_url' => JEO_BASEURL . '/includes/legend-types/simple-color.js'
-			]
+			array(
+				'script_url' => JEO_BASEURL . '/includes/legend-types/simple-color.js',
+			)
 		);
 
 		$this->register_legend_type(
 			'icons',
-			[
-				'script_url' => JEO_BASEURL . '/includes/legend-types/icons.js'
-			]
+			array(
+				'script_url' => JEO_BASEURL . '/includes/legend-types/icons.js',
+			)
 		);
 
 		$this->register_legend_type(
 			'circles',
-			[
-				'script_url' => JEO_BASEURL . '/includes/legend-types/circles.js'
-			]
+			array(
+				'script_url' => JEO_BASEURL . '/includes/legend-types/circles.js',
+			)
 		);
 
 		/**
@@ -55,86 +55,83 @@ class Legend_Types {
 		 *
 		 * example:
 		 * add_action('jeo_register_legend_types', function($legend_types) {
-		 * 		$legend_types->register_legend_type('my-legend-type', [ 'script_url' => 'http://url.to/legendtype.js' ] );
+		 *      $legend_types->register_legend_type('my-legend-type', [ 'script_url' => 'http://url.to/legendtype.js' ] );
 		 * });
 		 *
 		 * @param Jeo\Geocode_Handler The Geocode_Handler instance
 		 */
-		do_action('jeo_register_legend_types', $this);
-
+		do_action( 'jeo_register_legend_types', $this );
 	}
 
 	/**
 	 * Register legend_type
 	 *
 	 * @param string $slug A unique slug for the legend_type. e.g. 'example-legend_type'
-	 * @param array $options {
-	 *     Required. Array or string of arguments describing the legend_type
-	 * 	   @type string		 $script_url			Full URL to the legend type javascript file
-	 * 	   @type array 		 $dependencies 			List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependencies to the legend type main script
+	 * @param array  $options {
+	 *      Required. Array or string of arguments describing the legend_type
+	 *     @type string      $script_url            Full URL to the legend type javascript file
+	 *     @type array       $dependencies          List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependencies to the legend type main script
 	 * }
 	 */
-	public function register_legend_type($slug, $options) {
+	public function register_legend_type( $slug, $options ) {
 
-		if (!is_array($options) || !isset($options['script_url'])) {
+		if ( ! is_array( $options ) || ! isset( $options['script_url'] ) ) {
 			return false;
 		}
 
-		$this->registered_legend_types[$slug] = $options;
+		$this->registered_legend_types[ $slug ] = $options;
 
 		return true;
 	}
 
-	public function unregister_legend_type($legend_type_slug) {
-		unset($this->registered_legend_types[$legend_type_slug]);
+	public function unregister_legend_type( $legend_type_slug ) {
+		unset( $this->registered_legend_types[ $legend_type_slug ] );
 	}
 
 	public function get_registered_legend_types() {
-		if ( empty($this->registered_legend_types) ) {
+		if ( empty( $this->registered_legend_types ) ) {
 			$this->_register_legend_types();
 		}
 
 		return $this->registered_legend_types;
 	}
 
-	public function get_legend_type($legend_type_slug) {
+	public function get_legend_type( $legend_type_slug ) {
 		$legend_types = $this->get_registered_legend_types();
-		if (isset($legend_types[$legend_type_slug])) {
-			return $legend_types[$legend_type_slug];
+		if ( isset( $legend_types[ $legend_type_slug ] ) ) {
+			return $legend_types[ $legend_type_slug ];
 		}
 		return null;
 	}
 
-	public function is_legend_type_registered($legend_type_slug) {
-		return ! \is_null( $this->get_legend_type($legend_type_slug) );
+	public function is_legend_type_registered( $legend_type_slug ) {
+		return ! \is_null( $this->get_legend_type( $legend_type_slug ) );
 	}
 
 	public function register_assets() {
-		$asset_file = include( JEO_BASEPATH . '/js/build/JeoLegend.asset.php');
+		$asset_file = include JEO_BASEPATH . '/js/build/JeoLegend.asset.php';
 		wp_register_script(
 			'jeo-legend',
 			JEO_BASEURL . '/js/build/JeoLegend.js',
-			['mapgl'],
+			array( 'mapgl' ),
 			$asset_file['version']
 		);
 
-		wp_set_script_translations('jeo-legend', 'jeo', JEO_BASEPATH . 'languages');
+		wp_set_script_translations( 'jeo-legend', 'jeo', JEO_BASEPATH . 'languages' );
 	}
 
 	public function enqueue_scripts() {
 		// TODO: load only when needed
-		if(!$this->should_load_assets()) {
+		if ( ! $this->should_load_assets() ) {
 			return;
 		}
 
 		foreach ( $this->get_registered_legend_types() as $slug => $legend_type ) {
-			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : [];
-			$deps = array_merge( ['jeo-legend'], $deps );
+			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : array();
+			$deps = array_merge( array( 'jeo-legend' ), $deps );
 			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps, JEO_VERSION );
 			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
 
 		}
-
 	}
-
 }
