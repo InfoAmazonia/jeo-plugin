@@ -77,7 +77,7 @@ class Settings {
 	public function enqueue_admin_scripts( $page ) {
 		if ( 'jeo_page_jeo-settings' === $page ) {
 			wp_enqueue_media();
-			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery' ), JEO_VERSION );
+			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery' ), JEO_VERSION, true );
 			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
 
 		}

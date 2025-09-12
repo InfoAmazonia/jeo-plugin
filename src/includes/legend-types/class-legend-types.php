@@ -114,7 +114,8 @@ class Legend_Types {
 			'jeo-legend',
 			JEO_BASEURL . '/js/build/JeoLegend.js',
 			array( 'mapgl' ),
-			$asset_file['version']
+			$asset_file['version'],
+			true,
 		);
 
 		wp_set_script_translations( 'jeo-legend', 'jeo', JEO_BASEPATH . 'languages' );
@@ -129,7 +130,7 @@ class Legend_Types {
 		foreach ( $this->get_registered_legend_types() as $slug => $legend_type ) {
 			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : array();
 			$deps = array_merge( array( 'jeo-legend' ), $deps );
-			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps, JEO_VERSION );
+			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps, JEO_VERSION, true );
 			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
 
 		}

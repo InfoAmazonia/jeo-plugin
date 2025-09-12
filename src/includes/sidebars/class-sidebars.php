@@ -27,7 +27,8 @@ class Sidebars {
 			'jeo-layers-sidebar',
 			JEO_BASEURL . '/js/build/layersSidebar.js',
 			array_merge( $asset_file['dependencies'] ?? array(), array( 'mapgl-react' ) ),
-			$asset_file['version']
+			$asset_file['version'],
+			true
 		);
 
 		wp_set_script_translations( 'jeo-layers-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
@@ -37,7 +38,8 @@ class Sidebars {
 			'jeo-maps-sidebar',
 			JEO_BASEURL . '/js/build/mapsSidebar.js',
 			array_merge( $asset_file['dependencies'] ?? array(), array( 'mapgl-react' ) ),
-			$asset_file['version']
+			$asset_file['version'],
+			true
 		);
 
 		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
