@@ -121,7 +121,8 @@ class Layer_Types {
 			'jeo-layer',
 			JEO_BASEURL . '/js/build/JeoLayer.js',
 			array( 'mapgl' ),
-			$asset_file['version']
+			$asset_file['version'],
+			true,
 		);
 
 		wp_set_script_translations( 'jeo-layer', 'jeo', JEO_BASEPATH . 'languages' );
@@ -136,7 +137,7 @@ class Layer_Types {
 		foreach ( $this->get_registered_layer_types() as $slug => $layer_type ) {
 			$deps = isset( $layer_type['dependencies'] ) ? $layer_type['dependencies'] : array();
 			$deps = array_merge( array( 'jeo-layer' ), $deps );
-			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps, JEO_VERSION );
+			wp_enqueue_script( 'layer-type-' . $slug, $layer_type['script_url'], $deps, JEO_VERSION, true );
 			wp_set_script_translations( 'layer-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
 		}
 	}
