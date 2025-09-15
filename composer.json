@@ -1,16 +1,15 @@
 {
-    "name": "jeo/jeo",
-    "description": "A WordPress plugin for interactive maps and journalism.",
-    "type": "wordpress-plugin",
+    "name": "infoamazonia/jeo-plugin",
+    "type": "project",
     "require-dev": {
-        "phpunit/phpunit": "^7"
+        "squizlabs/php_codesniffer": "*",
+        "wp-coding-standards/wpcs": "*"
     },
-    "license": "GPL-3.0-or-later",
-    "authors": [
-        {
-            "name": "Leo Germani",
-            "email": "leogermani@gmail.com"
+    "license": "GPL-2.0",
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
-    ],
-    "minimum-stability": "stable"
+    }
 }
+
