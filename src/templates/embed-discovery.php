@@ -12,10 +12,11 @@
 
 	<?php
 		$img = \jeo_settings()->get_option( 'jeo_footer-logo' );
-		if(!empty($img)): ?>
+	if ( ! empty( $img ) ) :
+		?>
 			<div class="embed-footer">
 				<a href="/">
-					<img src="<?= esc_url($img) ?>">
+					<img src="<?php echo esc_url( $img ); ?>">
 				</a>
 			</div>
 	<?php endif; ?>

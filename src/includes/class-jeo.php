@@ -62,19 +62,17 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
-		add_action( 'cli_init', array($this, 'register_cli_commands') );
+		add_action( 'cli_init', array( $this, 'register_cli_commands' ) );
 
-		add_action( 'init', array($this, 'restrict_story_map_block_count' ) );
-
+		add_action( 'init', array( $this, 'restrict_story_map_block_count' ) );
 
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		add_filter('rest_post_tag_query', array( $this, 'maximum_terms_api_filter'), 10, 1 );
+		add_filter( 'rest_post_tag_query', array( $this, 'maximum_terms_api_filter' ), 10, 1 );
 
-
-		add_filter('rest_map-layer_query', array( $this, 'custom_layer_search_filters'), 10, 2);
-		add_filter('rest_map-layer_query', array( $this, 'order_rest_post_by_post_title'), 10, 2);
+		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
+		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
 	}
 
@@ -96,7 +94,7 @@ class Jeo {
 	public function rest_authenticate_by_cookie( $response, $handler, $request ) {
 		if ( preg_match( '/\/wp\/v2\/(map|map-layer|storymap)/', $request->get_route() ) === 1 ) {
 			$user_id = wp_validate_auth_cookie( '', 'logged_in' );
-			if ( !empty( $user_id ) ) {
+			if ( ! empty( $user_id ) ) {
 				wp_set_current_user( $user_id );
 			}
 		}
@@ -112,33 +110,36 @@ class Jeo {
 		load_plugin_textdomain(
 			'jeo',
 			false,
-			plugin_basename(  JEO_BASEPATH ) . '/languages',
+			plugin_basename( JEO_BASEPATH ) . '/languages',
 		);
 	}
 
-	function maximum_terms_api_filter( $prepared_args ) {
+	public function maximum_terms_api_filter( $prepared_args ) {
 		$prepared_args['number'] = 1000;
 		return $prepared_args;
 	}
 
-	public function order_rest_post_by_post_title($args, $request) {
-		if(isset($args['post__in']) && sizeof($args['post__in'])) {
+	public function order_rest_post_by_post_title( $args ) {
+		if ( isset( $args['post__in'] ) && ! empty( $args['post__in'] ) ) {
 			$args['suppress_filters'] = true;
 		}
 
 		return $args;
 	}
 
-	public function custom_layer_search_filters(array $query, \WP_REST_Request $request) {
-		if ($layer_type = $request->get_param('layer_type')) {
-			if (!isset($query['meta_query'])) {
-				$query['meta_query'] = [];
+	public function custom_layer_search_filters( array $query, \WP_REST_Request $request ) {
+		if ( $layer_type = $request->get_param( 'layer_type' ) ) {
+			if ( ! isset( $query['meta_query'] ) ) {
+				$query['meta_query'] = array();
 			}
 
-			$query['meta_query'][] = [ 'key' => 'type', 'value' => $layer_type ];
+			$query['meta_query'][] = array(
+				'key'   => 'type',
+				'value' => $layer_type,
+			);
 		}
 
-		if ($layer_name = $request->get_param('layer_name')) {
+		if ( $layer_name = $request->get_param( 'layer_name' ) ) {
 			$query['s'] = $layer_name;
 		}
 
@@ -148,26 +149,27 @@ class Jeo {
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
-		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] );
+		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] ?? array() );
 
 		wp_register_style( 'jeo-js', JEO_BASEURL . '/js/build/postsSidebar.css', array(), JEO_VERSION );
 		wp_register_script(
 			'jeo-js',
 			JEO_BASEURL . '/js/build/postsSidebar.js',
 			$deps,
-			$asset_file['version']
+			$asset_file['version'],
+			true,
 		);
 
-		wp_set_script_translations('jeo-js', 'jeo', JEO_BASEPATH . 'languages');
+		wp_set_script_translations( 'jeo-js', 'jeo', JEO_BASEPATH . 'languages' );
 
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
 
-		if ( $map_runtime === 'maplibregl' ) {
+		if ( 'maplibregl' === $map_runtime ) {
 			$mapgl_loader = 'maplibreglLoader';
-			$mapgl_react = 'maplibreglReact';
+			$mapgl_react  = 'maplibreglReact';
 		} else {
 			$mapgl_loader = 'mapboxglLoader';
-			$mapgl_react = 'mapboxglReact';
+			$mapgl_react  = 'mapboxglReact';
 		}
 
 		wp_localize_script(
@@ -183,13 +185,15 @@ class Jeo {
 			JEO_BASEURL . "/js/build/{$mapgl_loader}.js",
 			array(),
 			JEO_VERSION,
+			true,
 		);
 
 		wp_register_script(
 			'mapgl',
-			JEO_BASEURL . "/js/build/mapglLoader.js",
+			JEO_BASEURL . '/js/build/mapglLoader.js',
 			array( 'mapgl-vendor' ),
 			JEO_VERSION,
+			true,
 		);
 
 		wp_register_style(
@@ -203,38 +207,40 @@ class Jeo {
 			'mapgl',
 			'jeo_settings',
 			array(
-				'site_url' => get_site_url(),
-				'mapbox_key' => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' )),
-				'map_defaults' => [
-					'zoom' => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
-					'lat' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lng' => sanitize_text_field ( \jeo_settings()->get_option( 'map_default_lng' ) ),
+				'site_url'            => get_site_url(),
+				'mapbox_key'          => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' ) ),
+				'map_defaults'        => array(
+					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
+					'lat'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
+					'lng'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
-					'enable_fullscreen' => true,
-					'disable_drag_pan' => false,
-				],
-				'map_runtime' => $map_runtime,
-				'nonce' => $this->get_rest_nonce(),
+					'enable_fullscreen'   => true,
+					'disable_drag_pan'    => false,
+				),
+				'map_runtime'         => $map_runtime,
+				'nonce'               => $this->get_rest_nonce(),
 				'jeo_typography_name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
-				'public_path' => JEO_BASEURL . '/js/build/',
+				'public_path'         => JEO_BASEURL . '/js/build/',
 			)
 		);
 
-		$mapgl_react_assets = include JEO_BASEPATH . "/js/build/mapglReact.asset.php";
+		$mapgl_react_assets = include JEO_BASEPATH . '/js/build/mapglReact.asset.php';
 
 		wp_register_script(
 			'mapgl-react-vendor',
 			JEO_BASEURL . "/js/build/{$mapgl_react}.js",
 			array( 'mapgl' ),
 			JEO_VERSION,
+			true,
 		);
 
 		wp_register_script(
 			'mapgl-react',
-			JEO_BASEURL . "/js/build/mapglReact.js",
-			array_merge( $mapgl_react_assets['dependencies'], array( 'mapgl-react-vendor' ) ),
+			JEO_BASEURL . '/js/build/mapglReact.js',
+			array_merge( $mapgl_react_assets['dependencies'] ?? array(), array( 'mapgl-react-vendor' ) ),
 			JEO_VERSION,
+			true,
 		);
 
 		$map_blocks_assets = include JEO_BASEPATH . '/js/build/mapBlocks.asset.php';
@@ -242,88 +248,101 @@ class Jeo {
 		wp_register_style(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
-			array( 'mapgl' )
+			array( 'mapgl' ),
+			JEO_VERSION,
 		);
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
-			array_merge( $map_blocks_assets['dependencies'], array( 'jeo-layer', 'mapgl-react' ) ),
-			$map_blocks_assets['version']
+			array_merge( $map_blocks_assets['dependencies'] ?? array(), array( 'jeo-layer', 'mapgl-react' ) ),
+			$map_blocks_assets['version'],
+			true,
 		);
 
-		wp_set_script_translations('jeo-map-blocks', 'jeo', JEO_BASEPATH . 'languages');
-
+		wp_set_script_translations( 'jeo-map-blocks', 'jeo', JEO_BASEPATH . 'languages' );
 	}
 
 	public function register_block_category( $categories ) {
 		$slugs = wp_list_pluck( $categories, 'slug' );
 		return in_array( 'jeo', $slugs, true )
 			? $categories
-			: array_merge( $categories, [
-				[
-					'slug' => 'jeo',
-					'title' => 'JEO',
-					'icon' => null
-				]
-			] );
+			: array_merge(
+				$categories,
+				array(
+					array(
+						'slug'  => 'jeo',
+						'title' => 'JEO',
+						'icon'  => null,
+					),
+				)
+			);
 	}
 
 	public function register_block_types() {
-		register_block_type( 'jeo/map-blocks', array(
-			'editor_script' => 'jeo-map-blocks',
-			'editor_style' => 'jeo-map-blocks',
-		) );
-		register_block_type( 'jeo/storymap', array(
-			'render_callback' => [$this, 'story_map_dynamic_render_callback'],
-			'editor_script' => 'jeo-map-blocks',
-			'editor_style' => 'jeo-map-blocks',
-		) );
-		register_block_type( 'jeo/embedded-storymap', array(
-			'render_callback' => [$this, 'embedded_story_map_dynamic_render_callback'],
-			'editor_script' => 'jeo-map-blocks',
-			'editor_style' => 'jeo-map-blocks',
-		) );
+		register_block_type(
+			'jeo/map-blocks',
+			array(
+				'editor_script' => 'jeo-map-blocks',
+				'editor_style'  => 'jeo-map-blocks',
+			)
+		);
+		register_block_type(
+			'jeo/storymap',
+			array(
+				'render_callback' => array( $this, 'story_map_dynamic_render_callback' ),
+				'editor_script'   => 'jeo-map-blocks',
+				'editor_style'    => 'jeo-map-blocks',
+			)
+		);
+		register_block_type(
+			'jeo/embedded-storymap',
+			array(
+				'render_callback' => array( $this, 'embedded_story_map_dynamic_render_callback' ),
+				'editor_script'   => 'jeo-map-blocks',
+				'editor_style'    => 'jeo-map-blocks',
+			)
+		);
 	}
 
-	public function embedded_story_map_dynamic_render_callback ( $block_attributes, $content ) {
+	public function embedded_story_map_dynamic_render_callback( $block_attributes, $content ) {
 		$content = json_decode( $content );
 
-		$story_id = $content->attributes->storyID;
-		$story = get_post( $story_id );
-		$story_block = parse_blocks( $story->post_content )[0];
+		$story_id                       = $content->attributes->storyID;
+		$story                          = get_post( $story_id );
+		$story_block                    = parse_blocks( $story->post_content )[0];
 		$story_block['attrs']['postID'] = $story_id;
 
-		return $this->story_map_dynamic_render_callback( $block_attributes, json_encode( $story_block['attrs'] ) );
+		return $this->story_map_dynamic_render_callback( $block_attributes, wp_json_encode( $story_block['attrs'] ) );
 	}
 
-	private function cleanup_layers ($layers) {
-		foreach ($layers as $layer) {
-			if (property_exists($layer, 'yoast_head')) {
-				unset($layer->yoast_head);
+	private function cleanup_layers( $layers ) {
+		foreach ( $layers as $layer ) {
+			if ( property_exists( $layer, 'yoast_head' ) ) {
+				unset( $layer->yoast_head );
 			}
-			if (property_exists($layer, 'yoast_head_json')) {
-				unset($layer->yoast_head_json);
+			if ( property_exists( $layer, 'yoast_head_json' ) ) {
+				unset( $layer->yoast_head_json );
 			}
 		}
 	}
 
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
-		$saved_data = json_decode($content);
+		$saved_data = json_decode( $content );
 
-		$map_id = $saved_data->map_id;
+		$map_id     = $saved_data->map_id;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
 
-		if(!function_exists('layer_still_exists')) {
-			function layer_still_exists($map_layers, $selected_layer) {
-				$layer_status = get_post_status($selected_layer->id);
-				if($layer_status == "trash" || $layer_status == false ||  $layer_status == "private" ) {
+		if ( ! function_exists( 'layer_still_exists' ) ) {
+			function layer_still_exists( $map_layers, $selected_layer ) {
+				$layer_status = get_post_status( $selected_layer->id );
+				if ( 'trash' === $layer_status || false === $layer_status || 'private' === $layer_status ) {
 					return false;
 				}
 
-				foreach($map_layers as $layer) {
-					if($layer["id"] == $selected_layer->id) {
-						$selected_layer->meta->type = get_post_meta($layer['id'], 'type', true);
-						$selected_layer->meta->layer_type_options = (object) get_post_meta($layer['id'], 'layer_type_options', true);
+				foreach ( $map_layers as $layer ) {
+					if ( $layer['id'] === $selected_layer->id ) {
+						$selected_layer->meta->type               = get_post_meta( $layer['id'], 'type', true );
+						$selected_layer->meta->layer_type_options = (object) get_post_meta( $layer['id'], 'layer_type_options', true );
 						return true;
 					}
 				}
@@ -333,37 +352,37 @@ class Jeo {
 		}
 
 		// Remove not present layers from selectedLayers -- Fix selected layers order
-		foreach($saved_data->slides as $slide) {
-			foreach($slide->selectedLayers as $index => $selected_layer) {
+		foreach ( $saved_data->slides as $slide ) {
+			foreach ( $slide->selectedLayers as $index => $selected_layer ) {
 				// Check if the selected layers exists in the map
-				if(!layer_still_exists($map_layers, $selected_layer)) {
-					array_splice($slide->selectedLayers, $index, 1);
+				if ( ! layer_still_exists( $map_layers, $selected_layer ) ) {
+					array_splice( $slide->selectedLayers, $index, 1 );
 				}
 			}
 
-			$selected_layers_order = [];
+			$selected_layers_order = array();
 
-			foreach ($map_layers as $layer) {
-				foreach($slide->selectedLayers as $index => $selected_layer) {
-					if($selected_layer->id == $layer['id']) {
+			foreach ( $map_layers as $layer ) {
+				foreach ( $slide->selectedLayers as $index => $selected_layer ) {
+					if ( $selected_layer->id === $layer['id'] ) {
 						$selected_layers_order[] = $selected_layer;
 					}
 				}
 			}
 
 			$slide->selectedLayers = $selected_layers_order;
-			$this->cleanup_layers($slide->selectedLayers);
+			$this->cleanup_layers( $slide->selectedLayers );
 		}
 
 		// Remove not present layers from navigateMapLayers and create new order
-		$final_navigate_map_layers = [];
+		$final_navigate_map_layers = array();
 
-		foreach ($map_layers as $layer) {
-			foreach($saved_data->navigateMapLayers as $index => $navigate_layer) {
-				if($navigate_layer->id == $layer['id']) {
+		foreach ( $map_layers as $layer ) {
+			foreach ( $saved_data->navigateMapLayers as $index => $navigate_layer ) {
+				if ( $navigate_layer->id === $layer['id'] ) {
 					// Update meta / types
-					if(!layer_still_exists($map_layers, $navigate_layer)) {
-						array_splice($saved_data->navigateMapLayers, $index, 1);
+					if ( ! layer_still_exists( $map_layers, $navigate_layer ) ) {
+						array_splice( $saved_data->navigateMapLayers, $index, 1 );
 					} else {
 						$final_navigate_map_layers[] = $navigate_layer;
 					}
@@ -372,18 +391,21 @@ class Jeo {
 		}
 
 		$saved_data->navigateMapLayers = $final_navigate_map_layers;
-		$this->cleanup_layers($saved_data->navigateMapLayers);
-		$this->cleanup_layers($saved_data->loadedLayers);
+		$this->cleanup_layers( $saved_data->navigateMapLayers );
+		$this->cleanup_layers( $saved_data->loadedLayers );
 
 		// Option `use_smilies` breaks returned HTML :'-(
-		add_filter('option_use_smilies', function ($value) {
-			return false;
-		});
+		add_filter(
+			'option_use_smilies',
+			function ( $value ) {
+				return false;
+			}
+		);
 
-		return '<div class="story-map-container" data-properties="' . htmlentities(json_encode($saved_data)) . '" ></div>';
+		return '<div class="story-map-container" data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
 	}
 
-	public function filter_rest_query_by_zone($args, $request) {
+	public function filter_rest_query_by_zone( $args, $request ) {
 		$args['suppress_filters'] = true;
 		return $args;
 	}
@@ -395,9 +417,9 @@ class Jeo {
 			return;
 		}
 
-		$post_types = apply_filters('jeo_enabled_post_types', \jeo_settings()->get_option( 'enabled_post_types' ));
+		$post_types = apply_filters( 'jeo_enabled_post_types', \jeo_settings()->get_option( 'enabled_post_types' ) );
 
-		if ( in_array( $post->post_type, $post_types ) && $this->should_load_assets() ) {
+		if ( in_array( $post->post_type, $post_types, true ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
 		}
@@ -410,7 +432,7 @@ class Jeo {
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), JEO_VERSION );
 			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapgl', 'jquery' ), JEO_VERSION, true );
 
-			wp_set_script_translations('jeo-map', 'jeo', JEO_BASEPATH . 'languages');
+			wp_set_script_translations( 'jeo-map', 'jeo', JEO_BASEPATH . 'languages' );
 
 			$current_language = $this->get_current_language();
 
@@ -418,37 +440,43 @@ class Jeo {
 				'jeo-map',
 				'jeoMapVars',
 				array(
-					'jsonUrl' => rest_url( 'wp/v2/' ),
+					'jsonUrl'          => rest_url( 'wp/v2/' ),
 					'string_read_more' => esc_html__( 'Read more', 'jeo' ),
-					'jeoUrl' => JEO_BASEURL,
-					'nonce' => $this->get_rest_nonce(),
-					'currentLang' => $current_language,
-					'templates' => [
-						'moreInfo' => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
-						'popup' => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
-						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) )
-					],
-					'cluster' => apply_filters( 'jeomap_js_cluster', [
-						'circle_color' => '#ffffff'
-					] ),
-					'images' => apply_filters( 'jeomap_js_images', [
-						'/js/src/icons/news-marker' => [
-							'url' => JEO_BASEURL . '/js/src/icons/news-marker.png',
-							'icon_size' => 0.1,
-						],
-						'/js/src/icons/news-marker-hover' => [
-							'url' => JEO_BASEURL . '/js/src/icons/news-marker-hover.png',
-							'icon_size' => 0.1,
-						],
-						'/js/src/icons/news' => [
-							'url' => JEO_BASEURL . '/js/src/icons/news.png',
-							'icon_size' => 0.13,
-							'text_color' => '#202202'
-						],
-						'/js/src/icons/cluster' => [
-							'url' => JEO_BASEURL . '/js/src/icons/cluster.png',
-						],
-					] )
+					'jeoUrl'           => JEO_BASEURL,
+					'nonce'            => $this->get_rest_nonce(),
+					'currentLang'      => $current_language,
+					'templates'        => array(
+						'moreInfo'  => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
+						'popup'     => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
+						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) ),
+					),
+					'cluster'          => apply_filters(
+						'jeomap_js_cluster',
+						array(
+							'circle_color' => '#ffffff',
+						)
+					),
+					'images'           => apply_filters(
+						'jeomap_js_images',
+						array(
+							'/js/src/icons/news-marker' => array(
+								'url'       => JEO_BASEURL . '/js/src/icons/news-marker.png',
+								'icon_size' => 0.1,
+							),
+							'/js/src/icons/news-marker-hover' => array(
+								'url'       => JEO_BASEURL . '/js/src/icons/news-marker-hover.png',
+								'icon_size' => 0.1,
+							),
+							'/js/src/icons/news'        => array(
+								'url'        => JEO_BASEURL . '/js/src/icons/news.png',
+								'icon_size'  => 0.13,
+								'text_color' => '#202202',
+							),
+							'/js/src/icons/cluster'     => array(
+								'url' => JEO_BASEURL . '/js/src/icons/cluster.png',
+							),
+						)
+					),
 				)
 			);
 		}
@@ -467,45 +495,44 @@ class Jeo {
 
 		$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
 		wp_enqueue_style( 'discovery-map', JEO_BASEURL . '/js/build/discovery.css', array(), JEO_VERSION );
-		wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'], array( 'jeo-map' ) ), JEO_VERSION, true );
+		wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'] ?? array(), array( 'jeo-map' ) ), JEO_VERSION, true );
 
 		wp_set_script_translations( 'discovery-map', 'jeo', JEO_BASEPATH . 'languages' );
 
 		// Check if sites uses WPML
 		if ( function_exists( 'icl_object_id' ) ) {
-			wp_localize_script( 'discovery-map', 'languageParams', array(
-				'currentLang' => $current_language,
-			) );
+			wp_localize_script(
+				'discovery-map',
+				'languageParams',
+				array(
+					'currentLang' => $current_language,
+				)
+			);
 		}
 
-		wp_localize_script( 'discovery-map', 'mapPreferences', array(
-			'map_defaults' => [
-				'zoom' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ),
-				'lat' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-				'lng' => sanitize_text_field ( \jeo_settings()->get_option( 'map_default_lng' ) ),
-			]
-		) );
+		wp_localize_script(
+			'discovery-map',
+			'mapPreferences',
+			array(
+				'map_defaults' => array(
+					'zoom' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ),
+					'lat'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
+					'lng'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
+				),
+			)
+		);
 	}
 
 	public function enqueue_storymap_scripts() {
 		$storymap_assets = include JEO_BASEPATH . '/js/build/jeoStorymap.asset.php';
 		wp_enqueue_style( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.css', array( 'jeo-map' ), JEO_VERSION );
-		wp_enqueue_script( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.js', array_merge( $storymap_assets['dependencies'], array( 'jeo-map', 'mapgl-react' ) ), JEO_VERSION );
+		wp_enqueue_script( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.js', array_merge( $storymap_assets['dependencies'] ?? array(), array( 'jeo-map', 'mapgl-react' ) ), JEO_VERSION, true );
 
 		wp_set_script_translations( 'jeo-storymap', 'jeo', JEO_BASEPATH . 'languages' );
 	}
 
-	/**
-	 * Registers WP CLI commands
-	 *
-	 * @return void
-	 */
-	public function register_cli_commands() {
-		\WP_CLI::add_command( 'jeo fixtures', 'Jeo\Fixtures' );
-	}
-
-	public function register_oembed () {
-		\jeo_register_embedder('local_jeo', get_site_url());
+	public function register_oembed() {
+		\jeo_register_embedder( 'local_jeo', get_site_url() );
 	}
 
 	public function register_embed_rewrite() {
@@ -523,70 +550,65 @@ class Jeo {
 
 	public function register_embed_template_redirect() {
 
-		if( get_query_var( 'jeo_embed' ) === 'map' ) {
+		if ( get_query_var( 'jeo_embed' ) === 'map' ) {
 			add_filter( 'show_admin_bar', '__return_false' );
-			if( isset( $_GET[ 'storymap_id' ] ) ) {
-				$post = get_post( absint( sanitize_text_field( $_GET[ 'storymap_id' ] ) ) );
+			if ( isset( $_GET['storymap_id'] ) ) {
+				$post = get_post( absint( sanitize_text_field( $_GET['storymap_id'] ) ) );
 				setup_postdata( $post );
-				add_filter( 'the_content', [ $this, 'storymap_content' ], 1 );
+				add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 
 				require JEO_BASEPATH . '/templates/embed-storymap.php';
 				exit();
 			}
-			$discovery = isset($_GET['discovery'])? sanitize_text_field( $_GET['discovery'] ) : false;
+			$discovery = isset( $_GET['discovery'] ) ? sanitize_text_field( $_GET['discovery'] ) : false;
 
-			if( !$discovery ) {
+			if ( ! $discovery ) {
 				$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( sanitize_text_field( $_GET['map_id'] ) ) : false;
 				if ( $map_id ) {
-					$map_meta = get_post_meta($map_id);
-					$args = (array) maybe_unserialize($map_meta['related_posts'][0]);
+					$map_meta = get_post_meta( $map_id );
+					$args     = (array) maybe_unserialize( $map_meta['related_posts'][0] );
 
 					$args['per_page'] = 1;
-					$request = new WP_REST_Request( 'GET', '/wp/v2/posts');
+					$request          = new WP_REST_Request( 'GET', '/wp/v2/posts' );
 					$request->set_query_params( $args );
 					$response = rest_do_request( $request );
-					$server = rest_get_server();
-					$data = $server->response_to_data( $response, false );
+					$server   = rest_get_server();
+					$data     = $server->response_to_data( $response, false );
 
-					// var_dump(empty($map_meta['relate_posts'][0]));
+					$have_related_posts = ! empty( $map_meta['relate_posts'][0] ) && ! empty( $data ) || ! empty( $map->relate_posts );
 
-					$have_related_posts = !empty($map_meta['relate_posts'][0]) && !empty($data) || !empty($map->relate_posts);
-
-					// var_dump($have_related_posts);
-
-					if(isset($_GET['width']) ) {
-						$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( sanitize_text_field( $_GET['width'] ) ) : 820;
+					if ( isset( $_GET['width'] ) ) {
+						$full_width  = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( sanitize_text_field( $_GET['width'] ) ) : 820;
 						$popup_width = isset( $_GET['popup_width'] ) && is_numeric( $_GET['popup_width'] ) ? intval( sanitize_text_field( $_GET['popup_width'] ) ) : 220;
-						$map_width = $full_width ? $full_width : 600;
+						$map_width   = $full_width ? $full_width : 600;
 
-						if($have_related_posts){
+						if ( $have_related_posts ) {
 							$map_width = $full_width - $popup_width;
 						}
 
-						$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval ( sanitize_text_field( $_GET['height'] ) ) : 600;
+						$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval( sanitize_text_field( $_GET['height'] ) ) : 600;
 
-						$map_style = "width: {$map_width}px; height: {$height}px;";
+						$map_style       = "width: {$map_width}px; height: {$height}px;";
 						$container_style = "position: fixed; width: {$full_width}px; height: {$height}px;";
-						$popup_style = "width: {$popup_width}px; height: {$height}px;";
+						$popup_style     = "width: {$popup_width}px; height: {$height}px;";
 					} else {
-						$container_style = "position: fixed; width: 100%; height: 100%;";
+						$container_style = 'position: fixed; width: 100%; height: 100%;';
 
-						if($have_related_posts) {
-							$map_style = "width: 70%; height: calc(100% - 35px);";
-							$popup_style = "width: 30%; height: calc(100% - 35px);";
+						if ( $have_related_posts ) {
+							$map_style   = 'width: 70%; height: calc(100% - 35px);';
+							$popup_style = 'width: 30%; height: calc(100% - 35px);';
 						} else {
-							$map_style = "width: 100%; height: calc(100% - 35px);";
+							$map_style   = 'width: 100%; height: calc(100% - 35px);';
 							$popup_style = $container_style;
 						}
-
 					}
 
-					if(function_exists('wpml_get_language_information')) {
+					if ( function_exists( 'wpml_get_language_information' ) ) {
 						global $sitepress;
-						$post_language_information = wpml_get_language_information(null, $map_id);
-						if (!is_wp_error($post_language_information)) {
-							$sitepress->switch_lang($post_language_information['language_code'], true);
-							switch_to_locale($post_language_information['locale']);
+						$post_language_information = wpml_get_language_information( null, $map_id );
+						if ( ! is_wp_error( $post_language_information ) ) {
+							$sitepress->switch_lang( $post_language_information['language_code'], true );
+							switch_to_locale( $post_language_information['locale'] );
 						}
 					}
 
@@ -599,87 +621,59 @@ class Jeo {
 				require JEO_BASEPATH . '/templates/embed-discovery.php';
 				exit();
 			}
-
 		}
-
 	}
 
-	function storymap_content( $content ) {
-		// Check if we're inside the main loop in a single Post.
-		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && isset( $_GET[ 'storymap_id' ] ) ) ) {
+	public function storymap_content( $content ) {
+		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && isset( $_GET['storymap_id'] ) ) ) {
 			global $post, $wpdb;
 
-			// daqui para frente a logica é muito louca-> MESMO <-
-			// por algum motivo o post_content estava vindo vazio em alguns casos, então, em determinado
-			// caso, vai pegar o objeto global $post, o ID dentro desse objeto e fazer uma nova query no banco.
-			// não sei o pq
-
+			// Sometimes, content is empty
 			$post_id = $post->ID;
-			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
-				$post_id = sanitize_text_field( $_GET[ 'preview_id' ] );
+			if ( ! empty( $_GET['preview_id'] ) ) {
+				$post_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
 			}
-			if ( isset( $_GET[ 'storymap_id' ] ) && ! empty( $_GET[ 'storymap_id'] ) ) {
-				$post_id = sanitize_text_field( $_GET[ 'storymap_id' ] );
+			if ( ! empty( $_GET['storymap_id'] ) ) {
+				$post_id = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
 			}
 			$post_content = $wpdb->get_results(
-				$wpdb->prepare("SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", absint( $post_id ) )
+				$wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", $post_id )
 			);
+
 			return do_blocks( $post_content[0]->post_content );
 		}
-
 	}
 
-	function restrict_story_map_block_count() {
-		global $post, $parent_file, $typenow, $current_screen, $pagenow;
+	public function restrict_story_map_block_count() {
+		global $post;
 
-		$post_type = NULL;
-
-		if($post && (property_exists($post, 'post_type') || method_exists($post, 'post_type')))
-			$post_type = $post->post_type;
-
-		if(empty($post_type) && !empty($current_screen) && (property_exists($current_screen, 'post_type') || method_exists($current_screen, 'post_type')) && !empty($current_screen->post_type))
-			$post_type = $current_screen->post_type;
-
-		if(empty($post_type) && !empty($typenow))
-			$post_type = $typenow;
-
-		if(empty($post_type) && function_exists('get_current_screen'))
-			$post_type = get_current_screen();
-
-		if(empty($post_type) && isset($_REQUEST['post']) && !empty($_REQUEST['post']) && function_exists('get_post_type') && $get_post_type = get_post_type((int)$_REQUEST['post']))
-			$post_type = $get_post_type;
-
-		if(empty($post_type) && isset($_REQUEST['post_type']) && !empty($_REQUEST['post_type']))
-			$post_type = sanitize_key($_REQUEST['post_type']);
-
-		if(empty($post_type) && 'edit.php' == $pagenow)
-			$post_type = 'post';
-
-		if( isset( $_GET[ 'preview' ] ) && true == $_GET[ 'preview'] )  {
-			$post_id = false;
-			if ( ! empty($post) ) {
+		$preview = filter_input( INPUT_GET, 'preview', FILTER_VALIDATE_BOOL );
+		if ( $preview ) {
+			if ( ! empty( $post ) ) {
 				$post_id = $post->ID;
+			} else {
+				$preview_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
+				if ( $preview_id ) {
+					$post_id = $preview_id;
+				}
 			}
-			if ( isset( $_GET[ 'preview_id' ] ) && ! empty( $_GET[ 'preview_id'] ) ) {
-				$post_id = sanitize_text_field( $_GET[ 'preview_id' ] );
-			}
-			if ( $post_id ) {
-				$post = get_post( absint( $post_id ) );
-				if ( is_object( $post ) && $post instanceof WP_Post && 'storymap' == $post->post_type ) {
-					$post_type = $post->post_type;
+
+			if ( ! empty( $post_id ) ) {
+				$wp_post = get_post( $post_id );
+
+				if ( is_object( $wp_post ) && $wp_post instanceof WP_Post && 'storymap' === $wp_post->post_type ) {
 					add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 				}
 			}
 		}
 
-		if ( ! is_admin() || 'storymap' != $post_type ) {
-			return false;
-		}
-		global $wp_post_types;
+		if ( is_admin() ) {
+			global $wp_post_types;
 
-		$wp_post_types[ 'storymap' ]->template = array(
-			array( 'jeo/storymap'),
-		);
-		$wp_post_types[ 'storymap' ]->template_lock = 'all';
+			$wp_post_types['storymap']->template      = array(
+				array( 'jeo/storymap' ),
+			);
+			$wp_post_types['storymap']->template_lock = 'all';
+		}
 	}
 }

@@ -6,7 +6,7 @@ Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 3.0.0-rc.1
+Version: 3.0.0-rc.2
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -56,7 +56,7 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 This is a major release. Here are some highlights:
 * Support for MapLibreGL as an alternative rendering library (for compatibility, MapboxGL is still the default library)
 * When using MapLibreGL without Mapbox-hosted layers, the use of Mapbox API key is not required anymore
-* Removed support for Carto integration (reducing plugin size in ~90%)
+* Removed support for Carto integration (reducing plugin size in ~60%)
 
 Full changelog:
 * Support for MapLibreGL  as an alternative rendering library

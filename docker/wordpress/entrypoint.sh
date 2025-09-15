@@ -9,8 +9,6 @@ if [ ! -f /installed ]; then
 
 	wp --allow-root --path=/var/www/html plugin activate jeo
 
-	wp --allow-root --path=/var/www/html jeo fixtures update
-
 	touch /installed
 fi
 
