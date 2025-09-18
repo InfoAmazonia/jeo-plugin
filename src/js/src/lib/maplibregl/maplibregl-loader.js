@@ -37,7 +37,10 @@ export const defaultStyle = {
 export function mapboxTransformRequest(url, resourceType) {
 	if (isMapboxURL(url)) {
 		return transformMapboxUrl(url, resourceType, mapboxToken)
-  	}
+  	} else if (url.includes('tiles.mapbox.com') && url.includes('.jpg?')) {
+		// MapLibreGL don't remove black backgrounds from Mapbox JPEG static tiles
+		return { url: url.replace('.jpg?', '.webp?') }
+	}
     return { url }
 }
 
