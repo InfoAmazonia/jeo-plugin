@@ -29,7 +29,8 @@ let storyCounter = 0;
 
 function getAuthorsLinks( storymap ) {
 	if ( storymap?.jeo_authors ) {
-		return sprintf( __( 'By %s' ), joinList( storymap.jeo_authors.map( ( author ) => `<a href="${author.permalink}">${author.name}</a>` ) ) );
+		// translators: %s is the authors list
+		return sprintf( __( 'By %s', 'jeo' ), joinList( storymap.jeo_authors.map( ( author ) => `<a href="${author.permalink}">${author.name}</a>` ) ) );
 	} else {
 		return '';
 	}
@@ -329,7 +330,7 @@ class StoryMapDisplay extends Component {
 										<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: this.state.postData.title.rendered } } />
 										<div className="post-info">
 											<p className="author" dangerouslySetInnerHTML={ { __html: getAuthorsLinks( this.state.postData ) } } />
-											<p className="date">{ `${formatDate(storyDate)} ${ __("at", "jeo") } ${formatHour(storyDate)}` }</p>
+											<p className="date">{ `${formatDate(storyDate)} ${ __('at', 'jeo') } ${formatHour(storyDate)}` }</p>
 										</div>
 									</>
 								) }
