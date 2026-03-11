@@ -1,4 +1,4 @@
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { Button, PanelBody } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
@@ -15,6 +15,7 @@ import './onetime-map-editor.css';
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
+	const blockProps = useBlockProps();
 	const [ modal, setModal ] = useState( false );
 	const [ key, setKey ] = useState( 0 );
 
@@ -63,7 +64,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 	}
 
 	return (
-		<>
+		<div { ...blockProps }>
 			{ modal && (
 				<LayersSettingsModal
 					closeModal={ closeModal }
@@ -130,6 +131,6 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 					{ __( 'Edit layers settings', 'jeo' ) }
 				</Button>
 			</div>
-		</>
+		</div>
 	);
 };
