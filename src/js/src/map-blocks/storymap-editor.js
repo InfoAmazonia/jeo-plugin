@@ -170,7 +170,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		setAttributes( {
 			...attributes,
 			loadedLayers: [],
-			navigateMapLayers: loadedLayers,
+			navigateMapLayers: loadedLayers ?? [],
 		} );
 	}, [ loadedMap, loadedLayers ] );
 
@@ -253,7 +253,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								const map = event.style?.map ?? null;
 								if ( ! selectedMap && map ) {
 									setSelectedMap( map );
-									setStorymapLayers( loadedLayers );
+									setStorymapLayers( loadedLayers ?? [] );
 								}
 							} }
 							onMove={ ( event ) => {
@@ -335,7 +335,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								<span className="section-title">{ __( 'Story settings', 'jeo'  ) }</span>
 								<Button
 									className="show-button"
-									disabled={ !( loadedMap && loadedLayers ) }
+									disabled={ ! loadedMap }
 									onClick={ () => {
 										setShowStorySettings( true );
 									} }
@@ -407,7 +407,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																		ref={ provided.innerRef }
 																		className="layers"
 																>
-																		{ attributes.navigateMapLayers.map( ( item, index_ ) => (
+																		{ ( attributes.navigateMapLayers ?? [] ).map( ( item, index_ ) => (
 																			<Draggable key={ `${ index_ }` } draggableId={ `${ index_ }` } index={ index_ }>
 																				{ ( provided, snapshot ) => {
 																					let layerButtonStyle = {
@@ -734,7 +734,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
 								<Button
 									className="show-button"
-									disabled={ !( loadedMap && loadedLayers ) }
+									disabled={ ! loadedMap }
 									onClick={ () => {
 										setShowSlidesSettings( true );
 									} }
