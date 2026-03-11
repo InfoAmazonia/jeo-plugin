@@ -68,38 +68,49 @@ export default function LayerEditorPreview() {
 		prevPostMeta.current = debouncedPostMeta;
 	}, [ debouncedPostMeta.layer_type_options, postMeta.type ] );
 
+	// Stop mouse events from propagating to the block editor's selection
+	// handler so the map remains draggable inside the block.
+	const stopPropagation = useCallback( ( e ) => e.stopPropagation(), [] );
+
 	return (
 		<div { ...blockProps }>
-			<Map
-				key={ key }
-				onError={ () => {
-					setRenderControl( { status: 'request_error', statusCode: 400 } );
-				} }
-				onSourceData={ () => {
-					setRenderControl( { status: 'loaded' } );
-				} }
-				style={ { height: '500px', width: '100%' } }
-				latitude={ centerLat || 0 }
-				longitude={ centerLon || 0 }
-				zoom={ initialZoom || 0 }
-				onMove={ ( { viewState } ) => {
-					setPostMeta( {
-						center_lat: viewState.latitude,
-						center_lon: viewState.longitude,
-					} );
-				} }
-				onZoom={ ( { viewState } ) => {
-					const zoom = Math.round( viewState.zoom * 10 ) / 10;
-					setPostMeta( { initial_zoom: zoom } );
-				} }
+			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
+			<div
+				className="jeo-preview-area"
+				onMouseDown={ stopPropagation }
+				onTouchStart={ stopPropagation }
 			>
-				{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
-					<MemoizedRenderLayer
-						layer={ debouncedPostMeta }
-						instance={ { id: 1, use: 'fixed' } }
-					/>
-				) }
-			</Map>
+				<Map
+					key={ key }
+					onError={ () => {
+						setRenderControl( { status: 'request_error', statusCode: 400 } );
+					} }
+					onSourceData={ () => {
+						setRenderControl( { status: 'loaded' } );
+					} }
+					style={ { height: '500px', width: '100%' } }
+					latitude={ centerLat || 0 }
+					longitude={ centerLon || 0 }
+					zoom={ initialZoom || 0 }
+					onMove={ ( { viewState } ) => {
+						setPostMeta( {
+							center_lat: viewState.latitude,
+							center_lon: viewState.longitude,
+						} );
+					} }
+					onZoom={ ( { viewState } ) => {
+						const zoom = Math.round( viewState.zoom * 10 ) / 10;
+						setPostMeta( { initial_zoom: zoom } );
+					} }
+				>
+					{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
+						<MemoizedRenderLayer
+							layer={ debouncedPostMeta }
+							instance={ { id: 1, use: 'fixed' } }
+						/>
+					) }
+				</Map>
+			</div>
 		</div>
 	);
 }

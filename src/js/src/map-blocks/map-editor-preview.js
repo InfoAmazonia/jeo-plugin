@@ -77,85 +77,96 @@ export default function MapEditorPreview() {
 		border: 0,
 	} );
 
+	// Stop mouse events from propagating to the block editor's selection
+	// handler so the map remains draggable inside the block.
+	const stopPropagation = useCallback( ( e ) => e.stopPropagation(), [] );
+
 	return (
 		<div { ...blockProps }>
-			<div className="zoom-buttons-div">
-				<ButtonGroup className="button-group-div">
-					<Button
-						style={ buttonStyle( zoomState === 'initial_zoom' ) }
-						className="zoom-button"
-						variant="primary"
-						isLarge
-						onClick={ () => {
-							setZoomState( 'initial_zoom' );
-							setKey( key + 1 );
-						} }
-					>
-						{ __( 'Initial Zoom', 'jeo' ) }
-					</Button>
-					<Button
-						style={ buttonStyle( zoomState === 'min_zoom' ) }
-						className="zoom-button"
-						variant="primary"
-						isLarge
-						onClick={ () => {
-							if ( postMeta.min_zoom <= 0 ) {
-								setPostMeta( { min_zoom: 0.1 } );
-							}
-							setZoomState( 'min_zoom' );
-							setKey( key + 1 );
-						} }
-					>
-						{ __( 'Min Zoom', 'jeo' ) }
-					</Button>
-					<Button
-						style={ buttonStyle( zoomState === 'max_zoom' ) }
-						className="zoom-button"
-						variant="primary"
-						isLarge
-						onClick={ () => {
-							if ( postMeta.max_zoom <= 0 ) {
-								setPostMeta( { max_zoom: 0.1 } );
-							}
-							setZoomState( 'max_zoom' );
-							setKey( key + 1 );
-						} }
-					>
-						{ __( 'Max Zoom', 'jeo' ) }
-					</Button>
-				</ButtonGroup>
-			</div>
-			<Map
-				key={ key }
-				ref={ mapRef }
-				style={ { height: '500px', width: '100%' } }
-				latitude={ centerLat || 0 }
-				longitude={ centerLon || 0 }
-				zoom={ currentZoom || initialZoom || 11 }
-				onMove={ ( { viewState } ) => {
-					setPostMeta( {
-						center_lat: viewState.latitude,
-						center_lon: viewState.longitude,
-					} );
-				} }
-				onZoom={ ( { viewState } ) => {
-					let zoom = Math.round( viewState.zoom * 10 ) / 10;
-					setPostMeta( { [ zoomState ]: zoom } );
-				} }
+			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
+			<div
+				className="jeo-preview-area"
+				onMouseDown={ stopPropagation }
+				onTouchStart={ stopPropagation }
 			>
-				{ loadedLayers &&
-					( postMeta.layers || [] ).map( ( layer ) => {
-						const layerOptions = loadedLayers.find(
-							( { id } ) => id === layer.id
-						);
-						if ( layerOptions ) {
-							return renderLayer( {
-								layer: layerOptions.meta,
-								instance: layer,
-							} );
-						}
-					} ) }
-			</Map>
+				<div className="zoom-buttons-div">
+					<ButtonGroup className="button-group-div">
+						<Button
+							style={ buttonStyle( zoomState === 'initial_zoom' ) }
+							className="zoom-button"
+							variant="primary"
+							isLarge
+							onClick={ () => {
+								setZoomState( 'initial_zoom' );
+								setKey( key + 1 );
+							} }
+						>
+							{ __( 'Initial Zoom', 'jeo' ) }
+						</Button>
+						<Button
+							style={ buttonStyle( zoomState === 'min_zoom' ) }
+							className="zoom-button"
+							variant="primary"
+							isLarge
+							onClick={ () => {
+								if ( postMeta.min_zoom <= 0 ) {
+									setPostMeta( { min_zoom: 0.1 } );
+								}
+								setZoomState( 'min_zoom' );
+								setKey( key + 1 );
+							} }
+						>
+							{ __( 'Min Zoom', 'jeo' ) }
+						</Button>
+						<Button
+							style={ buttonStyle( zoomState === 'max_zoom' ) }
+							className="zoom-button"
+							variant="primary"
+							isLarge
+							onClick={ () => {
+								if ( postMeta.max_zoom <= 0 ) {
+									setPostMeta( { max_zoom: 0.1 } );
+								}
+								setZoomState( 'max_zoom' );
+								setKey( key + 1 );
+							} }
+						>
+							{ __( 'Max Zoom', 'jeo' ) }
+						</Button>
+					</ButtonGroup>
+				</div>
+				<Map
+					key={ key }
+					ref={ mapRef }
+					style={ { height: '500px', width: '100%' } }
+					latitude={ centerLat || 0 }
+					longitude={ centerLon || 0 }
+					zoom={ currentZoom || initialZoom || 11 }
+					onMove={ ( { viewState } ) => {
+						setPostMeta( {
+							center_lat: viewState.latitude,
+							center_lon: viewState.longitude,
+						} );
+					} }
+					onZoom={ ( { viewState } ) => {
+						let zoom = Math.round( viewState.zoom * 10 ) / 10;
+						setPostMeta( { [ zoomState ]: zoom } );
+					} }
+				>
+					{ loadedLayers &&
+						( postMeta.layers || [] ).map( ( layer ) => {
+							const layerOptions = loadedLayers.find(
+								( { id } ) => id === layer.id
+							);
+							if ( layerOptions ) {
+								return renderLayer( {
+									layer: layerOptions.meta,
+									instance: layer,
+								} );
+							}
+						} ) }
+				</Map>
+			</div>
 		</div>
 	);
 }
