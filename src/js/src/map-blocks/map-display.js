@@ -1,11 +1,9 @@
 import classNames from 'classnames';
+import { useBlockProps } from '@wordpress/block-editor';
 
+// Legacy save component – kept for deprecated block migration
 export default ( { attributes, className } ) => {
 	const style = {};
-
-	// if ( className.includes( 'alignfull' ) ) {
-	// 	style.width = '100vw';
-	// }
 
 	return (
 		<div
@@ -16,5 +14,16 @@ export default ( { attributes, className } ) => {
 			// data-map_id={ attributes.map_id }
 			style={ style }
 		/>
+	);
+};
+
+// New save component with useBlockProps.save() for API v2+
+export const MapSave = ( { attributes } ) => {
+	const blockProps = useBlockProps.save( {
+		className: classNames( [ 'jeomap', 'map_id_'+attributes.map_id ] ),
+	} );
+
+	return (
+		<div { ...blockProps } />
 	);
 };

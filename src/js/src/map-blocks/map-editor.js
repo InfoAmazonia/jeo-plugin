@@ -1,3 +1,4 @@
+import { useBlockProps } from '@wordpress/block-editor';
 import { Button, Spinner } from '@wordpress/components';
 import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 import { useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
@@ -11,6 +12,7 @@ import './map-editor.css';
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 export default function MapEditor ( {attributes, setAttributes } ) {
+	const blockProps = useBlockProps( { className: 'jeo-mapblock' } );
 	const instanceId = useId();
 	console.log({ instanceId });
 	const [ key, setKey ] = useState( 0 );
@@ -42,14 +44,10 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 		per_page: -1,
 	}, { enabled: layerIds.length > 0 } );
 
-	if ( attributes.map_id && !loadedMap ) {
-		return null;
-	}
-
 	return (
-		<div className="jeo-mapblock">
-			{ attributes.map_id && loadingMap && <Spinner /> }
-			{ attributes.map_id && ! loadingMap && (
+		<div { ...blockProps }>
+			{ attributes.map_id && ( loadingMap || !loadedMap ) && <Spinner /> }
+			{ attributes.map_id && ! loadingMap && loadedMap && (
 				<>
 					<div className="jeo-preview-area">
 						<Map

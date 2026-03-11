@@ -1,4 +1,5 @@
 import { CKEditor } from '@ckeditor/ckeditor5-react';
+import { useBlockProps } from '@wordpress/block-editor';
 import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
@@ -75,6 +76,7 @@ function flyTo ( map, location ) {
 }
 
 export default function StoryMapEditor ( { attributes, setAttributes } ) {
+	const blockProps = useBlockProps( { className: 'jeo-mapblock storymap' } );
 	const instanceId = useId();
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
@@ -232,7 +234,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	document.body.style.setProperty('--globalFontFamily', globalFontFamily);
 
 	return (
-		<div className="jeo-mapblock storymap">
+		<div { ...blockProps }>
 			{ attributes.map_id && loadingMap && <Spinner /> }
 			{ attributes.map_id && loadedMap && (
 				<Fragment>
