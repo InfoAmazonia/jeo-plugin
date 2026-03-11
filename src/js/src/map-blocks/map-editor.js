@@ -14,7 +14,6 @@ const { map_defaults: mapDefaults } = window.jeo_settings;
 export default function MapEditor ( {attributes, setAttributes } ) {
 	const blockProps = useBlockProps( { className: 'jeo-mapblock' } );
 	const instanceId = useId();
-	console.log({ instanceId });
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
 		setKey( key + 1 );
