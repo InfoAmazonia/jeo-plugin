@@ -3,6 +3,20 @@ import MapboxGL from 'mapbox-gl'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
+// Fix: Patch HTMLElement's instanceof check for cross-document (iframe) compatibility.
+// In WordPress Block API v3, blocks run inside an iframe. MapboxGL checks
+// `container instanceof HTMLElement` which fails when the container element
+// comes from the iframe document while MapboxGL uses the parent document's
+// HTMLElement prototype. This makes the check use duck-typing instead.
+try {
+	Object.defineProperty( HTMLElement, Symbol.hasInstance, {
+		value: ( instance ) => instance != null && typeof instance === 'object' && instance.nodeType === 1,
+		configurable: true,
+	} );
+} catch ( e ) {
+	// Symbol.hasInstance may not be configurable in some environments
+}
+
 /** @type string */
 export const mapboxToken = jeo_settings.mapbox_key
 

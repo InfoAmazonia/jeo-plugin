@@ -4,6 +4,18 @@ import Mapbox, { FullscreenControl, NavigationControl } from 'react-map-gl/mapbo
 import { computeInlineStart } from '../../shared/direction';
 import { defaultStyle, mapboxToken, mapgl } from './mapboxgl-loader'
 
+// Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
+// With splitChunks disabled, react-map-gl may bundle its own copy of mapbox-gl
+// in this chunk, using a separate HTMLElement reference from the loader chunk.
+try {
+	Object.defineProperty( HTMLElement, Symbol.hasInstance, {
+		value: ( instance ) => instance != null && typeof instance === 'object' && instance.nodeType === 1,
+		configurable: true,
+	} );
+} catch ( e ) {
+	// Symbol.hasInstance may not be configurable in some environments
+}
+
 /**
  * @typedef {import('react-map-gl/mapbox').MapProps} MapProps
  * @param {MapProps} props
