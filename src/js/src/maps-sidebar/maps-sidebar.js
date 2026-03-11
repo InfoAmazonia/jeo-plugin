@@ -164,6 +164,11 @@ function MapsSidebar( {
 				renderPanel={ PluginDocumentSettingPanel }
 				setPanLimitsFromMap={ setPanLimitsFromMap }
 			/>
+			<PluginDocumentSettingPanel
+				name="map-preview"
+				title={ __( 'Map Preview', 'jeo' ) }
+				className="jeo-map-preview-panel"
+			>
 			<MapPreviewPortal>
 				<div className="zoom-buttons-div">
 					<ButtonGroup className="button-group-div">
@@ -278,6 +283,7 @@ function MapsSidebar( {
 						} ) }
 				</Map>
 			</MapPreviewPortal>
+			</PluginDocumentSettingPanel>
 
 			<LayersPanel
 				attributes={ postMeta }

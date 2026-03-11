@@ -143,6 +143,11 @@ const LayersSidebar = ( {
 
 	return (
 		<>
+			<PluginDocumentSettingPanel
+				name="layer-preview"
+				title={ __( 'Layer Preview', 'jeo' ) }
+				className="jeo-layer-preview-panel"
+			>
 			<LayerPreviewPortal>
 				<Map
 					key={ key }
@@ -187,6 +192,7 @@ const LayersSidebar = ( {
 					) }
 				</Map>
 			</LayerPreviewPortal>
+			</PluginDocumentSettingPanel>
 
 			<PluginDocumentSettingPanel
 				name="settings"
