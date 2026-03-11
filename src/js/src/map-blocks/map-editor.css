@@ -80,3 +80,21 @@
 .wp-block[data-type="jeo/map"]:focus-within .jeo-preview-controls {
 	display: flex;
 }
+
+/* Editor-only preview blocks: full width, no toolbar */
+.wp-block-jeo-map-editor,
+.wp-block-jeo-layer-editor {
+	width: 100%;
+	max-width: 100%;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+/* Hide the block selection outline and toolbar for editor-only preview blocks.
+   The toolbar is rendered as a popover so we target it via the selected block
+   class and the popover container that appears above the block. */
+.wp-block-jeo-map-editor.is-selected,
+.wp-block-jeo-layer-editor.is-selected {
+	outline: none !important;
+	box-shadow: none !important;
+}
