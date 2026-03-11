@@ -324,6 +324,13 @@ registerBlockType( 'jeo/map-editor', {
 		reusable: false,
 		lock: false,
 		customClassName: false,
+		align: [ 'full' ],
+	},
+	attributes: {
+		align: {
+			type: 'string',
+			default: 'full',
+		},
 	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>
@@ -345,6 +352,13 @@ registerBlockType( 'jeo/layer-editor', {
 		reusable: false,
 		lock: false,
 		customClassName: false,
+		align: [ 'full' ],
+	},
+	attributes: {
+		align: {
+			type: 'string',
+			default: 'full',
+		},
 	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>
