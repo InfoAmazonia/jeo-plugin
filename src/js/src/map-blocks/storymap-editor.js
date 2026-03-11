@@ -225,13 +225,13 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		setAttributes( { ...attributes, postID } );
 	}, [] );
 
-	let globalFontFamily = window.jeo_settings.jeo_typography_name;
+	const globalFontFamily = window.jeo_settings.jeo_typography_name || 'sans-serif';
 
-	if ( ! globalFontFamily ) {
-		globalFontFamily =  'sans-serif';
-	}
-
-	document.body.style.setProperty('--globalFontFamily', globalFontFamily);
+	useEffect( () => {
+		// In apiVersion 3 the edit component runs inside an iframe,
+		// so `document` already points to the iframe's own document.
+		document.body.style.setProperty( '--globalFontFamily', globalFontFamily );
+	}, [ globalFontFamily ] );
 
 	return (
 		<div { ...blockProps }>
