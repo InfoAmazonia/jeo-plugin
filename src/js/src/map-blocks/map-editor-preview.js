@@ -28,6 +28,32 @@ export default function MapEditorPreview() {
 	const [ key, setKey ] = useState( 0 );
 	const mapRef = useRef( undefined );
 
+	// Expose setPanLimitsFromMap for the sidebar MapSettings button.
+	// Since the block runs inside the iframe and the sidebar in the parent,
+	// we use the editor data store to bridge them: MapSettings dispatches
+	// a custom action, and this block listens via a window message (future).
+	// For now, store the function on the iframe window so MapPanel can
+	// call it via cross-frame messaging if needed.
+	useEffect( () => {
+		window.__jeoSetPanLimitsFromMap = () => {
+			const { current: map } = mapRef;
+			if ( map ) {
+				const bounds = map.getBounds();
+				setPostMeta( {
+					pan_limits: {
+						east: bounds._ne.lat,
+						north: bounds._ne.lng,
+						south: bounds._sw.lng,
+						west: bounds._sw.lat,
+					},
+				} );
+			}
+		};
+		return () => {
+			delete window.__jeoSetPanLimitsFromMap;
+		};
+	}, [ setPostMeta ] );
+
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
