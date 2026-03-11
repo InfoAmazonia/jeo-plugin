@@ -12,7 +12,7 @@ import { cloneDeep } from 'lodash';
 import { AsyncModeProvider } from '@wordpress/data';
 
 registerBlockType( 'jeo/map', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: __( 'JEO Map', 'jeo' ),
 	description: __( 'Display maps with layers and data', 'jeo' ),
 	category: 'jeo',
@@ -138,7 +138,7 @@ const onetimeMapAttributes = {
 };
 
 registerBlockType( 'jeo/onetime-map', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: __( 'JEO One-time Map', 'jeo' ),
 	description: __( 'Display maps with layers and data', 'jeo' ),
 	category: 'jeo',
@@ -238,7 +238,7 @@ const storymapAttributes = {
 };
 
 registerBlockType( 'jeo/storymap', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: __( 'Story Map', 'jeo' ),
 	description: __( 'Display maps with storytelling', 'jeo' ),
 	category: 'jeo',
@@ -270,7 +270,7 @@ registerBlockType( 'jeo/storymap', {
 } );
 
 registerBlockType( 'jeo/embedded-storymap', {
-	apiVersion: 2,
+	apiVersion: 3,
 	title: __( 'Embedded Story Map', 'jeo' ),
 	description: __( 'Display maps with storytelling', 'jeo' ),
 	category: 'jeo',

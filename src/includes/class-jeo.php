@@ -289,7 +289,7 @@ class Jeo {
 		register_block_type(
 			'jeo/storymap',
 			array(
-				'api_version'     => 2,
+				'api_version'     => 3,
 				'render_callback' => array( $this, 'story_map_dynamic_render_callback' ),
 				'editor_script'   => 'jeo-map-blocks',
 				'editor_style'    => 'jeo-map-blocks',
@@ -298,7 +298,7 @@ class Jeo {
 		register_block_type(
 			'jeo/embedded-storymap',
 			array(
-				'api_version'     => 2,
+				'api_version'     => 3,
 				'render_callback' => array( $this, 'embedded_story_map_dynamic_render_callback' ),
 				'editor_script'   => 'jeo-map-blocks',
 				'editor_style'    => 'jeo-map-blocks',
