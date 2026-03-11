@@ -320,6 +320,10 @@ registerBlockType( 'jeo/map-editor', {
 	icon: MapIcon,
 	supports: {
 		inserter: false,
+		html: false,
+		reusable: false,
+		lock: false,
+		customClassName: false,
 	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>
@@ -337,6 +341,10 @@ registerBlockType( 'jeo/layer-editor', {
 	icon: MapIcon,
 	supports: {
 		inserter: false,
+		html: false,
+		reusable: false,
+		lock: false,
+		customClassName: false,
 	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>
