@@ -5,11 +5,10 @@
 	position: relative;
 
 	.storymap-controls {
-		// z-index only works on positioned elements; make this a
-		// positioned element so its z-index creates a stacking context
-		// above the map canvas (which uses position: relative internally).
-		position: relative;
-		z-index: 10;
+		// Do NOT add position: relative here — it would become the
+		// containing block for the absolutely-positioned children
+		// (settings panels, search input, current-slide box), pulling
+		// them out of their intended position relative to the block root.
 
 		.story-settings, .slides-settings, .story-settings-hide, .slides-settings-hide  {
 			border-radius: 7px;
@@ -100,6 +99,7 @@
 	top: 50px;
 	padding: 10px;
 	inset-inline-start: calc(45% + 15px);
+	z-index: 10;
 
 	.title {
 		label {
@@ -129,6 +129,7 @@
 	padding: 10px;
 	display: flex;
 	inset-inline-start: calc(45% + 15px);
+	z-index: 10;
 
 	// .section-title {
 	// 	margin: 0 0 0 15px;
@@ -149,6 +150,7 @@
     top: 10px;
 	padding: 10px;
 	font-size: 14px;
+	z-index: 10;
 
 	div {
 		margin: auto;
@@ -163,6 +165,7 @@
 	top: 50px;
 	// inset-inline-start: calc(30% + 15px);
 	background-color: #fff;
+	z-index: 10;
 	.slide-panel {
 		border-inline-start: none;
 		width: 100%;
@@ -293,6 +296,7 @@
 	position: absolute;
 	bottom: 15%;
 	padding: 10px;
+	z-index: 10;
 
 	// .section-title {
 	// 	margin: 0 0 0 15px;
@@ -310,6 +314,7 @@
 	position: absolute;
 	top: 0;
 	inset-inline-start: 10px;
+	z-index: 10;
 }
 .tooltip {
 	background-color: white;
