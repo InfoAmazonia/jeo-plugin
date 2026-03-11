@@ -5,7 +5,10 @@
 	position: relative;
 
 	.storymap-controls {
-		// Ensure settings panels stack above the map canvas
+		// z-index only works on positioned elements; make this a
+		// positioned element so its z-index creates a stacking context
+		// above the map canvas (which uses position: relative internally).
+		position: relative;
 		z-index: 10;
 
 		.story-settings, .slides-settings, .story-settings-hide, .slides-settings-hide  {
