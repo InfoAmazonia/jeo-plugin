@@ -310,6 +310,11 @@ export default class JeoMap {
 			this.map_post_object = data;
 
 			await this.getLayers();
+		} else if ( this.getArg( 'layers' ) ) {
+			// One-time maps have no map_id but store layer settings
+			// in the data-layers attribute. We still need to fetch
+			// the full layer objects so getStyleLayer() can resolve.
+			await this.getLayers();
 		}
 	}
 
@@ -613,9 +618,11 @@ export default class JeoMap {
 					( layer ) => layer.attributes.layer_post_id === layerSettings.id
 				);
 
-				const styleUrl = layer.getStyleUrl();
-				if ( styleUrl ) {
-					return styleUrl;
+				if ( layer ) {
+					const styleUrl = layer.getStyleUrl();
+					if ( styleUrl ) {
+						return styleUrl;
+					}
 				}
 			}
 		}

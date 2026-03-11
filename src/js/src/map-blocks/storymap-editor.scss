@@ -1,5 +1,13 @@
+// In Block API v3 the outer .wp-block wrapper (which had position: relative)
+// no longer exists. We need position: relative on the block root so the
+// absolutely-positioned settings panels have a proper containing block.
 .jeo-mapblock.storymap {
+	position: relative;
+
 	.storymap-controls {
+		// Ensure settings panels stack above the map canvas
+		z-index: 10;
+
 		.story-settings, .slides-settings, .story-settings-hide, .slides-settings-hide  {
 			border-radius: 7px;
 			box-shadow: 1px 3px 4px 0 rgba(0,0,0,.1);
