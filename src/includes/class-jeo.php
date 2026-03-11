@@ -701,7 +701,7 @@ class Jeo {
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/map-editor' ) ) {
-				$response->data['content']['raw'] = '<!-- wp:jeo/map-editor /-->';
+				$response->data['content']['raw'] = '<!-- wp:jeo/map-editor {"align":"full"} /-->';
 			}
 		}
 		return $response;
@@ -715,7 +715,7 @@ class Jeo {
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/layer-editor' ) ) {
-				$response->data['content']['raw'] = '<!-- wp:jeo/layer-editor /-->';
+				$response->data['content']['raw'] = '<!-- wp:jeo/layer-editor {"align":"full"} /-->';
 			}
 		}
 		return $response;
@@ -754,14 +754,14 @@ class Jeo {
 
 			if ( isset( $wp_post_types['map'] ) ) {
 				$wp_post_types['map']->template      = array(
-					array( 'jeo/map-editor' ),
+					array( 'jeo/map-editor', array( 'align' => 'full' ) ),
 				);
 				$wp_post_types['map']->template_lock = 'all';
 			}
 
 			if ( isset( $wp_post_types['map-layer'] ) ) {
 				$wp_post_types['map-layer']->template      = array(
-					array( 'jeo/layer-editor' ),
+					array( 'jeo/layer-editor', array( 'align' => 'full' ) ),
 				);
 				$wp_post_types['map-layer']->template_lock = 'all';
 			}
