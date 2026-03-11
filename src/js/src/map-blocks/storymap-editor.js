@@ -524,7 +524,9 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																attributes.slides[ index ].pitch == 0 && (
 																	<Button
 																		className="lock-location-button"
+																		disabled={ ! selectedMap }
 																		onClick={ () => {
+																			if ( ! selectedMap ) return;
 																			setCurrentSlideIndex( index );
 																			const latitude = selectedMap.getCenter().lat;
 																			const longitude = selectedMap.getCenter().lng;
@@ -562,7 +564,9 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																attributes.slides[ index ].pitch == 0 ) && (
 																	<Button
 																		className="lock-location-button"
+																		disabled={ ! selectedMap }
 																		onClick={ () => {
+																			if ( ! selectedMap ) return;
 																			setCurrentSlideIndex( index );
 																			const latitude = selectedMap.getCenter().lat;
 																			const longitude = selectedMap.getCenter().lng;
