@@ -4,6 +4,18 @@ import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/map
 import { computeInlineStart } from '../../shared/direction';
 import { defaultStyle, mapboxTransformRequest, mapgl } from './maplibregl-loader'
 
+// Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
+// With splitChunks disabled, react-map-gl may bundle its own copy of maplibre-gl
+// in this chunk, using a separate HTMLElement reference from the loader chunk.
+try {
+	Object.defineProperty( HTMLElement, Symbol.hasInstance, {
+		value: ( instance ) => instance != null && typeof instance === 'object' && instance.nodeType === 1,
+		configurable: true,
+	} );
+} catch ( e ) {
+	// Symbol.hasInstance may not be configurable in some environments
+}
+
 /**
  * @typedef {import('react-map-gl/maplibre').MapProps} MapProps
  * @param {MapProps} props
