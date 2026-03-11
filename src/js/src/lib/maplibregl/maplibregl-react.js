@@ -17,7 +17,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, ...props },
 			ref={ ref }
 			mapLib={ mapgl }
 			mapStyle={ defaultStyle }
-			reuseMaps={ true }
+			reuseMaps={ false }
 			transformRequest={ mapboxTransformRequest }
 			{ ...props }
 		>
