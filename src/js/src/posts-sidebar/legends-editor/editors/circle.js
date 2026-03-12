@@ -1,6 +1,7 @@
 import { Component, Fragment } from '@wordpress/element';
-import { TextControl, RangeControl, Button, Dropdown, ColorPicker } from '@wordpress/components';
+import { Button, Dropdown, ColorPicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { RangeControl, TextControl } from '../../../shared/wp-form-controls';
 import generateUUID from '../../../util/generate-uuid';
 import '../editors/circle.css';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';

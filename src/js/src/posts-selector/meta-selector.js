@@ -1,10 +1,9 @@
 import {
 	Button,
 	PanelRow,
-	SelectControl,
-	TextControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { SelectControl, TextControl } from '../shared/wp-form-controls';
 
 import './meta-selector.css';
 

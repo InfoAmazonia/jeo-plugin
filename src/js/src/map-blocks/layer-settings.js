@@ -1,8 +1,9 @@
-import { CheckboxControl, Dashicon, SelectControl } from '@wordpress/components';
+import { Dashicon } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { Draggable } from 'react-beautiful-dnd';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
+import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
 
 import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';

@@ -1,7 +1,8 @@
 import { MediaUpload } from '@wordpress/block-editor';
-import { Button, Dashicon, Modal, TextControl } from '@wordpress/components';
+import { Button, Dashicon, Modal } from '@wordpress/components';
 import { Component, Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { TextControl } from '../../../shared/wp-form-controls';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 import generateUUID from '../../../util/generate-uuid';
