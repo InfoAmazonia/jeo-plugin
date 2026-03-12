@@ -77,6 +77,7 @@ export default function LayerEditorPreview() {
 			{ /* eslint-disable-next-line jsx-a11y/no-static-element-interactions */ }
 			<div
 				className="jeo-preview-area"
+				onPointerDown={ stopPropagation }
 				onMouseDown={ stopPropagation }
 				onTouchStart={ stopPropagation }
 			>

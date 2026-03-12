@@ -34,6 +34,75 @@ try {
 	// Symbol.hasInstance may not be configurable in some environments
 }
 
+// Fix: Patch FullscreenControl for cross-document (iframe) compatibility.
+// Same issue as MapLibreGL: the control uses `document` (parent window) for
+// fullscreenElement, exitFullscreen(), and fullscreenchange listeners.
+// In the iframe editor the container lives in the iframe document, so
+// fullscreen state is tracked there — not on the parent document.
+//
+// MapboxGL's constructor uses bindAll() for _onClickFullscreen and
+// _changeIcon, creating bound instance methods that shadow prototype
+// patches. We must override onAdd to replace them at instance level.
+( function patchFullscreenControl() {
+	const FSC = MapboxGL.FullscreenControl;
+	if ( ! FSC ) return;
+	const proto = FSC.prototype;
+	const origOnAdd = proto.onAdd;
+
+	proto.onAdd = function ( map ) {
+		const result = origOnAdd.call( this, map );
+		const ownerDoc = this._container && this._container.ownerDocument;
+		if ( ! ownerDoc || ownerDoc === document ) {
+			return result; // same document — no patching needed
+		}
+
+		const self = this;
+
+		// 1. Move fullscreenchange listener from parent doc to iframe doc
+		const oldChangeIcon = this._changeIcon;
+		document.removeEventListener( this._fullscreenchange, oldChangeIcon );
+		this._changeIcon = function () {
+			const fse = ownerDoc.fullscreenElement || ownerDoc.webkitFullscreenElement;
+			if ( ( fse === self._container ) !== self._fullscreen ) {
+				self._fullscreen = ! self._fullscreen;
+				self._fullscreenButton.classList.toggle( 'mapboxgl-ctrl-shrink' );
+				self._fullscreenButton.classList.toggle( 'mapboxgl-ctrl-fullscreen' );
+				self._updateTitle();
+			}
+		};
+		ownerDoc.addEventListener( this._fullscreenchange, this._changeIcon );
+
+		// 2. Replace click handler to exit on the correct document
+		const oldClick = this._onClickFullscreen;
+		this._onClickFullscreen = function () {
+			if ( self._isFullscreen() ) {
+				if ( ownerDoc.exitFullscreen ) {
+					ownerDoc.exitFullscreen();
+				} else if ( ownerDoc.webkitCancelFullScreen ) {
+					ownerDoc.webkitCancelFullScreen();
+				}
+			} else if ( self._container.requestFullscreen ) {
+				self._container.requestFullscreen();
+			} else if ( self._container.webkitRequestFullscreen ) {
+				self._container.webkitRequestFullscreen();
+			}
+		};
+		this._fullscreenButton.removeEventListener( 'click', oldClick );
+		this._fullscreenButton.addEventListener( 'click', this._onClickFullscreen );
+
+		return result;
+	};
+
+	// onRemove: clean up from the correct document
+	const origOnRemove = proto.onRemove;
+	proto.onRemove = function () {
+		const ownerDoc = ( this._container && this._container.ownerDocument ) || document;
+		ownerDoc.removeEventListener( this._fullscreenchange, this._changeIcon );
+		this._controlContainer.remove();
+		this._map = null;
+	};
+} )();
+
 /** @type string */
 export const mapboxToken = jeo_settings.mapbox_key
 
