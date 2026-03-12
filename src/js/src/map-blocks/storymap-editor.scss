@@ -75,6 +75,7 @@
 
 .jeo-mapblock.storymap {
 	font-family: var(--globalFontFamily), sans-serif;;
+	overflow-anchor: none;
 }
 
 .ck.ck-balloon-panel, .ck.ck-toolbar__items {
@@ -87,6 +88,19 @@
 
 .ck.ck-content.ck-editor__editable.ck-blurred, .ck.ck-content.ck-editor__editable.ck-focused {
 	height: 300px !important;
+	overflow-y: auto;
+	overflow-anchor: none;
+	overscroll-behavior: contain;
+}
+
+.storymap-title-editor {
+	.ck.ck-content.ck-editor__editable.ck-blurred,
+	.ck.ck-content.ck-editor__editable.ck-focused {
+		height: 44px !important;
+		min-height: 44px;
+		max-height: 44px;
+		overflow-y: hidden;
+	}
 }
 
 
