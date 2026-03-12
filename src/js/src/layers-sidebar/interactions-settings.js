@@ -1,4 +1,4 @@
-import { Modal, Panel, SelectControl, Button } from '@wordpress/components';
+import { Modal, Panel, Button } from '@wordpress/components';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 

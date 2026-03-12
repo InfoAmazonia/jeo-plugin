@@ -1,7 +1,7 @@
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl } from '../shared/wp-form-controls';
 
 import { IntervalSelector } from './interval-selector';
 import { MetaSelector } from './meta-selector';

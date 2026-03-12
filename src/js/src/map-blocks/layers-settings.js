@@ -1,7 +1,8 @@
-import { Button, Card, CardBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
+import { Button, Card, CardBody, Spinner } from '@wordpress/components';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { SelectControl, TextControl } from '../shared/wp-form-controls';
 
 import { arrayMove } from 'react-movable';
 import { DragDropContext, Droppable } from "react-beautiful-dnd";

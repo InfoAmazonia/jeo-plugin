@@ -1,9 +1,10 @@
-import { Button, CheckboxControl, RadioControl } from '@wordpress/components';
+import { Button, RadioControl } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
+import { CheckboxControl } from '../shared/wp-form-controls';
 
 import JeoGeoAutoComplete from './geo-auto-complete';
 import 'leaflet/dist/leaflet.css';
