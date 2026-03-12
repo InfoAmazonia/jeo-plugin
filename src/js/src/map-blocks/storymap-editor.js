@@ -1,6 +1,7 @@
 import { CKEditor } from '@ckeditor/ckeditor5-react';
 import { useBlockProps } from '@wordpress/block-editor';
-import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
+import { Button, CheckboxControl, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
+import { chevronDown, chevronUp, lock, unlock, seen, trash, plus } from '@wordpress/icons';
 import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
 import { Fragment, useEffect, useId, useMemo, useState } from '@wordpress/element';
@@ -288,7 +289,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 											setShowStorySettings( false );
 										} }
 									>
-										<Dashicon icon="arrow-down-alt2" />
+										<Icon icon={ chevronDown } />
 									</Button>
 								</div>
 								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
@@ -340,7 +341,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 										setShowStorySettings( true );
 									} }
 								>
-									<Dashicon icon="arrow-up-alt2" />
+									<Icon icon={ chevronUp } />
 								</Button>
 							</div>
 						) }
@@ -354,7 +355,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 											setShowSlidesSettings( false );
 										} }
 									>
-										<Dashicon icon="arrow-down-alt2" />
+										<Icon icon={ chevronDown } />
 									</Button>
 								</div>
 								<List
@@ -550,7 +551,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																		} }
 																	>
 																		<div className="flex-center">
-																			<Dashicon icon="unlock" />
+																			<Icon icon={ unlock } />
 																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
 																		</div>
 																	</Button>
@@ -590,7 +591,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																		} }
 																	>
 																		<div>
-																			<Dashicon icon="lock" />
+																			<Icon icon={ lock } />
 																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
 																		</div>
 																	</Button>
@@ -610,7 +611,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 															} }
 														>
 															<div className="flex-center">
-																<Dashicon icon="visibility" />
+																<Icon icon={ seen } />
 																<span>{ __( 'Preview', 'jeo'  ) }</span>
 															</div>
 														</Button>
@@ -692,7 +693,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 															} }
 														>
 															<div className="flex-center">
-																<Dashicon icon="trash" />
+																<Icon icon={ trash } />
 																<span>{ __( 'Remove', 'jeo' ) }</span>
 															</div>
 														</Button>
@@ -727,7 +728,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 									} }
 								>
 									<div className="flex-center">
-										<Dashicon icon="plus" />
+										<Icon icon={ plus } />
 										<span>{ __( 'Add', 'jeo' ) }</span>
 									</div>
 								</Button>
@@ -743,7 +744,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 										setShowSlidesSettings( true );
 									} }
 								>
-									<Dashicon icon="arrow-up-alt2" />
+									<Icon icon={ chevronUp } />
 								</Button>
 							</div>
 						) }
