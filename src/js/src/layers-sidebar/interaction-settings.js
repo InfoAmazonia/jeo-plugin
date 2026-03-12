@@ -2,8 +2,6 @@ import {
 	Button,
 	Dashicon,
 	PanelBody,
-	SelectControl,
-	TextControl,
 } from '@wordpress/components';
 import {
 	Fragment,
@@ -13,6 +11,7 @@ import {
 	useState,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { SelectControl, TextControl } from '../shared/wp-form-controls';
 
 import './interaction-settings.css';
 

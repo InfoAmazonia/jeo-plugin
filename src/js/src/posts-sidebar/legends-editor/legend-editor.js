@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { SelectControl, CheckboxControl, TextControl } from '@wordpress/components';
+import { SelectControl, CheckboxControl, TextControl } from '../../shared/wp-form-controls';
 import JeoLegend from '../../../../includes/legend-types/JeoLegend';
 import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
