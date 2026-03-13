@@ -285,6 +285,11 @@ function collect_declared_properties( array $tokens, int $start, int $end ): arr
 	$brace_depth = 0;
 	$function_depth = 0;
 	$expect_property = false;
+	$property_modifier_tokens = array( T_PUBLIC, T_PROTECTED, T_PRIVATE, T_VAR, T_STATIC );
+
+	if ( defined( 'T_READONLY' ) ) {
+		$property_modifier_tokens[] = T_READONLY;
+	}
 
 	for ( $index = $start; $index <= $end; $index++ ) {
 		$token = $tokens[ $index ];
@@ -317,7 +322,7 @@ function collect_declared_properties( array $tokens, int $start, int $end ): arr
 			continue;
 		}
 
-		if ( is_array( $token ) && in_array( $token[0], array( T_PUBLIC, T_PROTECTED, T_PRIVATE, T_VAR, T_STATIC, T_READONLY ), true ) ) {
+		if ( is_array( $token ) && in_array( $token[0], $property_modifier_tokens, true ) ) {
 			$expect_property = true;
 			continue;
 		}
