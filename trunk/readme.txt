@@ -1,6 +1,6 @@
 === JEO ===
-Contributors: earthjournalism
-Tested up to: 6.8.2
+Contributors: infoamazonia
+Tested up to: 6.9.4
 Stable tag: 2.15.2
 Requires PHP: 8.0
 Requires at least: 6.6
@@ -15,6 +15,15 @@ The JEO plugin acts as a geojournalism platform that allows news organizations, 
 With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories.
 
 At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
+
+== Compatibility ==
+
+Compatibility snapshot validated on March 13, 2026:
+
+* Primary support: PHP 8.2, 8.3, and 8.4;
+* Stable WordPress gate: WordPress 6.9.4 on PHP 8.2, 8.3, and 8.4;
+* Backward-compatibility smoke tests: WordPress 6.6 on PHP 8.0 and 8.1;
+* Forward-compatibility smoke tests: WordPress 7.0-beta4 on PHP 8.2, 8.3, and 8.4.
 
 = Features =
 
