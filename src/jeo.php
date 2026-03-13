@@ -6,6 +6,8 @@
  * Plugin Name:       JEO WP
  * Description:       Interactive Map blocks for WordPress Gutenberg
  * Version:           3.0.0-rc.3
+ * Requires at least: 6.6
+ * Requires PHP:      8.0
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       jeo
@@ -32,5 +34,18 @@ define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );
  * admin-specific hooks, and public-facing site hooks.
  */
 require JEO_BASEPATH . 'includes/loaders.php';
+
+/**
+ * Register custom rewrites before flushing them on activation.
+ */
+function jeo_activate() {
+	jeo_maps()->register_post_type();
+	jeo_storymap()->register_post_type();
+	jeo()->register_embed_rewrite();
+
+	flush_rewrite_rules();
+}
+
+register_activation_hook( __FILE__, 'jeo_activate' );
 
 jeo();

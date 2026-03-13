@@ -6,6 +6,35 @@ With JEO, creating the interaction between data layers and contextual informatio
 
 At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
 
+## Compatibility
+
+This repository currently declares `Requires PHP: 8.0`, with primary validation focused on PHP `8.2` to `8.4`.
+
+Compatibility snapshot validated on March 13, 2026:
+
+- Primary support: PHP `8.2`, `8.3`, and `8.4`.
+- Stable WordPress gate: `WordPress 6.9.4` on PHP `8.2`, `8.3`, and `8.4`.
+- Backward-compatibility smoke tests: `WordPress 6.6` on PHP `8.0` and `8.1`.
+- Forward-compatibility smoke tests: `WordPress 7.0-beta4` on PHP `8.2`, `8.3`, and `8.4`.
+
+Automation:
+
+- Static PHP checks run in `.github/workflows/php-compat.yml`.
+- WordPress runtime smoke tests run in `.github/workflows/wordpress-smoke.yml`.
+
+Local commands:
+
+```bash
+php scripts/check-php-compat.php
+WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php \
+WP_DB_HOST=localhost \
+WP_DB_NAME=wordpress \
+WP_DB_USER=your-user \
+WP_DB_PASSWORD='' \
+WP_VERSION=7.0-beta4 \
+bash scripts/wordpress-smoke.sh
+```
+
 ## Setting up local environment
 
 First of all, clone this repository.
@@ -16,7 +45,7 @@ git clone git@github.com:InfoAmazonia/jeo-plugin.git
 ```
 
 Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have.
-(Note: This plugin requires WordPress 5.3+)
+(Note: This plugin requires WordPress 6.6+)
 
 Then create a symbolic link inside of `wp-content/plugins/jeo` pointing to the `src` folder in this repository.
 
