@@ -62,7 +62,6 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
-		add_action( 'cli_init', array( $this, 'register_cli_commands' ) );
 
 		add_action( 'init', array( $this, 'restrict_story_map_block_count' ) );
 
