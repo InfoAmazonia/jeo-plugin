@@ -23,18 +23,18 @@
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "^9.5.0",
 		"@nazka/map-gl-js-spiderfy": "^1.2.10",
-		"@wordpress/edit-post": "^8.16.0",
-		"@wordpress/editor": "^14.18.0",
-		"@wordpress/plugins": "^7.16.0",
+		"@wordpress/edit-post": "^8.41.0",
+		"@wordpress/editor": "^14.41.0",
+		"@wordpress/plugins": "^7.41.0",
 		"bootstrap-daterangepicker": "^3.1.0",
 		"ckeditor5": "^47.6.1",
 		"classnames": "^2.5.1",
 		"eta": "^3.5.0",
 		"leaflet": "^1.9.4",
-		"lodash-es": "^4.17.21",
+		"lodash-es": "^4.17.23",
 		"map-gl-utils": "^0.50.4",
-		"mapbox-gl": "^3.9.4",
-		"maplibre-gl": "^5.6.2",
+		"mapbox-gl": "^3.20.0",
+		"maplibre-gl": "^5.20.1",
 		"maplibregl-mapbox-request-transformer": "^0.0.3",
 		"react-autosuggest": "^10.1.0",
 		"react-beautiful-dnd": "^13.1.1",
@@ -42,19 +42,19 @@
 		"react-datepicker": "^7.6.0",
 		"react-jsonschema-form": "2.0.0-alpha.1",
 		"react-leaflet": "^4.2.1",
-		"react-map-gl": "^8.0.4",
+		"react-map-gl": "^8.1.0",
 		"react-movable": "^3.4.0",
 		"scrollama": "^3.2.0",
-		"use-debounce": "^10.0.4"
+		"use-debounce": "^10.1.0"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^30.21.0",
-		"ajv": "^8.17.1",
-		"css-loader": "^7.1.2",
-		"postcss": "^8.5.1",
-		"sass": "^1.83.4",
-		"sass-loader": "^16.0.4",
+		"@wordpress/scripts": "^30.27.0",
+		"ajv": "^8.18.0",
+		"css-loader": "^7.1.4",
+		"postcss": "^8.5.8",
+		"sass": "^1.98.0",
+		"sass-loader": "^16.0.7",
 		"style-loader": "^4.0.0",
-		"webpack": "^5.101.1"
+		"webpack": "^5.105.4"
 	}
 }
