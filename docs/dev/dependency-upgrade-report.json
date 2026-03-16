@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-16T12:00:50.240Z",
+  "generatedAt": "2026-03-16T12:09:51.226Z",
   "baseline": {
     "wordpress": "6.6+",
     "php": "8.0+",
@@ -14,7 +14,8 @@
     "notes": [
       "Automated approval gates are the Node Frontend Checks, PHP Compatibility and WordPress Smoke Tests GitHub Actions workflows.",
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
-      "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor."
+      "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor.",
+      "Post-track follow-up: plan a dedicated Gutenberg/React alignment phase before attempting direct React/ReactDOM majors or frontend packages that now require React 19."
     ],
     "toolingCaveats": [
       "Local Composer/PHP validation is available in this shell environment (Composer version 2.9.5 2026-01-29 11:40:53; PHP 8.5.4 (cli) (built: Mar 10 2026 23:15:23) (NTS)).",
@@ -140,7 +141,7 @@
       "id": "phase-5-eta-major",
       "phase": "Phase 5",
       "title": "Template runtime major",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Upgrade Eta without changing the popup template contract.",
       "packageNames": [
         "eta"
@@ -167,17 +168,18 @@
       "id": "phase-6-react-leaflet-major",
       "phase": "Phase 6",
       "title": "Leaflet sidebar major",
-      "status": "planned",
+      "status": "blocked",
       "scope": "Upgrade the post geocoding sidebar map and keep editing interactions intact.",
       "packageNames": [
         "react-leaflet"
       ],
       "automatedChecks": [
-        "npm run build",
-        "npm run test:unit",
-        "GitHub Actions Node frontend workflow",
-        "GitHub Actions PHP Compatibility workflow",
-        "GitHub Actions WordPress Smoke Tests workflow"
+        "npm view react-leaflet version peerDependencies --json",
+        "npm install react-leaflet@^5.0.0 --dry-run"
+      ],
+      "approvalNotes": [
+        "react-leaflet 5.0.0 is the current published major, but it now declares peerDependencies on react and react-dom ^19.0.0.",
+        "This repository currently resolves react 18.3.1 and react-dom 18.3.1 through the existing Gutenberg stack, so npm rejects the major upgrade before runtime checks can begin."
       ],
       "manualReviewItems": [
         "Add a point and confirm it appears in the Leaflet map.",
@@ -416,7 +418,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-5-eta-major",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Upgraded eta from 3.5.0 to 4.5.1. The frontend helper now imports the browser-safe eta/core entry and the Jest config transforms that subpath for the focused template tests.",
       "automatedChecks": [
         {
@@ -462,6 +464,39 @@
         "The published-map review confirmed that the Info panel and post popup templates still render correctly after the Eta major update.",
         "A pre-existing published-map runtime error remains outside this phase: Uncaught (in promise) TypeError: can't access property \"_geocode_lon\", e is null, raised during buildPostsGeoJson/getRelatedPosts when a related-post entry is null.",
         "A second pre-existing frontend limitation also remains outside this phase: when multiple posts share the same location, the marker popup still does not expose the individual posts for separate clicks."
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-6-react-leaflet-major",
+      "status": "blocked",
+      "summary": "Evaluated the react-leaflet major and found it blocked by the repository's current React line before any code changes could be applied.",
+      "automatedChecks": [
+        {
+          "name": "npm view react-leaflet version peerDependencies --json",
+          "status": "passed",
+          "details": "Confirmed that the current published major is react-leaflet 5.0.0 and that it declares peerDependencies on leaflet ^1.9.0 plus react and react-dom ^19.0.0."
+        },
+        {
+          "name": "node -e \"console.log(require('react/package.json').version)\"",
+          "status": "passed",
+          "details": "Confirmed that the installed runtime still resolves react 18.3.1."
+        },
+        {
+          "name": "node -e \"console.log(require('react-dom/package.json').version)\"",
+          "status": "passed",
+          "details": "Confirmed that the installed runtime still resolves react-dom 18.3.1."
+        },
+        {
+          "name": "npm install react-leaflet@^5.0.0 --dry-run",
+          "status": "failed",
+          "details": "npm returned ERESOLVE because react-leaflet 5.0.0 requires react and react-dom ^19.0.0, which conflicts with the repository's current React 18.3.1 line."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
       ]
     }
   ],
@@ -665,9 +700,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/posts-sidebar/index.js",
           "src/js/src/maps-sidebar/map-embed-url.js",
-          "src/js/src/maps-sidebar/maps-sidebar.js"
+          "src/js/src/maps-sidebar/maps-sidebar.js",
+          "src/js/src/posts-sidebar/index.js"
         ],
         "replacement": null,
         "notes": [
@@ -749,8 +784,8 @@
           }
         ],
         "usage": [
-          "package.json",
-          "webpack.config.js"
+          "webpack.config.js",
+          "package.json"
         ],
         "replacement": null,
         "notes": [
@@ -907,7 +942,7 @@
           "package.json",
           "src/js/src/posts-sidebar/geo-posts.js",
           "src/js/src/posts-selector/interval-selector.js",
-          "src/js/src/jeo-storymap/storymap-display.js"
+          "src/js/src/map-blocks/onetime-map-display.js"
         ],
         "replacement": null,
         "notes": []
@@ -967,8 +1002,8 @@
         "decision": "Keep current version",
         "batchId": "phase-5-eta-major",
         "batchLabel": "Phase 5",
-        "executionStatus": "ready-for-approval",
-        "executionStatusLabel": "Ready for approval",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
         "executionNotes": [
           "Upgraded to 4.5.1 after the template compilation contract was covered by the minimum JS test layer.",
           "The frontend helper now imports eta/core and Jest transforms eta/dist/core.js to keep the browser build and unit runner aligned."
@@ -1398,8 +1433,8 @@
         "decision": "Keep current version",
         "batchId": "phase-4-react-datepicker-major",
         "batchLabel": "Phase 4",
-        "executionStatus": "ready-for-approval",
-        "executionStatusLabel": "Ready for approval",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
         "executionNotes": [
           "Upgraded to 9.1.0; keep the related-posts date persistence flow under manual review after the major.",
           "The build now emits one non-blocking webpack warning from react-datepicker's optional date-fns-tz require path."
@@ -1452,8 +1487,8 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/layers-sidebar/attribution-settings.js",
-          "src/js/src/layers-sidebar/layer-settings.js"
+          "src/js/src/layers-sidebar/layer-settings.js",
+          "src/js/src/layers-sidebar/attribution-settings.js"
         ],
         "replacement": "@rjsf/core",
         "notes": []
@@ -1476,10 +1511,11 @@
         "decision": "Hold for the major batch",
         "batchId": "phase-6-react-leaflet-major",
         "batchLabel": "Phase 6",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
+        "executionStatus": "blocked",
+        "executionStatusLabel": "Blocked",
         "executionNotes": [
-          "Keep geocoding sidebar editing flows under manual review after the major."
+          "react-leaflet 5.0.0 currently requires react and react-dom ^19.0.0, so npm blocks the upgrade against the repository's React 18.3.1 line.",
+          "Revisit this phase only after the Gutenberg/React stack moves to React 19 or an officially compatible path becomes available."
         ],
         "evidence": [
           {
@@ -1571,9 +1607,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/map-blocks/layers-settings.js",
+          "src/js/src/discovery/blocks/map-layers.js",
           "src/js/src/map-blocks/storymap-editor.js",
-          "src/js/src/discovery/blocks/map-layers.js"
+          "src/js/src/map-blocks/layers-settings.js"
         ],
         "replacement": null,
         "notes": []
@@ -1760,8 +1796,8 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/layers-sidebar/layer-settings.js",
           "src/js/src/map-blocks/layer-editor-preview.js",
+          "src/js/src/layers-sidebar/layer-settings.js",
           "src/js/src/layers-sidebar/layers-sidebar.js"
         ],
         "replacement": null,
@@ -2000,8 +2036,8 @@
           }
         ],
         "usage": [
-          "composer.lock",
-          "composer.json"
+          "composer.json",
+          "composer.lock"
         ],
         "replacement": null,
         "notes": [
