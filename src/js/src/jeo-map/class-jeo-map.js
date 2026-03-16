@@ -1,12 +1,13 @@
 import Spiderfy from '@nazka/map-gl-js-spiderfy';
 import { __ } from '@wordpress/i18n';
-import { Eta } from 'eta';
 
 import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE } from '../shared/styles';
+import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
+import { compileEtaTemplate } from './template-compiler';
 
 import '../../../css/jeo-map.scss';
 
@@ -17,8 +18,7 @@ const decodeHtmlEntity = function ( str ) {
 };
 
 function compileTemplate ( template, config = {} ) {
-	const eta = new Eta( config );
-	return eta.compile( template ).bind( eta );
+	return compileEtaTemplate( template, config );
 }
 
 globalThis.Spiderfy = Spiderfy;
@@ -226,22 +226,13 @@ export default class JeoMap {
 							const customAttribution = [];
 							layers.forEach( ( layer ) => {
 								if ( layer.attribution ) {
-									let attributionLink = layer.attribution;
-									const attributionName = layer.attribution_name;
-
-									const regex = new RegExp(
-										/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+									const attributionLink = normalizeOptionalUrl(
+										layer.attribution
 									);
-
-									if (
-										layer.attribution &&
-										! layer.attribution.includes( 'http' )
-									) {
-										if ( layer.attribution.match( regex ) ) {
-											attributionLink = `https://${ layer.attribution }`;
-										}
-									}
-									const attributionLabel = attributionName.replace(
+									const attributionName = layer.attribution_name;
+									const attributionLabel = String(
+										attributionName || ''
+									).replace(
 										/\s/g,
 										''
 									).length
@@ -428,32 +419,15 @@ export default class JeoMap {
 			this.layers.forEach( ( layer ) => {
 				innerHTML += `<h3>${ layer.attributes.layer_name }</h1>`;
 
-				const regex = new RegExp(
-					/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+				const attributionLink = normalizeOptionalUrl(
+					layer.attributes.attribution
 				);
-
-				let attributionLink = layer.attributes.attribution;
 				const attributionName = layer.attributes.attribution_name;
-
-				let sourceLink = layer.source_url;
-
-				if (
-					layer.attributes.attribution &&
-					! layer.attributes.attribution.includes( 'http' )
-				) {
-					if ( layer.attributes.attribution.match( regex ) ) {
-						attributionLink = `https://${ layer.attributes.attribution }`;
-					}
-				}
-
-				if ( layer.source_url && ! layer.source_url.includes( 'http' ) ) {
-					if ( layer.source_url.match( regex ) ) {
-						sourceLink = `https://${ layer.source_url }`;
-					}
-				}
+				const sourceLink = normalizeOptionalUrl( layer.source_url );
 
 				if ( attributionLink ) {
-					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ attributionName }</a></p>`;
+					const attributionLabel = attributionName || attributionLink;
+					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ attributionLabel }</a></p>`;
 				}
 				if ( sourceLink ) {
 					innerHTML += `<a

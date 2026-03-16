@@ -4,6 +4,8 @@ import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
+import { toPickerDate } from './date-range';
+
 import './interval-selector.css';
 
 export function IntervalSelector( {
@@ -15,11 +17,11 @@ export function IntervalSelector( {
 	onEndChange,
 } ) {
 	const startDate = useMemo( () => {
-		return _startDate ? new Date( _startDate ) : null;
+		return toPickerDate( _startDate );
 	}, [ _startDate ] );
 
 	const endDate = useMemo( () => {
-		return _endDate ? new Date( _endDate ) : null;
+		return toPickerDate( _endDate );
 	}, [ _endDate ] );
 	return (
 		<div className="jeo-interval-selector">

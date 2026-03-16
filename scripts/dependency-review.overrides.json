@@ -12,6 +12,7 @@
     ],
     "notes": [
       "Automated approval gates are the Node Frontend Checks, PHP Compatibility and WordPress Smoke Tests GitHub Actions workflows.",
+      "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
       "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor."
     ]
   },
@@ -55,7 +56,7 @@
       "id": "phase-2-wp-scripts-major",
       "phase": "Phase 2",
       "title": "Build tooling major",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Upgrade the WordPress build toolchain major and keep the custom webpack config working.",
       "packageNames": [
         "@wordpress/scripts"
@@ -78,15 +79,25 @@
       "id": "phase-3-js-test-minimum",
       "phase": "Phase 3",
       "title": "Minimum JS test layer",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Add unit tests for the contracts that protect the remaining majors.",
       "packageNames": [],
       "automatedChecks": [
         "npm run build",
         "npm run test:unit",
-        "GitHub Actions Node frontend workflow"
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
       ],
-      "manualReviewItems": []
+      "approvalNotes": [
+        "No dependency versions or lockfiles change in this phase.",
+        "The Node workflow now treats npm run test:unit as a mandatory step.",
+        "The local WordPress smoke test passed after applying the separate PR #501 CLI-hook fix locally for validation only; src/includes/class-jeo.php remains outside this phase commit.",
+        "scripts/wordpress-smoke.sh now honors WP_CLI_PHP so Homebrew wp-cli setups can run the local smoke test on PHP 8.4 without the PHP 8.5 deprecation noise."
+      ],
+      "manualReviewItems": [
+        "Confirm the new test coverage protects date selector propagation, sidebar form normalization and Eta template compilation."
+      ]
     },
     {
       "id": "phase-4-react-datepicker-major",
@@ -264,7 +275,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-2-wp-scripts-major",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Upgraded @wordpress/scripts from 30.27.0 to 31.6.0. The existing webpack.config.js override remained compatible and no script changes were required.",
       "automatedChecks": [
         {
@@ -294,6 +305,46 @@
       "documentUpdates": [
         "package.json",
         "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-3-js-test-minimum",
+      "status": "ready-for-approval",
+      "summary": "Added the minimum JS test layer with focused coverage for date-selector propagation, sidebar attribution normalization and Eta template compilation, and made the Node workflow run npm run test:unit as a required step.",
+      "automatedChecks": [
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The new wp-scripts unit suite passed with 3 test files and 9 assertions."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings only."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend test-layer changes."
+        },
+        {
+          "name": "WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed after configuring the local MariaDB wordpress database/user and temporarily applying the separate PR #501 fix that removes the invalid cli_init callback registration from src/includes/class-jeo.php. The script now also honors WP_CLI_PHP so Homebrew wp-cli setups can run the same smoke on PHP 8.4 without the PHP 8.5 deprecation noise. class-jeo.php stays out of the Phase 3 commit because it already has its own PR."
+        }
+      ],
+      "manualReviewItems": [
+        "Confirm the new test coverage protects date selector propagation, sidebar form normalization and Eta template compilation."
+      ],
+      "documentUpdates": [
+        ".github/workflows/node-frontend.yml",
+        "README.md",
+        "docs/dev/php-compatibility.md",
+        "package.json",
+        "scripts/wordpress-smoke.sh",
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md"
       ]
@@ -421,7 +472,7 @@
     },
     "@wordpress/scripts": {
       "batchId": "phase-2-wp-scripts-major",
-      "executionStatus": "ready-for-approval",
+      "executionStatus": "completed",
       "executionNotes": [
         "Lead package for the tooling major batch.",
         "Upgraded to 31.x without requiring webpack.config.js changes in this repository."

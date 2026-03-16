@@ -6,6 +6,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
 WP_CLI="${WP_CLI:-wp}"
+WP_CLI_PHP="${WP_CLI_PHP:-}"
 WP_DIR="${WP_DIR:-${REPO_ROOT}/.tmp/wordpress}"
 WP_VERSION="${WP_VERSION:-latest}"
 WP_LOCALE="${WP_LOCALE:-en_US}"
@@ -21,9 +22,20 @@ WP_DB_HOST="${WP_DB_HOST:-127.0.0.1:3306}"
 PLUGIN_SLUG="${PLUGIN_SLUG:-jeo}"
 PLUGIN_SOURCE="${PLUGIN_SOURCE:-${REPO_ROOT}/src}"
 
+if [[ -n "${WP_CLI_PHP}" ]]; then
+	if [[ "${WP_CLI}" == */* ]]; then
+		WP_CLI_BIN="${WP_CLI}"
+	else
+		WP_CLI_BIN="$(command -v "${WP_CLI}")"
+	fi
+	WP_CLI_CMD=( "${WP_CLI_PHP}" "${WP_CLI_BIN}" )
+else
+	WP_CLI_CMD=( "${WP_CLI}" )
+fi
+
 mkdir -p "${WP_DIR}"
 
-"${WP_CLI}" core download \
+"${WP_CLI_CMD[@]}" core download \
 	--path="${WP_DIR}" \
 	--version="${WP_VERSION}" \
 	--locale="${WP_LOCALE}" \
@@ -33,7 +45,7 @@ mkdir -p "${WP_DIR}"
 mkdir -p "${WP_DIR}/wp-content/plugins"
 ln -sfn "${PLUGIN_SOURCE}" "${WP_DIR}/wp-content/plugins/${PLUGIN_SLUG}"
 
-"${WP_CLI}" config create \
+"${WP_CLI_CMD[@]}" config create \
 	--path="${WP_DIR}" \
 	--dbname="${WP_DB_NAME}" \
 	--dbuser="${WP_DB_USER}" \
@@ -43,12 +55,12 @@ ln -sfn "${PLUGIN_SOURCE}" "${WP_DIR}/wp-content/plugins/${PLUGIN_SLUG}"
 	--skip-check \
 	--force
 
-if ! "${WP_CLI}" db check --path="${WP_DIR}" >/dev/null 2>&1; then
-	"${WP_CLI}" db create --path="${WP_DIR}"
+if ! "${WP_CLI_CMD[@]}" db check --path="${WP_DIR}" >/dev/null 2>&1; then
+	"${WP_CLI_CMD[@]}" db create --path="${WP_DIR}"
 fi
 
-if ! "${WP_CLI}" core is-installed --path="${WP_DIR}" >/dev/null 2>&1; then
-	"${WP_CLI}" core install \
+if ! "${WP_CLI_CMD[@]}" core is-installed --path="${WP_DIR}" >/dev/null 2>&1; then
+	"${WP_CLI_CMD[@]}" core install \
 		--path="${WP_DIR}" \
 		--url="${WP_SITE_URL}" \
 		--title="${WP_TITLE}" \
@@ -58,7 +70,7 @@ if ! "${WP_CLI}" core is-installed --path="${WP_DIR}" >/dev/null 2>&1; then
 		--skip-email
 fi
 
-"${WP_CLI}" plugin activate "${PLUGIN_SLUG}" --path="${WP_DIR}"
-"${WP_CLI}" plugin list --path="${WP_DIR}"
-"${WP_CLI}" post-type list --field=name --path="${WP_DIR}"
-"${WP_CLI}" eval-file "${SCRIPT_DIR}/wordpress-smoke-check.php" --path="${WP_DIR}"
+"${WP_CLI_CMD[@]}" plugin activate "${PLUGIN_SLUG}" --path="${WP_DIR}"
+"${WP_CLI_CMD[@]}" plugin list --path="${WP_DIR}"
+"${WP_CLI_CMD[@]}" post-type list --field=name --path="${WP_DIR}"
+"${WP_CLI_CMD[@]}" eval-file "${SCRIPT_DIR}/wordpress-smoke-check.php" --path="${WP_DIR}"
