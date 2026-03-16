@@ -1,5 +1,6 @@
-import { FormTokenField } from '@wordpress/components';
 import { useCallback, useMemo } from '@wordpress/element';
+
+import { FormTokenField } from '../shared/wp-form-controls';
 
 export function TokensSelector( {
 	collection,
