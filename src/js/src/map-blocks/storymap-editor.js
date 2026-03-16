@@ -26,18 +26,23 @@ import { Button, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { chevronDown, chevronUp, lock, unlock, seen, trash, plus } from '@wordpress/icons';
 import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
-import { Fragment, useEffect, useId, useMemo, useState } from '@wordpress/element';
+import { Fragment, useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { List, arrayMove } from 'react-movable';
 import { CheckboxControl } from '../shared/wp-form-controls';
 
 import { createUploadAdapter } from './cke5-image-upload';
 import { baseColors } from './color-palettes';
-import { Map } from '../lib/mapgl-react';
+import { Map as MapPreview } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
+import {
+	moveActiveIndex,
+	reorderSlides,
+	reorderStorymapLayers,
+	sortSelectedLayersByMapOrder,
+} from './storymap-ordering';
 import { computeInlineEnd } from '../shared/direction';
 import './map-editor.css';
 import './storymap-editor.scss';
@@ -83,13 +88,6 @@ function removeTags(str) {
 	str = str.toString();
    return str.replace(/<[^>]*>/g, '');
  }
-
-function reorder ( list, startIndex, endIndex ) {
-	const result = Array.from( list );
-	const [ removed ] = result.splice( startIndex, 1 );
-	result.splice( endIndex, 0, removed );
-	return result;
-};
 
 function flyTo ( map, location ) {
 	map.flyTo({
@@ -391,26 +389,59 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
 	const [ selectedMap, setSelectedMap ] = useState( null );
 	const [ currentSlideIndex, setCurrentSlideIndex ] = useState( 0 );
+	const [ openSlideIndex, setOpenSlideIndex ] = useState( 0 );
+	const [ highlightedSlideKey, setHighlightedSlideKey ] = useState( null );
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ key, setKey ] = useState( 0 );
-	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 	const [ viewState, setViewState ] = useState( createInitialViewState );
 	const [ inlineEnd ] = useState( computeInlineEnd );
+	const slideRuntimeKeysRef = useRef( new WeakMap() );
+	const slideRuntimeKeyIndexRef = useRef( 0 );
+	const slideNodesRef = useRef( new globalThis.Map() );
 
-	const onDragEndLayers = ( result ) => {
-		// dropped outside the list
-		if ( !result.destination ) {
-		  return;
+	const getSlideRuntimeKey = ( slide ) => {
+		if ( ! slide || typeof slide !== 'object' ) {
+			return `slide-${ slideRuntimeKeyIndexRef.current++ }`;
 		}
 
-		const newItems = reorder(
-		  storymapLayers,
-		  result.source.index,
-		  result.destination.index
+		const existingKey = slideRuntimeKeysRef.current.get( slide );
+
+		if ( existingKey ) {
+			return existingKey;
+		}
+
+		const nextKey = `slide-${ slideRuntimeKeyIndexRef.current++ }`;
+		slideRuntimeKeysRef.current.set( slide, nextKey );
+		return nextKey;
+	};
+
+	const setSlideNode = ( runtimeKey ) => ( node ) => {
+		if ( node ) {
+			slideNodesRef.current.set( runtimeKey, node );
+			return;
+		}
+
+		slideNodesRef.current.delete( runtimeKey );
+	};
+
+	const onDragEndLayers = ( result ) => {
+		if ( ! result.destination || result.destination.index === result.source.index ) {
+			return;
+		}
+
+		const nextState = reorderStorymapLayers(
+			attributes.navigateMapLayers ?? [],
+			attributes.slides ?? [],
+			result.source.index,
+			result.destination.index
 		);
 
-		setStorymapLayers( newItems );
-	}
+		setAttributes( {
+			...attributes,
+			navigateMapLayers: nextState.navigateMapLayers,
+			slides: nextState.slides,
+		} );
+	};
 
 	const themeColors = useSelect( ( select ) => select( 'core/editor' ).getEditorSettings().colors, [] );
 
@@ -442,28 +473,74 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	}, [ attributes.slides, currentSlideIndex, setViewState ] );
 
 	useEffect( () => {
+		if ( ! attributes.slides?.length ) {
+			return;
+		}
+
+		const lastSlideIndex = attributes.slides.length - 1;
+
+		if ( currentSlideIndex > lastSlideIndex ) {
+			setCurrentSlideIndex( lastSlideIndex );
+		}
+
+		if ( openSlideIndex !== null && openSlideIndex > lastSlideIndex ) {
+			setOpenSlideIndex( lastSlideIndex );
+		}
+	}, [ attributes.slides?.length, currentSlideIndex, openSlideIndex ] );
+
+	useEffect( () => {
+		if ( ! highlightedSlideKey ) {
+			return undefined;
+		}
+
+		const highlightedNode = slideNodesRef.current.get( highlightedSlideKey );
+
+		if ( highlightedNode?.scrollIntoView ) {
+			window.requestAnimationFrame( () => {
+				highlightedNode.scrollIntoView( {
+					block: 'nearest',
+					behavior: 'smooth',
+				} );
+			} );
+		}
+
+		const timeoutId = window.setTimeout( () => {
+			setHighlightedSlideKey( ( currentHighlightedSlideKey ) =>
+				currentHighlightedSlideKey === highlightedSlideKey
+					? null
+					: currentHighlightedSlideKey
+			);
+		}, 650 );
+
+		return () => {
+			window.clearTimeout( timeoutId );
+		};
+	}, [ highlightedSlideKey ] );
+
+	useEffect( () => {
 		// Post already exists
-		if(attributes.slides && loadedMap && loadedLayers) {
-			const newSlides = attributes.slides.map(slide => {
-				slide.selectedLayers.forEach((selectedLayer, index) => {
-					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id ) || !loadedLayers.some(layer => layer.id === selectedLayer.id )) {
-						slide.selectedLayers.splice(index, 1);
-					}
-				})
+		if ( attributes.slides && loadedMap && loadedLayers ) {
+			const loadedMapLayerIds = new Set(
+				loadedMap.meta.layers.map( ( layer ) => layer.id )
+			);
+			const availableLayerIds = new Set(
+				loadedLayers.map( ( layer ) => layer.id )
+			);
+			const newSlides = attributes.slides.map( ( slide ) => {
+				const selectedLayers = ( slide.selectedLayers ?? [] ).filter(
+					( selectedLayer ) =>
+						loadedMapLayerIds.has( selectedLayer.id ) &&
+						availableLayerIds.has( selectedLayer.id )
+				);
 
-				const newOrder = [];
-
-				loadedMap.meta.layers.forEach(mapLayer => {
-					const foundLayer = slide.selectedLayers.find(layer => layer.id === mapLayer.id );
-					if( foundLayer ) {
-						newOrder.push(foundLayer);
-					}
-				})
-
-				slide.selectedLayers = newOrder;
-
-				return slide;
-			})
+				return {
+					...slide,
+					selectedLayers: sortSelectedLayersByMapOrder(
+						selectedLayers,
+						loadedMap.meta.layers
+					),
+				};
+			} );
 
 			setAttributes( {
 				...attributes,
@@ -544,6 +621,38 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		}
 	};
 
+	const moveSlide = ( fromIndex, toIndex ) => {
+		if (
+			toIndex < 0 ||
+			toIndex >= ( attributes.slides?.length ?? 0 ) ||
+			fromIndex === toIndex
+		) {
+			return;
+		}
+
+		const movedSlideKey = getSlideRuntimeKey( attributes.slides?.[ fromIndex ] );
+		const nextState = reorderSlides(
+			attributes.slides,
+			currentSlideIndex,
+			fromIndex,
+			toIndex
+		);
+
+		setCurrentSlideIndex( nextState.currentSlideIndex );
+		setOpenSlideIndex( ( currentOpenSlideIndex ) => {
+			if ( currentOpenSlideIndex === null ) {
+				return null;
+			}
+
+			return moveActiveIndex( currentOpenSlideIndex, fromIndex, toIndex );
+		} );
+		setAttributes( {
+			...attributes,
+			slides: nextState.slides,
+		} );
+		setHighlightedSlideKey( movedSlideKey );
+	};
+
 	useEffect( () => {
 		if ( ! attributes.slides ) {
 			setAttributes( {
@@ -582,7 +691,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			{ attributes.map_id && loadedMap && (
 				<Fragment>
 					<div className="jeo-preview-area">
-						<Map
+						<MapPreview
 							key={ key }
 							controls={ `top-${inlineEnd}` }
 							fullscreen={ loadedMap.meta.enable_fullscreen }
@@ -596,7 +705,6 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								const map = event.style?.map ?? null;
 								if ( ! selectedMap && map ) {
 									setSelectedMap( map );
-									setStorymapLayers( loadedLayers ?? [] );
 								}
 							} }
 							onMove={ ( event ) => {
@@ -618,7 +726,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 									}
 								}
 							) }
-						</Map>
+						</MapPreview>
 					</div>
 					<div className="storymap-controls">
 						{ showStorySettings && (
@@ -698,44 +806,46 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 										<Icon icon={ chevronDown } />
 									</Button>
 								</div>
-								<List
-									values={ attributes.slides }
-									onChange={ ( { oldIndex, newIndex } ) => {
-										let newSlides = JSON.parse(JSON.stringify(attributes.slides));
-										newSlides = arrayMove( newSlides, oldIndex, newIndex );
+								<div className="slides-container">
+									{ attributes.slides.map( ( slide, slideIndex ) => {
+										const slideRuntimeKey = getSlideRuntimeKey( slide );
 
-										setAttributes( {
-											...attributes,
-											slides: newSlides,
-										} );
-									} }
-									renderList={ ( { children, props } ) => {
 										return (
-											<div className="slides-container" { ...props }>
-												{ children }
+										<div
+											key={ slideRuntimeKey }
+											ref={ setSlideNode( slideRuntimeKey ) }
+											className={ `slide${ highlightedSlideKey === slideRuntimeKey ? ' was-moved' : '' }` }
+										>
+											<div className="slide-order-controls">
+												<Button
+													className="slide-order-button"
+													icon={ chevronUp }
+													label={ __( 'Move slide up', 'jeo' ) }
+													disabled={ slideIndex === 0 }
+													onClick={ () => moveSlide( slideIndex, slideIndex - 1 ) }
+												/>
+												<Button
+													className="slide-order-button"
+													icon={ chevronDown }
+													label={ __( 'Move slide down', 'jeo' ) }
+													disabled={
+														slideIndex === attributes.slides.length - 1
+													}
+													onClick={ () => moveSlide( slideIndex, slideIndex + 1 ) }
+												/>
 											</div>
-										);
-									} }
-									renderItem={ ( { value, isDragged, props } ) => {
-										const slide = value;
-										const index = attributes.slides.indexOf( value );
-										return (
-											<div key={ slide.content } className="slide" { ...props }>
-												 <button
-													data-movable-handle
-													tabIndex={-1}
-													>
-													=
-												</button>
-												<Panel key={ key } className="slide-panel">
+												<Panel className="slide-panel">
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( index + 1 ) }
-														initialOpen={
-															(index === currentSlideIndex ? true : false) && !isDragged
-														}
-														onToggle={ (props) => {
-															if(index !== currentSlideIndex) {
-																setCurrentSlideIndex(index);
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( slideIndex + 1 ) }
+														opened={ slideIndex === openSlideIndex }
+														scrollAfterOpen={ false }
+														onToggle={ ( next ) => {
+															setOpenSlideIndex(
+																next ? slideIndex : null
+															);
+
+															if ( next && slideIndex !== currentSlideIndex ) {
+																setCurrentSlideIndex( slideIndex );
 															}
 														} }
 													>
@@ -749,13 +859,13 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																		className="layers"
 																>
 																		{ ( attributes.navigateMapLayers ?? [] ).map( ( item, index_ ) => (
-																			<Draggable key={ `${ index_ }` } draggableId={ `${ index_ }` } index={ index_ }>
+																			<Draggable key={ `${ item.id }` } draggableId={ `${ item.id }` } index={ index_ }>
 																				{ ( provided, snapshot ) => {
 																					let layerButtonStyle = {
 																						background: 'rgb(240, 240, 240)',
 																					};
 
-																					attributes.slides[ index ].selectedLayers.map(
+																					attributes.slides[ slideIndex ].selectedLayers.map(
 																						( selectedLayer ) => {
 																							if ( selectedLayer.id === item.id ) {
 																								layerButtonStyle = {
@@ -778,16 +888,16 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																									className="layer"
 																									key={ item.id }
 																									onClick={ () => {
-																										setCurrentSlideIndex( index );
+																										setCurrentSlideIndex( slideIndex );
 
 																										const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
 																										let hasBeenRemoved = false;
 
-																										oldSlides[ index ].selectedLayers.map(
+																										oldSlides[ slideIndex ].selectedLayers.map(
 																											( selectedLayer, indexOfLayer ) => {
 																												if ( selectedLayer.id === item.id ) {
 																													oldSlides[
-																														index
+																														slideIndex
 																													].selectedLayers.splice(
 																														indexOfLayer,
 																														1
@@ -814,7 +924,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																												return itemPosition;
 																											}
 
-																											oldSlides[ index ].selectedLayers.map( (layer) => {
+																											oldSlides[ slideIndex ].selectedLayers.map( (layer) => {
 																												const position = findItemPostion(layer);
 																												if(position >= 0) {
 																													defaultOrder[ position ] = layer;
@@ -826,7 +936,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 																											defaultOrder = defaultOrder.filter(slot => slot !== null);
 
-																											oldSlides[ index ].selectedLayers = defaultOrder;
+																											oldSlides[ slideIndex ].selectedLayers = defaultOrder;
 																										}
 
 																										setKey(key + 1);
@@ -858,17 +968,17 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														</DragDropContext>
 														<div style={ { display: 'flex' } }>
 															{
-																attributes.slides[ index ].latitude == mapDefaults.lat &&
-																attributes.slides[ index ].longitude == mapDefaults.lng &&
-																attributes.slides[ index ].zoom == mapDefaults.zoom &&
-																attributes.slides[ index ].bearing == 0 &&
-																attributes.slides[ index ].pitch == 0 && (
+																attributes.slides[ slideIndex ].latitude == mapDefaults.lat &&
+																attributes.slides[ slideIndex ].longitude == mapDefaults.lng &&
+																attributes.slides[ slideIndex ].zoom == mapDefaults.zoom &&
+																attributes.slides[ slideIndex ].bearing == 0 &&
+																attributes.slides[ slideIndex ].pitch == 0 && (
 																	<Button
 																		className="lock-location-button"
 																		disabled={ ! selectedMap }
 																		onClick={ () => {
 																			if ( ! selectedMap ) return;
-																			setCurrentSlideIndex( index );
+																			setCurrentSlideIndex( slideIndex );
 																			const latitude = selectedMap.getCenter().lat;
 																			const longitude = selectedMap.getCenter().lng;
 																			const zoom =
@@ -878,11 +988,11 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																			const bearing = selectedMap.getBearing();
 
 																			const newSlides = [ ...attributes.slides ];
-																			newSlides[ index ].latitude = latitude;
-																			newSlides[ index ].longitude = longitude;
-																			newSlides[ index ].zoom = zoom;
-																			newSlides[ index ].pitch = pitch;
-																			newSlides[ index ].bearing = bearing;
+																			newSlides[ slideIndex ].latitude = latitude;
+																			newSlides[ slideIndex ].longitude = longitude;
+																			newSlides[ slideIndex ].zoom = zoom;
+																			newSlides[ slideIndex ].pitch = pitch;
+																			newSlides[ slideIndex ].bearing = bearing;
 
 																			setAttributes( {
 																				...attributes,
@@ -898,17 +1008,17 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																)
 															}
 															{
-																! ( attributes.slides[ index ].latitude == mapDefaults.lat &&
-																attributes.slides[ index ].longitude == mapDefaults.lng &&
-																attributes.slides[ index ].zoom == mapDefaults.zoom &&
-																attributes.slides[ index ].bearing == 0 &&
-																attributes.slides[ index ].pitch == 0 ) && (
+																! ( attributes.slides[ slideIndex ].latitude == mapDefaults.lat &&
+																attributes.slides[ slideIndex ].longitude == mapDefaults.lng &&
+																attributes.slides[ slideIndex ].zoom == mapDefaults.zoom &&
+																attributes.slides[ slideIndex ].bearing == 0 &&
+																attributes.slides[ slideIndex ].pitch == 0 ) && (
 																	<Button
 																		className="lock-location-button"
 																		disabled={ ! selectedMap }
 																		onClick={ () => {
 																			if ( ! selectedMap ) return;
-																			setCurrentSlideIndex( index );
+																			setCurrentSlideIndex( slideIndex );
 																			const latitude = selectedMap.getCenter().lat;
 																			const longitude = selectedMap.getCenter().lng;
 																			const zoom =
@@ -918,11 +1028,11 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																			const bearing = selectedMap.getBearing();
 
 																			const newSlides = [ ...attributes.slides ];
-																			newSlides[ index ].latitude = latitude;
-																			newSlides[ index ].longitude = longitude;
-																			newSlides[ index ].zoom = zoom;
-																			newSlides[ index ].pitch = pitch;
-																			newSlides[ index ].bearing = bearing;
+																			newSlides[ slideIndex ].latitude = latitude;
+																			newSlides[ slideIndex ].longitude = longitude;
+																			newSlides[ slideIndex ].zoom = zoom;
+																			newSlides[ slideIndex ].pitch = pitch;
+																			newSlides[ slideIndex ].bearing = bearing;
 
 																			setAttributes( {
 																				...attributes,
@@ -946,7 +1056,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														<Button
 															className="preview-button"
 															onClick={ () => {
-																setCurrentSlideIndex( index );
+																setCurrentSlideIndex( slideIndex );
 																setKey( key + 1 );
 															} }
 														>
@@ -957,9 +1067,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														</Button>
 
 															<span className="input-label">{ __( 'Title', 'jeo' ) }</span>
-															{ /* Wrap CKEditor in a div with React event handlers to stop
-															     synthetic events from reaching react-movable. Native
-															     stopPropagation does NOT stop React synthetic events. */ }
+															{ /* Keep editor interactions isolated from the outer slide drag handlers. */ }
 															<div
 																className="storymap-title-editor"
 																onMouseDown={ ( e ) => e.stopPropagation() }
@@ -971,10 +1079,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	config={ titleEditorConfig }
 																	onReady={ ( editor ) => setupEditor( editor, { singleLine: true } ) }
 																	onChange={ ( event, editor ) => {
-																		setCurrentSlideIndex( index );
+																		setCurrentSlideIndex( slideIndex );
 
 																	const oldSlides = [ ...attributes.slides ];
-																	oldSlides[ index ].title = editor.getData();
+																	oldSlides[ slideIndex ].title = editor.getData();
 
 																	setAttributes( {
 																		...attributes,
@@ -986,7 +1094,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														<span className="input-label">{ __(
 																'Content', 'jeo'
 														) }</span>
-														{ /* Same wrapper for content editor */ }
+														{ /* Same isolation for the content editor. */ }
 														<div
 															onMouseDown={ ( e ) => e.stopPropagation() }
 															onKeyDown={ ( e ) => e.stopPropagation() }
@@ -997,10 +1105,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																config={ editorConfig }
 																onReady={ setupEditor }
 																onChange={ ( event, editor ) => {
-																	setCurrentSlideIndex( index );
+																	setCurrentSlideIndex( slideIndex );
 
 																	const oldSlides = [ ...attributes.slides ];
-																	oldSlides[ index ].content = editor.getData();
+																	oldSlides[ slideIndex ].content = editor.getData();
 
 																	setAttributes( {
 																		...attributes,
@@ -1025,10 +1133,14 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	confirmation &&
 																	attributes.slides.length >= 2
 																) {
-																	setCurrentSlideIndex( 0 );
-
 																	const oldSlides = [ ...attributes.slides ];
-																	oldSlides.splice( index, 1 );
+																	oldSlides.splice( slideIndex, 1 );
+																	const nextSlideIndex = Math.max(
+																		0,
+																		Math.min( slideIndex, oldSlides.length - 1 )
+																	);
+																	setCurrentSlideIndex( nextSlideIndex );
+																	setOpenSlideIndex( nextSlideIndex );
 																	setAttributes( {
 																		...attributes,
 																		slides: oldSlides,
@@ -1045,8 +1157,8 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 												</Panel>
 											</div>
 										);
-									} }
-								/>
+									} ) }
+								</div>
 								<Button
 									className="add-button"
 									onClick={ () => {
@@ -1058,7 +1170,9 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 												{
 													title: null,
 													content: null,
-													selectedLayers: lastSlide[0].selectedLayers,
+													selectedLayers: [
+														...( lastSlide[ 0 ].selectedLayers ?? [] ),
+													],
 													latitude: lastSlide[0].latitude,
 													longitude: lastSlide[0].longitude,
 													zoom: lastSlide[0].zoom,
@@ -1068,6 +1182,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 											],
 										} );
 										setCurrentSlideIndex( attributes.slides.length );
+										setOpenSlideIndex( attributes.slides.length );
 										setKey( key + 1 );
 									} }
 								>
