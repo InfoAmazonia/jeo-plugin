@@ -35,7 +35,7 @@ Use this checklist when a dependency phase is ready for approval. The workflow f
 - Phase 4: verify related-post start and end date selection, persistence after save/reload and clearing of empty values.
 - Phase 5: verify map popups, featured image rendering, date formatting, Info panel content and any locally customized popup template. If the published map still shows the known null-geocode `buildPostsGeoJson` error or still fails to individualize multiple posts that share one point, record both as baseline issues instead of Eta regressions.
 - Phase 6: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map. If the major remains blocked because `react-leaflet` requires React 19 while the repository is still on React 18, record the phase as `blocked` and skip product review.
-- Phase 7: verify storymap editor loading, formatting toolbar behavior, selection retention, image upload and save/reopen flows.
+- Phase 7: verify storymap editor loading, formatting toolbar behavior, selection retention, image upload and save/reopen flows. If slide reorder still fails in the same pre-existing way, record it as a baseline issue instead of a wrapper regression.
 - Phase 8: no product review is required; read the Composer and PHPCS compatibility output and record `blocked` if the toolchain is not ready.
 
 ## Core functional checklist

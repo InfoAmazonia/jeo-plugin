@@ -180,7 +180,7 @@
       "id": "phase-7-ckeditor-react-evaluation",
       "phase": "Phase 7",
       "title": "CKEditor React major evaluation",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Evaluate the React wrapper major only if it remains compatible with the installed CKEditor core line.",
       "packageNames": [
         "@ckeditor/ckeditor5-react"
@@ -191,6 +191,11 @@
         "GitHub Actions Node frontend workflow",
         "GitHub Actions PHP Compatibility workflow",
         "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "@ckeditor/ckeditor5-react moved from 9.5.0 to 11.0.1 without requiring source changes in the storymap editor.",
+        "The published wrapper's peer requirements remain compatible with the installed ckeditor5 47.6.1 line and with React 18.3.1.",
+        "Manual review confirmed editor loading, formatting and save/reopen flows stayed functional. The existing slide reorder problem remains tracked as baseline only because it predates this phase."
       ],
       "manualReviewItems": [
         "Load the storymap editor and confirm the toolbar initializes.",
@@ -487,14 +492,68 @@
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md"
       ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-7-ckeditor-react-evaluation",
+      "status": "ready-for-approval",
+      "summary": "Upgraded @ckeditor/ckeditor5-react from 9.5.0 to 11.0.1. The wrapper stayed compatible with ckeditor5 47.6.1 and React 18.3.1 without requiring storymap editor source changes.",
+      "automatedChecks": [
+        {
+          "name": "npm view @ckeditor/ckeditor5-react version peerDependencies --json",
+          "status": "passed",
+          "details": "Confirmed that the current published wrapper line is 11.0.1 and that its peer requirements accept ckeditor5 >=46.0.0 plus React 18."
+        },
+        {
+          "name": "npm install @ckeditor/ckeditor5-react@^11.0.1",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to @ckeditor/ckeditor5-react 11.0.1 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after the CKEditor React wrapper major."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings and the known react-datepicker optional date-fns-tz warning from Phase 4."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the CKEditor React wrapper update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Load the storymap editor and confirm the toolbar initializes.",
+        "Verify text selection formatting still applies and the selection is retained.",
+        "Upload an image, save the storymap and reopen it."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ],
+      "manualReviewNotes": [
+        "The storymap editor, toolbar, formatting behavior and save/reopen flow remained functional after the wrapper major update.",
+        "The slide reorder problem still reproduces, but it predates this dependency track and remains tracked as a baseline issue rather than a Phase 7 regression."
+      ]
     }
   ],
   "npm": {
     "@ckeditor/ckeditor5-react": {
       "batchId": "phase-7-ckeditor-react-evaluation",
-      "executionStatus": "planned",
+      "executionStatus": "ready-for-approval",
       "executionNotes": [
-        "Evaluate compatibility against the installed ckeditor5 core before attempting the wrapper major."
+        "Upgraded to 11.0.1 after confirming compatibility with ckeditor5 47.6.1 and React 18.3.1.",
+        "No storymap editor source changes were required for the wrapper major itself."
       ]
     },
     "react-beautiful-dnd": {
