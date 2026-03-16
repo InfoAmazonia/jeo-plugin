@@ -1,0 +1,1874 @@
+{
+  "generatedAt": "2026-03-16T03:51:26.285Z",
+  "baseline": {
+    "wordpress": "6.6+",
+    "php": "8.0+",
+    "node": "20",
+    "sources": [
+      "README.md",
+      "src/README.txt",
+      ".github/workflows/node-frontend.yml",
+      ".github/workflows/php-compat.yml",
+      ".github/workflows/wordpress-smoke.yml"
+    ],
+    "notes": [
+      "Automated approval gates are the Node Frontend Checks, PHP Compatibility and WordPress Smoke Tests GitHub Actions workflows.",
+      "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor."
+    ],
+    "toolingCaveats": [
+      "Local Composer/PHP validation is available in this shell environment (Composer version 2.9.5 2026-01-29 11:40:53; PHP 8.5.4 (cli) (built: Mar 10 2026 23:15:23) (NTS)).",
+      "The npm and Packagist lookups require network access when the report is regenerated."
+    ],
+    "localValidation": {
+      "phpAvailable": true,
+      "phpVersion": "PHP 8.5.4 (cli) (built: Mar 10 2026 23:15:23) (NTS)",
+      "composerAvailable": true,
+      "composerVersion": "Composer version 2.9.5 2026-01-29 11:40:53"
+    }
+  },
+  "batches": [
+    {
+      "id": "phase-0-baseline-tracking",
+      "phase": "Phase 0",
+      "title": "Baseline and tracking scaffolding",
+      "status": "completed",
+      "scope": "Report generator, dependency reports and phased smoke-test guidance.",
+      "packageNames": [],
+      "automatedChecks": [
+        "node --check scripts/dependency-review.mjs",
+        "npm run deps:report"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "No dependency versions change in this phase."
+      ]
+    },
+    {
+      "id": "phase-1-frontend-gates",
+      "phase": "Phase 1",
+      "title": "Frontend gates for approval",
+      "status": "ready-for-approval",
+      "scope": "Create the Node workflow and treat PHP compatibility plus WordPress smoke checks as mandatory future gates.",
+      "packageNames": [],
+      "automatedChecks": [
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "No dependency versions or lockfiles change in this phase."
+      ],
+      "manualReviewItems": [
+        "Confirm the Node frontend, PHP Compatibility and WordPress Smoke Tests workflows trigger on push and pull_request events."
+      ]
+    },
+    {
+      "id": "phase-2-wp-scripts-major",
+      "phase": "Phase 2",
+      "title": "Build tooling major",
+      "status": "planned",
+      "scope": "Upgrade the WordPress build toolchain major and keep the custom webpack config working.",
+      "packageNames": [
+        "@wordpress/scripts"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "manualReviewItems": [
+        "No dedicated manual review unless asset or wp-admin regressions become visible."
+      ]
+    },
+    {
+      "id": "phase-3-js-test-minimum",
+      "phase": "Phase 3",
+      "title": "Minimum JS test layer",
+      "status": "planned",
+      "scope": "Add unit tests for the contracts that protect the remaining majors.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow"
+      ],
+      "manualReviewItems": []
+    },
+    {
+      "id": "phase-4-react-datepicker-major",
+      "phase": "Phase 4",
+      "title": "Date picker major",
+      "status": "planned",
+      "scope": "Upgrade the date picker used in related-post filters.",
+      "packageNames": [
+        "react-datepicker"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "manualReviewItems": [
+        "Select start and end dates in the related-posts sidebar.",
+        "Save the post, reload the editor and verify persisted values.",
+        "Clear dates and confirm empty values stay cleared after saving."
+      ]
+    },
+    {
+      "id": "phase-5-eta-major",
+      "phase": "Phase 5",
+      "title": "Template runtime major",
+      "status": "planned",
+      "scope": "Upgrade Eta without changing the popup template contract.",
+      "packageNames": [
+        "eta"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "manualReviewItems": [
+        "Open a map popup and verify the title, date and featured image rendering.",
+        "Open the map Info panel and verify template-driven content still renders.",
+        "Verify any locally customized popup template still compiles."
+      ]
+    },
+    {
+      "id": "phase-6-react-leaflet-major",
+      "phase": "Phase 6",
+      "title": "Leaflet sidebar major",
+      "status": "planned",
+      "scope": "Upgrade the post geocoding sidebar map and keep editing interactions intact.",
+      "packageNames": [
+        "react-leaflet"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "manualReviewItems": [
+        "Add a point and confirm it appears in the Leaflet map.",
+        "Edit an existing point and confirm map focus plus field values update.",
+        "Drag a marker, toggle magnetic markers, cancel, save and reopen the editor."
+      ]
+    },
+    {
+      "id": "phase-7-ckeditor-react-evaluation",
+      "phase": "Phase 7",
+      "title": "CKEditor React major evaluation",
+      "status": "planned",
+      "scope": "Evaluate the React wrapper major only if it remains compatible with the installed CKEditor core line.",
+      "packageNames": [
+        "@ckeditor/ckeditor5-react"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "manualReviewItems": [
+        "Load the storymap editor and confirm the toolbar initializes.",
+        "Verify text selection formatting still applies and the selection is retained.",
+        "Upload an image, save the storymap and reopen it."
+      ]
+    },
+    {
+      "id": "phase-8-phpcs-major-evaluation",
+      "phase": "Phase 8",
+      "title": "PHPCS major evaluation",
+      "status": "planned",
+      "scope": "Evaluate PHPCS 4 only if WPCS 3.3.0 and the local Composer/PHP toolchain support it.",
+      "packageNames": [
+        "squizlabs/php_codesniffer"
+      ],
+      "automatedChecks": [
+        "composer update --with-all-dependencies",
+        "vendor/bin/phpcs --standard=phpcs.xml.dist",
+        "php scripts/check-php-compat.php",
+        "bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": []
+    },
+    {
+      "id": "deferred-replacement-track",
+      "phase": "Deferred",
+      "title": "Replacement dependencies outside the current semver-major scope",
+      "status": "deferred",
+      "scope": "Track deprecated packages that require replacement work instead of an in-place semver major upgrade.",
+      "packageNames": [
+        "react-autosuggest",
+        "react-beautiful-dnd",
+        "react-bootstrap-daterangepicker",
+        "react-jsonschema-form"
+      ],
+      "automatedChecks": [],
+      "manualReviewItems": []
+    }
+  ],
+  "executionLog": [
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-0-baseline-tracking",
+      "status": "completed",
+      "summary": "Added phase planning, package-level execution tracking and the phased approval checklist without changing dependency versions.",
+      "automatedChecks": [
+        {
+          "name": "node --check scripts/dependency-review.mjs",
+          "status": "passed"
+        },
+        {
+          "name": "npm run deps:report",
+          "status": "passed",
+          "details": "Regenerated the JSON and Markdown reports against current npm and Packagist metadata."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-1-frontend-gates",
+      "status": "ready-for-approval",
+      "summary": "Added a Node frontend GitHub Actions workflow and promoted the PHP compatibility plus WordPress smoke workflows to the mandatory gate set for future dependency phases.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "Installed the existing lockfile successfully. The run repeated the already tracked react-autosize-textarea peer warnings and the known deprecation notices for react-beautiful-dnd and react-jsonschema-form."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings only."
+        }
+      ],
+      "manualReviewItems": [
+        "Confirm the Node frontend, PHP Compatibility and WordPress Smoke Tests workflows trigger on push and pull_request events."
+      ],
+      "documentUpdates": [
+        ".github/workflows/node-frontend.yml",
+        "README.md",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    }
+  ],
+  "smokeTests": [
+    {
+      "id": "build",
+      "title": "Build plugin assets",
+      "expected": "npm run build completes without new warnings or bundle errors."
+    },
+    {
+      "id": "map-editor",
+      "title": "Create and edit a map",
+      "expected": "The Maps editor loads, map settings persist, and the preview updates without console errors."
+    },
+    {
+      "id": "storymap-editor",
+      "title": "Edit a storymap with CKEditor",
+      "expected": "The storymap editor loads, inline rich text editing works, and image upload still attaches media."
+    },
+    {
+      "id": "reorder",
+      "title": "Reorder layers and storymap slides",
+      "expected": "Drag-and-drop or movable ordering works in all UIs that currently rely on reordering."
+    },
+    {
+      "id": "layer-form",
+      "title": "Edit layer and legend forms",
+      "expected": "Schema-driven forms, legend settings and interaction settings still render and save."
+    },
+    {
+      "id": "discovery-filter",
+      "title": "Filter stories by date in Discovery",
+      "expected": "The date range picker applies and clears filters correctly."
+    },
+    {
+      "id": "autosuggest",
+      "title": "Use geocoding autosuggest",
+      "expected": "Address suggestions load, selection writes values back, and no stale request errors appear."
+    },
+    {
+      "id": "map-runtimes",
+      "title": "Render maps in both Mapbox and MapLibre modes",
+      "expected": "Frontend and editor previews render with both runtimes, including layers, legends and interactions."
+    }
+  ],
+  "summary": {
+    "directNpm": 25,
+    "directNpmDev": 8,
+    "directComposer": 2,
+    "transitiveComposer": 3
+  },
+  "rows": {
+    "npm": [
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@ckeditor/ckeditor5-react",
+        "declaredRange": "^9.5.0",
+        "resolvedVersion": "9.5.0",
+        "scope": "Storymap editor",
+        "impact": "CKEditor runtime inside storymap editing flows",
+        "latestCompatible": "9.5.0",
+        "latestVersion": "11.0.1",
+        "lastPublished": "2025-12-18",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 11.0.1",
+        "decision": "Hold for the major batch",
+        "batchId": "phase-7-ckeditor-react-evaluation",
+        "batchLabel": "Phase 7",
+        "executionStatus": "planned",
+        "executionStatusLabel": "Planned",
+        "executionNotes": [
+          "Evaluate compatibility against the installed ckeditor5 core before attempting the wrapper major."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@ckeditor/ckeditor5-react"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/ckeditor/ckeditor5-react"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/storymap-editor.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@nazka/map-gl-js-spiderfy",
+        "declaredRange": "^1.2.10",
+        "resolvedVersion": "1.2.10",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "1.2.10",
+        "latestVersion": "1.2.10",
+        "lastPublished": "2025-09-03",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@nazka/map-gl-js-spiderfy"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/nazka/map-gl-js-spiderfy"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/jeo-map/class-jeo-map.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@wordpress/edit-post",
+        "declaredRange": "^8.41.0",
+        "resolvedVersion": "8.41.0",
+        "scope": "Gutenberg / editor",
+        "impact": "Node 20 build pipeline, Gutenberg editor runtime and React peer alignment",
+        "latestCompatible": "8.41.0",
+        "latestVersion": "8.41.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/edit-post"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": [
+          "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@wordpress/editor",
+        "declaredRange": "^14.41.0",
+        "resolvedVersion": "14.41.0",
+        "scope": "Gutenberg / editor",
+        "impact": "Node 20 build pipeline, Gutenberg editor runtime and React peer alignment",
+        "latestCompatible": "14.41.0",
+        "latestVersion": "14.41.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/editor"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/index.js",
+          "src/js/src/maps-sidebar/map-embed-url.js",
+          "src/js/src/maps-sidebar/maps-sidebar.js"
+        ],
+        "replacement": null,
+        "notes": [
+          "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@wordpress/plugins",
+        "declaredRange": "^7.41.0",
+        "resolvedVersion": "7.41.0",
+        "scope": "Gutenberg / editor",
+        "impact": "Node 20 build pipeline, Gutenberg editor runtime and React peer alignment",
+        "latestCompatible": "7.41.0",
+        "latestVersion": "7.41.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/plugins"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/index.js",
+          "src/js/src/maps-sidebar/index.js",
+          "src/js/src/layers-sidebar/index.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "@wordpress/scripts",
+        "declaredRange": "^30.27.0",
+        "resolvedVersion": "30.27.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "30.27.0",
+        "latestVersion": "31.6.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 31.6.0",
+        "decision": "Hold for the major batch",
+        "batchId": "phase-2-wp-scripts-major",
+        "batchLabel": "Phase 2",
+        "executionStatus": "planned",
+        "executionStatusLabel": "Planned",
+        "executionNotes": [
+          "Lead package for the tooling major batch."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/scripts"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "webpack.config.js"
+        ],
+        "replacement": null,
+        "notes": [
+          "Treat this package as the lead dependency for the build batch because it constrains Babel, webpack, PostCSS and much of the Gutenberg toolchain."
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "ajv",
+        "declaredRange": "^8.18.0",
+        "resolvedVersion": "8.18.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "8.18.0",
+        "latestVersion": "8.18.0",
+        "lastPublished": "2026-02-14",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/ajv"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/ajv-validator/ajv"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "bootstrap-daterangepicker",
+        "declaredRange": "^3.1.0",
+        "resolvedVersion": "3.1.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "3.1.0",
+        "latestVersion": "3.1.0",
+        "lastPublished": "2020-05-24",
+        "deprecatedMessage": null,
+        "maintenance": "Needs manual review",
+        "minorPath": "Allow minor-only evaluation if the wrapper replacement is deferred, but verify jQuery/moment assumptions in the browser.",
+        "majorPath": "Do not take a major jump unless the React wrapper strategy is already decided.",
+        "decision": "Review manually before taking the next batch",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [
+          "Keep this line documented while the paired React wrapper remains in the deferred replacement track."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/bootstrap-daterangepicker"
+          },
+          {
+            "label": "GitHub",
+            "url": "https://github.com/dangrossman/daterangepicker"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/discovery/blocks/stories.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "ckeditor5",
+        "declaredRange": "^47.6.1",
+        "resolvedVersion": "47.6.1",
+        "scope": "Storymap editor",
+        "impact": "CKEditor runtime inside storymap editing flows",
+        "latestCompatible": "47.6.1",
+        "latestVersion": "47.6.1",
+        "lastPublished": "2026-03-11",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/ckeditor5"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/ckeditor/ckeditor5"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/storymap-editor.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "classnames",
+        "declaredRange": "^2.5.1",
+        "resolvedVersion": "2.5.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "2.5.1",
+        "latestVersion": "2.5.1",
+        "lastPublished": "2023-12-29",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/classnames"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/JedWatson/classnames"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-selector/interval-selector.js",
+          "src/js/src/jeo-storymap/storymap-display.js",
+          "src/js/src/posts-sidebar/geo-posts.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "css-loader",
+        "declaredRange": "^7.1.4",
+        "resolvedVersion": "7.1.4",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "7.1.4",
+        "latestVersion": "7.1.4",
+        "lastPublished": "2026-02-16",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/css-loader"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack/css-loader"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "eta",
+        "declaredRange": "^3.5.0",
+        "resolvedVersion": "3.5.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "3.5.0",
+        "latestVersion": "4.5.1",
+        "lastPublished": "2026-02-05",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 4.5.1",
+        "decision": "Hold for the major batch",
+        "batchId": "phase-5-eta-major",
+        "batchLabel": "Phase 5",
+        "executionStatus": "planned",
+        "executionStatusLabel": "Planned",
+        "executionNotes": [
+          "Upgrade only after the template compilation contract is covered by the minimum JS test layer."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/eta"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/bgub/eta"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/jeo-map/class-jeo-map.js",
+          "src/templates/post-popup.ejs"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "leaflet",
+        "declaredRange": "^1.9.4",
+        "resolvedVersion": "1.9.4",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "1.9.4",
+        "latestVersion": "1.9.4",
+        "lastPublished": "2023-05-18",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/leaflet"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/Leaflet/Leaflet"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-posts.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "lodash-es",
+        "declaredRange": "^4.17.23",
+        "resolvedVersion": "4.17.23",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "4.17.23",
+        "latestVersion": "4.17.23",
+        "lastPublished": "2026-01-21",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/lodash-es"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/lodash/lodash"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-posts.js",
+          "src/js/src/layers-sidebar/layers-sidebar.js",
+          "src/js/src/map-blocks/jeo-autosuggest.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "map-gl-utils",
+        "declaredRange": "^0.50.4",
+        "resolvedVersion": "0.50.4",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "0.50.4",
+        "latestVersion": "0.50.4",
+        "lastPublished": "2025-01-21",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/map-gl-utils"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/stevage/map-gl-utils"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/lib/mapboxgl/mapboxgl-loader.js",
+          "src/js/src/lib/maplibregl/maplibregl-loader.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "mapbox-gl",
+        "declaredRange": "^3.20.0",
+        "resolvedVersion": "3.20.0",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "3.20.0",
+        "latestVersion": "3.20.0",
+        "lastPublished": "2026-03-12",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/mapbox-gl"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/mapbox/mapbox-gl-js"
+          }
+        ],
+        "usage": [
+          "src/README.txt",
+          "package.json",
+          "src/js/src/lib/mapboxgl/mapboxgl-loader.js",
+          "src/js/src/lib/mapboxgl/mapboxgl-react.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "maplibre-gl",
+        "declaredRange": "^5.20.1",
+        "resolvedVersion": "5.20.1",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "5.20.1",
+        "latestVersion": "5.20.1",
+        "lastPublished": "2026-03-13",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/maplibre-gl"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/maplibre/maplibre-gl-js"
+          }
+        ],
+        "usage": [
+          "src/README.txt",
+          "package.json",
+          "src/js/src/lib/maplibregl/maplibregl-react.js",
+          "src/js/src/lib/maplibregl/maplibregl-loader.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "maplibregl-mapbox-request-transformer",
+        "declaredRange": "^0.0.3",
+        "resolvedVersion": "0.0.3",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "0.0.3",
+        "latestVersion": "0.0.3",
+        "lastPublished": "2025-08-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/maplibregl-mapbox-request-transformer"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/rowanwins/maplibregl-mapbox-request-transformer"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/lib/maplibregl/maplibregl-loader.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "postcss",
+        "declaredRange": "^8.5.8",
+        "resolvedVersion": "8.5.8",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "8.5.8",
+        "latestVersion": "8.5.8",
+        "lastPublished": "2026-03-02",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/postcss"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/postcss/postcss"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-autosuggest",
+        "declaredRange": "^10.1.0",
+        "resolvedVersion": "10.1.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "10.1.0",
+        "latestVersion": "10.1.0",
+        "lastPublished": "2021-01-08",
+        "deprecatedMessage": null,
+        "maintenance": "Low activity / looking for maintainers",
+        "minorPath": "Do not spend time on the stale line unless a security fix forces it.",
+        "majorPath": "Replace with a maintained autosuggest/combobox wrapper before any React or Gutenberg major jump.",
+        "decision": "Replace instead of upgrading in place",
+        "batchId": "deferred-replacement-track",
+        "batchLabel": "Deferred",
+        "executionStatus": "deferred-replacement-track",
+        "executionStatusLabel": "Deferred replacement track",
+        "executionNotes": [
+          "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-autosuggest"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-auto-complete.css",
+          "src/js/src/posts-sidebar/geo-auto-complete.js",
+          "src/js/src/map-blocks/map-editor.css"
+        ],
+        "replacement": "internal combobox/autocomplete wrapper",
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-beautiful-dnd",
+        "declaredRange": "^13.1.1",
+        "resolvedVersion": "13.1.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "13.1.1",
+        "latestVersion": "13.1.1",
+        "lastPublished": "2022-08-30",
+        "deprecatedMessage": "react-beautiful-dnd is now deprecated. Context and options: https://github.com/atlassian/react-beautiful-dnd/issues/2672",
+        "maintenance": "Deprecated and archived",
+        "minorPath": "No maintained minor line. Replace instead of updating within 13.x.",
+        "majorPath": "No maintained major line. Migrate to @hello-pangea/dnd or consolidate on the existing react-movable wrapper.",
+        "decision": "Replace instead of upgrading in place",
+        "batchId": "deferred-replacement-track",
+        "batchLabel": "Deferred",
+        "executionStatus": "deferred-replacement-track",
+        "executionStatusLabel": "Deferred replacement track",
+        "executionNotes": [
+          "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-beautiful-dnd"
+          },
+          {
+            "label": "GitHub",
+            "url": "https://github.com/atlassian/react-beautiful-dnd"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/layers-settings.js",
+          "src/js/src/map-blocks/layer-settings.js",
+          "src/js/src/map-blocks/storymap-editor.js"
+        ],
+        "replacement": "@hello-pangea/dnd",
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-bootstrap-daterangepicker",
+        "declaredRange": "^8.0.0",
+        "resolvedVersion": "8.0.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "8.0.0",
+        "latestVersion": "8.0.0",
+        "lastPublished": "2022-08-24",
+        "deprecatedMessage": null,
+        "maintenance": "Deprecated",
+        "minorPath": "No supported minor path on the deprecated wrapper.",
+        "majorPath": "Replace with an internal date-range wrapper, preferably based on the existing react-datepicker dependency.",
+        "decision": "Replace instead of upgrading in place",
+        "batchId": "deferred-replacement-track",
+        "batchLabel": "Deferred",
+        "executionStatus": "deferred-replacement-track",
+        "executionStatusLabel": "Deferred replacement track",
+        "executionNotes": [
+          "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-bootstrap-daterangepicker"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/discovery/blocks/stories.js"
+        ],
+        "replacement": "react-datepicker-based internal wrapper",
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-datepicker",
+        "declaredRange": "^7.6.0",
+        "resolvedVersion": "7.6.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "7.6.0",
+        "latestVersion": "9.1.0",
+        "lastPublished": "2025-12-19",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 9.1.0",
+        "decision": "Hold for the major batch",
+        "batchId": "phase-4-react-datepicker-major",
+        "batchLabel": "Phase 4",
+        "executionStatus": "planned",
+        "executionStatusLabel": "Planned",
+        "executionNotes": [
+          "Keep the related-posts date persistence flow under manual review after the major."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-datepicker"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/Hacker0x01/react-datepicker"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-selector/interval-selector.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-jsonschema-form",
+        "declaredRange": "2.0.0-alpha.1",
+        "resolvedVersion": "2.0.0-alpha.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "2.0.0-alpha.1",
+        "latestVersion": "1.8.1",
+        "lastPublished": "2019-12-16",
+        "deprecatedMessage": "react-jsonschema-form has been moved to @rjsf/core",
+        "maintenance": "Deprecated",
+        "minorPath": "No maintained minor path on the deprecated package line.",
+        "majorPath": "Replace with @rjsf/core while preserving the internal form wrapper contract.",
+        "decision": "Replace instead of upgrading in place",
+        "batchId": "deferred-replacement-track",
+        "batchLabel": "Deferred",
+        "executionStatus": "deferred-replacement-track",
+        "executionStatusLabel": "Deferred replacement track",
+        "executionNotes": [
+          "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-jsonschema-form"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/layers-sidebar/layer-settings.js",
+          "src/js/src/layers-sidebar/attribution-settings.js"
+        ],
+        "replacement": "@rjsf/core",
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-leaflet",
+        "declaredRange": "^4.2.1",
+        "resolvedVersion": "4.2.1",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "4.2.1",
+        "latestVersion": "5.0.0",
+        "lastPublished": "2024-12-14",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 5.0.0",
+        "decision": "Hold for the major batch",
+        "batchId": "phase-6-react-leaflet-major",
+        "batchLabel": "Phase 6",
+        "executionStatus": "planned",
+        "executionStatusLabel": "Planned",
+        "executionNotes": [
+          "Keep geocoding sidebar editing flows under manual review after the major."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-leaflet"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PaulLeCam/react-leaflet"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-posts.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-map-gl",
+        "declaredRange": "^8.1.0",
+        "resolvedVersion": "8.1.0",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "8.1.0",
+        "latestVersion": "8.1.0",
+        "lastPublished": "2025-10-03",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-map-gl"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/visgl/react-map-gl"
+          }
+        ],
+        "usage": [
+          "src/README.txt",
+          "package.json",
+          "src/js/src/lib/mapboxgl/mapboxgl-react.js",
+          "src/js/src/lib/maplibregl/maplibregl-react.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-movable",
+        "declaredRange": "^3.4.0",
+        "resolvedVersion": "3.4.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "3.4.1",
+        "latestVersion": "3.4.1",
+        "lastPublished": "2025-02-26",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-movable"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/tajo/react-movable"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/discovery/blocks/map-layers.js",
+          "src/js/src/map-blocks/storymap-editor.js",
+          "src/js/src/map-blocks/layers-settings.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "sass",
+        "declaredRange": "^1.98.0",
+        "resolvedVersion": "1.98.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "1.98.0",
+        "latestVersion": "1.98.0",
+        "lastPublished": "2026-03-10",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/sass"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/sass/dart-sass"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "sass-loader",
+        "declaredRange": "^16.0.7",
+        "resolvedVersion": "16.0.7",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "16.0.7",
+        "latestVersion": "16.0.7",
+        "lastPublished": "2026-02-05",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/sass-loader"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack/sass-loader"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "scrollama",
+        "declaredRange": "^3.2.0",
+        "resolvedVersion": "3.2.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "3.2.0",
+        "latestVersion": "3.2.0",
+        "lastPublished": "2022-06-17",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/scrollama"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/russellgoldenberg/scrollama"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/jeo-storymap/storymap-display.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "style-loader",
+        "declaredRange": "^4.0.0",
+        "resolvedVersion": "4.0.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "4.0.0",
+        "latestVersion": "4.0.0",
+        "lastPublished": "2024-04-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/style-loader"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack-contrib/style-loader"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "use-debounce",
+        "declaredRange": "^10.1.0",
+        "resolvedVersion": "10.1.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "10.1.0",
+        "latestVersion": "10.1.0",
+        "lastPublished": "2026-01-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/use-debounce"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/xnimorz/use-debounce"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/layer-editor-preview.js",
+          "src/js/src/layers-sidebar/layer-settings.js",
+          "src/js/src/layers-sidebar/layers-sidebar.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "webpack",
+        "declaredRange": "^5.105.4",
+        "resolvedVersion": "5.105.4",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
+        "latestCompatible": "5.105.4",
+        "latestVersion": "5.105.4",
+        "lastPublished": "2026-03-03",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/webpack"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack/webpack"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "webpack.config.js",
+          "src/js/src/lib/mapgl-loader.js",
+          "src/js/src/lib/mapgl-react.js"
+        ],
+        "replacement": null,
+        "notes": []
+      }
+    ],
+    "composer": [
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerTransitiveDev",
+        "packageName": "dealerdirect/phpcodesniffer-composer-installer",
+        "declaredRange": "transitive",
+        "resolvedVersion": "1.2.0",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "1.2.0",
+        "latestVersion": "1.2.0",
+        "lastPublished": "2025-11-11",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/dealerdirect/phpcodesniffer-composer-installer"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/composer-installer"
+          }
+        ],
+        "usage": [
+          "composer.lock",
+          "composer.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerTransitiveDev",
+        "packageName": "phpcsstandards/phpcsextra",
+        "declaredRange": "transitive",
+        "resolvedVersion": "1.5.0",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "1.5.0",
+        "latestVersion": "1.5.0",
+        "lastPublished": "2025-11-12",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/phpcsstandards/phpcsextra"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/PHPCSExtra"
+          }
+        ],
+        "usage": [
+          "composer.lock"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerTransitiveDev",
+        "packageName": "phpcsstandards/phpcsutils",
+        "declaredRange": "transitive",
+        "resolvedVersion": "1.2.2",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "1.2.2",
+        "latestVersion": "1.2.2",
+        "lastPublished": "2025-12-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/phpcsstandards/phpcsutils"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/PHPCSUtils"
+          }
+        ],
+        "usage": [
+          "composer.lock"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerDevDependency",
+        "packageName": "squizlabs/php_codesniffer",
+        "declaredRange": "^3.13.5",
+        "resolvedVersion": "3.13.5",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "3.13.5",
+        "latestVersion": "4.0.1",
+        "lastPublished": "2025-11-10",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 4.0.1",
+        "decision": "Hold for the major batch",
+        "batchId": "phase-8-phpcs-major-evaluation",
+        "batchLabel": "Phase 8",
+        "executionStatus": "planned",
+        "executionStatusLabel": "Planned",
+        "executionNotes": [
+          "Evaluation-only first: do not force PHPCS 4 if WPCS 3.3.0 or the available Composer/PHP toolchain blocks it."
+        ],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/squizlabs/php_codesniffer"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer"
+          }
+        ],
+        "usage": [
+          "composer.lock",
+          "composer.json"
+        ],
+        "replacement": null,
+        "notes": [
+          "Direct dev dependency. Evaluate majors only after confirming WPCS compatibility."
+        ]
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerDevDependency",
+        "packageName": "wp-coding-standards/wpcs",
+        "declaredRange": "^3.3.0",
+        "resolvedVersion": "3.3.0",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "3.3.0",
+        "latestVersion": "3.3.0",
+        "lastPublished": "2025-11-25",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/wp-coding-standards/wpcs"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/WordPress-Coding-Standards"
+          }
+        ],
+        "usage": [
+          "composer.lock",
+          "composer.json"
+        ],
+        "replacement": null,
+        "notes": [
+          "Lead Composer dependency because it constrains PHPCS, PHPCSExtra and PHPCSUtils."
+        ]
+      }
+    ],
+    "watchlist": [
+      {
+        "ecosystem": "npm",
+        "dependencyType": "transitiveWatchlist",
+        "packageName": "react-autosize-textarea",
+        "declaredRange": "transitive",
+        "resolvedVersion": "7.1.0",
+        "override": {
+          "parents": [
+            "@wordpress/edit-post",
+            "@wordpress/editor"
+          ],
+          "maintenanceStatus": "peer-mismatch",
+          "decision": "watch",
+          "minorPath": "Re-evaluate after each Gutenberg batch; current 7.1.0 peer range is older than React 18.3.1.",
+          "majorPath": "Do not attempt a React/Gutenberg major upgrade until the peer warning disappears upstream or is replaced downstream.",
+          "evidence": [
+            {
+              "label": "npm",
+              "url": "https://www.npmjs.com/package/react-autosize-textarea"
+            }
+          ],
+          "batchId": "watch-parent-batch",
+          "executionStatus": "watch-via-parent-batch",
+          "executionNotes": [
+            "Re-evaluate after each Gutenberg-related or React-adjacent batch."
+          ],
+          "notes": [
+            "Observed locally through npm ls react react-dom."
+          ]
+        },
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "7.1.0",
+        "latestVersion": "7.1.0",
+        "lastPublished": "2020-07-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained upstream, but current tree has a peer warning",
+        "minorPath": "Re-evaluate after each Gutenberg batch; current 7.1.0 peer range is older than React 18.3.1.",
+        "majorPath": "Do not attempt a React/Gutenberg major upgrade until the peer warning disappears upstream or is replaced downstream.",
+        "decision": "Watch via the parent package batch",
+        "batchId": "watch-parent-batch",
+        "batchLabel": "Watch",
+        "executionStatus": "watch-via-parent-batch",
+        "executionStatusLabel": "Watch via parent batch",
+        "executionNotes": [
+          "Re-evaluate after each Gutenberg-related or React-adjacent batch."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-autosize-textarea"
+          }
+        ],
+        "usage": [],
+        "replacement": null,
+        "notes": [
+          "Observed locally through npm ls react react-dom."
+        ]
+      }
+    ]
+  }
+}

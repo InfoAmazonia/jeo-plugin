@@ -1,0 +1,39 @@
+name: Node Frontend Checks
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  node-frontend:
+    name: Node 20 frontend checks
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Show Node and npm versions
+        run: |
+          node --version
+          npm --version
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Detect optional scripts
+        id: scripts
+        run: |
+          node -e "const fs = require('node:fs'); const pkg = require('./package.json'); const hasTestUnit = Boolean(pkg.scripts && pkg.scripts['test:unit']); fs.appendFileSync(process.env.GITHUB_OUTPUT, 'has_test_unit=' + hasTestUnit + '\n');"
+
+      - name: Build assets
+        run: npm run build
+
+      - name: Run unit tests
+        if: steps.scripts.outputs.has_test_unit == 'true'
+        run: npm run test:unit
