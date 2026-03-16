@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-16T12:09:51.226Z",
+  "generatedAt": "2026-03-16T12:25:00.803Z",
   "baseline": {
     "wordpress": "6.6+",
     "php": "8.0+",
@@ -191,7 +191,7 @@
       "id": "phase-7-ckeditor-react-evaluation",
       "phase": "Phase 7",
       "title": "CKEditor React major evaluation",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Evaluate the React wrapper major only if it remains compatible with the installed CKEditor core line.",
       "packageNames": [
         "@ckeditor/ckeditor5-react"
@@ -202,6 +202,11 @@
         "GitHub Actions Node frontend workflow",
         "GitHub Actions PHP Compatibility workflow",
         "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "@ckeditor/ckeditor5-react moved from 9.5.0 to 11.0.1 without requiring source changes in the storymap editor.",
+        "The published wrapper's peer requirements remain compatible with the installed ckeditor5 47.6.1 line and with React 18.3.1.",
+        "Manual review confirmed editor loading, formatting and save/reopen flows stayed functional. The existing slide reorder problem remains tracked as baseline only because it predates this phase."
       ],
       "manualReviewItems": [
         "Load the storymap editor and confirm the toolbar initializes.",
@@ -498,6 +503,59 @@
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md"
       ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-7-ckeditor-react-evaluation",
+      "status": "ready-for-approval",
+      "summary": "Upgraded @ckeditor/ckeditor5-react from 9.5.0 to 11.0.1. The wrapper stayed compatible with ckeditor5 47.6.1 and React 18.3.1 without requiring storymap editor source changes.",
+      "automatedChecks": [
+        {
+          "name": "npm view @ckeditor/ckeditor5-react version peerDependencies --json",
+          "status": "passed",
+          "details": "Confirmed that the current published wrapper line is 11.0.1 and that its peer requirements accept ckeditor5 >=46.0.0 plus React 18."
+        },
+        {
+          "name": "npm install @ckeditor/ckeditor5-react@^11.0.1",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to @ckeditor/ckeditor5-react 11.0.1 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after the CKEditor React wrapper major."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings and the known react-datepicker optional date-fns-tz warning from Phase 4."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the CKEditor React wrapper update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Load the storymap editor and confirm the toolbar initializes.",
+        "Verify text selection formatting still applies and the selection is retained.",
+        "Upload an image, save the storymap and reopen it."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ],
+      "manualReviewNotes": [
+        "The storymap editor, toolbar, formatting behavior and save/reopen flow remained functional after the wrapper major update.",
+        "The slide reorder problem still reproduces, but it predates this dependency track and remains tracked as a baseline issue rather than a Phase 7 regression."
+      ]
     }
   ],
   "smokeTests": [
@@ -554,24 +612,25 @@
         "ecosystem": "npm",
         "dependencyType": "dependency",
         "packageName": "@ckeditor/ckeditor5-react",
-        "declaredRange": "^9.5.0",
-        "resolvedVersion": "9.5.0",
+        "declaredRange": "^11.0.1",
+        "resolvedVersion": "11.0.1",
         "scope": "Storymap editor",
         "impact": "CKEditor runtime inside storymap editing flows",
-        "latestCompatible": "9.5.0",
+        "latestCompatible": "11.0.1",
         "latestVersion": "11.0.1",
         "lastPublished": "2025-12-18",
         "deprecatedMessage": null,
         "maintenance": "Maintained",
         "minorPath": "Already on the latest compatible line",
-        "majorPath": "Review upgrade path to 11.0.1",
-        "decision": "Hold for the major batch",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
         "batchId": "phase-7-ckeditor-react-evaluation",
         "batchLabel": "Phase 7",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
+        "executionStatus": "ready-for-approval",
+        "executionStatusLabel": "Ready for approval",
         "executionNotes": [
-          "Evaluate compatibility against the installed ckeditor5 core before attempting the wrapper major."
+          "Upgraded to 11.0.1 after confirming compatibility with ckeditor5 47.6.1 and React 18.3.1.",
+          "No storymap editor source changes were required for the wrapper major itself."
         ],
         "evidence": [
           {
@@ -742,8 +801,8 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/maps-sidebar/index.js",
           "src/js/src/posts-sidebar/index.js",
+          "src/js/src/maps-sidebar/index.js",
           "src/js/src/layers-sidebar/index.js"
         ],
         "replacement": null,
@@ -784,8 +843,8 @@
           }
         ],
         "usage": [
-          "webpack.config.js",
-          "package.json"
+          "package.json",
+          "webpack.config.js"
         ],
         "replacement": null,
         "notes": [
@@ -1099,7 +1158,7 @@
         "usage": [
           "package.json",
           "src/js/src/posts-sidebar/geo-posts.js",
-          "src/js/src/map-blocks/jeo-autosuggest.js",
+          "src/js/src/layers-sidebar/layers-sidebar.js",
           "src/js/src/map-blocks/map-preview-layer.js"
         ],
         "replacement": null,
@@ -1176,8 +1235,8 @@
           }
         ],
         "usage": [
-          "src/README.txt",
           "package.json",
+          "src/README.txt",
           "src/js/src/lib/mapboxgl/mapboxgl-loader.js",
           "src/js/src/lib/mapboxgl/mapboxgl-react.js"
         ],
@@ -1216,8 +1275,8 @@
           }
         ],
         "usage": [
-          "src/README.txt",
           "package.json",
+          "src/README.txt",
           "src/js/src/lib/maplibregl/maplibregl-react.js",
           "src/js/src/lib/maplibregl/maplibregl-loader.js"
         ],
@@ -1372,9 +1431,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/map-blocks/layers-settings.js",
+          "src/js/src/map-blocks/storymap-editor.js",
           "src/js/src/map-blocks/layer-settings.js",
-          "src/js/src/map-blocks/storymap-editor.js"
+          "src/js/src/map-blocks/layers-settings.js"
         ],
         "replacement": "@hello-pangea/dnd",
         "notes": []
@@ -1568,8 +1627,8 @@
         "usage": [
           "src/README.txt",
           "package.json",
-          "src/js/src/lib/mapboxgl/mapboxgl-react.js",
-          "src/js/src/lib/maplibregl/maplibregl-react.js"
+          "src/js/src/lib/maplibregl/maplibregl-react.js",
+          "src/js/src/lib/mapboxgl/mapboxgl-react.js"
         ],
         "replacement": null,
         "notes": []
@@ -1796,9 +1855,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/map-blocks/layer-editor-preview.js",
           "src/js/src/layers-sidebar/layer-settings.js",
-          "src/js/src/layers-sidebar/layers-sidebar.js"
+          "src/js/src/layers-sidebar/layers-sidebar.js",
+          "src/js/src/map-blocks/layer-editor-preview.js"
         ],
         "replacement": null,
         "notes": []
@@ -1835,8 +1894,8 @@
           }
         ],
         "usage": [
-          "package.json",
           "webpack.config.js",
+          "package.json",
           "src/js/src/lib/mapgl-loader.js",
           "src/js/src/lib/mapgl-react.js"
         ],
@@ -1995,8 +2054,8 @@
           }
         ],
         "usage": [
-          "composer.lock",
-          "composer.json"
+          "composer.json",
+          "composer.lock"
         ],
         "replacement": null,
         "notes": [
@@ -2036,8 +2095,8 @@
           }
         ],
         "usage": [
-          "composer.json",
-          "composer.lock"
+          "composer.lock",
+          "composer.json"
         ],
         "replacement": null,
         "notes": [
