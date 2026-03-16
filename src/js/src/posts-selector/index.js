@@ -3,6 +3,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '../shared/wp-form-controls';
 
+import { updateRelatedPostsDate } from './date-range';
 import { IntervalSelector } from './interval-selector';
 import { MetaSelector } from './meta-selector';
 import { TokensSelector } from './tokens-selector';
@@ -67,16 +68,14 @@ const PostsSelector = ( {
 						startLabel={ __( 'Start date', 'jeo' ) }
 						endLabel={ __( 'End date', 'jeo' ) }
 						onStartChange={ ( date ) => {
-							setRelatedPosts( {
-								...relatedPosts,
-								after: date ? date.toISOString() : undefined,
-							} );
+							setRelatedPosts(
+								updateRelatedPostsDate( relatedPosts, 'after', date )
+							);
 						} }
 						onEndChange={ ( date ) => {
-							setRelatedPosts( {
-								...relatedPosts,
-								before: date ? date.toISOString() : undefined,
-							} );
+							setRelatedPosts(
+								updateRelatedPostsDate( relatedPosts, 'before', date )
+							);
 						} }
 					/>
 
