@@ -19,12 +19,15 @@ Compatibility snapshot validated on March 13, 2026:
 
 Automation:
 
+- Frontend asset checks run in `.github/workflows/node-frontend.yml`.
 - Static PHP checks run in `.github/workflows/php-compat.yml`.
 - WordPress runtime smoke tests run in `.github/workflows/wordpress-smoke.yml`.
 
 Local commands:
 
 ```bash
+npm ci
+npm run build
 php scripts/check-php-compat.php
 WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php \
 WP_DB_HOST=localhost \
