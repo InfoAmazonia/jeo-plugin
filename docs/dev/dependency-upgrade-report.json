@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-16T03:51:26.285Z",
+  "generatedAt": "2026-03-16T04:03:38.163Z",
   "baseline": {
     "wordpress": "6.6+",
     "php": "8.0+",
@@ -47,7 +47,7 @@
       "id": "phase-1-frontend-gates",
       "phase": "Phase 1",
       "title": "Frontend gates for approval",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Create the Node workflow and treat PHP compatibility plus WordPress smoke checks as mandatory future gates.",
       "packageNames": [],
       "automatedChecks": [
@@ -66,7 +66,7 @@
       "id": "phase-2-wp-scripts-major",
       "phase": "Phase 2",
       "title": "Build tooling major",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Upgrade the WordPress build toolchain major and keep the custom webpack config working.",
       "packageNames": [
         "@wordpress/scripts"
@@ -76,6 +76,10 @@
         "GitHub Actions Node frontend workflow",
         "GitHub Actions PHP Compatibility workflow",
         "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "The webpack.config.js override continued to work without code changes on @wordpress/scripts 31.x.",
+        "The local WordPress smoke attempt is environment-dependent and should still be confirmed by the GitHub workflow before merge."
       ],
       "manualReviewItems": [
         "No dedicated manual review unless asset or wp-admin regressions become visible."
@@ -243,7 +247,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-1-frontend-gates",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Added a Node frontend GitHub Actions workflow and promoted the PHP compatibility plus WordPress smoke workflows to the mandatory gate set for future dependency phases.",
       "automatedChecks": [
         {
@@ -266,6 +270,43 @@
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md",
         "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-2-wp-scripts-major",
+      "status": "ready-for-approval",
+      "summary": "Upgraded @wordpress/scripts from 30.27.0 to 31.6.0. The existing webpack.config.js override remained compatible and no script changes were required.",
+      "automatedChecks": [
+        {
+          "name": "npm install @wordpress/scripts@^31.6.0 --save-dev",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to @wordpress/scripts 31.6.0 while repeating only the already known react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the same bundle-size warnings as before the upgrade."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review found no blocking issues after the tooling upgrade."
+        },
+        {
+          "name": "WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "failed",
+          "details": "The local runtime smoke attempt reached wp-cli and WordPress download, but failed against the local MariaDB login for wordpress@localhost. The GitHub WordPress Smoke Tests workflow remains the authoritative gate for this check."
+        }
+      ],
+      "manualReviewItems": [
+        "No dedicated manual review unless asset or wp-admin regressions become visible."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
       ]
     }
   ],
@@ -469,8 +510,8 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/posts-sidebar/index.js",
           "src/js/src/maps-sidebar/map-embed-url.js",
+          "src/js/src/posts-sidebar/index.js",
           "src/js/src/maps-sidebar/maps-sidebar.js"
         ],
         "replacement": null,
@@ -511,8 +552,8 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/posts-sidebar/index.js",
           "src/js/src/maps-sidebar/index.js",
+          "src/js/src/posts-sidebar/index.js",
           "src/js/src/layers-sidebar/index.js"
         ],
         "replacement": null,
@@ -522,24 +563,25 @@
         "ecosystem": "npm",
         "dependencyType": "devDependency",
         "packageName": "@wordpress/scripts",
-        "declaredRange": "^30.27.0",
-        "resolvedVersion": "30.27.0",
+        "declaredRange": "^31.6.0",
+        "resolvedVersion": "31.6.0",
         "scope": "Build tooling",
         "impact": "Asset compilation, webpack config and CI reproducibility on Node 20",
-        "latestCompatible": "30.27.0",
+        "latestCompatible": "31.6.0",
         "latestVersion": "31.6.0",
         "lastPublished": "2026-03-04",
         "deprecatedMessage": null,
         "maintenance": "Maintained",
         "minorPath": "Already on the latest compatible line",
-        "majorPath": "Review upgrade path to 31.6.0",
-        "decision": "Hold for the major batch",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
         "batchId": "phase-2-wp-scripts-major",
         "batchLabel": "Phase 2",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
+        "executionStatus": "ready-for-approval",
+        "executionStatusLabel": "Ready for approval",
         "executionNotes": [
-          "Lead package for the tooling major batch."
+          "Lead package for the tooling major batch.",
+          "Upgraded to 31.x without requiring webpack.config.js changes in this repository."
         ],
         "evidence": [
           {
@@ -708,9 +750,9 @@
         ],
         "usage": [
           "package.json",
+          "src/js/src/posts-sidebar/geo-posts.js",
           "src/js/src/posts-selector/interval-selector.js",
-          "src/js/src/jeo-storymap/storymap-display.js",
-          "src/js/src/posts-sidebar/geo-posts.js"
+          "src/js/src/jeo-storymap/storymap-display.js"
         ],
         "replacement": null,
         "notes": []
@@ -866,7 +908,7 @@
           "package.json",
           "src/js/src/posts-sidebar/geo-posts.js",
           "src/js/src/layers-sidebar/layers-sidebar.js",
-          "src/js/src/map-blocks/jeo-autosuggest.js"
+          "src/js/src/map-blocks/map-preview-layer.js"
         ],
         "replacement": null,
         "notes": []
@@ -1138,9 +1180,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/map-blocks/layers-settings.js",
+          "src/js/src/map-blocks/storymap-editor.js",
           "src/js/src/map-blocks/layer-settings.js",
-          "src/js/src/map-blocks/storymap-editor.js"
+          "src/js/src/map-blocks/layers-settings.js"
         ],
         "replacement": "@hello-pangea/dnd",
         "notes": []
@@ -1371,9 +1413,9 @@
         ],
         "usage": [
           "package.json",
+          "src/js/src/map-blocks/layers-settings.js",
           "src/js/src/discovery/blocks/map-layers.js",
-          "src/js/src/map-blocks/storymap-editor.js",
-          "src/js/src/map-blocks/layers-settings.js"
+          "src/js/src/map-blocks/storymap-editor.js"
         ],
         "replacement": null,
         "notes": []
@@ -1560,9 +1602,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/map-blocks/layer-editor-preview.js",
           "src/js/src/layers-sidebar/layer-settings.js",
-          "src/js/src/layers-sidebar/layers-sidebar.js"
+          "src/js/src/layers-sidebar/layers-sidebar.js",
+          "src/js/src/map-blocks/layer-editor-preview.js"
         ],
         "replacement": null,
         "notes": []

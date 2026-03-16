@@ -15,6 +15,7 @@ Use this checklist when a dependency phase is ready for approval. The workflow f
 - Test both editor and frontend behavior whenever a phase touches runtime packages.
 - Treat a blocked evaluation as a valid outcome for the evaluation-only phases instead of forcing an unsafe upgrade.
 - Treat `.github/workflows/node-frontend.yml`, `.github/workflows/php-compat.yml` and `.github/workflows/wordpress-smoke.yml` as the mandatory CI gates from Phase 1 onward.
+- If the local WordPress smoke script cannot complete because the machine is missing the expected database or wp-cli runtime setup, record the failure details in the phase report and use the GitHub workflow as the authoritative runtime gate.
 
 ## Automated checks by phase
 
