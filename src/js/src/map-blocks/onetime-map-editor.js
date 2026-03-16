@@ -50,14 +50,16 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
 		if ( map ) {
-			const boundries = map.getBounds();
+			const bounds = map.getBounds();
+			const northEast = bounds.getNorthEast();
+			const southWest = bounds.getSouthWest();
 			setAttributes(
 				{	...attributes,
 					'pan_limits': {
-						east: boundries._ne.lat,
-						north: boundries._ne.lng,
-						south: boundries._sw.lng,
-						west: boundries._sw.lat,
+						east: northEast.lng,
+						north: northEast.lat,
+						south: southWest.lat,
+						west: southWest.lng,
 					}
 				} )
 		}

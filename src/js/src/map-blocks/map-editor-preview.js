@@ -39,12 +39,14 @@ export default function MapEditorPreview() {
 			const { current: map } = mapRef;
 			if ( map ) {
 				const bounds = map.getBounds();
+				const northEast = bounds.getNorthEast();
+				const southWest = bounds.getSouthWest();
 				setPostMeta( {
 					pan_limits: {
-						east: bounds._ne.lat,
-						north: bounds._ne.lng,
-						south: bounds._sw.lng,
-						west: bounds._sw.lat,
+						east: northEast.lng,
+						north: northEast.lat,
+						south: southWest.lat,
+						west: southWest.lng,
 					},
 				} );
 			}
