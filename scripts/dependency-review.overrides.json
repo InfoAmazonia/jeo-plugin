@@ -103,7 +103,7 @@
       "id": "phase-4-react-datepicker-major",
       "phase": "Phase 4",
       "title": "Date picker major",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Upgrade the date picker used in related-post filters.",
       "packageNames": [
         "react-datepicker"
@@ -129,7 +129,7 @@
       "id": "phase-5-eta-major",
       "phase": "Phase 5",
       "title": "Template runtime major",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Upgrade Eta without changing the popup template contract.",
       "packageNames": [
         "eta"
@@ -140,6 +140,11 @@
         "GitHub Actions Node frontend workflow",
         "GitHub Actions PHP Compatibility workflow",
         "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "eta moved from 3.5.0 to 4.5.1 and now uses the browser-safe eta/core entry inside the frontend helper.",
+        "A local jest.config.js now tells the unit runner to transform eta/dist/core.js so the existing template-compiler tests stay representative.",
+        "Manual review confirmed the Info panel and popup template rendering stayed functional. Two published-map issues remain tracked as baseline only: a null-related-post geocode crash in buildPostsGeoJson and the existing inability to individualize multiple posts that share the same map point."
       ],
       "manualReviewItems": [
         "Open a map popup and verify the title, date and featured image rendering.",
@@ -356,7 +361,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-4-react-datepicker-major",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Upgraded react-datepicker from 7.6.0 to 9.1.0. The existing date persistence helpers continued to satisfy the component contract without source changes.",
       "automatedChecks": [
         {
@@ -395,6 +400,57 @@
         "package-lock.json",
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-5-eta-major",
+      "status": "ready-for-approval",
+      "summary": "Upgraded eta from 3.5.0 to 4.5.1. The frontend helper now imports the browser-safe eta/core entry and the Jest config transforms that subpath for the focused template tests.",
+      "automatedChecks": [
+        {
+          "name": "npm install eta@^4.4.1",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to eta 4.5.1 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after pointing the helper at eta/core and teaching Jest to transform eta/dist/core.js."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after switching the frontend helper to eta/core. The existing bundle-size warnings remain, as does the known react-datepicker optional date-fns-tz warning from Phase 4."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the Eta major update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Open a map popup and verify the title, date and featured image rendering.",
+        "Open the map Info panel and verify template-driven content still renders.",
+        "Verify any locally customized popup template still compiles."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "jest.config.js",
+        "src/js/src/jeo-map/template-compiler.js",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ],
+      "manualReviewNotes": [
+        "The published-map review confirmed that the Info panel and post popup templates still render correctly after the Eta major update.",
+        "A pre-existing published-map runtime error remains outside this phase: Uncaught (in promise) TypeError: can't access property \"_geocode_lon\", e is null, raised during buildPostsGeoJson/getRelatedPosts when a related-post entry is null.",
+        "A second pre-existing frontend limitation also remains outside this phase: when multiple posts share the same location, the marker popup still does not expose the individual posts for separate clicks."
       ]
     }
   ],
@@ -504,7 +560,7 @@
     },
     "eta": {
       "batchId": "phase-5-eta-major",
-      "executionStatus": "planned",
+      "executionStatus": "ready-for-approval",
       "searchTerms": [
         "from 'eta'",
         "new Eta"
@@ -515,7 +571,8 @@
         "src/templates/post-popup.ejs"
       ],
       "executionNotes": [
-        "Upgrade only after the template compilation contract is covered by the minimum JS test layer."
+        "Upgraded to 4.5.1 after the template compilation contract was covered by the minimum JS test layer.",
+        "The frontend helper now imports eta/core and Jest transforms eta/dist/core.js to keep the browser build and unit runner aligned."
       ]
     },
     "@wordpress/scripts": {
