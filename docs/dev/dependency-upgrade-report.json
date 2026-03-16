@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-16T04:46:40.232Z",
+  "generatedAt": "2026-03-16T04:54:32.900Z",
   "baseline": {
     "wordpress": "6.6+",
     "php": "8.0+",
@@ -90,7 +90,7 @@
       "id": "phase-3-js-test-minimum",
       "phase": "Phase 3",
       "title": "Minimum JS test layer",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Add unit tests for the contracts that protect the remaining majors.",
       "packageNames": [],
       "automatedChecks": [
@@ -114,7 +114,7 @@
       "id": "phase-4-react-datepicker-major",
       "phase": "Phase 4",
       "title": "Date picker major",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Upgrade the date picker used in related-post filters.",
       "packageNames": [
         "react-datepicker"
@@ -125,6 +125,10 @@
         "GitHub Actions Node frontend workflow",
         "GitHub Actions PHP Compatibility workflow",
         "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "react-datepicker moved from 7.6.0 to 9.1.0 without requiring source changes in the related-posts selector.",
+        "The automated suite stayed green, but npm run build now reports one non-blocking webpack warning from react-datepicker's optional date-fns-tz require path."
       ],
       "manualReviewItems": [
         "Select start and end dates in the related-posts sidebar.",
@@ -323,7 +327,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-3-js-test-minimum",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Added the minimum JS test layer with focused coverage for date-selector propagation, sidebar attribution normalization and Eta template compilation, and made the Node workflow run npm run test:unit as a required step.",
       "automatedChecks": [
         {
@@ -356,6 +360,50 @@
         "docs/dev/php-compatibility.md",
         "package.json",
         "scripts/wordpress-smoke.sh",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-4-react-datepicker-major",
+      "status": "ready-for-approval",
+      "summary": "Upgraded react-datepicker from 7.6.0 to 9.1.0. The existing date persistence helpers continued to satisfy the component contract without source changes.",
+      "automatedChecks": [
+        {
+          "name": "npm install react-datepicker@^9.1.0",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to react-datepicker 9.1.0 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after the date picker major."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings plus one new webpack critical-dependency warning from react-datepicker's optional date-fns-tz require path."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend dependency update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Select start and end dates in the related-posts sidebar.",
+        "Save the post, reload the editor and verify persisted values.",
+        "Clear dates and confirm empty values stay cleared after saving."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md"
       ]
@@ -801,9 +849,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/jeo-storymap/storymap-display.js",
           "src/js/src/posts-sidebar/geo-posts.js",
-          "src/js/src/posts-selector/interval-selector.js"
+          "src/js/src/posts-selector/interval-selector.js",
+          "src/js/src/map-blocks/onetime-map-display.js"
         ],
         "replacement": null,
         "notes": []
@@ -959,8 +1007,8 @@
         "usage": [
           "package.json",
           "src/js/src/posts-sidebar/geo-posts.js",
-          "src/js/src/map-blocks/map-preview-layer.js",
-          "src/js/src/map-blocks/jeo-autosuggest.js"
+          "src/js/src/layers-sidebar/layers-sidebar.js",
+          "src/js/src/map-blocks/map-preview-layer.js"
         ],
         "replacement": null,
         "notes": []
@@ -1036,8 +1084,8 @@
           }
         ],
         "usage": [
-          "src/README.txt",
           "package.json",
+          "src/README.txt",
           "src/js/src/lib/mapboxgl/mapboxgl-loader.js",
           "src/js/src/lib/mapboxgl/mapboxgl-react.js"
         ],
@@ -1279,24 +1327,25 @@
         "ecosystem": "npm",
         "dependencyType": "dependency",
         "packageName": "react-datepicker",
-        "declaredRange": "^7.6.0",
-        "resolvedVersion": "7.6.0",
+        "declaredRange": "^9.1.0",
+        "resolvedVersion": "9.1.0",
         "scope": "UI / helper",
         "impact": "Browser runtime and React-driven editor UI behavior",
-        "latestCompatible": "7.6.0",
+        "latestCompatible": "9.1.0",
         "latestVersion": "9.1.0",
         "lastPublished": "2025-12-19",
         "deprecatedMessage": null,
         "maintenance": "Maintained",
         "minorPath": "Already on the latest compatible line",
-        "majorPath": "Review upgrade path to 9.1.0",
-        "decision": "Hold for the major batch",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
         "batchId": "phase-4-react-datepicker-major",
         "batchLabel": "Phase 4",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
+        "executionStatus": "ready-for-approval",
+        "executionStatusLabel": "Ready for approval",
         "executionNotes": [
-          "Keep the related-posts date persistence flow under manual review after the major."
+          "Upgraded to 9.1.0; keep the related-posts date persistence flow under manual review after the major.",
+          "The build now emits one non-blocking webpack warning from react-datepicker's optional date-fns-tz require path."
         ],
         "evidence": [
           {
@@ -1426,8 +1475,8 @@
         "usage": [
           "src/README.txt",
           "package.json",
-          "src/js/src/lib/mapboxgl/mapboxgl-react.js",
-          "src/js/src/lib/maplibregl/maplibregl-react.js"
+          "src/js/src/lib/maplibregl/maplibregl-react.js",
+          "src/js/src/lib/mapboxgl/mapboxgl-react.js"
         ],
         "replacement": null,
         "notes": []
@@ -1465,9 +1514,9 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/discovery/blocks/map-layers.js",
           "src/js/src/map-blocks/layers-settings.js",
-          "src/js/src/map-blocks/storymap-editor.js"
+          "src/js/src/map-blocks/storymap-editor.js",
+          "src/js/src/discovery/blocks/map-layers.js"
         ],
         "replacement": null,
         "notes": []

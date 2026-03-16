@@ -79,7 +79,7 @@
       "id": "phase-3-js-test-minimum",
       "phase": "Phase 3",
       "title": "Minimum JS test layer",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Add unit tests for the contracts that protect the remaining majors.",
       "packageNames": [],
       "automatedChecks": [
@@ -103,7 +103,7 @@
       "id": "phase-4-react-datepicker-major",
       "phase": "Phase 4",
       "title": "Date picker major",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Upgrade the date picker used in related-post filters.",
       "packageNames": [
         "react-datepicker"
@@ -114,6 +114,10 @@
         "GitHub Actions Node frontend workflow",
         "GitHub Actions PHP Compatibility workflow",
         "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "react-datepicker moved from 7.6.0 to 9.1.0 without requiring source changes in the related-posts selector.",
+        "The automated suite stayed green, but npm run build now reports one non-blocking webpack warning from react-datepicker's optional date-fns-tz require path."
       ],
       "manualReviewItems": [
         "Select start and end dates in the related-posts sidebar.",
@@ -312,7 +316,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-3-js-test-minimum",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Added the minimum JS test layer with focused coverage for date-selector propagation, sidebar attribution normalization and Eta template compilation, and made the Node workflow run npm run test:unit as a required step.",
       "automatedChecks": [
         {
@@ -345,6 +349,50 @@
         "docs/dev/php-compatibility.md",
         "package.json",
         "scripts/wordpress-smoke.sh",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-4-react-datepicker-major",
+      "status": "ready-for-approval",
+      "summary": "Upgraded react-datepicker from 7.6.0 to 9.1.0. The existing date persistence helpers continued to satisfy the component contract without source changes.",
+      "automatedChecks": [
+        {
+          "name": "npm install react-datepicker@^9.1.0",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to react-datepicker 9.1.0 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after the date picker major."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings plus one new webpack critical-dependency warning from react-datepicker's optional date-fns-tz require path."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend dependency update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Select start and end dates in the related-posts sidebar.",
+        "Save the post, reload the editor and verify persisted values.",
+        "Clear dates and confirm empty values stay cleared after saving."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md"
       ]
@@ -493,9 +541,10 @@
     },
     "react-datepicker": {
       "batchId": "phase-4-react-datepicker-major",
-      "executionStatus": "planned",
+      "executionStatus": "ready-for-approval",
       "executionNotes": [
-        "Keep the related-posts date persistence flow under manual review after the major."
+        "Upgraded to 9.1.0; keep the related-posts date persistence flow under manual review after the major.",
+        "The build now emits one non-blocking webpack warning from react-datepicker's optional date-fns-tz require path."
       ]
     },
     "react-leaflet": {
