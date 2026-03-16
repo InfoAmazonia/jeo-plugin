@@ -14,7 +14,8 @@
       "Automated approval gates are the Node Frontend Checks, PHP Compatibility and WordPress Smoke Tests GitHub Actions workflows.",
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
       "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor.",
-      "Post-track follow-up: plan a dedicated Gutenberg/React alignment phase before attempting direct React/ReactDOM majors or frontend packages that now require React 19."
+      "Post-track follow-up: plan a dedicated Gutenberg/React alignment phase before attempting direct React/ReactDOM majors or frontend packages that now require React 19.",
+      "Post-track follow-up: plan a dedicated PHP lint stack batch covering WPCS, PHPCS, PHPCSExtra and PHPCSUtils before attempting another PHPCS major."
     ]
   },
   "batches": [
@@ -180,7 +181,7 @@
       "id": "phase-7-ckeditor-react-evaluation",
       "phase": "Phase 7",
       "title": "CKEditor React major evaluation",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Evaluate the React wrapper major only if it remains compatible with the installed CKEditor core line.",
       "packageNames": [
         "@ckeditor/ckeditor5-react"
@@ -207,16 +208,21 @@
       "id": "phase-8-phpcs-major-evaluation",
       "phase": "Phase 8",
       "title": "PHPCS major evaluation",
-      "status": "planned",
+      "status": "blocked",
       "scope": "Evaluate PHPCS 4 only if WPCS 3.3.0 and the local Composer/PHP toolchain support it.",
       "packageNames": [
         "squizlabs/php_codesniffer"
       ],
       "automatedChecks": [
-        "composer update --with-all-dependencies",
+        "composer validate --no-check-publish",
+        "composer show squizlabs/php_codesniffer --locked",
+        "composer show wp-coding-standards/wpcs --locked",
         "vendor/bin/phpcs --standard=phpcs.xml.dist",
-        "php scripts/check-php-compat.php",
-        "bash scripts/wordpress-smoke.sh"
+        "php scripts/check-php-compat.php"
+      ],
+      "approvalNotes": [
+        "Packagist confirms that squizlabs/php_codesniffer 4.0.1 exists, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
+        "The current PHPCS 3.x toolchain also reports a large existing baseline of coding-standard violations, so the repository is not yet ready to treat a PHPCS 4 jump as a clean upgrade."
       ],
       "manualReviewItems": []
     },
@@ -496,7 +502,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-7-ckeditor-react-evaluation",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Upgraded @ckeditor/ckeditor5-react from 9.5.0 to 11.0.1. The wrapper stayed compatible with ckeditor5 47.6.1 and React 18.3.1 without requiring storymap editor source changes.",
       "automatedChecks": [
         {
@@ -545,12 +551,50 @@
         "The storymap editor, toolbar, formatting behavior and save/reopen flow remained functional after the wrapper major update.",
         "The slide reorder problem still reproduces, but it predates this dependency track and remains tracked as a baseline issue rather than a Phase 7 regression."
       ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-8-phpcs-major-evaluation",
+      "status": "blocked",
+      "summary": "Evaluated the PHPCS major and found the upgrade blocked by WPCS compatibility and by the repository's current PHPCS baseline.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The current composer.json is structurally valid."
+        },
+        {
+          "name": "composer show squizlabs/php_codesniffer --locked",
+          "status": "passed",
+          "details": "Confirmed that the installed PHPCS line is 3.13.5."
+        },
+        {
+          "name": "composer show wp-coding-standards/wpcs --locked",
+          "status": "passed",
+          "details": "Confirmed that the installed WPCS line is 3.3.0 and that it requires squizlabs/php_codesniffer ^3.13.4."
+        },
+        {
+          "name": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+          "status": "failed",
+          "details": "The current PHPCS 3.x run reports a large existing baseline of coding-standard violations across the repository, including scripts and template files, so the lint gate is not yet green even before attempting PHPCS 4."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green during the PHPCS evaluation."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
     }
   ],
   "npm": {
     "@ckeditor/ckeditor5-react": {
       "batchId": "phase-7-ckeditor-react-evaluation",
-      "executionStatus": "ready-for-approval",
+      "executionStatus": "completed",
       "executionNotes": [
         "Upgraded to 11.0.1 after confirming compatibility with ckeditor5 47.6.1 and React 18.3.1.",
         "No storymap editor source changes were required for the wrapper major itself."
@@ -710,9 +754,10 @@
   "composer": {
     "squizlabs/php_codesniffer": {
       "batchId": "phase-8-phpcs-major-evaluation",
-      "executionStatus": "planned",
+      "executionStatus": "blocked",
       "executionNotes": [
-        "Evaluation-only first: do not force PHPCS 4 if WPCS 3.3.0 or the available Composer/PHP toolchain blocks it."
+        "Packagist publishes PHPCS 4.0.1, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
+        "The current PHPCS 3.x run is not green yet, so the repository is not ready to treat a PHPCS 4 jump as a clean upgrade."
       ],
       "notes": [
         "Direct dev dependency. Evaluate majors only after confirming WPCS compatibility."
