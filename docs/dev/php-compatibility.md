@@ -42,3 +42,11 @@ WP_DB_PASSWORD='' \
 WP_VERSION=7.0-beta4 \
 bash scripts/wordpress-smoke.sh
 ```
+
+The smoke script now honors `WP_CLI_PHP` directly, which avoids Homebrew `wp` defaulting to the active `php` binary in `PATH`.
+
+## Follow-up after the dependency track
+
+- Re-run the repository-owned PHP checks on `PHP 8.5` after the dependency upgrade track is complete.
+- Separate warnings emitted by this repository from deprecations emitted by external tooling such as `wp-cli` and its bundled libraries.
+- Only turn `PHP 8.5` into a supported or monitored runtime gate after the local and CI logs are readable without third-party deprecation noise.

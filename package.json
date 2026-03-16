@@ -9,6 +9,7 @@
 	"scripts": {
 		"start": "wp-scripts start",
 		"build": "wp-scripts build",
+		"test:unit": "wp-scripts test-unit-js",
 		"deps:report": "node scripts/dependency-review.mjs --write"
 	},
 	"repository": {
