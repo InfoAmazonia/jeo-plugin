@@ -7,6 +7,7 @@ import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
+import { buildRelatedPostsGeoJson } from '../../shared/story-geojson';
 
 const POSTS_PER_PAGE = 10;
 const MEMOIZED_CATEGORIES = {};
@@ -259,33 +260,7 @@ class Stories extends Component {
 	}
 
 	buildPostsGeoJson( stories ) {
-		const finalFeatures = {
-			type: 'FeatureCollection',
-			features: [],
-		};
-
-		stories.map( ( story ) => {
-			const storyRelatedPoints = story.meta._related_point ?? [];
-			const storyPoints = storyRelatedPoints.map( ( point ) => {
-				return [ point._geocode_lon, point._geocode_lat ];
-			} );
-
-			finalFeatures.features.push(
-				...storyPoints.map( ( point ) => {
-					return {
-						id: story.id,
-						type: 'Feature',
-						properties: story,
-						geometry: {
-							type: 'Point',
-							coordinates: point,
-						},
-					};
-				} )
-			);
-		} );
-
-		return finalFeatures;
+		return buildRelatedPostsGeoJson( stories );
 	}
 
 	fetchStories( params = {} ) {

@@ -1027,7 +1027,7 @@ ${ report.baseline.notes.map( ( note ) => `- ${ note }` ).join( '\n' ) }
 
 ${ report.baseline.toolingCaveats.map( ( note ) => `- ${ note }` ).join( '\n' ) }
 
-## Phase plan
+## Execution plan
 
 ${ renderBatchPlan( report.batches ) }
 

@@ -1,42 +1,45 @@
 # Dependency Upgrade Smoke Tests
 
-Use this checklist when a dependency phase is ready for approval. The workflow for every phase is: update the report, run the automated checks required by the phase, collect the applicable manual review items, and only then ask for approval before creating a commit.
+Use this checklist for the current stabilization and compatibility track. The major-upgrade phase track remains documented in `docs/dev/dependency-upgrade-report.*`, but approvals now follow the batch sequence below.
 
 ## Approval package
 
-- Summarize the dependencies and lockfiles touched by the phase.
-- Update `docs/dev/dependency-upgrade-report.json`, `docs/dev/dependency-upgrade-report.md` and this checklist as needed.
+- Summarize the dependencies, lockfiles and source files touched by the batch.
+- Update `docs/dev/dependency-upgrade-report.json`, `docs/dev/dependency-upgrade-report.md` and this checklist.
 - Record automated check results in the report `executionLog`.
-- List only the manual review items that apply to the current phase.
+- List only the manual review items that apply to the current batch.
+- Ask for approval before creating a commit.
 
 ## Preconditions
 
 - Use a WordPress instance that matches the current baseline: WordPress 6.6+, PHP 8.0+ and Node 20 for local builds.
-- Test both editor and frontend behavior whenever a phase touches runtime packages.
-- Treat a blocked evaluation as a valid outcome for the evaluation-only phases instead of forcing an unsafe upgrade.
-- Treat `.github/workflows/node-frontend.yml`, `.github/workflows/php-compat.yml` and `.github/workflows/wordpress-smoke.yml` as the mandatory CI gates from Phase 1 onward.
-- If the local WordPress smoke script cannot complete because the machine is missing the expected database or wp-cli runtime setup, record the failure details in the phase report and use the GitHub workflow as the authoritative runtime gate.
+- Test both editor and frontend behavior whenever a batch touches runtime code.
+- Treat `.github/workflows/node-frontend.yml`, `.github/workflows/php-compat.yml` and `.github/workflows/wordpress-smoke.yml` as the mandatory CI gates.
+- When the local WordPress smoke runs from a clean worktree, make sure the ignored `src/js/build` assets have been generated first, or record the resulting asset-include warnings explicitly in the batch report.
+- If the local WordPress smoke script cannot complete because the machine is missing the expected database or wp-cli runtime setup, record the failure details in the batch report and use the GitHub workflow as the authoritative runtime gate.
+- Treat a blocked evaluation as a valid batch outcome only after recording the blocker, the evidence and the next step in the report.
 
-## Automated checks by phase
+## Automated checks by batch
 
-- Phase 0: run `node --check scripts/dependency-review.mjs` and `npm run deps:report`.
-- Phase 1: add and validate `.github/workflows/node-frontend.yml`, then confirm the PHP Compatibility and WordPress Smoke Tests workflows remain the mandatory companion gates.
-- Phase 2: run `npm run build` and require the Node frontend, PHP Compatibility and WordPress Smoke Tests workflows to stay green.
-- Phase 3: add `npm run test:unit`; from this phase onward run it together with `npm run build` and the mandatory workflows.
-- Phases 4-7: run `npm run build`, `npm run test:unit`, the Node frontend workflow, the PHP Compatibility workflow and the WordPress Smoke Tests workflow.
-- Phase 8: run `composer update --with-all-dependencies`, `vendor/bin/phpcs --standard=phpcs.xml.dist`, `php scripts/check-php-compat.php` and `bash scripts/wordpress-smoke.sh`.
+- Batch 0: run `composer validate --no-check-publish`, `php scripts/check-php-compat.php`, `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`, `node --check scripts/dependency-review.mjs` and `node scripts/dependency-review.mjs --write`.
+- Batch 1: run `npm ci`, `npm run build`, `npm run test:unit`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
+- Batch 2: run `npm ci`, `npm run build`, `npm run test:unit`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
+- Batch 3: run `npm ci`, `npm run build`, `npm run test:unit`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
+- Batch 4: run `npm ci`, `npm run build`, `npm run test:unit`, `npm ls react-autosize-textarea react react-dom`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
+- Batch 5: run `npm ci`, `npm run build`, `npm run test:unit`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
+- Batch 6: run `composer validate --no-check-publish`, `php scripts/check-php-compat.php` with PHP `8.0` through `8.5`, the local WordPress smoke on PHP `8.4`, and the local WordPress smoke on PHP `8.5` only after repository-owned deprecations are gone.
+- Batch 7: run `composer validate --no-check-publish`, `php scripts/check-php-compat.php`, `vendor/bin/phpcs --standard=phpcs.xml.dist`, and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh` if runtime-touching PHP files changed.
 
-## Manual review by phase
+## Manual review by batch
 
-- Phase 0: no manual product review is required.
-- Phase 1: confirm the Node frontend, PHP Compatibility and WordPress Smoke Tests workflows trigger on `push` and `pull_request` as intended.
-- Phase 2: no dedicated manual review unless asset or wp-admin regressions become visible.
-- Phase 3: confirm the new tests cover date selection, sidebar form normalization and Eta template compilation.
-- Phase 4: verify related-post start and end date selection, persistence after save/reload and clearing of empty values.
-- Phase 5: verify map popups, featured image rendering, date formatting, Info panel content and any locally customized popup template. If the published map still shows the known null-geocode `buildPostsGeoJson` error or still fails to individualize multiple posts that share one point, record both as baseline issues instead of Eta regressions.
-- Phase 6: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map. If the major remains blocked because `react-leaflet` requires React 19 while the repository is still on React 18, record the phase as `blocked` and skip product review.
-- Phase 7: verify storymap editor loading, formatting toolbar behavior, selection retention, image upload and save/reopen flows. If slide reorder still fails in the same pre-existing way, record it as a baseline issue instead of a wrapper regression.
-- Phase 8: no product review is required; read the Composer and PHPCS compatibility output and record `blocked` if WPCS still constrains PHPCS to 3.x or if the current PHPCS baseline is not yet green.
+- Batch 0: no product review is required.
+- Batch 1: verify published-map popups, same-point post individualization, the absence of the null-geocode crash, and storymap slide plus nested layer reorder, including save and reopen after reordering.
+- Batch 2: verify geocoding autosuggest, post/map autosuggest usage, Discovery date filtering, and layer or attribution forms backed by schema data.
+- Batch 3: verify map-layer ordering, storymap slide ordering and any remaining nested drag or reorder flow that still used `react-beautiful-dnd`.
+- Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the Gutenberg refresh.
+- Batch 5: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map.
+- Batch 6: verify the same product smoke already covered by the runtime batches, but execute it while watching specifically for repository-owned PHP 8.5 warnings or deprecations.
+- Batch 7: no product review is required unless the PHPCS cleanup changes runtime PHP logic; otherwise review the lint delta and escaping or nonce-sensitive paths in code review.
 
 ## Core functional checklist
 
@@ -44,25 +47,28 @@ Use this checklist when a dependency phase is ready for approval. The workflow f
    - Expected result: the build finishes successfully and no new webpack or peer-dependency warnings are introduced.
 2. Create and edit a map
    - Expected result: the Maps editor loads, map settings persist and the preview updates without console errors.
-3. Edit a storymap with CKEditor
-   - Expected result: storymap rich text editing works, images still upload and saved content reopens correctly.
-4. Reorder layers and storymap slides
-   - Expected result: every reorder UI continues to work, with no dropped state or duplicated items.
-5. Edit layer and legend forms
+3. View published maps with related posts
+   - Expected result: popups render, multiple posts at one point can be individually reached and null related points do not crash the map.
+4. Edit a storymap with CKEditor
+   - Expected result: storymap rich text editing works, images upload and saved content reopens correctly.
+5. Reorder layers and storymap slides
+   - Expected result: every reorder UI works, with no dropped state, duplicated items or stale order.
+6. Edit layer and legend forms
    - Expected result: schema-driven forms, legend controls and interaction settings render, validate and save correctly.
-6. Filter Discovery stories by date
+7. Filter Discovery stories by date
    - Expected result: applying and clearing the date range updates the result set as expected.
-7. Use geocoding autosuggest
+8. Use geocoding autosuggest
    - Expected result: suggestions load, selecting a result updates the field and no stale request errors appear.
-8. Render maps in Mapbox mode
+9. Render maps in Mapbox mode
    - Expected result: frontend maps and editor previews render with layers, legends and interactions intact.
-9. Render maps in MapLibre mode
+10. Render maps in MapLibre mode
    - Expected result: frontend maps and editor previews render with layers, legends and interactions intact.
 
 ## Notes by batch type
 
-- Build tooling batch: prioritize asset compilation, CI parity and bundle output.
-- Gutenberg batch: prioritize editor loading, save flows and React peer warnings.
-- Map/rendering batch: prioritize both runtime modes, previews and layer interactions.
-- UI/helper batch: prioritize forms, autosuggest and discovery filters.
+- Baseline-fix batch: prioritize reproducing the known bug first, then landing a focused fix plus a regression test.
+- Replacement batch: preserve existing saved data contracts and validate that the removed package disappears from `npm ci` warnings.
+- Gutenberg or React batch: prioritize editor loading, save flows and peer-warning cleanup before attempting dependent runtime majors.
+- Map or rendering batch: prioritize both runtime modes, previews, popups and layer interactions.
+- PHP 8.5 batch: distinguish repository-owned deprecations from external `wp-cli` or toolchain noise.
 - PHP lint stack batch: evaluate WPCS, PHPCS, PHPCSExtra and PHPCSUtils together instead of treating PHPCS as an isolated major.

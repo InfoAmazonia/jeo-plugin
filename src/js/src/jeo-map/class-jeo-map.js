@@ -1,9 +1,10 @@
 import Spiderfy from '@nazka/map-gl-js-spiderfy';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
-import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
+import { createMap, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
+import { buildRelatedPostsGeoJson } from '../shared/story-geojson';
 import { EMPTY_STYLE } from '../shared/styles';
 import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
@@ -16,6 +17,18 @@ const decodeHtmlEntity = function ( str ) {
 		return String.fromCharCode( dec );
 	} );
 };
+
+const chevronLeftSmallIcon = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<path d="m13.1 16-3.4-4 3.4-4 1.1 1-2.6 3 2.6 3-1.1 1z" />
+	</svg>
+`;
+
+const chevronRightSmallIcon = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<path d="M10.8622 8.04053L14.2805 12.0286L10.8622 16.0167L9.72327 15.0405L12.3049 12.0286L9.72327 9.01672L10.8622 8.04053Z" />
+	</svg>
+`;
 
 function compileTemplate ( template, config = {} ) {
 	return compileEtaTemplate( template, config );
@@ -84,6 +97,9 @@ export default class JeoMap {
             			'icon-image': 'news-marker',
 						'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
         			},
+					spiderLeavesPaint: {
+						'icon-opacity': 1,
+					},
 					onLeafClick: (feature, e) => {
 						this.showPostPopup(feature, e.lngLat);
 					},
@@ -651,6 +667,7 @@ export default class JeoMap {
 
 					const buildRelatedPosts = (map) => {
 						const sourceData = this.buildPostsGeoJson(cumulativePosts);
+						this.relatedPostsGeoJson = sourceData;
 
 						map.addSource( 'storiesSource', {
 							type: 'geojson',
@@ -665,6 +682,23 @@ export default class JeoMap {
 							loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
 							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url ),
 						]).then( () => {
+							map.addLayer( {
+								id: 'unclustered-points-hitarea',
+								type: 'symbol',
+								source: 'storiesSource',
+								filter: [ '!', [ 'has', 'point_count' ] ],
+								layout: {
+									'icon-image': 'news-marker',
+									'icon-size': parseFloat(
+										jeoMapVars.images['/js/src/icons/news-marker'].icon_size
+									) * 1.6,
+									'icon-allow-overlap': true,
+								},
+								paint: {
+									'icon-opacity': 0.001,
+								},
+							} );
+
 							// Single markers layer
 							map.addLayer( {
 								id: 'unclustered-points',
@@ -682,12 +716,26 @@ export default class JeoMap {
 								},
 							} );
 
-							map.on('click', 'unclustered-points', (e) => {
-								const feature = e.features[0];
-								if (!feature?.properties.cluster) {
-									this.showPostPopup(feature, feature.geometry.coordinates);
+							map.on( 'click', 'unclustered-points', ( e ) => {
+							} );
+
+							map.on( 'click', 'unclustered-points-hitarea', ( e ) => {
+								const featuresAtPoint = e.point
+									? map.queryRenderedFeatures( e.point, {
+										layers: [ 'unclustered-points-hitarea' ],
+									} )
+									: e.features;
+								const relatedCoordinateFeatures = this.resolvePopupFeatures(
+									featuresAtPoint
+								);
+
+								if ( relatedCoordinateFeatures.length ) {
+									this.showPostPopup(
+										relatedCoordinateFeatures,
+										e.lngLat ?? relatedCoordinateFeatures[ 0 ].geometry.coordinates
+									);
 								}
-							});
+							} );
 
 							// cluster circle layer
 							map.addLayer( {
@@ -727,12 +775,18 @@ export default class JeoMap {
 								},
 							} );
 
-							this.spiderifier.applyTo('unclustered-points');
+							map.on( 'click', 'cluster-layer', ( e ) => {
+								this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+							} );
 
-							map.on('mouseenter', ['unclustered-points', 'cluster-layer', 'cluster-count'], () => {
+							map.on( 'click', 'cluster-count', ( e ) => {
+								this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+							} );
+
+							map.on('mouseenter', ['unclustered-points-hitarea', 'cluster-layer', 'cluster-count'], () => {
 								map.getCanvas().style.cursor = 'pointer';
 							});
-							map.on('mouseleave', ['unclustered-points', 'cluster-layer', 'cluster-count'], () => {
+							map.on('mouseleave', ['unclustered-points-hitarea', 'cluster-layer', 'cluster-count'], () => {
 								map.getCanvas().style.cursor = '';
 							});
 						} );
@@ -749,11 +803,12 @@ export default class JeoMap {
 							fetch(targetURL)
 								.then(response => { return response.json() })
 								.then(moreresults => {
-									cumulativePosts = [...cumulativePosts, ...moreresults];
+								cumulativePosts = [...cumulativePosts, ...moreresults];
 
-									const sourceData = this.buildPostsGeoJson(cumulativePosts);
-									map.getSource('storiesSource').setData(sourceData);
-								});
+								const sourceData = this.buildPostsGeoJson(cumulativePosts);
+								this.relatedPostsGeoJson = sourceData;
+								map.getSource('storiesSource').setData(sourceData);
+							});
 						}
 					}
 
@@ -770,59 +825,369 @@ export default class JeoMap {
 	}
 
 	buildPostsGeoJson( stories ) {
-		const finalFeatures = {
-			type: 'FeatureCollection',
-			features: [],
-		};
-
-		stories.map( ( story ) => {
-			const storyRelatedPoints = story.meta._related_point ?? [];
-			const storyPoints = storyRelatedPoints.map( ( point ) => {
-				return [ point._geocode_lon, point._geocode_lat ];
-			} );
-
-			finalFeatures.features.push(
-				...storyPoints.map( ( point ) => {
-					return {
-						id: story.id,
-						type: 'Feature',
-						properties: story,
-						geometry: {
-							type: 'Point',
-							coordinates: point,
-						},
-					};
-				} )
-			);
-		} );
-
-		return finalFeatures;
+		return buildRelatedPostsGeoJson( stories );
 	}
 
-	showPostPopup( feature, lngLat ) {
-		this.popup?.remove();
+	getPopupFeatures( features = [] ) {
+		const seenFeatures = new Set();
 
-		const title = typeof feature.properties.title === 'string'
-			? JSON.parse( feature.properties.title )
-			: feature.properties.title;
+		return ( features ?? [] )
+			.filter(
+				( feature ) =>
+					! feature?.properties?.cluster && ! feature?.properties?.point_count
+			)
+			.filter( ( feature ) => {
+				const coordinates = feature?.geometry?.coordinates ?? [];
+				const uniqueKey =
+					feature?.properties?.link ||
+					`${ feature?.id ?? 'story' }:${ coordinates.join( ',' ) }`;
 
-		const post = {
-			date: feature.properties.date,
-			link: feature.properties.link,
+				if ( seenFeatures.has( uniqueKey ) ) {
+					return false;
+				}
+
+				seenFeatures.add( uniqueKey );
+				return true;
+			} );
+	}
+
+	getPopupFeaturesForCoordinates( coordinates ) {
+		const coordinateKey = this.getCoordinatesKey( coordinates );
+
+		if ( ! coordinateKey ) {
+			return [];
+		}
+
+		return this.getPopupFeatures(
+			( this.relatedPostsGeoJson?.features ?? [] ).filter(
+				( feature ) =>
+					this.getCoordinatesKey( feature?.geometry?.coordinates ) ===
+					coordinateKey
+			)
+		);
+	}
+
+	getPopupFeaturesForFeature( feature ) {
+		const sourceFeatures = this.relatedPostsGeoJson?.features ?? [];
+		const coordinateKey = this.getCoordinatesKey( feature?.geometry?.coordinates );
+		const featureId = feature?.id ?? feature?.properties?.id ?? null;
+		const featureLink = feature?.properties?.link ?? null;
+
+		return this.getPopupFeatures(
+			sourceFeatures.filter( ( sourceFeature ) => {
+				if ( featureLink && sourceFeature?.properties?.link === featureLink ) {
+					return true;
+				}
+
+				if (
+					featureId !== null &&
+					( sourceFeature?.id === featureId ||
+						sourceFeature?.properties?.id === featureId )
+				) {
+					return true;
+				}
+
+				if (
+					coordinateKey &&
+					this.getCoordinatesKey( sourceFeature?.geometry?.coordinates ) ===
+						coordinateKey
+				) {
+					return true;
+				}
+
+				return false;
+			} )
+		);
+	}
+
+	resolvePopupFeatures( features = [] ) {
+		const popupFeatures = this.getPopupFeatures( features );
+
+		if ( ! popupFeatures.length ) {
+			return [];
+		}
+
+		const sourceResolvedFeatures = popupFeatures.flatMap( ( feature ) =>
+			this.getPopupFeaturesForFeature( feature )
+		);
+
+		if ( sourceResolvedFeatures.length ) {
+			return this.getPopupFeatures( sourceResolvedFeatures );
+		}
+
+		if ( popupFeatures.length === 1 ) {
+			return this.getPopupFeaturesForCoordinates(
+				popupFeatures[ 0 ]?.geometry?.coordinates
+			);
+		}
+
+		return popupFeatures;
+	}
+
+	getCoordinatesKey( coordinates ) {
+		if ( ! Array.isArray( coordinates ) || coordinates.length < 2 ) {
+			return null;
+		}
+
+		return coordinates
+			.slice( 0, 2 )
+			.map( ( value ) => Number.parseFloat( value ).toFixed( 6 ) )
+			.join( ':' );
+	}
+	openClusterPostsPopup( feature, lngLat ) {
+		const clusterId = feature?.properties?.cluster_id;
+		const pointCount = feature?.properties?.point_count;
+
+		if ( ! clusterId || ! pointCount ) {
+			return;
+		}
+
+		getClusterLeaves(
+			this.map.getSource( 'storiesSource' ),
+			clusterId,
+			pointCount,
+			0
+		).then( ( leaves ) => {
+			const popupFeatures = this.getPopupFeatures( leaves );
+
+			if ( popupFeatures.length ) {
+				this.showPostPopup(
+					popupFeatures,
+					lngLat ?? feature.geometry.coordinates,
+					{ totalCount: pointCount }
+				);
+			}
+		} );
+	}
+
+	parsePopupTitle( title ) {
+		if ( typeof title !== 'string' ) {
+			return title;
+		}
+
+		try {
+			return JSON.parse( title );
+		} catch ( error ) {
+			return { rendered: title };
+		}
+	}
+
+	buildPopupPost( feature ) {
+		const title = this.parsePopupTitle( feature?.properties?.title );
+
+		return {
+			date: feature?.properties?.date,
+			link: feature?.properties?.link,
 			title: {
 				rendered: title?.rendered,
 			},
 		};
+	}
 
-		const popupHTML = this.popupTemplate( {
-			post,
+	buildPopupHTML( feature ) {
+		return this.popupTemplate( {
+			post: this.buildPopupPost( feature ),
 			read_more: jeoMapVars.string_read_more,
 			show_featured_media: false,
 		} );
+	}
+
+	createPopupArticleNode( feature ) {
+		const popupWrapper = document.createElement( 'div' );
+		popupWrapper.innerHTML = this.buildPopupHTML( feature ).trim();
+		return popupWrapper.firstElementChild;
+	}
+
+	createPopupNavigatorContent( popupFeatures, options = {} ) {
+		const totalCount = Number.isFinite( options.totalCount )
+			? options.totalCount
+			: popupFeatures.length;
+
+		if ( popupFeatures.length === 1 && totalCount === popupFeatures.length ) {
+			return this.createPopupArticleNode( popupFeatures[ 0 ] );
+		}
+
+		const navigator = document.createElement( 'div' );
+		navigator.className = 'jeo-popup-navigator';
+		navigator.innerHTML = `
+			<div class="jeo-popup-navigator__header">
+				<div class="jeo-popup-navigator__header-copy">
+					<div class="jeo-popup-navigator__counter"></div>
+					<div class="jeo-popup-navigator__meta"></div>
+				</div>
+				<div class="jeo-popup-navigator__controls">
+					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--previous" aria-label="${ __(
+						'Show previous post',
+						'jeo'
+					) }">${ chevronLeftSmallIcon }</button>
+					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--next" aria-label="${ __(
+						'Show next post',
+						'jeo'
+					) }">${ chevronRightSmallIcon }</button>
+				</div>
+			</div>
+			<div class="jeo-popup-navigator__viewport"></div>
+		`;
+
+		const counter = navigator.querySelector(
+			'.jeo-popup-navigator__counter'
+		);
+		const meta = navigator.querySelector( '.jeo-popup-navigator__meta' );
+		const previousButton = navigator.querySelector(
+			'.jeo-popup-navigator__button--previous'
+		);
+		const nextButton = navigator.querySelector(
+			'.jeo-popup-navigator__button--next'
+		);
+		const viewport = navigator.querySelector(
+			'.jeo-popup-navigator__viewport'
+		);
+
+		let currentIndex = 0;
+		let currentFrame = this.createPopupArticleNode( popupFeatures[ 0 ] );
+		let isTransitioning = false;
+		currentFrame.classList.add(
+			'jeo-popup-navigator__frame',
+			'is-current',
+			'is-active'
+		);
+		viewport.appendChild( currentFrame );
+
+		const updateCounter = () => {
+			counter.textContent = `${ currentIndex + 1 } / ${ popupFeatures.length }`;
+			meta.textContent =
+				totalCount !== popupFeatures.length
+					? sprintf(
+						_n(
+							'%d marker in this area',
+							'%d markers in this area',
+							totalCount,
+							'jeo'
+						),
+						totalCount
+					)
+					: '';
+			previousButton.disabled = currentIndex === 0 || isTransitioning;
+			nextButton.disabled =
+				currentIndex === popupFeatures.length - 1 || isTransitioning;
+		};
+
+		const transitionToIndex = ( nextIndex ) => {
+			if (
+				isTransitioning ||
+				nextIndex < 0 ||
+				nextIndex >= popupFeatures.length ||
+				nextIndex === currentIndex
+			) {
+				return;
+			}
+
+			const direction = nextIndex > currentIndex ? 'next' : 'previous';
+			isTransitioning = true;
+			updateCounter();
+			viewport.style.height = `${ currentFrame.offsetHeight }px`;
+
+			const enterNextFrame = () => {
+				if ( ! currentFrame?.isConnected ) {
+					return;
+				}
+
+				const nextFrame = this.createPopupArticleNode(
+					popupFeatures[ nextIndex ]
+				);
+				nextFrame.classList.add(
+					'jeo-popup-navigator__frame',
+					`is-entering-${ direction }`
+				);
+
+				currentFrame.replaceWith( nextFrame );
+				currentFrame = nextFrame;
+				currentIndex = nextIndex;
+				viewport.style.height = `${ nextFrame.offsetHeight }px`;
+
+				const finalizeEnter = () => {
+					if ( ! nextFrame?.isConnected ) {
+						return;
+					}
+
+					nextFrame.classList.remove( `is-entering-${ direction }` );
+					nextFrame.classList.add( 'is-current', 'is-active' );
+					isTransitioning = false;
+					viewport.style.height = '';
+					updateCounter();
+				};
+
+				window.requestAnimationFrame( () => {
+					nextFrame.classList.add( 'is-active' );
+				} );
+
+				nextFrame.addEventListener(
+					'transitionend',
+					( event ) => {
+						if ( event.target === nextFrame ) {
+							finalizeEnter();
+						}
+					},
+					{ once: true }
+				);
+
+				window.setTimeout( finalizeEnter, 240 );
+			};
+
+			window.requestAnimationFrame( () => {
+				currentFrame.classList.remove( 'is-active', 'is-current' );
+				currentFrame.classList.add( `is-exiting-${ direction }` );
+			} );
+
+			currentFrame.addEventListener(
+				'transitionend',
+				( event ) => {
+					if ( event.target === currentFrame ) {
+						enterNextFrame();
+					}
+				},
+				{ once: true }
+			);
+
+			window.setTimeout( enterNextFrame, 240 );
+		};
+
+		previousButton.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+			transitionToIndex( currentIndex - 1 );
+		} );
+
+		nextButton.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+			transitionToIndex( currentIndex + 1 );
+		} );
+
+		updateCounter();
+
+		return navigator;
+	}
+
+	showPostPopup( featureOrFeatures, lngLat, options = {} ) {
+		this.popup?.remove();
+
+		const popupFeatures = this.getPopupFeatures(
+			Array.isArray( featureOrFeatures ) ? featureOrFeatures : [ featureOrFeatures ]
+		);
+
+		if ( ! popupFeatures.length ) {
+			return;
+		}
+
+		const popupContent = this.createPopupNavigatorContent(
+			popupFeatures,
+			options
+		);
 
 		this.popup = new mapgl.Popup( { closeOnClick: false } )
 			.setLngLat( lngLat )
-			.setHTML( popupHTML )
+			.setDOMContent( popupContent )
 			.addTo( this.map );
 	}
 

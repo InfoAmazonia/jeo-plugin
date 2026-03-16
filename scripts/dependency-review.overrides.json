@@ -14,8 +14,10 @@
       "Automated approval gates are the Node Frontend Checks, PHP Compatibility and WordPress Smoke Tests GitHub Actions workflows.",
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
       "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor.",
-      "Post-track follow-up: plan a dedicated Gutenberg/React alignment phase before attempting direct React/ReactDOM majors or frontend packages that now require React 19.",
-      "Post-track follow-up: plan a dedicated PHP lint stack batch covering WPCS, PHPCS, PHPCSExtra and PHPCSUtils before attempting another PHPCS major."
+      "Current stabilization track: Batch 1 fixes the null-related-post geocode crash, same-point post individualization and reorder regressions that predate the dependency majors.",
+      "Current stabilization track: Batch 2 replaces react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form, while Batch 3 removes react-beautiful-dnd.",
+      "Current stabilization track: Batch 4 aligns the Gutenberg and React line to clear the remaining react-autosize-textarea peer warning and unblock react-leaflet 5.",
+      "Current stabilization track: Batch 6 validates PHP 8.5 and Batch 7 is the dedicated PHPCS baseline cleanup."
     ]
   },
   "batches": [
@@ -146,7 +148,7 @@
       "approvalNotes": [
         "eta moved from 3.5.0 to 4.5.1 and now uses the browser-safe eta/core entry inside the frontend helper.",
         "A local jest.config.js now tells the unit runner to transform eta/dist/core.js so the existing template-compiler tests stay representative.",
-        "Manual review confirmed the Info panel and popup template rendering stayed functional. Two published-map issues remain tracked as baseline only: a null-related-post geocode crash in buildPostsGeoJson and the existing inability to individualize multiple posts that share the same map point."
+        "Manual review confirmed the Info panel and popup template rendering stayed functional. The null-related-post geocode crash in buildPostsGeoJson and the inability to individualize multiple posts that share the same map point are now planned fixes in Batch 1."
       ],
       "manualReviewItems": [
         "Open a map popup and verify the title, date and featured image rendering.",
@@ -196,7 +198,7 @@
       "approvalNotes": [
         "@ckeditor/ckeditor5-react moved from 9.5.0 to 11.0.1 without requiring source changes in the storymap editor.",
         "The published wrapper's peer requirements remain compatible with the installed ckeditor5 47.6.1 line and with React 18.3.1.",
-        "Manual review confirmed editor loading, formatting and save/reopen flows stayed functional. The existing slide reorder problem remains tracked as baseline only because it predates this phase."
+        "Manual review confirmed editor loading, formatting and save/reopen flows stayed functional. The existing slide reorder problem is now tracked as a planned fix in Batch 1 and, if needed, Batch 3."
       ],
       "manualReviewItems": [
         "Load the storymap editor and confirm the toolbar initializes.",
@@ -227,19 +229,195 @@
       "manualReviewItems": []
     },
     {
-      "id": "deferred-replacement-track",
-      "phase": "Deferred",
-      "title": "Replacement dependencies outside the current semver-major scope",
-      "status": "deferred",
-      "scope": "Track deprecated packages that require replacement work instead of an in-place semver major upgrade.",
+      "id": "batch-0-local-prereqs",
+      "phase": "Batch 0",
+      "title": "Local prerequisites and report reset",
+      "status": "completed",
+      "scope": "Absorb the validated local prerequisites, remove the invalid cli_init hook dependency from local smoke, and reopen the dependency report for the stabilization track.",
+      "packageNames": [],
+      "automatedChecks": [
+        "composer validate --no-check-publish",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+        "node --check scripts/dependency-review.mjs",
+        "node scripts/dependency-review.mjs --write"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "No dependency versions or lockfiles change in this batch.",
+        "Local WordPress smoke no longer depends on a validation-only patch outside the working tree.",
+        "A clean worktree still needs the ignored src/js/build assets materialized locally before the smoke can run without asset-include warnings."
+      ]
+    },
+    {
+      "id": "batch-1-baseline-fixes",
+      "phase": "Batch 1",
+      "title": "Baseline fixes and warning cleanup",
+      "status": "completed",
+      "scope": "Fix the published-map baseline bugs, repair reorder flows, remove the react-datepicker webpack warning and add focused regression tests.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify published-map popups, same-point post navigation and the absence of the null-geocode crash.",
+        "Verify storymap slide ordering, save and reopen in the editor."
+      ],
+      "approvalNotes": [
+        "No dependency versions should change in this batch.",
+        "The react-datepicker version stays on 9.1.0; only its optional date-fns-tz webpack warning is removed.",
+        "Published-map review confirmed the null-geocode crash is gone and same-point posts now use a navigable popup instead of depending on spiderfy timing.",
+        "Storymap review confirmed the explicit slide ordering controls, accordion behavior and save or reopen flow stay consistent.",
+        "npm ci still reports the tracked react-autosize-textarea peer warning plus the deprecated packages scheduled for Batches 2 through 4, but Batch 1 no longer adds any new npm or webpack warnings of its own."
+      ]
+    },
+    {
+      "id": "batch-2-input-form-replacements",
+      "phase": "Batch 2",
+      "title": "Autosuggest, date-range and form replacements",
+      "status": "planned",
+      "scope": "Replace the deprecated input and form helpers while preserving the current geocoding, Discovery date filtering and formData contracts.",
       "packageNames": [
         "react-autosuggest",
-        "react-beautiful-dnd",
         "react-bootstrap-daterangepicker",
-        "react-jsonschema-form"
+        "react-jsonschema-form",
+        "bootstrap-daterangepicker"
       ],
-      "automatedChecks": [],
-      "manualReviewItems": []
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify geocoding autosuggest and post or map autosuggest flows.",
+        "Verify Discovery date apply and clear flows.",
+        "Verify layer and attribution forms render, normalize formData and save correctly."
+      ],
+      "approvalNotes": [
+        "The saved query and formData shapes must remain unchanged.",
+        "npm ci should no longer emit deprecation warnings for react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form."
+      ]
+    },
+    {
+      "id": "batch-3-dnd-consolidation",
+      "phase": "Batch 3",
+      "title": "Drag-and-drop consolidation",
+      "status": "planned",
+      "scope": "Remove react-beautiful-dnd in favor of the existing react-movable stack and close any remaining reorder issues.",
+      "packageNames": [
+        "react-beautiful-dnd"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify map-layer ordering, storymap slide ordering and any nested layer ordering still exposed in the editor."
+      ],
+      "approvalNotes": [
+        "The saved layer and slide structures must not change.",
+        "npm ci should no longer emit the react-beautiful-dnd deprecation warning."
+      ]
+    },
+    {
+      "id": "batch-4-gutenberg-react-alignment",
+      "phase": "Batch 4",
+      "title": "Gutenberg and React alignment",
+      "status": "planned",
+      "scope": "Refresh the Gutenberg package line, clear the remaining React peer warning and prepare the tree for the react-leaflet major.",
+      "packageNames": [
+        "@wordpress/edit-post",
+        "@wordpress/editor",
+        "@wordpress/plugins"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "npm ls react-autosize-textarea react react-dom",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify the map editor, layer editor, storymap editor and regular post editor load, save and stay console-clean."
+      ],
+      "approvalNotes": [
+        "Do not add react or react-dom directly unless the resolved Gutenberg line forces it.",
+        "If the react-autosize-textarea peer warning survives the refresh upstream, document and isolate the minimal override used to remove it."
+      ]
+    },
+    {
+      "id": "batch-5-react-leaflet-major",
+      "phase": "Batch 5",
+      "title": "react-leaflet major",
+      "status": "planned",
+      "scope": "Upgrade react-leaflet to 5.x after the React line is compatible and validate the entire geocoding sidebar map flow.",
+      "packageNames": [
+        "react-leaflet"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map."
+      ],
+      "approvalNotes": [
+        "Only start this batch after Batch 4 has removed the React-line blocker."
+      ]
+    },
+    {
+      "id": "batch-6-php-8-5-compat",
+      "phase": "Batch 6",
+      "title": "PHP 8.5 compatibility",
+      "status": "planned",
+      "scope": "Extend the local and CI PHP compatibility coverage to PHP 8.5 and remove repository-owned warnings or deprecations under that runtime.",
+      "packageNames": [],
+      "automatedChecks": [
+        "composer validate --no-check-publish",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Repeat the runtime smoke while watching for repository-owned PHP 8.5 warnings or deprecations."
+      ],
+      "approvalNotes": [
+        "Keep PHP 8.5 experimental in CI until static checks and smoke logs are clean without repository-owned deprecations.",
+        "Continue using PHP 8.4 for the local smoke when wp-cli is the source of third-party warning noise."
+      ]
+    },
+    {
+      "id": "batch-7-php-lint-stack",
+      "phase": "Batch 7",
+      "title": "PHP lint stack cleanup",
+      "status": "planned",
+      "scope": "Clean the PHPCS 3.x baseline across WPCS, PHPCSExtra and PHPCSUtils before re-evaluating PHPCS 4.",
+      "packageNames": [
+        "squizlabs/php_codesniffer",
+        "wp-coding-standards/wpcs"
+      ],
+      "automatedChecks": [
+        "composer validate --no-check-publish",
+        "php scripts/check-php-compat.php",
+        "vendor/bin/phpcs --standard=phpcs.xml.dist"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "Start with autofixable formatting sources, then move to manual docblock, escaping, naming and nonce issues.",
+        "Re-evaluate PHPCS 4 only after the PHPCS 3.x baseline is green and the installed WPCS line officially supports the major."
+      ]
     }
   ],
   "executionLog": [
@@ -462,8 +640,8 @@
       ],
       "manualReviewNotes": [
         "The published-map review confirmed that the Info panel and post popup templates still render correctly after the Eta major update.",
-        "A pre-existing published-map runtime error remains outside this phase: Uncaught (in promise) TypeError: can't access property \"_geocode_lon\", e is null, raised during buildPostsGeoJson/getRelatedPosts when a related-post entry is null.",
-        "A second pre-existing frontend limitation also remains outside this phase: when multiple posts share the same location, the marker popup still does not expose the individual posts for separate clicks."
+        "A published-map runtime error remains scheduled for Batch 1: Uncaught (in promise) TypeError: can't access property \"_geocode_lon\", e is null, raised during buildPostsGeoJson/getRelatedPosts when a related-post entry is null.",
+        "A second published-map limitation also remains scheduled for Batch 1: when multiple posts share the same location, the marker popup still does not expose the individual posts for separate clicks."
       ]
     },
     {
@@ -549,7 +727,7 @@
       ],
       "manualReviewNotes": [
         "The storymap editor, toolbar, formatting behavior and save/reopen flow remained functional after the wrapper major update.",
-        "The slide reorder problem still reproduces, but it predates this dependency track and remains tracked as a baseline issue rather than a Phase 7 regression."
+        "The slide reorder problem still reproduces, but it is now tracked as a planned fix in Batch 1 and, if needed, Batch 3 rather than as a Phase 7 regression."
       ]
     },
     {
@@ -589,6 +767,101 @@
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md"
       ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "batch-0-local-prereqs",
+      "status": "completed",
+      "summary": "Absorbed the validated local prerequisites for the stabilization track: the invalid cli_init hook no longer needs a local-only patch, the Composer metadata cleanup is part of the repository, and the dependency report now carries the new batch plan.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The updated composer.json stays structurally valid after the SPDX and tooling-script cleanup."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after absorbing the local prerequisites."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local WordPress smoke now passes without any local-only patch to src/includes/class-jeo.php. In a clean worktree it still emits PHP warnings until the ignored src/js/build assets are generated locally."
+        },
+        {
+          "name": "node --check scripts/dependency-review.mjs",
+          "status": "passed"
+        },
+        {
+          "name": "node scripts/dependency-review.mjs --write",
+          "status": "passed",
+          "details": "Regenerated the JSON and Markdown dependency reports with the reopened stabilization track and Batch 0 ready for approval."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "composer.json",
+        "src/includes/class-jeo.php",
+        "scripts/dependency-review.mjs",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "batch-1-baseline-fixes",
+      "status": "completed",
+      "summary": "Fixed the null-related-post geocode crash in frontend and Discovery GeoJSON builders, replaced brittle same-point spiderfy timing with a navigable popup for posts that share a location, repaired storymap slide ordering with explicit move controls and removed the targeted react-datepicker webpack warning with focused regression tests.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean install completed successfully after rebuilding node_modules. The run still reports the tracked react-autosize-textarea peer warning plus the deprecated packages scheduled for Batches 2 through 4, but no new install warnings were introduced by Batch 1."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite now passes with 5 test files and 17 assertions, including new coverage for GeoJSON sanitization and storymap reorder helpers."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully from a clean install with only the existing bundle-size warnings. The previous react-datepicker optional date-fns-tz critical-dependency warning no longer appears."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend baseline fixes."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed after rebuilding the ignored src/js/build assets, so the previous asset-include warnings no longer appear in the smoke log."
+        }
+      ],
+      "manualReviewItems": [
+        "Published-map review confirmed the null-geocode crash disappeared and same-point posts can be navigated inside the popup, including dense clusters.",
+        "Storymap review confirmed slide ordering, accordion behavior and save or reopen stayed stable after the UI changes."
+      ],
+      "documentUpdates": [
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "src/js/src/discovery/blocks/stories.js",
+        "src/js/src/jeo-map/class-jeo-map.js",
+        "src/js/src/map-blocks/storymap-editor.js",
+        "src/js/src/map-blocks/storymap-editor.scss",
+        "src/js/src/map-blocks/storymap-ordering.js",
+        "src/js/src/map-blocks/storymap-ordering.test.js",
+        "src/js/src/shared/story-geojson.js",
+        "src/js/src/shared/story-geojson.test.js",
+        "webpack.config.js",
+        "src/css/jeo-map.scss"
+      ]
     }
   ],
   "npm": {
@@ -601,16 +874,16 @@
       ]
     },
     "react-beautiful-dnd": {
-      "batchId": "deferred-replacement-track",
+      "batchId": "batch-3-dnd-consolidation",
       "maintenanceStatus": "deprecated-archived",
       "decision": "replace",
-      "executionStatus": "deferred-replacement-track",
+      "executionStatus": "planned",
       "executionNotes": [
-        "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        "Planned replacement in Batch 3 using the existing react-movable stack for the remaining reorder flows."
       ],
       "minorPath": "No maintained minor line. Replace instead of updating within 13.x.",
       "majorPath": "No maintained major line. Migrate to @hello-pangea/dnd or consolidate on the existing react-movable wrapper.",
-      "replacement": "@hello-pangea/dnd",
+      "replacement": "react-movable",
       "evidence": [
         {
           "label": "npm",
@@ -623,12 +896,12 @@
       ]
     },
     "react-jsonschema-form": {
-      "batchId": "deferred-replacement-track",
+      "batchId": "batch-2-input-form-replacements",
       "maintenanceStatus": "deprecated",
       "decision": "replace",
-      "executionStatus": "deferred-replacement-track",
+      "executionStatus": "planned",
       "executionNotes": [
-        "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        "Planned replacement in Batch 2 with an internal @rjsf/core adapter that preserves the current formData contract."
       ],
       "minorPath": "No maintained minor path on the deprecated package line.",
       "majorPath": "Replace with @rjsf/core while preserving the internal form wrapper contract.",
@@ -641,12 +914,12 @@
       ]
     },
     "react-bootstrap-daterangepicker": {
-      "batchId": "deferred-replacement-track",
+      "batchId": "batch-2-input-form-replacements",
       "maintenanceStatus": "deprecated",
       "decision": "replace",
-      "executionStatus": "deferred-replacement-track",
+      "executionStatus": "planned",
       "executionNotes": [
-        "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        "Planned replacement in Batch 2 with an internal date-range wrapper backed by react-datepicker."
       ],
       "minorPath": "No supported minor path on the deprecated wrapper.",
       "majorPath": "Replace with an internal date-range wrapper, preferably based on the existing react-datepicker dependency.",
@@ -659,12 +932,12 @@
       ]
     },
     "react-autosuggest": {
-      "batchId": "deferred-replacement-track",
+      "batchId": "batch-2-input-form-replacements",
       "maintenanceStatus": "looking-for-maintainers",
       "decision": "replace",
-      "executionStatus": "deferred-replacement-track",
+      "executionStatus": "planned",
       "executionNotes": [
-        "Out of scope for the current semver-major track because this line needs a replacement implementation."
+        "Planned replacement in Batch 2 with an internal async combobox wrapper based on @wordpress/components."
       ],
       "minorPath": "Do not spend time on the stale line unless a security fix forces it.",
       "majorPath": "Replace with a maintained autosuggest/combobox wrapper before any React or Gutenberg major jump.",
@@ -677,12 +950,13 @@
       ]
     },
     "bootstrap-daterangepicker": {
-      "executionStatus": "tracking-only",
+      "batchId": "batch-2-input-form-replacements",
+      "executionStatus": "planned",
       "executionNotes": [
-        "Keep this line documented while the paired React wrapper remains in the deferred replacement track."
+        "Expected to leave the dependency tree in Batch 2 when the Discovery date-range UI moves to the internal react-datepicker wrapper."
       ],
       "maintenanceStatus": "review-manually",
-      "decision": "review",
+      "decision": "replace",
       "minorPath": "Allow minor-only evaluation if the wrapper replacement is deferred, but verify jQuery/moment assumptions in the browser.",
       "majorPath": "Do not take a major jump unless the React wrapper strategy is already decided.",
       "evidence": [
@@ -725,13 +999,30 @@
       ]
     },
     "@wordpress/edit-post": {
+      "batchId": "batch-4-gutenberg-react-alignment",
+      "executionStatus": "planned",
+      "executionNotes": [
+        "Planned refresh in Batch 4 as part of the Gutenberg and React alignment needed to clear the remaining peer warning."
+      ],
       "notes": [
         "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
       ]
     },
     "@wordpress/editor": {
+      "batchId": "batch-4-gutenberg-react-alignment",
+      "executionStatus": "planned",
+      "executionNotes": [
+        "Planned refresh in Batch 4 as part of the Gutenberg and React alignment needed to clear the remaining peer warning."
+      ],
       "notes": [
         "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
+      ]
+    },
+    "@wordpress/plugins": {
+      "batchId": "batch-4-gutenberg-react-alignment",
+      "executionStatus": "planned",
+      "executionNotes": [
+        "Planned refresh in Batch 4 alongside the editor packages to keep the React line aligned."
       ]
     },
     "react-datepicker": {
@@ -739,25 +1030,26 @@
       "executionStatus": "completed",
       "executionNotes": [
         "Upgraded to 9.1.0; keep the related-posts date persistence flow under manual review after the major.",
-        "The build now emits one non-blocking webpack warning from react-datepicker's optional date-fns-tz require path."
+        "Phase 4 introduced a non-blocking webpack warning from react-datepicker's optional date-fns-tz require path.",
+        "Batch 1 removes that warning without changing the declared react-datepicker version."
       ]
     },
     "react-leaflet": {
-      "batchId": "phase-6-react-leaflet-major",
-      "executionStatus": "blocked",
+      "batchId": "batch-5-react-leaflet-major",
+      "executionStatus": "planned",
       "executionNotes": [
-        "react-leaflet 5.0.0 currently requires react and react-dom ^19.0.0, so npm blocks the upgrade against the repository's React 18.3.1 line.",
-        "Revisit this phase only after the Gutenberg/React stack moves to React 19 or an officially compatible path becomes available."
+        "Batch 5 stays gated by Batch 4 because react-leaflet 5.0.0 currently requires react and react-dom ^19.0.0.",
+        "Start the major only after the Gutenberg and React alignment leaves the tree compatible with the published peer requirements."
       ]
     }
   },
   "composer": {
     "squizlabs/php_codesniffer": {
-      "batchId": "phase-8-phpcs-major-evaluation",
+      "batchId": "batch-7-php-lint-stack",
       "executionStatus": "blocked",
       "executionNotes": [
         "Packagist publishes PHPCS 4.0.1, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
-        "The current PHPCS 3.x run is not green yet, so the repository is not ready to treat a PHPCS 4 jump as a clean upgrade."
+        "Batch 7 first cleans the PHPCS 3.x baseline and only then re-evaluates PHPCS 4 when the installed WPCS line officially supports the jump."
       ],
       "notes": [
         "Direct dev dependency. Evaluate majors only after confirming WPCS compatibility."
@@ -786,10 +1078,10 @@
             "url": "https://www.npmjs.com/package/react-autosize-textarea"
           }
         ],
-        "batchId": "watch-parent-batch",
-        "executionStatus": "watch-via-parent-batch",
+        "batchId": "batch-4-gutenberg-react-alignment",
+        "executionStatus": "planned",
         "executionNotes": [
-          "Re-evaluate after each Gutenberg-related or React-adjacent batch."
+          "Batch 4 revalidates this peer warning after the Gutenberg refresh and applies the minimum override if upstream still leaves it unresolved."
         ],
         "notes": [
           "Observed locally through npm ls react react-dom."
