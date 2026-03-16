@@ -36,7 +36,7 @@
       "id": "phase-1-frontend-gates",
       "phase": "Phase 1",
       "title": "Frontend gates for approval",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Create the Node workflow and treat PHP compatibility plus WordPress smoke checks as mandatory future gates.",
       "packageNames": [],
       "automatedChecks": [
@@ -55,7 +55,7 @@
       "id": "phase-2-wp-scripts-major",
       "phase": "Phase 2",
       "title": "Build tooling major",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Upgrade the WordPress build toolchain major and keep the custom webpack config working.",
       "packageNames": [
         "@wordpress/scripts"
@@ -65,6 +65,10 @@
         "GitHub Actions Node frontend workflow",
         "GitHub Actions PHP Compatibility workflow",
         "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "The webpack.config.js override continued to work without code changes on @wordpress/scripts 31.x.",
+        "The local WordPress smoke attempt is environment-dependent and should still be confirmed by the GitHub workflow before merge."
       ],
       "manualReviewItems": [
         "No dedicated manual review unless asset or wp-admin regressions become visible."
@@ -232,7 +236,7 @@
     {
       "date": "2026-03-16",
       "batchId": "phase-1-frontend-gates",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Added a Node frontend GitHub Actions workflow and promoted the PHP compatibility plus WordPress smoke workflows to the mandatory gate set for future dependency phases.",
       "automatedChecks": [
         {
@@ -255,6 +259,43 @@
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md",
         "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-2-wp-scripts-major",
+      "status": "ready-for-approval",
+      "summary": "Upgraded @wordpress/scripts from 30.27.0 to 31.6.0. The existing webpack.config.js override remained compatible and no script changes were required.",
+      "automatedChecks": [
+        {
+          "name": "npm install @wordpress/scripts@^31.6.0 --save-dev",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to @wordpress/scripts 31.6.0 while repeating only the already known react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the same bundle-size warnings as before the upgrade."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review found no blocking issues after the tooling upgrade."
+        },
+        {
+          "name": "WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "failed",
+          "details": "The local runtime smoke attempt reached wp-cli and WordPress download, but failed against the local MariaDB login for wordpress@localhost. The GitHub WordPress Smoke Tests workflow remains the authoritative gate for this check."
+        }
+      ],
+      "manualReviewItems": [
+        "No dedicated manual review unless asset or wp-admin regressions become visible."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
       ]
     }
   ],
@@ -380,9 +421,10 @@
     },
     "@wordpress/scripts": {
       "batchId": "phase-2-wp-scripts-major",
-      "executionStatus": "planned",
+      "executionStatus": "ready-for-approval",
       "executionNotes": [
-        "Lead package for the tooling major batch."
+        "Lead package for the tooling major batch.",
+        "Upgraded to 31.x without requiring webpack.config.js changes in this repository."
       ],
       "notes": [
         "Treat this package as the lead dependency for the build batch because it constrains Babel, webpack, PostCSS and much of the Gutenberg toolchain."
