@@ -1,12 +1,13 @@
 import { useBlockProps } from '@wordpress/block-editor';
 import { Button, Spinner } from '@wordpress/components';
-import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 import { useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
+import { useRecordsByIds } from '../shared/rest-records';
 import './map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
@@ -38,10 +39,12 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ loadedMap?.meta.layers ] );
 
-	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
-		include: layerIds,
-		per_page: -1,
-	}, { enabled: layerIds.length > 0 } );
+	const { records: loadedLayers = [] } = useRecordsByIds( {
+		path: '/wp/v2/map-layer',
+		ids: layerIds,
+		enabled: layerIds.length > 0,
+		query: { context: 'edit' },
+	} );
 
 	return (
 		<div { ...blockProps }>

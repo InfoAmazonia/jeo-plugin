@@ -104,8 +104,6 @@ class CircleEditor extends Component {
 				return item;
 			} );
 
-			//console.log(legendObject);
-
 			this.props.hasChanged( legendObject );
 
 			return { legendObject };

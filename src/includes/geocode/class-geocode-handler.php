@@ -41,8 +41,6 @@ class Geocode_Handler {
 		add_action( 'wp_ajax_jeo_reverse_geocode', array( $this, 'ajax_reverse_geocode' ) );
 		add_action( 'init', array( $this, 'register_metadata' ), 99 );
 
-		add_action( 'init', array( $this, 'register_metadata' ), 99 );
-
 		$this->add_index_metadata_hooks();
 	}
 
@@ -59,16 +57,20 @@ class Geocode_Handler {
 	 * @return void
 	 */
 	public function ajax_geocode() {
-		$geocoder = $this->get_active_geocoder();
+		check_ajax_referer( 'jeo_geocode', 'nonce' );
 
-		if ( $geocoder ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This wp_ajax endpoint is restricted to authenticated users and only returns sanitized geocoder results.
-			echo wp_json_encode( $geocoder->geocode( sanitize_text_field( $_GET['search'] ) ) );
-		} else {
-			echo wp_json_encode( array() );
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array(), 403 );
 		}
 
-		die;
+		$search   = filter_input( INPUT_GET, 'search', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$geocoder = $this->get_active_geocoder();
+
+		if ( ! $geocoder || empty( $search ) ) {
+			wp_send_json( array() );
+		}
+
+		wp_send_json( $geocoder->geocode( sanitize_text_field( $search ) ) );
 	}
 
 	/**
@@ -77,16 +79,26 @@ class Geocode_Handler {
 	 * @return void
 	 */
 	public function ajax_reverse_geocode() {
-		$geocoder = $this->get_active_geocoder();
+		check_ajax_referer( 'jeo_geocode', 'nonce' );
 
-		if ( $geocoder ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This wp_ajax endpoint is restricted to authenticated users and only returns sanitized geocoder results.
-			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
-		} else {
-			echo wp_json_encode( array() );
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array(), 403 );
 		}
 
-		die;
+		$lat      = filter_input( INPUT_GET, 'lat', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$lon      = filter_input( INPUT_GET, 'lon', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$geocoder = $this->get_active_geocoder();
+
+		if ( ! $geocoder || null === $lat || null === $lon ) {
+			wp_send_json( array() );
+		}
+
+		wp_send_json(
+			$geocoder->reverse_geocode(
+				sanitize_text_field( $lat ),
+				sanitize_text_field( $lon )
+			)
+		);
 	}
 
 	/**

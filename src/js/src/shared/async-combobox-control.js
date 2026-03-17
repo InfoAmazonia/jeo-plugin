@@ -97,10 +97,15 @@ export default function AsyncComboboxControl( {
 				allowReset={ allowReset }
 				expandOnFocus={ false }
 				onFilterValueChange={ onInputValueChange }
-				onChange={ ( nextValue ) => {
-					const selectedOption = options.find(
-						( option ) =>
-							option.value === String( nextValue ) && ! option.__freeform
+					onChange={ ( nextValue ) => {
+						if ( ! nextValue ) {
+							onOptionSelect?.( null );
+							return;
+						}
+
+						const selectedOption = options.find(
+							( option ) =>
+								option.value === String( nextValue ) && ! option.__freeform
 					);
 
 					if ( selectedOption ) {

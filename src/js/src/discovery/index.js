@@ -171,7 +171,13 @@ class Discovery extends Component {
 		};
 
 		const legends = this.state.appliedLayers
-			.filter( ( layer ) => layer.meta.use_legend )
+			.filter(
+				( layer ) =>
+					layer?.meta?.use_legend &&
+					layer?.meta?.legend_type &&
+					layer?.meta?.legend_type_options &&
+					typeof layer.meta.legend_type_options === 'object'
+			)
 			.map( ( layer ) => {
 				return new window.JeoLegend( layer.meta.legend_type, {
 					layer_id: layer.slug,

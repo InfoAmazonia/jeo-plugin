@@ -7,15 +7,21 @@ on:
 
 jobs:
   node-frontend:
-    name: Node 20 frontend checks
+    name: Node ${{ matrix.node-version }} frontend checks
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version:
+          - '24'
+          - '20'
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Show Node and npm versions
@@ -23,11 +29,17 @@ jobs:
           node --version
           npm --version
 
+      - name: Check supported runtime
+        run: npm run check:env
+
       - name: Install Node dependencies
         run: npm ci
 
       - name: Build assets
         run: npm run build
+
+      - name: Check bundle budgets
+        run: npm run build:report
 
       - name: Run unit tests
         run: npm run test:unit

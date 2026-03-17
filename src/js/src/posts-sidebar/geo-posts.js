@@ -166,11 +166,19 @@ class JeoGeocodePosts extends Component {
 	}
 
 	fetchReverseGeocode( lat, lng ) {
+		const requestUrl = new URL( jeo.ajax_url );
+		requestUrl.searchParams.set( 'action', 'jeo_reverse_geocode' );
+		requestUrl.searchParams.set( 'nonce', jeo.geocode_nonce );
+		requestUrl.searchParams.set( 'lat', lat );
+		requestUrl.searchParams.set( 'lon', lng );
+
 		return window
-			.fetch(
-				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lng
-			)
+			.fetch( requestUrl )
 			.then( ( response ) => {
+				if ( ! response.ok ) {
+					throw new Error( 'Unable to reverse-geocode the selected point.' );
+				}
+
 				return response.json();
 			} );
 	}

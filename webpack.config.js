@@ -42,14 +42,15 @@ module.exports = {
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),
-		publicPath: './src/js/build/',
+		publicPath: 'auto',
 		filename: '[name].js',
 	},
 	optimization: {
 		...defaultConfig.optimization,
-		chunkIds: 'named',
 		splitChunks: false,
+		chunkIds: 'named',
 	},
+	performance: false,
 	ignoreWarnings: [
 		...( defaultConfig.ignoreWarnings || [] ),
 		{
