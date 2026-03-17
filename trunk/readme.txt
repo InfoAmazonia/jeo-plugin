@@ -18,12 +18,15 @@ At the same time, by simply imputing the ids of layers hosted on [Mapbox](https:
 
 == Compatibility ==
 
-Compatibility snapshot validated on March 13, 2026:
+Compatibility snapshot validated on March 17, 2026:
 
 * Primary support: PHP 8.2, 8.3, and 8.4;
+* Experimental monitoring: PHP 8.5;
 * Stable WordPress gate: WordPress 6.9.4 on PHP 8.2, 8.3, and 8.4;
+* Experimental WordPress gate: WordPress 6.9.4 on PHP 8.5;
 * Backward-compatibility smoke tests: WordPress 6.6 on PHP 8.0 and 8.1;
-* Forward-compatibility smoke tests: WordPress 7.0-beta4 on PHP 8.2, 8.3, and 8.4.
+* Forward-compatibility smoke tests: WordPress 7.0-beta4 on PHP 8.2, 8.3, 8.4, and experimentally on PHP 8.5.
+* Repository test scripts include static PHP 8.5 checks and experimental WordPress smoke coverage on PHP 8.5.
 
 = Features =
 

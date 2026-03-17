@@ -34,6 +34,10 @@ jobs:
             wordpress: '6.9.4'
             label: WordPress 6.9.4 on PHP 8.4
             experimental: false
+          - php: '8.5'
+            wordpress: '6.9.4'
+            label: WordPress 6.9.4 on PHP 8.5 (experimental, non-blocking)
+            experimental: true
           - php: '8.2'
             wordpress: '7.0-beta4'
             label: WordPress 7.0-beta4 on PHP 8.2 (forward-compat, non-blocking)
@@ -45,6 +49,10 @@ jobs:
           - php: '8.4'
             wordpress: '7.0-beta4'
             label: WordPress 7.0-beta4 on PHP 8.4 (forward-compat, non-blocking)
+            experimental: true
+          - php: '8.5'
+            wordpress: '7.0-beta4'
+            label: WordPress 7.0-beta4 on PHP 8.5 (forward-compat, non-blocking)
             experimental: true
 
     services:

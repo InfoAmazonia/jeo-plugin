@@ -8,20 +8,27 @@ At the same time, by simply imputing the ids of layers hosted on [Mapbox](https:
 
 ## Compatibility
 
-This repository currently declares `Requires PHP: 8.0`, with primary validation focused on PHP `8.2` to `8.4`.
+This repository currently declares `Requires PHP: 8.0`, with primary validation focused on PHP `8.2` to `8.4` and experimental monitoring on PHP `8.5`.
 
-Compatibility snapshot validated on March 13, 2026:
+Compatibility snapshot validated on March 17, 2026:
 
 - Primary support: PHP `8.2`, `8.3`, and `8.4`.
+- Experimental monitoring: PHP `8.5`.
 - Stable WordPress gate: `WordPress 6.9.4` on PHP `8.2`, `8.3`, and `8.4`.
+- Experimental WordPress gate: `WordPress 6.9.4` on PHP `8.5`.
 - Backward-compatibility smoke tests: `WordPress 6.6` on PHP `8.0` and `8.1`.
-- Forward-compatibility smoke tests: `WordPress 7.0-beta4` on PHP `8.2`, `8.3`, and `8.4`.
+- Forward-compatibility smoke tests: `WordPress 7.0-beta4` on PHP `8.2`, `8.3`, `8.4`, and experimentally on `8.5`.
 
 Automation:
 
 - Frontend asset checks run in `.github/workflows/node-frontend.yml`.
-- Static PHP checks run in `.github/workflows/php-compat.yml`.
-- WordPress runtime smoke tests run in `.github/workflows/wordpress-smoke.yml`.
+- Static PHP checks run in `.github/workflows/php-compat.yml`, including an experimental PHP `8.5` job.
+- WordPress runtime smoke tests run in `.github/workflows/wordpress-smoke.yml`, including experimental PHP `8.5` jobs for `WordPress 6.9.4` and `WordPress 7.0-beta4`.
+
+Test script coverage:
+
+- `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`, including PHP `8.5`-specific deprecation heuristics.
+- `scripts/wordpress-smoke.sh` can be forced onto PHP `8.5` with `WP_CLI_PHP`, so the plugin's runtime smoke can be exercised on that line locally and in CI.
 
 Local commands:
 
@@ -30,6 +37,8 @@ npm ci
 npm run build
 npm run test:unit
 php scripts/check-php-compat.php
+/opt/homebrew/opt/php@8.5/bin/php scripts/check-php-compat.php
+
 WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php \
 WP_DB_HOST=localhost \
 WP_DB_NAME=wordpress \
@@ -40,6 +49,7 @@ bash scripts/wordpress-smoke.sh
 ```
 
 `scripts/wordpress-smoke.sh` honors `WP_CLI_PHP`, which is useful on Homebrew installs where `/opt/homebrew/bin/wp` otherwise follows the default `php` in `PATH`.
+Use PHP `8.5` for local smoke only when you specifically want to inspect the experimental runtime line. WordPress core 6.9 treats PHP `8.5` as beta support, while stable `wp-cli` support for PHP `8.5` is still planned upstream and `wp-cli` 2.12.0 still emits third-party deprecation noise there.
 
 ## Setting up local environment
 
