@@ -35,7 +35,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 - Batch 0: no product review is required.
 - Batch 1: verify published-map popups, same-point post individualization, the absence of the null-geocode crash, and storymap slide plus nested layer reorder, including save and reopen after reordering.
 - Batch 2: verify geocoding autosuggest suggestions and selection, post/map autosuggest insertion, Discovery date apply/clear behavior, and layer or attribution forms backed by schema data.
-- Batch 3: verify map-layer ordering, storymap slide ordering and any remaining nested drag or reorder flow that still used `react-beautiful-dnd`.
+- Batch 3: verify selected map-layer ordering, storymap slide ordering and storymap layer toggling after removing the unsupported nested drag affordance.
 - Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the Gutenberg refresh.
 - Batch 5: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map.
 - Batch 6: verify the same product smoke already covered by the runtime batches, but execute it while watching specifically for repository-owned PHP 8.5 warnings or deprecations.

@@ -4,8 +4,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { SelectControl, TextControl } from '../shared/wp-form-controls';
 
-import { arrayMove } from 'react-movable';
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { List, arrayMove } from 'react-movable';
 
 import LayerSettings from './layer-settings';
 import { loadLayer } from './utils';
@@ -63,32 +62,27 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		} );
 	};
 
-	const onDragEnd = (result) => {
-		if (!result.destination) {
+	const onLayerOrderChange = ( { oldIndex, newIndex } ) => {
+		if ( oldIndex === newIndex ) {
 			return;
 		}
 
-		if (result.destination.index === result.source.index) {
-			return;
-		}
-
-
-		const resultLayers = arrayMove( attributes.layers, result.source.index, result.destination.index );
+		const resultLayers = arrayMove( attributes.layers, oldIndex, newIndex );
 
 		// Set base layer always as fixed
-		if(resultLayers.length) {
-			resultLayers[0].use = "fixed";
+		if ( resultLayers.length ) {
+			resultLayers[0].use = 'fixed';
 		}
 
 		// Reset fixed default param
-		resultLayers.forEach(setting => {
-			if(setting.use === "fixed") {
+		resultLayers.forEach( ( setting ) => {
+			if ( setting.use === 'fixed' ) {
 				setting.default = true;
 			}
-		})
+		} );
 
 		setLayers( resultLayers );
-	}
+	};
 
 	return (
 		<Fragment>
@@ -221,11 +215,22 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 			) }
 
 			{ ! loadingLayers && attributes.layers.length > 0 && (
-				<DragDropContext onDragEnd={ onDragEnd }>
-					<Droppable droppableId="list">
-						{ provided => (
-							<div className="jeo-layers-list" ref={ provided.innerRef } { ...provided.droppableProps }>
-								{ attributes.layers.map((layer, index) => {
+				<List
+					values={ attributes.layers }
+					onChange={ onLayerOrderChange }
+					renderList={ ( { children, props } ) => (
+						<div className="jeo-layers-list" { ...props }>
+							{ children }
+						</div>
+					) }
+					renderItem={ ( {
+						value: layer,
+						props,
+						isDragged,
+						isSelected,
+						isOutOfBounds,
+						index,
+					} ) => {
 									const switchDefault = ( def ) =>
 										setLayers(
 											attributes.layers.map( ( settings ) =>
@@ -353,7 +358,11 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 									}
 
 									return <LayerSettings
+										itemProps={ props }
 										index={ index }
+										isDragged={ isDragged }
+										isSelected={ isSelected }
+										isOutOfBounds={ isOutOfBounds }
 										removeLayer={ removeLayer }
 										settings={ loadedLayer }
 										switchUseStyle={ switchUseStyle }
@@ -365,12 +374,8 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										updateStyleLayers={ updateStyleLayers }
 										key={ index }
 									/>;
-								} ) }
-								{ provided.placeholder }
-							</div>
-						) }
-					</Droppable>
-				</DragDropContext>
+								} }
+				/>
 			) }
 			<Button
 				className="done-button"

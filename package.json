@@ -39,7 +39,6 @@
 		"mapbox-gl": "^3.20.0",
 		"maplibre-gl": "^5.20.1",
 		"maplibregl-mapbox-request-transformer": "^0.0.3",
-		"react-beautiful-dnd": "^13.1.1",
 		"react-datepicker": "^9.1.0",
 		"react-leaflet": "^4.2.1",
 		"react-map-gl": "^8.1.0",
