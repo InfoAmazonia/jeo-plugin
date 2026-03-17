@@ -13,10 +13,11 @@
     "notes": [
       "Automated approval gates are the Node Frontend Checks, PHP Compatibility and WordPress Smoke Tests GitHub Actions workflows.",
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
-      "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor.",
+      "The report now captures a frontend runtime snapshot with the resolved React, ReactDOM and Gutenberg editor package versions plus their published peer ranges.",
+      "The installed tree now resolves a local react-autosize-textarea override so the stale upstream peer metadata no longer raises npm peer warnings against React 18.3.1.",
       "Current stabilization track: Batch 1 fixes the null-related-post geocode crash, same-point post individualization and reorder regressions that predate the dependency majors.",
       "Current stabilization track: Batch 2 has replaced react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form, and Batch 3 has now removed react-beautiful-dnd.",
-      "Current stabilization track: Batch 4 aligns the Gutenberg and React line to clear the remaining react-autosize-textarea peer warning and unblock react-leaflet 5.",
+      "Current stabilization track: Batch 4 confirmed the latest published Gutenberg editor packages still pin React 18, applied the minimum local react-autosize-textarea override, and kept react-leaflet 5 blocked until upstream publishes a React-19-compatible line.",
       "Current stabilization track: Batch 6 validates PHP 8.5 and Batch 7 is the dedicated PHPCS baseline cleanup."
     ]
   },
@@ -333,12 +334,13 @@
       "id": "batch-4-gutenberg-react-alignment",
       "phase": "Batch 4",
       "title": "Gutenberg and React alignment",
-      "status": "planned",
-      "scope": "Refresh the Gutenberg package line, clear the remaining React peer warning and prepare the tree for the react-leaflet major.",
+      "status": "ready-for-approval",
+      "scope": "Revalidate the latest published Gutenberg editor packages, clear the remaining React peer warning with a minimum local override, and document the still-blocked react-leaflet 5 path.",
       "packageNames": [
         "@wordpress/edit-post",
         "@wordpress/editor",
-        "@wordpress/plugins"
+        "@wordpress/plugins",
+        "react-autosize-textarea"
       ],
       "automatedChecks": [
         "npm ci",
@@ -352,16 +354,16 @@
         "Verify the map editor, layer editor, storymap editor and regular post editor load, save and stay console-clean."
       ],
       "approvalNotes": [
-        "Do not add react or react-dom directly unless the resolved Gutenberg line forces it.",
-        "If the react-autosize-textarea peer warning survives the refresh upstream, document and isolate the minimal override used to remove it."
+        "No newer published @wordpress/edit-post, @wordpress/editor or @wordpress/plugins versions were available beyond the already installed line, and their published peerDependencies still target React 18.",
+        "Batch 4 therefore uses a local react-autosize-textarea override to modernize peer metadata without changing the runtime implementation or adding react or react-dom directly."
       ]
     },
     {
       "id": "batch-5-react-leaflet-major",
       "phase": "Batch 5",
       "title": "react-leaflet major",
-      "status": "planned",
-      "scope": "Upgrade react-leaflet to 5.x after the React line is compatible and validate the entire geocoding sidebar map flow.",
+      "status": "blocked",
+      "scope": "Upgrade react-leaflet to 5.x after a React-19-compatible Gutenberg stack exists and validate the entire geocoding sidebar map flow.",
       "packageNames": [
         "react-leaflet"
       ],
@@ -376,7 +378,8 @@
         "Verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map."
       ],
       "approvalNotes": [
-        "Only start this batch after Batch 4 has removed the React-line blocker."
+        "The latest published Gutenberg editor packages still peer on react and react-dom ^18.0.0, while react-leaflet 5.0.0 requires react and react-dom ^19.0.0.",
+        "Do not start this batch until upstream publishes a supported React-19-compatible editor stack or the repository adopts another supported route."
       ]
     },
     {
@@ -976,6 +979,60 @@
         "src/js/src/map-blocks/storymap-editor.js",
         "src/js/src/map-blocks/storymap-editor.scss"
       ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-4-gutenberg-react-alignment",
+      "status": "ready-for-approval",
+      "summary": "Confirmed that the currently installed Gutenberg editor packages are already on the latest published line, applied a local react-autosize-textarea override to remove the stale React peer warning, and documented that react-leaflet 5 remains blocked by upstream React 18 peer ranges.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully after rebuilding node_modules from scratch. The prior react-autosize-textarea peer warning disappeared; the remaining install noise is broader transitive npm ecosystem deprecations such as inflight, rimraf, glob and eslint support notices."
+        },
+        {
+          "name": "npm ls react-autosize-textarea react react-dom",
+          "status": "passed",
+          "details": "The installed tree now resolves react-autosize-textarea@7.1.0-jeo.0 from npm-overrides/react-autosize-textarea under the Gutenberg editor packages, with React 18.3.1 and ReactDOM 18.3.1 accepted cleanly."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The wp-scripts unit suite remained green with 8 test files and 25 assertions after the local override and lockfile refresh."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after the override with only the existing bundle-size warnings."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green; Batch 4 did not change any PHP source."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after the lockfile refresh and override application."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify the map editor, layer editor, storymap editor and regular post editor load, save and stay console-clean."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "npm-overrides/react-autosize-textarea/package.json",
+        "npm-overrides/react-autosize-textarea/lib/index.js",
+        "npm-overrides/react-autosize-textarea/lib/TextareaAutosize.js",
+        "npm-overrides/react-autosize-textarea/lib/index.d.ts",
+        "npm-overrides/react-autosize-textarea/lib/TextareaAutosize.d.ts",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
     }
   ],
   "npm": {
@@ -1122,9 +1179,10 @@
     },
     "@wordpress/edit-post": {
       "batchId": "batch-4-gutenberg-react-alignment",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Planned refresh in Batch 4 as part of the Gutenberg and React alignment needed to clear the remaining peer warning."
+        "Revalidated in Batch 4: 8.41.0 is already the latest published line available to this repository.",
+        "Its published peerDependencies still target react and react-dom ^18.0.0, so no upstream React-line unlock happened in this batch."
       ],
       "notes": [
         "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
@@ -1132,9 +1190,10 @@
     },
     "@wordpress/editor": {
       "batchId": "batch-4-gutenberg-react-alignment",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Planned refresh in Batch 4 as part of the Gutenberg and React alignment needed to clear the remaining peer warning."
+        "Revalidated in Batch 4: 14.41.0 is already the latest published line available to this repository.",
+        "Its published peerDependencies still target react and react-dom ^18.0.0, so no upstream React-line unlock happened in this batch."
       ],
       "notes": [
         "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
@@ -1142,9 +1201,10 @@
     },
     "@wordpress/plugins": {
       "batchId": "batch-4-gutenberg-react-alignment",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Planned refresh in Batch 4 alongside the editor packages to keep the React line aligned."
+        "Revalidated in Batch 4: 7.41.0 is already the latest published line available to this repository.",
+        "Its published peerDependencies still target react and react-dom ^18.0.0, so this package does not yet help unlock react-leaflet 5."
       ]
     },
     "react-datepicker": {
@@ -1158,10 +1218,10 @@
     },
     "react-leaflet": {
       "batchId": "batch-5-react-leaflet-major",
-      "executionStatus": "planned",
+      "executionStatus": "blocked",
       "executionNotes": [
-        "Batch 5 stays gated by Batch 4 because react-leaflet 5.0.0 currently requires react and react-dom ^19.0.0.",
-        "Start the major only after the Gutenberg and React alignment leaves the tree compatible with the published peer requirements."
+        "Batch 5 remains blocked after Batch 4 because react-leaflet 5.0.0 requires react and react-dom ^19.0.0.",
+        "The latest published Gutenberg editor packages in this repository still peer on react and react-dom ^18.0.0, so the upgrade cannot start yet without leaving the supported upstream path."
       ]
     }
   },
@@ -1190,10 +1250,10 @@
           "@wordpress/edit-post",
           "@wordpress/editor"
         ],
-        "maintenanceStatus": "peer-mismatch",
+        "maintenanceStatus": "peer-metadata-overridden",
         "decision": "watch",
-        "minorPath": "Re-evaluate after each Gutenberg batch; current 7.1.0 peer range is older than React 18.3.1.",
-        "majorPath": "Do not attempt a React/Gutenberg major upgrade until the peer warning disappears upstream or is replaced downstream.",
+        "minorPath": "Keep the local override in place while the published Gutenberg editor packages still carry this stale peer metadata.",
+        "majorPath": "Remove the override only after upstream ships React-18 or React-19-compatible peer metadata or the parent editor stack is replaced through a supported upgrade path.",
         "evidence": [
           {
             "label": "npm",
@@ -1201,9 +1261,10 @@
           }
         ],
         "batchId": "batch-4-gutenberg-react-alignment",
-        "executionStatus": "planned",
+        "executionStatus": "completed",
         "executionNotes": [
-          "Batch 4 revalidates this peer warning after the Gutenberg refresh and applies the minimum override if upstream still leaves it unresolved."
+          "Batch 4 confirmed that the latest published Gutenberg editor packages still resolve this stale peer metadata and therefore applied a minimum local override at npm-overrides/react-autosize-textarea.",
+          "npm ci and npm ls no longer report invalid React peer ranges after the override."
         ],
         "notes": [
           "Observed locally through npm ls react react-dom."

@@ -13,6 +13,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 ## Preconditions
 
 - Use a WordPress instance that matches the current baseline: WordPress 6.6+, PHP 8.0+ and Node 20 for local builds.
+- At the start of every dependency review or planning batch that can touch editor or runtime behavior, regenerate the dependency report and record the resolved React, ReactDOM and Gutenberg editor package versions plus peer ranges from the frontend runtime snapshot.
 - Test both editor and frontend behavior whenever a batch touches runtime code.
 - Treat `.github/workflows/node-frontend.yml`, `.github/workflows/php-compat.yml` and `.github/workflows/wordpress-smoke.yml` as the mandatory CI gates.
 - When the local WordPress smoke runs from a clean worktree, make sure the ignored `src/js/build` assets have been generated first, or record the resulting asset-include warnings explicitly in the batch report.
@@ -36,7 +37,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 - Batch 1: verify published-map popups, same-point post individualization, the absence of the null-geocode crash, and storymap slide plus nested layer reorder, including save and reopen after reordering.
 - Batch 2: verify geocoding autosuggest suggestions and selection, post/map autosuggest insertion, Discovery date apply/clear behavior, and layer or attribution forms backed by schema data.
 - Batch 3: verify selected map-layer ordering, storymap slide ordering and storymap layer toggling after removing the unsupported nested drag affordance.
-- Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the Gutenberg refresh.
+- Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the local react-autosize-textarea override and lockfile refresh.
 - Batch 5: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map.
 - Batch 6: verify the same product smoke already covered by the runtime batches, but execute it while watching specifically for repository-owned PHP 8.5 warnings or deprecations.
 - Batch 7: no product review is required unless the PHPCS cleanup changes runtime PHP logic; otherwise review the lint delta and escaping or nonce-sensitive paths in code review.

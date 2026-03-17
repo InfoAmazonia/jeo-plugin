@@ -13,6 +13,12 @@ const COMPOSER_LOCK_PATH = path.join(ROOT, 'composer.lock');
 const OVERRIDES_PATH = path.join(ROOT, 'scripts', 'dependency-review.overrides.json');
 const REPORT_MD_PATH = path.join(ROOT, 'docs', 'dev', 'dependency-upgrade-report.md');
 const REPORT_JSON_PATH = path.join(ROOT, 'docs', 'dev', 'dependency-upgrade-report.json');
+const FRONTEND_RUNTIME_PACKAGES = [
+	'@wordpress/edit-post',
+	'@wordpress/editor',
+	'@wordpress/plugins',
+	'@wordpress/block-editor',
+];
 
 const WRITE_MODE = process.argv.includes('--write');
 
@@ -22,6 +28,7 @@ const MAINTENANCE_LABELS = {
 	'deprecated-archived': 'Deprecated and archived',
 	'looking-for-maintainers': 'Low activity / looking for maintainers',
 	'peer-mismatch': 'Maintained upstream, but current tree has a peer warning',
+	'peer-metadata-overridden': 'Maintained upstream, local override applied for stale peer metadata',
 	'review-manually': 'Needs manual review',
 };
 
@@ -60,7 +67,7 @@ function commandVersion( command, args = [ '--version' ] ) {
 	return output ? output.split( '\n' )[0] : null;
 }
 
-function buildBaseline( overrides ) {
+function buildBaseline( overrides, packageJson, packageLock ) {
 	const composerVersion = commandVersion( 'composer' );
 	const phpVersion = commandVersion( 'php', [ '-v' ] );
 	const toolingCaveats = [];
@@ -90,12 +97,54 @@ function buildBaseline( overrides ) {
 	return {
 		...overrides.baseline,
 		toolingCaveats,
+		frontendRuntime: buildFrontendRuntimeBaseline( packageJson, packageLock ),
 		localValidation: {
 			phpAvailable: Boolean( phpVersion ),
 			phpVersion,
 			composerAvailable: Boolean( composerVersion ),
 			composerVersion,
 		},
+	};
+}
+
+function packageLockEntry( packageLock, packageName ) {
+	return packageLock.packages?.[ `node_modules/${ packageName }` ] || null;
+}
+
+function buildFrontendRuntimeBaseline( packageJson, packageLock ) {
+	const reactEntry = packageLockEntry( packageLock, 'react' );
+	const reactDomEntry = packageLockEntry( packageLock, 'react-dom' );
+	const packages = FRONTEND_RUNTIME_PACKAGES.map( ( packageName ) => {
+		const entry = packageLockEntry( packageLock, packageName );
+
+		if ( ! entry ) {
+			return null;
+		}
+
+		return {
+			packageName,
+			declaredRange:
+				packageJson.dependencies?.[ packageName ] ||
+				packageJson.devDependencies?.[ packageName ] ||
+				'transitive',
+			resolvedVersion: normalizeVersion( entry.version ) || null,
+			peerReact: entry.peerDependencies?.react || null,
+			peerReactDom: entry.peerDependencies?.[ 'react-dom' ] || null,
+		};
+	} ).filter( Boolean );
+
+	const overrides = Object.entries( packageJson.overrides || {} ).map(
+		( [ packageName, spec ] ) => ( {
+			packageName,
+			spec: String( spec ),
+		} )
+	);
+
+	return {
+		reactVersion: normalizeVersion( reactEntry?.version ) || null,
+		reactDomVersion: normalizeVersion( reactDomEntry?.version ) || null,
+		packages,
+		overrides,
 	};
 }
 
@@ -1001,6 +1050,46 @@ function renderNotes( rows ) {
 	return notes.length > 0 ? notes.join( '\n' ) : '- No package-specific notes captured.';
 }
 
+function renderFrontendRuntimeSnapshot( frontendRuntime ) {
+	if ( ! frontendRuntime ) {
+		return '- No frontend runtime snapshot available.';
+	}
+
+	const packageTable = ( frontendRuntime.packages || [] ).length
+		? [
+			[
+				'Package',
+				'Declared',
+				'Resolved',
+				'React peer',
+				'ReactDOM peer',
+			],
+			[ '---', '---', '---', '---', '---' ],
+			...frontendRuntime.packages.map( ( entry ) => [
+				markdownEscape( entry.packageName ),
+				markdownEscape( entry.declaredRange || 'transitive' ),
+				markdownEscape( entry.resolvedVersion || 'Unavailable' ),
+				markdownEscape( entry.peerReact || '-' ),
+				markdownEscape( entry.peerReactDom || '-' ),
+			] ),
+		]
+			.map( ( row ) => `| ${ row.join( ' | ' ) } |` )
+			.join( '\n' )
+		: '- No Gutenberg runtime packages captured.';
+
+	const overrides = ( frontendRuntime.overrides || [] ).length
+		? frontendRuntime.overrides
+			.map( ( entry ) => `\`${ entry.packageName }\` -> \`${ entry.spec }\`` )
+			.join( ', ' )
+		: 'None';
+
+	return `- React: \`${ frontendRuntime.reactVersion || 'Unavailable' }\`.
+- ReactDOM: \`${ frontendRuntime.reactDomVersion || 'Unavailable' }\`.
+- Local npm overrides: ${ overrides }.
+
+${ packageTable }`;
+}
+
 function renderMarkdownReport( report ) {
 	const generatedDate = report.generatedAt.slice( 0, 10 );
 
@@ -1026,6 +1115,10 @@ ${ report.baseline.notes.map( ( note ) => `- ${ note }` ).join( '\n' ) }
 ### Environment caveats
 
 ${ report.baseline.toolingCaveats.map( ( note ) => `- ${ note }` ).join( '\n' ) }
+
+### Frontend runtime snapshot
+
+${ renderFrontendRuntimeSnapshot( report.baseline.frontendRuntime ) }
 
 ## Execution plan
 
@@ -1080,7 +1173,7 @@ async function main() {
 	const npmInventory = collectNpmInventory( packageJson, packageLock );
 	const composerInventory = collectComposerInventory( composerJson, composerLock );
 	const watchlistInventory = collectNpmWatchlist( overrides );
-	const baseline = buildBaseline( overrides );
+	const baseline = buildBaseline( overrides, packageJson, packageLock );
 
 	const npmRows = await Promise.all(
 		npmInventory.map( async ( item ) => {

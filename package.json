@@ -22,6 +22,9 @@
 		"url": "https://github.com/InfoAmazonia/jeo-plugin/issues"
 	},
 	"homepage": "https://github.com/InfoAmazonia/jeo-plugin#readme",
+	"overrides": {
+		"react-autosize-textarea": "file:npm-overrides/react-autosize-textarea"
+	},
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "^11.0.1",
 		"@nazka/map-gl-js-spiderfy": "^1.2.10",
