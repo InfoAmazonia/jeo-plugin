@@ -1,5 +1,11 @@
 <?php
-	$disable_embed = get_post_meta( $map_id, 'disable_embed', true ) === '1' ? true : false;
+/**
+ * Map embed template.
+ *
+ * @package Jeo
+ */
+
+$disable_embed = get_post_meta( $map_id, 'disable_embed', true ) === '1';
 
 if ( $disable_embed ) {
 	wp_safe_redirect( home_url() );

@@ -1,3 +1,11 @@
+<?php
+/**
+ * Settings page markup.
+ *
+ * @package Jeo
+ */
+
+?>
 <form action="options.php" method="post" class="clear prepend-top">
 	<?php settings_fields( $this->option_key ); ?>
 	<div class="wrap">
@@ -124,8 +132,8 @@
 
 						<tr class="geocoder_options" id="geocoder_options_<?php echo esc_attr( $gslug ); ?>">
 							<th scope="row">
-								<label for="input_id">
-									<?php // translators: %s is the geocoder name. Ex: Nominatim options ?>
+									<label for="input_id">
+									<?php // translators: %s is the geocoder name. Example: Nominatim options. ?>
 									<?php printf( esc_html_x( '%s options', 'geocoder_options', 'jeo' ), esc_attr( $geocoder['name'] ) ); ?>
 								</label>
 							</th>

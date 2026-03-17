@@ -1,5 +1,7 @@
 <?php
 /**
+ * Bootstrap the JEO plugin.
+ *
  * @package           Jeo
  *
  * @wordpress-plugin

@@ -1,15 +1,22 @@
 #!/usr/bin/env php
 <?php
+/**
+ * CLI PHP compatibility review for repository-owned code.
+ *
+ * @package Jeo
+ */
 
 declare(strict_types=1);
 
-$repositoryRoot = dirname(__DIR__);
-$targets = array(
-	$repositoryRoot . '/src',
-	$repositoryRoot . '/trunk',
+// phpcs:disable WordPress.Security.EscapeOutput.OutputNotEscaped,WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents,WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec -- This is a CLI-only diagnostic script, not a WordPress runtime endpoint.
+
+$repository_root = dirname( __DIR__ );
+$scan_targets    = array(
+	$repository_root . '/src',
+	$repository_root . '/trunk',
 );
 
-$files = collect_php_files( $targets );
+$files = collect_php_files( $scan_targets );
 sort( $files );
 
 $report = array(
@@ -24,31 +31,31 @@ $report = array(
 	'notes'                => array(),
 );
 
-$lint_findings = lint_php_files( $files );
+$lint_findings      = lint_php_files( $files );
 $report['checks'][] = summarize_check( 'Syntax lint', $lint_findings );
 
 $removed_function_findings = scan_removed_or_deprecated_functions( $files );
-$report['checks'][] = summarize_check( 'Removed/deprecated function scan', $removed_function_findings );
+$report['checks'][]        = summarize_check( 'Removed/deprecated function scan', $removed_function_findings );
 
 $parameter_findings = scan_optional_before_required_parameters( $files );
 $report['checks'][] = summarize_check( 'Optional-before-required parameter scan', $parameter_findings );
 
 $dynamic_property_findings = scan_dynamic_this_property_assignments( $files );
-$report['checks'][] = summarize_check( 'Dynamic $this property assignment scan', $dynamic_property_findings );
+$report['checks'][]        = summarize_check( 'Dynamic $this property assignment scan', $dynamic_property_findings );
 
-$backtick_findings = scan_backtick_shell_execution( $files );
+$backtick_findings  = scan_backtick_shell_execution( $files );
 $report['checks'][] = summarize_check( 'Backtick shell-execution scan', $backtick_findings );
 
-$cast_findings = scan_non_canonical_casts( $files );
+$cast_findings      = scan_non_canonical_casts( $files );
 $report['checks'][] = summarize_check( 'Non-canonical cast scan', $cast_findings );
 
 $case_syntax_findings = scan_case_semicolon_syntax( $files );
-$report['checks'][] = summarize_check( 'Case-semicolon syntax scan', $case_syntax_findings );
+$report['checks'][]   = summarize_check( 'Case-semicolon syntax scan', $case_syntax_findings );
 
 $legacy_magic_method_findings = scan_legacy_sleep_wakeup_methods( $files );
-$report['checks'][] = summarize_check( 'Legacy __sleep/__wakeup scan', $legacy_magic_method_findings );
+$report['checks'][]           = summarize_check( 'Legacy __sleep/__wakeup scan', $legacy_magic_method_findings );
 
-$metadata_notes = scan_readme_metadata( $repositoryRoot );
+$metadata_notes  = scan_readme_metadata( $repository_root );
 $report['notes'] = array_merge( $report['notes'], $metadata_notes );
 
 print_report( $report );
@@ -63,6 +70,12 @@ foreach ( $report['checks'] as $check ) {
 
 exit( $has_errors ? 1 : 0 );
 
+/**
+ * Collect all PHP files within the target directories.
+ *
+ * @param array $targets Directories to scan.
+ * @return array
+ */
 function collect_php_files( array $targets ): array {
 	$files = array();
 
@@ -85,13 +98,19 @@ function collect_php_files( array $targets ): array {
 	return $files;
 }
 
+/**
+ * Run `php -l` against every discovered PHP file.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function lint_php_files( array $files ): array {
 	$findings = array();
 
 	foreach ( $files as $file ) {
 		$command = escapeshellarg( PHP_BINARY ) . ' -d display_errors=1 -d error_reporting=32767 -l ' . escapeshellarg( $file ) . ' 2>&1';
-		$output = array();
-		$status = 0;
+		$output  = array();
+		$status  = 0;
 		exec( $command, $output, $status );
 
 		if ( 0 !== $status ) {
@@ -106,20 +125,26 @@ function lint_php_files( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Scan for removed or deprecated PHP functions.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function scan_removed_or_deprecated_functions( array $files ): array {
 	$functions = array(
-		'create_function'         => 'removed in PHP 8.0',
-		'each'                    => 'removed in PHP 8.0',
-		'utf8_encode'             => 'deprecated in PHP 8.2 and removed in PHP 8.4',
-		'utf8_decode'             => 'deprecated in PHP 8.2 and removed in PHP 8.4',
-		'money_format'            => 'removed in PHP 8.0',
-		'strftime'                => 'deprecated in PHP 8.1',
-		'gmstrftime'              => 'deprecated in PHP 8.1',
-		'hebrev'                  => 'deprecated in PHP 8.3',
-		'hebrevc'                 => 'deprecated in PHP 8.3',
-		'mbereg_replace'          => 'deprecated in PHP 8.4 when using the eval option',
-		'set_magic_quotes_runtime'=> 'removed in PHP 8.0',
-		'ezmlm_hash'              => 'removed in PHP 8.0',
+		'create_function'          => 'removed in PHP 8.0',
+		'each'                     => 'removed in PHP 8.0',
+		'utf8_encode'              => 'deprecated in PHP 8.2 and removed in PHP 8.4',
+		'utf8_decode'              => 'deprecated in PHP 8.2 and removed in PHP 8.4',
+		'money_format'             => 'removed in PHP 8.0',
+		'strftime'                 => 'deprecated in PHP 8.1',
+		'gmstrftime'               => 'deprecated in PHP 8.1',
+		'hebrev'                   => 'deprecated in PHP 8.3',
+		'hebrevc'                  => 'deprecated in PHP 8.3',
+		'mbereg_replace'           => 'deprecated in PHP 8.4 when using the eval option',
+		'set_magic_quotes_runtime' => 'removed in PHP 8.0',
+		'ezmlm_hash'               => 'removed in PHP 8.0',
 	);
 
 	$findings = array();
@@ -140,13 +165,13 @@ function scan_removed_or_deprecated_functions( array $files ): array {
 			}
 
 			$previous_index = previous_meaningful_token_index( $tokens, $index );
-			$previous = null !== $previous_index ? $tokens[ $previous_index ] : null;
+			$previous       = null !== $previous_index ? $tokens[ $previous_index ] : null;
 			if ( is_array( $previous ) && in_array( $previous[0], array( T_FUNCTION, T_NEW, T_OBJECT_OPERATOR, T_DOUBLE_COLON ), true ) ) {
 				continue;
 			}
 
 			$next_index = next_meaningful_token_index( $tokens, $index );
-			$next = null !== $next_index ? $tokens[ $next_index ] : null;
+			$next       = null !== $next_index ? $tokens[ $next_index ] : null;
 			if ( '(' !== token_text( $next ) ) {
 				continue;
 			}
@@ -162,6 +187,12 @@ function scan_removed_or_deprecated_functions( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Scan for required parameters declared after optional ones.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function scan_optional_before_required_parameters( array $files ): array {
 	$findings = array();
 
@@ -176,8 +207,8 @@ function scan_optional_before_required_parameters( array $files ): array {
 			}
 
 			$function_name = 'anonymous';
-			$name_index = next_meaningful_token_index( $tokens, $index );
-			$name_token = null !== $name_index ? $tokens[ $name_index ] : null;
+			$name_index    = next_meaningful_token_index( $tokens, $index );
+			$name_token    = null !== $name_index ? $tokens[ $name_index ] : null;
 			if ( is_array( $name_token ) && T_STRING === $name_token[0] ) {
 				$function_name = $name_token[1];
 			}
@@ -192,7 +223,7 @@ function scan_optional_before_required_parameters( array $files ): array {
 				continue;
 			}
 
-			$parameters = parse_parameters( $tokens, $open_index + 1, $close_index - 1 );
+			$parameters    = parse_parameters( $tokens, $open_index + 1, $close_index - 1 );
 			$seen_optional = false;
 
 			foreach ( $parameters as $parameter ) {
@@ -225,6 +256,12 @@ function scan_optional_before_required_parameters( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Scan for undeclared dynamic `$this` property assignments.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function scan_dynamic_this_property_assignments( array $files ): array {
 	$findings = array();
 
@@ -254,12 +291,18 @@ function scan_dynamic_this_property_assignments( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Scan for backtick shell-execution usage.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function scan_backtick_shell_execution( array $files ): array {
 	$findings = array();
 
 	foreach ( $files as $file ) {
-		$tokens = token_get_all( file_get_contents( $file ) );
-		$count = count( $tokens );
+		$tokens           = token_get_all( file_get_contents( $file ) );
+		$count            = count( $tokens );
 		$inside_backticks = false;
 
 		for ( $index = 0; $index < $count; $index++ ) {
@@ -282,6 +325,12 @@ function scan_backtick_shell_execution( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Scan for non-canonical casts deprecated in PHP 8.5.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function scan_non_canonical_casts( array $files ): array {
 	$deprecated_casts = array(
 		T_BOOL_CAST   => '(boolean)',
@@ -289,7 +338,7 @@ function scan_non_canonical_casts( array $files ): array {
 		T_DOUBLE_CAST => '(double)',
 		T_STRING_CAST => '(binary)',
 	);
-	$findings = array();
+	$findings         = array();
 
 	foreach ( $files as $file ) {
 		$tokens = token_get_all( file_get_contents( $file ) );
@@ -317,12 +366,18 @@ function scan_non_canonical_casts( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Scan for `case ...;` syntax deprecated in PHP 8.5.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function scan_case_semicolon_syntax( array $files ): array {
 	$findings = array();
 
 	foreach ( $files as $file ) {
 		$tokens = token_get_all( file_get_contents( $file ) );
-		$count = count( $tokens );
+		$count  = count( $tokens );
 
 		for ( $index = 0; $index < $count; $index++ ) {
 			$token = $tokens[ $index ];
@@ -355,12 +410,18 @@ function scan_case_semicolon_syntax( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Scan for legacy `__sleep()` and `__wakeup()` magic methods.
+ *
+ * @param array $files PHP file paths.
+ * @return array
+ */
 function scan_legacy_sleep_wakeup_methods( array $files ): array {
 	$findings = array();
 
 	foreach ( $files as $file ) {
 		$tokens = token_get_all( file_get_contents( $file ) );
-		$count = count( $tokens );
+		$count  = count( $tokens );
 
 		for ( $index = 0; $index < $count; $index++ ) {
 			$token = $tokens[ $index ];
@@ -393,6 +454,12 @@ function scan_legacy_sleep_wakeup_methods( array $files ): array {
 	return $findings;
 }
 
+/**
+ * Extract classes and traits plus their declared properties and assignments.
+ *
+ * @param array $tokens PHP token stream.
+ * @return array
+ */
 function extract_class_like_structures( array $tokens ): array {
 	$structures = array();
 	$count      = count( $tokens );
@@ -403,7 +470,7 @@ function extract_class_like_structures( array $tokens ): array {
 			continue;
 		}
 
-		$name = 'anonymous';
+		$name       = 'anonymous';
 		$name_index = next_meaningful_token_index( $tokens, $index );
 		$name_token = null !== $name_index ? $tokens[ $name_index ] : null;
 		if ( is_array( $name_token ) && T_STRING === $name_token[0] ) {
@@ -432,11 +499,19 @@ function extract_class_like_structures( array $tokens ): array {
 	return $structures;
 }
 
+/**
+ * Collect declared properties inside a class-like structure.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $start Start index.
+ * @param int   $end End index.
+ * @return array
+ */
 function collect_declared_properties( array $tokens, int $start, int $end ): array {
-	$properties = array();
-	$brace_depth = 0;
-	$function_depth = 0;
-	$expect_property = false;
+	$properties               = array();
+	$brace_depth              = 0;
+	$function_depth           = 0;
+	$expect_property          = false;
 	$property_modifier_tokens = array( T_PUBLIC, T_PROTECTED, T_PRIVATE, T_VAR, T_STATIC );
 
 	if ( defined( 'T_READONLY' ) ) {
@@ -492,6 +567,14 @@ function collect_declared_properties( array $tokens, int $start, int $end ): arr
 	return $properties;
 }
 
+/**
+ * Collect `$this->property = ...` assignments inside a class-like structure.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $start Start index.
+ * @param int   $end End index.
+ * @return array
+ */
 function collect_this_property_assignments( array $tokens, int $start, int $end ): array {
 	$assignments = array();
 	$count       = count( $tokens );
@@ -504,19 +587,19 @@ function collect_this_property_assignments( array $tokens, int $start, int $end 
 		}
 
 		$operator_index = next_meaningful_token_index( $tokens, $index );
-		$operator = null !== $operator_index ? $tokens[ $operator_index ] : null;
+		$operator       = null !== $operator_index ? $tokens[ $operator_index ] : null;
 		if ( '->' !== token_text( $operator ) ) {
 			continue;
 		}
 
 		$property_index = null !== $operator_index ? next_meaningful_token_index( $tokens, $operator_index ) : null;
-		$property = null !== $property_index ? $tokens[ $property_index ] : null;
+		$property       = null !== $property_index ? $tokens[ $property_index ] : null;
 		if ( ! is_array( $property ) || T_STRING !== $property[0] ) {
 			continue;
 		}
 
-		$next_index = null !== $property_index ? next_meaningful_token_index( $tokens, $property_index ) : null;
-		$next = null !== $next_index ? $tokens[ $next_index ] : null;
+		$next_index           = null !== $property_index ? next_meaningful_token_index( $tokens, $property_index ) : null;
+		$next                 = null !== $next_index ? $tokens[ $next_index ] : null;
 		$assignment_operators = array( '=', '+=', '-=', '*=', '/=', '.=', '%=', '&=', '|=', '^=', '??=' );
 		if ( ! in_array( token_text( $next ), $assignment_operators, true ) ) {
 			continue;
@@ -531,6 +614,14 @@ function collect_this_property_assignments( array $tokens, int $start, int $end 
 	return $assignments;
 }
 
+/**
+ * Parse function parameters from a token range.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $start Start index.
+ * @param int   $end End index.
+ * @return array
+ */
 function parse_parameters( array $tokens, int $start, int $end ): array {
 	$parameters = array();
 	$current    = array(
@@ -539,7 +630,7 @@ function parse_parameters( array $tokens, int $start, int $end ): array {
 		'has_default' => false,
 		'is_variadic' => false,
 	);
-	$depth = 0;
+	$depth      = 0;
 
 	for ( $index = $start; $index <= $end; $index++ ) {
 		$token = $tokens[ $index ];
@@ -557,7 +648,7 @@ function parse_parameters( array $tokens, int $start, int $end ): array {
 
 		if ( 0 === $depth && ',' === $text ) {
 			$parameters[] = $current;
-			$current = array(
+			$current      = array(
 				'name'        => null,
 				'line'        => null,
 				'has_default' => false,
@@ -589,11 +680,17 @@ function parse_parameters( array $tokens, int $start, int $end ): array {
 	return $parameters;
 }
 
-function scan_readme_metadata( string $repositoryRoot ): array {
+/**
+ * Read README metadata notes relevant to PHP compatibility messaging.
+ *
+ * @param string $repository_root Repository root path.
+ * @return array
+ */
+function scan_readme_metadata( string $repository_root ): array {
 	$notes = array();
 	$files = array(
-		$repositoryRoot . '/src/README.txt',
-		$repositoryRoot . '/trunk/readme.txt',
+		$repository_root . '/src/README.txt',
+		$repository_root . '/trunk/readme.txt',
 	);
 
 	foreach ( $files as $file ) {
@@ -603,6 +700,13 @@ function scan_readme_metadata( string $repositoryRoot ): array {
 
 		$content = file_get_contents( $file );
 		if ( preg_match( '/^Requires PHP:\s*(.+)$/mi', $content, $matches ) ) {
+			$documents_experimental_php85 = ( false !== stripos( $content, 'Experimental monitoring: PHP 8.5' ) )
+				|| ( false !== stripos( $content, 'experimental WordPress smoke coverage on PHP 8.5' ) );
+
+			if ( $documents_experimental_php85 ) {
+				continue;
+			}
+
 			$notes[] = sprintf(
 				'%s declares "Requires PHP: %s". This admits PHP 8.2-8.5 but does not explicitly document the repository\'s PHP 8.5 experimental validation line.',
 				relative_path( $file ),
@@ -614,6 +718,13 @@ function scan_readme_metadata( string $repositoryRoot ): array {
 	return $notes;
 }
 
+/**
+ * Build a report row for a named compatibility check.
+ *
+ * @param string $name Check label.
+ * @param array  $findings Findings collected by the check.
+ * @return array
+ */
 function summarize_check( string $name, array $findings ): array {
 	return array(
 		'name'     => $name,
@@ -622,6 +733,12 @@ function summarize_check( string $name, array $findings ): array {
 	);
 }
 
+/**
+ * Print the CLI compatibility report.
+ *
+ * @param array $report Report payload.
+ * @return void
+ */
 function print_report( array $report ): void {
 	printf( "PHP compatibility review\n" );
 	printf( "Target range: %s\n", $report['target_range'] );
@@ -664,6 +781,12 @@ function print_report( array $report ): void {
 	printf( "Limitations: static source review only; it does not boot WordPress or exercise runtime behavior.\n" );
 }
 
+/**
+ * Determine whether every collected check passed.
+ *
+ * @param array $checks Check rows.
+ * @return bool
+ */
 function all_checks_passed( array $checks ): bool {
 	foreach ( $checks as $check ) {
 		if ( 'PASS' !== $check['status'] ) {
@@ -674,6 +797,13 @@ function all_checks_passed( array $checks ): bool {
 	return true;
 }
 
+/**
+ * Find the previous non-whitespace, non-comment token index.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $index Current index.
+ * @return int|null
+ */
 function previous_meaningful_token_index( array $tokens, int $index ): ?int {
 	for ( $current = $index - 1; $current >= 0; $current-- ) {
 		$token = $tokens[ $current ];
@@ -687,9 +817,16 @@ function previous_meaningful_token_index( array $tokens, int $index ): ?int {
 	return null;
 }
 
+/**
+ * Find the next non-whitespace, non-comment token index.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $index Current index.
+ * @return int|null
+ */
 function next_meaningful_token_index( array $tokens, int $index ): ?int {
 	$count = count( $tokens );
-	for ( $current = $index + 1; $current < $count; $current++ ) {
+	for ( $current = $index + 1; $count > $current; $current++ ) {
 		$token = $tokens[ $current ];
 		if ( is_array( $token ) && in_array( $token[0], array( T_WHITESPACE, T_COMMENT, T_DOC_COMMENT ), true ) ) {
 			continue;
@@ -701,17 +838,36 @@ function next_meaningful_token_index( array $tokens, int $index ): ?int {
 	return null;
 }
 
+/**
+ * Find the next token with a given text value.
+ *
+ * @param array  $tokens PHP token stream.
+ * @param int    $index Current index.
+ * @param string $text Token text to match.
+ * @return int|null
+ */
 function find_next_token_index_by_text( array $tokens, int $index, string $text ): ?int {
-	$count = count( $tokens );
-	for ( $current = $index + 1; $current < $count; $current++ ) {
+	$count   = count( $tokens );
+	$current = $index + 1;
+	while ( $count > $current ) {
+		// phpcs:ignore WordPress.PHP.YodaConditions.NotYoda -- False positive while comparing against a parsed token value.
 		if ( $text === token_text( $tokens[ $current ] ) ) {
 			return $current;
 		}
+
+		++$current;
 	}
 
 	return null;
 }
 
+/**
+ * Find the matching closing parenthesis for an opening parenthesis token.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $open_index Opening parenthesis index.
+ * @return int|null
+ */
 function find_matching_parenthesis( array $tokens, int $open_index ): ?int {
 	$depth = 0;
 	$count = count( $tokens );
@@ -734,6 +890,13 @@ function find_matching_parenthesis( array $tokens, int $open_index ): ?int {
 	return null;
 }
 
+/**
+ * Find the matching closing brace for an opening brace token.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $open_index Opening brace index.
+ * @return int|null
+ */
 function find_matching_brace( array $tokens, int $open_index ): ?int {
 	$depth = 0;
 	$count = count( $tokens );
@@ -756,10 +919,23 @@ function find_matching_brace( array $tokens, int $open_index ): ?int {
 	return null;
 }
 
+/**
+ * Normalize a token into plain text.
+ *
+ * @param mixed $token Token array or raw string token.
+ * @return string
+ */
 function token_text( $token ): string {
 	return is_array( $token ) ? $token[1] : $token;
 }
 
+/**
+ * Calculate the source line for a token index.
+ *
+ * @param array $tokens PHP token stream.
+ * @param int   $index Token index.
+ * @return int|null
+ */
 function token_line( array $tokens, int $index ): ?int {
 	$current_line = 1;
 
@@ -777,11 +953,17 @@ function token_line( array $tokens, int $index ): ?int {
 	return $current_line;
 }
 
+/**
+ * Convert an absolute path into a repository-relative path.
+ *
+ * @param string $path Absolute file path.
+ * @return string
+ */
 function relative_path( string $path ): string {
 	static $root = null;
 
 	if ( null === $root ) {
-		$root = dirname(__DIR__) . DIRECTORY_SEPARATOR;
+		$root = dirname( __DIR__ ) . DIRECTORY_SEPARATOR;
 	}
 
 	if ( 0 === strpos( $path, $root ) ) {
@@ -790,3 +972,5 @@ function relative_path( string $path ): string {
 
 	return $path;
 }
+
+// phpcs:enable

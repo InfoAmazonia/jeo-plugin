@@ -1,14 +1,32 @@
 <?php
+/**
+ * Layer post-type registration.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Register and manage layer posts.
+ */
 class Layers {
 
 	use Singleton;
 	use Rest_Validate_Meta;
 
+	/**
+	 * Layer post type slug.
+	 *
+	 * @var string
+	 */
 	public $post_type = 'map-layer';
 
+	/**
+	 * Register layer hooks.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
@@ -16,6 +34,11 @@ class Layers {
 		$this->register_rest_meta_validation();
 	}
 
+	/**
+	 * Register the layer post type and its metadata.
+	 *
+	 * @return void
+	 */
 	public function register_post_type() {
 
 		$labels = array(
@@ -47,6 +70,7 @@ class Layers {
 			'show_in_rest'        => true,
 			'public'              => true,
 			'show_in_menu'        => 'jeo-main-menu',
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode,WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Encodes a bundled local SVG into a menu-icon data URI.
 			'menu_icon'           => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( JEO_BASEPATH . '/js/src/icons/layers.svg' ) ),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
@@ -61,8 +85,6 @@ class Layers {
 
 				'delete_post'        => 'delete_map-layer',
 			),
-			// 'map_meta_cap' => true,
-			// 'capability_type' => 'post',
 			'show_in_admin_bar'   => false,
 			'show_in_nav_menus'   => false,
 			'publicly_queryable'  => false,
@@ -190,6 +212,11 @@ class Layers {
 		);
 	}
 
+	/**
+	 * Grant layer capabilities to supported roles.
+	 *
+	 * @return void
+	 */
 	public function add_capabilities() {
 		$roles = array( 'author', 'editor', 'administrator' );
 		foreach ( $roles as $role ) {
@@ -207,12 +234,24 @@ class Layers {
 		}
 	}
 
+	/**
+	 * Relax the REST per_page limit for layers.
+	 *
+	 * @param array $params REST collection params.
+	 * @return array
+	 */
 	public function rest_collection_params( $params ) {
 		$params['per_page']['minimum'] = -1;
 		unset( $params['per_page']['maximum'] );
 		return $params;
 	}
 
+	/**
+	 * Validate that the selected layer type exists.
+	 *
+	 * @param string $meta_value Layer type slug.
+	 * @return true|\WP_Error
+	 */
 	public function validate_meta_type( $meta_value ) {
 		if ( ! \jeo_layer_types()->is_layer_type_registered( $meta_value ) ) {
 			return new \WP_Error( 'rest_invalid_field', __( 'Layer type not registered', 'jeo' ), array( 'status' => 400 ) );

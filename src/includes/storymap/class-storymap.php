@@ -1,14 +1,32 @@
 <?php
+/**
+ * Storymap post-type registration.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Register and manage storymap posts.
+ */
 class Storymap {
 
 	use Singleton;
 	use Rest_Validate_Meta;
 
+	/**
+	 * Storymap post type slug.
+	 *
+	 * @var string
+	 */
 	public $post_type = 'storymap';
 
+	/**
+	 * Register storymap hooks.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_filter( 'single_template', array( $this, 'override_template' ) );
@@ -21,6 +39,11 @@ class Storymap {
 		$this->register_rest_meta_validation();
 	}
 
+	/**
+	 * Register the storymap post type.
+	 *
+	 * @return void
+	 */
 	public function register_post_type() {
 		$labels = array(
 			'name'                     => __( 'Story Map', 'jeo' ),
@@ -51,6 +74,7 @@ class Storymap {
 			'public'              => true,
 			'show_in_menu'        => 'jeo-main-menu',
 			'show_in_rest'        => true,
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode,WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Encodes a bundled local SVG into a menu-icon data URI.
 			'menu_icon'           => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( JEO_BASEPATH . '/js/src/icons/map.svg' ) ),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
@@ -76,6 +100,11 @@ class Storymap {
 		register_post_type( $this->post_type, $args );
 	}
 
+	/**
+	 * Grant storymap capabilities to supported roles.
+	 *
+	 * @return void
+	 */
 	public function add_capabilities() {
 		$roles = array( 'author', 'editor', 'administrator' );
 		foreach ( $roles as $role ) {
@@ -92,6 +121,12 @@ class Storymap {
 		}
 	}
 
+	/**
+	 * Override the single template for storymaps.
+	 *
+	 * @param string $template Current single template path.
+	 * @return string
+	 */
 	public function override_template( $template ) {
 		global $post;
 
@@ -102,6 +137,12 @@ class Storymap {
 		return $template;
 	}
 
+	/**
+	 * Include storymaps in archive queries when enabled.
+	 *
+	 * @param \WP_Query $query Main query instance.
+	 * @return void
+	 */
 	public function show_on_archives( $query ) {
 		if ( ! $query->is_main_query() ) {
 			return;
@@ -122,6 +163,13 @@ class Storymap {
 		}
 	}
 
+	/**
+	 * Append co-author data to the REST response when available.
+	 *
+	 * @param \WP_REST_Response $response REST response.
+	 * @param \WP_Post          $post Storymap post object.
+	 * @return \WP_REST_Response
+	 */
 	public function prepare_rest_response( $response, $post ) {
 		if ( function_exists( 'get_coauthors' ) ) {
 			$authors = \get_coauthors( $post->ID );
