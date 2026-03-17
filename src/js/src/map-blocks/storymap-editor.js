@@ -28,7 +28,6 @@ import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { CheckboxControl } from '../shared/wp-form-controls';
 
 import { createUploadAdapter } from './cke5-image-upload';
@@ -40,7 +39,6 @@ import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import {
 	moveActiveIndex,
 	reorderSlides,
-	reorderStorymapLayers,
 	sortSelectedLayersByMapOrder,
 } from './storymap-ordering';
 import { computeInlineEnd } from '../shared/direction';
@@ -424,22 +422,23 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		slideNodesRef.current.delete( runtimeKey );
 	};
 
-	const onDragEndLayers = ( result ) => {
-		if ( ! result.destination || result.destination.index === result.source.index ) {
-			return;
-		}
+	const lockCurrentViewToSlide = ( slideIndex ) => {
+		const latitude = viewState.latitude;
+		const longitude = viewState.longitude;
+		const zoom = Math.round( viewState.zoom * 10 ) / 10;
+		const pitch = viewState.pitch || 0;
+		const bearing = viewState.bearing || 0;
 
-		const nextState = reorderStorymapLayers(
-			attributes.navigateMapLayers ?? [],
-			attributes.slides ?? [],
-			result.source.index,
-			result.destination.index
-		);
+		const newSlides = [ ...attributes.slides ];
+		newSlides[ slideIndex ].latitude = latitude;
+		newSlides[ slideIndex ].longitude = longitude;
+		newSlides[ slideIndex ].zoom = zoom;
+		newSlides[ slideIndex ].pitch = pitch;
+		newSlides[ slideIndex ].bearing = bearing;
 
 		setAttributes( {
 			...attributes,
-			navigateMapLayers: nextState.navigateMapLayers,
-			slides: nextState.slides,
+			slides: newSlides,
 		} );
 	};
 
@@ -850,122 +849,100 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														} }
 													>
 														<span className="input-label">{ __("Layers", "jeo") }</span>
-														<DragDropContext onDragEnd={ onDragEndLayers }>
-															<Droppable droppableId="droppable">
-																{ ( provided, snapshot ) => (
-																	<div
-																		{ ...provided.droppableProps }
-																		ref={ provided.innerRef }
-																		className="layers"
-																>
-																		{ ( attributes.navigateMapLayers ?? [] ).map( ( item, index_ ) => (
-																			<Draggable key={ `${ item.id }` } draggableId={ `${ item.id }` } index={ index_ }>
-																				{ ( provided, snapshot ) => {
-																					let layerButtonStyle = {
-																						background: 'rgb(240, 240, 240)',
-																					};
+														<div className="layers">
+															{ ( attributes.navigateMapLayers ?? [] ).map( ( item ) => {
+																let layerButtonStyle = {
+																	background: 'rgb(240, 240, 240)',
+																};
 
-																					attributes.slides[ slideIndex ].selectedLayers.map(
-																						( selectedLayer ) => {
-																							if ( selectedLayer.id === item.id ) {
-																								layerButtonStyle = {
-																									background: 'rgb(200, 200, 200)',
-																								};
-																							}
-																						}
-																					);
+																attributes.slides[ slideIndex ].selectedLayers.map(
+																	( selectedLayer ) => {
+																		if ( selectedLayer.id === item.id ) {
+																			layerButtonStyle = {
+																				background: 'rgb(200, 200, 200)',
+																			};
+																		}
+																	}
+																);
 
-																					if ( item ) {
-																						return (
-																							<div
-																								ref={ provided.innerRef }
-																								{ ...provided.draggableProps }
-																								{ ...provided.dragHandleProps }
-																							>
-																								<Button
+																if ( ! item ) {
+																	return null;
+																}
 
-																									style={ layerButtonStyle }
-																									className="layer"
-																									key={ item.id }
-																									onClick={ () => {
-																										setCurrentSlideIndex( slideIndex );
+																return (
+																	<Button
+																		style={ layerButtonStyle }
+																		className="layer"
+																		key={ item.id }
+																		onClick={ () => {
+																			setCurrentSlideIndex( slideIndex );
 
-																										const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
-																										let hasBeenRemoved = false;
+																			const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
+																			let hasBeenRemoved = false;
 
-																										oldSlides[ slideIndex ].selectedLayers.map(
-																											( selectedLayer, indexOfLayer ) => {
-																												if ( selectedLayer.id === item.id ) {
-																													oldSlides[
-																														slideIndex
-																													].selectedLayers.splice(
-																														indexOfLayer,
-																														1
-																													);
-																													hasBeenRemoved = true;
-																												}
-																											}
-																										);
-
-																										if ( ! hasBeenRemoved ) {
-
-																											let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
-																											let itemPosition = false;
-
-																											const findItemPostion = (item) => {
-																												let itemPosition = -1;
-
-																												loadedMap.meta.layers.forEach( (layer, index) => {
-																													if( item.id === layer.id ) {
-																														itemPosition = index;
-																													}
-																												})
-
-																												return itemPosition;
-																											}
-
-																											oldSlides[ slideIndex ].selectedLayers.map( (layer) => {
-																												const position = findItemPostion(layer);
-																												if(position >= 0) {
-																													defaultOrder[ position ] = layer;
-																												}
-																											})
-
-																											itemPosition = findItemPostion(item)
-																											defaultOrder[itemPosition] = item;
-
-																											defaultOrder = defaultOrder.filter(slot => slot !== null);
-
-																											oldSlides[ slideIndex ].selectedLayers = defaultOrder;
-																										}
-
-																										setKey(key + 1);
-
-																										setAttributes( {
-																											...attributes,
-																											slides: oldSlides,
-																										} );
-																									} }
-																								>
-																									<span>
-																										{ decodeHtmlEntity(
-																											item.title.rendered
-																										) }
-																									</span>
-																								</Button>
-																							</div>
+																			oldSlides[ slideIndex ].selectedLayers.map(
+																				( selectedLayer, indexOfLayer ) => {
+																					if ( selectedLayer.id === item.id ) {
+																						oldSlides[
+																							slideIndex
+																						].selectedLayers.splice(
+																							indexOfLayer,
+																							1
 																						);
+																						hasBeenRemoved = true;
 																					}
+																				}
+																			);
 
-																					return null;
-																				} }
-																			</Draggable>
-																	) ) }
-																		{ provided.placeholder }
-																	</div>
-															) }
-															</Droppable>
-														</DragDropContext>
+																			if ( ! hasBeenRemoved ) {
+
+																				let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
+																				let itemPosition = false;
+
+																				const findItemPostion = (item) => {
+																					let itemPosition = -1;
+
+																					loadedMap.meta.layers.forEach( (layer, index) => {
+																						if( item.id === layer.id ) {
+																							itemPosition = index;
+																						}
+																					})
+
+																					return itemPosition;
+																				}
+
+																				oldSlides[ slideIndex ].selectedLayers.map( (layer) => {
+																					const position = findItemPostion(layer);
+																					if(position >= 0) {
+																						defaultOrder[ position ] = layer;
+																					}
+																				})
+
+																				itemPosition = findItemPostion(item)
+																				defaultOrder[itemPosition] = item;
+
+																				defaultOrder = defaultOrder.filter(slot => slot !== null);
+
+																				oldSlides[ slideIndex ].selectedLayers = defaultOrder;
+																			}
+
+																			setKey(key + 1);
+
+																			setAttributes( {
+																				...attributes,
+																				slides: oldSlides,
+																			} );
+																		} }
+																	>
+																		<span>
+																			{ decodeHtmlEntity(
+																				item.title.rendered
+																			) }
+																		</span>
+																	</Button>
+																);
+															} ) }
+														</div>
 														<div style={ { display: 'flex' } }>
 															{
 																attributes.slides[ slideIndex ].latitude == mapDefaults.lat &&
@@ -975,29 +952,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																attributes.slides[ slideIndex ].pitch == 0 && (
 																	<Button
 																		className="lock-location-button"
-																		disabled={ ! selectedMap }
+																		disabled={ ! attributes.map_id }
 																		onClick={ () => {
-																			if ( ! selectedMap ) return;
 																			setCurrentSlideIndex( slideIndex );
-																			const latitude = selectedMap.getCenter().lat;
-																			const longitude = selectedMap.getCenter().lng;
-																			const zoom =
-																				Math.round( selectedMap.getZoom() * 10 ) /
-																				10;
-																			const pitch = selectedMap.getPitch();
-																			const bearing = selectedMap.getBearing();
-
-																			const newSlides = [ ...attributes.slides ];
-																			newSlides[ slideIndex ].latitude = latitude;
-																			newSlides[ slideIndex ].longitude = longitude;
-																			newSlides[ slideIndex ].zoom = zoom;
-																			newSlides[ slideIndex ].pitch = pitch;
-																			newSlides[ slideIndex ].bearing = bearing;
-
-																			setAttributes( {
-																				...attributes,
-																				slides: newSlides,
-																			} );
+																			lockCurrentViewToSlide( slideIndex );
 																		} }
 																	>
 																		<div className="flex-center">
@@ -1015,29 +973,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																attributes.slides[ slideIndex ].pitch == 0 ) && (
 																	<Button
 																		className="lock-location-button"
-																		disabled={ ! selectedMap }
+																		disabled={ ! attributes.map_id }
 																		onClick={ () => {
-																			if ( ! selectedMap ) return;
 																			setCurrentSlideIndex( slideIndex );
-																			const latitude = selectedMap.getCenter().lat;
-																			const longitude = selectedMap.getCenter().lng;
-																			const zoom =
-																				Math.round( selectedMap.getZoom() * 10 ) /
-																				10;
-																			const pitch = selectedMap.getPitch();
-																			const bearing = selectedMap.getBearing();
-
-																			const newSlides = [ ...attributes.slides ];
-																			newSlides[ slideIndex ].latitude = latitude;
-																			newSlides[ slideIndex ].longitude = longitude;
-																			newSlides[ slideIndex ].zoom = zoom;
-																			newSlides[ slideIndex ].pitch = pitch;
-																			newSlides[ slideIndex ].bearing = bearing;
-
-																			setAttributes( {
-																				...attributes,
-																				slides: newSlides,
-																			} );
+																			lockCurrentViewToSlide( slideIndex );
 																		} }
 																	>
 																		<div>
