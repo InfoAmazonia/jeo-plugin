@@ -19,7 +19,7 @@
       "The report now captures a frontend runtime snapshot with the resolved React, ReactDOM and Gutenberg editor package versions plus their published peer ranges.",
       "The installed tree now resolves a local react-autosize-textarea override so the stale upstream peer metadata no longer raises npm peer warnings against React 18.3.1.",
       "Previous stabilization track: the dependency-major batches are complete apart from the still-blocked react-leaflet 5 and PHPCS 4 paths, both waiting on upstream support.",
-      "Current plugin sanity track: Node 24 is now the default runtime, with Node 20 kept only as a transition line for validation.",
+      "Current plugin sanity track: Node 24 is now the supported frontend runtime for local development, CI and release validation.",
       "Current plugin sanity track: the implemented work now covers audit cleanup, incremental frontend loading, bundle budgets, runtime hardening, and pipeline alignment; these batches are ready for manual validation before commit.",
       "Known baseline outside the current sanity batches: Discovery story markers and the related View in map hover focus can still fail to render or navigate correctly; this remains queued for a dedicated future fix.",
       "Current plugin sanity track: a final override-governance batch remains pending so every local npm override is periodically re-justified or removed after major frontend toolchain refreshes."
@@ -436,7 +436,7 @@
       "phase": "Sanity Batch 0",
       "title": "Runtime policy and reproducibility",
       "status": "completed",
-      "scope": "Promote Node 24 to the project default, keep Node 20 only as a transition line, add an environment preflight, and align the deploy pipeline with deterministic installs.",
+      "scope": "Promote Node 24 to the project runtime, enforce it through an environment preflight, and align the deploy pipeline with deterministic installs.",
       "packageNames": [],
       "automatedChecks": [
         "npm run check:env",
@@ -447,7 +447,7 @@
       "manualReviewItems": [],
       "approvalNotes": [
         "This batch is mostly process and tooling work; the main validation is that the documented Node 24 path and the preflight behave correctly.",
-        "Node 20 remains supported only as a transition line while the lockfile and CI stay stable on Node 24.",
+        "Node 24 is now the single supported frontend runtime in local development and CI.",
         "The final full test rerun reconfirmed that the Node 24 preflight, deterministic install path and bundle-report flow are still the active project baseline."
       ]
     },
@@ -1342,7 +1342,7 @@
         {
           "name": "npm run check:env",
           "status": "passed",
-          "details": "The new preflight accepts the supported Node 24 runtime and documents Node 20 only as a temporary transition line."
+          "details": "The preflight now enforces Node 24 as the supported frontend runtime for this repository."
         },
         {
           "name": "npm ci",

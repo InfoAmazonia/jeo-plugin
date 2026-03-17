@@ -469,14 +469,14 @@ function packageScope( packageName, dependencyType ) {
 	) {
 		return {
 			scope: 'Build tooling',
-			impact: 'Asset compilation, webpack config and CI reproducibility on Node 20',
+			impact: 'Asset compilation, webpack config and CI reproducibility on Node 24',
 		};
 	}
 
 	if ( packageName.startsWith( '@wordpress/' ) ) {
 		return {
 			scope: 'Gutenberg / editor',
-			impact: 'Node 20 build pipeline, Gutenberg editor runtime and React peer alignment',
+			impact: 'Node 24 build pipeline, Gutenberg editor runtime and React peer alignment',
 		};
 	}
 

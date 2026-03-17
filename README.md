@@ -9,7 +9,7 @@ At the same time, by simply imputing the ids of layers hosted on [Mapbox](https:
 ## Compatibility
 
 This repository currently declares `Requires PHP: 8.0`, with primary validation focused on PHP `8.2` to `8.4` and experimental monitoring on PHP `8.5`.
-The frontend runtime now targets Node `24` as the project default, with Node `20` kept only as a transition line while CI and lockfile validation still cover both runtimes.
+The frontend runtime targets Node `24` as the supported project baseline.
 
 Compatibility snapshot validated on March 17, 2026:
 
@@ -30,7 +30,7 @@ Test script coverage:
 
 - `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`, including PHP `8.5`-specific deprecation heuristics.
 - `scripts/wordpress-smoke.sh` can be forced onto PHP `8.5` with `WP_CLI_PHP`, so the plugin's runtime smoke can be exercised on that line locally and in CI.
-- `scripts/check-node-version.mjs` enforces the supported frontend runtimes before `npm ci` or `npm install` continue.
+- `scripts/check-node-version.mjs` enforces the supported frontend runtime before `npm ci` or `npm install` continue.
 - `scripts/report-bundle-sizes.mjs` enforces explicit bundle budgets instead of relying on generic webpack performance warnings.
 
 Local commands:
@@ -57,7 +57,7 @@ bash scripts/wordpress-smoke.sh
 ```
 
 `scripts/wordpress-smoke.sh` honors `WP_CLI_PHP`, which is useful on Homebrew installs where `/opt/homebrew/bin/wp` otherwise follows the default `php` in `PATH`.
-For local frontend work, prefer Node `24`. Node `20` remains accepted only during the transition window tracked in CI.
+For local frontend work, use Node `24`.
 Use PHP `8.5` for local smoke only when you specifically want to inspect the experimental runtime line. WordPress core 6.9 treats PHP `8.5` as beta support, while stable `wp-cli` support for PHP `8.5` is still planned upstream and `wp-cli` 2.12.0 still emits third-party deprecation noise there.
 
 ## Setting up local environment
