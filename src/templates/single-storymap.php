@@ -1,6 +1,12 @@
 <?php
-	get_header();
-	the_post();
+/**
+ * Single storymap template.
+ *
+ * @package Jeo
+ */
+
+get_header();
+the_post();
 ?>
 
 <div class="content">

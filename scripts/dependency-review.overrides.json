@@ -18,7 +18,7 @@
       "Current stabilization track: Batch 1 fixes the null-related-post geocode crash, same-point post individualization and reorder regressions that predate the dependency majors.",
       "Current stabilization track: Batch 2 has replaced react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form, and Batch 3 has now removed react-beautiful-dnd.",
       "Current stabilization track: Batch 4 confirmed the latest published Gutenberg editor packages still pin React 18, applied the minimum local react-autosize-textarea override, and kept react-leaflet 5 blocked until upstream publishes a React-19-compatible line.",
-      "Current stabilization track: Batch 6 validates PHP 8.5 and Batch 7 is the dedicated PHPCS baseline cleanup."
+      "Current stabilization track: Batch 6 validates PHP 8.5, and Batch 7 has completed the PHPCS 3.x baseline cleanup while PHPCS 4 remains blocked by upstream WPCS compatibility."
     ]
   },
   "batches": [
@@ -386,7 +386,7 @@
       "id": "batch-6-php-8-5-compat",
       "phase": "Batch 6",
       "title": "PHP 8.5 compatibility",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Extend the local and CI PHP compatibility coverage to PHP 8.5 and remove repository-owned warnings or deprecations under that runtime.",
       "packageNames": [],
       "automatedChecks": [
@@ -408,7 +408,7 @@
       "id": "batch-7-php-lint-stack",
       "phase": "Batch 7",
       "title": "PHP lint stack cleanup",
-      "status": "planned",
+      "status": "completed",
       "scope": "Clean the PHPCS 3.x baseline across WPCS, PHPCSExtra and PHPCSUtils before re-evaluating PHPCS 4.",
       "packageNames": [
         "squizlabs/php_codesniffer",
@@ -421,8 +421,10 @@
       ],
       "manualReviewItems": [],
       "approvalNotes": [
-        "Start with autofixable formatting sources, then move to manual docblock, escaping, naming and nonce issues.",
-        "Re-evaluate PHPCS 4 only after the PHPCS 3.x baseline is green and the installed WPCS line officially supports the major."
+        "The PHPCS 3.x baseline is now green after autofixes plus manual cleanup across runtime PHP, templates and tooling scripts.",
+        "The runtime-touching PHP cleanup also passed local WordPress smoke, so the lint cleanup did not introduce regressions in embeds, maps or story maps.",
+        "Official WPCS metadata and the 3.3.0 release notes still require PHP_CodeSniffer 3.13.4, while older WPCS 2.3.0 notes only mention preliminary CI testing against the PHPCS 4 development branch.",
+        "Re-evaluate PHPCS 4 only after the installed WPCS line officially supports that major."
       ]
     }
   ],
@@ -1039,7 +1041,7 @@
     {
       "date": "2026-03-17",
       "batchId": "batch-6-php-8-5-compat",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Extended the repository-owned PHP compatibility checks and CI matrix to PHP 8.5, documented that WordPress core already treats PHP 8.5 as beta support while stable wp-cli support is still planned upstream, and verified that local WordPress smoke stays green on PHP 8.4 and PHP 8.5 with only third-party wp-cli deprecation noise under PHP 8.5.",
       "automatedChecks": [
         {
@@ -1078,6 +1080,74 @@
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md",
         "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-7-php-lint-stack",
+      "status": "completed",
+      "summary": "Cleaned the PHPCS 3.x baseline across scripts, templates and runtime PHP so the repository is now green on the current WPCS or PHPCS stack, while keeping the PHPCS 4 evaluation blocked until upstream WPCS support lands.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The current composer.json remains structurally valid during the PHPCS cleanup batch."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "The repository-owned PHP compatibility scanner stayed green after the lint-driven cleanup."
+        },
+        {
+          "name": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+          "status": "passed",
+          "details": "The PHPCS 3.x baseline is now clean across the repository after autofixes plus manual cleanup of docblocks, escaping, naming and query-input handling."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "Local WordPress smoke stayed green after the runtime-touching PHP cleanup, confirming that embeds, maps and story maps still bootstrap correctly."
+        },
+        {
+          "name": "node scripts/dependency-review.mjs --write",
+          "status": "passed",
+          "details": "Regenerated the JSON and Markdown dependency reports with Batch 7 marked as completed and the PHPCS 4 path still blocked by WPCS support."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "scripts/check-php-compat.php",
+        "scripts/wordpress-smoke-check.php",
+        "src/includes/class-jeo.php",
+        "src/includes/geocode/class-geocode-handler.php",
+        "src/includes/geocode/class-geocoder.php",
+        "src/includes/geocode/geocoders/class-nominatim.php",
+        "src/includes/index.php",
+        "src/includes/layer-types/class-layer-types.php",
+        "src/includes/layers/class-layers.php",
+        "src/includes/legend-types/class-legend-types.php",
+        "src/includes/loaders.php",
+        "src/includes/maps/class-maps.php",
+        "src/includes/menu/class-menu.php",
+        "src/includes/settings/class-settings.php",
+        "src/includes/settings/settings-page.php",
+        "src/includes/sidebars/class-sidebars.php",
+        "src/includes/storymap/class-storymap.php",
+        "src/includes/traits/class-rest-validate-meta.php",
+        "src/includes/traits/class-singleton.php",
+        "src/index.php",
+        "src/jeo.php",
+        "src/templates/discovery.php",
+        "src/templates/embed-discovery.php",
+        "src/templates/embed-storymap.php",
+        "src/templates/embed.php",
+        "src/templates/map-content-layers-list.php",
+        "src/templates/single-map.php",
+        "src/templates/single-storymap.php"
       ]
     }
   ],
@@ -1277,13 +1347,20 @@
       "executionStatus": "blocked",
       "executionNotes": [
         "Packagist publishes PHPCS 4.0.1, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
-        "Batch 7 first cleans the PHPCS 3.x baseline and only then re-evaluates PHPCS 4 when the installed WPCS line officially supports the jump."
+        "The WPCS 3.3.0 release notes still describe PHPCS 3.13.4 as the required line; the only published PHPCS 4 mention in WPCS releases is an older 2.3.0 note about preliminary CI testing against the PHPCS 4 development branch.",
+        "Batch 7 has now cleaned the PHPCS 3.x baseline, so the remaining blocker is purely upstream WPCS support for PHPCS 4."
       ],
       "notes": [
         "Direct dev dependency. Evaluate majors only after confirming WPCS compatibility."
       ]
     },
     "wp-coding-standards/wpcs": {
+      "batchId": "batch-7-php-lint-stack",
+      "executionStatus": "completed",
+      "executionNotes": [
+        "Batch 7 cleaned the repository baseline while keeping WPCS 3.3.0 on its current supported PHPCS 3.x line.",
+        "This package remains the compatibility gate that must move before PHPCS 4 can be re-evaluated."
+      ],
       "notes": [
         "Lead Composer dependency because it constrains PHPCS, PHPCSExtra and PHPCSUtils."
       ]

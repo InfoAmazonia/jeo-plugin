@@ -40,7 +40,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 - Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the local react-autosize-textarea override and lockfile refresh.
 - Batch 5: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map.
 - Batch 6: verify the same product smoke already covered by the runtime batches, but execute it while watching specifically for repository-owned PHP 8.5 warnings or deprecations instead of third-party `wp-cli` noise.
-- Batch 7: no product review is required unless the PHPCS cleanup changes runtime PHP logic; otherwise review the lint delta and escaping or nonce-sensitive paths in code review.
+- Batch 7: no dedicated product review is required unless the PHPCS cleanup changes runtime PHP logic; otherwise review the lint delta, escaping or nonce-sensitive paths, and embed or template handlers in code review.
 
 ## Core functional checklist
 

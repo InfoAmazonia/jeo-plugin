@@ -1,5 +1,4 @@
 <?php
-
 /**
  * The file that defines the core plugin class
  *
@@ -12,7 +11,6 @@
  * @package    Jeo
  * @subpackage Jeo/includes
  */
-
 
 /**
  * The core plugin class.
@@ -62,8 +60,6 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
-		add_action( 'cli_init', array( $this, 'register_cli_commands' ) );
-
 		add_action( 'init', array( $this, 'restrict_story_map_block_count' ) );
 
 		add_action( 'init', array( $this, 'register_assets' ) );
@@ -75,12 +71,17 @@ class Jeo {
 		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
 
-		// Auto-inject editor preview blocks into existing map/layer posts
+		// Auto-inject editor preview blocks into existing map/layer posts.
 		// so they don't show the "template mismatch" warning.
 		add_filter( 'rest_prepare_map', array( $this, 'inject_editor_block_for_map' ), 10, 3 );
 		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
 	}
 
+		/**
+		 * Get the current site language, including WPML overrides when available.
+		 *
+		 * @return string
+		 */
 	private function get_current_language(): string {
 		$language = get_bloginfo( 'language' );
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
@@ -89,6 +90,11 @@ class Jeo {
 		return apply_filters( 'wpml_current_language', $language );
 	}
 
+	/**
+	 * Create a REST nonce for logged-in users.
+	 *
+	 * @return string|null
+	 */
 	private function get_rest_nonce() {
 		if ( is_user_logged_in() ) {
 			return wp_create_nonce( 'wp_rest' );
@@ -96,6 +102,14 @@ class Jeo {
 		return null;
 	}
 
+	/**
+	 * Authenticate REST requests to protected JEO post types using the logged-in cookie.
+	 *
+	 * @param mixed           $response Current REST pre-callback response.
+	 * @param array           $handler Callback handler metadata.
+	 * @param WP_REST_Request $request Current REST request.
+	 * @return mixed
+	 */
 	public function rest_authenticate_by_cookie( $response, $handler, $request ) {
 		if ( preg_match( '/\/wp\/v2\/(map|map-layer|storymap)/', $request->get_route() ) === 1 ) {
 			$user_id = wp_validate_auth_cookie( '', 'logged_in' );
@@ -119,11 +133,23 @@ class Jeo {
 		);
 	}
 
+	/**
+	 * Allow large tag result sets in the REST API.
+	 *
+	 * @param array $prepared_args REST query args.
+	 * @return array
+	 */
 	public function maximum_terms_api_filter( $prepared_args ) {
 		$prepared_args['number'] = 1000;
 		return $prepared_args;
 	}
 
+	/**
+	 * Preserve requested map-layer ordering when explicit IDs are provided.
+	 *
+	 * @param array $args REST query args.
+	 * @return array
+	 */
 	public function order_rest_post_by_post_title( $args ) {
 		if ( isset( $args['post__in'] ) && ! empty( $args['post__in'] ) ) {
 			$args['suppress_filters'] = true;
@@ -132,8 +158,16 @@ class Jeo {
 		return $args;
 	}
 
-	public function custom_layer_search_filters( array $query, \WP_REST_Request $request ) {
-		if ( $layer_type = $request->get_param( 'layer_type' ) ) {
+	/**
+	 * Add custom layer type and search filters to map-layer REST queries.
+	 *
+	 * @param array           $query REST query args.
+	 * @param WP_REST_Request $request REST request object.
+	 * @return array
+	 */
+	public function custom_layer_search_filters( array $query, WP_REST_Request $request ) {
+		$layer_type = $request->get_param( 'layer_type' );
+		if ( $layer_type ) {
 			if ( ! isset( $query['meta_query'] ) ) {
 				$query['meta_query'] = array();
 			}
@@ -144,13 +178,19 @@ class Jeo {
 			);
 		}
 
-		if ( $layer_name = $request->get_param( 'layer_name' ) ) {
+		$layer_name = $request->get_param( 'layer_name' );
+		if ( $layer_name ) {
 			$query['s'] = $layer_name;
 		}
 
 		return $query;
 	}
 
+	/**
+	 * Register shared frontend and editor assets for the plugin.
+	 *
+	 * @return void
+	 */
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 
@@ -267,6 +307,12 @@ class Jeo {
 		wp_set_script_translations( 'jeo-map-blocks', 'jeo', JEO_BASEPATH . 'languages' );
 	}
 
+	/**
+	 * Register the JEO block category when it is not already present.
+	 *
+	 * @param array $categories Registered block categories.
+	 * @return array
+	 */
 	public function register_block_category( $categories ) {
 		$slugs = wp_list_pluck( $categories, 'slug' );
 		return in_array( 'jeo', $slugs, true )
@@ -283,6 +329,11 @@ class Jeo {
 			);
 	}
 
+	/**
+	 * Register all JEO blocks used in the editor.
+	 *
+	 * @return void
+	 */
 	public function register_block_types() {
 		register_block_type(
 			'jeo/map-blocks',
@@ -312,23 +363,24 @@ class Jeo {
 		register_block_type(
 			'jeo/map-editor',
 			array(
-				'api_version'     => 3,
-				'editor_script'   => 'jeo-map-blocks',
-				'editor_style'    => 'jeo-map-blocks',
+				'api_version'   => 3,
+				'editor_script' => 'jeo-map-blocks',
+				'editor_style'  => 'jeo-map-blocks',
 			)
 		);
 		register_block_type(
 			'jeo/layer-editor',
 			array(
-				'api_version'     => 3,
-				'editor_script'   => 'jeo-map-blocks',
-				'editor_style'    => 'jeo-map-blocks',
+				'api_version'   => 3,
+				'editor_script' => 'jeo-map-blocks',
+				'editor_style'  => 'jeo-map-blocks',
 			)
 		);
 	}
 
 	/**
 	 * Extract JSON content from block save output.
+	 *
 	 * Handles both legacy format (raw JSON string) and API v2+ format
 	 * (JSON wrapped in a <div> element with useBlockProps).
 	 *
@@ -338,14 +390,14 @@ class Jeo {
 	private function extract_json_from_block_content( $content ) {
 		$content = trim( $content );
 
-		// If it's already valid JSON, return as-is (legacy format)
+		// If it's already valid JSON, return as-is (legacy format).
 		$decoded = json_decode( $content );
 		if ( json_last_error() === JSON_ERROR_NONE ) {
 			return $content;
 		}
 
-		// API v2+ format: JSON is wrapped in a <div> element
-		// Strip the outer HTML wrapper to get the JSON content inside
+		// API v2+ format: JSON is wrapped in a <div> element.
+		// Strip the outer HTML wrapper to get the JSON content inside.
 		$inner = preg_replace( '/^<div[^>]*>/', '', $content );
 		$inner = preg_replace( '/<\/div>$/', '', $inner );
 		$inner = trim( $inner );
@@ -353,6 +405,13 @@ class Jeo {
 		return $inner;
 	}
 
+	/**
+	 * Render an embedded story map block from a referenced story.
+	 *
+	 * @param array  $block_attributes Block attributes.
+	 * @param string $content Saved block content.
+	 * @return string
+	 */
 	public function embedded_story_map_dynamic_render_callback( $block_attributes, $content ) {
 		$content = json_decode( $this->extract_json_from_block_content( $content ) );
 
@@ -364,6 +423,12 @@ class Jeo {
 		return $this->story_map_dynamic_render_callback( $block_attributes, wp_json_encode( $story_block['attrs'] ) );
 	}
 
+	/**
+	 * Remove transient SEO payloads from layer objects before serializing them.
+	 *
+	 * @param array $layers Layer objects.
+	 * @return void
+	 */
 	private function cleanup_layers( $layers ) {
 		foreach ( $layers as $layer ) {
 			if ( property_exists( $layer, 'yoast_head' ) ) {
@@ -375,63 +440,102 @@ class Jeo {
 		}
 	}
 
+	/**
+	 * Check whether a selected story map layer still exists in the parent map.
+	 *
+	 * @param array  $map_layers Map layers from post meta.
+	 * @param object $selected_layer Selected layer object from saved story data.
+	 * @return bool
+	 */
+	private function layer_still_exists( array $map_layers, $selected_layer ) {
+		$layer_status = get_post_status( $selected_layer->id );
+		if ( 'trash' === $layer_status || false === $layer_status || 'private' === $layer_status ) {
+			return false;
+		}
+
+		foreach ( $map_layers as $layer ) {
+			if ( $layer['id'] === $selected_layer->id ) {
+				$selected_layer->meta->type               = get_post_meta( $layer['id'], 'type', true );
+				$selected_layer->meta->layer_type_options = (object) get_post_meta( $layer['id'], 'layer_type_options', true );
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Get a saved story map layers collection without renaming its camelCase contract.
+	 *
+	 * @param object $source Source object holding the saved property.
+	 * @param string $property Saved camelCase property name.
+	 * @return array
+	 */
+	private function get_saved_layers_property( $source, string $property ): array {
+		$value = $source->{$property} ?? array();
+		return is_array( $value ) ? $value : array();
+	}
+
+	/**
+	 * Persist a saved story map layers collection without renaming its camelCase contract.
+	 *
+	 * @param object $target Target object holding the saved property.
+	 * @param string $property Saved camelCase property name.
+	 * @param array  $layers Layers to persist.
+	 * @return void
+	 */
+	private function set_saved_layers_property( $target, string $property, array $layers ) {
+		$target->{$property} = $layers;
+	}
+
+	/**
+	 * Render the public story map block markup.
+	 *
+	 * @param array  $block_attributes Block attributes.
+	 * @param string $content Saved block content.
+	 * @return string
+	 */
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
 		$saved_data = json_decode( $this->extract_json_from_block_content( $content ) );
 
 		$map_id     = $saved_data->map_id;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
 
-		if ( ! function_exists( 'layer_still_exists' ) ) {
-			function layer_still_exists( $map_layers, $selected_layer ) {
-				$layer_status = get_post_status( $selected_layer->id );
-				if ( 'trash' === $layer_status || false === $layer_status || 'private' === $layer_status ) {
-					return false;
-				}
-
-				foreach ( $map_layers as $layer ) {
-					if ( $layer['id'] === $selected_layer->id ) {
-						$selected_layer->meta->type               = get_post_meta( $layer['id'], 'type', true );
-						$selected_layer->meta->layer_type_options = (object) get_post_meta( $layer['id'], 'layer_type_options', true );
-						return true;
-					}
-				}
-
-				return false;
-			}
-		}
-
-		// Remove not present layers from selectedLayers -- Fix selected layers order
+		// Remove missing layers and restore the saved selected layer order.
 		foreach ( $saved_data->slides as $slide ) {
-			foreach ( $slide->selectedLayers as $index => $selected_layer ) {
-				// Check if the selected layers exists in the map
-				if ( ! layer_still_exists( $map_layers, $selected_layer ) ) {
-					array_splice( $slide->selectedLayers, $index, 1 );
+			$selected_layers = $this->get_saved_layers_property( $slide, 'selectedLayers' );
+
+			foreach ( $selected_layers as $index => $selected_layer ) {
+				// Check if the selected layer still exists in the map.
+				if ( ! $this->layer_still_exists( $map_layers, $selected_layer ) ) {
+					array_splice( $selected_layers, $index, 1 );
 				}
 			}
 
 			$selected_layers_order = array();
 
 			foreach ( $map_layers as $layer ) {
-				foreach ( $slide->selectedLayers as $index => $selected_layer ) {
+				foreach ( $selected_layers as $selected_layer ) {
 					if ( $selected_layer->id === $layer['id'] ) {
 						$selected_layers_order[] = $selected_layer;
 					}
 				}
 			}
 
-			$slide->selectedLayers = $selected_layers_order;
-			$this->cleanup_layers( $slide->selectedLayers );
+			$this->set_saved_layers_property( $slide, 'selectedLayers', $selected_layers_order );
+			$this->cleanup_layers( $selected_layers_order );
 		}
 
-		// Remove not present layers from navigateMapLayers and create new order
+		// Remove missing navigation layers and restore their saved order.
 		$final_navigate_map_layers = array();
+		$navigate_map_layers       = $this->get_saved_layers_property( $saved_data, 'navigateMapLayers' );
 
 		foreach ( $map_layers as $layer ) {
-			foreach ( $saved_data->navigateMapLayers as $index => $navigate_layer ) {
+			foreach ( $navigate_map_layers as $index => $navigate_layer ) {
 				if ( $navigate_layer->id === $layer['id'] ) {
-					// Update meta / types
-					if ( ! layer_still_exists( $map_layers, $navigate_layer ) ) {
-						array_splice( $saved_data->navigateMapLayers, $index, 1 );
+					// Update the saved metadata and layer types.
+					if ( ! $this->layer_still_exists( $map_layers, $navigate_layer ) ) {
+						array_splice( $navigate_map_layers, $index, 1 );
 					} else {
 						$final_navigate_map_layers[] = $navigate_layer;
 					}
@@ -439,26 +543,34 @@ class Jeo {
 			}
 		}
 
-		$saved_data->navigateMapLayers = $final_navigate_map_layers;
-		$this->cleanup_layers( $saved_data->navigateMapLayers );
-		$this->cleanup_layers( $saved_data->loadedLayers );
+		$this->set_saved_layers_property( $saved_data, 'navigateMapLayers', $final_navigate_map_layers );
+		$this->cleanup_layers( $final_navigate_map_layers );
+		$this->cleanup_layers( $this->get_saved_layers_property( $saved_data, 'loadedLayers' ) );
 
-		// Option `use_smilies` breaks returned HTML :'-(
-		add_filter(
-			'option_use_smilies',
-			function ( $value ) {
-				return false;
-			}
-		);
+		// The `use_smilies` option breaks the returned HTML.
+		add_filter( 'option_use_smilies', '__return_false' );
 
 		return '<div class="story-map-container" data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
 	}
 
+	/**
+	 * Ensure zone-filtered REST queries preserve their explicit ordering.
+	 *
+	 * @param array           $args REST query args.
+	 * @param WP_REST_Request $request Current REST request.
+	 * @return array
+	 */
 	public function filter_rest_query_by_zone( $args, $request ) {
+		unset( $request );
 		$args['suppress_filters'] = true;
 		return $args;
 	}
 
+	/**
+	 * Enqueue editor assets for supported post types.
+	 *
+	 * @return void
+	 */
 	public function enqueue_blocks_assets() {
 		global $post;
 
@@ -474,6 +586,11 @@ class Jeo {
 		}
 	}
 
+	/**
+	 * Enqueue the public map runtime and conditional frontend experiences.
+	 *
+	 * @return void
+	 */
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() ) {
 			wp_enqueue_style( 'mapgl' );
@@ -494,11 +611,13 @@ class Jeo {
 					'jeoUrl'           => JEO_BASEURL,
 					'nonce'            => $this->get_rest_nonce(),
 					'currentLang'      => $current_language,
+						// phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bundled templates are read from the local plugin directory at runtime.
 					'templates'        => array(
 						'moreInfo'  => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup'     => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
 						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) ),
 					),
+						// phpcs:enable
 					'cluster'          => apply_filters(
 						'jeomap_js_cluster',
 						array(
@@ -539,6 +658,11 @@ class Jeo {
 		}
 	}
 
+	/**
+	 * Enqueue Discovery frontend assets and localization payloads.
+	 *
+	 * @return void
+	 */
 	public function enqueue_discovery_scripts() {
 		$current_language = $this->get_current_language();
 
@@ -548,7 +672,7 @@ class Jeo {
 
 		wp_set_script_translations( 'discovery-map', 'jeo', JEO_BASEPATH . 'languages' );
 
-		// Check if sites uses WPML
+		// Check if the site uses WPML.
 		if ( function_exists( 'icl_object_id' ) ) {
 			wp_localize_script(
 				'discovery-map',
@@ -572,6 +696,11 @@ class Jeo {
 		);
 	}
 
+	/**
+	 * Enqueue story map frontend assets.
+	 *
+	 * @return void
+	 */
 	public function enqueue_storymap_scripts() {
 		$storymap_assets = include JEO_BASEPATH . '/js/build/jeoStorymap.asset.php';
 		wp_enqueue_style( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.css', array( 'jeo-map' ), JEO_VERSION );
@@ -580,10 +709,20 @@ class Jeo {
 		wp_set_script_translations( 'jeo-storymap', 'jeo', JEO_BASEPATH . 'languages' );
 	}
 
+	/**
+	 * Register the local JEO oEmbed provider.
+	 *
+	 * @return void
+	 */
 	public function register_oembed() {
 		\jeo_register_embedder( 'local_jeo', get_site_url() );
 	}
 
+	/**
+	 * Register the pretty permalink used by JEO embeds.
+	 *
+	 * @return void
+	 */
 	public function register_embed_rewrite() {
 		add_rewrite_rule(
 			'^embed/?$',
@@ -592,27 +731,44 @@ class Jeo {
 		);
 	}
 
+	/**
+	 * Register custom query vars used by embed endpoints.
+	 *
+	 * @param array $vars Existing query vars.
+	 * @return array
+	 */
 	public function register_embed_query_var( $vars ) {
 		$vars[] = 'jeo_embed';
 		return $vars;
 	}
 
+	/**
+	 * Serve the public embed templates for maps, story maps, and discovery.
+	 *
+	 * @return void
+	 */
 	public function register_embed_template_redirect() {
-
 		if ( get_query_var( 'jeo_embed' ) === 'map' ) {
+			$storymap_id     = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
+			$discovery       = filter_input( INPUT_GET, 'discovery', FILTER_DEFAULT );
+			$discovery       = is_string( $discovery ) ? sanitize_text_field( $discovery ) : false;
+			$map_id          = filter_input( INPUT_GET, 'map_id', FILTER_VALIDATE_INT );
+			$full_width      = filter_input( INPUT_GET, 'width', FILTER_VALIDATE_INT );
+			$popup_width_arg = filter_input( INPUT_GET, 'popup_width', FILTER_VALIDATE_INT );
+			$height          = filter_input( INPUT_GET, 'height', FILTER_VALIDATE_INT );
+			$selected_layers = filter_input( INPUT_GET, 'selected-layers', FILTER_DEFAULT );
+			$selected_layers = is_string( $selected_layers ) ? sanitize_text_field( $selected_layers ) : '';
+
 			add_filter( 'show_admin_bar', '__return_false' );
-			if ( isset( $_GET['storymap_id'] ) ) {
-				$post = get_post( absint( sanitize_text_field( $_GET['storymap_id'] ) ) );
+			if ( $storymap_id ) {
+				$post = get_post( $storymap_id );
 				setup_postdata( $post );
 				add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 
 				require JEO_BASEPATH . '/templates/embed-storymap.php';
 				exit();
 			}
-			$discovery = isset( $_GET['discovery'] ) ? sanitize_text_field( $_GET['discovery'] ) : false;
-
 			if ( ! $discovery ) {
-				$map_id = isset( $_GET['map_id'] ) && is_numeric( $_GET['map_id'] ) ? intval( sanitize_text_field( $_GET['map_id'] ) ) : false;
 				if ( $map_id ) {
 					$map_meta = get_post_meta( $map_id );
 					$args     = (array) maybe_unserialize( $map_meta['related_posts'][0] );
@@ -624,18 +780,17 @@ class Jeo {
 					$server   = rest_get_server();
 					$data     = $server->response_to_data( $response, false );
 
-					$have_related_posts = ! empty( $map_meta['relate_posts'][0] ) && ! empty( $data ) || ! empty( $map->relate_posts );
+					$have_related_posts = ( ! empty( $map_meta['relate_posts'][0] ) && ! empty( $data ) );
 
-					if ( isset( $_GET['width'] ) ) {
-						$full_width  = isset( $_GET['width'] ) && is_numeric( $_GET['width'] ) ? intval( sanitize_text_field( $_GET['width'] ) ) : 820;
-						$popup_width = isset( $_GET['popup_width'] ) && is_numeric( $_GET['popup_width'] ) ? intval( sanitize_text_field( $_GET['popup_width'] ) ) : 220;
+					if ( $full_width ) {
+						$popup_width = $popup_width_arg ? $popup_width_arg : 220;
 						$map_width   = $full_width ? $full_width : 600;
 
 						if ( $have_related_posts ) {
 							$map_width = $full_width - $popup_width;
 						}
 
-						$height = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval( sanitize_text_field( $_GET['height'] ) ) : 600;
+						$height = $height ? $height : 600;
 
 						$map_style       = "width: {$map_width}px; height: {$height}px;";
 						$container_style = "position: fixed; width: {$full_width}px; height: {$height}px;";
@@ -666,24 +821,32 @@ class Jeo {
 
 				}
 			} else {
-				$selected_layers = sanitize_text_field( $_GET['selected-layers'] );
 				require JEO_BASEPATH . '/templates/embed-discovery.php';
 				exit();
 			}
 		}
 	}
 
+	/**
+	 * Render the story map content for previews and embed requests.
+	 *
+	 * @param string $content Existing post content.
+	 * @return string
+	 */
 	public function storymap_content( $content ) {
-		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && isset( $_GET['storymap_id'] ) ) ) {
+		$storymap_id = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
+
+		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && $storymap_id ) ) {
 			global $post, $wpdb;
 
-			// Sometimes, content is empty
-			$post_id = $post->ID;
-			if ( ! empty( $_GET['preview_id'] ) ) {
-				$post_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
+			// Sometimes the saved content is empty.
+			$post_id    = $post->ID;
+			$preview_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
+			if ( $preview_id ) {
+				$post_id = $preview_id;
 			}
-			if ( ! empty( $_GET['storymap_id'] ) ) {
-				$post_id = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
+			if ( $storymap_id ) {
+				$post_id = $storymap_id;
 			}
 			$post_content = $wpdb->get_results(
 				$wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", $post_id )
@@ -691,13 +854,21 @@ class Jeo {
 
 			return do_blocks( $post_content[0]->post_content );
 		}
+
+		return $content;
 	}
 
 	/**
 	 * Auto-inject the editor preview block into existing map posts
 	 * so the block editor template matches without user intervention.
+	 *
+	 * @param WP_REST_Response $response REST response.
+	 * @param WP_Post          $post Current post object.
+	 * @param WP_REST_Request  $request REST request.
+	 * @return WP_REST_Response
 	 */
 	public function inject_editor_block_for_map( $response, $post, $request ) {
+		unset( $post );
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/map-editor' ) ) {
@@ -710,8 +881,14 @@ class Jeo {
 	/**
 	 * Auto-inject the editor preview block into existing layer posts
 	 * so the block editor template matches without user intervention.
+	 *
+	 * @param WP_REST_Response $response REST response.
+	 * @param WP_Post          $post Current post object.
+	 * @param WP_REST_Request  $request REST request.
+	 * @return WP_REST_Response
 	 */
 	public function inject_editor_block_for_layer( $response, $post, $request ) {
+		unset( $post );
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/layer-editor' ) ) {
@@ -721,6 +898,11 @@ class Jeo {
 		return $response;
 	}
 
+	/**
+	 * Lock the story map post type to a single block and enforce preview rendering.
+	 *
+	 * @return void
+	 */
 	public function restrict_story_map_block_count() {
 		global $post;
 

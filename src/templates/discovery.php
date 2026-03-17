@@ -1,4 +1,10 @@
 <?php
+/**
+ * Discovery page template.
+ *
+ * @package Jeo
+ */
+
 get_header(); ?>
 <main>
 	<div id="discovery">

@@ -1,15 +1,38 @@
 <?php
+/**
+ * Plugin settings bootstrap and accessors.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Manage plugin settings and geocoder options.
+ */
 class Settings {
 
 	use Singleton;
 
+	/**
+	 * Settings option key.
+	 *
+	 * @var string
+	 */
 	public $option_key = 'jeo-settings';
 
+	/**
+	 * Default settings values.
+	 *
+	 * @var array
+	 */
 	private $default_options = array();
 
+	/**
+	 * Register settings hooks and defaults.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 
 		$this->default_options = array(
@@ -32,6 +55,12 @@ class Settings {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 	}
 
+	/**
+	 * Return a single plugin option value merged with defaults.
+	 *
+	 * @param string $option_name Option slug.
+	 * @return mixed
+	 */
 	public function get_option( $option_name ) {
 		$options = get_option( $this->option_key );
 		if ( ! $options ) {
@@ -49,14 +78,33 @@ class Settings {
 		return null;
 	}
 
+	/**
+	 * Build a namespaced option field name.
+	 *
+	 * @param string $name Field slug.
+	 * @return string
+	 */
 	public function get_field_name( $name ) {
 		return $this->option_key . '[' . $name . ']';
 	}
 
+	/**
+	 * Build a geocoder option field name.
+	 *
+	 * @param string $geocoder Geocoder slug.
+	 * @param string $name Field slug.
+	 * @return string
+	 */
 	public function get_geocoder_option_field_name( $geocoder, $name ) {
 		return $this->get_field_name( 'geocoders' ) . '[' . $geocoder . '][' . $name . ']';
 	}
 
+	/**
+	 * Return all options for a geocoder, merged with defaults.
+	 *
+	 * @param string $geocoder_slug Geocoder slug.
+	 * @return array
+	 */
 	public function get_geocoder_options( $geocoder_slug ) {
 		$options  = $this->get_option( 'geocoders' );
 		$geocoder = \jeo_geocode_handler()->initialize_geocoder( $geocoder_slug );
@@ -65,15 +113,33 @@ class Settings {
 		return array_merge( $defaults, $current );
 	}
 
+	/**
+	 * Return a single geocoder option.
+	 *
+	 * @param string $geocoder_slug Geocoder slug.
+	 * @param string $option_name Option slug.
+	 * @return mixed
+	 */
 	public function get_geocoder_option( $geocoder_slug, $option_name ) {
 		$options = $this->get_geocoder_options( $geocoder_slug );
 		return isset( $options[ $option_name ] ) ? $options[ $option_name ] : '';
 	}
 
+	/**
+	 * Register the settings option group.
+	 *
+	 * @return void
+	 */
 	public function admin_init() {
 		register_setting( 'jeo-settings', $this->option_key );
 	}
 
+	/**
+	 * Enqueue admin assets for the settings screen.
+	 *
+	 * @param string $page Current admin page hook.
+	 * @return void
+	 */
 	public function enqueue_admin_scripts( $page ) {
 		if ( 'jeo_page_jeo-settings' === $page ) {
 			wp_enqueue_media();
@@ -83,6 +149,11 @@ class Settings {
 		}
 	}
 
+	/**
+	 * Register the plugin settings menu entry.
+	 *
+	 * @return void
+	 */
 	public function add_menu_item() {
 		add_submenu_page(
 			'jeo-main-menu',
@@ -94,6 +165,11 @@ class Settings {
 		);
 	}
 
+	/**
+	 * Render the settings page.
+	 *
+	 * @return void
+	 */
 	public function admin_page() {
 		include 'settings-page.php';
 	}

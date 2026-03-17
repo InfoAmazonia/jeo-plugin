@@ -1,12 +1,20 @@
 <?php
-	$is_embed = isset( $_GET['embed'] );
+/**
+ * Single map template.
+ *
+ * @package Jeo
+ */
 
-	$full_width = isset( $_GET['width'] ) && is_numeric( $_GET['height'] ) ? intval( sanitize_text_field( $_GET['width'] ) ) : 820;
-	$map_width  = $full_width ? $full_width - 220 : 600;
-	$height     = isset( $_GET['height'] ) && is_numeric( $_GET['height'] ) ? intval( sanitize_text_field( $_GET['height'] ) ) : 600;
+$is_embed = null !== filter_input( INPUT_GET, 'embed', FILTER_DEFAULT );
 
-	$map_style       = "width: {$map_width}px; height: {$height}px;";
-	$container_style = "width: {$full_width}px; height: {$height}px;";
+$full_width = filter_input( INPUT_GET, 'width', FILTER_VALIDATE_INT );
+$height     = filter_input( INPUT_GET, 'height', FILTER_VALIDATE_INT );
+
+$full_width      = $full_width ? $full_width : 820;
+$map_width       = $full_width ? $full_width - 220 : 600;
+$height          = $height ? $height : 600;
+$map_style       = "width: {$map_width}px; height: {$height}px;";
+$container_style = "width: {$full_width}px; height: {$height}px;";
 ?>
 
 <?php if ( $is_embed ) : ?>

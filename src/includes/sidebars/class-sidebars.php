@@ -1,16 +1,36 @@
 <?php
+/**
+ * Sidebar asset bootstrap.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Register editor sidebar assets and REST helpers.
+ */
 class Sidebars {
 
 	use Singleton;
 
+	/**
+	 * Register sidebar hooks.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'admin_init', array( $this, 'load_assets' ) );
 		add_action( 'rest_post_query', array( $this, 'rest_post_query' ), 10, 2 );
 	}
 
+	/**
+	 * Allow meta_query arguments in sidebar REST post requests.
+	 *
+	 * @param array            $args REST query arguments.
+	 * @param \WP_REST_Request $request REST request.
+	 * @return array
+	 */
 	public function rest_post_query( $args, $request ) {
 		if ( $request['meta_query'] ) {
 			$args['meta_query'] = $request['meta_query'];
@@ -19,6 +39,11 @@ class Sidebars {
 		return $args;
 	}
 
+	/**
+	 * Load the editor sidebar assets.
+	 *
+	 * @return void
+	 */
 	public function load_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 

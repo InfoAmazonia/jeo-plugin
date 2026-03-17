@@ -1,14 +1,32 @@
 <?php
+/**
+ * Map post-type registration.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Register and manage map posts.
+ */
 class Maps {
 
 	use Singleton;
 	use Rest_Validate_Meta;
 
+	/**
+	 * Map post type slug.
+	 *
+	 * @var string
+	 */
 	public $post_type = 'map';
 
+	/**
+	 * Register map hooks.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_action( 'init', array( $this, 'register_shortcode' ) );
@@ -18,6 +36,11 @@ class Maps {
 		$this->register_rest_meta_validation();
 	}
 
+	/**
+	 * Register the map post type and its metadata.
+	 *
+	 * @return void
+	 */
 	public function register_post_type() {
 
 		$labels = array(
@@ -50,6 +73,7 @@ class Maps {
 			'show_in_menu'        => 'jeo-main-menu',
 			'show_in_rest'        => true,
 			'menu_position'       => 4,
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode,WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Encodes a bundled local SVG into a menu-icon data URI.
 			'menu_icon'           => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( JEO_BASEPATH . '/js/src/icons/map.svg' ) ),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
@@ -64,8 +88,6 @@ class Maps {
 
 				'delete_post'        => 'delete_map',
 			),
-			// 'map_meta_cap' => true,
-			// 'capability_type' => 'post',
 		);
 
 		register_post_type( $this->post_type, $args );
@@ -367,22 +389,34 @@ class Maps {
 		);
 	}
 
-	public function sanitize_meta_center( $meta_value, $meta_key, $object_type, $object_subtype ) {
-		return intval( $meta_value );
-	}
-
-	public function sanitize_meta_initial_zoom( $meta_value, $meta_key, $object_type, $object_subtype ) {
+	/**
+	 * Sanitize a map-center coordinate.
+	 *
+	 * @param mixed $meta_value Raw coordinate value.
+	 * @return int
+	 */
+	public function sanitize_meta_center( $meta_value ) {
 		return intval( $meta_value );
 	}
 
 	/**
-	 * Validates the zoom metadata value
+	 * Sanitize the initial zoom value.
 	 *
-	 * @param  mixed $value The value to be validated
-	 * @return void|\WP_Error Returns a \WP_Error object in case the value is invalid
+	 * @param mixed $meta_value Raw zoom value.
+	 * @return int
+	 */
+	public function sanitize_meta_initial_zoom( $meta_value ) {
+		return intval( $meta_value );
+	}
+
+	/**
+	 * Validate the zoom metadata value.
+	 *
+	 * @param mixed $value The value to be validated.
+	 * @return void|\WP_Error Returns a \WP_Error object in case the value is invalid.
 	 */
 	public function validate_meta_initial_zoom( $value ) {
-		// WordPress is already validating if it is a number
+		// WordPress already validates whether the value is numeric.
 
 		$val = intval( $value );
 		if ( $val < 1 || $val > 14 ) {
@@ -390,10 +424,21 @@ class Maps {
 		}
 	}
 
+	/**
+	 * Register the public shortcode for maps.
+	 *
+	 * @return void
+	 */
 	public function register_shortcode() {
 		\add_shortcode( 'jeo-map', array( $this, 'map_shortcode' ) );
 	}
 
+	/**
+	 * Render the map shortcode container.
+	 *
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
 	public function map_shortcode( $atts ) {
 
 		$atts = \shortcode_atts(
@@ -425,7 +470,7 @@ class Maps {
 			$style .= 'height: ' . $atts['height'] . ';"';
 		}
 
-		if ( ! empty( $tyle ) ) {
+		if ( ! empty( $style ) ) {
 			$div .= 'style="' . $style . '"';
 		}
 
@@ -434,13 +479,19 @@ class Maps {
 		return $div;
 	}
 
+	/**
+	 * Append map-layer content to the single map output.
+	 *
+	 * @param string $content Current post content.
+	 * @return string
+	 */
 	public function the_content_filter( $content ) {
 
 		if ( get_post_type() !== 'map' ) {
 			return $content;
 		}
 
-		// Only when visiting the Map single page
+		// Only run when visiting the single map page.
 		if ( is_single( get_the_id() ) ) {
 			$map_id  = get_the_ID();
 			$div     = "<div class='jeomap map_id_'{$map_id}'";
@@ -504,6 +555,11 @@ class Maps {
 		return $content;
 	}
 
+	/**
+	 * Grant map-related capabilities to supported roles.
+	 *
+	 * @return void
+	 */
 	public function add_capabilities() {
 		$roles = array( 'author', 'editor', 'administrator', 'contributor' );
 		$types = array( 'map', 'map-layer', 'storymap' );
@@ -526,6 +582,12 @@ class Maps {
 		}
 	}
 
+	/**
+	 * Override the single template for maps.
+	 *
+	 * @param string $template Current single template path.
+	 * @return string
+	 */
 	public function override_template( $template ) {
 		global $post;
 
