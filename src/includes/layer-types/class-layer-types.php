@@ -1,13 +1,31 @@
 <?php
+/**
+ * Layer-type registry and assets.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Register available layer types and their assets.
+ */
 class Layer_Types {
 
 	use Singleton;
 
+	/**
+	 * Registered layer types keyed by slug.
+	 *
+	 * @var array
+	 */
 	private $registered_layer_types = array();
 
+	/**
+	 * Register hooks for layer-type assets.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -15,8 +33,8 @@ class Layer_Types {
 	}
 
 	/**
-	 * Registers all core layer_types and fires the hook for
-	 * extenals layer_types to be registered
+	 * Registers all core layer types and fires the hook for
+	 * external layer types to be registered.
 	 *
 	 * @return void
 	 */
@@ -58,27 +76,29 @@ class Layer_Types {
 		);
 
 		/**
-		 * Hook used to register layer_types
+		 * Hook used to register layer types.
 		 *
-		 * example:
+		 * Example:
 		 * add_action('jeo_register_layer_types', function($layer_types) {
 		 *      $layer_types->register_layer_type('my-layer-type', [ 'script_url' => 'http://url.to/layertype.js' ] );
 		 * });
 		 *
-		 * @param Jeo\Geocode_Handler The Geocode_Handler instance
+		 * @param Jeo\Layer_Types $layer_types The Layer_Types instance.
 		 */
 		do_action( 'jeo_register_layer_types', $this );
 	}
 
 	/**
-	 * Register layer_type
+	 * Register a layer type.
 	 *
-	 * @param string $slug A unique slug for the layer_type. e.g. 'example-layer_type'
+	 * @param string $slug A unique slug for the layer type. e.g. 'example-layer-type'.
 	 * @param array  $options {
-	 *      Required. Array or string of arguments describing the layer_type
-	 *     @type string      $script_url            Full URL to the layer type javascript file
-	 *     @type array       $dependencies          List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependencies to the layer type main script
+	 *     Required. Array of arguments describing the layer type.
+	 *
+	 *     @type string $script_url   Full URL to the layer type JavaScript file.
+	 *     @type array  $dependencies Script handles that should be loaded first.
 	 * }
+	 * @return bool
 	 */
 	public function register_layer_type( $slug, $options ) {
 
@@ -91,10 +111,21 @@ class Layer_Types {
 		return true;
 	}
 
+	/**
+	 * Remove a registered layer type.
+	 *
+	 * @param string $layer_type_slug Layer type slug.
+	 * @return void
+	 */
 	public function unregister_layer_type( $layer_type_slug ) {
 		unset( $this->registered_layer_types[ $layer_type_slug ] );
 	}
 
+	/**
+	 * Return the current layer-type registry.
+	 *
+	 * @return array
+	 */
 	public function get_registered_layer_types() {
 		if ( empty( $this->registered_layer_types ) ) {
 			$this->register_layer_types();
@@ -103,6 +134,12 @@ class Layer_Types {
 		return $this->registered_layer_types;
 	}
 
+	/**
+	 * Return a single layer type definition.
+	 *
+	 * @param string $layer_type_slug Layer type slug.
+	 * @return array|null
+	 */
 	public function get_layer_type( $layer_type_slug ) {
 		$layer_types = $this->get_registered_layer_types();
 		if ( isset( $layer_types[ $layer_type_slug ] ) ) {
@@ -111,10 +148,21 @@ class Layer_Types {
 		return null;
 	}
 
+	/**
+	 * Check whether a layer type is registered.
+	 *
+	 * @param string $layer_type_slug Layer type slug.
+	 * @return bool
+	 */
 	public function is_layer_type_registered( $layer_type_slug ) {
 		return ! \is_null( $this->get_layer_type( $layer_type_slug ) );
 	}
 
+	/**
+	 * Register shared layer scripts.
+	 *
+	 * @return void
+	 */
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/JeoLayer.asset.php';
 		wp_register_script(
@@ -128,8 +176,13 @@ class Layer_Types {
 		wp_set_script_translations( 'jeo-layer', 'jeo', JEO_BASEPATH . 'languages' );
 	}
 
+	/**
+	 * Enqueue scripts for all registered layer types.
+	 *
+	 * @return void
+	 */
 	public function enqueue_scripts() {
-		// TODO: load only when needed (non-generic way)
+		// TODO: Load only when needed via a more specific condition.
 		if ( ! $this->should_load_assets() ) {
 			return;
 		}

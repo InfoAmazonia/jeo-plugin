@@ -1,13 +1,31 @@
 <?php
+/**
+ * Legend-type registry and assets.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Register available legend types and their assets.
+ */
 class Legend_Types {
 
 	use Singleton;
 
+	/**
+	 * Registered legend types keyed by slug.
+	 *
+	 * @var array
+	 */
 	private $registered_legend_types = array();
 
+	/**
+	 * Register hooks for legend-type assets.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
@@ -15,8 +33,8 @@ class Legend_Types {
 	}
 
 	/**
-	 * Registers all core legend_types and fires the hook for
-	 * extenals legend_types to be registered
+	 * Registers all core legend types and fires the hook for
+	 * external legend types to be registered.
 	 *
 	 * @return void
 	 */
@@ -51,27 +69,29 @@ class Legend_Types {
 		);
 
 		/**
-		 * Hook used to register legend_types
+		 * Hook used to register legend types.
 		 *
-		 * example:
+		 * Example:
 		 * add_action('jeo_register_legend_types', function($legend_types) {
 		 *      $legend_types->register_legend_type('my-legend-type', [ 'script_url' => 'http://url.to/legendtype.js' ] );
 		 * });
 		 *
-		 * @param Jeo\Geocode_Handler The Geocode_Handler instance
+		 * @param Jeo\Legend_Types $legend_types The Legend_Types instance.
 		 */
 		do_action( 'jeo_register_legend_types', $this );
 	}
 
 	/**
-	 * Register legend_type
+	 * Register a legend type.
 	 *
-	 * @param string $slug A unique slug for the legend_type. e.g. 'example-legend_type'
+	 * @param string $slug A unique slug for the legend type. e.g. 'example-legend-type'.
 	 * @param array  $options {
-	 *      Required. Array or string of arguments describing the legend_type
-	 *     @type string      $script_url            Full URL to the legend type javascript file
-	 *     @type array       $dependencies          List of scripts handles, registered using @see \wp_register_script() that should be loaded as dependencies to the legend type main script
+	 *     Required. Array of arguments describing the legend type.
+	 *
+	 *     @type string $script_url   Full URL to the legend type JavaScript file.
+	 *     @type array  $dependencies Script handles that should be loaded first.
 	 * }
+	 * @return bool
 	 */
 	public function register_legend_type( $slug, $options ) {
 
@@ -84,10 +104,21 @@ class Legend_Types {
 		return true;
 	}
 
+	/**
+	 * Remove a registered legend type.
+	 *
+	 * @param string $legend_type_slug Legend type slug.
+	 * @return void
+	 */
 	public function unregister_legend_type( $legend_type_slug ) {
 		unset( $this->registered_legend_types[ $legend_type_slug ] );
 	}
 
+	/**
+	 * Return the current legend-type registry.
+	 *
+	 * @return array
+	 */
 	public function get_registered_legend_types() {
 		if ( empty( $this->registered_legend_types ) ) {
 			$this->register_legend_types();
@@ -96,6 +127,12 @@ class Legend_Types {
 		return $this->registered_legend_types;
 	}
 
+	/**
+	 * Return a single legend type definition.
+	 *
+	 * @param string $legend_type_slug Legend type slug.
+	 * @return array|null
+	 */
 	public function get_legend_type( $legend_type_slug ) {
 		$legend_types = $this->get_registered_legend_types();
 		if ( isset( $legend_types[ $legend_type_slug ] ) ) {
@@ -104,10 +141,21 @@ class Legend_Types {
 		return null;
 	}
 
+	/**
+	 * Check whether a legend type is registered.
+	 *
+	 * @param string $legend_type_slug Legend type slug.
+	 * @return bool
+	 */
 	public function is_legend_type_registered( $legend_type_slug ) {
 		return ! \is_null( $this->get_legend_type( $legend_type_slug ) );
 	}
 
+	/**
+	 * Register shared legend scripts.
+	 *
+	 * @return void
+	 */
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/JeoLegend.asset.php';
 		wp_register_script(
@@ -121,8 +169,13 @@ class Legend_Types {
 		wp_set_script_translations( 'jeo-legend', 'jeo', JEO_BASEPATH . 'languages' );
 	}
 
+	/**
+	 * Enqueue scripts for all registered legend types.
+	 *
+	 * @return void
+	 */
 	public function enqueue_scripts() {
-		// TODO: load only when needed
+		// TODO: Load only when needed.
 		if ( ! $this->should_load_assets() ) {
 			return;
 		}
@@ -132,7 +185,6 @@ class Legend_Types {
 			$deps = array_merge( array( 'jeo-legend' ), $deps );
 			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps, JEO_VERSION, true );
 			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
-
 		}
 	}
 }

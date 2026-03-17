@@ -1,4 +1,9 @@
 <?php
+/**
+ * REST meta validation helpers.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
@@ -21,6 +26,11 @@ namespace Jeo;
  */
 trait Rest_Validate_Meta {
 
+	/**
+	 * Register REST validation hook for the current post type.
+	 *
+	 * @return void
+	 */
 	public function register_rest_meta_validation() {
 		if ( ! $this->post_type ) {
 			return;
@@ -28,6 +38,13 @@ trait Rest_Validate_Meta {
 		add_filter( 'rest_pre_insert_' . $this->post_type, array( $this, 'rest_insert_validate' ), 10, 2 );
 	}
 
+	/**
+	 * Validate REST meta payload before insert.
+	 *
+	 * @param array|\WP_Post   $prepared_post Prepared post object or array.
+	 * @param \WP_REST_Request $request REST request.
+	 * @return array|\WP_Post|\WP_Error
+	 */
 	public function rest_insert_validate( $prepared_post, $request ) {
 		$registered_meta = get_registered_meta_keys( 'post', $this->post_type );
 		if ( is_array( $registered_meta ) && isset( $request['meta'] ) && is_array( $request['meta'] ) ) {

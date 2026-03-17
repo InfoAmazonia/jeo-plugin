@@ -1,6 +1,18 @@
 <?php
+/**
+ * Global loaders and helper functions.
+ *
+ * @package Jeo
+ */
+
 spl_autoload_register( 'jeo_autoload' );
 
+/**
+ * Autoload plugin classes based on namespace and folder conventions.
+ *
+ * @param string $class_name Fully-qualified class name.
+ * @return void
+ */
 function jeo_autoload( $class_name ) {
 
 	$class_path = explode( '\\', $class_name );
@@ -122,7 +134,7 @@ function jeo_storymap() {
  * * The pre-computed `$template_uri`
  * * The original `$template_name`
  *
- * @param string $template_name The name of the template (e.g. `some-template.php`)
+ * @param string $template_name The name of the template (e.g. `some-template.php`).
  * @return string The URL for the template file
  */
 function jeo_get_template( $template_name ) {
@@ -146,8 +158,8 @@ function jeo_get_template( $template_name ) {
 /**
  * Register an embedder for a JEO-capable site
  *
- * @param string $id Unique ID for the source
- * @param string $base_url Site URL (e.g.` http://example.org`)
+ * @param string $id Unique ID for the source.
+ * @param string $base_url Site URL (e.g. `http://example.org`).
  */
 function jeo_register_embedder( $id, $base_url ) {
 	$regex = '#' . preg_quote( $base_url, '/' ) . '\/embed\/.*#';
@@ -181,7 +193,11 @@ function jeo_register_embedder( $id, $base_url ) {
 	wp_embed_register_handler( $id, $regex, $embedder );
 }
 
-/* New JEO Plugin Settings */
+/**
+ * Build custom CSS from plugin settings.
+ *
+ * @return string
+ */
 function jeo_custom_settings_css() {
 	$theme_css = '';
 	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ) ) ) {
@@ -276,6 +292,12 @@ function jeo_custom_settings_css() {
 
 	return $theme_css;
 }
+
+/**
+ * Print custom CSS generated from plugin settings.
+ *
+ * @return void
+ */
 function jeo_custom_settings_css_wrap() {
 	?>
 	<style type="text/css" id="custom-jeo-css">
@@ -287,6 +309,11 @@ function jeo_custom_settings_css_wrap() {
 }
 add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
 
+/**
+ * Enqueue configured typography assets.
+ *
+ * @return void
+ */
 function jeo_scripts_typography() {
 	if ( \jeo_settings()->get_option( 'jeo_typography' ) ) {
 		wp_enqueue_style( 'jeo-font', \jeo_settings()->get_option( 'jeo_typography' ), array(), JEO_VERSION );
@@ -299,6 +326,13 @@ add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );
 add_action( 'admin_enqueue_scripts', 'jeo_scripts_typography' );
 
 if ( ! function_exists( 'color_luminance_jeo' ) ) {
+	/**
+	 * Adjust luminance for a hex color value.
+	 *
+	 * @param string    $hexcolor Base color.
+	 * @param float|int $percent Luminance delta.
+	 * @return string
+	 */
 	function color_luminance_jeo( $hexcolor, $percent ) {
 		if ( strlen( $hexcolor ) < 6 ) {
 			$hexcolor = $hexcolor[0] . $hexcolor[0] . $hexcolor[1] . $hexcolor[1] . $hexcolor[2] . $hexcolor[2];
@@ -316,8 +350,15 @@ if ( ! function_exists( 'color_luminance_jeo' ) ) {
 	}
 }
 
-// Load template for discovery
+// Load the Discovery template when the page template slug matches.
 add_filter( 'page_template', 'template_page_discovery' );
+
+/**
+ * Swap in the bundled Discovery page template.
+ *
+ * @param string $page_template Current page template path.
+ * @return string
+ */
 function template_page_discovery( $page_template ) {
 
 	if ( get_page_template_slug() === 'discovery.php' ) {
@@ -327,12 +368,19 @@ function template_page_discovery( $page_template ) {
 }
 
 /**
- * Add "Discovery" template to page attirbute template section.
+ * Add the Discovery template to the page-template selector.
  */
 add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
+
+/**
+ * Expose the bundled Discovery template in the editor selector.
+ *
+ * @param array $post_templates Registered page templates.
+ * @return array
+ */
 function add_template_page_discovery( $post_templates ) {
 
-	// Add custom template named template-custom.php to select dropdown
+	// Add the bundled Discovery template to the selector.
 	$post_templates['discovery.php'] = __( 'Discovery', 'jeo' );
 
 	return $post_templates;

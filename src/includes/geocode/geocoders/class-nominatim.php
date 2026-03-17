@@ -1,9 +1,23 @@
 <?php
+/**
+ * Nominatim geocoder integration.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\Geocoders;
 
+/**
+ * Geocoder implementation backed by OpenStreetMap Nominatim.
+ */
 class Nominatim extends \Jeo\Geocoder {
 
+	/**
+	 * Search Nominatim for matching addresses.
+	 *
+	 * @param string $search_string Search query string.
+	 * @return array
+	 */
 	public function geocode( $search_string ) {
 
 		$params = array(
@@ -32,6 +46,13 @@ class Nominatim extends \Jeo\Geocoder {
 		return $response;
 	}
 
+	/**
+	 * Reverse-geocode a latitude and longitude pair.
+	 *
+	 * @param string|float $lat Latitude value.
+	 * @param string|float $lon Longitude value.
+	 * @return array
+	 */
 	public function reverse_geocode( $lat, $lon ) {
 
 		$params = array(
@@ -50,6 +71,12 @@ class Nominatim extends \Jeo\Geocoder {
 		return $this->format_response_item( (array) $data );
 	}
 
+	/**
+	 * Normalize a Nominatim response item into the plugin shape.
+	 *
+	 * @param array $item Raw Nominatim response item.
+	 * @return array|null
+	 */
 	private function format_response_item( $item ) {
 
 		if ( isset( $item['lat'] ) && isset( $item['lon'] ) && isset( $item['display_name'] ) ) {
