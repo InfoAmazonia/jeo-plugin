@@ -411,6 +411,69 @@ $font: var(--jeo-font);
 					font-weight: bold;
 					color: #555d66;
 				}
+
+				.jeo-date-range-filter {
+					position: relative;
+				}
+
+				.jeo-date-range-filter__toggle {
+					width: 100%;
+					text-align: left;
+					cursor: pointer;
+				}
+
+				.jeo-date-range-filter__toggle:not(.has-value) {
+					color: #777;
+				}
+
+				.jeo-date-range-filter__popover {
+					position: absolute;
+					top: calc( 100% + 8px );
+					inset-inline-start: 0;
+					z-index: 4;
+					background: #fff;
+					border: 1px solid rgba( 0, 0, 0, 0.12 );
+					border-radius: 8px;
+					box-shadow: 0 10px 24px rgba( 0, 0, 0, 0.12 );
+					padding: 8px;
+				}
+
+				.jeo-date-range-filter__actions {
+					display: flex;
+					justify-content: flex-end;
+					gap: 8px;
+					padding: 8px 4px 4px;
+				}
+
+				.jeo-date-range-filter__action {
+					border: 1px solid #dcdcde;
+					border-radius: 6px;
+					padding: 6px 10px;
+					font-size: 13px;
+					font-weight: 600;
+					cursor: pointer;
+				}
+
+				.jeo-date-range-filter__action--secondary {
+					background: #fff;
+					color: #1d2327;
+				}
+
+				.jeo-date-range-filter__action--primary {
+					background: $primary;
+					border-color: $primary;
+					color: #fff;
+				}
+
+				.jeo-date-range-filter__action:disabled {
+					opacity: 0.5;
+					cursor: default;
+				}
+
+				.react-datepicker {
+					border: 0;
+					font-family: inherit;
+				}
 			}
 
 			.stories {

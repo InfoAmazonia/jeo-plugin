@@ -9,9 +9,9 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import Form from 'react-jsonschema-form';
 import InteractionsSettings from './interactions-settings';
 import { useDebounce } from 'use-debounce';
+import SchemaForm from '../shared/schema-form';
 
 const layerSchema = {
 	type: 'object',
@@ -119,7 +119,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 
 	return (
 		<Fragment>
-			<Form
+			<SchemaForm
 				className="jeo-layer-settings"
 				schema={ layerSchema }
 				uiSchema={ widgets }
@@ -131,7 +131,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 			>
 				{ /* Hide submit button */ }
 				<div />
-			</Form>
+			</SchemaForm>
 
 			{ styleLayers && interactions && (
 				<Fragment>

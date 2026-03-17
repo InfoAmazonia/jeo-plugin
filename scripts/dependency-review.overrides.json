@@ -15,7 +15,7 @@
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
       "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor.",
       "Current stabilization track: Batch 1 fixes the null-related-post geocode crash, same-point post individualization and reorder regressions that predate the dependency majors.",
-      "Current stabilization track: Batch 2 replaces react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form, while Batch 3 removes react-beautiful-dnd.",
+      "Current stabilization track: Batch 2 has replaced react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form; Batch 3 now removes react-beautiful-dnd.",
       "Current stabilization track: Batch 4 aligns the Gutenberg and React line to clear the remaining react-autosize-textarea peer warning and unblock react-leaflet 5.",
       "Current stabilization track: Batch 6 validates PHP 8.5 and Batch 7 is the dedicated PHPCS baseline cleanup."
     ]
@@ -279,7 +279,7 @@
       "id": "batch-2-input-form-replacements",
       "phase": "Batch 2",
       "title": "Autosuggest, date-range and form replacements",
-      "status": "planned",
+      "status": "completed",
       "scope": "Replace the deprecated input and form helpers while preserving the current geocoding, Discovery date filtering and formData contracts.",
       "packageNames": [
         "react-autosuggest",
@@ -300,8 +300,9 @@
         "Verify layer and attribution forms render, normalize formData and save correctly."
       ],
       "approvalNotes": [
-        "The saved query and formData shapes must remain unchanged.",
-        "npm ci should no longer emit deprecation warnings for react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form."
+        "The saved query and formData shapes stayed unchanged via legacy-compatible helpers for async combobox selection, Discovery date ranges and merged schema formData updates.",
+        "npm ci no longer emits the deprecation warnings that previously came from react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form.",
+        "The remaining npm install noise is now limited to the tracked react-beautiful-dnd deprecation, the react-autosize-textarea peer warning and broader transitive ecosystem deprecations that Batch 2 did not introduce."
       ]
     },
     {
@@ -862,6 +863,69 @@
         "webpack.config.js",
         "src/css/jeo-map.scss"
       ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "batch-2-input-form-replacements",
+      "status": "completed",
+      "summary": "Replaced react-autosuggest with an internal async combobox wrapper, moved Discovery date filtering off react-bootstrap-daterangepicker onto a react-datepicker-based internal component, and replaced react-jsonschema-form with an internal @rjsf/core adapter while preserving the existing query and formData contracts.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully after removing the locally corrupted node_modules tree left by an earlier ENOTEMPTY failure. The run no longer emits deprecation warnings for react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form; the remaining install noise is the tracked react-beautiful-dnd deprecation, the react-autosize-textarea peer warning and broader transitive npm ecosystem deprecations."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The wp-scripts unit suite passed with 8 test files and 25 assertions, including new coverage for the async combobox helper, the schema-form adapter and the Discovery date-range wrapper."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after the replacements with only the existing bundle-size warnings."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend replacement batch."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after replacing the autosuggest, date-range and schema-form helpers."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify geocoding autosuggest suggestions load, typing stays responsive and selecting a result updates the field value correctly.",
+        "Verify the post or map autosuggest search still surfaces suggestions and inserts the selected entity correctly.",
+        "Verify Discovery date apply and clear flows still update the after and before query values as expected.",
+        "Verify layer and attribution forms render, normalize formData and save correctly with the new schema-form adapter."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "jest.config.js",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "src/js/src/discovery/blocks/date-range-filter.js",
+        "src/js/src/discovery/blocks/date-range-filter.test.js",
+        "src/js/src/discovery/blocks/stories.js",
+        "src/js/src/discovery/style/discovery.scss",
+        "src/js/src/layers-sidebar/attribution-settings.js",
+        "src/js/src/layers-sidebar/layer-settings.js",
+        "src/js/src/map-blocks/jeo-autosuggest.js",
+        "src/js/src/map-blocks/map-editor.css",
+        "src/js/src/posts-sidebar/geo-auto-complete.css",
+        "src/js/src/posts-sidebar/geo-auto-complete.js",
+        "src/js/src/shared/async-combobox-control.js",
+        "src/js/src/shared/async-combobox-control.test.js",
+        "src/js/src/shared/schema-form.js",
+        "src/js/src/shared/schema-form.test.js",
+        "src/js/src/shared/wp-form-controls.js"
+      ]
     }
   ],
   "npm": {
@@ -899,9 +963,11 @@
       "batchId": "batch-2-input-form-replacements",
       "maintenanceStatus": "deprecated",
       "decision": "replace",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Planned replacement in Batch 2 with an internal @rjsf/core adapter that preserves the current formData contract."
+        "Replaced in Batch 2 by an internal SchemaForm adapter built on @rjsf/core and @rjsf/validator-ajv8.",
+        "The wrapper preserves the previous merged formData behavior so layer and attribution saves keep their existing postMeta contract.",
+        "The deprecated package has been removed from package.json and package-lock.json."
       ],
       "minorPath": "No maintained minor path on the deprecated package line.",
       "majorPath": "Replace with @rjsf/core while preserving the internal form wrapper contract.",
@@ -917,9 +983,11 @@
       "batchId": "batch-2-input-form-replacements",
       "maintenanceStatus": "deprecated",
       "decision": "replace",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Planned replacement in Batch 2 with an internal date-range wrapper backed by react-datepicker."
+        "Replaced in Batch 2 by an internal DateRangeFilter component backed by react-datepicker.",
+        "The wrapper preserves the previous apply and clear flow while continuing to drive after and before query values.",
+        "The deprecated package has been removed from package.json and package-lock.json."
       ],
       "minorPath": "No supported minor path on the deprecated wrapper.",
       "majorPath": "Replace with an internal date-range wrapper, preferably based on the existing react-datepicker dependency.",
@@ -935,9 +1003,11 @@
       "batchId": "batch-2-input-form-replacements",
       "maintenanceStatus": "looking-for-maintainers",
       "decision": "replace",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Planned replacement in Batch 2 with an internal async combobox wrapper based on @wordpress/components."
+        "Replaced in Batch 2 by an internal async combobox wrapper based on @wordpress/components ComboboxControl.",
+        "The new wrapper now backs both geocoding autocomplete and the post/map entity autosuggest flows without changing their external callback contracts.",
+        "The stale package has been removed from package.json and package-lock.json."
       ],
       "minorPath": "Do not spend time on the stale line unless a security fix forces it.",
       "majorPath": "Replace with a maintained autosuggest/combobox wrapper before any React or Gutenberg major jump.",
@@ -951,9 +1021,10 @@
     },
     "bootstrap-daterangepicker": {
       "batchId": "batch-2-input-form-replacements",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Expected to leave the dependency tree in Batch 2 when the Discovery date-range UI moves to the internal react-datepicker wrapper."
+        "Left the dependency tree in Batch 2 after the Discovery date-range UI moved to the internal react-datepicker-based wrapper.",
+        "The package no longer appears in package.json or package-lock.json."
       ],
       "maintenanceStatus": "review-manually",
       "decision": "replace",

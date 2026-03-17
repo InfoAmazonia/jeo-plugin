@@ -1,11 +1,10 @@
 import { Component } from '@wordpress/element';
 import Search from './search';
 import LazyImage from './lazy-image';
-import DateRangePicker from 'react-bootstrap-daterangepicker';
-import 'bootstrap-daterangepicker/daterangepicker.css';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
+import DateRangeFilter, { formatDateRangeValue } from './date-range-filter';
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
 import { buildRelatedPostsGeoJson } from '../../shared/story-geojson';
 
@@ -529,19 +528,17 @@ class Stories extends Component {
 	}
 
 	dateRangePickerApply( ev, picker ) {
-		const dateOptions = [ undefined, { year:"2-digit", month:"2-digit", day:"2-digit" } ];
-
 		this.props.updateState( {
-			dateRangeInputValue:
-				picker.startDate.toDate().toLocaleDateString( ...dateOptions ) +
-				' - ' +
-				picker.endDate.toDate().toLocaleDateString( ...dateOptions ),
+			dateRangeInputValue: formatDateRangeValue(
+				picker.startDate.toDate(),
+				picker.endDate.toDate()
+			),
 		} );
 
 		this.updateStories( { cumulative: false, after: picker.startDate.toISOString(), before: picker.endDate.toISOString(), page: 1 } );
 	}
 
-	dateRangePickerCancel(ev, picker) {
+	dateRangePickerCancel() {
 		this.props.updateState( {
 			dateRangeInputValue: '',
 		} );
@@ -632,13 +629,15 @@ class Stories extends Component {
 				</button>
 				{ this.state.showFilters && (
 					<div className="filters">
-						<DateRangePicker initialSettings={ { autoUpdateInput: false, locale: this.localeInfo } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
-							<input
-								placeholder={ __( 'Date range', 'jeo' ) }
-								readOnly="true"
-								value={ this.props.dateRangeInputValue }
-							></input>
-						</DateRangePicker>
+						<DateRangeFilter
+							placeholder={ __( 'Date range', 'jeo' ) }
+							value={ this.props.dateRangeInputValue }
+							startDate={ this.props.queryParams.after }
+							endDate={ this.props.queryParams.before }
+							localeInfo={ this.localeInfo }
+							onApply={ this.dateRangePickerApply }
+							onCancel={ this.dateRangePickerCancel }
+						/>
 						<select name="tags" onChange={ this.handleTagChange }>
 							<option value="">{ __( 'Tags', 'jeo' ) }</option>
 							{ this.props.tags.map( ( tag ) => (
