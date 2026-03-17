@@ -334,7 +334,7 @@
       "id": "batch-4-gutenberg-react-alignment",
       "phase": "Batch 4",
       "title": "Gutenberg and React alignment",
-      "status": "ready-for-approval",
+      "status": "completed",
       "scope": "Revalidate the latest published Gutenberg editor packages, clear the remaining React peer warning with a minimum local override, and document the still-blocked react-leaflet 5 path.",
       "packageNames": [
         "@wordpress/edit-post",
@@ -386,20 +386,22 @@
       "id": "batch-6-php-8-5-compat",
       "phase": "Batch 6",
       "title": "PHP 8.5 compatibility",
-      "status": "planned",
+      "status": "ready-for-approval",
       "scope": "Extend the local and CI PHP compatibility coverage to PHP 8.5 and remove repository-owned warnings or deprecations under that runtime.",
       "packageNames": [],
       "automatedChecks": [
         "composer validate --no-check-publish",
-        "php scripts/check-php-compat.php",
-        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+        "php scripts/check-php-compat.php with PHP 8.0 through 8.5",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+        "WP_CLI_PHP=/opt/homebrew/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke-85 bash scripts/wordpress-smoke.sh"
       ],
       "manualReviewItems": [
         "Repeat the runtime smoke while watching for repository-owned PHP 8.5 warnings or deprecations."
       ],
       "approvalNotes": [
-        "Keep PHP 8.5 experimental in CI until static checks and smoke logs are clean without repository-owned deprecations.",
-        "Continue using PHP 8.4 for the local smoke when wp-cli is the source of third-party warning noise."
+        "Static compatibility checks are green on PHP 8.0 through 8.5, and local WordPress smoke passes on both PHP 8.4 and PHP 8.5.",
+        "WordPress core 6.9 treats PHP 8.5 as beta support, while stable wp-cli support for PHP 8.5 is still planned upstream.",
+        "Keep PHP 8.5 experimental in CI for now because wp-cli still emits third-party deprecation noise under that runtime even though repository-owned checks are clean."
       ]
     },
     {
@@ -983,7 +985,7 @@
     {
       "date": "2026-03-17",
       "batchId": "batch-4-gutenberg-react-alignment",
-      "status": "ready-for-approval",
+      "status": "completed",
       "summary": "Confirmed that the currently installed Gutenberg editor packages are already on the latest published line, applied a local react-autosize-textarea override to remove the stale React peer warning, and documented that react-leaflet 5 remains blocked by upstream React 18 peer ranges.",
       "automatedChecks": [
         {
@@ -1028,6 +1030,50 @@
         "npm-overrides/react-autosize-textarea/lib/TextareaAutosize.js",
         "npm-overrides/react-autosize-textarea/lib/index.d.ts",
         "npm-overrides/react-autosize-textarea/lib/TextareaAutosize.d.ts",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-6-php-8-5-compat",
+      "status": "ready-for-approval",
+      "summary": "Extended the repository-owned PHP compatibility checks and CI matrix to PHP 8.5, documented that WordPress core already treats PHP 8.5 as beta support while stable wp-cli support is still planned upstream, and verified that local WordPress smoke stays green on PHP 8.4 and PHP 8.5 with only third-party wp-cli deprecation noise under PHP 8.5.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The current composer.json remains structurally valid."
+        },
+        {
+          "name": "php scripts/check-php-compat.php on PHP 8.0 through 8.5",
+          "status": "passed",
+          "details": "The static compatibility review stayed green on Homebrew PHP 8.0, 8.1, 8.2, 8.3, 8.4 and 8.5 after extending the script and report wording to PHP 8.5."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke remains green on PHP 8.4, which is still the cleanest local signal because wp-cli itself does not emit PHP 8.5 deprecation noise on this line."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke-85 bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke also passes on PHP 8.5. The log still contains third-party deprecations from wp-cli bundled libraries, but no repository-owned PHP 8.5 warnings or deprecations surfaced."
+        }
+      ],
+      "manualReviewItems": [
+        "Repeat the runtime smoke while watching specifically for repository-owned PHP 8.5 warnings or deprecations, not third-party wp-cli noise."
+      ],
+      "documentUpdates": [
+        ".github/workflows/php-compat.yml",
+        ".github/workflows/wordpress-smoke.yml",
+        "README.md",
+        "docs/dev/php-compatibility.md",
+        "src/README.txt",
+        "trunk/readme.txt",
+        "scripts/check-php-compat.php",
         "scripts/dependency-review.overrides.json",
         "docs/dev/dependency-upgrade-report.json",
         "docs/dev/dependency-upgrade-report.md",

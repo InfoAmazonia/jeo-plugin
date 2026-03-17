@@ -13,8 +13,9 @@ $files = collect_php_files( $targets );
 sort( $files );
 
 $report = array(
-	'target_range'         => 'PHP 8.0-8.4',
+	'target_range'         => 'PHP 8.0-8.5',
 	'primary_support'      => 'PHP 8.2-8.4',
+	'experimental_monitor' => 'PHP 8.5',
 	'backward_compat'      => 'PHP 8.0-8.1',
 	'analyzer_php'         => PHP_VERSION,
 	'php_binary'           => PHP_BINARY,
@@ -34,6 +35,18 @@ $report['checks'][] = summarize_check( 'Optional-before-required parameter scan'
 
 $dynamic_property_findings = scan_dynamic_this_property_assignments( $files );
 $report['checks'][] = summarize_check( 'Dynamic $this property assignment scan', $dynamic_property_findings );
+
+$backtick_findings = scan_backtick_shell_execution( $files );
+$report['checks'][] = summarize_check( 'Backtick shell-execution scan', $backtick_findings );
+
+$cast_findings = scan_non_canonical_casts( $files );
+$report['checks'][] = summarize_check( 'Non-canonical cast scan', $cast_findings );
+
+$case_syntax_findings = scan_case_semicolon_syntax( $files );
+$report['checks'][] = summarize_check( 'Case-semicolon syntax scan', $case_syntax_findings );
+
+$legacy_magic_method_findings = scan_legacy_sleep_wakeup_methods( $files );
+$report['checks'][] = summarize_check( 'Legacy __sleep/__wakeup scan', $legacy_magic_method_findings );
 
 $metadata_notes = scan_readme_metadata( $repositoryRoot );
 $report['notes'] = array_merge( $report['notes'], $metadata_notes );
@@ -235,6 +248,145 @@ function scan_dynamic_this_property_assignments( array $files ): array {
 					),
 				);
 			}
+		}
+	}
+
+	return $findings;
+}
+
+function scan_backtick_shell_execution( array $files ): array {
+	$findings = array();
+
+	foreach ( $files as $file ) {
+		$tokens = token_get_all( file_get_contents( $file ) );
+		$count = count( $tokens );
+		$inside_backticks = false;
+
+		for ( $index = 0; $index < $count; $index++ ) {
+			if ( '`' !== token_text( $tokens[ $index ] ) ) {
+				continue;
+			}
+
+			if ( ! $inside_backticks ) {
+				$findings[] = array(
+					'file'    => relative_path( $file ),
+					'line'    => token_line( $tokens, $index ),
+					'message' => 'Uses the backtick shell-execution operator, deprecated in PHP 8.5.',
+				);
+			}
+
+			$inside_backticks = ! $inside_backticks;
+		}
+	}
+
+	return $findings;
+}
+
+function scan_non_canonical_casts( array $files ): array {
+	$deprecated_casts = array(
+		T_BOOL_CAST   => '(boolean)',
+		T_INT_CAST    => '(integer)',
+		T_DOUBLE_CAST => '(double)',
+		T_STRING_CAST => '(binary)',
+	);
+	$findings = array();
+
+	foreach ( $files as $file ) {
+		$tokens = token_get_all( file_get_contents( $file ) );
+
+		foreach ( $tokens as $token ) {
+			if ( ! is_array( $token ) || ! isset( $deprecated_casts[ $token[0] ] ) ) {
+				continue;
+			}
+
+			if ( strtolower( $token[1] ) !== $deprecated_casts[ $token[0] ] ) {
+				continue;
+			}
+
+			$findings[] = array(
+				'file'    => relative_path( $file ),
+				'line'    => $token[2],
+				'message' => sprintf(
+					'Uses non-canonical cast %s, deprecated in PHP 8.5.',
+					$token[1]
+				),
+			);
+		}
+	}
+
+	return $findings;
+}
+
+function scan_case_semicolon_syntax( array $files ): array {
+	$findings = array();
+
+	foreach ( $files as $file ) {
+		$tokens = token_get_all( file_get_contents( $file ) );
+		$count = count( $tokens );
+
+		for ( $index = 0; $index < $count; $index++ ) {
+			$token = $tokens[ $index ];
+			if ( ! is_array( $token ) || T_CASE !== $token[0] ) {
+				continue;
+			}
+
+			$next_index = next_meaningful_token_index( $tokens, $index );
+			while ( null !== $next_index ) {
+				$next_text = token_text( $tokens[ $next_index ] );
+
+				if ( ':' === $next_text ) {
+					break;
+				}
+
+				if ( ';' === $next_text ) {
+					$findings[] = array(
+						'file'    => relative_path( $file ),
+						'line'    => $token[2],
+						'message' => 'Uses case syntax with a trailing semicolon instead of a colon, deprecated in PHP 8.5.',
+					);
+					break;
+				}
+
+				$next_index = next_meaningful_token_index( $tokens, $next_index );
+			}
+		}
+	}
+
+	return $findings;
+}
+
+function scan_legacy_sleep_wakeup_methods( array $files ): array {
+	$findings = array();
+
+	foreach ( $files as $file ) {
+		$tokens = token_get_all( file_get_contents( $file ) );
+		$count = count( $tokens );
+
+		for ( $index = 0; $index < $count; $index++ ) {
+			$token = $tokens[ $index ];
+			if ( ! is_array( $token ) || T_FUNCTION !== $token[0] ) {
+				continue;
+			}
+
+			$name_index = next_meaningful_token_index( $tokens, $index );
+			$name_token = null !== $name_index ? $tokens[ $name_index ] : null;
+			if ( ! is_array( $name_token ) || T_STRING !== $name_token[0] ) {
+				continue;
+			}
+
+			$name = strtolower( $name_token[1] );
+			if ( ! in_array( $name, array( '__sleep', '__wakeup' ), true ) ) {
+				continue;
+			}
+
+			$findings[] = array(
+				'file'    => relative_path( $file ),
+				'line'    => $name_token[2],
+				'message' => sprintf(
+					'Defines %s(), which is soft-deprecated in PHP 8.5 in favor of __serialize() and __unserialize().',
+					$name_token[1]
+				),
+			);
 		}
 	}
 
@@ -452,7 +604,7 @@ function scan_readme_metadata( string $repositoryRoot ): array {
 		$content = file_get_contents( $file );
 		if ( preg_match( '/^Requires PHP:\s*(.+)$/mi', $content, $matches ) ) {
 			$notes[] = sprintf(
-				'%s declares "Requires PHP: %s". This admits PHP 8.2-8.4 but does not explicitly document 8.3/8.4 validation.',
+				'%s declares "Requires PHP: %s". This admits PHP 8.2-8.5 but does not explicitly document the repository\'s PHP 8.5 experimental validation line.',
 				relative_path( $file ),
 				trim( $matches[1] )
 			);
@@ -474,6 +626,7 @@ function print_report( array $report ): void {
 	printf( "PHP compatibility review\n" );
 	printf( "Target range: %s\n", $report['target_range'] );
 	printf( "Primary support: %s\n", $report['primary_support'] );
+	printf( "Experimental monitoring: %s\n", $report['experimental_monitor'] );
 	printf( "Backward-compat coverage: %s\n", $report['backward_compat'] );
 	printf( "Analyzer PHP: %s\n", $report['analyzer_php'] );
 	printf( "PHP binary: %s\n", $report['php_binary'] );
@@ -498,14 +651,14 @@ function print_report( array $report ): void {
 	}
 
 	printf( "\nPolicy\n" );
-	printf( "  - Static compatibility checks cover PHP 8.0-8.4.\n" );
-	printf( "  - The stricter deprecation heuristics in this script are focused on PHP 8.2-8.4.\n" );
+	printf( "  - Static compatibility checks cover PHP 8.0-8.5.\n" );
+	printf( "  - The stricter deprecation heuristics in this script are focused on PHP 8.2-8.5.\n" );
 	printf( "  - Runtime compatibility for WordPress/PHP combinations should be enforced by the WordPress smoke-test workflow.\n" );
 
 	if ( all_checks_passed( $report['checks'] ) ) {
-		printf( "\nResult: no blocking PHP 8.0-8.4 compatibility issues were found by the static checks.\n" );
+		printf( "\nResult: no blocking PHP 8.0-8.5 compatibility issues were found by the static checks.\n" );
 	} else {
-		printf( "\nResult: one or more compatibility issues need review before claiming PHP 8.0-8.4 support.\n" );
+		printf( "\nResult: one or more compatibility issues need review before claiming PHP 8.0-8.5 support.\n" );
 	}
 
 	printf( "Limitations: static source review only; it does not boot WordPress or exercise runtime behavior.\n" );
@@ -605,6 +758,23 @@ function find_matching_brace( array $tokens, int $open_index ): ?int {
 
 function token_text( $token ): string {
 	return is_array( $token ) ? $token[1] : $token;
+}
+
+function token_line( array $tokens, int $index ): ?int {
+	$current_line = 1;
+
+	for ( $current = 0; $current <= $index; $current++ ) {
+		$token = $tokens[ $current ];
+
+		if ( is_array( $token ) ) {
+			$current_line = $token[2];
+			continue;
+		}
+
+		$current_line += substr_count( $token, "\n" );
+	}
+
+	return $current_line;
 }
 
 function relative_path( string $path ): string {

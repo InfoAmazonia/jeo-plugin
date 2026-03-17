@@ -29,6 +29,9 @@ jobs:
           - php: '8.4'
             label: PHP 8.4
             experimental: false
+          - php: '8.5'
+            label: PHP 8.5 (experimental, non-blocking)
+            experimental: true
 
     steps:
       - uses: actions/checkout@v4

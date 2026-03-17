@@ -28,7 +28,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 - Batch 3: run `npm ci`, `npm run build`, `npm run test:unit`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
 - Batch 4: run `npm ci`, `npm run build`, `npm run test:unit`, `npm ls react-autosize-textarea react react-dom`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
 - Batch 5: run `npm ci`, `npm run build`, `npm run test:unit`, `php scripts/check-php-compat.php` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
-- Batch 6: run `composer validate --no-check-publish`, `php scripts/check-php-compat.php` with PHP `8.0` through `8.5`, the local WordPress smoke on PHP `8.4`, and the local WordPress smoke on PHP `8.5` only after repository-owned deprecations are gone.
+- Batch 6: run `composer validate --no-check-publish`, `php scripts/check-php-compat.php` with PHP `8.0` through `8.5`, the local WordPress smoke on PHP `8.4`, and the local WordPress smoke on PHP `8.5`, recording any third-party `wp-cli` deprecation noise separately from repository-owned warnings.
 - Batch 7: run `composer validate --no-check-publish`, `php scripts/check-php-compat.php`, `vendor/bin/phpcs --standard=phpcs.xml.dist`, and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh` if runtime-touching PHP files changed.
 
 ## Manual review by batch
@@ -39,7 +39,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 - Batch 3: verify selected map-layer ordering, storymap slide ordering and storymap layer toggling after removing the unsupported nested drag affordance.
 - Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the local react-autosize-textarea override and lockfile refresh.
 - Batch 5: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map.
-- Batch 6: verify the same product smoke already covered by the runtime batches, but execute it while watching specifically for repository-owned PHP 8.5 warnings or deprecations.
+- Batch 6: verify the same product smoke already covered by the runtime batches, but execute it while watching specifically for repository-owned PHP 8.5 warnings or deprecations instead of third-party `wp-cli` noise.
 - Batch 7: no product review is required unless the PHPCS cleanup changes runtime PHP logic; otherwise review the lint delta and escaping or nonce-sensitive paths in code review.
 
 ## Core functional checklist
