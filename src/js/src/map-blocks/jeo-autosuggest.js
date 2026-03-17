@@ -1,25 +1,8 @@
-import { withSelect } from '@wordpress/data';
-import { useCallback, useId, useState } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { debounce } from 'lodash-es';
-import Autosuggest from 'react-autosuggest';
 
-const GutenbergAutosuggest = withSelect( ( select, { query, postType } ) => ( {
-	entityRecords: select( 'core' ).getEntityRecords(
-		'postType',
-		postType,
-		query
-	),
-	loading: select( 'core/data' ).isResolving( 'core', 'getEntityRecords', [
-		'postType',
-		postType,
-		query,
-	] ),
-} ) )( ( { entityRecords, filterSuggestions, ...props } ) => (
-	<Autosuggest
-		suggestions={ ( entityRecords || [] ).filter( filterSuggestions ) }
-		{ ...props }
-	/>
-) );
+import AsyncComboboxControl from '../shared/async-combobox-control';
 
 const decodeHtmlEntity = function ( str ) {
 	return str.replace( /&#(\d+);/g, function ( match, dec ) {
@@ -38,7 +21,7 @@ const _handleFetchRequest = ( { value } ) => {
 	return input ? { search: input } : {};
 };
 
-export default function JeoAutosuggest ( {
+export default function JeoAutosuggest( {
 	inputProps,
 	postType,
 	onSuggestionSelected,
@@ -47,37 +30,85 @@ export default function JeoAutosuggest ( {
 	handleFetchRequest = _handleFetchRequest,
 	renderSuggestion = _renderSuggestion,
 } ) {
-	const instanceId = useId();
 	const [ query, setQuery ] = useState( {} );
-	const [ value, setValue ] = useState( '' );
-	const onChange = useCallback(
-		( e, { newValue } ) => {
-			setValue( newValue );
+	const [ inputValue, setInputValue ] = useState( '' );
+	const [ selectedValue, setSelectedValue ] = useState( null );
+
+	const entityRecords = useSelect(
+		( select ) => {
+			return select( 'core' ).getEntityRecords( 'postType', postType, query );
 		},
-		[ setValue ]
+		[ postType, query ]
 	);
-	const onSuggestionsFetchRequested = useCallback(
-		debounce( ( request ) => {
-			setQuery( handleFetchRequest( request ) );
-		}, 500 ),
-		[ setQuery, handleFetchRequest ]
+
+	const loading = useSelect(
+		( select ) => {
+			return select( 'core/data' ).isResolving(
+				'core',
+				'getEntityRecords',
+				[ 'postType', postType, query ]
+			);
+		},
+		[ postType, query ]
 	);
-	const onSuggestionsClearRequested = useCallback( () => {
-		setQuery( {} );
-	}, [ setQuery ] );
+
+	const suggestions = useMemo( () => {
+		return ( entityRecords || [] ).filter( filterSuggestions );
+	}, [ entityRecords, filterSuggestions ] );
+
+	const debouncedFetchRequest = useMemo( () => {
+		return debounce( ( nextValue ) => {
+			setQuery( handleFetchRequest( { value: nextValue } ) );
+		}, 500 );
+	}, [ handleFetchRequest ] );
+
+	useEffect( () => {
+		return () => {
+			debouncedFetchRequest.cancel();
+		};
+	}, [ debouncedFetchRequest ] );
 
 	return (
-		<GutenbergAutosuggest
-			id={ `jeo-autosuggest-${ instanceId }` }
-			query={ query }
-			postType={ postType }
-			inputProps={ { ...inputProps, value, onChange } }
-			filterSuggestions={ filterSuggestions }
-			getSuggestionValue={ getSuggestionValue }
-			renderSuggestion={ renderSuggestion }
-			onSuggestionsFetchRequested={ onSuggestionsFetchRequested }
-			onSuggestionsClearRequested={ onSuggestionsClearRequested }
-			onSuggestionSelected={ onSuggestionSelected }
+		<AsyncComboboxControl
+			className="jeo-map-autosuggest"
+			items={ suggestions }
+			inputValue={ inputValue }
+			selectedValue={ selectedValue }
+			isLoading={ loading }
+			placeholder={ inputProps?.placeholder }
+			ariaLabel={ inputProps?.placeholder }
+			getOptionLabel={ getSuggestionValue }
+			getOptionValue={ ( suggestion ) => suggestion.id }
+			onInputValueChange={ ( nextValue ) => {
+				setInputValue( nextValue );
+				setSelectedValue( null );
+
+				if ( ! nextValue.trim() ) {
+					debouncedFetchRequest.cancel();
+					setQuery( {} );
+					return;
+				}
+
+				debouncedFetchRequest( nextValue );
+			} }
+			onOptionSelect={ ( suggestion ) => {
+				const suggestionValue = getSuggestionValue( suggestion );
+				const suggestionIndex = suggestions.findIndex(
+					( item ) => item.id === suggestion.id
+				);
+
+				setInputValue( suggestionValue );
+				setSelectedValue( String( suggestion.id ) );
+				onSuggestionSelected?.( undefined, {
+					suggestion,
+					suggestionValue,
+					suggestionIndex,
+					sectionIndex: null,
+					method: 'select',
+				} );
+			} }
+			renderItem={ renderSuggestion }
+			allowReset={ false }
 		/>
 	);
-};
+}

@@ -1,9 +1,9 @@
 import { withDispatch, withSelect } from '@wordpress/data';
 import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import Form from 'react-jsonschema-form';
 
 import { normalizeAttributionFormData } from './attribution-form-data';
+import SchemaForm from '../shared/schema-form';
 
 const layerSchema = {
 	type: 'object',
@@ -17,7 +17,7 @@ const layerSchema = {
 const AttributionSettings = ( { postMeta, setPostMeta } ) => {
 	return (
 		<Fragment>
-			<Form
+			<SchemaForm
 				className="jeo-layer-settings"
 				schema={ layerSchema }
 				formData={ postMeta }
@@ -30,7 +30,7 @@ const AttributionSettings = ( { postMeta, setPostMeta } ) => {
 			>
 				{ /* Hide submit button */ }
 				<div />
-			</Form>
+			</SchemaForm>
 		</Fragment>
 	);
 };

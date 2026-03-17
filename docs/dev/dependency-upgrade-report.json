@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-16T22:39:47.653Z",
+  "generatedAt": "2026-03-16T23:28:58.254Z",
   "baseline": {
     "wordpress": "6.6+",
     "php": "8.0+",
@@ -16,7 +16,7 @@
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
       "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor.",
       "Current stabilization track: Batch 1 fixes the null-related-post geocode crash, same-point post individualization and reorder regressions that predate the dependency majors.",
-      "Current stabilization track: Batch 2 replaces react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form, while Batch 3 removes react-beautiful-dnd.",
+      "Current stabilization track: Batch 2 has replaced react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form; Batch 3 now removes react-beautiful-dnd.",
       "Current stabilization track: Batch 4 aligns the Gutenberg and React line to clear the remaining react-autosize-textarea peer warning and unblock react-leaflet 5.",
       "Current stabilization track: Batch 6 validates PHP 8.5 and Batch 7 is the dedicated PHPCS baseline cleanup."
     ],
@@ -290,7 +290,7 @@
       "id": "batch-2-input-form-replacements",
       "phase": "Batch 2",
       "title": "Autosuggest, date-range and form replacements",
-      "status": "planned",
+      "status": "completed",
       "scope": "Replace the deprecated input and form helpers while preserving the current geocoding, Discovery date filtering and formData contracts.",
       "packageNames": [
         "react-autosuggest",
@@ -311,8 +311,9 @@
         "Verify layer and attribution forms render, normalize formData and save correctly."
       ],
       "approvalNotes": [
-        "The saved query and formData shapes must remain unchanged.",
-        "npm ci should no longer emit deprecation warnings for react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form."
+        "The saved query and formData shapes stayed unchanged via legacy-compatible helpers for async combobox selection, Discovery date ranges and merged schema formData updates.",
+        "npm ci no longer emits the deprecation warnings that previously came from react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form.",
+        "The remaining npm install noise is now limited to the tracked react-beautiful-dnd deprecation, the react-autosize-textarea peer warning and broader transitive ecosystem deprecations that Batch 2 did not introduce."
       ]
     },
     {
@@ -873,6 +874,69 @@
         "webpack.config.js",
         "src/css/jeo-map.scss"
       ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "batch-2-input-form-replacements",
+      "status": "completed",
+      "summary": "Replaced react-autosuggest with an internal async combobox wrapper, moved Discovery date filtering off react-bootstrap-daterangepicker onto a react-datepicker-based internal component, and replaced react-jsonschema-form with an internal @rjsf/core adapter while preserving the existing query and formData contracts.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully after removing the locally corrupted node_modules tree left by an earlier ENOTEMPTY failure. The run no longer emits deprecation warnings for react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form; the remaining install noise is the tracked react-beautiful-dnd deprecation, the react-autosize-textarea peer warning and broader transitive npm ecosystem deprecations."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The wp-scripts unit suite passed with 8 test files and 25 assertions, including new coverage for the async combobox helper, the schema-form adapter and the Discovery date-range wrapper."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after the replacements with only the existing bundle-size warnings."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend replacement batch."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after replacing the autosuggest, date-range and schema-form helpers."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify geocoding autosuggest suggestions load, typing stays responsive and selecting a result updates the field value correctly.",
+        "Verify the post or map autosuggest search still surfaces suggestions and inserts the selected entity correctly.",
+        "Verify Discovery date apply and clear flows still update the after and before query values as expected.",
+        "Verify layer and attribution forms render, normalize formData and save correctly with the new schema-form adapter."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "jest.config.js",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "src/js/src/discovery/blocks/date-range-filter.js",
+        "src/js/src/discovery/blocks/date-range-filter.test.js",
+        "src/js/src/discovery/blocks/stories.js",
+        "src/js/src/discovery/style/discovery.scss",
+        "src/js/src/layers-sidebar/attribution-settings.js",
+        "src/js/src/layers-sidebar/layer-settings.js",
+        "src/js/src/map-blocks/jeo-autosuggest.js",
+        "src/js/src/map-blocks/map-editor.css",
+        "src/js/src/posts-sidebar/geo-auto-complete.css",
+        "src/js/src/posts-sidebar/geo-auto-complete.js",
+        "src/js/src/shared/async-combobox-control.js",
+        "src/js/src/shared/async-combobox-control.test.js",
+        "src/js/src/shared/schema-form.js",
+        "src/js/src/shared/schema-form.test.js",
+        "src/js/src/shared/wp-form-controls.js"
+      ]
     }
   ],
   "smokeTests": [
@@ -918,7 +982,7 @@
     }
   ],
   "summary": {
-    "directNpm": 25,
+    "directNpm": 23,
     "directNpmDev": 8,
     "directComposer": 2,
     "transitiveComposer": 3
@@ -1007,6 +1071,82 @@
       {
         "ecosystem": "npm",
         "dependencyType": "dependency",
+        "packageName": "@rjsf/core",
+        "declaredRange": "^6.4.1",
+        "resolvedVersion": "6.4.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "6.4.1",
+        "latestVersion": "6.4.1",
+        "lastPublished": "2026-03-07",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@rjsf/core"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/rjsf-team/react-jsonschema-form"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/shared/schema-form.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@rjsf/validator-ajv8",
+        "declaredRange": "^6.4.1",
+        "resolvedVersion": "6.4.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "6.4.1",
+        "latestVersion": "6.4.1",
+        "lastPublished": "2026-03-07",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@rjsf/validator-ajv8"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/rjsf-team/react-jsonschema-form"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/shared/schema-form.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
         "packageName": "@wordpress/edit-post",
         "declaredRange": "^8.41.0",
         "resolvedVersion": "8.41.0",
@@ -1081,8 +1221,8 @@
         "usage": [
           "package.json",
           "src/js/src/posts-sidebar/index.js",
-          "src/js/src/maps-sidebar/map-embed-url.js",
-          "src/js/src/maps-sidebar/maps-sidebar.js"
+          "src/js/src/layers-sidebar/layers-sidebar.js",
+          "src/js/src/maps-sidebar/map-embed-url.js"
         ],
         "replacement": null,
         "notes": [
@@ -1125,8 +1265,8 @@
         "usage": [
           "package.json",
           "src/js/src/posts-sidebar/index.js",
-          "src/js/src/maps-sidebar/index.js",
-          "src/js/src/layers-sidebar/index.js"
+          "src/js/src/layers-sidebar/index.js",
+          "src/js/src/maps-sidebar/index.js"
         ],
         "replacement": null,
         "notes": []
@@ -1166,8 +1306,8 @@
           }
         ],
         "usage": [
-          "webpack.config.js",
-          "package.json"
+          "package.json",
+          "webpack.config.js"
         ],
         "replacement": null,
         "notes": [
@@ -1206,47 +1346,8 @@
           }
         ],
         "usage": [
-          "package.json"
-        ],
-        "replacement": null,
-        "notes": []
-      },
-      {
-        "ecosystem": "npm",
-        "dependencyType": "dependency",
-        "packageName": "bootstrap-daterangepicker",
-        "declaredRange": "^3.1.0",
-        "resolvedVersion": "3.1.0",
-        "scope": "UI / helper",
-        "impact": "Browser runtime and React-driven editor UI behavior",
-        "latestCompatible": "3.1.0",
-        "latestVersion": "3.1.0",
-        "lastPublished": "2020-05-24",
-        "deprecatedMessage": null,
-        "maintenance": "Needs manual review",
-        "minorPath": "Allow minor-only evaluation if the wrapper replacement is deferred, but verify jQuery/moment assumptions in the browser.",
-        "majorPath": "Do not take a major jump unless the React wrapper strategy is already decided.",
-        "decision": "Replace instead of upgrading in place",
-        "batchId": "batch-2-input-form-replacements",
-        "batchLabel": "Batch 2",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
-        "executionNotes": [
-          "Expected to leave the dependency tree in Batch 2 when the Discovery date-range UI moves to the internal react-datepicker wrapper."
-        ],
-        "evidence": [
-          {
-            "label": "npm",
-            "url": "https://www.npmjs.com/package/bootstrap-daterangepicker"
-          },
-          {
-            "label": "GitHub",
-            "url": "https://github.com/dangrossman/daterangepicker"
-          }
-        ],
-        "usage": [
           "package.json",
-          "src/js/src/discovery/blocks/stories.js"
+          "src/js/src/shared/schema-form.js"
         ],
         "replacement": null,
         "notes": []
@@ -1324,7 +1425,7 @@
           "package.json",
           "src/js/src/posts-sidebar/geo-posts.js",
           "src/js/src/posts-selector/interval-selector.js",
-          "src/js/src/jeo-storymap/storymap-display.js"
+          "src/js/src/map-blocks/onetime-map-display.js"
         ],
         "replacement": null,
         "notes": []
@@ -1480,9 +1581,9 @@
         ],
         "usage": [
           "package.json",
+          "src/js/src/posts-sidebar/geo-auto-complete.js",
           "src/js/src/posts-sidebar/geo-posts.js",
-          "src/js/src/map-blocks/jeo-autosuggest.js",
-          "src/js/src/map-blocks/map-preview-layer.js"
+          "src/js/src/map-blocks/jeo-autosuggest.js"
         ],
         "replacement": null,
         "notes": []
@@ -1598,10 +1699,10 @@
           }
         ],
         "usage": [
-          "package.json",
           "src/README.txt",
-          "src/js/src/lib/maplibregl/maplibregl-react.js",
-          "src/js/src/lib/maplibregl/maplibregl-loader.js"
+          "package.json",
+          "src/js/src/lib/maplibregl/maplibregl-loader.js",
+          "src/js/src/lib/maplibregl/maplibregl-react.js"
         ],
         "replacement": null,
         "notes": []
@@ -1684,44 +1785,6 @@
       {
         "ecosystem": "npm",
         "dependencyType": "dependency",
-        "packageName": "react-autosuggest",
-        "declaredRange": "^10.1.0",
-        "resolvedVersion": "10.1.0",
-        "scope": "UI / helper",
-        "impact": "Browser runtime and React-driven editor UI behavior",
-        "latestCompatible": "10.1.0",
-        "latestVersion": "10.1.0",
-        "lastPublished": "2021-01-08",
-        "deprecatedMessage": null,
-        "maintenance": "Low activity / looking for maintainers",
-        "minorPath": "Do not spend time on the stale line unless a security fix forces it.",
-        "majorPath": "Replace with a maintained autosuggest/combobox wrapper before any React or Gutenberg major jump.",
-        "decision": "Replace instead of upgrading in place",
-        "batchId": "batch-2-input-form-replacements",
-        "batchLabel": "Batch 2",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
-        "executionNotes": [
-          "Planned replacement in Batch 2 with an internal async combobox wrapper based on @wordpress/components."
-        ],
-        "evidence": [
-          {
-            "label": "npm",
-            "url": "https://www.npmjs.com/package/react-autosuggest"
-          }
-        ],
-        "usage": [
-          "package.json",
-          "src/js/src/posts-sidebar/geo-auto-complete.css",
-          "src/js/src/posts-sidebar/geo-auto-complete.js",
-          "src/js/src/map-blocks/map-editor.css"
-        ],
-        "replacement": "internal combobox/autocomplete wrapper",
-        "notes": []
-      },
-      {
-        "ecosystem": "npm",
-        "dependencyType": "dependency",
         "packageName": "react-beautiful-dnd",
         "declaredRange": "^13.1.1",
         "resolvedVersion": "13.1.1",
@@ -1764,42 +1827,6 @@
       {
         "ecosystem": "npm",
         "dependencyType": "dependency",
-        "packageName": "react-bootstrap-daterangepicker",
-        "declaredRange": "^8.0.0",
-        "resolvedVersion": "8.0.0",
-        "scope": "UI / helper",
-        "impact": "Browser runtime and React-driven editor UI behavior",
-        "latestCompatible": "8.0.0",
-        "latestVersion": "8.0.0",
-        "lastPublished": "2022-08-24",
-        "deprecatedMessage": null,
-        "maintenance": "Deprecated",
-        "minorPath": "No supported minor path on the deprecated wrapper.",
-        "majorPath": "Replace with an internal date-range wrapper, preferably based on the existing react-datepicker dependency.",
-        "decision": "Replace instead of upgrading in place",
-        "batchId": "batch-2-input-form-replacements",
-        "batchLabel": "Batch 2",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
-        "executionNotes": [
-          "Planned replacement in Batch 2 with an internal date-range wrapper backed by react-datepicker."
-        ],
-        "evidence": [
-          {
-            "label": "npm",
-            "url": "https://www.npmjs.com/package/react-bootstrap-daterangepicker"
-          }
-        ],
-        "usage": [
-          "package.json",
-          "src/js/src/discovery/blocks/stories.js"
-        ],
-        "replacement": "react-datepicker-based internal wrapper",
-        "notes": []
-      },
-      {
-        "ecosystem": "npm",
-        "dependencyType": "dependency",
         "packageName": "react-datepicker",
         "declaredRange": "^9.1.0",
         "resolvedVersion": "9.1.0",
@@ -1835,46 +1862,10 @@
         "usage": [
           "package.json",
           "webpack.config.js",
-          "src/js/src/posts-selector/interval-selector.js"
+          "src/js/src/posts-selector/interval-selector.js",
+          "src/js/src/discovery/style/discovery.scss"
         ],
         "replacement": null,
-        "notes": []
-      },
-      {
-        "ecosystem": "npm",
-        "dependencyType": "dependency",
-        "packageName": "react-jsonschema-form",
-        "declaredRange": "2.0.0-alpha.1",
-        "resolvedVersion": "2.0.0-alpha.1",
-        "scope": "UI / helper",
-        "impact": "Browser runtime and React-driven editor UI behavior",
-        "latestCompatible": "2.0.0-alpha.1",
-        "latestVersion": "1.8.1",
-        "lastPublished": "2019-12-16",
-        "deprecatedMessage": "react-jsonschema-form has been moved to @rjsf/core",
-        "maintenance": "Deprecated",
-        "minorPath": "No maintained minor path on the deprecated package line.",
-        "majorPath": "Replace with @rjsf/core while preserving the internal form wrapper contract.",
-        "decision": "Replace instead of upgrading in place",
-        "batchId": "batch-2-input-form-replacements",
-        "batchLabel": "Batch 2",
-        "executionStatus": "planned",
-        "executionStatusLabel": "Planned",
-        "executionNotes": [
-          "Planned replacement in Batch 2 with an internal @rjsf/core adapter that preserves the current formData contract."
-        ],
-        "evidence": [
-          {
-            "label": "npm",
-            "url": "https://www.npmjs.com/package/react-jsonschema-form"
-          }
-        ],
-        "usage": [
-          "package.json",
-          "src/js/src/layers-sidebar/layer-settings.js",
-          "src/js/src/layers-sidebar/attribution-settings.js"
-        ],
-        "replacement": "@rjsf/core",
         "notes": []
       },
       {
@@ -1991,8 +1982,8 @@
         ],
         "usage": [
           "package.json",
-          "src/js/src/discovery/blocks/map-layers.js",
-          "src/js/src/map-blocks/layers-settings.js"
+          "src/js/src/map-blocks/layers-settings.js",
+          "src/js/src/discovery/blocks/map-layers.js"
         ],
         "replacement": null,
         "notes": []

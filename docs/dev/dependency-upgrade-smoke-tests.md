@@ -34,7 +34,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 
 - Batch 0: no product review is required.
 - Batch 1: verify published-map popups, same-point post individualization, the absence of the null-geocode crash, and storymap slide plus nested layer reorder, including save and reopen after reordering.
-- Batch 2: verify geocoding autosuggest, post/map autosuggest usage, Discovery date filtering, and layer or attribution forms backed by schema data.
+- Batch 2: verify geocoding autosuggest suggestions and selection, post/map autosuggest insertion, Discovery date apply/clear behavior, and layer or attribution forms backed by schema data.
 - Batch 3: verify map-layer ordering, storymap slide ordering and any remaining nested drag or reorder flow that still used `react-beautiful-dnd`.
 - Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the Gutenberg refresh.
 - Batch 5: verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map.
@@ -67,7 +67,7 @@ Use this checklist for the current stabilization and compatibility track. The ma
 ## Notes by batch type
 
 - Baseline-fix batch: prioritize reproducing the known bug first, then landing a focused fix plus a regression test.
-- Replacement batch: preserve existing saved data contracts and validate that the removed package disappears from `npm ci` warnings.
+- Replacement batch: preserve existing saved data contracts, validate that the removed package disappears from `npm ci` warnings, and spot-check the replacement wrapper at the exact editor/frontend entry points it now owns.
 - Gutenberg or React batch: prioritize editor loading, save flows and peer-warning cleanup before attempting dependent runtime majors.
 - Map or rendering batch: prioritize both runtime modes, previews, popups and layer interactions.
 - PHP 8.5 batch: distinguish repository-owned deprecations from external `wp-cli` or toolchain noise.

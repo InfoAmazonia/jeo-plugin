@@ -1,5 +1,6 @@
 import {
 	CheckboxControl as WPCheckboxControl,
+	ComboboxControl as WPComboboxControl,
 	FormTokenField as WPFormTokenField,
 	RangeControl as WPRangeControl,
 	SelectControl as WPSelectControl,
@@ -17,6 +18,10 @@ const nextCheckboxControlProps = {
 
 export function CheckboxControl( props ) {
 	return <WPCheckboxControl { ...nextCheckboxControlProps } { ...props } />;
+}
+
+export function ComboboxControl( props ) {
+	return <WPComboboxControl { ...nextInputControlProps } { ...props } />;
 }
 
 export function SelectControl( props ) {
