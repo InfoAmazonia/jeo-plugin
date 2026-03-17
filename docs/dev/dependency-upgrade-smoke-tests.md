@@ -12,7 +12,7 @@ Use this checklist for both the completed stabilization track and the current pl
 
 ## Preconditions
 
-- Use a WordPress instance that matches the current baseline: WordPress 6.6+, PHP 8.0+, Node 24 as the default frontend runtime and Node 20 only for transition validation.
+- Use a WordPress instance that matches the current baseline: WordPress 6.6+, PHP 8.0+, Node 24 as the supported frontend runtime.
 - At the start of every dependency review or planning batch that can touch editor or runtime behavior, regenerate the dependency report and record the resolved React, ReactDOM and Gutenberg editor package versions plus peer ranges from the frontend runtime snapshot.
 - Test both editor and frontend behavior whenever a batch touches runtime code.
 - Treat `.github/workflows/node-frontend.yml`, `.github/workflows/php-compat.yml` and `.github/workflows/wordpress-smoke.yml` as the mandatory CI gates.
