@@ -52,6 +52,15 @@ const EXECUTION_STATUS_LABELS = {
 	skipped: 'Skipped',
 };
 
+const OVERRIDE_TYPE_LABELS = {
+	'local-package': 'Local package override',
+	'security-pin': 'Security pin',
+	'compatibility-pin': 'Compatibility pin',
+	'transitive-security-pin': 'Nested security pin',
+	'transitive-compatibility-pin': 'Nested compatibility pin',
+	'maintenance-pin': 'Maintenance pin',
+};
+
 function commandVersion( command, args = [ '--version' ] ) {
 	const result = spawnSync( command, args, {
 		cwd: ROOT,
@@ -98,6 +107,7 @@ function buildBaseline( overrides, packageJson, packageLock ) {
 		...overrides.baseline,
 		toolingCaveats,
 		frontendRuntime: buildFrontendRuntimeBaseline( packageJson, packageLock ),
+		overrideGovernance: buildOverrideGovernance( packageJson, packageLock, overrides ),
 		localValidation: {
 			phpAvailable: Boolean( phpVersion ),
 			phpVersion,
@@ -133,10 +143,11 @@ function buildFrontendRuntimeBaseline( packageJson, packageLock ) {
 		};
 	} ).filter( Boolean );
 
-	const overrides = Object.entries( packageJson.overrides || {} ).map(
-		( [ packageName, spec ] ) => ( {
-			packageName,
-			spec: String( spec ),
+	const overrides = flattenOverrideSpecs( packageJson.overrides || {} ).map(
+		( entry ) => ( {
+			selector: entry.selector,
+			packageName: entry.packageName,
+			spec: entry.spec,
 		} )
 	);
 
@@ -146,6 +157,95 @@ function buildFrontendRuntimeBaseline( packageJson, packageLock ) {
 		packages,
 		overrides,
 	};
+}
+
+function flattenOverrideSpecs( overridesTree, parents = [] ) {
+	return Object.entries( overridesTree || {} ).flatMap( ( [ selector, spec ] ) => {
+		const selectorChain = [ ...parents, selector ];
+
+		if ( spec && typeof spec === 'object' && ! Array.isArray( spec ) ) {
+			return flattenOverrideSpecs( spec, selectorChain );
+		}
+
+		return [ {
+			selector: selectorChain.join( ' > ' ),
+			packageName: selector,
+			spec: String( spec ),
+			parentSelectors: parents,
+		} ];
+	} );
+}
+
+function findPackageLockVersions( packageLock, packageName ) {
+	const versions = Object.entries( packageLock.packages || {} )
+		.filter( ( [ packagePath, entry ] ) =>
+			entry?.version &&
+			(
+				packagePath === `node_modules/${ packageName }` ||
+				packagePath.endsWith( `/node_modules/${ packageName }` )
+			)
+		)
+		.map( ( [ , entry ] ) => normalizeVersion( entry.version ) )
+		.filter( Boolean );
+
+	return uniqueSorted( versions );
+}
+
+function buildOverrideGovernance( packageJson, packageLock, overrides ) {
+	const declaredOverrides = flattenOverrideSpecs( packageJson.overrides || {} );
+	const governanceConfig = overrides.npmOverrideGovernance || {};
+	const declaredSelectors = new Set( declaredOverrides.map( ( entry ) => entry.selector ) );
+	const configuredSelectors = new Set( Object.keys( governanceConfig ) );
+	const missingSelectors = declaredOverrides
+		.map( ( entry ) => entry.selector )
+		.filter( ( selector ) => ! configuredSelectors.has( selector ) );
+	const staleSelectors = Object.keys( governanceConfig ).filter(
+		( selector ) => ! declaredSelectors.has( selector )
+	);
+
+	if ( missingSelectors.length > 0 || staleSelectors.length > 0 ) {
+		const problems = [];
+
+		if ( missingSelectors.length > 0 ) {
+			problems.push(
+				`missing governance entries for: ${ missingSelectors.map( ( selector ) => `"${ selector }"` ).join( ', ' ) }`
+			);
+		}
+
+		if ( staleSelectors.length > 0 ) {
+			problems.push(
+				`stale governance entries for removed overrides: ${ staleSelectors.map( ( selector ) => `"${ selector }"` ).join( ', ' ) }`
+			);
+		}
+
+		throw new Error( `npm override governance is out of sync (${ problems.join( '; ' ) })` );
+	}
+
+	return declaredOverrides.map( ( entry ) => {
+		const governance = governanceConfig[ entry.selector ] || {};
+		const resolvedVersions = findPackageLockVersions( packageLock, entry.packageName );
+
+		if ( resolvedVersions.length === 0 ) {
+			const installedVersion = resolveInstalledNpmVersion( entry.packageName );
+
+			if ( installedVersion ) {
+				resolvedVersions.push( installedVersion );
+			}
+		}
+
+		return {
+			selector: entry.selector,
+			packageName: entry.packageName,
+			spec: entry.spec,
+			resolvedVersions,
+			type: governance.type || ( entry.selector.includes( ' > ' ) ? 'transitive-security-pin' : 'maintenance-pin' ),
+			reason: governance.reason || 'No reason documented.',
+			removalCriteria: governance.removalCriteria || 'Remove when upstream absorbs the override and checks stay green.',
+			reviewTriggers: governance.reviewTriggers || [],
+			introducedByBatch: governance.introducedByBatch || null,
+			notes: governance.notes || [],
+		};
+	} );
 }
 
 function normalizeVersion(rawVersion) {
@@ -1079,7 +1179,7 @@ function renderFrontendRuntimeSnapshot( frontendRuntime ) {
 
 	const overrides = ( frontendRuntime.overrides || [] ).length
 		? frontendRuntime.overrides
-			.map( ( entry ) => `\`${ entry.packageName }\` -> \`${ entry.spec }\`` )
+			.map( ( entry ) => `\`${ entry.selector }\` -> \`${ entry.spec }\`` )
 			.join( ', ' )
 		: 'None';
 
@@ -1088,6 +1188,48 @@ function renderFrontendRuntimeSnapshot( frontendRuntime ) {
 - Local npm overrides: ${ overrides }.
 
 ${ packageTable }`;
+}
+
+function renderOverrideGovernance( overrideGovernance ) {
+	if ( ! overrideGovernance || overrideGovernance.length === 0 ) {
+		return '- No local npm overrides declared.';
+	}
+
+	const table = [
+		[
+			'Selector',
+			'Spec',
+			'Resolved',
+			'Type',
+			'Reason',
+			'Review when',
+			'Removal criteria',
+			'Introduced',
+		],
+		[ '---', '---', '---', '---', '---', '---', '---', '---' ],
+		...overrideGovernance.map( ( entry ) => [
+			markdownEscape( entry.selector ),
+			markdownEscape( entry.spec ),
+			markdownEscape( entry.resolvedVersions.join( ', ' ) || 'Unavailable' ),
+			markdownEscape( OVERRIDE_TYPE_LABELS[ entry.type ] || entry.type ),
+			markdownEscape( entry.reason ),
+			markdownEscape(
+				entry.reviewTriggers.length > 0 ? entry.reviewTriggers.join( ' / ' ) : 'Review after major frontend refreshes'
+			),
+			markdownEscape( entry.removalCriteria ),
+			markdownEscape( entry.introducedByBatch || '-' ),
+		] ),
+	]
+		.map( ( row ) => `| ${ row.join( ' | ' ) } |` )
+		.join( '\n' );
+
+	const notes = overrideGovernance
+		.flatMap( ( entry ) => ( entry.notes || [] ).map(
+			( note ) => `- **${ entry.selector }**: ${ note }`
+		) )
+		.join( '\n' );
+
+	return notes ? `${ table }\n\n${ notes }` : table;
 }
 
 function renderMarkdownReport( report ) {
@@ -1119,6 +1261,10 @@ ${ report.baseline.toolingCaveats.map( ( note ) => `- ${ note }` ).join( '\n' ) 
 ### Frontend runtime snapshot
 
 ${ renderFrontendRuntimeSnapshot( report.baseline.frontendRuntime ) }
+
+### Local npm override governance
+
+${ renderOverrideGovernance( report.baseline.overrideGovernance ) }
 
 ## Execution plan
 

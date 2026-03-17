@@ -65,8 +65,6 @@ class Jeo {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
-		add_filter( 'rest_post_tag_query', array( $this, 'maximum_terms_api_filter' ), 10, 1 );
-
 		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
 		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
@@ -77,11 +75,11 @@ class Jeo {
 		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
 	}
 
-		/**
-		 * Get the current site language, including WPML overrides when available.
-		 *
-		 * @return string
-		 */
+	/**
+	 * Get the current site language, including WPML overrides when available.
+	 *
+	 * @return string
+	 */
 	private function get_current_language(): string {
 		$language = get_bloginfo( 'language' );
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
@@ -131,17 +129,6 @@ class Jeo {
 			false,
 			plugin_basename( JEO_BASEPATH ) . '/languages',
 		);
-	}
-
-	/**
-	 * Allow large tag result sets in the REST API.
-	 *
-	 * @param array $prepared_args REST query args.
-	 * @return array
-	 */
-	public function maximum_terms_api_filter( $prepared_args ) {
-		$prepared_args['number'] = 1000;
-		return $prepared_args;
 	}
 
 	/**
@@ -221,7 +208,8 @@ class Jeo {
 			'jeo-js',
 			'jeo',
 			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'ajax_url'      => admin_url( 'admin-ajax.php' ),
+				'geocode_nonce' => wp_create_nonce( 'jeo_geocode' ),
 			)
 		);
 

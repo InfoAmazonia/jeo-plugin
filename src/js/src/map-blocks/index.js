@@ -6,6 +6,7 @@ import LayerEditorPreview from './layer-editor-preview';
 import MapDisplay, { MapSave } from './map-display';
 import MapEditor from './map-editor';
 import MapEditorPreview from './map-editor-preview';
+import { onetimeMapAttributes } from './onetime-map-config';
 import OnetimeMapDisplay, { OnetimeMapSave } from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
 import StorymapEditor from './storymap-editor'
@@ -42,102 +43,6 @@ registerBlockType( 'jeo/map', {
 		},
 	],
 } );
-
-const onetimeMapAttributes = {
-	layers: {
-		type: 'array',
-		default: [],
-		items: {
-			type: 'object',
-			properties: {
-				id: { type: 'number' },
-				use: { type: 'string' /* enum */ },
-				default: { type: 'boolean' },
-				show_legend: { type: 'boolean' },
-			},
-		},
-	},
-	center_lat: {
-		type: 'number',
-	},
-	center_lon: {
-		type: 'number',
-	},
-	initial_zoom: {
-		type: 'number',
-	},
-	min_zoom: {
-		type: 'number',
-	},
-	max_zoom: {
-		type: 'number',
-	},
-	disable_scroll_zoom: {
-		type: 'boolean',
-	},
-	disable_drag_pan: {
-		type: 'booelan',
-	},
-	disable_drag_rotate: {
-		type: 'boolean',
-	},
-	enable_fullscreen: {
-		type: 'boolean',
-	},
-	pan_limits: {
-		type: 'object',
-		'properties': {
-			'east': {
-				'description': __('East pan limit', 'jeo'),
-				'type': 'number'
-			},
-			'north': {
-				'description': __('North pan limit', 'jeo'),
-				'type': 'number'
-			},
-			'south': {
-				'description': __('South pan limit', 'jeo'),
-				'type': 'number'
-			},
-			'west': {
-				'description': __('West pan limit', 'jeo'),
-
-				'type': 'number'
-			},
-		}
-	},
-	related_posts: {
-		type: 'object',
-		default: {
-			categories: [],
-			tags: [],
-			meta_query: [],
-		},
-		properties: {
-			categories: {
-				type: 'array',
-				items: { type: 'integer' },
-			},
-			tags: {
-				type: 'array',
-				items: { type: 'integer' },
-			},
-			before: { type: 'string' },
-			after: { type: 'string' },
-			meta_query: {
-				type: 'array',
-				items: {
-					type: 'object',
-					properties: {
-						key: { type: 'string' },
-						compare: { type: 'string' },
-						value: { type: 'string' },
-					},
-				},
-			},
-		},
-	},
-};
 
 registerBlockType( 'jeo/onetime-map', {
 	apiVersion: 3,

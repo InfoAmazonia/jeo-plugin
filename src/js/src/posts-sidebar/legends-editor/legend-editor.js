@@ -46,7 +46,6 @@ class LegendEditor extends Component {
 	}
 
 	render() {
-		// console.log("Rerender called");
 		return (
 			<Fragment>
 				<CheckboxControl
@@ -74,7 +73,6 @@ class LegendEditor extends Component {
 					value={ this.state.legendObject.attributes.legend_title }
 					onChange={ ( value ) => {
 						const newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
-						// console.log(newMeta);
 						newMeta.legend_title = value;
 
 						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );

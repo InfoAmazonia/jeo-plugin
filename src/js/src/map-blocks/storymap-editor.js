@@ -24,7 +24,7 @@ import 'ckeditor5/ckeditor5.css';
 import { useBlockProps } from '@wordpress/block-editor';
 import { Button, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { chevronDown, chevronUp, lock, unlock, seen, trash, plus } from '@wordpress/icons';
-import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -41,6 +41,7 @@ import {
 	reorderSlides,
 	sortSelectedLayersByMapOrder,
 } from './storymap-ordering';
+import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
 import './map-editor.css';
 import './storymap-editor.scss';
@@ -455,10 +456,12 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ loadedMap?.meta.layers ] );
 
-	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
-		include: layerIds,
-		per_page: -1,
-	}, { enabled: layerIds.length > 0 } );
+	const { records: loadedLayers = [] } = useRecordsByIds( {
+		path: '/wp/v2/map-layer',
+		ids: layerIds,
+		enabled: layerIds.length > 0,
+		query: { context: 'edit' },
+	} );
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];

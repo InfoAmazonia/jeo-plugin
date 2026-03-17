@@ -26,7 +26,18 @@ class Nominatim extends \Jeo\Geocoder {
 			'addressdetails' => 1,
 		);
 
-		$r = wp_remote_get( add_query_arg( $params, 'https://nominatim.openstreetmap.org/search' ) );
+			$r = wp_remote_get(
+				add_query_arg( $params, 'https://nominatim.openstreetmap.org/search' ),
+				array(
+					'timeout'     => 10,
+					'redirection' => 3,
+					'user-agent'  => 'JEO geocoder/' . JEO_VERSION . '; ' . home_url( '/' ),
+				)
+			);
+
+		if ( is_wp_error( $r ) || 200 !== wp_remote_retrieve_response_code( $r ) ) {
+			return array();
+		}
 
 		$data = wp_remote_retrieve_body( $r );
 
@@ -62,7 +73,18 @@ class Nominatim extends \Jeo\Geocoder {
 			'addressdetails' => 1,
 		);
 
-		$r = wp_remote_get( add_query_arg( $params, 'https://nominatim.openstreetmap.org/reverse' ) );
+			$r = wp_remote_get(
+				add_query_arg( $params, 'https://nominatim.openstreetmap.org/reverse' ),
+				array(
+					'timeout'     => 10,
+					'redirection' => 3,
+					'user-agent'  => 'JEO geocoder/' . JEO_VERSION . '; ' . home_url( '/' ),
+				)
+			);
+
+		if ( is_wp_error( $r ) || 200 !== wp_remote_retrieve_response_code( $r ) ) {
+			return null;
+		}
 
 		$data = wp_remote_retrieve_body( $r );
 

@@ -24,17 +24,27 @@ export default function JeoGeoAutoComplete( {
 	}, [ selectedValue, value ] );
 
 	const debouncedLoadSuggestions = useMemo( () => {
-		return debounce( ( nextValue ) => {
-			const requestId = latestRequestRef.current + 1;
-			latestRequestRef.current = requestId;
-			setIsLoading( true );
+			return debounce( ( nextValue ) => {
+				const requestId = latestRequestRef.current + 1;
+				latestRequestRef.current = requestId;
+				setIsLoading( true );
+				const requestUrl = new URL( jeo.ajax_url );
+				requestUrl.searchParams.set( 'action', 'jeo_geocode' );
+				requestUrl.searchParams.set( 'nonce', jeo.geocode_nonce );
+				requestUrl.searchParams.set( 'search', nextValue );
 
-			window
-				.fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + nextValue )
-				.then( ( response ) => response.json() )
-				.then( ( result ) => {
-					if ( latestRequestRef.current === requestId ) {
-						setSuggestions( result );
+				window
+					.fetch( requestUrl )
+					.then( ( response ) => {
+						if ( ! response.ok ) {
+							throw new Error( 'Unable to load geocoding suggestions.' );
+						}
+
+						return response.json();
+					} )
+					.then( ( result ) => {
+						if ( latestRequestRef.current === requestId ) {
+							setSuggestions( result );
 					}
 				} )
 				.catch( () => {

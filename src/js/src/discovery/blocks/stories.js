@@ -6,7 +6,11 @@ import { __ } from '@wordpress/i18n';
 
 import DateRangeFilter, { formatDateRangeValue } from './date-range-filter';
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
-import { buildRelatedPostsGeoJson } from '../../shared/story-geojson';
+import {
+	buildRelatedPostsGeoJson,
+	getStoryRelatedCoordinates,
+} from '../../shared/story-geojson';
+import TagFilterControl from './tag-filter-control';
 
 const POSTS_PER_PAGE = 10;
 const MEMOIZED_CATEGORIES = {};
@@ -72,21 +76,6 @@ class Stories extends Component {
 		const map = this.props.map;
 
 		if ( this.props.firstLoad && this.props.useStories ) {
-			// Future optimization - fetching all categories is faster than getting them one by one
-			// this.fetchCategories().then( categories => {
-			// 	// console.log(categories);
-			// 	this.props.updateState( {
-			// 		categories
-			// 	} )
-			// } );
-
-			this.fetchTags().then( ( tags ) => {
-				// console.log(tags);
-				this.props.updateState( {
-					tags,
-				} );
-			} );
-
 			this.fetchStories( { page: 1 } ).then( ( stories ) => {
 				const sourceData = this.buildPostsGeoJson( stories );
 				map.addSource( 'storiesSource', {
@@ -189,16 +178,7 @@ class Stories extends Component {
 
 		map.on('mousemove', 'unclustered-points', (e) => {
 			if (e.features.length > 0 && map.selectedTab.name === "stories") {
-				// if (this.state.hoveredPostId) {
-				// 	map.setFeatureState(
-				// 		{ source: 'storiesSource', id: this.state.hoveredPostId },
-				// 		{ hover: false }
-				// 	);
-				// }
-				// console.log( this.state.hoveredPostId,  e.features[0].id  );
-
 				this.setState({
-					// ...this.state,
 					hoveredPostId: e.features[0].id,
 				})
 
@@ -215,7 +195,6 @@ class Stories extends Component {
 
 		map.on('mouseleave', 'unclustered-points', () => {
 			if(map.selectedTab.name === "stories"){
-				// console.log("mouseleave", this.state.hoveredPostId);
 				if (this.state.hoveredPostId) {
 					map.setFeatureState(
 						{ source: 'storiesSource', id: this.state.hoveredPostId },
@@ -322,8 +301,6 @@ class Stories extends Component {
 						( story ) => story.meta._related_point.length > 0
 					);
 
-					// console.log("stories", stories);
-
 					let storiesCumulative = params.cumulative
 						? [ ...this.props.stories, ...geolocatedStories ]
 						: geolocatedStories;
@@ -352,7 +329,6 @@ class Stories extends Component {
 					// Fetch categories
 					const storiesCategoriesPromises = geolocatedStories.map(
 						( story ) => {
-							// console.log(MEMOIZED_CATEGORIES);
 							return Promise.all(
 								story.categories.map( async ( category ) => {
 									const categoriesApiUrl = new URL(
@@ -465,33 +441,6 @@ class Stories extends Component {
 			);
 	}
 
-	fetchCategories() {
-		const categoriesApiUrl = new URL( jeoMapVars.jsonUrl + 'categories/' );
-
-		return fetch( categoriesApiUrl )
-			.then( ( data ) => data.json() )
-			.then( ( categories ) => {
-				return categories;
-			} );
-	}
-
-	fetchTags() {
-		const tagsApiUrl = new URL( jeoMapVars.jsonUrl + 'tags/' );
-		tagsApiUrl.searchParams.set('custom_per_page', '1000');
-		tagsApiUrl.searchParams.set('orderby', 'count');
-		tagsApiUrl.searchParams.set('order', 'desc');
-
-		if("languageParams" in window){
-			tagsApiUrl.searchParams.append( 'lang', languageParams.currentLang );
-		}
-
-		return fetch( tagsApiUrl )
-			.then( ( data ) => data.json() )
-			.then( ( tags ) => {
-				return tags;
-			} );
-	}
-
 	updateStories( params ) {
 		const map = this.props.map;
 		const prevQueryParams = this.props.queryParams;
@@ -546,8 +495,7 @@ class Stories extends Component {
 		this.updateStories( { cumulative: false, page: 1, clearDate: true } );
 	}
 
-	handleTagChange( event ) {
-		const value = event.target.value;
+	handleTagChange( value ) {
 		this.props.updateState( {
 			selectedTag: value,
 		} );
@@ -638,15 +586,10 @@ class Stories extends Component {
 							onApply={ this.dateRangePickerApply }
 							onCancel={ this.dateRangePickerCancel }
 						/>
-						<select name="tags" onChange={ this.handleTagChange }>
-							<option value="">{ __( 'Tags', 'jeo' ) }</option>
-							{ this.props.tags.map( ( tag ) => (
-								<option value={ tag.id } key={ tag.id } selected={ this.props.selectedTag == tag.id? "selected" : "" }>
-									{ ' ' }
-									{ tag.name }{ ' ' }
-								</option>
-							) ) }
-						</select>
+							<TagFilterControl
+								value={ this.props.selectedTag > 0 ? this.props.selectedTag : '' }
+								onChange={ this.handleTagChange }
+							/>
 
 						<div></div>
 					</div>
@@ -681,29 +624,22 @@ class Storie extends Component {
 	storyHovered() {
 		const map = this.props.map;
 		const story = this.props.story;
-		const average = { lat: 0, lon: 0 };
-		const bounds = [];
+		const bounds = getStoryRelatedCoordinates( story );
 
-		story.meta._related_point.forEach( ( point ) => {
-			const LngLat = {
-				lat: parseFloat( point._geocode_lat ),
-				lon: parseFloat( point._geocode_lon ),
-			};
+		if ( ! bounds.length ) {
+			return;
+		}
 
-			bounds.push([parseFloat( point._geocode_lon ), parseFloat( point._geocode_lat )])
-
-			// average.lat += LngLat.lat/story.meta._related_point.length
-			// average.lon += LngLat.lon/story.meta._related_point.length
-
-			average.lat = LngLat.lat;
-			average.lon = LngLat.lon;
-		} );
-
-
-		if(bounds.length === 1){
-			map.flyTo( { center: average, zoom: 7 } );
+		if ( bounds.length === 1 ) {
+			map.flyTo( {
+				center: {
+					lng: bounds[ 0 ][ 0 ],
+					lat: bounds[ 0 ][ 1 ],
+				},
+				zoom: 7,
+			} );
 		} else {
-			map.fitBounds( bounds, { padding: 100} );
+			map.fitBounds( bounds, { padding: 100 } );
 		}
 
 		map.setFeatureState(

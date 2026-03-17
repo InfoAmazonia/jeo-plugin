@@ -5,8 +5,8 @@ import { computeInlineStart } from '../../shared/direction';
 import { defaultStyle, mapboxToken, mapgl } from './mapboxgl-loader'
 
 // Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
-// With splitChunks disabled, react-map-gl may bundle its own copy of mapbox-gl
-// in this chunk, using a separate HTMLElement reference from the loader chunk.
+// Depending on how webpack groups the runtime and vendor code, react-map-gl may
+// still evaluate against a different HTMLElement reference from the loader chunk.
 // IMPORTANT: Must use `function` (not arrow) so `this` is the right-hand
 // constructor. For subclasses (e.g. HTMLInputElement), we fall back to a
 // standard prototype-chain walk to avoid false positives.

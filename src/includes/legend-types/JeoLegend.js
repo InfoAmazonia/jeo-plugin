@@ -9,6 +9,15 @@ class JeoLegend {
 	}
 
 	render( map ) {
+		if (
+			! this.__legendType ||
+			typeof this.__legendType.render !== 'function' ||
+			! this.attributes?.legend_type_options ||
+			typeof this.attributes.legend_type_options !== 'object'
+		) {
+			return document.createElement( 'div' );
+		}
+
 		return this.__legendType.render( map, this.attributes );
 	}
 
@@ -108,8 +117,6 @@ class JeoLegend {
 				...adicionalProps,
 			},
 		};
-
-		//console.log(legendMeta)
 
 		return legendMeta;
 	}
