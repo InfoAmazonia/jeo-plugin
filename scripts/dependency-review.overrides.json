@@ -15,7 +15,7 @@
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
       "The installed tree reports peer warnings for react-autosize-textarea@7.1.0 against React 18.3.1 via @wordpress/edit-post and @wordpress/editor.",
       "Current stabilization track: Batch 1 fixes the null-related-post geocode crash, same-point post individualization and reorder regressions that predate the dependency majors.",
-      "Current stabilization track: Batch 2 has replaced react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form; Batch 3 now removes react-beautiful-dnd.",
+      "Current stabilization track: Batch 2 has replaced react-autosuggest, react-bootstrap-daterangepicker and react-jsonschema-form, and Batch 3 has now removed react-beautiful-dnd.",
       "Current stabilization track: Batch 4 aligns the Gutenberg and React line to clear the remaining react-autosize-textarea peer warning and unblock react-leaflet 5.",
       "Current stabilization track: Batch 6 validates PHP 8.5 and Batch 7 is the dedicated PHPCS baseline cleanup."
     ]
@@ -309,8 +309,8 @@
       "id": "batch-3-dnd-consolidation",
       "phase": "Batch 3",
       "title": "Drag-and-drop consolidation",
-      "status": "planned",
-      "scope": "Remove react-beautiful-dnd in favor of the existing react-movable stack and close any remaining reorder issues.",
+      "status": "completed",
+      "scope": "Remove react-beautiful-dnd in favor of the existing react-movable stack and close the remaining reorder flows that were actually part of the product.",
       "packageNames": [
         "react-beautiful-dnd"
       ],
@@ -325,8 +325,8 @@
         "Verify map-layer ordering, storymap slide ordering and any nested layer ordering still exposed in the editor."
       ],
       "approvalNotes": [
-        "The saved layer and slide structures must not change.",
-        "npm ci should no longer emit the react-beautiful-dnd deprecation warning."
+        "The saved layer and slide structures stayed unchanged while the supported reorder flows moved onto react-movable.",
+        "npm ci no longer emits the react-beautiful-dnd deprecation warning because the package has been removed from package.json and package-lock.json."
       ]
     },
     {
@@ -926,6 +926,56 @@
         "src/js/src/shared/schema-form.test.js",
         "src/js/src/shared/wp-form-controls.js"
       ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-3-dnd-consolidation",
+      "status": "completed",
+      "summary": "Removed react-beautiful-dnd, migrated the remaining map-layer ordering UI to react-movable and removed the accidental nested storymap layer drag affordance while keeping the supported slide ordering and layer toggle flows intact.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully after clearing the locally stuck node_modules tree. The prior react-beautiful-dnd deprecation warning disappeared; the remaining install noise is the tracked react-autosize-textarea peer warning plus broader transitive npm ecosystem deprecations."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The wp-scripts unit suite remained green with 8 test files and 25 assertions after the drag-and-drop migration."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after the migration with only the existing bundle-size warnings. The emitted mapsSidebar bundle is smaller now that react-beautiful-dnd is gone."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend drag-and-drop changes."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after moving the remaining reorder flows to react-movable."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify selected map-layer ordering in the map editor modal, including saving and reopening after reordering.",
+        "Verify storymap slide ordering still works alongside the existing move up/down controls.",
+        "Verify storymap slide layer toggling still works without exposing a reorder affordance that the product never supported."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "src/js/src/map-blocks/layer-settings.js",
+        "src/js/src/map-blocks/layers-settings.js",
+        "src/js/src/map-blocks/storymap-editor.js",
+        "src/js/src/map-blocks/storymap-editor.scss"
+      ]
     }
   ],
   "npm": {
@@ -941,9 +991,10 @@
       "batchId": "batch-3-dnd-consolidation",
       "maintenanceStatus": "deprecated-archived",
       "decision": "replace",
-      "executionStatus": "planned",
+      "executionStatus": "completed",
       "executionNotes": [
-        "Planned replacement in Batch 3 using the existing react-movable stack for the remaining reorder flows."
+        "Removed in Batch 3 after migrating the supported map-layer ordering flow onto react-movable and dropping the unsupported nested storymap layer drag UI.",
+        "The deprecated package no longer appears in package.json, package-lock.json or src/js/src."
       ],
       "minorPath": "No maintained minor line. Replace instead of updating within 13.x.",
       "majorPath": "No maintained major line. Migrate to @hello-pangea/dnd or consolidate on the existing react-movable wrapper.",

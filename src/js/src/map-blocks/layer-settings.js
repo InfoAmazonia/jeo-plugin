@@ -1,6 +1,5 @@
 import { Dashicon } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { Draggable } from 'react-beautiful-dnd';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
@@ -24,6 +23,7 @@ const decodeHtmlEntity = function ( str ) {
 
 const LayerSettings = (
 	{
+		itemProps,
 		index: layerIndex,
 		isDragged,
 		isOutOfBounds,
@@ -40,11 +40,13 @@ const LayerSettings = (
 	}
 ) => {
 	const classes = classNames( [
+		'jeo-map-layer-item',
 		'layer',
 		{ dragging: isDragged },
 		{ selected: isSelected },
 		{ isoutofbounds: isOutOfBounds },
 	] );
+	const rootProps = itemProps || {};
 
 	const [ showStyleLayers, setshowStyleLayers ] = useState( false );
 
@@ -64,21 +66,11 @@ const LayerSettings = (
 	};
 
 	return (
-		<Draggable
-			key={ String( settings.id ) }
-			draggableId={ String( settings.id ) }
-			index={ layerIndex }
-		>
-			{ ( provided ) => {
-				if(!settings.layer) {
-					return null;
-				}
-
-				return (settings.layer && <div
-					ref={ provided.innerRef }
-					{ ...provided.draggableProps }
-					{ ...provided.dragHandleProps }
-					className={ classes }
+		<>
+			{ settings.layer && (
+				<div
+					{ ...rootProps }
+					className={ classNames( classes, rootProps.className ) }
 				>
 					<div className="handle" style={ setWidth( 0 ) }>
 						<Dashicon className="drag-handle" icon="move" data-movable-handle />
@@ -255,9 +247,8 @@ const LayerSettings = (
 						</>
 					) }
 				</div>
-			)
-			} }
-		</Draggable>
+			) }
+		</>
 	);
 };
 
