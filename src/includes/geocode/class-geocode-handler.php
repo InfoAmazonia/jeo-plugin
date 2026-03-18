@@ -63,7 +63,7 @@ class Geocode_Handler {
 			wp_send_json_error( array(), 403 );
 		}
 
-		$search   = '';
+		$search = '';
 		if ( isset( $_GET['search'] ) ) {
 			$search = sanitize_text_field( wp_unslash( $_GET['search'] ) );
 		}
