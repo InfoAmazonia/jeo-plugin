@@ -1,210 +1,135 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Layer types - JEO</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/highlight.css">
-
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Layer types";
-    var mkdocs_page_input_path = "dev/layer-types.md";
-    var mkdocs_page_url = "/dev/layer-types/";
-  </script>
-
-  <script src="../../js/jquery-2.1.1.min.js"></script>
-  <script src="../../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../../js/highlight.pack.js"></script>
-
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/dev/layer-types/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Layer types - JEO</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Layer types";
+        var mkdocs_page_input_path = "dev/layer-types.md";
+        var mkdocs_page_url = "/dev/layer-types/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> JEO</a>
-        <div role="search">
+          <a href="../.." class="icon icon-home"> JEO
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-
-
-            <li class="toctree-l1">
-
-    <a class="" href="../..">Home</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../README/">README</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../carto/">Carto</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../concepts/">Concepts</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../discovery/">Discovery</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../geolocating-posts/">Geolocating posts</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../getting-started/">Getting started</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../index-plugin/">Index plugin</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../layer-post/">Layer post</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../map-block/">Map block</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../map-embed/">Map embed</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../map-post/">Map post</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../map-shortcode/">Map shortcode</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../one-time-map-block/">One time map block</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <a class="" href="../../story-map/">Story map</a>
-	    </li>
-
-            <li class="toctree-l1">
-
-    <span class="caption-text">Dev</span>
-    <ul class="subnav">
-                <li class="">
-
-    <a class="" href="../geo-information/">Geo information</a>
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
                 </li>
-                <li class="">
-
-    <a class="" href="../geocoders/">Geocoders</a>
-                </li>
-                <li class="">
-
-    <a class="" href="../layer-types-api/">Layer types api</a>
-                </li>
-                <li class=" current">
-
-    <a class="current" href="./">Layer types</a>
-    <ul class="subnav">
-
-    <li class="toctree-l3"><a href="#adding-new-layer-types">Adding new Layer Types</a></li>
-
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Layer types</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#introduction">Introduction</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#creating-a-new-layer-type">Creating a new Layer Type</a>
         <ul>
-
-            <li><a class="toctree-l4" href="#introduction">Introduction</a></li>
-
-            <li><a class="toctree-l4" href="#creating-a-new-layer-type">Creating a new Layer Type</a></li>
-
-            <li><a class="toctree-l4" href="#addstylemap-attributes">addStyle(map, attributes)</a></li>
-
-            <li><a class="toctree-l4" href="#addlayermap-attributes">addLayer(map, attributes)</a></li>
-
-            <li><a class="toctree-l4" href="#layer-attributes">Layer attributes</a></li>
-
+    <li class="toctree-l3"><a class="reference internal" href="#getschemaattributes">getSchema(attributes)</a>
+    </li>
         </ul>
-
-
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#addstylemap-attributes">addStyle(map, attributes)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#addlayermap-attributes">addLayer(map, attributes)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#layer-attributes">Layer attributes</a>
+    </li>
     </ul>
-                </li>
-                <li class="">
-
-    <a class="" href="../migration/">Migration</a>
-                </li>
-    </ul>
-	    </li>
-
-        </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-smoke-tests/">Dependency upgrade smoke tests</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">JEO</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">JEO</a>
+        
       </nav>
-
-
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-
-
-
-          <li>Dev &raquo;</li>
-
-
-
-    <li>Layer types</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer</li>
+      <li class="breadcrumb-item active">Layer types</li>
     <li class="wy-breadcrumbs-aside">
-
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/dev/layer-types.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
-
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
                 <h1 id="adding-new-layer-types">Adding new Layer Types</h1>
 <p>This document describes how to register new Layer Types to be used in maps created with JEO.</p>
 <h2 id="introduction">Introduction</h2>
@@ -217,23 +142,22 @@
 <p>In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which is an extension to MapboxGL) to the project.</p>
 <h2 id="creating-a-new-layer-type">Creating a new Layer Type</h2>
 <p>First, let's register a new Layer Type by hooking up in the <code>jeo_register_layer_types</code> action:</p>
-<pre><code class="php">add_action('jeo_register_layer_types', function($layer_types) {
+<pre><code class="language-php">add_action('jeo_register_layer_types', function($layer_types) {
     $layer_types-&gt;register_layer_type( 'my-layer-type', [ 'script_url' =&gt; plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
 });
 </code></pre>
-
 <p><code>register_layer_type</code> method gets 2 parameters.</p>
 <ul>
 <li>Layer type slug - A unique sanitized string (make sure to make it unique)</li>
 <li>Options - An array with the layer type options:</li>
 <li><code>script_url</code>: Required. The absolute URL to your JavaScript file.</li>
-<li><code>dependencies</code>: Optional. An array of scripts handles registered using [wp_register_script]<a href="https://developer.wordpress.org/reference/functions/wp_register_script/">(</a>) that should be loaded as a dependency to the layer type main script</li>
+<li><code>dependencies</code>: Optional. An array of scripts handles registered using <a href="https://developer.wordpress.org/reference/functions/wp_register_script/">wp_register_script</a> that should be loaded as a dependency to the layer type main script</li>
 </ul>
 <p>That's all you need to do on the PHP side. All the magic happens on the JavaScript.</p>
 <p>Now, let's create our <code>layertype.js</code> file.</p>
 <p>In this file, we are going to register a JavaScript object using the globally available <code>window.JeoLayerTypes.registerLayerType</code>.</p>
 <p>The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.</p>
-<pre><code class="js">window.JeoLayerTypes.registerLayerType('tilelayer', {
+<pre><code class="language-js">window.JeoLayerTypes.registerLayerType('tilelayer', {
 
     addStyle: function(map, attributes) {
         // ...
@@ -248,7 +172,6 @@
     }
 });
 </code></pre>
-
 <p>Your Layer Type object MUST implement at least these three methods.</p>
 <h3 id="getschemaattributes">getSchema(attributes)</h3>
 <p><strong>params</strong>:</p>
@@ -264,7 +187,7 @@
 <p>This method must return a Promise with a json-schema representation of the layer type options.</p>
 <p>This schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.</p>
 <p>For example, the "Tile layer" layer type needs only a URL, so that's how its <code>getSchema</code> method will look like.</p>
-<pre><code class="js">    // ...
+<pre><code class="language-js">    // ...
 
     getSchema: function(attributes) {
         return new Promise( function(resolve, reject) {
@@ -285,7 +208,6 @@
         });
     }
 </code></pre>
-
 <h2 id="addstylemap-attributes">addStyle(map, attributes)</h2>
 <p><strong>params</strong>:</p>
 <ul>
@@ -299,7 +221,7 @@
 <p>In MapboxGL, every map has a <a href="https://docs.mapbox.com/mapbox-gl-js/style-spec/">Style</a> as a base layer. This method will add the layer as the Map Style, using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle">setStyle</a> method of the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object.</p>
 <p>This method will be invoked when a layer of this type is added to the map as the base layer.</p>
 <p>For example, the "Tile Layer" layer type sets the style as a raster layer:</p>
-<pre><code class="js">    // ...
+<pre><code class="language-js">    // ...
 
     addStyle: function(map, attributes) {
         return map.setStyle({
@@ -319,7 +241,6 @@
         })
     }
 </code></pre>
-
 <p><strong>Note</strong>: The <code>attributes.layer_type_options</code> object holds all the properties declared in the <code>getSchema</code> method. That's why there is a <code>url</code> there! (See Layer attributes section below)</p>
 <h2 id="addlayermap-attributes">addLayer(map, attributes)</h2>
 <p><strong>params</strong>:</p>
@@ -334,7 +255,7 @@
 <p>This method will add the layer to the map using the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer">addLayer</a> method of the <a href="https://docs.mapbox.com/mapbox-gl-js/api/#map">Map</a> object.</p>
 <p>This method will be invoked when a layer of this type is added to the map.</p>
 <p>For example, the "Tile Layer" layer type adds itself as a raster layer:</p>
-<pre><code class="js">    // ...
+<pre><code class="language-js">    // ...
 
     addLayer: function(map, attributes) {
         var layer = {
@@ -355,7 +276,6 @@
     }
 
 </code></pre>
-
 <p><strong>Note:</strong> This method must verify the value of <code>attributes.visible</code> to determine whether this layer should be visible when the map is initialized.</p>
 <h2 id="layer-attributes">Layer attributes</h2>
 <p>As you saw, each of the above methods gets an argument <code>attributes</code> as input. This argument holds all the information of the layer the user is editing or viewing.</p>
@@ -367,31 +287,23 @@
 <li><code>visible</code>: (boolean) A flag indicating whether this layer should be visible when the map initializes</li>
 <li><code>layer_type_options</code>: (object) A object with all the layer type-specific attributes (those registered in the <code>getSchema</code> method)</li>
 </ul>
-
+              
             </div>
-          </div>
-          <footer>
-
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-
-        <a href="../migration/" class="btn btn-neutral float-right" title="Migration">Next <span class="icon icon-circle-arrow-right"></span></a>
-
-
-        <a href="../layer-types-api/" class="btn btn-neutral" title="Layer types api"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../geocoders/" class="btn btn-neutral float-left" title="Geocoders"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../layer-types-api/" class="btn btn-neutral float-right" title="Layer types API">Next <span class="icon icon-circle-arrow-right"></span></a>
     </div>
-
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-
+          
         </div>
       </div>
 
@@ -399,18 +311,31 @@
 
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-
-
-        <span><a href="../layer-types-api/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-
-
-        <span style="margin-left: 15px"><a href="../migration/" style="color: #fcfcfc">Next &raquo;</a></span>
-
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../geocoders/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../layer-types-api/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
     <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
 
 </body>
 </html>

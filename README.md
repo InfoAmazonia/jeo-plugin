@@ -78,11 +78,56 @@ Then create a symbolic link inside of `wp-content/plugins/jeo` pointing to the `
 ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
 ```
 
-### Build
+## Building the plugin
 
-When we want to build the plugin, we run `npm run build` to compile all the assets (css and js) to `src/js/build`.
-While developing, you might want to run `npm run watch`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
+The plugin root for local development and release packaging is `src/`.
+Builds compile JavaScript and CSS assets into `src/js/build`.
+
+Use these commands during local development:
 
 ```bash
-rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
+npm run start
+npm run build
 ```
+
+- `npm run start` watches the source tree and rebuilds assets while you develop.
+- `npm run build` performs a production build for release validation.
+
+If you prefer copying files instead of symlinking them into a local WordPress install, use:
+
+```bash
+rsync --archive --progress --human-readable --delete ./src/ /path/to/wordpress/wp-content/plugins/jeo/
+```
+
+## Releasing
+
+WordPress.org releases are built from `src/`, not from the repository root.
+The deploy workflow also publishes assets from `.wordpress-org/`.
+
+Before creating a release tag, keep these files aligned:
+
+- `src/jeo.php`
+- `src/readme.txt`
+- `.wordpress-org/`
+
+The deploy workflow now validates that:
+
+- the plugin version in `src/jeo.php` matches `JEO_VERSION`
+- the `Stable tag` in `src/readme.txt` matches the plugin version
+- the release tag is a stable `x.y.z` version
+
+Pre-release tags such as `-rc` are intentionally blocked from the WordPress.org deploy pipeline.
+
+## Documentation
+
+The documentation source lives in `docs/`.
+The published static site lives in `site/` and is generated with MkDocs.
+
+To rebuild it locally:
+
+```bash
+python3 -m pip install -r requirements-docs.txt
+python3 -m mkdocs build --clean
+```
+
+Changes to `docs/`, `mkdocs.yml` or `requirements-docs.txt` on `master` automatically regenerate and commit `site/` through `.github/workflows/docs-site.yml`.

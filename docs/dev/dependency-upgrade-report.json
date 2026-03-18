@@ -7,8 +7,8 @@
     "sources": [
       ".nvmrc",
       "README.md",
-      "src/README.txt",
-      ".github/workflows/main.yml",
+      "src/readme.txt",
+      ".github/workflows/deploy-wordpress-org.yml",
       ".github/workflows/node-frontend.yml",
       ".github/workflows/php-compat.yml",
       ".github/workflows/wordpress-smoke.yml",
@@ -1438,7 +1438,7 @@
         ".github/workflows/wordpress-smoke.yml",
         "README.md",
         "docs/dev/php-compatibility.md",
-        "src/README.txt",
+        "src/readme.txt",
         "trunk/readme.txt",
         "scripts/check-php-compat.php",
         "scripts/dependency-review.overrides.json",
@@ -1542,7 +1542,7 @@
         ".nvmrc",
         "package.json",
         ".github/workflows/node-frontend.yml",
-        ".github/workflows/main.yml",
+        ".github/workflows/deploy-wordpress-org.yml",
         "README.md",
         "scripts/check-node-version.mjs",
         "scripts/dependency-review.overrides.json",
@@ -1815,7 +1815,7 @@
       ],
       "manualReviewItems": [],
       "documentUpdates": [
-        ".github/workflows/main.yml",
+        ".github/workflows/deploy-wordpress-org.yml",
         ".github/workflows/node-frontend.yml",
         "README.md",
         "scripts/dependency-review.overrides.json",
@@ -2580,7 +2580,7 @@
           }
         ],
         "usage": [
-          "src/README.txt",
+          "src/readme.txt",
           "package.json",
           "src/js/src/lib/mapboxgl/mapboxgl-loader.js"
         ],
@@ -2619,7 +2619,7 @@
           }
         ],
         "usage": [
-          "src/README.txt",
+          "src/readme.txt",
           "package.json",
           "src/js/src/lib/maplibregl/maplibregl-loader.js"
         ],
@@ -2818,7 +2818,7 @@
           }
         ],
         "usage": [
-          "src/README.txt",
+          "src/readme.txt",
           "package.json",
           "src/js/src/lib/mapboxgl/mapboxgl-react.js",
           "src/js/src/lib/maplibregl/maplibregl-react.js"

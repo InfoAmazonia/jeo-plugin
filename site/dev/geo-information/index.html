@@ -1,203 +1,128 @@
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  
-  <link rel="shortcut icon" href="../../img/favicon.ico">
-  <title>Geo information - JEO</title>
-  <link href='https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700' rel='stylesheet' type='text/css'>
-
-  <link rel="stylesheet" href="../../css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/theme_extra.css" type="text/css" />
-  <link rel="stylesheet" href="../../css/highlight.css">
-  
-  <script>
-    // Current page data
-    var mkdocs_page_name = "Geo information";
-    var mkdocs_page_input_path = "dev/geo-information.md";
-    var mkdocs_page_url = "/dev/geo-information/";
-  </script>
-  
-  <script src="../../js/jquery-2.1.1.min.js"></script>
-  <script src="../../js/modernizr-2.8.3.min.js"></script>
-  <script type="text/javascript" src="../../js/highlight.pack.js"></script> 
-  
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/dev/geo-information/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Geo information - JEO</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Geo information";
+        var mkdocs_page_input_path = "dev/geo-information.md";
+        var mkdocs_page_url = "/dev/geo-information/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
 </head>
 
 <body class="wy-body-for-nav" role="document">
 
   <div class="wy-grid-for-nav">
-
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
       <div class="wy-side-nav-search">
-        <a href="../.." class="icon icon-home"> JEO</a>
-        <div role="search">
+          <a href="../.." class="icon icon-home"> JEO
+        </a><div role="search">
   <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
   </form>
 </div>
       </div>
 
-      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-	<ul class="current">
-	  
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../..">Home</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../README/">README</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../carto/">Carto</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../concepts/">Concepts</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../discovery/">Discovery</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../geolocating-posts/">Geolocating posts</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../getting-started/">Getting started</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../index-plugin/">Index plugin</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../layer-post/">Layer post</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../map-block/">Map block</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../map-embed/">Map embed</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../map-post/">Map post</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../map-shortcode/">Map shortcode</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../one-time-map-block/">One time map block</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <a class="" href="../../story-map/">Story map</a>
-	    </li>
-          
-            <li class="toctree-l1">
-		
-    <span class="caption-text">Dev</span>
-    <ul class="subnav">
-                <li class=" current">
-                    
-    <a class="current" href="./">Geo information</a>
-    <ul class="subnav">
-            
-    <li class="toctree-l3"><a href="#geographical-information-of-a-post">Geographical Information of a post</a></li>
-    
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Geo information</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#how-geographical-information-is-stored">How geographical information is stored</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-to-search-for-posts-by-geoinformation-indexes">How to search for posts by geoinformation? (indexes)</a>
         <ul>
-        
-            <li><a class="toctree-l4" href="#how-geographical-information-is-stored">How geographical information is stored</a></li>
-        
-            <li><a class="toctree-l4" href="#how-to-search-for-posts-by-geoinformation-indexes">How to search for posts by geoinformation? (indexes)</a></li>
-        
+    <li class="toctree-l3"><a class="reference internal" href="#fetching-posts-by-geoinformation">Fetching posts by geoinformation</a>
+    </li>
         </ul>
-    
-
+    </li>
     </ul>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../geocoders/">Geocoders</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layer-types-api/">Layer types api</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../layer-types/">Layer types</a>
-                </li>
-                <li class="">
-                    
-    <a class="" href="../migration/">Migration</a>
-                </li>
-    </ul>
-	    </li>
-          
-        </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-smoke-tests/">Dependency upgrade smoke tests</a>
+                  </li>
+              </ul>
       </div>
-      &nbsp;
+    </div>
     </nav>
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
-        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="../..">JEO</a>
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">JEO</a>
+        
       </nav>
-
-      
       <div class="wy-nav-content">
-        <div class="rst-content">
-          <div role="navigation" aria-label="breadcrumbs navigation">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
   <ul class="wy-breadcrumbs">
-    <li><a href="../..">Docs</a> &raquo;</li>
-    
-      
-        
-          <li>Dev &raquo;</li>
-        
-      
-    
-    <li>Geo information</li>
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer</li>
+      <li class="breadcrumb-item active">Geo information</li>
     <li class="wy-breadcrumbs-aside">
-      
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/dev/geo-information.md" class="icon icon-github"> Edit on GitHub</a>
     </li>
   </ul>
   <hr/>
 </div>
-          <div role="main">
-            <div class="section">
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
               
                 <h1 id="geographical-information-of-a-post">Geographical Information of a post</h1>
 <p>Each post can be related to one or more points on the map.</p>
@@ -205,10 +130,9 @@
 <h2 id="how-geographical-information-is-stored">How geographical information is stored</h2>
 <p>Each related point is stored as one entry of the <code>_related_point</code> metadata key. Each entry is an object with all the information retrieved by the geocoder.</p>
 <p>Here is an example of two entries related to the same post, that could be get using:</p>
-<pre><code class="php">get_post_meta( $post_id, '_related_point' );
+<pre><code class="language-php">get_post_meta( $post_id, '_related_point' );
 </code></pre>
-
-<pre><code class="php">'_related_point' =&gt; [
+<pre><code class="language-php">'_related_point' =&gt; [
     'relevance' =&gt; 'primary',
     '_geocode_lat' =&gt; '-23,54659435',
     '_geocode_lon' =&gt; '-46,644533061712',
@@ -233,12 +157,11 @@
     '_geocode_city_level_1' =&gt; 'Parque do Colégio',
 ]
 </code></pre>
-
 <h2 id="how-to-search-for-posts-by-geoinformation-indexes">How to search for posts by geoinformation? (indexes)</h2>
 <p>When you save geographical information of the points, JEO also creates other metadata that will allow developers to query posts by specific geographical information.</p>
 <p>Since each point is stored as a serialized data in the database, this would not allow us to filter posts by <code>country_code</code> for example. That's why we create indexes.</p>
 <p>For the example above, this post would also have one individual metadata entry for each information, like this:</p>
-<pre><code class="php">[
+<pre><code class="language-php">[
     '_geocode_lat_p' =&gt; '-23,54659435',
     '_geocode_lon_p' =&gt; '-46,644533061712',
     '_geocode_country_p' =&gt; 'Brasil',
@@ -257,13 +180,12 @@
     '_geocode_city_level_1_s' =&gt; 'Parque do Colégio',
 ]
 </code></pre>
-
 <p>Note: <code>_s</code> and <code>_p</code> suffixes indicate if the relevance of that information is primary or secondary.</p>
 <p>Note 2: Full addresses are not indexed</p>
 <p>Now we have all the information as individual metadata and this allows me to query by them, however, the pairs are disconnected (if I had more than one primary point, it would be impossible to know what are the latitude-longitude pairs. That's why the information we actually use is the serialized object).</p>
 <h3 id="fetching-posts-by-geoinformation">Fetching posts by geoinformation</h3>
 <p>Give me all the posts that have primary points with the country code <code>'BR'</code>:</p>
-<pre><code class="php">$posts = new WP_Query([
+<pre><code class="language-php">$posts = new WP_Query([
     'meta_query' =&gt; [
         [
             'key' =&gt; '_geocode_country_code_p',
@@ -272,9 +194,8 @@
     ]
 ]);
 </code></pre>
-
 <p>Give me all the posts whose city is <code>'Manaus'</code>:</p>
-<pre><code class="PHP">$posts = new WP_Query([
+<pre><code class="language-PHP">$posts = new WP_Query([
     'meta_query' =&gt; [
         [
             'key' =&gt; '_geocode_city_s',
@@ -290,48 +211,53 @@
 </code></pre>
               
             </div>
-          </div>
-          <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../geolocating-posts/" class="btn btn-neutral float-left" title="Geolocating posts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
         <a href="../geocoders/" class="btn btn-neutral float-right" title="Geocoders">Next <span class="icon icon-circle-arrow-right"></span></a>
-      
-      
-        <a href="../../story-map/" class="btn btn-neutral" title="Story map"><span class="icon icon-circle-arrow-left"></span> Previous</a>
-      
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <!-- Copyright etc -->
-    
   </div>
 
-  Built with <a href="http://www.mkdocs.org">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
 </footer>
-	  
+          
         </div>
       </div>
 
     </section>
-    
+
   </div>
 
-  <div class="rst-versions" role="note" style="cursor: pointer">
-    <span class="rst-current-version" data-toggle="rst-current-version">
-      
-      
-        <span><a href="../../story-map/" style="color: #fcfcfc;">&laquo; Previous</a></span>
-      
-      
-        <span style="margin-left: 15px"><a href="../geocoders/" style="color: #fcfcfc">Next &raquo;</a></span>
-      
-    </span>
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../geolocating-posts/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../geocoders/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
 </div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
     <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
 
 </body>
 </html>
