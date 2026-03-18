@@ -2,13 +2,89 @@ import { Component, createRoot } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import Sidebar from './blocks/sidebar';
+import { formatDateRangeValue } from './blocks/date-range-filter';
 import { createMap, mapgl } from '../lib/mapgl-loader';
 import { computeInlineStart } from '../shared/direction';
 import './style/discovery.scss';
 
+function parseUrlStateParam( urlParams, paramKey ) {
+	const rawValue = urlParams.get( paramKey );
+
+	if ( rawValue === null ) {
+		return null;
+	}
+
+	try {
+		return JSON.parse( rawValue );
+	} catch ( error ) {
+		return null;
+	}
+}
+
+function parseInitialDiscoveryState() {
+	if ( typeof window === 'undefined' ) {
+		return {
+			queryParams: {},
+			dateRangeInputValue: '',
+			searchField: { searchStorie: '', searchMap: '' },
+			selectedTag: -1,
+		};
+	}
+
+	const urlParams = new URLSearchParams( window.location.search );
+	const queryParams = {};
+	const search = parseUrlStateParam( urlParams, 'search' );
+	const after = parseUrlStateParam( urlParams, 'after' );
+	const before = parseUrlStateParam( urlParams, 'before' );
+	const rawTagId = parseUrlStateParam( urlParams, 'tags' );
+	const tagId = Number.parseInt( rawTagId, 10 );
+
+	if ( typeof search === 'string' && search.trim().length ) {
+		queryParams.search = search;
+	}
+
+	if ( typeof after === 'string' && after ) {
+		queryParams.after = after;
+	}
+
+	if ( typeof before === 'string' && before ) {
+		queryParams.before = before;
+	}
+
+	if ( Number.isFinite( tagId ) && tagId > 0 ) {
+		queryParams.tags = tagId;
+	}
+
+	let dateRangeInputValue = '';
+
+	if ( queryParams.after && queryParams.before ) {
+		const startDate = new Date( queryParams.after );
+		const endDate = new Date( queryParams.before );
+
+		if (
+			! Number.isNaN( startDate.getTime() ) &&
+			! Number.isNaN( endDate.getTime() )
+		) {
+			dateRangeInputValue = formatDateRangeValue( startDate, endDate );
+		}
+	}
+
+	return {
+		queryParams,
+		dateRangeInputValue,
+		searchField: {
+			searchStorie: queryParams.search ?? '',
+			searchMap: '',
+		},
+		selectedTag:
+			Number.isFinite( tagId ) && tagId > 0 ? tagId : -1,
+	};
+}
+
 class Discovery extends Component {
 	constructor( props ) {
 		super( props );
+		const initialDiscoveryState = parseInitialDiscoveryState();
 
 		// map can't be a state, trust me.
 		this.map = null;
@@ -48,10 +124,10 @@ class Discovery extends Component {
 			hoveredClusterPostsId: [],
 
 			// filter data
-			queryParams: {},
-			dateRangeInputValue: '',
-			searchField: { searchStorie: '', searchMap: '' },
-			selectedTag: -1,
+			queryParams: initialDiscoveryState.queryParams,
+			dateRangeInputValue: initialDiscoveryState.dateRangeInputValue,
+			searchField: initialDiscoveryState.searchField,
+			selectedTag: initialDiscoveryState.selectedTag,
 			tags: [],
 			categories: [], // future api improvement (single api call)
 		};
@@ -100,7 +176,7 @@ class Discovery extends Component {
 
 	getParamFromUrl( paramKey ) {
 		const urlParams = new URLSearchParams( window.location.search );
-		const value = JSON.parse( urlParams.get( paramKey ) );
+		const value = parseUrlStateParam( urlParams, paramKey );
 		return value ?? false;
 	}
 
@@ -211,6 +287,18 @@ class Discovery extends Component {
 			} ),
 			zoom: this.state.mapLoaded ? this.map.getZoom() : 0,
 			center: this.state.mapLoaded ? this.map.getCenter() : 0,
+			...( this.state.queryParams.search
+				? { search: this.state.queryParams.search }
+				: {} ),
+			...( this.state.queryParams.after
+				? { after: this.state.queryParams.after }
+				: {} ),
+			...( this.state.queryParams.before
+				? { before: this.state.queryParams.before }
+				: {} ),
+			...( this.state.queryParams.tags
+				? { tags: this.state.queryParams.tags }
+				: {} ),
 		};
 
 		const generatedEmbedUrl = this.buildUrlParamsString( buildURLParams );
@@ -229,6 +317,8 @@ class Discovery extends Component {
 			true,
 			document.location.pathname + '?share=true'
 		);
+		const encodedShareStateUrl = encodeURIComponent( shareStateUrl );
+		const encodedMailBody = encodeURIComponent( shareStateUrl );
 
 		return (
 			<div
@@ -258,9 +348,7 @@ class Discovery extends Component {
 						>
 							<div className="options">
 								<a
-									href={
-										'https://twitter.com/intent/tweet?text=' + shareStateUrl
-									}
+									href={ `https://wa.me/?text=${ encodedShareStateUrl }` }
 									target="_blank"
 									rel="noreferrer"
 								>
@@ -268,39 +356,35 @@ class Discovery extends Component {
 										aria-hidden="true"
 										focusable="false"
 										data-prefix="fab"
-										data-icon="twitter"
+										data-icon="whatsapp"
+										role="img"
+										xmlns="http://www.w3.org/2000/svg"
+										viewBox="0 0 448 512"
+									>
+										<path
+											fill="currentColor"
+											d="M380.9 97.1C339 55.1 283.2 32 223.9 32c-122.4 0-221.7 99.3-221.7 221.7 0 39.1 10.2 77.3 29.6 111L0 480l118.7-31.1c32.6 17.8 69.3 27.2 106.1 27.2h.1c122.3 0 223-99.3 223-221.7 0-59.3-23.1-115.1-67-157.3zM224 438.7c-33.2 0-65.7-8.9-94.1-25.6l-6.7-4-70.4 18.5 18.8-68.6-4.3-7c-18.2-29-27.8-62.5-27.8-96.9 0-100.8 82-182.8 182.8-182.8 48.8 0 94.6 19 129.1 53.5 34.5 34.5 53.5 80.4 53.5 129.1-.1 100.7-82.1 182.8-181 182.8zm101.5-138.4c-5.5-2.8-32.8-16.1-37.9-18-5.1-1.9-8.8-2.8-12.5 2.8s-14.3 18-17.6 21.7c-3.2 3.7-6.5 4.2-12 1.4-32.6-16.3-54-29.1-75.6-65.8-5.7-9.8 5.7-9.1 16.3-30 1.8-3.7.9-6.9-.5-9.7-1.4-2.8-12.5-30.1-17.1-41.2-4.5-10.7-9-9.3-12.4-9.5-3.2-.2-6.9-.2-10.6-.2-3.7 0-9.7 1.4-14.8 6.9-5.1 5.6-19.4 18.9-19.4 46.1s19.9 53.4 22.6 57.1c2.8 3.7 39 59.6 94.5 83.6 13.2 5.7 23.5 9.1 31.6 11.7 13.2 4.2 25.2 3.6 34.6 2.2 10.6-1.6 32.8-13.4 37.4-26.4 4.6-13 4.6-24.1 3.2-26.4-1.3-2.2-5-3.6-10.5-6.4z"
+										></path>
+									</svg>
+								</a>
+
+								<a
+									href={ `https://x.com/intent/post?url=${ encodedShareStateUrl }` }
+									target="_blank"
+									rel="noreferrer"
+								>
+									<svg
+										aria-hidden="true"
+										focusable="false"
+										data-prefix="fab"
+										data-icon="x-twitter"
 										role="img"
 										xmlns="http://www.w3.org/2000/svg"
 										viewBox="0 0 512 512"
 									>
 										<path
 											fill="currentColor"
-											d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"
-											class=""
-										></path>
-									</svg>
-								</a>
-
-								<a
-									href={
-										'https://www.facebook.com/sharer/sharer.php?u=' +
-										shareStateUrl
-									}
-									target="_blank"
-									rel="noreferrer"
-								>
-									<svg
-										aria-hidden="true"
-										focusable="false"
-										data-prefix="fab"
-										data-icon="facebook-f"
-										role="img"
-										xmlns="http://www.w3.org/2000/svg"
-										viewBox="0 0 320 512"
-									>
-										<path
-											fill="currentColor"
-											d="M279.14 288l14.22-92.66h-88.91v-60.13c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S260.43 0 225.36 0c-73.22 0-121.08 44.38-121.08 124.72v70.62H22.89V288h81.39v224h100.17V288z"
+											d="M389.2 48h70.6L305.6 224.2 487.4 464H345L233.6 318.6 106.4 464H35.8l164.9-188.6L24.6 48H170l100.8 132.3L389.2 48zm-24.8 373.8h39.1L149.8 87.7H107.8z"
 										></path>
 									</svg>
 								</a>
@@ -327,7 +411,7 @@ class Discovery extends Component {
 								</a>
 
 								<a
-									href={ 'mailto:?subject=Discovery&body=' + shareStateUrl }
+									href={ `mailto:?subject=Discovery&body=${ encodedMailBody }` }
 									target="_blank"
 									rel="noreferrer"
 								>

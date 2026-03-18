@@ -51,6 +51,7 @@ class MapLayers extends Component {
 		this.applyLayersChanges = this.applyLayersChanges.bind( this );
 		this.updateMaps = this.updateMaps.bind( this );
 		this.toggleLayersBatch = this.toggleLayersBatch.bind( this );
+		this.buildSelectionState = this.buildSelectionState.bind( this );
 		this.loadMapLayers = this.loadMapLayers.bind( this );
 		this.fetchMapsByIds = this.fetchMapsByIds.bind( this );
 		this.loadMoreMaps = this.loadMoreMaps.bind( this );
@@ -105,9 +106,14 @@ class MapLayers extends Component {
 									?.find( ( layer ) => layer.id === item.id )
 							)
 							.filter( Boolean );
+						const { selectedLayers, layersQueue } =
+							this.buildSelectionState( sortedLayerBatch.reverse() );
 
-						this.toggleLayersBatch( sortedLayerBatch.reverse() );
-						this.applyLayersChanges();
+						this.props.updateState( {
+							selectedLayers,
+							layersQueue,
+						} );
+						this.applyLayersChanges( layersQueue, selectedLayers );
 					} );
 				} else {
 					this.fetchMaps();
@@ -268,7 +274,17 @@ class MapLayers extends Component {
 
 	getLayerIdsFromUrl() {
 		const urlParams = new URLSearchParams( window.location.search );
-		return JSON.parse( urlParams.get( 'selected-layers' ) );
+		const layerIds = urlParams.get( 'selected-layers' );
+
+		if ( ! layerIds ) {
+			return [];
+		}
+
+		try {
+			return JSON.parse( layerIds );
+		} catch ( error ) {
+			return [];
+		}
 	}
 
 	toggleLayer( layer ) {
@@ -290,12 +306,15 @@ class MapLayers extends Component {
 		} );
 	}
 
-	toggleLayersBatch( layers ) {
-		const selectedLayers = Object.assign( {}, this.props.selectedLayers );
-		let layersQueue = [ ...this.props.layersQueue ];
+	buildSelectionState(
+		layers,
+		baseSelectedLayers = this.props.selectedLayers,
+		baseLayersQueue = this.props.layersQueue
+	) {
+		const selectedLayers = Object.assign( {}, baseSelectedLayers );
+		let layersQueue = [ ...baseLayersQueue ];
 
 		layers.forEach( ( layer ) => {
-			// If layer does not exist
 			if ( ! selectedLayers.hasOwnProperty( layer.id ) ) {
 				selectedLayers[ layer.id ] = layer;
 				layersQueue = [ layer.id, ...layersQueue ];
@@ -305,18 +324,41 @@ class MapLayers extends Component {
 			}
 		} );
 
+		return {
+			selectedLayers,
+			layersQueue,
+		};
+	}
+
+	toggleLayersBatch( layers ) {
+		const { selectedLayers, layersQueue } = this.buildSelectionState( layers );
+
 		this.props.updateState( {
 			selectedLayers,
 			layersQueue,
 		} );
 	}
 
-	applyLayersChanges() {
-		const batch = this.props.layersQueue;
-		const map = this.props.map;
-		let appliedLayers = this.props.appliedLayers;
+	applyLayersChanges(
+		batch = this.props.layersQueue,
+		selectedLayers = this.props.selectedLayers,
+		appliedLayers = this.props.appliedLayers
+	) {
+		if ( batch?.preventDefault ) {
+			batch.preventDefault();
+			batch = this.props.layersQueue;
+			selectedLayers = this.props.selectedLayers;
+			appliedLayers = this.props.appliedLayers;
+		}
 
-		appliedLayers.forEach( ( layer ) => {
+		if ( ! Array.isArray( batch ) ) {
+			batch = this.props.layersQueue;
+		}
+
+		const map = this.props.map;
+		let nextAppliedLayers = appliedLayers;
+
+		nextAppliedLayers.forEach( ( layer ) => {
 			const layerId = String( layer.id );
 			// If layer is not requested
 			if ( ! batch.includes( layer.id ) ) {
@@ -329,7 +371,7 @@ class MapLayers extends Component {
 		const reverseBatch = [ ...batch ].reverse();
 		reverseBatch.forEach( ( layerID ) => {
 			const layerId = String( layerID );
-			const layer = this.props.selectedLayers[ layerId ];
+			const layer = selectedLayers[ layerId ];
 			const attributes = layer.meta;
 
 				if ( layer.meta.type === 'tilelayer' ) {
@@ -450,12 +492,12 @@ class MapLayers extends Component {
 			}
 		} );
 
-		appliedLayers = batch.map( ( layerId ) => {
-			return this.props.selectedLayers[ layerId ];
+		nextAppliedLayers = batch.map( ( layerId ) => {
+			return selectedLayers[ layerId ];
 		} );
 
 		this.props.updateState( {
-			appliedLayers,
+			appliedLayers: nextAppliedLayers,
 		} );
 	}
 
@@ -665,7 +707,10 @@ class MapLayers extends Component {
 						{ __( 'Changes applied', 'jeo' ) }
 					</button>
 				) : (
-					<button className="apply-changes" onClick={ this.applyLayersChanges }>
+					<button
+						className="apply-changes"
+						onClick={ () => this.applyLayersChanges() }
+					>
 						{ __( 'Apply changes', 'jeo' ) }
 					</button>
 				) }
