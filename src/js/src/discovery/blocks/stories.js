@@ -8,12 +8,121 @@ import DateRangeFilter, { formatDateRangeValue } from './date-range-filter';
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
 import {
 	buildRelatedPostsGeoJson,
+	getStoryFeatureIds,
 	getStoryRelatedCoordinates,
 } from '../../shared/story-geojson';
 import TagFilterControl from './tag-filter-control';
 
-const POSTS_PER_PAGE = 10;
+const POSTS_PER_PAGE = 30;
 const MEMOIZED_CATEGORIES = {};
+const STORIES_SOURCE_ID = 'storiesSource';
+const HOVERED_CLUSTER_LAYER_ID = 'hover-cluster-layer';
+const HOVERED_CLUSTER_COLOR = '#b1b1b1';
+
+function getHoveredStoryId( feature ) {
+	return feature?.properties?.id ?? feature?.id ?? null;
+}
+
+function getUniqueStoryIds( features = [] ) {
+	return Array.from(
+		new Set(
+			( features ?? [] )
+				.map( getHoveredStoryId )
+				.filter( ( storyId ) => storyId !== null )
+		)
+	);
+}
+
+function getHoveredFeatureIds( feature ) {
+	const storyFeatureIds = getStoryFeatureIds( feature?.properties );
+
+	if ( storyFeatureIds.length ) {
+		return storyFeatureIds;
+	}
+
+	return feature?.id ? [ feature.id ] : [];
+}
+
+function buildHoveredClusterFilter( clusterId = -1 ) {
+	return [
+		'all',
+		[ 'has', 'point_count' ],
+		[ '==', [ 'get', 'cluster_id' ], clusterId ],
+	];
+}
+
+function getHoveredClusterFeature( map, event ) {
+	if ( event?.features?.length ) {
+		return event.features[ 0 ];
+	}
+
+	const features = map.queryRenderedFeatures( event.point, {
+		layers: [ 'cluster-layer', 'cluster-count' ],
+	} );
+
+	return features?.[ 0 ] ?? null;
+}
+
+function getClusterHoverData( map, event ) {
+	const hoveredClusterFeature = getHoveredClusterFeature( map, event );
+	const clusterId = hoveredClusterFeature?.properties?.cluster_id;
+	const pointCount = hoveredClusterFeature?.properties?.point_count;
+	const clusterSource = map.getSource( STORIES_SOURCE_ID );
+
+	if ( ! clusterId || ! pointCount || ! clusterSource ) {
+		return Promise.resolve( {
+			clusterId: null,
+			postsIds: [],
+		} );
+	}
+
+	return getClusterLeaves( clusterSource, clusterId, pointCount, 0 ).then( ( clusterFeatures ) => ( {
+		clusterId,
+		postsIds: getUniqueStoryIds( clusterFeatures ),
+	} ) );
+}
+
+function normalizeClusterIds( clusterIds = [] ) {
+	return Array.from(
+		new Set(
+			( Array.isArray( clusterIds ) ? clusterIds : [ clusterIds ] )
+				.map( ( clusterId ) => Number.parseInt( clusterId, 10 ) )
+				.filter( Number.isFinite )
+		)
+	).sort( ( firstClusterId, secondClusterId ) => firstClusterId - secondClusterId );
+}
+
+function getClusterFeaturesInView( map ) {
+	const canvas = map?.getCanvas?.();
+
+	if ( ! canvas ) {
+		return [];
+	}
+
+	const clusterFeatures = map.queryRenderedFeatures(
+		[
+			[ 0, 0 ],
+			[ canvas.width, canvas.height ],
+		],
+		{
+			layers: [ 'cluster-layer', 'cluster-count' ],
+		}
+	);
+	const uniqueClusterFeatures = new Map();
+
+	clusterFeatures.forEach( ( clusterFeature ) => {
+		const clusterId = Number.parseInt(
+			clusterFeature?.properties?.cluster_id,
+			10
+		);
+
+		if ( Number.isFinite( clusterId ) && ! uniqueClusterFeatures.has( clusterId ) ) {
+			uniqueClusterFeatures.set( clusterId, clusterFeature );
+		}
+	} );
+
+	return Array.from( uniqueClusterFeatures.values() );
+}
 
 class Stories extends Component {
 	constructor( props ) {
@@ -27,10 +136,25 @@ class Stories extends Component {
 			hoveredPostId: null,
 			hoveredClusterPostsId: [],
 		};
+		this.hoveredFeatureIds = [];
+		this.hoveredClusterIds = [];
+		this.listHoveredStoryId = null;
+		this.storiesListRef = null;
+		this.storyCardElements = new Map();
 
 		// Story bindings
 		this.storyHovered = this.storyHovered.bind( this );
 		this.storyUnhover = this.storyUnhover.bind( this );
+		this.clearHoveredFeatureState = this.clearHoveredFeatureState.bind( this );
+		this.clearHoveredClusterState = this.clearHoveredClusterState.bind( this );
+		this.replaceHoveredFeatureState = this.replaceHoveredFeatureState.bind( this );
+		this.replaceHoveredClusterState = this.replaceHoveredClusterState.bind( this );
+		this.findStoryClusterIds = this.findStoryClusterIds.bind( this );
+		this.syncHoveredStoryClusterState =
+			this.syncHoveredStoryClusterState.bind( this );
+		this.registerStoriesList = this.registerStoriesList.bind( this );
+		this.registerStoryCard = this.registerStoryCard.bind( this );
+		this.scrollStoryIntoView = this.scrollStoryIntoView.bind( this );
 		this.updateStories = this.updateStories.bind( this );
 
 		// Filters bind
@@ -76,7 +200,10 @@ class Stories extends Component {
 		const map = this.props.map;
 
 		if ( this.props.firstLoad && this.props.useStories ) {
-			this.fetchStories( { page: 1 } ).then( ( stories ) => {
+			this.fetchStories( {
+				page: 1,
+				...this.props.queryParams,
+			} ).then( ( stories ) => {
 				const sourceData = this.buildPostsGeoJson( stories );
 				map.addSource( 'storiesSource', {
 					type: 'geojson',
@@ -143,6 +270,20 @@ class Stories extends Component {
 								},
 							} );
 
+							map.addLayer( {
+								id: HOVERED_CLUSTER_LAYER_ID,
+								type: 'circle',
+								source: 'storiesSource',
+								filter: buildHoveredClusterFilter(),
+								paint: {
+									'circle-color': HOVERED_CLUSTER_COLOR,
+									'circle-radius': 20,
+									'circle-stroke-color': HOVERED_CLUSTER_COLOR,
+									'circle-stroke-opacity': 0.4,
+									'circle-stroke-width': 9,
+								},
+							} );
+
 							// cluster number layer
 							map.addLayer( {
 								id: 'cluster-count',
@@ -178,63 +319,280 @@ class Stories extends Component {
 
 		map.on('mousemove', 'unclustered-points', (e) => {
 			if (e.features.length > 0 && map.selectedTab.name === "stories") {
-				this.setState({
-					hoveredPostId: e.features[0].id,
-				})
-
-				map.setFeatureState(
-					{ source: 'storiesSource', id: e.features[0].id },
-					{ hover: true }
-				);
-
-
-
-
+				const hoveredFeature = e.features[0];
+				this.replaceHoveredFeatureState( getHoveredFeatureIds( hoveredFeature ) );
+				this.setState( {
+					hoveredPostId: getHoveredStoryId( hoveredFeature ),
+				} );
 			}
 		});
 
 		map.on('mouseleave', 'unclustered-points', () => {
 			if(map.selectedTab.name === "stories"){
-				if (this.state.hoveredPostId) {
-					map.setFeatureState(
-						{ source: 'storiesSource', id: this.state.hoveredPostId },
-						{ hover: false }
-					);
-				}
-
-				this.setState({
-					...this.state,
+				this.clearHoveredFeatureState();
+				this.setState( {
 					hoveredPostId: null,
-				})
-
-
+				} );
 			}
 		});
 
-		map.on('mousemove', 'cluster-0', (e) => {
-			const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-0'] });
-			const clusterId = features[0].properties.cluster_id,
-			pointCount = features[0].properties.point_count,
-			clusterSource = map.getSource('storiesSource');
-
-			// Get all points under a cluster
-			getClusterLeaves(clusterSource, clusterId, pointCount, 0).then((aFeatures) => {
-				const postsIds = ( aFeatures ?? [] ).map( ( post ) => post.id)
-
+		const handleClusterMouseMove = ( event ) => {
+			getClusterHoverData( map, event ).then( ( { clusterId, postsIds } ) => {
+				this.replaceHoveredClusterState( clusterId );
 				this.setState( {
-					...this.state,
-					hoveredClusterPostsId: postsIds
-				} )
-			})
-		});
+					hoveredClusterPostsId: postsIds,
+				} );
+			} );
+		};
 
-
-		map.on('mouseleave', 'cluster-0', () => {
+		const handleClusterMouseLeave = () => {
+			this.clearHoveredClusterState();
 			this.setState( {
-				...this.state,
-				hoveredClusterPostsId: []
+				hoveredClusterPostsId: [],
+			} );
+		};
+
+		[ 'cluster-layer', 'cluster-count' ].forEach( ( layerId ) => {
+			map.on( 'mousemove', layerId, handleClusterMouseMove );
+			map.on( 'mouseleave', layerId, handleClusterMouseLeave );
+		} );
+	}
+
+	componentWillUnmount() {
+		this.clearHoveredFeatureState();
+		this.clearHoveredClusterState();
+	}
+
+	componentDidUpdate( prevProps, prevState ) {
+		if ( prevState.hoveredPostId !== this.state.hoveredPostId ) {
+			this.scrollStoryIntoView( this.state.hoveredPostId );
+			return;
+		}
+
+		const clusterHoverChanged =
+			prevState.hoveredClusterPostsId.length !==
+				this.state.hoveredClusterPostsId.length ||
+			prevState.hoveredClusterPostsId.some(
+				( storyId, index ) =>
+					storyId !== this.state.hoveredClusterPostsId[ index ]
+			);
+
+		if ( clusterHoverChanged && this.state.hoveredClusterPostsId.length ) {
+			const firstClusterStoryId = this.props.stories.find( ( story ) =>
+				this.state.hoveredClusterPostsId.includes( story.id )
+			)?.id;
+
+			this.scrollStoryIntoView( firstClusterStoryId ?? null );
+		}
+	}
+
+	clearHoveredFeatureState() {
+		const map = this.props.map;
+		const source = map?.getSource?.( STORIES_SOURCE_ID );
+
+		if ( ! source || ! this.hoveredFeatureIds.length ) {
+			this.hoveredFeatureIds = [];
+			return;
+		}
+
+		this.hoveredFeatureIds.forEach( ( featureId ) => {
+			map.setFeatureState(
+				{ source: STORIES_SOURCE_ID, id: featureId },
+				{ hover: false }
+			);
+		} );
+
+		this.hoveredFeatureIds = [];
+	}
+
+	replaceHoveredFeatureState( featureIds = [] ) {
+		const nextFeatureIds = Array.from(
+			new Set( ( featureIds ?? [] ).filter( Boolean ) )
+		);
+		const sameFeatureIds =
+			nextFeatureIds.length === this.hoveredFeatureIds.length &&
+			nextFeatureIds.every(
+				( featureId, index ) => featureId === this.hoveredFeatureIds[ index ]
+			);
+
+		if ( sameFeatureIds ) {
+			return;
+		}
+
+		this.clearHoveredFeatureState();
+
+		const map = this.props.map;
+		const source = map?.getSource?.( STORIES_SOURCE_ID );
+
+		if ( ! source || ! nextFeatureIds.length ) {
+			return;
+		}
+
+		nextFeatureIds.forEach( ( featureId ) => {
+			map.setFeatureState(
+				{ source: STORIES_SOURCE_ID, id: featureId },
+				{ hover: true }
+			);
+		} );
+
+		this.hoveredFeatureIds = nextFeatureIds;
+	}
+
+	clearHoveredClusterState() {
+		const map = this.props.map;
+
+		if ( ! map?.getLayer?.( HOVERED_CLUSTER_LAYER_ID ) ) {
+			this.hoveredClusterIds = [];
+			return;
+		}
+
+		map.setFilter( HOVERED_CLUSTER_LAYER_ID, buildHoveredClusterFilter() );
+		this.hoveredClusterIds = [];
+	}
+
+	replaceHoveredClusterState( clusterIds = [] ) {
+		const nextClusterIds = normalizeClusterIds( clusterIds );
+		const map = this.props.map;
+		const sameClusterIds =
+			nextClusterIds.length === this.hoveredClusterIds.length &&
+			nextClusterIds.every(
+				( clusterId, index ) => clusterId === this.hoveredClusterIds[ index ]
+			);
+
+		if ( sameClusterIds ) {
+			return;
+		}
+
+		if ( ! map?.getLayer?.( HOVERED_CLUSTER_LAYER_ID ) ) {
+			this.hoveredClusterIds = nextClusterIds;
+			return;
+		}
+
+		if ( ! nextClusterIds.length ) {
+			map.setFilter( HOVERED_CLUSTER_LAYER_ID, buildHoveredClusterFilter() );
+			this.hoveredClusterIds = [];
+			return;
+		}
+
+		map.setFilter( HOVERED_CLUSTER_LAYER_ID, [
+			'all',
+			[ 'has', 'point_count' ],
+			[
+				'any',
+				...nextClusterIds.map( ( clusterId ) => [
+					'==',
+					[ 'get', 'cluster_id' ],
+					clusterId,
+				] ),
+			],
+		] );
+		this.hoveredClusterIds = nextClusterIds;
+	}
+
+	findStoryClusterIds( story ) {
+		const map = this.props.map;
+		const clusterSource = map?.getSource?.( STORIES_SOURCE_ID );
+
+		if ( ! clusterSource || ! map?.queryRenderedFeatures ) {
+			return Promise.resolve( [] );
+		}
+
+		const clusterFeatures = getClusterFeaturesInView( map );
+
+		if ( ! clusterFeatures.length ) {
+			return Promise.resolve( [] );
+		}
+
+		return Promise.all(
+			clusterFeatures.map( ( clusterFeature ) => {
+				const clusterId = Number.parseInt(
+					clusterFeature?.properties?.cluster_id,
+					10
+				);
+				const pointCount = Number.parseInt(
+					clusterFeature?.properties?.point_count,
+					10
+				);
+
+				if ( ! Number.isFinite( clusterId ) || ! Number.isFinite( pointCount ) ) {
+					return null;
+				}
+
+				return getClusterLeaves(
+					clusterSource,
+					clusterId,
+					pointCount,
+					0
+				).then( ( clusterFeaturesList ) => {
+					const hasStory = clusterFeaturesList.some(
+						( clusterStoryFeature ) =>
+							getHoveredStoryId( clusterStoryFeature ) === story.id
+					);
+
+					return hasStory ? clusterId : null;
+				} );
 			} )
-		});
+		).then( ( clusterIds ) => normalizeClusterIds( clusterIds.filter( Boolean ) ) );
+	}
+
+	syncHoveredStoryClusterState( story ) {
+		return this.findStoryClusterIds( story ).then( ( clusterIds ) => {
+			if ( this.listHoveredStoryId !== story.id ) {
+				return;
+			}
+
+			this.replaceHoveredClusterState( clusterIds );
+		} );
+	}
+
+	registerStoriesList( element ) {
+		this.storiesListRef = element;
+	}
+
+	registerStoryCard( storyId, element ) {
+		if ( ! element ) {
+			this.storyCardElements.delete( storyId );
+			return;
+		}
+
+		this.storyCardElements.set( storyId, element );
+	}
+
+	scrollStoryIntoView( storyId ) {
+		if ( ! storyId ) {
+			return;
+		}
+
+		const container =
+			this.storiesListRef?.closest?.( '.togable-panel' ) ?? this.storiesListRef;
+		const storyElement = this.storyCardElements.get( storyId );
+
+		if ( ! container || ! storyElement ) {
+			return;
+		}
+
+		const containerRect = container.getBoundingClientRect();
+		const storyRect = storyElement.getBoundingClientRect();
+		const elementTop =
+			storyRect.top - containerRect.top + container.scrollTop;
+		const elementBottom = elementTop + storyRect.height;
+		const viewportTop = container.scrollTop;
+		const viewportBottom = viewportTop + container.clientHeight;
+
+		if ( elementTop < viewportTop ) {
+			container.scrollTo( {
+				top: elementTop,
+				behavior: 'smooth',
+			} );
+			return;
+		}
+
+		if ( elementBottom > viewportBottom ) {
+			container.scrollTo( {
+				top: elementBottom - container.clientHeight,
+				behavior: 'smooth',
+			} );
+		}
 	}
 
 	buildPostsGeoJson( stories ) {
@@ -443,12 +801,17 @@ class Stories extends Component {
 
 	updateStories( params ) {
 		const map = this.props.map;
-		const prevQueryParams = this.props.queryParams;
+		const prevQueryParams = { ...this.props.queryParams };
 
 		if(params.clearDate) {
 			delete prevQueryParams.after;
 			delete prevQueryParams.before;
 			params.clearDate = false;
+		}
+
+		if ( params.clearTag ) {
+			delete prevQueryParams.tags;
+			delete params.clearTag;
 		}
 
 		params = {
@@ -469,11 +832,59 @@ class Stories extends Component {
 	}
 
 	storyHovered( story ) {
-		this.props.storyHovered( story );
+		const map = this.props.map;
+		const bounds = getStoryRelatedCoordinates( story );
+		const featureIds = getStoryFeatureIds( story );
+
+		if ( ! bounds.length ) {
+			return;
+		}
+
+		this.listHoveredStoryId = story.id;
+		this.setState( {
+			hoveredPostId: story.id,
+			hoveredClusterPostsId: [],
+		} );
+		this.replaceHoveredFeatureState( featureIds );
+		this.clearHoveredClusterState();
+
+		if ( bounds.length === 1 ) {
+			map.flyTo( {
+				center: {
+					lng: bounds[ 0 ][ 0 ],
+					lat: bounds[ 0 ][ 1 ],
+				},
+				zoom: 7,
+			} );
+		} else {
+			map.fitBounds( bounds, { padding: 100 } );
+		}
+
+		window.requestAnimationFrame( () => {
+			if ( this.listHoveredStoryId === story.id ) {
+				this.syncHoveredStoryClusterState( story );
+			}
+		} );
+
+		map.once( 'idle', () => {
+			if ( this.listHoveredStoryId === story.id ) {
+				this.syncHoveredStoryClusterState( story );
+			}
+		} );
 	}
 
 	storyUnhover( story ) {
-		this.props.storyUnhover( story );
+		if ( this.listHoveredStoryId !== story.id ) {
+			return;
+		}
+
+		this.listHoveredStoryId = null;
+		this.clearHoveredFeatureState();
+		this.clearHoveredClusterState();
+		this.setState( {
+			hoveredPostId: null,
+			hoveredClusterPostsId: [],
+		} );
 	}
 
 	dateRangePickerApply( ev, picker ) {
@@ -496,10 +907,19 @@ class Stories extends Component {
 	}
 
 	handleTagChange( value ) {
+		const tagId = Number.parseInt( value, 10 );
+		const hasValidTag = Number.isFinite( tagId ) && tagId > 0;
+
 		this.props.updateState( {
-			selectedTag: value,
+			selectedTag: hasValidTag ? tagId : -1,
 		} );
-		this.updateStories( { cumulative: false, tags: value, page: 1 } );
+
+		if ( ! hasValidTag ) {
+			this.updateStories( { cumulative: false, page: 1, clearTag: true } );
+			return;
+		}
+
+		this.updateStories( { cumulative: false, tags: tagId, page: 1 } );
 	}
 
 	render() {
@@ -595,10 +1015,20 @@ class Stories extends Component {
 					</div>
 				) }
 
-				<div className="stories">
+				<div className="stories" ref={ this.registerStoriesList }>
 					{ this.props.stories.map( ( story, index ) => {
 						return (
-							<Storie className={ (story.id === this.state.hoveredPostId || this.state.hoveredClusterPostsId.includes(story.id) ? 'active' : '') } story={ story } key={ index } map={ this.props.map } />
+							<Storie
+								cardRef={ ( element ) =>
+									this.registerStoryCard( story.id, element )
+								}
+								className={ (story.id === this.state.hoveredPostId || this.state.hoveredClusterPostsId.includes(story.id) ? 'active' : '') }
+								onHover={ () => this.storyHovered( story ) }
+								onUnhover={ () => this.storyUnhover( story ) }
+								story={ story }
+								key={ index }
+								map={ this.props.map }
+							/>
 						);
 					} ) }
 				</div>
@@ -612,52 +1042,6 @@ class Stories extends Component {
 export default Stories;
 
 class Storie extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.storyHovered = this.storyHovered.bind( this );
-		this.storyUnhover = this.storyUnhover.bind( this );
-	}
-
-	componentDidMount() {}
-
-	storyHovered() {
-		const map = this.props.map;
-		const story = this.props.story;
-		const bounds = getStoryRelatedCoordinates( story );
-
-		if ( ! bounds.length ) {
-			return;
-		}
-
-		if ( bounds.length === 1 ) {
-			map.flyTo( {
-				center: {
-					lng: bounds[ 0 ][ 0 ],
-					lat: bounds[ 0 ][ 1 ],
-				},
-				zoom: 7,
-			} );
-		} else {
-			map.fitBounds( bounds, { padding: 100 } );
-		}
-
-		map.setFeatureState(
-			{ source: 'storiesSource', id: story.id },
-			{ hover: true }
-		);
-	}
-
-	storyUnhover() {
-		const story = this.props.story;
-		const map = this.props.map;
-
-		map.setFeatureState(
-			{ source: 'storiesSource', id: story.id },
-			{ hover: false }
-		);
-	}
-
 	render() {
 		const story = this.props.story;
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -683,9 +1067,12 @@ class Storie extends Component {
 
 		return (
 			<a
+				ref={ this.props.cardRef }
 				href={ story.link }
 				target="_blank"
 				rel="noreferrer"
+				onMouseEnter={ this.props.onHover }
+				onMouseLeave={ this.props.onUnhover }
 				className={
 					'card' + ( ! story.queriedFeaturedImage ? ' no-thumb' : '' ) + (this.props.className.length? (' ' + this.props.className) : '')
 				}
@@ -706,8 +1093,7 @@ class Storie extends Component {
 
 					<div className="date">{ storyDate }</div>
 					<div>
-						<small onMouseEnter={ this.storyHovered }
-							onMouseLeave={ this.storyUnhover }>{ __( 'View in map', 'jeo' ) }</small>
+						<small className="view-in-map">{ __( 'View in map', 'jeo' ) }</small>
 					</div>
 				</div>
 			</a>
