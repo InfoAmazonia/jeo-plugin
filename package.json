@@ -1,6 +1,6 @@
 {
 	"name": "jeo",
-	"version": "1.0.0",
+	"version": "3.0.0-rc.3",
 	"description": "Jeo plugin",
 	"main": "index.js",
 	"directories": {
@@ -13,6 +13,7 @@
 	"scripts": {
 		"check:env": "node scripts/check-node-version.mjs",
 		"preinstall": "node scripts/check-node-version.mjs",
+		"sync:version": "node scripts/sync-plugin-version.mjs",
 		"start": "wp-scripts start",
 		"build": "wp-scripts build",
 		"build:report": "node scripts/report-bundle-sizes.mjs",
@@ -25,12 +26,16 @@
 		"type": "git",
 		"url": "git+https://github.com/InfoAmazonia/jeo-plugin.git"
 	},
-	"author": "",
+	"author": {
+		"name": "InfoAmazonia",
+		"email": "contact@infoamazonia.org",
+		"url": "https://www.jeowp.org/"
+	},
 	"license": "ISC",
 	"bugs": {
 		"url": "https://github.com/InfoAmazonia/jeo-plugin/issues"
 	},
-	"homepage": "https://github.com/InfoAmazonia/jeo-plugin#readme",
+	"homepage": "https://www.jeowp.org/",
 	"overrides": {
 		"react-autosize-textarea": "file:npm-overrides/react-autosize-textarea",
 		"js-yaml": "^4.1.1",

@@ -104,16 +104,21 @@ rsync --archive --progress --human-readable --delete ./src/ /path/to/wordpress/w
 WordPress.org releases are built from `src/`, not from the repository root.
 The deploy workflow also publishes assets from `.wordpress-org/`.
 
-Before creating a release tag, keep these files aligned:
+Prerelease branches may carry a SemVer prerelease such as `3.0.0-rc.3` while
+WordPress.org stays on the latest stable release. Before creating a stable
+release tag, run `npm run sync:version` and keep these files aligned:
 
 - `src/jeo.php`
 - `src/readme.txt`
+- `package.json`
+- `package-lock.json`
 - `.wordpress-org/`
 
 The deploy workflow now validates that:
 
 - the plugin version in `src/jeo.php` matches `JEO_VERSION`
-- the `Stable tag` in `src/readme.txt` matches the plugin version
+- `package.json` and the root package entry in `package-lock.json` match the plugin version
+- the `Stable tag` in `src/readme.txt` matches the plugin version for the tagged stable release
 - the release tag is a stable `x.y.z` version
 
 Pre-release tags such as `-rc` are intentionally blocked from the WordPress.org deploy pipeline.
