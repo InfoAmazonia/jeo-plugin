@@ -5,7 +5,7 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       leo.com
+ * @link       https://www.jeowp.org/
  * @since      1.0.0
  *
  * @package    Jeo
@@ -24,7 +24,7 @@
  * @since      1.0.0
  * @package    Jeo
  * @subpackage Jeo/includes
- * @author     Leo <leo@Leo.leo>
+ * @author     InfoAmazonia <contact@infoamazonia.org>
  */
 class Jeo {
 

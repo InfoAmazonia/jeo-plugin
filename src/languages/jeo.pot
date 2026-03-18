@@ -2,7 +2,7 @@
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
-"Project-Id-Version: JEO WP 2.15.2\n"
+"Project-Id-Version: JEO 3.0.0-rc.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowp\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: jeo.php
-msgid "JEO WP"
+msgid "JEO"
 msgstr ""
 
 #. Description of the plugin
