@@ -1,8 +1,8 @@
 # Copyright (C) 2021
-# This file is distributed under the same license as the JEO WP plugin.
+# This file is distributed under the same license as the JEO plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: JEO WP 1.2.1\n"
+"Project-Id-Version: JEO 3.0.0-rc.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowp\n"
 "POT-Creation-Date: 2025-09-04T19:08:18+00:00\n"
 "PO-Revision-Date: 2025-09-04 16:20-0300\n"
@@ -19,8 +19,8 @@ msgstr ""
 
 #. Plugin Name of the plugin
 #: jeo.php
-msgid "JEO WP"
-msgstr "JEO WP"
+msgid "JEO"
+msgstr "JEO"
 
 #. Description of the plugin
 #: jeo.php
