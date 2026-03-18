@@ -1,0 +1,31 @@
+name: PHPCS / WPCS
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  phpcs-wpcs:
+    name: PHPCS with WPCS
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Show PHP version
+        run: php -v
+
+      - name: Validate composer.json
+        run: composer validate --no-check-publish
+
+      - name: Install PHP dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
+
+      - name: Run PHPCS with WordPress Coding Standards
+        run: vendor/bin/phpcs --standard=phpcs.xml.dist
