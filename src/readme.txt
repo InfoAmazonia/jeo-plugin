@@ -43,7 +43,7 @@ Compatibility snapshot validated on March 17, 2026:
 
 1. Upload `jeo.php` to the `/wp-content/plugins/` directory;
 2. Activate the plugin through the 'Plugins' menu in WordPress;
-3. Select Jeo on the admin menu.
+3. Select JEO on the admin menu.
 
 There, you can configure:
 * The map rendering library (either MapboxGL or MapLibreGL);
@@ -708,7 +708,7 @@ A Geocoder is a service that finds geographical coordinates from a search by add
 
 JEO needs a geocoder service in a few situations, such as when users indicate to where on a map a story (posts) is related.
 
-JEO comes with two native geocoder services users can choose from: Nominatim and Google. But new services can easily be added by plugins. This page documents how to do this.
+JEO ships with Nominatim as its native geocoder. Additional geocoders can be added by plugins through the `jeo_register_geocoders` hook. This page documents how to do this.
 
 ## Registering a Geocoder
 
