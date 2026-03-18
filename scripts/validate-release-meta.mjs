@@ -5,6 +5,8 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve( path.dirname( fileURLToPath( import.meta.url ) ), '..' );
 const PLUGIN_FILE = path.join( ROOT, 'src', 'jeo.php' );
 const README_FILE = path.join( ROOT, 'src', 'readme.txt' );
+const PACKAGE_JSON_FILE = path.join( ROOT, 'package.json' );
+const PACKAGE_LOCK_FILE = path.join( ROOT, 'package-lock.json' );
 
 function fail( message ) {
 	console.error( `Release metadata validation failed: ${ message }` );
@@ -26,6 +28,8 @@ function isStableVersion( value ) {
 
 const pluginContents = fs.readFileSync( PLUGIN_FILE, 'utf8' );
 const readmeContents = fs.readFileSync( README_FILE, 'utf8' );
+const packageJson = JSON.parse( fs.readFileSync( PACKAGE_JSON_FILE, 'utf8' ) );
+const packageLock = JSON.parse( fs.readFileSync( PACKAGE_LOCK_FILE, 'utf8' ) );
 
 const headerVersion = extract( pluginContents, /^\s*\*\s+Version:\s+(.+)$/m, 'plugin header version' );
 const constantVersion = extract(
@@ -44,6 +48,20 @@ if ( headerVersion !== constantVersion ) {
 if ( readmeVersionMatch && readmeVersionMatch[ 1 ].trim() !== headerVersion ) {
 	fail(
 		`src/readme.txt version (${ readmeVersionMatch[ 1 ].trim() }) does not match src/jeo.php version (${ headerVersion }).`
+	);
+}
+
+if ( packageJson.version !== headerVersion ) {
+	fail( `package.json version (${ packageJson.version }) does not match src/jeo.php version (${ headerVersion }).` );
+}
+
+if ( packageLock.version !== headerVersion ) {
+	fail( `package-lock.json version (${ packageLock.version }) does not match src/jeo.php version (${ headerVersion }).` );
+}
+
+if ( packageLock.packages?.['']?.version !== headerVersion ) {
+	fail(
+		`package-lock.json root package version (${ packageLock.packages?.['']?.version }) does not match src/jeo.php version (${ headerVersion }).`
 	);
 }
 
