@@ -14,14 +14,7 @@ export default function JeoGeoAutoComplete( {
 } ) {
 	const [ suggestions, setSuggestions ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( false );
-	const [ selectedValue, setSelectedValue ] = useState( null );
 	const latestRequestRef = useRef( 0 );
-
-	useEffect( () => {
-		if ( ! value || value !== selectedValue ) {
-			setSelectedValue( null );
-		}
-	}, [ selectedValue, value ] );
 
 	const debouncedLoadSuggestions = useMemo( () => {
 			return debounce( ( nextValue ) => {
@@ -66,20 +59,21 @@ export default function JeoGeoAutoComplete( {
 		};
 	}, [ debouncedLoadSuggestions ] );
 
+	const currentValue = value || '';
+
 	return (
 		<AsyncComboboxControl
 			className={ className }
 			items={ suggestions }
-			inputValue={ value }
-			selectedValue={ selectedValue }
+			inputValue={ currentValue }
+			selectedValue={ currentValue || null }
 			isLoading={ isLoading }
 			placeholder={ __( 'Search address', 'jeo' ) }
 			ariaLabel={ __( 'Search address', 'jeo' ) }
 			getOptionLabel={ ( suggestion ) => suggestion.full_address }
 			getOptionValue={ ( suggestion ) => suggestion.full_address }
 			onInputValueChange={ ( nextValue ) => {
-				setSelectedValue( null );
-				onChange( nextValue );
+				onChange?.( nextValue );
 
 				if ( nextValue.trim().length <= 2 ) {
 					debouncedLoadSuggestions.cancel();
@@ -91,9 +85,12 @@ export default function JeoGeoAutoComplete( {
 				debouncedLoadSuggestions( nextValue );
 			} }
 			onOptionSelect={ ( suggestion ) => {
-				setSelectedValue( suggestion.full_address );
-				onChange( suggestion.full_address );
-				onSelect( suggestion );
+				if ( ! suggestion ) {
+					return;
+				}
+
+				onChange?.( suggestion.full_address );
+				onSelect?.( suggestion );
 			} }
 			renderItem={ ( suggestion ) => (
 				<div className="jeo-geo-autocomplete">{ suggestion.full_address }</div>
