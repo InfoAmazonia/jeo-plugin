@@ -3,6 +3,65 @@ import MapboxGL from 'mapbox-gl'
 
 import 'mapbox-gl/dist/mapbox-gl.css'
 
+const MAPBOX_CSS_WARNING =
+	'This page appears to be missing CSS declarations for Mapbox GL JS, which may cause the map to display incorrectly. Please ensure your page includes mapbox-gl.css, as described in https://www.mapbox.com/mapbox-gl-js/api/.'
+
+function hasMapboxRuntimeStyles( targetDocument ) {
+	return Boolean(
+		targetDocument?.querySelector(
+			'link[href*="mapboxglLoader.css"], link[href*="mapboxglReact.css"], link[href*="vendors-node_modules_mapbox-gl"], style[data-jeo-mapbox-runtime], style[data-jeo-mapbox-canary]'
+		)
+	);
+}
+
+function copyMapboxRuntimeStyles( sourceDocument, targetDocument ) {
+	if (
+		! sourceDocument ||
+		! targetDocument ||
+		sourceDocument === targetDocument ||
+		hasMapboxRuntimeStyles( targetDocument )
+	) {
+		return;
+	}
+
+	const runtimeStyles = Array.from(
+		sourceDocument.querySelectorAll( 'link[rel="stylesheet"], style' )
+	).filter( ( node ) => {
+		if ( node.tagName === 'STYLE' ) {
+			return node.textContent?.includes( '.mapboxgl-canary' );
+		}
+
+		const href = node.getAttribute( 'href' ) || '';
+		return (
+			href.includes( 'mapboxglLoader.css' ) ||
+			href.includes( 'mapboxglReact.css' ) ||
+			href.includes( 'vendors-node_modules_mapbox-gl' )
+		);
+	} );
+
+	runtimeStyles.forEach( ( node ) => {
+		const clone = node.cloneNode( true );
+		if ( clone.tagName === 'STYLE' ) {
+			clone.setAttribute( 'data-jeo-mapbox-runtime', 'true' );
+		}
+		targetDocument.head.appendChild( clone );
+	} );
+}
+
+function ensureMapboxCanaryStyle( targetDocument ) {
+	if (
+		! targetDocument ||
+		targetDocument.querySelector( 'style[data-jeo-mapbox-canary]' )
+	) {
+		return;
+	}
+
+	const styleNode = targetDocument.createElement( 'style' );
+	styleNode.setAttribute( 'data-jeo-mapbox-canary', 'true' );
+	styleNode.textContent = '.mapboxgl-canary{background-color:salmon!important;}';
+	targetDocument.head.appendChild( styleNode );
+}
+
 // Fix: Patch HTMLElement's instanceof check for cross-document (iframe) compatibility.
 // In WordPress Block API v3, blocks run inside an iframe. MapboxGL checks
 // `container instanceof HTMLElement` which fails when the container element
@@ -33,6 +92,36 @@ try {
 } catch ( e ) {
 	// Symbol.hasInstance may not be configurable in some environments
 }
+
+// Fix: Patch the missing-CSS detection for cross-document (iframe)
+// compatibility. In the block editor the React tree can run in the parent
+// document while rendering the map container inside the iframe document, so
+// Mapbox's default `window.getComputedStyle(...)` check can inspect the wrong
+// document and emit a false-positive warning. We also copy the runtime styles
+// into the owner document when needed so the iframe preview has the same CSS.
+( function patchMissingCSSDetection() {
+	const proto = MapboxGL.Map?.prototype;
+	if ( ! proto ) return;
+
+	proto._detectMissingCSS = function () {
+		const ownerDocument =
+			this._missingCSSCanary?.ownerDocument ||
+			this._container?.ownerDocument ||
+			document;
+		const ownerWindow = ownerDocument?.defaultView || window;
+
+		copyMapboxRuntimeStyles( document, ownerDocument );
+		ensureMapboxCanaryStyle( ownerDocument );
+
+		const computedColor = ownerWindow
+			.getComputedStyle( this._missingCSSCanary )
+			.getPropertyValue( 'background-color' );
+
+		if ( computedColor !== 'rgb(250, 128, 114)' ) {
+			console.warn( MAPBOX_CSS_WARNING );
+		}
+	};
+} )();
 
 // Fix: Patch FullscreenControl for cross-document (iframe) compatibility.
 // Same issue as MapLibreGL: the control uses `document` (parent window) for
