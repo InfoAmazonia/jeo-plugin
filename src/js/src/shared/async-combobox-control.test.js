@@ -1,4 +1,7 @@
-import { buildAsyncComboboxOptions } from './async-combobox-control';
+import {
+	buildAsyncComboboxOptions,
+	shouldIgnoreInitialEmptyInputValue,
+} from './async-combobox-control';
 
 describe( 'buildAsyncComboboxOptions', () => {
 	const baseOptions = [
@@ -60,5 +63,27 @@ describe( 'buildAsyncComboboxOptions', () => {
 			{ item: baseOptions[ 0 ], label: 'Map One', value: '10' },
 			{ item: baseOptions[ 1 ], label: 'Map Two', value: '11' },
 		] );
+	} );
+} );
+
+describe( 'shouldIgnoreInitialEmptyInputValue', () => {
+	it( 'ignores the initial empty focus reset when a committed value exists', () => {
+		expect(
+			shouldIgnoreInitialEmptyInputValue( {
+				nextValue: '',
+				currentValue: 'Av. Paulista, Sao Paulo',
+				shouldIgnoreNextEmpty: true,
+			} )
+		).toBe( true );
+	} );
+
+	it( 'does not ignore later empty values when there is no committed value', () => {
+		expect(
+			shouldIgnoreInitialEmptyInputValue( {
+				nextValue: '',
+				currentValue: '',
+				shouldIgnoreNextEmpty: true,
+			} )
+		).toBe( false );
 	} );
 } );
