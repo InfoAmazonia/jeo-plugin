@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-03-17T20:36:23.269Z",
+  "generatedAt": "2026-03-18T03:38:19Z",
   "baseline": {
     "wordpress": "6.6+",
     "php": "8.0+",
@@ -19,11 +19,11 @@
       "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
       "The report now captures a frontend runtime snapshot with the resolved React, ReactDOM and Gutenberg editor package versions plus their published peer ranges.",
       "The installed tree now resolves a local react-autosize-textarea override so the stale upstream peer metadata no longer raises npm peer warnings against React 18.3.1.",
-      "Previous stabilization track: the dependency-major batches are complete apart from the still-blocked react-leaflet 5 and PHPCS 4 paths, both waiting on upstream support.",
+      "Previous stabilization track: the dependency-major batches are complete apart from the external monitoring paths for react-leaflet 5 and PHPCS 4, both still waiting on upstream support.",
       "Current plugin sanity track: Node 24 is now the supported frontend runtime for local development, CI and release validation.",
-      "Current plugin sanity track: the implemented work now covers audit cleanup, incremental frontend loading, bundle budgets, runtime hardening, and pipeline alignment; these batches are ready for manual validation before commit.",
-      "Known baseline outside the current sanity batches: Discovery story markers and the related View in map hover focus can still fail to render or navigate correctly; this remains queued for a dedicated future fix.",
-      "Current plugin sanity track: a final override-governance batch remains pending so every local npm override is periodically re-justified or removed after major frontend toolchain refreshes."
+      "Current plugin sanity track: the implemented work now covers audit cleanup, incremental frontend loading, bundle budgets, runtime hardening, pipeline alignment and the editor, Discovery and geocoding follow-ups validated in this branch.",
+      "Current plugin sanity track: the override-governance batch is complete, so every local npm override now has a documented reason, review trigger and removal criterion.",
+      "Current plugin sanity track: the remaining open items are external monitoring only: react-leaflet 5 against the current React line, PHPCS 4 against upstream WPCS support, and third-party wp-cli PHP 8.5 deprecation noise."
     ],
     "toolingCaveats": [
       "Local Composer/PHP validation is available in this shell environment (Composer version 2.9.5 2026-01-29 11:40:53; PHP 8.5.4 (cli) (built: Mar 10 2026 23:15:23) (NTS)).",
@@ -336,7 +336,7 @@
       "approvalNotes": [
         "eta moved from 3.5.0 to 4.5.1 and now uses the browser-safe eta/core entry inside the frontend helper.",
         "A local jest.config.js now tells the unit runner to transform eta/dist/core.js so the existing template-compiler tests stay representative.",
-        "Manual review confirmed the Info panel and popup template rendering stayed functional. The null-related-post geocode crash in buildPostsGeoJson and the inability to individualize multiple posts that share the same map point are now planned fixes in Batch 1."
+        "Manual review confirmed the Info panel and popup template rendering stayed functional, and the later same-point plus null-geocode popup fixes are now closed in Batch 1."
       ],
       "manualReviewItems": [
         "Open a map popup and verify the title, date and featured image rendering.",
@@ -348,8 +348,8 @@
       "id": "phase-6-react-leaflet-major",
       "phase": "Phase 6",
       "title": "Leaflet sidebar major",
-      "status": "blocked",
-      "scope": "Upgrade the post geocoding sidebar map and keep editing interactions intact.",
+      "status": "monitoring",
+      "scope": "Upgrade the post geocoding sidebar map and keep editing interactions intact once the upstream React line is compatible.",
       "packageNames": [
         "react-leaflet"
       ],
@@ -359,12 +359,11 @@
       ],
       "approvalNotes": [
         "react-leaflet 5.0.0 is the current published major, but it now declares peerDependencies on react and react-dom ^19.0.0.",
-        "This repository currently resolves react 18.3.1 and react-dom 18.3.1 through the existing Gutenberg stack, so npm rejects the major upgrade before runtime checks can begin."
+        "This repository currently resolves react 18.3.1 and react-dom 18.3.1 through the existing Gutenberg stack, so npm rejects the major upgrade before runtime checks can begin.",
+        "Treat this path as external upstream monitoring, not as an immediate repository-owned bugfix batch."
       ],
       "manualReviewItems": [
-        "Add a point and confirm it appears in the Leaflet map.",
-        "Edit an existing point and confirm map focus plus field values update.",
-        "Drag a marker, toggle magnetic markers, cancel, save and reopen the editor."
+        "No dedicated product review while the upstream React 19 path stays unavailable; keep add, edit, drag, cancel, save and reopen coverage for the supported react-leaflet 4 flow in the core smoke checklist."
       ]
     },
     {
@@ -386,7 +385,7 @@
       "approvalNotes": [
         "@ckeditor/ckeditor5-react moved from 9.5.0 to 11.0.1 without requiring source changes in the storymap editor.",
         "The published wrapper's peer requirements remain compatible with the installed ckeditor5 47.6.1 line and with React 18.3.1.",
-        "Manual review confirmed editor loading, formatting and save/reopen flows stayed functional. The existing slide reorder problem is now tracked as a planned fix in Batch 1 and, if needed, Batch 3."
+        "Manual review confirmed editor loading, formatting and save/reopen flows stayed functional, and the later slide-order fixes are now closed in Batch 1 and Batch 3."
       ],
       "manualReviewItems": [
         "Load the storymap editor and confirm the toolbar initializes.",
@@ -398,8 +397,8 @@
       "id": "phase-8-phpcs-major-evaluation",
       "phase": "Phase 8",
       "title": "PHPCS major evaluation",
-      "status": "blocked",
-      "scope": "Evaluate PHPCS 4 only if WPCS 3.3.0 and the local Composer/PHP toolchain support it.",
+      "status": "monitoring",
+      "scope": "Evaluate PHPCS 4 only after upstream WPCS support makes the major viable.",
       "packageNames": [
         "squizlabs/php_codesniffer"
       ],
@@ -412,7 +411,7 @@
       ],
       "approvalNotes": [
         "Packagist confirms that squizlabs/php_codesniffer 4.0.1 exists, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
-        "The current PHPCS 3.x toolchain also reports a large existing baseline of coding-standard violations, so the repository is not yet ready to treat a PHPCS 4 jump as a clean upgrade."
+        "The PHPCS 3.x baseline is now clean in this repository, so the remaining PHPCS 4 path is external upstream monitoring rather than a pending product fix."
       ],
       "manualReviewItems": []
     },
@@ -549,7 +548,7 @@
       "id": "batch-5-react-leaflet-major",
       "phase": "Batch 5",
       "title": "react-leaflet major",
-      "status": "blocked",
+      "status": "monitoring",
       "scope": "Upgrade react-leaflet to 5.x after a React-19-compatible Gutenberg stack exists and validate the entire geocoding sidebar map flow.",
       "packageNames": [
         "react-leaflet"
@@ -562,11 +561,12 @@
         "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
       ],
       "manualReviewItems": [
-        "Verify add, edit, drag, cancel, save and reopen flows in the geocoding sidebar map."
+        "No dedicated product review while the upstream React 19 path stays unavailable; keep add, edit, drag, cancel, save and reopen coverage for the supported react-leaflet 4 flow in the core smoke checklist."
       ],
       "approvalNotes": [
         "The latest published Gutenberg editor packages still peer on react and react-dom ^18.0.0, while react-leaflet 5.0.0 requires react and react-dom ^19.0.0.",
-        "Do not start this batch until upstream publishes a supported React-19-compatible editor stack or the repository adopts another supported route."
+        "Do not start this batch until upstream publishes a supported React-19-compatible editor stack or the repository adopts another supported route.",
+        "Treat this path as external upstream monitoring, not as an immediate repository-owned bugfix batch."
       ]
     },
     {
@@ -588,7 +588,7 @@
       "approvalNotes": [
         "Static compatibility checks are green on PHP 8.0 through 8.5, and local WordPress smoke passes on both PHP 8.4 and PHP 8.5.",
         "WordPress core 6.9 treats PHP 8.5 as beta support, while stable wp-cli support for PHP 8.5 is still planned upstream.",
-        "Keep PHP 8.5 experimental in CI for now because wp-cli still emits third-party deprecation noise under that runtime even though repository-owned checks are clean."
+        "Keep PHP 8.5 experimental in CI for now and track the remaining wp-cli deprecation noise as third-party monitoring only because repository-owned checks are clean."
       ]
     },
     {
@@ -611,7 +611,7 @@
         "The PHPCS 3.x baseline is now green after autofixes plus manual cleanup across runtime PHP, templates and tooling scripts.",
         "The runtime-touching PHP cleanup also passed local WordPress smoke, so the lint cleanup did not introduce regressions in embeds, maps or story maps.",
         "Official WPCS metadata and the 3.3.0 release notes still require PHP_CodeSniffer 3.13.4, while older WPCS 2.3.0 notes only mention preliminary CI testing against the PHPCS 4 development branch.",
-        "Re-evaluate PHPCS 4 only after the installed WPCS line officially supports that major."
+        "PHPCS 4 now remains an external upstream monitoring path until the installed WPCS line officially supports that major."
       ]
     },
     {
@@ -679,7 +679,7 @@
       "approvalNotes": [
         "Published maps and embeds keep completeness by exact selected IDs; pagination is used only for large libraries and list views.",
         "This batch targets the memory-risk patterns that previously depended on per_page -1, nopaging true or oversized taxonomy fetches.",
-        "Manual validation closed the batch after fixing the map-editor reload regression and the Discovery lazy-load crashes; a separate pre-existing Discovery issue still prevents some story points and View in map focus interactions from working reliably."
+        "Manual validation closed the batch after fixing the map-editor reload regression, the Discovery lazy-load crashes, and the later Discovery marker plus View in map follow-up that had been tracked separately at the time."
       ]
     },
     {
@@ -743,7 +743,7 @@
       "approvalNotes": [
         "This batch is about safety and failure handling, not feature changes.",
         "The old REST tag collection broadening was removed so large term collections no longer bypass normal limits.",
-        "Manual validation closed the batch while recording a separate pre-existing baseline issue: after selecting an address, dragging the geocoding marker to redefine the location still does not work reliably even though the editor hint says that it should."
+        "The draggable-marker reliability issue that was noted after this batch has now been fixed in the current branch."
       ]
     },
     {
@@ -1100,8 +1100,7 @@
         "docs/dev/dependency-upgrade-report.md"
       ],
       "manualReviewNotes": [
-        "The storymap editor, toolbar, formatting behavior and save/reopen flow remained functional after the wrapper major update.",
-        "The slide reorder problem still reproduces, but it is now tracked as a planned fix in Batch 1 and, if needed, Batch 3 rather than as a Phase 7 regression."
+        "The storymap editor, toolbar, formatting behavior and save/reopen flow remained functional after the wrapper major update, and the later slide-order fixes are now closed in Batch 1 and Batch 3."
       ]
     },
     {
@@ -1588,7 +1587,7 @@
       "date": "2026-03-17",
       "batchId": "sanity-batch-2-incremental-loading",
       "status": "completed",
-      "summary": "Replaced unbounded collection loading with chunked hydration by selected IDs, paginated layer libraries, async taxonomy lookup and lazy Discovery map hydration without dropping already-selected data. Manual validation then fixed the map-editor reload regression and the Discovery lazy-load crashes, while recording a separate pre-existing Discovery story-point issue for future work.",
+      "summary": "Replaced unbounded collection loading with chunked hydration by selected IDs, paginated layer libraries, async taxonomy lookup and lazy Discovery map hydration without dropping already-selected data. Manual validation then fixed the map-editor reload regression, the Discovery lazy-load crashes, and the later Discovery marker plus View in map follow-up that had been tracked separately at the time.",
       "automatedChecks": [
         {
           "name": "npm run test:unit",
@@ -1713,7 +1712,7 @@
       "date": "2026-03-17",
       "batchId": "sanity-batch-5-runtime-hardening",
       "status": "completed",
-      "summary": "Hardened geocoding and adjacent runtime request paths with nonce and capability checks, safer remote-request settings, cleaner JSON responses and more defensive client-side handling, while recording the long-standing draggable-marker issue as baseline follow-up work.",
+      "summary": "Hardened geocoding and adjacent runtime request paths with nonce and capability checks, safer remote-request settings, cleaner JSON responses and more defensive client-side handling; the later draggable-marker reliability and accented-search fixes are now closed in the current branch.",
       "automatedChecks": [
         {
           "name": "php scripts/check-php-compat.php",
@@ -2761,13 +2760,13 @@
         "maintenance": "Maintained",
         "minorPath": "Already on the latest compatible line",
         "majorPath": "Review upgrade path to 5.0.0",
-        "decision": "Hold for the major batch",
+        "decision": "Monitor upstream blocker",
         "batchId": "batch-5-react-leaflet-major",
-        "batchLabel": "Batch 5",
-        "executionStatus": "blocked",
-        "executionStatusLabel": "Blocked",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
         "executionNotes": [
-          "Batch 5 remains blocked after Batch 4 because react-leaflet 5.0.0 requires react and react-dom ^19.0.0.",
+          "Track this as external upstream monitoring because react-leaflet 5.0.0 requires react and react-dom ^19.0.0.",
           "The latest published Gutenberg editor packages in this repository still peer on react and react-dom ^18.0.0, so the upgrade cannot start yet without leaving the supported upstream path."
         ],
         "evidence": [
@@ -3228,15 +3227,15 @@
         "maintenance": "Maintained",
         "minorPath": "Already on the latest compatible line",
         "majorPath": "Review upgrade path to 4.0.1",
-        "decision": "Hold for the major batch",
+        "decision": "Monitor upstream blocker",
         "batchId": "batch-7-php-lint-stack",
-        "batchLabel": "Batch 7",
-        "executionStatus": "blocked",
-        "executionStatusLabel": "Blocked",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
         "executionNotes": [
           "Packagist publishes PHPCS 4.0.1, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
           "The WPCS 3.3.0 release notes still describe PHPCS 3.13.4 as the required line; the only published PHPCS 4 mention in WPCS releases is an older 2.3.0 note about preliminary CI testing against the PHPCS 4 development branch.",
-          "Batch 7 has now cleaned the PHPCS 3.x baseline, so the remaining blocker is purely upstream WPCS support for PHPCS 4."
+          "The repository PHPCS 3.x baseline is now clean, so the remaining blocker is purely upstream WPCS support for PHPCS 4."
         ],
         "evidence": [
           {
