@@ -60,6 +60,7 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_block_iframe_assets' ) );
 		add_action( 'init', array( $this, 'restrict_story_map_block_count' ) );
 
 		add_action( 'init', array( $this, 'register_assets' ) );
@@ -276,12 +277,19 @@ class Jeo {
 			true,
 		);
 
+		wp_register_style(
+			'mapgl-react-style',
+			JEO_BASEURL . "/js/build/{$mapgl_react}.css",
+			array( 'mapgl' ),
+			JEO_VERSION,
+		);
+
 		$map_blocks_assets = include JEO_BASEPATH . '/js/build/mapBlocks.asset.php';
 
 		wp_register_style(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
-			array( 'mapgl' ),
+			array( 'mapgl', 'mapgl-react-style' ),
 			JEO_VERSION,
 		);
 		wp_register_script(
@@ -572,6 +580,25 @@ class Jeo {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
 		}
+	}
+
+	/**
+	 * Enqueue shared map runtime styles inside the block-editor iframe.
+	 *
+	 * Block API v3 renders content in an iframe, and runtime styles enqueued for
+	 * the parent admin document do not automatically follow there. The map editor
+	 * previews need the runtime stylesheet in the iframe document as well so
+	 * Mapbox can resolve its required CSS declarations.
+	 *
+	 * @return void
+	 */
+	public function enqueue_block_iframe_assets() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		wp_enqueue_style( 'mapgl' );
+		wp_enqueue_style( 'mapgl-react-style' );
 	}
 
 	/**
