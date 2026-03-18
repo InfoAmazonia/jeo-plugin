@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/dev/dependency-upgrade-smoke-tests/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Dependency upgrade smoke tests - JEO</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Dependency upgrade smoke tests";
+        var mkdocs_page_input_path = "dev/dependency-upgrade-smoke-tests.md";
+        var mkdocs_page_url = "/dev/dependency-upgrade-smoke-tests/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Dependency upgrade smoke tests</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#approval-package">Approval package</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#preconditions">Preconditions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#automated-checks-by-batch">Automated checks by batch</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#manual-review-by-batch">Manual review by batch</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#core-functional-checklist">Core functional checklist</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#notes-by-batch-type">Notes by batch type</a>
+    </li>
+    </ul>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer</li>
+      <li class="breadcrumb-item active">Dependency upgrade smoke tests</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/dev/dependency-upgrade-smoke-tests.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="dependency-upgrade-smoke-tests">Dependency Upgrade Smoke Tests</h1>
+<p>Use this checklist for both the completed stabilization track and the current plugin sanity track. The dependency report keeps both rounds documented; approvals should follow the batch sequence that matches the active round.</p>
+<h2 id="approval-package">Approval package</h2>
+<ul>
+<li>Summarize the dependencies, lockfiles and source files touched by the batch.</li>
+<li>Update <code>docs/dev/dependency-upgrade-report.json</code>, <code>docs/dev/dependency-upgrade-report.md</code> and this checklist.</li>
+<li>Record automated check results in the report <code>executionLog</code>.</li>
+<li>List only the manual review items that apply to the current batch.</li>
+<li>Ask for approval before creating a commit.</li>
+</ul>
+<h2 id="preconditions">Preconditions</h2>
+<ul>
+<li>Use a WordPress instance that matches the current baseline: WordPress 6.6+, PHP 8.0+, Node 24 as the supported frontend runtime.</li>
+<li>At the start of every dependency review or planning batch that can touch editor or runtime behavior, regenerate the dependency report and record the resolved React, ReactDOM and Gutenberg editor package versions plus peer ranges from the frontend runtime snapshot.</li>
+<li>Test both editor and frontend behavior whenever a batch touches runtime code.</li>
+<li>Treat <code>.github/workflows/node-frontend.yml</code>, <code>.github/workflows/php-compat.yml</code> and <code>.github/workflows/wordpress-smoke.yml</code> as the mandatory CI gates.</li>
+<li>Run <code>npm run check:env</code> before local installs or frontend checks so unsupported Node versions fail early.</li>
+<li>When the local WordPress smoke runs from a clean worktree, make sure the ignored <code>src/js/build</code> assets have been generated first, or record the resulting asset-include warnings explicitly in the batch report.</li>
+<li>If the local WordPress smoke script cannot complete because the machine is missing the expected database or wp-cli runtime setup, record the failure details in the batch report and use the GitHub workflow as the authoritative runtime gate.</li>
+<li>Treat a blocked evaluation as a valid batch outcome only after recording the blocker, the evidence and the next step in the report.</li>
+</ul>
+<h2 id="automated-checks-by-batch">Automated checks by batch</h2>
+<ul>
+<li>Batch 0: run <code>composer validate --no-check-publish</code>, <code>php scripts/check-php-compat.php</code>, <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>, <code>node --check scripts/dependency-review.mjs</code> and <code>node scripts/dependency-review.mjs --write</code>.</li>
+<li>Batch 1: run <code>npm ci</code>, <code>npm run build</code>, <code>npm run test:unit</code>, <code>php scripts/check-php-compat.php</code> and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Batch 1: after <code>npm run build</code>, also run <code>npm run build:report</code> and <code>npm run audit:npm</code>.</li>
+<li>Batch 2: run <code>npm ci</code>, <code>npm run build</code>, <code>npm run test:unit</code>, <code>php scripts/check-php-compat.php</code> and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Batch 3: run <code>npm ci</code>, <code>npm run build</code>, <code>npm run test:unit</code>, <code>php scripts/check-php-compat.php</code> and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Batch 4: run <code>npm ci</code>, <code>npm run build</code>, <code>npm run test:unit</code>, <code>npm ls react-autosize-textarea react react-dom</code>, <code>php scripts/check-php-compat.php</code> and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Batch 5: do not start local execution until upstream Gutenberg and react-leaflet support a compatible React line; once that external blocker moves, run <code>npm ci</code>, <code>npm run build</code>, <code>npm run test:unit</code>, <code>php scripts/check-php-compat.php</code> and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Batch 6: run <code>composer validate --no-check-publish</code>, <code>php scripts/check-php-compat.php</code> with PHP <code>8.0</code> through <code>8.5</code>, the local WordPress smoke on PHP <code>8.4</code>, and the local WordPress smoke on PHP <code>8.5</code>, recording any third-party <code>wp-cli</code> deprecation noise separately from repository-owned warnings.</li>
+<li>Batch 7: run <code>composer validate --no-check-publish</code>, <code>php scripts/check-php-compat.php</code>, <code>vendor/bin/phpcs --standard=phpcs.xml.dist</code>, and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code> if runtime-touching PHP files changed.</li>
+<li>Sanity Batch 0: run <code>npm run check:env</code>, <code>npm ci</code>, <code>npm run build</code>, and <code>npm run build:report</code>.</li>
+<li>Sanity Batch 1: run <code>npm ci</code>, <code>npm audit --package-lock-only</code>, <code>npm audit --omit=dev</code>, and <code>composer audit --locked</code>.</li>
+<li>Sanity Batch 2: run <code>npm ci</code>, <code>npm run test:unit</code>, <code>npm run build</code>, <code>php scripts/check-php-compat.php</code>, and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Sanity Batch 3: run <code>npm run test:unit</code>, <code>npm run build</code>, and <code>npm run build:report</code>.</li>
+<li>Sanity Batch 4: run <code>npm run test:unit</code>, <code>npm run build</code>, and <code>php scripts/check-php-compat.php</code>.</li>
+<li>Sanity Batch 5: run <code>php scripts/check-php-compat.php</code>, <code>vendor/bin/phpcs --standard=phpcs.xml.dist</code>, and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Sanity Batch 6: run <code>npm ci</code>, <code>npm run test:unit</code>, <code>npm run build</code>, <code>npm run build:report</code>, <code>npm audit --package-lock-only</code>, <code>composer validate --no-check-publish</code>, <code>composer audit --locked</code>, <code>php scripts/check-php-compat.php</code>, <code>vendor/bin/phpcs --standard=phpcs.xml.dist</code>, and <code>WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh</code>.</li>
+<li>Sanity Batch 7: run <code>node scripts/dependency-review.mjs --write</code>, <code>npm audit --package-lock-only</code>, and <code>npm ls react-autosize-textarea react react-dom</code> while reviewing the active <code>overrides</code> inventory.</li>
+</ul>
+<h2 id="manual-review-by-batch">Manual review by batch</h2>
+<ul>
+<li>Batch 0: no product review is required.</li>
+<li>Batch 1: verify published-map popups, same-point post individualization, the absence of the null-geocode crash, and storymap slide plus nested layer reorder, including save and reopen after reordering.</li>
+<li>Batch 2: verify geocoding autosuggest suggestions and selection, post/map autosuggest insertion, Discovery date apply/clear behavior, and layer or attribution forms backed by schema data.</li>
+<li>Batch 3: verify selected map-layer ordering, storymap slide ordering and storymap layer toggling after removing the unsupported nested drag affordance.</li>
+<li>Batch 4: verify editor loading, save flows and console cleanliness in the map editor, layer editor, storymap editor and regular post editor after the local react-autosize-textarea override and lockfile refresh.</li>
+<li>Batch 5: no dedicated product review is required while the React 19 path stays externally blocked; keep add, edit, drag, cancel, save and reopen coverage for the supported react-leaflet 4 flow in the core functional checklist.</li>
+<li>Batch 6: verify the same product smoke already covered by the runtime batches, but execute it while watching specifically for repository-owned PHP 8.5 warnings or deprecations and track third-party <code>wp-cli</code> noise separately as external monitoring.</li>
+<li>Batch 7: no dedicated product review is required unless the PHPCS cleanup changes runtime PHP logic; otherwise review the lint delta, escaping or nonce-sensitive paths, and embed or template handlers in code review.</li>
+<li>Sanity Batch 0: no product review is required.</li>
+<li>Sanity Batch 1: no product review is required.</li>
+<li>Sanity Batch 2: verify exact selected-layer hydration, paginated layer search, Discovery map lazy loading and async taxonomy selection.</li>
+<li>Sanity Batch 3: verify the main editors, Discovery and published maps still load after the shared-chunk and bundle-budget changes.</li>
+<li>Sanity Batch 4: verify normal editor use stays console-clean after the cleanup.</li>
+<li>Sanity Batch 5: verify geocoding and public bootstrap flows that were hardened in PHP and JS.</li>
+<li>Sanity Batch 6: no dedicated product review is required beyond confirming the technical gates and documentation are aligned.</li>
+<li>Sanity Batch 7: no product review is required; confirm that each active override still has a documented reason, clear removal criteria, and no upstream replacement that would let us drop it.</li>
+</ul>
+<h2 id="core-functional-checklist">Core functional checklist</h2>
+<ol>
+<li>Build assets</li>
+<li>Expected result: the build finishes successfully and no new webpack or peer-dependency warnings are introduced.</li>
+<li>Create and edit a map</li>
+<li>Expected result: the Maps editor opens with the <code>Post</code> sidebar active, map settings persist, the preview updates, and no Mapbox runtime CSS warning appears in the editor console.</li>
+<li>View published maps with related posts</li>
+<li>Expected result: popups render, multiple posts at one point can be individually reached and null related points do not crash the map.</li>
+<li>Edit a storymap with CKEditor</li>
+<li>Expected result: storymap rich text editing works, images upload, the saved content reopens correctly, and the hidden/open Slides settings panels keep the same visual width.</li>
+<li>Reorder layers and storymap slides</li>
+<li>Expected result: every reorder UI works, with no dropped state, duplicated items or stale order.</li>
+<li>Edit layer and legend forms</li>
+<li>Expected result: schema-driven forms, legend controls and interaction settings render, validate and save correctly.</li>
+<li>Filter and share Discovery stories</li>
+<li>Expected result: applying and clearing date and tag filters updates the result set as expected, removing a selected tag restores the default result set, shared Discovery URLs restore active filters and selected layers, and <code>View in map</code> plus marker hover keep the correct Discovery card and point(s) in sync.</li>
+<li>Use geocoding autosuggest</li>
+<li>Expected result: suggestions load, selecting a result updates the field, accented place names such as <code>Sao Paulo</code> or <code>São Paulo</code> resolve normally, dragging the active marker redefines the location reliably, and no stale request errors appear.</li>
+<li>Render maps in Mapbox mode</li>
+<li>Expected result: frontend maps and editor previews render with layers, legends and interactions intact.</li>
+<li>Render maps in MapLibre mode</li>
+<li>Expected result: frontend maps and editor previews render with layers, legends and interactions intact.</li>
+</ol>
+<h2 id="notes-by-batch-type">Notes by batch type</h2>
+<ul>
+<li>Baseline-fix batch: prioritize reproducing the known bug first, then landing a focused fix plus a regression test.</li>
+<li>Replacement batch: preserve existing saved data contracts, validate that the removed package disappears from <code>npm ci</code> warnings, and spot-check the replacement wrapper at the exact editor/frontend entry points it now owns.</li>
+<li>Gutenberg or React batch: prioritize editor loading, save flows and peer-warning cleanup before attempting dependent runtime majors.</li>
+<li>Map or rendering batch: prioritize both runtime modes, previews, popups and layer interactions.</li>
+<li>PHP 8.5 batch: distinguish repository-owned deprecations from external <code>wp-cli</code> or toolchain noise.</li>
+<li>PHP lint stack batch: evaluate WPCS, PHPCS, PHPCSExtra and PHPCSUtils together instead of treating PHPCS as an isolated major.</li>
+<li>Override governance batch: treat <code>package.json</code> overrides as temporary maintenance decisions that must be revisited after major <code>@wordpress/scripts</code> or Gutenberg dependency refreshes.</li>
+<li>Plugin sanity track: use <code>Sanity Batch 0</code> through <code>Sanity Batch 7</code> for the post-upgrade stabilization work, and keep the earlier numbered batches as historical record of the prior dependency-major round.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../dependency-upgrade-report/" class="btn btn-neutral float-left" title="Dependency upgrade report"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../dependency-upgrade-report/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

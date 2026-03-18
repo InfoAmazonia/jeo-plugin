@@ -17,8 +17,11 @@ wp-content/upgrade/*
 wp-content/uploads/*
 wp-content/mu-plugins/*
 wp-content/languages/*
-mariadb_data/
 logs/
+
+dump.sql
+*.sql
+*.sql.gz
 
 .DS_Store
 Thumbs.db

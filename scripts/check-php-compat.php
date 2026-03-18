@@ -689,8 +689,7 @@ function parse_parameters( array $tokens, int $start, int $end ): array {
 function scan_readme_metadata( string $repository_root ): array {
 	$notes = array();
 	$files = array(
-		$repository_root . '/src/README.txt',
-		$repository_root . '/trunk/readme.txt',
+		$repository_root . '/src/readme.txt',
 	);
 
 	foreach ( $files as $file ) {

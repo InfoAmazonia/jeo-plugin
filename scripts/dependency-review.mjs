@@ -567,7 +567,7 @@ function searchUsage( item, override = {} ) {
 		override.searchRoots ||
 		( item.ecosystem === 'composer'
 			? [ 'composer.json', 'composer.lock', 'phpcs.xml.dist', '.github' ]
-			: [ 'src/js/src', 'src/includes', 'src/templates', 'webpack.config.js', 'package.json', '.github', 'src/README.txt' ] );
+			: [ 'src/js/src', 'src/includes', 'src/templates', 'webpack.config.js', 'package.json', '.github', 'src/readme.txt' ] );
 
 	for ( const term of searchTerms ) {
 		const search = spawnSync(

@@ -1,6 +1,34 @@
 site_name: JEO
+site_url: https://www.jeowp.org/
+repo_url: https://github.com/InfoAmazonia/jeo-plugin
+docs_dir: docs
+site_dir: site
+theme:
+  name: readthedocs
 nav:
-  - 'Home': index.md
-  - 'Home': index-plugin.md
-
-theme: readthedocs
+  - Home: index.md
+  - Plugin:
+      - Overview: index-plugin.md
+      - Concepts: concepts.md
+      - Getting started: getting-started.md
+      - Layers: layer-post.md
+      - Maps: map-post.md
+      - Discovery: discovery.md
+      - Story map: story-map.md
+      - Map shortcode: map-shortcode.md
+      - Map block: map-block.md
+      - One-time map block: one-time-map-block.md
+      - Map embed: map-embed.md
+      - Geolocating posts: geolocating-posts.md
+  - Developer:
+      - Geo information: dev/geo-information.md
+      - Geocoders: dev/geocoders.md
+      - Layer types: dev/layer-types.md
+      - Layer types API: dev/layer-types-api.md
+      - Migration: dev/migration.md
+      - PHP compatibility: dev/php-compatibility.md
+      - Dependency upgrade report: dev/dependency-upgrade-report.md
+      - Dependency upgrade smoke tests: dev/dependency-upgrade-smoke-tests.md
+exclude_docs: |
+  dev/dependency-upgrade-report.json
+  README.md
