@@ -63,14 +63,24 @@ class Geocode_Handler {
 			wp_send_json_error( array(), 403 );
 		}
 
-		$search   = filter_input( INPUT_GET, 'search', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$search   = '';
+		if ( isset( $_GET['search'] ) ) {
+			$search = sanitize_text_field( wp_unslash( $_GET['search'] ) );
+		}
 		$geocoder = $this->get_active_geocoder();
 
 		if ( ! $geocoder || empty( $search ) ) {
 			wp_send_json( array() );
 		}
 
-		wp_send_json( $geocoder->geocode( sanitize_text_field( $search ) ) );
+		$results         = $geocoder->geocode( $search );
+		$fallback_search = remove_accents( $search );
+
+		if ( empty( $results ) && $fallback_search !== $search ) {
+			$results = $geocoder->geocode( $fallback_search );
+		}
+
+		wp_send_json( $results );
 	}
 
 	/**
