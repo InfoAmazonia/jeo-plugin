@@ -31,7 +31,7 @@
 		"email": "contact@infoamazonia.org",
 		"url": "https://www.jeowp.org/"
 	},
-	"license": "ISC",
+	"license": "GPL-3.0-only",
 	"bugs": {
 		"url": "https://github.com/InfoAmazonia/jeo-plugin/issues"
 	},
@@ -64,7 +64,6 @@
 		"leaflet": "^1.9.4",
 		"lodash-es": "^4.17.23",
 		"map-gl-utils": "^0.50.4",
-		"mapbox-gl": "^3.20.0",
 		"maplibre-gl": "^5.20.1",
 		"maplibregl-mapbox-request-transformer": "^0.0.3",
 		"react-datepicker": "^9.1.0",

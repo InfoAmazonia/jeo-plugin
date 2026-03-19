@@ -102,6 +102,101 @@ class Jeo {
 	}
 
 	/**
+	 * Determine whether the current request is a preview for the given post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	public function is_preview_request_for_post( int $post_id ): bool {
+		$preview = filter_input( INPUT_GET, 'preview', FILTER_VALIDATE_BOOL );
+		if ( ! $preview && ! is_preview() ) {
+			return false;
+		}
+
+		$preview_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
+		if ( $preview_id && $preview_id !== $post_id ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Return the autosave revision when previewing a post, falling back to the
+	 * published post otherwise.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return WP_Post|null
+	 */
+	public function get_preview_post( int $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post instanceof WP_Post ) {
+			return null;
+		}
+
+		if ( ! $this->is_preview_request_for_post( $post_id ) ) {
+			return $post;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return $post;
+		}
+
+		$autosave = wp_get_post_autosave( $post_id );
+		if ( $autosave instanceof WP_Post ) {
+			return $autosave;
+		}
+
+		return $post;
+	}
+
+	/**
+	 * Return the requested map runtime normalized to a supported value.
+	 *
+	 * @return string
+	 */
+	private function get_requested_map_runtime(): string {
+		$map_runtime = sanitize_key( (string) \jeo_settings()->get_option( 'map_runtime' ) );
+		return in_array( $map_runtime, array( 'maplibregl', 'mapboxgl' ), true ) ? $map_runtime : 'maplibregl';
+	}
+
+	/**
+	 * Return the externally hosted Mapbox SDK metadata.
+	 *
+	 * @return array{version:string,js_url:string,css_url:string}
+	 */
+	private function get_mapbox_external_sdk(): array {
+		$version = 'v3.20.0';
+		$sdk     = apply_filters(
+			'jeo_mapbox_external_sdk',
+			array(
+				'version' => $version,
+				'js_url'  => sprintf( 'https://api.mapbox.com/mapbox-gl-js/%1$s/mapbox-gl.js', $version ),
+				'css_url' => sprintf( 'https://api.mapbox.com/mapbox-gl-js/%1$s/mapbox-gl.css', $version ),
+			)
+		);
+
+		return array(
+			'version' => sanitize_text_field( (string) ( $sdk['version'] ?? $version ) ),
+			'js_url'  => esc_url_raw( (string) ( $sdk['js_url'] ?? '' ) ),
+			'css_url' => esc_url_raw( (string) ( $sdk['css_url'] ?? '' ) ),
+		);
+	}
+
+	/**
+	 * Determine whether the external Mapbox SDK should be enqueued.
+	 *
+	 * @return bool
+	 */
+	private function should_load_external_mapbox_sdk(): bool {
+		if ( 'mapboxgl' !== $this->get_requested_map_runtime() ) {
+			return false;
+		}
+
+		return '' !== trim( sanitize_text_field( (string) \jeo_settings()->get_option( 'mapbox_key' ) ) );
+	}
+
+	/**
 	 * Authenticate REST requests to protected JEO post types using the logged-in cookie.
 	 *
 	 * @param mixed           $response Current REST pre-callback response.
@@ -195,14 +290,33 @@ class Jeo {
 
 		wp_set_script_translations( 'jeo-js', 'jeo', JEO_BASEPATH . 'languages' );
 
-		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
+		$map_runtime_requested = $this->get_requested_map_runtime();
+		$mapgl_script_deps     = array();
+		$mapgl_style_deps      = array();
 
-		if ( 'maplibregl' === $map_runtime ) {
-			$mapgl_loader = 'maplibreglLoader';
-			$mapgl_react  = 'maplibreglReact';
-		} else {
-			$mapgl_loader = 'mapboxglLoader';
-			$mapgl_react  = 'mapboxglReact';
+		if ( $this->should_load_external_mapbox_sdk() ) {
+			$mapbox_sdk = $this->get_mapbox_external_sdk();
+
+			if ( ! empty( $mapbox_sdk['js_url'] ) ) {
+				wp_register_script(
+					'jeo-mapbox-sdk-js',
+					$mapbox_sdk['js_url'],
+					array(),
+					$mapbox_sdk['version'],
+					true,
+				);
+				$mapgl_script_deps[] = 'jeo-mapbox-sdk-js';
+			}
+
+			if ( ! empty( $mapbox_sdk['css_url'] ) ) {
+				wp_register_style(
+					'jeo-mapbox-sdk-css',
+					$mapbox_sdk['css_url'],
+					array(),
+					$mapbox_sdk['version'],
+				);
+				$mapgl_style_deps[] = 'jeo-mapbox-sdk-css';
+			}
 		}
 
 		wp_localize_script(
@@ -215,25 +329,17 @@ class Jeo {
 		);
 
 		wp_register_script(
-			'mapgl-vendor',
-			JEO_BASEURL . "/js/build/{$mapgl_loader}.js",
-			array(),
-			JEO_VERSION,
-			true,
-		);
-
-		wp_register_script(
 			'mapgl',
 			JEO_BASEURL . '/js/build/mapglLoader.js',
-			array( 'mapgl-vendor' ),
+			$mapgl_script_deps,
 			JEO_VERSION,
 			true,
 		);
 
 		wp_register_style(
 			'mapgl',
-			JEO_BASEURL . "/js/build/{$mapgl_loader}.css",
-			array(),
+			JEO_BASEURL . '/js/build/mapglLoader.css',
+			$mapgl_style_deps,
 			JEO_VERSION,
 		);
 
@@ -241,9 +347,9 @@ class Jeo {
 			'mapgl',
 			'jeo_settings',
 			array(
-				'site_url'            => get_site_url(),
-				'mapbox_key'          => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' ) ),
-				'map_defaults'        => array(
+				'site_url'              => get_site_url(),
+				'mapbox_key'            => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' ) ),
+				'map_defaults'          => array(
 					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
 					'lng'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
@@ -252,34 +358,34 @@ class Jeo {
 					'enable_fullscreen'   => true,
 					'disable_drag_pan'    => false,
 				),
-				'map_runtime'         => $map_runtime,
-				'nonce'               => $this->get_rest_nonce(),
-				'jeo_typography_name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
-				'public_path'         => JEO_BASEURL . '/js/build/',
+				'map_runtime'           => $map_runtime_requested,
+				'map_runtime_requested' => $map_runtime_requested,
+				'runtime_messages'      => array(
+					'mapbox_missing_token'       => __( 'Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre.', 'jeo' ),
+					'mapbox_runtime_unavailable' => __(
+						'Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre.',
+						'jeo'
+					),
+				),
+				'nonce'                 => $this->get_rest_nonce(),
+				'jeo_typography_name'   => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
+				'public_path'           => JEO_BASEURL . '/js/build/',
 			)
 		);
 
 		$mapgl_react_assets = include JEO_BASEPATH . '/js/build/mapglReact.asset.php';
 
 		wp_register_script(
-			'mapgl-react-vendor',
-			JEO_BASEURL . "/js/build/{$mapgl_react}.js",
-			array( 'mapgl' ),
-			JEO_VERSION,
-			true,
-		);
-
-		wp_register_script(
 			'mapgl-react',
 			JEO_BASEURL . '/js/build/mapglReact.js',
-			array_merge( $mapgl_react_assets['dependencies'] ?? array(), array( 'mapgl-react-vendor' ) ),
-			JEO_VERSION,
+			array_merge( $mapgl_react_assets['dependencies'] ?? array(), array( 'mapgl' ) ),
+			$mapgl_react_assets['version'] ?? JEO_VERSION,
 			true,
 		);
 
 		wp_register_style(
 			'mapgl-react-style',
-			JEO_BASEURL . "/js/build/{$mapgl_react}.css",
+			false,
 			array( 'mapgl' ),
 			JEO_VERSION,
 		);
@@ -852,9 +958,8 @@ class Jeo {
 		$storymap_id = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
 
 		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && $storymap_id ) ) {
-			global $post, $wpdb;
+			global $post;
 
-			// Sometimes the saved content is empty.
 			$post_id    = $post->ID;
 			$preview_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
 			if ( $preview_id ) {
@@ -863,11 +968,11 @@ class Jeo {
 			if ( $storymap_id ) {
 				$post_id = $storymap_id;
 			}
-			$post_content = $wpdb->get_results(
-				$wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", $post_id )
-			);
 
-			return do_blocks( $post_content[0]->post_content );
+			$preview_post = $this->get_preview_post( $post_id );
+			if ( $preview_post instanceof WP_Post ) {
+				return do_blocks( $preview_post->post_content );
+			}
 		}
 
 		return $content;

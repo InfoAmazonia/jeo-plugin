@@ -13,8 +13,8 @@
  * Author URI:        https://www.jeowp.org/
  * Requires at least: 6.6
  * Requires PHP:      8.0
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * License:           GPL-3.0-only
+ * License URI:       https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
  * Text Domain:       jeo
  * Domain Path:       /languages
  */

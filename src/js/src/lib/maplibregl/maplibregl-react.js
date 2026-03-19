@@ -2,7 +2,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/maplibre';
 
 import { computeInlineStart } from '../../shared/direction';
-import { defaultStyle, mapboxTransformRequest, mapgl } from './maplibregl-loader'
+import { defaultStyle, mapgl, transformRequest } from '../mapgl-loader'
 
 // Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
 // Depending on how webpack groups the runtime and vendor code, react-map-gl may
@@ -44,38 +44,41 @@ try {
  * on the iframe's own `document` / `window` so they actually receive mouse
  * events.
  */
-function patchIframeListeners( map ) {
+function patchIframeAndResize( map ) {
 	const container = map.getCanvasContainer();
 	const ownerDoc = container.ownerDocument;
 	const ownerWin = ownerDoc.defaultView;
+	const cleanups = [];
 
-	// Nothing to patch when the map already lives in the same document
-	if ( ownerDoc === document && ownerWin === window ) {
-		return undefined;
-	}
-
-	const hm = map.handlers; // public HandlerManager instance
-	if ( ! hm || ! hm._listeners ) {
-		return undefined;
-	}
-
-	const added = [];
-
-	for ( const [ target, type, options ] of hm._listeners ) {
-		if ( target === document ) {
-			ownerDoc.addEventListener( type, hm.handleWindowEvent, options ?? undefined );
-			added.push( [ ownerDoc, type, hm.handleWindowEvent, options ?? undefined ] );
-		} else if ( target === window ) {
-			ownerWin.addEventListener( type, hm.handleEvent, options ?? undefined );
-			added.push( [ ownerWin, type, hm.handleEvent, options ?? undefined ] );
+	if ( ownerDoc !== document || ownerWin !== window ) {
+		const hm = map.handlers ?? map._handlers;
+		if ( hm && hm._listeners ) {
+			for ( const [ target, type, options ] of hm._listeners ) {
+				if ( target === document ) {
+					const fn = hm.handleWindowEvent;
+					ownerDoc.addEventListener( type, fn, options ?? undefined );
+					cleanups.push( () => ownerDoc.removeEventListener( type, fn, options ?? undefined ) );
+				} else if ( target === window ) {
+					const fn = hm.handleEvent;
+					ownerWin.addEventListener( type, fn, options ?? undefined );
+					cleanups.push( () => ownerWin.removeEventListener( type, fn, options ?? undefined ) );
+				}
+			}
 		}
 	}
 
-	return () => {
-		for ( const [ t, ev, fn, opts ] of added ) {
-			t.removeEventListener( ev, fn, opts );
-		}
-	};
+	const mapContainer = map.getContainer();
+	if ( typeof ResizeObserver !== 'undefined' ) {
+		const resizeObserver = new ResizeObserver( () => {
+			map.resize();
+		} );
+		resizeObserver.observe( mapContainer );
+		cleanups.push( () => resizeObserver.disconnect() );
+	}
+
+	return cleanups.length
+		? () => cleanups.forEach( ( fn ) => fn() )
+		: undefined;
 }
 
 /**
@@ -101,9 +104,8 @@ function MapGL( { children, controls = undefined, fullscreen = true, onLoad, ...
 	}, [ ref ] );
 
 	const handleLoad = useCallback( ( e ) => {
-		// Patch iframe document listeners for drag to work.
 		const map = e.target;
-		cleanupRef.current = patchIframeListeners( map );
+		cleanupRef.current = patchIframeAndResize( map );
 
 		// Forward the original onLoad callback.
 		if ( onLoad ) {
@@ -127,7 +129,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, onLoad, ...
 			mapLib={ mapgl }
 			mapStyle={ defaultStyle }
 			reuseMaps={ false }
-			transformRequest={ mapboxTransformRequest }
+			transformRequest={ transformRequest }
 			onLoad={ handleLoad }
 			{ ...props }
 		>

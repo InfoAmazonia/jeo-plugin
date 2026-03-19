@@ -4,8 +4,8 @@ Tested up to: 6.9.4
 Stable tag: 2.15.2
 Requires PHP: 8.0
 Requires at least: 6.6
-License: GPL-2.0+
-License URI: http://www.gnu.org/licenses/gpl-2.0.txt
+License: GPL-3.0-only
+License URI: https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
 Version: 3.0.0-rc.3
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
@@ -14,7 +14,7 @@ The JEO plugin acts as a geojournalism platform that allows news organizations, 
 
 With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories.
 
-At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
+At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. JEO bundles MapLibreGL by default and can optionally load Mapbox GL JS as an external service when Mapbox is selected in the plugin settings.
 
 == Compatibility ==
 
@@ -30,8 +30,9 @@ Compatibility snapshot validated on March 17, 2026:
 
 = Features =
 
-* Support for [MapboxGL](https://docs.mapbox.com/mapbox-gl-js/) and [MapLibreGL](https://maplibre.org/maplibre-gl-js/docs/);
-* Support for [Mapbox](https://www.mapbox.com) maps (requires a Mapbox API key);
+* Support for [MapLibreGL](https://maplibre.org/maplibre-gl-js/docs/) as the default bundled rendering library;
+* Optional support for [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/) loaded externally from Mapbox when selected in the plugin settings;
+* Support for [Mapbox](https://www.mapbox.com) maps and layers (requires a Mapbox API key);
 * Custom tile layers;
 * Layer filtering options, allowing you to mix tile layers;
 * Geocoding WordPress posts using [Nominatim](https://nominatim.org/), supporting the post type **Post**;
@@ -46,9 +47,9 @@ Compatibility snapshot validated on March 17, 2026:
 3. Select JEO on the admin menu.
 
 There, you can configure:
-* The map rendering library (either MapboxGL or MapLibreGL);
+* The map rendering library (MapLibreGL by default, or MapboxGL loaded externally from Mapbox);
 * The default latitude, longitude, and zoom for your maps;
-* The [Mapbox API key](https://docs.mapbox.com/help/how-mapbox-works/access-tokens), only required if you need MapboxGL or Mapbox layers;
+* The [Mapbox API key](https://docs.mapbox.com/help/how-mapbox-works/access-tokens), only required if you select MapboxGL or use Mapbox-hosted layers;
 * The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available by default;
 
 After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
@@ -420,14 +421,14 @@ We recommend keeping only the last 5 (five) revisions for each storymap -- see [
 
 ## Introduction
 
-In JEO, maps are rendered using the [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/api/) JavaScript library. Any new layer type will have to interact with this library to add the layer to the map.
+In JEO, maps are rendered using the configured GL runtime. By default this is MapLibreGL, and when enabled it may be Mapbox GL JS loaded externally from Mapbox. Any new layer type will have to interact with this runtime-compatible map object to add the layer to the map.
 
 To add a new layer type, there are 2 simple steps:
 
 1. Register the new Layer type using a PHP hook, informing where is the main JavaScript file of your Layer Type;
 2. Create a JavaScript class implementing methods to add the layer to the map and to describe what are the options a layer of this type has.
 
-In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which is an extension to MapboxGL) to the project.
+In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which extends the GL-based map runtime used by the layer) to the project.
 
 ## Creating a new Layer Type
 
@@ -514,14 +515,14 @@ For example, the "Tile layer" layer type needs only a URL, so that's how its `ge
 
 **params**:
 
-* `map` - the initialized Mapbox [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object
+* `map` - the initialized map runtime object, compatible with the Mapbox GL JS / MapLibreGL APIs
 * `attributes` - object with the layer attributes (See Layer attributes section below)
 
 **returns**:
 
 * The return of a call to [`map.setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle)
 
-In MapboxGL, every map has a [Style](https://docs.mapbox.com/mapbox-gl-js/style-spec/) as a base layer. This method will add the layer as the Map Style, using the [setStyle](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) method of the [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object.
+In the supported GL runtimes, every map has a [Style](https://docs.mapbox.com/mapbox-gl-js/style-spec/) as a base layer. This method will add the layer as the Map Style, using the [`setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) method of the active map object.
 
 This method will be invoked when a layer of this type is added to the map as the base layer.
 
@@ -553,7 +554,7 @@ For example, the "Tile Layer" layer type sets the style as a raster layer:
 
 **params**:
 
-* `map` - the initialized Mapbox [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object
+* `map` - the initialized map runtime object, compatible with the Mapbox GL JS / MapLibreGL APIs
 * `attributes` - object with the layer attributes (See Layer attributes section below)
 
 **returns**:
