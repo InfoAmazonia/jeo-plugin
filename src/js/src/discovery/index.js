@@ -12,6 +12,7 @@ class Discovery extends Component {
 
 		// map can't be a state, trust me.
 		this.map = null;
+		this.attributionResizeObserver = null;
 
 		// general state
 		this.state = {
@@ -86,6 +87,7 @@ class Discovery extends Component {
 			);
 
 			this.map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
+			this.syncAttributionSpacing();
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 
@@ -96,6 +98,13 @@ class Discovery extends Component {
 		this.map.on( 'zoom', () => {
 			this.setState( { ...this.state } );
 		} );
+	}
+
+	componentWillUnmount() {
+		if ( this.attributionResizeObserver ) {
+			this.attributionResizeObserver.disconnect();
+			this.attributionResizeObserver = null;
+		}
 	}
 
 	getParamFromUrl( paramKey ) {
@@ -131,6 +140,44 @@ class Discovery extends Component {
 			...currentState,
 			...state,
 		} ) );
+	}
+
+	syncAttributionSpacing() {
+		const discoveryMapElement = this.mapContainer?.closest( '.discovery-map' );
+		if ( ! discoveryMapElement ) {
+			return;
+		}
+
+		const updateSpacing = () => {
+			const attributionControl = discoveryMapElement.querySelector(
+				'.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib'
+			);
+			const attributionHeight = attributionControl
+				? Math.ceil( attributionControl.getBoundingClientRect().height )
+				: 0;
+
+			discoveryMapElement.style.setProperty(
+				'--jeo-attribution-offset',
+				attributionHeight > 0 ? `${ attributionHeight + 8 }px` : '0px'
+			);
+		};
+
+		updateSpacing();
+
+		if ( this.attributionResizeObserver ) {
+			this.attributionResizeObserver.disconnect();
+			this.attributionResizeObserver = null;
+		}
+
+		const attributionControl = discoveryMapElement.querySelector(
+			'.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib'
+		);
+		if ( attributionControl && typeof ResizeObserver !== 'undefined' ) {
+			this.attributionResizeObserver = new ResizeObserver( updateSpacing );
+			this.attributionResizeObserver.observe( attributionControl );
+		}
+
+		window.requestAnimationFrame( updateSpacing );
 	}
 
 	render() {

@@ -1,4 +1,4 @@
-# Copyright (C) 2025 
+# Copyright (C) 2025
 # This file is distributed under the GPL-2.0+.
 msgid ""
 msgstr ""
@@ -467,12 +467,24 @@ msgstr ""
 msgid "Mapbox"
 msgstr ""
 
+#: includes/settings/settings-page.php:89
+msgid "When selected, Mapbox loads the official Mapbox GL JS assets from api.mapbox.com and uses Mapbox terms and privacy practices."
+msgstr ""
+
 #: includes/settings/settings-page.php:84
 msgid "API Key"
 msgstr ""
 
 #: includes/settings/settings-page.php:86
 msgid "Ex. pk.eyJ3..."
+msgstr ""
+
+#: includes/settings/settings-page.php:99
+msgid "This key is required only when the rendering library is set to Mapbox."
+msgstr ""
+
+#: includes/settings/class-settings.php:175
+msgid "Mapbox requires a valid API key. The rendering library setting was not changed."
 msgstr ""
 
 #: includes/settings/settings-page.php:99

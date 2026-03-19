@@ -33,6 +33,7 @@ export default class JeoMap {
 		this.legends = [];
 		this.initialized = false;
 		this.popup = null;
+		this.attributionResizeObserver = null;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
@@ -253,28 +254,41 @@ export default class JeoMap {
 								}
 							} );
 
-							let controlPostion = `bottom-${inlineEnd}`;
+									const isMobileViewport = window.matchMedia
+										? window.matchMedia( '(max-width: 599px)' ).matches
+										: window.innerWidth < 600;
+									const controlPostion = MAP_RUNTIME === 'mapboxgl'
+										? 'bottom-right'
+										: `bottom-${inlineEnd}`;
 
-							let attributionControl = new mapgl.AttributionControl( {
-								compact: false,
-								customAttribution,
-							} );
+									let attributionControl = MAP_RUNTIME === 'mapboxgl'
+										? new mapgl.AttributionControl( {
+											compact: false,
+											customAttribution,
+										} )
+										: new mapgl.AttributionControl( {
+											customAttribution,
+										} );
 
-							if(window.innerWidth < 600) {
-								attributionControl = new mapgl.AttributionControl( {
-									compact: true,
-									customAttribution,
-								} )
+									if ( isMobileViewport && MAP_RUNTIME === 'mapboxgl' ) {
+										attributionControl = new mapgl.AttributionControl( {
+											compact: true,
+											customAttribution,
+										} );
+									}
 
-								controlPostion = `bottom-${inlineStart}`;
-							}
+								map.addControl(
+									attributionControl,
+									controlPostion
+								);
+								this.syncAttributionSpacing();
 
-							map.addControl(
-								attributionControl,
-								controlPostion
-							);
+								if ( MAP_RUNTIME === 'maplibregl' ) {
+									this.collapseCompactMapLibreAttribution();
+									map.on( 'resize', () => this.collapseCompactMapLibreAttribution() );
+								}
 
-							this.getRelatedPosts();
+								this.getRelatedPosts();
 						});
 
 						this.addLayersControl( amountLayers );
@@ -296,6 +310,17 @@ export default class JeoMap {
 	}
 
 	async fetchMapData() {
+		const previewMapPayload = this.element.dataset.previewMap;
+		if ( previewMapPayload ) {
+			try {
+				this.map_post_object = JSON.parse( previewMapPayload );
+				await this.getLayers();
+				return;
+			} catch ( error ) {
+				console.warn( 'Unable to parse preview map payload. Falling back to REST data.', error );
+			}
+		}
+
 		if ( this.getArg( 'map_id' ) ) {
 			const data = await jQuery.ajax( {
 				type: 'GET',
@@ -321,6 +346,53 @@ export default class JeoMap {
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
 		jQuery( this.element ).find( '.mapboxgl-control-container, .maplibregl-control-container' ).remove();
 		jQuery( this.element ).find( '.mapboxgl-canvas-container, .maplibregl-canvas-container' ).remove();
+	}
+
+	collapseCompactMapLibreAttribution() {
+		const attributionControl = this.element.querySelector(
+			'details.maplibregl-ctrl-attrib.maplibregl-compact'
+		);
+
+		if ( attributionControl ) {
+			attributionControl.classList.remove( 'maplibregl-compact-show' );
+			attributionControl.removeAttribute( 'open' );
+		}
+	}
+
+	syncAttributionSpacing() {
+		const updateSpacing = () => {
+			const attributionControl = this.element.querySelector(
+				'.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib'
+			);
+			const attributionHeight = attributionControl
+				? Math.ceil( attributionControl.getBoundingClientRect().height )
+				: 0;
+
+			this.element.style.setProperty(
+				'--jeo-attribution-offset',
+				attributionHeight > 0 ? `${ attributionHeight + 8 }px` : '0px'
+			);
+		};
+
+		updateSpacing();
+
+		if ( this.attributionResizeObserver ) {
+			this.attributionResizeObserver.disconnect();
+			this.attributionResizeObserver = null;
+		}
+
+		const attributionControl = this.element.querySelector(
+			'.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib'
+		);
+		if (
+			attributionControl &&
+			typeof ResizeObserver !== 'undefined'
+		) {
+			this.attributionResizeObserver = new ResizeObserver( updateSpacing );
+			this.attributionResizeObserver.observe( attributionControl );
+		}
+
+		window.requestAnimationFrame( updateSpacing );
 	}
 
 	/**
@@ -540,6 +612,13 @@ export default class JeoMap {
 		return new Promise( ( resolve, reject ) => {
 			const layersDefinitions = this.getArg( 'layers' );
 			this.layersDefinitions = layersDefinitions;
+
+			if ( ! Array.isArray( layersDefinitions ) || layersDefinitions.length === 0 ) {
+				this.layers = [];
+				this.legends = [];
+				resolve( [] );
+				return;
+			}
 
 			if ( layersDefinitions ) {
 				const layersIds = layersDefinitions.map( ( el ) => el.id );

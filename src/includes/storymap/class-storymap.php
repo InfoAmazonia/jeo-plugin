@@ -46,7 +46,7 @@ class Storymap {
 			'labels'              => $labels,
 			'hierarchical'        => true,
 			'description'         => __( 'JEO Story Map', 'jeo' ),
-			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks' ),
+			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks', 'revisions' ),
 			'rewrite'             => array( 'slug' => 'storymap' ),
 			'public'              => true,
 			'show_in_menu'        => 'jeo-main-menu',

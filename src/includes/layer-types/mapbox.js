@@ -1,3 +1,8 @@
+const MAPBOX_RASTER_ATTRIBUTION =
+	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
+	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
+
 window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	label: 'Mapbox Style',
 
@@ -22,6 +27,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				tiles: [
 					`https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
 				],
+				attribution: MAPBOX_RASTER_ATTRIBUTION,
 			} );
 		}
 
