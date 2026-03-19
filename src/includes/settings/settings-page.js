@@ -1,5 +1,10 @@
 (function ($) {
 	$(function () {
+		function toggleMapboxSettings() {
+			const shouldShow = $('#map_runtime').val() === 'mapboxgl';
+			$('.jeo-mapbox-settings').toggle(shouldShow);
+		}
+
 		$('a.nav-tab').click(function (ev) {
 			ev.preventDefault();
 			$('.tabs-content').hide();
@@ -14,6 +19,9 @@
 			$('tr.geocoder_options').hide();
 			$('#geocoder_options_' + $(this).val()).show();
 		}).change();
+
+		$('#map_runtime').change(toggleMapboxSettings);
+		toggleMapboxSettings();
 
 
 		var mediaUploader;

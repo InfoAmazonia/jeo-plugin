@@ -36,7 +36,7 @@ class Settings {
 	protected function init() {
 
 		$this->default_options = array(
-			'map_runtime'                     => 'mapboxgl',
+			'map_runtime'                     => 'maplibregl',
 			'enabled_post_types'              => array(
 				'post',
 				'storymap',
@@ -131,7 +131,60 @@ class Settings {
 	 * @return void
 	 */
 	public function admin_init() {
-		register_setting( 'jeo-settings', $this->option_key );
+		register_setting(
+			'jeo-settings',
+			$this->option_key,
+			array(
+				'sanitize_callback' => array( $this, 'sanitize_settings' ),
+			)
+		);
+	}
+
+	/**
+	 * Sanitize plugin settings before persisting them.
+	 *
+	 * @param array $input Submitted settings payload.
+	 * @return array
+	 */
+	public function sanitize_settings( $input ) {
+		$previous = get_option( $this->option_key );
+		if ( ! is_array( $previous ) ) {
+			$previous = array();
+		}
+
+		$input = is_array( $input ) ? $input : array();
+
+		$normalized = array_merge( $previous, $input );
+
+		$map_runtime = isset( $input['map_runtime'] ) ? sanitize_key( $input['map_runtime'] ) : $this->get_option( 'map_runtime' );
+		if ( ! in_array( $map_runtime, array( 'maplibregl', 'mapboxgl' ), true ) ) {
+			$map_runtime = 'maplibregl';
+		}
+		$normalized['map_runtime'] = $map_runtime;
+
+		if ( isset( $input['mapbox_key'] ) ) {
+			$normalized['mapbox_key'] = sanitize_text_field( $input['mapbox_key'] );
+		} else {
+			$normalized['mapbox_key'] = sanitize_text_field( $previous['mapbox_key'] ?? '' );
+		}
+
+		if ( 'mapboxgl' === $normalized['map_runtime'] && empty( $normalized['mapbox_key'] ) ) {
+			add_settings_error(
+				$this->option_key,
+				'jeo_mapbox_key_required',
+				__( 'Mapbox requires a valid API key. The rendering library setting was not changed.', 'jeo' ),
+				'error'
+			);
+
+			$normalized['map_runtime'] = sanitize_key( $previous['map_runtime'] ?? 'maplibregl' );
+			$normalized['mapbox_key']  = sanitize_text_field( $previous['mapbox_key'] ?? '' );
+		}
+
+		if ( isset( $normalized['enabled_post_types'] ) && ! is_array( $normalized['enabled_post_types'] ) ) {
+			$normalized['enabled_post_types'] = explode( ',', trim( sanitize_textarea_field( $normalized['enabled_post_types'] ) ) );
+		}
+
+		return $normalized;
 	}
 
 	/**
@@ -145,7 +198,6 @@ class Settings {
 			wp_enqueue_media();
 			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery' ), JEO_VERSION, true );
 			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
-
 		}
 	}
 

@@ -8,9 +8,10 @@
 ?>
 <form action="options.php" method="post" class="clear prepend-top">
 	<?php settings_fields( $this->option_key ); ?>
-	<div class="wrap">
-		<h1><?php esc_html_e( 'Jeo Settings', 'jeo' ); ?></h1>
-		<h2 id="tabs" class="nav-tab-wrapper">
+		<div class="wrap">
+			<h1><?php esc_html_e( 'Jeo Settings', 'jeo' ); ?></h1>
+			<?php settings_errors( $this->option_key ); ?>
+			<h2 id="tabs" class="nav-tab-wrapper">
 			<a href="#" class="nav-tab" data-target="general">
 				<?php esc_html_e( 'General', 'jeo' ); ?>
 			</a>
@@ -35,8 +36,8 @@
 						<th scope="row"><label for="map_runtime"><?php esc_html_e( 'Rendering library', 'jeo' ); ?></label></th>
 						<td>
 							<select name="<?php echo esc_html( $this->get_field_name( 'map_runtime' ) ); ?>" id="map_runtime">
-								<option value="mapboxgl" <?php selected( $this->get_option( 'map_runtime' ), 'mapboxgl' ); ?>>MapboxGL</option>
 								<option value="maplibregl" <?php selected( $this->get_option( 'map_runtime' ), 'maplibregl' ); ?>>MapLibreGL</option>
+								<option value="mapboxgl" <?php selected( $this->get_option( 'map_runtime' ), 'mapboxgl' ); ?>>MapboxGL</option>
 							</select>
 						</td>
 					</tr>
@@ -82,16 +83,22 @@
 						</td>
 					</tr>
 
-					<tr>
+					<tr class="jeo-mapbox-settings">
 						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e( 'Mapbox', 'jeo' ); ?></h2></th>
 						<td>
+							<p class="description">
+								<?php esc_html_e( 'When selected, Mapbox loads the official Mapbox GL JS assets from api.mapbox.com and uses Mapbox terms and privacy practices.', 'jeo' ); ?>
+							</p>
 						</td>
 					</tr>
 
-					<tr>
+					<tr class="jeo-mapbox-settings">
 						<th scope="row"><label for="mapbox_key"><?php esc_html_e( 'API Key', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'mapbox_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. pk.eyJ3...', 'jeo' ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option( 'mapbox_key' ) ); ?>" class="regular-text">
+							<input name="<?php echo esc_html( $this->get_field_name( 'mapbox_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. pk.eyJ3...', 'jeo' ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option( 'mapbox_key' ) ); ?>" class="regular-text">
+							<p class="description">
+								<?php esc_html_e( 'This key is required only when the rendering library is set to Mapbox.', 'jeo' ); ?>
+							</p>
 						</td>
 					</tr>
 				</tbody>

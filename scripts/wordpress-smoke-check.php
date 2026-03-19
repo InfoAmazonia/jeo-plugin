@@ -37,6 +37,45 @@ if ( ! in_array( 'jeo/jeo.php', $active_plugins, true ) ) {
 	exit( 1 );
 }
 
+$settings = jeo_settings();
+if ( 'maplibregl' !== $settings->get_option( 'map_runtime' ) ) {
+	fwrite( STDERR, "Default map runtime is not maplibregl.\n" );
+	exit( 1 );
+}
+
+update_option(
+	'jeo-settings',
+	array_merge(
+		(array) get_option( 'jeo-settings', array() ),
+		array(
+			'map_runtime' => 'maplibregl',
+			'mapbox_key'  => '',
+		)
+	)
+);
+
+$invalid_runtime = $settings->sanitize_settings(
+	array(
+		'map_runtime' => 'mapboxgl',
+		'mapbox_key'  => '',
+	)
+);
+if ( 'maplibregl' !== $invalid_runtime['map_runtime'] ) {
+	fwrite( STDERR, "Mapbox runtime without API key was not rejected.\n" );
+	exit( 1 );
+}
+
+$valid_runtime = $settings->sanitize_settings(
+	array(
+		'map_runtime' => 'mapboxgl',
+		'mapbox_key'  => 'pk.test-token',
+	)
+);
+if ( 'mapboxgl' !== $valid_runtime['map_runtime'] || 'pk.test-token' !== $valid_runtime['mapbox_key'] ) {
+	fwrite( STDERR, "Valid Mapbox runtime settings were not accepted.\n" );
+	exit( 1 );
+}
+
 fwrite( STDOUT, "WordPress smoke checks passed.\n" );
 
 // phpcs:enable

@@ -1,15 +1,32 @@
 import U from 'map-gl-utils'
-import MapboxGL from 'mapbox-gl'
-
-import 'mapbox-gl/dist/mapbox-gl.css'
 
 const MAPBOX_CSS_WARNING =
-	'This page appears to be missing CSS declarations for Mapbox GL JS, which may cause the map to display incorrectly. Please ensure your page includes mapbox-gl.css, as described in https://www.mapbox.com/mapbox-gl-js/api/.'
+	'This page appears to be missing CSS declarations for Mapbox GL JS, which may cause the map to display incorrectly. Please ensure your page includes the external Mapbox GL JS stylesheet.'
+
+let runtimePatched = false
+
+function getExternalMapboxGL() {
+	const runtime = globalThis.mapboxgl
+	return runtime && typeof runtime.Map === 'function' ? runtime : null
+}
+
+function getMapboxGLOrThrow() {
+	const runtime = getExternalMapboxGL()
+	if ( ! runtime ) {
+		throw new Error( 'Mapbox GL JS runtime was not found on globalThis.mapboxgl.' )
+	}
+
+	return runtime
+}
+
+export function isMapboxRuntimeAvailable() {
+	return Boolean( getExternalMapboxGL() )
+}
 
 function hasMapboxRuntimeStyles( targetDocument ) {
 	return Boolean(
 		targetDocument?.querySelector(
-			'link[href*="mapboxglLoader.css"], link[href*="mapboxglReact.css"], link[href*="vendors-node_modules_mapbox-gl"], style[data-jeo-mapbox-runtime], style[data-jeo-mapbox-canary]'
+			'link[href*="api.mapbox.com/mapbox-gl-js"], link[href*="mapbox-gl.css"], link[data-jeo-mapbox-runtime], style[data-jeo-mapbox-runtime], style[data-jeo-mapbox-canary]'
 		)
 	);
 }
@@ -33,17 +50,14 @@ function copyMapboxRuntimeStyles( sourceDocument, targetDocument ) {
 
 		const href = node.getAttribute( 'href' ) || '';
 		return (
-			href.includes( 'mapboxglLoader.css' ) ||
-			href.includes( 'mapboxglReact.css' ) ||
-			href.includes( 'vendors-node_modules_mapbox-gl' )
+			href.includes( 'api.mapbox.com/mapbox-gl-js' ) ||
+			href.includes( 'mapbox-gl.css' )
 		);
 	} );
 
 	runtimeStyles.forEach( ( node ) => {
 		const clone = node.cloneNode( true );
-		if ( clone.tagName === 'STYLE' ) {
-			clone.setAttribute( 'data-jeo-mapbox-runtime', 'true' );
-		}
+		clone.setAttribute( 'data-jeo-mapbox-runtime', 'true' );
 		targetDocument.head.appendChild( clone );
 	} );
 }
@@ -62,44 +76,30 @@ function ensureMapboxCanaryStyle( targetDocument ) {
 	targetDocument.head.appendChild( styleNode );
 }
 
-// Fix: Patch HTMLElement's instanceof check for cross-document (iframe) compatibility.
-// In WordPress Block API v3, blocks run inside an iframe. MapboxGL checks
-// `container instanceof HTMLElement` which fails when the container element
-// comes from the iframe document while MapboxGL uses the parent document's
-// HTMLElement prototype. This makes the check use duck-typing instead.
-// IMPORTANT: Must use `function` (not arrow) so `this` is the right-hand
-// constructor. For subclasses (e.g. HTMLInputElement), we fall back to a
-// standard prototype-chain walk to avoid false positives.
-try {
-	Object.defineProperty( HTMLElement, Symbol.hasInstance, {
-		value: function ( instance ) {
-			if ( instance == null || typeof instance !== 'object' ) return false;
-			if ( this === HTMLElement ) {
-				// Duck-type: any DOM element node, regardless of document origin
-				return instance.nodeType === 1;
-			}
-			// Subclass check (e.g. HTMLInputElement): walk the prototype chain
-			let proto = Object.getPrototypeOf( instance );
-			const targetProto = this.prototype;
-			while ( proto !== null ) {
-				if ( proto === targetProto ) return true;
-				proto = Object.getPrototypeOf( proto );
-			}
-			return false;
-		},
-		configurable: true,
-	} );
-} catch ( e ) {
-	// Symbol.hasInstance may not be configurable in some environments
+function patchHTMLElementInstanceOf() {
+	try {
+		Object.defineProperty( HTMLElement, Symbol.hasInstance, {
+			value: function ( instance ) {
+				if ( instance == null || typeof instance !== 'object' ) return false;
+				if ( this === HTMLElement ) {
+					return instance.nodeType === 1;
+				}
+				let proto = Object.getPrototypeOf( instance );
+				const targetProto = this.prototype;
+				while ( proto !== null ) {
+					if ( proto === targetProto ) return true;
+					proto = Object.getPrototypeOf( proto );
+				}
+				return false;
+			},
+			configurable: true,
+		} );
+	} catch ( e ) {
+		// Symbol.hasInstance may not be configurable in some environments
+	}
 }
 
-// Fix: Patch the missing-CSS detection for cross-document (iframe)
-// compatibility. In the block editor the React tree can run in the parent
-// document while rendering the map container inside the iframe document, so
-// Mapbox's default `window.getComputedStyle(...)` check can inspect the wrong
-// document and emit a false-positive warning. We also copy the runtime styles
-// into the owner document when needed so the iframe preview has the same CSS.
-( function patchMissingCSSDetection() {
+function patchMissingCSSDetection( MapboxGL ) {
 	const proto = MapboxGL.Map?.prototype;
 	if ( ! proto ) return;
 
@@ -121,7 +121,7 @@ try {
 			console.warn( MAPBOX_CSS_WARNING );
 		}
 	};
-} )();
+}
 
 // Fix: Patch FullscreenControl for cross-document (iframe) compatibility.
 // Same issue as MapLibreGL: the control uses `document` (parent window) for
@@ -132,7 +132,7 @@ try {
 // MapboxGL's constructor uses bindAll() for _onClickFullscreen and
 // _changeIcon, creating bound instance methods that shadow prototype
 // patches. We must override onAdd to replace them at instance level.
-( function patchFullscreenControl() {
+function patchFullscreenControl( MapboxGL ) {
 	const FSC = MapboxGL.FullscreenControl;
 	if ( ! FSC ) return;
 	const proto = FSC.prototype;
@@ -187,25 +187,48 @@ try {
 	proto.onRemove = function () {
 		const ownerDoc = ( this._container && this._container.ownerDocument ) || document;
 		ownerDoc.removeEventListener( this._fullscreenchange, this._changeIcon );
+		if ( typeof origOnRemove === 'function' ) {
+			origOnRemove.call( this );
+			return;
+		}
 		this._controlContainer.remove();
 		this._map = null;
 	};
-} )();
+}
+
+function ensureMapboxRuntimePatched() {
+	const MapboxGL = getMapboxGLOrThrow()
+	if ( runtimePatched ) {
+		MapboxGL.accessToken = mapboxToken
+		return MapboxGL
+	}
+
+	patchHTMLElementInstanceOf()
+	patchMissingCSSDetection( MapboxGL )
+	patchFullscreenControl( MapboxGL )
+
+	MapboxGL.accessToken = mapboxToken
+	runtimePatched = true
+
+	return MapboxGL
+}
 
 /** @type string */
 export const mapboxToken = jeo_settings.mapbox_key
 
-MapboxGL.accessToken = mapboxToken
-
-export const mapgl = MapboxGL
-globalThis.mapboxgl = MapboxGL // compat
-
 export const defaultStyle = 'mapbox://styles/mapbox/streets-v11'
+export const transformRequest = undefined
+
+export function getMapLibrary() {
+	return ensureMapboxRuntimePatched()
+}
 
 export function createMap ({ container, style, ...options }) {
+	const MapboxGL = ensureMapboxRuntimePatched()
 	const map = new MapboxGL.Map({
 		accessToken: mapboxToken,
 		container: container,
+		logoPosition: 'bottom-left',
 		projection: 'equirectangular',
 		style: style ?? defaultStyle,
 		...options,

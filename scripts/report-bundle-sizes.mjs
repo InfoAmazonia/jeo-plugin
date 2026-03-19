@@ -5,11 +5,9 @@ import path from 'node:path';
 
 const buildDir = path.resolve( 'src/js/build' );
 const budgetByEntry = {
-	mapboxglReact: 1800,
-	mapboxglLoader: 1750,
+	mapglLoader: 1100,
+	mapglReact: 120,
 	mapBlocks: 1150,
-	maplibreglReact: 1100,
-	maplibreglLoader: 1100,
 	layersSidebar: 360,
 	discovery: 280,
 	mapsSidebar: 240,

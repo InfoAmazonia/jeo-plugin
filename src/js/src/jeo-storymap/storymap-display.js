@@ -123,10 +123,58 @@ class StoryMapDisplay extends Component {
         };
     }
 
-    componentDidMount() {
+	componentDidMount() {
 		this.eagerInitStorymap();
 
 		onFirstIntersection( this.el, this.lazyInitStorymap.bind( this ) );
+	}
+
+	scheduleInitialMapLibreAttributionSync() {
+		if ( MAP_RUNTIME !== 'maplibregl' || ! this.map ) {
+			return;
+		}
+
+		const sync = () => {
+			this.map?.resize();
+			this.syncMapLibreAttributionControl();
+		};
+
+		sync();
+		window.requestAnimationFrame( sync );
+		window.setTimeout( sync, 0 );
+		window.setTimeout( sync, 150 );
+	}
+
+	syncMapLibreAttributionControl() {
+		if ( MAP_RUNTIME !== 'maplibregl' ) {
+			return;
+		}
+
+		const attributionControl = this.mapContainer?.querySelector(
+			'details.maplibregl-ctrl-attrib'
+		);
+		const attributionButton = attributionControl?.querySelector(
+			'.maplibregl-ctrl-attrib-button'
+		);
+
+		if ( ! attributionControl ) {
+			return;
+		}
+
+		const mapWidth = this.map?.getCanvasContainer?.().offsetWidth || this.mapContainer?.offsetWidth || 0;
+		const shouldCompact = mapWidth > 0 && mapWidth <= 640;
+
+		if ( shouldCompact ) {
+			attributionControl.classList.add( 'maplibregl-compact' );
+			attributionControl.classList.remove( 'maplibregl-compact-show' );
+			attributionControl.removeAttribute( 'open' );
+			attributionButton?.removeAttribute( 'hidden' );
+			return;
+		}
+
+		attributionControl.classList.remove( 'maplibregl-compact', 'maplibregl-compact-show' );
+		attributionControl.setAttribute( 'open', '' );
+		attributionButton?.setAttribute( 'hidden', 'hidden' );
 	}
 
 	eagerInitStorymap() {
@@ -254,6 +302,9 @@ class StoryMapDisplay extends Component {
 			map.dragPan.disable();
 			map.touchZoomRotate.disable();
 			map.dragRotate.disable();
+			this.scheduleInitialMapLibreAttributionSync();
+			map.once( 'idle', () => this.scheduleInitialMapLibreAttributionSync() );
+			map.on( 'resize', () => this.syncMapLibreAttributionControl() );
 
 			this.props.navigateMapLayers.forEach(layer => {
 				const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
