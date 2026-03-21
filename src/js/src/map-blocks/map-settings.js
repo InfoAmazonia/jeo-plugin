@@ -219,7 +219,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 								setPanLimitsFromMap();
 							} }
 						>
-							{ __( 'Set current as map settings', 'jeo' ) }
+							{ __( 'Use current map view', 'jeo' ) }
 						</Button>
 					</p>
 				</section>
