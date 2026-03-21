@@ -1,6 +1,7 @@
 const { __ } = wp.i18n;
 
 window.JeoLegendTypes.registerLegendType( 'icons', {
+	label: __( 'Icon categories', 'jeo' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type

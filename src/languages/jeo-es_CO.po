@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: JEO 3.0.0-rc.3\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/src\n"
-"POT-Creation-Date: 2026-03-21T02:53:08+00:00\n"
+"POT-Creation-Date: 2026-03-21T05:12:15+00:00\n"
 "PO-Revision-Date: 2026-03-21 00:08-0300\n"
 "Last-Translator: Stefano Wrobleski\n"
 "Language-Team: InfoAmazonia\n"
@@ -38,7 +38,7 @@ msgstr "Mapas interactivos para el editor de bloques de WordPress"
 msgid "InfoAmazonia"
 msgstr ""
 
-#: includes/class-jeo.php:364
+#: includes/class-jeo.php:365
 msgid ""
 "Mapbox was selected as the rendering library, but no Mapbox API key is "
 "configured. Falling back to MapLibre."
@@ -46,7 +46,7 @@ msgstr ""
 "Se seleccionó Mapbox como biblioteca de renderizado, pero no hay ninguna "
 "clave de API de Mapbox configurada. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:365
+#: includes/class-jeo.php:366
 msgid ""
 "Mapbox was selected as the rendering library, but the external Mapbox SDK "
 "could not be loaded. Falling back to MapLibre."
@@ -54,7 +54,7 @@ msgstr ""
 "Se seleccionó Mapbox como biblioteca de renderizado, pero no se pudo cargar "
 "el SDK externo de Mapbox. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:731
+#: includes/class-jeo.php:736
 msgid "Read more"
 msgstr "Leer más"
 
@@ -211,13 +211,13 @@ msgid "Legend type-specific options"
 msgstr "Opciones específicas del tipo de leyenda"
 
 #: includes/layers/class-layers.php:198 js/build/layersSidebar.js:7
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:52
+#: js/src/posts-sidebar/legends-editor/legend-editor.js:159
 #: js/build/layersSidebar.js:22210
 msgid "Use legend"
 msgstr "Usar leyenda"
 
 #: includes/layers/class-layers.php:210 js/build/layersSidebar.js:7
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:72
+#: js/src/posts-sidebar/legends-editor/legend-editor.js:180
 #: js/build/layersSidebar.js:22230
 msgid "Legend title"
 msgstr "Título de leyenda"
@@ -448,8 +448,9 @@ msgstr ""
 "Mapbox requiere una clave de API válida. La configuración de la biblioteca "
 "de renderizado no se modificó."
 
-#: includes/settings/class-settings.php:212 js/build/layersSidebar.js:7
-#: js/src/layers-sidebar/layers-sidebar.js:117 js/build/layersSidebar.js:21345
+#: includes/settings/class-settings.php:212
+#: includes/settings/class-settings.php:213 js/build/layersSidebar.js:7
+#: js/src/layers-sidebar/layers-sidebar.js:139 js/build/layersSidebar.js:21345
 msgid "Settings"
 msgstr "Configuraciones"
 
@@ -511,8 +512,7 @@ msgid ""
 "api.mapbox.com and uses Mapbox terms and privacy practices."
 msgstr ""
 "Cuando se selecciona, Mapbox carga los recursos oficiales de Mapbox GL JS "
-"desde api.mapbox.com y usa los términos y prácticas de privacidad de "
-"Mapbox."
+"desde api.mapbox.com y usa los términos y prácticas de privacidad de Mapbox."
 
 #: includes/settings/settings-page.php:96
 msgid "API Key"
@@ -531,10 +531,6 @@ msgstr ""
 #: includes/settings/settings-page.php:114
 msgid "Active Geocoder"
 msgstr "Geocodificador activo"
-
-#: includes/settings/settings-page.php:267
-msgid "Insert Image"
-msgstr "Insertar imagen"
 
 #. translators: %s is the geocoder name. Example: Nominatim options.
 #: includes/settings/settings-page.php:144
@@ -627,6 +623,10 @@ msgstr "Incrustación"
 #: includes/settings/settings-page.php:264
 msgid "Company logo"
 msgstr "Logotipo de la empresa"
+
+#: includes/settings/settings-page.php:267
+msgid "Insert Image"
+msgstr "Insertar imagen"
 
 #: includes/settings/settings-page.php:277
 msgid "Save Changes"
@@ -723,39 +723,54 @@ msgstr "Atribución:"
 msgid "Download from source"
 msgstr "Descargar desde la fuente"
 
-#: includes/layer-types/mapbox-tileset-raster.js:4 js/build/mapBlocks.js:3
-#: js/build/mapsSidebar.js:1 js/src/map-blocks/layers-settings.js:48
+#: includes/layer-types/mapbox-tileset-raster.js:4 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
+#: js/src/layers-sidebar/layer-type-definitions.js:10
+#: js/src/map-blocks/layers-settings.js:49
 msgid "Raster Mapbox Tiled Source"
 msgstr "Fuente ráster de teselas de Mapbox"
 
 #: includes/layer-types/mapbox-tileset-raster.js:67
-#: includes/layer-types/mapbox-tileset-vector.js:69
+#: includes/layer-types/mapbox-tileset-vector.js:69 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:114
+#: js/src/layers-sidebar/layer-type-definitions.js:143
 msgid "Tileset ID"
 msgstr "ID del tileset"
 
 #: includes/layer-types/mapbox-tileset-raster.js:68
-#: includes/layer-types/mapbox-tileset-vector.js:70
+#: includes/layer-types/mapbox-tileset-vector.js:70 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:115
+#: js/src/layers-sidebar/layer-type-definitions.js:144
 msgid "Example: username.tilesetid"
 msgstr "Ejemplo: username.tilesetid"
 
 #: includes/layer-types/mapbox-tileset-raster.js:71
 #: includes/layer-types/mapbox-tileset-vector.js:98
-#: includes/layer-types/mvt.js:100
+#: includes/layer-types/mvt.js:100 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:99
+#: js/src/layers-sidebar/layer-type-definitions.js:118
+#: js/src/layers-sidebar/layer-type-definitions.js:171
 msgid "Style Source Type"
 msgstr "Tipo de fuente del estilo"
 
 #: includes/layer-types/mapbox-tileset-raster.js:72
-#: includes/layer-types/mvt.js:101
+#: includes/layer-types/mvt.js:101 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:100
+#: js/src/layers-sidebar/layer-type-definitions.js:119
 msgid "Which data the map should display"
 msgstr "Qué datos debe mostrar el mapa"
 
 #: includes/layer-types/mapbox-tileset-raster.js:78
-#: includes/layer-types/mapbox-tileset-vector.js:78
+#: includes/layer-types/mapbox-tileset-vector.js:78 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:125
+#: js/src/layers-sidebar/layer-type-definitions.js:152
 msgid "Layer Type"
 msgstr "Tipo de capa"
 
 #: includes/layer-types/mapbox-tileset-raster.js:80
-#: includes/layer-types/mapbox-tileset-vector.js:80
+#: includes/layer-types/mapbox-tileset-vector.js:80 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:126
+#: js/src/layers-sidebar/layer-type-definitions.js:153
 msgid ""
 "Layers take the data that they get from a source, optionally filter "
 "features, and then define how those features are styled."
@@ -763,34 +778,44 @@ msgstr ""
 "Las capas toman los datos que reciben de una fuente, opcionalmente filtran "
 "entidades y luego definen cómo se aplican los estilos a esas entidades."
 
-#: includes/layer-types/mapbox-tileset-vector.js:4 js/build/mapBlocks.js:3
-#: js/build/mapsSidebar.js:1 js/src/map-blocks/layers-settings.js:47
+#: includes/layer-types/mapbox-tileset-vector.js:4 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
+#: js/src/layers-sidebar/layer-type-definitions.js:6
+#: js/src/map-blocks/layers-settings.js:48
 msgid "Vector Mapbox Tiled Source"
 msgstr "Fuente vectorial de teselas de Mapbox"
 
 #: includes/layer-types/mapbox-tileset-vector.js:74
-#: includes/layer-types/mvt.js:82
+#: includes/layer-types/mvt.js:82 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:78
+#: js/src/layers-sidebar/layer-type-definitions.js:148
 msgid "Source layer"
 msgstr "Capa de origen"
 
-#: includes/layer-types/mapbox-tileset-vector.js:75
+#: includes/layer-types/mapbox-tileset-vector.js:75 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:149
 msgid "Which data the map should display."
 msgstr "Qué datos debe mostrar el mapa."
 
-#: includes/layer-types/mapbox-tileset-vector.js:99
+#: includes/layer-types/mapbox-tileset-vector.js:99 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:172
 msgid "The layer source type style"
 msgstr "El tipo de fuente del estilo de la capa"
 
-#: includes/layer-types/mapbox.js:9 js/build/mapBlocks.js:3
-#: js/build/mapsSidebar.js:1 js/src/map-blocks/layers-settings.js:46
+#: includes/layer-types/mapbox.js:9 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
+#: js/src/layers-sidebar/layer-type-definitions.js:4
+#: js/src/map-blocks/layers-settings.js:47
 msgid "Mapbox Style"
 msgstr "Estilo de Mapbox"
 
-#: includes/layer-types/mapbox.js:153
+#: includes/layer-types/mapbox.js:154 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:26
 msgid "Style ID"
 msgstr "ID del estilo"
 
-#: includes/layer-types/mapbox.js:155
+#: includes/layer-types/mapbox.js:156 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:27
 msgid ""
 "The Mapbox Style ID includes the user name and id. Example: username/id or "
 "mapbox://styles/username/id"
@@ -798,11 +823,13 @@ msgstr ""
 "El ID del estilo de Mapbox incluye el nombre de usuario y el ID. Ejemplo: "
 "username/id o mapbox://styles/username/id"
 
-#: includes/layer-types/mapbox.js:162
+#: includes/layer-types/mapbox.js:163 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:34
 msgid "Access token"
 msgstr "Token de acceso"
 
-#: includes/layer-types/mapbox.js:164
+#: includes/layer-types/mapbox.js:165 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:35
 msgid ""
 "Optional. If this layer needs a different access token from the one set in "
 "Settings, inform it here."
@@ -810,58 +837,85 @@ msgstr ""
 "Opcional. Si esta capa necesita un token de acceso diferente del configurado "
 "en Ajustes, indícalo aquí."
 
-#: includes/layer-types/mvt.js:4 js/build/mapBlocks.js:3
-#: js/build/mapsSidebar.js:1 js/src/map-blocks/layers-settings.js:50
+#: includes/layer-types/mvt.js:4 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
+#: js/src/layers-sidebar/layer-type-definitions.js:14
+#: js/src/map-blocks/layers-settings.js:51
 msgid "Mapbox Vector Tiles (MVT)"
 msgstr "Teselas vectoriales de Mapbox (MVT)"
 
 #: includes/layer-types/mvt.js:78 includes/layer-types/tilelayer.js:56
-#: includes/legend-types/circles.js:23 includes/legend-types/icons.js:23
+#: includes/legend-types/circles.js:24 includes/legend-types/icons.js:24
+#: js/build/layersSidebar.js:7 js/build/mapBlocks.js:1
+#: js/src/layers-sidebar/layer-type-definitions.js:49
+#: js/src/layers-sidebar/layer-type-definitions.js:74
 msgid "URL"
 msgstr "URL"
 
-#: includes/layer-types/mvt.js:83
+#: includes/layer-types/mvt.js:83 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:79
 msgid "Layer to use from a vector tile source."
 msgstr "Capa que se usará de una fuente de teselas vectoriales."
 
-#: includes/layer-types/tilelayer.js:4 js/build/mapBlocks.js:3
-#: js/build/mapsSidebar.js:1 js/src/map-blocks/layers-settings.js:49
+#: includes/layer-types/tilelayer.js:4 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
+#: js/src/layers-sidebar/layer-type-definitions.js:13
+#: js/src/map-blocks/layers-settings.js:50
 msgid "Raster Tiled Source"
 msgstr "Fuente ráster de teselas"
 
-#: includes/layer-types/tilelayer.js:60
+#: includes/layer-types/tilelayer.js:60 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:53
 msgid "Scheme"
 msgstr "Esquema"
 
-#: includes/layer-types/tilelayer.js:61
+#: includes/layer-types/tilelayer.js:61 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:54
 msgid "Influences the Y direction of the tile coordinates."
 msgstr "Influye en la dirección Y de las coordenadas de las teselas."
 
-#: includes/layer-types/tilelayer.js:64
+#: includes/layer-types/tilelayer.js:64 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:60
 msgid "Slippy Map tilenames (XYZ)"
 msgstr "Nombres de teselas de Slippy Map (XYZ)"
 
-#: includes/layer-types/tilelayer.js:65
+#: includes/layer-types/tilelayer.js:65 js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1 js/src/layers-sidebar/layer-type-definitions.js:61
 msgid "OSGeo spec (TMS)"
 msgstr "Especificación OSGeo (TMS)"
 
-#: includes/legend-types/barscale.js:14
+#: includes/legend-types/barscale.js:4
+#: js/src/posts-sidebar/legends-editor/legend-editor.js:9
+msgid "Color scale"
+msgstr "Escala de color"
+
+#: includes/legend-types/barscale.js:15
 msgid "The label shown at the left end of the bar"
 msgstr "La etiqueta que se muestra en el extremo izquierdo de la barra"
 
-#: includes/legend-types/barscale.js:18
+#: includes/legend-types/barscale.js:19
 msgid "The label shown at the right end of the bar"
 msgstr "La etiqueta que se muestra en el extremo derecho de la barra"
 
-#: includes/legend-types/barscale.js:22
+#: includes/legend-types/barscale.js:23
 msgid "An array of hexadecimal color values"
 msgstr "Un arreglo de valores de color hexadecimales"
 
-#: includes/legend-types/circles.js:14
+#: includes/legend-types/circles.js:4
+#: js/src/posts-sidebar/legends-editor/legend-editor.js:12
+msgid "Circle sizes"
+msgstr "Tamaños de círculos"
+
+#: includes/legend-types/circles.js:15
 msgid "An array of labels and radius values"
 msgstr "Un arreglo de etiquetas y valores de radio"
 
-#: includes/legend-types/icons.js:14
+#: includes/legend-types/icons.js:4
+#: js/src/posts-sidebar/legends-editor/legend-editor.js:11
+msgid "Icon categories"
+msgstr "Categorías de íconos"
+
+#: includes/legend-types/icons.js:15
 msgid "An array of labels and icons"
 msgstr "Un arreglo de etiquetas e íconos"
 
@@ -874,7 +928,12 @@ msgstr "Un arreglo de etiquetas e íconos"
 msgid "Default label"
 msgstr "Etiqueta predeterminada"
 
-#: includes/legend-types/simple-color.js:14
+#: includes/legend-types/simple-color.js:4
+#: js/src/posts-sidebar/legends-editor/legend-editor.js:10
+msgid "Color categories"
+msgstr "Categorías de color"
+
+#: includes/legend-types/simple-color.js:15
 msgid "An array of labels and colors"
 msgstr "Un arreglo de etiquetas y colores"
 
@@ -885,7 +944,7 @@ msgstr "Elegir imagen"
 #: js/build/discovery.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
 #: js/src/discovery/blocks/date-range-filter.js:122
 #: js/src/discovery/blocks/map-item.js:165
-#: js/src/map-blocks/layers-settings.js:134 js/build/discovery.js:2471
+#: js/src/map-blocks/layers-settings.js:136 js/build/discovery.js:2471
 #: js/build/mapBlocks.js:44057 js/build/mapsSidebar.js:40322
 msgid "Clear"
 msgstr "Limpiar"
@@ -899,7 +958,7 @@ msgstr "Aplicar"
 
 #: js/build/discovery.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
 #: js/src/discovery/blocks/tag-filter-control.js:54
-#: js/src/posts-selector/index.js:51 js/build/discovery.js:3985
+#: js/src/posts-selector/index.js:57 js/build/discovery.js:3985
 #: js/build/mapBlocks.js:46193 js/build/mapsSidebar.js:41122
 msgid "Tags"
 msgstr "Etiquetas"
@@ -921,7 +980,7 @@ msgstr " - "
 #: js/build/discovery.js:1 js/build/mapBlocks.js:1 js/build/postsSidebar.js:1
 #: js/src/discovery/blocks/stories.js:170 js/src/map-blocks/map-editor.js:142
 #: js/src/map-blocks/storymap-editor.js:1239
-#: js/src/posts-sidebar/geo-posts.js:425 js/build/discovery.js:3359
+#: js/src/posts-sidebar/geo-posts.js:430 js/build/discovery.js:3359
 #: js/build/mapBlocks.js:44664 js/build/mapBlocks.js:46114
 #: js/build/postsSidebar.js:18621
 msgid "Cancel"
@@ -1093,7 +1152,7 @@ msgstr "No aplicado"
 
 #: js/build/discovery.js:1 js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
 #: js/src/discovery/blocks/map-layers.js:696
-#: js/src/map-blocks/layers-settings.js:242 js/build/discovery.js:3030
+#: js/src/map-blocks/layers-settings.js:244 js/build/discovery.js:3030
 #: js/build/mapBlocks.js:44148 js/build/mapsSidebar.js:40413
 msgid "Selected layers"
 msgstr "Capas seleccionadas"
@@ -1135,7 +1194,7 @@ msgstr "embebido"
 
 #: js/build/discovery.js:1 js/build/jeoMap.js:1 js/build/layersSidebar.js:7
 #: js/src/discovery/index.js:539 js/src/jeo-map/class-jeo-map.js:447
-#: js/src/layers-sidebar/layers-sidebar.js:131 js/build/discovery.js:4526
+#: js/src/layers-sidebar/layers-sidebar.js:153 js/build/discovery.js:4526
 #: js/build/jeoMap.js:372 js/build/layersSidebar.js:21359
 msgid "Legend"
 msgstr "Leyenda"
@@ -1193,7 +1252,7 @@ msgstr "Volver al inicio"
 msgid "NAVIGATE THE MAP"
 msgstr "NAVEGAR EL MAPA"
 
-#: js/build/layersSidebar.js:7 js/src/shared/schema-form.js:132
+#: js/build/layersSidebar.js:7 js/src/shared/schema-form.js:129
 msgid "Select an option"
 msgstr "Selecciona una opción"
 
@@ -1308,9 +1367,9 @@ msgid "Ok"
 msgstr "Ok"
 
 #: js/build/layersSidebar.js:7 js/build/mapBlocks.js:3
-#: js/build/mapsSidebar.js:1 js/src/layers-sidebar/layer-settings.js:19
+#: js/build/mapsSidebar.js:1 js/src/layers-sidebar/layer-settings.js:24
 #: js/src/map-blocks/layer-settings.js:89
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:90
+#: js/src/posts-sidebar/legends-editor/legend-editor.js:202
 #: js/build/layersSidebar.js:21081 js/build/layersSidebar.js:22249
 #: js/build/mapBlocks.js:43675 js/build/mapsSidebar.js:39940
 msgid "Type"
@@ -1373,17 +1432,17 @@ msgstr "Interacciones"
 
 #: js/build/layersSidebar.js:7 js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1 js/src/layers-sidebar/interactions-settings.js:114
-#: js/src/map-blocks/layers-settings.js:420 js/build/layersSidebar.js:21057
+#: js/src/map-blocks/layers-settings.js:422 js/build/layersSidebar.js:21057
 #: js/build/mapBlocks.js:44315 js/build/mapsSidebar.js:40580
 msgid "Done"
 msgstr "Hecho"
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layer-settings.js:149
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layer-settings.js:242
 #: js/build/layersSidebar.js:21211
 msgid "Edit interactions"
 msgstr "Editar interacciones"
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:43
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:65
 #: js/build/layersSidebar.js:21271
 msgid ""
 "Please fill all required fields, you will not be able to publish or update "
@@ -1392,7 +1451,7 @@ msgstr ""
 "Complete todos los campos obligatorios, no podrá publicar ni actualizar "
 "hasta ese momento."
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:50
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:72
 #: js/build/layersSidebar.js:21278
 msgid ""
 "Your Mapbox access token may be invalid. You will not be able to publish or "
@@ -1401,7 +1460,7 @@ msgstr ""
 "Es posible que su token de acceso de Mapbox no sea válido. No podrá publicar "
 "ni actualizar. Por favor revise su configuración."
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:53
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:75
 #: js/build/layersSidebar.js:21281
 msgid ""
 "Your layer was not found. You will not be able to publish or update. Please "
@@ -1410,7 +1469,7 @@ msgstr ""
 "No se encontró la capa. No podrá publicar ni actualizar. Por favor revise su "
 "configuración."
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:56
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:78
 #: js/build/layersSidebar.js:21284
 msgid ""
 "Error loading your layer, you will not be able to publish or update. Please "
@@ -1419,7 +1478,7 @@ msgstr ""
 "Error al cargar la capa, no podrá publicar ni actualizar. Compruebe la "
 "configuración."
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:63
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:85
 #: js/build/layersSidebar.js:21291
 msgid ""
 "Your Mapbox API Key was not found in your JEO Settings. You will not be able "
@@ -1428,12 +1487,12 @@ msgstr ""
 "No se encontró la clave de API de Mapbox en la configuración de JEO. No "
 "podrá publicar ni actualizar."
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:67
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:89
 #: js/build/layersSidebar.js:21295
 msgid "Please, check your settings."
 msgstr "Por favor, revise su configuración."
 
-#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:124
+#: js/build/layersSidebar.js:7 js/src/layers-sidebar/layers-sidebar.js:146
 #: js/build/layersSidebar.js:21352
 msgid "Attributions"
 msgstr "Atribuciones"
@@ -1596,8 +1655,13 @@ msgid "Fuchsia"
 msgstr "Fucsia"
 
 #: js/build/mapBlocks.js:1 js/build/postsSidebar.js:1
-#: js/src/posts-sidebar/geo-auto-complete.js:71
-#: js/src/posts-sidebar/geo-auto-complete.js:72 js/build/mapBlocks.js:46541
+#: js/src/posts-sidebar/geo-auto-complete.js:34
+msgid "Unable to load address suggestions."
+msgstr "No fue posible cargar las sugerencias de direcciones."
+
+#: js/build/mapBlocks.js:1 js/build/postsSidebar.js:1
+#: js/src/posts-sidebar/geo-auto-complete.js:73
+#: js/src/posts-sidebar/geo-auto-complete.js:74 js/build/mapBlocks.js:46541
 #: js/build/postsSidebar.js:18201
 msgid "Search address"
 msgstr "Buscar dirección"
@@ -1777,65 +1841,65 @@ msgstr ""
 "visibilidad."
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:58
+#: js/src/map-blocks/layers-settings.js:59
 msgid "Select a layer type"
 msgstr "Selecciona un tipo de capa"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:109 js/build/mapBlocks.js:44032
+#: js/src/map-blocks/layers-settings.js:111 js/build/mapBlocks.js:44032
 #: js/build/mapsSidebar.js:40297
 msgid "Enter keywords to search layers"
 msgstr "Ingresa palabras clave para buscar capas"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:118 js/build/mapBlocks.js:44041
+#: js/src/map-blocks/layers-settings.js:120 js/build/mapBlocks.js:44041
 #: js/build/mapsSidebar.js:40306
 msgid "Layer type"
 msgstr "Tipo de capa"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:148 js/build/mapBlocks.js:44071
+#: js/src/map-blocks/layers-settings.js:150 js/build/mapBlocks.js:44071
 #: js/build/mapsSidebar.js:40336
 msgid "New Layer"
 msgstr "Nueva capa"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:155
+#: js/src/map-blocks/layers-settings.js:157
 msgid "Search layers by name or type to browse the library."
 msgstr "Busca capas por nombre o tipo para explorar la biblioteca."
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:203 js/build/mapBlocks.js:44120
+#: js/src/map-blocks/layers-settings.js:205 js/build/mapBlocks.js:44120
 #: js/build/mapsSidebar.js:40385
 msgid "Add to map"
 msgstr "Añadir al mapa"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:209
-#: js/src/map-blocks/layers-settings.js:373 js/build/mapBlocks.js:44126
+#: js/src/map-blocks/layers-settings.js:211
+#: js/src/map-blocks/layers-settings.js:375 js/build/mapBlocks.js:44126
 #: js/build/mapBlocks.js:44268 js/build/mapsSidebar.js:40391
 #: js/build/mapsSidebar.js:40533
 msgid "Do you really want to delete this layer?"
 msgstr "¿Está seguro de eliminar esta capa?"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:219 js/build/mapBlocks.js:44136
+#: js/src/map-blocks/layers-settings.js:221 js/build/mapBlocks.js:44136
 #: js/build/mapsSidebar.js:40401
 msgid "Remove from map"
 msgstr "Eliminar del mapa"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:231
+#: js/src/map-blocks/layers-settings.js:233
 msgid "No layers matched the current search filters."
 msgstr "Ninguna capa coincide con los filtros de búsqueda actuales."
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:238
+#: js/src/map-blocks/layers-settings.js:240
 msgid "Load more layers"
 msgstr "Cargar más capas"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/map-blocks/layers-settings.js:245 js/build/mapBlocks.js:44151
+#: js/src/map-blocks/layers-settings.js:247 js/build/mapBlocks.js:44151
 #: js/build/mapsSidebar.js:40416
 msgid "No layers have been added to this map."
 msgstr "No se ha añadido ninguna capa a este mapa."
@@ -1991,37 +2055,37 @@ msgid "Value"
 msgstr "Valor"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/posts-selector/index.js:25 js/build/mapBlocks.js:46164
+#: js/src/posts-selector/index.js:27 js/build/mapBlocks.js:46164
 #: js/build/mapsSidebar.js:41093
 msgid "Related posts"
 msgstr "Entradas relacionadas"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/posts-selector/index.js:28 js/build/mapBlocks.js:46167
+#: js/src/posts-selector/index.js:30 js/build/mapBlocks.js:46167
 #: js/build/mapsSidebar.js:41096
 msgid "Use related posts"
 msgstr "Usar entradas relacionadas"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/posts-selector/index.js:42 js/build/mapBlocks.js:46181
+#: js/src/posts-selector/index.js:45 js/build/mapBlocks.js:46181
 #: js/build/mapsSidebar.js:41110
 msgid "Categories"
 msgstr "Categorías"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/posts-selector/index.js:61 js/build/mapBlocks.js:46206
+#: js/src/posts-selector/index.js:70 js/build/mapBlocks.js:46206
 #: js/build/mapsSidebar.js:41135
 msgid "Start date"
 msgstr "Fecha de inicio"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/posts-selector/index.js:62 js/build/mapBlocks.js:46207
+#: js/src/posts-selector/index.js:71 js/build/mapBlocks.js:46207
 #: js/build/mapsSidebar.js:41136
 msgid "End date"
 msgstr "Fecha de fin"
 
 #: js/build/mapBlocks.js:3 js/build/mapsSidebar.js:1
-#: js/src/posts-selector/index.js:76 js/build/mapBlocks.js:46223
+#: js/src/posts-selector/index.js:93 js/build/mapBlocks.js:46223
 #: js/build/mapsSidebar.js:41152
 msgid "Meta queries"
 msgstr "Consultas de metadatos"
@@ -2031,63 +2095,67 @@ msgstr "Consultas de metadatos"
 msgid "Embed URL"
 msgstr "URL de incrustación"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:398
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:181
+msgid "Unable to retrieve the address for the selected point."
+msgstr "No fue posible obtener la dirección del punto seleccionado."
+
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:403
 #: js/build/postsSidebar.js:18594
 msgid "You can also drag the marker across the map."
 msgstr "También puedes arrastrar el marcador por el mapa."
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:405
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:410
 #: js/build/postsSidebar.js:18601
 msgid "Move marker to nearest address"
 msgstr "Mover el marcador a la dirección más cercana"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:410
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:415
 #: js/build/postsSidebar.js:18606
 msgid "Relevance"
 msgstr "Relevancia"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:415
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:420
 #: js/build/postsSidebar.js:18611
 msgid "Primary"
 msgstr "Primario"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:416
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:421
 #: js/build/postsSidebar.js:18612
 msgid "Secondary"
 msgstr "Secundario"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:433
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:438
 #: js/build/postsSidebar.js:18629
 msgid "Update selected point"
 msgstr "Actualizar punto seleccionado"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:434
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:439
 #: js/build/postsSidebar.js:18630
 msgid "Save new point"
 msgstr "Guardar nuevo punto"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:453
-#: js/src/posts-sidebar/geo-posts.js:457 js/build/postsSidebar.js:18649
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:458
+#: js/src/posts-sidebar/geo-posts.js:462 js/build/postsSidebar.js:18649
 #: js/build/postsSidebar.js:18653
 msgid "Add new point"
 msgstr "Añadir nuevo punto"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:465
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:470
 #: js/build/postsSidebar.js:18661
 msgid "Current points"
 msgstr "Puntos actuales"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:467
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:472
 #: js/build/postsSidebar.js:18663
 msgid "No points"
 msgstr "Sin puntos"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:491
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:496
 #: js/build/postsSidebar.js:18687
 msgid "Delete"
 msgstr "Borrar"
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:499
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:504
 #: js/build/postsSidebar.js:18695
 msgid "Edit"
 msgstr "Editar"
@@ -2097,14 +2165,6 @@ msgstr "Editar"
 #: js/build/postsSidebar.js:18854
 msgid "Geolocate this post"
 msgstr "Geolocalizar este post"
-
-#: js/src/posts-sidebar/geo-auto-complete.js:31
-msgid "Unable to load address suggestions."
-msgstr "No fue posible cargar las sugerencias de direcciones."
-
-#: js/src/posts-sidebar/geo-posts.js:180
-msgid "Unable to retrieve the address for the selected point."
-msgstr "No fue posible obtener la dirección del punto seleccionado."
 
 #: js/build/postsSidebar.js:1 js/src/posts-sidebar/index.js:50
 #: js/build/postsSidebar.js:18878
