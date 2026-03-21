@@ -9,7 +9,7 @@
 <form action="options.php" method="post" class="clear prepend-top">
 	<?php settings_fields( $this->option_key ); ?>
 		<div class="wrap">
-			<h1><?php esc_html_e( 'Jeo Settings', 'jeo' ); ?></h1>
+			<h1><?php esc_html_e( 'JEO Settings', 'jeo' ); ?></h1>
 			<?php settings_errors( $this->option_key ); ?>
 			<h2 id="tabs" class="nav-tab-wrapper">
 			<a href="#" class="nav-tab" data-target="general">

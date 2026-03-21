@@ -486,7 +486,7 @@ class Discovery extends Component {
 										} )
 									}
 								>
-									{ __( 'embed', 'jeo' ) }
+									{ __( 'Embed', 'jeo' ) }
 								</button>
 
 								{ this.state.showEmbedTooltip && (
