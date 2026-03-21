@@ -9,13 +9,15 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-21T05:12:15+00:00\n"
+"POT-Creation-Date: 2026-03-21T05:31:47+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeo\n"
 
 #. Plugin Name of the plugin
 #: jeo.php
+#: includes/menu/class-menu.php:33
+#: includes/menu/class-menu.php:34
 msgid "JEO"
 msgstr ""
 
@@ -106,7 +108,7 @@ msgstr ""
 #: js/build/jeoMap.js:2
 #: js/build/mapBlocks.js:1
 #: js/src/jeo-map/class-jeo-map.js:1447
-#: js/src/map-blocks/storymap-editor.js:854
+#: js/src/map-blocks/storymap-editor.js:867
 #: js/build/jeoMap.js:1023
 #: js/build/mapBlocks.js:45678
 msgid "Layers"
@@ -441,10 +443,6 @@ msgstr ""
 msgid "Map zoom must be between 1 and 14"
 msgstr ""
 
-#: includes/menu/class-menu.php:33
-msgid "Jeo"
-msgstr ""
-
 #: includes/settings/class-settings.php:175
 msgid "Mapbox requires a valid API key. The rendering library setting was not changed."
 msgstr ""
@@ -458,7 +456,7 @@ msgid "Settings"
 msgstr ""
 
 #: includes/settings/settings-page.php:12
-msgid "Jeo Settings"
+msgid "JEO Settings"
 msgstr ""
 
 #: includes/settings/settings-page.php:16
@@ -612,6 +610,8 @@ msgid "Close button color"
 msgstr ""
 
 #: includes/settings/settings-page.php:260
+#: js/build/discovery.js:1
+#: js/src/discovery/index.js:489
 msgid "Embed"
 msgstr ""
 
@@ -926,6 +926,7 @@ msgid "OSGeo spec (TMS)"
 msgstr ""
 
 #: includes/legend-types/barscale.js:4
+#: js/build/layersSidebar.js:7
 #: js/src/posts-sidebar/legends-editor/legend-editor.js:9
 msgid "Color scale"
 msgstr ""
@@ -943,6 +944,7 @@ msgid "An array of hexadecimal color values"
 msgstr ""
 
 #: includes/legend-types/circles.js:4
+#: js/build/layersSidebar.js:7
 #: js/src/posts-sidebar/legends-editor/legend-editor.js:12
 msgid "Circle sizes"
 msgstr ""
@@ -952,6 +954,7 @@ msgid "An array of labels and radius values"
 msgstr ""
 
 #: includes/legend-types/icons.js:4
+#: js/build/layersSidebar.js:7
 #: js/src/posts-sidebar/legends-editor/legend-editor.js:11
 msgid "Icon categories"
 msgstr ""
@@ -972,6 +975,7 @@ msgid "Default label"
 msgstr ""
 
 #: includes/legend-types/simple-color.js:4
+#: js/build/layersSidebar.js:7
 #: js/src/posts-sidebar/legends-editor/legend-editor.js:10
 msgid "Color categories"
 msgstr ""
@@ -988,7 +992,7 @@ msgstr ""
 #: js/build/discovery.js:1
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
-#: js/src/discovery/blocks/date-range-filter.js:122
+#: js/src/discovery/blocks/date-range-filter.js:125
 #: js/src/discovery/blocks/map-item.js:165
 #: js/src/map-blocks/layers-settings.js:136
 #: js/build/discovery.js:2471
@@ -998,7 +1002,7 @@ msgid "Clear"
 msgstr ""
 
 #: js/build/discovery.js:1
-#: js/src/discovery/blocks/date-range-filter.js:139
+#: js/src/discovery/blocks/date-range-filter.js:142
 #: js/src/discovery/blocks/map-item.js:165
 #: js/src/discovery/blocks/stories.js:169
 #: js/build/discovery.js:2471
@@ -1039,7 +1043,7 @@ msgstr ""
 #: js/build/postsSidebar.js:1
 #: js/src/discovery/blocks/stories.js:170
 #: js/src/map-blocks/map-editor.js:142
-#: js/src/map-blocks/storymap-editor.js:1239
+#: js/src/map-blocks/storymap-editor.js:1252
 #: js/src/posts-sidebar/geo-posts.js:430
 #: js/build/discovery.js:3359
 #: js/build/mapBlocks.js:44664
@@ -1297,12 +1301,6 @@ msgid "Map layers"
 msgstr ""
 
 #: js/build/discovery.js:1
-#: js/src/discovery/index.js:489
-#: js/build/discovery.js:4476
-msgid "embed"
-msgstr ""
-
-#: js/build/discovery.js:1
 #: js/build/jeoMap.js:1
 #: js/build/layersSidebar.js:7
 #: js/src/discovery/index.js:539
@@ -1440,7 +1438,7 @@ msgstr ""
 #: js/build/mapBlocks.js:1
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
-#: js/src/map-blocks/storymap-editor.js:1095
+#: js/src/map-blocks/storymap-editor.js:1108
 #: js/src/posts-selector/meta-selector.js:67
 #: js/src/posts-sidebar/legends-editor/editors/barscale.js:199
 #: js/src/posts-sidebar/legends-editor/editors/circle.js:171
@@ -1464,7 +1462,7 @@ msgstr ""
 
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:1007
+#: js/src/map-blocks/storymap-editor.js:1020
 #: js/src/posts-sidebar/legends-editor/editors/circle.js:181
 #: js/build/layersSidebar.js:21787
 #: js/build/mapBlocks.js:45891
@@ -1545,7 +1543,7 @@ msgstr ""
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 #: js/src/layers-sidebar/interaction-settings.js:128
-#: js/src/map-blocks/storymap-editor.js:1011
+#: js/src/map-blocks/storymap-editor.js:1024
 #: js/build/layersSidebar.js:20877
 #: js/build/mapBlocks.js:45895
 msgid "Title"
@@ -1568,7 +1566,7 @@ msgstr ""
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 #: js/src/layers-sidebar/interaction-settings.js:175
-#: js/src/map-blocks/storymap-editor.js:1133
+#: js/src/map-blocks/storymap-editor.js:1146
 #: js/src/posts-selector/meta-selector.js:79
 #: js/build/layersSidebar.js:20924
 #: js/build/mapBlocks.js:46008
@@ -1662,7 +1660,7 @@ msgstr ""
 
 #: js/build/mapBlocks.js:1
 #: js/src/map-blocks/map-editor.js:119
-#: js/src/map-blocks/storymap-editor.js:1199
+#: js/src/map-blocks/storymap-editor.js:1212
 #: js/build/mapBlocks.js:44641
 #: js/build/mapBlocks.js:46074
 msgid "Insert a map from the library"
@@ -1670,7 +1668,7 @@ msgstr ""
 
 #: js/build/mapBlocks.js:1
 #: js/src/map-blocks/map-editor.js:123
-#: js/src/map-blocks/storymap-editor.js:1203
+#: js/src/map-blocks/storymap-editor.js:1216
 #: js/build/mapBlocks.js:44645
 #: js/build/mapBlocks.js:46078
 msgid "Type a map name"
@@ -1856,91 +1854,91 @@ msgid "Search address"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:737
-#: js/src/map-blocks/storymap-editor.js:786
+#: js/src/map-blocks/storymap-editor.js:750
+#: js/src/map-blocks/storymap-editor.js:799
 #: js/build/mapBlocks.js:45561
 #: js/build/mapBlocks.js:45612
 msgid "Story settings"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:747
+#: js/src/map-blocks/storymap-editor.js:760
 #: js/build/mapBlocks.js:45571
 msgid "Brief description"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:762
+#: js/src/map-blocks/storymap-editor.js:775
 #: js/build/mapBlocks.js:45588
 msgid "Show story map introduction"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:773
+#: js/src/map-blocks/storymap-editor.js:786
 #: js/build/mapBlocks.js:45599
 msgid "Use \"Navigate to map\" button"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:801
-#: js/src/map-blocks/storymap-editor.js:1140
+#: js/src/map-blocks/storymap-editor.js:814
+#: js/src/map-blocks/storymap-editor.js:1153
 #: js/build/mapBlocks.js:45627
 #: js/build/mapBlocks.js:46015
 msgid "Slides settings"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:825
+#: js/src/map-blocks/storymap-editor.js:838
 msgid "Move slide up"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:832
+#: js/src/map-blocks/storymap-editor.js:845
 msgid "Move slide down"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:841
-#: js/src/map-blocks/storymap-editor.js:1155
+#: js/src/map-blocks/storymap-editor.js:854
+#: js/src/map-blocks/storymap-editor.js:1168
 #: js/build/mapBlocks.js:45668
 #: js/build/mapBlocks.js:46030
 msgid "Slide"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:966
-#: js/src/map-blocks/storymap-editor.js:987
+#: js/src/map-blocks/storymap-editor.js:979
+#: js/src/map-blocks/storymap-editor.js:1000
 #: js/build/mapBlocks.js:45831
 #: js/build/mapBlocks.js:45871
 msgid "Lock current spot"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:1036
+#: js/src/map-blocks/storymap-editor.js:1049
 #: js/build/mapBlocks.js:45919
 msgid "Content"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:1066
+#: js/src/map-blocks/storymap-editor.js:1079
 #: js/build/mapBlocks.js:45948
 msgid "The minimum number of slides is 1."
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:1072
+#: js/src/map-blocks/storymap-editor.js:1085
 #: js/build/mapBlocks.js:45954
 msgid "Do you really want to remove this slide?"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:1155
+#: js/src/map-blocks/storymap-editor.js:1168
 #: js/build/mapBlocks.js:46030
 msgid "Current slide:"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-#: js/src/map-blocks/storymap-editor.js:1190
+#: js/src/map-blocks/storymap-editor.js:1203
 #: js/build/mapBlocks.js:46065
 msgid "Map:"
 msgstr ""
@@ -2272,9 +2270,7 @@ msgstr ""
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 #: js/src/map-blocks/map-settings.js:222
-#: js/build/mapBlocks.js:45009
-#: js/build/mapsSidebar.js:40843
-msgid "Set current as map settings"
+msgid "Use current map view"
 msgstr ""
 
 #: js/build/mapBlocks.js:3
@@ -2500,7 +2496,16 @@ msgstr ""
 msgid "Discovery"
 msgstr ""
 
+#: js/build/discovery.js:4476
+msgid "embed"
+msgstr ""
+
 #: js/build/mapBlocks.js:43776
 #: js/build/mapsSidebar.js:40041
 msgid "If the layer is not visible inside Mapbox Studio we will not be able to control the displayment."
+msgstr ""
+
+#: js/build/mapBlocks.js:45009
+#: js/build/mapsSidebar.js:40843
+msgid "Set current as map settings"
 msgstr ""

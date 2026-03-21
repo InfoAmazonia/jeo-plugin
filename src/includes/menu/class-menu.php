@@ -30,8 +30,8 @@ class Menu {
 	 */
 	public function add_main_menu() {
 		add_menu_page(
-			__( 'Jeo', 'jeo' ),
-			'Jeo',
+			__( 'JEO', 'jeo' ),
+			__( 'JEO', 'jeo' ),
 			'read',
 			'jeo-main-menu',
 			'',

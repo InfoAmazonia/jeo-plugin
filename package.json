@@ -1,7 +1,7 @@
 {
 	"name": "jeo",
 	"version": "3.0.0-rc.3",
-	"description": "Jeo plugin",
+	"description": "Interactive maps for the WordPress block editor",
 	"main": "index.js",
 	"directories": {
 		"test": "tests"
