@@ -6,6 +6,7 @@ import { SelectControl, TextControl } from '../shared/wp-form-controls';
 import { List, arrayMove } from 'react-movable';
 
 import LayerSettings from './layer-settings';
+import { mergeLayerTypeOptions } from './layer-type-options';
 import { loadLayer } from './utils';
 import { usePaginatedRecords } from '../shared/rest-records';
 
@@ -42,13 +43,24 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		},
 	} );
 
+	const fallbackLayerTypeOptions = [
+		{ label: __( 'Mapbox Style', 'jeo' ), value: 'mapbox' },
+		{ label: __( 'Vector Mapbox Tiled Source', 'jeo' ), value: 'mapbox-tileset-vector' },
+		{ label: __( 'Raster Mapbox Tiled Source', 'jeo' ), value: 'mapbox-tileset-raster' },
+		{ label: __( 'Raster Tiled Source', 'jeo' ), value: 'tilelayer' },
+		{ label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ), value: 'mvt' },
+	];
+	const registeredLayerTypeOptions =
+		window.JeoLayerTypes?.getLayerTypes?.().map( ( slug ) => ( {
+			label: window.JeoLayerTypes.getLayerType( slug )?.label || slug,
+			value: slug,
+		} ) ) ?? [];
 	const layerTypeOptions = [
-		{ label: 'Select a layer type', value: '' },
-		{ label: 'Mapbox', value: 'mapbox' },
-		{ label: 'Mapbox-tileset-vector', value: 'mapbox-tileset-vector' },
-		{ label: 'Mapbox-tileset-raster', value: 'mapbox-tileset-raster' },
-		{ label: 'Tilelayer', value: 'tilelayer' },
-		{ label: 'MVT', value: 'mvt' },
+		{ label: __( 'Select a layer type', 'jeo' ), value: '' },
+		...mergeLayerTypeOptions(
+			fallbackLayerTypeOptions,
+			registeredLayerTypeOptions
+		),
 	];
 
 	useEffect( () => {

@@ -1,4 +1,6 @@
 (function ($) {
+	const { __ } = wp.i18n;
+
 	$(function () {
 		function toggleMapboxSettings() {
 			const shouldShow = $('#map_runtime').val() === 'mapboxgl';
@@ -32,9 +34,9 @@
 				return;
 			}
 			mediaUploader = wp.media.frames.file_frame = wp.media({
-				title: 'Choose Image',
+				title: __( 'Choose Image', 'jeo' ),
 				button: {
-					text: 'Choose Image'
+					text: __( 'Choose Image', 'jeo' )
 				}, multiple: false
 			});
 			mediaUploader.on('select', function () {

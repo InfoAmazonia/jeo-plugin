@@ -352,8 +352,10 @@ export default class JeoMap {
 
 	addMapWithoutLayersMessage() {
 		const layers = document.createElement( 'div' );
-		layers.innerHTML +=
-			'<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
+		layers.innerHTML += `<p class="jeomap-no-layers__text">${ __(
+			"This map doesn't have layers",
+			'jeo'
+		) }</p>`;
 		this.element.appendChild( layers );
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
 		jQuery( this.element ).find( '.mapboxgl-control-container, .maplibregl-control-container' ).remove();
@@ -515,7 +517,10 @@ export default class JeoMap {
 
 				if ( attributionLink ) {
 					const attributionLabel = attributionName || attributionLink;
-					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ attributionLabel }</a></p>`;
+					innerHTML += `<p>${ __(
+						'Attribution:',
+						'jeo'
+					) } <a href="${ attributionLink }">${ attributionLabel }</a></p>`;
 				}
 				if ( sourceLink ) {
 					innerHTML += `<a
@@ -533,7 +538,10 @@ export default class JeoMap {
 									font-size: 16px;
 									font-weight: bold;
 									transition: all .2 ease-in-out;"
-									href="${ sourceLink }" class="download-source">Download from source
+									href="${ sourceLink }" class="download-source">${ __(
+										'Download from source',
+										'jeo'
+									) }
 								  </a>`;
 				}
 			} );
@@ -543,7 +551,10 @@ export default class JeoMap {
 		const closeButton = document.createElement( 'div' );
 		closeButton.classList.add( 'more-info-close' );
 		closeButton.innerHTML =
-			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>`;
+			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="${ __(
+				'Close popup',
+				'jeo'
+			) }"><span>×</span></button>`;
 
 		closeButton.click( function ( e ) {} );
 
@@ -1137,6 +1148,7 @@ export default class JeoMap {
 			meta.textContent =
 				totalCount !== popupFeatures.length
 					? sprintf(
+						/* translators: %d: number of markers in the current map area. */
 						_n(
 							'%d marker in this area',
 							'%d markers in this area',

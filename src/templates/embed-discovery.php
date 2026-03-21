@@ -9,7 +9,7 @@
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title><?php bloginfo( 'name' ); ?> - Discovery</title>
+		<title><?php bloginfo( 'name' ); ?> - <?php esc_html_e( 'Explore', 'jeo' ); ?></title>
 		<?php wp_head(); ?>
 	</head>
 

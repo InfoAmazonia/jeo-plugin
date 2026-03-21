@@ -8,6 +8,7 @@ import LayersSettingsModal from '../map-blocks/layers-settings-modal';
 import MapPanel from '../map-blocks/map-panel';
 import MapEmbedUrl from './map-embed-url';
 import PostsSelector from '../posts-selector';
+import { normalizeRelatedPosts } from '../posts-selector/defaults';
 import { useRecordsByIds } from '../shared/rest-records';
 
 import './maps-sidebar.scss';
@@ -81,13 +82,17 @@ export default withDispatch( ( dispatch ) => ( {
 		dispatch( 'core/editor' ).editPost( { meta } );
 	},
 	setRelatedPosts: ( value ) => {
-		dispatch( 'core/editor' ).editPost( { meta: { related_posts: value } } );
+		dispatch( 'core/editor' ).editPost( {
+			meta: { related_posts: normalizeRelatedPosts( value ) },
+		} );
 	},
 } ) )(
 	withSelect( ( select ) => ( {
 		postId: select( 'core/editor' ).getCurrentPostId(),
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-		relatedPosts: select( 'core/editor' ).getEditedPostAttribute( 'meta' )
-			.related_posts,
+		relatedPosts: normalizeRelatedPosts(
+			select( 'core/editor' ).getEditedPostAttribute( 'meta' )
+				.related_posts
+		),
 	} ) )( MapsSidebar )
 );

@@ -1,3 +1,5 @@
+const { __ } = wp.i18n;
+
 window.JeoLegendTypes.registerLegendType( 'simple-color', {
 
 	/**
@@ -9,7 +11,7 @@ window.JeoLegendTypes.registerLegendType( 'simple-color', {
 			properties: {
 				colors: {
 					type: 'array',
-					description: 'An array of labels and colors',
+					description: __( 'An array of labels and colors', 'jeo' ),
 					items: {
 						type: 'object',
 						properties: {

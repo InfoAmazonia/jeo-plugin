@@ -1,10 +1,12 @@
+const { __ } = wp.i18n;
+
 const MAPBOX_RASTER_ATTRIBUTION =
 	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
 	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
 	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
 
 window.JeoLayerTypes.registerLayerType( 'mapbox', {
-	label: 'Mapbox Style',
+	label: __( 'Mapbox Style', 'jeo' ),
 
 	addStyle( map, attributes ) {
 		const styleUrl = this.getStyleUrl( attributes );
@@ -148,15 +150,21 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 			properties: {
 				style_id: {
 					type: 'string',
-					title: 'Style ID',
+					title: __( 'Style ID', 'jeo' ),
 					description:
-						'The mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
+						__(
+							'The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
+							'jeo'
+						),
 				},
 				access_token: {
 					type: 'string',
-					title: 'Access token',
+					title: __( 'Access token', 'jeo' ),
 					description:
-						'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+						__(
+							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+							'jeo'
+						),
 				},
 			},
 		};
