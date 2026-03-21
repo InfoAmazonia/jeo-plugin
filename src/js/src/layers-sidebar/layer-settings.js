@@ -11,8 +11,12 @@ import {
 import { __ } from '@wordpress/i18n';
 import InteractionsSettings from './interactions-settings';
 import { useDebounce } from 'use-debounce';
-import SchemaForm from '../shared/schema-form';
+import SchemaForm, { mergeSchemaFormData } from '../shared/schema-form';
 import { mergeLayerTypeOptions } from '../map-blocks/layer-type-options';
+import {
+	coreLayerTypeOptions,
+	getEditorLayerTypeSchema,
+} from './layer-type-definitions';
 
 const baseLayerSchema = {
 	type: 'object',
@@ -22,19 +26,18 @@ const baseLayerSchema = {
 	required: [ 'type' ],
 };
 
-const fallbackLayerTypeOptions = [
-	{ label: __( 'Mapbox Style', 'jeo' ), value: 'mapbox' },
-	{
-		label: __( 'Vector Mapbox Tiled Source', 'jeo' ),
-		value: 'mapbox-tileset-vector',
-	},
-	{
-		label: __( 'Raster Mapbox Tiled Source', 'jeo' ),
-		value: 'mapbox-tileset-raster',
-	},
-	{ label: __( 'Raster Tiled Source', 'jeo' ), value: 'tilelayer' },
-	{ label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ), value: 'mvt' },
-];
+function isPlainObject( value ) {
+	return Boolean( value ) && typeof value === 'object' && ! Array.isArray( value );
+}
+
+function normalizeLayerFormData( postMeta = {} ) {
+	return {
+		...postMeta,
+		layer_type_options: isPlainObject( postMeta.layer_type_options )
+			? postMeta.layer_type_options
+			: {},
+	};
+}
 
 function getLayerTypeOptions() {
 	const registeredLayerTypeOptions =
@@ -44,7 +47,7 @@ function getLayerTypeOptions() {
 		} ) ) ?? [];
 
 	return mergeLayerTypeOptions(
-		fallbackLayerTypeOptions,
+		coreLayerTypeOptions,
 		registeredLayerTypeOptions
 	);
 }
@@ -86,6 +89,9 @@ function usePrevious( value ) {
 const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
+	const [ formData, setFormData ] = useState( () =>
+		normalizeLayerFormData( postMeta )
+	);
 	const [ layerTypeOptions, setLayerTypeOptions ] = useState( () =>
 		getLayerTypeOptions()
 	);
@@ -98,8 +104,9 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const openModal = useCallback( () => setModalStatus( true ), [
 		setModalStatus,
 	] );
-	const prevPostMeta = usePrevious( postMeta );
-	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
+	const prevLayerType = usePrevious( formData.type );
+	const serializedPostMeta = JSON.stringify( normalizeLayerFormData( postMeta ) );
+	const [ debouncedFormData ] = useDebounce( formData, 1500 );
 
 	const schema = useMemo(
 		() => ( {
@@ -119,20 +126,26 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	);
 
 	const interactions = useMemo( () => {
-		return postMeta.layer_type_options?.interactions || [];
-	}, [ postMeta.layer_type_options?.interactions ] );
+		return formData.layer_type_options?.interactions || [];
+	}, [ formData.layer_type_options?.interactions ] );
+
+	useEffect( () => {
+		setFormData( normalizeLayerFormData( postMeta ) );
+	}, [ serializedPostMeta ] );
 
 	const setInteractions = useCallback(
 		( e ) => {
-			setPostMeta( {
-				...postMeta,
+			const nextFormData = {
+				...formData,
 				layer_type_options: {
-					...postMeta.layer_type_options,
+					...formData.layer_type_options,
 					interactions: e,
 				},
-			} );
+			};
+			setFormData( nextFormData );
+			setPostMeta( nextFormData );
 		},
-		[ postMeta, setPostMeta ]
+		[ formData, setPostMeta ]
 	);
 
 	useEffect( () => {
@@ -152,46 +165,46 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	}, [] );
 
 	useEffect( () => {
-		if ( postMeta.type ) {
-			const schema = window.JeoLayerTypes.getLayerTypeSchema( postMeta );
-			if ( ! schema ) {
+		if ( formData.type ) {
+			const nextSchema = getEditorLayerTypeSchema( formData );
+			if ( ! nextSchema ) {
 				setOptions( {} );
 				setWidgets( {} );
 				return;
 			}
-			formUpdater( setOptions, setWidgets, schema );
+			formUpdater( setOptions, setWidgets, nextSchema );
 
-			if ( postMeta.type ) {
-				const layerTypeOptions =
-					prevPostMeta?.type && prevPostMeta.type !== postMeta.type
-						? {}
-						: postMeta.layer_type_options || {};
-
-				if ( postMeta.layer_type_options !== layerTypeOptions ) {
-				setPostMeta( {
-					...postMeta,
-					layer_type_options: layerTypeOptions,
-				} );
+			if ( prevLayerType && prevLayerType !== formData.type ) {
+				const nextFormData = {
+					...formData,
+					layer_type_options: {},
+				};
+				setFormData( nextFormData );
+				setPostMeta( nextFormData );
 				}
 				setStyleLayers( null );
-			}
 		} else {
 			setOptions( {} );
 			setWidgets( {} );
 		}
-	}, [ postMeta.type, layerTypeOptions ] );
+	}, [ formData.type, layerTypeOptions ] );
 
 	useEffect( () => {
 		const layerType = window.JeoLayerTypes.getLayerType(
-			debouncedPostMeta.type
+			debouncedFormData.type
 		);
-		if ( layerType && layerType.getStyleLayers ) {
-			layerType._getStyleDefinition( debouncedPostMeta ).then( setStyleDefinition );
-			layerType.getStyleLayers( debouncedPostMeta ).then( setStyleLayers );
+		const layerTypeOptions = debouncedFormData.layer_type_options;
+		const hasLayerTypeOptions =
+			layerTypeOptions && typeof layerTypeOptions === 'object';
+
+		if ( layerType && layerType.getStyleLayers && hasLayerTypeOptions ) {
+			layerType._getStyleDefinition( debouncedFormData ).then( setStyleDefinition );
+			layerType.getStyleLayers( debouncedFormData ).then( setStyleLayers );
 		} else {
 			setStyleLayers( null );
+			setStyleDefinition( null );
 		}
-	}, [ debouncedPostMeta ] );
+	}, [ debouncedFormData ] );
 
 	return (
 		<Fragment>
@@ -199,10 +212,14 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 				className="jeo-layer-settings"
 				schema={ schema }
 				uiSchema={ widgets }
-				formData={ postMeta }
-				onChange={ ( { formData } ) => {
-					window.layerFormData = formData;
-					setPostMeta( formData );
+				formData={ formData }
+				onChange={ ( { formData: nextPartialFormData } ) => {
+					const nextFormData = normalizeLayerFormData(
+						mergeSchemaFormData( formData, nextPartialFormData )
+					);
+					window.layerFormData = nextFormData;
+					setFormData( nextFormData );
+					setPostMeta( nextFormData );
 				} }
 			>
 				{ /* Hide submit button */ }
