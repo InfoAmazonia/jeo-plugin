@@ -230,7 +230,7 @@ class Jeo {
 	}
 
 	/**
-	 * Fall back to the Colombian Spanish catalog when another Spanish locale is active.
+	 * Fall back to the closest bundled locale when another locale in the same language family is active.
 	 *
 	 * @param string $mofile Translation file path.
 	 * @param string $domain Text domain.
@@ -252,7 +252,7 @@ class Jeo {
 	}
 
 	/**
-	 * Fall back to the Colombian Spanish script catalogs for other Spanish locales.
+	 * Fall back to the closest bundled script catalog for locales in the same language family.
 	 *
 	 * @param string|false $file Script translation file path.
 	 * @param string       $handle Script handle.
@@ -298,12 +298,19 @@ class Jeo {
 	private function get_locale_fallback( string $locale ): ?string {
 		$locale = $this->normalize_translation_locale( $locale );
 
-		if ( 'es_CO' === $locale ) {
-			return null;
-		}
+		$fallbacks = array(
+			'es' => 'es_CO',
+			'pt' => 'pt_BR',
+		);
 
-		if ( 'es' === $locale || 0 === strpos( $locale, 'es_' ) ) {
-			return 'es_CO';
+		foreach ( $fallbacks as $language => $fallback_locale ) {
+			if ( $fallback_locale === $locale ) {
+				return null;
+			}
+
+			if ( $language === $locale || 0 === strpos( $locale, $language . '_' ) ) {
+				return $fallback_locale;
+			}
 		}
 
 		return null;
