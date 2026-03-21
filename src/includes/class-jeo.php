@@ -50,6 +50,8 @@ class Jeo {
 		\jeo_sidebars();
 		\jeo_storymap();
 
+		add_filter( 'load_textdomain_mofile', array( $this, 'fallback_translation_mofile' ), 10, 2 );
+		add_filter( 'load_script_translation_file', array( $this, 'fallback_script_translation_file' ), 10, 3 );
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
@@ -225,6 +227,86 @@ class Jeo {
 			false,
 			plugin_basename( JEO_BASEPATH ) . '/languages',
 		);
+	}
+
+	/**
+	 * Fall back to the Colombian Spanish catalog when another Spanish locale is active.
+	 *
+	 * @param string $mofile Translation file path.
+	 * @param string $domain Text domain.
+	 * @return string
+	 */
+	public function fallback_translation_mofile( $mofile, $domain ) {
+		if ( 'jeo' !== $domain || is_readable( $mofile ) ) {
+			return $mofile;
+		}
+
+		$fallback_locale = $this->get_locale_fallback( determine_locale() );
+		if ( ! $fallback_locale ) {
+			return $mofile;
+		}
+
+		$fallback_mofile = JEO_BASEPATH . 'languages/jeo-' . $fallback_locale . '.mo';
+
+		return is_readable( $fallback_mofile ) ? $fallback_mofile : $mofile;
+	}
+
+	/**
+	 * Fall back to the Colombian Spanish script catalogs for other Spanish locales.
+	 *
+	 * @param string|false $file Script translation file path.
+	 * @param string       $handle Script handle.
+	 * @param string       $domain Text domain.
+	 * @return string|false
+	 */
+	public function fallback_script_translation_file( $file, $handle, $domain ) {
+		if ( 'jeo' !== $domain || ! $file || is_readable( $file ) ) {
+			return $file;
+		}
+
+		$current_locale  = $this->normalize_translation_locale( determine_locale() );
+		$fallback_locale = $this->get_locale_fallback( $current_locale );
+		if ( ! $fallback_locale ) {
+			return $file;
+		}
+
+		$fallback_file = str_replace(
+			'-' . $current_locale . '-',
+			'-' . $fallback_locale . '-',
+			$file,
+		);
+
+		return $fallback_file !== $file && is_readable( $fallback_file ) ? $fallback_file : $file;
+	}
+
+	/**
+	 * Normalize locale codes used in translation file names.
+	 *
+	 * @param string $locale Locale code.
+	 * @return string
+	 */
+	private function normalize_translation_locale( string $locale ): string {
+		return str_replace( '-', '_', $locale );
+	}
+
+	/**
+	 * Get a fallback locale for translation files.
+	 *
+	 * @param string $locale Locale code.
+	 * @return string|null
+	 */
+	private function get_locale_fallback( string $locale ): ?string {
+		$locale = $this->normalize_translation_locale( $locale );
+
+		if ( 'es_CO' === $locale ) {
+			return null;
+		}
+
+		if ( 'es' === $locale || 0 === strpos( $locale, 'es_' ) ) {
+			return 'es_CO';
+		}
+
+		return null;
 	}
 
 	/**
