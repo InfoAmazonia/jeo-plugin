@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerSettings from './layer-settings';
+import { getEditorLayerTypeSchema } from './layer-type-definitions';
 import './layers-sidebar.scss';
 
 const LayersSidebar = ( {
@@ -51,7 +52,7 @@ const LayersSidebar = ( {
 
 	useEffect( () => {
 		if ( postMeta.type ) {
-			const schema = window.JeoLayerTypes.getLayerTypeSchema( postMeta );
+			const schema = getEditorLayerTypeSchema( postMeta );
 			setLayerTypeSchema( schema || {} );
 		} else {
 			setLayerTypeSchema( {} );

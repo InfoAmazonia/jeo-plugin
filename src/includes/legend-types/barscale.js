@@ -1,6 +1,7 @@
 const { __ } = wp.i18n;
 
 window.JeoLegendTypes.registerLegendType( 'barscale', {
+	label: __( 'Color scale', 'jeo' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type

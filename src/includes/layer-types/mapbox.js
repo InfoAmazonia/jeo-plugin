@@ -18,11 +18,12 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 
 	addLayer( map, attributes, addLayerParams = null ) {
 		const layerId = attributes.layer_id;
+		const layerTypeOptions = attributes.layer_type_options || {};
 
 		if ( ! map.getSource( layerId ) ) {
-			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
+			const accessToken = layerTypeOptions.access_token || jeo_settings.mapbox_key;
 
-			const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+			const styleId = layerTypeOptions.style_id?.replace( 'mapbox://styles/', '' );
 
 			map.addSource( layerId, {
 				type: 'raster',
@@ -171,9 +172,10 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	},
 
 	getStyleUrl( attributes ) {
-		const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
+		const layerTypeOptions = attributes.layer_type_options || {};
+		const accessToken = layerTypeOptions.access_token || jeo_settings.mapbox_key;
 
-		const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+		const styleId = layerTypeOptions.style_id?.replace( 'mapbox://styles/', '' );
 
 		if ( styleId ) {
 			return `https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }`;
@@ -221,10 +223,11 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleDefinitions[ attributes.layer_id ] );
 			}
 
-			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
+			const layerTypeOptions = attributes.layer_type_options || {};
+			const accessToken = layerTypeOptions.access_token || jeo_settings.mapbox_key;
 
-			if ( accessToken && attributes.layer_type_options.style_id ) {
-				const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+			if ( accessToken && layerTypeOptions.style_id ) {
+				const styleId = layerTypeOptions.style_id?.replace( 'mapbox://styles/', '' );
 
 				jQuery.get(
 					`https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }`,
@@ -246,7 +249,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				resolve( self._styleLayers[ attributes.layer_id ] );
 			}
 
-			const accessToken = attributes.layer_type_options.access_token || jeo_settings.mapbox_key;
+			const layerTypeOptions = attributes.layer_type_options || {};
+			const accessToken = layerTypeOptions.access_token || jeo_settings.mapbox_key;
 
 			self
 				._getStyleDefinition( attributes )
