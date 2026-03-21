@@ -30,7 +30,9 @@ export default function JeoGeoAutoComplete( {
 					.fetch( requestUrl )
 					.then( ( response ) => {
 						if ( ! response.ok ) {
-							throw new Error( 'Unable to load geocoding suggestions.' );
+							throw new Error(
+								__( 'Unable to load address suggestions.', 'jeo' )
+							);
 						}
 
 						return response.json();

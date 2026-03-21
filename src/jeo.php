@@ -7,7 +7,7 @@
  * @wordpress-plugin
  * Plugin Name:       JEO
  * Plugin URI:        https://www.jeowp.org/
- * Description:       Interactive Map blocks for WordPress Gutenberg
+ * Description:       Interactive maps for the WordPress block editor
  * Version:           3.0.0-rc.3
  * Author:            InfoAmazonia
  * Author URI:        https://www.jeowp.org/

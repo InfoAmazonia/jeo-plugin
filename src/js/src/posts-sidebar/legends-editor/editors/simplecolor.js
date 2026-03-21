@@ -101,7 +101,7 @@ class SimplecolorEditor extends Component {
 			}
 
 			colors.push(
-				{ label: 'Default name', color: randomColor, id: generateUUID() },
+				{ label: __( 'Default label', 'jeo' ), color: randomColor, id: generateUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
@@ -170,7 +170,12 @@ function ColorItem( { item, itemChanged, removeItem } ) {
 					onChange={ ( label ) => itemChanged( { ...item, label } ) }
 				/>
 
-				<Button icon="minus" label="Remove" onClick={ () => removeItem( item.id ) } className="remove-button" />
+				<Button
+					icon="minus"
+					label={ __( 'Remove', 'jeo' ) }
+					onClick={ () => removeItem( item.id ) }
+					className="remove-button"
+				/>
 			</div>
 		</div>
 	);

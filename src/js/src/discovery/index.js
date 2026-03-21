@@ -458,7 +458,7 @@ class Discovery extends Component {
 								</a>
 
 								<a
-									href={ `mailto:?subject=Discovery&body=${ encodedMailBody }` }
+									href={ `mailto:?subject=${ encodeURIComponent( __( 'Explore', 'jeo' ) ) }&body=${ encodedMailBody }` }
 									target="_blank"
 									rel="noreferrer"
 								>

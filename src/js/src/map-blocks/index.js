@@ -146,6 +146,7 @@ const storymapAttributes = {
 
 registerBlockType( 'jeo/storymap', {
 	apiVersion: 3,
+	// translators: Story Map is the name of JEO's storytelling map feature.
 	title: __( 'Story Map', 'jeo' ),
 	description: __( 'Display maps with storytelling', 'jeo' ),
 	category: 'jeo',

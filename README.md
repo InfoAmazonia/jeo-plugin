@@ -91,7 +91,16 @@ npm run build
 ```
 
 - `npm run start` watches the source tree and rebuilds assets while you develop.
-- `npm run build` performs a production build for release validation.
+- `npm run build` performs a production build and regenerates JavaScript translation JSON catalogs in `src/languages`.
+
+To generate JavaScript translation JSON catalogs on their own, run:
+
+```bash
+npm run i18n:json
+```
+
+These scripts expect `wp` (WP-CLI) to be available on your `PATH`. If it lives elsewhere, set `WP_CLI_BIN` when running the command.
+The generated `src/languages/*.json` catalogs are release artifacts and are intentionally not versioned in Git.
 
 If you prefer copying files instead of symlinking them into a local WordPress install, use:
 
@@ -122,6 +131,13 @@ The deploy workflow now validates that:
 - the release tag is a stable `x.y.z` version
 
 Pre-release tags such as `-rc` are intentionally blocked from the WordPress.org deploy pipeline.
+
+Release validation and packaging should use:
+
+```bash
+npm ci
+npm run build
+```
 
 ## Documentation
 

@@ -1,3 +1,5 @@
+const { __ } = wp.i18n;
+
 window.JeoLegendTypes.registerLegendType( 'barscale', {
 
 	/**
@@ -9,15 +11,15 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 			properties: {
 				left_label: {
 					type: 'string',
-					description: 'The label shown at the left end of the bar',
+					description: __( 'The label shown at the left end of the bar', 'jeo' ),
 				},
 				right_label: {
 					type: 'string',
-					description: 'The label shown at the right end of the bar',
+					description: __( 'The label shown at the right end of the bar', 'jeo' ),
 				},
 				colors: {
 					type: 'array',
-					description: 'An array of hexadecimal color values',
+					description: __( 'An array of hexadecimal color values', 'jeo' ),
 					items: {
 						type: 'string',
 					},

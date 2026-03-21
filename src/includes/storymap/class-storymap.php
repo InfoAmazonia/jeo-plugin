@@ -46,6 +46,7 @@ class Storymap {
 	 */
 	public function register_post_type() {
 		$labels = array(
+			// translators: Story Map is the name of JEO's storytelling map feature.
 			'name'                     => __( 'Story Map', 'jeo' ),
 			'singular_name'            => __( 'Story Map', 'jeo' ),
 			'add_new'                  => __( 'Add new Story Map', 'jeo' ),

@@ -123,7 +123,7 @@ class Geocode_Handler {
 			array(
 				'slug'        => 'nominatim',
 				'name'        => 'Nominatim',
-				'description' => __( 'Service provided by Open Street Maps at https://nominatim.openstreetmap.org/', 'jeo' ),
+				'description' => __( 'Geocoding service provided by OpenStreetMap at https://nominatim.openstreetmap.org/.', 'jeo' ),
 				'class_name'  => '\Jeo\Geocoders\Nominatim',
 			)
 		);
@@ -224,7 +224,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'              => 'object',
-						'description'       => __( 'Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo' ),
+						'description'       => __( 'Metadata storing the locations related to the post. Each location is an object with latitude, longitude, and geocode attributes.', 'jeo' ),
 					)
 				);
 

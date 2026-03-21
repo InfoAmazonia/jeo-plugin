@@ -177,7 +177,12 @@ class JeoGeocodePosts extends Component {
 			.fetch( requestUrl )
 			.then( ( response ) => {
 				if ( ! response.ok ) {
-					throw new Error( 'Unable to reverse-geocode the selected point.' );
+					throw new Error(
+						__(
+							'Unable to retrieve the address for the selected point.',
+							'jeo'
+						)
+					);
 				}
 
 				return response.json();

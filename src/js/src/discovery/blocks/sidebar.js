@@ -155,7 +155,7 @@ class Sidebar extends Component {
 				onScrollCapture={ this.handleScroll }
 				className={ this.props.isEmbed ? 'is-embed' : 'default-sidebar' }
 			>
-				<div className="discovery-title">{ __( 'Discovery', 'jeo' ) }</div>
+				<div className="discovery-title">{ __( 'Explore', 'jeo' ) }</div>
 				<TabPanel
 					className="togable-panel"
 					activeClass="active-tab"
