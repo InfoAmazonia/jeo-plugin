@@ -113,7 +113,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'The layer attribution. A text or HTML code with a link', 'jeo' ),
+				'description'   => __( 'Layer attribution as text or HTML with a link', 'jeo' ),
 			)
 		);
 
@@ -154,7 +154,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'The name of entity of attribution URL link', 'jeo' ),
+				'description'   => __( 'Label for the attribution URL link', 'jeo' ),
 			)
 		);
 

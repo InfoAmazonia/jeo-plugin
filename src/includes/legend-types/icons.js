@@ -1,3 +1,5 @@
+const { __ } = wp.i18n;
+
 window.JeoLegendTypes.registerLegendType( 'icons', {
 
 	/**
@@ -9,7 +11,7 @@ window.JeoLegendTypes.registerLegendType( 'icons', {
 			properties: {
 				colors: {
 					type: 'array',
-					description: 'An array of labels and icons',
+					description: __( 'An array of labels and icons', 'jeo' ),
 					items: {
 						type: 'object',
 						properties: {
@@ -18,7 +20,7 @@ window.JeoLegendTypes.registerLegendType( 'icons', {
 							},
 							icon: {
 								type: 'string',
-								description: 'url',
+								description: __( 'URL', 'jeo' ),
 							},
 						},
 					},

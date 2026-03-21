@@ -276,6 +276,7 @@ class Jeo {
 	 */
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
+		$layer_type_handles = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
 
 		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] ?? array() );
 
@@ -401,7 +402,11 @@ class Jeo {
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
-			array_merge( $map_blocks_assets['dependencies'] ?? array(), array( 'jeo-layer', 'mapgl-react' ) ),
+			array_merge(
+				$map_blocks_assets['dependencies'] ?? array(),
+				array( 'jeo-layer', 'mapgl-react' ),
+				$layer_type_handles
+			),
 			$map_blocks_assets['version'],
 			true,
 		);

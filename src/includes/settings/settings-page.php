@@ -185,25 +185,25 @@
 					<tr>
 						<th scope="row"><label for="jeo_typography"><?php esc_html_e( 'Typography URL', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography' ) ); ?>" type="text" id="jeo_typography" value="<?php echo esc_html( $this->get_option( 'jeo_typography' ) ); ?>" placeholder="Ex. https://fonts.googleapis.com/css2?family=Open+Sans" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography' ) ); ?>" type="text" id="jeo_typography" value="<?php echo esc_html( $this->get_option( 'jeo_typography' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. https://fonts.googleapis.com/css2?family=Open+Sans', 'jeo' ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_typography-name"><?php esc_html_e( 'Typography name', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-name' ) ); ?>" placeholder="Ex. Open Sans" type="text" id="jeo_typography-name" value="<?php echo esc_html( $this->get_option( 'jeo_typography-name' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-name' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. Open Sans', 'jeo' ); ?>" type="text" id="jeo_typography-name" value="<?php echo esc_html( $this->get_option( 'jeo_typography-name' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_typography-stories"><?php esc_html_e( 'Secondary Typography URL', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-stories' ) ); ?>" type="text" id="jeo_typography-stories" value="<?php echo esc_html( $this->get_option( 'jeo_typography-stories' ) ); ?>" placeholder="Ex. https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-stories' ) ); ?>" type="text" id="jeo_typography-stories" value="<?php echo esc_html( $this->get_option( 'jeo_typography-stories' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap', 'jeo' ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_typography-name-stories"><?php esc_html_e( 'Secondary Typography name', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-name-stories' ) ); ?>" placeholder="Ex. Libre Baskerville" type="text" id="jeo_typography-name-stories" value="<?php echo esc_html( $this->get_option( 'jeo_typography-name-stories' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-name-stories' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. Libre Baskerville', 'jeo' ); ?>" type="text" id="jeo_typography-name-stories" value="<?php echo esc_html( $this->get_option( 'jeo_typography-name-stories' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
@@ -220,7 +220,7 @@
 					<tr>
 						<th scope="row"><label for="jeo_primary-color"><?php esc_html_e( 'Primary color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_primary-color' ) ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_primary-color" value="<?php echo esc_html( $this->get_option( 'jeo_primary-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_primary-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_primary-color" value="<?php echo esc_html( $this->get_option( 'jeo_primary-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -234,13 +234,13 @@
 					<tr>
 						<th scope="row"><label for="jeo_more-bkg-color"><?php esc_html_e( 'Info button background color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_more-bkg-color' ) ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_more-bkg-color" value="<?php echo esc_html( $this->get_option( 'jeo_more-bkg-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_more-bkg-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_more-bkg-color" value="<?php echo esc_html( $this->get_option( 'jeo_more-bkg-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_more-color"><?php esc_html_e( 'Info button color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_more-color' ) ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_more-color" value="<?php echo esc_html( $this->get_option( 'jeo_more-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_more-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_more-color" value="<?php echo esc_html( $this->get_option( 'jeo_more-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
@@ -252,7 +252,7 @@
 					<tr>
 						<th scope="row"><label for="jeo_close-color"><?php esc_html_e( 'Close button color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_close-color' ) ); ?>" placeholder="Ex. #ffffff" type="text" id="jeo_close-color" value="<?php echo esc_html( $this->get_option( 'jeo_close-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_close-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_close-color" value="<?php echo esc_html( $this->get_option( 'jeo_close-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -264,7 +264,7 @@
 						<th scope="row"><label for="background_image"><?php esc_html_e( 'Company logo', 'jeo' ); ?></label></th>
 						<td>
 							<input id="background_image" type="text" name="<?php echo esc_html( $this->get_field_name( 'jeo_footer-logo' ) ); ?>" value="<?php echo esc_html( $this->get_option( 'jeo_footer-logo' ) ); ?>" />
-							<input id="upload_image_button" type="button" class="button-primary" value="Insert Image" />
+							<input id="upload_image_button" type="button" class="button-primary" value="<?php esc_attr_e( 'Insert Image', 'jeo' ); ?>" />
 						</td>
 					</tr>
 			</tbody>

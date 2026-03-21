@@ -3,6 +3,7 @@ import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '../shared/wp-form-controls';
 
 import { updateRelatedPostsDate } from './date-range';
+import { normalizeRelatedPosts } from './defaults';
 import { IntervalSelector } from './interval-selector';
 import { MetaSelector } from './meta-selector';
 import { AsyncTokensSelector } from './async-tokens-selector';
@@ -18,6 +19,7 @@ const PostsSelector = ( {
 		( select ) => select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
 		[]
 	);
+	const normalizedRelatedPosts = normalizeRelatedPosts( relatedPosts );
 	const { editPost } = useDispatch( 'core/editor' );
 	const setPostMeta = ( meta ) => editPost( { meta } );
 
@@ -31,6 +33,7 @@ const PostsSelector = ( {
 					setPostMeta( {
 						...postMeta,
 						relate_posts: ! postMeta.relate_posts,
+						related_posts: normalizedRelatedPosts,
 					} );
 				} }
 			/>
@@ -40,43 +43,60 @@ const PostsSelector = ( {
 					<AsyncTokensSelector
 						path="/wp/v2/categories"
 						label={ __( 'Categories', 'jeo' ) }
-						value={ relatedPosts.categories }
+						value={ normalizedRelatedPosts.categories }
 						onChange={ ( tokens ) => {
-							setRelatedPosts( { ...relatedPosts, categories: tokens } );
+							setRelatedPosts( {
+								...normalizedRelatedPosts,
+								categories: tokens,
+							} );
 						} }
 					/>
 
 					<AsyncTokensSelector
 						path="/wp/v2/tags"
 						label={ __( 'Tags', 'jeo' ) }
-						value={ relatedPosts.tags }
+						value={ normalizedRelatedPosts.tags }
 						onChange={ ( tokens ) => {
-							setRelatedPosts( { ...relatedPosts, tags: tokens } );
+							setRelatedPosts( {
+								...normalizedRelatedPosts,
+								tags: tokens,
+							} );
 						} }
 					/>
 
 					<IntervalSelector
-						startDate={ relatedPosts.after }
-						endDate={ relatedPosts.before }
+						startDate={ normalizedRelatedPosts.after }
+						endDate={ normalizedRelatedPosts.before }
 						startLabel={ __( 'Start date', 'jeo' ) }
 						endLabel={ __( 'End date', 'jeo' ) }
 						onStartChange={ ( date ) => {
 							setRelatedPosts(
-								updateRelatedPostsDate( relatedPosts, 'after', date )
+								updateRelatedPostsDate(
+									normalizedRelatedPosts,
+									'after',
+									date
+								)
 							);
 						} }
 						onEndChange={ ( date ) => {
 							setRelatedPosts(
-								updateRelatedPostsDate( relatedPosts, 'before', date )
+								updateRelatedPostsDate(
+									normalizedRelatedPosts,
+									'before',
+									date
+								)
 							);
 						} }
 					/>
 
 					<MetaSelector
 						label={ __( 'Meta queries', 'jeo' ) }
-						value={ relatedPosts.meta_query }
+						value={ normalizedRelatedPosts.meta_query }
 						onChange={ ( queries ) => {
-							setRelatedPosts( { ...relatedPosts, meta_query: queries } );
+							setRelatedPosts( {
+								...normalizedRelatedPosts,
+								meta_query: queries,
+							} );
 						} }
 					/>
 				</>

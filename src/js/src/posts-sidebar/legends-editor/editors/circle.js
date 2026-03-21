@@ -51,7 +51,7 @@ class CircleEditor extends Component {
 			const circles = this.state.legendObject.attributes.legend_type_options.circles;
 
 			circles.push(
-				{ label: 'Default Label', radius: 50, id: generateUUID() },
+				{ label: __( 'Default label', 'jeo' ), radius: 50, id: generateUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.circles = circles;
