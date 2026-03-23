@@ -4,6 +4,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { createMap, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
+import { appendRestQueryParams } from '../shared/rest-query';
 import { buildRelatedPostsGeoJson } from '../shared/story-geojson';
 import { EMPTY_STYLE } from '../shared/styles';
 import { normalizeOptionalUrl } from '../shared/url-normalization';
@@ -30,6 +31,22 @@ const chevronRightSmallIcon = `
 	</svg>
 `;
 
+const RELATED_POSTS_CLUSTER_BADGE_PREFIX = 'jeo-related-posts-cluster-badge-';
+
+function mergeUniqueStoriesById( currentStories = [], nextStories = [] ) {
+	const storiesById = new Map();
+
+	[ ...currentStories, ...nextStories ].forEach( ( story ) => {
+		const storyId = Number.parseInt( story?.id, 10 );
+
+		if ( Number.isFinite( storyId ) ) {
+			storiesById.set( storyId, story );
+		}
+	} );
+
+	return Array.from( storiesById.values() );
+}
+
 function compileTemplate ( template, config = {} ) {
 	return compileEtaTemplate( template, config );
 }
@@ -47,6 +64,8 @@ export default class JeoMap {
 		this.initialized = false;
 		this.popup = null;
 		this.attributionResizeObserver = null;
+		this.relatedPostsClusterBadgeBaseImage = null;
+		this.relatedPostsClusterBadgeHandlerRegistered = false;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
@@ -707,200 +726,241 @@ export default class JeoMap {
 	}
 
 	getRelatedPosts() {
-		return new Promise( ( resolve, reject ) => {
-			const self = this;
-			const relatedPostsCriteria = this.getArg( 'related_posts' );
-			this.relatedPostsCriteria = relatedPostsCriteria;
+		return ( async () => {
+			try {
+				const relatedPostsCriteria = this.getArg( 'related_posts' ) || {};
+				this.relatedPostsCriteria = relatedPostsCriteria;
 
-			const relatePosts = this.getArg( 'relate_posts' );
-			if ( ! relatePosts ) {
-				resolve( [] );
-				return;
-			}
+				if ( ! this.getArg( 'relate_posts' ) ) {
+					return [];
+				}
 
-			const query = {};
-			query.per_page = 100;
+				const query = {
+					per_page: 100,
+					_fields: 'id,meta,title,link,date,featured_media,categories',
+				};
 
-			if ( this.relatedPostsCriteria.after || this.relatedPostsCriteria.before ) {
-				query.orderby = 'date';
-				query.order = 'desc';
-			}
+				if ( relatedPostsCriteria.after || relatedPostsCriteria.before ) {
+					query.orderby = 'date';
+					query.order = 'desc';
+				}
 
-			const keys = Object.keys( relatedPostsCriteria );
+				Object.entries( relatedPostsCriteria ).forEach( ( [ key, value ] ) => {
+					if ( value !== undefined && value !== null && value !== '' ) {
+						query[ key ] = value;
+					}
+				} );
 
-			for ( const i in keys ) {
-				query[ keys[ i ] ] = relatedPostsCriteria[ keys[ i ] ];
-			}
+				const buildRelatedPostsUrl = ( page = null ) => {
+					const targetUrl = new URL( jeoMapVars.jsonUrl + 'posts' );
+					appendRestQueryParams( targetUrl.searchParams, query );
 
-			if ( keys.length < 1 ) {
-				resolve( [] );
-			}
+					if ( page !== null ) {
+						targetUrl.searchParams.set( 'page', page );
+					}
 
-			query._fields = ['id', 'meta', 'title', 'link', 'date'];
+					if ( jeoMapVars.currentLang ) {
+						targetUrl.searchParams.append( 'lang', jeoMapVars.currentLang );
+					}
+					return targetUrl;
+				};
 
-			const targetURL = new URL(jeoMapVars.jsonUrl + 'posts');
-			Object.keys(query).forEach(key => targetURL.searchParams.append(key, query[key]));
-			targetURL.searchParams.append('lang', jeoMapVars.currentLang);
+				const fetchPostsPage = async ( page = null ) => {
+					const response = await fetch( buildRelatedPostsUrl( page ), {
+						cache: 'no-store',
+					} );
+					const data = await response.json();
 
-			fetch(targetURL)
-				.then(async (response) => {
-					const jsonResponse = await response.json();
-					return { data: jsonResponse, totalPages: response.headers.get("x-wp-totalpages") };
-				})
-				.then(({ data, totalPages }) => {
-					// Save first page results
-					let cumulativePosts = data;
+					return {
+						data: Array.isArray( data ) ? data : [],
+						totalPages: Number.parseInt(
+							response.headers.get( 'x-wp-totalpages' ) || '1',
+							10
+						),
+					};
+				};
 
-					const buildRelatedPosts = (map) => {
-						const sourceData = this.buildPostsGeoJson(cumulativePosts);
-						this.relatedPostsGeoJson = sourceData;
+				const { data, totalPages } = await fetchPostsPage();
+				let cumulativePosts = data;
 
-						map.addSource( 'storiesSource', {
-							type: 'geojson',
-							data: sourceData,
-							cluster: true,
-							clusterRadius: 40,
+				const buildRelatedPosts = ( map ) => {
+					const sourceData = this.buildPostsGeoJson( cumulativePosts );
+					this.relatedPostsGeoJson = sourceData;
+
+					map.addSource( 'storiesSource', {
+						type: 'geojson',
+						data: sourceData,
+						cluster: true,
+						clusterRadius: 40,
+					} );
+
+					const relatedPostsImages = [
+						loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
+						loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
+						loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
+					];
+
+					if ( MAP_RUNTIME !== 'mapboxgl' ) {
+						relatedPostsImages.push(
+							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url )
+						);
+					}
+
+					Promise.all( relatedPostsImages ).then( () => {
+						if ( MAP_RUNTIME === 'mapboxgl' ) {
+							this.registerRelatedPostsClusterBadgeHandler( map );
+						}
+
+						map.addLayer( {
+							id: 'unclustered-points-hitarea',
+							type: 'symbol',
+							source: 'storiesSource',
+							filter: [ '!', [ 'has', 'point_count' ] ],
+							layout: {
+								'icon-image': 'news-marker',
+								'icon-size': parseFloat(
+									jeoMapVars.images['/js/src/icons/news-marker'].icon_size
+								) * 1.6,
+								'icon-allow-overlap': true,
+							},
+							paint: {
+								'icon-opacity': 0.001,
+							},
 						} );
 
-						Promise.all([
-							loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
-							loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
-							loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
-							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url ),
-						]).then( () => {
-							map.addLayer( {
-								id: 'unclustered-points-hitarea',
-								type: 'symbol',
-								source: 'storiesSource',
-								filter: [ '!', [ 'has', 'point_count' ] ],
-								layout: {
-									'icon-image': 'news-marker',
-									'icon-size': parseFloat(
-										jeoMapVars.images['/js/src/icons/news-marker'].icon_size
-									) * 1.6,
-									'icon-allow-overlap': true,
-								},
-								paint: {
-									'icon-opacity': 0.001,
-								},
-							} );
+						map.addLayer( {
+							id: 'unclustered-points',
+							type: 'symbol',
+							source: 'storiesSource',
+							layout: {
+								'icon-allow-overlap': true,
+								'icon-image': [
+									'case',
+									[ 'boolean', [ 'has', 'point_count' ], false ],
+									'cluster',
+									'news-marker',
+								],
+								'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
+							},
+						} );
 
-							// Single markers layer
-							map.addLayer( {
-								id: 'unclustered-points',
-								type: 'symbol',
-								source: 'storiesSource',
-								layout: {
-									'icon-allow-overlap': true,
-									'icon-image': [
-										'case',
-										['boolean', ['has', 'point_count'], false],
-										'cluster',
-										'news-marker',
-									],
-									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
-								},
-							} );
+						map.on( 'click', 'unclustered-points', () => {} );
 
-							map.on( 'click', 'unclustered-points', ( e ) => {
-							} );
+						map.on( 'click', 'unclustered-points-hitarea', ( e ) => {
+							const featuresAtPoint = e.point
+								? map.queryRenderedFeatures( e.point, {
+									layers: [ 'unclustered-points-hitarea' ],
+								} )
+								: e.features;
+							const relatedCoordinateFeatures = this.resolvePopupFeatures(
+								featuresAtPoint
+							);
 
-							map.on( 'click', 'unclustered-points-hitarea', ( e ) => {
-								const featuresAtPoint = e.point
-									? map.queryRenderedFeatures( e.point, {
-										layers: [ 'unclustered-points-hitarea' ],
-									} )
-									: e.features;
-								const relatedCoordinateFeatures = this.resolvePopupFeatures(
-									featuresAtPoint
+							if ( relatedCoordinateFeatures.length ) {
+								this.showPostPopup(
+									relatedCoordinateFeatures,
+									e.lngLat ?? relatedCoordinateFeatures[ 0 ].geometry.coordinates
 								);
+							}
+						} );
 
-								if ( relatedCoordinateFeatures.length ) {
-									this.showPostPopup(
-										relatedCoordinateFeatures,
-										e.lngLat ?? relatedCoordinateFeatures[ 0 ].geometry.coordinates
-									);
+						map.addLayer( {
+							id: 'cluster-layer',
+							type: 'circle',
+							source: 'storiesSource',
+							filter: [ 'has', 'point_count' ],
+							paint: {
+								'circle-color': jeoMapVars.cluster.circle_color,
+								'circle-radius': 20,
+								'circle-stroke-color': '#ffffff',
+								'circle-stroke-opacity': 0.4,
+								'circle-stroke-width': 9,
+							},
+						} );
+
+						map.addLayer( {
+							id: 'cluster-count',
+							type: 'symbol',
+							source: 'storiesSource',
+							filter: [ 'has', 'point_count' ],
+							layout: MAP_RUNTIME === 'mapboxgl'
+								? {
+									'icon-image': [
+										'concat',
+										RELATED_POSTS_CLUSTER_BADGE_PREFIX,
+										[
+											'to-string',
+											[
+												'coalesce',
+												[ 'get', 'point_count_abbreviated' ],
+												[ 'get', 'point_count' ],
+											],
+										],
+									],
+									'icon-size': 1,
+									'icon-allow-overlap': true,
+									'icon-ignore-placement': true,
 								}
-							} );
-
-							// cluster circle layer
-							map.addLayer( {
-								id: 'cluster-layer',
-								type: 'circle',
-								source: 'storiesSource',
-								filter: [ 'has', 'point_count' ],
-								paint: {
-									'circle-color': jeoMapVars.cluster.circle_color,
-									'circle-radius': 20,
-									'circle-stroke-color': '#ffffff',
-									'circle-stroke-opacity': 0.4,
-									'circle-stroke-width': 9,
-								},
-							} );
-
-							// cluster number layer
-							map.addLayer( {
-								id: 'cluster-count',
-								type: 'symbol',
-								source: 'storiesSource',
-								filter: [ 'has', 'point_count' ],
-								layout: {
+								: {
 									'icon-image': 'news-no-marker',
 									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
-									'icon-allow-overlap': false,
+									'icon-allow-overlap': true,
+									'icon-ignore-placement': true,
 									'icon-offset': [ 0, -30 ],
-									'text-field': [ 'get', 'point_count' ],
+									'text-field': '{point_count}',
 									'text-font': [ 'Open Sans Bold' ],
 									'text-size': 12,
 									'text-transform': 'uppercase',
 									'text-letter-spacing': 0.05,
 									'text-offset': [ 0, 0.8 ],
+									'text-allow-overlap': true,
+									'text-ignore-placement': true,
 								},
-								paint: {
+							paint: MAP_RUNTIME === 'mapboxgl'
+								? {}
+								: {
 									'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
 								},
-							} );
-
-							map.on( 'click', 'cluster-layer', ( e ) => {
-								this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
-							} );
-
-							map.on( 'click', 'cluster-count', ( e ) => {
-								this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
-							} );
-
-							map.on('mouseenter', ['unclustered-points-hitarea', 'cluster-layer', 'cluster-count'], () => {
-								map.getCanvas().style.cursor = 'pointer';
-							});
-							map.on('mouseleave', ['unclustered-points-hitarea', 'cluster-layer', 'cluster-count'], () => {
-								map.getCanvas().style.cursor = '';
-							});
 						} );
 
-						// Keep requesting to get to the last page
-						for (let i = 2; i <= totalPages; i++) {
-							// Break to avoid respect page limiting
-							if (i >= 100) {
-								break;
-							}
+						map.on( 'click', 'cluster-layer', ( e ) => {
+							this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+						} );
 
-							targetURL.searchParams.set('page', i);
+						map.on( 'click', 'cluster-count', ( e ) => {
+							this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+						} );
 
-							fetch(targetURL)
-								.then(response => { return response.json() })
-								.then(moreresults => {
-								cumulativePosts = [...cumulativePosts, ...moreresults];
+						map.on( 'mouseenter', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
+							map.getCanvas().style.cursor = 'pointer';
+						} );
+						map.on( 'mouseleave', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
+							map.getCanvas().style.cursor = '';
+						} );
+					} );
+				};
 
-								const sourceData = this.buildPostsGeoJson(cumulativePosts);
-								this.relatedPostsGeoJson = sourceData;
-								map.getSource('storiesSource').setData(sourceData);
-							});
-						}
-					}
+				buildRelatedPosts( this.map );
 
-					buildRelatedPosts(this.map);
-			});
-		} );
+				const maxPage = Number.isFinite( totalPages ) ? Math.min( totalPages, 99 ) : 1;
+				for ( let page = 2; page <= maxPage; page++ ) {
+					const { data: moreResults } = await fetchPostsPage( page );
+					cumulativePosts = mergeUniqueStoriesById(
+						cumulativePosts,
+						moreResults
+					);
+
+					const sourceData = this.buildPostsGeoJson( cumulativePosts );
+					this.relatedPostsGeoJson = sourceData;
+					this.map.getSource( 'storiesSource' )?.setData( sourceData );
+				}
+
+				return cumulativePosts;
+			} catch ( error ) {
+				console.error( 'Unable to load related posts.', error );
+				return [];
+			}
+		} )();
 	}
 
 	getCircleSvg( { fill, radius = 20 } ) {
@@ -908,6 +968,114 @@ export default class JeoMap {
 		return `data:image/svg+xml;charset=utf-8,<svg width='${width}' height='${width}' version='1.1' viewBox='0 0 ${width} ${width}' xmlns='http://www.w3.org/2000/svg'>
 			<circle cx='${radius}' cy='${radius}' r='${radius}' fill='${fill}'/>
 		</svg>`
+	}
+
+	getRelatedPostsClusterBadgeImageId( label ) {
+		return `${ RELATED_POSTS_CLUSTER_BADGE_PREFIX }${ label }`;
+	}
+
+	getRelatedPostsClusterBadgeLabel( value ) {
+		const count = Number.parseInt( value, 10 );
+
+		if ( ! Number.isFinite( count ) ) {
+			return String( value ?? '' );
+		}
+
+		if ( count >= 1000000 ) {
+			return `${ Math.round( count / 100000 ) / 10 }m`.replace( '.0m', 'm' );
+		}
+
+		if ( count >= 1000 ) {
+			return `${ Math.round( count / 100 ) / 10 }k`.replace( '.0k', 'k' );
+		}
+
+		return String( count );
+	}
+
+	getRelatedPostsClusterBadgeBaseImage() {
+		if ( this.relatedPostsClusterBadgeBaseImage ) {
+			return this.relatedPostsClusterBadgeBaseImage;
+		}
+
+		this.relatedPostsClusterBadgeBaseImage = new Promise( ( resolve, reject ) => {
+			const image = new Image();
+			image.decoding = 'async';
+			image.crossOrigin = 'anonymous';
+			image.onload = () => resolve( image );
+			image.onerror = () => reject( new Error( 'Unable to load cluster badge icon.' ) );
+			image.src = jeoMapVars.images['/js/src/icons/news'].url;
+		} );
+
+		return this.relatedPostsClusterBadgeBaseImage;
+	}
+
+	async createRelatedPostsClusterBadgeImage( label ) {
+		const iconImage = await this.getRelatedPostsClusterBadgeBaseImage();
+		const pixelRatio = 2;
+		const displaySize = 40;
+		const size = displaySize * pixelRatio;
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = size;
+		canvas.height = size;
+
+		const context = canvas.getContext( '2d' );
+
+		if ( ! context ) {
+			throw new Error( 'Unable to create cluster badge canvas.' );
+		}
+
+		context.clearRect( 0, 0, size, size );
+		context.drawImage( iconImage, 20, 12, 40, 28 );
+
+		const safeLabel = String( label ?? '' ).trim();
+		const fontSize = safeLabel.length >= 4 ? 22 : safeLabel.length === 3 ? 24 : 28;
+
+		context.fillStyle = jeoMapVars.images['/js/src/icons/news'].text_color || '#202202';
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.font = `700 ${ fontSize }px sans-serif`;
+		context.fillText( safeLabel, size / 2, 58 );
+
+		const imageData = context.getImageData( 0, 0, size, size );
+
+		return {
+			width: imageData.width,
+			height: imageData.height,
+			data: imageData.data,
+			pixelRatio,
+		};
+	}
+
+	registerRelatedPostsClusterBadgeHandler( map ) {
+		if ( MAP_RUNTIME !== 'mapboxgl' || this.relatedPostsClusterBadgeHandlerRegistered ) {
+			return;
+		}
+
+		this.relatedPostsClusterBadgeHandlerRegistered = true;
+
+		map.on( 'styleimagemissing', async ( event ) => {
+			const imageId = event?.id;
+
+			if (
+				typeof imageId !== 'string' ||
+				! imageId.startsWith( RELATED_POSTS_CLUSTER_BADGE_PREFIX ) ||
+				map.hasImage( imageId )
+			) {
+				return;
+			}
+
+			const label = imageId.slice( RELATED_POSTS_CLUSTER_BADGE_PREFIX.length );
+
+			try {
+				const image = await this.createRelatedPostsClusterBadgeImage( label );
+
+				if ( ! map.hasImage( imageId ) ) {
+					map.addImage( imageId, image, { pixelRatio: image.pixelRatio } );
+				}
+			} catch ( error ) {
+				console.error( 'Unable to build related posts cluster badge.', error );
+			}
+		} );
 	}
 
 	buildPostsGeoJson( stories ) {

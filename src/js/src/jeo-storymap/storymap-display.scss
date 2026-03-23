@@ -69,12 +69,11 @@ $font-stories: var( --jeo-font-stories );
 		inset-inline: 50%;
 		margin: 0 -50vw;
 		position: relative;
-		top: 0;
 		width: 100vw;
 
 		&.loaded {
 			background-color: transparent;
-			top: -100vh;
+			margin-top: -100vh;
 		}
 	}
 
@@ -203,6 +202,10 @@ $font-stories: var( --jeo-font-stories );
 				}
 			}
 		}
+	}
+
+	.storymap-features--with-navigation-step {
+		padding-bottom: 0;
 	}
 
 	.centered {
@@ -354,6 +357,12 @@ $font-stories: var( --jeo-font-stories );
 		margin-inline: auto;
 		box-shadow: 0 2px 6px 0 rgba( 0, 0, 0, 0.3 );
 		font-family: $font;
+	}
+
+	.storymap-navigation-step {
+		margin-bottom: 0;
+		min-height: 62px;
+		padding-bottom: calc( 50vh - 31px );
 	}
 
 	.storymap-start-button {

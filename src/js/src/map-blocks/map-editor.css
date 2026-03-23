@@ -153,6 +153,70 @@
 	width: 100%;
 }
 
+/* Content editor map blocks need an explicit width when floated left/right.
+   Otherwise the wrapper can shrink to 0 because the interactive map internals
+   are absolutely positioned. */
+.wp-block-jeo-map.alignleft,
+.wp-block-jeo-map.alignright {
+	--jeo-aligned-map-base-width: var( --wp--style--global--content-size, 645px );
+	--jeo-aligned-map-expanded-width: calc( var( --jeo-aligned-map-base-width ) * 1.6 );
+	box-sizing: border-box;
+	display: table;
+	max-width: none;
+	width: auto;
+}
+
+.wp-block-jeo-map.alignleft {
+	margin-right: 1em;
+	margin-left: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-map.alignright {
+	margin-left: 1em;
+	margin-right: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-map.alignleft .jeo-preview-area,
+.wp-block-jeo-map.alignright .jeo-preview-area,
+.wp-block-jeo-map.alignleft .mapboxgl-map,
+.wp-block-jeo-map.alignright .mapboxgl-map,
+.wp-block-jeo-map.alignleft .maplibregl-map,
+.wp-block-jeo-map.alignright .maplibregl-map {
+	max-width: none;
+	width: 100%;
+}
+
+.wp-block-jeo-map.alignleft .jeo-preview-area,
+.wp-block-jeo-map.alignright .jeo-preview-area {
+	min-width: min( var( --jeo-aligned-map-base-width ), calc( 100vw - 2rem ) );
+	width: min( var( --jeo-aligned-map-expanded-width ), calc( 100vw - 2rem ) );
+}
+
+@media (max-width: 782px) {
+	.wp-block-jeo-map.alignleft,
+	.wp-block-jeo-map.alignright {
+		display: block;
+		float: none;
+		margin-left: 0;
+		margin-right: 0;
+		width: 100%;
+	}
+
+	.wp-block-jeo-map.alignleft .jeo-preview-area,
+	.wp-block-jeo-map.alignright .jeo-preview-area,
+	.wp-block-jeo-map.alignleft .mapboxgl-map,
+	.wp-block-jeo-map.alignright .mapboxgl-map,
+	.wp-block-jeo-map.alignleft .maplibregl-map,
+	.wp-block-jeo-map.alignright .maplibregl-map {
+		min-width: 0;
+		width: 100%;
+	}
+}
+
 /* Hide the block selection outline and toolbar for editor-only preview blocks.
    The toolbar is rendered as a popover so we target it via the selected block
    class and the popover container that appears above the block. */

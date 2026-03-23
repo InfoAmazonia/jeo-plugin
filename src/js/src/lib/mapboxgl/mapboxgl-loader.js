@@ -144,6 +144,25 @@ function patchDeprecatedLightApi( MapboxGL ) {
 	};
 }
 
+function patchMissingSkyApi( MapboxGL ) {
+	const proto = MapboxGL.Map?.prototype;
+	if ( ! proto ) {
+		return;
+	}
+
+	if ( typeof proto.getSky !== 'function' ) {
+		proto.getSky = function () {
+			return null;
+		};
+	}
+
+	if ( typeof proto.setSky !== 'function' ) {
+		proto.setSky = function () {
+			return this;
+		};
+	}
+}
+
 // Fix: Patch FullscreenControl for cross-document (iframe) compatibility.
 // Same issue as MapLibreGL: the control uses `document` (parent window) for
 // fullscreenElement, exitFullscreen(), and fullscreenchange listeners.
@@ -226,6 +245,7 @@ function ensureMapboxRuntimePatched() {
 
 	patchHTMLElementInstanceOf()
 	patchDeprecatedLightApi( MapboxGL )
+	patchMissingSkyApi( MapboxGL )
 	patchMissingCSSDetection( MapboxGL )
 	patchFullscreenControl( MapboxGL )
 
