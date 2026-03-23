@@ -664,7 +664,7 @@ export default class JeoMap {
 
 								if (
 									layerObject.meta.legend_type !== 'none' &&
-									layersDefinitions[ i ].show_legend
+									layersDefinitions[ i ].show_legend !== false
 								) {
 									returnLegends[ i ] = (
 										new window.JeoLegend( layerObject.meta.legend_type, {

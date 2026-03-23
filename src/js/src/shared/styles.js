@@ -1,7 +1,6 @@
 export const EMPTY_STYLE = {
 	version: 8,
 	name: 'Empty',
-	glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
 	sources: {},
 	layers: [
 		{

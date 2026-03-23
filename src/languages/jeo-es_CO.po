@@ -510,6 +510,16 @@ msgstr ""
 "Cuando se selecciona, Mapbox carga los recursos oficiales de Mapbox GL JS "
 "desde api.mapbox.com y usa los términos y prácticas de privacidad de Mapbox."
 
+#: includes/settings/settings-page.php:93
+msgid ""
+"Visitors load Mapbox assets in the browser, and Mapbox receives the "
+"configured access token plus the visitor IP address and requested map "
+"resources."
+msgstr ""
+"Los visitantes cargan los recursos de Mapbox en el navegador, y Mapbox "
+"recibe el token de acceso configurado, además de la dirección IP del "
+"visitante y los recursos de mapa solicitados."
+
 #: includes/settings/settings-page.php:96
 msgid "API Key"
 msgstr "Clave de API"
@@ -527,6 +537,17 @@ msgstr ""
 #: includes/settings/settings-page.php:114
 msgid "Active Geocoder"
 msgstr "Geocodificador activo"
+
+#: includes/settings/settings-page.php:127
+msgid ""
+"The built-in Nominatim geocoder sends the address you submit, or the "
+"coordinates selected on the map, to nominatim.openstreetmap.org only when "
+"you explicitly run a search or reverse-geocode a point."
+msgstr ""
+"El geocodificador Nominatim integrado envía la dirección que ingresas, o "
+"las coordenadas seleccionadas en el mapa, a nominatim.openstreetmap.org "
+"solo cuando ejecutas explícitamente una búsqueda o una geocodificación "
+"inversa de un punto."
 
 #. translators: %s is the geocoder name. Example: Nominatim options.
 #: includes/settings/settings-page.php:144
@@ -546,6 +567,16 @@ msgstr "URL de la tipografía"
 #: includes/settings/settings-page.php:188
 msgid "Ex. https://fonts.googleapis.com/css2?family=Open+Sans"
 msgstr "Ej.: https://fonts.googleapis.com/css2?family=Open+Sans"
+
+#: includes/settings/settings-page.php:190
+#: includes/settings/settings-page.php:202
+msgid ""
+"You may use a local or external stylesheet URL. If you choose an external "
+"host, your visitors will request that asset directly from that provider."
+msgstr ""
+"Puedes usar una URL local o externa de hoja de estilos. Si eliges un host "
+"externo, los visitantes solicitarán ese recurso directamente a ese "
+"proveedor."
 
 #: includes/settings/settings-page.php:192
 msgid "Typography name"
@@ -612,14 +643,85 @@ msgstr "Color de fondo del botón de cierre"
 msgid "Close button color"
 msgstr "Color del botón de cierre"
 
-#: includes/settings/settings-page.php:260 js/build/discovery.js:1
+#: includes/settings/settings-page.php:260
+msgid "Embed"
+msgstr "Incrustación"
+
+#: js/build/discovery.js:1
 #: js/src/discovery/index.js:489
+msgctxt "discovery share action"
 msgid "Embed"
 msgstr "Embed"
 
 #: includes/settings/settings-page.php:264
 msgid "Company logo"
 msgstr "Logotipo de la empresa"
+
+#: includes/settings/settings-page.php:268
+msgid ""
+"You may use a local or external image URL. Large logos will be scaled down "
+"automatically in the embed footer."
+msgstr ""
+"Puedes usar una URL local o externa de imagen. Los logotipos grandes se "
+"reducirán automáticamente en el pie de la incrustación."
+
+#: includes/loaders.php:289
+#, php-format
+msgid ""
+"<p>JEO can connect to third-party services depending on your configuration.</"
+"p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the "
+"rendering library or when a map uses Mapbox-hosted resources. In that case "
+"the site loads JavaScript/CSS from Mapbox and sends the configured access "
+"token plus the visitor&#8217;s IP address, browser details and requested "
+"map resources to Mapbox. Terms: <a href=\"%1$s\">Mapbox Terms of Service</"
+"a>. Privacy Policy: <a href=\"%2$s\">Mapbox Privacy Policy</a>.</li><li>"
+"<strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly "
+"runs an address search or reverse geocoding request in the post geolocation "
+"UI. The typed address or selected coordinates, the site URL in the user "
+"agent string and the server IP address are sent to the Nominatim service. "
+"Usage Policy: <a href=\"%3$s\">Nominatim Usage Policy</a>. Privacy Policy: "
+"<a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</a>.</li><li>"
+"<strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview "
+"style requests map tiles from the OpenStreetMap tile service, which "
+"receives the visitor&#8217;s IP address, browser details and requested tile "
+"URLs. Tile Policy: <a href=\"%5$s\">OpenStreetMap Tile Usage Policy</a>. "
+"Privacy Policy: <a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</"
+"a>.</li><li><strong>Optional external asset URLs configured by the site "
+"administrator</strong>: if you configure an external typography stylesheet "
+"or footer logo URL, visitors&#8217; browsers will request that asset "
+"directly from the selected host. That host may receive the visitor&#8217;s "
+"IP address, browser details and referrer according to its own terms and "
+"privacy policy.</li></ul>"
+msgstr ""
+"<p>JEO puede conectarse a servicios de terceros según tu configuración.</"
+"p><ul><li><strong>Mapbox</strong>: solo se usa cuando Mapbox se selecciona "
+"como biblioteca de renderizado o cuando un mapa usa recursos alojados en "
+"Mapbox. En ese caso, el sitio carga JavaScript/CSS desde Mapbox y envía el "
+"token de acceso configurado, además de la dirección IP del visitante, "
+"detalles del navegador y los recursos de mapa solicitados a Mapbox. "
+"Términos: <a href=\"%1$s\">Términos de Servicio de Mapbox</a>. Política de "
+"Privacidad: <a href=\"%2$s\">Política de Privacidad de Mapbox</a>.</li><li>"
+"<strong>Nominatim (OpenStreetMap)</strong>: se usa cuando un editor ejecuta "
+"explícitamente una búsqueda de dirección o una solicitud de geocodificación "
+"inversa en la interfaz de geolocalización de entradas. La dirección "
+"escrita o las coordenadas seleccionadas, la URL del sitio en la cadena del "
+"user agent y la dirección IP del servidor se envían al servicio Nominatim. "
+"Política de Uso: <a href=\"%3$s\">Política de Uso de Nominatim</a>. "
+"Política de Privacidad: <a href=\"%4$s\">Política de Privacidad de la "
+"OpenStreetMap Foundation</a>.</li><li><strong>Teselas ráster de "
+"OpenStreetMap</strong>: el estilo de vista previa predeterminado de "
+"MapLibre solicita teselas al servicio de teselas de OpenStreetMap, que "
+"recibe la dirección IP del visitante, detalles del navegador y las URL de "
+"teselas solicitadas. Política de Teselas: <a href=\"%5$s\">Política de Uso "
+"de Teselas de OpenStreetMap</a>. Política de Privacidad: <a href=\"%4$s"
+"\">Política de Privacidad de la OpenStreetMap Foundation</a>.</li><li>"
+"<strong>URLs externas opcionales de recursos configuradas por el "
+"administrador del sitio</strong>: si configuras una URL externa para la "
+"hoja de estilos tipográfica o para el logotipo del pie, los navegadores de "
+"los visitantes solicitarán ese recurso directamente al host seleccionado. "
+"Ese host puede recibir la dirección IP del visitante, detalles del "
+"navegador y el referente, según sus propios términos y política de "
+"privacidad.</li></ul>"
 
 #: includes/settings/settings-page.php:267
 msgid "Insert Image"
@@ -628,6 +730,12 @@ msgstr "Insertar imagen"
 #: includes/settings/settings-page.php:277
 msgid "Save Changes"
 msgstr "Guardar cambios"
+
+#: includes/settings/class-settings.php:311
+msgid "JEO could not save this asset URL. Use a valid http(s) or root-relative URL."
+msgstr ""
+"JEO no pudo guardar esta URL de recurso. Usa una URL http(s) válida o una "
+"URL relativa a la raíz."
 
 #. translators: Story Map is the name of JEO's storytelling map feature.
 #: includes/storymap/class-storymap.php:50
@@ -1658,6 +1766,11 @@ msgstr "No fue posible cargar las sugerencias de direcciones."
 msgid "Search address"
 msgstr "Buscar dirección"
 
+#: js/build/mapBlocks.js:1 js/build/postsSidebar.js:1
+#: js/src/posts-sidebar/geo-auto-complete.js:180
+msgid "Search"
+msgstr "Buscar"
+
 #: js/build/mapBlocks.js:1 js/src/map-blocks/storymap-editor.js:750
 #: js/src/map-blocks/storymap-editor.js:799 js/build/mapBlocks.js:45561
 #: js/build/mapBlocks.js:45612
@@ -2090,10 +2203,13 @@ msgstr "URL de incrustación"
 msgid "Unable to retrieve the address for the selected point."
 msgstr "No fue posible obtener la dirección del punto seleccionado."
 
-#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:403
-#: js/build/postsSidebar.js:18594
-msgid "You can also drag the marker across the map."
-msgstr "También puedes arrastrar el marcador por el mapa."
+#: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:421
+msgid ""
+"Type an address, then click Search or press Enter. You can also drag the "
+"marker across the map."
+msgstr ""
+"Escribe una dirección y luego haz clic en Buscar o presiona Enter. También "
+"puedes arrastrar el marcador por el mapa."
 
 #: js/build/postsSidebar.js:1 js/src/posts-sidebar/geo-posts.js:410
 #: js/build/postsSidebar.js:18601
@@ -2168,7 +2284,7 @@ msgstr "Explorar"
 
 #: js/build/discovery.js:4476
 msgid "embed"
-msgstr "embebido"
+msgstr "embed"
 
 #: js/build/mapBlocks.js:43776 js/build/mapsSidebar.js:40041
 msgid ""

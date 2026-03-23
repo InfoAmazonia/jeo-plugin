@@ -424,7 +424,23 @@
 	position: absolute;
 	top: 0;
 	inset-inline-start: 10px;
+	display: grid;
+	grid-template-columns: minmax( 0, 1fr ) auto;
+	align-items: start;
+	column-gap: 8px;
+	width: min( 360px, calc( 100% - 20px ) );
+	max-width: calc( 100% - 20px );
 	z-index: 10;
+
+	.jeo-geo-autocomplete__field {
+		min-width: 0;
+	}
+
+	> .components-button,
+	> .jeo-geo-autocomplete__button {
+		align-self: start;
+		margin: 4px 0 0;
+	}
 }
 .tooltip {
 	background-color: white;

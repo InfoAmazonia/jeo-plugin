@@ -16,7 +16,7 @@ class JeoLegendTypes {
 		return this.getLegendType( legendTypeSlug ).getSchema();
 	}
 }
-const instance = new JeoLegendTypes();
+const instance = window.JeoLegendTypes || new JeoLegendTypes();
 
 if ( window.JeoLegendTypes === undefined ) {
 	window.JeoLegendTypes = instance;

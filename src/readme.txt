@@ -54,6 +54,15 @@ There, you can configure:
 
 After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
 
+== Third Party Services ==
+
+JEO can connect to the following third-party services:
+
+* Mapbox, only when you select Mapbox as the rendering library or use Mapbox-hosted map resources. The site loads JavaScript/CSS from `api.mapbox.com`, and Mapbox receives the configured access token, visitor IP address, browser details, and requested map resources. Terms of Service: [https://www.mapbox.com/legal/tos](https://www.mapbox.com/legal/tos). Privacy Policy: [https://www.mapbox.com/legal/privacy](https://www.mapbox.com/legal/privacy).
+* Nominatim (OpenStreetMap), only when an editor explicitly runs an address search or reverse-geocodes a point in the post geolocation UI. The typed address or selected coordinates, the site URL in the request user agent, and the server IP address are sent to `nominatim.openstreetmap.org`. Usage Policy: [https://operations.osmfoundation.org/policies/nominatim/](https://operations.osmfoundation.org/policies/nominatim/). Privacy Policy: [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy).
+* OpenStreetMap raster tiles, used by the default MapLibre preview style. The tile service receives the visitor IP address, browser details, and requested tile URLs. Tile Usage Policy: [https://operations.osmfoundation.org/policies/tiles/](https://operations.osmfoundation.org/policies/tiles/). Privacy Policy: [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy).
+* Optional external typography and footer logo URLs, only when the site administrator explicitly configures those fields with an external host. In that case the visitor browser requests the asset directly from the chosen host, which may receive the visitor IP address, browser details, and referrer according to that provider's own terms and privacy policy.
+
 == Screenshots ==
 1. Map being displayed in a post
 2. One-time map block

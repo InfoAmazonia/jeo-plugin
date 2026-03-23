@@ -4,6 +4,12 @@ import { isMapboxURL, transformMapboxStyle, transformMapboxUrl } from 'maplibreg
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 
+if (typeof MapLibreGL.Map?.prototype?.getLight === 'function') {
+	MapLibreGL.Map.prototype.getLight = function () {
+		return this.style?.getLight?.()
+	}
+}
+
 // Fix: Patch instanceof checks for cross-document (iframe) compatibility.
 // In WordPress Block API v3, blocks run inside an iframe. The JS module
 // is evaluated in one document context but DOM elements and events may
@@ -152,7 +158,6 @@ export const mapgl = MapLibreGL
 
 export const defaultStyle = {
 	version: 8,
-	glyphs: 'https://fonts.openmaptiles.org/{fontstack}/{range}.pbf',
 	sources: {
 		osm: {
 			type: 'raster',

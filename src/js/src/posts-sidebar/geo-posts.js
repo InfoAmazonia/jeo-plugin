@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import { CheckboxControl } from '../shared/wp-form-controls';
+import primaryMarkerIconUrl from '../icons/editor-marker-primary.svg';
+import secondaryMarkerIconUrl from '../icons/editor-marker-secondary.svg';
 
 import JeoGeoAutoComplete from './geo-auto-complete';
 import 'leaflet/dist/leaflet.css';
@@ -16,6 +18,20 @@ function clonePoints( points = [] ) {
 		? points.map( ( point ) => ( point ? { ...point } : point ) )
 		: [];
 }
+
+const PRIMARY_MARKER_ICON = new L.Icon( {
+	iconUrl: primaryMarkerIconUrl,
+	iconSize: [ 25, 41 ],
+	iconAnchor: [ 12, 41 ],
+	popupAnchor: [ 0, -34 ],
+} );
+
+const SECONDARY_MARKER_ICON = new L.Icon( {
+	iconUrl: secondaryMarkerIconUrl,
+	iconSize: [ 25, 41 ],
+	iconAnchor: [ 12, 41 ],
+	popupAnchor: [ 0, -34 ],
+} );
 
 class JeoGeocodePosts extends Component {
 	constructor() {
@@ -385,8 +401,9 @@ class JeoGeocodePosts extends Component {
 			magneticMarkers,
 		} = this.state;
 		const selectedPoint = points[ currentMarkerIndex ];
-		const currentSearchValue =
-			searchValue || selectedPoint?._geocode_full_address || '';
+		const currentSearchValue = typeof searchValue === 'string'
+			? searchValue
+			: selectedPoint?._geocode_full_address || '';
 		const isDisabled = ! (
 			loadStatus === 'resolved' &&
 			currentSearchValue.replace( /\s/g, '' ).length
@@ -398,9 +415,10 @@ class JeoGeocodePosts extends Component {
 						onSelect={ this.onLocationFound }
 						value={ currentSearchValue }
 						onChange={ this.handleSearchValue }
+						onSearchRequest={ () => this.setState( { loadStatus: 'pending' } ) }
 					/>
 					<span className="jeo-geocode-search__hint">
-						{ __( 'You can also drag the marker across the map.', 'jeo' ) }
+						{ __( 'Type an address, then click Search or press Enter. You can also drag the marker across the map.', 'jeo' ) }
 					</span>
 				</div>
 				<div>
@@ -526,27 +544,14 @@ class JeoGeocodePosts extends Component {
 							ref={ this.refMap }
 						>
 							<TileLayer
-								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+								attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
 								url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
 							/>
 							{ pointsMap.map( ( point, i ) => {
-								let icon;
-
-								if ( ! point.relevance || point.relevance === 'primary' ) {
-									icon = new L.Icon( {
-										iconUrl:
-											'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-										iconSize: [ 25, 41 ],
-										iconAnchor: [ 12, 41 ],
-									} );
-								} else {
-									icon = new L.Icon( {
-										iconUrl:
-											'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
-										iconSize: [ 25, 41 ],
-										iconAnchor: [ 12, 41 ],
-									} );
-								}
+								const icon =
+									! point.relevance || point.relevance === 'primary'
+										? PRIMARY_MARKER_ICON
+										: SECONDARY_MARKER_ICON;
 
 								return (
 									<Marker

@@ -23,20 +23,20 @@ if ( $disable_embed ) {
 
 <body style="margin: 0px !important; padding: 0!important">
 
-<div id="embed-container" style="<?php echo esc_html( $container_style ); ?>">
-	<div class="jeomap map_id_<?php echo esc_html( $map_id ); ?>" data-embed="true" data-options='{"marker_action": "embed_preview"}' style="<?php echo esc_html( $map_style ); ?>"></div>
+<div id="embed-container" style="<?php echo esc_attr( $container_style ); ?>">
+	<div class="jeomap map_id_<?php echo esc_attr( absint( $map_id ) ); ?>" data-embed="true" data-options='{"marker_action": "embed_preview"}' style="<?php echo esc_attr( $map_style ); ?>"></div>
 
 	<?php if ( $have_related_posts ) : ?>
-		<div id="embed-post-preview" style="<?php echo esc_html( $popup_style ); ?>"></div>
+		<div id="embed-post-preview" style="<?php echo esc_attr( $popup_style ); ?>"></div>
 	<?php endif; ?>
 
 	<?php
-		$img = \jeo_settings()->get_option( 'jeo_footer-logo' );
+		$img = \jeo_normalize_asset_url( \jeo_settings()->get_option( 'jeo_footer-logo' ) );
 	if ( ! empty( $img ) ) :
 		?>
 			<div class="embed-footer">
-				<a href="/">
-					<img src="<?php echo esc_url( $img ); ?>">
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>">
+					<img src="<?php echo esc_url( $img ); ?>" alt="" loading="lazy" decoding="async" style="max-width: min(240px, 100%); max-height: 30px; width: auto; height: auto; object-fit: contain;">
 				</a>
 			</div>
 	<?php endif; ?>

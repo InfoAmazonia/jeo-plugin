@@ -129,7 +129,7 @@ const LayerSettings = (
 						{ settings.layer.meta.use_legend && (
 							<CheckboxControl
 								label={ __( 'Show legend', 'jeo' ) }
-								checked={ settings.show_legend }
+								checked={ settings.show_legend !== false }
 								onChange={ switchShowLegend }
 							/>
 						) }

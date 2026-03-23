@@ -364,10 +364,15 @@ class Jeo {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
-		$layer_type_handles = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
+		$asset_file            = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
+		$layer_type_handles    = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
+		$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
 
-		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] ?? array() );
+		$deps = array_merge(
+			array( 'lodash' ),
+			$asset_file['dependencies'] ?? array(),
+			$legend_script_handles
+		);
 
 		wp_register_style( 'jeo-js', JEO_BASEURL . '/js/build/postsSidebar.css', array(), JEO_VERSION );
 		wp_register_script(
@@ -494,7 +499,8 @@ class Jeo {
 			array_merge(
 				$map_blocks_assets['dependencies'] ?? array(),
 				array( 'jeo-layer', 'mapgl-react' ),
-				$layer_type_handles
+				$layer_type_handles,
+				$legend_script_handles
 			),
 			$map_blocks_assets['version'],
 			true,
@@ -693,9 +699,19 @@ class Jeo {
 	 */
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
 		$saved_data = json_decode( $this->extract_json_from_block_content( $content ) );
+		if ( ! is_object( $saved_data ) ) {
+			return '';
+		}
 
-		$map_id     = $saved_data->map_id;
+		$map_id     = isset( $saved_data->map_id ) ? (int) $saved_data->map_id : 0;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
+		if ( ! is_array( $map_layers ) ) {
+			$map_layers = array();
+		}
+
+		if ( ! isset( $saved_data->slides ) || ! is_array( $saved_data->slides ) ) {
+			$saved_data->slides = array();
+		}
 
 		// Remove missing layers and restore the saved selected layer order.
 		foreach ( $saved_data->slides as $slide ) {
@@ -808,10 +824,18 @@ class Jeo {
 	 */
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() ) {
+			$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
+
 			wp_enqueue_style( 'mapgl' );
 			wp_enqueue_script( 'mapgl' );
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), JEO_VERSION );
-			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapgl', 'jquery' ), JEO_VERSION, true );
+			wp_enqueue_script(
+				'jeo-map',
+				JEO_BASEURL . '/js/build/jeoMap.js',
+				array_merge( array( 'mapgl', 'jquery' ), $legend_script_handles ),
+				JEO_VERSION,
+				true
+			);
 
 			wp_set_script_translations( 'jeo-map', 'jeo', JEO_BASEPATH . 'languages' );
 
