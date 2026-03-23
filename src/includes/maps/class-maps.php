@@ -549,6 +549,26 @@ class Maps {
 	}
 
 	/**
+	 * Sanitize a shortcode CSS dimension.
+	 *
+	 * @param mixed $value Raw dimension.
+	 * @return string
+	 */
+	private function sanitize_shortcode_dimension( $value ) {
+		$value = trim( (string) $value );
+
+		if ( '' === $value ) {
+			return '';
+		}
+
+		if ( preg_match( '/^\d+$/', $value ) ) {
+			return $value . 'px';
+		}
+
+		return preg_match( '/^\d+(?:\.\d+)?(?:px|%|vh|vw|rem|em)$/', $value ) ? $value : '';
+	}
+
+	/**
 	 * Register the public shortcode for maps.
 	 *
 	 * @return void
@@ -580,27 +600,28 @@ class Maps {
 			return '';
 		}
 
-		$div = '<div class="jeomap map_id_"' . $map_id . '" ';
+		$width  = $this->sanitize_shortcode_dimension( $atts['width'] );
+		$height = $this->sanitize_shortcode_dimension( $atts['height'] );
+		$styles = array();
 
-		$w     = $atts['width'];
-		$h     = $atts['height'];
-		$style = '';
-
-		if ( ! empty( $w ) ) {
-			$style .= 'style="width: ' . $atts['width'] . '; ';
+		if ( '' !== $width ) {
+			$styles[] = 'width: ' . $width;
 		}
 
-		if ( ! empty( $h ) ) {
-			$style .= 'height: ' . $atts['height'] . ';"';
+		if ( '' !== $height ) {
+			$styles[] = 'height: ' . $height;
 		}
 
-		if ( ! empty( $style ) ) {
-			$div .= 'style="' . $style . '"';
+		$style_attribute = '';
+		if ( ! empty( $styles ) ) {
+			$style_attribute = sprintf( ' style="%s"', esc_attr( implode( '; ', $styles ) . ';' ) );
 		}
 
-		$div .= '></div>';
-
-		return $div;
+		return sprintf(
+			'<div class="jeomap map_id_%1$d"%2$s></div>',
+			$map_id,
+			$style_attribute
+		);
 	}
 
 	/**
@@ -618,8 +639,11 @@ class Maps {
 		// Only run when visiting the single map page.
 		if ( is_single( get_the_id() ) ) {
 			$map_id  = get_the_ID();
-			$div     = "<div class='jeomap map_id_'{$map_id}'";
-			$content = $div . $content;
+			$content = sprintf(
+				'<div class="jeomap map_id_%1$d"></div>%2$s',
+				absint( $map_id ),
+				$content
+			);
 		}
 
 		$layers_def = get_post_meta( get_the_ID(), 'layers', true );

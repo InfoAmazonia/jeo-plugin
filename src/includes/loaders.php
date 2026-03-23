@@ -171,27 +171,135 @@ function jeo_register_embedder( $id, $base_url ) {
 	};
 
 	$embedder = function ( $matches ) use ( $get_param ) {
-		$url    = $matches[0];
-		$height = $get_param( $url, 'height' );
-		$width  = $get_param( $url, 'width' );
+		$url         = esc_url( $matches[0] );
+		$height      = absint( $get_param( $matches[0], 'height' ) );
+		$width       = absint( $get_param( $matches[0], 'width' ) );
+		$storymap_id = absint( $get_param( $matches[0], 'storymap_id' ) );
 
-		$html = "<iframe src='$url'";
-		if ( ! empty( $height ) ) {
-			$html .= " height='$height'";
+		if ( '' === $url ) {
+			return '';
 		}
-		if ( ! empty( $width ) ) {
-			$html .= " width='$width'";
-		}
-		if ( ! empty( $get_param( $url, 'storymap_id' ) ) ) {
-			$html .= " class='embed-storymap' seamless scrolling='yes'";
-		}
-		$html .= " frameborder='0' loading='lazy'></iframe>";
 
-		return $html;
+		$attributes = array(
+			sprintf( 'src="%s"', $url ),
+			'frameborder="0"',
+			'loading="lazy"',
+		);
+
+		if ( $height > 0 ) {
+			$attributes[] = sprintf( 'height="%d"', $height );
+		}
+		if ( $width > 0 ) {
+			$attributes[] = sprintf( 'width="%d"', $width );
+		}
+		if ( $storymap_id > 0 ) {
+			$attributes[] = 'class="embed-storymap"';
+			$attributes[] = 'seamless';
+			$attributes[] = 'scrolling="yes"';
+		}
+
+		return '<iframe ' . implode( ' ', $attributes ) . '></iframe>';
 	};
 
 	wp_embed_register_handler( $id, $regex, $embedder );
 }
+
+/**
+ * Normalize an optional asset URL.
+ *
+ * @param string $url Raw URL value.
+ * @return string
+ */
+function jeo_normalize_asset_url( $url ) {
+	$url = trim( (string) $url );
+	if ( '' === $url ) {
+		return '';
+	}
+
+	if ( 0 === strpos( $url, '/' ) && 0 !== strpos( $url, '//' ) ) {
+		$url = home_url( $url );
+	}
+
+	$normalized = esc_url_raw( $url );
+	if ( '' === $normalized ) {
+		return '';
+	}
+
+	$target = wp_parse_url( $normalized );
+	if ( ! is_array( $target ) ) {
+		return '';
+	}
+
+	if ( empty( $target['host'] ) ) {
+		return '';
+	}
+
+	if ( ! empty( $target['scheme'] ) && ! in_array( strtolower( $target['scheme'] ), array( 'http', 'https' ), true ) ) {
+		return '';
+	}
+
+	return $normalized;
+}
+
+/**
+ * Sanitize a font-family label for safe CSS output.
+ *
+ * @param string $font_name Raw font-family string.
+ * @return string
+ */
+function jeo_sanitize_font_family( $font_name ) {
+	$font_name = sanitize_text_field( (string) $font_name );
+	$font_name = preg_replace( '/[^A-Za-z0-9 \-_]/', '', $font_name );
+	$font_name = preg_replace( '/\s+/', ' ', $font_name );
+
+	return trim( (string) $font_name );
+}
+
+/**
+ * Sanitize a numeric CSS value used with a fixed unit.
+ *
+ * @param mixed $value Raw numeric value.
+ * @return string
+ */
+function jeo_sanitize_css_number( $value ) {
+	if ( ! is_numeric( $value ) ) {
+		return '';
+	}
+
+	$normalized = sprintf( '%.4F', (float) $value );
+	$normalized = rtrim( rtrim( $normalized, '0' ), '.' );
+
+	return $normalized;
+}
+
+/**
+ * Register privacy policy text for JEO third-party services.
+ *
+ * @return void
+ */
+function jeo_add_privacy_policy_content() {
+	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
+		return;
+	}
+
+	$content = sprintf(
+		wp_kses_post(
+			/* translators: 1: Mapbox terms URL, 2: Mapbox privacy URL, 3: Nominatim usage policy URL, 4: OSMF privacy URL, 5: OSM tile policy URL. */
+			__(
+				'<p>JEO can connect to third-party services depending on your configuration.</p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the rendering library or when a map uses Mapbox-hosted resources. In that case the site loads JavaScript/CSS from Mapbox and sends the configured access token plus the visitor&#8217;s IP address, browser details and requested map resources to Mapbox. Terms: <a href="%1$s">Mapbox Terms of Service</a>. Privacy Policy: <a href="%2$s">Mapbox Privacy Policy</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly runs an address search or reverse geocoding request in the post geolocation UI. The typed address or selected coordinates, the site URL in the user agent string and the server IP address are sent to the Nominatim service. Usage Policy: <a href="%3$s">Nominatim Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview style requests map tiles from the OpenStreetMap tile service, which receives the visitor&#8217;s IP address, browser details and requested tile URLs. Tile Policy: <a href="%5$s">OpenStreetMap Tile Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>Optional external asset URLs configured by the site administrator</strong>: if you configure an external typography stylesheet or footer logo URL, visitors&#8217; browsers will request that asset directly from the selected host. That host may receive the visitor&#8217;s IP address, browser details and referrer according to its own terms and privacy policy.</li></ul>',
+				'jeo'
+			)
+		),
+		'https://www.mapbox.com/legal/tos',
+		'https://www.mapbox.com/legal/privacy',
+		'https://operations.osmfoundation.org/policies/nominatim/',
+		'https://osmfoundation.org/wiki/Privacy_Policy',
+		'https://operations.osmfoundation.org/policies/tiles/'
+	);
+
+	wp_add_privacy_policy_content( 'JEO', $content );
+}
+add_action( 'admin_init', 'jeo_add_privacy_policy_content' );
 
 /**
  * Build custom CSS from plugin settings.
@@ -200,8 +308,8 @@ function jeo_register_embedder( $id, $base_url ) {
  */
 function jeo_custom_settings_css() {
 	$theme_css = '';
-	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ) ) ) {
-		$jeo_font = wp_kses( \jeo_settings()->get_option( 'jeo_typography-name' ), null );
+	$jeo_font  = jeo_sanitize_font_family( \jeo_settings()->get_option( 'jeo_typography-name' ) );
+	if ( '' !== $jeo_font ) {
 
 		$theme_css .= '
 		.jeomap .legend-container a.more-info-button  {
@@ -212,8 +320,8 @@ function jeo_custom_settings_css() {
 		}
 		';
 	}
-	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name-stories' ) ) ) ) {
-		$jeo_font_stories = wp_kses( \jeo_settings()->get_option( 'jeo_typography-name-stories' ), null );
+	$jeo_font_stories = jeo_sanitize_font_family( \jeo_settings()->get_option( 'jeo_typography-name-stories' ) );
+	if ( '' !== $jeo_font_stories ) {
 
 		$theme_css .= '
 		:root {
@@ -222,19 +330,9 @@ function jeo_custom_settings_css() {
 		';
 	}
 
-	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ) ) ) {
-		$jeo_font = wp_kses( \jeo_settings()->get_option( 'jeo_typography-name' ), null );
-
-		$theme_css .= '
-		.jeomap .legend-container a.more-info-button  {
-			font-family: "' . $jeo_font . '", "sans-serif";
-		}
-		';
-	}
-
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_more-font-size', '1' ) ) ) {
-		$jeo_info_font_size = \jeo_settings()->get_option( 'jeo_more-font-size', '1' );
-		$font_unit          = 'rem';
+	$jeo_info_font_size = jeo_sanitize_css_number( \jeo_settings()->get_option( 'jeo_more-font-size', '1' ) );
+	if ( '' !== $jeo_info_font_size ) {
+		$font_unit = 'rem';
 
 		$theme_css .= '
 		.jeomap div.legend-container a.more-info-button {
@@ -242,53 +340,55 @@ function jeo_custom_settings_css() {
 		}';
 	}
 
-	$css_variables = '';
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' ) ) ) {
-		$color_more_bkg = \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' );
+	$css_variables  = '';
+	$color_more_bkg = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' ) );
+	if ( ! empty( $color_more_bkg ) ) {
 
 		$color_css       = '--jeo_more-bkg-color: ' . $color_more_bkg . ';';
 		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo( $color_more_bkg, -0.15 ) . ';';
 		$css_variables  .= $color_css . ' ' . $color_css_hover;
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_primary-color', '#ffffff' ) ) ) {
-		$primary_color          = \jeo_settings()->get_option( 'jeo_primary-color', '#0073aa' );
+	$primary_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_primary-color', '#0073aa' ) );
+	if ( ! empty( $primary_color ) ) {
 		$color_css_primary      = '--jeo-primary-color: ' . $primary_color . ';';
 		$color_css_primary_dark = '--jeo-primary-color-darker-15: ' . color_luminance_jeo( $primary_color, -0.15 ) . ';';
 		$css_variables         .= $color_css_primary . ' ' . $color_css_primary_dark;
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000' ) ) ) {
-		$over_primary_color = \jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000' );
-		$color_css          = '--jeo-text-over-primary-color: ' . $over_primary_color . ';';
-		$css_variables     .= $color_css;
+	$over_primary_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000' ) );
+	if ( ! empty( $over_primary_color ) ) {
+		$color_css      = '--jeo-text-over-primary-color: ' . $over_primary_color . ';';
+		$css_variables .= $color_css;
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_more-color', '#555D66' ) ) ) {
-		$color          = \jeo_settings()->get_option( 'jeo_more-color', '#555D66' );
+	$color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_more-color', '#555D66' ) );
+	if ( ! empty( $color ) ) {
 		$color_css      = '--jeo_more-color: ' . $color . ';';
 		$css_variables .= $color_css;
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' ) ) ) {
-		$color          = \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' );
+	$color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' ) );
+	if ( ! empty( $color ) ) {
 		$color_css      = '--jeo_close-bkg-color: ' . $color . ';';
 		$css_variables .= $color_css;
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_close-color', '#555D66' ) ) ) {
-		$color_close_bkg = \jeo_settings()->get_option( 'jeo_close-color', '#555D66' );
+	$color_close_bkg = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-color', '#555D66' ) );
+	if ( ! empty( $color_close_bkg ) ) {
 
 		$color_css       = '--jeo_close-color: ' . $color_close_bkg . ';';
 		$color_css_hover = '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo( $color_close_bkg, -0.15 ) . ';';
 		$css_variables  .= $color_css . ' ' . $color_css_hover;
 	}
 
-	$theme_css .= '
-		:root {' .
-			$css_variables; '
+	if ( '' !== trim( $css_variables ) ) {
+		$theme_css .= '
+		:root {
+			' . trim( $css_variables ) . '
 		}
-	';
+		';
+	}
 
 	return $theme_css;
 }
@@ -315,11 +415,13 @@ add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
  * @return void
  */
 function jeo_scripts_typography() {
-	if ( \jeo_settings()->get_option( 'jeo_typography' ) ) {
-		wp_enqueue_style( 'jeo-font', \jeo_settings()->get_option( 'jeo_typography' ), array(), JEO_VERSION );
+	$primary_font_url = jeo_normalize_asset_url( \jeo_settings()->get_option( 'jeo_typography' ) );
+	if ( '' !== $primary_font_url ) {
+		wp_enqueue_style( 'jeo-font', $primary_font_url, array(), JEO_VERSION );
 	}
-	if ( \jeo_settings()->get_option( 'jeo_typography-stories' ) ) {
-		wp_enqueue_style( 'jeo-font-stories', \jeo_settings()->get_option( 'jeo_typography-stories' ), array(), JEO_VERSION );
+	$secondary_font_url = jeo_normalize_asset_url( \jeo_settings()->get_option( 'jeo_typography-stories' ) );
+	if ( '' !== $secondary_font_url ) {
+		wp_enqueue_style( 'jeo-font-stories', $secondary_font_url, array(), JEO_VERSION );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );

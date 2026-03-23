@@ -167,6 +167,21 @@ class Legend_Types {
 		);
 
 		wp_set_script_translations( 'jeo-legend', 'jeo', JEO_BASEPATH . 'languages' );
+
+		foreach ( $this->get_registered_legend_types() as $slug => $legend_type ) {
+			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : array();
+			$deps = array_merge( array( 'jeo-legend', 'wp-i18n' ), $deps );
+
+			wp_register_script(
+				'legend-type-' . $slug,
+				$legend_type['script_url'],
+				$deps,
+				JEO_VERSION,
+				true
+			);
+
+			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
+		}
 	}
 
 	/**
@@ -180,11 +195,22 @@ class Legend_Types {
 			return;
 		}
 
-		foreach ( $this->get_registered_legend_types() as $slug => $legend_type ) {
-			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : array();
-			$deps = array_merge( array( 'jeo-legend', 'wp-i18n' ), $deps );
-			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps, JEO_VERSION, true );
-			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
+		foreach ( array_keys( $this->get_registered_legend_types() ) as $slug ) {
+			wp_enqueue_script( 'legend-type-' . $slug );
 		}
+	}
+
+	/**
+	 * Get all registered legend type script handles.
+	 *
+	 * @return array
+	 */
+	public function get_registered_script_handles() {
+		return array_map(
+			static function ( $slug ) {
+				return 'legend-type-' . $slug;
+			},
+			array_keys( $this->get_registered_legend_types() )
+		);
 	}
 }
