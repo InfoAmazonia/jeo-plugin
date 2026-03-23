@@ -132,8 +132,10 @@ The deploy workflow now validates that:
 - `package.json` and the root package entry in `package-lock.json` match the plugin version
 - the `Stable tag` in `src/readme.txt` matches the plugin version for the tagged stable release
 - the release tag is a stable `x.y.z` version
+- the built release tree from `src/` passes WordPress Plugin Check when staged as `jeo/`
 
 Pre-release tags such as `-rc` are intentionally blocked from the WordPress.org deploy pipeline.
+Stable tag releases only proceed to WordPress.org deployment after Plugin Check passes; a failing check blocks the release before any publish step runs.
 
 Release validation and packaging should use:
 

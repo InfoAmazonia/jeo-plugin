@@ -2,14 +2,14 @@ name: Deploy to WordPress.org
 on:
   push:
     tags:
-    - "*"
+    - "*.*.*"
+    - "!*-*"
 
 permissions:
   contents: write
-
 jobs:
   tag:
-    name: New tag
+    name: Stable tag deploy
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -34,6 +34,17 @@ jobs:
         npm run test:unit
         npm run build:release
         npm run build:report
+    - name: Prepare Plugin Check build
+      run: |
+        rm -rf "${RUNNER_TEMP}/plugin-check-build"
+        mkdir -p "${RUNNER_TEMP}/plugin-check-build/jeo"
+        rsync -a --delete src/ "${RUNNER_TEMP}/plugin-check-build/jeo/"
+    - name: Run WordPress Plugin Check
+      uses: wordpress/plugin-check-action@v1
+      with:
+        build-dir: ${{ runner.temp }}/plugin-check-build/jeo
+        slug: jeo
+        include-experimental: false
     - name: WordPress Plugin Deploy
       id: wordpress_org_deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
