@@ -29,6 +29,12 @@ jobs:
       - name: Install Node dependencies
         run: npm ci
 
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: wp-cli
+
       - name: Build assets
         run: npm run build
 
