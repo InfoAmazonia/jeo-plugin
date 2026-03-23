@@ -67,9 +67,13 @@ export default function MapEditorPreview() {
 	const layerIds = useMemo( () => {
 		return ( postMeta.layers || [] ).map( ( layer ) => layer.id );
 	}, [ postMeta.layers ] );
+	const layerSettingsKey = useMemo(
+		() => JSON.stringify( postMeta.layers || [] ),
+		[ postMeta.layers ]
+	);
 
 	const { records: loadedLayers = [] } = useRecordsByIds( {
-		path: '/wp/v2/map-layer',
+		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
@@ -107,7 +111,7 @@ export default function MapEditorPreview() {
 							isLarge
 							onClick={ () => {
 								setZoomState( 'initial_zoom' );
-								setKey( key + 1 );
+								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
 							{ __( 'Initial Zoom', 'jeo' ) }
@@ -122,7 +126,7 @@ export default function MapEditorPreview() {
 									setPostMeta( { min_zoom: 0.1 } );
 								}
 								setZoomState( 'min_zoom' );
-								setKey( key + 1 );
+								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
 							{ __( 'Min Zoom', 'jeo' ) }
@@ -137,7 +141,7 @@ export default function MapEditorPreview() {
 									setPostMeta( { max_zoom: 0.1 } );
 								}
 								setZoomState( 'max_zoom' );
-								setKey( key + 1 );
+								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
 							{ __( 'Max Zoom', 'jeo' ) }
@@ -145,7 +149,7 @@ export default function MapEditorPreview() {
 					</div>
 				</div>
 				<Map
-					key={ key }
+					key={ `${ key }:${ zoomState }:${ layerSettingsKey }` }
 					ref={ mapRef }
 					style={ { height: '500px', width: '100%' } }
 					latitude={ centerLat || 0 }

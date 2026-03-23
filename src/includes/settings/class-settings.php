@@ -7,6 +7,10 @@
 
 namespace Jeo;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Manage plugin settings and geocoder options.
  */

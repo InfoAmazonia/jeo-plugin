@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 get_header(); ?>
 <main>
 	<div id="discovery">

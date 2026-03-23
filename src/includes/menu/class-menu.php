@@ -7,6 +7,10 @@
 
 namespace Jeo;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Register the plugin top-level admin menu.
  */

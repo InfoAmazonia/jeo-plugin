@@ -628,16 +628,12 @@ export default class JeoMap {
 
 			if ( layersDefinitions ) {
 				const layersIds = layersDefinitions.map( ( el ) => el.id );
-				const urlRoutes = window.location.pathname.split( '/' );
-				const lang = urlRoutes[ 1 ];
 
 				jQuery.get(
-					jeoMapVars.jsonUrl + 'map-layer',
+					jeoMapVars.layersUrl,
 					{
 						include: layersIds,
-						orderby: 'include',
-						per_page: 100,
-						// lang: lang ? lang : '',
+						context: 'view',
 					},
 					( data ) => {
 						const returnLayers = [];

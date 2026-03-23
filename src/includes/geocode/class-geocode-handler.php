@@ -7,6 +7,10 @@
 
 namespace Jeo;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Register geocoders, AJAX endpoints and geocode metadata.
  */

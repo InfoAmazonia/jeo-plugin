@@ -4,9 +4,19 @@ import { isMapboxURL, transformMapboxStyle, transformMapboxUrl } from 'maplibreg
 
 import 'maplibre-gl/dist/maplibre-gl.css'
 
-if (typeof MapLibreGL.Map?.prototype?.getLight === 'function') {
-	MapLibreGL.Map.prototype.getLight = function () {
-		return this.style?.getLight?.()
+if ( typeof MapLibreGL.Map?.prototype?.getLight === 'function' ) {
+	try {
+		Object.defineProperty( MapLibreGL.Map.prototype, 'getLight', {
+			value: function () {
+				return this.style?.getLight?.() ?? null
+			},
+			configurable: true,
+			writable: true,
+		} )
+	} catch ( error ) {
+		MapLibreGL.Map.prototype.getLight = function () {
+			return this.style?.getLight?.() ?? null
+		}
 	}
 }
 

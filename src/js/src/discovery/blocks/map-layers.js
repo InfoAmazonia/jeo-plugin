@@ -10,15 +10,24 @@ import MapItem from './map-item';
 import Search from './search';
 
 const MAPS_PER_PAGE = 20;
+const MAP_COLLECTION_FIELDS = 'id,title,excerpt,meta';
 
 const normalizeMaps = ( maps = [] ) =>
-	maps
-		.filter( ( map ) => ! map.meta.hide_in_discovery )
+	( Array.isArray( maps ) ? maps : [] )
+		.filter( ( map ) => ! map?.meta?.hide_in_discovery )
 		.map( ( singleMap ) => ( {
 			...singleMap,
+			meta: {
+				...singleMap.meta,
+				layers: Array.isArray( singleMap?.meta?.layers )
+					? singleMap.meta.layers
+					: [],
+			},
 			queriedLayers: Array.isArray( singleMap.queriedLayers ) ?
 				singleMap.queriedLayers :
-				singleMap.meta.layers.length ? null : [],
+				Array.isArray( singleMap?.meta?.layers ) && singleMap.meta.layers.length
+					? null
+					: [],
 		} ) );
 
 const mergeMapsById = ( currentMaps = [], nextMaps = [] ) => {
@@ -127,6 +136,7 @@ class MapLayers extends Component {
 			per_page: MAPS_PER_PAGE,
 			page: 1,
 			search: '',
+			_fields: MAP_COLLECTION_FIELDS,
 			cumulative: false,
 		};
 		params = { ...defaultParams, ...params };
@@ -189,6 +199,7 @@ class MapLayers extends Component {
 				include: chunk,
 				orderby: 'include',
 				per_page: chunk.length,
+				_fields: MAP_COLLECTION_FIELDS,
 				...( 'languageParams' in window && window.languageParams?.currentLang
 					? { lang: languageParams.currentLang }
 					: {} ),
@@ -207,10 +218,9 @@ class MapLayers extends Component {
 	fetchLayers( layersIds ) {
 		const layerChunks = chunkRecordIds( layersIds );
 		const requests = layerChunks.map( ( chunk ) => {
-			const path = addQueryArgs( jeoMapVars.jsonUrl + 'map-layer/', {
+			const path = addQueryArgs( jeoMapVars.layersUrl, {
 				include: chunk,
-				orderby: 'include',
-				per_page: chunk.length,
+				context: 'view',
 				...( "languageParams" in window && window.languageParams?.currentLang
 					? { lang: languageParams.currentLang }
 					: {} ),
@@ -228,6 +238,10 @@ class MapLayers extends Component {
 
 	loadMapLayers( map, maps = this.props.maps ) {
 		if ( ! map ) {
+			return Promise.resolve( [] );
+		}
+
+		if ( ! Array.isArray( map?.meta?.layers ) || map.meta.layers.length === 0 ) {
 			return Promise.resolve( [] );
 		}
 

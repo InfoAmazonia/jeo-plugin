@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $disable_embed = get_post_meta( get_the_ID(), 'disable_embed', true ) === '1';
 $storymap_id   = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
 

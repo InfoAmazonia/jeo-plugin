@@ -7,6 +7,10 @@
 
 namespace Jeo;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Register and manage storymap posts.
  */
@@ -110,6 +114,9 @@ class Storymap {
 		$roles = array( 'author', 'editor', 'administrator' );
 		foreach ( $roles as $role ) {
 			$role_obj = get_role( $role );
+			if ( ! $role_obj ) {
+				continue;
+			}
 
 			$role_obj->add_cap( 'edit_storymap' );
 			$role_obj->add_cap( 'edit_storymap' );

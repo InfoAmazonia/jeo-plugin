@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 spl_autoload_register( 'jeo_autoload' );
 
 /**
