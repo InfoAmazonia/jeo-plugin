@@ -112,6 +112,9 @@ rsync --archive --progress --human-readable --delete ./src/ /path/to/wordpress/w
 
 WordPress.org releases are built from `src/`, not from the repository root.
 The deploy workflow also publishes assets from `.wordpress-org/`.
+When a stable release tag is pushed, the workflow also creates a GitHub Release
+that keeps GitHub's source-code archives and attaches a built `jeo.zip`
+artifact generated from `src/`.
 
 Prerelease branches may carry a SemVer prerelease such as `3.0.0-rc.3` while
 WordPress.org stays on the latest stable release. Before creating a stable
@@ -138,6 +141,10 @@ Release validation and packaging should use:
 npm ci
 npm run build
 ```
+
+The attached `jeo.zip` mirrors the WordPress.org deploy package: it contains
+the built contents of `src/` under the `jeo/` plugin slug directory, ready for
+manual installation in WordPress.
 
 ## Documentation
 
