@@ -3,6 +3,10 @@ on:
   push:
     tags:
     - "*"
+
+permissions:
+  contents: write
+
 jobs:
   tag:
     name: New tag
@@ -31,10 +35,18 @@ jobs:
         npm run build:release
         npm run build:report
     - name: WordPress Plugin Deploy
+      id: wordpress_org_deploy
       uses: 10up/action-wordpress-plugin-deploy@stable
+      with:
+        generate-zip: true
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SLUG: jeowp # optional, remove if GitHub repo name matches SVN slug, including capitalization
+        SLUG: jeo # optional, remove if GitHub repo name matches SVN slug, including capitalization
         BUILD_DIR: src
         ASSETS_DIR: .wordpress-org
+    - name: Publish GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.wordpress_org_deploy.outputs.zip-path }}
+        generate_release_notes: true
