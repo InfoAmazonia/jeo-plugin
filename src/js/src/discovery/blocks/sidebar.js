@@ -9,7 +9,15 @@ class Sidebar extends Component {
 		super( props );
 
 		this.storiesRef = createRef();
+		this.lastStoriesScrollTop = 0;
+		this.pendingStoriesPage = null;
 		this.handleScroll = this.handleScroll.bind( this );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if ( ! prevProps.storiesLoaded && this.props.storiesLoaded ) {
+			this.pendingStoriesPage = null;
+		}
 	}
 
 	displayTab( tab ) {
@@ -76,17 +84,43 @@ class Sidebar extends Component {
 	}
 
 	handleScroll( e ) {
-		// Only send parent update if the previous one is done
-		if ( this.props.storiesLoaded ) {
-			const element = e.target;
-			if (
-				( element.scrollHeight - element.scrollTop - 100) <=
-				element.clientHeight
-			) {
-				if ( this.storiesRef.current ) {
-					this.storiesRef.current.updateStories( { cumulative: true } );
-				}
+		if ( ! this.props.storiesLoaded || this.props.map?.selectedTab?.name !== 'stories' ) {
+			return;
+		}
+
+		this.storiesRef.current?.markListScrolling?.();
+
+		const element = e.target?.closest?.( '.togable-panel' ) ?? e.target;
+		const totalPages = Number.parseInt( this.props.pageInfo.totalPages, 10 );
+		const currentPage = Number.parseInt( this.props.pageInfo.currentPage, 10 ) || 1;
+		const currentScrollTop = element.scrollTop;
+		const isScrollingDown = currentScrollTop > this.lastStoriesScrollTop;
+
+		this.lastStoriesScrollTop = currentScrollTop;
+
+		if ( ! isScrollingDown ) {
+			return;
+		}
+
+		if ( Number.isFinite( totalPages ) && currentPage >= totalPages ) {
+			return;
+		}
+
+		if (
+			( element.scrollHeight - element.scrollTop - 100 ) <= element.clientHeight &&
+			this.storiesRef.current
+		) {
+			const nextPage = currentPage + 1;
+
+			if ( this.pendingStoriesPage === nextPage ) {
+				return;
 			}
+
+			this.pendingStoriesPage = nextPage;
+			this.storiesRef.current.updateStories( {
+				cumulative: true,
+				page: nextPage,
+			} );
 		}
 	}
 

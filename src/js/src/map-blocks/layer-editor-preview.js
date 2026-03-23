@@ -1,7 +1,6 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { useDebounce } from 'use-debounce';
 
 import { Map } from '../lib/mapgl-react';
@@ -21,14 +20,11 @@ export default function LayerEditorPreview() {
 
 	const postMeta = useSelect( ( select ) =>
 		select( 'core/editor' ).getEditedPostAttribute( 'meta' ), [] );
-	const { editPost } = useDispatch( 'core/editor' );
-	const setPostMeta = useCallback( ( meta ) => editPost( { meta } ), [ editPost ] );
-
-	const {
-		center_lat: centerLat,
-		center_lon: centerLon,
-		initial_zoom: initialZoom,
-	} = { ...mapDefaults, ...postMeta };
+	const [ viewState, setViewState ] = useState( {
+		latitude: mapDefaults.center_lat,
+		longitude: mapDefaults.center_lon,
+		zoom: mapDefaults.initial_zoom,
+	} );
 
 	const [ key, setKey ] = useState( 0 );
 	const [ renderControl, setRenderControl ] = useState( { status: 'incomplete_form' } );
@@ -91,18 +87,15 @@ export default function LayerEditorPreview() {
 						setRenderControl( { status: 'loaded' } );
 					} }
 					style={ { height: '500px', width: '100%' } }
-					latitude={ centerLat || 0 }
-					longitude={ centerLon || 0 }
-					zoom={ initialZoom || 0 }
+					latitude={ viewState.latitude || 0 }
+					longitude={ viewState.longitude || 0 }
+					zoom={ viewState.zoom || 0 }
 					onMove={ ( { viewState } ) => {
-						setPostMeta( {
-							center_lat: viewState.latitude,
-							center_lon: viewState.longitude,
+						setViewState( {
+							latitude: viewState.latitude,
+							longitude: viewState.longitude,
+							zoom: Math.round( viewState.zoom * 10 ) / 10,
 						} );
-					} }
-					onZoom={ ( { viewState } ) => {
-						const zoom = Math.round( viewState.zoom * 10 ) / 10;
-						setPostMeta( { initial_zoom: zoom } );
 					} }
 				>
 					{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
