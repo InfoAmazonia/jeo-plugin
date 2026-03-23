@@ -9,6 +9,10 @@ namespace Jeo;
 
 use WP_Post;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Register and manage map posts.
  */
@@ -631,7 +635,6 @@ class Maps {
 	 * @return string
 	 */
 	public function the_content_filter( $content ) {
-
 		if ( get_post_type() !== 'map' ) {
 			return $content;
 		}
@@ -673,29 +676,27 @@ class Maps {
 				return $content;
 			}
 
-			$layers = new \WP_Query(
-				array(
-					'post_type'        => 'map-layer',
-					'post__in'         => $layers_ids,
-					'orderby'          => 'post__in',
-					'nopaging'         => true,
-					'suppress_filters' => true,
-				)
-			);
-
 			$template = \jeo_get_template( 'map-content-layers-list.php' );
 
 			$return = '<div class="map-content-layers-list">';
 
 			ob_start();
 
-			while ( $layers->have_posts() ) {
+			foreach ( $layers_ids as $layer_id ) {
+				$layer_post = get_post( $layer_id );
 
-				$layers->the_post();
+				if ( ! $layer_post instanceof \WP_Post || 'map-layer' !== $layer_post->post_type ) {
+					continue;
+				}
 
-				$source_url       = get_post_meta( get_the_ID(), 'source_url', true );
-				$attribution      = get_post_meta( get_the_ID(), 'attribution', true );
-				$attribution_name = get_post_meta( get_the_ID(), 'attribution_name', true );
+				if ( 'publish' !== get_post_status( $layer_post ) && ! current_user_can( 'edit_post', $layer_id ) ) {
+					continue;
+				}
+
+				$source_url       = get_post_meta( $layer_post->ID, 'source_url', true );
+				$attribution      = get_post_meta( $layer_post->ID, 'attribution', true );
+				$attribution_name = get_post_meta( $layer_post->ID, 'attribution_name', true );
+				$layer_content    = $this->render_layer_content( $layer_post );
 
 				if ( $source_url || $attribution || $attribution_name ) {
 					include $template;
@@ -704,8 +705,6 @@ class Maps {
 
 			$return .= \ob_get_clean();
 
-			\wp_reset_postdata();
-
 			$return .= '</div>';
 
 			$content .= $return;
@@ -713,6 +712,22 @@ class Maps {
 		}
 
 		return $content;
+	}
+
+	/**
+	 * Render layer content without recursively re-entering the map content filter.
+	 *
+	 * @param WP_Post $layer_post Layer post object.
+	 * @return string
+	 */
+	private function render_layer_content( WP_Post $layer_post ) {
+		remove_filter( 'the_content', array( $this, 'the_content_filter' ) );
+
+		try {
+			return apply_filters( 'the_content', $layer_post->post_content );
+		} finally {
+			add_filter( 'the_content', array( $this, 'the_content_filter' ) );
+		}
 	}
 
 	/**
@@ -725,6 +740,9 @@ class Maps {
 		$types = array( 'map', 'map-layer', 'storymap' );
 		foreach ( $roles as $role ) {
 			$role_obj = get_role( $role );
+			if ( ! $role_obj ) {
+				continue;
+			}
 
 			foreach ( $types as $type ) {
 				$role_obj->add_cap( "edit_{$type}" );
@@ -732,7 +750,7 @@ class Maps {
 				$role_obj->add_cap( "delete_{$type}" );
 				$role_obj->add_cap( "read_{$type}" );
 				$role_obj->add_cap( "read_{$type}s" );
-				if ( 'contributor' !== $type ) {
+				if ( 'contributor' !== $role ) {
 					$role_obj->add_cap( "edit_others_{$type}s" );
 					$role_obj->add_cap( "publish_{$type}s" );
 					$role_obj->add_cap( "read_private_{$type}s" );

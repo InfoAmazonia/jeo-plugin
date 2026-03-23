@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $disable_embed = get_post_meta( $map_id, 'disable_embed', true ) === '1';
 
 if ( $disable_embed ) {

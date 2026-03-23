@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 ?>
 <form action="options.php" method="post" class="clear prepend-top">
 	<?php settings_fields( $this->option_key ); ?>

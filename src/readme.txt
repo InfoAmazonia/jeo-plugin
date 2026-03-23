@@ -1,44 +1,20 @@
-=== JEO ===
+=== JEO Maps ===
 Contributors: infoamazonia
-Tested up to: 6.9.4
-Stable tag: 2.15.2
+Tested up to: 6.9
+Stable tag: 3.0.0-rc.3
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-3.0-only
 License URI: https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
 Version: 3.0.0-rc.3
 
-The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
+Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
 
 == Description ==
 
-With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories.
+With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each featured story.
 
-At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. JEO bundles MapLibreGL by default and can optionally load Mapbox GL JS as an external service when Mapbox is selected in the plugin settings.
-
-== Compatibility ==
-
-Compatibility snapshot validated on March 17, 2026:
-
-* Primary support: PHP 8.2, 8.3, and 8.4;
-* Experimental monitoring: PHP 8.5;
-* Stable WordPress gate: WordPress 6.9.4 on PHP 8.2, 8.3, and 8.4;
-* Experimental WordPress gate: WordPress 6.9.4 on PHP 8.5;
-* Backward-compatibility smoke tests: WordPress 6.6 on PHP 8.0 and 8.1;
-* Forward-compatibility smoke tests: WordPress 7.0-beta4 on PHP 8.2, 8.3, 8.4, and experimentally on PHP 8.5.
-* Repository test scripts include static PHP 8.5 checks and experimental WordPress smoke coverage on PHP 8.5.
-
-= Features =
-
-* Support for [MapLibreGL](https://maplibre.org/maplibre-gl-js/docs/) as the default bundled rendering library;
-* Optional support for [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/) loaded externally from Mapbox when selected in the plugin settings;
-* Support for [Mapbox](https://www.mapbox.com) maps and layers (requires a Mapbox API key);
-* Custom tile layers;
-* Layer filtering options, allowing you to mix tile layers;
-* Geocoding WordPress posts using [Nominatim](https://nominatim.org/), supporting the post type **Post**;
-* Customizable marker icons that can be associated with categories, custom taxonomies or posts directly;
-* Map markers query integrated to posts query;
-* Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguage plugins.
+JEO bundles MapLibreGL by default and can optionally load Mapbox GL JS as an external service when Mapbox is selected in the plugin settings.
 
 == Installation ==
 
@@ -53,6 +29,30 @@ There, you can configure:
 * The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available by default;
 
 After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
+
+== Features ==
+
+* Support for [MapLibreGL](https://maplibre.org/maplibre-gl-js/docs/) as the default bundled rendering library;
+* Optional support for [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/) loaded externally from Mapbox when selected in the plugin settings;
+* Support for [Mapbox](https://www.mapbox.com) maps and layers (requires a Mapbox API key);
+* Custom tile layers;
+* Layer filtering options, allowing you to mix tile layers;
+* Geocoding WordPress posts using [Nominatim](https://nominatim.org/), supporting the post type **Post**;
+* Customizable marker icons that can be associated with categories, custom taxonomies or posts directly;
+* Map markers query integrated to posts query;
+* Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguage plugins.
+
+== Compatibility ==
+
+Compatibility snapshot validated on March 17, 2026:
+
+* Primary support: PHP 8.2, 8.3, and 8.4;
+* Experimental monitoring: PHP 8.5;
+* Stable WordPress gate: WordPress 6.9.4 on PHP 8.2, 8.3, and 8.4;
+* Experimental WordPress gate: WordPress 6.9.4 on PHP 8.5;
+* Backward-compatibility smoke tests: WordPress 6.6 on PHP 8.0 and 8.1;
+* Forward-compatibility smoke tests: WordPress 7.0-beta4 on PHP 8.2, 8.3, 8.4, and experimentally on PHP 8.5.
+* Repository test scripts include static PHP 8.5 checks and experimental WordPress smoke coverage on PHP 8.5.
 
 == Third Party Services ==
 

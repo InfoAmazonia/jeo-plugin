@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $is_embed = null !== filter_input( INPUT_GET, 'embed', FILTER_DEFAULT );
 
 $full_width = filter_input( INPUT_GET, 'width', FILTER_VALIDATE_INT );

@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $site_name = get_bloginfo( 'name' );
 ?>
 <!DOCTYPE html>

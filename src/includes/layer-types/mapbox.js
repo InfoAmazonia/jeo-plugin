@@ -1,11 +1,12 @@
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-const MAPBOX_RASTER_ATTRIBUTION =
+	const MAPBOX_RASTER_ATTRIBUTION =
 	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
 	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
 	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
 
-window.JeoLayerTypes.registerLayerType( 'mapbox', {
+	window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	label: __( 'Mapbox Style', 'jeo' ),
 
 	addStyle( map, attributes ) {
@@ -275,4 +276,5 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				} );
 		} );
 	},
-} );
+	} );
+} )();

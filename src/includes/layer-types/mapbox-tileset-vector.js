@@ -1,6 +1,7 @@
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
+	window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 	label: __( 'Vector Mapbox Tiled Source', 'jeo' ),
 
 	addStyle( map, attributes ) {
@@ -104,4 +105,5 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			},
 		};
 	},
-} );
+	} );
+} )();

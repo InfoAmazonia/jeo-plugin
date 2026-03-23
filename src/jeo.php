@@ -5,7 +5,7 @@
  * @package           Jeo
  *
  * @wordpress-plugin
- * Plugin Name:       JEO
+ * Plugin Name:       JEO Maps
  * Plugin URI:        https://www.jeowp.org/
  * Description:       Interactive maps for the WordPress block editor
  * Version:           3.0.0-rc.3

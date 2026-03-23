@@ -7,6 +7,10 @@
 
 namespace Jeo;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * This trait adds allows classes to add a validation method for any metadata registered using register_post_meta()
  *

@@ -112,7 +112,7 @@ class MapItem extends Component {
 			) :
 			null;
 
-		if ( ! map.meta.layers?.length ) {
+		if ( ! Array.isArray( map?.meta?.layers ) || ! map.meta.layers.length ) {
 			return '';
 		}
 

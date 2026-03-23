@@ -397,7 +397,6 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	const instanceId = useId();
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
-	const [ selectedMap, setSelectedMap ] = useState( null );
 	const [ currentSlideIndex, setCurrentSlideIndex ] = useState( 0 );
 	const [ openSlideIndex, setOpenSlideIndex ] = useState( 0 );
 	const [ highlightedSlideKey, setHighlightedSlideKey ] = useState( null );
@@ -408,6 +407,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	const slideRuntimeKeysRef = useRef( new WeakMap() );
 	const slideRuntimeKeyIndexRef = useRef( 0 );
 	const slideNodesRef = useRef( new globalThis.Map() );
+	const mapRef = useRef( undefined );
 
 	const getSlideRuntimeKey = ( slide ) => {
 		if ( ! slide || typeof slide !== 'object' ) {
@@ -468,11 +468,21 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	}, [ loadedMap?.meta.layers ] );
 
 	const { records: loadedLayers = [] } = useRecordsByIds( {
-		path: '/wp/v2/map-layer',
+		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
 	} );
+	const currentSlidePreviewKey = useMemo(
+		() =>
+			JSON.stringify( {
+				selectedLayers:
+					attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [],
+				navigateLayers:
+					attributes.navigateMapLayers?.map( ( layer ) => layer.id ) || [],
+			} ),
+		[ attributes.slides, attributes.navigateMapLayers, currentSlideIndex ]
+	);
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
@@ -707,7 +717,8 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 				<Fragment>
 					<div className="jeo-preview-area">
 						<MapPreview
-							key={ key }
+							ref={ mapRef }
+							key={ `${ key }:${ currentSlideIndex }:${ currentSlidePreviewKey }` }
 							controls={ `top-${inlineEnd}` }
 							fullscreen={ loadedMap.meta.enable_fullscreen }
 							style={ { height: '85vh' } }
@@ -716,12 +727,6 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 							zoom={ viewState.zoom }
 							bearing={ viewState.bearing }
 							pitch={ viewState.pitch }
-							onStyleData={ ( event ) => {
-								const map = event.style?.map ?? null;
-								if ( ! selectedMap && map ) {
-									setSelectedMap( map );
-								}
-							} }
 							onMove={ ( event ) => {
 								setViewState( event.viewState );
 							} }
@@ -942,7 +947,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																				oldSlides[ slideIndex ].selectedLayers = defaultOrder;
 																			}
 
-																			setKey(key + 1);
+																			setKey( ( currentKey ) => currentKey + 1 );
 
 																			setAttributes( {
 																				...attributes,
@@ -1012,7 +1017,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 															className="preview-button"
 															onClick={ () => {
 																setCurrentSlideIndex( slideIndex );
-																setKey( key + 1 );
+																setKey( ( currentKey ) => currentKey + 1 );
 															} }
 														>
 															<div className="flex-center">
@@ -1138,7 +1143,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 										} );
 										setCurrentSlideIndex( attributes.slides.length );
 										setOpenSlideIndex( attributes.slides.length );
-										setKey( key + 1 );
+										setKey( ( currentKey ) => currentKey + 1 );
 									} }
 								>
 									<div className="flex-center">
@@ -1172,10 +1177,14 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 						<JeoGeoAutoComplete
 							className="search-adress-input"
 							onSelect={ ( location ) => {
-								flyTo( selectedMap, location );
+								const map = mapRef.current;
+
+								if ( map ) {
+									flyTo( map, location );
+								}
 
 								/*
-								selectedMap.flyTo( {
+								map.flyTo( {
 									center: [
 										parseFloat( location.lat ),
 										parseFloat( location.lon ),
