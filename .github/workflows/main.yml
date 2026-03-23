@@ -3,6 +3,10 @@ on:
   push:
     tags:
     - "*"
+
+permissions:
+  contents: write
+
 jobs:
   tag:
     name: New tag
@@ -12,13 +16,30 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: 20
-    - name: Build # Remove or modify this step as needed
+    - name: Build release package
       run: |
         npm install
         npm run build
+    - name: Build jeowp.zip from src
+      run: |
+        RELEASE_ROOT="${RUNNER_TEMP}/jeowp-release"
+        PACKAGE_DIR="${RELEASE_ROOT}/jeowp"
+
+        rm -rf "${RELEASE_ROOT}" "${RUNNER_TEMP}/jeowp.zip"
+        mkdir -p "${PACKAGE_DIR}"
+
+        rsync --archive --delete ./src/ "${PACKAGE_DIR}/"
+
+        cd "${RELEASE_ROOT}"
+        zip -r "${RUNNER_TEMP}/jeowp.zip" jeowp
     - name: WordPress Plugin Deploy
       uses: matheusgimenez/action-wordpress-plugin-deploy@develop
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SLUG: jeowp # optional, remove if GitHub repo name matches SVN slug, including capitalization
+    - name: Publish GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ runner.temp }}/jeowp.zip
+        generate_release_notes: true

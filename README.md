@@ -32,3 +32,17 @@ While developing, you might want to run `npm run watch`. This script will watch 
 ```bash
 rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
 ```
+
+## Releasing
+
+Release packages are built from `src/`, not from the repository root.
+
+When a stable tag is pushed, the GitHub Actions release workflow:
+
+- runs `npm install` and `npm run build`
+- deploys the plugin to WordPress.org
+- creates a GitHub Release with GitHub's source-code archives
+- attaches a built `jeowp.zip` artifact generated from the contents of `src/`
+
+The attached `jeowp.zip` contains the built plugin files inside a `jeowp/`
+directory, ready for manual installation in WordPress.
