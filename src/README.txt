@@ -55,14 +55,16 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 = 3.5.0 =
 This is a major feature release introducing AI-powered Georeferencing.
 * feature: Autonomous AI Georeferencing Co-Pilot for the Gutenberg Editor.
-* feature: New Fullscreen JEO Dashboard with interactive maps, staggered pin drop animation, and clickable popups.
-* feature: Support for Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek LLMs.
+* feature: New Fullscreen JEO Dashboard with interactive maps, staggered pin drop animation, and a cinematic `fitBounds` camera to auto-frame all global locations.
+* feature: Support for Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek LLMs (with strict temperature=0.1 for high precision).
 * feature: Intermediate UI Approval Modal (Review AI suggestions and their textual Quotes before saving to map).
-* feature: AI Prompt Engineer Assistant (Chat with the LLM to generate custom, strict system prompts).
-* feature: AI Debug Logs page (View raw inputs and outputs in a dedicated WordPress List Table).
-* feature: Auto-validation and Safety Checks for API Keys in the Settings panel.
+* feature: AI Prompt Engineer Assistant (Chat with the LLM to generate custom system prompts) with real-time `localStorage` auto-save.
+* feature: AI Debug Logs page (View raw inputs and outputs in a dedicated WordPress List Table with Pretty-JSON modals).
+* feature: Auto-validation and Safety Checks for API Keys in the Settings panel (Prevents saving invalid or empty keys).
 * feature: Dynamic UI Translations (Portuguese gettext injection for AI panels without .mo compilation).
-* UX: Modernized Settings panel with Skeleton Loader transitions.
+* UX: Modernized Settings panel with Skeleton Loader transitions and collapsible Dashboard Header.
+* bugfix: Restored PHP 7.4 compatibility (`FILTER_VALIDATE_BOOLEAN` fix).
+* bugfix: Strict WP REST Schema compliance for `_related_point` metadata (properly saves `_ai_quote`).
 
 = 3.0.0 =
 This is a major release. Here are some highlights:

@@ -243,46 +243,55 @@
 					if(l) l.remove();
 				}, 1000);
 
-				// Add markers with delay (staggered animation)
-				pins.forEach(function(pin, index) {
-					// Ensure we have numbers
-					var lat = Number(pin.lat);
-					var lng = Number(pin.lng);
-
-					if (isNaN(lat) || isNaN(lng)) return;
-
-					// Create HTML element for the marker
-					var el = document.createElement('div');
-					el.className = 'jeo-pin-marker';
-					el.style.display = 'block'; // Force display
-
-					// Create Popup Content
-					var popupHTML = '<div class="jeo-dashboard-popup" style="padding: 10px; min-width: 200px;">';
-					popupHTML += '<h3 style="margin:0 0 8px 0; font-size:15px; border-bottom:1px solid #eee; padding-bottom:5px;">' + (pin.title || 'Untitled Post') + '</h3>';
-					popupHTML += '<p style="margin:0 0 10px 0; font-size:12px; color:#1d2327;"><strong>' + pin.name + '</strong></p>';
+				// Bounds object to fit all pins
+				if (pins.length > 0) {
+					var bounds = new glObject.LngLatBounds();
 					
-					if (pin.quote) {
-						popupHTML += '<blockquote style="margin:0 0 15px 0; padding:8px 12px; border-left:3px solid #007cba; background:#f0f7ff; font-style:italic; font-size:12px; line-height: 1.4; color: #2c3338;">"' + pin.quote + '"</blockquote>';
-					}
+					// Add markers with delay (staggered animation)
+					pins.forEach(function(pin, index) {
+						var lat = Number(pin.lat);
+						var lng = Number(pin.lng);
+						if (isNaN(lat) || isNaN(lng)) return;
 
-					popupHTML += '<div style="display:flex; gap:10px; margin-top:10px;">';
-					popupHTML += '<a href="' + pin.view_url + '" class="button button-small" target="_blank">View Post</a>';
-					popupHTML += '<a href="' + pin.edit_url + '" class="button button-small" target="_blank">Edit Post</a>';
-					popupHTML += '</div></div>';
+						// Extend bounds to include this pin
+						bounds.extend([lng, lat]);
 
-					var popup = new glObject.Popup({ offset: 25, closeButton: true }).setHTML(popupHTML);
+						var el = document.createElement('div');
+						el.className = 'jeo-pin-marker';
+						el.style.display = 'block';
 
-					// Add marker to map
-					new glObject.Marker({ element: el })
-						.setLngLat([lng, lat])
-						.setPopup(popup)
-						.addTo(map);
+						var popupHTML = '<div class="jeo-dashboard-popup" style="padding: 10px; min-width: 200px;">';
+						popupHTML += '<h3 style="margin:0 0 8px 0; font-size:15px; border-bottom:1px solid #eee; padding-bottom:5px;">' + (pin.title || 'Untitled Post') + '</h3>';
+						popupHTML += '<p style="margin:0 0 10px 0; font-size:12px; color:#1d2327;"><strong>' + pin.name + '</strong></p>';
+						if (pin.quote) {
+							popupHTML += '<blockquote style="margin:0 0 15px 0; padding:8px 12px; border-left:3px solid #007cba; background:#f0f7ff; font-style:italic; font-size:12px; line-height: 1.4; color: #2c3338;">"' + pin.quote + '"</blockquote>';
+						}
+						popupHTML += '<div style="display:flex; gap:10px; margin-top:10px;">';
+						popupHTML += '<a href="' + pin.view_url + '" class="button button-small" target="_blank">View Post</a>';
+						popupHTML += '<a href="' + pin.edit_url + '" class="button button-small" target="_blank">Edit Post</a>';
+						popupHTML += '</div></div>';
 
-					// Trigger CSS drop animation with stagger
+						var popup = new glObject.Popup({ offset: 25, closeButton: true }).setHTML(popupHTML);
+
+						new glObject.Marker({ element: el })
+							.setLngLat([lng, lat])
+							.setPopup(popup)
+							.addTo(map);
+
+						setTimeout(function() {
+							el.classList.add('drop');
+						}, 100 + (index * 30));
+					});
+
+					// Transition to show all pins globally
 					setTimeout(function() {
-						el.classList.add('drop');
-					}, 100 + (index * 30));
-				});
+						map.fitBounds(bounds, {
+							padding: 100,
+							maxZoom: 12,
+							duration: 2500 // 2.5 seconds smooth transition
+						});
+					}, 800);
+				}
 
 			}).catch(function(err) {
 				console.error('JEO Map Dashboard Error:', err);
