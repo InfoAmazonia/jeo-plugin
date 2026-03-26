@@ -73,6 +73,15 @@ class Geocode_Handler {
 			)
 		);
 
+		$this->register_geocoder(
+			array(
+				'slug'        => 'googlemaps',
+				'name'        => 'Google Maps',
+				'description' => __( 'Service provided by Google Cloud Console (requires API Key).', 'jeo' ),
+				'class_name'  => '\Jeo\Geocoders\GoogleMaps',
+			)
+		);
+
 		/**
 		 * Hook used to register geocoders
 		 *

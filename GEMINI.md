@@ -84,8 +84,9 @@ Uma interface imersiva de controle editorial.
 - **Multi-language Docs:** A página inicial do plugin detecta arquivos `README*.md` e os renderiza em abas de idiomas automaticamente.
 
 ### 5.3. Suporte ao Google Maps (v3.5.2+)
-O JEO agora suporta o Google Maps como motor de renderização.
+O JEO agora suporta o Google Maps como motor de renderização e como Geocodificador.
 - **Configuração:** Uma nova seção em "General Settings" permite inserir a **Google Cloud API Key**.
+- **Geocodificador:** O Google Maps foi adicionado como alternativa ao Nominatim para buscas de endereços e geocodificação reversa.
 - **Dashboard:** A Home do plugin detecta o runtime selecionado e renderiza o mapa global usando a API nativa do Google Maps se selecionada, mantendo a animação de pins (`DROP`) e popups informativos.
 - **Normalização:** O sistema garante que as coordenadas `lat` e `lng` sejam tratadas como objetos numéricos consistentes em todos os motores.
 
