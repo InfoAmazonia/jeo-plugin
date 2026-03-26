@@ -10,7 +10,7 @@ class Layers {
 	public $post_type = 'map-layer';
 
 	protected function init() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'register_post_type' ), 20 );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
 		add_filter( "rest_{$this->post_type}_collection_params", array( $this, 'rest_collection_params' ) );
 		$this->register_rest_meta_validation();

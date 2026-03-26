@@ -10,7 +10,7 @@ class Maps {
 	public $post_type = 'map';
 
 	protected function init() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'register_post_type' ), 20 );
 		add_action( 'init', array( $this, 'register_shortcode' ) );
 		add_filter( 'single_template', array( $this, 'override_template' ) );
 		add_filter( 'the_content', array( $this, 'the_content_filter' ) );

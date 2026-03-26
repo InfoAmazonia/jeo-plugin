@@ -4,7 +4,7 @@
 set -e
 
 PLUGIN_SLUG="jeo"
-VERSION="3.5.1-experimental"
+VERSION="3.5.2-experimental"
 ZIP_NAME="${PLUGIN_SLUG}-${VERSION}.zip"
 BUILD_DIR=".build-tmp"
 
@@ -27,6 +27,9 @@ mkdir -p $BUILD_DIR/$PLUGIN_SLUG
 echo "📋 Copiando arquivos do plugin..."
 # O diretório 'src' é a raiz do nosso plugin no WordPress
 cp -a src/. $BUILD_DIR/$PLUGIN_SLUG/
+
+# Copia todos os arquivos README de documentação para a Welcome Page
+cp README*.md $BUILD_DIR/$PLUGIN_SLUG/ 2>/dev/null || true
 
 echo "🗑️ Removendo arquivos de desenvolvimento do pacote final..."
 # Remove a pasta de código-fonte JS bruto, mas guarda a pasta de ícones se precisar

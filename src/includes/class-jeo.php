@@ -88,6 +88,45 @@ class Jeo {
 				'permission_callback' => function () { return current_user_can( 'read' ); },
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/readme',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_get_readme' ),
+				'permission_callback' => function () { return current_user_can( 'read' ); },
+			)
+		);
+	}
+
+	/**
+	 * Returns the content of all README*.md files found in the plugin root.
+	 */
+	public function api_get_readme() {
+		$files = glob( JEO_BASEPATH . 'README*.md' );
+		$readmes = array();
+
+		if ( empty( $files ) ) {
+			return new \WP_REST_Response( array( 'error' => 'No README files found' ), 404 );
+		}
+
+		foreach ( $files as $file_path ) {
+			$file_name = basename( $file_path );
+			// Create a friendly label: README_BR.md -> BR, README.md -> Default
+			$label = str_replace( array( 'README_', 'README', '.md' ), '', $file_name );
+			$label = empty( $label ) ? 'English' : str_replace( '_', ' ', $label );
+			
+			// Map specific codes to names
+			if ( 'BR' === $label ) { $label = 'Português Brasil'; }
+
+			$readmes[] = array(
+				'label'   => $label,
+				'content' => file_get_contents( $file_path )
+			);
+		}
+
+		return new \WP_REST_Response( $readmes, 200 );
 	}
 
 	public function api_all_pins( $request ) {
@@ -761,10 +800,12 @@ class Jeo {
 		if ( is_admin() ) {
 			global $wp_post_types;
 
-			$wp_post_types['storymap']->template      = array(
-				array( 'jeo/storymap' ),
-			);
-			$wp_post_types['storymap']->template_lock = 'all';
+			if ( isset( $wp_post_types['storymap'] ) ) {
+				$wp_post_types['storymap']->template      = array(
+					array( 'jeo/storymap' ),
+				);
+				$wp_post_types['storymap']->template_lock = 'all';
+			}
 		}
 	}
 }

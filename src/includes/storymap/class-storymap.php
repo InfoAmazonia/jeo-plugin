@@ -10,7 +10,7 @@ class Storymap {
 	public $post_type = 'storymap';
 
 	protected function init() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'register_post_type' ), 20 );
 		add_filter( 'single_template', array( $this, 'override_template' ) );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
 
