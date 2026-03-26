@@ -82,6 +82,15 @@ class Geocode_Handler {
 			)
 		);
 
+		$this->register_geocoder(
+			array(
+				'slug'        => 'mapbox',
+				'name'        => 'Mapbox',
+				'description' => __( 'Service provided by Mapbox (requires API Key).', 'jeo' ),
+				'class_name'  => '\Jeo\Geocoders\Mapbox',
+			)
+		);
+
 		/**
 		 * Hook used to register geocoders
 		 *

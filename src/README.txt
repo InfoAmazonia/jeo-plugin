@@ -6,7 +6,7 @@ Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 3.5.2-experimental
+Version: 3.5.3-experimental
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -52,8 +52,11 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 
 == Changelog ==
 
-= 3.5.0 =
-This is a major feature release introducing AI-powered Georeferencing.
+= 3.5.3 =
+This version expands the geodata infrastructure and adds multi-engine support.
+* feature: Added Google Maps Geocoding as a provider.
+* feature: Added Mapbox Geocoding as a provider.
+* feature: Support for Google Maps JS API as a renderer for the Dashboard.
 * feature: Autonomous AI Georeferencing Co-Pilot for the Gutenberg Editor.
 * feature: New Fullscreen JEO Dashboard with interactive maps, staggered pin drop animation, and a cinematic `fitBounds` camera to auto-frame all global locations.
 * feature: Support for Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek LLMs (with strict temperature=0.1 for high precision).
