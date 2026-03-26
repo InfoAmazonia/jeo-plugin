@@ -149,8 +149,11 @@ class Geocode_Handler {
 											'secondary',
 										),
 									),
+									'_ai_quote'        => array(
+										'type' => 'string',
+									),
 								),
-								'additionalProperties' => false,
+								'additionalProperties' => true,
 							),
 						),
 						'single'            => false,

@@ -46,10 +46,18 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 
 				const formattedPoints = locations.map( ( loc, index ) => ( {
 					id: index,
+					relevance: 'primary',
 					_geocode_lat: String( loc.lat ),
 					_geocode_lon: String( loc.lng ),
-					_geocode_full_address: loc.name,
-					relevance: 'primary',
+					_geocode_full_address: loc.name || '',
+					_geocode_country: '',
+					_geocode_country_code: '',
+					_geocode_region_level_1: '',
+					_geocode_region_level_2: '',
+					_geocode_region_level_3: '',
+					_geocode_city: '',
+					_geocode_city_level_1: '',
+					_ai_quote: loc.quote || '', // Armazena o trecho onde foi encontrado para o Modal Visual
 					_selected: true, // Auto-select items by default
 				} ) );
 
@@ -77,14 +85,24 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 	}
 
 	saveAiLocations() {
-		// Filter only selected points and remove the temporary "_selected" flag
+		// Filter only selected points and map them to the exact Schema expected by JEO Backend
 		const selectedPoints = this.state.aiSuggestedLocations
 			.filter( loc => loc._selected )
 			.map( loc => {
-				const cleanLoc = { ...loc };
-				delete cleanLoc._selected;
-				delete cleanLoc.id;
-				return cleanLoc;
+				return {
+					relevance: 'primary',
+					_geocode_lat: String( loc._geocode_lat ),
+					_geocode_lon: String( loc._geocode_lon ),
+					_geocode_full_address: loc._geocode_full_address || '',
+					_geocode_country: '',
+					_geocode_country_code: '',
+					_geocode_region_level_1: '',
+					_geocode_region_level_2: '',
+					_geocode_region_level_3: '',
+					_geocode_city: '',
+					_geocode_city_level_1: '',
+					_ai_quote: loc._ai_quote || '', // Persiste o trecho no banco de dados para o Dashboard
+				};
 			});
 
 		// Merge Additively with current map points (preserve old points)

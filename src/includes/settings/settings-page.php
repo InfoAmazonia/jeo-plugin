@@ -208,11 +208,20 @@
 					<tr>
 						<th scope="row"><label for="ai_default_provider"><?php esc_html_e( 'Active AI Provider', 'jeo' ); ?></label></th>
 						<td>
-							<select name="<?php echo esc_html( $this->get_field_name( 'ai_default_provider' ) ); ?>" id="ai_default_provider">
-								<?php foreach ( jeo_ai_handler()->get_adapters() as $slug => $name ) : ?>
-									<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $this->get_option( 'ai_default_provider' ), $slug ); ?>><?php echo esc_html( $name ); ?></option>
-								<?php endforeach; ?>
-							</select>
+							<div style="display:flex; align-items:center; gap: 20px;">
+								<select name="<?php echo esc_html( $this->get_field_name( 'ai_default_provider' ) ); ?>" id="ai_default_provider">
+									<?php foreach ( jeo_ai_handler()->get_adapters() as $slug => $name ) : ?>
+										<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $this->get_option( 'ai_default_provider' ), $slug ); ?>><?php echo esc_html( $name ); ?></option>
+									<?php endforeach; ?>
+								</select>
+								<div id="jeo-ai-key-status-wrapper" style="font-size:12px; font-weight: 500; display:flex; align-items:center; gap:8px;">
+									<span><?php esc_html_e( 'API Status:', 'jeo' ); ?></span>
+									<span id="jeo-ai-key-status-badge" style="padding: 2px 8px; border-radius: 12px; background: #f0f0f1; color: #646970;"><?php esc_html_e( 'Checking...', 'jeo' ); ?></span>
+								</div>
+								<button type="button" class="button button-secondary" id="jeo-ai-test-key-btn">
+									<?php esc_html_e( 'Test API Key', 'jeo' ); ?>
+								</button>
+							</div>
 						</td>
 					</tr>
 					<tr>

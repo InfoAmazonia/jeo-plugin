@@ -13,7 +13,7 @@ class Settings {
 	protected function init() {
 
 		$this->default_options = array(
-			'map_runtime'                     => 'mapboxgl',
+			'map_runtime'                     => 'maplibregl',
 			'enabled_post_types'              => array(
 				'post',
 				'storymap',

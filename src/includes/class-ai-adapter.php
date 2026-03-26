@@ -30,30 +30,40 @@ abstract class AI_Adapter {
 	 * @return string
 	 */
 	protected function get_system_prompt( $override_prompt = null ) {
-		if ( ! empty( $override_prompt ) ) {
-			return $override_prompt;
-		}
+		$prompt = '';
 
-		$use_custom = \jeo_settings()->get_option( 'ai_use_custom_prompt' );
-		if ( $use_custom ) {
-			$custom = \jeo_settings()->get_option( 'ai_system_prompt' );
-			if ( ! empty( $custom ) ) {
-				return $custom;
+		if ( ! empty( $override_prompt ) ) {
+			$prompt = $override_prompt;
+		} else {
+			$use_custom = \jeo_settings()->get_option( 'ai_use_custom_prompt' );
+			if ( $use_custom ) {
+				$custom = \jeo_settings()->get_option( 'ai_system_prompt' );
+				if ( ! empty( $custom ) ) {
+					$prompt = $custom;
+				}
 			}
 		}
 
-		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects.
-		Each object MUST have:
-		- "name": The location name.
-		- "lat": Latitude (string or float).
-		- "lng": Longitude (string or float).
-		- "quote": A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
-
-		Example: [{"name": "Teatro Amazonas", "lat": -3.1303, "lng": -60.0234, "quote": "...localizado no centro de Manaus, o Teatro Amazonas recebeu..."}]
-
-		If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].', 'jeo' );
+		if ( empty( $prompt ) ) {
+			$prompt = __( 'You are a highly skilled geographer API. Analyze the text and extract locations.', 'jeo' );
 		}
 
+		// Inject mandatory JSON schema constraints aggressively to any prompt to prevent formatting regressions
+		$enforced_schema = "
+
+	You MUST respond ONLY with a raw JSON array of objects.
+	Each object MUST have EXACTLY these keys:
+	- \"name\": The location name.
+	- \"lat\": Latitude (string or float).
+	- \"lng\": Longitude (string or float).
+	- \"quote\": A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
+
+	Example: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro de Manaus, o Teatro...\"}]
+
+	If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].";
+
+		return $prompt . $enforced_schema;
+	}
 	/**
 	 * Log AI Data for debugging.
 	 *

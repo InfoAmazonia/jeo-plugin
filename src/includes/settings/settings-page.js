@@ -37,8 +37,56 @@
 				$('#tab-' + target).fadeIn(200, function() {
 					$('.jeo-settings-submit').fadeIn(200);
 					isAnimating = false; // Libera os cliques novamente
+
+					// Auto-teste ao entrar na aba AI
+					if (target === 'ai') {
+						runApiKeyTest();
+					}
 				});
 			}, delay);
+		});
+
+		// ------------------------------------
+		// AI API Key Validation Logic
+		// ------------------------------------
+		function runApiKeyTest() {
+			var provider = $('#ai_default_provider').val();
+			var key = $('#' + provider + '_api_key').val();
+			var $badge = $('#jeo-ai-key-status-badge');
+			var $btn = $('#jeo-ai-test-key-btn');
+
+			if (!key) {
+				$badge.text('Missing Key').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+				return;
+			}
+
+			$badge.text('Checking...').css({ 'background': '#f0f0f1', 'color': '#646970' });
+			$btn.prop('disabled', true);
+
+			wp.apiFetch({
+				path: '/jeo/v1/ai-test-key',
+				method: 'POST',
+				data: { provider: provider }
+			}).then(function(res) {
+				if (res && res.success) {
+					$badge.text('Active').css({ 'background': '#edfaef', 'color': '#008a20' });
+				} else {
+					$badge.text('Error').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+				}
+			}).catch(function(err) {
+				$badge.text('Request Failed').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+			}).finally(function() {
+				$btn.prop('disabled', false);
+			});
+		}
+
+		$('#jeo-ai-test-key-btn').click(function(e) {
+			e.preventDefault();
+			runApiKeyTest();
+		});
+
+		$('#ai_default_provider').change(function() {
+			runApiKeyTest();
 		});
 
 		// Lê o Hash da URL para abrir na mesma aba salva (acione com flag isInitialLoad)
@@ -50,9 +98,22 @@
 			$('.nav-tab:first').trigger('click', [true]);
 		}
 
-		// Adiciona o current hash ao formulário, dessa forma as atualizações 
 		// voltam para a mesma tab usando o form 'options.php' nativo
-		$('form').on('submit', function() {
+		$('form').on('submit', function(e) {
+			// Validação de Chave de API ao salvar (Task: não salvar sem chave)
+			var currentHash = window.location.hash;
+			if (currentHash === '#tab-ai') {
+				var provider = $('#ai_default_provider').val();
+				var key = $('#' + provider + '_api_key').val();
+				
+				if (!key) {
+					e.preventDefault();
+					alert('Please enter an API Key for the selected provider before saving.');
+					$('#' + provider + '_api_key').focus();
+					return false;
+				}
+			}
+
 			var $form = $(this);
 			var action = $form.attr('action') || '';
 			// Strip qualquer hash antigo se houver na action ou referer e coloca o atual

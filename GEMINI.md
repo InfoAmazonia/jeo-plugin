@@ -32,20 +32,26 @@ O sistema agora é capaz de analisar autonomamente o título e o conteúdo dos p
 
 ### 2. Interface de Configuração (Settings) e Engenharia de Prompt
 - **Aba AI (v3.5) Refatorada:** Gerencia as chaves de API e foca no **System Prompt**.
+  - **Auto-Teste de API:** Ao abrir a aba, o sistema roda silenciosamente um "Hello World" formatado em JSON para validar a chave do provedor escolhido, exibindo um badge visual ("Active" ou "Error") e impedindo o salvamento do painel se a chave estiver vazia.
   - **Checkbox "Use Custom Prompt":** Permite testar diferentes prompts e ocultar/bloquear a caixa de texto caso o usuário queira voltar ao comportamento padrão do JEO sem deletar suas anotações temporárias.
   - **Live Validator ("Validate Custom Prompt"):** Um botão abaixo da caixa de texto permite disparar um teste fictício com a IA configurada para garantir que as alterações no JSON não quebrarão o parser.
-  - **Assistente de Prompt:** Uma caixa de chat (com suporte a `Enter` ou `Shift+Enter`) aciona a rota REST `/ai-chat-prompt-generator`. A LLM ativa se transforma num *Engenheiro de Prompt Especialista no JEO* e cospe uma string perfeita que já preenche a tela. O texto digitado pelo usuário possui auto-save em `localStorage` (`jeo_ai_assistant_context`), impedindo a perda de raciocínios complexos durante a navegação entre as abas.
+  - **Assistente de Prompt:** Uma caixa de chat aciona a rota REST `/ai-chat-prompt-generator`. A LLM ativa se transforma num *Engenheiro de Prompt Especialista no JEO* e gera uma string perfeita. O texto possui auto-save em `localStorage` (`jeo_ai_assistant_context`).
 - **Tradução Dinâmica (`gettext`):** As configurações de IA são traduzidas em tempo real para `pt_BR` (`class-ai-handler.php`), evitando recompilar os `.mo`.
-- **Skeleton Loader (1s):** As abas usam `location.hash` (`#tab-ai`). Ao recarregar a tela, um *Skeleton Loader* bloqueante (com *Easter Egg* da v4.0) oculta toda a UI (incluindo o botão de "Save Changes", que possui um `margin-top: 50px` fluido) por 1 segundo, resultando num carregamento e transição sem *Flicker*.
-- **Nova Tela (AI Debug Logs):** Foi criada uma página própria em *WP List Table* (Submenu do JEO) que exibe as últimas interações. É paginada (25 por tela), possui caixa de Busca e traz botões "View Details", que abrem o *Input* e *Output* limpos através de `<dialog>` modais formatados em Pretty-JSON.
+- **Skeleton Loader (1s):** As abas usam `location.hash` (`#tab-ai`). Ao recarregar a tela, um *Skeleton Loader* bloqueante oculta toda a UI (incluindo o botão de "Save Changes", que possui um `margin-top: 50px` fluido) por 1 segundo, resultando num carregamento e transição sem *Flicker*.
+- **Nova Tela (AI Debug Logs):** Submenu do JEO que exibe as últimas interações (paginada em 25, com busca) e traz botões "View Details" abrindo modais formatados em Pretty-JSON.
 
 ### 3. Editor do Gutenberg (Frontend - React)
-- **Botão Dinâmico:** O botão na barra lateral de Geolocalização (em `src/js/src/posts-sidebar/index.js`) reage ao PHP exibindo, por exemplo, "Georeference with OpenAI (GPT)".
-- **Modal de Revisão (Cards Modernos):** Quando a IA devolve resultados, o sistema **não salva automaticamente** os metadados. Um Modal elegante intercepta a ação. Ele exibe cards brancos minimalistas contendo:
-  - Checkboxes (selecionáveis individualmente).
-  - O Nome e as Coordenadas geográficas.
-  - Um `<blockquote>` formatado e em itálico que mostra o **Trecho Exato** do post onde a IA encontrou a menção (`quote`).
-- Somente após a aprovação humana ("Save Selected Locations"), a marcação é gravada de forma aditiva na tela e o *quote* é expurgado para não poluir o banco de dados.
+- **Botão Dinâmico:** O botão na barra lateral de Geolocalização reage ao PHP exibindo, por exemplo, "Georeference with OpenAI (GPT)".
+- **Modal de Revisão (Cards Modernos):** Quando a IA devolve resultados, o sistema **não salva automaticamente**. Um Modal exibe checkboxes, o Nome, as Coordenadas e o **Trecho Exato (`quote`)**.
+- **Persistência Rigorosa:** Ao aprovar, o React limpa campos de controle (`_selected`) e salva o objeto perfeitamente formatado no banco, incluindo o campo `_ai_quote` (adicionado ao Schema REST do WP `register_post_meta`). Isso garante compatibilidade nativa com o banco de dados.
+
+### 4. A Nova Home (JEO Dashboard)
+O JEO agora possui uma Dashboard imersiva de "Boas-Vindas" (`toplevel_page_jeo-main-menu`), substituindo redirecionamentos antigos.
+- **Tela Cheia (100vh):** O dashboard sobrepõe a UI padrão do WordPress (removendo rodapés e *scrolls* extras) para exibir um mapa em tela cheia do site.
+- **Integração MapLibre:** A configuração padrão de motor de mapa foi revertida para `maplibregl`. A Dashboard sempre usa MapLibre a menos que haja um token explícito do Mapbox.
+- **Interface Flutuante (Header Box):** Possui um *Card* minimizável que se contrai em um ícone (JEO Logo), despoluindo a tela.
+- **Endpoint `/all-pins` Autenticado:** Uma requisição AJAX (`X-WP-Nonce`) carrega rapidamente uma query de SQL limpa (ignorando `get_posts`) que devolve todos os pontos do site e seus respectivos links de edição, eliminando pontos matematicamente idênticos (arredondamento de 5 casas).
+- **Animação e Popups:** Os marcadores caem do topo (`staggered drop animation`) e são clicáveis. O *Popup* gerado mostra a *Quote* (o trecho original onde a IA encontrou a menção) e dois botões de atalho: "View Post" e "Edit Post".
 
 ## Construção e Execução
 

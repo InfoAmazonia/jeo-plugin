@@ -90,6 +90,13 @@ class AI_Handler {
 			'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lng, or quote).' => 'Falha na validação: A IA não retornou o esquema JSON esperado (faltando name, lat, lng ou quote).',
 			'Context is required.' => 'O contexto é obrigatório.',
 			'Prompt is required.' => 'O prompt é obrigatório.',
+			'API Key is valid and active!' => 'A Chave de API é válida e está ativa!',
+			'Invalid provider.' => 'Provedor inválido.',
+			'Test API Key' => 'Testar Chave de API',
+			'Testing key...' => 'Testando chave...',
+			'API Status:' => 'Status da API:',
+			'Checking...' => 'Verificando...',
+			'Please enter an API Key for the selected provider before saving.' => 'Por favor, insira uma Chave de API para o provedor selecionado antes de salvar.',
 		);
 
 		if ( isset( $translations[ $text ] ) ) {
@@ -184,6 +191,59 @@ class AI_Handler {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-key',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_key' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+	}
+
+	/**
+	 * Callback to test if an API key is valid using a simple Hello World.
+	 */
+	public function api_test_key( $request ) {
+		$provider = $request->get_param( 'provider' );
+		$adapter  = null;
+
+		switch ( $provider ) {
+			case 'gemini':
+				$adapter = new AI\Gemini_Adapter();
+				break;
+			case 'openai':
+				$adapter = new AI\OpenAI_Adapter();
+				break;
+			case 'deepseek':
+				$adapter = new AI\DeepSeek_Adapter();
+				break;
+		}
+
+		if ( ! $adapter ) {
+			return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeo' ) ), 400 );
+		}
+
+		// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
+		$test_prompt = "You are a test assistant. Respond ONLY with this exact JSON array: [{\"name\": \"API_TEST_OK\", \"lat\": 0, \"lng\": 0, \"quote\": \"Success\"}]";
+		$result = $adapter->georeference( "Test", "Connection check", $test_prompt );
+
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response( array( 
+				'success' => false, 
+				'message' => $result->get_error_message() 
+			), 200 );
+		}
+
+		return new \WP_REST_Response( array( 
+			'success' => true, 
+			'message' => __( 'API Key is valid and active!', 'jeo' ),
+			'raw'     => $result
+		), 200 );
 	}
 
 	/**

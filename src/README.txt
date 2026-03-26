@@ -55,10 +55,12 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 = 3.5.0 =
 This is a major feature release introducing AI-powered Georeferencing.
 * feature: Autonomous AI Georeferencing Co-Pilot for the Gutenberg Editor.
+* feature: New Fullscreen JEO Dashboard with interactive maps, staggered pin drop animation, and clickable popups.
 * feature: Support for Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek LLMs.
-* feature: Intermediate UI Approval Modal (Review AI suggestions before saving to map).
+* feature: Intermediate UI Approval Modal (Review AI suggestions and their textual Quotes before saving to map).
 * feature: AI Prompt Engineer Assistant (Chat with the LLM to generate custom, strict system prompts).
 * feature: AI Debug Logs page (View raw inputs and outputs in a dedicated WordPress List Table).
+* feature: Auto-validation and Safety Checks for API Keys in the Settings panel.
 * feature: Dynamic UI Translations (Portuguese gettext injection for AI panels without .mo compilation).
 * UX: Modernized Settings panel with Skeleton Loader transitions.
 

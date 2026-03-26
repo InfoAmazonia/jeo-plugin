@@ -69,11 +69,85 @@ class Jeo {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
+		add_action( 'rest_api_init', array( $this, 'register_dashboard_routes' ) );
+
 		add_filter( 'rest_post_tag_query', array( $this, 'maximum_terms_api_filter' ), 10, 1 );
 
 		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
 		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
+	}
+
+	public function register_dashboard_routes() {
+		register_rest_route(
+			'jeo/v1',
+			'/all-pins',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_all_pins' ),
+				'permission_callback' => function () { return current_user_can( 'read' ); },
+			)
+		);
+	}
+
+	public function api_all_pins( $request ) {
+		global $wpdb;
+		
+		// Query para buscar meta_value e post_id ao mesmo tempo
+		$results = $wpdb->get_results( "
+			SELECT post_id, meta_value FROM {$wpdb->postmeta} 
+			WHERE meta_key = '_related_point' AND meta_value != ''
+		" );
+
+		$unique_pins = array();
+		$hash_map    = array();
+
+		foreach ( $results as $row ) {
+			$post_id     = $row->post_id;
+			$meta_data   = maybe_unserialize( $row->meta_value );
+			$post_title  = get_the_title( $post_id );
+			$view_url    = get_permalink( $post_id );
+			$edit_url    = get_edit_post_link( $post_id, '' );
+
+			// O WordPress pode retornar um array de pontos ou um ponto único 
+			// dependendo de como o metadado foi registrado e salvo.
+			$points = array();
+			if ( is_array( $meta_data ) ) {
+				// Se o primeiro item for numérico, é um array de arrays (múltiplos pontos)
+				if ( isset( $meta_data[0] ) && is_array( $meta_data[0] ) ) {
+					$points = $meta_data;
+				} else {
+					// Caso contrário é um ponto único formatado como array associativo
+					$points[] = $meta_data;
+				}
+			}
+
+			foreach ( $points as $point ) {
+				if ( isset( $point['_geocode_lat'] ) && isset( $point['_geocode_lon'] ) ) {
+					
+					$lat = (float) str_replace(',', '.', $point['_geocode_lat']);
+					$lng = (float) str_replace(',', '.', $point['_geocode_lon']);
+					
+					// Arredondamento para filtrar duplicatas
+					$hash = round($lat, 5) . '|' . round($lng, 5) . '|' . $post_id;
+
+					if ( ! isset( $hash_map[ $hash ] ) ) {
+						$hash_map[ $hash ] = true;
+						$unique_pins[] = array(
+							'post_id'  => $post_id,
+							'title'    => $post_title,
+							'view_url' => $view_url,
+							'edit_url' => $edit_url,
+							'name'     => isset( $point['_geocode_full_address'] ) ? $point['_geocode_full_address'] : '',
+							'lat'      => $lat,
+							'lng'      => $lng,
+							'quote'    => isset( $point['_ai_quote'] ) ? $point['_ai_quote'] : ''
+						);
+					}
+				}
+			}
+		}
+		return new \WP_REST_Response( $unique_pins, 200 );
 	}
 
 	private function get_current_language(): string {
@@ -162,7 +236,16 @@ class Jeo {
 
 		wp_set_script_translations( 'jeo-js', 'jeo', JEO_BASEPATH . 'languages' );
 
+		// Define variables that will be used across the admin/frontend
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
+		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
+		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
+		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
+		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 5;
+		
+		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';
+		$ai_adapters      = \jeo_ai_handler()->get_adapters();
+		$ai_provider_name = isset( $ai_adapters[ $ai_provider_slug ] ) ? $ai_adapters[ $ai_provider_slug ] : 'AI';
 
 		if ( 'maplibregl' === $map_runtime ) {
 			$mapgl_loader = 'maplibreglLoader';
@@ -172,16 +255,19 @@ class Jeo {
 			$mapgl_react  = 'mapboxglReact';
 		}
 
-		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';
-		$ai_adapters      = \jeo_ai_handler()->get_adapters();
-		$ai_provider_name = isset( $ai_adapters[ $ai_provider_slug ] ) ? $ai_adapters[ $ai_provider_slug ] : 'AI';
-
 		wp_localize_script(
 			'jeo-js',
 			'jeo',
 			array(
 				'ajax_url'         => admin_url( 'admin-ajax.php' ),
 				'ai_provider_name' => $ai_provider_name,
+				'map_runtime'      => $map_runtime,
+				'mapbox_key'       => $mapbox_key,
+				'default_lat'      => $default_lat,
+				'default_lon'      => $default_lon,
+				'default_zoom'     => $default_zoom,
+				'rest_url'         => rest_url('jeo/v1'),
+				'nonce'            => wp_create_nonce( 'wp_rest' )
 			)
 		);
 
@@ -652,7 +738,7 @@ class Jeo {
 	public function restrict_story_map_block_count() {
 		global $post;
 
-		$preview = filter_input( INPUT_GET, 'preview', FILTER_VALIDATE_BOOL );
+		$preview = filter_input( INPUT_GET, 'preview', FILTER_VALIDATE_BOOLEAN );
 		if ( $preview ) {
 			if ( ! empty( $post ) ) {
 				$post_id = $post->ID;
