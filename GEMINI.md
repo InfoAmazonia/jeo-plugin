@@ -1,8 +1,8 @@
-# Contexto do Plugin JEO - Gemini CLI (v3.5.2-experimental Master)
+# Contexto do Plugin JEO - Gemini CLI (v3.5.3-experimental Master)
 
 O JEO é uma plataforma de geojornalismo para WordPress que permite a organizações de notícias, blogueiros e ONGs publicarem matérias jornalísticas como camadas de informações em mapas digitais interativos.
 
-**Status Atual:** Versão **3.5.2-experimental**. O projeto consolidou seu ecossistema de Inteligência Artificial, segurança de credenciais, curadoria territorial brasileira e uma experiência de usuário profissional e imersiva.
+**Status Atual:** Versão **3.5.3-experimental**. O projeto consolidou seu ecossistema de Inteligência Artificial, segurança de credenciais, curadoria territorial brasileira e expandiu o suporte a múltiplos motores de renderização e geocodificação.
 
 ---
 
@@ -25,91 +25,83 @@ O coração desta versão é o Co-Piloto Editorial de Georreferenciamento Automa
 ### 2.1. Arquitetura de Adapters
 Localizado em `src/includes/ai/`, o sistema usa o padrão **Factory/Adapter** injetado via `AI_Handler`.
 - **Provedores Suportados (2026):**
-  - **Google Gemini:** Utiliza `gemini-2.5-flash` (a série 1.5 foi desativada pelo Google).
+  - **Google Gemini:** Utiliza `gemini-2.5-flash`.
   - **OpenAI:** Utiliza `gpt-4o`.
   - **DeepSeek:** Utiliza `deepseek-chat`.
-- **Configuração Determinística:** Todas as chamadas são forçadas com **Temperature = 0.1** para eliminar "criatividade" e garantir precisão na extração de dados.
+- **Configuração Determinística:** Todas as chamadas são forçadas com **Temperature = 0.1**.
 
 ### 2.2. Blindagem de Prompt e Resiliência
-- **Prompt API Level:** O `System Prompt` é injetado com uma cláusula de **Enforced Schema** inquebrável. Independentemente do prompt customizado pelo usuário, o código anexa instruções estritas no final exigindo apenas JSON bruto e chaves específicas: `"name", "lat", "lng", "quote"`.
-- **Agressive JSON Parser:** O método `parse_json_from_text` (em `AI_Adapter.php`) utiliza Regex e busca por colchetes (`[` e `]`) para ignorar blocos de Markdown ou textos conversacionais ("Claro, aqui está o JSON...") que as LLMs costumam injetar, prevenindo erros de decodificação.
+- **Prompt API Level:** Injeção de cláusula de **Enforced Schema** inquebrável. 
+- **Agressive JSON Parser:** Método `parse_json_from_text` (em `AI_Adapter.php`) utiliza Regex para ignorar lixo conversacional e extrair apenas o array de objetos.
 
 ### 2.3. Sistema de RAG Leve (Base de Conhecimento)
-O JEO possui uma camada de **Dicionários Territoriais Brasileiros** embarcados.
 - **Localização:** `src/includes/ai/data/*.json`.
-- **Funcionamento:** O sistema lê biomas, terras indígenas e quilombos (10 categorias) e injeta esse contexto como "Autoridade Geográfica" no prompt caso os termos apareçam no texto da notícia.
+- **Dicionários Territoriais:** 10 categorias embarcadas (Biomas, TIs, Quilombos, etc.) que agem como autoridade geográfica durante o georreferenciamento por IA.
 
 ---
 
 ## 3. Experiência do Usuário (Settings UI)
 
 ### 3.1. Engenharia de Prompt e Assistant
-- **Aba AI:** Centraliza a gestão de chaves e o refinamento do prompt.
-- **Auto-Save:** O assistente de chat possui persistência em `localStorage` (`jeo_ai_assistant_context`), impedindo a perda de rascunhos durante a navegação.
-- **Live Validator:** Um botão de simulação real testa o prompt contra a API antes de salvá-lo definitivamente.
-- **Auto-Teste de Chave:** Ao carregar a aba, um "Hello World" formatado em JSON valida se a API Key está ativa, exibindo badges visuais de status.
+- **Aba AI:** Refinamento de prompt com Assistente de Chat e persistência em `localStorage`.
+- **Live Validator:** Botão de simulação real antes do salvamento definitivo.
+- **Auto-Teste de Chave:** Validação instantânea de API Keys ao carregar a aba.
 
 ### 3.2. Navegação e Performance
-- **Skeleton Loader:** Implementação de transições suaves de 1 segundo entre abas com prevenção de "Flicker" (FOUC).
-- **Isolamento de Hash:** A navegação via URL (`#tab-ai`) é restrita apenas ao painel principal, impedindo que cliques em modais ou previews alterem o endereço da página.
+- **Skeleton Loader:** Transições suaves de 1 segundo entre abas.
+- **Knowledge Base:** Gestão de dicionários com Visualizer (Listagem e Raw JSON) e Download.
 
 ---
 
 ## 4. Persistência de Dados e Segurança
 
-### 4.1. WordPress REST Schema (Crucial para Regressão)
-O JEO utiliza o metadado `_related_point` para salvar as localizações. 
-- **O Desafio:** O WordPress rejeita objetos que contenham propriedades não registradas.
-- **A Solução:** O campo `_ai_quote` foi registrado formalmente no Schema REST (`class-geocode-handler.php`). O React (`index.js`) foi programado para limpar chaves temporárias (como `_selected` ou `id`) e preencher atributos nulos obrigatórios (`_geocode_country`, etc.) antes do salvamento final, garantindo que o banco de dados não recuse a atualização do post.
+### 4.1. WordPress REST Schema
+- **Propriedades Registradas:** O campo `_ai_quote` está integrado ao Schema do `_related_point`, permitindo salvar o contexto original da IA no banco de dados.
 
 ### 4.2. Segurança e Ciclo de Vida
-- **Desativação:** Limpa obrigatoriamente as **API Keys** de todos os modelos e deleta arquivos de log físicos por privacidade.
-- **Exclusão:** O arquivo `uninstall.php` remove todas as configurações globais (`jeo-settings`) do banco de dados.
-- **Integridade Editorial:** Os dados geográficos salvos nos posts **nunca** são removidos na desativação ou exclusão, preservando o patrimônio histórico do site.
+- **Desativação:** Limpa **API Keys** e logs físicos.
+- **Exclusão:** `uninstall.php` remove as configurações globais (`jeo-settings`).
+- **Integridade:** Metadados geográficos dos posts são mantidos permanentemente.
 
 ### 4.3. Compatibilidade PHP
-- **Legacy Fix:** O plugin substituiu o uso da constante `FILTER_VALIDATE_BOOL` (PHP 8.0+) por `FILTER_VALIDATE_BOOLEAN` para garantir funcionamento perfeito em servidores rodando **PHP 7.4**.
+- **Legacy Fix:** Suporte total para **PHP 7.4** via `FILTER_VALIDATE_BOOLEAN`.
 
 ---
 
 ## 5. Visualização e Dashboards
 
 ### 5.1. JEO Dashboard (Página Home)
-Uma interface imersiva de controle editorial.
-- **Cinematic Map:** Renderiza um mapa full-height (100vh) com animações em cascata (`staggered pin drop`).
-- **Auto-Frame (fitBounds):** Após o carregamento, a câmera faz uma transição suave de 2.5 segundos para enquadrar todos os pins globais na tela.
-- **Clickable Popups:** Exibem o trecho original da notícia (`quote`) e links diretos para visualizar ou editar a matéria.
+- **Cinematic Map:** Tela cheia (100vh) com animações `staggered drop` e transição `fitBounds` automática.
+- **Multi-Renderer:** Detecta e renderiza Mapbox GL, MapLibre ou Google Maps nativamente na Home.
 
 ### 5.2. Central de Boas-Vindas
-- **Multi-language Docs:** A página inicial do plugin detecta arquivos `README*.md` e os renderiza em abas de idiomas automaticamente.
+- **Multi-language Docs:** Renderização dinâmica de arquivos `README*.md` em abas de idiomas.
 
-### 5.3. Suporte ao Google Maps (v3.5.2+)
-O JEO agora suporta o Google Maps como motor de renderização e como Geocodificador.
-- **Configuração:** Uma nova seção em "General Settings" permite inserir a **Google Cloud API Key**.
-- **Geocodificador:** O Google Maps foi adicionado como alternativa ao Nominatim para buscas de endereços e geocodificação reversa.
-- **Dashboard:** A Home do plugin detecta o runtime selecionado e renderiza o mapa global usando a API nativa do Google Maps se selecionada, mantendo a animação de pins (`DROP`) e popups informativos.
-- **Normalização:** O sistema garante que as coordenadas `lat` e `lng` sejam tratadas como objetos numéricos consistentes em todos os motores.
+### 5.3. Suporte Multi-Motor (v3.5.3+)
+O JEO agora suporta uma tríade de serviços líderes:
+- **Motores de Renderização:** MapLibre GL JS, Mapbox GL JS e Google Maps JS API.
+- **Geocodificadores (Busca de Endereços):**
+  - **Nominatim:** Open-source (OSM).
+  - **Google Maps Geocoding:** Alta precisão global (requer Google Cloud API Key). Normalização robusta de dados geográficos (cidade, estado, país).
+  - **Mapbox Geocoding:** Otimizado para o ecossistema JEO (requer Mapbox API Key). Suporte para geocodificação permanente.
 
 ---
 
 ## 6. Estrutura de Menus e Navegação
 
-A hierarquia de navegação foi travada na seguinte ordem profissional:
-1. **Welcome** (Guia dinâmico e suporte multi-idioma)
-2. **Dashboard** (Mapa global de impacto do projeto)
-3. **Maps** (Post type de gestão de mapas)
-4. **Layers** (Post type de gestão de camadas)
-5. **Storymaps** (Editor de narrativas)
-6. **Settings** (Painel de controle e Engenharia de IA)
-7. **AI Debug Logs** (Relatórios técnicos detalhados)
+1. **Welcome** (Default)
+2. **Dashboard**
+3. **Maps**
+4. **Layers**
+5. **Storymaps**
+6. **Settings**
+7. **AI Debug Logs**
 
 ---
 
 ## 7. Construção e Execução
 
 ### Build de Produção (`build.sh`)
-O script de empacotamento realiza uma limpeza profunda, mas segue regras de proteção:
-1. Compila Assets (Gutenberg/React).
-2. Coleta todos os arquivos `README*.md` (Documentação dinâmica).
-3. **Preserva arquivos SVG:** Imprescindível para o `jeo.svg` não sumir e causar Erro Fatal 404 no Menu principal.
-4. **Segurança:** Remove obrigatoriamente logs de debug (`*.log`) e configurações sensíveis de desenvolvimento.
+- Compila Assets (Gutenberg/React).
+- Preserva ícones essenciais (`jeo.svg`).
+- Limpeza de logs e configs de desenvolvimento.

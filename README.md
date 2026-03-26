@@ -11,6 +11,7 @@ JEO now features an **AI Co-Pilot** that can autonomously analyze your post's co
 
 - **Supported LLMs:** Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek.
 - **Supported Renderers:** MapLibre GL (Default), Mapbox GL, and Google Maps API.
+- **Supported Geocoders:** Nominatim (OSM), Google Maps, and Mapbox Geocoding.
 - **Smart Approvals:** Visual validation modal to review, approve, or discard AI suggestions before adding them to the map.
 - **Prompt Engineering Studio:** A dedicated Settings panel where you can chat with the active LLM to generate highly optimized, strict System Prompts tailored to your editorial rules.
 - **Authoritative Knowledge Base:** Over 10 embedded data dictionaries for Brazilian territories (Biomes, Indigenous Lands, Quilombolas, and more).
