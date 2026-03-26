@@ -33,4 +33,17 @@ define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );
  */
 require JEO_BASEPATH . 'includes/loaders.php';
 
+/**
+ * Register custom rewrites before flushing them on activation.
+ */
+function jeo_activate() {
+	jeo_maps()->register_post_type();
+	jeo_storymap()->register_post_type();
+	jeo()->register_embed_rewrite();
+
+	flush_rewrite_rules();
+}
+
+register_activation_hook( __FILE__, 'jeo_activate' );
+
 jeo();
