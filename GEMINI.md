@@ -1,65 +1,108 @@
-# Contexto do Plugin JEO - Gemini CLI (v3.5.2-experimental Final)
+# Contexto do Plugin JEO - Gemini CLI (v3.5.2-experimental Master)
 
 O JEO é uma plataforma de geojornalismo para WordPress que permite a organizações de notícias, blogueiros e ONGs publicarem matérias jornalísticas como camadas de informações em mapas digitais interativos.
 
-**Status Atual:** O projeto atingiu a versão **3.5.2-experimental**, consolidando a central de boas-vindas multi-idioma e a hierarquia profissional de menus.
+**Status Atual:** Versão **3.5.2-experimental**. O projeto consolidou seu ecossistema de Inteligência Artificial, segurança de credenciais, curadoria territorial brasileira e uma experiência de usuário profissional e imersiva.
 
-## Visão Geral do Projeto
+---
 
-- **Tipo:** Plugin para WordPress
-- **Propósito:** Plataforma de geojornalismo interativa focada no editor Gutenberg.
-- **Principais Tecnologias:**
-    - **Backend:** PHP (WordPress Plugin API, OOP, Custom Autoloader).
-    - **Frontend:** JavaScript e TypeScript (React, Gutenberg Blocks, `@wordpress/scripts`).
-    - **Mapas:** MapLibre GL JS, Mapbox GL JS e suporte estendido via React Map GL e Leaflet.
-    - **Estilização:** CSS/Sass integrado ao fluxo do Webpack.
-    - **Ambiente de Desenvolvimento:** Docker Compose (WordPress + MariaDB).
+## 1. Visão Geral da Arquitetura
 
-## Georreferenciamento com IA (v3.5.2)
+O JEO é construído com uma separação clara entre o motor de dados (PHP) e a interface de blocos interativos (React).
 
-O sistema conta com um Co-Piloto Editorial capaz de extrair coordenadas geográficas e citações contextuais de forma autônoma.
+- **Tipo:** Plugin para WordPress.
+- **Backend (PHP):** WordPress Plugin API, Programação Orientada a Objetos (OOP), Padrão Singleton, Autoloader Personalizado.
+- **Frontend (JS/TS):** React, Gutenberg Blocks, `@wordpress/scripts`, Webpack.
+- **Renderização de Mapas:** Suporte dual para **MapLibre GL JS** (padrão nativo v3.5+) e **Mapbox GL JS**.
+- **Ambiente de Desenvolvimento:** Docker Compose (WordPress + MariaDB).
 
-### 1. Arquitetura e IA
-- **Provedores Suportados:** Gemini 2.5 Flash, OpenAI GPT-4o e DeepSeek Chat.
-- **Resiliência:** Uso de Temperatura 0.1 e Prompts Agressivos para garantir saídas JSON puras e estruturadas.
-- **Sistema de RAG Leve:** Suporte a dicionários territoriais brasileiros embarcados (10 categorias) que são injetados no prompt para aumentar a precisão em áreas socioambientais.
+---
 
-### 2. Interface e Experiência do Usuário (Settings)
-- **Aba Knowledge Base:** Centraliza a gestão de dicionários JSON com ferramentas de Preview (Visualizer tabular e Raw JSON) e Download.
-- **Engenharia de Prompt:** Painel interativo com assistente de chat para geração de prompts e validador ao vivo. Possui auto-save em `localStorage`.
-- **Skeleton Loader:** Transições suaves de 1 segundo entre as abas das configurações com prevenção de FOUC e bloqueio de cliques durante a animação.
+## 2. Ecossistema de Inteligência Artificial (v3.5.x)
 
-### 3. Hierarquia de Menus e Boas-Vindas
-O plugin segue uma ordem rigorosa e profissional de navegação no WP Admin:
-1. **Welcome (Default):** Central de documentação dinâmica que renderiza arquivos `README*.md` (Suporta English e Português Brasil via abas).
-2. **Dashboard:** Mapa global interativo com enquadramento automático (`fitBounds`).
-3. **Maps:** Listagem de mapas customizados.
-4. **Layers:** Gestão de camadas geográficas.
-5. **Storymaps:** Editor de narrativas espaciais.
-6. **Settings:** Configurações globais e de IA.
-7. **AI Debug Logs:** Submenu técnico para análise de logs em Pretty-JSON.
+O coração desta versão é o Co-Piloto Editorial de Georreferenciamento Automatizado.
 
-### 4. Segurança e Ciclo de Vida
-O JEO v3.5.2-experimental implementa políticas rigorosas de proteção de credenciais:
-- **Ao Desativar:** O sistema limpa automaticamente as **API Keys** e arquivos de log físicos para proteger as credenciais do usuário. Um alerta de confirmação em JS na tela de plugins previne desativações acidentais.
-- **Ao Excluir (Uninstall):** Todas as configurações globais (`jeo-settings`) são removidas via `uninstall.php`.
-- **Preservação de Dados:** Os metadados geográficos dos posts (`_related_point`) são preservados permanentemente, garantindo a integridade do acervo jornalístico.
+### 2.1. Arquitetura de Adapters
+Localizado em `src/includes/ai/`, o sistema usa o padrão **Factory/Adapter** injetado via `AI_Handler`.
+- **Provedores Suportados (2026):**
+  - **Google Gemini:** Utiliza `gemini-2.5-flash` (a série 1.5 foi desativada pelo Google).
+  - **OpenAI:** Utiliza `gpt-4o`.
+  - **DeepSeek:** Utiliza `deepseek-chat`.
+- **Configuração Determinística:** Todas as chamadas são forçadas com **Temperature = 0.1** para eliminar "criatividade" e garantir precisão na extração de dados.
 
-## Construção e Execução
+### 2.2. Blindagem de Prompt e Resiliência
+- **Prompt API Level:** O `System Prompt` é injetado com uma cláusula de **Enforced Schema** inquebrável. Independentemente do prompt customizado pelo usuário, o código anexa instruções estritas no final exigindo apenas JSON bruto e chaves específicas: `"name", "lat", "lng", "quote"`.
+- **Agressive JSON Parser:** O método `parse_json_from_text` (em `AI_Adapter.php`) utiliza Regex e busca por colchetes (`[` e `]`) para ignorar blocos de Markdown ou textos conversacionais ("Claro, aqui está o JSON...") que as LLMs costumam injetar, prevenindo erros de decodificação.
 
-### 1. Ambiente Local de Dev
-```bash
-# Subir ambiente (WP + MariaDB)
-docker-compose up -d
+### 2.3. Sistema de RAG Leve (Base de Conhecimento)
+O JEO possui uma camada de **Dicionários Territoriais Brasileiros** embarcados.
+- **Localização:** `src/includes/ai/data/*.json`.
+- **Funcionamento:** O sistema lê biomas, terras indígenas e quilombos (10 categorias) e injeta esse contexto como "Autoridade Geográfica" no prompt caso os termos apareçam no texto da notícia.
 
-# Compilar assets JS/React em tempo real
-npm install
-npm run start
-```
+---
 
-### 2. Deploy Seguro para Produção (`build.sh`)
-O script `build.sh` compila e zipa a versão oficial **3.5.2-experimental**, incluindo automaticamente todos os arquivos de documentação Markdown e preservando ícones essenciais.
+## 3. Experiência do Usuário (Settings UI)
 
-```bash
-./build.sh
-```
+### 3.1. Engenharia de Prompt e Assistant
+- **Aba AI:** Centraliza a gestão de chaves e o refinamento do prompt.
+- **Auto-Save:** O assistente de chat possui persistência em `localStorage` (`jeo_ai_assistant_context`), impedindo a perda de rascunhos durante a navegação.
+- **Live Validator:** Um botão de simulação real testa o prompt contra a API antes de salvá-lo definitivamente.
+- **Auto-Teste de Chave:** Ao carregar a aba, um "Hello World" formatado em JSON valida se a API Key está ativa, exibindo badges visuais de status.
+
+### 3.2. Navegação e Performance
+- **Skeleton Loader:** Implementação de transições suaves de 1 segundo entre abas com prevenção de "Flicker" (FOUC).
+- **Isolamento de Hash:** A navegação via URL (`#tab-ai`) é restrita apenas ao painel principal, impedindo que cliques em modais ou previews alterem o endereço da página.
+
+---
+
+## 4. Persistência de Dados e Segurança
+
+### 4.1. WordPress REST Schema (Crucial para Regressão)
+O JEO utiliza o metadado `_related_point` para salvar as localizações. 
+- **O Desafio:** O WordPress rejeita objetos que contenham propriedades não registradas.
+- **A Solução:** O campo `_ai_quote` foi registrado formalmente no Schema REST (`class-geocode-handler.php`). O React (`index.js`) foi programado para limpar chaves temporárias (como `_selected` ou `id`) e preencher atributos nulos obrigatórios (`_geocode_country`, etc.) antes do salvamento final, garantindo que o banco de dados não recuse a atualização do post.
+
+### 4.2. Segurança e Ciclo de Vida
+- **Desativação:** Limpa obrigatoriamente as **API Keys** de todos os modelos e deleta arquivos de log físicos por privacidade.
+- **Exclusão:** O arquivo `uninstall.php` remove todas as configurações globais (`jeo-settings`) do banco de dados.
+- **Integridade Editorial:** Os dados geográficos salvos nos posts **nunca** são removidos na desativação ou exclusão, preservando o patrimônio histórico do site.
+
+### 4.3. Compatibilidade PHP
+- **Legacy Fix:** O plugin substituiu o uso da constante `FILTER_VALIDATE_BOOL` (PHP 8.0+) por `FILTER_VALIDATE_BOOLEAN` para garantir funcionamento perfeito em servidores rodando **PHP 7.4**.
+
+---
+
+## 5. Visualização e Dashboards
+
+### 5.1. JEO Dashboard (Página Home)
+Uma interface imersiva de controle editorial.
+- **Cinematic Map:** Renderiza um mapa full-height (100vh) com animações em cascata (`staggered pin drop`).
+- **Auto-Frame (fitBounds):** Após o carregamento, a câmera faz uma transição suave de 2.5 segundos para enquadrar todos os pins globais na tela.
+- **Clickable Popups:** Exibem o trecho original da notícia (`quote`) e links diretos para visualizar ou editar a matéria.
+
+### 5.2. Central de Boas-Vindas
+- **Multi-language Docs:** A página inicial do plugin detecta arquivos `README*.md` e os renderiza em abas de idiomas automaticamente.
+
+---
+
+## 6. Estrutura de Menus e Navegação
+
+A hierarquia de navegação foi travada na seguinte ordem profissional:
+1. **Welcome** (Guia dinâmico e suporte multi-idioma)
+2. **Dashboard** (Mapa global de impacto do projeto)
+3. **Maps** (Post type de gestão de mapas)
+4. **Layers** (Post type de gestão de camadas)
+5. **Storymaps** (Editor de narrativas)
+6. **Settings** (Painel de controle e Engenharia de IA)
+7. **AI Debug Logs** (Relatórios técnicos detalhados)
+
+---
+
+## 7. Construção e Execução
+
+### Build de Produção (`build.sh`)
+O script de empacotamento realiza uma limpeza profunda, mas segue regras de proteção:
+1. Compila Assets (Gutenberg/React).
+2. Coleta todos os arquivos `README*.md` (Documentação dinâmica).
+3. **Preserva arquivos SVG:** Imprescindível para o `jeo.svg` não sumir e causar Erro Fatal 404 no Menu principal.
+4. **Segurança:** Remove obrigatoriamente logs de debug (`*.log`) e configurações sensíveis de desenvolvimento.
