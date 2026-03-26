@@ -39,7 +39,15 @@ There, you can configure:
 * The [Mapbox API key](https://docs.mapbox.com/help/how-mapbox-works/access-tokens), only required if you need MapboxGL or Mapbox layers;
 * The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available by default;
 
-After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
+After activating the plugin, a new item will appear on the WordPress dashboard: JEO. 
+
+The menu follows a professional Geo-Editorial workflow:
+* Welcome: Living documentation and multi-language guide.
+* Experimental: Cinematic dashboard showing all your mapped pins.
+* Maps & Layers: Core management of spatial data and layouts.
+* Storymaps: Scroll-telling narrative editor.
+* Settings: Full control over AI Models (Gemini, OpenAI, DeepSeek) and Geocoders.
+* AI Debug Logs: Technical auditing for LLM interactions.
 
 == Screenshots ==
 1. Map being displayed in a post

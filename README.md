@@ -18,6 +18,16 @@ JEO now features an **AI Co-Pilot** that can autonomously analyze your post's co
 - **Interactive Experience:** Professional [Welcome Guide](https://github.com/InfoAmazonia/jeo-plugin) (built-in) and a cinematic [Geographic Dashboard](https://github.com/InfoAmazonia/jeo-plugin) to visualize your entire project's impact.
 - **Robust Debugging:** A dedicated AI Debug Logs page to inspect every prompt sent and raw JSON received.
 
+## 🕹️ Navigating the JEO Panel
+The WordPress admin menu is organized to provide a professional Geo-Editorial workflow:
+1. **Welcome / Boas-vindas:** Your living documentation and getting started guide.
+2. **Experimental (Dashboard):** A birds-eye view of all your geolocated content.
+3. **Maps / Mapas:** Manage your map instances and layouts.
+4. **Layers / Camadas:** Connect your data sources (Mapbox, TileLayers, etc).
+5. **Storymaps / Mapas de História:** Create immersive scroll-telling narratives.
+6. **Settings / Configurações:** Global setup for IA (Gemini, OpenAI, DeepSeek) and Geocoders.
+7. **AI Debug Logs / Logs de Depuração IA:** Technical auditing for AI georeferencing.
+
 ## Setting up local environment
 
 First of all, clone this repository.

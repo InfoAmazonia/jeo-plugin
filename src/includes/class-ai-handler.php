@@ -94,6 +94,14 @@ class AI_Handler {
 		}
 
 		$translations = array(
+			'Welcome' => 'Boas-vindas',
+			'Dashboard' => 'Experimental',
+			'Settings' => 'Configurações',
+			'AI Debug Logs' => 'Logs de Depuração IA',
+			'Maps' => 'Mapas',
+			'Layers' => 'Camadas',
+			'Story Map' => 'Mapas de História',
+			'Story Maps' => 'Mapas de História',
 			'AI (v3.5)' => 'IA (v3.5)',
 			'Active AI Provider' => 'Provedor de IA Ativo',
 			'Gemini API Key' => 'Chave de API do Gemini',

@@ -33,7 +33,7 @@ class Menu {
 			array( $this, 'render_welcome_page' )
 		);
 
-		// 3. Submenu Dashboard (Segunda posição)
+		// 3. Submenu Dashboard (Segunda posição, agora chamado de Experimental)
 		add_submenu_page(
 			'jeo-main-menu',
 			__( 'Dashboard', 'jeo' ),
