@@ -122,6 +122,16 @@
 			}
 		});
 
+		// Auto-save: Restaura e Salva o contexto do usuário no LocalStorage
+		var savedChatContext = localStorage.getItem('jeo_ai_assistant_context');
+		if (savedChatContext) {
+			$('#jeo-ai-chat-input').val(savedChatContext);
+		}
+		
+		$('#jeo-ai-chat-input').on('input', function() {
+			localStorage.setItem('jeo_ai_assistant_context', $(this).val());
+		});
+
 		$('#jeo-ai-generate-prompt-btn').click(function(e) {
 			e.preventDefault();
 			var $btn = $(this);
