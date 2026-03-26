@@ -83,6 +83,7 @@
 							<select name="<?php echo esc_html( $this->get_field_name( 'map_runtime' ) ); ?>" id="map_runtime">
 								<option value="mapboxgl" <?php selected( $this->get_option( 'map_runtime' ), 'mapboxgl' ); ?>>MapboxGL</option>
 								<option value="maplibregl" <?php selected( $this->get_option( 'map_runtime' ), 'maplibregl' ); ?>>MapLibreGL</option>
+								<option value="googlemaps" <?php selected( $this->get_option( 'map_runtime' ), 'googlemaps' ); ?>>Google Maps</option>
 							</select>
 						</td>
 					</tr>
@@ -128,16 +129,25 @@
 						</td>
 					</tr>
 
-					<tr>
+					<tr class="mapbox_options" style="display: <?php echo $this->get_option( 'map_runtime' ) === 'mapboxgl' ? 'table-row' : 'none'; ?>;">
 						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e( 'Mapbox', 'jeo' ); ?></h2></th>
+						<td></td>
+					</tr>
+					<tr class="mapbox_options" style="display: <?php echo $this->get_option( 'map_runtime' ) === 'mapboxgl' ? 'table-row' : 'none'; ?>;">
+						<th scope="row"><label for="mapbox_key"><?php esc_html_e( 'Mapbox API Key', 'jeo' ); ?></label></th>
 						<td>
+							<input name="<?php echo esc_html( $this->get_field_name( 'mapbox_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. pk.eyJ3...', 'jeo' ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option( 'mapbox_key' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
-					<tr>
-						<th scope="row"><label for="mapbox_key"><?php esc_html_e( 'API Key', 'jeo' ); ?></label></th>
+					<tr class="googlemaps_options" style="display: <?php echo $this->get_option( 'map_runtime' ) === 'googlemaps' ? 'table-row' : 'none'; ?>;">
+						<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e( 'Google Maps', 'jeo' ); ?></h2></th>
+						<td></td>
+					</tr>
+					<tr class="googlemaps_options" style="display: <?php echo $this->get_option( 'map_runtime' ) === 'googlemaps' ? 'table-row' : 'none'; ?>;">
+						<th scope="row"><label for="google_maps_key"><?php esc_html_e( 'Google Maps API Key', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'mapbox_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. pk.eyJ3...', 'jeo' ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option( 'mapbox_key' ) ); ?>" class="regular-text">
+							<input name="<?php echo esc_html( $this->get_field_name( 'google_maps_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Google Cloud API Key', 'jeo' ); ?>" type="text" id="google_maps_key" value="<?php echo esc_html( $this->get_option( 'google_maps_key' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 				</tbody>

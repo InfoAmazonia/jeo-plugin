@@ -136,6 +136,16 @@
 			$('#geocoder_options_' + $(this).val()).show();
 		}).change();
 
+		$('#map_runtime').change(function() {
+			var runtime = $(this).val();
+			$('.mapbox_options, .googlemaps_options').hide();
+			if (runtime === 'mapboxgl') {
+				$('.mapbox_options').show();
+			} else if (runtime === 'googlemaps') {
+				$('.googlemaps_options').show();
+			}
+		}).change();
+
 
 		var mediaUploader;
 		$('#upload_image_button').click(function (e) {

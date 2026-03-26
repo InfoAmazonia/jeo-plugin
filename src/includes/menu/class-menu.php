@@ -59,6 +59,9 @@ class Menu {
 		if ( 'maplibregl' === $map_runtime ) {
 			wp_enqueue_style( 'maplibregl-css', 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css', array(), '3.6.2' );
 			wp_enqueue_script( 'maplibregl', 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js', array(), '3.6.2', true );
+		} elseif ( 'googlemaps' === $map_runtime ) {
+			$google_maps_key = \jeo_settings()->get_option( 'google_maps_key' );
+			wp_enqueue_script( 'googlemaps', 'https://maps.googleapis.com/maps/api/js?key=' . $google_maps_key, array(), JEO_VERSION, true );
 		} else {
 			wp_enqueue_style( 'mapboxgl-css', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css', array(), '2.15.0' );
 			wp_enqueue_script( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', array(), '2.15.0', true );

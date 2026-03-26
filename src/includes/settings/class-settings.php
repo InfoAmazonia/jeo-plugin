@@ -23,6 +23,7 @@ class Settings {
 			'map_default_lat'                 => -23.54998517,
 			'map_default_lng'                 => -46.65599340,
 			'mapbox_key'                      => '',
+			'google_maps_key'                 => '',
 			'jeo_footer-logo'                 => '',
 			'show_storymaps_on_post_archives' => 0,
 			'ai_default_provider'             => 'gemini',

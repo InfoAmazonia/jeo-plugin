@@ -13,7 +13,7 @@ O JEO é construído com uma separação clara entre o motor de dados (PHP) e a 
 - **Tipo:** Plugin para WordPress.
 - **Backend (PHP):** WordPress Plugin API, Programação Orientada a Objetos (OOP), Padrão Singleton, Autoloader Personalizado.
 - **Frontend (JS/TS):** React, Gutenberg Blocks, `@wordpress/scripts`, Webpack.
-- **Renderização de Mapas:** Suporte dual para **MapLibre GL JS** (padrão nativo v3.5+) e **Mapbox GL JS**.
+- **Renderização de Mapas:** Suporte trial para **MapLibre GL JS** (padrão nativo v3.5+), **Mapbox GL JS** e **Google Maps JS API**.
 - **Ambiente de Desenvolvimento:** Docker Compose (WordPress + MariaDB).
 
 ---
@@ -82,6 +82,12 @@ Uma interface imersiva de controle editorial.
 
 ### 5.2. Central de Boas-Vindas
 - **Multi-language Docs:** A página inicial do plugin detecta arquivos `README*.md` e os renderiza em abas de idiomas automaticamente.
+
+### 5.3. Suporte ao Google Maps (v3.5.2+)
+O JEO agora suporta o Google Maps como motor de renderização.
+- **Configuração:** Uma nova seção em "General Settings" permite inserir a **Google Cloud API Key**.
+- **Dashboard:** A Home do plugin detecta o runtime selecionado e renderiza o mapa global usando a API nativa do Google Maps se selecionada, mantendo a animação de pins (`DROP`) e popups informativos.
+- **Normalização:** O sistema garante que as coordenadas `lat` e `lng` sejam tratadas como objetos numéricos consistentes em todos os motores.
 
 ---
 

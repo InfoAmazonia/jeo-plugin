@@ -275,9 +275,9 @@ class Jeo {
 
 		wp_set_script_translations( 'jeo-js', 'jeo', JEO_BASEPATH . 'languages' );
 
-		// Define variables that will be used across the admin/frontend
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
 		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
+		$google_maps_key = \jeo_settings()->get_option( 'google_maps_key' );
 		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
 		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 5;
@@ -302,6 +302,7 @@ class Jeo {
 				'ai_provider_name' => $ai_provider_name,
 				'map_runtime'      => $map_runtime,
 				'mapbox_key'       => $mapbox_key,
+				'google_maps_key'  => $google_maps_key,
 				'default_lat'      => $default_lat,
 				'default_lon'      => $default_lon,
 				'default_zoom'     => $default_zoom,
