@@ -6,7 +6,7 @@ Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
-Version: 3.5.0
+Version: 3.5.1-experimental
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
 
@@ -59,6 +59,7 @@ This is a major feature release introducing AI-powered Georeferencing.
 * feature: Support for Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek LLMs (with strict temperature=0.1 for high precision).
 * feature: Intermediate UI Approval Modal (Review AI suggestions and their textual Quotes before saving to map).
 * feature: AI Prompt Engineer Assistant (Chat with the LLM to generate custom system prompts) with real-time `localStorage` auto-save.
+* feature: New Knowledge Base tab with 10 embedded Brazilian Data Dictionaries (Biomes, Indigenous Lands, etc.) with Preview and Download capabilities.
 * feature: AI Debug Logs page (View raw inputs and outputs in a dedicated WordPress List Table with Pretty-JSON modals).
 * feature: Auto-validation and Safety Checks for API Keys in the Settings panel (Prevents saving invalid or empty keys).
 * feature: Dynamic UI Translations (Portuguese gettext injection for AI panels without .mo compilation).

@@ -5,7 +5,7 @@
  * @wordpress-plugin
  * Plugin Name:       JEO WP
  * Description:       Interactive Map blocks for WordPress Gutenberg
- * Version:           3.5.0
+ * Version:           3.5.1-experimental
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       jeo
@@ -22,7 +22,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'JEO_VERSION', '3.5.0' );
+define( 'JEO_VERSION', '3.5.1-experimental' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );
@@ -44,6 +44,32 @@ function jeo_activate() {
 	flush_rewrite_rules();
 }
 
+/**
+ * Deactivation Hook
+ * Clear ONLY sensitive API Keys upon deactivation for security.
+ */
+function jeo_deactivate() {
+	// Clear ONLY sensitive AI keys
+	$options = get_option( 'jeo-settings' );
+	if ( is_array( $options ) ) {
+		$options['gemini_api_key']   = '';
+		$options['openai_api_key']   = '';
+		$options['deepseek_api_key'] = '';
+		update_option( 'jeo-settings', $options );
+	}
+	
+	// Clear residual debug logs for safety
+	$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
+	if ( file_exists( $log_file ) ) { @unlink( $log_file ); }
+	
+	$upload_dir = wp_upload_dir();
+	$log_file_uploads = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
+	if ( file_exists( $log_file_uploads ) ) { @unlink( $log_file_uploads ); }
+
+	flush_rewrite_rules();
+}
+
 register_activation_hook( __FILE__, 'jeo_activate' );
+register_deactivation_hook( __FILE__, 'jeo_deactivate' );
 
 jeo();

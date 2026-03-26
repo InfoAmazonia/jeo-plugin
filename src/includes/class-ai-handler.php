@@ -28,6 +28,56 @@ class AI_Handler {
 	protected function init() {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_filter( 'gettext', array( $this, 'dynamic_pt_br_translations' ), 10, 3 );
+		add_action( 'admin_post_jeo_download_dict', array( $this, 'api_download_dict' ) );
+		add_action( 'admin_footer', array( $this, 'deactivation_confirmation_js' ) );
+	}
+
+	/**
+	 * Inject a confirmation JS on the plugins page to warn about data removal.
+	 */
+	public function deactivation_confirmation_js() {
+		$screen = get_current_screen();
+		if ( ! $screen || 'plugins' !== $screen->id ) {
+			return;
+		}
+
+		$msg = __( 'Warning: Deactivating JEO will permanently remove all API Keys and AI settings for security reasons. Do you want to proceed?', 'jeo' );
+		?>
+		<script>
+			jQuery(function($) {
+				$('.wp-list-table tr[data-slug="jeo"] .deactivate a').on('click', function(e) {
+					if (!confirm("<?php echo esc_js( $msg ); ?>")) {
+						e.preventDefault();
+					}
+				});
+			});
+		</script>
+		<?php
+	}
+
+	/**
+	 * Securely download a dictionary JSON file.
+	 */
+	public function api_download_dict() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( 'Unauthorized' );
+		}
+
+		$file = isset( $_GET['file'] ) ? sanitize_file_name( $_GET['file'] ) : '';
+		if ( empty( $file ) || strpos( $file, '.json' ) === false ) {
+			wp_die( 'Invalid file' );
+		}
+
+		$path = JEO_BASEPATH . '/includes/ai/data/' . $file;
+		if ( ! file_exists( $path ) ) {
+			wp_die( 'File not found' );
+		}
+
+		header( 'Content-Type: application/json' );
+		header( 'Content-Disposition: attachment; filename="' . $file . '"' );
+		header( 'Pragma: no-cache' );
+		readfile( $path );
+		exit;
 	}
 
 	/**
@@ -90,6 +140,17 @@ class AI_Handler {
 			'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lng, or quote).' => 'Falha na validação: A IA não retornou o esquema JSON esperado (faltando name, lat, lng ou quote).',
 			'Context is required.' => 'O contexto é obrigatório.',
 			'Prompt is required.' => 'O prompt é obrigatório.',
+			'Knowledge Base' => 'Base de Conhecimento',
+			'Data Dictionaries' => 'Dicionários de Dados',
+			'Embedded Brazilian Territories' => 'Territórios Brasileiros Embarcados',
+			'The following geographic dictionaries are available locally to improve AI precision:' => 'Os seguintes dicionários geográficos estão disponíveis localmente para melhorar a precisão da IA:',
+			'Advanced RAG Connections (Coming Soon)' => 'Conexões RAG Avançadas (Em breve)',
+			'Connect your own external databases to provide custom context to the LLM.' => 'Conecte seus próprios bancos de dados externos para fornecer contexto personalizado à LLM.',
+			'Connect Supabase (PostgreSQL)' => 'Conectar Supabase (PostgreSQL)',
+			'Connect SQLite Local' => 'Conectar SQLite Local',
+			'Connect N8N Webhook' => 'Conectar Webhook N8N',
+			'File:' => 'Arquivo:',
+			'Entries found:' => 'Entradas encontradas:',
 			'API Key is valid and active!' => 'A Chave de API é válida e está ativa!',
 			'Invalid provider.' => 'Provedor inválido.',
 			'Test API Key' => 'Testar Chave de API',
@@ -97,6 +158,7 @@ class AI_Handler {
 			'API Status:' => 'Status da API:',
 			'Checking...' => 'Verificando...',
 			'Please enter an API Key for the selected provider before saving.' => 'Por favor, insira uma Chave de API para o provedor selecionado antes de salvar.',
+			'Warning: Deactivating JEO will remove your AI API Keys for security reasons. Other settings will be preserved. Do you want to proceed?' => 'Atenção: Desativar o JEO removerá suas chaves de API de Inteligência Artificial por motivos de segurança. Outras configurações serão preservadas. Deseja continuar?',
 		);
 
 		if ( isset( $translations[ $text ] ) ) {

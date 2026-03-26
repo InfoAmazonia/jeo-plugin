@@ -2,10 +2,13 @@
 	$(function () {
 		var isAnimating = false; // Flag to prevent multiple rapid clicks
 
-		// Inicializa o state das tabs
-		$('a.nav-tab').click(function (ev, isInitialLoad) {
+		// Inicializa o state das tabs PRINCIPAIS (com Skeleton e Hash)
+		$('#tabs > .nav-tab').click(function (ev, isInitialLoad) {
 			ev.preventDefault();
 			var target = $(this).data('target');
+
+			// Proteção contra cliques em abas que não são do Settings (como as do modal)
+			if (!target) return;
 
 			// Bloqueia se já estiver animando ou se clicar na aba já ativa (e não for o load inicial)
 			if (isAnimating || (!isInitialLoad && $(this).hasClass('nav-tab-active'))) {
@@ -17,7 +20,7 @@
 			// Esconde abas e botão de salvar, mostra o Skeleton Loader
 			$('.tabs-content').hide();
 			$('.jeo-settings-submit').hide();
-			$('a.nav-tab').removeClass('nav-tab-active');
+			$('#tabs > .nav-tab').removeClass('nav-tab-active');
 			$(this).addClass('nav-tab-active');
 			$('#jeo-skeleton').show();
 
@@ -93,9 +96,9 @@
 		var hash = window.location.hash;
 		if (hash && hash.indexOf('tab-') !== -1) {
 			var tabName = hash.replace('#tab-', '');
-			$('a.nav-tab[data-target="' + tabName + '"]').trigger('click', [true]);
+			$('#tabs .nav-tab[data-target="' + tabName + '"]').trigger('click', [true]);
 		} else {
-			$('.nav-tab:first').trigger('click', [true]);
+			$('#tabs .nav-tab:first').trigger('click', [true]);
 		}
 
 		// voltam para a mesma tab usando o form 'options.php' nativo
@@ -254,6 +257,30 @@
 			}).finally(function() {
 				$btn.prop('disabled', false).text('Validate Custom Prompt');
 			});
+		});
+
+		// Lógica do Modal de Dicionários (Preview) - Usando delegação para maior resiliência
+		$(document).on('click', '.jeo-ai-preview-dict-btn', function(e) {
+			e.preventDefault();
+			var targetId = $(this).data('dict-id');
+			var dialog = document.getElementById(targetId);
+			if (dialog) {
+				dialog.showModal();
+			}
+		});
+
+		$(document).on('click', '.jeo-ai-close-modal-btn', function(e) {
+			e.preventDefault();
+			var dialog = this.closest('dialog');
+			if (dialog) dialog.close();
+		});
+
+		// Também adicionar delegate para o botão de Log da outra página se necessário
+		$(document).on('click', '.jeo-ai-view-log-btn', function(e) {
+			e.preventDefault();
+			var targetId = $(this).data('log-id');
+			var dialog = document.getElementById(targetId);
+			if (dialog) dialog.showModal();
 		});
 	});
 

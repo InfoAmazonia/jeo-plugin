@@ -12,6 +12,7 @@ JEO now features an **AI Co-Pilot** that can autonomously analyze your post's co
 - **Supported LLMs:** Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek.
 - **Smart Approvals:** Visual validation modal to review, approve, or discard AI suggestions before adding them to the map.
 - **Prompt Engineering Studio:** A dedicated Settings panel where you can chat with the active LLM to generate highly optimized, strict System Prompts tailored to your editorial rules.
+- **Authoritative Knowledge Base:** Over 10 embedded data dictionaries for Brazilian territories (Biomes, Indigenous Lands, Quilombolas, and more) to ensure precision in complex socio-environmental contexts.
 - **Robust Debugging:** A dedicated AI Debug Logs page to inspect every prompt sent and raw JSON received.
 
 ## Setting up local environment

@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Assentamento Eldorado dos Carajás",
+    "type": "agrarian_settlement",
+    "lat": -6.110,
+    "lng": -49.330,
+    "aliases": ["Curva do S", "Eldorado dos Carajás", "Assentamento Eldorado"]
+  },
+  {
+    "name": "Projeto de Assentamento (PA) Ituxi",
+    "type": "agrarian_settlement",
+    "lat": -8.500,
+    "lng": -65.500,
+    "aliases": ["PA Ituxi", "Assentamento Ituxi"]
+  },
+  {
+    "name": "Assentamento 17 de Abril",
+    "type": "agrarian_settlement",
+    "lat": -5.850,
+    "lng": -49.150,
+    "aliases": ["PA 17 de Abril", "17 de Abril"]
+  }
+]

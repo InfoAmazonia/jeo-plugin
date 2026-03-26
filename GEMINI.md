@@ -1,8 +1,8 @@
-# Contexto do Plugin JEO - Gemini CLI (v3.5.0 Final)
+# Contexto do Plugin JEO - Gemini CLI (v3.5.1 Final)
 
 O JEO é uma plataforma de geojornalismo para WordPress que permite a organizações de notícias, blogueiros e ONGs publicarem matérias jornalísticas como camadas de informações em mapas digitais interativos.
 
-**Status Atual:** O projeto atingiu a versão de produção **3.5.0** (substituindo a antiga 3.0.0-rc.3), consolidando o Georreferenciamento Automatizado via IA como funcionalidade nativa.
+**Status Atual:** O projeto atingiu a versão **3.5.1**, consolidando a Base de Conhecimento Territorial e a interface de Engenharia de Prompt.
 
 ## Visão Geral do Projeto
 
@@ -15,7 +15,7 @@ O JEO é uma plataforma de geojornalismo para WordPress que permite a organizaç
     - **Estilização:** CSS/Sass integrado ao fluxo do Webpack.
     - **Ambiente de Desenvolvimento:** Docker Compose (WordPress + MariaDB).
 
-## Georreferenciamento com IA (Feature Estável v3.5.0)
+## Georreferenciamento com IA (Feature Estável v3.5.1)
 
 O sistema agora é capaz de analisar autonomamente o título e o conteúdo dos posts para identificar locais mencionados e extrair suas coordenadas, agindo como um "Co-Piloto Editorial".
 
@@ -40,18 +40,33 @@ O sistema agora é capaz de analisar autonomamente o título e o conteúdo dos p
 - **Skeleton Loader (1s):** As abas usam `location.hash` (`#tab-ai`). Ao recarregar a tela, um *Skeleton Loader* bloqueante oculta toda a UI (incluindo o botão de "Save Changes", que possui um `margin-top: 50px` fluido) por 1 segundo, resultando num carregamento e transição sem *Flicker*.
 - **Nova Tela (AI Debug Logs):** Submenu do JEO que exibe as últimas interações (paginada em 25, com busca) e traz botões "View Details" abrindo modais formatados em Pretty-JSON.
 
-### 3. Editor do Gutenberg (Frontend - React)
+### 3. Base de Conhecimento e Dicionários Geográficos
+O JEO v3.5.1 introduz uma infraestrutura de dados autoritativa para o Brasil.
+- **Aba Knowledge Base:** Centraliza a gestão de ativos geográficos para melhorar o contexto da IA.
+- **Dicionários Brasileiros Embarcados (10 Categorias):** O plugin já traz 10 bases JSON pré-configuradas (Biomas, Terras Indígenas, Quilombos, Resex, Bacias Hidrográficas, etc.) com centroides e aliases.
+- **Interatividade de Dados:**
+  - **Download Seguro:** Sistema de exportação de JSON via PHP.
+  - **Visualizer Unificado:** Modal de prévia (max-height: 85vh) com cabeçalho fixo que exibe a lista tabular de locais e o código-fonte (Raw JSON) em sequência, evitando conflitos de navegação via URL.
+- **Roteiro RAG (Em breve):** O painel já exibe visualmente as futuras integrações com Supabase (PostgreSQL), SQLite e N8N Webhooks para enriquecimento dinâmico de dados.
+
+### 4. Editor do Gutenberg (Frontend - React)
 - **Botão Dinâmico:** O botão na barra lateral de Geolocalização reage ao PHP exibindo, por exemplo, "Georeference with OpenAI (GPT)".
 - **Modal de Revisão (Cards Modernos):** Quando a IA devolve resultados, o sistema **não salva automaticamente**. Um Modal exibe checkboxes, o Nome, as Coordenadas e o **Trecho Exato (`quote`)**.
 - **Persistência Rigorosa:** Ao aprovar, o React limpa campos de controle (`_selected`) e salva o objeto perfeitamente formatado no banco, incluindo o campo `_ai_quote` (adicionado ao Schema REST do WP `register_post_meta`). Isso garante compatibilidade nativa com o banco de dados.
 
-### 4. A Nova Home (JEO Dashboard)
+### 5. A Nova Home (JEO Dashboard)
 O JEO agora possui uma Dashboard imersiva de "Boas-Vindas" (`toplevel_page_jeo-main-menu`), substituindo redirecionamentos antigos.
 - **Tela Cheia (100vh):** O dashboard sobrepõe a UI padrão do WordPress (removendo rodapés e *scrolls* extras) para exibir um mapa em tela cheia do site.
 - **Integração MapLibre:** A configuração padrão de motor de mapa foi revertida para `maplibregl`. A Dashboard sempre usa MapLibre a menos que haja um token explícito do Mapbox.
 - **Interface Flutuante (Header Box):** Possui um *Card* minimizável que se contrai em um ícone (JEO Logo), despoluindo a tela.
-- **Endpoint `/all-pins` Autenticado:** Uma requisição AJAX (`X-WP-Nonce`) carrega rapidamente uma query de SQL limpa (ignorando `get_posts`) que devolve todos os pontos do site e seus respectivos links de edição, eliminando pontos matematicamente idênticos (arredondamento de 5 casas).
-- **Animação e Popups:** Os marcadores caem do topo (`staggered drop animation`) e são clicáveis. O *Popup* gerado mostra a *Quote* (o trecho original onde a IA encontrou a menção) e dois botões de atalho: "View Post" e "Edit Post".
+- **Endpoint `/all-pins` Autenticado:** Uma requisição AJAX (`X-WP-Nonce`) carrega rapidamente uma query de SQL limpa que devolve todos os pontos do site e seus respectivos links de edição.
+- **Animação e Popups:** Os marcadores caem do topo (`staggered drop animation`) e o mapa realiza um `fitBounds` cinematográfico. Os pins são clicáveis e mostram a *Quote* original.
+
+### 6. Segurança e Ciclo de Vida
+O JEO v3.5.1-experimental implementa políticas rigorosas de proteção de credenciais:
+- **Ao Desativar:** O sistema limpa automaticamente as **API Keys** de todos os provedores de IA (Gemini, OpenAI, DeepSeek) e remove os arquivos físicos de log (`jeo-ai-debug.log`). Um alerta de confirmação em JS na tela de plugins previne desativações acidentais.
+- **Ao Excluir (Uninstall):** Todas as configurações globais (`jeo-settings`) são removidas do banco de dados através do arquivo `uninstall.php`.
+- **Preservação de Dados:** Os metadados geográficos dos posts (`_related_point`) são preservados em ambos os cenários (Desativação ou Exclusão), garantindo a integridade do acervo jornalístico.
 
 ## Construção e Execução
 
@@ -64,16 +79,10 @@ docker-compose up -d
 npm install
 npm run start
 ```
-*A pasta `src/` é montada como um volume via Docker diretamente no caminho do plugin.*
 
 ### 2. Deploy Seguro para Produção (`build.sh`)
-O script `build.sh` compila e zipa a versão oficial **3.5.0**.
+O script `build.sh` compila e zipa a versão oficial **3.5.1**.
 
 ```bash
 ./build.sh
 ```
-**Regras do Deploy (Evitando 404 e Vazamentos):**
-1. Faz `npm run build` e `composer install --no-dev --optimize-autoloader`.
-2. Cria o arquivo `jeo-3.5.0.zip` mantendo a estrutura da pasta `src/`.
-3. **Limpeza Cirúrgica:** Exclui pastas pesadas (`js/src/`), **mas preserva os arquivos SVG** (como `jeo.svg`), o que previne Erros Fatais 404 no Menu raiz do WordPress.
-4. **Segurança:** Remove obrigatoriamente arquivos sensíveis, como o log do debug da IA (`*.log`) e configurações (`.editorconfig`).
