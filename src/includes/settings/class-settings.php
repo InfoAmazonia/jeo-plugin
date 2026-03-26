@@ -25,6 +25,13 @@ class Settings {
 			'mapbox_key'                      => '',
 			'jeo_footer-logo'                 => '',
 			'show_storymaps_on_post_archives' => 0,
+			'ai_default_provider'             => 'gemini',
+			'gemini_api_key'                  => '',
+			'openai_api_key'                  => '',
+			'deepseek_api_key'                => '',
+			'ai_use_custom_prompt'            => 0,
+			'ai_system_prompt'                => '',
+			'ai_debug_mode'                   => 0,
 		);
 
 		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
@@ -77,7 +84,7 @@ class Settings {
 	public function enqueue_admin_scripts( $page ) {
 		if ( 'jeo_page_jeo-settings' === $page ) {
 			wp_enqueue_media();
-			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery' ), JEO_VERSION, true );
+			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery', 'wp-api-fetch' ), JEO_VERSION, true );
 			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
 
 		}
@@ -92,9 +99,22 @@ class Settings {
 			'jeo-settings',
 			array( $this, 'admin_page' ),
 		);
+
+		add_submenu_page(
+			'jeo-main-menu',
+			__( 'AI Debug Logs', 'jeo' ),
+			__( 'AI Debug Logs', 'jeo' ),
+			'manage_options',
+			'jeo-ai-logs',
+			array( $this, 'admin_logs_page' )
+		);
 	}
 
 	public function admin_page() {
 		include 'settings-page.php';
+	}
+
+	public function admin_logs_page() {
+		include 'ai-logs-page.php';
 	}
 }

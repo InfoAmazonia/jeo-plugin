@@ -1,0 +1,159 @@
+<?php
+
+namespace Jeo;
+
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+/**
+ * AI Adapter Interface
+ *
+ * All AI providers must implement this.
+ */
+abstract class AI_Adapter {
+
+	/**
+	 * Georeference a post content.
+	 *
+	 * @param string $title Post title.
+	 * @param string $content Post content.
+	 * @param string $override_prompt Optional custom prompt for testing.
+	 * @return array|\WP_Error
+	 */
+	abstract public function georeference( $title, $content, $override_prompt = null );
+
+	/**
+	 * Get the system prompt.
+	 *
+	 * @param string $override_prompt Optional prompt to override the saved one.
+	 * @return string
+	 */
+	protected function get_system_prompt( $override_prompt = null ) {
+		if ( ! empty( $override_prompt ) ) {
+			return $override_prompt;
+		}
+
+		$use_custom = \jeo_settings()->get_option( 'ai_use_custom_prompt' );
+		if ( $use_custom ) {
+			$custom = \jeo_settings()->get_option( 'ai_system_prompt' );
+			if ( ! empty( $custom ) ) {
+				return $custom;
+			}
+		}
+
+		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects.
+		Each object MUST have:
+		- "name": The location name.
+		- "lat": Latitude (string or float).
+		- "lng": Longitude (string or float).
+		- "quote": A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
+
+		Example: [{"name": "Teatro Amazonas", "lat": -3.1303, "lng": -60.0234, "quote": "...localizado no centro de Manaus, o Teatro Amazonas recebeu..."}]
+
+		If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].', 'jeo' );
+		}
+
+	/**
+	 * Log AI Data for debugging.
+	 *
+	 * @param string $provider Provider name.
+	 * @param mixed  $input    The prompt sent.
+	 * @param mixed  $output   The raw response received.
+	 */
+	protected function log_debug( $provider, $input, $output ) {
+		$debug_mode = \jeo_settings()->get_option( 'ai_debug_mode' );
+		
+		if ( empty( $debug_mode ) ) {
+			return;
+		}
+
+		$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
+		
+		// If JEO_BASEPATH is not writable, fallback to WordPress upload dir
+		if ( ! is_writable( JEO_BASEPATH ) && ! file_exists( $log_file ) ) {
+			$upload_dir = wp_upload_dir();
+			$log_file = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
+		}
+
+		$timestamp = current_time( 'Y-m-d H:i:s' );
+		
+		$entry = "[$timestamp] PROVIDER: $provider\n";
+		$entry .= "INPUT (Prompt):\n" . ( is_string( $input ) ? $input : wp_json_encode( $input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) ) . "\n";
+		$entry .= "OUTPUT (Raw Response):\n" . ( is_string( $output ) ? $output : wp_json_encode( $output, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) ) . "\n";
+		$entry .= str_repeat( '=', 80 ) . "\n\n";
+
+		@file_put_contents( $log_file, $entry, FILE_APPEND );
+	}
+
+	/**
+	 * Handle API HTTP Errors.
+	 *
+	 * @param array|WP_Error $response The wp_remote_post response.
+	 * @param string         $provider The name of the AI provider.
+	 * @return array|\WP_Error
+	 */
+	protected function validate_api_response( $response, $provider ) {
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$status_code = wp_remote_retrieve_response_code( $response );
+		$body        = wp_remote_retrieve_body( $response );
+		$data        = json_decode( $body, true );
+
+		if ( $status_code >= 400 ) {
+			$error_msg = 'Unknown Error';
+			if ( isset( $data['error']['message'] ) ) {
+				$error_msg = $data['error']['message'];
+			} elseif ( isset( $data['error'] ) && is_string( $data['error'] ) ) {
+				$error_msg = $data['error'];
+			}
+			return new \WP_Error( 'api_error', "{$provider} API Error ({$status_code}): {$error_msg}" );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Extract and parse JSON from AI response text.
+	 *
+	 * @param string $text The raw text from AI.
+	 * @return array|\WP_Error
+	 */
+	protected function parse_json_from_text( $text ) {
+		if ( empty( $text ) ) {
+			return new \WP_Error( 'empty_response', __( 'Empty response from AI.', 'jeo' ) );
+		}
+
+		// 1. Remove markdown backticks if wrapped
+		if ( preg_match( '/```(?:json)?\s*(.*?)\s*```/is', $text, $matches ) ) {
+			$text = $matches[1];
+		}
+
+		// 2. Aggressive hunting: Find the first '[' and the last ']'
+		$start_pos = strpos( $text, '[' );
+		$end_pos   = strrpos( $text, ']' );
+
+		if ( $start_pos !== false && $end_pos !== false && $end_pos > $start_pos ) {
+			// Extract just the array portion
+			$text = substr( $text, $start_pos, ( $end_pos - $start_pos ) + 1 );
+		}
+
+		// Clean up the string to ensure it parses properly
+		$text = trim( $text );
+		
+		// Attempt to parse the JSON
+		$parsed = json_decode( $text, true );
+
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			return new \WP_Error( 'json_parse_error', 'Invalid JSON from AI: ' . json_last_error_msg() . ' | Cleaned output: ' . $text );
+		}
+
+		if ( ! is_array( $parsed ) ) {
+			return new \WP_Error( 'json_format_error', 'AI response is not a JSON array.' );
+		}
+
+		return $parsed;
+	}
+}

@@ -9,10 +9,61 @@
 			<a href="#" class="nav-tab" data-target="geocoders">
 				<?php esc_html_e( 'Geocoders', 'jeo' ); ?>
 			</a>
+			<a href="#" class="nav-tab" data-target="ai">
+				<?php esc_html_e( 'AI (v3.5)', 'jeo' ); ?>
+			</a>
 			<a href="#" class="nav-tab" data-target="customize">
 				<?php esc_html_e( 'Customize', 'jeo' ); ?>
 			</a>
 		</h2>
+
+		<style>
+			/* Esconde todas as abas inicialmente para o Skeleton Loader brilhar */
+			.tabs-content { display: none; }
+			
+			.jeo-skeleton-container {
+				background: #fff;
+				border: 1px solid #c3c4c7;
+				padding: 30px;
+				margin-top: 15px;
+				box-shadow: 0 1px 1px rgba(0,0,0,.04);
+			}
+			.jeo-skeleton-pulse {
+				animation: jeo-pulse 1.5s infinite ease-in-out;
+			}
+			.jeo-skeleton-line {
+				height: 20px;
+				background: #e2e4e7;
+				border-radius: 4px;
+				margin-bottom: 20px;
+			}
+			.jeo-skeleton-line.short { width: 30%; }
+			.jeo-skeleton-line.medium { width: 60%; }
+			.jeo-skeleton-line.long { width: 90%; }
+			.jeo-v4-notice {
+				text-align: right;
+				font-style: italic;
+				color: #646970;
+				font-size: 13px;
+				margin-top: 30px;
+				border-top: 1px dashed #dcdcdc;
+				padding-top: 15px;
+			}
+			@keyframes jeo-pulse {
+				0% { opacity: 0.5; }
+				50% { opacity: 1; }
+				100% { opacity: 0.5; }
+			}
+		</style>
+
+		<div id="jeo-skeleton" class="jeo-skeleton-container jeo-skeleton-pulse">
+			<div class="jeo-skeleton-line short"></div>
+			<div class="jeo-skeleton-line long"></div>
+			<div class="jeo-skeleton-line medium"></div>
+			<div class="jeo-skeleton-line long"></div>
+			<div class="jeo-skeleton-line short"></div>
+			<div class="jeo-v4-notice">✨ <?php esc_html_e( 'Loading settings... (A completely revamped panel is coming in JEO v4.0)', 'jeo' ); ?></div>
+		</div>
 
 		<div id="tab-general" class="tabs-content">
 			<table class="form-table">
@@ -150,6 +201,97 @@
 				</tbody>
 			</table>
 		</div>
+
+		<div id="tab-ai" class="tabs-content">
+			<table class="form-table">
+				<tbody>
+					<tr>
+						<th scope="row"><label for="ai_default_provider"><?php esc_html_e( 'Active AI Provider', 'jeo' ); ?></label></th>
+						<td>
+							<select name="<?php echo esc_html( $this->get_field_name( 'ai_default_provider' ) ); ?>" id="ai_default_provider">
+								<?php foreach ( jeo_ai_handler()->get_adapters() as $slug => $name ) : ?>
+									<option value="<?php echo esc_attr( $slug ); ?>" <?php selected( $this->get_option( 'ai_default_provider' ), $slug ); ?>><?php echo esc_html( $name ); ?></option>
+								<?php endforeach; ?>
+							</select>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'jeo' ); ?></label></th>
+						<td>
+							<input name="<?php echo esc_html( $this->get_field_name( 'gemini_api_key' ) ); ?>" type="text" id="gemini_api_key" value="<?php echo esc_html( $this->get_option( 'gemini_api_key' ) ); ?>" class="regular-text">
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'jeo' ); ?></label></th>
+						<td>
+							<input name="<?php echo esc_html( $this->get_field_name( 'openai_api_key' ) ); ?>" type="text" id="openai_api_key" value="<?php echo esc_html( $this->get_option( 'openai_api_key' ) ); ?>" class="regular-text">
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="deepseek_api_key"><?php esc_html_e( 'DeepSeek API Key', 'jeo' ); ?></label></th>
+						<td>
+							<input name="<?php echo esc_html( $this->get_field_name( 'deepseek_api_key' ) ); ?>" type="text" id="deepseek_api_key" value="<?php echo esc_html( $this->get_option( 'deepseek_api_key' ) ); ?>" class="regular-text">
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="ai_use_custom_prompt"><?php esc_html_e( 'System Prompt Configuration', 'jeo' ); ?></label></th>
+						<td>
+							<div style="margin-bottom: 10px;">
+								<label>
+									<input type="checkbox" name="<?php echo esc_html( $this->get_field_name( 'ai_use_custom_prompt' ) ); ?>" id="ai_use_custom_prompt" value="1" <?php checked( 1, $this->get_option( 'ai_use_custom_prompt' ) ); ?> />
+									<strong><?php esc_html_e( 'Use Custom System Prompt', 'jeo' ); ?></strong>
+								</label>
+								<p class="description" style="margin-top:4px;">
+									<?php esc_html_e( 'Check this to override the default behavior. Uncheck to temporarily disable and return to the optimized default prompt.', 'jeo' ); ?>
+								</p>
+							</div>
+
+							<div id="ai_system_prompt_wrapper" style="display: <?php echo $this->get_option( 'ai_use_custom_prompt' ) ? 'block' : 'none'; ?>;">
+								<textarea name="<?php echo esc_html( $this->get_field_name( 'ai_system_prompt' ) ); ?>" id="ai_system_prompt" rows="8" style="width:100%; max-width: 800px; font-family: monospace;" placeholder="<?php echo esc_attr( jeo_ai_handler()->get_default_system_prompt() ); ?>"><?php echo esc_textarea( $this->get_option( 'ai_system_prompt' ) ); ?></textarea>
+								
+								<div style="display:flex; align-items:center; gap: 10px; margin-top: 10px;">
+									<button type="button" class="button button-secondary" id="jeo-ai-validate-prompt-btn">
+										<?php esc_html_e( 'Validate Custom Prompt', 'jeo' ); ?>
+									</button>
+									<button type="button" class="button button-link-delete" id="jeo-ai-clear-prompt-btn" style="color: #d63638; text-decoration: none;">
+										<?php esc_html_e( 'Clear Text', 'jeo' ); ?>
+									</button>
+									<span id="jeo-ai-validate-status" style="font-size:13px; font-weight: 500;"></span>
+								</div>
+							</div>
+
+							<p class="description" style="margin-top: 20px;">
+								<strong><?php esc_html_e( 'Default Prompt Guide:', 'jeo' ); ?></strong> <em><?php echo esc_html( jeo_ai_handler()->get_default_system_prompt() ); ?></em>
+							</p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row"><label for="ai_debug_mode"><?php esc_html_e( 'Enable AI Debug Mode', 'jeo' ); ?></label></th>
+						<td>
+							<input type="checkbox" name="<?php echo esc_html( $this->get_field_name( 'ai_debug_mode' ) ); ?>" id="ai_debug_mode" value="1" <?php checked( 1, $this->get_option( 'ai_debug_mode' ) ); ?> />
+							<p class="description"><?php echo wp_kses_post( sprintf( __( 'If enabled, raw AI inputs and outputs will be saved. You can view them on the <a href="%s">AI Debug Logs page</a>.', 'jeo' ), admin_url( 'admin.php?page=jeo-ai-logs' ) ) ); ?></p>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+
+			<hr>
+			
+			<div id="jeo-prompt-generator-wrapper" style="margin-top: 30px; background: #fff; padding: 25px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 800px;">
+				<h3 style="margin-top: 0;">✨ <?php esc_html_e( 'AI Prompt Engineer Assistant', 'jeo' ); ?></h3>
+				<p style="font-size: 14px; color: #50575e;"><?php esc_html_e( 'Describe how you want the AI to behave (e.g., "Only map cities in Brazil" or "Ignore street names"). The active LLM will generate a highly optimized System Prompt for you, strictly adhering to JEO formatting rules.', 'jeo' ); ?></p>
+				
+				<div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+					<textarea id="jeo-ai-chat-input" class="large-text" rows="3" placeholder="<?php esc_attr_e( 'Ex: I want to map only locations inside Europe. Press Shift+Enter for new line, or Enter to generate.', 'jeo' ); ?>"></textarea>
+					
+					<div style="display: flex; align-items: center; gap: 15px;">
+						<button type="button" class="button button-primary" id="jeo-ai-generate-prompt-btn" style="min-width: 140px; justify-content: center;"><?php esc_html_e( 'Generate Prompt', 'jeo' ); ?></button>
+						<span id="jeo-ai-chat-status" style="font-style:italic; font-weight: 500;"></span>
+					</div>
+				</div>
+			</div>
+
+		</div>
 		<!--
 
 		More button font-size
@@ -259,6 +401,19 @@
 
 	</div>
 
-	<input type="submit" class="button-primary" value="<?php esc_attr_e( 'Save Changes', 'jeo' ); ?>" />
+	<div class="jeo-settings-submit">
+		<input type="submit" class="button-primary" value="<?php esc_attr_e( 'Save Changes', 'jeo' ); ?>" />
+	</div>
 
 </form>
+
+<style>
+	.jeo-settings-submit {
+		margin-top: 50px;
+		display: none; /* Initially hidden, shown by JS after skeleton */
+	}
+	/* Fix WP standard button spacing slightly */
+	.jeo-settings-submit input {
+		padding: 6px 24px;
+	}
+</style>

@@ -47,6 +47,7 @@ class Jeo {
 		\jeo_layers();
 		\jeo_geocode_handler();
 		\jeo_settings();
+		\jeo_ai_handler();
 		\jeo_layer_types();
 		\jeo_legend_types();
 		\jeo_sidebars();
@@ -171,11 +172,16 @@ class Jeo {
 			$mapgl_react  = 'mapboxglReact';
 		}
 
+		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';
+		$ai_adapters      = \jeo_ai_handler()->get_adapters();
+		$ai_provider_name = isset( $ai_adapters[ $ai_provider_slug ] ) ? $ai_adapters[ $ai_provider_slug ] : 'AI';
+
 		wp_localize_script(
 			'jeo-js',
 			'jeo',
 			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'ajax_url'         => admin_url( 'admin-ajax.php' ),
+				'ai_provider_name' => $ai_provider_name,
 			)
 		);
 

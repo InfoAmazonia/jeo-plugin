@@ -6,6 +6,14 @@ With JEO, creating the interaction between data layers and contextual informatio
 
 At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
 
+## 🤖 What's new in v3.5.0 (AI Georeferencing)
+JEO now features an **AI Co-Pilot** that can autonomously analyze your post's content and title to find mentioned locations and extract their exact coordinates!
+
+- **Supported LLMs:** Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek.
+- **Smart Approvals:** Visual validation modal to review, approve, or discard AI suggestions before adding them to the map.
+- **Prompt Engineering Studio:** A dedicated Settings panel where you can chat with the active LLM to generate highly optimized, strict System Prompts tailored to your editorial rules.
+- **Robust Debugging:** A dedicated AI Debug Logs page to inspect every prompt sent and raw JSON received.
+
 ## Setting up local environment
 
 First of all, clone this repository.

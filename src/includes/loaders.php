@@ -14,7 +14,7 @@ function jeo_autoload( $class_name ) {
 
 	$filename = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
 
-	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization' );
+	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization', 'ai' );
 
 	foreach ( $folders as $folder ) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -23,6 +23,15 @@ function jeo_autoload( $class_name ) {
 			break;
 		}
 	}
+}
+
+/**
+ * Gets the instance of the main AI Handler Class
+ *
+ * @return \Jeo\AI_Handler AI_Handler instance
+ */
+function jeo_ai_handler() {
+	return \Jeo\AI_Handler::get_instance();
 }
 
 /**
