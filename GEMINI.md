@@ -1,8 +1,8 @@
-# Contexto do Plugin JEO - Gemini CLI (v3.5.3-experimental Master)
+# Contexto do Plugin JEO - Gemini CLI (v3.5.4-experimental Master)
 
 O JEO é uma plataforma de geojornalismo para WordPress que permite a organizações de notícias, blogueiros e ONGs publicarem matérias jornalísticas como camadas de informações em mapas digitais interativos.
 
-**Status Atual:** Versão **3.5.3-experimental**. O projeto consolidou seu ecossistema de Inteligência Artificial, segurança de credenciais, curadoria territorial brasileira e expandiu o suporte a múltiplos motores de renderização e geocodificação.
+**Status Atual:** Versão **3.5.4-experimental**. O projeto consolidou seu ecossistema de Inteligência Artificial, segurança de credenciais, curadoria territorial brasileira, expandiu o suporte a múltiplos motores de renderização e implementou integração dinâmica e universal para Custom Post Types (ACF, Pods, etc).
 
 ---
 
@@ -47,7 +47,11 @@ Localizado em `src/includes/ai/`, o sistema usa o padrão **Factory/Adapter** in
 - **Live Validator:** Botão de simulação real antes do salvamento definitivo.
 - **Auto-Teste de Chave:** Validação instantânea de API Keys ao carregar a aba. Bloqueia o salvamento do painel caso a chave do provedor ativo esteja vazia.
 
-### 3.2. Navegação e Performance
+### 3.2. Configuração Universal de Post Types
+- **Integração Dinâmica:** O JEO detecta automaticamente `Custom Post Types` públicos registrados no sistema (nativos, ACF, Pods ou via código).
+- **Settings UI:** A gestão ocorre por meio de `checkboxes` dinâmicos na página de configurações, substituindo o antigo input estático (texto). A interface filtra tipos internos como `map` e `map-layer` para segurança.
+
+### 3.3. Navegação e Performance
 - **Skeleton Loader:** Transições suaves de 1 segundo entre abas.
 - **Knowledge Base:** Gestão de dicionários com Visualizer Unificado (Listagem e Raw JSON) em modal de 85vh e Download Seguro.
 
@@ -56,6 +60,7 @@ Localizado em `src/includes/ai/`, o sistema usa o padrão **Factory/Adapter** in
 ## 4. Persistência de Dados e Segurança
 
 ### 4.1. WordPress REST Schema
+- **Injeção Tardia (Priority 99):** O registro do esquema de geolocalização e metadados R.E.S.T. (incluindo `_geocode_lat`, `_ai_quote`, etc.) ocorre no gancho `init` tardiamente. Isso garante a vinculação perfeita com CPTs registrados por outros plugins.
 - **Propriedades Registradas:** O campo `_ai_quote` está integrado ao Schema do `_related_point`, permitindo salvar o contexto original da IA no banco de dados. O React limpa chaves impuras antes de submeter ao WP REST API.
 
 ### 4.2. Segurança e Ciclo de Vida

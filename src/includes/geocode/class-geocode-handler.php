@@ -23,8 +23,6 @@ class Geocode_Handler {
 		add_action( 'wp_ajax_jeo_reverse_geocode', array( $this, 'ajax_reverse_geocode' ) );
 		add_action( 'init', array( $this, 'register_metadata' ), 99 );
 
-		add_action( 'init', array( $this, 'register_metadata' ), 99 );
-
 		$this->add_index_metadata_hooks();
 	}
 
@@ -187,7 +185,7 @@ class Geocode_Handler {
 			foreach ( array( 'p', 's' )  as $relevance ) {
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_lat_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -201,7 +199,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_lon_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -215,7 +213,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_country_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -229,7 +227,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_country_code_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -243,7 +241,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_region_level_1_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -257,7 +255,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_region_level_2_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -271,7 +269,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_region_level_3_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -285,7 +283,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_city_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -299,7 +297,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_city_level_1_' . $relevance,
 					array(
 						'show_in_rest'  => false,

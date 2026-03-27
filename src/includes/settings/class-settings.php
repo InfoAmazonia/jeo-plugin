@@ -79,7 +79,24 @@ class Settings {
 	}
 
 	public function admin_init() {
-		register_setting( 'jeo-settings', $this->option_key );
+		register_setting( 'jeo-settings', $this->option_key, array( 'sanitize_callback' => array( $this, 'sanitize_settings' ) ) );
+	}
+
+	public function sanitize_settings( $input ) {
+		if ( isset( $input['enabled_post_types'] ) ) {
+			if ( ! is_array( $input['enabled_post_types'] ) ) {
+				if ( empty( trim( $input['enabled_post_types'] ) ) ) {
+					$input['enabled_post_types'] = array();
+				} else {
+					$input['enabled_post_types'] = explode( ',', trim( $input['enabled_post_types'] ) );
+				}
+			} else {
+				$input['enabled_post_types'] = array_filter( array_map( 'trim', $input['enabled_post_types'] ) );
+			}
+		} else {
+			$input['enabled_post_types'] = array();
+		}
+		return $input;
 	}
 
 	public function enqueue_admin_scripts( $page ) {

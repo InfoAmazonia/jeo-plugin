@@ -123,9 +123,33 @@
 					</tr>
 
 					<tr>
-						<th scope="row"><label for="enabled_post_types"><?php esc_html_e( 'Enabled Post Types. Default: post,storymap', 'jeo' ); ?></label></th>
+						<th scope="row"><label><?php esc_html_e( 'Enabled Post Types', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'enabled_post_types' ) ); ?>" placeholder="<?php esc_attr_e( 'Post types separated by comma, Ex: map,post,page', 'jeo' ); ?>" type="text" id="enabled_post_types" value="<?php echo esc_textarea( implode( ',', $this->get_option( 'enabled_post_types' ) ) ); ?>" class="regular-text">
+							<fieldset>
+								<legend class="screen-reader-text"><span><?php esc_html_e( 'Enabled Post Types', 'jeo' ); ?></span></legend>
+								<input type="hidden" name="<?php echo esc_attr( $this->get_field_name( 'enabled_post_types' ) ); ?>" value="" />
+								<?php
+								$enabled_post_types = $this->get_option( 'enabled_post_types' );
+								if ( ! is_array( $enabled_post_types ) ) {
+									$enabled_post_types = array();
+								}
+								$public_post_types  = get_post_types( array( 'public' => true ), 'objects' );
+								$excluded_types     = array( 'map', 'map-layer', 'attachment' );
+
+								foreach ( $public_post_types as $post_type ) {
+									if ( in_array( $post_type->name, $excluded_types, true ) ) {
+										continue;
+									}
+									?>
+									<label>
+										<input type="checkbox" name="<?php echo esc_attr( $this->get_field_name( 'enabled_post_types' ) ); ?>[]" value="<?php echo esc_attr( $post_type->name ); ?>" <?php checked( in_array( $post_type->name, $enabled_post_types, true ) ); ?> />
+										<?php echo esc_html( $post_type->label ); ?>
+									</label><br>
+									<?php
+								}
+								?>
+								<p class="description"><?php esc_html_e( 'Select the post types that should have geolocating and AI features enabled.', 'jeo' ); ?></p>
+							</fieldset>
 						</td>
 					</tr>
 
