@@ -121,6 +121,10 @@ class Geocode_Handler {
 			$post_types = array( 'post' );
 		}
 		foreach ( $post_types as $type ) {
+
+				// Garante que o Post Type tenha suporte a custom-fields, essencial para a REST API expor a chave 'meta'.
+				add_post_type_support( $type, 'custom-fields' );
+
 				register_post_meta(
 					$type,
 					'_related_point',
