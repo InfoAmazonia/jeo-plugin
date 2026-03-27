@@ -60,6 +60,11 @@ The menu follows a professional Geo-Editorial workflow:
 
 == Changelog ==
 
+= 3.5.4 =
+* feature: Dynamic Discovery and Integration of Custom Post Types (ACF, Pods, programmatic CPTs).
+* feature: Replaced static text-input for Enabled Post Types with a dynamic Checkbox UI matrix.
+* bugfix: Added fallback support for `custom-fields` to dynamically registered CPTs, ensuring REST API correctly saves `_related_point` metadata and AI geolocations.
+
 = 3.5.3 =
 This version expands the geodata infrastructure and adds multi-engine support.
 * feature: Added Google Maps Geocoding as a provider.

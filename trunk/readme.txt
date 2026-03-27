@@ -52,6 +52,11 @@ After activating the plugin, a new item will appear on the WordPress dashboard: 
 
 == Changelog ==
 
+= 3.5.4 =
+* feature: Dynamic Discovery and Integration of Custom Post Types (ACF, Pods, programmatic CPTs).
+* feature: Replaced static text-input for Enabled Post Types with a dynamic Checkbox UI matrix.
+* bugfix: Added fallback support for `custom-fields` to dynamically registered CPTs, ensuring REST API correctly saves `_related_point` metadata and AI geolocations.
+
 = 3.5.0 =
 This is a major feature release introducing AI-powered Georeferencing.
 * feature: Autonomous AI Georeferencing Co-Pilot for the Gutenberg Editor.

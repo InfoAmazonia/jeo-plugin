@@ -60,7 +60,7 @@ Localizado em `src/includes/ai/`, o sistema usa o padrão **Factory/Adapter** in
 ## 4. Persistência de Dados e Segurança
 
 ### 4.1. WordPress REST Schema
-- **Injeção Tardia (Priority 99):** O registro do esquema de geolocalização e metadados R.E.S.T. (incluindo `_geocode_lat`, `_ai_quote`, etc.) ocorre no gancho `init` tardiamente. Isso garante a vinculação perfeita com CPTs registrados por outros plugins.
+- **Injeção Tardia e Força de Suporte (Priority 99):** O registro do esquema de geolocalização e metadados R.E.S.T. (incluindo `_geocode_lat`, `_ai_quote`, etc.) ocorre no gancho `init` tardiamente. Adicionalmente, o JEO força a injeção via `add_post_type_support( $type, 'custom-fields' )` em todos os Custom Post Types (como ACF ou Pods) habilitados, garantindo que a API R.E.S.T. do WordPress processe e salve o payload na chave `meta` sem descartes silenciosos.
 - **Propriedades Registradas:** O campo `_ai_quote` está integrado ao Schema do `_related_point`, permitindo salvar o contexto original da IA no banco de dados. O React limpa chaves impuras antes de submeter ao WP REST API.
 
 ### 4.2. Segurança e Ciclo de Vida
