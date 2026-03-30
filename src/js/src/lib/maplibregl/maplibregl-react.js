@@ -1,4 +1,4 @@
-import { forwardRef, useState } from 'react';
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/maplibre';
 
 import { computeInlineStart } from '../../shared/direction';
@@ -85,7 +85,7 @@ function patchIframeAndResize( map ) {
  * @typedef {import('react-map-gl/maplibre').MapProps} MapProps
  * @param {MapProps} props
  */
-function MapGL( { children, controls = undefined, fullscreen = true, ...props }, ref ) {
+function MapGL( { children, controls = undefined, fullscreen = true, onLoad, ...props }, ref ) {
 	const [ inlineStart ] = useState( computeInlineStart );
 	const controlsPosition = controls ?? `top-${inlineStart}`;
 
@@ -125,7 +125,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, ...props },
 
 	return (
 		<MapLibre
-			ref={ ref }
+			ref={ setRef }
 			mapLib={ mapgl }
 			mapStyle={ defaultStyle }
 			reuseMaps={ false }
