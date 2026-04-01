@@ -590,6 +590,30 @@
 
 </form>
 
+<div id="jeo-ai-debug-console" style="position: fixed; bottom: 0; right: 20px; width: 450px; background: #1d2327; color: #fff; border: 1px solid #3c434a; border-bottom: 0; border-radius: 6px 6px 0 0; z-index: 99999; font-family: monospace; display: flex; flex-direction: column; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); transition: transform 0.3s ease;">
+	<div id="jeo-ai-debug-header" style="padding: 8px 15px; background: #2c3338; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px 6px 0 0;">
+		<span style="font-size: 11px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px;">🛠️ AI API Debugger</span>
+		<div style="display:flex; gap: 10px;">
+			<span id="jeo-ai-debug-clear" title="Clear logs" style="cursor:pointer; font-size: 14px;">🧹</span>
+			<span id="jeo-ai-debug-toggle" style="font-size: 12px;">▲</span>
+		</div>
+	</div>
+	<div id="jeo-ai-debug-body" style="height: 300px; overflow-y: auto; padding: 10px; font-size: 11px; display: none;">
+		<div id="jeo-ai-debug-log-container">
+			<div style="color: #8c8f94; font-style: italic;">[System] Console initialized. Awaiting API interactions...</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	.jeo-debug-entry { border-bottom: 1px solid #3c434a; padding-bottom: 8px; margin-bottom: 8px; }
+	.jeo-debug-label { font-weight: bold; margin-bottom: 3px; display: block; }
+	.jeo-debug-request { color: #72aee6; }
+	.jeo-debug-response { color: #46b450; }
+	.jeo-debug-error { color: #d63638; }
+	.jeo-debug-payload { background: #000; padding: 5px; border-radius: 3px; overflow-x: auto; margin-top: 5px; white-space: pre; }
+</style>
+
 <style>
 	.jeo-settings-submit {
 		margin-top: 50px;

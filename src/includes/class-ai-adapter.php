@@ -128,13 +128,26 @@ abstract class AI_Adapter {
 			$text = $matches[1];
 		}
 
-		// 2. Aggressive hunting: Find the first '[' and the last ']'
+		// 2. Surgical Extraction: Find the first '[' and its MATCHING ']'
+		// This prevents capturing extra data that LLMs often append after the array (like "topics", "keywords", etc.)
 		$start_pos = strpos( $text, '[' );
-		$end_pos   = strrpos( $text, ']' );
-
-		if ( $start_pos !== false && $end_pos !== false && $end_pos > $start_pos ) {
-			// Extract just the array portion
-			$text = substr( $text, $start_pos, ( $end_pos - $start_pos ) + 1 );
+		if ( $start_pos !== false ) {
+			$depth = 0;
+			$found_end = false;
+			$len = strlen( $text );
+			
+			for ( $i = $start_pos; $i < $len; $i++ ) {
+				if ( $text[ $i ] === '[' ) {
+					$depth++;
+				} elseif ( $text[ $i ] === ']' ) {
+					$depth--;
+					if ( $depth === 0 ) {
+						$text = substr( $text, $start_pos, ( $i - $start_pos ) + 1 );
+						$found_end = true;
+						break;
+					}
+				}
+			}
 		}
 
 		// Clean up the string to ensure it parses properly

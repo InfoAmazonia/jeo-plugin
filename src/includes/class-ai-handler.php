@@ -541,9 +541,10 @@ The user wants to configure an AI georeferencing tool with specific editorial ru
 Write a clear, strict System Prompt that incorporates the user's rules. 
 {$model_optimization}
 
-CRITICAL: At the very end of your response, you MUST append the following text EXACTLY AS WRITTEN. Do not change a single word, do not translate it, do not omit it:
+### OUTPUT FORMAT MANDATE
+You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
 
-\"You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
+\"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
 Each object inside the array MUST have EXACTLY these keys:
 - 'name': The location name.
 - 'lat': Latitude (string or float).

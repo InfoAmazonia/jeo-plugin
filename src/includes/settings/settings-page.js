@@ -26,7 +26,19 @@
 			if (!$container.length) return;
 
 			var timestamp = new Date().toLocaleTimeString();
-			var payloadStr = (typeof payload === 'string') ? payload : JSON.stringify(payload, null, 2);
+			
+			// Anonymize API Key in logs
+			var displayPayload = $.extend(true, {}, payload);
+			if (displayPayload.api_key && typeof displayPayload.api_key === 'string') {
+				var key = displayPayload.api_key;
+				if (key.length > 8) {
+					displayPayload.api_key = key.substring(0, 5) + '*****' + key.substring(key.length - 5);
+				} else {
+					displayPayload.api_key = '*****';
+				}
+			}
+
+			var payloadStr = (typeof displayPayload === 'string') ? displayPayload : JSON.stringify(displayPayload, null, 2);
 			
 			var entryHtml = '<div class="jeo-debug-entry">' +
 				'<span class="jeo-debug-label ' + (type === 'req' ? 'jeo-debug-request' : (type === 'err' ? 'jeo-debug-error' : 'jeo-debug-response')) + '">' + 
