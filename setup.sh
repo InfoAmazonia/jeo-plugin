@@ -39,10 +39,21 @@ echo "📦 Garantindo que as dependências do Composer estão prontas (para loca
 composer install --ignore-platform-reqs
 
 echo "🚀 Reconstruindo e subindo os containers Docker..."
-docker-compose down
-docker-compose up -d --build
+
+# Detecta se o sistema usa o novo 'docker compose' (plugin) ou o antigo 'docker-compose' (standalone)
+if command -v docker-compose &> /dev/null; then
+    DOCKER_CMD="docker-compose"
+elif docker compose version &> /dev/null; then
+    DOCKER_CMD="docker compose"
+else
+    echo "❌ Erro: Docker Compose não encontrado no seu sistema. Por favor, instale o Docker."
+    exit 1
+fi
+
+$DOCKER_CMD down
+$DOCKER_CMD up -d --build
 
 echo "✅ Ambiente local subiu com sucesso na porta 72!"
 echo "👉 Acesse: http://localhost:72"
-echo "🛑 Para parar depois do teste: docker-compose down"
+echo "🛑 Para parar depois do teste: $DOCKER_CMD down"
 exit 0
