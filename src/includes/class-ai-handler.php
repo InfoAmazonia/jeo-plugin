@@ -321,8 +321,8 @@ class AI_Handler {
 		}
 
 		// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
-		$test_prompt = "You are a test assistant. Respond ONLY with this exact JSON array: [{\"name\": \"API_TEST_OK\", \"lat\": 0, \"lng\": 0, \"quote\": \"Success\"}]";
-		$result = $adapter->georeference( "Test", "Connection check", $test_prompt );
+		$test_prompt = "Instruction: Return a JSON array confirming API access.";
+		$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
 
 		if ( is_wp_error( $result ) ) {
 			return new \WP_REST_Response( array( 
