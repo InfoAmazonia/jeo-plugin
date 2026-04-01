@@ -540,8 +540,11 @@ class AI_Handler {
 The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
 Write a clear, strict System Prompt that incorporates the user's rules. 
 {$model_optimization}
-CRITICAL: DO NOT include instructions about output format, JSON schemas, keys, or arrays. The JEO system already handles strict JSON formatting automatically. Focus EXCLUSIVELY on the geographic, editorial, and filtering rules requested by the user.
-Output ONLY the generated prompt text without any markdown wrappers, quotes, or conversational intro.";
+CRITICAL: The generated prompt MUST explicitly instruct the AI to return ONLY a raw JSON array of objects.
+Each object MUST have EXACTLY these keys: 'name', 'lat' (string/float), 'lng' (string/float), and 'quote' (a short relevant snippet from the text).
+You MUST include this exact example in your generated prompt: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\"}].
+You MUST include this instruction in your generated prompt: 'If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].'
+Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
 
 		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content' 
 		// and using a dummy system prompt so the LLM acts as an assistant.
@@ -603,6 +606,7 @@ Output ONLY the generated prompt text without any markdown wrappers, quotes, or 
 		$test_title   = "Global News Report: Environment and Economy";
 		$test_content = "Today, leaders met in Paris, France to discuss the European economy. Meanwhile, a scientific expedition in the Amazon Rainforest left Manaus, Brazil, to explore the Encontro das Águas. In Asia, Tokyo, Japan reported new technological advancements.";
 
+		// Pass empty string for assistant override to let the adapter attach the enforced schema
 		$result = $adapter->georeference( $test_title, $test_content, $custom_prompt );
 
 		if ( is_wp_error( $result ) ) {
