@@ -1,53 +1,56 @@
-(function ($) {
-	$(function () {
-		var isAnimating = false; // Flag to prevent multiple rapid clicks
-
-		// Inicializa o state das tabs PRINCIPAIS (com Skeleton e Hash)
-		$('#tabs > .nav-tab').click(function (ev, isInitialLoad) {
-			ev.preventDefault();
-			var target = $(this).data('target');
-
-			// Proteção contra cliques em abas que não são do Settings (como as do modal)
-			if (!target) return;
-
-			// Bloqueia se já estiver animando ou se clicar na aba já ativa (e não for o load inicial)
-			if (isAnimating || (!isInitialLoad && $(this).hasClass('nav-tab-active'))) {
-				return;
+(function($) {
+	$(document).ready(function() {
+		
+		// ------------------------------------
+		// Debug Console Logic
+		// ------------------------------------
+		$('#jeo-ai-debug-header').click(function() {
+			var $body = $('#jeo-ai-debug-body');
+			var $toggle = $('#jeo-ai-debug-toggle');
+			if ($body.is(':visible')) {
+				$body.slideUp('fast');
+				$toggle.text('▲');
+			} else {
+				$body.slideDown('fast');
+				$toggle.text('▼');
 			}
-
-			isAnimating = true;
-
-			// Esconde abas e botão de salvar, mostra o Skeleton Loader
-			$('.tabs-content').hide();
-			$('.jeo-settings-submit').hide();
-			$('#tabs > .nav-tab').removeClass('nav-tab-active');
-			$(this).addClass('nav-tab-active');
-			$('#jeo-skeleton').show();
-
-			if (!isInitialLoad) {
-				// Atualiza a URL silenciosamente (Task 3)
-				if (history.pushState) {
-					history.pushState(null, null, '#tab-' + target);
-				} else {
-					location.hash = '#tab-' + target;
-				}
-			}
-
-			// Simula o tempo de carregamento suave com 1s proposital (FOUC Prevention & V4 Easter Egg)
-			var delay = isInitialLoad ? 1200 : 1000;
-			setTimeout(function() {
-				$('#jeo-skeleton').hide();
-				$('#tab-' + target).fadeIn(200, function() {
-					$('.jeo-settings-submit').fadeIn(200);
-					isAnimating = false; // Libera os cliques novamente
-
-					// Auto-teste ao entrar na aba AI
-					if (target === 'ai') {
-						runApiKeyTest();
-					}
-				});
-			}, delay);
 		});
+
+		$('#jeo-ai-debug-clear').click(function(e) {
+			e.stopPropagation();
+			$('#jeo-ai-debug-log-container').empty().append('<div style="color: #8c8f94; font-style: italic;">[System] Console cleared.</div>');
+		});
+
+		function logToConsole(label, type, payload) {
+			var $container = $('#jeo-ai-debug-log-container');
+			if (!$container.length) return;
+
+			var timestamp = new Date().toLocaleTimeString();
+			var payloadStr = (typeof payload === 'string') ? payload : JSON.stringify(payload, null, 2);
+			
+			var entryHtml = '<div class="jeo-debug-entry">' +
+				'<span class="jeo-debug-label ' + (type === 'req' ? 'jeo-debug-request' : (type === 'err' ? 'jeo-debug-error' : 'jeo-debug-response')) + '">' + 
+				'[' + timestamp + '] ' + label + ' (' + (type === 'req' ? 'REQUEST' : 'RESPONSE') + ')</span>' +
+				'<pre class="jeo-debug-payload">' + 
+				(payloadStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')) + 
+				'</pre></div>';
+			
+			$container.append(entryHtml);
+			var body = document.getElementById('jeo-ai-debug-body');
+			if(body) body.scrollTop = body.scrollHeight;
+		}
+
+		// Helper wrapper for apiFetch with logging
+		function loggedApiFetch(options) {
+			logToConsole(options.path, 'req', options.data || {});
+			return wp.apiFetch(options).then(function(response) {
+				logToConsole(options.path, 'res', response);
+				return response;
+			}).catch(function(error) {
+				logToConsole(options.path, 'err', error);
+				throw error;
+			});
+		}
 
 		// ------------------------------------
 		// AI API Key Validation Logic
@@ -65,6 +68,8 @@
 
 		function runApiKeyTest() {
 			var provider = $('#ai_default_provider').val();
+			if (!provider) return;
+
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
 			var model = $('#' + provider + '_model_hidden').val();
@@ -79,7 +84,7 @@
 			$badge.text('Checking...').css({ 'background': '#f0f0f1', 'color': '#646970' });
 			$btn.prop('disabled', true);
 
-			wp.apiFetch({
+			loggedApiFetch({
 				path: '/jeo/v1/ai-test-key',
 				method: 'POST',
 				data: { 
@@ -105,15 +110,6 @@
 			runApiKeyTest();
 		});
 
-		// Initialize Select2 on all model selectors so user can type freely or search existing
-		if ($.fn.select2) {
-			$('.jeo-ai-model-select').select2({
-				tags: true,
-				width: '100%',
-				placeholder: 'Type a model ID or click Load Models'
-			});
-		}
-
 		// Fetch Dynamic Models Logic
 		$('.jeo-ai-fetch-models-btn').click(function(e) {
 			e.preventDefault();
@@ -137,7 +133,7 @@
 			var originalText = $btn.text();
 			$btn.prop('disabled', true).text('Loading...');
 
-			wp.apiFetch({
+			loggedApiFetch({
 				path: '/jeo/v1/ai-get-models',
 				method: 'POST',
 				data: { provider: provider, api_key: key }
@@ -146,7 +142,7 @@
 					// Transform the UI
 					$readonlyWrapper.hide();
 					$selectWrapper.show();
-					$btn.hide(); // Hide the Change Model button as they are now interacting
+					$btn.hide();
 
 					var currentValue = $hiddenInput.val();
 					$modelSelect.empty();
@@ -159,24 +155,22 @@
 						$modelSelect.append(option);
 					});
 
-					// If current value wasn't in the fetched list, append it anyway as a custom tag
 					if (currentValue && !foundCurrent) {
 						var customOption = new Option(currentValue, currentValue, true, true);
 						$modelSelect.append(customOption);
 					}
 					
-					$modelSelect.trigger('change');
+					if ($.fn.select2) {
+						$modelSelect.select2({ tags: true, width: '100%' });
+						$modelSelect.trigger('change');
+						$modelSelect.select2('open');
+					}
 
-					// Sync the visible select2 selection back to the hidden input
 					$modelSelect.on('change', function() {
 						var selectedVal = $(this).val();
 						$hiddenInput.val(selectedVal);
 						$readonlyInput.val(selectedVal);
 					});
-					
-					if ($.fn.select2) {
-						$modelSelect.select2('open'); // Open dropdown to show results
-					}
 				}
 			}).catch(function(err) {
 				alert('Error fetching models: ' + (err.message || err.error || 'Unknown error'));
@@ -184,118 +178,30 @@
 			});
 		});
 
-		// Ensure proper selection updates the inputs for auto key testing
-		$('.jeo-ai-model-select').on('change', function() {
-			var provider = $(this).attr('id').replace('_model_select', '');
-			$('#' + provider + '_model_hidden').val($(this).val());
-		});
-
-		// Lê o Hash da URL para abrir na mesma aba salva (acione com flag isInitialLoad)
-		var hash = window.location.hash;
-		if (hash && hash.indexOf('tab-') !== -1) {
-			var tabName = hash.replace('#tab-', '');
-			$('#tabs .nav-tab[data-target="' + tabName + '"]').trigger('click', [true]);
-		} else {
-			$('#tabs .nav-tab:first').trigger('click', [true]);
-		}
-
-		// voltam para a mesma tab usando o form 'options.php' nativo
-		$('form').on('submit', function(e) {
-			// Validação de Chave de API ao salvar (Task: não salvar sem chave)
-			var currentHash = window.location.hash;
-			if (currentHash === '#tab-ai') {
-				var provider = $('#ai_default_provider').val();
-				var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
-				var key = $(keyInputId).val();
-				
-				if (!key) {
-					e.preventDefault();
-					alert('Please enter an API Key (or URL) for the selected provider before saving.');
-					$(keyInputId).focus();
-					return false;
-				}
-			}
-
-			var $form = $(this);
-			var action = $form.attr('action') || '';
-			// Strip qualquer hash antigo se houver na action ou referer e coloca o atual
-			var currentHash = window.location.hash;
-			
-			// Atualiza a URL do redirect (_wp_http_referer) que o WordPress usa nativamente
-			var $referer = $form.find('input[name="_wp_http_referer"]');
-			if ($referer.length > 0 && currentHash) {
-				var refVal = $referer.val();
-				refVal = refVal.split('#')[0] + currentHash;
-				$referer.val(refVal);
-			}
-		});
-
-		$('#active_geocoder_select').change(function () {
-			$('tr.geocoder_options').hide();
-			$('#geocoder_options_' + $(this).val()).show();
-		}).change();
-
-		$('#map_runtime').change(function() {
-			var runtime = $(this).val();
-			$('.mapbox_options, .googlemaps_options').hide();
-			if (runtime === 'mapboxgl') {
-				$('.mapbox_options').show();
-			} else if (runtime === 'googlemaps') {
-				$('.googlemaps_options').show();
-			}
-		}).change();
-
-
-		var mediaUploader;
-		$('#upload_image_button').click(function (e) {
-			e.preventDefault();
-			if (mediaUploader) {
-				mediaUploader.open();
-				return;
-			}
-			mediaUploader = wp.media.frames.file_frame = wp.media({
-				title: 'Choose Image',
-				button: {
-					text: 'Choose Image'
-				}, multiple: false
-			});
-			mediaUploader.on('select', function () {
-				var attachment = mediaUploader.state().get('selection').first().toJSON();
-				$('#background_image').val(attachment.url);
-			});
-			mediaUploader.open();
-		});
-
 		// ------------------------------------
 		// AI Prompt Generator & Validator Logic
 		// ------------------------------------
-		var restUrl = (typeof wp !== 'undefined' && wp.apiFetch) ? '' : '/wp-json/jeo/v1'; // fallback
-
-		// Toggle Checkbox
 		$('#ai_use_custom_prompt').change(function() {
 			if ($(this).is(':checked')) {
 				$('#ai_system_prompt_wrapper').slideDown();
 			} else {
 				$('#ai_system_prompt_wrapper').slideUp();
 			}
-		});
+		}).trigger('change');
 
-		// Clear Prompt Button
 		$('#jeo-ai-clear-prompt-btn').click(function(e) {
 			e.preventDefault();
 			$('#ai_system_prompt').val('').focus();
 			$('#jeo-ai-validate-status').text('');
 		});
 
-		// Enter Interception on Assistant
 		$('#jeo-ai-chat-input').keydown(function(e) {
 			if (e.key === 'Enter' && !e.shiftKey) {
-				e.preventDefault(); // Impede pular linha ou submeter form inteiro
+				e.preventDefault();
 				$('#jeo-ai-generate-prompt-btn').click();
 			}
 		});
 
-		// Auto-save: Restaura e Salva o contexto do usuário no LocalStorage
 		var savedChatContext = localStorage.getItem('jeo_ai_assistant_context');
 		if (savedChatContext) {
 			$('#jeo-ai-chat-input').val(savedChatContext);
@@ -317,7 +223,6 @@
 				return;
 			}
 
-			// Capture dynamic provider configuration to allow generating prompts with an unsaved key
 			var provider = $('#ai_default_provider').val();
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
@@ -326,7 +231,7 @@
 			$btn.prop('disabled', true).text('Generating...');
 			$status.text('Asking the active LLM to generate an optimized prompt...').css('color', '#007cba');
 
-			wp.apiFetch({
+			loggedApiFetch({
 				path: '/jeo/v1/ai-chat-prompt-generator',
 				method: 'POST',
 				data: { 
@@ -338,7 +243,7 @@
 			}).then(function(res) {
 				if (res && res.prompt) {
 					$('#ai_system_prompt').val(res.prompt);
-					$status.text('✨ Success! The new prompt has been applied above. (Save changes to persist)').css('color', 'green');
+					$status.text('✨ Success! Applied above.').css('color', 'green');
 					$input.val('');
 				}
 			}).catch(function(err) {
@@ -354,7 +259,6 @@
 			var $status = $('#jeo-ai-validate-status');
 			var prompt = $('#ai_system_prompt').val();
 
-			// Se vazio, vai testar o fallback (default system prompt) ou avisa o user
 			if (!prompt) {
 				prompt = $('#ai_system_prompt').attr('placeholder');
 			}
@@ -365,9 +269,9 @@
 			var model = $('#' + provider + '_model_hidden').val();
 
 			$btn.prop('disabled', true).text('Testing...');
-			$status.text('Running a simulation against the LLM...').css('color', '#007cba');
+			$status.text('Running simulation...').css('color', '#007cba');
 
-			wp.apiFetch({
+			loggedApiFetch({
 				path: '/jeo/v1/ai-validate-prompt',
 				method: 'POST',
 				data: { 
@@ -383,35 +287,85 @@
 					$status.text('❌ ' + (res.message || 'Validation failed.')).css('color', 'red');
 				}
 			}).catch(function(err) {
-				$status.text('❌ Request Error: ' + (err.message || err.error || 'Check console')).css('color', 'red');
+				$status.text('Error: ' + (err.message || err.error || 'Request failed')).css('color', 'red');
 			}).finally(function() {
-				$btn.prop('disabled', false).text('Validate Custom Prompt');
+				$btn.prop('disabled', false).text('Validate Prompt');
 			});
 		});
 
-		// Lógica do Modal de Dicionários (Preview) - Usando delegação para maior resiliência
-		$(document).on('click', '.jeo-ai-preview-dict-btn', function(e) {
+		// ------------------------------------
+		// Navigation and UI
+		// ------------------------------------
+		function showTab(target, isInitialLoad) {
+			$('.tabs-content').hide();
+			$('#tab-' + target).show();
+			$('#tabs .nav-tab').removeClass('nav-tab-active');
+			$('#tabs .nav-tab[data-target="' + target + '"]').addClass('nav-tab-active');
+
+			if (!isInitialLoad) {
+				window.location.hash = 'tab-' + target;
+			}
+			
+			if (target === 'ai') {
+				runApiKeyTest();
+			}
+		}
+
+		$('#tabs .nav-tab').on('click', function(e) {
 			e.preventDefault();
-			var targetId = $(this).data('dict-id');
-			var dialog = document.getElementById(targetId);
-			if (dialog) {
-				dialog.showModal();
+			var target = $(this).data('target');
+			showTab(target, false);
+		});
+
+		// ------------------------------------
+		// Skeleton Loader & Initial State
+		// ------------------------------------
+		setTimeout(function() {
+			$('#jeo-skeleton').fadeOut('fast', function() {
+				// Determine which tab to show
+				var hash = window.location.hash;
+				var initialTab = 'general';
+				if (hash && hash.indexOf('tab-') !== -1) {
+					initialTab = hash.replace('#tab-', '');
+				}
+				
+				showTab(initialTab, true);
+				$('.jeo-settings-submit').fadeIn('fast');
+			});
+		}, 500);
+
+		$('form').on('submit', function(e) {
+			var currentHash = window.location.hash;
+			if (currentHash === '#tab-ai') {
+				var provider = $('#ai_default_provider').val();
+				var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
+				var key = $(keyInputId).val();
+				if (!key) {
+					e.preventDefault();
+					alert('Please enter an API Key before saving.');
+					$(keyInputId).focus();
+					return false;
+				}
+			}
+			var $referer = $(this).find('input[name="_wp_http_referer"]');
+			if ($referer.length > 0 && currentHash) {
+				$referer.val($referer.val().split('#')[0] + currentHash);
 			}
 		});
 
-		$(document).on('click', '.jeo-ai-close-modal-btn', function(e) {
-			e.preventDefault();
-			var dialog = this.closest('dialog');
-			if (dialog) dialog.close();
-		});
+		$('#active_geocoder_select').change(function () {
+			$('tr.geocoder_options').hide();
+			$('#geocoder_options_' + $(this).val()).show();
+		}).change();
 
-		// Também adicionar delegate para o botão de Log da outra página se necessário
-		$(document).on('click', '.jeo-ai-view-log-btn', function(e) {
-			e.preventDefault();
-			var targetId = $(this).data('log-id');
-			var dialog = document.getElementById(targetId);
-			if (dialog) dialog.showModal();
-		});
+		$('#map_runtime').change(function() {
+			var runtime = $(this).val();
+			$('.mapbox_options, .googlemaps_options').hide();
+			if (runtime === 'mapboxgl') {
+				$('.mapbox_options').show();
+			} else if (runtime === 'googlemaps') {
+				$('.googlemaps_options').show();
+			}
+		}).change();
 	});
-
-}(jQuery));
+})(jQuery);
