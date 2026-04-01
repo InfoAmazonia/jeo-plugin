@@ -67,6 +67,7 @@
 			var provider = $('#ai_default_provider').val();
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
+			var model = $('#' + provider + '_model').val();
 			var $badge = $('#jeo-ai-key-status-badge');
 			var $btn = $('#jeo-ai-test-key-btn');
 
@@ -81,7 +82,11 @@
 			wp.apiFetch({
 				path: '/jeo/v1/ai-test-key',
 				method: 'POST',
-				data: { provider: provider, api_key: key }
+				data: { 
+					provider: provider, 
+					api_key: key,
+					model: model
+				}
 			}).then(function(res) {
 				if (res && res.success) {
 					$badge.text('Active').css({ 'background': '#edfaef', 'color': '#008a20' });

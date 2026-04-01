@@ -292,6 +292,7 @@ class AI_Handler {
 	public function api_test_key( $request ) {
 		$provider = $request->get_param( 'provider' );
 		$api_key  = $request->get_param( 'api_key' ); // It might be empty if the frontend relies on saved DB key
+		$model    = $request->get_param( 'model' );
 
 		if ( empty( $api_key ) ) {
 			if ( 'ollama' === $provider ) {
@@ -301,7 +302,9 @@ class AI_Handler {
 			}
 		}
 
-		$model = \jeo_settings()->get_option( $provider . '_model' );
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
 		
 		if ( empty( $api_key ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
