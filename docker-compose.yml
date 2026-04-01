@@ -8,7 +8,7 @@ services:
       args:
         WP_IMAGE_TAG: ${WP_IMAGE_TAG:-php8.2-apache}
     ports:
-      - 72:80
+      - 8072:80
     depends_on:
       - mariadb
     environment:

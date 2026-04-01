@@ -53,7 +53,7 @@ fi
 $DOCKER_CMD down
 $DOCKER_CMD up -d --build
 
-echo "✅ Ambiente local subiu com sucesso na porta 72!"
-echo "👉 Acesse: http://localhost:72"
+echo "✅ Ambiente local subiu com sucesso na porta 8072!"
+echo "👉 Acesse: http://localhost:8072"
 echo "🛑 Para parar depois do teste: $DOCKER_CMD down"
 exit 0
