@@ -541,8 +541,9 @@ The user wants to configure an AI georeferencing tool with specific editorial ru
 Write a clear, strict System Prompt that incorporates the user's rules. 
 {$model_optimization}
 
-You MUST append the following text VERBATIM to the very end of your generated prompt. Do not modify it:
-\"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
+CRITICAL: At the very end of your response, you MUST append the following text EXACTLY AS WRITTEN. Do not change a single word, do not translate it, do not omit it:
+
+\"You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
 Each object inside the array MUST have EXACTLY these keys:
 - 'name': The location name.
 - 'lat': Latitude (string or float).
@@ -558,7 +559,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		$test_title = "Prompt Engineering Task";
 		$assistant_override = "You are an assistant. Just do as instructed in the text.";
 		
-		$meta_prompt_json_hack = $meta_prompt . "\n\nReturn your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";
+		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";
 		
 		$result = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
 
