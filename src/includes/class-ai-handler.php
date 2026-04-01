@@ -537,26 +537,18 @@ class AI_Handler {
 
 		// Meta-prompt instructed to build a JEO prompt
 		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin. 
-The user wants to configure an AI georeferencing tool with specific rules: '{$context}'.
+The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
 Write a clear, strict System Prompt that incorporates the user's rules. 
 {$model_optimization}
-CRITICAL: The generated prompt MUST explicitly instruct the AI to return ONLY a raw JSON array of objects.
-Each object MUST have keys: 'name', 'lat' (string/float), 'lng' (string/float), and 'quote'.
-Example to include: [{\"name\": \"Place\", \"lat\": 0, \"lng\": 0, \"quote\": \"...\"}].
-If no locations match, return [].
-Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
+CRITICAL: DO NOT include instructions about output format, JSON schemas, keys, or arrays. The JEO system already handles strict JSON formatting automatically. Focus EXCLUSIVELY on the geographic, editorial, and filtering rules requested by the user.
+Output ONLY the generated prompt text without any markdown wrappers, quotes, or conversational intro.";
 
 		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content' 
 		// and using a dummy system prompt so the LLM acts as an assistant.
 		$test_title = "Prompt Engineering Task";
 		$assistant_override = "You are an assistant. Just do as instructed in the text.";
 		
-		// The current adapters are wired to parse JSON from output.
-		// Wait, if we use georeference(), it expects a JSON output. But for the prompt generator, we want raw text.
-		// Since we can't easily change the abstract without refactoring all adapters to return raw text, 
-		// we'll instruct the LLM to return the prompt *inside* the expected JSON format!
-		
-		$meta_prompt_json_hack = $meta_prompt . "\n\nReturn your generated prompt inside this JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"PUT_YOUR_GENERATED_PROMPT_HERE\"}]";
+		$meta_prompt_json_hack = $meta_prompt . "\n\nReturn your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";
 		
 		$result = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
 
@@ -607,8 +599,9 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
 
-		$test_title   = "Test Article: The Amazon Rainforest";
-		$test_content = "Today, an expedition was organized in the Amazon Rainforest, specifically leaving from the city of Manaus to explore the Negro River. The researchers found interesting species near the Encontro das Águas.";
+		// Use a diverse global text so validation succeeds regardless of regional prompt restrictions (Europe, Brazil, etc.)
+		$test_title   = "Global News Report: Environment and Economy";
+		$test_content = "Today, leaders met in Paris, France to discuss the European economy. Meanwhile, a scientific expedition in the Amazon Rainforest left Manaus, Brazil, to explore the Encontro das Águas. In Asia, Tokyo, Japan reported new technological advancements.";
 
 		$result = $adapter->georeference( $test_title, $test_content, $custom_prompt );
 
@@ -619,13 +612,24 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			), 200 ); // Send 200 so UI can display the error nicely
 		}
 
-		// Basic schema validation
+		// Strict schema validation
 		$is_valid = true;
-		$msg = __( 'Prompt successfully validated! The AI returned a valid JSON array.', 'jeo' );
+		$msg = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeo' );
 
-		if ( ! is_array( $result ) || ( count( $result ) > 0 && ( ! isset( $result[0]['name'] ) || ! isset( $result[0]['lat'] ) ) ) ) {
+		if ( ! is_array( $result ) ) {
 			$is_valid = false;
-			$msg = __( 'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lng, or quote).', 'jeo' );
+			$msg = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeo' );
+		} elseif ( count( $result ) > 0 ) {
+			foreach ( $result as $item ) {
+				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lng', $item ) || ! isset( $item['quote'] ) ) {
+					$is_valid = false;
+					$msg = __( 'Validation failed: The AI missed mandatory keys (name, lat, lng, quote) in its JSON objects.', 'jeo' );
+					break;
+				}
+			}
+		} else {
+			// Array is empty (count == 0). This is VALID if the AI correctly filtered out locations based on user prompt.
+			$msg = __( 'Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text.', 'jeo' );
 		}
 
 		return new \WP_REST_Response( array( 
