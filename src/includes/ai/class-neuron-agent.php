@@ -133,7 +133,7 @@ class Neuron_Agent extends Agent {
 	 */
 	public function run_georeference( $system_prompt, $user_text, &$input_tokens, &$output_tokens, &$raw_output ) {
 		// Define the system instructions for the agent
-		$this->instructions( $system_prompt );
+		$this->setInstructions( $system_prompt );
 
 		// Execute chat with User text
 		$message = $this->chat( new UserMessage( $user_text ) )->getMessage();

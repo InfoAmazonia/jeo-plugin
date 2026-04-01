@@ -463,7 +463,7 @@ class AI_Handler {
 		}
 
 		// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
-		$test_prompt = "Instruction: Return a JSON array confirming API access.";
+		$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lng\": 0, \"quote\": \"Status: Ping\"}]";
 		$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
 
 		if ( is_wp_error( $result ) ) {
@@ -558,10 +558,9 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content' 
 		// and using a dummy system prompt so the LLM acts as an assistant.
 		$test_title = "Prompt Engineering Task";
-		$assistant_override = "You are an assistant. Just do as instructed in the text.";
-		
-		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";
-		
+		$assistant_override = "[SKIP_ENFORCED_SCHEMA] You are an assistant. Just do as instructed in the text.";
+
+		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";		
 		$result = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
 
 		if ( is_wp_error( $result ) ) {

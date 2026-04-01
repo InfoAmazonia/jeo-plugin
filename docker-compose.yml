@@ -28,6 +28,7 @@ services:
 
   mariadb:
     image: mariadb:10.4
+    command: --max_allowed_packet=256M
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./docker/mariadb/data:/docker-entrypoint-initdb.d

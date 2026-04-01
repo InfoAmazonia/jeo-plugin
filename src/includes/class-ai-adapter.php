@@ -48,6 +48,11 @@ abstract class AI_Adapter {
 			$prompt = __( 'You are a highly skilled geographer API. Analyze the text and extract locations.', 'jeo' );
 		}
 
+		// Allow internal tools (like the prompt generator) to bypass the aggressive schema injection
+		if ( strpos( $prompt, '[SKIP_ENFORCED_SCHEMA]' ) !== false ) {
+			return trim( str_replace( '[SKIP_ENFORCED_SCHEMA]', '', $prompt ) );
+		}
+
 		// Inject mandatory JSON schema constraints aggressively to any prompt to prevent formatting regressions
 		$enforced_schema = "
 

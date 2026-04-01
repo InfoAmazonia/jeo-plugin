@@ -69,6 +69,8 @@ Todos os dados geográficos de um post são armazenados em um único metadado ch
 3. **NÃO use `file_put_contents` para logs:** Use a classe `AI_Logger`.
 4. **NÃO publique a pasta `vendor` no Git.**
 5. **NÃO permita que a IA defina o formato de saída:** Sempre injete o contrato JSON agressivo (`enforced_schema`) para evitar que modelos "espertos" retornem objetos aninhados ou chaves inventadas.
+6. **NÃO injete prompts via `$this->instructions()` no Neuron AI:** Na classe base do Neuron AI (`NeuronAI\Agent\Agent`), o método `instructions()` é um **getter** interno que não aceita argumentos e retorna o texto padrão ("You are a helpful and friendly AI..."). Para injetar o System Prompt do JEO e forçar o contrato do JSON, você **DEVE** utilizar o **setter** correto: `$this->setInstructions($prompt);`. O uso incorreto fará a LLM ignorar o esquema do JEO e gerar um JSON genérico e quebrado.
+7. **NÃO remova a flag `[SKIP_ENFORCED_SCHEMA]` de ferramentas internas:** Como o JEO injeta agressivamente o contrato JSON em todas as chamadas de georreferenciamento (via `AI_Adapter::get_system_prompt()`), ferramentas internas que reaproveitam o LLM para "meta-tarefas" (como o *Prompt Generator* ou o *API Key Tester*) falharão ao usar modelos estritos como a OpenAI, pois o modelo obedecerá a regra de retornar `[]` se não achar locais geográficos reais no texto. Sempre inicie o prompt dessas ferramentas internas com `[SKIP_ENFORCED_SCHEMA]` para desativar temporariamente o contrato.
 
 ---
 
@@ -77,6 +79,9 @@ Todos os dados geográficos de um post são armazenados em um único metadado ch
 ### 6.1. Ambiente de Desenvolvimento (`setup.sh`)
 - Utilize `./setup.sh` para subir o ambiente em **http://localhost:8072**.
 - Credenciais: `admin` / `admin`.
+- **Limites Generosos (Docker):** O ambiente local está pré-configurado para suportar cargas pesadas típicas de geojornalismo e requisições longas de IA:
+  - **PHP/Apache:** `memory_limit=2048M`, `upload_max_filesize=1024M`, `max_execution_time=600s`.
+  - **MariaDB:** `max_allowed_packet=256M` (evita falhas ao importar bancos ou grandes camadas GeoJSON).
 
 ### 6.2. Build de Release (`build.sh`)
 - Sempre gere o pacote oficial via `./build.sh`. O script injeta o `vendor` otimizado e limpa arquivos de desenvolvimento.
