@@ -24,15 +24,17 @@ O JEO utiliza o framework **Neuron AI** como motor universal de LLM.
 - **Configuração Determinística:** Todos os modelos são configurados com `temperature = 0.1` para garantir que a extração de coordenadas seja precisa e não criativa.
 - **Provedores:** Suporte nativo a 10 provedores (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, etc.) configuráveis na Aba AI.
 
-### 2.2. Model-Aware Prompt Optimization
+### 2.2. Model-Aware Prompt Optimization & Verbatim Mandate
 - O **AI Prompt Engineer Assistant** intercepta a requisição e injeta "Regras Constitucionais" específicas dependendo do provedor ativo:
   - **Gemini:** Exige Markdown estrito e instrução passo a passo. Injeta forçosamente `responseMimeType: application/json` via `generationConfig`.
   - **OpenAI:** Otimizado com regras abstratas e concisas.
   - **DeepSeek:** Utiliza blocos de tags XML (`<rules>`) para guiar o raciocínio.
   - **Anthropic:** Abordagem negativa constitucional ("O que não fazer").
+- **Verbatim Mandate:** O Assistente é proibido de resumir as regras de saída. Ele deve anexar obrigatoriamente um bloco de texto imutável (verbatim) definindo o contrato JSON do JEO, incluindo o exemplo do "Teatro Amazonas".
 
-### 2.3. Surgical JSON Parser
-- O JEO utiliza um extrator de JSON via profundidade de colchetes (`depth balancing`). Ele localiza o primeiro `[` e busca o seu `]` correspondente. Isso garante que, mesmo que o modelo de IA adicione informações extras após o array (como listas de "topics"), o JEO capture apenas a lista plana de geolocalização necessária.
+### 2.3. Surgical JSON Parser (Depth Balancing)
+- **Resiliência contra Lixo:** O JEO utiliza um extrator de JSON via profundidade de colchetes. Ele localiza o primeiro `[` e busca o seu `]` correspondente exato. Isso ignora qualquer conteúdo extra (conversas, tópicos, keywords) que o modelo tente adicionar fora do array principal.
+- **Negative Key Constraints:** O prompt do sistema proíbe explicitamente que a IA invente chaves como `"city"`, `"country"`, `"continent"` ou `"type"`. O retorno deve conter apenas as chaves do contrato: `"name"`, `"lat"`, `"lng"`, `"quote"`.
 
 ### 2.4. Cost Dashboard (Gestão de Custos)
 - **Salvamento de Tokens:** O plugin utiliza a classe `AI_Logger` para persistir o consumo de tokens (`input_tokens` e `output_tokens`) no Custom Post Type privado `jeo-ai-log`.
@@ -44,9 +46,9 @@ O JEO utiliza o framework **Neuron AI** como motor universal de LLM.
 
 ### 3.1. Engenharia de Prompt e Assistant
 - **Aba AI:** Refinamento de prompt com Assistente de Chat e persistência em `localStorage`. A tela renderiza dinamicamente as **API Keys** e **Models** de acordo com o provedor ativado.
-- **AI API Debugger:** Ferramenta de console flutuante integrada que intercepta e exibe as requisições e respostas JSON brutas. Permite auditoria técnica imediata. As chaves de API são anonimizadas (`AizaS*****hCuhs`) nos logs.
-- **Dynamic Model Fetcher:** Botão "Change Model" que consulta as APIs dos provedores em tempo real e popula um campo de busca `Select2` com os modelos de chat disponíveis.
-- **Live Validator:** Botão de simulação real contra um texto de teste global diversificado (Paris, Manaus, Tóquio).
+- **AI API Debugger:** Terminal integrado que intercepta e exibe as requisições e respostas JSON brutas. As chaves de API são anonimizadas (`AizaS*****hCuhs`) automaticamente para permitir auditoria segura.
+- **Dynamic Model Fetcher:** Botão "Change Model" que consulta as APIs dos provedores em tempo real e popula um campo de busca `Select2` (Searchable & Taggable).
+- **Live Validator:** Simulação real contra um texto de teste global diversificado (Paris, Manaus, Tóquio) para evitar falhas de falso-positivo em regras regionais.
 
 ---
 
@@ -66,6 +68,7 @@ Todos os dados geográficos de um post são armazenados em um único metadado ch
 2. **NÃO altere o Schema do `_related_point` sem atualizar o JS.**
 3. **NÃO use `file_put_contents` para logs:** Use a classe `AI_Logger`.
 4. **NÃO publique a pasta `vendor` no Git.**
+5. **NÃO permita que a IA defina o formato de saída:** Sempre injete o contrato JSON agressivo (`enforced_schema`) para evitar que modelos "espertos" retornem objetos aninhados ou chaves inventadas.
 
 ---
 
