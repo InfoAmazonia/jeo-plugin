@@ -545,7 +545,7 @@ Write a clear, strict System Prompt that incorporates the user's rules.
 You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
 
 \"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-Each object inside the array MUST have EXACTLY these keys:
+Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote'. Do NOT use any other keys like 'city', 'country', 'continent' or 'type'.
 - 'name': The location name.
 - 'lat': Latitude (string or float).
 - 'lng': Longitude (string or float).
