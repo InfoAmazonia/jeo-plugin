@@ -21,6 +21,60 @@
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'All AI logs have been permanently deleted.', 'jeo' ) . '</p></div>';
 		}
 
+		// Calculate Totals per Model
+		global $wpdb;
+		$stats = $wpdb->get_results( "
+			SELECT 
+				pm1.meta_value AS provider_model, 
+				SUM(pm2.meta_value) AS total_input,
+				SUM(pm3.meta_value) AS total_output,
+				SUM(pm4.meta_value) AS total_tokens,
+				COUNT(p.ID) AS total_requests
+			FROM {$wpdb->posts} p
+			INNER JOIN {$wpdb->postmeta} pm1 ON p.ID = pm1.post_id AND pm1.meta_key = '_jeo_ai_provider'
+			INNER JOIN {$wpdb->postmeta} pm2 ON p.ID = pm2.post_id AND pm2.meta_key = '_jeo_ai_input_tokens'
+			INNER JOIN {$wpdb->postmeta} pm3 ON p.ID = pm3.post_id AND pm3.meta_key = '_jeo_ai_output_tokens'
+			INNER JOIN {$wpdb->postmeta} pm4 ON p.ID = pm4.post_id AND pm4.meta_key = '_jeo_ai_total_tokens'
+			WHERE p.post_type = 'jeo-ai-log' AND p.post_status = 'private'
+			GROUP BY pm1.meta_value
+			ORDER BY total_tokens DESC
+		" );
+
+		if ( $stats ) {
+			echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 20px 0;">';
+			foreach ( $stats as $stat ) {
+				$p_meta = $stat->provider_model;
+				$provider_name = strtoupper( $p_meta );
+				$model_name = '';
+				
+				if ( preg_match( '/^(.*?)\s*\((.*?)\)$/', $p_meta, $matches ) ) {
+					$provider_name = strtoupper( $matches[1] );
+					$model_name = $matches[2];
+				}
+
+				echo '
+				<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #2271b1; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+					<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px;">
+						<div>
+							<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase;">' . esc_html( $provider_name ) . '</div>
+							<div style="font-size: 12px; color: #646970; font-family: monospace;">' . esc_html( $model_name ) . '</div>
+						</div>
+						<div style="background: #f0f0f1; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #50575e;">
+							' . number_format_i18n( $stat->total_requests ) . ' reqs
+						</div>
+					</div>
+					<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #2271b1;">
+						' . number_format_i18n( $stat->total_tokens ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+					</div>
+					<div style="display: flex; justify-content: space-between; font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
+						<div><strong>In (Prompt):</strong> ' . number_format_i18n( $stat->total_input ) . '</div>
+						<div><strong>Out (Compl.):</strong> ' . number_format_i18n( $stat->total_output ) . '</div>
+					</div>
+				</div>';
+			}
+			echo '</div><hr>';
+		}
+
 		$search_term = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; 
 		$current_page = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
 		$per_page     = 25;
@@ -109,10 +163,22 @@
 					$raw_output = $resp_decoded ? wp_json_encode( $resp_decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) : $response;
 
 					$preview = mb_substr( strip_tags( $raw_output ), 0, 100 ) . '...';
+
+					$provider_name = strtoupper( $provider );
+					$model_name = '';
+					if ( preg_match( '/^(.*?)\s*\((.*?)\)$/', $provider, $matches ) ) {
+						$provider_name = strtoupper( $matches[1] );
+						$model_name = $matches[2];
+					}
 					?>
 					<tr>
 						<td><?php echo esc_html( get_the_date( 'Y-m-d H:i:s' ) ); ?></td>
-						<td><span class="badge" style="background:#0073aa;color:#fff;padding:3px 6px;border-radius:3px;font-size:11px;"><?php echo esc_html( strtoupper( $provider ) ); ?></span></td>
+						<td>
+							<span class="badge" style="background:#0073aa;color:#fff;padding:3px 6px;border-radius:3px;font-size:11px;font-weight:600;display:inline-block;margin-bottom:4px;"><?php echo esc_html( $provider_name ); ?></span>
+							<?php if ( $model_name ) : ?>
+								<div style="font-size:11px;color:#646970;font-family:monospace;"><?php echo esc_html( $model_name ); ?></div>
+							<?php endif; ?>
+						</td>
 						<td>
 							<strong style="font-size: 14px;"><?php echo esc_html( $tot_tok ); ?> Total</strong><br/>
 							<small style="color:#555;">Prompt: <?php echo esc_html( $in_tok ); ?> | Completion: <?php echo esc_html( $out_tok ); ?></small>
