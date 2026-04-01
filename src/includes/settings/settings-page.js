@@ -105,14 +105,21 @@
 			runApiKeyTest();
 		});
 
+		// Initialize Select2 on all model selectors so user can type freely or search existing
+		if ($.fn.select2) {
+			$('.jeo-ai-model-select').select2({
+				tags: true,
+				width: '100%',
+				placeholder: 'Type a model ID or click Load Models'
+			});
+		}
+
 		// Fetch Dynamic Models Logic
 		$('.jeo-ai-fetch-models-btn').click(function(e) {
 			e.preventDefault();
 			var $btn = $(this);
 			var provider = $btn.data('provider');
-			var targetListId = $btn.data('target');
-			var $datalist = $('#' + targetListId);
-			var $modelInput = $('#' + provider + '_model');
+			var $modelSelect = $('#' + provider + '_model');
 			
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
@@ -131,15 +138,30 @@
 				data: { provider: provider, api_key: key }
 			}).then(function(res) {
 				if (res && res.success && res.models) {
-					$datalist.empty();
-					res.models.forEach(function(modelName) {
-						$datalist.append($('<option></option>').attr('value', modelName));
-					});
+					// Save currently typed/selected value to re-select it if it's in the list
+					var currentValue = $modelSelect.val();
+					$modelSelect.empty();
 					
+					var foundCurrent = false;
+					res.models.forEach(function(modelName) {
+						var isSelected = (modelName === currentValue);
+						if (isSelected) foundCurrent = true;
+						var option = new Option(modelName, modelName, isSelected, isSelected);
+						$modelSelect.append(option);
+					});
+
+					// If current value wasn't in the fetched list, append it anyway as a custom tag
+					if (currentValue && !foundCurrent) {
+						var customOption = new Option(currentValue, currentValue, true, true);
+						$modelSelect.append(customOption);
+					}
+					
+					$modelSelect.trigger('change');
 					$btn.text('Loaded (' + res.models.length + ')');
 					
-					// Focus the input to let user see the datalist arrow
-					$modelInput.focus();
+					if ($.fn.select2) {
+						$modelSelect.select2('open'); // Open dropdown to show results
+					}
 				}
 			}).catch(function(err) {
 				alert('Error fetching models: ' + (err.message || err.error || 'Unknown error'));
