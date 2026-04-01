@@ -1,4 +1,5 @@
-FROM wordpress
+ARG WP_IMAGE_TAG=php8.2-apache
+FROM wordpress:${WP_IMAGE_TAG}
 
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
 	chmod +x wp-cli.phar && \

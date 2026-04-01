@@ -1,4 +1,11 @@
 <?php
+// Carrega o Composer Autoloader dependendo do ambiente (Desenvolvimento ou Produção)
+if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
+	require_once JEO_BASEPATH . 'vendor/autoload.php';
+} elseif ( file_exists( dirname( JEO_BASEPATH ) . '/vendor/autoload.php' ) ) {
+	require_once dirname( JEO_BASEPATH ) . '/vendor/autoload.php';
+}
+
 spl_autoload_register( 'jeo_autoload' );
 
 function jeo_autoload( $class_name ) {
@@ -32,6 +39,15 @@ function jeo_autoload( $class_name ) {
  */
 function jeo_ai_handler() {
 	return \Jeo\AI_Handler::get_instance();
+}
+
+/**
+ * Gets the instance of the AI Logger Class
+ *
+ * @return \Jeo\AI\AI_Logger AI_Logger instance
+ */
+function jeo_ai_logger() {
+	return \Jeo\AI\AI_Logger::get_instance();
 }
 
 /**

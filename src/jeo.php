@@ -5,7 +5,7 @@
  * @wordpress-plugin
  * Plugin Name:       JEO WP
  * Description:       A professional geojournalism platform for WordPress. Features an AI-powered Georeferencing Co-Pilot, interactive mapping blocks, and a centralized territorial Knowledge Base. Start with our [Welcome Guide](admin.php?page=jeo-welcome) or view your [Geographic Dashboard](admin.php?page=jeo-dashboard).
- * Version:           3.5.4-experimental
+ * Version:           3.6.0-experimental
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       jeo
@@ -18,11 +18,36 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
+ * Check PHP Version Compatibility (Requires 8.2+)
+ */
+if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
+	add_action( 'admin_notices', function () {
+		printf(
+			'<div class="notice notice-error"><p>%s</p></div>',
+			esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated.', 'jeo' )
+		);
+	} );
+
+	if ( ! function_exists( 'deactivate_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	
+	// Ensure we don't cause infinite loop on activation failure
+	if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
+	}
+	return;
+}
+
+/**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'JEO_VERSION', '3.5.4-experimental' );
+define( 'JEO_VERSION', '3.6.0-experimental' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );

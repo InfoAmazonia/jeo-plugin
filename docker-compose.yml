@@ -5,8 +5,10 @@ services:
     build:
       context: .
       dockerfile: ./docker/wordpress/Dockerfile
+      args:
+        WP_IMAGE_TAG: ${WP_IMAGE_TAG:-php8.2-apache}
     ports:
-      - 80:80
+      - 72:80
     depends_on:
       - mariadb
     environment:
@@ -16,6 +18,7 @@ services:
       WORDPRESS_DEBUG: 'true'
     volumes:
       - ./src:/var/www/html/wp-content/plugins/jeo
+      - ./vendor:/var/www/html/wp-content/plugins/vendor
       - ./wp-content:/var/www/html/wp-content
       - ./docker/mariadb/data:/docker-entrypoint-initdb.d
       - ./docker/wordpress/.htaccess:/var/www/html/.htaccess
