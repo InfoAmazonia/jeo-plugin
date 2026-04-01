@@ -193,9 +193,16 @@ class AI_Handler {
 	 */
 	public function get_adapters() {
 		return array(
-			'gemini'   => __( 'Google Gemini', 'jeo' ),
-			'openai'   => __( 'OpenAI (GPT)', 'jeo' ),
-			'deepseek' => __( 'DeepSeek', 'jeo' ),
+			'gemini'      => __( 'Google Gemini', 'jeo' ),
+			'openai'      => __( 'OpenAI', 'jeo' ),
+			'deepseek'    => __( 'DeepSeek', 'jeo' ),
+			'anthropic'   => __( 'Anthropic Claude', 'jeo' ),
+			'ollama'      => __( 'Ollama (Local/Custom)', 'jeo' ),
+			'mistral'     => __( 'Mistral AI', 'jeo' ),
+			'zai'         => __( 'Zhipu AI (GLM)', 'jeo' ),
+			'huggingface' => __( 'HuggingFace Inference', 'jeo' ),
+			'grok'        => __( 'Grok (xAI)', 'jeo' ),
+			'cohere'      => __( 'Cohere', 'jeo' ),
 		);
 	}
 
@@ -210,15 +217,19 @@ class AI_Handler {
 			$active = 'gemini';
 		}
 
-		switch ( $active ) {
-			case 'gemini':
-				return new AI\Gemini_Adapter();
-			case 'openai':
-				return new AI\OpenAI_Adapter();
-			case 'deepseek':
-				return new AI\DeepSeek_Adapter();
+		// Dynamically fetch configured model and API key
+		$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+		$model   = \jeo_settings()->get_option( $active . '_model' );
+
+		// Specific fallback for Ollama URL mapping
+		if ( 'ollama' === $active ) {
+			$api_key = \jeo_settings()->get_option( 'ollama_url' );
 		}
 
+		if ( array_key_exists( $active, $this->get_adapters() ) ) {
+			return new AI\Neuron_Adapter( $active, (string) $api_key, (string) $model );
+		}
+		
 		return null;
 	}
 
@@ -280,18 +291,26 @@ class AI_Handler {
 	 */
 	public function api_test_key( $request ) {
 		$provider = $request->get_param( 'provider' );
-		$adapter  = null;
+		$api_key  = $request->get_param( 'api_key' ); // It might be empty if the frontend relies on saved DB key
 
-		switch ( $provider ) {
-			case 'gemini':
-				$adapter = new AI\Gemini_Adapter();
-				break;
-			case 'openai':
-				$adapter = new AI\OpenAI_Adapter();
-				break;
-			case 'deepseek':
-				$adapter = new AI\DeepSeek_Adapter();
-				break;
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		$model = \jeo_settings()->get_option( $provider . '_model' );
+		
+		if ( empty( $api_key ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
+		}
+
+		$adapter = null;
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
 		}
 
 		if ( ! $adapter ) {
