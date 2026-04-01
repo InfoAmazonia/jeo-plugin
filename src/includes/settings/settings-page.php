@@ -261,24 +261,23 @@
 							</div>
 						</td>
 					</tr>
-					<tr>
-						<th scope="row"><label for="gemini_api_key"><?php esc_html_e( 'Gemini API Key', 'jeo' ); ?></label></th>
-						<td>
-							<input name="<?php echo esc_html( $this->get_field_name( 'gemini_api_key' ) ); ?>" type="text" id="gemini_api_key" value="<?php echo esc_html( $this->get_option( 'gemini_api_key' ) ); ?>" class="regular-text">
-						</td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="openai_api_key"><?php esc_html_e( 'OpenAI API Key', 'jeo' ); ?></label></th>
-						<td>
-							<input name="<?php echo esc_html( $this->get_field_name( 'openai_api_key' ) ); ?>" type="text" id="openai_api_key" value="<?php echo esc_html( $this->get_option( 'openai_api_key' ) ); ?>" class="regular-text">
-						</td>
-					</tr>
-					<tr>
-						<th scope="row"><label for="deepseek_api_key"><?php esc_html_e( 'DeepSeek API Key', 'jeo' ); ?></label></th>
-						<td>
-							<input name="<?php echo esc_html( $this->get_field_name( 'deepseek_api_key' ) ); ?>" type="text" id="deepseek_api_key" value="<?php echo esc_html( $this->get_option( 'deepseek_api_key' ) ); ?>" class="regular-text">
-						</td>
-					</tr>
+					
+					<?php foreach ( jeo_ai_handler()->get_adapters() as $slug => $name ) : ?>
+						<tr class="jeo-ai-provider-settings" data-provider="<?php echo esc_attr( $slug ); ?>" style="display: <?php echo $this->get_option( 'ai_default_provider' ) === $slug ? 'table-row' : 'none'; ?>;">
+							<th scope="row"><label for="<?php echo esc_attr( $slug ); ?>_api_key"><?php echo esc_html( $name ); ?> <?php echo 'ollama' === $slug ? 'Endpoint URL' : 'API Key'; ?></label></th>
+							<td>
+								<input name="<?php echo esc_html( $this->get_field_name( 'ollama' === $slug ? 'ollama_url' : $slug . '_api_key' ) ); ?>" type="<?php echo 'ollama' === $slug ? 'url' : 'password'; ?>" id="<?php echo esc_attr( $slug ); ?>_api_key" value="<?php echo esc_html( $this->get_option( 'ollama' === $slug ? 'ollama_url' : $slug . '_api_key' ) ); ?>" class="regular-text" placeholder="<?php echo 'ollama' === $slug ? 'http://localhost:11434/api' : '*******************'; ?>">
+							</td>
+						</tr>
+						<tr class="jeo-ai-provider-settings" data-provider="<?php echo esc_attr( $slug ); ?>" style="display: <?php echo $this->get_option( 'ai_default_provider' ) === $slug ? 'table-row' : 'none'; ?>;">
+							<th scope="row"><label for="<?php echo esc_attr( $slug ); ?>_model"><?php echo esc_html( $name ); ?> Model</label></th>
+							<td>
+								<input name="<?php echo esc_html( $this->get_field_name( $slug . '_model' ) ); ?>" type="text" id="<?php echo esc_attr( $slug ); ?>_model" value="<?php echo esc_html( $this->get_option( $slug . '_model' ) ); ?>" class="regular-text">
+								<p class="description"><?php echo sprintf( esc_html__( 'Model ID for %s.', 'jeo' ), $name ); ?></p>
+							</td>
+						</tr>
+					<?php endforeach; ?>
+
 					<tr>
 						<th scope="row"><label for="ai_use_custom_prompt"><?php esc_html_e( 'System Prompt Configuration', 'jeo' ); ?></label></th>
 						<td>

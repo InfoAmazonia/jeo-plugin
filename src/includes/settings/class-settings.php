@@ -27,9 +27,47 @@ class Settings {
 			'jeo_footer-logo'                 => '',
 			'show_storymaps_on_post_archives' => 0,
 			'ai_default_provider'             => 'gemini',
+			
+			// Gemini
 			'gemini_api_key'                  => '',
+			'gemini_model'                    => 'gemini-2.5-flash',
+
+			// OpenAI
 			'openai_api_key'                  => '',
+			'openai_model'                    => 'gpt-4o',
+
+			// Deepseek
 			'deepseek_api_key'                => '',
+			'deepseek_model'                  => 'deepseek-chat',
+
+			// Anthropic
+			'anthropic_api_key'               => '',
+			'anthropic_model'                 => 'claude-3-5-sonnet-20240620',
+
+			// Ollama
+			'ollama_url'                      => 'http://localhost:11434/api',
+			'ollama_model'                    => 'llama3',
+
+			// Mistral
+			'mistral_api_key'                 => '',
+			'mistral_model'                   => 'mistral-large-latest',
+
+			// ZAI
+			'zai_api_key'                     => '',
+			'zai_model'                       => 'glm-4',
+
+			// HuggingFace
+			'huggingface_api_key'             => '',
+			'huggingface_model'               => 'mistralai/Mistral-7B-Instruct-v0.3',
+
+			// Grok (X-AI)
+			'grok_api_key'                    => '',
+			'grok_model'                      => 'grok-beta',
+
+			// Cohere
+			'cohere_api_key'                  => '',
+			'cohere_model'                    => 'command-r-plus',
+
 			'ai_use_custom_prompt'            => 0,
 			'ai_system_prompt'                => '',
 			'ai_debug_mode'                   => 0,

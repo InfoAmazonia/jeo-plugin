@@ -52,14 +52,26 @@
 		// ------------------------------------
 		// AI API Key Validation Logic
 		// ------------------------------------
+		$('#ai_default_provider').on('change', function() {
+			var provider = $(this).val();
+
+			// Hide all provider specific rows
+			$('.jeo-ai-provider-settings').hide();
+			// Show specific rows
+			$('.jeo-ai-provider-settings[data-provider="' + provider + '"]').show();
+			
+			runApiKeyTest();
+		});
+
 		function runApiKeyTest() {
 			var provider = $('#ai_default_provider').val();
-			var key = $('#' + provider + '_api_key').val();
+			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
+			var key = $(keyInputId).val();
 			var $badge = $('#jeo-ai-key-status-badge');
 			var $btn = $('#jeo-ai-test-key-btn');
 
 			if (!key) {
-				$badge.text('Missing Key').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+				$badge.text('Missing Config').css({ 'background': '#fcf0f1', 'color': '#d63638' });
 				return;
 			}
 
@@ -69,7 +81,7 @@
 			wp.apiFetch({
 				path: '/jeo/v1/ai-test-key',
 				method: 'POST',
-				data: { provider: provider }
+				data: { provider: provider, api_key: key }
 			}).then(function(res) {
 				if (res && res.success) {
 					$badge.text('Active').css({ 'background': '#edfaef', 'color': '#008a20' });
@@ -88,10 +100,6 @@
 			runApiKeyTest();
 		});
 
-		$('#ai_default_provider').change(function() {
-			runApiKeyTest();
-		});
-
 		// Lê o Hash da URL para abrir na mesma aba salva (acione com flag isInitialLoad)
 		var hash = window.location.hash;
 		if (hash && hash.indexOf('tab-') !== -1) {
@@ -107,12 +115,13 @@
 			var currentHash = window.location.hash;
 			if (currentHash === '#tab-ai') {
 				var provider = $('#ai_default_provider').val();
-				var key = $('#' + provider + '_api_key').val();
+				var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
+				var key = $(keyInputId).val();
 				
 				if (!key) {
 					e.preventDefault();
-					alert('Please enter an API Key for the selected provider before saving.');
-					$('#' + provider + '_api_key').focus();
+					alert('Please enter an API Key (or URL) for the selected provider before saving.');
+					$(keyInputId).focus();
 					return false;
 				}
 			}
