@@ -105,6 +105,50 @@
 			runApiKeyTest();
 		});
 
+		// Fetch Dynamic Models Logic
+		$('.jeo-ai-fetch-models-btn').click(function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var provider = $btn.data('provider');
+			var targetListId = $btn.data('target');
+			var $datalist = $('#' + targetListId);
+			var $modelInput = $('#' + provider + '_model');
+			
+			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
+			var key = $(keyInputId).val();
+
+			if (!key) {
+				alert('Please enter an API Key first to fetch models.');
+				return;
+			}
+
+			var originalText = $btn.text();
+			$btn.prop('disabled', true).text('Loading...');
+
+			wp.apiFetch({
+				path: '/jeo/v1/ai-get-models',
+				method: 'POST',
+				data: { provider: provider, api_key: key }
+			}).then(function(res) {
+				if (res && res.success && res.models) {
+					$datalist.empty();
+					res.models.forEach(function(modelName) {
+						$datalist.append($('<option></option>').attr('value', modelName));
+					});
+					
+					$btn.text('Loaded (' + res.models.length + ')');
+					
+					// Focus the input to let user see the datalist arrow
+					$modelInput.focus();
+				}
+			}).catch(function(err) {
+				alert('Error fetching models: ' + (err.message || err.error || 'Unknown error'));
+				$btn.text('Failed');
+			}).finally(function() {
+				setTimeout(function() { $btn.prop('disabled', false).text(originalText); }, 3000);
+			});
+		});
+
 		// Lê o Hash da URL para abrir na mesma aba salva (acione com flag isInitialLoad)
 		var hash = window.location.hash;
 		if (hash && hash.indexOf('tab-') !== -1) {

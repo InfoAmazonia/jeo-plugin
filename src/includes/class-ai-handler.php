@@ -284,6 +284,148 @@ class AI_Handler {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-get-models',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_get_models' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+	}
+
+	/**
+	 * Fetch available models dynamically from the LLM Provider's API
+	 */
+	public function api_get_models( $request ) {
+		$provider = $request->get_param( 'provider' );
+		$api_key  = $request->get_param( 'api_key' );
+
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $api_key ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'API Key or URL is required to list models.', 'jeo' ) ), 400 );
+		}
+
+		$models = [];
+		$args   = array(
+			'headers' => array(
+				'Authorization' => 'Bearer ' . $api_key,
+				'Content-Type'  => 'application/json',
+			),
+			'timeout' => 15,
+		);
+
+		switch ( $provider ) {
+			case 'openai':
+			case 'deepseek':
+			case 'mistral':
+			case 'grok':
+			case 'zai':
+				$url = '';
+				if ( 'openai' === $provider ) $url = 'https://api.openai.com/v1/models';
+				if ( 'deepseek' === $provider ) $url = 'https://api.deepseek.com/models';
+				if ( 'mistral' === $provider ) $url = 'https://api.mistral.ai/v1/models';
+				if ( 'grok' === $provider ) $url = 'https://api.x.ai/v1/models';
+				// Zhipu AI usually implements OpenAI's v1/models compat too if used via SDK endpoint, but can fail if unsupported.
+				if ( 'zai' === $provider ) {
+					return new \WP_REST_Response( array( 'error' => __( 'Model fetching not officially supported dynamically for Zhipu AI.', 'jeo' ) ), 400 );
+				}
+
+				$response = wp_remote_get( $url, $args );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
+					foreach ( $data['data'] as $model ) {
+						$models[] = $model['id'];
+					}
+				}
+				break;
+			
+			case 'gemini':
+				$url = 'https://generativelanguage.googleapis.com/v1beta/models?key=' . $api_key;
+				$response = wp_remote_get( $url, [ 'timeout' => 15 ] );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						// Only allow models supporting generateContent for georeferencing
+						if ( isset( $model['supportedGenerationMethods'] ) && in_array( 'generateContent', $model['supportedGenerationMethods'], true ) ) {
+							$models[] = str_replace( 'models/', '', $model['name'] );
+						}
+					}
+				}
+				break;
+			
+			case 'anthropic':
+				$args['headers']['x-api-key'] = $api_key;
+				$args['headers']['anthropic-version'] = '2023-06-01';
+				unset( $args['headers']['Authorization'] );
+				
+				$response = wp_remote_get( 'https://api.anthropic.com/v1/models', $args );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
+					foreach ( $data['data'] as $model ) {
+						$models[] = $model['id'];
+					}
+				}
+				break;
+
+			case 'ollama':
+				// Ex: http://localhost:11434/api
+				$base_url = rtrim( str_replace( '/api', '', $api_key ), '/' );
+				$response = wp_remote_get( $base_url . '/api/tags', [ 'timeout' => 10 ] );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						$models[] = $model['name'];
+					}
+				}
+				break;
+			
+			case 'cohere':
+				$response = wp_remote_get( 'https://api.cohere.com/v1/models', $args );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						if ( isset( $model['endpoints'] ) && in_array( 'chat', $model['endpoints'], true ) ) {
+							$models[] = $model['name'];
+						}
+					}
+				}
+				break;
+
+			default:
+				return new \WP_REST_Response( array( 'error' => __( 'Model fetching is not supported for this provider yet. Please enter the model ID manually.', 'jeo' ) ), 400 );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			return new \WP_REST_Response( array( 'error' => $response->get_error_message() ), 500 );
+		}
+
+		if ( empty( $models ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No models found. Check your API key or permissions.', 'jeo' ) ), 404 );
+		}
+
+		return new \WP_REST_Response( array( 'success' => true, 'models' => array_reverse( $models ) ), 200 );
 	}
 
 	/**
