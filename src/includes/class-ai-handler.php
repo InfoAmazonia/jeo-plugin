@@ -540,10 +540,17 @@ class AI_Handler {
 The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
 Write a clear, strict System Prompt that incorporates the user's rules. 
 {$model_optimization}
-CRITICAL: The generated prompt MUST explicitly instruct the AI to return ONLY a raw JSON array of objects.
-Each object MUST have EXACTLY these keys: 'name', 'lat' (string/float), 'lng' (string/float), and 'quote' (a short relevant snippet from the text).
-You MUST include this exact example in your generated prompt: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\"}].
-You MUST include this instruction in your generated prompt: 'If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].'
+
+You MUST append the following text VERBATIM to the very end of your generated prompt. Do not modify it:
+\"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
+Each object inside the array MUST have EXACTLY these keys:
+- 'name': The location name.
+- 'lat': Latitude (string or float).
+- 'lng': Longitude (string or float).
+- 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
+Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\"}]
+If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"
+
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
 
 		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content' 
