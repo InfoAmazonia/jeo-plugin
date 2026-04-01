@@ -306,7 +306,7 @@ class MapLayers extends Component {
 		let layersQueue = [ ...this.props.layersQueue ];
 
 		// If layer does not exist
-		if ( ! selectedLayers.hasOwnProperty( layer.id ) ) {
+		if ( ! Object.hasOwn( selectedLayers, layer.id ) ) {
 			selectedLayers[ layer.id ] = layer;
 			layersQueue = [ layer.id, ...layersQueue ];
 		} else {
@@ -329,7 +329,7 @@ class MapLayers extends Component {
 		let layersQueue = [ ...baseLayersQueue ];
 
 		layers.forEach( ( layer ) => {
-			if ( ! selectedLayers.hasOwnProperty( layer.id ) ) {
+			if ( ! Object.hasOwn( selectedLayers, layer.id ) ) {
 				selectedLayers[ layer.id ] = layer;
 				layersQueue = [ layer.id, ...layersQueue ];
 			} else {

@@ -13,7 +13,7 @@ export function mergeUniqueStoriesById( currentStories = [], nextStories = [] ) 
 }
 
 export function resolveStoriesPage( params = {}, pageInfo = {} ) {
-	if ( Object.prototype.hasOwnProperty.call( params, 'page' ) ) {
+	if ( Object.hasOwn( params, 'page' ) ) {
 		const explicitPage = Number.parseInt( params.page, 10 );
 		return Number.isFinite( explicitPage ) && explicitPage > 0
 			? explicitPage
