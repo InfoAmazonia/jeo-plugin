@@ -227,13 +227,24 @@
 				return;
 			}
 
+			// Capture dynamic provider configuration to allow generating prompts with an unsaved key
+			var provider = $('#ai_default_provider').val();
+			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
+			var key = $(keyInputId).val();
+			var model = $('#' + provider + '_model').val();
+
 			$btn.prop('disabled', true).text('Generating...');
 			$status.text('Asking the active LLM to generate an optimized prompt...').css('color', '#007cba');
 
 			wp.apiFetch({
 				path: '/jeo/v1/ai-chat-prompt-generator',
 				method: 'POST',
-				data: { context: context }
+				data: { 
+					context: context,
+					provider: provider,
+					api_key: key,
+					model: model
+				}
 			}).then(function(res) {
 				if (res && res.prompt) {
 					$('#ai_system_prompt').val(res.prompt);
@@ -258,13 +269,23 @@
 				prompt = $('#ai_system_prompt').attr('placeholder');
 			}
 
+			var provider = $('#ai_default_provider').val();
+			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
+			var key = $(keyInputId).val();
+			var model = $('#' + provider + '_model').val();
+
 			$btn.prop('disabled', true).text('Testing...');
 			$status.text('Running a simulation against the LLM...').css('color', '#007cba');
 
 			wp.apiFetch({
 				path: '/jeo/v1/ai-validate-prompt',
 				method: 'POST',
-				data: { prompt: prompt }
+				data: { 
+					prompt: prompt,
+					provider: provider,
+					api_key: key,
+					model: model
+				}
 			}).then(function(res) {
 				if (res && res.success) {
 					$status.text('✅ ' + res.message).css('color', 'green');

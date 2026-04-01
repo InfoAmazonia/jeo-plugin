@@ -339,20 +339,62 @@ class AI_Handler {
 	 * Callback to generate an optimized prompt using the active LLM.
 	 */
 	public function api_chat_prompt_generator( $request ) {
-		$context = $request->get_param( 'context' );
+		$context  = $request->get_param( 'context' );
+		$provider = $request->get_param( 'provider' );
+		$api_key  = $request->get_param( 'api_key' );
+		$model    = $request->get_param( 'model' );
+
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
 		}
 
-		$adapter = $this->get_active_adapter();
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) && ! empty( $api_key ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+		} else {
+			$adapter = $this->get_active_adapter();
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+		}
+
+		// Prompt Optimizer: Appends model-specific guidelines to the meta-prompt
+		$model_optimization = "";
+		switch ( $provider ) {
+			case 'gemini':
+				$model_optimization = "Since the target model is Google Gemini, please use clear Markdown headers (##) and explicit step-by-step instructions. Gemini performs best when formatting is highly structured and unambiguous.";
+				break;
+			case 'openai':
+				$model_optimization = "Since the target model is OpenAI (GPT), provide highly concise, abstract rules. GPT models are excellent at generalizing logic and understanding constraints without excessive verbosity.";
+				break;
+			case 'deepseek':
+				$model_optimization = "Since the target model is DeepSeek, enclose critical thinking rules and constraints inside XML-like tags (e.g., <rules>...</rules>). DeepSeek is a reasoning model and heavily benefits from chain-of-thought and structured tag-based directives.";
+				break;
+			case 'anthropic':
+				$model_optimization = "Since the target model is Anthropic Claude, use conversational but highly detailed boundaries. Claude responds well to 'constitutional' style rules and clearly defined 'Do not do X' instructions.";
+				break;
+			default:
+				$model_optimization = "Make the prompt robust, precise, and well-structured to ensure high accuracy in georeferencing tasks.";
+				break;
 		}
 
 		// Meta-prompt instructed to build a JEO prompt
 		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin. 
 The user wants to configure an AI georeferencing tool with specific rules: '{$context}'.
 Write a clear, strict System Prompt that incorporates the user's rules. 
+{$model_optimization}
 CRITICAL: The generated prompt MUST explicitly instruct the AI to return ONLY a raw JSON array of objects.
 Each object MUST have keys: 'name', 'lat' (string/float), 'lng' (string/float), and 'quote'.
 Example to include: [{\"name\": \"Place\", \"lat\": 0, \"lng\": 0, \"quote\": \"...\"}].
@@ -390,11 +432,32 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 */
 	public function api_validate_prompt( $request ) {
 		$custom_prompt = $request->get_param( 'prompt' );
+		$provider      = $request->get_param( 'provider' );
+		$api_key       = $request->get_param( 'api_key' );
+		$model         = $request->get_param( 'model' );
+
 		if ( empty( $custom_prompt ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Prompt is required.', 'jeo' ) ), 400 );
 		}
 
-		$adapter = $this->get_active_adapter();
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) && ! empty( $api_key ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+		} else {
+			$adapter = $this->get_active_adapter();
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
