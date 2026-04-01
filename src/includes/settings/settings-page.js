@@ -67,7 +67,7 @@
 			var provider = $('#ai_default_provider').val();
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
-			var model = $('#' + provider + '_model').val();
+			var model = $('#' + provider + '_model_hidden').val();
 			var $badge = $('#jeo-ai-key-status-badge');
 			var $btn = $('#jeo-ai-test-key-btn');
 
@@ -119,7 +119,12 @@
 			e.preventDefault();
 			var $btn = $(this);
 			var provider = $btn.data('provider');
-			var $modelSelect = $('#' + provider + '_model');
+			var $container = $btn.closest('.jeo-ai-model-container');
+			var $readonlyWrapper = $container.find('.jeo-ai-model-readonly-wrapper');
+			var $selectWrapper = $container.find('.jeo-ai-model-select-wrapper');
+			var $modelSelect = $('#' + provider + '_model_select');
+			var $hiddenInput = $('#' + provider + '_model_hidden');
+			var $readonlyInput = $('#' + provider + '_model_readonly');
 			
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
@@ -138,8 +143,12 @@
 				data: { provider: provider, api_key: key }
 			}).then(function(res) {
 				if (res && res.success && res.models) {
-					// Save currently typed/selected value to re-select it if it's in the list
-					var currentValue = $modelSelect.val();
+					// Transform the UI
+					$readonlyWrapper.hide();
+					$selectWrapper.show();
+					$btn.hide(); // Hide the Change Model button as they are now interacting
+
+					var currentValue = $hiddenInput.val();
 					$modelSelect.empty();
 					
 					var foundCurrent = false;
@@ -157,7 +166,13 @@
 					}
 					
 					$modelSelect.trigger('change');
-					$btn.text('Loaded (' + res.models.length + ')');
+
+					// Sync the visible select2 selection back to the hidden input
+					$modelSelect.on('change', function() {
+						var selectedVal = $(this).val();
+						$hiddenInput.val(selectedVal);
+						$readonlyInput.val(selectedVal);
+					});
 					
 					if ($.fn.select2) {
 						$modelSelect.select2('open'); // Open dropdown to show results
@@ -165,10 +180,14 @@
 				}
 			}).catch(function(err) {
 				alert('Error fetching models: ' + (err.message || err.error || 'Unknown error'));
-				$btn.text('Failed');
-			}).finally(function() {
-				setTimeout(function() { $btn.prop('disabled', false).text(originalText); }, 3000);
+				$btn.prop('disabled', false).text('Failed, Try Again');
 			});
+		});
+
+		// Ensure proper selection updates the inputs for auto key testing
+		$('.jeo-ai-model-select').on('change', function() {
+			var provider = $(this).attr('id').replace('_model_select', '');
+			$('#' + provider + '_model_hidden').val($(this).val());
 		});
 
 		// Lê o Hash da URL para abrir na mesma aba salva (acione com flag isInitialLoad)
@@ -302,7 +321,7 @@
 			var provider = $('#ai_default_provider').val();
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
-			var model = $('#' + provider + '_model').val();
+			var model = $('#' + provider + '_model_hidden').val();
 
 			$btn.prop('disabled', true).text('Generating...');
 			$status.text('Asking the active LLM to generate an optimized prompt...').css('color', '#007cba');
@@ -343,7 +362,7 @@
 			var provider = $('#ai_default_provider').val();
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
-			var model = $('#' + provider + '_model').val();
+			var model = $('#' + provider + '_model_hidden').val();
 
 			$btn.prop('disabled', true).text('Testing...');
 			$status.text('Running a simulation against the LLM...').css('color', '#007cba');

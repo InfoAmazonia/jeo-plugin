@@ -272,16 +272,22 @@
 						<tr class="jeo-ai-provider-settings" data-provider="<?php echo esc_attr( $slug ); ?>" style="display: <?php echo $this->get_option( 'ai_default_provider' ) === $slug ? 'table-row' : 'none'; ?>;">
 							<th scope="row"><label for="<?php echo esc_attr( $slug ); ?>_model"><?php echo esc_html( $name ); ?> Model</label></th>
 							<td>
-								<div style="display: flex; gap: 10px; align-items: center; max-width: 600px;">
-									<select name="<?php echo esc_html( $this->get_field_name( $slug . '_model' ) ); ?>" id="<?php echo esc_attr( $slug ); ?>_model" class="regular-text jeo-ai-model-select" style="flex: 1; width: 100%;">
-										<?php $current_model = $this->get_option( $slug . '_model' ); ?>
-										<?php if ( $current_model ) : ?>
-											<option value="<?php echo esc_attr( $current_model ); ?>" selected="selected"><?php echo esc_html( $current_model ); ?></option>
-										<?php endif; ?>
-									</select>
-									<button type="button" class="button jeo-ai-fetch-models-btn" data-provider="<?php echo esc_attr( $slug ); ?>" data-target="<?php echo esc_attr( $slug ); ?>_model"><?php esc_html_e( 'Load Models', 'jeo' ); ?></button>
+								<div class="jeo-ai-model-container" style="display: flex; gap: 10px; align-items: center; max-width: 600px;">
+									<?php $current_model = $this->get_option( $slug . '_model' ); ?>
+									<div class="jeo-ai-model-readonly-wrapper" style="flex: 1; display: flex;">
+										<input type="text" id="<?php echo esc_attr( $slug ); ?>_model_readonly" value="<?php echo esc_html( $current_model ); ?>" class="regular-text" readonly style="flex: 1; background: #f0f0f1; color: #50575e; border-color: #ccd0d4; box-shadow: none;">
+										<input type="hidden" name="<?php echo esc_html( $this->get_field_name( $slug . '_model' ) ); ?>" id="<?php echo esc_attr( $slug ); ?>_model_hidden" value="<?php echo esc_html( $current_model ); ?>">
+									</div>
+									<div class="jeo-ai-model-select-wrapper" style="flex: 1; display: none;">
+										<select id="<?php echo esc_attr( $slug ); ?>_model_select" class="regular-text jeo-ai-model-select" style="width: 100%;">
+											<?php if ( $current_model ) : ?>
+												<option value="<?php echo esc_attr( $current_model ); ?>" selected="selected"><?php echo esc_html( $current_model ); ?></option>
+											<?php endif; ?>
+										</select>
+									</div>
+									<button type="button" class="button jeo-ai-fetch-models-btn" data-provider="<?php echo esc_attr( $slug ); ?>"><?php esc_html_e( 'Change Model', 'jeo' ); ?></button>
 								</div>
-								<p class="description"><?php echo sprintf( esc_html__( 'Model ID for %s. You can type manually or fetch available models from the API.', 'jeo' ), $name ); ?></p>
+								<p class="description"><?php echo sprintf( esc_html__( 'Model ID for %s. Click "Change Model" to fetch available models from the API or type manually.', 'jeo' ), $name ); ?></p>
 							</td>
 						</tr>
 					<?php endforeach; ?>
