@@ -24,7 +24,14 @@ O JEO utiliza o framework **Neuron AI** como motor universal de LLM.
 - **Configuração Determinística:** Todos os modelos são configurados com `temperature = 0.1` para garantir que a extração de coordenadas seja precisa e não criativa.
 - **Provedores:** Suporte nativo a 10 provedores (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, etc.) configuráveis na Aba AI.
 
-### 2.2. Cost Dashboard (Gestão de Custos)
+### 2.2. Model-Aware Prompt Optimization
+- O **AI Prompt Engineer Assistant** não usa mais um prompt estático genérico. O JEO intercepta a requisição e injeta "Regras Constitucionais" específicas dependendo do provedor ativo na interface:
+  - **Gemini:** Exige uso de Markdown estrito (headers `##`) e instrução de passo a passo. Além disso, o Agente nativo do JEO agora injeta forçosamente `['generationConfig' => ['responseMimeType' => 'application/json']]` para impedir a "lixeira conversacional" que o Gemini sofre ao fazer test_keys e chat prompt.
+  - **OpenAI:** Otimizado com regras abstratas e concisas (melhor generalização GPT).
+  - **DeepSeek:** Instruído a usar blocos de tags tipo XML (ex: `<rules>`) para engatilhar um raciocínio lógico forte (*chain-of-thought*).
+  - **Anthropic:** Abordagem negativa constitucional ("O que não fazer e onde não ir").
+
+### 2.3. Cost Dashboard (Gestão de Custos)
 - **Salvamento de Tokens:** O plugin utiliza a classe `AI_Logger` para persistir o consumo de tokens (`input_tokens` e `output_tokens`) no Custom Post Type privado `jeo-ai-log`.
 - **Integridade:** As métricas de custo são extraídas via `$message->getUsage()` após cada interação do Agente.
 
