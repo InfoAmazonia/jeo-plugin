@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ ! -f /installed ]; then
-    wp --allow-root --path=/var/www/html core install --url=http://localhost/ \
+    wp --allow-root --path=/var/www/html core install --url=http://localhost:8072/ \
 		--admin_user=admin --admin_password=admin --admin_email=admin@localhost.local \
 		--title='JEO Development'
 
