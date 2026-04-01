@@ -58,7 +58,7 @@ class Neuron_Agent extends Agent {
 				return new Gemini(
 					key: $this->api_key,
 					model: $this->model,
-					parameters: $temperature_param
+					parameters: [ 'generationConfig' => $temperature_param ]
 				);
 			case 'openai':
 				return new OpenAI(
