@@ -89,7 +89,7 @@ const storyMapCleanUp = (props) => {
 	}
 
 	function removeYoastTagsFromObject(object) {
-		if( object && object.hasOwnProperty('yoast_head') ) {
+		if(Object.hasOwn( object, 'yoast_head') ) {
 			delete object.yoast_head;
 		}
 	}

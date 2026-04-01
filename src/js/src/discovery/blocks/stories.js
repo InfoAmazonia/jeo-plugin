@@ -653,7 +653,7 @@ class Stories extends Component {
 		params = { ...defaultParams, ...params };
 
 		// Use constant POSTS_PER_PAGE if param per_page is not set
-		if ( ! params.hasOwnProperty( 'per_page' ) )
+		if ( ! Object.hasOwn( params, 'per_page' ) )
 			params.per_page = POSTS_PER_PAGE;
 
 		// Set or use param page
@@ -666,7 +666,7 @@ class Stories extends Component {
 		} );
 
 		// Update using cumulative param for stories - infinite scrolling
-		if ( params.hasOwnProperty( 'cumulative' ) && params.cumulative ) {
+		if ( Object.hasOwn( params, 'cumulative' ) && params.cumulative ) {
 			// Cancel request if page exceed the max page;
 			if ( params.page > pageInfo.totalPages ) {
 				return Promise.reject();

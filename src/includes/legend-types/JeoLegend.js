@@ -147,8 +147,8 @@ class JeoLegend {
 
 		if ( Array.isArray( legendTypeOptions.colors ) ) {
 			return (
-				Object.prototype.hasOwnProperty.call( legendTypeOptions, 'left_label' ) ||
-				Object.prototype.hasOwnProperty.call( legendTypeOptions, 'right_label' )
+				Object.hasOwn( legendTypeOptions, 'left_label' ) ||
+				Object.hasOwn( legendTypeOptions, 'right_label' )
 			)
 				? 'barscale'
 				: 'simple-color';

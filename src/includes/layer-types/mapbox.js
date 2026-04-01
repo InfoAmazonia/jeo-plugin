@@ -105,7 +105,7 @@
 						let html = '';
 
 						for ( const interaction of interactionsGroup ) {
-							if ( feature.properties.hasOwnProperty( interaction.title ) ) {
+							if ( Object.hasOwn( feature.properties, interaction.title ) ) {
 								html += '<h3>' + feature.properties[ interaction.title ] + '</h3>';
 								break;
 							}
@@ -114,7 +114,7 @@
 						const fieldsSet = new Set();
 						for ( const interaction of interactionsGroup ) {
 							interaction.fields.forEach( ( { field, label } ) => {
-								if ( ! fieldsSet.has( field ) && feature.properties.hasOwnProperty( field ) ) {
+								if ( ! fieldsSet.has( field ) && Object.hasOwn( feature.properties, field ) ) {
 									fieldsSet.add( field );
 									html += '<p><strong>' + label + ': </strong>' + feature.properties[ field ] + '</p>';
 								}
