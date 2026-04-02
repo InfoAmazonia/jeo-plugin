@@ -87,6 +87,13 @@ class RAG_Agent extends RAG {
 			wp_mkdir_p( $store_dir );
 		}
 
+		// Security Mandate: Protect the vector store from public web access
+		$htaccess_file = $store_dir . '/.htaccess';
+		if ( ! file_exists( $htaccess_file ) ) {
+			$htaccess_content = "Order Deny,Allow\nDeny from all\n";
+			@file_put_contents( $htaccess_file, $htaccess_content );
+		}
+
 		$store_name = $this->is_test_mode ? 'jeo_knowledge_test' : 'jeo_knowledge';
 		$store_file = $store_dir . '/' . $store_name . '.store';
 
