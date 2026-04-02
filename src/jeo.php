@@ -5,7 +5,7 @@
  * @wordpress-plugin
  * Plugin Name:       JEO WP
  * Description:       A professional geojournalism platform for WordPress. Features an AI-powered Georeferencing Co-Pilot, interactive mapping blocks, and a centralized territorial Knowledge Base. Start with our [Welcome Guide](admin.php?page=jeo-welcome) or view your [Geographic Dashboard](admin.php?page=jeo-dashboard).
- * Version:           3.6.0-experimental
+ * Version:           3.6.3-experimental
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       jeo
@@ -47,7 +47,7 @@ if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'JEO_VERSION', '3.6.0-experimental' );
+define( 'JEO_VERSION', '3.6.3-experimental' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );

@@ -1,4 +1,4 @@
-# Planejamento: Integração JEO RAG (v3.8.0-alpha)
+# Planejamento: Integração JEO RAG (v3.6.3-experimental)
 
 Este documento descreve a estratégia para implementar um sistema de **Retrieval-Augmented Generation (RAG)** no JEO, permitindo que a IA consulte o acervo de posts do WordPress para responder perguntas contextuais ou auxiliar na geolocalização.
 

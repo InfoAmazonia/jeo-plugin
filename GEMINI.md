@@ -1,4 +1,4 @@
-# JEO Plugin - Master Architecture Guide & Mandates (v3.6.0-experimental)
+# JEO Plugin - Master Architecture Guide & Mandates (v3.6.3-experimental)
 
 Este documento é a autoridade máxima sobre a arquitetura do plugin JEO. Qualquer alteração, refatoração ou adição de funcionalidade deve respeitar estritamente as diretrizes aqui estabelecidas para garantir a estabilidade e a integridade dos dados geográficos.
 
@@ -15,7 +15,7 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 
 ---
 
-## 2. Motor de Inteligência Artificial (v3.6.x -> v3.8.x)
+## 2. Motor de Inteligência Artificial (v3.6.3-experimental)
 
 O JEO utiliza o framework **Neuron AI** como motor universal de LLM. 
 
