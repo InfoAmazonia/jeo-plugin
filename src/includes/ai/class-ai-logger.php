@@ -88,10 +88,39 @@ class AI_Logger {
 			update_post_meta( $post_id, '_jeo_ai_input_tokens', $input_tokens );
 			update_post_meta( $post_id, '_jeo_ai_output_tokens', $output_tokens );
 			update_post_meta( $post_id, '_jeo_ai_total_tokens', $total_tokens );
-			
+
 			// Save context
 			update_post_meta( $post_id, '_jeo_ai_prompt', wp_json_encode( $prompt, JSON_UNESCAPED_UNICODE ) );
 			update_post_meta( $post_id, '_jeo_ai_response', wp_json_encode( $response, JSON_UNESCAPED_UNICODE ) );
 		}
+	}
+
+	/**
+	 * Updates the global token aggregate for RAG operations.
+	 * Using a 1 token = ~4 chars heuristic for embedding approximations.
+	 *
+	 * @param string $type The operation type: 'vectorize' or 'retrieve'.
+	 * @param int    $char_length The total number of characters processed.
+	 */
+	public function add_embedding_tokens( $type, $char_length ) {
+		$estimated_tokens = (int) ceil( $char_length / 4 );
+
+		$totals = get_option( 'jeo_ai_embedding_tokens', array( 'vectorize' => 0, 'retrieve' => 0 ) );
+
+		if ( ! isset( $totals[ $type ] ) ) {
+			$totals[ $type ] = 0;
+		}
+
+		$totals[ $type ] += $estimated_tokens;
+		update_option( 'jeo_ai_embedding_tokens', $totals, false );
+	}
+
+	/**
+	 * Retrieve the aggregate embedding token counts.
+	 *
+	 * @return array
+	 */
+	public function get_embedding_tokens() {
+		return get_option( 'jeo_ai_embedding_tokens', array( 'vectorize' => 0, 'retrieve' => 0 ) );
 	}
 }

@@ -97,4 +97,8 @@ function jeo_deactivate() {
 register_activation_hook( __FILE__, 'jeo_activate' );
 register_deactivation_hook( __FILE__, 'jeo_deactivate' );
 
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	\WP_CLI::add_command( 'jeo ai', 'Jeo\CLI\AI_CLI' );
+}
+
 jeo();

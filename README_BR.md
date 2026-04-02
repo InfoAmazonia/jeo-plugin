@@ -4,15 +4,15 @@ O plugin JEO atua como uma plataforma de geojornalismo que permite a organizaç�
 
 Com o JEO, a criação da interação entre camadas de dados e informações contextuais é intuitiva e interativa. Você pode publicar matérias georreferenciadas e criar páginas ricamente desenhadas para cada uma das histórias em destaque.
 
-## 🤖 O que há de novo na v3.6.0 (Integração Neuron AI)
-O JEO evoluiu suas capacidades de Inteligência Artificial ao integrar o framework **Neuron AI**, proporcionando uma experiência de georreferenciamento mais robusta, estável e transparente.
+## 🤖 O que há de novo na v3.8.0 (RAG & Knowledge Base)
+O JEO evoluiu consideravelmente sua integração com o framework Neuron AI, introduzindo uma arquitetura nativa de **Retrieval-Augmented Generation (RAG)** que converte o conteúdo do WordPress no seu cérebro semântico e territorial privado.
 
-- **Motor de IA Unificado:** Agora alimentado pelo Neuron AI para interações padronizadas e saídas estruturadas (Structured Output).
-- **10 LLMs Suportadas:** Google Gemini, OpenAI (GPT-4o), DeepSeek, Anthropic Claude, Ollama (Local), Mistral AI, Zhipu AI (GLM), HuggingFace, Grok (xAI) e Cohere.
-- **Dashboard de Custos e Tokens:** Novo painel privado para monitorar o consumo de tokens (Input/Output) em tempo real para cada requisição de IA, armazenado nativamente no WordPress.
-- **Core PHP 8.2:** Infraestrutura atualizada exigindo PHP 8.2 ou superior para máxima performance e segurança.
-- **Aprovações Inteligentes:** Modal de validação visual aprimorado para revisar locais extraídos pela IA antes da publicação.
-- **Base de Conhecimento Autoritativa:** Mais de 10 dicionários de dados incorporados para territórios brasileiros (Biomas, Terras Indígenas, Quilombos e mais).
+- **Base de Conhecimento RAG:** Vetorize seus posts já publicados em massa via WP-CLI (`wp jeo ai vectorize`) gravando um banco de dados inteligente direto no disco (FileVectorStore).
+- **Recuperação Semântica (Retrieval):** Valide os modelos no painel do JEO usando busca por linguagem natural que encontra similaridade algorítmica de Cosseno sem precisar depender das tags do WordPress.
+- **Camada de Isolamento RAG:** Dois bancos físicos criados por padrão. Um de produção (`jeo_knowledge.store`) e um temporário para amostragem/testes de random posts (`jeo_knowledge_test.store`).
+- **Flexibilidade de Embeddings:** Confie nos defaults inteligentes (`text-embedding-3-small`, `nomic-embed-text`) ou insira o identificador oficial do provedor que quer testar entre os 10+ modelos (Google Gemini, OpenAI, Ollama, DeepSeek).
+- **Estimativa de Custos RAG:** O painel "AI Logs" agora conta a conversão de caracteres e estima os tokens gastos em Ingestion (armazenamento) e Retrieval (busca semântica).
+- **Motor Unificado Atualizado:** Interceptador de APIs ainda exigindo PHP 8.2 e injetando regras constitucionais por provedor para garantir o melhor Structured Output geográfico.
 
 ## 🕹️ Navegando no Painel JEO
 O menu administrativo do WordPress está organizado para um fluxo de trabalho geo-editorial profissional:

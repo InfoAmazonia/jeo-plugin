@@ -296,6 +296,194 @@ class AI_Handler {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-embedding',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_embedding' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-retrieval',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_retrieval' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'jeo/v1',
+			'/ai-clear-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_store' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+	}
+
+	public function api_clear_store( $request ) {
+		try {
+			$store = $request->get_param( 'store' );
+			if ( ! in_array( $store, [ 'test', 'production' ] ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'Invalid store type.', 'jeo' ) ], 400 );
+			}
+
+			$upload_dir = wp_upload_dir();
+			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
+			$store_name = ( $store === 'test' ) ? 'jeo_knowledge_test.store' : 'jeo_knowledge.store';
+			$file_path  = $store_dir . '/' . $store_name;
+
+			if ( file_exists( $file_path ) ) {
+				unlink( $file_path );
+			}
+
+			if ( $store === 'production' ) {
+				global $wpdb;
+				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s", '_jeo_vectorized_at' ) );
+			}
+
+			return new \WP_REST_Response( [
+				'success' => true,
+				'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
+			], 200 );
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( [ 
+				'success' => false, 
+				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+			], 200 );
+		}
+	}
+
+	public function api_test_retrieval( $request ) {
+		try {
+			$query = $request->get_param( 'query' );
+			$store = $request->get_param( 'store' );
+
+			if ( empty( $query ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'Query is required.', 'jeo' ) ], 400 );
+			}
+
+			// Initialize the RAG Agent to access Vector Store
+			$rag = new \Jeo\AI\RAG_Agent();
+			if ( $store === 'test' ) {
+				$rag->is_test_mode = true;
+			}
+
+			// Estimate tokens for the query
+			\jeo_ai_logger()->add_embedding_tokens( 'retrieve', strlen( $query ) );
+
+			// Use the native SimilarityRetrieval logic
+			$retrieval = $rag->resolveRetrieval();
+			$retrieved_docs = $retrieval->retrieve( new \NeuronAI\Chat\Messages\UserMessage( $query ) );
+
+			if ( empty( $retrieved_docs ) ) {
+				return new \WP_REST_Response( [
+					'success' => true,
+					'documents' => [],
+					'message' => __( 'No matches found in the selected Vector Store. Try vectorizing some posts first.', 'jeo' ),
+				], 200 );
+			}
+
+			$formatted_docs = [];
+			foreach ( $retrieved_docs as $doc ) {
+				$formatted_docs[] = [
+					'id' => $doc->getId(),
+					'score' => $doc->getScore(),
+					'content' => mb_strimwidth( $doc->getContent(), 0, 150, '...' ),
+					'metadata' => $doc->metadata,
+				];
+			}
+
+			return new \WP_REST_Response( [
+				'success' => true,
+				'documents' => $formatted_docs,
+			], 200 );
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( [ 
+				'success' => false, 
+				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+			], 200 );
+		}
+	}
+
+	public function api_test_embedding( $request ) {
+		try {
+			// Select a random post
+			$query = new \WP_Query( [
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'orderby'        => 'rand',
+			] );
+
+			if ( empty( $query->posts ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'No posts available to test.', 'jeo' ) ], 400 );
+			}
+
+			$post = $query->posts[0];
+
+			// Load into Document
+			$documents = \Jeo\AI\WP_Post_Data_Loader::load( [ $post ] );
+			if ( empty( $documents ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'The selected random post has no usable text content.', 'jeo' ) ], 400 );
+			}
+
+			$test_doc = $documents[0];
+
+			// Estimate tokens used for embedding test doc
+			\jeo_ai_logger()->add_embedding_tokens( 'vectorize', strlen( $test_doc->getContent() ) );
+
+			// Use the Factory to get the active embeddings provider
+			$embed_provider = \Jeo\AI\Neuron_Factory::get_active_embeddings_provider();
+
+			// Test the embed operation directly
+			$embedded_doc = $embed_provider->embedDocument( $test_doc );
+			$vector = $embedded_doc->getEmbedding();
+
+			if ( empty( $vector ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'The embedding provider returned an empty vector.', 'jeo' ) ], 500 );
+			}
+
+			// Save the embedded document to the TEST Vector Store so we can retrieve it later
+			$rag = new \Jeo\AI\RAG_Agent();
+			$rag->is_test_mode = true;
+			$rag->resolveVectorStore()->addDocument( $embedded_doc );
+
+			// Format dimensions text
+			$dimensions = count( $vector );
+			$preview_vector = array_slice( $vector, 0, 5 ); // Just show first 5 floats
+
+			return new \WP_REST_Response( [
+				'success' => true,
+				'message' => __( 'Embedding created and saved to Test Store!', 'jeo' ),
+				'details' => [
+					'post_id'         => $post->ID,
+					'post_title'      => $post->post_title,
+					'content_snippet' => mb_strimwidth( $test_doc->getContent(), 0, 200, '...' ),
+					'dimensions'      => $dimensions,
+					'vector_start'    => $preview_vector,
+				]
+			], 200 );
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( [ 
+				'success' => false, 
+				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+			], 200 );
+		}
 	}
 
 	/**

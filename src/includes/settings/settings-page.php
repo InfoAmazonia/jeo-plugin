@@ -363,9 +363,142 @@
 
 		-->
 		<div id="tab-knowledge" class="tabs-content">
-			<h2 style="margin-bottom: 20px;"><?php esc_html_e( 'Data Dictionaries', 'jeo' ); ?></h2>
-			
-			<div class="card" style="max-width: 100%; margin-top: 0; padding: 20px; border-radius: 8px;">
+<h2 style="margin-bottom: 20px;"><?php esc_html_e( 'Data Dictionaries', 'jeo' ); ?></h2>
+
+
+                        <div class="card" style="max-width: 100%; margin-top: 0; padding: 20px; border-radius: 8px;">
+                                <h3 style="margin-top: 0; color: #1d2327;">🧠 <?php esc_html_e( 'RAG Knowledge Base (Vector Store)', 'jeo' ); ?></h3>
+                                <p class="description"><?php esc_html_e( 'Vectorize your WordPress posts to allow the JEO AI to contextually answer questions and cross-reference territorial data.', 'jeo' ); ?></p>
+
+                                <table class="form-table" style="margin-top: 20px;">
+                                        <tbody>
+                                                <tr>
+                                                        <th scope="row"><label for="ai_embedding_model"><?php esc_html_e( 'Embedding Model (Optional)', 'jeo' ); ?></label></th>
+                                                        <td>
+                                                                <?php
+                                                                $current_embed_model = $this->get_option( 'ai_embedding_model' );
+                                                                $known_models = [
+                                                                        '', 'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002',
+                                                                        'models/text-embedding-004', 'models/embedding-001', 'nomic-embed-text', 'mxbai-embed-large'
+                                                                ];
+                                                                ?>
+                                                                <select name="<?php echo esc_html( $this->get_field_name( 'ai_embedding_model' ) ); ?>" id="ai_embedding_model" style="width: 100%; max-width: 400px;">
+                                                                        <option value="" <?php selected( $current_embed_model, '' ); ?>><?php esc_html_e( 'Auto (Recommended Default for Active Provider)', 'jeo' ); ?></option>
+
+                                                                        <?php if ( ! in_array( $current_embed_model, $known_models ) && ! empty( $current_embed_model ) ) : ?>
+                                                                                <option value="<?php echo esc_attr( $current_embed_model ); ?>" selected="selected"><?php echo esc_html( $current_embed_model ); ?> (Custom)</option>
+                                                                        <?php endif; ?>
+
+                                                                        <optgroup label="OpenAI">
+                                                                                <option value="text-embedding-3-small" <?php selected( $current_embed_model, 'text-embedding-3-small' ); ?>>text-embedding-3-small</option>
+                                                                                <option value="text-embedding-3-large" <?php selected( $current_embed_model, 'text-embedding-3-large' ); ?>>text-embedding-3-large</option>
+                                                                                <option value="text-embedding-ada-002" <?php selected( $current_embed_model, 'text-embedding-ada-002' ); ?>>text-embedding-ada-002</option>
+                                                                        </optgroup>
+                                                                        <optgroup label="Google Gemini">
+                                                                                <option value="models/text-embedding-004" <?php selected( $current_embed_model, 'models/text-embedding-004' ); ?>>models/text-embedding-004</option>
+                                                                                <option value="models/embedding-001" <?php selected( $current_embed_model, 'models/embedding-001' ); ?>>models/embedding-001</option>
+                                                                        </optgroup>
+                                                                        <optgroup label="Ollama (Local)">
+                                                                                <option value="nomic-embed-text" <?php selected( $current_embed_model, 'nomic-embed-text' ); ?>>nomic-embed-text</option>
+                                                                                <option value="mxbai-embed-large" <?php selected( $current_embed_model, 'mxbai-embed-large' ); ?>>mxbai-embed-large</option>
+                                                                        </optgroup>
+                                                                </select>
+                                                                <p class="description"><?php esc_html_e( 'Select an embedding model or type a custom one. Leave as "Auto" to use the recommended default for your active provider.', 'jeo' ); ?></p>
+                                                        </td>
+                                                </tr>
+                                        </tbody>
+                                </table>
+
+                                <div style="margin-top: 20px; display: flex; align-items: center; gap: 20px;">
+                                        <div>
+                                                <strong><?php esc_html_e( 'Status:', 'jeo' ); ?></strong>
+                                                <span style="color: #46b450; font-weight: bold;">
+                                                        <?php esc_html_e( 'Active (Local File Store)', 'jeo' ); ?>
+                                                </span>
+                                        </div>
+                                        <div>
+                                                <p style="margin: 0;"><em><?php esc_html_e( 'To vectorize posts, use the following WP-CLI command in your terminal:', 'jeo' ); ?></em></p>
+                                                <code style="display: block; margin-top: 5px; background: #000; color: #0f0; padding: 10px; border-radius: 4px;">wp jeo ai vectorize --post_type=post --batch_size=20</code>
+                                        </div>
+                                </div>
+
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccd0d4;">
+                                        <h4 style="margin-top: 0; margin-bottom: 10px;"><?php esc_html_e( 'Test Embeddings & RAG Retrieval', 'jeo' ); ?></h4>
+                                        <p class="description" style="margin-bottom: 15px;"><?php esc_html_e( 'Test your configured Embedding Model on a random post to ensure it works correctly before indexing your entire database. This uses a temporary testing store.', 'jeo' ); ?></p>
+
+                                        <div style="display: flex; gap: 15px; align-items: center;">
+                                                <button type="button" class="button button-primary" id="jeo-ai-test-embedding-btn"><?php esc_html_e( 'Run Test on Random Post', 'jeo' ); ?></button>
+                                                <button type="button" class="button button-secondary" id="jeo-ai-test-retrieval-btn"><?php esc_html_e( 'Test Vector Retrieval', 'jeo' ); ?></button>
+                                                <span id="jeo-ai-test-embedding-status" style="font-style:italic; font-weight: 500;"></span>
+                                        </div>
+                                        <div id="jeo-ai-test-embedding-results" style="margin-top: 15px; display: none; background: #f6f7f7; padding: 15px; border: 1px solid #dcdcde; border-radius: 6px;"></div>
+
+                                        <!-- RAG Retrieval Modal -->
+                                        <dialog id="rag-retrieval-modal" class="jeo-ai-modal jeo-dict-modal" style="width: 90%; max-width: 1000px;">
+                                                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #ccc; padding-bottom: 15px; margin-bottom: 20px; position: sticky; top: 0; background: #fff; z-index: 10;">
+                                                        <h2 style="margin:0;">🔍 <?php esc_html_e( 'Test Local Vector Retrieval', 'jeo' ); ?></h2>
+                                                        <button type="button" class="button jeo-ai-close-retrieval-modal-btn"><?php esc_html_e( 'Close', 'jeo' ); ?></button>
+                                                </div>
+
+                                                <div class="jeo-dict-content">
+                                                        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+                                                                <select id="rag-search-store" class="regular-text" style="width: auto;">
+                                                                        <option value="production"><?php esc_html_e( 'Search Production Store', 'jeo' ); ?></option>
+                                                                        <option value="test"><?php esc_html_e( 'Search Test Store', 'jeo' ); ?></option>
+                                                                </select>
+                                                                <input type="text" id="rag-search-input" class="regular-text" style="flex: 1; padding: 8px;" placeholder="<?php esc_attr_e( 'Search the Vector Store for semantic meaning (e.g., "Indigenous lands in Amazon")', 'jeo' ); ?>">
+                                                                <button type="button" class="button button-primary" id="rag-search-submit" style="padding: 0 20px;"><?php esc_html_e( 'Search', 'jeo' ); ?></button>
+                                                        </div>
+                                                        <div id="rag-search-results" style="min-height: 100px;">
+                                                                <p style="color: #646970; font-style: italic;"><?php esc_html_e( 'Enter a semantic search query to retrieve similar vectors from your local store.', 'jeo' ); ?></p>
+                                                        </div>
+                                                </div>
+                                        </dialog>
+                                </div>
+
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccd0d4;">
+                                        <h4 style="margin-top: 0; margin-bottom: 10px;">📖 <?php esc_html_e( 'How to use the Knowledge Base', 'jeo' ); ?></h4>
+                                        <p class="description" style="margin-bottom: 15px;"><?php esc_html_e( 'Once your posts are vectorized, the RAG Agent will automatically query this database when it needs context for Georeferencing. For example, if an article mentions "The community we visited in the Amazon", the AI will search the store for coordinates related to that community.', 'jeo' ); ?></p>
+                                        
+                                        <p style="margin-bottom: 5px;"><strong><?php esc_html_e( 'Document Schema Reference:', 'jeo' ); ?></strong></p>
+                                        <pre style="background: #f6f7f7; color: #2c3338; padding: 15px; border-radius: 4px; overflow-x: auto; font-family: monospace; font-size: 13px; border: 1px solid #dcdcde;">{
+  "id": "1412...",
+  "content": "Title: The Post Title\n\nContent: The post content without HTML tags...",
+  "embedding": [0.012, -0.045, 0.089, ...],
+  "metadata": {
+    "post_id": 1234,
+    "post_type": "post",
+    "title": "The Post Title",
+    "url": "https://yoursite.com/the-post-title",
+    "date": "2026-04-02 14:00:00"
+  }
+}</pre>
+                                </div>
+
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccd0d4;">
+                                        <h4 style="margin-top: 0; margin-bottom: 10px; color: #d63638;">⚠️ <?php esc_html_e( 'Maintenance & Cleanup', 'jeo' ); ?></h4>
+                                        <p class="description" style="margin-bottom: 15px;"><?php esc_html_e( 'Clear your vector databases. Clearing production will require you to run the WP-CLI vectorize command again to rebuild your Knowledge Base.', 'jeo' ); ?></p>
+                                        <div style="display: flex; gap: 15px;">
+                                                <button type="button" class="button jeo-ai-clear-store-btn" data-store="test"><?php esc_html_e( 'Clear Test Store', 'jeo' ); ?></button>
+                                                <button type="button" class="button jeo-ai-clear-store-btn" data-store="production" style="border-color: #d63638; color: #d63638;"><?php esc_html_e( 'Clear Production Store', 'jeo' ); ?></button>
+                                        </div>
+                                </div>
+
+                                <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ccd0d4;">
+                                        <h4 style="margin-top: 0; margin-bottom: 10px;"><?php esc_html_e( 'Advanced Connections', 'jeo' ); ?></h4>
+                                        <p class="description" style="margin-bottom: 15px;"><?php esc_html_e( 'By default, embeddings are saved securely in your wp-content folder. You can connect external vector databases below (Coming soon).', 'jeo' ); ?></p>
+                                        <div style="display: flex; gap: 15px;">
+                                                <button type="button" class="button button-secondary" disabled><?php esc_html_e( 'Connect Qdrant', 'jeo' ); ?></button>
+                                                <button type="button" class="button button-secondary" disabled><?php esc_html_e( 'Connect Supabase (pgvector)', 'jeo' ); ?></button>
+                                                <button type="button" class="button button-secondary" disabled><?php esc_html_e( 'Connect Pinecone', 'jeo' ); ?></button>
+                                        </div>
+                                </div>
+                        </div>
+
+
+
+
+<div class="card" style="max-width: 100%; margin-top: 30px; padding: 20px; border-radius: 8px;">
 				<h3 style="margin-top: 0;">🇧🇷 <?php esc_html_e( 'Embedded Brazilian Territories', 'jeo' ); ?></h3>
 				<p class="description"><?php esc_html_e( 'The following geographic dictionaries are available locally to improve AI precision:', 'jeo' ); ?></p>
 				
@@ -473,17 +606,6 @@
 				.jeo-dict-modal::backdrop { background: rgba(0,0,0,0.7); }
 				.jeo-dict-content { padding-bottom: 20px; }
 			</style>
-
-			<div class="card" style="max-width: 100%; margin-top: 30px; padding: 20px; border-radius: 8px; opacity: 0.7; background: #fafafa; border: 1px dashed #ccd0d4;">
-				<h3 style="margin-top: 0; color: #646970;">🔗 <?php esc_html_e( 'Advanced RAG Connections (Coming Soon)', 'jeo' ); ?></h3>
-				<p class="description"><?php esc_html_e( 'Connect your own external databases to provide custom context to the LLM.', 'jeo' ); ?></p>
-				
-				<div style="display: flex; gap: 15px; margin-top: 20px;">
-					<button type="button" class="button button-secondary" disabled><?php esc_html_e( 'Connect Supabase (PostgreSQL)', 'jeo' ); ?></button>
-					<button type="button" class="button button-secondary" disabled><?php esc_html_e( 'Connect SQLite Local', 'jeo' ); ?></button>
-					<button type="button" class="button button-secondary" disabled><?php esc_html_e( 'Connect N8N Webhook', 'jeo' ); ?></button>
-				</div>
-			</div>
 		</div>
 
 		<div id="tab-customize" class="tabs-content">

@@ -330,6 +330,172 @@
 		});
 
 		// ------------------------------------
+		// AI Embeddings Test Logic
+		// ------------------------------------
+		if ($.fn.select2) {
+			$('#ai_embedding_model').select2({
+				tags: true,
+				width: '100%'
+			});
+		}
+
+		$('#jeo-ai-test-embedding-btn').click(function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var $status = $('#jeo-ai-test-embedding-status');
+			var $results = $('#jeo-ai-test-embedding-results');
+
+			$btn.prop('disabled', true).text('Generating...');
+			$status.text('Fetching post and generating vector embeddings...').css('color', '#646970');
+			$results.hide().empty();
+
+			loggedApiFetch({
+				path: '/jeo/v1/ai-test-embedding',
+				method: 'POST'
+			}).then(function(res) {
+				if (res && res.success) {
+					$status.text('Success!').css('color', '#008a20');
+					var html = '<h4 style="margin-top:0;">' + res.message + '</h4>';
+					html += '<p><strong>Post Extracted:</strong> ' + res.details.post_title + ' (ID: ' + res.details.post_id + ')</p>';
+					html += '<p><strong>Vector Dimensions:</strong> ' + res.details.dimensions + '</p>';
+					html += '<p><strong>Text Snippet:</strong> <em>"' + (res.details.content_snippet || '') + '"</em></p>';
+					html += '<p><strong>Vector Preview:</strong> <code>[' + res.details.vector_start.join(', ') + '...]</code></p>';
+					$results.html(html).slideDown();
+				} else {
+					$status.text('Failed: ' + (res.message || res.error || 'Unknown error')).css('color', 'red');
+				}
+			}).catch(function(err) {
+				$status.text('Error: ' + (err.message || err.error || 'API call failed')).css('color', 'red');
+			}).finally(function() {
+				$btn.prop('disabled', false).text('Run Test on Random Post');
+			});
+		});
+
+		// ------------------------------------
+		// Store Cleanup Logic
+		// ------------------------------------
+		$('.jeo-ai-clear-store-btn').click(function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var store = $btn.data('store');
+
+			if (store === 'production') {
+				var confirm1 = confirm('Are you sure you want to clear the PRODUCTION vector store? This will delete all embeddings and require a full re-indexing via WP-CLI.');
+				if (!confirm1) return;
+				var confirm2 = confirm('WARNING: This action cannot be undone. Click OK to confirm or Cancel to abort.');
+				if (!confirm2) return;
+			} else {
+				var confirmTest = confirm('Clear the test vector store?');
+				if (!confirmTest) return;
+			}
+
+			var originalText = $btn.text();
+			$btn.prop('disabled', true).text('Clearing...');
+
+			loggedApiFetch({
+				path: '/jeo/v1/ai-clear-store',
+				method: 'POST',
+				data: { store: store }
+			}).then(function(res) {
+				if (res && res.success) {
+					alert('Success: ' + res.message);
+				} else {
+					alert('Failed: ' + (res.message || 'Unknown error'));
+				}
+			}).catch(function(err) {
+				alert('Error: ' + (err.message || err.error));
+			}).finally(function() {
+				$btn.prop('disabled', false).text(originalText);
+			});
+		});
+
+		// ------------------------------------
+		// RAG Retrieval Test Logic
+		// ------------------------------------
+		var $retrievalModal = $('#rag-retrieval-modal');
+
+		$('#jeo-ai-test-retrieval-btn').click(function(e) {
+			e.preventDefault();
+			if ($retrievalModal.length && $retrievalModal[0].showModal) {
+				$retrievalModal[0].showModal();
+			} else {
+				$retrievalModal.show(); // Fallback
+			}
+		});
+
+		$('.jeo-ai-close-retrieval-modal-btn').click(function(e) {
+			e.preventDefault();
+			if ($retrievalModal.length && $retrievalModal[0].close) {
+				$retrievalModal[0].close();
+			} else {
+				$retrievalModal.hide(); // Fallback
+			}
+		});
+
+		$('#rag-search-submit').click(function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var query = $('#rag-search-input').val();
+			var store = $('#rag-search-store').val();
+			var $resultsContainer = $('#rag-search-results');
+
+			if (!query) return;
+
+			$btn.prop('disabled', true).text('Searching...');
+			$resultsContainer.html('<p>Searching the ' + store + ' vector store...</p>');
+
+			loggedApiFetch({
+				path: '/jeo/v1/ai-test-retrieval',
+				method: 'POST',
+				data: { query: query, store: store }
+			}).then(function(res) {
+				if (res && res.success) {
+					if (!res.documents || res.documents.length === 0) {
+						$resultsContainer.html('<p style="color: #d63638;">' + (res.message || 'No documents found. Did you run the vectorize CLI command?') + '</p>');
+						return;
+					}
+
+					var html = '<table class="wp-list-table widefat fixed striped" style="margin-top: 15px;">';
+					html += '<thead><tr><th style="width: 15%;">Score / Relevance</th><th style="width: 25%;">Metadata</th><th>Content Snippet</th></tr></thead><tbody>';
+					
+					res.documents.forEach(function(doc) {
+						var metaHtml = '';
+						if (doc.metadata) {
+							metaHtml += '<strong>' + (doc.metadata.title || 'Untitled') + '</strong><br>';
+							metaHtml += 'ID: ' + (doc.metadata.post_id || 'N/A') + '<br>';
+							metaHtml += 'Type: ' + (doc.metadata.post_type || 'N/A');
+						}
+
+						// Calculate percentage for score (simplified)
+						var scoreLabel = typeof doc.score === 'number' ? doc.score.toFixed(4) : doc.score;
+
+						html += '<tr>';
+						html += '<td><span style="background:#e0f0fa; color:#005a9e; padding:3px 6px; border-radius:3px; font-weight:bold;">' + scoreLabel + '</span></td>';
+						html += '<td>' + metaHtml + '</td>';
+						html += '<td style="font-size: 13px;">' + (doc.content || '') + '</td>';
+						html += '</tr>';
+					});
+
+					html += '</tbody></table>';
+					$resultsContainer.html(html);
+				} else {
+					$resultsContainer.html('<p style="color: red;">Error: ' + (res.message || 'Unknown error') + '</p>');
+				}
+			}).catch(function(err) {
+				$resultsContainer.html('<p style="color: red;">Request failed: ' + (err.message || err.error) + '</p>');
+			}).finally(function() {
+				$btn.prop('disabled', false).text('Search');
+			});
+		});
+
+		$('#rag-search-input').keydown(function(e) {
+			if (e.key === 'Enter') {
+				e.preventDefault();
+				$('#rag-search-submit').click();
+			}
+		});
+
+		// ------------------------------------
 		// Skeleton Loader & Initial State
 		// ------------------------------------
 		setTimeout(function() {

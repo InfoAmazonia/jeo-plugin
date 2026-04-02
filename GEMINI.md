@@ -15,16 +15,21 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 
 ---
 
-## 2. Motor de Inteligência Artificial (v3.6.x)
+## 2. Motor de Inteligência Artificial (v3.6.x -> v3.8.x)
 
 O JEO utiliza o framework **Neuron AI** como motor universal de LLM. 
 
 ### 2.1. Neuron Agent & Adapters
-- **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas para APIs de LLM.
-- **Configuração Determinística:** Todos os modelos são configurados com `temperature = 0.1` para garantir que a extração de coordenadas seja precisa e não criativa.
+- **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas para APIs de LLM. O `Neuron_Factory` centraliza a instanciação de provedores de Chat e Embeddings.
+- **Configuração Determinística:** Todos os modelos de Chat são configurados com `temperature = 0.1` para garantir que a extração de coordenadas seja precisa e não criativa.
 - **Provedores:** Suporte nativo a 10 provedores (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, etc.) configuráveis na Aba AI.
 
-### 2.2. Model-Aware Prompt Optimization & Verbatim Mandate
+### 2.2. RAG Knowledge Base (Vector Store)
+- **Caminho Seguro:** Os embeddings são armazenados estritamente na pasta `wp-content/uploads/jeo-ai-store/` protegida por `.htaccess` contra acesso público via web.
+- **Isolamento de Ambiente:** O JEO possui duas bases vetoriais físicas. O `jeo_knowledge.store` (Produção, preenchido via CLI) e o `jeo_knowledge_test.store` (Testes, preenchido via interface admin). NUNCA misture as duas bases.
+- **Limitações de API:** Modelos de Chat (`gpt-4o`, `gemini-2.5-flash`) não suportam vetorização. O `Neuron_Factory` deve SEMPRE forçar a injeção de modelos focados em embeddings (`text-embedding-3-small`, `models/text-embedding-004`) para a `EmbeddingsProviderInterface` caso o usuário não defina um modelo customizado na interface.
+
+### 2.3. Model-Aware Prompt Optimization & Verbatim Mandate
 - O **AI Prompt Engineer Assistant** intercepta a requisição e injeta "Regras Constitucionais" específicas dependendo do provedor ativo:
   - **Gemini:** Exige Markdown estrito e instrução passo a passo. Injeta forçosamente `responseMimeType: application/json` via `generationConfig`.
   - **OpenAI:** Otimizado com regras abstratas e concisas.
@@ -71,6 +76,8 @@ Todos os dados geográficos de um post são armazenados em um único metadado ch
 5. **NÃO permita que a IA defina o formato de saída:** Sempre injete o contrato JSON agressivo (`enforced_schema`) para evitar que modelos "espertos" retornem objetos aninhados ou chaves inventadas.
 6. **NÃO injete prompts via `$this->instructions()` no Neuron AI:** Na classe base do Neuron AI (`NeuronAI\Agent\Agent`), o método `instructions()` é um **getter** interno que não aceita argumentos e retorna o texto padrão ("You are a helpful and friendly AI..."). Para injetar o System Prompt do JEO e forçar o contrato do JSON, você **DEVE** utilizar o **setter** correto: `$this->setInstructions($prompt);`. O uso incorreto fará a LLM ignorar o esquema do JEO e gerar um JSON genérico e quebrado.
 7. **NÃO remova a flag `[SKIP_ENFORCED_SCHEMA]` de ferramentas internas:** Como o JEO injeta agressivamente o contrato JSON em todas as chamadas de georreferenciamento (via `AI_Adapter::get_system_prompt()`), ferramentas internas que reaproveitam o LLM para "meta-tarefas" (como o *Prompt Generator* ou o *API Key Tester*) falharão ao usar modelos estritos como a OpenAI, pois o modelo obedecerá a regra de retornar `[]` se não achar locais geográficos reais no texto. Sempre inicie o prompt dessas ferramentas internas com `[SKIP_ENFORCED_SCHEMA]` para desativar temporariamente o contrato.
+8. **NÃO acesse Vector Stores no painel web:** A vetorização em massa causa exaustão de PHP `max_execution_time`. SEMPRE adicione novos documentos (Ingestion) ao RAG através da CLI (`wp jeo ai vectorize`). O dashboard é apenas para testes com posts aleatórios (amostragem) e buscas.
+9. **NÃO sobrescreva propriedades privadas do NeuronAI RAG:** Como observado na classe base, injetar propriedades de RAG incorretamente (`embeddingsProvider` vs `embeddings()`) causará *Fatal Errors*. Use SEMPRE os setters oficiais ou estenda os métodos `resolve...` da biblioteca Neuron.
 
 ---
 

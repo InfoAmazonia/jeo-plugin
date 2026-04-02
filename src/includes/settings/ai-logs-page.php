@@ -75,6 +75,42 @@
 			echo '</div><hr>';
 		}
 
+		$embedding_tokens = \jeo_ai_logger()->get_embedding_tokens();
+		$total_embeddings = $embedding_tokens['vectorize'] + $embedding_tokens['retrieve'];
+
+		if ( $total_embeddings > 0 ) {
+			echo '<h2 style="margin-top: 30px;">' . esc_html__( 'RAG & Vectorization Estimates', 'jeo' ) . '</h2>';
+			echo '<p class="description">' . esc_html__( 'These numbers represent the estimated tokens consumed to create and query your RAG Knowledge Base. Since embedding models do not natively report their specific usage, the system estimates the token count via mathematical approximation.', 'jeo' ) . '</p>';
+
+			echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 20px 0;">';
+			
+			// Vectorize Card
+			echo '
+			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #46b450; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Document Vectorization', 'jeo' ) . '</div>
+				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #46b450;">
+					' . number_format_i18n( $embedding_tokens['vectorize'] ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+				</div>
+				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
+					' . esc_html__( 'Tokens used inserting posts to Vector Store.', 'jeo' ) . '
+				</div>
+			</div>';
+
+			// Retrieve Card
+			echo '
+			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #f56e28; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
+				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Semantic Retrieval', 'jeo' ) . '</div>
+				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #f56e28;">
+					' . number_format_i18n( $embedding_tokens['retrieve'] ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+				</div>
+				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
+					' . esc_html__( 'Tokens used mapping user queries to vectors.', 'jeo' ) . '
+				</div>
+			</div>';
+
+			echo '</div><hr>';
+		}
+
 		$search_term = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; 
 		$current_page = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
 		$per_page     = 25;

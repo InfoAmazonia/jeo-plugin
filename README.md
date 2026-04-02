@@ -4,15 +4,15 @@ The JEO plugin acts as a geojournalism platform that allows news organizations, 
 
 With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories.
 
-## 🤖 What's new in v3.6.0 (Neuron AI Integration)
-JEO has evolved its AI capabilities by integrating the **Neuron AI Framework**, providing a more robust, stable, and transparent georeferencing experience.
+## 🤖 What's new in v3.8.0 (RAG & Knowledge Base Integration)
+JEO has evolved its AI capabilities by introducing a **Retrieval-Augmented Generation (RAG)** architecture built on top of the Neuron AI Framework, allowing your entire WordPress content to act as a semantic geographic brain.
 
-- **Unified AI Engine:** Now powered by Neuron AI for standardized interactions and structured outputs.
-- **10 Supported LLMs:** Google Gemini, OpenAI (GPT-4o), DeepSeek, Anthropic Claude, Ollama (Local), Mistral AI, Zhipu AI (GLM), HuggingFace, Grok (xAI), and Cohere.
-- **Cost & Token Dashboard:** A new private dashboard to monitor real-time token consumption (Input/Output) for every AI request, stored natively in WordPress.
-- **PHP 8.2 Core:** Upgraded infrastructure requiring PHP 8.2 or higher for maximum performance and security.
-- **Smart Approvals:** Enhanced visual validation modal to review AI-extracted locations before publishing.
-- **Authoritative Knowledge Base:** Over 10 embedded data dictionaries for Brazilian territories (Biomes, Indigenous Lands, Quilombolas, and more).
+- **RAG Knowledge Base:** Your published posts can now be vectorized via WP-CLI (`wp jeo ai vectorize`) and saved locally into a secure `FileVectorStore`.
+- **Semantic Retrieval:** Test the power of vector similarity directly from the JEO Settings panel using the built-in natural language search engine.
+- **Dual Vector Environments:** Isolate tests on random posts (`jeo_knowledge_test.store`) before indexing your entire production database (`jeo_knowledge.store`).
+- **Flexible Embeddings:** Define specific embedding models manually or rely on JEO's intelligent defaults (e.g. `text-embedding-3-small`, `nomic-embed-text`) across 10 supported LLMs.
+- **RAG Cost Estimations:** The AI Dashboard now intercepts and approximates the token overhead from your Vectorization (Ingestion) and Retrieval workloads.
+- **Unified AI Engine:** Now powered by Neuron AI for standardized interactions and structured outputs across Google Gemini, OpenAI, DeepSeek, Anthropic Claude, Ollama (Local), and more.
 
 ## 🕹️ Navigating the JEO Panel
 The WordPress admin menu is organized for a professional Geo-Editorial workflow:

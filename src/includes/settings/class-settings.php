@@ -27,7 +27,8 @@ class Settings {
 			'jeo_footer-logo'                 => '',
 			'show_storymaps_on_post_archives' => 0,
 			'ai_default_provider'             => 'gemini',
-			
+			'ai_embedding_model'              => '',
+
 			// Gemini
 			'gemini_api_key'                  => '',
 			'gemini_model'                    => 'gemini-2.5-flash',
