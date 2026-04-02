@@ -450,7 +450,9 @@ class Jeo {
 			}
 		);
 
-		return '<div class="story-map-container" data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'story-map-container' ) );
+
+		return '<div ' . $wrapper_attributes . ' data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
 	}
 
 	public function filter_rest_query_by_zone( $args, $request ) {
