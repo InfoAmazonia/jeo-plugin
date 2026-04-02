@@ -753,10 +753,15 @@ class Jeo {
 			$wp_post_types['storymap']->template_lock = 'all';
 
 			if ( isset( $wp_post_types['map'] ) ) {
-				$wp_post_types['map']->template      = array(
-					array( 'jeo/map-editor', array( 'align' => 'full' ) ),
+				$wp_post_types['map']->template = array(
+					array( 'jeo/map-editor', array(
+						'align' => 'full',
+						'lock' => array(
+							'move'   => true,
+							'remove' => true,
+						),
+					) ),
 				);
-				$wp_post_types['map']->template_lock = 'all';
 			}
 
 			if ( isset( $wp_post_types['map-layer'] ) ) {
