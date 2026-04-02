@@ -701,7 +701,7 @@ class Jeo {
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/map-editor' ) ) {
-				$response->data['content']['raw'] = '<!-- wp:jeo/map-editor {"align":"full"} /-->';
+				$response->data['content']['raw'] = '<!-- wp:jeo/map-editor {"align":"full"} /-->' . $raw;
 			}
 		}
 		return $response;
