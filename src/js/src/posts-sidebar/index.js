@@ -166,7 +166,8 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 					<Modal
 						title={ __( 'Review AI Suggestions', 'jeo' ) }
 						onRequestClose={ () => this.setState( { isApprovalModalOpen: false } ) }
-						style={ { width: '550px' } }
+						className="jeo-geocode-modal"
+						isFullScreen={ true }
 					>
 						<JeoGeocodePostsAI
 							aiSuggestedLocations={ aiSuggestedLocations }
