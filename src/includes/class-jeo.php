@@ -62,7 +62,6 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
-		add_action( 'cli_init', array( $this, 'register_cli_commands' ) );
 
 		add_action( 'init', array( $this, 'restrict_story_map_block_count' ) );
 
@@ -451,7 +450,9 @@ class Jeo {
 			}
 		);
 
-		return '<div class="story-map-container" data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'story-map-container' ) );
+
+		return '<div ' . $wrapper_attributes . ' data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
 	}
 
 	public function filter_rest_query_by_zone( $args, $request ) {
