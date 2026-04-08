@@ -1,5 +1,4 @@
 import JeoLegendTypes from './JeoLegendTypes';
-import generateUUID from '../../js/src/util/generate-uuid';
 
 class JeoLegend {
 	constructor( legendTypeSlug, attributes ) {
@@ -35,11 +34,11 @@ class JeoLegend {
 				right_label: '100',
 				colors: [ {
 					color: '#ff0909',
-					id: generateUUID(),
+					id: crypto.randomUUID(),
 					},
 					{
 					color:'#000',
-					id: generateUUID(),
+					id: crypto.randomUUID(),
 					}
 				],
 			},

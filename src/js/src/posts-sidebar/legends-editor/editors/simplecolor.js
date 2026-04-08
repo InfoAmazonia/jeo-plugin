@@ -4,7 +4,6 @@ import { __ } from '@wordpress/i18n';
 
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
-import generateUUID from '../../../util/generate-uuid';
 import '../editors/simplecolor.css';
 
 class SimplecolorEditor extends Component {
@@ -34,7 +33,7 @@ class SimplecolorEditor extends Component {
 							}
 							return {
 								...result,
-								id: generateUUID(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -100,7 +99,7 @@ class SimplecolorEditor extends Component {
 			}
 
 			colors.push(
-				{ label: 'Default name', color: randomColor, id: generateUUID() },
+				{ label: 'Default name', color: randomColor, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
