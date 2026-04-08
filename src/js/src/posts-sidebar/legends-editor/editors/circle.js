@@ -1,7 +1,6 @@
 import { Component, Fragment } from '@wordpress/element';
 import { TextControl, RangeControl, Button, Dropdown, ColorPicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import generateUUID from '../../../util/generate-uuid';
 import '../editors/circle.css';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
@@ -27,7 +26,7 @@ class CircleEditor extends Component {
 						circles: [ ...legendData.attributes.legend_type_options.circles.map( ( item ) => {
 							return {
 								...item,
-								id: generateUUID(),
+								id: crypto.randomUUID(),
 							};
 						} ) ],
 					},
@@ -50,7 +49,7 @@ class CircleEditor extends Component {
 			const circles = this.state.legendObject.attributes.legend_type_options.circles;
 
 			circles.push(
-				{ label: 'Default Label', radius: 50, id: generateUUID() },
+				{ label: 'Default Label', radius: 50, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.circles = circles;
