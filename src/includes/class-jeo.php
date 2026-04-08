@@ -288,6 +288,7 @@ class Jeo {
 		register_block_type(
 			'jeo/storymap',
 			array(
+				'api_version'     => 2,
 				'render_callback' => array( $this, 'story_map_dynamic_render_callback' ),
 				'editor_script'   => 'jeo-map-blocks',
 				'editor_style'    => 'jeo-map-blocks',
@@ -296,6 +297,7 @@ class Jeo {
 		register_block_type(
 			'jeo/embedded-storymap',
 			array(
+				'api_version'     => 2,
 				'render_callback' => array( $this, 'embedded_story_map_dynamic_render_callback' ),
 				'editor_script'   => 'jeo-map-blocks',
 				'editor_style'    => 'jeo-map-blocks',
@@ -303,8 +305,34 @@ class Jeo {
 		);
 	}
 
+	/**
+	 * Extract JSON content from block save output.
+	 * Handles both legacy format (raw JSON string) and API v2+ format
+	 * (JSON wrapped in a <div> element with useBlockProps).
+	 *
+	 * @param string $content Block save output.
+	 * @return string Extracted JSON string.
+	 */
+	private function extract_json_from_block_content( $content ) {
+		$content = trim( $content );
+
+		// If it's already valid JSON, return as-is (legacy format)
+		$decoded = json_decode( $content );
+		if ( json_last_error() === JSON_ERROR_NONE ) {
+			return $content;
+		}
+
+		// API v2+ format: JSON is wrapped in a <div> element
+		// Strip the outer HTML wrapper to get the JSON content inside
+		$inner = preg_replace( '/^<div[^>]*>/', '', $content );
+		$inner = preg_replace( '/<\/div>$/', '', $inner );
+		$inner = trim( $inner );
+
+		return $inner;
+	}
+
 	public function embedded_story_map_dynamic_render_callback( $block_attributes, $content ) {
-		$content = json_decode( $content );
+		$content = json_decode( $this->extract_json_from_block_content( $content ) );
 
 		$story_id                       = $content->attributes->storyID;
 		$story                          = get_post( $story_id );
@@ -326,7 +354,7 @@ class Jeo {
 	}
 
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
-		$saved_data = json_decode( $content );
+		$saved_data = json_decode( $this->extract_json_from_block_content( $content ) );
 
 		$map_id     = $saved_data->map_id;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
