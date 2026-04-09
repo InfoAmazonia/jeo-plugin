@@ -1,6 +1,6 @@
-import { TextControl } from '@wordpress/components';
 import { PluginPostStatusInfo } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
+import { TextControl } from '../shared/wp-form-controls';
 
 import './map-embed-url.css';
 

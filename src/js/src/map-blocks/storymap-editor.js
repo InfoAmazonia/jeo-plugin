@@ -22,7 +22,7 @@ import {
 } from 'ckeditor5';
 import 'ckeditor5/ckeditor5.css';
 import { useBlockProps } from '@wordpress/block-editor';
-import { Button, CheckboxControl, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
+import { Button, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { chevronDown, chevronUp, lock, unlock, seen, trash, plus } from '@wordpress/icons';
 import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
@@ -30,6 +30,7 @@ import { Fragment, useEffect, useId, useMemo, useState } from '@wordpress/elemen
 import { __ } from '@wordpress/i18n';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { List, arrayMove } from 'react-movable';
+import { CheckboxControl } from '../shared/wp-form-controls';
 
 import { createUploadAdapter } from './cke5-image-upload';
 import { baseColors } from './color-palettes';

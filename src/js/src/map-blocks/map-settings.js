@@ -1,11 +1,13 @@
 import {
-	TextControl,
-	RangeControl,
-	CheckboxControl,
 	Button,
 } from '@wordpress/components';
 import { Fragment, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	CheckboxControl,
+	RangeControl,
+	TextControl,
+} from '../shared/wp-form-controls';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
