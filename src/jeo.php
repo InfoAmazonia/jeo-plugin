@@ -6,7 +6,7 @@
  *
  * @wordpress-plugin
  * Plugin Name:       JEO WP
- * Description:       Interactive Map blocks for WordPress Gutenberg
+ * Description:       Interactive map blocks for Gutenberg
  * Version:           3.0.0-rc.3
  * Requires at least: 6.6
  * Requires PHP:      8.0

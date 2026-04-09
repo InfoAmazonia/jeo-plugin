@@ -550,7 +550,9 @@ class Jeo {
 		// The `use_smilies` option breaks the returned HTML.
 		add_filter( 'option_use_smilies', '__return_false' );
 
-		return '<div class="story-map-container" data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
+		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'story-map-container' ) );
+
+		return '<div ' . $wrapper_attributes . ' data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
 	}
 
 	/**
@@ -872,7 +874,7 @@ class Jeo {
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/map-editor' ) ) {
-				$response->data['content']['raw'] = '<!-- wp:jeo/map-editor {"align":"full"} /-->';
+				$response->data['content']['raw'] = '<!-- wp:jeo/map-editor {"align":"full"} /-->' . $raw;
 			}
 		}
 		return $response;
@@ -935,10 +937,15 @@ class Jeo {
 			$wp_post_types['storymap']->template_lock = 'all';
 
 			if ( isset( $wp_post_types['map'] ) ) {
-				$wp_post_types['map']->template      = array(
-					array( 'jeo/map-editor', array( 'align' => 'full' ) ),
+				$wp_post_types['map']->template = array(
+					array( 'jeo/map-editor', array(
+						'align' => 'full',
+						'lock' => array(
+							'move'   => true,
+							'remove' => true,
+						),
+					) ),
 				);
-				$wp_post_types['map']->template_lock = 'all';
 			}
 
 			if ( isset( $wp_post_types['map-layer'] ) ) {
