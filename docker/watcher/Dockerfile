@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:20
 
 LABEL mantainer "hacklab/ <contato@hacklab.com.br>"
 

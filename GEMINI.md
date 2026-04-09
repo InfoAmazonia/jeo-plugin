@@ -1,111 +1,97 @@
-# Contexto do Plugin JEO - Gemini CLI (v3.5.4-experimental Master)
+# JEO Plugin - Master Architecture Guide & Mandates (v3.6.3-experimental)
 
-O JEO é uma plataforma de geojornalismo para WordPress que permite a organizações de notícias, blogueiros e ONGs publicarem matérias jornalísticas como camadas de informações em mapas digitais interativos.
-
-**Status Atual:** Versão **3.5.4-experimental**. O projeto consolidou seu ecossistema de Inteligência Artificial, segurança de credenciais, curadoria territorial brasileira, expandiu o suporte a múltiplos motores de renderização e implementou integração dinâmica e universal para Custom Post Types (ACF, Pods, etc).
+Este documento é a autoridade máxima sobre a arquitetura do plugin JEO. Qualquer alteração, refatoração ou adição de funcionalidade deve respeitar estritamente as diretrizes aqui estabelecidas para garantir a estabilidade e a integridade dos dados geográficos.
 
 ---
 
-## 1. Visão Geral da Arquitetura
+## 1. Visão Geral e Propósito
+O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em camadas de dados interativos, permitindo a geolocalização manual ou automatizada (via IA) de matérias jornalísticas.
 
-O JEO é construído com uma separação clara entre o motor de dados (PHP) e a interface de blocos interativos (React).
-
-- **Tipo:** Plugin para WordPress.
-- **Backend (PHP):** WordPress Plugin API, Programação Orientada a Objetos (OOP), Padrão Singleton, Autoloader Personalizado.
-- **Frontend (JS/TS):** React, Gutenberg Blocks, `@wordpress/scripts`, Webpack.
-- **Renderização de Mapas:** Suporte trial para **MapLibre GL JS** (padrão nativo v3.5+), **Mapbox GL JS** e **Google Maps JS API**.
-- **Ambiente de Desenvolvimento:** Docker Compose (WordPress + MariaDB).
+### Stack Tecnológica:
+- **Backend:** PHP 8.2+ (Obrigatório), Composer para gerenciamento de dependências.
+- **AI Engine:** Neuron AI Framework.
+- **Frontend:** React, Gutenberg Blocks, MapLibre GL / Mapbox GL.
+- **Infraestrutura Local:** Docker Compose (Apache + MariaDB, Porta 8072).
 
 ---
 
-## 2. Ecossistema de Inteligência Artificial (v3.5.x)
+## 2. Motor de Inteligência Artificial (v3.6.3-experimental)
 
-O coração desta versão é o Co-Piloto Editorial de Georreferenciamento Automatizado.
+O JEO utiliza o framework **Neuron AI** como motor universal de LLM. 
 
-### 2.1. Arquitetura de Adapters
-Localizado em `src/includes/ai/`, o sistema usa o padrão **Factory/Adapter** injetado via `AI_Handler`.
-- **Provedores Suportados (2026):**
-  - **Google Gemini:** Utiliza `gemini-2.5-flash`.
-  - **OpenAI:** Utiliza `gpt-4o`.
-  - **DeepSeek:** Utiliza `deepseek-chat`.
-- **Configuração Determinística:** Todas as chamadas são forçadas com **Temperature = 0.1**.
+### 2.1. Neuron Agent & Adapters
+- **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas para APIs de LLM. O `Neuron_Factory` centraliza a instanciação de provedores de Chat e Embeddings.
+- **Configuração Determinística:** Todos os modelos de Chat são configurados com `temperature = 0.1` para garantir que a extração de coordenadas seja precisa e não criativa.
+- **Provedores:** Suporte nativo a 10 provedores (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, etc.) configuráveis na Aba AI.
 
-### 2.2. Blindagem de Prompt e Resiliência
-- **Prompt API Level:** Injeção de cláusula de **Enforced Schema** inquebrável no final de qualquer prompt customizado, garantindo retorno obrigatório de `"name", "lat", "lng", "quote"`. 
-- **Agressive JSON Parser:** Método `parse_json_from_text` (em `AI_Adapter.php`) utiliza Regex para ignorar lixo conversacional e extrair apenas o array de objetos.
+### 2.2. RAG Knowledge Base (Vector Store)
+- **Caminho Seguro:** Os embeddings são armazenados estritamente na pasta `wp-content/uploads/jeo-ai-store/` protegida por `.htaccess` contra acesso público via web.
+- **Isolamento de Ambiente:** O JEO possui duas bases vetoriais físicas. O `jeo_knowledge.store` (Produção, preenchido via CLI) e o `jeo_knowledge_test.store` (Testes, preenchido via interface admin). NUNCA misture as duas bases.
+- **Limitações de API:** Modelos de Chat (`gpt-4o`, `gemini-2.5-flash`) não suportam vetorização. O `Neuron_Factory` deve SEMPRE forçar a injeção de modelos focados em embeddings (`text-embedding-3-small`, `models/text-embedding-004`) para a `EmbeddingsProviderInterface` caso o usuário não defina um modelo customizado na interface.
 
-### 2.3. Sistema de RAG Leve (Base de Conhecimento)
-- **Localização:** `src/includes/ai/data/*.json`.
-- **Dicionários Territoriais:** 10 categorias embarcadas (Biomas, TIs, Quilombos, etc.) que agem como autoridade geográfica durante o georreferenciamento por IA. Injetado dinamicamente caso o termo seja detectado no texto.
+### 2.3. Model-Aware Prompt Optimization & Verbatim Mandate
+- O **AI Prompt Engineer Assistant** intercepta a requisição e injeta "Regras Constitucionais" específicas dependendo do provedor ativo:
+  - **Gemini:** Exige Markdown estrito e instrução passo a passo. Injeta forçosamente `responseMimeType: application/json` via `generationConfig`.
+  - **OpenAI:** Otimizado com regras abstratas e concisas.
+  - **DeepSeek:** Utiliza blocos de tags XML (`<rules>`) para guiar o raciocínio.
+  - **Anthropic:** Abordagem negativa constitucional ("O que não fazer").
+- **Verbatim Mandate:** O Assistente é proibido de resumir as regras de saída. Ele deve anexar obrigatoriamente um bloco de texto imutável (verbatim) definindo o contrato JSON do JEO, incluindo o exemplo do "Teatro Amazonas".
+
+### 2.3. Surgical JSON Parser (Depth Balancing)
+- **Resiliência contra Lixo:** O JEO utiliza um extrator de JSON via profundidade de colchetes. Ele localiza o primeiro `[` e busca o seu `]` correspondente exato. Isso ignora qualquer conteúdo extra (conversas, tópicos, keywords) que o modelo tente adicionar fora do array principal.
+- **Negative Key Constraints:** O prompt do sistema proíbe explicitamente que a IA invente chaves como `"city"`, `"country"`, `"continent"` ou `"type"`. O retorno deve conter apenas as chaves do contrato: `"name"`, `"lat"`, `"lng"`, `"quote"`.
+
+### 2.4. Cost Dashboard (Gestão de Custos)
+- **Salvamento de Tokens:** O plugin utiliza a classe `AI_Logger` para persistir o consumo de tokens (`input_tokens` e `output_tokens`) no Custom Post Type privado `jeo-ai-log`.
+- **Integridade:** As métricas de custo são extraídas via `$message->getUsage()` após cada interação do Agente.
 
 ---
 
 ## 3. Experiência do Usuário (Settings UI)
 
 ### 3.1. Engenharia de Prompt e Assistant
-- **Aba AI:** Refinamento de prompt com Assistente de Chat e persistência em `localStorage` (`jeo_ai_assistant_context`).
-- **Live Validator:** Botão de simulação real antes do salvamento definitivo.
-- **Auto-Teste de Chave:** Validação instantânea de API Keys ao carregar a aba. Bloqueia o salvamento do painel caso a chave do provedor ativo esteja vazia.
-
-### 3.2. Configuração Universal de Post Types
-- **Integração Dinâmica:** O JEO detecta automaticamente `Custom Post Types` públicos registrados no sistema (nativos, ACF, Pods ou via código).
-- **Settings UI:** A gestão ocorre por meio de `checkboxes` dinâmicos na página de configurações, substituindo o antigo input estático (texto). A interface filtra tipos internos como `map` e `map-layer` para segurança.
-
-### 3.3. Navegação e Performance
-- **Skeleton Loader:** Transições suaves de 1 segundo entre abas.
-- **Knowledge Base:** Gestão de dicionários com Visualizer Unificado (Listagem e Raw JSON) em modal de 85vh e Download Seguro.
+- **Aba AI:** Refinamento de prompt com Assistente de Chat e persistência em `localStorage`. A tela renderiza dinamicamente as **API Keys** e **Models** de acordo com o provedor ativado.
+- **AI API Debugger:** Terminal integrado que intercepta e exibe as requisições e respostas JSON brutas. As chaves de API são anonimizadas (`AizaS*****hCuhs`) automaticamente para permitir auditoria segura.
+- **Dynamic Model Fetcher:** Botão "Change Model" que consulta as APIs dos provedores em tempo real e popula um campo de busca `Select2` (Searchable & Taggable).
+- **Live Validator:** Simulação real contra um texto de teste global diversificado (Paris, Manaus, Tóquio) para evitar falhas de falso-positivo em regras regionais.
 
 ---
 
-## 4. Persistência de Dados e Segurança
+## 4. Persistência de Dados e Geolocalização
 
-### 4.1. WordPress REST Schema
-- **Injeção Tardia e Força de Suporte (Priority 99):** O registro do esquema de geolocalização e metadados R.E.S.T. (incluindo `_geocode_lat`, `_ai_quote`, etc.) ocorre no gancho `init` tardiamente. Adicionalmente, o JEO força a injeção via `add_post_type_support( $type, 'custom-fields' )` em todos os Custom Post Types (como ACF ou Pods) habilitados, garantindo que a API R.E.S.T. do WordPress processe e salve o payload na chave `meta` sem descartes silenciosos.
-- **Propriedades Registradas:** O campo `_ai_quote` está integrado ao Schema do `_related_point`, permitindo salvar o contexto original da IA no banco de dados. O React limpa chaves impuras antes de submeter ao WP REST API.
-
-### 4.2. Segurança e Ciclo de Vida
-- **Desativação:** Limpa **API Keys** e logs físicos. Exibe alerta de confirmação em JS na tela de plugins.
-- **Exclusão:** `uninstall.php` remove as configurações globais (`jeo-settings`).
-- **Integridade:** Metadados geográficos dos posts são mantidos permanentemente.
-
-### 4.3. Compatibilidade PHP
-- **Legacy Fix:** Suporte total para **PHP 7.4** via `FILTER_VALIDATE_BOOLEAN`.
+### 4.1. O Metadado Mestre: `_related_point`
+Todos os dados geográficos de um post são armazenados em um único metadado chamado `_related_point`.
+- **Estrutura:** É um array de objetos.
+- **Campos Obrigatórios:** `_geocode_lat`, `_geocode_lon`, `name`, `quote`.
+- **Resiliência REST API:** O JEO força o suporte a `custom-fields` via `add_post_type_support` no hook `init:99`.
 
 ---
 
-## 5. Visualização e Dashboards
+## 5. Mandatos de Estabilidade (O que NÃO fazer)
 
-### 5.1. JEO Dashboard (Experimental)
-- **Cinematic Map:** Tela cheia (100vh) com animações `staggered drop` e transição `fitBounds` automática para enquadrar todos os pins globais.
-- **Multi-Renderer:** Detecta e renderiza Mapbox GL, MapLibre ou Google Maps nativamente.
-
-### 5.2. Central de Boas-Vindas
-- **Multi-language Docs:** Renderização dinâmica de arquivos `README*.md` em abas de idiomas. Serve como a página default de entrada do plugin.
-
-### 5.3. Suporte Multi-Motor (v3.5.3+)
-- **Motores:** MapLibre GL JS, Mapbox GL JS e Google Maps JS API.
-- **Geocodificadores:** Nominatim, Google Maps e Mapbox Geocoding.
-
----
-
-## 6. Estrutura de Menus e Navegação Profissional
-
-A hierarquia de navegação foi travada para garantir uma experiência de produto "premium", respeitando a tradução dinâmica (`pt_BR`):
-
-1. **Welcome / Boas-vindas (Default):** Documentação viva multi-idioma.
-2. **Experimental (Dashboard):** Visualização global de impacto.
-3. **Maps / Mapas:** Gestão de mapas customizados.
-4. **Layers / Camadas:** Gestão de camadas geográficas.
-5. **Storymaps / Mapas de História:** Editor de narrativas espaciais.
-6. **Settings / Configurações:** Painel central.
-7. **AI Debug Logs / Logs de Depuração IA:** Histórico técnico de LLM.
+1. **NÃO baixe a versão do PHP:** O plugin exige **PHP 8.2**.
+2. **NÃO altere o Schema do `_related_point` sem atualizar o JS.**
+3. **NÃO use `file_put_contents` para logs:** Use a classe `AI_Logger`.
+4. **NÃO publique a pasta `vendor` no Git.**
+5. **NÃO permita que a IA defina o formato de saída:** Sempre injete o contrato JSON agressivo (`enforced_schema`) para evitar que modelos "espertos" retornem objetos aninhados ou chaves inventadas.
+6. **NÃO injete prompts via `$this->instructions()` no Neuron AI:** Na classe base do Neuron AI (`NeuronAI\Agent\Agent`), o método `instructions()` é um **getter** interno que não aceita argumentos e retorna o texto padrão ("You are a helpful and friendly AI..."). Para injetar o System Prompt do JEO e forçar o contrato do JSON, você **DEVE** utilizar o **setter** correto: `$this->setInstructions($prompt);`. O uso incorreto fará a LLM ignorar o esquema do JEO e gerar um JSON genérico e quebrado.
+7. **NÃO remova a flag `[SKIP_ENFORCED_SCHEMA]` de ferramentas internas:** Como o JEO injeta agressivamente o contrato JSON em todas as chamadas de georreferenciamento (via `AI_Adapter::get_system_prompt()`), ferramentas internas que reaproveitam o LLM para "meta-tarefas" (como o *Prompt Generator* ou o *API Key Tester*) falharão ao usar modelos estritos como a OpenAI, pois o modelo obedecerá a regra de retornar `[]` se não achar locais geográficos reais no texto. Sempre inicie o prompt dessas ferramentas internas com `[SKIP_ENFORCED_SCHEMA]` para desativar temporariamente o contrato.
+8. **NÃO acesse Vector Stores no painel web:** A vetorização em massa causa exaustão de PHP `max_execution_time`. SEMPRE adicione novos documentos (Ingestion) ao RAG através da CLI (`wp jeo ai vectorize`). O dashboard é apenas para testes com posts aleatórios (amostragem) e buscas.
+9. **NÃO sobrescreva propriedades privadas do NeuronAI RAG:** Como observado na classe base, injetar propriedades de RAG incorretamente (`embeddingsProvider` vs `embeddings()`) causará *Fatal Errors*. Use SEMPRE os setters oficiais ou estenda os métodos `resolve...` da biblioteca Neuron.
 
 ---
 
-## 7. Construção e Execução
+## 6. Fluxos de Trabalho (DevOps)
 
-### Build de Produção (`build.sh`)
-- Compila Assets (Gutenberg/React).
-- Coleta arquivos `README*.md`.
-- Preserva ícones essenciais (`jeo.svg`) para evitar erro 404 no menu.
-- Limpeza de logs e configs de desenvolvimento.
+### 6.1. Ambiente de Desenvolvimento (`setup.sh`)
+- Utilize `./setup.sh` para subir o ambiente em **http://localhost:8072**.
+- Credenciais: `admin` / `admin`.
+- **Limites Generosos (Docker):** O ambiente local está pré-configurado para suportar cargas pesadas típicas de geojornalismo e requisições longas de IA:
+  - **PHP/Apache:** `memory_limit=2048M`, `upload_max_filesize=1024M`, `max_execution_time=600s`.
+  - **MariaDB:** `max_allowed_packet=256M` (evita falhas ao importar bancos ou grandes camadas GeoJSON).
+
+### 6.2. Build de Release (`build.sh`)
+- Sempre gere o pacote oficial via `./build.sh`. O script injeta o `vendor` otimizado e limpa arquivos de desenvolvimento.
+
+---
+*Este guia deve ser atualizado sempre que uma mudança estrutural for implementada.*

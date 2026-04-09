@@ -48,52 +48,44 @@ abstract class AI_Adapter {
 			$prompt = __( 'You are a highly skilled geographer API. Analyze the text and extract locations.', 'jeo' );
 		}
 
+		// Allow internal tools (like the prompt generator) to bypass the aggressive schema injection
+		if ( strpos( $prompt, '[SKIP_ENFORCED_SCHEMA]' ) !== false ) {
+			return trim( str_replace( '[SKIP_ENFORCED_SCHEMA]', '', $prompt ) );
+		}
+
 		// Inject mandatory JSON schema constraints aggressively to any prompt to prevent formatting regressions
 		$enforced_schema = "
 
-	You MUST respond ONLY with a raw JSON array of objects.
-	Each object MUST have EXACTLY these keys:
+	CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
+	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
 	- \"name\": The location name.
 	- \"lat\": Latitude (string or float).
 	- \"lng\": Longitude (string or float).
 	- \"quote\": A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
 
-	Example: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro de Manaus, o Teatro...\"}]
+	Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro de Manaus, o Teatro...\"}]
 
 	If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].";
 
 		return $prompt . $enforced_schema;
 	}
 	/**
-	 * Log AI Data for debugging.
+	 * Log AI Data and Costs for debugging.
 	 *
-	 * @param string $provider Provider name.
-	 * @param mixed  $input    The prompt sent.
-	 * @param mixed  $output   The raw response received.
+	 * @param string $provider    Provider name.
+	 * @param mixed  $input       The prompt sent.
+	 * @param mixed  $output      The raw response received.
+	 * @param int    $input_tokens  Tokens used for input.
+	 * @param int    $output_tokens Tokens generated as output.
 	 */
-	protected function log_debug( $provider, $input, $output ) {
+	protected function log_debug( $provider, $input, $output, $input_tokens = 0, $output_tokens = 0 ) {
 		$debug_mode = \jeo_settings()->get_option( 'ai_debug_mode' );
 		
 		if ( empty( $debug_mode ) ) {
 			return;
 		}
 
-		$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
-		
-		// If JEO_BASEPATH is not writable, fallback to WordPress upload dir
-		if ( ! is_writable( JEO_BASEPATH ) && ! file_exists( $log_file ) ) {
-			$upload_dir = wp_upload_dir();
-			$log_file = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
-		}
-
-		$timestamp = current_time( 'Y-m-d H:i:s' );
-		
-		$entry = "[$timestamp] PROVIDER: $provider\n";
-		$entry .= "INPUT (Prompt):\n" . ( is_string( $input ) ? $input : wp_json_encode( $input, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) ) . "\n";
-		$entry .= "OUTPUT (Raw Response):\n" . ( is_string( $output ) ? $output : wp_json_encode( $output, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) ) . "\n";
-		$entry .= str_repeat( '=', 80 ) . "\n\n";
-
-		@file_put_contents( $log_file, $entry, FILE_APPEND );
+		\jeo_ai_logger()->insert_log( $provider, $input, $output, $input_tokens, $output_tokens );
 	}
 
 	/**
@@ -141,13 +133,26 @@ abstract class AI_Adapter {
 			$text = $matches[1];
 		}
 
-		// 2. Aggressive hunting: Find the first '[' and the last ']'
+		// 2. Surgical Extraction: Find the first '[' and its MATCHING ']'
+		// This prevents capturing extra data that LLMs often append after the array (like "topics", "keywords", etc.)
 		$start_pos = strpos( $text, '[' );
-		$end_pos   = strrpos( $text, ']' );
-
-		if ( $start_pos !== false && $end_pos !== false && $end_pos > $start_pos ) {
-			// Extract just the array portion
-			$text = substr( $text, $start_pos, ( $end_pos - $start_pos ) + 1 );
+		if ( $start_pos !== false ) {
+			$depth = 0;
+			$found_end = false;
+			$len = strlen( $text );
+			
+			for ( $i = $start_pos; $i < $len; $i++ ) {
+				if ( $text[ $i ] === '[' ) {
+					$depth++;
+				} elseif ( $text[ $i ] === ']' ) {
+					$depth--;
+					if ( $depth === 0 ) {
+						$text = substr( $text, $start_pos, ( $i - $start_pos ) + 1 );
+						$found_end = true;
+						break;
+					}
+				}
+			}
 		}
 
 		// Clean up the string to ensure it parses properly

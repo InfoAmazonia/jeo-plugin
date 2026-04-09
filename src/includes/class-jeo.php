@@ -47,6 +47,7 @@ class Jeo {
 		\jeo_layers();
 		\jeo_geocode_handler();
 		\jeo_settings();
+		\jeo_ai_logger();
 		\jeo_ai_handler();
 		\jeo_layer_types();
 		\jeo_legend_types();

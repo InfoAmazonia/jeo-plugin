@@ -1,35 +1,47 @@
-version: '2'
-
 services:
   wordpress:
     build:
       context: .
       dockerfile: ./docker/wordpress/Dockerfile
+      args:
+        WP_IMAGE_TAG: ${WP_IMAGE_TAG:-php8.2-apache}
     ports:
-      - 80:80
+      - 8072:80
     depends_on:
-      - mariadb
+      mariadb:
+        condition: service_healthy
     environment:
       WORDPRESS_DB_HOST: mariadb
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DEBUG: 'true'
+      # Force dynamic URL for port 8072
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'WP_HOME', 'http://localhost:8072' );
+        define( 'WP_SITEURL', 'http://localhost:8072' );
     volumes:
       - ./src:/var/www/html/wp-content/plugins/jeo
+      - ./vendor:/var/www/html/wp-content/plugins/jeo/vendor
       - ./wp-content:/var/www/html/wp-content
       - ./docker/mariadb/data:/docker-entrypoint-initdb.d
       - ./docker/wordpress/.htaccess:/var/www/html/.htaccess
 
   mariadb:
     image: mariadb:10.4
+    command: --max_allowed_packet=256M
     volumes:
-      - ./mariadb_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
       - ./docker/mariadb/data:/docker-entrypoint-initdb.d
     environment:
       MYSQL_ROOT_PASSWORD: therootpassword
       MYSQL_DATABASE: wordpress
       MYSQL_USER: wordpress
       MYSQL_PASSWORD: wordpress
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "wordpress", "-pwordpress"]
+      timeout: 5s
+      retries: 10
+      interval: 10s
 
   watcher:
     build:
@@ -37,6 +49,9 @@ services:
       dockerfile: ./docker/watcher/Dockerfile
     volumes:
       - ./:/app
+    depends_on:
+      wordpress:
+        condition: service_started
 
 volumes:
   mariadb_data:

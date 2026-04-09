@@ -193,9 +193,16 @@ class AI_Handler {
 	 */
 	public function get_adapters() {
 		return array(
-			'gemini'   => __( 'Google Gemini', 'jeo' ),
-			'openai'   => __( 'OpenAI (GPT)', 'jeo' ),
-			'deepseek' => __( 'DeepSeek', 'jeo' ),
+			'gemini'      => __( 'Google Gemini', 'jeo' ),
+			'openai'      => __( 'OpenAI', 'jeo' ),
+			'deepseek'    => __( 'DeepSeek', 'jeo' ),
+			'anthropic'   => __( 'Anthropic Claude', 'jeo' ),
+			'ollama'      => __( 'Ollama (Local/Custom)', 'jeo' ),
+			'mistral'     => __( 'Mistral AI', 'jeo' ),
+			'zai'         => __( 'Zhipu AI (GLM)', 'jeo' ),
+			'huggingface' => __( 'HuggingFace Inference', 'jeo' ),
+			'grok'        => __( 'Grok (xAI)', 'jeo' ),
+			'cohere'      => __( 'Cohere', 'jeo' ),
 		);
 	}
 
@@ -210,15 +217,19 @@ class AI_Handler {
 			$active = 'gemini';
 		}
 
-		switch ( $active ) {
-			case 'gemini':
-				return new AI\Gemini_Adapter();
-			case 'openai':
-				return new AI\OpenAI_Adapter();
-			case 'deepseek':
-				return new AI\DeepSeek_Adapter();
+		// Dynamically fetch configured model and API key
+		$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+		$model   = \jeo_settings()->get_option( $active . '_model' );
+
+		// Specific fallback for Ollama URL mapping
+		if ( 'ollama' === $active ) {
+			$api_key = \jeo_settings()->get_option( 'ollama_url' );
 		}
 
+		if ( array_key_exists( $active, $this->get_adapters() ) ) {
+			return new AI\Neuron_Adapter( $active, (string) $api_key, (string) $model );
+		}
+		
 		return null;
 	}
 
@@ -273,6 +284,336 @@ class AI_Handler {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-get-models',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_get_models' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-embedding',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_embedding' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-retrieval',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_retrieval' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+		register_rest_route(
+			'jeo/v1',
+			'/ai-clear-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_store' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+	}
+
+	public function api_clear_store( $request ) {
+		try {
+			$store = $request->get_param( 'store' );
+			if ( ! in_array( $store, [ 'test', 'production' ] ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'Invalid store type.', 'jeo' ) ], 400 );
+			}
+
+			$upload_dir = wp_upload_dir();
+			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
+			$store_name = ( $store === 'test' ) ? 'jeo_knowledge_test.store' : 'jeo_knowledge.store';
+			$file_path  = $store_dir . '/' . $store_name;
+
+			if ( file_exists( $file_path ) ) {
+				unlink( $file_path );
+			}
+
+			if ( $store === 'production' ) {
+				global $wpdb;
+				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s", '_jeo_vectorized_at' ) );
+			}
+
+			return new \WP_REST_Response( [
+				'success' => true,
+				'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
+			], 200 );
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( [ 
+				'success' => false, 
+				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+			], 200 );
+		}
+	}
+
+	public function api_test_retrieval( $request ) {
+		try {
+			$query = $request->get_param( 'query' );
+			$store = $request->get_param( 'store' );
+
+			if ( empty( $query ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'Query is required.', 'jeo' ) ], 400 );
+			}
+
+			// Initialize the RAG Agent to access Vector Store
+			$rag = new \Jeo\AI\RAG_Agent();
+			if ( $store === 'test' ) {
+				$rag->is_test_mode = true;
+			}
+
+			// Estimate tokens for the query
+			\jeo_ai_logger()->add_embedding_tokens( 'retrieve', strlen( $query ) );
+
+			// Use the native SimilarityRetrieval logic
+			$retrieval = $rag->resolveRetrieval();
+			$retrieved_docs = $retrieval->retrieve( new \NeuronAI\Chat\Messages\UserMessage( $query ) );
+
+			if ( empty( $retrieved_docs ) ) {
+				return new \WP_REST_Response( [
+					'success' => true,
+					'documents' => [],
+					'message' => __( 'No matches found in the selected Vector Store. Try vectorizing some posts first.', 'jeo' ),
+				], 200 );
+			}
+
+			$formatted_docs = [];
+			foreach ( $retrieved_docs as $doc ) {
+				$formatted_docs[] = [
+					'id' => $doc->getId(),
+					'score' => $doc->getScore(),
+					'content' => mb_strimwidth( $doc->getContent(), 0, 150, '...' ),
+					'metadata' => $doc->metadata,
+				];
+			}
+
+			return new \WP_REST_Response( [
+				'success' => true,
+				'documents' => $formatted_docs,
+			], 200 );
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( [ 
+				'success' => false, 
+				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+			], 200 );
+		}
+	}
+
+	public function api_test_embedding( $request ) {
+		try {
+			// Select a random post
+			$query = new \WP_Query( [
+				'post_type'      => 'post',
+				'post_status'    => 'publish',
+				'posts_per_page' => 1,
+				'orderby'        => 'rand',
+			] );
+
+			if ( empty( $query->posts ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'No posts available to test.', 'jeo' ) ], 400 );
+			}
+
+			$post = $query->posts[0];
+
+			// Load into Document
+			$documents = \Jeo\AI\WP_Post_Data_Loader::load( [ $post ] );
+			if ( empty( $documents ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'The selected random post has no usable text content.', 'jeo' ) ], 400 );
+			}
+
+			$test_doc = $documents[0];
+
+			// Estimate tokens used for embedding test doc
+			\jeo_ai_logger()->add_embedding_tokens( 'vectorize', strlen( $test_doc->getContent() ) );
+
+			// Use the Factory to get the active embeddings provider
+			$embed_provider = \Jeo\AI\Neuron_Factory::get_active_embeddings_provider();
+
+			// Test the embed operation directly
+			$embedded_doc = $embed_provider->embedDocument( $test_doc );
+			$vector = $embedded_doc->getEmbedding();
+
+			if ( empty( $vector ) ) {
+				return new \WP_REST_Response( [ 'error' => __( 'The embedding provider returned an empty vector.', 'jeo' ) ], 500 );
+			}
+
+			// Save the embedded document to the TEST Vector Store so we can retrieve it later
+			$rag = new \Jeo\AI\RAG_Agent();
+			$rag->is_test_mode = true;
+			$rag->resolveVectorStore()->addDocument( $embedded_doc );
+
+			// Format dimensions text
+			$dimensions = count( $vector );
+			$preview_vector = array_slice( $vector, 0, 5 ); // Just show first 5 floats
+
+			return new \WP_REST_Response( [
+				'success' => true,
+				'message' => __( 'Embedding created and saved to Test Store!', 'jeo' ),
+				'details' => [
+					'post_id'         => $post->ID,
+					'post_title'      => $post->post_title,
+					'content_snippet' => mb_strimwidth( $test_doc->getContent(), 0, 200, '...' ),
+					'dimensions'      => $dimensions,
+					'vector_start'    => $preview_vector,
+				]
+			], 200 );
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( [ 
+				'success' => false, 
+				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
+			], 200 );
+		}
+	}
+
+	/**
+	 * Fetch available models dynamically from the LLM Provider's API
+	 */
+	public function api_get_models( $request ) {
+		$provider = $request->get_param( 'provider' );
+		$api_key  = $request->get_param( 'api_key' );
+
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $api_key ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'API Key or URL is required to list models.', 'jeo' ) ), 400 );
+		}
+
+		$models = [];
+		$args   = array(
+			'headers' => array(
+				'Authorization' => 'Bearer ' . $api_key,
+				'Content-Type'  => 'application/json',
+			),
+			'timeout' => 15,
+		);
+
+		switch ( $provider ) {
+			case 'openai':
+			case 'deepseek':
+			case 'mistral':
+			case 'grok':
+			case 'zai':
+				$url = '';
+				if ( 'openai' === $provider ) $url = 'https://api.openai.com/v1/models';
+				if ( 'deepseek' === $provider ) $url = 'https://api.deepseek.com/models';
+				if ( 'mistral' === $provider ) $url = 'https://api.mistral.ai/v1/models';
+				if ( 'grok' === $provider ) $url = 'https://api.x.ai/v1/models';
+				// Zhipu AI usually implements OpenAI's v1/models compat too if used via SDK endpoint, but can fail if unsupported.
+				if ( 'zai' === $provider ) {
+					return new \WP_REST_Response( array( 'error' => __( 'Model fetching not officially supported dynamically for Zhipu AI.', 'jeo' ) ), 400 );
+				}
+
+				$response = wp_remote_get( $url, $args );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
+					foreach ( $data['data'] as $model ) {
+						$models[] = $model['id'];
+					}
+				}
+				break;
+			
+			case 'gemini':
+				$url = 'https://generativelanguage.googleapis.com/v1beta/models?key=' . $api_key;
+				$response = wp_remote_get( $url, [ 'timeout' => 15 ] );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						// Only allow models supporting generateContent for georeferencing
+						if ( isset( $model['supportedGenerationMethods'] ) && in_array( 'generateContent', $model['supportedGenerationMethods'], true ) ) {
+							$models[] = str_replace( 'models/', '', $model['name'] );
+						}
+					}
+				}
+				break;
+			
+			case 'anthropic':
+				$args['headers']['x-api-key'] = $api_key;
+				$args['headers']['anthropic-version'] = '2023-06-01';
+				unset( $args['headers']['Authorization'] );
+				
+				$response = wp_remote_get( 'https://api.anthropic.com/v1/models', $args );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
+					foreach ( $data['data'] as $model ) {
+						$models[] = $model['id'];
+					}
+				}
+				break;
+
+			case 'ollama':
+				// Ex: http://localhost:11434/api
+				$base_url = rtrim( str_replace( '/api', '', $api_key ), '/' );
+				$response = wp_remote_get( $base_url . '/api/tags', [ 'timeout' => 10 ] );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						$models[] = $model['name'];
+					}
+				}
+				break;
+			
+			case 'cohere':
+				$response = wp_remote_get( 'https://api.cohere.com/v1/models', $args );
+				$body = wp_remote_retrieve_body( $response );
+				$data = json_decode( $body, true );
+				
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						if ( isset( $model['endpoints'] ) && in_array( 'chat', $model['endpoints'], true ) ) {
+							$models[] = $model['name'];
+						}
+					}
+				}
+				break;
+
+			default:
+				return new \WP_REST_Response( array( 'error' => __( 'Model fetching is not supported for this provider yet. Please enter the model ID manually.', 'jeo' ) ), 400 );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			return new \WP_REST_Response( array( 'error' => $response->get_error_message() ), 500 );
+		}
+
+		if ( empty( $models ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No models found. Check your API key or permissions.', 'jeo' ) ), 404 );
+		}
+
+		return new \WP_REST_Response( array( 'success' => true, 'models' => array_reverse( $models ) ), 200 );
 	}
 
 	/**
@@ -280,18 +621,29 @@ class AI_Handler {
 	 */
 	public function api_test_key( $request ) {
 		$provider = $request->get_param( 'provider' );
-		$adapter  = null;
+		$api_key  = $request->get_param( 'api_key' ); // It might be empty if the frontend relies on saved DB key
+		$model    = $request->get_param( 'model' );
 
-		switch ( $provider ) {
-			case 'gemini':
-				$adapter = new AI\Gemini_Adapter();
-				break;
-			case 'openai':
-				$adapter = new AI\OpenAI_Adapter();
-				break;
-			case 'deepseek':
-				$adapter = new AI\DeepSeek_Adapter();
-				break;
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
+		
+		if ( empty( $api_key ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
+		}
+
+		$adapter = null;
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
 		}
 
 		if ( ! $adapter ) {
@@ -299,8 +651,8 @@ class AI_Handler {
 		}
 
 		// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
-		$test_prompt = "You are a test assistant. Respond ONLY with this exact JSON array: [{\"name\": \"API_TEST_OK\", \"lat\": 0, \"lng\": 0, \"quote\": \"Success\"}]";
-		$result = $adapter->georeference( "Test", "Connection check", $test_prompt );
+		$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lng\": 0, \"quote\": \"Status: Ping\"}]";
+		$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
 
 		if ( is_wp_error( $result ) ) {
 			return new \WP_REST_Response( array( 
@@ -320,38 +672,83 @@ class AI_Handler {
 	 * Callback to generate an optimized prompt using the active LLM.
 	 */
 	public function api_chat_prompt_generator( $request ) {
-		$context = $request->get_param( 'context' );
+		$context  = $request->get_param( 'context' );
+		$provider = $request->get_param( 'provider' );
+		$api_key  = $request->get_param( 'api_key' );
+		$model    = $request->get_param( 'model' );
+
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
 		}
 
-		$adapter = $this->get_active_adapter();
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) && ! empty( $api_key ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+		} else {
+			$adapter = $this->get_active_adapter();
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
 
+		// Prompt Optimizer: Appends model-specific guidelines to the meta-prompt
+		$model_optimization = "";
+		switch ( $provider ) {
+			case 'gemini':
+				$model_optimization = "Since the target model is Google Gemini, please use clear Markdown headers (##) and explicit step-by-step instructions. Gemini performs best when formatting is highly structured and unambiguous.";
+				break;
+			case 'openai':
+				$model_optimization = "Since the target model is OpenAI (GPT), provide highly concise, abstract rules. GPT models are excellent at generalizing logic and understanding constraints without excessive verbosity.";
+				break;
+			case 'deepseek':
+				$model_optimization = "Since the target model is DeepSeek, enclose critical thinking rules and constraints inside XML-like tags (e.g., <rules>...</rules>). DeepSeek is a reasoning model and heavily benefits from chain-of-thought and structured tag-based directives.";
+				break;
+			case 'anthropic':
+				$model_optimization = "Since the target model is Anthropic Claude, use conversational but highly detailed boundaries. Claude responds well to 'constitutional' style rules and clearly defined 'Do not do X' instructions.";
+				break;
+			default:
+				$model_optimization = "Make the prompt robust, precise, and well-structured to ensure high accuracy in georeferencing tasks.";
+				break;
+		}
+
 		// Meta-prompt instructed to build a JEO prompt
 		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin. 
-The user wants to configure an AI georeferencing tool with specific rules: '{$context}'.
+The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
 Write a clear, strict System Prompt that incorporates the user's rules. 
-CRITICAL: The generated prompt MUST explicitly instruct the AI to return ONLY a raw JSON array of objects.
-Each object MUST have keys: 'name', 'lat' (string/float), 'lng' (string/float), and 'quote'.
-Example to include: [{\"name\": \"Place\", \"lat\": 0, \"lng\": 0, \"quote\": \"...\"}].
-If no locations match, return [].
+{$model_optimization}
+
+### OUTPUT FORMAT MANDATE
+You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
+
+\"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
+Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote'. Do NOT use any other keys like 'city', 'country', 'continent' or 'type'.
+- 'name': The location name.
+- 'lat': Latitude (string or float).
+- 'lng': Longitude (string or float).
+- 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
+Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\"}]
+If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"
+
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
 
 		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content' 
 		// and using a dummy system prompt so the LLM acts as an assistant.
 		$test_title = "Prompt Engineering Task";
-		$assistant_override = "You are an assistant. Just do as instructed in the text.";
-		
-		// The current adapters are wired to parse JSON from output.
-		// Wait, if we use georeference(), it expects a JSON output. But for the prompt generator, we want raw text.
-		// Since we can't easily change the abstract without refactoring all adapters to return raw text, 
-		// we'll instruct the LLM to return the prompt *inside* the expected JSON format!
-		
-		$meta_prompt_json_hack = $meta_prompt . "\n\nReturn your generated prompt inside this JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"PUT_YOUR_GENERATED_PROMPT_HERE\"}]";
-		
+		$assistant_override = "[SKIP_ENFORCED_SCHEMA] You are an assistant. Just do as instructed in the text.";
+
+		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";		
 		$result = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
 
 		if ( is_wp_error( $result ) ) {
@@ -371,18 +768,41 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 */
 	public function api_validate_prompt( $request ) {
 		$custom_prompt = $request->get_param( 'prompt' );
+		$provider      = $request->get_param( 'provider' );
+		$api_key       = $request->get_param( 'api_key' );
+		$model         = $request->get_param( 'model' );
+
 		if ( empty( $custom_prompt ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Prompt is required.', 'jeo' ) ), 400 );
 		}
 
-		$adapter = $this->get_active_adapter();
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) && ! empty( $api_key ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+		} else {
+			$adapter = $this->get_active_adapter();
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
 
-		$test_title   = "Test Article: The Amazon Rainforest";
-		$test_content = "Today, an expedition was organized in the Amazon Rainforest, specifically leaving from the city of Manaus to explore the Negro River. The researchers found interesting species near the Encontro das Águas.";
+		// Use a diverse global text so validation succeeds regardless of regional prompt restrictions (Europe, Brazil, etc.)
+		$test_title   = "Global News Report: Environment and Economy";
+		$test_content = "Today, leaders met in Paris, France to discuss the European economy. Meanwhile, a scientific expedition in the Amazon Rainforest left Manaus, Brazil, to explore the Encontro das Águas. In Asia, Tokyo, Japan reported new technological advancements.";
 
+		// Pass empty string for assistant override to let the adapter attach the enforced schema
 		$result = $adapter->georeference( $test_title, $test_content, $custom_prompt );
 
 		if ( is_wp_error( $result ) ) {
@@ -392,13 +812,24 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			), 200 ); // Send 200 so UI can display the error nicely
 		}
 
-		// Basic schema validation
+		// Strict schema validation
 		$is_valid = true;
-		$msg = __( 'Prompt successfully validated! The AI returned a valid JSON array.', 'jeo' );
+		$msg = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeo' );
 
-		if ( ! is_array( $result ) || ( count( $result ) > 0 && ( ! isset( $result[0]['name'] ) || ! isset( $result[0]['lat'] ) ) ) ) {
+		if ( ! is_array( $result ) ) {
 			$is_valid = false;
-			$msg = __( 'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lng, or quote).', 'jeo' );
+			$msg = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeo' );
+		} elseif ( count( $result ) > 0 ) {
+			foreach ( $result as $item ) {
+				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lng', $item ) || ! isset( $item['quote'] ) ) {
+					$is_valid = false;
+					$msg = __( 'Validation failed: The AI missed mandatory keys (name, lat, lng, quote) in its JSON objects.', 'jeo' );
+					break;
+				}
+			}
+		} else {
+			// Array is empty (count == 0). This is VALID if the AI correctly filtered out locations based on user prompt.
+			$msg = __( 'Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text.', 'jeo' );
 		}
 
 		return new \WP_REST_Response( array( 
