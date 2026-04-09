@@ -73,6 +73,11 @@ class Jeo {
 		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
 		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
+
+		// Auto-inject editor preview blocks into existing map/layer posts
+		// so they don't show the "template mismatch" warning.
+		add_filter( 'rest_prepare_map', array( $this, 'inject_editor_block_for_map' ), 10, 3 );
+		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
 	}
 
 	private function get_current_language(): string {
@@ -288,7 +293,7 @@ class Jeo {
 		register_block_type(
 			'jeo/storymap',
 			array(
-				'api_version'     => 2,
+				'api_version'     => 3,
 				'render_callback' => array( $this, 'story_map_dynamic_render_callback' ),
 				'editor_script'   => 'jeo-map-blocks',
 				'editor_style'    => 'jeo-map-blocks',
@@ -297,8 +302,24 @@ class Jeo {
 		register_block_type(
 			'jeo/embedded-storymap',
 			array(
-				'api_version'     => 2,
+				'api_version'     => 3,
 				'render_callback' => array( $this, 'embedded_story_map_dynamic_render_callback' ),
+				'editor_script'   => 'jeo-map-blocks',
+				'editor_style'    => 'jeo-map-blocks',
+			)
+		);
+		register_block_type(
+			'jeo/map-editor',
+			array(
+				'api_version'     => 3,
+				'editor_script'   => 'jeo-map-blocks',
+				'editor_style'    => 'jeo-map-blocks',
+			)
+		);
+		register_block_type(
+			'jeo/layer-editor',
+			array(
+				'api_version'     => 3,
 				'editor_script'   => 'jeo-map-blocks',
 				'editor_style'    => 'jeo-map-blocks',
 			)
@@ -673,6 +694,34 @@ class Jeo {
 		}
 	}
 
+	/**
+	 * Auto-inject the editor preview block into existing map posts
+	 * so the block editor template matches without user intervention.
+	 */
+	public function inject_editor_block_for_map( $response, $post, $request ) {
+		if ( 'edit' === $request->get_param( 'context' ) ) {
+			$raw = $response->data['content']['raw'] ?? '';
+			if ( false === strpos( $raw, 'jeo/map-editor' ) ) {
+				$response->data['content']['raw'] = '<!-- wp:jeo/map-editor {"align":"full"} /-->' . $raw;
+			}
+		}
+		return $response;
+	}
+
+	/**
+	 * Auto-inject the editor preview block into existing layer posts
+	 * so the block editor template matches without user intervention.
+	 */
+	public function inject_editor_block_for_layer( $response, $post, $request ) {
+		if ( 'edit' === $request->get_param( 'context' ) ) {
+			$raw = $response->data['content']['raw'] ?? '';
+			if ( false === strpos( $raw, 'jeo/layer-editor' ) ) {
+				$response->data['content']['raw'] = '<!-- wp:jeo/layer-editor {"align":"full"} /-->';
+			}
+		}
+		return $response;
+	}
+
 	public function restrict_story_map_block_count() {
 		global $post;
 
@@ -703,6 +752,25 @@ class Jeo {
 				array( 'jeo/storymap' ),
 			);
 			$wp_post_types['storymap']->template_lock = 'all';
+
+			if ( isset( $wp_post_types['map'] ) ) {
+				$wp_post_types['map']->template = array(
+					array( 'jeo/map-editor', array(
+						'align' => 'full',
+						'lock' => array(
+							'move'   => true,
+							'remove' => true,
+						),
+					) ),
+				);
+			}
+
+			if ( isset( $wp_post_types['map-layer'] ) ) {
+				$wp_post_types['map-layer']->template      = array(
+					array( 'jeo/layer-editor', array( 'align' => 'full' ) ),
+				);
+				$wp_post_types['map-layer']->template_lock = 'all';
+			}
 		}
 	}
 }

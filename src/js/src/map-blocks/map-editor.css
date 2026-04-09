@@ -80,3 +80,27 @@
 .wp-block[data-type="jeo/map"]:focus-within .jeo-preview-controls {
 	display: flex;
 }
+
+/* Editor-only preview blocks: full-width inside the iframe editor.
+   With align:'full', Gutenberg applies negative margins to stretch the
+   block wrapper beyond the content column.  We must NOT override
+   width (it needs to stay 'auto' so the negative margins work). */
+.wp-block-jeo-map-editor,
+.wp-block-jeo-layer-editor {
+	box-sizing: border-box;
+}
+
+/* Ensure the preview area inside fills the full extended width */
+.wp-block-jeo-map-editor .jeo-preview-area,
+.wp-block-jeo-layer-editor .jeo-preview-area {
+	width: 100%;
+}
+
+/* Hide the block selection outline and toolbar for editor-only preview blocks.
+   The toolbar is rendered as a popover so we target it via the selected block
+   class and the popover container that appears above the block. */
+.wp-block-jeo-map-editor.is-selected,
+.wp-block-jeo-layer-editor.is-selected {
+	outline: none !important;
+	box-shadow: none !important;
+}

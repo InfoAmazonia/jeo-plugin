@@ -1,5 +1,15 @@
+// In Block API v3 the outer .wp-block wrapper (which had position: relative)
+// no longer exists. We need position: relative on the block root so the
+// absolutely-positioned settings panels have a proper containing block.
 .jeo-mapblock.storymap {
+	position: relative;
+
 	.storymap-controls {
+		// Do NOT add position: relative here — it would become the
+		// containing block for the absolutely-positioned children
+		// (settings panels, search input, current-slide box), pulling
+		// them out of their intended position relative to the block root.
+
 		.story-settings, .slides-settings, .story-settings-hide, .slides-settings-hide  {
 			border-radius: 7px;
 			box-shadow: 1px 3px 4px 0 rgba(0,0,0,.1);
@@ -65,6 +75,7 @@
 
 .jeo-mapblock.storymap {
 	font-family: var(--globalFontFamily), sans-serif;;
+	overflow-anchor: none;
 }
 
 .ck.ck-balloon-panel, .ck.ck-toolbar__items {
@@ -77,6 +88,19 @@
 
 .ck.ck-content.ck-editor__editable.ck-blurred, .ck.ck-content.ck-editor__editable.ck-focused {
 	height: 300px !important;
+	overflow-y: auto;
+	overflow-anchor: none;
+	overscroll-behavior: contain;
+}
+
+.storymap-title-editor {
+	.ck.ck-content.ck-editor__editable.ck-blurred,
+	.ck.ck-content.ck-editor__editable.ck-focused {
+		height: 44px !important;
+		min-height: 44px;
+		max-height: 44px;
+		overflow-y: hidden;
+	}
 }
 
 
@@ -89,6 +113,7 @@
 	top: 50px;
 	padding: 10px;
 	inset-inline-start: calc(45% + 15px);
+	z-index: 10;
 
 	.title {
 		label {
@@ -118,6 +143,7 @@
 	padding: 10px;
 	display: flex;
 	inset-inline-start: calc(45% + 15px);
+	z-index: 10;
 
 	// .section-title {
 	// 	margin: 0 0 0 15px;
@@ -138,6 +164,7 @@
     top: 10px;
 	padding: 10px;
 	font-size: 14px;
+	z-index: 10;
 
 	div {
 		margin: auto;
@@ -152,6 +179,7 @@
 	top: 50px;
 	// inset-inline-start: calc(30% + 15px);
 	background-color: #fff;
+	z-index: 10;
 	.slide-panel {
 		border-inline-start: none;
 		width: 100%;
@@ -282,6 +310,7 @@
 	position: absolute;
 	bottom: 15%;
 	padding: 10px;
+	z-index: 10;
 
 	// .section-title {
 	// 	margin: 0 0 0 15px;
@@ -299,6 +328,7 @@
 	position: absolute;
 	top: 0;
 	inset-inline-start: 10px;
+	z-index: 10;
 }
 .tooltip {
 	background-color: white;

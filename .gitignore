@@ -19,3 +19,6 @@ wp-content/mu-plugins/*
 wp-content/languages/*
 mariadb_data/
 logs/
+
+.DS_Store
+Thumbs.db
