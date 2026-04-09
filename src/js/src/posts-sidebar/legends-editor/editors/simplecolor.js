@@ -1,6 +1,7 @@
-import { Button, ColorPicker, Dropdown, TextControl } from '@wordpress/components';
+import { Button, ColorPicker, Dropdown } from '@wordpress/components';
 import { Component, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { TextControl } from '../../../shared/wp-form-controls';
 
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 

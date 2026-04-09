@@ -1,5 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { Button, ButtonGroup } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
@@ -91,7 +91,11 @@ export default function MapEditorPreview() {
 				onTouchStart={ stopPropagation }
 			>
 				<div className="zoom-buttons-div">
-					<ButtonGroup className="button-group-div">
+					<div
+						className="button-group-div"
+						role="group"
+						aria-label={ __( 'Preview zoom controls', 'jeo' ) }
+					>
 						<Button
 							style={ buttonStyle( zoomState === 'initial_zoom' ) }
 							className="zoom-button"
@@ -134,7 +138,7 @@ export default function MapEditorPreview() {
 						>
 							{ __( 'Max Zoom', 'jeo' ) }
 						</Button>
-					</ButtonGroup>
+					</div>
 				</div>
 				<Map
 					key={ key }
