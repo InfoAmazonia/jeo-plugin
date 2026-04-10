@@ -57,7 +57,7 @@ class IconEditor extends Component {
 			const icons = this.state.legendObject.attributes.legend_type_options.icons;
 
 			icons.push(
-				{ label: 'Default Label', icon: null, id: crypto.randomUUID() },
+				{ label: __( 'Default label', 'jeo' ), icon: null, id: generateUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.icons = icons;
@@ -91,7 +91,10 @@ class IconEditor extends Component {
 		return (
 			<Fragment>
 				<div className="size-warning">
-					<span className="warning-character">* </span> <span className="warning-text">Minimum size: 60x60</span>
+					<span className="warning-character">* </span>
+					<span className="warning-text">
+						{ __( 'Minimum size: 60x60 pixels', 'jeo' ) }
+					</span>
 				</div>
 				{
 					this.state.legendObject.attributes.legend_type_options.icons.map( ( item ) => {
@@ -120,7 +123,12 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 					isDismissible={ false }
 					onRequestClose={ () => setOpenModal( false ) }
 				>
-					<h4>The uploaded icon is too small. The minimum size required is 60x60 pixels.</h4>
+					<h4>
+						{ __(
+							'The uploaded icon is too small. The minimum size required is 60x60 pixels.',
+							'jeo'
+						) }
+					</h4>
 					<Button
 						isLarge
 						variant="primary"
@@ -148,13 +156,13 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 
 					render={ ( { open } ) => {
 						return (
-							<div className="content-wrapper">
-								<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
-									{ item.icon ? (
-										<img src={ item.icon } width="50" height="50" alt="Logo" />
-									) : (
-										<Dashicon icon="format-image" width="50" height="50" />
-									) }
+								<div className="content-wrapper">
+									<div className="image" role="button" tabIndex={ 0 } onClick={ open }>
+										{ item.icon ? (
+											<img src={ item.icon } width="50" height="50" alt="" />
+										) : (
+											<Dashicon icon="format-image" width="50" height="50" />
+										) }
 								</div>
 								<div className="buttons-inputs">
 									<TextControl
@@ -163,7 +171,12 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 										onChange={ ( label ) => itemChanged( { ...item, label } ) }
 									/>
 
-									<Button icon="minus" label="Remove" onClick={ () => removeLabel( item.id ) } className="remove-button" />
+									<Button
+										icon="minus"
+										label={ __( 'Remove', 'jeo' ) }
+										onClick={ () => removeLabel( item.id ) }
+										className="remove-button"
+									/>
 								</div>
 							</div>
 						);

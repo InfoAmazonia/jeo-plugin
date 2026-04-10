@@ -7,7 +7,7 @@ on:
 
 jobs:
   node-frontend:
-    name: Node 20 frontend checks
+    name: Node 24 frontend checks
     runs-on: ubuntu-latest
 
     steps:
@@ -15,7 +15,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: 24
           cache: npm
 
       - name: Show Node and npm versions
@@ -23,11 +23,23 @@ jobs:
           node --version
           npm --version
 
+      - name: Check supported runtime
+        run: npm run check:env
+
       - name: Install Node dependencies
         run: npm ci
 
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: wp-cli
+
       - name: Build assets
         run: npm run build
+
+      - name: Check bundle budgets
+        run: npm run build:report
 
       - name: Run unit tests
         run: npm run test:unit

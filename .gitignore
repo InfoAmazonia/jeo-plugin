@@ -2,6 +2,7 @@ build-config.cfg
 tests/bootstrap-config.php
 node_modules
 src/js/build
+src/languages/*.json
 jeo.zip
 .env
 
@@ -17,8 +18,11 @@ wp-content/upgrade/*
 wp-content/uploads/*
 wp-content/mu-plugins/*
 wp-content/languages/*
-mariadb_data/
 logs/
+
+dump.sql
+*.sql
+*.sql.gz
 
 .DS_Store
 Thumbs.db

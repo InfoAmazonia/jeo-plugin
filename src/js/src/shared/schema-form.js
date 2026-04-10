@@ -125,14 +125,11 @@ function SelectWidget( {
 } ) {
 	const enumOptions = options.enumOptions || [];
 	const selectOptions = [
-		...( required
-			? []
-			: [
-					{
-						label: placeholder || __( 'Select an option', 'jeo' ),
-						value: '',
-					},
-			  ] ),
+		{
+			label: required ? '' : placeholder || __( 'Select an option', 'jeo' ),
+			value: '',
+			disabled: required,
+		},
 		...enumOptions.map( ( option ) => ( {
 			label: option.label,
 			value: String( option.value ),
@@ -146,7 +143,7 @@ function SelectWidget( {
 			disabled={ disabled || readonly }
 			options={ selectOptions }
 			onChange={ ( nextValue ) => {
-				if ( nextValue === '' && ! required ) {
+				if ( nextValue === '' ) {
 					onChange( undefined );
 					return;
 				}

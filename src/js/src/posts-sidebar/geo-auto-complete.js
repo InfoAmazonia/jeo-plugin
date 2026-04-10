@@ -14,27 +14,32 @@ export default function JeoGeoAutoComplete( {
 } ) {
 	const [ suggestions, setSuggestions ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( false );
-	const [ selectedValue, setSelectedValue ] = useState( null );
 	const latestRequestRef = useRef( 0 );
 
-	useEffect( () => {
-		if ( ! value || value !== selectedValue ) {
-			setSelectedValue( null );
-		}
-	}, [ selectedValue, value ] );
-
 	const debouncedLoadSuggestions = useMemo( () => {
-		return debounce( ( nextValue ) => {
-			const requestId = latestRequestRef.current + 1;
-			latestRequestRef.current = requestId;
-			setIsLoading( true );
+			return debounce( ( nextValue ) => {
+				const requestId = latestRequestRef.current + 1;
+				latestRequestRef.current = requestId;
+				setIsLoading( true );
+				const requestUrl = new URL( jeo.ajax_url );
+				requestUrl.searchParams.set( 'action', 'jeo_geocode' );
+				requestUrl.searchParams.set( 'nonce', jeo.geocode_nonce );
+				requestUrl.searchParams.set( 'search', nextValue );
 
-			window
-				.fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + nextValue )
-				.then( ( response ) => response.json() )
-				.then( ( result ) => {
-					if ( latestRequestRef.current === requestId ) {
-						setSuggestions( result );
+				window
+					.fetch( requestUrl )
+					.then( ( response ) => {
+						if ( ! response.ok ) {
+							throw new Error(
+								__( 'Unable to load address suggestions.', 'jeo' )
+							);
+						}
+
+						return response.json();
+					} )
+					.then( ( result ) => {
+						if ( latestRequestRef.current === requestId ) {
+							setSuggestions( result );
 					}
 				} )
 				.catch( () => {
@@ -56,20 +61,21 @@ export default function JeoGeoAutoComplete( {
 		};
 	}, [ debouncedLoadSuggestions ] );
 
+	const currentValue = value || '';
+
 	return (
 		<AsyncComboboxControl
 			className={ className }
 			items={ suggestions }
-			inputValue={ value }
-			selectedValue={ selectedValue }
+			inputValue={ currentValue }
+			selectedValue={ currentValue || null }
 			isLoading={ isLoading }
 			placeholder={ __( 'Search address', 'jeo' ) }
 			ariaLabel={ __( 'Search address', 'jeo' ) }
 			getOptionLabel={ ( suggestion ) => suggestion.full_address }
 			getOptionValue={ ( suggestion ) => suggestion.full_address }
 			onInputValueChange={ ( nextValue ) => {
-				setSelectedValue( null );
-				onChange( nextValue );
+				onChange?.( nextValue );
 
 				if ( nextValue.trim().length <= 2 ) {
 					debouncedLoadSuggestions.cancel();
@@ -81,9 +87,12 @@ export default function JeoGeoAutoComplete( {
 				debouncedLoadSuggestions( nextValue );
 			} }
 			onOptionSelect={ ( suggestion ) => {
-				setSelectedValue( suggestion.full_address );
-				onChange( suggestion.full_address );
-				onSelect( suggestion );
+				if ( ! suggestion ) {
+					return;
+				}
+
+				onChange?.( suggestion.full_address );
+				onSelect?.( suggestion );
 			} }
 			renderItem={ ( suggestion ) => (
 				<div className="jeo-geo-autocomplete">{ suggestion.full_address }</div>

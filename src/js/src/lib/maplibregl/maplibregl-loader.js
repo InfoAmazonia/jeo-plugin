@@ -149,7 +149,6 @@ patchInstanceOf( WheelEvent, ( i ) =>
 export const mapboxToken = jeo_settings.mapbox_key
 
 export const mapgl = MapLibreGL
-globalThis.mapboxgl = MapLibreGL // compat
 
 export const defaultStyle = {
 	version: 8,
@@ -182,8 +181,10 @@ export function mapboxTransformRequest(url, resourceType) {
 		// MapLibreGL don't remove black backgrounds from Mapbox JPEG static tiles
 		return { url: url.replace('.jpg?', '.webp?') }
 	}
-    return { url }
+	    return { url }
 }
+
+export const transformRequest = mapboxTransformRequest
 
 function createTransformRequest(baseTransformRequest) {
 	if (baseTransformRequest) {
@@ -199,6 +200,7 @@ function createTransformRequest(baseTransformRequest) {
 export function createMap({ container, style, transformRequest, ...options }) {
 	const map = new MapLibreGL.Map({
 		container: container,
+		maplibreLogo: false,
 		projection: 'equirectangular',
 		validateStyle: false,
 		transformRequest: createTransformRequest(transformRequest),

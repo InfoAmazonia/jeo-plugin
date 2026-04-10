@@ -1,8 +1,8 @@
-# JEO WordPress Theme
+# JEO Documentation
 
-JEO WordPress Theme acts as a geojournalism platform which allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is much more intuitive and interactive. The theme is ready for multilingual content and facilitates the publishing tasks.
+JEO acts as a geojournalism platform which allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is much more intuitive and interactive.
 
-You can post geotagged stories and create richly designed pages for each one of the featured stories. At same time, by simply imputing the ids of layers hosted on MapBox, you can manage sophisticated maps without loosing perfomance, add legends directly with HTML and set the map paramethers. All direct at the WordPress dashboard.
+You can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by configuring layers hosted on Mapbox and choosing between MapboxGL and MapLibreGL, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
 
 JEO wants to help journalists and NGOs to improve storytelling with maps. Creating a child theme with all its functionality is easy since it contains all the necessary hooks to customize layouts and data visualization.
 
@@ -10,17 +10,14 @@ JEO wants to help journalists and NGOs to improve storytelling with maps. Creati
 
 ## Features
 
-- Leaflet map library
+- MapboxGL and MapLibreGL map rendering
 - Custom tile layers
-- [MapBox](http://mapbox.com/) maps
-- [CartoDB](http://cartodb.com/) maps
-- Layer filtering options, allowing you to mix tile layer, MapBox and CartoDB.
-- Geocoding WordPress posts using OpenStreetMaps or Google Maps supporting custom post types.
-- Google Street View support for Google Maps geocoding.
+- [Mapbox](https://www.mapbox.com/) maps
+- Layer filtering options, allowing you to mix tile layers.
+- Geocoding WordPress posts using OpenStreetMap (Nominatim), with extensibility for additional geocoders via hook.
 - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
 - Map markers query integrated to posts query.
-- GeoJSON API (any content /?geojson gives the geojson output). E.g.: yourwebsite.com/category/one/?geojson
-- Support [qTranslate](https://wordpress.org/plugins/qtranslate/) multilanguage plugin
+- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilingual plugins
 
 ## User tutorials
 

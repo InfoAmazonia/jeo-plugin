@@ -380,8 +380,8 @@ add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
  */
 function add_template_page_discovery( $post_templates ) {
 
-	// Add the bundled Discovery template to the selector.
-	$post_templates['discovery.php'] = __( 'Discovery', 'jeo' );
+	// translators: Explore is the name of JEO's discovery page feature.
+	$post_templates['discovery.php'] = __( 'Explore', 'jeo' );
 
 	return $post_templates;
 }

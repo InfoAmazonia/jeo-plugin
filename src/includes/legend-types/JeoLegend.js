@@ -1,3 +1,4 @@
+import { __ } from '@wordpress/i18n';
 import JeoLegendTypes from './JeoLegendTypes';
 
 class JeoLegend {
@@ -8,6 +9,15 @@ class JeoLegend {
 	}
 
 	render( map ) {
+		if (
+			! this.__legendType ||
+			typeof this.__legendType.render !== 'function' ||
+			! this.attributes?.legend_type_options ||
+			typeof this.attributes.legend_type_options !== 'object'
+		) {
+			return document.createElement( 'div' );
+		}
+
 		return this.__legendType.render( map, this.attributes );
 	}
 
@@ -17,16 +27,16 @@ class JeoLegend {
 			'simple-color': {
 				left_label: '0',
 				right_label: '0',
-				colors: [ { label: 'Default Item', color: '#ff0909' } ],
+				colors: [ { label: __( 'Default label', 'jeo' ), color: '#ff0909' } ],
 			},
 
 			icons: {
-				icons: [ { label: 'Default Item', icon: null } ],
+				icons: [ { label: __( 'Default label', 'jeo' ), icon: null } ],
 			},
 
 			circles: {
 				color: '#000',
-				circles: [ { label: 'Default Item', radius: 8 } ],
+				circles: [ { label: __( 'Default label', 'jeo' ), radius: 8 } ],
 			},
 
 			barscale: {
@@ -107,8 +117,6 @@ class JeoLegend {
 				...adicionalProps,
 			},
 		};
-
-		//console.log(legendMeta)
 
 		return legendMeta;
 	}

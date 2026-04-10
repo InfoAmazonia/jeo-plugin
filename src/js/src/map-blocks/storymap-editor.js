@@ -20,11 +20,15 @@ import {
 	PasteFromOffice,
 	Underline,
 } from 'ckeditor5';
+import ckeditorEsTranslations from 'ckeditor5/translations/es.js';
+import ckeditorEsCoTranslations from 'ckeditor5/translations/es-co.js';
+import ckeditorPtTranslations from 'ckeditor5/translations/pt.js';
+import ckeditorPtBrTranslations from 'ckeditor5/translations/pt-br.js';
 import 'ckeditor5/ckeditor5.css';
 import { useBlockProps } from '@wordpress/block-editor';
 import { Button, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { chevronDown, chevronUp, lock, unlock, seen, trash, plus } from '@wordpress/icons';
-import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
 import { Fragment, useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -41,7 +45,9 @@ import {
 	reorderSlides,
 	sortSelectedLayersByMapOrder,
 } from './storymap-ordering';
+import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
+import { getCKEditorLanguage } from '../shared/locale';
 import './map-editor.css';
 import './storymap-editor.scss';
 
@@ -53,6 +59,12 @@ const percentageFormatter = new Intl.NumberFormat( 'en-US', {
 	maximumFractionDigits: 2,
 } );
 const TOOLBAR_SELECTION_COMMANDS = [ 'bold', 'italic', 'underline', 'fontColor', 'fontBackgroundColor' ];
+const CKEDITOR_TRANSLATIONS = [
+	ckeditorEsTranslations,
+	ckeditorEsCoTranslations,
+	ckeditorPtTranslations,
+	ckeditorPtBrTranslations,
+];
 
 function percentage ( number ) {
 	return percentageFormatter.format( number );
@@ -455,10 +467,12 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ loadedMap?.meta.layers ] );
 
-	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
-		include: layerIds,
-		per_page: -1,
-	}, { enabled: layerIds.length > 0 } );
+	const { records: loadedLayers = [] } = useRecordsByIds( {
+		path: '/wp/v2/map-layer',
+		ids: layerIds,
+		enabled: layerIds.length > 0,
+		query: { context: 'edit' },
+	} );
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
@@ -579,6 +593,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 		return {
 			licenseKey: 'GPL',
+			language: getCKEditorLanguage(),
 			plugins: [
 				Essentials, Autoformat, PasteFromOffice,
 				Bold, Italic, Underline,
@@ -599,6 +614,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			fontColor: { colors, columns: 14, colorPicker: false },
 			image: { toolbar: [ 'imageTextAlternative' ] },
 			mediaEmbed: { previewsInData: true },
+			translations: CKEDITOR_TRANSLATIONS,
 			};
 	}, [ loadedLayers, themeColors ] );
 

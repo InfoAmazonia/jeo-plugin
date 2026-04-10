@@ -1,4 +1,7 @@
+const { __ } = wp.i18n;
+
 window.JeoLegendTypes.registerLegendType( 'simple-color', {
+	label: __( 'Color categories', 'jeo' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type
@@ -9,7 +12,7 @@ window.JeoLegendTypes.registerLegendType( 'simple-color', {
 			properties: {
 				colors: {
 					type: 'array',
-					description: 'An array of labels and colors',
+					description: __( 'An array of labels and colors', 'jeo' ),
 					items: {
 						type: 'object',
 						properties: {

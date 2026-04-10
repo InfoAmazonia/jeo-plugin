@@ -11,9 +11,14 @@ import {
 import { __ } from '@wordpress/i18n';
 import InteractionsSettings from './interactions-settings';
 import { useDebounce } from 'use-debounce';
-import SchemaForm from '../shared/schema-form';
+import SchemaForm, { mergeSchemaFormData } from '../shared/schema-form';
+import { mergeLayerTypeOptions } from '../map-blocks/layer-type-options';
+import {
+	coreLayerTypeOptions,
+	getEditorLayerTypeSchema,
+} from './layer-type-definitions';
 
-const layerSchema = {
+const baseLayerSchema = {
 	type: 'object',
 	properties: {
 		type: { title: __( 'Type', 'jeo' ), type: 'string' },
@@ -21,9 +26,45 @@ const layerSchema = {
 	required: [ 'type' ],
 };
 
+function isPlainObject( value ) {
+	return Boolean( value ) && typeof value === 'object' && ! Array.isArray( value );
+}
+
+function normalizeLayerFormData( postMeta = {} ) {
+	return {
+		...postMeta,
+		layer_type_options: isPlainObject( postMeta.layer_type_options )
+			? postMeta.layer_type_options
+			: {},
+	};
+}
+
+function getLayerTypeOptions() {
+	const registeredLayerTypeOptions =
+		window.JeoLayerTypes?.getLayerTypes?.().map( ( slug ) => ( {
+			label: window.JeoLayerTypes.getLayerType( slug )?.label || slug,
+			value: slug,
+		} ) ) ?? [];
+
+	return mergeLayerTypeOptions(
+		coreLayerTypeOptions,
+		registeredLayerTypeOptions
+	);
+}
+
 const formUpdater = ( setOptions, setWidgets, options ) => {
 	const widgets = { layer_type_options: {} };
-	Object.entries( options.properties ).forEach( ( [ key, property ] ) => {
+	const nextOptions = {
+		...options,
+		properties: Object.fromEntries(
+			Object.entries( options.properties || {} ).map( ( [ key, property ] ) => [
+				key,
+				{ ...property },
+			] )
+		),
+	};
+
+	Object.entries( nextOptions.properties ).forEach( ( [ key, property ] ) => {
 		if ( property.description ) {
 			widgets.layer_type_options[ key ] = { 'ui:help': property.description };
 			delete property.description;
@@ -34,7 +75,7 @@ const formUpdater = ( setOptions, setWidgets, options ) => {
 		}
 	} );
 	setWidgets( widgets );
-	setOptions( options );
+	setOptions( nextOptions );
 };
 
 function usePrevious( value ) {
@@ -48,6 +89,12 @@ function usePrevious( value ) {
 const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
+	const [ formData, setFormData ] = useState( () =>
+		normalizeLayerFormData( postMeta )
+	);
+	const [ layerTypeOptions, setLayerTypeOptions ] = useState( () =>
+		getLayerTypeOptions()
+	);
 	const [ styleLayers, setStyleLayers ] = useState( null );
 	const [ styleDefinition, setStyleDefinition ]= useState( null );
 	const [ modalOpen, setModalStatus ] = useState( false );
@@ -57,76 +104,122 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const openModal = useCallback( () => setModalStatus( true ), [
 		setModalStatus,
 	] );
-	const prevPostMeta = usePrevious( postMeta );
-	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
+	const prevLayerType = usePrevious( formData.type );
+	const serializedPostMeta = JSON.stringify( normalizeLayerFormData( postMeta ) );
+	const [ debouncedFormData ] = useDebounce( formData, 1500 );
 
-	layerSchema.properties.type.enum = window.JeoLayerTypes.getLayerTypes();
-	layerSchema.properties.type.enumNames = window.JeoLayerTypes.getLayerTypesLabels();
-	layerSchema.properties.layer_type_options = options;
+	const schema = useMemo(
+		() => ( {
+			...baseLayerSchema,
+			properties: {
+				type: {
+					...baseLayerSchema.properties.type,
+					enum: layerTypeOptions.map( ( option ) => option.value ),
+					enumNames: layerTypeOptions.map( ( option ) => option.label ),
+				},
+				...( options?.type === 'object'
+					? { layer_type_options: options }
+					: {} ),
+			},
+		} ),
+		[ layerTypeOptions, options ]
+	);
 
 	const interactions = useMemo( () => {
-		return postMeta.layer_type_options.interactions || [];
-	}, [ postMeta.layer_type_options.interactions ] );
+		return formData.layer_type_options?.interactions || [];
+	}, [ formData.layer_type_options?.interactions ] );
+
+	useEffect( () => {
+		setFormData( normalizeLayerFormData( postMeta ) );
+	}, [ serializedPostMeta ] );
 
 	const setInteractions = useCallback(
 		( e ) => {
-			setPostMeta( {
-				...postMeta,
+			const nextFormData = {
+				...formData,
 				layer_type_options: {
-					...postMeta.layer_type_options,
+					...formData.layer_type_options,
 					interactions: e,
 				},
-			} );
+			};
+			setFormData( nextFormData );
+			setPostMeta( nextFormData );
 		},
-		[ postMeta, setPostMeta ]
+		[ formData, setPostMeta ]
 	);
 
 	useEffect( () => {
-		if ( postMeta.type ) {
-			const schema = window.JeoLayerTypes.getLayerTypeSchema( postMeta );
-			formUpdater( setOptions, setWidgets, schema );
+		const syncLayerTypeOptions = () => {
+			setLayerTypeOptions( getLayerTypeOptions() );
+		};
 
-			if ( postMeta.type ) {
-				let layerTypeOptions = {};
-				if (
-					! prevPostMeta ||
-					( prevPostMeta && prevPostMeta.type === postMeta.type )
-				) {
-					layerTypeOptions = postMeta.layer_type_options;
-				}
-				setPostMeta( {
-					...postMeta,
-					layer_type_options: layerTypeOptions,
-				} );
-				setStyleLayers( null );
+		syncLayerTypeOptions();
+		window.addEventListener( 'jeo-layer-types-changed', syncLayerTypeOptions );
+
+		return () => {
+			window.removeEventListener(
+				'jeo-layer-types-changed',
+				syncLayerTypeOptions
+			);
+		};
+	}, [] );
+
+	useEffect( () => {
+		if ( formData.type ) {
+			const nextSchema = getEditorLayerTypeSchema( formData );
+			if ( ! nextSchema ) {
+				setOptions( {} );
+				setWidgets( {} );
+				return;
 			}
+			formUpdater( setOptions, setWidgets, nextSchema );
+
+			if ( prevLayerType && prevLayerType !== formData.type ) {
+				const nextFormData = {
+					...formData,
+					layer_type_options: {},
+				};
+				setFormData( nextFormData );
+				setPostMeta( nextFormData );
+				}
+				setStyleLayers( null );
 		} else {
 			setOptions( {} );
+			setWidgets( {} );
 		}
-	}, [ postMeta.type ] );
+	}, [ formData.type, layerTypeOptions ] );
 
 	useEffect( () => {
 		const layerType = window.JeoLayerTypes.getLayerType(
-			debouncedPostMeta.type
+			debouncedFormData.type
 		);
-		if ( layerType && layerType.getStyleLayers ) {
-			layerType._getStyleDefinition( debouncedPostMeta ).then( setStyleDefinition );
-			layerType.getStyleLayers( debouncedPostMeta ).then( setStyleLayers );
+		const layerTypeOptions = debouncedFormData.layer_type_options;
+		const hasLayerTypeOptions =
+			layerTypeOptions && typeof layerTypeOptions === 'object';
+
+		if ( layerType && layerType.getStyleLayers && hasLayerTypeOptions ) {
+			layerType._getStyleDefinition( debouncedFormData ).then( setStyleDefinition );
+			layerType.getStyleLayers( debouncedFormData ).then( setStyleLayers );
 		} else {
 			setStyleLayers( null );
+			setStyleDefinition( null );
 		}
-	}, [ debouncedPostMeta ] );
+	}, [ debouncedFormData ] );
 
 	return (
 		<Fragment>
 			<SchemaForm
 				className="jeo-layer-settings"
-				schema={ layerSchema }
+				schema={ schema }
 				uiSchema={ widgets }
-				formData={ postMeta }
-				onChange={ ( { formData } ) => {
-					window.layerFormData = formData;
-					setPostMeta( formData );
+				formData={ formData }
+				onChange={ ( { formData: nextPartialFormData } ) => {
+					const nextFormData = normalizeLayerFormData(
+						mergeSchemaFormData( formData, nextPartialFormData )
+					);
+					window.layerFormData = nextFormData;
+					setFormData( nextFormData );
+					setPostMeta( nextFormData );
 				} }
 			>
 				{ /* Hide submit button */ }

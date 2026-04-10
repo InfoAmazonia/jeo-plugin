@@ -41,8 +41,6 @@ class Geocode_Handler {
 		add_action( 'wp_ajax_jeo_reverse_geocode', array( $this, 'ajax_reverse_geocode' ) );
 		add_action( 'init', array( $this, 'register_metadata' ), 99 );
 
-		add_action( 'init', array( $this, 'register_metadata' ), 99 );
-
 		$this->add_index_metadata_hooks();
 	}
 
@@ -59,16 +57,30 @@ class Geocode_Handler {
 	 * @return void
 	 */
 	public function ajax_geocode() {
-		$geocoder = $this->get_active_geocoder();
+		check_ajax_referer( 'jeo_geocode', 'nonce' );
 
-		if ( $geocoder ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This wp_ajax endpoint is restricted to authenticated users and only returns sanitized geocoder results.
-			echo wp_json_encode( $geocoder->geocode( sanitize_text_field( $_GET['search'] ) ) );
-		} else {
-			echo wp_json_encode( array() );
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array(), 403 );
 		}
 
-		die;
+		$search = '';
+		if ( isset( $_GET['search'] ) ) {
+			$search = sanitize_text_field( wp_unslash( $_GET['search'] ) );
+		}
+		$geocoder = $this->get_active_geocoder();
+
+		if ( ! $geocoder || empty( $search ) ) {
+			wp_send_json( array() );
+		}
+
+		$results         = $geocoder->geocode( $search );
+		$fallback_search = remove_accents( $search );
+
+		if ( empty( $results ) && $fallback_search !== $search ) {
+			$results = $geocoder->geocode( $fallback_search );
+		}
+
+		wp_send_json( $results );
 	}
 
 	/**
@@ -77,16 +89,26 @@ class Geocode_Handler {
 	 * @return void
 	 */
 	public function ajax_reverse_geocode() {
-		$geocoder = $this->get_active_geocoder();
+		check_ajax_referer( 'jeo_geocode', 'nonce' );
 
-		if ( $geocoder ) {
-			// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- This wp_ajax endpoint is restricted to authenticated users and only returns sanitized geocoder results.
-			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
-		} else {
-			echo wp_json_encode( array() );
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array(), 403 );
 		}
 
-		die;
+		$lat      = filter_input( INPUT_GET, 'lat', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$lon      = filter_input( INPUT_GET, 'lon', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
+		$geocoder = $this->get_active_geocoder();
+
+		if ( ! $geocoder || null === $lat || null === $lon ) {
+			wp_send_json( array() );
+		}
+
+		wp_send_json(
+			$geocoder->reverse_geocode(
+				sanitize_text_field( $lat ),
+				sanitize_text_field( $lon )
+			)
+		);
 	}
 
 	/**
@@ -101,7 +123,7 @@ class Geocode_Handler {
 			array(
 				'slug'        => 'nominatim',
 				'name'        => 'Nominatim',
-				'description' => __( 'Service provided by Open Street Maps at https://nominatim.openstreetmap.org/', 'jeo' ),
+				'description' => __( 'Geocoding service provided by OpenStreetMap at https://nominatim.openstreetmap.org/.', 'jeo' ),
 				'class_name'  => '\Jeo\Geocoders\Nominatim',
 			)
 		);
@@ -202,7 +224,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'              => 'object',
-						'description'       => __( 'Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo' ),
+						'description'       => __( 'Metadata storing the locations related to the post. Each location is an object with latitude, longitude, and geocode attributes.', 'jeo' ),
 					)
 				);
 

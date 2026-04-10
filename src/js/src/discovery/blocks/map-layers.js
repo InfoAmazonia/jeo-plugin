@@ -1,24 +1,60 @@
 import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
-import { List, arrayMove, arrayRemove } from 'react-movable';
+import { List, arrayMove } from 'react-movable';
+import { addQueryArgs } from '@wordpress/url';
 
 import { mapboxToken } from '../../lib/mapgl-loader';
+import { chunkRecordIds, mergeRecordsByIdOrder } from '../../shared/rest-records';
 import MapItem from './map-item';
 import Search from './search';
+
+const MAPS_PER_PAGE = 20;
+
+const normalizeMaps = ( maps = [] ) =>
+	maps
+		.filter( ( map ) => ! map.meta.hide_in_discovery )
+		.map( ( singleMap ) => ( {
+			...singleMap,
+			queriedLayers: Array.isArray( singleMap.queriedLayers ) ?
+				singleMap.queriedLayers :
+				singleMap.meta.layers.length ? null : [],
+		} ) );
+
+const mergeMapsById = ( currentMaps = [], nextMaps = [] ) => {
+	const mapsById = new Map();
+
+	[ ...currentMaps, ...nextMaps ].forEach( ( map ) => {
+		if ( Number.isFinite( Number.parseInt( map?.id, 10 ) ) ) {
+			mapsById.set( Number.parseInt( map.id, 10 ), map );
+		}
+	} );
+
+	return Array.from( mapsById.values() );
+};
 
 class MapLayers extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
-			maps: [],
+			loadingMapLayerIds: {},
+			mapsError: null,
+			isLoadingMaps: false,
+			mapsPage: 1,
+			mapsTotalPages: 1,
+			currentSearch: '',
 		};
+		this.pendingLayerRequests = new Map();
 
 		this.toggleLayer = this.toggleLayer.bind( this );
 		this.applyLayersChanges = this.applyLayersChanges.bind( this );
 		this.updateMaps = this.updateMaps.bind( this );
 		this.toggleLayersBatch = this.toggleLayersBatch.bind( this );
+		this.buildSelectionState = this.buildSelectionState.bind( this );
+		this.loadMapLayers = this.loadMapLayers.bind( this );
+		this.fetchMapsByIds = this.fetchMapsByIds.bind( this );
+		this.loadMoreMaps = this.loadMoreMaps.bind( this );
 
 		if ( ! this.props.mapsLoaded ) {
 			if ( this.props.isEmbed ) {
@@ -26,40 +62,58 @@ class MapLayers extends Component {
 					( data ) => data[ 0 ]
 				);
 				this.fetchLayers( requestedLayerIds ).then( ( layers ) => {
-					// console.log(layers);
 					this.toggleLayersBatch( layers.reverse() );
 					this.applyLayersChanges();
 				} );
 			} else {
 				const urlParams = new URLSearchParams( window.location.search );
 				const isShare = urlParams.get( 'share' );
+
 				if ( isShare ) {
-					this.fetchMaps().then( ( _ ) => {
-						let requestedLayerIds = this.getLayerIdsFromUrl().map(
+					this.fetchMaps().then( async ( maps ) => {
+						const requestedLayerIds = this.getLayerIdsFromUrl().map(
 							( item ) => ( { id: item[ 0 ], map: item[ 1 ] } )
 						);
-						let layersBatch = [];
+						const missingMapIds = [
+							...new Set(
+								requestedLayerIds
+									.map( ( item ) => item.map )
+									.filter(
+										( mapId ) =>
+											! maps.some( ( singleMap ) => singleMap.id === mapId )
+									)
+							),
+						];
+						const allMaps = missingMapIds.length ?
+							mergeMapsById( maps, await this.fetchMapsByIds( missingMapIds ) ) :
+							maps;
+						const layersByMap = new Map();
 
-						this.props.maps.map( ( aMap ) => {
-							requestedLayerIds.map( ( layer ) => {
-								if ( layer.map === aMap.id ) {
-									layersBatch = [
-										...layersBatch,
-										aMap.queriedLayers.find( ( item ) => item.id === layer.id ),
-									];
-								}
-							} );
+						for ( const mapId of [ ...new Set( requestedLayerIds.map( ( item ) => item.map ) ) ] ) {
+							layersByMap.set(
+								mapId,
+								await this.loadMapLayers(
+									allMaps.find( ( singleMap ) => singleMap.id === mapId ) || null,
+									allMaps
+								)
+							);
+						}
+
+						const sortedLayerBatch = requestedLayerIds
+							.map( ( item ) =>
+								layersByMap
+									.get( item.map )
+									?.find( ( layer ) => layer.id === item.id )
+							)
+							.filter( Boolean );
+						const { selectedLayers, layersQueue } =
+							this.buildSelectionState( sortedLayerBatch.reverse() );
+
+						this.props.updateState( {
+							selectedLayers,
+							layersQueue,
 						} );
-
-						// console.log( layersBatch );
-						requestedLayerIds = requestedLayerIds.map( ( item ) => item.id );
-
-						const sortedLayerBatch = requestedLayerIds.map( ( id ) => {
-							return layersBatch.find( ( layer ) => layer.id === id );
-						} );
-
-						this.toggleLayersBatch( sortedLayerBatch.reverse() );
-						this.applyLayersChanges();
+						this.applyLayersChanges( layersQueue, selectedLayers );
 					} );
 				} else {
 					this.fetchMaps();
@@ -69,108 +123,168 @@ class MapLayers extends Component {
 	}
 
 	fetchMaps( params = {} ) {
-		const defaultParams = { per_page: 99 };
+		const defaultParams = {
+			per_page: MAPS_PER_PAGE,
+			page: 1,
+			search: '',
+			cumulative: false,
+		};
 		params = { ...defaultParams, ...params };
 
 		const mapsUrl = new URL( jeoMapVars.jsonUrl + 'map/' );
+		const { cumulative, ...requestParams } = params;
 
-		Object.keys( params ).forEach( ( key ) =>
-			mapsUrl.searchParams.append( key, params[ key ] )
+		this.setState( { isLoadingMaps: true } );
+
+		Object.keys( requestParams ).forEach( ( key ) =>
+			mapsUrl.searchParams.append( key, requestParams[ key ] )
 		);
 
-		if("languageParams" in window){
+		if ( 'languageParams' in window ) {
 			mapsUrl.searchParams.append( 'lang', languageParams.currentLang );
 		}
 
 		return fetch( mapsUrl )
-			.then( ( response ) => response.json() )
-			.then( ( maps ) => {
-				// Filter the ones that shoudnt be listed
-				const filteredMaps = maps.filter(map => !map.meta.hide_in_discovery);
+			.then( async ( response ) => ( {
+				maps: await response.json(),
+				totalPages: Number.parseInt(
+					response.headers.get( 'X-WP-TotalPages' ) || '1',
+					10
+				),
+			} ) )
+			.then( ( { maps, totalPages } ) => {
+				const nextMaps = normalizeMaps( maps );
+				const mergedMaps = cumulative ?
+					mergeMapsById( this.props.maps, nextMaps ) :
+					nextMaps;
 
-				// Fetch layers
-				const mapsLayersPromises = filteredMaps.map( ( singleMap ) => {
-					const result = singleMap.meta.layers.map( async ( layer ) => {
-						const mapLayerApiUrl = new URL(
-							jeoMapVars.jsonUrl + 'map-layer/' + layer.id
-						);
-
-						if("languageParams" in window){
-							mapLayerApiUrl.searchParams.append( 'lang', languageParams.currentLang );
-						}
-
-						return fetch( mapLayerApiUrl )
-							.then( ( data ) => data.json() )
-							.then( ( layer ) => {
-								if (
-									layer.code &&
-									( layer.code === 'rest_forbidden' ||
-										layer.code === 'rest_post_invalid_id' )
-								) {
-									return;
-								}
-
-								if (
-									singleMap.queriedLayers &&
-									singleMap.queriedLayers.length
-								) {
-									singleMap.queriedLayers = [
-										...singleMap.queriedLayers,
-										{ ...layer, map: singleMap },
-									];
-								} else {
-									singleMap.queriedLayers = [ { ...layer, map: singleMap } ];
-								}
-
-								return layer;
-							} );
-					} );
-
-					if ( ! singleMap.meta.layers.length ) {
-						singleMap.queriedLayers = [];
-					}
-
-					return Promise.all( result ).then(response => {
-						// console.log(response, singleMap);
-
-						const fixedLayersOrder = singleMap.meta.layers.map(mapLayer => {
-							const currentLayerId = mapLayer.id;
-							return singleMap.queriedLayers.find(layer => layer.id == currentLayerId)
-						});
-
-						singleMap.queriedLayers = fixedLayersOrder;
-
-						return response;
-					});
+				this.props.updateState( {
+					maps: mergedMaps,
+					mapsLoaded: true,
+				} );
+				this.setState( {
+					mapsError: null,
+					isLoadingMaps: false,
+					mapsPage: requestParams.page,
+					mapsTotalPages: totalPages,
+					currentSearch: requestParams.search || '',
 				} );
 
-				return Promise.all( mapsLayersPromises ).then( () => {
-					this.props.updateState( { maps, mapsLoaded: true } );
+				return mergedMaps;
+			} )
+			.catch( ( error ) => {
+				this.setState( {
+					isLoadingMaps: false,
+					mapsError: __( 'Unable to load map layers right now.', 'jeo' ),
 				} );
 
-				// Build layers legends using legacy strategy (based on active layers)
+				throw error;
 			} );
 	}
 
+	fetchMapsByIds( mapIds = [] ) {
+		const mapChunks = chunkRecordIds( mapIds );
+		const requests = mapChunks.map( ( chunk ) => {
+			const path = addQueryArgs( jeoMapVars.jsonUrl + 'map/', {
+				include: chunk,
+				orderby: 'include',
+				per_page: chunk.length,
+				...( 'languageParams' in window && window.languageParams?.currentLang
+					? { lang: languageParams.currentLang }
+					: {} ),
+			} );
+
+			return fetch( path )
+				.then( ( response ) => response.json() )
+				.then( ( response ) => Array.isArray( response ) ? response : [] );
+		} );
+
+		return Promise.all( requests ).then( ( maps ) =>
+			normalizeMaps( mergeRecordsByIdOrder( mapIds, maps.flat() ) )
+		);
+	}
+
 	fetchLayers( layersIds ) {
-		return Promise.all(
-			layersIds.map( ( layerId ) => {
-				const mapLayerApiUrl = new URL(
-					jeoMapVars.jsonUrl + 'map-layer/' + layerId
+		const layerChunks = chunkRecordIds( layersIds );
+		const requests = layerChunks.map( ( chunk ) => {
+			const path = addQueryArgs( jeoMapVars.jsonUrl + 'map-layer/', {
+				include: chunk,
+				orderby: 'include',
+				per_page: chunk.length,
+				...( "languageParams" in window && window.languageParams?.currentLang
+					? { lang: languageParams.currentLang }
+					: {} ),
+			} );
+
+			return fetch( path )
+				.then( ( response ) => response.json() )
+				.then( ( response ) => Array.isArray( response ) ? response : [] );
+		} );
+
+		return Promise.all( requests ).then( ( layers ) =>
+			mergeRecordsByIdOrder( layersIds, layers.flat() )
+		);
+	}
+
+	loadMapLayers( map, maps = this.props.maps ) {
+		if ( ! map ) {
+			return Promise.resolve( [] );
+		}
+
+		if ( Array.isArray( map.queriedLayers ) ) {
+			return Promise.resolve( map.queriedLayers );
+		}
+
+		if ( this.pendingLayerRequests.has( map.id ) ) {
+			return this.pendingLayerRequests.get( map.id );
+		}
+
+		this.setState( ( currentState ) => ( {
+			loadingMapLayerIds: {
+				...currentState.loadingMapLayerIds,
+				[ map.id ]: true,
+			},
+		} ) );
+
+		const request = this.fetchLayers( map.meta.layers.map( ( layer ) => layer.id ) )
+			.then( ( layers ) => {
+				const queriedLayers = layers.map( ( layer ) => ( { ...layer, map } ) );
+				const nextMaps = maps.map( ( currentMap ) =>
+					currentMap.id === map.id
+						? { ...currentMap, queriedLayers }
+						: currentMap
 				);
 
-				return fetch( mapLayerApiUrl )
-					.then( ( data ) => data.json() )
-					.then( ( layer ) => {
-						return layer;
-					} );
+				this.props.updateState( { maps: nextMaps } );
+				return queriedLayers;
 			} )
-		);
+			.finally( () => {
+				this.pendingLayerRequests.delete( map.id );
+				this.setState( ( currentState ) => {
+					const loadingMapLayerIds = { ...currentState.loadingMapLayerIds };
+					delete loadingMapLayerIds[ map.id ];
+					return { loadingMapLayerIds };
+				} );
+			} );
+
+		this.pendingLayerRequests.set( map.id, request );
+
+		return request;
 	}
 
 	getLayerIdsFromUrl() {
 		const urlParams = new URLSearchParams( window.location.search );
-		return JSON.parse( urlParams.get( 'selected-layers' ) );
+		const layerIds = urlParams.get( 'selected-layers' );
+
+		if ( ! layerIds ) {
+			return [];
+		}
+
+		try {
+			return JSON.parse( layerIds );
+		} catch ( error ) {
+			return [];
+		}
 	}
 
 	toggleLayer( layer ) {
@@ -192,12 +306,15 @@ class MapLayers extends Component {
 		} );
 	}
 
-	toggleLayersBatch( layers ) {
-		const selectedLayers = Object.assign( {}, this.props.selectedLayers );
-		let layersQueue = [ ...this.props.layersQueue ];
+	buildSelectionState(
+		layers,
+		baseSelectedLayers = this.props.selectedLayers,
+		baseLayersQueue = this.props.layersQueue
+	) {
+		const selectedLayers = Object.assign( {}, baseSelectedLayers );
+		let layersQueue = [ ...baseLayersQueue ];
 
 		layers.forEach( ( layer ) => {
-			// If layer does not exist
 			if ( ! selectedLayers.hasOwnProperty( layer.id ) ) {
 				selectedLayers[ layer.id ] = layer;
 				layersQueue = [ layer.id, ...layersQueue ];
@@ -207,18 +324,41 @@ class MapLayers extends Component {
 			}
 		} );
 
+		return {
+			selectedLayers,
+			layersQueue,
+		};
+	}
+
+	toggleLayersBatch( layers ) {
+		const { selectedLayers, layersQueue } = this.buildSelectionState( layers );
+
 		this.props.updateState( {
 			selectedLayers,
 			layersQueue,
 		} );
 	}
 
-	applyLayersChanges() {
-		const batch = this.props.layersQueue;
-		const map = this.props.map;
-		let appliedLayers = this.props.appliedLayers;
+	applyLayersChanges(
+		batch = this.props.layersQueue,
+		selectedLayers = this.props.selectedLayers,
+		appliedLayers = this.props.appliedLayers
+	) {
+		if ( batch?.preventDefault ) {
+			batch.preventDefault();
+			batch = this.props.layersQueue;
+			selectedLayers = this.props.selectedLayers;
+			appliedLayers = this.props.appliedLayers;
+		}
 
-		appliedLayers.forEach( ( layer ) => {
+		if ( ! Array.isArray( batch ) ) {
+			batch = this.props.layersQueue;
+		}
+
+		const map = this.props.map;
+		let nextAppliedLayers = appliedLayers;
+
+		nextAppliedLayers.forEach( ( layer ) => {
 			const layerId = String( layer.id );
 			// If layer is not requested
 			if ( ! batch.includes( layer.id ) ) {
@@ -231,12 +371,10 @@ class MapLayers extends Component {
 		const reverseBatch = [ ...batch ].reverse();
 		reverseBatch.forEach( ( layerID ) => {
 			const layerId = String( layerID );
-			const layer = this.props.selectedLayers[ layerId ];
+			const layer = selectedLayers[ layerId ];
 			const attributes = layer.meta;
 
-			// console.log(layer.meta.type);
-
-			if ( layer.meta.type === 'tilelayer' ) {
+				if ( layer.meta.type === 'tilelayer' ) {
 				if ( ! map.getSource( layerId ) ) {
 					map.addSource( layerId, {
 						type: 'raster',
@@ -354,17 +492,29 @@ class MapLayers extends Component {
 			}
 		} );
 
-		appliedLayers = batch.map( ( layerId ) => {
-			return this.props.selectedLayers[ layerId ];
+		nextAppliedLayers = batch.map( ( layerId ) => {
+			return selectedLayers[ layerId ];
 		} );
 
 		this.props.updateState( {
-			appliedLayers,
+			appliedLayers: nextAppliedLayers,
 		} );
 	}
 
 	updateMaps( params ) {
-		this.fetchMaps( { ...params } ).catch( ( err ) => console.log( err ) );
+		this.fetchMaps( { ...params } ).catch( () => {} );
+	}
+
+	loadMoreMaps() {
+		if ( this.state.mapsPage >= this.state.mapsTotalPages ) {
+			return;
+		}
+
+		this.fetchMaps( {
+			page: this.state.mapsPage + 1,
+			search: this.state.currentSearch,
+			cumulative: true,
+		} ).catch( () => {} );
 	}
 
 	render() {
@@ -374,15 +524,17 @@ class MapLayers extends Component {
 
 		const mapItens = this.props.maps.map( ( map, index ) => {
 			return (
-				<MapItem
-					map={ map }
-					key={ index }
-					toggleLayer={ this.toggleLayer }
-					selectedLayers={ this.props.selectedLayers }
-					toggleLayersBatch={ this.toggleLayersBatch }
-				/>
-			);
-		} );
+					<MapItem
+						map={ map }
+						key={ index }
+						toggleLayer={ this.toggleLayer }
+						selectedLayers={ this.props.selectedLayers }
+						toggleLayersBatch={ this.toggleLayersBatch }
+						loadMapLayers={ this.loadMapLayers }
+						loadingMapLayers={ Boolean( this.state.loadingMapLayerIds[ map.id ] ) }
+					/>
+				);
+			} );
 
 		const selectedLayersRender = (
 			<List
@@ -496,7 +648,7 @@ class MapLayers extends Component {
 
 		return (
 			<div className="maps-tab" style={ this.props.style }>
-				<Search searchPlaceholder={ __("Search map", "jeo") } update={ this.updateMaps } />
+				<Search searchPlaceholder={ __( 'Search map', 'jeo' ) } update={ this.updateMaps } />
 
 				<div className="selected-layers">
 					<div className="status">
@@ -555,12 +707,26 @@ class MapLayers extends Component {
 						{ __( 'Changes applied', 'jeo' ) }
 					</button>
 				) : (
-					<button className="apply-changes" onClick={ this.applyLayersChanges }>
+					<button
+						className="apply-changes"
+						onClick={ () => this.applyLayersChanges() }
+					>
 						{ __( 'Apply changes', 'jeo' ) }
 					</button>
 				) }
 				{ loading }
+				{ this.state.mapsError ? (
+					<div className="maps-error">{ this.state.mapsError }</div>
+				) : null }
 				<div className="map-itens">{ mapItens }</div>
+				{ this.state.isLoadingMaps && this.props.mapsLoaded ? (
+					<div className="maps-loading">{ __( 'Loading more maps…', 'jeo' ) }</div>
+				) : null }
+				{ this.state.mapsPage < this.state.mapsTotalPages ? (
+					<button className="load-more-maps" onClick={ this.loadMoreMaps }>
+						{ __( 'Load more maps', 'jeo' ) }
+					</button>
+				) : null }
 			</div>
 		);
 	}

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { getDateFnsLocale, normalizeLocaleCode } from '../../shared/locale';
 
 export function createLegacyDateRangePickerValue( startDate, endDate ) {
 	const wrapDate = ( date ) => ( {
@@ -17,7 +18,7 @@ export function createLegacyDateRangePickerValue( startDate, endDate ) {
 
 export function formatDateRangeValue( startDate, endDate ) {
 	const dateOptions = [
-		undefined,
+		normalizeLocaleCode(),
 		{ year: '2-digit', month: '2-digit', day: '2-digit' },
 	];
 
@@ -50,6 +51,7 @@ export default function DateRangeFilter( {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const [ draftStartDate, setDraftStartDate ] = useState( parseDateValue( startDate ) );
 	const [ draftEndDate, setDraftEndDate ] = useState( parseDateValue( endDate ) );
+	const datePickerLocale = useMemo( () => getDateFnsLocale(), [] );
 
 	useEffect( () => {
 		if ( isOpen ) {
@@ -100,6 +102,7 @@ export default function DateRangeFilter( {
 					<DatePicker
 						inline
 						selectsRange
+						locale={ datePickerLocale }
 						startDate={ draftStartDate }
 						endDate={ draftEndDate }
 						onChange={ ( [ nextStartDate, nextEndDate ] ) => {

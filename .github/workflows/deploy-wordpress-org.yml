@@ -1,0 +1,40 @@
+name: Deploy to WordPress.org
+on:
+  push:
+    tags:
+    - "*"
+jobs:
+  tag:
+    name: New tag
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: npm
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+        coverage: none
+        tools: wp-cli
+    - name: Check supported runtime
+      run: npm run check:env
+    - name: Install frontend dependencies
+      run: |
+        npm ci
+    - name: Validate release metadata
+      run: node scripts/validate-release-meta.mjs
+    - name: Validate frontend build and tests
+      run: |
+        npm run test:unit
+        npm run build:release
+        npm run build:report
+    - name: WordPress Plugin Deploy
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      env:
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SLUG: jeowp # optional, remove if GitHub repo name matches SVN slug, including capitalization
+        BUILD_DIR: src
+        ASSETS_DIR: .wordpress-org

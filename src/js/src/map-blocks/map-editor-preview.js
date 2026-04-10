@@ -1,12 +1,12 @@
 import { useBlockProps } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useEntityRecords } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
+import { useRecordsByIds } from '../shared/rest-records';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -68,10 +68,12 @@ export default function MapEditorPreview() {
 		return ( postMeta.layers || [] ).map( ( layer ) => layer.id );
 	}, [ postMeta.layers ] );
 
-	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
-		include: layerIds,
-		per_page: -1,
-	}, { enabled: layerIds.length > 0 } );
+	const { records: loadedLayers = [] } = useRecordsByIds( {
+		path: '/wp/v2/map-layer',
+		ids: layerIds,
+		enabled: layerIds.length > 0,
+		query: { context: 'edit' },
+	} );
 
 	const buttonStyle = ( selected ) => ( {
 		color: selected ? '#fff' : '#000',

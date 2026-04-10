@@ -123,7 +123,7 @@ const LayerSettings = (
 					<div className="default-control" style={ setWidth( 5 ) }>
 						{ ! settings.layer.meta.use_legend && (
 							<p>
-								<em>No Legend</em>
+								<em>{ __( 'No legend', 'jeo' ) }</em>
 							</p>
 						) }
 						{ settings.layer.meta.use_legend && (
@@ -187,7 +187,7 @@ const LayerSettings = (
 					{ settings.load_as_style && showStyleLayers && (
 						<>
 							<div className="informative-message">
-								{ __("If the layer is not visible inside Mapbox Studio we will not be able to control the displayment.", "jeo") }
+								{ __( 'If the layer is not visible in Mapbox Studio, we will not be able to control its visibility.', 'jeo' ) }
 							</div>
 
 							<div className="layers-selector">

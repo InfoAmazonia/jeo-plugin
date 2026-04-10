@@ -46,6 +46,7 @@ class Storymap {
 	 */
 	public function register_post_type() {
 		$labels = array(
+			// translators: Story Map is the name of JEO's storytelling map feature.
 			'name'                     => __( 'Story Map', 'jeo' ),
 			'singular_name'            => __( 'Story Map', 'jeo' ),
 			'add_new'                  => __( 'Add new Story Map', 'jeo' ),
@@ -69,7 +70,7 @@ class Storymap {
 			'labels'              => $labels,
 			'hierarchical'        => true,
 			'description'         => __( 'JEO Story Map', 'jeo' ),
-			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks' ),
+			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks', 'revisions' ),
 			'rewrite'             => array( 'slug' => 'storymap' ),
 			'public'              => true,
 			'show_in_menu'        => 'jeo-main-menu',

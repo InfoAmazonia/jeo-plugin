@@ -5,114 +5,215 @@ import JeoLegendTypes from '../../../../includes/legend-types/JeoLegendTypes';
 import { __ } from '@wordpress/i18n';
 import LegendTypeEdition from './legend-type-edition';
 
+const CORE_LEGEND_TYPES = [
+	{ value: 'barscale', label: __( 'Color scale', 'jeo' ) },
+	{ value: 'simple-color', label: __( 'Color categories', 'jeo' ) },
+	{ value: 'icons', label: __( 'Icon categories', 'jeo' ) },
+	{ value: 'circles', label: __( 'Circle sizes', 'jeo' ) },
+];
+
+function isPlainObject( value ) {
+	return Boolean( value ) && typeof value === 'object' && ! Array.isArray( value );
+}
+
+function getRegisteredLegendTypes() {
+	const registeredLegendTypes = Object.keys( JeoLegendTypes.legendTypes || {} ).map(
+		( slug ) => ( {
+			value: slug,
+			label: JeoLegendTypes.getLegendType( slug )?.label || slug,
+		} )
+	);
+
+	return registeredLegendTypes.length ? registeredLegendTypes : CORE_LEGEND_TYPES;
+}
+
+function normalizeLegendTypeOptions( legendType, legendTypeOptions ) {
+	const defaultLegendTypeOptions = JeoLegend.typeOptionsShape( legendType );
+
+	if ( ! isPlainObject( defaultLegendTypeOptions ) ) {
+		return {};
+	}
+
+	const currentLegendTypeOptions = isPlainObject( legendTypeOptions )
+		? legendTypeOptions
+		: {};
+
+	switch ( legendType ) {
+		case 'barscale':
+			return {
+				left_label:
+					currentLegendTypeOptions.left_label ?? defaultLegendTypeOptions.left_label,
+				right_label:
+					currentLegendTypeOptions.right_label ??
+					defaultLegendTypeOptions.right_label,
+				colors:
+					Array.isArray( currentLegendTypeOptions.colors ) &&
+					currentLegendTypeOptions.colors.length
+						? currentLegendTypeOptions.colors
+						: defaultLegendTypeOptions.colors,
+			};
+
+		case 'simple-color':
+			return {
+				colors:
+					Array.isArray( currentLegendTypeOptions.colors ) &&
+					currentLegendTypeOptions.colors.length
+						? currentLegendTypeOptions.colors
+						: defaultLegendTypeOptions.colors,
+			};
+
+		case 'icons':
+			return {
+				icons:
+					Array.isArray( currentLegendTypeOptions.icons ) &&
+					currentLegendTypeOptions.icons.length
+						? currentLegendTypeOptions.icons
+						: defaultLegendTypeOptions.icons,
+			};
+
+		case 'circles':
+			return {
+				color: currentLegendTypeOptions.color ?? defaultLegendTypeOptions.color,
+				circles:
+					Array.isArray( currentLegendTypeOptions.circles ) &&
+					currentLegendTypeOptions.circles.length
+						? currentLegendTypeOptions.circles
+						: defaultLegendTypeOptions.circles,
+			};
+
+		default:
+			return {
+				...defaultLegendTypeOptions,
+				...currentLegendTypeOptions,
+			};
+	}
+}
+
+function buildLegendObject( legendType = 'barscale', attributes = {} ) {
+	return new JeoLegend( legendType, {
+		use_legend: Boolean( attributes.use_legend ),
+		legend_title: attributes.legend_title ? attributes.legend_title : '',
+		legend_type_options: normalizeLegendTypeOptions(
+			legendType,
+			attributes.legend_type_options
+		),
+	} );
+}
+
 class LegendEditor extends Component {
 	constructor() {
 		super();
-		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
+		this.legendTypes = getRegisteredLegendTypes();
 		this.hasChanged = this.hasChanged.bind( this );
 
-		const metadata = wp.data.select('core/editor').getEditedPostAttribute('meta');
+		const metadata =
+			wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+		const legendType = metadata.legend_type || 'barscale';
+		const legendObject = buildLegendObject( legendType, {
+			legend_type_options: metadata.legend_type_options,
+			use_legend: metadata.use_legend,
+			legend_title: metadata.legend_title,
+		} );
 
 		this.state = {
-			legendObject: new JeoLegend( metadata.legend_type, {
-				legend_type_options: metadata.legend_type_options,
-				use_legend: metadata.use_legend,
-				legend_title: metadata.legend_title? metadata.legend_title : "",
-			} ),
+			legendObject,
 		};
 
-		// New post case
-		if ( this.state.legendObject.legendSlug.length === 0 ) {
-			this.initialType = 'barscale';
-			this.state.legendObject.__legendType = this.initialType;
-			this.state.legendObject.__legendSlug = this.initialType;
-			this.state.legendObject.attributes.legend_type_options = JeoLegend.typeOptionsShape( 'barscale' );
-		}
-
-		this.initialType = this.state.legendObject.legendSlug === undefined ? 'barscale' : this.state.legendObject.legendSlug;
-		this.inicialAttrType = this.state.legendObject.attributes.legend_type_options;
+		this.initialType = legendObject.legendSlug || 'barscale';
+		this.inicialAttrType = normalizeLegendTypeOptions(
+			this.initialType,
+			legendObject.attributes.legend_type_options
+		);
 
 		// Update layer with the initialized legend
-		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( this.state.legendObject ) } );
-	}
-
-	componentDidUpdate() {
-
+		wp.data.dispatch( 'core/editor' ).editPost( {
+			meta: {
+				...metadata,
+				...JeoLegend.updatedLegendMeta( legendObject ),
+			},
+		} );
 	}
 
 	hasChanged( legendObject ) {
-		wp.data.dispatch( 'core/editor' ).editPost( { meta: JeoLegend.updatedLegendMeta( legendObject) } );
+		const metadata =
+			wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+		wp.data.dispatch( 'core/editor' ).editPost( {
+			meta: {
+				...metadata,
+				...JeoLegend.updatedLegendMeta( legendObject ),
+			},
+		} );
 		this.setState( { legendObject } );
 	}
 
 	render() {
-		// console.log("Rerender called");
+		const legendType = this.state.legendObject.legendSlug || 'barscale';
+		const legendObject = buildLegendObject( legendType, {
+			...this.state.legendObject.attributes,
+			legend_type_options: this.state.legendObject.attributes.legend_type_options,
+		} );
+
 		return (
 			<Fragment>
 				<CheckboxControl
 					label={ __( 'Use legend', 'jeo' ) }
-					checked={ this.state.legendObject.attributes.use_legend }
+					checked={ legendObject.attributes.use_legend }
 					onChange={ () => {
-						let newMeta = window.layerFormData;
-						if ( ! newMeta ) {
-							newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
-						}
-						newMeta.use_legend = ! newMeta.use_legend;
-						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
-
-						this.setState( ( prevState ) => {
-							const newState = prevState;
-							newState.legendObject.attributes.use_legend = ! newState.legendObject.attributes.use_legend;
-							return ( newState );
+						const metadata =
+							wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+						const nextLegendObject = buildLegendObject( legendType, {
+							...legendObject.attributes,
+							use_legend: ! legendObject.attributes.use_legend,
 						} );
+						wp.data.dispatch( 'core/editor' ).editPost( {
+							meta: {
+								...metadata,
+								use_legend: nextLegendObject.attributes.use_legend,
+							},
+						} );
+						this.setState( { legendObject: nextLegendObject } );
 					} }
 				/>
 
-				{ this.state.legendObject.attributes.use_legend && <TextControl
+				{ legendObject.attributes.use_legend && <TextControl
 					className="label-input-wrapper"
 					label={ __( 'Legend title', 'jeo' ) }
-					value={ this.state.legendObject.attributes.legend_title }
+					value={ legendObject.attributes.legend_title }
 					onChange={ ( value ) => {
-						const newMeta = wp.data.select('core/editor').getEditedPostAttribute('meta');
-						// console.log(newMeta);
-						newMeta.legend_title = value;
-
-						wp.data.dispatch( 'core/editor' ).editPost( { meta: newMeta } );
-
-						const newLegendObject = Object.assign( new JeoLegend, this.state.legendObject );
-						newLegendObject.attributes.legend_title = value;
-
-						this.setState( { legendObject: newLegendObject });
+						const metadata =
+							wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+						const nextLegendObject = buildLegendObject( legendType, {
+							...legendObject.attributes,
+							legend_title: value,
+						} );
+						wp.data.dispatch( 'core/editor' ).editPost( {
+							meta: {
+								...metadata,
+								legend_title: value,
+							},
+						} );
+						this.setState( { legendObject: nextLegendObject } );
 					} }
 				/> }
 
-				{ this.state.legendObject.attributes.use_legend && (
+				{ legendObject.attributes.use_legend && (
 					<>
 						<SelectControl
 							label={ __( 'Type', 'jeo' ) }
-							value={ this.state.legendObject.legendSlug }
-							options={ [	...this.legendTypes.map( ( item ) => {
-								return { label: item, value: item };
-							} )	] }
+							value={ legendType }
+							options={ this.legendTypes }
 							onChange={ ( newLegendType ) => {
-								this.setState( ( prevState ) => {
-									const legendObject = Object.assign( new JeoLegend, prevState.legendObject );
-									legendObject.legendType = newLegendType;
-									legendObject.setlegengSlug = newLegendType;
-
-									if ( this.initialType !== newLegendType ) {
-										legendObject.attributes.legend_type_options = JeoLegend.typeOptionsShape( newLegendType );
-									} else {
-										legendObject.attributes.legend_type_options = this.inicialAttrType;
-									}
-
-									this.hasChanged( legendObject );
-
-									return { legendObject };
+								const nextLegendObject = buildLegendObject( newLegendType, {
+									...legendObject.attributes,
+									legend_type_options:
+										this.initialType === newLegendType
+											? this.inicialAttrType
+											: JeoLegend.typeOptionsShape( newLegendType ),
 								} );
+								this.hasChanged( nextLegendObject );
 							} }
 						/>
-						<LegendTypeEdition legendObject={ this.state.legendObject } initialType={ this.initialType } hasChanged={ this.hasChanged } />
+						<LegendTypeEdition legendObject={ legendObject } hasChanged={ this.hasChanged } />
 					</>
 				) }
 

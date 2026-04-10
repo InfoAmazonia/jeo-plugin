@@ -6,6 +6,7 @@ import { useDebounce } from 'use-debounce';
 
 import { Map } from '../lib/mapgl-react';
 import { MemoizedRenderLayer } from './map-preview-layer';
+import { getEditorLayerTypeSchema } from '../layers-sidebar/layer-type-definitions';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -38,7 +39,7 @@ export default function LayerEditorPreview() {
 		if ( ! postMeta.type ) {
 			return;
 		}
-		const schema = window.JeoLayerTypes?.getLayerTypeSchema?.( postMeta );
+		const schema = getEditorLayerTypeSchema( postMeta );
 		if ( ! schema || ! schema.properties ) {
 			return;
 		}

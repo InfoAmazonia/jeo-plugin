@@ -5,7 +5,7 @@
  * A class definition that includes attributes and functions used across both the
  * public-facing side of the site and the admin area.
  *
- * @link       leo.com
+ * @link       https://www.jeowp.org/
  * @since      1.0.0
  *
  * @package    Jeo
@@ -24,7 +24,7 @@
  * @since      1.0.0
  * @package    Jeo
  * @subpackage Jeo/includes
- * @author     Leo <leo@Leo.leo>
+ * @author     InfoAmazonia <contact@infoamazonia.org>
  */
 class Jeo {
 
@@ -50,6 +50,8 @@ class Jeo {
 		\jeo_sidebars();
 		\jeo_storymap();
 
+		add_filter( 'load_textdomain_mofile', array( $this, 'fallback_translation_mofile' ), 10, 2 );
+		add_filter( 'load_script_translation_file', array( $this, 'fallback_script_translation_file' ), 10, 3 );
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
@@ -60,12 +62,11 @@ class Jeo {
 		add_action( 'template_redirect', array( $this, 'register_embed_template_redirect' ) );
 
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_blocks_assets' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_block_iframe_assets' ) );
 		add_action( 'init', array( $this, 'restrict_story_map_block_count' ) );
 
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-
-		add_filter( 'rest_post_tag_query', array( $this, 'maximum_terms_api_filter' ), 10, 1 );
 
 		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
 		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
@@ -77,11 +78,11 @@ class Jeo {
 		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
 	}
 
-		/**
-		 * Get the current site language, including WPML overrides when available.
-		 *
-		 * @return string
-		 */
+	/**
+	 * Get the current site language, including WPML overrides when available.
+	 *
+	 * @return string
+	 */
 	private function get_current_language(): string {
 		$language = get_bloginfo( 'language' );
 		if ( defined( 'ICL_LANGUAGE_CODE' ) ) {
@@ -100,6 +101,101 @@ class Jeo {
 			return wp_create_nonce( 'wp_rest' );
 		}
 		return null;
+	}
+
+	/**
+	 * Determine whether the current request is a preview for the given post.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return bool
+	 */
+	public function is_preview_request_for_post( int $post_id ): bool {
+		$preview = filter_input( INPUT_GET, 'preview', FILTER_VALIDATE_BOOL );
+		if ( ! $preview && ! is_preview() ) {
+			return false;
+		}
+
+		$preview_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
+		if ( $preview_id && $preview_id !== $post_id ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Return the autosave revision when previewing a post, falling back to the
+	 * published post otherwise.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return WP_Post|null
+	 */
+	public function get_preview_post( int $post_id ) {
+		$post = get_post( $post_id );
+		if ( ! $post instanceof WP_Post ) {
+			return null;
+		}
+
+		if ( ! $this->is_preview_request_for_post( $post_id ) ) {
+			return $post;
+		}
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			return $post;
+		}
+
+		$autosave = wp_get_post_autosave( $post_id );
+		if ( $autosave instanceof WP_Post ) {
+			return $autosave;
+		}
+
+		return $post;
+	}
+
+	/**
+	 * Return the requested map runtime normalized to a supported value.
+	 *
+	 * @return string
+	 */
+	private function get_requested_map_runtime(): string {
+		$map_runtime = sanitize_key( (string) \jeo_settings()->get_option( 'map_runtime' ) );
+		return in_array( $map_runtime, array( 'maplibregl', 'mapboxgl' ), true ) ? $map_runtime : 'maplibregl';
+	}
+
+	/**
+	 * Return the externally hosted Mapbox SDK metadata.
+	 *
+	 * @return array{version:string,js_url:string,css_url:string}
+	 */
+	private function get_mapbox_external_sdk(): array {
+		$version = 'v3.20.0';
+		$sdk     = apply_filters(
+			'jeo_mapbox_external_sdk',
+			array(
+				'version' => $version,
+				'js_url'  => sprintf( 'https://api.mapbox.com/mapbox-gl-js/%1$s/mapbox-gl.js', $version ),
+				'css_url' => sprintf( 'https://api.mapbox.com/mapbox-gl-js/%1$s/mapbox-gl.css', $version ),
+			)
+		);
+
+		return array(
+			'version' => sanitize_text_field( (string) ( $sdk['version'] ?? $version ) ),
+			'js_url'  => esc_url_raw( (string) ( $sdk['js_url'] ?? '' ) ),
+			'css_url' => esc_url_raw( (string) ( $sdk['css_url'] ?? '' ) ),
+		);
+	}
+
+	/**
+	 * Determine whether the external Mapbox SDK should be enqueued.
+	 *
+	 * @return bool
+	 */
+	private function should_load_external_mapbox_sdk(): bool {
+		if ( 'mapboxgl' !== $this->get_requested_map_runtime() ) {
+			return false;
+		}
+
+		return '' !== trim( sanitize_text_field( (string) \jeo_settings()->get_option( 'mapbox_key' ) ) );
 	}
 
 	/**
@@ -134,14 +230,90 @@ class Jeo {
 	}
 
 	/**
-	 * Allow large tag result sets in the REST API.
+	 * Fall back to the closest bundled locale when another locale in the same language family is active.
 	 *
-	 * @param array $prepared_args REST query args.
-	 * @return array
+	 * @param string $mofile Translation file path.
+	 * @param string $domain Text domain.
+	 * @return string
 	 */
-	public function maximum_terms_api_filter( $prepared_args ) {
-		$prepared_args['number'] = 1000;
-		return $prepared_args;
+	public function fallback_translation_mofile( $mofile, $domain ) {
+		if ( 'jeo' !== $domain || is_readable( $mofile ) ) {
+			return $mofile;
+		}
+
+		$fallback_locale = $this->get_locale_fallback( determine_locale() );
+		if ( ! $fallback_locale ) {
+			return $mofile;
+		}
+
+		$fallback_mofile = JEO_BASEPATH . 'languages/jeo-' . $fallback_locale . '.mo';
+
+		return is_readable( $fallback_mofile ) ? $fallback_mofile : $mofile;
+	}
+
+	/**
+	 * Fall back to the closest bundled script catalog for locales in the same language family.
+	 *
+	 * @param string|false $file Script translation file path.
+	 * @param string       $handle Script handle.
+	 * @param string       $domain Text domain.
+	 * @return string|false
+	 */
+	public function fallback_script_translation_file( $file, $handle, $domain ) {
+		if ( 'jeo' !== $domain || ! $file || is_readable( $file ) ) {
+			return $file;
+		}
+
+		$current_locale  = $this->normalize_translation_locale( determine_locale() );
+		$fallback_locale = $this->get_locale_fallback( $current_locale );
+		if ( ! $fallback_locale ) {
+			return $file;
+		}
+
+		$fallback_file = str_replace(
+			'-' . $current_locale . '-',
+			'-' . $fallback_locale . '-',
+			$file,
+		);
+
+		return $fallback_file !== $file && is_readable( $fallback_file ) ? $fallback_file : $file;
+	}
+
+	/**
+	 * Normalize locale codes used in translation file names.
+	 *
+	 * @param string $locale Locale code.
+	 * @return string
+	 */
+	private function normalize_translation_locale( string $locale ): string {
+		return str_replace( '-', '_', $locale );
+	}
+
+	/**
+	 * Get a fallback locale for translation files.
+	 *
+	 * @param string $locale Locale code.
+	 * @return string|null
+	 */
+	private function get_locale_fallback( string $locale ): ?string {
+		$locale = $this->normalize_translation_locale( $locale );
+
+		$fallbacks = array(
+			'es' => 'es_CO',
+			'pt' => 'pt_BR',
+		);
+
+		foreach ( $fallbacks as $language => $fallback_locale ) {
+			if ( $fallback_locale === $locale ) {
+				return null;
+			}
+
+			if ( $language === $locale || 0 === strpos( $locale, $language . '_' ) ) {
+				return $fallback_locale;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -193,6 +365,7 @@ class Jeo {
 	 */
 	public function register_assets() {
 		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
+		$layer_type_handles = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
 
 		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] ?? array() );
 
@@ -207,44 +380,56 @@ class Jeo {
 
 		wp_set_script_translations( 'jeo-js', 'jeo', JEO_BASEPATH . 'languages' );
 
-		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
+		$map_runtime_requested = $this->get_requested_map_runtime();
+		$mapgl_script_deps     = array();
+		$mapgl_style_deps      = array();
 
-		if ( 'maplibregl' === $map_runtime ) {
-			$mapgl_loader = 'maplibreglLoader';
-			$mapgl_react  = 'maplibreglReact';
-		} else {
-			$mapgl_loader = 'mapboxglLoader';
-			$mapgl_react  = 'mapboxglReact';
+		if ( $this->should_load_external_mapbox_sdk() ) {
+			$mapbox_sdk = $this->get_mapbox_external_sdk();
+
+			if ( ! empty( $mapbox_sdk['js_url'] ) ) {
+				wp_register_script(
+					'jeo-mapbox-sdk-js',
+					$mapbox_sdk['js_url'],
+					array(),
+					$mapbox_sdk['version'],
+					true,
+				);
+				$mapgl_script_deps[] = 'jeo-mapbox-sdk-js';
+			}
+
+			if ( ! empty( $mapbox_sdk['css_url'] ) ) {
+				wp_register_style(
+					'jeo-mapbox-sdk-css',
+					$mapbox_sdk['css_url'],
+					array(),
+					$mapbox_sdk['version'],
+				);
+				$mapgl_style_deps[] = 'jeo-mapbox-sdk-css';
+			}
 		}
 
 		wp_localize_script(
 			'jeo-js',
 			'jeo',
 			array(
-				'ajax_url' => admin_url( 'admin-ajax.php' ),
+				'ajax_url'      => admin_url( 'admin-ajax.php' ),
+				'geocode_nonce' => wp_create_nonce( 'jeo_geocode' ),
 			)
-		);
-
-		wp_register_script(
-			'mapgl-vendor',
-			JEO_BASEURL . "/js/build/{$mapgl_loader}.js",
-			array(),
-			JEO_VERSION,
-			true,
 		);
 
 		wp_register_script(
 			'mapgl',
 			JEO_BASEURL . '/js/build/mapglLoader.js',
-			array( 'mapgl-vendor' ),
+			$mapgl_script_deps,
 			JEO_VERSION,
 			true,
 		);
 
 		wp_register_style(
 			'mapgl',
-			JEO_BASEURL . "/js/build/{$mapgl_loader}.css",
-			array(),
+			JEO_BASEURL . '/js/build/mapglLoader.css',
+			$mapgl_style_deps,
 			JEO_VERSION,
 		);
 
@@ -252,9 +437,9 @@ class Jeo {
 			'mapgl',
 			'jeo_settings',
 			array(
-				'site_url'            => get_site_url(),
-				'mapbox_key'          => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' ) ),
-				'map_defaults'        => array(
+				'site_url'              => get_site_url(),
+				'mapbox_key'            => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' ) ),
+				'map_defaults'          => array(
 					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
 					'lng'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
@@ -263,29 +448,36 @@ class Jeo {
 					'enable_fullscreen'   => true,
 					'disable_drag_pan'    => false,
 				),
-				'map_runtime'         => $map_runtime,
-				'nonce'               => $this->get_rest_nonce(),
-				'jeo_typography_name' => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
-				'public_path'         => JEO_BASEURL . '/js/build/',
+				'map_runtime'           => $map_runtime_requested,
+				'map_runtime_requested' => $map_runtime_requested,
+				'runtime_messages'      => array(
+					'mapbox_missing_token'       => __( 'Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre.', 'jeo' ),
+					'mapbox_runtime_unavailable' => __(
+						'Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre.',
+						'jeo'
+					),
+				),
+				'nonce'                 => $this->get_rest_nonce(),
+				'jeo_typography_name'   => sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ),
+				'public_path'           => JEO_BASEURL . '/js/build/',
 			)
 		);
 
 		$mapgl_react_assets = include JEO_BASEPATH . '/js/build/mapglReact.asset.php';
 
 		wp_register_script(
-			'mapgl-react-vendor',
-			JEO_BASEURL . "/js/build/{$mapgl_react}.js",
-			array( 'mapgl' ),
-			JEO_VERSION,
+			'mapgl-react',
+			JEO_BASEURL . '/js/build/mapglReact.js',
+			array_merge( $mapgl_react_assets['dependencies'] ?? array(), array( 'mapgl' ) ),
+			$mapgl_react_assets['version'] ?? JEO_VERSION,
 			true,
 		);
 
-		wp_register_script(
-			'mapgl-react',
-			JEO_BASEURL . '/js/build/mapglReact.js',
-			array_merge( $mapgl_react_assets['dependencies'] ?? array(), array( 'mapgl-react-vendor' ) ),
+		wp_register_style(
+			'mapgl-react-style',
+			false,
+			array( 'mapgl' ),
 			JEO_VERSION,
-			true,
 		);
 
 		$map_blocks_assets = include JEO_BASEPATH . '/js/build/mapBlocks.asset.php';
@@ -293,13 +485,17 @@ class Jeo {
 		wp_register_style(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
-			array( 'mapgl' ),
+			array( 'mapgl', 'mapgl-react-style' ),
 			JEO_VERSION,
 		);
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
-			array_merge( $map_blocks_assets['dependencies'] ?? array(), array( 'jeo-layer', 'mapgl-react' ) ),
+			array_merge(
+				$map_blocks_assets['dependencies'] ?? array(),
+				array( 'jeo-layer', 'mapgl-react' ),
+				$layer_type_handles
+			),
 			$map_blocks_assets['version'],
 			true,
 		);
@@ -589,6 +785,25 @@ class Jeo {
 	}
 
 	/**
+	 * Enqueue shared map runtime styles inside the block-editor iframe.
+	 *
+	 * Block API v3 renders content in an iframe, and runtime styles enqueued for
+	 * the parent admin document do not automatically follow there. The map editor
+	 * previews need the runtime stylesheet in the iframe document as well so
+	 * Mapbox can resolve its required CSS declarations.
+	 *
+	 * @return void
+	 */
+	public function enqueue_block_iframe_assets() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		wp_enqueue_style( 'mapgl' );
+		wp_enqueue_style( 'mapgl-react-style' );
+	}
+
+	/**
 	 * Enqueue the public map runtime and conditional frontend experiences.
 	 *
 	 * @return void
@@ -839,9 +1054,8 @@ class Jeo {
 		$storymap_id = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
 
 		if ( ( is_singular() && in_the_loop() && is_main_query() ) || ( get_query_var( 'jeo_embed' ) === 'map' && $storymap_id ) ) {
-			global $post, $wpdb;
+			global $post;
 
-			// Sometimes the saved content is empty.
 			$post_id    = $post->ID;
 			$preview_id = filter_input( INPUT_GET, 'preview_id', FILTER_VALIDATE_INT );
 			if ( $preview_id ) {
@@ -850,11 +1064,11 @@ class Jeo {
 			if ( $storymap_id ) {
 				$post_id = $storymap_id;
 			}
-			$post_content = $wpdb->get_results(
-				$wpdb->prepare( "SELECT post_content FROM {$wpdb->posts} WHERE ID=%d", $post_id )
-			);
 
-			return do_blocks( $post_content[0]->post_content );
+			$preview_post = $this->get_preview_post( $post_id );
+			if ( $preview_post instanceof WP_Post ) {
+				return do_blocks( $preview_post->post_content );
+			}
 		}
 
 		return $content;

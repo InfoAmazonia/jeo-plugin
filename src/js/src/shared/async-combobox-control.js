@@ -1,4 +1,4 @@
-import { useMemo, useState } from '@wordpress/element';
+import { useMemo, useRef, useState } from '@wordpress/element';
 
 import { ComboboxControl } from './wp-form-controls';
 
@@ -37,6 +37,14 @@ export function buildAsyncComboboxOptions( {
 	];
 }
 
+export function shouldIgnoreInitialEmptyInputValue( {
+	nextValue,
+	currentValue,
+	shouldIgnoreNextEmpty,
+} ) {
+	return shouldIgnoreNextEmpty && nextValue === '' && Boolean( currentValue );
+}
+
 export default function AsyncComboboxControl( {
 	className,
 	items = [],
@@ -54,6 +62,7 @@ export default function AsyncComboboxControl( {
 	persistFreeText = true,
 } ) {
 	const [ hasFocus, setHasFocus ] = useState( false );
+	const ignoreNextEmptyInputRef = useRef( false );
 	const options = useMemo( () => {
 		return buildAsyncComboboxOptions( {
 			items,
@@ -75,14 +84,33 @@ export default function AsyncComboboxControl( {
 	] );
 
 	const currentValue = selectedValue ?? ( persistFreeText ? inputValue : null );
+	const handleInputValueChange = ( nextValue ) => {
+		if (
+			shouldIgnoreInitialEmptyInputValue( {
+				nextValue,
+				currentValue,
+				shouldIgnoreNextEmpty: ignoreNextEmptyInputRef.current,
+			} )
+		) {
+			ignoreNextEmptyInputRef.current = false;
+			return;
+		}
+
+		ignoreNextEmptyInputRef.current = false;
+		onInputValueChange?.( nextValue );
+	};
 
 	return (
 		<div
 			className={ className }
-			onFocusCapture={ () => setHasFocus( true ) }
+			onFocusCapture={ () => {
+				setHasFocus( true );
+				ignoreNextEmptyInputRef.current = Boolean( currentValue );
+			} }
 			onBlurCapture={ ( event ) => {
 				if ( ! event.currentTarget.contains( event.relatedTarget ) ) {
 					setHasFocus( false );
+					ignoreNextEmptyInputRef.current = false;
 				}
 			} }
 		>
@@ -96,8 +124,13 @@ export default function AsyncComboboxControl( {
 				isLoading={ isLoading }
 				allowReset={ allowReset }
 				expandOnFocus={ false }
-				onFilterValueChange={ onInputValueChange }
+				onFilterValueChange={ handleInputValueChange }
 				onChange={ ( nextValue ) => {
+					if ( ! nextValue ) {
+						onOptionSelect?.( null );
+						return;
+					}
+
 					const selectedOption = options.find(
 						( option ) =>
 							option.value === String( nextValue ) && ! option.__freeform

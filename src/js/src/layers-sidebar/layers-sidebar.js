@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerSettings from './layer-settings';
+import { getEditorLayerTypeSchema } from './layer-type-definitions';
 import './layers-sidebar.scss';
 
 const LayersSidebar = ( {
@@ -19,6 +20,7 @@ const LayersSidebar = ( {
 	unlockPostSaving,
 } ) => {
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
+	const [ layerTypeRegistryVersion, setLayerTypeRegistryVersion ] = useState( 0 );
 
 	const [ renderControl, setRenderControl ] = useState( {
 		status: 'incomplete_form',
@@ -31,11 +33,31 @@ const LayersSidebar = ( {
 	}, [ sendNotice ] );
 
 	useEffect( () => {
+		const handleLayerTypesChanged = () => {
+			setLayerTypeRegistryVersion( ( currentVersion ) => currentVersion + 1 );
+		};
+
+		window.addEventListener(
+			'jeo-layer-types-changed',
+			handleLayerTypesChanged
+		);
+
+		return () => {
+			window.removeEventListener(
+				'jeo-layer-types-changed',
+				handleLayerTypesChanged
+			);
+		};
+	}, [] );
+
+	useEffect( () => {
 		if ( postMeta.type ) {
-			const schema = window.JeoLayerTypes.getLayerTypeSchema( postMeta );
-			setLayerTypeSchema( schema );
+			const schema = getEditorLayerTypeSchema( postMeta );
+			setLayerTypeSchema( schema || {} );
+		} else {
+			setLayerTypeSchema( {} );
 		}
-	}, [ postMeta.type ] );
+	}, [ postMeta.type, layerTypeRegistryVersion ] );
 
 	useEffect( () => {
 		switch ( renderControl.status ) {
@@ -79,8 +101,8 @@ const LayersSidebar = ( {
 	}, [ renderControl.status ] );
 
 	useEffect( () => {
-		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
-		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
+		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options || {};
+		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options || {};
 		if ( Object.keys( debouncedLayerTypeOptions ).length && Object.keys( layerTypeSchema ).length ) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;

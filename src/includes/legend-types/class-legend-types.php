@@ -182,7 +182,7 @@ class Legend_Types {
 
 		foreach ( $this->get_registered_legend_types() as $slug => $legend_type ) {
 			$deps = isset( $legend_type['dependencies'] ) ? $legend_type['dependencies'] : array();
-			$deps = array_merge( array( 'jeo-legend' ), $deps );
+			$deps = array_merge( array( 'jeo-legend', 'wp-i18n' ), $deps );
 			wp_enqueue_script( 'legend-type-' . $slug, $legend_type['script_url'], $deps, JEO_VERSION, true );
 			wp_set_script_translations( 'legend-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
 		}

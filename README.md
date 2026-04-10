@@ -9,6 +9,7 @@ At the same time, by simply imputing the ids of layers hosted on [Mapbox](https:
 ## Compatibility
 
 This repository currently declares `Requires PHP: 8.0`, with primary validation focused on PHP `8.2` to `8.4` and experimental monitoring on PHP `8.5`.
+The frontend runtime targets Node `24` as the supported project baseline.
 
 Compatibility snapshot validated on March 17, 2026:
 
@@ -29,13 +30,20 @@ Test script coverage:
 
 - `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`, including PHP `8.5`-specific deprecation heuristics.
 - `scripts/wordpress-smoke.sh` can be forced onto PHP `8.5` with `WP_CLI_PHP`, so the plugin's runtime smoke can be exercised on that line locally and in CI.
+- `scripts/check-node-version.mjs` enforces the supported frontend runtime before `npm ci` or `npm install` continue.
+- `scripts/report-bundle-sizes.mjs` enforces explicit bundle budgets instead of relying on generic webpack performance warnings.
 
 Local commands:
 
 ```bash
+nvm use
+npm run check:env
 npm ci
 npm run build
+npm run build:report
 npm run test:unit
+npm run audit:npm
+composer audit --locked
 php scripts/check-php-compat.php
 /opt/homebrew/opt/php@8.5/bin/php scripts/check-php-compat.php
 
@@ -49,6 +57,7 @@ bash scripts/wordpress-smoke.sh
 ```
 
 `scripts/wordpress-smoke.sh` honors `WP_CLI_PHP`, which is useful on Homebrew installs where `/opt/homebrew/bin/wp` otherwise follows the default `php` in `PATH`.
+For local frontend work, use Node `24`.
 Use PHP `8.5` for local smoke only when you specifically want to inspect the experimental runtime line. WordPress core 6.9 treats PHP `8.5` as beta support, while stable `wp-cli` support for PHP `8.5` is still planned upstream and `wp-cli` 2.12.0 still emits third-party deprecation noise there.
 
 ## Setting up local environment
@@ -69,11 +78,77 @@ Then create a symbolic link inside of `wp-content/plugins/jeo` pointing to the `
 ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
 ```
 
-### Build
+## Building the plugin
 
-When we want to build the plugin, we run `npm run build` to compile all the assets (css and js) to `src/js/build`.
-While developing, you might want to run `npm run watch`. This script will watch your development folder for changes and automatically build the plugin so you don't have to do it manually every time you modify a file.
+The plugin root for local development and release packaging is `src/`.
+Builds compile JavaScript and CSS assets into `src/js/build`.
+
+Use these commands during local development:
 
 ```bash
-rsync --archive --progress --human-readable --delete .src/ /path/to/wordpress/wp-content/plugins/jeo
+npm run start
+npm run build
 ```
+
+- `npm run start` watches the source tree and rebuilds assets while you develop.
+- `npm run build` performs a production build and regenerates JavaScript translation JSON catalogs in `src/languages`.
+
+To generate JavaScript translation JSON catalogs on their own, run:
+
+```bash
+npm run i18n:json
+```
+
+These scripts expect `wp` (WP-CLI) to be available on your `PATH`. If it lives elsewhere, set `WP_CLI_BIN` when running the command.
+The generated `src/languages/*.json` catalogs are release artifacts and are intentionally not versioned in Git.
+
+If you prefer copying files instead of symlinking them into a local WordPress install, use:
+
+```bash
+rsync --archive --progress --human-readable --delete ./src/ /path/to/wordpress/wp-content/plugins/jeo/
+```
+
+## Releasing
+
+WordPress.org releases are built from `src/`, not from the repository root.
+The deploy workflow also publishes assets from `.wordpress-org/`.
+
+Prerelease branches may carry a SemVer prerelease such as `3.0.0-rc.3` while
+WordPress.org stays on the latest stable release. Before creating a stable
+release tag, run `npm run sync:version` and keep these files aligned:
+
+- `src/jeo.php`
+- `src/readme.txt`
+- `package.json`
+- `package-lock.json`
+- `.wordpress-org/`
+
+The deploy workflow now validates that:
+
+- the plugin version in `src/jeo.php` matches `JEO_VERSION`
+- `package.json` and the root package entry in `package-lock.json` match the plugin version
+- the `Stable tag` in `src/readme.txt` matches the plugin version for the tagged stable release
+- the release tag is a stable `x.y.z` version
+
+Pre-release tags such as `-rc` are intentionally blocked from the WordPress.org deploy pipeline.
+
+Release validation and packaging should use:
+
+```bash
+npm ci
+npm run build
+```
+
+## Documentation
+
+The documentation source lives in `docs/`.
+The published static site lives in `site/` and is generated with MkDocs.
+
+To rebuild it locally:
+
+```bash
+python3 -m pip install -r requirements-docs.txt
+python3 -m mkdocs build --clean
+```
+
+Changes to `docs/`, `mkdocs.yml` or `requirements-docs.txt` on `master` automatically regenerate and commit `site/` through `.github/workflows/docs-site.yml`.
