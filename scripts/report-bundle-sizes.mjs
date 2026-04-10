@@ -7,7 +7,7 @@ const buildDir = path.resolve( 'src/js/build' );
 const budgetByEntry = {
 	mapglLoader: 1100,
 	mapglReact: 120,
-	mapBlocks: 1300,
+	mapBlocks: 1280,
 	layersSidebar: 360,
 	discovery: 280,
 	mapsSidebar: 240,
