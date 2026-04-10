@@ -364,7 +364,7 @@ class Jeo {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
+		$asset_file         = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 		$layer_type_handles = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
 
 		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] ?? array() );
@@ -1152,13 +1152,16 @@ class Jeo {
 
 			if ( isset( $wp_post_types['map'] ) ) {
 				$wp_post_types['map']->template = array(
-					array( 'jeo/map-editor', array(
-						'align' => 'full',
-						'lock' => array(
-							'move'   => true,
-							'remove' => true,
+					array(
+						'jeo/map-editor',
+						array(
+							'align' => 'full',
+							'lock'  => array(
+								'move'   => true,
+								'remove' => true,
+							),
 						),
-					) ),
+					),
 				);
 			}
 
