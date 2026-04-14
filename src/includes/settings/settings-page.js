@@ -538,12 +538,50 @@
 
 		$('#map_runtime').change(function() {
 			var runtime = $(this).val();
-			$('.mapbox_options, .googlemaps_options').hide();
+			$('.mapbox_options').hide();
 			if (runtime === 'mapboxgl') {
 				$('.mapbox_options').show();
-			} else if (runtime === 'googlemaps') {
-				$('.googlemaps_options').show();
 			}
 		}).change();
+
+		// Bulk manual run
+		$('#jeo-bulk-run-manual-btn').on('click', function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			$btn.prop('disabled', true).text('Processing...');
+
+			$.ajax({
+				url: jeo_settings.rest_url + '/bulk-ai-run',
+				method: 'POST',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', jeo_settings.nonce);
+				},
+				success: function(response) {
+					alert(response.message);
+					location.reload(); // Reload to show new logs and progress
+				},
+				error: function() {
+					alert('Error triggering manual batch.');
+					$btn.prop('disabled', false).text('Run 1 Batch Now');
+				}
+			});
+		});
+
+		// Bulk clear logs
+		$('#jeo-bulk-clear-logs-btn').on('click', function(e) {
+			e.preventDefault();
+			if (!confirm('Are you sure you want to clear the logs?')) return;
+
+			$.ajax({
+				url: jeo_settings.rest_url + '/bulk-ai-clear-logs',
+				method: 'POST',
+				beforeSend: function(xhr) {
+					xhr.setRequestHeader('X-WP-Nonce', jeo_settings.nonce);
+				},
+				success: function() {
+					location.reload();
+				}
+			});
+		});
 	});
 })(jQuery);

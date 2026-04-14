@@ -164,13 +164,12 @@
 
 	<?php
 		// Fetch Map Settings directly for inline use (safe for admin page)
-		// Forcing MapLibre on Dashboard to avoid missing token errors unless user specifically wants Mapbox or Google Maps
+		// Forcing MapLibre on Dashboard to avoid missing token errors unless user specifically wants Mapbox
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
-		if ( ! in_array( $map_runtime, array( 'mapboxgl', 'googlemaps' ) ) ) {
+		if ( ! in_array( $map_runtime, array( 'mapboxgl' ) ) ) {
 			$map_runtime = 'maplibregl';
 		}
 		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
-		$google_maps_key = \jeo_settings()->get_option( 'google_maps_key' );
 		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
 		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 4;
@@ -192,89 +191,13 @@
 			// Configuration
 			var mapRuntime = '<?php echo esc_js( $map_runtime ); ?>';
 			var mapboxKey  = '<?php echo esc_js( $mapbox_key ); ?>';
-			var googleMapsKey = '<?php echo esc_js( $google_maps_key ); ?>';
 			var defaultLat = parseFloat( '<?php echo esc_js( $default_lat ); ?>' );
 			var defaultLon = parseFloat( '<?php echo esc_js( $default_lon ); ?>' );
 			var defaultZoom = parseFloat( '<?php echo esc_js( $default_zoom ); ?>' );
 			var apiPinsUrl = '<?php echo esc_url_raw( $rest_url ); ?>';
 			var wpNonce    = '<?php echo wp_create_nonce("wp_rest"); ?>';
 
-			if (mapRuntime === 'googlemaps') {
-				initGoogleMaps();
-			} else {
-				initGLMaps();
-			}
-
-			function initGoogleMaps() {
-				if (typeof google === 'undefined') {
-					console.error('JEO: Google Maps library not loaded.');
-					return;
-				}
-
-				var map = new google.maps.Map(document.getElementById('jeo-dashboard-map'), {
-					center: { lat: defaultLat, lng: defaultLon },
-					zoom: defaultZoom,
-					disableDefaultUI: false,
-					zoomControl: true,
-				});
-
-				fetch(apiPinsUrl, {
-					headers: { 'X-WP-Nonce': wpNonce }
-				})
-				.then(res => res.json())
-				.then(function(pins) {
-					document.getElementById('jeo-pin-count').innerText = pins.length + ' locations mapped across your site.';
-					document.getElementById('jeo-dashboard-loader').classList.add('hidden');
-					document.getElementById('jeo-dashboard-map').style.opacity = '1';
-
-					var bounds = new google.maps.LatLngBounds();
-
-					pins.forEach(function(pin, index) {
-						var lat = Number(pin.lat);
-						var lng = Number(pin.lng);
-						if (isNaN(lat) || isNaN(lng)) return;
-
-						var position = { lat: lat, lng: lng };
-						bounds.extend(position);
-
-						var marker = new google.maps.Marker({
-							position: position,
-							map: map,
-							title: pin.name,
-							animation: google.maps.Animation.DROP
-						});
-
-						var popupHTML = '<div class="jeo-dashboard-popup" style="padding: 10px; min-width: 200px;">';
-						popupHTML += '<h3 style="margin:0 0 8px 0; font-size:15px; border-bottom:1px solid #eee; padding-bottom:5px;">' + (pin.title || 'Untitled Post') + '</h3>';
-						popupHTML += '<p style="margin:0 0 10px 0; font-size:12px; color:#1d2327;"><strong>' + pin.name + '</strong></p>';
-						if (pin.quote) {
-							popupHTML += '<blockquote style="margin:0 0 15px 0; padding:8px 12px; border-left:3px solid #007cba; background:#f0f7ff; font-style:italic; font-size:12px; line-height: 1.4; color: #2c3338;">"' + pin.quote + '"</blockquote>';
-						}
-						popupHTML += '<div style="display:flex; gap:10px; margin-top:10px;">';
-						popupHTML += '<a href="' + pin.view_url + '" class="button button-small" target="_blank">View Post</a>';
-						popupHTML += '<a href="' + pin.edit_url + '" class="button button-small" target="_blank">Edit Post</a>';
-						popupHTML += '</div></div>';
-
-						var infowindow = new google.maps.InfoWindow({
-							content: popupHTML
-						});
-
-						marker.addListener('click', function() {
-							infowindow.open(map, marker);
-						});
-					});
-
-					if (pins.length > 0) {
-						setTimeout(function() {
-							map.fitBounds(bounds);
-						}, 800);
-					}
-				})
-				.catch(err => {
-					console.error('JEO Google Maps Dashboard Error:', err);
-					document.querySelector('.jeo-loading-text').innerText = "Oops! Could not load geodata. Check console.";
-				});
-			}
+			initGLMaps();
 
 			function initGLMaps() {
 				var isMapbox = (mapRuntime === 'mapboxgl');

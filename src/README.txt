@@ -67,9 +67,7 @@ The menu follows a professional Geo-Editorial workflow:
 
 = 3.5.3 =
 This version expands the geodata infrastructure and adds multi-engine support.
-* feature: Added Google Maps Geocoding as a provider.
 * feature: Added Mapbox Geocoding as a provider.
-* feature: Support for Google Maps JS API as a renderer for the Dashboard.
 * feature: Autonomous AI Georeferencing Co-Pilot for the Gutenberg Editor.
 * feature: New Fullscreen JEO Dashboard with interactive maps, staggered pin drop animation, and a cinematic `fitBounds` camera to auto-frame all global locations.
 * feature: Support for Google Gemini (2.5 Flash), OpenAI (GPT-4o), and DeepSeek LLMs (with strict temperature=0.1 for high precision).
@@ -727,7 +725,7 @@ A Geocoder is a service that finds geographical coordinates from a search by add
 
 JEO needs a geocoder service in a few situations, such as when users indicate to where on a map a story (posts) is related.
 
-JEO comes with two native geocoder services users can choose from: Nominatim and Google. But new services can easily be added by plugins. This page documents how to do this.
+JEO comes with a native geocoder service users can choose from: Nominatim. But new services can easily be added by plugins. This page documents how to do this.
 
 ## Registering a Geocoder
 

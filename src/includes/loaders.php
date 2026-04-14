@@ -51,6 +51,15 @@ function jeo_ai_logger() {
 }
 
 /**
+ * Gets the instance of the Bulk Processor Class
+ *
+ * @return \Jeo\AI\Bulk_Processor Bulk_Processor instance
+ */
+function jeo_bulk_processor() {
+	return \Jeo\AI\Bulk_Processor::get_instance();
+}
+
+/**
  * Gets the instance of the main Jeo Class
  *
  * @return \Jeo Jeo instance

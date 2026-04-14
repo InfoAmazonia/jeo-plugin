@@ -102,3 +102,4 @@ if ( defined( 'WP_CLI' ) && WP_CLI ) {
 }
 
 jeo();
+jeo_bulk_processor();

@@ -23,11 +23,17 @@ class Settings {
 			'map_default_lat'                 => -23.54998517,
 			'map_default_lng'                 => -46.65599340,
 			'mapbox_key'                      => '',
-			'google_maps_key'                 => '',
 			'jeo_footer-logo'                 => '',
 			'show_storymaps_on_post_archives' => 0,
 			'ai_default_provider'             => 'gemini',
 			'ai_embedding_model'              => '',
+
+			// Bulk Processing
+			'jeo_bulk_ai_active'              => false,
+			'jeo_bulk_batch_size'             => 5,
+			'jeo_bulk_post_types'             => array( 'post' ),
+			'jeo_bulk_cron_interval'          => 'hourly',
+			'jeo_bulk_logging'                => false,
 
 			// Gemini
 			'gemini_api_key'                  => '',
@@ -135,6 +141,17 @@ class Settings {
 		} else {
 			$input['enabled_post_types'] = array();
 		}
+
+		if ( isset( $input['jeo_bulk_post_types'] ) ) {
+			if ( ! is_array( $input['jeo_bulk_post_types'] ) ) {
+				$input['jeo_bulk_post_types'] = array( 'post' );
+			}
+		}
+
+		// Ensure booleans are correct
+		$input['jeo_bulk_ai_active'] = ! empty( $input['jeo_bulk_ai_active'] );
+		$input['jeo_bulk_logging']   = ! empty( $input['jeo_bulk_logging'] );
+
 		return $input;
 	}
 
@@ -145,6 +162,12 @@ class Settings {
 			wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
 			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery', 'wp-api-fetch' ), JEO_VERSION, true );
 			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
+
+			wp_localize_script( 'jeo-settings', 'jeo_settings', array(
+				'rest_url'    => rest_url( 'jeo/v1' ),
+				'nonce'       => wp_create_nonce( 'wp_rest' ),
+				'map_runtime' => $this->get_option( 'map_runtime' ),
+			) );
 
 		}
 	}

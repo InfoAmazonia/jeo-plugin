@@ -70,16 +70,7 @@ class Geocode_Handler {
 				'class_name'  => '\Jeo\Geocoders\Nominatim',
 			)
 		);
-
-		$this->register_geocoder(
-			array(
-				'slug'        => 'googlemaps',
-				'name'        => 'Google Maps',
-				'description' => __( 'Service provided by Google Cloud Console (requires API Key).', 'jeo' ),
-				'class_name'  => '\Jeo\Geocoders\GoogleMaps',
-			)
-		);
-
+		// Register Mapbox geocoder
 		$this->register_geocoder(
 			array(
 				'slug'        => 'mapbox',

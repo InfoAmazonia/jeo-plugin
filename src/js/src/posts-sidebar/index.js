@@ -8,25 +8,21 @@ import apiFetch from '@wordpress/api-fetch';
 import JeoGeocodePosts from './geo-posts';
 import { JeoGeocodePostsAI } from './geo-posts-ai';
 
-const JeoGeocodePanel = class JeoGeocodePanel extends Component {
-	constructor() {
-		super();
-		this.state = {
-			isOpen: false,
-			isAIProcessing: false,
-			aiError: null,
-			isApprovalModalOpen: false,
-			aiSuggestedLocations: [],
-		};
-		this.handleAIGeoreference = this.handleAIGeoreference.bind( this );
-		this.saveAiLocations = this.saveAiLocations.bind( this );
-		this.toggleAiLocation = this.toggleAiLocation.bind( this );
-	}
+const JeoGeocodePanel = ( props ) => {
+	const { postId, title, content } = props;
+	const [ state, setState ] = wp.element.useState( {
+		isOpen: false,
+		isAIProcessing: false,
+		aiError: null,
+		isApprovalModalOpen: false,
+		aiSuggestedLocations: [],
+	} );
 
-	async handleAIGeoreference() {
-		this.setState( { isAIProcessing: true, aiError: null } );
+	const meta = useSelect( ( select ) => select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {} );
+	const pendingLocations = meta._jeo_ai_pending_point || [];
 
-		const { postId, title, content } = this.props;
+	const handleAIGeoreference = async () => {
+		setState( ( prev ) => ( { ...prev, isAIProcessing: true, aiError: null } ) );
 
 		try {
 			const locations = await apiFetch( {
@@ -41,7 +37,7 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 
 			if ( locations && Array.isArray( locations ) ) {
 				if ( locations.length === 0 ) {
-					this.setState( { isAIProcessing: false, aiError: __( 'No locations found by the AI.', 'jeo' ) } );
+					setState( ( prev ) => ( { ...prev, isAIProcessing: false, aiError: __( 'No locations found by the AI.', 'jeo' ) } ) );
 					return;
 				}
 
@@ -58,142 +54,170 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 					_geocode_region_level_3: '',
 					_geocode_city: '',
 					_geocode_city_level_1: '',
-					_ai_quote: loc.quote || '', // Armazena o trecho onde foi encontrado para o Modal Visual
-					_selected: true, // Auto-select items by default
+					_ai_quote: loc.quote || '',
+					_selected: true,
 				} ) );
 
-				// Show the intermediate approval modal instead of saving immediately
-				this.setState( {
+				setState( ( prev ) => ( {
+					...prev,
 					aiSuggestedLocations: formattedPoints,
 					isApprovalModalOpen: true,
 					isAIProcessing: false
-				} );
+				} ) );
 			} else {
 				throw new Error( __( 'Invalid response from AI.', 'jeo' ) );
 			}
 		} catch ( error ) {
-			this.setState( {
+			setState( ( prev ) => ( {
+				...prev,
 				isAIProcessing: false,
 				aiError: error.message || __( 'Error processing AI georeference.', 'jeo' ),
-			} );
+			} ) );
 		}
-	}
+	};
 
-	toggleAiLocation( index ) {
-		const newLocations = [ ...this.state.aiSuggestedLocations ];
+	const toggleAiLocation = ( index ) => {
+		const newLocations = [ ...state.aiSuggestedLocations ];
 		newLocations[ index ]._selected = ! newLocations[ index ]._selected;
-		this.setState( { aiSuggestedLocations: newLocations } );
-	}
+		setState( ( prev ) => ( { ...prev, aiSuggestedLocations: newLocations } ) );
+	};
 
-	saveAiLocations() {
-		// Filter only selected points and map them to the exact Schema expected by JEO Backend
-		const selectedPoints = this.state.aiSuggestedLocations
+	const saveAiLocations = () => {
+		const selectedPoints = state.aiSuggestedLocations
 			.filter( loc => loc._selected )
-			.map( loc => {
-				return {
-					relevance: 'primary',
-					_geocode_lat: String( loc._geocode_lat ),
-					_geocode_lon: String( loc._geocode_lon ),
-					_geocode_full_address: loc._geocode_full_address || '',
-					_geocode_country: '',
-					_geocode_country_code: '',
-					_geocode_region_level_1: '',
-					_geocode_region_level_2: '',
-					_geocode_region_level_3: '',
-					_geocode_city: '',
-					_geocode_city_level_1: '',
-					_ai_quote: loc._ai_quote || '', // Persiste o trecho no banco de dados para o Dashboard
-				};
-			});
+			.map( loc => ( {
+				relevance: 'primary',
+				_geocode_lat: String( loc._geocode_lat ),
+				_geocode_lon: String( loc._geocode_lon ),
+				_geocode_full_address: loc._geocode_full_address || '',
+				_geocode_country: '',
+				_geocode_country_code: '',
+				_geocode_region_level_1: '',
+				_geocode_region_level_2: '',
+				_geocode_region_level_3: '',
+				_geocode_city: '',
+				_geocode_city_level_1: '',
+				_ai_quote: loc._ai_quote || '',
+			} ) );
 
-		// Merge Additively with current map points (preserve old points)
-		const currentMeta = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' );
-		const currentPoints = currentMeta._related_point || [];
+		const currentPoints = meta._related_point || [];
 		const newPoints = [ ...currentPoints, ...selectedPoints ];
 
 		wp.data.dispatch( 'core/editor' ).editPost( {
 			meta: {
+				...meta,
 				_related_point: newPoints,
+				_jeo_ai_pending_point: [],
+				_jeo_legacy_status: 'approved'
 			},
 		} );
 
-		// Close approval modal and open the primary Map modal for the user to review
-		this.setState( {
+		setState( ( prev ) => ( {
+			...prev,
 			isApprovalModalOpen: false,
 			aiSuggestedLocations: [],
 			isOpen: true
-		} );
-	}
+		} ) );
+	};
 
-	render() {
-		const { isOpen, isAIProcessing, aiError, isApprovalModalOpen, aiSuggestedLocations } = this.state;
+	const handleReviewPending = () => {
+		const formattedPoints = pendingLocations.map( ( loc, index ) => ( {
+			id: index,
+			relevance: 'primary',
+			_geocode_lat: String( loc.lat ),
+			_geocode_lon: String( loc.lng ),
+			_geocode_full_address: loc.name || '',
+			_geocode_country: '',
+			_geocode_country_code: '',
+			_geocode_region_level_1: '',
+			_geocode_region_level_2: '',
+			_geocode_region_level_3: '',
+			_geocode_city: '',
+			_geocode_city_level_1: '',
+			_ai_quote: loc.quote || '',
+			_selected: true,
+		} ) );
 
-		// Fallback se window.jeo não existir, com tradução (Ex: 'Geolocate with Google Gemini')
-		const aiProviderName = globalThis.jeo?.ai_provider_name ?? _x( 'AI', 'Artifical Intelligence', 'jeo' );
+		setState( ( prev ) => ( {
+			...prev,
+			aiSuggestedLocations: formattedPoints,
+			isApprovalModalOpen: true,
+		} ) );
+	};
 
-		return (
-			<Fragment>
-				<div style={ { display: 'flex', flexDirection: 'column', gap: '10px' } }>
-					<Button
-						variant="secondary"
-						onClick={ () => this.setState( { isOpen: true } ) }
-						style={ { width: '100%', justifyContent: 'center' } }
-					>
-						{ __( 'Geolocate this post', 'jeo' ) }
+	const { isOpen, isAIProcessing, aiError, isApprovalModalOpen, aiSuggestedLocations } = state;
+	const aiProviderName = globalThis.jeo?.ai_provider_name ?? _x( 'AI', 'Artifical Intelligence', 'jeo' );
+
+	return (
+		<Fragment>
+			{ pendingLocations.length > 0 && (
+				<Notice status="warning" isDismissible={ false }>
+					<p>{ sprintf( __( 'AI found %d locations during bulk processing.', 'jeo' ), pendingLocations.length ) }</p>
+					<Button variant="primary" onClick={ handleReviewPending }>
+						{ __( 'Review Suggestions', 'jeo' ) }
 					</Button>
-					<Button
-						variant="secondary"
-						isBusy={ isAIProcessing }
-						disabled={ isAIProcessing }
-						onClick={ this.handleAIGeoreference }
-						style={ { width: '100%', justifyContent: 'center' } }
-					>
-						{ isAIProcessing
-							? __( 'Processing AI...', 'jeo' )
-							// translators: %s is the AI provider (e.g. Google Gemini, DeepSeek, etc.)
-							: sprintf( __( 'Geolocate with %s', 'jeo' ),  aiProviderName )
-						}
-					</Button>
-				</div>
+				</Notice>
+			) }
 
-				{ aiError && (
-					<Notice status="error" onRemove={ () => this.setState( { aiError: null } ) }>
-						{ aiError }
-					</Notice>
-				) }
+			<div style={ { display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '10px' } }>
+				<Button
+					variant="secondary"
+					onClick={ () => setState( ( prev ) => ( { ...prev, isOpen: true } ) ) }
+					style={ { width: '100%', justifyContent: 'center' } }
+				>
+					{ __( 'Geolocate this post', 'jeo' ) }
+				</Button>
+				<Button
+					variant="secondary"
+					isBusy={ isAIProcessing }
+					disabled={ isAIProcessing }
+					onClick={ handleAIGeoreference }
+					style={ { width: '100%', justifyContent: 'center' } }
+				>
+					{ isAIProcessing
+						? __( 'Processing AI...', 'jeo' )
+						: sprintf( __( 'Geolocate with %s', 'jeo' ),  aiProviderName )
+					}
+				</Button>
+			</div>
 
-				{ isApprovalModalOpen && (
-					<Modal
-						title={ __( 'Review AI Suggestions', 'jeo' ) }
-						onRequestClose={ () => this.setState( { isApprovalModalOpen: false } ) }
-						className="jeo-geocode-modal"
-						isFullScreen={ true }
-					>
-						<JeoGeocodePostsAI
-							aiSuggestedLocations={ aiSuggestedLocations }
-							saveAiLocations={ this.saveAiLocations }
-							toggleAiLocation={ this.toggleAiLocation }
-							onCancel={ () => this.setState( { isApprovalModalOpen: false }) }
-						/>
-					</Modal>
-				) }
+			{ aiError && (
+				<Notice status="error" onRemove={ () => setState( ( prev ) => ( { ...prev, aiError: null } ) ) }>
+					{ aiError }
+				</Notice>
+			) }
 
-				{ isOpen && (
-					<Modal
-						title={ __( 'Geolocate this post', 'jeo' ) }
-						onRequestClose={ () => this.setState( { isOpen: false } ) }
-						className="jeo-geocode-modal"
-						isFullScreen={ true }
-					>
-						<JeoGeocodePosts
-							onSaveLocation={ () => this.setState( { isOpen: false } ) }
-							onCancel={ () => this.setState( { isOpen: false } ) }
-						/>
-					</Modal>
-				) }
-			</Fragment>
-		);
-	}
+			{ isApprovalModalOpen && (
+				<Modal
+					title={ __( 'Review AI Suggestions', 'jeo' ) }
+					onRequestClose={ () => setState( ( prev ) => ( { ...prev, isApprovalModalOpen: false } ) ) }
+					className="jeo-geocode-modal"
+					isFullScreen={ true }
+				>
+					<JeoGeocodePostsAI
+						aiSuggestedLocations={ aiSuggestedLocations }
+						saveAiLocations={ saveAiLocations }
+						toggleAiLocation={ toggleAiLocation }
+						onCancel={ () => setState( ( prev ) => ( { ...prev, isApprovalModalOpen: false }) ) }
+					/>
+				</Modal>
+			) }
+
+			{ isOpen && (
+				<Modal
+					title={ __( 'Geolocate this post', 'jeo' ) }
+					onRequestClose={ () => setState( ( prev ) => ( { ...prev, isOpen: false } ) ) }
+					className="jeo-geocode-modal"
+					isFullScreen={ true }
+				>
+					<JeoGeocodePosts
+						onSaveLocation={ () => setState( ( prev ) => ( { ...prev, isOpen: false } ) ) }
+						onCancel={ () => setState( ( prev ) => ( { ...prev, isOpen: false } ) ) }
+					/>
+				</Modal>
+			) }
+		</Fragment>
+	);
 };
 
 registerPlugin( 'jeo-posts-sidebar', {
