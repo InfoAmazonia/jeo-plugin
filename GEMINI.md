@@ -27,7 +27,7 @@ O JEO utiliza o framework **Neuron AI** como motor universal de LLM.
 ### 2.2. RAG Knowledge Base (Vector Store)
 - **Caminho Seguro:** Os embeddings são armazenados estritamente na pasta `wp-content/uploads/jeo-ai-store/` protegida por `.htaccess` contra acesso público via web.
 - **Isolamento de Ambiente:** O JEO possui duas bases vetoriais físicas (`jeo_knowledge.store` para Produção, `jeo_knowledge_test.store` para Testes). O código implementa endpoints REST para a limpeza (`clear`) individual de cada store.
-- **Limitações de API:** Modelos de Chat (`gpt-4o`, `gemini-2.5-flash`) não suportam vetorização. O `Neuron_Factory` deve SEMPRE forçar a injeção de modelos focados em embeddings (`text-embedding-3-small`, `models/text-embedding-004`) para a `EmbeddingsProviderInterface`.
+- **Limitações de API:** Modelos de Chat (`gpt-4o`, `gemini-2.5-flash`) não suportam vetorização. O `Neuron_Factory` deve SEMPRE forçar a injeção de modelos focados em embeddings (`text-embedding-3-small`, `text-embedding-004`) para a `EmbeddingsProviderInterface`.
 
 ### 2.3. Model-Aware Prompt Optimization & Verbatim Mandate
 - O **AI Prompt Engineer Assistant** (Meta-Prompting) intercepta a requisição do usuário via `api_chat_prompt_generator` e gera automaticamente um System Prompt otimizado, injetando "Regras Constitucionais" específicas dependendo do provedor ativo:

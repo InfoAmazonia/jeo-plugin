@@ -107,6 +107,8 @@ class Neuron_Factory {
 					model: $model
 				);
 			case 'gemini':
+				// Gemini provider in neuron-ai already includes 'models/' in its baseUri
+				$model = str_replace( 'models/', '', $model );
 				return new \NeuronAI\RAG\Embeddings\GeminiEmbeddingsProvider(
 					key: $api_key,
 					model: $model
@@ -162,7 +164,7 @@ class Neuron_Factory {
 					$embedding_model = 'text-embedding-3-small';
 					break;
 				case 'gemini':
-					$embedding_model = 'models/text-embedding-004';
+					$embedding_model = 'text-embedding-004';
 					break;
 				case 'ollama':
 					$embedding_model = 'nomic-embed-text'; // Best open source default

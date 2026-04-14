@@ -396,7 +396,7 @@
                                                                 $current_embed_model = $this->get_option( 'ai_embedding_model' );
                                                                 $known_models = [
                                                                         '', 'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002',
-                                                                        'models/text-embedding-004', 'models/embedding-001', 'nomic-embed-text', 'mxbai-embed-large'
+                                                                        'text-embedding-004', 'embedding-001', 'nomic-embed-text', 'mxbai-embed-large'
                                                                 ];
                                                                 ?>
                                                                 <select name="<?php echo esc_html( $this->get_field_name( 'ai_embedding_model' ) ); ?>" id="ai_embedding_model" style="width: 100%; max-width: 400px;">
@@ -412,8 +412,8 @@
                                                                                 <option value="text-embedding-ada-002" <?php selected( $current_embed_model, 'text-embedding-ada-002' ); ?>>text-embedding-ada-002</option>
                                                                         </optgroup>
                                                                         <optgroup label="Google Gemini">
-                                                                                <option value="models/text-embedding-004" <?php selected( $current_embed_model, 'models/text-embedding-004' ); ?>>models/text-embedding-004</option>
-                                                                                <option value="models/embedding-001" <?php selected( $current_embed_model, 'models/embedding-001' ); ?>>models/embedding-001</option>
+                                                                                <option value="text-embedding-004" <?php selected( $current_embed_model, 'text-embedding-004' ); ?>>text-embedding-004</option>
+                                                                                <option value="embedding-001" <?php selected( $current_embed_model, 'embedding-001' ); ?>>embedding-001</option>
                                                                         </optgroup>
                                                                         <optgroup label="Ollama (Local)">
                                                                                 <option value="nomic-embed-text" <?php selected( $current_embed_model, 'nomic-embed-text' ); ?>>nomic-embed-text</option>
