@@ -103,17 +103,38 @@ class Jeo {
 
 	/**
 	 * Returns the content of all README*.md files found in the plugin root.
+	 * Also looks one level up to support Docker development environments where only src is mounted.
 	 */
 	public function api_get_readme() {
-		$files = glob( JEO_BASEPATH . 'README*.md' );
+		$paths = array(
+			JEO_BASEPATH . 'README*.md',
+			dirname( JEO_BASEPATH ) . '/README*.md',
+		);
+
+		$files = array();
+		foreach ( $paths as $path ) {
+			$found = glob( $path );
+			if ( is_array( $found ) ) {
+				$files = array_merge( $files, $found );
+			}
+		}
+
+		// Remove duplicates (same filename in different paths)
+		$unique_files = array();
+		foreach ( $files as $file ) {
+			$name = basename( $file );
+			if ( ! isset( $unique_files[ $name ] ) ) {
+				$unique_files[ $name ] = $file;
+			}
+		}
+
 		$readmes = array();
 
-		if ( empty( $files ) ) {
+		if ( empty( $unique_files ) ) {
 			return new \WP_REST_Response( array( 'error' => 'No README files found' ), 404 );
 		}
 
-		foreach ( $files as $file_path ) {
-			$file_name = basename( $file_path );
+		foreach ( $unique_files as $file_name => $file_path ) {
 			// Create a friendly label: README_BR.md -> BR, README.md -> Default
 			$label = str_replace( array( 'README_', 'README', '.md' ), '', $file_name );
 			$label = empty( $label ) ? 'English' : str_replace( '_', ' ', $label );

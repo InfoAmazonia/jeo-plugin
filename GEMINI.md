@@ -1,4 +1,4 @@
-# JEO Plugin - Master Architecture Guide & Mandates (v3.6.3-experimental)
+# JEO Plugin - Master Architecture Guide & Mandates (v3.6.4)
 
 Este documento é a autoridade máxima sobre a arquitetura do plugin JEO. Qualquer alteração, refatoração ou adição de funcionalidade deve respeitar estritamente as diretrizes aqui estabelecidas para garantir a estabilidade e a integridade dos dados geográficos.
 
