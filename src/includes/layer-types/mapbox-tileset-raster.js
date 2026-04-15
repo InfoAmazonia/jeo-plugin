@@ -1,3 +1,4 @@
+( function() {
 const { __ } = wp.i18n;
 
 window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
@@ -89,3 +90,4 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 		};
 	},
 } );
+} )();

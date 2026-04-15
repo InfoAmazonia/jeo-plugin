@@ -1,3 +1,4 @@
+( function() {
 const { __ } = wp.i18n;
 
 window.JeoLegendTypes.registerLegendType( 'barscale', {
@@ -66,3 +67,4 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 		return container;
 	},
 } );
+} )();

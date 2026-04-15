@@ -1,3 +1,4 @@
+( function() {
 const { __ } = wp.i18n;
 
 window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
@@ -105,3 +106,4 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 		};
 	},
 } );
+} )();

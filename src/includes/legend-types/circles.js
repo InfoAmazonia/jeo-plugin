@@ -1,3 +1,4 @@
+( function() {
 const { __ } = wp.i18n;
 
 window.JeoLegendTypes.registerLegendType( 'circles', {
@@ -85,3 +86,4 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 	},
 
 } );
+} )();

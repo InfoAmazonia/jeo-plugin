@@ -1,3 +1,4 @@
+( function() {
 const { __ } = wp.i18n;
 
 window.JeoLayerTypes.registerLayerType( 'mvt', {
@@ -107,3 +108,4 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 		};
 	},
 } );
+} )();

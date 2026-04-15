@@ -1,3 +1,4 @@
+( function() {
 const { __ } = wp.i18n;
 
 window.JeoLayerTypes.registerLayerType( 'tilelayer', {
@@ -70,3 +71,4 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 		};
 	},
 } );
+} )();

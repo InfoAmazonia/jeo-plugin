@@ -1,3 +1,4 @@
+( function() {
 const { __ } = wp.i18n;
 
 const MAPBOX_RASTER_ATTRIBUTION =
@@ -276,3 +277,4 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 		} );
 	},
 } );
+} )();
