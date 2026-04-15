@@ -23,8 +23,8 @@ class WP_Post_Data_Loader {
 		$documents = [];
 
 		foreach ( $posts as $post ) {
-			// Basic filtering to avoid empty posts or revisions being passed directly
-			if ( empty( $post->post_content ) ) {
+			// Safety checks: skip empty content, revisions, or non-published posts
+			if ( empty( $post->post_content ) || 'publish' !== $post->post_status || 'revision' === $post->post_type ) {
 				continue;
 			}
 

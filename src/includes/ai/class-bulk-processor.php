@@ -325,9 +325,11 @@ class Bulk_Processor {
 			echo '<span class="badge badge-warning" style="background:#ffb900; color:#fff; padding:2px 8px; border-radius:4px;">' . esc_html__( 'Pending AI Approval', 'jeo' ) . '</span>';
 			echo '<div class="row-actions"><span><a href="' . esc_url( add_query_arg( array( 'jeo_approve_ai' => $post_id, 'post' => $post_id, 'action' => 'edit' ), admin_url( 'post.php' ) ) ) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
 		} elseif ( 'no_locations' === $status ) {
-			echo '<span class="badge badge-error" style="background:#d63638; color:#fff; padding:2px 8px; border-radius:4px;">' . esc_html__( 'No Locations', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-info" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px;">' . esc_html__( 'No Locations Found', 'jeo' ) . '</span>';
+		} elseif ( 'error' === $status ) {
+			echo '<span class="badge badge-error" style="background:#d63638; color:#fff; padding:2px 8px; border-radius:4px;">' . esc_html__( 'AI Error', 'jeo' ) . '</span>';
 		} else {
-			echo '<span class="badge" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px;">' . esc_html__( 'Not Processed', 'jeo' ) . '</span>';
+			echo '<span class="badge" style="background:#f0f0f1; color:#646970; padding:2px 8px; border-radius:4px;">' . esc_html__( 'Not Processed', 'jeo' ) . '</span>';
 		}
 	}
 
