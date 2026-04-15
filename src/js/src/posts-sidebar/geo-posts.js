@@ -17,12 +17,19 @@ class JeoGeocodePosts extends Component {
 			.select( 'core/editor' )
 			.getEditedPostAttribute( 'meta' );
 
+		// Legacy Migration: Map _geocode_lon to _geocode_lng if needed
+		const rawPoints = metadata._related_point || [];
+		const sanitizedPoints = rawPoints.map( p => ( {
+			...p,
+			_geocode_lng: p._geocode_lng || p._geocode_lon || ''
+		} ) );
+
 		this.state = {
 			pointsCheckpoint: [],
 			formMode: 'view',
 			searchValue: '',
 			zoom: 1,
-			points: metadata._related_point,
+			points: sanitizedPoints,
 			currentMarkerIndex: 0,
 			loadStatus: 'pending',
 			magneticMarkers: true,
@@ -80,7 +87,7 @@ class JeoGeocodePosts extends Component {
 					if ( activePoint ) {
 						this.flyToLocation(
 							activePoint._geocode_lat,
-							activePoint._geocode_lon
+							activePoint._geocode_lng
 						);
 					}
 				}
@@ -137,7 +144,7 @@ class JeoGeocodePosts extends Component {
 				const currentPoint = points[ currentMarkerIndex ];
 				this.flyToLocation(
 					currentPoint._geocode_lat,
-					currentPoint._geocode_lon
+					currentPoint._geocode_lng
 				);
 			}
 		);
@@ -154,7 +161,7 @@ class JeoGeocodePosts extends Component {
 				const currentPoint = points[ currentMarkerIndex ];
 				this.flyToLocation(
 					currentPoint._geocode_lat,
-					currentPoint._geocode_lon
+					currentPoint._geocode_lng
 				);
 			}
 		);
@@ -167,7 +174,7 @@ class JeoGeocodePosts extends Component {
 	fetchReverseGeocode( lat, lng ) {
 		return window
 			.fetch(
-				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lng
+				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lng=' + lng
 			)
 			.then( ( response ) => {
 				return response.json();
@@ -218,7 +225,7 @@ class JeoGeocodePosts extends Component {
 				loadStatus: 'resolved',
 			},
 			() => {
-				this.flyToLocation( point._geocode_lat, point._geocode_lon );
+				this.flyToLocation( point._geocode_lat, point._geocode_lng );
 			}
 		);
 	}
@@ -241,15 +248,23 @@ class JeoGeocodePosts extends Component {
 	}
 
 	onLocationFound( location ) {
-		this.flyToLocation( location.lat, location.lon );
-		this.fetchReverseGeocode( location.lat, location.lon ).then( ( result ) => {
-			if ( result.raw.error ) {
+		const lat = parseFloat( location.lat );
+		const lng = parseFloat( location.lng );
+		
+		if ( isNaN( lat ) || isNaN( lng ) ) {
+			console.error( 'JEO: Invalid coordinates received', location );
+			return;
+		}
+
+		this.flyToLocation( lat, lng );
+		this.fetchReverseGeocode( lat, lng ).then( ( result ) => {
+			if ( ! result || ( result.raw && result.raw.error ) ) {
 				return this.resetForm();
 			}
 
 			const foundPoint = {
-				_geocode_lat: this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : String( location.lat ),
-				_geocode_lon: this.state.magneticMarkers ? this.getProperty( result, 'lon' ) : String( location.lon ),
+				_geocode_lat: this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : String( lat ),
+				_geocode_lng: this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : String( lng ),
 				_geocode_full_address: this.getProperty( result, 'full_address' ),
 				_geocode_country: this.getProperty( result, 'country' ),
 				_geocode_country_code: this.getProperty( result, 'country_code' ),
@@ -296,12 +311,13 @@ class JeoGeocodePosts extends Component {
 	mapLoaded( e ) {
 		const { points } = this.state;
 
-		const coords = points.map( ( point ) => {
-			return [
-				parseFloat( point._geocode_lat ),
-				parseFloat( point._geocode_lon ),
-			];
-		} );
+		const coords = points
+			.map( ( point ) => {
+				const lat = parseFloat( point._geocode_lat );
+				const lng = parseFloat( point._geocode_lng );
+				return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lat, lng ];
+			} )
+			.filter( c => c !== null );
 
 		const map = e.target;
 
@@ -316,7 +332,7 @@ class JeoGeocodePosts extends Component {
 	onMarkerDragged( e ) {
 		const marker = e.target;
 		const latLng = marker.getLatLng();
-		this.onLocationFound( { lat: latLng.lat, lon: latLng.lng } );
+		this.onLocationFound( { lat: latLng.lat, lng: latLng.lng } );
 		this.setState( { loadStatus: 'pending' } );
 	}
 
@@ -511,6 +527,10 @@ class JeoGeocodePosts extends Component {
 									} );
 								}
 
+								const lat = parseFloat( point._geocode_lat );
+								const lng = parseFloat( point._geocode_lng );
+								if ( isNaN( lat ) || isNaN( lng ) ) return null;
+
 								return (
 									<Marker
 										key={ i }
@@ -520,10 +540,7 @@ class JeoGeocodePosts extends Component {
 										}
 										onDragend={ this.onMarkerDragged }
 										onClick={ formMode === 'view' ? this.clickMarkerMap : null }
-										position={ [
-											parseFloat( point._geocode_lat ),
-											parseFloat( point._geocode_lon ),
-										] }
+										position={ [ lat, lng ] }
 										id={ i }
 										opacity={ currentMarkerIndex === i ? 1 : 0.6 }
 									/>

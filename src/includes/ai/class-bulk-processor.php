@@ -37,6 +37,7 @@ class Bulk_Processor {
 
 		// Admin Table Hooks
 		add_action( 'admin_init', array( $this, 'admin_hooks' ) );
+		add_action( 'admin_print_footer_scripts', array( $this, 'render_bulk_approval_modal' ) );
 	}
 
 	/**
@@ -56,6 +57,14 @@ class Bulk_Processor {
 			'callback'            => array( $this, 'api_clear_logs' ),
 			'permission_callback' => function() {
 				return current_user_can( 'manage_options' );
+			},
+		) );
+
+		register_rest_route( 'jeo/v1', '/bulk-ai-preview-approval', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'api_preview_approval' ),
+			'permission_callback' => function() {
+				return current_user_can( 'edit_posts' );
 			},
 		) );
 	}
@@ -307,8 +316,12 @@ class Bulk_Processor {
 
 			$related_points = array();
 			foreach ( $pending as $p ) {
+				$conf = isset( $p['confidence'] ) ? (int) $p['confidence'] : 100;
+				// Follow the same logic as the UI: 75%+ is primary, below is secondary
+				$relevance = ( $conf >= 75 ) ? 'primary' : 'secondary';
+
 				$related_points[] = array(
-					'relevance'    => 'primary',
+					'relevance'    => $relevance,
 					'_geocode_lat' => (string) $p['lat'],
 					'_geocode_lng' => (string) $p['lng'],
 					'name'         => $p['name'],
@@ -318,13 +331,181 @@ class Bulk_Processor {
 			}
 
 			update_post_meta( $post_id, '_related_point', $related_points );
-			\jeo_geocode_handler()->save_post( $post_id, get_post( $post_id ), true );
-
+			
 			delete_post_meta( $post_id, self::META_PENDING );
 			update_post_meta( $post_id, self::META_STATUS, 'approved' );
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * REST Callback: Preview what posts will be approved in bulk.
+	 */
+	public function api_preview_approval( $request ) {
+		$post_ids = $request->get_param( 'post_ids' );
+		if ( empty( $post_ids ) || ! is_array( $post_ids ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No posts selected.', 'jeo' ) ), 400 );
+		}
+
+		$threshold = (int) \jeo_settings()->get_option( 'jeo_bulk_confidence_threshold', 0 );
+		$summary = array(
+			'threshold'        => $threshold,
+			'will_approve'     => 0,
+			'ignored_by_score' => 0,
+			'not_applicable'   => 0,
+			'details'          => array()
+		);
+
+		foreach ( $post_ids as $id ) {
+			$pending = get_post_meta( $id, self::META_PENDING, true );
+			$post    = get_post( $id );
+			
+			if ( ! empty( $pending ) && is_array( $pending ) ) {
+				$total_conf = 0;
+				foreach ( $pending as $p ) {
+					$total_conf += isset( $p['confidence'] ) ? (int) $p['confidence'] : 100;
+				}
+				$avg_conf = count( $pending ) > 0 ? round( $total_conf / count( $pending ) ) : 0;
+				
+				if ( $avg_conf >= $threshold ) {
+					$summary['will_approve']++;
+					$status = 'ready';
+				} else {
+					$summary['ignored_by_score']++;
+					$status = 'low_score';
+				}
+
+				$summary['details'][] = array(
+					'id'       => $id,
+					'title'    => $post->post_title,
+					'avg_conf' => $avg_conf,
+					'status'   => $status,
+					'count'    => count( $pending )
+				);
+			} else {
+				$summary['not_applicable']++;
+			}
+		}
+
+		return new \WP_REST_Response( $summary, 200 );
+	}
+
+	/**
+	 * Render the confirmation modal and JS logic in the admin footer of edit.php.
+	 */
+	public function render_bulk_approval_modal() {
+		global $pagenow, $typenow;
+		if ( 'edit.php' !== $pagenow ) {
+			return;
+		}
+
+		$enabled_post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
+		if ( ! in_array( $typenow, $enabled_post_types ) ) {
+			return;
+		}
+		?>
+		<div id="jeo-bulk-ai-modal" style="display:none; position:fixed; z-index:99999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); overflow:hidden;">
+			<div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:25px; border-radius:8px; width:600px; max-width:90%; max-height:85vh; display:flex; flex-direction:column; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
+				<h2 style="margin-top:0; border-bottom:1px solid #ccc; padding-bottom:10px; font-weight:600; color:#1d2327;">✨ <?php esc_html_e( 'Review Bulk AI Approval', 'jeo' ); ?></h2>
+				<div id="jeo-bulk-ai-modal-content" style="overflow-y:auto; flex-grow:1; margin-bottom:20px;">
+					<p style="text-align:center; padding:20px; color:#666; font-style:italic;">
+						<?php esc_html_e( 'Analyzing selected posts...', 'jeo' ); ?>
+					</p>
+				</div>
+				<div style="border-top:1px solid #ccc; padding-top:15px; text-align:right;">
+					<button type="button" class="button button-secondary" id="jeo-bulk-ai-cancel"><?php esc_html_e( 'Cancel', 'jeo' ); ?></button>
+					<button type="button" class="button button-primary" id="jeo-bulk-ai-confirm" style="margin-left:10px;"><?php esc_html_e( 'Confirm & Apply', 'jeo' ); ?></button>
+				</div>
+			</div>
+		</div>
+
+		<script>
+		jQuery(document).ready(function($) {
+			var $form = $('#posts-filter');
+			var $modal = $('#jeo-bulk-ai-modal');
+			var $content = $('#jeo-bulk-ai-modal-content');
+			var isConfirmed = false;
+
+			$form.on('submit', function(e) {
+				var action1 = $('select[name="action"]').val();
+				var action2 = $('select[name="action2"]').val();
+				var action = (action1 === 'jeo_approve_ai') ? action1 : ((action2 === 'jeo_approve_ai') ? action2 : false);
+
+				if ( action === 'jeo_approve_ai' && ! isConfirmed ) {
+					e.preventDefault();
+					
+					var postIds = [];
+					$('input[name="post[]"]:checked').each(function() {
+						postIds.push($(this).val());
+					});
+
+					if (postIds.length === 0) {
+						alert('<?php esc_js( __( 'Please select at least one post.', 'jeo' ) ); ?>');
+						return;
+					}
+
+					$modal.show();
+					$content.html('<p style="text-align:center; padding:20px; color:#666; font-style:italic;"><?php esc_js( __( 'Analyzing selected posts...', 'jeo' ) ); ?></p>');
+
+					$.ajax({
+						url: '<?php echo esc_url_raw( rest_url( 'jeo/v1/bulk-ai-preview-approval' ) ); ?>',
+						method: 'POST',
+						data: {
+							post_ids: postIds
+						},
+						beforeSend: function(xhr) {
+							xhr.setRequestHeader('X-WP-Nonce', '<?php echo wp_create_nonce("wp_rest"); ?>');
+						},
+						success: function(res) {
+							var html = '<p style="font-size:14px;"><strong>' + res.will_approve + '</strong> posts will be approved.</p>';
+							if ( res.ignored_by_score > 0 ) {
+								html += '<p style="color:#d63638; font-size:13px;">⚠️ <strong>' + res.ignored_by_score + '</strong> posts have a confidence score below your threshold (' + res.threshold + '%) and will be ignored.</p>';
+							}
+							if ( res.not_applicable > 0 ) {
+								html += '<p style="color:#666; font-size:13px;">ℹ️ <strong>' + res.not_applicable + '</strong> posts are already geolocated or don\'t have AI suggestions.</p>';
+							}
+
+							html += '<table class="wp-list-table widefat fixed striped" style="margin-top:15px; border:1px solid #e0e0e0;">';
+							html += '<thead><tr><th>Post Title</th><th style="width:80px; text-align:center;">Locs</th><th style="width:100px; text-align:center;">Confidence</th></tr></thead><tbody>';
+							
+							res.details.forEach(function(d) {
+								var color = d.status === 'ready' ? '#46b450' : '#d63638';
+								html += '<tr>';
+								html += '<td style="font-size:12px;">' + d.title + '</td>';
+								html += '<td style="text-align:center; font-size:12px;">' + d.count + '</td>';
+								html += '<td style="text-align:center; color:' + color + '; font-weight:bold; font-size:12px;">' + d.avg_conf + '%</td>';
+								html += '</tr>';
+							});
+							html += '</tbody></table>';
+
+							$content.html(html);
+
+							if ( res.will_approve === 0 ) {
+								$('#jeo-bulk-ai-confirm').prop('disabled', true).text('Nothing to Approve');
+							} else {
+								$('#jeo-bulk-ai-confirm').prop('disabled', false).text('Confirm & Apply');
+							}
+						},
+						error: function() {
+							$content.html('<p style="color:#d63638; text-align:center; padding:20px;">Error loading preview. Please try again.</p>');
+						}
+					});
+				}
+			});
+
+			$('#jeo-bulk-ai-cancel').click(function() {
+				$modal.hide();
+			});
+
+			$('#jeo-bulk-ai-confirm').click(function() {
+				$modal.hide();
+				isConfirmed = true;
+				$form.submit();
+			});
+		});
+		</script>
+		<?php
 	}
 
 	public function add_status_column( $columns ) {
@@ -340,11 +521,26 @@ class Bulk_Processor {
 		$status = get_post_meta( $post_id, self::META_STATUS, true );
 		$has_points = ! empty( get_post_meta( $post_id, '_related_point', true ) );
 
+		// 1. Render Status Badge
 		if ( $has_points ) {
-			echo '<span class="badge badge-success" style="background:#46b450; color:#fff; padding:2px 8px; border-radius:4px;">' . esc_html__( 'Geolocated', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-success" style="background:#46b450; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'Geolocated', 'jeo' ) . '</span>';
 		} elseif ( 'pending_approval' === $status ) {
+			echo '<span class="badge badge-warning" style="background:#ffb900; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'Pending Approval', 'jeo' ) . '</span>';
+		} elseif ( 'no_locations' === $status ) {
+			echo '<span class="badge badge-info" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'No Locations Found', 'jeo' ) . '</span>';
+		} elseif ( 'error' === $status ) {
+			echo '<span class="badge badge-error" style="background:#d63638; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'AI Error', 'jeo' ) . '</span>';
+		} else {
+			echo '<span class="badge" style="background:#f0f0f1; color:#646970; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'Not Processed', 'jeo' ) . '</span>';
+		}
+
+		// 2. Render Confidence Score (Below Badge)
+		if ( 'pending_approval' === $status || 'approved' === $status ) {
 			$pending = get_post_meta( $post_id, self::META_PENDING, true );
 			$avg_conf = 0;
+			
+			// If approved, we might want to calculate from current points if they have confidence meta, 
+			// but for now we look at pending to show what was the AI score.
 			if ( is_array( $pending ) && ! empty( $pending ) ) {
 				$total_conf = 0;
 				foreach ( $pending as $p ) {
@@ -353,20 +549,20 @@ class Bulk_Processor {
 				$avg_conf = round( $total_conf / count( $pending ) );
 			}
 
-			$color = '#ffb900'; // Amber
-			if ( $avg_conf >= 80 ) { $color = '#46b450'; } // Greenish
-			elseif ( $avg_conf < 50 ) { $color = '#d63638'; } // Reddish
+			if ( $avg_conf > 0 ) {
+				$conf_color = '#72aee6'; // Default Blue
+				if ( $avg_conf >= 80 ) { $conf_color = '#46b450'; }
+				elseif ( $avg_conf < 40 ) { $conf_color = '#d63638'; }
 
-			echo '<span class="badge badge-warning" style="background:' . esc_attr( $color ) . '; color:#fff; padding:2px 8px; border-radius:4px;" title="' . esc_attr__( 'Average AI Confidence', 'jeo' ) . ': ' . $avg_conf . '%">';
-			echo esc_html__( 'Pending', 'jeo' ) . ' (' . $avg_conf . '%)';
-			echo '</span>';
-			echo '<div class="row-actions"><span><a href="' . esc_url( add_query_arg( array( 'jeo_approve_ai' => $post_id, 'post' => $post_id, 'action' => 'edit' ), admin_url( 'post.php' ) ) ) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
-		} elseif ( 'no_locations' === $status ) {
-			echo '<span class="badge badge-info" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px;">' . esc_html__( 'No Locations Found', 'jeo' ) . '</span>';
-		} elseif ( 'error' === $status ) {
-			echo '<span class="badge badge-error" style="background:#d63638; color:#fff; padding:2px 8px; border-radius:4px;">' . esc_html__( 'AI Error', 'jeo' ) . '</span>';
-		} else {
-			echo '<span class="badge" style="background:#f0f0f1; color:#646970; padding:2px 8px; border-radius:4px;">' . esc_html__( 'Not Processed', 'jeo' ) . '</span>';
+				echo '<div style="font-size:11px; font-weight:600; margin-top:2px; color:' . esc_attr( $conf_color ) . ';">';
+				echo 'Precison: ' . $avg_conf . '%';
+				echo '</div>';
+			}
+		}
+
+		// 3. Render Row Actions
+		if ( 'pending_approval' === $status && ! $has_points ) {
+			echo '<div class="row-actions" style="margin-top:4px;"><span><a href="' . esc_url( add_query_arg( array( 'jeo_approve_ai' => $post_id, 'post' => $post_id, 'action' => 'edit' ), admin_url( 'post.php' ) ) ) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
 		}
 	}
 

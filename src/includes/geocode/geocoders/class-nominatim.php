@@ -32,11 +32,11 @@ class Nominatim extends \Jeo\Geocoder {
 		return $response;
 	}
 
-	public function reverse_geocode( $lat, $lon ) {
+	public function reverse_geocode( $lat, $lng ) {
 
 		$params = array(
 			'lat'            => $lat,
-			'lon'            => $lon,
+			'lon'            => $lng,
 			'format'         => 'json',
 			'addressdetails' => 1,
 		);
@@ -56,7 +56,7 @@ class Nominatim extends \Jeo\Geocoder {
 
 			$response = array(
 				'lat'          => $item['lat'],
-				'lon'          => $item['lon'],
+				'lng'          => $item['lon'],
 				'full_address' => $item['display_name'],
 			);
 		}

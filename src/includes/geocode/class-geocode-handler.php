@@ -42,15 +42,10 @@ class Geocode_Handler {
 	}
 
 	public function ajax_reverse_geocode() {
-
 		$geocoder = $this->get_active_geocoder();
-
 		if ( $geocoder ) {
-			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
-		} else {
-			echo wp_json_encode( array() );
+			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lng'] ) ) );
 		}
-
 		die;
 	}
 
@@ -461,7 +456,9 @@ class Geocode_Handler {
 
 				foreach ( $all_points as $point ) {
 
-					$suffix = 'primary' === $point['relevance'] ? '_p' : '_s';
+					// Fallback to secondary if relevance is missing to prevent PHP Warnings
+					$point_relevance = isset( $point['relevance'] ) ? $point['relevance'] : 'secondary';
+					$suffix = 'primary' === $point_relevance ? '_p' : '_s';
 
 					if ( isset( $point[ $attr ] ) ) {
 						add_post_meta( $object_id, $attr . $suffix, $point[ $attr ] );

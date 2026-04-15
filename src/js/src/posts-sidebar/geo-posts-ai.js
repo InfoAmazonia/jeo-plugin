@@ -25,12 +25,13 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 		if ( mapInstance && mapReady && aiSuggestedLocations.length > 0 ) {
 			const selectedLocations = aiSuggestedLocations.filter( loc => loc._selected );
 			if ( selectedLocations.length > 0 ) {
-				const coords = selectedLocations.map( ( loc ) => {
-					return [
-						parseFloat( loc._geocode_lat ),
-						parseFloat( loc._geocode_lon ),
-					];
-				} );
+				const coords = selectedLocations
+					.map( ( loc ) => {
+						const lat = parseFloat( loc._geocode_lat );
+						const lng = parseFloat( loc._geocode_lng );
+						return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lat, lng ];
+					} )
+					.filter( c => c !== null );
 
 				if ( coords.length === 1 ) {
 					mapInstance.setZoom( 6 );
@@ -55,8 +56,10 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 
 	// Handle marker click to fly to location
 	const handleMarkerClick = ( lat, lon ) => {
-		if ( mapInstance ) {
-			mapInstance.flyTo( [ parseFloat( lat ), parseFloat( lon ) ], 10 );
+		const latitude = parseFloat( lat );
+		const longitude = parseFloat( lon );
+		if ( mapInstance && ! isNaN( latitude ) && ! isNaN( longitude ) ) {
+			mapInstance.flyTo( [ latitude, longitude ], 10 );
 		}
 	};
 
@@ -94,7 +97,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 									cursor: 'pointer',
 									opacity: loc._disabled ? 0.7 : 1
 								} }
-								onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
+								onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lng ) }
 								>
 									<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' } }>
 										<div style={ { display: 'flex', alignItems: 'center' } }>
@@ -120,7 +123,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 									<div style={ { marginLeft: '32px' } }>
 										<div style={ { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' } }>
 											<p style={ { fontSize: '11px', color: '#757575', margin: 0, fontFamily: 'monospace' } }>
-												{ `LAT: ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | LNG: ${ Number.parseFloat(loc._geocode_lon).toFixed(4) }` }
+												{ `LAT: ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | LNG: ${ Number.parseFloat(loc._geocode_lng).toFixed(4) }` }
 											</p>
 											
 											<div style={ { width: '130px' } } onClick={ (e) => e.stopPropagation() }>
@@ -184,18 +187,21 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
 								url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
 							/>
-							{ aiSuggestedLocations.map( ( loc, index ) => (
-								<Marker
-									key={ index }
-									icon={ createMarkerIcon( loc._selected ) }
-									position={ [
-										parseFloat( loc._geocode_lat ),
-										parseFloat( loc._geocode_lon ),
-									] }
-									opacity={ loc._selected ? 1 : 0.3 }
-									onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
-								/>
-							) ) }
+							{ aiSuggestedLocations.map( ( loc, index ) => {
+								const lat = parseFloat( loc._geocode_lat );
+								const lng = parseFloat( loc._geocode_lng );
+								if ( isNaN( lat ) || isNaN( lng ) ) return null;
+
+								return (
+									<Marker
+										key={ index }
+										icon={ createMarkerIcon( loc._selected ) }
+										position={ [ lat, lng ] }
+										opacity={ loc._selected ? 1 : 0.3 }
+										onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lng ) }
+									/>
+								);
+							} ) }
 						</MapContainer>
 					</div>
 				</div>
