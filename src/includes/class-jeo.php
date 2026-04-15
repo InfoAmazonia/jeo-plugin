@@ -92,6 +92,16 @@ class Jeo {
 
 		register_rest_route(
 			'jeo/v1',
+			'/dashboard-stats',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_dashboard_stats' ),
+				'permission_callback' => function () { return current_user_can( 'read' ); },
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
 			'/readme',
 			array(
 				'methods'             => 'GET',
@@ -151,20 +161,103 @@ class Jeo {
 		return new \WP_REST_Response( $readmes, 200 );
 	}
 
+	public function api_dashboard_stats() {
+		global $wpdb;
+		$min_date = $wpdb->get_var( "SELECT MIN(post_date) FROM {$wpdb->posts} WHERE post_status = 'publish'" );
+		
+		$post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
+		$types_data = array();
+		foreach ( $post_types as $pt ) {
+			$obj = get_post_type_object( $pt );
+			if ( ! $obj ) continue;
+			
+			$taxonomies = get_object_taxonomies( $pt, 'objects' );
+			$tax_data = array();
+			foreach ( $taxonomies as $tax ) {
+				if ( ! $tax->public || ! $tax->show_ui ) continue;
+				$terms = get_terms( array( 'taxonomy' => $tax->name, 'hide_empty' => true ) );
+				$term_list = array();
+				foreach ( $terms as $term ) {
+					$term_list[] = array( 'id' => (int) $term->term_id, 'name' => (string) $term->name );
+				}
+				$tax_data[] = array(
+					'slug'  => (string) $tax->name,
+					'label' => (string) $tax->label,
+					'terms' => $term_list
+				);
+			}
+
+			$types_data[] = array(
+				'slug'       => (string) $pt,
+				'label'      => (string) $obj->label,
+				'taxonomies' => $tax_data
+			);
+		}
+
+		return new \WP_REST_Response( array(
+			'min_date'   => $min_date ? substr( $min_date, 0, 10 ) : date( 'Y-m-d', strtotime( '-1 year' ) ),
+			'post_types' => $types_data
+		), 200 );
+	}
+
 	public function api_all_pins( $request ) {
 		global $wpdb;
-		
-		// Query para buscar meta_value e post_id ao mesmo tempo
-		$results = $wpdb->get_results( "
-			SELECT post_id, meta_value FROM {$wpdb->postmeta} 
-			WHERE meta_key = '_related_point' AND meta_value != ''
-		" );
+
+		$search    = $request->get_param( 'search' );
+		$after     = $request->get_param( 'after' );
+		$before    = $request->get_param( 'before' );
+		$post_type = $request->get_param( 'post_type' );
+		$taxonomy  = $request->get_param( 'taxonomy' );
+		$term_id   = $request->get_param( 'term_id' );
+
+		$query_where = "pm.meta_key = '_related_point' AND pm.meta_value != ''";
+		$join = "";
+		$params = array();
+
+		if ( ! empty( $search ) || ! empty( $after ) || ! empty( $before ) || ! empty( $post_type ) || ! empty( $taxonomy ) ) {
+			$join .= " INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID";
+		}
+
+		if ( ! empty( $search ) ) {
+			$query_where .= " AND (p.post_title LIKE %s OR p.post_content LIKE %s)";
+			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
+			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
+		}
+
+		if ( ! empty( $post_type ) ) {
+			$query_where .= " AND p.post_type = %s";
+			$params[] = $post_type;
+		}
+
+		if ( ! empty( $taxonomy ) && ! empty( $term_id ) ) {
+			$join .= " INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id";
+			$join .= " INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id";
+			$query_where .= " AND tt.taxonomy = %s AND tt.term_id = %d";
+			$params[] = $taxonomy;
+			$params[] = (int) $term_id;
+		}
+
+		if ( ! empty( $after ) ) {
+			$query_where .= " AND p.post_date >= %s";
+			$params[] = $after . ' 00:00:00';
+		}
+		if ( ! empty( $before ) ) {
+			$query_where .= " AND p.post_date <= %s";
+			$params[] = $before . ' 23:59:59';
+		}
+
+		$sql = "SELECT pm.post_id, pm.meta_value FROM {$wpdb->postmeta} pm $join WHERE $query_where";
+
+		if ( ! empty( $params ) ) {
+			$sql = $wpdb->prepare( $sql, $params );
+		}
+
+		$results = $wpdb->get_results( $sql );
 
 		$unique_pins = array();
 		$hash_map    = array();
 
-		foreach ( $results as $row ) {
-			$post_id     = $row->post_id;
+		foreach ( $results as $row ) {			$post_id     = $row->post_id;
 			$meta_data   = maybe_unserialize( $row->meta_value );
 			$post_title  = get_the_title( $post_id );
 			$view_url    = get_permalink( $post_id );
