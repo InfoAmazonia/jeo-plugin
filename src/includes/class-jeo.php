@@ -393,7 +393,7 @@ class Jeo {
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
 		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
 		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
+		$default_lon = \jeo_settings()->get_option( 'map_default_lng' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 5;
 		
 		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';

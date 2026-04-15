@@ -12,7 +12,7 @@
 			margin: 0;
 			padding: 0;
 			width: 100%;
-			height: calc(100vh - 32px); /* 100% minus the admin bar */
+			height: calc(100vh - 32px);
 			position: relative;
 			background: #f0f0f1;
 			overflow: hidden;
@@ -59,7 +59,7 @@
 		#jeo-dashboard-map {
 			width: 100%;
 			height: 100%;
-			opacity: 0; /* starts hidden until loaded */
+			opacity: 0;
 			transition: opacity 1s ease-in-out;
 		}
 
@@ -72,41 +72,53 @@
 			border-radius: 50%;
 			box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 			cursor: pointer;
-			opacity: 0; /* starts hidden */
+			opacity: 0;
 			transform: scale(0.1) translateY(50px);
 			transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 		}
 		
-		/* Drop animation class added via JS */
 		.jeo-pin-marker.drop {
 			opacity: 1;
 			transform: scale(1) translateY(0);
 		}
 		
-		/* Collapsible Title Overlay (MOVED TO BOTTOM) */
+		/* Dashboard Header / Bottom Panel */
 		.jeo-dashboard-header {
 			position: absolute;
 			bottom: 30px; left: 20px; right: 20px;
 			background: rgba(255,255,255,0.98);
-			border-radius: 8px;
-			box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+			border-radius: 12px;
+			box-shadow: 0 8px 30px rgba(0,0,0,0.2);
 			z-index: 100;
 			display: flex;
 			flex-direction: column;
 			overflow: hidden;
-			transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+			transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
 			width: calc(100% - 40px);
-			padding: 15px 20px;
+			padding: 20px 25px;
 			box-sizing: border-box;
+			max-height: 500px;
+			opacity: 1;
+			transform: translateY(0);
 		}
+
 		.jeo-dashboard-header.minimized {
-			width: 50px;
-			height: 50px;
-			padding: 10px;
+			width: 60px;
+			height: 60px;
+			padding: 15px;
 			cursor: pointer;
 			border-radius: 50%;
-			bottom: 20px;
+			bottom: 30px;
 			left: 20px;
+			right: auto;
+			max-height: 60px;
+			transform: translateY(0);
+			background: #1d2327;
+		}
+
+		.jeo-dashboard-header.minimized .jeo-dashboard-logo {
+			filter: brightness(0) invert(1);
+			width: 30px; height: 30px;
 		}
 		
 		.jeo-dashboard-logo {
@@ -115,23 +127,27 @@
 			background-size: contain;
 			flex-shrink: 0;
 			cursor: pointer;
+			transition: all 0.3s ease;
 		}
+
 		.jeo-dashboard-header-main {
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
 			width: 100%;
+			transition: opacity 0.3s ease;
 		}
+		
 		.jeo-dashboard-header-content {
 			margin-left: 15px;
 			white-space: nowrap;
-			transition: opacity 0.3s;
-			opacity: 1;
 			flex-grow: 1;
 			display: flex;
 			align-items: center;
 			justify-content: space-between;
+			transition: all 0.3s ease;
 		}
+
 		.jeo-dashboard-header.minimized .jeo-dashboard-header-content,
 		.jeo-dashboard-header.minimized .jeo-dashboard-filters {
 			opacity: 0;
@@ -149,58 +165,133 @@
 			margin-left: 20px;
 			color: #a7aaad;
 			cursor: pointer;
-			font-size: 20px;
+			font-size: 22px;
 			line-height: 1;
 			padding: 5px;
+			transition: color 0.2s ease;
 		}
-		.jeo-dashboard-header-toggle:hover { color: #007cba; }
-		.jeo-dashboard-header.minimized .jeo-dashboard-header-toggle { display: none; }
+		.jeo-dashboard-header-toggle:hover { color: #d63638; }
 
 		/* Filters Styling */
 		.jeo-dashboard-filters {
-			margin-top: 15px;
-			padding-top: 15px;
+			margin-top: 20px;
+			padding-top: 20px;
 			border-top: 1px solid #eee;
 			display: flex;
 			flex-direction: column;
-			gap: 15px;
+			gap: 20px;
+			transition: opacity 0.4s ease;
 		}
+
 		.jeo-filter-row {
 			display: flex;
-			gap: 20px;
+			gap: 15px;
 			align-items: flex-end;
 			flex-wrap: wrap;
 		}
+
 		.jeo-filter-group {
 			display: flex;
 			flex-direction: column;
-			gap: 5px;
+			gap: 8px;
 		}
+
 		.jeo-filter-group label {
-			font-size: 11px;
-			font-weight: 600;
+			font-size: 10px;
+			font-weight: 700;
 			text-transform: uppercase;
 			color: #8c8f94;
+			letter-spacing: 0.5px;
 		}
+
 		.jeo-dashboard-filters input, .jeo-dashboard-filters select {
 			border: 1px solid #ddd;
-			border-radius: 4px;
-			padding: 5px 10px;
+			border-radius: 6px;
+			padding: 8px 12px;
 			font-size: 13px;
 			background: #fff;
+			box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
 		}
-		#jeo-search-filter { width: 250px; }
-		#jeo-post-type-filter { width: 150px; }
-		#jeo-taxonomy-filter { width: 150px; }
+
+		#jeo-search-filter { width: 280px; }
+		#jeo-post-type-filter, #jeo-taxonomy-filter { width: 160px; }
 		#jeo-term-filter { width: 200px; }
-		#jeo-date-range { width: 100%; max-width: 800px; }
+
+		/* DUAL RANGE SLIDER CSS */
+		.jeo-range-slider-container {
+			position: relative;
+			width: 100%;
+			max-width: 900px;
+			height: 40px;
+			margin-top: 10px;
+		}
+		.jeo-range-slider-track {
+			position: absolute;
+			width: 100%;
+			height: 6px;
+			background: #e2e4e7;
+			border-radius: 3px;
+			top: 50%;
+			transform: translateY(-50%);
+		}
+		.jeo-range-slider-active-track {
+			position: absolute;
+			height: 6px;
+			background: #007cba;
+			border-radius: 3px;
+			top: 50%;
+			transform: translateY(-50%);
+			z-index: 1;
+		}
+		.jeo-range-input {
+			position: absolute;
+			width: 100%;
+			top: 50%;
+			transform: translateY(-50%);
+			background: none;
+			pointer-events: none;
+			-webkit-appearance: none;
+			appearance: none;
+			margin: 0;
+			z-index: 2;
+		}
+		.jeo-range-input::-webkit-slider-thumb {
+			height: 20px;
+			width: 20px;
+			border-radius: 50%;
+			background: #fff;
+			border: 2px solid #007cba;
+			cursor: pointer;
+			pointer-events: auto;
+			-webkit-appearance: none;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		}
+		.jeo-range-input::-moz-range-thumb {
+			height: 18px;
+			width: 18px;
+			border-radius: 50%;
+			background: #fff;
+			border: 2px solid #007cba;
+			cursor: pointer;
+			pointer-events: auto;
+			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+		}
+
 		.jeo-date-labels {
 			display: flex;
 			justify-content: space-between;
-			font-size: 11px;
-			color: #646970;
-			max-width: 800px;
+			font-size: 12px;
+			font-weight: 600;
+			color: #1d2327;
+			margin-top: 5px;
+			max-width: 900px;
 		}
+		.jeo-date-labels span {
+			background: #f0f0f1;
+			padding: 2px 8px;
+			border-radius: 4px;
+		}
+
 	</style>
 
 	<div id="jeo-dashboard-map"></div>
@@ -211,7 +302,7 @@
 			<div class="jeo-dashboard-header-content">
 				<h1><?php esc_html_e( 'JEO Platform', 'jeo' ); ?></h1>
 				<p id="jeo-pin-count"><?php esc_html_e( 'Loading geodata...', 'jeo' ); ?></p>
-				<div class="jeo-dashboard-header-toggle" id="jeo-header-collapse" title="<?php esc_attr_e( 'Minimize Dashboard Header', 'jeo' ); ?>">&times;</div>
+				<div class="jeo-dashboard-header-toggle" id="jeo-header-collapse" title="<?php esc_attr_e( 'Minimize Dashboard', 'jeo' ); ?>">&times;</div>
 			</div>
 		</div>
 
@@ -239,17 +330,22 @@
 					<select id="jeo-term-filter"></select>
 				</div>
 
-				<button type="button" class="button button-primary" id="jeo-apply-filters">
+				<button type="button" class="button button-primary" id="jeo-apply-filters" style="height:37px;">
 					<?php esc_html_e( 'Apply Filters', 'jeo' ); ?>
 				</button>
 			</div>
 
 			<div class="jeo-filter-group">
-				<label><?php esc_html_e( 'Date Range', 'jeo' ); ?></label>
-				<input type="range" id="jeo-date-range" min="0" max="100" value="100">
+				<label><?php esc_html_e( 'Timeline Range', 'jeo' ); ?></label>
+				<div class="jeo-range-slider-container">
+					<div class="jeo-range-slider-track"></div>
+					<div class="jeo-range-slider-active-track" id="jeo-range-active-track"></div>
+					<input type="range" class="jeo-range-input" id="jeo-range-min" min="0" max="100" value="0">
+					<input type="range" class="jeo-range-input" id="jeo-range-max" min="0" max="100" value="100">
+				</div>
 				<div class="jeo-date-labels">
-					<span id="jeo-date-from">...</span>
-					<span id="jeo-date-to"><?php esc_html_e( 'Today', 'jeo' ); ?></span>
+					<span id="jeo-date-from-label">...</span>
+					<span id="jeo-date-to-label">...</span>
 				</div>
 			</div>
 		</div>
@@ -267,7 +363,7 @@
 		}
 		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
 		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
+		$default_lon = \jeo_settings()->get_option( 'map_default_lng' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 4;
 		$rest_url = rest_url('jeo/v1');
 	?>
@@ -277,19 +373,20 @@
 
 			// UI Toggle Logic
 			var headerBox = document.getElementById('jeo-header-box');
-			document.getElementById('jeo-header-collapse').addEventListener('click', function() {
+			document.getElementById('jeo-header-collapse').addEventListener('click', function(e) {
+				e.stopPropagation();
 				headerBox.classList.add('minimized');
 			});
 			document.getElementById('jeo-header-logo').addEventListener('click', function() {
 				headerBox.classList.toggle('minimized');
 			});
+			headerBox.addEventListener('click', function() {
+				if (this.classList.contains('minimized')) {
+					this.classList.remove('minimized');
+				}
+			});
 
 			// Configuration
-			var mapRuntime = '<?php echo esc_js( $map_runtime ); ?>';
-			var mapboxKey  = '<?php echo esc_js( $mapbox_key ); ?>';
-			var defaultLat = parseFloat( '<?php echo esc_js( $default_lat ); ?>' );
-			var defaultLon = parseFloat( '<?php echo esc_js( $default_lon ); ?>' );
-			var defaultZoom = parseFloat( '<?php echo esc_js( $default_zoom ); ?>' );
 			var apiUrl     = '<?php echo esc_url_raw( $rest_url ); ?>';
 			var wpNonce    = '<?php echo wp_create_nonce("wp_rest"); ?>';
 
@@ -302,26 +399,49 @@
 			var maxTimestamp = new Date().getTime();
 
 			// Elements
-			var dateRangeInput = document.getElementById('jeo-date-range');
-			var dateFromLabel = document.getElementById('jeo-date-from');
+			var rangeMinInput = document.getElementById('jeo-range-min');
+			var rangeMaxInput = document.getElementById('jeo-range-max');
+			var activeTrack = document.getElementById('jeo-range-active-track');
+			var dateFromLabel = document.getElementById('jeo-date-from-label');
+			var dateToLabel = document.getElementById('jeo-date-to-label');
+			
 			var postTypeSelect = document.getElementById('jeo-post-type-filter');
 			var taxSelect = document.getElementById('jeo-taxonomy-filter');
 			var termSelect = document.getElementById('jeo-term-filter');
 			var taxGroup = document.getElementById('jeo-tax-group');
 			var termGroup = document.getElementById('jeo-term-group');
 
-			function updateDateLabel() {
-				var val = parseInt(dateRangeInput.value);
-				var currentTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (val / 100) );
-				var date = new Date(currentTs);
-				dateFromLabel.innerText = date.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+			function updateRangeUI() {
+				var minVal = parseInt(rangeMinInput.value);
+				var maxVal = parseInt(rangeMaxInput.value);
+
+				if (minVal > maxVal) {
+					var temp = minVal;
+					rangeMinInput.value = maxVal;
+					rangeMaxInput.value = temp;
+					minVal = parseInt(rangeMinInput.value);
+					maxVal = parseInt(rangeMaxInput.value);
+				}
+
+				activeTrack.style.left = minVal + '%';
+				activeTrack.style.width = (maxVal - minVal) + '%';
+
+				var fromTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (minVal / 100) );
+				var toTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (maxVal / 100) );
+				
+				dateFromLabel.innerText = new Date(fromTs).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
+				dateToLabel.innerText = new Date(toTs).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 			}
-			dateRangeInput.addEventListener('input', updateDateLabel);
+
+			rangeMinInput.addEventListener('input', updateRangeUI);
+			rangeMaxInput.addEventListener('input', updateRangeUI);
 
 			// Init
 			initGLMaps();
 
 			function initGLMaps() {
+				var mapRuntime = '<?php echo esc_js( $map_runtime ); ?>';
+				var mapboxKey  = '<?php echo esc_js( $mapbox_key ); ?>';
 				var isMapbox = (mapRuntime === 'mapboxgl');
 				var mapStyle = (isMapbox && mapboxKey) ? 'mapbox://styles/mapbox/light-v11' : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
 				if(isMapbox && mapboxKey) mapboxgl.accessToken = mapboxKey;
@@ -332,40 +452,38 @@
 				map = new glObject.Map({
 					container: 'jeo-dashboard-map',
 					style: mapStyle,
-					center: [defaultLon, defaultLat],
-					zoom: defaultZoom,
+					center: [<?php echo (float)$default_lon; ?>, <?php echo (float)$default_lat; ?>],
+					zoom: <?php echo (int)$default_zoom; ?>,
 					attributionControl: false
 				});
 
 				map.addControl(new glObject.NavigationControl(), 'top-right');
 
 				map.on('load', function() {
-					// Load initial stats and pins
 					fetch(apiUrl + '/dashboard-stats', { headers: { 'X-WP-Nonce': wpNonce } })
 					.then(res => res.json())
 					.then(data => {
 						dashboardData = data;
 						setupFilters(data);
-						fetchPins(true); // Initial fetch with 3 months default
+						fetchPins();
 					});
 					
-					document.getElementById('jeo-apply-filters').addEventListener('click', () => fetchPins(false));
+					document.getElementById('jeo-apply-filters').addEventListener('click', fetchPins);
 				});
 			}
 
 			function setupFilters(data) {
-				// Setup Date Range
-				var minDate = new Date(data.min_date);
-				minTimestamp = minDate.getTime();
+				minTimestamp = new Date(data.min_date).getTime();
 				
-				// Calculate default 3 months ago percentage
+				// Pre-select last 3 months
 				var threeMonthsAgo = new Date();
 				threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
-				var defaultPct = Math.max(0, Math.min(100, ( (threeMonthsAgo.getTime() - minTimestamp) / (maxTimestamp - minTimestamp) ) * 100 ));
-				dateRangeInput.value = Math.round(defaultPct);
-				updateDateLabel();
+				var minPct = Math.max(0, Math.min(100, ( (threeMonthsAgo.getTime() - minTimestamp) / (maxTimestamp - minTimestamp) ) * 100 ));
+				
+				rangeMinInput.value = Math.round(minPct);
+				rangeMaxInput.value = 100;
+				updateRangeUI();
 
-				// Setup Post Types
 				data.post_types.forEach(pt => {
 					var opt = document.createElement('option');
 					opt.value = pt.slug;
@@ -408,15 +526,14 @@
 				});
 			}
 
-			function fetchPins(isInitial) {
+			function fetchPins() {
 				var search = document.getElementById('jeo-search-filter').value;
 				var pt = postTypeSelect.value;
 				var tax = taxSelect.value;
 				var term = termSelect.value;
 				
-				var val = parseInt(dateRangeInput.value);
-				var afterTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (val / 100) );
-				var afterDate = new Date(afterTs).toISOString().split('T')[0];
+				var minTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (parseInt(rangeMinInput.value) / 100) );
+				var maxTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (parseInt(rangeMaxInput.value) / 100) );
 
 				var url = new URL(apiUrl + '/all-pins');
 				if (search) url.searchParams.append('search', search);
@@ -425,7 +542,8 @@
 					url.searchParams.append('taxonomy', tax);
 					url.searchParams.append('term_id', term);
 				}
-				url.searchParams.append('after', afterDate);
+				url.searchParams.append('after', new Date(minTs).toISOString().split('T')[0]);
+				url.searchParams.append('before', new Date(maxTs).toISOString().split('T')[0]);
 
 				var loader = document.getElementById('jeo-dashboard-loader');
 				if (loader) loader.classList.remove('hidden');

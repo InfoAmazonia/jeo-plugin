@@ -239,6 +239,7 @@
 			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
 			var key = $(keyInputId).val();
 			var model = $('#' + provider + '_model_hidden').val();
+			var lang = $('#jeo-ai-chat-lang').val();
 
 			$btn.prop('disabled', true).text('Generating...');
 			$status.text('Asking the active LLM to generate an optimized prompt...').css('color', '#007cba');
@@ -250,7 +251,8 @@
 					context: context,
 					provider: provider,
 					api_key: key,
-					model: model
+					model: model,
+					lang: lang
 				}
 			}).then(function(res) {
 				if (res && res.prompt) {
@@ -372,6 +374,79 @@
 		});
 
 		// ------------------------------------
+		// RAG Backup & List Logic
+		// ------------------------------------
+		function fetchBackups() {
+			var $container = $('#jeo-ai-backups-list');
+			if (!$container.length) return;
+
+			$container.html('<p>Loading backups...</p>');
+
+			loggedApiFetch({
+				path: '/jeo/v1/ai-list-backups',
+				method: 'GET'
+			}).then(function(res) {
+				if (res && Array.isArray(res) && res.length > 0) {
+					var html = '<table class="wp-list-table widefat fixed striped" style="margin-top:10px;">';
+					html += '<thead><tr><th>File</th><th>Date</th><th>Size</th><th style="width:150px;">Actions</th></tr></thead>';
+					html += '<tbody>';
+					res.forEach(function(b) {
+						html += '<tr>';
+						html += '<td><code>' + b.filename + '</code></td>';
+						html += '<td>' + b.date + '</td>';
+						html += '<td>' + b.size + '</td>';
+						html += '<td>';
+						html += '<a href="' + b.url + '" class="button button-small" download>Download</a> ';
+						html += '<button type="button" class="button button-small button-link-delete jeo-ai-delete-backup-btn" data-filename="' + b.filename + '">Delete</button>';
+						html += '</td>';
+						html += '</tr>';
+					});
+					html += '</tbody></table>';
+					$container.html(html);
+
+					$('.jeo-ai-delete-backup-btn').click(function() {
+						var filename = $(this).data('filename');
+						if (!confirm('Delete this backup?')) return;
+						loggedApiFetch({
+							path: '/jeo/v1/ai-delete-backup',
+							method: 'DELETE',
+							data: { filename: filename }
+						}).then(function() {
+							fetchBackups();
+						});
+					});
+				} else {
+					$container.html('<p style="color: #8c8f94; font-style: italic;">No backups found.</p>');
+				}
+			}).catch(function(err) {
+				console.error('JEO: Error fetching backups', err);
+				$container.html('<p style="color: #d63638;">Error loading backups list.</p>');
+			});
+		}
+
+		if ($('#tab-knowledge').length) {
+			fetchBackups();
+		}
+
+		$('#jeo-ai-backup-store-btn').click(function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			$btn.prop('disabled', true).text('Scheduling...');
+
+			loggedApiFetch({
+				path: '/jeo/v1/ai-backup-store',
+				method: 'POST'
+			}).then(function(res) {
+				alert(res.message);
+				setTimeout(fetchBackups, 3000);
+			}).catch(function(err) {
+				alert('Backup error: ' + (err.message || 'Unknown error'));
+			}).finally(function() {
+				$btn.prop('disabled', false).text('Backup Store');
+			});
+		});
+
+		// ------------------------------------
 		// Store Cleanup Logic
 		// ------------------------------------
 		$('.jeo-ai-clear-store-btn').click(function(e) {
@@ -382,7 +457,7 @@
 			if (store === 'production') {
 				var confirm1 = confirm('Are you sure you want to clear the PRODUCTION vector store? This will delete all embeddings and require a full re-indexing via WP-CLI.');
 				if (!confirm1) return;
-				var confirm2 = confirm('WARNING: This action cannot be undone. Click OK to confirm or Cancel to abort.');
+				var confirm2 = confirm('WARNING: This action cannot be undone. You should probably create a backup first. Click OK to confirm or Cancel to abort.');
 				if (!confirm2) return;
 			} else {
 				var confirmTest = confirm('Clear the test vector store?');
@@ -399,6 +474,7 @@
 			}).then(function(res) {
 				if (res && res.success) {
 					alert('Success: ' + res.message);
+					location.reload(); // Reload to refresh model lock UI
 				} else {
 					alert('Failed: ' + (res.message || 'Unknown error'));
 				}

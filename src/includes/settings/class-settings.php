@@ -79,6 +79,21 @@ class Settings {
 			'ai_use_custom_prompt'            => 0,
 			'ai_system_prompt'                => '',
 			'ai_debug_mode'                   => 0,
+
+			// Appearance - Colors
+			'jeo_primary-color'               => '#007cba',
+			'jeo_secondary-color'             => '#2c3338',
+			'jeo_info-btn-bg'                 => '#ffffff',
+			'jeo_info-btn-color'              => '#2c3338',
+			'jeo_close-btn-bg'                => '#2c3338',
+			'jeo_close-btn-color'             => '#ffffff',
+
+			// Appearance - Typography
+			'jeo_font-url'                    => '',
+			'jeo_font-family'                 => '',
+			'jeo_font-url-secondary'          => '',
+			'jeo_font-family-secondary'       => '',
+			'jeo_info-btn-font-size'          => '1',
 		);
 
 		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
@@ -152,6 +167,36 @@ class Settings {
 		// Ensure booleans are correct
 		$input['jeo_bulk_ai_active'] = ! empty( $input['jeo_bulk_ai_active'] );
 		$input['jeo_bulk_logging']   = ! empty( $input['jeo_bulk_logging'] );
+
+		// Sanitize Appearance - Colors
+		$color_fields = array(
+			'jeo_primary-color',
+			'jeo_secondary-color',
+			'jeo_info-btn-bg',
+			'jeo_info-btn-color',
+			'jeo_close-btn-bg',
+			'jeo_close-btn-color'
+		);
+		foreach ( $color_fields as $field ) {
+			if ( isset( $input[ $field ] ) ) {
+				$input[ $field ] = sanitize_hex_color( $input[ $field ] );
+			}
+		}
+
+		// Sanitize Appearance - Typography
+		$text_fields = array(
+			'jeo_font-url',
+			'jeo_font-family',
+			'jeo_font-url-secondary',
+			'jeo_font-family-secondary',
+			'jeo_info-btn-font-size',
+			'jeo_footer-logo'
+		);
+		foreach ( $text_fields as $field ) {
+			if ( isset( $input[ $field ] ) ) {
+				$input[ $field ] = sanitize_text_field( $input[ $field ] );
+			}
+		}
 
 		return $input;
 	}

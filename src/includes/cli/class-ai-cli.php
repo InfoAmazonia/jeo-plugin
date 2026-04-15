@@ -42,6 +42,19 @@ class AI_CLI {
 
 		\WP_CLI::log( "Starting vectorization for post type: {$post_type}" );
 
+		// Check for model lock
+		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
+		$locked_model  = RAG_Agent::get_locked_model( 'jeo_knowledge' );
+
+		if ( ! empty( $locked_model ) && ! empty( $current_model ) && $current_model !== $locked_model ) {
+			\WP_CLI::error( "Vector Store mismatch! This store was initialized with '{$locked_model}', but your settings use '{$current_model}'. Please clear the store or revert the model before proceeding." );
+		}
+
+		// Setup lock if first time
+		if ( empty( $locked_model ) ) {
+			RAG_Agent::setup_store_model( 'jeo_knowledge', $current_model );
+		}
+
 		$query_args = [
 			'post_type'      => $post_type,
 			'post_status'    => 'publish',

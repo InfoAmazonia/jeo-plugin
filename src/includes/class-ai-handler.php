@@ -345,6 +345,42 @@ class AI_Handler {
 		);
 		register_rest_route(
 			'jeo/v1',
+			'/ai-backup-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_backup_store' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-list-backups',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_list_backups' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-delete-backup',
+			array(
+				'methods'             => 'DELETE',
+				'callback'            => array( $this, 'api_delete_backup' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
 			'/ai-clear-store',
 			array(
 				'methods'             => 'POST',
@@ -365,11 +401,16 @@ class AI_Handler {
 
 			$upload_dir = wp_upload_dir();
 			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
-			$store_name = ( $store === 'test' ) ? 'jeo_knowledge_test.store' : 'jeo_knowledge.store';
-			$file_path  = $store_dir . '/' . $store_name;
+			$base_name  = ( $store === 'test' ) ? 'jeo_knowledge_test' : 'jeo_knowledge';
+			
+			$file_path  = $store_dir . '/' . $base_name . '.store';
+			$info_path  = $store_dir . '/' . $base_name . '.model_info';
 
 			if ( file_exists( $file_path ) ) {
 				unlink( $file_path );
+			}
+			if ( file_exists( $info_path ) ) {
+				unlink( $info_path );
 			}
 
 			if ( $store === 'production' ) {
@@ -559,7 +600,17 @@ class AI_Handler {
 				
 				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
 					foreach ( $data['data'] as $model ) {
-						$models[] = $model['id'];
+						$id = $model['id'];
+						// Filter for Text models in OpenAI
+						if ( 'openai' === $provider ) {
+							if ( strpos( $id, 'gpt-' ) === false 
+								 || strpos( $id, 'audio' ) !== false 
+								 || strpos( $id, 'realtime' ) !== false 
+								 || strpos( $id, 'embedding' ) !== false ) {
+								continue;
+							}
+						}
+						$models[] = $id;
 					}
 				}
 				break;
@@ -572,9 +623,13 @@ class AI_Handler {
 				
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
 					foreach ( $data['models'] as $model ) {
-						// Only allow models supporting generateContent for georeferencing
-						if ( isset( $model['supportedGenerationMethods'] ) && in_array( 'generateContent', $model['supportedGenerationMethods'], true ) ) {
-							$models[] = str_replace( 'models/', '', $model['name'] );
+						$id = str_replace( 'models/', '', $model['name'] );
+						// Filter for Text-only chat models in Gemini
+						if ( isset( $model['supportedGenerationMethods'] ) 
+							 && in_array( 'generateContent', $model['supportedGenerationMethods'], true )
+							 && strpos( $id, 'embedding' ) === false 
+							 && strpos( $id, 'vision' ) === false ) {
+							$models[] = $id;
 						}
 					}
 				}
@@ -699,10 +754,17 @@ class AI_Handler {
 		$provider = $request->get_param( 'provider' );
 		$api_key  = $request->get_param( 'api_key' );
 		$model    = $request->get_param( 'model' );
+		$lang     = $request->get_param( 'lang' ) ?: 'en';
 
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
 		}
+
+		$lang_instruction = ( 'en' === $lang ) 
+			? "IMPORTANT: You MUST write the generated prompt and all rules in English. Large Language Models process English instructions more accurately and reliably."
+			: "IMPORTANT: You MUST write the generated prompt and all rules in " . get_bloginfo( 'language' ) . ".";
+
+		$context = $lang_instruction . "\n\nUser request: " . $context;
 
 		if ( empty( $api_key ) ) {
 			if ( 'ollama' === $provider ) {
@@ -971,5 +1033,40 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		// Reverse to get newest first and slice
 		$parsed_entries = array_reverse( $parsed_entries );
 		return array_slice( $parsed_entries, 0, $limit );
+	}
+
+	/**
+	 * REST Callback: Trigger a backup.
+	 */
+	public function api_backup_store() {
+		\jeo_rag_backup()->schedule_backup();
+		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Backup scheduled. It will be available in a few moments.', 'jeo' ) ), 200 );
+	}
+
+	/**
+	 * REST Callback: List backups.
+	 */
+	public function api_list_backups() {
+		return new \WP_REST_Response( \jeo_rag_backup()->get_backups(), 200 );
+	}
+
+	/**
+	 * REST Callback: Delete a backup.
+	 */
+	public function api_delete_backup( $request ) {
+		$filename = $request->get_param( 'filename' );
+		if ( empty( $filename ) ) {
+			return new \WP_REST_Response( array( 'error' => 'Missing filename' ), 400 );
+		}
+
+		$uploads = wp_upload_dir();
+		$file_path = $uploads['basedir'] . '/jeo-ai-store/backups/' . sanitize_file_name( $filename );
+
+		if ( file_exists( $file_path ) && str_ends_with( $file_path, '.zip' ) ) {
+			unlink( $file_path );
+			return new \WP_REST_Response( array( 'success' => true ), 200 );
+		}
+
+		return new \WP_REST_Response( array( 'error' => 'File not found' ), 404 );
 	}
 }

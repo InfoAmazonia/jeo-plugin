@@ -60,6 +60,15 @@ function jeo_bulk_processor() {
 }
 
 /**
+ * Gets the instance of the RAG Backup Class
+ *
+ * @return \Jeo\AI\RAG_Backup RAG_Backup instance
+ */
+function jeo_rag_backup() {
+	return \Jeo\AI\RAG_Backup::get_instance();
+}
+
+/**
  * Gets the instance of the main Jeo Class
  *
  * @return \Jeo Jeo instance

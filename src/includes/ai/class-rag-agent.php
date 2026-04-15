@@ -96,6 +96,7 @@ class RAG_Agent extends RAG {
 
 		$store_name = $this->is_test_mode ? 'jeo_knowledge_test' : 'jeo_knowledge';
 		$store_file = $store_dir . '/' . $store_name . '.store';
+		$info_file  = $store_dir . '/' . $store_name . '.model_info';
 
 		// Prevent fopen() errors on empty/uninitialized stores
 		if ( ! file_exists( $store_file ) ) {
@@ -107,6 +108,45 @@ class RAG_Agent extends RAG {
 			throw new \Exception( "File {$store_file} is not readable/writable. Please fix permissions." );
 		}
 
+		// Consistency Check: Ensure the model matches what was used to initialize the store
+		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
+		if ( file_exists( $store_file ) && filesize( $store_file ) > 0 && file_exists( $info_file ) ) {
+			$saved_model = trim( file_get_contents( $info_file ) );
+			if ( ! empty( $current_model ) && $current_model !== $saved_model ) {
+				// We don't throw here to avoid fatal crashes, but we should block indexing in UI
+			}
+		} elseif ( file_exists( $store_file ) && filesize( $store_file ) > 0 && ! empty( $current_model ) ) {
+			// Migration: Save current model as the lock for this existing store
+			file_put_contents( $info_file, $current_model );
+		}
+
 		return new FileVectorStore( directory: $store_dir, topK: 3, name: $store_name );
+	}
+
+	/**
+	 * Securely save the model info when the first vectorization happens.
+	 */
+	public static function setup_store_model( $name, $model ) {
+		$uploads = wp_upload_dir();
+		$store_dir = $uploads['basedir'] . '/jeo-ai-store';
+		$info_file = $store_dir . '/' . $name . '.model_info';
+		if ( ! empty( $model ) ) {
+			file_put_contents( $info_file, $model );
+		}
+	}
+
+	/**
+	 * Check if a store has a fixed model and what it is.
+	 */
+	public static function get_locked_model( $name ) {
+		$uploads = wp_upload_dir();
+		$store_dir = $uploads['basedir'] . '/jeo-ai-store';
+		$info_file = $store_dir . '/' . $name . '.model_info';
+		$store_file = $store_dir . '/' . $name . '.store';
+
+		if ( file_exists( $store_file ) && filesize( $store_file ) > 0 && file_exists( $info_file ) ) {
+			return trim( file_get_contents( $info_file ) );
+		}
+		return null;
 	}
 }
