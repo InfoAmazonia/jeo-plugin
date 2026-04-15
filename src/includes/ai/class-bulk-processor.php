@@ -151,10 +151,11 @@ class Bulk_Processor {
 						'items' => array(
 							'type'       => 'object',
 							'properties' => array(
-								'name'  => array( 'type' => 'string' ),
-								'lat'   => array( 'type' => 'number' ),
-								'lng'   => array( 'type' => 'number' ),
-								'quote' => array( 'type' => 'string' ),
+								'name'       => array( 'type' => 'string' ),
+								'lat'        => array( 'type' => 'number' ),
+								'lng'        => array( 'type' => 'number' ),
+								'quote'      => array( 'type' => 'string' ),
+								'confidence' => array( 'type' => 'integer' ),
 							),
 						),
 					),
@@ -224,7 +225,14 @@ class Bulk_Processor {
 				if ( ! is_wp_error( $result ) && ! empty( $result ) ) {
 					update_post_meta( $post->ID, self::META_PENDING, $result );
 					update_post_meta( $post->ID, self::META_STATUS, 'pending_approval' );
-					if ( $logging ) $this->log( sprintf( 'Post ID %d: Success. %d locations found.', $post->ID, count( $result ) ) );
+					
+					$total_conf = 0;
+					foreach ( $result as $p ) {
+						$total_conf += isset( $p['confidence'] ) ? (int) $p['confidence'] : 0;
+					}
+					$avg_conf = round( $total_conf / count( $result ) );
+
+					if ( $logging ) $this->log( sprintf( 'Post ID %d: Success. %d locations found. Avg Confidence: %d%%', $post->ID, count( $result ), $avg_conf ) );
 				} elseif ( is_wp_error( $result ) ) {
 					update_post_meta( $post->ID, self::META_STATUS, 'error' );
 					if ( $logging ) $this->log( sprintf( 'Post ID %d: AI Error - %s', $post->ID, $result->get_error_message() ) );
@@ -281,9 +289,22 @@ class Bulk_Processor {
 		exit;
 	}
 
-	private function approve_post( $post_id ) {
+	private function approve_post( $post_id, $threshold = 0 ) {
 		$pending = get_post_meta( $post_id, self::META_PENDING, true );
 		if ( ! empty( $pending ) ) {
+
+			// Calculate confidence if threshold is set
+			if ( $threshold > 0 ) {
+				$total_conf = 0;
+				foreach ( $pending as $p ) {
+					$total_conf += isset( $p['confidence'] ) ? (int) $p['confidence'] : 0;
+				}
+				$avg_conf = round( $total_conf / count( $pending ) );
+				if ( $avg_conf < $threshold ) {
+					return false; // Skip if below threshold
+				}
+			}
+
 			$related_points = array();
 			foreach ( $pending as $p ) {
 				$related_points[] = array(
@@ -322,7 +343,23 @@ class Bulk_Processor {
 		if ( $has_points ) {
 			echo '<span class="badge badge-success" style="background:#46b450; color:#fff; padding:2px 8px; border-radius:4px;">' . esc_html__( 'Geolocated', 'jeo' ) . '</span>';
 		} elseif ( 'pending_approval' === $status ) {
-			echo '<span class="badge badge-warning" style="background:#ffb900; color:#fff; padding:2px 8px; border-radius:4px;">' . esc_html__( 'Pending AI Approval', 'jeo' ) . '</span>';
+			$pending = get_post_meta( $post_id, self::META_PENDING, true );
+			$avg_conf = 0;
+			if ( is_array( $pending ) && ! empty( $pending ) ) {
+				$total_conf = 0;
+				foreach ( $pending as $p ) {
+					$total_conf += isset( $p['confidence'] ) ? (int) $p['confidence'] : 0;
+				}
+				$avg_conf = round( $total_conf / count( $pending ) );
+			}
+
+			$color = '#ffb900'; // Amber
+			if ( $avg_conf >= 80 ) { $color = '#46b450'; } // Greenish
+			elseif ( $avg_conf < 50 ) { $color = '#d63638'; } // Reddish
+
+			echo '<span class="badge badge-warning" style="background:' . esc_attr( $color ) . '; color:#fff; padding:2px 8px; border-radius:4px;" title="' . esc_attr__( 'Average AI Confidence', 'jeo' ) . ': ' . $avg_conf . '%">';
+			echo esc_html__( 'Pending', 'jeo' ) . ' (' . $avg_conf . '%)';
+			echo '</span>';
 			echo '<div class="row-actions"><span><a href="' . esc_url( add_query_arg( array( 'jeo_approve_ai' => $post_id, 'post' => $post_id, 'action' => 'edit' ), admin_url( 'post.php' ) ) ) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
 		} elseif ( 'no_locations' === $status ) {
 			echo '<span class="badge badge-info" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px;">' . esc_html__( 'No Locations Found', 'jeo' ) . '</span>';
@@ -343,9 +380,11 @@ class Bulk_Processor {
 			return $redirect_to;
 		}
 
+		$threshold = (int) \jeo_settings()->get_option( 'jeo_bulk_confidence_threshold', 0 );
+
 		$approved_count = 0;
 		foreach ( $post_ids as $post_id ) {
-			if ( $this->approve_post( $post_id ) ) {
+			if ( $this->approve_post( $post_id, $threshold ) ) {
 				$approved_count++;
 			}
 		}

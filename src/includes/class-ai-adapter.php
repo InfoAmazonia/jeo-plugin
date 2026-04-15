@@ -57,13 +57,14 @@ abstract class AI_Adapter {
 		$enforced_schema = "
 
 	CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
+	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote', 'confidence'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
 	- \"name\": The location name.
 	- \"lat\": Latitude (string or float).
 	- \"lng\": Longitude (string or float).
 	- \"quote\": A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
+	- \"confidence\": An integer between 0 and 100 representing your confidence level in this extraction.
 
-	Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro de Manaus, o Teatro...\"}]
+	Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro de Manaus, o Teatro...\", \"confidence\": 95}]
 
 	If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].";
 

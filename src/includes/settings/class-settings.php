@@ -34,6 +34,7 @@ class Settings {
 			'jeo_bulk_post_types'             => array( 'post' ),
 			'jeo_bulk_cron_interval'          => 'hourly',
 			'jeo_bulk_logging'                => false,
+			'jeo_bulk_confidence_threshold'   => 70,
 
 			// Gemini
 			'gemini_api_key'                  => '',
