@@ -818,12 +818,13 @@ Write a clear, strict System Prompt that incorporates the user's rules.
 You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
 
 \"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote'. Do NOT use any other keys like 'city', 'country', 'continent' or 'type'.
+Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote', 'confidence'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
 - 'name': The location name.
 - 'lat': Latitude (string or float).
 - 'lng': Longitude (string or float).
 - 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
-Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\"}]
+- 'confidence': An integer between 0 and 100 representing your confidence level in this extraction.
+Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
 If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"
 
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
@@ -962,7 +963,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 * @return string
 	 */
 	public function get_default_system_prompt() {
-		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects, each containing "name", "lat" (string/float), "lng" (string/float), and "quote" (a short relevant snippet from the text where the location was mentioned). If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].', 'jeo' );
+		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects, each containing "name", "lat" (string/float), "lng" (string/float), "quote" (a short relevant snippet from the text where the location was mentioned), and "confidence" (an integer 0-100). If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].', 'jeo' );
 	}
 
 	/**
