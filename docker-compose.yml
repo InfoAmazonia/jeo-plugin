@@ -6,7 +6,7 @@ services:
       args:
         WP_IMAGE_TAG: ${WP_IMAGE_TAG:-php8.2-apache}
     ports:
-      - 8072:80
+      - ${JEO_PORT:-8077}:80
     depends_on:
       mariadb:
         condition: service_healthy
@@ -15,10 +15,11 @@ services:
       WORDPRESS_DB_USER: wordpress
       WORDPRESS_DB_PASSWORD: wordpress
       WORDPRESS_DEBUG: 'true'
-      # Force dynamic URL for port 8072
+      # Force dynamic URL for port
       WORDPRESS_CONFIG_EXTRA: |
-        define( 'WP_HOME', 'http://localhost:8072' );
-        define( 'WP_SITEURL', 'http://localhost:8072' );
+        define( 'WP_HOME', 'http://localhost:${JEO_PORT:-8077}' );
+        define( 'WP_SITEURL', 'http://localhost:${JEO_PORT:-8077}' );
+      JEO_PORT: ${JEO_PORT:-8077}
     volumes:
       - ./src:/var/www/html/wp-content/plugins/jeo
       - ./vendor:/var/www/html/wp-content/plugins/jeo/vendor

@@ -10,6 +10,7 @@ set -e
 # Exemplo: ./setup.sh --test-env 6.4.2-php8.1-apache
 TEST_ENV=false
 WP_TAG="php8.2-apache"
+JEO_PORT=8077
 
 while [[ "$#" -gt 0 ]]; do
     case $1 in
@@ -18,12 +19,17 @@ while [[ "$#" -gt 0 ]]; do
             WP_TAG="$2"
             shift 2
             ;;
+        --port)
+            JEO_PORT="$2"
+            shift 2
+            ;;
         --help)
             echo "Uso: ./setup.sh [opções]"
             echo "Opções:"
             echo "  --test-env <tag>  Sobes o Docker para testar uma versão do WordPress e PHP"
             echo "                    (Ex: ./setup.sh --test-env php8.1-apache)"
-            echo "  Sem argumentos    Sobe o ambiente padrão (PHP 8.2)"
+            echo "  --port <port>     Define a porta do servidor (Padrão: 8077)"
+            echo "  Sem argumentos    Sobe o ambiente padrão (PHP 8.2 na porta 8077)"
             exit 0
             ;;
         *)
@@ -32,8 +38,9 @@ while [[ "$#" -gt 0 ]]; do
     esac
 done
 
-echo "🧪 Preparando ambiente de desenvolvimento/testes com a imagem 'wordpress:$WP_TAG'..."
+echo "🧪 Preparando ambiente de desenvolvimento/testes com a imagem 'wordpress:$WP_TAG' na porta $JEO_PORT..."
 export WP_IMAGE_TAG="$WP_TAG"
+export JEO_PORT="$JEO_PORT"
 
 echo "📦 Garantindo que as dependências do Composer estão prontas (para localhost)..."
 composer install --ignore-platform-reqs
@@ -53,7 +60,7 @@ fi
 $DOCKER_CMD down
 $DOCKER_CMD up -d --build
 
-echo "✅ Ambiente local subiu com sucesso na porta 8072!"
-echo "👉 Acesse: http://localhost:8072"
+echo "✅ Ambiente local subiu com sucesso na porta $JEO_PORT!"
+echo "👉 Acesse: http://localhost:$JEO_PORT"
 echo "🛑 Para parar depois do teste: $DOCKER_CMD down"
 exit 0
