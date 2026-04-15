@@ -4,7 +4,7 @@
 set -e
 
 PLUGIN_SLUG="jeo"
-VERSION="3.6.3-experimental"
+VERSION="3.6.4"
 ZIP_NAME="${PLUGIN_SLUG}-${VERSION}.zip"
 BUILD_DIR=".build-tmp"
 
@@ -27,6 +27,9 @@ mkdir -p $BUILD_DIR/$PLUGIN_SLUG
 echo "📋 Copiando arquivos do plugin..."
 # O diretório 'src' é a raiz do nosso plugin no WordPress
 cp -a src/. $BUILD_DIR/$PLUGIN_SLUG/
+# Remove a pasta vendor vazia do src se existir para evitar confusão
+rm -rf $BUILD_DIR/$PLUGIN_SLUG/vendor
+# Copia a pasta vendor real gerada pelo composer na raiz do projeto para a raiz do pacote zip
 cp -a vendor $BUILD_DIR/$PLUGIN_SLUG/vendor
 
 # Copia todos os arquivos README de documentação para a Welcome Page

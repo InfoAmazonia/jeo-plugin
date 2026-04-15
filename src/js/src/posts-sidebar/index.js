@@ -41,22 +41,39 @@ const JeoGeocodePanel = ( props ) => {
 					return;
 				}
 
-				const formattedPoints = locations.map( ( loc, index ) => ( {
-					id: index,
-					relevance: 'primary',
-					_geocode_lat: String( loc.lat ),
-					_geocode_lon: String( loc.lng ),
-					_geocode_full_address: loc.name || '',
-					_geocode_country: '',
-					_geocode_country_code: '',
-					_geocode_region_level_1: '',
-					_geocode_region_level_2: '',
-					_geocode_region_level_3: '',
-					_geocode_city: '',
-					_geocode_city_level_1: '',
-					_ai_quote: loc.quote || '',
-					_selected: true,
-				} ) );
+				const formattedPoints = locations.map( ( loc, index ) => {
+					const confidence = loc.confidence ?? 100;
+					let relevance = 'primary';
+					let selected = true;
+					let disabled = false;
+
+					if ( confidence < 35 ) {
+						relevance = 'secondary';
+						selected = false;
+						disabled = true;
+					} else if ( confidence < 75 ) {
+						relevance = 'secondary';
+					}
+
+					return {
+						id: index,
+						relevance: relevance,
+						confidence: confidence,
+						_geocode_lat: String( loc.lat ),
+						_geocode_lon: String( loc.lng ),
+						_geocode_full_address: loc.name || '',
+						_geocode_country: '',
+						_geocode_country_code: '',
+						_geocode_region_level_1: '',
+						_geocode_region_level_2: '',
+						_geocode_region_level_3: '',
+						_geocode_city: '',
+						_geocode_city_level_1: '',
+						_ai_quote: loc.quote || '',
+						_selected: selected,
+						_disabled: disabled,
+					};
+				} );
 
 				setState( ( prev ) => ( {
 					...prev,
@@ -77,8 +94,15 @@ const JeoGeocodePanel = ( props ) => {
 	};
 
 	const toggleAiLocation = ( index ) => {
+		if ( state.aiSuggestedLocations[ index ]._disabled ) return;
 		const newLocations = [ ...state.aiSuggestedLocations ];
 		newLocations[ index ]._selected = ! newLocations[ index ]._selected;
+		setState( ( prev ) => ( { ...prev, aiSuggestedLocations: newLocations } ) );
+	};
+
+	const changeRelevance = ( index, relevance ) => {
+		const newLocations = [ ...state.aiSuggestedLocations ];
+		newLocations[ index ].relevance = relevance;
 		setState( ( prev ) => ( { ...prev, aiSuggestedLocations: newLocations } ) );
 	};
 
@@ -86,7 +110,7 @@ const JeoGeocodePanel = ( props ) => {
 		const selectedPoints = state.aiSuggestedLocations
 			.filter( loc => loc._selected )
 			.map( loc => ( {
-				relevance: 'primary',
+				relevance: loc.relevance || 'primary',
 				_geocode_lat: String( loc._geocode_lat ),
 				_geocode_lon: String( loc._geocode_lon ),
 				_geocode_full_address: loc._geocode_full_address || '',
@@ -121,22 +145,39 @@ const JeoGeocodePanel = ( props ) => {
 	};
 
 	const handleReviewPending = () => {
-		const formattedPoints = pendingLocations.map( ( loc, index ) => ( {
-			id: index,
-			relevance: 'primary',
-			_geocode_lat: String( loc.lat ),
-			_geocode_lon: String( loc.lng ),
-			_geocode_full_address: loc.name || '',
-			_geocode_country: '',
-			_geocode_country_code: '',
-			_geocode_region_level_1: '',
-			_geocode_region_level_2: '',
-			_geocode_region_level_3: '',
-			_geocode_city: '',
-			_geocode_city_level_1: '',
-			_ai_quote: loc.quote || '',
-			_selected: true,
-		} ) );
+		const formattedPoints = pendingLocations.map( ( loc, index ) => {
+			const confidence = loc.confidence ?? 100;
+			let relevance = 'primary';
+			let selected = true;
+			let disabled = false;
+
+			if ( confidence < 35 ) {
+				relevance = 'secondary';
+				selected = false;
+				disabled = true;
+			} else if ( confidence < 75 ) {
+				relevance = 'secondary';
+			}
+
+			return {
+				id: index,
+				relevance: relevance,
+				confidence: confidence,
+				_geocode_lat: String( loc.lat ),
+				_geocode_lon: String( loc.lng ),
+				_geocode_full_address: loc.name || '',
+				_geocode_country: '',
+				_geocode_country_code: '',
+				_geocode_region_level_1: '',
+				_geocode_region_level_2: '',
+				_geocode_region_level_3: '',
+				_geocode_city: '',
+				_geocode_city_level_1: '',
+				_ai_quote: loc.quote || '',
+				_selected: selected,
+				_disabled: disabled,
+			};
+		} );
 
 		setState( ( prev ) => ( {
 			...prev,
@@ -176,7 +217,7 @@ const JeoGeocodePanel = ( props ) => {
 				>
 					{ isAIProcessing
 						? __( 'Processing AI...', 'jeo' )
-						: sprintf( __( 'Geolocate with %s', 'jeo' ),  aiProviderName )
+						: __( 'Geolocate with AI', 'jeo' )
 					}
 				</Button>
 			</div>
@@ -198,6 +239,7 @@ const JeoGeocodePanel = ( props ) => {
 						aiSuggestedLocations={ aiSuggestedLocations }
 						saveAiLocations={ saveAiLocations }
 						toggleAiLocation={ toggleAiLocation }
+						changeRelevance={ changeRelevance }
 						onCancel={ () => setState( ( prev ) => ( { ...prev, isApprovalModalOpen: false }) ) }
 					/>
 				</Modal>

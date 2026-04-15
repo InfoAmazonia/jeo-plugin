@@ -1,6 +1,6 @@
 {
 	"name": "jeo",
-	"version": "3.6.3-experimental",
+	"version": "3.6.4",
 	"description": "Jeo plugin",
 	"main": "index.js",
 	"directories": {

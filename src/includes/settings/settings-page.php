@@ -800,6 +800,13 @@
 						</td>
 					</tr>
 					<tr>
+						<th scope="row"><label for="jeo_bulk_confidence_threshold"><?php esc_html_e( 'Bulk Approval Threshold', 'jeo' ); ?></label></th>
+						<td>
+							<input name="<?php echo esc_html( $this->get_field_name( 'jeo_bulk_confidence_threshold' ) ); ?>" type="number" id="jeo_bulk_confidence_threshold" value="<?php echo esc_attr( $this->get_option( 'jeo_bulk_confidence_threshold' ) ); ?>" min="0" max="100" class="small-text"> %
+							<span class="description"><?php esc_html_e( 'Minimum average confidence required to auto-approve locations during bulk actions.', 'jeo' ); ?></span>
+						</td>
+					</tr>
+					<tr>
 						<th scope="row"><?php esc_html_e( 'Processing Status', 'jeo' ); ?></th>
 						<td>
 							<?php
