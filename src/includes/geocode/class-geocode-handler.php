@@ -16,6 +16,9 @@ class Geocode_Handler {
 		'_geocode_region_level_1',
 		'_geocode_country_code',
 		'_geocode_country',
+		'_geocode_address',
+		'_geocode_address_number',
+		'_geocode_postcode',
 	);
 
 	protected function init() {
@@ -143,6 +146,15 @@ class Geocode_Handler {
 										'type' => 'string',
 									),
 									'_geocode_country' => array(
+										'type' => 'string',
+									),
+									'_geocode_address' => array(
+										'type' => 'string',
+									),
+									'_geocode_address_number' => array(
+										'type' => 'string',
+									),
+									'_geocode_postcode' => array(
 										'type' => 'string',
 									),
 									'_geocode_full_address' => array(

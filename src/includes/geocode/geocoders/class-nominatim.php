@@ -71,6 +71,9 @@ class Nominatim extends \Jeo\Geocoder {
 				'country',
 				'country_name',
 			),
+			'country_code'   => array(
+				'country_code',
+			),
 			'region_level_1' => array(
 				'region',
 			),
@@ -102,6 +105,18 @@ class Nominatim extends \Jeo\Geocoder {
 				'hamlet',
 				'locality',
 				'croft',
+			),
+			'address'        => array(
+				'road',
+				'street',
+				'path',
+				'pedestrian',
+			),
+			'address_number' => array(
+				'house_number',
+			),
+			'postcode'       => array(
+				'postcode',
 			),
 		);
 

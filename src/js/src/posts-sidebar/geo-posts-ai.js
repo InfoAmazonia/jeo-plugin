@@ -32,10 +32,26 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 			const result = await response.json();
 
 			if ( result && ! result.raw?.error ) {
-				// We update the relevance and address data through a new local handler
-				// We'll pass the enriched data back to the parent via an updated changeRelevance or similar
+				// Format a pretty full address string with more details
+				let displayAddress = result.full_address || aiSuggestedLocations[ index ]._geocode_full_address;
+				
+				// Build structured detail parts
+				const parts = [];
+				if ( result.address ) {
+					parts.push( result.address + ( result.address_number ? ', ' + result.address_number : '' ) );
+				}
+				if ( result.city_level_1 ) parts.push( result.city_level_1 );
+				if ( result.city ) parts.push( result.city );
+				if ( result.region_level_2 ) parts.push( result.region_level_2 );
+				if ( result.postcode ) parts.push( result.postcode );
+				if ( result.country ) parts.push( result.country );
+
+				if ( parts.length > 0 ) {
+					displayAddress = parts.join( ' - ' );
+				}
+
 				const enrichedData = {
-					_geocode_full_address: result.full_address || aiSuggestedLocations[ index ]._geocode_full_address,
+					_geocode_full_address: displayAddress,
 					_geocode_country: result.country || '',
 					_geocode_country_code: result.country_code || '',
 					_geocode_region_level_1: result.region_level_1 || '',
@@ -43,6 +59,9 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 					_geocode_region_level_3: result.region_level_3 || '',
 					_geocode_city: result.city || '',
 					_geocode_city_level_1: result.city_level_1 || '',
+					_geocode_address: result.address || '',
+					_geocode_address_number: result.address_number || '',
+					_geocode_postcode: result.postcode || '',
 					_is_enriched: true
 				};
 				

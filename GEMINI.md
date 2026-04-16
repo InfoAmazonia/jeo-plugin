@@ -22,7 +22,6 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
   1. No array `$default_options` do método `init()`.
   2. No método `get_option()` (garantindo o merge com defaults).
   3. No método `sanitize_settings()` para permitir a persistência segura no banco.
-- **Campos de Aparência:** Cores e Tipografia devem ser sempre sanitizados. URLs de fontes devem ser validadas como links seguros.
 
 ### 2.3. Blindagem de Templates Admin
 - Templates em `includes/admin/` ou `includes/settings/` devem ser puramente declarativos.
@@ -48,48 +47,54 @@ Toda extração de IA deve retornar obrigatoriamente um array plano de objetos c
 - **High Confidence (>= 75%):** Ponto Primário, selecionado por padrão.
 - **Medium Confidence (35% - 74%):** Ponto Secundário, selecionado por padrão.
 - **Low Confidence (< 35%):** Ponto Secundário, **desabilitado** para seleção para evitar poluição visual e imprecisões.
-- **Relevance Switcher:** A interface de revisão deve utilizar um `ToggleControl` (Switcher) para alternar entre Primário e Secundário, em vez de menus suspensos.
+- **Relevance Switcher:** A interface de revisão utiliza um `ToggleControl` (Switcher) para alternar entre Primário e Secundário.
 
 ### 3.4. Enriquecimento de Geodata (Enrichment)
-- **Enrich Data:** A interface de revisão por IA inclui um botão para buscar dados oficiais do Geocodificador (Nominatim/Mapbox) via lat/lng.
-- **Visualização:** Dados enriquecidos devem ser exibidos como uma "Citação Verificada" (cor verde) para distinção do "Contexto da IA" (cor azul).
-- **Persistência:** Todos os campos estruturados (Cidade, Região, País) devem ser salvos no metadado final para alimentar os filtros do Dashboard.
-
-### 3.5. Prompt Generator & Language
-- O assistente deve sempre oferecer a opção de gerar o prompt em **Inglês (Optimized)** para maior acurácia dos modelos LLM.
+- **Enrich Data:** A interface de revisão inclui um botão para buscar dados oficiais do Geocodificador (Nominatim/Mapbox) via lat/lng.
+- **Dados Estruturados:** O enriquecimento deve extrair não apenas a cidade, mas também: **Rua** (`address`), **Número** (`address_number`) e **CEP** (`postcode`).
+- **Visualização:** Dados enriquecidos aparecem como uma "Citação Verificada" (verde) abaixo do "Contexto da IA" (azul).
 
 ---
 
-## 4. Processamento em Lote (Bulk) e RAG
+## 4. Persistência e Processamento em Lote
 
-### 4.1. Bulk Processor & Workflow de Aprovação
-- **Engine de Background:** Utiliza a classe `Jeo\AI\Bulk_Processor` integrada ao `WP-Cron`.
-- **Isolamento de Dados:** Sugestões da IA são salvas em `_jeo_ai_pending_point` até aprovação humana.
-- **Modal de Confirmação (UX):** A ação em massa intercepta o formulário para exibir um sumário via AJAX (`/bulk-ai-preview-approval`), comparando a confiança com o **Threshold** definido nas configurações.
+### 4.1. Esquema de Metadados (Metadata Master)
+Todos os pontos de um post residem no array `_related_point`. O schema obrigatório para persistência e indexação é:
+- `_geocode_lat`, `_geocode_lng`: Coordenadas decimais.
+- `_geocode_full_address`: Endereço humano formatado.
+- `_geocode_address`, `_geocode_address_number`, `_geocode_postcode`: Detalhes de logradouro.
+- `_geocode_city`, `_geocode_city_level_1`: Cidade e Bairro.
+- `_geocode_region_level_1/2/3`: Estado e Divisões Regionais.
+- `_geocode_country`, `_geocode_country_code`: País e ISO Code.
+- `relevance`: `primary` ou `secondary`.
+- `_ai_quote`: Trecho de contexto da IA.
 
-### 4.2. RAG Knowledge Base (Vector Store)
-- **Model Lock:** Uma vez inicializado um Vector Store, o modelo de embedding é travado em `.model_info`. É proibido trocar o modelo sem o reset completo do banco.
-- **Backup:** O sistema mantém os últimos 3 backups `.zip` do banco vetorial para recuperação em caso de erros de reindexação.
+### 4.2. Indexação de Performance (Sufixos _p e _s)
+**Mandato:** Todo salvamento de geodata dispara a indexação automática que espelha os campos acima em metadados individuais com sufixos `_p` (Primary) e `_s` (Secondary), permitindo buscas via `WP_Query`.
+
+### 4.3. Bulk Processor & RAG
+- **Background Engine:** Classe `Jeo\AI\Bulk_Processor` via `WP-Cron`.
+- **Threshold:** Limite de confiança configurável para aprovação automática em massa.
+- **Model Lock:** Travamento do modelo de embedding em `.model_info` para evitar corrupção do Vector Store.
 
 ---
 
 ## 5. Interface e Dashboards
 
 ### 5.1. Dashboard Cinematográfico
-- **Interface:** Bottom-UI focada em imersão.
-- **Filtros Dinâmicos:** Date Range do tipo **Dual-Point** (Início e Fim) com timeline baseada na query de menor data (`MIN(post_date)`).
-- **Taxonomia:** Filtros cruzados dinâmicos (Post Type > Taxonomia > Termo) via AJAX.
+- **Localização:** Rodapé (Bottom-UI).
+- **Filtros Dinâmicos:** Date Range do tipo **Dual-Point** (Início e Fim) e hierarquia de busca Post Type > Taxonomia > Termo.
 
 ### 5.2. Settings UI
-- **Isolamento de Abas:** Conteúdo deve estar sempre encapsulado em `div.tabs-content` para evitar vazamentos de estilo.
-- **Embedded Data:** Aba dedicada para dicionários territoriais locais.
+- **Isolamento de Abas:** Conteúdo encapsulado em `div.tabs-content`.
+- **Aba Embedded Data:** Espaço exclusivo para dicionários territoriais locais.
 
 ---
 
 ## 6. Fluxos de DevOps
 
 ### 6.1. Build de Release (`build.sh`)
-- O script de build deve injetar a pasta `vendor` (Neuron AI) na raiz do plugin e limpar arquivos de desenvolvimento.
+- Injeta a pasta `vendor` (Neuron AI) na raiz do plugin e limpa arquivos de desenvolvimento.
 
 ### 6.2. Versionamento
 - Toda mudança estrutural exige atualização deste guia.

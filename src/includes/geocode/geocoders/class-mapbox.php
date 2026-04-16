@@ -98,12 +98,25 @@ class Mapbox extends \Jeo\Geocoder {
 					$response['country_code'] = isset( $ctx['short_code'] ) ? strtoupper( $ctx['short_code'] ) : '';
 				} elseif ( strpos( $id, 'region' ) !== false ) {
 					$response['region_level_2'] = $ctx['text']; // State
+				} elseif ( strpos( $id, 'postcode' ) !== false ) {
+					$response['postcode'] = $ctx['text'];
 				} elseif ( strpos( $id, 'place' ) !== false ) {
 					$response['city'] = $ctx['text'];
 				} elseif ( strpos( $id, 'neighborhood' ) !== false || strpos( $id, 'locality' ) !== false ) {
 					$response['city_level_1'] = $ctx['text'];
 				}
 			}
+		}
+
+		// Mapbox specific address extraction (from properties or text)
+		if ( isset( $item['properties']['address'] ) ) {
+			$response['address'] = $item['properties']['address'];
+		} elseif ( isset( $item['text'] ) && strpos( $item['id'], 'address' ) !== false ) {
+			$response['address'] = $item['text'];
+		}
+
+		if ( isset( $item['address'] ) ) {
+			$response['address_number'] = $item['address'];
 		}
 
 		$response['raw'] = $item;

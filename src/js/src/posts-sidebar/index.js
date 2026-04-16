@@ -127,6 +127,9 @@ const JeoGeocodePanel = ( props ) => {
 				_geocode_region_level_3: loc._geocode_region_level_3 || '',
 				_geocode_city: loc._geocode_city || '',
 				_geocode_city_level_1: loc._geocode_city_level_1 || '',
+				_geocode_address: loc._geocode_address || '',
+				_geocode_address_number: loc._geocode_address_number || '',
+				_geocode_postcode: loc._geocode_postcode || '',
 				_ai_quote: loc._ai_quote || '',
 			} ) );
 
