@@ -635,9 +635,11 @@ class Stories extends Component {
 		}
 
 		const postsUrl = new URL( jeoMapVars.jsonUrl + 'posts/' );
-		Object.keys( params ).forEach( ( key ) =>
-			postsUrl.searchParams.append( key, params[ key ] )
-		);
+		for ( const key of Object.keys( params ) ) {
+			if ( params[ key ] ) {
+				postsUrl.searchParams.append( key, params[ key ] )
+			}
+		}
 
 		if("languageParams" in window){
 			postsUrl.searchParams.append( 'lang', languageParams.currentLang );

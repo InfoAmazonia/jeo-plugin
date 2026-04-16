@@ -732,8 +732,10 @@ export default class JeoMap {
 
 			const keys = Object.keys( relatedPostsCriteria );
 
-			for ( const i in keys ) {
-				query[ keys[ i ] ] = relatedPostsCriteria[ keys[ i ] ];
+			for ( const key of keys ) {
+				if ( query[ key ] ) {
+					query[ key ] = relatedPostsCriteria[ key ];
+				}
 			}
 
 			if ( keys.length < 1 ) {
