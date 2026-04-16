@@ -24,27 +24,14 @@ class AI_Settings {
 	}
 
 	public function add_menu_pages() {
-		add_menu_page(
-			__( 'JEO AI', 'jeo' ),
-			__( 'JEO AI', 'jeo' ),
+		add_submenu_page(
+			'jeo-main-menu',
+			__( 'AI (novo)', 'jeo' ),
+			__( 'AI (novo)', 'jeo' ),
 			'manage_options',
 			$this->page_slug,
-			array( $this, 'render_settings_page' ),
-			'dashicons-superhero',
-			30
+			array( $this, 'render_settings_page' )
 		);
-
-		$tabs = $this->get_tabs();
-		foreach ( $tabs as $slug => $label ) {
-			add_submenu_page(
-				$this->page_slug,
-				$label,
-				$label,
-				'manage_options',
-				$this->page_slug . '&tab=' . $slug,
-				array( $this, 'render_settings_page' )
-			);
-		}
 	}
 
 	public function get_tabs() {
