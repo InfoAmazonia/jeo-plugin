@@ -48,8 +48,14 @@ Toda extração de IA deve retornar obrigatoriamente um array plano de objetos c
 - **High Confidence (>= 75%):** Ponto Primário, selecionado por padrão.
 - **Medium Confidence (35% - 74%):** Ponto Secundário, selecionado por padrão.
 - **Low Confidence (< 35%):** Ponto Secundário, **desabilitado** para seleção para evitar poluição visual e imprecisões.
+- **Relevance Switcher:** A interface de revisão deve utilizar um `ToggleControl` (Switcher) para alternar entre Primário e Secundário, em vez de menus suspensos.
 
-### 3.4. Prompt Generator & Language
+### 3.4. Enriquecimento de Geodata (Enrichment)
+- **Enrich Data:** A interface de revisão por IA inclui um botão para buscar dados oficiais do Geocodificador (Nominatim/Mapbox) via lat/lng.
+- **Visualização:** Dados enriquecidos devem ser exibidos como uma "Citação Verificada" (cor verde) para distinção do "Contexto da IA" (cor azul).
+- **Persistência:** Todos os campos estruturados (Cidade, Região, País) devem ser salvos no metadado final para alimentar os filtros do Dashboard.
+
+### 3.5. Prompt Generator & Language
 - O assistente deve sempre oferecer a opção de gerar o prompt em **Inglês (Optimized)** para maior acurácia dos modelos LLM.
 
 ---
