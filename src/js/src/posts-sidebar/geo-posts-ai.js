@@ -1,6 +1,6 @@
-import { Button, CheckboxControl, SelectControl } from '@wordpress/components';
+import { Button, CheckboxControl, ToggleControl, Spinner } from '@wordpress/components';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -9,6 +9,7 @@ import './geo-posts.css';
 export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocations, toggleAiLocation, changeRelevance }) {
 	const [ mapInstance, setMapInstance ] = useState( null );
 	const [ mapReady, setMapReady ] = useState( false );
+	const [ enriching, setEnriching ] = useState( {} ); // Track which items are being enriched
 
 	// Handle map creation
 	const mapCreated = ( map ) => {
@@ -18,6 +19,41 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 	// Handle map loaded to fit bounds
 	const mapLoaded = () => {
 		setMapReady( true );
+	};
+
+	// Function to enrich data via reverse geocode
+	const handleEnrich = async ( index, lat, lng ) => {
+		setEnriching( prev => ( { ...prev, [ index ]: true } ) );
+		
+		try {
+			const response = await window.fetch(
+				globalThis.jeo?.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lng=' + lng
+			);
+			const result = await response.json();
+
+			if ( result && ! result.raw?.error ) {
+				// We update the relevance and address data through a new local handler
+				// We'll pass the enriched data back to the parent via an updated changeRelevance or similar
+				const enrichedData = {
+					_geocode_full_address: result.full_address || aiSuggestedLocations[ index ]._geocode_full_address,
+					_geocode_country: result.country || '',
+					_geocode_country_code: result.country_code || '',
+					_geocode_region_level_1: result.region_level_1 || '',
+					_geocode_region_level_2: result.region_level_2 || '',
+					_geocode_region_level_3: result.region_level_3 || '',
+					_geocode_city: result.city || '',
+					_geocode_city_level_1: result.city_level_1 || '',
+					_is_enriched: true
+				};
+				
+				// Using a trick: changeRelevance now accepts an object for enrichment
+				changeRelevance( index, aiSuggestedLocations[ index ].relevance, enrichedData );
+			}
+		} catch ( error ) {
+			console.error( 'JEO: Enrichment failed', error );
+		} finally {
+			setEnriching( prev => ( { ...prev, [ index ]: false } ) );
+		}
 	};
 
 	// Fit map bounds when map is ready and locations exist
@@ -84,6 +120,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 					} }>
 						{ aiSuggestedLocations.map( ( loc, index ) => {
 							const confidenceColor = loc.confidence >= 80 ? '#46b450' : (loc.confidence >= 50 ? '#ffb900' : '#d63638');
+							const isPrimary = loc.relevance === 'primary';
 							
 							return (
 								<div key={ index } style={ {
@@ -106,7 +143,10 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 												onChange={ () => toggleAiLocation( index ) }
 												disabled={ loc._disabled }
 											/>
-											<span style={ { fontSize: '15px', fontWeight: '600', color: '#1e1e1e', marginLeft: '8px' } }>{ loc._geocode_full_address }</span>
+											<span style={ { fontSize: '15px', fontWeight: '600', color: '#1e1e1e', marginLeft: '8px' } }>
+												{ loc._geocode_full_address }
+												{ loc._is_enriched && <span title={ __( 'Enriched via Geocoder', 'jeo' ) } style={ { marginLeft: '5px', fontSize: '12px' } }>✅</span> }
+											</span>
 										</div>
 										<div style={ { 
 											background: confidenceColor, 
@@ -121,24 +161,30 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 									</div>
 
 									<div style={ { marginLeft: '32px' } }>
-										<div style={ { display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '12px' } }>
+										<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px', marginBottom: '12px' } }>
 											<p style={ { fontSize: '11px', color: '#757575', margin: 0, fontFamily: 'monospace' } }>
 												{ `LAT: ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | LNG: ${ Number.parseFloat(loc._geocode_lng).toFixed(4) }` }
 											</p>
 											
-											<div style={ { width: '130px' } } onClick={ (e) => e.stopPropagation() }>
-												<SelectControl
-													label={ __( 'Relevance', 'jeo' ) }
-													hideLabelFromVision={ true }
-													value={ loc.relevance }
-													disabled={ loc._disabled || !loc._selected }
-													options={ [
-														{ label: __( 'Primary', 'jeo' ), value: 'primary' },
-														{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
-													] }
-													onChange={ ( val ) => changeRelevance( index, val ) }
-													__nextHasNoMarginBottom
-												/>
+											<div style={ { display: 'flex', alignItems: 'center', gap: '20px' } }>
+												<Button
+													variant="secondary"
+													isSmall
+													onClick={ ( e ) => { e.stopPropagation(); handleEnrich( index, loc._geocode_lat, loc._geocode_lng ); } }
+													disabled={ enriching[ index ] || loc._disabled || !loc._selected }
+												>
+													{ enriching[ index ] ? <Spinner /> : __( 'Enrich Data', 'jeo' ) }
+												</Button>
+
+												<div onClick={ (e) => e.stopPropagation() }>
+													<ToggleControl
+														label={ isPrimary ? __( 'Primary', 'jeo' ) : __( 'Secondary', 'jeo' ) }
+														checked={ isPrimary }
+														disabled={ loc._disabled || !loc._selected }
+														onChange={ () => changeRelevance( index, isPrimary ? 'secondary' : 'primary' ) }
+														__nextHasNoMarginBottom
+													/>
+												</div>
 											</div>
 										</div>
 
@@ -151,13 +197,28 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 												fontSize: '13px',
 												lineHeight: '1.5',
 												fontStyle: 'italic',
-												color: '#2c3338'
+												color: '#2c3338',
+												marginBottom: loc._is_enriched ? '10px' : '0'
 											} }>
-												"{ loc._ai_quote }"
+												<strong>{ __( 'AI Context:', 'jeo' ) }</strong> "{ loc._ai_quote }"
 											</div>
 										) : (
-											<div style={ { fontSize: '12px', color: '#a7aaad', fontStyle: 'italic' } }>
+											<div style={ { fontSize: '12px', color: '#a7aaad', fontStyle: 'italic', marginBottom: loc._is_enriched ? '10px' : '0' } }>
 												{ __( '(No context snippet found for this location)', 'jeo' ) }
+											</div>
+										) }
+
+										{ loc._is_enriched && (
+											<div style={ {
+												padding: '10px 14px',
+												borderLeft: '4px solid #46b450',
+												background: '#f0fbf0',
+												borderRadius: '0 4px 4px 0',
+												fontSize: '13px',
+												lineHeight: '1.5',
+												color: '#1e4620'
+											} }>
+												<strong>{ __( 'Verified Address:', 'jeo' ) }</strong> { loc._geocode_full_address }
 											</div>
 										) }
 										

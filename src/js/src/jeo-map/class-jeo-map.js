@@ -91,10 +91,12 @@ export default class JeoMap {
 
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
 					map.setZoom( this.getArg( 'initial_zoom' ) );
-					map.setCenter( [
-						this.getArg( 'center_lon' ),
-						this.getArg( 'center_lat' ),
-					] );
+					const centerLat = parseFloat( this.getArg( 'center_lat' ) );
+					const centerLng = parseFloat( this.getArg( 'center_lng' ) || this.getArg( 'center_lon' ) );
+					
+					if ( ! isNaN( centerLat ) && ! isNaN( centerLng ) ) {
+						map.setCenter( [ centerLng, centerLat ] );
+					}
 
 					map.addControl(
 						new mapgl.NavigationControl( { showCompass: false } ),
@@ -796,9 +798,13 @@ export default class JeoMap {
 
 		stories.map( ( story ) => {
 			const storyRelatedPoints = story.meta._related_point ?? [];
-			const storyPoints = storyRelatedPoints.map( ( point ) => {
-				return [ point._geocode_lon, point._geocode_lat ];
-			} );
+			const storyPoints = storyRelatedPoints
+				.map( ( point ) => {
+					const lat = parseFloat( point._geocode_lat );
+					const lng = parseFloat( point._geocode_lng || point._geocode_lon );
+					return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lng, lat ];
+				} )
+				.filter( c => c !== null );
 
 			finalFeatures.features.push(
 				...storyPoints.map( ( point ) => {
@@ -867,9 +873,14 @@ export default class JeoMap {
 
 		const popUp = new mapgl.Popup().setHTML( popupHTML );
 
+		const lat = parseFloat( point._geocode_lat );
+		const lng = parseFloat( point._geocode_lng || point._geocode_lon );
+
+		if ( isNaN( lat ) || isNaN( lng ) ) return;
+
 		const LngLat = {
-			lat: parseFloat( point._geocode_lat ),
-			lon: parseFloat( point._geocode_lon ),
+			lat: lat,
+			lon: lng,
 		};
 
 		var el = document.createElement( 'div' );

@@ -193,11 +193,7 @@ class JeoGeocodePosts extends Component {
 		);
 	}
 
-	onClickDelete( e ) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		const index = parseInt( e.target.attributes.marker_index.value );
+	onClickDelete( index ) {
 		const { points } = this.state;
 		this.setState(
 			{
@@ -209,18 +205,14 @@ class JeoGeocodePosts extends Component {
 		);
 	}
 
-	onClickEdit( e ) {
-		e.preventDefault();
-		e.stopPropagation();
-
+	onClickEdit( index ) {
 		const { points } = this.state;
-		const index = parseInt( e.target.attributes.marker_index.value );
 		const point = points[ index ];
 		this.setState(
 			{
 				pointsCheckpoint: points,
 				currentMarkerIndex: index,
-				searchValue: point._geocode_full_address,
+				searchValue: point._geocode_full_address || '',
 				formMode: 'edit',
 				loadStatus: 'resolved',
 			},
@@ -297,11 +289,12 @@ class JeoGeocodePosts extends Component {
 		} );
 	}
 
-	flyToLocation( lat, lon ) {
-		this.refMap.current.flyTo( [
-			parseFloat( lat ),
-			parseFloat( lon ),
-		] );
+	flyToLocation( lat, lng ) {
+		const latitude = parseFloat( lat );
+		const longitude = parseFloat( lng );
+		if ( this.refMap.current && ! isNaN( latitude ) && ! isNaN( longitude ) ) {
+			this.refMap.current.flyTo( [ latitude, longitude ] );
+		}
 	}
 
 	mapCreated( mapInstance ) {
@@ -365,8 +358,10 @@ class JeoGeocodePosts extends Component {
 			loadStatus,
 			magneticMarkers,
 		} = this.state;
+		
+		const currentSearchValue = searchValue || '';
 		const isDisabled = ! (
-			loadStatus === 'resolved' && searchValue.replace( /\s/g, '' ).length
+			loadStatus === 'resolved' && currentSearchValue.replace( /\s/g, '' ).length
 		);
 
 		const selectedPoint = points[ currentMarkerIndex ];
@@ -469,16 +464,14 @@ class JeoGeocodePosts extends Component {
 											<Fragment>
 												<Button
 													variant="link"
-													onClick={ this.onClickDelete }
-													marker_index={ i }
+													onClick={ ( e ) => { e.stopPropagation(); this.onClickDelete( i ); } }
 												>
 													{ __( 'Delete', 'jeo' ) }
 												</Button>
 												<span> | </span>
 												<Button
 													variant="link"
-													onClick={ this.onClickEdit }
-													marker_index={ i }
+													onClick={ ( e ) => { e.stopPropagation(); this.onClickEdit( i ); } }
 												>
 													{ __( 'Edit', 'jeo' ) }
 												</Button>

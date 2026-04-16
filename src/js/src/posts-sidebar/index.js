@@ -100,9 +100,15 @@ const JeoGeocodePanel = ( props ) => {
 		setState( ( prev ) => ( { ...prev, aiSuggestedLocations: newLocations } ) );
 	};
 
-	const changeRelevance = ( index, relevance ) => {
+	const changeRelevance = ( index, relevance, enrichment = {} ) => {
 		const newLocations = [ ...state.aiSuggestedLocations ];
 		newLocations[ index ].relevance = relevance;
+		
+		// If enrichment data is provided, merge it into the location
+		if ( Object.keys( enrichment ).length > 0 ) {
+			newLocations[ index ] = { ...newLocations[ index ], ...enrichment };
+		}
+
 		setState( ( prev ) => ( { ...prev, aiSuggestedLocations: newLocations } ) );
 	};
 
@@ -114,13 +120,13 @@ const JeoGeocodePanel = ( props ) => {
 				_geocode_lat: String( loc._geocode_lat ),
 				_geocode_lng: String( loc._geocode_lng ),
 				_geocode_full_address: loc._geocode_full_address || '',
-				_geocode_country: '',
-				_geocode_country_code: '',
-				_geocode_region_level_1: '',
-				_geocode_region_level_2: '',
-				_geocode_region_level_3: '',
-				_geocode_city: '',
-				_geocode_city_level_1: '',
+				_geocode_country: loc._geocode_country || '',
+				_geocode_country_code: loc._geocode_country_code || '',
+				_geocode_region_level_1: loc._geocode_region_level_1 || '',
+				_geocode_region_level_2: loc._geocode_region_level_2 || '',
+				_geocode_region_level_3: loc._geocode_region_level_3 || '',
+				_geocode_city: loc._geocode_city || '',
+				_geocode_city_level_1: loc._geocode_city_level_1 || '',
 				_ai_quote: loc._ai_quote || '',
 			} ) );
 

@@ -23,8 +23,7 @@ export default ( { attributes, className } ) => {
 		<div
 			className={ classNames( [ 'jeomap', className ] ) }
 			data-center_lat={ attributes.center_lat }
-			data-center_lon={ attributes.center_lon }
-			data-initial_zoom={ attributes.initial_zoom }
+			data-center_lng={ attributes.center_lng }			data-initial_zoom={ attributes.initial_zoom }
 			data-min_zoom={ attributes.min_zoom }
 			data-max_zoom={ attributes.max_zoom }
 			data-disable_scroll_zoom={ attributes.disable_scroll_zoom }

@@ -267,7 +267,7 @@ class Stories extends Component {
 		stories.map( ( story ) => {
 			const storyRelatedPoints = story.meta._related_point ?? [];
 			const storyPoints = storyRelatedPoints.map( ( point ) => {
-				return [ point._geocode_lon, point._geocode_lat ];
+				return [ point._geocode_lng, point._geocode_lat ];
 			} );
 
 			finalFeatures.features.push(
@@ -707,22 +707,22 @@ class Storie extends Component {
 	storyHovered() {
 		const map = this.props.map;
 		const story = this.props.story;
-		const average = { lat: 0, lon: 0 };
+		const average = { lat: 0, lng: 0 };
 		const bounds = [];
 
 		story.meta._related_point.forEach( ( point ) => {
 			const LngLat = {
 				lat: parseFloat( point._geocode_lat ),
-				lon: parseFloat( point._geocode_lon ),
+				lng: parseFloat( point._geocode_lng ),
 			};
 
-			bounds.push([parseFloat( point._geocode_lon ), parseFloat( point._geocode_lat )])
+			bounds.push([parseFloat( point._geocode_lng ), parseFloat( point._geocode_lat )])
 
 			// average.lat += LngLat.lat/story.meta._related_point.length
-			// average.lon += LngLat.lon/story.meta._related_point.length
+			// average.lng += LngLat.lng/story.meta._related_point.length
 
 			average.lat = LngLat.lat;
-			average.lon = LngLat.lon;
+			average.lng = LngLat.lng;
 		} );
 
 
