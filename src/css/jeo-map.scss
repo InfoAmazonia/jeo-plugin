@@ -771,12 +771,13 @@
 
 .jeo-popup-navigator__header {
 	display: flex;
-	align-items: flex-start;
+	align-items: center;
 	justify-content: space-between;
 	gap: 12px;
 	margin-bottom: 12px;
-	padding-top: 18px;
+	margin-top: -8px;
 	padding-bottom: 10px;
+	padding-inline-end: 32px;
 	border-bottom: 1px solid rgba( 0, 0, 0, 0.08 );
 }
 
