@@ -174,6 +174,23 @@ class Settings {
 		$input['jeo_bulk_logging']   = ! empty( $input['jeo_bulk_logging'] );
 		$input['jeo_rag_auto_index'] = ! empty( $input['jeo_rag_auto_index'] );
 
+		// Secure API Key handling: If the input contains the visual mask, revert to existing stored value
+		$existing_options = get_option( $this->option_key );
+		$sensitive_keys = array(
+			'gemini_api_key', 'openai_api_key', 'anthropic_api_key', 'deepseek_api_key',
+			'mistral_api_key', 'zai_api_key', 'huggingface_api_key', 'grok_api_key',
+			'cohere_api_key', 'mapbox_key'
+		);
+
+		foreach ( $sensitive_keys as $s_key ) {
+			if ( isset( $input[ $s_key ] ) && strpos( $input[ $s_key ], '********' ) !== false ) {
+				// Restore the real key from DB if it exists
+				if ( isset( $existing_options[ $s_key ] ) ) {
+					$input[ $s_key ] = $existing_options[ $s_key ];
+				}
+			}
+		}
+
 		// Sanitize Appearance - Colors
 		$color_fields = array(
 			'jeo_primary-color',

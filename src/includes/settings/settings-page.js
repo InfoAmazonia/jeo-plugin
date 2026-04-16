@@ -139,7 +139,12 @@
 			var $container = $btn.closest('.jeo-ai-key-container');
 			var $input = $container.find('.jeo-ai-key-input');
 
-			$input.prop('disabled', false).val('').focus().css({ 'background': '#fff', 'opacity': 1 });
+			$input.prop('disabled', false)
+				  .prop('type', 'password') // Switch to password for private entry
+				  .val('')
+				  .focus()
+				  .css({ 'background': '#fff', 'opacity': 1 });
+			
 			$btn.fadeOut(200);
 		});
 

@@ -36,12 +36,12 @@
 					<div style="display: flex; gap: 10px; align-items: center;" class="jeo-ai-key-container">
 						<input 
 							name="<?php echo esc_html( \jeo_settings()->get_field_name( $slug . ( $slug === 'ollama' ? '_url' : '_api_key' ) ) ); ?>" 
-							type="password" 
+							type="text" 
 							id="<?php echo esc_attr( $slug ); ?>_api_key" 
-							value="<?php echo esc_attr( $key_value ); ?>" 
+							value="<?php echo esc_attr( $display_value ); ?>" 
 							class="regular-text jeo-ai-key-input" 
 							data-original-value="<?php echo esc_attr( $display_value ); ?>"
-							<?php echo ! $is_empty ? 'disabled style="background: #f0f0f1; opacity: 0.7;"' : ''; ?>
+							<?php echo ! $is_empty ? 'disabled style="background: #f0f0f1; opacity: 0.7; font-family: monospace;"' : ''; ?>
 							placeholder="<?php echo $slug === 'ollama' ? 'http://localhost:11434/api' : 'Paste your API key here...'; ?>"
 						>
 						
