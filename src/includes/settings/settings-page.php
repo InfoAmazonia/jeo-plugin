@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 ?>
 <form action="options.php" method="post" class="clear prepend-top">
 	<?php settings_fields( $this->option_key ); ?>
@@ -35,7 +39,7 @@
 					<tr>
 						<th scope="row"><label for="map_runtime"><?php esc_html_e( 'Rendering library', 'jeo' ); ?></label></th>
 						<td>
-							<select name="<?php echo esc_html( $this->get_field_name( 'map_runtime' ) ); ?>" id="map_runtime">
+							<select name="<?php echo esc_attr( $this->get_field_name( 'map_runtime' ) ); ?>" id="map_runtime">
 								<option value="maplibregl" <?php selected( $this->get_option( 'map_runtime' ), 'maplibregl' ); ?>>MapLibreGL</option>
 								<option value="mapboxgl" <?php selected( $this->get_option( 'map_runtime' ), 'mapboxgl' ); ?>>MapboxGL</option>
 							</select>
@@ -45,21 +49,21 @@
 					<tr>
 						<th scope="row"><label for="map_default_lat"><?php esc_html_e( 'Default map latitute', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'map_default_lat' ) ); ?>" type="number" step=".00000000000001" id="map_default_lat" value="<?php echo esc_html( $this->get_option( 'map_default_lat' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'map_default_lat' ) ); ?>" type="number" step=".00000000000001" id="map_default_lat" value="<?php echo esc_attr( $this->get_option( 'map_default_lat' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="map_default_lng"><?php esc_html_e( 'Default map longitude', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'map_default_lng' ) ); ?>" type="number" step=".00000000000001" id="map_default_lng" value="<?php echo esc_html( $this->get_option( 'map_default_lng' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'map_default_lng' ) ); ?>" type="number" step=".00000000000001" id="map_default_lng" value="<?php echo esc_attr( $this->get_option( 'map_default_lng' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="map_default_zoom"><?php esc_html_e( 'Default map zoom', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'map_default_zoom' ) ); ?>" type="number" step=".00000000000001" id="map_default_zoom" value="<?php echo esc_html( $this->get_option( 'map_default_zoom' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'map_default_zoom' ) ); ?>" type="number" step=".00000000000001" id="map_default_zoom" value="<?php echo esc_attr( $this->get_option( 'map_default_zoom' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -72,14 +76,14 @@
 					<tr>
 						<th scope="row"><label for="show_storymaps_on_post_archives"><?php esc_html_e( 'Show story maps on post archives pages', 'jeo' ); ?></label></th>
 						<td>
-						<input type="checkbox" name="<?php echo esc_html( $this->get_field_name( 'show_storymaps_on_post_archives' ) ); ?>" value="1" <?php checked( 1, $this->get_option( 'show_storymaps_on_post_archives' ), true ); ?> />
+						<input type="checkbox" name="<?php echo esc_attr( $this->get_field_name( 'show_storymaps_on_post_archives' ) ); ?>" value="1" <?php checked( 1, $this->get_option( 'show_storymaps_on_post_archives' ), true ); ?> />
 						</td>
 					</tr>
 
 					<tr>
 						<th scope="row"><label for="enabled_post_types"><?php esc_html_e( 'Enabled Post Types. Default: post,storymap', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'enabled_post_types' ) ); ?>" placeholder="<?php esc_attr_e( 'Post types separated by comma, Ex: map,post,page', 'jeo' ); ?>" type="text" id="enabled_post_types" value="<?php echo esc_textarea( implode( ',', $this->get_option( 'enabled_post_types' ) ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'enabled_post_types' ) ); ?>" placeholder="<?php esc_attr_e( 'Post types separated by comma, Ex: map,post,page', 'jeo' ); ?>" type="text" id="enabled_post_types" value="<?php echo esc_attr( implode( ',', $this->get_option( 'enabled_post_types' ) ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -89,13 +93,16 @@
 							<p class="description">
 								<?php esc_html_e( 'When selected, Mapbox loads the official Mapbox GL JS assets from api.mapbox.com and uses Mapbox terms and privacy practices.', 'jeo' ); ?>
 							</p>
+							<p class="description">
+								<?php esc_html_e( 'Visitors load Mapbox assets in the browser, and Mapbox receives the configured access token plus the visitor IP address and requested map resources.', 'jeo' ); ?>
+							</p>
 						</td>
 					</tr>
 
 					<tr class="jeo-mapbox-settings">
 						<th scope="row"><label for="mapbox_key"><?php esc_html_e( 'API Key', 'jeo' ); ?></label></th>
 						<td>
-							<input name="<?php echo esc_html( $this->get_field_name( 'mapbox_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. pk.eyJ3...', 'jeo' ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option( 'mapbox_key' ) ); ?>" class="regular-text">
+							<input name="<?php echo esc_attr( $this->get_field_name( 'mapbox_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. pk.eyJ3...', 'jeo' ); ?>" type="text" id="mapbox_key" value="<?php echo esc_attr( $this->get_option( 'mapbox_key' ) ); ?>" class="regular-text">
 							<p class="description">
 								<?php esc_html_e( 'This key is required only when the rendering library is set to Mapbox.', 'jeo' ); ?>
 							</p>
@@ -113,18 +120,21 @@
 					<tr>
 						<th scope="row"><label for="active_geocoder_select"><?php esc_html_e( 'Active Geocoder', 'jeo' ); ?></label></th>
 						<td>
-							<select name="<?php echo esc_html( $this->get_field_name( 'active_geocoder' ) ); ?>" id="active_geocoder_select">
+							<select name="<?php echo esc_attr( $this->get_field_name( 'active_geocoder' ) ); ?>" id="active_geocoder_select">
 
 								<?php foreach ( jeo_geocode_handler()->get_registered_geocoders() as $geocoder ) : ?>
 
-									<option selected="<?php selected( $this->get_option( 'active_geocoder' ), $geocoder['slug'] ); ?>" value="<?php echo esc_html( $geocoder['slug'] ); ?>">
+									<option value="<?php echo esc_attr( $geocoder['slug'] ); ?>" <?php selected( $this->get_option( 'active_geocoder' ), $geocoder['slug'] ); ?>>
 										<?php echo esc_html( $geocoder['name'] ); ?>
 									</option>
 
 								<?php endforeach; ?>
-							</select>
-						</td>
-					</tr>
+								</select>
+								<p class="description">
+									<?php esc_html_e( 'The built-in Nominatim geocoder sends the address you submit, or the coordinates selected on the map, to nominatim.openstreetmap.org only when you explicitly run a search or reverse-geocode a point.', 'jeo' ); ?>
+								</p>
+							</td>
+						</tr>
 
 
 					<?php
@@ -141,15 +151,20 @@
 							<th scope="row">
 									<label for="input_id">
 									<?php // translators: %s is the geocoder name. Example: Nominatim options. ?>
-									<?php printf( esc_html_x( '%s options', 'geocoder_options', 'jeo' ), esc_attr( $geocoder['name'] ) ); ?>
+									<?php printf( esc_html_x( '%s options', 'geocoder_options', 'jeo' ), esc_html( $geocoder['name'] ) ); ?>
 								</label>
 							</th>
 							<td>
+								<?php if ( ! empty( $geocoder['description'] ) ) : ?>
+									<p class="description">
+										<?php echo esc_html( $geocoder['description'] ); ?>
+									</p>
+								<?php endif; ?>
 								<?php foreach ( $geo_object->get_settings() as $settings ) : ?>
-									<label for="<?php echo esc_html( $settings['slug'] ); ?>">
+									<label for="<?php echo esc_attr( $settings['slug'] ); ?>">
 										<strong><?php echo esc_html( $settings['name'] ); ?></strong> <br/>
 									</label>
-									<input name="<?php echo esc_html( $this->get_geocoder_option_field_name( $gslug, $settings['slug'] ) ); ?>" type="text" id="<?php echo esc_html( $settings['slug'] ); ?>" value="<?php echo esc_html( $this->get_geocoder_option( $gslug, $settings['slug'] ) ); ?>" class="regular-text">
+									<input name="<?php echo esc_attr( $this->get_geocoder_option_field_name( $gslug, $settings['slug'] ) ); ?>" type="text" id="<?php echo esc_attr( $settings['slug'] ); ?>" value="<?php echo esc_attr( $this->get_geocoder_option( $gslug, $settings['slug'] ) ); ?>" class="regular-text">
 									<p class="description">
 									<?php echo esc_html( $settings['description'] ); ?>
 									</p>
@@ -185,31 +200,37 @@
 					<tr>
 						<th scope="row"><label for="jeo_typography"><?php esc_html_e( 'Typography URL', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography' ) ); ?>" type="text" id="jeo_typography" value="<?php echo esc_html( $this->get_option( 'jeo_typography' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. https://fonts.googleapis.com/css2?family=Open+Sans', 'jeo' ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_typography' ) ); ?>" type="text" id="jeo_typography" value="<?php echo esc_attr( $this->get_option( 'jeo_typography' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. https://example.com/wp-content/uploads/fonts/jeo-font.css', 'jeo' ); ?>" class="regular-text">
+						<p class="description">
+							<?php esc_html_e( 'You may use a local or external stylesheet URL. If you choose an external host, your visitors will request that asset directly from that provider.', 'jeo' ); ?>
+						</p>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_typography-name"><?php esc_html_e( 'Typography name', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-name' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. Open Sans', 'jeo' ); ?>" type="text" id="jeo_typography-name" value="<?php echo esc_html( $this->get_option( 'jeo_typography-name' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_typography-name' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. Open Sans', 'jeo' ); ?>" type="text" id="jeo_typography-name" value="<?php echo esc_attr( $this->get_option( 'jeo_typography-name' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_typography-stories"><?php esc_html_e( 'Secondary Typography URL', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-stories' ) ); ?>" type="text" id="jeo_typography-stories" value="<?php echo esc_html( $this->get_option( 'jeo_typography-stories' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. https://fonts.googleapis.com/css2?family=Libre+Baskerville&display=swap', 'jeo' ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_typography-stories' ) ); ?>" type="text" id="jeo_typography-stories" value="<?php echo esc_attr( $this->get_option( 'jeo_typography-stories' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. https://example.com/wp-content/uploads/fonts/jeo-story-font.css', 'jeo' ); ?>" class="regular-text">
+						<p class="description">
+							<?php esc_html_e( 'You may use a local or external stylesheet URL. If you choose an external host, your visitors will request that asset directly from that provider.', 'jeo' ); ?>
+						</p>
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_typography-name-stories"><?php esc_html_e( 'Secondary Typography name', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_typography-name-stories' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. Libre Baskerville', 'jeo' ); ?>" type="text" id="jeo_typography-name-stories" value="<?php echo esc_html( $this->get_option( 'jeo_typography-name-stories' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_typography-name-stories' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. Libre Baskerville', 'jeo' ); ?>" type="text" id="jeo_typography-name-stories" value="<?php echo esc_attr( $this->get_option( 'jeo_typography-name-stories' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_more-font-size"><?php esc_html_e( 'Info button font-size (rem)', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_more-font-size' ) ); ?>" type="text" id="jeo_more-font-size" value="<?php echo esc_html( $this->get_option( 'jeo_more-font-size' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_more-font-size' ) ); ?>" type="text" id="jeo_more-font-size" value="<?php echo esc_attr( $this->get_option( 'jeo_more-font-size' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -220,39 +241,39 @@
 					<tr>
 						<th scope="row"><label for="jeo_primary-color"><?php esc_html_e( 'Primary color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_primary-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_primary-color" value="<?php echo esc_html( $this->get_option( 'jeo_primary-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_primary-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_primary-color" value="<?php echo esc_attr( $this->get_option( 'jeo_primary-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
 					<!-- <tr>
 						<th scope="row"><label for="jeo_text-over-primary-color"><?php esc_html_e( 'Text over primary color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_text-over-primary-color' ) ); ?>" placeholder="Ex. #000000" type="text" id="jeo_text-over-primary-color" value="<?php echo esc_html( $this->get_option( 'jeo_text-over-primary-color' ) ); ?>" class="regular-text">
+							<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_text-over-primary-color' ) ); ?>" placeholder="Ex. #000000" type="text" id="jeo_text-over-primary-color" value="<?php echo esc_attr( $this->get_option( 'jeo_text-over-primary-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr> -->
 
 					<tr>
 						<th scope="row"><label for="jeo_more-bkg-color"><?php esc_html_e( 'Info button background color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_more-bkg-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_more-bkg-color" value="<?php echo esc_html( $this->get_option( 'jeo_more-bkg-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_more-bkg-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_more-bkg-color" value="<?php echo esc_attr( $this->get_option( 'jeo_more-bkg-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_more-color"><?php esc_html_e( 'Info button color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_more-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_more-color" value="<?php echo esc_html( $this->get_option( 'jeo_more-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_more-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_more-color" value="<?php echo esc_attr( $this->get_option( 'jeo_more-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_close-bkg-color"><?php esc_html_e( 'Close button background color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_close-bkg-color' ) ); ?>" type="text" id="jeo_close-bkg-color" value="<?php echo esc_html( $this->get_option( 'jeo_close-bkg-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_close-bkg-color' ) ); ?>" type="text" id="jeo_close-bkg-color" value="<?php echo esc_attr( $this->get_option( 'jeo_close-bkg-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 					<tr>
 						<th scope="row"><label for="jeo_close-color"><?php esc_html_e( 'Close button color', 'jeo' ); ?></label></th>
 						<td>
-						<input name="<?php echo esc_html( $this->get_field_name( 'jeo_close-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_close-color" value="<?php echo esc_html( $this->get_option( 'jeo_close-color' ) ); ?>" class="regular-text">
+						<input name="<?php echo esc_attr( $this->get_field_name( 'jeo_close-color' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. #ffffff', 'jeo' ); ?>" type="text" id="jeo_close-color" value="<?php echo esc_attr( $this->get_option( 'jeo_close-color' ) ); ?>" class="regular-text">
 						</td>
 					</tr>
 
@@ -263,7 +284,10 @@
 					<tr>
 						<th scope="row"><label for="background_image"><?php esc_html_e( 'Company logo', 'jeo' ); ?></label></th>
 						<td>
-							<input id="background_image" type="text" name="<?php echo esc_html( $this->get_field_name( 'jeo_footer-logo' ) ); ?>" value="<?php echo esc_html( $this->get_option( 'jeo_footer-logo' ) ); ?>" />
+							<input id="background_image" type="text" name="<?php echo esc_attr( $this->get_field_name( 'jeo_footer-logo' ) ); ?>" value="<?php echo esc_attr( $this->get_option( 'jeo_footer-logo' ) ); ?>" />
+							<p class="description">
+								<?php esc_html_e( 'You may use a local or external image URL. Large logos will be scaled down automatically in the embed footer.', 'jeo' ); ?>
+							</p>
 							<input id="upload_image_button" type="button" class="button-primary" value="<?php esc_attr_e( 'Insert Image', 'jeo' ); ?>" />
 						</td>
 					</tr>

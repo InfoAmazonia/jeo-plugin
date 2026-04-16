@@ -1,7 +1,7 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLayerTypes.registerLayerType( 'mvt', {
+	window.JeoLayerTypes.registerLayerType( 'mvt', {
 	label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ),
 
 	addStyle( map, attributes ) {
@@ -107,5 +107,5 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 			},
 		};
 	},
-} );
+	} );
 } )();

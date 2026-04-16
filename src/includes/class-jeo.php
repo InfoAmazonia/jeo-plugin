@@ -12,6 +12,10 @@
  * @subpackage Jeo/includes
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * The core plugin class.
  *
@@ -52,10 +56,10 @@ class Jeo {
 
 		add_filter( 'load_textdomain_mofile', array( $this, 'fallback_translation_mofile' ), 10, 2 );
 		add_filter( 'load_script_translation_file', array( $this, 'fallback_script_translation_file' ), 10, 3 );
-		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 		add_filter( 'block_categories_all', array( $this, 'register_block_category' ) );
 		add_action( 'init', array( $this, 'register_block_types' ) );
 		add_action( 'init', array( $this, 'register_oembed' ) );
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 
 		add_action( 'init', array( $this, 'register_embed_rewrite' ) );
 		add_filter( 'query_vars', array( $this, 'register_embed_query_var' ) );
@@ -217,19 +221,6 @@ class Jeo {
 	}
 
 	/**
-	 * Load the plugin text domain for translation.
-	 *
-	 * @since    1.0.0
-	 */
-	public function load_plugin_textdomain() {
-		load_plugin_textdomain(
-			'jeo',
-			false,
-			plugin_basename( JEO_BASEPATH ) . '/languages',
-		);
-	}
-
-	/**
 	 * Fall back to the closest bundled locale when another locale in the same language family is active.
 	 *
 	 * @param string $mofile Translation file path.
@@ -324,7 +315,7 @@ class Jeo {
 	 */
 	public function order_rest_post_by_post_title( $args ) {
 		if ( isset( $args['post__in'] ) && ! empty( $args['post__in'] ) ) {
-			$args['suppress_filters'] = true;
+			$args['orderby'] = 'post__in';
 		}
 
 		return $args;
@@ -359,15 +350,131 @@ class Jeo {
 	}
 
 	/**
+	 * Register custom REST routes used by JEO.
+	 *
+	 * @return void
+	 */
+	public function register_rest_routes() {
+		register_rest_route(
+			'jeo/v1',
+			'/map-layer',
+			array(
+				'methods'             => \WP_REST_Server::READABLE,
+				'callback'            => array( $this, 'get_map_layers_by_ids' ),
+				'permission_callback' => '__return_true',
+				'args'                => array(
+					'include' => array(
+						'description'       => __( 'Ordered list of map-layer IDs to return.', 'jeo' ),
+						'sanitize_callback' => array( $this, 'sanitize_rest_include_ids' ),
+						'default'           => array(),
+					),
+					'context' => array(
+						'description'       => __( 'Request context.', 'jeo' ),
+						'sanitize_callback' => 'sanitize_key',
+						'default'           => 'view',
+						'validate_callback' => static function ( $value ) {
+							return in_array( $value, array( 'view', 'edit' ), true );
+						},
+					),
+				),
+			)
+		);
+	}
+
+	/**
+	 * Normalize a REST include argument into an ordered array of unique IDs.
+	 *
+	 * @param mixed           $value Raw request value.
+	 * @param WP_REST_Request $request Current request.
+	 * @param string          $param Parameter name.
+	 * @return int[]
+	 */
+	public function sanitize_rest_include_ids( $value, $request = null, $param = '' ) {
+		unset( $request, $param );
+
+		if ( is_string( $value ) ) {
+			$value = explode( ',', $value );
+		}
+
+		if ( ! is_array( $value ) ) {
+			return array();
+		}
+
+		return array_values(
+			array_unique(
+				array_filter(
+					array_map( 'absint', $value )
+				)
+			)
+		);
+	}
+
+	/**
+	 * Return map-layer posts in the requested order without relying on filtered collection queries.
+	 *
+	 * @param WP_REST_Request $request Current request.
+	 * @return WP_REST_Response
+	 */
+	public function get_map_layers_by_ids( WP_REST_Request $request ) {
+		$ids     = $this->sanitize_rest_include_ids( $request->get_param( 'include' ) );
+		$context = 'edit' === $request->get_param( 'context' ) ? 'edit' : 'view';
+
+		if ( empty( $ids ) ) {
+			return rest_ensure_response( array() );
+		}
+
+		$controller = new \WP_REST_Posts_Controller( 'map-layer' );
+		$items      = array();
+
+		foreach ( $ids as $id ) {
+			$post = get_post( $id );
+
+			if ( ! $post instanceof \WP_Post || 'map-layer' !== $post->post_type ) {
+				continue;
+			}
+
+			if ( 'edit' === $context ) {
+				if ( ! current_user_can( 'edit_post', $id ) ) {
+					continue;
+				}
+			} elseif ( 'publish' !== get_post_status( $post ) ) {
+				continue;
+			}
+
+			$item_request = new \WP_REST_Request( \WP_REST_Server::READABLE, '/jeo/v1/map-layer' );
+			$item_request->set_param( 'context', $context );
+
+			$item = $controller->prepare_item_for_response( $post, $item_request );
+
+			if ( is_wp_error( $item ) ) {
+				continue;
+			}
+
+			$items[] = $controller->prepare_response_for_collection( $item );
+		}
+
+		$response = rest_ensure_response( $items );
+		$response->header( 'X-WP-Total', (string) count( $items ) );
+		$response->header( 'X-WP-TotalPages', '1' );
+
+		return $response;
+	}
+
+	/**
 	 * Register shared frontend and editor assets for the plugin.
 	 *
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file         = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
-		$layer_type_handles = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
+		$asset_file            = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
+		$layer_type_handles    = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
+		$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
 
-		$deps = array_merge( array( 'lodash' ), $asset_file['dependencies'] ?? array() );
+		$deps = array_merge(
+			array( 'lodash' ),
+			$asset_file['dependencies'] ?? array(),
+			$legend_script_handles
+		);
 
 		wp_register_style( 'jeo-js', JEO_BASEURL . '/js/build/postsSidebar.css', array(), JEO_VERSION );
 		wp_register_script(
@@ -494,7 +601,8 @@ class Jeo {
 			array_merge(
 				$map_blocks_assets['dependencies'] ?? array(),
 				array( 'jeo-layer', 'mapgl-react' ),
-				$layer_type_handles
+				$layer_type_handles,
+				$legend_script_handles
 			),
 			$map_blocks_assets['version'],
 			true,
@@ -693,9 +801,19 @@ class Jeo {
 	 */
 	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
 		$saved_data = json_decode( $this->extract_json_from_block_content( $content ) );
+		if ( ! is_object( $saved_data ) ) {
+			return '';
+		}
 
-		$map_id     = $saved_data->map_id;
+		$map_id     = isset( $saved_data->map_id ) ? (int) $saved_data->map_id : 0;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
+		if ( ! is_array( $map_layers ) ) {
+			$map_layers = array();
+		}
+
+		if ( ! isset( $saved_data->slides ) || ! is_array( $saved_data->slides ) ) {
+			$saved_data->slides = array();
+		}
 
 		// Remove missing layers and restore the saved selected layer order.
 		foreach ( $saved_data->slides as $slide ) {
@@ -760,7 +878,11 @@ class Jeo {
 	 */
 	public function filter_rest_query_by_zone( $args, $request ) {
 		unset( $request );
-		$args['suppress_filters'] = true;
+
+		if ( isset( $args['post__in'] ) && ! empty( $args['post__in'] ) ) {
+			$args['orderby'] = 'post__in';
+		}
+
 		return $args;
 	}
 
@@ -810,10 +932,18 @@ class Jeo {
 	 */
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() ) {
+			$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
+
 			wp_enqueue_style( 'mapgl' );
 			wp_enqueue_script( 'mapgl' );
 			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), JEO_VERSION );
-			wp_enqueue_script( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.js', array( 'mapgl', 'jquery' ), JEO_VERSION, true );
+			wp_enqueue_script(
+				'jeo-map',
+				JEO_BASEURL . '/js/build/jeoMap.js',
+				array_merge( array( 'mapgl', 'jquery' ), $legend_script_handles ),
+				JEO_VERSION,
+				true
+			);
 
 			wp_set_script_translations( 'jeo-map', 'jeo', JEO_BASEPATH . 'languages' );
 
@@ -824,6 +954,7 @@ class Jeo {
 				'jeoMapVars',
 				array(
 					'jsonUrl'          => rest_url( 'wp/v2/' ),
+					'layersUrl'        => rest_url( 'jeo/v1/map-layer' ),
 					'string_read_more' => esc_html__( 'Read more', 'jeo' ),
 					'jeoUrl'           => JEO_BASEURL,
 					'nonce'            => $this->get_rest_nonce(),

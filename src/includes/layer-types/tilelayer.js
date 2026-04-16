@@ -1,7 +1,7 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLayerTypes.registerLayerType( 'tilelayer', {
+	window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 	label: __( 'Raster Tiled Source', 'jeo' ),
 
 	addStyle( map, attributes ) {
@@ -70,5 +70,5 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 			},
 		};
 	},
-} );
+	} );
 } )();

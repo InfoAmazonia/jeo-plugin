@@ -7,6 +7,10 @@
 
 namespace Jeo;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 /**
  * Register and manage layer posts.
  */
@@ -221,6 +225,9 @@ class Layers {
 		$roles = array( 'author', 'editor', 'administrator' );
 		foreach ( $roles as $role ) {
 			$role_obj = get_role( $role );
+			if ( ! $role_obj ) {
+				continue;
+			}
 
 			$role_obj->add_cap( 'edit_map-layer' );
 			$role_obj->add_cap( 'edit_map-layers' );

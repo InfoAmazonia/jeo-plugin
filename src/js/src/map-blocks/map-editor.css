@@ -33,9 +33,24 @@
 
 .jeo-map-autosuggest .components-combobox-control__suggestions-container,
 .search-adress-input .components-combobox-control__suggestions-container {
+	position: relative;
+	top: 0;
+	width: 100%;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	z-index: auto;
+}
+
+.jeo-map-autosuggest .components-form-token-field__suggestions-list,
+.search-adress-input .components-form-token-field__suggestions-list {
 	position: absolute;
 	top: calc( 100% + 1px );
-	width: 280px;
+	inset-inline-start: 0;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
 	border: 1px solid #c3c4c7;
 	background-color: #fff;
 	font-family: Helvetica, sans-serif;
@@ -107,7 +122,7 @@
 
 .wp-block-jeo-embedded-storymap
 	.jeo-map-autosuggest
-	.components-combobox-control__suggestions-container {
+	.components-form-token-field__suggestions-list {
 	position: relative;
 	top: 0;
 	width: 100%;
@@ -136,6 +151,70 @@
 .wp-block-jeo-map-editor .jeo-preview-area,
 .wp-block-jeo-layer-editor .jeo-preview-area {
 	width: 100%;
+}
+
+/* Content editor map blocks need an explicit width when floated left/right.
+   Otherwise the wrapper can shrink to 0 because the interactive map internals
+   are absolutely positioned. */
+.wp-block-jeo-map.alignleft,
+.wp-block-jeo-map.alignright {
+	--jeo-aligned-map-base-width: var( --wp--style--global--content-size, 645px );
+	--jeo-aligned-map-expanded-width: calc( var( --jeo-aligned-map-base-width ) * 1.6 );
+	box-sizing: border-box;
+	display: table;
+	max-width: none;
+	width: auto;
+}
+
+.wp-block-jeo-map.alignleft {
+	margin-right: 1em;
+	margin-left: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-map.alignright {
+	margin-left: 1em;
+	margin-right: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-map.alignleft .jeo-preview-area,
+.wp-block-jeo-map.alignright .jeo-preview-area,
+.wp-block-jeo-map.alignleft .mapboxgl-map,
+.wp-block-jeo-map.alignright .mapboxgl-map,
+.wp-block-jeo-map.alignleft .maplibregl-map,
+.wp-block-jeo-map.alignright .maplibregl-map {
+	max-width: none;
+	width: 100%;
+}
+
+.wp-block-jeo-map.alignleft .jeo-preview-area,
+.wp-block-jeo-map.alignright .jeo-preview-area {
+	min-width: min( var( --jeo-aligned-map-base-width ), calc( 100vw - 2rem ) );
+	width: min( var( --jeo-aligned-map-expanded-width ), calc( 100vw - 2rem ) );
+}
+
+@media (max-width: 782px) {
+	.wp-block-jeo-map.alignleft,
+	.wp-block-jeo-map.alignright {
+		display: block;
+		float: none;
+		margin-left: 0;
+		margin-right: 0;
+		width: 100%;
+	}
+
+	.wp-block-jeo-map.alignleft .jeo-preview-area,
+	.wp-block-jeo-map.alignright .jeo-preview-area,
+	.wp-block-jeo-map.alignleft .mapboxgl-map,
+	.wp-block-jeo-map.alignright .mapboxgl-map,
+	.wp-block-jeo-map.alignleft .maplibregl-map,
+	.wp-block-jeo-map.alignright .maplibregl-map {
+		min-width: 0;
+		width: 100%;
+	}
 }
 
 /* Hide the block selection outline and toolbar for editor-only preview blocks.

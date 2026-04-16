@@ -10,12 +10,24 @@ export function buildAsyncComboboxOptions( {
 	selectedValue,
 	hasFocus,
 	persistFreeText = true,
+	suppressEmptyState = false,
 } ) {
 	const options = items.map( ( item ) => ( {
 		item,
 		label: getOptionLabel( item ),
 		value: String( getOptionValue( item ) ),
 	} ) );
+
+	if ( suppressEmptyState && options.length === 0 ) {
+		return [
+			{
+				label: inputValue || ' ',
+				value: String( selectedValue ?? inputValue ?? '__jeo-hidden-option__' ),
+				__hidden: true,
+				disabled: true,
+			},
+		];
+	}
 
 	if ( ! persistFreeText || hasFocus || ! inputValue ) {
 		return options;
@@ -60,6 +72,7 @@ export default function AsyncComboboxControl( {
 	renderItem,
 	allowReset = false,
 	persistFreeText = true,
+	suppressEmptyState = false,
 } ) {
 	const [ hasFocus, setHasFocus ] = useState( false );
 	const ignoreNextEmptyInputRef = useRef( false );
@@ -72,6 +85,7 @@ export default function AsyncComboboxControl( {
 			selectedValue,
 			hasFocus,
 			persistFreeText,
+			suppressEmptyState,
 		} );
 	}, [
 		getOptionLabel,
@@ -81,6 +95,7 @@ export default function AsyncComboboxControl( {
 		items,
 		persistFreeText,
 		selectedValue,
+		suppressEmptyState,
 	] );
 
 	const currentValue = selectedValue ?? ( persistFreeText ? inputValue : null );
@@ -133,7 +148,9 @@ export default function AsyncComboboxControl( {
 
 					const selectedOption = options.find(
 						( option ) =>
-							option.value === String( nextValue ) && ! option.__freeform
+							option.value === String( nextValue ) &&
+							! option.__freeform &&
+							! option.__hidden
 					);
 
 					if ( selectedOption ) {
@@ -143,6 +160,15 @@ export default function AsyncComboboxControl( {
 				__experimentalRenderItem={
 					renderItem
 						? ( { item } ) => {
+								if ( item.__hidden ) {
+									return (
+										<span
+											className="jeo-async-combobox__hidden-option"
+											aria-hidden="true"
+										/>
+									);
+								}
+
 								if ( item.__freeform ) {
 									return null;
 								}

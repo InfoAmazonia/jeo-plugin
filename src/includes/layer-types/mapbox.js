@@ -1,12 +1,12 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-const MAPBOX_RASTER_ATTRIBUTION =
+	const MAPBOX_RASTER_ATTRIBUTION =
 	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
 	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
 	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
 
-window.JeoLayerTypes.registerLayerType( 'mapbox', {
+	window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	label: __( 'Mapbox Style', 'jeo' ),
 
 	addStyle( map, attributes ) {
@@ -105,7 +105,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						let html = '';
 
 						for ( const interaction of interactionsGroup ) {
-							if ( feature.properties.hasOwnProperty( interaction.title ) ) {
+							if ( Object.hasOwn( feature.properties, interaction.title ) ) {
 								html += '<h3>' + feature.properties[ interaction.title ] + '</h3>';
 								break;
 							}
@@ -114,7 +114,7 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 						const fieldsSet = new Set();
 						for ( const interaction of interactionsGroup ) {
 							interaction.fields.forEach( ( { field, label } ) => {
-								if ( ! fieldsSet.has( field ) && feature.properties.hasOwnProperty( field ) ) {
+								if ( ! fieldsSet.has( field ) && Object.hasOwn( feature.properties, field ) ) {
 									fieldsSet.add( field );
 									html += '<p><strong>' + label + ': </strong>' + feature.properties[ field ] + '</p>';
 								}
@@ -276,5 +276,5 @@ window.JeoLayerTypes.registerLayerType( 'mapbox', {
 				} );
 		} );
 	},
-} );
+	} );
 } )();

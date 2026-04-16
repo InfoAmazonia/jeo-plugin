@@ -123,6 +123,46 @@ function patchMissingCSSDetection( MapboxGL ) {
 	};
 }
 
+function patchDeprecatedLightApi( MapboxGL ) {
+	const proto = MapboxGL.Map?.prototype;
+	if ( ! proto || typeof proto.getLights !== 'function' ) {
+		return;
+	}
+
+	proto.getLight = function () {
+		const lights = this.getLights();
+
+		if ( Array.isArray( lights ) ) {
+			return lights[ 0 ] ?? null;
+		}
+
+		if ( Array.isArray( lights?.lights ) ) {
+			return lights.lights[ 0 ] ?? null;
+		}
+
+		return lights ?? null;
+	};
+}
+
+function patchMissingSkyApi( MapboxGL ) {
+	const proto = MapboxGL.Map?.prototype;
+	if ( ! proto ) {
+		return;
+	}
+
+	if ( typeof proto.getSky !== 'function' ) {
+		proto.getSky = function () {
+			return null;
+		};
+	}
+
+	if ( typeof proto.setSky !== 'function' ) {
+		proto.setSky = function () {
+			return this;
+		};
+	}
+}
+
 // Fix: Patch FullscreenControl for cross-document (iframe) compatibility.
 // Same issue as MapLibreGL: the control uses `document` (parent window) for
 // fullscreenElement, exitFullscreen(), and fullscreenchange listeners.
@@ -204,6 +244,8 @@ function ensureMapboxRuntimePatched() {
 	}
 
 	patchHTMLElementInstanceOf()
+	patchDeprecatedLightApi( MapboxGL )
+	patchMissingSkyApi( MapboxGL )
 	patchMissingCSSDetection( MapboxGL )
 	patchFullscreenControl( MapboxGL )
 

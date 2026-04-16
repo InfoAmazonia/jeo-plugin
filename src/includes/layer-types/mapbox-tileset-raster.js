@@ -1,7 +1,7 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
+	window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 	label: __( 'Raster Mapbox Tiled Source', 'jeo' ),
 
 	addStyle( map, attributes ) {
@@ -89,5 +89,5 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
 			},
 		};
 	},
-} );
+	} );
 } )();

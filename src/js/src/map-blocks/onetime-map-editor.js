@@ -30,7 +30,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 	}, [ attributes ] );
 
 	useEffect( () => {
-		setKey( key + 1 );
+		setKey( ( currentKey ) => currentKey + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
 	const setRelatedPosts = useCallback(
@@ -51,9 +51,13 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 	const layerIds = useMemo( () => {
 		return normalizedAttributes.layers.map( ( layer ) => layer.id );
 	}, [ normalizedAttributes.layers ] );
+	const layerSettingsKey = useMemo(
+		() => JSON.stringify( normalizedAttributes.layers || [] ),
+		[ normalizedAttributes.layers ]
+	);
 
 	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
-		path: '/wp/v2/map-layer',
+		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
@@ -113,7 +117,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 
 			<div className="jeo-preview-area">
 				<Map
-					key={ currentZoom }
+					key={ `${ key }:${ currentZoom }:${ layerSettingsKey }` }
 					ref={ mapRef }
 					style={ { height: '50vh' } }
 					latitude={ normalizedAttributes.center_lat }

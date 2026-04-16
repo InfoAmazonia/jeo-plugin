@@ -74,7 +74,7 @@ class MapItem extends Component {
 		const layerToggleClassName = ( layer ) => {
 			const defaultClasses = 'layer-toggle';
 
-			if ( selectedLayers.hasOwnProperty( layer.id ) ) {
+			if ( Object.hasOwn( selectedLayers, layer.id ) ) {
 				return isCurrentMapLayer( layer ) ?
 					`${ defaultClasses } current-map-layer` :
 					`${ defaultClasses } no-current-map-layer`;
@@ -85,7 +85,7 @@ class MapItem extends Component {
 
 		const layersToggle = map.queriedLayers ?
 			map.queriedLayers.map( ( layer, index ) => {
-				const isSelected = selectedLayers.hasOwnProperty( layer.id );
+				const isSelected = Object.hasOwn( selectedLayers, layer.id );
 
 				return (
 					<button
@@ -107,12 +107,12 @@ class MapItem extends Component {
 		const applyRemoveButton = map.queriedLayers ?
 			map.queriedLayers.some( ( layer ) =>
 				Object.keys( selectedLayers )
-					.map( ( layerId ) => parseInt( layerId, 10 ) )
+					.map( ( layerId ) => Number.parseInt( layerId, 10 ) )
 					.includes( layer.id )
 			) :
 			null;
 
-		if ( ! map.meta.layers?.length ) {
+		if ( ! Array.isArray( map?.meta?.layers ) || ! map.meta.layers.length ) {
 			return '';
 		}
 

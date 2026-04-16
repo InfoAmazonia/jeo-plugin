@@ -56,6 +56,9 @@ class StoryMapDisplay extends Component {
 		this.navigable = Boolean(this.props.navigateButton);
 		this.navigateMap = null;
 		this.cid = ++storyCounter;
+		this.isIntroductionScrollLocked = false;
+		this.previousBodyOverflow = null;
+		this.previousDocumentOverflow = null;
 
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
@@ -126,8 +129,42 @@ class StoryMapDisplay extends Component {
 
 	componentDidMount() {
 		this.eagerInitStorymap();
+		this.syncIntroductionScrollLock();
 
 		onFirstIntersection( this.el, this.lazyInitStorymap.bind( this ) );
+	}
+
+	componentWillUnmount() {
+		this.setIntroductionScrollLocked( false );
+		window.removeEventListener( 'resize', this.scroller.resize );
+	}
+
+	setIntroductionScrollLocked( locked ) {
+		const ownerDocument = this.el?.ownerDocument || document;
+		const documentElement = ownerDocument.documentElement;
+		const body = ownerDocument.body;
+
+		if ( ! documentElement || ! body || this.isIntroductionScrollLocked === locked ) {
+			return;
+		}
+
+		if ( locked ) {
+			this.previousDocumentOverflow = documentElement.style.overflow;
+			this.previousBodyOverflow = body.style.overflow;
+			documentElement.style.overflow = 'hidden';
+			body.style.overflow = 'hidden';
+		} else {
+			documentElement.style.overflow = this.previousDocumentOverflow ?? '';
+			body.style.overflow = this.previousBodyOverflow ?? '';
+		}
+
+		this.isIntroductionScrollLocked = locked;
+	}
+
+	syncIntroductionScrollLock() {
+		this.setIntroductionScrollLocked(
+			Boolean( this.props.hasIntroduction && ! this.state.inSlides && ! this.state.isNavigating )
+		);
 	}
 
 	scheduleInitialMapLibreAttributionSync() {
@@ -320,6 +357,8 @@ class StoryMapDisplay extends Component {
 	}
 
 	componentDidUpdate() {
+		this.syncIntroductionScrollLock();
+
 		const mapEl = this.el.querySelector(`.${MAP_RUNTIME}-map`);
 		if (mapEl) {
 			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
@@ -361,7 +400,6 @@ class StoryMapDisplay extends Component {
         const theme = this.config.theme;
 		const currentChapterID = this.state.currentChapter.id;
 		const storyDate = this.state.postData ? new Date( this.state.postData.date ) : null;
-
 		const Heading = isSingle ? 'h1' : 'h2';
 
         return(
@@ -392,6 +430,7 @@ class StoryMapDisplay extends Component {
 								<button
 									className="storymap-start-button"
 									onClick={ () => {
+										this.setIntroductionScrollLocked( false );
 										this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
 										this.el.querySelector( '.storymap-features' ).scrollIntoView();
@@ -416,6 +455,7 @@ class StoryMapDisplay extends Component {
 										<div
 											className="skip-intro-icon"
 											onClick={ async () => {
+												this.setIntroductionScrollLocked( false );
 												this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
 												this.el.querySelector( '.storymap-features' ).scrollIntoView();
@@ -429,19 +469,27 @@ class StoryMapDisplay extends Component {
 						}
 						{ ! this.state.inHeader && (
 							<>
-								<div className={ classNames( [ 'storymap-features', alignments[ this.config.alignment ] ] ) } style={ { display: 'block' } }>
+								<div
+									className={ classNames( [
+										'storymap-features',
+										alignments[ this.config.alignment ],
+										{
+											'storymap-features--with-navigation-step': this.props.navigateButton,
+										},
+									] ) }
+									style={ { display: 'block' } }
+								>
 									{
 										this.config.chapters.map( ( chapter, index ) => {
 											let isLastChapter = false;
 
-											// If is the last chapter:
-											if( this.config.chapters.indexOf( this.state.currentChapter ) === this.config.chapters.length -1 && this.state.currentChapter === chapter ) {
+											if ( this.config.chapters.indexOf( this.state.currentChapter ) === this.config.chapters.length - 1 && this.state.currentChapter === chapter ) {
 												isLastChapter = true;
 											}
 
 											this.lastChapter = { ...chapter };
-											this.lastChapter.selectedLayers = this.props.navigateMapLayers
-											this.lastChapter.id = chapter.id
+											this.lastChapter.selectedLayers = this.props.navigateMapLayers;
+											this.lastChapter.id = chapter.id;
 
 											if ( index === this.config.chapters.length - 1 ) {
 												return(
@@ -509,7 +557,7 @@ class StoryMapDisplay extends Component {
 									this.el.querySelector('.navigate-map').style.display = 'none';
 									this.el.querySelector('.not-navigating-map').style.display = 'block';
 
-									this.state.map.resize();
+									this.map?.resize();
 								} }
 							>
 								<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-up" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="white" d="M177 255.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 351.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 425.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1zm-34-192L7 199.7c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l96.4-96.4 96.4 96.4c9.4 9.4 24.6 9.4 33.9 0l22.6-22.6c9.4-9.4 9.4-24.6 0-33.9l-136-136c-9.2-9.4-24.4-9.4-33.8 0z"></path></svg>
@@ -534,7 +582,7 @@ class StoryMapDisplay extends Component {
 								this.el.querySelector('.navigate-map').style.display = 'none';
 								this.el.querySelector('.not-navigating-map').style.display = 'block';
 
-								this.map.resize();
+								this.map?.resize();
 
 								window.scrollTo(0, 0);
 							} }
@@ -550,7 +598,10 @@ class StoryMapDisplay extends Component {
 }
 
 function Chapter({ index, id, theme, title, image, description, currentChapterID, isLastChapter, onClickFunction, props}) {
-	const classList = id === currentChapterID ? "step active" : "step";
+	const classList = classNames( 'step', {
+		active: id === currentChapterID,
+		'storymap-navigation-step': isLastChapter,
+	} );
 
     return (
 		<>

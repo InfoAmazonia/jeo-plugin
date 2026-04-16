@@ -1,7 +1,7 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLegendTypes.registerLegendType( 'circles', {
+	window.JeoLegendTypes.registerLegendType( 'circles', {
 	label: __( 'Circle sizes', 'jeo' ),
 
 	/**
@@ -85,5 +85,5 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 		return container;
 	},
 
-} );
+	} );
 } )();

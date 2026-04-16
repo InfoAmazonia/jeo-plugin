@@ -1,7 +1,7 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLegendTypes.registerLegendType( 'simple-color', {
+	window.JeoLegendTypes.registerLegendType( 'simple-color', {
 	label: __( 'Color categories', 'jeo' ),
 
 	/**
@@ -60,5 +60,6 @@ window.JeoLegendTypes.registerLegendType( 'simple-color', {
 		return container;
 	},
 
-} );
+	} );
 } )();
+

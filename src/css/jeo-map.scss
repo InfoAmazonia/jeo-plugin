@@ -252,10 +252,13 @@
 	}
 
 	div.more-info-overlayer {
+		box-sizing: border-box;
 		margin-top: 50px;
 		position: absolute;
 		width: calc(100% - 250px);
 		height: calc(100% - 70px);
+		max-width: calc(100% - 20px);
+		max-height: calc(100% - 70px);
 		background-color: white;
 		z-index: 10;
 		top: 10px;
@@ -1126,6 +1129,50 @@
 	width: auto;
 }
 
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignfull {
+	margin-inline: calc(50% - 50vw);
+	max-width: 100vw;
+	width: 100vw;
+}
+
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright {
+	--jeo-aligned-map-base-width: var( --wp--style--global--content-size, 645px );
+	--jeo-aligned-map-expanded-width: calc( var( --jeo-aligned-map-base-width ) * 1.6 );
+	display: table;
+	max-width: none;
+	min-width: min( var( --jeo-aligned-map-base-width ), calc( 100vw - 2rem ) );
+	width: min( var( --jeo-aligned-map-expanded-width ), calc( 100vw - 2rem ) );
+}
+
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft {
+	float: left;
+	margin-left: 0;
+	margin-right: 1em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright {
+	float: right;
+	margin-right: 0;
+	margin-left: 1em;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+@media (max-width: 782px) {
+	.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft,
+	.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright {
+		display: block;
+		float: none;
+		margin-left: 0;
+		margin-right: 0;
+		min-width: 0;
+		width: 100%;
+	}
+}
+
 p.jeomap-no-layers__text {
 	font-size: 16px;
 	border: 1px solid #e3dfdf;
@@ -1205,8 +1252,16 @@ div.jeomap.alignwide {
 		}
 
 		div.more-info-overlayer {
-			width: calc(100% - 20px);
-			height: calc(100% - 150px);
+			inset-inline-start: 10px;
+			inset-inline-end: 10px;
+			top: 60px;
+			bottom: 10px;
+			margin-top: 0;
+			width: auto;
+			height: auto;
+			max-width: none;
+			max-height: none;
+			padding: 0 14px 14px;
 		}
 	}
 }

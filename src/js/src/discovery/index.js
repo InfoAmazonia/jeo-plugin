@@ -1,5 +1,5 @@
 import { Component, createRoot } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 import Sidebar from './blocks/sidebar';
 import { formatDateRangeValue } from './blocks/date-range-filter';
@@ -294,13 +294,7 @@ class Discovery extends Component {
 		};
 
 		const legends = this.state.appliedLayers
-			.filter(
-				( layer ) =>
-					layer?.meta?.use_legend &&
-					layer?.meta?.legend_type &&
-					layer?.meta?.legend_type_options &&
-					typeof layer.meta.legend_type_options === 'object'
-			)
+			.filter( ( layer ) => layer?.meta?.use_legend )
 			.map( ( layer ) => {
 				return new window.JeoLegend( layer.meta.legend_type, {
 					layer_id: layer.slug,
@@ -486,7 +480,7 @@ class Discovery extends Component {
 										} )
 									}
 								>
-									{ __( 'Embed', 'jeo' ) }
+									{ _x( 'Embed', 'discovery share action', 'jeo' ) }
 								</button>
 
 								{ this.state.showEmbedTooltip && (

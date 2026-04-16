@@ -1,7 +1,7 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLegendTypes.registerLegendType( 'icons', {
+	window.JeoLegendTypes.registerLegendType( 'icons', {
 	label: __( 'Icon categories', 'jeo' ),
 
 	/**
@@ -55,5 +55,5 @@ window.JeoLegendTypes.registerLegendType( 'icons', {
 		return container;
 	},
 
-} );
+	} );
 } )();

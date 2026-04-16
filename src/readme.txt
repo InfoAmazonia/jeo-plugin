@@ -1,44 +1,18 @@
-=== JEO ===
+=== JEO Maps ===
 Contributors: infoamazonia
-Tested up to: 6.9.4
-Stable tag: 2.15.2
+Tested up to: 6.9
+Stable tag: 3.0.0-rc.3
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-3.0-only
 License URI: https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
 Version: 3.0.0-rc.3
 
-The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps.
+Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
 
 == Description ==
 
-With JEO, creating the interaction between data layers and contextual information is intuitive and interactive. You can post geotagged stories and create richly designed pages for each one of the featured stories.
-
-At the same time, by simply imputing the ids of layers hosted on [Mapbox](https://www.mapbox.com/), you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. JEO bundles MapLibreGL by default and can optionally load Mapbox GL JS as an external service when Mapbox is selected in the plugin settings.
-
-== Compatibility ==
-
-Compatibility snapshot validated on March 17, 2026:
-
-* Primary support: PHP 8.2, 8.3, and 8.4;
-* Experimental monitoring: PHP 8.5;
-* Stable WordPress gate: WordPress 6.9.4 on PHP 8.2, 8.3, and 8.4;
-* Experimental WordPress gate: WordPress 6.9.4 on PHP 8.5;
-* Backward-compatibility smoke tests: WordPress 6.6 on PHP 8.0 and 8.1;
-* Forward-compatibility smoke tests: WordPress 7.0-beta4 on PHP 8.2, 8.3, 8.4, and experimentally on PHP 8.5.
-* Repository test scripts include static PHP 8.5 checks and experimental WordPress smoke coverage on PHP 8.5.
-
-= Features =
-
-* Support for [MapLibreGL](https://maplibre.org/maplibre-gl-js/docs/) as the default bundled rendering library;
-* Optional support for [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/) loaded externally from Mapbox when selected in the plugin settings;
-* Support for [Mapbox](https://www.mapbox.com) maps and layers (requires a Mapbox API key);
-* Custom tile layers;
-* Layer filtering options, allowing you to mix tile layers;
-* Geocoding WordPress posts using [Nominatim](https://nominatim.org/), supporting the post type **Post**;
-* Customizable marker icons that can be associated with categories, custom taxonomies or posts directly;
-* Map markers query integrated to posts query;
-* Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilanguage plugins.
+JEO helps newsrooms build interactive maps, geolocate posts, and publish storymaps inside WordPress.
 
 == Installation ==
 
@@ -53,6 +27,40 @@ There, you can configure:
 * The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available by default;
 
 After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
+
+JEO includes:
+* [MapLibreGL](https://maplibre.org/maplibre-gl-js/docs/) by default, with optional external [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/);
+* Support for Mapbox-hosted layers, custom tile layers, and layer filtering;
+* Geocoded posts via [Nominatim](https://nominatim.org/);
+* Customizable marker icons;
+* Support for [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/).
+
+== Frequently Asked Questions ==
+
+= Which WordPress and PHP versions are validated? =
+
+Compatibility snapshot validated on March 17, 2026:
+
+* Primary support: PHP 8.2, 8.3, and 8.4;
+* Experimental monitoring: PHP 8.5;
+* Stable WordPress gate: WordPress 6.9.4 on PHP 8.2, 8.3, and 8.4;
+* Experimental WordPress gate: WordPress 6.9.4 on PHP 8.5;
+* Backward-compatibility smoke tests: WordPress 6.6 on PHP 8.0 and 8.1;
+* Forward-compatibility smoke tests: WordPress 7.0-beta4 on PHP 8.2, 8.3, 8.4, and experimentally on PHP 8.5;
+* Repository test scripts include static PHP 8.5 checks and experimental WordPress smoke coverage on PHP 8.5.
+
+= Which third-party services can JEO connect to? =
+
+JEO can connect to the following third-party services:
+
+* Mapbox, only when you select Mapbox as the rendering library or use Mapbox-hosted map resources. The site loads JavaScript/CSS from `api.mapbox.com`, and Mapbox receives the configured access token, visitor IP address, browser details, and requested map resources. Terms of Service: [https://www.mapbox.com/legal/tos](https://www.mapbox.com/legal/tos). Privacy Policy: [https://www.mapbox.com/legal/privacy](https://www.mapbox.com/legal/privacy).
+* Nominatim (OpenStreetMap), only when an editor explicitly runs an address search or reverse-geocodes a point in the post geolocation UI. The typed address or selected coordinates, the site URL in the request user agent, and the server IP address are sent to `nominatim.openstreetmap.org`. Usage Policy: [https://operations.osmfoundation.org/policies/nominatim/](https://operations.osmfoundation.org/policies/nominatim/). Privacy Policy: [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy).
+* OpenStreetMap raster tiles, used by the default MapLibre preview style. The tile service receives the visitor IP address, browser details, and requested tile URLs. Tile Usage Policy: [https://operations.osmfoundation.org/policies/tiles/](https://operations.osmfoundation.org/policies/tiles/). Privacy Policy: [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy).
+* Optional external typography and footer logo URLs, only when the site administrator explicitly configures those fields with an external host. In that case the visitor browser requests the asset directly from the chosen host, which may receive the visitor IP address, browser details, and referrer according to that provider's own terms and privacy policy.
+
+== Third Party Services ==
+
+See "Which third-party services can JEO connect to?" in the FAQ above for the required service disclosures.
 
 == Screenshots ==
 1. Map being displayed in a post
@@ -321,358 +329,13 @@ A legend can be of one of these types:
 
 On the **Related posts** panel, you can set which geolocated posts will be used as markers on the post. You can filter the posts by categories, tags, dates interval or, for advanced uses, meta queries using WordPress `post_meta`.
 
-== Other user tutorials ==
+= Where can I find more tutorials and developer documentation? =
 
-= Posts =
-# Geolocating posts
-
-When editing a post, JEO will add an extra panel to the sidebar: **Geolocation**. Clicking on **Geolocate this post**, a popup containing two tabs (**Map** and **List**) will then be displayed.
-
-New points can be added to the post by clicking on the **Add new point** button. You can search for a specific location in the search bar.
-
-It's also possible to choose the relevance of each point, which is useful when you have more than one point.
-
-## Map tab
-
-The Map tab allows you to move a point by dragging its marker and dropping it on the new location.
-
-## List tab
-
-The List tab allows you to visualize all the created points and delete a specific point.
-
-## Visualizing a map with geolocated posts
-
-Maps with geolocated posts contain markers on the localization of each post. Clicking on them will open a popup with their title and publication date. Clicking on the title will take you to the post itself.
-
-# Map shortcode
-
-A map can be inserted on any page or post using the `jeo-map` shortcode.
-
-The shortcode accepts three attributes:
-
-* `map_id` (required): The ID of the map you want to insert;
-* `width` (optional): The width of the map. It'll default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class;
-* `height` (optional): The height of the map. Will default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class.
-
-Examples:
-
-    [jeo-map map_id=99]
-
-You have to inform at least the ID of the Map you want to insert. By default, it will be inserted with a size of 600&times;600px (or whatever the active theme defines), but you can also change it:
-
-    [jeo-map map_id=99 width="800px" height="800px"]
-
-# Map block
-
-After creating maps, it is possible to display them apart or inside a block. This functionality makes it possible to group maps, increasing your post organization.
-
-## Displaying a map apart
-
-When creating a new post, note that is available a new block category: **JEO**.
-
-Selecting the **JEO Map** block, you can search for any map you've created.
-
-With a map selected, it is possible to choose an optional alignment (`Left`, `Right`, `Centre`, `Wide Width` or `Full Width`). `Centre` is the standard alignment.
-
-## Displaying grouped maps
-
-Besides the alignment option, there's also a group functionality available to arrange maps.
-
-## Visualizing a map into a post
-
-If your map has more than one layer, you can swap them and select which one you want to see, depending on the map layer settings.
-
-# One-time map block
-
-It is possible to use maps in posts without having to create a new map or using an existing one. For this, the JEO plugin makes available another type of block: **One-time map**.
-
-When creating a new post, note that is available a new block category: **JEO**.
-
-Selecting the **JEO One-time Map** block, a standard map preview will appear. This type of map allows all the same customizations as a normal JEO Map, such as modifying coordinates, zoom settings, related posts, alignment options and layers settings.
-
-# Embedding a map
-
-The JEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called `Embed map` and it's very easy to be done.
-
-When editing a Map, one of the setting panels is `Status & Visibility`. There you can find the `embed URL` of that specific map.
-
-Copying this link and pasting it on the post editor will result in an embedded map.
-
-**Warning**: If your post displays a *Not Found* error, do the following steps:
-
-1. Go to WordPress Dashboard > Settings > Permalinks;
-2. Change the Common Settings (you may change to a different setting and then change back to the original) and click on `Save Changes`.
-
-Now you should be able to see the embedded maps with no problems.
-
-== Troubleshooting ==
+Visit [https://www.jeowp.org/](https://www.jeowp.org/) for user guides, publishing tips, and developer extension examples.
 
 = Why do I see a "memory exhausted" fatal error when editing a storymap? =
 
-One likely reason is that the Gutenberg editor is failing to load all revisions to your post.
-
-We recommend keeping only the last 5 (five) revisions for each storymap -- see [Jetpack documentation](https://jetpack.com/resources/wordpress-revisions/) for more details.
-
-== Developer documentation ==
-
-= Tutorials =
-
-# Adding new Layer Types
-
-## Introduction
-
-In JEO, maps are rendered using the configured GL runtime. By default this is MapLibreGL, and when enabled it may be Mapbox GL JS loaded externally from Mapbox. Any new layer type will have to interact with this runtime-compatible map object to add the layer to the map.
-
-To add a new layer type, there are 2 simple steps:
-
-1. Register the new Layer type using a PHP hook, informing where is the main JavaScript file of your Layer Type;
-2. Create a JavaScript class implementing methods to add the layer to the map and to describe what are the options a layer of this type has.
-
-In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which extends the GL-based map runtime used by the layer) to the project.
-
-## Creating a new Layer Type
-
-First, let's register a new Layer Type by hooking up in the `jeo_register_layer_types` action:
-
-    add_action('jeo_register_layer_types', function($layer_types) {
-        $layer_types->register_layer_type( 'my-layer-type', [ 'script_url' => plugin_dir_url( __FILE__ ) . '/js/layertype.js' ] );
-    });
-
-The `register_layer_type` method gets 2 parameters.
-
-* Layer type slug - A unique sanitized string (make sure to make it unique)
-* Options - An array with the layer type options:
-  * `script_url`: Required. The absolute URL to your JavaScript file.
-  * `dependencies`: Optional. An array of script handles registered using [wp_register_script](https://developer.wordpress.org/reference/functions/wp_register_script/) that should be loaded as a dependency to the layer type main script
-
-That's all you need to do on the PHP side. All the magic happens in JavaScript.
-
-Now, let's create our `layertype.js` file.
-
-In this file, we are going to register a JavaScript object using the globally available `window.JeoLayerTypes.registerLayerType`.
-
-The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and the second parameter is an object with, at least, three methods.
-
-    window.JeoLayerTypes.registerLayerType('tilelayer', {
-
-        addStyle: function(map, attributes) {
-            // ...
-        },
-
-        addLayer: function(map, attributes) {
-            // ...
-        },
-
-        getSchema: function(attributes) {
-            // ...
-        }
-    });
-
-Your Layer Type object MUST implement at least these three methods.
-
-### getSchema(attributes)
-
-**params**:
-
-* `attributes` - object with the layer attributes (see the section below)
-
-**returns**:
-
-* Promise with JSON-schema
-
-This method will tell JEO which options the user has to fill in when creating a new layer of this type.
-
-For example, a raster tile layer type might have only a URL. A Mapbox layer has the Style ID and the optional Access token.
-
-This method must return a Promise with a JSON Schema representation of the layer type options.
-
-This schema must only include layer-type-specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.
-
-For example, the "Tile layer" layer type needs only a URL, so that's how its `getSchema` method will look like.
-
-    // ...
-
-    getSchema: function(attributes) {
-        return new Promise( function(resolve, reject) {
-
-            resolve({
-                "type": "object",
-                "required": [
-                    "url"
-                ],
-                "properties": {
-                    "url": {
-                        "type": "string",
-                        "title": "URL"
-                    }
-                }
-            });
-
-        });
-    }
-
-## addStyle(map, attributes)
-
-**params**:
-
-* `map` - the initialized map runtime object, compatible with the Mapbox GL JS / MapLibreGL APIs
-* `attributes` - object with the layer attributes (See Layer attributes section below)
-
-**returns**:
-
-* The return of a call to [`map.setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle)
-
-In the supported GL runtimes, every map has a [Style](https://docs.mapbox.com/mapbox-gl-js/style-spec/) as a base layer. This method will add the layer as the Map Style, using the [`setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) method of the active map object.
-
-This method will be invoked when a layer of this type is added to the map as the base layer.
-
-For example, the "Tile Layer" layer type sets the style as a raster layer:
-
-    // ...
-
-    addStyle: function(map, attributes) {
-        return map.setStyle({
-            'version': 8,
-            'sources': {
-                'raster-tiles': {
-                    'type': 'raster',
-                    'tiles': [attributes.layer_type_options.url],
-                    'tileSize': 256
-                }
-            },
-            'layers': [{
-                id: attributes.layer_id,
-                type: 'raster',
-                source: 'raster-tiles'
-            }]
-        })
-    }
-
-**Note**: The `attributes.layer_type_options` object holds all the properties declared in the `getSchema` method. That's why there is a `url` there! (See Layer attributes section below)
-
-## addLayer(map, attributes)
-
-**params**:
-
-* `map` - the initialized map runtime object, compatible with the Mapbox GL JS / MapLibreGL APIs
-* `attributes` - object with the layer attributes (See Layer attributes section below)
-
-**returns**:
-
-* The return of a call to [`map.addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer)
-
-This method will add the layer to the map using the [addLayer](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer) method of the [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object.
-
-This method will be invoked when a layer of this type is added to the map.
-
-For example, the "Tile Layer" layer type adds itself as a raster layer:
-
-    // ...
-
-    addLayer: function(map, attributes) {
-        var layer = {
-            id: attributes.layer_id,
-            source: {
-              type: 'raster',
-              tiles: [attributes.layer_type_options.url],
-              "tileSize": 256
-            },
-            type: 'raster'
-        };
-        if ( ! attributes.visible ) {
-            layer.layout = {
-                visibility: 'none'
-            };
-        }
-        return map.addLayer(layer);
-    }
-
-**Note:** This method must verify the value of `attributes.visible` to determine whether this layer should be visible when the map is initialized.
-
-## Layer attributes
-
-As you saw, each of the above methods gets an argument `attributes` as input. This argument holds all the information of the layer the user is editing or viewing.
-
-Some attributes are common to any layer type, and others are specific to a layer type. Every layer type-specific attribute a layer has is stored under the `layer_type_options` attributes.
-
-So these are the keys available in the `attributes` object:
-
-* `layer_id`: (integer) A unique ID that represents this layer and identifies it in the database
-* `layer_name`: (string) The layer name, given by the user
-* `visible`: (boolean) A flag indicating whether this layer should be visible when the map initializes
-* `layer_type_options`: (object) A object with all the layer type-specific attributes (those registered in the `getSchema` method)
-
-# Geographical Information of a post
-
-Each post can be related to one or more points on the map.
-
-For each point, JEO collects geographical information such as city and country names.
-
-## How geographical information is stored
-
-Each related point is stored as one entry of the `_related_point` metadata key. Each entry is an object with all the information retrieved by the geocoder.
-
-Here is an example of two entries related to the same post, that could be get using:
-
-    get_post_meta( $post_id, '_related_point' );
-
-    '_related_point' => [
-        'relevance' => 'primary',
-        '_geocode_lat' => '-23,54659435',
-        '_geocode_lon' => '-46,644533061712',
-        '_geocode_full_address' => 'Edifício Copan, Rua Araújo, Vila Buarque, República, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01046-010, Brasil',
-        '_geocode_country' => 'Brasil',
-        '_geocode_country_code' => '',
-        '_geocode_city' => 'São Paulo',
-        '_geocode_region_level_2' => 'São Paulo',
-        '_geocode_region_level_3' => 'Região Intermediária de São Paulo',
-        '_geocode_city_level_1' => 'Vila Buarque',
-    ],
-    '_related_point' => [
-        'relevance' => 'secondary',
-        '_geocode_lat' => '-23,183525102463',
-        '_geocode_lon' => '-46,898231506348',
-        '_geocode_full_address' => 'Rua Jorge Gebran, Parque do Colégio, Chácara Urbana, Jundiaí, Região Imediata de Jundiaí, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13209-090, Brasil',
-        '_geocode_country' => 'Brasil',
-        '_geocode_country_code' => '',
-        '_geocode_city' => 'Jundiaí',
-        '_geocode_region_level_2' => 'São Paulo',
-        '_geocode_region_level_3' => 'Região Intermediária de Campinas',
-        '_geocode_city_level_1' => 'Parque do Colégio',
-    ]
-
-## How to search for posts by geoinformation? (indexes)
-
-When you save geographical information of the points, JEO also creates other metadata that will allow developers to query posts by specific geographical information.
-
-Since each point is stored as serialized data in the database, this would not allow us to filter posts by `country_code` for example. That's why we create indexes.
-
-For the example above, this post would also have one individual metadata entry for each piece of information, like this:
-
-    [
-        '_geocode_lat_p' => '-23,54659435',
-        '_geocode_lon_p' => '-46,644533061712',
-        '_geocode_country_p' => 'Brasil',
-        '_geocode_country_code_p' => '',
-        '_geocode_city_p' => 'São Paulo',
-        '_geocode_region_level_2_p' => 'São Paulo',
-        '_geocode_region_level_3_p' => 'Região Intermediária de São Paulo',
-        '_geocode_city_level_1_p' => 'Vila Buarque',
-        '_geocode_lat_s' => '-23,183525102463',
-        '_geocode_lon_s' => '-46,898231506348',
-        '_geocode_country_s' => 'Brasil',
-        '_geocode_country_code_s' => '',
-        '_geocode_city_s' => 'Jundiaí',
-        '_geocode_region_level_2_s' => 'São Paulo',
-        '_geocode_region_level_3_s' => 'Região Intermediária de Campinas',
-        '_geocode_city_level_1_s' => 'Parque do Colégio',
-    ]
-
-Note: `_s` and `_p` suffixes indicate if the relevance of that information is primary or secondary.
-
-Note 2: Full addresses are not indexed
-
-Now we have all the information as individual metadata and this allows me to query them, however, the pairs are disconnected (if I had more than one primary point, it would be impossible to know what are the latitude-longitude pairs. That's why the information we actually use is the serialized object).
+One likely reason is that the Gutenberg editor is loading too many revisions of the post. We recommend keeping only the last 5 revisions for each storymap; see [Jetpack documentation](https://jetpack.com/resources/wordpress-revisions/) for more details.
 
 ### Fetching posts by geoinformation
 

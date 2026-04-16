@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 $disable_embed = get_post_meta( get_the_ID(), 'disable_embed', true ) === '1';
 $storymap_id   = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
 
@@ -32,12 +36,12 @@ if ( $disable_embed ) {
 	</div>
 
 	<?php
-		$img = \jeo_settings()->get_option( 'jeo_footer-logo' );
+		$img = \jeo_normalize_asset_url( \jeo_settings()->get_option( 'jeo_footer-logo' ) );
 	if ( ! empty( $img ) ) :
 		?>
 			<div class="embed-footer">
-				<a href="/">
-					<img src="<?php echo esc_url( $img ); ?>">
+				<a href="<?php echo esc_url( home_url( '/' ) ); ?>">
+					<img src="<?php echo esc_url( $img ); ?>" alt="" loading="lazy" decoding="async" style="max-width: min(240px, 100%); max-height: 30px; width: auto; height: auto; object-fit: contain;">
 				</a>
 			</div>
 	<?php endif; ?>

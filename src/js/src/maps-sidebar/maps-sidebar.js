@@ -27,7 +27,7 @@ function MapsSidebar( {
 	}, [ postMeta.layers ] );
 
 	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
-		path: '/wp/v2/map-layer',
+		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },

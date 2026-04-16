@@ -64,6 +64,28 @@ describe( 'buildAsyncComboboxOptions', () => {
 			{ item: baseOptions[ 1 ], label: 'Map Two', value: '11' },
 		] );
 	} );
+
+	it( 'returns a hidden placeholder option when empty state should stay suppressed', () => {
+		expect(
+			buildAsyncComboboxOptions( {
+				items: [],
+				getOptionLabel,
+				getOptionValue,
+				inputValue: 'Rua Example, 123',
+				selectedValue: 'Rua Example, 123',
+				hasFocus: true,
+				persistFreeText: false,
+				suppressEmptyState: true,
+			} )
+		).toEqual( [
+			{
+				label: 'Rua Example, 123',
+				value: 'Rua Example, 123',
+				__hidden: true,
+				disabled: true,
+			},
+		] );
+	} );
 } );
 
 describe( 'shouldIgnoreInitialEmptyInputValue', () => {

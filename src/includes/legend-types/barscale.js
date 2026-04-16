@@ -1,7 +1,7 @@
-( function() {
-const { __ } = wp.i18n;
+( () => {
+	const { __ } = wp.i18n;
 
-window.JeoLegendTypes.registerLegendType( 'barscale', {
+	window.JeoLegendTypes.registerLegendType( 'barscale', {
 	label: __( 'Color scale', 'jeo' ),
 
 	/**
@@ -66,5 +66,5 @@ window.JeoLegendTypes.registerLegendType( 'barscale', {
 
 		return container;
 	},
-} );
+	} );
 } )();

@@ -12,12 +12,17 @@ import {
 	getStoryRelatedCoordinates,
 } from '../../shared/story-geojson';
 import TagFilterControl from './tag-filter-control';
+import {
+	mergeUniqueStoriesById,
+	resolveStoriesPage,
+} from './stories-helpers';
 
 const POSTS_PER_PAGE = 30;
 const MEMOIZED_CATEGORIES = {};
 const STORIES_SOURCE_ID = 'storiesSource';
 const HOVERED_CLUSTER_LAYER_ID = 'hover-cluster-layer';
 const HOVERED_CLUSTER_COLOR = '#b1b1b1';
+const CLUSTER_INTERACTION_LAYER_IDS = [ 'cluster-layer', 'cluster-count' ];
 
 function getHoveredStoryId( feature ) {
 	return feature?.properties?.id ?? feature?.id ?? null;
@@ -56,8 +61,16 @@ function getHoveredClusterFeature( map, event ) {
 		return event.features[ 0 ];
 	}
 
+	const clusterLayers = CLUSTER_INTERACTION_LAYER_IDS.filter( ( layerId ) =>
+		map?.getLayer?.( layerId )
+	);
+
+	if ( ! clusterLayers.length ) {
+		return null;
+	}
+
 	const features = map.queryRenderedFeatures( event.point, {
-		layers: [ 'cluster-layer', 'cluster-count' ],
+		layers: clusterLayers,
 	} );
 
 	return features?.[ 0 ] ?? null;
@@ -94,8 +107,11 @@ function normalizeClusterIds( clusterIds = [] ) {
 
 function getClusterFeaturesInView( map ) {
 	const canvas = map?.getCanvas?.();
+	const clusterLayers = CLUSTER_INTERACTION_LAYER_IDS.filter( ( layerId ) =>
+		map?.getLayer?.( layerId )
+	);
 
-	if ( ! canvas ) {
+	if ( ! canvas || ! clusterLayers.length ) {
 		return [];
 	}
 
@@ -105,7 +121,7 @@ function getClusterFeaturesInView( map ) {
 			[ canvas.width, canvas.height ],
 		],
 		{
-			layers: [ 'cluster-layer', 'cluster-count' ],
+			layers: clusterLayers,
 		}
 	);
 	const uniqueClusterFeatures = new Map();
@@ -122,6 +138,31 @@ function getClusterFeaturesInView( map ) {
 	} );
 
 	return Array.from( uniqueClusterFeatures.values() );
+}
+
+function buildStoryBounds( coordinates = [] ) {
+	if ( ! Array.isArray( coordinates ) || ! coordinates.length ) {
+		return [];
+	}
+
+	return coordinates.reduce(
+		( bounds, [ longitude, latitude ] ) => {
+			return [
+				[
+					Math.min( bounds[ 0 ][ 0 ], longitude ),
+					Math.min( bounds[ 0 ][ 1 ], latitude ),
+				],
+				[
+					Math.max( bounds[ 1 ][ 0 ], longitude ),
+					Math.max( bounds[ 1 ][ 1 ], latitude ),
+				],
+			];
+		},
+		[
+			[ coordinates[ 0 ][ 0 ], coordinates[ 0 ][ 1 ] ],
+			[ coordinates[ 0 ][ 0 ], coordinates[ 0 ][ 1 ] ],
+		]
+	);
 }
 
 class Stories extends Component {
@@ -141,10 +182,12 @@ class Stories extends Component {
 		this.listHoveredStoryId = null;
 		this.storiesListRef = null;
 		this.storyCardElements = new Map();
+		this.hoverSuppressedUntil = 0;
 
 		// Story bindings
 		this.storyHovered = this.storyHovered.bind( this );
 		this.storyUnhover = this.storyUnhover.bind( this );
+		this.markListScrolling = this.markListScrolling.bind( this );
 		this.clearHoveredFeatureState = this.clearHoveredFeatureState.bind( this );
 		this.clearHoveredClusterState = this.clearHoveredClusterState.bind( this );
 		this.replaceHoveredFeatureState = this.replaceHoveredFeatureState.bind( this );
@@ -595,6 +638,10 @@ class Stories extends Component {
 		}
 	}
 
+	markListScrolling() {
+		this.hoverSuppressedUntil = Date.now() + 600;
+	}
+
 	buildPostsGeoJson( stories ) {
 		return buildRelatedPostsGeoJson( stories );
 	}
@@ -606,19 +653,11 @@ class Stories extends Component {
 		params = { ...defaultParams, ...params };
 
 		// Use constant POSTS_PER_PAGE if param per_page is not set
-		if ( ! params.hasOwnProperty( 'per_page' ) )
+		if ( ! Object.hasOwn( params, 'per_page' ) )
 			params.per_page = POSTS_PER_PAGE;
 
 		// Set or use param page
-		if ( ! params.hasOwnProperty( 'page' ) ) {
-			params.page = pageInfo.currentPage;
-
-			if ( ! ( params.page > pageInfo.totalPages ) ) {
-				params.page++;
-			}
-		} else {
-			params.page = 1;
-		}
+		params.page = resolveStoriesPage( params, pageInfo );
 
 		// Update storiesLoaded to display loading & set current page to param
 		this.props.updateState( {
@@ -627,7 +666,7 @@ class Stories extends Component {
 		} );
 
 		// Update using cumulative param for stories - infinite scrolling
-		if ( params.hasOwnProperty( 'cumulative' ) && params.cumulative ) {
+		if ( Object.hasOwn( params, 'cumulative' ) && params.cumulative ) {
 			// Cancel request if page exceed the max page;
 			if ( params.page > pageInfo.totalPages ) {
 				return Promise.reject();
@@ -662,7 +701,10 @@ class Stories extends Component {
 					);
 
 					let storiesCumulative = params.cumulative
-						? [ ...this.props.stories, ...geolocatedStories ]
+						? mergeUniqueStoriesById(
+							this.props.stories,
+							geolocatedStories
+						)
 						: geolocatedStories;
 
 					// Fetch medias
@@ -753,7 +795,12 @@ class Stories extends Component {
 								accumulator.then(_ => currentValue),
 							Promise.resolve()
 						).then( () => {
-							storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
+							storiesCumulative = params.cumulative
+								? mergeUniqueStoriesById(
+									this.props.stories,
+									geolocatedStories
+								)
+								: geolocatedStories;
 
 							const reusableParams = {...params};
 
@@ -834,11 +881,15 @@ class Stories extends Component {
 	}
 
 	storyHovered( story ) {
+		if ( Date.now() < this.hoverSuppressedUntil || ! this.props.storiesLoaded ) {
+			return;
+		}
+
 		const map = this.props.map;
-		const bounds = getStoryRelatedCoordinates( story );
+		const coordinates = getStoryRelatedCoordinates( story );
 		const featureIds = getStoryFeatureIds( story );
 
-		if ( ! bounds.length ) {
+		if ( ! coordinates.length ) {
 			return;
 		}
 
@@ -850,16 +901,16 @@ class Stories extends Component {
 		this.replaceHoveredFeatureState( featureIds );
 		this.clearHoveredClusterState();
 
-		if ( bounds.length === 1 ) {
+		if ( coordinates.length === 1 ) {
 			map.flyTo( {
 				center: {
-					lng: bounds[ 0 ][ 0 ],
-					lat: bounds[ 0 ][ 1 ],
+					lng: coordinates[ 0 ][ 0 ],
+					lat: coordinates[ 0 ][ 1 ],
 				},
 				zoom: 7,
 			} );
 		} else {
-			map.fitBounds( bounds, { padding: 100 } );
+			map.fitBounds( buildStoryBounds( coordinates ), { padding: 100 } );
 		}
 
 		window.requestAnimationFrame( () => {
@@ -1017,7 +1068,12 @@ class Stories extends Component {
 					</div>
 				) }
 
-				<div className="stories" ref={ this.registerStoriesList }>
+				<div
+					className="stories"
+					ref={ this.registerStoriesList }
+					onWheelCapture={ this.markListScrolling }
+					onTouchMove={ this.markListScrolling }
+				>
 					{ this.props.stories.map( ( story, index ) => {
 						return (
 							<Storie
@@ -1028,7 +1084,7 @@ class Stories extends Component {
 								onHover={ () => this.storyHovered( story ) }
 								onUnhover={ () => this.storyUnhover( story ) }
 								story={ story }
-								key={ index }
+								key={ story.id }
 								map={ this.props.map }
 							/>
 						);

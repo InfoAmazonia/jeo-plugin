@@ -17,7 +17,7 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 	const instanceId = useId();
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
-		setKey( key + 1 );
+		setKey( ( currentKey ) => currentKey + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
 	const decodeHtmlEntity = function ( str ) {
@@ -38,9 +38,13 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 		}
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ loadedMap?.meta.layers ] );
+	const layerSettingsKey = useMemo(
+		() => JSON.stringify( loadedMap?.meta.layers || [] ),
+		[ loadedMap?.meta.layers ]
+	);
 
 	const { records: loadedLayers = [] } = useRecordsByIds( {
-		path: '/wp/v2/map-layer',
+		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
@@ -53,7 +57,7 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 				<>
 					<div className="jeo-preview-area">
 						<Map
-							key={ key }
+							key={ `${ key }:${ layerSettingsKey }` }
 							ref={ mapRef }
 							onStyleData={ () => {
 								const { current: map } = mapRef;
