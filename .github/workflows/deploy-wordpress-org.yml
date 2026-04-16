@@ -1,0 +1,63 @@
+name: Deploy to WordPress.org
+on:
+  push:
+    tags:
+    - "*.*.*"
+    - "!*-*"
+
+permissions:
+  contents: write
+jobs:
+  tag:
+    name: Stable tag deploy
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 24
+        cache: npm
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.4'
+        coverage: none
+        tools: wp-cli
+    - name: Check supported runtime
+      run: npm run check:env
+    - name: Install frontend dependencies
+      run: |
+        npm ci
+    - name: Validate release metadata
+      run: node scripts/validate-release-meta.mjs
+    - name: Validate frontend build and tests
+      run: |
+        npm run test:unit
+        npm run build:release
+        npm run build:report
+    - name: Prepare Plugin Check build
+      run: |
+        rm -rf "${RUNNER_TEMP}/plugin-check-build"
+        mkdir -p "${RUNNER_TEMP}/plugin-check-build/jeo"
+        rsync -a --delete src/ "${RUNNER_TEMP}/plugin-check-build/jeo/"
+    - name: Run WordPress Plugin Check
+      uses: wordpress/plugin-check-action@v1
+      with:
+        build-dir: ${{ runner.temp }}/plugin-check-build/jeo
+        slug: jeo
+        include-experimental: false
+    - name: WordPress Plugin Deploy
+      id: wordpress_org_deploy
+      uses: 10up/action-wordpress-plugin-deploy@stable
+      with:
+        generate-zip: true
+      env:
+        SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+        SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+        SLUG: jeo # optional, remove if GitHub repo name matches SVN slug, including capitalization
+        BUILD_DIR: src
+        ASSETS_DIR: .wordpress-org
+    - name: Publish GitHub release
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.wordpress_org_deploy.outputs.zip-path }}
+        generate_release_notes: true

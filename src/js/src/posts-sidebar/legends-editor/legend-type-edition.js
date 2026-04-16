@@ -1,37 +1,19 @@
-import { Component, Fragment } from '@wordpress/element';
+import { Fragment } from '@wordpress/element';
 import CircleEditor from './editors/circle';
 import BarscaleEditor from './editors/barscale';
 import SimplecolorEditor from './editors/simplecolor';
 import IconsEditor from './editors/icons';
 
-class LegendTypeEdition extends Component {
-	constructor( props ) {
-		super( props );
+function LegendTypeEdition( { legendObject, hasChanged } ) {
+	const legendType = legendObject?.legendSlug || 'barscale';
+	const typesEditorComponents = {
+		circles: <CircleEditor legendObject={ legendObject } hasChanged={ hasChanged } />,
+		barscale: <BarscaleEditor legendObject={ legendObject } hasChanged={ hasChanged } />,
+		icons: <IconsEditor legendObject={ legendObject } hasChanged={ hasChanged } />,
+		'simple-color': <SimplecolorEditor legendObject={ legendObject } hasChanged={ hasChanged } />,
+	};
 
-		this.hasChanged = this.hasChanged.bind( this );
-		this.legendTypes = Object.keys( JeoLegendTypes.legendTypes );
-	}
-
-	hasChanged( legendObject ) {
-		this.props.hasChanged( legendObject );
-	}
-
-	render() {
-		const typesEditorComponents = {
-			circles: <CircleEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></CircleEditor>,
-			barscale: <BarscaleEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></BarscaleEditor>,
-			icons: <IconsEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></IconsEditor>,
-			'simple-color': <SimplecolorEditor legendObject={ this.props.legendObject } hasChanged={ this.hasChanged } ></SimplecolorEditor>,
-		};
-
-		const legendTypeEdition = typesEditorComponents[ this.props.legendObject.legendSlug ];
-
-		return (
-			<Fragment>
-				{ legendTypeEdition }
-			</Fragment>
-		);
-	}
+	return <Fragment>{ typesEditorComponents[ legendType ] || null }</Fragment>;
 }
 
 export default LegendTypeEdition;

@@ -1,5 +1,8 @@
-window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
-	label: 'Vector Mapbox Tiled Source',
+( () => {
+	const { __ } = wp.i18n;
+
+	window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
+	label: __( 'Vector Mapbox Tiled Source', 'jeo' ),
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -64,18 +67,21 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			properties: {
 				tileset_id: {
 					type: 'string',
-					title: 'Tileset ID',
-					description: 'Example: username.tilesetid',
+					title: __( 'Tileset ID', 'jeo' ),
+					description: __( 'Example: username.tilesetid', 'jeo' ),
 				},
 				source_layer: {
 					type: 'string',
-					title: 'Source layer',
-					description: 'Which data the map should display.',
+					title: __( 'Source layer', 'jeo' ),
+					description: __( 'Which data the map should display.', 'jeo' ),
 				},
 				type: {
-					title: 'Layer Type',
+					title: __( 'Layer Type', 'jeo' ),
 					description:
-						'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.						',
+						__(
+							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
+							'jeo'
+						),
 					type: 'string',
 					default: 'fill',
 					enum: [
@@ -90,8 +96,8 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 					],
 				},
 				style_source_type: {
-					title: 'Style Source Type',
-					description: 'The layer source type style',
+					title: __( 'Style Source Type', 'jeo' ),
+					description: __( 'The layer source type style', 'jeo' ),
 					type: 'string',
 					default: 'vector',
 					disabled: true,
@@ -99,4 +105,5 @@ window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-vector', {
 			},
 		};
 	},
-} );
+	} );
+} )();

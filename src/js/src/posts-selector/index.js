@@ -1,25 +1,27 @@
-import { withSelect, withDispatch } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { CheckboxControl } from '@wordpress/components';
+import { CheckboxControl } from '../shared/wp-form-controls';
 
+import { updateRelatedPostsDate } from './date-range';
+import { normalizeRelatedPosts } from './defaults';
 import { IntervalSelector } from './interval-selector';
 import { MetaSelector } from './meta-selector';
-import { TokensSelector } from './tokens-selector';
+import { AsyncTokensSelector } from './async-tokens-selector';
 
 import './index.css';
 
 const PostsSelector = ( {
-	loadedCategories,
-	loadingCategories,
-	loadedTags,
-	loadingTags,
 	relatedPosts,
 	setRelatedPosts,
 	renderPanel: Panel,
-	postMeta,
-	setPostMeta,
 } ) => {
+	const postMeta = useSelect(
+		( select ) => select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
+		[]
+	);
+	const normalizedRelatedPosts = normalizeRelatedPosts( relatedPosts );
+	const { editPost } = useDispatch( 'core/editor' );
+	const setPostMeta = ( meta ) => editPost( { meta } );
 
 	return (
 		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
@@ -31,60 +33,70 @@ const PostsSelector = ( {
 					setPostMeta( {
 						...postMeta,
 						relate_posts: ! postMeta.relate_posts,
+						related_posts: normalizedRelatedPosts,
 					} );
 				} }
 			/>
 
 			{ postMeta.relate_posts && (
 				<>
-					{ loadedCategories && (
-						<TokensSelector
-							label={ __( 'Categories', 'jeo' ) }
-							collection={ loadedCategories }
-							loadingCollection={ loadingCategories }
-							value={ relatedPosts.categories }
-							onChange={ ( tokens ) => {
-								setRelatedPosts( { ...relatedPosts, categories: tokens } );
-							} }
-						/>
-					) }
+					<AsyncTokensSelector
+						path="/wp/v2/categories"
+						label={ __( 'Categories', 'jeo' ) }
+						value={ normalizedRelatedPosts.categories }
+						onChange={ ( tokens ) => {
+							setRelatedPosts( {
+								...normalizedRelatedPosts,
+								categories: tokens,
+							} );
+						} }
+					/>
 
-					{ loadedTags && (
-						<TokensSelector
-							label={ __( 'Tags', 'jeo' ) }
-							collection={ loadedTags }
-							loadingCollection={ loadingTags }
-							value={ relatedPosts.tags }
-							onChange={ ( tokens ) => {
-								setRelatedPosts( { ...relatedPosts, tags: tokens } );
-							} }
-						/>
-					) }
+					<AsyncTokensSelector
+						path="/wp/v2/tags"
+						label={ __( 'Tags', 'jeo' ) }
+						value={ normalizedRelatedPosts.tags }
+						onChange={ ( tokens ) => {
+							setRelatedPosts( {
+								...normalizedRelatedPosts,
+								tags: tokens,
+							} );
+						} }
+					/>
 
 					<IntervalSelector
-						startDate={ relatedPosts.after }
-						endDate={ relatedPosts.before }
+						startDate={ normalizedRelatedPosts.after }
+						endDate={ normalizedRelatedPosts.before }
 						startLabel={ __( 'Start date', 'jeo' ) }
 						endLabel={ __( 'End date', 'jeo' ) }
 						onStartChange={ ( date ) => {
-							setRelatedPosts( {
-								...relatedPosts,
-								after: date ? date.toISOString() : undefined,
-							} );
+							setRelatedPosts(
+								updateRelatedPostsDate(
+									normalizedRelatedPosts,
+									'after',
+									date
+								)
+							);
 						} }
 						onEndChange={ ( date ) => {
-							setRelatedPosts( {
-								...relatedPosts,
-								before: date ? date.toISOString() : undefined,
-							} );
+							setRelatedPosts(
+								updateRelatedPostsDate(
+									normalizedRelatedPosts,
+									'before',
+									date
+								)
+							);
 						} }
 					/>
 
 					<MetaSelector
 						label={ __( 'Meta queries', 'jeo' ) }
-						value={ relatedPosts.meta_query }
+						value={ normalizedRelatedPosts.meta_query }
 						onChange={ ( queries ) => {
-							setRelatedPosts( { ...relatedPosts, meta_query: queries } );
+							setRelatedPosts( {
+								...normalizedRelatedPosts,
+								meta_query: queries,
+							} );
 						} }
 					/>
 				</>
@@ -93,27 +105,4 @@ const PostsSelector = ( {
 	);
 };
 
-export default withDispatch( ( dispatch ) => ( {
-	setPostMeta: ( meta ) => {
-		dispatch( 'core/editor' ).editPost( { meta } );
-	},
-} ) )(
-	withSelect( ( select ) => ( {
-		loadedCategories: select( 'core' ).getEntityRecords(
-			'taxonomy',
-			'category'
-		),
-		loadingCategories: select( 'core/data' ).isResolving(
-			'core',
-			'getEntityRecords',
-			[ 'taxonomy', 'category' ]
-		),
-		loadedTags: select( 'core' ).getEntityRecords( 'taxonomy', 'post_tag' ),
-		loadingTags: select( 'core/data' ).isResolving(
-			'core',
-			'getEntityRecords',
-			[ 'taxonomy', 'post_tag' ]
-		),
-		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-	} ) )( PostsSelector )
-);
+export default PostsSelector;

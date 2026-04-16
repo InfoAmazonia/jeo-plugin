@@ -1,67 +1,103 @@
-.react-autosuggest__container {
+.jeo-map-autosuggest .components-base-control,
+.search-adress-input .components-base-control {
+	margin-bottom: 0;
+}
+
+.jeo-map-autosuggest .components-combobox-control,
+.search-adress-input .components-combobox-control {
 	position: relative;
 }
 
-.react-autosuggest__input {
+.jeo-map-autosuggest .components-combobox-control__input,
+.search-adress-input .components-combobox-control__input {
 	width: 240px;
 	height: 30px;
 	padding: 10px 20px;
 	font-family: Helvetica, sans-serif;
 	font-weight: 300;
 	font-size: 16px;
-	border: 1px solid #aaa;
+	color: #1d2327;
+	border: 1px solid #8c8f94;
 	border-radius: 4px;
+	background: #fff;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease,
+		background-color 0.15s ease;
 }
 
-.react-autosuggest__input:focus {
+.jeo-map-autosuggest .components-combobox-control__input:focus,
+.search-adress-input .components-combobox-control__input:focus {
 	outline: none;
+	border-color: var( --wp-admin-theme-color, #3858e9 );
+	box-shadow: 0 0 0 1px var( --wp-admin-theme-color, #3858e9 );
 }
 
-.react-autosuggest__container--open .react-autosuggest__input {
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0;
+.jeo-map-autosuggest .components-combobox-control__suggestions-container,
+.search-adress-input .components-combobox-control__suggestions-container {
+	position: relative;
+	top: 0;
+	width: 100%;
+	border: 0;
+	background: transparent;
+	box-shadow: none;
+	z-index: auto;
 }
 
-.react-autosuggest__suggestions-container {
-	display: none;
-}
-
-.react-autosuggest__container--open .react-autosuggest__suggestions-container {
-	display: block;
+.jeo-map-autosuggest .components-form-token-field__suggestions-list,
+.search-adress-input .components-form-token-field__suggestions-list {
 	position: absolute;
-	top: 51px;
-	width: 280px;
-	border: 1px solid #aaa;
+	top: calc( 100% + 1px );
+	inset-inline-start: 0;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+	border: 1px solid #c3c4c7;
 	background-color: #fff;
 	font-family: Helvetica, sans-serif;
 	font-weight: 300;
 	font-size: 16px;
 	border-bottom-left-radius: 4px;
 	border-bottom-right-radius: 4px;
-	/* z-index: 2; */
 	z-index: 3;
+	box-shadow: 0 8px 24px rgba( 0, 0, 0, 0.08 );
 }
 
-.react-autosuggest__suggestions-list {
-	margin: 0;
-	padding: 0;
-	list-style-type: none;
-}
-
-.react-autosuggest__suggestion {
+.jeo-map-autosuggest .components-form-token-field__suggestion,
+.search-adress-input .components-form-token-field__suggestion {
 	cursor: pointer;
 	padding: 10px 20px;
 	overflow-wrap: break-word;
+	margin: 0;
+	color: #1d2327;
+	background: #fff;
+	transition: background-color 0.15s ease, color 0.15s ease;
 }
 
-.react-autosuggest__suggestion:not(:first-child) {
+.jeo-map-autosuggest
+	.components-form-token-field__suggestion:not(:first-child),
+.search-adress-input
+	.components-form-token-field__suggestion:not(:first-child) {
 	border-top: 1px solid #ddd;
 }
 
-.react-autosuggest__suggestion--focused {
-	/* background-color: #0C7EAF; */
-	background-color: blueviolet;
+.jeo-map-autosuggest .components-form-token-field__suggestion:hover,
+.search-adress-input .components-form-token-field__suggestion:hover {
+	background-color: #f0f0f1;
+}
+
+.jeo-map-autosuggest
+	.components-form-token-field__suggestion.is-selected,
+.search-adress-input
+	.components-form-token-field__suggestion.is-selected {
+	background-color: var( --wp-admin-theme-color, #3858e9 );
 	color: #fff;
+}
+
+.jeo-map-autosuggest
+	.components-form-token-field__suggestion.is-selected:hover,
+.search-adress-input
+	.components-form-token-field__suggestion.is-selected:hover {
+	background-color: var( --wp-admin-theme-color-darker-10, #2145e6 );
 }
 
 .jeo-preview-controls {
@@ -73,10 +109,119 @@
 	margin-inline-start: 10px;
 }
 
+.wp-block-jeo-embedded-storymap .jeo-map-autosuggest .components-base-control,
+.wp-block-jeo-embedded-storymap .jeo-map-autosuggest .components-combobox-control,
+.wp-block-jeo-embedded-storymap .jeo-map-autosuggest .components-base-control__field {
+	width: 100%;
+}
+
+.wp-block-jeo-embedded-storymap .jeo-map-autosuggest .components-combobox-control__input {
+	width: 100%;
+	max-width: 100%;
+}
+
+.wp-block-jeo-embedded-storymap
+	.jeo-map-autosuggest
+	.components-form-token-field__suggestions-list {
+	position: relative;
+	top: 0;
+	width: 100%;
+	margin-top: 4px;
+	z-index: auto;
+}
+
 .wp-block[data-type="jeo/map"] .jeo-preview-controls {
 	display: none;
 }
 
 .wp-block[data-type="jeo/map"]:focus-within .jeo-preview-controls {
 	display: flex;
+}
+
+/* Editor-only preview blocks: full-width inside the iframe editor.
+   With align:'full', Gutenberg applies negative margins to stretch the
+   block wrapper beyond the content column.  We must NOT override
+   width (it needs to stay 'auto' so the negative margins work). */
+.wp-block-jeo-map-editor,
+.wp-block-jeo-layer-editor {
+	box-sizing: border-box;
+}
+
+/* Ensure the preview area inside fills the full extended width */
+.wp-block-jeo-map-editor .jeo-preview-area,
+.wp-block-jeo-layer-editor .jeo-preview-area {
+	width: 100%;
+}
+
+/* Content editor map blocks need an explicit width when floated left/right.
+   Otherwise the wrapper can shrink to 0 because the interactive map internals
+   are absolutely positioned. */
+.wp-block-jeo-map.alignleft,
+.wp-block-jeo-map.alignright {
+	--jeo-aligned-map-base-width: var( --wp--style--global--content-size, 645px );
+	--jeo-aligned-map-expanded-width: calc( var( --jeo-aligned-map-base-width ) * 1.6 );
+	box-sizing: border-box;
+	display: table;
+	max-width: none;
+	width: auto;
+}
+
+.wp-block-jeo-map.alignleft {
+	margin-right: 1em;
+	margin-left: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-map.alignright {
+	margin-left: 1em;
+	margin-right: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-map.alignleft .jeo-preview-area,
+.wp-block-jeo-map.alignright .jeo-preview-area,
+.wp-block-jeo-map.alignleft .mapboxgl-map,
+.wp-block-jeo-map.alignright .mapboxgl-map,
+.wp-block-jeo-map.alignleft .maplibregl-map,
+.wp-block-jeo-map.alignright .maplibregl-map {
+	max-width: none;
+	width: 100%;
+}
+
+.wp-block-jeo-map.alignleft .jeo-preview-area,
+.wp-block-jeo-map.alignright .jeo-preview-area {
+	min-width: min( var( --jeo-aligned-map-base-width ), calc( 100vw - 2rem ) );
+	width: min( var( --jeo-aligned-map-expanded-width ), calc( 100vw - 2rem ) );
+}
+
+@media (max-width: 782px) {
+	.wp-block-jeo-map.alignleft,
+	.wp-block-jeo-map.alignright {
+		display: block;
+		float: none;
+		margin-left: 0;
+		margin-right: 0;
+		width: 100%;
+	}
+
+	.wp-block-jeo-map.alignleft .jeo-preview-area,
+	.wp-block-jeo-map.alignright .jeo-preview-area,
+	.wp-block-jeo-map.alignleft .mapboxgl-map,
+	.wp-block-jeo-map.alignright .mapboxgl-map,
+	.wp-block-jeo-map.alignleft .maplibregl-map,
+	.wp-block-jeo-map.alignright .maplibregl-map {
+		min-width: 0;
+		width: 100%;
+	}
+}
+
+/* Hide the block selection outline and toolbar for editor-only preview blocks.
+   The toolbar is rendered as a popover so we target it via the selected block
+   class and the popover container that appears above the block. */
+.wp-block-jeo-map-editor.is-selected,
+.wp-block-jeo-layer-editor.is-selected {
+	outline: none !important;
+	box-shadow: none !important;
 }

@@ -1,5 +1,8 @@
-window.JeoLayerTypes.registerLayerType( 'tilelayer', {
-	label: 'Raster Tiled Source',
+( () => {
+	const { __ } = wp.i18n;
+
+	window.JeoLayerTypes.registerLayerType( 'tilelayer', {
+	label: __( 'Raster Tiled Source', 'jeo' ),
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -51,17 +54,21 @@ window.JeoLayerTypes.registerLayerType( 'tilelayer', {
 			properties: {
 				url: {
 					type: 'string',
-					title: 'URL',
+					title: __( 'URL', 'jeo' ),
 				},
 				scheme: {
 					type: 'string',
-					title: 'Scheme',
-					description: 'Influences the Y direction of the tile coordinates.',
+					title: __( 'Scheme', 'jeo' ),
+					description: __( 'Influences the Y direction of the tile coordinates.', 'jeo' ),
 					enum: ['xyz', 'tms'],
-					enumNames: ['Slippy Map tilenames (XYZ)', 'OSGeo spec (TMS)'],
+					enumNames: [
+						__( 'Slippy Map tilenames (XYZ)', 'jeo' ),
+						__( 'OSGeo spec (TMS)', 'jeo' ),
+					],
 					default: 'xyz',
 				}
 			},
 		};
 	},
-} );
+	} );
+} )();

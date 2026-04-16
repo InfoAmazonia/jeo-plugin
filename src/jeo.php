@@ -1,13 +1,20 @@
 <?php
 /**
+ * Bootstrap the JEO plugin.
+ *
  * @package           Jeo
  *
  * @wordpress-plugin
- * Plugin Name:       JEO WP
- * Description:       Interactive Map blocks for WordPress Gutenberg
+ * Plugin Name:       JEO Maps
+ * Plugin URI:        https://www.jeowp.org/
+ * Description:       Interactive maps for the WordPress block editor
  * Version:           3.0.0-rc.3
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Author:            InfoAmazonia
+ * Author URI:        https://www.jeowp.org/
+ * Requires at least: 6.6
+ * Requires PHP:      8.0
+ * License:           GPL-3.0-only
+ * License URI:       https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
  * Text Domain:       jeo
  * Domain Path:       /languages
  */

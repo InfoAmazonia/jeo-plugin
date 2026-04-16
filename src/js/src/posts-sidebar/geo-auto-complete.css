@@ -1,15 +1,109 @@
-.react-autosuggest__suggestion {
+.search-adress-input .components-form-token-field__suggestion {
 	margin: 0;
 }
 
-.react-autosuggest__suggestion:nth-of-type(even) {
-	background-color: #f9f9f9;
+.search-adress-input .components-form-token-field__suggestion:nth-of-type(even) {
+	background-color: #f6f7f7;
 }
 
-.react-autosuggest__suggestion:hover {
-	background-color: aliceblue;
+.search-adress-input .components-form-token-field__suggestion:hover {
+	background-color: #f0f0f1;
 }
 
 .jeo-geo-autocomplete {
 	padding: 5px;
+}
+
+.jeo-geo-autocomplete__controls {
+	display: flex;
+	flex-wrap: nowrap;
+	gap: 8px;
+	align-items: flex-end;
+	max-width: 100%;
+}
+
+.jeo-geo-autocomplete__field {
+	flex: 1 1 280px;
+	min-width: 0;
+}
+
+.jeo-geo-autocomplete__field > div,
+.jeo-geo-autocomplete__field > div > div {
+	width: 100%;
+	min-width: 0;
+}
+
+.jeo-geo-autocomplete__controls .components-base-control,
+.jeo-geo-autocomplete__controls .components-base-control__field,
+.jeo-geo-autocomplete__controls .components-combobox-control,
+.jeo-geo-autocomplete__controls .components-combobox-control__suggestions-container,
+.jeo-geo-autocomplete__controls .components-flex,
+.jeo-geo-autocomplete__controls .components-flex-item,
+.jeo-geo-autocomplete__controls .components-flex-block,
+.jeo-geo-autocomplete__controls .components-form-token-field__input-container {
+	width: 100%;
+	min-width: 0;
+	margin: 0;
+}
+
+.jeo-geo-autocomplete__controls .components-flex,
+.jeo-geo-autocomplete__controls .components-flex-item,
+.jeo-geo-autocomplete__controls .components-flex-block,
+.jeo-geo-autocomplete__controls .components-form-token-field__input-container {
+	flex: 1 1 auto;
+}
+
+.jeo-geo-autocomplete__controls
+	.components-combobox-control__suggestions-container {
+	width: 100%;
+}
+
+.jeo-geo-autocomplete__controls
+	input.components-combobox-control__input.components-form-token-field__input {
+	flex: 1 1 auto;
+	width: 100% !important;
+	min-width: 0 !important;
+	max-width: none !important;
+	box-sizing: border-box;
+}
+
+.jeo-geo-autocomplete__controls > .components-button,
+.jeo-geo-autocomplete__controls > .jeo-geo-autocomplete__button {
+	flex: 0 0 auto;
+	margin: 0;
+	align-self: flex-end;
+	white-space: nowrap;
+	height: 30px;
+	min-height: 30px;
+	padding-block: 0;
+}
+
+.search-adress-input {
+	inline-size: min( calc( 100% - 20px ), 360px );
+	max-inline-size: calc( 100% - 20px );
+}
+
+.search-adress-input .jeo-geo-autocomplete__field {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.jeo-async-combobox
+	.components-form-token-field__suggestion:has(> .jeo-async-combobox__hidden-option) {
+	display: none;
+	padding: 0;
+	border: 0;
+}
+
+.jeo-async-combobox
+	.components-combobox-control__suggestions-container:has(
+		.jeo-async-combobox__hidden-option
+	):not(
+		:has(
+			.components-form-token-field__suggestion:not(
+				:has(> .jeo-async-combobox__hidden-option)
+			)
+		)
+	) {
+	display: none;
 }

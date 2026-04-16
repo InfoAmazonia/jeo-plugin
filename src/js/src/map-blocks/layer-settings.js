@@ -1,8 +1,8 @@
-import { CheckboxControl, Dashicon, SelectControl } from '@wordpress/components';
+import { Dashicon } from '@wordpress/components';
 import { useState } from '@wordpress/element';
-import { Draggable } from 'react-beautiful-dnd';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
+import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
 
 import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';
@@ -23,6 +23,7 @@ const decodeHtmlEntity = function ( str ) {
 
 const LayerSettings = (
 	{
+		itemProps,
 		index: layerIndex,
 		isDragged,
 		isOutOfBounds,
@@ -39,11 +40,13 @@ const LayerSettings = (
 	}
 ) => {
 	const classes = classNames( [
+		'jeo-map-layer-item',
 		'layer',
 		{ dragging: isDragged },
 		{ selected: isSelected },
 		{ isoutofbounds: isOutOfBounds },
 	] );
+	const rootProps = itemProps || {};
 
 	const [ showStyleLayers, setshowStyleLayers ] = useState( false );
 
@@ -63,21 +66,11 @@ const LayerSettings = (
 	};
 
 	return (
-		<Draggable
-			key={ String( settings.id ) }
-			draggableId={ String( settings.id ) }
-			index={ layerIndex }
-		>
-			{ ( provided ) => {
-				if(!settings.layer) {
-					return null;
-				}
-
-				return (settings.layer && <div
-					ref={ provided.innerRef }
-					{ ...provided.draggableProps }
-					{ ...provided.dragHandleProps }
-					className={ classes }
+		<>
+			{ settings.layer && (
+				<div
+					{ ...rootProps }
+					className={ classNames( classes, rootProps.className ) }
 				>
 					<div className="handle" style={ setWidth( 0 ) }>
 						<Dashicon className="drag-handle" icon="move" data-movable-handle />
@@ -130,13 +123,13 @@ const LayerSettings = (
 					<div className="default-control" style={ setWidth( 5 ) }>
 						{ ! settings.layer.meta.use_legend && (
 							<p>
-								<em>No Legend</em>
+								<em>{ __( 'No legend', 'jeo' ) }</em>
 							</p>
 						) }
 						{ settings.layer.meta.use_legend && (
 							<CheckboxControl
 								label={ __( 'Show legend', 'jeo' ) }
-								checked={ settings.show_legend }
+								checked={ settings.show_legend !== false }
 								onChange={ switchShowLegend }
 							/>
 						) }
@@ -194,7 +187,7 @@ const LayerSettings = (
 					{ settings.load_as_style && showStyleLayers && (
 						<>
 							<div className="informative-message">
-								{ __("If the layer is not visible inside Mapbox Studio we will not be able to control the displayment.", "jeo") }
+								{ __( 'If the layer is not visible in Mapbox Studio, we will not be able to control its visibility.', 'jeo' ) }
 							</div>
 
 							<div className="layers-selector">
@@ -254,9 +247,8 @@ const LayerSettings = (
 						</>
 					) }
 				</div>
-			)
-			} }
-		</Draggable>
+			) }
+		</>
 	);
 };
 

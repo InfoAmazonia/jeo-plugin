@@ -1,6 +1,16 @@
 <?php
-	get_header();
-	the_post();
+/**
+ * Single storymap template.
+ *
+ * @package Jeo
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+get_header();
+the_post();
 ?>
 
 <div class="content">

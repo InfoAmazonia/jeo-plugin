@@ -1,0 +1,120 @@
+name: WordPress Smoke Tests
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  wordpress-smoke:
+    name: ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.0'
+            wordpress: '6.6'
+            label: WordPress 6.6 on PHP 8.0 (backward-compat, non-blocking)
+            experimental: true
+          - php: '8.1'
+            wordpress: '6.6'
+            label: WordPress 6.6 on PHP 8.1 (backward-compat, non-blocking)
+            experimental: true
+          - php: '8.2'
+            wordpress: '6.9.4'
+            label: WordPress 6.9.4 on PHP 8.2
+            experimental: false
+          - php: '8.3'
+            wordpress: '6.9.4'
+            label: WordPress 6.9.4 on PHP 8.3
+            experimental: false
+          - php: '8.4'
+            wordpress: '6.9.4'
+            label: WordPress 6.9.4 on PHP 8.4
+            experimental: false
+          - php: '8.5'
+            wordpress: '6.9.4'
+            label: WordPress 6.9.4 on PHP 8.5 (experimental, non-blocking)
+            experimental: true
+          - php: '8.2'
+            wordpress: '7.0-beta4'
+            label: WordPress 7.0-beta4 on PHP 8.2 (forward-compat, non-blocking)
+            experimental: true
+          - php: '8.3'
+            wordpress: '7.0-beta4'
+            label: WordPress 7.0-beta4 on PHP 8.3 (forward-compat, non-blocking)
+            experimental: true
+          - php: '8.4'
+            wordpress: '7.0-beta4'
+            label: WordPress 7.0-beta4 on PHP 8.4 (forward-compat, non-blocking)
+            experimental: true
+          - php: '8.5'
+            wordpress: '7.0-beta4'
+            label: WordPress 7.0-beta4 on PHP 8.5 (forward-compat, non-blocking)
+            experimental: true
+
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress
+          MYSQL_USER: wordpress
+          MYSQL_PASSWORD: wordpress
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h 127.0.0.1 -uroot -proot --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          extensions: mysqli
+          tools: wp-cli
+
+      - name: Show PHP version
+        run: php -v
+
+      - name: Wait for MariaDB
+        env:
+          WP_DB_HOST: 127.0.0.1
+          WP_DB_NAME: wordpress
+          WP_DB_USER: wordpress
+          WP_DB_PASSWORD: wordpress
+        run: |
+          php -r '
+          $host = getenv("WP_DB_HOST");
+          $name = getenv("WP_DB_NAME");
+          $user = getenv("WP_DB_USER");
+          $password = getenv("WP_DB_PASSWORD");
+          for ( $attempt = 1; $attempt <= 30; $attempt++ ) {
+              $mysqli = @mysqli_connect($host, $user, $password, $name, 3306);
+              if ( false !== $mysqli ) {
+                  mysqli_close($mysqli);
+                  exit(0);
+              }
+              sleep(2);
+          }
+          fwrite(STDERR, "Timed out waiting for MariaDB.\n");
+          exit(1);
+          '
+
+      - name: Run WordPress smoke test
+        env:
+          WP_DIR: ${{ runner.temp }}/wordpress
+          WP_VERSION: ${{ matrix.wordpress }}
+          WP_SITE_URL: http://127.0.0.1
+          WP_DB_HOST: 127.0.0.1:3306
+          WP_DB_NAME: wordpress
+          WP_DB_USER: wordpress
+          WP_DB_PASSWORD: wordpress
+        run: bash scripts/wordpress-smoke.sh

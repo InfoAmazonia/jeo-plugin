@@ -1,104 +1,184 @@
-import { Spinner } from '@wordpress/components';
-import { Component } from '@wordpress/element';
+import { Button } from '@wordpress/components';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import Autosuggest from 'react-autosuggest';
+
+import AsyncComboboxControl from '../shared/async-combobox-control';
 
 import './geo-auto-complete.css';
 
-class JeoGeoAutoComplete extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = {
-			suggestions: [],
-			isLoading: false,
-		};
-		this.onChange = this.onChange.bind( this );
-		this.onSuggestionsFetchRequested = this.onSuggestionsFetchRequested.bind(
-			this
-		);
-		this.onSuggestionsClearRequested = this.onSuggestionsClearRequested.bind(
-			this
-		);
-		this.getSuggestionValue = this.getSuggestionValue.bind( this );
-		this.renderSuggestion = this.renderSuggestion.bind( this );
-		this.onSuggestionSelected = this.onSuggestionSelected.bind( this );
-		this.shouldRenderSuggestions = this.shouldRenderSuggestions.bind( this );
+function shouldSubmitSearchOnEnter( event ) {
+	const targetTagName = event?.target?.tagName;
 
-		this.debouncedLoadSuggestions = _.debounce(
-			this.onSuggestionsFetchRequested,
-			500
-		);
-	}
-
-	onChange( event, { newValue } ) {
-		this.props.onChange( newValue );
-	}
-
-	getSuggestionValue( suggestion ) {
-		return suggestion.full_address;
-	}
-
-	onSuggestionSelected(
-		event,
-		{ suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+	if (
+		event?.key !== 'Enter' ||
+		event?.defaultPrevented ||
+		event?.altKey ||
+		event?.ctrlKey ||
+		event?.metaKey ||
+		event?.shiftKey ||
+		typeof targetTagName !== 'string' ||
+		targetTagName.toUpperCase() !== 'INPUT'
 	) {
-		this.props.onSelect( suggestion );
+		return false;
 	}
 
-	renderSuggestion( suggestion ) {
-		return (
-			<div className="jeo-geo-autocomplete">{ suggestion.full_address }</div>
-		);
-	}
+	return true;
+}
 
-	onSuggestionsFetchRequested( { value } ) {
-		this.setState( { isLoading: true } );
+export default function JeoGeoAutoComplete( {
+	className,
+	onChange,
+	onSelect,
+	onSearchRequest,
+	value,
+} ) {
+	const [ inputValue, setInputValue ] = useState( value || '' );
+	const [ suggestions, setSuggestions ] = useState( [] );
+	const [ isLoading, setIsLoading ] = useState( false );
+	const [ hasSearched, setHasSearched ] = useState( false );
+	const containerRef = useRef( null );
+	const latestRequestRef = useRef( 0 );
+
+	useEffect( () => {
+		setInputValue( value || '' );
+	}, [ value ] );
+
+	const currentValue = inputValue;
+	const searchValue = currentValue.trim();
+	const isSearchDisabled = isLoading || searchValue.length <= 2;
+
+	const loadSuggestions = ( nextValue ) => {
+		const trimmedValue = nextValue.trim();
+		if ( trimmedValue.length <= 2 ) {
+			setSuggestions( [] );
+			setIsLoading( false );
+			setHasSearched( false );
+			return;
+		}
+
+		onSearchRequest?.( trimmedValue );
+
+		const requestId = latestRequestRef.current + 1;
+		latestRequestRef.current = requestId;
+		setHasSearched( true );
+		setSuggestions( [] );
+		setIsLoading( true );
+
+		const requestUrl = new URL( jeo.ajax_url );
+		requestUrl.searchParams.set( 'action', 'jeo_geocode' );
+		requestUrl.searchParams.set( 'nonce', jeo.geocode_nonce );
+		requestUrl.searchParams.set( 'search', trimmedValue );
+
 		window
-			.fetch( jeo.ajax_url + '?action=jeo_geocode&search=' + value )
+			.fetch( requestUrl )
 			.then( ( response ) => {
+				if ( ! response.ok ) {
+					throw new Error(
+						__( 'Unable to load address suggestions.', 'jeo' )
+					);
+				}
+
 				return response.json();
 			} )
 			.then( ( result ) => {
-				this.setState( { suggestions: result, isLoading: false } );
+				if ( latestRequestRef.current === requestId ) {
+					setSuggestions( result );
+				}
+			} )
+			.catch( () => {
+				if ( latestRequestRef.current === requestId ) {
+					setSuggestions( [] );
+				}
+			} )
+			.finally( () => {
+				if ( latestRequestRef.current === requestId ) {
+					setIsLoading( false );
+				}
 			} );
-	}
+	};
 
-	shouldRenderSuggestions( value ) {
-		return value.trim().length > 2;
-	}
+	useEffect( () => {
+		const inputElement = containerRef.current?.querySelector(
+			'input[role="combobox"]'
+		);
 
-	onSuggestionsClearRequested() {
-		this.setState( {
-			suggestions: [],
-		} );
-	}
+		if ( ! inputElement ) {
+			return undefined;
+		}
 
-	render() {
-		const { suggestions } = this.state;
-		// Autosuggest will pass through all these props to the input.
-		const inputProps = {
-			placeholder: __( 'Search address', 'jeo' ),
-			value: this.props.value,
-			onChange: this.onChange,
+		const handleInputKeyDown = ( event ) => {
+			if (
+				! shouldSubmitSearchOnEnter( event ) ||
+				isSearchDisabled ||
+				suggestions.length > 0
+			) {
+				return;
+			}
+
+			event.preventDefault();
+			event.stopPropagation();
+			loadSuggestions( inputElement.value || currentValue );
 		};
 
-		// Finally, render it!
-		return (
-			<div className={ this.props.className }>
-				<Autosuggest
-					suggestions={ suggestions }
-					onSuggestionsFetchRequested={ this.debouncedLoadSuggestions }
-					onSuggestionsClearRequested={ this.onSuggestionsClearRequested }
-					getSuggestionValue={ this.getSuggestionValue }
-					renderSuggestion={ this.renderSuggestion }
-					onSuggestionSelected={ this.onSuggestionSelected }
-					shouldRenderSuggestions={ this.shouldRenderSuggestions }
-					inputProps={ inputProps }
-				/>
-				{ this.state.isLoading && <Spinner /> }
-			</div>
-		);
-	}
-}
+		inputElement.addEventListener( 'keydown', handleInputKeyDown, true );
 
-export default JeoGeoAutoComplete;
+		return () => {
+			inputElement.removeEventListener( 'keydown', handleInputKeyDown, true );
+		};
+	}, [ currentValue, isSearchDisabled, suggestions.length ] );
+
+	return (
+		<div
+			ref={ containerRef }
+			className={ [ 'jeo-geo-autocomplete__controls', className ]
+				.filter( Boolean )
+				.join( ' ' ) }
+		>
+			<div className="jeo-geo-autocomplete__field">
+				<AsyncComboboxControl
+					items={ suggestions }
+					inputValue={ currentValue }
+					selectedValue={ currentValue || null }
+					isLoading={ isLoading }
+					placeholder={ __( 'Search address', 'jeo' ) }
+					ariaLabel={ __( 'Search address', 'jeo' ) }
+					getOptionLabel={ ( suggestion ) => suggestion.full_address }
+					getOptionValue={ ( suggestion ) => suggestion.full_address }
+					onInputValueChange={ ( nextValue ) => {
+						latestRequestRef.current += 1;
+						setInputValue( nextValue );
+						onChange?.( nextValue );
+						setSuggestions( [] );
+						setIsLoading( false );
+						setHasSearched( false );
+					} }
+					onOptionSelect={ ( suggestion ) => {
+						if ( ! suggestion ) {
+							return;
+						}
+
+						setInputValue( suggestion.full_address );
+						onChange?.( suggestion.full_address );
+						onSelect?.( suggestion );
+					} }
+					renderItem={ ( suggestion ) => (
+						<div className="jeo-geo-autocomplete">{ suggestion.full_address }</div>
+					) }
+					allowReset={ false }
+					persistFreeText={ false }
+					suppressEmptyState={ ! hasSearched }
+				/>
+			</div>
+			<Button
+				className="jeo-geo-autocomplete__button"
+				variant="secondary"
+				type="button"
+				onMouseDown={ ( event ) => event.preventDefault() }
+				onClick={ () => loadSuggestions( currentValue ) }
+				disabled={ isSearchDisabled }
+			>
+				{ __( 'Search', 'jeo' ) }
+			</Button>
+		</div>
+	);
+}

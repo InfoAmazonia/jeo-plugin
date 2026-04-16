@@ -4,21 +4,11 @@ import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Map } from '../lib/mapgl-react';
-import { MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
-import LayerPreviewPortal from './layer-preview-portal';
 import LayerSettings from './layer-settings';
+import { getEditorLayerTypeSchema } from './layer-type-definitions';
 import './layers-sidebar.scss';
-
-const mapDefaults = {
-	initial_zoom: jeo_settings.map_defaults.zoom,
-	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lng,
-	min_zoom: 0,
-	max_zoom: 20,
-};
 
 const LayersSidebar = ( {
 	postMeta,
@@ -29,18 +19,12 @@ const LayersSidebar = ( {
 	lockPostSaving,
 	unlockPostSaving,
 } ) => {
-	const {
-		center_lat: centerLat,
-		center_lon: centerLon,
-		initial_zoom: initialZoom,
-	} = { ...mapDefaults, ...postMeta };
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
+	const [ layerTypeRegistryVersion, setLayerTypeRegistryVersion ] = useState( 0 );
 
-	const [ key, setKey ] = useState( 0 );
 	const [ renderControl, setRenderControl ] = useState( {
 		status: 'incomplete_form',
 	} );
-	const editingMap = useRef( false );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
 
@@ -49,11 +33,31 @@ const LayersSidebar = ( {
 	}, [ sendNotice ] );
 
 	useEffect( () => {
+		const handleLayerTypesChanged = () => {
+			setLayerTypeRegistryVersion( ( currentVersion ) => currentVersion + 1 );
+		};
+
+		window.addEventListener(
+			'jeo-layer-types-changed',
+			handleLayerTypesChanged
+		);
+
+		return () => {
+			window.removeEventListener(
+				'jeo-layer-types-changed',
+				handleLayerTypesChanged
+			);
+		};
+	}, [] );
+
+	useEffect( () => {
 		if ( postMeta.type ) {
-			const schema = window.JeoLayerTypes.getLayerTypeSchema( postMeta );
-			setLayerTypeSchema( schema );
+			const schema = getEditorLayerTypeSchema( postMeta );
+			setLayerTypeSchema( schema || {} );
+		} else {
+			setLayerTypeSchema( {} );
 		}
-	}, [ postMeta.type ] );
+	}, [ postMeta.type, layerTypeRegistryVersion ] );
 
 	useEffect( () => {
 		switch ( renderControl.status ) {
@@ -91,13 +95,14 @@ const LayersSidebar = ( {
 				break;
 			case 'ready':
 				removeNotice( 'layer_notices' );
+				unlockPostSaving( 'layer_lock_key' );
 				break;
 		}
 	}, [ renderControl.status ] );
 
 	useEffect( () => {
-		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options;
-		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options;
+		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options || {};
+		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options || {};
 		if ( Object.keys( debouncedLayerTypeOptions ).length && Object.keys( layerTypeSchema ).length ) {
 			const optionsKeys = Object.keys( layerTypeSchema.properties );
 			let anyEmpty = false;
@@ -122,72 +127,13 @@ const LayersSidebar = ( {
 				setRenderControl( {
 					status: 'ready',
 				} );
-				setKey( key + 1 );
 			}
 			prevPostMeta.current = debouncedPostMeta;
 		}
 	}, [ debouncedPostMeta.layer_type_options, layerTypeSchema ] );
 
-	const origOpen = XMLHttpRequest.prototype.open;
-	XMLHttpRequest.prototype.open = function () {
-		this.addEventListener( 'load', function () {
-			if ( this.status >= 400 ) {
-				setRenderControl( {
-					status: 'request_error',
-					statusCode: this.status,
-				} );
-			}
-		} );
-		origOpen.apply( this, arguments );
-	};
-
 	return (
 		<>
-			<LayerPreviewPortal>
-				<Map
-					key={ key }
-					onError={ ( { target: map, error } ) => {
-						try {
-							const layer = map.getLayer( 'layer_1' );
-							if ( layer ) {
-								map.removeLayer( 'layer_1' );
-							}
-							setRenderControl( {
-								status: 'request_error',
-								statusCode: 400,
-							} );
-						} catch ( err ) {
-							setRenderControl( {
-								status: 'request_error',
-								statusCode: 400,
-							} );
-						}
-					} }
-					onSourceData={ () => {
-						setRenderControl( { status: 'loaded' } );
-						unlockPostSaving( 'layer_lock_key' );
-					} }
-					style={ { height: '500px', width: '100%' } }
-					latitude={ centerLat || 0 }
-					longitude={ centerLon || 0 }
-					zoom={ initialZoom || 0 }
-					onMove={ ( { viewState } ) => {
-						setPostMeta( {
-							center_lat: viewState.latitude,
-							center_lon: viewState.longitude,
-						} );
-					} }
-					onZoom={ ( { viewState } ) => {
-						const zoom = Math.round( viewState.zoom * 10 ) / 10;
-						setPostMeta( { initial_zoom: zoom } );
-					} }
-				>
-					{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
-						<MemoizedRenderLayer layer={ debouncedPostMeta } instance={ { id: 1, use: 'fixed' } } />
-					) }
-				</Map>
-			</LayerPreviewPortal>
-
 			<PluginDocumentSettingPanel
 				name="settings"
 				title={ __( 'Settings', 'jeo' ) }

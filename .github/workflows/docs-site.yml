@@ -1,0 +1,51 @@
+name: Sync MkDocs Site
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - docs/**
+      - mkdocs.yml
+      - requirements-docs.txt
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-site:
+    name: Build and sync site/
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: requirements-docs.txt
+
+      - name: Install documentation dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-docs.txt
+
+      - name: Build MkDocs site
+        run: python -m mkdocs build --clean
+
+      - name: Commit generated site
+        run: |
+          if [ -z "$(git status --porcelain -- site)" ]; then
+            echo "site/ is already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A site
+          git commit -m "docs: sync generated site"
+          git push

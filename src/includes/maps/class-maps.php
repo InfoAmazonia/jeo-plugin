@@ -1,14 +1,38 @@
 <?php
+/**
+ * Map post-type registration.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+use WP_Post;
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Register and manage map posts.
+ */
 class Maps {
 
 	use Singleton;
 	use Rest_Validate_Meta;
 
+	/**
+	 * Map post type slug.
+	 *
+	 * @var string
+	 */
 	public $post_type = 'map';
 
+	/**
+	 * Register map hooks.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_action( 'init', array( $this, 'register_shortcode' ) );
@@ -18,6 +42,11 @@ class Maps {
 		$this->register_rest_meta_validation();
 	}
 
+	/**
+	 * Register the map post type and its metadata.
+	 *
+	 * @return void
+	 */
 	public function register_post_type() {
 
 		$labels = array(
@@ -44,12 +73,13 @@ class Maps {
 			'labels'              => $labels,
 			'hierarchical'        => true,
 			'description'         => __( 'JEO Maps', 'jeo' ),
-			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks' ),
+			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks', 'revisions' ),
 			'rewrite'             => array( 'slug' => 'maps' ),
 			'public'              => true,
 			'show_in_menu'        => 'jeo-main-menu',
 			'show_in_rest'        => true,
 			'menu_position'       => 4,
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode,WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Encodes a bundled local SVG into a menu-icon data URI.
 			'menu_icon'           => 'data:image/svg+xml;base64,' . base64_encode( file_get_contents( JEO_BASEPATH . '/js/src/icons/map.svg' ) ),
 			'has_archive'         => true,
 			'exclude_from_search' => true,
@@ -64,8 +94,6 @@ class Maps {
 
 				'delete_post'        => 'delete_map',
 			),
-			// 'map_meta_cap' => true,
-			// 'capability_type' => 'post',
 		);
 
 		register_post_type( $this->post_type, $args );
@@ -74,6 +102,7 @@ class Maps {
 			$this->post_type,
 			'initial_zoom',
 			array(
+				'revisions_enabled' => true,
 				'show_in_rest'      => true,
 				'single'            => true,
 				'auth_callback'     => '__return_true',
@@ -87,11 +116,12 @@ class Maps {
 			$this->post_type,
 			'center_lat',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'number',
-				'description'   => __( 'The map initial latitude', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'number',
+				'description'       => __( 'The map initial latitude', 'jeo' ),
 			)
 		);
 
@@ -99,11 +129,12 @@ class Maps {
 			$this->post_type,
 			'center_lon',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'number',
-				'description'   => __( 'The map initial longitude', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'number',
+				'description'       => __( 'The map initial longitude', 'jeo' ),
 			)
 		);
 
@@ -111,7 +142,8 @@ class Maps {
 			$this->post_type,
 			'layers',
 			array(
-				'show_in_rest'  => array(
+				'revisions_enabled' => true,
+				'show_in_rest'      => array(
 					'schema' => array(
 						'items' => array(
 							'type'       => 'object',
@@ -159,10 +191,10 @@ class Maps {
 
 					),
 				),
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'array',
-				'description'   => __( 'The map Layers', 'jeo' ),
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'array',
+				'description'       => __( 'The map Layers', 'jeo' ),
 			)
 		);
 
@@ -170,7 +202,8 @@ class Maps {
 			$this->post_type,
 			'pan_limits',
 			array(
-				'show_in_rest'  => array(
+				'revisions_enabled' => true,
+				'show_in_rest'      => array(
 					'schema' => array(
 						'properties' => array(
 							'east'  => array(
@@ -193,10 +226,10 @@ class Maps {
 						),
 					),
 				),
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'object',
-				'description'   => __( 'Map pan limits', 'jeo' ),
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'object',
+				'description'       => __( 'Map pan limits', 'jeo' ),
 			)
 		);
 
@@ -204,7 +237,8 @@ class Maps {
 			$this->post_type,
 			'related_posts',
 			array(
-				'show_in_rest'  => array(
+				'revisions_enabled' => true,
+				'show_in_rest'      => array(
 					'schema' => array(
 						'properties' => array(
 							'categories' => array(
@@ -251,10 +285,10 @@ class Maps {
 					),
 
 				),
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'object',
-				'description'   => __( 'The map criteria to get related posts', 'jeo' ),
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'object',
+				'description'       => __( 'The map criteria to get related posts', 'jeo' ),
 			)
 		);
 
@@ -262,11 +296,12 @@ class Maps {
 			$this->post_type,
 			'disable_scroll_zoom',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'boolean',
-				'description'   => __( 'Disable scroll zoom', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'boolean',
+				'description'       => __( 'Disable scroll zoom', 'jeo' ),
 			)
 		);
 
@@ -274,11 +309,12 @@ class Maps {
 			$this->post_type,
 			'disable_drag_pan',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'boolean',
-				'description'   => __( 'Disable drag pan', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'boolean',
+				'description'       => __( 'Disable drag pan', 'jeo' ),
 			)
 		);
 
@@ -286,11 +322,12 @@ class Maps {
 			$this->post_type,
 			'disable_drag_rotate',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'boolean',
-				'description'   => __( 'Disable drag rotation', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'boolean',
+				'description'       => __( 'Disable drag rotation', 'jeo' ),
 			)
 		);
 
@@ -298,11 +335,12 @@ class Maps {
 			$this->post_type,
 			'enable_fullscreen',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'boolean',
-				'description'   => __( 'Enable fullscreen button', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'boolean',
+				'description'       => __( 'Enable fullscreen button', 'jeo' ),
 			)
 		);
 
@@ -310,11 +348,12 @@ class Maps {
 			$this->post_type,
 			'relate_posts',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'boolean',
-				'description'   => __( 'Show all posts on map', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'boolean',
+				'description'       => __( 'Show all posts on map', 'jeo' ),
 			)
 		);
 
@@ -322,11 +361,12 @@ class Maps {
 			$this->post_type,
 			'min_zoom',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'number',
-				'description'   => __( 'Minimum Zoom level', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'number',
+				'description'       => __( 'Minimum Zoom level', 'jeo' ),
 			)
 		);
 
@@ -334,11 +374,12 @@ class Maps {
 			$this->post_type,
 			'max_zoom',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'number',
-				'description'   => __( 'Maximum zoom level', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'number',
+				'description'       => __( 'Maximum zoom level', 'jeo' ),
 			)
 		);
 
@@ -346,11 +387,12 @@ class Maps {
 			$this->post_type,
 			'hide_in_discovery',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'boolean',
-				'description'   => __( 'Hide in discovery', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'boolean',
+				'description'       => __( 'Hide in discovery', 'jeo' ),
 			)
 		);
 
@@ -358,31 +400,151 @@ class Maps {
 			$this->post_type,
 			'disable_embed',
 			array(
-				'show_in_rest'  => true,
-				'single'        => true,
-				'auth_callback' => '__return_true',
-				'type'          => 'boolean',
-				'description'   => __( 'Disable embed', 'jeo' ),
+				'revisions_enabled' => true,
+				'show_in_rest'      => true,
+				'single'            => true,
+				'auth_callback'     => '__return_true',
+				'type'              => 'boolean',
+				'description'       => __( 'Disable embed', 'jeo' ),
 			)
 		);
 	}
 
-	public function sanitize_meta_center( $meta_value, $meta_key, $object_type, $object_subtype ) {
-		return intval( $meta_value );
+	/**
+	 * Return the list of map metadata keys used in frontend previews.
+	 *
+	 * @return string[]
+	 */
+	private function get_preview_meta_keys() {
+		return array(
+			'initial_zoom',
+			'center_lat',
+			'center_lon',
+			'layers',
+			'pan_limits',
+			'related_posts',
+			'disable_scroll_zoom',
+			'disable_drag_pan',
+			'disable_drag_rotate',
+			'enable_fullscreen',
+			'relate_posts',
+			'min_zoom',
+			'max_zoom',
+			'hide_in_discovery',
+			'disable_embed',
+		);
 	}
 
-	public function sanitize_meta_initial_zoom( $meta_value, $meta_key, $object_type, $object_subtype ) {
+	/**
+	 * Read post meta without letting WordPress' preview meta filter rewrite the
+	 * response for the parent post.
+	 *
+	 * @param int    $post_id Post ID.
+	 * @param string $meta_key Meta key.
+	 * @return mixed
+	 */
+	private function get_unfiltered_post_meta_value( int $post_id, string $meta_key ) {
+		$preview_meta_filter_priority = has_filter( 'get_post_metadata', '_wp_preview_meta_filter' );
+
+		if ( false !== $preview_meta_filter_priority ) {
+			remove_filter( 'get_post_metadata', '_wp_preview_meta_filter', $preview_meta_filter_priority );
+		}
+
+		$meta_value = get_post_meta( $post_id, $meta_key, true );
+
+		if ( false !== $preview_meta_filter_priority ) {
+			add_filter( 'get_post_metadata', '_wp_preview_meta_filter', $preview_meta_filter_priority, 4 );
+		}
+
+		return $meta_value;
+	}
+
+	/**
+	 * Resolve preview metadata using the autosave revision when available, while
+	 * safely falling back to the published post value.
+	 *
+	 * @param int     $post_id Parent post ID.
+	 * @param WP_Post $preview_post Preview post or autosave revision.
+	 * @param string  $meta_key Meta key.
+	 * @return mixed
+	 */
+	private function get_preview_meta_value( int $post_id, WP_Post $preview_post, string $meta_key ) {
+		if ( $preview_post->ID !== $post_id && metadata_exists( 'post', $preview_post->ID, $meta_key ) ) {
+			return get_post_meta( $preview_post->ID, $meta_key, true );
+		}
+
+		return $this->get_unfiltered_post_meta_value( $post_id, $meta_key );
+	}
+
+	/**
+	 * Build a preview-aware map payload for the single map template.
+	 *
+	 * @param int $post_id Map post ID.
+	 * @return array|null
+	 */
+	public function get_preview_map_payload( int $post_id ) {
+		$preview_post = \jeo()->get_preview_post( $post_id );
+		if ( ! $preview_post instanceof WP_Post ) {
+			return null;
+		}
+
+		$meta = array();
+		foreach ( $this->get_preview_meta_keys() as $meta_key ) {
+			$meta[ $meta_key ] = $this->get_preview_meta_value( $post_id, $preview_post, $meta_key );
+		}
+
+		$the_content_filter_priority = has_filter( 'the_content', array( $this, 'the_content_filter' ) );
+		if ( false !== $the_content_filter_priority ) {
+			remove_filter( 'the_content', array( $this, 'the_content_filter' ), $the_content_filter_priority );
+		}
+
+		$rendered_content = apply_filters( 'the_content', $preview_post->post_content );
+
+		if ( false !== $the_content_filter_priority ) {
+			add_filter( 'the_content', array( $this, 'the_content_filter' ), $the_content_filter_priority );
+		}
+
+		return array(
+			'id'      => $post_id,
+			'slug'    => get_post_field( 'post_name', $post_id ),
+			'title'   => array(
+				'rendered' => $preview_post->post_title,
+			),
+			'content' => array(
+				'rendered' => $rendered_content,
+			),
+			'meta'    => $meta,
+		);
+	}
+
+	/**
+	 * Sanitize a map-center coordinate.
+	 *
+	 * @param mixed $meta_value Raw coordinate value.
+	 * @return int
+	 */
+	public function sanitize_meta_center( $meta_value ) {
 		return intval( $meta_value );
 	}
 
 	/**
-	 * Validates the zoom metadata value
+	 * Sanitize the initial zoom value.
 	 *
-	 * @param  mixed $value The value to be validated
-	 * @return void|\WP_Error Returns a \WP_Error object in case the value is invalid
+	 * @param mixed $meta_value Raw zoom value.
+	 * @return int
+	 */
+	public function sanitize_meta_initial_zoom( $meta_value ) {
+		return intval( $meta_value );
+	}
+
+	/**
+	 * Validate the zoom metadata value.
+	 *
+	 * @param mixed $value The value to be validated.
+	 * @return void|\WP_Error Returns a \WP_Error object in case the value is invalid.
 	 */
 	public function validate_meta_initial_zoom( $value ) {
-		// WordPress is already validating if it is a number
+		// WordPress already validates whether the value is numeric.
 
 		$val = intval( $value );
 		if ( $val < 1 || $val > 14 ) {
@@ -390,10 +552,41 @@ class Maps {
 		}
 	}
 
+	/**
+	 * Sanitize a shortcode CSS dimension.
+	 *
+	 * @param mixed $value Raw dimension.
+	 * @return string
+	 */
+	private function sanitize_shortcode_dimension( $value ) {
+		$value = trim( (string) $value );
+
+		if ( '' === $value ) {
+			return '';
+		}
+
+		if ( preg_match( '/^\d+$/', $value ) ) {
+			return $value . 'px';
+		}
+
+		return preg_match( '/^\d+(?:\.\d+)?(?:px|%|vh|vw|rem|em)$/', $value ) ? $value : '';
+	}
+
+	/**
+	 * Register the public shortcode for maps.
+	 *
+	 * @return void
+	 */
 	public function register_shortcode() {
 		\add_shortcode( 'jeo-map', array( $this, 'map_shortcode' ) );
 	}
 
+	/**
+	 * Render the map shortcode container.
+	 *
+	 * @param array $atts Shortcode attributes.
+	 * @return string
+	 */
 	public function map_shortcode( $atts ) {
 
 		$atts = \shortcode_atts(
@@ -411,66 +604,77 @@ class Maps {
 			return '';
 		}
 
-		$div = '<div class="jeomap map_id_"' . $map_id . '" ';
+		$width  = $this->sanitize_shortcode_dimension( $atts['width'] );
+		$height = $this->sanitize_shortcode_dimension( $atts['height'] );
+		$styles = array();
 
-		$w     = $atts['width'];
-		$h     = $atts['height'];
-		$style = '';
-
-		if ( ! empty( $w ) ) {
-			$style .= 'style="width: ' . $atts['width'] . '; ';
+		if ( '' !== $width ) {
+			$styles[] = 'width: ' . $width;
 		}
 
-		if ( ! empty( $h ) ) {
-			$style .= 'height: ' . $atts['height'] . ';"';
+		if ( '' !== $height ) {
+			$styles[] = 'height: ' . $height;
 		}
 
-		if ( ! empty( $tyle ) ) {
-			$div .= 'style="' . $style . '"';
+		$style_attribute = '';
+		if ( ! empty( $styles ) ) {
+			$style_attribute = sprintf( ' style="%s"', esc_attr( implode( '; ', $styles ) . ';' ) );
 		}
 
-		$div .= '></div>';
-
-		return $div;
+		return sprintf(
+			'<div class="jeomap map_id_%1$d"%2$s></div>',
+			$map_id,
+			$style_attribute
+		);
 	}
 
+	/**
+	 * Append map-layer content to the single map output.
+	 *
+	 * @param string $content Current post content.
+	 * @return string
+	 */
 	public function the_content_filter( $content ) {
-
 		if ( get_post_type() !== 'map' ) {
 			return $content;
 		}
 
-		// Only when visiting the Map single page
+		// Only run when visiting the single map page.
 		if ( is_single( get_the_id() ) ) {
 			$map_id  = get_the_ID();
-			$div     = "<div class='jeomap map_id_'{$map_id}'";
-			$content = $div . $content;
+			$content = sprintf(
+				'<div class="jeomap map_id_%1$d"></div>%2$s',
+				absint( $map_id ),
+				$content
+			);
 		}
 
 		$layers_def = get_post_meta( get_the_ID(), 'layers', true );
 
 		if ( is_array( $layers_def ) ) {
 
-			$layers_ids = array_map(
-				function ( $e ) {
-					return $e['id'];
-				},
-				$layers_def
-			);
+				$layers_ids = array_values(
+					array_filter(
+						array_map(
+							function ( $layer_item ) {
+								if ( is_array( $layer_item ) && isset( $layer_item['id'] ) ) {
+									return (int) $layer_item['id'];
+								}
+
+								if ( is_object( $layer_item ) && isset( $layer_item->id ) ) {
+									return (int) $layer_item->id;
+								}
+
+								return 0;
+							},
+							$layers_def
+						)
+					)
+				);
 
 			if ( empty( $layers_ids ) ) {
 				return $content;
 			}
-
-			$layers = new \WP_Query(
-				array(
-					'post_type'        => 'map-layer',
-					'post__in'         => $layers_ids,
-					'orderby'          => 'post__in',
-					'nopaging'         => true,
-					'suppress_filters' => true,
-				)
-			);
 
 			$template = \jeo_get_template( 'map-content-layers-list.php' );
 
@@ -478,13 +682,21 @@ class Maps {
 
 			ob_start();
 
-			while ( $layers->have_posts() ) {
+			foreach ( $layers_ids as $layer_id ) {
+				$layer_post = get_post( $layer_id );
 
-				$layers->the_post();
+				if ( ! $layer_post instanceof \WP_Post || 'map-layer' !== $layer_post->post_type ) {
+					continue;
+				}
 
-				$source_url       = get_post_meta( get_the_ID(), 'source_url', true );
-				$attribution      = get_post_meta( get_the_ID(), 'attribution', true );
-				$attribution_name = get_post_meta( get_the_ID(), 'attribution_name', true );
+				if ( 'publish' !== get_post_status( $layer_post ) && ! current_user_can( 'edit_post', $layer_id ) ) {
+					continue;
+				}
+
+				$source_url       = get_post_meta( $layer_post->ID, 'source_url', true );
+				$attribution      = get_post_meta( $layer_post->ID, 'attribution', true );
+				$attribution_name = get_post_meta( $layer_post->ID, 'attribution_name', true );
+				$layer_content    = $this->render_layer_content( $layer_post );
 
 				if ( $source_url || $attribution || $attribution_name ) {
 					include $template;
@@ -492,8 +704,6 @@ class Maps {
 			}
 
 			$return .= \ob_get_clean();
-
-			\wp_reset_postdata();
 
 			$return .= '</div>';
 
@@ -504,11 +714,35 @@ class Maps {
 		return $content;
 	}
 
+	/**
+	 * Render layer content without recursively re-entering the map content filter.
+	 *
+	 * @param WP_Post $layer_post Layer post object.
+	 * @return string
+	 */
+	private function render_layer_content( WP_Post $layer_post ) {
+		remove_filter( 'the_content', array( $this, 'the_content_filter' ) );
+
+		try {
+			return apply_filters( 'the_content', $layer_post->post_content );
+		} finally {
+			add_filter( 'the_content', array( $this, 'the_content_filter' ) );
+		}
+	}
+
+	/**
+	 * Grant map-related capabilities to supported roles.
+	 *
+	 * @return void
+	 */
 	public function add_capabilities() {
 		$roles = array( 'author', 'editor', 'administrator', 'contributor' );
 		$types = array( 'map', 'map-layer', 'storymap' );
 		foreach ( $roles as $role ) {
 			$role_obj = get_role( $role );
+			if ( ! $role_obj ) {
+				continue;
+			}
 
 			foreach ( $types as $type ) {
 				$role_obj->add_cap( "edit_{$type}" );
@@ -516,7 +750,7 @@ class Maps {
 				$role_obj->add_cap( "delete_{$type}" );
 				$role_obj->add_cap( "read_{$type}" );
 				$role_obj->add_cap( "read_{$type}s" );
-				if ( 'contributor' !== $type ) {
+				if ( 'contributor' !== $role ) {
 					$role_obj->add_cap( "edit_others_{$type}s" );
 					$role_obj->add_cap( "publish_{$type}s" );
 					$role_obj->add_cap( "read_private_{$type}s" );
@@ -526,6 +760,12 @@ class Maps {
 		}
 	}
 
+	/**
+	 * Override the single template for maps.
+	 *
+	 * @param string $template Current single template path.
+	 * @return string
+	 */
 	public function override_template( $template ) {
 		global $post;
 

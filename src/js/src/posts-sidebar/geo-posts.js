@@ -1,14 +1,37 @@
-import { Button, CheckboxControl, RadioControl } from '@wordpress/components';
+import { Button, RadioControl } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
+import { CheckboxControl } from '../shared/wp-form-controls';
+import primaryMarkerIconUrl from '../icons/editor-marker-primary.svg';
+import secondaryMarkerIconUrl from '../icons/editor-marker-secondary.svg';
 
 import JeoGeoAutoComplete from './geo-auto-complete';
 import 'leaflet/dist/leaflet.css';
 import './geo-posts.css';
 import { isEqual } from 'lodash-es';
+
+function clonePoints( points = [] ) {
+	return Array.isArray( points )
+		? points.map( ( point ) => ( point ? { ...point } : point ) )
+		: [];
+}
+
+const PRIMARY_MARKER_ICON = new L.Icon( {
+	iconUrl: primaryMarkerIconUrl,
+	iconSize: [ 25, 41 ],
+	iconAnchor: [ 12, 41 ],
+	popupAnchor: [ 0, -34 ],
+} );
+
+const SECONDARY_MARKER_ICON = new L.Icon( {
+	iconUrl: secondaryMarkerIconUrl,
+	iconSize: [ 25, 41 ],
+	iconAnchor: [ 12, 41 ],
+	popupAnchor: [ 0, -34 ],
+} );
 
 class JeoGeocodePosts extends Component {
 	constructor() {
@@ -16,13 +39,14 @@ class JeoGeocodePosts extends Component {
 		const metadata = wp.data
 			.select( 'core/editor' )
 			.getEditedPostAttribute( 'meta' );
+		const initialPoints = clonePoints( metadata?._related_point );
 
 		this.state = {
 			pointsCheckpoint: [],
 			formMode: 'view',
 			searchValue: '',
 			zoom: 1,
-			points: metadata._related_point,
+			points: initialPoints,
 			currentMarkerIndex: 0,
 			loadStatus: 'pending',
 			magneticMarkers: true,
@@ -61,18 +85,14 @@ class JeoGeocodePosts extends Component {
 	}
 
 	resetForm() {
-		this.setState( {
-			formMode: 'view',
-			searchValue: '',
-		} );
-
-		const { pointsCheckpoint } = this.state;
 		this.setState(
-			{
-				points: pointsCheckpoint,
+			( prevState ) => ( {
+				formMode: 'view',
+				searchValue: '',
+				points: clonePoints( prevState.pointsCheckpoint ),
 				pointsCheckpoint: [],
 				currentMarkerIndex: 0,
-			},
+			} ),
 			() => {
 				const { points, currentMarkerIndex } = this.state;
 				if ( points.length > 0 ) {
@@ -97,9 +117,9 @@ class JeoGeocodePosts extends Component {
 	}
 
 	toggleMagnet () {
-		this.setState( {
-			magneticMarkers: !this.state.magneticMarkers,
-		} );
+		this.setState( ( prevState ) => ( {
+			magneticMarkers: ! prevState.magneticMarkers,
+		} ) );
 	}
 
 	/**
@@ -109,16 +129,14 @@ class JeoGeocodePosts extends Component {
 	 * @param {Object} data the new data. Only attributes that change
 	 */
 	updatePoint( point, data ) {
-		const { points } = this.state;
-		this.setState( {
-			...this.state,
-			points: points.map( ( value, i ) => {
+		this.setState( ( prevState ) => ( {
+			points: prevState.points.map( ( value, i ) => {
 				if ( i === point ) {
 					return { ...value, ...data };
 				}
 				return value;
 			} ),
-		} );
+		} ) );
 	}
 
 	updateCurrentPoint( data ) {
@@ -165,11 +183,24 @@ class JeoGeocodePosts extends Component {
 	}
 
 	fetchReverseGeocode( lat, lng ) {
+		const requestUrl = new URL( jeo.ajax_url );
+		requestUrl.searchParams.set( 'action', 'jeo_reverse_geocode' );
+		requestUrl.searchParams.set( 'nonce', jeo.geocode_nonce );
+		requestUrl.searchParams.set( 'lat', lat );
+		requestUrl.searchParams.set( 'lon', lng );
+
 		return window
-			.fetch(
-				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lng
-			)
+			.fetch( requestUrl )
 			.then( ( response ) => {
+				if ( ! response.ok ) {
+					throw new Error(
+						__(
+							'Unable to retrieve the address for the selected point.',
+							'jeo'
+						)
+					);
+				}
+
 				return response.json();
 			} );
 	}
@@ -191,13 +222,11 @@ class JeoGeocodePosts extends Component {
 		e.stopPropagation();
 
 		const index = parseInt( e.target.attributes.marker_index.value );
-		const { points } = this.state;
 		this.setState(
-			{
-				...this.state,
-				points: points.filter( ( el, i ) => i !== index ),
+			( prevState ) => ( {
+				points: prevState.points.filter( ( el, i ) => i !== index ),
 				currentMarkerIndex: 0,
-			},
+			} ),
 			() => this.save()
 		);
 	}
@@ -211,7 +240,7 @@ class JeoGeocodePosts extends Component {
 		const point = points[ index ];
 		this.setState(
 			{
-				pointsCheckpoint: points,
+				pointsCheckpoint: clonePoints( points ),
 				currentMarkerIndex: index,
 				searchValue: point._geocode_full_address,
 				formMode: 'edit',
@@ -228,7 +257,7 @@ class JeoGeocodePosts extends Component {
 
 		this.setState( {
 			formMode: 'new',
-			pointsCheckpoint: points,
+			pointsCheckpoint: clonePoints( points ),
 			loadStatus: 'pending',
 		} );
 	}
@@ -247,38 +276,60 @@ class JeoGeocodePosts extends Component {
 				return this.resetForm();
 			}
 
-			const foundPoint = {
-				_geocode_lat: this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : String( location.lat ),
-				_geocode_lon: this.state.magneticMarkers ? this.getProperty( result, 'lon' ) : String( location.lon ),
-				_geocode_full_address: this.getProperty( result, 'full_address' ),
-				_geocode_country: this.getProperty( result, 'country' ),
-				_geocode_country_code: this.getProperty( result, 'country_code' ),
-				_geocode_region_level_1: this.getProperty( result, 'region_level_1' ),
-				_geocode_region_level_2: this.getProperty( result, 'region_level_2' ),
-				_geocode_region_level_3: this.getProperty( result, 'region_level_3' ),
-				_geocode_city: this.getProperty( result, 'city' ),
-				_geocode_city_level_1: this.getProperty( result, 'city_level_1' ),
-			};
+			const fullAddress =
+				this.getProperty( result, 'full_address' ) ||
+				this.getProperty( result.raw || {}, 'display_name' ) ||
+				this.getProperty( location, 'full_address' ) ||
+				'';
 
-			this.setState( {
-				searchValue: foundPoint._geocode_full_address,
-				loadStatus: 'resolved',
-			} );
+			this.setState( ( prevState ) => {
+				const foundPoint = {
+					_geocode_lat: prevState.magneticMarkers
+						? this.getProperty( result, 'lat' )
+						: String( location.lat ),
+					_geocode_lon: prevState.magneticMarkers
+						? this.getProperty( result, 'lon' )
+						: String( location.lon ),
+					_geocode_full_address: fullAddress,
+					_geocode_country: this.getProperty( result, 'country' ),
+					_geocode_country_code: this.getProperty( result, 'country_code' ),
+					_geocode_region_level_1: this.getProperty( result, 'region_level_1' ),
+					_geocode_region_level_2: this.getProperty( result, 'region_level_2' ),
+					_geocode_region_level_3: this.getProperty( result, 'region_level_3' ),
+					_geocode_city: this.getProperty( result, 'city' ),
+					_geocode_city_level_1: this.getProperty( result, 'city_level_1' ),
+				};
+				const nextState = {
+					searchValue: fullAddress,
+					loadStatus: 'resolved',
+				};
 
-			const { formMode, points, pointsCheckpoint } = this.state;
-			if ( formMode === 'new' && points.length === pointsCheckpoint.length ) {
-				const existingPoint = points.filter( ( p ) =>
-					isEqual( p, foundPoint )
-				);
-				if ( ! existingPoint.length ) {
-					this.setState( {
-						points: [ ...points, foundPoint ],
-						currentMarkerIndex: points.length,
-					} );
+				if (
+					prevState.formMode === 'new' &&
+					prevState.points.length === prevState.pointsCheckpoint.length
+				) {
+					const existingPoint = prevState.points.filter( ( point ) =>
+						isEqual( point, foundPoint )
+					);
+
+					if ( ! existingPoint.length ) {
+						nextState.points = [ ...prevState.points, foundPoint ];
+						nextState.currentMarkerIndex = prevState.points.length;
+					}
+
+					return nextState;
 				}
-			} else {
-				this.updateCurrentPoint( foundPoint );
-			}
+
+				nextState.points = prevState.points.map( ( point, index ) => {
+					if ( index === prevState.currentMarkerIndex ) {
+						return { ...point, ...foundPoint };
+					}
+
+					return point;
+				} );
+
+				return nextState;
+			} );
 		} );
 	}
 
@@ -316,8 +367,8 @@ class JeoGeocodePosts extends Component {
 	onMarkerDragged( e ) {
 		const marker = e.target;
 		const latLng = marker.getLatLng();
-		this.onLocationFound( { lat: latLng.lat, lon: latLng.lng } );
 		this.setState( { loadStatus: 'pending' } );
+		this.onLocationFound( { lat: latLng.lat, lon: latLng.lng } );
 	}
 
 	save() {
@@ -349,21 +400,25 @@ class JeoGeocodePosts extends Component {
 			loadStatus,
 			magneticMarkers,
 		} = this.state;
-		const isDisabled = ! (
-			loadStatus === 'resolved' && searchValue.replace( /\s/g, '' ).length
-		);
-
 		const selectedPoint = points[ currentMarkerIndex ];
+		const currentSearchValue = typeof searchValue === 'string'
+			? searchValue
+			: selectedPoint?._geocode_full_address || '';
+		const isDisabled = ! (
+			loadStatus === 'resolved' &&
+			currentSearchValue.replace( /\s/g, '' ).length
+		);
 		return (
 			<div>
 				<div>
 					<JeoGeoAutoComplete
 						onSelect={ this.onLocationFound }
-						value={ searchValue }
+						value={ currentSearchValue }
 						onChange={ this.handleSearchValue }
+						onSearchRequest={ () => this.setState( { loadStatus: 'pending' } ) }
 					/>
 					<span className="jeo-geocode-search__hint">
-						{ __( 'You can also drag the marker across the map.', 'jeo' ) }
+						{ __( 'Type an address, then click Search or press Enter. You can also drag the marker across the map.', 'jeo' ) }
 					</span>
 				</div>
 				<div>
@@ -489,27 +544,14 @@ class JeoGeocodePosts extends Component {
 							ref={ this.refMap }
 						>
 							<TileLayer
-								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+								attribution='&copy; <a href="https://osm.org/copyright">OpenStreetMap</a> contributors'
 								url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
 							/>
 							{ pointsMap.map( ( point, i ) => {
-								let icon;
-
-								if ( ! point.relevance || point.relevance === 'primary' ) {
-									icon = new L.Icon( {
-										iconUrl:
-											'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-										iconSize: [ 25, 41 ],
-										iconAnchor: [ 12, 41 ],
-									} );
-								} else {
-									icon = new L.Icon( {
-										iconUrl:
-											'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
-										iconSize: [ 25, 41 ],
-										iconAnchor: [ 12, 41 ],
-									} );
-								}
+								const icon =
+									! point.relevance || point.relevance === 'primary'
+										? PRIMARY_MARKER_ICON
+										: SECONDARY_MARKER_ICON;
 
 								return (
 									<Marker
@@ -518,8 +560,12 @@ class JeoGeocodePosts extends Component {
 										draggable={
 											currentMarkerIndex === i && formMode !== 'view'
 										}
-										onDragend={ this.onMarkerDragged }
-										onClick={ formMode === 'view' ? this.clickMarkerMap : null }
+										eventHandlers={ {
+											dragend: this.onMarkerDragged,
+											...( formMode === 'view'
+												? { click: this.clickMarkerMap }
+												: {} ),
+										} }
 										position={ [
 											parseFloat( point._geocode_lat ),
 											parseFloat( point._geocode_lon ),

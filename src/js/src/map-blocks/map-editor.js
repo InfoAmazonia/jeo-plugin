@@ -1,12 +1,13 @@
 import { useBlockProps } from '@wordpress/block-editor';
 import { Button, Spinner } from '@wordpress/components';
-import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
+import { useEntityRecord } from '@wordpress/core-data';
 import { useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
+import { useRecordsByIds } from '../shared/rest-records';
 import './map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
@@ -14,10 +15,9 @@ const { map_defaults: mapDefaults } = window.jeo_settings;
 export default function MapEditor ( {attributes, setAttributes } ) {
 	const blockProps = useBlockProps( { className: 'jeo-mapblock' } );
 	const instanceId = useId();
-	console.log({ instanceId });
 	const [ key, setKey ] = useState( 0 );
 	useEffect( () => {
-		setKey( key + 1 );
+		setKey( ( currentKey ) => currentKey + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
 	const decodeHtmlEntity = function ( str ) {
@@ -38,11 +38,17 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 		}
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ loadedMap?.meta.layers ] );
+	const layerSettingsKey = useMemo(
+		() => JSON.stringify( loadedMap?.meta.layers || [] ),
+		[ loadedMap?.meta.layers ]
+	);
 
-	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
-		include: layerIds,
-		per_page: -1,
-	}, { enabled: layerIds.length > 0 } );
+	const { records: loadedLayers = [] } = useRecordsByIds( {
+		path: '/jeo/v1/map-layer',
+		ids: layerIds,
+		enabled: layerIds.length > 0,
+		query: { context: 'edit' },
+	} );
 
 	return (
 		<div { ...blockProps }>
@@ -51,7 +57,7 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 				<>
 					<div className="jeo-preview-area">
 						<Map
-							key={ key }
+							key={ `${ key }:${ layerSettingsKey }` }
 							ref={ mapRef }
 							onStyleData={ () => {
 								const { current: map } = mapRef;

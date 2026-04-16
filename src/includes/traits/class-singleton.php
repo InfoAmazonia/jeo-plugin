@@ -1,9 +1,22 @@
 <?php
+/**
+ * Shared singleton behavior for JEO services.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
+/**
+ * Provide a simple singleton pattern plus shared asset-loading helpers.
+ */
 trait Singleton {
 
+	/**
+	 * Singleton instance.
+	 *
+	 * @var object|null
+	 */
 	protected static $instance;
 
 	/**
@@ -19,8 +32,13 @@ trait Singleton {
 		$this->init();
 	}
 
+	/**
+	 * Determine whether shared assets should load for the current request.
+	 *
+	 * @return bool
+	 */
 	public function should_load_assets() {
-		// This is a workaround! The right way is to refactor all enqueues to have their individuals enqueues for admin and a custom conditional one to front-end
+		// This is a workaround. The right fix is to separate admin and frontend enqueue conditions.
 		if ( is_admin() ) {
 			return true;
 		}
@@ -58,10 +76,20 @@ trait Singleton {
 		return apply_filters( 'jeo_should_load_assets', $should_load_assets );
 	}
 
+	/**
+	 * Determine whether Discovery assets should load.
+	 *
+	 * @return bool
+	 */
 	public function should_load_discovery_assets() {
 		return is_page_template( 'discovery.php' );
 	}
 
+	/**
+	 * Determine whether storymap assets should load.
+	 *
+	 * @return bool
+	 */
 	public function should_log_storymap_assets() {
 		$mapblocks = array(
 			'jeo/storymap',
@@ -81,6 +109,11 @@ trait Singleton {
 		return apply_filters( 'jeo_should_load_storymap_assets', $should_load_assets );
 	}
 
+	/**
+	 * Return the singleton instance.
+	 *
+	 * @return static
+	 */
 	final public static function get_instance() {
 		if ( ! isset( self::$instance ) ) {
 			self::$instance = new self();
@@ -89,5 +122,10 @@ trait Singleton {
 		return self::$instance;
 	}
 
+	/**
+	 * Initialize the singleton implementation.
+	 *
+	 * @return void
+	 */
 	abstract protected function init();
 }

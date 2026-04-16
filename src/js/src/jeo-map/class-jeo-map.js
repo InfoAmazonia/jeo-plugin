@@ -1,12 +1,15 @@
 import Spiderfy from '@nazka/map-gl-js-spiderfy';
-import { __ } from '@wordpress/i18n';
-import { Eta } from 'eta';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
-import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
+import { createMap, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
+import { appendRestQueryParams } from '../shared/rest-query';
+import { buildRelatedPostsGeoJson } from '../shared/story-geojson';
 import { EMPTY_STYLE } from '../shared/styles';
+import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
+import { compileEtaTemplate } from './template-compiler';
 
 import '../../../css/jeo-map.scss';
 
@@ -16,9 +19,36 @@ const decodeHtmlEntity = function ( str ) {
 	} );
 };
 
+const chevronLeftSmallIcon = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<path d="m13.1 16-3.4-4 3.4-4 1.1 1-2.6 3 2.6 3-1.1 1z" />
+	</svg>
+`;
+
+const chevronRightSmallIcon = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<path d="M10.8622 8.04053L14.2805 12.0286L10.8622 16.0167L9.72327 15.0405L12.3049 12.0286L9.72327 9.01672L10.8622 8.04053Z" />
+	</svg>
+`;
+
+const RELATED_POSTS_CLUSTER_BADGE_PREFIX = 'jeo-related-posts-cluster-badge-';
+
+function mergeUniqueStoriesById( currentStories = [], nextStories = [] ) {
+	const storiesById = new Map();
+
+	[ ...currentStories, ...nextStories ].forEach( ( story ) => {
+		const storyId = Number.parseInt( story?.id, 10 );
+
+		if ( Number.isFinite( storyId ) ) {
+			storiesById.set( storyId, story );
+		}
+	} );
+
+	return Array.from( storiesById.values() );
+}
+
 function compileTemplate ( template, config = {} ) {
-	const eta = new Eta( config );
-	return eta.compile( template ).bind( eta );
+	return compileEtaTemplate( template, config );
 }
 
 globalThis.Spiderfy = Spiderfy;
@@ -33,6 +63,9 @@ export default class JeoMap {
 		this.legends = [];
 		this.initialized = false;
 		this.popup = null;
+		this.attributionResizeObserver = null;
+		this.relatedPostsClusterBadgeBaseImage = null;
+		this.relatedPostsClusterBadgeHandlerRegistered = false;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
@@ -84,6 +117,9 @@ export default class JeoMap {
             			'icon-image': 'news-marker',
 						'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
         			},
+					spiderLeavesPaint: {
+						'icon-opacity': 1,
+					},
 					onLeafClick: (feature, e) => {
 						this.showPostPopup(feature, e.lngLat);
 					},
@@ -226,22 +262,13 @@ export default class JeoMap {
 							const customAttribution = [];
 							layers.forEach( ( layer ) => {
 								if ( layer.attribution ) {
-									let attributionLink = layer.attribution;
-									const attributionName = layer.attribution_name;
-
-									const regex = new RegExp(
-										/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+									const attributionLink = normalizeOptionalUrl(
+										layer.attribution
 									);
-
-									if (
-										layer.attribution &&
-										! layer.attribution.includes( 'http' )
-									) {
-										if ( layer.attribution.match( regex ) ) {
-											attributionLink = `https://${ layer.attribution }`;
-										}
-									}
-									const attributionLabel = attributionName.replace(
+									const attributionName = layer.attribution_name;
+									const attributionLabel = String(
+										attributionName || ''
+									).replace(
 										/\s/g,
 										''
 									).length
@@ -253,28 +280,41 @@ export default class JeoMap {
 								}
 							} );
 
-							let controlPostion = `bottom-${inlineEnd}`;
+									const isMobileViewport = window.matchMedia
+										? window.matchMedia( '(max-width: 599px)' ).matches
+										: window.innerWidth < 600;
+									const controlPostion = MAP_RUNTIME === 'mapboxgl'
+										? 'bottom-right'
+										: `bottom-${inlineEnd}`;
 
-							let attributionControl = new mapgl.AttributionControl( {
-								compact: false,
-								customAttribution,
-							} );
+									let attributionControl = MAP_RUNTIME === 'mapboxgl'
+										? new mapgl.AttributionControl( {
+											compact: false,
+											customAttribution,
+										} )
+										: new mapgl.AttributionControl( {
+											customAttribution,
+										} );
 
-							if(window.innerWidth < 600) {
-								attributionControl = new mapgl.AttributionControl( {
-									compact: true,
-									customAttribution,
-								} )
+									if ( isMobileViewport && MAP_RUNTIME === 'mapboxgl' ) {
+										attributionControl = new mapgl.AttributionControl( {
+											compact: true,
+											customAttribution,
+										} );
+									}
 
-								controlPostion = `bottom-${inlineStart}`;
-							}
+								map.addControl(
+									attributionControl,
+									controlPostion
+								);
+								this.syncAttributionSpacing();
 
-							map.addControl(
-								attributionControl,
-								controlPostion
-							);
+								if ( MAP_RUNTIME === 'maplibregl' ) {
+									this.collapseCompactMapLibreAttribution();
+									map.on( 'resize', () => this.collapseCompactMapLibreAttribution() );
+								}
 
-							this.getRelatedPosts();
+								this.getRelatedPosts();
 						});
 
 						this.addLayersControl( amountLayers );
@@ -296,6 +336,17 @@ export default class JeoMap {
 	}
 
 	async fetchMapData() {
+		const previewMapPayload = this.element.dataset.previewMap;
+		if ( previewMapPayload ) {
+			try {
+				this.map_post_object = JSON.parse( previewMapPayload );
+				await this.getLayers();
+				return;
+			} catch ( error ) {
+				console.warn( 'Unable to parse preview map payload. Falling back to REST data.', error );
+			}
+		}
+
 		if ( this.getArg( 'map_id' ) ) {
 			const data = await jQuery.ajax( {
 				type: 'GET',
@@ -310,17 +361,71 @@ export default class JeoMap {
 			this.map_post_object = data;
 
 			await this.getLayers();
+		} else if ( this.getArg( 'layers' ) ) {
+			// One-time maps have no map_id but store layer settings
+			// in the data-layers attribute. We still need to fetch
+			// the full layer objects so getStyleLayer() can resolve.
+			await this.getLayers();
 		}
 	}
 
 	addMapWithoutLayersMessage() {
 		const layers = document.createElement( 'div' );
-		layers.innerHTML +=
-			'<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
+		layers.innerHTML += `<p class="jeomap-no-layers__text">${ __(
+			"This map doesn't have layers",
+			'jeo'
+		) }</p>`;
 		this.element.appendChild( layers );
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
 		jQuery( this.element ).find( '.mapboxgl-control-container, .maplibregl-control-container' ).remove();
 		jQuery( this.element ).find( '.mapboxgl-canvas-container, .maplibregl-canvas-container' ).remove();
+	}
+
+	collapseCompactMapLibreAttribution() {
+		const attributionControl = this.element.querySelector(
+			'details.maplibregl-ctrl-attrib.maplibregl-compact'
+		);
+
+		if ( attributionControl ) {
+			attributionControl.classList.remove( 'maplibregl-compact-show' );
+			attributionControl.removeAttribute( 'open' );
+		}
+	}
+
+	syncAttributionSpacing() {
+		const updateSpacing = () => {
+			const attributionControl = this.element.querySelector(
+				'.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib'
+			);
+			const attributionHeight = attributionControl
+				? Math.ceil( attributionControl.getBoundingClientRect().height )
+				: 0;
+
+			this.element.style.setProperty(
+				'--jeo-attribution-offset',
+				attributionHeight > 0 ? `${ attributionHeight + 8 }px` : '0px'
+			);
+		};
+
+		updateSpacing();
+
+		if ( this.attributionResizeObserver ) {
+			this.attributionResizeObserver.disconnect();
+			this.attributionResizeObserver = null;
+		}
+
+		const attributionControl = this.element.querySelector(
+			'.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib'
+		);
+		if (
+			attributionControl &&
+			typeof ResizeObserver !== 'undefined'
+		) {
+			this.attributionResizeObserver = new ResizeObserver( updateSpacing );
+			this.attributionResizeObserver.observe( attributionControl );
+		}
+
+		window.requestAnimationFrame( updateSpacing );
 	}
 
 	/**
@@ -423,32 +528,18 @@ export default class JeoMap {
 			this.layers.forEach( ( layer ) => {
 				innerHTML += `<h3>${ layer.attributes.layer_name }</h1>`;
 
-				const regex = new RegExp(
-					/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+				const attributionLink = normalizeOptionalUrl(
+					layer.attributes.attribution
 				);
-
-				let attributionLink = layer.attributes.attribution;
 				const attributionName = layer.attributes.attribution_name;
-
-				let sourceLink = layer.source_url;
-
-				if (
-					layer.attributes.attribution &&
-					! layer.attributes.attribution.includes( 'http' )
-				) {
-					if ( layer.attributes.attribution.match( regex ) ) {
-						attributionLink = `https://${ layer.attributes.attribution }`;
-					}
-				}
-
-				if ( layer.source_url && ! layer.source_url.includes( 'http' ) ) {
-					if ( layer.source_url.match( regex ) ) {
-						sourceLink = `https://${ layer.source_url }`;
-					}
-				}
+				const sourceLink = normalizeOptionalUrl( layer.source_url );
 
 				if ( attributionLink ) {
-					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ attributionName }</a></p>`;
+					const attributionLabel = attributionName || attributionLink;
+					innerHTML += `<p>${ __(
+						'Attribution:',
+						'jeo'
+					) } <a href="${ attributionLink }">${ attributionLabel }</a></p>`;
 				}
 				if ( sourceLink ) {
 					innerHTML += `<a
@@ -466,7 +557,10 @@ export default class JeoMap {
 									font-size: 16px;
 									font-weight: bold;
 									transition: all .2 ease-in-out;"
-									href="${ sourceLink }" class="download-source">Download from source
+									href="${ sourceLink }" class="download-source">${ __(
+										'Download from source',
+										'jeo'
+									) }
 								  </a>`;
 				}
 			} );
@@ -476,7 +570,10 @@ export default class JeoMap {
 		const closeButton = document.createElement( 'div' );
 		closeButton.classList.add( 'more-info-close' );
 		closeButton.innerHTML =
-			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>`;
+			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="${ __(
+				'Close popup',
+				'jeo'
+			) }"><span>×</span></button>`;
 
 		closeButton.click( function ( e ) {} );
 
@@ -541,18 +638,21 @@ export default class JeoMap {
 			const layersDefinitions = this.getArg( 'layers' );
 			this.layersDefinitions = layersDefinitions;
 
+			if ( ! Array.isArray( layersDefinitions ) || layersDefinitions.length === 0 ) {
+				this.layers = [];
+				this.legends = [];
+				resolve( [] );
+				return;
+			}
+
 			if ( layersDefinitions ) {
 				const layersIds = layersDefinitions.map( ( el ) => el.id );
-				const urlRoutes = window.location.pathname.split( '/' );
-				const lang = urlRoutes[ 1 ];
 
 				jQuery.get(
-					jeoMapVars.jsonUrl + 'map-layer',
+					jeoMapVars.layersUrl,
 					{
 						include: layersIds,
-						orderby: 'include',
-						per_page: 100,
-						// lang: lang ? lang : '',
+						context: 'view',
 					},
 					( data ) => {
 						const returnLayers = [];
@@ -579,7 +679,7 @@ export default class JeoMap {
 
 								if (
 									layerObject.meta.legend_type !== 'none' &&
-									layersDefinitions[ i ].show_legend
+									layersDefinitions[ i ].show_legend !== false
 								) {
 									returnLegends[ i ] = (
 										new window.JeoLegend( layerObject.meta.legend_type, {
@@ -613,9 +713,11 @@ export default class JeoMap {
 					( layer ) => layer.attributes.layer_post_id === layerSettings.id
 				);
 
-				const styleUrl = layer.getStyleUrl();
-				if ( styleUrl ) {
-					return styleUrl;
+				if ( layer ) {
+					const styleUrl = layer.getStyleUrl();
+					if ( styleUrl ) {
+						return styleUrl;
+					}
 				}
 			}
 		}
@@ -624,161 +726,241 @@ export default class JeoMap {
 	}
 
 	getRelatedPosts() {
-		return new Promise( ( resolve, reject ) => {
-			const self = this;
-			const relatedPostsCriteria = this.getArg( 'related_posts' );
-			this.relatedPostsCriteria = relatedPostsCriteria;
+		return ( async () => {
+			try {
+				const relatedPostsCriteria = this.getArg( 'related_posts' ) || {};
+				this.relatedPostsCriteria = relatedPostsCriteria;
 
-			const relatePosts = this.getArg( 'relate_posts' );
-			if ( ! relatePosts ) {
-				resolve( [] );
-				return;
-			}
+				if ( ! this.getArg( 'relate_posts' ) ) {
+					return [];
+				}
 
-			const query = {};
-			query.per_page = 100;
+				const query = {
+					per_page: 100,
+					_fields: 'id,meta,title,link,date,featured_media,categories',
+				};
 
-			if ( this.relatedPostsCriteria.after || this.relatedPostsCriteria.before ) {
-				query.orderby = 'date';
-				query.order = 'desc';
-			}
+				if ( relatedPostsCriteria.after || relatedPostsCriteria.before ) {
+					query.orderby = 'date';
+					query.order = 'desc';
+				}
 
-			const keys = Object.keys( relatedPostsCriteria );
+				Object.entries( relatedPostsCriteria ).forEach( ( [ key, value ] ) => {
+					if ( value !== undefined && value !== null && value !== '' ) {
+						query[ key ] = value;
+					}
+				} );
 
-			for ( const i in keys ) {
-				query[ keys[ i ] ] = relatedPostsCriteria[ keys[ i ] ];
-			}
+				const buildRelatedPostsUrl = ( page = null ) => {
+					const targetUrl = new URL( jeoMapVars.jsonUrl + 'posts' );
+					appendRestQueryParams( targetUrl.searchParams, query );
 
-			if ( keys.length < 1 ) {
-				resolve( [] );
-			}
+					if ( page !== null ) {
+						targetUrl.searchParams.set( 'page', page );
+					}
 
-			query._fields = ['id', 'meta', 'title', 'link', 'date'];
+					if ( jeoMapVars.currentLang ) {
+						targetUrl.searchParams.append( 'lang', jeoMapVars.currentLang );
+					}
+					return targetUrl;
+				};
 
-			const targetURL = new URL(jeoMapVars.jsonUrl + 'posts');
-			Object.keys(query).forEach(key => targetURL.searchParams.append(key, query[key]));
-			targetURL.searchParams.append('lang', jeoMapVars.currentLang);
+				const fetchPostsPage = async ( page = null ) => {
+					const response = await fetch( buildRelatedPostsUrl( page ), {
+						cache: 'no-store',
+					} );
+					const data = await response.json();
 
-			fetch(targetURL)
-				.then(async (response) => {
-					const jsonResponse = await response.json();
-					return { data: jsonResponse, totalPages: response.headers.get("x-wp-totalpages") };
-				})
-				.then(({ data, totalPages }) => {
-					// Save first page results
-					let cumulativePosts = data;
+					return {
+						data: Array.isArray( data ) ? data : [],
+						totalPages: Number.parseInt(
+							response.headers.get( 'x-wp-totalpages' ) || '1',
+							10
+						),
+					};
+				};
 
-					const buildRelatedPosts = (map) => {
-						const sourceData = this.buildPostsGeoJson(cumulativePosts);
+				const { data, totalPages } = await fetchPostsPage();
+				let cumulativePosts = data;
 
-						map.addSource( 'storiesSource', {
-							type: 'geojson',
-							data: sourceData,
-							cluster: true,
-							clusterRadius: 40,
+				const buildRelatedPosts = ( map ) => {
+					const sourceData = this.buildPostsGeoJson( cumulativePosts );
+					this.relatedPostsGeoJson = sourceData;
+
+					map.addSource( 'storiesSource', {
+						type: 'geojson',
+						data: sourceData,
+						cluster: true,
+						clusterRadius: 40,
+					} );
+
+					const relatedPostsImages = [
+						loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
+						loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
+						loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
+					];
+
+					if ( MAP_RUNTIME !== 'mapboxgl' ) {
+						relatedPostsImages.push(
+							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url )
+						);
+					}
+
+					Promise.all( relatedPostsImages ).then( () => {
+						if ( MAP_RUNTIME === 'mapboxgl' ) {
+							this.registerRelatedPostsClusterBadgeHandler( map );
+						}
+
+						map.addLayer( {
+							id: 'unclustered-points-hitarea',
+							type: 'symbol',
+							source: 'storiesSource',
+							filter: [ '!', [ 'has', 'point_count' ] ],
+							layout: {
+								'icon-image': 'news-marker',
+								'icon-size': parseFloat(
+									jeoMapVars.images['/js/src/icons/news-marker'].icon_size
+								) * 1.6,
+								'icon-allow-overlap': true,
+							},
+							paint: {
+								'icon-opacity': 0.001,
+							},
 						} );
 
-						Promise.all([
-							loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
-							loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
-							loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
-							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url ),
-						]).then( () => {
-							// Single markers layer
-							map.addLayer( {
-								id: 'unclustered-points',
-								type: 'symbol',
-								source: 'storiesSource',
-								layout: {
-									'icon-allow-overlap': true,
+						map.addLayer( {
+							id: 'unclustered-points',
+							type: 'symbol',
+							source: 'storiesSource',
+							layout: {
+								'icon-allow-overlap': true,
+								'icon-image': [
+									'case',
+									[ 'boolean', [ 'has', 'point_count' ], false ],
+									'cluster',
+									'news-marker',
+								],
+								'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
+							},
+						} );
+
+						map.on( 'click', 'unclustered-points', () => {} );
+
+						map.on( 'click', 'unclustered-points-hitarea', ( e ) => {
+							const featuresAtPoint = e.point
+								? map.queryRenderedFeatures( e.point, {
+									layers: [ 'unclustered-points-hitarea' ],
+								} )
+								: e.features;
+							const relatedCoordinateFeatures = this.resolvePopupFeatures(
+								featuresAtPoint
+							);
+
+							if ( relatedCoordinateFeatures.length ) {
+								this.showPostPopup(
+									relatedCoordinateFeatures,
+									e.lngLat ?? relatedCoordinateFeatures[ 0 ].geometry.coordinates
+								);
+							}
+						} );
+
+						map.addLayer( {
+							id: 'cluster-layer',
+							type: 'circle',
+							source: 'storiesSource',
+							filter: [ 'has', 'point_count' ],
+							paint: {
+								'circle-color': jeoMapVars.cluster.circle_color,
+								'circle-radius': 20,
+								'circle-stroke-color': '#ffffff',
+								'circle-stroke-opacity': 0.4,
+								'circle-stroke-width': 9,
+							},
+						} );
+
+						map.addLayer( {
+							id: 'cluster-count',
+							type: 'symbol',
+							source: 'storiesSource',
+							filter: [ 'has', 'point_count' ],
+							layout: MAP_RUNTIME === 'mapboxgl'
+								? {
 									'icon-image': [
-										'case',
-										['boolean', ['has', 'point_count'], false],
-										'cluster',
-										'news-marker',
+										'concat',
+										RELATED_POSTS_CLUSTER_BADGE_PREFIX,
+										[
+											'to-string',
+											[
+												'coalesce',
+												[ 'get', 'point_count_abbreviated' ],
+												[ 'get', 'point_count' ],
+											],
+										],
 									],
-									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
-								},
-							} );
-
-							map.on('click', 'unclustered-points', (e) => {
-								const feature = e.features[0];
-								if (!feature?.properties.cluster) {
-									this.showPostPopup(feature, feature.geometry.coordinates);
+									'icon-size': 1,
+									'icon-allow-overlap': true,
+									'icon-ignore-placement': true,
 								}
-							});
-
-							// cluster circle layer
-							map.addLayer( {
-								id: 'cluster-layer',
-								type: 'circle',
-								source: 'storiesSource',
-								filter: [ 'has', 'point_count' ],
-								paint: {
-									'circle-color': jeoMapVars.cluster.circle_color,
-									'circle-radius': 20,
-									'circle-stroke-color': '#ffffff',
-									'circle-stroke-opacity': 0.4,
-									'circle-stroke-width': 9,
-								},
-							} );
-
-							// cluster number layer
-							map.addLayer( {
-								id: 'cluster-count',
-								type: 'symbol',
-								source: 'storiesSource',
-								filter: [ 'has', 'point_count' ],
-								layout: {
+								: {
 									'icon-image': 'news-no-marker',
 									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
-									'icon-allow-overlap': false,
+									'icon-allow-overlap': true,
+									'icon-ignore-placement': true,
 									'icon-offset': [ 0, -30 ],
-									'text-field': [ 'get', 'point_count' ],
+									'text-field': '{point_count}',
 									'text-font': [ 'Open Sans Bold' ],
 									'text-size': 12,
 									'text-transform': 'uppercase',
 									'text-letter-spacing': 0.05,
 									'text-offset': [ 0, 0.8 ],
+									'text-allow-overlap': true,
+									'text-ignore-placement': true,
 								},
-								paint: {
+							paint: MAP_RUNTIME === 'mapboxgl'
+								? {}
+								: {
 									'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
 								},
-							} );
-
-							this.spiderifier.applyTo('unclustered-points');
-
-							map.on('mouseenter', ['unclustered-points', 'cluster-layer', 'cluster-count'], () => {
-								map.getCanvas().style.cursor = 'pointer';
-							});
-							map.on('mouseleave', ['unclustered-points', 'cluster-layer', 'cluster-count'], () => {
-								map.getCanvas().style.cursor = '';
-							});
 						} );
 
-						// Keep requesting to get to the last page
-						for (let i = 2; i <= totalPages; i++) {
-							// Break to avoid respect page limiting
-							if (i >= 100) {
-								break;
-							}
+						map.on( 'click', 'cluster-layer', ( e ) => {
+							this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+						} );
 
-							targetURL.searchParams.set('page', i);
+						map.on( 'click', 'cluster-count', ( e ) => {
+							this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+						} );
 
-							fetch(targetURL)
-								.then(response => { return response.json() })
-								.then(moreresults => {
-									cumulativePosts = [...cumulativePosts, ...moreresults];
+						map.on( 'mouseenter', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
+							map.getCanvas().style.cursor = 'pointer';
+						} );
+						map.on( 'mouseleave', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
+							map.getCanvas().style.cursor = '';
+						} );
+					} );
+				};
 
-									const sourceData = this.buildPostsGeoJson(cumulativePosts);
-									map.getSource('storiesSource').setData(sourceData);
-								});
-						}
-					}
+				buildRelatedPosts( this.map );
 
-					buildRelatedPosts(this.map);
-			});
-		} );
+				const maxPage = Number.isFinite( totalPages ) ? Math.min( totalPages, 99 ) : 1;
+				for ( let page = 2; page <= maxPage; page++ ) {
+					const { data: moreResults } = await fetchPostsPage( page );
+					cumulativePosts = mergeUniqueStoriesById(
+						cumulativePosts,
+						moreResults
+					);
+
+					const sourceData = this.buildPostsGeoJson( cumulativePosts );
+					this.relatedPostsGeoJson = sourceData;
+					this.map.getSource( 'storiesSource' )?.setData( sourceData );
+				}
+
+				return cumulativePosts;
+			} catch ( error ) {
+				console.error( 'Unable to load related posts.', error );
+				return [];
+			}
+		} )();
 	}
 
 	getCircleSvg( { fill, radius = 20 } ) {
@@ -788,60 +970,479 @@ export default class JeoMap {
 		</svg>`
 	}
 
-	buildPostsGeoJson( stories ) {
-		const finalFeatures = {
-			type: 'FeatureCollection',
-			features: [],
-		};
-
-		stories.map( ( story ) => {
-			const storyRelatedPoints = story.meta._related_point ?? [];
-			const storyPoints = storyRelatedPoints.map( ( point ) => {
-				return [ point._geocode_lon, point._geocode_lat ];
-			} );
-
-			finalFeatures.features.push(
-				...storyPoints.map( ( point ) => {
-					return {
-						id: story.id,
-						type: 'Feature',
-						properties: story,
-						geometry: {
-							type: 'Point',
-							coordinates: point,
-						},
-					};
-				} )
-			);
-		} );
-
-		return finalFeatures;
+	getRelatedPostsClusterBadgeImageId( label ) {
+		return `${ RELATED_POSTS_CLUSTER_BADGE_PREFIX }${ label }`;
 	}
 
-	showPostPopup( feature, lngLat ) {
-		this.popup?.remove();
+	getRelatedPostsClusterBadgeLabel( value ) {
+		const count = Number.parseInt( value, 10 );
 
-		const title = typeof feature.properties.title === 'string'
-			? JSON.parse( feature.properties.title )
-			: feature.properties.title;
+		if ( ! Number.isFinite( count ) ) {
+			return String( value ?? '' );
+		}
 
-		const post = {
-			date: feature.properties.date,
-			link: feature.properties.link,
+		if ( count >= 1000000 ) {
+			return `${ Math.round( count / 100000 ) / 10 }m`.replace( '.0m', 'm' );
+		}
+
+		if ( count >= 1000 ) {
+			return `${ Math.round( count / 100 ) / 10 }k`.replace( '.0k', 'k' );
+		}
+
+		return String( count );
+	}
+
+	getRelatedPostsClusterBadgeBaseImage() {
+		if ( this.relatedPostsClusterBadgeBaseImage ) {
+			return this.relatedPostsClusterBadgeBaseImage;
+		}
+
+		this.relatedPostsClusterBadgeBaseImage = new Promise( ( resolve, reject ) => {
+			const image = new Image();
+			image.decoding = 'async';
+			image.crossOrigin = 'anonymous';
+			image.onload = () => resolve( image );
+			image.onerror = () => reject( new Error( 'Unable to load cluster badge icon.' ) );
+			image.src = jeoMapVars.images['/js/src/icons/news'].url;
+		} );
+
+		return this.relatedPostsClusterBadgeBaseImage;
+	}
+
+	async createRelatedPostsClusterBadgeImage( label ) {
+		const iconImage = await this.getRelatedPostsClusterBadgeBaseImage();
+		const pixelRatio = 2;
+		const displaySize = 40;
+		const size = displaySize * pixelRatio;
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = size;
+		canvas.height = size;
+
+		const context = canvas.getContext( '2d' );
+
+		if ( ! context ) {
+			throw new Error( 'Unable to create cluster badge canvas.' );
+		}
+
+		context.clearRect( 0, 0, size, size );
+		context.drawImage( iconImage, 20, 12, 40, 28 );
+
+		const safeLabel = String( label ?? '' ).trim();
+		const fontSize = safeLabel.length >= 4 ? 22 : safeLabel.length === 3 ? 24 : 28;
+
+		context.fillStyle = jeoMapVars.images['/js/src/icons/news'].text_color || '#202202';
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.font = `700 ${ fontSize }px sans-serif`;
+		context.fillText( safeLabel, size / 2, 58 );
+
+		const imageData = context.getImageData( 0, 0, size, size );
+
+		return {
+			width: imageData.width,
+			height: imageData.height,
+			data: imageData.data,
+			pixelRatio,
+		};
+	}
+
+	registerRelatedPostsClusterBadgeHandler( map ) {
+		if ( MAP_RUNTIME !== 'mapboxgl' || this.relatedPostsClusterBadgeHandlerRegistered ) {
+			return;
+		}
+
+		this.relatedPostsClusterBadgeHandlerRegistered = true;
+
+		map.on( 'styleimagemissing', async ( event ) => {
+			const imageId = event?.id;
+
+			if (
+				typeof imageId !== 'string' ||
+				! imageId.startsWith( RELATED_POSTS_CLUSTER_BADGE_PREFIX ) ||
+				map.hasImage( imageId )
+			) {
+				return;
+			}
+
+			const label = imageId.slice( RELATED_POSTS_CLUSTER_BADGE_PREFIX.length );
+
+			try {
+				const image = await this.createRelatedPostsClusterBadgeImage( label );
+
+				if ( ! map.hasImage( imageId ) ) {
+					map.addImage( imageId, image, { pixelRatio: image.pixelRatio } );
+				}
+			} catch ( error ) {
+				console.error( 'Unable to build related posts cluster badge.', error );
+			}
+		} );
+	}
+
+	buildPostsGeoJson( stories ) {
+		return buildRelatedPostsGeoJson( stories );
+	}
+
+	getPopupFeatures( features = [] ) {
+		const seenFeatures = new Set();
+
+		return ( features ?? [] )
+			.filter(
+				( feature ) =>
+					! feature?.properties?.cluster && ! feature?.properties?.point_count
+			)
+			.filter( ( feature ) => {
+				const coordinates = feature?.geometry?.coordinates ?? [];
+				const uniqueKey =
+					feature?.properties?.link ||
+					`${ feature?.id ?? 'story' }:${ coordinates.join( ',' ) }`;
+
+				if ( seenFeatures.has( uniqueKey ) ) {
+					return false;
+				}
+
+				seenFeatures.add( uniqueKey );
+				return true;
+			} );
+	}
+
+	getPopupFeaturesForCoordinates( coordinates ) {
+		const coordinateKey = this.getCoordinatesKey( coordinates );
+
+		if ( ! coordinateKey ) {
+			return [];
+		}
+
+		return this.getPopupFeatures(
+			( this.relatedPostsGeoJson?.features ?? [] ).filter(
+				( feature ) =>
+					this.getCoordinatesKey( feature?.geometry?.coordinates ) ===
+					coordinateKey
+			)
+		);
+	}
+
+	getPopupFeaturesForFeature( feature ) {
+		const sourceFeatures = this.relatedPostsGeoJson?.features ?? [];
+		const coordinateKey = this.getCoordinatesKey( feature?.geometry?.coordinates );
+		const featureId = feature?.id ?? feature?.properties?.id ?? null;
+		const featureLink = feature?.properties?.link ?? null;
+
+		return this.getPopupFeatures(
+			sourceFeatures.filter( ( sourceFeature ) => {
+				if ( featureLink && sourceFeature?.properties?.link === featureLink ) {
+					return true;
+				}
+
+				if (
+					featureId !== null &&
+					( sourceFeature?.id === featureId ||
+						sourceFeature?.properties?.id === featureId )
+				) {
+					return true;
+				}
+
+				if (
+					coordinateKey &&
+					this.getCoordinatesKey( sourceFeature?.geometry?.coordinates ) ===
+						coordinateKey
+				) {
+					return true;
+				}
+
+				return false;
+			} )
+		);
+	}
+
+	resolvePopupFeatures( features = [] ) {
+		const popupFeatures = this.getPopupFeatures( features );
+
+		if ( ! popupFeatures.length ) {
+			return [];
+		}
+
+		const sourceResolvedFeatures = popupFeatures.flatMap( ( feature ) =>
+			this.getPopupFeaturesForFeature( feature )
+		);
+
+		if ( sourceResolvedFeatures.length ) {
+			return this.getPopupFeatures( sourceResolvedFeatures );
+		}
+
+		if ( popupFeatures.length === 1 ) {
+			return this.getPopupFeaturesForCoordinates(
+				popupFeatures[ 0 ]?.geometry?.coordinates
+			);
+		}
+
+		return popupFeatures;
+	}
+
+	getCoordinatesKey( coordinates ) {
+		if ( ! Array.isArray( coordinates ) || coordinates.length < 2 ) {
+			return null;
+		}
+
+		return coordinates
+			.slice( 0, 2 )
+			.map( ( value ) => Number.parseFloat( value ).toFixed( 6 ) )
+			.join( ':' );
+	}
+	openClusterPostsPopup( feature, lngLat ) {
+		const clusterId = feature?.properties?.cluster_id;
+		const pointCount = feature?.properties?.point_count;
+
+		if ( ! clusterId || ! pointCount ) {
+			return;
+		}
+
+		getClusterLeaves(
+			this.map.getSource( 'storiesSource' ),
+			clusterId,
+			pointCount,
+			0
+		).then( ( leaves ) => {
+			const popupFeatures = this.getPopupFeatures( leaves );
+
+			if ( popupFeatures.length ) {
+				this.showPostPopup(
+					popupFeatures,
+					lngLat ?? feature.geometry.coordinates,
+					{ totalCount: pointCount }
+				);
+			}
+		} );
+	}
+
+	parsePopupTitle( title ) {
+		if ( typeof title !== 'string' ) {
+			return title;
+		}
+
+		try {
+			return JSON.parse( title );
+		} catch ( error ) {
+			return { rendered: title };
+		}
+	}
+
+	buildPopupPost( feature ) {
+		const title = this.parsePopupTitle( feature?.properties?.title );
+
+		return {
+			date: feature?.properties?.date,
+			link: feature?.properties?.link,
 			title: {
 				rendered: title?.rendered,
 			},
 		};
+	}
 
-		const popupHTML = this.popupTemplate( {
-			post,
+	buildPopupHTML( feature ) {
+		return this.popupTemplate( {
+			post: this.buildPopupPost( feature ),
 			read_more: jeoMapVars.string_read_more,
 			show_featured_media: false,
 		} );
+	}
+
+	createPopupArticleNode( feature ) {
+		const popupWrapper = document.createElement( 'div' );
+		popupWrapper.innerHTML = this.buildPopupHTML( feature ).trim();
+		return popupWrapper.firstElementChild;
+	}
+
+	createPopupNavigatorContent( popupFeatures, options = {} ) {
+		const totalCount = Number.isFinite( options.totalCount )
+			? options.totalCount
+			: popupFeatures.length;
+
+		if ( popupFeatures.length === 1 && totalCount === popupFeatures.length ) {
+			return this.createPopupArticleNode( popupFeatures[ 0 ] );
+		}
+
+		const navigator = document.createElement( 'div' );
+		navigator.className = 'jeo-popup-navigator';
+		navigator.innerHTML = `
+			<div class="jeo-popup-navigator__header">
+				<div class="jeo-popup-navigator__header-copy">
+					<div class="jeo-popup-navigator__counter"></div>
+					<div class="jeo-popup-navigator__meta"></div>
+				</div>
+				<div class="jeo-popup-navigator__controls">
+					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--previous" aria-label="${ __(
+						'Show previous post',
+						'jeo'
+					) }">${ chevronLeftSmallIcon }</button>
+					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--next" aria-label="${ __(
+						'Show next post',
+						'jeo'
+					) }">${ chevronRightSmallIcon }</button>
+				</div>
+			</div>
+			<div class="jeo-popup-navigator__viewport"></div>
+		`;
+
+		const counter = navigator.querySelector(
+			'.jeo-popup-navigator__counter'
+		);
+		const meta = navigator.querySelector( '.jeo-popup-navigator__meta' );
+		const previousButton = navigator.querySelector(
+			'.jeo-popup-navigator__button--previous'
+		);
+		const nextButton = navigator.querySelector(
+			'.jeo-popup-navigator__button--next'
+		);
+		const viewport = navigator.querySelector(
+			'.jeo-popup-navigator__viewport'
+		);
+
+		let currentIndex = 0;
+		let currentFrame = this.createPopupArticleNode( popupFeatures[ 0 ] );
+		let isTransitioning = false;
+		currentFrame.classList.add(
+			'jeo-popup-navigator__frame',
+			'is-current',
+			'is-active'
+		);
+		viewport.appendChild( currentFrame );
+
+		const updateCounter = () => {
+			counter.textContent = `${ currentIndex + 1 } / ${ popupFeatures.length }`;
+			meta.textContent =
+				totalCount !== popupFeatures.length
+					? sprintf(
+						/* translators: %d: number of markers in the current map area. */
+						_n(
+							'%d marker in this area',
+							'%d markers in this area',
+							totalCount,
+							'jeo'
+						),
+						totalCount
+					)
+					: '';
+			previousButton.disabled = currentIndex === 0 || isTransitioning;
+			nextButton.disabled =
+				currentIndex === popupFeatures.length - 1 || isTransitioning;
+		};
+
+		const transitionToIndex = ( nextIndex ) => {
+			if (
+				isTransitioning ||
+				nextIndex < 0 ||
+				nextIndex >= popupFeatures.length ||
+				nextIndex === currentIndex
+			) {
+				return;
+			}
+
+			const direction = nextIndex > currentIndex ? 'next' : 'previous';
+			isTransitioning = true;
+			updateCounter();
+			viewport.style.height = `${ currentFrame.offsetHeight }px`;
+
+			const enterNextFrame = () => {
+				if ( ! currentFrame?.isConnected ) {
+					return;
+				}
+
+				const nextFrame = this.createPopupArticleNode(
+					popupFeatures[ nextIndex ]
+				);
+				nextFrame.classList.add(
+					'jeo-popup-navigator__frame',
+					`is-entering-${ direction }`
+				);
+
+				currentFrame.replaceWith( nextFrame );
+				currentFrame = nextFrame;
+				currentIndex = nextIndex;
+				viewport.style.height = `${ nextFrame.offsetHeight }px`;
+
+				const finalizeEnter = () => {
+					if ( ! nextFrame?.isConnected ) {
+						return;
+					}
+
+					nextFrame.classList.remove( `is-entering-${ direction }` );
+					nextFrame.classList.add( 'is-current', 'is-active' );
+					isTransitioning = false;
+					viewport.style.height = '';
+					updateCounter();
+				};
+
+				window.requestAnimationFrame( () => {
+					nextFrame.classList.add( 'is-active' );
+				} );
+
+				nextFrame.addEventListener(
+					'transitionend',
+					( event ) => {
+						if ( event.target === nextFrame ) {
+							finalizeEnter();
+						}
+					},
+					{ once: true }
+				);
+
+				window.setTimeout( finalizeEnter, 240 );
+			};
+
+			window.requestAnimationFrame( () => {
+				currentFrame.classList.remove( 'is-active', 'is-current' );
+				currentFrame.classList.add( `is-exiting-${ direction }` );
+			} );
+
+			currentFrame.addEventListener(
+				'transitionend',
+				( event ) => {
+					if ( event.target === currentFrame ) {
+						enterNextFrame();
+					}
+				},
+				{ once: true }
+			);
+
+			window.setTimeout( enterNextFrame, 240 );
+		};
+
+		previousButton.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+			transitionToIndex( currentIndex - 1 );
+		} );
+
+		nextButton.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+			transitionToIndex( currentIndex + 1 );
+		} );
+
+		updateCounter();
+
+		return navigator;
+	}
+
+	showPostPopup( featureOrFeatures, lngLat, options = {} ) {
+		this.popup?.remove();
+
+		const popupFeatures = this.getPopupFeatures(
+			Array.isArray( featureOrFeatures ) ? featureOrFeatures : [ featureOrFeatures ]
+		);
+
+		if ( ! popupFeatures.length ) {
+			return;
+		}
+
+		const popupContent = this.createPopupNavigatorContent(
+			popupFeatures,
+			options
+		);
 
 		this.popup = new mapgl.Popup( { closeOnClick: false } )
 			.setLngLat( lngLat )
-			.setHTML( popupHTML )
+			.setDOMContent( popupContent )
 			.addTo( this.map );
 	}
 

@@ -1,0 +1,22 @@
+{
+	"name": "react-autosize-textarea",
+	"version": "7.1.0-jeo.0",
+	"description": "JEO-local override of react-autosize-textarea with modernized peer dependency metadata",
+	"main": "lib",
+	"typings": "lib",
+	"license": "MIT",
+	"homepage": "https://github.com/buildo/react-autosize-textarea",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/buildo/react-autosize-textarea.git"
+	},
+	"dependencies": {
+		"autosize": "^4.0.2",
+		"line-height": "^0.3.1",
+		"prop-types": "^15.5.6"
+	},
+	"peerDependencies": {
+		"react": "^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0",
+		"react-dom": "^0.14.0 || ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0"
+	}
+}

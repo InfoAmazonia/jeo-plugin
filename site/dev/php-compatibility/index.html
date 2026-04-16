@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/dev/php-compatibility/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>PHP compatibility - JEO</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "PHP compatibility";
+        var mkdocs_page_input_path = "dev/php-compatibility.md";
+        var mkdocs_page_url = "/dev/php-compatibility/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">PHP compatibility</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#policy-snapshot">Policy snapshot</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#automation">Automation</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-php-85-is-covered">How PHP 8.5 is covered</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#local-commands">Local commands</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#current-status">Current status</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-smoke-tests/">Dependency upgrade smoke tests</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer</li>
+      <li class="breadcrumb-item active">PHP compatibility</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/dev/php-compatibility.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="php-compatibility">PHP Compatibility</h1>
+<p>This repository keeps two layers of PHP compatibility validation:</p>
+<ul>
+<li>Static compatibility checks for PHP <code>8.0</code> through <code>8.5</code>.</li>
+<li>WordPress smoke tests for the PHP and WordPress combinations we currently support or monitor.</li>
+</ul>
+<h2 id="policy-snapshot">Policy snapshot</h2>
+<p>Validated on March 17, 2026.</p>
+<ul>
+<li>Primary support: PHP <code>8.2</code>, <code>8.3</code>, and <code>8.4</code>.</li>
+<li>Experimental monitoring: PHP <code>8.5</code>.</li>
+<li>Stable WordPress gate: <code>WordPress 6.9.4</code> on PHP <code>8.2</code>, <code>8.3</code>, and <code>8.4</code>.</li>
+<li>Experimental WordPress gate: <code>WordPress 6.9.4</code> on PHP <code>8.5</code>.</li>
+<li>Backward-compatibility coverage: <code>WordPress 6.6</code> on PHP <code>8.0</code> and <code>8.1</code>.</li>
+<li>Forward-compatibility coverage: <code>WordPress 7.0-beta4</code> on PHP <code>8.2</code>, <code>8.3</code>, <code>8.4</code>, and experimentally on <code>8.5</code>.</li>
+</ul>
+<h2 id="automation">Automation</h2>
+<ul>
+<li>Static checks: <code>.github/workflows/php-compat.yml</code></li>
+<li>WordPress smoke tests: <code>.github/workflows/wordpress-smoke.yml</code></li>
+</ul>
+<h2 id="how-php-85-is-covered">How PHP 8.5 is covered</h2>
+<ul>
+<li><code>scripts/check-php-compat.php</code> now validates repository-owned compatibility from PHP <code>8.0</code> through <code>8.5</code>.</li>
+<li>The static script includes PHP <code>8.5</code>-focused heuristics for backtick execution, non-canonical casts, <code>case ...;</code> syntax and legacy <code>__sleep()</code> or <code>__wakeup()</code> usage.</li>
+<li><code>.github/workflows/php-compat.yml</code> includes PHP <code>8.5</code> as an experimental CI job.</li>
+<li><code>.github/workflows/wordpress-smoke.yml</code> includes experimental PHP <code>8.5</code> smoke jobs for both <code>WordPress 6.9.4</code> and <code>WordPress 7.0-beta4</code>.</li>
+<li><code>scripts/wordpress-smoke.sh</code> honors <code>WP_CLI_PHP</code>, so the same runtime smoke can be executed against PHP <code>8.5</code> locally.</li>
+<li>WordPress core 6.9 treats PHP <code>8.5</code> as beta support, while stable <code>wp-cli</code> support for PHP <code>8.5</code> is still planned upstream. That mismatch is why PHP <code>8.5</code> remains experimental in this repository's CI policy.</li>
+</ul>
+<h2 id="local-commands">Local commands</h2>
+<p>Run the static checks with the PHP binary you want to validate:</p>
+<pre><code class="language-bash">/opt/homebrew/opt/php@8.0/bin/php scripts/check-php-compat.php
+/opt/homebrew/opt/php@8.1/bin/php scripts/check-php-compat.php
+/opt/homebrew/opt/php@8.2/bin/php scripts/check-php-compat.php
+/opt/homebrew/opt/php@8.3/bin/php scripts/check-php-compat.php
+/opt/homebrew/opt/php@8.4/bin/php scripts/check-php-compat.php
+/opt/homebrew/opt/php@8.5/bin/php scripts/check-php-compat.php
+</code></pre>
+<p>Run the WordPress smoke test locally with an explicit PHP runtime:</p>
+<pre><code class="language-bash">WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php \
+WP_DB_HOST=localhost \
+WP_DB_NAME=wordpress \
+WP_DB_USER=your-user \
+WP_DB_PASSWORD='' \
+WP_VERSION=7.0-beta4 \
+bash scripts/wordpress-smoke.sh
+</code></pre>
+<p>The smoke script now honors <code>WP_CLI_PHP</code> directly, which avoids Homebrew <code>wp</code> defaulting to the active <code>php</code> binary in <code>PATH</code>.
+The repository itself is currently clean under PHP <code>8.5</code>, but <code>wp-cli</code> 2.12.0 still emits third-party deprecation noise there, so PHP <code>8.5</code> remains an experimental runtime line.</p>
+<h2 id="current-status">Current status</h2>
+<ul>
+<li>Repository-owned static checks are green from PHP <code>8.0</code> through <code>8.5</code>.</li>
+<li>Local WordPress smoke on PHP <code>8.5</code> passes, but still logs third-party deprecations from <code>wp-cli</code> and its bundled libraries.</li>
+<li>Keep PHP <code>8.5</code> experimental in CI until those third-party logs stop obscuring runtime signal.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../migration/" class="btn btn-neutral float-left" title="Migration"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../dependency-upgrade-report/" class="btn btn-neutral float-right" title="Dependency upgrade report">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../migration/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../dependency-upgrade-report/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

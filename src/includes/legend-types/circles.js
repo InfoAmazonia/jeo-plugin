@@ -1,4 +1,8 @@
-window.JeoLegendTypes.registerLegendType( 'circles', {
+( () => {
+	const { __ } = wp.i18n;
+
+	window.JeoLegendTypes.registerLegendType( 'circles', {
+	label: __( 'Circle sizes', 'jeo' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type
@@ -9,7 +13,7 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 			properties: {
 				colors: {
 					type: 'array',
-					description: 'An array of labels and radius',
+					description: __( 'An array of labels and radius values', 'jeo' ),
 					items: {
 						type: 'object',
 						properties: {
@@ -18,7 +22,7 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 							},
 							circle: {
 								type: 'string',
-								description: 'url',
+								description: __( 'URL', 'jeo' ),
 							},
 						},
 					},
@@ -81,4 +85,5 @@ window.JeoLegendTypes.registerLegendType( 'circles', {
 		return container;
 	},
 
-} );
+	} );
+} )();

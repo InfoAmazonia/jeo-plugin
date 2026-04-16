@@ -1,0 +1,3370 @@
+{
+  "generatedAt": "2026-03-18T03:38:19Z",
+  "baseline": {
+    "wordpress": "6.6+",
+    "php": "8.0+",
+    "node": "24",
+    "sources": [
+      ".nvmrc",
+      "README.md",
+      "src/readme.txt",
+      ".github/workflows/deploy-wordpress-org.yml",
+      ".github/workflows/node-frontend.yml",
+      ".github/workflows/php-compat.yml",
+      ".github/workflows/wordpress-smoke.yml",
+      "scripts/check-node-version.mjs"
+    ],
+    "notes": [
+      "Automated approval gates are the Node Frontend Checks, PHP Compatibility and WordPress Smoke Tests GitHub Actions workflows.",
+      "A minimum frontend unit-test layer is available via npm run test:unit and enforced by the Node workflow from Phase 3 onward.",
+      "The report now captures a frontend runtime snapshot with the resolved React, ReactDOM and Gutenberg editor package versions plus their published peer ranges.",
+      "The installed tree now resolves a local react-autosize-textarea override so the stale upstream peer metadata no longer raises npm peer warnings against React 18.3.1.",
+      "Previous stabilization track: the dependency-major batches are complete apart from the external monitoring paths for react-leaflet 5 and PHPCS 4, both still waiting on upstream support.",
+      "Current plugin sanity track: Node 24 is now the supported frontend runtime for local development, CI and release validation.",
+      "Current plugin sanity track: the implemented work now covers audit cleanup, incremental frontend loading, bundle budgets, runtime hardening, pipeline alignment and the editor, Discovery and geocoding follow-ups validated in this branch.",
+      "Current plugin sanity track: the override-governance batch is complete, so every local npm override now has a documented reason, review trigger and removal criterion.",
+      "Current plugin sanity track: the remaining open items are external monitoring only: react-leaflet 5 against the current React line, PHPCS 4 against upstream WPCS support, and third-party wp-cli PHP 8.5 deprecation noise."
+    ],
+    "toolingCaveats": [
+      "Local Composer/PHP validation is available in this shell environment (Composer version 2.9.5 2026-01-29 11:40:53; PHP 8.5.4 (cli) (built: Mar 10 2026 23:15:23) (NTS)).",
+      "The npm and Packagist lookups require network access when the report is regenerated."
+    ],
+    "frontendRuntime": {
+      "reactVersion": "18.3.1",
+      "reactDomVersion": "18.3.1",
+      "packages": [
+        {
+          "packageName": "@wordpress/edit-post",
+          "declaredRange": "^8.41.0",
+          "resolvedVersion": "8.41.0",
+          "peerReact": "^18.0.0",
+          "peerReactDom": "^18.0.0"
+        },
+        {
+          "packageName": "@wordpress/editor",
+          "declaredRange": "^14.41.0",
+          "resolvedVersion": "14.41.0",
+          "peerReact": "^18.0.0",
+          "peerReactDom": "^18.0.0"
+        },
+        {
+          "packageName": "@wordpress/plugins",
+          "declaredRange": "^7.41.0",
+          "resolvedVersion": "7.41.0",
+          "peerReact": "^18.0.0",
+          "peerReactDom": "^18.0.0"
+        },
+        {
+          "packageName": "@wordpress/block-editor",
+          "declaredRange": "transitive",
+          "resolvedVersion": "15.14.0",
+          "peerReact": "^18.0.0",
+          "peerReactDom": "^18.0.0"
+        }
+      ],
+      "overrides": [
+        {
+          "selector": "react-autosize-textarea",
+          "packageName": "react-autosize-textarea",
+          "spec": "file:npm-overrides/react-autosize-textarea"
+        },
+        {
+          "selector": "js-yaml",
+          "packageName": "js-yaml",
+          "spec": "^4.1.1"
+        },
+        {
+          "selector": "webpack-dev-server",
+          "packageName": "webpack-dev-server",
+          "spec": "^5.2.3"
+        },
+        {
+          "selector": "@typescript-eslint/typescript-estree > minimatch",
+          "packageName": "minimatch",
+          "spec": "^9.0.9"
+        },
+        {
+          "selector": "markdownlint-cli > minimatch",
+          "packageName": "minimatch",
+          "spec": "^3.1.5"
+        },
+        {
+          "selector": "copy-webpack-plugin > serialize-javascript",
+          "packageName": "serialize-javascript",
+          "spec": "^7.0.4"
+        }
+      ]
+    },
+    "overrideGovernance": [
+      {
+        "selector": "react-autosize-textarea",
+        "packageName": "react-autosize-textarea",
+        "spec": "file:npm-overrides/react-autosize-textarea",
+        "resolvedVersions": [],
+        "type": "local-package",
+        "reason": "The Gutenberg editor stack still resolves react-autosize-textarea with stale peer metadata that does not accept the React 18 line used by this project.",
+        "removalCriteria": "Remove when the installed Gutenberg tree resolves React-compatible peer metadata without the local file override and npm ls stays clean.",
+        "reviewTriggers": [
+          "Any refresh of @wordpress/scripts or the @wordpress/* editor packages.",
+          "Any React or ReactDOM line change."
+        ],
+        "introducedByBatch": "Batch 4",
+        "notes": [
+          "The local package mirrors upstream runtime files and only broadens peer metadata."
+        ]
+      },
+      {
+        "selector": "js-yaml",
+        "packageName": "js-yaml",
+        "spec": "^4.1.1",
+        "resolvedVersions": [
+          "4.1.1"
+        ],
+        "type": "security-pin",
+        "reason": "Pins js-yaml to a patched line so the npm audit baseline stays clean even when upstream tooling lags behind.",
+        "removalCriteria": "Remove when package-lock naturally resolves js-yaml >= 4.1.1 without the override and npm audit remains green.",
+        "reviewTriggers": [
+          "Any lockfile refresh.",
+          "Any @wordpress/scripts or webpack toolchain refresh."
+        ],
+        "introducedByBatch": "Sanity Batch 1",
+        "notes": []
+      },
+      {
+        "selector": "webpack-dev-server",
+        "packageName": "webpack-dev-server",
+        "spec": "^5.2.3",
+        "resolvedVersions": [
+          "5.2.3"
+        ],
+        "type": "security-pin",
+        "reason": "Keeps the dev-server subtree on a patched line required by the current audit baseline.",
+        "removalCriteria": "Remove when the resolved toolchain already pulls webpack-dev-server >= 5.2.3 without the override and audits stay green.",
+        "reviewTriggers": [
+          "Any @wordpress/scripts or webpack toolchain refresh.",
+          "Any lockfile refresh."
+        ],
+        "introducedByBatch": "Sanity Batch 1",
+        "notes": []
+      },
+      {
+        "selector": "@typescript-eslint/typescript-estree > minimatch",
+        "packageName": "minimatch",
+        "spec": "^9.0.9",
+        "resolvedVersions": [
+          "9.0.9",
+          "3.1.5"
+        ],
+        "type": "transitive-security-pin",
+        "reason": "Pins minimatch inside the TypeScript ESLint parser subtree to a patched line without replacing the parent package.",
+        "removalCriteria": "Remove when the subtree resolves a patched minimatch line on its own and npm audit remains green.",
+        "reviewTriggers": [
+          "Any eslint or @typescript-eslint refresh.",
+          "Any lockfile refresh."
+        ],
+        "introducedByBatch": "Sanity Batch 1",
+        "notes": []
+      },
+      {
+        "selector": "markdownlint-cli > minimatch",
+        "packageName": "minimatch",
+        "spec": "^3.1.5",
+        "resolvedVersions": [
+          "9.0.9",
+          "3.1.5"
+        ],
+        "type": "transitive-security-pin",
+        "reason": "Pins minimatch in the markdownlint-cli subtree so markdown tooling does not reintroduce the old advisory.",
+        "removalCriteria": "Remove when markdownlint-cli resolves a patched minimatch line without the nested override and npm audit remains green.",
+        "reviewTriggers": [
+          "Any markdownlint-cli refresh.",
+          "Any lockfile refresh."
+        ],
+        "introducedByBatch": "Sanity Batch 1",
+        "notes": []
+      },
+      {
+        "selector": "copy-webpack-plugin > serialize-javascript",
+        "packageName": "serialize-javascript",
+        "spec": "^7.0.4",
+        "resolvedVersions": [
+          "7.0.4"
+        ],
+        "type": "transitive-security-pin",
+        "reason": "Pins serialize-javascript in the copy-webpack-plugin subtree to the secure line used by the current build baseline.",
+        "removalCriteria": "Remove when copy-webpack-plugin resolves serialize-javascript >= 7.0.4 without help and npm audit remains green.",
+        "reviewTriggers": [
+          "Any webpack or copy-webpack-plugin refresh.",
+          "Any lockfile refresh."
+        ],
+        "introducedByBatch": "Sanity Batch 1",
+        "notes": []
+      }
+    ],
+    "localValidation": {
+      "phpAvailable": true,
+      "phpVersion": "PHP 8.5.4 (cli) (built: Mar 10 2026 23:15:23) (NTS)",
+      "composerAvailable": true,
+      "composerVersion": "Composer version 2.9.5 2026-01-29 11:40:53"
+    }
+  },
+  "batches": [
+    {
+      "id": "phase-0-baseline-tracking",
+      "phase": "Phase 0",
+      "title": "Baseline and tracking scaffolding",
+      "status": "completed",
+      "scope": "Report generator, dependency reports and phased smoke-test guidance.",
+      "packageNames": [],
+      "automatedChecks": [
+        "node --check scripts/dependency-review.mjs",
+        "npm run deps:report"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "No dependency versions change in this phase."
+      ]
+    },
+    {
+      "id": "phase-1-frontend-gates",
+      "phase": "Phase 1",
+      "title": "Frontend gates for approval",
+      "status": "completed",
+      "scope": "Create the Node workflow and treat PHP compatibility plus WordPress smoke checks as mandatory future gates.",
+      "packageNames": [],
+      "automatedChecks": [
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "No dependency versions or lockfiles change in this phase."
+      ],
+      "manualReviewItems": [
+        "Confirm the Node frontend, PHP Compatibility and WordPress Smoke Tests workflows trigger on push and pull_request events."
+      ]
+    },
+    {
+      "id": "phase-2-wp-scripts-major",
+      "phase": "Phase 2",
+      "title": "Build tooling major",
+      "status": "completed",
+      "scope": "Upgrade the WordPress build toolchain major and keep the custom webpack config working.",
+      "packageNames": [
+        "@wordpress/scripts"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "The webpack.config.js override continued to work without code changes on @wordpress/scripts 31.x.",
+        "The local WordPress smoke attempt is environment-dependent and should still be confirmed by the GitHub workflow before merge."
+      ],
+      "manualReviewItems": [
+        "No dedicated manual review unless asset or wp-admin regressions become visible."
+      ]
+    },
+    {
+      "id": "phase-3-js-test-minimum",
+      "phase": "Phase 3",
+      "title": "Minimum JS test layer",
+      "status": "completed",
+      "scope": "Add unit tests for the contracts that protect the remaining majors.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "No dependency versions or lockfiles change in this phase.",
+        "The Node workflow now treats npm run test:unit as a mandatory step.",
+        "The local WordPress smoke test passed after applying the separate PR #501 CLI-hook fix locally for validation only; src/includes/class-jeo.php remains outside this phase commit.",
+        "scripts/wordpress-smoke.sh now honors WP_CLI_PHP so Homebrew wp-cli setups can run the local smoke test on PHP 8.4 without the PHP 8.5 deprecation noise."
+      ],
+      "manualReviewItems": [
+        "Confirm the new test coverage protects date selector propagation, sidebar form normalization and Eta template compilation."
+      ]
+    },
+    {
+      "id": "phase-4-react-datepicker-major",
+      "phase": "Phase 4",
+      "title": "Date picker major",
+      "status": "completed",
+      "scope": "Upgrade the date picker used in related-post filters.",
+      "packageNames": [
+        "react-datepicker"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "react-datepicker moved from 7.6.0 to 9.1.0 without requiring source changes in the related-posts selector.",
+        "The automated suite stayed green, but npm run build now reports one non-blocking webpack warning from react-datepicker's optional date-fns-tz require path."
+      ],
+      "manualReviewItems": [
+        "Select start and end dates in the related-posts sidebar.",
+        "Save the post, reload the editor and verify persisted values.",
+        "Clear dates and confirm empty values stay cleared after saving."
+      ]
+    },
+    {
+      "id": "phase-5-eta-major",
+      "phase": "Phase 5",
+      "title": "Template runtime major",
+      "status": "completed",
+      "scope": "Upgrade Eta without changing the popup template contract.",
+      "packageNames": [
+        "eta"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "eta moved from 3.5.0 to 4.5.1 and now uses the browser-safe eta/core entry inside the frontend helper.",
+        "A local jest.config.js now tells the unit runner to transform eta/dist/core.js so the existing template-compiler tests stay representative.",
+        "Manual review confirmed the Info panel and popup template rendering stayed functional, and the later same-point plus null-geocode popup fixes are now closed in Batch 1."
+      ],
+      "manualReviewItems": [
+        "Open a map popup and verify the title, date and featured image rendering.",
+        "Open the map Info panel and verify template-driven content still renders.",
+        "Verify any locally customized popup template still compiles."
+      ]
+    },
+    {
+      "id": "phase-6-react-leaflet-major",
+      "phase": "Phase 6",
+      "title": "Leaflet sidebar major",
+      "status": "monitoring",
+      "scope": "Upgrade the post geocoding sidebar map and keep editing interactions intact once the upstream React line is compatible.",
+      "packageNames": [
+        "react-leaflet"
+      ],
+      "automatedChecks": [
+        "npm view react-leaflet version peerDependencies --json",
+        "npm install react-leaflet@^5.0.0 --dry-run"
+      ],
+      "approvalNotes": [
+        "react-leaflet 5.0.0 is the current published major, but it now declares peerDependencies on react and react-dom ^19.0.0.",
+        "This repository currently resolves react 18.3.1 and react-dom 18.3.1 through the existing Gutenberg stack, so npm rejects the major upgrade before runtime checks can begin.",
+        "Treat this path as external upstream monitoring, not as an immediate repository-owned bugfix batch."
+      ],
+      "manualReviewItems": [
+        "No dedicated product review while the upstream React 19 path stays unavailable; keep add, edit, drag, cancel, save and reopen coverage for the supported react-leaflet 4 flow in the core smoke checklist."
+      ]
+    },
+    {
+      "id": "phase-7-ckeditor-react-evaluation",
+      "phase": "Phase 7",
+      "title": "CKEditor React major evaluation",
+      "status": "completed",
+      "scope": "Evaluate the React wrapper major only if it remains compatible with the installed CKEditor core line.",
+      "packageNames": [
+        "@ckeditor/ckeditor5-react"
+      ],
+      "automatedChecks": [
+        "npm run build",
+        "npm run test:unit",
+        "GitHub Actions Node frontend workflow",
+        "GitHub Actions PHP Compatibility workflow",
+        "GitHub Actions WordPress Smoke Tests workflow"
+      ],
+      "approvalNotes": [
+        "@ckeditor/ckeditor5-react moved from 9.5.0 to 11.0.1 without requiring source changes in the storymap editor.",
+        "The published wrapper's peer requirements remain compatible with the installed ckeditor5 47.6.1 line and with React 18.3.1.",
+        "Manual review confirmed editor loading, formatting and save/reopen flows stayed functional, and the later slide-order fixes are now closed in Batch 1 and Batch 3."
+      ],
+      "manualReviewItems": [
+        "Load the storymap editor and confirm the toolbar initializes.",
+        "Verify text selection formatting still applies and the selection is retained.",
+        "Upload an image, save the storymap and reopen it."
+      ]
+    },
+    {
+      "id": "phase-8-phpcs-major-evaluation",
+      "phase": "Phase 8",
+      "title": "PHPCS major evaluation",
+      "status": "monitoring",
+      "scope": "Evaluate PHPCS 4 only after upstream WPCS support makes the major viable.",
+      "packageNames": [
+        "squizlabs/php_codesniffer"
+      ],
+      "automatedChecks": [
+        "composer validate --no-check-publish",
+        "composer show squizlabs/php_codesniffer --locked",
+        "composer show wp-coding-standards/wpcs --locked",
+        "vendor/bin/phpcs --standard=phpcs.xml.dist",
+        "php scripts/check-php-compat.php"
+      ],
+      "approvalNotes": [
+        "Packagist confirms that squizlabs/php_codesniffer 4.0.1 exists, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
+        "The PHPCS 3.x baseline is now clean in this repository, so the remaining PHPCS 4 path is external upstream monitoring rather than a pending product fix."
+      ],
+      "manualReviewItems": []
+    },
+    {
+      "id": "batch-0-local-prereqs",
+      "phase": "Batch 0",
+      "title": "Local prerequisites and report reset",
+      "status": "completed",
+      "scope": "Absorb the validated local prerequisites, remove the invalid cli_init hook dependency from local smoke, and reopen the dependency report for the stabilization track.",
+      "packageNames": [],
+      "automatedChecks": [
+        "composer validate --no-check-publish",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+        "node --check scripts/dependency-review.mjs",
+        "node scripts/dependency-review.mjs --write"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "No dependency versions or lockfiles change in this batch.",
+        "Local WordPress smoke no longer depends on a validation-only patch outside the working tree.",
+        "A clean worktree still needs the ignored src/js/build assets materialized locally before the smoke can run without asset-include warnings."
+      ]
+    },
+    {
+      "id": "batch-1-baseline-fixes",
+      "phase": "Batch 1",
+      "title": "Baseline fixes and warning cleanup",
+      "status": "completed",
+      "scope": "Fix the published-map baseline bugs, repair reorder flows, remove the react-datepicker webpack warning and add focused regression tests.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify published-map popups, same-point post navigation and the absence of the null-geocode crash.",
+        "Verify storymap slide ordering, save and reopen in the editor."
+      ],
+      "approvalNotes": [
+        "No dependency versions should change in this batch.",
+        "The react-datepicker version stays on 9.1.0; only its optional date-fns-tz webpack warning is removed.",
+        "Published-map review confirmed the null-geocode crash is gone and same-point posts now use a navigable popup instead of depending on spiderfy timing.",
+        "Storymap review confirmed the explicit slide ordering controls, accordion behavior and save or reopen flow stay consistent.",
+        "npm ci still reports the tracked react-autosize-textarea peer warning plus the deprecated packages scheduled for Batches 2 through 4, but Batch 1 no longer adds any new npm or webpack warnings of its own."
+      ]
+    },
+    {
+      "id": "batch-2-input-form-replacements",
+      "phase": "Batch 2",
+      "title": "Autosuggest, date-range and form replacements",
+      "status": "completed",
+      "scope": "Replace the deprecated input and form helpers while preserving the current geocoding, Discovery date filtering and formData contracts.",
+      "packageNames": [
+        "react-autosuggest",
+        "react-bootstrap-daterangepicker",
+        "react-jsonschema-form",
+        "bootstrap-daterangepicker"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify geocoding autosuggest and post or map autosuggest flows.",
+        "Verify Discovery date apply and clear flows.",
+        "Verify layer and attribution forms render, normalize formData and save correctly."
+      ],
+      "approvalNotes": [
+        "The saved query and formData shapes stayed unchanged via legacy-compatible helpers for async combobox selection, Discovery date ranges and merged schema formData updates.",
+        "npm ci no longer emits the deprecation warnings that previously came from react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form.",
+        "The remaining npm install noise is now limited to the tracked react-beautiful-dnd deprecation, the react-autosize-textarea peer warning and broader transitive ecosystem deprecations that Batch 2 did not introduce."
+      ]
+    },
+    {
+      "id": "batch-3-dnd-consolidation",
+      "phase": "Batch 3",
+      "title": "Drag-and-drop consolidation",
+      "status": "completed",
+      "scope": "Remove react-beautiful-dnd in favor of the existing react-movable stack and close the remaining reorder flows that were actually part of the product.",
+      "packageNames": [
+        "react-beautiful-dnd"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify map-layer ordering, storymap slide ordering and any nested layer ordering still exposed in the editor."
+      ],
+      "approvalNotes": [
+        "The saved layer and slide structures stayed unchanged while the supported reorder flows moved onto react-movable.",
+        "npm ci no longer emits the react-beautiful-dnd deprecation warning because the package has been removed from package.json and package-lock.json."
+      ]
+    },
+    {
+      "id": "batch-4-gutenberg-react-alignment",
+      "phase": "Batch 4",
+      "title": "Gutenberg and React alignment",
+      "status": "completed",
+      "scope": "Revalidate the latest published Gutenberg editor packages, clear the remaining React peer warning with a minimum local override, and document the still-blocked react-leaflet 5 path.",
+      "packageNames": [
+        "@wordpress/edit-post",
+        "@wordpress/editor",
+        "@wordpress/plugins",
+        "react-autosize-textarea"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "npm ls react-autosize-textarea react react-dom",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify the map editor, layer editor, storymap editor and regular post editor load, save and stay console-clean."
+      ],
+      "approvalNotes": [
+        "No newer published @wordpress/edit-post, @wordpress/editor or @wordpress/plugins versions were available beyond the already installed line, and their published peerDependencies still target React 18.",
+        "Batch 4 therefore uses a local react-autosize-textarea override to modernize peer metadata without changing the runtime implementation or adding react or react-dom directly."
+      ]
+    },
+    {
+      "id": "batch-5-react-leaflet-major",
+      "phase": "Batch 5",
+      "title": "react-leaflet major",
+      "status": "monitoring",
+      "scope": "Upgrade react-leaflet to 5.x after a React-19-compatible Gutenberg stack exists and validate the entire geocoding sidebar map flow.",
+      "packageNames": [
+        "react-leaflet"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm run build",
+        "npm run test:unit",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "No dedicated product review while the upstream React 19 path stays unavailable; keep add, edit, drag, cancel, save and reopen coverage for the supported react-leaflet 4 flow in the core smoke checklist."
+      ],
+      "approvalNotes": [
+        "The latest published Gutenberg editor packages still peer on react and react-dom ^18.0.0, while react-leaflet 5.0.0 requires react and react-dom ^19.0.0.",
+        "Do not start this batch until upstream publishes a supported React-19-compatible editor stack or the repository adopts another supported route.",
+        "Treat this path as external upstream monitoring, not as an immediate repository-owned bugfix batch."
+      ]
+    },
+    {
+      "id": "batch-6-php-8-5-compat",
+      "phase": "Batch 6",
+      "title": "PHP 8.5 compatibility",
+      "status": "completed",
+      "scope": "Extend the local and CI PHP compatibility coverage to PHP 8.5 and remove repository-owned warnings or deprecations under that runtime.",
+      "packageNames": [],
+      "automatedChecks": [
+        "composer validate --no-check-publish",
+        "php scripts/check-php-compat.php with PHP 8.0 through 8.5",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+        "WP_CLI_PHP=/opt/homebrew/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke-85 bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Repeat the runtime smoke while watching for repository-owned PHP 8.5 warnings or deprecations."
+      ],
+      "approvalNotes": [
+        "Static compatibility checks are green on PHP 8.0 through 8.5, and local WordPress smoke passes on both PHP 8.4 and PHP 8.5.",
+        "WordPress core 6.9 treats PHP 8.5 as beta support, while stable wp-cli support for PHP 8.5 is still planned upstream.",
+        "Keep PHP 8.5 experimental in CI for now and track the remaining wp-cli deprecation noise as third-party monitoring only because repository-owned checks are clean."
+      ]
+    },
+    {
+      "id": "batch-7-php-lint-stack",
+      "phase": "Batch 7",
+      "title": "PHP lint stack cleanup",
+      "status": "completed",
+      "scope": "Clean the PHPCS 3.x baseline across WPCS, PHPCSExtra and PHPCSUtils before re-evaluating PHPCS 4.",
+      "packageNames": [
+        "squizlabs/php_codesniffer",
+        "wp-coding-standards/wpcs"
+      ],
+      "automatedChecks": [
+        "composer validate --no-check-publish",
+        "php scripts/check-php-compat.php",
+        "vendor/bin/phpcs --standard=phpcs.xml.dist"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "The PHPCS 3.x baseline is now green after autofixes plus manual cleanup across runtime PHP, templates and tooling scripts.",
+        "The runtime-touching PHP cleanup also passed local WordPress smoke, so the lint cleanup did not introduce regressions in embeds, maps or story maps.",
+        "Official WPCS metadata and the 3.3.0 release notes still require PHP_CodeSniffer 3.13.4, while older WPCS 2.3.0 notes only mention preliminary CI testing against the PHPCS 4 development branch.",
+        "PHPCS 4 now remains an external upstream monitoring path until the installed WPCS line officially supports that major."
+      ]
+    },
+    {
+      "id": "sanity-batch-0-runtime-policy",
+      "phase": "Sanity Batch 0",
+      "title": "Runtime policy and reproducibility",
+      "status": "completed",
+      "scope": "Promote Node 24 to the project runtime, enforce it through an environment preflight, and align the deploy pipeline with deterministic installs.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm run check:env",
+        "npm ci",
+        "npm run build",
+        "npm run build:report"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "This batch is mostly process and tooling work; the main validation is that the documented Node 24 path and the preflight behave correctly.",
+        "Node 24 is now the single supported frontend runtime in local development and CI.",
+        "The final full test rerun reconfirmed that the Node 24 preflight, deterministic install path and bundle-report flow are still the active project baseline."
+      ]
+    },
+    {
+      "id": "sanity-batch-1-npm-health-security",
+      "phase": "Sanity Batch 1",
+      "title": "npm health and security",
+      "status": "completed",
+      "scope": "Refresh the JavaScript dependency tree under Node 24, eliminate the known js-yaml vulnerability, and make npm and Composer audits part of the maintained process.",
+      "packageNames": [
+        "js-yaml"
+      ],
+      "automatedChecks": [
+        "npm ci",
+        "npm audit --package-lock-only",
+        "npm audit --omit=dev",
+        "composer audit --locked"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "Audit coverage is now part of the expected maintenance flow.",
+        "Remaining npm install notices are transitive deprecation warnings from the upstream Gutenberg or wp-scripts toolchain, not audit failures in this repository.",
+        "The final full rerun kept npm audit and composer audit clean, so this batch is now fully closed."
+      ]
+    },
+    {
+      "id": "sanity-batch-2-incremental-loading",
+      "phase": "Sanity Batch 2",
+      "title": "Incremental loading for layers, maps and taxonomies",
+      "status": "completed",
+      "scope": "Replace unbounded frontend collection loads with chunked hydration by selected IDs, paginated layer search, async taxonomy queries and lazy Discovery map hydration.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm ci",
+        "npm run test:unit",
+        "npm run build",
+        "php scripts/check-php-compat.php",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify that maps, onetime maps, storymaps and sidebars still show every already-selected layer.",
+        "Verify paginated layer search in the map editor modal, including Load more behavior.",
+        "Verify Discovery map loading, Load more maps and selected-layer hydration from shared or URL-driven state.",
+        "Verify async category and tag selection in the related-posts editor flow."
+      ],
+      "approvalNotes": [
+        "Published maps and embeds keep completeness by exact selected IDs; pagination is used only for large libraries and list views.",
+        "This batch targets the memory-risk patterns that previously depended on per_page -1, nopaging true or oversized taxonomy fetches.",
+        "Manual validation closed the batch after fixing the map-editor reload regression, the Discovery lazy-load crashes, and the later Discovery marker plus View in map follow-up that had been tracked separately at the time."
+      ]
+    },
+    {
+      "id": "sanity-batch-3-bundle-build",
+      "phase": "Sanity Batch 3",
+      "title": "Bundle budgets and build stability",
+      "status": "completed",
+      "scope": "Add explicit bundle-size reporting and budgets, and keep the frontend build on a predictable asset graph that preserves editor stability.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm run build",
+        "npm run build:report",
+        "npm run test:unit"
+      ],
+      "manualReviewItems": [
+        "Verify the map editor, storymap editor, Discovery and published maps still load after the chunking change."
+      ],
+      "approvalNotes": [
+        "This batch changes build structure and measurement, not the public asset contract exposed by the plugin.",
+        "The budget report is now part of the approval evidence for future frontend-heavy changes.",
+        "Manual validation closed the batch after keeping the explicit budget tooling but settling on the more predictable asset graph that avoided the intermittent reload and template issues seen in existing map editors."
+      ]
+    },
+    {
+      "id": "sanity-batch-4-logs-and-deprecations",
+      "phase": "Sanity Batch 4",
+      "title": "Logs, warnings and editor runtime cleanup",
+      "status": "completed",
+      "scope": "Remove repository-owned console noise, clean dead debug traces, document the remaining experimental Gutenberg render hook, and fix editor runtime issues uncovered during console-clean validation.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm run test:unit",
+        "npm run build",
+        "php scripts/check-php-compat.php"
+      ],
+      "manualReviewItems": [
+        "Verify the editor flows touched in this track stay console-clean during normal use."
+      ],
+      "approvalNotes": [
+        "The remaining install-time npm deprecation notices come from upstream tooling packages, not from repository-owned source.",
+        "The current @wordpress/components line still requires __experimentalRenderItem for the customized async combobox rendering used by this project.",
+        "Manual validation closed the batch after fixing the Onetime Map block's saved-attribute round-trip and guarding preview rendering when a selected layer record is temporarily unresolved."
+      ]
+    },
+    {
+      "id": "sanity-batch-5-runtime-hardening",
+      "phase": "Sanity Batch 5",
+      "title": "Runtime hardening and request hygiene",
+      "status": "completed",
+      "scope": "Tighten geocoding and related request flows with nonce checks, capability checks, sanitized inputs, safer remote requests and cleaner error handling.",
+      "packageNames": [],
+      "automatedChecks": [
+        "php scripts/check-php-compat.php",
+        "vendor/bin/phpcs --standard=phpcs.xml.dist",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [
+        "Verify geocoding autosuggest, reverse geocoding and save or reopen flows still work normally.",
+        "Verify public maps, embeds and storymaps touched by the hardening changes still bootstrap correctly."
+      ],
+      "approvalNotes": [
+        "This batch is about safety and failure handling, not feature changes.",
+        "The old REST tag collection broadening was removed so large term collections no longer bypass normal limits.",
+        "The draggable-marker reliability issue that was noted after this batch has now been fixed in the current branch."
+      ]
+    },
+    {
+      "id": "sanity-batch-6-pipeline-quality",
+      "phase": "Sanity Batch 6",
+      "title": "Pipeline and quality gate alignment",
+      "status": "completed",
+      "scope": "Align the release and CI pipelines with the same deterministic install, audit, build, bundle-budget, PHP compatibility, PHPCS and smoke-test gates used locally.",
+      "packageNames": [],
+      "automatedChecks": [
+        "npm ci",
+        "npm run test:unit",
+        "npm run build",
+        "npm run build:report",
+        "npm audit --package-lock-only",
+        "composer validate --no-check-publish",
+        "composer audit --locked",
+        "php scripts/check-php-compat.php",
+        "vendor/bin/phpcs --standard=phpcs.xml.dist",
+        "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh"
+      ],
+      "manualReviewItems": [],
+      "approvalNotes": [
+        "This batch closes the process loop for the new sanity track.",
+        "PHP 8.5 stays monitored in the process documentation but is not promoted to a blocking smoke gate while wp-cli still lacks stable upstream support for that runtime.",
+        "A full rerun of the documented gates confirmed that the sanity-track changes did not reintroduce repository-owned warnings, vulnerabilities or failing quality checks."
+      ]
+    },
+    {
+      "id": "sanity-batch-7-override-governance",
+      "phase": "Sanity Batch 7",
+      "title": "Override governance and maintenance",
+      "status": "completed",
+      "scope": "Inventory every npm override, record its reason and removal criteria, and re-review the set whenever @wordpress/scripts, the Gutenberg dependency tree or another major frontend refresh changes the upstream graph.",
+      "packageNames": [],
+      "automatedChecks": [
+        "node scripts/dependency-review.mjs --write",
+        "npm audit --package-lock-only",
+        "npm ls react-autosize-textarea react react-dom"
+      ],
+      "manualReviewItems": [
+        "Confirm that each override still solves a current problem, that its rationale is documented, and that anything already absorbed upstream is removed."
+      ],
+      "approvalNotes": [
+        "This batch is governance-oriented and should not change runtime behavior unless an obsolete override is removed or replaced.",
+        "Use it after significant @wordpress/scripts or Gutenberg refreshes so override drift does not become silent technical debt.",
+        "The dependency-review script now validates that every active package.json override has governance metadata and that no stale governance entries survive after an override is removed."
+      ]
+    }
+  ],
+  "executionLog": [
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-0-baseline-tracking",
+      "status": "completed",
+      "summary": "Added phase planning, package-level execution tracking and the phased approval checklist without changing dependency versions.",
+      "automatedChecks": [
+        {
+          "name": "node --check scripts/dependency-review.mjs",
+          "status": "passed"
+        },
+        {
+          "name": "npm run deps:report",
+          "status": "passed",
+          "details": "Regenerated the JSON and Markdown reports against current npm and Packagist metadata."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-1-frontend-gates",
+      "status": "completed",
+      "summary": "Added a Node frontend GitHub Actions workflow and promoted the PHP compatibility plus WordPress smoke workflows to the mandatory gate set for future dependency phases.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "Installed the existing lockfile successfully. The run repeated the already tracked react-autosize-textarea peer warnings and the known deprecation notices for react-beautiful-dnd and react-jsonschema-form."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings only."
+        }
+      ],
+      "manualReviewItems": [
+        "Confirm the Node frontend, PHP Compatibility and WordPress Smoke Tests workflows trigger on push and pull_request events."
+      ],
+      "documentUpdates": [
+        ".github/workflows/node-frontend.yml",
+        "README.md",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-2-wp-scripts-major",
+      "status": "completed",
+      "summary": "Upgraded @wordpress/scripts from 30.27.0 to 31.6.0. The existing webpack.config.js override remained compatible and no script changes were required.",
+      "automatedChecks": [
+        {
+          "name": "npm install @wordpress/scripts@^31.6.0 --save-dev",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to @wordpress/scripts 31.6.0 while repeating only the already known react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the same bundle-size warnings as before the upgrade."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review found no blocking issues after the tooling upgrade."
+        },
+        {
+          "name": "WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "failed",
+          "details": "The local runtime smoke attempt reached wp-cli and WordPress download, but failed against the local MariaDB login for wordpress@localhost. The GitHub WordPress Smoke Tests workflow remains the authoritative gate for this check."
+        }
+      ],
+      "manualReviewItems": [
+        "No dedicated manual review unless asset or wp-admin regressions become visible."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-3-js-test-minimum",
+      "status": "completed",
+      "summary": "Added the minimum JS test layer with focused coverage for date-selector propagation, sidebar attribution normalization and Eta template compilation, and made the Node workflow run npm run test:unit as a required step.",
+      "automatedChecks": [
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The new wp-scripts unit suite passed with 3 test files and 9 assertions."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings only."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend test-layer changes."
+        },
+        {
+          "name": "WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed after configuring the local MariaDB wordpress database/user and temporarily applying the separate PR #501 fix that removes the invalid cli_init callback registration from src/includes/class-jeo.php. The script now also honors WP_CLI_PHP so Homebrew wp-cli setups can run the same smoke on PHP 8.4 without the PHP 8.5 deprecation noise. class-jeo.php stays out of the Phase 3 commit because it already has its own PR."
+        }
+      ],
+      "manualReviewItems": [
+        "Confirm the new test coverage protects date selector propagation, sidebar form normalization and Eta template compilation."
+      ],
+      "documentUpdates": [
+        ".github/workflows/node-frontend.yml",
+        "README.md",
+        "docs/dev/php-compatibility.md",
+        "package.json",
+        "scripts/wordpress-smoke.sh",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-4-react-datepicker-major",
+      "status": "completed",
+      "summary": "Upgraded react-datepicker from 7.6.0 to 9.1.0. The existing date persistence helpers continued to satisfy the component contract without source changes.",
+      "automatedChecks": [
+        {
+          "name": "npm install react-datepicker@^9.1.0",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to react-datepicker 9.1.0 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after the date picker major."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings plus one new webpack critical-dependency warning from react-datepicker's optional date-fns-tz require path."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend dependency update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Select start and end dates in the related-posts sidebar.",
+        "Save the post, reload the editor and verify persisted values.",
+        "Clear dates and confirm empty values stay cleared after saving."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-5-eta-major",
+      "status": "completed",
+      "summary": "Upgraded eta from 3.5.0 to 4.5.1. The frontend helper now imports the browser-safe eta/core entry and the Jest config transforms that subpath for the focused template tests.",
+      "automatedChecks": [
+        {
+          "name": "npm install eta@^4.4.1",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to eta 4.5.1 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after pointing the helper at eta/core and teaching Jest to transform eta/dist/core.js."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after switching the frontend helper to eta/core. The existing bundle-size warnings remain, as does the known react-datepicker optional date-fns-tz warning from Phase 4."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the Eta major update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Open a map popup and verify the title, date and featured image rendering.",
+        "Open the map Info panel and verify template-driven content still renders.",
+        "Verify any locally customized popup template still compiles."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "jest.config.js",
+        "src/js/src/jeo-map/template-compiler.js",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ],
+      "manualReviewNotes": [
+        "The published-map review confirmed that the Info panel and post popup templates still render correctly after the Eta major update.",
+        "A published-map runtime error remains scheduled for Batch 1: Uncaught (in promise) TypeError: can't access property \"_geocode_lon\", e is null, raised during buildPostsGeoJson/getRelatedPosts when a related-post entry is null.",
+        "A second published-map limitation also remains scheduled for Batch 1: when multiple posts share the same location, the marker popup still does not expose the individual posts for separate clicks."
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-6-react-leaflet-major",
+      "status": "blocked",
+      "summary": "Evaluated the react-leaflet major and found it blocked by the repository's current React line before any code changes could be applied.",
+      "automatedChecks": [
+        {
+          "name": "npm view react-leaflet version peerDependencies --json",
+          "status": "passed",
+          "details": "Confirmed that the current published major is react-leaflet 5.0.0 and that it declares peerDependencies on leaflet ^1.9.0 plus react and react-dom ^19.0.0."
+        },
+        {
+          "name": "node -e \"console.log(require('react/package.json').version)\"",
+          "status": "passed",
+          "details": "Confirmed that the installed runtime still resolves react 18.3.1."
+        },
+        {
+          "name": "node -e \"console.log(require('react-dom/package.json').version)\"",
+          "status": "passed",
+          "details": "Confirmed that the installed runtime still resolves react-dom 18.3.1."
+        },
+        {
+          "name": "npm install react-leaflet@^5.0.0 --dry-run",
+          "status": "failed",
+          "details": "npm returned ERESOLVE because react-leaflet 5.0.0 requires react and react-dom ^19.0.0, which conflicts with the repository's current React 18.3.1 line."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-7-ckeditor-react-evaluation",
+      "status": "completed",
+      "summary": "Upgraded @ckeditor/ckeditor5-react from 9.5.0 to 11.0.1. The wrapper stayed compatible with ckeditor5 47.6.1 and React 18.3.1 without requiring storymap editor source changes.",
+      "automatedChecks": [
+        {
+          "name": "npm view @ckeditor/ckeditor5-react version peerDependencies --json",
+          "status": "passed",
+          "details": "Confirmed that the current published wrapper line is 11.0.1 and that its peer requirements accept ckeditor5 >=46.0.0 plus React 18."
+        },
+        {
+          "name": "npm install @ckeditor/ckeditor5-react@^11.0.1",
+          "status": "passed",
+          "details": "Updated the direct dependency and lockfile to @ckeditor/ckeditor5-react 11.0.1 while repeating only the already tracked react-autosize-textarea peer warnings."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite remained green with 3 test files and 9 assertions after the CKEditor React wrapper major."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully with the existing bundle-size warnings and the known react-datepicker optional date-fns-tz warning from Phase 4."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the CKEditor React wrapper update."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed with the PHP 8.4 wp-cli override and the same temporary PR #501 class-jeo.php patch used for local validation only."
+        }
+      ],
+      "manualReviewItems": [
+        "Load the storymap editor and confirm the toolbar initializes.",
+        "Verify text selection formatting still applies and the selection is retained.",
+        "Upload an image, save the storymap and reopen it."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ],
+      "manualReviewNotes": [
+        "The storymap editor, toolbar, formatting behavior and save/reopen flow remained functional after the wrapper major update, and the later slide-order fixes are now closed in Batch 1 and Batch 3."
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "phase-8-phpcs-major-evaluation",
+      "status": "blocked",
+      "summary": "Evaluated the PHPCS major and found the upgrade blocked by WPCS compatibility and by the repository's current PHPCS baseline.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The current composer.json is structurally valid."
+        },
+        {
+          "name": "composer show squizlabs/php_codesniffer --locked",
+          "status": "passed",
+          "details": "Confirmed that the installed PHPCS line is 3.13.5."
+        },
+        {
+          "name": "composer show wp-coding-standards/wpcs --locked",
+          "status": "passed",
+          "details": "Confirmed that the installed WPCS line is 3.3.0 and that it requires squizlabs/php_codesniffer ^3.13.4."
+        },
+        {
+          "name": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+          "status": "failed",
+          "details": "The current PHPCS 3.x run reports a large existing baseline of coding-standard violations across the repository, including scripts and template files, so the lint gate is not yet green even before attempting PHPCS 4."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green during the PHPCS evaluation."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "batch-0-local-prereqs",
+      "status": "completed",
+      "summary": "Absorbed the validated local prerequisites for the stabilization track: the invalid cli_init hook no longer needs a local-only patch, the Composer metadata cleanup is part of the repository, and the dependency report now carries the new batch plan.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The updated composer.json stays structurally valid after the SPDX and tooling-script cleanup."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after absorbing the local prerequisites."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local WordPress smoke now passes without any local-only patch to src/includes/class-jeo.php. In a clean worktree it still emits PHP warnings until the ignored src/js/build assets are generated locally."
+        },
+        {
+          "name": "node --check scripts/dependency-review.mjs",
+          "status": "passed"
+        },
+        {
+          "name": "node scripts/dependency-review.mjs --write",
+          "status": "passed",
+          "details": "Regenerated the JSON and Markdown dependency reports with the reopened stabilization track and Batch 0 ready for approval."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "composer.json",
+        "src/includes/class-jeo.php",
+        "scripts/dependency-review.mjs",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "batch-1-baseline-fixes",
+      "status": "completed",
+      "summary": "Fixed the null-related-post geocode crash in frontend and Discovery GeoJSON builders, replaced brittle same-point spiderfy timing with a navigable popup for posts that share a location, repaired storymap slide ordering with explicit move controls and removed the targeted react-datepicker webpack warning with focused regression tests.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean install completed successfully after rebuilding node_modules. The run still reports the tracked react-autosize-textarea peer warning plus the deprecated packages scheduled for Batches 2 through 4, but no new install warnings were introduced by Batch 1."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The focused wp-scripts unit suite now passes with 5 test files and 17 assertions, including new coverage for GeoJSON sanitization and storymap reorder helpers."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully from a clean install with only the existing bundle-size warnings. The previous react-datepicker optional date-fns-tz critical-dependency warning no longer appears."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend baseline fixes."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke passed after rebuilding the ignored src/js/build assets, so the previous asset-include warnings no longer appear in the smoke log."
+        }
+      ],
+      "manualReviewItems": [
+        "Published-map review confirmed the null-geocode crash disappeared and same-point posts can be navigated inside the popup, including dense clusters.",
+        "Storymap review confirmed slide ordering, accordion behavior and save or reopen stayed stable after the UI changes."
+      ],
+      "documentUpdates": [
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "src/js/src/discovery/blocks/stories.js",
+        "src/js/src/jeo-map/class-jeo-map.js",
+        "src/js/src/map-blocks/storymap-editor.js",
+        "src/js/src/map-blocks/storymap-editor.scss",
+        "src/js/src/map-blocks/storymap-ordering.js",
+        "src/js/src/map-blocks/storymap-ordering.test.js",
+        "src/js/src/shared/story-geojson.js",
+        "src/js/src/shared/story-geojson.test.js",
+        "webpack.config.js",
+        "src/css/jeo-map.scss"
+      ]
+    },
+    {
+      "date": "2026-03-16",
+      "batchId": "batch-2-input-form-replacements",
+      "status": "completed",
+      "summary": "Replaced react-autosuggest with an internal async combobox wrapper, moved Discovery date filtering off react-bootstrap-daterangepicker onto a react-datepicker-based internal component, and replaced react-jsonschema-form with an internal @rjsf/core adapter while preserving the existing query and formData contracts.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully after removing the locally corrupted node_modules tree left by an earlier ENOTEMPTY failure. The run no longer emits deprecation warnings for react-autosuggest, react-bootstrap-daterangepicker or react-jsonschema-form; the remaining install noise is the tracked react-beautiful-dnd deprecation, the react-autosize-textarea peer warning and broader transitive npm ecosystem deprecations."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The wp-scripts unit suite passed with 8 test files and 25 assertions, including new coverage for the async combobox helper, the schema-form adapter and the Discovery date-range wrapper."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after the replacements with only the existing bundle-size warnings."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend replacement batch."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after replacing the autosuggest, date-range and schema-form helpers."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify geocoding autosuggest suggestions load, typing stays responsive and selecting a result updates the field value correctly.",
+        "Verify the post or map autosuggest search still surfaces suggestions and inserts the selected entity correctly.",
+        "Verify Discovery date apply and clear flows still update the after and before query values as expected.",
+        "Verify layer and attribution forms render, normalize formData and save correctly with the new schema-form adapter."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "jest.config.js",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "src/js/src/discovery/blocks/date-range-filter.js",
+        "src/js/src/discovery/blocks/date-range-filter.test.js",
+        "src/js/src/discovery/blocks/stories.js",
+        "src/js/src/discovery/style/discovery.scss",
+        "src/js/src/layers-sidebar/attribution-settings.js",
+        "src/js/src/layers-sidebar/layer-settings.js",
+        "src/js/src/map-blocks/jeo-autosuggest.js",
+        "src/js/src/map-blocks/map-editor.css",
+        "src/js/src/posts-sidebar/geo-auto-complete.css",
+        "src/js/src/posts-sidebar/geo-auto-complete.js",
+        "src/js/src/shared/async-combobox-control.js",
+        "src/js/src/shared/async-combobox-control.test.js",
+        "src/js/src/shared/schema-form.js",
+        "src/js/src/shared/schema-form.test.js",
+        "src/js/src/shared/wp-form-controls.js"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-3-dnd-consolidation",
+      "status": "completed",
+      "summary": "Removed react-beautiful-dnd, migrated the remaining map-layer ordering UI to react-movable and removed the accidental nested storymap layer drag affordance while keeping the supported slide ordering and layer toggle flows intact.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully after clearing the locally stuck node_modules tree. The prior react-beautiful-dnd deprecation warning disappeared; the remaining install noise is the tracked react-autosize-textarea peer warning plus broader transitive npm ecosystem deprecations."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The wp-scripts unit suite remained green with 8 test files and 25 assertions after the drag-and-drop migration."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after the migration with only the existing bundle-size warnings. The emitted mapsSidebar bundle is smaller now that react-beautiful-dnd is gone."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green after the frontend drag-and-drop changes."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after moving the remaining reorder flows to react-movable."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify selected map-layer ordering in the map editor modal, including saving and reopening after reordering.",
+        "Verify storymap slide ordering still works alongside the existing move up/down controls.",
+        "Verify storymap slide layer toggling still works without exposing a reorder affordance that the product never supported."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "src/js/src/map-blocks/layer-settings.js",
+        "src/js/src/map-blocks/layers-settings.js",
+        "src/js/src/map-blocks/storymap-editor.js",
+        "src/js/src/map-blocks/storymap-editor.scss"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-4-gutenberg-react-alignment",
+      "status": "completed",
+      "summary": "Confirmed that the currently installed Gutenberg editor packages are already on the latest published line, applied a local react-autosize-textarea override to remove the stale React peer warning, and documented that react-leaflet 5 remains blocked by upstream React 18 peer ranges.",
+      "automatedChecks": [
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully after rebuilding node_modules from scratch. The prior react-autosize-textarea peer warning disappeared; the remaining install noise is broader transitive npm ecosystem deprecations such as inflight, rimraf, glob and eslint support notices."
+        },
+        {
+          "name": "npm ls react-autosize-textarea react react-dom",
+          "status": "passed",
+          "details": "The installed tree now resolves react-autosize-textarea@7.1.0-jeo.0 from npm-overrides/react-autosize-textarea under the Gutenberg editor packages, with React 18.3.1 and ReactDOM 18.3.1 accepted cleanly."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The wp-scripts unit suite remained green with 8 test files and 25 assertions after the local override and lockfile refresh."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "wp-scripts build completed successfully after the override with only the existing bundle-size warnings."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static PHP 8.0-8.4 compatibility review remained green; Batch 4 did not change any PHP source."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after the lockfile refresh and override application."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify the map editor, layer editor, storymap editor and regular post editor load, save and stay console-clean."
+      ],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "npm-overrides/react-autosize-textarea/package.json",
+        "npm-overrides/react-autosize-textarea/lib/index.js",
+        "npm-overrides/react-autosize-textarea/lib/TextareaAutosize.js",
+        "npm-overrides/react-autosize-textarea/lib/index.d.ts",
+        "npm-overrides/react-autosize-textarea/lib/TextareaAutosize.d.ts",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-6-php-8-5-compat",
+      "status": "completed",
+      "summary": "Extended the repository-owned PHP compatibility checks and CI matrix to PHP 8.5, documented that WordPress core already treats PHP 8.5 as beta support while stable wp-cli support is still planned upstream, and verified that local WordPress smoke stays green on PHP 8.4 and PHP 8.5 with only third-party wp-cli deprecation noise under PHP 8.5.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The current composer.json remains structurally valid."
+        },
+        {
+          "name": "php scripts/check-php-compat.php on PHP 8.0 through 8.5",
+          "status": "passed",
+          "details": "The static compatibility review stayed green on Homebrew PHP 8.0, 8.1, 8.2, 8.3, 8.4 and 8.5 after extending the script and report wording to PHP 8.5."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke remains green on PHP 8.4, which is still the cleanest local signal because wp-cli itself does not emit PHP 8.5 deprecation noise on this line."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke-85 bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke also passes on PHP 8.5. The log still contains third-party deprecations from wp-cli bundled libraries, but no repository-owned PHP 8.5 warnings or deprecations surfaced."
+        }
+      ],
+      "manualReviewItems": [
+        "Repeat the runtime smoke while watching specifically for repository-owned PHP 8.5 warnings or deprecations, not third-party wp-cli noise."
+      ],
+      "documentUpdates": [
+        ".github/workflows/php-compat.yml",
+        ".github/workflows/wordpress-smoke.yml",
+        "README.md",
+        "docs/dev/php-compatibility.md",
+        "src/readme.txt",
+        "trunk/readme.txt",
+        "scripts/check-php-compat.php",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "batch-7-php-lint-stack",
+      "status": "completed",
+      "summary": "Cleaned the PHPCS 3.x baseline across scripts, templates and runtime PHP so the repository is now green on the current WPCS or PHPCS stack, while keeping the PHPCS 4 evaluation blocked until upstream WPCS support lands.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The current composer.json remains structurally valid during the PHPCS cleanup batch."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "The repository-owned PHP compatibility scanner stayed green after the lint-driven cleanup."
+        },
+        {
+          "name": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+          "status": "passed",
+          "details": "The PHPCS 3.x baseline is now clean across the repository after autofixes plus manual cleanup of docblocks, escaping, naming and query-input handling."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "Local WordPress smoke stayed green after the runtime-touching PHP cleanup, confirming that embeds, maps and story maps still bootstrap correctly."
+        },
+        {
+          "name": "node scripts/dependency-review.mjs --write",
+          "status": "passed",
+          "details": "Regenerated the JSON and Markdown dependency reports with Batch 7 marked as completed and the PHPCS 4 path still blocked by WPCS support."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md",
+        "scripts/check-php-compat.php",
+        "scripts/wordpress-smoke-check.php",
+        "src/includes/class-jeo.php",
+        "src/includes/geocode/class-geocode-handler.php",
+        "src/includes/geocode/class-geocoder.php",
+        "src/includes/geocode/geocoders/class-nominatim.php",
+        "src/includes/index.php",
+        "src/includes/layer-types/class-layer-types.php",
+        "src/includes/layers/class-layers.php",
+        "src/includes/legend-types/class-legend-types.php",
+        "src/includes/loaders.php",
+        "src/includes/maps/class-maps.php",
+        "src/includes/menu/class-menu.php",
+        "src/includes/settings/class-settings.php",
+        "src/includes/settings/settings-page.php",
+        "src/includes/sidebars/class-sidebars.php",
+        "src/includes/storymap/class-storymap.php",
+        "src/includes/traits/class-rest-validate-meta.php",
+        "src/includes/traits/class-singleton.php",
+        "src/index.php",
+        "src/jeo.php",
+        "src/templates/discovery.php",
+        "src/templates/embed-discovery.php",
+        "src/templates/embed-storymap.php",
+        "src/templates/embed.php",
+        "src/templates/map-content-layers-list.php",
+        "src/templates/single-map.php",
+        "src/templates/single-storymap.php"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-0-runtime-policy",
+      "status": "completed",
+      "summary": "Promoted Node 24 to the default project runtime, added an explicit environment preflight, and aligned the release workflow with deterministic installs and the same baseline used by the frontend CI gates.",
+      "automatedChecks": [
+        {
+          "name": "npm run check:env",
+          "status": "passed",
+          "details": "The preflight now enforces Node 24 as the supported frontend runtime for this repository."
+        },
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A clean reinstall completed successfully under Node 24 with the refreshed lockfile."
+        },
+        {
+          "name": "npm run build:report",
+          "status": "passed",
+          "details": "The bundle report now runs as part of the documented frontend approval path."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        ".nvmrc",
+        "package.json",
+        ".github/workflows/node-frontend.yml",
+        ".github/workflows/deploy-wordpress-org.yml",
+        "README.md",
+        "scripts/check-node-version.mjs",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-1-npm-health-security",
+      "status": "completed",
+      "summary": "Refreshed the Node 24 dependency tree, removed the known js-yaml vulnerability, documented audit coverage as a first-class maintenance gate, and kept npm and Composer audit outputs clean.",
+      "automatedChecks": [
+        {
+          "name": "npm audit --package-lock-only",
+          "status": "passed",
+          "details": "The production and development dependency graph is now free of known advisories at the lockfile level."
+        },
+        {
+          "name": "npm audit --omit=dev",
+          "status": "passed",
+          "details": "The installable runtime dependency tree is clean."
+        },
+        {
+          "name": "composer audit --locked",
+          "status": "passed",
+          "details": "Composer dependencies remain free of known advisories."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        "package.json",
+        "package-lock.json",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-2-incremental-loading",
+      "status": "completed",
+      "summary": "Replaced unbounded collection loading with chunked hydration by selected IDs, paginated layer libraries, async taxonomy lookup and lazy Discovery map hydration without dropping already-selected data. Manual validation then fixed the map-editor reload regression, the Discovery lazy-load crashes, and the later Discovery marker plus View in map follow-up that had been tracked separately at the time.",
+      "automatedChecks": [
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The new shared rest-record helpers and the existing JS coverage stayed green after the loading-strategy rewrite."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "The frontend bundles compile successfully after replacing per_page -1 style loading with chunked and paginated flows."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "Local runtime smoke stayed green after the Discovery and editor data-loading changes."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify exact selected layers still appear in map, onetime map, storymap and sidebar flows.",
+        "Verify paginated layer search and Load more behavior in the map editor modal.",
+        "Verify Discovery map loading, shared-link hydration and async taxonomy selectors."
+      ],
+      "documentUpdates": [
+        "src/js/src/shared/rest-records.js",
+        "src/js/src/shared/rest-records.test.js",
+        "src/js/src/map-blocks/map-editor.js",
+        "src/js/src/map-blocks/onetime-map-editor.js",
+        "src/js/src/map-blocks/map-editor-preview.js",
+        "src/js/src/map-blocks/layers-settings.js",
+        "src/js/src/map-blocks/storymap-editor.js",
+        "src/js/src/maps-sidebar/maps-sidebar.js",
+        "src/js/src/discovery/blocks/map-layers.js",
+        "src/js/src/discovery/blocks/stories.js",
+        "src/js/src/discovery/blocks/tag-filter-control.js",
+        "src/js/src/discovery/style/discovery.scss",
+        "src/js/src/posts-selector/index.js",
+        "src/js/src/posts-selector/async-tokens-selector.js",
+        "src/includes/class-jeo.php",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-3-bundle-build",
+      "status": "completed",
+      "summary": "Added an explicit bundle-size report and budgets, then finalized a more predictable asset graph after validation showed intermittent reload issues with the more aggressive chunking setup.",
+      "automatedChecks": [
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "The webpack build remains green after the budget and asset-graph adjustments."
+        },
+        {
+          "name": "npm run build:report",
+          "status": "passed",
+          "details": "Current budget highlights: mapBlocks 1092 of 1150 KB, discovery 241 of 280 KB and jeoMap 79 of 120 KB."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify the main editors, Discovery and published maps still load correctly after the asset graph changes."
+      ],
+      "documentUpdates": [
+        "webpack.config.js",
+        "scripts/report-bundle-sizes.mjs",
+        "src/js/src/map-blocks/index.js",
+        "src/js/src/map-blocks/onetime-map-editor.js",
+        "src/js/src/map-blocks/onetime-map-config.js",
+        "src/js/src/map-blocks/onetime-map-config.test.js",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-4-logs-and-deprecations",
+      "status": "completed",
+      "summary": "Removed repository-owned console noise and dead debug traces, documented the remaining async combobox dependency on the current experimental Gutenberg render hook, and fixed the editor-side runtime errors surfaced during manual validation.",
+      "automatedChecks": [
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "The editor-side cleanup did not change the passing JS test suite."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "The build stayed green with no new repository-owned warnings."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "The JS cleanup did not affect PHP compatibility checks."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify normal editor use stays console-clean after the cleanup."
+      ],
+      "documentUpdates": [
+        "src/js/src/shared/async-combobox-control.js",
+        "src/js/src/layers-sidebar/interactions-settings.js",
+        "src/js/src/posts-sidebar/legends-editor/editors/circle.js",
+        "src/js/src/posts-sidebar/legends-editor/legend-editor.js",
+        "src/includes/legend-types/JeoLegend.js",
+        "src/js/src/discovery/blocks/stories.js",
+        "src/js/src/discovery/index.js",
+        "src/js/src/map-blocks/index.js",
+        "src/js/src/map-blocks/onetime-map-editor.js",
+        "src/js/src/map-blocks/onetime-map-config.js",
+        "src/js/src/map-blocks/onetime-map-config.test.js",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-5-runtime-hardening",
+      "status": "completed",
+      "summary": "Hardened geocoding and adjacent runtime request paths with nonce and capability checks, safer remote-request settings, cleaner JSON responses and more defensive client-side handling; the later draggable-marker reliability and accented-search fixes are now closed in the current branch.",
+      "automatedChecks": [
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Repository-owned PHP checks stayed green after the request hardening changes."
+        },
+        {
+          "name": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+          "status": "passed",
+          "details": "The hardened request and sanitization paths remain clean under the current PHPCS stack."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The local runtime smoke stayed green after the geocoding and bootstrap hardening work."
+        }
+      ],
+      "manualReviewItems": [
+        "Verify geocoding autosuggest, reverse geocoding and save or reopen flows.",
+        "Verify embeds and public maps touched by bootstrap changes still load."
+      ],
+      "documentUpdates": [
+        "src/includes/class-jeo.php",
+        "src/includes/geocode/class-geocode-handler.php",
+        "src/includes/geocode/geocoders/class-nominatim.php",
+        "src/js/src/posts-sidebar/geo-auto-complete.js",
+        "src/js/src/posts-sidebar/geo-posts.js",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-6-pipeline-quality",
+      "status": "completed",
+      "summary": "Closed the sanity-track loop by aligning release and CI expectations with the same install, audit, bundle-budget, PHP compatibility, PHPCS and smoke-test gates now documented for local maintenance, and confirmed them again in a full rerun after the late editor fixes.",
+      "automatedChecks": [
+        {
+          "name": "composer validate --no-check-publish",
+          "status": "passed",
+          "details": "The current Composer metadata remains structurally valid."
+        },
+        {
+          "name": "npm ci",
+          "status": "passed",
+          "details": "A full reinstall under Node 24 completed successfully; the remaining install-time notices are the same upstream tooling deprecations already tracked for future review."
+        },
+        {
+          "name": "npm run test:unit",
+          "status": "passed",
+          "details": "All current frontend unit tests passed again after the final editor and geocoding-related fixes."
+        },
+        {
+          "name": "npm run build",
+          "status": "passed",
+          "details": "The frontend build remains green after the final sanity-track fixes, with no repository-owned warnings."
+        },
+        {
+          "name": "npm run build:report",
+          "status": "passed",
+          "details": "Bundle budgets remain within limits, including mapBlocks 1092 of 1150 KB, discovery 241 of 280 KB and jeoMap 79 of 120 KB."
+        },
+        {
+          "name": "composer audit --locked",
+          "status": "passed",
+          "details": "Composer dependencies remain free of known advisories."
+        },
+        {
+          "name": "npm audit --package-lock-only",
+          "status": "passed",
+          "details": "The npm lockfile remains free of known advisories after the full sanity-track refresh."
+        },
+        {
+          "name": "npm audit --omit=dev",
+          "status": "passed",
+          "details": "The installed runtime dependency tree remains free of known npm advisories."
+        },
+        {
+          "name": "npm ls react-autosize-textarea react react-dom",
+          "status": "passed",
+          "details": "The frontend runtime tree remains aligned on React 18.3.1 with the local react-autosize-textarea override applied cleanly."
+        },
+        {
+          "name": "php scripts/check-php-compat.php",
+          "status": "passed",
+          "details": "Static compatibility checks remain green for PHP 8.0 through 8.5."
+        },
+        {
+          "name": "vendor/bin/phpcs --standard=phpcs.xml.dist",
+          "status": "passed",
+          "details": "The repository stays clean on the current PHPCS and WPCS line."
+        },
+        {
+          "name": "WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh",
+          "status": "passed",
+          "details": "The runtime smoke remains green at the end of the full sanity track."
+        }
+      ],
+      "manualReviewItems": [],
+      "documentUpdates": [
+        ".github/workflows/deploy-wordpress-org.yml",
+        ".github/workflows/node-frontend.yml",
+        "README.md",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md",
+        "docs/dev/dependency-upgrade-smoke-tests.md"
+      ]
+    },
+    {
+      "date": "2026-03-17",
+      "batchId": "sanity-batch-7-override-governance",
+      "status": "completed",
+      "summary": "Added an explicit npm override inventory with reason, review triggers and removal criteria for every active override, and made the dependency-review script fail when the governance map falls out of sync with package.json.",
+      "automatedChecks": [
+        {
+          "name": "node scripts/dependency-review.mjs --write",
+          "status": "passed",
+          "details": "The report generator now renders a dedicated override-governance section and verifies that every active override is documented."
+        },
+        {
+          "name": "npm audit --package-lock-only",
+          "status": "passed",
+          "details": "The current override set still keeps the lockfile free of known advisories."
+        },
+        {
+          "name": "npm ls react-autosize-textarea react react-dom",
+          "status": "passed",
+          "details": "The local react-autosize-textarea override still resolves cleanly against React 18.3.1 and ReactDOM 18.3.1."
+        }
+      ],
+      "manualReviewItems": [
+        "Confirm that each active override still has a clear reason, a review trigger and an actionable removal criterion."
+      ],
+      "documentUpdates": [
+        "scripts/dependency-review.mjs",
+        "scripts/dependency-review.overrides.json",
+        "docs/dev/dependency-upgrade-report.json",
+        "docs/dev/dependency-upgrade-report.md"
+      ]
+    }
+  ],
+  "smokeTests": [
+    {
+      "id": "build",
+      "title": "Build plugin assets",
+      "expected": "npm run build completes without new warnings or bundle errors."
+    },
+    {
+      "id": "map-editor",
+      "title": "Create and edit a map",
+      "expected": "The Maps editor loads, map settings persist, and the preview updates without console errors."
+    },
+    {
+      "id": "storymap-editor",
+      "title": "Edit a storymap with CKEditor",
+      "expected": "The storymap editor loads, inline rich text editing works, and image upload still attaches media."
+    },
+    {
+      "id": "reorder",
+      "title": "Reorder layers and storymap slides",
+      "expected": "Drag-and-drop or movable ordering works in all UIs that currently rely on reordering."
+    },
+    {
+      "id": "layer-form",
+      "title": "Edit layer and legend forms",
+      "expected": "Schema-driven forms, legend settings and interaction settings still render and save."
+    },
+    {
+      "id": "discovery-filter",
+      "title": "Filter stories by date in Discovery",
+      "expected": "The date range picker applies and clears filters correctly."
+    },
+    {
+      "id": "autosuggest",
+      "title": "Use geocoding autosuggest",
+      "expected": "Address suggestions load, selection writes values back, and no stale request errors appear."
+    },
+    {
+      "id": "map-runtimes",
+      "title": "Render maps in both Mapbox and MapLibre modes",
+      "expected": "Frontend and editor previews render with both runtimes, including layers, legends and interactions."
+    }
+  ],
+  "summary": {
+    "directNpm": 22,
+    "directNpmDev": 8,
+    "directComposer": 2,
+    "transitiveComposer": 3
+  },
+  "rows": {
+    "npm": [
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@ckeditor/ckeditor5-react",
+        "declaredRange": "^11.0.1",
+        "resolvedVersion": "11.0.1",
+        "scope": "Storymap editor",
+        "impact": "CKEditor runtime inside storymap editing flows",
+        "latestCompatible": "11.0.1",
+        "latestVersion": "11.0.1",
+        "lastPublished": "2025-12-18",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "phase-7-ckeditor-react-evaluation",
+        "batchLabel": "Phase 7",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Upgraded to 11.0.1 after confirming compatibility with ckeditor5 47.6.1 and React 18.3.1.",
+          "No storymap editor source changes were required for the wrapper major itself."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@ckeditor/ckeditor5-react"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/ckeditor/ckeditor5-react"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/storymap-editor.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@nazka/map-gl-js-spiderfy",
+        "declaredRange": "^1.2.10",
+        "resolvedVersion": "1.2.10",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "1.2.10",
+        "latestVersion": "1.2.10",
+        "lastPublished": "2025-09-03",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@nazka/map-gl-js-spiderfy"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/nazka/map-gl-js-spiderfy"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/jeo-map/class-jeo-map.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@rjsf/core",
+        "declaredRange": "^6.4.1",
+        "resolvedVersion": "6.4.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "6.4.1",
+        "latestVersion": "6.4.1",
+        "lastPublished": "2026-03-07",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@rjsf/core"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/rjsf-team/react-jsonschema-form"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/shared/schema-form.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@rjsf/validator-ajv8",
+        "declaredRange": "^6.4.1",
+        "resolvedVersion": "6.4.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "6.4.1",
+        "latestVersion": "6.4.1",
+        "lastPublished": "2026-03-07",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@rjsf/validator-ajv8"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/rjsf-team/react-jsonschema-form"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/shared/schema-form.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@wordpress/edit-post",
+        "declaredRange": "^8.41.0",
+        "resolvedVersion": "8.41.0",
+        "scope": "Gutenberg / editor",
+        "impact": "Node 24 build pipeline, Gutenberg editor runtime and React peer alignment",
+        "latestCompatible": "8.41.0",
+        "latestVersion": "8.41.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "batch-4-gutenberg-react-alignment",
+        "batchLabel": "Batch 4",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Revalidated in Batch 4: 8.41.0 is already the latest published line available to this repository.",
+          "Its published peerDependencies still target react and react-dom ^18.0.0, so no upstream React-line unlock happened in this batch."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/edit-post"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": [
+          "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@wordpress/editor",
+        "declaredRange": "^14.41.0",
+        "resolvedVersion": "14.41.0",
+        "scope": "Gutenberg / editor",
+        "impact": "Node 24 build pipeline, Gutenberg editor runtime and React peer alignment",
+        "latestCompatible": "14.41.0",
+        "latestVersion": "14.41.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "batch-4-gutenberg-react-alignment",
+        "batchLabel": "Batch 4",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Revalidated in Batch 4: 14.41.0 is already the latest published line available to this repository.",
+          "Its published peerDependencies still target react and react-dom ^18.0.0, so no upstream React-line unlock happened in this batch."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/editor"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/index.js",
+          "src/js/src/layers-sidebar/layers-sidebar.js",
+          "src/js/src/maps-sidebar/map-embed-url.js"
+        ],
+        "replacement": null,
+        "notes": [
+          "Keep this aligned with the rest of the Gutenberg package batch to avoid React peer drift."
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "@wordpress/plugins",
+        "declaredRange": "^7.41.0",
+        "resolvedVersion": "7.41.0",
+        "scope": "Gutenberg / editor",
+        "impact": "Node 24 build pipeline, Gutenberg editor runtime and React peer alignment",
+        "latestCompatible": "7.41.0",
+        "latestVersion": "7.41.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "batch-4-gutenberg-react-alignment",
+        "batchLabel": "Batch 4",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Revalidated in Batch 4: 7.41.0 is already the latest published line available to this repository.",
+          "Its published peerDependencies still target react and react-dom ^18.0.0, so this package does not yet help unlock react-leaflet 5."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/plugins"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/index.js",
+          "src/js/src/maps-sidebar/index.js",
+          "src/js/src/layers-sidebar/index.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "@wordpress/scripts",
+        "declaredRange": "^31.6.0",
+        "resolvedVersion": "31.6.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "31.6.0",
+        "latestVersion": "31.6.0",
+        "lastPublished": "2026-03-04",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "phase-2-wp-scripts-major",
+        "batchLabel": "Phase 2",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Lead package for the tooling major batch.",
+          "Upgraded to 31.x without requiring webpack.config.js changes in this repository."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/@wordpress/scripts"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/gutenberg"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "webpack.config.js"
+        ],
+        "replacement": null,
+        "notes": [
+          "Treat this package as the lead dependency for the build batch because it constrains Babel, webpack, PostCSS and much of the Gutenberg toolchain."
+        ]
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "ajv",
+        "declaredRange": "^8.18.0",
+        "resolvedVersion": "8.18.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "8.18.0",
+        "latestVersion": "8.18.0",
+        "lastPublished": "2026-02-14",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/ajv"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/ajv-validator/ajv"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/shared/schema-form.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "ckeditor5",
+        "declaredRange": "^47.6.1",
+        "resolvedVersion": "47.6.1",
+        "scope": "Storymap editor",
+        "impact": "CKEditor runtime inside storymap editing flows",
+        "latestCompatible": "47.6.1",
+        "latestVersion": "47.6.1",
+        "lastPublished": "2026-03-11",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/ckeditor5"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/ckeditor/ckeditor5"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/storymap-editor.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "classnames",
+        "declaredRange": "^2.5.1",
+        "resolvedVersion": "2.5.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "2.5.1",
+        "latestVersion": "2.5.1",
+        "lastPublished": "2023-12-29",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/classnames"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/JedWatson/classnames"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-posts.js",
+          "src/js/src/posts-selector/interval-selector.js",
+          "src/js/src/jeo-storymap/storymap-display.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "css-loader",
+        "declaredRange": "^7.1.4",
+        "resolvedVersion": "7.1.4",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "7.1.4",
+        "latestVersion": "7.1.4",
+        "lastPublished": "2026-02-16",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/css-loader"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack/css-loader"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "eta",
+        "declaredRange": "^4.5.1",
+        "resolvedVersion": "4.5.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "4.5.1",
+        "latestVersion": "4.5.1",
+        "lastPublished": "2026-02-05",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "phase-5-eta-major",
+        "batchLabel": "Phase 5",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Upgraded to 4.5.1 after the template compilation contract was covered by the minimum JS test layer.",
+          "The frontend helper now imports eta/core and Jest transforms eta/dist/core.js to keep the browser build and unit runner aligned."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/eta"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/bgub/eta"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/jeo-map/class-jeo-map.js",
+          "src/templates/post-popup.ejs",
+          "src/js/src/jeo-map/template-compiler.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "leaflet",
+        "declaredRange": "^1.9.4",
+        "resolvedVersion": "1.9.4",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "1.9.4",
+        "latestVersion": "1.9.4",
+        "lastPublished": "2023-05-18",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/leaflet"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/Leaflet/Leaflet"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-posts.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "lodash-es",
+        "declaredRange": "^4.17.23",
+        "resolvedVersion": "4.17.23",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "4.17.23",
+        "latestVersion": "4.17.23",
+        "lastPublished": "2026-01-21",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/lodash-es"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/lodash/lodash"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-auto-complete.js",
+          "src/js/src/posts-sidebar/geo-posts.js",
+          "src/js/src/map-blocks/map-preview-layer.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "map-gl-utils",
+        "declaredRange": "^0.50.4",
+        "resolvedVersion": "0.50.4",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "0.50.4",
+        "latestVersion": "0.50.4",
+        "lastPublished": "2025-01-21",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/map-gl-utils"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/stevage/map-gl-utils"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/lib/mapboxgl/mapboxgl-loader.js",
+          "src/js/src/lib/maplibregl/maplibregl-loader.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "mapbox-gl",
+        "declaredRange": "^3.20.0",
+        "resolvedVersion": "3.20.0",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "3.20.0",
+        "latestVersion": "3.20.0",
+        "lastPublished": "2026-03-12",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/mapbox-gl"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/mapbox/mapbox-gl-js"
+          }
+        ],
+        "usage": [
+          "src/readme.txt",
+          "package.json",
+          "src/js/src/lib/mapboxgl/mapboxgl-loader.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "maplibre-gl",
+        "declaredRange": "^5.20.1",
+        "resolvedVersion": "5.20.1",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "5.20.2",
+        "latestVersion": "5.20.2",
+        "lastPublished": "2026-03-17",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Update to 5.20.2",
+        "majorPath": "No newer major detected",
+        "decision": "Candidate for the minor batch",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/maplibre-gl"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/maplibre/maplibre-gl-js"
+          }
+        ],
+        "usage": [
+          "src/readme.txt",
+          "package.json",
+          "src/js/src/lib/maplibregl/maplibregl-loader.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "maplibregl-mapbox-request-transformer",
+        "declaredRange": "^0.0.3",
+        "resolvedVersion": "0.0.3",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "0.0.3",
+        "latestVersion": "0.0.3",
+        "lastPublished": "2025-08-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/maplibregl-mapbox-request-transformer"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/rowanwins/maplibregl-mapbox-request-transformer"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/lib/maplibregl/maplibregl-loader.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "postcss",
+        "declaredRange": "^8.5.8",
+        "resolvedVersion": "8.5.8",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "8.5.8",
+        "latestVersion": "8.5.8",
+        "lastPublished": "2026-03-02",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/postcss"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/postcss/postcss"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-datepicker",
+        "declaredRange": "^9.1.0",
+        "resolvedVersion": "9.1.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "9.1.0",
+        "latestVersion": "9.1.0",
+        "lastPublished": "2025-12-19",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "phase-4-react-datepicker-major",
+        "batchLabel": "Phase 4",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Upgraded to 9.1.0; keep the related-posts date persistence flow under manual review after the major.",
+          "Phase 4 introduced a non-blocking webpack warning from react-datepicker's optional date-fns-tz require path.",
+          "Batch 1 removes that warning without changing the declared react-datepicker version."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-datepicker"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/Hacker0x01/react-datepicker"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "webpack.config.js",
+          "src/js/src/posts-selector/interval-selector.js",
+          "src/js/src/discovery/style/discovery.scss"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-leaflet",
+        "declaredRange": "^4.2.1",
+        "resolvedVersion": "4.2.1",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "4.2.1",
+        "latestVersion": "5.0.0",
+        "lastPublished": "2024-12-14",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 5.0.0",
+        "decision": "Monitor upstream blocker",
+        "batchId": "batch-5-react-leaflet-major",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [
+          "Track this as external upstream monitoring because react-leaflet 5.0.0 requires react and react-dom ^19.0.0.",
+          "The latest published Gutenberg editor packages in this repository still peer on react and react-dom ^18.0.0, so the upgrade cannot start yet without leaving the supported upstream path."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-leaflet"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PaulLeCam/react-leaflet"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/posts-sidebar/geo-posts.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-map-gl",
+        "declaredRange": "^8.1.0",
+        "resolvedVersion": "8.1.0",
+        "scope": "Map rendering",
+        "impact": "Frontend maps, editor previews, Mapbox/MapLibre runtime compatibility",
+        "latestCompatible": "8.1.0",
+        "latestVersion": "8.1.0",
+        "lastPublished": "2025-10-03",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-map-gl"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/visgl/react-map-gl"
+          }
+        ],
+        "usage": [
+          "src/readme.txt",
+          "package.json",
+          "src/js/src/lib/mapboxgl/mapboxgl-react.js",
+          "src/js/src/lib/maplibregl/maplibregl-react.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "react-movable",
+        "declaredRange": "^3.4.0",
+        "resolvedVersion": "3.4.1",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "3.4.1",
+        "latestVersion": "3.4.1",
+        "lastPublished": "2025-02-26",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-movable"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/tajo/react-movable"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/layers-settings.js",
+          "src/js/src/discovery/blocks/map-layers.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "sass",
+        "declaredRange": "^1.98.0",
+        "resolvedVersion": "1.98.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "1.98.0",
+        "latestVersion": "1.98.0",
+        "lastPublished": "2026-03-10",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/sass"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/sass/dart-sass"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "sass-loader",
+        "declaredRange": "^16.0.7",
+        "resolvedVersion": "16.0.7",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "16.0.7",
+        "latestVersion": "16.0.7",
+        "lastPublished": "2026-02-05",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/sass-loader"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack/sass-loader"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "scrollama",
+        "declaredRange": "^3.2.0",
+        "resolvedVersion": "3.2.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "3.2.0",
+        "latestVersion": "3.2.0",
+        "lastPublished": "2022-06-17",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/scrollama"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/russellgoldenberg/scrollama"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/jeo-storymap/storymap-display.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "style-loader",
+        "declaredRange": "^4.0.0",
+        "resolvedVersion": "4.0.0",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "4.0.0",
+        "latestVersion": "4.0.0",
+        "lastPublished": "2024-04-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/style-loader"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack-contrib/style-loader"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "dependency",
+        "packageName": "use-debounce",
+        "declaredRange": "^10.1.0",
+        "resolvedVersion": "10.1.0",
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "10.1.0",
+        "latestVersion": "10.1.0",
+        "lastPublished": "2026-01-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/use-debounce"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/xnimorz/use-debounce"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "src/js/src/map-blocks/layer-editor-preview.js",
+          "src/js/src/layers-sidebar/layer-settings.js",
+          "src/js/src/layers-sidebar/layers-sidebar.js"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "npm",
+        "dependencyType": "devDependency",
+        "packageName": "webpack",
+        "declaredRange": "^5.105.4",
+        "resolvedVersion": "5.105.4",
+        "scope": "Build tooling",
+        "impact": "Asset compilation, webpack config and CI reproducibility on Node 24",
+        "latestCompatible": "5.105.4",
+        "latestVersion": "5.105.4",
+        "lastPublished": "2026-03-03",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/webpack"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/webpack/webpack"
+          }
+        ],
+        "usage": [
+          "package.json",
+          "webpack.config.js",
+          "src/js/src/lib/mapgl-loader.js",
+          "src/js/src/lib/mapboxgl/mapboxgl-react.js"
+        ],
+        "replacement": null,
+        "notes": []
+      }
+    ],
+    "composer": [
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerTransitiveDev",
+        "packageName": "dealerdirect/phpcodesniffer-composer-installer",
+        "declaredRange": "transitive",
+        "resolvedVersion": "1.2.0",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "1.2.0",
+        "latestVersion": "1.2.0",
+        "lastPublished": "2025-11-11",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/dealerdirect/phpcodesniffer-composer-installer"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/composer-installer"
+          }
+        ],
+        "usage": [
+          "composer.lock",
+          "composer.json"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerTransitiveDev",
+        "packageName": "phpcsstandards/phpcsextra",
+        "declaredRange": "transitive",
+        "resolvedVersion": "1.5.0",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "1.5.0",
+        "latestVersion": "1.5.0",
+        "lastPublished": "2025-11-12",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/phpcsstandards/phpcsextra"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/PHPCSExtra"
+          }
+        ],
+        "usage": [
+          "composer.lock"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerTransitiveDev",
+        "packageName": "phpcsstandards/phpcsutils",
+        "declaredRange": "transitive",
+        "resolvedVersion": "1.2.2",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "1.2.2",
+        "latestVersion": "1.2.2",
+        "lastPublished": "2025-12-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "monitor-current-line",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/phpcsstandards/phpcsutils"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/PHPCSUtils"
+          }
+        ],
+        "usage": [
+          "composer.lock"
+        ],
+        "replacement": null,
+        "notes": []
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerDevDependency",
+        "packageName": "squizlabs/php_codesniffer",
+        "declaredRange": "^3.13.5",
+        "resolvedVersion": "3.13.5",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "3.13.5",
+        "latestVersion": "4.0.1",
+        "lastPublished": "2025-11-10",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "Review upgrade path to 4.0.1",
+        "decision": "Monitor upstream blocker",
+        "batchId": "batch-7-php-lint-stack",
+        "batchLabel": "Monitor",
+        "executionStatus": "tracking-only",
+        "executionStatusLabel": "Tracking only",
+        "executionNotes": [
+          "Packagist publishes PHPCS 4.0.1, but the installed WPCS 3.3.0 line still requires squizlabs/php_codesniffer ^3.13.4.",
+          "The WPCS 3.3.0 release notes still describe PHPCS 3.13.4 as the required line; the only published PHPCS 4 mention in WPCS releases is an older 2.3.0 note about preliminary CI testing against the PHPCS 4 development branch.",
+          "The repository PHPCS 3.x baseline is now clean, so the remaining blocker is purely upstream WPCS support for PHPCS 4."
+        ],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/squizlabs/php_codesniffer"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/PHPCSStandards/PHP_CodeSniffer"
+          }
+        ],
+        "usage": [
+          "composer.lock",
+          "composer.json"
+        ],
+        "replacement": null,
+        "notes": [
+          "Direct dev dependency. Evaluate majors only after confirming WPCS compatibility."
+        ]
+      },
+      {
+        "ecosystem": "composer",
+        "dependencyType": "composerDevDependency",
+        "packageName": "wp-coding-standards/wpcs",
+        "declaredRange": "^3.3.0",
+        "resolvedVersion": "3.3.0",
+        "parentPackage": null,
+        "scope": "PHP tooling",
+        "impact": "Developer-only PHPCS/WPCS checks; validate PHP 8.0 and WPCS compatibility before majors",
+        "latestCompatible": "3.3.0",
+        "latestVersion": "3.3.0",
+        "lastPublished": "2025-11-25",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained",
+        "minorPath": "Already on the latest compatible line",
+        "majorPath": "No newer major detected",
+        "decision": "Keep current version",
+        "batchId": "batch-7-php-lint-stack",
+        "batchLabel": "Batch 7",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Batch 7 cleaned the repository baseline while keeping WPCS 3.3.0 on its current supported PHPCS 3.x line.",
+          "This package remains the compatibility gate that must move before PHPCS 4 can be re-evaluated."
+        ],
+        "evidence": [
+          {
+            "label": "Packagist",
+            "url": "https://packagist.org/packages/wp-coding-standards/wpcs"
+          },
+          {
+            "label": "Repository",
+            "url": "https://github.com/WordPress/WordPress-Coding-Standards"
+          }
+        ],
+        "usage": [
+          "composer.json",
+          "composer.lock"
+        ],
+        "replacement": null,
+        "notes": [
+          "Lead Composer dependency because it constrains PHPCS, PHPCSExtra and PHPCSUtils."
+        ]
+      }
+    ],
+    "watchlist": [
+      {
+        "ecosystem": "npm",
+        "dependencyType": "transitiveWatchlist",
+        "packageName": "react-autosize-textarea",
+        "declaredRange": "transitive",
+        "resolvedVersion": null,
+        "override": {
+          "parents": [
+            "@wordpress/edit-post",
+            "@wordpress/editor"
+          ],
+          "maintenanceStatus": "peer-metadata-overridden",
+          "decision": "watch",
+          "minorPath": "Keep the local override in place while the published Gutenberg editor packages still carry this stale peer metadata.",
+          "majorPath": "Remove the override only after upstream ships React-18 or React-19-compatible peer metadata or the parent editor stack is replaced through a supported upgrade path.",
+          "evidence": [
+            {
+              "label": "npm",
+              "url": "https://www.npmjs.com/package/react-autosize-textarea"
+            }
+          ],
+          "batchId": "batch-4-gutenberg-react-alignment",
+          "executionStatus": "completed",
+          "executionNotes": [
+            "Batch 4 confirmed that the latest published Gutenberg editor packages still resolve this stale peer metadata and therefore applied a minimum local override at npm-overrides/react-autosize-textarea.",
+            "npm ci and npm ls no longer report invalid React peer ranges after the override."
+          ],
+          "notes": [
+            "Observed locally through npm ls react react-dom."
+          ]
+        },
+        "scope": "UI / helper",
+        "impact": "Browser runtime and React-driven editor UI behavior",
+        "latestCompatible": "7.1.0",
+        "latestVersion": "7.1.0",
+        "lastPublished": "2020-07-08",
+        "deprecatedMessage": null,
+        "maintenance": "Maintained upstream, local override applied for stale peer metadata",
+        "minorPath": "Keep the local override in place while the published Gutenberg editor packages still carry this stale peer metadata.",
+        "majorPath": "Remove the override only after upstream ships React-18 or React-19-compatible peer metadata or the parent editor stack is replaced through a supported upgrade path.",
+        "decision": "Watch via the parent package batch",
+        "batchId": "batch-4-gutenberg-react-alignment",
+        "batchLabel": "Batch 4",
+        "executionStatus": "completed",
+        "executionStatusLabel": "Completed",
+        "executionNotes": [
+          "Batch 4 confirmed that the latest published Gutenberg editor packages still resolve this stale peer metadata and therefore applied a minimum local override at npm-overrides/react-autosize-textarea.",
+          "npm ci and npm ls no longer report invalid React peer ranges after the override."
+        ],
+        "evidence": [
+          {
+            "label": "npm",
+            "url": "https://www.npmjs.com/package/react-autosize-textarea"
+          }
+        ],
+        "usage": [
+          "package.json"
+        ],
+        "replacement": null,
+        "notes": [
+          "Observed locally through npm ls react react-dom."
+        ]
+      }
+    ]
+  }
+}

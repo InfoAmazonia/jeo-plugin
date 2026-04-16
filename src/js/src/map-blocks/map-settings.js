@@ -1,11 +1,13 @@
 import {
-	TextControl,
-	RangeControl,
-	CheckboxControl,
 	Button,
 } from '@wordpress/components';
 import { Fragment, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	CheckboxControl,
+	RangeControl,
+	TextControl,
+} from '../shared/wp-form-controls';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -208,8 +210,16 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					</div>
 					</p>
 					<p>
-						<Button variant="primary" isLarge onClick={ setPanLimitsFromMap }>
-							{ __( 'Set current as map settings', 'jeo' ) }
+						<Button
+							variant="primary"
+							isLarge
+							type="button"
+							onClick={ ( event ) => {
+								event.preventDefault();
+								setPanLimitsFromMap();
+							} }
+						>
+							{ __( 'Use current map view', 'jeo' ) }
 						</Button>
 					</p>
 				</section>

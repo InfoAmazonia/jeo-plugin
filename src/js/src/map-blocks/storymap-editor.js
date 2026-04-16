@@ -1,21 +1,53 @@
 import { CKEditor } from '@ckeditor/ckeditor5-react';
+import {
+	ClassicEditor,
+	Autoformat,
+	Bold,
+	Essentials,
+	FileRepository,
+	FontBackgroundColor,
+	FontColor,
+	Heading,
+	HtmlEmbed,
+	Image,
+	ImageToolbar,
+	ImageUpload,
+	Italic,
+	Link,
+	List as CKEditorList,
+	MediaEmbed,
+	Paragraph,
+	PasteFromOffice,
+	Underline,
+} from 'ckeditor5';
+import ckeditorEsTranslations from 'ckeditor5/translations/es.js';
+import ckeditorEsCoTranslations from 'ckeditor5/translations/es-co.js';
+import ckeditorPtTranslations from 'ckeditor5/translations/pt.js';
+import ckeditorPtBrTranslations from 'ckeditor5/translations/pt-br.js';
+import 'ckeditor5/ckeditor5.css';
 import { useBlockProps } from '@wordpress/block-editor';
-import { Button, CheckboxControl, Dashicon, Panel, PanelBody, Spinner } from '@wordpress/components';
-import { useEntityRecord, useEntityRecords } from '@wordpress/core-data';
+import { Button, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
+import { chevronDown, chevronUp, lock, unlock, seen, trash, plus } from '@wordpress/icons';
+import { useEntityRecord } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
-import { Fragment, useEffect, useId, useMemo, useState } from '@wordpress/element';
+import { Fragment, useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import ClassicEditor from 'ckeditor5-build-full';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
-import { List, arrayMove } from 'react-movable';
+import { CheckboxControl } from '../shared/wp-form-controls';
 
 import { createUploadAdapter } from './cke5-image-upload';
 import { baseColors } from './color-palettes';
-import { Map } from '../lib/mapgl-react';
+import { Map as MapPreview } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
+import {
+	moveActiveIndex,
+	reorderSlides,
+	sortSelectedLayersByMapOrder,
+} from './storymap-ordering';
+import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
+import { getCKEditorLanguage } from '../shared/locale';
 import './map-editor.css';
 import './storymap-editor.scss';
 
@@ -26,6 +58,14 @@ const percentageFormatter = new Intl.NumberFormat( 'en-US', {
 	minimumFractionDigits: 0,
 	maximumFractionDigits: 2,
 } );
+const TOOLBAR_SELECTION_COMMANDS = [ 'bold', 'italic', 'underline', 'fontColor', 'fontBackgroundColor' ];
+const CKEDITOR_TRANSLATIONS = [
+	ckeditorEsTranslations,
+	ckeditorEsCoTranslations,
+	ckeditorPtTranslations,
+	ckeditorPtBrTranslations,
+];
+
 function percentage ( number ) {
 	return percentageFormatter.format( number );
 }
@@ -59,13 +99,6 @@ function removeTags(str) {
    return str.replace(/<[^>]*>/g, '');
  }
 
-function reorder ( list, startIndex, endIndex ) {
-	const result = Array.from( list );
-	const [ removed ] = result.splice( startIndex, 1 );
-	result.splice( endIndex, 0, removed );
-	return result;
-};
-
 function flyTo ( map, location ) {
 	map.flyTo({
 		center: [
@@ -75,33 +108,351 @@ function flyTo ( map, location ) {
 	});
 }
 
+function getToolbarInteractionTarget( target ) {
+	if ( ! target ) {
+		return null;
+	}
+
+	if ( target.nodeType === Node.TEXT_NODE ) {
+		return target.parentElement || null;
+	}
+
+	if ( typeof target.closest === 'function' ) {
+		return target;
+	}
+
+	return target.parentElement || null;
+}
+
+function serializeModelSelectionSnapshot( selection ) {
+	return {
+		isBackward: selection.isBackward,
+		ranges: Array.from( selection.getRanges(), ( range ) => ( {
+			start: {
+				root: range.start.root.rootName,
+				path: Array.from( range.start.path ),
+			},
+			end: {
+				root: range.end.root.rootName,
+				path: Array.from( range.end.path ),
+			},
+		} ) ),
+	};
+}
+
+function isSelectionInsideEditable( editableElement, domSelection ) {
+	if ( ! editableElement || ! domSelection ) {
+		return false;
+	}
+
+	const anchorNode = domSelection.anchorNode?.nodeType === Node.TEXT_NODE ? domSelection.anchorNode.parentNode : domSelection.anchorNode;
+	const focusNode = domSelection.focusNode?.nodeType === Node.TEXT_NODE ? domSelection.focusNode.parentNode : domSelection.focusNode;
+
+	return Boolean(
+		( anchorNode && editableElement.contains( anchorNode ) ) ||
+		( focusNode && editableElement.contains( focusNode ) )
+	);
+}
+
+function createModelSelectionSnapshotFromDom( editor ) {
+	const editableElement = editor.ui.getEditableElement();
+	const domRoot = editor.editing.view.getDomRoot();
+	const domSelection = domRoot?.ownerDocument?.defaultView?.getSelection();
+
+	if ( ! isSelectionInsideEditable( editableElement, domSelection ) ) {
+		return null;
+	}
+
+	let viewSelection;
+
+	try {
+		viewSelection = editor.editing.view.domConverter.domSelectionToView( domSelection );
+	} catch ( error ) {
+		return null;
+	}
+
+	const modelRanges = Array.from( viewSelection.getRanges(), ( viewRange ) => {
+		try {
+			return editor.editing.mapper.toModelRange( viewRange );
+		} catch ( error ) {
+			return null;
+		}
+	} ).filter( Boolean );
+
+	if ( ! modelRanges.length ) {
+		return null;
+	}
+
+	return serializeModelSelectionSnapshot( editor.model.createSelection( modelRanges, {
+		backward: viewSelection.isBackward,
+	} ) );
+}
+
+function restoreModelSelectionSnapshot( editor, snapshot ) {
+	if ( ! snapshot?.ranges?.length ) {
+		return false;
+	}
+
+	const restoredRanges = snapshot.ranges.map( ( range ) => {
+		const startRoot = editor.model.document.getRoot( range.start.root );
+		const endRoot = editor.model.document.getRoot( range.end.root );
+
+		if ( ! startRoot || ! endRoot ) {
+			return null;
+		}
+
+		try {
+			const start = editor.model.createPositionFromPath( startRoot, range.start.path );
+			const end = editor.model.createPositionFromPath( endRoot, range.end.path );
+
+			return editor.model.createRange( start, end );
+		} catch ( error ) {
+			return null;
+		}
+	} ).filter( Boolean );
+
+	if ( ! restoredRanges.length ) {
+		return false;
+	}
+
+	editor.model.change( ( writer ) => {
+		writer.setSelection( restoredRanges, {
+			backward: snapshot.isBackward,
+		} );
+	} );
+
+	return true;
+}
+
+function areSelectionSnapshotsEqual( firstSnapshot, secondSnapshot ) {
+	if ( ! firstSnapshot || ! secondSnapshot ) {
+		return false;
+	}
+
+	if ( firstSnapshot.isBackward !== secondSnapshot.isBackward ) {
+		return false;
+	}
+
+	if ( firstSnapshot.ranges.length !== secondSnapshot.ranges.length ) {
+		return false;
+	}
+
+	return firstSnapshot.ranges.every( ( range, index ) => {
+		const otherRange = secondSnapshot.ranges[ index ];
+
+		if ( ! otherRange ) {
+			return false;
+		}
+
+		return JSON.stringify( range ) === JSON.stringify( otherRange );
+	} );
+}
+
+function enableSelectionFormattingFromToolbar( editor ) {
+	const toolbarView = editor.ui?.view?.toolbar;
+	const editableElement = editor.ui.getEditableElement();
+	let pendingToolbarSelection = null;
+	let needsEditingSelectionSync = false;
+	let needsFocusMouseSelectionSync = false;
+
+	const clearPendingToolbarSelection = () => {
+		pendingToolbarSelection = null;
+	};
+
+	const syncModelSelectionWithDom = ( source ) => {
+		if ( ! needsEditingSelectionSync && ! needsFocusMouseSelectionSync ) {
+			return;
+		}
+
+		const domSnapshot = createModelSelectionSnapshotFromDom( editor );
+
+		if ( ! domSnapshot ) {
+			return;
+		}
+
+		const modelSnapshot = serializeModelSelectionSnapshot( editor.model.document.selection );
+
+		if ( areSelectionSnapshotsEqual( modelSnapshot, domSnapshot ) ) {
+			needsEditingSelectionSync = false;
+			needsFocusMouseSelectionSync = false;
+			return;
+		}
+
+		if ( restoreModelSelectionSnapshot( editor, domSnapshot ) ) {
+			needsEditingSelectionSync = false;
+			needsFocusMouseSelectionSync = false;
+		}
+	};
+
+	const captureToolbarSelection = () => {
+		const snapshot = createModelSelectionSnapshotFromDom( editor );
+
+		if ( snapshot ) {
+			pendingToolbarSelection = snapshot;
+		}
+	};
+
+	const attachToolbarElementListeners = () => {
+		const toolbarElement = toolbarView?.element;
+
+		if ( ! toolbarElement || toolbarElement.dataset.jeoSelectionPreservation === 'true' ) {
+			return;
+		}
+
+		toolbarElement.dataset.jeoSelectionPreservation = 'true';
+
+		const preserveToolbarInteraction = ( event ) => {
+			const target = getToolbarInteractionTarget( event.target );
+
+			if ( ! target ) {
+				return;
+			}
+
+			const interactiveToolbarElement = target.closest(
+				'.ck-button, .ck-dropdown, .ck-dropdown__panel, .ck-color-grid, .ck-list'
+			);
+
+			if ( interactiveToolbarElement ) {
+				captureToolbarSelection();
+				event.preventDefault();
+			}
+		};
+
+		toolbarElement.addEventListener( 'pointerdown', preserveToolbarInteraction, true );
+		toolbarElement.addEventListener( 'mousedown', preserveToolbarInteraction, true );
+	};
+
+	attachToolbarElementListeners();
+
+	if ( toolbarView?.element === null ) {
+		toolbarView.once( 'render', attachToolbarElementListeners );
+	}
+
+	if ( editableElement ) {
+		editableElement.addEventListener( 'pointerdown', clearPendingToolbarSelection, true );
+		editableElement.addEventListener( 'mousedown', clearPendingToolbarSelection, true );
+		editableElement.addEventListener( 'keydown', clearPendingToolbarSelection, true );
+		editableElement.addEventListener( 'mouseup', () => {
+			window.requestAnimationFrame( () => {
+				syncModelSelectionWithDom( 'editable-mouseup' );
+			} );
+		}, true );
+	}
+
+	editor.editing.view.document.on( 'blur', () => {
+		needsEditingSelectionSync = false;
+		needsFocusMouseSelectionSync = false;
+		const domSnapshot = createModelSelectionSnapshotFromDom( editor );
+
+		if ( domSnapshot ) {
+			pendingToolbarSelection = domSnapshot;
+		}
+	} );
+
+	editor.editing.view.document.on( 'focus', () => {
+		needsFocusMouseSelectionSync = true;
+	} );
+
+	TOOLBAR_SELECTION_COMMANDS.forEach( ( commandName ) => {
+		const command = editor.commands.get( commandName );
+
+		if ( ! command ) {
+			return;
+		}
+
+		command.on( 'execute', () => {
+			if ( ! pendingToolbarSelection ) {
+				return;
+			}
+
+			if ( restoreModelSelectionSnapshot( editor, pendingToolbarSelection ) ) {
+				needsEditingSelectionSync = true;
+				command.refresh();
+			}
+		}, { priority: 'highest' } );
+
+		command.on( 'execute', clearPendingToolbarSelection, { priority: 'lowest' } );
+	} );
+}
+
+function configureSingleLineEditor( editor ) {
+	const editableElement = editor.ui.getEditableElement();
+
+	if ( ! editableElement || editableElement.dataset.jeoSingleLineEditor === 'true' ) {
+		return;
+	}
+
+	editableElement.dataset.jeoSingleLineEditor = 'true';
+	editableElement.classList.add( 'jeo-storymap-editor-single-line' );
+	editableElement.addEventListener( 'keydown', ( event ) => {
+		if ( event.key === 'Enter' ) {
+			event.preventDefault();
+			event.stopPropagation();
+		}
+	}, true );
+}
+
 export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps( { className: 'jeo-mapblock storymap' } );
 	const instanceId = useId();
 	const [ showStorySettings, setShowStorySettings ] = useState( false );
 	const [ showSlidesSettings, setShowSlidesSettings ] = useState( false );
-	const [ selectedMap, setSelectedMap ] = useState( null );
 	const [ currentSlideIndex, setCurrentSlideIndex ] = useState( 0 );
+	const [ openSlideIndex, setOpenSlideIndex ] = useState( 0 );
+	const [ highlightedSlideKey, setHighlightedSlideKey ] = useState( null );
 	const [ searchValue, setSearchValue ] = useState( '' );
 	const [ key, setKey ] = useState( 0 );
-	const [ storymapLayers, setStorymapLayers ] = useState( [] );
 	const [ viewState, setViewState ] = useState( createInitialViewState );
 	const [ inlineEnd ] = useState( computeInlineEnd );
+	const slideRuntimeKeysRef = useRef( new WeakMap() );
+	const slideRuntimeKeyIndexRef = useRef( 0 );
+	const slideNodesRef = useRef( new globalThis.Map() );
+	const mapRef = useRef( undefined );
 
-	const onDragEndLayers = ( result ) => {
-		// dropped outside the list
-		if ( !result.destination ) {
-		  return;
+	const getSlideRuntimeKey = ( slide ) => {
+		if ( ! slide || typeof slide !== 'object' ) {
+			return `slide-${ slideRuntimeKeyIndexRef.current++ }`;
 		}
 
-		const newItems = reorder(
-		  storymapLayers,
-		  result.source.index,
-		  result.destination.index
-		);
+		const existingKey = slideRuntimeKeysRef.current.get( slide );
 
-		setStorymapLayers( newItems );
-	}
+		if ( existingKey ) {
+			return existingKey;
+		}
+
+		const nextKey = `slide-${ slideRuntimeKeyIndexRef.current++ }`;
+		slideRuntimeKeysRef.current.set( slide, nextKey );
+		return nextKey;
+	};
+
+	const setSlideNode = ( runtimeKey ) => ( node ) => {
+		if ( node ) {
+			slideNodesRef.current.set( runtimeKey, node );
+			return;
+		}
+
+		slideNodesRef.current.delete( runtimeKey );
+	};
+
+	const lockCurrentViewToSlide = ( slideIndex ) => {
+		const latitude = viewState.latitude;
+		const longitude = viewState.longitude;
+		const zoom = Math.round( viewState.zoom * 10 ) / 10;
+		const pitch = viewState.pitch || 0;
+		const bearing = viewState.bearing || 0;
+
+		const newSlides = [ ...attributes.slides ];
+		newSlides[ slideIndex ].latitude = latitude;
+		newSlides[ slideIndex ].longitude = longitude;
+		newSlides[ slideIndex ].zoom = zoom;
+		newSlides[ slideIndex ].pitch = pitch;
+		newSlides[ slideIndex ].bearing = bearing;
+
+		setAttributes( {
+			...attributes,
+			slides: newSlides,
+		} );
+	};
 
 	const themeColors = useSelect( ( select ) => select( 'core/editor' ).getEditorSettings().colors, [] );
 
@@ -116,10 +467,22 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ loadedMap?.meta.layers ] );
 
-	const { records: loadedLayers } = useEntityRecords( 'postType', 'map-layer', {
-		include: layerIds,
-		per_page: -1,
-	}, { enabled: layerIds.length > 0 } );
+	const { records: loadedLayers = [] } = useRecordsByIds( {
+		path: '/jeo/v1/map-layer',
+		ids: layerIds,
+		enabled: layerIds.length > 0,
+		query: { context: 'edit' },
+	} );
+	const currentSlidePreviewKey = useMemo(
+		() =>
+			JSON.stringify( {
+				selectedLayers:
+					attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [],
+				navigateLayers:
+					attributes.navigateMapLayers?.map( ( layer ) => layer.id ) || [],
+			} ),
+		[ attributes.slides, attributes.navigateMapLayers, currentSlideIndex ]
+	);
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
@@ -133,28 +496,74 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	}, [ attributes.slides, currentSlideIndex, setViewState ] );
 
 	useEffect( () => {
+		if ( ! attributes.slides?.length ) {
+			return;
+		}
+
+		const lastSlideIndex = attributes.slides.length - 1;
+
+		if ( currentSlideIndex > lastSlideIndex ) {
+			setCurrentSlideIndex( lastSlideIndex );
+		}
+
+		if ( openSlideIndex !== null && openSlideIndex > lastSlideIndex ) {
+			setOpenSlideIndex( lastSlideIndex );
+		}
+	}, [ attributes.slides?.length, currentSlideIndex, openSlideIndex ] );
+
+	useEffect( () => {
+		if ( ! highlightedSlideKey ) {
+			return undefined;
+		}
+
+		const highlightedNode = slideNodesRef.current.get( highlightedSlideKey );
+
+		if ( highlightedNode?.scrollIntoView ) {
+			window.requestAnimationFrame( () => {
+				highlightedNode.scrollIntoView( {
+					block: 'nearest',
+					behavior: 'smooth',
+				} );
+			} );
+		}
+
+		const timeoutId = window.setTimeout( () => {
+			setHighlightedSlideKey( ( currentHighlightedSlideKey ) =>
+				currentHighlightedSlideKey === highlightedSlideKey
+					? null
+					: currentHighlightedSlideKey
+			);
+		}, 650 );
+
+		return () => {
+			window.clearTimeout( timeoutId );
+		};
+	}, [ highlightedSlideKey ] );
+
+	useEffect( () => {
 		// Post already exists
-		if(attributes.slides && loadedMap && loadedLayers) {
-			const newSlides = attributes.slides.map(slide => {
-				slide.selectedLayers.forEach((selectedLayer, index) => {
-					if (!loadedMap.meta.layers.some(layer => layer.id === selectedLayer.id ) || !loadedLayers.some(layer => layer.id === selectedLayer.id )) {
-						slide.selectedLayers.splice(index, 1);
-					}
-				})
+		if ( attributes.slides && loadedMap && loadedLayers ) {
+			const loadedMapLayerIds = new Set(
+				loadedMap.meta.layers.map( ( layer ) => layer.id )
+			);
+			const availableLayerIds = new Set(
+				loadedLayers.map( ( layer ) => layer.id )
+			);
+			const newSlides = attributes.slides.map( ( slide ) => {
+				const selectedLayers = ( slide.selectedLayers ?? [] ).filter(
+					( selectedLayer ) =>
+						loadedMapLayerIds.has( selectedLayer.id ) &&
+						availableLayerIds.has( selectedLayer.id )
+				);
 
-				const newOrder = [];
-
-				loadedMap.meta.layers.forEach(mapLayer => {
-					const foundLayer = slide.selectedLayers.find(layer => layer.id === mapLayer.id );
-					if( foundLayer ) {
-						newOrder.push(foundLayer);
-					}
-				})
-
-				slide.selectedLayers = newOrder;
-
-				return slide;
-			})
+				return {
+					...slide,
+					selectedLayers: sortSelectedLayersByMapOrder(
+						selectedLayers,
+						loadedMap.meta.layers
+					),
+				};
+			} );
 
 			setAttributes( {
 				...attributes,
@@ -170,7 +579,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		setAttributes( {
 			...attributes,
 			loadedLayers: [],
-			navigateMapLayers: loadedLayers,
+			navigateMapLayers: loadedLayers ?? [],
 		} );
 	}, [ loadedMap, loadedLayers ] );
 
@@ -193,13 +602,81 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		];
 
 		return {
-			toolbar: 'undo redo | bold italic underline fontColor fontBackgroundColor | heading bulletedList numberedList | link imageUpload htmlEmbed'.split( ' ' ),
-			fontBackgroundColor: { colors, columns: 14 },
-			fontColor: { colors, columns: 14 },
+			licenseKey: 'GPL',
+			language: getCKEditorLanguage(),
+			plugins: [
+				Essentials, Autoformat, PasteFromOffice,
+				Bold, Italic, Underline,
+				FontColor, FontBackgroundColor,
+				Heading, CKEditorList, Link,
+				Image, ImageToolbar, ImageUpload, FileRepository,
+				HtmlEmbed, MediaEmbed, Paragraph,
+			],
+			toolbar: [
+				'undo', 'redo', '|',
+				'bold', 'italic', 'underline',
+				'fontColor', 'fontBackgroundColor', '|',
+				'heading',
+				'bulletedList', 'numberedList', '|',
+				'link', 'imageUpload', 'htmlEmbed',
+			],
+			fontBackgroundColor: { colors, columns: 14, colorPicker: false },
+			fontColor: { colors, columns: 14, colorPicker: false },
 			image: { toolbar: [ 'imageTextAlternative' ] },
 			mediaEmbed: { previewsInData: true },
-		};
+			translations: CKEDITOR_TRANSLATIONS,
+			};
 	}, [ loadedLayers, themeColors ] );
+
+	const titleEditorConfig = useMemo( () => ( {
+		...editorConfig,
+		toolbar: [
+			'undo', 'redo', '|',
+			'bold', 'italic', 'underline',
+			'fontColor', 'fontBackgroundColor',
+		],
+	} ), [ editorConfig ] );
+
+	const setupEditor = ( editor, options = {} ) => {
+		editor.plugins.get( 'FileRepository' ).createUploadAdapter = createUploadAdapter;
+		enableSelectionFormattingFromToolbar( editor );
+
+		if ( options.singleLine ) {
+			configureSingleLineEditor( editor );
+		}
+	};
+
+	const moveSlide = ( fromIndex, toIndex ) => {
+		if (
+			toIndex < 0 ||
+			toIndex >= ( attributes.slides?.length ?? 0 ) ||
+			fromIndex === toIndex
+		) {
+			return;
+		}
+
+		const movedSlideKey = getSlideRuntimeKey( attributes.slides?.[ fromIndex ] );
+		const nextState = reorderSlides(
+			attributes.slides,
+			currentSlideIndex,
+			fromIndex,
+			toIndex
+		);
+
+		setCurrentSlideIndex( nextState.currentSlideIndex );
+		setOpenSlideIndex( ( currentOpenSlideIndex ) => {
+			if ( currentOpenSlideIndex === null ) {
+				return null;
+			}
+
+			return moveActiveIndex( currentOpenSlideIndex, fromIndex, toIndex );
+		} );
+		setAttributes( {
+			...attributes,
+			slides: nextState.slides,
+		} );
+		setHighlightedSlideKey( movedSlideKey );
+	};
 
 	useEffect( () => {
 		if ( ! attributes.slides ) {
@@ -225,13 +702,13 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		setAttributes( { ...attributes, postID } );
 	}, [] );
 
-	let globalFontFamily = window.jeo_settings.jeo_typography_name;
+	const globalFontFamily = window.jeo_settings.jeo_typography_name || 'sans-serif';
 
-	if ( ! globalFontFamily ) {
-		globalFontFamily =  'sans-serif';
-	}
-
-	document.body.style.setProperty('--globalFontFamily', globalFontFamily);
+	useEffect( () => {
+		// In apiVersion 3 the edit component runs inside an iframe,
+		// so `document` already points to the iframe's own document.
+		document.body.style.setProperty( '--globalFontFamily', globalFontFamily );
+	}, [ globalFontFamily ] );
 
 	return (
 		<div { ...blockProps }>
@@ -239,8 +716,9 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			{ attributes.map_id && loadedMap && (
 				<Fragment>
 					<div className="jeo-preview-area">
-						<Map
-							key={ key }
+						<MapPreview
+							ref={ mapRef }
+							key={ `${ key }:${ currentSlideIndex }:${ currentSlidePreviewKey }` }
 							controls={ `top-${inlineEnd}` }
 							fullscreen={ loadedMap.meta.enable_fullscreen }
 							style={ { height: '85vh' } }
@@ -249,13 +727,6 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 							zoom={ viewState.zoom }
 							bearing={ viewState.bearing }
 							pitch={ viewState.pitch }
-							onStyleData={ ( event ) => {
-								const map = event.style?.map ?? null;
-								if ( ! selectedMap && map ) {
-									setSelectedMap( map );
-									setStorymapLayers( loadedLayers );
-								}
-							} }
 							onMove={ ( event ) => {
 								setViewState( event.viewState );
 							} }
@@ -275,7 +746,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 									}
 								}
 							) }
-						</Map>
+						</MapPreview>
 					</div>
 					<div className="storymap-controls">
 						{ showStorySettings && (
@@ -288,7 +759,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 											setShowStorySettings( false );
 										} }
 									>
-										<Dashicon icon="arrow-down-alt2" />
+										<Icon icon={ chevronDown } />
 									</Button>
 								</div>
 								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
@@ -296,9 +767,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 									editor={ ClassicEditor }
 									data={ attributes.description }
 									config={ editorConfig }
-									onReady={ ( editor ) => {
-										editor.plugins.get( 'FileRepository' ).createUploadAdapter = createUploadAdapter;
-									} }
+									onReady={ setupEditor }
 									onChange={ ( event, editor ) =>  {
 										setAttributes( {
 											...attributes,
@@ -335,12 +804,12 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								<span className="section-title">{ __( 'Story settings', 'jeo'  ) }</span>
 								<Button
 									className="show-button"
-									disabled={ !( loadedMap && loadedLayers ) }
+									disabled={ ! loadedMap }
 									onClick={ () => {
 										setShowStorySettings( true );
 									} }
 								>
-									<Dashicon icon="arrow-up-alt2" />
+									<Icon icon={ chevronUp } />
 								</Button>
 							</div>
 						) }
@@ -354,239 +823,185 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 											setShowSlidesSettings( false );
 										} }
 									>
-										<Dashicon icon="arrow-down-alt2" />
+										<Icon icon={ chevronDown } />
 									</Button>
 								</div>
-								<List
-									values={ attributes.slides }
-									onChange={ ( { oldIndex, newIndex } ) => {
-										let newSlides = JSON.parse(JSON.stringify(attributes.slides));
-										newSlides = arrayMove( newSlides, oldIndex, newIndex );
+								<div className="slides-container">
+									{ attributes.slides.map( ( slide, slideIndex ) => {
+										const slideRuntimeKey = getSlideRuntimeKey( slide );
 
-										setAttributes( {
-											...attributes,
-											slides: newSlides,
-										} );
-									} }
-									renderList={ ( { children, props } ) => {
 										return (
-											<div className="slides-container" { ...props }>
-												{ children }
+										<div
+											key={ slideRuntimeKey }
+											ref={ setSlideNode( slideRuntimeKey ) }
+											className={ `slide${ highlightedSlideKey === slideRuntimeKey ? ' was-moved' : '' }` }
+										>
+											<div className="slide-order-controls">
+												<Button
+													className="slide-order-button"
+													icon={ chevronUp }
+													label={ __( 'Move slide up', 'jeo' ) }
+													disabled={ slideIndex === 0 }
+													onClick={ () => moveSlide( slideIndex, slideIndex - 1 ) }
+												/>
+												<Button
+													className="slide-order-button"
+													icon={ chevronDown }
+													label={ __( 'Move slide down', 'jeo' ) }
+													disabled={
+														slideIndex === attributes.slides.length - 1
+													}
+													onClick={ () => moveSlide( slideIndex, slideIndex + 1 ) }
+												/>
 											</div>
-										);
-									} }
-									renderItem={ ( { value, isDragged, props } ) => {
-										const slide = value;
-										const index = attributes.slides.indexOf( value );
-										return (
-											<div key={ slide.content } className="slide" { ...props }>
-												 <button
-													data-movable-handle
-													tabIndex={-1}
-													>
-													=
-												</button>
-												<Panel key={ key } className="slide-panel">
+												<Panel className="slide-panel">
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( index + 1 ) }
-														initialOpen={
-															(index === currentSlideIndex ? true : false) && !isDragged
-														}
-														onToggle={ (props) => {
-															if(index !== currentSlideIndex) {
-																setCurrentSlideIndex(index);
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( slideIndex + 1 ) }
+														opened={ slideIndex === openSlideIndex }
+														scrollAfterOpen={ false }
+														onToggle={ ( next ) => {
+															setOpenSlideIndex(
+																next ? slideIndex : null
+															);
+
+															if ( next && slideIndex !== currentSlideIndex ) {
+																setCurrentSlideIndex( slideIndex );
 															}
 														} }
 													>
 														<span className="input-label">{ __("Layers", "jeo") }</span>
-														<DragDropContext onDragEnd={ onDragEndLayers }>
-															<Droppable droppableId="droppable">
-																{ ( provided, snapshot ) => (
-																	<div
-																		{ ...provided.droppableProps }
-																		ref={ provided.innerRef }
-																		className="layers"
-																>
-																		{ attributes.navigateMapLayers.map( ( item, index_ ) => (
-																			<Draggable key={ `${ index_ }` } draggableId={ `${ index_ }` } index={ index_ }>
-																				{ ( provided, snapshot ) => {
-																					let layerButtonStyle = {
-																						background: 'rgb(240, 240, 240)',
-																					};
+														<div className="layers">
+															{ ( attributes.navigateMapLayers ?? [] ).map( ( item ) => {
+																let layerButtonStyle = {
+																	background: 'rgb(240, 240, 240)',
+																};
 
-																					attributes.slides[ index ].selectedLayers.map(
-																						( selectedLayer ) => {
-																							if ( selectedLayer.id === item.id ) {
-																								layerButtonStyle = {
-																									background: 'rgb(200, 200, 200)',
-																								};
-																							}
-																						}
-																					);
+																attributes.slides[ slideIndex ].selectedLayers.map(
+																	( selectedLayer ) => {
+																		if ( selectedLayer.id === item.id ) {
+																			layerButtonStyle = {
+																				background: 'rgb(200, 200, 200)',
+																			};
+																		}
+																	}
+																);
 
-																					if ( item ) {
-																						return (
-																							<div
-																								ref={ provided.innerRef }
-																								{ ...provided.draggableProps }
-																								{ ...provided.dragHandleProps }
-																							>
-																								<Button
+																if ( ! item ) {
+																	return null;
+																}
 
-																									style={ layerButtonStyle }
-																									className="layer"
-																									key={ item.id }
-																									onClick={ () => {
-																										setCurrentSlideIndex( index );
-
-																										const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
-																										let hasBeenRemoved = false;
-
-																										oldSlides[ index ].selectedLayers.map(
-																											( selectedLayer, indexOfLayer ) => {
-																												if ( selectedLayer.id === item.id ) {
-																													oldSlides[
-																														index
-																													].selectedLayers.splice(
-																														indexOfLayer,
-																														1
-																													);
-																													hasBeenRemoved = true;
-																												}
-																											}
-																										);
-
-																										if ( ! hasBeenRemoved ) {
-
-																											let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
-																											let itemPosition = false;
-
-																											const findItemPostion = (item) => {
-																												let itemPosition = -1;
-
-																												loadedMap.meta.layers.forEach( (layer, index) => {
-																													if( item.id === layer.id ) {
-																														itemPosition = index;
-																													}
-																												})
-
-																												return itemPosition;
-																											}
-
-																											oldSlides[ index ].selectedLayers.map( (layer) => {
-																												const position = findItemPostion(layer);
-																												if(position >= 0) {
-																													defaultOrder[ position ] = layer;
-																												}
-																											})
-
-																											itemPosition = findItemPostion(item)
-																											defaultOrder[itemPosition] = item;
-
-																											defaultOrder = defaultOrder.filter(slot => slot !== null);
-
-																											oldSlides[ index ].selectedLayers = defaultOrder;
-																										}
-
-																										setKey(key + 1);
-
-																										setAttributes( {
-																											...attributes,
-																											slides: oldSlides,
-																										} );
-																									} }
-																								>
-																									<span>
-																										{ decodeHtmlEntity(
-																											item.title.rendered
-																										) }
-																									</span>
-																								</Button>
-																							</div>
-																						);
-																					}
-
-																					return null;
-																				} }
-																			</Draggable>
-																	) ) }
-																		{ provided.placeholder }
-																	</div>
-															) }
-															</Droppable>
-														</DragDropContext>
-														<div style={ { display: 'flex' } }>
-															{
-																attributes.slides[ index ].latitude == mapDefaults.lat &&
-																attributes.slides[ index ].longitude == mapDefaults.lng &&
-																attributes.slides[ index ].zoom == mapDefaults.zoom &&
-																attributes.slides[ index ].bearing == 0 &&
-																attributes.slides[ index ].pitch == 0 && (
+																return (
 																	<Button
-																		className="lock-location-button"
+																		style={ layerButtonStyle }
+																		className="layer"
+																		key={ item.id }
 																		onClick={ () => {
-																			setCurrentSlideIndex( index );
-																			const latitude = selectedMap.getCenter().lat;
-																			const longitude = selectedMap.getCenter().lng;
-																			const zoom =
-																				Math.round( selectedMap.getZoom() * 10 ) /
-																				10;
-																			const pitch = selectedMap.getPitch();
-																			const bearing = selectedMap.getBearing();
+																			setCurrentSlideIndex( slideIndex );
 
-																			const newSlides = [ ...attributes.slides ];
-																			newSlides[ index ].latitude = latitude;
-																			newSlides[ index ].longitude = longitude;
-																			newSlides[ index ].zoom = zoom;
-																			newSlides[ index ].pitch = pitch;
-																			newSlides[ index ].bearing = bearing;
+																			const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
+																			let hasBeenRemoved = false;
+
+																			oldSlides[ slideIndex ].selectedLayers.map(
+																				( selectedLayer, indexOfLayer ) => {
+																					if ( selectedLayer.id === item.id ) {
+																						oldSlides[
+																							slideIndex
+																						].selectedLayers.splice(
+																							indexOfLayer,
+																							1
+																						);
+																						hasBeenRemoved = true;
+																					}
+																				}
+																			);
+
+																			if ( ! hasBeenRemoved ) {
+
+																				let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
+																				let itemPosition = false;
+
+																				const findItemPostion = (item) => {
+																					let itemPosition = -1;
+
+																					loadedMap.meta.layers.forEach( (layer, index) => {
+																						if( item.id === layer.id ) {
+																							itemPosition = index;
+																						}
+																					})
+
+																					return itemPosition;
+																				}
+
+																				oldSlides[ slideIndex ].selectedLayers.map( (layer) => {
+																					const position = findItemPostion(layer);
+																					if(position >= 0) {
+																						defaultOrder[ position ] = layer;
+																					}
+																				})
+
+																				itemPosition = findItemPostion(item)
+																				defaultOrder[itemPosition] = item;
+
+																				defaultOrder = defaultOrder.filter(slot => slot !== null);
+
+																				oldSlides[ slideIndex ].selectedLayers = defaultOrder;
+																			}
+
+																			setKey( ( currentKey ) => currentKey + 1 );
 
 																			setAttributes( {
 																				...attributes,
-																				slides: newSlides,
+																				slides: oldSlides,
 																			} );
 																		} }
 																	>
+																		<span>
+																			{ decodeHtmlEntity(
+																				item.title.rendered
+																			) }
+																		</span>
+																	</Button>
+																);
+															} ) }
+														</div>
+														<div style={ { display: 'flex' } }>
+															{
+																attributes.slides[ slideIndex ].latitude == mapDefaults.lat &&
+																attributes.slides[ slideIndex ].longitude == mapDefaults.lng &&
+																attributes.slides[ slideIndex ].zoom == mapDefaults.zoom &&
+																attributes.slides[ slideIndex ].bearing == 0 &&
+																attributes.slides[ slideIndex ].pitch == 0 && (
+																	<Button
+																		className="lock-location-button"
+																		disabled={ ! attributes.map_id }
+																		onClick={ () => {
+																			setCurrentSlideIndex( slideIndex );
+																			lockCurrentViewToSlide( slideIndex );
+																		} }
+																	>
 																		<div className="flex-center">
-																			<Dashicon icon="unlock" />
+																			<Icon icon={ unlock } />
 																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
 																		</div>
 																	</Button>
 																)
 															}
 															{
-																! ( attributes.slides[ index ].latitude == mapDefaults.lat &&
-																attributes.slides[ index ].longitude == mapDefaults.lng &&
-																attributes.slides[ index ].zoom == mapDefaults.zoom &&
-																attributes.slides[ index ].bearing == 0 &&
-																attributes.slides[ index ].pitch == 0 ) && (
+																! ( attributes.slides[ slideIndex ].latitude == mapDefaults.lat &&
+																attributes.slides[ slideIndex ].longitude == mapDefaults.lng &&
+																attributes.slides[ slideIndex ].zoom == mapDefaults.zoom &&
+																attributes.slides[ slideIndex ].bearing == 0 &&
+																attributes.slides[ slideIndex ].pitch == 0 ) && (
 																	<Button
 																		className="lock-location-button"
+																		disabled={ ! attributes.map_id }
 																		onClick={ () => {
-																			setCurrentSlideIndex( index );
-																			const latitude = selectedMap.getCenter().lat;
-																			const longitude = selectedMap.getCenter().lng;
-																			const zoom =
-																				Math.round( selectedMap.getZoom() * 10 ) /
-																				10;
-																			const pitch = selectedMap.getPitch();
-																			const bearing = selectedMap.getBearing();
-
-																			const newSlides = [ ...attributes.slides ];
-																			newSlides[ index ].latitude = latitude;
-																			newSlides[ index ].longitude = longitude;
-																			newSlides[ index ].zoom = zoom;
-																			newSlides[ index ].pitch = pitch;
-																			newSlides[ index ].bearing = bearing;
-
-																			setAttributes( {
-																				...attributes,
-																				slides: newSlides,
-																			} );
+																			setCurrentSlideIndex( slideIndex );
+																			lockCurrentViewToSlide( slideIndex );
 																		} }
 																	>
 																		<div>
-																			<Dashicon icon="lock" />
+																			<Icon icon={ lock } />
 																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
 																		</div>
 																	</Button>
@@ -601,65 +1016,67 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														<Button
 															className="preview-button"
 															onClick={ () => {
-																setCurrentSlideIndex( index );
-																setKey( key + 1 );
+																setCurrentSlideIndex( slideIndex );
+																setKey( ( currentKey ) => currentKey + 1 );
 															} }
 														>
 															<div className="flex-center">
-																<Dashicon icon="visibility" />
+																<Icon icon={ seen } />
 																<span>{ __( 'Preview', 'jeo'  ) }</span>
 															</div>
 														</Button>
 
-														<span className="input-label">{ __( 'Title', 'jeo' ) }</span>
-														<CKEditor
-															atributo="meuatributo"
-															editor={ ClassicEditor }
-															data={ slide.title }
-															config={ editorConfig }
-															onReady={ ( editor ) => {
-																editor.plugins.get( 'FileRepository' ).createUploadAdapter = createUploadAdapter;
-															} }
-															onChange={ ( event, editor ) => {
-																// Set role 'button' to editor element so it isn't affected by drag and drop events
-																editor.ui.getEditableElement().setAttribute('role', 'button')
+															<span className="input-label">{ __( 'Title', 'jeo' ) }</span>
+															{ /* Keep editor interactions isolated from the outer slide drag handlers. */ }
+															<div
+																className="storymap-title-editor"
+																onMouseDown={ ( e ) => e.stopPropagation() }
+																onKeyDown={ ( e ) => e.stopPropagation() }
+															>
+																<CKEditor
+																	editor={ ClassicEditor }
+																	data={ slide.title }
+																	config={ titleEditorConfig }
+																	onReady={ ( editor ) => setupEditor( editor, { singleLine: true } ) }
+																	onChange={ ( event, editor ) => {
+																		setCurrentSlideIndex( slideIndex );
 
-																setCurrentSlideIndex( index );
+																	const oldSlides = [ ...attributes.slides ];
+																	oldSlides[ slideIndex ].title = editor.getData();
 
-																const oldSlides = [ ...attributes.slides ];
-																oldSlides[ index ].title = editor.getData();
-
-																setAttributes( {
-																	...attributes,
-																	slides: oldSlides,
-																} );
-															} }
-														/>
+																	setAttributes( {
+																		...attributes,
+																		slides: oldSlides,
+																	} );
+																} }
+															/>
+														</div>
 														<span className="input-label">{ __(
 																'Content', 'jeo'
 														) }</span>
-														<CKEditor
-															editor={ ClassicEditor }
-															data={ slide.content }
-															config={ editorConfig }
-															onReady={ ( editor ) => {
-																editor.plugins.get( 'FileRepository' ).createUploadAdapter = createUploadAdapter;
-															} }
-															onChange={ ( event, editor ) => {
-																// Set role 'button' to editor element so it isn't affected by drag and drop events
-																editor.ui.getEditableElement().setAttribute('role', 'button')
+														{ /* Same isolation for the content editor. */ }
+														<div
+															onMouseDown={ ( e ) => e.stopPropagation() }
+															onKeyDown={ ( e ) => e.stopPropagation() }
+														>
+															<CKEditor
+																editor={ ClassicEditor }
+																data={ slide.content }
+																config={ editorConfig }
+																onReady={ setupEditor }
+																onChange={ ( event, editor ) => {
+																	setCurrentSlideIndex( slideIndex );
 
-																setCurrentSlideIndex( index );
+																	const oldSlides = [ ...attributes.slides ];
+																	oldSlides[ slideIndex ].content = editor.getData();
 
-																const oldSlides = [ ...attributes.slides ];
-																oldSlides[ index ].content = editor.getData();
-
-																setAttributes( {
-																	...attributes,
-																	slides: oldSlides,
-																} );
-															} }
-														/>
+																	setAttributes( {
+																		...attributes,
+																		slides: oldSlides,
+																	} );
+																} }
+															/>
+														</div>
 														<Button
 															className="remove-button"
 															onClick={ () => {
@@ -676,10 +1093,14 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	confirmation &&
 																	attributes.slides.length >= 2
 																) {
-																	setCurrentSlideIndex( 0 );
-
 																	const oldSlides = [ ...attributes.slides ];
-																	oldSlides.splice( index, 1 );
+																	oldSlides.splice( slideIndex, 1 );
+																	const nextSlideIndex = Math.max(
+																		0,
+																		Math.min( slideIndex, oldSlides.length - 1 )
+																	);
+																	setCurrentSlideIndex( nextSlideIndex );
+																	setOpenSlideIndex( nextSlideIndex );
 																	setAttributes( {
 																		...attributes,
 																		slides: oldSlides,
@@ -688,7 +1109,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 															} }
 														>
 															<div className="flex-center">
-																<Dashicon icon="trash" />
+																<Icon icon={ trash } />
 																<span>{ __( 'Remove', 'jeo' ) }</span>
 															</div>
 														</Button>
@@ -696,8 +1117,8 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 												</Panel>
 											</div>
 										);
-									} }
-								/>
+									} ) }
+								</div>
 								<Button
 									className="add-button"
 									onClick={ () => {
@@ -709,7 +1130,9 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 												{
 													title: null,
 													content: null,
-													selectedLayers: lastSlide[0].selectedLayers,
+													selectedLayers: [
+														...( lastSlide[ 0 ].selectedLayers ?? [] ),
+													],
 													latitude: lastSlide[0].latitude,
 													longitude: lastSlide[0].longitude,
 													zoom: lastSlide[0].zoom,
@@ -719,11 +1142,12 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 											],
 										} );
 										setCurrentSlideIndex( attributes.slides.length );
-										setKey( key + 1 );
+										setOpenSlideIndex( attributes.slides.length );
+										setKey( ( currentKey ) => currentKey + 1 );
 									} }
 								>
 									<div className="flex-center">
-										<Dashicon icon="plus" />
+										<Icon icon={ plus } />
 										<span>{ __( 'Add', 'jeo' ) }</span>
 									</div>
 								</Button>
@@ -734,12 +1158,12 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
 								<Button
 									className="show-button"
-									disabled={ !( loadedMap && loadedLayers ) }
+									disabled={ ! loadedMap }
 									onClick={ () => {
 										setShowSlidesSettings( true );
 									} }
 								>
-									<Dashicon icon="arrow-up-alt2" />
+									<Icon icon={ chevronUp } />
 								</Button>
 							</div>
 						) }
@@ -753,10 +1177,14 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 						<JeoGeoAutoComplete
 							className="search-adress-input"
 							onSelect={ ( location ) => {
-								flyTo( selectedMap, location );
+								const map = mapRef.current;
+
+								if ( map ) {
+									flyTo( map, location );
+								}
 
 								/*
-								selectedMap.flyTo( {
+								map.flyTo( {
 									center: [
 										parseFloat( location.lat ),
 										parseFloat( location.lon ),
