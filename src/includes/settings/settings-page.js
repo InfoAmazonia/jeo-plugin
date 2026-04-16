@@ -1,6 +1,8 @@
 (function($) {
 	$(document).ready(function() {
 		
+		console.log('JEO Settings JS loaded.');
+
 		// ------------------------------------
 		// Debug Console Logic
 		// ------------------------------------
@@ -42,7 +44,7 @@
 			
 			var entryHtml = '<div class="jeo-debug-entry">' +
 				'<span class="jeo-debug-label ' + (type === 'req' ? 'jeo-debug-request' : (type === 'err' ? 'jeo-debug-error' : 'jeo-debug-response')) + '">' + 
-				'[' + timestamp + '] ' + label + ' (' + (type === 'req' ? 'REQUEST' : 'RESPONSE') + ')</span>' +
+				'[' + timestamp + '] ' + label + ' (' + (type === 'req' ? 'REQUEST' : (type === 'err' ? 'ERROR' : 'RESPONSE')) + ')</span>' +
 				'<pre class="jeo-debug-payload">' + 
 				(payloadStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')) + 
 				'</pre></div>';
@@ -67,31 +69,21 @@
 		// ------------------------------------
 		// AI API Key Validation Logic
 		// ------------------------------------
-		$('#ai_default_provider').on('change', function() {
-			var provider = $(this).val();
-
-			// Hide all provider specific rows
-			$('.jeo-ai-provider-settings').hide();
-			// Show specific rows
-			$('.jeo-ai-provider-settings[data-provider="' + provider + '"]').show();
+		function runApiKeyTest($btn) {
+			if (!$btn || !$btn.length) return;
 			
-			runApiKeyTest();
-		});
-
-		function runApiKeyTest() {
-			var provider = $('#ai_default_provider').val();
-			if (!provider) return;
-
-			var $container = $('.jeo-ai-provider-settings[data-provider="' + provider + '"]');
-			var $input = $container.find('.jeo-ai-key-input');
+			var provider = $btn.closest('tr').data('provider') || $('#ai_default_provider').val();
+			var $row = $btn.closest('tr');
+			var $input = $row.find('.jeo-ai-key-input');
 			var key = $input.val();
 			var model = $('#' + provider + '_model_hidden').val();
-			var $badge = $('#jeo-ai-key-status-badge');
-			var $btn = $('#jeo-ai-test-key-btn');
-			var $detail = $('#jeo-ai-key-test-detail');
+			var $badge = $row.find('.jeo-ai-key-status-badge');
+			var $detail = $row.find('.jeo-ai-key-test-detail');
 
-			// Check if we are sending a masked key. If so, tell the backend to use the stored one.
-			var isMasked = key.includes('********');
+			console.log('Testing key for provider:', provider);
+
+			// Security: Don't send masked keys via AJAX
+			var isMasked = key && key.indexOf('********') !== -1;
 			var apiData = { 
 				provider: provider, 
 				model: model
@@ -132,100 +124,115 @@
 			});
 		}
 
+		// Initial provider visibility and test
+		if ($('#ai_default_provider').length) {
+			var initialProvider = $('#ai_default_provider').val();
+			$('.jeo-ai-provider-settings').hide();
+			$('.jeo-ai-provider-settings[data-provider="' + initialProvider + '"]').show();
+			
+			// Auto test on load if on provider tab
+			if (window.location.search.includes('tab=provider') || window.location.hash === '#tab-ai') {
+				var $initBtn = $('.jeo-ai-provider-settings[data-provider="' + initialProvider + '"]').find('.jeo-ai-test-key-btn');
+				runApiKeyTest($initBtn);
+			}
+		}
+
+		$('#ai_default_provider').on('change', function() {
+			var provider = $(this).val();
+			$('.jeo-ai-provider-settings').hide();
+			$('.jeo-ai-provider-settings[data-provider="' + provider + '"]').show();
+			
+			var $activeBtn = $('.jeo-ai-provider-settings[data-provider="' + provider + '"]').find('.jeo-ai-test-key-btn');
+			runApiKeyTest($activeBtn);
+		});
+
+		$(document).on('click', '.jeo-ai-test-key-btn', function(e) {
+			e.preventDefault();
+			runApiKeyTest($(this));
+		});
+
 		// Unlock Key Logic
 		$(document).on('click', '.jeo-ai-unlock-key-btn', function(e) {
 			e.preventDefault();
+			console.log('Unlock key clicked');
 			var $btn = $(this);
 			var $container = $btn.closest('.jeo-ai-key-container');
 			var $input = $container.find('.jeo-ai-key-input');
 
-			$input.prop('disabled', false)
-				  .prop('type', 'password') // Switch to password for private entry
+			$input.prop('readonly', false)
+				  .prop('type', 'password')
 				  .val('')
 				  .focus()
-				  .css({ 'background': '#fff', 'opacity': 1 });
+				  .css({ 'background': '#fff', 'cursor': 'text' });
 			
 			$btn.fadeOut(200);
 		});
 
-		// Apply masks on load
-		$('.jeo-ai-key-input').each(function() {
-			var mask = $(this).data('original-value');
-			if (mask) {
-				$(this).val(mask);
-			}
-		});
-
-		$('#jeo-ai-test-key-btn').click(function(e) {
-			e.preventDefault();
-			runApiKeyTest();
-		});
-
 		// Fetch Dynamic Models Logic
-		$('.jeo-ai-fetch-models-btn').click(function(e) {
+		$(document).on('click', '.jeo-ai-fetch-models-btn', function(e) {
 			e.preventDefault();
 			var $btn = $(this);
 			var provider = $btn.data('provider');
-			var $container = $btn.closest('.jeo-ai-model-container');
-			var $readonlyWrapper = $container.find('.jeo-ai-model-readonly-wrapper');
-			var $selectWrapper = $container.find('.jeo-ai-model-select-wrapper');
-			var $modelSelect = $('#' + provider + '_model_select');
-			var $hiddenInput = $('#' + provider + '_model_hidden');
-			var $readonlyInput = $('#' + provider + '_model_readonly');
+			var $row = $btn.closest('tr');
 			
-			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
-			var key = $(keyInputId).val();
+			// Find the key in the PREVIOUS row (the one with the key input)
+			var $keyRow = $row.prev('tr');
+			var $keyInput = $keyRow.find('.jeo-ai-key-input');
+			var key = $keyInput.val();
 
-			if (!key) {
-				alert('Please enter an API Key first to fetch models.');
+			console.log('Fetching models for:', provider);
+
+			// Security: Don't send masked keys via AJAX
+			var isMasked = key && key.indexOf('********') !== -1;
+			var apiData = { provider: provider };
+			if (!isMasked) {
+				apiData.api_key = key;
+			}
+
+			if (!key && !isMasked) {
+				alert('Please enter an API Key first.');
 				return;
 			}
 
-			var originalText = $btn.text();
 			$btn.prop('disabled', true).text('Loading...');
 
 			loggedApiFetch({
-				path: '/jeo/v1/ai-get-models',
+				path: '/jeo/v1/ai-fetch-models',
 				method: 'POST',
-				data: { provider: provider, api_key: key }
+				data: apiData
 			}).then(function(res) {
 				if (res && res.success && res.models) {
-					// Transform the UI
-					$readonlyWrapper.hide();
-					$selectWrapper.show();
+					var $modelContainer = $btn.closest('.jeo-ai-model-container');
+					var $readOnly = $modelContainer.find('input[type="text"]');
+					var $hidden = $modelContainer.find('input[type="hidden"]');
+					
+					// Convert input to Select2
+					var $select = $('<select class="jeo-ai-model-select" style="width: 300px;"></select>');
+					res.models.forEach(function(m) {
+						$select.append($('<option></option>').val(m.id).text(m.name + (m.is_chat ? '' : ' (Non-chat)')));
+					});
+
+					$readOnly.hide();
 					$btn.hide();
+					$readOnly.after($select);
 
-					var currentValue = $hiddenInput.val();
-					$modelSelect.empty();
-					
-					var foundCurrent = false;
-					res.models.forEach(function(modelName) {
-						var isSelected = (modelName === currentValue);
-						if (isSelected) foundCurrent = true;
-						var option = new Option(modelName, modelName, isSelected, isSelected);
-						$modelSelect.append(option);
+					$select.select2({
+						tags: true,
+						placeholder: "Select or type a model..."
+					}).on('change', function() {
+						$hidden.val($(this).val());
 					});
 
-					if (currentValue && !foundCurrent) {
-						var customOption = new Option(currentValue, currentValue, true, true);
-						$modelSelect.append(customOption);
-					}
-					
-					if ($.fn.select2) {
-						$modelSelect.select2({ tags: true, width: '100%' });
-						$modelSelect.trigger('change');
-						$modelSelect.select2('open');
-					}
+					// Set current value
+					$select.val($hidden.val()).trigger('change');
 
-					$modelSelect.on('change', function() {
-						var selectedVal = $(this).val();
-						$hiddenInput.val(selectedVal);
-						$readonlyInput.val(selectedVal);
-					});
+				} else {
+					alert('Failed to fetch models: ' + (res.message || 'Unknown error'));
 				}
 			}).catch(function(err) {
-				alert('Error fetching models: ' + (err.message || err.error || 'Unknown error'));
-				$btn.prop('disabled', false).text('Failed, Try Again');
+				alert('Error fetching models. Check your API key and connection.');
+			}).finally(function() {
+				$btn.prop('disabled', false).text('Change Model');
 			});
 		});
 
@@ -281,21 +288,12 @@
 			var model = $('#' + provider + '_model_hidden').val();
 			var lang = $('#jeo-ai-chat-lang').val();
 
-			// Security: Don't send masked keys via AJAX
-			var isMasked = key.includes('********');
-			var apiData = { 
-				context: context,
-				provider: provider,
-				model: model,
-				lang: lang
-			};
-
-			if (!isMasked) {
-				apiData.api_key = key;
-			}
+			var isMasked = key && key.indexOf('********') !== -1;
+			var apiData = { context: context, provider: provider, model: model, lang: lang };
+			if (!isMasked) apiData.api_key = key;
 
 			$btn.prop('disabled', true).text('Generating...');
-			$status.text('Asking the active LLM to generate an optimized prompt...').css('color', '#007cba');
+			$status.text('Asking LLM...').css('color', '#007cba');
 
 			loggedApiFetch({
 				path: '/jeo/v1/ai-chat-prompt-generator',
@@ -304,11 +302,10 @@
 			}).then(function(res) {
 				if (res && res.prompt) {
 					$('#ai_system_prompt').val(res.prompt);
-					$status.text('✨ Success! Applied above.').css('color', 'green');
-					$input.val('');
+					$status.text('✨ Applied above.').css('color', 'green');
 				}
 			}).catch(function(err) {
-				$status.text('Error: ' + (err.message || err.error || 'Unknown API failure')).css('color', 'red');
+				$status.text('Error generating prompt.').css('color', 'red');
 			}).finally(function() {
 				$btn.prop('disabled', false).text('Generate Prompt');
 			});
@@ -318,247 +315,135 @@
 			e.preventDefault();
 			var $btn = $(this);
 			var $status = $('#jeo-ai-validate-status');
-			var prompt = $('#ai_system_prompt').val();
-
-			if (!prompt) {
-				prompt = $('#ai_system_prompt').attr('placeholder');
-			}
+			var prompt = $('#ai_system_prompt').val() || $('#ai_system_prompt').attr('placeholder');
 
 			var provider = $('#ai_default_provider').val();
-			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
-			var key = $(keyInputId).val();
+			var $container = $('.jeo-ai-provider-settings[data-provider="' + provider + '"]');
+			var $input_key = $container.find('.jeo-ai-key-input');
+			var key = $input_key.val();
 			var model = $('#' + provider + '_model_hidden').val();
 
-			$btn.prop('disabled', true).text('Testing...');
-			$status.text('Running simulation...').css('color', '#007cba');
+			var isMasked = key && key.indexOf('********') !== -1;
+			var apiData = { prompt: prompt, provider: provider, model: model };
+			if (!isMasked) apiData.api_key = key;
 
+			$btn.prop('disabled', true).text('Testing...');
 			loggedApiFetch({
 				path: '/jeo/v1/ai-validate-prompt',
 				method: 'POST',
-				data: { 
-					prompt: prompt,
-					provider: provider,
-					api_key: key,
-					model: model
-				}
+				data: apiData
 			}).then(function(res) {
-				if (res && res.success) {
-					$status.text('✅ ' + res.message).css('color', 'green');
-				} else {
-					$status.text('❌ ' + (res.message || 'Validation failed.')).css('color', 'red');
-				}
-			}).catch(function(err) {
-				$status.text('Error: ' + (err.message || err.error || 'Request failed')).css('color', 'red');
+				$status.text(res.success ? '✅ Valid' : '❌ Invalid').css('color', res.success ? 'green' : 'red');
 			}).finally(function() {
 				$btn.prop('disabled', false).text('Validate Prompt');
 			});
 		});
 
 		// ------------------------------------
-		// Navigation and UI
+		// Tabs and Navigation
 		// ------------------------------------
 		function showTab(target, isInitialLoad) {
 			$('.tabs-content').hide();
 			$('#tab-' + target).show();
 			$('#tabs .nav-tab').removeClass('nav-tab-active');
 			$('#tabs .nav-tab[data-target="' + target + '"]').addClass('nav-tab-active');
-
-			if (!isInitialLoad) {
-				window.location.hash = 'tab-' + target;
-			}
-			
-			if (target === 'ai') {
-				runApiKeyTest();
-			}
+			if (!isInitialLoad) window.location.hash = 'tab-' + target;
 		}
 
 		$('#tabs .nav-tab').on('click', function(e) {
 			e.preventDefault();
 			var target = $(this).data('target');
 			showTab(target, false);
-
-			// Update URL hash without scrolling the page
-			if (history.replaceState) {
-				history.replaceState(null, null, '#tab-' + target);
-			} else {
-				location.hash = 'tab-' + target;
-			}
+			if (history.replaceState) history.replaceState(null, null, '#tab-' + target);
 		});
 
-		// ------------------------------------
-		// AI Embeddings Test Logic
-		// ------------------------------------
-		if ($.fn.select2) {
-			$('#ai_embedding_model').select2({
-				tags: true,
-				width: '100%'
-			});
+		// Trigger initial tab for general settings page
+		if ($('#tabs').length && !window.location.search.includes('page=jeo-ai-settings')) {
+			var hash = window.location.hash;
+			var initialTab = hash ? hash.replace('#tab-', '') : $('#tabs .nav-tab').first().data('target');
+			showTab(initialTab, true);
 		}
 
-		$('#jeo-ai-test-embedding-btn').click(function(e) {
-			e.preventDefault();
-			var $btn = $(this);
-			var $status = $('#jeo-ai-test-embedding-status');
-			var $results = $('#jeo-ai-test-embedding-results');
-
-			$btn.prop('disabled', true).text('Generating...');
-			$status.text('Fetching post and generating vector embeddings...').css('color', '#646970');
-			$results.hide().empty();
-
-			loggedApiFetch({
-				path: '/jeo/v1/ai-test-embedding',
-				method: 'POST'
-			}).then(function(res) {
-				if (res && res.success) {
-					$status.text('Success!').css('color', '#008a20');
-					var html = '<h4 style="margin-top:0;">' + res.message + '</h4>';
-					html += '<p><strong>Post Extracted:</strong> ' + res.details.post_title + ' (ID: ' + res.details.post_id + ')</p>';
-					html += '<p><strong>Vector Dimensions:</strong> ' + res.details.dimensions + '</p>';
-					html += '<p><strong>Text Snippet:</strong> <em>"' + (res.details.content_snippet || '') + '"</em></p>';
-					html += '<p><strong>Vector Preview:</strong> <code>[' + res.details.vector_start.join(', ') + '...]</code></p>';
-					$results.html(html).slideDown();
-				} else {
-					$status.text('Failed: ' + (res.message || res.error || 'Unknown error')).css('color', 'red');
-				}
-			}).catch(function(err) {
-				$status.text('Error: ' + (err.message || err.error || 'API call failed')).css('color', 'red');
-			}).finally(function() {
-				$btn.prop('disabled', false).text('Run Test on Random Post');
-			});
-		});
-
 		// ------------------------------------
-		// RAG Backup & List Logic
+		// RAG and Bulk Logic
 		// ------------------------------------
 		function fetchBackups() {
 			var $container = $('#jeo-ai-backups-list');
 			if (!$container.length) return;
-
 			$container.html('<p>Loading backups...</p>');
-
-			loggedApiFetch({
-				path: '/jeo/v1/ai-list-backups',
-				method: 'GET'
-			}).then(function(res) {
-				if (res && Array.isArray(res) && res.length > 0) {
-					var html = '<table class="wp-list-table widefat fixed striped" style="margin-top:10px;">';
-					html += '<thead><tr><th>File</th><th>Date</th><th>Size</th><th style="width:150px;">Actions</th></tr></thead>';
-					html += '<tbody>';
+			loggedApiFetch({ path: '/jeo/v1/ai-list-backups', method: 'GET' }).then(function(res) {
+				if (res && res.length > 0) {
+					var html = '<table class="wp-list-table widefat fixed striped"><thead><tr><th>File</th><th>Date</th><th>Size</th><th>Actions</th></tr></thead><tbody>';
 					res.forEach(function(b) {
-						html += '<tr>';
-						html += '<td><code>' + b.filename + '</code></td>';
-						html += '<td>' + b.date + '</td>';
-						html += '<td>' + b.size + '</td>';
-						html += '<td>';
-						html += '<a href="' + b.url + '" class="button button-small" download>Download</a> ';
-						html += '<button type="button" class="button button-small button-link-delete jeo-ai-delete-backup-btn" data-filename="' + b.filename + '">Delete</button>';
-						html += '</td>';
-						html += '</tr>';
+						html += '<tr><td><code>' + b.filename + '</code></td><td>' + b.date + '</td><td>' + b.size + '</td>';
+						html += '<td><a href="' + b.url + '" class="button button-small" download>Download</a> ';
+						html += '<button type="button" class="button button-small button-link-delete jeo-ai-delete-backup-btn" data-filename="' + b.filename + '">Delete</button></td></tr>';
 					});
 					html += '</tbody></table>';
 					$container.html(html);
-
 					$('.jeo-ai-delete-backup-btn').click(function() {
-						var filename = $(this).data('filename');
-						if (!confirm('Delete this backup?')) return;
-						loggedApiFetch({
-							path: '/jeo/v1/ai-delete-backup',
-							method: 'DELETE',
-							data: { filename: filename }
-						}).then(function() {
-							fetchBackups();
-						});
+						if (!confirm('Delete?')) return;
+						loggedApiFetch({ path: '/jeo/v1/ai-delete-backup', method: 'DELETE', data: { filename: $(this).data('filename') } }).then(fetchBackups);
 					});
-				} else {
-					$container.html('<p style="color: #8c8f94; font-style: italic;">No backups found.</p>');
-				}
-			}).catch(function(err) {
-				console.error('JEO: Error fetching backups', err);
-				$container.html('<p style="color: #d63638;">Error loading backups list.</p>');
+				} else { $container.html('<p>No backups.</p>'); }
 			});
 		}
 
-		if ($('#tab-knowledge').length) {
-			fetchBackups();
-		}
+		if ($('#tab-knowledge').length || window.location.search.includes('tab=knowledge')) fetchBackups();
 
 		$('#jeo-ai-rag-manual-btn').click(function(e) {
 			e.preventDefault();
-			var $btn = $(this);
-			$btn.prop('disabled', true).text('Vectorizing...');
-
-			loggedApiFetch({
-				path: '/jeo/v1/ai-rag-run-manual',
-				method: 'POST'
-			}).then(function(res) {
-				if (res && res.success) {
-					alert(res.message);
-					location.reload();
-				} else {
-					alert('Vectorization failed: ' + (res.message || 'Unknown error'));
-				}
-			}).catch(function(err) {
-				alert('Error: ' + (err.message || err.error));
-			}).finally(function() {
-				$btn.prop('disabled', false).text('Vectorize 1 Batch Now');
-			});
+			var $btn = $(this).prop('disabled', true).text('Vectorizing...');
+			loggedApiFetch({ path: '/jeo/v1/ai-rag-run-manual', method: 'POST' }).then(function(res) {
+				alert(res.message); location.reload();
+			}).finally(function() { $btn.prop('disabled', false).text('Vectorize Now'); });
 		});
 
 		$('#jeo-ai-backup-store-btn').click(function(e) {
 			e.preventDefault();
-			var $btn = $(this);
-			$btn.prop('disabled', true).text('Scheduling...');
+			var $btn = $(this).prop('disabled', true);
+			loggedApiFetch({ path: '/jeo/v1/ai-backup-store', method: 'POST' }).then(function(res) {
+				alert(res.message); setTimeout(fetchBackups, 2000);
+			}).finally(function() { $btn.prop('disabled', false); });
+		});
 
-			loggedApiFetch({
-				path: '/jeo/v1/ai-backup-store',
-				method: 'POST'
-			}).then(function(res) {
-				alert(res.message);
-				setTimeout(fetchBackups, 3000);
-			}).catch(function(err) {
-				alert('Backup error: ' + (err.message || 'Unknown error'));
-			}).finally(function() {
-				$btn.prop('disabled', false).text('Backup Store');
+		$('.jeo-ai-clear-store-btn').click(function(e) {
+			e.preventDefault();
+			if (!confirm('Clear store?')) return;
+			var $btn = $(this).prop('disabled', true);
+			loggedApiFetch({ path: '/jeo/v1/ai-clear-store', method: 'POST', data: { store: $(this).data('store') } }).then(function(res) {
+				alert(res.message); location.reload();
 			});
 		});
 
+		if ($.fn.select2) $('#ai_embedding_model').select2({ tags: true, width: '100%' });
+
 		// ------------------------------------
-		// Store Cleanup Logic
+		// Embedded Data Preview Logic
 		// ------------------------------------
-		$('.jeo-ai-clear-store-btn').click(function(e) {
+		$(document).on('click', '.jeo-ai-preview-dict-btn', function(e) {
 			e.preventDefault();
-			var $btn = $(this);
-			var store = $btn.data('store');
-
-			if (store === 'production') {
-				var confirm1 = confirm('Are you sure you want to clear the PRODUCTION vector store? This will delete all embeddings and require a full re-indexing via WP-CLI.');
-				if (!confirm1) return;
-				var confirm2 = confirm('WARNING: This action cannot be undone. You should probably create a backup first. Click OK to confirm or Cancel to abort.');
-				if (!confirm2) return;
-			} else {
-				var confirmTest = confirm('Clear the test vector store?');
-				if (!confirmTest) return;
-			}
-
-			var originalText = $btn.text();
-			$btn.prop('disabled', true).text('Clearing...');
-
-			loggedApiFetch({
-				path: '/jeo/v1/ai-clear-store',
-				method: 'POST',
-				data: { store: store }
-			}).then(function(res) {
-				if (res && res.success) {
-					alert('Success: ' + res.message);
-					location.reload(); // Reload to refresh model lock UI
+			var dictId = $(this).data('dict-id');
+			var $modal = $('#' + dictId);
+			if ($modal.length) {
+				if ($modal[0].showModal) {
+					$modal[0].showModal();
 				} else {
-					alert('Failed: ' + (res.message || 'Unknown error'));
+					$modal.show();
 				}
-			}).catch(function(err) {
-				alert('Error: ' + (err.message || err.error));
-			}).finally(function() {
-				$btn.prop('disabled', false).text(originalText);
-			});
+			}
+		});
+
+		$(document).on('click', '.jeo-ai-close-modal-btn', function(e) {
+			e.preventDefault();
+			var $modal = $(this).closest('dialog');
+			if ($modal.length) {
+				if ($modal[0].close) {
+					$modal[0].close();
+				} else {
+					$modal.hide();
+				}
+			}
 		});
 
 		// ------------------------------------
@@ -566,174 +451,41 @@
 		// ------------------------------------
 		var $retrievalModal = $('#rag-retrieval-modal');
 
-		$('#jeo-ai-test-retrieval-btn').click(function(e) {
+		$(document).on('click', '#jeo-ai-test-retrieval-btn', function(e) {
 			e.preventDefault();
-			if ($retrievalModal.length && $retrievalModal[0].showModal) {
-				$retrievalModal[0].showModal();
-			} else {
-				$retrievalModal.show(); // Fallback
-			}
-		});
-
-		$('.jeo-ai-close-retrieval-modal-btn').click(function(e) {
-			e.preventDefault();
-			if ($retrievalModal.length && $retrievalModal[0].close) {
-				$retrievalModal[0].close();
-			} else {
-				$retrievalModal.hide(); // Fallback
-			}
-		});
-
-		$('#rag-search-submit').click(function(e) {
-			e.preventDefault();
-			var $btn = $(this);
-			var query = $('#rag-search-input').val();
-			var store = $('#rag-search-store').val();
-			var $resultsContainer = $('#rag-search-results');
-
-			if (!query) return;
-
-			$btn.prop('disabled', true).text('Searching...');
-			$resultsContainer.html('<p>Searching the ' + store + ' vector store...</p>');
-
-			loggedApiFetch({
-				path: '/jeo/v1/ai-test-retrieval',
-				method: 'POST',
-				data: { query: query, store: store }
-			}).then(function(res) {
-				if (res && res.success) {
-					if (!res.documents || res.documents.length === 0) {
-						$resultsContainer.html('<p style="color: #d63638;">' + (res.message || 'No documents found. Did you run the vectorize CLI command?') + '</p>');
-						return;
-					}
-
-					var html = '<table class="wp-list-table widefat fixed striped" style="margin-top: 15px;">';
-					html += '<thead><tr><th style="width: 15%;">Score / Relevance</th><th style="width: 25%;">Metadata</th><th>Content Snippet</th></tr></thead><tbody>';
-					
-					res.documents.forEach(function(doc) {
-						var metaHtml = '';
-						if (doc.metadata) {
-							metaHtml += '<strong>' + (doc.metadata.title || 'Untitled') + '</strong><br>';
-							metaHtml += 'ID: ' + (doc.metadata.post_id || 'N/A') + '<br>';
-							metaHtml += 'Type: ' + (doc.metadata.post_type || 'N/A');
-						}
-
-						// Calculate percentage for score (simplified)
-						var scoreLabel = typeof doc.score === 'number' ? doc.score.toFixed(4) : doc.score;
-
-						html += '<tr>';
-						html += '<td><span style="background:#e0f0fa; color:#005a9e; padding:3px 6px; border-radius:3px; font-weight:bold;">' + scoreLabel + '</span></td>';
-						html += '<td>' + metaHtml + '</td>';
-						html += '<td style="font-size: 13px;">' + (doc.content || '') + '</td>';
-						html += '</tr>';
-					});
-
-					html += '</tbody></table>';
-					$resultsContainer.html(html);
+			if ($retrievalModal.length) {
+				if ($retrievalModal[0].showModal) {
+					$retrievalModal[0].showModal();
 				} else {
-					$resultsContainer.html('<p style="color: red;">Error: ' + (res.message || 'Unknown error') + '</p>');
+					$retrievalModal.show();
 				}
-			}).catch(function(err) {
-				$resultsContainer.html('<p style="color: red;">Request failed: ' + (err.message || err.error) + '</p>');
-			}).finally(function() {
-				$btn.prop('disabled', false).text('Search');
-			});
-		});
-
-		$('#rag-search-input').keydown(function(e) {
-			if (e.key === 'Enter') {
-				e.preventDefault();
-				$('#rag-search-submit').click();
 			}
 		});
 
-		// ------------------------------------
-		// Skeleton Loader & Initial State
-		// ------------------------------------
+		$(document).on('click', '.jeo-ai-close-retrieval-modal-btn', function(e) {
+			e.preventDefault();
+			if ($retrievalModal.length) {
+				if ($retrievalModal[0].close) {
+					$retrievalModal[0].close();
+				} else {
+					$retrievalModal.hide();
+				}
+			}
+		});
+
+		// Skeleton
 		setTimeout(function() {
-			$('#jeo-skeleton').fadeOut('fast', function() {
-				// Determine which tab to show
-				var hash = window.location.hash;
-				var initialTab = 'general';
-				if (hash && hash.indexOf('tab-') !== -1) {
-					initialTab = hash.replace('#tab-', '');
-				}
-				
-				showTab(initialTab, true);
-				$('.jeo-settings-submit').fadeIn('fast');
-			});
-		}, 500);
+			$('#jeo-skeleton').fadeOut('fast', function() { $('.jeo-settings-submit').fadeIn('fast'); });
+		}, 300);
 
-		$('form').on('submit', function(e) {
-			var currentHash = window.location.hash;
-			if (currentHash === '#tab-ai') {
-				var provider = $('#ai_default_provider').val();
-				var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
-				var key = $(keyInputId).val();
-				if (!key) {
-					e.preventDefault();
-					alert('Please enter an API Key before saving.');
-					$(keyInputId).focus();
-					return false;
-				}
-			}
-			var $referer = $(this).find('input[name="_wp_http_referer"]');
-			if ($referer.length > 0 && currentHash) {
-				$referer.val($referer.val().split('#')[0] + currentHash);
-			}
-		});
-
+		// Other handlers
 		$('#active_geocoder_select').change(function () {
 			$('tr.geocoder_options').hide();
 			$('#geocoder_options_' + $(this).val()).show();
 		}).change();
 
 		$('#map_runtime').change(function() {
-			var runtime = $(this).val();
-			$('.mapbox_options').hide();
-			if (runtime === 'mapboxgl') {
-				$('.mapbox_options').show();
-			}
+			$('.mapbox_options').toggle($(this).val() === 'mapboxgl');
 		}).change();
-
-		// Bulk manual run
-		$('#jeo-bulk-run-manual-btn').on('click', function(e) {
-			e.preventDefault();
-			var $btn = $(this);
-			$btn.prop('disabled', true).text('Processing...');
-
-			$.ajax({
-				url: jeo_settings.rest_url + '/bulk-ai-run',
-				method: 'POST',
-				beforeSend: function(xhr) {
-					xhr.setRequestHeader('X-WP-Nonce', jeo_settings.nonce);
-				},
-				success: function(response) {
-					alert(response.message);
-					location.reload(); // Reload to show new logs and progress
-				},
-				error: function() {
-					alert('Error triggering manual batch.');
-					$btn.prop('disabled', false).text('Run 1 Batch Now');
-				}
-			});
-		});
-
-		// Bulk clear logs
-		$('#jeo-bulk-clear-logs-btn').on('click', function(e) {
-			e.preventDefault();
-			if (!confirm('Are you sure you want to clear the logs?')) return;
-
-			$.ajax({
-				url: jeo_settings.rest_url + '/bulk-ai-clear-logs',
-				method: 'POST',
-				beforeSend: function(xhr) {
-					xhr.setRequestHeader('X-WP-Nonce', jeo_settings.nonce);
-				},
-				success: function() {
-					location.reload();
-				}
-			});
-		});
 	});
 })(jQuery);

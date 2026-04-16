@@ -41,7 +41,7 @@
 							value="<?php echo esc_attr( $display_value ); ?>" 
 							class="regular-text jeo-ai-key-input" 
 							data-original-value="<?php echo esc_attr( $display_value ); ?>"
-							<?php echo ! $is_empty ? 'disabled style="background: #f0f0f1; opacity: 0.7; font-family: monospace;"' : ''; ?>
+							<?php echo ! $is_empty ? 'readonly style="background: #f0f0f1; cursor: not-allowed; font-family: monospace;"' : ''; ?>
 							placeholder="<?php echo $slug === 'ollama' ? 'http://localhost:11434/api' : 'Paste your API key here...'; ?>"
 						>
 						
@@ -51,14 +51,14 @@
 							</button>
 						<?php endif; ?>
 
-						<div id="jeo-ai-key-status-wrapper" style="display: flex; align-items: center; gap: 8px;">
-							<span id="jeo-ai-key-status-badge" style="padding: 2px 8px; border-radius: 12px; background: #f0f0f1; color: #646970;"><?php esc_html_e( 'Status: Unknown', 'jeo' ); ?></span>
+						<div class="jeo-ai-key-status-wrapper" style="display: flex; align-items: center; gap: 8px;">
+							<span class="jeo-ai-key-status-badge" style="padding: 2px 8px; border-radius: 12px; background: #f0f0f1; color: #646970;"><?php esc_html_e( 'Status: Unknown', 'jeo' ); ?></span>
 						</div>
-						<button type="button" class="button button-secondary" id="jeo-ai-test-key-btn">
+						<button type="button" class="button button-secondary jeo-ai-test-key-btn">
 							<?php esc_html_e( 'Test Connection', 'jeo' ); ?>
 						</button>
 					</div>
-					<div id="jeo-ai-key-test-detail" style="margin-top: 10px; display: none; background: #fff; padding: 12px; border: 1px solid #dcdcde; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4; max-width: 800px; white-space: pre-wrap; word-break: break-all;"></div>
+					<div class="jeo-ai-key-test-detail" style="margin-top: 10px; display: none; background: #fff; padding: 12px; border: 1px solid #dcdcde; border-radius: 6px; font-family: monospace; font-size: 12px; line-height: 1.4; max-width: 800px; white-space: pre-wrap; word-break: break-all;"></div>
 				</td>
 			</tr>
 			<tr class="jeo-ai-provider-settings" data-provider="<?php echo esc_attr( $slug ); ?>" style="display: <?php echo \jeo_settings()->get_option( 'ai_default_provider' ) === $slug ? 'table-row' : 'none'; ?>;">

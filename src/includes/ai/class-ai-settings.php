@@ -40,9 +40,6 @@ class AI_Settings {
 		$current_tab = $this->get_current_tab();
 		$tabs = $this->get_tabs();
 		
-		// Enqueue the same settings logic for API tests and buttons
-		wp_enqueue_script( 'jeo-settings' );
-		
 		include JEO_BASEPATH . '/includes/ai/settings/main-page.php';
 	}
 }

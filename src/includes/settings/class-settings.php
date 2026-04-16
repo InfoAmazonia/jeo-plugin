@@ -2,146 +2,101 @@
 
 namespace Jeo;
 
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+/**
+ * Main Settings Class
+ */
 class Settings {
 
 	use Singleton;
 
 	public $option_key = 'jeo-settings';
 
-	private $default_options = array();
+	public $default_options = array(
+		'map_runtime'                     => 'mapboxgl',
+		'enabled_post_types'              => array( 'post' ),
+		'map_default_zoom'                => 1,
+		'map_default_lat'                 => 0,
+		'map_default_lng'                 => 0,
+		'mapbox_key'                      => '',
+		'active_geocoder'                 => 'nominatim',
+		'show_storymaps_on_post_archives' => true,
+
+		// AI
+		'ai_default_provider'             => 'gemini',
+		'ai_system_prompt'                => '',
+		'ai_use_custom_prompt'            => false,
+		'ai_debug_mode'                   => false,
+		'ai_embedding_model'              => '',
+
+		// Bulk AI
+		'jeo_bulk_ai_active'              => false,
+		'jeo_bulk_batch_size'             => 5,
+		'jeo_bulk_post_types'             => array( 'post' ),
+		'jeo_bulk_cron_interval'          => 'hourly',
+		'jeo_bulk_logging'                => false,
+		'jeo_bulk_confidence_threshold'   => 70,
+
+		// RAG Auto-indexing
+		'jeo_rag_auto_index'              => false,
+		'jeo_rag_batch_size'              => 10,
+		'jeo_rag_cron_interval'           => 'hourly',
+
+		// Gemini
+		'gemini_api_key'                  => '',
+		'gemini_model'                    => 'gemini-2.5-flash',
+
+		// OpenAI
+		'openai_api_key'                  => '',
+		'openai_model'                    => 'gpt-4o',
+
+		// DeepSeek
+		'deepseek_api_key'                => '',
+		'deepseek_model'                  => 'deepseek-chat',
+
+		// Appearance
+		'jeo_font-url'                    => 'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap',
+		'jeo_font-family'                 => 'Open Sans',
+		'jeo_font-url-secondary'          => 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap',
+		'jeo_font-family-secondary'       => 'Libre Baskerville',
+		'jeo_info-btn-font-size'          => '0.9',
+		'jeo_primary-color'               => '#007cba',
+		'jeo_secondary-color'             => '#2c3338',
+		'jeo_info-btn-bg'                 => '#ffffff',
+		'jeo_info-btn-color'              => '#007cba',
+		'jeo_close-btn-bg'                => '#ffffff',
+		'jeo_close-btn-color'             => '#000000',
+		'jeo_map-widgets-bg'              => '#ffffff',
+		'jeo_map-widgets-color'           => '#000000',
+		'jeo_map-widgets-bg-hover'        => '#f0f0f1',
+		'jeo_footer-logo'                 => '',
+	);
 
 	protected function init() {
-
-		$this->default_options = array(
-			'map_runtime'                     => 'maplibregl',
-			'enabled_post_types'              => array(
-				'post',
-				'storymap',
-			),
-			'active_geocoder'                 => 'nominatim',
-			'map_default_zoom'                => 11,
-			'map_default_lat'                 => -23.54998517,
-			'map_default_lng'                 => -46.65599340,
-			'mapbox_key'                      => '',
-			'jeo_footer-logo'                 => '',
-			'show_storymaps_on_post_archives' => 0,
-			'ai_default_provider'             => 'gemini',
-			'ai_embedding_model'              => '',
-
-			// Bulk Processing
-			'jeo_bulk_ai_active'              => false,
-			'jeo_bulk_batch_size'             => 5,
-			'jeo_bulk_post_types'             => array( 'post' ),
-			'jeo_bulk_cron_interval'          => 'hourly',
-			'jeo_bulk_logging'                => false,
-			'jeo_bulk_confidence_threshold'   => 70,
-
-			// RAG Auto-indexing
-			'jeo_rag_auto_index'              => false,
-			'jeo_rag_batch_size'              => 10,
-			'jeo_rag_cron_interval'           => 'hourly',
-
-			// Gemini
-			'gemini_api_key'                  => '',
-			'gemini_model'                    => 'gemini-2.5-flash',
-
-			// OpenAI
-			'openai_api_key'                  => '',
-			'openai_model'                    => 'gpt-4o',
-
-			// Deepseek
-			'deepseek_api_key'                => '',
-			'deepseek_model'                  => 'deepseek-chat',
-
-			// Anthropic
-			'anthropic_api_key'               => '',
-			'anthropic_model'                 => 'claude-3-5-sonnet-20240620',
-
-			// Ollama
-			'ollama_url'                      => 'http://localhost:11434/api',
-			'ollama_model'                    => 'llama3',
-
-			// Mistral
-			'mistral_api_key'                 => '',
-			'mistral_model'                   => 'mistral-large-latest',
-
-			// ZAI
-			'zai_api_key'                     => '',
-			'zai_model'                       => 'glm-4',
-
-			// HuggingFace
-			'huggingface_api_key'             => '',
-			'huggingface_model'               => 'mistralai/Mistral-7B-Instruct-v0.3',
-
-			// Grok (X-AI)
-			'grok_api_key'                    => '',
-			'grok_model'                      => 'grok-beta',
-
-			// Cohere
-			'cohere_api_key'                  => '',
-			'cohere_model'                    => 'command-r-plus',
-
-			'ai_use_custom_prompt'            => 0,
-			'ai_system_prompt'                => '',
-			'ai_debug_mode'                   => 0,
-
-			// Appearance - Colors
-			'jeo_primary-color'               => '#007cba',
-			'jeo_secondary-color'             => '#2c3338',
-			'jeo_info-btn-bg'                 => '#ffffff',
-			'jeo_info-btn-color'              => '#2c3338',
-			'jeo_close-btn-bg'                => '#2c3338',
-			'jeo_close-btn-color'             => '#ffffff',
-
-			// Appearance - Typography
-			'jeo_font-url'                    => '',
-			'jeo_font-family'                 => '',
-			'jeo_font-url-secondary'          => '',
-			'jeo_font-family-secondary'       => '',
-			'jeo_info-btn-font-size'          => '1',
-		);
-
-		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
+		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_scripts' ) );
 	}
 
-	public function get_option( $option_name ) {
+	public function get_option( $key, $default = null ) {
 		$options = get_option( $this->option_key );
-		if ( ! $options ) {
-			$options = array();
+
+		if ( isset( $options[ $key ] ) ) {
+			return $options[ $key ];
 		}
-		if ( isset( $options['enabled_post_types'] ) && ! empty( $options['enabled_post_types'] ) ) {
-			if ( ! is_array( $options['enabled_post_types'] ) ) {
-				$options['enabled_post_types'] = explode( ',', trim( esc_textarea( $options['enabled_post_types'] ) ) );
-			}
+
+		if ( isset( $this->default_options[ $key ] ) ) {
+			return $this->default_options[ $key ];
 		}
-		$options = array_merge( $this->default_options, $options );
-		if ( isset( $options[ $option_name ] ) ) {
-			return $options[ $option_name ];
-		}
-		return null;
+
+		return $default;
 	}
 
-	public function get_field_name( $name ) {
-		return $this->option_key . '[' . $name . ']';
-	}
-
-	public function get_geocoder_option_field_name( $geocoder, $name ) {
-		return $this->get_field_name( 'geocoders' ) . '[' . $geocoder . '][' . $name . ']';
-	}
-
-	public function get_geocoder_options( $geocoder_slug ) {
-		$options  = $this->get_option( 'geocoders' );
-		$geocoder = \jeo_geocode_handler()->initialize_geocoder( $geocoder_slug );
-		$defaults = $geocoder->get_default_options();
-		$current  = isset( $options[ $geocoder_slug ] ) ? $options[ $geocoder_slug ] : array();
-		return array_merge( $defaults, $current );
-	}
-
-	public function get_geocoder_option( $geocoder_slug, $option_name ) {
-		$options = $this->get_geocoder_options( $geocoder_slug );
-		return isset( $options[ $option_name ] ) ? $options[ $option_name ] : '';
+	public function get_field_name( $key ) {
+		return $this->option_key . '[' . $key . ']';
 	}
 
 	public function admin_init() {
@@ -149,6 +104,13 @@ class Settings {
 	}
 
 	public function sanitize_settings( $input ) {
+		// 1. Get existing options to merge
+		$existing_options = get_option( $this->option_key );
+		if ( ! is_array( $existing_options ) ) {
+			$existing_options = $this->default_options;
+		}
+
+		// 2. Handle specific field sanitization within $input
 		if ( isset( $input['enabled_post_types'] ) ) {
 			if ( ! is_array( $input['enabled_post_types'] ) ) {
 				if ( empty( trim( $input['enabled_post_types'] ) ) ) {
@@ -159,8 +121,6 @@ class Settings {
 			} else {
 				$input['enabled_post_types'] = array_filter( array_map( 'trim', $input['enabled_post_types'] ) );
 			}
-		} else {
-			$input['enabled_post_types'] = array();
 		}
 
 		if ( isset( $input['jeo_bulk_post_types'] ) ) {
@@ -169,17 +129,19 @@ class Settings {
 			}
 		}
 
-		// Ensure booleans are correct
-		$input['jeo_bulk_ai_active'] = ! empty( $input['jeo_bulk_ai_active'] );
-		$input['jeo_bulk_logging']   = ! empty( $input['jeo_bulk_logging'] );
-		$input['jeo_rag_auto_index'] = ! empty( $input['jeo_rag_auto_index'] );
+		// Handle booleans (checkboxes) - only if they are present in the request
+		$booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_use_custom_prompt', 'show_storymaps_on_post_archives' );
+		foreach ( $booleans as $bool_key ) {
+			if ( isset( $input[ $bool_key ] ) ) {
+				$input[ $bool_key ] = ! empty( $input[ $bool_key ] );
+			}
+		}
 
 		// Secure API Key handling: If the input contains the visual mask, revert to existing stored value
-		$existing_options = get_option( $this->option_key );
 		$sensitive_keys = array(
 			'gemini_api_key', 'openai_api_key', 'anthropic_api_key', 'deepseek_api_key',
 			'mistral_api_key', 'zai_api_key', 'huggingface_api_key', 'grok_api_key',
-			'cohere_api_key', 'mapbox_key'
+			'cohere_api_key', 'mapbox_key', 'ollama_url'
 		);
 
 		foreach ( $sensitive_keys as $s_key ) {
@@ -193,12 +155,9 @@ class Settings {
 
 		// Sanitize Appearance - Colors
 		$color_fields = array(
-			'jeo_primary-color',
-			'jeo_secondary-color',
-			'jeo_info-btn-bg',
-			'jeo_info-btn-color',
-			'jeo_close-btn-bg',
-			'jeo_close-btn-color'
+			'jeo_primary-color', 'jeo_secondary-color', 'jeo_info-btn-bg', 
+			'jeo_info-btn-color', 'jeo_close-btn-bg', 'jeo_close-btn-color',
+			'jeo_map-widgets-bg', 'jeo_map-widgets-color', 'jeo_map-widgets-bg-hover'
 		);
 		foreach ( $color_fields as $field ) {
 			if ( isset( $input[ $field ] ) ) {
@@ -206,14 +165,10 @@ class Settings {
 			}
 		}
 
-		// Sanitize Appearance - Typography
+		// Sanitize Appearance - Typography & Others
 		$text_fields = array(
-			'jeo_font-url',
-			'jeo_font-family',
-			'jeo_font-url-secondary',
-			'jeo_font-family-secondary',
-			'jeo_info-btn-font-size',
-			'jeo_footer-logo'
+			'jeo_font-url', 'jeo_font-family', 'jeo_font-url-secondary', 
+			'jeo_font-family-secondary', 'jeo_info-btn-font-size', 'jeo_footer-logo'
 		);
 		foreach ( $text_fields as $field ) {
 			if ( isset( $input[ $field ] ) ) {
@@ -221,11 +176,12 @@ class Settings {
 			}
 		}
 
-		return $input;
+		// 3. FINAL MERGE: Overwrite existing options with sanitized new input
+		return array_merge( $existing_options, $input );
 	}
 
 	public function enqueue_admin_scripts( $page ) {
-		if ( 'jeo_page_jeo-settings' === $page ) {
+		if ( 'jeo_page_jeo-settings' === $page || 'jeo_page_jeo-ai-settings' === $page ) {
 			wp_enqueue_media();
 			wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
 			wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery' ), '4.0.13', true );
@@ -236,6 +192,11 @@ class Settings {
 				'rest_url'    => rest_url( 'jeo/v1' ),
 				'nonce'       => wp_create_nonce( 'wp_rest' ),
 				'map_runtime' => $this->get_option( 'map_runtime' ),
+				'map_defaults' => array(
+					'zoom' => $this->get_option( 'map_default_zoom' ),
+					'lat'  => $this->get_option( 'map_default_lat' ),
+					'lng'  => $this->get_option( 'map_default_lng' ),
+				)
 			) );
 
 		}
