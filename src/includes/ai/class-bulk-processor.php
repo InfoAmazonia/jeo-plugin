@@ -101,6 +101,10 @@ class Bulk_Processor {
 	}
 
 	public function add_cron_intervals( $schedules ) {
+		$schedules['every_minute'] = array(
+			'interval' => 60,
+			'display'  => __( 'Every Minute', 'jeo' ),
+		);
 		$schedules['every_5_mins'] = array(
 			'interval' => 300,
 			'display'  => __( 'Every 5 Minutes', 'jeo' ),

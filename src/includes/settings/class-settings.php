@@ -36,6 +36,11 @@ class Settings {
 			'jeo_bulk_logging'                => false,
 			'jeo_bulk_confidence_threshold'   => 70,
 
+			// RAG Auto-indexing
+			'jeo_rag_auto_index'              => false,
+			'jeo_rag_batch_size'              => 10,
+			'jeo_rag_cron_interval'           => 'hourly',
+
 			// Gemini
 			'gemini_api_key'                  => '',
 			'gemini_model'                    => 'gemini-2.5-flash',
@@ -167,6 +172,7 @@ class Settings {
 		// Ensure booleans are correct
 		$input['jeo_bulk_ai_active'] = ! empty( $input['jeo_bulk_ai_active'] );
 		$input['jeo_bulk_logging']   = ! empty( $input['jeo_bulk_logging'] );
+		$input['jeo_rag_auto_index'] = ! empty( $input['jeo_rag_auto_index'] );
 
 		// Sanitize Appearance - Colors
 		$color_fields = array(

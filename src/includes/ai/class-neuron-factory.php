@@ -41,7 +41,7 @@ class Neuron_Factory {
 					key: $api_key,
 					model: $model,
 					parameters: $temperature_param,
-					strict_response: true
+					strict_response: false
 				);
 			case 'deepseek':
 				return new Deepseek(

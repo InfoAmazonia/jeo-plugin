@@ -75,7 +75,10 @@ Todos os pontos de um post residem no array `_related_point`. O schema obrigató
 ### 4.3. Bulk Processor & RAG
 - **Background Engine:** Classe `Jeo\AI\Bulk_Processor` via `WP-Cron`.
 - **Threshold:** Limite de confiança configurável para aprovação automática em massa.
+- **RAG Worker:** Classe `Jeo\AI\RAG_Worker` integrada ao `WP-Cron` para vetorização automática de posts em segundo plano.
+- **Manual Trigger (UI):** Botão "Vectorize 1 Batch Now" na aba Knowledge Base permite disparar a vetorização de produção via REST API.
 - **Model Lock:** Travamento do modelo de embedding em `.model_info` para evitar corrupção do Vector Store.
+- **Backup:** O sistema mantém os últimos 3 backups `.zip` do banco vetorial.
 
 ---
 

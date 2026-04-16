@@ -161,6 +161,11 @@ class AI_Handler {
 			'Number of posts to process per cron run.' => 'Número de posts a processar por ciclo.',
 			'Target Post Types' => 'Tipos de Post Alvo',
 			'Cron Interval' => 'Intervalo de Execução',
+			'Every Minute' => 'A cada minuto',
+			'Every 5 Minutes' => 'A cada 5 minutos',
+			'Every 15 Minutes' => 'A cada 15 minutos',
+			'Hourly' => 'De hora em hora',
+			'Twice Daily' => 'Duas vezes ao dia',
 			'Processing Status' => 'Status do Processamento',
 			'Recent Logs' => 'Logs Recentes',
 			'Manual Actions' => 'Ações Manuais',
@@ -176,6 +181,17 @@ class AI_Handler {
 			'Not Processed' => 'Não Processado',
 			'Approve AI' => 'Aprovar IA',
 			'Approve JEO AI Geolocations' => 'Aprovar Geolocalizações IA do JEO',
+			'Background Indexing' => 'Indexação em Segundo Plano',
+			'Automatically vectorize your posts in small batches using WP-Cron.' => 'Vetoriza seus posts automaticamente em pequenos lotes usando WP-Cron.',
+			'Enable Auto-indexing' => 'Ativar Auto-indexação',
+			'Manual Indexing' => 'Indexação Manual',
+			'Trigger a single batch vectorization immediately.' => 'Dispara a vetorização de um único lote imediatamente.',
+			'Vectorize 1 Batch Now' => 'Vetorizar 1 Lote Agora',
+			'Indexing Progress' => 'Progresso da Indexação',
+			'%d of %d posts indexed.' => '%d de %d posts indexados.',
+			'Alternative: Use WP-CLI for large databases:' => 'Alternativa: Use WP-CLI para bases de dados grandes:',
+			'Successfully vectorized %d posts.' => 'Vetorizado com sucesso %d posts.',
+			'No more posts to vectorize.' => 'Não há mais posts para vetorizar.',
 			'Data Dictionaries' => 'Dicionários de Dados',
 			'Embedded Brazilian Territories' => 'Territórios Brasileiros Embarcados',
 			'The following geographic dictionaries are available locally to improve AI precision:' => 'Os seguintes dicionários geográficos estão disponíveis localmente para melhorar a precisão da IA:',
@@ -702,52 +718,69 @@ class AI_Handler {
 	 * Callback to test if an API key is valid using a simple Hello World.
 	 */
 	public function api_test_key( $request ) {
-		$provider = $request->get_param( 'provider' );
-		$api_key  = $request->get_param( 'api_key' ); // It might be empty if the frontend relies on saved DB key
-		$model    = $request->get_param( 'model' );
+		try {
+			$provider = $request->get_param( 'provider' );
+			$api_key  = $request->get_param( 'api_key' );
+			$model    = $request->get_param( 'model' );
 
-		if ( empty( $api_key ) ) {
-			if ( 'ollama' === $provider ) {
-				$api_key = \jeo_settings()->get_option( 'ollama_url' );
-			} else {
-				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			if ( empty( $api_key ) ) {
+				if ( 'ollama' === $provider ) {
+					$api_key = \jeo_settings()->get_option( 'ollama_url' );
+				} else {
+					$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+				}
 			}
-		}
 
-		if ( empty( $model ) ) {
-			$model = \jeo_settings()->get_option( $provider . '_model' );
-		}
-		
-		if ( empty( $api_key ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
-		}
+			if ( empty( $model ) ) {
+				$model = \jeo_settings()->get_option( $provider . '_model' );
+			}
+			
+			if ( empty( $api_key ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
+			}
 
-		$adapter = null;
+			$adapter = null;
 
-		if ( array_key_exists( $provider, $this->get_adapters() ) ) {
-			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
-		}
+			if ( array_key_exists( $provider, $this->get_adapters() ) ) {
+				$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+			}
 
-		if ( ! $adapter ) {
-			return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeo' ) ), 400 );
-		}
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeo' ) ), 400 );
+			}
 
-		// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
-		$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lng\": 0, \"quote\": \"Status: Ping\"}]";
-		$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
+			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
+			// Usamos [SKIP_ENFORCED_SCHEMA] para evitar que o JEO injete o prompt gigante de geolocalização durante o teste de conexão.
+			$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lng\": 0, \"quote\": \"Status: Ping\", \"confidence\": 100}]";
+			
+			$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
 
-		if ( is_wp_error( $result ) ) {
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response( array( 
+					'success' => false, 
+					'message' => $result->get_error_message() 
+				), 200 );
+			}
+
+			if ( is_array( $result ) ) {
+				return new \WP_REST_Response( array( 
+					'success' => true, 
+					'message' => __( 'API Key is valid and active!', 'jeo' ),
+					'data'    => $result
+				), 200 );
+			}
+
 			return new \WP_REST_Response( array( 
 				'success' => false, 
-				'message' => $result->get_error_message() 
+				'message' => __( 'The AI provider returned an unexpected response format.', 'jeo' )
+			), 200 );
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( array( 
+				'success' => false, 
+				'message' => 'System Error: ' . $e->getMessage() 
 			), 200 );
 		}
-
-		return new \WP_REST_Response( array( 
-			'success' => true, 
-			'message' => __( 'API Key is valid and active!', 'jeo' ),
-			'raw'     => $result
-		), 200 );
 	}
 
 	/**

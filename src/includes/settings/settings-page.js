@@ -82,40 +82,74 @@
 			var provider = $('#ai_default_provider').val();
 			if (!provider) return;
 
-			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
-			var key = $(keyInputId).val();
+			var $container = $('.jeo-ai-provider-settings[data-provider="' + provider + '"]');
+			var $input = $container.find('.jeo-ai-key-input');
+			var key = $input.val();
 			var model = $('#' + provider + '_model_hidden').val();
 			var $badge = $('#jeo-ai-key-status-badge');
 			var $btn = $('#jeo-ai-test-key-btn');
+			var $detail = $('#jeo-ai-key-test-detail');
 
-			if (!key) {
+			// Check if we are sending a masked key. If so, tell the backend to use the stored one.
+			var isMasked = key.includes('********');
+			var apiData = { 
+				provider: provider, 
+				model: model
+			};
+
+			if (!isMasked) {
+				apiData.api_key = key;
+			}
+
+			if (!key && !isMasked) {
 				$badge.text('Missing Config').css({ 'background': '#fcf0f1', 'color': '#d63638' });
 				return;
 			}
 
 			$badge.text('Checking...').css({ 'background': '#f0f0f1', 'color': '#646970' });
 			$btn.prop('disabled', true);
+			$detail.hide().empty();
 
 			loggedApiFetch({
 				path: '/jeo/v1/ai-test-key',
 				method: 'POST',
-				data: { 
-					provider: provider, 
-					api_key: key,
-					model: model
-				}
+				data: apiData
 			}).then(function(res) {
 				if (res && res.success) {
 					$badge.text('Active').css({ 'background': '#edfaef', 'color': '#008a20' });
+					$detail.html('<span style="color: #46b450;">✅ ' + res.message + '</span>').show();
 				} else {
-					$badge.text('Error').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+					var msg = res.message || 'Error';
+					$badge.text('Invalid').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+					$detail.html('<span style="color: #d63638;">❌ ' + msg + '</span>').show();
 				}
 			}).catch(function(err) {
-				$badge.text('Request Failed').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : 'Request Failed';
+				$badge.text('Failed').css({ 'background': '#fcf0f1', 'color': '#d63638' });
+				$detail.html('<span style="color: #d63638;">❌ ' + msg + '</span>').show();
 			}).finally(function() {
 				$btn.prop('disabled', false);
 			});
 		}
+
+		// Unlock Key Logic
+		$(document).on('click', '.jeo-ai-unlock-key-btn', function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			var $container = $btn.closest('.jeo-ai-key-container');
+			var $input = $container.find('.jeo-ai-key-input');
+
+			$input.prop('disabled', false).val('').focus().css({ 'background': '#fff', 'opacity': 1 });
+			$btn.fadeOut(200);
+		});
+
+		// Apply masks on load
+		$('.jeo-ai-key-input').each(function() {
+			var mask = $(this).data('original-value');
+			if (mask) {
+				$(this).val(mask);
+			}
+		});
 
 		$('#jeo-ai-test-key-btn').click(function(e) {
 			e.preventDefault();
@@ -236,10 +270,24 @@
 			}
 
 			var provider = $('#ai_default_provider').val();
-			var keyInputId = provider === 'ollama' ? '#ollama_url' : '#' + provider + '_api_key';
-			var key = $(keyInputId).val();
+			var $container = $('.jeo-ai-provider-settings[data-provider="' + provider + '"]');
+			var $input_key = $container.find('.jeo-ai-key-input');
+			var key = $input_key.val();
 			var model = $('#' + provider + '_model_hidden').val();
 			var lang = $('#jeo-ai-chat-lang').val();
+
+			// Security: Don't send masked keys via AJAX
+			var isMasked = key.includes('********');
+			var apiData = { 
+				context: context,
+				provider: provider,
+				model: model,
+				lang: lang
+			};
+
+			if (!isMasked) {
+				apiData.api_key = key;
+			}
 
 			$btn.prop('disabled', true).text('Generating...');
 			$status.text('Asking the active LLM to generate an optimized prompt...').css('color', '#007cba');
@@ -247,13 +295,7 @@
 			loggedApiFetch({
 				path: '/jeo/v1/ai-chat-prompt-generator',
 				method: 'POST',
-				data: { 
-					context: context,
-					provider: provider,
-					api_key: key,
-					model: model,
-					lang: lang
-				}
+				data: apiData
 			}).then(function(res) {
 				if (res && res.prompt) {
 					$('#ai_system_prompt').val(res.prompt);
@@ -329,6 +371,13 @@
 			e.preventDefault();
 			var target = $(this).data('target');
 			showTab(target, false);
+
+			// Update URL hash without scrolling the page
+			if (history.replaceState) {
+				history.replaceState(null, null, '#tab-' + target);
+			} else {
+				location.hash = 'tab-' + target;
+			}
 		});
 
 		// ------------------------------------
@@ -427,6 +476,28 @@
 		if ($('#tab-knowledge').length) {
 			fetchBackups();
 		}
+
+		$('#jeo-ai-rag-manual-btn').click(function(e) {
+			e.preventDefault();
+			var $btn = $(this);
+			$btn.prop('disabled', true).text('Vectorizing...');
+
+			loggedApiFetch({
+				path: '/jeo/v1/ai-rag-run-manual',
+				method: 'POST'
+			}).then(function(res) {
+				if (res && res.success) {
+					alert(res.message);
+					location.reload();
+				} else {
+					alert('Vectorization failed: ' + (res.message || 'Unknown error'));
+				}
+			}).catch(function(err) {
+				alert('Error: ' + (err.message || err.error));
+			}).finally(function() {
+				$btn.prop('disabled', false).text('Vectorize 1 Batch Now');
+			});
+		});
 
 		$('#jeo-ai-backup-store-btn').click(function(e) {
 			e.preventDefault();

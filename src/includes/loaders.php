@@ -69,6 +69,24 @@ function jeo_rag_backup() {
 }
 
 /**
+ * Gets the instance of the RAG Worker Class
+ *
+ * @return \Jeo\AI\RAG_Worker RAG_Worker instance
+ */
+function jeo_rag_worker() {
+	return \Jeo\AI\RAG_Worker::get_instance();
+}
+
+/**
+ * Gets the instance of the AI Settings Class
+ *
+ * @return \Jeo\AI\AI_Settings AI_Settings instance
+ */
+function jeo_ai_settings() {
+	return \Jeo\AI\AI_Settings::get_instance();
+}
+
+/**
  * Gets the instance of the main Jeo Class
  *
  * @return \Jeo Jeo instance
