@@ -42,6 +42,16 @@ class Menu {
 			'jeo-dashboard',
 			array( $this, 'render_dashboard_page' )
 		);
+
+		// 4. Submenu AI (novo) - Posicionado após Dashboard e antes dos CPTs (Maps, Layers)
+		add_submenu_page(
+			'jeo-main-menu',
+			__( 'AI (novo)', 'jeo' ),
+			__( 'AI (novo)', 'jeo' ),
+			'manage_options',
+			'jeo-ai-settings',
+			array( \jeo_ai_settings(), 'render_settings_page' )
+		);
 		
 		// Nota: Maps, Layers e Story Maps são injetados via seus respectivos arquivos class-*.php 
 		// usando o slug 'jeo-main-menu' como 'show_in_menu'. 

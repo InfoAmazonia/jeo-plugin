@@ -20,18 +20,7 @@ class AI_Settings {
 	public $page_slug = 'jeo-ai-settings';
 
 	protected function init() {
-		add_action( 'admin_menu', array( $this, 'add_menu_pages' ), 20 );
-	}
-
-	public function add_menu_pages() {
-		add_submenu_page(
-			'jeo-main-menu',
-			__( 'AI (novo)', 'jeo' ),
-			__( 'AI (novo)', 'jeo' ),
-			'manage_options',
-			$this->page_slug,
-			array( $this, 'render_settings_page' )
-		);
+		// No longer adding menu here, moved to Jeo\Menu for ordering
 	}
 
 	public function get_tabs() {
