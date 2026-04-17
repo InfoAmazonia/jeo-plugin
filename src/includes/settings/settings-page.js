@@ -574,6 +574,72 @@
 			}
 		});
 
+		// ------------------------------------
+		// Bulk Geocoding Manual Control
+		// ------------------------------------
+		$('#jeo-bulk-run-manual-btn').click(function(e) {
+			e.preventDefault();
+			var i18n = jeo_settings.i18n || {};
+			var $btn = $(this);
+			$btn.prop('disabled', true).text(i18n.processing || 'Processing...');
+			
+			loggedApiFetch({ path: '/jeo/v1/bulk-ai-run', method: 'POST' }).then(function(res) {
+				alert(res.message || (i18n.success || 'Success'));
+				location.reload();
+			}).catch(function(err) {
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
+				alert((i18n.error || 'Error') + ': ' + msg);
+			}).finally(function() {
+				$btn.prop('disabled', false).text('Process 1 Batch Now');
+			});
+		});
+
+		$('#jeo-bulk-clear-batch-btn').click(function(e) {
+			e.preventDefault();
+			var i18n = jeo_settings.i18n || {};
+			var $btn = $(this);
+			$btn.prop('disabled', true).text(i18n.clearing || 'Clearing...');
+			
+			loggedApiFetch({ path: '/jeo/v1/bulk-ai-clear-batch', method: 'POST' }).then(function(res) {
+				alert(res.message || (i18n.success || 'Success'));
+				location.reload();
+			}).catch(function(err) {
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
+				alert((i18n.error || 'Error') + ': ' + msg);
+			}).finally(function() {
+				$btn.prop('disabled', false).text('Clear 1 Batch');
+			});
+		});
+
+		$('#jeo-bulk-clear-all-btn').click(function(e) {
+			e.preventDefault();
+			var i18n = jeo_settings.i18n || {};
+			
+			if (!confirm(i18n.confirm_clear_bulk || 'This will schedule a reset of ALL posts. Continue?')) return;
+			if (!confirm(i18n.confirm_clear_bulk_2 || 'ARE YOU SURE? This cannot be undone.')) return;
+
+			var $btn = $(this);
+			$btn.prop('disabled', true);
+			
+			loggedApiFetch({ path: '/jeo/v1/bulk-ai-clear-all', method: 'POST' }).then(function(res) {
+				alert(res.message || (i18n.bulk_clear_started || 'Bulk clearing started.'));
+				location.reload();
+			}).catch(function(err) {
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
+				alert((i18n.error || 'Error') + ': ' + msg);
+			}).finally(function() {
+				$btn.prop('disabled', false);
+			});
+		});
+
+		$('#jeo-bulk-clear-logs-btn').click(function(e) {
+			e.preventDefault();
+			if (!confirm('Delete log file?')) return;
+			loggedApiFetch({ path: '/jeo/v1/bulk-ai-clear-logs', method: 'POST' }).then(function() {
+				location.reload();
+			});
+		});
+
 		// Other handlers
 		$('#active_geocoder_select').change(function () {
 			$('tr.geocoder_options').hide();

@@ -31,6 +31,7 @@ class Bulk_Processor {
 		add_action( 'init', array( $this, 'register_meta' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'jeo_bulk_ai_cron_hook', array( $this, 'process_batch' ) );
+		add_action( 'jeo_bulk_ai_clear_cron_hook', array( $this, 'process_clear_batch' ) );
 		
 		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
 		add_action( 'update_option_jeo-settings', array( $this, 'maybe_schedule_cron' ), 10, 2 );
@@ -47,6 +48,22 @@ class Bulk_Processor {
 		register_rest_route( 'jeo/v1', '/bulk-ai-run', array(
 			'methods'             => 'POST',
 			'callback'            => array( $this, 'api_run_batch' ),
+			'permission_callback' => function() {
+				return current_user_can( 'manage_options' );
+			},
+		) );
+
+		register_rest_route( 'jeo/v1', '/bulk-ai-clear-batch', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'api_clear_batch' ),
+			'permission_callback' => function() {
+				return current_user_can( 'manage_options' );
+			},
+		) );
+
+		register_rest_route( 'jeo/v1', '/bulk-ai-clear-all', array(
+			'methods'             => 'POST',
+			'callback'            => array( $this, 'api_clear_all' ),
 			'permission_callback' => function() {
 				return current_user_can( 'manage_options' );
 			},
@@ -73,20 +90,49 @@ class Bulk_Processor {
 	 * REST Callback: Run batch manually.
 	 */
 	public function api_run_batch() {
-		// Force active temporarily if it's off, just for this manual run
-		$was_active = \jeo_settings()->get_option( 'jeo_bulk_ai_active', false );
-		if ( ! $was_active ) {
-			// Temporarily override option memory for this execution
-			add_filter( 'pre_option_jeo-settings', function( $val ) {
-				$options = get_option( 'jeo-settings' );
-				$options['jeo_bulk_ai_active'] = true;
-				return $options;
-			} );
+		$result = $this->process_batch( true );
+		
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 400 );
 		}
 
-		$this->process_batch();
+		return new \WP_REST_Response( array( 'success' => true, 'message' => $result ), 200 );
+	}
 
-		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Manual batch processed. Check logs for details.', 'jeo' ) ), 200 );
+	/**
+	 * REST Callback: Clear one batch manually.
+	 */
+	public function api_clear_batch() {
+		$result = $this->process_clear_batch();
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 400 );
+		}
+		return new \WP_REST_Response( array( 'success' => true, 'message' => $result ), 200 );
+	}
+
+	/**
+	 * REST Callback: Start clearing all posts via background cron.
+	 */
+	public function api_clear_all() {
+		if ( ! wp_next_scheduled( 'jeo_bulk_ai_clear_cron_hook' ) ) {
+			wp_schedule_event( time(), 'every_minute', 'jeo_bulk_ai_clear_cron_hook' );
+		}
+		
+		$this->log_action( __( 'Bulk clearing started (Background).', 'jeo' ) );
+		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Bulk clearing started in background. Posts will be reset in batches.', 'jeo' ) ), 200 );
+	}
+
+	private function log_action( $message, $is_error = false ) {
+		$logs = get_option( 'jeo_bulk_ai_cron_logs', array() );
+		if ( ! is_array( $logs ) ) { $logs = array(); }
+		
+		$time = current_time( 'Y-m-d H:i:s' );
+		$source = current_action() === 'jeo_bulk_ai_cron_hook' || current_action() === 'jeo_bulk_ai_clear_cron_hook' ? 'Cron' : 'Manual';
+		$status = $is_error ? '❌ ' . __( 'Error', 'jeo' ) : '✅ ' . __( 'Success', 'jeo' );
+		
+		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
+		$logs = array_slice( $logs, 0, 5 ); 
+		update_option( 'jeo_bulk_ai_cron_logs', $logs, false );
 	}
 
 	/**
@@ -97,22 +143,20 @@ class Bulk_Processor {
 		if ( file_exists( $log_file ) ) {
 			unlink( $log_file );
 		}
+		delete_option( 'jeo_bulk_ai_cron_logs' );
 		return new \WP_REST_Response( array( 'success' => true ), 200 );
 	}
 
 	public function add_cron_intervals( $schedules ) {
-		$schedules['every_minute'] = array(
-			'interval' => 60,
-			'display'  => __( 'Every Minute', 'jeo' ),
-		);
-		$schedules['every_5_mins'] = array(
-			'interval' => 300,
-			'display'  => __( 'Every 5 Minutes', 'jeo' ),
-		);
-		$schedules['every_15_mins'] = array(
-			'interval' => 900,
-			'display'  => __( 'Every 15 Minutes', 'jeo' ),
-		);
+		if ( ! isset( $schedules['every_minute'] ) ) {
+			$schedules['every_minute'] = array( 'interval' => 60, 'display' => __( 'Every Minute', 'jeo' ) );
+		}
+		if ( ! isset( $schedules['every_5_mins'] ) ) {
+			$schedules['every_5_mins'] = array( 'interval' => 300, 'display' => __( 'Every 5 Minutes', 'jeo' ) );
+		}
+		if ( ! isset( $schedules['every_15_mins'] ) ) {
+			$schedules['every_15_mins'] = array( 'interval' => 900, 'display' => __( 'Every 15 Minutes', 'jeo' ) );
+		}
 		return $schedules;
 	}
 
@@ -183,12 +227,11 @@ class Bulk_Processor {
 	/**
 	 * Process a batch of posts.
 	 */
-	public function process_batch() {
+	public function process_batch( $force = false ) {
 		$active = \jeo_settings()->get_option( 'jeo_bulk_ai_active', false );
 		$logging = \jeo_settings()->get_option( 'jeo_bulk_logging', false );
 
-		if ( ! $active ) {
-			if ( $logging ) $this->log( 'Worker is inactive. Skipping batch.' );
+		if ( ! $active && ! $force ) {
 			return;
 		}
 
@@ -196,8 +239,9 @@ class Bulk_Processor {
 		$batch_size = (int) \jeo_settings()->get_option( 'jeo_bulk_batch_size', 5 );
 
 		if ( empty( $post_types ) ) {
-			if ( $logging ) $this->log( 'No post types selected for bulk processing.' );
-			return;
+			$err = __( 'No post types selected for bulk processing.', 'jeo' );
+			$this->log_action( $err, true );
+			return new \WP_Error( 'no_post_types', $err );
 		}
 
 		$query_args = array(
@@ -215,22 +259,24 @@ class Bulk_Processor {
 		$query = new \WP_Query( $query_args );
 
 		if ( ! $query->have_posts() ) {
-			if ( $logging ) $this->log( 'No more posts to process. Deactivating worker.' );
+			$msg = __( 'No more posts to process. Deactivating worker.', 'jeo' );
+			$this->log_action( $msg );
+			
 			$options = get_option( 'jeo-settings' );
 			$options['jeo_bulk_ai_active'] = false;
 			update_option( 'jeo-settings', $options );
 			wp_clear_scheduled_hook( 'jeo_bulk_ai_cron_hook' );
-			return;
+			return $msg;
 		}
 
 		$adapter = \jeo_ai_handler()->get_active_adapter();
 		if ( ! $adapter ) {
-			if ( $logging ) $this->log( 'CRITICAL: No active AI adapter found for bulk processing.' );
-			return;
+			$err = __( 'CRITICAL: No active AI adapter found for bulk processing.', 'jeo' );
+			$this->log_action( $err, true );
+			return new \WP_Error( 'no_adapter', $err );
 		}
 
-		if ( $logging ) $this->log( sprintf( 'Processing batch of %d posts.', count( $query->posts ) ) );
-
+		$processed_count = 0;
 		foreach ( $query->posts as $post ) {
 			try {
 				$result = $adapter->georeference( $post->post_title, $post->post_content );
@@ -238,28 +284,63 @@ class Bulk_Processor {
 				if ( ! is_wp_error( $result ) && ! empty( $result ) ) {
 					update_post_meta( $post->ID, self::META_PENDING, $result );
 					update_post_meta( $post->ID, self::META_STATUS, 'pending_approval' );
-					
-					$total_conf = 0;
-					foreach ( $result as $p ) {
-						$total_conf += isset( $p['confidence'] ) ? (int) $p['confidence'] : 0;
-					}
-					$avg_conf = round( $total_conf / count( $result ) );
-
-					if ( $logging ) $this->log( sprintf( 'Post ID %d: Success. %d locations found. Avg Confidence: %d%%', $post->ID, count( $result ), $avg_conf ) );
 				} elseif ( is_wp_error( $result ) ) {
 					update_post_meta( $post->ID, self::META_STATUS, 'error' );
-					if ( $logging ) $this->log( sprintf( 'Post ID %d: AI Error - %s', $post->ID, $result->get_error_message() ) );
 				} else {
 					update_post_meta( $post->ID, self::META_STATUS, 'no_locations' );
-					if ( $logging ) $this->log( sprintf( 'Post ID %d: No locations found.', $post->ID ) );
 				}
 			} catch ( \Exception $e ) {
 				update_post_meta( $post->ID, self::META_STATUS, 'error' );
-				if ( $logging ) $this->log( sprintf( 'Post ID %d: Exception - %s', $post->ID, $e->getMessage() ) );
 			}
 
 			update_post_meta( $post->ID, self::META_PROCESSED, true );
+			$processed_count++;
 		}
+
+		$msg = sprintf( __( 'Processed batch of %d posts.', 'jeo' ), $processed_count );
+		$this->log_action( $msg );
+		return $msg;
+	}
+
+	/**
+	 * Reset/Clear a batch of posts.
+	 */
+	public function process_clear_batch() {
+		$post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
+		$batch_size = (int) \jeo_settings()->get_option( 'jeo_bulk_batch_size', 10 );
+
+		$query_args = array(
+			'post_type'      => $post_types,
+			'post_status'    => 'any',
+			'posts_per_page' => $batch_size,
+			'meta_query'     => array(
+				array(
+					'key'     => self::META_PROCESSED,
+					'compare' => 'EXISTS',
+				),
+			),
+		);
+
+		$query = new \WP_Query( $query_args );
+
+		if ( ! $query->have_posts() ) {
+			$msg = __( 'No more posts to clear.', 'jeo' );
+			$this->log_action( $msg );
+			wp_clear_scheduled_hook( 'jeo_bulk_ai_clear_cron_hook' );
+			return $msg;
+		}
+
+		$cleared_count = 0;
+		foreach ( $query->posts as $post ) {
+			delete_post_meta( $post->ID, self::META_PROCESSED );
+			delete_post_meta( $post->ID, self::META_STATUS );
+			delete_post_meta( $post->ID, self::META_PENDING );
+			$cleared_count++;
+		}
+
+		$msg = sprintf( __( 'Cleared batch of %d posts.', 'jeo' ), $cleared_count );
+		$this->log_action( $msg );
+		return $msg;
 	}
 
 	/**

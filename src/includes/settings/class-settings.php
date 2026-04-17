@@ -295,7 +295,11 @@ class Settings {
 					'metadata'             => __( 'Metadados', 'jeo' ),
 					'untitled'             => __( 'Sem título', 'jeo' ),
 					'error'                => __( 'Erro', 'jeo' ),
-					'success'              => __( 'Sucesso', 'jeo' ),
+					'processing'           => __( 'Processando...', 'jeo' ),
+					'clearing'             => __( 'Limpando...', 'jeo' ),
+					'confirm_clear_bulk'   => __( 'Isso irá agendar a limpeza de TODOS os posts geolocalizados pela IA em segundo plano. Deseja continuar?', 'jeo' ),
+					'confirm_clear_bulk_2' => __( 'TEM CERTEZA? Esta ação não pode ser desfeita e exigirá uma nova vetorização completa para estes posts.', 'jeo' ),
+					'bulk_clear_started'   => __( 'Limpeza em massa iniciada em segundo plano.', 'jeo' ),
 				)
 			) );
 
