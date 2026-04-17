@@ -395,19 +395,19 @@ class Geocode_Handler {
 	public function sanitize_points( $value ) {
 
 		if ( isset( $value['_geocode_lat'] ) ) {
-			$value['_geocode_lat'] = str_replace( ',', '.', $value['_geocode_lat'] );
+			$value['_geocode_lat'] = (float) str_replace( ',', '.', $value['_geocode_lat'] );
 		}
 
 		if ( isset( $value['_geocode_lon'] ) ) {
-			$value['_geocode_lon'] = str_replace( ',', '.', $value['_geocode_lon'] );
+			$value['_geocode_lon'] = (float) str_replace( ',', '.', $value['_geocode_lon'] );
 		}
 
 		if ( isset( $value->_geocode_lat ) ) {
-			$value->_geocode_lat = str_replace( ',', '.', $value->_geocode_lat );
+			$value->_geocode_lat = (float) str_replace( ',', '.', $value->_geocode_lat );
 		}
 
-		if ( isset( $value->_geocode_lng ) ) {
-			$value->_geocode_lng = str_replace( ',', '.', $value->_geocode_lng );
+		if ( isset( $value->_geocode_lon ) ) {
+			$value->_geocode_lon = (float) str_replace( ',', '.', $value->_geocode_lon );
 		}
 
 		return $value;

@@ -254,8 +254,8 @@ class JeoGeocodePosts extends Component {
 			}
 
 			const foundPoint = {
-				_geocode_lat: this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : String( lat ),
-				_geocode_lon: this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : String( lng ),
+				_geocode_lat: parseFloat( this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : lat ),
+				_geocode_lon: parseFloat( this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : lng ),
 				_geocode_full_address: this.getProperty( result, 'full_address' ),
 				_geocode_country: this.getProperty( result, 'country' ),
 				_geocode_country_code: this.getProperty( result, 'country_code' ),
