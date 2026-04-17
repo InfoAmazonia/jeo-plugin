@@ -57,6 +57,11 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 - **Model Lock:** O modelo de embedding fica travado permanentemente em `.model_info` após a primeira inicialização. Trocar o modelo exige apagar (resetar) todo o banco vetorial atual. A interface nunca deve bloquear a seleção de modelo (Deadlock) caso o banco já esteja travado; deve usar a técnica de Auto-Recuperação exibindo o modelo em `readonly`.
 - **Backups (Síncronos):** A geração de backups do Vector Store (`.zip`) deve ocorrer de forma **Síncrona** na API REST, sem agendamentos assíncronos no Cron. Falhas processuais (como a falta da extensão `ZipArchive` no servidor ou diretório vazio) devem retornar um objeto `\WP_Error` para fornecer feedback visual imediato na UI. Manter os últimos 3 backups no sistema.
 
+### 4.3. Geolocalização em Massa (Bulk Processing)
+- **Restrições de Loop Infinito (Options API):** É estritamente proibido utilizar o filtro `pre_option_jeo-settings` para injetar valores temporários (ex: forçar ativação) em tempo de execução via REST API, sob risco de recursão infinita e Erro 500 no servidor. Se um método (como o *Manual Run*) precisar bypassar configurações de estado, ele deve fazê-lo explicitamente via argumentos do método (ex: `process_batch($force = true)`).
+- **Dupla Confirmação para Resets Globais:** Qualquer ação destrutiva que zere configurações em massa (como `Clear All Posts`) deve exigir duas caixas de diálogo `confirm()` distintas no Frontend antes de submeter requisições à API. O reset em si deve ser agendado em segundo plano (`wp_schedule_event`) e nunca travando a requisição HTTP.
+- **Log Universal:** O `Bulk_Processor` deve manter um array circular (`jeo_bulk_ai_cron_logs`) com os 5 últimos eventos executados, idêntico à arquitetura do `RAG_Worker`, sinalizando visualmente na UI o status das operações manuais ou de Cron.
+
 ---
 
 ## 5. Interface Administrativa (Configurações)
