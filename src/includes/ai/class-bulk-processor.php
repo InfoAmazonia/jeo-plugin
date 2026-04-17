@@ -335,6 +335,10 @@ class Bulk_Processor {
 			delete_post_meta( $post->ID, self::META_PROCESSED );
 			delete_post_meta( $post->ID, self::META_STATUS );
 			delete_post_meta( $post->ID, self::META_PENDING );
+			// Clear legacy and active geolocations
+			delete_post_meta( $post->ID, '_related_point' );
+			delete_post_meta( $post->ID, '_jeo_legacy_status' );
+			delete_post_meta( $post->ID, '_jeo_ai_pending_point' );
 			$cleared_count++;
 		}
 
