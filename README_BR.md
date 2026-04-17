@@ -4,7 +4,7 @@ O plugin JEO atua como uma plataforma de geojornalismo que permite a organizaç�
 
 Com o JEO, a criação da interação entre camadas de dados e informações contextuais é intuitiva e interativa. Você pode publicar matérias georreferenciadas e criar páginas ricamente desenhadas para cada uma das histórias em destaque.
 
-## 🤖 O que há de novo na v3.6.3-experimental (RAG & Knowledge Base)
+## 🤖 O que há de novo na v3.6.5 (RAG & Knowledge Base)
 O JEO evoluiu consideravelmente sua integração com o framework Neuron AI, introduzindo uma arquitetura nativa de **Retrieval-Augmented Generation (RAG)** que converte o conteúdo do WordPress no seu cérebro semântico e territorial privado.
 
 - **Base de Conhecimento RAG:** Vetorize seus posts já publicados em massa via WP-CLI (`wp jeo ai vectorize`) gravando um banco de dados inteligente direto no disco (FileVectorStore).

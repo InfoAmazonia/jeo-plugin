@@ -4,7 +4,7 @@
 set -e
 
 PLUGIN_SLUG="jeo"
-VERSION="3.6.4"
+VERSION="3.6.5"
 ZIP_NAME="${PLUGIN_SLUG}-${VERSION}.zip"
 BUILD_DIR=".build-tmp"
 
