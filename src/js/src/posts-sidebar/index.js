@@ -116,8 +116,8 @@ const JeoGeocodePanel = ( props ) => {
 			.filter( loc => loc._selected )
 			.map( loc => ( {
 				relevance: loc.relevance || 'primary',
-				_geocode_lat: parseFloat( loc._geocode_lat ),
-				_geocode_lon: parseFloat( loc._geocode_lon ),
+				_geocode_lat: parseFloat( String( loc._geocode_lat || 0 ).replace( ',', '.' ) ),
+				_geocode_lon: parseFloat( String( loc._geocode_lon || 0 ).replace( ',', '.' ) ),
 				_geocode_full_address: loc._geocode_full_address || '',
 				_geocode_country: loc._geocode_country || '',
 				_geocode_country_code: loc._geocode_country_code || '',
@@ -132,7 +132,16 @@ const JeoGeocodePanel = ( props ) => {
 				_ai_quote: loc._ai_quote || '',
 			} ) );
 
-		const currentPoints = meta._related_point || [];
+		const currentPoints = ( meta._related_point || [] ).map( p => {
+			const lat = parseFloat( String( p._geocode_lat ).replace( ',', '.' ) );
+			const lon = parseFloat( String( p._geocode_lon || '' ).replace( ',', '.' ) );
+			return {
+				...p,
+				_geocode_lat: isNaN( lat ) ? 0 : lat,
+				_geocode_lon: isNaN( lon ) ? 0 : lon
+			};
+		} );
+
 		const newPoints = [ ...currentPoints, ...selectedPoints ];
 
 		wp.data.dispatch( 'core/editor' ).editPost( {

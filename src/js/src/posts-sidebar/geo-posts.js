@@ -18,10 +18,15 @@ class JeoGeocodePosts extends Component {
 			.getEditedPostAttribute( 'meta' );
 
 		const rawPoints = metadata._related_point || [];
-		const sanitizedPoints = rawPoints.map( p => ( {
-			...p,
-			_geocode_lon: p._geocode_lon || ''
-		} ) );
+		const sanitizedPoints = rawPoints.map( p => {
+			const lat = parseFloat( String( p._geocode_lat ).replace( ',', '.' ) );
+			const lon = parseFloat( String( p._geocode_lon || '' ).replace( ',', '.' ) );
+			return {
+				...p,
+				_geocode_lat: isNaN( lat ) ? 0 : lat,
+				_geocode_lon: isNaN( lon ) ? 0 : lon
+			};
+		} );
 
 		this.state = {
 			pointsCheckpoint: [],
@@ -253,9 +258,12 @@ class JeoGeocodePosts extends Component {
 				return this.resetForm();
 			}
 
+			const rawLat = this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : lat;
+			const rawLon = this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : lng;
+
 			const foundPoint = {
-				_geocode_lat: parseFloat( this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : lat ),
-				_geocode_lon: parseFloat( this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : lng ),
+				_geocode_lat: parseFloat( String( rawLat || 0 ).replace( ',', '.' ) ),
+				_geocode_lon: parseFloat( String( rawLon || 0 ).replace( ',', '.' ) ),
 				_geocode_full_address: this.getProperty( result, 'full_address' ),
 				_geocode_country: this.getProperty( result, 'country' ),
 				_geocode_country_code: this.getProperty( result, 'country_code' ),
