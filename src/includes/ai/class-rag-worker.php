@@ -24,10 +24,41 @@ class RAG_Worker {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'jeo_rag_index_cron_hook', array( $this, 'process_batch' ) );
 		add_action( 'update_option_jeo-settings', array( $this, 'maybe_schedule_cron' ), 10, 2 );
+		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
+	}
+
+	public function add_cron_intervals( $schedules ) {
+		if ( ! isset( $schedules['every_minute'] ) ) {
+			$schedules['every_minute'] = array( 'interval' => 60, 'display' => __( 'Every Minute', 'jeo' ) );
+		}
+		if ( ! isset( $schedules['every_5_mins'] ) ) {
+			$schedules['every_5_mins'] = array( 'interval' => 300, 'display' => __( 'Every 5 Minutes', 'jeo' ) );
+		}
+		if ( ! isset( $schedules['every_15_mins'] ) ) {
+			$schedules['every_15_mins'] = array( 'interval' => 900, 'display' => __( 'Every 15 Minutes', 'jeo' ) );
+		}
+		return $schedules;
+	}
+
+	private function log_cron_run( $message, $is_error = false ) {
+		$logs = get_option( 'jeo_rag_cron_logs', array() );
+		if ( ! is_array( $logs ) ) {
+			$logs = array();
+		}
+		
+		$time = current_time( 'Y-m-d H:i:s' );
+		// Since we might be called manually via REST, check action
+		$source = current_action() === 'jeo_rag_index_cron_hook' ? 'Cron' : 'Manual';
+		$status = $is_error ? '❌ ' . __( 'Error', 'jeo' ) : '✅ ' . __( 'Success', 'jeo' );
+		
+		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
+		$logs = array_slice( $logs, 0, 5 ); // Keep top 5
+		update_option( 'jeo_rag_cron_logs', $logs, false );
 	}
 
 	/**
 	 * Register REST API routes.
+
 	 */
 	public function register_rest_routes() {
 		register_rest_route( 'jeo/v1', '/ai-rag-run-manual', array(
@@ -99,7 +130,9 @@ class RAG_Worker {
 		if ( ! empty( $locked_model ) && ! empty( $current_model ) ) {
 			// Check if locked model matches the full name OR the basename
 			if ( $locked_model !== $current_model && $locked_model !== $current_model_basename ) {
-				return new \WP_Error( 'model_mismatch', sprintf( __( 'Vector Store mismatch! Expected %s, found %s.', 'jeo' ), $locked_model, $current_model ) );
+				$err_msg = sprintf( __( 'Vector Store mismatch! Expected %s, found %s.', 'jeo' ), $locked_model, $current_model );
+				$this->log_cron_run( $err_msg, true );
+				return new \WP_Error( 'model_mismatch', $err_msg );
 			}
 		}
 
@@ -123,7 +156,9 @@ class RAG_Worker {
 		$query = new \WP_Query( $query_args );
 
 		if ( ! $query->have_posts() ) {
-			return __( 'No more posts to vectorize.', 'jeo' );
+			$msg = __( 'No more posts to vectorize.', 'jeo' );
+			$this->log_cron_run( $msg, false );
+			return $msg;
 		}
 
 		try {
@@ -145,16 +180,21 @@ class RAG_Worker {
 					update_post_meta( $post->ID, '_jeo_vectorized_at', $now );
 				}
 
-				return sprintf( __( 'Successfully vectorized %d posts.', 'jeo' ), count( $posts ) );
+				$msg = sprintf( __( 'Successfully vectorized %d posts.', 'jeo' ), count( $posts ) );
+				$this->log_cron_run( $msg, false );
+				return $msg;
 			} else {
 				// Mark as processed even if no docs loaded (empty content)
 				$now = current_time( 'mysql' );
 				foreach ( $posts as $post ) {
 					update_post_meta( $post->ID, '_jeo_vectorized_at', $now );
 				}
-				return __( 'Batch skipped (no content found in selected posts).', 'jeo' );
+				$msg = __( 'Batch skipped (no content found in selected posts).', 'jeo' );
+				$this->log_cron_run( $msg, false );
+				return $msg;
 			}
 		} catch ( \Exception $e ) {
+			$this->log_cron_run( $e->getMessage(), true );
 			return new \WP_Error( 'rag_error', $e->getMessage() );
 		}
 	}

@@ -129,6 +129,28 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 							</select>
 						</div>
 					</div>
+
+					<div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee;">
+						<h5 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent Background Logs', 'jeo' ); ?></h5>
+						<?php
+						$cron_logs = get_option( 'jeo_rag_cron_logs', array() );
+						if ( empty( $cron_logs ) || ! is_array( $cron_logs ) ) : ?>
+							<p style="font-size: 11px; color: #8c8f94; font-style: italic; margin: 0;">
+								<?php esc_html_e( 'No indexing jobs have run recently.', 'jeo' ); ?>
+							</p>
+						<?php else : ?>
+							<ul style="margin: 0; padding: 0; list-style: none; font-size: 11px; font-family: monospace;">
+								<?php foreach ( $cron_logs as $log ) : ?>
+									<li style="margin-bottom: 5px; padding: 5px 8px; background: #f6f7f7; border-left: 2px solid #ccc; border-radius: 3px;">
+										<span style="color: #8c8f94;">[<?php echo esc_html( $log['time'] ); ?>]</span> 
+										<strong><?php echo esc_html( $log['source'] ); ?>:</strong> 
+										<?php echo esc_html( $log['status'] ); ?> - 
+										<?php echo esc_html( $log['message'] ); ?>
+									</li>
+								<?php endforeach; ?>
+							</ul>
+						<?php endif; ?>
+					</div>
 			</div>
 			<div style="flex: 1; border-left: 1px solid #eee; padding-left: 20px;">
 					<h4 style="margin-top: 0;"><?php esc_html_e( 'Manual Indexing', 'jeo' ); ?></h4>

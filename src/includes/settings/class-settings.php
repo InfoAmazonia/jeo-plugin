@@ -294,6 +294,8 @@ class Settings {
 					'score'                => __( 'Pontuação / Relevância', 'jeo' ),
 					'metadata'             => __( 'Metadados', 'jeo' ),
 					'untitled'             => __( 'Sem título', 'jeo' ),
+					'error'                => __( 'Erro', 'jeo' ),
+					'success'              => __( 'Sucesso', 'jeo' ),
 				)
 			) );
 
