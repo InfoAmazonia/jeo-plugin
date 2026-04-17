@@ -1077,8 +1077,11 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 * REST Callback: Trigger a backup.
 	 */
 	public function api_backup_store() {
-		\jeo_rag_backup()->schedule_backup();
-		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Backup scheduled. It will be available in a few moments.', 'jeo' ) ), 200 );
+		$result = \jeo_rag_backup()->do_backup();
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 500 );
+		}
+		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Backup created successfully!', 'jeo' ) ), 200 );
 	}
 
 	/**

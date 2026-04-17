@@ -41,9 +41,19 @@ class RAG_Backup {
 		$store_dir = $uploads['basedir'] . '/jeo-ai-store';
 		$backup_dir = $store_dir . '/backups';
 
+		if ( ! class_exists( 'ZipArchive' ) ) {
+			return new \WP_Error( 'missing_ziparchive', __( 'The PHP ZipArchive extension is required to create backups.', 'jeo' ) );
+		}
+
 		if ( ! file_exists( $backup_dir ) ) {
 			wp_mkdir_p( $backup_dir );
 			file_put_contents( $backup_dir . '/index.php', '' );
+
+			$htaccess_file = $backup_dir . '/.htaccess';
+			if ( ! file_exists( $htaccess_file ) ) {
+				$htaccess_content = "Order Deny,Allow\nDeny from all\n";
+				@file_put_contents( $htaccess_file, $htaccess_content );
+			}
 		}
 
 		$timestamp = current_time( 'Y-m-d_H-i-s' );
@@ -51,9 +61,11 @@ class RAG_Backup {
 
 		$zip = new \ZipArchive();
 		if ( $zip->open( $zip_file, \ZipArchive::CREATE ) === TRUE ) {
+			$files_added = false;
 			// Add production store
 			if ( file_exists( $store_dir . '/jeo_knowledge.store' ) ) {
 				$zip->addFile( $store_dir . '/jeo_knowledge.store', 'jeo_knowledge.store' );
+				$files_added = true;
 			}
 			if ( file_exists( $store_dir . '/jeo_knowledge.model_info' ) ) {
 				$zip->addFile( $store_dir . '/jeo_knowledge.model_info', 'jeo_knowledge.model_info' );
@@ -66,14 +78,18 @@ class RAG_Backup {
 				$zip->addFile( $store_dir . '/jeo_knowledge_test.model_info', 'jeo_knowledge_test.model_info' );
 			}
 			$zip->close();
-			
+
+			if ( ! $files_added ) {
+				@unlink( $zip_file );
+				return new \WP_Error( 'empty_store', __( 'No vector store found to backup.', 'jeo' ) );
+			}
+
 			$this->rotate_backups( $backup_dir );
 			return true;
 		}
 
-		return false;
+		return new \WP_Error( 'zip_failed', __( 'Failed to create the ZIP archive.', 'jeo' ) );
 	}
-
 	/**
 	 * Keep only the 3 latest backups.
 	 */

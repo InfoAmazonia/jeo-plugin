@@ -155,7 +155,19 @@ class Neuron_Factory {
 		$configured_embedding_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 
 		if ( ! empty( $configured_embedding_model ) ) {
-			$embedding_model = $configured_embedding_model;
+			// Check if it has a provider prefix like 'openai:text-embedding-3-small'
+			if ( strpos( $configured_embedding_model, ':' ) !== false ) {
+				list( $provider_override, $embedding_model ) = explode( ':', $configured_embedding_model, 2 );
+				$active = $provider_override;
+				
+				// Re-fetch API key for the new overridden provider
+				$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+				if ( 'ollama' === $active ) {
+					$api_key = \jeo_settings()->get_option( 'ollama_url' );
+				}
+			} else {
+				$embedding_model = $configured_embedding_model;
+			}
 		} else {
 			// Fallback to intelligent defaults if the user didn't specify one
 			$embedding_model = \jeo_settings()->get_option( $active . '_model' ); // fallback to chat model just in case it's custom

@@ -57,23 +57,31 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 									<select name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_embedding_model' ) ); ?>" id="ai_embedding_model" style="width: 100%; max-width: 400px;" <?php disabled( $is_locked ); ?>>
 											<option value="" <?php selected( $current_embed_model, '' ); ?>><?php esc_html_e( 'Auto (Recommended Default for Active Provider)', 'jeo' ); ?></option>
 
-											<?php if ( ! in_array( $current_embed_model, $known_models ) && ! empty( $current_embed_model ) ) : ?>
-													<option value="<?php echo esc_attr( $current_embed_model ); ?>" selected="selected"><?php echo esc_html( $current_embed_model ); ?> (Custom)</option>
+											<?php if ( ! empty( $current_embed_model ) && strpos( $current_embed_model, ':' ) === false ) : ?>
+													<option value="<?php echo esc_attr( $current_embed_model ); ?>" selected="selected"><?php echo esc_html( $current_embed_model ); ?> (Legacy/Custom)</option>
 											<?php endif; ?>
 
+											<?php if ( ! empty( \jeo_settings()->get_option( 'openai_api_key' ) ) ) : ?>
 											<optgroup label="OpenAI">
-													<option value="text-embedding-3-small" <?php selected( $current_embed_model, 'text-embedding-3-small' ); ?>>text-embedding-3-small</option>
-													<option value="text-embedding-3-large" <?php selected( $current_embed_model, 'text-embedding-3-large' ); ?>>text-embedding-3-large</option>
-													<option value="text-embedding-ada-002" <?php selected( $current_embed_model, 'text-embedding-ada-002' ); ?>>text-embedding-ada-002</option>
+													<option value="openai:text-embedding-3-small" <?php selected( $current_embed_model, 'openai:text-embedding-3-small' ); ?>>text-embedding-3-small</option>
+													<option value="openai:text-embedding-3-large" <?php selected( $current_embed_model, 'openai:text-embedding-3-large' ); ?>>text-embedding-3-large</option>
+													<option value="openai:text-embedding-ada-002" <?php selected( $current_embed_model, 'openai:text-embedding-ada-002' ); ?>>text-embedding-ada-002</option>
 											</optgroup>
+											<?php endif; ?>
+
+											<?php if ( ! empty( \jeo_settings()->get_option( 'gemini_api_key' ) ) ) : ?>
 											<optgroup label="Google Gemini">
-													<option value="text-embedding-004" <?php selected( $current_embed_model, 'text-embedding-004' ); ?>>text-embedding-004</option>
-													<option value="embedding-001" <?php selected( $current_embed_model, 'embedding-001' ); ?>>embedding-001</option>
+													<option value="gemini:text-embedding-004" <?php selected( $current_embed_model, 'gemini:text-embedding-004' ); ?>>text-embedding-004</option>
+													<option value="gemini:embedding-001" <?php selected( $current_embed_model, 'gemini:embedding-001' ); ?>>embedding-001</option>
 											</optgroup>
+											<?php endif; ?>
+
+											<?php if ( ! empty( \jeo_settings()->get_option( 'ollama_url' ) ) ) : ?>
 											<optgroup label="Ollama (Local)">
-													<option value="nomic-embed-text" <?php selected( $current_embed_model, 'nomic-embed-text' ); ?>>nomic-embed-text</option>
-													<option value="mxbai-embed-large" <?php selected( $current_embed_model, 'mxbai-embed-large' ); ?>>mxbai-embed-large</option>
+													<option value="ollama:nomic-embed-text" <?php selected( $current_embed_model, 'ollama:nomic-embed-text' ); ?>>nomic-embed-text</option>
+													<option value="ollama:mxbai-embed-large" <?php selected( $current_embed_model, 'ollama:mxbai-embed-large' ); ?>>mxbai-embed-large</option>
 											</optgroup>
+											<?php endif; ?>
 									</select>
 									<p class="description"><?php esc_html_e( 'Select an embedding model or type a custom one. Leave as "Auto" to use the recommended default for your active provider.', 'jeo' ); ?></p>
 							</td>

@@ -47,20 +47,28 @@ class RAG_Agent extends RAG {
 			return new \WP_Error( 'rag_no_provider', __( 'No AI Provider is configured. Please set up a provider (Gemini, OpenAI, etc.) before using RAG.', 'jeo' ) );
 		}
 
-		// 3. Check for specific provider compatibility (Embeddings)
-		$compatible_providers = [ 'openai', 'gemini', 'ollama' ];
-		if ( ! in_array( $active, $compatible_providers ) ) {
-			return new \WP_Error( 'rag_incompatible_provider', sprintf( __( 'The current AI Provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for RAG features.', 'jeo' ), ucfirst( $active ) ) );
+		// 3. Determine Embedding Provider
+		$embedding_model_setting = \jeo_settings()->get_option( 'ai_embedding_model' );
+		$embedding_provider = $active;
+
+		if ( ! empty( $embedding_model_setting ) && strpos( $embedding_model_setting, ':' ) !== false ) {
+			list( $embedding_provider, $ignored_model ) = explode( ':', $embedding_model_setting, 2 );
 		}
 
-		// 4. Check API Key
-		$api_key = \jeo_settings()->get_option( $active . '_api_key' );
-		if ( 'ollama' === $active ) {
+		// 4. Check for specific provider compatibility (Embeddings)
+		$compatible_providers = [ 'openai', 'gemini', 'ollama' ];
+		if ( ! in_array( $embedding_provider, $compatible_providers ) ) {
+			return new \WP_Error( 'rag_incompatible_provider', sprintf( __( 'The selected embedding provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for Vector Store features.', 'jeo' ), ucfirst( $embedding_provider ) ) );
+		}
+
+		// 5. Check API Key
+		$api_key = \jeo_settings()->get_option( $embedding_provider . '_api_key' );
+		if ( 'ollama' === $embedding_provider ) {
 			$api_key = \jeo_settings()->get_option( 'ollama_url' );
 		}
 
 		if ( empty( $api_key ) ) {
-			return new \WP_Error( 'rag_no_key', sprintf( __( 'The API Key for %s is missing. RAG requires a valid connection to generate embeddings.', 'jeo' ), ucfirst( $active ) ) );
+			return new \WP_Error( 'rag_no_key', sprintf( __( 'The API Key for the Embedding provider (%s) is missing. RAG requires a valid connection to generate embeddings.', 'jeo' ), ucfirst( $embedding_provider ) ) );
 		}
 
 		return true;
