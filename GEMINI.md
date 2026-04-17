@@ -50,10 +50,12 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 - **Proteção de Sanitização:** O backend deve detectar a string de máscara (`********`) e abortar a atualização daquele campo específico, preservando o segredo original no banco.
 - **Tráfego Seguro:** O JavaScript não deve enviar chaves mascaradas via AJAX. O backend deve recuperar o segredo interno se o parâmetro `api_key` estiver ausente.
 
-### 4.2. RAG & Processamento Background
-- **RAG Worker:** Classe `Jeo\AI\RAG_Worker` via `WP-Cron` para vetorização automática.
-- **Model Lock:** O modelo de embedding é travado em `.model_info` na primeira inicialização. Troca de modelo exige reset manual.
-- **Backups:** Manter os últimos 3 backups `.zip` do Vector Store.
+### 4.2. RAG & Processamento Background (Vector Store)
+- **Desacoplamento de Embeddings:** O modelo de Embedding é 100% independente do Provedor de Chat principal. O sistema utiliza a taxonomia `provider:model` (ex: `gemini:gemini-embedding-001`). Lógicas de fallback "Automático" (Auto) são expressamente proibidas; o usuário DEVE selecionar ativamente um motor de vetorização.
+- **Google Gemini Embeddings:** A API v1beta do Gemini rejeita nomes legados para embeddings. É obrigatório utilizar a nomenclatura canônica do Neuron-AI: apenas `gemini-embedding-001` ou `gemini-embedding-2-preview` são válidos. Nomes como `text-embedding-004` resultarão em erros silenciosos (404 Not Found).
+- **RAG Worker:** Classe `Jeo\AI\RAG_Worker` via `WP-Cron` para vetorização automática de postagens.
+- **Model Lock:** O modelo de embedding fica travado permanentemente em `.model_info` após a primeira inicialização. Trocar o modelo exige apagar (resetar) todo o banco vetorial atual.
+- **Backups (Síncronos):** A geração de backups do Vector Store (`.zip`) deve ocorrer de forma **Síncrona** na API REST, sem agendamentos assíncronos no Cron. Falhas processuais (como a falta da extensão `ZipArchive` no servidor ou diretório vazio) devem retornar um objeto `\WP_Error` para fornecer feedback visual imediato na UI. Manter os últimos 3 backups no sistema.
 
 ---
 
@@ -73,6 +75,9 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 
 ### 5.4. AI Debug Console
 - Terminal flutuante para auditoria técnica de Requests/Responses em tempo real presente na página do **JEO AI**.
+
+### 5.5. Prevenção de Deadlocks (UX Blocks)
+- **Telas Restritas:** Painéis de erro globais (`.jeo-rag-blocked-overlay`) jamais devem sobrepor e bloquear elementos de formulário (`<select>`, `<input>`) necessários para que o usuário corrija o próprio erro listado. O bloqueio só deve restringir botões de execução e relatórios.
 
 ---
 
