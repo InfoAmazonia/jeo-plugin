@@ -3,44 +3,20 @@ $rag_feasibility = \Jeo\AI\RAG_Agent::is_feasible();
 $is_rag_blocked = is_wp_error( $rag_feasibility );
 ?>
 
-<div class="card" style="max-width: 100%; margin-top: 0; padding: 20px; border-radius: 8px; position: relative; <?php echo $is_rag_blocked ? 'background: #f6f7f7; border-color: #dcdcde;' : ''; ?>">
+<div class="card" style="max-width: 100%; margin-top: 0; padding: 20px; border-radius: 8px; position: relative;">
 	
-	<?php if ( $is_rag_blocked ) : ?>
-		<div class="jeo-rag-blocked-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 8px; text-align: center; padding: 40px; box-sizing: border-box;">
-			<div style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #dcdcde; max-width: 500px;">
-				<span style="font-size: 40px; display: block; margin-bottom: 15px;">🚧</span>
-				<h3 style="margin-top: 0; color: #d63638;"><?php esc_html_e( 'RAG Knowledge Base is not available', 'jeo' ); ?></h3>
-				<p style="font-size: 14px; line-height: 1.6; color: #50575e; margin-bottom: 20px;">
-					<?php echo esc_html( $rag_feasibility->get_error_message() ); ?>
-				</p>
-				<div style="background: #f0f6fb; padding: 15px; border-left: 4px solid #2271b1; border-radius: 4px; text-align: left; margin-bottom: 20px;">
-					<strong><?php esc_html_e( 'How to fix this:', 'jeo' ); ?></strong>
-					<ul style="margin: 10px 0 0 20px; list-style: disc; font-size: 13px;">
-						<li><?php esc_html_e( 'Ensure you have an active AI Provider (Gemini, OpenAI, or Ollama) configured in the "AI Provider" tab.', 'jeo' ); ?></li>
-						<li><?php esc_html_e( 'Check if the "wp-content/uploads" directory exists and is writable.', 'jeo' ); ?></li>
-					</ul>
-				</div>
-				<a href="<?php echo esc_url( admin_url( 'admin.php?page=jeo-ai-settings&tab=provider' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Go to AI Provider Settings', 'jeo' ); ?></a>
-			</div>
-		</div>
-	<?php endif; ?>
-
 	<h3 style="margin-top: 0; color: #1d2327;">🧠 <?php esc_html_e( 'RAG Knowledge Base (Vector Store)', 'jeo' ); ?></h3>
 	<p class="description"><?php esc_html_e( 'Vectorize your WordPress posts to allow the JEO AI to contextually answer questions and cross-reference territorial data.', 'jeo' ); ?></p>
 
 	<table class="form-table" style="margin-top: 20px;">
 			<tbody>
 					<tr>
-							<th scope="row"><label for="ai_embedding_model"><?php esc_html_e( 'Embedding Model (Optional)', 'jeo' ); ?></label></th>
+							<th scope="row"><label for="ai_embedding_model"><?php esc_html_e( 'Embedding Model', 'jeo' ); ?></label></th>
 							<td>
 									<?php
 									$current_embed_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 									$locked_model = \Jeo\AI\RAG_Agent::get_locked_model( 'jeo_knowledge' );
 									$is_locked = ! empty( $locked_model );
-									$known_models = [
-											'', 'text-embedding-3-small', 'text-embedding-3-large', 'text-embedding-ada-002',
-											'text-embedding-004', 'embedding-001', 'nomic-embed-text', 'mxbai-embed-large'
-									];
 									?>
 									
 									<?php if ( $is_locked ) : ?>
@@ -88,6 +64,34 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 					</tr>
 			</tbody>
 	</table>
+
+	<div style="position: relative; <?php echo $is_rag_blocked ? 'background: #f6f7f7; border-color: #dcdcde;' : ''; ?> padding: 20px; border-radius: 8px;">
+	
+		<?php if ( $is_rag_blocked ) : ?>
+			<div class="jeo-rag-blocked-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255, 255, 255, 0.7); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10; border-radius: 8px; text-align: center; padding: 40px; box-sizing: border-box;">
+				<div style="background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); border: 1px solid #dcdcde; max-width: 500px;">
+					<span style="font-size: 40px; display: block; margin-bottom: 15px;">🚧</span>
+					<h3 style="margin-top: 0; color: #d63638;"><?php esc_html_e( 'RAG Knowledge Base is not available', 'jeo' ); ?></h3>
+					<p style="font-size: 14px; line-height: 1.6; color: #50575e; margin-bottom: 20px;">
+						<?php echo esc_html( $rag_feasibility->get_error_message() ); ?>
+					</p>
+					<div style="background: #f0f6fb; padding: 15px; border-left: 4px solid #2271b1; border-radius: 4px; text-align: left; margin-bottom: 20px;">
+						<strong><?php esc_html_e( 'How to fix this:', 'jeo' ); ?></strong>
+						<ul style="margin: 10px 0 0 20px; list-style: disc; font-size: 13px;">
+							<?php if ( $rag_feasibility->get_error_code() === 'rag_no_embedding_model' ) : ?>
+								<li><?php esc_html_e( 'Please select an Embedding Model from the dropdown above and click "Save AI Settings".', 'jeo' ); ?></li>
+							<?php else : ?>
+								<li><?php esc_html_e( 'Ensure you have an active AI Provider (Gemini, OpenAI, or Ollama) configured in the "AI Provider" tab.', 'jeo' ); ?></li>
+								<li><?php esc_html_e( 'Check if the "wp-content/uploads" directory exists and is writable.', 'jeo' ); ?></li>
+							<?php endif; ?>
+						</ul>
+					</div>
+					<?php if ( $rag_feasibility->get_error_code() !== 'rag_no_embedding_model' ) : ?>
+						<a href="<?php echo esc_url( admin_url( 'admin.php?page=jeo-ai-settings&tab=provider' ) ); ?>" class="button button-primary"><?php esc_html_e( 'Go to AI Provider Settings', 'jeo' ); ?></a>
+					<?php endif; ?>
+				</div>
+			</div>
+		<?php endif; ?>
 
 	<div style="margin-top: 20px; display: flex; align-items: flex-start; gap: 20px; background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 6px;">
 			<div style="flex: 1;">
