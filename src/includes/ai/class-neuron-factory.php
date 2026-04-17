@@ -145,42 +145,32 @@ class Neuron_Factory {
 			$active = 'gemini';
 		}
 
-		$api_key = \jeo_settings()->get_option( $active . '_api_key' );
-		
-		if ( 'ollama' === $active ) {
-			$api_key = \jeo_settings()->get_option( 'ollama_url' );
-		}
-
-		// User specifically selected an embedding model
+		// User MUST specifically select an embedding model
 		$configured_embedding_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 
-		if ( ! empty( $configured_embedding_model ) ) {
-			// Check if it has a provider prefix like 'openai:text-embedding-3-small'
-			if ( strpos( $configured_embedding_model, ':' ) !== false ) {
-				list( $provider_override, $embedding_model ) = explode( ':', $configured_embedding_model, 2 );
-				$active = $provider_override;
-				
-				// Re-fetch API key for the new overridden provider
-				$api_key = \jeo_settings()->get_option( $active . '_api_key' );
-				if ( 'ollama' === $active ) {
-					$api_key = \jeo_settings()->get_option( 'ollama_url' );
-				}
-			} else {
-				$embedding_model = $configured_embedding_model;
+		if ( empty( $configured_embedding_model ) ) {
+			throw new \Exception( __( 'No Embedding Model configured. Please select one in the JEO AI settings.', 'jeo' ) );
+		}
+
+		$api_key = '';
+		$embedding_model = '';
+
+		// Check if it has a provider prefix like 'openai:text-embedding-3-small'
+		if ( strpos( $configured_embedding_model, ':' ) !== false ) {
+			list( $provider_override, $embedding_model ) = explode( ':', $configured_embedding_model, 2 );
+			$active = $provider_override;
+			
+			// Re-fetch API key for the new overridden provider
+			$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+			if ( 'ollama' === $active ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
 			}
 		} else {
-			// Fallback to intelligent defaults if the user didn't specify one
-			$embedding_model = \jeo_settings()->get_option( $active . '_model' ); // fallback to chat model just in case it's custom
-			switch ( $active ) {
-				case 'openai':
-					$embedding_model = 'text-embedding-3-small';
-					break;
-				case 'gemini':
-					$embedding_model = 'text-embedding-004';
-					break;
-				case 'ollama':
-					$embedding_model = 'nomic-embed-text'; // Best open source default
-					break;
+			// Legacy support, assume it was the main active provider
+			$embedding_model = $configured_embedding_model;
+			$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+			if ( 'ollama' === $active ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
 			}
 		}
 

@@ -54,8 +54,8 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 										</div>
 									<?php endif; ?>
 
-									<select name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_embedding_model' ) ); ?>" id="ai_embedding_model" style="width: 100%; max-width: 400px;" <?php disabled( $is_locked ); ?>>
-											<option value="" <?php selected( $current_embed_model, '' ); ?>><?php esc_html_e( 'Auto (Recommended Default for Active Provider)', 'jeo' ); ?></option>
+									<select name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_embedding_model' ) ); ?>" id="ai_embedding_model" style="width: 100%; max-width: 400px;" <?php disabled( $is_locked ); ?> required>
+											<option value="" disabled <?php selected( $current_embed_model, '' ); ?>><?php esc_html_e( 'Select an embedding model...', 'jeo' ); ?></option>
 
 											<?php if ( ! empty( $current_embed_model ) && strpos( $current_embed_model, ':' ) === false ) : ?>
 													<option value="<?php echo esc_attr( $current_embed_model ); ?>" selected="selected"><?php echo esc_html( $current_embed_model ); ?> (Legacy/Custom)</option>
@@ -71,8 +71,8 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 
 											<?php if ( ! empty( \jeo_settings()->get_option( 'gemini_api_key' ) ) ) : ?>
 											<optgroup label="Google Gemini">
-													<option value="gemini:text-embedding-004" <?php selected( $current_embed_model, 'gemini:text-embedding-004' ); ?>>text-embedding-004</option>
-													<option value="gemini:embedding-001" <?php selected( $current_embed_model, 'gemini:embedding-001' ); ?>>embedding-001</option>
+													<option value="gemini:gemini-embedding-001" <?php selected( $current_embed_model, 'gemini:gemini-embedding-001' ); ?>>gemini-embedding-001</option>
+													<option value="gemini:gemini-embedding-2-preview" <?php selected( $current_embed_model, 'gemini:gemini-embedding-2-preview' ); ?>>gemini-embedding-2-preview</option>
 											</optgroup>
 											<?php endif; ?>
 
@@ -83,7 +83,7 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 											</optgroup>
 											<?php endif; ?>
 									</select>
-									<p class="description"><?php esc_html_e( 'Select an embedding model or type a custom one. Leave as "Auto" to use the recommended default for your active provider.', 'jeo' ); ?></p>
+									<p class="description"><?php esc_html_e( 'Select the specific embedding model. You can mix providers (e.g. use Gemini for chat and OpenAI for embeddings).', 'jeo' ); ?></p>
 							</td>
 					</tr>
 			</tbody>
