@@ -49,6 +49,13 @@ class RAG_Agent extends RAG {
 
 		// 3. Determine Embedding Provider
 		$embedding_model_setting = \jeo_settings()->get_option( 'ai_embedding_model' );
+		$locked_model = self::get_locked_model( 'jeo_knowledge' );
+
+		// Recovery mechanism: if DB setting is empty but store was locked with a model (from legacy Auto mode)
+		if ( empty( $embedding_model_setting ) && ! empty( $locked_model ) ) {
+			$embedding_model_setting = $locked_model;
+		}
+
 		if ( empty( $embedding_model_setting ) ) {
 			return new \WP_Error( 'rag_no_embedding_model', __( 'No Embedding Model selected. Please choose a model in the Knowledge Base tab.', 'jeo' ) );
 		}
@@ -57,8 +64,14 @@ class RAG_Agent extends RAG {
 		if ( strpos( $embedding_model_setting, ':' ) !== false ) {
 			list( $embedding_provider, $ignored_model ) = explode( ':', $embedding_model_setting, 2 );
 		} else {
-			// Legacy support: assume openai if no prefix is given (or whatever default)
-			$embedding_provider = 'openai';
+			// Legacy support: infer provider from known legacy names
+			if ( strpos( $embedding_model_setting, 'gemini' ) !== false || strpos( $embedding_model_setting, 'embedding-001' ) !== false || strpos( $embedding_model_setting, 'text-embedding-004' ) !== false ) {
+				$embedding_provider = 'gemini';
+			} elseif ( strpos( $embedding_model_setting, 'nomic' ) !== false || strpos( $embedding_model_setting, 'mxbai' ) !== false ) {
+				$embedding_provider = 'ollama';
+			} else {
+				$embedding_provider = 'openai';
+			}
 		}
 
 		// 4. Check for specific provider compatibility (Embeddings)

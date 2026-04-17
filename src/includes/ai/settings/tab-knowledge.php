@@ -16,6 +16,11 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 									<?php
 									$current_embed_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 									$locked_model = \Jeo\AI\RAG_Agent::get_locked_model( 'jeo_knowledge' );
+									
+									if ( empty( $current_embed_model ) && ! empty( $locked_model ) ) {
+										$current_embed_model = $locked_model;
+									}
+
 									$is_locked = ! empty( $locked_model );
 									?>
 									
@@ -28,6 +33,7 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 												<?php printf( esc_html__( 'This Vector Store was initialized with %s. To use a different model, you must clear the current store first.', 'jeo' ), '<code>' . esc_html( $locked_model ) . '</code>' ); ?>
 											</p>
 										</div>
+										<input type="hidden" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_embedding_model' ) ); ?>" value="<?php echo esc_attr( $current_embed_model ); ?>">
 									<?php endif; ?>
 
 									<select name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_embedding_model' ) ); ?>" id="ai_embedding_model" style="width: 100%; max-width: 400px;" <?php disabled( $is_locked ); ?> required>
@@ -103,6 +109,9 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 							<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_rag_auto_index' ) ); ?>" type="checkbox" value="1" <?php checked( \jeo_settings()->get_option( 'jeo_rag_auto_index' ), 1 ); ?>>
 							<strong><?php esc_html_e( 'Enable Auto-indexing', 'jeo' ); ?></strong>
 						</label>
+						<p style="font-size: 11px; margin-top: 5px; color: #8c8f94; font-style: italic;">
+							<?php esc_html_e( 'Note: WP-Cron only runs when your site receives visitor traffic. If you are on a local development server with no traffic, indexing will pause until pages are loaded.', 'jeo' ); ?>
+						</p>
 					</div>
 
 					<div style="margin-top: 15px; display: flex; gap: 20px;">
@@ -130,9 +139,17 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 					</button>
 
 					<?php
-					$total_posts = wp_count_posts()->publish;
+					$enabled_post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
+					$total_posts = 0;
+					foreach ( $enabled_post_types as $pt ) {
+						$count = wp_count_posts( $pt );
+						if ( isset( $count->publish ) ) {
+							$total_posts += (int) $count->publish;
+						}
+					}
+					
 					$vectorized_query = new \WP_Query( array(
-						'post_type'      => 'post',
+						'post_type'      => $enabled_post_types,
 						'post_status'    => 'publish',
 						'posts_per_page' => -1,
 						'fields'         => 'ids',

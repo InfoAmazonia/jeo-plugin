@@ -88,8 +88,19 @@ class RAG_Worker {
 		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 		$locked_model  = RAG_Agent::get_locked_model( 'jeo_knowledge' );
 
-		if ( ! empty( $locked_model ) && ! empty( $current_model ) && $current_model !== $locked_model ) {
-			return new \WP_Error( 'model_mismatch', sprintf( __( 'Vector Store mismatch! Expected %s, found %s.', 'jeo' ), $locked_model, $current_model ) );
+		// Legacy support: if the locked model doesn't have a provider prefix, but the current model does,
+		// compare only the model part.
+		$current_model_basename = $current_model;
+		if ( ! empty( $current_model ) && strpos( $current_model, ':' ) !== false ) {
+			$parts = explode( ':', $current_model, 2 );
+			$current_model_basename = $parts[1];
+		}
+
+		if ( ! empty( $locked_model ) && ! empty( $current_model ) ) {
+			// Check if locked model matches the full name OR the basename
+			if ( $locked_model !== $current_model && $locked_model !== $current_model_basename ) {
+				return new \WP_Error( 'model_mismatch', sprintf( __( 'Vector Store mismatch! Expected %s, found %s.', 'jeo' ), $locked_model, $current_model ) );
+			}
 		}
 
 		// Setup lock if first time
