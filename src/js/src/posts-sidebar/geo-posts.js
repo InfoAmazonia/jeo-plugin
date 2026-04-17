@@ -17,11 +17,10 @@ class JeoGeocodePosts extends Component {
 			.select( 'core/editor' )
 			.getEditedPostAttribute( 'meta' );
 
-		// Legacy Migration: Map _geocode_lon to _geocode_lng if needed
 		const rawPoints = metadata._related_point || [];
 		const sanitizedPoints = rawPoints.map( p => ( {
 			...p,
-			_geocode_lng: p._geocode_lng || p._geocode_lon || ''
+			_geocode_lon: p._geocode_lon || ''
 		} ) );
 
 		this.state = {
@@ -87,7 +86,7 @@ class JeoGeocodePosts extends Component {
 					if ( activePoint ) {
 						this.flyToLocation(
 							activePoint._geocode_lat,
-							activePoint._geocode_lng
+							activePoint._geocode_lon
 						);
 					}
 				}
@@ -144,7 +143,7 @@ class JeoGeocodePosts extends Component {
 				const currentPoint = points[ currentMarkerIndex ];
 				this.flyToLocation(
 					currentPoint._geocode_lat,
-					currentPoint._geocode_lng
+					currentPoint._geocode_lon
 				);
 			}
 		);
@@ -161,7 +160,7 @@ class JeoGeocodePosts extends Component {
 				const currentPoint = points[ currentMarkerIndex ];
 				this.flyToLocation(
 					currentPoint._geocode_lat,
-					currentPoint._geocode_lng
+					currentPoint._geocode_lon
 				);
 			}
 		);
@@ -217,7 +216,7 @@ class JeoGeocodePosts extends Component {
 				loadStatus: 'resolved',
 			},
 			() => {
-				this.flyToLocation( point._geocode_lat, point._geocode_lng );
+				this.flyToLocation( point._geocode_lat, point._geocode_lon );
 			}
 		);
 	}
@@ -256,7 +255,7 @@ class JeoGeocodePosts extends Component {
 
 			const foundPoint = {
 				_geocode_lat: this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : String( lat ),
-				_geocode_lng: this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : String( lng ),
+				_geocode_lon: this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : String( lng ),
 				_geocode_full_address: this.getProperty( result, 'full_address' ),
 				_geocode_country: this.getProperty( result, 'country' ),
 				_geocode_country_code: this.getProperty( result, 'country_code' ),
@@ -307,7 +306,7 @@ class JeoGeocodePosts extends Component {
 		const coords = points
 			.map( ( point ) => {
 				const lat = parseFloat( point._geocode_lat );
-				const lng = parseFloat( point._geocode_lng );
+				const lng = parseFloat( point._geocode_lon );
 				return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lat, lng ];
 			} )
 			.filter( c => c !== null );
@@ -521,7 +520,7 @@ class JeoGeocodePosts extends Component {
 								}
 
 								const lat = parseFloat( point._geocode_lat );
-								const lng = parseFloat( point._geocode_lng );
+								const lng = parseFloat( point._geocode_lon );
 								if ( isNaN( lat ) || isNaN( lng ) ) return null;
 
 								return (

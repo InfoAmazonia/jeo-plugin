@@ -408,7 +408,7 @@ class Bulk_Processor {
 				$related_points[] = array(
 					'relevance'    => $relevance,
 					'_geocode_lat' => (string) $p['lat'],
-					'_geocode_lng' => (string) $p['lng'],
+					'_geocode_lon' => (string) $p['lng'],
 					'name'         => $p['name'],
 					'quote'        => $p['quote'],
 					'_ai_quote'    => $p['quote']

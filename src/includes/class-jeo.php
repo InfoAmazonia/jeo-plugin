@@ -277,10 +277,10 @@ class Jeo {
 			}
 
 			foreach ( $points as $point ) {
-				if ( isset( $point['_geocode_lat'] ) && isset( $point['_geocode_lng'] ) ) {
+				if ( isset( $point['_geocode_lat'] ) && isset( $point['_geocode_lon'] ) ) {
 					
 					$lat = (float) str_replace(',', '.', $point['_geocode_lat']);
-					$lng = (float) str_replace(',', '.', $point['_geocode_lng']);
+					$lng = (float) str_replace(',', '.', $point['_geocode_lon']);
 					
 					// Arredondamento para filtrar duplicatas
 					$hash = round($lat, 5) . '|' . round($lng, 5) . '|' . $post_id;

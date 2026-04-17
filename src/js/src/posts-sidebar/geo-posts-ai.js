@@ -83,7 +83,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 				const coords = selectedLocations
 					.map( ( loc ) => {
 						const lat = parseFloat( loc._geocode_lat );
-						const lng = parseFloat( loc._geocode_lng );
+						const lng = parseFloat( loc._geocode_lon );
 						return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lat, lng ];
 					} )
 					.filter( c => c !== null );
@@ -153,7 +153,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 									cursor: 'pointer',
 									opacity: loc._disabled ? 0.7 : 1
 								} }
-								onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lng ) }
+								onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
 								>
 									<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' } }>
 										<div style={ { display: 'flex', alignItems: 'center' } }>
@@ -182,14 +182,14 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 									<div style={ { marginLeft: '32px' } }>
 										<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px', marginBottom: '12px' } }>
 											<p style={ { fontSize: '11px', color: '#757575', margin: 0, fontFamily: 'monospace' } }>
-												{ `${ __( 'LAT:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | ${ __( 'LNG:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lng).toFixed(4) }` }
+												{ `${ __( 'LAT:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | ${ __( 'LNG:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lon).toFixed(4) }` }
 											</p>
 											
 											<div style={ { display: 'flex', alignItems: 'center', gap: '20px' } }>
 												<Button
 													variant="secondary"
 													isSmall
-													onClick={ ( e ) => { e.stopPropagation(); handleEnrich( index, loc._geocode_lat, loc._geocode_lng ); } }
+													onClick={ ( e ) => { e.stopPropagation(); handleEnrich( index, loc._geocode_lat, loc._geocode_lon ); } }
 													disabled={ enriching[ index ] || loc._disabled || !loc._selected }
 												>
 													{ enriching[ index ] ? <Spinner /> : __( 'Enrich Data', 'jeo' ) }
@@ -269,7 +269,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 							/>
 							{ aiSuggestedLocations.map( ( loc, index ) => {
 								const lat = parseFloat( loc._geocode_lat );
-								const lng = parseFloat( loc._geocode_lng );
+								const lng = parseFloat( loc._geocode_lon );
 								if ( isNaN( lat ) || isNaN( lng ) ) return null;
 
 								return (
@@ -278,7 +278,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 										icon={ createMarkerIcon( loc._selected ) }
 										position={ [ lat, lng ] }
 										opacity={ loc._selected ? 1 : 0.3 }
-										onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lng ) }
+										onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
 									/>
 								);
 							} ) }

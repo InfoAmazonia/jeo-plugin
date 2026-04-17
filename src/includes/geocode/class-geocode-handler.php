@@ -8,7 +8,7 @@ class Geocode_Handler {
 
 	public $geo_attributes = array(
 		'_geocode_lat',
-		'_geocode_lng',
+		'_geocode_lon',
 		'_geocode_city_level_1',
 		'_geocode_city',
 		'_geocode_region_level_3',
@@ -124,7 +124,7 @@ class Geocode_Handler {
 									'_geocode_lat'     => array(
 										'type' => 'number',
 									),
-									'_geocode_lng'     => array(
+									'_geocode_lon'     => array(
 										'type' => 'number',
 									),
 									'_geocode_city_level_1' => array(
@@ -398,8 +398,8 @@ class Geocode_Handler {
 			$value['_geocode_lat'] = str_replace( ',', '.', $value['_geocode_lat'] );
 		}
 
-		if ( isset( $value['_geocode_lng'] ) ) {
-			$value['_geocode_lng'] = str_replace( ',', '.', $value['_geocode_lng'] );
+		if ( isset( $value['_geocode_lon'] ) ) {
+			$value['_geocode_lon'] = str_replace( ',', '.', $value['_geocode_lon'] );
 		}
 
 		if ( isset( $value->_geocode_lat ) ) {

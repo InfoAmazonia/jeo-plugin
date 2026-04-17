@@ -801,7 +801,7 @@ export default class JeoMap {
 			const storyPoints = storyRelatedPoints
 				.map( ( point ) => {
 					const lat = parseFloat( point._geocode_lat );
-					const lng = parseFloat( point._geocode_lng || point._geocode_lon );
+					const lng = parseFloat( point._geocode_lon );
 					return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lng, lat ];
 				} )
 				.filter( c => c !== null );
@@ -874,7 +874,7 @@ export default class JeoMap {
 		const popUp = new mapgl.Popup().setHTML( popupHTML );
 
 		const lat = parseFloat( point._geocode_lat );
-		const lng = parseFloat( point._geocode_lng || point._geocode_lon );
+		const lng = parseFloat( point._geocode_lon );
 
 		if ( isNaN( lat ) || isNaN( lng ) ) return;
 
