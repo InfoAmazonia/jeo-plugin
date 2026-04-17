@@ -42,7 +42,7 @@
 							class="regular-text jeo-ai-key-input" 
 							data-original-value="<?php echo esc_attr( $display_value ); ?>"
 							<?php echo ! $is_empty ? 'readonly style="background: #f0f0f1; cursor: not-allowed; font-family: monospace;"' : ''; ?>
-							placeholder="<?php echo $slug === 'ollama' ? 'http://localhost:11434/api' : 'Paste your API key here...'; ?>"
+							placeholder="<?php echo $slug === 'ollama' ? 'http://localhost:11434/api' : esc_attr__( 'Paste your API key here...', 'jeo' ); ?>"
 						>
 						
 						<?php if ( ! $is_empty ) : ?>

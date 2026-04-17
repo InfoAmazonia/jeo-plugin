@@ -21,7 +21,8 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
   1. No array `$default_options` do método `init()`.
   2. No método `get_option()` (merge com defaults).
   3. No método `sanitize_settings()` (persistência segura).
-- **Merge Obligatório:** O `sanitize_settings` deve realizar um `array_merge` com as opções existentes para evitar que salvamentos em formulários parciais (multi-abas) apaguem configurações de outras seções.
+- **Tratamento de Abas em Formulários (Checkboxes):** Em painéis multi-abas, utilize o campo oculto `current_tab`. O `sanitize_settings` deve apenas redefinir para falso (desmarcar) os checkboxes que pertencem especificamente à aba submetida. Nunca zere todas as chaves booleanas do sistema ao salvar uma única aba.
+- **Merge Obrigatório:** O `sanitize_settings` deve realizar um `array_merge` com as opções existentes para evitar que salvamentos em formulários parciais apaguem configurações de outras seções.
 
 ---
 
@@ -56,12 +57,22 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 
 ---
 
-## 5. Interface Administrativa
+## 5. Interface Administrativa (Configurações)
 
-### 5.1. Menu JEO AI (v3.6.5+)
-- **Localização:** Submenu do JEO, posicionado após "Dashboard" e antes de "Maps".
-- **Abas Nativas:** Navegação via links reais (`?page=...&tab=...`) para garantir estabilidade de carregamento de scripts e assets (Select2, Modais).
-- **AI Debug Console:** Terminal flutuante para auditoria técnica de Requests/Responses em tempo real.
+### 5.1. Abas Nativas (Navegação Estável)
+- **Painéis Multi-Abas:** Todas as páginas de configuração do JEO devem utilizar **links reais** (`?page=...&tab=...`) para alternar conteúdos. É estritamente **proibido** utilizar jQuery/CSS para mostrar ou esconder blocos como forma de navegação entre abas. A renderização do PHP deve entregar apenas o conteúdo da `current_tab`.
+- **Skeleton Loader:** Ao recarregar abas, a UI deve iniciar com um `Skeleton Loader` css/html (padrão `jeo-skeleton`) que é ocultado via Javascript quando o DOM e as dependências nativas terminam de carregar.
+
+### 5.2. Internacionalização Rigorosa (i18n)
+- **Javascript (Textos Dinâmicos):** Nenhuma string em inglês deve ser "hardcoded" em arquivos `.js` (isso quebra os arquivos `.po/.mo`). Todas as mensagens de interface, alertas, botões ou `console.log` expostos devem vir injetados do PHP via `wp_localize_script` sob a matriz `jeo_settings.i18n`. Use o formato `alert( i18n.error_fetching || 'Fallback' )`.
+
+### 5.3. Tratamento de Modais HTML5
+- Modais administrativos devem utilizar a tag nativa `<dialog class="jeo-ai-modal">`.
+- **CSS Estrito para Modais:** Não utilize `display: flex` como padrão na classe global do modal para evitar sobrescrever a inatividade padrão do HTML5 (ele só deve ser flexível quando `[open]`).
+- **Dimensões e Rolagem:** Modais de pré-visualização (como Dicionários RAG) devem limitar-se à tela sem expandir para todo o monitor, utilizando `max-width`, `max-height: 85vh` e uma área interna restrita com `overflow-y: auto`.
+
+### 5.4. AI Debug Console
+- Terminal flutuante para auditoria técnica de Requests/Responses em tempo real presente na página do **JEO AI**.
 
 ---
 
