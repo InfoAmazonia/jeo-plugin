@@ -59,9 +59,8 @@ const JeoGeocodePanel = ( props ) => {
 						id: index,
 						relevance: relevance,
 						confidence: confidence,
-						_geocode_lat: String( loc.lat ),
-						_geocode_lon: String( loc.lng ),
-						_geocode_full_address: loc.name || '',
+						_geocode_lat: parseFloat( loc.lat ),
+						_geocode_lon: parseFloat( loc.lng ),						_geocode_full_address: loc.name || '',
 						_geocode_country: '',
 						_geocode_country_code: '',
 						_geocode_region_level_1: '',
@@ -100,9 +99,15 @@ const JeoGeocodePanel = ( props ) => {
 		setState( ( prev ) => ( { ...prev, aiSuggestedLocations: newLocations } ) );
 	};
 
-	const changeRelevance = ( index, relevance ) => {
+	const changeRelevance = ( index, relevance, enrichment = {} ) => {
 		const newLocations = [ ...state.aiSuggestedLocations ];
 		newLocations[ index ].relevance = relevance;
+		
+		// If enrichment data is provided, merge it into the location
+		if ( Object.keys( enrichment ).length > 0 ) {
+			newLocations[ index ] = { ...newLocations[ index ], ...enrichment };
+		}
+
 		setState( ( prev ) => ( { ...prev, aiSuggestedLocations: newLocations } ) );
 	};
 
@@ -111,20 +116,32 @@ const JeoGeocodePanel = ( props ) => {
 			.filter( loc => loc._selected )
 			.map( loc => ( {
 				relevance: loc.relevance || 'primary',
-				_geocode_lat: String( loc._geocode_lat ),
-				_geocode_lon: String( loc._geocode_lon ),
+				_geocode_lat: parseFloat( String( loc._geocode_lat || 0 ).replace( ',', '.' ) ),
+				_geocode_lon: parseFloat( String( loc._geocode_lon || 0 ).replace( ',', '.' ) ),
 				_geocode_full_address: loc._geocode_full_address || '',
-				_geocode_country: '',
-				_geocode_country_code: '',
-				_geocode_region_level_1: '',
-				_geocode_region_level_2: '',
-				_geocode_region_level_3: '',
-				_geocode_city: '',
-				_geocode_city_level_1: '',
+				_geocode_country: loc._geocode_country || '',
+				_geocode_country_code: loc._geocode_country_code || '',
+				_geocode_region_level_1: loc._geocode_region_level_1 || '',
+				_geocode_region_level_2: loc._geocode_region_level_2 || '',
+				_geocode_region_level_3: loc._geocode_region_level_3 || '',
+				_geocode_city: loc._geocode_city || '',
+				_geocode_city_level_1: loc._geocode_city_level_1 || '',
+				_geocode_address: loc._geocode_address || '',
+				_geocode_address_number: loc._geocode_address_number || '',
+				_geocode_postcode: loc._geocode_postcode || '',
 				_ai_quote: loc._ai_quote || '',
 			} ) );
 
-		const currentPoints = meta._related_point || [];
+		const currentPoints = ( meta._related_point || [] ).map( p => {
+			const lat = parseFloat( String( p._geocode_lat ).replace( ',', '.' ) );
+			const lon = parseFloat( String( p._geocode_lon || '' ).replace( ',', '.' ) );
+			return {
+				...p,
+				_geocode_lat: isNaN( lat ) ? 0 : lat,
+				_geocode_lon: isNaN( lon ) ? 0 : lon
+			};
+		} );
+
 		const newPoints = [ ...currentPoints, ...selectedPoints ];
 
 		wp.data.dispatch( 'core/editor' ).editPost( {
@@ -163,9 +180,8 @@ const JeoGeocodePanel = ( props ) => {
 				id: index,
 				relevance: relevance,
 				confidence: confidence,
-				_geocode_lat: String( loc.lat ),
-				_geocode_lon: String( loc.lng ),
-				_geocode_full_address: loc.name || '',
+				_geocode_lat: parseFloat( loc.lat ),
+				_geocode_lon: parseFloat( loc.lng ),				_geocode_full_address: loc.name || '',
 				_geocode_country: '',
 				_geocode_country_code: '',
 				_geocode_region_level_1: '',

@@ -132,6 +132,10 @@ class AI_Handler {
 			'(No context snippet found for this location)' => '(Nenhum trecho de contexto encontrado para este local)',
 			'Discard All' => 'Descartar Todos',
 			'Add to Map' => 'Adicionar ao Mapa',
+			'AI Context:' => 'Contexto da IA:',
+			'Verified Address:' => 'Endereço Verificado:',
+			'Enrich Data' => 'Enriquecer Dados',
+			'Enriched via Geocoder' => 'Enriquecido via Geocoder',
 			'Validate Custom Prompt' => 'Validar Prompt Customizado',
 			'System Prompt Configuration' => 'Configuração do Prompt de Sistema',
 			'Use Custom System Prompt' => 'Usar Prompt de Sistema Personalizado',
@@ -157,6 +161,11 @@ class AI_Handler {
 			'Number of posts to process per cron run.' => 'Número de posts a processar por ciclo.',
 			'Target Post Types' => 'Tipos de Post Alvo',
 			'Cron Interval' => 'Intervalo de Execução',
+			'Every Minute' => 'A cada minuto',
+			'Every 5 Minutes' => 'A cada 5 minutos',
+			'Every 15 Minutes' => 'A cada 15 minutos',
+			'Hourly' => 'De hora em hora',
+			'Twice Daily' => 'Duas vezes ao dia',
 			'Processing Status' => 'Status do Processamento',
 			'Recent Logs' => 'Logs Recentes',
 			'Manual Actions' => 'Ações Manuais',
@@ -172,6 +181,17 @@ class AI_Handler {
 			'Not Processed' => 'Não Processado',
 			'Approve AI' => 'Aprovar IA',
 			'Approve JEO AI Geolocations' => 'Aprovar Geolocalizações IA do JEO',
+			'Background Indexing' => 'Indexação em Segundo Plano',
+			'Automatically vectorize your posts in small batches using WP-Cron.' => 'Vetoriza seus posts automaticamente em pequenos lotes usando WP-Cron.',
+			'Enable Auto-indexing' => 'Ativar Auto-indexação',
+			'Manual Indexing' => 'Indexação Manual',
+			'Trigger a single batch vectorization immediately.' => 'Dispara a vetorização de um único lote imediatamente.',
+			'Vectorize 1 Batch Now' => 'Vetorizar 1 Lote Agora',
+			'Indexing Progress' => 'Progresso da Indexação',
+			'%d of %d posts indexed.' => '%d de %d posts indexados.',
+			'Alternative: Use WP-CLI for large databases:' => 'Alternativa: Use WP-CLI para bases de dados grandes:',
+			'Successfully vectorized %d posts.' => 'Vetorizado com sucesso %d posts.',
+			'No more posts to vectorize.' => 'Não há mais posts para vetorizar.',
 			'Data Dictionaries' => 'Dicionários de Dados',
 			'Embedded Brazilian Territories' => 'Territórios Brasileiros Embarcados',
 			'The following geographic dictionaries are available locally to improve AI precision:' => 'Os seguintes dicionários geográficos estão disponíveis localmente para melhorar a precisão da IA:',
@@ -345,6 +365,42 @@ class AI_Handler {
 		);
 		register_rest_route(
 			'jeo/v1',
+			'/ai-backup-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_backup_store' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-list-backups',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_list_backups' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-delete-backup',
+			array(
+				'methods'             => 'DELETE',
+				'callback'            => array( $this, 'api_delete_backup' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
 			'/ai-clear-store',
 			array(
 				'methods'             => 'POST',
@@ -365,11 +421,16 @@ class AI_Handler {
 
 			$upload_dir = wp_upload_dir();
 			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
-			$store_name = ( $store === 'test' ) ? 'jeo_knowledge_test.store' : 'jeo_knowledge.store';
-			$file_path  = $store_dir . '/' . $store_name;
+			$base_name  = ( $store === 'test' ) ? 'jeo_knowledge_test' : 'jeo_knowledge';
+			
+			$file_path  = $store_dir . '/' . $base_name . '.store';
+			$info_path  = $store_dir . '/' . $base_name . '.model_info';
 
 			if ( file_exists( $file_path ) ) {
 				unlink( $file_path );
+			}
+			if ( file_exists( $info_path ) ) {
+				unlink( $info_path );
 			}
 
 			if ( $store === 'production' ) {
@@ -559,7 +620,17 @@ class AI_Handler {
 				
 				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
 					foreach ( $data['data'] as $model ) {
-						$models[] = $model['id'];
+						$id = $model['id'];
+						// Filter for Text models in OpenAI
+						if ( 'openai' === $provider ) {
+							if ( strpos( $id, 'gpt-' ) === false 
+								 || strpos( $id, 'audio' ) !== false 
+								 || strpos( $id, 'realtime' ) !== false 
+								 || strpos( $id, 'embedding' ) !== false ) {
+								continue;
+							}
+						}
+						$models[] = $id;
 					}
 				}
 				break;
@@ -572,9 +643,13 @@ class AI_Handler {
 				
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
 					foreach ( $data['models'] as $model ) {
-						// Only allow models supporting generateContent for georeferencing
-						if ( isset( $model['supportedGenerationMethods'] ) && in_array( 'generateContent', $model['supportedGenerationMethods'], true ) ) {
-							$models[] = str_replace( 'models/', '', $model['name'] );
+						$id = str_replace( 'models/', '', $model['name'] );
+						// Filter for Text-only chat models in Gemini
+						if ( isset( $model['supportedGenerationMethods'] ) 
+							 && in_array( 'generateContent', $model['supportedGenerationMethods'], true )
+							 && strpos( $id, 'embedding' ) === false 
+							 && strpos( $id, 'vision' ) === false ) {
+							$models[] = $id;
 						}
 					}
 				}
@@ -643,52 +718,69 @@ class AI_Handler {
 	 * Callback to test if an API key is valid using a simple Hello World.
 	 */
 	public function api_test_key( $request ) {
-		$provider = $request->get_param( 'provider' );
-		$api_key  = $request->get_param( 'api_key' ); // It might be empty if the frontend relies on saved DB key
-		$model    = $request->get_param( 'model' );
+		try {
+			$provider = $request->get_param( 'provider' );
+			$api_key  = $request->get_param( 'api_key' );
+			$model    = $request->get_param( 'model' );
 
-		if ( empty( $api_key ) ) {
-			if ( 'ollama' === $provider ) {
-				$api_key = \jeo_settings()->get_option( 'ollama_url' );
-			} else {
-				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			if ( empty( $api_key ) ) {
+				if ( 'ollama' === $provider ) {
+					$api_key = \jeo_settings()->get_option( 'ollama_url' );
+				} else {
+					$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+				}
 			}
-		}
 
-		if ( empty( $model ) ) {
-			$model = \jeo_settings()->get_option( $provider . '_model' );
-		}
-		
-		if ( empty( $api_key ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
-		}
+			if ( empty( $model ) ) {
+				$model = \jeo_settings()->get_option( $provider . '_model' );
+			}
+			
+			if ( empty( $api_key ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
+			}
 
-		$adapter = null;
+			$adapter = null;
 
-		if ( array_key_exists( $provider, $this->get_adapters() ) ) {
-			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
-		}
+			if ( array_key_exists( $provider, $this->get_adapters() ) ) {
+				$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+			}
 
-		if ( ! $adapter ) {
-			return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeo' ) ), 400 );
-		}
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeo' ) ), 400 );
+			}
 
-		// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
-		$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lng\": 0, \"quote\": \"Status: Ping\"}]";
-		$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
+			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
+			// Usamos [SKIP_ENFORCED_SCHEMA] para evitar que o JEO injete o prompt gigante de geolocalização durante o teste de conexão.
+			$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lng\": 0, \"quote\": \"Status: Ping\", \"confidence\": 100}]";
+			
+			$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
 
-		if ( is_wp_error( $result ) ) {
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response( array( 
+					'success' => false, 
+					'message' => $result->get_error_message() 
+				), 200 );
+			}
+
+			if ( is_array( $result ) ) {
+				return new \WP_REST_Response( array( 
+					'success' => true, 
+					'message' => __( 'API Key is valid and active!', 'jeo' ),
+					'data'    => $result
+				), 200 );
+			}
+
 			return new \WP_REST_Response( array( 
 				'success' => false, 
-				'message' => $result->get_error_message() 
+				'message' => __( 'The AI provider returned an unexpected response format.', 'jeo' )
+			), 200 );
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response( array( 
+				'success' => false, 
+				'message' => 'System Error: ' . $e->getMessage() 
 			), 200 );
 		}
-
-		return new \WP_REST_Response( array( 
-			'success' => true, 
-			'message' => __( 'API Key is valid and active!', 'jeo' ),
-			'raw'     => $result
-		), 200 );
 	}
 
 	/**
@@ -699,10 +791,17 @@ class AI_Handler {
 		$provider = $request->get_param( 'provider' );
 		$api_key  = $request->get_param( 'api_key' );
 		$model    = $request->get_param( 'model' );
+		$lang     = $request->get_param( 'lang' ) ?: 'en';
 
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
 		}
+
+		$lang_instruction = ( 'en' === $lang ) 
+			? "IMPORTANT: You MUST write the generated prompt and all rules in English. Large Language Models process English instructions more accurately and reliably."
+			: "IMPORTANT: You MUST write the generated prompt and all rules in " . get_bloginfo( 'language' ) . ".";
+
+		$context = $lang_instruction . "\n\nUser request: " . $context;
 
 		if ( empty( $api_key ) ) {
 			if ( 'ollama' === $provider ) {
@@ -756,12 +855,13 @@ Write a clear, strict System Prompt that incorporates the user's rules.
 You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
 
 \"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote'. Do NOT use any other keys like 'city', 'country', 'continent' or 'type'.
+Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote', 'confidence'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
 - 'name': The location name.
 - 'lat': Latitude (string or float).
 - 'lng': Longitude (string or float).
 - 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
-Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\"}]
+- 'confidence': An integer between 0 and 100 representing your confidence level in this extraction.
+Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
 If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"
 
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
@@ -900,7 +1000,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 * @return string
 	 */
 	public function get_default_system_prompt() {
-		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects, each containing "name", "lat" (string/float), "lng" (string/float), and "quote" (a short relevant snippet from the text where the location was mentioned). If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].', 'jeo' );
+		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects, each containing "name", "lat" (string/float), "lng" (string/float), "quote" (a short relevant snippet from the text where the location was mentioned), and "confidence" (an integer 0-100). If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].', 'jeo' );
 	}
 
 	/**
@@ -971,5 +1071,43 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		// Reverse to get newest first and slice
 		$parsed_entries = array_reverse( $parsed_entries );
 		return array_slice( $parsed_entries, 0, $limit );
+	}
+
+	/**
+	 * REST Callback: Trigger a backup.
+	 */
+	public function api_backup_store() {
+		$result = \jeo_rag_backup()->do_backup();
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 500 );
+		}
+		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Backup created successfully!', 'jeo' ) ), 200 );
+	}
+
+	/**
+	 * REST Callback: List backups.
+	 */
+	public function api_list_backups() {
+		return new \WP_REST_Response( \jeo_rag_backup()->get_backups(), 200 );
+	}
+
+	/**
+	 * REST Callback: Delete a backup.
+	 */
+	public function api_delete_backup( $request ) {
+		$filename = $request->get_param( 'filename' );
+		if ( empty( $filename ) ) {
+			return new \WP_REST_Response( array( 'error' => 'Missing filename' ), 400 );
+		}
+
+		$uploads = wp_upload_dir();
+		$file_path = $uploads['basedir'] . '/jeo-ai-store/backups/' . sanitize_file_name( $filename );
+
+		if ( file_exists( $file_path ) && str_ends_with( $file_path, '.zip' ) ) {
+			unlink( $file_path );
+			return new \WP_REST_Response( array( 'success' => true ), 200 );
+		}
+
+		return new \WP_REST_Response( array( 'error' => 'File not found' ), 404 );
 	}
 }

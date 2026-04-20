@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lng,
+	center_lng: jeo_settings.map_defaults.lng,
 	min_zoom: 0,
 	max_zoom: 20,
 	disable_scroll_zoom: jeo_settings.map_defaults.disable_scroll_zoom,
@@ -31,7 +31,7 @@ function parseNumber( value ) {
 export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 	const {
 		center_lat: centerLat,
-		center_lon: centerLon,
+		center_lng: centerLon,
 		initial_zoom: initialZoom,
 		min_zoom: minZoom,
 		max_zoom: maxZoom,
@@ -69,7 +69,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						onChange={ ( value ) => {
 							editingMap.current = true;
 							setTimeout( () => ( editingMap.current = false ), 50 );
-							return attributeUpdater( 'center_lon' )( parseNumber( value ) );
+							return attributeUpdater( 'center_lng' )( parseNumber( value ) );
 						} }
 					/>
 				</section>

@@ -66,11 +66,13 @@ function reorder ( list, startIndex, endIndex ) {
 };
 
 function flyTo ( map, location ) {
+	const lat = parseFloat( location.lat );
+	const lng = parseFloat( location.lng || location.lon );
+
+	if ( isNaN( lat ) || isNaN( lng ) ) return;
+
 	map.flyTo({
-		center: [
-			parseFloat( location.lon ),
-			parseFloat( location.lat ),
-		]
+		center: [ lng, lat ]
 	});
 }
 

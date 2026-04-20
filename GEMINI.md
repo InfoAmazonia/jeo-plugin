@@ -1,4 +1,4 @@
-# JEO Plugin - Master Architecture Guide & Mandates (v3.6.4)
+# JEO Plugin - Master Architecture Guide & Mandates (v3.6.5)
 
 Este documento é a autoridade máxima sobre a arquitetura do plugin JEO. Qualquer alteração, refatoração ou adição de funcionalidade deve respeitar estritamente as diretrizes aqui estabelecidas para garantir a estabilidade e a integridade dos dados geográficos.
 
@@ -7,138 +7,94 @@ Este documento é a autoridade máxima sobre a arquitetura do plugin JEO. Qualqu
 ## 1. Visão Geral e Propósito
 O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em camadas de dados interativos, permitindo a geolocalização manual ou automatizada (via IA) de matérias jornalísticas.
 
-### Stack Tecnológica:
-- **Backend:** PHP 8.2+ (Obrigatório), Composer para gerenciamento de dependências.
-- **AI Engine:** Neuron AI Framework.
-- **Frontend:** React, Gutenberg Blocks, MapLibre GL / Mapbox GL.
-- **Infraestrutura Local:** Docker Compose (Apache + MariaDB, Porta 8072).
+---
+
+## 2. Mandatos de Integridade Técnica (Prevenção de Regressões)
+
+### 2.1. Padrão de Nomenclatura de Geodata
+- **Longitude:** O sufixo padrão para longitude em todo o sistema (PHP, JS, REST e Database) é estritamente `lng`. O uso de `lon` é obsoleto e proibido em novos desenvolvimentos.
+- **Normalização Automática:** Todo input de coordenadas deve ser validado para evitar `NaN`. Use `parseFloat` e verifique `isNaN()` antes de passar dados para Leaflet ou Mapbox.
+- **Migração em Runtime (Legacy Data):** Componentes que carregam metadados do banco devem implementar um mapeamento imediato no `constructor`: se existir `_geocode_lon` mas não `_geocode_lng`, o valor deve ser transferido para a chave nova para garantir compatibilidade.
+
+### 2.2. Registry-First Mandate (Configurações)
+- Toda nova opção de configuração **DEVE** ser registrada em três lugares no arquivo `Jeo\Settings`:
+  1. No array `$default_options` do método `init()`.
+  2. No método `get_option()` (merge com defaults).
+  3. No método `sanitize_settings()` (persistência segura).
+- **Tratamento de Abas em Formulários (Checkboxes):** Em painéis multi-abas, utilize o campo oculto `current_tab`. O `sanitize_settings` deve apenas redefinir para falso (desmarcar) os checkboxes que pertencem especificamente à aba submetida. Nunca zere todas as chaves booleanas do sistema ao salvar uma única aba.
+- **Merge Obrigatório:** O `sanitize_settings` deve realizar um `array_merge` com as opções existentes para evitar que salvamentos em formulários parciais apaguem configurações de outras seções.
 
 ---
 
-## 2. Motor de Inteligência Artificial (v3.6.4)
+## 3. Motor de Inteligência Artificial (AI Engine)
 
-O JEO utiliza o framework **Neuron AI** como motor universal de LLM. 
+### 3.1. Neuron Agent & Universal Adapters
+- **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas. 
+- **O Contrato JSON Imutável:** Toda extração deve retornar um array plano de objetos com: `name`, `lat`, `lng`, `quote`, `confidence`.
 
-### 2.1. Neuron Agent & Adapters
-- **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas para APIs de LLM. O `Neuron_Factory` centraliza a instanciação de provedores de Chat e Embeddings.
-- **Configuração Determinística:** Todos os modelos de Chat são configurados com `temperature = 0.1` para garantir que a extração de coordenadas seja precisa e não criativa.
-- **Provedores:** Suporte nativo a 10 provedores (Gemini, OpenAI, Anthropic, DeepSeek, Ollama, Mistral, ZAI, HuggingFace, Grok, Cohere) configuráveis na Aba IA.
+### 3.2. Lógica de Relevância e Corte (UI/UX)
+- **Corte de Confiança:** High (>=75%) -> Primário; Medium (35-74%) -> Secundário; Low (<35%) -> Desabilitado.
+- **Interface:** Utilizar `ToggleControl` (Switcher) para alternar relevância.
 
-### 2.2. RAG Knowledge Base (Vector Store)
-- **Caminho Seguro:** Os embeddings são armazenados estritamente na pasta `wp-content/uploads/jeo-ai-store/` protegida por `.htaccess` contra acesso público via web.
-- **Isolamento de Ambiente:** O JEO possui duas bases vetoriais físicas (`jeo_knowledge.store` para Produção, `jeo_knowledge_test.store` para Testes). O código implementa endpoints REST para a limpeza (`clear`) individual de cada store.
-- **Limitações de API:** Modelos de Chat (`gpt-4o`, `gemini-2.5-flash`) não suportam vetorização. O `Neuron_Factory` deve SEMPRE forçar a injeção de modelos focados em embeddings (`text-embedding-3-small`, `text-embedding-004`) para a `EmbeddingsProviderInterface`.
-
-### 2.3. Model-Aware Prompt Optimization & Verbatim Mandate
-- O **AI Prompt Engineer Assistant** (Meta-Prompting) intercepta a requisição do usuário via `api_chat_prompt_generator` e gera automaticamente um System Prompt otimizado, injetando "Regras Constitucionais" específicas dependendo do provedor ativo:
-  - **Gemini:** Exige Markdown estrito e instrução passo a passo.
-  - **OpenAI:** Otimizado com regras abstratas e concisas.
-  - **DeepSeek:** Utiliza blocos de tags XML (`<rules>`) para guiar o raciocínio.
-  - **Anthropic:** Abordagem negativa constitucional ("O que não fazer").
-- **Verbatim Mandate:** O Assistente anexa obrigatoriamente um bloco de texto imutável (verbatim) definindo o contrato JSON do JEO, incluindo o exemplo do "Teatro Amazonas".
-- **Live Validator:** Utiliza o `api_validate_prompt` para testar o prompt customizado contra um texto global fixo (Paris, Manaus, Tóquio) garantindo a integridade da saída.
-
-### 2.4. Surgical JSON Parser (Depth Balancing)
-- **Resiliência contra Lixo:** O JEO utiliza um extrator de JSON via profundidade de colchetes. Ele localiza o primeiro `[` e busca o seu `]` correspondente exato, ignorando lixo fora do array.
-- **Negative Key Constraints:** Proíbe inventar chaves (como `"city"` ou `"country"`). O retorno restrito do schema é `"name"`, `"lat"`, `"lng"`, `"quote"`, `"confidence"`.
-- **Confidence Score:** O campo `"confidence"` deve ser um inteiro de 0 a 100 representando a certeza da IA sobre a localização extraída.
-
-### 2.5. Dicionários Geográficos Locais
-- Localizados in `src/includes/ai/data/`, fornecem contexto geográfico focado no Brasil e na Amazônia (ex: `biomes.json`, `indigenous-territories.json`) que podem ser processados localmente ou baixados para grounding avançado.
-
-### 2.6. Processamento em Lote (Legacy Bulk Processor)
-- **Engine de Background:** Utiliza a classe `Jeo\AI\Bulk_Processor` integrada ao `WP-Cron` para processar posts antigos de forma assíncrona.
-- **Armazenamento Temporário:** Os resultados sugeridos pela IA são salvos no meta privado `_jeo_ai_pending_point` até que um humano os aprove. O status do processamento é rastreado via `_jeo_legacy_status`.
-- **Workflow de Aprovação:**
-  - **Individual:** Um "Notice" de aviso no sidebar do Gutenberg alerta sobre locais encontrados e permite a revisão/aprovação via modal.
-  - **Lógica de Interface (Review Modal):**
-    - **Score >= 75%:** Definido como **Ponto Primário** e selecionado por padrão.
-    - **Score entre 35% e 74%:** Definido como **Ponto Secundário** e selecionado por padrão.
-    - **Score < 35%:** Ponto desativado e desmarcado por padrão (bloqueado para evitar ruído geográfico).
-    - **Switcher de Relevância:** Permite ao usuário alternar manualmente entre Primário e Secundário na revisão.
-  - **Em Massa:** Adiciona uma coluna "Status IA JEO" na listagem de posts (`edit.php`) e uma "Ação em Massa" para aprovação rápida de múltiplos posts simultaneamente.
-- **Configuração & Monitoramento:** Interface dedicada na aba "Bulk Geolocation" para gerenciar intervalo do cron, tamanho do lote e post types habilitados.
-- **Limite de Confiança (Threshold):** Permite definir um score mínimo de confiança (0-100%) para que a aprovação em massa automatizada processe o post. Posts abaixo do limite são ignorados na ação em massa, exigindo revisão manual.
-- **Controle Manual e Auditoria:**
-  - **Botão "Run 1 Batch Now":** Permite o disparo manual imediato via REST API para testes e processamento sob demanda.
-  - **Logging e Limpeza:** Sistema de logs em tempo real salvo em `jeo-bulk-ai.log` com interface de visualização no painel e botão para limpeza rápida do arquivo.
-
-### 2.7. Cost Dashboard (Gestão de Custos)
-- **Salvamento de Tokens:** Utiliza a classe `AI_Logger` para persistir o consumo (`input_tokens`, `output_tokens`) no Custom Post Type privado `jeo-ai-log`. Tokens de embeddings são estimados (1 token =~ 4 caracteres) e agregados na tabela `options`.
+### 3.3. Enriquecimento de Geodata (Enrichment)
+- **Dados Estruturados:** O enriquecimento (Reverse Geocode) deve extrair: **Rua** (`address`), **Número** (`address_number`), **CEP** (`postcode`), Bairro, Cidade, Estado e País.
+- **Visualização:** Dados enriquecidos aparecem em verde ("Verified Address") abaixo do contexto da IA em azul.
 
 ---
 
-## 3. Experiência do Usuário (Settings UI)
+## 4. Persistência e Segurança
 
-### 3.1. Configurações de IA e Interceptações
-- **Tradução Dinâmica (Hardcoded):** Para evitar a recompilação de `.mo` a cada nova funcionalidade, o `AI_Handler` intercepta o filtro `gettext` e traduz dezenas de strings dinamicamente para `pt_BR`.
-- **Proteção Anti-Vazamento:** Um script JS injetado na página de plugins alerta na desativação: desativar o JEO expurga permanentemente todas as chaves de API por motivos de segurança.
-- **Dynamic Model Fetcher:** Consulta as APIs dos provedores em tempo real (`api_get_models`) e popula um campo de busca Select2 para seleção do LLM.
+### 4.1. Cofre de API Keys (Security Vault)
+- **Máscara de Visualização:** Chaves salvas devem ser exibidas como `AAAAA**********ZZZZZ` em inputs do tipo `text` com atributo `readonly`.
+- **Fluxo de Edição:** O botão "Set New Key" deve limpar o campo, remover o `readonly` e trocar o tipo para `password`.
+- **Proteção de Sanitização:** O backend deve detectar a string de máscara (`********`) e abortar a atualização daquele campo específico, preservando o segredo original no banco.
+- **Tráfego Seguro:** O JavaScript não deve enviar chaves mascaradas via AJAX. O backend deve recuperar o segredo interno se o parâmetro `api_key` estiver ausente.
 
----
+### 4.2. RAG & Processamento Background (Vector Store)
+- **Desacoplamento de Embeddings:** O modelo de Embedding é 100% independente do Provedor de Chat principal. O sistema utiliza a taxonomia `provider:model` (ex: `gemini:gemini-embedding-001`). Lógicas de fallback "Automático" (Auto) são expressamente proibidas; o usuário DEVE selecionar ativamente um motor de vetorização.
+- **Google Gemini Embeddings:** A API v1beta do Gemini rejeita nomes legados para embeddings. É obrigatório utilizar a nomenclatura canônica do Neuron-AI: apenas `gemini-embedding-001` ou `gemini-embedding-2-preview` são válidos. Nomes como `text-embedding-004` resultarão em erros silenciosos (404 Not Found).
+- **RAG Worker:** Classe `Jeo\AI\RAG_Worker` via `WP-Cron` para vetorização automática de postagens. O sistema deve implementar rotinas estritas de logging persistente (em `jeo_rag_cron_logs`) reportando `success` ou `error` para cada lote processado, provendo feedback de background na aba Knowledge Base.
+- **Model Lock:** O modelo de embedding fica travado permanentemente em `.model_info` após a primeira inicialização. Trocar o modelo exige apagar (resetar) todo o banco vetorial atual. A interface nunca deve bloquear a seleção de modelo (Deadlock) caso o banco já esteja travado; deve usar a técnica de Auto-Recuperação exibindo o modelo em `readonly`.
+- **Backups (Síncronos):** A geração de backups do Vector Store (`.zip`) deve ocorrer de forma **Síncrona** na API REST, sem agendamentos assíncronos no Cron. Falhas processuais (como a falta da extensão `ZipArchive` no servidor ou diretório vazio) devem retornar um objeto `\WP_Error` para fornecer feedback visual imediato na UI. Manter os últimos 3 backups no sistema.
 
-## 4. Persistência de Dados e Geolocalização
-
-### 4.1. O Metadado Mestre: `_related_point`
-Todos os dados geográficos de um post são armazenados no metadado mestre (array de objetos) `_related_point`.
-- **Campos do Schema:** `_geocode_lat`, `_geocode_lon`, `name`, `quote` (foco da IA). A API REST também expõe e mapeia a estrutura complexa do provedor de mapa: `_geocode_city_level_1`, `_geocode_city`, `_geocode_region_level_1/2/3`, `_geocode_country_code`, `_geocode_country`, e o controle de `relevance` (primary, secondary).
-- **Citação da IA:** Usa especificamente a chave `_ai_quote` para armazenar o trecho do texto onde o local foi encontrado.
-
-### 4.2. Indexação Automática de Performance
-**NUNCA desative ou faça bypass nas funções de hook do `Geocode_Handler`.**
-- Como consultas em arrays serializados via `WP_Query` destroem a performance do banco, o JEO implementa um sistema de **indexação "On Save"**.
-- Ao salvar o post, o handler destrincha o array e cria dezenas de metadados avulsos (ex: `_geocode_lat_p` para latitude do ponto primário, `_geocode_country_s` para país secundário), permitindo buscas e filtros geográficos otimizados.
-
----
-
-## 5. Interface, Integrações e APIs Restritas
-
-### 5.1. Customização e Discovery Mode
-- **Motor CSS Dinâmico:** O arquivo `loaders.php` processa propriedades globais de aparência (como `jeo_primary-color` e fontes do Google) e injeta um `<style>` no cabeçalho com variáveis nativas CSS (`:root`) modificando luminosidade dinamicamente (para os hovers).
-- **Discovery Mode:** Um template especial `discovery.php` permite uma navegação exploratória do mapa em tela cheia com layouts em React específicos.
-- **Embedder Universal:** Um hook de `wp_embed` expõe os Mapas e Storymaps para serem incorporados globalmente (`iframe`) em qualquer plataforma externa, aceitando query strings para manipular dimensões (`height`, `width`).
-
-### 5.2. Geographic Dashboard (Cinematic UI)
-- **Localização:** Acessível via `?page=jeo-dashboard`.
-- **Interface Bottom-Focused:** O painel de controle e logo foram movidos para a base da tela para maximizar a área visível do mapa, com comportamento de minimização circular.
-- **Filtros Dinâmicos:**
-  - **Date Range Slider:** Timeline dinâmica baseada na query SQL `MIN(post_date)`, permitindo filtrar pontos desde o post mais antigo até hoje (default: últimos 3 meses).
-  - **Hierarquia de Busca:** Filtro por termo (título/conteúdo) + Post Type (habilitados no JEO) + Taxonomia dinâmica (carregada via AJAX baseado no Post Type selecionado) + Termo.
-- **Performance:** Utiliza o endpoint `/dashboard-stats` para metadados leves e `/all-pins` com `INNER JOIN` dinâmicos para renderização massiva de pinos.
-
-### 5.3. Ecossistema WordPress
-- **WPML:** Há checagens nativas para carregar blocos traduzidos usando `currentLang` injetado na localização dos scripts JS.
-- **Co-Authors Plus:** A API de respostas de Storymaps (`class-storymap.php`) detecta automaticamente se múltiplos autores estão registrados e os exibe dentro do bloco de resposta REST na chave `jeo_authors`.
-- **REST API Limits Override:** O JEO força um overwrite violento em alguns endpoints REST. Em `map-layer`, o `per_page` máximo é desativado para garantir que mapas com infinitas camadas não escondam dados devido à limitação padrão de paginação do WP. E as tags chegam ao limite arbitrário de `1000` itens.
+### 4.3. Geolocalização em Massa (Bulk Processing)
+- **Restrições de Loop Infinito (Options API):** É estritamente proibido utilizar o filtro `pre_option_jeo-settings` para injetar valores temporários (ex: forçar ativação) em tempo de execução via REST API, sob risco de recursão infinita e Erro 500 no servidor. Se um método (como o *Manual Run*) precisar bypassar configurações de estado, ele deve fazê-lo explicitamente via argumentos do método (ex: `process_batch($force = true)`).
+- **Dupla Confirmação para Resets Globais:** Qualquer ação destrutiva que zere configurações em massa (como `Clear All Posts`) deve exigir duas caixas de diálogo `confirm()` distintas no Frontend antes de submeter requisições à API. O reset em si deve ser agendado em segundo plano (`wp_schedule_event`) e nunca travando a requisição HTTP.
+- **Log Universal:** O `Bulk_Processor` deve manter um array circular (`jeo_bulk_ai_cron_logs`) com os 5 últimos eventos executados, idêntico à arquitetura do `RAG_Worker`, sinalizando visualmente na UI o status das operações manuais ou de Cron.
 
 ---
 
-## 6. Mandatos de Estabilidade (O que NÃO fazer)
+## 5. Interface Administrativa (Configurações)
 
-1. **NÃO baixe a versão do PHP:** O plugin exige **PHP 8.2**.
-2. **NÃO altere o Schema do `_related_point` sem atualizar o JS e o `Geocode_Handler`.** Lembre-se que você pode quebrar os sufixos de indexação (`_p` / `_s`).
-3. **NÃO use `file_put_contents` para logs de custos:** Use a classe `AI_Logger`.
-4. **NÃO publique a pasta `vendor` no Git.**
-5. **NÃO permita que a IA defina o formato de saída:** Sempre injete o contrato JSON agressivo (`enforced_schema`).
-6. **NÃO injete prompts via `$this->instructions()` no Neuron AI:** Na classe base, esse método é um getter interno. Utilize o **setter** correto: `$this->setInstructions($prompt);`.
-7. **NÃO remova a flag `[SKIP_ENFORCED_SCHEMA]` de ferramentas internas:** Ferramentas que geram texto ao invés de coordenadas (como o Meta-Prompt Generator) não funcionarão se presas na prisão constitucional de JSON do JEO.
-8. **NÃO acesse Vector Stores no painel web:** A vetorização massiva esgota `max_execution_time`. SEMPRE adicione novos documentos (Ingestion) ao RAG através da CLI (`wp jeo ai vectorize --post_type=X`). O dashboard é apenas para testes com posts aleatórios (amostragem) e buscas.
-9. **NÃO reverta as anulações da REST API:** Nunca adicione os limites de `per_page` nos params de colletion das camadas (`map-layer`), senão o React quebrará ao renderizar camadas ocultas por paginação.
-10. **NÃO reintroduza o suporte ao Google Maps:** O motor de renderização e geocodificação do Google foi removido na v3.6.4 em favor do MapLibreGL/MapboxGL para garantir soberania de dados e performance vetorial.
+### 5.1. Abas Nativas (Navegação Estável)
+- **Painéis Multi-Abas:** Todas as páginas de configuração do JEO devem utilizar **links reais** (`?page=...&tab=...`) para alternar conteúdos. É estritamente **proibido** utilizar jQuery/CSS para mostrar ou esconder blocos como forma de navegação entre abas. A renderização do PHP deve entregar apenas o conteúdo da `current_tab`.
+- **Skeleton Loader:** Ao recarregar abas, a UI deve iniciar com um `Skeleton Loader` css/html (padrão `jeo-skeleton`) que é ocultado via Javascript quando o DOM e as dependências nativas terminam de carregar.
 
----
+### 5.2. Internacionalização Rigorosa (i18n)
+- **Javascript (Textos Dinâmicos):** Nenhuma string em inglês deve ser "hardcoded" em arquivos `.js` (isso quebra os arquivos `.po/.mo`). Todas as mensagens de interface, alertas, botões ou `console.log` expostos devem vir injetados do PHP via `wp_localize_script` sob a matriz `jeo_settings.i18n`. Use o formato `alert( i18n.error_fetching || 'Fallback' )`.
 
-## 7. Fluxos de Trabalho (DevOps)
+### 5.3. Tratamento de Modais HTML5
+- Modais administrativos devem utilizar a tag nativa `<dialog class="jeo-ai-modal">`.
+- **CSS Estrito para Modais:** Não utilize `display: flex` como padrão na classe global do modal para evitar sobrescrever a inatividade padrão do HTML5 (ele só deve ser flexível quando `[open]`).
+- **Dimensões e Rolagem:** Modais de pré-visualização (como Dicionários RAG) devem limitar-se à tela sem expandir para todo o monitor, utilizando `max-width`, `max-height: 85vh` e uma área interna restrita com `overflow-y: auto`.
 
-### 7.1. Ambiente de Desenvolvimento (`setup.sh`)
-- Utilize `./setup.sh` para subir o ambiente em **http://localhost:8072**.
-- Credenciais: `admin` / `admin`.
-- **Limites Generosos (Docker):** O ambiente local está pré-configurado para suportar cargas pesadas típicas de geojornalismo e requisições longas de IA:
-  - **PHP/Apache:** `memory_limit=2048M`, `upload_max_filesize=1024M`, `max_execution_time=600s`.
-  - **MariaDB:** `max_allowed_packet=256M` (evita falhas ao importar bancos ou grandes camadas GeoJSON).
+### 5.4. AI Debug Console
+- Terminal flutuante para auditoria técnica de Requests/Responses em tempo real presente na página do **JEO AI**.
 
-### 7.2. Build de Release (`build.sh`)
-- Sempre gere o pacote oficial via `./build.sh`. O script injeta o `vendor` otimizado e limpa arquivos de desenvolvimento. Garantindo que o diretório `vendor` seja incluído corretamente na raiz do plugin.
+### 5.5. Prevenção de Deadlocks (UX Blocks)
+- **Telas Restritas:** Painéis de erro globais (`.jeo-rag-blocked-overlay`) jamais devem sobrepor e bloquear elementos de formulário (`<select>`, `<input>`) necessários para que o usuário corrija o próprio erro listado. O bloqueio só deve restringir botões de ação e relatórios (como "Vectorize Now" ou barras de progresso).
+- **Progress Bars Universais:** Medidores percentuais de processamento devem consultar todos os "Tipos de Post (CPT)" habilitados no plugin (e não limitar a busca à entidade `post`), sob risco de apresentar valores falsos (como 0% ou ultrapassar 100%).
+- **Ambientes de Desenvolvimento Locais (Docker Loopback):** Entenda que a fila nativa do WordPress (WP-Cron) não roda assincronamente por padrão em ambientes Docker (Localhost) sem requisições HTTP constantes para acionar o laço. Não submeta tickets de "Erro de Cron" se a rede loopback `WP_CRON_URL` falhar em `curl error 7`. O CLI em background `wp jeo ai vectorize` deve ser promovido como método primário de processamento denso em documentação.
 
 ---
-*Este guia deve ser atualizado sempre que uma mudança estrutural for implementada.*
+
+## 6. Fluxos de DevOps
+
+### 6.1. Build de Release (`build.sh`)
+- Injeta a pasta `vendor` na raiz e limpa arquivos de desenvolvimento.
+
+### 6.2. Versionamento
+- Siga rigorosamente o SemVer. Versão atual: **3.6.5**.
+
+---
+*Este guia é a defesa contra o caos técnico. Respeite os mandatos ou o sistema falhará.*

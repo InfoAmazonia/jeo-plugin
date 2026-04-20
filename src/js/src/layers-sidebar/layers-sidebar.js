@@ -15,7 +15,7 @@ import './layers-sidebar.scss';
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lng,
+	center_lng: jeo_settings.map_defaults.lng,
 	min_zoom: 0,
 	max_zoom: 20,
 };
@@ -31,7 +31,7 @@ const LayersSidebar = ( {
 } ) => {
 	const {
 		center_lat: centerLat,
-		center_lon: centerLon,
+		center_lng: centerLon,
 		initial_zoom: initialZoom,
 	} = { ...mapDefaults, ...postMeta };
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
@@ -174,7 +174,7 @@ const LayersSidebar = ( {
 					onMove={ ( { viewState } ) => {
 						setPostMeta( {
 							center_lat: viewState.latitude,
-							center_lon: viewState.longitude,
+							center_lng: viewState.longitude,
 						} );
 					} }
 					onZoom={ ( { viewState } ) => {

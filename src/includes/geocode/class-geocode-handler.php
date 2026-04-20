@@ -16,6 +16,9 @@ class Geocode_Handler {
 		'_geocode_region_level_1',
 		'_geocode_country_code',
 		'_geocode_country',
+		'_geocode_address',
+		'_geocode_address_number',
+		'_geocode_postcode',
 	);
 
 	protected function init() {
@@ -42,15 +45,10 @@ class Geocode_Handler {
 	}
 
 	public function ajax_reverse_geocode() {
-
 		$geocoder = $this->get_active_geocoder();
-
 		if ( $geocoder ) {
-			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
-		} else {
-			echo wp_json_encode( array() );
+			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lng'] ) ) );
 		}
-
 		die;
 	}
 
@@ -150,6 +148,15 @@ class Geocode_Handler {
 									'_geocode_country' => array(
 										'type' => 'string',
 									),
+									'_geocode_address' => array(
+										'type' => 'string',
+									),
+									'_geocode_address_number' => array(
+										'type' => 'string',
+									),
+									'_geocode_postcode' => array(
+										'type' => 'string',
+									),
 									'_geocode_full_address' => array(
 										'type' => 'string',
 									),
@@ -195,7 +202,7 @@ class Geocode_Handler {
 
 				register_post_meta(
 					$type,
-					'_geocode_lon_' . $relevance,
+					'_geocode_lng_' . $relevance,
 					array(
 						'show_in_rest'  => false,
 						'single'        => false,
@@ -388,19 +395,19 @@ class Geocode_Handler {
 	public function sanitize_points( $value ) {
 
 		if ( isset( $value['_geocode_lat'] ) ) {
-			$value['_geocode_lat'] = str_replace( ',', '.', $value['_geocode_lat'] );
+			$value['_geocode_lat'] = (float) str_replace( ',', '.', $value['_geocode_lat'] );
 		}
 
 		if ( isset( $value['_geocode_lon'] ) ) {
-			$value['_geocode_lon'] = str_replace( ',', '.', $value['_geocode_lon'] );
+			$value['_geocode_lon'] = (float) str_replace( ',', '.', $value['_geocode_lon'] );
 		}
 
 		if ( isset( $value->_geocode_lat ) ) {
-			$value->_geocode_lat = str_replace( ',', '.', $value->_geocode_lat );
+			$value->_geocode_lat = (float) str_replace( ',', '.', $value->_geocode_lat );
 		}
 
 		if ( isset( $value->_geocode_lon ) ) {
-			$value->_geocode_lon = str_replace( ',', '.', $value->_geocode_lon );
+			$value->_geocode_lon = (float) str_replace( ',', '.', $value->_geocode_lon );
 		}
 
 		return $value;
@@ -461,7 +468,9 @@ class Geocode_Handler {
 
 				foreach ( $all_points as $point ) {
 
-					$suffix = 'primary' === $point['relevance'] ? '_p' : '_s';
+					// Fallback to secondary if relevance is missing to prevent PHP Warnings
+					$point_relevance = isset( $point['relevance'] ) ? $point['relevance'] : 'secondary';
+					$suffix = 'primary' === $point_relevance ? '_p' : '_s';
 
 					if ( isset( $point[ $attr ] ) ) {
 						add_post_meta( $object_id, $attr . $suffix, $point[ $attr ] );

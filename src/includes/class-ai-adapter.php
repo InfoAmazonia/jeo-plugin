@@ -57,14 +57,16 @@ abstract class AI_Adapter {
 		$enforced_schema = "
 
 	CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote', 'confidence'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
+	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote', 'confidence'. Do NOT use any other keys.
 	- \"name\": The location name.
 	- \"lat\": Latitude (string or float).
 	- \"lng\": Longitude (string or float).
-	- \"quote\": A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
-	- \"confidence\": An integer between 0 and 100 representing your confidence level in this extraction.
+	- \"quote\": A short relevant snippet (10-15 words) from the provided text.
+	- \"confidence\": An integer 0-100.
 
-	Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro de Manaus, o Teatro...\", \"confidence\": 95}]
+	INSTRUCTION ON PRECISION: Include EVERY possible geographic location found in the text. Even if you have low confidence, include it and set the 'confidence' score accordingly. Do not be overly cautious; our system will handle the final filtering based on your score.
+
+	Example: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
 
 	If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].";
 
@@ -129,12 +131,15 @@ abstract class AI_Adapter {
 			return new \WP_Error( 'empty_response', __( 'Empty response from AI.', 'jeo' ) );
 		}
 
-		// 1. Remove markdown backticks if wrapped
+		// 1. Remove "Thinking" or "Thought" blocks often returned by models like DeepSeek or Gemini 2.5
+		$text = preg_replace( '/<(thought|thinking)>.*?<\/\1>/is', '', $text );
+
+		// 2. Remove markdown backticks if wrapped
 		if ( preg_match( '/```(?:json)?\s*(.*?)\s*```/is', $text, $matches ) ) {
 			$text = $matches[1];
 		}
 
-		// 2. Surgical Extraction: Find the first '[' and its MATCHING ']'
+		// 3. Surgical Extraction: Find the first '[' and its MATCHING ']'
 		// This prevents capturing extra data that LLMs often append after the array (like "topics", "keywords", etc.)
 		$start_pos = strpos( $text, '[' );
 		if ( $start_pos !== false ) {

@@ -17,12 +17,23 @@ class JeoGeocodePosts extends Component {
 			.select( 'core/editor' )
 			.getEditedPostAttribute( 'meta' );
 
+		const rawPoints = metadata._related_point || [];
+		const sanitizedPoints = rawPoints.map( p => {
+			const lat = parseFloat( String( p._geocode_lat ).replace( ',', '.' ) );
+			const lon = parseFloat( String( p._geocode_lon || '' ).replace( ',', '.' ) );
+			return {
+				...p,
+				_geocode_lat: isNaN( lat ) ? 0 : lat,
+				_geocode_lon: isNaN( lon ) ? 0 : lon
+			};
+		} );
+
 		this.state = {
 			pointsCheckpoint: [],
 			formMode: 'view',
 			searchValue: '',
 			zoom: 1,
-			points: metadata._related_point,
+			points: sanitizedPoints,
 			currentMarkerIndex: 0,
 			loadStatus: 'pending',
 			magneticMarkers: true,
@@ -167,7 +178,7 @@ class JeoGeocodePosts extends Component {
 	fetchReverseGeocode( lat, lng ) {
 		return window
 			.fetch(
-				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lng
+				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lng=' + lng
 			)
 			.then( ( response ) => {
 				return response.json();
@@ -186,11 +197,7 @@ class JeoGeocodePosts extends Component {
 		);
 	}
 
-	onClickDelete( e ) {
-		e.preventDefault();
-		e.stopPropagation();
-
-		const index = parseInt( e.target.attributes.marker_index.value );
+	onClickDelete( index ) {
 		const { points } = this.state;
 		this.setState(
 			{
@@ -202,18 +209,14 @@ class JeoGeocodePosts extends Component {
 		);
 	}
 
-	onClickEdit( e ) {
-		e.preventDefault();
-		e.stopPropagation();
-
+	onClickEdit( index ) {
 		const { points } = this.state;
-		const index = parseInt( e.target.attributes.marker_index.value );
 		const point = points[ index ];
 		this.setState(
 			{
 				pointsCheckpoint: points,
 				currentMarkerIndex: index,
-				searchValue: point._geocode_full_address,
+				searchValue: point._geocode_full_address || '',
 				formMode: 'edit',
 				loadStatus: 'resolved',
 			},
@@ -241,15 +244,26 @@ class JeoGeocodePosts extends Component {
 	}
 
 	onLocationFound( location ) {
-		this.flyToLocation( location.lat, location.lon );
-		this.fetchReverseGeocode( location.lat, location.lon ).then( ( result ) => {
-			if ( result.raw.error ) {
+		const lat = parseFloat( location.lat );
+		const lng = parseFloat( location.lng );
+		
+		if ( isNaN( lat ) || isNaN( lng ) ) {
+			console.error( 'JEO: Invalid coordinates received', location );
+			return;
+		}
+
+		this.flyToLocation( lat, lng );
+		this.fetchReverseGeocode( lat, lng ).then( ( result ) => {
+			if ( ! result || ( result.raw && result.raw.error ) ) {
 				return this.resetForm();
 			}
 
+			const rawLat = this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : lat;
+			const rawLon = this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : lng;
+
 			const foundPoint = {
-				_geocode_lat: this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : String( location.lat ),
-				_geocode_lon: this.state.magneticMarkers ? this.getProperty( result, 'lon' ) : String( location.lon ),
+				_geocode_lat: parseFloat( String( rawLat || 0 ).replace( ',', '.' ) ),
+				_geocode_lon: parseFloat( String( rawLon || 0 ).replace( ',', '.' ) ),
 				_geocode_full_address: this.getProperty( result, 'full_address' ),
 				_geocode_country: this.getProperty( result, 'country' ),
 				_geocode_country_code: this.getProperty( result, 'country_code' ),
@@ -282,11 +296,12 @@ class JeoGeocodePosts extends Component {
 		} );
 	}
 
-	flyToLocation( lat, lon ) {
-		this.refMap.current.flyTo( [
-			parseFloat( lat ),
-			parseFloat( lon ),
-		] );
+	flyToLocation( lat, lng ) {
+		const latitude = parseFloat( lat );
+		const longitude = parseFloat( lng );
+		if ( this.refMap.current && ! isNaN( latitude ) && ! isNaN( longitude ) ) {
+			this.refMap.current.flyTo( [ latitude, longitude ] );
+		}
 	}
 
 	mapCreated( mapInstance ) {
@@ -296,12 +311,13 @@ class JeoGeocodePosts extends Component {
 	mapLoaded( e ) {
 		const { points } = this.state;
 
-		const coords = points.map( ( point ) => {
-			return [
-				parseFloat( point._geocode_lat ),
-				parseFloat( point._geocode_lon ),
-			];
-		} );
+		const coords = points
+			.map( ( point ) => {
+				const lat = parseFloat( point._geocode_lat );
+				const lng = parseFloat( point._geocode_lon );
+				return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lat, lng ];
+			} )
+			.filter( c => c !== null );
 
 		const map = e.target;
 
@@ -316,7 +332,7 @@ class JeoGeocodePosts extends Component {
 	onMarkerDragged( e ) {
 		const marker = e.target;
 		const latLng = marker.getLatLng();
-		this.onLocationFound( { lat: latLng.lat, lon: latLng.lng } );
+		this.onLocationFound( { lat: latLng.lat, lng: latLng.lng } );
 		this.setState( { loadStatus: 'pending' } );
 	}
 
@@ -349,8 +365,10 @@ class JeoGeocodePosts extends Component {
 			loadStatus,
 			magneticMarkers,
 		} = this.state;
+		
+		const currentSearchValue = searchValue || '';
 		const isDisabled = ! (
-			loadStatus === 'resolved' && searchValue.replace( /\s/g, '' ).length
+			loadStatus === 'resolved' && currentSearchValue.replace( /\s/g, '' ).length
 		);
 
 		const selectedPoint = points[ currentMarkerIndex ];
@@ -453,16 +471,14 @@ class JeoGeocodePosts extends Component {
 											<Fragment>
 												<Button
 													variant="link"
-													onClick={ this.onClickDelete }
-													marker_index={ i }
+													onClick={ ( e ) => { e.stopPropagation(); this.onClickDelete( i ); } }
 												>
 													{ __( 'Delete', 'jeo' ) }
 												</Button>
 												<span> | </span>
 												<Button
 													variant="link"
-													onClick={ this.onClickEdit }
-													marker_index={ i }
+													onClick={ ( e ) => { e.stopPropagation(); this.onClickEdit( i ); } }
 												>
 													{ __( 'Edit', 'jeo' ) }
 												</Button>
@@ -511,6 +527,10 @@ class JeoGeocodePosts extends Component {
 									} );
 								}
 
+								const lat = parseFloat( point._geocode_lat );
+								const lng = parseFloat( point._geocode_lon );
+								if ( isNaN( lat ) || isNaN( lng ) ) return null;
+
 								return (
 									<Marker
 										key={ i }
@@ -520,10 +540,7 @@ class JeoGeocodePosts extends Component {
 										}
 										onDragend={ this.onMarkerDragged }
 										onClick={ formMode === 'view' ? this.clickMarkerMap : null }
-										position={ [
-											parseFloat( point._geocode_lat ),
-											parseFloat( point._geocode_lon ),
-										] }
+										position={ [ lat, lng ] }
 										id={ i }
 										opacity={ currentMarkerIndex === i ? 1 : 0.6 }
 									/>

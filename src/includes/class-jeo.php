@@ -393,7 +393,7 @@ class Jeo {
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
 		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
 		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
+		$default_lng = \jeo_settings()->get_option( 'map_default_lng' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 5;
 		
 		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';
@@ -417,7 +417,7 @@ class Jeo {
 				'map_runtime'      => $map_runtime,
 				'mapbox_key'       => $mapbox_key,
 				'default_lat'      => $default_lat,
-				'default_lon'      => $default_lon,
+				'default_lng'      => $default_lng,
 				'default_zoom'     => $default_zoom,
 				'rest_url'         => rest_url('jeo/v1'),
 				'nonce'            => wp_create_nonce( 'wp_rest' )
