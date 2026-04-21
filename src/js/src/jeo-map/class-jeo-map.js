@@ -92,10 +92,9 @@ export default class JeoMap {
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
 					map.setZoom( this.getArg( 'initial_zoom' ) );
 					const centerLat = parseFloat( this.getArg( 'center_lat' ) );
-					const centerLng = parseFloat( this.getArg( 'center_lng' ) || this.getArg( 'center_lon' ) );
-					
-					if ( ! isNaN( centerLat ) && ! isNaN( centerLng ) ) {
-						map.setCenter( [ centerLng, centerLat ] );
+					const centerLon = parseFloat( this.getArg( 'center_lon' ) );
+					if ( ! isNaN( centerLat ) && ! isNaN( centerLon ) ) {
+						map.setCenter( [ centerLon, centerLat ] );
 					}
 
 					map.addControl(

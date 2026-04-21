@@ -21,16 +21,7 @@ class RAG_Backup {
 	 * Init hooks.
 	 */
 	protected function init() {
-		add_action( 'jeo_ai_run_backup_cron', array( $this, 'do_backup' ) );
-	}
-
-	/**
-	 * Schedule a backup via Cron.
-	 */
-	public function schedule_backup() {
-		if ( ! wp_next_scheduled( 'jeo_ai_run_backup_cron' ) ) {
-			wp_schedule_single_event( time(), 'jeo_ai_run_backup_cron' );
-		}
+		// Synchronous only. No Cron allowed for backups per Mandate 4.2.
 	}
 
 	/**

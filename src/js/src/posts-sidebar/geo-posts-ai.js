@@ -27,7 +27,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 		
 		try {
 			const response = await window.fetch(
-				globalThis.jeo?.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lng=' + lng
+				globalThis.jeo?.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lon
 			);
 			const result = await response.json();
 
@@ -182,7 +182,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 									<div style={ { marginLeft: '32px' } }>
 										<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px', marginBottom: '12px' } }>
 											<p style={ { fontSize: '11px', color: '#757575', margin: 0, fontFamily: 'monospace' } }>
-												{ `${ __( 'LAT:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | ${ __( 'LNG:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lon).toFixed(4) }` }
+												{ `${ __( 'LAT:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | ${ __( 'LON:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lon).toFixed(4) }` }
 											</p>
 											
 											<div style={ { display: 'flex', alignItems: 'center', gap: '20px' } }>

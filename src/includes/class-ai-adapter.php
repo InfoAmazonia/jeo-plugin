@@ -57,16 +57,16 @@ abstract class AI_Adapter {
 		$enforced_schema = "
 
 	CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote', 'confidence'. Do NOT use any other keys.
-	- \"name\": The location name.
-	- \"lat\": Latitude (string or float).
-	- \"lng\": Longitude (string or float).
-	- \"quote\": A short relevant snippet (10-15 words) from the provided text.
-	- \"confidence\": An integer 0-100.
+	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lon', 'quote', 'confidence'. Do NOT use any other keys.
+		- 'name': The location name.
+		- 'lat': Latitude (string or float).
+		- 'lon': Longitude (string or float).
+		- 'quote': A short relevant snippet (10-15 words) from the provided text.
+		- 'confidence': An integer 0-100.
 
-	INSTRUCTION ON PRECISION: Include EVERY possible geographic location found in the text. Even if you have low confidence, include it and set the 'confidence' score accordingly. Do not be overly cautious; our system will handle the final filtering based on your score.
+		INSTRUCTION ON PRECISION: Include EVERY possible geographic location found in the text. Even if you have low confidence, include it and set the 'confidence' score accordingly. Do not be overly cautious; our system will handle the final filtering based on your score.
 
-	Example: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
+		Example: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lon\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
 
 	If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].";
 

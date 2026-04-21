@@ -47,7 +47,7 @@ class Geocode_Handler {
 	public function ajax_reverse_geocode() {
 		$geocoder = $this->get_active_geocoder();
 		if ( $geocoder ) {
-			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lng'] ) ) );
+			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
 		}
 		die;
 	}

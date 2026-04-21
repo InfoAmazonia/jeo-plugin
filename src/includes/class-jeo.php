@@ -257,7 +257,8 @@ class Jeo {
 		$unique_pins = array();
 		$hash_map    = array();
 
-		foreach ( $results as $row ) {			$post_id     = $row->post_id;
+		foreach ( $results as $row ) {
+			$post_id     = $row->post_id;
 			$meta_data   = maybe_unserialize( $row->meta_value );
 			$post_title  = get_the_title( $post_id );
 			$view_url    = get_permalink( $post_id );
@@ -280,10 +281,10 @@ class Jeo {
 				if ( isset( $point['_geocode_lat'] ) && isset( $point['_geocode_lon'] ) ) {
 					
 					$lat = (float) str_replace(',', '.', $point['_geocode_lat']);
-					$lng = (float) str_replace(',', '.', $point['_geocode_lon']);
+					$lon = (float) str_replace(',', '.', $point['_geocode_lon']);
 					
 					// Arredondamento para filtrar duplicatas
-					$hash = round($lat, 5) . '|' . round($lng, 5) . '|' . $post_id;
+					$hash = round($lat, 5) . '|' . round($lon, 5) . '|' . $post_id;
 
 					if ( ! isset( $hash_map[ $hash ] ) ) {
 						$hash_map[ $hash ] = true;
@@ -294,7 +295,7 @@ class Jeo {
 							'edit_url' => $edit_url,
 							'name'     => isset( $point['_geocode_full_address'] ) ? $point['_geocode_full_address'] : '',
 							'lat'      => $lat,
-							'lng'      => $lng,
+							'lon'      => $lon,
 							'quote'    => isset( $point['_ai_quote'] ) ? $point['_ai_quote'] : ''
 						);
 					}
@@ -393,7 +394,7 @@ class Jeo {
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
 		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
 		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lng = \jeo_settings()->get_option( 'map_default_lng' ) ?: -46.633519;
+		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 5;
 		
 		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';
@@ -417,7 +418,7 @@ class Jeo {
 				'map_runtime'      => $map_runtime,
 				'mapbox_key'       => $mapbox_key,
 				'default_lat'      => $default_lat,
-				'default_lng'      => $default_lng,
+				'default_lon'      => $default_lon,
 				'default_zoom'     => $default_zoom,
 				'rest_url'         => rest_url('jeo/v1'),
 				'nonce'            => wp_create_nonce( 'wp_rest' )
@@ -456,7 +457,7 @@ class Jeo {
 				'map_defaults'        => array(
 					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lng'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
+					'lon'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lon' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
 					'enable_fullscreen'   => true,
@@ -761,7 +762,7 @@ class Jeo {
 				'map_defaults' => array(
 					'zoom' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lng'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
+					'lon'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lon' ) ),
 				),
 			)
 		);
@@ -921,5 +922,17 @@ class Jeo {
 				$wp_post_types['storymap']->template_lock = 'all';
 			}
 		}
+	}
+
+	private function should_load_assets() {
+		return ! is_admin();
+	}
+
+	private function should_load_discovery_assets() {
+		return is_singular( 'map' ) || is_post_type_archive( 'map' );
+	}
+
+	private function should_log_storymap_assets() {
+		return is_singular( 'storymap' );
 	}
 }
