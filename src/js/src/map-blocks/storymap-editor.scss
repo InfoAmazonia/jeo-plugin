@@ -1,7 +1,21 @@
+// In Block API v3 the outer .wp-block wrapper (which had position: relative)
+// no longer exists. We need position: relative on the block root so the
+// absolutely-positioned settings panels have a proper containing block.
 .jeo-mapblock.storymap {
+	position: relative;
+	--jeo-storymap-slides-width: 54%;
+	--jeo-storymap-story-width: 26%;
+	--jeo-storymap-panel-gap: 15px;
+
 	.storymap-controls {
+		// Do NOT add position: relative here — it would become the
+		// containing block for the absolutely-positioned children
+		// (settings panels, search input, current-slide box), pulling
+		// them out of their intended position relative to the block root.
+
 		.story-settings, .slides-settings, .story-settings-hide, .slides-settings-hide  {
 			border-radius: 7px;
+			box-sizing: border-box;
 			box-shadow: 1px 3px 4px 0 rgba(0,0,0,.1);
 
 			.heading {
@@ -65,6 +79,7 @@
 
 .jeo-mapblock.storymap {
 	font-family: var(--globalFontFamily), sans-serif;;
+	overflow-anchor: none;
 }
 
 .ck.ck-balloon-panel, .ck.ck-toolbar__items {
@@ -77,18 +92,34 @@
 
 .ck.ck-content.ck-editor__editable.ck-blurred, .ck.ck-content.ck-editor__editable.ck-focused {
 	height: 300px !important;
+	overflow-y: auto;
+	overflow-anchor: none;
+	overscroll-behavior: contain;
+}
+
+.storymap-title-editor {
+	.ck.ck-content.ck-editor__editable.ck-blurred,
+	.ck.ck-content.ck-editor__editable.ck-focused {
+		height: 44px !important;
+		min-height: 44px;
+		max-height: 44px;
+		overflow-y: hidden;
+	}
 }
 
 
 
 .story-settings {
-	max-width: 30%;
+	width: var(--jeo-storymap-story-width);
 	margin: 10px;
 	background-color: #fff;
 	position: absolute;
 	top: 50px;
 	padding: 10px;
-	inset-inline-start: calc(45% + 15px);
+	inset-inline-start: calc(
+		var(--jeo-storymap-slides-width) + var(--jeo-storymap-panel-gap)
+	);
+	z-index: 10;
 
 	.title {
 		label {
@@ -110,14 +141,17 @@
 }
 
 .story-settings-hide {
-	width: 30%;
+	width: var(--jeo-storymap-story-width);
 	margin: 10px;
 	background-color: #fff;
 	position: absolute;
 	bottom: 15%;
 	padding: 10px;
 	display: flex;
-	inset-inline-start: calc(45% + 15px);
+	inset-inline-start: calc(
+		var(--jeo-storymap-slides-width) + var(--jeo-storymap-panel-gap)
+	);
+	z-index: 10;
 
 	// .section-title {
 	// 	margin: 0 0 0 15px;
@@ -138,6 +172,7 @@
     top: 10px;
 	padding: 10px;
 	font-size: 14px;
+	z-index: 10;
 
 	div {
 		margin: auto;
@@ -145,16 +180,31 @@
 	}
 }
 .slides-settings {
-	width: 45%;
+	width: var(--jeo-storymap-slides-width);
 	margin: 10px;
 	padding: 10px;
 	position: absolute;
 	top: 50px;
 	// inset-inline-start: calc(30% + 15px);
 	background-color: #fff;
+	z-index: 10;
 	.slide-panel {
 		border-inline-start: none;
+		flex: 1 1 auto;
+		min-width: 0;
 		width: 100%;
+		position: relative;
+		z-index: 1;
+
+		.components-panel__body {
+			min-width: 0;
+			overflow: hidden;
+		}
+
+		.components-panel__body.is-opened {
+			padding-inline-end: 10px;
+		}
+
 		.layer {
 			padding: 10px;
 			margin: 0 0 5px 0;
@@ -173,11 +223,49 @@
 	.slide {
 		display: flex;
 		flex-direction: row;
-		& > button {
+		min-width: 0;
+		position: relative;
+		border-radius: 6px;
+		overflow: hidden;
+		transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+
+		&::after {
+			content: '';
+			position: absolute;
+			inset: 0;
+			background-color: transparent;
+			opacity: 0;
+			pointer-events: none;
+			z-index: 2;
+		}
+
+		&.was-moved {
+			animation: jeo-storymap-slide-moved 480ms ease;
+
+			&::after {
+				animation: jeo-storymap-slide-overlay 480ms ease;
+			}
+		}
+
+		.slide-order-controls {
 			border: 1px solid #f0f0f0;
 			border-inline-end: none;
 			background: transparent;
-			height: 56px;
+			min-width: 40px;
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			padding: 4px 0;
+			position: relative;
+			z-index: 1;
+
+			.slide-order-button {
+				min-width: 40px;
+				height: 28px;
+				padding: 0;
+				border-radius: 0;
+				justify-content: center;
+			}
 		}
 		h2 {
 			&::before {
@@ -271,17 +359,54 @@
 		height: 330px;
 		overflow-y: scroll;
 		overflow-x: hidden;
+		padding-inline-end: 16px;
+		scrollbar-gutter: stable;
+	}
+}
+
+@keyframes jeo-storymap-slide-moved {
+	0% {
+		box-shadow: 0 0 0 1px rgba( 25, 95, 147, 0.18 );
+		transform: translateY( 0 );
+	}
+
+	35% {
+		box-shadow: 0 8px 24px rgba( 25, 95, 147, 0.16 );
+		transform: translateY( -4px );
+	}
+
+	100% {
+		box-shadow: none;
+		transform: translateY( 0 );
+	}
+}
+
+@keyframes jeo-storymap-slide-overlay {
+	0% {
+		background-color: rgba( 25, 95, 147, 0.12 );
+		opacity: 0.8;
+	}
+
+	35% {
+		background-color: rgba( 25, 95, 147, 0.18 );
+		opacity: 1;
+	}
+
+	100% {
+		background-color: transparent;
+		opacity: 0;
 	}
 }
 .slides-settings-hide {
 	display: flex;
-	width: 45%;
+	width: var(--jeo-storymap-slides-width);
 	// inset-inline-style: calc(30% + 15px);
 	margin: 10px;
 	background-color: #fff;
 	position: absolute;
 	bottom: 15%;
 	padding: 10px;
+	z-index: 10;
 
 	// .section-title {
 	// 	margin: 0 0 0 15px;
@@ -299,6 +424,23 @@
 	position: absolute;
 	top: 0;
 	inset-inline-start: 10px;
+	display: grid;
+	grid-template-columns: minmax( 0, 1fr ) auto;
+	align-items: start;
+	column-gap: 8px;
+	width: min( 360px, calc( 100% - 20px ) );
+	max-width: calc( 100% - 20px );
+	z-index: 10;
+
+	.jeo-geo-autocomplete__field {
+		min-width: 0;
+	}
+
+	> .components-button,
+	> .jeo-geo-autocomplete__button {
+		align-self: start;
+		margin: 4px 0 0;
+	}
 }
 .tooltip {
 	background-color: white;
@@ -325,10 +467,17 @@
 */
 
 .slides-container h2.components-panel__body-title {
-   display: flex;
-   margin-top: 0px;
-   margin-bottom: 0px;
-   padding: 13px 4px;
+	display: flex;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	padding: 13px 4px;
+	overflow: hidden;
+}
+
+.slides-container .components-panel__body-toggle {
+	box-sizing: border-box;
+	inline-size: 100%;
+	overflow: hidden;
 }
 
 

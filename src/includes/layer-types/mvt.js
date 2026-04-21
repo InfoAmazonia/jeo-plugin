@@ -1,5 +1,8 @@
-window.JeoLayerTypes.registerLayerType( 'mvt', {
-	label: 'Mapbox Vector Tiles (MVT)',
+( () => {
+	const { __ } = wp.i18n;
+
+	window.JeoLayerTypes.registerLayerType( 'mvt', {
+	label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ),
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -73,12 +76,12 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 			properties: {
 				url: {
 					type: 'string',
-					title: 'URL',
+					title: __( 'URL', 'jeo' ),
 				},
 				source_layer: {
 					type: 'string',
-					title: 'Source layer',
-					description: 'Layer to use from a vector tile source. ',
+					title: __( 'Source layer', 'jeo' ),
+					description: __( 'Layer to use from a vector tile source.', 'jeo' ),
 				},
 				type: {
 					type: 'string',
@@ -95,8 +98,8 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 					],
 				},
 				style_source_type: {
-					title: 'Style Source Type',
-					description: 'Which data the map should display',
+					title: __( 'Style Source Type', 'jeo' ),
+					description: __( 'Which data the map should display', 'jeo' ),
 					type: 'string',
 					default: 'vector',
 					disabled: true,
@@ -104,4 +107,5 @@ window.JeoLayerTypes.registerLayerType( 'mvt', {
 			},
 		};
 	},
-} );
+	} );
+} )();

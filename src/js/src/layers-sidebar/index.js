@@ -3,32 +3,25 @@ import domReady from '@wordpress/dom-ready';
 import { registerPlugin } from '@wordpress/plugins';
 
 import LayersSidebar from './layers-sidebar';
-import { waitUntil } from '../shared/wait';
+import useDocumentSidebarDefault from '../shared/use-document-sidebar-default';
 
-domReady(() => {
-	waitUntil(
-		() => document.querySelector( '.editor-post-title' ),
-		( postTitleElement ) => {
-			registerPlugin( 'jeo-layers-sidebar', {
-				icon: null,
-				render: () => {
-					const currentPostType = useSelect( ( select ) => {
-						return select( 'core/editor' ).getCurrentPostType()
-					}, [] );
+function LayersSidebarPlugin() {
+	const currentPostType = useSelect( ( select ) => {
+		return select( 'core/editor' ).getCurrentPostType();
+	}, [] );
 
-					if (currentPostType === "map-layer") {
-						const preview = document.createElement('div');
-						preview.setAttribute('id', 'layer-preview');
-						postTitleElement.parentNode.appendChild(preview);
-					}
+	useDocumentSidebarDefault( currentPostType === 'map-layer' );
 
-					return (
-						<AsyncModeProvider value={ true }>
-							{ currentPostType === "map-layer"? <LayersSidebar /> : null };
-						</AsyncModeProvider>
-					);
-				},
-			} );
-		}
+	return (
+		<AsyncModeProvider value={ true }>
+			{ currentPostType === 'map-layer' ? <LayersSidebar /> : null }
+		</AsyncModeProvider>
 	);
-});
+}
+
+domReady( () => {
+	registerPlugin( 'jeo-layers-sidebar', {
+		icon: null,
+		render: LayersSidebarPlugin,
+	} );
+} );

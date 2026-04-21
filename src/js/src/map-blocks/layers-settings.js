@@ -1,13 +1,14 @@
-import { Button, Card, CardBody, SelectControl, Spinner, TextControl } from '@wordpress/components';
+import { Button, Card, CardBody, Spinner } from '@wordpress/components';
 import { Fragment, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
+import { SelectControl, TextControl } from '../shared/wp-form-controls';
 
-import { arrayMove } from 'react-movable';
-import { DragDropContext, Droppable } from "react-beautiful-dnd";
+import { List, arrayMove } from 'react-movable';
 
 import LayerSettings from './layer-settings';
+import { mergeLayerTypeOptions } from './layer-type-options';
 import { loadLayer } from './utils';
+import { usePaginatedRecords } from '../shared/rest-records';
 
 import './layers-settings.css';
 
@@ -20,30 +21,46 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
 	let widths = [];
 
-	const [ layerTypeFilter, setLayerTypeFilter ] = useState( null );
-	const [ layerNameFilter, setLayerNameFilter ] = useState('');
-
-	const searchedLayers = useSelect((select) => {
-		if ( ! layerNameFilter && ! layerTypeFilter ) {
-			return [];
-		}
-
-		return select( 'core' ).getEntityRecords( 'postType', 'map-layer', {
-			per_page: -1,
+	const [ layerTypeFilter, setLayerTypeFilter ] = useState( '' );
+	const [ layerNameFilter, setLayerNameFilter ] = useState( '' );
+	const searchEnabled =
+		layerNameFilter.trim().length > 0 || layerTypeFilter.length > 0;
+	const {
+		records: searchedLayers,
+		isLoading: searchingLayers,
+		hasMore: hasMoreSearchedLayers,
+		loadMore: loadMoreSearchedLayers,
+	} = usePaginatedRecords( {
+		path: '/wp/v2/map-layer',
+		enabled: searchEnabled,
+		pageSize: 20,
+		query: {
+			context: 'edit',
 			order: 'asc',
 			orderby: 'title',
-			layer_name: layerNameFilter,
-			layer_type: layerTypeFilter ?? undefined,
-		} ) ?? [];
-	}, [layerNameFilter, layerTypeFilter]);
+			layer_name: layerNameFilter.trim() || undefined,
+			layer_type: layerTypeFilter || undefined,
+		},
+	} );
 
+	const fallbackLayerTypeOptions = [
+		{ label: __( 'Mapbox Style', 'jeo' ), value: 'mapbox' },
+		{ label: __( 'Vector Mapbox Tiled Source', 'jeo' ), value: 'mapbox-tileset-vector' },
+		{ label: __( 'Raster Mapbox Tiled Source', 'jeo' ), value: 'mapbox-tileset-raster' },
+		{ label: __( 'Raster Tiled Source', 'jeo' ), value: 'tilelayer' },
+		{ label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ), value: 'mvt' },
+	];
+	const registeredLayerTypeOptions =
+		window.JeoLayerTypes?.getLayerTypes?.().map( ( slug ) => ( {
+			label: window.JeoLayerTypes.getLayerType( slug )?.label || slug,
+			value: slug,
+		} ) ) ?? [];
 	const layerTypeOptions = [
-		{ label: 'Select a layer type', value: '' },
-		{ label: 'Mapbox', value: 'mapbox' },
-		{ label: 'Mapbox-tileset-vector', value: 'mapbox-tileset-vector' },
-		{ label: 'Mapbox-tileset-raster', value: 'mapbox-tileset-raster' },
-		{ label: 'Tilelayer', value: 'tilelayer' },
-		{ label: 'MVT', value: 'mvt' },
+		{ label: __( 'Select a layer type', 'jeo' ), value: '' },
+		...mergeLayerTypeOptions(
+			fallbackLayerTypeOptions,
+			registeredLayerTypeOptions
+		),
 	];
 
 	useEffect( () => {
@@ -62,32 +79,27 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		} );
 	};
 
-	const onDragEnd = (result) => {
-		if (!result.destination) {
+	const onLayerOrderChange = ( { oldIndex, newIndex } ) => {
+		if ( oldIndex === newIndex ) {
 			return;
 		}
 
-		if (result.destination.index === result.source.index) {
-			return;
-		}
-
-
-		const resultLayers = arrayMove( attributes.layers, result.source.index, result.destination.index );
+		const resultLayers = arrayMove( attributes.layers, oldIndex, newIndex );
 
 		// Set base layer always as fixed
-		if(resultLayers.length) {
-			resultLayers[0].use = "fixed";
+		if ( resultLayers.length ) {
+			resultLayers[0].use = 'fixed';
 		}
 
 		// Reset fixed default param
-		resultLayers.forEach(setting => {
-			if(setting.use === "fixed") {
+		resultLayers.forEach( ( setting ) => {
+			if ( setting.use === 'fixed' ) {
 				setting.default = true;
 			}
-		})
+		} );
 
 		setLayers( resultLayers );
-	}
+	};
 
 	return (
 		<Fragment>
@@ -139,9 +151,15 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 					</Button>
 				</div>
 			</div>
-			<div name="map-layers" className="jeo-layers-panel">
-				<ul className="jeo-layers-list">
-					{ searchedLayers.map( ( layer, i ) => {
+				<div name="map-layers" className="jeo-layers-panel">
+					<ul className="jeo-layers-list">
+						{ ! searchEnabled && (
+							<p>{ __( 'Search layers by name or type to browse the library.', 'jeo' ) }</p>
+						) }
+						{ searchEnabled && searchingLayers && ! searchedLayers.length && (
+							<Spinner />
+						) }
+						{ searchedLayers.map( ( layer, i ) => {
 						let inUse = false;
 						attributes.layers.map( ( l ) => {
 							if ( layer.id === l.id ) {
@@ -209,9 +227,20 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 								</CardBody>
 							</Card>
 						);
-					} ) }
-				</ul>
-			</div>
+						} ) }
+					</ul>
+					{ searchEnabled && ! searchingLayers && ! searchedLayers.length && (
+						<p>{ __( 'No layers matched the current search filters.', 'jeo' ) }</p>
+					) }
+					{ hasMoreSearchedLayers && (
+						<Button
+							variant="secondary"
+							onClick={ loadMoreSearchedLayers }
+						>
+							{ __( 'Load more layers', 'jeo' ) }
+						</Button>
+					) }
+				</div>
 			<h2 className="selected-layers-title" >{ __( 'Selected layers', 'jeo' ) }</h2>
 			{ ! loadingLayers && ! attributes.layers.length && (
 				<p className="jeo-layers-list">
@@ -220,11 +249,22 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 			) }
 
 			{ ! loadingLayers && attributes.layers.length > 0 && (
-				<DragDropContext onDragEnd={ onDragEnd }>
-					<Droppable droppableId="list">
-						{ provided => (
-							<div className="jeo-layers-list" ref={ provided.innerRef } { ...provided.droppableProps }>
-								{ attributes.layers.map((layer, index) => {
+				<List
+					values={ attributes.layers }
+					onChange={ onLayerOrderChange }
+					renderList={ ( { children, props } ) => (
+						<div className="jeo-layers-list" { ...props }>
+							{ children }
+						</div>
+					) }
+					renderItem={ ( {
+						value: layer,
+						props,
+						isDragged,
+						isSelected,
+						isOutOfBounds,
+						index,
+					} ) => {
 									const switchDefault = ( def ) =>
 										setLayers(
 											attributes.layers.map( ( settings ) =>
@@ -352,7 +392,11 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 									}
 
 									return <LayerSettings
+										itemProps={ props }
 										index={ index }
+										isDragged={ isDragged }
+										isSelected={ isSelected }
+										isOutOfBounds={ isOutOfBounds }
 										removeLayer={ removeLayer }
 										settings={ loadedLayer }
 										switchUseStyle={ switchUseStyle }
@@ -364,12 +408,8 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										updateStyleLayers={ updateStyleLayers }
 										key={ index }
 									/>;
-								} ) }
-								{ provided.placeholder }
-							</div>
-						) }
-					</Droppable>
-				</DragDropContext>
+								} }
+				/>
 			) }
 			<Button
 				className="done-button"

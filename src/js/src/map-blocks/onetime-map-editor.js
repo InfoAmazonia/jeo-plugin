@@ -1,25 +1,36 @@
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { Button, PanelBody } from '@wordpress/components';
-import { useEntityRecords } from '@wordpress/core-data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
 import { renderLayer } from './map-preview-layer';
+import { coerceOnetimeMapAttributes } from './onetime-map-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import PostsSelector from '../posts-selector';
+import { useRecordsByIds } from '../shared/rest-records';
 import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
 export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
+	const blockProps = useBlockProps();
 	const [ modal, setModal ] = useState( false );
 	const [ key, setKey ] = useState( 0 );
+	const normalizedAttributes = useMemo( () => {
+		return coerceOnetimeMapAttributes( attributes, {
+			center_lat: mapDefaults.lat,
+			center_lon: mapDefaults.lng,
+			initial_zoom: mapDefaults.zoom,
+			min_zoom: 0,
+			max_zoom: 20,
+		} );
+	}, [ attributes ] );
 
 	useEffect( () => {
-		setKey( key + 1 );
+		setKey( ( currentKey ) => currentKey + 1 );
 	}, [ attributes.align, window.screen.width ] );
 
 	const setRelatedPosts = useCallback(
@@ -33,37 +44,45 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
 
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
-	const currentZoom = attributes[ zoomState ];
+	const currentZoom = normalizedAttributes[ zoomState ];
 
 	const mapRef = useRef( undefined );
 
 	const layerIds = useMemo( () => {
-		return attributes.layers.map( ( layer ) => layer.id );
-	}, [ attributes.layers ] );
+		return normalizedAttributes.layers.map( ( layer ) => layer.id );
+	}, [ normalizedAttributes.layers ] );
+	const layerSettingsKey = useMemo(
+		() => JSON.stringify( normalizedAttributes.layers || [] ),
+		[ normalizedAttributes.layers ]
+	);
 
-	const { records: loadedLayers, isResolving: loadingLayers } = useEntityRecords( 'postType', 'map-layer', {
-		include: layerIds,
-		per_page: -1,
-	}, { enabled: layerIds.length > 0 } );
+	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
+		path: '/jeo/v1/map-layer',
+		ids: layerIds,
+		enabled: layerIds.length > 0,
+		query: { context: 'edit' },
+	} );
 
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
 		if ( map ) {
-			const boundries = map.getBounds();
+			const bounds = map.getBounds();
+			const northEast = bounds.getNorthEast();
+			const southWest = bounds.getSouthWest();
 			setAttributes(
 				{	...attributes,
 					'pan_limits': {
-						east: boundries._ne.lat,
-						north: boundries._ne.lng,
-						south: boundries._sw.lng,
-						west: boundries._sw.lat,
+						east: northEast.lng,
+						north: northEast.lat,
+						south: southWest.lat,
+						west: southWest.lng,
 					}
 				} )
 		}
 	}
 
 	return (
-		<>
+		<div { ...blockProps }>
 			{ modal && (
 				<LayersSettingsModal
 					closeModal={ closeModal }
@@ -76,14 +95,14 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 
 			<InspectorControls>
 				<MapPanel
-					attributes={ attributes }
+					attributes={ normalizedAttributes }
 					setAttributes={ setAttributes }
 					renderPanel={ PanelBody }
 					setZoomState={ setZoomState }
 					setPanLimitsFromMap={ setPanLimitsFromMap }
 				/>
 				<LayersPanel
-					attributes={ attributes }
+					attributes={ normalizedAttributes }
 					loadedLayers={ loadedLayers }
 					loadingLayers={ loadingLayers }
 					openModal={ openModal }
@@ -98,11 +117,11 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 
 			<div className="jeo-preview-area">
 				<Map
-					key={ currentZoom }
+					key={ `${ key }:${ currentZoom }:${ layerSettingsKey }` }
 					ref={ mapRef }
 					style={ { height: '50vh' } }
-					latitude={ attributes.center_lat || mapDefaults.lat }
-					longitude={ attributes.center_lon || mapDefaults.lng }
+					latitude={ normalizedAttributes.center_lat }
+					longitude={ normalizedAttributes.center_lon }
 					zoom={ currentZoom || mapDefaults.zoom }
 					onMove={ ( { viewState } ) => {
 						setAttributes( {
@@ -116,11 +135,16 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 					} }
 				>
 					{ loadedLayers &&
-						attributes.layers.map( ( layer ) => {
-							const layerOptions = loadedLayers.find(
+						normalizedAttributes.layers.map( ( layer ) => {
+							const layerRecord = loadedLayers.find(
 								( { id } ) => id === layer.id
-							).meta;
-							return renderLayer( { layer: layerOptions, instance: layer } );
+							);
+
+							if ( ! layerRecord?.meta ) {
+								return null;
+							}
+
+							return renderLayer( { layer: layerRecord.meta, instance: layer } );
 						} ) }
 				</Map>
 			</div>
@@ -130,6 +154,6 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 					{ __( 'Edit layers settings', 'jeo' ) }
 				</Button>
 			</div>
-		</>
+		</div>
 	);
 };

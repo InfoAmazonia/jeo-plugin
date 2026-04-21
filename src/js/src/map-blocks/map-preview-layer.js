@@ -4,6 +4,11 @@ import { isEqual } from 'lodash-es';
 import { mapboxToken } from '../lib/mapgl-loader';
 import { Layer, Source } from '../lib/mapgl-react';
 
+const MAPBOX_RASTER_ATTRIBUTION =
+	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
+	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
+
 export function renderLayer( { layer, instance } ) {
 	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {
 		return null;
@@ -21,7 +26,13 @@ export function renderLayer( { layer, instance } ) {
 			const styleUrl = `https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`
 
 			return (
-				<Source key={ styleUrl } id={ sourceId } type="raster" tiles={ [ styleUrl ] }>
+				<Source
+					key={ styleUrl }
+					id={ sourceId }
+					type="raster"
+					tiles={ [ styleUrl ] }
+					attribution={ MAPBOX_RASTER_ATTRIBUTION }
+				>
 					<Layer id={ layerId } type="raster" />
 				</Source>
 			);

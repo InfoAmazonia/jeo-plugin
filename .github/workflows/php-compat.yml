@@ -1,0 +1,48 @@
+name: PHP Compatibility
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+jobs:
+  php-compat:
+    name: ${{ matrix.label }}
+    runs-on: ubuntu-latest
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - php: '8.0'
+            label: PHP 8.0 (backward-compat, non-blocking)
+            experimental: true
+          - php: '8.1'
+            label: PHP 8.1 (backward-compat, non-blocking)
+            experimental: true
+          - php: '8.2'
+            label: PHP 8.2
+            experimental: false
+          - php: '8.3'
+            label: PHP 8.3
+            experimental: false
+          - php: '8.4'
+            label: PHP 8.4
+            experimental: false
+          - php: '8.5'
+            label: PHP 8.5 (experimental, non-blocking)
+            experimental: true
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Show PHP version
+        run: php -v
+
+      - name: Run PHP compatibility review
+        run: php scripts/check-php-compat.php

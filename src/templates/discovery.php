@@ -1,4 +1,14 @@
 <?php
+/**
+ * Discovery page template.
+ *
+ * @package Jeo
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 get_header(); ?>
 <main>
 	<div id="discovery">
@@ -9,7 +19,7 @@ get_header(); ?>
 			<?php esc_html_e( 'Sorry!', 'jeo' ); ?>
 		</h1>
 		<h4>
-			<?php esc_html_e( "This page can't be viewed on mobiles.", 'jeo' ); ?>
+			<?php esc_html_e( "This page can't be viewed on mobile devices.", 'jeo' ); ?>
 		</h4>
 
 		<a href="/">

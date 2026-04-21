@@ -3,6 +3,9 @@ import { useMemo } from '@wordpress/element';
 import classNames from 'classnames';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { getDateFnsLocale } from '../shared/locale';
+
+import { toPickerDate } from './date-range';
 
 import './interval-selector.css';
 
@@ -14,12 +17,16 @@ export function IntervalSelector( {
 	onStartChange,
 	onEndChange,
 } ) {
+	const datePickerLocale = useMemo( () => {
+		return getDateFnsLocale();
+	}, [] );
+
 	const startDate = useMemo( () => {
-		return _startDate ? new Date( _startDate ) : null;
+		return toPickerDate( _startDate );
 	}, [ _startDate ] );
 
 	const endDate = useMemo( () => {
-		return _endDate ? new Date( _endDate ) : null;
+		return toPickerDate( _endDate );
 	}, [ _endDate ] );
 	return (
 		<div className="jeo-interval-selector">
@@ -28,6 +35,7 @@ export function IntervalSelector( {
 					{ startLabel }
 					<DatePicker
 						dateFormat="yyyy-MM-dd"
+						locale={ datePickerLocale }
 						selected={ startDate }
 						selectsStart
 						startDate={ startDate }
@@ -42,6 +50,7 @@ export function IntervalSelector( {
 					{ endLabel }
 					<DatePicker
 						dateFormat="yyyy-MM-dd"
+						locale={ datePickerLocale }
 						selected={ endDate }
 						selectsEnd
 						startDate={ startDate }

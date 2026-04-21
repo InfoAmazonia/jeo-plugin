@@ -1,59 +1,90 @@
 {
 	"name": "jeo",
-	"version": "3.6.5",	"description": "Jeo plugin",
+	"version": "3.0.0-rc.3",
+	"description": "Interactive maps for the WordPress block editor",
 	"main": "index.js",
 	"directories": {
 		"test": "tests"
 	},
+	"engines": {
+		"node": "^24.0.0",
+		"npm": ">=10"
+	},
 	"scripts": {
+		"check:env": "node scripts/check-node-version.mjs",
+		"preinstall": "node scripts/check-node-version.mjs",
+		"sync:version": "node scripts/sync-plugin-version.mjs",
+		"check:wporg-compliance": "node scripts/check-wporg-compliance.mjs",
 		"start": "wp-scripts start",
-		"build": "wp-scripts build"
+		"build:assets": "wp-scripts build && node scripts/patch-build-compliance.mjs",
+		"i18n:json": "node scripts/make-i18n-json.mjs",
+		"build": "npm run build:assets && npm run i18n:json",
+		"build:release": "npm run build",
+		"build:report": "node scripts/report-bundle-sizes.mjs",
+		"test:unit": "wp-scripts test-unit-js",
+		"audit:npm": "npm audit --package-lock-only",
+		"audit:composer": "composer audit --locked",
+		"deps:report": "node scripts/dependency-review.mjs --write"
 	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/InfoAmazonia/jeo-plugin.git"
 	},
-	"author": "",
-	"license": "ISC",
+	"author": {
+		"name": "InfoAmazonia",
+		"email": "contact@infoamazonia.org",
+		"url": "https://www.jeowp.org/"
+	},
+	"license": "GPL-3.0-only",
 	"bugs": {
 		"url": "https://github.com/InfoAmazonia/jeo-plugin/issues"
 	},
-	"homepage": "https://github.com/InfoAmazonia/jeo-plugin#readme",
+	"homepage": "https://www.jeowp.org/",
+	"overrides": {
+		"react-autosize-textarea": "file:npm-overrides/react-autosize-textarea",
+		"js-yaml": "^4.1.1",
+		"webpack-dev-server": "^5.2.3",
+		"@typescript-eslint/typescript-estree": {
+			"minimatch": "^9.0.9"
+		},
+		"markdownlint-cli": {
+			"minimatch": "^3.1.5"
+		},
+		"copy-webpack-plugin": {
+			"serialize-javascript": "^7.0.4"
+		}
+	},
 	"dependencies": {
-		"@ckeditor/ckeditor5-react": "^5.1.0",
+		"@ckeditor/ckeditor5-react": "^11.0.1",
 		"@nazka/map-gl-js-spiderfy": "^1.2.10",
-		"@wordpress/edit-post": "^8.16.0",
-		"@wordpress/editor": "^14.18.0",
-		"@wordpress/plugins": "^7.16.0",
-		"bootstrap-daterangepicker": "^3.1.0",
-		"ckeditor5-build-full": "^25.0.0",
+		"@rjsf/core": "^6.4.1",
+		"@rjsf/validator-ajv8": "^6.4.1",
+		"@wordpress/edit-post": "^8.41.0",
+		"@wordpress/editor": "^14.41.0",
+		"@wordpress/plugins": "^7.41.0",
+		"ckeditor5": "^47.6.1",
 		"classnames": "^2.5.1",
-		"eta": "^3.5.0",
+		"eta": "^4.5.1",
 		"leaflet": "^1.9.4",
-		"lodash-es": "^4.17.21",
+		"lodash-es": "^4.17.23",
 		"map-gl-utils": "^0.50.4",
-		"mapbox-gl": "^3.9.4",
-		"maplibre-gl": "^5.6.2",
+		"maplibre-gl": "^5.20.1",
 		"maplibregl-mapbox-request-transformer": "^0.0.3",
-		"react-autosuggest": "^10.1.0",
-		"react-beautiful-dnd": "^13.1.1",
-		"react-bootstrap-daterangepicker": "^8.0.0",
-		"react-datepicker": "^7.6.0",
-		"react-jsonschema-form": "2.0.0-alpha.1",
+		"react-datepicker": "^9.1.0",
 		"react-leaflet": "^4.2.1",
-		"react-map-gl": "^8.0.4",
+		"react-map-gl": "^8.1.0",
 		"react-movable": "^3.4.0",
 		"scrollama": "^3.2.0",
-		"use-debounce": "^10.0.4"
+		"use-debounce": "^10.1.0"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^30.21.0",
-		"ajv": "^8.17.1",
-		"css-loader": "^7.1.2",
-		"postcss": "^8.5.1",
-		"sass": "^1.83.4",
-		"sass-loader": "^16.0.4",
+		"@wordpress/scripts": "^31.6.0",
+		"ajv": "^8.18.0",
+		"css-loader": "^7.1.4",
+		"postcss": "^8.5.8",
+		"sass": "^1.98.0",
+		"sass-loader": "^16.0.7",
 		"style-loader": "^4.0.0",
-		"webpack": "^5.101.1"
+		"webpack": "^5.105.4"
 	}
 }

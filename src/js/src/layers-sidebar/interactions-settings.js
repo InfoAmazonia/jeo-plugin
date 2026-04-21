@@ -1,4 +1,4 @@
-import { Modal, Panel, SelectControl, Button } from '@wordpress/components';
+import { Modal, Panel, Button } from '@wordpress/components';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -16,8 +16,6 @@ export default function InteractionsSettings( {
 	onCloseModal,
 } ) {
 	const [ localInteractions, setLocalInteractions ] = useState( interactions );
-	// console.log(styleDefinition.layers.filter(item => item.source));
-	// layers = styleDefinition.layers;
 
 	const interactiveLayers = useMemo( () => {
 		if ( ! sources ) {
@@ -27,8 +25,6 @@ export default function InteractionsSettings( {
 		let layersWithSource = styleDefinition.layers.filter( ( layer ) => {
 			return layer.source && layer['source-layer'];
 		} );
-
-		// console.log("1", layersWithSource);
 
 		layersWithSource = layersWithSource.map( ( layer ) => {
 			const source = sources.find(( sourceLayer ) => sourceLayer.id === layer[ 'source-layer' ]);
@@ -44,9 +40,6 @@ export default function InteractionsSettings( {
 			return layer;
 		} );
 
-		//console.log(layersWithSource);
-
-
 		return layersWithSource;
 	}, [ sources, styleDefinition ] );
 
@@ -60,7 +53,6 @@ export default function InteractionsSettings( {
 
 	const onUpdate = useCallback(
 		( interactionId, newInteraction ) => {
-			//console.log( interactionId, newInteraction );
 			setLocalInteractions(
 				localInteractions.map( ( interaction ) => {
 					return interaction.id === interactionId

@@ -243,6 +243,69 @@ ul.jeo-layers-list .components-card {
 	margin-inline-end: 1em;
 }
 
+/* One-time map blocks need the same explicit floated width in the editor as
+   regular maps, otherwise the wrapper can collapse to zero width. */
+.wp-block-jeo-onetime-map.alignleft,
+.wp-block-jeo-onetime-map.alignright {
+	--jeo-aligned-map-base-width: var( --wp--style--global--content-size, 645px );
+	--jeo-aligned-map-expanded-width: calc( var( --jeo-aligned-map-base-width ) * 1.6 );
+	box-sizing: border-box;
+	display: table;
+	max-width: none;
+	width: auto;
+}
+
+.wp-block-jeo-onetime-map.alignleft {
+	margin-right: 1em;
+	margin-left: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-onetime-map.alignright {
+	margin-left: 1em;
+	margin-right: 0;
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+}
+
+.wp-block-jeo-onetime-map.alignleft .jeo-preview-area,
+.wp-block-jeo-onetime-map.alignright .jeo-preview-area,
+.wp-block-jeo-onetime-map.alignleft .mapboxgl-map,
+.wp-block-jeo-onetime-map.alignright .mapboxgl-map,
+.wp-block-jeo-onetime-map.alignleft .maplibregl-map,
+.wp-block-jeo-onetime-map.alignright .maplibregl-map {
+	max-width: none;
+	width: 100%;
+}
+
+.wp-block-jeo-onetime-map.alignleft .jeo-preview-area,
+.wp-block-jeo-onetime-map.alignright .jeo-preview-area {
+	min-width: min( var( --jeo-aligned-map-base-width ), calc( 100vw - 2rem ) );
+	width: min( var( --jeo-aligned-map-expanded-width ), calc( 100vw - 2rem ) );
+}
+
+@media (max-width: 782px) {
+	.wp-block-jeo-onetime-map.alignleft,
+	.wp-block-jeo-onetime-map.alignright {
+		display: block;
+		float: none;
+		margin-left: 0;
+		margin-right: 0;
+		width: 100%;
+	}
+
+	.wp-block-jeo-onetime-map.alignleft .jeo-preview-area,
+	.wp-block-jeo-onetime-map.alignright .jeo-preview-area,
+	.wp-block-jeo-onetime-map.alignleft .mapboxgl-map,
+	.wp-block-jeo-onetime-map.alignright .mapboxgl-map,
+	.wp-block-jeo-onetime-map.alignleft .maplibregl-map,
+	.wp-block-jeo-onetime-map.alignright .maplibregl-map {
+		min-width: 0;
+		width: 100%;
+	}
+}
+
 .jeo-layer-settings fieldset legend {
 	display: none;
 }

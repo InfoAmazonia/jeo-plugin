@@ -1,5 +1,5 @@
 import { Component, Fragment } from '@wordpress/element';
-import { TextControl, RangeControl, Button, Dropdown, ColorPicker } from '@wordpress/components';
+import { Button, Dropdown, ColorPicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import '../editors/circle.css';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
@@ -49,7 +49,7 @@ class CircleEditor extends Component {
 			const circles = this.state.legendObject.attributes.legend_type_options.circles;
 
 			circles.push(
-				{ label: 'Default Label', radius: 50, id: crypto.randomUUID() },
+				{ label: __( 'Default label', 'jeo' ), radius: 50, id: generateUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.circles = circles;
@@ -101,8 +101,6 @@ class CircleEditor extends Component {
 
 				return item;
 			} );
-
-			//console.log(legendObject);
 
 			this.props.hasChanged( legendObject );
 

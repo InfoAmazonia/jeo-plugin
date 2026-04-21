@@ -1,16 +1,18 @@
+import { useBlockProps } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { Fragment, useId } from '@wordpress/element';
+import { useId } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 import JeoAutosuggest from './jeo-autosuggest';
 
 function EmbeddedStorymapEditor ({ attributes, loadedStory, setAttributes }) {
+	const blockProps = useBlockProps();
 	const instanceId = useId();
 	const inputId = `jeo-storymap-autosuggest-${ instanceId }`
 
 	return (
-		<Fragment>
+		<div { ...blockProps }>
 			<label htmlFor={ inputId }>
 				{ __( 'Insert a story map from the library', 'jeo' ) + ':' }
 			</label>
@@ -24,7 +26,7 @@ function EmbeddedStorymapEditor ({ attributes, loadedStory, setAttributes }) {
 					setAttributes({ ...attributes, storyID: suggestion.id })
 				} }
 			/>
-		</Fragment>
+		</div>
 	);
 }
 
