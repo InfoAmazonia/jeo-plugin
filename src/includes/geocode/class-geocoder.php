@@ -42,7 +42,7 @@ abstract class Geocoder {
 	 * @return array $matches
 	 */
 	abstract public function geocode( $search_string );
-	abstract public function reverse_geocode( $lat, $lng );
+	abstract public function reverse_geocode( $lat, $lon );
 
 	public function get_settings() {
 		return false;

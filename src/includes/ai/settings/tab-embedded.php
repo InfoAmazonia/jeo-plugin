@@ -72,7 +72,7 @@
 											<tr>
 												<td><strong><?php echo esc_html( $item['name'] ); ?></strong></td>
 												<td><code><?php echo esc_html( $item['lat'] ); ?></code></td>
-												<td><code><?php echo esc_html( $item['lng'] ); ?></code></td>
+												<td><code><?php echo esc_html( $item['lon'] ); ?></code></td>
 											</tr>
 										<?php endforeach; ?>
 									</tbody>

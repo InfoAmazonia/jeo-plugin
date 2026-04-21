@@ -42,7 +42,7 @@ class Mapbox extends \Jeo\Geocoder {
 		return $response;
 	}
 
-	public function reverse_geocode( $lat, $lng ) {
+	public function reverse_geocode( $lat, $lon ) {
 
 		$api_key = \jeo_settings()->get_option( 'mapbox_key' );
 
@@ -56,7 +56,7 @@ class Mapbox extends \Jeo\Geocoder {
 			'language'     => get_locale(),
 		);
 
-		$url = "https://api.mapbox.com/geocoding/v5/mapbox.places/{$lng},{$lat}.json";
+		$url = "https://api.mapbox.com/geocoding/v5/mapbox.places/{$lon},{$lat}.json";
 
 		$r = wp_remote_get( add_query_arg( $params, $url ) );
 
@@ -81,7 +81,7 @@ class Mapbox extends \Jeo\Geocoder {
 
 		$response = array(
 			'lat'          => $item['geometry']['coordinates'][1],
-			'lng'          => $item['geometry']['coordinates'][0],
+			'lon'          => $item['geometry']['coordinates'][0],
 			'full_address' => $item['place_name'],
 		);
 

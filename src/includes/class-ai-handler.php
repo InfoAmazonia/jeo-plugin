@@ -150,8 +150,7 @@ class AI_Handler {
 			'Search logs:' => 'Pesquisar logs:',
 			'Search Logs' => 'Pesquisar Logs',
 			'Prompt successfully validated! The AI returned a valid JSON array.' => 'Prompt validado com sucesso! A IA retornou um array JSON válido.',
-			'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lng, or quote).' => 'Falha na validação: A IA não retornou o esquema JSON esperado (faltando name, lat, lng ou quote).',
-			'Context is required.' => 'O contexto é obrigatório.',
+			'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lon, or quote).' => 'Falha na validação: A IA não retornou o esquema JSON esperado (faltando name, lat, lon ou quote).',			'Context is required.' => 'O contexto é obrigatório.',
 			'Prompt is required.' => 'O prompt é obrigatório.',
 			'Knowledge Base' => 'Base de Conhecimento',
 			'Bulk Geolocation' => 'Geolocalização em Massa',
@@ -751,7 +750,7 @@ class AI_Handler {
 
 			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
 			// Usamos [SKIP_ENFORCED_SCHEMA] para evitar que o JEO injete o prompt gigante de geolocalização durante o teste de conexão.
-			$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lng\": 0, \"quote\": \"Status: Ping\", \"confidence\": 100}]";
+			$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lon\": 0, \"quote\": \"Status: Ping\", \"confidence\": 100}]";
 			
 			$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
 
@@ -855,13 +854,13 @@ Write a clear, strict System Prompt that incorporates the user's rules.
 You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
 
 \"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lng', 'quote', 'confidence'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
+Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lon', 'quote', 'confidence'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
 - 'name': The location name.
 - 'lat': Latitude (string or float).
-- 'lng': Longitude (string or float).
+- 'lon': Longitude (string or float).
 - 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
 - 'confidence': An integer between 0 and 100 representing your confidence level in this extraction.
-Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lng\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
+Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lon\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
 If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"
 
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
@@ -944,9 +943,9 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$msg = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeo' );
 		} elseif ( count( $result ) > 0 ) {
 			foreach ( $result as $item ) {
-				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lng', $item ) || ! isset( $item['quote'] ) ) {
+				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lon', $item ) || ! isset( $item['quote'] ) ) {
 					$is_valid = false;
-					$msg = __( 'Validation failed: The AI missed mandatory keys (name, lat, lng, quote) in its JSON objects.', 'jeo' );
+					$msg = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeo' );
 					break;
 				}
 			}
@@ -1000,7 +999,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 * @return string
 	 */
 	public function get_default_system_prompt() {
-		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects, each containing "name", "lat" (string/float), "lng" (string/float), "quote" (a short relevant snippet from the text where the location was mentioned), and "confidence" (an integer 0-100). If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].', 'jeo' );
+		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects, each containing "name", "lat" (string/float), "lon" (string/float), "quote" (a short relevant snippet from the text where the location was mentioned), and "confidence" (an integer 0-100). If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].', 'jeo' );
 	}
 
 	/**

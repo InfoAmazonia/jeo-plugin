@@ -32,11 +32,10 @@ class Nominatim extends \Jeo\Geocoder {
 		return $response;
 	}
 
-	public function reverse_geocode( $lat, $lng ) {
-
+	public function reverse_geocode( $lat, $lon ) {
 		$params = array(
 			'lat'            => $lat,
-			'lon'            => $lng,
+			'lon'            => $lon,
 			'format'         => 'json',
 			'addressdetails' => 1,
 		);
@@ -53,13 +52,13 @@ class Nominatim extends \Jeo\Geocoder {
 	private function format_response_item( $item ) {
 
 		if ( isset( $item['lat'] ) && isset( $item['lon'] ) && isset( $item['display_name'] ) ) {
-
-			$response = array(
-				'lat'          => $item['lat'],
-				'lng'          => $item['lon'],
-				'full_address' => $item['display_name'],
-			);
-		}
+if ( $item ) {
+	$response[] = array(
+		'lat'          => $item['lat'],
+		'lon'          => $item['lon'],
+		'full_address' => $item['display_name'],
+	);
+}
 
 		/**
 		 * See https://github.com/OpenCageData/address-formatting/blob/master/conf/components.yaml

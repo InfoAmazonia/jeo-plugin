@@ -20,7 +20,7 @@ class Settings {
 		'enabled_post_types'              => array( 'post' ),
 		'map_default_zoom'                => 1,
 		'map_default_lat'                 => 0,
-		'map_default_lng'                 => 0,
+		'map_default_lon'                 => 0,
 		'mapbox_key'                      => '',
 		'active_geocoder'                 => 'nominatim',
 		'show_storymaps_on_post_archives' => true,
@@ -242,7 +242,7 @@ class Settings {
 				'map_defaults' => array(
 					'zoom' => $this->get_option( 'map_default_zoom' ),
 					'lat'  => $this->get_option( 'map_default_lat' ),
-					'lng'  => $this->get_option( 'map_default_lng' ),
+					'lon'  => $this->get_option( 'map_default_lon' ),
 				),
 				'i18n'        => array(
 					'console_cleared'      => __( '[Sistema] Console limpo.', 'jeo' ),

@@ -60,9 +60,9 @@
 						</tr>
 
 						<tr>
-							<th scope="row"><label for="map_default_lng"><?php esc_html_e( 'Default map center (longitude)', 'jeo' ); ?></label></th>
+							<th scope="row"><label for="map_default_lon"><?php esc_html_e( 'Default map center (longitude)', 'jeo' ); ?></label></th>
 							<td>
-								<input name="<?php echo esc_html( $this->get_field_name( 'map_default_lng' ) ); ?>" type="text" id="map_default_lng" value="<?php echo esc_html( $this->get_option( 'map_default_lng' ) ); ?>" class="regular-text">
+								<input name="<?php echo esc_html( $this->get_field_name( 'map_default_lon' ) ); ?>" type="text" id="map_default_lon" value="<?php echo esc_html( $this->get_option( 'map_default_lon' ) ); ?>" class="regular-text">
 							</td>
 						</tr>
 

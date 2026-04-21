@@ -363,7 +363,7 @@
 		}
 		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
 		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lng = \jeo_settings()->get_option( 'map_default_lng' ) ?: -46.633519;
+		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 4;
 		$rest_url = rest_url('jeo/v1');
 	?>
@@ -452,7 +452,7 @@
 				map = new glObject.Map({
 					container: 'jeo-dashboard-map',
 					style: mapStyle,
-					center: [<?php echo (float)$default_lng; ?>, <?php echo (float)$default_lat; ?>],
+					center: [<?php echo (float)$default_lon; ?>, <?php echo (float)$default_lat; ?>],
 					zoom: <?php echo (int)$default_zoom; ?>,
 					attributionControl: false
 				});
@@ -564,9 +564,9 @@
 				if (pins.length > 0) {
 					var bounds = new glObject.LngLatBounds();
 					pins.forEach((pin, index) => {
-						var lat = Number(pin.lat), lng = Number(pin.lng);
-						if (isNaN(lat) || isNaN(lng)) return;
-						bounds.extend([lng, lat]);
+						var lat = Number(pin.lat), lon = Number(pin.lon);
+						if (isNaN(lat) || isNaN(lon)) return;
+						bounds.extend([lon, lat]);
 						var el = document.createElement('div');
 						el.className = 'jeo-pin-marker';
 						var popupHTML = '<div class="jeo-dashboard-popup" style="padding:10px;min-width:200px;">' +
@@ -574,7 +574,7 @@
 							'<p style="margin:0 0 10px 0;font-size:12px;color:#1d2327;"><strong>' + pin.name + '</strong></p>';
 						if (pin.quote) popupHTML += '<blockquote style="margin:0 0 15px 0;padding:8px 12px;border-left:3px solid #007cba;background:#f0f7ff;font-style:italic;font-size:12px;line-height:1.4;color:#2c3338;">"' + pin.quote + '"</blockquote>';
 						popupHTML += '<div style="display:flex;gap:10px;margin-top:10px;"><a href="' + pin.view_url + '" class="button button-small" target="_blank">View Post</a><a href="' + pin.edit_url + '" class="button button-small" target="_blank">Edit Post</a></div></div>';
-						var marker = new glObject.Marker({ element: el }).setLngLat([lng, lat]).setPopup(new glObject.Popup({ offset: 25 }).setHTML(popupHTML)).addTo(map);
+						var marker = new glObject.Marker({ element: el }).setLngLat([lon, lat]).setPopup(new glObject.Popup({ offset: 25 }).setHTML(popupHTML)).addTo(map);
 						markers.push(marker);
 						setTimeout(() => el.classList.add('drop'), 100 + (index * 20));
 					});

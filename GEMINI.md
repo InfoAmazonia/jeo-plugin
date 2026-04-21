@@ -12,9 +12,9 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 ## 2. Mandatos de Integridade Técnica (Prevenção de Regressões)
 
 ### 2.1. Padrão de Nomenclatura de Geodata
-- **Longitude:** O sufixo padrão para longitude em todo o sistema (PHP, JS, REST e Database) é estritamente `lng`. O uso de `lon` é obsoleto e proibido em novos desenvolvimentos.
+- **Longitude:** O sufixo padrão para longitude em todo o sistema (PHP, JS, REST e Database) é estritamente `lon` (ou `_geocode_lon` para metadados). O uso de `lng` é obsoleto e proibido em novos desenvolvimentos, devendo ser mantido apenas se necessário para compatibilidade com bibliotecas externas de terceiros em seu consumo interno.
 - **Normalização Automática:** Todo input de coordenadas deve ser validado para evitar `NaN`. Use `parseFloat` e verifique `isNaN()` antes de passar dados para Leaflet ou Mapbox.
-- **Migração em Runtime (Legacy Data):** Componentes que carregam metadados do banco devem implementar um mapeamento imediato no `constructor`: se existir `_geocode_lon` mas não `_geocode_lng`, o valor deve ser transferido para a chave nova para garantir compatibilidade.
+- **Migração em Runtime (Legacy Data):** Componentes que carregam metadados do banco devem ser consistentes com o padrão `_geocode_lon`.
 
 ### 2.2. Registry-First Mandate (Configurações)
 - Toda nova opção de configuração **DEVE** ser registrada em três lugares no arquivo `Jeo\Settings`:
@@ -30,7 +30,7 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 
 ### 3.1. Neuron Agent & Universal Adapters
 - **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas. 
-- **O Contrato JSON Imutável:** Toda extração deve retornar um array plano de objetos com: `name`, `lat`, `lng`, `quote`, `confidence`.
+- **O Contrato JSON Imutável:** Toda extração deve retornar um array plano de objetos com: `name`, `lat`, `lon`, `quote`, `confidence`.
 
 ### 3.2. Lógica de Relevância e Corte (UI/UX)
 - **Corte de Confiança:** High (>=75%) -> Primário; Medium (35-74%) -> Secundário; Low (<35%) -> Desabilitado.
@@ -55,7 +55,7 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 - **Google Gemini Embeddings:** A API v1beta do Gemini rejeita nomes legados para embeddings. É obrigatório utilizar a nomenclatura canônica do Neuron-AI: apenas `gemini-embedding-001` ou `gemini-embedding-2-preview` são válidos. Nomes como `text-embedding-004` resultarão em erros silenciosos (404 Not Found).
 - **RAG Worker:** Classe `Jeo\AI\RAG_Worker` via `WP-Cron` para vetorização automática de postagens. O sistema deve implementar rotinas estritas de logging persistente (em `jeo_rag_cron_logs`) reportando `success` ou `error` para cada lote processado, provendo feedback de background na aba Knowledge Base.
 - **Model Lock:** O modelo de embedding fica travado permanentemente em `.model_info` após a primeira inicialização. Trocar o modelo exige apagar (resetar) todo o banco vetorial atual. A interface nunca deve bloquear a seleção de modelo (Deadlock) caso o banco já esteja travado; deve usar a técnica de Auto-Recuperação exibindo o modelo em `readonly`.
-- **Backups (Síncronos):** A geração de backups do Vector Store (`.zip`) deve ocorrer de forma **Síncrona** na API REST, sem agendamentos assíncronos no Cron. Falhas processuais (como a falta da extensão `ZipArchive` no servidor ou diretório vazio) devem retornar um objeto `\WP_Error` para fornecer feedback visual imediato na UI. Manter os últimos 3 backups no sistema.
+- **Backups (Síncronos):** A geração de backups do Vector Store (`.zip`) deve ocorrer de forma **Síncrona** na API REST. É terminantemente proibido o uso de `wp_schedule_event` ou qualquer forma de processamento assíncrono (Cron) para backups, visando feedback visual imediato e prevenção de concorrência. Falhas processuais (como a falta da extensão `ZipArchive` no servidor ou diretório vazio) devem retornar um objeto `\WP_Error` para fornecer feedback visual imediato na UI. Manter os últimos 3 backups no sistema.
 
 ### 4.3. Geolocalização em Massa (Bulk Processing)
 - **Restrições de Loop Infinito (Options API):** É estritamente proibido utilizar o filtro `pre_option_jeo-settings` para injetar valores temporários (ex: forçar ativação) em tempo de execução via REST API, sob risco de recursão infinita e Erro 500 no servidor. Se um método (como o *Manual Run*) precisar bypassar configurações de estado, ele deve fazê-lo explicitamente via argumentos do método (ex: `process_batch($force = true)`).
