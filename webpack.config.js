@@ -1,8 +1,26 @@
 const path = require( 'path' );
+const webpack = require( 'webpack' );
 const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack.config' );
 
 module.exports = {
 	...defaultConfig,
+	plugins: [
+		...( defaultConfig.plugins || [] ),
+		new webpack.NormalModuleReplacementPlugin(
+			/^node:(.*)$/,
+			( resource ) => {
+				resource.request = resource.request.replace( /^node:/, '' );
+			}
+		),
+	],
+	resolve: {
+		...defaultConfig.resolve,
+		fallback: {
+			...( defaultConfig.resolve?.fallback ),
+			fs: false,
+			path: false,
+		},
+	},
 	entry: {
 		mapglLoader: './src/js/src/lib/mapgl-loader.js',
 		mapglReact: {
