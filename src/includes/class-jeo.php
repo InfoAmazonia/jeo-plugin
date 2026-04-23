@@ -1524,10 +1524,12 @@ class Jeo {
 		if ( is_admin() ) {
 			global $wp_post_types;
 
-			$wp_post_types['storymap']->template      = array(
-				array( 'jeo/storymap' ),
-			);
-			$wp_post_types['storymap']->template_lock = 'all';
+			if ( isset( $wp_post_types['storymap'] ) ) {
+				$wp_post_types['storymap']->template      = array(
+					array( 'jeo/storymap' ),
+				);
+				$wp_post_types['storymap']->template_lock = 'all';
+			}
 
 			if ( isset( $wp_post_types['map'] ) ) {
 				$wp_post_types['map']->template = array(
