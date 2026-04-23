@@ -271,7 +271,7 @@ class AI_Handler {
 		if ( array_key_exists( $active, $this->get_adapters() ) ) {
 			return new AI\Neuron_Adapter( $active, (string) $api_key, (string) $model );
 		}
-		
+
 		return null;
 	}
 
@@ -421,7 +421,7 @@ class AI_Handler {
 			$upload_dir = wp_upload_dir();
 			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
 			$base_name  = ( $store === 'test' ) ? 'jeo_knowledge_test' : 'jeo_knowledge';
-			
+
 			$file_path  = $store_dir . '/' . $base_name . '.store';
 			$info_path  = $store_dir . '/' . $base_name . '.model_info';
 
@@ -442,8 +442,8 @@ class AI_Handler {
 				'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
 			], 200 );
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( [ 
-				'success' => false, 
+			return new \WP_REST_Response( [
+				'success' => false,
 				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
 			], 200 );
 		}
@@ -495,8 +495,8 @@ class AI_Handler {
 			], 200 );
 
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( [ 
-				'success' => false, 
+			return new \WP_REST_Response( [
+				'success' => false,
 				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
 			], 200 );
 		}
@@ -562,8 +562,8 @@ class AI_Handler {
 			], 200 );
 
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( [ 
-				'success' => false, 
+			return new \WP_REST_Response( [
+				'success' => false,
 				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
 			], 200 );
 		}
@@ -616,56 +616,101 @@ class AI_Handler {
 				$response = wp_remote_get( $url, $args );
 				$body = wp_remote_retrieve_body( $response );
 				$data = json_decode( $body, true );
-				
+
 				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
 					foreach ( $data['data'] as $model ) {
 						$id = $model['id'];
-						// Filter for Text models in OpenAI
+
+						$skip = false;
+
 						if ( 'openai' === $provider ) {
-							if ( strpos( $id, 'gpt-' ) === false 
-								 || strpos( $id, 'audio' ) !== false 
-								 || strpos( $id, 'realtime' ) !== false 
-								 || strpos( $id, 'embedding' ) !== false ) {
-								continue;
+							$id_lower = strtolower( $id );
+							$skip = ! (
+								str_starts_with( $id, 'gpt-' )
+								|| str_starts_with( $id_lower, 'o1-' )
+								|| str_starts_with( $id_lower, 'o3-' )
+								|| str_starts_with( $id_lower, 'o4-' )
+								|| str_starts_with( $id_lower, 'chatgpt-' )
+							);
+							if ( ! $skip ) {
+								$skip = (
+									str_contains( $id_lower, 'audio' )
+									|| str_contains( $id_lower, 'realtime' )
+									|| str_contains( $id_lower, 'tts' )
+									|| str_contains( $id_lower, 'whisper' )
+									|| str_contains( $id_lower, 'dall-e' )
+									|| str_contains( $id_lower, 'embedding' )
+								);
 							}
 						}
+
+						if ( 'deepseek' === $provider ) {
+							$id_lower = strtolower( $id );
+							$skip = str_contains( $id_lower, 'embedding' );
+						}
+
+						if ( 'mistral' === $provider ) {
+							$id_lower = strtolower( $id );
+							$skip = str_contains( $id_lower, 'embed' );
+						}
+
+						if ( 'grok' === $provider ) {
+							$id_lower = strtolower( $id );
+							$skip = (
+								str_contains( $id_lower, 'embedding' )
+								|| str_contains( $id_lower, 'grok-2-image' )
+								|| str_contains( $id_lower, 'aurora' )
+								|| str_contains( $id_lower, 'flux' )
+							);
+						}
+
+						if ( $skip ) {
+							continue;
+						}
+
 						$models[] = $id;
 					}
 				}
 				break;
-			
+
 			case 'gemini':
 				$url = 'https://generativelanguage.googleapis.com/v1beta/models?key=' . $api_key;
 				$response = wp_remote_get( $url, [ 'timeout' => 15 ] );
 				$body = wp_remote_retrieve_body( $response );
 				$data = json_decode( $body, true );
-				
+
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
 					foreach ( $data['models'] as $model ) {
 						$id = str_replace( 'models/', '', $model['name'] );
-						// Filter for Text-only chat models in Gemini
-						if ( isset( $model['supportedGenerationMethods'] ) 
-							 && in_array( 'generateContent', $model['supportedGenerationMethods'], true )
-							 && strpos( $id, 'embedding' ) === false 
-							 && strpos( $id, 'vision' ) === false ) {
-							$models[] = $id;
+						$id_lower = strtolower( $id );
+						if ( ! isset( $model['supportedGenerationMethods'] )
+							 || ! in_array( 'generateContent', $model['supportedGenerationMethods'], true )
+							 || str_contains( $id_lower, 'embedding' )
+							 || str_contains( $id_lower, 'imagen' ) ) {
+							continue;
 						}
+						$models[] = $id;
 					}
 				}
 				break;
-			
+
 			case 'anthropic':
 				$args['headers']['x-api-key'] = $api_key;
 				$args['headers']['anthropic-version'] = '2023-06-01';
 				unset( $args['headers']['Authorization'] );
-				
+
 				$response = wp_remote_get( 'https://api.anthropic.com/v1/models', $args );
 				$body = wp_remote_retrieve_body( $response );
 				$data = json_decode( $body, true );
-				
+
 				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
 					foreach ( $data['data'] as $model ) {
-						$models[] = $model['id'];
+						$id = $model['id'];
+						$id_lower = strtolower( $id );
+						if ( str_contains( $id_lower, 'embedding' ) ) {
+							continue;
+						}
+						$models[] = $id;
 					}
 				}
 				break;
@@ -676,19 +721,34 @@ class AI_Handler {
 				$response = wp_remote_get( $base_url . '/api/tags', [ 'timeout' => 10 ] );
 				$body = wp_remote_retrieve_body( $response );
 				$data = json_decode( $body, true );
-				
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					$ollama_non_text_patterns = array(
+						'stable-diffusion', 'sd-', 'flux', 'imagegen',
+						'whisper', 'tts', 'nomic-embed', 'mxbai-embed',
+						'all-minilm', 'snowflake-arctic-embed',
+					);
 					foreach ( $data['models'] as $model ) {
+						$id_lower = strtolower( $model['name'] );
+						$skip = false;
+						foreach ( $ollama_non_text_patterns as $pattern ) {
+							if ( str_contains( $id_lower, $pattern ) ) {
+								$skip = true;
+								break;
+							}
+						}
+						if ( $skip ) {
+							continue;
+						}
 						$models[] = $model['name'];
 					}
 				}
 				break;
-			
+
 			case 'cohere':
 				$response = wp_remote_get( 'https://api.cohere.com/v1/models', $args );
 				$body = wp_remote_retrieve_body( $response );
 				$data = json_decode( $body, true );
-				
+
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
 					foreach ( $data['models'] as $model ) {
 						if ( isset( $model['endpoints'] ) && in_array( 'chat', $model['endpoints'], true ) ) {
@@ -733,7 +793,7 @@ class AI_Handler {
 			if ( empty( $model ) ) {
 				$model = \jeo_settings()->get_option( $provider . '_model' );
 			}
-			
+
 			if ( empty( $api_key ) ) {
 				return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
 			}
@@ -751,33 +811,33 @@ class AI_Handler {
 			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
 			// Usamos [SKIP_ENFORCED_SCHEMA] para evitar que o JEO injete o prompt gigante de geolocalização durante o teste de conexão.
 			$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lon\": 0, \"quote\": \"Status: Ping\", \"confidence\": 100}]";
-			
+
 			$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
 
 			if ( is_wp_error( $result ) ) {
-				return new \WP_REST_Response( array( 
-					'success' => false, 
-					'message' => $result->get_error_message() 
+				return new \WP_REST_Response( array(
+					'success' => false,
+					'message' => $result->get_error_message()
 				), 200 );
 			}
 
 			if ( is_array( $result ) ) {
-				return new \WP_REST_Response( array( 
-					'success' => true, 
+				return new \WP_REST_Response( array(
+					'success' => true,
 					'message' => __( 'API Key is valid and active!', 'jeo' ),
 					'data'    => $result
 				), 200 );
 			}
 
-			return new \WP_REST_Response( array( 
-				'success' => false, 
+			return new \WP_REST_Response( array(
+				'success' => false,
 				'message' => __( 'The AI provider returned an unexpected response format.', 'jeo' )
 			), 200 );
 
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( array( 
-				'success' => false, 
-				'message' => 'System Error: ' . $e->getMessage() 
+			return new \WP_REST_Response( array(
+				'success' => false,
+				'message' => 'System Error: ' . $e->getMessage()
 			), 200 );
 		}
 	}
@@ -796,7 +856,7 @@ class AI_Handler {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
 		}
 
-		$lang_instruction = ( 'en' === $lang ) 
+		$lang_instruction = ( 'en' === $lang )
 			? "IMPORTANT: You MUST write the generated prompt and all rules in English. Large Language Models process English instructions more accurately and reliably."
 			: "IMPORTANT: You MUST write the generated prompt and all rules in " . get_bloginfo( 'language' ) . ".";
 
@@ -845,9 +905,9 @@ class AI_Handler {
 		}
 
 		// Meta-prompt instructed to build a JEO prompt
-		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin. 
+		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
 The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
-Write a clear, strict System Prompt that incorporates the user's rules. 
+Write a clear, strict System Prompt that incorporates the user's rules.
 {$model_optimization}
 
 ### OUTPUT FORMAT MANDATE
@@ -865,12 +925,12 @@ If no locations are found, return exactly []. Do not use markdown backticks, no 
 
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
 
-		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content' 
+		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content'
 		// and using a dummy system prompt so the LLM acts as an assistant.
 		$test_title = "Prompt Engineering Task";
 		$assistant_override = "[SKIP_ENFORCED_SCHEMA] You are an assistant. Just do as instructed in the text.";
 
-		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";		
+		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";
 		$result = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
 
 		if ( is_wp_error( $result ) ) {
@@ -928,9 +988,9 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		$result = $adapter->georeference( $test_title, $test_content, $custom_prompt );
 
 		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array( 
-				'success' => false, 
-				'message' => $result->get_error_message() 
+			return new \WP_REST_Response( array(
+				'success' => false,
+				'message' => $result->get_error_message()
 			), 200 ); // Send 200 so UI can display the error nicely
 		}
 
@@ -954,10 +1014,10 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$msg = __( 'Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text.', 'jeo' );
 		}
 
-		return new \WP_REST_Response( array( 
-			'success' => $is_valid, 
+		return new \WP_REST_Response( array(
+			'success' => $is_valid,
 			'message' => $msg,
-			'data'    => $result 
+			'data'    => $result
 		), 200 );
 	}
 
@@ -995,7 +1055,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 	/**
 	 * Get the default system prompt for the AI adapters.
-	 * 
+	 *
 	 * @return string
 	 */
 	public function get_default_system_prompt() {
@@ -1010,7 +1070,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 */
 	public function get_last_logs( $limit = 10 ) {
 		$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
-		
+
 		if ( ! file_exists( $log_file ) ) {
 			$upload_dir = wp_upload_dir();
 			$log_file = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
@@ -1027,12 +1087,12 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 		// Split logs by the separator line
 		$entries_raw = explode( str_repeat( '=', 80 ) . "\n\n", $content );
-		
+
 		// Clean empty ends
 		$entries_raw = array_filter( array_map( 'trim', $entries_raw ) );
-		
+
 		$parsed_entries = array();
-		
+
 		foreach ( $entries_raw as $raw_entry ) {
 			if ( empty( $raw_entry ) ) continue;
 
