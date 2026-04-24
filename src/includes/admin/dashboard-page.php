@@ -242,7 +242,7 @@
 			height: 20px;
 			width: 20px;
 			border-radius: 50%;
-			background: #fff;
+			background: #a0a0a0;
 			border: 2px solid #007cba;
 			cursor: pointer;
 			pointer-events: auto;
@@ -253,7 +253,7 @@
 			height: 18px;
 			width: 18px;
 			border-radius: 50%;
-			background: #fff;
+			background: #a0a0a0;
 			border: 2px solid #007cba;
 			cursor: pointer;
 			pointer-events: auto;
