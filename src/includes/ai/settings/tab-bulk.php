@@ -20,10 +20,12 @@
 			<td>
 				<?php
 				$enabled_post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
-				$bulk_post_types = \jeo_settings()->get_option( 'jeo_bulk_post_types', array( 'post' ) );
+				$bulk_post_types    = \jeo_settings()->get_option( 'jeo_bulk_post_types', array( 'post' ) );
 				foreach ( $enabled_post_types as $pt ) :
 					$pt_object = get_post_type_object( $pt );
-					if ( ! $pt_object ) continue;
+					if ( ! $pt_object ) {
+						continue;
+					}
 					?>
 					<label>
 						<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_bulk_post_types' ) ); ?>[]" type="checkbox" value="<?php echo esc_attr( $pt ); ?>" <?php checked( in_array( $pt, $bulk_post_types ) ); ?>>
@@ -52,7 +54,8 @@
 					<h5 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent Background Activity', 'jeo' ); ?></h5>
 					<?php
 					$bulk_logs = get_option( 'jeo_bulk_ai_cron_logs', array() );
-					if ( empty( $bulk_logs ) || ! is_array( $bulk_logs ) ) : ?>
+					if ( empty( $bulk_logs ) || ! is_array( $bulk_logs ) ) :
+						?>
 						<p style="font-size: 11px; color: #8c8f94; font-style: italic; margin: 0;">
 							<?php esc_html_e( 'No recent activity recorded.', 'jeo' ); ?>
 						</p>
@@ -101,21 +104,23 @@
 						$total_posts += (int) $count->publish;
 					}
 				}
-				
-				$processed_query = new \WP_Query( array(
-					'post_type'      => $bulk_post_types,
-					'post_status'    => 'publish',
-					'posts_per_page' => -1,
-					'fields'         => 'ids',
-					'meta_query'     => array(
-						array(
-							'key'     => \Jeo\AI\Bulk_Processor::META_PROCESSED,
-							'compare' => 'EXISTS',
+
+				$processed_query = new \WP_Query(
+					array(
+						'post_type'      => $bulk_post_types,
+						'post_status'    => 'publish',
+						'posts_per_page' => -1,
+						'fields'         => 'ids',
+						'meta_query'     => array(
+							array(
+								'key'     => \Jeo\AI\Bulk_Processor::META_PROCESSED,
+								'compare' => 'EXISTS',
+							),
 						),
-					),
-				) );
+					)
+				);
 				$processed_posts = $processed_query->found_posts;
-				$percent = $total_posts > 0 ? round( ( $processed_posts / $total_posts ) * 100 ) : 0;
+				$percent         = $total_posts > 0 ? round( ( $processed_posts / $total_posts ) * 100 ) : 0;
 				?>
 				<div style="width: 100%; background: #e2e4e7; border-radius: 4px; height: 20px; margin-bottom: 10px; max-width: 800px;">
 					<div style="width: <?php echo esc_attr( $percent ); ?>%; background: #46b450; height: 100%; border-radius: 4px; transition: width 0.5s ease;"></div>

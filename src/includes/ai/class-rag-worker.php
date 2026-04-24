@@ -27,30 +27,52 @@ class RAG_Worker {
 		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
 	}
 
+	/**
+	 * Add custom cron intervals (every minute, 5 mins, 15 mins) for RAG indexing.
+	 *
+	 * @param array $schedules Existing cron schedules.
+	 * @return array
+	 */
 	public function add_cron_intervals( $schedules ) {
 		if ( ! isset( $schedules['every_minute'] ) ) {
-			$schedules['every_minute'] = array( 'interval' => 60, 'display' => __( 'Every Minute', 'jeo' ) );
+			$schedules['every_minute'] = array(
+				'interval' => 60,
+				'display'  => __( 'Every Minute', 'jeo' ),
+			);
 		}
 		if ( ! isset( $schedules['every_5_mins'] ) ) {
-			$schedules['every_5_mins'] = array( 'interval' => 300, 'display' => __( 'Every 5 Minutes', 'jeo' ) );
+			$schedules['every_5_mins'] = array(
+				'interval' => 300,
+				'display'  => __( 'Every 5 Minutes', 'jeo' ),
+			);
 		}
 		if ( ! isset( $schedules['every_15_mins'] ) ) {
-			$schedules['every_15_mins'] = array( 'interval' => 900, 'display' => __( 'Every 15 Minutes', 'jeo' ) );
+			$schedules['every_15_mins'] = array(
+				'interval' => 900,
+				'display'  => __( 'Every 15 Minutes', 'jeo' ),
+			);
 		}
 		return $schedules;
 	}
 
+	/**
+	 * Append a timestamped cron log entry, keeping the 5 most recent.
+	 *
+	 * @param string $message  Log message.
+	 * @param bool   $is_error Whether this is an error entry.
+	 * @return void
+	 */
 	private function log_cron_run( $message, $is_error = false ) {
 		$logs = get_option( 'jeo_rag_cron_logs', array() );
 		if ( ! is_array( $logs ) ) {
 			$logs = array();
 		}
-		
+
 		$time = current_time( 'Y-m-d H:i:s' );
 		// Since we might be called manually via REST, check action
 		$source = current_action() === 'jeo_rag_index_cron_hook' ? 'Cron' : 'Manual';
 		$status = $is_error ? '❌ ' . __( 'Error', 'jeo' ) : '✅ ' . __( 'Success', 'jeo' );
-		
+
 		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
 		$logs = array_slice( $logs, 0, 5 ); // Keep top 5
 		update_option( 'jeo_rag_cron_logs', $logs, false );
@@ -58,16 +80,19 @@ class RAG_Worker {
 
 	/**
 	 * Register REST API routes.
-
 	 */
 	public function register_rest_routes() {
-		register_rest_route( 'jeo/v1', '/ai-rag-run-manual', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'api_run_manual' ),
-			'permission_callback' => function() {
-				return current_user_can( 'manage_options' );
-			},
-		) );
+		register_rest_route(
+			'jeo/v1',
+			'/ai-rag-run-manual',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_run_manual' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -76,9 +101,21 @@ class RAG_Worker {
 	public function api_run_manual() {
 		$result = $this->process_batch();
 		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 400 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				400
+			);
 		}
-		return new \WP_REST_Response( array( 'success' => true, 'message' => $result ), 200 );
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => $result,
+			),
+			200
+		);
 	}
 
 	/**
@@ -123,14 +160,14 @@ class RAG_Worker {
 		// compare only the model part.
 		$current_model_basename = $current_model;
 		if ( ! empty( $current_model ) && strpos( $current_model, ':' ) !== false ) {
-			$parts = explode( ':', $current_model, 2 );
+			$parts                  = explode( ':', $current_model, 2 );
 			$current_model_basename = $parts[1];
 		}
 
 		if ( ! empty( $locked_model ) && ! empty( $current_model ) ) {
 			// Check if locked model matches the full name OR the basename
 			if ( $locked_model !== $current_model && $locked_model !== $current_model_basename ) {
-				$err_msg = sprintf( __( 'Vector Store mismatch! Expected %s, found %s.', 'jeo' ), $locked_model, $current_model );
+				$err_msg = sprintf( __( 'Vector Store mismatch! Expected %1$s, found %2$s.', 'jeo' ), $locked_model, $current_model );
 				$this->log_cron_run( $err_msg, true );
 				return new \WP_Error( 'model_mismatch', $err_msg );
 			}
@@ -162,8 +199,8 @@ class RAG_Worker {
 		}
 
 		try {
-			$rag = new RAG_Agent();
-			$posts = $query->posts;
+			$rag       = new RAG_Agent();
+			$posts     = $query->posts;
 			$documents = WP_Post_Data_Loader::load( $posts );
 
 			if ( ! empty( $documents ) ) {

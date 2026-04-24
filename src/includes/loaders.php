@@ -8,6 +8,12 @@ if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
 
 spl_autoload_register( 'jeo_autoload' );
 
+/**
+ * PSR-0-compatible autoloader that maps `Jeo\ClassName` to `class-class-name.php` across known directories.
+ *
+ * @param string $class_name Fully-qualified class name.
+ * @return void
+ */
 function jeo_autoload( $class_name ) {
 
 	$class_path = explode( '\\', $class_name );
@@ -243,6 +249,11 @@ function jeo_register_embedder( $id, $base_url ) {
 }
 
 /* New JEO Plugin Settings */
+/**
+ * Generate dynamic CSS for typography, colors, and CSS variables based on JEO appearance settings.
+ *
+ * @return string
+ */
 function jeo_custom_settings_css() {
 	$theme_css = '';
 	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ) ) ) {
@@ -337,6 +348,11 @@ function jeo_custom_settings_css() {
 
 	return $theme_css;
 }
+/**
+ * Output the custom JEO CSS in a `<style>` tag in the frontend `<head>`.
+ *
+ * @return void
+ */
 function jeo_custom_settings_css_wrap() {
 	?>
 	<style type="text/css" id="custom-jeo-css">
@@ -348,6 +364,11 @@ function jeo_custom_settings_css_wrap() {
 }
 add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
 
+/**
+ * Enqueue Google Fonts stylesheets for primary and stories typography when configured.
+ *
+ * @return void
+ */
 function jeo_scripts_typography() {
 	if ( \jeo_settings()->get_option( 'jeo_typography' ) ) {
 		wp_enqueue_style( 'jeo-font', \jeo_settings()->get_option( 'jeo_typography' ), array(), JEO_VERSION );
@@ -360,6 +381,13 @@ add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );
 add_action( 'admin_enqueue_scripts', 'jeo_scripts_typography' );
 
 if ( ! function_exists( 'color_luminance_jeo' ) ) {
+	/**
+	 * Adjust a hex color's luminance by a given percentage for lighter/darker variants.
+	 *
+	 * @param string $hexcolor Hex color string (e.g. '#ff0000').
+	 * @param float  $percent  Percentage adjustment (-1.0 to 1.0).
+	 * @return string Adjusted hex color string.
+	 */
 	function color_luminance_jeo( $hexcolor, $percent ) {
 		if ( strlen( $hexcolor ) < 6 ) {
 			$hexcolor = $hexcolor[0] . $hexcolor[0] . $hexcolor[1] . $hexcolor[1] . $hexcolor[2] . $hexcolor[2];
@@ -379,6 +407,12 @@ if ( ! function_exists( 'color_luminance_jeo' ) ) {
 
 // Load template for discovery
 add_filter( 'page_template', 'template_page_discovery' );
+/**
+ * Override the page template to the Discovery template when the `discovery.php` template slug is selected.
+ *
+ * @param string $page_template Current page template path.
+ * @return string
+ */
 function template_page_discovery( $page_template ) {
 
 	if ( get_page_template_slug() === 'discovery.php' ) {

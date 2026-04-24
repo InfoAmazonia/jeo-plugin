@@ -63,7 +63,7 @@
 
 		<div class="jeo-tab-content-wrapper" style="background: #fff; border: 1px solid #ccd0d4; border-top: 0; padding: 20px 30px;">
 			<input type="hidden" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'current_tab' ) ); ?>" value="<?php echo esc_attr( $current_tab ); ?>">
-			<?php 
+			<?php
 			switch ( $current_tab ) {
 				case 'provider':
 					include 'tab-provider.php';

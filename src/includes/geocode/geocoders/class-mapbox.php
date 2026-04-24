@@ -2,8 +2,23 @@
 
 namespace Jeo\Geocoders;
 
+/**
+ * Mapbox Geocoder implementation.
+ *
+ * @package Jeo
+ */
+
+/**
+ * Geocodes addresses using the Mapbox Geocoding API.
+ */
 class Mapbox extends \Jeo\Geocoder {
 
+	/**
+	 * Geocode a search string using the Mapbox Geocoding API.
+	 *
+	 * @param string $search_string Search query string.
+	 * @return array
+	 */
 	public function geocode( $search_string ) {
 
 		$api_key = \jeo_settings()->get_option( 'mapbox_key' );
@@ -42,6 +57,13 @@ class Mapbox extends \Jeo\Geocoder {
 		return $response;
 	}
 
+	/**
+	 * Reverse-geocode a lat/lon pair using the Mapbox Geocoding API.
+	 *
+	 * @param string|float $lat Latitude.
+	 * @param string|float $lon Longitude.
+	 * @return array
+	 */
 	public function reverse_geocode( $lat, $lon ) {
 
 		$api_key = \jeo_settings()->get_option( 'mapbox_key' );
@@ -73,6 +95,12 @@ class Mapbox extends \Jeo\Geocoder {
 		return array();
 	}
 
+	/**
+	 * Normalize a Mapbox feature into the JEO geocoder response shape.
+	 *
+	 * @param array $item Raw Mapbox feature.
+	 * @return array|null
+	 */
 	private function format_response_item( $item ) {
 
 		if ( ! isset( $item['geometry']['coordinates'] ) ) {

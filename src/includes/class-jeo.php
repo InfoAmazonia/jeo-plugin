@@ -88,6 +88,11 @@ class Jeo {
 		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
 	}
 
+	/**
+	 * Register REST routes for dashboard pins, stats, and readme endpoints.
+	 *
+	 * @return void
+	 */
 	public function register_dashboard_routes() {
 		register_rest_route(
 			'jeo/v1',
@@ -95,7 +100,8 @@ class Jeo {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'api_all_pins' ),
-				'permission_callback' => function () { return current_user_can( 'read' ); },
+				'permission_callback' => function () {
+					return current_user_can( 'read' ); },
 			)
 		);
 
@@ -105,7 +111,9 @@ class Jeo {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'api_dashboard_stats' ),
-				'permission_callback' => function () { return current_user_can( 'read' ); },
+				'permission_callback' => function () {
+					return current_user_can( 'read' );
+				},
 			)
 		);
 
@@ -115,7 +123,9 @@ class Jeo {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'api_get_readme' ),
-				'permission_callback' => function () { return current_user_can( 'read' ); },
+				'permission_callback' => function () {
+					return current_user_can( 'read' );
+				},
 			)
 		);
 	}
@@ -159,17 +169,24 @@ class Jeo {
 			$label = empty( $label ) ? 'English' : str_replace( '_', ' ', $label );
 
 			// Map specific codes to names
-			if ( 'BR' === $label ) { $label = 'Português Brasil'; }
+			if ( 'BR' === $label ) {
+				$label = 'Português Brasil';
+			}
 
 			$readmes[] = array(
 				'label'   => $label,
-				'content' => file_get_contents( $file_path )
+				'content' => file_get_contents( $file_path ),
 			);
 		}
 
 		return new \WP_REST_Response( $readmes, 200 );
 	}
 
+	/**
+	 * REST callback that returns the earliest publish date and enabled post types with their taxonomies and terms.
+	 *
+	 * @return \WP_REST_Response
+	 */
 	public function api_dashboard_stats() {
 		global $wpdb;
 		$min_date = $wpdb->get_var( "SELECT MIN(post_date) FROM {$wpdb->posts} WHERE post_status = 'publish'" );
@@ -178,37 +195,58 @@ class Jeo {
 		$types_data = array();
 		foreach ( $post_types as $pt ) {
 			$obj = get_post_type_object( $pt );
-			if ( ! $obj ) continue;
+			if ( ! $obj ) {
+				continue;
+			}
 
 			$taxonomies = get_object_taxonomies( $pt, 'objects' );
-			$tax_data = array();
+			$tax_data   = array();
 			foreach ( $taxonomies as $tax ) {
-				if ( ! $tax->public || ! $tax->show_ui ) continue;
-				$terms = get_terms( array( 'taxonomy' => $tax->name, 'hide_empty' => true ) );
+				if ( ! $tax->public || ! $tax->show_ui ) {
+					continue;
+				}
+				$terms     = get_terms(
+					array(
+						'taxonomy'   => $tax->name,
+						'hide_empty' => true,
+					)
+				);
 				$term_list = array();
 				foreach ( $terms as $term ) {
-					$term_list[] = array( 'id' => (int) $term->term_id, 'name' => (string) $term->name );
+					$term_list[] = array(
+						'id'   => (int) $term->term_id,
+						'name' => (string) $term->name,
+					);
 				}
 				$tax_data[] = array(
 					'slug'  => (string) $tax->name,
 					'label' => (string) $tax->label,
-					'terms' => $term_list
+					'terms' => $term_list,
 				);
 			}
 
 			$types_data[] = array(
 				'slug'       => (string) $pt,
 				'label'      => (string) $obj->label,
-				'taxonomies' => $tax_data
+				'taxonomies' => $tax_data,
 			);
 		}
 
-		return new \WP_REST_Response( array(
-			'min_date'   => $min_date ? substr( $min_date, 0, 10 ) : date( 'Y-m-d', strtotime( '-1 year' ) ),
-			'post_types' => $types_data
-		), 200 );
+		return new \WP_REST_Response(
+			array(
+				'min_date'   => $min_date ? substr( $min_date, 0, 10 ) : date( 'Y-m-d', strtotime( '-1 year' ) ),
+				'post_types' => $types_data,
+			),
+			200
+		);
 	}
 
+	/**
+	 * REST callback that queries all geocoded posts filtered by search, date, post type, and taxonomy.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
 	public function api_all_pins( $request ) {
 		global $wpdb;
 
@@ -220,39 +258,39 @@ class Jeo {
 		$term_id   = $request->get_param( 'term_id' );
 
 		$query_where = "pm.meta_key = '_related_point' AND pm.meta_value != ''";
-		$join = "";
-		$params = array();
+		$join        = '';
+		$params      = array();
 
 		if ( ! empty( $search ) || ! empty( $after ) || ! empty( $before ) || ! empty( $post_type ) || ! empty( $taxonomy ) ) {
 			$join .= " INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID";
 		}
 
 		if ( ! empty( $search ) ) {
-			$query_where .= " AND (p.post_title LIKE %s OR p.post_content LIKE %s)";
-			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
-			$params[] = '%' . $wpdb->esc_like( $search ) . '%';
+			$query_where .= ' AND (p.post_title LIKE %s OR p.post_content LIKE %s)';
+			$params[]     = '%' . $wpdb->esc_like( $search ) . '%';
+			$params[]     = '%' . $wpdb->esc_like( $search ) . '%';
 		}
 
 		if ( ! empty( $post_type ) ) {
-			$query_where .= " AND p.post_type = %s";
-			$params[] = $post_type;
+			$query_where .= ' AND p.post_type = %s';
+			$params[]     = $post_type;
 		}
 
 		if ( ! empty( $taxonomy ) && ! empty( $term_id ) ) {
-			$join .= " INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id";
-			$join .= " INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id";
-			$query_where .= " AND tt.taxonomy = %s AND tt.term_id = %d";
-			$params[] = $taxonomy;
-			$params[] = (int) $term_id;
+			$join        .= " INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id";
+			$join        .= " INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id";
+			$query_where .= ' AND tt.taxonomy = %s AND tt.term_id = %d';
+			$params[]     = $taxonomy;
+			$params[]     = (int) $term_id;
 		}
 
 		if ( ! empty( $after ) ) {
-			$query_where .= " AND p.post_date >= %s";
-			$params[] = $after . ' 00:00:00';
+			$query_where .= ' AND p.post_date >= %s';
+			$params[]     = $after . ' 00:00:00';
 		}
 		if ( ! empty( $before ) ) {
-			$query_where .= " AND p.post_date <= %s";
-			$params[] = $before . ' 23:59:59';
+			$query_where .= ' AND p.post_date <= %s';
+			$params[]     = $before . ' 23:59:59';
 		}
 
 		$sql = "SELECT pm.post_id, pm.meta_value FROM {$wpdb->postmeta} pm $join WHERE $query_where";
@@ -267,11 +305,11 @@ class Jeo {
 		$hash_map    = array();
 
 		foreach ( $results as $row ) {
-			$post_id     = $row->post_id;
-			$meta_data   = maybe_unserialize( $row->meta_value );
-			$post_title  = get_the_title( $post_id );
-			$view_url    = get_permalink( $post_id );
-			$edit_url    = get_edit_post_link( $post_id, '' );
+			$post_id    = $row->post_id;
+			$meta_data  = maybe_unserialize( $row->meta_value );
+			$post_title = get_the_title( $post_id );
+			$view_url   = get_permalink( $post_id );
+			$edit_url   = get_edit_post_link( $post_id, '' );
 
 			// O WordPress pode retornar um array de pontos ou um ponto único
 			// dependendo de como o metadado foi registrado e salvo.
@@ -289,15 +327,15 @@ class Jeo {
 			foreach ( $points as $point ) {
 				if ( isset( $point['_geocode_lat'] ) && isset( $point['_geocode_lon'] ) ) {
 
-					$lat = (float) str_replace(',', '.', $point['_geocode_lat']);
-					$lon = (float) str_replace(',', '.', $point['_geocode_lon']);
+					$lat = (float) str_replace( ',', '.', $point['_geocode_lat'] );
+					$lon = (float) str_replace( ',', '.', $point['_geocode_lon'] );
 
 					// Arredondamento para filtrar duplicatas
-					$hash = round($lat, 5) . '|' . round($lon, 5) . '|' . $post_id;
+					$hash = round( $lat, 5 ) . '|' . round( $lon, 5 ) . '|' . $post_id;
 
 					if ( ! isset( $hash_map[ $hash ] ) ) {
 						$hash_map[ $hash ] = true;
-						$unique_pins[] = array(
+						$unique_pins[]     = array(
 							'post_id'  => $post_id,
 							'title'    => $post_title,
 							'view_url' => $view_url,
@@ -305,7 +343,7 @@ class Jeo {
 							'name'     => isset( $point['_geocode_full_address'] ) ? $point['_geocode_full_address'] : '',
 							'lat'      => $lat,
 							'lon'      => $lon,
-							'quote'    => isset( $point['_ai_quote'] ) ? $point['_ai_quote'] : ''
+							'quote'    => isset( $point['_ai_quote'] ) ? $point['_ai_quote'] : '',
 						);
 					}
 				}
@@ -723,9 +761,9 @@ class Jeo {
 		$mapgl_script_deps     = array();
 		$mapgl_style_deps      = array();
 
-		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
-		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
+		$mapbox_key   = \jeo_settings()->get_option( 'mapbox_key' );
+		$default_lat  = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
+		$default_lon  = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 5;
 
 		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';
@@ -768,8 +806,8 @@ class Jeo {
 				'default_lat'      => $default_lat,
 				'default_lon'      => $default_lon,
 				'default_zoom'     => $default_zoom,
-				'rest_url'         => rest_url('jeo/v1'),
-				'nonce'            => wp_create_nonce( 'wp_rest' )
+				'rest_url'         => rest_url( 'jeo/v1' ),
+				'nonce'            => wp_create_nonce( 'wp_rest' ),
 			)
 		);
 

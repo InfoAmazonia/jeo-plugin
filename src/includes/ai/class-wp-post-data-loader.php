@@ -20,7 +20,7 @@ class WP_Post_Data_Loader {
 	 * @return Document[] Array of RAG Documents.
 	 */
 	public static function load( array $posts ): array {
-		$documents = [];
+		$documents = array();
 
 		foreach ( $posts as $post ) {
 			// Safety checks: skip empty content, revisions, or non-published posts
@@ -31,18 +31,18 @@ class WP_Post_Data_Loader {
 			// Clean up the content by stripping tags and shortcodes for better embedding
 			$content = strip_shortcodes( $post->post_content );
 			$content = wp_strip_all_tags( $content );
-			
+
 			// Optional: Combine title, excerpt, and content
 			$text_to_embed = "Title: {$post->post_title}\n\nContent: {$content}";
 
 			// Store metadata like the post ID and URL so the AI can reference it
-			$metadata = [
+			$metadata = array(
 				'post_id'   => $post->ID,
 				'post_type' => $post->post_type,
 				'title'     => $post->post_title,
 				'url'       => get_permalink( $post->ID ),
 				'date'      => $post->post_date,
-			];
+			);
 
 			$doc = new Document( $text_to_embed );
 			foreach ( $metadata as $key => $value ) {

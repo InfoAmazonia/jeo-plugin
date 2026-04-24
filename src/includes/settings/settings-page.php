@@ -30,7 +30,7 @@
 							<th scope="row"><label for="enabled_post_types"><?php esc_html_e( 'Enabled Post Types', 'jeo' ); ?></label></th>
 							<td>
 								<?php
-								$post_types = get_post_types( array( 'public' => true ), 'objects' );
+								$post_types         = get_post_types( array( 'public' => true ), 'objects' );
 								$enabled_post_types = $this->get_option( 'enabled_post_types' );
 								if ( ! is_array( $enabled_post_types ) ) {
 									$enabled_post_types = array( 'post' );
@@ -206,11 +206,13 @@
 							<th scope="row"><label for="jeo_discovery_page"><?php esc_html_e( 'Discovery page', 'jeo' ); ?></label></th>
 							<td>
 								<?php
-								wp_dropdown_pages( array(
-									'name'              => $this->get_field_name( 'discovery_page' ),
-									'selected'          => $this->get_option( 'discovery_page' ),
-									'show_option_none'  => __( 'Select a page', 'jeo' ),
-								) );
+								wp_dropdown_pages(
+									array(
+										'name'             => $this->get_field_name( 'discovery_page' ),
+										'selected'         => $this->get_option( 'discovery_page' ),
+										'show_option_none' => __( 'Select a page', 'jeo' ),
+									)
+								);
 								?>
 								<p class="description"><?php esc_html_e( 'Select the page where the JEO Discovery block is located.', 'jeo' ); ?></p>
 							</td>

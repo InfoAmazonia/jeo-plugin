@@ -1,6 +1,6 @@
 <?php
 $rag_feasibility = \Jeo\AI\RAG_Agent::is_feasible();
-$is_rag_blocked = is_wp_error( $rag_feasibility );
+$is_rag_blocked  = is_wp_error( $rag_feasibility );
 ?>
 
 <div class="card" style="max-width: 100%; margin-top: 0; padding: 20px; border-radius: 8px; position: relative;">
@@ -15,8 +15,8 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 							<td>
 									<?php
 									$current_embed_model = \jeo_settings()->get_option( 'ai_embedding_model' );
-									$locked_model = \Jeo\AI\RAG_Agent::get_locked_model( 'jeo_knowledge' );
-									
+									$locked_model        = \Jeo\AI\RAG_Agent::get_locked_model( 'jeo_knowledge' );
+
 									if ( empty( $current_embed_model ) && ! empty( $locked_model ) ) {
 										$current_embed_model = $locked_model;
 									}
@@ -134,7 +134,8 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 						<h5 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent Background Logs', 'jeo' ); ?></h5>
 						<?php
 						$cron_logs = get_option( 'jeo_rag_cron_logs', array() );
-						if ( empty( $cron_logs ) || ! is_array( $cron_logs ) ) : ?>
+						if ( empty( $cron_logs ) || ! is_array( $cron_logs ) ) :
+							?>
 							<p style="font-size: 11px; color: #8c8f94; font-style: italic; margin: 0;">
 								<?php esc_html_e( 'No indexing jobs have run recently.', 'jeo' ); ?>
 							</p>
@@ -162,28 +163,30 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 
 					<?php
 					$enabled_post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
-					$total_posts = 0;
+					$total_posts        = 0;
 					foreach ( $enabled_post_types as $pt ) {
 						$count = wp_count_posts( $pt );
 						if ( isset( $count->publish ) ) {
 							$total_posts += (int) $count->publish;
 						}
 					}
-					
-					$vectorized_query = new \WP_Query( array(
-						'post_type'      => $enabled_post_types,
-						'post_status'    => 'publish',
-						'posts_per_page' => -1,
-						'fields'         => 'ids',
-						'meta_query'     => array(
-							array(
-								'key'     => '_jeo_vectorized_at',
-								'compare' => 'EXISTS',
+
+					$vectorized_query = new \WP_Query(
+						array(
+							'post_type'      => $enabled_post_types,
+							'post_status'    => 'publish',
+							'posts_per_page' => -1,
+							'fields'         => 'ids',
+							'meta_query'     => array(
+								array(
+									'key'     => '_jeo_vectorized_at',
+									'compare' => 'EXISTS',
+								),
 							),
-						),
-					) );
+						)
+					);
 					$vectorized_count = $vectorized_query->found_posts;
-					$rag_percent = $total_posts > 0 ? round( ( $vectorized_count / $total_posts ) * 100 ) : 0;
+					$rag_percent      = $total_posts > 0 ? round( ( $vectorized_count / $total_posts ) * 100 ) : 0;
 					?>
 					<div style="margin-top: 20px;">
 						<div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
@@ -194,7 +197,7 @@ $is_rag_blocked = is_wp_error( $rag_feasibility );
 							<div style="width: <?php echo $rag_percent; ?>%; background: #2271b1; height: 100%; border-radius: 4px;"></div>
 						</div>
 						<p style="font-size: 11px; color: #646970; margin-top: 8px;">
-							<?php printf( esc_html__( '%d of %d posts indexed.', 'jeo' ), $vectorized_count, $total_posts ); ?>
+							<?php printf( esc_html__( '%1$d of %2$d posts indexed.', 'jeo' ), $vectorized_count, $total_posts ); ?>
 						</p>
 					</div>
 			</div>

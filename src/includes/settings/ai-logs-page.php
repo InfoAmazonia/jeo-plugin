@@ -3,27 +3,30 @@
 	<p><?php esc_html_e( 'Here you can view the most recent AI interactions powered by Neuron AI, along with their detailed token usage (Input/Output).', 'jeo' ); ?></p>
 	<hr>
 
-	<?php 
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( 'Unauthorized access.' );
-		}
+	<?php
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( 'Unauthorized access.' );
+	}
 
 		// Handle "Clear Logs" action
-		if ( isset( $_POST['jeo_clear_logs'] ) && check_admin_referer( 'jeo_clear_logs_action' ) ) {
-			$posts_to_delete = get_posts( array(
+	if ( isset( $_POST['jeo_clear_logs'] ) && check_admin_referer( 'jeo_clear_logs_action' ) ) {
+		$posts_to_delete = get_posts(
+			array(
 				'post_type'      => \Jeo\AI\AI_Logger::POST_TYPE,
 				'posts_per_page' => -1,
 				'post_status'    => 'any',
-			) );
-			foreach ( $posts_to_delete as $log_post ) {
-				wp_delete_post( $log_post->ID, true );
-			}
-			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'All AI logs have been permanently deleted.', 'jeo' ) . '</p></div>';
+			)
+		);
+		foreach ( $posts_to_delete as $log_post ) {
+			wp_delete_post( $log_post->ID, true );
 		}
+		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'All AI logs have been permanently deleted.', 'jeo' ) . '</p></div>';
+	}
 
 		// Calculate Totals per Model
 		global $wpdb;
-		$stats = $wpdb->get_results( "
+		$stats = $wpdb->get_results(
+			"
 			SELECT 
 				pm1.meta_value AS provider_model, 
 				SUM(pm2.meta_value) AS total_input,
@@ -38,18 +41,19 @@
 			WHERE p.post_type = 'jeo-ai-log' AND p.post_status = 'private'
 			GROUP BY pm1.meta_value
 			ORDER BY total_tokens DESC
-		" );
+		"
+		);
 
 		if ( $stats ) {
 			echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 20px 0;">';
 			foreach ( $stats as $stat ) {
-				$p_meta = $stat->provider_model;
+				$p_meta        = $stat->provider_model;
 				$provider_name = strtoupper( $p_meta );
-				$model_name = '';
-				
+				$model_name    = '';
+
 				if ( preg_match( '/^(.*?)\s*\((.*?)\)$/', $p_meta, $matches ) ) {
 					$provider_name = strtoupper( $matches[1] );
-					$model_name = $matches[2];
+					$model_name    = $matches[2];
 				}
 
 				echo '
@@ -83,7 +87,7 @@
 			echo '<p class="description">' . esc_html__( 'These numbers represent the estimated tokens consumed to create and query your RAG Knowledge Base. Since embedding models do not natively report their specific usage, the system estimates the token count via mathematical approximation.', 'jeo' ) . '</p>';
 
 			echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 20px 0;">';
-			
+
 			// Vectorize Card
 			echo '
 			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #46b450; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
@@ -111,7 +115,7 @@
 			echo '</div><hr>';
 		}
 
-		$search_term = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : ''; 
+		$search_term  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
 		$current_page = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
 		$per_page     = 25;
 
@@ -120,13 +124,13 @@
 			'posts_per_page' => $per_page,
 			'paged'          => $current_page,
 			'post_status'    => 'any',
-			's'              => $search_term
+			's'              => $search_term,
 		);
 		$logs_query = new \WP_Query( $query_args );
 
 		$total_items = $logs_query->found_posts;
 		$total_pages = $logs_query->max_num_pages;
-	?>
+		?>
 
 	<div style="display:flex; justify-content:space-between; align-items:center;">
 		<form method="get" style="display:inline-block;">
@@ -152,15 +156,17 @@
 			<span class="displaying-num"><?php echo esc_html( sprintf( _n( '%s item', '%s items', $total_items, 'jeo' ), $total_items ) ); ?></span>
 			<?php if ( $total_pages > 1 ) : ?>
 				<span class="pagination-links">
-					<?php 
-						echo paginate_links( array(
-							'base'      => add_query_arg( 'paged', '%#%' ),
-							'format'    => '',
-							'prev_text' => __( '&laquo;' ),
-							'next_text' => __( '&raquo;' ),
-							'total'     => $total_pages,
-							'current'   => $current_page
-						) );
+					<?php
+						echo paginate_links(
+							array(
+								'base'      => add_query_arg( 'paged', '%#%' ),
+								'format'    => '',
+								'prev_text' => __( '&laquo;' ),
+								'next_text' => __( '&raquo;' ),
+								'total'     => $total_pages,
+								'current'   => $current_page,
+							)
+						);
 					?>
 				</span>
 			<?php endif; ?>
@@ -181,14 +187,17 @@
 			<?php if ( ! $logs_query->have_posts() ) : ?>
 				<tr><td colspan="5"><?php esc_html_e( 'No logs found yet. Ensure Debug Mode is enabled and georeference a post.', 'jeo' ); ?></td></tr>
 			<?php else : ?>
-				<?php while ( $logs_query->have_posts() ) : $logs_query->the_post(); ?>
-					<?php 
+				<?php
+				while ( $logs_query->have_posts() ) :
+					$logs_query->the_post();
+					?>
+					<?php
 					$post_id  = get_the_ID();
 					$provider = get_post_meta( $post_id, '_jeo_ai_provider', true );
 					$in_tok   = get_post_meta( $post_id, '_jeo_ai_input_tokens', true );
 					$out_tok  = get_post_meta( $post_id, '_jeo_ai_output_tokens', true );
 					$tot_tok  = get_post_meta( $post_id, '_jeo_ai_total_tokens', true );
-					
+
 					$prompt   = get_post_meta( $post_id, '_jeo_ai_prompt', true );
 					$response = get_post_meta( $post_id, '_jeo_ai_response', true );
 
@@ -201,10 +210,10 @@
 					$preview = mb_substr( strip_tags( $raw_output ), 0, 100 ) . '...';
 
 					$provider_name = strtoupper( $provider );
-					$model_name = '';
+					$model_name    = '';
 					if ( preg_match( '/^(.*?)\s*\((.*?)\)$/', $provider, $matches ) ) {
 						$provider_name = strtoupper( $matches[1] );
-						$model_name = $matches[2];
+						$model_name    = $matches[2];
 					}
 					?>
 					<tr>
@@ -245,7 +254,10 @@
 							</dialog>
 						</td>
 					</tr>
-				<?php endwhile; wp_reset_postdata(); ?>
+					<?php
+				endwhile;
+				wp_reset_postdata();
+				?>
 			<?php endif; ?>
 		</tbody>
 	</table>

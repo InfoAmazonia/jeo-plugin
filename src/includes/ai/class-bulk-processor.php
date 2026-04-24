@@ -32,7 +32,7 @@ class Bulk_Processor {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'jeo_bulk_ai_cron_hook', array( $this, 'process_batch' ) );
 		add_action( 'jeo_bulk_ai_clear_cron_hook', array( $this, 'process_clear_batch' ) );
-		
+
 		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
 		add_action( 'update_option_jeo-settings', array( $this, 'maybe_schedule_cron' ), 10, 2 );
 
@@ -45,45 +45,65 @@ class Bulk_Processor {
 	 * Register REST API routes.
 	 */
 	public function register_rest_routes() {
-		register_rest_route( 'jeo/v1', '/bulk-ai-run', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'api_run_batch' ),
-			'permission_callback' => function() {
-				return current_user_can( 'manage_options' );
-			},
-		) );
+		register_rest_route(
+			'jeo/v1',
+			'/bulk-ai-run',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_run_batch' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 
-		register_rest_route( 'jeo/v1', '/bulk-ai-clear-batch', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'api_clear_batch' ),
-			'permission_callback' => function() {
-				return current_user_can( 'manage_options' );
-			},
-		) );
+		register_rest_route(
+			'jeo/v1',
+			'/bulk-ai-clear-batch',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_batch' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 
-		register_rest_route( 'jeo/v1', '/bulk-ai-clear-all', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'api_clear_all' ),
-			'permission_callback' => function() {
-				return current_user_can( 'manage_options' );
-			},
-		) );
+		register_rest_route(
+			'jeo/v1',
+			'/bulk-ai-clear-all',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_all' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 
-		register_rest_route( 'jeo/v1', '/bulk-ai-clear-logs', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'api_clear_logs' ),
-			'permission_callback' => function() {
-				return current_user_can( 'manage_options' );
-			},
-		) );
+		register_rest_route(
+			'jeo/v1',
+			'/bulk-ai-clear-logs',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_logs' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 
-		register_rest_route( 'jeo/v1', '/bulk-ai-preview-approval', array(
-			'methods'             => 'POST',
-			'callback'            => array( $this, 'api_preview_approval' ),
-			'permission_callback' => function() {
-				return current_user_can( 'edit_posts' );
-			},
-		) );
+		register_rest_route(
+			'jeo/v1',
+			'/bulk-ai-preview-approval',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_preview_approval' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -91,12 +111,24 @@ class Bulk_Processor {
 	 */
 	public function api_run_batch() {
 		$result = $this->process_batch( true );
-		
+
 		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 400 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				400
+			);
 		}
 
-		return new \WP_REST_Response( array( 'success' => true, 'message' => $result ), 200 );
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => $result,
+			),
+			200
+		);
 	}
 
 	/**
@@ -105,9 +137,21 @@ class Bulk_Processor {
 	public function api_clear_batch() {
 		$result = $this->process_clear_batch();
 		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 400 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				400
+			);
 		}
-		return new \WP_REST_Response( array( 'success' => true, 'message' => $result ), 200 );
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => $result,
+			),
+			200
+		);
 	}
 
 	/**
@@ -117,21 +161,35 @@ class Bulk_Processor {
 		if ( ! wp_next_scheduled( 'jeo_bulk_ai_clear_cron_hook' ) ) {
 			wp_schedule_event( time(), 'every_minute', 'jeo_bulk_ai_clear_cron_hook' );
 		}
-		
+
 		$this->log_action( __( 'Bulk clearing started (Background).', 'jeo' ) );
-		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Bulk clearing started in background. Posts will be reset in batches.', 'jeo' ) ), 200 );
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => __( 'Bulk clearing started in background. Posts will be reset in batches.', 'jeo' ),
+			),
+			200
+		);
 	}
 
+	/**
+	 * Append a timestamped action log entry, keeping only the 5 most recent entries.
+	 *
+	 * @param string $message  Log message.
+	 * @param bool   $is_error Whether this is an error entry.
+	 * @return void
+	 */
 	private function log_action( $message, $is_error = false ) {
 		$logs = get_option( 'jeo_bulk_ai_cron_logs', array() );
-		if ( ! is_array( $logs ) ) { $logs = array(); }
-		
-		$time = current_time( 'Y-m-d H:i:s' );
+		if ( ! is_array( $logs ) ) {
+			$logs = array(); }
+
+		$time   = current_time( 'Y-m-d H:i:s' );
 		$source = current_action() === 'jeo_bulk_ai_cron_hook' || current_action() === 'jeo_bulk_ai_clear_cron_hook' ? 'Cron' : 'Manual';
 		$status = $is_error ? '❌ ' . __( 'Error', 'jeo' ) : '✅ ' . __( 'Success', 'jeo' );
-		
+
 		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
-		$logs = array_slice( $logs, 0, 5 ); 
+		$logs = array_slice( $logs, 0, 5 );
 		update_option( 'jeo_bulk_ai_cron_logs', $logs, false );
 	}
 
@@ -147,19 +205,41 @@ class Bulk_Processor {
 		return new \WP_REST_Response( array( 'success' => true ), 200 );
 	}
 
+	/**
+	 * Add custom cron intervals (every minute, 5 mins, 15 mins) to WP cron schedules.
+	 *
+	 * @param array $schedules Existing cron schedules.
+	 * @return array
+	 */
 	public function add_cron_intervals( $schedules ) {
 		if ( ! isset( $schedules['every_minute'] ) ) {
-			$schedules['every_minute'] = array( 'interval' => 60, 'display' => __( 'Every Minute', 'jeo' ) );
+			$schedules['every_minute'] = array(
+				'interval' => 60,
+				'display'  => __( 'Every Minute', 'jeo' ),
+			);
 		}
 		if ( ! isset( $schedules['every_5_mins'] ) ) {
-			$schedules['every_5_mins'] = array( 'interval' => 300, 'display' => __( 'Every 5 Minutes', 'jeo' ) );
+			$schedules['every_5_mins'] = array(
+				'interval' => 300,
+				'display'  => __( 'Every 5 Minutes', 'jeo' ),
+			);
 		}
 		if ( ! isset( $schedules['every_15_mins'] ) ) {
-			$schedules['every_15_mins'] = array( 'interval' => 900, 'display' => __( 'Every 15 Minutes', 'jeo' ) );
+			$schedules['every_15_mins'] = array(
+				'interval' => 900,
+				'display'  => __( 'Every 15 Minutes', 'jeo' ),
+			);
 		}
 		return $schedules;
 	}
 
+	/**
+	 * Schedule, reschedule, or clear the bulk AI processing cron based on settings changes.
+	 *
+	 * @param array $old_value Previous settings value.
+	 * @param array $new_value New settings value.
+	 * @return void
+	 */
 	public function maybe_schedule_cron( $old_value, $new_value ) {
 		$is_active = isset( $new_value['jeo_bulk_ai_active'] ) ? (bool) $new_value['jeo_bulk_ai_active'] : false;
 		$interval  = isset( $new_value['jeo_bulk_cron_interval'] ) ? $new_value['jeo_bulk_cron_interval'] : 'hourly';
@@ -187,40 +267,55 @@ class Bulk_Processor {
 		$post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
 
 		foreach ( $post_types as $post_type ) {
-			register_post_meta( $post_type, self::META_PROCESSED, array(
-				'show_in_rest' => true,
-				'single'       => true,
-				'type'         => 'boolean',
-				'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
-			) );
+			register_post_meta(
+				$post_type,
+				self::META_PROCESSED,
+				array(
+					'show_in_rest'  => true,
+					'single'        => true,
+					'type'          => 'boolean',
+					'auth_callback' => function () {
+						return current_user_can( 'edit_posts' ); },
+				)
+			);
 
-			register_post_meta( $post_type, self::META_STATUS, array(
-				'show_in_rest' => true,
-				'single'       => true,
-				'type'         => 'string',
-				'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
-			) );
+			register_post_meta(
+				$post_type,
+				self::META_STATUS,
+				array(
+					'show_in_rest'  => true,
+					'single'        => true,
+					'type'          => 'string',
+					'auth_callback' => function () {
+						return current_user_can( 'edit_posts' ); },
+				)
+			);
 
-			register_post_meta( $post_type, self::META_PENDING, array(
-				'show_in_rest' => array(
-					'schema' => array(
-						'type'  => 'array',
-						'items' => array(
-							'type'       => 'object',
-							'properties' => array(
-								'name'       => array( 'type' => 'string' ),
-								'lat'        => array( 'type' => 'number' ),
-								'lon'        => array( 'type' => 'number' ),
-								'quote'      => array( 'type' => 'string' ),
-								'confidence' => array( 'type' => 'integer' ),
+			register_post_meta(
+				$post_type,
+				self::META_PENDING,
+				array(
+					'show_in_rest'  => array(
+						'schema' => array(
+							'type'  => 'array',
+							'items' => array(
+								'type'       => 'object',
+								'properties' => array(
+									'name'       => array( 'type' => 'string' ),
+									'lat'        => array( 'type' => 'number' ),
+									'lon'        => array( 'type' => 'number' ),
+									'quote'      => array( 'type' => 'string' ),
+									'confidence' => array( 'type' => 'integer' ),
+								),
 							),
 						),
 					),
-				),
-				'single'       => true,
-				'type'         => 'array',
-				'auth_callback' => function() { return current_user_can( 'edit_posts' ); }
-			) );
+					'single'        => true,
+					'type'          => 'array',
+					'auth_callback' => function () {
+						return current_user_can( 'edit_posts' ); },
+				)
+			);
 		}
 	}
 
@@ -228,7 +323,7 @@ class Bulk_Processor {
 	 * Process a batch of posts.
 	 */
 	public function process_batch( $force = false ) {
-		$active = \jeo_settings()->get_option( 'jeo_bulk_ai_active', false );
+		$active  = \jeo_settings()->get_option( 'jeo_bulk_ai_active', false );
 		$logging = \jeo_settings()->get_option( 'jeo_bulk_logging', false );
 
 		if ( ! $active && ! $force ) {
@@ -261,8 +356,8 @@ class Bulk_Processor {
 		if ( ! $query->have_posts() ) {
 			$msg = __( 'No more posts to process. Deactivating worker.', 'jeo' );
 			$this->log_action( $msg );
-			
-			$options = get_option( 'jeo-settings' );
+
+			$options                       = get_option( 'jeo-settings' );
 			$options['jeo_bulk_ai_active'] = false;
 			update_option( 'jeo-settings', $options );
 			wp_clear_scheduled_hook( 'jeo_bulk_ai_cron_hook' );
@@ -294,7 +389,7 @@ class Bulk_Processor {
 			}
 
 			update_post_meta( $post->ID, self::META_PROCESSED, true );
-			$processed_count++;
+			++$processed_count;
 		}
 
 		$msg = sprintf( __( 'Processed batch of %d posts.', 'jeo' ), $processed_count );
@@ -339,7 +434,7 @@ class Bulk_Processor {
 			delete_post_meta( $post->ID, '_related_point' );
 			delete_post_meta( $post->ID, '_jeo_legacy_status' );
 			delete_post_meta( $post->ID, '_jeo_ai_pending_point' );
-			$cleared_count++;
+			++$cleared_count;
 		}
 
 		$msg = sprintf( __( 'Cleared batch of %d posts.', 'jeo' ), $cleared_count );
@@ -351,9 +446,9 @@ class Bulk_Processor {
 	 * Log a message to a file for debugging.
 	 */
 	private function log( $message ) {
-		$log_file = JEO_BASEPATH . 'jeo-bulk-ai.log';
+		$log_file  = JEO_BASEPATH . 'jeo-bulk-ai.log';
 		$timestamp = current_time( 'mysql' );
-		$entry = "[{$timestamp}] {$message}\n";
+		$entry     = "[{$timestamp}] {$message}\n";
 		@file_put_contents( $log_file, $entry, FILE_APPEND );
 	}
 
@@ -366,7 +461,7 @@ class Bulk_Processor {
 		foreach ( $post_types as $post_type ) {
 			add_filter( "manage_{$post_type}_posts_columns", array( $this, 'add_status_column' ) );
 			add_action( "manage_{$post_type}_posts_custom_column", array( $this, 'render_status_column' ), 10, 2 );
-			
+
 			add_filter( "bulk_actions-edit-{$post_type}", array( $this, 'add_bulk_actions' ) );
 			add_filter( "handle_bulk_actions-edit-{$post_type}", array( $this, 'handle_bulk_actions' ), 10, 3 );
 		}
@@ -375,6 +470,11 @@ class Bulk_Processor {
 		add_action( 'admin_init', array( $this, 'handle_individual_approval' ) );
 	}
 
+	/**
+	 * Handle single-post AI geolocation approval via a query parameter redirect.
+	 *
+	 * @return void
+	 */
 	public function handle_individual_approval() {
 		if ( ! isset( $_GET['jeo_approve_ai'] ) || ! current_user_can( 'edit_posts' ) ) {
 			return;
@@ -387,6 +487,13 @@ class Bulk_Processor {
 		exit;
 	}
 
+	/**
+	 * Move pending AI geolocation data into the permanent `_related_point` meta, respecting a confidence threshold.
+	 *
+	 * @param int $post_id   Post ID to approve.
+	 * @param int $threshold Minimum average confidence score required.
+	 * @return bool Whether the post was approved.
+	 */
 	private function approve_post( $post_id, $threshold = 0 ) {
 		$pending = get_post_meta( $post_id, self::META_PENDING, true );
 		if ( ! empty( $pending ) ) {
@@ -415,12 +522,12 @@ class Bulk_Processor {
 					'_geocode_lon' => (string) $p['lon'],
 					'name'         => $p['name'],
 					'quote'        => $p['quote'],
-					'_ai_quote'    => $p['quote']
+					'_ai_quote'    => $p['quote'],
 				);
 			}
 
 			update_post_meta( $post_id, '_related_point', $related_points );
-			
+
 			delete_post_meta( $post_id, self::META_PENDING );
 			update_post_meta( $post_id, self::META_STATUS, 'approved' );
 			return true;
@@ -438,30 +545,30 @@ class Bulk_Processor {
 		}
 
 		$threshold = (int) \jeo_settings()->get_option( 'jeo_bulk_confidence_threshold', 0 );
-		$summary = array(
+		$summary   = array(
 			'threshold'        => $threshold,
 			'will_approve'     => 0,
 			'ignored_by_score' => 0,
 			'not_applicable'   => 0,
-			'details'          => array()
+			'details'          => array(),
 		);
 
 		foreach ( $post_ids as $id ) {
 			$pending = get_post_meta( $id, self::META_PENDING, true );
 			$post    = get_post( $id );
-			
+
 			if ( ! empty( $pending ) && is_array( $pending ) ) {
 				$total_conf = 0;
 				foreach ( $pending as $p ) {
 					$total_conf += isset( $p['confidence'] ) ? (int) $p['confidence'] : 100;
 				}
 				$avg_conf = count( $pending ) > 0 ? round( $total_conf / count( $pending ) ) : 0;
-				
+
 				if ( $avg_conf >= $threshold ) {
-					$summary['will_approve']++;
+					++$summary['will_approve'];
 					$status = 'ready';
 				} else {
-					$summary['ignored_by_score']++;
+					++$summary['ignored_by_score'];
 					$status = 'low_score';
 				}
 
@@ -470,10 +577,10 @@ class Bulk_Processor {
 					'title'    => $post->post_title,
 					'avg_conf' => $avg_conf,
 					'status'   => $status,
-					'count'    => count( $pending )
+					'count'    => count( $pending ),
 				);
 			} else {
-				$summary['not_applicable']++;
+				++$summary['not_applicable'];
 			}
 		}
 
@@ -544,7 +651,7 @@ class Bulk_Processor {
 							post_ids: postIds
 						},
 						beforeSend: function(xhr) {
-							xhr.setRequestHeader('X-WP-Nonce', '<?php echo wp_create_nonce("wp_rest"); ?>');
+							xhr.setRequestHeader('X-WP-Nonce', '<?php echo wp_create_nonce( 'wp_rest' ); ?>');
 						},
 						success: function(res) {
 							var html = '<p style="font-size:14px;"><strong>' + res.will_approve + '</strong> posts will be approved.</p>';
@@ -597,17 +704,30 @@ class Bulk_Processor {
 		<?php
 	}
 
+	/**
+	 * Add the JEO AI Status column to admin post list tables.
+	 *
+	 * @param array $columns Existing columns.
+	 * @return array
+	 */
 	public function add_status_column( $columns ) {
 		$columns['jeo_ai_status'] = __( 'JEO AI Status', 'jeo' );
 		return $columns;
 	}
 
+	/**
+	 * Render the AI status badge, confidence score, and approval action link in the admin list table.
+	 *
+	 * @param string $column  Column identifier.
+	 * @param int    $post_id Current post ID.
+	 * @return void
+	 */
 	public function render_status_column( $column, $post_id ) {
 		if ( 'jeo_ai_status' !== $column ) {
 			return;
 		}
 
-		$status = get_post_meta( $post_id, self::META_STATUS, true );
+		$status     = get_post_meta( $post_id, self::META_STATUS, true );
 		$has_points = ! empty( get_post_meta( $post_id, '_related_point', true ) );
 
 		// 1. Render Status Badge
@@ -625,10 +745,10 @@ class Bulk_Processor {
 
 		// 2. Render Confidence Score (Below Badge)
 		if ( 'pending_approval' === $status || 'approved' === $status ) {
-			$pending = get_post_meta( $post_id, self::META_PENDING, true );
+			$pending  = get_post_meta( $post_id, self::META_PENDING, true );
 			$avg_conf = 0;
-			
-			// If approved, we might want to calculate from current points if they have confidence meta, 
+
+			// If approved, we might want to calculate from current points if they have confidence meta,
 			// but for now we look at pending to show what was the AI score.
 			if ( is_array( $pending ) && ! empty( $pending ) ) {
 				$total_conf = 0;
@@ -640,26 +760,50 @@ class Bulk_Processor {
 
 			if ( $avg_conf > 0 ) {
 				$conf_color = '#72aee6'; // Default Blue
-				if ( $avg_conf >= 80 ) { $conf_color = '#46b450'; }
-				elseif ( $avg_conf < 40 ) { $conf_color = '#d63638'; }
+				if ( $avg_conf >= 80 ) {
+					$conf_color = '#46b450'; } elseif ( $avg_conf < 40 ) {
+					$conf_color = '#d63638'; }
 
-				echo '<div style="font-size:11px; font-weight:600; margin-top:2px; color:' . esc_attr( $conf_color ) . ';">';
-				echo 'Precison: ' . $avg_conf . '%';
-				echo '</div>';
+					echo '<div style="font-size:11px; font-weight:600; margin-top:2px; color:' . esc_attr( $conf_color ) . ';">';
+					echo 'Precison: ' . $avg_conf . '%';
+					echo '</div>';
 			}
 		}
 
 		// 3. Render Row Actions
 		if ( 'pending_approval' === $status && ! $has_points ) {
-			echo '<div class="row-actions" style="margin-top:4px;"><span><a href="' . esc_url( add_query_arg( array( 'jeo_approve_ai' => $post_id, 'post' => $post_id, 'action' => 'edit' ), admin_url( 'post.php' ) ) ) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
+			echo '<div class="row-actions" style="margin-top:4px;"><span><a href="' . esc_url(
+				add_query_arg(
+					array(
+						'jeo_approve_ai' => $post_id,
+						'post'           => $post_id,
+						'action'         => 'edit',
+					),
+					admin_url( 'post.php' )
+				)
+			) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
 		}
 	}
 
+	/**
+	 * Add the "Approve JEO AI Geolocations" bulk action to post list tables.
+	 *
+	 * @param array $bulk_actions Existing bulk actions.
+	 * @return array
+	 */
 	public function add_bulk_actions( $bulk_actions ) {
 		$bulk_actions['jeo_approve_ai'] = __( 'Approve JEO AI Geolocations', 'jeo' );
 		return $bulk_actions;
 	}
 
+	/**
+	 * Handle the bulk approval action by approving each qualifying post and redirecting with a count.
+	 *
+	 * @param string $redirect_to Default redirect URL.
+	 * @param string $action      Current bulk action.
+	 * @param array  $post_ids    Selected post IDs.
+	 * @return string
+	 */
 	public function handle_bulk_actions( $redirect_to, $action, $post_ids ) {
 		if ( 'jeo_approve_ai' !== $action ) {
 			return $redirect_to;
@@ -670,7 +814,7 @@ class Bulk_Processor {
 		$approved_count = 0;
 		foreach ( $post_ids as $post_id ) {
 			if ( $this->approve_post( $post_id, $threshold ) ) {
-				$approved_count++;
+				++$approved_count;
 			}
 		}
 

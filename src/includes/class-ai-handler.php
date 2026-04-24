@@ -94,119 +94,120 @@ class AI_Handler {
 		}
 
 		$translations = array(
-			'Welcome' => 'Boas-vindas',
-			'Dashboard' => 'Experimental',
-			'Settings' => 'Configurações',
-			'AI Debug Logs' => 'Logs de Depuração IA',
-			'Maps' => 'Mapas',
-			'Layers' => 'Camadas',
-			'Story Map' => 'Mapas de História',
-			'Story Maps' => 'Mapas de História',
-			'AI (v3.5)' => 'IA (v3.5)',
-			'Active AI Provider' => 'Provedor de IA Ativo',
-			'Gemini API Key' => 'Chave de API do Gemini',
-			'OpenAI API Key' => 'Chave de API da OpenAI',
-			'DeepSeek API Key' => 'Chave de API do DeepSeek',
-			'Custom System Prompt' => 'Prompt de Sistema Personalizado',
-			'Leave empty to use the default prompt.' => 'Deixe em branco para usar o prompt otimizado padrão.',
-			'Default Prompt Guide:' => 'Guia do Prompt Padrão:',
-			'Enable AI Debug Mode' => 'Ativar Modo de Depuração (Debug)',
+			'Welcome'                                      => 'Boas-vindas',
+			'Dashboard'                                    => 'Experimental',
+			'Settings'                                     => 'Configurações',
+			'AI Debug Logs'                                => 'Logs de Depuração IA',
+			'Maps'                                         => 'Mapas',
+			'Layers'                                       => 'Camadas',
+			'Story Map'                                    => 'Mapas de História',
+			'Story Maps'                                   => 'Mapas de História',
+			'AI (v3.5)'                                    => 'IA (v3.5)',
+			'Active AI Provider'                           => 'Provedor de IA Ativo',
+			'Gemini API Key'                               => 'Chave de API do Gemini',
+			'OpenAI API Key'                               => 'Chave de API da OpenAI',
+			'DeepSeek API Key'                             => 'Chave de API do DeepSeek',
+			'Custom System Prompt'                         => 'Prompt de Sistema Personalizado',
+			'Leave empty to use the default prompt.'       => 'Deixe em branco para usar o prompt otimizado padrão.',
+			'Default Prompt Guide:'                        => 'Guia do Prompt Padrão:',
+			'Enable AI Debug Mode'                         => 'Ativar Modo de Depuração (Debug)',
 			'If enabled, raw AI inputs and outputs will be saved to src/jeo-ai-debug.log for refinement.' => 'Se ativado, os envios e retornos brutos da IA serão salvos no arquivo jeo-ai-debug.log para análise.',
 			'Loading settings... (A completely revamped panel is coming in JEO v4.0)' => 'Carregando painel... (Uma interface totalmente nova chegará no JEO v4.0)',
-			'AI Debug Logs (Last 10 entries)' => 'Logs de Depuração da IA (Últimos 10)',
+			'AI Debug Logs (Last 10 entries)'              => 'Logs de Depuração da IA (Últimos 10)',
 			'No logs found yet. Try georeferencing a post with AI first.' => 'Nenhum log encontrado. Tente georreferenciar um post usando IA primeiro.',
-			'Date/Time' => 'Data / Hora',
-			'Provider' => 'Provedor LLM',
-			'Status / Output Preview' => 'Prévia da Resposta',
-			'Actions' => 'Ações',
-			'View Details' => 'Ver Detalhes',
-			'AI Interaction Details' => 'Detalhes da Interação com a IA',
-			'Close' => 'Fechar',
-			'Timestamp' => 'Registro de Tempo',
-			'Input (Prompt sent)' => 'Entrada (Prompt Enviado)',
-			'Output (Raw Response)' => 'Saída (Retorno Bruto)',
-			'Processing AI...' => 'Processando com IA...',
-			'Geolocate with AI' => 'Geolocalizar com IA',
-			'Review AI Suggestions' => 'Revisar Sugestões da IA',
+			'Date/Time'                                    => 'Data / Hora',
+			'Provider'                                     => 'Provedor LLM',
+			'Status / Output Preview'                      => 'Prévia da Resposta',
+			'Actions'                                      => 'Ações',
+			'View Details'                                 => 'Ver Detalhes',
+			'AI Interaction Details'                       => 'Detalhes da Interação com a IA',
+			'Close'                                        => 'Fechar',
+			'Timestamp'                                    => 'Registro de Tempo',
+			'Input (Prompt sent)'                          => 'Entrada (Prompt Enviado)',
+			'Output (Raw Response)'                        => 'Saída (Retorno Bruto)',
+			'Processing AI...'                             => 'Processando com IA...',
+			'Geolocate with AI'                            => 'Geolocalizar com IA',
+			'Review AI Suggestions'                        => 'Revisar Sugestões da IA',
 			'I identified these locations in your text. Review and select which ones to add to the map:' => 'Identifiquei os seguintes locais no texto. Revise e selecione quais deseja adicionar ao mapa:',
 			'(No context snippet found for this location)' => '(Nenhum trecho de contexto encontrado para este local)',
-			'Discard All' => 'Descartar Todos',
-			'Add to Map' => 'Adicionar ao Mapa',
-			'AI Context:' => 'Contexto da IA:',
-			'Verified Address:' => 'Endereço Verificado:',
-			'Enrich Data' => 'Enriquecer Dados',
-			'Enriched via Geocoder' => 'Enriquecido via Geocoder',
-			'Validate Custom Prompt' => 'Validar Prompt Customizado',
-			'System Prompt Configuration' => 'Configuração do Prompt de Sistema',
-			'Use Custom System Prompt' => 'Usar Prompt de Sistema Personalizado',
+			'Discard All'                                  => 'Descartar Todos',
+			'Add to Map'                                   => 'Adicionar ao Mapa',
+			'AI Context:'                                  => 'Contexto da IA:',
+			'Verified Address:'                            => 'Endereço Verificado:',
+			'Enrich Data'                                  => 'Enriquecer Dados',
+			'Enriched via Geocoder'                        => 'Enriquecido via Geocoder',
+			'Validate Custom Prompt'                       => 'Validar Prompt Customizado',
+			'System Prompt Configuration'                  => 'Configuração do Prompt de Sistema',
+			'Use Custom System Prompt'                     => 'Usar Prompt de Sistema Personalizado',
 			'Check this to override the default behavior. Uncheck to temporarily disable and return to the optimized default prompt.' => 'Marque esta opção para substituir o comportamento padrão. Desmarque para desativar temporariamente e retornar ao prompt padrão otimizado.',
-			'Clear Text' => 'Limpar Texto',
-			'AI Prompt Engineer Assistant' => 'Assistente de Engenharia de Prompt IA',
+			'Clear Text'                                   => 'Limpar Texto',
+			'AI Prompt Engineer Assistant'                 => 'Assistente de Engenharia de Prompt IA',
 			'Describe how you want the AI to behave (e.g., "Only map cities in Brazil" or "Ignore street names"). The active LLM will generate a highly optimized System Prompt for you, strictly adhering to JEO formatting rules.' => 'Descreva como você quer que a IA se comporte (ex: "Mapeie apenas cidades no Brasil" ou "Ignore nomes de ruas"). A LLM ativa vai gerar um Prompt de Sistema altamente otimizado para você, aderindo estritamente às regras de formatação do JEO.',
 			'Ex: I want to map only locations inside Europe. Press Shift+Enter for new line, or Enter to generate.' => 'Ex: Quero mapear apenas locais dentro da Europa. Aperte Shift+Enter para pular linha, ou Enter para gerar.',
-			'Generate Prompt' => 'Gerar Prompt',
-			'JEO AI Debug Logs' => 'Logs de Depuração da IA do JEO',
+			'Generate Prompt'                              => 'Gerar Prompt',
+			'JEO AI Debug Logs'                            => 'Logs de Depuração da IA do JEO',
 			'Here you can view the most recent AI interactions, raw inputs, and raw outputs for debugging.' => 'Aqui você pode visualizar as interações mais recentes da IA, entradas e saídas brutas para depuração.',
-			'Search logs:' => 'Pesquisar logs:',
-			'Search Logs' => 'Pesquisar Logs',
+			'Search logs:'                                 => 'Pesquisar logs:',
+			'Search Logs'                                  => 'Pesquisar Logs',
 			'Prompt successfully validated! The AI returned a valid JSON array.' => 'Prompt validado com sucesso! A IA retornou um array JSON válido.',
-			'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lon, or quote).' => 'Falha na validação: A IA não retornou o esquema JSON esperado (faltando name, lat, lon ou quote).',			'Context is required.' => 'O contexto é obrigatório.',
-			'Prompt is required.' => 'O prompt é obrigatório.',
-			'Knowledge Base' => 'Base de Conhecimento',
-			'Bulk Geolocation' => 'Geolocalização em Massa',
-			'Background Processing' => 'Processamento em Segundo Plano',
+			'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lon, or quote).' => 'Falha na validação: A IA não retornou o esquema JSON esperado (faltando name, lat, lon ou quote).',
+			'Context is required.'                         => 'O contexto é obrigatório.',
+			'Prompt is required.'                          => 'O prompt é obrigatório.',
+			'Knowledge Base'                               => 'Base de Conhecimento',
+			'Bulk Geolocation'                             => 'Geolocalização em Massa',
+			'Background Processing'                        => 'Processamento em Segundo Plano',
 			'Enable background AI geolocalization for legacy posts.' => 'Ativa a geolocalização automática por IA para posts antigos em segundo plano.',
-			'Batch Size' => 'Tamanho do Lote',
-			'Number of posts to process per cron run.' => 'Número de posts a processar por ciclo.',
-			'Target Post Types' => 'Tipos de Post Alvo',
-			'Cron Interval' => 'Intervalo de Execução',
-			'Every Minute' => 'A cada minuto',
-			'Every 5 Minutes' => 'A cada 5 minutos',
-			'Every 15 Minutes' => 'A cada 15 minutos',
-			'Hourly' => 'De hora em hora',
-			'Twice Daily' => 'Duas vezes ao dia',
-			'Processing Status' => 'Status do Processamento',
-			'Recent Logs' => 'Logs Recentes',
-			'Manual Actions' => 'Ações Manuais',
-			'Run 1 Batch Now' => 'Processar 1 Lote Agora',
-			'Clear Logs' => 'Limpar Logs',
-			'Bulk Approval Threshold' => 'Limite de Aprovação em Massa',
+			'Batch Size'                                   => 'Tamanho do Lote',
+			'Number of posts to process per cron run.'     => 'Número de posts a processar por ciclo.',
+			'Target Post Types'                            => 'Tipos de Post Alvo',
+			'Cron Interval'                                => 'Intervalo de Execução',
+			'Every Minute'                                 => 'A cada minuto',
+			'Every 5 Minutes'                              => 'A cada 5 minutos',
+			'Every 15 Minutes'                             => 'A cada 15 minutos',
+			'Hourly'                                       => 'De hora em hora',
+			'Twice Daily'                                  => 'Duas vezes ao dia',
+			'Processing Status'                            => 'Status do Processamento',
+			'Recent Logs'                                  => 'Logs Recentes',
+			'Manual Actions'                               => 'Ações Manuais',
+			'Run 1 Batch Now'                              => 'Processar 1 Lote Agora',
+			'Clear Logs'                                   => 'Limpar Logs',
+			'Bulk Approval Threshold'                      => 'Limite de Aprovação em Massa',
 			'Minimum average confidence required to auto-approve locations during bulk actions.' => 'Confiança média mínima necessária para auto-aprovar locais durante ações em massa.',
-			'Average AI Confidence' => 'Confiança Média da IA',
-			'Geolocated' => 'Geolocalizado',
-			'Pending AI Approval' => 'Pendente de Aprovação IA',
-			'No Locations Found' => 'Nenhum Local Encontrado',
-			'AI Error' => 'Erro na IA',
-			'Not Processed' => 'Não Processado',
-			'Approve AI' => 'Aprovar IA',
-			'Approve JEO AI Geolocations' => 'Aprovar Geolocalizações IA do JEO',
-			'Background Indexing' => 'Indexação em Segundo Plano',
+			'Average AI Confidence'                        => 'Confiança Média da IA',
+			'Geolocated'                                   => 'Geolocalizado',
+			'Pending AI Approval'                          => 'Pendente de Aprovação IA',
+			'No Locations Found'                           => 'Nenhum Local Encontrado',
+			'AI Error'                                     => 'Erro na IA',
+			'Not Processed'                                => 'Não Processado',
+			'Approve AI'                                   => 'Aprovar IA',
+			'Approve JEO AI Geolocations'                  => 'Aprovar Geolocalizações IA do JEO',
+			'Background Indexing'                          => 'Indexação em Segundo Plano',
 			'Automatically vectorize your posts in small batches using WP-Cron.' => 'Vetoriza seus posts automaticamente em pequenos lotes usando WP-Cron.',
-			'Enable Auto-indexing' => 'Ativar Auto-indexação',
-			'Manual Indexing' => 'Indexação Manual',
+			'Enable Auto-indexing'                         => 'Ativar Auto-indexação',
+			'Manual Indexing'                              => 'Indexação Manual',
 			'Trigger a single batch vectorization immediately.' => 'Dispara a vetorização de um único lote imediatamente.',
-			'Vectorize 1 Batch Now' => 'Vetorizar 1 Lote Agora',
-			'Indexing Progress' => 'Progresso da Indexação',
-			'%d of %d posts indexed.' => '%d de %d posts indexados.',
+			'Vectorize 1 Batch Now'                        => 'Vetorizar 1 Lote Agora',
+			'Indexing Progress'                            => 'Progresso da Indexação',
+			'%d of %d posts indexed.'                      => '%d de %d posts indexados.',
 			'Alternative: Use WP-CLI for large databases:' => 'Alternativa: Use WP-CLI para bases de dados grandes:',
-			'Successfully vectorized %d posts.' => 'Vetorizado com sucesso %d posts.',
-			'No more posts to vectorize.' => 'Não há mais posts para vetorizar.',
-			'Data Dictionaries' => 'Dicionários de Dados',
-			'Embedded Brazilian Territories' => 'Territórios Brasileiros Embarcados',
+			'Successfully vectorized %d posts.'            => 'Vetorizado com sucesso %d posts.',
+			'No more posts to vectorize.'                  => 'Não há mais posts para vetorizar.',
+			'Data Dictionaries'                            => 'Dicionários de Dados',
+			'Embedded Brazilian Territories'               => 'Territórios Brasileiros Embarcados',
 			'The following geographic dictionaries are available locally to improve AI precision:' => 'Os seguintes dicionários geográficos estão disponíveis localmente para melhorar a precisão da IA:',
-			'Advanced RAG Connections (Coming Soon)' => 'Conexões RAG Avançadas (Em breve)',
+			'Advanced RAG Connections (Coming Soon)'       => 'Conexões RAG Avançadas (Em breve)',
 			'Connect your own external databases to provide custom context to the LLM.' => 'Conecte seus próprios bancos de dados externos para fornecer contexto personalizado à LLM.',
-			'Connect Supabase (PostgreSQL)' => 'Conectar Supabase (PostgreSQL)',
-			'Connect SQLite Local' => 'Conectar SQLite Local',
-			'Connect N8N Webhook' => 'Conectar Webhook N8N',
-			'File:' => 'Arquivo:',
-			'Entries found:' => 'Entradas encontradas:',
-			'API Key is valid and active!' => 'A Chave de API é válida e está ativa!',
-			'Invalid provider.' => 'Provedor inválido.',
-			'Test API Key' => 'Testar Chave de API',
-			'Testing key...' => 'Testando chave...',
-			'API Status:' => 'Status da API:',
-			'Checking...' => 'Verificando...',
+			'Connect Supabase (PostgreSQL)'                => 'Conectar Supabase (PostgreSQL)',
+			'Connect SQLite Local'                         => 'Conectar SQLite Local',
+			'Connect N8N Webhook'                          => 'Conectar Webhook N8N',
+			'File:'                                        => 'Arquivo:',
+			'Entries found:'                               => 'Entradas encontradas:',
+			'API Key is valid and active!'                 => 'A Chave de API é válida e está ativa!',
+			'Invalid provider.'                            => 'Provedor inválido.',
+			'Test API Key'                                 => 'Testar Chave de API',
+			'Testing key...'                               => 'Testando chave...',
+			'API Status:'                                  => 'Status da API:',
+			'Checking...'                                  => 'Verificando...',
 			'Please enter an API Key for the selected provider before saving.' => 'Por favor, insira uma Chave de API para o provedor selecionado antes de salvar.',
 			'Warning: Deactivating JEO will remove your AI API Keys for security reasons. Other settings will be preserved. Do you want to proceed?' => 'Atenção: Desativar o JEO removerá suas chaves de API de Inteligência Artificial por motivos de segurança. Outras configurações serão preservadas. Deseja continuar?',
 		);
@@ -411,19 +412,25 @@ class AI_Handler {
 		);
 	}
 
+	/**
+	 * REST callback that clears the test or production vector store files and optionally resets postmeta.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
 	public function api_clear_store( $request ) {
 		try {
 			$store = $request->get_param( 'store' );
-			if ( ! in_array( $store, [ 'test', 'production' ] ) ) {
-				return new \WP_REST_Response( [ 'error' => __( 'Invalid store type.', 'jeo' ) ], 400 );
+			if ( ! in_array( $store, array( 'test', 'production' ) ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'Invalid store type.', 'jeo' ) ), 400 );
 			}
 
 			$upload_dir = wp_upload_dir();
 			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
 			$base_name  = ( $store === 'test' ) ? 'jeo_knowledge_test' : 'jeo_knowledge';
 
-			$file_path  = $store_dir . '/' . $base_name . '.store';
-			$info_path  = $store_dir . '/' . $base_name . '.model_info';
+			$file_path = $store_dir . '/' . $base_name . '.store';
+			$info_path = $store_dir . '/' . $base_name . '.model_info';
 
 			if ( file_exists( $file_path ) ) {
 				unlink( $file_path );
@@ -437,25 +444,37 @@ class AI_Handler {
 				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s", '_jeo_vectorized_at' ) );
 			}
 
-			return new \WP_REST_Response( [
-				'success' => true,
-				'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
-			], 200 );
+			return new \WP_REST_Response(
+				array(
+					'success' => true,
+					'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
+				),
+				200
+			);
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( [
-				'success' => false,
-				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
-			], 200 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
 		}
 	}
 
+	/**
+	 * REST callback that tests RAG retrieval by performing a similarity search against the vector store.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
 	public function api_test_retrieval( $request ) {
 		try {
 			$query = $request->get_param( 'query' );
 			$store = $request->get_param( 'store' );
 
 			if ( empty( $query ) ) {
-				return new \WP_REST_Response( [ 'error' => __( 'Query is required.', 'jeo' ) ], 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'Query is required.', 'jeo' ) ), 400 );
 			}
 
 			// Initialize the RAG Agent to access Vector Store
@@ -468,60 +487,77 @@ class AI_Handler {
 			\jeo_ai_logger()->add_embedding_tokens( 'retrieve', strlen( $query ) );
 
 			// Use the native SimilarityRetrieval logic
-			$retrieval = $rag->resolveRetrieval();
+			$retrieval      = $rag->resolveRetrieval();
 			$retrieved_docs = $retrieval->retrieve( new \NeuronAI\Chat\Messages\UserMessage( $query ) );
 
 			if ( empty( $retrieved_docs ) ) {
-				return new \WP_REST_Response( [
-					'success' => true,
-					'documents' => [],
-					'message' => __( 'No matches found in the selected Vector Store. Try vectorizing some posts first.', 'jeo' ),
-				], 200 );
+				return new \WP_REST_Response(
+					array(
+						'success'   => true,
+						'documents' => array(),
+						'message'   => __( 'No matches found in the selected Vector Store. Try vectorizing some posts first.', 'jeo' ),
+					),
+					200
+				);
 			}
 
-			$formatted_docs = [];
+			$formatted_docs = array();
 			foreach ( $retrieved_docs as $doc ) {
-				$formatted_docs[] = [
-					'id' => $doc->getId(),
-					'score' => $doc->getScore(),
-					'content' => mb_strimwidth( $doc->getContent(), 0, 150, '...' ),
+				$formatted_docs[] = array(
+					'id'       => $doc->getId(),
+					'score'    => $doc->getScore(),
+					'content'  => mb_strimwidth( $doc->getContent(), 0, 150, '...' ),
 					'metadata' => $doc->metadata,
-				];
+				);
 			}
 
-			return new \WP_REST_Response( [
-				'success' => true,
-				'documents' => $formatted_docs,
-			], 200 );
+			return new \WP_REST_Response(
+				array(
+					'success'   => true,
+					'documents' => $formatted_docs,
+				),
+				200
+			);
 
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( [
-				'success' => false,
-				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
-			], 200 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
 		}
 	}
 
+	/**
+	 * REST callback that tests embedding generation on a random post and saves it to the test store.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
 	public function api_test_embedding( $request ) {
 		try {
 			// Select a random post
-			$query = new \WP_Query( [
-				'post_type'      => 'post',
-				'post_status'    => 'publish',
-				'posts_per_page' => 1,
-				'orderby'        => 'rand',
-			] );
+			$query = new \WP_Query(
+				array(
+					'post_type'      => 'post',
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+					'orderby'        => 'rand',
+				)
+			);
 
 			if ( empty( $query->posts ) ) {
-				return new \WP_REST_Response( [ 'error' => __( 'No posts available to test.', 'jeo' ) ], 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'No posts available to test.', 'jeo' ) ), 400 );
 			}
 
 			$post = $query->posts[0];
 
 			// Load into Document
-			$documents = \Jeo\AI\WP_Post_Data_Loader::load( [ $post ] );
+			$documents = \Jeo\AI\WP_Post_Data_Loader::load( array( $post ) );
 			if ( empty( $documents ) ) {
-				return new \WP_REST_Response( [ 'error' => __( 'The selected random post has no usable text content.', 'jeo' ) ], 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'The selected random post has no usable text content.', 'jeo' ) ), 400 );
 			}
 
 			$test_doc = $documents[0];
@@ -534,38 +570,44 @@ class AI_Handler {
 
 			// Test the embed operation directly
 			$embedded_doc = $embed_provider->embedDocument( $test_doc );
-			$vector = $embedded_doc->getEmbedding();
+			$vector       = $embedded_doc->getEmbedding();
 
 			if ( empty( $vector ) ) {
-				return new \WP_REST_Response( [ 'error' => __( 'The embedding provider returned an empty vector.', 'jeo' ) ], 500 );
+				return new \WP_REST_Response( array( 'error' => __( 'The embedding provider returned an empty vector.', 'jeo' ) ), 500 );
 			}
 
 			// Save the embedded document to the TEST Vector Store so we can retrieve it later
-			$rag = new \Jeo\AI\RAG_Agent();
+			$rag               = new \Jeo\AI\RAG_Agent();
 			$rag->is_test_mode = true;
 			$rag->resolveVectorStore()->addDocument( $embedded_doc );
 
 			// Format dimensions text
-			$dimensions = count( $vector );
+			$dimensions     = count( $vector );
 			$preview_vector = array_slice( $vector, 0, 5 ); // Just show first 5 floats
 
-			return new \WP_REST_Response( [
-				'success' => true,
-				'message' => __( 'Embedding created and saved to Test Store!', 'jeo' ),
-				'details' => [
-					'post_id'         => $post->ID,
-					'post_title'      => $post->post_title,
-					'content_snippet' => mb_strimwidth( $test_doc->getContent(), 0, 200, '...' ),
-					'dimensions'      => $dimensions,
-					'vector_start'    => $preview_vector,
-				]
-			], 200 );
+			return new \WP_REST_Response(
+				array(
+					'success' => true,
+					'message' => __( 'Embedding created and saved to Test Store!', 'jeo' ),
+					'details' => array(
+						'post_id'         => $post->ID,
+						'post_title'      => $post->post_title,
+						'content_snippet' => mb_strimwidth( $test_doc->getContent(), 0, 200, '...' ),
+						'dimensions'      => $dimensions,
+						'vector_start'    => $preview_vector,
+					),
+				),
+				200
+			);
 
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( [
-				'success' => false,
-				'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine()
-			], 200 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
 		}
 	}
 
@@ -588,7 +630,7 @@ class AI_Handler {
 			return new \WP_REST_Response( array( 'error' => __( 'API Key or URL is required to list models.', 'jeo' ) ), 400 );
 		}
 
-		$models = [];
+		$models = array();
 		$args   = array(
 			'headers' => array(
 				'Authorization' => 'Bearer ' . $api_key,
@@ -604,18 +646,26 @@ class AI_Handler {
 			case 'grok':
 			case 'zai':
 				$url = '';
-				if ( 'openai' === $provider ) $url = 'https://api.openai.com/v1/models';
-				if ( 'deepseek' === $provider ) $url = 'https://api.deepseek.com/models';
-				if ( 'mistral' === $provider ) $url = 'https://api.mistral.ai/v1/models';
-				if ( 'grok' === $provider ) $url = 'https://api.x.ai/v1/models';
+				if ( 'openai' === $provider ) {
+					$url = 'https://api.openai.com/v1/models';
+				}
+				if ( 'deepseek' === $provider ) {
+					$url = 'https://api.deepseek.com/models';
+				}
+				if ( 'mistral' === $provider ) {
+					$url = 'https://api.mistral.ai/v1/models';
+				}
+				if ( 'grok' === $provider ) {
+					$url = 'https://api.x.ai/v1/models';
+				}
 				// Zhipu AI usually implements OpenAI's v1/models compat too if used via SDK endpoint, but can fail if unsupported.
 				if ( 'zai' === $provider ) {
 					return new \WP_REST_Response( array( 'error' => __( 'Model fetching not officially supported dynamically for Zhipu AI.', 'jeo' ) ), 400 );
 				}
 
 				$response = wp_remote_get( $url, $args );
-				$body = wp_remote_retrieve_body( $response );
-				$data = json_decode( $body, true );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
 
 				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
 					foreach ( $data['data'] as $model ) {
@@ -625,7 +675,7 @@ class AI_Handler {
 
 						if ( 'openai' === $provider ) {
 							$id_lower = strtolower( $id );
-							$skip = ! (
+							$skip     = ! (
 								str_starts_with( $id, 'gpt-' )
 								|| str_starts_with( $id_lower, 'o1-' )
 								|| str_starts_with( $id_lower, 'o3-' )
@@ -646,17 +696,17 @@ class AI_Handler {
 
 						if ( 'deepseek' === $provider ) {
 							$id_lower = strtolower( $id );
-							$skip = str_contains( $id_lower, 'embedding' );
+							$skip     = str_contains( $id_lower, 'embedding' );
 						}
 
 						if ( 'mistral' === $provider ) {
 							$id_lower = strtolower( $id );
-							$skip = str_contains( $id_lower, 'embed' );
+							$skip     = str_contains( $id_lower, 'embed' );
 						}
 
 						if ( 'grok' === $provider ) {
 							$id_lower = strtolower( $id );
-							$skip = (
+							$skip     = (
 								str_contains( $id_lower, 'embedding' )
 								|| str_contains( $id_lower, 'grok-2-image' )
 								|| str_contains( $id_lower, 'aurora' )
@@ -674,19 +724,19 @@ class AI_Handler {
 				break;
 
 			case 'gemini':
-				$url = 'https://generativelanguage.googleapis.com/v1beta/models?key=' . $api_key;
-				$response = wp_remote_get( $url, [ 'timeout' => 15 ] );
-				$body = wp_remote_retrieve_body( $response );
-				$data = json_decode( $body, true );
+				$url      = 'https://generativelanguage.googleapis.com/v1beta/models?key=' . $api_key;
+				$response = wp_remote_get( $url, array( 'timeout' => 15 ) );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
 
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
 					foreach ( $data['models'] as $model ) {
-						$id = str_replace( 'models/', '', $model['name'] );
+						$id       = str_replace( 'models/', '', $model['name'] );
 						$id_lower = strtolower( $id );
 						if ( ! isset( $model['supportedGenerationMethods'] )
-							 || ! in_array( 'generateContent', $model['supportedGenerationMethods'], true )
-							 || str_contains( $id_lower, 'embedding' )
-							 || str_contains( $id_lower, 'imagen' ) ) {
+							|| ! in_array( 'generateContent', $model['supportedGenerationMethods'], true )
+							|| str_contains( $id_lower, 'embedding' )
+							|| str_contains( $id_lower, 'imagen' ) ) {
 							continue;
 						}
 						$models[] = $id;
@@ -695,17 +745,17 @@ class AI_Handler {
 				break;
 
 			case 'anthropic':
-				$args['headers']['x-api-key'] = $api_key;
+				$args['headers']['x-api-key']         = $api_key;
 				$args['headers']['anthropic-version'] = '2023-06-01';
 				unset( $args['headers']['Authorization'] );
 
 				$response = wp_remote_get( 'https://api.anthropic.com/v1/models', $args );
-				$body = wp_remote_retrieve_body( $response );
-				$data = json_decode( $body, true );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
 
 				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
 					foreach ( $data['data'] as $model ) {
-						$id = $model['id'];
+						$id       = $model['id'];
 						$id_lower = strtolower( $id );
 						if ( str_contains( $id_lower, 'embedding' ) ) {
 							continue;
@@ -718,18 +768,25 @@ class AI_Handler {
 			case 'ollama':
 				// Ex: http://localhost:11434/api
 				$base_url = rtrim( str_replace( '/api', '', $api_key ), '/' );
-				$response = wp_remote_get( $base_url . '/api/tags', [ 'timeout' => 10 ] );
-				$body = wp_remote_retrieve_body( $response );
-				$data = json_decode( $body, true );
+				$response = wp_remote_get( $base_url . '/api/tags', array( 'timeout' => 10 ) );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
 					$ollama_non_text_patterns = array(
-						'stable-diffusion', 'sd-', 'flux', 'imagegen',
-						'whisper', 'tts', 'nomic-embed', 'mxbai-embed',
-						'all-minilm', 'snowflake-arctic-embed',
+						'stable-diffusion',
+						'sd-',
+						'flux',
+						'imagegen',
+						'whisper',
+						'tts',
+						'nomic-embed',
+						'mxbai-embed',
+						'all-minilm',
+						'snowflake-arctic-embed',
 					);
 					foreach ( $data['models'] as $model ) {
 						$id_lower = strtolower( $model['name'] );
-						$skip = false;
+						$skip     = false;
 						foreach ( $ollama_non_text_patterns as $pattern ) {
 							if ( str_contains( $id_lower, $pattern ) ) {
 								$skip = true;
@@ -746,8 +803,8 @@ class AI_Handler {
 
 			case 'cohere':
 				$response = wp_remote_get( 'https://api.cohere.com/v1/models', $args );
-				$body = wp_remote_retrieve_body( $response );
-				$data = json_decode( $body, true );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
 
 				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
 					foreach ( $data['models'] as $model ) {
@@ -770,7 +827,13 @@ class AI_Handler {
 			return new \WP_REST_Response( array( 'error' => __( 'No models found. Check your API key or permissions.', 'jeo' ) ), 404 );
 		}
 
-		return new \WP_REST_Response( array( 'success' => true, 'models' => array_reverse( $models ) ), 200 );
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'models'  => array_reverse( $models ),
+			),
+			200
+		);
 	}
 
 	/**
@@ -810,35 +873,47 @@ class AI_Handler {
 
 			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
 			// Usamos [SKIP_ENFORCED_SCHEMA] para evitar que o JEO injete o prompt gigante de geolocalização durante o teste de conexão.
-			$test_prompt = "[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{\"name\": \"SystemCheck\", \"lat\": 0, \"lon\": 0, \"quote\": \"Status: Ping\", \"confidence\": 100}]";
+			$test_prompt = '[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{"name": "SystemCheck", "lat": 0, "lon": 0, "quote": "Status: Ping", "confidence": 100}]';
 
-			$result = $adapter->georeference( "SystemCheck", "Status: Ping", $test_prompt );
+			$result = $adapter->georeference( 'SystemCheck', 'Status: Ping', $test_prompt );
 
 			if ( is_wp_error( $result ) ) {
-				return new \WP_REST_Response( array(
-					'success' => false,
-					'message' => $result->get_error_message()
-				), 200 );
+				return new \WP_REST_Response(
+					array(
+						'success' => false,
+						'message' => $result->get_error_message(),
+					),
+					200
+				);
 			}
 
 			if ( is_array( $result ) ) {
-				return new \WP_REST_Response( array(
-					'success' => true,
-					'message' => __( 'API Key is valid and active!', 'jeo' ),
-					'data'    => $result
-				), 200 );
+				return new \WP_REST_Response(
+					array(
+						'success' => true,
+						'message' => __( 'API Key is valid and active!', 'jeo' ),
+						'data'    => $result,
+					),
+					200
+				);
 			}
 
-			return new \WP_REST_Response( array(
-				'success' => false,
-				'message' => __( 'The AI provider returned an unexpected response format.', 'jeo' )
-			), 200 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'The AI provider returned an unexpected response format.', 'jeo' ),
+				),
+				200
+			);
 
 		} catch ( \Throwable $e ) {
-			return new \WP_REST_Response( array(
-				'success' => false,
-				'message' => 'System Error: ' . $e->getMessage()
-			), 200 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'System Error: ' . $e->getMessage(),
+				),
+				200
+			);
 		}
 	}
 
@@ -857,8 +932,8 @@ class AI_Handler {
 		}
 
 		$lang_instruction = ( 'en' === $lang )
-			? "IMPORTANT: You MUST write the generated prompt and all rules in English. Large Language Models process English instructions more accurately and reliably."
-			: "IMPORTANT: You MUST write the generated prompt and all rules in " . get_bloginfo( 'language' ) . ".";
+			? 'IMPORTANT: You MUST write the generated prompt and all rules in English. Large Language Models process English instructions more accurately and reliably.'
+			: 'IMPORTANT: You MUST write the generated prompt and all rules in ' . get_bloginfo( 'language' ) . '.';
 
 		$context = $lang_instruction . "\n\nUser request: " . $context;
 
@@ -885,22 +960,22 @@ class AI_Handler {
 		}
 
 		// Prompt Optimizer: Appends model-specific guidelines to the meta-prompt
-		$model_optimization = "";
+		$model_optimization = '';
 		switch ( $provider ) {
 			case 'gemini':
-				$model_optimization = "Since the target model is Google Gemini, please use clear Markdown headers (##) and explicit step-by-step instructions. Gemini performs best when formatting is highly structured and unambiguous.";
+				$model_optimization = 'Since the target model is Google Gemini, please use clear Markdown headers (##) and explicit step-by-step instructions. Gemini performs best when formatting is highly structured and unambiguous.';
 				break;
 			case 'openai':
-				$model_optimization = "Since the target model is OpenAI (GPT), provide highly concise, abstract rules. GPT models are excellent at generalizing logic and understanding constraints without excessive verbosity.";
+				$model_optimization = 'Since the target model is OpenAI (GPT), provide highly concise, abstract rules. GPT models are excellent at generalizing logic and understanding constraints without excessive verbosity.';
 				break;
 			case 'deepseek':
-				$model_optimization = "Since the target model is DeepSeek, enclose critical thinking rules and constraints inside XML-like tags (e.g., <rules>...</rules>). DeepSeek is a reasoning model and heavily benefits from chain-of-thought and structured tag-based directives.";
+				$model_optimization = 'Since the target model is DeepSeek, enclose critical thinking rules and constraints inside XML-like tags (e.g., <rules>...</rules>). DeepSeek is a reasoning model and heavily benefits from chain-of-thought and structured tag-based directives.';
 				break;
 			case 'anthropic':
 				$model_optimization = "Since the target model is Anthropic Claude, use conversational but highly detailed boundaries. Claude responds well to 'constitutional' style rules and clearly defined 'Do not do X' instructions.";
 				break;
 			default:
-				$model_optimization = "Make the prompt robust, precise, and well-structured to ensure high accuracy in georeferencing tasks.";
+				$model_optimization = 'Make the prompt robust, precise, and well-structured to ensure high accuracy in georeferencing tasks.';
 				break;
 		}
 
@@ -927,11 +1002,11 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content'
 		// and using a dummy system prompt so the LLM acts as an assistant.
-		$test_title = "Prompt Engineering Task";
-		$assistant_override = "[SKIP_ENFORCED_SCHEMA] You are an assistant. Just do as instructed in the text.";
+		$test_title         = 'Prompt Engineering Task';
+		$assistant_override = '[SKIP_ENFORCED_SCHEMA] You are an assistant. Just do as instructed in the text.';
 
 		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";
-		$result = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
+		$result                = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
 
 		if ( is_wp_error( $result ) ) {
 			return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
@@ -981,31 +1056,34 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		}
 
 		// Use a diverse global text so validation succeeds regardless of regional prompt restrictions (Europe, Brazil, etc.)
-		$test_title   = "Global News Report: Environment and Economy";
-		$test_content = "Today, leaders met in Paris, France to discuss the European economy. Meanwhile, a scientific expedition in the Amazon Rainforest left Manaus, Brazil, to explore the Encontro das Águas. In Asia, Tokyo, Japan reported new technological advancements.";
+		$test_title   = 'Global News Report: Environment and Economy';
+		$test_content = 'Today, leaders met in Paris, France to discuss the European economy. Meanwhile, a scientific expedition in the Amazon Rainforest left Manaus, Brazil, to explore the Encontro das Águas. In Asia, Tokyo, Japan reported new technological advancements.';
 
 		// Pass empty string for assistant override to let the adapter attach the enforced schema
 		$result = $adapter->georeference( $test_title, $test_content, $custom_prompt );
 
 		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array(
-				'success' => false,
-				'message' => $result->get_error_message()
-			), 200 ); // Send 200 so UI can display the error nicely
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				200
+			); // Send 200 so UI can display the error nicely
 		}
 
 		// Strict schema validation
 		$is_valid = true;
-		$msg = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeo' );
+		$msg      = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeo' );
 
 		if ( ! is_array( $result ) ) {
 			$is_valid = false;
-			$msg = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeo' );
+			$msg      = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeo' );
 		} elseif ( count( $result ) > 0 ) {
 			foreach ( $result as $item ) {
 				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lon', $item ) || ! isset( $item['quote'] ) ) {
 					$is_valid = false;
-					$msg = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeo' );
+					$msg      = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeo' );
 					break;
 				}
 			}
@@ -1014,11 +1092,14 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$msg = __( 'Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text.', 'jeo' );
 		}
 
-		return new \WP_REST_Response( array(
-			'success' => $is_valid,
-			'message' => $msg,
-			'data'    => $result
-		), 200 );
+		return new \WP_REST_Response(
+			array(
+				'success' => $is_valid,
+				'message' => $msg,
+				'data'    => $result,
+			),
+			200
+		);
 	}
 
 	/**
@@ -1073,7 +1154,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 		if ( ! file_exists( $log_file ) ) {
 			$upload_dir = wp_upload_dir();
-			$log_file = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
+			$log_file   = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
 		}
 
 		if ( ! file_exists( $log_file ) ) {
@@ -1094,17 +1175,19 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		$parsed_entries = array();
 
 		foreach ( $entries_raw as $raw_entry ) {
-			if ( empty( $raw_entry ) ) continue;
+			if ( empty( $raw_entry ) ) {
+				continue;
+			}
 
 			// Extract components using basic regex/strpos
 			$timestamp = '';
-			$provider = '';
-			$input = '';
-			$output = '';
+			$provider  = '';
+			$input     = '';
+			$output    = '';
 
 			if ( preg_match( '/^\[(.*?)\] PROVIDER: (.*?)\n/s', $raw_entry, $matches ) ) {
 				$timestamp = $matches[1];
-				$provider = trim( $matches[2] );
+				$provider  = trim( $matches[2] );
 			}
 
 			// Find INPUT section
@@ -1138,9 +1221,21 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	public function api_backup_store() {
 		$result = \jeo_rag_backup()->do_backup();
 		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array( 'success' => false, 'message' => $result->get_error_message() ), 500 );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				500
+			);
 		}
-		return new \WP_REST_Response( array( 'success' => true, 'message' => __( 'Backup created successfully!', 'jeo' ) ), 200 );
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => __( 'Backup created successfully!', 'jeo' ),
+			),
+			200
+		);
 	}
 
 	/**
@@ -1159,7 +1254,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return new \WP_REST_Response( array( 'error' => 'Missing filename' ), 400 );
 		}
 
-		$uploads = wp_upload_dir();
+		$uploads   = wp_upload_dir();
 		$file_path = $uploads['basedir'] . '/jeo-ai-store/backups/' . sanitize_file_name( $filename );
 
 		if ( file_exists( $file_path ) && str_ends_with( $file_path, '.zip' ) ) {

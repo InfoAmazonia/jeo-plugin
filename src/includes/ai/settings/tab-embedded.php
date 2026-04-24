@@ -5,9 +5,9 @@
 	<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-top: 20px;">
 		<?php
 		$data_dir = JEO_BASEPATH . '/includes/ai/data/';
-		
+
 		$friendly_names = array(
-			'biomes.json'                     => 'Biomas Brasileiros',
+			'biomes.json'                      => 'Biomas Brasileiros',
 			'indigenous-territories.json'      => 'Terras Indígenas',
 			'quilombola-territories.json'      => 'Territórios Quilombolas',
 			'extractive-reserves.json'         => 'Reservas Extrativistas (Resex)',
@@ -23,12 +23,12 @@
 			$files = scandir( $data_dir );
 			foreach ( $files as $file ) {
 				if ( strpos( $file, '.json' ) !== false ) {
-					$json_path = $data_dir . $file;
+					$json_path    = $data_dir . $file;
 					$json_content = file_get_contents( $json_path );
-					$data = json_decode( $json_content, true );
-					$count = is_array( $data ) ? count( $data ) : 0;
-					
-					$file_slug = str_replace( '.json', '', $file );
+					$data         = json_decode( $json_content, true );
+					$count        = is_array( $data ) ? count( $data ) : 0;
+
+					$file_slug    = str_replace( '.json', '', $file );
 					$display_name = isset( $friendly_names[ $file ] ) ? $friendly_names[ $file ] : ucwords( str_replace( '-', ' ', $file_slug ) );
 					?>
 					<div style="background: #f6f7f7; border: 1px solid #dcdcde; padding: 15px; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between;">

@@ -44,6 +44,13 @@ class Neuron_Agent extends Agent {
 	 */
 	protected $model;
 
+	/**
+	 * Initialize the Neuron Agent with provider credentials.
+	 *
+	 * @param string $provider_name AI provider slug.
+	 * @param string $api_key       API key for the provider.
+	 * @param string $model         Model identifier to use.
+	 */
 	public function __construct( $provider_name, $api_key, $model ) {
 		$this->provider_name = $provider_name;
 		$this->api_key       = $api_key;
@@ -51,6 +58,11 @@ class Neuron_Agent extends Agent {
 		parent::__construct();
 	}
 
+	/**
+	 * Return the AI provider instance for the configured provider.
+	 *
+	 * @return AIProviderInterface
+	 */
 	protected function provider(): AIProviderInterface {
 		return Neuron_Factory::create_provider( $this->provider_name, $this->api_key, $this->model );
 	}
@@ -64,7 +76,7 @@ class Neuron_Agent extends Agent {
 
 		// Execute chat with User text
 		$message = $this->chat( new UserMessage( $user_text ) )->getMessage();
-		
+
 		$raw_output = $message->getContent();
 		$usage      = $message->getUsage();
 

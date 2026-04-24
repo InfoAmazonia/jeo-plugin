@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * AI Settings Class
- * 
+ *
  * Manages the new dedicated AI Settings pages.
  */
 class AI_Settings {
@@ -23,6 +23,11 @@ class AI_Settings {
 		// No longer adding menu here, moved to Jeo\Menu for ordering
 	}
 
+	/**
+	 * Return the associative array of AI settings tab slugs and labels.
+	 *
+	 * @return array
+	 */
 	public function get_tabs() {
 		return array(
 			'provider'  => __( 'AI Provider', 'jeo' ),
@@ -32,14 +37,24 @@ class AI_Settings {
 		);
 	}
 
+	/**
+	 * Return the sanitized current tab slug from the query string, defaulting to 'provider'.
+	 *
+	 * @return string
+	 */
 	public function get_current_tab() {
 		return isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'provider';
 	}
 
+	/**
+	 * Render the AI settings page with tab navigation and the active tab content.
+	 *
+	 * @return void
+	 */
 	public function render_settings_page() {
 		$current_tab = $this->get_current_tab();
-		$tabs = $this->get_tabs();
-		
+		$tabs        = $this->get_tabs();
+
 		include JEO_BASEPATH . '/includes/ai/settings/main-page.php';
 	}
 }

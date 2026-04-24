@@ -37,7 +37,7 @@
 
 		.jeo-pulse-icon {
 			width: 80px; height: 80px;
-			background: url('<?php echo esc_url( JEO_BASEURL . "/js/src/icons/jeo.svg" ); ?>') center center no-repeat;
+			background: url('<?php echo esc_url( JEO_BASEURL . '/js/src/icons/jeo.svg' ); ?>') center center no-repeat;
 			background-size: contain;
 			animation: jeo-pulse-scale 1.5s infinite ease-in-out;
 			margin-bottom: 20px;
@@ -106,7 +106,7 @@
 
 		.jeo-dashboard-logo {
 			width: 30px; height: 30px;
-			background: url('<?php echo esc_url( JEO_BASEURL . "/js/src/icons/jeo.svg" ); ?>') center center no-repeat;
+			background: url('<?php echo esc_url( JEO_BASEURL . '/js/src/icons/jeo.svg' ); ?>') center center no-repeat;
 			background-size: contain;
 			flex-shrink: 0;
 			cursor: pointer;
@@ -355,14 +355,14 @@
 
 	<?php
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
-		if ( ! in_array( $map_runtime, array( 'mapboxgl' ) ) ) {
-			$map_runtime = 'maplibregl';
-		}
-		$mapbox_key  = \jeo_settings()->get_option( 'mapbox_key' );
-		$default_lat = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lon = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
+	if ( ! in_array( $map_runtime, array( 'mapboxgl' ) ) ) {
+		$map_runtime = 'maplibregl';
+	}
+		$mapbox_key   = \jeo_settings()->get_option( 'mapbox_key' );
+		$default_lat  = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
+		$default_lon  = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
 		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 4;
-		$rest_url = rest_url('jeo/v1');
+		$rest_url     = rest_url( 'jeo/v1' );
 	?>
 
 	<script>
@@ -385,7 +385,7 @@
 
 			// Configuration
 			var apiUrl     = '<?php echo esc_url_raw( $rest_url ); ?>';
-			var wpNonce    = '<?php echo wp_create_nonce("wp_rest"); ?>';
+			var wpNonce    = '<?php echo wp_create_nonce( 'wp_rest' ); ?>';
 
 			// State
 			var markers = [];
@@ -472,8 +472,8 @@
 				map = new glObject.Map({
 					container: 'jeo-dashboard-map',
 					style: mapStyle,
-					center: [<?php echo (float)$default_lon; ?>, <?php echo (float)$default_lat; ?>],
-					zoom: <?php echo (int)$default_zoom; ?>,
+					center: [<?php echo (float) $default_lon; ?>, <?php echo (float) $default_lat; ?>],
+					zoom: <?php echo (int) $default_zoom; ?>,
 					attributionControl: false
 				});
 

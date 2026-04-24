@@ -20,21 +20,35 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+/**
+ * Factory for creating Neuron AI provider and embeddings instances.
+ *
+ * @package Jeo
+ */
 class Neuron_Factory {
 
+	/**
+	 * Create an AIProviderInterface instance for the given provider slug.
+	 *
+	 * @param string $provider_name AI provider slug (e.g. 'gemini', 'openai').
+	 * @param string $api_key       API key for the provider.
+	 * @param string $model         Model identifier to use.
+	 * @return AIProviderInterface
+	 * @throws \Exception If the provider is not supported.
+	 */
 	public static function create_provider( $provider_name, $api_key, $model ): AIProviderInterface {
-		$temperature_param = [ 'temperature' => 0.1 ];
+		$temperature_param = array( 'temperature' => 0.1 );
 		switch ( $provider_name ) {
 			case 'gemini':
 				return new Gemini(
 					key: $api_key,
 					model: $model,
-					parameters: [ 
-						'generationConfig' => [
+					parameters: array(
+						'generationConfig' => array(
 							'temperature'      => 0.1,
-							'responseMimeType' => 'application/json'
-						] 
-					]
+							'responseMimeType' => 'application/json',
+						),
+					)
 				);
 			case 'openai':
 				return new OpenAI(
@@ -99,6 +113,15 @@ class Neuron_Factory {
 		}
 	}
 
+	/**
+	 * Create an EmbeddingsProviderInterface for the given provider.
+	 *
+	 * @param string $provider_name AI provider slug.
+	 * @param string $api_key       API key for the provider.
+	 * @param string $model         Embedding model identifier.
+	 * @return EmbeddingsProviderInterface
+	 * @throws \Exception If the provider does not have a native embeddings implementation.
+	 */
 	public static function create_embeddings_provider( $provider_name, $api_key, $model ): EmbeddingsProviderInterface {
 		switch ( $provider_name ) {
 			case 'openai':
@@ -123,6 +146,11 @@ class Neuron_Factory {
 		}
 	}
 
+	/**
+	 * Resolve the currently configured AI provider from JEO settings and return its instance.
+	 *
+	 * @return AIProviderInterface
+	 */
 	public static function get_active_provider(): AIProviderInterface {
 		$active = \jeo_settings()->get_option( 'ai_default_provider' );
 		if ( ! $active ) {
@@ -139,6 +167,12 @@ class Neuron_Factory {
 		return self::create_provider( $active, (string) $api_key, (string) $model );
 	}
 
+	/**
+	 * Resolve the configured embedding model and provider from settings, handling provider-prefixed model names.
+	 *
+	 * @return EmbeddingsProviderInterface
+	 * @throws \Exception If no embedding model is configured.
+	 */
 	public static function get_active_embeddings_provider(): EmbeddingsProviderInterface {
 		$active = \jeo_settings()->get_option( 'ai_default_provider' );
 		if ( ! $active ) {
@@ -152,14 +186,14 @@ class Neuron_Factory {
 			throw new \Exception( __( 'No Embedding Model configured. Please select one in the JEO AI settings.', 'jeo' ) );
 		}
 
-		$api_key = '';
+		$api_key         = '';
 		$embedding_model = '';
 
 		// Check if it has a provider prefix like 'openai:text-embedding-3-small'
 		if ( strpos( $configured_embedding_model, ':' ) !== false ) {
 			list( $provider_override, $embedding_model ) = explode( ':', $configured_embedding_model, 2 );
-			$active = $provider_override;
-			
+			$active                                      = $provider_override;
+
 			// Re-fetch API key for the new overridden provider
 			$api_key = \jeo_settings()->get_option( $active . '_api_key' );
 			if ( 'ollama' === $active ) {
@@ -168,7 +202,7 @@ class Neuron_Factory {
 		} else {
 			// Legacy support, assume it was the main active provider
 			$embedding_model = $configured_embedding_model;
-			$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+			$api_key         = \jeo_settings()->get_option( $active . '_api_key' );
 			if ( 'ollama' === $active ) {
 				$api_key = \jeo_settings()->get_option( 'ollama_url' );
 			}

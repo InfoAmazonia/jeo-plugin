@@ -55,21 +55,21 @@ class AI_CLI {
 			RAG_Agent::setup_store_model( 'jeo_knowledge', $current_model );
 		}
 
-		$query_args = [
+		$query_args = array(
 			'post_type'      => $post_type,
 			'post_status'    => 'publish',
 			'posts_per_page' => $batch_size,
 			'paged'          => 1,
-		];
+		);
 
 		if ( ! $force ) {
 			// Only get posts that haven't been vectorized yet
-			$query_args['meta_query'] = [
-				[
+			$query_args['meta_query'] = array(
+				array(
 					'key'     => '_jeo_vectorized_at',
 					'compare' => 'NOT EXISTS',
-				],
-			];
+				),
+			);
 		}
 
 		$query = new \WP_Query( $query_args );
@@ -87,7 +87,7 @@ class AI_CLI {
 		try {
 			$rag = new RAG_Agent();
 		} catch ( \Exception $e ) {
-			\WP_CLI::error( "Failed to initialize RAG Agent: " . $e->getMessage() );
+			\WP_CLI::error( 'Failed to initialize RAG Agent: ' . $e->getMessage() );
 		}
 
 		$progress = \WP_CLI\Utils\make_progress_bar( 'Vectorizing posts', $total_posts );
@@ -95,7 +95,7 @@ class AI_CLI {
 		for ( $page = 1; $page <= $total_pages; $page++ ) {
 			if ( $page > 1 ) {
 				$query_args['paged'] = $page;
-				$query = new \WP_Query( $query_args );
+				$query               = new \WP_Query( $query_args );
 			}
 
 			$posts = $query->posts;
@@ -105,7 +105,7 @@ class AI_CLI {
 
 			// Load documents
 			$documents = WP_Post_Data_Loader::load( $posts );
-			
+
 			if ( ! empty( $documents ) ) {
 				try {
 					// Approximate tokens processed (string length of all document contents combined)

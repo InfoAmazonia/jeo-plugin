@@ -49,7 +49,7 @@ class RAG_Agent extends RAG {
 
 		// 3. Determine Embedding Provider
 		$embedding_model_setting = \jeo_settings()->get_option( 'ai_embedding_model' );
-		$locked_model = self::get_locked_model( 'jeo_knowledge' );
+		$locked_model            = self::get_locked_model( 'jeo_knowledge' );
 
 		// Recovery mechanism: if DB setting is empty but store was locked with a model (from legacy Auto mode)
 		if ( empty( $embedding_model_setting ) && ! empty( $locked_model ) ) {
@@ -75,7 +75,7 @@ class RAG_Agent extends RAG {
 		}
 
 		// 4. Check for specific provider compatibility (Embeddings)
-		$compatible_providers = [ 'openai', 'gemini', 'ollama' ];
+		$compatible_providers = array( 'openai', 'gemini', 'ollama' );
 		if ( ! in_array( $embedding_provider, $compatible_providers ) ) {
 			return new \WP_Error( 'rag_incompatible_provider', sprintf( __( 'The selected embedding provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for Vector Store features.', 'jeo' ), ucfirst( $embedding_provider ) ) );
 		}
@@ -93,17 +93,33 @@ class RAG_Agent extends RAG {
 		return true;
 	}
 
+	/**
+	 * Return the active AI provider for chat operations.
+	 *
+	 * @return AIProviderInterface
+	 */
 	protected function ai(): AIProviderInterface {
 		// Returns the active AI provider configured in JEO settings
 		return Neuron_Factory::get_active_provider();
 	}
 
+	/**
+	 * Return the active embeddings provider for vector operations.
+	 *
+	 * @return EmbeddingsProviderInterface
+	 */
 	protected function embeddings(): EmbeddingsProviderInterface {
 		// Returns the active AI provider assuming it implements EmbeddingsProviderInterface
 		// For a robust system, the embedding model should be separate from the chat model
 		return Neuron_Factory::get_active_embeddings_provider();
 	}
 
+	/**
+	 * Configure and return the FileVectorStore with directory setup and permission checks.
+	 *
+	 * @return VectorStoreInterface
+	 * @throws \Exception If the store directory cannot be created or secured.
+	 */
 	protected function vectorStore(): VectorStoreInterface {
 		// Store defaults to wp-content/uploads/jeo-ai-store for shared hosting support
 		$upload_dir = wp_upload_dir();
@@ -154,7 +170,7 @@ class RAG_Agent extends RAG {
 	 * Securely save the model info when the first vectorization happens.
 	 */
 	public static function setup_store_model( $name, $model ) {
-		$uploads = wp_upload_dir();
+		$uploads   = wp_upload_dir();
 		$store_dir = $uploads['basedir'] . '/jeo-ai-store';
 		$info_file = $store_dir . '/' . $name . '.model_info';
 		if ( ! empty( $model ) ) {
@@ -166,9 +182,9 @@ class RAG_Agent extends RAG {
 	 * Check if a store has a fixed model and what it is.
 	 */
 	public static function get_locked_model( $name ) {
-		$uploads = wp_upload_dir();
-		$store_dir = $uploads['basedir'] . '/jeo-ai-store';
-		$info_file = $store_dir . '/' . $name . '.model_info';
+		$uploads    = wp_upload_dir();
+		$store_dir  = $uploads['basedir'] . '/jeo-ai-store';
+		$info_file  = $store_dir . '/' . $name . '.model_info';
 		$store_file = $store_dir . '/' . $name . '.store';
 
 		if ( file_exists( $store_file ) && filesize( $store_file ) > 0 && file_exists( $info_file ) ) {

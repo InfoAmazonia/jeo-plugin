@@ -83,7 +83,7 @@ abstract class AI_Adapter {
 	 */
 	protected function log_debug( $provider, $input, $output, $input_tokens = 0, $output_tokens = 0 ) {
 		$debug_mode = \jeo_settings()->get_option( 'ai_debug_mode' );
-		
+
 		if ( empty( $debug_mode ) ) {
 			return;
 		}
@@ -143,17 +143,17 @@ abstract class AI_Adapter {
 		// This prevents capturing extra data that LLMs often append after the array (like "topics", "keywords", etc.)
 		$start_pos = strpos( $text, '[' );
 		if ( $start_pos !== false ) {
-			$depth = 0;
+			$depth     = 0;
 			$found_end = false;
-			$len = strlen( $text );
-			
+			$len       = strlen( $text );
+
 			for ( $i = $start_pos; $i < $len; $i++ ) {
 				if ( $text[ $i ] === '[' ) {
-					$depth++;
+					++$depth;
 				} elseif ( $text[ $i ] === ']' ) {
-					$depth--;
+					--$depth;
 					if ( $depth === 0 ) {
-						$text = substr( $text, $start_pos, ( $i - $start_pos ) + 1 );
+						$text      = substr( $text, $start_pos, ( $i - $start_pos ) + 1 );
 						$found_end = true;
 						break;
 					}
@@ -163,7 +163,7 @@ abstract class AI_Adapter {
 
 		// Clean up the string to ensure it parses properly
 		$text = trim( $text );
-		
+
 		// Attempt to parse the JSON
 		$parsed = json_decode( $text, true );
 

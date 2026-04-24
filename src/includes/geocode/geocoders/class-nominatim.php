@@ -172,85 +172,86 @@ class Nominatim extends \Jeo\Geocoder {
 	private function format_response_item( $item ) {
 
 		if ( isset( $item['lat'] ) && isset( $item['lon'] ) && isset( $item['display_name'] ) ) {
-if ( $item ) {
-	$response[] = array(
-		'lat'          => $item['lat'],
-		'lon'          => $item['lon'],
-		'full_address' => $item['display_name'],
-	);
-}
+			if ( $item ) {
+				$response[] = array(
+					'lat'          => $item['lat'],
+					'lon'          => $item['lon'],
+					'full_address' => $item['display_name'],
+				);
+			}
 
-		/**
-		 * See https://github.com/OpenCageData/address-formatting/blob/master/conf/components.yaml
-		 * See https://github.com/openstreetmap/Nominatim/blob/6c1977b448e8b195bf96b6144674ffe0527e79de/lib/lib.php#L63
-		 * for all possible values
-		 */
-		$correspondences = array(
-			'country'        => array(
-				'country',
-				'country_name',
-			),
-			'country_code'   => array(
-				'country_code',
-			),
-			'region_level_1' => array(
-				'region',
-			),
-			'region_level_2' => array(
-				'state',
-				'state_code',
-				'province',
-			),
-			'region_level_3' => array(
-				'state_district',
-				'county',
-				'local_administrative_area',
-				'county_code',
-			),
-			'city'           => array(
-				'city',
-				'town',
-				'municipality',
-			),
-			'city_level_1'   => array(
-				'neighbourhood',
-				'suburb',
-				'city_district',
-				'district',
-				'quarter',
-				'houses',
-				'subdivision',
-				'village',
-				'hamlet',
-				'locality',
-				'croft',
-			),
-			'address'        => array(
-				'road',
-				'street',
-				'path',
-				'pedestrian',
-			),
-			'address_number' => array(
-				'house_number',
-			),
-			'postcode'       => array(
-				'postcode',
-			),
-		);
+			/**
+			 * See https://github.com/OpenCageData/address-formatting/blob/master/conf/components.yaml
+			 * See https://github.com/openstreetmap/Nominatim/blob/6c1977b448e8b195bf96b6144674ffe0527e79de/lib/lib.php#L63
+			 * for all possible values
+			 */
+			$correspondences = array(
+				'country'        => array(
+					'country',
+					'country_name',
+				),
+				'country_code'   => array(
+					'country_code',
+				),
+				'region_level_1' => array(
+					'region',
+				),
+				'region_level_2' => array(
+					'state',
+					'state_code',
+					'province',
+				),
+				'region_level_3' => array(
+					'state_district',
+					'county',
+					'local_administrative_area',
+					'county_code',
+				),
+				'city'           => array(
+					'city',
+					'town',
+					'municipality',
+				),
+				'city_level_1'   => array(
+					'neighbourhood',
+					'suburb',
+					'city_district',
+					'district',
+					'quarter',
+					'houses',
+					'subdivision',
+					'village',
+					'hamlet',
+					'locality',
+					'croft',
+				),
+				'address'        => array(
+					'road',
+					'street',
+					'path',
+					'pedestrian',
+				),
+				'address_number' => array(
+					'house_number',
+				),
+				'postcode'       => array(
+					'postcode',
+				),
+			);
 
-		foreach ( $correspondences as $jeo_field => $nominatim_fields ) {
+			foreach ( $correspondences as $jeo_field => $nominatim_fields ) {
 
-			foreach ( $nominatim_fields as $field ) {
-				if ( isset( $item['address']->$field ) ) {
-					$response[ $jeo_field ] = $item['address']->$field;
-					break;
+				foreach ( $nominatim_fields as $field ) {
+					if ( isset( $item['address']->$field ) ) {
+						$response[ $jeo_field ] = $item['address']->$field;
+						break;
+					}
 				}
 			}
+
+			$response['raw'] = $item;
+
+			return $response;
 		}
-
-		$response['raw'] = $item;
-
-		return $response;
 	}
 }

@@ -10,7 +10,7 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * RAG Backup Class
- * 
+ *
  * Manages ZIP backups of the Vector Store before resets.
  */
 class RAG_Backup {
@@ -28,8 +28,8 @@ class RAG_Backup {
 	 * Perform the backup (ZIP store and info files).
 	 */
 	public function do_backup() {
-		$uploads = wp_upload_dir();
-		$store_dir = $uploads['basedir'] . '/jeo-ai-store';
+		$uploads    = wp_upload_dir();
+		$store_dir  = $uploads['basedir'] . '/jeo-ai-store';
 		$backup_dir = $store_dir . '/backups';
 
 		if ( ! class_exists( 'ZipArchive' ) ) {
@@ -48,10 +48,10 @@ class RAG_Backup {
 		}
 
 		$timestamp = current_time( 'Y-m-d_H-i-s' );
-		$zip_file = $backup_dir . '/jeo-rag-backup-' . $timestamp . '.zip';
+		$zip_file  = $backup_dir . '/jeo-rag-backup-' . $timestamp . '.zip';
 
 		$zip = new \ZipArchive();
-		if ( $zip->open( $zip_file, \ZipArchive::CREATE ) === TRUE ) {
+		if ( $zip->open( $zip_file, \ZipArchive::CREATE ) === true ) {
 			$files_added = false;
 			// Add production store
 			if ( file_exists( $store_dir . '/jeo_knowledge.store' ) ) {
@@ -87,9 +87,12 @@ class RAG_Backup {
 	private function rotate_backups( $backup_dir ) {
 		$files = glob( $backup_dir . '/jeo-rag-backup-*.zip' );
 		if ( count( $files ) > 3 ) {
-			usort( $files, function( $a, $b ) {
-				return filemtime( $b ) - filemtime( $a );
-			} );
+			usort(
+				$files,
+				function ( $a, $b ) {
+					return filemtime( $b ) - filemtime( $a );
+				}
+			);
 
 			$files_to_delete = array_slice( $files, 3 );
 			foreach ( $files_to_delete as $f ) {
@@ -102,16 +105,21 @@ class RAG_Backup {
 	 * Get list of available backups.
 	 */
 	public function get_backups() {
-		$uploads = wp_upload_dir();
+		$uploads    = wp_upload_dir();
 		$backup_dir = $uploads['basedir'] . '/jeo-ai-store/backups';
 		$backup_url = $uploads['baseurl'] . '/jeo-ai-store/backups';
 
 		$files = glob( $backup_dir . '/jeo-rag-backup-*.zip' );
-		if ( ! $files ) return array();
+		if ( ! $files ) {
+			return array();
+		}
 
-		usort( $files, function( $a, $b ) {
-			return filemtime( $b ) - filemtime( $a );
-		} );
+		usort(
+			$files,
+			function ( $a, $b ) {
+				return filemtime( $b ) - filemtime( $a );
+			}
+		);
 
 		$data = array();
 		foreach ( $files as $f ) {
@@ -119,7 +127,7 @@ class RAG_Backup {
 				'filename' => basename( $f ),
 				'url'      => $backup_url . '/' . basename( $f ),
 				'date'     => date( 'Y-m-d H:i:s', filemtime( $f ) ),
-				'size'     => size_format( filesize( $f ) )
+				'size'     => size_format( filesize( $f ) ),
 			);
 		}
 

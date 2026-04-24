@@ -2,6 +2,11 @@
 
 namespace Jeo;
 
+/**
+ * Handles geocoding operations, metadata registration, and geocoder management.
+ *
+ * @package Jeo
+ */
 class Geocode_Handler {
 
 	use Singleton;
@@ -31,6 +36,11 @@ class Geocode_Handler {
 
 	private $registered_geocoders = array();
 
+	/**
+	 * AJAX handler that geocodes a search string using the active geocoder and returns JSON.
+	 *
+	 * @return void
+	 */
 	public function ajax_geocode() {
 
 		$geocoder = $this->get_active_geocoder();
@@ -44,6 +54,11 @@ class Geocode_Handler {
 		die;
 	}
 
+	/**
+	 * AJAX handler that reverse-geocodes lat/lon using the active geocoder.
+	 *
+	 * @return void
+	 */
 	public function ajax_reverse_geocode() {
 		$geocoder = $this->get_active_geocoder();
 		if ( $geocoder ) {
@@ -96,12 +111,22 @@ class Geocode_Handler {
 		do_action( 'jeo_register_geocoders', $this );
 	}
 
+	/**
+	 * Return an instance of the currently active geocoder based on settings.
+	 *
+	 * @return Geocoder|false
+	 */
 	public function get_active_geocoder() {
 		$this->register_geocoders();
 		$active_geocoder = jeo_settings()->get_option( 'active_geocoder' );
 		return $this->initialize_geocoder( $active_geocoder );
 	}
 
+	/**
+	 * Register the `_related_point` and all index metadata for enabled post types.
+	 *
+	 * @return void
+	 */
 	public function register_metadata() {
 
 		$post_types = \jeo_settings()->get_option( 'enabled_post_types' );
@@ -121,16 +146,16 @@ class Geocode_Handler {
 						'show_in_rest'      => array(
 							'schema' => array(
 								'properties'           => array(
-									'_geocode_lat'     => array(
+									'_geocode_lat'      => array(
 										'type' => 'number',
 									),
-									'_geocode_lon'     => array(
+									'_geocode_lon'      => array(
 										'type' => 'number',
 									),
 									'_geocode_city_level_1' => array(
 										'type' => 'string',
 									),
-									'_geocode_city'    => array(
+									'_geocode_city'     => array(
 										'type' => 'string',
 									),
 									'_geocode_region_level_3' => array(
@@ -145,10 +170,10 @@ class Geocode_Handler {
 									'_geocode_country_code' => array(
 										'type' => 'string',
 									),
-									'_geocode_country' => array(
+									'_geocode_country'  => array(
 										'type' => 'string',
 									),
-									'_geocode_address' => array(
+									'_geocode_address'  => array(
 										'type' => 'string',
 									),
 									'_geocode_address_number' => array(
@@ -160,14 +185,14 @@ class Geocode_Handler {
 									'_geocode_full_address' => array(
 										'type' => 'string',
 									),
-									'relevance'        => array(
+									'relevance'         => array(
 										'type' => 'string',
 										'enum' => array(
 											'primary',
 											'secondary',
 										),
 									),
-									'_ai_quote'        => array(
+									'_ai_quote'         => array(
 										'type' => 'string',
 									),
 								),
@@ -338,10 +363,21 @@ class Geocode_Handler {
 		return true;
 	}
 
+	/**
+	 * Remove a registered geocoder by slug.
+	 *
+	 * @param string $geocoder_slug Unique geocoder slug.
+	 * @return void
+	 */
 	public function unregister_geocoder( $geocoder_slug ) {
 		unset( $this->registered_geocoders[ $geocoder_slug ] );
 	}
 
+	/**
+	 * Lazily initialize and return all registered geocoders.
+	 *
+	 * @return array
+	 */
 	public function get_registered_geocoders() {
 		if ( empty( $this->registered_geocoders ) ) {
 			$this->register_geocoders();
@@ -349,6 +385,12 @@ class Geocode_Handler {
 		return $this->registered_geocoders;
 	}
 
+	/**
+	 * Return the definition array for a single registered geocoder by slug.
+	 *
+	 * @param string $geocoder_slug Unique geocoder slug.
+	 * @return array|null
+	 */
 	public function get_geocoder( $geocoder_slug ) {
 		$geocoders = $this->get_registered_geocoders();
 		if ( isset( $geocoders[ $geocoder_slug ] ) ) {
@@ -357,6 +399,12 @@ class Geocode_Handler {
 		return null;
 	}
 
+	/**
+	 * Look up a registered geocoder definition matching a Geocoder object instance by class name.
+	 *
+	 * @param \Jeo\Geocoder $geocoder_object Geocoder instance to look up.
+	 * @return array|null
+	 */
 	public function get_geocoder_by_object( \Jeo\Geocoder $geocoder_object ) {
 		$class_name = get_class( $geocoder_object );
 		// add first bracket
@@ -370,6 +418,12 @@ class Geocode_Handler {
 		return null;
 	}
 
+	/**
+	 * Instantiate and return a Geocoder object for the given slug.
+	 *
+	 * @param string $geocoder_slug Unique geocoder slug.
+	 * @return Geocoder|false
+	 */
 	public function initialize_geocoder( $geocoder_slug ) {
 		$geocoder = $this->get_geocoder( $geocoder_slug );
 		if ( is_array( $geocoder ) && isset( $geocoder['class_name'] ) ) {
@@ -413,6 +467,11 @@ class Geocode_Handler {
 		return $value;
 	}
 
+	/**
+	 * Register the metadata filter and action hooks used to maintain geocode index meta.
+	 *
+	 * @return void
+	 */
 	private function add_index_metadata_hooks() {
 
 		add_filter( 'update_post_metadata', array( $this, 'disable_update_post_meta' ), 10, 3 );
@@ -422,6 +481,11 @@ class Geocode_Handler {
 		add_action( 'added_post_meta', array( $this, 'update_meta_indexes' ), 10, 3 );
 	}
 
+	/**
+	 * Remove the metadata filter and action hooks to prevent recursion during index updates.
+	 *
+	 * @return void
+	 */
 	private function remove_index_metadata_hooks() {
 
 		remove_filter( 'update_post_metadata', array( $this, 'disable_update_post_meta' ) );
@@ -470,7 +534,7 @@ class Geocode_Handler {
 
 					// Fallback to secondary if relevance is missing to prevent PHP Warnings
 					$point_relevance = isset( $point['relevance'] ) ? $point['relevance'] : 'secondary';
-					$suffix = 'primary' === $point_relevance ? '_p' : '_s';
+					$suffix          = 'primary' === $point_relevance ? '_p' : '_s';
 
 					if ( isset( $point[ $attr ] ) ) {
 						add_post_meta( $object_id, $attr . $suffix, $point[ $attr ] );

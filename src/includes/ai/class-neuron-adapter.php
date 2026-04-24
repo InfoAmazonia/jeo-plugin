@@ -30,10 +30,17 @@ class Neuron_Adapter extends AI_Adapter {
 	 */
 	protected $model_name;
 
+	/**
+	 * Initialize the adapter with provider details and create the underlying Neuron_Agent instance.
+	 *
+	 * @param string $provider_name AI provider slug (e.g. 'gemini', 'openai').
+	 * @param string $api_key       API key for the provider.
+	 * @param string $model_name    Model identifier to use.
+	 */
 	public function __construct( $provider_name, $api_key, $model_name ) {
 		$this->provider_name = $provider_name;
 		$this->model_name    = $model_name;
-		
+
 		// Inicia o agente Neuron por trás das cenas
 		$this->agent = new Neuron_Agent( $provider_name, $api_key, $model_name );
 	}
@@ -65,7 +72,7 @@ class Neuron_Adapter extends AI_Adapter {
 			// Salva metadados de custo usando o novo Dashboard (via nossa nova Jeo\AI\AI_Logger)
 			$this->log_debug( $this->provider_name . ' (' . $this->model_name . ')', $user_text, $raw_output, $input_tokens, $output_tokens );
 
-			// Opcional: Em vez do método obsoleto parse_json_from_text, poderíamos usar Neuron Structured, mas 
+			// Opcional: Em vez do método obsoleto parse_json_from_text, poderíamos usar Neuron Structured, mas
 			// como o parser do JEO usa regex para arrancar lixos, vamos aproveitá-lo como "plano B" robusto, caso o Neuron devolva lixo:
 			return $this->parse_json_from_text( $raw_output );
 

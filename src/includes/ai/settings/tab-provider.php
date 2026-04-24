@@ -21,10 +21,10 @@
 				</th>
 				<td>
 					<?php
-					$key_value = \jeo_settings()->get_option( $slug . ( $slug === 'ollama' ? '_url' : '_api_key' ) );
-					$is_empty = empty( $key_value );
+					$key_value     = \jeo_settings()->get_option( $slug . ( $slug === 'ollama' ? '_url' : '_api_key' ) );
+					$is_empty      = empty( $key_value );
 					$display_value = '';
-					
+
 					if ( ! $is_empty ) {
 						if ( $slug === 'ollama' ) {
 							$display_value = $key_value;

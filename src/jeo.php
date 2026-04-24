@@ -21,17 +21,20 @@ if ( ! defined( 'WPINC' ) ) {
  * Check PHP Version Compatibility (Requires 8.2+)
  */
 if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
-	add_action( 'admin_notices', function () {
-		printf(
-			'<div class="notice notice-error"><p>%s</p></div>',
-			esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated.', 'jeo' )
-		);
-	} );
+	add_action(
+		'admin_notices',
+		function () {
+			printf(
+				'<div class="notice notice-error"><p>%s</p></div>',
+				esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated.', 'jeo' )
+			);
+		}
+	);
 
 	if ( ! function_exists( 'deactivate_plugins' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
-	
+
 	// Ensure we don't cause infinite loop on activation failure
 	if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
@@ -82,14 +85,16 @@ function jeo_deactivate() {
 		$options['deepseek_api_key'] = '';
 		update_option( 'jeo-settings', $options );
 	}
-	
+
 	// Clear residual debug logs for safety
 	$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
-	if ( file_exists( $log_file ) ) { @unlink( $log_file ); }
-	
-	$upload_dir = wp_upload_dir();
+	if ( file_exists( $log_file ) ) {
+		@unlink( $log_file ); }
+
+	$upload_dir       = wp_upload_dir();
 	$log_file_uploads = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
-	if ( file_exists( $log_file_uploads ) ) { @unlink( $log_file_uploads ); }
+	if ( file_exists( $log_file_uploads ) ) {
+		@unlink( $log_file_uploads ); }
 
 	flush_rewrite_rules();
 }

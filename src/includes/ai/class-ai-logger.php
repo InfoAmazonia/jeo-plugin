@@ -31,11 +31,11 @@ class AI_Logger {
 	 */
 	public function register_post_type() {
 		$labels = array(
-			'name'               => _x( 'AI Usage Logs', 'Post Type General Name', 'jeo' ),
-			'singular_name'      => _x( 'AI Usage Log', 'Post Type Singular Name', 'jeo' ),
-			'menu_name'          => __( 'AI Logs (Costs)', 'jeo' ),
-			'all_items'          => __( 'All AI Logs', 'jeo' ),
-			'view_item'          => __( 'View Log', 'jeo' ),
+			'name'          => _x( 'AI Usage Logs', 'Post Type General Name', 'jeo' ),
+			'singular_name' => _x( 'AI Usage Log', 'Post Type Singular Name', 'jeo' ),
+			'menu_name'     => __( 'AI Logs (Costs)', 'jeo' ),
+			'all_items'     => __( 'All AI Logs', 'jeo' ),
+			'view_item'     => __( 'View Log', 'jeo' ),
 		);
 
 		$args = array(
@@ -74,13 +74,15 @@ class AI_Logger {
 	 */
 	public function insert_log( $provider, $prompt, $response, $input_tokens = 0, $output_tokens = 0 ) {
 		$total_tokens = (int) $input_tokens + (int) $output_tokens;
-		$title = sprintf( 'Log [%s] - %d Tokens', $provider, $total_tokens );
+		$title        = sprintf( 'Log [%s] - %d Tokens', $provider, $total_tokens );
 
-		$post_id = wp_insert_post( array(
-			'post_type'   => self::POST_TYPE,
-			'post_title'  => $title,
-			'post_status' => 'private',
-		) );
+		$post_id = wp_insert_post(
+			array(
+				'post_type'   => self::POST_TYPE,
+				'post_title'  => $title,
+				'post_status' => 'private',
+			)
+		);
 
 		if ( ! is_wp_error( $post_id ) ) {
 			// Save metrics for cost dashboard
@@ -105,7 +107,13 @@ class AI_Logger {
 	public function add_embedding_tokens( $type, $char_length ) {
 		$estimated_tokens = (int) ceil( $char_length / 4 );
 
-		$totals = get_option( 'jeo_ai_embedding_tokens', array( 'vectorize' => 0, 'retrieve' => 0 ) );
+		$totals = get_option(
+			'jeo_ai_embedding_tokens',
+			array(
+				'vectorize' => 0,
+				'retrieve'  => 0,
+			)
+		);
 
 		if ( ! isset( $totals[ $type ] ) ) {
 			$totals[ $type ] = 0;
@@ -121,6 +129,12 @@ class AI_Logger {
 	 * @return array
 	 */
 	public function get_embedding_tokens() {
-		return get_option( 'jeo_ai_embedding_tokens', array( 'vectorize' => 0, 'retrieve' => 0 ) );
+		return get_option(
+			'jeo_ai_embedding_tokens',
+			array(
+				'vectorize' => 0,
+				'retrieve'  => 0,
+			)
+		);
 	}
 }

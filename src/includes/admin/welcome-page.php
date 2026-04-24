@@ -44,7 +44,7 @@
 
 		.jeo-pulse-icon {
 			width: 60px; height: 60px;
-			background: url('<?php echo esc_url( JEO_BASEURL . "/js/src/icons/jeo.svg" ); ?>') center center no-repeat;
+			background: url('<?php echo esc_url( JEO_BASEURL . '/js/src/icons/jeo.svg' ); ?>') center center no-repeat;
 			background-size: contain;
 			animation: jeo-pulse-scale 1.5s infinite ease-in-out;
 			margin-bottom: 20px;
@@ -71,8 +71,8 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			var readmeUrl = '<?php echo rest_url("jeo/v1/readme"); ?>';
-			var wpNonce = '<?php echo wp_create_nonce("wp_rest"); ?>';
+			var readmeUrl = '<?php echo rest_url( 'jeo/v1/readme' ); ?>';
+			var wpNonce = '<?php echo wp_create_nonce( 'wp_rest' ); ?>';
 			var allDocs = [];
 
 			function simpleMarkdown(md) {
