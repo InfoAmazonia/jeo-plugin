@@ -1,4 +1,9 @@
 <?php
+/**
+ * NeuronAI provider adapter.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -16,16 +21,22 @@ if ( ! defined( 'WPINC' ) ) {
 class Neuron_Adapter extends AI_Adapter {
 
 	/**
+	 * Neuron agent instance.
+	 *
 	 * @var Neuron_Agent
 	 */
 	protected $agent;
 
 	/**
+	 * AI provider slug.
+	 *
 	 * @var string
 	 */
 	protected $provider_name;
 
 	/**
+	 * Model identifier.
+	 *
 	 * @var string
 	 */
 	protected $model_name;
@@ -41,7 +52,7 @@ class Neuron_Adapter extends AI_Adapter {
 		$this->provider_name = $provider_name;
 		$this->model_name    = $model_name;
 
-		// Inicia o agente Neuron por trás das cenas
+		// Inicia o agente Neuron por trás das cenas.
 		$this->agent = new Neuron_Agent( $provider_name, $api_key, $model_name );
 	}
 
@@ -54,30 +65,30 @@ class Neuron_Adapter extends AI_Adapter {
 	 * @return array|\WP_Error
 	 */
 	public function georeference( $title, $content, $override_prompt = null ) {
-		// Pega a instrução do sistema (Prompt + Schema agressivo do JEO)
+		// Pega a instrução do sistema (Prompt + Schema agressivo do JEO).
 		$system_prompt = $this->get_system_prompt( $override_prompt );
 
-		// Prepara o texto do usuário
+		// Prepara o texto do usuário.
 		$user_text = "Title: {$title}\n\nContent: {$content}";
 
-		// Variáveis de referência para guardar consumo
+		// Variáveis de referência para guardar consumo.
 		$input_tokens  = 0;
 		$output_tokens = 0;
 		$raw_output    = '';
 
 		try {
-			// Delega ao Neuron framework
+			// Delega ao Neuron framework.
 			$raw_output = $this->agent->run_georeference( $system_prompt, $user_text, $input_tokens, $output_tokens, $raw_output );
 
-			// Salva metadados de custo usando o novo Dashboard (via nossa nova Jeo\AI\AI_Logger)
+			// Salva metadados de custo usando o novo Dashboard (via nossa nova Jeo\AI\AI_Logger).
 			$this->log_debug( $this->provider_name . ' (' . $this->model_name . ')', $user_text, $raw_output, $input_tokens, $output_tokens );
 
 			// Opcional: Em vez do método obsoleto parse_json_from_text, poderíamos usar Neuron Structured, mas
-			// como o parser do JEO usa regex para arrancar lixos, vamos aproveitá-lo como "plano B" robusto, caso o Neuron devolva lixo:
+			// como o parser do JEO usa regex para arrancar lixos, vamos aproveitá-lo como "plano B" robusto, caso o Neuron devolva lixo.
 			return $this->parse_json_from_text( $raw_output );
 
 		} catch ( \Exception $e ) {
-			// Em caso de API key errada, rate limit, etc. Loga e devolve erro
+			// Em caso de API key errada, rate limit, etc. Loga e devolve erro.
 			$this->log_debug( $this->provider_name . ' [ERROR]', $user_text, $e->getMessage(), 0, 0 );
 			return new \WP_Error( 'neuron_api_error', "{$this->provider_name} Neuron API Error: " . $e->getMessage() );
 		}

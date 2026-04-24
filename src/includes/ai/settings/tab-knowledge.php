@@ -1,4 +1,10 @@
 <?php
+/**
+ * AI knowledge base / RAG settings tab.
+ *
+ * @package Jeo
+ */
+
 $rag_feasibility = \Jeo\AI\RAG_Agent::is_feasible();
 $is_rag_blocked  = is_wp_error( $rag_feasibility );
 ?>
@@ -30,7 +36,10 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 												🔒 <?php esc_html_e( 'Model selection is locked.', 'jeo' ); ?>
 											</p>
 											<p style="margin: 5px 0 0 0; font-size: 13px;">
-												<?php printf( esc_html__( 'This Vector Store was initialized with %s. To use a different model, you must clear the current store first.', 'jeo' ), '<code>' . esc_html( $locked_model ) . '</code>' ); ?>
+												<?php
+												/* translators: %s: locked embedding model name */
+												printf( esc_html__( 'This Vector Store was initialized with %s. To use a different model, you must clear the current store first.', 'jeo' ), '<code>' . esc_html( $locked_model ) . '</code>' );
+												?>
 											</p>
 										</div>
 										<input type="hidden" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_embedding_model' ) ); ?>" value="<?php echo esc_attr( $current_embed_model ); ?>">
@@ -191,13 +200,16 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 					<div style="margin-top: 20px;">
 						<div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
 							<span><?php esc_html_e( 'Indexing Progress', 'jeo' ); ?></span>
-							<span><?php echo $rag_percent; ?>%</span>
+							<span><?php echo esc_html( $rag_percent ); ?>%</span>
 						</div>
 						<div style="width: 100%; background: #e2e4e7; border-radius: 4px; height: 10px;">
-							<div style="width: <?php echo $rag_percent; ?>%; background: #2271b1; height: 100%; border-radius: 4px;"></div>
+							<div style="width: <?php echo esc_html( $rag_percent ); ?>%; background: #2271b1; height: 100%; border-radius: 4px;"></div>
 						</div>
 						<p style="font-size: 11px; color: #646970; margin-top: 8px;">
-							<?php printf( esc_html__( '%1$d of %2$d posts indexed.', 'jeo' ), $vectorized_count, $total_posts ); ?>
+							<?php
+							/* translators: %1$d: vectorized count, %2$d: total posts count */
+							printf( esc_html__( '%1$d of %2$d posts indexed.', 'jeo' ), esc_html( $vectorized_count ), esc_html( $total_posts ) );
+							?>
 						</p>
 					</div>
 			</div>

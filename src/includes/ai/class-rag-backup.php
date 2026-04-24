@@ -1,4 +1,9 @@
 <?php
+/**
+ * RAG index backup and restore.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -53,7 +58,7 @@ class RAG_Backup {
 		$zip = new \ZipArchive();
 		if ( $zip->open( $zip_file, \ZipArchive::CREATE ) === true ) {
 			$files_added = false;
-			// Add production store
+			// Add production store.
 			if ( file_exists( $store_dir . '/jeo_knowledge.store' ) ) {
 				$zip->addFile( $store_dir . '/jeo_knowledge.store', 'jeo_knowledge.store' );
 				$files_added = true;
@@ -61,7 +66,7 @@ class RAG_Backup {
 			if ( file_exists( $store_dir . '/jeo_knowledge.model_info' ) ) {
 				$zip->addFile( $store_dir . '/jeo_knowledge.model_info', 'jeo_knowledge.model_info' );
 			}
-			// Add test store
+			// Add test store.
 			if ( file_exists( $store_dir . '/jeo_knowledge_test.store' ) ) {
 				$zip->addFile( $store_dir . '/jeo_knowledge_test.store', 'jeo_knowledge_test.store' );
 			}
@@ -83,6 +88,8 @@ class RAG_Backup {
 	}
 	/**
 	 * Keep only the 3 latest backups.
+	 *
+	 * @param string $backup_dir Path to the backup directory.
 	 */
 	private function rotate_backups( $backup_dir ) {
 		$files = glob( $backup_dir . '/jeo-rag-backup-*.zip' );
@@ -126,7 +133,7 @@ class RAG_Backup {
 			$data[] = array(
 				'filename' => basename( $f ),
 				'url'      => $backup_url . '/' . basename( $f ),
-				'date'     => date( 'Y-m-d H:i:s', filemtime( $f ) ),
+				'date'     => gmdate( 'Y-m-d H:i:s', filemtime( $f ) ),
 				'size'     => size_format( filesize( $f ) ),
 			);
 		}

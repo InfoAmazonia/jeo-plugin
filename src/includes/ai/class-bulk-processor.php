@@ -1,4 +1,9 @@
 <?php
+/**
+ * Bulk processor for AI geolocalization of legacy posts.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -36,7 +41,7 @@ class Bulk_Processor {
 		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
 		add_action( 'update_option_jeo-settings', array( $this, 'maybe_schedule_cron' ), 10, 2 );
 
-		// Admin Table Hooks
+		// Admin Table Hooks.
 		add_action( 'admin_init', array( $this, 'admin_hooks' ) );
 		add_action( 'admin_print_footer_scripts', array( $this, 'render_bulk_approval_modal' ) );
 	}
@@ -248,7 +253,7 @@ class Bulk_Processor {
 			if ( ! wp_next_scheduled( 'jeo_bulk_ai_cron_hook' ) ) {
 				wp_schedule_event( time(), $interval, 'jeo_bulk_ai_cron_hook' );
 			} else {
-				// Check if interval changed
+				// Check if interval changed.
 				$schedule = wp_get_schedule( 'jeo_bulk_ai_cron_hook' );
 				if ( $schedule !== $interval ) {
 					wp_clear_scheduled_hook( 'jeo_bulk_ai_cron_hook' );
@@ -321,6 +326,8 @@ class Bulk_Processor {
 
 	/**
 	 * Process a batch of posts.
+	 *
+	 * @param bool $force Whether to force processing even if inactive.
 	 */
 	public function process_batch( $force = false ) {
 		$active  = \jeo_settings()->get_option( 'jeo_bulk_ai_active', false );
@@ -392,7 +399,7 @@ class Bulk_Processor {
 			++$processed_count;
 		}
 
-		$msg = sprintf( __( 'Processed batch of %d posts.', 'jeo' ), $processed_count );
+		$msg = sprintf( /* translators: %d: number of posts processed. */ __( 'Processed batch of %d posts.', 'jeo' ), $processed_count );
 		$this->log_action( $msg );
 		return $msg;
 	}
@@ -430,20 +437,22 @@ class Bulk_Processor {
 			delete_post_meta( $post->ID, self::META_PROCESSED );
 			delete_post_meta( $post->ID, self::META_STATUS );
 			delete_post_meta( $post->ID, self::META_PENDING );
-			// Clear legacy and active geolocations
+			// Clear legacy and active geolocations.
 			delete_post_meta( $post->ID, '_related_point' );
 			delete_post_meta( $post->ID, '_jeo_legacy_status' );
 			delete_post_meta( $post->ID, '_jeo_ai_pending_point' );
 			++$cleared_count;
 		}
 
-		$msg = sprintf( __( 'Cleared batch of %d posts.', 'jeo' ), $cleared_count );
+		$msg = sprintf( /* translators: %d: number of posts cleared. */ __( 'Cleared batch of %d posts.', 'jeo' ), $cleared_count );
 		$this->log_action( $msg );
 		return $msg;
 	}
 
 	/**
 	 * Log a message to a file for debugging.
+	 *
+	 * @param string $message The log message.
 	 */
 	private function log( $message ) {
 		$log_file  = JEO_BASEPATH . 'jeo-bulk-ai.log';
@@ -466,7 +475,7 @@ class Bulk_Processor {
 			add_filter( "handle_bulk_actions-edit-{$post_type}", array( $this, 'handle_bulk_actions' ), 10, 3 );
 		}
 
-		// Individual approval action
+		// Individual approval action.
 		add_action( 'admin_init', array( $this, 'handle_individual_approval' ) );
 	}
 
@@ -498,7 +507,7 @@ class Bulk_Processor {
 		$pending = get_post_meta( $post_id, self::META_PENDING, true );
 		if ( ! empty( $pending ) ) {
 
-			// Calculate confidence if threshold is set
+			// Calculate confidence if threshold is set.
 			if ( $threshold > 0 ) {
 				$total_conf = 0;
 				foreach ( $pending as $p ) {
@@ -506,14 +515,14 @@ class Bulk_Processor {
 				}
 				$avg_conf = round( $total_conf / count( $pending ) );
 				if ( $avg_conf < $threshold ) {
-					return false; // Skip if below threshold
+					return false; // Skip if below threshold.
 				}
 			}
 
 			$related_points = array();
 			foreach ( $pending as $p ) {
 				$conf = isset( $p['confidence'] ) ? (int) $p['confidence'] : 100;
-				// Follow the same logic as the UI: 75%+ is primary, below is secondary
+				// Follow the same logic as the UI: 75%+ is primary, below is secondary.
 				$relevance = ( $conf >= 75 ) ? 'primary' : 'secondary';
 
 				$related_points[] = array(
@@ -537,6 +546,8 @@ class Bulk_Processor {
 
 	/**
 	 * REST Callback: Preview what posts will be approved in bulk.
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
 	 */
 	public function api_preview_approval( $request ) {
 		$post_ids = $request->get_param( 'post_ids' );
@@ -651,7 +662,7 @@ class Bulk_Processor {
 							post_ids: postIds
 						},
 						beforeSend: function(xhr) {
-							xhr.setRequestHeader('X-WP-Nonce', '<?php echo wp_create_nonce( 'wp_rest' ); ?>');
+							xhr.setRequestHeader('X-WP-Nonce', '<?php echo esc_attr( wp_create_nonce( 'wp_rest' ) ); ?>');
 						},
 						success: function(res) {
 							var html = '<p style="font-size:14px;"><strong>' + res.will_approve + '</strong> posts will be approved.</p>';
@@ -759,13 +770,13 @@ class Bulk_Processor {
 			}
 
 			if ( $avg_conf > 0 ) {
-				$conf_color = '#72aee6'; // Default Blue
+				$conf_color = '#72aee6'; // Default Blue.
 				if ( $avg_conf >= 80 ) {
 					$conf_color = '#46b450'; } elseif ( $avg_conf < 40 ) {
 					$conf_color = '#d63638'; }
 
 					echo '<div style="font-size:11px; font-weight:600; margin-top:2px; color:' . esc_attr( $conf_color ) . ';">';
-					echo 'Precison: ' . $avg_conf . '%';
+					echo 'Precison: ' . esc_html( $avg_conf ) . '%';
 					echo '</div>';
 			}
 		}

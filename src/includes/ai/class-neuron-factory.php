@@ -1,4 +1,9 @@
 <?php
+/**
+ * Neuron AI provider and embeddings factory.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -109,7 +114,7 @@ class Neuron_Factory {
 					model: $model
 				);
 			default:
-				throw new \Exception( 'Unsupported AI Provider: ' . $provider_name );
+				throw new \Exception( 'Unsupported AI Provider: ' . esc_html( $provider_name ) );
 		}
 	}
 
@@ -130,7 +135,7 @@ class Neuron_Factory {
 					model: $model
 				);
 			case 'gemini':
-				// Gemini provider in neuron-ai already includes 'models/' in its baseUri
+				// Gemini provider in neuron-ai already includes 'models/' in its baseUri.
 				$model = str_replace( 'models/', '', $model );
 				return new \NeuronAI\RAG\Embeddings\GeminiEmbeddingsProvider(
 					key: $api_key,
@@ -139,10 +144,10 @@ class Neuron_Factory {
 			case 'ollama':
 				return new \NeuronAI\RAG\Embeddings\OllamaEmbeddingsProvider(
 					model: $model,
-					url: rtrim( $api_key, '/' ) // api_key acts as URL for Ollama in JEO
+					url: rtrim( $api_key, '/' ) // api_key acts as URL for Ollama in JEO.
 				);
 			default:
-				throw new \Exception( "The provider {$provider_name} does not have a native Embeddings Provider in Neuron AI configured for JEO." );
+				throw new \Exception( 'The provider ' . esc_html( $provider_name ) . ' does not have a native Embeddings Provider in Neuron AI configured for JEO.' );
 		}
 	}
 
@@ -179,28 +184,28 @@ class Neuron_Factory {
 			$active = 'gemini';
 		}
 
-		// User MUST specifically select an embedding model
+		// User MUST specifically select an embedding model.
 		$configured_embedding_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 
 		if ( empty( $configured_embedding_model ) ) {
-			throw new \Exception( __( 'No Embedding Model configured. Please select one in the JEO AI settings.', 'jeo' ) );
+			throw new \Exception( esc_html( __( 'No Embedding Model configured. Please select one in the JEO AI settings.', 'jeo' ) ) );
 		}
 
 		$api_key         = '';
 		$embedding_model = '';
 
-		// Check if it has a provider prefix like 'openai:text-embedding-3-small'
+		// Check if it has a provider prefix like 'openai:text-embedding-3-small'.
 		if ( strpos( $configured_embedding_model, ':' ) !== false ) {
 			list( $provider_override, $embedding_model ) = explode( ':', $configured_embedding_model, 2 );
 			$active                                      = $provider_override;
 
-			// Re-fetch API key for the new overridden provider
+			// Re-fetch API key for the new overridden provider.
 			$api_key = \jeo_settings()->get_option( $active . '_api_key' );
 			if ( 'ollama' === $active ) {
 				$api_key = \jeo_settings()->get_option( 'ollama_url' );
 			}
 		} else {
-			// Legacy support, assume it was the main active provider
+			// Legacy support, assume it was the main active provider.
 			$embedding_model = $configured_embedding_model;
 			$api_key         = \jeo_settings()->get_option( $active . '_api_key' );
 			if ( 'ollama' === $active ) {

@@ -1,3 +1,11 @@
+<?php
+/**
+ * Bulk AI processing settings tab.
+ *
+ * @package Jeo
+ */
+
+?>
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -126,7 +134,10 @@
 					<div style="width: <?php echo esc_attr( $percent ); ?>%; background: #46b450; height: 100%; border-radius: 4px; transition: width 0.5s ease;"></div>
 				</div>
 				<p>
-					<?php printf( esc_html__( 'Geolocalization Progress: %1$d of %2$d posts marked as processed (%3$d%%).', 'jeo' ), $processed_posts, $total_posts, $percent ); ?>
+					<?php
+					/* translators: %1$d: processed posts, %2$d: total posts, %3$d: percentage */
+					printf( esc_html__( 'Geolocalization Progress: %1$d of %2$d posts marked as processed (%3$d%%).', 'jeo' ), esc_html( $processed_posts ), esc_html( $total_posts ), esc_html( $percent ) );
+					?>
 				</p>
 			</td>
 		</tr>

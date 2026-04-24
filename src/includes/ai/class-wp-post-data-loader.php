@@ -1,4 +1,9 @@
 <?php
+/**
+ * WordPress post data loader for RAG.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -23,19 +28,19 @@ class WP_Post_Data_Loader {
 		$documents = array();
 
 		foreach ( $posts as $post ) {
-			// Safety checks: skip empty content, revisions, or non-published posts
+			// Safety checks: skip empty content, revisions, or non-published posts.
 			if ( empty( $post->post_content ) || 'publish' !== $post->post_status || 'revision' === $post->post_type ) {
 				continue;
 			}
 
-			// Clean up the content by stripping tags and shortcodes for better embedding
+			// Clean up the content by stripping tags and shortcodes for better embedding.
 			$content = strip_shortcodes( $post->post_content );
 			$content = wp_strip_all_tags( $content );
 
-			// Optional: Combine title, excerpt, and content
+			// Optional: Combine title, excerpt, and content.
 			$text_to_embed = "Title: {$post->post_title}\n\nContent: {$content}";
 
-			// Store metadata like the post ID and URL so the AI can reference it
+			// Store metadata like the post ID and URL so the AI can reference it.
 			$metadata = array(
 				'post_id'   => $post->ID,
 				'post_type' => $post->post_type,

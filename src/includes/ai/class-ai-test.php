@@ -1,4 +1,9 @@
 <?php
+/**
+ * AI connection test utilities.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -19,7 +24,7 @@ class AI_Test {
 	 * @return array|\WP_Error
 	 */
 	public static function run_test() {
-		// Mock values
+		// Mock values.
 		$test_title   = 'Incêndio florestal em Manaus';
 		$test_content = 'Um grande incêndio foi reportado hoje próximo ao Teatro Amazonas, no centro de Manaus.';
 

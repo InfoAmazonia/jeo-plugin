@@ -148,7 +148,7 @@ class Jeo {
 			}
 		}
 
-		// Remove duplicates (same filename in different paths)
+		// Remove duplicates (same filename in different paths).
 		$unique_files = array();
 		foreach ( $files as $file ) {
 			$name = basename( $file );
@@ -164,11 +164,11 @@ class Jeo {
 		}
 
 		foreach ( $unique_files as $file_name => $file_path ) {
-			// Create a friendly label: README_BR.md -> BR, README.md -> Default
+			// Create a friendly label: README_BR.md -> BR, README.md -> Default.
 			$label = str_replace( array( 'README_', 'README', '.md' ), '', $file_name );
 			$label = empty( $label ) ? 'English' : str_replace( '_', ' ', $label );
 
-			// Map specific codes to names
+			// Map specific codes to names.
 			if ( 'BR' === $label ) {
 				$label = 'Português Brasil';
 			}
@@ -234,7 +234,7 @@ class Jeo {
 
 		return new \WP_REST_Response(
 			array(
-				'min_date'   => $min_date ? substr( $min_date, 0, 10 ) : date( 'Y-m-d', strtotime( '-1 year' ) ),
+				'min_date'   => $min_date ? substr( $min_date, 0, 10 ) : gmdate( 'Y-m-d', strtotime( '-1 year' ) ),
 				'post_types' => $types_data,
 			),
 			200
@@ -296,10 +296,10 @@ class Jeo {
 		$sql = "SELECT pm.post_id, pm.meta_value FROM {$wpdb->postmeta} pm $join WHERE $query_where";
 
 		if ( ! empty( $params ) ) {
-			$sql = $wpdb->prepare( $sql, $params );
+			$sql = $wpdb->prepare( $sql, $params ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 		}
 
-		$results = $wpdb->get_results( $sql );
+		$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
 
 		$unique_pins = array();
 		$hash_map    = array();
@@ -315,11 +315,11 @@ class Jeo {
 			// dependendo de como o metadado foi registrado e salvo.
 			$points = array();
 			if ( is_array( $meta_data ) ) {
-				// Se o primeiro item for numérico, é um array de arrays (múltiplos pontos)
+				// Se o primeiro item for numérico, é um array de arrays (múltiplos pontos).
 				if ( isset( $meta_data[0] ) && is_array( $meta_data[0] ) ) {
 					$points = $meta_data;
 				} else {
-					// Caso contrário é um ponto único formatado como array associativo
+					// Caso contrário é um ponto único formatado como array associativo.
 					$points[] = $meta_data;
 				}
 			}
@@ -330,7 +330,7 @@ class Jeo {
 					$lat = (float) str_replace( ',', '.', $point['_geocode_lat'] );
 					$lon = (float) str_replace( ',', '.', $point['_geocode_lon'] );
 
-					// Arredondamento para filtrar duplicatas
+					// Arredondamento para filtrar duplicatas.
 					$hash = round( $lat, 5 ) . '|' . round( $lon, 5 ) . '|' . $post_id;
 
 					if ( ! isset( $hash_map[ $hash ] ) ) {
@@ -761,12 +761,16 @@ class Jeo {
 		$mapgl_script_deps     = array();
 		$mapgl_style_deps      = array();
 
-		$mapbox_key   = \jeo_settings()->get_option( 'mapbox_key' );
-		$default_lat  = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lon  = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
-		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 5;
+		$mapbox_key       = \jeo_settings()->get_option( 'mapbox_key' );
+		$default_lat_raw  = \jeo_settings()->get_option( 'map_default_lat' );
+		$default_lon_raw  = \jeo_settings()->get_option( 'map_default_lon' );
+		$default_zoom_raw = \jeo_settings()->get_option( 'map_default_zoom' );
+		$default_lat      = $default_lat_raw ? $default_lat_raw : -23.549985;
+		$default_lon      = $default_lon_raw ? $default_lon_raw : -46.633519;
+		$default_zoom     = $default_zoom_raw ? $default_zoom_raw : 5;
 
-		$ai_provider_slug = \jeo_settings()->get_option( 'ai_default_provider' ) ?: 'gemini';
+		$ai_provider_raw  = \jeo_settings()->get_option( 'ai_default_provider' );
+		$ai_provider_slug = $ai_provider_raw ? $ai_provider_raw : 'gemini';
 		$ai_adapters      = \jeo_ai_handler()->get_adapters();
 		$ai_provider_name = isset( $ai_adapters[ $ai_provider_slug ] ) ? $ai_adapters[ $ai_provider_slug ] : 'AI';
 

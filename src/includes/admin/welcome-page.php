@@ -1,3 +1,11 @@
+<?php
+/**
+ * JEO welcome page.
+ *
+ * @package Jeo
+ */
+
+?>
 <div class="wrap jeo-welcome-wrap">
 	
 	<style>
@@ -71,8 +79,8 @@
 
 	<script>
 		document.addEventListener('DOMContentLoaded', function() {
-			var readmeUrl = '<?php echo rest_url( 'jeo/v1/readme' ); ?>';
-			var wpNonce = '<?php echo wp_create_nonce( 'wp_rest' ); ?>';
+			var readmeUrl = '<?php echo esc_url( rest_url( 'jeo/v1/readme' ) ); ?>';
+			var wpNonce = '<?php echo esc_attr( wp_create_nonce( 'wp_rest' ) ); ?>';
 			var allDocs = [];
 
 			function simpleMarkdown(md) {

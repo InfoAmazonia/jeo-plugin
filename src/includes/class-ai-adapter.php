@@ -1,4 +1,9 @@
 <?php
+/**
+ * AI Adapter abstract class.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
@@ -48,12 +53,12 @@ abstract class AI_Adapter {
 			$prompt = __( 'You are a highly skilled geographer API. Analyze the text and extract locations.', 'jeo' );
 		}
 
-		// Allow internal tools (like the prompt generator) to bypass the aggressive schema injection
+		// Allow internal tools (like the prompt generator) to bypass the aggressive schema injection.
 		if ( strpos( $prompt, '[SKIP_ENFORCED_SCHEMA]' ) !== false ) {
 			return trim( str_replace( '[SKIP_ENFORCED_SCHEMA]', '', $prompt ) );
 		}
 
-		// Inject mandatory JSON schema constraints aggressively to any prompt to prevent formatting regressions
+		// Inject mandatory JSON schema constraints aggressively to any prompt to prevent formatting regressions.
 		$enforced_schema = "
 
 	CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
@@ -142,17 +147,17 @@ abstract class AI_Adapter {
 		// 3. Surgical Extraction: Find the first '[' and its MATCHING ']'
 		// This prevents capturing extra data that LLMs often append after the array (like "topics", "keywords", etc.)
 		$start_pos = strpos( $text, '[' );
-		if ( $start_pos !== false ) {
+		if ( false !== $start_pos ) {
 			$depth     = 0;
 			$found_end = false;
 			$len       = strlen( $text );
 
 			for ( $i = $start_pos; $i < $len; $i++ ) {
-				if ( $text[ $i ] === '[' ) {
+				if ( '[' === $text[ $i ] ) {
 					++$depth;
-				} elseif ( $text[ $i ] === ']' ) {
+				} elseif ( ']' === $text[ $i ] ) {
 					--$depth;
-					if ( $depth === 0 ) {
+					if ( 0 === $depth ) {
 						$text      = substr( $text, $start_pos, ( $i - $start_pos ) + 1 );
 						$found_end = true;
 						break;
@@ -161,10 +166,10 @@ abstract class AI_Adapter {
 			}
 		}
 
-		// Clean up the string to ensure it parses properly
+		// Clean up the string to ensure it parses properly.
 		$text = trim( $text );
 
-		// Attempt to parse the JSON
+		// Attempt to parse the JSON.
 		$parsed = json_decode( $text, true );
 
 		if ( json_last_error() !== JSON_ERROR_NONE ) {

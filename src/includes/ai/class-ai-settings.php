@@ -1,4 +1,9 @@
 <?php
+/**
+ * AI settings page management.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -17,10 +22,18 @@ class AI_Settings {
 
 	use Singleton;
 
+	/**
+	 * Settings page slug.
+	 *
+	 * @var string
+	 */
 	public $page_slug = 'jeo-ai-settings';
 
+	/**
+	 * Initialize the singleton instance.
+	 */
 	protected function init() {
-		// No longer adding menu here, moved to Jeo\Menu for ordering
+		// No longer adding menu here, moved to Jeo\Menu for ordering.
 	}
 
 	/**

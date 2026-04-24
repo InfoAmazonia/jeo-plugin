@@ -1,5 +1,7 @@
 <?php
 /**
+ * JEO WP — Geojournalism platform for WordPress.
+ *
  * @package           Jeo
  *
  * @wordpress-plugin
@@ -35,7 +37,7 @@ if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
 
-	// Ensure we don't cause infinite loop on activation failure
+	// Ensure we don't cause infinite loop on activation failure.
 	if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
 		if ( isset( $_GET['activate'] ) ) {
@@ -77,7 +79,7 @@ function jeo_activate() {
  * Clear ONLY sensitive API Keys upon deactivation for security.
  */
 function jeo_deactivate() {
-	// Clear ONLY sensitive AI keys
+	// Clear ONLY sensitive AI keys.
 	$options = get_option( 'jeo-settings' );
 	if ( is_array( $options ) ) {
 		$options['gemini_api_key']   = '';
@@ -86,7 +88,7 @@ function jeo_deactivate() {
 		update_option( 'jeo-settings', $options );
 	}
 
-	// Clear residual debug logs for safety
+	// Clear residual debug logs for safety.
 	$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
 	if ( file_exists( $log_file ) ) {
 		@unlink( $log_file ); }

@@ -1,4 +1,9 @@
 <?php
+/**
+ * JEO Settings class.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
@@ -13,8 +18,18 @@ class Settings {
 
 	use Singleton;
 
+	/**
+	 * Option key for JEO settings.
+	 *
+	 * @var string
+	 */
 	public $option_key = 'jeo-settings';
 
+	/**
+	 * Default option values.
+	 *
+	 * @var array
+	 */
 	public $default_options = array(
 		'map_runtime'                     => 'mapboxgl',
 		'enabled_post_types'              => array( 'post' ),
@@ -25,14 +40,14 @@ class Settings {
 		'active_geocoder'                 => 'nominatim',
 		'show_storymaps_on_post_archives' => true,
 
-		// AI
+		// AI.
 		'ai_default_provider'             => 'gemini',
 		'ai_system_prompt'                => '',
 		'ai_use_custom_prompt'            => false,
 		'ai_debug_mode'                   => false,
 		'ai_embedding_model'              => '',
 
-		// Bulk AI
+		// Bulk AI.
 		'jeo_bulk_ai_active'              => false,
 		'jeo_bulk_batch_size'             => 5,
 		'jeo_bulk_post_types'             => array( 'post' ),
@@ -40,52 +55,52 @@ class Settings {
 		'jeo_bulk_logging'                => false,
 		'jeo_bulk_confidence_threshold'   => 70,
 
-		// RAG Auto-indexing
+		// RAG Auto-indexing.
 		'jeo_rag_auto_index'              => false,
 		'jeo_rag_batch_size'              => 10,
 		'jeo_rag_cron_interval'           => 'hourly',
 
-		// Gemini
+		// Gemini.
 		'gemini_api_key'                  => '',
 		'gemini_model'                    => 'gemini-2.5-flash',
 
-		// OpenAI
+		// OpenAI.
 		'openai_api_key'                  => '',
 		'openai_model'                    => 'gpt-4o',
 
-		// DeepSeek
+		// DeepSeek.
 		'deepseek_api_key'                => '',
 		'deepseek_model'                  => 'deepseek-chat',
 
-		// Anthropic
+		// Anthropic.
 		'anthropic_api_key'               => '',
 		'anthropic_model'                 => 'claude-3-opus-20240229',
 
-		// Mistral
+		// Mistral.
 		'mistral_api_key'                 => '',
 		'mistral_model'                   => 'mistral-large-latest',
 
-		// ZAI
+		// ZAI.
 		'zai_api_key'                     => '',
 		'zai_model'                       => '',
 
-		// HuggingFace
+		// HuggingFace.
 		'huggingface_api_key'             => '',
 		'huggingface_model'               => '',
 
-		// Grok
+		// Grok.
 		'grok_api_key'                    => '',
 		'grok_model'                      => 'grok-1',
 
-		// Cohere
+		// Cohere.
 		'cohere_api_key'                  => '',
 		'cohere_model'                    => 'command-r-plus',
 
-		// Ollama
+		// Ollama.
 		'ollama_url'                      => '',
 		'ollama_model'                    => 'llama3',
 
-		// Appearance
+		// Appearance.
 		'jeo_font-url'                    => 'https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap',
 		'jeo_font-family'                 => 'Open Sans',
 		'jeo_font-url-secondary'          => 'https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap',
@@ -103,6 +118,11 @@ class Settings {
 		'jeo_footer-logo'                 => '',
 	);
 
+	/**
+	 * Initialize hooks.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'admin_init', array( $this, 'admin_init' ) );
 		add_action( 'admin_menu', array( $this, 'add_menu_item' ) );
@@ -181,11 +201,11 @@ class Settings {
 			}
 		}
 
-		// Identify the current tab submitted, so we only reset checkboxes that belong to this tab
+		// Identify the current tab submitted, so we only reset checkboxes that belong to this tab.
 		$current_tab = isset( $input['current_tab'] ) ? sanitize_text_field( $input['current_tab'] ) : '';
 		unset( $input['current_tab'] );
 
-		// Checkboxes grouped by tab
+		// Checkboxes grouped by tab.
 		$booleans_by_tab = array(
 			'general'   => array( 'show_storymaps_on_post_archives' ),
 			'provider'  => array( 'ai_use_custom_prompt', 'ai_debug_mode' ),
@@ -193,13 +213,13 @@ class Settings {
 			'knowledge' => array( 'jeo_rag_auto_index' ),
 		);
 
-		// Handle booleans (checkboxes) - if the tab was submitted, assume unchecked if absent
+		// Handle booleans (checkboxes) - if the tab was submitted, assume unchecked if absent.
 		if ( ! empty( $current_tab ) && isset( $booleans_by_tab[ $current_tab ] ) ) {
 			foreach ( $booleans_by_tab[ $current_tab ] as $bool_key ) {
 				$input[ $bool_key ] = isset( $input[ $bool_key ] ) ? true : false;
 			}
 		} else {
-			// Fallback if no tab identifier (e.g. direct API updates or older logic)
+			// Fallback if no tab identifier (e.g. direct API updates or older logic).
 			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_use_custom_prompt', 'show_storymaps_on_post_archives' );
 			foreach ( $all_booleans as $bool_key ) {
 				if ( isset( $input[ $bool_key ] ) ) {
@@ -208,7 +228,7 @@ class Settings {
 			}
 		}
 
-		// Secure API Key handling: If the input contains the visual mask, revert to existing stored value
+		// Secure API Key handling: If the input contains the visual mask, revert to existing stored value.
 		$sensitive_keys = array(
 			'gemini_api_key',
 			'openai_api_key',
@@ -225,14 +245,14 @@ class Settings {
 
 		foreach ( $sensitive_keys as $s_key ) {
 			if ( isset( $input[ $s_key ] ) && strpos( $input[ $s_key ], '********' ) !== false ) {
-				// Restore the real key from DB if it exists
+				// Restore the real key from DB if it exists.
 				if ( isset( $existing_options[ $s_key ] ) ) {
 					$input[ $s_key ] = $existing_options[ $s_key ];
 				}
 			}
 		}
 
-		// Sanitize Appearance - Colors
+		// Sanitize Appearance - Colors.
 		$color_fields = array(
 			'jeo_primary-color',
 			'jeo_secondary-color',
@@ -250,7 +270,7 @@ class Settings {
 			}
 		}
 
-		// Sanitize Appearance - Typography & Others
+		// Sanitize Appearance - Typography & Others.
 		$text_fields = array(
 			'jeo_font-url',
 			'jeo_font-family',

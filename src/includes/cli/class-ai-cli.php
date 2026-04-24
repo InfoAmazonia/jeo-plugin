@@ -1,4 +1,9 @@
 <?php
+/**
+ * WP-CLI commands for AI features.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\CLI;
 
@@ -33,6 +38,9 @@ class AI_CLI {
 	 *     wp jeo ai vectorize
 	 *     wp jeo ai vectorize --post_type=page --batch_size=10
 	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Associative arguments.
+	 *
 	 * @when after_wp_load
 	 */
 	public function vectorize( $args, $assoc_args ) {
@@ -42,7 +50,7 @@ class AI_CLI {
 
 		\WP_CLI::log( "Starting vectorization for post type: {$post_type}" );
 
-		// Check for model lock
+		// Check for model lock.
 		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 		$locked_model  = RAG_Agent::get_locked_model( 'jeo_knowledge' );
 
@@ -50,7 +58,7 @@ class AI_CLI {
 			\WP_CLI::error( "Vector Store mismatch! This store was initialized with '{$locked_model}', but your settings use '{$current_model}'. Please clear the store or revert the model before proceeding." );
 		}
 
-		// Setup lock if first time
+		// Setup lock if first time.
 		if ( empty( $locked_model ) ) {
 			RAG_Agent::setup_store_model( 'jeo_knowledge', $current_model );
 		}
@@ -63,7 +71,7 @@ class AI_CLI {
 		);
 
 		if ( ! $force ) {
-			// Only get posts that haven't been vectorized yet
+			// Only get posts that haven't been vectorized yet.
 			$query_args['meta_query'] = array(
 				array(
 					'key'     => '_jeo_vectorized_at',
@@ -103,24 +111,24 @@ class AI_CLI {
 				continue;
 			}
 
-			// Load documents
+			// Load documents.
 			$documents = WP_Post_Data_Loader::load( $posts );
 
 			if ( ! empty( $documents ) ) {
 				try {
-					// Approximate tokens processed (string length of all document contents combined)
+					// Approximate tokens processed (string length of all document contents combined).
 					$batch_char_length = 0;
 					foreach ( $documents as $doc ) {
 						$batch_char_length += strlen( $doc->getContent() );
 					}
 
-					// Add documents to Vector Store
+					// Add documents to Vector Store.
 					$rag->addDocuments( $documents );
 
-					// Log estimated embedding tokens
+					// Log estimated embedding tokens.
 					\jeo_ai_logger()->add_embedding_tokens( 'vectorize', $batch_char_length );
 
-					// Mark as vectorized
+					// Mark as vectorized.
 					$now = current_time( 'mysql' );
 					foreach ( $posts as $post ) {
 						update_post_meta( $post->ID, '_jeo_vectorized_at', $now );
@@ -130,9 +138,9 @@ class AI_CLI {
 					\WP_CLI::warning( "Batch {$page} failed: " . $e->getMessage() );
 				}
 			} else {
-				// Documents might be empty if content was empty
+				// Documents might be empty if content was empty.
 				foreach ( $posts as $post ) {
-					update_post_meta( $post->ID, '_jeo_vectorized_at', current_time( 'mysql' ) ); // Mark to skip next time
+					update_post_meta( $post->ID, '_jeo_vectorized_at', current_time( 'mysql' ) ); // Mark to skip next time.
 					$progress->tick();
 				}
 			}

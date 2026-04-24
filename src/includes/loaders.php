@@ -1,5 +1,10 @@
 <?php
-// Carrega o Composer Autoloader dependendo do ambiente (Desenvolvimento ou Produção)
+/**
+ * Carrega o Composer Autoloader dependendo do ambiente (Desenvolvimento ou Produção).
+ *
+ * @package Jeo
+ */
+
 if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
 	require_once JEO_BASEPATH . 'vendor/autoload.php';
 } elseif ( file_exists( dirname( JEO_BASEPATH ) . '/vendor/autoload.php' ) ) {
@@ -189,7 +194,7 @@ function jeo_storymap() {
  * * The pre-computed `$template_uri`
  * * The original `$template_name`
  *
- * @param string $template_name The name of the template (e.g. `some-template.php`)
+ * @param string $template_name The name of the template (e.g. `some-template.php`).
  * @return string The URL for the template file
  */
 function jeo_get_template( $template_name ) {
@@ -213,8 +218,8 @@ function jeo_get_template( $template_name ) {
 /**
  * Register an embedder for a JEO-capable site
  *
- * @param string $id Unique ID for the source
- * @param string $base_url Site URL (e.g.` http://example.org`)
+ * @param string $id Unique ID for the source.
+ * @param string $base_url Site URL (e.g.` http://example.org`).
  */
 function jeo_register_embedder( $id, $base_url ) {
 	$regex = '#' . preg_quote( $base_url, '/' ) . '\/embed\/.*#';
@@ -405,7 +410,7 @@ if ( ! function_exists( 'color_luminance_jeo' ) ) {
 	}
 }
 
-// Load template for discovery
+// Load template for discovery.
 add_filter( 'page_template', 'template_page_discovery' );
 /**
  * Override the page template to the Discovery template when the `discovery.php` template slug is selected.
@@ -421,13 +426,18 @@ function template_page_discovery( $page_template ) {
 	return $page_template;
 }
 
+add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
+
 /**
  * Add "Discovery" template to page attirbute template section.
+ *
+ * @param array $post_templates Existing page templates.
+ *
+ * @return array
  */
-add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
 function add_template_page_discovery( $post_templates ) {
 
-	// Add custom template named template-custom.php to select dropdown
+	// Add custom template named template-custom.php to select dropdown.
 	$post_templates['discovery.php'] = __( 'Discovery', 'jeo' );
 
 	return $post_templates;

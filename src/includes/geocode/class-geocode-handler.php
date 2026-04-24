@@ -1,4 +1,9 @@
 <?php
+/**
+ * Geocode Handler class file.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
@@ -11,6 +16,11 @@ class Geocode_Handler {
 
 	use Singleton;
 
+	/**
+	 * List of geocode attribute keys.
+	 *
+	 * @var array
+	 */
 	public $geo_attributes = array(
 		'_geocode_lat',
 		'_geocode_lon',
@@ -26,6 +36,11 @@ class Geocode_Handler {
 		'_geocode_postcode',
 	);
 
+	/**
+	 * Initialize hooks and geocode metadata.
+	 *
+	 * @return void
+	 */
 	protected function init() {
 		add_action( 'wp_ajax_jeo_geocode', array( $this, 'ajax_geocode' ) );
 		add_action( 'wp_ajax_jeo_reverse_geocode', array( $this, 'ajax_reverse_geocode' ) );
@@ -34,6 +49,11 @@ class Geocode_Handler {
 		$this->add_index_metadata_hooks();
 	}
 
+	/**
+	 * Registered geocoder definitions.
+	 *
+	 * @var array
+	 */
 	private $registered_geocoders = array();
 
 	/**
@@ -83,7 +103,7 @@ class Geocode_Handler {
 				'class_name'  => '\Jeo\Geocoders\Nominatim',
 			)
 		);
-		// Register Mapbox geocoder
+		// Register Mapbox geocoder.
 		$this->register_geocoder(
 			array(
 				'slug'        => 'mapbox',
@@ -96,7 +116,7 @@ class Geocode_Handler {
 		/**
 		 * Hook used to register geocoders
 		 *
-		 * example:
+		 * Example:
 		 * add_action('jeo_register_geocoders', function($geocoders) {
 		 *      $geocoders->register_geocoder([
 		 *          'slug' => 'my-geocoder',
@@ -345,7 +365,7 @@ class Geocode_Handler {
 	 * Register Geocoder
 	 *
 	 * @param array $geocoder {
-	 *     Required. Array or string of arguments describing the geocoder
+	 *     Required. Array or string of arguments describing the geocoder.
 	 *
 	 *     @type string      $name                  The name of the geocoder. e.g. 'Example geocoder'
 	 *     @type string      $slug                  A unique slug for the geocoder. e.g. 'example-geocoder'
@@ -407,7 +427,7 @@ class Geocode_Handler {
 	 */
 	public function get_geocoder_by_object( \Jeo\Geocoder $geocoder_object ) {
 		$class_name = get_class( $geocoder_object );
-		// add first bracket
+		// Add first bracket.
 		$class_name = '\\' . $class_name;
 		$geocoders  = $this->get_registered_geocoders();
 		foreach ( $geocoders as $geocoder ) {
@@ -443,7 +463,7 @@ class Geocode_Handler {
 	 * WordPress API tries to update values, it deletes older occurrences and passes the value
 	 * through wp_slash and coverts float to string. (In WP_REST_Meta_Fields::update_multi_meta_value())
 	 *
-	 * @param object|array $value
+	 * @param object|array $value Sanitized value.
 	 * @return object|array $value
 	 */
 	public function sanitize_points( $value ) {
@@ -496,12 +516,17 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * metadata used as indexes are generated automatically when _primary_point and _secondary_point are updated
-	 * and should not be updated directly
+	 * Metadata used as indexes are generated automatically when _primary_point and _secondary_point are updated
+	 * and should not be updated directly.
+	 *
+	 * @param mixed  $check     Whether to allow update.
+	 * @param int    $object_id Post ID.
+	 * @param string $meta_key  Meta key.
+	 * @return mixed
 	 */
 	public function disable_update_post_meta( $check, $object_id, $meta_key ) {
 
-		// the name of the meta without the last _s or _p suffix
+		// The name of the meta without the last _s or _p suffix.
 		$raw_key = substr( $meta_key, 0, strlen( $meta_key ) );
 		if ( in_array( $raw_key, $this->geo_attributes, true ) ) {
 			return false;
@@ -515,6 +540,11 @@ class Geocode_Handler {
 	 * the geocoded information from the point and add it as post meta to the post.
 	 *
 	 * This serves as an index so we can find posts by this information.
+	 *
+	 * @param int    $meta_id   Meta ID.
+	 * @param int    $object_id Post ID.
+	 * @param string $meta_key  Meta key.
+	 * @return void
 	 */
 	public function update_meta_indexes( $meta_id, $object_id, $meta_key ) {
 
@@ -522,7 +552,7 @@ class Geocode_Handler {
 
 			$this->remove_index_metadata_hooks();
 
-			// get all values
+			// Get all values.
 			$all_points = get_post_meta( $object_id, '_related_point', false );
 
 			foreach ( $this->geo_attributes as $attr ) {
@@ -532,7 +562,7 @@ class Geocode_Handler {
 
 				foreach ( $all_points as $point ) {
 
-					// Fallback to secondary if relevance is missing to prevent PHP Warnings
+					// Fallback to secondary if relevance is missing to prevent PHP warnings.
 					$point_relevance = isset( $point['relevance'] ) ? $point['relevance'] : 'secondary';
 					$suffix          = 'primary' === $point_relevance ? '_p' : '_s';
 

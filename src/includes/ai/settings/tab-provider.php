@@ -1,3 +1,11 @@
+<?php
+/**
+ * AI provider settings tab.
+ *
+ * @package Jeo
+ */
+
+?>
 <table class="form-table">
 	<tbody>
 		<tr>
@@ -16,17 +24,17 @@
 				<th scope="row">
 					<label for="<?php echo esc_attr( $slug ); ?>_api_key">
 						<?php echo esc_html( $name ); ?> 
-						<?php echo ( $slug === 'ollama' ) ? esc_html__( 'URL', 'jeo' ) : esc_html__( 'API Key', 'jeo' ); ?>
+						<?php echo ( 'ollama' === $slug ) ? esc_html__( 'URL', 'jeo' ) : esc_html__( 'API Key', 'jeo' ); ?>
 					</label>
 				</th>
 				<td>
 					<?php
-					$key_value     = \jeo_settings()->get_option( $slug . ( $slug === 'ollama' ? '_url' : '_api_key' ) );
+					$key_value     = \jeo_settings()->get_option( $slug . ( 'ollama' === $slug ? '_url' : '_api_key' ) );
 					$is_empty      = empty( $key_value );
 					$display_value = '';
 
 					if ( ! $is_empty ) {
-						if ( $slug === 'ollama' ) {
+						if ( 'ollama' === $slug ) {
 							$display_value = $key_value;
 						} else {
 							$display_value = substr( $key_value, 0, 5 ) . '****************' . substr( $key_value, -5 );
@@ -35,14 +43,14 @@
 					?>
 					<div style="display: flex; gap: 10px; align-items: center;" class="jeo-ai-key-container">
 						<input 
-							name="<?php echo esc_html( \jeo_settings()->get_field_name( $slug . ( $slug === 'ollama' ? '_url' : '_api_key' ) ) ); ?>" 
+							name="<?php echo esc_html( \jeo_settings()->get_field_name( $slug . ( 'ollama' === $slug ? '_url' : '_api_key' ) ) ); ?>" 
 							type="text" 
 							id="<?php echo esc_attr( $slug ); ?>_api_key" 
 							value="<?php echo esc_attr( $display_value ); ?>" 
 							class="regular-text jeo-ai-key-input" 
 							data-original-value="<?php echo esc_attr( $display_value ); ?>"
 							<?php echo ! $is_empty ? 'readonly style="background: #f0f0f1; cursor: not-allowed; font-family: monospace;"' : ''; ?>
-							placeholder="<?php echo $slug === 'ollama' ? 'http://localhost:11434/api' : esc_attr__( 'Paste your API key here...', 'jeo' ); ?>"
+							placeholder="<?php echo 'ollama' === $slug ? 'http://localhost:11434/api' : esc_attr__( 'Paste your API key here...', 'jeo' ); ?>"
 						>
 						
 						<?php if ( ! $is_empty ) : ?>
@@ -116,7 +124,7 @@
 			<p style="margin: 0 0 10px 0; font-weight: 600; font-size: 13px; color: #2c3338;">🌍 <?php esc_html_e( 'Output Language', 'jeo' ); ?></p>
 			<select id="jeo-ai-chat-lang" style="width: 100%; max-width: 250px; margin-bottom: 10px;">
 				<option value="en"><?php esc_html_e( 'English (Optimized)', 'jeo' ); ?></option>
-				<option value="site"><?php printf( esc_html__( 'Site Language (%s)', 'jeo' ), get_bloginfo( 'language' ) ); ?></option>
+				<option value="site"><?php /* translators: %s: site language */ printf( esc_html__( 'Site Language (%s)', 'jeo' ), esc_html( get_bloginfo( 'language' ) ) ); ?></option>
 			</select>
 			<p style="margin: 0; font-size: 12px; line-height: 1.4; color: #50575e;">
 				<?php esc_html_e( 'LLMs usually follow English instructions with higher precision and lower latency. We recommend English for complex rules, even if your posts are in other languages.', 'jeo' ); ?>

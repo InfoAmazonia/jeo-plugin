@@ -1,3 +1,11 @@
+<?php
+/**
+ * JEO settings page template.
+ *
+ * @package Jeo
+ */
+
+?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'Jeo Settings', 'jeo' ); ?></h1>
 	<nav class="nav-tab-wrapper wp-clearfix">
@@ -35,11 +43,11 @@
 								if ( ! is_array( $enabled_post_types ) ) {
 									$enabled_post_types = array( 'post' );
 								}
-								foreach ( $post_types as $post_type ) :
+								foreach ( $post_types as $settings_post_type ) :
 									?>
 									<label>
-										<input type="checkbox" name="<?php echo esc_html( $this->get_field_name( 'enabled_post_types' ) ); ?>[]" value="<?php echo esc_attr( $post_type->name ); ?>" <?php checked( in_array( $post_type->name, $enabled_post_types ) ); ?> />
-										<?php echo esc_html( $post_type->labels->name ); ?>
+										<input type="checkbox" name="<?php echo esc_html( $this->get_field_name( 'enabled_post_types' ) ); ?>[]" value="<?php echo esc_attr( $settings_post_type->name ); ?>" <?php checked( in_array( $settings_post_type->name, $enabled_post_types ) ); ?> />
+										<?php echo esc_html( $settings_post_type->labels->name ); ?>
 									</label><br />
 								<?php endforeach; ?>
 							</td>
@@ -208,9 +216,9 @@
 								<?php
 								wp_dropdown_pages(
 									array(
-										'name'             => $this->get_field_name( 'discovery_page' ),
-										'selected'         => $this->get_option( 'discovery_page' ),
-										'show_option_none' => __( 'Select a page', 'jeo' ),
+										'name'             => esc_attr( $this->get_field_name( 'discovery_page' ) ),
+										'selected'         => absint( $this->get_option( 'discovery_page' ) ),
+										'show_option_none' => esc_html__( 'Select a page', 'jeo' ),
 									)
 								);
 								?>

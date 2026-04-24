@@ -1,4 +1,9 @@
 <?php
+/**
+ * Mapbox geocoder integration.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\Geocoders;
 
@@ -125,7 +130,7 @@ class Mapbox extends \Jeo\Geocoder {
 					$response['country']      = $ctx['text'];
 					$response['country_code'] = isset( $ctx['short_code'] ) ? strtoupper( $ctx['short_code'] ) : '';
 				} elseif ( strpos( $id, 'region' ) !== false ) {
-					$response['region_level_2'] = $ctx['text']; // State
+					$response['region_level_2'] = $ctx['text']; // State.
 				} elseif ( strpos( $id, 'postcode' ) !== false ) {
 					$response['postcode'] = $ctx['text'];
 				} elseif ( strpos( $id, 'place' ) !== false ) {
@@ -136,7 +141,7 @@ class Mapbox extends \Jeo\Geocoder {
 			}
 		}
 
-		// Mapbox specific address extraction (from properties or text)
+		// Mapbox specific address extraction (from properties or text).
 		if ( isset( $item['properties']['address'] ) ) {
 			$response['address'] = $item['properties']['address'];
 		} elseif ( isset( $item['text'] ) && strpos( $item['id'], 'address' ) !== false ) {

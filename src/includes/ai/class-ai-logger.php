@@ -1,4 +1,9 @@
 <?php
+/**
+ * AI request logging.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -42,11 +47,11 @@ class AI_Logger {
 			'label'               => __( 'AI Usage Log', 'jeo' ),
 			'description'         => __( 'Internal logs for AI token usage and costs.', 'jeo' ),
 			'labels'              => $labels,
-			'supports'            => array( 'title', 'custom-fields' ), // Only title and meta
+			'supports'            => array( 'title', 'custom-fields' ), // Only title and meta.
 			'hierarchical'        => false,
-			'public'              => false, // Private CPT
+			'public'              => false, // Private CPT.
 			'show_ui'             => true,
-			'show_in_menu'        => 'jeo-settings', // Render under Settings
+			'show_in_menu'        => 'jeo-settings', // Render under Settings.
 			'show_in_admin_bar'   => false,
 			'show_in_nav_menus'   => false,
 			'can_export'          => true,
@@ -55,7 +60,7 @@ class AI_Logger {
 			'publicly_queryable'  => false,
 			'capability_type'     => 'page',
 			'capabilities'        => array(
-				'create_posts' => 'do_not_allow', // Prevents users from manually creating logs
+				'create_posts' => 'do_not_allow', // Prevents users from manually creating logs.
 			),
 			'map_meta_cap'        => true,
 		);
@@ -85,13 +90,13 @@ class AI_Logger {
 		);
 
 		if ( ! is_wp_error( $post_id ) ) {
-			// Save metrics for cost dashboard
+			// Save metrics for cost dashboard.
 			update_post_meta( $post_id, '_jeo_ai_provider', $provider );
 			update_post_meta( $post_id, '_jeo_ai_input_tokens', $input_tokens );
 			update_post_meta( $post_id, '_jeo_ai_output_tokens', $output_tokens );
 			update_post_meta( $post_id, '_jeo_ai_total_tokens', $total_tokens );
 
-			// Save context
+			// Save context.
 			update_post_meta( $post_id, '_jeo_ai_prompt', wp_json_encode( $prompt, JSON_UNESCAPED_UNICODE ) );
 			update_post_meta( $post_id, '_jeo_ai_response', wp_json_encode( $response, JSON_UNESCAPED_UNICODE ) );
 		}

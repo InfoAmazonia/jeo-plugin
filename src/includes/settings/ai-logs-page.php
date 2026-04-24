@@ -1,3 +1,11 @@
+<?php
+/**
+ * AI logs page template.
+ *
+ * @package Jeo
+ */
+
+?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'AI Cost Dashboard & Debug Logs', 'jeo' ); ?></h1>
 	<p><?php esc_html_e( 'Here you can view the most recent AI interactions powered by Neuron AI, along with their detailed token usage (Input/Output).', 'jeo' ); ?></p>
@@ -8,7 +16,7 @@
 		wp_die( 'Unauthorized access.' );
 	}
 
-		// Handle "Clear Logs" action
+		// Handle "Clear Logs" action.
 	if ( isset( $_POST['jeo_clear_logs'] ) && check_admin_referer( 'jeo_clear_logs_action' ) ) {
 		$posts_to_delete = get_posts(
 			array(
@@ -23,7 +31,7 @@
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'All AI logs have been permanently deleted.', 'jeo' ) . '</p></div>';
 	}
 
-		// Calculate Totals per Model
+		// Calculate Totals per Model.
 		global $wpdb;
 		$stats = $wpdb->get_results(
 			"
@@ -64,15 +72,15 @@
 							<div style="font-size: 12px; color: #646970; font-family: monospace;">' . esc_html( $model_name ) . '</div>
 						</div>
 						<div style="background: #f0f0f1; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #50575e;">
-							' . number_format_i18n( $stat->total_requests ) . ' reqs
+							' . esc_html( number_format_i18n( $stat->total_requests ) ) . ' reqs
 						</div>
 					</div>
 					<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #2271b1;">
-						' . number_format_i18n( $stat->total_tokens ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+						' . esc_html( number_format_i18n( $stat->total_tokens ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
 					</div>
 					<div style="display: flex; justify-content: space-between; font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
-						<div><strong>In (Prompt):</strong> ' . number_format_i18n( $stat->total_input ) . '</div>
-						<div><strong>Out (Compl.):</strong> ' . number_format_i18n( $stat->total_output ) . '</div>
+						<div><strong>In (Prompt):</strong> ' . esc_html( number_format_i18n( $stat->total_input ) ) . '</div>
+						<div><strong>Out (Compl.):</strong> ' . esc_html( number_format_i18n( $stat->total_output ) ) . '</div>
 					</div>
 				</div>';
 			}
@@ -88,24 +96,24 @@
 
 			echo '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 20px 0;">';
 
-			// Vectorize Card
+			// Vectorize Card.
 			echo '
 			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #46b450; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
 				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Document Vectorization', 'jeo' ) . '</div>
 				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #46b450;">
-					' . number_format_i18n( $embedding_tokens['vectorize'] ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+					' . esc_html( number_format_i18n( $embedding_tokens['vectorize'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
 				</div>
 				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
 					' . esc_html__( 'Tokens used inserting posts to Vector Store.', 'jeo' ) . '
 				</div>
 			</div>';
 
-			// Retrieve Card
+			// Retrieve Card.
 			echo '
 			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #f56e28; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
 				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Semantic Retrieval', 'jeo' ) . '</div>
 				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #f56e28;">
-					' . number_format_i18n( $embedding_tokens['retrieve'] ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+					' . esc_html( number_format_i18n( $embedding_tokens['retrieve'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
 				</div>
 				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
 					' . esc_html__( 'Tokens used mapping user queries to vectors.', 'jeo' ) . '
@@ -115,13 +123,13 @@
 			echo '</div><hr>';
 		}
 
-		$search_term  = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
-		$current_page = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
-		$per_page     = 25;
+		$search_term   = isset( $_GET['s'] ) ? sanitize_text_field( wp_unslash( $_GET['s'] ) ) : '';
+		$current_page  = isset( $_GET['paged'] ) ? max( 1, intval( $_GET['paged'] ) ) : 1;
+		$logs_per_page = 25;
 
 		$query_args = array(
 			'post_type'      => \Jeo\AI\AI_Logger::POST_TYPE,
-			'posts_per_page' => $per_page,
+			'posts_per_page' => $logs_per_page,
 			'paged'          => $current_page,
 			'post_status'    => 'any',
 			's'              => $search_term,
@@ -153,18 +161,20 @@
 
 	<div class="tablenav top">
 		<div class="tablenav-pages">
-			<span class="displaying-num"><?php echo esc_html( sprintf( _n( '%s item', '%s items', $total_items, 'jeo' ), $total_items ) ); ?></span>
+			<span class="displaying-num"><?php echo esc_html( sprintf( /* translators: %s: Number of log items. */ _n( '%s item', '%s items', $total_items, 'jeo' ), $total_items ) ); ?></span>
 			<?php if ( $total_pages > 1 ) : ?>
 				<span class="pagination-links">
 					<?php
-						echo paginate_links(
-							array(
-								'base'      => add_query_arg( 'paged', '%#%' ),
-								'format'    => '',
-								'prev_text' => __( '&laquo;' ),
-								'next_text' => __( '&raquo;' ),
-								'total'     => $total_pages,
-								'current'   => $current_page,
+						echo wp_kses_post(
+							paginate_links(
+								array(
+									'base'      => add_query_arg( 'paged', '%#%' ),
+									'format'    => '',
+									'prev_text' => __( '&laquo;' ),
+									'next_text' => __( '&raquo;' ),
+									'total'     => $total_pages,
+									'current'   => $current_page,
+								)
 							)
 						);
 					?>
@@ -192,14 +202,14 @@
 					$logs_query->the_post();
 					?>
 					<?php
-					$post_id  = get_the_ID();
-					$provider = get_post_meta( $post_id, '_jeo_ai_provider', true );
-					$in_tok   = get_post_meta( $post_id, '_jeo_ai_input_tokens', true );
-					$out_tok  = get_post_meta( $post_id, '_jeo_ai_output_tokens', true );
-					$tot_tok  = get_post_meta( $post_id, '_jeo_ai_total_tokens', true );
+					$log_entry_id = get_the_ID();
+					$provider     = get_post_meta( $log_entry_id, '_jeo_ai_provider', true );
+					$in_tok       = get_post_meta( $log_entry_id, '_jeo_ai_input_tokens', true );
+					$out_tok      = get_post_meta( $log_entry_id, '_jeo_ai_output_tokens', true );
+					$tot_tok      = get_post_meta( $log_entry_id, '_jeo_ai_total_tokens', true );
 
-					$prompt   = get_post_meta( $post_id, '_jeo_ai_prompt', true );
-					$response = get_post_meta( $post_id, '_jeo_ai_response', true );
+					$prompt   = get_post_meta( $log_entry_id, '_jeo_ai_prompt', true );
+					$response = get_post_meta( $log_entry_id, '_jeo_ai_response', true );
 
 					$prompt_decoded = json_decode( $prompt );
 					$resp_decoded   = json_decode( $response );
@@ -207,7 +217,7 @@
 					$raw_input  = $prompt_decoded ? wp_json_encode( $prompt_decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) : $prompt;
 					$raw_output = $resp_decoded ? wp_json_encode( $resp_decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) : $response;
 
-					$preview = mb_substr( strip_tags( $raw_output ), 0, 100 ) . '...';
+					$output_preview = mb_substr( strip_tags( $raw_output ), 0, 100 ) . '...';
 
 					$provider_name = strtoupper( $provider );
 					$model_name    = '';
@@ -228,13 +238,13 @@
 							<strong style="font-size: 14px;"><?php echo esc_html( $tot_tok ); ?> Total</strong><br/>
 							<small style="color:#555;">Prompt: <?php echo esc_html( $in_tok ); ?> | Completion: <?php echo esc_html( $out_tok ); ?></small>
 						</td>
-						<td><code><?php echo esc_html( $preview ); ?></code></td>
+						<td><code><?php echo esc_html( $output_preview ); ?></code></td>
 						<td>
-							<button type="button" class="button jeo-ai-view-log-btn" data-log-id="ai-log-modal-<?php echo esc_attr( $post_id ); ?>">
+							<button type="button" class="button jeo-ai-view-log-btn" data-log-id="ai-log-modal-<?php echo esc_attr( $log_entry_id ); ?>">
 								<?php esc_html_e( 'View Details', 'jeo' ); ?>
 							</button>
 
-							<dialog id="ai-log-modal-<?php echo esc_attr( $post_id ); ?>" class="jeo-ai-modal">
+							<dialog id="ai-log-modal-<?php echo esc_attr( $log_entry_id ); ?>" class="jeo-ai-modal">
 								<div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid #ccc; padding-bottom: 10px; margin-bottom: 15px;">
 									<h2 style="margin:0;"><?php esc_html_e( 'AI Interaction Details', 'jeo' ); ?> - <?php echo esc_html( $provider ); ?></h2>
 									<button type="button" class="button jeo-ai-close-modal-btn"><?php esc_html_e( 'Close', 'jeo' ); ?></button>

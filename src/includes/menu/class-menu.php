@@ -1,12 +1,11 @@
 <?php
-
-namespace Jeo;
-
 /**
- * Admin menu registration and asset management.
+ * JEO admin menu.
  *
  * @package Jeo
  */
+
+namespace Jeo;
 
 /**
  * Manages the JEO admin menu structure and dashboard/welcome page assets.
@@ -15,8 +14,9 @@ class Menu {
 
 	use Singleton;
 
+	/** {@inheritDoc} */
 	protected function init() {
-		add_action( 'admin_menu', array( $this, 'add_main_menu' ), 5 ); // Priority 5 to run before CPTs if possible
+		add_action( 'admin_menu', array( $this, 'add_main_menu' ), 5 ); // Priority 5 to run before CPTs if possible.
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_dashboard_assets' ) );
 	}
 
@@ -79,7 +79,7 @@ class Menu {
 	 * @return void
 	 */
 	public function enqueue_dashboard_assets( $hook ) {
-		// Enfileira assets DO MAPA apenas na Dashboard
+		// Enfileira assets DO MAPA apenas na Dashboard.
 		if ( strpos( $hook, 'jeo-dashboard' ) === false && strpos( $hook, 'jeo-main-menu' ) === false ) {
 			return;
 		}

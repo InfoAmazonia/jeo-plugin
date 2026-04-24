@@ -1,4 +1,9 @@
 <?php
+/**
+ * AI Handler class.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo;
 
@@ -82,9 +87,13 @@ class AI_Handler {
 
 	/**
 	 * Dynamically translate new AI strings to pt_BR without recompiling .mo files.
+	 *
+	 * @param string $translation Translated text.
+	 * @param string $text        Text to translate.
+	 * @param string $domain      Text domain.
 	 */
 	public function dynamic_pt_br_translations( $translation, $text, $domain ) {
-		if ( 'jeo' !== $domain || ! is_admin() && ! wp_is_json_request() ) {
+		if ( 'jeo' !== $domain || ( ! is_admin() && ! wp_is_json_request() ) ) {
 			return $translation;
 		}
 
@@ -260,11 +269,11 @@ class AI_Handler {
 			$active = 'gemini';
 		}
 
-		// Dynamically fetch configured model and API key
+		// Dynamically fetch configured model and API key.
 		$api_key = \jeo_settings()->get_option( $active . '_api_key' );
 		$model   = \jeo_settings()->get_option( $active . '_model' );
 
-		// Specific fallback for Ollama URL mapping
+		// Specific fallback for Ollama URL mapping.
 		if ( 'ollama' === $active ) {
 			$api_key = \jeo_settings()->get_option( 'ollama_url' );
 		}
@@ -427,7 +436,7 @@ class AI_Handler {
 
 			$upload_dir = wp_upload_dir();
 			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
-			$base_name  = ( $store === 'test' ) ? 'jeo_knowledge_test' : 'jeo_knowledge';
+			$base_name  = ( 'test' === $store ) ? 'jeo_knowledge_test' : 'jeo_knowledge';
 
 			$file_path = $store_dir . '/' . $base_name . '.store';
 			$info_path = $store_dir . '/' . $base_name . '.model_info';
@@ -439,7 +448,7 @@ class AI_Handler {
 				unlink( $info_path );
 			}
 
-			if ( $store === 'production' ) {
+			if ( 'production' === $store ) {
 				global $wpdb;
 				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s", '_jeo_vectorized_at' ) );
 			}
@@ -447,6 +456,7 @@ class AI_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => true,
+					/* translators: %s: Store type name. */
 					'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
 				),
 				200
@@ -477,16 +487,16 @@ class AI_Handler {
 				return new \WP_REST_Response( array( 'error' => __( 'Query is required.', 'jeo' ) ), 400 );
 			}
 
-			// Initialize the RAG Agent to access Vector Store
+			// Initialize the RAG Agent to access Vector Store.
 			$rag = new \Jeo\AI\RAG_Agent();
-			if ( $store === 'test' ) {
+			if ( 'test' === $store ) {
 				$rag->is_test_mode = true;
 			}
 
-			// Estimate tokens for the query
+			// Estimate tokens for the query.
 			\jeo_ai_logger()->add_embedding_tokens( 'retrieve', strlen( $query ) );
 
-			// Use the native SimilarityRetrieval logic
+			// Use the native SimilarityRetrieval logic.
 			$retrieval      = $rag->resolveRetrieval();
 			$retrieved_docs = $retrieval->retrieve( new \NeuronAI\Chat\Messages\UserMessage( $query ) );
 
@@ -538,7 +548,7 @@ class AI_Handler {
 	 */
 	public function api_test_embedding( $request ) {
 		try {
-			// Select a random post
+			// Select a random post.
 			$query = new \WP_Query(
 				array(
 					'post_type'      => 'post',
@@ -554,7 +564,7 @@ class AI_Handler {
 
 			$post = $query->posts[0];
 
-			// Load into Document
+			// Load into Document.
 			$documents = \Jeo\AI\WP_Post_Data_Loader::load( array( $post ) );
 			if ( empty( $documents ) ) {
 				return new \WP_REST_Response( array( 'error' => __( 'The selected random post has no usable text content.', 'jeo' ) ), 400 );
@@ -562,13 +572,13 @@ class AI_Handler {
 
 			$test_doc = $documents[0];
 
-			// Estimate tokens used for embedding test doc
+			// Estimate tokens used for embedding test doc.
 			\jeo_ai_logger()->add_embedding_tokens( 'vectorize', strlen( $test_doc->getContent() ) );
 
-			// Use the Factory to get the active embeddings provider
+			// Use the Factory to get the active embeddings provider.
 			$embed_provider = \Jeo\AI\Neuron_Factory::get_active_embeddings_provider();
 
-			// Test the embed operation directly
+			// Test the embed operation directly.
 			$embedded_doc = $embed_provider->embedDocument( $test_doc );
 			$vector       = $embedded_doc->getEmbedding();
 
@@ -576,14 +586,14 @@ class AI_Handler {
 				return new \WP_REST_Response( array( 'error' => __( 'The embedding provider returned an empty vector.', 'jeo' ) ), 500 );
 			}
 
-			// Save the embedded document to the TEST Vector Store so we can retrieve it later
+			// Save the embedded document to the TEST Vector Store so we can retrieve it later.
 			$rag               = new \Jeo\AI\RAG_Agent();
 			$rag->is_test_mode = true;
 			$rag->resolveVectorStore()->addDocument( $embedded_doc );
 
-			// Format dimensions text
+			// Format dimensions text.
 			$dimensions     = count( $vector );
-			$preview_vector = array_slice( $vector, 0, 5 ); // Just show first 5 floats
+			$preview_vector = array_slice( $vector, 0, 5 ); // Just show first 5 floats.
 
 			return new \WP_REST_Response(
 				array(
@@ -612,7 +622,9 @@ class AI_Handler {
 	}
 
 	/**
-	 * Fetch available models dynamically from the LLM Provider's API
+	 * Fetch available models dynamically from the LLM Provider's API.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_get_models( $request ) {
 		$provider = $request->get_param( 'provider' );
@@ -766,7 +778,7 @@ class AI_Handler {
 				break;
 
 			case 'ollama':
-				// Ex: http://localhost:11434/api
+				// Ex: http://localhost:11434/api.
 				$base_url = rtrim( str_replace( '/api', '', $api_key ), '/' );
 				$response = wp_remote_get( $base_url . '/api/tags', array( 'timeout' => 10 ) );
 				$body     = wp_remote_retrieve_body( $response );
@@ -838,6 +850,8 @@ class AI_Handler {
 
 	/**
 	 * Callback to test if an API key is valid using a simple Hello World.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_test_key( $request ) {
 		try {
@@ -919,13 +933,15 @@ class AI_Handler {
 
 	/**
 	 * Callback to generate an optimized prompt using the active LLM.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_chat_prompt_generator( $request ) {
 		$context  = $request->get_param( 'context' );
 		$provider = $request->get_param( 'provider' );
 		$api_key  = $request->get_param( 'api_key' );
 		$model    = $request->get_param( 'model' );
-		$lang     = $request->get_param( 'lang' ) ?: 'en';
+		$lang     = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
 
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
@@ -959,7 +975,7 @@ class AI_Handler {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
 
-		// Prompt Optimizer: Appends model-specific guidelines to the meta-prompt
+		// Prompt Optimizer: Appends model-specific guidelines to the meta-prompt.
 		$model_optimization = '';
 		switch ( $provider ) {
 			case 'gemini':
@@ -979,7 +995,7 @@ class AI_Handler {
 				break;
 		}
 
-		// Meta-prompt instructed to build a JEO prompt
+		// Meta-prompt instructed to build a JEO prompt.
 		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
 The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
 Write a clear, strict System Prompt that incorporates the user's rules.
@@ -1022,6 +1038,8 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 	/**
 	 * Callback to validate a custom prompt.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_validate_prompt( $request ) {
 		$custom_prompt = $request->get_param( 'prompt' );
@@ -1055,11 +1073,11 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
 
-		// Use a diverse global text so validation succeeds regardless of regional prompt restrictions (Europe, Brazil, etc.)
+		// Use a diverse global text so validation succeeds regardless of regional prompt restrictions (Europe, Brazil, etc.).
 		$test_title   = 'Global News Report: Environment and Economy';
 		$test_content = 'Today, leaders met in Paris, France to discuss the European economy. Meanwhile, a scientific expedition in the Amazon Rainforest left Manaus, Brazil, to explore the Encontro das Águas. In Asia, Tokyo, Japan reported new technological advancements.';
 
-		// Pass empty string for assistant override to let the adapter attach the enforced schema
+		// Pass empty string for assistant override to let the adapter attach the enforced schema.
 		$result = $adapter->georeference( $test_title, $test_content, $custom_prompt );
 
 		if ( is_wp_error( $result ) ) {
@@ -1069,10 +1087,10 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 					'message' => $result->get_error_message(),
 				),
 				200
-			); // Send 200 so UI can display the error nicely
+			); // Send 200 so UI can display the error nicely.
 		}
 
-		// Strict schema validation
+		// Strict schema validation.
 		$is_valid = true;
 		$msg      = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeo' );
 
@@ -1166,10 +1184,10 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return array();
 		}
 
-		// Split logs by the separator line
+		// Split logs by the separator line.
 		$entries_raw = explode( str_repeat( '=', 80 ) . "\n\n", $content );
 
-		// Clean empty ends
+		// Clean empty ends.
 		$entries_raw = array_filter( array_map( 'trim', $entries_raw ) );
 
 		$parsed_entries = array();
@@ -1179,7 +1197,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 				continue;
 			}
 
-			// Extract components using basic regex/strpos
+			// Extract components using basic regex/strpos.
 			$timestamp = '';
 			$provider  = '';
 			$input     = '';
@@ -1190,12 +1208,12 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 				$provider  = trim( $matches[2] );
 			}
 
-			// Find INPUT section
+			// Find INPUT section.
 			if ( preg_match( '/INPUT \(Prompt\):\n(.*?)\nOUTPUT \(Raw Response\):/s', $raw_entry, $matches ) ) {
 				$input = trim( $matches[1] );
 			}
 
-			// Find OUTPUT section
+			// Find OUTPUT section.
 			if ( preg_match( '/OUTPUT \(Raw Response\):\n(.*)$/s', $raw_entry, $matches ) ) {
 				$output = trim( $matches[1] );
 			}
@@ -1210,7 +1228,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			}
 		}
 
-		// Reverse to get newest first and slice
+		// Reverse to get newest first and slice.
 		$parsed_entries = array_reverse( $parsed_entries );
 		return array_slice( $parsed_entries, 0, $limit );
 	}
@@ -1247,6 +1265,8 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 	/**
 	 * REST Callback: Delete a backup.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_delete_backup( $request ) {
 		$filename = $request->get_param( 'filename' );

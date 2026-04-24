@@ -1,4 +1,9 @@
 <?php
+/**
+ * RAG index background worker.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -69,12 +74,12 @@ class RAG_Worker {
 		}
 
 		$time = current_time( 'Y-m-d H:i:s' );
-		// Since we might be called manually via REST, check action
+		// Since we might be called manually via REST, check action.
 		$source = current_action() === 'jeo_rag_index_cron_hook' ? 'Cron' : 'Manual';
 		$status = $is_error ? '❌ ' . __( 'Error', 'jeo' ) : '✅ ' . __( 'Success', 'jeo' );
 
 		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
-		$logs = array_slice( $logs, 0, 5 ); // Keep top 5
+		$logs = array_slice( $logs, 0, 5 ); // Keep top 5.
 		update_option( 'jeo_rag_cron_logs', $logs, false );
 	}
 
@@ -120,6 +125,9 @@ class RAG_Worker {
 
 	/**
 	 * Maybe schedule the cron job.
+	 *
+	 * @param mixed $old_value The old option value.
+	 * @param mixed $new_value The new option value.
 	 */
 	public function maybe_schedule_cron( $old_value, $new_value ) {
 		$is_active = isset( $new_value['jeo_rag_auto_index'] ) ? (bool) $new_value['jeo_rag_auto_index'] : false;
@@ -144,7 +152,7 @@ class RAG_Worker {
 	 * Process a batch of posts for vectorization.
 	 */
 	public function process_batch() {
-		// If called via cron, check if it's enabled
+		// If called via cron, check if it's enabled.
 		if ( current_action() === 'jeo_rag_index_cron_hook' && ! \jeo_settings()->get_option( 'jeo_rag_auto_index', false ) ) {
 			return;
 		}
@@ -152,7 +160,7 @@ class RAG_Worker {
 		$post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
 		$batch_size = (int) \jeo_settings()->get_option( 'jeo_rag_batch_size', 10 );
 
-		// Check for model lock
+		// Check for model lock.
 		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 		$locked_model  = RAG_Agent::get_locked_model( 'jeo_knowledge' );
 
@@ -165,15 +173,16 @@ class RAG_Worker {
 		}
 
 		if ( ! empty( $locked_model ) && ! empty( $current_model ) ) {
-			// Check if locked model matches the full name OR the basename
+			// Check if locked model matches the full name OR the basename.
 			if ( $locked_model !== $current_model && $locked_model !== $current_model_basename ) {
+				/* translators: 1: locked model name, 2: current model name */
 				$err_msg = sprintf( __( 'Vector Store mismatch! Expected %1$s, found %2$s.', 'jeo' ), $locked_model, $current_model );
 				$this->log_cron_run( $err_msg, true );
 				return new \WP_Error( 'model_mismatch', $err_msg );
 			}
 		}
 
-		// Setup lock if first time
+		// Setup lock if first time.
 		if ( empty( $locked_model ) ) {
 			RAG_Agent::setup_store_model( 'jeo_knowledge', $current_model );
 		}
@@ -217,11 +226,12 @@ class RAG_Worker {
 					update_post_meta( $post->ID, '_jeo_vectorized_at', $now );
 				}
 
+				/* translators: %d: number of posts vectorized */
 				$msg = sprintf( __( 'Successfully vectorized %d posts.', 'jeo' ), count( $posts ) );
 				$this->log_cron_run( $msg, false );
 				return $msg;
 			} else {
-				// Mark as processed even if no docs loaded (empty content)
+				// Mark as processed even if no docs loaded (empty content).
 				$now = current_time( 'mysql' );
 				foreach ( $posts as $post ) {
 					update_post_meta( $post->ID, '_jeo_vectorized_at', $now );

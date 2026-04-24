@@ -1,3 +1,11 @@
+<?php
+/**
+ * JEO dashboard page.
+ *
+ * @package Jeo
+ */
+
+?>
 <div class="wrap jeo-dashboard-wrap">
 
 	<style>
@@ -359,9 +367,9 @@
 		$map_runtime = 'maplibregl';
 	}
 		$mapbox_key   = \jeo_settings()->get_option( 'mapbox_key' );
-		$default_lat  = \jeo_settings()->get_option( 'map_default_lat' ) ?: -23.549985;
-		$default_lon  = \jeo_settings()->get_option( 'map_default_lon' ) ?: -46.633519;
-		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ?: 4;
+		$default_lat  = \jeo_settings()->get_option( 'map_default_lat' ) ? \jeo_settings()->get_option( 'map_default_lat' ) : -23.549985;
+		$default_lon  = \jeo_settings()->get_option( 'map_default_lon' ) ? \jeo_settings()->get_option( 'map_default_lon' ) : -46.633519;
+		$default_zoom = \jeo_settings()->get_option( 'map_default_zoom' ) ? \jeo_settings()->get_option( 'map_default_zoom' ) : 4;
 		$rest_url     = rest_url( 'jeo/v1' );
 	?>
 
@@ -385,7 +393,7 @@
 
 			// Configuration
 			var apiUrl     = '<?php echo esc_url_raw( $rest_url ); ?>';
-			var wpNonce    = '<?php echo wp_create_nonce( 'wp_rest' ); ?>';
+			var wpNonce    = '<?php echo esc_html( wp_create_nonce( 'wp_rest' ) ); ?>';
 
 			// State
 			var markers = [];

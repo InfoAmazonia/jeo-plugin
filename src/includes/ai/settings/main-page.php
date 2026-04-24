@@ -1,3 +1,11 @@
+<?php
+/**
+ * AI settings main page template.
+ *
+ * @package Jeo
+ */
+
+?>
 <div class="wrap">
 	<h1><?php esc_html_e( 'JEO AI Configuration', 'jeo' ); ?></h1>
 

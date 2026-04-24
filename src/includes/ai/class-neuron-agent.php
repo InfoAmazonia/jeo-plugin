@@ -1,4 +1,9 @@
 <?php
+/**
+ * NeuronAI geocoding agent.
+ *
+ * @package Jeo
+ */
 
 namespace Jeo\AI;
 
@@ -30,16 +35,22 @@ if ( ! defined( 'WPINC' ) ) {
 class Neuron_Agent extends Agent {
 
 	/**
+	 * Provider name.
+	 *
 	 * @var string
 	 */
 	protected $provider_name;
 
 	/**
+	 * API key.
+	 *
 	 * @var string
 	 */
 	protected $api_key;
 
 	/**
+	 * Model identifier.
+	 *
 	 * @var string
 	 */
 	protected $model;
@@ -68,21 +79,27 @@ class Neuron_Agent extends Agent {
 	}
 
 	/**
-	 * Run the georeference task utilizing Neuron Structured Output
+	 * Run the georeference task utilizing Neuron Structured Output.
+	 *
+	 * @param string $system_prompt The system prompt.
+	 * @param string $user_text     The user text.
+	 * @param int    $input_tokens  Input token count (passed by reference).
+	 * @param int    $output_tokens Output token count (passed by reference).
+	 * @param string $raw_output    Raw output (passed by reference).
 	 */
 	public function run_georeference( $system_prompt, $user_text, &$input_tokens, &$output_tokens, &$raw_output ) {
-		// Define the system instructions for the agent
+		// Define the system instructions for the agent.
 		$this->setInstructions( $system_prompt );
 
-		// Execute chat with User text
+		// Execute chat with User text.
 		$message = $this->chat( new UserMessage( $user_text ) )->getMessage();
 
 		$raw_output = $message->getContent();
 		$usage      = $message->getUsage();
 
 		if ( $usage ) {
-			$input_tokens  = $usage->inputTokens;
-			$output_tokens = $usage->outputTokens;
+			$input_tokens  = $usage->inputTokens; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$output_tokens = $usage->outputTokens; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		}
 
 		return $raw_output;
