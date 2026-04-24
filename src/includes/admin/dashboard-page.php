@@ -187,7 +187,7 @@
 			letter-spacing: 0.5px;
 		}
 
-		.jeo-dashboard-filters input, .jeo-dashboard-filters select {
+		.jeo-dashboard-filters input[type="text"], .jeo-dashboard-filters select {
 			border: 1px solid #ddd;
 			border-radius: 6px;
 			padding: 8px 12px;
@@ -202,62 +202,76 @@
 
 		/* DUAL RANGE SLIDER CSS */
 		.jeo-range-slider-container {
+			border: 1px solid #ddd;
 			position: relative;
 			width: 100%;
 			max-width: 900px;
-			height: 40px;
+			height: 44px;
 			margin-top: 10px;
+			border-radius: 8px;
+			padding: 0 10px;
+			box-sizing: border-box;
 		}
 		.jeo-range-slider-track {
 			position: absolute;
-			width: 100%;
-			height: 6px;
-			background: #e2e4e7;
-			border-radius: 3px;
+			width: calc(100% - 20px);
+			height: 8px;
+			background: #c3c4c7;
+			border-radius: 4px;
 			top: 50%;
 			transform: translateY(-50%);
+			z-index: 1;
 		}
 		.jeo-range-slider-active-track {
 			position: absolute;
-			height: 6px;
+			height: 8px;
+			margin-inline: 10px;
 			background: #007cba;
-			border-radius: 3px;
+			border-radius: 4px;
 			top: 50%;
 			transform: translateY(-50%);
 			z-index: 1;
 		}
 		.jeo-range-input {
 			position: absolute;
-			width: 100%;
+			width: calc(100% - 20px);
 			top: 50%;
 			transform: translateY(-50%);
-			background: none;
+			background: transparent;
 			pointer-events: none;
 			-webkit-appearance: none;
 			appearance: none;
 			margin: 0;
 			z-index: 2;
 		}
+		#jeo-range-max { z-index: 2; }
+		#jeo-range-min { z-index: 3; }
+		#jeo-range-min:hover,
+		#jeo-range-min:active { z-index: 4; }
 		.jeo-range-input::-webkit-slider-thumb {
-			height: 20px;
-			width: 20px;
+			height: 24px;
+			width: 24px;
 			border-radius: 50%;
-			background: #a0a0a0;
-			border: 2px solid #007cba;
+			background: #007cba;
+			border: 3px solid #fff;
 			cursor: pointer;
 			pointer-events: auto;
 			-webkit-appearance: none;
-			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+			box-shadow: 0 2px 6px rgba(0,0,0,0.3);
 		}
 		.jeo-range-input::-moz-range-thumb {
-			height: 18px;
-			width: 18px;
+			height: 24px;
+			width: 24px;
 			border-radius: 50%;
-			background: #a0a0a0;
-			border: 2px solid #007cba;
+			background: #007cba;
+			border: 3px solid #fff;
 			cursor: pointer;
 			pointer-events: auto;
-			box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+			box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+		}
+		.jeo-range-input::-moz-range-track {
+			background: transparent;
+			border: none;
 		}
 
 		.jeo-date-labels {
@@ -408,7 +422,7 @@
 				}
 
 				activeTrack.style.left = minVal + '%';
-				activeTrack.style.width = (maxVal - minVal) + '%';
+				activeTrack.style.width = `calc(${maxVal - minVal}% - 20px)`;
 
 				var fromTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (minVal / 100) );
 				var toTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (maxVal / 100) );
