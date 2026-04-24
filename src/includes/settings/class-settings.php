@@ -133,10 +133,10 @@ class Settings {
 	 * Retrieve a single option value from the JEO settings, falling back to defaults.
 	 *
 	 * @param string $key     Option key.
-	 * @param mixed  $default Default value if not found.
+	 * @param mixed  $default_value Default value if not found.
 	 * @return mixed
 	 */
-	public function get_option( $key, $default = null ) {
+	public function get_option( $key, $default_value = null ) {
 		$options = get_option( $this->option_key );
 
 		if ( isset( $options[ $key ] ) ) {
@@ -147,7 +147,7 @@ class Settings {
 			return $this->default_options[ $key ];
 		}
 
-		return $default;
+		return $default_value;
 	}
 
 	/**
@@ -416,7 +416,8 @@ class Settings {
 			'discovery' => __( 'Discovery', 'jeo' ),
 		);
 
-		$current_tab = isset( $_GET['tab'] ) && array_key_exists( sanitize_text_field( $_GET['tab'] ), $tabs ) ? sanitize_text_field( $_GET['tab'] ) : 'general';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$current_tab = isset( $_GET['tab'] ) && array_key_exists( sanitize_text_field( wp_unslash( $_GET['tab'] ) ), $tabs ) ? sanitize_text_field( wp_unslash( $_GET['tab'] ) ) : 'general';
 
 		include 'settings-page.php';
 	}

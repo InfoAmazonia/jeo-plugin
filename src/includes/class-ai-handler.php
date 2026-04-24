@@ -68,7 +68,9 @@ class AI_Handler {
 			wp_die( 'Unauthorized' );
 		}
 
-		$file = isset( $_GET['file'] ) ? sanitize_file_name( $_GET['file'] ) : '';
+		check_admin_referer( 'jeo_download_dict' );
+
+		$file = isset( $_GET['file'] ) ? sanitize_file_name( wp_unslash( $_GET['file'] ) ) : '';
 		if ( empty( $file ) || strpos( $file, '.json' ) === false ) {
 			wp_die( 'Invalid file' );
 		}
@@ -81,7 +83,7 @@ class AI_Handler {
 		header( 'Content-Type: application/json' );
 		header( 'Content-Disposition: attachment; filename="' . $file . '"' );
 		header( 'Pragma: no-cache' );
-		readfile( $path );
+		readfile( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile
 		exit;
 	}
 
@@ -430,7 +432,7 @@ class AI_Handler {
 	public function api_clear_store( $request ) {
 		try {
 			$store = $request->get_param( 'store' );
-			if ( ! in_array( $store, array( 'test', 'production' ) ) ) {
+			if ( ! in_array( $store, array( 'test', 'production' ), true ) ) {
 				return new \WP_REST_Response( array( 'error' => __( 'Invalid store type.', 'jeo' ) ), 400 );
 			}
 
@@ -442,10 +444,10 @@ class AI_Handler {
 			$info_path = $store_dir . '/' . $base_name . '.model_info';
 
 			if ( file_exists( $file_path ) ) {
-				unlink( $file_path );
+				wp_delete_file( $file_path );
 			}
 			if ( file_exists( $info_path ) ) {
-				unlink( $info_path );
+				wp_delete_file( $info_path );
 			}
 
 			if ( 'production' === $store ) {
@@ -543,10 +545,10 @@ class AI_Handler {
 	/**
 	 * REST callback that tests embedding generation on a random post and saves it to the test store.
 	 *
-	 * @param \WP_REST_Request $request Current REST request.
+	 * @param \WP_REST_Request $_request Current REST request.
 	 * @return \WP_REST_Response
 	 */
-	public function api_test_embedding( $request ) {
+	public function api_test_embedding( $_request ) {
 		try {
 			// Select a random post.
 			$query = new \WP_Query(
@@ -1179,8 +1181,8 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return array();
 		}
 
-		$content = @file_get_contents( $log_file );
-		if ( empty( $content ) ) {
+		$content = file_get_contents( $log_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( false === $content || empty( $content ) ) {
 			return array();
 		}
 
@@ -1278,7 +1280,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		$file_path = $uploads['basedir'] . '/jeo-ai-store/backups/' . sanitize_file_name( $filename );
 
 		if ( file_exists( $file_path ) && str_ends_with( $file_path, '.zip' ) ) {
-			unlink( $file_path );
+			wp_delete_file( $file_path );
 			return new \WP_REST_Response( array( 'success' => true ), 200 );
 		}
 

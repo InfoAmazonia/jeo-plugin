@@ -36,7 +36,7 @@
 					}
 					?>
 					<label>
-						<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_bulk_post_types' ) ); ?>[]" type="checkbox" value="<?php echo esc_attr( $pt ); ?>" <?php checked( in_array( $pt, $bulk_post_types ) ); ?>>
+						<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'jeo_bulk_post_types' ) ); ?>[]" type="checkbox" value="<?php echo esc_attr( $pt ); ?>" <?php checked( in_array( $pt, $bulk_post_types, true ) ); ?>>
 						<?php echo esc_html( $pt_object->labels->name ); ?>
 					</label><br>
 				<?php endforeach; ?>

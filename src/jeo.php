@@ -40,6 +40,7 @@ if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
 	// Ensure we don't cause infinite loop on activation failure.
 	if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
 		deactivate_plugins( plugin_basename( __FILE__ ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( isset( $_GET['activate'] ) ) {
 			unset( $_GET['activate'] );
 		}
@@ -91,12 +92,14 @@ function jeo_deactivate() {
 	// Clear residual debug logs for safety.
 	$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
 	if ( file_exists( $log_file ) ) {
-		@unlink( $log_file ); }
+		wp_delete_file( $log_file );
+	}
 
 	$upload_dir       = wp_upload_dir();
 	$log_file_uploads = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
 	if ( file_exists( $log_file_uploads ) ) {
-		@unlink( $log_file_uploads ); }
+		wp_delete_file( $log_file_uploads );
+	}
 
 	flush_rewrite_rules();
 }

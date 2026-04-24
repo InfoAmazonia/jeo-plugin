@@ -62,11 +62,12 @@ class Geocode_Handler {
 	 * @return void
 	 */
 	public function ajax_geocode() {
+		check_ajax_referer( 'jeo_geocode_nonce', 'nonce' );
 
 		$geocoder = $this->get_active_geocoder();
 
 		if ( $geocoder ) {
-			echo wp_json_encode( $geocoder->geocode( sanitize_text_field( $_GET['search'] ) ) );
+			echo wp_json_encode( $geocoder->geocode( sanitize_text_field( wp_unslash( $_GET['search'] ) ) ) );
 		} else {
 			echo wp_json_encode( array() );
 		}
@@ -80,9 +81,11 @@ class Geocode_Handler {
 	 * @return void
 	 */
 	public function ajax_reverse_geocode() {
+		check_ajax_referer( 'jeo_geocode_nonce', 'nonce' );
+
 		$geocoder = $this->get_active_geocoder();
 		if ( $geocoder ) {
-			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( $_GET['lat'] ), sanitize_text_field( $_GET['lon'] ) ) );
+			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( wp_unslash( $_GET['lat'] ) ), sanitize_text_field( wp_unslash( $_GET['lon'] ) ) ) );
 		}
 		die;
 	}

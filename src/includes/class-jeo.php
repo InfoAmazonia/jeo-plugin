@@ -175,7 +175,7 @@ class Jeo {
 
 			$readmes[] = array(
 				'label'   => $label,
-				'content' => file_get_contents( $file_path ),
+				'content' => file_get_contents( $file_path ), // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			);
 		}
 

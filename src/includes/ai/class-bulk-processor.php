@@ -204,7 +204,7 @@ class Bulk_Processor {
 	public function api_clear_logs() {
 		$log_file = JEO_BASEPATH . 'jeo-bulk-ai.log';
 		if ( file_exists( $log_file ) ) {
-			unlink( $log_file );
+			wp_delete_file( $log_file );
 		}
 		delete_option( 'jeo_bulk_ai_cron_logs' );
 		return new \WP_REST_Response( array( 'success' => true ), 200 );
@@ -219,7 +219,7 @@ class Bulk_Processor {
 	public function add_cron_intervals( $schedules ) {
 		if ( ! isset( $schedules['every_minute'] ) ) {
 			$schedules['every_minute'] = array(
-				'interval' => 60,
+				'interval' => 900,
 				'display'  => __( 'Every Minute', 'jeo' ),
 			);
 		}
@@ -458,7 +458,7 @@ class Bulk_Processor {
 		$log_file  = JEO_BASEPATH . 'jeo-bulk-ai.log';
 		$timestamp = current_time( 'mysql' );
 		$entry     = "[{$timestamp}] {$message}\n";
-		@file_put_contents( $log_file, $entry, FILE_APPEND );
+		file_put_contents( $log_file, $entry, FILE_APPEND ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents
 	}
 
 	/**
@@ -485,10 +485,14 @@ class Bulk_Processor {
 	 * @return void
 	 */
 	public function handle_individual_approval() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! isset( $_GET['jeo_approve_ai'] ) || ! current_user_can( 'edit_posts' ) ) {
 			return;
 		}
 
+		check_admin_referer( 'jeo_approve_ai_' . (int) $_GET['jeo_approve_ai'] );
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$post_id = (int) $_GET['jeo_approve_ai'];
 		$this->approve_post( $post_id );
 
@@ -608,7 +612,7 @@ class Bulk_Processor {
 		}
 
 		$enabled_post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
-		if ( ! in_array( $typenow, $enabled_post_types ) ) {
+		if ( ! in_array( $typenow, $enabled_post_types, true ) ) {
 			return;
 		}
 		?>
@@ -783,16 +787,15 @@ class Bulk_Processor {
 
 		// 3. Render Row Actions
 		if ( 'pending_approval' === $status && ! $has_points ) {
-			echo '<div class="row-actions" style="margin-top:4px;"><span><a href="' . esc_url(
-				add_query_arg(
-					array(
-						'jeo_approve_ai' => $post_id,
-						'post'           => $post_id,
-						'action'         => 'edit',
-					),
-					admin_url( 'post.php' )
-				)
-			) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
+			$approve_url = add_query_arg(
+				array(
+					'jeo_approve_ai' => $post_id,
+				),
+				admin_url( 'admin.php' )
+			);
+			$approve_url = wp_nonce_url( $approve_url, 'jeo_approve_ai_' . $post_id );
+
+			echo '<div class="row-actions" style="margin-top:4px;"><span><a href="' . esc_url( $approve_url ) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
 		}
 	}
 

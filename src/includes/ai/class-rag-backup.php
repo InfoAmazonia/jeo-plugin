@@ -43,12 +43,12 @@ class RAG_Backup {
 
 		if ( ! file_exists( $backup_dir ) ) {
 			wp_mkdir_p( $backup_dir );
-			file_put_contents( $backup_dir . '/index.php', '' );
+			file_put_contents( $backup_dir . '/index.php', '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents
 
 			$htaccess_file = $backup_dir . '/.htaccess';
 			if ( ! file_exists( $htaccess_file ) ) {
 				$htaccess_content = "Order Deny,Allow\nDeny from all\n";
-				@file_put_contents( $htaccess_file, $htaccess_content );
+				file_put_contents( $htaccess_file, $htaccess_content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents
 			}
 		}
 
@@ -76,7 +76,7 @@ class RAG_Backup {
 			$zip->close();
 
 			if ( ! $files_added ) {
-				@unlink( $zip_file );
+				wp_delete_file( $zip_file );
 				return new \WP_Error( 'empty_store', __( 'No vector store found to backup.', 'jeo' ) );
 			}
 
@@ -103,7 +103,7 @@ class RAG_Backup {
 
 			$files_to_delete = array_slice( $files, 3 );
 			foreach ( $files_to_delete as $f ) {
-				unlink( $f );
+				wp_delete_file( $f );
 			}
 		}
 	}

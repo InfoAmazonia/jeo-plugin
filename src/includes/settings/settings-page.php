@@ -46,7 +46,7 @@
 								foreach ( $post_types as $settings_post_type ) :
 									?>
 									<label>
-										<input type="checkbox" name="<?php echo esc_html( $this->get_field_name( 'enabled_post_types' ) ); ?>[]" value="<?php echo esc_attr( $settings_post_type->name ); ?>" <?php checked( in_array( $settings_post_type->name, $enabled_post_types ) ); ?> />
+										<input type="checkbox" name="<?php echo esc_html( $this->get_field_name( 'enabled_post_types' ) ); ?>[]" value="<?php echo esc_attr( $settings_post_type->name ); ?>" <?php checked( in_array( $settings_post_type->name, $enabled_post_types, true ) ); ?> />
 										<?php echo esc_html( $settings_post_type->labels->name ); ?>
 									</label><br />
 								<?php endforeach; ?>

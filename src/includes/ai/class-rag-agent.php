@@ -48,7 +48,7 @@ class RAG_Agent extends RAG {
 			}
 		}
 
-		if ( ! is_writable( $store_dir ) ) {
+		if ( ! is_writable( $store_dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			/* translators: %s: directory path */
 			return new \WP_Error( 'rag_write_error', sprintf( __( 'The RAG Vector Store directory (%s) is not writable. Local Vectorization is disabled.', 'jeo' ), 'wp-content/uploads/jeo-ai-store' ) );
 		}
@@ -86,7 +86,7 @@ class RAG_Agent extends RAG {
 
 		// 4. Check for specific provider compatibility (Embeddings)
 		$compatible_providers = array( 'openai', 'gemini', 'ollama' );
-		if ( ! in_array( $embedding_provider, $compatible_providers ) ) {
+		if ( ! in_array( $embedding_provider, $compatible_providers, true ) ) {
 			/* translators: %s: provider name */
 			return new \WP_Error( 'rag_incompatible_provider', sprintf( __( 'The selected embedding provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for Vector Store features.', 'jeo' ), ucfirst( $embedding_provider ) ) );
 		}
@@ -146,7 +146,7 @@ class RAG_Agent extends RAG {
 		$htaccess_file = $store_dir . '/.htaccess';
 		if ( ! file_exists( $htaccess_file ) ) {
 			$htaccess_content = "Order Deny,Allow\nDeny from all\n";
-			@file_put_contents( $htaccess_file, $htaccess_content );
+			file_put_contents( $htaccess_file, $htaccess_content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors.Discouraged
 		}
 
 		$store_name = $this->is_test_mode ? 'jeo_knowledge_test' : 'jeo_knowledge';
@@ -155,24 +155,24 @@ class RAG_Agent extends RAG {
 
 		// Prevent fopen() errors on empty/uninitialized stores.
 		if ( ! file_exists( $store_file ) ) {
-			if ( ! is_writable( $store_dir ) ) {
+			if ( ! is_writable( $store_dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 				throw new \Exception( 'Directory ' . esc_html( $store_dir ) . ' is not writable by the web server. Please fix permissions.' );
 			}
-			touch( $store_file );
-		} elseif ( ! is_writable( $store_file ) && ! is_readable( $store_file ) ) {
+			touch( $store_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_touch
+		} elseif ( ! is_writable( $store_file ) && ! is_readable( $store_file ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			throw new \Exception( 'File ' . esc_html( $store_file ) . ' is not readable/writable. Please fix permissions.' );
 		}
 
 		// Consistency Check: Ensure the model matches what was used to initialize the store.
 		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 		if ( file_exists( $store_file ) && filesize( $store_file ) > 0 && file_exists( $info_file ) ) {
-			$saved_model = trim( file_get_contents( $info_file ) );
+			$saved_model = trim( file_get_contents( $info_file ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 			if ( ! empty( $current_model ) && $current_model !== $saved_model ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedIf
 				// We don't throw here to avoid fatal crashes, but we should block indexing in UI.
 			}
 		} elseif ( file_exists( $store_file ) && filesize( $store_file ) > 0 && ! empty( $current_model ) ) {
 			// Migration: Save current model as the lock for this existing store.
-			file_put_contents( $info_file, $current_model );
+			file_put_contents( $info_file, $current_model ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		}
 
 		return new FileVectorStore( directory: $store_dir, topK: 3, name: $store_name );
@@ -189,7 +189,7 @@ class RAG_Agent extends RAG {
 		$store_dir = $uploads['basedir'] . '/jeo-ai-store';
 		$info_file = $store_dir . '/' . $name . '.model_info';
 		if ( ! empty( $model ) ) {
-			file_put_contents( $info_file, $model );
+			file_put_contents( $info_file, $model ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		}
 	}
 
@@ -205,7 +205,7 @@ class RAG_Agent extends RAG {
 		$store_file = $store_dir . '/' . $name . '.store';
 
 		if ( file_exists( $store_file ) && filesize( $store_file ) > 0 && file_exists( $info_file ) ) {
-			return trim( file_get_contents( $info_file ) );
+			return trim( file_get_contents( $info_file ) ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		}
 		return null;
 	}

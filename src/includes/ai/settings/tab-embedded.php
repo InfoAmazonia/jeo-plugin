@@ -32,7 +32,7 @@
 			foreach ( $files as $file ) {
 				if ( strpos( $file, '.json' ) !== false ) {
 					$json_path    = $data_dir . $file;
-					$json_content = file_get_contents( $json_path );
+					$json_content = file_get_contents( $json_path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 					$data         = json_decode( $json_content, true );
 					$count        = is_array( $data ) ? count( $data ) : 0;
 

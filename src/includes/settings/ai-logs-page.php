@@ -217,7 +217,7 @@
 					$raw_input  = $prompt_decoded ? wp_json_encode( $prompt_decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) : $prompt;
 					$raw_output = $resp_decoded ? wp_json_encode( $resp_decoded, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE ) : $response;
 
-					$output_preview = mb_substr( strip_tags( $raw_output ), 0, 100 ) . '...';
+					$output_preview = mb_substr( wp_strip_all_tags( $raw_output ), 0, 100 ) . '...';
 
 					$provider_name = strtoupper( $provider );
 					$model_name    = '';

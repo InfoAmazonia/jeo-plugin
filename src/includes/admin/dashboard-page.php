@@ -363,7 +363,7 @@
 
 	<?php
 		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
-	if ( ! in_array( $map_runtime, array( 'mapboxgl' ) ) ) {
+	if ( ! in_array( $map_runtime, array( 'mapboxgl' ), true ) ) {
 		$map_runtime = 'maplibregl';
 	}
 		$mapbox_key   = \jeo_settings()->get_option( 'mapbox_key' );

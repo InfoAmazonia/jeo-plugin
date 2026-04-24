@@ -56,7 +56,8 @@ class AI_Settings {
 	 * @return string
 	 */
 	public function get_current_tab() {
-		return isset( $_GET['tab'] ) ? sanitize_key( $_GET['tab'] ) : 'provider';
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : 'provider';
 	}
 
 	/**
