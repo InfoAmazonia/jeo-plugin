@@ -1,5 +1,5 @@
 <div class="wrap jeo-dashboard-wrap">
-	
+
 	<style>
 		/* Full height logic specific for WP Admin */
 		html.wp-toolbar { padding-top: 32px; }
@@ -7,7 +7,7 @@
 		#wpbody { padding-top: 0; }
 		#wpbody-content { padding-bottom: 0; }
 		#wpfooter { display: none; } /* Hide WP footer on dashboard to prevent scroll */
-		
+
 		.jeo-dashboard-wrap {
 			margin: 0;
 			padding: 0;
@@ -63,25 +63,8 @@
 			transition: opacity 1s ease-in-out;
 		}
 
-		/* Map Markers / Pins Animation */
-		.jeo-pin-marker {
-			width: 24px;
-			height: 24px;
-			background-color: #007cba;
-			border: 3px solid #fff;
-			border-radius: 50%;
-			box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-			cursor: pointer;
-			opacity: 0;
-			transform: scale(0.1) translateY(50px);
-			transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
-		}
-		
-		.jeo-pin-marker.drop {
-			opacity: 1;
-			transform: scale(1) translateY(0);
-		}
-		
+		.jeo-dashboard-popup h3 { font-weight: 600; }
+
 		/* Dashboard Header / Bottom Panel */
 		.jeo-dashboard-header {
 			position: absolute;
@@ -120,7 +103,7 @@
 			filter: brightness(0) invert(1);
 			width: 30px; height: 30px;
 		}
-		
+
 		.jeo-dashboard-logo {
 			width: 30px; height: 30px;
 			background: url('<?php echo esc_url( JEO_BASEURL . "/js/src/icons/jeo.svg" ); ?>') center center no-repeat;
@@ -137,7 +120,7 @@
 			width: 100%;
 			transition: opacity 0.3s ease;
 		}
-		
+
 		.jeo-dashboard-header-content {
 			margin-left: 15px;
 			white-space: nowrap;
@@ -154,7 +137,7 @@
 			pointer-events: none;
 			display: none;
 		}
-		
+
 		.jeo-dashboard-header h1 {
 			margin: 0; padding: 0; font-size: 18px; color: #1d2327; font-weight: 600;
 		}
@@ -295,7 +278,7 @@
 	</style>
 
 	<div id="jeo-dashboard-map"></div>
-	
+
 	<div class="jeo-dashboard-header" id="jeo-header-box">
 		<div class="jeo-dashboard-header-main">
 			<div class="jeo-dashboard-logo" id="jeo-header-logo" title="<?php esc_attr_e( 'Toggle panel', 'jeo' ); ?>"></div>
@@ -397,6 +380,7 @@
 			var dashboardData = null;
 			var minTimestamp = 0;
 			var maxTimestamp = new Date().getTime();
+			var pinsLayersInitialized = false;
 
 			// Elements
 			var rangeMinInput = document.getElementById('jeo-range-min');
@@ -404,7 +388,7 @@
 			var activeTrack = document.getElementById('jeo-range-active-track');
 			var dateFromLabel = document.getElementById('jeo-date-from-label');
 			var dateToLabel = document.getElementById('jeo-date-to-label');
-			
+
 			var postTypeSelect = document.getElementById('jeo-post-type-filter');
 			var taxSelect = document.getElementById('jeo-taxonomy-filter');
 			var termSelect = document.getElementById('jeo-term-filter');
@@ -428,7 +412,7 @@
 
 				var fromTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (minVal / 100) );
 				var toTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (maxVal / 100) );
-				
+
 				dateFromLabel.innerText = new Date(fromTs).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 				dateToLabel.innerText = new Date(toTs).toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
 			}
@@ -445,6 +429,7 @@
 				var isMapbox = (mapRuntime === 'mapboxgl');
 				var mapStyle = (isMapbox && mapboxKey) ? 'mapbox://styles/mapbox/streets-v11' : {
 					version: 8,
+					glyphs: 'https://demotiles.maplibre.org/font/{fontstack}/{range}.pbf',
 					sources: {
 						osm: {
 							type: 'raster',
@@ -488,19 +473,19 @@
 						setupFilters(data);
 						fetchPins();
 					});
-					
+
 					document.getElementById('jeo-apply-filters').addEventListener('click', fetchPins);
 				});
 			}
 
 			function setupFilters(data) {
 				minTimestamp = new Date(data.min_date).getTime();
-				
+
 				// Pre-select last 3 months
 				var threeMonthsAgo = new Date();
 				threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
 				var minPct = Math.max(0, Math.min(100, ( (threeMonthsAgo.getTime() - minTimestamp) / (maxTimestamp - minTimestamp) ) * 100 ));
-				
+
 				rangeMinInput.value = Math.round(minPct);
 				rangeMaxInput.value = 100;
 				updateRangeUI();
@@ -552,7 +537,7 @@
 				var pt = postTypeSelect.value;
 				var tax = taxSelect.value;
 				var term = termSelect.value;
-				
+
 				var minTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (parseInt(rangeMinInput.value) / 100) );
 				var maxTs = minTimestamp + ( (maxTimestamp - minTimestamp) * (parseInt(rangeMaxInput.value) / 100) );
 
@@ -581,24 +566,139 @@
 			function renderPins(pins) {
 				markers.forEach(m => m.remove());
 				markers = [];
+
+				if (pinsLayersInitialized) {
+					map.off('click', 'jeo-clusters');
+					map.off('click', 'jeo-unclustered');
+					map.off('mouseenter', 'jeo-clusters');
+					map.off('mouseleave', 'jeo-clusters');
+					map.off('mouseenter', 'jeo-unclustered');
+					map.off('mouseleave', 'jeo-unclustered');
+					if (map.getLayer('jeo-cluster-count')) map.removeLayer('jeo-cluster-count');
+					if (map.getLayer('jeo-clusters')) map.removeLayer('jeo-clusters');
+					if (map.getLayer('jeo-unclustered')) map.removeLayer('jeo-unclustered');
+					if (map.getSource('jeo-dashboard-pins')) map.removeSource('jeo-dashboard-pins');
+				}
+
 				document.getElementById('jeo-pin-count').innerText = pins.length + ' locations found.';
-				if (pins.length > 0) {
-					var bounds = new glObject.LngLatBounds();
-					pins.forEach((pin, index) => {
-						var lat = Number(pin.lat), lon = Number(pin.lon);
-						if (isNaN(lat) || isNaN(lon)) return;
-						bounds.extend([lon, lat]);
-						var el = document.createElement('div');
-						el.className = 'jeo-pin-marker';
-						var popupHTML = '<div class="jeo-dashboard-popup" style="padding:10px;min-width:200px;">' +
-							'<h3 style="margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #eee;padding-bottom:5px;">' + (pin.title || 'Untitled') + '</h3>' +
-							'<p style="margin:0 0 10px 0;font-size:12px;color:#1d2327;"><strong>' + pin.name + '</strong></p>';
-						if (pin.quote) popupHTML += '<blockquote style="margin:0 0 15px 0;padding:8px 12px;border-left:3px solid #007cba;background:#f0f7ff;font-style:italic;font-size:12px;line-height:1.4;color:#2c3338;">"' + pin.quote + '"</blockquote>';
-						popupHTML += '<div style="display:flex;gap:10px;margin-top:10px;"><a href="' + pin.view_url + '" class="button button-small" target="_blank">View Post</a><a href="' + pin.edit_url + '" class="button button-small" target="_blank">Edit Post</a></div></div>';
-						var marker = new glObject.Marker({ element: el }).setLngLat([lon, lat]).setPopup(new glObject.Popup({ offset: 25 }).setHTML(popupHTML)).addTo(map);
-						markers.push(marker);
-						setTimeout(() => el.classList.add('drop'), 100 + (index * 20));
+				if (pins.length === 0) return;
+
+				var features = [];
+				var bounds = new glObject.LngLatBounds();
+				pins.forEach(function(pin) {
+					var lat = Number(pin.lat), lon = Number(pin.lon);
+					if (isNaN(lat) || isNaN(lon)) return;
+					bounds.extend([lon, lat]);
+					features.push({
+						type: 'Feature',
+						properties: {
+							title: pin.title || 'Untitled',
+							name: pin.name || '',
+							quote: pin.quote || '',
+							view_url: pin.view_url || '#',
+							edit_url: pin.edit_url || '#'
+						},
+						geometry: { type: 'Point', coordinates: [lon, lat] }
 					});
+				});
+
+				map.addSource('jeo-dashboard-pins', {
+					type: 'geojson',
+					data: { type: 'FeatureCollection', features: features },
+					cluster: true,
+					clusterRadius: 50,
+					clusterMaxZoom: 14
+				});
+
+				map.addLayer({
+					id: 'jeo-clusters',
+					type: 'circle',
+					source: 'jeo-dashboard-pins',
+					filter: ['has', 'point_count'],
+					paint: {
+						'circle-color': [
+							'step', ['get', 'point_count'],
+							'#007cba', 15,
+							'#005a9e', 50,
+							'#003d6b'
+						],
+						'circle-radius': [
+							'step', ['get', 'point_count'],
+							20, 15, 28, 50, 36
+						],
+						'circle-stroke-color': '#ffffff',
+						'circle-stroke-width': 4,
+						'circle-stroke-opacity': 0.9
+					}
+				});
+
+				map.addLayer({
+					id: 'jeo-cluster-count',
+					type: 'symbol',
+					source: 'jeo-dashboard-pins',
+					filter: ['has', 'point_count'],
+					layout: {
+						'text-field': '{point_count}',
+						'text-size': 13
+					},
+					paint: {
+						'text-color': '#ffffff'
+					}
+				});
+
+				map.addLayer({
+					id: 'jeo-unclustered',
+					type: 'circle',
+					source: 'jeo-dashboard-pins',
+					filter: ['!', ['has', 'point_count']],
+					paint: {
+						'circle-color': '#007cba',
+						'circle-radius': 8,
+						'circle-stroke-color': '#ffffff',
+						'circle-stroke-width': 3
+					}
+				});
+
+				map.on('click', 'jeo-clusters', function(e) {
+					var clusterFeatures = map.queryRenderedFeatures(e.point, { layers: ['jeo-clusters'] });
+					if (!clusterFeatures.length) return;
+					var clusterId = clusterFeatures[0].properties.cluster_id;
+					map.getSource('jeo-dashboard-pins').getClusterExpansionZoom(clusterId, function(err, zoom) {
+						if (err) return;
+						map.easeTo({
+							center: clusterFeatures[0].geometry.coordinates,
+							zoom: zoom
+						});
+					});
+				});
+
+				map.on('click', 'jeo-unclustered', function(e) {
+					var p = e.features[0].properties;
+					var coordinates = e.features[0].geometry.coordinates.slice();
+					while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+					}
+					var popupHTML = '<div class="jeo-dashboard-popup" style="padding:10px;min-width:200px;">' +
+						'<h3 style="margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #eee;padding-bottom:5px;">' + (p.title || 'Untitled') + '</h3>' +
+						'<p style="margin:0 0 10px 0;font-size:12px;color:#1d2327;"><strong>' + p.name + '</strong></p>';
+					if (p.quote) popupHTML += '<blockquote style="margin:0 0 15px 0;padding:8px 12px;border-left:3px solid #007cba;background:#f0f7ff;font-style:italic;font-size:12px;line-height:1.4;color:#2c3338;">"' + p.quote + '"</blockquote>';
+					popupHTML += '<div style="display:flex;gap:10px;margin-top:10px;"><a href="' + p.view_url + '" class="button button-small" target="_blank">View Post</a><a href="' + p.edit_url + '" class="button button-small" target="_blank">Edit Post</a></div></div>';
+					new glObject.Popup({ offset: 15, closeOnClick: true })
+						.setLngLat(coordinates)
+						.setHTML(popupHTML)
+						.addTo(map);
+				});
+
+				map.on('mouseenter', 'jeo-clusters', function() { map.getCanvas().style.cursor = 'pointer'; });
+				map.on('mouseleave', 'jeo-clusters', function() { map.getCanvas().style.cursor = ''; });
+				map.on('mouseenter', 'jeo-unclustered', function() { map.getCanvas().style.cursor = 'pointer'; });
+				map.on('mouseleave', 'jeo-unclustered', function() { map.getCanvas().style.cursor = ''; });
+
+				pinsLayersInitialized = true;
+
+				if (features.length === 1) {
+					map.flyTo({ center: features[0].geometry.coordinates, zoom: 10, duration: 1500 });
+				} else {
 					map.fitBounds(bounds, { padding: 100, maxZoom: 12, duration: 2000 });
 				}
 			}
