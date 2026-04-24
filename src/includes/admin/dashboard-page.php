@@ -443,7 +443,28 @@
 				var mapRuntime = '<?php echo esc_js( $map_runtime ); ?>';
 				var mapboxKey  = '<?php echo esc_js( $mapbox_key ); ?>';
 				var isMapbox = (mapRuntime === 'mapboxgl');
-				var mapStyle = (isMapbox && mapboxKey) ? 'mapbox://styles/mapbox/light-v11' : 'https://basemaps.cartocdn.com/gl/positron-gl-style/style.json';
+				var mapStyle = (isMapbox && mapboxKey) ? 'mapbox://styles/mapbox/streets-v11' : {
+					version: 8,
+					sources: {
+						osm: {
+							type: 'raster',
+							tiles: [
+								'https://a.tile.openstreetmap.org/{z}/{x}/{y}.png',
+								'https://b.tile.openstreetmap.org/{z}/{x}/{y}.png',
+							],
+							tileSize: 256,
+							attribution: '© OpenStreetMap Contributors',
+							maxzoom: 19,
+						},
+					},
+					layers: [
+						{
+							id: 'osm',
+							type: 'raster',
+							source: 'osm',
+						},
+					],
+				};
 				if(isMapbox && mapboxKey) mapboxgl.accessToken = mapboxKey;
 
 				glObject = (typeof maplibregl !== 'undefined') ? maplibregl : (typeof mapboxgl !== 'undefined' ? mapboxgl : null);
