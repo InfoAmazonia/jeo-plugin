@@ -1,12 +1,14 @@
 import { registerBlockType } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import EmbeddedStorymapEditor from './embedded-story-map-editor';
+import LayerEditorPreview from './layer-editor-preview';
 import MapDisplay from './map-display';
 import MapEditor from './map-editor';
+import MapEditorPreview from './map-editor-preview';
 import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
 import StoriesNearYouEditor from './stories-near-you-editor';
-import StorymapEditor from './storymap-editor'
+import StorymapEditor from './storymap-editor';
 import MapIcon from '../icons/ion/map';
 import { cloneDeep } from 'lodash';
 import { AsyncModeProvider } from '@wordpress/data';
@@ -310,5 +312,27 @@ registerBlockType( 'jeo/stories-near-you', {
 		},
 	},
 	edit: StoriesNearYouEditor,
+	save: () => null,
+} );
+
+registerBlockType( 'jeo/layer-editor', {
+	title: __( 'Layer Preview', 'jeo' ),
+	category: 'jeo',
+	icon: MapIcon,
+	supports: {
+		align: true,
+	},
+	edit: ( props ) => <LayerEditorPreview { ...props } />,
+	save: () => null,
+} );
+
+registerBlockType( 'jeo/map-editor', {
+	title: __( 'Map Preview', 'jeo' ),
+	category: 'jeo',
+	icon: MapIcon,
+	supports: {
+		align: true,
+	},
+	edit: ( props ) => <MapEditorPreview { ...props } />,
 	save: () => null,
 } );
