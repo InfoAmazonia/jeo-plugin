@@ -296,6 +296,10 @@ registerBlockType( 'jeo/stories-near-you', {
 			type: 'boolean',
 			default: true,
 		},
+		showAuthor: {
+			type: 'boolean',
+			default: true,
+		},
 		lat: {
 			type: 'number',
 			default: 0,

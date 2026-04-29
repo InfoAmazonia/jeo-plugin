@@ -73,6 +73,7 @@
 				'showCategory',
 				'showDate',
 				'showExcerpt',
+				'showAuthor',
 			];
 
 			keys.forEach( ( key ) => {

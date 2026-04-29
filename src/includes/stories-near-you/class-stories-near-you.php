@@ -78,6 +78,10 @@ class Stories_Near_You {
 						'type'    => 'boolean',
 						'default' => true,
 					),
+					'showAuthor'    => array(
+						'type'    => 'boolean',
+						'default' => true,
+					),
 					'lat'           => array(
 						'type'    => 'number',
 						'default' => 0,
@@ -109,6 +113,7 @@ class Stories_Near_You {
 				'showCategory'  => true,
 				'showDate'      => true,
 				'showExcerpt'   => true,
+				'showAuthor'    => true,
 				'lat'           => 0,
 				'lng'           => 0,
 			)
@@ -163,6 +168,9 @@ class Stories_Near_You {
 						<div class="jeo-stories-near-you__skeleton-line jeo-stories-near-you__skeleton-line--title jeo-stories-near-you__skeleton-line--narrow"></div>
 						<?php if ( $atts['showDate'] ) : ?>
 						<div class="jeo-stories-near-you__skeleton-line jeo-stories-near-you__skeleton-line--medium"></div>
+						<?php endif; ?>
+						<?php if ( $atts['showAuthor'] ) : ?>
+						<div class="jeo-stories-near-you__skeleton-line jeo-stories-near-you__skeleton-line--short"></div>
 						<?php endif; ?>
 						<?php if ( $atts['showExcerpt'] ) : ?>
 						<div class="jeo-stories-near-you__skeleton-line"></div>
@@ -240,6 +248,10 @@ class Stories_Near_You {
 						'type'    => 'boolean',
 						'default' => true,
 					),
+					'showAuthor'    => array(
+						'type'    => 'boolean',
+						'default' => true,
+					),
 				),
 			)
 		);
@@ -298,6 +310,7 @@ class Stories_Near_You {
 			'showCategory'  => filter_var( $request->get_param( 'showCategory' ), FILTER_VALIDATE_BOOLEAN ),
 			'showDate'      => filter_var( $request->get_param( 'showDate' ), FILTER_VALIDATE_BOOLEAN ),
 			'showExcerpt'   => filter_var( $request->get_param( 'showExcerpt' ), FILTER_VALIDATE_BOOLEAN ),
+			'showAuthor'    => filter_var( $request->get_param( 'showAuthor' ), FILTER_VALIDATE_BOOLEAN ),
 		);
 
 		$post_ids = $this->get_nearby_posts( $lat, $lng, $atts['category'], $atts['tag'], $atts['postsPerPage'] );
@@ -502,6 +515,12 @@ class Stories_Near_You {
 				<time class="jeo-stories-near-you__post-date" datetime="<?php echo esc_attr( get_the_date( 'c', $post_id ) ); ?>">
 					<?php echo esc_html( $date ); ?>
 				</time>
+				<?php endif; ?>
+
+				<?php if ( $atts['showAuthor'] ) : ?>
+				<span class="jeo-stories-near-you__post-author">
+					<?php echo esc_html( get_the_author_meta( 'display_name', $post->post_author ) ); ?>
+				</span>
 				<?php endif; ?>
 
 				<?php if ( $atts['showExcerpt'] ) : ?>

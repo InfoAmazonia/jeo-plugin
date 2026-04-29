@@ -29,6 +29,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		showCategory,
 		showDate,
 		showExcerpt,
+		showAuthor,
 	} = attributes;
 
 	const [ previewLat, setPreviewLat ] = useState( DEFAULT_LAT );
@@ -86,13 +87,6 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						step="any"
 						min={ -180 }
 						max={ 180 }
-						value={ previewLng }
-						onChange={ ( val ) => setPreviewLng( Number.parseFloat( val ) || 0 ) }
-					/>
-					<TextControl
-						label={ __( 'Longitude', 'jeo' ) }
-						type="number"
-						step="any"
 						value={ previewLng }
 						onChange={ ( val ) => setPreviewLng( Number.parseFloat( val ) || 0 ) }
 					/>
@@ -178,6 +172,13 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						checked={ showExcerpt }
 						onChange={ ( val ) =>
 							setAttributes( { showExcerpt: val } )
+						}
+					/>
+					<ToggleControl
+						label={ __( 'Show author', 'jeo' ) }
+						checked={ showAuthor }
+						onChange={ ( val ) =>
+							setAttributes( { showAuthor: val } )
 						}
 					/>
 				</PanelBody>

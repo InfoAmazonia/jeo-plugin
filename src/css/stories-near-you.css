@@ -76,7 +76,6 @@
 	font-size: 0.75em;
 	text-transform: uppercase;
 	letter-spacing: 0.04em;
-	/* opacity: 0.6; */
 }
 
 .jeo-stories-near-you__post-title {
@@ -106,6 +105,11 @@
 	margin: 0;
 	font-size: 0.9em;
 	line-height: 1.5;
+}
+
+.jeo-stories-near-you__post-author {
+	order: 5;
+	font-size: 0.85em;
 }
 
 /* Skeleton */
