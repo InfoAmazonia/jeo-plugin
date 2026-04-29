@@ -12,6 +12,7 @@
 | Geocoding, post geolocation | [`geocoding/README.md`](geocoding/README.md) |
 | Storymap (scrollytelling) | [`storymap/README.md`](storymap/README.md) |
 | Discovery feature | [`discovery/README.md`](discovery/README.md) |
+| Stories Near You block | [`stories-near-you/README.md`](stories-near-you/README.md) |
 | AI integration (georef, RAG, bulk) | [`ai/README.md`](ai/README.md) |
 | REST API endpoints | [`rest-api/README.md`](rest-api/README.md) |
 | Settings, admin pages | [`settings/README.md`](settings/README.md) |

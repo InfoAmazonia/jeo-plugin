@@ -5,6 +5,7 @@ import MapDisplay from './map-display';
 import MapEditor from './map-editor';
 import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
+import StoriesNearYouEditor from './stories-near-you-editor';
 import StorymapEditor from './storymap-editor'
 import MapIcon from '../icons/ion/map';
 import { cloneDeep } from 'lodash';
@@ -253,3 +254,57 @@ registerBlockType( 'jeo/embedded-storymap', {
 		return JSON.stringify(props);
 	},
 });
+
+registerBlockType( 'jeo/stories-near-you', {
+	title: __( 'Stories Near You', 'jeo' ),
+	description: __( 'Display geolocated posts sorted by proximity to the reader', 'jeo' ),
+	category: 'jeo',
+	icon: MapIcon,
+	supports: {
+		align: true,
+	},
+	attributes: {
+		postsPerPage: {
+			type: 'number',
+			default: 6,
+		},
+		postsPerRow: {
+			type: 'number',
+			default: 3,
+		},
+		category: {
+			type: 'number',
+			default: 0,
+		},
+		tag: {
+			type: 'number',
+			default: 0,
+		},
+		showThumbnail: {
+			type: 'boolean',
+			default: true,
+		},
+		showCategory: {
+			type: 'boolean',
+			default: true,
+		},
+		showDate: {
+			type: 'boolean',
+			default: true,
+		},
+		showExcerpt: {
+			type: 'boolean',
+			default: true,
+		},
+		lat: {
+			type: 'number',
+			default: 0,
+		},
+		lng: {
+			type: 'number',
+			default: 0,
+		},
+	},
+	edit: StoriesNearYouEditor,
+	save: () => null,
+} );

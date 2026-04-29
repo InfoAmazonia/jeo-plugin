@@ -4,7 +4,7 @@
 
 | File | Role |
 |------|------|
-| `src/includes/class-jeo.php` | Registers all blocks via `register_block_type()` |
+| `src/includes/class-jeo.php` | Registers most blocks via `register_block_type()` |
 | `src/js/src/map-blocks/index.js` | Webpack entry point `mapBlocks` |
 | `src/js/src/map-blocks/map-editor.js` | Edit component for `jeo/map-blocks` |
 | `src/js/src/map-blocks/onetime-map-display.js` | Save component for one-time map |
@@ -26,6 +26,7 @@ Registered in `class-jeo.php` on `init` hook:
 | `jeo/embedded-storymap` | Server-side | Embeddable storymap |
 | `jeo/map-editor` | Dynamic (iframe) | Inline map preview in editor |
 | `jeo/layer-editor` | Dynamic (iframe) | Inline layer preview in editor |
+| `jeo/stories-near-you` | Skeleton + JS (self-registered) | Geolocated posts sorted by proximity — see [`stories-near-you/README.md`](../stories-near-you/README.md) |
 
 ## Gutenberg Sidebar Plugins
 
@@ -40,7 +41,7 @@ Registered in `class-jeo.php` on `init` hook:
 1. Define attributes in JS (`attributes` in `registerBlockType` or config file)
 2. Create `Edit` component (React) using `@wordpress/block-editor`
 3. Create `Save` component or use `render_callback` PHP (server-side)
-4. Register in `class-jeo.php` via `register_block_type()`
+4. Register in `class-jeo.php` via `register_block_type()`, or self-register in a dedicated class
 5. Add entry point in `webpack.config.js` if needed
 
 ## Block Frontend Dependencies

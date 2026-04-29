@@ -57,6 +57,7 @@ module.exports = {
 			import: './src/js/src/maps-sidebar/index.js',
 			dependOn: ['mapglReact'],
 		},
+		storiesNearYou: './src/js/src/stories-near-you/stories-near-you-frontend.js',
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),

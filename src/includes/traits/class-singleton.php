@@ -48,6 +48,7 @@ trait Singleton {
 			'jeo/onetime-map',
 			'jeo/storymap',
 			'jeo/embedded-storymap',
+			'jeo/stories-near-you',
 		);
 
 		$should_load_assets = false;

@@ -32,7 +32,7 @@ function jeo_autoload( $class_name ) {
 
 	$filename = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
 
-	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization', 'ai' );
+	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization', 'ai', 'stories-near-you' );
 
 	foreach ( $folders as $folder ) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -185,6 +185,10 @@ function jeo_menu() {
  */
 function jeo_storymap() {
 	return \Jeo\Storymap::get_instance();
+}
+
+function jeo_stories_near_you() {
+	return \Jeo\Stories_Near_You::get_instance();
 }
 
 /**

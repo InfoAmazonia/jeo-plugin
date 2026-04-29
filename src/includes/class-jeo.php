@@ -55,6 +55,7 @@ class Jeo {
 		\jeo_legend_types();
 		\jeo_sidebars();
 		\jeo_storymap();
+		\jeo_stories_near_you();
 
 		add_filter( 'load_textdomain_mofile', array( $this, 'fallback_translation_mofile' ), 10, 2 );
 		add_filter( 'load_script_translation_file', array( $this, 'fallback_script_translation_file' ), 10, 3 );
