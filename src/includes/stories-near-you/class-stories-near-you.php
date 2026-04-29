@@ -117,8 +117,8 @@ class Stories_Near_You {
 		$use_preview_coords = ! empty( $atts['lat'] ) || ! empty( $atts['lng'] );
 
 		if ( $use_preview_coords ) {
-			$lat = (float) $atts['lat'];
-			$lng = (float) $atts['lng'];
+			$lat      = (float) $atts['lat'];
+			$lng      = (float) $atts['lng'];
 			$post_ids = $this->get_nearby_posts( $lat, $lng, $atts['category'], $atts['tag'], $atts['postsPerPage'] );
 
 			$wrapper_attrs = get_block_wrapper_attributes(
@@ -146,11 +146,9 @@ class Stories_Near_You {
 			)
 		);
 
-		$data_atts = wp_json_encode( $atts );
-
 		ob_start();
 		?>
-		<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput -- get_block_wrapper_attributes() returns escaped HTML. ?>>
+		<div <?php echo esc_html( $wrapper_attrs ); ?>>
 			<div class="jeo-stories-near-you__skeleton jeo-stories-near-you__grid jeo-stories-near-you__grid--cols-<?php echo (int) $atts['postsPerRow']; ?>">
 				<?php for ( $i = 0; $i < (int) $atts['postsPerPage']; $i++ ) : ?>
 				<article class="jeo-stories-near-you__skeleton-card">
@@ -178,7 +176,7 @@ class Stories_Near_You {
 			<div class="jeo-stories-near-you__error hidden">
 				<p><?php esc_html_e( 'Unable to load stories near you.', 'jeo' ); ?></p>
 			</div>
-			<script type="application/json" class="jeo-stories-near-you-attrs"><?php echo esc_html( $data_atts ); ?></script>
+			<script type="application/json" class="jeo-stories-near-you-attrs"><?php echo wp_json_encode( $atts ); ?></script>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -296,10 +294,10 @@ class Stories_Near_You {
 			'postsPerRow'   => (int) $request->get_param( 'postsPerRow' ),
 			'category'      => (int) $request->get_param( 'category' ),
 			'tag'           => (int) $request->get_param( 'tag' ),
-			'showThumbnail' => (bool) $request->get_param( 'showThumbnail' ),
-			'showCategory'  => (bool) $request->get_param( 'showCategory' ),
-			'showDate'      => (bool) $request->get_param( 'showDate' ),
-			'showExcerpt'   => (bool) $request->get_param( 'showExcerpt' ),
+			'showThumbnail' => filter_var( $request->get_param( 'showThumbnail' ), FILTER_VALIDATE_BOOLEAN ),
+			'showCategory'  => filter_var( $request->get_param( 'showCategory' ), FILTER_VALIDATE_BOOLEAN ),
+			'showDate'      => filter_var( $request->get_param( 'showDate' ), FILTER_VALIDATE_BOOLEAN ),
+			'showExcerpt'   => filter_var( $request->get_param( 'showExcerpt' ), FILTER_VALIDATE_BOOLEAN ),
 		);
 
 		$post_ids = $this->get_nearby_posts( $lat, $lng, $atts['category'], $atts['tag'], $atts['postsPerPage'] );
