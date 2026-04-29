@@ -78,7 +78,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           coverage: none
-          extensions: mysqli
+          extensions: mysqli, zip
           tools: wp-cli
 
       - name: Show PHP version
