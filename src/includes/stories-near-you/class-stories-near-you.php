@@ -153,7 +153,7 @@ class Stories_Near_You {
 
 		ob_start();
 		?>
-		<div <?php echo esc_html( $wrapper_attrs ); ?>>
+		<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput -- get_block_wrapper_attributes() returns escaped HTML. ?>>
 			<div class="jeo-stories-near-you__skeleton jeo-stories-near-you__grid jeo-stories-near-you__grid--cols-<?php echo (int) $atts['postsPerRow']; ?>">
 				<?php for ( $i = 0; $i < (int) $atts['postsPerPage']; $i++ ) : ?>
 				<article class="jeo-stories-near-you__skeleton-card">
