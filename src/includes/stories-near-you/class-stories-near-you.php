@@ -341,7 +341,7 @@ class Stories_Near_You {
 	 */
 	protected function resolve_server_location() {
 		$lat = \jeo_settings()->get_option( 'map_default_lat' );
-		$lng = \jeo_settings()->get_option( 'map_default_lon' );
+		$lng = \jeo_settings()->get_option( 'map_default_lng' );
 
 		return array(
 			'lat' => $lat ? (float) $lat : -23.549985,

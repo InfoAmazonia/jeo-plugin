@@ -187,6 +187,11 @@ function jeo_storymap() {
 	return \Jeo\Storymap::get_instance();
 }
 
+/**
+ * Gets the instance of the Stories_Near_You class
+ *
+ * @return \Stories_Near_You Stories_Near_You instance
+ */
 function jeo_stories_near_you() {
 	return \Jeo\Stories_Near_You::get_instance();
 }

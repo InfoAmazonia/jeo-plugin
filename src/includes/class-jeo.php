@@ -764,7 +764,7 @@ class Jeo {
 
 		$mapbox_key       = \jeo_settings()->get_option( 'mapbox_key' );
 		$default_lat_raw  = \jeo_settings()->get_option( 'map_default_lat' );
-		$default_lon_raw  = \jeo_settings()->get_option( 'map_default_lon' );
+		$default_lon_raw  = \jeo_settings()->get_option( 'map_default_lng' );
 		$default_zoom_raw = \jeo_settings()->get_option( 'map_default_zoom' );
 		$default_lat      = $default_lat_raw ? $default_lat_raw : -23.549985;
 		$default_lon      = $default_lon_raw ? $default_lon_raw : -46.633519;
@@ -840,7 +840,7 @@ class Jeo {
 				'map_defaults'          => array(
 					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lon'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lon' ) ),
+					'lon'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
 					'enable_fullscreen'   => true,
@@ -1329,7 +1329,7 @@ class Jeo {
 				'map_defaults' => array(
 					'zoom' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lon'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lon' ) ),
+					'lon'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
 				),
 			)
 		);

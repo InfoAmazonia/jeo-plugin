@@ -43,7 +43,7 @@ sequenceDiagram
 
 1. **Browser Geolocation API** → lat/lng sent to REST endpoint
 2. _(future)_ **IP Geolocation** → resolved server-side from `$_SERVER['REMOTE_ADDR']`
-3. **Map center defaults** → from JEO settings (`map_default_lat`, `map_default_lon`)
+3. **Map center defaults** → from JEO settings (`map_default_lat`, `map_default_lng`)
 
 ## Block Attributes
 
