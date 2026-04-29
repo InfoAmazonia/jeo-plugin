@@ -27,9 +27,11 @@ class Stories_Near_You {
 	 * @return void
 	 */
 	protected function init() {
+		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'init', array( $this, 'register_block_type' ) );
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_assets' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_editor_assets' ) );
 	}
 
 	/**
@@ -258,6 +260,20 @@ class Stories_Near_You {
 	}
 
 	/**
+	 * Register the Stories Near You stylesheet.
+	 *
+	 * @return void
+	 */
+	public function register_assets() {
+		wp_register_style(
+			'jeo-stories-near-you',
+			JEO_BASEURL . '/css/stories-near-you.css',
+			array(),
+			JEO_VERSION
+		);
+	}
+
+	/**
 	 * Enqueue frontend CSS and JS when the block is present on the page.
 	 *
 	 * @return void
@@ -269,12 +285,7 @@ class Stories_Near_You {
 
 		$asset_file = include JEO_BASEPATH . '/js/build/storiesNearYou.asset.php';
 
-		wp_enqueue_style(
-			'jeo-stories-near-you',
-			JEO_BASEURL . '/css/stories-near-you.css',
-			array(),
-			$asset_file['version'] ?? JEO_VERSION
-		);
+		wp_enqueue_style( 'jeo-stories-near-you' );
 
 		wp_enqueue_script(
 			'jeo-stories-near-you',
@@ -283,6 +294,19 @@ class Stories_Near_You {
 			$asset_file['version'] ?? JEO_VERSION,
 			true
 		);
+	}
+
+	/**
+	 * Enqueue editor CSS for both iframe (WP 7.x) and non-iframe (WP 6.x) contexts.
+	 *
+	 * @return void
+	 */
+	public function enqueue_editor_assets() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		wp_enqueue_style( 'jeo-stories-near-you' );
 	}
 
 	/**
@@ -493,6 +517,8 @@ class Stories_Near_You {
 					?>
 				</a>
 			</figure>
+			<?php elseif ( $atts['showThumbnail'] ) : ?>
+			<div class="jeo-stories-near-you__post-featured-image jeo-stories-near-you__post-featured-image--placeholder"></div>
 			<?php endif; ?>
 
 			<div class="jeo-stories-near-you__post-content">
@@ -517,11 +543,25 @@ class Stories_Near_You {
 				</time>
 				<?php endif; ?>
 
-				<?php if ( $atts['showAuthor'] ) : ?>
+			<?php if ( $atts['showAuthor'] ) : ?>
 				<span class="jeo-stories-near-you__post-author">
-					<?php echo esc_html( get_the_author_meta( 'display_name', $post->post_author ) ); ?>
+					<?php
+					$author_names = array();
+					if ( function_exists( 'get_coauthors' ) ) {
+						$coauthors = get_coauthors( $post_id );
+						foreach ( $coauthors as $coauthor ) {
+							if ( ! empty( $coauthor->display_name ) ) {
+								$author_names[] = $coauthor->display_name;
+							}
+						}
+					}
+					if ( empty( $author_names ) ) {
+						$author_names[] = get_the_author_meta( 'display_name', $post->post_author );
+					}
+					echo esc_html( implode( ', ', $author_names ) );
+					?>
 				</span>
-				<?php endif; ?>
+			<?php endif; ?>
 
 				<?php if ( $atts['showExcerpt'] ) : ?>
 				<p class="jeo-stories-near-you__post-excerpt"><?php echo esc_html( $excerpt ); ?></p>

@@ -49,6 +49,10 @@
 	display: block;
 }
 
+.jeo-stories-near-you__post-featured-image--placeholder {
+	display: none;
+}
+
 .jeo-stories-near-you__post-image {
 	width: 100%;
 	height: auto;
