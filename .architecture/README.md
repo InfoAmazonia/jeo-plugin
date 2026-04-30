@@ -13,7 +13,8 @@
 | Storymap (scrollytelling) | [`storymap/README.md`](storymap/README.md) |
 | Discovery feature | [`discovery/README.md`](discovery/README.md) |
 | Stories Near You block | [`stories-near-you/README.md`](stories-near-you/README.md) |
-| AI integration (georef, RAG, bulk) | [`ai/README.md`](ai/README.md) |
+| AI integration (georef, RAG, bulk, minilayer) | [`ai/README.md`](ai/README.md) |
+| Minilayer (AI-generated layers) | [`minilayer/README.md`](minilayer/README.md) |
 | REST API endpoints | [`rest-api/README.md`](rest-api/README.md) |
 | Settings, admin pages | [`settings/README.md`](settings/README.md) |
 | Frontend: MapLibre/Mapbox, React, iframe | [`frontend/README.md`](frontend/README.md) |
@@ -98,6 +99,7 @@ graph TB
     GB --> ML[MapLibre GL / Mapbox GL]
     JEO --> AI[AI Providers]
     JEO --> GEO[Geocoding APIs]
+    JEO --> MCP[Mapbox DevKit MCP]
     AI --> RAG[RAG Vector Store]
     ML --> Tiles[Tile Servers]
     

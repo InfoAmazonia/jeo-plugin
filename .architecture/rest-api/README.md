@@ -16,6 +16,12 @@ All registered in `class-jeo.php` and `class-ai-handler.php` via `rest_api_init`
 
 See [`ai/README.md`](../ai/README.md) for full details.
 
+### Minilayer
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/jeo/v1/minilayer/generate` | POST | Generate Mapbox style from text prompt and create JEO layer |
+
 ### Dashboard
 
 | Route | Method | Description |

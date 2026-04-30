@@ -16,6 +16,8 @@
 | `src/includes/ai/class-rag-worker.php` | Background vectorization worker |
 | `src/includes/ai/class-rag-backup.php` | Vector store backup/restore |
 | `src/includes/ai/class-wp-post-data-loader.php` | Converts WP_Post → NeuronAI Document |
+| `src/includes/ai/class-minilayer-agent.php` | NeuronAI agent for Minilayer (MCP tools) |
+| `src/includes/ai/class-minilayer-handler.php` | Minilayer REST endpoint + layer CPT creation |
 | `src/includes/ai/data/*.json` | Brazilian geographic dictionaries |
 | `src/includes/cli/class-ai-cli.php` | WP-CLI `wp jeo ai vectorize` |
 
@@ -55,6 +57,7 @@
 | `/jeo/v1/bulk-ai-clear-logs` | POST | Clear logs |
 | `/jeo/v1/bulk-ai-preview-approval` | POST | Preview batch approval |
 | `/jeo/v1/ai-rag-run-manual` | POST | Manual vectorization trigger |
+| `/jeo/v1/minilayer/generate` | POST | Generate Mapbox style from text prompt (Minilayer) |
 
 ## AI Georeferencing
 
@@ -146,3 +149,7 @@ graph LR
 - Timestamp
 
 Dashboard at **Jeo → AI Debug Logs** with metrics per model/provider.
+
+## Minilayer (AI-Generated Layers)
+
+See [`minilayer/README.md`](../minilayer/README.md).

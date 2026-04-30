@@ -51,6 +51,7 @@ class Jeo {
 		\jeo_settings();
 		\jeo_ai_logger();
 		\jeo_ai_handler();
+		\jeo_minilayer_handler();
 		\jeo_layer_types();
 		\jeo_legend_types();
 		\jeo_sidebars();

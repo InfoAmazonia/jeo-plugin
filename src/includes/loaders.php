@@ -98,6 +98,15 @@ function jeo_ai_settings() {
 }
 
 /**
+ * Gets the instance of the Minilayer Handler Class
+ *
+ * @return \Jeo\AI\Minilayer_Handler Minilayer_Handler instance
+ */
+function jeo_minilayer_handler() {
+	return \Jeo\AI\Minilayer_Handler::get_instance();
+}
+
+/**
  * Gets the instance of the main Jeo Class
  *
  * @return \Jeo Jeo instance
