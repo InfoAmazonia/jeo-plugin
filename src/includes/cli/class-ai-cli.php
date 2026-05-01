@@ -8,7 +8,9 @@
 namespace Jeo\CLI;
 
 use Jeo\AI\RAG_Agent;
+use Jeo\AI\RAG_Pipeline_Config;
 use Jeo\AI\WP_Post_Data_Loader;
+use Jeo\AI\Layer_Data_Loader;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -20,22 +22,26 @@ if ( ! defined( 'WPINC' ) ) {
 class AI_CLI {
 
 	/**
-	 * Vectorize WordPress posts into the RAG Knowledge Base.
+	 * Vectorize content into the RAG Knowledge Base.
 	 *
 	 * ## OPTIONS
 	 *
+	 * [--store=<store>]
+	 * : Which store to vectorize into. Accepts 'posts' or 'layers'. Defaults to 'posts'.
+	 *
 	 * [--post_type=<type>]
-	 * : The post type to vectorize. Defaults to 'post'.
+	 * : The post type to vectorize. Defaults to 'post'. Ignored when --store=layers.
 	 *
 	 * [--batch_size=<size>]
-	 * : Number of posts to process per batch. Defaults to 20.
+	 * : Number of items to process per batch. Defaults to 20.
 	 *
 	 * [--force]
-	 * : Re-index posts even if they are already vectorized.
+	 * : Re-index items even if they are already vectorized.
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp jeo ai vectorize
+	 *     wp jeo ai vectorize --store=layers --batch_size=10
 	 *     wp jeo ai vectorize --post_type=page --batch_size=10
 	 *
 	 * @param array $args       Positional arguments.
@@ -44,37 +50,103 @@ class AI_CLI {
 	 * @when after_wp_load
 	 */
 	public function vectorize( $args, $assoc_args ) {
-		$post_type  = \WP_CLI\Utils\get_flag_value( $assoc_args, 'post_type', 'post' );
+		$store      = \WP_CLI\Utils\get_flag_value( $assoc_args, 'store', 'posts' );
 		$batch_size = (int) \WP_CLI\Utils\get_flag_value( $assoc_args, 'batch_size', 20 );
 		$force      = \WP_CLI\Utils\get_flag_value( $assoc_args, 'force', false );
 
-		\WP_CLI::log( "Starting vectorization for post type: {$post_type}" );
+		if ( 'layers' === $store ) {
+			$this->do_vectorize( RAG_Pipeline_Config::layers(), $batch_size, $force );
+		} else {
+			$post_type    = \WP_CLI\Utils\get_flag_value( $assoc_args, 'post_type', 'post' );
+			$posts_config = new RAG_Pipeline_Config(
+				'posts',
+				'jeo_knowledge',
+				array( $post_type ),
+				WP_Post_Data_Loader::class,
+				'_jeo_vectorized_at',
+				'jeo_rag_cron_logs'
+			);
+			$this->do_vectorize( $posts_config, $batch_size, $force );
+		}
+	}
 
-		// Check for model lock.
+	/**
+	 * Vectorize posts into the RAG Knowledge Base (alias for vectorize --store=posts).
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--post_type=<type>]
+	 * : The post type to vectorize. Defaults to 'post'.
+	 *
+	 * [--batch_size=<size>]
+	 * : Number of items to process per batch. Defaults to 20.
+	 *
+	 * [--force]
+	 * : Re-index items even if they are already vectorized.
+	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Associative arguments.
+	 *
+	 * @when after_wp_load
+	 */
+	public function vectorize_posts( $args, $assoc_args ) {
+		$assoc_args['store'] = 'posts';
+		$this->vectorize( $args, $assoc_args );
+	}
+
+	/**
+	 * Vectorize map layers into the Layer RAG Store (alias for vectorize --store=layers).
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--batch_size=<size>]
+	 * : Number of layers to process per batch. Defaults to 20.
+	 *
+	 * [--force]
+	 * : Re-index layers even if they are already vectorized.
+	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Associative arguments.
+	 *
+	 * @when after_wp_load
+	 */
+	public function vectorize_layers( $args, $assoc_args ) {
+		$assoc_args['store'] = 'layers';
+		$this->vectorize( $args, $assoc_args );
+	}
+
+	/**
+	 * Internal vectorize implementation for a given pipeline config.
+	 *
+	 * @param RAG_Pipeline_Config $config     Pipeline configuration.
+	 * @param int                 $batch_size Batch size.
+	 * @param bool                $force      Whether to force re-indexing.
+	 */
+	private function do_vectorize( RAG_Pipeline_Config $config, int $batch_size, bool $force ) {
+		\WP_CLI::log( "Starting vectorization for {$config->name} (post types: " . implode( ', ', $config->post_types ) . ')' );
+
 		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
-		$locked_model  = RAG_Agent::get_locked_model( 'jeo_knowledge' );
+		$locked_model  = RAG_Agent::get_locked_model( $config->store_name );
 
 		if ( ! empty( $locked_model ) && ! empty( $current_model ) && $current_model !== $locked_model ) {
-			\WP_CLI::error( "Vector Store mismatch! This store was initialized with '{$locked_model}', but your settings use '{$current_model}'. Please clear the store or revert the model before proceeding." );
+			\WP_CLI::error( "Vector Store mismatch for {$config->name}! This store was initialized with '{$locked_model}', but your settings use '{$current_model}'. Please clear the store or revert the model before proceeding." );
 		}
 
-		// Setup lock if first time.
 		if ( empty( $locked_model ) ) {
-			RAG_Agent::setup_store_model( 'jeo_knowledge', $current_model );
+			RAG_Agent::setup_store_model( $config->store_name, $current_model );
 		}
 
 		$query_args = array(
-			'post_type'      => $post_type,
+			'post_type'      => $config->post_types,
 			'post_status'    => 'publish',
 			'posts_per_page' => $batch_size,
 			'paged'          => 1,
 		);
 
 		if ( ! $force ) {
-			// Only get posts that haven't been vectorized yet.
 			$query_args['meta_query'] = array(
 				array(
-					'key'     => '_jeo_vectorized_at',
+					'key'     => $config->meta_key,
 					'compare' => 'NOT EXISTS',
 				),
 			);
@@ -83,22 +155,22 @@ class AI_CLI {
 		$query = new \WP_Query( $query_args );
 
 		if ( ! $query->have_posts() ) {
-			\WP_CLI::success( 'No posts to vectorize.' );
+			\WP_CLI::success( "No {$config->name} to vectorize." );
 			return;
 		}
 
 		$total_pages = $query->max_num_pages;
 		$total_posts = $query->found_posts;
 
-		\WP_CLI::log( "Found {$total_posts} posts. Processing in {$total_pages} batches of {$batch_size}." );
+		\WP_CLI::log( "Found {$total_posts} items. Processing in {$total_pages} batches of {$batch_size}." );
 
 		try {
-			$rag = new RAG_Agent();
+			$rag = new RAG_Agent( $config->store_name );
 		} catch ( \Exception $e ) {
 			\WP_CLI::error( 'Failed to initialize RAG Agent: ' . $e->getMessage() );
 		}
 
-		$progress = \WP_CLI\Utils\make_progress_bar( 'Vectorizing posts', $total_posts );
+		$progress = \WP_CLI\Utils\make_progress_bar( "Vectorizing {$config->name}", $total_posts );
 
 		for ( $page = 1; $page <= $total_pages; $page++ ) {
 			if ( $page > 1 ) {
@@ -111,42 +183,36 @@ class AI_CLI {
 				continue;
 			}
 
-			// Load documents.
-			$documents = WP_Post_Data_Loader::load( $posts );
+			$documents = $config->data_loader_class::load( $posts );
 
 			if ( ! empty( $documents ) ) {
 				try {
-					// Approximate tokens processed (string length of all document contents combined).
 					$batch_char_length = 0;
 					foreach ( $documents as $doc ) {
 						$batch_char_length += strlen( $doc->getContent() );
 					}
 
-					// Add documents to Vector Store.
 					$rag->addDocuments( $documents );
 
-					// Log estimated embedding tokens.
-					\jeo_ai_logger()->add_embedding_tokens( 'vectorize', $batch_char_length );
+					\jeo_ai_logger()->add_embedding_tokens( 'vectorize_' . $config->name, $batch_char_length );
 
-					// Mark as vectorized.
 					$now = current_time( 'mysql' );
 					foreach ( $posts as $post ) {
-						update_post_meta( $post->ID, '_jeo_vectorized_at', $now );
+						update_post_meta( $post->ID, $config->meta_key, $now );
 						$progress->tick();
 					}
 				} catch ( \Exception $e ) {
 					\WP_CLI::warning( "Batch {$page} failed: " . $e->getMessage() );
 				}
 			} else {
-				// Documents might be empty if content was empty.
 				foreach ( $posts as $post ) {
-					update_post_meta( $post->ID, '_jeo_vectorized_at', current_time( 'mysql' ) ); // Mark to skip next time.
+					update_post_meta( $post->ID, $config->meta_key, current_time( 'mysql' ) );
 					$progress->tick();
 				}
 			}
 		}
 
 		$progress->finish();
-		\WP_CLI::success( 'Vectorization completed.' );
+		\WP_CLI::success( "Vectorization completed for {$config->name}." );
 	}
 }

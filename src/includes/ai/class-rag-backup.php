@@ -73,6 +73,14 @@ class RAG_Backup {
 			if ( file_exists( $store_dir . '/jeo_knowledge_test.model_info' ) ) {
 				$zip->addFile( $store_dir . '/jeo_knowledge_test.model_info', 'jeo_knowledge_test.model_info' );
 			}
+			// Add layer store.
+			if ( file_exists( $store_dir . '/jeo_layers_knowledge.store' ) ) {
+				$zip->addFile( $store_dir . '/jeo_layers_knowledge.store', 'jeo_layers_knowledge.store' );
+				$files_added = true;
+			}
+			if ( file_exists( $store_dir . '/jeo_layers_knowledge.model_info' ) ) {
+				$zip->addFile( $store_dir . '/jeo_layers_knowledge.model_info', 'jeo_layers_knowledge.model_info' );
+			}
 			$zip->close();
 
 			if ( ! $files_added ) {

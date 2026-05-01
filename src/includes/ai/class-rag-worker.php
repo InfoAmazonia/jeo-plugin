@@ -1,6 +1,6 @@
 <?php
 /**
- * RAG index background worker.
+ * RAG index background worker (unified multi-pipeline).
  *
  * @package Jeo
  */
@@ -14,26 +14,49 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * RAG Worker Class
+ * RAG index background worker (unified multi-pipeline).
  *
- * Manages background and manual vectorization of posts.
+ * Manages cron-based and manual indexing of posts and layers into
+ * NeuronAI vector stores for semantic search and layer suggestions.
  */
 class RAG_Worker {
 
 	use Singleton;
 
 	/**
+	 * Registered pipeline configs.
+	 *
+	 * @var RAG_Pipeline_Config[]
+	 */
+	private array $pipelines = array();
+
+	/**
 	 * Init the worker.
 	 */
 	protected function init() {
+		$this->pipelines = array(
+			'posts'  => RAG_Pipeline_Config::posts(),
+			'layers' => RAG_Pipeline_Config::layers(),
+		);
+
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
-		add_action( 'jeo_rag_index_cron_hook', array( $this, 'process_batch' ) );
+		add_action( 'jeo_rag_index_cron_hook', array( $this, 'process_all_pipelines' ) );
 		add_action( 'update_option_jeo-settings', array( $this, 'maybe_schedule_cron' ), 10, 2 );
 		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
+		add_action( 'save_post_map-layer', array( $this, 'on_layer_save' ), 10, 2 );
 	}
 
 	/**
-	 * Add custom cron intervals (every minute, 5 mins, 15 mins) for RAG indexing.
+	 * Get a pipeline config by name.
+	 *
+	 * @param string $name Pipeline name.
+	 */
+	public function get_pipeline( string $name ): ?RAG_Pipeline_Config {
+		return $this->pipelines[ $name ] ?? null;
+	}
+
+	/**
+	 * Add custom cron intervals.
 	 *
 	 * @param array $schedules Existing cron schedules.
 	 * @return array
@@ -63,24 +86,23 @@ class RAG_Worker {
 	/**
 	 * Append a timestamped cron log entry, keeping the 5 most recent.
 	 *
-	 * @param string $message  Log message.
-	 * @param bool   $is_error Whether this is an error entry.
-	 * @return void
+	 * @param string $message    Log message.
+	 * @param bool   $is_error   Whether this is an error entry.
+	 * @param string $log_option Option key for the log.
 	 */
-	private function log_cron_run( $message, $is_error = false ) {
-		$logs = get_option( 'jeo_rag_cron_logs', array() );
+	private function log_cron_run( $message, $is_error = false, string $log_option = 'jeo_rag_cron_logs' ) {
+		$logs = get_option( $log_option, array() );
 		if ( ! is_array( $logs ) ) {
 			$logs = array();
 		}
 
-		$time = current_time( 'Y-m-d H:i:s' );
-		// Since we might be called manually via REST, check action.
+		$time   = current_time( 'Y-m-d H:i:s' );
 		$source = current_action() === 'jeo_rag_index_cron_hook' ? 'Cron' : 'Manual';
-		$status = $is_error ? '❌ ' . __( 'Error', 'jeo' ) : '✅ ' . __( 'Success', 'jeo' );
+		$status = $is_error ? __( 'Error', 'jeo' ) : __( 'Success', 'jeo' );
 
 		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
-		$logs = array_slice( $logs, 0, 5 ); // Keep top 5.
-		update_option( 'jeo_rag_cron_logs', $logs, false );
+		$logs = array_slice( $logs, 0, 5 );
+		update_option( $log_option, $logs, false );
 	}
 
 	/**
@@ -98,13 +120,37 @@ class RAG_Worker {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-layer-rag-run-manual',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_run_layer_manual' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-suggest-layers',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_suggest_layers' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 	}
 
 	/**
-	 * REST Callback: Run one batch manually.
+	 * REST Callback: Run one batch manually for posts.
 	 */
 	public function api_run_manual() {
-		$result = $this->process_batch();
+		$result = $this->process_batch( 'posts' );
 		if ( is_wp_error( $result ) ) {
 			return new \WP_REST_Response(
 				array(
@@ -121,6 +167,89 @@ class RAG_Worker {
 			),
 			200
 		);
+	}
+
+	/**
+	 * REST Callback: Run one batch manually for layers.
+	 */
+	public function api_run_layer_manual() {
+		$result = $this->process_batch( 'layers' );
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				400
+			);
+		}
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => $result,
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST Callback: Suggest layers matching a post.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 */
+	public function api_suggest_layers( $request ) {
+		$post_id = (int) $request->get_param( 'post_id' );
+		$top_k   = (int) $request->get_param( 'top_k' ) ? (int) $request->get_param( 'top_k' ) : 5;
+		$query   = $request->get_param( 'query' );
+
+		if ( empty( $post_id ) && empty( $query ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Either post_id or query is required.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		$search_text = $query;
+
+		if ( ! empty( $post_id ) ) {
+			$post = get_post( $post_id );
+			if ( ! $post ) {
+				return new \WP_REST_Response(
+					array(
+						'success' => false,
+						'message' => __( 'Post not found.', 'jeo' ),
+					),
+					404
+				);
+			}
+
+			if ( empty( $search_text ) ) {
+				$search_text = $post->post_title . "\n\n" . $post->post_content;
+			}
+		}
+
+		try {
+			$results = self::find_matching_layers( $search_text, $top_k );
+			return new \WP_REST_Response(
+				array(
+					'success'     => true,
+					'results'     => $results,
+					'total_found' => count( $results ),
+				),
+				200
+			);
+		} catch ( \Exception $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage(),
+				),
+				500
+			);
+		}
 	}
 
 	/**
@@ -149,23 +278,89 @@ class RAG_Worker {
 	}
 
 	/**
-	 * Process a batch of posts for vectorization.
+	 * Process all pipelines on a cron tick.
 	 */
-	public function process_batch() {
-		// If called via cron, check if it's enabled.
+	public function process_all_pipelines() {
+		if ( ! \jeo_settings()->get_option( 'jeo_rag_auto_index', false ) ) {
+			return;
+		}
+
+		foreach ( $this->pipelines as $name => $config ) {
+			$this->process_batch( $name );
+		}
+	}
+
+	/**
+	 * Auto-index a single layer on save.
+	 *
+	 * @param int      $post_id Post ID.
+	 * @param \WP_Post $post    Post object.
+	 */
+	public function on_layer_save( $post_id, $post ) {
+		if ( wp_is_post_revision( $post_id ) || 'publish' !== $post->post_status ) {
+			return;
+		}
+
+		$config = $this->pipelines['layers'];
+
+		try {
+			$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
+			$locked_model  = RAG_Agent::get_locked_model( $config->store_name );
+
+			if ( ! empty( $locked_model ) && ! empty( $current_model ) && $locked_model !== $current_model ) {
+				return;
+			}
+
+			if ( empty( $locked_model ) && ! empty( $current_model ) ) {
+				RAG_Agent::setup_store_model( $config->store_name, $current_model );
+			}
+
+			$rag       = new RAG_Agent( $config->store_name );
+			$documents = $config->data_loader_class::load( array( $post ) );
+
+			if ( ! empty( $documents ) ) {
+				$rag->addDocuments( $documents );
+				update_post_meta( $post_id, $config->meta_key, current_time( 'mysql' ) );
+			}
+		} catch ( \Exception $e ) {
+			return;
+		}
+	}
+
+	/**
+	 * Process a batch for a named pipeline.
+	 *
+	 * @param string $pipeline_name The pipeline name ('posts' or 'layers').
+	 */
+	public function process_batch( string $pipeline_name = 'posts' ) {
 		if ( current_action() === 'jeo_rag_index_cron_hook' && ! \jeo_settings()->get_option( 'jeo_rag_auto_index', false ) ) {
 			return;
 		}
 
-		$post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
+		$config = $this->pipelines[ $pipeline_name ] ?? null;
+		if ( ! $config ) {
+			/* translators: %s: pipeline name */
+			return new \WP_Error( 'invalid_pipeline', sprintf( __( 'Unknown pipeline: %s', 'jeo' ), $pipeline_name ) );
+		}
+
+		return $this->process_batch_for_config( $config );
+	}
+
+	/**
+	 * Process a batch using the given pipeline config.
+	 *
+	 * @param RAG_Pipeline_Config $config Pipeline configuration.
+	 */
+	private function process_batch_for_config( RAG_Pipeline_Config $config ) {
+		$post_types = 'posts' === $config->name
+			? \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) )
+			: $config->post_types;
+
 		$batch_size = (int) \jeo_settings()->get_option( 'jeo_rag_batch_size', 10 );
 
-		// Check for model lock.
 		$current_model = \jeo_settings()->get_option( 'ai_embedding_model' );
-		$locked_model  = RAG_Agent::get_locked_model( 'jeo_knowledge' );
+		$locked_model  = RAG_Agent::get_locked_model( $config->store_name );
 
-		// Legacy support: if the locked model doesn't have a provider prefix, but the current model does,
-		// compare only the model part.
 		$current_model_basename = $current_model;
 		if ( ! empty( $current_model ) && strpos( $current_model, ':' ) !== false ) {
 			$parts                  = explode( ':', $current_model, 2 );
@@ -173,18 +368,16 @@ class RAG_Worker {
 		}
 
 		if ( ! empty( $locked_model ) && ! empty( $current_model ) ) {
-			// Check if locked model matches the full name OR the basename.
 			if ( $locked_model !== $current_model && $locked_model !== $current_model_basename ) {
 				/* translators: 1: locked model name, 2: current model name */
-				$err_msg = sprintf( __( 'Vector Store mismatch! Expected %1$s, found %2$s.', 'jeo' ), $locked_model, $current_model );
-				$this->log_cron_run( $err_msg, true );
+				$err_msg = sprintf( __( 'Vector Store mismatch for %1$s! Expected %2$s, found %3$s.', 'jeo' ), $config->name, $locked_model, $current_model );
+				$this->log_cron_run( $err_msg, true, $config->cron_log_option );
 				return new \WP_Error( 'model_mismatch', $err_msg );
 			}
 		}
 
-		// Setup lock if first time.
 		if ( empty( $locked_model ) ) {
-			RAG_Agent::setup_store_model( 'jeo_knowledge', $current_model );
+			RAG_Agent::setup_store_model( $config->store_name, $current_model );
 		}
 
 		$query_args = array(
@@ -193,7 +386,7 @@ class RAG_Worker {
 			'posts_per_page' => $batch_size,
 			'meta_query'     => array(
 				array(
-					'key'     => '_jeo_vectorized_at',
+					'key'     => $config->meta_key,
 					'compare' => 'NOT EXISTS',
 				),
 			),
@@ -202,15 +395,16 @@ class RAG_Worker {
 		$query = new \WP_Query( $query_args );
 
 		if ( ! $query->have_posts() ) {
-			$msg = __( 'No more posts to vectorize.', 'jeo' );
-			$this->log_cron_run( $msg, false );
+			/* translators: %s: pipeline name */
+			$msg = sprintf( __( 'No more %s to vectorize.', 'jeo' ), $config->name );
+			$this->log_cron_run( $msg, false, $config->cron_log_option );
 			return $msg;
 		}
 
 		try {
-			$rag       = new RAG_Agent();
+			$rag       = new RAG_Agent( $config->store_name );
 			$posts     = $query->posts;
-			$documents = WP_Post_Data_Loader::load( $posts );
+			$documents = $config->data_loader_class::load( $posts );
 
 			if ( ! empty( $documents ) ) {
 				$batch_char_length = 0;
@@ -219,30 +413,72 @@ class RAG_Worker {
 				}
 
 				$rag->addDocuments( $documents );
-				\jeo_ai_logger()->add_embedding_tokens( 'vectorize', $batch_char_length );
+				\jeo_ai_logger()->add_embedding_tokens( 'vectorize_' . $config->name, $batch_char_length );
 
 				$now = current_time( 'mysql' );
 				foreach ( $posts as $post ) {
-					update_post_meta( $post->ID, '_jeo_vectorized_at', $now );
+					update_post_meta( $post->ID, $config->meta_key, $now );
 				}
 
-				/* translators: %d: number of posts vectorized */
-				$msg = sprintf( __( 'Successfully vectorized %d posts.', 'jeo' ), count( $posts ) );
-				$this->log_cron_run( $msg, false );
+				/* translators: %d: number of items vectorized */
+				$msg = sprintf( __( 'Successfully vectorized %1$d %2$s.', 'jeo' ), count( $posts ), $config->name );
+				$this->log_cron_run( $msg, false, $config->cron_log_option );
 				return $msg;
 			} else {
-				// Mark as processed even if no docs loaded (empty content).
 				$now = current_time( 'mysql' );
 				foreach ( $posts as $post ) {
-					update_post_meta( $post->ID, '_jeo_vectorized_at', $now );
+					update_post_meta( $post->ID, $config->meta_key, $now );
 				}
-				$msg = __( 'Batch skipped (no content found in selected posts).', 'jeo' );
-				$this->log_cron_run( $msg, false );
+				/* translators: %s: pipeline name */
+				$msg = sprintf( __( 'Batch skipped for %s (no content found).', 'jeo' ), $config->name );
+				$this->log_cron_run( $msg, false, $config->cron_log_option );
 				return $msg;
 			}
 		} catch ( \Exception $e ) {
-			$this->log_cron_run( $e->getMessage(), true );
+			$this->log_cron_run( $e->getMessage(), true, $config->cron_log_option );
 			return new \WP_Error( 'rag_error', $e->getMessage() );
 		}
+	}
+
+	/**
+	 * Find layers that semantically match the given text.
+	 *
+	 * @param string $text  Text to search against the layer store.
+	 * @param int    $top_k Number of results to return.
+	 * @return array Array of matched documents with metadata.
+	 */
+	public static function find_matching_layers( string $text, int $top_k = 5 ): array {
+		$config = RAG_Pipeline_Config::layers();
+
+		$rag = new RAG_Agent( $config->store_name );
+
+		$retrieval      = $rag->resolveRetrieval();
+		$retrieved_docs = $retrieval->retrieve( new \NeuronAI\Chat\Messages\UserMessage( $text ) );
+
+		\jeo_ai_logger()->add_embedding_tokens( 'suggest_layers', strlen( $text ) );
+
+		$results = array();
+		$count   = 0;
+		foreach ( $retrieved_docs as $doc ) {
+			if ( $count >= $top_k ) {
+				break;
+			}
+
+			$layer_id = (int) ( $doc->metadata['layer_id'] ?? 0 );
+			$post     = $layer_id ? get_post( $layer_id ) : null;
+
+			$results[] = array(
+				'layer_id'   => $layer_id,
+				'title'      => $post ? $post->post_title : ( $doc->metadata['title'] ?? '' ),
+				'layer_type' => $doc->metadata['layer_type'] ?? '',
+				'source_url' => $doc->metadata['source_url'] ?? '',
+				'score'      => $doc->getScore(),
+				'content'    => mb_strimwidth( $doc->getContent(), 0, 300, '...' ),
+				'edit_url'   => $layer_id ? get_edit_post_link( $layer_id, 'raw' ) : '',
+			);
+			++$count;
+		}
+
+		return $results;
 	}
 }

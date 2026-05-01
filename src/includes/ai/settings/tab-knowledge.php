@@ -278,3 +278,115 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 				</div>
 		</dialog>
 </div>
+
+<!-- Layer Store Section -->
+<div style="margin-top: 30px; padding-top: 25px; border-top: 2px solid #ccd0d4;">
+		<h3 style="margin-top: 0; color: #1d2327;"><?php esc_html_e( 'Layer Store (Vectorized Map Layers)', 'jeo' ); ?></h3>
+		<p class="description"><?php esc_html_e( 'Vectorize your map layers to enable AI-powered semantic search and layer suggestions based on post content.', 'jeo' ); ?></p>
+
+		<div style="margin-top: 20px; display: flex; align-items: flex-start; gap: 20px; background: #fff; padding: 20px; border: 1px solid #ccd0d4; border-radius: 6px;">
+				<div style="flex: 1;">
+						<h4 style="margin-top: 0;"><?php esc_html_e( 'Manual Layer Indexing', 'jeo' ); ?></h4>
+						<p class="description"><?php esc_html_e( 'Trigger a single batch vectorization for map layers. Layers are also auto-indexed on the background cron schedule and when saved.', 'jeo' ); ?></p>
+
+						<button type="button" class="button button-primary" id="jeo-ai-layer-rag-manual-btn" style="margin-top: 15px;">
+								🚀 <?php esc_html_e( 'Vectorize 1 Batch Now', 'jeo' ); ?>
+						</button>
+
+						<?php
+						$total_layers           = wp_count_posts( 'map-layer' );
+						$total_layer_count      = isset( $total_layers->publish ) ? (int) $total_layers->publish : 0;
+						$layer_vectorized_q     = new \WP_Query(
+							array(
+								'post_type'      => 'map-layer',
+								'post_status'    => 'publish',
+								'posts_per_page' => -1,
+								'fields'         => 'ids',
+								'meta_query'     => array(
+									array(
+										'key'     => '_jeo_layer_vectorized_at',
+										'compare' => 'EXISTS',
+									),
+								),
+							)
+						);
+						$layer_vectorized_count = $layer_vectorized_q->found_posts;
+						$layer_rag_percent      = $total_layer_count > 0 ? round( ( $layer_vectorized_count / $total_layer_count ) * 100 ) : 0;
+						?>
+						<div style="margin-top: 20px;">
+								<div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px;">
+										<span><?php esc_html_e( 'Layer Indexing Progress', 'jeo' ); ?></span>
+										<span><?php echo esc_html( $layer_rag_percent ); ?>%</span>
+								</div>
+								<div style="width: 100%; background: #e2e4e7; border-radius: 4px; height: 10px;">
+										<div style="width: <?php echo esc_html( $layer_rag_percent ); ?>%; background: #d63638; height: 100%; border-radius: 4px;"></div>
+								</div>
+								<p style="font-size: 11px; color: #646970; margin-top: 8px;">
+										<?php
+										/* translators: %1$d: vectorized count, %2$d: total layers count */
+										printf( esc_html__( '%1$d of %2$d layers indexed.', 'jeo' ), esc_html( $layer_vectorized_count ), esc_html( $total_layer_count ) );
+										?>
+								</p>
+						</div>
+
+						<div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee;">
+								<h5 style="margin: 0 0 10px 0;"><?php esc_html_e( 'Recent Layer Logs', 'jeo' ); ?></h5>
+								<?php
+								$layer_cron_logs = get_option( 'jeo_layer_rag_cron_logs', array() );
+								if ( empty( $layer_cron_logs ) || ! is_array( $layer_cron_logs ) ) :
+									?>
+									<p style="font-size: 11px; color: #8c8f94; font-style: italic; margin: 0;">
+										<?php esc_html_e( 'No layer indexing jobs have run recently.', 'jeo' ); ?>
+									</p>
+								<?php else : ?>
+									<ul style="margin: 0; padding: 0; list-style: none; font-size: 11px; font-family: monospace;">
+										<?php foreach ( $layer_cron_logs as $log ) : ?>
+											<li style="margin-bottom: 5px; padding: 5px 8px; background: #f6f7f7; border-left: 2px solid #d63638; border-radius: 3px;">
+												<span style="color: #8c8f94;">[<?php echo esc_html( $log['time'] ); ?>]</span>
+												<strong><?php echo esc_html( $log['source'] ); ?>:</strong>
+												<?php echo esc_html( $log['status'] ); ?> -
+												<?php echo esc_html( $log['message'] ); ?>
+											</li>
+										<?php endforeach; ?>
+									</ul>
+								<?php endif; ?>
+						</div>
+				</div>
+				<div style="flex: 1; border-left: 1px solid #eee; padding-left: 20px;">
+						<h4 style="margin-top: 0;"><?php esc_html_e( 'Suggest Layers', 'jeo' ); ?></h4>
+						<p class="description"><?php esc_html_e( 'Test semantic layer matching. Enter a post ID or text to find layers that match the content.', 'jeo' ); ?></p>
+
+						<div style="margin-top: 15px; display: flex; gap: 10px; align-items: flex-end;">
+								<div>
+										<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Post ID', 'jeo' ); ?></label>
+										<input type="number" id="jeo-ai-suggest-layers-post-id" class="small-text" placeholder="<?php esc_attr_e( 'e.g. 123', 'jeo' ); ?>" min="1">
+								</div>
+								<div style="flex: 1;">
+										<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Or search text', 'jeo' ); ?></label>
+										<input type="text" id="jeo-ai-suggest-layers-query" class="regular-text" style="width: 100%;" placeholder="<?php esc_attr_e( 'e.g., deforestation in Amazon rainforest', 'jeo' ); ?>">
+								</div>
+								<button type="button" class="button button-primary" id="jeo-ai-suggest-layers-btn"><?php esc_html_e( 'Find Layers', 'jeo' ); ?></button>
+						</div>
+
+						<div id="jeo-ai-suggest-layers-results" style="margin-top: 15px; display: none;"></div>
+				</div>
+		</div>
+
+		<div style="margin-top: 20px; display: flex; align-items: center; gap: 20px;">
+				<div>
+						<strong><?php esc_html_e( 'Status:', 'jeo' ); ?></strong>
+						<span style="color: #d63638; font-weight: bold;">
+								<?php esc_html_e( 'Active (Shared embedding model with Posts Store)', 'jeo' ); ?>
+						</span>
+				</div>
+				<div>
+						<p style="margin: 0;"><em><?php esc_html_e( 'WP-CLI:', 'jeo' ); ?></em></p>
+						<code style="display: block; margin-top: 5px; background: #000; color: #0f0; padding: 10px; border-radius: 4px;">wp jeo ai vectorize-layers --batch_size=20</code>
+				</div>
+				<div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+						<button type="button" class="button jeo-ai-clear-layer-store-btn" style="border-color: #d63638; color: #d63638;">
+								🗑️ <?php esc_html_e( 'Clear Layer Store', 'jeo' ); ?>
+						</button>
+				</div>
+		</div>
+</div>

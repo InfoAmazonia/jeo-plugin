@@ -421,6 +421,18 @@ class AI_Handler {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-clear-layer-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_layer_store' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -460,6 +472,49 @@ class AI_Handler {
 					'success' => true,
 					/* translators: %s: Store type name. */
 					'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
+				),
+				200
+			);
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
+		}
+	}
+
+	/**
+	 * REST callback that clears the layer vector store files and resets layer postmeta.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_clear_layer_store( $request ) {
+		try {
+			$upload_dir = wp_upload_dir();
+			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
+			$base_name  = 'jeo_layers_knowledge';
+
+			$file_path = $store_dir . '/' . $base_name . '.store';
+			$info_path = $store_dir . '/' . $base_name . '.model_info';
+
+			if ( file_exists( $file_path ) ) {
+				wp_delete_file( $file_path );
+			}
+			if ( file_exists( $info_path ) ) {
+				wp_delete_file( $info_path );
+			}
+
+			global $wpdb;
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s", '_jeo_layer_vectorized_at' ) );
+
+			return new \WP_REST_Response(
+				array(
+					'success' => true,
+					'message' => __( 'Layer store cleared successfully.', 'jeo' ),
 				),
 				200
 			);

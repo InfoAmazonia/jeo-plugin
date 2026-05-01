@@ -12,10 +12,13 @@
 | `src/includes/ai/class-ai-logger.php` | Cost tracking (CPT `jeo-ai-log`) |
 | `src/includes/ai/class-ai-settings.php` | AI settings page |
 | `src/includes/ai/class-bulk-processor.php` | Batch geolocation (WP-Cron) |
-| `src/includes/ai/class-rag-agent.php` | RAG pipeline (FileVectorStore) |
-| `src/includes/ai/class-rag-worker.php` | Background vectorization worker |
+| `src/includes/ai/class-rag-agent.php` | RAG pipeline (FileVectorStore), accepts store name |
+| `src/includes/ai/class-rag-worker.php` | Unified background worker (posts + layers pipelines) |
 | `src/includes/ai/class-rag-backup.php` | Vector store backup/restore |
+| `src/includes/ai/class-rag-pipeline-config.php` | Pipeline configuration value object |
 | `src/includes/ai/class-wp-post-data-loader.php` | Converts WP_Post → NeuronAI Document |
+| `src/includes/ai/class-layer-data-loader.php` | Converts map-layer → NeuronAI Document |
+| `src/includes/ai/class-color-describer.php` | HSL color analysis for legend embeddings |
 | `src/includes/ai/class-minilayer-agent.php` | NeuronAI agent for Minilayer (MCP tools) |
 | `src/includes/ai/class-minilayer-handler.php` | Minilayer REST endpoint + layer CPT creation |
 | `src/includes/ai/data/*.json` | Brazilian geographic dictionaries |
@@ -56,7 +59,10 @@
 | `/jeo/v1/bulk-ai-clear-all` | POST | Clear all |
 | `/jeo/v1/bulk-ai-clear-logs` | POST | Clear logs |
 | `/jeo/v1/bulk-ai-preview-approval` | POST | Preview batch approval |
-| `/jeo/v1/ai-rag-run-manual` | POST | Manual vectorization trigger |
+| `/jeo/v1/ai-rag-run-manual` | POST | Manual vectorization trigger (posts) |
+| `/jeo/v1/ai-layer-rag-run-manual` | POST | Manual vectorization trigger (layers) |
+| `/jeo/v1/ai-clear-layer-store` | POST | Clear layer vector store |
+| `/jeo/v1/ai-suggest-layers` | POST | Semantic layer matching (post ID or query) |
 | `/jeo/v1/minilayer/generate` | POST | Generate Mapbox style from text prompt (Minilayer) |
 
 ## AI Georeferencing
@@ -118,12 +124,66 @@ graph LR
     E -->|Neuron_Agent| F[LLM Response]
 ```
 
+### Unified Multi-Pipeline Architecture
+
+The RAG system uses a **unified pipeline** managed by `RAG_Worker` with a `RAG_Pipeline_Config` value object that parameterizes the indexing process for different content types.
+
+#### Active Pipelines
+
+| Pipeline | Store Name | Post Type | Data Loader | Meta Key |
+|----------|-----------|-----------|-------------|----------|
+| Posts | `jeo_knowledge` | Configurable (`['post']` default) | `WP_Post_Data_Loader` | `_jeo_vectorized_at` |
+| Layers | `jeo_layers_knowledge` | `map-layer` | `Layer_Data_Loader` | `_jeo_layer_vectorized_at` |
+
+#### Pipeline Flow
+
+```mermaid
+graph LR
+    A[Single Cron Hook] --> B[RAG_Worker]
+    B --> C1[Posts Pipeline]
+    B --> C2[Layers Pipeline]
+    C1 --> D1[WP_Post_Data_Loader]
+    C2 --> D2[Layer_Data_Loader]
+    D1 --> E1[jeo_knowledge.store]
+    D2 --> E2[jeo_layers_knowledge.store]
+```
+
+### Layer Store
+
+#### Layer Data Loader (`class-layer-data-loader.php`)
+
+Converts `map-layer` CPT posts into `NeuronAI\RAG\Document[]`. Composes embedding text from:
+
+- Title (always)
+- Content (optional — future-ready)
+- Layer type (human-readable label)
+- Attribution
+- Source URL/path (only if human-readable keywords detected)
+- Source layer (only if human-readable keywords detected)
+- Legend labels + color descriptions (via `Color_Describer`)
+- Palette summary
+
+#### Color Describer (`class-color-describer.php`)
+
+Analyzes hex colors via HSL conversion for semantic embedding:
+
+- Hue name (red, green, blue, etc.)
+- Lightness: very dark / dark / medium / light / very light
+- Saturation: gray / muted / vivid
+- Temperature: warm / cool / neutral
+- Palette summary across all legend colors
+
+#### Cross-Store Retrieval
+
+`RAG_Worker::find_matching_layers($text, $topK)` enables semantic matching between post content and layers by embedding the query text and searching the layer store.
+
 ### Components
 
 - **FileVectorStore**: Stored in `wp-content/uploads/jeo-ai-store/`
-- **Model Lock**: Ensures consistency between embedding and retrieval models
-- **Backup**: ZIP with rotation (max 3 backups)
-- **WP-CLI**: `wp jeo ai vectorize --post_type=post --batch_size=20`
+- **Model Lock**: Per-store model consistency (`<store_name>.model_info`)
+- **Backup**: ZIP with rotation (max 3 backups), includes both stores
+- **WP-CLI**: `wp jeo ai vectorize --store=posts|layers --batch_size=20`
+- **WP-CLI Aliases**: `vectorize-posts`, `vectorize-layers`
 
 ### Embedded Dictionaries
 

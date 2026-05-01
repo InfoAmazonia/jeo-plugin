@@ -422,6 +422,79 @@
 
 		if ($.fn.select2) $('#ai_embedding_model').select2({ tags: true, width: '100%' });
 
+		// Layer Store: Manual vectorization
+		$('#jeo-ai-layer-rag-manual-btn').click(function(e) {
+			e.preventDefault();
+			var i18n = jeo_settings.i18n || {};
+			var $btn = $(this).prop('disabled', true).text(i18n.vectorizing || 'Vectorizing...');
+			loggedApiFetch({ path: '/jeo/v1/ai-layer-rag-run-manual', method: 'POST' }).then(function(res) {
+				alert(res.message || (i18n.success || 'Success!'));
+				location.reload();
+			}).catch(function(err) {
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
+				alert((i18n.error || 'Error') + ': ' + msg);
+			}).finally(function() {
+				$btn.prop('disabled', false).text(i18n.vectorize_now || 'Vectorize Now');
+			});
+		});
+
+		// Layer Store: Clear
+		$('.jeo-ai-clear-layer-store-btn').click(function(e) {
+			e.preventDefault();
+			var i18n = jeo_settings.i18n || {};
+			if (!confirm(i18n.confirm_clear_store || 'Clear layer store?')) return;
+			var $btn = $(this).prop('disabled', true);
+			loggedApiFetch({ path: '/jeo/v1/ai-clear-layer-store', method: 'POST' }).then(function(res) {
+				alert(res.message); location.reload();
+			}).catch(function(err) {
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
+				alert((i18n.error || 'Error') + ': ' + msg);
+			}).finally(function() { $btn.prop('disabled', false); });
+		});
+
+		// Layer Store: Suggest layers
+		$('#jeo-ai-suggest-layers-btn').click(function(e) {
+			e.preventDefault();
+			var i18n = jeo_settings.i18n || {};
+			var $btn = $(this).prop('disabled', true);
+			var $results = $('#jeo-ai-suggest-layers-results');
+			var postId = $('#jeo-ai-suggest-layers-post-id').val();
+			var query = $('#jeo-ai-suggest-layers-query').val();
+			var data = {};
+			if (postId) data.post_id = postId;
+			if (query) data.query = query;
+
+			if (!postId && !query) {
+				alert(i18n.error || 'Please enter a post ID or search text.');
+				$btn.prop('disabled', false);
+				return;
+			}
+
+			$results.html('<p style="color: #8c8f94; font-style: italic;">' + (i18n.searching || 'Searching...') + '</p>').show();
+
+			loggedApiFetch({ path: '/jeo/v1/ai-suggest-layers', method: 'POST', data: data }).then(function(res) {
+				if (!res.success || !res.results || res.results.length === 0) {
+					$results.html('<p style="color: #8c8f94;">' + (res.message || 'No matching layers found.') + '</p>').show();
+					return;
+				}
+				var html = '<h5 style="margin-top:0;">' + res.results.length + ' matching layers:</h5><ul style="margin:0;padding:0;list-style:none;">';
+				$.each(res.results, function(i, layer) {
+					var score = layer.score ? ' (score: ' + layer.score.toFixed(4) + ')' : '';
+					html += '<li style="margin-bottom:8px;padding:10px;background:#f6f7f7;border-left:3px solid #d63638;border-radius:3px;">';
+					html += '<strong>' + (layer.title || 'Untitled') + '</strong>';
+					html += '<span style="color:#8c8f94;font-size:11px;margin-left:8px;">' + (layer.layer_type || '') + score + '</span>';
+					if (layer.edit_url) html += ' <a href="' + layer.edit_url + '" target="_blank" style="font-size:11px;">Edit</a>';
+					html += '<p style="margin:4px 0 0 0;font-size:11px;color:#646970;">' + (layer.content || '') + '</p>';
+					html += '</li>';
+				});
+				html += '</ul>';
+				$results.html(html).show();
+			}).catch(function(err) {
+				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
+				$results.html('<p style="color:red;">' + msg + '</p>').show();
+			}).finally(function() { $btn.prop('disabled', false); });
+		});
+
 		// ------------------------------------
 		// Embedded Data Preview Logic
 		// ------------------------------------

@@ -32,6 +32,23 @@ class RAG_Agent extends RAG {
 	public bool $is_test_mode = false;
 
 	/**
+	 * Store name used for vector storage.
+	 *
+	 * @var string
+	 */
+	private string $store_name;
+
+	/**
+	 * Constructor.
+	 *
+	 * @param string $store_name The vector store name. Defaults to 'jeo_knowledge'.
+	 */
+	public function __construct( string $store_name = 'jeo_knowledge' ) {
+		$this->store_name = $store_name;
+		parent::__construct();
+	}
+
+	/**
 	 * Check if RAG operations are feasible.
 	 *
 	 * @return bool|\WP_Error True if feasible, WP_Error with message if not.
@@ -149,7 +166,7 @@ class RAG_Agent extends RAG {
 			file_put_contents( $htaccess_file, $htaccess_content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents, WordPress.PHP.NoSilencedErrors.Discouraged
 		}
 
-		$store_name = $this->is_test_mode ? 'jeo_knowledge_test' : 'jeo_knowledge';
+		$store_name = $this->is_test_mode ? $this->store_name . '_test' : $this->store_name;
 		$store_file = $store_dir . '/' . $store_name . '.store';
 		$info_file  = $store_dir . '/' . $store_name . '.model_info';
 
