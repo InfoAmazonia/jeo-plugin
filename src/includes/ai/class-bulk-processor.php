@@ -458,7 +458,7 @@ class Bulk_Processor {
 		$log_file  = JEO_BASEPATH . 'jeo-bulk-ai.log';
 		$timestamp = current_time( 'mysql' );
 		$entry     = "[{$timestamp}] {$message}\n";
-		file_put_contents( $log_file, $entry, FILE_APPEND ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents
+		file_put_contents( $log_file, $entry, FILE_APPEND ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 	}
 
 	/**

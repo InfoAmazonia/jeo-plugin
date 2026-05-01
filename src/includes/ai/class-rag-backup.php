@@ -43,12 +43,16 @@ class RAG_Backup {
 
 		if ( ! file_exists( $backup_dir ) ) {
 			wp_mkdir_p( $backup_dir );
-			file_put_contents( $backup_dir . '/index.php', '' ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents
+
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+			global $wp_filesystem;
+
+			$wp_filesystem->put_contents( $backup_dir . '/index.php', '' );
 
 			$htaccess_file = $backup_dir . '/.htaccess';
 			if ( ! file_exists( $htaccess_file ) ) {
-				$htaccess_content = "Order Deny,Allow\nDeny from all\n";
-				file_put_contents( $htaccess_file, $htaccess_content ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_put_contents_file_put_contents
+				$wp_filesystem->put_contents( $htaccess_file, "Order Deny,Allow\nDeny from all\n" );
 			}
 		}
 

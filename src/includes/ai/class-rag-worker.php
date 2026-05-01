@@ -42,7 +42,7 @@ class RAG_Worker {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
 		add_action( 'jeo_rag_index_cron_hook', array( $this, 'process_all_pipelines' ) );
 		add_action( 'update_option_jeo-settings', array( $this, 'maybe_schedule_cron' ), 10, 2 );
-		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) );
+		add_filter( 'cron_schedules', array( $this, 'add_cron_intervals' ) ); // phpcs:ignore WordPress.WP.CronInterval.CronSchedulesInterval
 		add_action( 'save_post_map-layer', array( $this, 'on_layer_save' ), 10, 2 );
 	}
 

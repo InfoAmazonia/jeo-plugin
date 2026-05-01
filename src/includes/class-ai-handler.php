@@ -83,7 +83,7 @@ class AI_Handler {
 		header( 'Content-Type: application/json' );
 		header( 'Content-Disposition: attachment; filename="' . $file . '"' );
 		header( 'Pragma: no-cache' );
-		readfile( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_read_readfile
+		readfile( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
 		exit;
 	}
 
@@ -492,7 +492,7 @@ class AI_Handler {
 	 * @param \WP_REST_Request $request Current REST request.
 	 * @return \WP_REST_Response
 	 */
-	public function api_clear_layer_store( $request ) {
+	public function api_clear_layer_store( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		try {
 			$upload_dir = wp_upload_dir();
 			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
@@ -603,7 +603,7 @@ class AI_Handler {
 	 * @param \WP_REST_Request $_request Current REST request.
 	 * @return \WP_REST_Response
 	 */
-	public function api_test_embedding( $_request ) {
+	public function api_test_embedding( $_request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		try {
 			// Select a random post.
 			$query = new \WP_Query(
