@@ -9,11 +9,15 @@
 | `src/js/src/map-blocks/map-editor.js` | Edit component for `jeo/map-blocks` |
 | `src/js/src/map-blocks/onetime-map-display.js` | Save component for one-time map |
 | `src/js/src/map-blocks/onetime-map-config.js` | Attributes for one-time map |
+| `src/js/src/map-blocks/minimap-editor.js` | Edit component for `jeo/ai-minimap` |
+| `src/js/src/map-blocks/minimap-display.js` | Save component for `jeo/ai-minimap` |
+| `src/js/src/map-blocks/minimap-config.js` | Attributes for `jeo/ai-minimap` |
 | `src/js/src/map-blocks/layers-settings.js` | Layer configuration UI inside block |
 | `src/js/src/map-blocks/layers-settings-modal.js` | Modal wrapper for layers settings |
 | `src/js/src/map-blocks/map-preview-layer.js` | Renders layer in editor preview |
 | `src/js/src/map-blocks/jeo-autosuggest.js` | Autosuggest for searching maps/layers |
 | `src/js/src/map-blocks/color-palettes.js` | Color palette (437 colors) |
+| `src/includes/minimap/class-minimap.php` | `Jeo\Minimap` — REST endpoint, base layer logic |
 
 ## Registered Blocks
 
@@ -27,6 +31,7 @@ Registered in `class-jeo.php` on `init` hook:
 | `jeo/map-editor` | Dynamic (iframe) | Inline map preview in editor |
 | `jeo/layer-editor` | Dynamic (iframe) | Inline layer preview in editor |
 | `jeo/stories-near-you` | Skeleton + JS (self-registered) | Geolocated posts sorted by proximity — see [`stories-near-you/README.md`](../stories-near-you/README.md) |
+| `jeo/ai-minimap` | Client-side save (`<div class="jeomap">`) | AI-assisted contextual map with RAG-suggested layers, base terrain, and post geolocation pins |
 
 ## Gutenberg Sidebar Plugins
 

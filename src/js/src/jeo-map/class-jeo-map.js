@@ -289,6 +289,8 @@ export default class JeoMap {
 				}
 			} )
 			.then( () => {
+				this.addOwnPins();
+
 				// Remove all empty jeo map blocks
 				jQuery(
 					`.jeomap.wp-block-jeo-map.${MAP_RUNTIME}-map:not([data-map_id])`
@@ -923,6 +925,98 @@ export default class JeoMap {
 				marker._lngLat.lat === activeMarker._lngLat.lat &&
 				marker._lngLat.lon === activeMarker._lngLat.lon;
 			return marker.getElement().classList.toggle( 'marker-active', canToggle );
+		} );
+	}
+
+	addOwnPins() {
+		const pins = this.getArg( 'pins' );
+		const showPins = this.getArg( 'show_pins' );
+
+		if ( ! pins || ! Array.isArray( pins ) || pins.length === 0 ) {
+			return;
+		}
+
+		if ( showPins === 'false' || showPins === false ) {
+			return;
+		}
+
+		if ( ! this.map ) {
+			return;
+		}
+
+		const markerUrl = jeoMapVars.images['/js/src/icons/news-marker'];
+		const hoverUrl = jeoMapVars.images['/js/src/icons/news-marker-hover'];
+
+		if ( markerUrl ) {
+			this.map.loadImage(
+				markerUrl.url,
+				( err, img ) => {
+					if ( err || ! img ) {
+						this.addOwnPinsAsMarkers( pins );
+						return;
+					}
+					if ( ! this.map.hasImage( 'own-pin-primary' ) ) {
+						this.map.addImage( 'own-pin-primary', img, { sdf: false } );
+					}
+				}
+			);
+		}
+
+		if ( hoverUrl ) {
+			this.map.loadImage(
+				hoverUrl.url,
+				( err, img ) => {
+					if ( err || ! img ) {
+						return;
+					}
+					if ( ! this.map.hasImage( 'own-pin-secondary' ) ) {
+						this.map.addImage( 'own-pin-secondary', img, { sdf: false } );
+					}
+				}
+			);
+		}
+
+		this.addOwnPinsAsMarkers( pins );
+	}
+
+	addOwnPinsAsMarkers( pins ) {
+		pins.forEach( ( pin ) => {
+			const lat = parseFloat( pin.lat );
+			const lon = parseFloat( pin.lon );
+
+			if ( Number.isNaN( lat ) || Number.isNaN( lon ) ) {
+				return;
+			}
+
+			const isSecondary = pin.relevance === 'secondary';
+			const url = isSecondary
+				? `url(${ jeoMapVars.images['/js/src/icons/news-marker-hover'].url })`
+				: `url(${ jeoMapVars.images['/js/src/icons/news-marker'].url })`;
+
+			const el = document.createElement( 'div' );
+			el.className = 'marker';
+			el.style.background = url;
+			el.style.width = '27px';
+			el.style.height = '36px';
+			el.style.backgroundSize = 'cover';
+
+			const lngLat = { lat, lon };
+
+			const marker = new mapgl.Marker( { element: el, anchor: 'bottom' } )
+				.setLngLat( lngLat )
+				.addTo( this.map );
+
+			this.markers.push( marker );
+
+			if ( pin.address ) {
+				const popup = new mapgl.Popup( { offset: 25, closeButton: false } )
+					.setHTML( `<div class="popup popup-wmt"><p>${ pin.address }</p></div>` );
+
+				marker.getElement().addEventListener( 'click', () => {
+					popup.addTo( this.map );
+					this.map.flyTo( { center: lngLat } );
+				} );
+			}
 		} );
 	}
 

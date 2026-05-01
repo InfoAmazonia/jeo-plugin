@@ -5,6 +5,8 @@ import LayerEditorPreview from './layer-editor-preview';
 import MapDisplay from './map-display';
 import MapEditor from './map-editor';
 import MapEditorPreview from './map-editor-preview';
+import MinimapDisplay from './minimap-display';
+import MinimapEditor from './minimap-editor';
 import OnetimeMapDisplay from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
 import StoriesNearYouEditor from './stories-near-you-editor';
@@ -144,6 +146,88 @@ registerBlockType( 'jeo/onetime-map', {
 		</AsyncModeProvider>
 	),
 	save: ( props ) => <OnetimeMapDisplay { ...props } />,
+} );
+
+registerBlockType( 'jeo/ai-minimap', {
+	title: __( 'AI-Assisted Map', 'jeo' ),
+	description: __( 'Display an AI-generated contextual map with layers and geolocation pins', 'jeo' ),
+	category: 'jeo',
+	icon: MapIcon,
+	supports: {
+		align: true,
+	},
+	attributes: {
+		layers: {
+			type: 'array',
+			default: [],
+			items: {
+				type: 'object',
+				properties: {
+					id: { type: 'number' },
+					use: { type: 'string' },
+					default: { type: 'boolean' },
+					show_legend: { type: 'boolean' },
+					load_as_style: { type: 'boolean' },
+				},
+			},
+		},
+		base_layer: {
+			type: 'object',
+			default: null,
+		},
+		center_lat: {
+			type: 'number',
+		},
+		center_lon: {
+			type: 'number',
+		},
+		initial_zoom: {
+			type: 'number',
+		},
+		min_zoom: {
+			type: 'number',
+		},
+		max_zoom: {
+			type: 'number',
+		},
+		disable_scroll_zoom: {
+			type: 'boolean',
+		},
+		disable_drag_pan: {
+			type: 'boolean',
+		},
+		disable_drag_rotate: {
+			type: 'boolean',
+		},
+		enable_fullscreen: {
+			type: 'boolean',
+		},
+		pan_limits: {
+			type: 'object',
+		},
+		pins: {
+			type: 'array',
+			default: [],
+		},
+		show_pins: {
+			type: 'boolean',
+			default: true,
+		},
+		status: {
+			type: 'string',
+			default: 'idle',
+		},
+		message: {
+			type: 'string',
+			default: '',
+		},
+	},
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<MinimapEditor { ...props } />
+		</AsyncModeProvider>
+	),
+	save: ( props ) => <MinimapDisplay { ...props } />,
 } );
 
 const storyMapCleanUp = (props) => {

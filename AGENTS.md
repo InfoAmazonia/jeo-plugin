@@ -30,7 +30,7 @@ vendor/bin/phpcs                   # PHP lint (WPCS)
 
 ## Conventions
 
-- **PHP**: PSR-0 autoload (`Jeo\ClassName` → `class-class-name.php`), WPCS, `Jeo\Singleton` trait
+- **PHP**: PSR-0 autoload (`Jeo\ClassName` → `class-class-name.php`), WPCS, `Jeo\Singleton` trait, PHPDoc required on all classes and methods
 - **Accessors**: `jeo()`, `jeo_maps()`, `jeo_layers()`, `jeo_settings()`, etc.
 - **Map runtime**: Always via `lib/mapgl-loader.js`, never import maplibre/mapbox directly
 - **WP form controls**: Use `shared/wp-form-controls.js` (not `@wordpress/components` directly)

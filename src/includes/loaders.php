@@ -32,7 +32,7 @@ function jeo_autoload( $class_name ) {
 
 	$filename = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
 
-	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization', 'ai', 'stories-near-you' );
+	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization', 'ai', 'stories-near-you', 'minimap' );
 
 	foreach ( $folders as $folder ) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -104,6 +104,15 @@ function jeo_ai_settings() {
  */
 function jeo_minilayer_handler() {
 	return \Jeo\AI\Minilayer_Handler::get_instance();
+}
+
+/**
+ * Gets the instance of the Minimap Class
+ *
+ * @return \Jeo\Minimap Minimap instance
+ */
+function jeo_minimap() {
+	return \Jeo\Minimap::get_instance();
 }
 
 /**

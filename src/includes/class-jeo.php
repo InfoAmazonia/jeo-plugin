@@ -57,6 +57,7 @@ class Jeo {
 		\jeo_sidebars();
 		\jeo_storymap();
 		\jeo_stories_near_you();
+		\jeo_minimap();
 
 		add_filter( 'load_textdomain_mofile', array( $this, 'fallback_translation_mofile' ), 10, 2 );
 		add_filter( 'load_script_translation_file', array( $this, 'fallback_script_translation_file' ), 10, 3 );
@@ -966,6 +967,14 @@ class Jeo {
 		);
 		register_block_type(
 			'jeo/layer-editor',
+			array(
+				'api_version'   => 3,
+				'editor_script' => 'jeo-map-blocks',
+				'editor_style'  => 'jeo-map-blocks',
+			)
+		);
+		register_block_type(
+			'jeo/ai-minimap',
 			array(
 				'api_version'   => 3,
 				'editor_script' => 'jeo-map-blocks',
