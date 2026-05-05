@@ -199,7 +199,35 @@ class Minilayer_Handler {
 	}
 
 	/**
+	 * Determine whether the style data qualifies as a mapbox-tileset-vector layer.
+	 *
+	 * Requires tileset_id, source_layer, and layer_geometry_type to all be present
+	 * and layer_geometry_type to be a valid vector layer type.
+	 *
+	 * @param array $style_data Parsed style data from the AI.
+	 * @return bool
+	 */
+	private function is_tileset_vector( array $style_data ): bool {
+		if ( ( $style_data['layer_type'] ?? '' ) !== 'mapbox-tileset-vector' ) {
+			return false;
+		}
+
+		$required = array( 'tileset_id', 'source_layer', 'layer_geometry_type' );
+		foreach ( $required as $key ) {
+			if ( empty( $style_data[ $key ] ) ) {
+				return false;
+			}
+		}
+
+		$vector_types = array( 'fill', 'line', 'symbol', 'circle', 'fill-extrusion', 'heatmap' );
+		return in_array( $style_data['layer_geometry_type'], $vector_types, true );
+	}
+
+	/**
 	 * Create a map-layer CPT post from the generated style data.
+	 *
+	 * Prefers mapbox-tileset-vector when the AI response contains a single vector
+	 * tileset source. Falls back to mapbox (full style) otherwise.
 	 *
 	 * @param array  $style_data Parsed style data from the AI.
 	 * @param string $layer_name Optional custom title for the layer.
@@ -225,21 +253,38 @@ class Minilayer_Handler {
 			return $post_id;
 		}
 
-		update_post_meta( $post_id, 'type', 'mapbox' );
-		update_post_meta(
-			$post_id,
-			'layer_type_options',
-			array(
+		if ( $this->is_tileset_vector( $style_data ) ) {
+			$layer_type         = 'mapbox-tileset-vector';
+			$layer_type_options = array(
+				'tileset_id'        => $style_data['tileset_id'],
+				'source_layer'      => $style_data['source_layer'],
+				'type'              => $style_data['layer_geometry_type'],
+				'style_source_type' => 'vector',
+			);
+		} else {
+			$layer_type         = 'mapbox';
+			$layer_type_options = array(
 				'style_id' => $style_id,
-			)
-		);
+			);
+		}
 
-		return array(
+		update_post_meta( $post_id, 'type', $layer_type );
+		update_post_meta( $post_id, 'layer_type_options', $layer_type_options );
+
+		$result = array(
 			'id'       => $post_id,
 			'title'    => $post_title,
-			'type'     => 'mapbox',
+			'type'     => $layer_type,
 			'style_id' => $style_id,
 			'edit_url' => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
 		);
+
+		if ( 'mapbox-tileset-vector' === $layer_type ) {
+			$result['tileset_id']          = $style_data['tileset_id'];
+			$result['source_layer']        = $style_data['source_layer'];
+			$result['layer_geometry_type'] = $style_data['layer_geometry_type'];
+		}
+
+		return $result;
 	}
 }
