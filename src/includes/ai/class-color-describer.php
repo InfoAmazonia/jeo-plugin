@@ -32,7 +32,6 @@ class Color_Describer {
 		array( 250, 'purple' ),
 		array( 290, 'magenta' ),
 		array( 335, 'red' ),
-		array( 361, null ),
 	);
 
 	/**
