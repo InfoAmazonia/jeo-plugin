@@ -1,6 +1,10 @@
 import { useBlockProps } from '@wordpress/block-editor';
 
 export default function MinimapDisplay( { attributes } ) {
+	if ( attributes.status === 'error' ) {
+		return null;
+	}
+
 	const allLayers = [];
 
 	if ( attributes.base_layer ) {

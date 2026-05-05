@@ -64,8 +64,18 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		query: { context: 'edit' },
 	} );
 
+	const hasMapboxKey = !! window.jeo_settings?.mapbox_key;
+
 	useEffect( () => {
 		if ( attributes.status !== 'idle' ) {
+			return;
+		}
+
+		if ( ! hasMapboxKey ) {
+			setAttributes( {
+				status: 'error',
+				message: __( 'Mapbox API key is not configured. Set the key in JEO Settings to use the AI-Assisted Map block.', 'jeo' ),
+			} );
 			return;
 		}
 
@@ -222,6 +232,21 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const currentZoom = normalizedAttributes[ zoomState ];
 	const mapRef = useRef( undefined );
+
+	if ( attributes.status === 'error' ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon="map"
+					label={ __( 'AI-Assisted Map', 'jeo' ) }
+				>
+					<Notice status="error" isDismissible={ false }>
+						{ attributes.message }
+					</Notice>
+				</Placeholder>
+			</div>
+		);
+	}
 
 	if ( attributes.status === 'idle' || attributes.status === 'loading' ) {
 		return (
