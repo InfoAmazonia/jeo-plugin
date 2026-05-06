@@ -84,6 +84,7 @@ class Jeo {
 		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
 		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
+		add_action( 'pre_get_posts', array( $this, 'suppress_wpml_for_map_layer_rest_queries' ), 10, 1 );
 
 		// Auto-inject editor preview blocks into existing map/layer posts.
 		// so they don't show the "template mismatch" warning.
@@ -592,6 +593,23 @@ class Jeo {
 		}
 
 		return $args;
+	}
+
+	/**
+	 * Skip WPML language filtering for map-layer REST queries.
+	 *
+	 * Base layers are language-agnostic tile styles. The REST endpoint
+	 * should return all matching layers regardless of language so the
+	 * editor and front-end can access them.
+	 *
+	 * @param WP_Query $query The WP_Query instance.
+	 * @return void
+	 */
+	public function suppress_wpml_for_map_layer_rest_queries( WP_Query $query ) {
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST
+			&& 'map-layer' === ( $query->query_vars['post_type'] ?? '' ) ) {
+			$query->set( 'suppress_filters', true );
+		}
 	}
 
 	/**

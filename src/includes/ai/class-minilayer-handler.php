@@ -271,6 +271,8 @@ class Minilayer_Handler {
 		update_post_meta( $post_id, 'type', $layer_type );
 		update_post_meta( $post_id, 'layer_type_options', $layer_type_options );
 
+		$this->assign_current_language( $post_id );
+
 		$result = array(
 			'id'       => $post_id,
 			'title'    => $post_title,
@@ -286,5 +288,34 @@ class Minilayer_Handler {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Assign the current WPML language to a newly created post.
+	 *
+	 * No-op when WPML is not active.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	private function assign_current_language( int $post_id ): void {
+		if ( ! did_action( 'wpml_loaded' ) ) {
+			return;
+		}
+
+		$current_lang = apply_filters( 'wpml_current_language', null );
+		if ( empty( $current_lang ) ) {
+			return;
+		}
+
+		do_action(
+			'wpml_set_element_language_details',
+			array(
+				'element_id'    => $post_id,
+				'element_type'  => 'post_map-layer',
+				'trid'          => false,
+				'language_code' => $current_lang,
+			)
+		);
 	}
 }

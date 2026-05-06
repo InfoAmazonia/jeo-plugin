@@ -240,7 +240,7 @@ class Minimap {
 	}
 
 	/**
-	 * Find or create a base layer for the given variant.
+	 * Get or create a base layer for the given visual variant.
 	 *
 	 * @param string $variant One of 'dark', 'light', 'satellite'.
 	 * @return array|null Base layer definition, or null on failure.
@@ -263,15 +263,16 @@ class Minimap {
 	private function find_existing_base_layer( $variant ) {
 		$query = new \WP_Query(
 			array(
-				'post_type'      => 'map-layer',
-				'post_status'    => 'publish',
-				'posts_per_page' => 1,
-				'meta_query'     => array(
+				'post_type'        => 'map-layer',
+				'post_status'      => 'publish',
+				'posts_per_page'   => 1,
+				'meta_query'       => array(
 					array(
 						'key'   => self::BASE_LAYER_META_KEY,
 						'value' => $variant,
 					),
 				),
+				'suppress_filters' => true, // Ensure WPML doesn't filter by language.
 			)
 		);
 
@@ -381,6 +382,8 @@ class Minimap {
 
 		update_post_meta( $post_id, self::BASE_LAYER_META_KEY, $config['variant'] );
 
+		$this->assign_default_language( $post_id );
+
 		return $this->build_base_layer_response( $post_id, $config['variant'] );
 	}
 
@@ -485,6 +488,35 @@ class Minimap {
 			'show_legend'   => false,
 			'load_as_style' => $load_as_style,
 			'variant'       => $variant,
+		);
+	}
+
+	/**
+	 * Assign the site's default WPML language to a newly created post.
+	 *
+	 * No-op when WPML is not active.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return void
+	 */
+	private function assign_default_language( int $post_id ): void {
+		if ( ! did_action( 'wpml_loaded' ) ) {
+			return;
+		}
+
+		$default_lang = apply_filters( 'wpml_default_language', null );
+		if ( empty( $default_lang ) ) {
+			return;
+		}
+
+		do_action(
+			'wpml_set_element_language_details',
+			array(
+				'element_id'    => $post_id,
+				'element_type'  => 'post_map-layer',
+				'trid'          => false,
+				'language_code' => $default_lang,
+			)
 		);
 	}
 
