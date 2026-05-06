@@ -1014,8 +1014,9 @@ export default class JeoMap {
 				const popup = new mapgl.Popup( { offset: 25, closeButton: false } )
 					.setHTML( `<div class="popup popup-wmt"><p>${ pin.address }</p></div>` );
 
+				marker.setPopup( popup );
+
 				marker.getElement().addEventListener( 'click', () => {
-					popup.addTo( this.map );
 					this.map.flyTo( { center: lngLat } );
 				} );
 			}
