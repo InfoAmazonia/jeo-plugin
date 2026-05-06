@@ -311,7 +311,9 @@ export default class JeoMap {
 			} );
 
 			this.map_post_object = data;
+		}
 
+		if ( this.getArg( 'layers' ) ) {
 			await this.getLayers();
 		}
 	}
