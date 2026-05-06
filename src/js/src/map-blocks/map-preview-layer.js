@@ -3,6 +3,7 @@ import { isEqual } from 'lodash-es';
 
 import { mapboxToken } from '../lib/mapgl-loader';
 import { Layer, Source } from '../lib/mapgl-react';
+import { resolveTileUrl } from '../shared/styles';
 
 const MAPBOX_RASTER_ATTRIBUTION =
 	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
@@ -70,7 +71,7 @@ export function renderLayer( { layer, instance } ) {
 
 		case 'tilelayer': {
 			return (
-				<Source id={ sourceId } type="raster" tiles={ [ options.url ] } tileSize={ 256 } scheme={ options.scheme || 'xyz' }>
+				<Source id={ sourceId } type="raster" tiles={ [ resolveTileUrl( options.url ) ] } tileSize={ 256 } scheme={ options.scheme || 'xyz' }>
 					<Layer id={ layerId } type="raster" />
 				</Source>
 			);
