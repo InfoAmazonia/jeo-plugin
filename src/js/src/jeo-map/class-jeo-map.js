@@ -586,6 +586,7 @@ export default class JeoMap {
 											visible: layersDefinitions[ i ].default,
 											layer_type_options: layerObject.meta.layer_type_options,
 											source_url: layerObject.meta.source_url,
+											style: layersDefinitions[ i ].style,
 										} )
 									);
 

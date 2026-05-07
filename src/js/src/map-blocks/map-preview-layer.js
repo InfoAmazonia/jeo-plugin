@@ -56,7 +56,7 @@ export function renderLayer( { layer, instance } ) {
 
 			return (
 				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } paint={ instance.style?.paint } layout={ instance.style?.layout } />
 				</Source>
 			);
 		}
@@ -64,7 +64,7 @@ export function renderLayer( { layer, instance } ) {
 		case 'mvt': {
 			return (
 				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } paint={ instance.style?.paint } layout={ instance.style?.layout } />
 				</Source>
 			);
 		}
@@ -86,5 +86,8 @@ export const MemoizedRenderLayer = memo( renderLayer, ( props, prevProps ) => {
 	return isEqual(
 		props.layer.layer_type_options,
 		prevProps.layer.layer_type_options
+	) && isEqual(
+		props.instance.style,
+		prevProps.instance.style
 	);
 } );

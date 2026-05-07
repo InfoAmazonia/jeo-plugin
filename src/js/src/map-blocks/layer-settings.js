@@ -3,6 +3,7 @@ import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
+import LayerStyleEditor, { isStyleableLayerType } from '../shared/layer-style-editor';
 
 import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';
@@ -36,6 +37,7 @@ const LayerSettings = (
 		updateStyleLayers,
 		switchDefault,
 		updateUse,
+		updateStyle,
 		widths,
 	}
 ) => {
@@ -49,6 +51,7 @@ const LayerSettings = (
 	const rootProps = itemProps || {};
 
 	const [ showStyleLayers, setshowStyleLayers ] = useState( false );
+	const [ showStyleModal, setShowStyleModal ] = useState( false );
 
 	const setWidth = ( index ) =>
 		isDragged && widths.length ? { width: widths[ index ] } : {};
@@ -135,6 +138,15 @@ const LayerSettings = (
 						) }
 					</div>
 					<div className="layer-actions" style={ setWidth( 6 ) }>
+						{ updateStyle && settings.layer && isStyleableLayerType( settings.layer.meta?.layer_type_options?.type ) && (
+							<button
+								onClick={ () => setShowStyleModal( true ) }
+								className="open-style-editor"
+								title={ __( 'Style layer', 'jeo' ) }
+							>
+								<Dashicon icon="art" />
+							</button>
+						) }
 						{ settings.load_as_style && (
 							<button
 								onClick={ () => setshowStyleLayers( ! showStyleLayers ) }
@@ -245,6 +257,15 @@ const LayerSettings = (
 									} ) }
 							</div>
 						</>
+					) }
+
+					{ showStyleModal && updateStyle && settings.layer && (
+						<LayerStyleEditor
+							style={ settings.style || {} }
+							layerType={ settings.layer.meta?.layer_type_options?.type }
+							onChange={ updateStyle }
+							onClose={ () => setShowStyleModal( false ) }
+						/>
 					) }
 				</div>
 			) }

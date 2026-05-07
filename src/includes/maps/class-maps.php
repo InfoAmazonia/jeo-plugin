@@ -185,6 +185,20 @@ class Maps {
 									'description' => __( 'Indicates if the legend of this layer should be displayed or not', 'jeo' ),
 									'type'        => 'boolean',
 								),
+								'style'         => array(
+									'description' => __( 'Per-instance paint and layout overrides for vector layers', 'jeo' ),
+									'type'        => 'object',
+									'properties'  => array(
+										'paint' => array(
+											'description' => __( 'Map paint properties', 'jeo' ),
+											'type'        => 'object',
+										),
+										'layout' => array(
+											'description' => __( 'Map layout properties', 'jeo' ),
+											'type'        => 'object',
+										),
+									),
+								),
 							),
 							'required'   => array( 'id', 'use' ),
 						),
