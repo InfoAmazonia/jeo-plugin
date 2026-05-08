@@ -4,6 +4,7 @@ import { Eta } from 'eta';
 
 import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
+import { decodeHtmlEntity } from '../shared/html';
 import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE, resolveTileUrl } from '../shared/styles';
 import { waitMapEvent } from '../shared/wait';
@@ -11,12 +12,6 @@ import { waitMapEvent } from '../shared/wait';
 import '../../../css/jeo-map.scss';
 
 globalThis.jeoResolveTileUrl = resolveTileUrl;
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, ( match, dec ) => {
-		return String.fromCharCode( dec );
-	} );
-};
 
 function compileTemplate ( template, config = {} ) {
 	const eta = new Eta( config );

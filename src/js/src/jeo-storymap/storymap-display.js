@@ -7,6 +7,7 @@ import { createMap, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { onFirstIntersection } from '../shared/intersect';
 import { renderLayer } from '../map-blocks/map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
+import { decodeHtmlEntity } from '../shared/html';
 import { formatDate, formatHour, joinList } from '../shared/intl';
 import { EMPTY_STYLE } from '../shared/styles';
 
@@ -39,12 +40,6 @@ function getAuthorsLinks( storymap ) {
 function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
 }
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
 
 class StoryMapDisplay extends Component {
     constructor( props ) {

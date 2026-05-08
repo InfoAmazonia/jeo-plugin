@@ -8,20 +8,16 @@ import { List, arrayMove } from 'react-movable';
 import LayerSettings from './layer-settings';
 import { mergeLayerTypeOptions } from './layer-type-options';
 import { loadLayer } from './utils';
+import { decodeHtmlEntity } from '../shared/html';
 import { usePaginatedRecords } from '../shared/rest-records';
 
 import './layers-settings.css';
 
 const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
 
-const anySwapDefault = ( settings ) =>
-	settings.some( ( s ) => s.use === 'swappable' && s.default );
-
-const decodeHtmlEntity = ( str ) => {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
+const anySwapDefault = ( settings ) => {
+	return settings.some( ( s ) => s.use === 'swappable' && s.default );
+}
 
 const LayerListItem = memo(
 	( {

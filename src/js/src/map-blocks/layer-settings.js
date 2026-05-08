@@ -3,8 +3,9 @@ import { memo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { isEqual } from 'lodash-es';
-import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
+import { decodeHtmlEntity } from '../shared/html';
 import LayerStyleEditor, { isStyleableLayerType } from '../shared/layer-style-editor';
+import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
 
 import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';
@@ -16,12 +17,6 @@ const useOptions = [
 	{ label: layerUseLabels.swappable, value: 'swappable' },
 	{ label: layerUseLabels.switchable, value: 'switchable' },
 ];
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
 
 const LayerSettings = (
 	{

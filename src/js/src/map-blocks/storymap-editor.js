@@ -47,6 +47,7 @@ import {
 } from './storymap-ordering';
 import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
+import { decodeHtmlEntity } from '../shared/html';
 import { getCKEditorLanguage } from '../shared/locale';
 import './map-editor.css';
 import './storymap-editor.scss';
@@ -86,10 +87,6 @@ function createInitialViewState () {
 		pitch: 0,
 	};
 }
-
-function decodeHtmlEntity ( str ) {
-	return str.replace( /&#(\d+);/g, ( match, dec ) => String.fromCharCode( dec ) );
-};
 
 function removeTags(str) {
 	if ((str == null) || (str === '')) {
