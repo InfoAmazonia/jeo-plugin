@@ -31,7 +31,7 @@ class Settings {
 	 * @var array
 	 */
 	public $default_options = array(
-		'map_runtime'                     => 'mapboxgl',
+		'map_runtime'                     => 'maplibregl',
 		'enabled_post_types'              => array( 'post' ),
 		'map_default_zoom'                => 1,
 		'map_default_lat'                 => 0,
