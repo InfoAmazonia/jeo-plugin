@@ -189,7 +189,7 @@ class Maps {
 									'description' => __( 'Per-instance paint and layout overrides for vector layers', 'jeo' ),
 									'type'        => 'object',
 									'properties'  => array(
-										'paint' => array(
+										'paint'  => array(
 											'description' => __( 'Map paint properties', 'jeo' ),
 											'type'        => 'object',
 										),
