@@ -1,7 +1,8 @@
 import { Dashicon } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { memo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
+import { isEqual } from 'lodash-es';
 import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
 import LayerStyleEditor, { isStyleableLayerType } from '../shared/layer-style-editor';
 
@@ -180,7 +181,7 @@ const LayerSettings = (
 									>
 										<path
 											fill="currentColor"
-											d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z"
+											d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901-.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z"
 										></path>
 									</svg>
 								) }
@@ -273,4 +274,13 @@ const LayerSettings = (
 	);
 };
 
-export default LayerSettings;
+export default memo( LayerSettings, ( prevProps, nextProps ) => {
+	return (
+		prevProps.index === nextProps.index &&
+		prevProps.isDragged === nextProps.isDragged &&
+		prevProps.isSelected === nextProps.isSelected &&
+		prevProps.isOutOfBounds === nextProps.isOutOfBounds &&
+		isEqual( prevProps.settings, nextProps.settings ) &&
+		isEqual( prevProps.widths, nextProps.widths )
+	);
+} );

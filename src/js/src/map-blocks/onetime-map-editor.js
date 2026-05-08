@@ -50,7 +50,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 
 	const layerIds = useMemo( () => {
 		return normalizedAttributes.layers.map( ( layer ) => layer.id );
-	}, [ normalizedAttributes.layers ] );
+	}, [ JSON.stringify( normalizedAttributes.layers.map( ( l ) => l.id ) ) ] );
 	const layerSettingsKey = useMemo(
 		() => JSON.stringify( normalizedAttributes.layers || [] ),
 		[ normalizedAttributes.layers ]

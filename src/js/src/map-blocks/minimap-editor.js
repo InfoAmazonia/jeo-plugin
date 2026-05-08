@@ -50,7 +50,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 	const layerIds = useMemo( () => {
 		return allLayers.map( ( l ) => l.id ).filter( ( id ) => id > 0 );
-	}, [ allLayers ] );
+	}, [ JSON.stringify( allLayers.map( ( l ) => l.id ) ) ] );
 
 	const layerSettingsKey = useMemo(
 		() => JSON.stringify( allLayers ),

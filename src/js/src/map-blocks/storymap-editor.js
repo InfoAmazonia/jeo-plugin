@@ -467,7 +467,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			return [];
 		}
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
-	}, [ loadedMap?.meta.layers ] );
+	}, [ JSON.stringify( loadedMap?.meta.layers?.map( ( l ) => l.id ) || [] ) ] );
 
 	const { records: loadedLayers = [] } = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
