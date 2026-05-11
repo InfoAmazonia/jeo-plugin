@@ -31,7 +31,7 @@ Registered in `class-jeo.php` on `init` hook:
 | `jeo/map-editor` | Dynamic (iframe) | Inline map preview in editor |
 | `jeo/layer-editor` | Dynamic (iframe) | Inline layer preview in editor |
 | `jeo/stories-near-you` | Skeleton + JS (self-registered) | Geolocated posts sorted by proximity — see [`stories-near-you/README.md`](../stories-near-you/README.md) |
-| `jeo/ai-minimap` | Client-side save (`<div class="jeomap">`) | AI-assisted contextual map with RAG-suggested layers, base terrain, and post geolocation pins |
+| `jeo/ai-minimap` | Client-side save (`<div class="jeomap">`) | AI-assisted contextual map. Two generation modes: **from post content** (RAG + post geolocation pins) or **from a text prompt** (RAG + geocoder). Includes base terrain layer, thematic layers, and geolocation pins |
 
 ## Gutenberg Sidebar Plugins
 

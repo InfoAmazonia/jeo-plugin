@@ -107,4 +107,8 @@ export const minimapAttributes = {
 		type: 'string',
 		default: '',
 	},
+	prompt: {
+		type: 'string',
+		default: '',
+	},
 };

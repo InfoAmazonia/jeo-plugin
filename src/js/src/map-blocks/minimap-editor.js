@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { Button, Notice, PanelBody, Placeholder, SelectControl, Spinner } from '@wordpress/components';
+import { Button, Notice, PanelBody, Placeholder, Spinner } from '@wordpress/components';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -11,6 +11,7 @@ import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import { useRecordsByIds } from '../shared/rest-records';
+import { SelectControl, TextareaControl } from '../shared/wp-form-controls';
 import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
@@ -170,6 +171,61 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			} );
 	}, [ setAttributes ] );
 
+	const generateFromPrompt = useCallback( () => {
+		if ( ! attributes.prompt?.trim() ) {
+			return;
+		}
+
+		if ( ! mapboxKey ) {
+			setAttributes( {
+				status: 'error',
+				message: __( 'Mapbox API key is not configured. Set the key in JEO Settings to use the AI-Assisted Map block.', 'jeo' ),
+			} );
+			return;
+		}
+
+		setAttributes( { status: 'loading' } );
+
+		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
+
+		apiFetch( {
+			path: '/jeo/v1/minimap/setup-prompt',
+			method: 'POST',
+			data: { prompt: attributes.prompt, post_id: postId || undefined },
+		} )
+			.then( ( response ) => {
+				if ( response.success ) {
+					const updates = {
+						status: 'ready',
+						layers: response.layers || [],
+						base_layer: response.base_layer || null,
+						center_lat: response.center_lat,
+						center_lon: response.center_lon,
+						initial_zoom: response.initial_zoom,
+						pins: response.pins || [],
+						message: response.message || '',
+					};
+
+					if ( response.base_layer?.variant ) {
+						setBaseVariant( response.base_layer.variant );
+					}
+
+					setAttributes( updates );
+				} else {
+					setAttributes( {
+						status: 'error',
+						message: response.message || __( 'Failed to generate from prompt.', 'jeo' ),
+					} );
+				}
+			} )
+			.catch( ( error ) => {
+				setAttributes( {
+					status: 'error',
+					message: error.message || __( 'Request failed.', 'jeo' ),
+				} );
+			} );
+	}, [ attributes.prompt, setAttributes ] );
+
 	const handleBaseVariantChange = useCallback( ( newVariant ) => {
 		setBaseVariant( newVariant );
 
@@ -243,6 +299,21 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					<Notice status="error" isDismissible={ false }>
 						{ attributes.message }
 					</Notice>
+					<TextareaControl
+						label={ __( 'Map prompt', 'jeo' ) }
+						placeholder={ __( 'Describe the map you want…', 'jeo' ) }
+						value={ attributes.prompt || '' }
+						onChange={ ( v ) => setAttributes( { prompt: v } ) }
+					/>
+					<Button variant="primary" onClick={ generateFromPrompt }
+						disabled={ ! attributes.prompt?.trim() }
+					>
+						{ __( 'Generate from prompt', 'jeo' ) }
+					</Button>
+					<hr />
+					<Button variant="secondary" onClick={ generate }>
+						{ __( 'Generate from post content', 'jeo' ) }
+					</Button>
 				</Placeholder>
 			</div>
 		);
@@ -257,6 +328,34 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					instructions={ __( 'Analyzing post content and suggesting layers…', 'jeo' ) }
 				>
 					<Spinner />
+				</Placeholder>
+			</div>
+		);
+	}
+
+	if ( attributes.status === 'idle' ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon="map"
+					label={ __( 'AI-Assisted Map', 'jeo' ) }
+					instructions={ __( 'Generate map from a text prompt or from post content.', 'jeo' ) }
+				>
+					<TextareaControl
+						label={ __( 'Map prompt', 'jeo' ) }
+						placeholder={ __( 'Describe the map you want…', 'jeo' ) }
+						value={ attributes.prompt || '' }
+						onChange={ ( v ) => setAttributes( { prompt: v } ) }
+					/>
+					<Button variant="primary" onClick={ generateFromPrompt }
+						disabled={ ! attributes.prompt?.trim() }
+					>
+						{ __( 'Generate from prompt', 'jeo' ) }
+					</Button>
+					<hr />
+					<Button variant="secondary" onClick={ generate }>
+						{ __( 'Generate from post content', 'jeo' ) }
+					</Button>
 				</Placeholder>
 			</div>
 		);
@@ -342,6 +441,17 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					title={ __( 'AI Suggestions', 'jeo' ) }
 					className="jeo-minimap-actions-panel"
 				>
+					<TextareaControl
+						label={ __( 'Map prompt', 'jeo' ) }
+						value={ attributes.prompt || '' }
+						onChange={ ( v ) => setAttributes( { prompt: v } ) }
+					/>
+					<Button variant="secondary" onClick={ generateFromPrompt } isLarge
+						disabled={ ! attributes.prompt?.trim() }
+					>
+						{ __( 'Generate from prompt', 'jeo' ) }
+					</Button>
+					<hr />
 					<Button variant="secondary" onClick={ resuggest } isLarge>
 						{ __( 'Re-suggest layers', 'jeo' ) }
 					</Button>

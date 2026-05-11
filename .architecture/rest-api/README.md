@@ -22,6 +22,13 @@ See [`ai/README.md`](../ai/README.md) for full details.
 |-------|--------|-------------|
 | `/jeo/v1/minilayer/generate` | POST | Generate Mapbox style from text prompt and create JEO layer |
 
+### Minimap (AI-Assisted Map)
+
+| Route | Method | Callback | Description |
+|-------|--------|----------|-------------|
+| `/jeo/v1/minimap/setup` | POST | `api_setup` | Generate map from post content (RAG + post geopoints) |
+| `/jeo/v1/minimap/setup-prompt` | POST | `api_setup_prompt` | Generate map from text prompt (RAG + geocoder). Optional `post_id` to use post pins for zoom |
+
 ### Dashboard
 
 | Route | Method | Description |

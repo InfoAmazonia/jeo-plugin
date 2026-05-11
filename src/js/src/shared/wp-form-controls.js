@@ -5,6 +5,7 @@ import {
 	RangeControl as WPRangeControl,
 	SelectControl as WPSelectControl,
 	TextControl as WPTextControl,
+	TextareaControl as WPTextareaControl,
 } from '@wordpress/components';
 
 const nextInputControlProps = {
@@ -38,4 +39,8 @@ export function RangeControl( props ) {
 
 export function FormTokenField( props ) {
 	return <WPFormTokenField { ...nextInputControlProps } { ...props } />;
+}
+
+export function TextareaControl( props ) {
+	return <WPTextareaControl { ...nextInputControlProps } { ...props } />;
 }

@@ -87,6 +87,18 @@ class Minimap {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/minimap/setup-prompt',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_setup_prompt' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -143,6 +155,95 @@ class Minimap {
 		$center_zoom = $this->compute_center_zoom( $post_id );
 
 		$pins = $this->get_pins( $post_id );
+
+		return new \WP_REST_Response(
+			array(
+				'success'      => true,
+				'layers'       => $layers,
+				'base_layer'   => $base_layer,
+				'center_lat'   => $center_zoom['lat'],
+				'center_lon'   => $center_zoom['lon'],
+				'initial_zoom' => $center_zoom['zoom'],
+				'pins'         => $pins,
+				'message'      => $rag_message,
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST callback: build minimap data from a text prompt.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_setup_prompt( $request ) {
+		$prompt    = sanitize_textarea_field( $request->get_param( 'prompt' ) );
+		$post_id   = (int) $request->get_param( 'post_id' );
+		$raw_top_k = $request->get_param( 'top_k' );
+		$top_k     = $raw_top_k ? (int) $raw_top_k : 5;
+
+		if ( empty( $prompt ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'A prompt is required.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
+		if ( empty( $mapbox_key ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Mapbox API key is not configured. Set the key in JEO Settings.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		$layers      = array();
+		$rag_message = '';
+
+		try {
+			$results = RAG_Worker::find_matching_layers( $prompt, $top_k );
+			foreach ( $results as $result ) {
+				$layer_id = (int) $result['layer_id'];
+				if ( $layer_id && 'publish' === get_post_status( $layer_id ) ) {
+					$layers[] = array(
+						'id'          => $layer_id,
+						'use'         => 'fixed',
+						'default'     => true,
+						'show_legend' => true,
+					);
+				}
+			}
+		} catch ( \Exception $e ) {
+			$rag_message = $e->getMessage();
+		}
+
+		if ( empty( $layers ) ) {
+			$rag_message = $rag_message ? $rag_message : __( 'No matching layers found. Add layers manually or run the RAG indexer in JEO Settings.', 'jeo' );
+		}
+
+		$center_zoom = $this->geocode_prompt( $prompt );
+		$pins        = array();
+
+		if ( $post_id ) {
+			$pins = $this->get_pins( $post_id );
+
+			if ( ! empty( $pins ) ) {
+				$post_center_zoom    = $this->compute_center_zoom( $post_id );
+				$center_zoom['lat']  = $post_center_zoom['lat'];
+				$center_zoom['lon']  = $post_center_zoom['lon'];
+				$center_zoom['zoom'] = $post_center_zoom['zoom'];
+			}
+		}
+
+		$base_variant = $this->determine_base_variant( $layers );
+		$base_layer   = $this->get_or_create_base_layer( $base_variant );
 
 		return new \WP_REST_Response(
 			array(
@@ -485,6 +586,49 @@ class Minimap {
 			'show_legend'   => false,
 			'load_as_style' => $load_as_style,
 			'variant'       => $variant,
+		);
+	}
+
+	/**
+	 * Geocode a text prompt and return center coordinates with zoom.
+	 *
+	 * Uses the plugin's active geocoder. Falls back to JEO default map settings
+	 * when geocoding returns no results.
+	 *
+	 * @param string $prompt Text to geocode.
+	 * @return array { lat: float, lon: float, zoom: int }
+	 */
+	private function geocode_prompt( $prompt ) {
+		$defaults = array(
+			'lat'  => (float) \jeo_settings()->get_option( 'map_default_lat', 0 ),
+			'lon'  => (float) \jeo_settings()->get_option( 'map_default_lng', 0 ),
+			'zoom' => (float) \jeo_settings()->get_option( 'map_default_zoom', 2 ),
+		);
+
+		$geocoder = \jeo_geocode_handler()->get_active_geocoder();
+		if ( ! $geocoder ) {
+			return $defaults;
+		}
+
+		$results = $geocoder->geocode( $prompt );
+		if ( empty( $results ) || ! is_array( $results ) ) {
+			return $defaults;
+		}
+
+		$first = $results[0];
+		$lat   = isset( $first['lat'] ) ? (float) $first['lat'] : null;
+		$lon   = isset( $first['lon'] ) ? (float) $first['lon'] : null;
+
+		if ( null === $lat || null === $lon || ! is_finite( $lat ) || ! is_finite( $lon ) ) {
+			return $defaults;
+		}
+
+		$zoom = (int) \jeo_settings()->get_option( 'map_default_zoom', 2 );
+
+		return array(
+			'lat'  => round( $lat, 6 ),
+			'lon'  => round( $lon, 6 ),
+			'zoom' => $zoom,
 		);
 	}
 

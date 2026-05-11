@@ -221,6 +221,10 @@ registerBlockType( 'jeo/ai-minimap', {
 			type: 'string',
 			default: '',
 		},
+		prompt: {
+			type: 'string',
+			default: '',
+		},
 	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>

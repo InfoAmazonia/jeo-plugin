@@ -64,6 +64,8 @@
 | `/jeo/v1/ai-clear-layer-store` | POST | Clear layer vector store |
 | `/jeo/v1/ai-suggest-layers` | POST | Semantic layer matching (post ID or query) |
 | `/jeo/v1/minilayer/generate` | POST | Generate Mapbox style from text prompt (Minilayer) |
+| `/jeo/v1/minimap/setup` | POST | Generate minimap from post content (RAG + post geopoints) |
+| `/jeo/v1/minimap/setup-prompt` | POST | Generate minimap from text prompt (RAG + geocoder) |
 
 ## AI Georeferencing
 
@@ -209,6 +211,57 @@ Analyzes hex colors via HSL conversion for semantic embedding:
 - Timestamp
 
 Dashboard at **Jeo → AI Debug Logs** with metrics per model/provider.
+
+## Minimap (AI-Assisted Map Block)
+
+The `jeo/ai-minimap` block provides two generation modes, both producing the same output: a map with RAG-matched layers, a base terrain layer, center/zoom, and optional geolocation pins.
+
+### Generation Modes
+
+| Mode | Endpoint | Input | Center/Zoom Source |
+|------|----------|-------|--------------------|
+| Post content | `POST /jeo/v1/minimap/setup` | `post_id` | Post `_related_point` meta |
+| Text prompt | `POST /jeo/v1/minimap/setup-prompt` | `prompt` (required), `post_id` (optional) | Geocoder (prompt), or post `_related_point` if `post_id` provided with pins |
+
+### Prompt Mode Flow
+
+```mermaid
+sequenceDiagram
+    participant Editor as Gutenberg Editor
+    participant REST as /minimap/setup-prompt
+    participant Minimap as Jeo\Minimap
+    participant RAG as RAG_Worker
+    participant GEO as Active Geocoder
+
+    Editor->>REST: POST {prompt, post_id?}
+    REST->>Minimap: api_setup_prompt()
+    Minimap->>RAG: find_matching_layers(prompt)
+    RAG-->>Minimap: Layer IDs
+    Minimap->>GEO: geocode(prompt)
+    GEO-->>Minimap: {lat, lon}
+    alt post_id provided with pins
+        Minimap->>Minimap: compute_center_zoom(post_id) overrides zoom
+    end
+    Minimap->>Minimap: determine_base_variant(layers)
+    Minimap->>Minimap: get_or_create_base_layer(variant)
+    Minimap-->>REST: {layers, base_layer, center_lat, center_lon, zoom, pins}
+    REST-->>Editor: Response
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `src/includes/minimap/class-minimap.php` | `Jeo\Minimap` — REST endpoints (`/setup`, `/setup-prompt`), base layer logic, geocode prompt |
+| `src/js/src/map-blocks/minimap-editor.js` | Edit component with prompt textarea + dual generation buttons |
+| `src/js/src/map-blocks/minimap-config.js` | Block attributes including `prompt` |
+
+### Block Attributes (prompt-related)
+
+| Attribute | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `prompt` | `string` | `''` | User's text prompt for map generation |
+| `status` | `string` | `'idle'` | `idle` → `loading` → `ready` / `error` |
 
 ## Minilayer (AI-Generated Layers)
 
