@@ -1,6 +1,6 @@
 import apiFetch from '@wordpress/api-fetch';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { Button, Notice, PanelBody, Placeholder, SelectControl, Spinner } from '@wordpress/components';
+import { Button, Notice, PanelBody, Placeholder, Spinner } from '@wordpress/components';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -11,9 +11,10 @@ import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import { useRecordsByIds } from '../shared/rest-records';
+import { SelectControl } from '../shared/wp-form-controls';
 import './onetime-map-editor.css';
 
-const { map_defaults: mapDefaults } = window.jeo_settings;
+const { map_defaults: mapDefaults, mapbox_key: mapboxKey } = globalThis.jeo_settings;
 
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
@@ -64,14 +65,8 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		query: { context: 'edit' },
 	} );
 
-	const hasMapboxKey = !! window.jeo_settings?.mapbox_key;
-
-	useEffect( () => {
-		if ( attributes.status !== 'idle' ) {
-			return;
-		}
-
-		if ( ! hasMapboxKey ) {
+	const generate = useCallback( () => {
+		if ( ! mapboxKey ) {
 			setAttributes( {
 				status: 'error',
 				message: __( 'Mapbox API key is not configured. Set the key in JEO Settings to use the AI-Assisted Map block.', 'jeo' ),
@@ -122,7 +117,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					message: error.message || __( 'Request failed.', 'jeo' ),
 				} );
 			} );
-	}, [] );
+	}, [ setAttributes ] );
 
 	const resuggest = useCallback( () => {
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
@@ -187,12 +182,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				let chosen = response.base_layer;
 
 				if ( newVariant !== 'none' && response.base_layer.variant !== newVariant ) {
-					const allDefaults = [
-						{ variant: 'dark', id: response.base_layer.id },
-						{ variant: 'light', id: response.base_layer.id },
-						{ variant: 'satellite', id: response.base_layer.id },
-					];
-
 					apiFetch( {
 						path: '/jeo/v1/minimap/setup',
 						method: 'POST',
@@ -243,12 +232,15 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					<Notice status="error" isDismissible={ false }>
 						{ attributes.message }
 					</Notice>
+					<Button variant="primary" onClick={ generate }>
+						{ __( 'Generate from post content', 'jeo' ) }
+					</Button>
 				</Placeholder>
 			</div>
 		);
 	}
 
-	if ( attributes.status === 'idle' || attributes.status === 'loading' ) {
+	if ( attributes.status === 'loading' ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
@@ -257,6 +249,22 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					instructions={ __( 'Analyzing post content and suggesting layers…', 'jeo' ) }
 				>
 					<Spinner />
+				</Placeholder>
+			</div>
+		);
+	}
+
+	if ( attributes.status === 'idle' ) {
+		return (
+			<div { ...blockProps }>
+				<Placeholder
+					icon="map"
+					label={ __( 'AI-Assisted Map', 'jeo' ) }
+					instructions={ __( 'Click the button below to analyze the post content and generate map layers.', 'jeo' ) }
+				>
+					<Button variant="primary" onClick={ generate }>
+						{ __( 'Generate from post content', 'jeo' ) }
+					</Button>
 				</Placeholder>
 			</div>
 		);
@@ -316,8 +324,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							{ label: __( 'None', 'jeo' ), value: 'none' },
 						] }
 						onChange={ handleBaseVariantChange }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 				</PanelBody>
 				<PanelBody
@@ -333,8 +339,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							{ label: __( 'No', 'jeo' ), value: 'no' },
 						] }
 						onChange={ ( v ) => setAttributes( { show_pins: v === 'yes' } ) }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 				</PanelBody>
 				<PanelBody
