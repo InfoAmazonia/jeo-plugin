@@ -372,6 +372,11 @@ class Bulk_Processor {
 		}
 
 		$adapter = \jeo_ai_handler()->get_active_adapter();
+		if ( is_wp_error( $adapter ) ) {
+			$err = $adapter->get_error_message();
+			$this->log_action( $err, true );
+			return new \WP_Error( 'no_adapter', $err );
+		}
 		if ( ! $adapter ) {
 			$err = __( 'CRITICAL: No active AI adapter found for bulk processing.', 'jeo' );
 			$this->log_action( $err, true );

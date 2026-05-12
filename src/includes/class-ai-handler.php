@@ -280,6 +280,17 @@ class AI_Handler {
 			$api_key = \jeo_settings()->get_option( 'ollama_url' );
 		}
 
+		if ( empty( $api_key ) ) {
+			return new \WP_Error(
+				'jeo_ai_no_key',
+				sprintf(
+					/* translators: %s: AI provider name */
+					__( 'No API key configured for %s. Please add it in JEO → AI Settings.', 'jeo' ),
+					esc_html( $this->get_adapters()[ $active ] ?? $active )
+				)
+			);
+		}
+
 		if ( array_key_exists( $active, $this->get_adapters() ) ) {
 			return new AI\Neuron_Adapter( $active, (string) $api_key, (string) $model );
 		}
@@ -1028,6 +1039,10 @@ class AI_Handler {
 			$adapter = $this->get_active_adapter();
 		}
 
+		if ( is_wp_error( $adapter ) ) {
+			return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
@@ -1126,6 +1141,10 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$adapter = $this->get_active_adapter();
 		}
 
+		if ( is_wp_error( $adapter ) ) {
+			return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
@@ -1194,19 +1213,32 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$content = $post->post_content;
 		}
 
-		$adapter = $this->get_active_adapter();
+		try {
+			$adapter = $this->get_active_adapter();
 
-		if ( ! $adapter ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+			if ( is_wp_error( $adapter ) ) {
+				return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+			}
+
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+			}
+
+			$result = $adapter->georeference( $title, $content );
+
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
+			}
+
+			return new \WP_REST_Response( $result, 200 );
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'error' => __( 'An unexpected error occurred while processing the AI request.', 'jeo' ) . ' ' . $e->getMessage(),
+				),
+				500
+			);
 		}
-
-		$result = $adapter->georeference( $title, $content );
-
-		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
-		}
-
-		return new \WP_REST_Response( $result, 200 );
 	}
 
 	/**

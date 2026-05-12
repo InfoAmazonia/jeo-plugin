@@ -87,7 +87,7 @@ class Neuron_Adapter extends AI_Adapter {
 			// como o parser do JEO usa regex para arrancar lixos, vamos aproveitá-lo como "plano B" robusto, caso o Neuron devolva lixo.
 			return $this->parse_json_from_text( $raw_output );
 
-		} catch ( \Exception $e ) {
+		} catch ( \Throwable $e ) {
 			// Em caso de API key errada, rate limit, etc. Loga e devolve erro.
 			$this->log_debug( $this->provider_name . ' [ERROR]', $user_text, $e->getMessage(), 0, 0 );
 			return new \WP_Error( 'neuron_api_error', "{$this->provider_name} Neuron API Error: " . $e->getMessage() );

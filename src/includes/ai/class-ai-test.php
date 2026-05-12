@@ -37,6 +37,12 @@ class AI_Test {
 		}
 
 		$adapter = $handler->get_active_adapter();
+		if ( is_wp_error( $adapter ) ) {
+			return array(
+				'status'  => 'partial_success',
+				'message' => $adapter->get_error_message(),
+			);
+		}
 		if ( ! $adapter ) {
 			return array(
 				'status'  => 'partial_success',
