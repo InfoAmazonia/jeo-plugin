@@ -14,6 +14,7 @@ if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
 spl_autoload_register( 'jeo_autoload' );
 
 require_once __DIR__ . '/privacy.php';
+require_once __DIR__ . '/admin/uninstall-handler.php';
 
 /**
  * PSR-0-compatible autoloader that maps `Jeo\ClassName` to `class-class-name.php` across known directories.

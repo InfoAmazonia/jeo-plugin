@@ -42,6 +42,7 @@ vendor/bin/phpcs src/              # PHP lint (WPCS) — scope to src/ to avoid 
 - **Vendor assets**: Third-party libraries (e.g. Select2) are bundled locally under `src/includes/vendor/`. Avoid CDN URLs in production code.
 - **CSS escaping**: Dynamic CSS generated from settings must sanitize each value individually. Use `sanitize_hex_color()` for colors, `floatval()` + `esc_attr()` for sizes, and a dedicated regex helper for font-family names. Do not rely on `wp_kses(..., null)` for CSS contexts.
 - **Privacy**: The plugin implements `wp_add_privacy_policy_content()`, personal data exporters/erasers for `_related_point`, and a complete `uninstall.php` cleanup.
+- **Uninstall flow**: The plugin overrides the default WordPress "Delete" link with a dedicated confirmation page (`admin.php?page=jeo-uninstall-confirm`) that lists all data to be removed and requires explicit user consent before deletion.
 
 ## Architecture
 
