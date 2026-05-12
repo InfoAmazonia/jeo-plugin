@@ -11,10 +11,10 @@ import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import { useRecordsByIds } from '../shared/rest-records';
-import { SelectControl, TextareaControl } from '../shared/wp-form-controls';
+import { SelectControl } from '../shared/wp-form-controls';
 import './onetime-map-editor.css';
 
-const { map_defaults: mapDefaults } = window.jeo_settings;
+const { map_defaults: mapDefaults, mapbox_key: mapboxKey } = globalThis.jeo_settings;
 
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
@@ -51,7 +51,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 	const layerIds = useMemo( () => {
 		return allLayers.map( ( l ) => l.id ).filter( ( id ) => id > 0 );
-	}, [ allLayers ] );
+	}, [ JSON.stringify( allLayers.map( ( l ) => l.id ) ) ] );
 
 	const layerSettingsKey = useMemo(
 		() => JSON.stringify( allLayers ),
@@ -65,14 +65,8 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		query: { context: 'edit' },
 	} );
 
-	const hasMapboxKey = !! window.jeo_settings?.mapbox_key;
-
-	useEffect( () => {
-		if ( attributes.status !== 'idle' ) {
-			return;
-		}
-
-		if ( ! hasMapboxKey ) {
+	const generate = useCallback( () => {
+		if ( ! mapboxKey ) {
 			setAttributes( {
 				status: 'error',
 				message: __( 'Mapbox API key is not configured. Set the key in JEO Settings to use the AI-Assisted Map block.', 'jeo' ),
@@ -123,7 +117,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					message: error.message || __( 'Request failed.', 'jeo' ),
 				} );
 			} );
-	}, [] );
+	}, [ setAttributes ] );
 
 	const resuggest = useCallback( () => {
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
@@ -243,12 +237,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				let chosen = response.base_layer;
 
 				if ( newVariant !== 'none' && response.base_layer.variant !== newVariant ) {
-					const allDefaults = [
-						{ variant: 'dark', id: response.base_layer.id },
-						{ variant: 'light', id: response.base_layer.id },
-						{ variant: 'satellite', id: response.base_layer.id },
-					];
-
 					apiFetch( {
 						path: '/jeo/v1/minimap/setup',
 						method: 'POST',
@@ -299,19 +287,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					<Notice status="error" isDismissible={ false }>
 						{ attributes.message }
 					</Notice>
-					<TextareaControl
-						label={ __( 'Map prompt', 'jeo' ) }
-						placeholder={ __( 'Describe the map you want…', 'jeo' ) }
-						value={ attributes.prompt || '' }
-						onChange={ ( v ) => setAttributes( { prompt: v } ) }
-					/>
-					<Button variant="primary" onClick={ generateFromPrompt }
-						disabled={ ! attributes.prompt?.trim() }
-					>
-						{ __( 'Generate from prompt', 'jeo' ) }
-					</Button>
-					<hr />
-					<Button variant="secondary" onClick={ generate }>
+					<Button variant="primary" onClick={ generate }>
 						{ __( 'Generate from post content', 'jeo' ) }
 					</Button>
 				</Placeholder>
@@ -319,7 +295,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		);
 	}
 
-	if ( attributes.status === 'idle' || attributes.status === 'loading' ) {
+	if ( attributes.status === 'loading' ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
@@ -339,21 +315,9 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				<Placeholder
 					icon="map"
 					label={ __( 'AI-Assisted Map', 'jeo' ) }
-					instructions={ __( 'Generate map from a text prompt or from post content.', 'jeo' ) }
+					instructions={ __( 'Click the button below to analyze the post content and generate map layers.', 'jeo' ) }
 				>
-					<TextareaControl
-						label={ __( 'Map prompt', 'jeo' ) }
-						placeholder={ __( 'Describe the map you want…', 'jeo' ) }
-						value={ attributes.prompt || '' }
-						onChange={ ( v ) => setAttributes( { prompt: v } ) }
-					/>
-					<Button variant="primary" onClick={ generateFromPrompt }
-						disabled={ ! attributes.prompt?.trim() }
-					>
-						{ __( 'Generate from prompt', 'jeo' ) }
-					</Button>
-					<hr />
-					<Button variant="secondary" onClick={ generate }>
+					<Button variant="primary" onClick={ generate }>
 						{ __( 'Generate from post content', 'jeo' ) }
 					</Button>
 				</Placeholder>
@@ -415,8 +379,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							{ label: __( 'None', 'jeo' ), value: 'none' },
 						] }
 						onChange={ handleBaseVariantChange }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 				</PanelBody>
 				<PanelBody
@@ -432,8 +394,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							{ label: __( 'No', 'jeo' ), value: 'no' },
 						] }
 						onChange={ ( v ) => setAttributes( { show_pins: v === 'yes' } ) }
-						__next40pxDefaultSize
-						__nextHasNoMarginBottom
 					/>
 				</PanelBody>
 				<PanelBody

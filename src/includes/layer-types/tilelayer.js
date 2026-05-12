@@ -11,7 +11,7 @@
 			sources: {
 				[ name ]: {
 					type: 'raster',
-					tiles: [ attributes.layer_type_options.url ],
+					tiles: [ globalThis.jeoResolveTileUrl( attributes.layer_type_options.url ) ],
 					tileSize: 256,
 				},
 			},
@@ -30,7 +30,7 @@
 			id: attributes.layer_id,
 			source: {
 				type: 'raster',
-				tiles: [ attributes.layer_type_options.url ],
+				tiles: [ globalThis.jeoResolveTileUrl( attributes.layer_type_options.url ) ],
 				tileSize: 256,
 				scheme: attributes.layer_type_options.scheme || 'xyz',
 			},

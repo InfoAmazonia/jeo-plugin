@@ -10,10 +10,10 @@ const budgetByEntry = {
 	mapBlocks: 1280,
 	layersSidebar: 360,
 	discovery: 280,
-	mapsSidebar: 240,
+	mapsSidebar: 250,
 	postsSidebar: 190,
 	jeoMap: 120,
-	jeoStorymap: 40,
+	jeoStorymap: 45,
 };
 
 const bundleEntries = Object.entries( budgetByEntry ).map( ( [ name, budgetKb ] ) => {

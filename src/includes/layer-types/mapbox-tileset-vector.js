@@ -53,6 +53,15 @@
 			},
 		};
 
+		if ( attributes.style ) {
+			if ( attributes.style.paint ) {
+				layer.paint = { ...attributes.style.paint };
+			}
+			if ( attributes.style.layout ) {
+				layer.layout = { ...layer.layout, ...attributes.style.layout };
+			}
+		}
+
 		if ( addLayerParams ) {
 			return map.addLayer( layer, ...addLayerParams );
 		}

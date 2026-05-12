@@ -61,7 +61,7 @@ registerBlockType( 'jeo/onetime-map', {
 		center_lat: {
 			type: 'number',
 		},
-		center_lng: {
+		center_lon: {
 			type: 'number',
 		},
 		initial_zoom: {

@@ -4,17 +4,14 @@ import { Eta } from 'eta';
 
 import { createMap, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
+import { decodeHtmlEntity } from '../shared/html';
 import { onFirstIntersection } from '../shared/intersect';
-import { EMPTY_STYLE } from '../shared/styles';
+import { EMPTY_STYLE, resolveTileUrl } from '../shared/styles';
 import { waitMapEvent } from '../shared/wait';
 
 import '../../../css/jeo-map.scss';
 
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, ( match, dec ) => {
-		return String.fromCharCode( dec );
-	} );
-};
+globalThis.jeoResolveTileUrl = resolveTileUrl;
 
 function compileTemplate ( template, config = {} ) {
 	const eta = new Eta( config );
@@ -311,7 +308,9 @@ export default class JeoMap {
 			} );
 
 			this.map_post_object = data;
+		}
 
+		if ( this.getArg( 'layers' ) ) {
 			await this.getLayers();
 		}
 	}
@@ -549,59 +548,65 @@ export default class JeoMap {
 				const urlRoutes = window.location.pathname.split( '/' );
 				const lang = urlRoutes[ 1 ];
 
-				jQuery.get(
-					jeoMapVars.jsonUrl + 'map-layer',
-					{
+				jQuery.ajax( {
+					type: 'GET',
+					url: jeoMapVars.jsonUrl + 'map-layer',
+					data: {
 						include: layersIds,
 						orderby: 'include',
 						per_page: 100,
-						// lang: lang ? lang : '',
 					},
-					( data ) => {
-						const returnLayers = [];
-						const returnLegends = [];
-						const ordered = [];
-						layersIds.forEach( ( el, index ) => {
-							ordered[ index ] = data.find( ( l ) => l.id == el );
-						} );
+					beforeSend( request ) {
+						if ( jeoMapVars.nonce ) {
+							request.setRequestHeader( 'X-WP-Nonce', jeoMapVars.nonce );
+						}
+					},
+					success: ( data ) => {
+							const returnLayers = [];
+							const returnLegends = [];
+							const ordered = [];
+							layersIds.forEach( ( el, index ) => {
+								ordered[ index ] = data.find( ( l ) => l.id == el );
+							} );
 
-						ordered.forEach( ( layerObject, i ) => {
-							if ( layerObject ) {
-								returnLayers[ i ] = (
-									new window.JeoLayer( layerObject.meta.type, {
-										layer_post_id: layerObject.id,
-										layer_id: layerObject.slug,
-										layer_name: layerObject.title.rendered,
-										attribution: layerObject.meta.attribution,
-										attribution_name: layerObject.meta.attribution_name,
-										visible: layersDefinitions[ i ].default,
-										layer_type_options: layerObject.meta.layer_type_options,
-										source_url: layerObject.meta.source_url,
-									} )
-								);
-
-								if (
-									layerObject.meta.legend_type !== 'none' &&
-									layersDefinitions[ i ].show_legend
-								) {
-									returnLegends[ i ] = (
-										new window.JeoLegend( layerObject.meta.legend_type, {
+							ordered.forEach( ( layerObject, i ) => {
+								if ( layerObject ) {
+									returnLayers[ i ] = (
+										new window.JeoLayer( layerObject.meta.type, {
 											layer_post_id: layerObject.id,
 											layer_id: layerObject.slug,
-											legend_type_options: layerObject.meta.legend_type_options,
-											use_legend: layerObject.meta.use_legend,
-											legend_title: layerObject.meta.legend_title,
+											layer_name: layerObject.title.rendered,
+											attribution: layerObject.meta.attribution,
+											attribution_name: layerObject.meta.attribution_name,
+											visible: layersDefinitions[ i ].default,
+											layer_type_options: layerObject.meta.layer_type_options,
+											source_url: layerObject.meta.source_url,
+											style: layersDefinitions[ i ].style,
 										} )
 									);
-								}
-							}
-						} );
 
-						this.layers = returnLayers;
-						this.legends = returnLegends;
-						resolve( returnLayers );
-					}
-				);
+									if (
+										layerObject.meta.legend_type !== 'none' &&
+										layersDefinitions[ i ].show_legend
+									) {
+										returnLegends[ i ] = (
+											new window.JeoLegend( layerObject.meta.legend_type, {
+												layer_post_id: layerObject.id,
+												layer_id: layerObject.slug,
+												legend_type_options: layerObject.meta.legend_type_options,
+												use_legend: layerObject.meta.use_legend,
+												legend_title: layerObject.meta.legend_title,
+											} )
+										);
+									}
+								}
+							} );
+
+							this.layers = returnLayers;
+							this.legends = returnLegends;
+							resolve( returnLayers );
+						},
+					} );
 			}
 		} );
 	}
@@ -1012,8 +1017,9 @@ export default class JeoMap {
 				const popup = new mapgl.Popup( { offset: 25, closeButton: false } )
 					.setHTML( `<div class="popup popup-wmt"><p>${ pin.address }</p></div>` );
 
+				marker.setPopup( popup );
+
 				marker.getElement().addEventListener( 'click', () => {
-					popup.addTo( this.map );
 					this.map.flyTo( { center: lngLat } );
 				} );
 			}

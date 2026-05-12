@@ -3,6 +3,7 @@ import { isEqual } from 'lodash-es';
 
 import { mapboxToken } from '../lib/mapgl-loader';
 import { Layer, Source } from '../lib/mapgl-react';
+import { resolveTileUrl } from '../shared/styles';
 
 const MAPBOX_RASTER_ATTRIBUTION =
 	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
@@ -55,7 +56,7 @@ export function renderLayer( { layer, instance } ) {
 
 			return (
 				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } paint={ instance.style?.paint } layout={ instance.style?.layout } />
 				</Source>
 			);
 		}
@@ -63,14 +64,14 @@ export function renderLayer( { layer, instance } ) {
 		case 'mvt': {
 			return (
 				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } />
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } paint={ instance.style?.paint } layout={ instance.style?.layout } />
 				</Source>
 			);
 		}
 
 		case 'tilelayer': {
 			return (
-				<Source id={ sourceId } type="raster" tiles={ [ options.url ] } tileSize={ 256 } scheme={ options.scheme || 'xyz' }>
+				<Source id={ sourceId } type="raster" tiles={ [ resolveTileUrl( options.url ) ] } tileSize={ 256 } scheme={ options.scheme || 'xyz' }>
 					<Layer id={ layerId } type="raster" />
 				</Source>
 			);
@@ -85,5 +86,8 @@ export const MemoizedRenderLayer = memo( renderLayer, ( props, prevProps ) => {
 	return isEqual(
 		props.layer.layer_type_options,
 		prevProps.layer.layer_type_options
+	) && isEqual(
+		props.instance.style,
+		prevProps.instance.style
 	);
 } );

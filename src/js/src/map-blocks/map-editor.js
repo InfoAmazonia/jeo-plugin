@@ -7,6 +7,7 @@ import { __ } from '@wordpress/i18n';
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
+import { decodeHtmlEntity } from '../shared/html';
 import { useRecordsByIds } from '../shared/rest-records';
 import './map-editor.css';
 
@@ -19,12 +20,6 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 	useEffect( () => {
 		setKey( ( currentKey ) => currentKey + 1 );
 	}, [ attributes.align, window.screen.width ] );
-
-	const decodeHtmlEntity = function ( str ) {
-		return str.replace( /&#(\d+);/g, function ( match, dec ) {
-			return String.fromCharCode( dec );
-		} );
-	};
 
 	const mapRef = useRef( undefined );
 

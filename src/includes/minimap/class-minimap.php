@@ -341,7 +341,7 @@ class Minimap {
 	}
 
 	/**
-	 * Find or create a base layer for the given variant.
+	 * Get or create a base layer for the given visual variant.
 	 *
 	 * @param string $variant One of 'dark', 'light', 'satellite'.
 	 * @return array|null Base layer definition, or null on failure.
@@ -364,15 +364,16 @@ class Minimap {
 	private function find_existing_base_layer( $variant ) {
 		$query = new \WP_Query(
 			array(
-				'post_type'      => 'map-layer',
-				'post_status'    => 'publish',
-				'posts_per_page' => 1,
-				'meta_query'     => array(
+				'post_type'        => 'map-layer',
+				'post_status'      => 'publish',
+				'posts_per_page'   => 1,
+				'meta_query'       => array(
 					array(
 						'key'   => self::BASE_LAYER_META_KEY,
 						'value' => $variant,
 					),
 				),
+				'suppress_filters' => true, // Ensure WPML doesn't filter by language.
 			)
 		);
 
@@ -482,6 +483,8 @@ class Minimap {
 
 		update_post_meta( $post_id, self::BASE_LAYER_META_KEY, $config['variant'] );
 
+		$this->assign_default_language( $post_id );
+
 		return $this->build_base_layer_response( $post_id, $config['variant'] );
 	}
 
@@ -590,45 +593,31 @@ class Minimap {
 	}
 
 	/**
-	 * Geocode a text prompt and return center coordinates with zoom.
+	 * Assign the site's default WPML language to a newly created post.
 	 *
-	 * Uses the plugin's active geocoder. Falls back to JEO default map settings
-	 * when geocoding returns no results.
+	 * No-op when WPML is not active.
 	 *
-	 * @param string $prompt Text to geocode.
-	 * @return array { lat: float, lon: float, zoom: int }
+	 * @param int $post_id Post ID.
+	 * @return void
 	 */
-	private function geocode_prompt( $prompt ) {
-		$defaults = array(
-			'lat'  => (float) \jeo_settings()->get_option( 'map_default_lat', 0 ),
-			'lon'  => (float) \jeo_settings()->get_option( 'map_default_lng', 0 ),
-			'zoom' => (float) \jeo_settings()->get_option( 'map_default_zoom', 2 ),
-		);
-
-		$geocoder = \jeo_geocode_handler()->get_active_geocoder();
-		if ( ! $geocoder ) {
-			return $defaults;
+	private function assign_default_language( int $post_id ): void {
+		if ( ! did_action( 'wpml_loaded' ) ) {
+			return;
 		}
 
-		$results = $geocoder->geocode( $prompt );
-		if ( empty( $results ) || ! is_array( $results ) ) {
-			return $defaults;
+		$default_lang = apply_filters( 'wpml_default_language', null );
+		if ( empty( $default_lang ) ) {
+			return;
 		}
 
-		$first = $results[0];
-		$lat   = isset( $first['lat'] ) ? (float) $first['lat'] : null;
-		$lon   = isset( $first['lon'] ) ? (float) $first['lon'] : null;
-
-		if ( null === $lat || null === $lon || ! is_finite( $lat ) || ! is_finite( $lon ) ) {
-			return $defaults;
-		}
-
-		$zoom = (int) \jeo_settings()->get_option( 'map_default_zoom', 2 );
-
-		return array(
-			'lat'  => round( $lat, 6 ),
-			'lon'  => round( $lon, 6 ),
-			'zoom' => $zoom,
+		do_action(
+			'wpml_set_element_language_details',
+			array(
+				'element_id'    => $post_id,
+				'element_type'  => 'post_map-layer',
+				'trid'          => false,
+				'language_code' => $default_lang,
+			)
 		);
 	}
 

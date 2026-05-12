@@ -2,13 +2,8 @@ import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 import { layerUseLabels, loadLayer } from './utils';
+import { decodeHtmlEntity } from '../shared/html';
 import './layers-panel.css';
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
 
 export default function ( {
 	attributes,

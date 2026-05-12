@@ -31,7 +31,7 @@ class Settings {
 	 * @var array
 	 */
 	public $default_options = array(
-		'map_runtime'                     => 'mapboxgl',
+		'map_runtime'                     => 'maplibregl',
 		'enabled_post_types'              => array( 'post' ),
 		'map_default_zoom'                => 1,
 		'map_default_lat'                 => 0,
@@ -282,6 +282,14 @@ class Settings {
 		foreach ( $text_fields as $field ) {
 			if ( isset( $input[ $field ] ) ) {
 				$input[ $field ] = sanitize_text_field( $input[ $field ] );
+			}
+		}
+
+		// Reject Mapbox runtime without a valid API key.
+		if ( isset( $input['map_runtime'] ) && 'mapboxgl' === $input['map_runtime'] ) {
+			$mapbox_key = isset( $input['mapbox_key'] ) ? trim( $input['mapbox_key'] ) : '';
+			if ( '' === $mapbox_key ) {
+				$input['map_runtime'] = 'maplibregl';
 			}
 		}
 
