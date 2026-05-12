@@ -285,6 +285,14 @@ class Settings {
 			}
 		}
 
+		// Reject Mapbox runtime without a valid API key.
+		if ( isset( $input['map_runtime'] ) && 'mapboxgl' === $input['map_runtime'] ) {
+			$mapbox_key = isset( $input['mapbox_key'] ) ? trim( $input['mapbox_key'] ) : '';
+			if ( '' === $mapbox_key ) {
+				$input['map_runtime'] = 'maplibregl';
+			}
+		}
+
 		// 3. FINAL MERGE: Overwrite existing options with sanitized new input
 		return array_merge( $existing_options, $input );
 	}

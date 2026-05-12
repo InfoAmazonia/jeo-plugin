@@ -1,7 +1,7 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 6.8.2
-Stable tag: 2.15.2
+Stable tag: 3.6.5
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-2.0+
@@ -40,6 +40,15 @@ There, you can configure:
 * The geocoder that'll be used by the plugin -- currently only [Nominatim](https://nominatim.openstreetmap.org) is available by default;
 
 After activating the plugin, a new item will appear on the WordPress dashboard: a menu containing the **Maps** and **Layers** post types, and the JEO settings menus.
+
+== Third Party Services ==
+
+This plugin uses the following third-party services:
+
+* [Mapbox](https://www.mapbox.com/) — map tiles and geocoding (requires API key)
+* [Nominatim](https://nominatim.org/) — OpenStreetMap geocoding
+* [Google Fonts](https://fonts.google.com/) — typography (Open Sans, Libre Baskerville)
+* [CDNJS](https://cdnjs.cloudflare.com/) — Select2 assets
 
 == Screenshots ==
 1. Map being displayed in a post
