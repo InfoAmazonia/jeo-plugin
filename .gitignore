@@ -2,6 +2,7 @@ build-config.cfg
 tests/bootstrap-config.php
 node_modules
 .tmp/
+.docker/
 src/js/build
 src/languages/*.json
 jeo.zip

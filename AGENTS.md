@@ -22,10 +22,21 @@ When making significant code changes (creating/removing/modifying components, bl
 ## Commands
 
 ```bash
+# JS / Build
 npm start                          # Dev (webpack watch)
 npm run build                      # Production build + i18n JSON (requires WP-CLI)
 npm run test:unit                  # Jest
+
+# PHP
 vendor/bin/phpcs src/              # PHP lint (WPCS) — scope to src/ to avoid .tmp/ noise
+php scripts/check-php-compat.php   # Static PHP compatibility check
+
+# Local WordPress (Docker)
+bash .docker/start.sh              # Start WordPress + MariaDB containers
+# WordPress: http://localhost:8081
+# DB:        localhost:3307 (jeo/jeo/jeo)
+# Plugin src/ is mounted live — no need to reinstall after edits.
+# Stop: docker compose -f .docker/docker-compose.yml down
 ```
 
 ## Conventions
