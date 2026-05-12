@@ -13,6 +13,8 @@ if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
 
 spl_autoload_register( 'jeo_autoload' );
 
+require_once __DIR__ . '/privacy.php';
+
 /**
  * PSR-0-compatible autoloader that maps `Jeo\ClassName` to `class-class-name.php` across known directories.
  *
@@ -286,113 +288,95 @@ function jeo_register_embedder( $id, $base_url ) {
  *
  * @return string
  */
+/**
+ * Sanitize a font-family name for safe use inside a CSS string.
+ *
+ * @param string $font Raw font name.
+ * @return string Sanitized font name.
+ */
+function jeo_sanitize_css_font_family( $font ) {
+	$font = sanitize_text_field( $font );
+	// Allow letters, numbers, spaces, hyphens, underscores, and common punctuation.
+	return preg_replace( '/[^A-Za-z0-9\s\-_.,&()\/]+/', '', $font );
+}
+
+/**
+ * Generate dynamic CSS from JEO appearance settings.
+ *
+ * @return string Safe CSS string.
+ */
 function jeo_custom_settings_css() {
 	$theme_css = '';
-	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ) ) ) {
-		$jeo_font = wp_kses( \jeo_settings()->get_option( 'jeo_typography-name' ), null );
 
-		$theme_css .= '
-		.jeomap .legend-container a.more-info-button  {
-			font-family: "' . $jeo_font . '", "sans-serif";
-		}
-		:root {
-			--jeo-font: "' . $jeo_font . '", "sans-serif";
-		}
-		';
-	}
-	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name-stories' ) ) ) ) {
-		$jeo_font_stories = wp_kses( \jeo_settings()->get_option( 'jeo_typography-name-stories' ), null );
-
-		$theme_css .= '
-		:root {
-			--jeo-font-stories: "' . $jeo_font_stories . '", "sans-serif";
-		}
-		';
+	$font = jeo_sanitize_css_font_family( \jeo_settings()->get_option( 'jeo_typography-name', '' ) );
+	if ( ! empty( $font ) ) {
+		$theme_css .= '.jeomap .legend-container a.more-info-button { font-family: "' . esc_attr( $font ) . '", "sans-serif"; } :root { --jeo-font: "' . esc_attr( $font ) . '", "sans-serif"; }';
 	}
 
-	if ( ! empty( sanitize_text_field( \jeo_settings()->get_option( 'jeo_typography-name' ) ) ) ) {
-		$jeo_font = wp_kses( \jeo_settings()->get_option( 'jeo_typography-name' ), null );
-
-		$theme_css .= '
-		.jeomap .legend-container a.more-info-button  {
-			font-family: "' . $jeo_font . '", "sans-serif";
-		}
-		';
+	$font_stories = jeo_sanitize_css_font_family( \jeo_settings()->get_option( 'jeo_typography-name-stories', '' ) );
+	if ( ! empty( $font_stories ) ) {
+		$theme_css .= ':root { --jeo-font-stories: "' . esc_attr( $font_stories ) . '", "sans-serif"; }';
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_more-font-size', '1' ) ) ) {
-		$jeo_info_font_size = \jeo_settings()->get_option( 'jeo_more-font-size', '1' );
-		$font_unit          = 'rem';
-
-		$theme_css .= '
-		.jeomap div.legend-container a.more-info-button {
-			font-size: ' . $jeo_info_font_size . $font_unit . ';
-		}';
+	$info_font_size = floatval( \jeo_settings()->get_option( 'jeo_more-font-size', '1' ) );
+	if ( $info_font_size > 0 ) {
+		$theme_css .= '.jeomap div.legend-container a.more-info-button { font-size: ' . esc_attr( $info_font_size ) . 'rem; }';
 	}
 
 	$css_variables = '';
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' ) ) ) {
-		$color_more_bkg = \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' );
 
-		$color_css       = '--jeo_more-bkg-color: ' . $color_more_bkg . ';';
-		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo( $color_more_bkg, -0.15 ) . ';';
-		$css_variables  .= $color_css . ' ' . $color_css_hover;
+	$color_more_bkg = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' ) );
+	if ( ! empty( $color_more_bkg ) ) {
+		$css_variables .= '--jeo_more-bkg-color: ' . $color_more_bkg . ';';
+		$css_variables .= '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo( $color_more_bkg, -0.15 ) . ';';
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_primary-color', '#ffffff' ) ) ) {
-		$primary_color          = \jeo_settings()->get_option( 'jeo_primary-color', '#0073aa' );
-		$color_css_primary      = '--jeo-primary-color: ' . $primary_color . ';';
-		$color_css_primary_dark = '--jeo-primary-color-darker-15: ' . color_luminance_jeo( $primary_color, -0.15 ) . ';';
-		$css_variables         .= $color_css_primary . ' ' . $color_css_primary_dark;
+	$primary_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_primary-color', '#0073aa' ) );
+	if ( ! empty( $primary_color ) ) {
+		$css_variables .= '--jeo-primary-color: ' . $primary_color . ';';
+		$css_variables .= '--jeo-primary-color-darker-15: ' . color_luminance_jeo( $primary_color, -0.15 ) . ';';
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000' ) ) ) {
-		$over_primary_color = \jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000' );
-		$color_css          = '--jeo-text-over-primary-color: ' . $over_primary_color . ';';
-		$css_variables     .= $color_css;
+	$over_primary_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000' ) );
+	if ( ! empty( $over_primary_color ) ) {
+		$css_variables .= '--jeo-text-over-primary-color: ' . $over_primary_color . ';';
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_more-color', '#555D66' ) ) ) {
-		$color          = \jeo_settings()->get_option( 'jeo_more-color', '#555D66' );
-		$color_css      = '--jeo_more-color: ' . $color . ';';
-		$css_variables .= $color_css;
+	$more_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_more-color', '#555D66' ) );
+	if ( ! empty( $more_color ) ) {
+		$css_variables .= '--jeo_more-color: ' . $more_color . ';';
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' ) ) ) {
-		$color          = \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' );
-		$color_css      = '--jeo_close-bkg-color: ' . $color . ';';
-		$css_variables .= $color_css;
+	$close_bkg_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' ) );
+	if ( ! empty( $close_bkg_color ) ) {
+		$css_variables .= '--jeo_close-bkg-color: ' . $close_bkg_color . ';';
 	}
 
-	if ( ! empty( \jeo_settings()->get_option( 'jeo_close-color', '#555D66' ) ) ) {
-		$color_close_bkg = \jeo_settings()->get_option( 'jeo_close-color', '#555D66' );
-
-		$color_css       = '--jeo_close-color: ' . $color_close_bkg . ';';
-		$color_css_hover = '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo( $color_close_bkg, -0.15 ) . ';';
-		$css_variables  .= $color_css . ' ' . $color_css_hover;
+	$close_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-color', '#555D66' ) );
+	if ( ! empty( $close_color ) ) {
+		$css_variables .= '--jeo_close-color: ' . $close_color . ';';
+		$css_variables .= '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo( $close_color, -0.15 ) . ';';
 	}
 
-	$theme_css .= '
-		:root {' .
-			$css_variables; '
-		}
-	';
+	if ( ! empty( $css_variables ) ) {
+		$theme_css .= ':root { ' . $css_variables . ' }';
+	}
 
 	return $theme_css;
 }
+
 /**
  * Output the custom JEO CSS in a `<style>` tag in the frontend `<head>`.
  *
  * @return void
  */
 function jeo_custom_settings_css_wrap() {
-	?>
-	<style type="text/css" id="custom-jeo-css">
-		<?php
-		echo jeo_custom_settings_css(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		?>
-	</style>
-	<?php
+	$css = jeo_custom_settings_css();
+	if ( empty( $css ) ) {
+		return;
+	}
+	// Values are individually sanitized in jeo_custom_settings_css().
+	echo '<style type="text/css" id="custom-jeo-css">' . $css . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
 

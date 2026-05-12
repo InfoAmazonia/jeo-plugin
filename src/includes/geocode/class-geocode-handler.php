@@ -64,6 +64,10 @@ class Geocode_Handler {
 	public function ajax_geocode() {
 		check_ajax_referer( 'jeo_geocode_nonce', 'nonce' );
 
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array( 'message' => 'Unauthorized.' ), 403 );
+		}
+
 		$geocoder = $this->get_active_geocoder();
 
 		if ( $geocoder ) {
@@ -82,6 +86,10 @@ class Geocode_Handler {
 	 */
 	public function ajax_reverse_geocode() {
 		check_ajax_referer( 'jeo_geocode_nonce', 'nonce' );
+
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			wp_send_json_error( array( 'message' => 'Unauthorized.' ), 403 );
+		}
 
 		$geocoder = $this->get_active_geocoder();
 		if ( $geocoder ) {

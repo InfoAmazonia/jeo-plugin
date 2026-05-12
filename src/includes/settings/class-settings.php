@@ -306,8 +306,8 @@ class Settings {
 	public function enqueue_admin_scripts( $page ) {
 		if ( 'jeo_page_jeo-settings' === $page || 'jeo_page_jeo-ai-settings' === $page ) {
 			wp_enqueue_media();
-			wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
-			wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery', 'wp-i18n' ), '4.0.13', true );
+			wp_enqueue_style( 'select2', JEO_BASEURL . '/includes/vendor/select2/css/select2.min.css', array(), '4.0.13' );
+			wp_enqueue_script( 'select2', JEO_BASEURL . '/includes/vendor/select2/js/select2.min.js', array( 'jquery', 'wp-i18n' ), '4.0.13', true );
 			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery', 'wp-api-fetch', 'wp-i18n' ), JEO_VERSION, true );
 			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
 
