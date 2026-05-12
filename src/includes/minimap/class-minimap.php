@@ -593,6 +593,49 @@ class Minimap {
 	}
 
 	/**
+	 * Geocode a text prompt and return center coordinates with zoom.
+	 *
+	 * Uses the plugin's active geocoder. Falls back to JEO default map settings
+	 * when geocoding returns no results.
+	 *
+	 * @param string $prompt Text to geocode.
+	 * @return array { lat: float, lon: float, zoom: int }
+	 */
+	private function geocode_prompt( $prompt ) {
+		$defaults = array(
+			'lat'  => (float) \jeo_settings()->get_option( 'map_default_lat', 0 ),
+			'lon'  => (float) \jeo_settings()->get_option( 'map_default_lng', 0 ),
+			'zoom' => (float) \jeo_settings()->get_option( 'map_default_zoom', 2 ),
+		);
+
+		$geocoder = \jeo_geocode_handler()->get_active_geocoder();
+		if ( ! $geocoder ) {
+			return $defaults;
+		}
+
+		$results = $geocoder->geocode( $prompt );
+		if ( empty( $results ) || ! is_array( $results ) ) {
+			return $defaults;
+		}
+
+		$first = $results[0];
+		$lat   = isset( $first['lat'] ) ? (float) $first['lat'] : null;
+		$lon   = isset( $first['lon'] ) ? (float) $first['lon'] : null;
+
+		if ( null === $lat || null === $lon || ! is_finite( $lat ) || ! is_finite( $lon ) ) {
+			return $defaults;
+		}
+
+		$zoom = (int) \jeo_settings()->get_option( 'map_default_zoom', 2 );
+
+		return array(
+			'lat'  => round( $lat, 6 ),
+			'lon'  => round( $lon, 6 ),
+			'zoom' => $zoom,
+		);
+	}
+
+	/**
 	 * Assign the site's default WPML language to a newly created post.
 	 *
 	 * No-op when WPML is not active.
