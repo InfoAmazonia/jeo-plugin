@@ -11,7 +11,7 @@ import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import { useRecordsByIds } from '../shared/rest-records';
-import { SelectControl } from '../shared/wp-form-controls';
+import { RadioControl, SelectControl, TextareaControl } from '../shared/wp-form-controls';
 import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults, mapbox_key: mapboxKey } = globalThis.jeo_settings;
@@ -277,7 +277,19 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const currentZoom = normalizedAttributes[ zoomState ];
 	const mapRef = useRef( undefined );
 
-	if ( attributes.status === 'error' ) {
+	const [ generationMode, setGenerationMode ] = useState(
+		() => attributes.prompt?.trim() ? 'prompt' : 'content'
+	);
+
+	const handleGenerate = useCallback( () => {
+		if ( generationMode === 'prompt' ) {
+			generateFromPrompt();
+		} else {
+			generate();
+		}
+	}, [ generationMode, generate, generateFromPrompt ] );
+
+	if ( attributes.status === 'error' && ! mapboxKey ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
@@ -287,9 +299,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					<Notice status="error" isDismissible={ false }>
 						{ attributes.message }
 					</Notice>
-					<Button variant="primary" onClick={ generate }>
-						{ __( 'Generate from post content', 'jeo' ) }
-					</Button>
 				</Placeholder>
 			</div>
 		);
@@ -301,7 +310,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				<Placeholder
 					icon="map"
 					label={ __( 'AI-Assisted Map', 'jeo' ) }
-					instructions={ __( 'Analyzing post content and suggesting layers…', 'jeo' ) }
+					instructions={ __( 'Generating map layers…', 'jeo' ) }
 				>
 					<Spinner />
 				</Placeholder>
@@ -309,16 +318,39 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		);
 	}
 
-	if ( attributes.status === 'idle' ) {
+	if ( attributes.status === 'idle' || attributes.status === 'error' ) {
 		return (
 			<div { ...blockProps }>
 				<Placeholder
 					icon="map"
 					label={ __( 'AI-Assisted Map', 'jeo' ) }
-					instructions={ __( 'Click the button below to analyze the post content and generate map layers.', 'jeo' ) }
 				>
-					<Button variant="primary" onClick={ generate }>
-						{ __( 'Generate from post content', 'jeo' ) }
+					{ attributes.status === 'error' && (
+						<Notice status="error" isDismissible={ false }>
+							{ attributes.message }
+						</Notice>
+					) }
+					<RadioControl
+						selected={ generationMode }
+						options={ [
+							{ label: __( 'Generate from post content', 'jeo' ), value: 'content' },
+							{ label: __( 'Generate from prompt', 'jeo' ), value: 'prompt' },
+						] }
+						onChange={ setGenerationMode }
+					/>
+					{ generationMode === 'prompt' && (
+						<TextareaControl
+							label={ __( 'Map prompt', 'jeo' ) }
+							value={ attributes.prompt || '' }
+							onChange={ ( v ) => setAttributes( { prompt: v } ) }
+						/>
+					) }
+					<Button
+						variant="primary"
+						onClick={ handleGenerate }
+						disabled={ generationMode === 'prompt' && ! attributes.prompt?.trim() }
+					>
+						{ __( 'Generate map', 'jeo' ) }
 					</Button>
 				</Placeholder>
 			</div>

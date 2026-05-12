@@ -2,6 +2,7 @@ import {
 	CheckboxControl as WPCheckboxControl,
 	ComboboxControl as WPComboboxControl,
 	FormTokenField as WPFormTokenField,
+	RadioControl as WPRadioControl,
 	RangeControl as WPRangeControl,
 	SelectControl as WPSelectControl,
 	TextControl as WPTextControl,
@@ -39,6 +40,10 @@ export function RangeControl( props ) {
 
 export function FormTokenField( props ) {
 	return <WPFormTokenField { ...nextInputControlProps } { ...props } />;
+}
+
+export function RadioControl( props ) {
+	return <WPRadioControl { ...nextCheckboxControlProps } { ...props } />;
 }
 
 export function TextareaControl( props ) {
