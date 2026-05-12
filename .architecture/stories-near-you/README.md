@@ -23,11 +23,21 @@ sequenceDiagram
     participant DB as MySQL (ST_Distance_Sphere)
 
     PHP->>HTML: Outputs skeleton + data-attrs
-    JS->>GEO: getLocation()
-    alt Location obtained
-        GEO-->>JS: {lat, lng}
-    else Denied / unavailable
-        GEO-->>JS: null
+    JS->>GEO: Check prior consent (localStorage)
+    alt Consent given
+        GEO-->>JS: getLocation()
+        alt Location obtained
+            GEO-->>JS: {lat, lng}
+        else Denied / unavailable
+            GEO-->>JS: null
+        end
+    else No consent
+        JS->>HTML: Show opt-in prompt
+        alt User accepts
+            GEO-->>JS: getLocation()
+        else User skips
+            GEO-->>JS: null
+        end
     end
     JS->>REST: GET with lat/lng (or empty)
     REST->>DB: UNION query with ST_Distance_Sphere

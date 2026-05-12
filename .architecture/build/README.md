@@ -44,6 +44,8 @@ Extends `@wordpress/scripts/config/webpack.config` with:
 | i18n JSON | `scripts/make-i18n-json.mjs` | Generates translation JSON |
 | Bundle report | `scripts/report-bundle-sizes.mjs` | Reports bundle sizes |
 | WP.org check | `scripts/check-wporg-compliance.mjs` | Checks WP.org compliance |
+| PHP compat | `scripts/check-php-compat.php` | Checks PHP 8.0-8.5 compatibility |
+| Smoke test | `scripts/wordpress-smoke.sh` | WordPress smoke test |
 | Dependency review | `scripts/dependency-review.mjs` | License/security review |
 | Version validate | `scripts/validate-release-meta.mjs` | Validates release metadata |
 | PHP compat | `scripts/check-php-compat.php` | Checks PHP compatibility |
