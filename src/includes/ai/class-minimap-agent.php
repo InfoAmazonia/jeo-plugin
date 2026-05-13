@@ -23,7 +23,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Uses the hacklabr/ai-assistant library with:
  * - Structured output (Minimap_Output)
  * - Sub-agent for post content analysis
- * - Tools: Search_Layers_Tool, Geocode_Tool
+ * - Tools: Search_Layers_Tool, Geocode_Tool, Generate_Layer_Tool (when Mapbox key is available)
  * - Separate storages for conversations (post_meta), learning (wp_options), user memory (user_meta)
  */
 class Minimap_Agent {
@@ -50,16 +50,25 @@ class Minimap_Agent {
 			$prefs = self::load_user_prefs_prompt( $user_id );
 		}
 
+		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
+		$has_mapbox = ! empty( $mapbox_key );
+
+		$tools = array(
+			Search_Layers_Tool::class,
+			Geocode_Tool::class,
+		);
+
+		if ( $has_mapbox ) {
+			$tools[] = Generate_Layer_Tool::class;
+		}
+
 		$config = new AssistantConfig(
 			logger:               new StderrLogger(),
 			provider:             $provider,
 			storage:              $fallback_storage,
-			instructions:         self::system_prompt( $prefs, $initial_context ),
+			instructions:         self::system_prompt( $prefs, $initial_context, $has_mapbox ),
 			contextWindow:        200000,
-			tools:                array(
-				Search_Layers_Tool::class,
-				Geocode_Tool::class,
-			),
+			tools:                $tools,
 			subAgents:            array(
 				'post_analyzer' => self::post_analyzer_config( $provider ),
 			),
@@ -82,9 +91,10 @@ class Minimap_Agent {
 	 *
 	 * @param string      $user_prefs      User preferences section (empty if none).
 	 * @param string|null $initial_context Extra context from the caller.
+	 * @param bool        $has_mapbox      Whether a Mapbox API key is configured.
 	 * @return string
 	 */
-	private static function system_prompt( string $user_prefs = '', ?string $initial_context = null ): string {
+	private static function system_prompt( string $user_prefs = '', ?string $initial_context = null, bool $has_mapbox = false ): string {
 		$prompt = <<<'PROMPT'
 You are a cartographic AI assistant embedded in a WordPress block editor. Your task is to generate and refine interactive maps (minimaps) for journalistic and editorial posts.
 
@@ -139,6 +149,26 @@ Always respond in the same language the user used in their message.
 
 If the user asks something unrelated to the map (e.g. general questions, preferences, non-geographic topics), respond conversationally without modifying the map configuration. Repeat the previous `message` value unchanged.
 PROMPT;
+
+		if ( $has_mapbox ) {
+			$prompt .= "\n\n" . <<<'PROMPT'
+## Layer Generation (Mapbox)
+
+You have access to `generate_layer(prompt, layer_name)` which creates custom Mapbox map styles from a text description and creates a new layer. This has cost implications (AI tokens + Mapbox API usage).
+
+Rules:
+- NEVER call `generate_layer` without explicit user authorization via chat.
+- When `search_layers` returns insufficient results, mention what's missing in `assistant_message` and ask the user if they would like you to generate a custom layer.
+- Only call `generate_layer` after the user explicitly confirms (e.g. "yes", "go ahead", "generate it").
+- On the initial auto-generation (from post content or prompt), do NOT generate custom layers — use existing ones only. Report gaps in `assistant_message`.
+PROMPT;
+		} else {
+			$prompt .= "\n\n" . <<<'PROMPT'
+## Layer Limitations
+
+Custom layer generation is not available (no Mapbox API key is configured). If `search_layers` returns insufficient results, mention what topics lack coverage in `assistant_message` and suggest the user connect a Mapbox API key in JEO Settings to enable AI-powered layer generation.
+PROMPT;
+		}
 
 		if ( ! empty( $user_prefs ) ) {
 			$prompt .= "\n\n## User Preferences\n" . $user_prefs;

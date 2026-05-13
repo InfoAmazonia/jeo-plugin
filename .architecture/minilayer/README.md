@@ -7,35 +7,54 @@ Creates Mapbox map styles from natural-language prompts and auto-creates a JEO l
 | File | Class | Role |
 |------|-------|------|
 | `src/includes/ai/class-minilayer-agent.php` | `Minilayer_Agent` | NeuronAI Agent with Mapbox DevKit MCP tools |
-| `src/includes/ai/class-minilayer-handler.php` | `Minilayer_Handler` | REST endpoint, JSON parsing, layer CPT creation |
+| `src/includes/ai/class-minilayer-handler.php` | `Minilayer_Handler` | REST endpoint, delegates to `Minilayer_Service` |
+| `src/includes/ai/class-minilayer-service.php` | `Minilayer_Service` | Shared service — AI style generation, JSON parsing, layer CPT creation. Used by both the REST handler and `Generate_Layer_Tool` |
+| `src/includes/ai/class-generate-layer-tool.php` | `Generate_Layer_Tool` | NeuronAI tool for the minimap agent — conditionally registered when a Mapbox API key is available |
 
-## Flow
+## Flow (REST Endpoint)
 
 ```mermaid
 sequenceDiagram
     participant Client
     participant REST as /minilayer/generate
     participant H as Minilayer_Handler
+    participant S as Minilayer_Service
     participant A as Minilayer_Agent
     participant MCP as Mapbox DevKit MCP
     participant LLM as AI Provider
 
     Client->>REST: POST { prompt }
     REST->>H: api_generate()
-    H->>H: Validate Mapbox key + AI provider
-    H->>A: generate(prompt)
+    H->>H: Validate prompt
+    H->>S: generate_and_create(prompt)
+    S->>S: Validate Mapbox key + AI provider
+    S->>A: generate(prompt)
     A->>A: tools() → McpConnector → Mapbox DevKit
     A->>LLM: Chat with MCP tools available
     LLM-->>A: Tool calls (StyleBuilderTool, CreateStyleTool, ...)
     A->>MCP: callTool() via StreamableHttpTransport
     MCP-->>A: Style created
     A->>A: Determine layer_type (tileset-vector vs mapbox)
-    A-->>H: { style_id, layer_title, style_json, layer_type, ... }
-    H->>H: is_tileset_vector() → choose CPT type
-    H->>H: Create map-layer CPT
-    H-->>REST: { style, layer }
+    A-->>S: Raw AI response
+    S->>S: parse_response() → extract JSON
+    S->>S: is_tileset_vector() → choose CPT type
+    S->>S: create_layer() → map-layer CPT
+    S-->>H: Layer info array
+    H-->>REST: { success, layer }
     REST-->>Client: 200 OK
 ```
+
+## Integration with Minimap Agent
+
+The minimap agent can optionally use `Generate_Layer_Tool` to create custom layers when existing search results are insufficient. This integration is gated on the Mapbox API key:
+
+1. `Minimap_Agent::create()` checks for a Mapbox key
+2. If present, `Generate_Layer_Tool` is registered as an available tool
+3. The agent's system prompt includes layer generation instructions with an authorization gate
+4. The agent must ask the user for confirmation before generating a layer (cost implications)
+5. `Generate_Layer_Tool` delegates to `Minilayer_Service::generate_and_create()` — same pipeline as the REST endpoint
+
+The tool is never available without a Mapbox key, and the system prompt includes a "Layer Limitations" section instead, asking the agent to suggest configuring a Mapbox key.
 
 ## MCP Connection
 

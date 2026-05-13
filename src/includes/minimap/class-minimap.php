@@ -322,7 +322,8 @@ class Minimap {
 	 * @param int    $user_id         User ID.
 	 * @param string $message         User message to the agent.
 	 * @return Minimap_Output
-	 * @throws \Exception On agent failure.
+	 * @throws \Exception On agent failure or empty AI response.
+	 * @throws \TypeError On unexpected type errors from the AI library.
 	 */
 	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message ): Minimap_Output {
 		$assistant = Minimap_Agent::create( $post_id, $conversation_id, $user_id ? $user_id : null );
@@ -330,7 +331,15 @@ class Minimap {
 		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
 		$this->inject_history( $assistant, $store, $conversation_id );
 
-		$result = $assistant->structured( new UserMessage( $message ) );
+		try {
+			$result = $assistant->structured( new UserMessage( $message ) );
+		} catch ( \TypeError $e ) {
+			if ( false !== strpos( $e->getMessage(), 'getJson()' ) ) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception message, not HTML output.
+				throw new \Exception( esc_html__( 'The AI returned an empty response. Please try again.', 'jeo' ), 0, $e );
+			}
+			throw $e;
+		}
 
 		$this->persist_history( $assistant, $store, $conversation_id );
 

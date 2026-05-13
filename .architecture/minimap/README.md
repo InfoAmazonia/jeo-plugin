@@ -11,6 +11,7 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/includes/ai/class-minimap-output.php` | `Jeo\AI\Minimap_Output` — structured output DTO with `#[SchemaProperty]` attributes |
 | `src/includes/ai/class-search-layers-tool.php` | Agent tool: semantic layer search via `RAG_Worker::find_matching_layers()` |
 | `src/includes/ai/class-geocode-tool.php` | Agent tool: geocoding with fallback chain (active geocoder → Mapbox → defaults) |
+| `src/includes/ai/class-generate-layer-tool.php` | Agent tool (conditional): generates custom Mapbox styles and creates layer CPTs via `Minilayer_Service`. Only available when a Mapbox API key is configured. |
 | `src/includes/ai/class-get-post-content-tool.php` | Agent tool: post content + `_related_point` meta (used by post_analyzer sub-agent) |
 | `src/includes/ai/class-wp-storage.php` | `StorageInterface` adapter for `post_meta` and `user_meta` |
 | `src/includes/ai/class-wp-option-storage.php` | `StorageInterface` adapter for `wp_options` (single option per namespace, `autoload=false`) |
@@ -40,7 +41,10 @@ graph TB
         AGENT --> SUB[post_analyzer<br/>Sub-Agent]
         MAIN --> T1[Search_Layers_Tool]
         MAIN --> T2[Geocode_Tool]
+        MAIN -.->|Mapbox key only| T4[Generate_Layer_Tool]
         SUB --> T3[Get_Post_Content_Tool]
+        T4 -.-> MLS[Minilayer_Service]
+        MLS -.-> MLA[Minilayer_Agent]
         MAIN --> OUT[Structured Output<br/>Minimap_Output]
     end
 
@@ -116,10 +120,48 @@ graph LR
     A --> C[post_analyzer sub-agent]
     B --> D[Search_Layers_Tool]
     B --> E[Geocode_Tool]
-    C --> F[Get_Post_Content_Tool]
-    B --> G[Minimap_Output<br/>structured output]
-    B --> H[autoLearn: true]
-    B --> I[autoDelegate: true]
+    B -.->|Mapbox key only| F[Generate_Layer_Tool]
+    C --> G[Get_Post_Content_Tool]
+    F -.-> H[Minilayer_Service]
+    B --> I[Minimap_Output<br/>structured output]
+    B --> J[autoLearn: true]
+    B --> K[autoDelegate: true]
+```
+
+### Optional Minilayer Integration
+
+When a Mapbox API key is configured, `Minimap_Agent::create()` registers `Generate_Layer_Tool` alongside the standard tools. This tool allows the agent to generate custom Mapbox styles and create new layer CPTs when existing layers are insufficient.
+
+**Authorization gate:** The system prompt instructs the agent to NEVER call `generate_layer` without explicit user authorization via chat. On the initial auto-generation (from post content or prompt), the agent only uses existing layers and reports gaps in `assistant_message`. The user must explicitly confirm (e.g. "yes", "go ahead") before the agent invokes the tool.
+
+When no Mapbox key is configured, the tool is omitted entirely and the prompt includes a "Layer Limitations" section instructing the agent to suggest connecting a Mapbox key.
+
+**Flow: Layer generation via chat**
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant E as minimap-editor.js
+    participant R as /minimap/chat
+    participant M as Minimap::run_agent()
+    participant A as Minimap_Agent
+    participant GL as Generate_Layer_Tool
+    participant S as Minilayer_Service
+
+    U->>E: "No deforestation layer? Can you generate one?"
+    E->>R: POST {conversation_id, message}
+    R->>M: run_agent()
+    M->>A: Minimap_Agent::create() — with Generate_Layer_Tool
+    M->>A: structured(UserMessage)
+    A->>A: Evaluate: user authorized generation
+    A->>GL: generate_layer("deforestation heatmap Amazon")
+    GL->>S: Minilayer_Service::generate_and_create()
+    S-->>GL: {success, layer_id, title, type, ...}
+    GL-->>A: JSON result
+    A-->>M: Minimap_Output (with new layer_id)
+    M-->>R: to_rest_response()
+    R-->>E: {success, layers, ..., assistant_message}
+    E-->>U: Updated map with generated layer
 ```
 
 ### Storage Strategy
@@ -331,3 +373,4 @@ Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 - **Agent never writes preferences**: User preferences are suggested via agent output and stored by the backend in user_meta, never written directly by the agent
 - **Structured controls**: Base variant changes, layer additions, and regeneration are sent as typed messages (`type` field) to the chat endpoint and resolved to natural language server-side
 - **Fallback chain**: Agent output is always post-processed with luminance heuristic and pin extraction to ensure complete, usable maps
+- **Layer generation authorization**: When Mapbox is available, the agent must always ask for explicit user confirmation via chat before generating custom layers (`generate_layer` tool). Initial auto-generation never creates custom layers

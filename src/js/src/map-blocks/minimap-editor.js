@@ -14,7 +14,7 @@ import { useRecordsByIds } from '../shared/rest-records';
 import { RadioControl, SelectControl, TextareaControl } from '../shared/wp-form-controls';
 import './onetime-map-editor.css';
 
-const { map_defaults: mapDefaults, mapbox_key: mapboxKey } = globalThis.jeo_settings;
+const { map_defaults: mapDefaults } = globalThis.jeo_settings;
 
 const LOADING_MESSAGES = [
 	__( 'Analyzing content…', 'jeo' ),
@@ -105,14 +105,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	} );
 
 	const generate = useCallback( () => {
-		if ( ! mapboxKey ) {
-			setAttributes( {
-				status: 'error',
-				message: __( 'Mapbox API key is not configured. Set the key in JEO Settings to use the AI-Assisted Map block.', 'jeo' ),
-			} );
-			return;
-		}
-
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
 			return;
@@ -391,14 +383,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			return;
 		}
 
-		if ( ! mapboxKey ) {
-			setAttributes( {
-				status: 'error',
-				message: __( 'Mapbox API key is not configured. Set the key in JEO Settings to use the AI-Assisted Map block.', 'jeo' ),
-			} );
-			return;
-		}
-
 		setAttributes( { status: 'loading' } );
 
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
@@ -530,26 +514,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			generate();
 		}
 	}, [ generationMode, generate, generateFromPrompt ] );
-
-	if ( attributes.status === 'error' && ! mapboxKey ) {
-		return (
-			<div { ...blockProps }>
-				<Placeholder
-					icon="map"
-					label={ __( 'AI-Assisted Map', 'jeo' ) }
-					isColumnLayout={ true }
-					className="jeo-minimap-placeholder"
-				>
-					<p className="jeo-minimap-placeholder__description">
-						{ __( 'AI will analyze your content and suggest relevant map layers, center point, and zoom level.', 'jeo' ) }
-					</p>
-					<Notice status="error" isDismissible={ false } className="jeo-minimap-placeholder__error">
-						{ attributes.message }
-					</Notice>
-				</Placeholder>
-			</div>
-		);
-	}
 
 	if ( attributes.status === 'loading' ) {
 		return (

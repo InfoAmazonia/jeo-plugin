@@ -20,7 +20,9 @@
 | `src/includes/ai/class-layer-data-loader.php` | Converts map-layer → NeuronAI Document |
 | `src/includes/ai/class-color-describer.php` | HSL color analysis for legend embeddings |
 | `src/includes/ai/class-minilayer-agent.php` | NeuronAI agent for Minilayer (MCP tools) |
-| `src/includes/ai/class-minilayer-handler.php` | Minilayer REST endpoint + layer CPT creation |
+| `src/includes/ai/class-minilayer-handler.php` | Minilayer REST endpoint, delegates to `Minilayer_Service` |
+| `src/includes/ai/class-minilayer-service.php` | Shared service — AI style generation, JSON parsing, layer CPT creation (used by handler and `Generate_Layer_Tool`) |
+| `src/includes/ai/class-generate-layer-tool.php` | NeuronAI tool for minimap agent — generates custom Mapbox styles (conditional on Mapbox key) |
 | `src/includes/ai/class-minimap-agent.php` | Minimap agent factory (Assistant::configure with sub-agents, tools, structured output) |
 | `src/includes/ai/class-minimap-output.php` | Structured output DTO (layers, base_layer, center, zoom, pins, messages) |
 | `src/includes/ai/class-search-layers-tool.php` | Agent tool — wraps RAG_Worker::find_matching_layers() |
@@ -234,10 +236,11 @@ The `jeo/ai-minimap` block provides:
 
 | File | Role |
 |------|------|
-| `src/includes/ai/class-minimap-agent.php` | Agent factory (Assistant::configure with tools, sub-agents, storages) |
+| `src/includes/ai/class-minimap-agent.php` | Agent factory (Assistant::configure with tools, sub-agents, storages). Conditionally includes `Generate_Layer_Tool` when Mapbox key is available |
 | `src/includes/ai/class-minimap-output.php` | Structured output DTO |
 | `src/includes/ai/class-search-layers-tool.php` | Semantic layer search tool |
 | `src/includes/ai/class-geocode-tool.php` | Geocoding tool with fallback chain |
+| `src/includes/ai/class-generate-layer-tool.php` | Custom Mapbox style generation tool (conditional, requires Mapbox key + user authorization) |
 | `src/includes/ai/class-get-post-content-tool.php` | Post content tool for post_analyzer sub-agent |
 | `src/includes/ai/class-wp-storage.php` | Post/user meta storage adapter |
 | `src/includes/ai/class-wp-option-storage.php` | WP options storage adapter (global learning) |
@@ -245,3 +248,7 @@ The `jeo/ai-minimap` block provides:
 ## Minilayer (AI-Generated Layers)
 
 See [`minilayer/README.md`](../minilayer/README.md).
+
+The minilayer pipeline is shared between:
+- The standalone REST endpoint (`/jeo/v1/minilayer/generate`)
+- The minimap agent's `Generate_Layer_Tool` (conditional, requires Mapbox key + user authorization)
