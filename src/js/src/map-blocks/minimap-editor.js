@@ -16,6 +16,12 @@ import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults, mapbox_key: mapboxKey } = globalThis.jeo_settings;
 
+const LOADING_MESSAGES = [
+	__( 'Analyzing content…', 'jeo' ),
+	__( 'Searching for map layers…', 'jeo' ),
+	__( 'Generating map configuration…', 'jeo' ),
+];
+
 function generateUUID() {
 	return crypto.randomUUID();
 }
@@ -31,6 +37,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const [ chatInput, setChatInput ] = useState( '' );
 	const [ chatPromptVisible, setChatPromptVisible ] = useState( false );
 	const [ chatPrompt, setChatPrompt ] = useState( '' );
+	const [ loadingMsgIndex, setLoadingMsgIndex ] = useState( 0 );
 	const messagesEndRef = useRef( null );
 	const attrsRef = useRef( attributes );
 	attrsRef.current = attributes;
@@ -44,6 +51,17 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			setAttributes( { conversation_id: generateUUID() } );
 		}
 	}, [ attributes.status, attributes.conversation_id, setAttributes ] );
+
+	useEffect( () => {
+		if ( attributes.status !== 'loading' ) {
+			setLoadingMsgIndex( 0 );
+			return;
+		}
+		const timer = setInterval( () => {
+			setLoadingMsgIndex( ( i ) => ( i + 1 ) % LOADING_MESSAGES.length );
+		}, 3000 );
+		return () => clearInterval( timer );
+	}, [ attributes.status ] );
 
 	const normalizedAttributes = useMemo( () => {
 		return coerceMinimapAttributes( attributes, {
@@ -519,8 +537,13 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				<Placeholder
 					icon="map"
 					label={ __( 'AI-Assisted Map', 'jeo' ) }
+					isColumnLayout={ true }
+					className="jeo-minimap-placeholder"
 				>
-					<Notice status="error" isDismissible={ false }>
+					<p className="jeo-minimap-placeholder__description">
+						{ __( 'AI will analyze your content and suggest relevant map layers, center point, and zoom level.', 'jeo' ) }
+					</p>
+					<Notice status="error" isDismissible={ false } className="jeo-minimap-placeholder__error">
 						{ attributes.message }
 					</Notice>
 				</Placeholder>
@@ -534,9 +557,15 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				<Placeholder
 					icon="map"
 					label={ __( 'AI-Assisted Map', 'jeo' ) }
-					instructions={ __( 'Generating map layers…', 'jeo' ) }
+					isColumnLayout={ true }
+					className="jeo-minimap-placeholder"
 				>
-					<Spinner />
+					<div className="jeo-minimap-placeholder__loading">
+						<Spinner />
+						<span className="jeo-minimap-placeholder__loading-text">
+							{ LOADING_MESSAGES[ loadingMsgIndex ] }
+						</span>
+					</div>
 				</Placeholder>
 			</div>
 		);
@@ -548,9 +577,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				<Placeholder
 					icon="map"
 					label={ __( 'AI-Assisted Map', 'jeo' ) }
+					isColumnLayout={ true }
+					className="jeo-minimap-placeholder"
 				>
+					<p className="jeo-minimap-placeholder__description">
+						{ __( 'AI will analyze your content and suggest relevant map layers, center point, and zoom level.', 'jeo' ) }
+					</p>
 					{ attributes.status === 'error' && (
-						<Notice status="error" isDismissible={ false }>
+						<Notice status="error" isDismissible={ false } className="jeo-minimap-placeholder__error">
 							{ attributes.message }
 						</Notice>
 					) }
@@ -573,6 +607,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						variant="primary"
 						onClick={ handleGenerate }
 						disabled={ generationMode === 'prompt' && ! attributes.prompt?.trim() }
+						className="jeo-minimap-placeholder__generate"
 					>
 						{ __( 'Generate map', 'jeo' ) }
 					</Button>
@@ -674,7 +709,9 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							{ chatLoading && (
 								<div className="jeo-chat-message jeo-chat-message--assistant jeo-chat-message--typing">
 									<span className="jeo-chat-message__role">{ __( 'Assistant', 'jeo' ) }</span>
-									<Spinner />
+									<span className="jeo-chat-typing-dots" aria-label={ __( 'Typing…', 'jeo' ) }>
+										<span /><span /><span />
+									</span>
 								</div>
 							) }
 							<div ref={ messagesEndRef } />
@@ -691,28 +728,28 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							onClick={ () => sendChat( chatInput ) }
 							disabled={ chatLoading || ! chatInput.trim() }
 							isSmall
+							icon="arrow-right-alt2"
+							aria-label={ __( 'Send message', 'jeo' ) }
+						/>
+					</div>
+					<div className="jeo-chat-actions">
+						<Button
+							variant="secondary"
+							onClick={ () => sendChat( '', 'regenerate' ) }
+							disabled={ chatLoading }
+							isSmall
 						>
-							{ __( 'Send', 'jeo' ) }
+							{ __( 'Regenerate', 'jeo' ) }
+						</Button>
+						<Button
+							variant="secondary"
+							onClick={ () => setChatPromptVisible( ! chatPromptVisible ) }
+							disabled={ chatLoading }
+							isSmall
+						>
+							{ __( 'New prompt', 'jeo' ) }
 						</Button>
 					</div>
-					<Button
-						variant="secondary"
-						onClick={ () => sendChat( '', 'regenerate' ) }
-						disabled={ chatLoading }
-						isSmall
-						className="jeo-chat-regenerate"
-					>
-						{ __( 'Regenerate', 'jeo' ) }
-					</Button>
-					<hr />
-					<Button
-						variant="secondary"
-						onClick={ () => setChatPromptVisible( ! chatPromptVisible ) }
-						disabled={ chatLoading }
-						isSmall
-					>
-						{ __( 'New prompt', 'jeo' ) }
-					</Button>
 					{ chatPromptVisible && (
 						<div className="jeo-chat-prompt-area">
 							<TextareaControl

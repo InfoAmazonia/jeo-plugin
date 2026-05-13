@@ -328,10 +328,53 @@ ul.jeo-layers-list .components-card {
 }
 
 /**
+ * Minimap Placeholder
+ */
+.jeo-minimap-placeholder {
+	padding: 2em;
+	text-align: center;
+}
+
+.jeo-minimap-placeholder .components-placeholder__label {
+	font-size: 18px;
+	font-weight: 600;
+}
+
+.jeo-minimap-placeholder__description {
+	color: #757575;
+	font-size: 13px;
+	line-height: 1.5;
+	max-width: 420px;
+	margin: 0 auto 16px;
+}
+
+.jeo-minimap-placeholder__error {
+	margin-bottom: 16px;
+}
+
+.jeo-minimap-placeholder__generate {
+	margin-top: 16px;
+}
+
+.jeo-minimap-placeholder__loading {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+	padding: 24px 0;
+}
+
+.jeo-minimap-placeholder__loading-text {
+	color: #757575;
+	font-size: 13px;
+	transition: opacity 0.3s ease-in-out;
+}
+
+/**
  * Minimap Chat Panel
  */
 .jeo-minimap-chat-panel .jeo-chat-messages {
-	max-height: 260px;
+	max-height: 400px;
 	overflow-y: auto;
 	margin-bottom: 12px;
 	border: 1px solid #e0e0e0;
@@ -350,6 +393,10 @@ ul.jeo-layers-list .components-card {
 	word-wrap: break-word;
 }
 
+.jeo-chat-message:last-child {
+	margin-bottom: 0;
+}
+
 .jeo-chat-message--user {
 	margin-left: auto;
 	background: #007cba;
@@ -362,10 +409,45 @@ ul.jeo-layers-list .components-card {
 	color: #1e1e1e;
 }
 
-.jeo-chat-message--typing .components-spinner {
-	margin: 0;
-	width: 16px;
-	height: 16px;
+.jeo-chat-message--typing {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.jeo-chat-typing-dots {
+	display: inline-flex;
+	gap: 3px;
+	align-items: center;
+	padding: 2px 0;
+}
+
+.jeo-chat-typing-dots span {
+	display: inline-block;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #757575;
+	animation: jeo-typing-bounce 1.2s ease-in-out infinite;
+}
+
+.jeo-chat-typing-dots span:nth-child( 2 ) {
+	animation-delay: 0.15s;
+}
+
+.jeo-chat-typing-dots span:nth-child( 3 ) {
+	animation-delay: 0.3s;
+}
+
+@keyframes jeo-typing-bounce {
+	0%, 60%, 100% {
+		transform: translateY( 0 );
+		opacity: 0.4;
+	}
+	30% {
+		transform: translateY( -4px );
+		opacity: 1;
+	}
 }
 
 .jeo-chat-message__role {
@@ -382,7 +464,7 @@ ul.jeo-layers-list .components-card {
 
 .jeo-chat-input-row {
 	display: flex;
-	gap: 8px;
+	gap: 6px;
 	align-items: flex-end;
 	margin-bottom: 8px;
 }
@@ -401,9 +483,10 @@ ul.jeo-layers-list .components-card {
 	resize: vertical;
 }
 
-.jeo-chat-regenerate {
-	display: block;
-	margin-top: 4px;
+.jeo-chat-actions {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 8px;
 }
 
 .jeo-chat-prompt-area {
