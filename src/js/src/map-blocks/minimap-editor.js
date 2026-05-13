@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
-import { renderLayer } from './map-preview-layer';
+import { MemoizedRenderLayer } from './map-preview-layer';
 import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
@@ -91,11 +91,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const layerIds = useMemo( () => {
 		return allLayers.map( ( l ) => l.id ).filter( ( id ) => id > 0 );
 	}, [ JSON.stringify( allLayers.map( ( l ) => l.id ) ) ] );
-
-	const layerSettingsKey = useMemo(
-		() => JSON.stringify( allLayers ),
-		[ allLayers ]
-	);
 
 	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
@@ -746,7 +741,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 			<div className="jeo-preview-area">
 				<Map
-					key={ `${ key }:${ currentZoom }:${ layerSettingsKey }` }
+					key={ key }
 					ref={ mapRef }
 					style={ { height: '50vh' } }
 					latitude={ normalizedAttributes.center_lat }
@@ -773,7 +768,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 								return null;
 							}
 
-							return renderLayer( { layer: layerRecord.meta, instance: layer } );
+							return <MemoizedRenderLayer key={ layer.id } layer={ layerRecord.meta } instance={ layer } />;
 						} ) }
 				</Map>
 			</div>

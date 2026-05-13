@@ -36,7 +36,7 @@ const LayersSidebar = ( {
 	} = { ...mapDefaults, ...postMeta };
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
 
-	const [ key, setKey ] = useState( 0 );
+	const loadedRef = useRef( false );
 	const [ renderControl, setRenderControl ] = useState( {
 		status: 'incomplete_form',
 	} );
@@ -56,6 +56,9 @@ const LayersSidebar = ( {
 	}, [ postMeta.type ] );
 
 	useEffect( () => {
+		if ( renderControl.status !== 'loaded' ) {
+			loadedRef.current = false;
+		}
 		switch ( renderControl.status ) {
 			case 'incomplete_form':
 				createNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ) );
@@ -116,54 +119,41 @@ const LayersSidebar = ( {
 			} );
 			if (
 				! anyEmpty &&
-				renderControl != 'ready' &&
+				renderControl.status !== 'ready' &&
 				! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions )
 			) {
 				setRenderControl( {
 					status: 'ready',
 				} );
-				setKey( key + 1 );
 			}
 			prevPostMeta.current = debouncedPostMeta;
 		}
 	}, [ debouncedPostMeta.layer_type_options, layerTypeSchema ] );
 
-	const origOpen = XMLHttpRequest.prototype.open;
-	XMLHttpRequest.prototype.open = function () {
-		this.addEventListener( 'load', function () {
-			if ( this.status >= 400 ) {
-				setRenderControl( {
-					status: 'request_error',
-					statusCode: this.status,
-				} );
+	const handleMapError = useCallback( ( { target: map, error } ) => {
+		try {
+			const layer = map.getLayer( 'layer_1' );
+			if ( layer ) {
+				map.removeLayer( 'layer_1' );
 			}
-		} );
-		origOpen.apply( this, arguments );
-	};
+		} catch ( err ) {
+			// Layer may not exist yet.
+		}
+
+		const statusCode = error?.status ?? error?.source?.status ?? 400;
+		setRenderControl( { status: 'request_error', statusCode } );
+	}, [] );
 
 	return (
 		<>
 			<LayerPreviewPortal>
 				<Map
-					key={ key }
-					onError={ ( { target: map, error } ) => {
-						try {
-							const layer = map.getLayer( 'layer_1' );
-							if ( layer ) {
-								map.removeLayer( 'layer_1' );
-							}
-							setRenderControl( {
-								status: 'request_error',
-								statusCode: 400,
-							} );
-						} catch ( err ) {
-							setRenderControl( {
-								status: 'request_error',
-								statusCode: 400,
-							} );
-						}
-					} }
+					onError={ handleMapError }
 					onSourceData={ () => {
+						if ( loadedRef.current ) {
+							return;
+						}
+						loadedRef.current = true;
 						setRenderControl( { status: 'loaded' } );
 						unlockPostSaving( 'layer_lock_key' );
 					} }
