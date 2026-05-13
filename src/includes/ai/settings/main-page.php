@@ -109,6 +109,18 @@
 		</div>
 	</div>
 </div>
+	<script>
+		document.addEventListener( 'DOMContentLoaded', function() {
+			var skeleton = document.getElementById( 'jeo-skeleton' );
+			var content  = document.querySelector( '.jeo-tab-content-wrapper' );
+			if ( skeleton ) {
+				skeleton.style.display = 'none';
+			}
+			if ( content ) {
+				content.style.display = 'block';
+			}
+		} );
+	</script>
 
 <style>
 	.jeo-debug-entry { border-bottom: 1px solid #3c434a; padding-bottom: 8px; margin-bottom: 8px; }
