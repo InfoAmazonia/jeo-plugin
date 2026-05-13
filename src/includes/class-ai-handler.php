@@ -1005,11 +1005,19 @@ class AI_Handler {
 	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_chat_prompt_generator( $request ) {
-		$context  = $request->get_param( 'context' );
-		$provider = $request->get_param( 'provider' );
-		$api_key  = $request->get_param( 'api_key' );
-		$model    = $request->get_param( 'model' );
-		$lang     = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
+		$context          = $request->get_param( 'context' );
+		$provider         = $request->get_param( 'provider' );
+		$api_key          = $request->get_param( 'api_key' );
+		$model            = $request->get_param( 'model' );
+		$lang             = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
+		$granularity      = sanitize_text_field( $request->get_param( 'granularity' ) ? $request->get_param( 'granularity' ) : \jeo_settings()->get_option( 'ai_cal_granularity', 'balanced' ) );
+		$confidence       = absint( $request->get_param( 'confidence' ) ? $request->get_param( 'confidence' ) : \jeo_settings()->get_option( 'ai_cal_confidence', 50 ) );
+		$title_weight     = absint( $request->get_param( 'title_weight' ) ? $request->get_param( 'title_weight' ) : \jeo_settings()->get_option( 'ai_cal_title_weight', 70 ) );
+		$max_tokens       = absint( $request->get_param( 'max_tokens' ) ? $request->get_param( 'max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_max_tokens', 8000 ) );
+		$use_granularity  = $request->get_param( 'use_granularity' ) ? $request->get_param( 'use_granularity' ) : \jeo_settings()->get_option( 'ai_cal_use_granularity', true );
+		$use_confidence   = $request->get_param( 'use_confidence' ) ? $request->get_param( 'use_confidence' ) : \jeo_settings()->get_option( 'ai_cal_use_confidence', true );
+		$use_title_weight = $request->get_param( 'use_title_weight' ) ? $request->get_param( 'use_title_weight' ) : \jeo_settings()->get_option( 'ai_cal_use_title_weight', true );
+		$use_max_tokens   = $request->get_param( 'use_max_tokens' ) ? $request->get_param( 'use_max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_use_max_tokens', true );
 
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
@@ -1067,11 +1075,34 @@ class AI_Handler {
 				break;
 		}
 
+		$calibration_rules = '';
+		if ( $use_granularity ) {
+			if ( 'broad' === $granularity ) {
+				$calibration_rules .= "- Prefer extracting large-scale locations (countries, regions, states, major cities). Avoid small neighborhoods, streets, or individual landmarks.\n";
+			} elseif ( 'fine' === $granularity ) {
+				$calibration_rules .= "- Prioritize extracting specific, fine-grained locations (streets, landmarks, neighborhoods, points of interest). Do not skip detailed addresses or place names.\n";
+			} else {
+				$calibration_rules .= "- Extract a balanced mix of locations: cities, neighborhoods, and notable landmarks. Use common sense to determine importance.\n";
+			}
+		}
+		if ( $use_confidence ) {
+			$calibration_rules .= "- Only output locations with a confidence level of at least {$confidence}. If uncertain, skip the location rather than guessing.\n";
+		}
+		if ( $use_title_weight ) {
+			$calibration_rules .= "- When a location is mentioned in the post title, apply a priority boost of {$title_weight} percent. Title mentions usually indicate the primary geographic focus of the content.\n";
+		}
+		if ( $use_max_tokens ) {
+			$calibration_rules .= "- The generated system prompt MUST be concise enough to fit within a {$max_tokens} token budget. Avoid redundant examples and verbose explanations. Focus on the most critical rules.\n";
+		}
+
 		// Meta-prompt instructed to build a JEO prompt.
 		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
 The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
 Write a clear, strict System Prompt that incorporates the user's rules.
 {$model_optimization}
+
+### CALIBRATION RULES
+{$calibration_rules}
 
 ### OUTPUT FORMAT MANDATE
 You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
@@ -1213,6 +1244,14 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$content = $post->post_content;
 		}
 
+		// Optionally append taxonomy terms to provide extra context for georeferencing.
+		if ( ! empty( $post_id ) && \jeo_settings()->get_option( 'ai_include_taxonomies' ) ) {
+			$tax_context = $this->get_post_taxonomy_context( $post_id );
+			if ( ! empty( $tax_context ) ) {
+				$content .= "\n\n" . $tax_context;
+			}
+		}
+
 		try {
 			$adapter = $this->get_active_adapter();
 
@@ -1239,6 +1278,30 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 				500
 			);
 		}
+	}
+
+	/**
+	 * Build a taxonomy context string from a post's categories and tags.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string
+	 */
+	private function get_post_taxonomy_context( $post_id ) {
+		$lines = array();
+
+		$categories = get_the_category( $post_id );
+		if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+			$names   = wp_list_pluck( $categories, 'name' );
+			$lines[] = 'Categories: ' . implode( ', ', $names );
+		}
+
+		$tags = get_the_tags( $post_id );
+		if ( ! empty( $tags ) && ! is_wp_error( $tags ) ) {
+			$names   = wp_list_pluck( $tags, 'name' );
+			$lines[] = 'Tags: ' . implode( ', ', $names );
+		}
+
+		return empty( $lines ) ? '' : implode( "\n", $lines );
 	}
 
 	/**

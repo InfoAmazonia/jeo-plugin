@@ -45,7 +45,16 @@ class Settings {
 		'ai_system_prompt'                => '',
 		'ai_use_custom_prompt'            => false,
 		'ai_debug_mode'                   => false,
+		'ai_include_taxonomies'           => false,
 		'ai_embedding_model'              => '',
+		'ai_cal_granularity'              => 'balanced',
+		'ai_cal_confidence'               => 50,
+		'ai_cal_title_weight'             => 70,
+		'ai_cal_max_tokens'               => 8000,
+		'ai_cal_use_granularity'          => true,
+		'ai_cal_use_confidence'           => true,
+		'ai_cal_use_title_weight'         => true,
+		'ai_cal_use_max_tokens'           => true,
 
 		// Bulk AI.
 		'jeo_bulk_ai_active'              => false,
@@ -208,7 +217,7 @@ class Settings {
 		// Checkboxes grouped by tab.
 		$booleans_by_tab = array(
 			'general'   => array( 'show_storymaps_on_post_archives' ),
-			'provider'  => array( 'ai_use_custom_prompt', 'ai_debug_mode' ),
+			'provider'  => array( 'ai_use_custom_prompt', 'ai_debug_mode', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens' ),
 			'bulk'      => array( 'jeo_bulk_ai_active', 'jeo_bulk_logging' ),
 			'knowledge' => array( 'jeo_rag_auto_index' ),
 		);
@@ -220,11 +229,37 @@ class Settings {
 			}
 		} else {
 			// Fallback if no tab identifier (e.g. direct API updates or older logic).
-			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_use_custom_prompt', 'show_storymaps_on_post_archives' );
+			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_use_custom_prompt', 'ai_include_taxonomies', 'show_storymaps_on_post_archives', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens' );
 			foreach ( $all_booleans as $bool_key ) {
 				if ( isset( $input[ $bool_key ] ) ) {
 					$input[ $bool_key ] = ! empty( $input[ $bool_key ] );
 				}
+			}
+		}
+
+		// AI Calibration controls sanitization.
+		if ( isset( $input['ai_cal_granularity'] ) ) {
+			$input['ai_cal_granularity'] = sanitize_text_field( $input['ai_cal_granularity'] );
+			if ( ! in_array( $input['ai_cal_granularity'], array( 'broad', 'balanced', 'fine' ), true ) ) {
+				$input['ai_cal_granularity'] = 'balanced';
+			}
+		}
+		if ( isset( $input['ai_cal_confidence'] ) ) {
+			$input['ai_cal_confidence'] = absint( $input['ai_cal_confidence'] );
+			if ( $input['ai_cal_confidence'] < 0 || $input['ai_cal_confidence'] > 100 ) {
+				$input['ai_cal_confidence'] = 50;
+			}
+		}
+		if ( isset( $input['ai_cal_title_weight'] ) ) {
+			$input['ai_cal_title_weight'] = absint( $input['ai_cal_title_weight'] );
+			if ( $input['ai_cal_title_weight'] < 0 || $input['ai_cal_title_weight'] > 100 ) {
+				$input['ai_cal_title_weight'] = 70;
+			}
+		}
+		if ( isset( $input['ai_cal_max_tokens'] ) ) {
+			$input['ai_cal_max_tokens'] = absint( $input['ai_cal_max_tokens'] );
+			if ( $input['ai_cal_max_tokens'] < 1000 || $input['ai_cal_max_tokens'] > 100000 ) {
+				$input['ai_cal_max_tokens'] = 8000;
 			}
 		}
 
@@ -379,6 +414,12 @@ class Settings {
 						'confirm_clear_bulk'   => __( 'Isso irá agendar a limpeza de TODOS os posts geolocalizados pela IA em segundo plano. Deseja continuar?', 'jeo' ),
 						'confirm_clear_bulk_2' => __( 'TEM CERTEZA? Esta ação não pode ser desfeita e exigirá uma nova vetorização completa para estes posts.', 'jeo' ),
 						'bulk_clear_started'   => __( 'Limpeza em massa iniciada em segundo plano.', 'jeo' ),
+						'expand'               => __( 'Expandir', 'jeo' ),
+						'collapse'             => __( 'Recolher', 'jeo' ),
+						'back'                 => __( 'Voltar', 'jeo' ),
+						'low'                  => __( 'Baixo', 'jeo' ),
+						'fair'                 => __( 'Regular', 'jeo' ),
+						'optimal'              => __( 'Ótimo', 'jeo' ),
 					),
 				)
 			);

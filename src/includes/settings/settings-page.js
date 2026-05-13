@@ -275,6 +275,129 @@
 			localStorage.setItem('jeo_ai_assistant_context', $(this).val());
 		});
 
+		// Ensure collapse buttons are hidden on page load (prevents browser state restoration issues)
+		$('#jeo-ai-collapse-btn, #jeo-ai-sys-collapse-btn').hide();
+
+		// Expand / Collapse textarea fullscreen
+		function toggleFullscreen(e) {
+			if (e) { e.preventDefault(); e.stopPropagation(); }
+			var $ta = $('#jeo-ai-chat-input');
+			var $expandBtn = $('#jeo-ai-expand-btn');
+			var $collapseBtn = $('#jeo-ai-collapse-btn');
+			if ($ta.hasClass('jeo-chat-fullscreen')) {
+				$ta.removeClass('jeo-chat-fullscreen');
+				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.expand : 'Expand'));
+				$collapseBtn.hide();
+			} else {
+				$ta.addClass('jeo-chat-fullscreen').focus();
+				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.collapse : 'Collapse'));
+				$collapseBtn.show();
+			}
+		}
+		$('#jeo-ai-expand-btn').on('click', toggleFullscreen);
+		$('#jeo-ai-collapse-btn').on('click', toggleFullscreen);
+
+		// Expand / Collapse system prompt textarea fullscreen
+		function toggleSysFullscreen(e) {
+			if (e) { e.preventDefault(); e.stopPropagation(); }
+			var $ta = $('#ai_system_prompt');
+			var $expandBtn = $('#jeo-ai-sys-expand-btn');
+			var $collapseBtn = $('#jeo-ai-sys-collapse-btn');
+			if ($ta.hasClass('jeo-sys-fullscreen')) {
+				$ta.removeClass('jeo-sys-fullscreen');
+				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.expand : 'Expand'));
+				$collapseBtn.hide();
+			} else {
+				$ta.addClass('jeo-sys-fullscreen').focus();
+				$expandBtn.html('⛶ ' + (jeo_settings.i18n ? jeo_settings.i18n.collapse : 'Collapse'));
+				$collapseBtn.show();
+			}
+		}
+		$('#jeo-ai-sys-expand-btn').on('click', toggleSysFullscreen);
+		$('#jeo-ai-sys-collapse-btn').on('click', toggleSysFullscreen);
+
+		// Calibration toggles: enable/disable controls
+		function bindCalToggle(toggleId, controlSelector) {
+			var $toggle = $('#' + toggleId);
+			var $controls = $(controlSelector);
+			var $row = $toggle.closest('.jeo-ai-cal-row');
+			function updateState() {
+				var enabled = $toggle.is(':checked');
+				$controls.prop('disabled', !enabled);
+				$row.toggleClass('is-disabled', !enabled);
+			}
+			$toggle.on('change', updateState);
+			updateState();
+		}
+		bindCalToggle('jeo-ai-cal-use-granularity', '#jeo-ai-cal-granularity');
+		bindCalToggle('jeo-ai-cal-use-confidence', '#jeo-ai-cal-confidence');
+		bindCalToggle('jeo-ai-cal-use-title-weight', '#jeo-ai-cal-title-weight');
+		// Max tokens toggle with extra UI (thermometer + unlimited message)
+		(function() {
+			var $toggle = $('#jeo-ai-cal-use-max-tokens');
+			var $control = $('#jeo-ai-cal-max-tokens');
+			var $row = $toggle.closest('.jeo-ai-cal-row');
+			var $tokenUis = $('.jeo-ai-token-ui');
+			var $unlimitedMsg = $('.jeo-ai-unlimited-msg');
+			function updateState() {
+				var enabled = $toggle.is(':checked');
+				$control.prop('disabled', !enabled);
+				$row.toggleClass('is-disabled', !enabled);
+				if (enabled) {
+					$tokenUis.show();
+					$unlimitedMsg.hide();
+				} else {
+					$tokenUis.hide();
+					$unlimitedMsg.show();
+				}
+			}
+			$toggle.on('change', updateState);
+			updateState();
+		})();
+
+		// Calibration slider live value updates
+		function bindCalSlider(id) {
+			var $input = $('#' + id);
+			var $val = $('#' + id + '-val');
+			if (!$input.length) return;
+			$input.on('input', function() {
+				$val.text($input.val());
+			});
+		}
+		bindCalSlider('jeo-ai-cal-confidence');
+		bindCalSlider('jeo-ai-cal-title-weight');
+
+		// Max tokens slider with formatted value
+		(function() {
+			var $input = $('#jeo-ai-cal-max-tokens');
+			var $val = $('#jeo-ai-cal-max-tokens-val');
+			var $thermo = $('#jeo-ai-token-thermometer');
+			var $label = $('#jeo-ai-token-thermo-label');
+			if (!$input.length) return;
+			function updateTokenUI() {
+				var v = parseInt($input.val(), 10);
+				$val.text(v.toLocaleString());
+				var pct = Math.max(1, Math.min(100, Math.round((v - 1000) / 99000 * 100)));
+				$thermo.css('width', pct + '%');
+				var i18n = jeo_settings.i18n || {};
+				if (v < 4000) {
+					$thermo.css('background', '#d63638');
+					$label.text(i18n.low || 'Low').css('color', '#d63638');
+				} else if (v < 16000) {
+					$thermo.css('background', '#f0c33c');
+					$label.text(i18n.fair || 'Fair').css('color', '#996b00');
+				} else if (v < 32000) {
+					$thermo.css('background', '#72aee6');
+					$label.text(i18n.balanced || 'Balanced').css('color', '#2271b1');
+				} else {
+					$thermo.css('background', '#00a32a');
+					$label.text(i18n.optimal || 'Optimal').css('color', '#00a32a');
+				}
+			}
+			$input.on('input', updateTokenUI);
+			updateTokenUI();
+		})();
+
 		$('#jeo-ai-generate-prompt-btn').click(function(e) {
 			e.preventDefault();
 			var $btn = $(this);
@@ -297,6 +420,24 @@
 			var isMasked = key && key.indexOf('********') !== -1;
 			var apiData = { context: context, provider: provider, model: model, lang: lang };
 			if (!isMasked) apiData.api_key = key;
+
+			// Calibration controls (only send if toggle is active)
+			apiData.use_granularity = $('#jeo-ai-cal-use-granularity').is(':checked') ? 1 : 0;
+			apiData.use_confidence = $('#jeo-ai-cal-use-confidence').is(':checked') ? 1 : 0;
+			apiData.use_title_weight = $('#jeo-ai-cal-use-title-weight').is(':checked') ? 1 : 0;
+			apiData.use_max_tokens = $('#jeo-ai-cal-use-max-tokens').is(':checked') ? 1 : 0;
+			if ($('#jeo-ai-cal-use-granularity').is(':checked')) {
+				apiData.granularity = $('#jeo-ai-cal-granularity').val();
+			}
+			if ($('#jeo-ai-cal-use-confidence').is(':checked')) {
+				apiData.confidence = parseInt($('#jeo-ai-cal-confidence').val(), 10);
+			}
+			if ($('#jeo-ai-cal-use-title-weight').is(':checked')) {
+				apiData.title_weight = parseInt($('#jeo-ai-cal-title-weight').val(), 10);
+			}
+			if ($('#jeo-ai-cal-use-max-tokens').is(':checked')) {
+				apiData.max_tokens = parseInt($('#jeo-ai-cal-max-tokens').val(), 10);
+			}
 
 			$btn.prop('disabled', true).text('Generating...');
 			$status.text('Asking LLM...').css('color', '#007cba');
