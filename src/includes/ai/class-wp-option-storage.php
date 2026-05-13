@@ -22,9 +22,13 @@ class WP_Option_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @param array  $data  Data to store.
 	 */
-	public function save( string $namespace, string $key, array $data ): void {
-		$option_key  = $this->build_option_key( $namespace );
+	public function save( string $space, string $key, array $data ): void {
+		$option_key  = $this->build_option_key( $space );
 		$all         = get_option( $option_key, array() );
 		$all[ $key ] = array_merge( $data, array( '_saved_at' => time() ) );
 		update_option( $option_key, $all, false );
@@ -32,9 +36,13 @@ class WP_Option_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @return array|null Stored data or null.
 	 */
-	public function load( string $namespace, string $key ): ?array {
-		$option_key = $this->build_option_key( $namespace );
+	public function load( string $space, string $key ): ?array {
+		$option_key = $this->build_option_key( $space );
 		$all        = get_option( $option_key, array() );
 		if ( ! is_array( $all ) || ! isset( $all[ $key ] ) ) {
 			return null;
@@ -44,9 +52,13 @@ class WP_Option_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @return bool
 	 */
-	public function delete( string $namespace, string $key ): bool {
-		$option_key = $this->build_option_key( $namespace );
+	public function delete( string $space, string $key ): bool {
+		$option_key = $this->build_option_key( $space );
 		$all        = get_option( $option_key, array() );
 		if ( ! is_array( $all ) || ! isset( $all[ $key ] ) ) {
 			return false;
@@ -61,9 +73,13 @@ class WP_Option_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @return bool
 	 */
-	public function exists( string $namespace, string $key ): bool {
-		$option_key = $this->build_option_key( $namespace );
+	public function exists( string $space, string $key ): bool {
+		$option_key = $this->build_option_key( $space );
 		$all        = get_option( $option_key, array() );
 		return is_array( $all ) && isset( $all[ $key ] );
 	}
@@ -71,10 +87,12 @@ class WP_Option_Storage implements StorageInterface {
 	/**
 	 * {@inheritdoc}
 	 *
+	 * @param string $space   Storage namespace.
+	 * @param string $pattern Key pattern for filtering.
 	 * @return string[]
 	 */
-	public function list( string $namespace, string $pattern = '*' ): array {
-		$option_key = $this->build_option_key( $namespace );
+	public function list( string $space, string $pattern = '*' ): array {
+		$option_key = $this->build_option_key( $space );
 		$all        = get_option( $option_key, array() );
 		if ( ! is_array( $all ) ) {
 			return array();
@@ -97,10 +115,13 @@ class WP_Option_Storage implements StorageInterface {
 	/**
 	 * {@inheritdoc}
 	 *
+	 * @param string $space Storage namespace.
+	 * @param string $query Search query string.
+	 * @param int    $limit Maximum results to return.
 	 * @return array{data: array, score: float}[]
 	 */
-	public function search( string $namespace, string $query, int $limit = 10 ): array {
-		$option_key = $this->build_option_key( $namespace );
+	public function search( string $space, string $query, int $limit = 10 ): array {
+		$option_key = $this->build_option_key( $space );
 		$all        = get_option( $option_key, array() );
 		if ( ! is_array( $all ) ) {
 			return array();
@@ -147,11 +168,12 @@ class WP_Option_Storage implements StorageInterface {
 	/**
 	 * {@inheritdoc}
 	 *
-	 * @param array{max_age_days?: int, max_per_namespace?: int} $criteria
-	 * @return int
+	 * @param string $space    Storage namespace.
+	 * @param array  $criteria Cleanup criteria (max_age_days, max_per_namespace).
+	 * @return int Number of entries removed.
 	 */
-	public function cleanup( string $namespace, array $criteria = array() ): int {
-		$option_key = $this->build_option_key( $namespace );
+	public function cleanup( string $space, array $criteria = array() ): int {
+		$option_key = $this->build_option_key( $space );
 		$all        = get_option( $option_key, array() );
 		if ( ! is_array( $all ) ) {
 			return 0;
@@ -196,11 +218,11 @@ class WP_Option_Storage implements StorageInterface {
 	/**
 	 * Build the option key for a namespace.
 	 *
-	 * @param string $namespace Storage namespace.
+	 * @param string $space Storage namespace.
 	 * @return string
 	 */
-	protected function build_option_key( string $namespace ): string {
-		$safe_ns = preg_replace( '/[^a-z0-9_]/', '_', strtolower( $namespace ) );
+	protected function build_option_key( string $space ): string {
+		$safe_ns = preg_replace( '/[^a-z0-9_]/', '_', strtolower( $space ) );
 		return "jeo_ai_{$safe_ns}";
 	}
 }

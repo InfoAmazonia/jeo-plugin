@@ -74,8 +74,9 @@ class Get_Post_Content_Tool extends Tool {
 			'name'
 		);
 
-		$tags = wp_list_pluck(
-			get_the_tags( $post_id ) ?: array(),
+		$tags_raw = get_the_tags( $post_id );
+		$tags     = wp_list_pluck(
+			false !== $tags_raw ? $tags_raw : array(),
 			'name'
 		);
 

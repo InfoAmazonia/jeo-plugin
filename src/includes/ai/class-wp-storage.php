@@ -45,59 +45,78 @@ class WP_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @param array  $data  Data to store.
 	 */
-	public function save( string $namespace, string $key, array $data ): void {
-		$meta_key = $this->build_key( $namespace, $key );
+	public function save( string $space, string $key, array $data ): void {
+		$meta_key = $this->build_key( $space, $key );
 		update_metadata( $this->meta_type, $this->object_id, $meta_key, $data );
 	}
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @return array|null Stored data or null.
 	 */
-	public function load( string $namespace, string $key ): ?array {
-		$meta_key = $this->build_key( $namespace, $key );
+	public function load( string $space, string $key ): ?array {
+		$meta_key = $this->build_key( $space, $key );
 		$meta     = get_metadata( $this->meta_type, $this->object_id, $meta_key, true );
 		return is_array( $meta ) ? $meta : null;
 	}
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @return bool
 	 */
-	public function delete( string $namespace, string $key ): bool {
-		$meta_key = $this->build_key( $namespace, $key );
+	public function delete( string $space, string $key ): bool {
+		$meta_key = $this->build_key( $space, $key );
 		return delete_metadata( $this->meta_type, $this->object_id, $meta_key );
 	}
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
+	 * @return bool
 	 */
-	public function exists( string $namespace, string $key ): bool {
-		$meta_key = $this->build_key( $namespace, $key );
+	public function exists( string $space, string $key ): bool {
+		$meta_key = $this->build_key( $space, $key );
 		return metadata_exists( $this->meta_type, $this->object_id, $meta_key );
 	}
 
 	/**
 	 * {@inheritdoc}
 	 *
+	 * @param string $space   Storage namespace.
+	 * @param string $pattern Key pattern for filtering.
 	 * @return string[]
 	 */
-	public function list( string $namespace, string $pattern = '*' ): array {
+	public function list( string $space, string $pattern = '*' ): array {
 		global $wpdb;
 
 		$table  = $this->get_table();
 		$column = $this->get_id_column();
-		$prefix = $wpdb->esc_like( '_jeo_ai_' . $namespace . '_' );
+		$prefix = $wpdb->esc_like( '_jeo_ai_' . $space . '_' );
 		$like   = $prefix . '%';
 
 		$rows = $wpdb->get_col(
 			$wpdb->prepare(
+				// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table and $column are derived from trusted $wpdb properties.
 				"SELECT meta_key FROM {$table} WHERE {$column} = %d AND meta_key LIKE %s",
 				$this->object_id,
 				$like
 			)
 		);
 
-		$prefix_len = strlen( '_jeo_ai_' . $namespace . '_' );
+		$prefix_len = strlen( '_jeo_ai_' . $space . '_' );
 		$results    = array();
 
 		foreach ( $rows as $meta_key ) {
@@ -113,17 +132,20 @@ class WP_Storage implements StorageInterface {
 	/**
 	 * {@inheritdoc}
 	 *
+	 * @param string $space Storage namespace.
+	 * @param string $query Search query string.
+	 * @param int    $limit Maximum results to return.
 	 * @return array{data: array, score: float}[]
 	 */
-	public function search( string $namespace, string $query, int $limit = 10 ): array {
-		$all     = $this->list( $namespace );
+	public function search( string $space, string $query, int $limit = 10 ): array {
+		$all     = $this->list( $space );
 		$results = array();
 
 		$query_lower = strtolower( $query );
 		$query_words = str_word_count( $query_lower, 1 );
 
 		foreach ( $all as $key ) {
-			$data = $this->load( $namespace, $key );
+			$data = $this->load( $space, $key );
 			if ( null === $data ) {
 				continue;
 			}
@@ -160,12 +182,13 @@ class WP_Storage implements StorageInterface {
 	/**
 	 * {@inheritdoc}
 	 *
-	 * @param array{max_age_days?: int, max_per_namespace?: int} $criteria
-	 * @return int
+	 * @param string $space     Storage namespace.
+	 * @param array  $criteria  Cleanup criteria (max_age_days, max_per_namespace).
+	 * @return int Number of entries removed.
 	 */
-	public function cleanup( string $namespace, array $criteria = array() ): int {
+	public function cleanup( string $space, array $criteria = array() ): int {
 		$removed = 0;
-		$all     = $this->list( $namespace );
+		$all     = $this->list( $space );
 
 		if ( isset( $criteria['max_age_days'] ) ) {
 			$threshold = time() - ( $criteria['max_age_days'] * DAY_IN_SECONDS );
@@ -175,9 +198,10 @@ class WP_Storage implements StorageInterface {
 			$column = $this->get_id_column();
 
 			foreach ( $all as $key ) {
-				$meta_key = $this->build_key( $namespace, $key );
+				$meta_key = $this->build_key( $space, $key );
 				$mtime    = (int) $wpdb->get_var(
 					$wpdb->prepare(
+						// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- $table and $column are derived from trusted $wpdb properties.
 						"SELECT UNIX_TIMESTAMP(meta_id) FROM {$table} WHERE {$column} = %d AND meta_key = %s LIMIT 1",
 						$this->object_id,
 						$meta_key
@@ -185,18 +209,18 @@ class WP_Storage implements StorageInterface {
 				);
 
 				if ( $mtime > 0 && $mtime < $threshold ) {
-					$this->delete( $namespace, $key );
+					$this->delete( $space, $key );
 					++$removed;
 				}
 			}
 
-			$all = $this->list( $namespace );
+			$all = $this->list( $space );
 		}
 
 		if ( isset( $criteria['max_per_namespace'] ) && count( $all ) > $criteria['max_per_namespace'] ) {
 			$to_remove = array_slice( $all, $criteria['max_per_namespace'] );
 			foreach ( $to_remove as $key ) {
-				$this->delete( $namespace, $key );
+				$this->delete( $space, $key );
 				++$removed;
 			}
 		}
@@ -207,12 +231,12 @@ class WP_Storage implements StorageInterface {
 	/**
 	 * Build the meta key from namespace and key.
 	 *
-	 * @param string $namespace Storage namespace.
-	 * @param string $key       Storage key.
+	 * @param string $space Storage namespace.
+	 * @param string $key   Storage key.
 	 * @return string
 	 */
-	protected function build_key( string $namespace, string $key ): string {
-		$safe_ns  = preg_replace( '/[^a-z0-9_\-]/', '_', strtolower( $namespace ) );
+	protected function build_key( string $space, string $key ): string {
+		$safe_ns  = preg_replace( '/[^a-z0-9_\-]/', '_', strtolower( $space ) );
 		$safe_key = preg_replace( '/[^a-z0-9_\-]/', '_', strtolower( $key ) );
 		return "_jeo_ai_{$safe_ns}_{$safe_key}";
 	}

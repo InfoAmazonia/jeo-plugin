@@ -21,17 +21,32 @@ if ( ! defined( 'WPINC' ) ) {
  */
 class Minimap_Output {
 
+	/**
+	 * Thematic map layer definitions.
+	 *
+	 * @var array
+	 */
 	#[SchemaProperty(
 		description: 'Thematic map layer definitions. Each entry has id (int), use ("fixed"), default (true), show_legend (bool).',
 		required: true,
 	)]
 	public array $layers = array();
 
+	/**
+	 * Base terrain layer definition or null.
+	 *
+	 * @var array|null
+	 */
 	#[SchemaProperty(
 		description: 'Base terrain layer definition with id, use, default, show_legend, load_as_style (bool), variant ("dark"|"light"|"satellite"). Null if no base layer.',
 	)]
 	public ?array $base_layer = null;
 
+	/**
+	 * Map center latitude.
+	 *
+	 * @var float
+	 */
 	#[SchemaProperty(
 		description: 'Map center latitude.',
 		required: true,
@@ -40,6 +55,11 @@ class Minimap_Output {
 	)]
 	public float $center_lat = 0.0;
 
+	/**
+	 * Map center longitude.
+	 *
+	 * @var float
+	 */
 	#[SchemaProperty(
 		description: 'Map center longitude.',
 		required: true,
@@ -48,6 +68,11 @@ class Minimap_Output {
 	)]
 	public float $center_lon = 0.0;
 
+	/**
+	 * Initial zoom level.
+	 *
+	 * @var int
+	 */
 	#[SchemaProperty(
 		description: 'Initial zoom level (0–20).',
 		required: true,
@@ -56,22 +81,42 @@ class Minimap_Output {
 	)]
 	public int $initial_zoom = 2;
 
+	/**
+	 * Geolocation pins.
+	 *
+	 * @var array
+	 */
 	#[SchemaProperty(
 		description: 'Geolocation pins. Each entry has lat (float), lon (float), relevance ("primary"|"secondary"), address (string).',
 	)]
 	public array $pins = array();
 
+	/**
+	 * Base layer variant choice.
+	 *
+	 * @var string|null
+	 */
 	#[SchemaProperty(
 		description: 'Base layer variant choice: "dark", "light", or "satellite". Set when the agent decides the variant based on context; null to use the luminance heuristic fallback.',
 	)]
 	public ?string $base_variant = null;
 
+	/**
+	 * Cumulative summary of map-relevant changes.
+	 *
+	 * @var string
+	 */
 	#[SchemaProperty(
 		description: 'Cumulative summary of all map-relevant changes across the conversation so far, shown as a notice above the map. Reflect the full history of what was done and the current state. Omit off-topic exchanges. Keep it concise.',
 		required: true,
 	)]
 	public string $message = '';
 
+	/**
+	 * Optional assistant chat message.
+	 *
+	 * @var string
+	 */
 	#[SchemaProperty(
 		description: 'Optional human-readable summary of what the agent did, shown as an assistant chat message in the block UI.',
 	)]
