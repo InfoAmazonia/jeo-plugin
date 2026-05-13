@@ -20,6 +20,12 @@
         }
     },
     "require": {
-        "neuron-core/neuron-ai": "^3.3"
-    }
+        "neuron-core/neuron-ai": "^3.3",
+        "hacklabr/ai-assistant": "dev-main"
+    },
+    "repositories": [{
+        "name": "hacklabr/ai-assistant",
+        "type": "vcs",
+        "url": "https://github.com/hacklabr/ai-assistant"
+    }]
 }

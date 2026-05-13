@@ -16,6 +16,10 @@ import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults, mapbox_key: mapboxKey } = globalThis.jeo_settings;
 
+function generateUUID() {
+	return crypto.randomUUID();
+}
+
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
 	const [ modal, setModal ] = useState( false );
@@ -23,6 +27,23 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const [ baseVariant, setBaseVariant ] = useState(
 		attributes.base_layer?.variant || 'dark'
 	);
+	const [ chatLoading, setChatLoading ] = useState( false );
+	const [ chatInput, setChatInput ] = useState( '' );
+	const [ chatPromptVisible, setChatPromptVisible ] = useState( false );
+	const [ chatPrompt, setChatPrompt ] = useState( '' );
+	const messagesEndRef = useRef( null );
+	const attrsRef = useRef( attributes );
+	attrsRef.current = attributes;
+
+	useEffect( () => {
+		messagesEndRef.current?.scrollIntoView( { behavior: 'smooth' } );
+	}, [ attributes.conversation ] );
+
+	useEffect( () => {
+		if ( 'ready' === attributes.status && ! attributes.conversation_id ) {
+			setAttributes( { conversation_id: generateUUID() } );
+		}
+	}, [ attributes.status, attributes.conversation_id, setAttributes ] );
 
 	const normalizedAttributes = useMemo( () => {
 		return coerceMinimapAttributes( attributes, {
@@ -81,6 +102,8 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 		setAttributes( { status: 'loading' } );
 
+		const convId = attrsRef.current.conversation_id || generateUUID();
+
 		apiFetch( {
 			path: '/jeo/v1/minimap/setup',
 			method: 'POST',
@@ -97,6 +120,15 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						initial_zoom: response.initial_zoom,
 						pins: response.pins || [],
 						message: response.message || '',
+						conversation_id: convId,
+						conversation: [
+							...( attrsRef.current.conversation || [] ),
+							{
+								role: 'assistant',
+								text: response.message || __( 'Map generated from post content.', 'jeo' ),
+								ts: new Date().toISOString(),
+							},
+						],
 					};
 
 					if ( response.base_layer?.variant ) {
@@ -119,7 +151,170 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			} );
 	}, [ setAttributes ] );
 
+	const sendChat = useCallback( ( message, type = 'text', payload = {} ) => {
+		if ( chatLoading ) {
+			return;
+		}
+		const text = message || '';
+		if ( ! text.trim() && 'regenerate' !== type ) {
+			return;
+		}
+
+		const attrs = attrsRef.current;
+		const convId = attrs.conversation_id || generateUUID();
+		if ( ! attrs.conversation_id ) {
+			setAttributes( { conversation_id: convId } );
+		}
+
+		setChatLoading( true );
+
+		apiFetch( {
+			path: '/jeo/v1/minimap/chat',
+			method: 'POST',
+			data: {
+				conversation_id: convId,
+				post_id: wp.data.select( 'core/editor' ).getCurrentPostId() || 0,
+				message: text,
+				type,
+				payload,
+			},
+		} )
+			.then( ( response ) => {
+				const convUpdates = [];
+				if ( text.trim() && 'regenerate' !== type ) {
+					convUpdates.push( { role: 'user', text, ts: new Date().toISOString() } );
+				}
+
+				if ( response.success ) {
+					convUpdates.push( {
+						role: 'assistant',
+						text: response.assistant_message || response.message || __( 'Map updated.', 'jeo' ),
+						ts: new Date().toISOString(),
+					} );
+
+					setAttributes( {
+						layers: response.layers || attrs.layers,
+						base_layer: response.base_layer || attrs.base_layer,
+						center_lat: response.center_lat ?? attrs.center_lat,
+						center_lon: response.center_lon ?? attrs.center_lon,
+						initial_zoom: response.initial_zoom ?? attrs.initial_zoom,
+						pins: response.pins || attrs.pins,
+						message: response.message || '',
+						conversation: [ ...( attrs.conversation || [] ), ...convUpdates ],
+					} );
+
+					if ( response.base_layer?.variant ) {
+						setBaseVariant( response.base_layer.variant );
+					}
+				} else {
+					convUpdates.push( {
+						role: 'assistant',
+						text: response.message || __( 'Failed to update map.', 'jeo' ),
+						ts: new Date().toISOString(),
+					} );
+					setAttributes( {
+						conversation: [ ...( attrs.conversation || [] ), ...convUpdates ],
+					} );
+				}
+			} )
+			.catch( ( error ) => {
+				const attrs = attrsRef.current;
+				setAttributes( {
+					conversation: [ ...( attrs.conversation || [] ), {
+						role: 'assistant',
+						text: error.message || __( 'Request failed.', 'jeo' ),
+						ts: new Date().toISOString(),
+					} ],
+				} );
+			} )
+			.finally( () => {
+				setChatLoading( false );
+				setChatInput( '' );
+			} );
+	}, [ chatLoading, setAttributes ] );
+
+	const generateFromChatPrompt = useCallback( () => {
+		if ( ! chatPrompt?.trim() || chatLoading ) {
+			return;
+		}
+
+		const attrs = attrsRef.current;
+		const convId = attrs.conversation_id || generateUUID();
+		const userMsg = chatPrompt.trim();
+
+		setChatLoading( true );
+		setChatPromptVisible( false );
+
+		apiFetch( {
+			path: '/jeo/v1/minimap/setup-prompt',
+			method: 'POST',
+			data: {
+				prompt: userMsg,
+				post_id: wp.data.select( 'core/editor' ).getCurrentPostId() || 0,
+				conversation_id: convId,
+			},
+		} )
+			.then( ( response ) => {
+				const currentAttrs = attrsRef.current;
+				const convUpdates = [
+					{ role: 'user', text: userMsg, ts: new Date().toISOString() },
+				];
+
+				if ( response.success ) {
+					convUpdates.push( {
+						role: 'assistant',
+						text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeo' ),
+						ts: new Date().toISOString(),
+					} );
+
+					setAttributes( {
+						layers: response.layers || [],
+						base_layer: response.base_layer || null,
+						center_lat: response.center_lat,
+						center_lon: response.center_lon,
+						initial_zoom: response.initial_zoom,
+						pins: response.pins || currentAttrs.pins,
+						message: response.message || '',
+						conversation_id: convId,
+						conversation: [ ...( currentAttrs.conversation || [] ), ...convUpdates ],
+					} );
+
+					if ( response.base_layer?.variant ) {
+						setBaseVariant( response.base_layer.variant );
+					}
+				} else {
+					convUpdates.push( {
+						role: 'assistant',
+						text: response.message || __( 'Failed to generate from prompt.', 'jeo' ),
+						ts: new Date().toISOString(),
+					} );
+					setAttributes( {
+						conversation: [ ...( currentAttrs.conversation || [] ), ...convUpdates ],
+					} );
+				}
+			} )
+			.catch( ( error ) => {
+				const currentAttrs = attrsRef.current;
+				setAttributes( {
+					conversation: [ ...( currentAttrs.conversation || [] ), {
+						role: 'assistant',
+						text: error.message || __( 'Request failed.', 'jeo' ),
+						ts: new Date().toISOString(),
+					} ],
+				} );
+			} )
+			.finally( () => {
+				setChatLoading( false );
+				setChatPrompt( '' );
+			} );
+	}, [ chatPrompt, chatLoading, setAttributes ] );
+
 	const resuggest = useCallback( () => {
+		if ( attrsRef.current.conversation_id ) {
+			sendChat( '', 'regenerate' );
+			return;
+		}
+
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
 			return;
@@ -143,6 +338,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						initial_zoom: response.initial_zoom,
 						pins: response.pins || [],
 						message: response.message || '',
+						conversation_id: generateUUID(),
+						conversation: [
+							{
+								role: 'assistant',
+								text: response.message || __( 'Map regenerated from post content.', 'jeo' ),
+								ts: new Date().toISOString(),
+							},
+						],
 					};
 
 					if ( response.base_layer?.variant ) {
@@ -163,7 +366,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					message: error.message || __( 'Request failed.', 'jeo' ),
 				} );
 			} );
-	}, [ setAttributes ] );
+	}, [ sendChat, setAttributes ] );
 
 	const generateFromPrompt = useCallback( () => {
 		if ( ! attributes.prompt?.trim() ) {
@@ -181,14 +384,28 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		setAttributes( { status: 'loading' } );
 
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
+		const convId = attrsRef.current.conversation_id || generateUUID();
 
 		apiFetch( {
 			path: '/jeo/v1/minimap/setup-prompt',
 			method: 'POST',
-			data: { prompt: attributes.prompt, post_id: postId || undefined },
+			data: {
+				prompt: attributes.prompt,
+				post_id: postId || undefined,
+				conversation_id: convId,
+			},
 		} )
 			.then( ( response ) => {
 				if ( response.success ) {
+					const convUpdates = [
+						{ role: 'user', text: attributes.prompt, ts: new Date().toISOString() },
+						{
+							role: 'assistant',
+							text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeo' ),
+							ts: new Date().toISOString(),
+						},
+					];
+
 					const updates = {
 						status: 'ready',
 						layers: response.layers || [],
@@ -198,6 +415,8 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						initial_zoom: response.initial_zoom,
 						pins: response.pins || [],
 						message: response.message || '',
+						conversation_id: convId,
+						conversation: [ ...( attrsRef.current.conversation || [] ), ...convUpdates ],
 					};
 
 					if ( response.base_layer?.variant ) {
@@ -222,6 +441,11 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 	const handleBaseVariantChange = useCallback( ( newVariant ) => {
 		setBaseVariant( newVariant );
+
+		if ( attrsRef.current.conversation_id ) {
+			sendChat( `Change the base layer variant to ${ newVariant }.`, 'base_variant', { variant: newVariant } );
+			return;
+		}
 
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
@@ -251,7 +475,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				}
 			}
 		} );
-	}, [ setAttributes ] );
+	}, [ sendChat, setAttributes ] );
 
 	const closeModal = useCallback( () => setModal( false ), [] );
 	const openModal = useCallback( () => setModal( true ), [] );
@@ -429,24 +653,83 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					/>
 				</PanelBody>
 				<PanelBody
-					name="minimap-actions"
-					title={ __( 'AI Suggestions', 'jeo' ) }
-					className="jeo-minimap-actions-panel"
+					name="minimap-chat"
+					title={ __( 'AI Assistant', 'jeo' ) }
+					className="jeo-minimap-chat-panel"
+					initialOpen={ true }
 				>
-					<TextareaControl
-						label={ __( 'Map prompt', 'jeo' ) }
-						value={ attributes.prompt || '' }
-						onChange={ ( v ) => setAttributes( { prompt: v } ) }
-					/>
-					<Button variant="secondary" onClick={ generateFromPrompt } isLarge
-						disabled={ ! attributes.prompt?.trim() }
+					{ attributes.conversation?.length > 0 && (
+						<div className="jeo-chat-messages">
+							{ attributes.conversation.map( ( msg, i ) => (
+								<div
+									key={ i }
+									className={ `jeo-chat-message jeo-chat-message--${ msg.role }` }
+								>
+									<span className="jeo-chat-message__role">
+										{ 'assistant' === msg.role ? __( 'Assistant', 'jeo' ) : __( 'You', 'jeo' ) }
+									</span>
+									<span className="jeo-chat-message__text">{ msg.text }</span>
+								</div>
+							) ) }
+							{ chatLoading && (
+								<div className="jeo-chat-message jeo-chat-message--assistant jeo-chat-message--typing">
+									<span className="jeo-chat-message__role">{ __( 'Assistant', 'jeo' ) }</span>
+									<Spinner />
+								</div>
+							) }
+							<div ref={ messagesEndRef } />
+						</div>
+					) }
+					<div className="jeo-chat-input-row">
+						<TextareaControl
+							value={ chatInput }
+							onChange={ setChatInput }
+							placeholder={ __( 'Ask the AI to refine the map…', 'jeo' ) }
+						/>
+						<Button
+							variant="primary"
+							onClick={ () => sendChat( chatInput ) }
+							disabled={ chatLoading || ! chatInput.trim() }
+							isSmall
+						>
+							{ __( 'Send', 'jeo' ) }
+						</Button>
+					</div>
+					<Button
+						variant="secondary"
+						onClick={ () => sendChat( '', 'regenerate' ) }
+						disabled={ chatLoading }
+						isSmall
+						className="jeo-chat-regenerate"
 					>
-						{ __( 'Generate from prompt', 'jeo' ) }
+						{ __( 'Regenerate', 'jeo' ) }
 					</Button>
 					<hr />
-					<Button variant="secondary" onClick={ resuggest } isLarge>
-						{ __( 'Re-suggest layers', 'jeo' ) }
+					<Button
+						variant="secondary"
+						onClick={ () => setChatPromptVisible( ! chatPromptVisible ) }
+						disabled={ chatLoading }
+						isSmall
+					>
+						{ __( 'New prompt', 'jeo' ) }
 					</Button>
+					{ chatPromptVisible && (
+						<div className="jeo-chat-prompt-area">
+							<TextareaControl
+								value={ chatPrompt }
+								onChange={ setChatPrompt }
+								placeholder={ __( 'Describe the map you want…', 'jeo' ) }
+							/>
+							<Button
+								variant="primary"
+								onClick={ generateFromChatPrompt }
+								disabled={ chatLoading || ! chatPrompt.trim() }
+								isSmall
+							>
+								{ __( 'Generate', 'jeo' ) }
+							</Button>
+						</div>
+					) }
 				</PanelBody>
 			</InspectorControls>
 

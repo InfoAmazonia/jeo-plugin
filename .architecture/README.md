@@ -15,6 +15,7 @@
 | Stories Near You block | [`stories-near-you/README.md`](stories-near-you/README.md) |
 | AI integration (georef, RAG, bulk, minilayer) | [`ai/README.md`](ai/README.md) |
 | Minilayer (AI-generated layers) | [`minilayer/README.md`](minilayer/README.md) |
+| Minimap (AI-assisted map block) | [`minimap/README.md`](minimap/README.md) |
 | REST API endpoints | [`rest-api/README.md`](rest-api/README.md) |
 | Settings, admin pages | [`settings/README.md`](settings/README.md) |
 | Frontend: MapLibre/Mapbox, React, iframe | [`frontend/README.md`](frontend/README.md) |

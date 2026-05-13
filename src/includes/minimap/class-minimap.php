@@ -7,8 +7,16 @@
 
 namespace Jeo;
 
+use HackLab\AIAssistant\Persistence\ConversationStore;
+use Jeo\AI\Minimap_Agent;
+use Jeo\AI\Minimap_Output;
 use Jeo\AI\RAG_Worker;
+use Jeo\AI\WP_Storage;
 use Jeo\Singleton;
+use NeuronAI\Chat\Messages\AssistantMessage;
+use NeuronAI\Chat\Messages\ToolCallMessage;
+use NeuronAI\Chat\Messages\ToolResultMessage;
+use NeuronAI\Chat\Messages\UserMessage;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -99,6 +107,18 @@ class Minimap {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/minimap/chat',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_chat' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -178,10 +198,10 @@ class Minimap {
 	 * @return \WP_REST_Response
 	 */
 	public function api_setup_prompt( $request ) {
-		$prompt    = sanitize_textarea_field( $request->get_param( 'prompt' ) );
-		$post_id   = (int) $request->get_param( 'post_id' );
-		$raw_top_k = $request->get_param( 'top_k' );
-		$top_k     = $raw_top_k ? (int) $raw_top_k : 5;
+		$prompt          = sanitize_textarea_field( $request->get_param( 'prompt' ) );
+		$post_id         = (int) $request->get_param( 'post_id' );
+		$conversation_id = sanitize_text_field( $request->get_param( 'conversation_id' ) );
+		$user_id         = get_current_user_id();
 
 		if ( empty( $prompt ) ) {
 			return new \WP_REST_Response(
@@ -193,71 +213,228 @@ class Minimap {
 			);
 		}
 
-		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
-		if ( empty( $mapbox_key ) ) {
+		$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
+		if ( empty( $active_provider ) ) {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Mapbox API key is not configured. Set the key in JEO Settings.', 'jeo' ),
+					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
 				),
 				400
 			);
 		}
 
-		$layers      = array();
-		$rag_message = '';
+		try {
+			$result = $this->run_agent(
+				$post_id ? $post_id : 0,
+				$conversation_id,
+				$user_id,
+				$prompt
+			);
+
+			return new \WP_REST_Response( $result->to_rest_response(), 200 );
+		} catch ( \Exception $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage(),
+				),
+				500
+			);
+		}
+	}
+
+	/**
+	 * REST callback: refine a minimap via multi-turn conversation.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_chat( $request ) {
+		$conversation_id = sanitize_text_field( $request->get_param( 'conversation_id' ) );
+		$post_id         = (int) $request->get_param( 'post_id' );
+		$message         = sanitize_textarea_field( $request->get_param( 'message' ) );
+		$type_param      = sanitize_text_field( $request->get_param( 'type' ) );
+		$type            = ! empty( $type_param ) ? $type_param : 'text';
+		$user_id         = get_current_user_id();
+
+		if ( empty( $conversation_id ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'conversation_id is required.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		if ( empty( $message ) && 'regenerate' !== $type ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'A message is required.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
+		if ( empty( $active_provider ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		$resolved_message = $this->resolve_structured_message( $type, $message, $request );
 
 		try {
-			$results = RAG_Worker::find_matching_layers( $prompt, $top_k );
-			foreach ( $results as $result ) {
-				$layer_id = (int) $result['layer_id'];
-				if ( $layer_id && 'publish' === get_post_status( $layer_id ) ) {
-					$layers[] = array(
-						'id'          => $layer_id,
-						'use'         => 'fixed',
-						'default'     => true,
-						'show_legend' => true,
-					);
-				}
-			}
+			$result = $this->run_agent(
+				$post_id,
+				$conversation_id,
+				$user_id,
+				$resolved_message
+			);
+
+			return new \WP_REST_Response( $result->to_rest_response(), 200 );
 		} catch ( \Exception $e ) {
-			$rag_message = $e->getMessage();
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage(),
+				),
+				500
+			);
+		}
+	}
+
+	/**
+	 * Run the minimap agent and return a Minimap_Output.
+	 *
+	 * Handles base layer creation/assignment and applies the luminance
+	 * heuristic as a fallback when the agent does not return base_variant.
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @param int    $user_id         User ID.
+	 * @param string $message         User message to the agent.
+	 * @return Minimap_Output
+	 * @throws \Exception On agent failure.
+	 */
+	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message ): Minimap_Output {
+		$assistant = Minimap_Agent::create( $post_id, $conversation_id, $user_id ? $user_id : null );
+
+		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
+		$this->inject_history( $assistant, $store, $conversation_id );
+
+		$result = $assistant->structured( new UserMessage( $message ) );
+
+		$this->persist_history( $assistant, $store, $conversation_id );
+
+		if ( null === $result->base_layer ) {
+			$base_variant       = $result->base_variant ? $result->base_variant : $this->determine_base_variant( $result->layers );
+			$result->base_layer = $this->get_or_create_base_layer( $base_variant );
 		}
 
-		if ( empty( $layers ) ) {
-			$rag_message = $rag_message ? $rag_message : __( 'No matching layers found. Add layers manually or run the RAG indexer in JEO Settings.', 'jeo' );
+		if ( empty( $result->pins ) && $post_id ) {
+			$result->pins = $this->get_pins( $post_id );
 		}
 
-		$center_zoom = $this->geocode_prompt( $prompt );
-		$pins        = array();
+		return $result;
+	}
 
-		if ( $post_id ) {
-			$pins = $this->get_pins( $post_id );
+	/**
+	 * Inject prior conversation messages into the assistant's chat history.
+	 *
+	 * @param \HackLab\AIAssistant\Assistant $assistant       Configured assistant.
+	 * @param ConversationStore              $store           Conversation store.
+	 * @param string                         $conversation_id Thread ID.
+	 */
+	private function inject_history( $assistant, ConversationStore $store, string $conversation_id ): void {
+		$raw_messages = $store->loadThread( $conversation_id );
+		if ( empty( $raw_messages ) ) {
+			return;
+		}
 
-			if ( ! empty( $pins ) ) {
-				$post_center_zoom    = $this->compute_center_zoom( $post_id );
-				$center_zoom['lat']  = $post_center_zoom['lat'];
-				$center_zoom['lon']  = $post_center_zoom['lon'];
-				$center_zoom['zoom'] = $post_center_zoom['zoom'];
+		$history = $assistant->getChatHistory();
+		foreach ( $raw_messages as $msg ) {
+			if ( ! is_array( $msg ) || empty( $msg['role'] ) || empty( $msg['content'] ) ) {
+				continue;
+			}
+
+			$text = is_string( $msg['content'] ) ? $msg['content'] : wp_json_encode( $msg['content'] );
+			if ( 'assistant' === $msg['role'] ) {
+				$history->addMessage( new AssistantMessage( $text ) );
+			} else {
+				$history->addMessage( new UserMessage( $text ) );
 			}
 		}
+	}
 
-		$base_variant = $this->determine_base_variant( $layers );
-		$base_layer   = $this->get_or_create_base_layer( $base_variant );
+	/**
+	 * Persist the assistant's chat history after a structured call.
+	 *
+	 * Only stores user and assistant text messages for context continuity.
+	 *
+	 * @param \HackLab\AIAssistant\Assistant $assistant       Configured assistant.
+	 * @param ConversationStore              $store           Conversation store.
+	 * @param string                         $conversation_id Thread ID.
+	 */
+	private function persist_history( $assistant, ConversationStore $store, string $conversation_id ): void {
+		$messages = $assistant->getChatHistory()->getMessages();
+		$storable = array();
 
-		return new \WP_REST_Response(
-			array(
-				'success'      => true,
-				'layers'       => $layers,
-				'base_layer'   => $base_layer,
-				'center_lat'   => $center_zoom['lat'],
-				'center_lon'   => $center_zoom['lon'],
-				'initial_zoom' => $center_zoom['zoom'],
-				'pins'         => $pins,
-				'message'      => $rag_message,
-			),
-			200
-		);
+		foreach ( $messages as $msg ) {
+			if ( $msg instanceof ToolCallMessage || $msg instanceof ToolResultMessage ) {
+				continue;
+			}
+
+			$role = $msg->getRole();
+			if ( ! in_array( $role, array( 'user', 'assistant' ), true ) ) {
+				continue;
+			}
+			$content = $msg->getContent();
+			if ( empty( $content ) ) {
+				continue;
+			}
+			$storable[] = array(
+				'role'    => $role,
+				'content' => $content,
+			);
+		}
+
+		$store->saveThread( $conversation_id, $storable );
+	}
+
+	/**
+	 * Resolve structured control messages into natural language for the agent.
+	 *
+	 * @param string           $type    Message type.
+	 * @param string           $message Original message.
+	 * @param \WP_REST_Request $request REST request for payload extraction.
+	 * @return string
+	 */
+	private function resolve_structured_message( string $type, string $message, $request ): string {
+		$payload = $request->get_param( 'payload' ) ?? array();
+
+		switch ( $type ) {
+			case 'base_variant':
+				$variant = sanitize_text_field( $payload['variant'] ?? '' );
+				return "Change the base layer variant to {$variant}.";
+
+			case 'add_layers':
+				$topic = sanitize_text_field( $payload['topic'] ?? '' );
+				return "Search for and add additional map layers about: {$topic}";
+
+			case 'regenerate':
+				return 'Generate a completely new map suggestion, ignoring previous choices.';
+
+			default:
+				return $message;
+		}
 	}
 
 	/**
@@ -589,49 +766,6 @@ class Minimap {
 			'show_legend'   => false,
 			'load_as_style' => $load_as_style,
 			'variant'       => $variant,
-		);
-	}
-
-	/**
-	 * Geocode a text prompt and return center coordinates with zoom.
-	 *
-	 * Uses the plugin's active geocoder. Falls back to JEO default map settings
-	 * when geocoding returns no results.
-	 *
-	 * @param string $prompt Text to geocode.
-	 * @return array { lat: float, lon: float, zoom: int }
-	 */
-	private function geocode_prompt( $prompt ) {
-		$defaults = array(
-			'lat'  => (float) \jeo_settings()->get_option( 'map_default_lat', 0 ),
-			'lon'  => (float) \jeo_settings()->get_option( 'map_default_lng', 0 ),
-			'zoom' => (float) \jeo_settings()->get_option( 'map_default_zoom', 2 ),
-		);
-
-		$geocoder = \jeo_geocode_handler()->get_active_geocoder();
-		if ( ! $geocoder ) {
-			return $defaults;
-		}
-
-		$results = $geocoder->geocode( $prompt );
-		if ( empty( $results ) || ! is_array( $results ) ) {
-			return $defaults;
-		}
-
-		$first = $results[0];
-		$lat   = isset( $first['lat'] ) ? (float) $first['lat'] : null;
-		$lon   = isset( $first['lon'] ) ? (float) $first['lon'] : null;
-
-		if ( null === $lat || null === $lon || ! is_finite( $lat ) || ! is_finite( $lon ) ) {
-			return $defaults;
-		}
-
-		$zoom = (int) \jeo_settings()->get_option( 'map_default_zoom', 2 );
-
-		return array(
-			'lat'  => round( $lat, 6 ),
-			'lon'  => round( $lon, 6 ),
-			'zoom' => $zoom,
 		);
 	}
 

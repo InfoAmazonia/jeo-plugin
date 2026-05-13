@@ -27,7 +27,8 @@ See [`ai/README.md`](../ai/README.md) for full details.
 | Route | Method | Callback | Description |
 |-------|--------|----------|-------------|
 | `/jeo/v1/minimap/setup` | POST | `api_setup` | Generate map from post content (RAG + post geopoints) |
-| `/jeo/v1/minimap/setup-prompt` | POST | `api_setup_prompt` | Generate map from text prompt (RAG + geocoder). Optional `post_id` to use post pins for zoom |
+| `/jeo/v1/minimap/setup-prompt` | POST | `api_setup_prompt` | Generate map from text prompt via AI agent |
+| `/jeo/v1/minimap/chat` | POST | `api_chat` | Multi-turn map refinement via AI agent (requires `conversation_id`) |
 
 ### Dashboard
 

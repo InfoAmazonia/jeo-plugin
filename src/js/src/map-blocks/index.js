@@ -225,6 +225,22 @@ registerBlockType( 'jeo/ai-minimap', {
 			type: 'string',
 			default: '',
 		},
+		conversation_id: {
+			type: 'string',
+			default: '',
+		},
+		conversation: {
+			type: 'array',
+			default: [],
+			items: {
+				type: 'object',
+				properties: {
+					role: { type: 'string' },
+					text: { type: 'string' },
+					ts: { type: 'string' },
+				},
+			},
+		},
 	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>

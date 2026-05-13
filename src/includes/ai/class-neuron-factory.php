@@ -38,22 +38,22 @@ class Neuron_Factory {
 	 * @param string $provider_name AI provider slug (e.g. 'gemini', 'openai').
 	 * @param string $api_key       API key for the provider.
 	 * @param string $model         Model identifier to use.
+	 * @param bool   $agent_mode    True to skip responseMimeType (needed for Gemini tool calling).
 	 * @return AIProviderInterface
 	 * @throws \Exception If the provider is not supported.
 	 */
-	public static function create_provider( $provider_name, $api_key, $model ): AIProviderInterface {
+	public static function create_provider( $provider_name, $api_key, $model, bool $agent_mode = false ): AIProviderInterface {
 		$temperature_param = array( 'temperature' => 0.1 );
 		switch ( $provider_name ) {
 			case 'gemini':
+				$generation_config = array( 'temperature' => 0.1 );
+				if ( ! $agent_mode ) {
+					$generation_config['responseMimeType'] = 'application/json';
+				}
 				return new Gemini(
 					key: $api_key,
 					model: $model,
-					parameters: array(
-						'generationConfig' => array(
-							'temperature'      => 0.1,
-							'responseMimeType' => 'application/json',
-						),
-					)
+					parameters: array( 'generationConfig' => $generation_config ),
 				);
 			case 'openai':
 				return new OpenAI(
@@ -154,9 +154,10 @@ class Neuron_Factory {
 	/**
 	 * Resolve the currently configured AI provider from JEO settings and return its instance.
 	 *
+	 * @param bool $agent_mode True to skip responseMimeType (needed for Gemini tool calling).
 	 * @return AIProviderInterface
 	 */
-	public static function get_active_provider(): AIProviderInterface {
+	public static function get_active_provider( bool $agent_mode = false ): AIProviderInterface {
 		$active = \jeo_settings()->get_option( 'ai_default_provider' );
 		if ( ! $active ) {
 			$active = 'gemini';
@@ -169,7 +170,7 @@ class Neuron_Factory {
 			$api_key = \jeo_settings()->get_option( 'ollama_url' );
 		}
 
-		return self::create_provider( $active, (string) $api_key, (string) $model );
+		return self::create_provider( $active, (string) $api_key, (string) $model, $agent_mode );
 	}
 
 	/**

@@ -21,6 +21,13 @@
 | `src/includes/ai/class-color-describer.php` | HSL color analysis for legend embeddings |
 | `src/includes/ai/class-minilayer-agent.php` | NeuronAI agent for Minilayer (MCP tools) |
 | `src/includes/ai/class-minilayer-handler.php` | Minilayer REST endpoint + layer CPT creation |
+| `src/includes/ai/class-minimap-agent.php` | Minimap agent factory (Assistant::configure with sub-agents, tools, structured output) |
+| `src/includes/ai/class-minimap-output.php` | Structured output DTO (layers, base_layer, center, zoom, pins, messages) |
+| `src/includes/ai/class-search-layers-tool.php` | Agent tool — wraps RAG_Worker::find_matching_layers() |
+| `src/includes/ai/class-geocode-tool.php` | Agent tool — active geocoder → Mapbox fallback → defaults |
+| `src/includes/ai/class-get-post-content-tool.php` | Agent tool — post content + _related_point meta for sub-agent |
+| `src/includes/ai/class-wp-storage.php` | StorageInterface adapter for post_meta / user_meta |
+| `src/includes/ai/class-wp-option-storage.php` | StorageInterface adapter for wp_options (global learning storage) |
 | `src/includes/ai/data/*.json` | Brazilian geographic dictionaries |
 | `src/includes/cli/class-ai-cli.php` | WP-CLI `wp jeo ai vectorize` |
 
@@ -65,7 +72,8 @@
 | `/jeo/v1/ai-suggest-layers` | POST | Semantic layer matching (post ID or query) |
 | `/jeo/v1/minilayer/generate` | POST | Generate Mapbox style from text prompt (Minilayer) |
 | `/jeo/v1/minimap/setup` | POST | Generate minimap from post content (RAG + post geopoints) |
-| `/jeo/v1/minimap/setup-prompt` | POST | Generate minimap from text prompt (RAG + geocoder) |
+| `/jeo/v1/minimap/setup-prompt` | POST | Generate minimap from text prompt via AI agent |
+| `/jeo/v1/minimap/chat` | POST | Multi-turn conversation for map refinement via AI agent |
 
 ## AI Georeferencing
 
@@ -214,54 +222,25 @@ Dashboard at **Jeo → AI Debug Logs** with metrics per model/provider.
 
 ## Minimap (AI-Assisted Map Block)
 
-The `jeo/ai-minimap` block provides two generation modes, both producing the same output: a map with RAG-matched layers, a base terrain layer, center/zoom, and optional geolocation pins.
+See [`minimap/README.md`](../minimap/README.md) for full architecture, agent details, REST endpoints, and data flows.
 
-### Generation Modes
+The `jeo/ai-minimap` block provides:
 
-| Mode | Endpoint | Input | Center/Zoom Source |
-|------|----------|-------|--------------------|
-| Post content | `POST /jeo/v1/minimap/setup` | `post_id` | Post `_related_point` meta |
-| Text prompt | `POST /jeo/v1/minimap/setup-prompt` | `prompt` (required), `post_id` (optional) | Geocoder (prompt), or post `_related_point` if `post_id` provided with pins |
+- **Post content mode**: Legacy RAG-based generation via `RAG_Worker::find_matching_layers()` (`/minimap/setup`)
+- **Prompt mode**: Full AI agent with structured output, sub-agents, and tools (`/minimap/setup-prompt`)
+- **Chat refinement**: Multi-turn conversation for iterative map changes (`/minimap/chat`)
 
-### Prompt Mode Flow
-
-```mermaid
-sequenceDiagram
-    participant Editor as Gutenberg Editor
-    participant REST as /minimap/setup-prompt
-    participant Minimap as Jeo\Minimap
-    participant RAG as RAG_Worker
-    participant GEO as Active Geocoder
-
-    Editor->>REST: POST {prompt, post_id?}
-    REST->>Minimap: api_setup_prompt()
-    Minimap->>RAG: find_matching_layers(prompt)
-    RAG-->>Minimap: Layer IDs
-    Minimap->>GEO: geocode(prompt)
-    GEO-->>Minimap: {lat, lon}
-    alt post_id provided with pins
-        Minimap->>Minimap: compute_center_zoom(post_id) overrides zoom
-    end
-    Minimap->>Minimap: determine_base_variant(layers)
-    Minimap->>Minimap: get_or_create_base_layer(variant)
-    Minimap-->>REST: {layers, base_layer, center_lat, center_lon, zoom, pins}
-    REST-->>Editor: Response
-```
-
-### Key Files
+### Key Agent Files
 
 | File | Role |
 |------|------|
-| `src/includes/minimap/class-minimap.php` | `Jeo\Minimap` — REST endpoints (`/setup`, `/setup-prompt`), base layer logic, geocode prompt |
-| `src/js/src/map-blocks/minimap-editor.js` | Edit component with prompt textarea + dual generation buttons |
-| `src/js/src/map-blocks/minimap-config.js` | Block attributes including `prompt` |
-
-### Block Attributes (prompt-related)
-
-| Attribute | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `prompt` | `string` | `''` | User's text prompt for map generation |
-| `status` | `string` | `'idle'` | `idle` → `loading` → `ready` / `error` |
+| `src/includes/ai/class-minimap-agent.php` | Agent factory (Assistant::configure with tools, sub-agents, storages) |
+| `src/includes/ai/class-minimap-output.php` | Structured output DTO |
+| `src/includes/ai/class-search-layers-tool.php` | Semantic layer search tool |
+| `src/includes/ai/class-geocode-tool.php` | Geocoding tool with fallback chain |
+| `src/includes/ai/class-get-post-content-tool.php` | Post content tool for post_analyzer sub-agent |
+| `src/includes/ai/class-wp-storage.php` | Post/user meta storage adapter |
+| `src/includes/ai/class-wp-option-storage.php` | WP options storage adapter (global learning) |
 
 ## Minilayer (AI-Generated Layers)
 

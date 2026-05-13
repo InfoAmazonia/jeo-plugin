@@ -326,3 +326,96 @@ ul.jeo-layers-list .components-card {
 .jeo-setting-layer h2 {
 	margin-bottom: 0;
 }
+
+/**
+ * Minimap Chat Panel
+ */
+.jeo-minimap-chat-panel .jeo-chat-messages {
+	max-height: 260px;
+	overflow-y: auto;
+	margin-bottom: 12px;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	padding: 8px;
+	background: #fafafa;
+}
+
+.jeo-chat-message {
+	margin-bottom: 8px;
+	padding: 6px 10px;
+	border-radius: 6px;
+	font-size: 13px;
+	line-height: 1.4;
+	max-width: 85%;
+	word-wrap: break-word;
+}
+
+.jeo-chat-message--user {
+	margin-left: auto;
+	background: #007cba;
+	color: #fff;
+}
+
+.jeo-chat-message--assistant {
+	margin-right: auto;
+	background: #f0f0f0;
+	color: #1e1e1e;
+}
+
+.jeo-chat-message--typing .components-spinner {
+	margin: 0;
+	width: 16px;
+	height: 16px;
+}
+
+.jeo-chat-message__role {
+	display: block;
+	font-size: 11px;
+	font-weight: 600;
+	margin-bottom: 2px;
+	opacity: 0.7;
+}
+
+.jeo-chat-message--user .jeo-chat-message__role {
+	color: rgba( 255, 255, 255, 0.8 );
+}
+
+.jeo-chat-input-row {
+	display: flex;
+	gap: 8px;
+	align-items: flex-end;
+	margin-bottom: 8px;
+}
+
+.jeo-chat-input-row .components-base-control {
+	flex: 1;
+	margin-bottom: 0;
+}
+
+.jeo-chat-input-row .components-base-control__field {
+	margin-bottom: 0;
+}
+
+.jeo-chat-input-row textarea {
+	min-height: 36px;
+	resize: vertical;
+}
+
+.jeo-chat-regenerate {
+	display: block;
+	margin-top: 4px;
+}
+
+.jeo-chat-prompt-area {
+	margin-top: 8px;
+}
+
+.jeo-chat-prompt-area textarea {
+	min-height: 60px;
+	resize: vertical;
+}
+
+.jeo-chat-prompt-area .components-button {
+	margin-top: 8px;
+	display: block;
+}
