@@ -283,7 +283,7 @@ class Stories_Near_You {
 			return;
 		}
 
-		$asset_file = include JEO_BASEPATH . '/js/build/storiesNearYou.asset.php';
+		$asset_file = file_exists( JEO_BASEPATH . '/js/build/storiesNearYou.asset.php' ) ? include JEO_BASEPATH . '/js/build/storiesNearYou.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
 
 		wp_enqueue_style( 'jeo-stories-near-you' );
 

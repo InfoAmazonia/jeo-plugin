@@ -5,6 +5,29 @@
  * @package Jeo
  */
 
+$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
+
+// Early exit: show friendly CTA when no AI provider is configured at all.
+if ( empty( $active_provider ) ) :
+	?>
+	<style>
+		#jeo-skeleton { display: none !important; }
+		.jeo-tab-content-wrapper { display: block !important; }
+	</style>
+	<div class="card" style="max-width: 100%; margin-top: 0; padding: 40px; border-radius: 8px; text-align: center;">
+		<span style="font-size: 48px; display: block; margin-bottom: 20px;">🔌</span>
+		<h2 style="margin-top: 0; color: #1d2327;"><?php esc_html_e( 'AI Provider Required', 'jeo' ); ?></h2>
+		<p style="font-size: 15px; color: #50575e; max-width: 500px; margin: 0 auto 25px; line-height: 1.6;">
+			<?php esc_html_e( 'You need to configure an AI Provider before you can use the Knowledge Base. Set up your API key and choose a model in the Provider tab first.', 'jeo' ); ?>
+		</p>
+		<a href="<?php echo esc_url( admin_url( 'admin.php?page=jeo-ai-settings&tab=provider' ) ); ?>" class="button button-primary button-hero">
+			<?php esc_html_e( 'Configure AI Provider', 'jeo' ); ?>
+		</a>
+	</div>
+	<?php
+	return;
+endif;
+
 $rag_feasibility = \Jeo\AI\RAG_Agent::is_feasible();
 $is_rag_blocked  = is_wp_error( $rag_feasibility );
 ?>
