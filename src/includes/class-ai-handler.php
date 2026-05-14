@@ -280,6 +280,17 @@ class AI_Handler {
 			$api_key = \jeo_settings()->get_option( 'ollama_url' );
 		}
 
+		if ( empty( $api_key ) ) {
+			return new \WP_Error(
+				'jeo_ai_no_key',
+				sprintf(
+					/* translators: %s: AI provider name */
+					__( 'No API key configured for %s. Please add it in JEO → AI Settings.', 'jeo' ),
+					esc_html( $this->get_adapters()[ $active ] ?? $active )
+				)
+			);
+		}
+
 		if ( array_key_exists( $active, $this->get_adapters() ) ) {
 			return new AI\Neuron_Adapter( $active, (string) $api_key, (string) $model );
 		}
@@ -994,11 +1005,23 @@ class AI_Handler {
 	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_chat_prompt_generator( $request ) {
-		$context  = $request->get_param( 'context' );
-		$provider = $request->get_param( 'provider' );
-		$api_key  = $request->get_param( 'api_key' );
-		$model    = $request->get_param( 'model' );
-		$lang     = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
+		$context          = $request->get_param( 'context' );
+		$provider         = $request->get_param( 'provider' );
+		$api_key          = $request->get_param( 'api_key' );
+		$model            = $request->get_param( 'model' );
+		$lang             = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
+		$granularity      = sanitize_text_field( $request->get_param( 'granularity' ) ? $request->get_param( 'granularity' ) : \jeo_settings()->get_option( 'ai_cal_granularity', 'balanced' ) );
+		$confidence       = absint( $request->get_param( 'confidence' ) ? $request->get_param( 'confidence' ) : \jeo_settings()->get_option( 'ai_cal_confidence', 50 ) );
+		$title_weight     = absint( $request->get_param( 'title_weight' ) ? $request->get_param( 'title_weight' ) : \jeo_settings()->get_option( 'ai_cal_title_weight', 70 ) );
+		$max_tokens       = absint( $request->get_param( 'max_tokens' ) ? $request->get_param( 'max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_max_tokens', 8000 ) );
+		$use_granularity  = $request->get_param( 'use_granularity' ) ? $request->get_param( 'use_granularity' ) : \jeo_settings()->get_option( 'ai_cal_use_granularity', true );
+		$use_confidence   = $request->get_param( 'use_confidence' ) ? $request->get_param( 'use_confidence' ) : \jeo_settings()->get_option( 'ai_cal_use_confidence', true );
+		$use_title_weight = $request->get_param( 'use_title_weight' ) ? $request->get_param( 'use_title_weight' ) : \jeo_settings()->get_option( 'ai_cal_use_title_weight', true );
+		$use_max_tokens   = $request->get_param( 'use_max_tokens' ) ? $request->get_param( 'use_max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_use_max_tokens', true );
+		$primary_threshold   = absint( $request->get_param( 'primary_threshold' ) ? $request->get_param( 'primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 ) );
+		$secondary_threshold = absint( $request->get_param( 'secondary_threshold' ) ? $request->get_param( 'secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ) );
+		$use_primary_threshold   = $request->get_param( 'use_primary_threshold' ) ? $request->get_param( 'use_primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_threshold', true );
+		$use_secondary_threshold = $request->get_param( 'use_secondary_threshold' ) ? $request->get_param( 'use_secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_threshold', true );
 
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
@@ -1028,6 +1051,10 @@ class AI_Handler {
 			$adapter = $this->get_active_adapter();
 		}
 
+		if ( is_wp_error( $adapter ) ) {
+			return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
@@ -1052,13 +1079,53 @@ class AI_Handler {
 				break;
 		}
 
-		// Meta-prompt instructed to build a JEO prompt.
-		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
-The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
-Write a clear, strict System Prompt that incorporates the user's rules.
-{$model_optimization}
+		$calibration_rules = '';
+		if ( $use_granularity ) {
+			if ( 'broad' === $granularity ) {
+				$calibration_rules .= "- Prefer extracting large-scale locations (countries, regions, states, major cities). Avoid small neighborhoods, streets, or individual landmarks.\n";
+			} elseif ( 'fine' === $granularity ) {
+				$calibration_rules .= "- Prioritize extracting specific, fine-grained locations (streets, landmarks, neighborhoods, points of interest). Do not skip detailed addresses or place names.\n";
+			} else {
+				$calibration_rules .= "- Extract a balanced mix of locations: cities, neighborhoods, and notable landmarks. Use common sense to determine importance.\n";
+			}
+		}
+		if ( $use_confidence ) {
+			$calibration_rules .= "- Only output locations with a confidence level of at least {$confidence}. If uncertain, skip the location rather than guessing.\n";
+		}
+		if ( $use_title_weight ) {
+			$calibration_rules .= "- When a location is mentioned in the post title, apply a priority boost of {$title_weight} percent. Title mentions usually indicate the primary geographic focus of the content.\n";
+		}
+		if ( $use_max_tokens ) {
+			$calibration_rules .= "- The generated system prompt MUST be concise enough to fit within a {$max_tokens} token budget. Avoid redundant examples and verbose explanations. Focus on the most critical rules.\n";
+		}
+		if ( $use_primary_threshold ) {
+			$calibration_rules .= "- Locations with a confidence score of {$primary_threshold} or higher should be classified as PRIMARY (main geographic focus of the content).\n";
+		}
+		if ( $use_secondary_threshold ) {
+			$calibration_rules .= "- Locations with a confidence score below {$primary_threshold} but at least {$secondary_threshold} should be classified as SECONDARY (mentioned but not central).\n";
+			$calibration_rules .= "- Locations with a confidence score below {$secondary_threshold} should be discarded entirely (treated as disabled / not relevant enough).\n";
+		}
+		$calibration_rules .= "- CRITICAL: Each location object MUST include the boolean field 'is_primary'. Set it to true ONLY for locations that are the MAIN geographic focus of the content (where the story happens, the central territory, or the primary object of the report). Set it to false for all secondary, supporting, or contextual locations. Do NOT rely solely on confidence scores for this classification; use your editorial judgment based on the text analysis.\n";
 
-### OUTPUT FORMAT MANDATE
+		$structured_active = \jeo_settings()->get_option( 'ai_use_structured_output' );
+
+		// When structured output is active the JSON schema is enforced natively by the provider.
+		// The generated system prompt should NOT include the aggressive CRITICAL INSTRUCTION block,
+		// otherwise it creates conflicting instructions.
+		if ( $structured_active ) {
+			$output_format_mandate = "### OUTPUT FORMAT MANDATE — ABSOLUTE RULE
+The JEO system now uses Native Structured Output (API-level schema enforcement). This means the AI provider automatically handles the JSON response format.
+
+YOU MUST OMIT the following from your generated system prompt:
+- ANY paragraph starting with 'CRITICAL INSTRUCTION' that mentions JSON arrays, keys, or response format.
+- ANY 'Example of the ONLY valid format' block.
+- ANY instruction like 'If no locations are found, return exactly []'.
+- ANY 'Output MUST start with [' or similar formatting rules.
+
+If you include these, the prompt will contain CONFLICTING INSTRUCTIONS and the AI will produce errors.
+Focus ONLY on editorial rules, calibration, and geographic logic.";
+		} else {
+			$output_format_mandate = "### OUTPUT FORMAT MANDATE
 You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
 
 \"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
@@ -1069,7 +1136,19 @@ Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lon',
 - 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
 - 'confidence': An integer between 0 and 100 representing your confidence level in this extraction.
 Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lon\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
-If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"
+If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"";
+		}
+
+		// Meta-prompt instructed to build a JEO prompt.
+		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
+The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
+Write a clear, strict System Prompt that incorporates the user's rules.
+{$model_optimization}
+
+### CALIBRATION RULES
+{$calibration_rules}
+
+{$output_format_mandate}
 
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
 
@@ -1126,6 +1205,10 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$adapter = $this->get_active_adapter();
 		}
 
+		if ( is_wp_error( $adapter ) ) {
+			return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+		}
+
 		if ( ! $adapter ) {
 			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
 		}
@@ -1161,6 +1244,11 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 					$msg      = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeo' );
 					break;
 				}
+				if ( isset( $item['is_primary'] ) && ! is_bool( $item['is_primary'] ) && ! in_array( $item['is_primary'], array( true, false, 1, 0, 'true', 'false' ), true ) ) {
+					$is_valid = false;
+					$msg      = __( 'Validation failed: The AI returned an invalid is_primary value (must be boolean).', 'jeo' );
+					break;
+				}
 			}
 		} else {
 			// Array is empty (count == 0). This is VALID if the AI correctly filtered out locations based on user prompt.
@@ -1194,19 +1282,64 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			$content = $post->post_content;
 		}
 
-		$adapter = $this->get_active_adapter();
-
-		if ( ! $adapter ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+		// Optionally append taxonomy terms to provide extra context for georeferencing.
+		if ( ! empty( $post_id ) && \jeo_settings()->get_option( 'ai_include_taxonomies' ) ) {
+			$tax_context = $this->get_post_taxonomy_context( $post_id );
+			if ( ! empty( $tax_context ) ) {
+				$content .= "\n\n" . $tax_context;
+			}
 		}
 
-		$result = $adapter->georeference( $title, $content );
+		try {
+			$adapter = $this->get_active_adapter();
 
-		if ( is_wp_error( $result ) ) {
-			return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
+			if ( is_wp_error( $adapter ) ) {
+				return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+			}
+
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+			}
+
+			$result = $adapter->georeference( $title, $content );
+
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
+			}
+
+			return new \WP_REST_Response( $result, 200 );
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'error' => __( 'An unexpected error occurred while processing the AI request.', 'jeo' ) . ' ' . $e->getMessage(),
+				),
+				500
+			);
+		}
+	}
+
+	/**
+	 * Build a taxonomy context string from a post's categories and tags.
+	 *
+	 * @param int $post_id Post ID.
+	 * @return string
+	 */
+	private function get_post_taxonomy_context( $post_id ) {
+		$lines = array();
+
+		$categories = get_the_category( $post_id );
+		if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+			$names   = wp_list_pluck( $categories, 'name' );
+			$lines[] = 'Categories: ' . implode( ', ', $names );
 		}
 
-		return new \WP_REST_Response( $result, 200 );
+		$tags = get_the_tags( $post_id );
+		if ( ! empty( $tags ) && ! is_wp_error( $tags ) ) {
+			$names   = wp_list_pluck( $tags, 'name' );
+			$lines[] = 'Tags: ' . implode( ', ', $names );
+		}
+
+		return empty( $lines ) ? '' : implode( "\n", $lines );
 	}
 
 	/**

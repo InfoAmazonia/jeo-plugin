@@ -172,3 +172,36 @@
 .jeo-stories-near-you__error.hidden {
 	display: none;
 }
+
+/* Geolocation consent */
+.jeo-stories-near-you__consent {
+	padding: 40px 20px;
+	text-align: center;
+	background: #f6f7f7;
+	border-radius: 4px;
+}
+
+.jeo-stories-near-you__consent-text {
+	margin: 0 0 16px;
+	font-size: 1em;
+}
+
+.jeo-stories-near-you__consent-button,
+.jeo-stories-near-you__consent-skip {
+	padding: 8px 16px;
+	border-radius: 4px;
+	border: 1px solid #0073aa;
+	font-size: 0.95em;
+	cursor: pointer;
+}
+
+.jeo-stories-near-you__consent-button {
+	background: #0073aa;
+	color: #fff;
+	margin-right: 8px;
+}
+
+.jeo-stories-near-you__consent-skip {
+	background: transparent;
+	color: #0073aa;
+}

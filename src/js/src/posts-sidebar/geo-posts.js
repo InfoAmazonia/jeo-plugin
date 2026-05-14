@@ -1,6 +1,6 @@
 import { Button, CheckboxControl, RadioControl } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
@@ -37,7 +37,12 @@ class JeoGeocodePosts extends Component {
 			currentMarkerIndex: 0,
 			loadStatus: 'pending',
 			magneticMarkers: true,
+		isPanelMinimized: false,
+		panelOffset: { x: 0, y: 0 },
 		};
+
+		this.isDraggingPanel = false;
+		this.dragStartPos = { x: 0, y: 0 };
 
 		this.onLocationFound = this.onLocationFound.bind( this );
 		this.onMarkerDragged = this.onMarkerDragged.bind( this );
@@ -61,6 +66,10 @@ class JeoGeocodePosts extends Component {
 		this.onClickNewPoint = this.onClickNewPoint.bind( this );
 		this.onClickCancel = this.onClickCancel.bind( this );
 		this.toggleMagnet = this.toggleMagnet.bind( this );
+		this.togglePanel = this.togglePanel.bind( this );
+		this.startPanelDrag = this.startPanelDrag.bind( this );
+		this.movePanelDrag = this.movePanelDrag.bind( this );
+		this.stopPanelDrag = this.stopPanelDrag.bind( this );
 
 		this.refMap = createRef();
 	}
@@ -110,6 +119,12 @@ class JeoGeocodePosts extends Component {
 	toggleMagnet () {
 		this.setState( {
 			magneticMarkers: !this.state.magneticMarkers,
+		} );
+	}
+
+	togglePanel () {
+		this.setState( {
+			isPanelMinimized: !this.state.isPanelMinimized,
 		} );
 	}
 
@@ -356,6 +371,45 @@ class JeoGeocodePosts extends Component {
 		}
 	}
 
+	startPanelDrag( e ) {
+		if ( e.target.tagName === 'BUTTON' || e.target.closest( 'button' ) ) {
+			return;
+		}
+		this.isDraggingPanel = true;
+		const clientX = e.clientX ?? e.touches?.[ 0 ]?.clientX ?? 0;
+		const clientY = e.clientY ?? e.touches?.[ 0 ]?.clientY ?? 0;
+		this.dragStartPos = { x: clientX, y: clientY };
+		document.addEventListener( 'mousemove', this.movePanelDrag );
+		document.addEventListener( 'mouseup', this.stopPanelDrag );
+		document.addEventListener( 'touchmove', this.movePanelDrag, { passive: false } );
+		document.addEventListener( 'touchend', this.stopPanelDrag );
+	}
+
+	movePanelDrag( e ) {
+		if ( ! this.isDraggingPanel ) {
+			return;
+		}
+		const clientX = e.clientX ?? e.touches?.[ 0 ]?.clientX ?? 0;
+		const clientY = e.clientY ?? e.touches?.[ 0 ]?.clientY ?? 0;
+		const dx = clientX - this.dragStartPos.x;
+		const dy = clientY - this.dragStartPos.y;
+		this.setState( ( prev ) => ( {
+			panelOffset: {
+				x: prev.panelOffset.x + dx,
+				y: prev.panelOffset.y + dy,
+			},
+		} ) );
+		this.dragStartPos = { x: clientX, y: clientY };
+	}
+
+	stopPanelDrag() {
+		this.isDraggingPanel = false;
+		document.removeEventListener( 'mousemove', this.movePanelDrag );
+		document.removeEventListener( 'mouseup', this.stopPanelDrag );
+		document.removeEventListener( 'touchmove', this.movePanelDrag );
+		document.removeEventListener( 'touchend', this.stopPanelDrag );
+	}
+
 	renderForm() {
 		const {
 			currentMarkerIndex,
@@ -427,127 +481,162 @@ class JeoGeocodePosts extends Component {
 	}
 
 	render() {
-		const { currentMarkerIndex, formMode, zoom } = this.state;
+		const { currentMarkerIndex, formMode, zoom, isPanelMinimized } = this.state;
 		const pointsList =
 			formMode !== 'new' ? this.state.points : this.state.pointsCheckpoint;
 		const pointsMap = this.state.points;
+		const panelClass = `jeo-geocode-modal__panel ${ isPanelMinimized ? 'is-collapsed' : '' }`;
 
 		return (
-			<div className="jeo-geocode-posts">
-				<div className="jeo-geocode-posts__column">
-					<div>
-						<h2>{ __( 'Add new point', 'jeo' ) }</h2>
-						<div>
-							{ formMode === 'view' ? (
-								<Button variant="primary" onClick={ this.onClickNewPoint }>
-									{ __( 'Add new point', 'jeo' ) }
-								</Button>
-							) : formMode === 'new' ? (
-								this.renderForm()
-							) : null }
-						</div>
-					</div>
-					<div>
-						<h2>{ __( 'Current points', 'jeo' ) }</h2>
-						{ pointsList.length === 0 ? (
-							__( 'No points', 'jeo' )
-						) : (
-							<ul>
-								{ pointsList.map( ( point, i ) => (
-									<li
-										key={ i }
-										id={ i }
-										onClick={
-											formMode === 'view' ? this.clickMarkerList : null
-										}
-										className={ classNames( [
-											'jeo-geocode-posts__post',
-											( point && point.relevance ) || 'primary',
-											currentMarkerIndex === i && 'active',
-										] ) }
-									>
-										{ point._geocode_full_address }{ ' ' }
-										{ formMode === 'view' ? (
-											<Fragment>
-												<Button
-													variant="link"
-													onClick={ ( e ) => { e.stopPropagation(); this.onClickDelete( i ); } }
-												>
-													{ __( 'Delete', 'jeo' ) }
-												</Button>
-												<span> | </span>
-												<Button
-													variant="link"
-													onClick={ ( e ) => { e.stopPropagation(); this.onClickEdit( i ); } }
-												>
-													{ __( 'Edit', 'jeo' ) }
-												</Button>
-											</Fragment>
-										) : (
-											formMode === 'edit' &&
-											currentMarkerIndex === i &&
-											this.renderForm()
-										) }
-									</li>
-								) ) }
-							</ul>
-						) }
-					</div>
+			<div className="jeo-geocode-modal__container">
+				{/* Fullscreen map */}
+				<div className="jeo-geocode-modal__map">
+					<MapContainer
+						center={ [ 0, 0 ] }
+						zoom={ zoom }
+						whenCreated={ this.mapCreated }
+						whenReady={ this.mapLoaded }
+						ref={ this.refMap }
+						style={ { height: '100%', width: '100%' } }
+					>
+						<TileLayer
+							attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+							url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+						/>
+						{ pointsMap.map( ( point, i ) => {
+							let icon;
+
+							const pinUrls = window.jeo?.pin_urls || {
+								primary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png',
+								secondary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png',
+							};
+							if ( ! point.relevance || point.relevance === 'primary' ) {
+								icon = new L.Icon( {
+									iconUrl: pinUrls.primary,
+									iconSize: [ 25, 41 ],
+									iconAnchor: [ 12, 41 ],
+								} );
+							} else {
+								icon = new L.Icon( {
+									iconUrl: pinUrls.secondary,
+									iconSize: [ 25, 41 ],
+									iconAnchor: [ 12, 41 ],
+								} );
+							}
+
+							const lat = parseFloat( point._geocode_lat );
+							const lng = parseFloat( point._geocode_lon );
+							if ( isNaN( lat ) || isNaN( lng ) ) return null;
+
+							return (
+								<Marker
+									key={ i }
+									icon={ icon }
+									draggable={
+										currentMarkerIndex === i && formMode !== 'view'
+									}
+									onDragend={ this.onMarkerDragged }
+									onClick={ formMode === 'view' ? this.clickMarkerMap : null }
+									position={ [ lat, lng ] }
+									id={ i }
+									opacity={ currentMarkerIndex === i ? 1 : 0.6 }
+								/>
+							);
+						} ) }
+					</MapContainer>
 				</div>
 
-				<div className="jeo-geocode-posts__column">
-					<div id="geocode-map-container" style={ { display: 'block' } }>
-						<MapContainer
-							center={ [ 0, 0 ] }
-							zoom={ zoom }
-							whenCreated={ this.mapCreated }
-							whenReady={ this.mapLoaded }
-							ref={ this.refMap }
+				{/* Floating overlay panel */}
+				<div
+					className={ panelClass }
+					style={ { transform: `translate(${ this.state.panelOffset.x }px, ${ this.state.panelOffset.y }px)` } }
+				>
+					<div
+						className="jeo-geocode-modal__panel-header"
+					>
+						<h3
+							onMouseDown={ this.startPanelDrag }
+							onTouchStart={ this.startPanelDrag }
+							style={ { userSelect: 'none' } }
 						>
-							<TileLayer
-								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-								url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
-							/>
-							{ pointsMap.map( ( point, i ) => {
-								let icon;
-
-								if ( ! point.relevance || point.relevance === 'primary' ) {
-									icon = new L.Icon( {
-										iconUrl:
-											'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-										iconSize: [ 25, 41 ],
-										iconAnchor: [ 12, 41 ],
-									} );
-								} else {
-									icon = new L.Icon( {
-										iconUrl:
-											'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
-										iconSize: [ 25, 41 ],
-										iconAnchor: [ 12, 41 ],
-									} );
-								}
-
-								const lat = parseFloat( point._geocode_lat );
-								const lng = parseFloat( point._geocode_lon );
-								if ( isNaN( lat ) || isNaN( lng ) ) return null;
-
-								return (
-									<Marker
-										key={ i }
-										icon={ icon }
-										draggable={
-											currentMarkerIndex === i && formMode !== 'view'
-										}
-										onDragend={ this.onMarkerDragged }
-										onClick={ formMode === 'view' ? this.clickMarkerMap : null }
-										position={ [ lat, lng ] }
-										id={ i }
-										opacity={ currentMarkerIndex === i ? 1 : 0.6 }
-									/>
-								);
-							} ) }
-						</MapContainer>
+							{ isPanelMinimized
+								? sprintf( __( 'Points (%d)', 'jeo' ), pointsList.length )
+								: __( 'Geolocate this post', 'jeo' )
+							}
+						</h3>
+						<button
+							className="jeo-geocode-modal__panel-toggle"
+							onClick={ ( e ) => { e.stopPropagation(); this.togglePanel(); } }
+							type="button"
+							aria-label={ isPanelMinimized ? __( 'Expand panel', 'jeo' ) : __( 'Minimize panel', 'jeo' ) }
+						>
+							{ isPanelMinimized ? '▶' : '◀' }
+						</button>
 					</div>
+
+					{ ! isPanelMinimized && (
+						<div className="jeo-geocode-modal__panel-content">
+							<div>
+								<h2 style={ { fontSize: '1.2rem', marginTop: 0 } }>{ __( 'Add new point', 'jeo' ) }</h2>
+								<div>
+									{ formMode === 'view' ? (
+										<Button variant="primary" onClick={ this.onClickNewPoint }>
+											{ __( 'Add new point', 'jeo' ) }
+										</Button>
+									) : formMode === 'new' ? (
+										this.renderForm()
+									) : null }
+								</div>
+							</div>
+							<div style={ { marginTop: '20px' } }>
+								<h2 style={ { fontSize: '1.2rem' } }>{ __( 'Current points', 'jeo' ) }</h2>
+								{ pointsList.length === 0 ? (
+									__( 'No points', 'jeo' )
+								) : (
+									<ul style={ { padding: 0, margin: 0, listStyle: 'none' } }>
+										{ pointsList.map( ( point, i ) => (
+											<li
+												key={ i }
+												id={ i }
+												onClick={
+													formMode === 'view' ? this.clickMarkerList : null
+												}
+												className={ classNames( [
+													'jeo-geocode-posts__post',
+													( point && point.relevance ) || 'primary',
+													currentMarkerIndex === i && 'active',
+												] ) }
+												style={ { marginBottom: '4px', borderRadius: '4px' } }
+											>
+												{ point._geocode_full_address }{ ' ' }
+												{ formMode === 'view' ? (
+													<Fragment>
+														<Button
+															variant="link"
+															onClick={ ( e ) => { e.stopPropagation(); this.onClickDelete( i ); } }
+														>
+															{ __( 'Delete', 'jeo' ) }
+														</Button>
+														<span> | </span>
+														<Button
+															variant="link"
+															onClick={ ( e ) => { e.stopPropagation(); this.onClickEdit( i ); } }
+														>
+															{ __( 'Edit', 'jeo' ) }
+														</Button>
+													</Fragment>
+												) : (
+													formMode === 'edit' &&
+													currentMarkerIndex === i &&
+													this.renderForm()
+												) }
+											</li>
+										) ) }
+									</ul>
+								) }
+							</div>
+						</div>
+					) }
 				</div>
 			</div>
 		);

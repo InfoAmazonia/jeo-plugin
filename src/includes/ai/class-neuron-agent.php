@@ -8,6 +8,7 @@
 namespace Jeo\AI;
 
 use Jeo\AI_Adapter;
+use Jeo\AI\Structured\Georeference_Result;
 use NeuronAI\Agent\Agent;
 use NeuronAI\Chat\Messages\UserMessage;
 use NeuronAI\Providers\Gemini\Gemini;
@@ -103,5 +104,48 @@ class Neuron_Agent extends Agent {
 		}
 
 		return $raw_output;
+	}
+
+	/**
+	 * Run georeference using NeuronAI Structured Output.
+	 *
+	 * Uses schema enforcement, automatic retry on validation failures,
+	 * and returns a plain array for backward compatibility.
+	 *
+	 * @param string $system_prompt The system prompt.
+	 * @param string $user_text     The user text.
+	 * @param int    $input_tokens  Input token count (passed by reference).
+	 * @param int    $output_tokens Output token count (passed by reference).
+	 * @return array Array of location associative arrays.
+	 * @throws \Throwable If structured output fails after retries.
+	 */
+	public function run_georeference_structured( $system_prompt, $user_text, &$input_tokens, &$output_tokens ) {
+		$this->setInstructions( $system_prompt );
+
+		/** @var Georeference_Result $result */
+		$result = $this->structured(
+			messages: new UserMessage( $user_text ),
+			class: Georeference_Result::class,
+			maxRetries: 3
+		);
+
+		$locations = array();
+		foreach ( $result->locations as $loc ) {
+			$locations[] = array(
+				'name'       => $loc->name,
+				'lat'        => $loc->lat,
+				'lon'        => $loc->lon,
+				'quote'      => $loc->quote,
+				'confidence' => $loc->confidence,
+				'is_primary' => $loc->is_primary,
+			);
+		}
+
+		// Token tracking is not directly available from structured() output,
+		// so we leave them at 0 unless the caller handles it separately.
+		$input_tokens  = 0;
+		$output_tokens = 0;
+
+		return $locations;
 	}
 }

@@ -72,7 +72,7 @@ The class must extend `Jeo\Geocoder` and implement:
 | `wp_ajax_jeo_geocode` | Forward | Text → coordinates |
 | `wp_ajax_jeo_reverse_geocode` | Reverse | Coordinates → address |
 
-Both require nonce `jeo_geocode_nonce` and `is_user_logged_in()`.
+Both require nonce `jeo_geocode_nonce` and `current_user_can('edit_posts')`.
 
 ## Frontend: Geolocation Sidebar
 

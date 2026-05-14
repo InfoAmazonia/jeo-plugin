@@ -41,17 +41,25 @@ const JeoGeocodePanel = ( props ) => {
 					return;
 				}
 
+				const thresholds = window.jeo?.ai_thresholds || { primary: 75, secondary: 35 };
 				const formattedPoints = locations.map( ( loc, index ) => {
 					const confidence = loc.confidence ?? 100;
 					let relevance = 'primary';
 					let selected = true;
 					let disabled = false;
 
-					if ( confidence < 35 ) {
+					// Respect AI's editorial determination of is_primary when available.
+					if ( typeof loc.is_primary === 'boolean' ) {
+						relevance = loc.is_primary ? 'primary' : 'secondary';
+						if ( ! loc.is_primary && confidence < thresholds.secondary ) {
+							selected = false;
+							disabled = true;
+						}
+					} else if ( confidence < thresholds.secondary ) {
 						relevance = 'secondary';
 						selected = false;
 						disabled = true;
-					} else if ( confidence < 75 ) {
+					} else if ( confidence < thresholds.primary ) {
 						relevance = 'secondary';
 					}
 
@@ -163,17 +171,25 @@ const JeoGeocodePanel = ( props ) => {
 	};
 
 	const handleReviewPending = () => {
+		const thresholds = window.jeo?.ai_thresholds || { primary: 75, secondary: 35 };
 		const formattedPoints = pendingLocations.map( ( loc, index ) => {
 			const confidence = loc.confidence ?? 100;
 			let relevance = 'primary';
 			let selected = true;
 			let disabled = false;
 
-			if ( confidence < 35 ) {
+			// Respect AI's editorial determination of is_primary when available.
+			if ( typeof loc.is_primary === 'boolean' ) {
+				relevance = loc.is_primary ? 'primary' : 'secondary';
+				if ( ! loc.is_primary && confidence < thresholds.secondary ) {
+					selected = false;
+					disabled = true;
+				}
+			} else if ( confidence < thresholds.secondary ) {
 				relevance = 'secondary';
 				selected = false;
 				disabled = true;
-			} else if ( confidence < 75 ) {
+			} else if ( confidence < thresholds.primary ) {
 				relevance = 'secondary';
 			}
 
@@ -255,10 +271,12 @@ const JeoGeocodePanel = ( props ) => {
 				>
 					<JeoGeocodePostsAI
 						aiSuggestedLocations={ aiSuggestedLocations }
+						isAIProcessing={ isAIProcessing }
 						saveAiLocations={ saveAiLocations }
 						toggleAiLocation={ toggleAiLocation }
 						changeRelevance={ changeRelevance }
 						onCancel={ () => setState( ( prev ) => ( { ...prev, isApprovalModalOpen: false }) ) }
+						onRetry={ handleAIGeoreference }
 					/>
 				</Modal>
 			) }

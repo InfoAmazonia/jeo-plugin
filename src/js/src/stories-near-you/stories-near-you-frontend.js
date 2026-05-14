@@ -2,6 +2,7 @@
 	const CONTAINER_SELECTOR = '.wp-block-jeo-stories-near-you';
 	const REST_ENDPOINT = '/wp-json/jeo/v1/stories-near-you';
 	const GEOLOCATION_TIMEOUT = 10000;
+	const CONSENT_KEY = 'jeo_stories_near_you_consent';
 
 	class BrowserGeolocationProvider {
 		getLocation() {
@@ -52,8 +53,72 @@
 		}
 
 		async init() {
-			const location = await this.geolocationProvider.getLocation();
-			await this.fetchAndRender( location );
+			// If geolocation is not supported, fall back to generic listing.
+			if ( ! navigator.geolocation ) {
+				await this.fetchAndRender( null );
+				return;
+			}
+
+			// If the user has previously consented, proceed automatically.
+			if ( window.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
+				const location = await this.geolocationProvider.getLocation();
+				await this.fetchAndRender( location );
+				return;
+			}
+
+			// Otherwise show an opt-in UI.
+			this.renderConsentPrompt();
+		}
+
+		renderConsentPrompt() {
+			const skeleton = this.element.querySelector(
+				'.jeo-stories-near-you__skeleton'
+			);
+			if ( skeleton ) {
+				skeleton.remove();
+			}
+
+			const consentEl = document.createElement( 'div' );
+			consentEl.className = 'jeo-stories-near-you__consent';
+			consentEl.innerHTML = `
+				<p class="jeo-stories-near-you__consent-text">${ this.attrs.consentText || 'Show stories near my current location.' }</p>
+				<button type="button" class="jeo-stories-near-you__consent-button">${ this.attrs.consentButton || 'Use my location' }</button>
+				<button type="button" class="jeo-stories-near-you__consent-skip">${ this.attrs.consentSkip || 'Skip' }</button>
+			`;
+
+			this.element.insertBefore( consentEl, this.element.querySelector( '.jeo-stories-near-you__error' ) );
+
+			consentEl.querySelector( '.jeo-stories-near-you__consent-button' ).addEventListener( 'click', async () => {
+				if ( window.localStorage ) {
+					localStorage.setItem( CONSENT_KEY, '1' );
+				}
+				consentEl.remove();
+				// Show skeleton again while loading.
+				this.showSkeleton();
+				const location = await this.geolocationProvider.getLocation();
+				await this.fetchAndRender( location );
+			} );
+
+			consentEl.querySelector( '.jeo-stories-near-you__consent-skip' ).addEventListener( 'click', async () => {
+				consentEl.remove();
+				await this.fetchAndRender( null );
+			} );
+		}
+
+		showSkeleton() {
+			// Re-create a minimal skeleton for loading state.
+			const skeleton = document.createElement( 'div' );
+			skeleton.className = 'jeo-stories-near-you__skeleton jeo-stories-near-you__grid';
+			if ( this.attrs.postsPerRow ) {
+				skeleton.classList.add( 'jeo-stories-near-you__grid--cols-' + this.attrs.postsPerRow );
+			}
+			for ( let i = 0; i < ( this.attrs.postsPerPage || 3 ); i++ ) {
+				const card = document.createElement( 'article' );
+				card.className = 'jeo-stories-near-you__skeleton-card';
+				card.innerHTML = '<div class="jeo-stories-near-you__skeleton-thumb"></div><div class="jeo-stories-near-you__skeleton-content"><div class="jeo-stories-near-you__skeleton-line jeo-stories-near-you__skeleton-line--title"></div></div>';
+				skeleton.appendChild( card );
+			}
+			this.element.insertBefore( skeleton, this.element.querySelector( '.jeo-stories-near-you__error' ) );
 		}
 
 		async fetchAndRender( location ) {
@@ -136,9 +201,15 @@
 			const errorEl = this.element.querySelector(
 				'.jeo-stories-near-you__error'
 			);
+			const consentEl = this.element.querySelector(
+				'.jeo-stories-near-you__consent'
+			);
 
 			if ( skeleton ) {
 				skeleton.remove();
+			}
+			if ( consentEl ) {
+				consentEl.remove();
 			}
 
 			if ( errorEl ) {

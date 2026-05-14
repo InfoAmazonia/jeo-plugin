@@ -35,6 +35,7 @@ The plugin is deployed as the contents of `src/` (not repo root):
 - `node_modules/`, `scripts/`, `docs/` are not deployed
 - `src/js/build/` (compiled) is included
 - `src/vendor/` (composer) is included if present
+- `src/includes/vendor/` (bundled third-party assets such as Select2) is included
 
 ## Activation/Deactivation
 
@@ -46,3 +47,16 @@ The plugin is deployed as the contents of `src/` (not repo root):
 - Clears configured API keys
 - Clears debug logs
 - Flushes rewrite rules
+
+### Uninstall (`uninstall.php`)
+- Deletes `jeo-settings` option
+- Deletes `jeo_bulk_ai_cron_logs` and `jeo_ai_embedding_tokens` options
+- Clears scheduled cron hooks (`jeo_bulk_ai_cron_hook`, `jeo_bulk_ai_clear_cron_hook`)
+- Deletes all `jeo-ai-log` posts
+- Deletes all geolocation post meta (`_related_point`, `_geocode_*`)
+- Deletes Nominatim transients
+- Removes RAG vector store directory (`wp-content/uploads/jeo-ai-store/`)
+
+### Uninstall Confirmation Page
+
+To prevent accidental data loss, the plugin overrides the default **Delete** link on `plugins.php` with a confirmation screen (`admin.php?page=jeo-uninstall-confirm`). This screen lists every type of data that will be removed and requires the user to check an explicit acknowledgment before proceeding.},{

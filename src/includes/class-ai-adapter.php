@@ -58,20 +58,32 @@ abstract class AI_Adapter {
 			return trim( str_replace( '[SKIP_ENFORCED_SCHEMA]', '', $prompt ) );
 		}
 
+		// When NeuronAI Structured Output is active, the schema is enforced natively by the provider
+		// via the API response_format parameter. Adding JSON formatting instructions here would
+		// create redundant/conflicting directives and waste tokens. Just return the clean prompt.
+		if ( \jeo_settings()->get_option( 'ai_use_structured_output' ) ) {
+			// Safety net: strip any legacy JSON formatting blocks that may have been pasted from
+		// old prompts or generated before the assistant was updated. These patterns are specific
+		// enough that legitimate editorial instructions are extremely unlikely to collide.
+		$prompt = $this->strip_legacy_json_instructions( $prompt );
+			return $prompt;
+		}
+
 		// Inject mandatory JSON schema constraints aggressively to any prompt to prevent formatting regressions.
 		$enforced_schema = "
 
 	CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
-	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lon', 'quote', 'confidence'. Do NOT use any other keys.
+	Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lon', 'quote', 'confidence', 'is_primary'. Do NOT use any other keys.
 		- 'name': The location name.
 		- 'lat': Latitude (string or float).
 		- 'lon': Longitude (string or float).
 		- 'quote': A short relevant snippet (10-15 words) from the provided text.
 		- 'confidence': An integer 0-100.
+		- 'is_primary': A boolean (true or false) indicating whether this location is the PRIMARY geographic focus of the content. Use true only for the main location(s) central to the story; use false for secondary or supporting locations.
 
 		INSTRUCTION ON PRECISION: Include EVERY possible geographic location found in the text. Even if you have low confidence, include it and set the 'confidence' score accordingly. Do not be overly cautious; our system will handle the final filtering based on your score.
 
-		Example: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lon\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
+		Example: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lon\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95, \"is_primary\": true}]
 
 	If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].";
 
@@ -123,6 +135,25 @@ abstract class AI_Adapter {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Strip legacy JSON formatting instructions from a prompt when Structured Output is active.
+	 *
+	 * Serves as a safety net for prompts generated before the assistant update,
+	 * or when the LLM ignored the meta-prompt and included the block anyway.
+	 *
+	 * @param string $prompt The prompt to sanitize.
+	 * @return string
+	 */
+	protected function strip_legacy_json_instructions( $prompt ) {
+		// Remove everything from "### OUTPUT FORMAT MANDATE" to the end of the prompt.
+		$prompt = preg_replace( '/\s*### OUTPUT FORMAT MANDATE.*$/s', '', $prompt );
+
+		// Remove the legacy CRITICAL INSTRUCTION block if it appears inline.
+		$prompt = preg_replace( '/\s*CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array.*$/s', '', $prompt );
+
+		return trim( $prompt );
 	}
 
 	/**

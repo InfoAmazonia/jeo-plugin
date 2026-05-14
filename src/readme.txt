@@ -1,8 +1,9 @@
 === JEO ===
 Contributors: earthjournalism
 Tested up to: 6.8.2
+Tags: maps, geolocation, gutenberg, storymap, cartography, mapbox, maplibre, blocks, interactive, journalism, openstreetmap, spatial
 Stable tag: 3.6.5
-Requires PHP: 8.0
+Requires PHP: 8.2
 Requires at least: 6.6
 License: GPL-2.0+
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt

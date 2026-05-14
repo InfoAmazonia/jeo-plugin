@@ -85,6 +85,9 @@
 				case 'bulk':
 					include 'tab-bulk.php';
 					break;
+				case 'settings':
+					include 'tab-general.php';
+					break;
 			}
 			?>
 		</div>
@@ -95,6 +98,7 @@
 	</form>
 </div>
 
+<?php if ( \jeo_settings()->get_option( 'ai_debug_console' ) ) : ?>
 <div id="jeo-ai-debug-console" style="position: fixed; bottom: 0; right: 20px; width: 450px; background: #1d2327; color: #fff; border: 1px solid #3c434a; border-bottom: 0; border-radius: 6px 6px 0 0; z-index: 99999; font-family: monospace; display: flex; flex-direction: column; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); transition: transform 0.3s ease;">
 	<div id="jeo-ai-debug-header" style="padding: 8px 15px; background: #2c3338; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px 6px 0 0;">
 		<span style="font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">📡 <?php esc_html_e( 'JEO AI API Debugger', 'jeo' ); ?></span>
@@ -109,6 +113,19 @@
 		</div>
 	</div>
 </div>
+<?php endif; ?>
+	<script>
+		document.addEventListener( 'DOMContentLoaded', function() {
+			var skeleton = document.getElementById( 'jeo-skeleton' );
+			var content  = document.querySelector( '.jeo-tab-content-wrapper' );
+			if ( skeleton ) {
+				skeleton.style.display = 'none';
+			}
+			if ( content ) {
+				content.style.display = 'block';
+			}
+		} );
+	</script>
 
 <style>
 	.jeo-debug-entry { border-bottom: 1px solid #3c434a; padding-bottom: 8px; margin-bottom: 8px; }

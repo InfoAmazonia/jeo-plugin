@@ -168,7 +168,7 @@ class Layer_Types {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file = include JEO_BASEPATH . '/js/build/JeoLayer.asset.php';
+		$asset_file = file_exists( JEO_BASEPATH . '/js/build/JeoLayer.asset.php' ) ? include JEO_BASEPATH . '/js/build/JeoLayer.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
 		wp_register_script(
 			'jeo-layer',
 			JEO_BASEURL . '/js/build/JeoLayer.js',

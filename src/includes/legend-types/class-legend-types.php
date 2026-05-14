@@ -161,7 +161,7 @@ class Legend_Types {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file = include JEO_BASEPATH . '/js/build/JeoLegend.asset.php';
+		$asset_file = file_exists( JEO_BASEPATH . '/js/build/JeoLegend.asset.php' ) ? include JEO_BASEPATH . '/js/build/JeoLegend.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
 		wp_register_script(
 			'jeo-legend',
 			JEO_BASEURL . '/js/build/JeoLegend.js',

@@ -45,7 +45,26 @@ class Settings {
 		'ai_system_prompt'                => '',
 		'ai_use_custom_prompt'            => false,
 		'ai_debug_mode'                   => false,
+		'ai_debug_console'                => true,
+		'ai_use_structured_output'         => false,
+		'ai_include_taxonomies'           => false,
 		'ai_embedding_model'              => '',
+		'ai_cal_granularity'              => 'balanced',
+		'ai_cal_confidence'               => 50,
+		'ai_cal_title_weight'             => 70,
+		'ai_cal_max_tokens'               => 8000,
+		'ai_cal_use_granularity'          => true,
+		'ai_cal_use_confidence'           => true,
+		'ai_cal_use_title_weight'         => true,
+		'ai_cal_use_max_tokens'           => true,
+		'ai_cal_primary_threshold'        => 75,
+		'ai_cal_secondary_threshold'      => 35,
+		'ai_cal_use_primary_threshold'    => true,
+		'ai_cal_use_secondary_threshold'  => true,
+
+		// Pin icons.
+		'jeo_pin_primary_url'             => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png',
+		'jeo_pin_secondary_url'           => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png',
 
 		// Bulk AI.
 		'jeo_bulk_ai_active'              => false,
@@ -208,7 +227,8 @@ class Settings {
 		// Checkboxes grouped by tab.
 		$booleans_by_tab = array(
 			'general'   => array( 'show_storymaps_on_post_archives' ),
-			'provider'  => array( 'ai_use_custom_prompt', 'ai_debug_mode' ),
+			'provider'  => array( 'ai_use_custom_prompt', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold' ),
+			'settings'  => array( 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output' ),
 			'bulk'      => array( 'jeo_bulk_ai_active', 'jeo_bulk_logging' ),
 			'knowledge' => array( 'jeo_rag_auto_index' ),
 		);
@@ -220,12 +240,58 @@ class Settings {
 			}
 		} else {
 			// Fallback if no tab identifier (e.g. direct API updates or older logic).
-			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_use_custom_prompt', 'show_storymaps_on_post_archives' );
+			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output', 'ai_use_custom_prompt', 'ai_include_taxonomies', 'show_storymaps_on_post_archives', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold' );
 			foreach ( $all_booleans as $bool_key ) {
 				if ( isset( $input[ $bool_key ] ) ) {
 					$input[ $bool_key ] = ! empty( $input[ $bool_key ] );
 				}
 			}
+		}
+
+		// AI Calibration controls sanitization.
+		if ( isset( $input['ai_cal_granularity'] ) ) {
+			$input['ai_cal_granularity'] = sanitize_text_field( $input['ai_cal_granularity'] );
+			if ( ! in_array( $input['ai_cal_granularity'], array( 'broad', 'balanced', 'fine' ), true ) ) {
+				$input['ai_cal_granularity'] = 'balanced';
+			}
+		}
+		if ( isset( $input['ai_cal_confidence'] ) ) {
+			$input['ai_cal_confidence'] = absint( $input['ai_cal_confidence'] );
+			if ( $input['ai_cal_confidence'] < 0 || $input['ai_cal_confidence'] > 100 ) {
+				$input['ai_cal_confidence'] = 50;
+			}
+		}
+		if ( isset( $input['ai_cal_title_weight'] ) ) {
+			$input['ai_cal_title_weight'] = absint( $input['ai_cal_title_weight'] );
+			if ( $input['ai_cal_title_weight'] < 0 || $input['ai_cal_title_weight'] > 100 ) {
+				$input['ai_cal_title_weight'] = 70;
+			}
+		}
+		if ( isset( $input['ai_cal_max_tokens'] ) ) {
+			$input['ai_cal_max_tokens'] = absint( $input['ai_cal_max_tokens'] );
+			if ( $input['ai_cal_max_tokens'] < 1000 || $input['ai_cal_max_tokens'] > 100000 ) {
+				$input['ai_cal_max_tokens'] = 8000;
+			}
+		}
+		if ( isset( $input['ai_cal_primary_threshold'] ) ) {
+			$input['ai_cal_primary_threshold'] = absint( $input['ai_cal_primary_threshold'] );
+			if ( $input['ai_cal_primary_threshold'] < 0 || $input['ai_cal_primary_threshold'] > 100 ) {
+				$input['ai_cal_primary_threshold'] = 75;
+			}
+		}
+		if ( isset( $input['ai_cal_secondary_threshold'] ) ) {
+			$input['ai_cal_secondary_threshold'] = absint( $input['ai_cal_secondary_threshold'] );
+			if ( $input['ai_cal_secondary_threshold'] < 0 || $input['ai_cal_secondary_threshold'] > 100 ) {
+				$input['ai_cal_secondary_threshold'] = 35;
+			}
+		}
+
+		// Pin icon URLs.
+		if ( isset( $input['jeo_pin_primary_url'] ) ) {
+			$input['jeo_pin_primary_url'] = esc_url_raw( $input['jeo_pin_primary_url'] );
+		}
+		if ( isset( $input['jeo_pin_secondary_url'] ) ) {
+			$input['jeo_pin_secondary_url'] = esc_url_raw( $input['jeo_pin_secondary_url'] );
 		}
 
 		// Secure API Key handling: If the input contains the visual mask, revert to existing stored value.
@@ -306,8 +372,8 @@ class Settings {
 	public function enqueue_admin_scripts( $page ) {
 		if ( 'jeo_page_jeo-settings' === $page || 'jeo_page_jeo-ai-settings' === $page ) {
 			wp_enqueue_media();
-			wp_enqueue_style( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css', array(), '4.0.13' );
-			wp_enqueue_script( 'select2', 'https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js', array( 'jquery', 'wp-i18n' ), '4.0.13', true );
+			wp_enqueue_style( 'select2', JEO_BASEURL . '/includes/vendor/select2/css/select2.min.css', array(), '4.0.13' );
+			wp_enqueue_script( 'select2', JEO_BASEURL . '/includes/vendor/select2/js/select2.min.js', array( 'jquery', 'wp-i18n' ), '4.0.13', true );
 			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery', 'wp-api-fetch', 'wp-i18n' ), JEO_VERSION, true );
 			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
 
@@ -379,6 +445,12 @@ class Settings {
 						'confirm_clear_bulk'   => __( 'Isso irá agendar a limpeza de TODOS os posts geolocalizados pela IA em segundo plano. Deseja continuar?', 'jeo' ),
 						'confirm_clear_bulk_2' => __( 'TEM CERTEZA? Esta ação não pode ser desfeita e exigirá uma nova vetorização completa para estes posts.', 'jeo' ),
 						'bulk_clear_started'   => __( 'Limpeza em massa iniciada em segundo plano.', 'jeo' ),
+						'expand'               => __( 'Expandir', 'jeo' ),
+						'collapse'             => __( 'Recolher', 'jeo' ),
+						'back'                 => __( 'Voltar', 'jeo' ),
+						'low'                  => __( 'Baixo', 'jeo' ),
+						'fair'                 => __( 'Regular', 'jeo' ),
+						'optimal'              => __( 'Ótimo', 'jeo' ),
 					),
 				)
 			);

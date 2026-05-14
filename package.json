@@ -16,7 +16,7 @@
 		"sync:version": "node scripts/sync-plugin-version.mjs",
 		"check:wporg-compliance": "node scripts/check-wporg-compliance.mjs",
 		"start": "wp-scripts start",
-		"build:assets": "wp-scripts build && node scripts/patch-build-compliance.mjs",
+		"build:assets": "NODE_ENV=production wp-scripts build && node scripts/patch-build-compliance.mjs",
 		"i18n:json": "node scripts/make-i18n-json.mjs",
 		"build": "npm run build:assets && npm run i18n:json",
 		"build:release": "npm run build",

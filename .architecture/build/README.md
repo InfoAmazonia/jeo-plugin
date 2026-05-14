@@ -44,6 +44,25 @@ Extends `@wordpress/scripts/config/webpack.config` with:
 | i18n JSON | `scripts/make-i18n-json.mjs` | Generates translation JSON |
 | Bundle report | `scripts/report-bundle-sizes.mjs` | Reports bundle sizes |
 | WP.org check | `scripts/check-wporg-compliance.mjs` | Checks WP.org compliance |
+| PHP compat | `scripts/check-php-compat.php` | Checks PHP 8.0-8.5 compatibility |
+| Smoke test | `scripts/wordpress-smoke.sh` | WordPress smoke test |
+
+## Local Development Environment (Docker)
+
+A self-contained Docker environment lives in `.docker/` (gitignored) and is **not** committed to the repository.
+
+```bash
+bash .docker/start.sh   # Start WordPress + MariaDB
+```
+
+| Service | Container Name | Host Port | Credentials |
+|---------|---------------|-----------|-------------|
+| WordPress | `jeo-dev-wordpress` | `8081` | Setup wizard on first run |
+| MariaDB | `jeo-dev-mariadb` | `3307` | `jeo` / `jeo` / `jeo` |
+
+- `src/` is mounted live into `/var/www/html/wp-content/plugins/jeo` — no reinstall needed after edits.
+- Network: `jeo-dev-network` (isolated bridge).
+- Stop: `docker compose -f .docker/docker-compose.yml down`
 | Dependency review | `scripts/dependency-review.mjs` | License/security review |
 | Version validate | `scripts/validate-release-meta.mjs` | Validates release metadata |
 | PHP compat | `scripts/check-php-compat.php` | Checks PHP compatibility |

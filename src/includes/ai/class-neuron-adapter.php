@@ -65,8 +65,14 @@ class Neuron_Adapter extends AI_Adapter {
 	 * @return array|\WP_Error
 	 */
 	public function georeference( $title, $content, $override_prompt = null ) {
-		// Pega a instrução do sistema (Prompt + Schema agressivo do JEO).
-		$system_prompt = $this->get_system_prompt( $override_prompt );
+		$use_structured = \jeo_settings()->get_option( 'ai_use_structured_output' );
+
+		// Internal tools (prompt generator, test connection) use [SKIP_ENFORCED_SCHEMA]
+		// to bypass aggressive schema injection. They rely on free-text JSON array hacks,
+		// so structured output (which enforces Georeference_Result) must be bypassed too.
+		if ( $use_structured && null !== $override_prompt && strpos( $override_prompt, '[SKIP_ENFORCED_SCHEMA]' ) !== false ) {
+			$use_structured = false;
+		}
 
 		// Prepara o texto do usuário.
 		$user_text = "Title: {$title}\n\nContent: {$content}";
@@ -76,19 +82,31 @@ class Neuron_Adapter extends AI_Adapter {
 		$output_tokens = 0;
 		$raw_output    = '';
 
-		try {
-			// Delega ao Neuron framework.
-			$raw_output = $this->agent->run_georeference( $system_prompt, $user_text, $input_tokens, $output_tokens, $raw_output );
+		// ── Caminho primário: Structured Output ──
+		if ( $use_structured ) {
+			try {
+				$system_prompt = $this->get_system_prompt( $override_prompt );
+				$locations     = $this->agent->run_georeference_structured( $system_prompt, $user_text, $input_tokens, $output_tokens );
 
-			// Salva metadados de custo usando o novo Dashboard (via nossa nova Jeo\AI\AI_Logger).
+				$this->log_debug( $this->provider_name . ' (' . $this->model_name . ') [Structured]', $user_text, wp_json_encode( $locations ), $input_tokens, $output_tokens );
+
+				return $locations;
+			} catch ( \Throwable $e ) {
+				// Structured output falhou — loga e cai no fallback de texto.
+				$this->log_debug( $this->provider_name . ' [Structured Fallback]', $user_text, $e->getMessage(), 0, 0 );
+			}
+		}
+
+		// ── Caminho fallback: texto livre + parser regex ──
+		try {
+			$system_prompt = $this->get_system_prompt( $override_prompt );
+			$raw_output    = $this->agent->run_georeference( $system_prompt, $user_text, $input_tokens, $output_tokens, $raw_output );
+
 			$this->log_debug( $this->provider_name . ' (' . $this->model_name . ')', $user_text, $raw_output, $input_tokens, $output_tokens );
 
-			// Opcional: Em vez do método obsoleto parse_json_from_text, poderíamos usar Neuron Structured, mas
-			// como o parser do JEO usa regex para arrancar lixos, vamos aproveitá-lo como "plano B" robusto, caso o Neuron devolva lixo.
 			return $this->parse_json_from_text( $raw_output );
 
-		} catch ( \Exception $e ) {
-			// Em caso de API key errada, rate limit, etc. Loga e devolve erro.
+		} catch ( \Throwable $e ) {
 			$this->log_debug( $this->provider_name . ' [ERROR]', $user_text, $e->getMessage(), 0, 0 );
 			return new \WP_Error( 'neuron_api_error', "{$this->provider_name} Neuron API Error: " . $e->getMessage() );
 		}

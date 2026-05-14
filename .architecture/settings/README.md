@@ -7,6 +7,7 @@
 | `src/includes/settings/class-settings.php` | `Jeo\Settings` class — 60+ options |
 | `src/includes/settings/settings-page.php` | Settings page template |
 | `src/includes/settings/settings-page.js` | Interactive JS (Select2, API tests) |
+| `src/includes/vendor/select2/` | Locally bundled Select2 assets (no CDN) |
 | `src/includes/settings/ai-logs-page.php` | AI cost dashboard |
 | `src/includes/menu/class-menu.php` | Admin menu |
 | `src/includes/admin/dashboard-page.php` | Geographic dashboard |
