@@ -10,6 +10,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 	const [ mapInstance, setMapInstance ] = useState( null );
 	const [ mapReady, setMapReady ] = useState( false );
 	const [ enriching, setEnriching ] = useState( {} ); // Track which items are being enriched
+	const [ isMinimized, setIsMinimized ] = useState( false );
 
 	// Handle map creation
 	const mapCreated = ( map ) => {
@@ -120,199 +121,210 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 		}
 	};
 
+	const selectedCount = aiSuggestedLocations.filter( l => l._selected ).length;
+
 	return (
 		<Fragment>
-			<div style={ { marginBottom: '20px' } }>
-				<p style={ { fontSize: '14px', color: '#1e1e1e', margin: '0 0 10px 0' } }>
-					{ __( 'I identified these locations in your text. Review and select which ones to add to the map:', 'jeo' ) }
-				</p>
-			</div>
-
-			<div style={ { display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', gap: '20px', width: '100%', marginBottom: '20px', alignItems: 'flex-start', boxSizing: 'border-box', minWidth: '700px' } }>
-				{/* Left column - Location list */}
-				<div style={ { flex: '1', minWidth: '350px', overflow: 'hidden', display: 'flex', flexDirection: 'column' } }>
-					<div style={ {
-						maxHeight: '450px',
-						overflowY: 'auto',
-						padding: '4px',
-						display: 'flex',
-						flexDirection: 'column',
-						gap: '12px'
-					} }>
+			<div className="jeo-geocode-modal__container">
+				{/* Fullscreen map */}
+				<div className="jeo-geocode-modal__map">
+					<MapContainer
+						center={ [ 0, 0 ] }
+						zoom={ 1 }
+						whenCreated={ mapCreated }
+						whenReady={ mapLoaded }
+						style={ { height: '100%', width: '100%' } }
+					>
+						<TileLayer
+							attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+							url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
+						/>
 						{ aiSuggestedLocations.map( ( loc, index ) => {
-							const confidenceColor = loc.confidence >= 80 ? '#46b450' : (loc.confidence >= 50 ? '#ffb900' : '#d63638');
-							const isPrimary = loc.relevance === 'primary';
-							
+							const lat = parseFloat( loc._geocode_lat );
+							const lng = parseFloat( loc._geocode_lon );
+							if ( isNaN( lat ) || isNaN( lng ) ) return null;
+
 							return (
-								<div key={ index } style={ {
-									background: loc._disabled ? '#f6f7f7' : '#fff',
-									border: '1px solid #e0e0e0',
-									borderRadius: '8px',
-									padding: '16px',
-									boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-									transition: 'border-color 0.2s ease',
-									borderColor: loc._selected ? '#007cba' : '#e0e0e0',
-									cursor: 'pointer',
-									opacity: loc._disabled ? 0.7 : 1
-								} }
-								onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
-								>
-									<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' } }>
-										<div style={ { display: 'flex', alignItems: 'center' } }>
-											<CheckboxControl
-												checked={ loc._selected }
-												onChange={ () => toggleAiLocation( index ) }
-												disabled={ loc._disabled }
-											/>
-											<span style={ { fontSize: '15px', fontWeight: '600', color: '#1e1e1e', marginLeft: '8px' } }>
-												{ loc._geocode_full_address }
-												{ loc._is_enriched && <span title={ __( 'Enriched via Geocoder', 'jeo' ) } style={ { marginLeft: '5px', fontSize: '12px' } }>✅</span> }
-												{ isPrimary && <span title={ __( 'AI flagged this as primary location', 'jeo' ) } style={ { marginLeft: '5px', fontSize: '11px', background: '#e0f0fa', color: '#005a9e', padding: '1px 6px', borderRadius: '10px', fontWeight: '600' } }>★ { __( 'Primary', 'jeo' ) }</span> }
-											</span>
-										</div>
-										<div style={ { 
-											background: confidenceColor, 
-											color: '#fff', 
-											padding: '2px 8px', 
-											borderRadius: '12px', 
-											fontSize: '11px', 
-											fontWeight: 'bold' 
-										} }>
-											{ loc.confidence }% { __( 'confidence', 'jeo' ) }
-										</div>
-									</div>
-
-									<div style={ { marginLeft: '32px' } }>
-										<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '15px', marginBottom: '12px' } }>
-											<p style={ { fontSize: '11px', color: '#757575', margin: 0, fontFamily: 'monospace' } }>
-												{ `${ __( 'LAT:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lat).toFixed(4) } | ${ __( 'LON:', 'jeo' ) } ${ Number.parseFloat(loc._geocode_lon).toFixed(4) }` }
-											</p>
-											
-											<div style={ { display: 'flex', alignItems: 'center', gap: '20px' } }>
-												<Button
-													variant="secondary"
-													isSmall
-													onClick={ ( e ) => { e.stopPropagation(); handleEnrich( index, loc._geocode_lat, loc._geocode_lon ); } }
-													disabled={ enriching[ index ] || loc._disabled || !loc._selected }
-												>
-													{ enriching[ index ] ? <Spinner /> : __( 'Enrich Data', 'jeo' ) }
-												</Button>
-
-												<div onClick={ (e) => e.stopPropagation() }>
-													<ToggleControl
-														label={ isPrimary ? __( 'Primary', 'jeo' ) : __( 'Secondary', 'jeo' ) }
-														checked={ isPrimary }
-														disabled={ loc._disabled || !loc._selected }
-														onChange={ () => changeRelevance( index, isPrimary ? 'secondary' : 'primary' ) }
-														__nextHasNoMarginBottom
-													/>
-												</div>
-											</div>
-										</div>
-
-										{ loc._ai_quote ? (
-											<div style={ {
-												padding: '10px 14px',
-												borderLeft: '4px solid #007cba',
-												background: '#f0f7ff',
-												borderRadius: '0 4px 4px 0',
-												fontSize: '13px',
-												lineHeight: '1.5',
-												fontStyle: 'italic',
-												color: '#2c3338',
-												marginBottom: loc._is_enriched ? '10px' : '0'
-											} }>
-												<strong>{ __( 'AI Context:', 'jeo' ) }</strong> "{ loc._ai_quote }"
-											</div>
-										) : (
-											<div style={ { fontSize: '12px', color: '#a7aaad', fontStyle: 'italic', marginBottom: loc._is_enriched ? '10px' : '0' } }>
-												{ __( '(No context snippet found for this location)', 'jeo' ) }
-											</div>
-										) }
-
-										{ loc._is_enriched && (
-											<div style={ {
-												padding: '10px 14px',
-												borderLeft: '4px solid #46b450',
-												background: '#f0fbf0',
-												borderRadius: '0 4px 4px 0',
-												fontSize: '13px',
-												lineHeight: '1.5',
-												color: '#1e4620'
-											} }>
-												<strong>{ __( 'Verified Address:', 'jeo' ) }</strong> { loc._geocode_full_address }
-											</div>
-										) }
-										
-										{ loc._disabled && (
-											<p style={ { color: '#d63638', fontSize: '11px', marginTop: '8px', fontWeight: '500' } }>
-												{ __( 'Score too low for reliable mapping.', 'jeo' ) }
-											</p>
-										) }
-									</div>
-								</div>
+								<Marker
+									key={ index }
+									icon={ createMarkerIcon( loc._selected ) }
+									position={ [ lat, lng ] }
+									opacity={ loc._selected ? 1 : 0.3 }
+									onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
+								/>
 							);
 						} ) }
-					</div>
+					</MapContainer>
 				</div>
 
-				{/* Right column - Map */}
-				<div style={ { flex: '1', minWidth: '280px', overflow: 'hidden', display: 'flex', flexDirection: 'column' } }>
-					<div id="geocode-map-container" style={ { display: 'block', height: '450px', width: '100%' } }>
-						<MapContainer
-							center={ [ 0, 0 ] }
-							zoom={ 1 }
-							whenCreated={ mapCreated }
-							whenReady={ mapLoaded }
-							style={ { height: '100%', width: '100%' } }
+				{/* Floating overlay panel */}
+				<div className={ `jeo-geocode-modal__panel ${ isMinimized ? 'is-collapsed' : '' }` }>
+					<div
+						className="jeo-geocode-modal__panel-header"
+						onClick={ () => setIsMinimized( ! isMinimized ) }
+						role="button"
+						tabIndex={ 0 }
+						onKeyDown={ ( e ) => { if ( e.key === 'Enter' || e.key === ' ' ) setIsMinimized( ! isMinimized ); } }
+					>
+						<h3>
+							{ isMinimized
+								? sprintf( __( 'AI Suggestions (%d selected)', 'jeo' ), selectedCount )
+								: __( 'Review AI Suggestions', 'jeo' )
+							}
+						</h3>
+						<button
+							className="jeo-geocode-modal__panel-toggle"
+							onClick={ ( e ) => { e.stopPropagation(); setIsMinimized( ! isMinimized ); } }
+							type="button"
+							aria-label={ isMinimized ? __( 'Expand panel', 'jeo' ) : __( 'Minimize panel', 'jeo' ) }
 						>
-							<TileLayer
-								attribution='&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-								url="https://{s}.tile.osm.org/{z}/{x}/{y}.png"
-							/>
-							{ aiSuggestedLocations.map( ( loc, index ) => {
-								const lat = parseFloat( loc._geocode_lat );
-								const lng = parseFloat( loc._geocode_lon );
-								if ( isNaN( lat ) || isNaN( lng ) ) return null;
-
-								return (
-									<Marker
-										key={ index }
-										icon={ createMarkerIcon( loc._selected ) }
-										position={ [ lat, lng ] }
-										opacity={ loc._selected ? 1 : 0.3 }
-										onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
-									/>
-								);
-							} ) }
-						</MapContainer>
+							{ isMinimized ? '▶' : '◀' }
+						</button>
 					</div>
-				</div>
-			</div>
 
-			<div style={ {
-				display: 'flex',
-				gap: '12px',
-				justifyContent: 'flex-end',
-				marginTop: '24px',
-				borderTop: '1px solid #e0e0e0',
-				paddingTop: '20px'
-			} }>
-				<Button
-					variant="tertiary"
-					onClick={ onCancel }
-					style={ { color: '#cc1818' } }
-				>
-					{ __( 'Discard All', 'jeo' ) }
-				</Button>
-				<Button
-					variant="primary"
-					onClick={ saveAiLocations }
-					disabled={ ! aiSuggestedLocations.some( l => l._selected ) }
-					style={ { height: '40px', padding: '0 24px' } }
-				>
-					{ __( 'Add to Map', 'jeo' ) }
-				</Button>
+					{ ! isMinimized && (
+						<div className="jeo-geocode-modal__panel-content">
+							<p style={ { fontSize: '13px', color: '#50575e', margin: '0 0 12px 0' } }>
+								{ __( 'Select locations to add to the map:', 'jeo' ) }
+							</p>
+							<div style={ {
+								display: 'flex',
+								flexDirection: 'column',
+								gap: '10px'
+							} }>
+								{ aiSuggestedLocations.map( ( loc, index ) => {
+									const confidenceColor = loc.confidence >= 80 ? '#46b450' : (loc.confidence >= 50 ? '#ffb900' : '#d63638');
+									const isPrimary = loc.relevance === 'primary';
+									
+									return (
+										<div key={ index } style={ {
+											background: loc._disabled ? '#f6f7f7' : '#fff',
+											border: '1px solid #e0e0e0',
+											borderRadius: '8px',
+											padding: '12px',
+											boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
+											transition: 'border-color 0.2s ease',
+											borderColor: loc._selected ? '#007cba' : '#e0e0e0',
+											cursor: 'pointer',
+											opacity: loc._disabled ? 0.7 : 1
+										} }
+										onClick={ () => handleMarkerClick( loc._geocode_lat, loc._geocode_lon ) }
+										>
+											<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' } }>
+												<div style={ { display: 'flex', alignItems: 'center', gap: '6px' } }>
+													<CheckboxControl
+														checked={ loc._selected }
+														onChange={ () => toggleAiLocation( index ) }
+														disabled={ loc._disabled }
+													/>
+													<span style={ { fontSize: '14px', fontWeight: '600', color: '#1e1e1e' } }>
+														{ loc._geocode_full_address }
+														{ loc._is_enriched && <span title={ __( 'Enriched via Geocoder', 'jeo' ) } style={ { marginLeft: '4px', fontSize: '12px' } }>✅</span> }
+														{ isPrimary && <span title={ __( 'AI flagged this as primary location', 'jeo' ) } style={ { marginLeft: '4px', fontSize: '11px', background: '#e0f0fa', color: '#005a9e', padding: '1px 6px', borderRadius: '10px', fontWeight: '600' } }>★ { __( 'Primary', 'jeo' ) }</span> }
+													</span>
+												</div>
+												<div style={ { 
+													background: confidenceColor, 
+													color: '#fff', 
+													padding: '1px 6px', 
+													borderRadius: '10px', 
+													fontSize: '10px', 
+													fontWeight: 'bold' 
+												} }>
+													{ loc.confidence }%
+												</div>
+											</div>
+
+											<div style={ { marginLeft: '28px' } }>
+												<div style={ { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '10px', marginBottom: '8px' } }>
+													<p style={ { fontSize: '10px', color: '#757575', margin: 0, fontFamily: 'monospace' } }>
+														{ `${ Number.parseFloat(loc._geocode_lat).toFixed(4) }, ${ Number.parseFloat(loc._geocode_lon).toFixed(4) }` }
+													</p>
+													
+													<div style={ { display: 'flex', alignItems: 'center', gap: '8px' } }>
+														<Button
+															variant="secondary"
+															isSmall
+															onClick={ ( e ) => { e.stopPropagation(); handleEnrich( index, loc._geocode_lat, loc._geocode_lon ); } }
+															disabled={ enriching[ index ] || loc._disabled || !loc._selected }
+														>
+															{ enriching[ index ] ? <Spinner /> : __( 'Enrich', 'jeo' ) }
+														</Button>
+
+														<div onClick={ (e) => e.stopPropagation() }>
+															<ToggleControl
+																label={ isPrimary ? __( 'Primary', 'jeo' ) : __( 'Secondary', 'jeo' ) }
+																checked={ isPrimary }
+																disabled={ loc._disabled || !loc._selected }
+																onChange={ () => changeRelevance( index, isPrimary ? 'secondary' : 'primary' ) }
+																__nextHasNoMarginBottom
+															/>
+														</div>
+													</div>
+												</div>
+
+												{ loc._ai_quote ? (
+													<div style={ {
+														padding: '8px 10px',
+														borderLeft: '3px solid #007cba',
+														background: '#f0f7ff',
+														borderRadius: '0 4px 4px 0',
+														fontSize: '12px',
+														lineHeight: '1.4',
+														fontStyle: 'italic',
+														color: '#2c3338',
+														marginBottom: loc._is_enriched ? '8px' : '0'
+													} }>
+														<strong>{ __( 'Context:', 'jeo' ) }</strong> "{ loc._ai_quote }"
+													</div>
+												) : null }
+
+												{ loc._is_enriched && (
+													<div style={ {
+														padding: '8px 10px',
+														borderLeft: '3px solid #46b450',
+														background: '#f0fbf0',
+														borderRadius: '0 4px 4px 0',
+														fontSize: '12px',
+														lineHeight: '1.4',
+														color: '#1e4620'
+													} }>
+														<strong>{ __( 'Verified:', 'jeo' ) }</strong> { loc._geocode_full_address }
+													</div>
+												) }
+												
+												{ loc._disabled && (
+													<p style={ { color: '#d63638', fontSize: '11px', marginTop: '6px', fontWeight: '500' } }>
+														{ __( 'Score too low for reliable mapping.', 'jeo' ) }
+													</p>
+												) }
+											</div>
+										</div>
+									);
+								} ) }
+							</div>
+						</div>
+					) }
+				</div>
+
+				{/* Floating action bar */}
+				<div className="jeo-geocode-modal__actions">
+					<Button
+						variant="tertiary"
+						onClick={ onCancel }
+						style={ { color: '#cc1818' } }
+					>
+						{ __( 'Discard All', 'jeo' ) }
+					</Button>
+					<Button
+						variant="primary"
+						onClick={ saveAiLocations }
+						disabled={ ! aiSuggestedLocations.some( l => l._selected ) }
+						style={ { height: '36px', padding: '0 20px' } }
+					>
+						{ __( 'Add to Map', 'jeo' ) }
+					</Button>
+				</div>
 			</div>
 		</Fragment>
 	);
