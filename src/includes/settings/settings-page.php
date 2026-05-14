@@ -215,14 +215,14 @@
 						<tr>
 							<th scope="row"><label for="jeo_pin_primary_url"><?php esc_html_e( 'Primary Pin URL', 'jeo' ); ?></label></th>
 							<td>
-								<input name="<?php echo esc_html( $this->get_field_name( 'jeo_pin_primary_url' ) ); ?>" type="url" id="jeo_pin_primary_url" value="<?php echo esc_attr( $this->get_option( 'jeo_pin_primary_url' ) ); ?>" class="regular-text" placeholder="https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png">
+								<input name="<?php echo esc_html( $this->get_field_name( 'jeo_pin_primary_url' ) ); ?>" type="url" id="jeo_pin_primary_url" value="<?php echo esc_attr( $this->get_option( 'jeo_pin_primary_url' ) ); ?>" class="regular-text" placeholder="https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png">
 								<p class="description"><?php esc_html_e( 'URL for the primary location marker icon. Leave empty to use the default blue marker.', 'jeo' ); ?></p>
 							</td>
 						</tr>
 						<tr>
 							<th scope="row"><label for="jeo_pin_secondary_url"><?php esc_html_e( 'Secondary Pin URL', 'jeo' ); ?></label></th>
 							<td>
-								<input name="<?php echo esc_html( $this->get_field_name( 'jeo_pin_secondary_url' ) ); ?>" type="url" id="jeo_pin_secondary_url" value="<?php echo esc_attr( $this->get_option( 'jeo_pin_secondary_url' ) ); ?>" class="regular-text" placeholder="https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png">
+								<input name="<?php echo esc_html( $this->get_field_name( 'jeo_pin_secondary_url' ) ); ?>" type="url" id="jeo_pin_secondary_url" value="<?php echo esc_attr( $this->get_option( 'jeo_pin_secondary_url' ) ); ?>" class="regular-text" placeholder="https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png">
 								<p class="description"><?php esc_html_e( 'URL for the secondary location marker icon. Leave empty to use the default grey marker.', 'jeo' ); ?></p>
 							</td>
 						</tr>

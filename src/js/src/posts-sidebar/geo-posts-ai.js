@@ -100,8 +100,8 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 
 	// Create marker icon
 	const pinUrls = window.jeo?.pin_urls || {
-		primary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-		secondary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+		primary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png',
+		secondary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png',
 	};
 	const createMarkerIcon = ( isSelected ) => {
 		return new L.Icon( {

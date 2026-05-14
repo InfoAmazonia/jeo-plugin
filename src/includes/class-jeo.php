@@ -838,8 +838,8 @@ class Jeo {
 					'secondary' => (int) \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ),
 				),
 				'pin_urls'         => array(
-					'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png' ) ),
-					'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png' ) ),
+					'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png' ) ),
+					'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png' ) ),
 				),
 			)
 		);
@@ -1321,8 +1321,8 @@ class Jeo {
 						)
 					),
 					'pin_urls'         => array(
-						'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png' ) ),
-						'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png' ) ),
+						'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png' ) ),
+						'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png' ) ),
 					),
 				)
 			);

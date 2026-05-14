@@ -512,8 +512,8 @@ class JeoGeocodePosts extends Component {
 								let icon;
 
 								const pinUrls = window.jeo?.pin_urls || {
-									primary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-									secondary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+									primary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png',
+									secondary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png',
 								};
 								if ( ! point.relevance || point.relevance === 'primary' ) {
 									icon = new L.Icon( {

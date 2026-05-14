@@ -61,8 +61,8 @@ class Settings {
 		'ai_cal_use_secondary_threshold'  => true,
 
 		// Pin icons.
-		'jeo_pin_primary_url'             => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
-		'jeo_pin_secondary_url'           => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+		'jeo_pin_primary_url'             => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png',
+		'jeo_pin_secondary_url'           => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png',
 
 		// Bulk AI.
 		'jeo_bulk_ai_active'              => false,
