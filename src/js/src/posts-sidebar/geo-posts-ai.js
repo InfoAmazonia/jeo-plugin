@@ -7,7 +7,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './geo-posts.css';
 
-export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocations, toggleAiLocation, changeRelevance }) {
+export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCancel, saveAiLocations, toggleAiLocation, changeRelevance, onRetry }) {
 	const [ mapInstance, setMapInstance ] = useState( null );
 	const [ mapReady, setMapReady ] = useState( false );
 	const [ enriching, setEnriching ] = useState( {} ); // Track which items are being enriched
@@ -312,9 +312,18 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 										{ __( 'Discard All', 'jeo' ) }
 									</Button>
 									<Button
+										variant="secondary"
+										isBusy={ isAIProcessing }
+										disabled={ isAIProcessing }
+										onClick={ onRetry }
+										style={ { height: '36px' } }
+									>
+										{ isAIProcessing ? __( 'Retrying...', 'jeo' ) : __( 'Retry AI', 'jeo' ) }
+									</Button>
+									<Button
 										variant="primary"
 										onClick={ saveAiLocations }
-										disabled={ ! aiSuggestedLocations.some( l => l._selected ) }
+										disabled={ ! aiSuggestedLocations.some( l => l._selected ) || isAIProcessing }
 										style={ { height: '36px', padding: '0 20px' } }
 									>
 										{ __( 'Add to Map', 'jeo' ) }

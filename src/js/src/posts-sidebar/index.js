@@ -271,10 +271,12 @@ const JeoGeocodePanel = ( props ) => {
 				>
 					<JeoGeocodePostsAI
 						aiSuggestedLocations={ aiSuggestedLocations }
+						isAIProcessing={ isAIProcessing }
 						saveAiLocations={ saveAiLocations }
 						toggleAiLocation={ toggleAiLocation }
 						changeRelevance={ changeRelevance }
 						onCancel={ () => setState( ( prev ) => ( { ...prev, isApprovalModalOpen: false }) ) }
+						onRetry={ handleAIGeoreference }
 					/>
 				</Modal>
 			) }
