@@ -28,3 +28,4 @@ dump.sql
 
 .DS_Store
 Thumbs.db
+dist/
