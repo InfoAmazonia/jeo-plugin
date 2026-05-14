@@ -348,6 +348,24 @@
 					⚠️ <?php esc_html_e( 'No token limit set. The LLM will use as many tokens as it deems necessary to produce the result.', 'jeo' ); ?>
 				</div>
 			</div>
+			<div class="jeo-ai-cal-row">
+				<label class="jeo-ai-cal-toggle-label">
+					<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_primary_threshold' ) ); ?>" id="jeo-ai-cal-use-primary-threshold" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_primary_threshold' ) ); ?> />
+					<span class="jeo-ai-cal-toggle-text"><?php esc_html_e( 'Use', 'jeo' ); ?></span>
+				</label>
+				<label for="jeo-ai-cal-primary-threshold"><?php esc_html_e( 'Primary Threshold', 'jeo' ); ?></label>
+				<input type="range" id="jeo-ai-cal-primary-threshold" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_primary_threshold' ) ); ?>" min="0" max="100" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_primary_threshold' ) ); ?>">
+				<span class="jeo-cal-value" id="jeo-ai-cal-primary-threshold-val"><?php echo esc_html( \jeo_settings()->get_option( 'ai_cal_primary_threshold' ) ); ?></span>
+			</div>
+			<div class="jeo-ai-cal-row">
+				<label class="jeo-ai-cal-toggle-label">
+					<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_secondary_threshold' ) ); ?>" id="jeo-ai-cal-use-secondary-threshold" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_secondary_threshold' ) ); ?> />
+					<span class="jeo-ai-cal-toggle-text"><?php esc_html_e( 'Use', 'jeo' ); ?></span>
+				</label>
+				<label for="jeo-ai-cal-secondary-threshold"><?php esc_html_e( 'Secondary Threshold', 'jeo' ); ?></label>
+				<input type="range" id="jeo-ai-cal-secondary-threshold" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_secondary_threshold' ) ); ?>" min="0" max="100" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_secondary_threshold' ) ); ?>">
+				<span class="jeo-cal-value" id="jeo-ai-cal-secondary-threshold-val"><?php echo esc_html( \jeo_settings()->get_option( 'ai_cal_secondary_threshold' ) ); ?></span>
+			</div>
 	</div>
 
 	<div class="jeo-ai-lang-box">

@@ -833,6 +833,10 @@ class Jeo {
 				'default_zoom'     => $default_zoom,
 				'rest_url'         => rest_url( 'jeo/v1' ),
 				'nonce'            => wp_create_nonce( 'wp_rest' ),
+				'ai_thresholds'    => array(
+					'primary'   => (int) \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 ),
+					'secondary' => (int) \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ),
+				),
 			)
 		);
 

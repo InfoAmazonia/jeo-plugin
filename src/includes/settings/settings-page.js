@@ -332,6 +332,8 @@
 		bindCalToggle('jeo-ai-cal-use-granularity', '#jeo-ai-cal-granularity');
 		bindCalToggle('jeo-ai-cal-use-confidence', '#jeo-ai-cal-confidence');
 		bindCalToggle('jeo-ai-cal-use-title-weight', '#jeo-ai-cal-title-weight');
+		bindCalToggle('jeo-ai-cal-use-primary-threshold', '#jeo-ai-cal-primary-threshold');
+		bindCalToggle('jeo-ai-cal-use-secondary-threshold', '#jeo-ai-cal-secondary-threshold');
 		// Max tokens toggle with extra UI (thermometer + unlimited message)
 		(function() {
 			var $toggle = $('#jeo-ai-cal-use-max-tokens');
@@ -366,6 +368,8 @@
 		}
 		bindCalSlider('jeo-ai-cal-confidence');
 		bindCalSlider('jeo-ai-cal-title-weight');
+		bindCalSlider('jeo-ai-cal-primary-threshold');
+		bindCalSlider('jeo-ai-cal-secondary-threshold');
 
 		// Max tokens slider with formatted value
 		(function() {
@@ -426,6 +430,8 @@
 			apiData.use_confidence = $('#jeo-ai-cal-use-confidence').is(':checked') ? 1 : 0;
 			apiData.use_title_weight = $('#jeo-ai-cal-use-title-weight').is(':checked') ? 1 : 0;
 			apiData.use_max_tokens = $('#jeo-ai-cal-use-max-tokens').is(':checked') ? 1 : 0;
+			apiData.use_primary_threshold = $('#jeo-ai-cal-use-primary-threshold').is(':checked') ? 1 : 0;
+			apiData.use_secondary_threshold = $('#jeo-ai-cal-use-secondary-threshold').is(':checked') ? 1 : 0;
 			if ($('#jeo-ai-cal-use-granularity').is(':checked')) {
 				apiData.granularity = $('#jeo-ai-cal-granularity').val();
 			}
@@ -437,6 +443,12 @@
 			}
 			if ($('#jeo-ai-cal-use-max-tokens').is(':checked')) {
 				apiData.max_tokens = parseInt($('#jeo-ai-cal-max-tokens').val(), 10);
+			}
+			if ($('#jeo-ai-cal-use-primary-threshold').is(':checked')) {
+				apiData.primary_threshold = parseInt($('#jeo-ai-cal-primary-threshold').val(), 10);
+			}
+			if ($('#jeo-ai-cal-use-secondary-threshold').is(':checked')) {
+				apiData.secondary_threshold = parseInt($('#jeo-ai-cal-secondary-threshold').val(), 10);
 			}
 
 			$btn.prop('disabled', true).text('Generating...');

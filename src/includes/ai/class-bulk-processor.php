@@ -528,11 +528,16 @@ class Bulk_Processor {
 				}
 			}
 
+			$primary_threshold   = (int) \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 );
+			$secondary_threshold = (int) \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 );
+
 			$related_points = array();
 			foreach ( $pending as $p ) {
 				$conf = isset( $p['confidence'] ) ? (int) $p['confidence'] : 100;
-				// Follow the same logic as the UI: 75%+ is primary, below is secondary.
-				$relevance = ( $conf >= 75 ) ? 'primary' : 'secondary';
+				if ( $conf < $secondary_threshold ) {
+					continue; // Disabled / discarded.
+				}
+				$relevance = ( $conf >= $primary_threshold ) ? 'primary' : 'secondary';
 
 				$related_points[] = array(
 					'relevance'    => $relevance,

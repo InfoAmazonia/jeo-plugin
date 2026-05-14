@@ -41,17 +41,18 @@ const JeoGeocodePanel = ( props ) => {
 					return;
 				}
 
+				const thresholds = window.jeo?.ai_thresholds || { primary: 75, secondary: 35 };
 				const formattedPoints = locations.map( ( loc, index ) => {
 					const confidence = loc.confidence ?? 100;
 					let relevance = 'primary';
 					let selected = true;
 					let disabled = false;
 
-					if ( confidence < 35 ) {
+					if ( confidence < thresholds.secondary ) {
 						relevance = 'secondary';
 						selected = false;
 						disabled = true;
-					} else if ( confidence < 75 ) {
+					} else if ( confidence < thresholds.primary ) {
 						relevance = 'secondary';
 					}
 
@@ -163,17 +164,18 @@ const JeoGeocodePanel = ( props ) => {
 	};
 
 	const handleReviewPending = () => {
+		const thresholds = window.jeo?.ai_thresholds || { primary: 75, secondary: 35 };
 		const formattedPoints = pendingLocations.map( ( loc, index ) => {
 			const confidence = loc.confidence ?? 100;
 			let relevance = 'primary';
 			let selected = true;
 			let disabled = false;
 
-			if ( confidence < 35 ) {
+			if ( confidence < thresholds.secondary ) {
 				relevance = 'secondary';
 				selected = false;
 				disabled = true;
-			} else if ( confidence < 75 ) {
+			} else if ( confidence < thresholds.primary ) {
 				relevance = 'secondary';
 			}
 
