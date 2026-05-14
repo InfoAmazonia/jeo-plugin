@@ -113,29 +113,45 @@
 	}
 }
 
-/* Fullscreen modal layout: map fills viewport, overlay panel floats on top */
+/* Fullscreen modal layout: map fills viewport, overlay panel floats on top.
+   The WordPress Modal component already sets display:flex on the frame and,
+   when isFullScreen, display:flex on .components-modal__content with
+   > :last-child { flex: 1 }. We only need to override sizing and ensure
+   the map container has explicit dimensions. */
 .jeo-geocode-modal .components-modal__frame {
-	max-width: 100vw !important;
+	border-radius: 0 !important;
+	margin: 0 !important;
 	max-height: 100vh !important;
+	max-width: 100vw !important;
 	width: 100vw !important;
 	height: 100vh !important;
-	margin: 0 !important;
-	border-radius: 0 !important;
 }
 
 .jeo-geocode-modal .components-modal__content {
 	padding: 0 !important;
+	overflow: hidden !important;
+}
+
+.jeo-geocode-modal .components-modal__header {
+	background: rgba(255, 255, 255, 0.95);
 }
 
 .jeo-geocode-modal__container {
 	position: relative;
 	width: 100%;
-	height: 100%;
+	height: calc(100vh - 72px);
 	overflow: hidden;
 }
 
-.jeo-geocode-modal__map,
-.jeo-geocode-modal__map > div,
+.jeo-geocode-modal__map {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
 .jeo-geocode-modal__map .leaflet-container {
 	width: 100% !important;
 	height: 100% !important;
@@ -144,10 +160,10 @@
 /* Floating overlay panel */
 .jeo-geocode-modal__panel {
 	position: absolute;
-	top: 16px;
+	bottom: 100px;
 	left: 16px;
 	width: 420px;
-	max-height: calc(100% - 32px);
+	max-height: calc(100% - 96px);
 	background: rgba(255, 255, 255, 0.96);
 	border-radius: 8px;
 	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
@@ -155,7 +171,6 @@
 	z-index: 500;
 	display: flex;
 	flex-direction: column;
-	transition: all 0.3s ease;
 }
 
 .jeo-geocode-modal__panel.is-collapsed {
@@ -176,7 +191,7 @@
 	padding: 10px 14px;
 	border-bottom: 1px solid #e0e0e0;
 	flex-shrink: 0;
-	cursor: pointer;
+	cursor: move;
 	user-select: none;
 }
 

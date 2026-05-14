@@ -109,13 +109,6 @@
 			</td>
 		</tr>
 
-		<tr>
-			<th scope="row"><label for="ai_debug_mode"><?php esc_html_e( 'Debug Mode', 'jeo' ); ?></label></th>
-			<td>
-				<input type="checkbox" name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_debug_mode' ) ); ?>" id="ai_debug_mode" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_debug_mode' ) ); ?> />
-				<span class="description"><?php esc_html_e( 'Enable internal logging of all AI calls (Inputs/Outputs) for 24 hours. Useful for debugging prompt regressions.', 'jeo' ); ?></span>
-			</td>
-		</tr>
 	</tbody>
 </table>
 

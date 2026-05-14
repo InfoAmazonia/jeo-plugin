@@ -1,6 +1,6 @@
 import { Button, CheckboxControl, RadioControl } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
@@ -37,8 +37,12 @@ class JeoGeocodePosts extends Component {
 			currentMarkerIndex: 0,
 			loadStatus: 'pending',
 			magneticMarkers: true,
-			isPanelMinimized: false,
+		isPanelMinimized: false,
+		panelOffset: { x: 0, y: 0 },
 		};
+
+		this.isDraggingPanel = false;
+		this.dragStartPos = { x: 0, y: 0 };
 
 		this.onLocationFound = this.onLocationFound.bind( this );
 		this.onMarkerDragged = this.onMarkerDragged.bind( this );
@@ -63,6 +67,9 @@ class JeoGeocodePosts extends Component {
 		this.onClickCancel = this.onClickCancel.bind( this );
 		this.toggleMagnet = this.toggleMagnet.bind( this );
 		this.togglePanel = this.togglePanel.bind( this );
+		this.startPanelDrag = this.startPanelDrag.bind( this );
+		this.movePanelDrag = this.movePanelDrag.bind( this );
+		this.stopPanelDrag = this.stopPanelDrag.bind( this );
 
 		this.refMap = createRef();
 	}
@@ -364,6 +371,45 @@ class JeoGeocodePosts extends Component {
 		}
 	}
 
+	startPanelDrag( e ) {
+		if ( e.target.tagName === 'BUTTON' || e.target.closest( 'button' ) ) {
+			return;
+		}
+		this.isDraggingPanel = true;
+		const clientX = e.clientX ?? e.touches?.[ 0 ]?.clientX ?? 0;
+		const clientY = e.clientY ?? e.touches?.[ 0 ]?.clientY ?? 0;
+		this.dragStartPos = { x: clientX, y: clientY };
+		document.addEventListener( 'mousemove', this.movePanelDrag );
+		document.addEventListener( 'mouseup', this.stopPanelDrag );
+		document.addEventListener( 'touchmove', this.movePanelDrag, { passive: false } );
+		document.addEventListener( 'touchend', this.stopPanelDrag );
+	}
+
+	movePanelDrag( e ) {
+		if ( ! this.isDraggingPanel ) {
+			return;
+		}
+		const clientX = e.clientX ?? e.touches?.[ 0 ]?.clientX ?? 0;
+		const clientY = e.clientY ?? e.touches?.[ 0 ]?.clientY ?? 0;
+		const dx = clientX - this.dragStartPos.x;
+		const dy = clientY - this.dragStartPos.y;
+		this.setState( ( prev ) => ( {
+			panelOffset: {
+				x: prev.panelOffset.x + dx,
+				y: prev.panelOffset.y + dy,
+			},
+		} ) );
+		this.dragStartPos = { x: clientX, y: clientY };
+	}
+
+	stopPanelDrag() {
+		this.isDraggingPanel = false;
+		document.removeEventListener( 'mousemove', this.movePanelDrag );
+		document.removeEventListener( 'mouseup', this.stopPanelDrag );
+		document.removeEventListener( 'touchmove', this.movePanelDrag );
+		document.removeEventListener( 'touchend', this.stopPanelDrag );
+	}
+
 	renderForm() {
 		const {
 			currentMarkerIndex,
@@ -501,15 +547,18 @@ class JeoGeocodePosts extends Component {
 				</div>
 
 				{/* Floating overlay panel */}
-				<div className={ panelClass }>
+				<div
+					className={ panelClass }
+					style={ { transform: `translate(${ this.state.panelOffset.x }px, ${ this.state.panelOffset.y }px)` } }
+				>
 					<div
 						className="jeo-geocode-modal__panel-header"
-						onClick={ this.togglePanel }
-						role="button"
-						tabIndex={ 0 }
-						onKeyDown={ ( e ) => { if ( e.key === 'Enter' || e.key === ' ' ) this.togglePanel(); } }
 					>
-						<h3>
+						<h3
+							onMouseDown={ this.startPanelDrag }
+							onTouchStart={ this.startPanelDrag }
+							style={ { userSelect: 'none' } }
+						>
 							{ isPanelMinimized
 								? sprintf( __( 'Points (%d)', 'jeo' ), pointsList.length )
 								: __( 'Geolocate this post', 'jeo' )

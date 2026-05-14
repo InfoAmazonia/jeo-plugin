@@ -1,5 +1,6 @@
 import { Button, CheckboxControl, ToggleControl, Spinner } from '@wordpress/components';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import { useDraggable } from './use-draggable';
 import { __, sprintf } from '@wordpress/i18n';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
@@ -11,6 +12,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 	const [ mapReady, setMapReady ] = useState( false );
 	const [ enriching, setEnriching ] = useState( {} ); // Track which items are being enriched
 	const [ isMinimized, setIsMinimized ] = useState( false );
+	const { position: panelPos, bindDrag: panelDrag } = useDraggable();
 
 	// Handle map creation
 	const mapCreated = ( map ) => {
@@ -28,7 +30,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 		
 		try {
 			const response = await window.fetch(
-				globalThis.jeo?.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lon
+				globalThis.jeo?.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lng
 			);
 			const result = await response.json();
 
@@ -79,22 +81,19 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 	// Fit map bounds when map is ready and locations exist
 	useEffect( () => {
 		if ( mapInstance && mapReady && aiSuggestedLocations.length > 0 ) {
-			const selectedLocations = aiSuggestedLocations.filter( loc => loc._selected );
-			if ( selectedLocations.length > 0 ) {
-				const coords = selectedLocations
-					.map( ( loc ) => {
-						const lat = parseFloat( loc._geocode_lat );
-						const lng = parseFloat( loc._geocode_lon );
-						return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lat, lng ];
-					} )
-					.filter( c => c !== null );
+			const coords = aiSuggestedLocations
+				.map( ( loc ) => {
+					const lat = parseFloat( loc._geocode_lat );
+					const lng = parseFloat( loc._geocode_lon );
+					return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lat, lng ];
+				} )
+				.filter( c => c !== null );
 
-				if ( coords.length === 1 ) {
-					mapInstance.setZoom( 6 );
-					mapInstance.panTo( coords[ 0 ] );
-				} else if ( coords.length > 1 ) {
-					mapInstance.fitBounds( coords );
-				}
+			if ( coords.length === 1 ) {
+				mapInstance.setZoom( 10 );
+				mapInstance.panTo( coords[ 0 ] );
+			} else if ( coords.length > 1 ) {
+				mapInstance.fitBounds( coords );
 			}
 		}
 	}, [ mapInstance, mapReady, aiSuggestedLocations ] );
@@ -158,15 +157,17 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 				</div>
 
 				{/* Floating overlay panel */}
-				<div className={ `jeo-geocode-modal__panel ${ isMinimized ? 'is-collapsed' : '' }` }>
+				<div
+					className={ `jeo-geocode-modal__panel ${ isMinimized ? 'is-collapsed' : '' }` }
+					style={ { transform: `translate(${ panelPos.x }px, ${ panelPos.y }px)` } }
+				>
 					<div
 						className="jeo-geocode-modal__panel-header"
-						onClick={ () => setIsMinimized( ! isMinimized ) }
-						role="button"
-						tabIndex={ 0 }
-						onKeyDown={ ( e ) => { if ( e.key === 'Enter' || e.key === ' ' ) setIsMinimized( ! isMinimized ); } }
 					>
-						<h3>
+						<h3
+							{ ...panelDrag }
+							style={ { userSelect: 'none' } }
+						>
 							{ isMinimized
 								? sprintf( __( 'AI Suggestions (%d selected)', 'jeo' ), selectedCount )
 								: __( 'Review AI Suggestions', 'jeo' )
@@ -302,28 +303,26 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 										</div>
 									);
 								} ) }
+								<div style={ { display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '16px', paddingTop: '12px', borderTop: '1px solid #e0e0e0' } }>
+									<Button
+										variant="tertiary"
+										onClick={ onCancel }
+										style={ { color: '#cc1818' } }
+									>
+										{ __( 'Discard All', 'jeo' ) }
+									</Button>
+									<Button
+										variant="primary"
+										onClick={ saveAiLocations }
+										disabled={ ! aiSuggestedLocations.some( l => l._selected ) }
+										style={ { height: '36px', padding: '0 20px' } }
+									>
+										{ __( 'Add to Map', 'jeo' ) }
+									</Button>
+								</div>
 							</div>
 						</div>
 					) }
-				</div>
-
-				{/* Floating action bar */}
-				<div className="jeo-geocode-modal__actions">
-					<Button
-						variant="tertiary"
-						onClick={ onCancel }
-						style={ { color: '#cc1818' } }
-					>
-						{ __( 'Discard All', 'jeo' ) }
-					</Button>
-					<Button
-						variant="primary"
-						onClick={ saveAiLocations }
-						disabled={ ! aiSuggestedLocations.some( l => l._selected ) }
-						style={ { height: '36px', padding: '0 20px' } }
-					>
-						{ __( 'Add to Map', 'jeo' ) }
-					</Button>
 				</div>
 			</div>
 		</Fragment>
