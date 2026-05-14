@@ -1105,6 +1105,7 @@ class AI_Handler {
 			$calibration_rules .= "- Locations with a confidence score below {$primary_threshold} but at least {$secondary_threshold} should be classified as SECONDARY (mentioned but not central).\n";
 			$calibration_rules .= "- Locations with a confidence score below {$secondary_threshold} should be discarded entirely (treated as disabled / not relevant enough).\n";
 		}
+		$calibration_rules .= "- CRITICAL: Each location object MUST include the boolean field 'is_primary'. Set it to true ONLY for locations that are the MAIN geographic focus of the content (where the story happens, the central territory, or the primary object of the report). Set it to false for all secondary, supporting, or contextual locations. Do NOT rely solely on confidence scores for this classification; use your editorial judgment based on the text analysis.\n";
 
 		// Meta-prompt instructed to build a JEO prompt.
 		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
@@ -1220,6 +1221,11 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lon', $item ) || ! isset( $item['quote'] ) ) {
 					$is_valid = false;
 					$msg      = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeo' );
+					break;
+				}
+				if ( isset( $item['is_primary'] ) && ! is_bool( $item['is_primary'] ) && ! in_array( $item['is_primary'], array( true, false, 1, 0, 'true', 'false' ), true ) ) {
+					$is_valid = false;
+					$msg      = __( 'Validation failed: The AI returned an invalid is_primary value (must be boolean).', 'jeo' );
 					break;
 				}
 			}

@@ -537,7 +537,13 @@ class Bulk_Processor {
 				if ( $conf < $secondary_threshold ) {
 					continue; // Disabled / discarded.
 				}
-				$relevance = ( $conf >= $primary_threshold ) ? 'primary' : 'secondary';
+
+				// Respect AI's editorial is_primary determination when available.
+				if ( isset( $p['is_primary'] ) ) {
+					$relevance = $p['is_primary'] ? 'primary' : 'secondary';
+				} else {
+					$relevance = ( $conf >= $primary_threshold ) ? 'primary' : 'secondary';
+				}
 
 				$related_points[] = array(
 					'relevance'    => $relevance,

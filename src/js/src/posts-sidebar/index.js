@@ -48,7 +48,14 @@ const JeoGeocodePanel = ( props ) => {
 					let selected = true;
 					let disabled = false;
 
-					if ( confidence < thresholds.secondary ) {
+					// Respect AI's editorial determination of is_primary when available.
+					if ( typeof loc.is_primary === 'boolean' ) {
+						relevance = loc.is_primary ? 'primary' : 'secondary';
+						if ( ! loc.is_primary && confidence < thresholds.secondary ) {
+							selected = false;
+							disabled = true;
+						}
+					} else if ( confidence < thresholds.secondary ) {
 						relevance = 'secondary';
 						selected = false;
 						disabled = true;
@@ -171,7 +178,14 @@ const JeoGeocodePanel = ( props ) => {
 			let selected = true;
 			let disabled = false;
 
-			if ( confidence < thresholds.secondary ) {
+			// Respect AI's editorial determination of is_primary when available.
+			if ( typeof loc.is_primary === 'boolean' ) {
+				relevance = loc.is_primary ? 'primary' : 'secondary';
+				if ( ! loc.is_primary && confidence < thresholds.secondary ) {
+					selected = false;
+					disabled = true;
+				}
+			} else if ( confidence < thresholds.secondary ) {
 				relevance = 'secondary';
 				selected = false;
 				disabled = true;

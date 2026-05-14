@@ -165,6 +165,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, onCancel, saveAiLocat
 											<span style={ { fontSize: '15px', fontWeight: '600', color: '#1e1e1e', marginLeft: '8px' } }>
 												{ loc._geocode_full_address }
 												{ loc._is_enriched && <span title={ __( 'Enriched via Geocoder', 'jeo' ) } style={ { marginLeft: '5px', fontSize: '12px' } }>✅</span> }
+												{ isPrimary && <span title={ __( 'AI flagged this as primary location', 'jeo' ) } style={ { marginLeft: '5px', fontSize: '11px', background: '#e0f0fa', color: '#005a9e', padding: '1px 6px', borderRadius: '10px', fontWeight: '600' } }>★ { __( 'Primary', 'jeo' ) }</span> }
 											</span>
 										</div>
 										<div style={ { 
