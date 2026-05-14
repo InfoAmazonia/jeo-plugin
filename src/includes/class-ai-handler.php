@@ -1107,16 +1107,25 @@ class AI_Handler {
 		}
 		$calibration_rules .= "- CRITICAL: Each location object MUST include the boolean field 'is_primary'. Set it to true ONLY for locations that are the MAIN geographic focus of the content (where the story happens, the central territory, or the primary object of the report). Set it to false for all secondary, supporting, or contextual locations. Do NOT rely solely on confidence scores for this classification; use your editorial judgment based on the text analysis.\n";
 
-		// Meta-prompt instructed to build a JEO prompt.
-		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
-The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
-Write a clear, strict System Prompt that incorporates the user's rules.
-{$model_optimization}
+		$structured_active = \jeo_settings()->get_option( 'ai_use_structured_output' );
 
-### CALIBRATION RULES
-{$calibration_rules}
+		// When structured output is active the JSON schema is enforced natively by the provider.
+		// The generated system prompt should NOT include the aggressive CRITICAL INSTRUCTION block,
+		// otherwise it creates conflicting instructions.
+		if ( $structured_active ) {
+			$output_format_mandate = "### OUTPUT FORMAT MANDATE — ABSOLUTE RULE
+The JEO system now uses Native Structured Output (API-level schema enforcement). This means the AI provider automatically handles the JSON response format.
 
-### OUTPUT FORMAT MANDATE
+YOU MUST OMIT the following from your generated system prompt:
+- ANY paragraph starting with 'CRITICAL INSTRUCTION' that mentions JSON arrays, keys, or response format.
+- ANY 'Example of the ONLY valid format' block.
+- ANY instruction like 'If no locations are found, return exactly []'.
+- ANY 'Output MUST start with [' or similar formatting rules.
+
+If you include these, the prompt will contain CONFLICTING INSTRUCTIONS and the AI will produce errors.
+Focus ONLY on editorial rules, calibration, and geographic logic.";
+		} else {
+			$output_format_mandate = "### OUTPUT FORMAT MANDATE
 You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
 
 \"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
@@ -1127,7 +1136,19 @@ Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lon',
 - 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
 - 'confidence': An integer between 0 and 100 representing your confidence level in this extraction.
 Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lon\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
-If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"
+If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"";
+		}
+
+		// Meta-prompt instructed to build a JEO prompt.
+		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
+The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
+Write a clear, strict System Prompt that incorporates the user's rules.
+{$model_optimization}
+
+### CALIBRATION RULES
+{$calibration_rules}
+
+{$output_format_mandate}
 
 Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
 

@@ -58,6 +58,17 @@ abstract class AI_Adapter {
 			return trim( str_replace( '[SKIP_ENFORCED_SCHEMA]', '', $prompt ) );
 		}
 
+		// When NeuronAI Structured Output is active, the schema is enforced natively by the provider
+		// via the API response_format parameter. Adding JSON formatting instructions here would
+		// create redundant/conflicting directives and waste tokens. Just return the clean prompt.
+		if ( \jeo_settings()->get_option( 'ai_use_structured_output' ) ) {
+			// Safety net: strip any legacy JSON formatting blocks that may have been pasted from
+		// old prompts or generated before the assistant was updated. These patterns are specific
+		// enough that legitimate editorial instructions are extremely unlikely to collide.
+		$prompt = $this->strip_legacy_json_instructions( $prompt );
+			return $prompt;
+		}
+
 		// Inject mandatory JSON schema constraints aggressively to any prompt to prevent formatting regressions.
 		$enforced_schema = "
 
@@ -124,6 +135,25 @@ abstract class AI_Adapter {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Strip legacy JSON formatting instructions from a prompt when Structured Output is active.
+	 *
+	 * Serves as a safety net for prompts generated before the assistant update,
+	 * or when the LLM ignored the meta-prompt and included the block anyway.
+	 *
+	 * @param string $prompt The prompt to sanitize.
+	 * @return string
+	 */
+	protected function strip_legacy_json_instructions( $prompt ) {
+		// Remove everything from "### OUTPUT FORMAT MANDATE" to the end of the prompt.
+		$prompt = preg_replace( '/\s*### OUTPUT FORMAT MANDATE.*$/s', '', $prompt );
+
+		// Remove the legacy CRITICAL INSTRUCTION block if it appears inline.
+		$prompt = preg_replace( '/\s*CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array.*$/s', '', $prompt );
+
+		return trim( $prompt );
 	}
 
 	/**

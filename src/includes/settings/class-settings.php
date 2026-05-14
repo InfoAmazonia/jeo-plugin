@@ -46,6 +46,7 @@ class Settings {
 		'ai_use_custom_prompt'            => false,
 		'ai_debug_mode'                   => false,
 		'ai_debug_console'                => true,
+		'ai_use_structured_output'         => false,
 		'ai_include_taxonomies'           => false,
 		'ai_embedding_model'              => '',
 		'ai_cal_granularity'              => 'balanced',
@@ -227,7 +228,7 @@ class Settings {
 		$booleans_by_tab = array(
 			'general'   => array( 'show_storymaps_on_post_archives' ),
 			'provider'  => array( 'ai_use_custom_prompt', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold' ),
-			'settings'  => array( 'ai_debug_mode', 'ai_debug_console' ),
+			'settings'  => array( 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output' ),
 			'bulk'      => array( 'jeo_bulk_ai_active', 'jeo_bulk_logging' ),
 			'knowledge' => array( 'jeo_rag_auto_index' ),
 		);
@@ -239,7 +240,7 @@ class Settings {
 			}
 		} else {
 			// Fallback if no tab identifier (e.g. direct API updates or older logic).
-			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_debug_console', 'ai_use_custom_prompt', 'ai_include_taxonomies', 'show_storymaps_on_post_archives', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold' );
+			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output', 'ai_use_custom_prompt', 'ai_include_taxonomies', 'show_storymaps_on_post_archives', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold' );
 			foreach ( $all_booleans as $bool_key ) {
 				if ( isset( $input[ $bool_key ] ) ) {
 					$input[ $bool_key ] = ! empty( $input[ $bool_key ] );
