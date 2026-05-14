@@ -112,7 +112,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		apiFetch( {
 			path: '/jeo/v1/minimap/setup',
 			method: 'POST',
-			data: { post_id: postId },
+			data: { post_id: postId, conversation_id: convId },
 		} )
 			.then( ( response ) => {
 				if ( response.success ) {
@@ -182,6 +182,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				message: text,
 				type,
 				payload,
+				current_map_state: {
+					layers: attrs.layers || [],
+					base_layer: attrs.base_layer || null,
+					center_lat: attrs.center_lat,
+					center_lon: attrs.center_lon,
+					initial_zoom: attrs.initial_zoom,
+					pins: attrs.pins || [],
+				},
 			},
 		} )
 			.then( ( response ) => {
@@ -325,12 +333,13 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			return;
 		}
 
+		const convId = generateUUID();
 		setAttributes( { status: 'loading', message: '' } );
 
 		apiFetch( {
 			path: '/jeo/v1/minimap/setup',
 			method: 'POST',
-			data: { post_id: postId },
+			data: { post_id: postId, conversation_id: convId },
 		} )
 			.then( ( response ) => {
 				if ( response.success ) {
@@ -343,7 +352,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						initial_zoom: response.initial_zoom,
 						pins: response.pins || [],
 						message: response.message || '',
-						conversation_id: generateUUID(),
+						conversation_id: convId,
 						conversation: [
 							{
 								role: 'assistant',

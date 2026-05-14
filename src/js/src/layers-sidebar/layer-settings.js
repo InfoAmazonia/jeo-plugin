@@ -10,6 +10,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import InteractionsSettings from './interactions-settings';
+import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import SchemaForm, { mergeSchemaFormData } from '../shared/schema-form';
 import { mergeLayerTypeOptions } from '../map-blocks/layer-type-options';
@@ -130,7 +131,10 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	}, [ formData.layer_type_options?.interactions ] );
 
 	useEffect( () => {
-		setFormData( normalizeLayerFormData( postMeta ) );
+		const next = normalizeLayerFormData( postMeta );
+		if ( ! isEqual( next, formData ) ) {
+			setFormData( next );
+		}
 	}, [ serializedPostMeta ] );
 
 	const setInteractions = useCallback(
@@ -218,8 +222,10 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 						mergeSchemaFormData( formData, nextPartialFormData )
 					);
 					window.layerFormData = nextFormData;
-					setFormData( nextFormData );
-					setPostMeta( nextFormData );
+					if ( ! isEqual( nextFormData, formData ) ) {
+						setFormData( nextFormData );
+						setPostMeta( nextFormData );
+					}
 				} }
 			>
 				{ /* Hide submit button */ }

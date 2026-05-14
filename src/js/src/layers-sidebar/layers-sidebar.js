@@ -37,6 +37,7 @@ const LayersSidebar = ( {
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
 
 	const loadedRef = useRef( false );
+	const layerReadyRef = useRef( false );
 	const [ renderControl, setRenderControl ] = useState( {
 		status: 'incomplete_form',
 	} );
@@ -58,6 +59,9 @@ const LayersSidebar = ( {
 	useEffect( () => {
 		if ( renderControl.status !== 'loaded' ) {
 			loadedRef.current = false;
+		}
+		if ( [ 'ready', 'loaded' ].includes( renderControl.status ) ) {
+			layerReadyRef.current = true;
 		}
 		switch ( renderControl.status ) {
 			case 'incomplete_form':
@@ -172,7 +176,7 @@ const LayersSidebar = ( {
 						setPostMeta( { initial_zoom: zoom } );
 					} }
 				>
-					{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
+					{ ( layerReadyRef.current || [ 'ready', 'loaded' ].includes( renderControl.status ) ) && (
 						<MemoizedRenderLayer layer={ debouncedPostMeta } instance={ { id: 1, use: 'fixed' } } />
 					) }
 				</Map>

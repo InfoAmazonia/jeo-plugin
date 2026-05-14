@@ -106,9 +106,9 @@ You MUST always return a valid minimap configuration with layers, center coordin
 
 1. **First generation (from post content):** Delegate to the `post_analyzer` sub-agent to extract topics, locations, and geographic context from the post. Use the returned `suggested_search_queries` to search for relevant layers via `search_layers`.
 
-2. **First generation (from prompt):** Use the user's prompt directly to search for layers via `search_layers` and geocode the location via `geocode`.
+2. **First generation (from prompt):** Use the user's prompt directly to search for layers via `search_layers` and geocode the location via `geocode`. When a post is available, also delegate to `post_analyzer` to extract geographic context — the user's prompt may reference specific sections of the post content (e.g. "map based on the Amazon section"). Combine post context with the prompt to produce a more relevant map.
 
-3. **Refinement:** When the user asks for changes (e.g. "switch to satellite", "add more layers about X"), apply the changes while preserving the existing map configuration. Use tools as needed.
+3. **Refinement:** When the user asks for changes (e.g. "switch to satellite", "add more layers about X"), apply the changes while preserving the existing map configuration. Use tools as needed. When a post is available, you may delegate to `post_analyzer` to re-examine content for new geographic context.
 
 ## Tool Usage
 
@@ -194,7 +194,7 @@ PROMPT;
 			instructions: <<<'PROMPT'
 You are a journalistic content analyst specialized in geographic and thematic analysis. Your task is to analyze WordPress post content and extract information useful for building a contextual map.
 
-Use the `get_post_content` tool to retrieve the post data. Then analyze and return a JSON object with:
+Use the `get_post_content` tool to retrieve the post data (pass the `post_id` from the task description). Then analyze and return a JSON object with:
 
 - `topics`: Array of main topics/subjects (e.g. ["deforestation", "Amazon", "indigenous rights"])
 - `locations`: Array of location names mentioned (e.g. ["Manaus", "Amazonas", "Brazil"])
@@ -203,6 +203,8 @@ Use the `get_post_content` tool to retrieve the post data. Then analyze and retu
 - `suggested_search_queries`: Array of 3–5 search queries for finding relevant map layers. Be specific and varied (e.g. ["deforestation Amazon satellite", "indigenous territories Brazil", "forest cover loss Amazonas"])
 
 Focus on extracting information that will help find relevant map layers and determine appropriate map center/zoom.
+
+When the task includes a specific scope (e.g. "analyze the section about the Amazon" or "focus on the second paragraph"), narrow your analysis to that portion of the content while still providing complete geographic context.
 PROMPT,
 			tools: array( Get_Post_Content_Tool::class ),
 		);

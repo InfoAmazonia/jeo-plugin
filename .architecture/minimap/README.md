@@ -66,23 +66,24 @@ graph TB
 
 ### `POST /jeo/v1/minimap/setup` — Generate from post content
 
-Legacy RAG-based endpoint (no AI agent). Uses `RAG_Worker::find_matching_layers()` directly.
+Legacy RAG-based endpoint (no AI agent). Uses `RAG_Worker::find_matching_layers()` directly. When a `conversation_id` is provided, the generated map state is persisted as a synthetic conversation thread so subsequent chat messages can build on the existing map.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `post_id` | int | Yes | Post to analyze |
 | `top_k` | int | No | Max layers (default 5) |
+| `conversation_id` | string | No | UUID — if provided, persists initial context for chat continuity |
 
 Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom, pins[], message }`
 
 ### `POST /jeo/v1/minimap/setup-prompt` — Generate from prompt (AI agent)
 
-Uses the full AI agent with structured output.
+Uses the full AI agent with structured output. When a `post_id` is provided, the agent receives context about the post and may delegate to the `post_analyzer` sub-agent to extract geographic information from the post content — useful when the prompt references specific sections of the post (e.g. "map based on the Amazon section").
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `prompt` | string | Yes | Text description of desired map |
-| `post_id` | int | No | Post ID for pin extraction |
+| `post_id` | int | No | Post ID — enables post content analysis via post_analyzer |
 | `conversation_id` | string | No | UUID for conversation continuity |
 
 Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom, pins[], message, assistant_message, base_variant? }`
@@ -98,6 +99,7 @@ Refines an existing map through conversation. The agent maintains context via co
 | `type` | string | No | `text` (default), `base_variant`, `add_layers`, `regenerate` |
 | `post_id` | int | No | Post ID for pin extraction |
 | `payload` | object | No | Structured data (e.g. `{ variant: "satellite" }`) |
+| `current_map_state` | object | No | Live block attributes (`layers`, `base_layer`, `center_lat`, `center_lon`, `initial_zoom`, `pins`) — injected as system prompt context so the AI always knows the current map regardless of conversation history |
 
 Structured types are resolved to natural language by `resolve_structured_message()` before being sent to the agent:
 
@@ -214,6 +216,25 @@ sequenceDiagram
 **Serialization**: Only `user` and `assistant` text messages are stored (tool calls, tool results are excluded). Each message is a simple `{role: string, content: string}` array. Stored via `ConversationStore` → `WP_Storage` → `update_post_meta()` (PHP `serialize()`).
 
 **Injection**: Prior messages are loaded and added to the assistant's chat history via `addMessage()` BEFORE `structured()` is called. This works because `resolveState()` is lazy — the state is created once and reused, and `init()` resets `toolRuns`/`steps` but NOT the chat history.
+
+#### Content-based generation context (persist_initial_context)
+
+When a map is generated from post content via `/minimap/setup`, the RAG-based flow does not use the AI agent and therefore produces no conversation history. To ensure chat refinement works, `persist_initial_context()` stores a synthetic thread:
+
+```
+[user]    "Generate a map for this post based on its content."
+[assistant] "Map generated from post content with the following configuration:
+             Layers: - Layer Name (ID: 123), ...
+             Center: -14.235, -51.925 | Zoom: 8
+             Base: dark
+             Pins: 2 geolocation point(s)"
+```
+
+This synthetic history is loaded by `inject_history()` on the first chat message, giving the AI agent full context about the existing map.
+
+#### Live state context (build_state_context)
+
+In addition to conversation history, `/minimap/chat` also receives the current block attributes as `current_map_state`. `build_state_context()` formats this as a context string passed to `Minimap_Agent::create()` as `initial_context`, which appends it to the system prompt. This ensures the AI always knows the live map state even if conversation history is stale or missing.
 
 ### Post-Processing in `run_agent()`
 

@@ -128,9 +128,10 @@ class Minimap {
 	 * @return \WP_REST_Response
 	 */
 	public function api_setup( $request ) {
-		$post_id   = (int) $request->get_param( 'post_id' );
-		$raw_top_k = $request->get_param( 'top_k' );
-		$top_k     = $raw_top_k ? (int) $raw_top_k : 5;
+		$post_id         = (int) $request->get_param( 'post_id' );
+		$conversation_id = sanitize_text_field( $request->get_param( 'conversation_id' ) );
+		$raw_top_k       = $request->get_param( 'top_k' );
+		$top_k           = $raw_top_k ? (int) $raw_top_k : 5;
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
@@ -176,19 +177,22 @@ class Minimap {
 
 		$pins = $this->get_pins( $post_id );
 
-		return new \WP_REST_Response(
-			array(
-				'success'      => true,
-				'layers'       => $layers,
-				'base_layer'   => $base_layer,
-				'center_lat'   => $center_zoom['lat'],
-				'center_lon'   => $center_zoom['lon'],
-				'initial_zoom' => $center_zoom['zoom'],
-				'pins'         => $pins,
-				'message'      => $rag_message,
-			),
-			200
+		$response_data = array(
+			'success'      => true,
+			'layers'       => $layers,
+			'base_layer'   => $base_layer,
+			'center_lat'   => $center_zoom['lat'],
+			'center_lon'   => $center_zoom['lon'],
+			'initial_zoom' => $center_zoom['zoom'],
+			'pins'         => $pins,
+			'message'      => $rag_message,
 		);
+
+		if ( ! empty( $conversation_id ) ) {
+			$this->persist_initial_context( $post_id, $conversation_id, $response_data );
+		}
+
+		return new \WP_REST_Response( $response_data, 200 );
 	}
 
 	/**
@@ -225,11 +229,20 @@ class Minimap {
 		}
 
 		try {
+			$state_context = null;
+			if ( $post_id ) {
+				$post = get_post( $post_id );
+				if ( $post ) {
+					$state_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '"). You may delegate to the post_analyzer sub-agent to extract geographic context from the post content.';
+				}
+			}
+
 			$result = $this->run_agent(
 				$post_id ? $post_id : 0,
 				$conversation_id,
 				$user_id,
-				$prompt
+				$prompt,
+				$state_context
 			);
 
 			return new \WP_REST_Response( $result->to_rest_response(), 200 );
@@ -291,12 +304,15 @@ class Minimap {
 
 		$resolved_message = $this->resolve_structured_message( $type, $message, $request );
 
+		$state_context = $this->build_state_context( $request );
+
 		try {
 			$result = $this->run_agent(
 				$post_id,
 				$conversation_id,
 				$user_id,
-				$resolved_message
+				$resolved_message,
+				$state_context
 			);
 
 			return new \WP_REST_Response( $result->to_rest_response(), 200 );
@@ -317,16 +333,17 @@ class Minimap {
 	 * Handles base layer creation/assignment and applies the luminance
 	 * heuristic as a fallback when the agent does not return base_variant.
 	 *
-	 * @param int    $post_id         Post ID.
-	 * @param string $conversation_id Conversation UUID.
-	 * @param int    $user_id         User ID.
-	 * @param string $message         User message to the agent.
+	 * @param int         $post_id         Post ID.
+	 * @param string      $conversation_id Conversation UUID.
+	 * @param int         $user_id         User ID.
+	 * @param string      $message         User message to the agent.
+	 * @param string|null $state_context   Current map state context for the system prompt.
 	 * @return Minimap_Output
 	 * @throws \Exception On agent failure or empty AI response.
 	 * @throws \TypeError On unexpected type errors from the AI library.
 	 */
-	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message ): Minimap_Output {
-		$assistant = Minimap_Agent::create( $post_id, $conversation_id, $user_id ? $user_id : null );
+	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message, ?string $state_context = null ): Minimap_Output {
+		$assistant = Minimap_Agent::create( $post_id, $conversation_id, $user_id ? $user_id : null, $state_context );
 
 		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
 		$this->inject_history( $assistant, $store, $conversation_id );
@@ -416,6 +433,127 @@ class Minimap {
 		}
 
 		$store->saveThread( $conversation_id, $storable );
+	}
+
+	/**
+	 * Persist a synthetic conversation thread for content-based map generation.
+	 *
+	 * Stores the initial user request and the generated map configuration as
+	 * a conversation thread so subsequent chat messages build on the existing
+	 * map instead of generating from scratch.
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @param array  $map_config      Generated map configuration.
+	 */
+	private function persist_initial_context( int $post_id, string $conversation_id, array $map_config ): void {
+		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
+
+		$layer_lines = array();
+		foreach ( $map_config['layers'] as $layer_def ) {
+			$layer_post    = get_post( (int) $layer_def['id'] );
+			$name          = $layer_post ? $layer_post->post_title : 'Layer #' . $layer_def['id'];
+			$layer_lines[] = "- {$name} (ID: {$layer_def['id']})";
+		}
+
+		$parts = array( 'Map generated from post content with the following configuration:' );
+
+		if ( ! empty( $layer_lines ) ) {
+			$parts[] = "\nLayers:\n" . implode( "\n", $layer_lines );
+		} else {
+			$parts[] = "\nLayers: (none found)";
+		}
+
+		$parts[] = sprintf(
+			"\nCenter: %.6f, %.6f | Zoom: %d",
+			$map_config['center_lat'],
+			$map_config['center_lon'],
+			$map_config['initial_zoom']
+		);
+
+		if ( ! empty( $map_config['base_layer']['variant'] ) ) {
+			$parts[] = 'Base: ' . $map_config['base_layer']['variant'];
+		}
+
+		if ( ! empty( $map_config['pins'] ) ) {
+			$parts[] = sprintf( 'Pins: %d geolocation point(s)', count( $map_config['pins'] ) );
+		}
+
+		if ( ! empty( $map_config['message'] ) ) {
+			$parts[] = 'Notes: ' . $map_config['message'];
+		}
+
+		$assistant_content = implode( "\n", $parts );
+
+		$store->saveThread(
+			$conversation_id,
+			array(
+				array(
+					'role'    => 'user',
+					'content' => 'Generate a map for this post based on its content.',
+				),
+				array(
+					'role'    => 'assistant',
+					'content' => $assistant_content,
+				),
+			)
+		);
+	}
+
+	/**
+	 * Build a context string describing the current map state from the request.
+	 *
+	 * The returned string is passed as initial_context to Minimap_Agent so the
+	 * AI always knows the live block state regardless of conversation history.
+	 *
+	 * @param \WP_REST_Request $request REST request containing current_map_state.
+	 * @return string|null Context string or null if no state provided.
+	 */
+	private function build_state_context( $request ): ?string {
+		$raw_state = $request->get_param( 'current_map_state' );
+		if ( empty( $raw_state ) || ! is_array( $raw_state ) ) {
+			return null;
+		}
+
+		$parts = array( 'Current map state from the block editor:' );
+
+		$layers = $raw_state['layers'] ?? array();
+		if ( ! empty( $layers ) ) {
+			$layer_lines = array();
+			foreach ( $layers as $layer_def ) {
+				$layer_id = (int) ( $layer_def['id'] ?? 0 );
+				if ( ! $layer_id ) {
+					continue;
+				}
+				$layer_post    = get_post( $layer_id );
+				$name          = $layer_post ? $layer_post->post_title : "Layer #{$layer_id}";
+				$layer_lines[] = "{$name} (ID: {$layer_id})";
+			}
+			$parts[] = 'Layers: ' . ( ! empty( $layer_lines ) ? implode( ', ', $layer_lines ) : '(none)' );
+		} else {
+			$parts[] = 'Layers: (none)';
+		}
+
+		$center_lat = $raw_state['center_lat'] ?? null;
+		$center_lon = $raw_state['center_lon'] ?? null;
+		$zoom       = $raw_state['initial_zoom'] ?? null;
+		if ( null !== $center_lat && null !== $center_lon ) {
+			$parts[] = sprintf( 'Center: %.6f, %.6f | Zoom: %s', (float) $center_lat, (float) $center_lon, $zoom ?? '?' );
+		}
+
+		$base_layer = $raw_state['base_layer'] ?? null;
+		if ( ! empty( $base_layer ) && ! empty( $base_layer['variant'] ) ) {
+			$parts[] = 'Base: ' . $base_layer['variant'];
+		}
+
+		$pins = $raw_state['pins'] ?? array();
+		if ( ! empty( $pins ) ) {
+			$parts[] = sprintf( 'Pins: %d geolocation point(s)', count( $pins ) );
+		}
+
+		$parts[] = "\nWhen refining, preserve the existing map configuration unless the user explicitly asks to change it.";
+
+		return implode( "\n", $parts );
 	}
 
 	/**
