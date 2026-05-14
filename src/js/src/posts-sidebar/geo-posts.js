@@ -511,17 +511,19 @@ class JeoGeocodePosts extends Component {
 							{ pointsMap.map( ( point, i ) => {
 								let icon;
 
+								const pinUrls = window.jeo?.pin_urls || {
+									primary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+									secondary: 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+								};
 								if ( ! point.relevance || point.relevance === 'primary' ) {
 									icon = new L.Icon( {
-										iconUrl:
-											'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+										iconUrl: pinUrls.primary,
 										iconSize: [ 25, 41 ],
 										iconAnchor: [ 12, 41 ],
 									} );
 								} else {
 									icon = new L.Icon( {
-										iconUrl:
-											'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+										iconUrl: pinUrls.secondary,
 										iconSize: [ 25, 41 ],
 										iconAnchor: [ 12, 41 ],
 									} );

@@ -60,6 +60,10 @@ class Settings {
 		'ai_cal_use_primary_threshold'    => true,
 		'ai_cal_use_secondary_threshold'  => true,
 
+		// Pin icons.
+		'jeo_pin_primary_url'             => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-blue.png',
+		'jeo_pin_secondary_url'           => 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/master/img/marker-icon-grey.png',
+
 		// Bulk AI.
 		'jeo_bulk_ai_active'              => false,
 		'jeo_bulk_batch_size'             => 5,
@@ -277,6 +281,14 @@ class Settings {
 			if ( $input['ai_cal_secondary_threshold'] < 0 || $input['ai_cal_secondary_threshold'] > 100 ) {
 				$input['ai_cal_secondary_threshold'] = 35;
 			}
+		}
+
+		// Pin icon URLs.
+		if ( isset( $input['jeo_pin_primary_url'] ) ) {
+			$input['jeo_pin_primary_url'] = esc_url_raw( $input['jeo_pin_primary_url'] );
+		}
+		if ( isset( $input['jeo_pin_secondary_url'] ) ) {
+			$input['jeo_pin_secondary_url'] = esc_url_raw( $input['jeo_pin_secondary_url'] );
 		}
 
 		// Secure API Key handling: If the input contains the visual mask, revert to existing stored value.
