@@ -32,7 +32,7 @@ The easiest way to develop JEO is using our modern Docker stack.
 
 ### Prerequisites:
 - Docker and Docker Compose (v2+)
-- PHP 8.2+ and Composer (locally for dependencies)
+- PHP 8.3+ and Composer (locally for dependencies)
 
 ### Quick Start:
 1. Clone the repository:
