@@ -1,0 +1,57 @@
+name: jeo-dev
+
+services:
+  jeo-dev-mariadb:
+    image: mariadb:10.11
+    container_name: jeo-dev-mariadb
+    hostname: jeo-dev-mariadb
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: jeo
+      MYSQL_USER: jeo
+      MYSQL_PASSWORD: jeo
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      - jeo-dev-network
+    healthcheck:
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  jeo-dev-wordpress:
+    image: wordpress:${PHP_VERSION:-php8.3}-apache
+    container_name: jeo-dev-wordpress
+    hostname: jeo-dev-wordpress
+    restart: unless-stopped
+    depends_on:
+      jeo-dev-mariadb:
+        condition: service_healthy
+    ports:
+      - "8081:80"
+    environment:
+      WORDPRESS_DB_HOST: jeo-dev-mariadb:3306
+      WORDPRESS_DB_NAME: jeo
+      WORDPRESS_DB_USER: jeo
+      WORDPRESS_DB_PASSWORD: jeo
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'WP_DEBUG', true );
+        define( 'WP_DEBUG_LOG', true );
+        define( 'WP_DEBUG_DISPLAY', false );
+        define( 'FS_METHOD', 'direct' );
+    volumes:
+      - ../src:/var/www/html/wp-content/plugins/jeo
+      - ../vendor:/var/www/html/wp-content/plugins/jeo/vendor
+      - ./uploads:/var/www/html/wp-content/uploads
+    networks:
+      - jeo-dev-network
+
+networks:
+  jeo-dev-network:
+    name: jeo-dev-network
+    driver: bridge

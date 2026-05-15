@@ -2,7 +2,11 @@ build-config.cfg
 tests/bootstrap-config.php
 node_modules
 .tmp/
-.docker/
+.docker/*
+!.docker/docker-compose.yml
+!.docker/.env
+!.docker/start.sh
+!.docker/switch-php.sh
 src/js/build
 src/languages/*.json
 jeo.zip
