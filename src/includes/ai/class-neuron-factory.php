@@ -7,7 +7,6 @@
 
 namespace Jeo\AI;
 
-use NeuronAI\Providers\Gemini\Gemini;
 use NeuronAI\Providers\OpenAI\OpenAI;
 use NeuronAI\Providers\Deepseek\Deepseek;
 use NeuronAI\Providers\Anthropic\Anthropic;
@@ -50,7 +49,7 @@ class Neuron_Factory {
 				if ( ! $agent_mode ) {
 					$generation_config['responseMimeType'] = 'application/json';
 				}
-				return new Gemini(
+				return new Gemini_Provider(
 					key: $api_key,
 					model: $model,
 					parameters: array( 'generationConfig' => $generation_config ),
