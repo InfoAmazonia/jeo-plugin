@@ -55,6 +55,10 @@ class WP_User_Memory_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Namespace.
+	 * @param string $key   Storage key.
+	 * @param array  $data  Data to store.
 	 */
 	public function save( string $space, string $key, array $data ): void {
 		$this->storage->save( $this->normalize_space( $space ), $key, $data );
@@ -62,6 +66,9 @@ class WP_User_Memory_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Namespace.
+	 * @param string $key   Storage key.
 	 */
 	public function load( string $space, string $key ): ?array {
 		return $this->storage->load( $this->normalize_space( $space ), $key );
@@ -69,6 +76,9 @@ class WP_User_Memory_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Namespace.
+	 * @param string $key   Storage key.
 	 */
 	public function delete( string $space, string $key ): bool {
 		return $this->storage->delete( $this->normalize_space( $space ), $key );
@@ -76,6 +86,9 @@ class WP_User_Memory_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Namespace.
+	 * @param string $key   Storage key.
 	 */
 	public function exists( string $space, string $key ): bool {
 		return $this->storage->exists( $this->normalize_space( $space ), $key );
@@ -83,6 +96,9 @@ class WP_User_Memory_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space   Namespace.
+	 * @param string $pattern Glob-style pattern.
 	 */
 	public function list( string $space, string $pattern = '*' ): array {
 		return $this->storage->list( $this->normalize_space( $space ), $pattern );
@@ -90,6 +106,10 @@ class WP_User_Memory_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space Namespace.
+	 * @param string $query Search query string.
+	 * @param int    $limit Maximum results to return.
 	 */
 	public function search( string $space, string $query, int $limit = 10 ): array {
 		return $this->storage->search( $this->normalize_space( $space ), $query, $limit );
@@ -97,6 +117,9 @@ class WP_User_Memory_Storage implements StorageInterface {
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @param string $space    Namespace.
+	 * @param array  $criteria Cleanup criteria.
 	 */
 	public function cleanup( string $space, array $criteria = array() ): int {
 		return $this->storage->cleanup( $this->normalize_space( $space ), $criteria );

@@ -63,9 +63,9 @@ abstract class AI_Adapter {
 		// create redundant/conflicting directives and waste tokens. Just return the clean prompt.
 		if ( \jeo_settings()->get_option( 'ai_use_structured_output' ) ) {
 			// Safety net: strip any legacy JSON formatting blocks that may have been pasted from
-		// old prompts or generated before the assistant was updated. These patterns are specific
-		// enough that legitimate editorial instructions are extremely unlikely to collide.
-		$prompt = $this->strip_legacy_json_instructions( $prompt );
+			// old prompts or generated before the assistant was updated. These patterns are specific
+			// enough that legitimate editorial instructions are extremely unlikely to collide.
+			$prompt = $this->strip_legacy_json_instructions( $prompt );
 			return $prompt;
 		}
 
