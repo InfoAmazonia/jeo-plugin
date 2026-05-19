@@ -52,7 +52,7 @@ class Minilayer_Agent extends Agent {
 	 * @return AIProviderInterface
 	 */
 	protected function provider(): AIProviderInterface {
-		return Neuron_Factory::get_active_provider();
+		return Neuron_Factory::get_active_provider( true );
 	}
 
 	/**
