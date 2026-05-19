@@ -20,9 +20,14 @@ use NeuronAI\StructuredOutput\Validation\Rules\ArrayOf;
  */
 class Georeference_Result {
 
+	/**
+	 * List of geographic locations found in the text.
+	 *
+	 * @var Location_Output[]
+	 */
 	#[SchemaProperty(
 		description: 'List of geographic locations found in the provided text, filtered and limited according to the system prompt rules.',
-		anyOf: [ Location_Output::class ]
+		anyOf: array( Location_Output::class )
 	)]
 	#[ArrayOf( Location_Output::class )]
 	public array $locations;

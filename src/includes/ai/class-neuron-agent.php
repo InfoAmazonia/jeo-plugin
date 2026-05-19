@@ -122,7 +122,11 @@ class Neuron_Agent extends Agent {
 	public function run_georeference_structured( $system_prompt, $user_text, &$input_tokens, &$output_tokens ) {
 		$this->setInstructions( $system_prompt );
 
-		/** @var Georeference_Result $result */
+		/**
+		 * Structured georeference result.
+		 *
+		 * @var Georeference_Result $result
+		 */
 		$result = $this->structured(
 			messages: new UserMessage( $user_text ),
 			class: Georeference_Result::class,

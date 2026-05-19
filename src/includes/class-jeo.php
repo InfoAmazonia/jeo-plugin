@@ -755,7 +755,10 @@ class Jeo {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file            = file_exists( JEO_BASEPATH . '/js/build/postsSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/postsSidebar.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
+		$asset_file            = file_exists( JEO_BASEPATH . '/js/build/postsSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/postsSidebar.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
 		$layer_type_handles    = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
 		$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
 
@@ -893,7 +896,10 @@ class Jeo {
 			)
 		);
 
-		$mapgl_react_assets = file_exists( JEO_BASEPATH . '/js/build/mapglReact.asset.php' ) ? include JEO_BASEPATH . '/js/build/mapglReact.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
+		$mapgl_react_assets = file_exists( JEO_BASEPATH . '/js/build/mapglReact.asset.php' ) ? include JEO_BASEPATH . '/js/build/mapglReact.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
 
 		wp_register_script(
 			'mapgl-react',
@@ -910,7 +916,10 @@ class Jeo {
 			JEO_VERSION,
 		);
 
-		$map_blocks_assets = file_exists( JEO_BASEPATH . '/js/build/mapBlocks.asset.php' ) ? include JEO_BASEPATH . '/js/build/mapBlocks.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
+		$map_blocks_assets = file_exists( JEO_BASEPATH . '/js/build/mapBlocks.asset.php' ) ? include JEO_BASEPATH . '/js/build/mapBlocks.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
 
 		wp_register_style(
 			'jeo-map-blocks',
@@ -1349,7 +1358,10 @@ class Jeo {
 	public function enqueue_discovery_scripts() {
 		$current_language = $this->get_current_language();
 
-		$discovery_assets = file_exists( JEO_BASEPATH . '/js/build/discovery.asset.php' ) ? include JEO_BASEPATH . '/js/build/discovery.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
+		$discovery_assets = file_exists( JEO_BASEPATH . '/js/build/discovery.asset.php' ) ? include JEO_BASEPATH . '/js/build/discovery.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
 		wp_enqueue_style( 'discovery-map', JEO_BASEURL . '/js/build/discovery.css', array(), JEO_VERSION );
 		wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'] ?? array(), array( 'jeo-map' ) ), JEO_VERSION, true );
 
@@ -1385,7 +1397,10 @@ class Jeo {
 	 * @return void
 	 */
 	public function enqueue_storymap_scripts() {
-		$storymap_assets = file_exists( JEO_BASEPATH . '/js/build/jeoStorymap.asset.php' ) ? include JEO_BASEPATH . '/js/build/jeoStorymap.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
+		$storymap_assets = file_exists( JEO_BASEPATH . '/js/build/jeoStorymap.asset.php' ) ? include JEO_BASEPATH . '/js/build/jeoStorymap.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
 		wp_enqueue_style( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.css', array( 'jeo-map' ), JEO_VERSION );
 		wp_enqueue_script( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.js', array_merge( $storymap_assets['dependencies'] ?? array(), array( 'jeo-map', 'mapgl-react' ) ), JEO_VERSION, true );
 

@@ -19,13 +19,12 @@
             "dealerdirect/phpcodesniffer-composer-installer": true
         }
     },
-    "require": {
-        "neuron-core/neuron-ai": "^3.3",
-        "hacklabr/ai-assistant": "dev-main"
-    },
-    "repositories": [{
-        "name": "hacklabr/ai-assistant",
-        "type": "vcs",
-        "url": "https://github.com/hacklabr/ai-assistant"
-    }]
+    "scripts": {
+        "post-install-cmd": [
+            "@php -r \"file_exists('src/composer.json') && passthru('composer install --no-dev --optimize-autoloader --quiet --working-dir=src');\""
+        ],
+        "post-update-cmd": [
+            "@php -r \"file_exists('src/composer.json') && passthru('composer update --no-dev --optimize-autoloader --quiet --working-dir=src');\""
+        ]
+    }
 }

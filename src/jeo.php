@@ -20,15 +20,15 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Check PHP Version Compatibility (Requires 8.3+)
+ * Check PHP Version Compatibility (Requires 8.2+)
  */
-if ( version_compare( PHP_VERSION, '8.3', '<' ) ) {
+if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
 	add_action(
 		'admin_notices',
 		function () {
 			printf(
 				'<div class="notice notice-error"><p>%s</p></div>',
-				esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.3 or higher. The plugin will remain deactivated.', 'jeo' )
+				esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated.', 'jeo' )
 			);
 		}
 	);

@@ -1005,21 +1005,21 @@ class AI_Handler {
 	 * @param \WP_REST_Request $request Current REST request.
 	 */
 	public function api_chat_prompt_generator( $request ) {
-		$context          = $request->get_param( 'context' );
-		$provider         = $request->get_param( 'provider' );
-		$api_key          = $request->get_param( 'api_key' );
-		$model            = $request->get_param( 'model' );
-		$lang             = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
-		$granularity      = sanitize_text_field( $request->get_param( 'granularity' ) ? $request->get_param( 'granularity' ) : \jeo_settings()->get_option( 'ai_cal_granularity', 'balanced' ) );
-		$confidence       = absint( $request->get_param( 'confidence' ) ? $request->get_param( 'confidence' ) : \jeo_settings()->get_option( 'ai_cal_confidence', 50 ) );
-		$title_weight     = absint( $request->get_param( 'title_weight' ) ? $request->get_param( 'title_weight' ) : \jeo_settings()->get_option( 'ai_cal_title_weight', 70 ) );
-		$max_tokens       = absint( $request->get_param( 'max_tokens' ) ? $request->get_param( 'max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_max_tokens', 8000 ) );
-		$use_granularity  = $request->get_param( 'use_granularity' ) ? $request->get_param( 'use_granularity' ) : \jeo_settings()->get_option( 'ai_cal_use_granularity', true );
-		$use_confidence   = $request->get_param( 'use_confidence' ) ? $request->get_param( 'use_confidence' ) : \jeo_settings()->get_option( 'ai_cal_use_confidence', true );
-		$use_title_weight = $request->get_param( 'use_title_weight' ) ? $request->get_param( 'use_title_weight' ) : \jeo_settings()->get_option( 'ai_cal_use_title_weight', true );
-		$use_max_tokens   = $request->get_param( 'use_max_tokens' ) ? $request->get_param( 'use_max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_use_max_tokens', true );
-		$primary_threshold   = absint( $request->get_param( 'primary_threshold' ) ? $request->get_param( 'primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 ) );
-		$secondary_threshold = absint( $request->get_param( 'secondary_threshold' ) ? $request->get_param( 'secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ) );
+		$context                 = $request->get_param( 'context' );
+		$provider                = $request->get_param( 'provider' );
+		$api_key                 = $request->get_param( 'api_key' );
+		$model                   = $request->get_param( 'model' );
+		$lang                    = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
+		$granularity             = sanitize_text_field( $request->get_param( 'granularity' ) ? $request->get_param( 'granularity' ) : \jeo_settings()->get_option( 'ai_cal_granularity', 'balanced' ) );
+		$confidence              = absint( $request->get_param( 'confidence' ) ? $request->get_param( 'confidence' ) : \jeo_settings()->get_option( 'ai_cal_confidence', 50 ) );
+		$title_weight            = absint( $request->get_param( 'title_weight' ) ? $request->get_param( 'title_weight' ) : \jeo_settings()->get_option( 'ai_cal_title_weight', 70 ) );
+		$max_tokens              = absint( $request->get_param( 'max_tokens' ) ? $request->get_param( 'max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_max_tokens', 8000 ) );
+		$use_granularity         = $request->get_param( 'use_granularity' ) ? $request->get_param( 'use_granularity' ) : \jeo_settings()->get_option( 'ai_cal_use_granularity', true );
+		$use_confidence          = $request->get_param( 'use_confidence' ) ? $request->get_param( 'use_confidence' ) : \jeo_settings()->get_option( 'ai_cal_use_confidence', true );
+		$use_title_weight        = $request->get_param( 'use_title_weight' ) ? $request->get_param( 'use_title_weight' ) : \jeo_settings()->get_option( 'ai_cal_use_title_weight', true );
+		$use_max_tokens          = $request->get_param( 'use_max_tokens' ) ? $request->get_param( 'use_max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_use_max_tokens', true );
+		$primary_threshold       = absint( $request->get_param( 'primary_threshold' ) ? $request->get_param( 'primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 ) );
+		$secondary_threshold     = absint( $request->get_param( 'secondary_threshold' ) ? $request->get_param( 'secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ) );
 		$use_primary_threshold   = $request->get_param( 'use_primary_threshold' ) ? $request->get_param( 'use_primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_threshold', true );
 		$use_secondary_threshold = $request->get_param( 'use_secondary_threshold' ) ? $request->get_param( 'use_secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_threshold', true );
 		$primary_max   = absint( $request->get_param( 'primary_max' ) ? $request->get_param( 'primary_max' ) : \jeo_settings()->get_option( 'ai_cal_primary_max', 10 ) );

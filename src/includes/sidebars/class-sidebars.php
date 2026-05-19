@@ -49,8 +49,14 @@ class Sidebars {
 	 * @return void
 	 */
 	public function load_assets() {
-		$layers_sidebar_asset = file_exists( JEO_BASEPATH . '/js/build/layersSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/layersSidebar.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
-		$maps_sidebar_asset   = file_exists( JEO_BASEPATH . '/js/build/mapsSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/mapsSidebar.asset.php' : array( 'dependencies' => array(), 'version' => JEO_VERSION );
+		$layers_sidebar_asset = file_exists( JEO_BASEPATH . '/js/build/layersSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/layersSidebar.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
+		$maps_sidebar_asset   = file_exists( JEO_BASEPATH . '/js/build/mapsSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/mapsSidebar.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
 		$layer_type_handles   = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
 
 		wp_enqueue_style( 'jeo-layers-sidebar', JEO_BASEURL . '/js/build/layersSidebar.css', array( 'mapgl', 'mapgl-react-style' ), JEO_VERSION );

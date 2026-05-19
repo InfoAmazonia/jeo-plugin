@@ -15,6 +15,7 @@ jeo.zip
 /wordpress/
 /test-environment/
 /vendor/
+/src/vendor/
 wp-content
 
 wp-content/*
