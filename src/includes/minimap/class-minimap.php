@@ -369,6 +369,12 @@ class Minimap {
 			$result->pins = $this->get_pins( $post_id );
 		}
 
+		$result->layers = $this->validate_layers( $result->layers );
+
+		if ( ! empty( $result->base_layer ) && ! $this->is_valid_layer( $result->base_layer['id'] ?? 0 ) ) {
+			$result->base_layer = null;
+		}
+
 		return $result;
 	}
 
@@ -582,6 +588,37 @@ class Minimap {
 			default:
 				return $message;
 		}
+	}
+
+	/**
+	 * Validate a list of layer definitions, filtering out invalid or non-publish IDs.
+	 *
+	 * @param array $layers Layer definitions from agent output.
+	 * @return array Valid layer definitions only.
+	 */
+	private function validate_layers( array $layers ): array {
+		$valid = array();
+		foreach ( $layers as $layer_def ) {
+			$layer_id = (int) ( $layer_def['id'] ?? 0 );
+			if ( $this->is_valid_layer( $layer_id ) ) {
+				$valid[] = $layer_def;
+			}
+		}
+		return $valid;
+	}
+
+	/**
+	 * Check whether a given post ID is a published map-layer.
+	 *
+	 * @param int $layer_id Post ID.
+	 * @return bool
+	 */
+	private function is_valid_layer( int $layer_id ): bool {
+		if ( $layer_id <= 0 ) {
+			return false;
+		}
+		$post = get_post( $layer_id );
+		return $post instanceof \WP_Post && 'map-layer' === $post->post_type && 'publish' === $post->post_status;
 	}
 
 	/**

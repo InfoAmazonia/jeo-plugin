@@ -30,7 +30,6 @@ function generateUUID() {
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
 	const [ modal, setModal ] = useState( false );
-	const [ key, setKey ] = useState( 0 );
 	const [ baseVariant, setBaseVariant ] = useState(
 		attributes.base_layer?.variant || 'dark'
 	);
@@ -73,10 +72,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			max_zoom: 20,
 		} );
 	}, [ attributes ] );
-
-	useEffect( () => {
-		setKey( ( k ) => k + 1 );
-	}, [ attributes.align, window.screen.width ] );
 
 	const allLayers = useMemo( () => {
 		const list = [];
@@ -776,7 +771,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 			<div className="jeo-preview-area">
 				<Map
-					key={ key }
 					ref={ mapRef }
 					style={ { height: '50vh' } }
 					latitude={ normalizedAttributes.center_lat }
