@@ -319,6 +319,10 @@ class RAG_Worker {
 			$documents = $config->data_loader_class::load( array( $post ) );
 
 			if ( ! empty( $documents ) ) {
+				$store = $rag->resolveVectorStore();
+				if ( $store instanceof \NeuronAI\RAG\VectorStore\DeleteByInterface ) {
+					$store->deleteBy( 'layer', (string) $post_id );
+				}
 				$rag->addDocuments( $documents );
 				update_post_meta( $post_id, $config->meta_key, current_time( 'mysql' ) );
 			}

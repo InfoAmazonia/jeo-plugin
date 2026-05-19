@@ -160,6 +160,11 @@ $is_rag_blocked  = is_wp_error( $rag_feasibility );
 								<option value="hourly" <?php selected( \jeo_settings()->get_option( 'jeo_rag_cron_interval' ), 'hourly' ); ?>><?php esc_html_e( 'Hourly', 'jeo' ); ?></option>
 							</select>
 						</div>
+						<div class="jeo-filter-group">
+							<label style="font-size: 11px; font-weight: 600; text-transform: uppercase; color: #8c8f94; display: block; margin-bottom: 5px;"><?php esc_html_e( 'Search Results (topK)', 'jeo' ); ?></label>
+							<input name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_rag_topk' ) ); ?>" type="number" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_rag_topk' ) ); ?>" min="1" max="50" class="small-text">
+							<p class="description" style="font-size: 11px; margin-top: 4px;"><?php esc_html_e( 'Max semantic matches returned per search.', 'jeo' ); ?></p>
+						</div>
 					</div>
 
 					<div style="margin-top: 25px; padding-top: 15px; border-top: 1px solid #eee;">
