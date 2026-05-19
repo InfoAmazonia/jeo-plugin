@@ -2,6 +2,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { Button, Notice, PanelBody, Placeholder, Spinner } from '@wordpress/components';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { debounce } from 'lodash';
 import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
@@ -29,7 +30,6 @@ function generateUUID() {
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
 	const [ modal, setModal ] = useState( false );
-	const [ key, setKey ] = useState( 0 );
 	const [ baseVariant, setBaseVariant ] = useState(
 		attributes.base_layer?.variant || 'dark'
 	);
@@ -73,10 +73,6 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		} );
 	}, [ attributes ] );
 
-	useEffect( () => {
-		setKey( ( k ) => k + 1 );
-	}, [ attributes.align, window.screen.width ] );
-
 	const allLayers = useMemo( () => {
 		const list = [];
 		if ( attributes.base_layer ) {
@@ -90,7 +86,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 	const layerIds = useMemo( () => {
 		return allLayers.map( ( l ) => l.id ).filter( ( id ) => id > 0 );
-	}, [ JSON.stringify( allLayers.map( ( l ) => l.id ) ) ] );
+	}, [ allLayers ] );
 
 	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
@@ -507,6 +503,31 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const currentZoom = normalizedAttributes[ zoomState ];
 	const mapRef = useRef( undefined );
 
+	const debouncedOnMove = useMemo(
+		() => debounce( ( { viewState } ) => {
+			setAttributes( {
+				center_lat: viewState.latitude,
+				center_lon: viewState.longitude,
+			} );
+		}, 300 ),
+		[ setAttributes ]
+	);
+
+	const debouncedOnZoom = useMemo(
+		() => debounce( ( { viewState } ) => {
+			const zoom = Math.round( viewState.zoom * 10 ) / 10;
+			setAttributes( { [ zoomState ]: zoom } );
+		}, 300 ),
+		[ setAttributes, zoomState ]
+	);
+
+	useEffect( () => {
+		return () => {
+			debouncedOnMove.cancel();
+			debouncedOnZoom.cancel();
+		};
+	}, [ debouncedOnMove, debouncedOnZoom ] );
+
 	const [ generationMode, setGenerationMode ] = useState(
 		() => attributes.prompt?.trim() ? 'prompt' : 'content'
 	);
@@ -750,24 +771,15 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 			<div className="jeo-preview-area">
 				<Map
-					key={ key }
 					ref={ mapRef }
 					style={ { height: '50vh' } }
 					latitude={ normalizedAttributes.center_lat }
 					longitude={ normalizedAttributes.center_lon }
 					zoom={ currentZoom || mapDefaults.zoom }
-					onMove={ ( { viewState } ) => {
-						setAttributes( {
-							center_lat: viewState.latitude,
-							center_lon: viewState.longitude,
-						} );
-					} }
-					onZoom={ ( { viewState } ) => {
-						const zoom = Math.round( viewState.zoom * 10 ) / 10;
-						setAttributes( { [ zoomState ]: zoom } );
-					} }
+					onMove={ debouncedOnMove }
+					onZoom={ debouncedOnZoom }
 				>
-					{ loadedLayers &&
+					{ loadedLayers.length > 0 &&
 						allLayers.map( ( layer ) => {
 							const layerRecord = loadedLayers.find(
 								( { id } ) => id === layer.id

@@ -58,6 +58,10 @@ class Layer_Data_Loader {
 			);
 
 			$doc = new Document( $text );
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- NeuronAI Document uses camelCase.
+			$doc->sourceType = 'layer';
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- NeuronAI Document uses camelCase.
+			$doc->sourceName = (string) $post->ID;
 			foreach ( $metadata as $key => $value ) {
 				$doc->addMetadata( $key, (string) $value );
 			}

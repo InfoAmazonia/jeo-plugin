@@ -92,6 +92,7 @@ The repository maintains the following automated checks. All must pass before a 
 ### Settings Validation
 
 - `map_runtime` is sanitized in `Settings::sanitize_settings()`. Selecting `mapboxgl` without a valid `mapbox_key` is rejected and silently falls back to `maplibregl`.
+- `ai_rag_topk` is clamped to 1–50 in `Settings::sanitize_settings()` and defaults to 10. It controls the `FileVectorStore` retrieval ceiling.
 
 ## Notes
 

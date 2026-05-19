@@ -78,6 +78,7 @@ class Settings {
 		'jeo_rag_auto_index'              => false,
 		'jeo_rag_batch_size'              => 10,
 		'jeo_rag_cron_interval'           => 'hourly',
+		'ai_rag_topk'                     => 10,
 
 		// Gemini.
 		'gemini_api_key'                  => '',
@@ -295,6 +296,14 @@ class Settings {
 			$input['ai_cal_secondary_max'] = absint( $input['ai_cal_secondary_max'] );
 			if ( $input['ai_cal_secondary_max'] < 1 || $input['ai_cal_secondary_max'] > 100 ) {
 				$input['ai_cal_secondary_max'] = 10;
+			}
+		}
+
+		// RAG topK sanitization.
+		if ( isset( $input['ai_rag_topk'] ) ) {
+			$input['ai_rag_topk'] = absint( $input['ai_rag_topk'] );
+			if ( $input['ai_rag_topk'] < 1 || $input['ai_rag_topk'] > 50 ) {
+				$input['ai_rag_topk'] = 10;
 			}
 		}
 

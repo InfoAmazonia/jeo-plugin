@@ -192,7 +192,12 @@ class RAG_Agent extends RAG {
 			file_put_contents( $info_file, $current_model ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		}
 
-		return new FileVectorStore( directory: $store_dir, topK: 3, name: $store_name );
+		$top_k = (int) \jeo_settings()->get_option( 'ai_rag_topk', 10 );
+		if ( $top_k < 1 ) {
+			$top_k = 10;
+		}
+
+		return new FileVectorStore( directory: $store_dir, topK: $top_k, name: $store_name );
 	}
 
 	/**

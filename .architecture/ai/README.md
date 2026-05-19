@@ -207,11 +207,23 @@ Analyzes hex colors via HSL conversion for semantic embedding:
 - Hydrographic Basins, Settlements, Quilombola territories
 - Legal Amazon, Extractive Reserves, etc.
 
+## RAG Vector Store Configuration
+
+| Setting | Key | Default | Range | Description |
+|---------|-----|---------|-------|-------------|
+| Search Results (topK) | `ai_rag_topk` | 10 | 1–50 | Maximum semantic matches returned per search by `FileVectorStore` |
+
+The `topK` value is read from JEO settings in `RAG_Agent::vectorStore()` and passed to `FileVectorStore`. Previously hardcoded to 3, it is now configurable so callers like `Search_Layers_Tool` and `find_matching_layers()` can receive the full number of results they request.
+
+### Layer Deduplication
+
+`Layer_Data_Loader` sets `Document->sourceType = 'layer'` and `Document->sourceName = (string) $post->ID` so each embedding is tagged with its layer ID. When a layer is saved, `RAG_Worker::on_layer_save()` calls `deleteBy('layer', $post_id)` on the vector store before adding the new embedding, preventing duplicate entries that would pollute search results.
+
 ## AI Settings
 
 4 tabs under **Jeo → AI**:
 1. **Provider**: Selection + API key + model
-2. **Knowledge Base**: Manage vector store
+2. **Knowledge Base**: Manage vector store (embedding model, auto-indexing, batch size, cron interval, topK)
 3. **Embedded Data**: Geographic dictionaries
 4. **Bulk Geolocation**: Batch processing config
 

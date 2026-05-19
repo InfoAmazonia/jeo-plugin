@@ -396,3 +396,5 @@ Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 - **Structured controls**: Base variant changes, layer additions, and regeneration are sent as typed messages (`type` field) to the chat endpoint and resolved to natural language server-side
 - **Fallback chain**: Agent output is always post-processed with luminance heuristic and pin extraction to ensure complete, usable maps
 - **Layer generation authorization**: When Mapbox is available, the agent must always ask for explicit user confirmation via chat before generating custom layers (`generate_layer` tool). Initial auto-generation never creates custom layers
+- **Debounced map interaction**: `onMove` and `onZoom` handlers use 300 ms lodash debounce to avoid excessive `setAttributes` calls and re-renders during map pan/zoom
+- **Layer render guard**: The map preview only attempts to render layers when `loadedLayers.length > 0`, preventing an empty-map flash while REST metadata is still loading

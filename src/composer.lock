@@ -217,16 +217,16 @@
         },
         {
             "name": "guzzlehttp/psr7",
-            "version": "2.9.0",
+            "version": "2.9.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/guzzle/psr7.git",
-                "reference": "7d0ed42f28e42d61352a7a79de682e5e67fec884"
+                "reference": "3780f78d6f2854cb327944a22c7b0617852ab7e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/guzzle/psr7/zipball/7d0ed42f28e42d61352a7a79de682e5e67fec884",
-                "reference": "7d0ed42f28e42d61352a7a79de682e5e67fec884",
+                "url": "https://api.github.com/repos/guzzle/psr7/zipball/3780f78d6f2854cb327944a22c7b0617852ab7e9",
+                "reference": "3780f78d6f2854cb327944a22c7b0617852ab7e9",
                 "shasum": ""
             },
             "require": {
@@ -241,9 +241,9 @@
             },
             "require-dev": {
                 "bamarni/composer-bin-plugin": "^1.8.2",
-                "http-interop/http-factory-tests": "0.9.0",
+                "http-interop/http-factory-tests": "1.1.0",
                 "jshttp/mime-db": "1.54.0.1",
-                "phpunit/phpunit": "^8.5.44 || ^9.6.25"
+                "phpunit/phpunit": "^8.5.52 || ^9.6.34"
             },
             "suggest": {
                 "laminas/laminas-httphandlerrunner": "Emit PSR-7 responses"
@@ -314,7 +314,7 @@
             ],
             "support": {
                 "issues": "https://github.com/guzzle/psr7/issues",
-                "source": "https://github.com/guzzle/psr7/tree/2.9.0"
+                "source": "https://github.com/guzzle/psr7/tree/2.9.1"
             },
             "funding": [
                 {
@@ -330,7 +330,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-03-10T16:41:02+00:00"
+            "time": "2026-05-19T15:17:22+00:00"
         },
         {
             "name": "hacklabr/ai-assistant",
@@ -338,12 +338,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hacklabr/ai-assistant.git",
-                "reference": "1480be1c8f65875979513a73f2702ba6de31681e"
+                "reference": "14edff07ff2f70e8bfd496067e6bee8e8fd13db9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hacklabr/ai-assistant/zipball/1480be1c8f65875979513a73f2702ba6de31681e",
-                "reference": "1480be1c8f65875979513a73f2702ba6de31681e",
+                "url": "https://api.github.com/repos/hacklabr/ai-assistant/zipball/14edff07ff2f70e8bfd496067e6bee8e8fd13db9",
+                "reference": "14edff07ff2f70e8bfd496067e6bee8e8fd13db9",
                 "shasum": ""
             },
             "require": {
@@ -388,10 +388,10 @@
                 "neuron"
             ],
             "support": {
-                "source": "https://github.com/hacklabr/ai-assistant/tree/v0.5.0",
+                "source": "https://github.com/hacklabr/ai-assistant/tree/main",
                 "issues": "https://github.com/hacklabr/ai-assistant/issues"
             },
-            "time": "2026-05-12T19:12:47+00:00"
+            "time": "2026-05-19T16:56:19+00:00"
         },
         {
             "name": "inspector-apm/inspector-php",
