@@ -518,16 +518,16 @@
         },
         {
             "name": "neuron-core/neuron-ai",
-            "version": "3.4.6",
+            "version": "3.4.9",
             "source": {
                 "type": "git",
                 "url": "https://github.com/neuron-core/neuron-ai.git",
-                "reference": "7c2c8b50bc7c82e4aed1cb7e17cbf86f290d400e"
+                "reference": "2b615c4614dae3a8963aecd4fc2d48faf1dbb1b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/neuron-core/neuron-ai/zipball/7c2c8b50bc7c82e4aed1cb7e17cbf86f290d400e",
-                "reference": "7c2c8b50bc7c82e4aed1cb7e17cbf86f290d400e",
+                "url": "https://api.github.com/repos/neuron-core/neuron-ai/zipball/2b615c4614dae3a8963aecd4fc2d48faf1dbb1b9",
+                "reference": "2b615c4614dae3a8963aecd4fc2d48faf1dbb1b9",
                 "shasum": ""
             },
             "require": {
@@ -578,7 +578,7 @@
             "description": "The PHP Agentic Framework.",
             "support": {
                 "issues": "https://github.com/neuron-core/neuron-ai/issues",
-                "source": "https://github.com/neuron-core/neuron-ai/tree/3.4.6"
+                "source": "https://github.com/neuron-core/neuron-ai/tree/3.4.9"
             },
             "funding": [
                 {
@@ -586,7 +586,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-05-12T18:47:13+00:00"
+            "time": "2026-05-19T09:26:54+00:00"
         },
         {
             "name": "phpoffice/phpword",

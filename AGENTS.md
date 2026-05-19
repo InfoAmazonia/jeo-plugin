@@ -15,7 +15,7 @@ When making significant code changes (creating/removing/modifying components, bl
 
 ## Stack
 
-- PHP 8.3+ | WordPress 6.x + Gutenberg | React 18
+- PHP 8.2+ | WordPress 6.x + Gutenberg | React 18
 - MapLibre GL JS (default) / Mapbox GL JS (optional)
 - NeuronAI (10 providers) | Webpack 5, @wordpress/scripts | Node 24+
 
@@ -75,7 +75,7 @@ The repository maintains the following automated checks. All must pass before a 
 
 ### WordPress.org Compliance Rules
 
-- `src/readme.txt` **must** contain `Tags:` (1–12) and `Requires PHP:` aligned with runtime enforcement (8.3+).
+- `src/readme.txt` **must** contain `Tags:` (1–12) and `Requires PHP:` aligned with runtime enforcement (8.2+).
 - `src/readme.txt` **must** contain a `== Third Party Services ==` section.
 - Forbidden URLs in any `src/` text file: `raw.githubusercontent.com`, `fonts.openmaptiles.org`.
 - Use `cdn.jsdelivr.net/gh` as an alternative for GitHub raw assets.
