@@ -14,6 +14,7 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/includes/ai/class-generate-layer-tool.php` | Agent tool (conditional): generates custom Mapbox styles and creates layer CPTs via `Minilayer_Service`. Only available when a Mapbox API key is configured. |
 | `src/includes/ai/class-get-post-content-tool.php` | Agent tool: post content + `_related_point` meta (used by post_analyzer sub-agent) |
 | `src/includes/ai/class-wp-storage.php` | `StorageInterface` adapter for `post_meta` and `user_meta` |
+| `src/includes/ai/class-wp-user-memory-storage.php` | `StorageInterface` adapter for `user_meta` memories — strips redundant user ID from the namespace so preferences are reusable across contexts |
 | `src/includes/ai/class-wp-option-storage.php` | `StorageInterface` adapter for `wp_options` (single option per namespace, `autoload=false`) |
 | `src/js/src/map-blocks/minimap-editor.js` | Edit component — placeholder, map preview, inspector chat panel |
 | `src/js/src/map-blocks/minimap-display.js` | Save component — renders `<div class="jeomap">` for frontend JS |
@@ -51,7 +52,7 @@ graph TB
     subgraph "Storages"
         S1[WP_Storage<br/>post_meta<br/>conversations]
         S2[WP_Option_Storage<br/>wp_options<br/>learning]
-        S3[WP_Storage<br/>user_meta<br/>user memory]
+        S3[WP_User_Memory_Storage<br/>user_meta<br/>user memory]
     end
 
     AGENT --> S1
@@ -172,7 +173,7 @@ sequenceDiagram
 |---------|-------|---------|-----------|---------|
 | Conversation | `WP_Storage` | `post_meta` | Per post ID | Chat history per block instance |
 | Learning | `WP_Option_Storage` | `wp_options` | Global | Agent self-improvement across sessions |
-| User Memory | `WP_Storage` | `user_meta` | Per user ID | User preferences (base variant, layer preferences) |
+| User Memory | `WP_User_Memory_Storage` | `user_meta` | `memories` (namespace normalised) | User preferences (base variant, layer preferences). The ai-assistant library builds namespaces as `memories/{userId}`; this adapter strips the redundant user ID because the `usermeta.user_id` column already scopes the row. Resulting meta key: `_jeo_ai_memories_{memory_id}` |
 
 ### Structured Output (Minimap_Output)
 

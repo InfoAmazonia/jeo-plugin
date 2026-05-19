@@ -42,7 +42,7 @@ class Minimap_Agent {
 
 		$conversation_storage = new WP_Storage( $post_id, 'post' );
 		$learning_storage     = new WP_Option_Storage();
-		$user_memory_storage  = null !== $user_id ? new WP_Storage( $user_id, 'user' ) : null;
+		$user_memory_storage  = null !== $user_id ? new WP_User_Memory_Storage( $user_id ) : null;
 		$fallback_storage     = new WP_Option_Storage();
 
 		$prefs = '';
@@ -217,14 +217,18 @@ PROMPT,
 	 * @return string
 	 */
 	private static function load_user_prefs_prompt( int $user_id ): string {
-		$prefs = get_user_meta( $user_id, '_jeo_ai_user_memory_minimap_prefs', true );
-		if ( empty( $prefs ) || ! is_array( $prefs ) ) {
-			return '';
-		}
+		$storage = new WP_User_Memory_Storage( $user_id );
+		$keys    = $storage->list( 'memories' );
 
 		$lines = array();
-		foreach ( $prefs as $key => $value ) {
-			$lines[] = "- {$key}: " . ( is_string( $value ) ? $value : wp_json_encode( $value ) );
+		foreach ( $keys as $key ) {
+			$data = $storage->load( 'memories', $key );
+			if ( empty( $data ) || ! is_array( $data ) ) {
+				continue;
+			}
+			if ( isset( $data['category'] ) && 'preference' === $data['category'] && ! empty( $data['content'] ) ) {
+				$lines[] = '- ' . $data['content'];
+			}
 		}
 
 		return empty( $lines ) ? '' : implode( "\n", $lines );
