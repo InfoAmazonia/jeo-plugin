@@ -835,6 +835,12 @@ class Jeo {
 					'primary'   => (int) \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 ),
 					'secondary' => (int) \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ),
 				),
+				'ai_limits'        => array(
+					'use_primary_limit'   => (bool) \jeo_settings()->get_option( 'ai_cal_use_primary_limit', false ),
+					'primary_max'         => (int) \jeo_settings()->get_option( 'ai_cal_primary_max', 10 ),
+					'use_secondary_limit' => (bool) \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false ),
+					'secondary_max'       => (int) \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 ),
+				),
 				'pin_urls'         => array(
 					'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png' ) ),
 					'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png' ) ),

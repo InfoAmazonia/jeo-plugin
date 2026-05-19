@@ -318,12 +318,30 @@
 		</div>
 		<div class="jeo-ai-cal-row">
 			<label class="jeo-ai-cal-toggle-label">
+				<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_primary_limit' ) ); ?>" id="jeo-ai-cal-use-primary-limit" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_primary_limit' ) ); ?> />
+				<span class="jeo-ai-cal-toggle-text"><?php esc_html_e( 'Use', 'jeo' ); ?></span>
+			</label>
+			<label for="jeo-ai-cal-primary-max"><?php esc_html_e( 'Primary Points', 'jeo' ); ?></label>
+			<input type="range" id="jeo-ai-cal-primary-max" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_primary_max' ) ); ?>" min="1" max="100" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_primary_max' ) ); ?>">
+			<span class="jeo-cal-value" id="jeo-ai-cal-primary-max-val"><?php echo esc_html( \jeo_settings()->get_option( 'ai_cal_primary_max' ) ); ?></span>
+		</div>
+		<div class="jeo-ai-cal-row">
+			<label class="jeo-ai-cal-toggle-label">
 				<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_secondary_threshold' ) ); ?>" id="jeo-ai-cal-use-secondary-threshold" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_secondary_threshold' ) ); ?> />
 				<span class="jeo-ai-cal-toggle-text"><?php esc_html_e( 'Use', 'jeo' ); ?></span>
 			</label>
 			<label for="jeo-ai-cal-secondary-threshold"><?php esc_html_e( 'Secondary Threshold', 'jeo' ); ?></label>
 			<input type="range" id="jeo-ai-cal-secondary-threshold" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_secondary_threshold' ) ); ?>" min="0" max="100" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_secondary_threshold' ) ); ?>">
 			<span class="jeo-cal-value" id="jeo-ai-cal-secondary-threshold-val"><?php echo esc_html( \jeo_settings()->get_option( 'ai_cal_secondary_threshold' ) ); ?></span>
+		</div>
+		<div class="jeo-ai-cal-row">
+			<label class="jeo-ai-cal-toggle-label">
+				<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_secondary_limit' ) ); ?>" id="jeo-ai-cal-use-secondary-limit" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_secondary_limit' ) ); ?> />
+				<span class="jeo-ai-cal-toggle-text"><?php esc_html_e( 'Use', 'jeo' ); ?></span>
+			</label>
+			<label for="jeo-ai-cal-secondary-max"><?php esc_html_e( 'Secondary Points', 'jeo' ); ?></label>
+			<input type="range" id="jeo-ai-cal-secondary-max" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_secondary_max' ) ); ?>" min="1" max="100" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_secondary_max' ) ); ?>">
+			<span class="jeo-cal-value" id="jeo-ai-cal-secondary-max-val"><?php echo esc_html( \jeo_settings()->get_option( 'ai_cal_secondary_max' ) ); ?></span>
 		</div>
 		<div class="jeo-ai-cal-row">
 			<label class="jeo-ai-cal-toggle-label">
@@ -334,32 +352,33 @@
 			<input type="range" id="jeo-ai-cal-title-weight" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_title_weight' ) ); ?>" min="0" max="100" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_title_weight' ) ); ?>">
 			<span class="jeo-cal-value" id="jeo-ai-cal-title-weight-val"><?php echo esc_html( \jeo_settings()->get_option( 'ai_cal_title_weight' ) ); ?></span>
 		</div>
-			<div class="jeo-ai-cal-row">
-				<label class="jeo-ai-cal-toggle-label">
-					<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_max_tokens' ) ); ?>" id="jeo-ai-cal-use-max-tokens" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_max_tokens' ) ); ?> />
-					<span class="jeo-ai-cal-toggle-text"><?php esc_html_e( 'Use', 'jeo' ); ?></span>
-				</label>
-				<label for="jeo-ai-cal-max-tokens"><?php esc_html_e( 'Prompt Token Budget', 'jeo' ); ?></label>
-				<input type="range" id="jeo-ai-cal-max-tokens" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_max_tokens' ) ); ?>" min="1000" max="100000" step="1000" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_max_tokens' ) ); ?>">
-				<span class="jeo-cal-value" id="jeo-ai-cal-max-tokens-val"><?php echo esc_html( number_format_i18n( \jeo_settings()->get_option( 'ai_cal_max_tokens' ) ) ); ?></span>
+		<div class="jeo-ai-cal-row">
+			<label class="jeo-ai-cal-toggle-label">
+				<input type="checkbox" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_use_max_tokens' ) ); ?>" id="jeo-ai-cal-use-max-tokens" value="1" <?php checked( 1, \jeo_settings()->get_option( 'ai_cal_use_max_tokens' ) ); ?> />
+				<span class="jeo-ai-cal-toggle-text"><?php esc_html_e( 'Use', 'jeo' ); ?></span>
+			</label>
+			<label for="jeo-ai-cal-max-tokens"><?php esc_html_e( 'Prompt Token Budget', 'jeo' ); ?></label>
+			<input type="range" id="jeo-ai-cal-max-tokens" name="<?php echo esc_attr( \jeo_settings()->get_field_name( 'ai_cal_max_tokens' ) ); ?>" min="1000" max="100000" step="1000" value="<?php echo esc_attr( \jeo_settings()->get_option( 'ai_cal_max_tokens' ) ); ?>">
+			<span class="jeo-cal-value" id="jeo-ai-cal-max-tokens-val"><?php echo esc_html( number_format_i18n( \jeo_settings()->get_option( 'ai_cal_max_tokens' ) ) ); ?></span>
+		</div>
+		<div class="jeo-ai-cal-row jeo-ai-token-ui" style="margin-bottom: 0;">
+			<div id="jeo-ai-token-quality" style="flex: 1; font-size: 12px; color: #646970;">
+				<?php esc_html_e( 'Higher budgets allow the AI to process longer articles but increase cost and latency.', 'jeo' ); ?>
 			</div>
-			<div class="jeo-ai-cal-row jeo-ai-token-ui" style="margin-bottom: 0;">
-				<div id="jeo-ai-token-quality" style="flex: 1; font-size: 12px; color: #646970;">
-					<?php esc_html_e( 'Higher budgets allow the AI to process longer articles but increase cost and latency.', 'jeo' ); ?>
-				</div>
+		</div>
+		<div class="jeo-ai-cal-row jeo-ai-token-ui" style="margin-bottom: 0; margin-top: 6px;">
+			<div style="flex: 1; height: 6px; background: #dcdcde; border-radius: 3px; overflow: hidden;">
+				<div id="jeo-ai-token-thermometer" style="width: 8%; height: 100%; background: #72aee6; transition: width 0.2s, background 0.2s;"></div>
 			</div>
-			<div class="jeo-ai-cal-row jeo-ai-token-ui" style="margin-bottom: 0; margin-top: 6px;">
-				<div style="flex: 1; height: 6px; background: #dcdcde; border-radius: 3px; overflow: hidden;">
-					<div id="jeo-ai-token-thermometer" style="width: 8%; height: 100%; background: #72aee6; transition: width 0.2s, background 0.2s;"></div>
-				</div>
-				<span id="jeo-ai-token-thermo-label" style="font-size: 11px; font-weight: 600; color: #2271b1; min-width: 55px; text-align: right;"><?php esc_html_e( 'Balanced', 'jeo' ); ?></span>
+			<span id="jeo-ai-token-thermo-label" style="font-size: 11px; font-weight: 600; color: #2271b1; min-width: 55px; text-align: right;"><?php esc_html_e( 'Balanced', 'jeo' ); ?></span>
+		</div>
+		<div class="jeo-ai-cal-row jeo-ai-unlimited-msg" style="margin-bottom: 0; display: none;">
+			<div style="flex: 1; font-size: 12px; color: #996b00; background: #fcf9e8; padding: 8px 12px; border-radius: 4px; border-left: 3px solid #f0c33c;">
+				⚠️ <?php esc_html_e( 'No token limit set. The LLM will use as many tokens as it deems necessary to produce the result.', 'jeo' ); ?>
 			</div>
-			<div class="jeo-ai-cal-row jeo-ai-unlimited-msg" style="margin-bottom: 0; display: none;">
-				<div style="flex: 1; font-size: 12px; color: #996b00; background: #fcf9e8; padding: 8px 12px; border-radius: 4px; border-left: 3px solid #f0c33c;">
-					⚠️ <?php esc_html_e( 'No token limit set. The LLM will use as many tokens as it deems necessary to produce the result.', 'jeo' ); ?>
-				</div>
-			</div>
+		</div>
 	</div>
+
 
 	<div class="jeo-ai-lang-box">
 		<p style="margin: 0 0 10px 0; font-weight: 600; font-size: 13px; color: #2c3338;">🌍 <?php esc_html_e( 'Output Language', 'jeo' ); ?></p>

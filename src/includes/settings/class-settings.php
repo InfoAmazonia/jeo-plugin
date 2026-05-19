@@ -227,7 +227,7 @@ class Settings {
 		// Checkboxes grouped by tab.
 		$booleans_by_tab = array(
 			'general'   => array( 'show_storymaps_on_post_archives' ),
-			'provider'  => array( 'ai_use_custom_prompt', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold' ),
+			'provider'  => array( 'ai_use_custom_prompt', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold', 'ai_cal_use_primary_limit', 'ai_cal_use_secondary_limit' ),
 			'settings'  => array( 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output' ),
 			'bulk'      => array( 'jeo_bulk_ai_active', 'jeo_bulk_logging' ),
 			'knowledge' => array( 'jeo_rag_auto_index' ),
@@ -240,7 +240,7 @@ class Settings {
 			}
 		} else {
 			// Fallback if no tab identifier (e.g. direct API updates or older logic).
-			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output', 'ai_use_custom_prompt', 'ai_include_taxonomies', 'show_storymaps_on_post_archives', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold' );
+			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output', 'ai_use_custom_prompt', 'ai_include_taxonomies', 'show_storymaps_on_post_archives', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold', 'ai_cal_use_primary_limit', 'ai_cal_use_secondary_limit' );
 			foreach ( $all_booleans as $bool_key ) {
 				if ( isset( $input[ $bool_key ] ) ) {
 					$input[ $bool_key ] = ! empty( $input[ $bool_key ] );
@@ -283,6 +283,18 @@ class Settings {
 			$input['ai_cal_secondary_threshold'] = absint( $input['ai_cal_secondary_threshold'] );
 			if ( $input['ai_cal_secondary_threshold'] < 0 || $input['ai_cal_secondary_threshold'] > 100 ) {
 				$input['ai_cal_secondary_threshold'] = 35;
+			}
+		}
+		if ( isset( $input['ai_cal_primary_max'] ) ) {
+			$input['ai_cal_primary_max'] = absint( $input['ai_cal_primary_max'] );
+			if ( $input['ai_cal_primary_max'] < 1 || $input['ai_cal_primary_max'] > 100 ) {
+				$input['ai_cal_primary_max'] = 10;
+			}
+		}
+		if ( isset( $input['ai_cal_secondary_max'] ) ) {
+			$input['ai_cal_secondary_max'] = absint( $input['ai_cal_secondary_max'] );
+			if ( $input['ai_cal_secondary_max'] < 1 || $input['ai_cal_secondary_max'] > 100 ) {
+				$input['ai_cal_secondary_max'] = 10;
 			}
 		}
 

@@ -21,7 +21,7 @@ use NeuronAI\StructuredOutput\Validation\Rules\ArrayOf;
 class Georeference_Result {
 
 	#[SchemaProperty(
-		description: 'List of geographic locations found in the provided text. Include EVERY possible location, even with low confidence.',
+		description: 'List of geographic locations found in the provided text, filtered and limited according to the system prompt rules.',
 		anyOf: [ Location_Output::class ]
 	)]
 	#[ArrayOf( Location_Output::class )]

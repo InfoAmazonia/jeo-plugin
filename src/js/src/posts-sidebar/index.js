@@ -8,6 +8,32 @@ import apiFetch from '@wordpress/api-fetch';
 import JeoGeocodePosts from './geo-posts';
 import { JeoGeocodePostsAI } from './geo-posts-ai';
 
+/**
+ * Apply configured primary/secondary point limits to a list of formatted locations.
+ *
+ * @param {Array} points Formatted location points.
+ * @return {Array} Points respecting max limits when configured.
+ */
+const applyPointLimits = ( points ) => {
+	const limits = window.jeo?.ai_limits || {};
+	if ( ! limits.use_primary_limit && ! limits.use_secondary_limit ) {
+		return points;
+	}
+
+	const primary   = points.filter( p => p.relevance === 'primary' );
+	const secondary = points.filter( p => p.relevance === 'secondary' );
+	const disabled  = points.filter( p => p._disabled );
+
+	const limitedPrimary   = limits.use_primary_limit
+		? primary.slice( 0, limits.primary_max )
+		: primary;
+	const limitedSecondary = limits.use_secondary_limit
+		? secondary.slice( 0, limits.secondary_max )
+		: secondary;
+
+	return [ ...limitedPrimary, ...limitedSecondary, ...disabled ];
+};
+
 const JeoGeocodePanel = ( props ) => {
 	const { postId, title, content } = props;
 	const [ state, setState ] = wp.element.useState( {
@@ -85,7 +111,7 @@ const JeoGeocodePanel = ( props ) => {
 
 				setState( ( prev ) => ( {
 					...prev,
-					aiSuggestedLocations: formattedPoints,
+					aiSuggestedLocations: applyPointLimits( formattedPoints ),
 					isApprovalModalOpen: true,
 					isAIProcessing: false
 				} ) );
@@ -215,7 +241,7 @@ const JeoGeocodePanel = ( props ) => {
 
 		setState( ( prev ) => ( {
 			...prev,
-			aiSuggestedLocations: formattedPoints,
+			aiSuggestedLocations: applyPointLimits( formattedPoints ),
 			isApprovalModalOpen: true,
 		} ) );
 	};

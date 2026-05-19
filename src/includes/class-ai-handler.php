@@ -1022,6 +1022,10 @@ class AI_Handler {
 		$secondary_threshold = absint( $request->get_param( 'secondary_threshold' ) ? $request->get_param( 'secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ) );
 		$use_primary_threshold   = $request->get_param( 'use_primary_threshold' ) ? $request->get_param( 'use_primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_threshold', true );
 		$use_secondary_threshold = $request->get_param( 'use_secondary_threshold' ) ? $request->get_param( 'use_secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_threshold', true );
+		$primary_max   = absint( $request->get_param( 'primary_max' ) ? $request->get_param( 'primary_max' ) : \jeo_settings()->get_option( 'ai_cal_primary_max', 10 ) );
+		$secondary_max = absint( $request->get_param( 'secondary_max' ) ? $request->get_param( 'secondary_max' ) : \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 ) );
+		$use_primary_limit   = $request->get_param( 'use_primary_limit' ) ? $request->get_param( 'use_primary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_limit', false );
+		$use_secondary_limit = $request->get_param( 'use_secondary_limit' ) ? $request->get_param( 'use_secondary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false );
 
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
@@ -1104,6 +1108,12 @@ class AI_Handler {
 		if ( $use_secondary_threshold ) {
 			$calibration_rules .= "- Locations with a confidence score below {$primary_threshold} but at least {$secondary_threshold} should be classified as SECONDARY (mentioned but not central).\n";
 			$calibration_rules .= "- Locations with a confidence score below {$secondary_threshold} should be discarded entirely (treated as disabled / not relevant enough).\n";
+		}
+		if ( $use_primary_limit ) {
+			$calibration_rules .= "- Return at most {$primary_max} PRIMARY location(s). Never exceed this limit.\n";
+		}
+		if ( $use_secondary_limit ) {
+			$calibration_rules .= "- Return at most {$secondary_max} SECONDARY location(s). Never exceed this limit.\n";
 		}
 		$calibration_rules .= "- CRITICAL: Each location object MUST include the boolean field 'is_primary'. Set it to true ONLY for locations that are the MAIN geographic focus of the content (where the story happens, the central territory, or the primary object of the report). Set it to false for all secondary, supporting, or contextual locations. Do NOT rely solely on confidence scores for this classification; use your editorial judgment based on the text analysis.\n";
 
@@ -1348,7 +1358,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	 * @return string
 	 */
 	public function get_default_system_prompt() {
-		return __( 'You are a highly skilled geographer API. Analyze the text and extract locations. You MUST respond ONLY with a raw JSON array of objects, each containing "name", "lat" (string/float), "lon" (string/float), "quote" (a short relevant snippet from the text where the location was mentioned), and "confidence" (an integer 0-100). If no locations are found, return exactly []. Do not use markdown backticks, do not include any conversational text. Output MUST start with [ and end with ].', 'jeo' );
+		return AI_Adapter::get_calibration_aware_prompt();
 	}
 
 	/**

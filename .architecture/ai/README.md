@@ -111,6 +111,9 @@ The base adapter (`class-ai-adapter.php`) builds a prompt that:
 - Provides strict JSON schema for the response
 - Includes confidence scoring instructions
 - Applies aggressive JSON format enforcement
+- **Incorporates active calibration settings** (granularity, confidence threshold, title weight, primary/secondary thresholds, primary/secondary point count limits) into the default prompt so users who do not generate a custom prompt via the AI Prompt Assistant still benefit from their calibration configuration
+- Adapts the precision instruction in the enforced schema based on whether a minimum confidence calibration is active, avoiding conflicting directives
+- Enforces max point limits in both the frontend sidebar and the bulk processor when configured
 
 ## Bulk Processing
 

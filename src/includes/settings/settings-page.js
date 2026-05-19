@@ -334,6 +334,8 @@
 		bindCalToggle('jeo-ai-cal-use-title-weight', '#jeo-ai-cal-title-weight');
 		bindCalToggle('jeo-ai-cal-use-primary-threshold', '#jeo-ai-cal-primary-threshold');
 		bindCalToggle('jeo-ai-cal-use-secondary-threshold', '#jeo-ai-cal-secondary-threshold');
+		bindCalToggle('jeo-ai-cal-use-primary-limit', '#jeo-ai-cal-primary-max');
+		bindCalToggle('jeo-ai-cal-use-secondary-limit', '#jeo-ai-cal-secondary-max');
 		// Max tokens toggle with extra UI (thermometer + unlimited message)
 		(function() {
 			var $toggle = $('#jeo-ai-cal-use-max-tokens');
@@ -370,6 +372,8 @@
 		bindCalSlider('jeo-ai-cal-title-weight');
 		bindCalSlider('jeo-ai-cal-primary-threshold');
 		bindCalSlider('jeo-ai-cal-secondary-threshold');
+				bindCalSlider('jeo-ai-cal-primary-max');
+				bindCalSlider('jeo-ai-cal-secondary-max');
 
 		// Max tokens slider with formatted value
 		(function() {
@@ -432,6 +436,8 @@
 			apiData.use_max_tokens = $('#jeo-ai-cal-use-max-tokens').is(':checked') ? 1 : 0;
 			apiData.use_primary_threshold = $('#jeo-ai-cal-use-primary-threshold').is(':checked') ? 1 : 0;
 			apiData.use_secondary_threshold = $('#jeo-ai-cal-use-secondary-threshold').is(':checked') ? 1 : 0;
+			apiData.use_primary_limit = $('#jeo-ai-cal-use-primary-limit').is(':checked') ? 1 : 0;
+			apiData.use_secondary_limit = $('#jeo-ai-cal-use-secondary-limit').is(':checked') ? 1 : 0;
 			if ($('#jeo-ai-cal-use-granularity').is(':checked')) {
 				apiData.granularity = $('#jeo-ai-cal-granularity').val();
 			}
@@ -449,6 +455,12 @@
 			}
 			if ($('#jeo-ai-cal-use-secondary-threshold').is(':checked')) {
 				apiData.secondary_threshold = parseInt($('#jeo-ai-cal-secondary-threshold').val(), 10);
+			}
+			if ($('#jeo-ai-cal-use-primary-limit').is(':checked')) {
+				apiData.primary_max = parseInt($('#jeo-ai-cal-primary-max').val(), 10);
+			}
+			if ($('#jeo-ai-cal-use-secondary-limit').is(':checked')) {
+				apiData.secondary_max = parseInt($('#jeo-ai-cal-secondary-max').val(), 10);
 			}
 
 			$btn.prop('disabled', true).text('Generating...');
