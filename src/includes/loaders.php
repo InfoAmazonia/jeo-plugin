@@ -7,8 +7,6 @@
 
 if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
 	require_once JEO_BASEPATH . 'vendor/autoload.php';
-} elseif ( file_exists( dirname( JEO_BASEPATH ) . '/vendor/autoload.php' ) ) {
-	require_once dirname( JEO_BASEPATH ) . '/vendor/autoload.php';
 }
 
 spl_autoload_register( 'jeo_autoload' );

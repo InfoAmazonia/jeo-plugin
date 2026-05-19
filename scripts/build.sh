@@ -49,8 +49,8 @@ if [[ "${1:-}" == "--skip-build" ]]; then
 fi
 
 if [[ "$SKIP_BUILD" == false ]]; then
-	echo "📦 Installing PHP dependencies (no-dev)..."
-	composer install --no-dev --optimize-autoloader --quiet
+	echo "📦 Installing PHP dependencies (no-dev) in src/..."
+	composer install --no-dev --optimize-autoloader --quiet --working-dir="${REPO_ROOT}/src"
 	echo "✅ Composer done"
 	echo
 
@@ -62,13 +62,6 @@ else
 	echo "⏭️  Skipping npm/composer builds (--skip-build)"
 	echo
 fi
-
-# ── Copy vendor into src/ ────────────────────────────────────────────────────
-echo "📂 Copying vendor/ into src/vendor/..."
-rm -rf "${REPO_ROOT}/src/vendor"
-cp -a "${REPO_ROOT}/vendor" "${REPO_ROOT}/src/vendor"
-echo "✅ Vendor copied"
-echo
 
 # ── Create ZIP ───────────────────────────────────────────────────────────────
 mkdir -p "$DIST_DIR"
@@ -94,12 +87,6 @@ echo
 # ── Report size ──────────────────────────────────────────────────────────────
 SIZE=$(du -h "$ZIP_PATH" | cut -f1)
 echo "📊 Size: ${SIZE}"
-echo
-
-# ── Clean up src/vendor ──────────────────────────────────────────────────────
-echo "🧹 Cleaning src/vendor..."
-rm -rf "${REPO_ROOT}/src/vendor"
-echo "✅ Done"
 echo
 
 echo "========================================"
