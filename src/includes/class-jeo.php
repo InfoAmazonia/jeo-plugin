@@ -759,8 +759,8 @@ class Jeo {
 		$post_type_object = get_post_type_object( $post_type );
 		$rest_base        = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type;
 
-		$saved_data->postID       = $post_id;
-		$saved_data->postRestBase = $rest_base;
+		$saved_data->{'postID'}       = $post_id;
+		$saved_data->{'postRestBase'} = $rest_base;
 	}
 
 	/**
@@ -848,6 +848,7 @@ class Jeo {
 	 *
 	 * @param array  $block_attributes Block attributes.
 	 * @param string $content Saved block content.
+	 * @param object $block Block instance.
 	 * @return string
 	 */
 	public function story_map_dynamic_render_callback( $block_attributes, $content, $block = null ) {
@@ -858,7 +859,7 @@ class Jeo {
 			return '';
 		}
 
-		$post_id = absint( $saved_data->postID ?? get_the_ID() );
+		$post_id = absint( $saved_data->{'postID'} ?? get_the_ID() );
 		$this->set_story_map_post_rest_data( $saved_data, $post_id );
 
 		$map_id     = isset( $saved_data->map_id ) ? (int) $saved_data->map_id : 0;
