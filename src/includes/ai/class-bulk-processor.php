@@ -559,14 +559,24 @@ class Bulk_Processor {
 			$use_primary_limit   = (bool) \jeo_settings()->get_option( 'ai_cal_use_primary_limit', false );
 			$use_secondary_limit = (bool) \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false );
 			if ( $use_primary_limit || $use_secondary_limit ) {
-				$primary_points   = array_filter( $related_points, function( $rp ) { return 'primary' === $rp['relevance']; } );
-				$secondary_points = array_filter( $related_points, function( $rp ) { return 'secondary' === $rp['relevance']; } );
+				$primary_points   = array_filter(
+					$related_points,
+					function ( $rp ) {
+						return 'primary' === $rp['relevance'];
+					}
+				);
+				$secondary_points = array_filter(
+					$related_points,
+					function ( $rp ) {
+						return 'secondary' === $rp['relevance'];
+					}
+				);
 				if ( $use_primary_limit ) {
-					$primary_max = (int) \jeo_settings()->get_option( 'ai_cal_primary_max', 10 );
+					$primary_max    = (int) \jeo_settings()->get_option( 'ai_cal_primary_max', 10 );
 					$primary_points = array_slice( $primary_points, 0, $primary_max );
 				}
 				if ( $use_secondary_limit ) {
-					$secondary_max = (int) \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 );
+					$secondary_max    = (int) \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 );
 					$secondary_points = array_slice( $secondary_points, 0, $secondary_max );
 				}
 				$related_points = array_merge( array_values( $primary_points ), array_values( $secondary_points ) );
