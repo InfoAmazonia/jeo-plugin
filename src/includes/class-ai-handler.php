@@ -308,9 +308,23 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_georeference' ),
-				'permission_callback' => function () {
-					return current_user_can( 'edit_posts' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+				'args'                => array(
+					'post_id' => array(
+						'required' => true,
+						'type'     => 'integer',
+						'minimum'  => 1,
+					),
+					'title'   => array(
+						'required'  => true,
+						'type'      => 'string',
+						'minLength' => 1,
+					),
+					'content' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
 			)
 		);
 
@@ -320,9 +334,7 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_chat_prompt_generator' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
 			)
 		);
 
@@ -332,9 +344,7 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_validate_prompt' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
 			)
 		);
 
@@ -344,9 +354,22 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_test_key' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'provider' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array_keys( $this->get_adapters() ),
+					),
+					'api_key'  => array(
+						'required' => false,
+						'type'     => 'string',
+					),
+					'model'    => array(
+						'required' => false,
+						'type'     => 'string',
+					),
+				),
 			)
 		);
 
@@ -356,9 +379,18 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_get_models' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'provider' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array_keys( $this->get_adapters() ),
+					),
+					'api_key'  => array(
+						'required' => false,
+						'type'     => 'string',
+					),
+				),
 			)
 		);
 
@@ -368,9 +400,7 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_test_embedding' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
 			)
 		);
 
@@ -380,9 +410,20 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_test_retrieval' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'query' => array(
+						'required'  => true,
+						'type'      => 'string',
+						'minLength' => 1,
+					),
+					'store' => array(
+						'required' => false,
+						'type'     => 'string',
+						'enum'     => array( 'test', 'production' ),
+						'default'  => 'production',
+					),
+				),
 			)
 		);
 		register_rest_route(
@@ -391,9 +432,7 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_backup_store' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
 			)
 		);
 
@@ -403,9 +442,7 @@ class AI_Handler {
 			array(
 				'methods'             => 'GET',
 				'callback'            => array( $this, 'api_list_backups' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
 			)
 		);
 
@@ -415,9 +452,14 @@ class AI_Handler {
 			array(
 				'methods'             => 'DELETE',
 				'callback'            => array( $this, 'api_delete_backup' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'filename' => array(
+						'required' => true,
+						'type'     => 'string',
+						'pattern'  => '^[a-zA-Z0-9._-]+\.zip$',
+					),
+				),
 			)
 		);
 
@@ -427,9 +469,14 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_clear_store' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'store' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array( 'test', 'production' ),
+					),
+				),
 			)
 		);
 
@@ -439,9 +486,7 @@ class AI_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_clear_layer_store' ),
-				'permission_callback' => function () {
-					return current_user_can( 'manage_options' );
-				},
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
 			)
 		);
 	}
@@ -1022,10 +1067,10 @@ class AI_Handler {
 		$secondary_threshold     = absint( $request->get_param( 'secondary_threshold' ) ? $request->get_param( 'secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ) );
 		$use_primary_threshold   = $request->get_param( 'use_primary_threshold' ) ? $request->get_param( 'use_primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_threshold', true );
 		$use_secondary_threshold = $request->get_param( 'use_secondary_threshold' ) ? $request->get_param( 'use_secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_threshold', true );
-		$primary_max   = absint( $request->get_param( 'primary_max' ) ? $request->get_param( 'primary_max' ) : \jeo_settings()->get_option( 'ai_cal_primary_max', 10 ) );
-		$secondary_max = absint( $request->get_param( 'secondary_max' ) ? $request->get_param( 'secondary_max' ) : \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 ) );
-		$use_primary_limit   = $request->get_param( 'use_primary_limit' ) ? $request->get_param( 'use_primary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_limit', false );
-		$use_secondary_limit = $request->get_param( 'use_secondary_limit' ) ? $request->get_param( 'use_secondary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false );
+		$primary_max             = absint( $request->get_param( 'primary_max' ) ? $request->get_param( 'primary_max' ) : \jeo_settings()->get_option( 'ai_cal_primary_max', 10 ) );
+		$secondary_max           = absint( $request->get_param( 'secondary_max' ) ? $request->get_param( 'secondary_max' ) : \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 ) );
+		$use_primary_limit       = $request->get_param( 'use_primary_limit' ) ? $request->get_param( 'use_primary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_limit', false );
+		$use_secondary_limit     = $request->get_param( 'use_secondary_limit' ) ? $request->get_param( 'use_secondary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false );
 
 		if ( empty( $context ) ) {
 			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );

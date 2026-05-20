@@ -53,14 +53,12 @@ class Minimap_Agent {
 		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
 		$has_mapbox = ! empty( $mapbox_key );
 
-		$tools = array(
-			Search_Layers_Tool::class,
-			Geocode_Tool::class,
-		);
-
+		$tool_ids = array( 'search_layers', 'geocode' );
 		if ( $has_mapbox ) {
-			$tools[] = Generate_Layer_Tool::class;
+			$tool_ids[] = 'generate_layer';
 		}
+
+		$tools = Tool_Registry::get_instances_by_id( $tool_ids );
 
 		$config = new AssistantConfig(
 			logger:               new StderrLogger(),
