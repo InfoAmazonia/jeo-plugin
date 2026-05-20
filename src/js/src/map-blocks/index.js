@@ -89,27 +89,40 @@ const storyMapCleanUp = (props) => {
 	}
 
 	function removeYoastTagsFromObject(object) {
-		if(Object.hasOwn( object, 'yoast_head') ) {
-			delete object.yoast_head;
+		if(! object || typeof object !== 'object') {
+			return;
 		}
+
+		delete object.yoast_head;
+		delete object.yoast_head_json;
 	}
 
-	attributesStructure.navigateMapLayers.forEach( item => {
-		removeYoastTagsFromObject(item);
-		delete item.content;
-	})
-
-	attributesStructure.slides.forEach( slide => {
-		slide.selectedLayers.forEach( layer => {
-			// Remove yoast tags that are unecessary
-			removeYoastTagsFromObject(layer);
-
-			// Remove slide content from future JSON
-			if(layer.content) {
-				delete layer.content;
+	if(Array.isArray(attributesStructure.navigateMapLayers)) {
+		attributesStructure.navigateMapLayers.forEach( item => {
+			removeYoastTagsFromObject(item);
+			if(item && typeof item === 'object') {
+				delete item.content;
 			}
-		} )
-	})
+		})
+	}
+
+	if(Array.isArray(attributesStructure.slides)) {
+		attributesStructure.slides.forEach( slide => {
+			if(! slide || ! Array.isArray(slide.selectedLayers)) {
+				return;
+			}
+
+			slide.selectedLayers.forEach( layer => {
+				// Remove yoast tags that are unecessary
+				removeYoastTagsFromObject(layer);
+
+				// Remove slide content from future JSON
+				if(layer && typeof layer === 'object' && layer.content) {
+					delete layer.content;
+				}
+			} )
+		})
+	}
 
 	// Loaded layers aren't used properly
 	attributesStructure.loadedLayers = [];
