@@ -330,6 +330,43 @@ class AI_Handler {
 
 		register_rest_route(
 			'jeo/v1',
+			'/ai-georeference-chat',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_georeference_chat' ),
+				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+				'args'                => array(
+					'post_id'         => array(
+						'required' => true,
+						'type'     => 'integer',
+						'minimum'  => 1,
+					),
+					'conversation_id' => array(
+						'required' => true,
+						'type'     => 'string',
+						'format'   => 'uuid',
+					),
+					'message'         => array(
+						'required' => false,
+						'type'     => 'string',
+						'default'  => '',
+					),
+					'title'           => array(
+						'required' => false,
+						'type'     => 'string',
+						'default'  => '',
+					),
+					'content'         => array(
+						'required' => false,
+						'type'     => 'string',
+						'default'  => '',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
 			'/ai-chat-prompt-generator',
 			array(
 				'methods'             => 'POST',
@@ -1000,7 +1037,7 @@ class AI_Handler {
 
 			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
 			// Usamos [SKIP_ENFORCED_SCHEMA] para evitar que o JEO injete o prompt gigante de geolocalização durante o teste de conexão.
-			$test_prompt = '[SKIP_ENFORCED_SCHEMA] Instruction: Return a JSON array confirming API access. Your ONLY output must be this exact format: [{"name": "SystemCheck", "lat": 0, "lon": 0, "quote": "Status: Ping", "confidence": 100}]';
+			$test_prompt = AI\System_Prompt_Builder::for_test_connection();
 
 			$result = $adapter->georeference( 'SystemCheck', 'Status: Ping', $test_prompt );
 
@@ -1373,12 +1410,81 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		}
 	}
 
-	/**
-	 * Build a taxonomy context string from a post's categories and tags.
-	 *
-	 * @param int $post_id Post ID.
-	 * @return string
-	 */
+		/**
+		 * Multi-turn georeferencing with conversation history.
+		 *
+		 * @param \WP_REST_Request $request Current REST request.
+		 * @return \WP_REST_Response
+		 */
+	public function api_georeference_chat( $request ) {
+		$post_id         = $request->get_param( 'post_id' );
+		$conversation_id = $request->get_param( 'conversation_id' );
+		$message         = trim( $request->get_param( 'message' ) );
+		$title           = $request->get_param( 'title' );
+		$content         = $request->get_param( 'content' );
+
+		if ( empty( $title ) && ! empty( $post_id ) ) {
+			$post    = get_post( $post_id );
+			$title   = $post->post_title;
+			$content = $post->post_content;
+		}
+
+		$conv = new AI\Georeferencing_Conversation( (int) $post_id, $conversation_id );
+
+		try {
+			$adapter = $this->get_active_adapter();
+
+			if ( is_wp_error( $adapter ) ) {
+				return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+			}
+
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+			}
+
+			// First interaction: store the initial post context.
+			if ( ! $conv->exists() ) {
+				$conv->start( $title, $content );
+			}
+
+			// If user sent a refinement message, add it to the thread.
+			if ( ! empty( $message ) ) {
+				$conv->add_user_message( $message );
+			}
+
+			// Run georeferencing (currently stateless; future Phase will inject history).
+			$result = $adapter->georeference( $title, $content );
+
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
+			}
+
+			// Persist assistant response for future refinement context.
+			$conv->add_assistant_message( wp_json_encode( $result ) );
+
+			return new \WP_REST_Response(
+				array(
+					'locations'       => $result,
+					'conversation_id' => $conversation_id,
+				),
+				200
+			);
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'error' => __( 'An unexpected error occurred while processing the AI chat request.', 'jeo' ) . ' ' . $e->getMessage(),
+				),
+				500
+			);
+		}
+	}
+
+		/**
+		 * Build a taxonomy context string from a post's categories and tags.
+		 *
+		 * @param int $post_id Post ID.
+		 * @return string
+		 */
 	private function get_post_taxonomy_context( $post_id ) {
 		$lines = array();
 
