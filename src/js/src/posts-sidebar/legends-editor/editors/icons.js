@@ -22,10 +22,10 @@ class IconEditor extends Component {
 				attributes: {
 					...legendData.attributes,
 					legend_type_options: {
-						icons: [ ...legendData.attributes.legend_type_options.icons.map( ( item ) => {
+						icons: [ ...legendData.attributes.legend_type_options.icons.map( ( item, index ) => {
 							return {
 								...item,
-								id: crypto.randomUUID(),
+								id: item.id || `icon-${ index }`,
 							};
 						} ) ],
 					},

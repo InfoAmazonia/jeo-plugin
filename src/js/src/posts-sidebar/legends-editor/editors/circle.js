@@ -23,10 +23,10 @@ class CircleEditor extends Component {
 					...legendData.attributes,
 					legend_type_options: {
 						...legendData.attributes.legend_type_options,
-						circles: [ ...legendData.attributes.legend_type_options.circles.map( ( item ) => {
+						circles: [ ...legendData.attributes.legend_type_options.circles.map( ( item, index ) => {
 							return {
 								...item,
-								id: crypto.randomUUID(),
+								id: item.id || `circle-${ index }`,
 							};
 						} ) ],
 					},
