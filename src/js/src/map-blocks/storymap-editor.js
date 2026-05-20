@@ -41,9 +41,11 @@ import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import {
+	getLayerId,
+	layerIdsMatch,
 	moveActiveIndex,
+	reconcileSelectedLayersWithAvailableLayers,
 	reorderSlides,
-	sortSelectedLayersByMapOrder,
 } from './storymap-ordering';
 import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
@@ -467,7 +469,12 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ loadedMap?.meta.layers ] );
 
-	const { records: loadedLayers = [] } = useRecordsByIds( {
+	const {
+		records: loadedLayers = [],
+		isLoading: loadingLayers,
+		error: layersError,
+		hasResolved: layersResolved,
+	} = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
@@ -479,7 +486,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 				selectedLayers:
 					attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [],
 				navigateLayers:
-					attributes.navigateMapLayers?.map( ( layer ) => layer.id ) || [],
+					attributes.navigateMapLayers?.map( getLayerId ) || [],
 			} ),
 		[ attributes.slides, attributes.navigateMapLayers, currentSlideIndex ]
 	);
@@ -541,26 +548,24 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	}, [ highlightedSlideKey ] );
 
 	useEffect( () => {
-		// Post already exists
-		if ( attributes.slides && loadedMap && loadedLayers ) {
-			const loadedMapLayerIds = new Set(
-				loadedMap.meta.layers.map( ( layer ) => layer.id )
-			);
-			const availableLayerIds = new Set(
-				loadedLayers.map( ( layer ) => layer.id )
-			);
-			const newSlides = attributes.slides.map( ( slide ) => {
-				const selectedLayers = ( slide.selectedLayers ?? [] ).filter(
-					( selectedLayer ) =>
-						loadedMapLayerIds.has( selectedLayer.id ) &&
-						availableLayerIds.has( selectedLayer.id )
-				);
+		if ( ! loadedMap || ! layersResolved || loadingLayers || layersError ) {
+			return;
+		}
 
+		if ( layerIds.length > 0 && loadedLayers.length === 0 ) {
+			return;
+		}
+
+		// Post already exists
+		if ( attributes.slides ) {
+			const loadedMapLayers = loadedMap.meta.layers ?? [];
+			const newSlides = attributes.slides.map( ( slide ) => {
 				return {
 					...slide,
-					selectedLayers: sortSelectedLayersByMapOrder(
-						selectedLayers,
-						loadedMap.meta.layers
+					selectedLayers: reconcileSelectedLayersWithAvailableLayers(
+						slide.selectedLayers,
+						loadedMapLayers,
+						loadedLayers
 					),
 				};
 			} );
@@ -581,7 +586,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			loadedLayers: [],
 			navigateMapLayers: loadedLayers ?? [],
 		} );
-	}, [ loadedMap, loadedLayers ] );
+	}, [ loadedMap, loadedLayers, layerIds.length, layersResolved, loadingLayers, layersError ] );
 
 	const editorConfig = useMemo( () => {
 		const layerColors = (loadedLayers ?? []).flatMap( ( layer ) => {
@@ -735,7 +740,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								( layer ) => {
 									if(attributes.navigateMapLayers) {
 										const layerOptions = attributes.navigateMapLayers.find(
-											( { id } ) => id === layer.id
+											( item ) => layerIdsMatch( item, layer )
 										);
 										if ( layerOptions ) {
 											return renderLayer( {
@@ -876,15 +881,15 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	background: 'rgb(240, 240, 240)',
 																};
 
-																attributes.slides[ slideIndex ].selectedLayers.map(
-																	( selectedLayer ) => {
-																		if ( selectedLayer.id === item.id ) {
-																			layerButtonStyle = {
-																				background: 'rgb(200, 200, 200)',
-																			};
+																	attributes.slides[ slideIndex ].selectedLayers.map(
+																		( selectedLayer ) => {
+																			if ( layerIdsMatch( selectedLayer, item ) ) {
+																				layerButtonStyle = {
+																					background: 'rgb(200, 200, 200)',
+																				};
+																			}
 																		}
-																	}
-																);
+																	);
 
 																if ( ! item ) {
 																	return null;
@@ -892,45 +897,45 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 																return (
 																	<Button
-																		style={ layerButtonStyle }
-																		className="layer"
-																		key={ item.id }
-																		onClick={ () => {
-																			setCurrentSlideIndex( slideIndex );
+																			style={ layerButtonStyle }
+																			className="layer"
+																			key={ item.id }
+																			onClick={ () => {
+																				setCurrentSlideIndex( slideIndex );
 
-																			const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
-																			let hasBeenRemoved = false;
+																				const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
+																				let hasBeenRemoved = false;
 
-																			oldSlides[ slideIndex ].selectedLayers.map(
-																				( selectedLayer, indexOfLayer ) => {
-																					if ( selectedLayer.id === item.id ) {
-																						oldSlides[
-																							slideIndex
-																						].selectedLayers.splice(
-																							indexOfLayer,
-																							1
-																						);
-																						hasBeenRemoved = true;
-																					}
-																				}
-																			);
-
-																			if ( ! hasBeenRemoved ) {
-
-																				let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
-																				let itemPosition = false;
-
-																				const findItemPostion = (item) => {
-																					let itemPosition = -1;
-
-																					loadedMap.meta.layers.forEach( (layer, index) => {
-																						if( item.id === layer.id ) {
-																							itemPosition = index;
+																				oldSlides[ slideIndex ].selectedLayers.map(
+																					( selectedLayer, indexOfLayer ) => {
+																						if ( layerIdsMatch( selectedLayer, item ) ) {
+																							oldSlides[
+																								slideIndex
+																							].selectedLayers.splice(
+																								indexOfLayer,
+																								1
+																							);
+																							hasBeenRemoved = true;
 																						}
-																					})
+																					}
+																				);
 
-																					return itemPosition;
-																				}
+																				if ( ! hasBeenRemoved ) {
+
+																					let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
+																					let itemPosition = false;
+
+																					const findItemPostion = (item) => {
+																						let itemPosition = -1;
+
+																						loadedMap.meta.layers.forEach( (layer, index) => {
+																							if( layerIdsMatch( item, layer ) ) {
+																								itemPosition = index;
+																							}
+																						})
+
+																						return itemPosition;
+																					}
 
 																				oldSlides[ slideIndex ].selectedLayers.map( (layer) => {
 																					const position = findItemPostion(layer);

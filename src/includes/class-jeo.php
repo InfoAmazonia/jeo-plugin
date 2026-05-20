@@ -752,15 +752,30 @@ class Jeo {
 	 * @return bool
 	 */
 	private function layer_still_exists( array $map_layers, $selected_layer ) {
-		$layer_status = get_post_status( $selected_layer->id );
+		if ( ! is_object( $selected_layer ) || ! isset( $selected_layer->id ) ) {
+			return false;
+		}
+
+		$selected_layer_id = absint( $selected_layer->id );
+		if ( ! $selected_layer_id ) {
+			return false;
+		}
+
+		$layer_status = get_post_status( $selected_layer_id );
 		if ( 'trash' === $layer_status || false === $layer_status || 'private' === $layer_status ) {
 			return false;
 		}
 
 		foreach ( $map_layers as $layer ) {
-			if ( $layer['id'] === $selected_layer->id ) {
-				$selected_layer->meta->type               = get_post_meta( $layer['id'], 'type', true );
-				$selected_layer->meta->layer_type_options = (object) get_post_meta( $layer['id'], 'layer_type_options', true );
+			$map_layer_id = absint( $layer['id'] ?? 0 );
+			if ( $map_layer_id === $selected_layer_id ) {
+				if ( ! isset( $selected_layer->meta ) || ! is_object( $selected_layer->meta ) ) {
+					$selected_layer->meta = new \stdClass();
+				}
+
+				$selected_layer->id                       = $selected_layer_id;
+				$selected_layer->meta->type               = get_post_meta( $selected_layer_id, 'type', true );
+				$selected_layer->meta->layer_type_options = (object) get_post_meta( $selected_layer_id, 'layer_type_options', true );
 				return true;
 			}
 		}
@@ -830,7 +845,7 @@ class Jeo {
 
 			foreach ( $map_layers as $layer ) {
 				foreach ( $selected_layers as $selected_layer ) {
-					if ( $selected_layer->id === $layer['id'] ) {
+					if ( absint( $selected_layer->id ?? 0 ) === absint( $layer['id'] ?? 0 ) ) {
 						$selected_layers_order[] = $selected_layer;
 					}
 				}
@@ -846,7 +861,7 @@ class Jeo {
 
 		foreach ( $map_layers as $layer ) {
 			foreach ( $navigate_map_layers as $index => $navigate_layer ) {
-				if ( $navigate_layer->id === $layer['id'] ) {
+				if ( absint( $navigate_layer->id ?? 0 ) === absint( $layer['id'] ?? 0 ) ) {
 					// Update the saved metadata and layer types.
 					if ( ! $this->layer_still_exists( $map_layers, $navigate_layer ) ) {
 						array_splice( $navigate_map_layers, $index, 1 );
