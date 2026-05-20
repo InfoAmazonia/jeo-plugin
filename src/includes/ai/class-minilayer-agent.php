@@ -1,26 +1,26 @@
 <?php
 /**
- * Minilayer AI agent — creates Mapbox styles from text prompts via MCP.
+ * Minilayer AI agent factory — creates Mapbox styles from text prompts via MCP.
+ *
+ * Uses the hacklabr/ai-assistant Assistant with native MCP integration.
  *
  * @package Jeo
  */
 
 namespace Jeo\AI;
 
-use NeuronAI\Agent\Agent;
+use HackLab\AIAssistant\Assistant;
 use NeuronAI\Chat\Messages\UserMessage;
-use NeuronAI\MCP\McpConnector;
-use NeuronAI\Providers\AIProviderInterface;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
 /**
- * NeuronAI agent that connects to the Mapbox DevKit MCP server
- * to generate map styles from natural-language prompts.
+ * Factory that builds an Assistant configured to connect to the Mapbox DevKit
+ * MCP server for generating map styles from natural-language prompts.
  */
-class Minilayer_Agent extends Agent {
+class Minilayer_Agent {
 
 	/**
 	 * Mapbox DevKit MCP hosted endpoint.
@@ -30,29 +30,30 @@ class Minilayer_Agent extends Agent {
 	const MCP_ENDPOINT = 'https://mcp-devkit.mapbox.com/mcp';
 
 	/**
-	 * Mapbox access token with styles:write scope.
-	 *
-	 * @var string
-	 */
-	protected string $mapbox_token;
-
-	/**
-	 * Constructor.
+	 * Create a configured Assistant for minilayer generation.
 	 *
 	 * @param string $mapbox_token Mapbox public or secret access token.
+	 * @return Assistant
 	 */
-	public function __construct( string $mapbox_token ) {
-		$this->mapbox_token = $mapbox_token;
-		parent::__construct();
+	public static function create( string $mapbox_token ): Assistant {
+		return JEO_AI_Factory::create_minilayer_assistant(
+			instructions: self::instructions(),
+			mapbox_token: $mapbox_token,
+		);
 	}
 
 	/**
-	 * Return the active JEO AI provider.
+	 * Run the minilayer generation.
 	 *
-	 * @return AIProviderInterface
+	 * @param string $prompt User's text description of the desired map style.
+	 * @param string $mapbox_token Mapbox API token.
+	 * @return string Raw response from the AI.
+	 * @throws \Exception On agent failure.
 	 */
-	protected function provider(): AIProviderInterface {
-		return Neuron_Factory::get_active_provider( true );
+	public static function generate( string $prompt, string $mapbox_token ): string {
+		$assistant = self::create( $mapbox_token );
+		$message   = $assistant->chat( new UserMessage( $prompt ) )->getMessage();
+		return $message->getContent();
 	}
 
 	/**
@@ -60,7 +61,7 @@ class Minilayer_Agent extends Agent {
 	 *
 	 * @return string
 	 */
-	public function instructions(): string {
+	public static function instructions(): string {
 		return <<<'PROMPT'
 You are a professional cartographer and Mapbox style designer.
 
@@ -136,65 +137,5 @@ When layer_type is "mapbox":
 - Keep the style performant — avoid excessive layers.
 - When using Mapbox tilesets, prefer mapbox://mapbox-streets-v8 or similar vector sources.
 PROMPT;
-	}
-
-	/**
-	 * Provide Mapbox DevKit MCP tools to the agent.
-	 *
-	 * @return array
-	 */
-	protected function tools(): array {
-		try {
-			$connector = McpConnector::make(
-				array(
-					'url'     => self::MCP_ENDPOINT,
-					'token'   => $this->mapbox_token,
-					'timeout' => 60,
-				)
-			)->only(
-				array(
-					'StyleBuilderTool',
-					'CreateStyleTool',
-					'ValidateStyleTool',
-					'PreviewStyleTool',
-					'RetrieveStyleTool',
-					'ListStylesTool',
-				)
-			);
-
-			return $connector->tools();
-		} catch ( \Exception $e ) {
-			return array();
-		}
-	}
-
-	/**
-	 * Handle tool execution errors gracefully.
-	 *
-	 * @return callable|null
-	 */
-	protected function resolveToolErrorHandler(): ?callable {
-		return function ( \Throwable $e, $tool ): string {
-			return wp_json_encode(
-				array(
-					'error'   => true,
-					'message' => $e->getMessage(),
-					'tool'    => $tool->getName(),
-				)
-			);
-		};
-	}
-
-	/**
-	 * Run the minilayer generation.
-	 *
-	 * @param string $prompt User's text description of the desired map style.
-	 * @return string Raw response from the AI.
-	 * @throws \Exception On agent failure.
-	 */
-	public function generate( string $prompt ): string {
-		$this->setInstructions( $this->instructions() );
-		$message = $this->chat( new UserMessage( $prompt ) )->getMessage();
-		return $message->getContent();
 	}
 }

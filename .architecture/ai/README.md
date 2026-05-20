@@ -19,11 +19,16 @@
 | `src/includes/ai/class-wp-post-data-loader.php` | Converts WP_Post → NeuronAI Document |
 | `src/includes/ai/class-layer-data-loader.php` | Converts map-layer → NeuronAI Document |
 | `src/includes/ai/class-color-describer.php` | HSL color analysis for legend embeddings |
-| `src/includes/ai/class-minilayer-agent.php` | NeuronAI agent for Minilayer (MCP tools) |
+| `src/includes/ai/class-minilayer-agent.php` | Minilayer agent factory (Assistant with native MCP config) |
 | `src/includes/ai/class-minilayer-handler.php` | Minilayer REST endpoint, delegates to `Minilayer_Service` |
 | `src/includes/ai/class-minilayer-service.php` | Shared service — AI style generation, JSON parsing, layer CPT creation (used by handler and `Generate_Layer_Tool`) |
 | `src/includes/ai/class-generate-layer-tool.php` | NeuronAI tool for minimap agent — generates custom Mapbox styles (conditional on Mapbox key) |
 | `src/includes/ai/class-minimap-agent.php` | Minimap agent factory (Assistant::configure with sub-agents, tools, structured output) |
+| `src/includes/ai/class-jeo-ai-factory.php` | Unified Assistant factory — provider, logger, storage, tools, MCP |
+| `src/includes/ai/class-tool-registry.php` | Central registry for all NeuronAI tools |
+| `src/includes/ai/class-ai-rest-permissions.php` | Reusable REST permission callbacks |
+| `src/includes/ai/class-system-prompt-builder.php` | Shared prompt construction (calibration, schema blocks, sanitization) |
+| `src/includes/ai/class-georeferencing-conversation.php` | Multi-turn georeferencing session manager (ConversationStore) |
 | `src/includes/ai/class-minimap-output.php` | Structured output DTO (layers, base_layer, center, zoom, pins, messages) |
 | `src/includes/ai/class-search-layers-tool.php` | Agent tool — wraps RAG_Worker::find_matching_layers() |
 | `src/includes/ai/class-geocode-tool.php` | Agent tool — active geocoder → Mapbox fallback → defaults |
@@ -72,6 +77,7 @@
 | `/jeo/v1/ai-layer-rag-run-manual` | POST | Manual vectorization trigger (layers) |
 | `/jeo/v1/ai-clear-layer-store` | POST | Clear layer vector store |
 | `/jeo/v1/ai-suggest-layers` | POST | Semantic layer matching (post ID or query) |
+| `/jeo/v1/ai-georeference-chat` | POST | Multi-turn georeferencing with conversation history |
 | `/jeo/v1/minilayer/generate` | POST | Generate Mapbox style from text prompt (Minilayer) |
 | `/jeo/v1/minimap/setup` | POST | Generate minimap from post content (RAG + post geopoints) |
 | `/jeo/v1/minimap/setup-prompt` | POST | Generate minimap from text prompt via AI agent |
@@ -218,6 +224,16 @@ The `topK` value is read from JEO settings in `RAG_Agent::vectorStore()` and pas
 ### Layer Deduplication
 
 `Layer_Data_Loader` sets `Document->sourceType = 'layer'` and `Document->sourceName = (string) $post->ID` so each embedding is tagged with its layer ID. When a layer is saved, `RAG_Worker::on_layer_save()` calls `deleteBy('layer', $post_id)` on the vector store before adding the new embedding, preventing duplicate entries that would pollute search results.
+
+## Unified AI Architecture (Phase 1–2)
+
+The JEO AI system is converging onto `hacklabr/ai-assistant` as the unified execution layer:
+
+- **JEO_AI_Factory**: Creates all `Assistant` instances with shared provider, logger, storage, and tool registry.
+- **Tool_Registry**: Central singleton registering `search_layers`, `geocode`, `generate_layer`, `get_post_content`.
+- **AI_REST_Permissions**: Reusable `permission_callback` closures replacing inline anonymous functions.
+- **System_Prompt_Builder**: Extracts calibration-aware prompt construction from `AI_Adapter` into reusable static methods.
+- **Georeferencing_Conversation**: Enables multi-turn refinement of georeferencing results via `ConversationStore`.
 
 ## AI Settings
 

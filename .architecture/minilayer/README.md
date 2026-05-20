@@ -6,7 +6,7 @@ Creates Mapbox map styles from natural-language prompts and auto-creates a JEO l
 
 | File | Class | Role |
 |------|-------|------|
-| `src/includes/ai/class-minilayer-agent.php` | `Minilayer_Agent` | NeuronAI Agent with Mapbox DevKit MCP tools |
+| `src/includes/ai/class-minilayer-agent.php` | `Minilayer_Agent` | Assistant factory with native MCP config (Mapbox DevKit) |
 | `src/includes/ai/class-minilayer-handler.php` | `Minilayer_Handler` | REST endpoint, delegates to `Minilayer_Service` |
 | `src/includes/ai/class-minilayer-service.php` | `Minilayer_Service` | Shared service — AI style generation, JSON parsing, layer CPT creation. Used by both the REST handler and `Generate_Layer_Tool` |
 | `src/includes/ai/class-generate-layer-tool.php` | `Generate_Layer_Tool` | NeuronAI tool for the minimap agent — conditionally registered when a Mapbox API key is available |
@@ -19,7 +19,8 @@ sequenceDiagram
     participant REST as /minilayer/generate
     participant H as Minilayer_Handler
     participant S as Minilayer_Service
-    participant A as Minilayer_Agent
+    participant F as JEO_AI_Factory
+    participant A as Assistant (MCP)
     participant MCP as Mapbox DevKit MCP
     participant LLM as AI Provider
 
@@ -28,13 +29,12 @@ sequenceDiagram
     H->>H: Validate prompt
     H->>S: generate_and_create(prompt)
     S->>S: Validate Mapbox key + AI provider
-    S->>A: generate(prompt)
-    A->>A: tools() → McpConnector → Mapbox DevKit
+    S->>F: create_minilayer_assistant()
+    F->>A: Assistant::configure(mcps: [Mapbox DevKit])
     A->>LLM: Chat with MCP tools available
     LLM-->>A: Tool calls (StyleBuilderTool, CreateStyleTool, ...)
     A->>MCP: callTool() via StreamableHttpTransport
     MCP-->>A: Style created
-    A->>A: Determine layer_type (tileset-vector vs mapbox)
     A-->>S: Raw AI response
     S->>S: parse_response() → extract JSON
     S->>S: is_tileset_vector() → choose CPT type
@@ -58,9 +58,10 @@ The tool is never available without a Mapbox key, and the system prompt includes
 
 ## MCP Connection
 
-- **Endpoint**: `https://mcp-devkit.mapbox.com/mcp` (hosted, StreamableHttpTransport)
+- **Endpoint**: `https://mcp-devkit.mapbox.com/mcp` (hosted, SSE transport)
 - **Auth**: Mapbox access token from `jeo_settings()->get_option('mapbox_key')` as Bearer token
 - **Tools used**: `StyleBuilderTool`, `CreateStyleTool`, `ValidateStyleTool`, `PreviewStyleTool`, `RetrieveStyleTool`, `ListStylesTool`
+- **Integration**: MCP config is passed declaratively to `AssistantConfig::$mcps` via `JEO_AI_Factory::create_minilayer_assistant()`. The `hacklabr/ai-assistant` library handles tool discovery, security validation, and invocation automatically through `McpConfigBridge`.
 
 ## REST Endpoint
 

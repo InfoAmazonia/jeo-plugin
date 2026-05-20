@@ -54,12 +54,14 @@ bash .docker/start.sh              # Start WordPress + MariaDB containers
 - **CSS escaping**: Dynamic CSS generated from settings must sanitize each value individually. Use `sanitize_hex_color()` for colors, `floatval()` + `esc_attr()` for sizes, and a dedicated regex helper for font-family names. Do not rely on `wp_kses(..., null)` for CSS contexts.
 - **Privacy**: The plugin implements `wp_add_privacy_policy_content()`, personal data exporters/erasers for `_related_point`, and a complete `uninstall.php` cleanup.
 - **Uninstall flow**: The plugin overrides the default WordPress "Delete" link with a dedicated confirmation page (`admin.php?page=jeo-uninstall-confirm`) that lists all data to be removed and requires explicit user consent before deletion.
-- **AI System Prompt**: The default prompt is calibration-aware (`AI_Adapter::get_calibration_aware_prompt()`). It dynamically reads active calibration settings (granularity, confidence, title weight, thresholds, primary/secondary max points) and injects them as editorial rules. When adding new calibration controls, propagate them to:
-  1. The default prompt builder (`class-ai-adapter.php`)
+- **AI System Prompt**: The default prompt is calibration-aware (`System_Prompt_Builder::for_georeferencing()`). It dynamically reads active calibration settings (granularity, confidence, title weight, thresholds, primary/secondary max points) and injects them as editorial rules. When adding new calibration controls, propagate them to:
+  1. The default prompt builder (`class-system-prompt-builder.php`)
   2. The prompt generator meta-prompt (`class-ai-handler.php::api_chat_prompt_generator()`)
   3. Frontend post-processing (`posts-sidebar/index.js::applyPointLimits()`)
   4. Bulk post-processing (`class-bulk-processor.php::approve_post()`)
   5. The structured output schema description if it affects filtering behavior (`class-georeference-result.php`)
+- **AI Architecture**: All new AI features should use `JEO_AI_Factory` to create `Assistant` instances. Tools must be registered in `Tool_Registry`. REST endpoints must use `AI_REST_Permissions`. MCP servers are passed declaratively via `AssistantConfig::$mcps`.
+- **Minilayer**: Uses `JEO_AI_Factory::create_minilayer_assistant()` with native MCP config. The old `extends Agent` pattern is deprecated.
 
 ## Architecture
 

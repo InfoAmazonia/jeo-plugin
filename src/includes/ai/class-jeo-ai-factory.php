@@ -60,15 +60,16 @@ class JEO_AI_Factory {
 	/**
 	 * Create a fully configured Assistant instance.
 	 *
-	 * @param string                   $instructions        System prompt.
-	 * @param array<string>            $tools               Class names of NeuronAI Tool instances.
-	 * @param string|null              $output_class        Fully-qualified structured output DTO class.
-	 * @param array<string,mixed>      $sub_agents          Map of sub-agent ID to SubAgentConfig.
-	 * @param AIProviderInterface|null $provider         Override provider (defaults to active).
-	 * @param int|null                 $context_window      Max context window (defaults to 200k).
-	 * @param int|null                 $structured_retries  Max retries for structured output.
-	 * @param bool                     $auto_learn          Enable auto-learning.
-	 * @param bool                     $auto_delegate       Enable auto-delegation to sub-agents.
+	 * @param string                     $instructions        System prompt.
+	 * @param array<string>              $tools               Class names of NeuronAI Tool instances.
+	 * @param string|null                $output_class        Fully-qualified structured output DTO class.
+	 * @param array<string,mixed>        $sub_agents          Map of sub-agent ID to SubAgentConfig.
+	 * @param AIProviderInterface|null   $provider            Override provider (defaults to active).
+	 * @param int|null                   $context_window      Max context window (defaults to 200k).
+	 * @param int|null                   $structured_retries  Max retries for structured output.
+	 * @param bool                       $auto_learn          Enable auto-learning.
+	 * @param bool                       $auto_delegate       Enable auto-delegation to sub-agents.
+	 * @param array<array<string,mixed>> $mcps              MCP server configurations.
 	 * @return Assistant
 	 */
 	public static function create_assistant(
@@ -80,7 +81,8 @@ class JEO_AI_Factory {
 		?int $context_window = null,
 		?int $structured_retries = null,
 		bool $auto_learn = false,
-		bool $auto_delegate = false
+		bool $auto_delegate = false,
+		array $mcps = array()
 	): Assistant {
 		if ( null === $provider ) {
 			$provider = Neuron_Factory::get_active_provider( true );
@@ -107,6 +109,7 @@ class JEO_AI_Factory {
 			autoDelegate:         $auto_delegate,
 			outputClass:          $output_class,
 			structuredMaxRetries: $structured_retries ?? self::DEFAULT_STRUCTURED_RETRIES,
+			mcps:                 $mcps,
 		);
 
 		return Assistant::configure( $config );
@@ -135,7 +138,7 @@ class JEO_AI_Factory {
 	 * Create an Assistant pre-configured for prompt-engineering tasks.
 	 *
 	 * @param string                   $instructions   System prompt.
-	 * @param AIProviderInterface|null $provider    Override provider.
+	 * @param AIProviderInterface|null $provider       Override provider.
 	 * @return Assistant
 	 */
 	public static function create_prompt_engineer_assistant(
@@ -146,6 +149,34 @@ class JEO_AI_Factory {
 			instructions:        $instructions,
 			provider:            $provider,
 			structuredRetries:   1,
+		);
+	}
+
+	/**
+	 * Create an Assistant pre-configured for minilayer (Mapbox style generation).
+	 *
+	 * @param string                   $instructions   System prompt.
+	 * @param string                   $mapbox_token   Mapbox API token.
+	 * @param AIProviderInterface|null $provider       Override provider.
+	 * @return Assistant
+	 */
+	public static function create_minilayer_assistant(
+		string $instructions,
+		string $mapbox_token,
+		?AIProviderInterface $provider = null
+	): Assistant {
+		return self::create_assistant(
+			instructions:      $instructions,
+			provider:          $provider,
+			mcps:              array(
+				array(
+					'type'    => 'sse',
+					'url'     => 'https://mcp-devkit.mapbox.com/mcp',
+					'token'   => $mapbox_token,
+					'timeout' => 60,
+				),
+			),
+			structuredRetries: 3,
 		);
 	}
 }

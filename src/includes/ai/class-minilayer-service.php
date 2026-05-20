@@ -43,8 +43,7 @@ class Minilayer_Service {
 		}
 
 		try {
-			$agent = new Minilayer_Agent( $mapbox_key );
-			$raw   = $agent->generate( $prompt );
+			$raw = Minilayer_Agent::generate( $prompt, $mapbox_key );
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'minilayer_agent_error',
