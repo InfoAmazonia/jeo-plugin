@@ -100,7 +100,7 @@ class SimplecolorEditor extends Component {
 			}
 
 			colors.push(
-				{ label: __( 'Default label', 'jeo' ), color: randomColor, id: generateUUID() },
+				{ label: __( 'Default label', 'jeo' ), color: randomColor, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
