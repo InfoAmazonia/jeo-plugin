@@ -359,9 +359,8 @@ class Stories extends Component {
 			} );
 		}
 
-
 		map.on('mousemove', 'unclustered-points', (e) => {
-			if (e.features.length > 0 && map.selectedTab.name === "stories") {
+			if ( e.features.length > 0 && this.isStoriesTabActive() ) {
 				const hoveredFeature = e.features[0];
 				this.replaceHoveredFeatureState( getHoveredFeatureIds( hoveredFeature ) );
 				this.setState( {
@@ -371,7 +370,7 @@ class Stories extends Component {
 		});
 
 		map.on('mouseleave', 'unclustered-points', () => {
-			if(map.selectedTab.name === "stories"){
+			if ( this.isStoriesTabActive() ) {
 				this.clearHoveredFeatureState();
 				this.setState( {
 					hoveredPostId: null,
@@ -380,7 +379,15 @@ class Stories extends Component {
 		});
 
 		const handleClusterMouseMove = ( event ) => {
+			if ( ! this.isStoriesTabActive() ) {
+				return;
+			}
+
 			getClusterHoverData( map, event ).then( ( { clusterId, postsIds } ) => {
+				if ( ! this.isStoriesTabActive() ) {
+					return;
+				}
+
 				this.replaceHoveredClusterState( clusterId );
 				this.setState( {
 					hoveredClusterPostsId: postsIds,
@@ -406,7 +413,15 @@ class Stories extends Component {
 		this.clearHoveredClusterState();
 	}
 
+	isStoriesTabActive() {
+		return this.props.map?.selectedTab?.name === 'stories';
+	}
+
 	componentDidUpdate( prevProps, prevState ) {
+		if ( ! this.isStoriesTabActive() ) {
+			return;
+		}
+
 		if ( prevState.hoveredPostId !== this.state.hoveredPostId ) {
 			this.scrollStoryIntoView( this.state.hoveredPostId );
 			return;
@@ -602,7 +617,7 @@ class Stories extends Component {
 	}
 
 	scrollStoryIntoView( storyId ) {
-		if ( ! storyId ) {
+		if ( ! storyId || ! this.isStoriesTabActive() ) {
 			return;
 		}
 
