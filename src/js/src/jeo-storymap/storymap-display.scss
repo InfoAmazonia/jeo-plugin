@@ -344,6 +344,10 @@ $font-stories: var( --jeo-font-stories );
 		opacity: 0.99;
 	}
 
+	.step.storymap-navigation-step {
+		opacity: 0.99;
+	}
+
 	.navigate-button-display {
 		background-color: var( --jeo-primary-color );
 		color: white;

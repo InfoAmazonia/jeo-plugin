@@ -59,6 +59,15 @@ class StoryMapDisplay extends Component {
 		this.isIntroductionScrollLocked = false;
 		this.previousBodyOverflow = null;
 		this.previousDocumentOverflow = null;
+		this.handleFullscreenChange = () => {
+			const returnToSlidesContainer = this.el?.querySelector( '.return-to-slides-container' );
+
+			if ( returnToSlidesContainer ) {
+				returnToSlidesContainer.style.display = document.fullscreenElement ? 'none' : 'block';
+			}
+
+			window.scrollTo( 0, document.body.scrollHeight );
+		};
 
 		const slides = [];
 		props.slides.map( ( slide, index ) => {
@@ -137,6 +146,7 @@ class StoryMapDisplay extends Component {
 	componentWillUnmount() {
 		this.setIntroductionScrollLocked( false );
 		window.removeEventListener( 'resize', this.scroller.resize );
+		document.removeEventListener( 'fullscreenchange', this.handleFullscreenChange );
 	}
 
 	setIntroductionScrollLocked( locked ) {
@@ -295,8 +305,12 @@ class StoryMapDisplay extends Component {
 			navigateMapDiv.dataset.map_id = this.props.map_id;
 
 			this.navigateMap = new JeoMap( navigateMapDiv );
-			this.el.querySelector('.navigate-map').append( navigateMapDiv );
-			this.el.querySelector('.navigate-map .jeomap').appendChild(this.el.querySelector('.return-to-slides-container'))
+			const navigateMapContainer = this.el?.querySelector( '.navigate-map' );
+
+			if ( navigateMapContainer ) {
+				// Mapbox owns the map element after initialization, so storymap controls stay outside it.
+				navigateMapContainer.append( navigateMapDiv );
+			}
 		}
 
 		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
@@ -306,15 +320,27 @@ class StoryMapDisplay extends Component {
 			} )
 			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
 
-		document.addEventListener('fullscreenchange', function() {
-			if ( document.fullscreenElement ) {
-				this.el.querySelector( '.return-to-slides-container' ).style.display = 'none';
-			} else {
-				this.el.querySelector( '.return-to-slides-container' ).style.display = 'block';
-			}
+		document.addEventListener( 'fullscreenchange', this.handleFullscreenChange );
+	}
 
-			window.scrollTo ( 0, document.body.scrollHeight );
-		});
+	enterNavigationMode() {
+		this.setState( { isNavigating: true, mapBrightness: 1 }, () => {
+			this.navigateMap?.forceUpdate?.();
+			window.scrollTo( 0, this.el?.scrollHeight || document.body.scrollHeight );
+		} );
+	}
+
+	exitNavigationMode() {
+		if ( document.fullscreenElement ) {
+			document.exitFullscreen();
+		}
+
+		const mapBrightness = this.props.hasIntroduction ? MAP_DIM : 1;
+
+		this.setState( { isNavigating: false, mapBrightness }, () => {
+			this.map?.resize();
+			window.scrollTo( 0, 0 );
+		} );
 	}
 
 	lazyInitStorymap() {
@@ -351,15 +377,18 @@ class StoryMapDisplay extends Component {
 				jeoLayer.addLayer(map);
 			});
 
-			this.el.querySelector(`.${MAP_RUNTIME}-map`).style.filter = `brightness(${ this.state.mapBrightness })`;
-			this.el.querySelector('.the-story').classList.add('loaded');
+			const mapEl = this.el?.querySelector( `.${MAP_RUNTIME}-map` );
+			if ( mapEl ) {
+				mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
+			}
+			this.el?.querySelector( '.the-story' )?.classList.add( 'loaded' );
 		});
 	}
 
 	componentDidUpdate() {
 		this.syncIntroductionScrollLock();
 
-		const mapEl = this.el.querySelector(`.${MAP_RUNTIME}-map`);
+		const mapEl = this.el?.querySelector(`.${MAP_RUNTIME}-map`);
 		if (mapEl) {
 			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
 		}
@@ -401,10 +430,14 @@ class StoryMapDisplay extends Component {
 		const currentChapterID = this.state.currentChapter.id;
 		const storyDate = this.state.postData ? new Date( this.state.postData.date ) : null;
 		const Heading = isSingle ? 'h1' : 'h2';
+		const isNavigating = this.state.isNavigating;
 
         return(
 			<section id={ `story-map-${this.cid}` } className="story-map" ref={ ( el ) => ( this.el = el ) }>
-				<div className="not-navigating-map">
+				<div
+					className="not-navigating-map"
+					style={ { display: isNavigating ? 'none' : 'block' } }
+				>
 					<div
 						ref={ ( el ) => ( this.mapContainer = el ) }
 						className="story-map-element"
@@ -433,7 +466,7 @@ class StoryMapDisplay extends Component {
 										this.setIntroductionScrollLocked( false );
 										this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
-										this.el.querySelector( '.storymap-features' ).scrollIntoView();
+										this.el?.querySelector( '.storymap-features' )?.scrollIntoView();
 									} }
 								>
 									{ __('START', 'jeo') }
@@ -444,10 +477,10 @@ class StoryMapDisplay extends Component {
 										<p
 											className="skip-intro-link"
 											onClick={ async () => {
-												this.el.querySelector('.storymap-start-button').click();
+												this.el?.querySelector( '.storymap-start-button' )?.click();
 												await sleep(1);
-												window.scrollTo( 0, this.el.scrollHeight );
-												this.el.querySelector('.navigate-button-display').click();
+												window.scrollTo( 0, this.el?.scrollHeight || document.body.scrollHeight );
+												this.el?.querySelector( '.navigate-button-display' )?.click();
 											} }
 										>
 											{ __('skip intro', 'jeo') }
@@ -458,7 +491,7 @@ class StoryMapDisplay extends Component {
 												this.setIntroductionScrollLocked( false );
 												this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
 
-												this.el.querySelector( '.storymap-features' ).scrollIntoView();
+												this.el?.querySelector( '.storymap-features' )?.scrollIntoView();
 											} }
 										>
 											<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" ><path fill="currentColor" d="M143 256.3L7 120.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0L313 86.3c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.4 9.5-24.6 9.5-34 .1zm34 192l136-136c9.4-9.4 9.4-24.6 0-33.9l-22.6-22.6c-9.4-9.4-24.6-9.4-33.9 0L160 352.1l-96.4-96.4c-9.4-9.4-24.6-9.4-33.9 0L7 278.3c-9.4 9.4-9.4 24.6 0 33.9l136 136c9.4 9.5 24.6 9.5 34 .1z"></path></svg>
@@ -496,14 +529,7 @@ class StoryMapDisplay extends Component {
 													<Chapter
 														index={ this.config.chapters.length }
 														props={ this.props }
-														onClickFunction={ () => {
-															this.el.querySelector( '.navigate-map' ).style.display = 'block';
-															this.setState( { ...this.state, isNavigating: true, mapBrightness: 1 } );
-															this.navigateMap?.forceUpdate();
-															this.el.querySelector( '.not-navigating-map' ).style.display = ' none ';
-
-															window.scrollTo( 0,this.el.scrollHeight );
-														} }
+														onClickFunction={ () => this.enterNavigationMode() }
 														isLastChapter={ true }
 														{ ...this.lastChapter }
 														theme={ theme }
@@ -532,60 +558,21 @@ class StoryMapDisplay extends Component {
 						) }
 					</div>
 				</div>
-				<div style={ { display: 'none' } } className="navigate-map">
+				<div
+					className="navigate-map"
+					style={ { display: isNavigating ? 'block' : 'none' } }
+				>
 					<div className="return-to-slides-container">
 						<p className="icon-return">
 							<div
 								className="icon"
-								onClick={ () => {
-									if ( document.fullscreenElement ) {
-										document.exitFullscreen();
-									}
-
-									sleep(1000)
-
-									let mapBrightness;
-
-									if ( this.props.hasIntroduction ) {
-										mapBrightness = MAP_DIM;
-									} else {
-										mapBrightness = 1;
-									}
-
-									this.setState( { ...this.state, isNavigating: false, mapBrightness } )
-									window.scrollTo(0, 0);
-									this.el.querySelector('.navigate-map').style.display = 'none';
-									this.el.querySelector('.not-navigating-map').style.display = 'block';
-
-									this.map?.resize();
-								} }
+								onClick={ () => this.exitNavigationMode() }
 							>
 								<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-up" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="white" d="M177 255.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 351.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 425.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1zm-34-192L7 199.7c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l96.4-96.4 96.4 96.4c9.4 9.4 24.6 9.4 33.9 0l22.6-22.6c9.4-9.4 9.4-24.6 0-33.9l-136-136c-9.2-9.4-24.4-9.4-33.8 0z"></path></svg>
 							</div>
 						</p>
 						<p
-							onClick={ async () => {
-								if ( document.fullscreenElement ) {
-									document.exitFullscreen();
-								}
-
-								let mapBrightness;
-
-								if ( this.props.hasIntroduction ) {
-									mapBrightness = MAP_DIM;
-								} else {
-									mapBrightness = 1;
-								}
-
-								this.setState( { ...this.state, isNavigating: false, mapBrightness } )
-
-								this.el.querySelector('.navigate-map').style.display = 'none';
-								this.el.querySelector('.not-navigating-map').style.display = 'block';
-
-								this.map?.resize();
-
-								window.scrollTo(0, 0);
-							} }
+							onClick={ () => this.exitNavigationMode() }
 						>
 							{ __('Back to top', 'jeo') }
 						</p>
