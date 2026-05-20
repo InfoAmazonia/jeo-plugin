@@ -68,8 +68,9 @@ registerBlockType( 'jeo/onetime-map', {
 	],
 } );
 
-const storyMapCleanUp = (props) => {
+const storyMapCleanUp = (props, options = {}) => {
 	const propsCopy = cloneDeep(props);
+	const { removeYoastHeadJson = true } = options;
 
 	const attributesStructure = {
 		map_id: null,
@@ -94,7 +95,10 @@ const storyMapCleanUp = (props) => {
 		}
 
 		delete object.yoast_head;
-		delete object.yoast_head_json;
+
+		if(removeYoastHeadJson) {
+			delete object.yoast_head_json;
+		}
 	}
 
 	if(Array.isArray(attributesStructure.navigateMapLayers)) {
@@ -129,6 +133,8 @@ const storyMapCleanUp = (props) => {
 
 	return attributesStructure;
 }
+
+const legacyStoryMapCleanUp = (props) => storyMapCleanUp(props, { removeYoastHeadJson: false });
 
 const storymapAttributes = {
 	map_id: {
@@ -180,10 +186,24 @@ registerBlockType( 'jeo/storymap', {
 		);
 	},
 	deprecated: [
+		// Compatibility for storymaps saved before PR #564 started stripping
+		// yoast_head_json; Gutenberg needs this exact legacy markup to validate.
+		{
+			attributes: storymapAttributes,
+			save: ( { attributes } ) => {
+				const blockProps = useBlockProps.save();
+				const attributesStructure = legacyStoryMapCleanUp( { attributes } );
+				return (
+					<div { ...blockProps }>
+						{ JSON.stringify( attributesStructure ) }
+					</div>
+				);
+			},
+		},
 		{
 			attributes: storymapAttributes,
 			save: ( props ) => {
-				const attributesStructure = storyMapCleanUp(props);
+				const attributesStructure = legacyStoryMapCleanUp(props);
 				return JSON.stringify(attributesStructure)
 			},
 		},
