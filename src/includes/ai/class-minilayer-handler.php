@@ -41,7 +41,7 @@ class Minilayer_Handler {
 			array(
 				'methods'             => 'POST',
 				'callback'            => array( $this, 'api_generate' ),
-				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+				'permission_callback' => AI_REST_Permissions::edit_posts(),
 				'args'                => array(
 					'prompt'     => array(
 						'required'  => true,
