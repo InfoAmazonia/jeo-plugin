@@ -249,6 +249,17 @@
 			margin-inline-end: 12px;
 			filter: brightness(0) invert(1);
 		}
+
+		.info-icon {
+			width: 16px;
+			height: 16px;
+			background-size: cover;
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M11 10h2v7h-2zm0-3h2v2h-2z'/%3E%3Cpath fill='%23333' d='M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z'/%3E%3C/svg%3E");
+			background-position: center;
+			cursor: pointer;
+			margin-inline-end: 12px;
+			filter: brightness(0) invert(1);
+		}
 	}
 
 	div.more-info-overlayer {
@@ -355,6 +366,11 @@
 			justify-content: space-between;
 			align-items: center;
 			font-family: var(--jeo-font);
+		}
+
+		.more-info-title {
+			cursor: pointer;
+			display: none;
 		}
 
 		i.arrow-icon {
@@ -537,6 +553,24 @@
 			color: rgba(0, 0, 0, .78);
 			text-underline-offset: 2px;
 		}
+	}
+
+	:is(.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib) {
+		box-sizing: border-box;
+	}
+
+	.maplibregl-ctrl-attrib-button {
+		list-style: none;
+
+		&::-webkit-details-marker {
+			display: none;
+		}
+	}
+
+	.mapboxgl-ctrl-attrib.mapboxgl-compact-show .mapboxgl-ctrl-attrib-inner,
+	.maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-inner {
+		box-sizing: border-box;
+		padding-inline-end: 32px;
 	}
 
 	.mapboxgl-ctrl-attrib.mapboxgl-compact-show {
@@ -1137,12 +1171,15 @@
 
 .jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft,
 .jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright {
-	--jeo-aligned-map-base-width: var( --wp--style--global--content-size, 645px );
-	--jeo-aligned-map-expanded-width: calc( var( --jeo-aligned-map-base-width ) * 1.6 );
-	display: table;
-	max-width: none;
-	min-width: min( var( --jeo-aligned-map-base-width ), calc( 100vw - 2rem ) );
-	width: min( var( --jeo-aligned-map-expanded-width ), calc( 100vw - 2rem ) );
+	--jeo-aligned-map-width: 420px;
+	--jeo-aligned-map-aspect-ratio: 8 / 9;
+	aspect-ratio: var( --jeo-aligned-map-aspect-ratio );
+	box-sizing: border-box;
+	display: block;
+	height: auto;
+	max-width: min( 50%, calc( 100vw - 2rem ) );
+	min-width: 0;
+	width: min( var( --jeo-aligned-map-width ), 50%, calc( 100vw - 2rem ) );
 }
 
 .jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft {
@@ -1161,13 +1198,38 @@
 	margin-bottom: 0.5em;
 }
 
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft:fullscreen,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright:fullscreen,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft:-webkit-full-screen,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright:-webkit-full-screen,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft.mapboxgl-pseudo-fullscreen,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright.mapboxgl-pseudo-fullscreen,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft.maplibregl-pseudo-fullscreen,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright.maplibregl-pseudo-fullscreen {
+	aspect-ratio: auto;
+	display: block;
+	float: none;
+	height: 100%;
+	margin: 0;
+	max-width: none;
+	width: 100%;
+}
+
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft div.more-info-overlayer,
+.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright div.more-info-overlayer {
+	inset-inline-end: 10px;
+	max-width: none;
+	width: auto;
+}
+
 @media (max-width: 782px) {
-	.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft,
-	.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright {
+	.jeomap.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignleft,
+	.jeomap.jeomap:is(.wp-block-jeo-map, .wp-block-jeo-onetime-map).alignright {
 		display: block;
 		float: none;
 		margin-left: 0;
 		margin-right: 0;
+		max-width: 100%;
 		min-width: 0;
 		width: 100%;
 	}
@@ -1181,7 +1243,34 @@ p.jeomap-no-layers__text {
 
 .mapboxgl-ctrl-attrib.mapboxgl-compact {
 	.mapboxgl-ctrl-attrib-button {
+		appearance: none;
+		background-color: #ffffff80;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg' fill-rule='evenodd'%3E%3Cpath d='M4 10a6 6 0 1 0 12 0 6 6 0 1 0-12 0m5-3a1 1 0 1 0 2 0 1 1 0 1 0-2 0m0 3a1 1 0 1 1 2 0v3a1 1 0 1 1-2 0'/%3E%3C/svg%3E");
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: 20px 20px;
+		border: 0;
+		border-radius: 50%;
+		box-sizing: border-box;
+		color: transparent;
+		cursor: pointer;
+		display: block;
+		font-size: 0;
+		height: 24px;
+		line-height: 0;
+		margin: 0;
+		min-height: 0;
+		min-width: 0;
+		padding: 0;
+		vertical-align: initial;
 		visibility: visible;
+		width: 24px;
+	}
+
+	&.mapboxgl-compact-show {
+		.mapboxgl-ctrl-attrib-button {
+			background-color: #0000000d;
+		}
 	}
 }
 
@@ -1193,6 +1282,62 @@ p.jeomap-no-layers__text {
 
 div.jeomap.alignwide {
 	width: auto;
+}
+
+.jeomap.jeo-small-controls {
+	nav.layers-selection.hidden {
+		max-width: 40px;
+		min-width: 40px;
+		transition: all .2s ease-in-out;
+
+		.layer-selection-title {
+			.legends-title {
+				padding: 12px 10px;
+				justify-content: center;
+
+				.text {
+					display: none;
+				}
+			}
+
+			.arrow-icon {
+				display: none;
+			}
+		}
+
+		.text-icon {
+			.layer-icon {
+				margin-inline-end: 0;
+			}
+		}
+	}
+
+	.legend-container .more-info-title {
+		display: flex;
+	}
+
+	.legend-container.hidden {
+		min-width: 40px;
+		max-width: 40px;
+		transition: all .2s ease-in-out;
+
+		.legends-title {
+			padding: 12px 10px;
+
+			.text {
+				display: none;
+			}
+
+			.arrow-icon {
+				display: none;
+			}
+
+			.legend-icon,
+			.info-icon {
+				margin-inline-end: 0;
+			}
+		}
+	}
 }
 
 @media (max-width: 800px) {
@@ -1230,6 +1375,10 @@ div.jeomap.alignwide {
 			max-height: 230px;
 			transition: all .2s ease-in-out;
 
+			.more-info-title {
+				display: flex;
+			}
+
 			&.hidden {
 				min-width: 40px;
 				max-width: 40px;
@@ -1242,10 +1391,15 @@ div.jeomap.alignwide {
 						.text {
 							display: none;
 						}
+					}
 
-						.arrow-icon {
-							display: none;
-						}
+					.arrow-icon {
+						display: none;
+					}
+
+					.legend-icon,
+					.info-icon {
+						margin-inline-end: 0;
 					}
 				}
 			}

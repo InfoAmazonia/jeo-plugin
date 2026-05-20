@@ -32,6 +32,7 @@ const chevronRightSmallIcon = `
 `;
 
 const RELATED_POSTS_CLUSTER_BADGE_PREFIX = 'jeo-related-posts-cluster-badge-';
+const SMALL_MAP_CONTROL_MAX_WIDTH = 420;
 
 function mergeUniqueStoriesById( currentStories = [], nextStories = [] ) {
 	const storiesById = new Map();
@@ -152,6 +153,7 @@ export default class JeoMap {
 
 					if ( this.getArg( 'enable_fullscreen' ) ) {
 						map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
+						this.bindAlignedFullscreenReset();
 					}
 
 					if (
@@ -280,45 +282,41 @@ export default class JeoMap {
 								}
 							} );
 
-									const isMobileViewport = window.matchMedia
-										? window.matchMedia( '(max-width: 599px)' ).matches
-										: window.innerWidth < 600;
-									const controlPostion = MAP_RUNTIME === 'mapboxgl'
-										? 'bottom-right'
-										: `bottom-${inlineEnd}`;
+							const isMobileViewport = window.matchMedia
+								? window.matchMedia( '(max-width: 599px)' ).matches
+								: window.innerWidth < 600;
+							const shouldCompactAttribution =
+								isMobileViewport || this.shouldStartControlsCollapsed();
+							const controlPostion = MAP_RUNTIME === 'mapboxgl'
+								? 'bottom-right'
+								: `bottom-${inlineEnd}`;
+							const attributionOptions = {
+								customAttribution,
+							};
 
-									let attributionControl = MAP_RUNTIME === 'mapboxgl'
-										? new mapgl.AttributionControl( {
-											compact: false,
-											customAttribution,
-										} )
-										: new mapgl.AttributionControl( {
-											customAttribution,
-										} );
+							if ( MAP_RUNTIME === 'mapboxgl' || shouldCompactAttribution ) {
+								attributionOptions.compact = shouldCompactAttribution;
+							}
 
-									if ( isMobileViewport && MAP_RUNTIME === 'mapboxgl' ) {
-										attributionControl = new mapgl.AttributionControl( {
-											compact: true,
-											customAttribution,
-										} );
-									}
+							const attributionControl = new mapgl.AttributionControl(
+								attributionOptions
+							);
 
-								map.addControl(
-									attributionControl,
-									controlPostion
-								);
-								this.syncAttributionSpacing();
+							map.addControl(
+								attributionControl,
+								controlPostion
+							);
+							this.syncAttributionSpacing();
+							this.queueCompactAttributionCollapse();
+							map.once?.( 'idle', () => this.queueCompactAttributionCollapse() );
+							map.on( 'resize', () => this.queueCompactAttributionCollapse() );
 
-								if ( MAP_RUNTIME === 'maplibregl' ) {
-									this.collapseCompactMapLibreAttribution();
-									map.on( 'resize', () => this.collapseCompactMapLibreAttribution() );
-								}
-
-								this.getRelatedPosts();
+							this.getRelatedPosts();
 						});
 
 						this.addLayersControl( amountLayers );
 						this.addMoreButtonAndLegends();
+						this.syncSmallMapControlState();
 					}
 
 					// Show a message when a map doesn't have layers
@@ -381,15 +379,70 @@ export default class JeoMap {
 		jQuery( this.element ).find( '.mapboxgl-canvas-container, .maplibregl-canvas-container' ).remove();
 	}
 
-	collapseCompactMapLibreAttribution() {
+	shouldStartControlsCollapsed() {
+		const width =
+			this.element.getBoundingClientRect().width ||
+			this.element.clientWidth ||
+			0;
+		const shouldCollapse = width > 0 && width <= SMALL_MAP_CONTROL_MAX_WIDTH;
+
+		this.element.classList.toggle( 'jeo-small-controls', shouldCollapse );
+		return shouldCollapse;
+	}
+
+	queueCompactAttributionCollapse() {
+		this.collapseCompactAttribution();
+		window.requestAnimationFrame( () => this.collapseCompactAttribution() );
+		[ 100, 500, 1000 ].forEach( ( delay ) => {
+			window.setTimeout(
+				() => this.collapseCompactAttribution(),
+				delay
+			);
+		} );
+	}
+
+	collapseCompactAttribution() {
 		const attributionControl = this.element.querySelector(
-			'details.maplibregl-ctrl-attrib.maplibregl-compact'
+			'.mapboxgl-ctrl-attrib.mapboxgl-compact, .maplibregl-ctrl-attrib.maplibregl-compact'
 		);
 
 		if ( attributionControl ) {
-			attributionControl.classList.remove( 'maplibregl-compact-show' );
+			attributionControl.classList.remove(
+				'mapboxgl-compact-show',
+				'maplibregl-compact-show'
+			);
 			attributionControl.removeAttribute( 'open' );
 		}
+	}
+
+	syncSmallMapControlState() {
+		if ( ! this.shouldStartControlsCollapsed() ) {
+			return;
+		}
+
+		const layersControl = this.element.querySelector( 'nav.layers-selection' );
+		const layersTitle = layersControl?.querySelector( '.layer-selection-title' );
+		const layersWrapper = layersControl?.querySelector( '.layers-wrapper' );
+		const layersArrow = layersTitle?.querySelector( '.arrow-icon' );
+
+		if ( layersTitle && layersWrapper ) {
+			layersControl.classList.add( 'hidden' );
+			layersWrapper.style.display = 'none';
+			layersArrow?.classList.remove( 'active' );
+		}
+
+		const legendControl = this.element.querySelector( '.legend-container' );
+		const legendTitle = legendControl?.querySelector( '.legends-title' );
+		const legendContent = legendControl?.querySelector( '.hideable-content' );
+		const legendArrow = legendTitle?.querySelector( '.arrow-icon' );
+
+		if ( legendTitle && legendContent ) {
+			legendControl.classList.add( 'hidden' );
+			legendContent.style.display = 'none';
+			legendArrow?.classList.remove( 'active' );
+		}
+
+		this.queueCompactAttributionCollapse();
 	}
 
 	syncAttributionSpacing() {
@@ -428,6 +481,130 @@ export default class JeoMap {
 		window.requestAnimationFrame( updateSpacing );
 	}
 
+	bindAlignedFullscreenReset() {
+		if ( ! this.element.matches( '.alignleft, .alignright' ) ) {
+			return;
+		}
+
+		const ownerDoc = this.element.ownerDocument || document;
+		const pseudoFullscreenClasses = [
+			'mapboxgl-pseudo-fullscreen',
+			'maplibregl-pseudo-fullscreen',
+		];
+		const fullscreenControlSelector = [
+			'.mapboxgl-ctrl-fullscreen',
+			'.mapboxgl-ctrl-shrink',
+			'.maplibregl-ctrl-fullscreen',
+			'.maplibregl-ctrl-shrink',
+		].join( ',' );
+		const shrinkControlSelector = [
+			'.mapboxgl-ctrl-shrink',
+			'.maplibregl-ctrl-shrink',
+		].join( ',' );
+
+		let previousStyle = null;
+		let previousSize = null;
+		let trackedFullscreen = false;
+
+		const isNativeFullscreen = () =>
+			ownerDoc.fullscreenElement === this.element ||
+			ownerDoc.webkitFullscreenElement === this.element;
+
+		const hasPseudoFullscreenClass = () =>
+			pseudoFullscreenClasses.some( ( className ) =>
+				this.element.classList.contains( className )
+			);
+
+		const isFullscreenActive = () =>
+			isNativeFullscreen() ||
+			( hasPseudoFullscreenClass() &&
+				this.element.querySelector( shrinkControlSelector ) );
+
+		const resizeMap = () => {
+			if ( typeof this.map?.resize !== 'function' ) {
+				return;
+			}
+			window.requestAnimationFrame( () => this.map.resize() );
+			window.setTimeout( () => this.map.resize(), 50 );
+			window.setTimeout( () => this.map.resize(), 250 );
+		};
+
+		const restorePreviousStyle = () => {
+			if ( previousStyle === null ) {
+				this.element.removeAttribute( 'style' );
+			} else {
+				this.element.setAttribute( 'style', previousStyle );
+			}
+		};
+
+		const applyPreviousSize = () => {
+			if ( ! previousSize?.width || ! previousSize?.height ) {
+				return false;
+			}
+
+			this.element.style.width = `${ previousSize.width }px`;
+			this.element.style.height = `${ previousSize.height }px`;
+			return true;
+		};
+
+		const releasePreviousSize = () => {
+			restorePreviousStyle();
+			previousStyle = null;
+			previousSize = null;
+			resizeMap();
+		};
+
+		const restoreAfterExit = () => {
+			window.setTimeout( () => {
+				if ( ! trackedFullscreen || isFullscreenActive() ) {
+					return;
+				}
+
+				trackedFullscreen = false;
+				pseudoFullscreenClasses.forEach( ( className ) => {
+					this.element.classList.remove( className );
+				} );
+
+				restorePreviousStyle();
+				const constrained = applyPreviousSize();
+				resizeMap();
+
+				if ( constrained ) {
+					window.requestAnimationFrame( () => {
+						window.requestAnimationFrame( releasePreviousSize );
+					} );
+					window.setTimeout( releasePreviousSize, 300 );
+				} else {
+					previousStyle = null;
+					previousSize = null;
+				}
+			}, 0 );
+		};
+
+		this.element.addEventListener(
+			'click',
+			( event ) => {
+				if ( ! event.target.closest( fullscreenControlSelector ) ) {
+					return;
+				}
+
+				if ( ! isFullscreenActive() ) {
+					previousStyle = this.element.getAttribute( 'style' );
+					previousSize = this.element.getBoundingClientRect();
+					trackedFullscreen = true;
+				}
+
+				restoreAfterExit();
+				window.setTimeout( restoreAfterExit, 100 );
+				window.setTimeout( restoreAfterExit, 300 );
+			},
+			true
+		);
+
+		ownerDoc.addEventListener( 'fullscreenchange', restoreAfterExit );
+		ownerDoc.addEventListener( 'webkitfullscreenchange', restoreAfterExit );
+	}
+
 	/**
 	 * Adds the "More" button that will open the Content of the Map post in an overlayer
 	 *
@@ -436,6 +613,7 @@ export default class JeoMap {
 	addMoreButtonAndLegends() {
 		const container = document.createElement( 'div' );
 		container.classList.add( 'legend-container' );
+		const startCollapsed = this.shouldStartControlsCollapsed();
 
 		const hideableContent = document.createElement( 'div' );
 		hideableContent.classList.add( 'hideable-content' );
@@ -449,7 +627,15 @@ export default class JeoMap {
 			appearingLegends++;
 		} );
 
-		if ( this.legends.length > 0 && appearingLegends > 0 ) {
+		const hasAppearingLegends =
+			this.legends.length > 0 && appearingLegends > 0;
+
+		if ( hasAppearingLegends ) {
+			if ( startCollapsed ) {
+				container.classList.add( 'hidden' );
+				hideableContent.style.display = 'none';
+			}
+
 			/*const legendsTitle = document.createElement( 'div' );
 			legendsTitle.classList.add( 'legends-title' );
 			legendsTitle.innerHTML = '<span class="text"> Legend </span>';*/
@@ -471,7 +657,10 @@ export default class JeoMap {
 			legendsTitle.appendChild( legendTextIcon );
 
 			const legendsHideIcon = document.createElement( 'i' );
-			legendsHideIcon.classList.add( 'arrow-icon', 'active' );
+			legendsHideIcon.classList.add( 'arrow-icon' );
+			if ( ! startCollapsed ) {
+				legendsHideIcon.classList.add( 'active' );
+			}
 
 			legendsTitle.appendChild( legendsHideIcon );
 			container.appendChild( legendsTitle );
@@ -513,6 +702,46 @@ export default class JeoMap {
 
 				legendContainer.appendChild( legend.render() );
 				legendsWrapper.appendChild( legendContainer );
+			} );
+		}
+
+		if ( ! hasAppearingLegends ) {
+			if ( startCollapsed ) {
+				container.classList.add( 'hidden' );
+				hideableContent.style.display = 'none';
+			}
+
+			const moreInfoTitle = document.createElement( 'div' );
+			moreInfoTitle.classList.add( 'legends-title', 'more-info-title' );
+			moreInfoTitle.setAttribute( 'role', 'button' );
+			moreInfoTitle.tabIndex = 0;
+
+			const moreInfoTextIcon = document.createElement( 'div' );
+			moreInfoTextIcon.classList.add( 'text-icon' );
+
+			const moreInfoIcon = document.createElement( 'i' );
+			moreInfoIcon.classList.add( 'info-icon' );
+
+			const moreInfoText = document.createElement( 'span' );
+			moreInfoText.classList.add( 'text' );
+			moreInfoText.innerText = ` ${ __( 'Info', 'jeo' ) } `;
+
+			moreInfoTextIcon.appendChild( moreInfoIcon );
+			moreInfoTextIcon.appendChild( moreInfoText );
+			moreInfoTitle.appendChild( moreInfoTextIcon );
+			container.appendChild( moreInfoTitle );
+
+			const openMoreInfoModal = ( e ) => {
+				e.preventDefault();
+				e.stopPropagation();
+				jQuery( container ).siblings( '.more-info-overlayer' ).show();
+			};
+
+			moreInfoTitle.addEventListener( 'click', openMoreInfoModal );
+			moreInfoTitle.addEventListener( 'keydown', ( e ) => {
+				if ( e.key === 'Enter' || e.key === ' ' ) {
+					openMoreInfoModal( e );
+				}
 			} );
 		}
 
