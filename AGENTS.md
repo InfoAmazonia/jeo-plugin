@@ -6,6 +6,8 @@ WordPress plugin for interactive maps in the block editor (Gutenberg).
 
 Write all code, comments, commit messages, and documentation in plain English. Be clear and concise.
 
+**Communication Language**: Always respond to the user in Brazilian Portuguese (pt-BR), unless explicitly requested otherwise.
+
 ## Documentation Maintenance (MANDATORY)
 
 When making significant code changes (creating/removing/modifying components, blocks, CPTs, REST routes, settings, etc.), update **both**:
@@ -62,6 +64,7 @@ bash .docker/start.sh              # Start WordPress + MariaDB containers
   5. The structured output schema description if it affects filtering behavior (`class-georeference-result.php`)
 - **AI Architecture**: All new AI features should use `JEO_AI_Factory` to create `Assistant` instances. Tools must be registered in `Tool_Registry`. REST endpoints must use `AI_REST_Permissions`. MCP servers are passed declaratively via `AssistantConfig::$mcps`.
 - **Minilayer**: Uses `JEO_AI_Factory::create_minilayer_assistant()` with native MCP config. The old `extends Agent` pattern is deprecated.
+- **Structured Output** (`ai_use_structured_output`): Defaults to `true`. When enabled, georeferencing uses NeuronAI's native `Agent::structured()` method with the `Georeference_Result` DTO; the API provider enforces the JSON schema natively (e.g. OpenAI `response_format`, Gemini `responseSchema`). When disabled, the system falls back to free-text prompt + `parse_json_from_text()` regex extraction. The fallback is automatic — if structured output throws, the adapter silently retries via the text path. Token usage tracking is unavailable in structured mode (reported as 0). Override prompts containing `[SKIP_ENFORCED_SCHEMA]` force free-text mode even when the setting is on (used by internal tools). The Prompt Assistant (prompt generator) adapts its meta-prompt instructions based on this setting: when structured is active it omits JSON formatting mandates from generated prompts; when inactive it appends the aggressive `CRITICAL INSTRUCTION` block. The adapter also strips legacy JSON instructions via `strip_legacy_json_instructions()` as a safety net when structured output is active.
 
 ## Architecture
 

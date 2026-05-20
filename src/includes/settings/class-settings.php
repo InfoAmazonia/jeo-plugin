@@ -46,7 +46,7 @@ class Settings {
 		'ai_use_custom_prompt'            => false,
 		'ai_debug_mode'                   => false,
 		'ai_debug_console'                => true,
-		'ai_use_structured_output'        => false,
+		'ai_use_structured_output'        => true,
 		'ai_include_taxonomies'           => false,
 		'ai_embedding_model'              => '',
 		'ai_cal_granularity'              => 'balanced',
