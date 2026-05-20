@@ -97,12 +97,25 @@
 	overscroll-behavior: contain;
 }
 
+.slides-settings .storymap-content-editor {
+	.ck.ck-content.ck-editor__editable.ck-blurred,
+	.ck.ck-content.ck-editor__editable.ck-focused {
+		height: 300px !important;
+		min-height: 300px;
+		max-height: 300px;
+		overflow-y: auto !important;
+		overflow-anchor: none;
+		overscroll-behavior: contain;
+		scrollbar-gutter: stable;
+	}
+}
+
 .storymap-title-editor {
 	.ck.ck-content.ck-editor__editable.ck-blurred,
 	.ck.ck-content.ck-editor__editable.ck-focused {
-		height: 44px !important;
-		min-height: 44px;
-		max-height: 44px;
+		height: 72px !important;
+		min-height: 72px;
+		max-height: none;
 		overflow-y: hidden;
 	}
 }
@@ -132,6 +145,18 @@
 		}
 		textarea {
 			height: 150px;
+		}
+	}
+	.storymap-description-editor {
+		.ck.ck-content.ck-editor__editable.ck-blurred,
+		.ck.ck-content.ck-editor__editable.ck-focused {
+			height: 300px !important;
+			min-height: 300px;
+			max-height: 300px;
+			overflow-y: auto !important;
+			overflow-anchor: none;
+			overscroll-behavior: contain;
+			scrollbar-gutter: stable;
 		}
 	}
 	.input-label {
@@ -356,7 +381,8 @@
 		}
 	}
 	.slides-container {
-		height: 330px;
+		height: min( 650px, calc( 85vh - 120px ) );
+		max-height: calc( 100vh - 160px );
 		overflow-y: scroll;
 		overflow-x: hidden;
 		padding-inline-end: 16px;
