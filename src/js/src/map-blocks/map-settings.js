@@ -30,7 +30,7 @@ function parseNumber( value ) {
 	return isNaN( numValue ) ? value : numValue;
 }
 
-export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
+export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = false } ) => {
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
@@ -224,6 +224,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					</p>
 				</section>
 
+				{ ! isMapBlock && (
 				<section className="public-maps">
 					<h3>{ __( 'For public maps only', 'jeo' ) }</h3>
 
@@ -247,6 +248,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 				</section>
+			) }
 			</form>
 		</Fragment>
 	);

@@ -636,6 +636,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					renderPanel={ PanelBody }
 					setZoomState={ setZoomState }
 					setPanLimitsFromMap={ setPanLimitsFromMap }
+					isMapBlock={ true }
 				/>
 				<LayersPanel
 					attributes={ { layers: allLayers } }

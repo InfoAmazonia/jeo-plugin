@@ -100,6 +100,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 					renderPanel={ PanelBody }
 					setZoomState={ setZoomState }
 					setPanLimitsFromMap={ setPanLimitsFromMap }
+					isMapBlock={ true }
 				/>
 				<LayersPanel
 					attributes={ normalizedAttributes }
