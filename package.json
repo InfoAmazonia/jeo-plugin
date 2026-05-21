@@ -23,8 +23,7 @@
 		"build:report": "node scripts/report-bundle-sizes.mjs",
 		"test:unit": "wp-scripts test-unit-js",
 		"audit:npm": "npm audit --package-lock-only",
-		"audit:composer": "composer audit --locked",
-		"deps:report": "node scripts/dependency-review.mjs --write"
+		"audit:composer": "composer audit --locked"
 	},
 	"repository": {
 		"type": "git",
