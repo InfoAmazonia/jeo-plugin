@@ -66,7 +66,7 @@ class StoryMapDisplay extends Component {
 				returnToSlidesContainer.style.display = document.fullscreenElement ? 'none' : 'block';
 			}
 
-			window.scrollTo ( 0, document.body.scrollHeight );
+			window.scrollTo( 0, document.body.scrollHeight );
 		};
 
 		const slides = [];
@@ -174,8 +174,12 @@ class StoryMapDisplay extends Component {
 
 	syncIntroductionScrollLock() {
 		this.setIntroductionScrollLocked(
-			Boolean( isSingle && this.props.hasIntroduction && ! this.state.hasStartedStorymap && ! this.state.isNavigating )
+			Boolean( isSingle && this.isIntroductionActive() && ! this.state.isNavigating )
 		);
+	}
+
+	isIntroductionActive() {
+		return Boolean( this.props.hasIntroduction && this.state.hasStartedStorymap === false );
 	}
 
 	startStorymapDisplay() {
@@ -247,7 +251,7 @@ class StoryMapDisplay extends Component {
 				progress: true,
 			})
 			.onStepEnter(response => {
-				if ( this.props.hasIntroduction && ! this.state.hasStartedStorymap ) {
+				if ( this.isIntroductionActive() ) {
 					return;
 				}
 
@@ -290,7 +294,7 @@ class StoryMapDisplay extends Component {
 				})
 		})
 		.onStepExit(response => {
-			if ( this.props.hasIntroduction && ! this.state.hasStartedStorymap ) {
+			if ( this.isIntroductionActive() ) {
 				return;
 			}
 
@@ -331,48 +335,49 @@ class StoryMapDisplay extends Component {
 			const navigateMapContainer = this.el?.querySelector( '.navigate-map' );
 
 			if ( navigateMapContainer ) {
+				// Mapbox owns the map element after initialization, so storymap controls stay outside it.
 				navigateMapContainer.append( navigateMapDiv );
 			}
 		}
 
-			const postRestBase = this.props.postRestBase || 'storymap';
-			const url = `${ window.jeoMapVars.jsonUrl }${ postRestBase }/${ this.props.postID }`;
-			window.fetch( url )
-				.then( ( response ) => {
-					if ( ! response.ok ) {
-						return null;
-					}
-					return response.json();
-				} )
-				.then( ( json ) => {
-					if ( json ) {
-						this.setState( { ...this.state, postData: json } );
-					}
-				} );
+		const postRestBase = this.props.postRestBase || 'storymap';
+		const url = `${ window.jeoMapVars.jsonUrl }${ postRestBase }/${ this.props.postID }`;
+		window.fetch( url )
+			.then( ( response ) => {
+				if ( ! response.ok ) {
+					return null;
+				}
+				return response.json();
+			} )
+			.then( ( json ) => {
+				if ( json ) {
+					this.setState( { ...this.state, postData: json } );
+				}
+			} );
 
 		document.addEventListener( 'fullscreenchange', this.handleFullscreenChange );
 	}
 
-		enterNavigationMode() {
-			this.setState( { isNavigating: true, mapBrightness: 1 }, () => {
-				this.el?.scrollIntoView( { block: 'start' } );
-				window.requestAnimationFrame( () => {
-					this.navigateMap?.forceUpdate?.();
-					window.requestAnimationFrame( () => this.navigateMap?.forceUpdate?.() );
-				} );
+	enterNavigationMode() {
+		this.setState( { isNavigating: true, mapBrightness: 1 }, () => {
+			this.el?.scrollIntoView( { block: 'start' } );
+			window.requestAnimationFrame( () => {
+				this.navigateMap?.forceUpdate?.();
+				window.requestAnimationFrame( () => this.navigateMap?.forceUpdate?.() );
 			} );
-		}
+		} );
+	}
 
 	exitNavigationMode() {
 		if ( document.fullscreenElement ) {
 			document.exitFullscreen();
 		}
 
-			this.setState( { isNavigating: false, mapBrightness: 1, inSlides: true, hasStartedStorymap: true }, () => {
-				this.map?.resize();
-				this.el?.scrollIntoView( { block: 'start' } );
-			} );
-		}
+		this.setState( { isNavigating: false, mapBrightness: 1, inSlides: true, hasStartedStorymap: true }, () => {
+			this.map?.resize();
+			this.el?.scrollIntoView( { block: 'start' } );
+		} );
+	}
 
 	lazyInitStorymap() {
 		if ( this.initialized ) {
@@ -419,7 +424,7 @@ class StoryMapDisplay extends Component {
 	componentDidUpdate() {
 		this.syncIntroductionScrollLock();
 
-		const mapEl = this.el.querySelector(`.${MAP_RUNTIME}-map`);
+		const mapEl = this.el?.querySelector(`.${MAP_RUNTIME}-map`);
 		if (mapEl) {
 			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
 		}
@@ -456,24 +461,24 @@ class StoryMapDisplay extends Component {
 		}
 	}
 
-	    render() {
-	        const theme = this.config.theme;
-			const currentChapterID = this.state.currentChapter.id;
-			const postTitle = this.state.postData?.title?.rendered;
-			const storyDate = this.state.postData?.date ? new Date( this.state.postData.date ) : null;
-			const Heading = isSingle ? 'h1' : 'h2';
-			const isNavigating = this.state.isNavigating;
-			const isIntroductionActive = this.props.hasIntroduction && ! this.state.hasStartedStorymap;
+    render() {
+        const theme = this.config.theme;
+		const currentChapterID = this.state.currentChapter.id;
+		const postTitle = this.state.postData?.title?.rendered;
+		const storyDate = this.state.postData?.date ? new Date( this.state.postData.date ) : null;
+		const Heading = isSingle ? 'h1' : 'h2';
+		const isNavigating = this.state.isNavigating;
+		const isIntroductionActive = this.isIntroductionActive();
 
-	        return(
-				<section
-					id={ `story-map-${this.cid}` }
-					className={ classNames( 'story-map', {
-						'story-map--navigating': isNavigating,
-						'story-map--intro-active': isIntroductionActive,
-					} ) }
-					ref={ ( el ) => ( this.el = el ) }
-				>
+        return(
+			<section
+				id={ `story-map-${this.cid}` }
+				className={ classNames( 'story-map', {
+					'story-map--navigating': isNavigating,
+					'story-map--intro-active': isIntroductionActive,
+				} ) }
+				ref={ ( el ) => ( this.el = el ) }
+			>
 				<div
 					className="not-navigating-map"
 					style={ { display: isNavigating ? 'none' : 'block' } }
@@ -486,18 +491,18 @@ class StoryMapDisplay extends Component {
 
 					<div className="the-story">
 						{ isIntroductionActive &&
-								<div className={ classNames( [ 'storymap-header', theme ] ) } style={ { marginBottom: window.innerHeight / 3 } }>
-									{ postTitle && (
-										<>
-											<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: postTitle } } />
-											<div className="post-info">
-												<p className="author" dangerouslySetInnerHTML={ { __html: getAuthorsLinks( this.state.postData ) } } />
-												{ storyDate && (
-													<p className="date">{ `${formatDate(storyDate)} ${ __('at', 'jeo') } ${formatHour(storyDate)}` }</p>
-												) }
-											</div>
-										</>
-									) }
+							<div className={ classNames( [ 'storymap-header', theme ] ) } style={ { marginBottom: window.innerHeight / 3 } }>
+								{ postTitle && (
+									<>
+										<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: postTitle } } />
+										<div className="post-info">
+											<p className="author" dangerouslySetInnerHTML={ { __html: getAuthorsLinks( this.state.postData ) } } />
+											{ storyDate && (
+												<p className="date">{ `${formatDate(storyDate)} ${ __('at', 'jeo') } ${formatHour(storyDate)}` }</p>
+											) }
+										</div>
+									</>
+								) }
 								{ this.config.subtitle &&
 									<h3 className="storymap-description" dangerouslySetInnerHTML={ { __html: decodeHtmlEntity( this.config.subtitle ) } } />
 								}
@@ -516,7 +521,7 @@ class StoryMapDisplay extends Component {
 											onClick={ async () => {
 												this.el?.querySelector( '.storymap-start-button' )?.click();
 												await sleep(1);
-												window.scrollTo( 0, this.el.scrollHeight );
+												window.scrollTo( 0, this.el?.scrollHeight || document.body.scrollHeight );
 												this.el?.querySelector( '.navigate-button-display' )?.click();
 											} }
 										>
@@ -605,18 +610,13 @@ class StoryMapDisplay extends Component {
 						<p className="icon-return">
 							<div
 								className="icon"
-								onClick={ () => {
-									sleep(1000)
-									this.exitNavigationMode();
-								} }
+								onClick={ () => this.exitNavigationMode() }
 							>
 								<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-up" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><path fill="white" d="M177 255.7l136 136c9.4 9.4 9.4 24.6 0 33.9l-22.6 22.6c-9.4 9.4-24.6 9.4-33.9 0L160 351.9l-96.4 96.4c-9.4 9.4-24.6 9.4-33.9 0L7 425.7c-9.4-9.4-9.4-24.6 0-33.9l136-136c9.4-9.5 24.6-9.5 34-.1zm-34-192L7 199.7c-9.4 9.4-9.4 24.6 0 33.9l22.6 22.6c9.4 9.4 24.6 9.4 33.9 0l96.4-96.4 96.4 96.4c9.4 9.4 24.6 9.4 33.9 0l22.6-22.6c9.4-9.4 9.4-24.6 0-33.9l-136-136c-9.2-9.4-24.4-9.4-33.8 0z"></path></svg>
 							</div>
 						</p>
 						<p
-							onClick={ async () => {
-								this.exitNavigationMode();
-							} }
+							onClick={ () => this.exitNavigationMode() }
 						>
 							{ __('Back to top', 'jeo') }
 						</p>
