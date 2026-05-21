@@ -22,24 +22,19 @@ Validated on May 21, 2026.
 
 ## How PHP 8.5 is covered
 
-- `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`.
-- The static script includes PHP `8.5`-focused heuristics for backtick execution, non-canonical casts, `case ...;` syntax and legacy `__sleep()` or `__wakeup()` usage.
-- `.github/workflows/php-compat.yml` includes PHP `8.5` as an experimental CI job.
+- `phpcs-compat.xml.dist` runs PHPCompatibilityWP against the plugin source with `testVersion` set to PHP `8.0-8.5`.
+- `.github/workflows/php-compat.yml` runs that PHPCompatibilityWP ruleset as the repository's static PHP compatibility gate.
 - `.github/workflows/wordpress-smoke.yml` includes one experimental PHP `8.5` smoke job for `WordPress 7.0`.
 - `scripts/wordpress-smoke.sh` honors `WP_CLI_PHP`, so the same runtime smoke can be executed against PHP `8.5` locally.
 - Stable `wp-cli` support for PHP `8.5` is still planned upstream. That mismatch is why PHP `8.5` remains experimental in this repository's CI policy.
 
 ## Local commands
 
-Run the static checks with the PHP binary you want to validate:
+Run the static PHP compatibility checks locally:
 
 ```bash
-/opt/homebrew/opt/php@8.0/bin/php scripts/check-php-compat.php
-/opt/homebrew/opt/php@8.1/bin/php scripts/check-php-compat.php
-/opt/homebrew/opt/php@8.2/bin/php scripts/check-php-compat.php
-/opt/homebrew/opt/php@8.3/bin/php scripts/check-php-compat.php
-/opt/homebrew/opt/php@8.4/bin/php scripts/check-php-compat.php
-/opt/homebrew/opt/php@8.5/bin/php scripts/check-php-compat.php
+composer install --no-interaction --no-progress --prefer-dist
+vendor/bin/phpcs --standard=phpcs-compat.xml.dist
 ```
 
 Run the WordPress smoke test locally with an explicit PHP runtime:
@@ -59,6 +54,6 @@ The repository itself is currently clean under PHP `8.5`, but `wp-cli` 2.12.0 st
 
 ## Current status
 
-- Repository-owned static checks are green from PHP `8.0` through `8.5`.
+- PHPCompatibilityWP static checks are green for PHP `8.0` through `8.5`.
 - Local WordPress smoke on PHP `8.5` passes, but still logs third-party deprecations from `wp-cli` and its bundled libraries.
 - Keep PHP `8.5` experimental in CI until those third-party logs stop obscuring runtime signal.

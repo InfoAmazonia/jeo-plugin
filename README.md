@@ -22,12 +22,12 @@ Compatibility snapshot validated on May 21, 2026:
 Automation:
 
 - Frontend asset checks run in `.github/workflows/node-frontend.yml`.
-- Static PHP checks run in `.github/workflows/php-compat.yml`, including an experimental PHP `8.5` job.
+- Static PHP compatibility checks run in `.github/workflows/php-compat.yml` through PHPCompatibilityWP, configured for PHP `8.0-8.5`.
 - WordPress runtime smoke tests run in `.github/workflows/wordpress-smoke.yml`, including an experimental PHP `8.5` job for `WordPress 7.0`.
 
 Test script coverage:
 
-- `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`, including PHP `8.5`-specific deprecation heuristics.
+- `phpcs-compat.xml.dist` runs PHPCompatibilityWP for generic PHP cross-version compatibility checks against the plugin source.
 - `scripts/wordpress-smoke.sh` can be forced onto PHP `8.5` with `WP_CLI_PHP`, so the plugin's runtime smoke can be exercised on that line locally and in CI.
 - `scripts/check-node-version.mjs` enforces the supported frontend runtime before `npm ci` or `npm install` continue.
 - `scripts/report-bundle-sizes.mjs` enforces explicit bundle budgets instead of relying on generic webpack performance warnings.
@@ -43,8 +43,9 @@ npm run build:report
 npm run test:unit
 npm run audit:npm
 composer audit --locked
-php scripts/check-php-compat.php
-/opt/homebrew/opt/php@8.5/bin/php scripts/check-php-compat.php
+composer install --no-interaction --no-progress --prefer-dist
+vendor/bin/phpcs --standard=phpcs.xml.dist
+vendor/bin/phpcs --standard=phpcs-compat.xml.dist
 
 WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php \
 WP_DB_HOST=localhost \
