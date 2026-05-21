@@ -79,12 +79,12 @@ Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom
 
 ### `POST /jeo/v1/minimap/setup-prompt` — Generate from prompt (AI agent)
 
-Uses the full AI agent with structured output. When a `post_id` is provided, the agent receives context about the post and may delegate to the `post_analyzer` sub-agent to extract geographic information from the post content — useful when the prompt references specific sections of the post (e.g. "map based on the Amazon section").
+Uses the full AI agent with structured output. The agent receives context about the post and may delegate to the `post_analyzer` sub-agent to extract geographic information from the post content — useful when the prompt references specific sections of the post (e.g. "map based on the Amazon section").
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `prompt` | string | Yes | Text description of desired map |
-| `post_id` | int | No | Post ID — enables post content analysis via post_analyzer |
+| `post_id` | int | Yes | Post ID — enables post content analysis via post_analyzer and conversation storage |
 | `conversation_id` | string | No | UUID for conversation continuity |
 
 Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom, pins[], message, assistant_message, base_variant? }`
@@ -98,7 +98,7 @@ Refines an existing map through conversation. The agent maintains context via co
 | `conversation_id` | string | Yes | Block conversation UUID |
 | `message` | string | No* | User message (*required unless `type=regenerate`) |
 | `type` | string | No | `text` (default), `base_variant`, `add_layers`, `regenerate` |
-| `post_id` | int | No | Post ID for pin extraction |
+| `post_id` | int | Yes | Post ID for conversation storage and pin extraction |
 | `payload` | object | No | Structured data (e.g. `{ variant: "satellite" }`) |
 | `current_map_state` | object | No | Live block attributes (`layers`, `base_layer`, `center_lat`, `center_lon`, `initial_zoom`, `pins`) — injected as system prompt context so the AI always knows the current map regardless of conversation history |
 
@@ -330,7 +330,7 @@ sequenceDiagram
     M->>A: Minimap_Agent::create(post_id, conversation_id, user_id)
     A-->>M: Assistant instance
     M->>A: structured(UserMessage(prompt))
-    A->>A: Delegate to post_analyzer (if post_id)
+    A->>A: Delegate to post_analyzer
     A->>A: search_layers(query)
     A->>A: geocode(location)
     A->>LLM: API call (structured output)
@@ -356,7 +356,7 @@ sequenceDiagram
 
     U->>E: Type "Switch to satellite view"
     E->>E: Append assistant typing indicator
-    E->>R: POST {conversation_id, message, type: "text"}
+    E->>R: POST {conversation_id, post_id, message, type: "text"}
     R->>R: resolve_structured_message("text", msg, req) → msg
     R->>M: run_agent(post_id, conversation_id, user_id, msg)
     M->>A: Minimap_Agent::create()

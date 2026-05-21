@@ -174,7 +174,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			method: 'POST',
 			data: {
 				conversation_id: convId,
-				post_id: wp.data.select( 'core/editor' ).getCurrentPostId() || 0,
+				post_id: wp.data.select( 'core/editor' ).getCurrentPostId(),
 				message: text,
 				type,
 				payload,
@@ -259,7 +259,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			method: 'POST',
 			data: {
 				prompt: userMsg,
-				post_id: wp.data.select( 'core/editor' ).getCurrentPostId() || 0,
+				post_id: wp.data.select( 'core/editor' ).getCurrentPostId(),
 				conversation_id: convId,
 			},
 		} )
@@ -393,7 +393,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			method: 'POST',
 			data: {
 				prompt: attributes.prompt,
-				post_id: postId || undefined,
+				post_id: postId,
 				conversation_id: convId,
 			},
 		} )

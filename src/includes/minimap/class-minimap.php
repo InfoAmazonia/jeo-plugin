@@ -217,6 +217,27 @@ class Minimap {
 			);
 		}
 
+		if ( empty( $post_id ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'A post ID is required.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Post not found.', 'jeo' ),
+				),
+				404
+			);
+		}
+
 		$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
 		if ( empty( $active_provider ) ) {
 			return new \WP_REST_Response(
@@ -229,16 +250,10 @@ class Minimap {
 		}
 
 		try {
-			$state_context = null;
-			if ( $post_id ) {
-				$post = get_post( $post_id );
-				if ( $post ) {
-					$state_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '"). You may delegate to the post_analyzer sub-agent to extract geographic context from the post content.';
-				}
-			}
+			$state_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '"). You may delegate to the post_analyzer sub-agent to extract geographic context from the post content.';
 
 			$result = $this->run_agent(
-				$post_id ? $post_id : 0,
+				$post_id,
 				$conversation_id,
 				$user_id,
 				$prompt,
@@ -278,6 +293,26 @@ class Minimap {
 					'message' => __( 'conversation_id is required.', 'jeo' ),
 				),
 				400
+			);
+		}
+
+		if ( empty( $post_id ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'A post ID is required.', 'jeo' ),
+				),
+				400
+			);
+		}
+
+		if ( ! get_post( $post_id ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Post not found.', 'jeo' ),
+				),
+				404
 			);
 		}
 
