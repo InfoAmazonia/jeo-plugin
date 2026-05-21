@@ -1121,7 +1121,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	editor={ ClassicEditor }
 																	data={ slide.title }
 																	config={ titleEditorConfig }
-																	onReady={ ( editor ) => setupEditor( editor, { singleLine: true } ) }
+																	onReady={ ( editor ) => setupEditor( editor, {
+																		singleLine: true,
+																		stabilizeOuterScroll: true,
+																	} ) }
 																	onChange={ ( event, editor ) => {
 																		setCurrentSlideIndex( slideIndex );
 

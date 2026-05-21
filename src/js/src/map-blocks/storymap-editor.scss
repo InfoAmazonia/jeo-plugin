@@ -113,10 +113,13 @@
 .storymap-title-editor {
 	.ck.ck-content.ck-editor__editable.ck-blurred,
 	.ck.ck-content.ck-editor__editable.ck-focused {
-		height: 72px !important;
+		height: auto !important;
 		min-height: 72px;
-		max-height: none;
-		overflow-y: hidden;
+		max-height: 144px;
+		overflow-y: auto !important;
+		overflow-anchor: none;
+		overscroll-behavior: contain;
+		scrollbar-gutter: stable;
 	}
 }
 
