@@ -42,8 +42,39 @@ $font-stories: var( --jeo-font-stories );
 
 .story-map {
 	margin: 0;
+	min-height: 100vh;
 	padding: 0;
 	position: relative;
+
+	&.story-map--navigating {
+		min-height: 100vh;
+
+		.navigate-map {
+			background: #ffffff;
+			height: 100vh;
+			inset-inline: 50%;
+			margin-inline: -50vw;
+			overflow: hidden;
+			position: relative;
+			width: 100vw;
+
+			.jeomap {
+				height: 100%;
+				inset: 0;
+				max-width: none;
+				position: absolute;
+				width: 100%;
+			}
+		}
+	}
+
+	&.story-map--intro-active {
+		min-height: 100vh;
+
+		.not-navigating-map {
+			min-height: 100vh;
+		}
+	}
 
 	@media (max-width: 829px) {
 		.storymap-page-title {
@@ -432,11 +463,11 @@ $font-stories: var( --jeo-font-stories );
 
 	.return-to-slides-container {
 		filter: drop-shadow( 0px 0px 4px black );
-		position: fixed;
+		position: absolute;
 		inset-inline-start: 50%;
-		transform: translate( -50%, -50% );
-		bottom: 0;
-		z-index: 1;
+		transform: translateX( -50% );
+		bottom: 28px;
+		z-index: 5;
 
 		p {
 			text-decoration: underline;
@@ -523,19 +554,19 @@ $font-stories: var( --jeo-font-stories );
 	.navigate-map {
 		:is(.mapboxgl-map, .maplibregl-map) {
 			transition: filter 0.7s ease;
-			width: 100vw !important;
-			height: 96vh !important;
-			max-width: 100%;
+			width: 100% !important;
+			height: 100% !important;
+			max-width: none;
 
 			:is(.mapboxgl-canvas-container, .maplibregl-canvas-container) {
 				canvas {
-					width: 100vw !important;
-					height: 95vh !important;
+					width: 100% !important;
+					height: 100% !important;
 				}
 			}
 
 			@media ( max-width: 800px ) {
-				height: 94vh !important;
+				height: 100% !important;
 			}
 		}
 	}

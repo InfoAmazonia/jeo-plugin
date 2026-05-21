@@ -133,6 +133,7 @@ class StoryMapDisplay extends Component {
 			postData: null,
 			hiddenLayersIds: [],
 			inSlides,
+			hasStartedStorymap: ! props.hasIntroduction,
         };
     }
 
@@ -173,8 +174,22 @@ class StoryMapDisplay extends Component {
 
 	syncIntroductionScrollLock() {
 		this.setIntroductionScrollLocked(
-			Boolean( this.props.hasIntroduction && ! this.state.inSlides && ! this.state.isNavigating )
+			Boolean( isSingle && this.isIntroductionActive() && ! this.state.isNavigating )
 		);
+	}
+
+	isIntroductionActive() {
+		return Boolean( this.props.hasIntroduction && this.state.hasStartedStorymap === false );
+	}
+
+	startStorymapDisplay() {
+		this.setIntroductionScrollLocked( false );
+		this.setState( { ...this.state, mapBrightness: 1, inSlides: true, hasStartedStorymap: true }, () => {
+			window.requestAnimationFrame( () => {
+				this.scroller.resize();
+				this.el?.querySelector( '.storymap-features' )?.scrollIntoView();
+			} );
+		} );
 	}
 
 	scheduleInitialMapLibreAttributionSync() {
@@ -236,6 +251,10 @@ class StoryMapDisplay extends Component {
 				progress: true,
 			})
 			.onStepEnter(response => {
+				if ( this.isIntroductionActive() ) {
+					return;
+				}
+
 				if ( response.index === config.chapters.length - 1 ) {
 					this.setState({ ...this.state, mapBrightness: MAP_DIM, inSlides: false })
 					this.map?.flyTo({
@@ -275,7 +294,15 @@ class StoryMapDisplay extends Component {
 				})
 		})
 		.onStepExit(response => {
+			if ( this.isIntroductionActive() ) {
+				return;
+			}
+
 			if ( response.index === 0 && response.direction === 'up' ) {
+				if ( ! this.props.hasIntroduction || this.state.hasStartedStorymap ) {
+					return;
+				}
+
 				this.setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
 
 				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
@@ -325,8 +352,11 @@ class StoryMapDisplay extends Component {
 
 	enterNavigationMode() {
 		this.setState( { isNavigating: true, mapBrightness: 1 }, () => {
-			this.navigateMap?.forceUpdate?.();
-			window.scrollTo( 0, this.el?.scrollHeight || document.body.scrollHeight );
+			this.el?.scrollIntoView( { block: 'start' } );
+			window.requestAnimationFrame( () => {
+				this.navigateMap?.forceUpdate?.();
+				window.requestAnimationFrame( () => this.navigateMap?.forceUpdate?.() );
+			} );
 		} );
 	}
 
@@ -335,11 +365,9 @@ class StoryMapDisplay extends Component {
 			document.exitFullscreen();
 		}
 
-		const mapBrightness = this.props.hasIntroduction ? MAP_DIM : 1;
-
-		this.setState( { isNavigating: false, mapBrightness }, () => {
+		this.setState( { isNavigating: false, mapBrightness: 1, inSlides: true, hasStartedStorymap: true }, () => {
 			this.map?.resize();
-			window.scrollTo( 0, 0 );
+			this.el?.scrollIntoView( { block: 'start' } );
 		} );
 	}
 
@@ -428,12 +456,21 @@ class StoryMapDisplay extends Component {
     render() {
         const theme = this.config.theme;
 		const currentChapterID = this.state.currentChapter.id;
-		const storyDate = this.state.postData ? new Date( this.state.postData.date ) : null;
+		const postTitle = this.state.postData?.title?.rendered;
+		const storyDate = this.state.postData?.date ? new Date( this.state.postData.date ) : null;
 		const Heading = isSingle ? 'h1' : 'h2';
 		const isNavigating = this.state.isNavigating;
+		const isIntroductionActive = this.isIntroductionActive();
 
         return(
-			<section id={ `story-map-${this.cid}` } className="story-map" ref={ ( el ) => ( this.el = el ) }>
+			<section
+				id={ `story-map-${this.cid}` }
+				className={ classNames( 'story-map', {
+					'story-map--navigating': isNavigating,
+					'story-map--intro-active': isIntroductionActive,
+				} ) }
+				ref={ ( el ) => ( this.el = el ) }
+			>
 				<div
 					className="not-navigating-map"
 					style={ { display: isNavigating ? 'none' : 'block' } }
@@ -445,14 +482,16 @@ class StoryMapDisplay extends Component {
 					</div>
 
 					<div className="the-story">
-						{ this.props.hasIntroduction &&
+						{ isIntroductionActive &&
 							<div className={ classNames( [ 'storymap-header', theme ] ) } style={ { marginBottom: window.innerHeight / 3 } }>
-								{ this.state.postData && (
+								{ postTitle && (
 									<>
-										<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: this.state.postData.title.rendered } } />
+										<Heading className="storymap-page-title" dangerouslySetInnerHTML={ { __html: postTitle } } />
 										<div className="post-info">
 											<p className="author" dangerouslySetInnerHTML={ { __html: getAuthorsLinks( this.state.postData ) } } />
-											<p className="date">{ `${formatDate(storyDate)} ${ __('at', 'jeo') } ${formatHour(storyDate)}` }</p>
+											{ storyDate && (
+												<p className="date">{ `${formatDate(storyDate)} ${ __('at', 'jeo') } ${formatHour(storyDate)}` }</p>
+											) }
 										</div>
 									</>
 								) }
@@ -462,12 +501,7 @@ class StoryMapDisplay extends Component {
 
 								<button
 									className="storymap-start-button"
-									onClick={ () => {
-										this.setIntroductionScrollLocked( false );
-										this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
-
-										this.el?.querySelector( '.storymap-features' )?.scrollIntoView();
-									} }
+									onClick={ () => this.startStorymapDisplay() }
 								>
 									{ __('START', 'jeo') }
 								</button>
@@ -487,12 +521,7 @@ class StoryMapDisplay extends Component {
 										</p>
 										<div
 											className="skip-intro-icon"
-											onClick={ async () => {
-												this.setIntroductionScrollLocked( false );
-												this.setState( { ...this.state, mapBrightness: 1, inSlides: true } );
-
-												this.el?.querySelector( '.storymap-features' )?.scrollIntoView();
-											} }
+											onClick={ () => this.startStorymapDisplay() }
 										>
 											<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="angle-double-down" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" ><path fill="currentColor" d="M143 256.3L7 120.3c-9.4-9.4-9.4-24.6 0-33.9l22.6-22.6c9.4-9.4 24.6-9.4 33.9 0l96.4 96.4 96.4-96.4c9.4-9.4 24.6-9.4 33.9 0L313 86.3c9.4 9.4 9.4 24.6 0 33.9l-136 136c-9.4 9.5-24.6 9.5-34 .1zm34 192l136-136c9.4-9.4 9.4-24.6 0-33.9l-22.6-22.6c-9.4-9.4-24.6-9.4-33.9 0L160 352.1l-96.4-96.4c-9.4-9.4-24.6-9.4-33.9 0L7 278.3c-9.4 9.4-9.4 24.6 0 33.9l136 136c9.4 9.5 24.6 9.5 34 .1z"></path></svg>
 										</div>
@@ -510,7 +539,14 @@ class StoryMapDisplay extends Component {
 											'storymap-features--with-navigation-step': this.props.navigateButton,
 										},
 									] ) }
-									style={ { display: 'block' } }
+									style={ isIntroductionActive ? {
+										height: 0,
+										overflow: 'hidden',
+										paddingBottom: 0,
+										paddingTop: 0,
+										pointerEvents: 'none',
+										visibility: 'hidden',
+									} : { display: 'block' } }
 								>
 									{
 										this.config.chapters.map( ( chapter, index ) => {
