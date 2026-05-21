@@ -7,14 +7,13 @@ This repository keeps two layers of PHP compatibility validation:
 
 ## Policy snapshot
 
-Validated on March 17, 2026.
+Validated on May 21, 2026.
 
 - Primary support: PHP `8.2`, `8.3`, and `8.4`.
 - Experimental monitoring: PHP `8.5`.
-- Stable WordPress gate: `WordPress 6.9.4` on PHP `8.2`, `8.3`, and `8.4`.
-- Experimental WordPress gate: `WordPress 6.9.4` on PHP `8.5`.
+- Stable WordPress gate: `WordPress 7.0` on PHP `8.2`, `8.3`, and `8.4`.
+- Experimental WordPress gate: `WordPress 7.0` on PHP `8.5`.
 - Backward-compatibility coverage: `WordPress 6.6` on PHP `8.0` and `8.1`.
-- Forward-compatibility coverage: `WordPress 7.0-beta4` on PHP `8.2`, `8.3`, `8.4`, and experimentally on `8.5`.
 
 ## Automation
 
@@ -26,9 +25,9 @@ Validated on March 17, 2026.
 - `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`.
 - The static script includes PHP `8.5`-focused heuristics for backtick execution, non-canonical casts, `case ...;` syntax and legacy `__sleep()` or `__wakeup()` usage.
 - `.github/workflows/php-compat.yml` includes PHP `8.5` as an experimental CI job.
-- `.github/workflows/wordpress-smoke.yml` includes experimental PHP `8.5` smoke jobs for both `WordPress 6.9.4` and `WordPress 7.0-beta4`.
+- `.github/workflows/wordpress-smoke.yml` includes one experimental PHP `8.5` smoke job for `WordPress 7.0`.
 - `scripts/wordpress-smoke.sh` honors `WP_CLI_PHP`, so the same runtime smoke can be executed against PHP `8.5` locally.
-- WordPress core 6.9 treats PHP `8.5` as beta support, while stable `wp-cli` support for PHP `8.5` is still planned upstream. That mismatch is why PHP `8.5` remains experimental in this repository's CI policy.
+- Stable `wp-cli` support for PHP `8.5` is still planned upstream. That mismatch is why PHP `8.5` remains experimental in this repository's CI policy.
 
 ## Local commands
 
@@ -51,7 +50,7 @@ WP_DB_HOST=localhost \
 WP_DB_NAME=wordpress \
 WP_DB_USER=your-user \
 WP_DB_PASSWORD='' \
-WP_VERSION=7.0-beta4 \
+WP_VERSION=7.0 \
 bash scripts/wordpress-smoke.sh
 ```
 
