@@ -81,7 +81,8 @@ ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
 ## Building the plugin
 
 The plugin root for local development and release packaging is `src/`.
-Builds compile JavaScript and CSS assets into `src/js/build`.
+Builds compile JavaScript and CSS assets into `src/js/build`, then compile
+runtime translation artifacts into `src/languages`.
 
 Use these commands during local development:
 
@@ -91,16 +92,61 @@ npm run build
 ```
 
 - `npm run start` watches the source tree and rebuilds assets while you develop.
-- `npm run build` performs a production build and regenerates JavaScript translation JSON catalogs in `src/languages`.
+- `npm run build` performs a production build and regenerates compiled translation catalogs in `src/languages`.
 
-To generate JavaScript translation JSON catalogs on their own, run:
+These scripts expect `wp` (WP-CLI) to be available on your `PATH`.
+
+### Translation workflow
+
+Translation source files are versioned in Git:
+
+- `src/languages/jeo.pot`
+- `src/languages/*.po`
+
+Compiled translation files are generated artifacts and are not versioned in Git:
+
+- `src/languages/*.mo`
+- `src/languages/*.json`
+
+When source strings change, refresh the source catalogs after building assets:
 
 ```bash
+npm run i18n:refresh
+```
+
+This runs `npm run build:assets`, regenerates `src/languages/jeo.pot`, and
+updates the existing `*.po` catalogs. Review the updated `*.po` translations
+before compiling release artifacts. If you want to run each step manually, use:
+
+```bash
+npm run build:assets
+npm run i18n:pot
+npm run i18n:po
+```
+
+After human review of the `*.po` catalogs, compile the generated runtime files:
+
+```bash
+npm run i18n:compile
+```
+
+You can also run each compile step directly:
+
+```bash
+npm run i18n:mo
 npm run i18n:json
 ```
 
-These scripts expect `wp` (WP-CLI) to be available on your `PATH`. If it lives elsewhere, set `WP_CLI_BIN` when running the command.
-The generated `src/languages/*.json` catalogs are release artifacts and are intentionally not versioned in Git.
+Before committing translation changes, validate changed PO catalogs with
+`msgfmt --check --statistics`. For example:
+
+```bash
+msgfmt --check --statistics -o /tmp/jeo-pt_BR.mo src/languages/jeo-pt_BR.po
+```
+
+Commit reviewed `*.po` and `jeo.pot` changes. Do not commit generated `*.mo`
+or `*.json` files; `npm run build` and `npm run build:release` regenerate
+them for local testing and release packaging.
 
 If you prefer copying files instead of symlinking them into a local WordPress install, use:
 
@@ -145,8 +191,9 @@ npm run build
 ```
 
 The attached `jeo.zip` mirrors the WordPress.org deploy package: it contains
-the built contents of `src/` under the `jeo/` plugin slug directory, ready for
-manual installation in WordPress.
+the built contents of `src/` under the `jeo/` plugin slug directory, including
+generated `*.mo` and `*.json` translation catalogs, ready for manual
+installation in WordPress.
 
 ## Documentation
 
