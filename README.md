@@ -31,7 +31,7 @@ Test script coverage:
 - `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`, including PHP `8.5`-specific deprecation heuristics.
 - `scripts/wordpress-smoke.sh` can be forced onto PHP `8.5` with `WP_CLI_PHP`, so the plugin's runtime smoke can be exercised on that line locally and in CI.
 - `scripts/check-node-version.mjs` enforces the supported frontend runtime before `npm ci` or `npm install` continue.
-- `scripts/report-bundle-sizes.mjs` enforces explicit bundle budgets instead of relying on generic webpack performance warnings.
+- Size Limit enforces explicit bundle budgets from `.size-limit.json` instead of relying on generic webpack performance warnings.
 
 Local commands:
 
