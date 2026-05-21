@@ -1,0 +1,50 @@
+name: WordPress Language Files
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  wordpress-language-files:
+    name: Validate WordPress language files
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          coverage: none
+
+      - name: Test WordPress language files
+        id: language-files
+        uses: holyhope/test-wordpress-languages-github-action@v4.0.2
+        with:
+          slug: jeo
+          source: src
+          pot_file: src/languages/jeo.pot
+          domain: jeo
+          exclude: assets
+          fail_on_diff: true
+          fail_on_warning: true
+
+      - name: Upload language file patch
+        if: always() && steps.language-files.outputs.patch_path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordpress-language-files-patch
+          path: ${{ steps.language-files.outputs.patch_path }}
+          if-no-files-found: ignore
+
+      - name: Upload language file warnings
+        if: always() && steps.language-files.outputs.warnings_path != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: wordpress-language-files-warnings
+          path: ${{ steps.language-files.outputs.warnings_path }}
+          if-no-files-found: ignore
