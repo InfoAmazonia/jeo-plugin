@@ -1,0 +1,56 @@
+[
+	{
+		"name": "mapglLoader",
+		"path": "src/js/build/mapglLoader.js",
+		"limit": "1100 KB",
+		"brotli": false
+	},
+	{
+		"name": "mapglReact",
+		"path": "src/js/build/mapglReact.js",
+		"limit": "25 KB",
+		"brotli": false
+	},
+	{
+		"name": "mapBlocks",
+		"path": "src/js/build/mapBlocks.js",
+		"limit": "1300 KB",
+		"brotli": false
+	},
+	{
+		"name": "layersSidebar",
+		"path": "src/js/build/layersSidebar.js",
+		"limit": "360 KB",
+		"brotli": false
+	},
+	{
+		"name": "discovery",
+		"path": "src/js/build/discovery.js",
+		"limit": "285 KB",
+		"brotli": false
+	},
+	{
+		"name": "mapsSidebar",
+		"path": "src/js/build/mapsSidebar.js",
+		"limit": "250 KB",
+		"brotli": false
+	},
+	{
+		"name": "postsSidebar",
+		"path": "src/js/build/postsSidebar.js",
+		"limit": "180 KB",
+		"brotli": false
+	},
+	{
+		"name": "jeoMap",
+		"path": "src/js/build/jeoMap.js",
+		"limit": "90 KB",
+		"brotli": false
+	},
+	{
+		"name": "jeoStorymap",
+		"path": "src/js/build/jeoStorymap.js",
+		"limit": "45 KB",
+		"brotli": false
+	}
+]
