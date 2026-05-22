@@ -53,13 +53,20 @@
 			},
 		};
 
-		if ( attributes.style ) {
-			if ( attributes.style.paint ) {
-				layer.paint = { ...attributes.style.paint };
-			}
-			if ( attributes.style.layout ) {
-				layer.layout = { ...layer.layout, ...attributes.style.layout };
-			}
+		const effectiveStyle = ( attributes.style?.use_default )
+			? ( attributes.default_style || {} )
+			: ( attributes.style || {} );
+
+		if ( effectiveStyle.filter ) {
+			layer.filter = effectiveStyle.filter;
+		}
+
+		if ( effectiveStyle.paint ) {
+			layer.paint = { ...effectiveStyle.paint };
+		}
+
+		if ( effectiveStyle.layout ) {
+			layer.layout = { ...layer.layout, ...effectiveStyle.layout };
 		}
 
 		if ( addLayerParams ) {

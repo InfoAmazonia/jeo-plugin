@@ -199,6 +199,17 @@ class Minilayer_Service {
 		update_post_meta( $post_id, 'type', $layer_type );
 		update_post_meta( $post_id, 'layer_type_options', $layer_type_options );
 
+		$default_style = array();
+		if ( ! empty( $style_data['suggested_filter'] ) ) {
+			$default_style['filter'] = $style_data['suggested_filter'];
+		}
+		if ( ! empty( $style_data['suggested_paint'] ) ) {
+			$default_style['paint'] = $style_data['suggested_paint'];
+		}
+		if ( ! empty( $default_style ) ) {
+			update_post_meta( $post_id, 'default_style', $default_style );
+		}
+
 		self::assign_current_language( $post_id );
 
 		$result = array(

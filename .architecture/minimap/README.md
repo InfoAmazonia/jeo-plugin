@@ -139,6 +139,21 @@ When a Mapbox API key is configured, `Minimap_Agent::create()` registers `Genera
 
 When no Mapbox key is configured, the tool is omitted entirely and the prompt includes a "Layer Limitations" section instructing the agent to suggest connecting a Mapbox key.
 
+### Default Style from Generated Layers
+
+When `Generate_Layer_Tool` creates a `mapbox-tileset-vector` layer that includes `suggested_filter` and/or `suggested_paint` from the AI, these are stored as `default_style` CPT meta on the layer. The minimap agent then sets `style.use_default: true` on the layer instance in its structured output, activating the AI-suggested filter/paint without the user needing to configure it manually.
+
+The user can later toggle `use_default` off in the `LayerStyleEditor` modal (Gutenberg layer settings) to override with manual paint values. See [`.architecture/minilayer/README.md`](../minilayer/README.md) for the full `default_style` storage and resolution flow.
+
+### Tool Error Handling
+
+The minimap agent's system prompt includes explicit instructions for handling tool failures gracefully:
+
+- **`search_layers` failure** → informational `assistant_message`, map renders with base layer + pins only
+- **`generate_layer` failure** → user-friendly explanation via `assistant_message`, suggests retrying or adjusting the prompt
+- **Technical error details** (WP_Error messages, API error codes, stack traces) are never exposed to the user
+- The map is always rendered (with base layer + pins at minimum) even when tools fail
+
 **Flow: Layer generation via chat**
 
 ```mermaid

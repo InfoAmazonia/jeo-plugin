@@ -259,6 +259,7 @@ const LayerSettings = (
 						<LayerStyleEditor
 							style={ settings.style || {} }
 							layerType={ settings.layer.meta?.layer_type_options?.type }
+							defaultStyle={ settings.layer.meta?.default_style || null }
 							onChange={ updateStyle }
 							onClose={ () => setShowStyleModal( false ) }
 						/>

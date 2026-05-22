@@ -582,6 +582,7 @@ export default class JeoMap {
 											layer_type_options: layerObject.meta.layer_type_options,
 											source_url: layerObject.meta.source_url,
 											style: layersDefinitions[ i ].style,
+											default_style: layerObject.meta.default_style,
 										} )
 									);
 

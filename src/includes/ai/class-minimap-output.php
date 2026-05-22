@@ -27,7 +27,7 @@ class Minimap_Output {
 	 * @var array
 	 */
 	#[SchemaProperty(
-		description: 'Thematic map layer definitions. Each entry has id (int), use ("fixed"), default (true), show_legend (bool).',
+		description: 'Thematic map layer definitions. Each entry has: id (int), use ("fixed"), default (true), show_legend (bool), style (optional object). The style object can contain: use_default (bool — when true, use the layer\'s AI-suggested default_style), filter (array — MapLibre filter expression like ["==", "class", "wood"]), paint (object — paint properties like {"fill-color": "#2d5a27", "fill-opacity": 0.6}), layout (object — layout properties).',
 		required: true,
 	)]
 	public array $layers = array();

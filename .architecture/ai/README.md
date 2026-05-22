@@ -283,3 +283,5 @@ See [`minilayer/README.md`](../minilayer/README.md).
 The minilayer pipeline is shared between:
 - The standalone REST endpoint (`/jeo/v1/minilayer/generate`)
 - The minimap agent's `Generate_Layer_Tool` (conditional, requires Mapbox key + user authorization)
+
+See [`minimap/README.md`](../minimap/README.md) for the minimap-side integration: default style activation, tool error handling, and the authorization gate for layer generation.

@@ -77,15 +77,24 @@ class Minilayer_Handler {
 		$result = Minilayer_Service::generate_and_create( $prompt, $layer_name );
 
 		if ( is_wp_error( $result ) ) {
-			$code     = $result->get_error_code();
-			$status   = ( 'minilayer_parse_error' === $code || 'minilayer_missing_style_id' === $code ) ? 502 : 400;
-			$response = array( 'error' => $result->get_error_message() );
+			$code   = $result->get_error_code();
+			$status = ( 'minilayer_parse_error' === $code || 'minilayer_missing_style_id' === $code ) ? 502 : 400;
 
-			if ( 502 === $status ) {
-				$response['raw_output'] = $prompt;
-			}
+			$messages = array(
+				'minilayer_no_mapbox_key'    => __( 'Mapbox API key is not configured. Set it in JEO Settings.', 'jeo' ),
+				'minilayer_no_provider'      => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
+				'minilayer_agent_error'      => __( 'Could not generate the map style. Please try again.', 'jeo' ),
+				'minilayer_parse_error'      => __( 'The AI returned an unexpected response. Please try again.', 'jeo' ),
+				'minilayer_missing_style_id' => __( 'The AI did not create a valid style. Please try again.', 'jeo' ),
+			);
 
-			return new \WP_REST_Response( $response, $status );
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'error'   => $messages[ $code ] ?? $result->get_error_message(),
+				),
+				$status
+			);
 		}
 
 		return new \WP_REST_Response(

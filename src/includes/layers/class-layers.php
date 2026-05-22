@@ -214,6 +214,38 @@ class Layers {
 				'description'   => __( 'Legend title', 'jeo' ),
 			)
 		);
+
+		register_post_meta(
+			$this->post_type,
+			'default_style',
+			array(
+				'show_in_rest'  => array(
+					'schema' => array(
+						'type'       => 'object',
+						'properties' => array(
+							'filter' => array(
+								'type'  => 'array',
+								'items' => array(
+									'type' => array( 'string', 'number', 'boolean', 'array', 'object' ),
+								),
+							),
+							'paint'  => array(
+								'type'                 => 'object',
+								'additionalProperties' => true,
+							),
+							'layout' => array(
+								'type'                 => 'object',
+								'additionalProperties' => true,
+							),
+						),
+					),
+				),
+				'single'        => true,
+				'auth_callback' => '__return_true',
+				'type'          => 'object',
+				'description'   => __( 'AI-suggested default style with optional filter, paint, and layout for mapbox-tileset-vector layers', 'jeo' ),
+			)
+		);
 	}
 
 	/**

@@ -1,4 +1,5 @@
-import { Modal } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { CheckboxControl, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RangeControl, TextControl } from './wp-form-controls';
 
@@ -60,7 +61,7 @@ function setNestedValue( obj, path, value ) {
 	return result;
 }
 
-function ColorPickerField( { label, value, onChange } ) {
+function ColorPickerField( { label, value, onChange, disabled } ) {
 	return (
 		<div className="jeo-style-editor-field" style={ { display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' } }>
 			<label style={ { minWidth: '120px', fontWeight: 500 } }>{ label }</label>
@@ -68,29 +69,42 @@ function ColorPickerField( { label, value, onChange } ) {
 				type="color"
 				value={ value || '#000000' }
 				onChange={ ( e ) => onChange( e.target.value ) }
-				style={ { width: 44, height: 30, border: '1px solid #ddd', borderRadius: 4, padding: 1, cursor: 'pointer' } }
+				disabled={ disabled }
+				style={ { width: 44, height: 30, border: '1px solid #ddd', borderRadius: 4, padding: 1, cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.5 : 1 } }
 			/>
 			<TextControl
 				value={ value || '' }
 				onChange={ onChange }
 				placeholder="#000000"
+				disabled={ disabled }
 				style={ { flex: 1 } }
 			/>
 		</div>
 	);
 }
 
-export default function LayerStyleEditor( { style, layerType, onChange, onClose } ) {
+export default function LayerStyleEditor( { style, layerType, defaultStyle, onChange, onClose } ) {
+	const [ useDefault, setUseDefault ] = useState( !! ( defaultStyle && style?.use_default ) );
+
 	const paint = style?.paint || {};
 
+	const handleToggleDefault = ( checked ) => {
+		setUseDefault( checked );
+		if ( checked ) {
+			onChange( { use_default: true } );
+		} else {
+			onChange( {} );
+		}
+	};
+
 	const updatePaint = ( key, value ) => {
-		const next = { ...style, paint: { ...paint, [ key ]: value } };
+		const next = { ...style, use_default: false, paint: { ...paint, [ key ]: value } };
 		onChange( next );
 	};
 
 	const removePaint = ( key ) => {
 		const { [ key ]: _, ...rest } = paint;
-		const nextStyle = { ...style, paint: rest };
+		const nextStyle = { ...style, use_default: false, paint: rest };
 		if ( Object.keys( rest ).length === 0 ) {
 			delete nextStyle.paint;
 		}
@@ -124,6 +138,33 @@ export default function LayerStyleEditor( { style, layerType, onChange, onClose 
 			onRequestClose={ onClose }
 		>
 			<div style={ { minWidth: 360, maxWidth: 480 } }>
+				{ defaultStyle && (
+					<fieldset style={ { border: '1px solid #007cba', borderRadius: 6, padding: '12px 16px', marginBottom: 16 } }>
+						<legend style={ { fontWeight: 600, padding: '0 8px' } }>
+							{ __( 'AI Default Style', 'jeo' ) }
+						</legend>
+						<CheckboxControl
+							label={ __( 'Use AI-suggested default style', 'jeo' ) }
+							checked={ useDefault }
+							onChange={ handleToggleDefault }
+						/>
+						{ useDefault && (
+							<div style={ { marginTop: 8, fontSize: '0.85em', color: '#666' } }>
+								{ defaultStyle.filter && (
+									<p style={ { margin: '4px 0' } }>
+										{ __( 'Filter:', 'jeo' ) } <code>{ JSON.stringify( defaultStyle.filter ) }</code>
+									</p>
+								) }
+								{ defaultStyle.paint && (
+									<p style={ { margin: '4px 0' } }>
+										{ __( 'Paint:', 'jeo' ) } <code>{ JSON.stringify( defaultStyle.paint ) }</code>
+									</p>
+								) }
+							</div>
+						) }
+					</fieldset>
+				) }
+
 				{ colorFields.length > 0 && (
 					<fieldset style={ { border: '1px solid #e0e0e0', borderRadius: 6, padding: '12px 16px', marginBottom: 16 } }>
 						<legend style={ { fontWeight: 600, padding: '0 8px' } }>{ __( 'Colors', 'jeo' ) }</legend>
@@ -133,6 +174,7 @@ export default function LayerStyleEditor( { style, layerType, onChange, onClose 
 								label={ field.label }
 								value={ paint[ field.key ] }
 								onChange={ ( v ) => updatePaint( field.key, v ) }
+								disabled={ useDefault }
 							/>
 						) ) }
 					</fieldset>
@@ -150,6 +192,7 @@ export default function LayerStyleEditor( { style, layerType, onChange, onClose 
 								max={ field.max }
 								step={ field.step }
 								onChange={ ( v ) => updatePaint( field.key, v ) }
+								disabled={ useDefault }
 							/>
 						) ) }
 					</fieldset>
@@ -167,6 +210,7 @@ export default function LayerStyleEditor( { style, layerType, onChange, onClose 
 								max={ field.max }
 								step={ field.step }
 								onChange={ ( v ) => updatePaint( field.key, v ) }
+								disabled={ useDefault }
 							/>
 						) ) }
 					</fieldset>

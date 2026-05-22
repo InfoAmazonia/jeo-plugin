@@ -19,6 +19,13 @@ export function renderLayer( { layer, instance } ) {
 	const layerId = `layer_${ instance.id }`;
 	const sourceId = `source_${ instance.id }`;
 
+	const resolveStyle = ( inst, ly ) => {
+		if ( inst.style?.use_default && ly.default_style ) {
+			return ly.default_style;
+		}
+		return inst.style || {};
+	};
+
 	switch ( layer.type ) {
 		case 'mapbox': {
 			const accessToken = options.access_token || mapboxToken;
@@ -53,18 +60,21 @@ export function renderLayer( { layer, instance } ) {
 		case 'mapbox-tileset-vector': {
 			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
+			const effectiveStyle = resolveStyle( instance, layer );
 
 			return (
 				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } paint={ instance.style?.paint } layout={ instance.style?.layout } />
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } filter={ effectiveStyle.filter } paint={ effectiveStyle.paint } layout={ effectiveStyle.layout } />
 				</Source>
 			);
 		}
 
 		case 'mvt': {
+			const effectiveStyle = resolveStyle( instance, layer );
+
 			return (
 				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
-					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } paint={ instance.style?.paint } layout={ instance.style?.layout } />
+					<Layer id={ layerId } type={ options.type } source-layer={ options.source_layer } filter={ effectiveStyle.filter } paint={ effectiveStyle.paint } layout={ effectiveStyle.layout } />
 				</Source>
 			);
 		}
@@ -86,6 +96,9 @@ export const MemoizedRenderLayer = memo( renderLayer, ( props, prevProps ) => {
 	return isEqual(
 		props.layer.layer_type_options,
 		prevProps.layer.layer_type_options
+	) && isEqual(
+		props.layer.default_style,
+		prevProps.layer.default_style
 	) && isEqual(
 		props.instance.style,
 		prevProps.instance.style
