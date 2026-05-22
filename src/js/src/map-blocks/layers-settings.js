@@ -18,7 +18,7 @@ const anySwapDefault = ( settings ) =>
 	settings.some( ( s ) => s.use === 'swappable' && s.default );
 
 export default function LayersSettings ( { attributes, setAttributes, loadedLayers, loadingLayers, closeModal } ) {
-	const setLayers = ( layers ) => setAttributes( { ...attributes, layers } );
+	const setLayers = ( layers ) => setAttributes( { layers } );
 	let widths = [];
 
 	const [ layerTypeFilter, setLayerTypeFilter ] = useState( '' );
@@ -196,7 +196,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 													<p
 														onClick={ () => {
 															setAttributes( {
-																...attributes,
 																layers: [ ...attributes.layers, setLayer( layer.id ) ],
 															} );
 														} }

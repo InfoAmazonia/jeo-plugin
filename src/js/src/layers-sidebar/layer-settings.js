@@ -1,5 +1,5 @@
 import { Button } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { select, withDispatch, withSelect } from '@wordpress/data';
 import {
 	Fragment,
 	useCallback,
@@ -249,10 +249,15 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 
 export default withDispatch( ( dispatch ) => ( {
 	setPostMeta: ( meta ) => {
-		dispatch( 'core/editor' ).editPost( { meta } );
+		const currentMeta =
+			select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+
+		dispatch( 'core/editor' ).editPost( {
+			meta: { ...currentMeta, ...meta },
+		} );
 	},
 } ) )(
 	withSelect( ( select ) => ( {
-		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
+		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {},
 	} ) )( LayerSettings )
 );
