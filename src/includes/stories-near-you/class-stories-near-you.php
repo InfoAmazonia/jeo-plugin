@@ -104,6 +104,8 @@ class Stories_Near_You {
 	 * @return string
 	 */
 	public function render_callback( $attributes ) {
+		static $rendered_ids = array();
+
 		$atts = wp_parse_args(
 			$attributes,
 			array(
@@ -124,9 +126,10 @@ class Stories_Near_You {
 		$use_preview_coords = ! empty( $atts['lat'] ) || ! empty( $atts['lng'] );
 
 		if ( $use_preview_coords ) {
-			$lat      = (float) $atts['lat'];
-			$lng      = (float) $atts['lng'];
-			$post_ids = $this->get_nearby_posts( $lat, $lng, $atts['category'], $atts['tag'], $atts['postsPerPage'] );
+			$lat          = (float) $atts['lat'];
+			$lng          = (float) $atts['lng'];
+			$post_ids     = $this->get_nearby_posts( $lat, $lng, $atts['category'], $atts['tag'], $atts['postsPerPage'], $rendered_ids );
+			$rendered_ids = array_merge( $rendered_ids, $post_ids );
 
 			$wrapper_attrs = get_block_wrapper_attributes(
 				array(
@@ -186,7 +189,7 @@ class Stories_Near_You {
 			<div class="jeo-stories-near-you__error hidden">
 				<p><?php esc_html_e( 'Unable to load stories near you.', 'jeo' ); ?></p>
 			</div>
-			<script type="application/json" class="jeo-stories-near-you-attrs"><?php echo wp_json_encode( $atts ); ?></script>
+			<script type="application/json" class="jeo-stories-near-you-attrs"><?php echo wp_json_encode( array_merge( $atts, array( 'excludeIds' => $rendered_ids ) ) ); ?></script>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -253,6 +256,10 @@ class Stories_Near_You {
 					'showAuthor'    => array(
 						'type'    => 'boolean',
 						'default' => true,
+					),
+					'excludeIds'    => array(
+						'type'    => 'string',
+						'default' => '',
 					),
 				),
 			)
@@ -340,7 +347,8 @@ class Stories_Near_You {
 			'showAuthor'    => filter_var( $request->get_param( 'showAuthor' ), FILTER_VALIDATE_BOOLEAN ),
 		);
 
-		$post_ids = $this->get_nearby_posts( $lat, $lng, $atts['category'], $atts['tag'], $atts['postsPerPage'] );
+		$exclude_ids = $this->parse_exclude_ids( $request->get_param( 'excludeIds' ) );
+		$post_ids    = $this->get_nearby_posts( $lat, $lng, $atts['category'], $atts['tag'], $atts['postsPerPage'], $exclude_ids );
 
 		if ( empty( $post_ids ) ) {
 			return new \WP_REST_Response(
@@ -359,6 +367,27 @@ class Stories_Near_You {
 			),
 			200
 		);
+	}
+
+	/**
+	 * Parse a comma-separated string of post IDs into a sanitized array.
+	 *
+	 * @param string $raw Comma-separated post IDs.
+	 * @return int[] Sanitized post IDs.
+	 */
+	protected function parse_exclude_ids( $raw ) {
+		if ( empty( $raw ) || ! is_string( $raw ) ) {
+			return array();
+		}
+		$parts = explode( ',', $raw );
+		$ids   = array();
+		foreach ( $parts as $part ) {
+			$val = absint( trim( $part ) );
+			if ( $val > 0 ) {
+				$ids[] = $val;
+			}
+		}
+		return array_unique( $ids );
 	}
 
 	/**
@@ -384,9 +413,10 @@ class Stories_Near_You {
 	 * @param int   $category_id Optional category term ID to filter by.
 	 * @param int   $tag_id      Optional tag term ID to filter by.
 	 * @param int   $limit       Maximum number of posts to return.
+	 * @param int[] $exclude_ids Post IDs to exclude from results.
 	 * @return int[] Post IDs ordered by ascending distance.
 	 */
-	protected function get_nearby_posts( $lat, $lng, $category_id, $tag_id, $limit ) {
+	protected function get_nearby_posts( $lat, $lng, $category_id, $tag_id, $limit, $exclude_ids = array() ) {
 		global $wpdb;
 
 		$limit   = max( 1, min( 36, (int) $limit ) );
@@ -417,6 +447,12 @@ class Stories_Near_You {
 			$taxonomy_where .= " AND tt_tag.taxonomy = 'post_tag' AND tt_tag.term_id = " . (int) $tag_id;
 		}
 
+		$exclude_clause = '';
+		if ( ! empty( $exclude_ids ) ) {
+			$exclude_list   = implode( ',', array_map( 'absint', $exclude_ids ) );
+			$exclude_clause = " AND p.ID NOT IN ({$exclude_list})";
+		}
+
 		$primary_template = "
 			SELECT p.ID,
 				ST_Distance_Sphere(POINT(%f, %f), POINT(CAST(tlon.meta_value AS DECIMAL(10,6)), CAST(tlat.meta_value AS DECIMAL(10,6)))) AS distance
@@ -436,7 +472,8 @@ class Stories_Near_You {
 			{$taxonomy_join}
 			WHERE p.post_status = 'publish'
 				AND p.post_type IN ({$types_placeholders})
-				{$taxonomy_where}";
+				{$taxonomy_where}
+				{$exclude_clause}";
 
 		$secondary_template = str_replace(
 			array( '_geocode_lon_p', '_geocode_lat_p' ),
@@ -504,7 +541,7 @@ class Stories_Near_You {
 
 		ob_start();
 		?>
-		<article class="jeo-stories-near-you__post">
+		<article class="jeo-stories-near-you__post" data-post-id="<?php echo (int) $post_id; ?>">
 			<?php if ( $atts['showThumbnail'] && has_post_thumbnail( $post_id ) ) : ?>
 			<figure class="jeo-stories-near-you__post-featured-image">
 				<a href="<?php echo esc_url( $permalink ); ?>">

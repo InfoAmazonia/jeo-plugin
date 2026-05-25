@@ -36,6 +36,7 @@
 			this.element = element;
 			this.geolocationProvider = geolocationProvider;
 			this.attrs = this.parseAttributes();
+			this.excludeIds = [];
 		}
 
 		parseAttributes() {
@@ -47,26 +48,41 @@
 			}
 			try {
 				return JSON.parse( script.textContent );
-			} catch ( e ) {
+			} catch {
 				return {};
 			}
 		}
 
-		async init() {
-			// If geolocation is not supported, fall back to generic listing.
+		setExcludeIds( ids ) {
+			this.excludeIds = ids;
+		}
+
+		getRenderedPostIds() {
+			const articles = this.element.querySelectorAll(
+				'.jeo-stories-near-you__post[data-post-id]'
+			);
+			return Array.from( articles )
+				.map( ( a ) => Number.parseInt( a.dataset.postId, 10 ) )
+				.filter( ( id ) => id > 0 );
+		}
+
+		async init( location ) {
+			if ( location !== undefined ) {
+				await this.fetchAndRender( location );
+				return;
+			}
+
 			if ( ! navigator.geolocation ) {
 				await this.fetchAndRender( null );
 				return;
 			}
 
-			// If the user has previously consented, proceed automatically.
-			if ( window.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
-				const location = await this.geolocationProvider.getLocation();
-				await this.fetchAndRender( location );
+			if ( globalThis.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
+				const loc = await this.geolocationProvider.getLocation();
+				await this.fetchAndRender( loc );
 				return;
 			}
 
-			// Otherwise show an opt-in UI.
 			this.renderConsentPrompt();
 		}
 
@@ -89,11 +105,10 @@
 			this.element.insertBefore( consentEl, this.element.querySelector( '.jeo-stories-near-you__error' ) );
 
 			consentEl.querySelector( '.jeo-stories-near-you__consent-button' ).addEventListener( 'click', async () => {
-				if ( window.localStorage ) {
+				if ( globalThis.localStorage ) {
 					localStorage.setItem( CONSENT_KEY, '1' );
 				}
 				consentEl.remove();
-				// Show skeleton again while loading.
 				this.showSkeleton();
 				const location = await this.geolocationProvider.getLocation();
 				await this.fetchAndRender( location );
@@ -106,7 +121,6 @@
 		}
 
 		showSkeleton() {
-			// Re-create a minimal skeleton for loading state.
 			const skeleton = document.createElement( 'div' );
 			skeleton.className = 'jeo-stories-near-you__skeleton jeo-stories-near-you__grid';
 			if ( this.attrs.postsPerRow ) {
@@ -147,6 +161,13 @@
 				}
 			} );
 
+			const serverExcludeIds = this.attrs.excludeIds || [];
+			const allExclude = [ ...serverExcludeIds, ...this.excludeIds ];
+			const uniqueExclude = [ ...new Set( allExclude.map( ( id ) => Number.parseInt( id, 10 ) ) ) ];
+			if ( uniqueExclude.length ) {
+				params.set( 'excludeIds', uniqueExclude.join( ',' ) );
+			}
+
 			try {
 				const response = await fetch(
 					REST_ENDPOINT + '?' + params.toString()
@@ -158,7 +179,7 @@
 
 				const data = await response.json();
 				this.renderResponse( data.html );
-			} catch ( e ) {
+			} catch {
 				this.showError();
 			}
 		}
@@ -218,14 +239,40 @@
 		}
 	}
 
-	function initAll() {
+	async function resolveSharedLocation( provider ) {
+		if ( ! navigator.geolocation ) {
+			return null;
+		}
+
+		if ( window.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
+			return provider.getLocation();
+		}
+
+		return undefined;
+	}
+
+	async function initAll() {
 		const elements = document.querySelectorAll( CONTAINER_SELECTOR );
 		const provider = new BrowserGeolocationProvider();
 
-		elements.forEach( ( element ) => {
+		if ( elements.length <= 1 ) {
+			elements.forEach( ( element ) => {
+				const instance = new StoriesNearYou( element, provider );
+				instance.init();
+			} );
+			return;
+		}
+
+		const sharedLocation = await resolveSharedLocation( provider );
+		const allRenderedIds = [];
+
+		for ( const element of elements ) {
 			const instance = new StoriesNearYou( element, provider );
-			instance.init();
-		} );
+			instance.setExcludeIds( allRenderedIds );
+			await instance.init( sharedLocation );
+			const ids = instance.getRenderedPostIds();
+			allRenderedIds.push( ...ids );
+		}
 	}
 
 	if ( document.readyState === 'loading' ) {
