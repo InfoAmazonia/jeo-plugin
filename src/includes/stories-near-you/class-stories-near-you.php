@@ -30,34 +30,6 @@ class Stories_Near_You {
 	const POST_LAYOUTS    = array( 'grid', 'list' );
 	const MEDIA_POSITIONS = array( 'top', 'left', 'right', 'behind' );
 	const IMAGE_SHAPES    = array( 'landscape', 'portrait', 'square', 'uncropped' );
-	const ASPECT_RATIOS   = array(
-		'landscape' => '16/9',
-		'portrait'  => '9/16',
-		'square'    => '1/1',
-	);
-	const TYPE_SCALES     = array(
-		1  => '0.7em',
-		2  => '0.9em',
-		3  => '1em',
-		4  => '1.2em',
-		5  => '1.4em',
-		6  => '1.7em',
-		7  => '2em',
-		8  => '2.2em',
-		9  => '2.4em',
-		10 => '2.6em',
-	);
-	const IMAGE_SCALES    = array(
-		1 => '25%',
-		2 => '33%',
-		3 => '50%',
-		4 => '75%',
-	);
-	const COL_GAPS        = array(
-		1 => '8px',
-		2 => '16px',
-		3 => '32px',
-	);
 
 	/**
 	 * Initialize hooks.
@@ -212,6 +184,14 @@ class Stories_Near_You {
 						'type'    => 'string',
 						'default' => '',
 					),
+					'imageSize'          => array(
+						'type'    => 'string',
+						'default' => 'medium_large',
+					),
+					'imageAsLink'        => array(
+						'type'    => 'boolean',
+						'default' => false,
+					),
 				),
 			)
 		);
@@ -256,10 +236,11 @@ class Stories_Near_You {
 				'tagExclusions'      => '',
 				'customTaxonomies'   => '',
 				'postType'           => '',
+				'imageSize'          => 'medium_large',
+				'imageAsLink'        => false,
 			)
 		);
 
-		// Migrate legacy cardLayout → postLayout + mediaPosition.
 		if ( ! empty( $atts['cardLayout'] ) && empty( $atts['postLayout'] ) && 'top' === $atts['mediaPosition'] ) {
 			$migration = array(
 				'grid'         => array(
@@ -294,13 +275,15 @@ class Stories_Near_You {
 		if ( ! in_array( $atts['imageShape'], self::IMAGE_SHAPES, true ) ) {
 			$atts['imageShape'] = 'landscape';
 		}
+		if ( ! in_array( $atts['imageSize'], $this->get_available_image_sizes(), true ) ) {
+			$atts['imageSize'] = 'medium_large';
+		}
 
 		$atts['typeScale']  = max( 1, min( 10, (int) $atts['typeScale'] ) );
 		$atts['imageScale'] = max( 1, min( 4, (int) $atts['imageScale'] ) );
 		$atts['colGap']     = max( 1, min( 3, (int) $atts['colGap'] ) );
 		$atts['minHeight']  = max( 0, min( 100, (int) $atts['minHeight'] ) );
 
-		// Migrate legacy single category/tag to multi-value.
 		if ( empty( $atts['categories'] ) && ! empty( $atts['category'] ) ) {
 			$atts['categories'] = (string) (int) $atts['category'];
 		}
@@ -350,11 +333,7 @@ class Stories_Near_You {
 			$wrapper_classes .= ' ' . $this->build_newspack_wrapper_classes( $atts );
 		}
 
-		$wrapper_extra = array( 'class' => $wrapper_classes );
-		$inline_style  = $this->build_gutenberg_inline_style( $atts );
-		if ( $inline_style ) {
-			$wrapper_extra['style'] = $inline_style;
-		}
+		$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => $wrapper_classes ) );
 
 		if ( $use_preview_coords ) {
 			$lat          = (float) $atts['lat'];
@@ -362,8 +341,6 @@ class Stories_Near_You {
 			$filters      = $this->build_filters( $atts );
 			$post_ids     = $this->get_nearby_posts( $lat, $lng, $atts['postsPerPage'], $rendered_ids, $filters );
 			$rendered_ids = array_merge( $rendered_ids, $post_ids );
-
-			$wrapper_attrs = get_block_wrapper_attributes( $wrapper_extra );
 
 			ob_start();
 			?>
@@ -377,8 +354,6 @@ class Stories_Near_You {
 			<?php
 			return ob_get_clean();
 		}
-
-		$wrapper_attrs = get_block_wrapper_attributes( $wrapper_extra );
 
 		ob_start();
 		?>
@@ -591,9 +566,29 @@ class Stories_Near_You {
 						'type'    => 'string',
 						'default' => '',
 					),
+					'imageSize'          => array(
+						'type'    => 'string',
+						'default' => 'medium_large',
+						'enum'    => $this->get_available_image_sizes(),
+					),
+					'imageAsLink'        => array(
+						'type'    => 'boolean',
+						'default' => false,
+					),
 				),
 			)
 		);
+	}
+
+	/**
+	 * Get all registered image size slugs including 'full'.
+	 *
+	 * @return string[] Image size slugs.
+	 */
+	protected function get_available_image_sizes() {
+		$sizes   = get_intermediate_image_sizes();
+		$sizes[] = 'full';
+		return $sizes;
 	}
 
 	/**
@@ -694,6 +689,8 @@ class Stories_Near_You {
 			'tagExclusions'      => $request->get_param( 'tagExclusions' ),
 			'customTaxonomies'   => $request->get_param( 'customTaxonomies' ),
 			'postType'           => $request->get_param( 'postType' ),
+			'imageSize'          => $request->get_param( 'imageSize' ),
+			'imageAsLink'        => filter_var( $request->get_param( 'imageAsLink' ), FILTER_VALIDATE_BOOLEAN ),
 		);
 
 		$atts        = $this->sanitize_atts( $atts );
@@ -703,7 +700,10 @@ class Stories_Near_You {
 
 		if ( empty( $post_ids ) ) {
 			return new \WP_REST_Response(
-				array( 'html' => $this->render_empty_state() ),
+				array(
+					'html'    => $this->render_empty_state(),
+					'postIds' => array(),
+				),
 				200
 			);
 		}
@@ -711,7 +711,10 @@ class Stories_Near_You {
 		$html = $this->render_posts( $post_ids, $atts );
 
 		return new \WP_REST_Response(
-			array( 'html' => $html ),
+			array(
+				'html'    => $html,
+				'postIds' => $post_ids,
+			),
 			200
 		);
 	}
@@ -748,7 +751,6 @@ class Stories_Near_You {
 		$lat   = (float) $lat;
 		$lng   = (float) $lng;
 
-		// Post types: per-block subset intersected with globally geo-enabled types.
 		$enabled = array_map( 'sanitize_key', \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) ) );
 		$enabled = array_filter( $enabled );
 		if ( empty( $enabled ) ) {
@@ -767,7 +769,6 @@ class Stories_Near_You {
 
 		$types_placeholders = implode( ',', array_fill( 0, count( $types ), '%s' ) );
 
-		// Build taxonomy JOIN/WHERE from filters.
 		$taxonomy_join  = '';
 		$taxonomy_where = '';
 
@@ -785,7 +786,6 @@ class Stories_Near_You {
 			$taxonomy_where .= " AND tt_tag.taxonomy = 'post_tag' AND tt_tag.term_id IN ({$tag_ids})";
 		}
 
-		// Custom taxonomies.
 		$tx_idx = 0;
 		if ( ! empty( $filters['custom_taxonomies'] ) ) {
 			foreach ( $filters['custom_taxonomies'] as $tax ) {
@@ -804,7 +804,6 @@ class Stories_Near_You {
 			}
 		}
 
-		// Exclusion sub-queries.
 		$exclude_clause = '';
 		if ( ! empty( $exclude_ids ) ) {
 			$exclude_list   = implode( ',', array_map( 'absint', $exclude_ids ) );

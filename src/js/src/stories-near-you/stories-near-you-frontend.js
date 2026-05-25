@@ -37,6 +37,7 @@
 			this.geolocationProvider = geolocationProvider;
 			this.attrs = this.parseAttributes();
 			this.excludeIds = [];
+			this.renderedPostIds = [];
 		}
 
 		parseAttributes() {
@@ -58,12 +59,7 @@
 		}
 
 		getRenderedPostIds() {
-			const articles = this.element.querySelectorAll(
-				'[data-post-id]'
-			);
-			return Array.from( articles )
-				.map( ( a ) => Number.parseInt( a.dataset.postId, 10 ) )
-				.filter( ( id ) => id > 0 );
+			return this.renderedPostIds;
 		}
 
 		async init( location ) {
@@ -168,6 +164,8 @@
 				'tagExclusions',
 				'customTaxonomies',
 				'postType',
+				'imageSize',
+				'imageAsLink',
 			];
 
 			keys.forEach( ( key ) => {
@@ -193,6 +191,7 @@
 				}
 
 				const data = await response.json();
+				this.renderedPostIds = [ ...this.renderedPostIds, ...( data.postIds || [] ) ];
 				this.renderResponse( data.html );
 			} catch ( e ) {
 				this.showError();

@@ -44,10 +44,16 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		categoryExclusions,
 		tagExclusions,
 		postType,
+		imageSize,
+		imageAsLink,
 	} = attributes;
 
 	const [ previewLat, setPreviewLat ] = useState( DEFAULT_LAT );
 	const [ previewLng, setPreviewLng ] = useState( DEFAULT_LNG );
+
+	const hasNewspack = useSelect( ( select ) => {
+		return !! select( 'core/blocks' ).getBlockType( 'newspack-blocks/homepage-articles' );
+	}, [] );
 
 	const categoryList = useSelect( ( select ) => {
 		return select( 'core' ).getEntityRecords( 'taxonomy', 'category', {
@@ -71,6 +77,12 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		const jeoTypes = globalThis.jeo_settings?.enabled_post_types || [ 'post' ];
 		return types.filter(
 			( t ) => jeoTypes.includes( t.slug ) && t.rest_base
+		);
+	}, [] );
+
+	const imageSizeOptions = useSelect( ( select ) => {
+		return ( select( 'core/block-editor' ).getSettings().imageSizes || [] ).map(
+			( s ) => ( { label: s.name, value: s.slug } )
 		);
 	}, [] );
 
@@ -118,9 +130,6 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		? tagExclusions.split( ',' ).filter( Boolean )
 		: [];
 
-	const isHorizontal = mediaPosition === 'left' || mediaPosition === 'right';
-	const isFeatured = mediaPosition === 'behind';
-
 	return (
 		<div { ...blockProps }>
 			<InspectorControls>
@@ -157,31 +166,9 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						value={ postLayout }
 						options={ [
 							{ label: __( 'Grid', 'jeo' ), value: 'grid' },
-							{ label: __( 'List (stacked)', 'jeo' ), value: 'list' },
+							{ label: __( 'List', 'jeo' ), value: 'list' },
 						] }
 						onChange={ ( val ) => setAttributes( { postLayout: val } ) }
-					/>
-					<SelectControl
-						label={ __( 'Media position', 'jeo' ) }
-						value={ mediaPosition }
-						options={ [
-							{ label: __( 'Top', 'jeo' ), value: 'top' },
-							{ label: __( 'Left', 'jeo' ), value: 'left' },
-							{ label: __( 'Right', 'jeo' ), value: 'right' },
-							{ label: __( 'Behind', 'jeo' ), value: 'behind' },
-						] }
-						onChange={ ( val ) => setAttributes( { mediaPosition: val } ) }
-					/>
-					<SelectControl
-						label={ __( 'Image shape', 'jeo' ) }
-						value={ imageShape }
-						options={ [
-							{ label: __( 'Landscape', 'jeo' ), value: 'landscape' },
-							{ label: __( 'Portrait', 'jeo' ), value: 'portrait' },
-							{ label: __( 'Square', 'jeo' ), value: 'square' },
-							{ label: __( 'Uncropped', 'jeo' ), value: 'uncropped' },
-						] }
-						onChange={ ( val ) => setAttributes( { imageShape: val } ) }
 					/>
 					{ postLayout === 'grid' && (
 						<RangeControl
@@ -191,6 +178,47 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 							min={ 1 }
 							max={ 6 }
 						/>
+					) }
+					{ hasNewspack && (
+						<>
+							<SelectControl
+								label={ __( 'Media position', 'jeo' ) }
+								value={ mediaPosition }
+								options={ [
+									{ label: __( 'Top', 'jeo' ), value: 'top' },
+									{ label: __( 'Left', 'jeo' ), value: 'left' },
+									{ label: __( 'Right', 'jeo' ), value: 'right' },
+									{ label: __( 'Behind', 'jeo' ), value: 'behind' },
+								] }
+								onChange={ ( val ) => setAttributes( { mediaPosition: val } ) }
+							/>
+							<SelectControl
+								label={ __( 'Image shape', 'jeo' ) }
+								value={ imageShape }
+								options={ [
+									{ label: __( 'Landscape', 'jeo' ), value: 'landscape' },
+									{ label: __( 'Portrait', 'jeo' ), value: 'portrait' },
+									{ label: __( 'Square', 'jeo' ), value: 'square' },
+									{ label: __( 'Uncropped', 'jeo' ), value: 'uncropped' },
+								] }
+								onChange={ ( val ) => setAttributes( { imageShape: val } ) }
+							/>
+						</>
+					) }
+					{ ! hasNewspack && (
+						<>
+							<SelectControl
+								label={ __( 'Image size', 'jeo' ) }
+								value={ imageSize }
+								options={ imageSizeOptions }
+								onChange={ ( val ) => setAttributes( { imageSize: val } ) }
+							/>
+							<ToggleControl
+								label={ __( 'Link featured image', 'jeo' ) }
+								checked={ imageAsLink }
+								onChange={ ( val ) => setAttributes( { imageAsLink: val } ) }
+							/>
+						</>
 					) }
 				</PanelBody>
 
@@ -258,11 +286,13 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						checked={ showThumbnail }
 						onChange={ ( val ) => setAttributes( { showThumbnail: val } ) }
 					/>
-					<ToggleControl
-						label={ __( 'Show category', 'jeo' ) }
-						checked={ showCategory }
-						onChange={ ( val ) => setAttributes( { showCategory: val } ) }
-					/>
+					{ hasNewspack && (
+						<ToggleControl
+							label={ __( 'Show category', 'jeo' ) }
+							checked={ showCategory }
+							onChange={ ( val ) => setAttributes( { showCategory: val } ) }
+						/>
+					) }
 					<ToggleControl
 						label={ __( 'Show date', 'jeo' ) }
 						checked={ showDate }
@@ -287,41 +317,45 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						checked={ showAuthor }
 						onChange={ ( val ) => setAttributes( { showAuthor: val } ) }
 					/>
-					{ showAuthor && (
+					{ hasNewspack && showAuthor && (
 						<ToggleControl
 							label={ __( 'Show avatar', 'jeo' ) }
 							checked={ showAvatar }
 							onChange={ ( val ) => setAttributes( { showAvatar: val } ) }
 						/>
 					) }
-					<ToggleControl
-						label={ __( 'Show read more link', 'jeo' ) }
-						checked={ showReadMore }
-						onChange={ ( val ) => setAttributes( { showReadMore: val } ) }
-					/>
-					{ showReadMore && (
-						<TextControl
-							label={ __( 'Read more label', 'jeo' ) }
-							type="text"
-							value={ readMoreLabel }
-							placeholder={ __( 'Read more', 'jeo' ) }
-							onChange={ ( val ) => setAttributes( { readMoreLabel: val } ) }
-						/>
+					{ hasNewspack && (
+						<>
+							<ToggleControl
+								label={ __( 'Show read more link', 'jeo' ) }
+								checked={ showReadMore }
+								onChange={ ( val ) => setAttributes( { showReadMore: val } ) }
+							/>
+							{ showReadMore && (
+								<TextControl
+									label={ __( 'Read more label', 'jeo' ) }
+									type="text"
+									value={ readMoreLabel }
+									placeholder={ __( 'Read more', 'jeo' ) }
+									onChange={ ( val ) => setAttributes( { readMoreLabel: val } ) }
+								/>
+							) }
+						</>
 					) }
 				</PanelBody>
 
-				<PanelBody
-					title={ __( 'Typography & Spacing', 'jeo' ) }
-					initialOpen={ false }
-				>
-					<RangeControl
-						label={ __( 'Type scale', 'jeo' ) }
-						value={ typeScale }
-						onChange={ ( val ) => setAttributes( { typeScale: val } ) }
-						min={ 1 }
-						max={ 10 }
-					/>
-					{ isHorizontal && (
+				{ hasNewspack && (
+					<PanelBody
+						title={ __( 'Typography & Spacing', 'jeo' ) }
+						initialOpen={ false }
+					>
+						<RangeControl
+							label={ __( 'Type scale', 'jeo' ) }
+							value={ typeScale }
+							onChange={ ( val ) => setAttributes( { typeScale: val } ) }
+							min={ 1 }
+							max={ 10 }
+						/>
 						<RangeControl
 							label={ __( 'Image scale', 'jeo' ) }
 							value={ imageScale }
@@ -329,15 +363,13 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 							min={ 1 }
 							max={ 4 }
 						/>
-					) }
-					<RangeControl
-						label={ __( 'Column gap', 'jeo' ) }
-						value={ colGap }
-						onChange={ ( val ) => setAttributes( { colGap: val } ) }
-						min={ 1 }
-						max={ 3 }
-					/>
-					{ isFeatured && (
+						<RangeControl
+							label={ __( 'Column gap', 'jeo' ) }
+							value={ colGap }
+							onChange={ ( val ) => setAttributes( { colGap: val } ) }
+							min={ 1 }
+							max={ 3 }
+						/>
 						<RangeControl
 							label={ __( 'Min height (vh)', 'jeo' ) }
 							value={ minHeight }
@@ -345,8 +377,8 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 							min={ 0 }
 							max={ 100 }
 						/>
-					) }
-				</PanelBody>
+					</PanelBody>
+				) }
 			</InspectorControls>
 
 			<ServerSideRender

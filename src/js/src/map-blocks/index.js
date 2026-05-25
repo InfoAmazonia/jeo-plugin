@@ -493,6 +493,14 @@ registerBlockType( 'jeo/stories-near-you', {
 			type: 'string',
 			default: '',
 		},
+		imageSize: {
+			type: 'string',
+			default: 'medium_large',
+		},
+		imageAsLink: {
+			type: 'boolean',
+			default: false,
+		},
 	},
 	edit: StoriesNearYouEditor,
 	save: () => null,
