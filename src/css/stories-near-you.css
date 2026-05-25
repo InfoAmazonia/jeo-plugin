@@ -1,122 +1,4 @@
-.wp-block-jeo-stories-near-you {
-	max-width: 100%;
-}
-
-.jeo-stories-near-you__grid {
-	display: grid;
-	gap: 24px;
-}
-
-.jeo-stories-near-you__grid--cols-1 { grid-template-columns: 1fr; }
-.jeo-stories-near-you__grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
-.jeo-stories-near-you__grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
-.jeo-stories-near-you__grid--cols-4 { grid-template-columns: repeat(4, 1fr); }
-.jeo-stories-near-you__grid--cols-5 { grid-template-columns: repeat(5, 1fr); }
-.jeo-stories-near-you__grid--cols-6 { grid-template-columns: repeat(6, 1fr); }
-
-@media (max-width: 782px) {
-	.jeo-stories-near-you__grid--cols-4,
-	.jeo-stories-near-you__grid--cols-5,
-	.jeo-stories-near-you__grid--cols-6 {
-		grid-template-columns: repeat(3, 1fr);
-	}
-}
-
-@media (max-width: 600px) {
-	.jeo-stories-near-you__grid--cols-3,
-	.jeo-stories-near-you__grid--cols-4,
-	.jeo-stories-near-you__grid--cols-5,
-	.jeo-stories-near-you__grid--cols-6 {
-		grid-template-columns: repeat(2, 1fr);
-	}
-}
-
-/* Post card */
-.jeo-stories-near-you__post {
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-	border-radius: 4px;
-}
-
-.jeo-stories-near-you__post-featured-image {
-	margin: 0;
-	order: 0;
-	line-height: 0;
-}
-
-.jeo-stories-near-you__post-featured-image a {
-	display: block;
-}
-
-.jeo-stories-near-you__post-featured-image--placeholder {
-	display: none;
-}
-
-.jeo-stories-near-you__post-image {
-	width: 100%;
-	height: auto;
-	object-fit: cover;
-	display: block;
-}
-
-.jeo-stories-near-you__post-content {
-	padding: 12px 16px;
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	flex: 1;
-}
-
-.jeo-stories-near-you__post-terms {
-	order: 1;
-	display: flex;
-	flex-wrap: wrap;
-	gap: 4px;
-}
-
-.jeo-stories-near-you__post-term {
-	display: inline-block;
-	font-size: 0.75em;
-	text-transform: uppercase;
-	letter-spacing: 0.04em;
-}
-
-.jeo-stories-near-you__post-title {
-	order: 2;
-	margin: 0;
-	font-size: 1.1em;
-	line-height: 1.3;
-	font-weight: 600;
-}
-
-.jeo-stories-near-you__post-title a {
-	color: inherit;
-	text-decoration: none;
-}
-
-.jeo-stories-near-you__post-title a:hover {
-	text-decoration: underline;
-}
-
-.jeo-stories-near-you__post-date {
-	order: 3;
-	font-size: 0.85em;
-}
-
-.jeo-stories-near-you__post-excerpt {
-	order: 4;
-	margin: 0;
-	font-size: 0.9em;
-	line-height: 1.5;
-}
-
-.jeo-stories-near-you__post-author {
-	order: 5;
-	font-size: 0.85em;
-}
-
-/* Skeleton */
+/* Skeleton loading cards */
 .jeo-stories-near-you__skeleton-card {
 	display: flex;
 	flex-direction: column;
@@ -164,6 +46,7 @@
 	text-align: center;
 }
 
+/* Error state */
 .jeo-stories-near-you__error {
 	padding: 40px 20px;
 	text-align: center;
@@ -204,4 +87,185 @@
 .jeo-stories-near-you__consent-skip {
 	background: transparent;
 	color: #0073aa;
+}
+
+/*
+ * All layout overrides below are scoped to the SNU block wrapper.
+ * Gutenberg path uses core/latest-posts classes inside our container.
+ */
+.wp-block-jeo-stories-near-you {
+
+	/*
+	 * Horizontal card (list) — image left.
+	 */
+	.jeo-snu-list > li {
+		display: flex;
+		gap: 1em;
+		align-items: flex-start;
+	}
+
+	.jeo-snu-list > li > .wp-block-latest-posts__featured-image {
+		max-width: 33%;
+	}
+
+	.jeo-snu-list > li > .wp-block-latest-posts__featured-image img {
+		width: 100%;
+		height: auto;
+		object-fit: cover;
+	}
+
+	/*
+	 * Horizontal card (list-reverse) — image right.
+	 */
+	.jeo-snu-list-reverse > li {
+		display: flex;
+		flex-direction: row-reverse;
+		gap: 1em;
+		align-items: flex-start;
+	}
+
+	.jeo-snu-list-reverse > li > .wp-block-latest-posts__featured-image {
+		max-width: 33%;
+	}
+
+	.jeo-snu-list-reverse > li > .wp-block-latest-posts__featured-image img {
+		width: 100%;
+		height: auto;
+		object-fit: cover;
+	}
+
+	/*
+	 * Image scale variants for horizontal layouts.
+	 */
+	.jeo-snu-is-1 > li > .wp-block-latest-posts__featured-image { flex: 0 0 25%; max-width: 25%; }
+	.jeo-snu-is-2 > li > .wp-block-latest-posts__featured-image { flex: 0 0 33%; max-width: 33%; }
+	.jeo-snu-is-3 > li > .wp-block-latest-posts__featured-image { flex: 0 0 50%; max-width: 50%; }
+	.jeo-snu-is-4 > li > .wp-block-latest-posts__featured-image { flex: 0 0 75%; max-width: 75%; }
+
+	/*
+	 * Featured card (image behind text).
+	 */
+	.jeo-snu-featured > li {
+		position: relative;
+		min-height: 300px;
+		overflow: hidden;
+		display: flex;
+		align-items: flex-end;
+	}
+
+	.jeo-snu-featured > li > .wp-block-latest-posts__featured-image {
+		position: absolute;
+		inset: 0;
+		z-index: 0;
+		margin: 0;
+	}
+
+	.jeo-snu-featured > li > .wp-block-latest-posts__featured-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.jeo-snu-featured > li > .wp-block-latest-posts__featured-image a {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.jeo-snu-featured .jeo-snu-featured__overlay {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 60%, transparent 100%);
+		z-index: 1;
+	}
+
+	.jeo-snu-featured__content,
+	.jeo-snu-featured > li > .wp-block-latest-posts__post-title,
+	.jeo-snu-featured > li > .wp-block-latest-posts__post-date,
+	.jeo-snu-featured > li > .wp-block-latest-posts__post-author,
+	.jeo-snu-featured > li > .wp-block-latest-posts__post-excerpt,
+	.jeo-snu-featured > li > .wp-block-post-terms {
+		position: relative;
+		z-index: 2;
+		color: #fff;
+	}
+
+	.jeo-snu-featured > li > .wp-block-latest-posts__post-title a,
+	.jeo-snu-featured > li > .wp-block-post-terms a {
+		color: #fff;
+	}
+
+	/* Avatar */
+	.jeo-snu-avatar {
+		border-radius: 50%;
+		vertical-align: middle;
+		margin-right: 0.4em;
+		width: 25px;
+		height: 25px;
+	}
+
+	.wp-block-latest-posts__post-author {
+		display: flex;
+		align-items: center;
+		gap: 0.3em;
+		font-size: 0.85em;
+	}
+
+	/* Read more link */
+	.jeo-snu-read-more {
+		display: inline-block;
+		margin-top: 0.5em;
+		font-size: 0.9em;
+		text-decoration: underline;
+		text-decoration-style: dotted;
+	}
+
+	.jeo-snu-read-more:hover {
+		text-decoration-style: solid;
+	}
+
+	/* Grid + list: collapse horizontal to column when grid forces equal-width cells */
+	.is-grid.jeo-snu-list > li,
+	.is-grid.jeo-snu-list-reverse > li {
+		flex-direction: column;
+	}
+
+	.is-grid.jeo-snu-list > li > .wp-block-latest-posts__featured-image,
+	.is-grid.jeo-snu-list-reverse > li > .wp-block-latest-posts__featured-image {
+		flex: none;
+		max-width: 100%;
+	}
+
+	/* Grid + featured */
+	.is-grid.jeo-snu-featured > li {
+		min-height: 200px;
+	}
+
+	/* Content wrapper for horizontal/featured layouts */
+	.jeo-snu-list__content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.25em;
+	}
+}
+
+/* Responsive: collapse horizontal/featured on mobile */
+@media (max-width: 600px) {
+	.wp-block-jeo-stories-near-you {
+		.jeo-snu-list > li,
+		.jeo-snu-list-reverse > li {
+			flex-direction: column;
+		}
+
+		.jeo-snu-list > li > .wp-block-latest-posts__featured-image,
+		.jeo-snu-list-reverse > li > .wp-block-latest-posts__featured-image {
+			flex: none;
+			max-width: 100%;
+		}
+
+		.jeo-snu-featured > li {
+			min-height: 200px;
+		}
+	}
 }

@@ -48,7 +48,7 @@
 			}
 			try {
 				return JSON.parse( script.textContent );
-			} catch {
+			} catch ( e ) {
 				return {};
 			}
 		}
@@ -59,7 +59,7 @@
 
 		getRenderedPostIds() {
 			const articles = this.element.querySelectorAll(
-				'.jeo-stories-near-you__post[data-post-id]'
+				'[data-post-id]'
 			);
 			return Array.from( articles )
 				.map( ( a ) => Number.parseInt( a.dataset.postId, 10 ) )
@@ -77,7 +77,7 @@
 				return;
 			}
 
-			if ( globalThis.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
+			if ( window.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
 				const loc = await this.geolocationProvider.getLocation();
 				await this.fetchAndRender( loc );
 				return;
@@ -105,7 +105,7 @@
 			this.element.insertBefore( consentEl, this.element.querySelector( '.jeo-stories-near-you__error' ) );
 
 			consentEl.querySelector( '.jeo-stories-near-you__consent-button' ).addEventListener( 'click', async () => {
-				if ( globalThis.localStorage ) {
+				if ( window.localStorage ) {
 					localStorage.setItem( CONSENT_KEY, '1' );
 				}
 				consentEl.remove();
@@ -146,17 +146,32 @@
 			const keys = [
 				'postsPerPage',
 				'postsPerRow',
-				'category',
-				'tag',
 				'showThumbnail',
 				'showCategory',
 				'showDate',
 				'showExcerpt',
 				'showAuthor',
+				'postLayout',
+				'mediaPosition',
+				'imageShape',
+				'excerptLength',
+				'showReadMore',
+				'readMoreLabel',
+				'showAvatar',
+				'colGap',
+				'typeScale',
+				'imageScale',
+				'minHeight',
+				'categories',
+				'tags',
+				'categoryExclusions',
+				'tagExclusions',
+				'customTaxonomies',
+				'postType',
 			];
 
 			keys.forEach( ( key ) => {
-				if ( this.attrs[ key ] !== undefined ) {
+				if ( this.attrs[ key ] !== undefined && this.attrs[ key ] !== '' ) {
 					params.set( key, this.attrs[ key ] );
 				}
 			} );
@@ -179,7 +194,7 @@
 
 				const data = await response.json();
 				this.renderResponse( data.html );
-			} catch {
+			} catch ( e ) {
 				this.showError();
 			}
 		}
@@ -203,10 +218,10 @@
 			if ( html ) {
 				const temp = document.createElement( 'div' );
 				temp.innerHTML = html;
-				const grid = temp.firstElementChild;
-				if ( grid ) {
+				const content = temp.firstElementChild;
+				if ( content ) {
 					this.element.insertBefore(
-						grid,
+						content,
 						this.element.querySelector(
 							'.jeo-stories-near-you__error'
 						)
