@@ -217,14 +217,11 @@
 			if ( html ) {
 				const temp = document.createElement( 'div' );
 				temp.innerHTML = html;
-				const content = temp.firstElementChild;
-				if ( content ) {
-					this.element.insertBefore(
-						content,
-						this.element.querySelector(
-							'.jeo-stories-near-you__error'
-						)
-					);
+				const errorRef = this.element.querySelector(
+					'.jeo-stories-near-you__error'
+				);
+				while ( temp.firstChild ) {
+					this.element.insertBefore( temp.firstChild, errorRef );
 				}
 			}
 		}

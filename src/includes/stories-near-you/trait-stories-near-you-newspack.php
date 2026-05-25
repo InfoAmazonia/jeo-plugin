@@ -31,8 +31,8 @@ trait Stories_Near_You_Newspack {
 	 * @return void
 	 */
 	protected function enqueue_newspack_styles() {
-		if ( function_exists( 'newspack_blocks_enqueue_block_homepage_articles_styles' ) ) {
-			\newspack_blocks_enqueue_block_homepage_articles_styles();
+		if ( class_exists( 'Newspack_Blocks' ) && method_exists( 'Newspack_Blocks', 'enqueue_view_assets' ) ) {
+			\Newspack_Blocks::enqueue_view_assets( 'homepage-articles' );
 		}
 	}
 
@@ -161,6 +161,7 @@ trait Stories_Near_You_Newspack {
 		$newspack_blocks_hpb_rendering_context['attrs'] = $newspack_attrs;
 
 		ob_start();
+
 		echo '<div data-posts>';
 
 		if ( $query->have_posts() ) {

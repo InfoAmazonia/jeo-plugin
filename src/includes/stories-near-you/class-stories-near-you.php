@@ -769,6 +769,16 @@ class Stories_Near_You {
 
 		$types_placeholders = implode( ',', array_fill( 0, count( $types ), '%s' ) );
 
+		$wpml_join  = '';
+		$wpml_where = '';
+		if ( defined( 'ICL_SITEPRESS_VERSION' ) || class_exists( 'SitePress' ) ) {
+			$current_lang = apply_filters( 'wpml_current_language', null );
+			if ( $current_lang ) {
+				$wpml_join  = " INNER JOIN {$wpdb->prefix}icl_translations icl ON p.ID = icl.element_id AND icl.element_type = CONCAT('post_', p.post_type)";
+				$wpml_where = $wpdb->prepare( ' AND icl.language_code = %s', $current_lang );
+			}
+		}
+
 		$taxonomy_join  = '';
 		$taxonomy_where = '';
 
@@ -837,9 +847,11 @@ class Stories_Near_You {
 				GROUP BY post_id
 			) tlat ON p.ID = tlat.post_id
 			{$taxonomy_join}
+			{$wpml_join}
 			WHERE p.post_status = 'publish'
 				AND p.post_type IN ({$types_placeholders})
 				{$taxonomy_where}
+				{$wpml_where}
 				{$exclude_clause}";
 
 		$secondary_template = str_replace(

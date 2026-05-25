@@ -53,7 +53,7 @@
 }
 
 .jeo-stories-near-you__error.hidden {
-	display: none;
+	display: none !important;
 }
 
 /* Geolocation consent */
