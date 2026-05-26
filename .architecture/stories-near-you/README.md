@@ -161,6 +161,21 @@ PHP `render_callback` uses a `static $rendered_ids` array. Each block invocation
 4. The next block sends the accumulated `excludeIds` to the REST endpoint.
 5. The REST endpoint parses `excludeIds` via `parse_id_list()` and passes them to `get_nearby_posts()`.
 
+### Frontend Waterfall (Consent Flow)
+
+When multiple blocks exist and the user has **not** previously consented to geolocation:
+
+1. All blocks render their consent prompts.
+2. Each instance receives a shared `waterfallTrigger` callback via `setWaterfallTrigger()`.
+3. When the user clicks **"Use my location"** on **any** block, `triggerWaterfall()` fires:
+   - Persists consent to `localStorage`.
+   - Obtains geolocation **once** from the browser.
+   - Removes all consent prompts across all blocks.
+   - Shows skeletons on blocks that haven't rendered yet.
+   - Runs the sequential waterfall **in DOM order**, skipping any block that already rendered (e.g. via "Skip").
+4. If the user clicks **"Skip"** instead, only that individual block renders without location (no waterfall).
+5. Subsequent clicks on "Use my location" reuse the same promise (singleton pattern) to prevent duplicate waterfalls.
+
 ### Trade-off
 
 Sequential fetching means N blocks take ~N×200ms instead of ~200ms total. Acceptable for typical 2-3 block pages.

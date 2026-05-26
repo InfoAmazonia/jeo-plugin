@@ -18,7 +18,10 @@
 							lng: position.coords.longitude,
 						} );
 					},
-					() => {
+					( error ) => {
+						if ( error.code === error.PERMISSION_DENIED ) {
+							localStorage.removeItem( CONSENT_KEY );
+						}
 						resolve( null );
 					},
 					{
@@ -38,6 +41,8 @@
 			this.attrs = this.parseAttributes();
 			this.excludeIds = [];
 			this.renderedPostIds = [];
+			this.hasRendered = false;
+			this.waterfallTrigger = null;
 		}
 
 		parseAttributes() {
@@ -58,6 +63,10 @@
 			this.excludeIds = ids;
 		}
 
+		setWaterfallTrigger( fn ) {
+			this.waterfallTrigger = fn;
+		}
+
 		getRenderedPostIds() {
 			return this.renderedPostIds;
 		}
@@ -73,7 +82,7 @@
 				return;
 			}
 
-			if ( window.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
+			if ( localStorage.getItem( CONSENT_KEY ) === '1' ) {
 				const loc = await this.geolocationProvider.getLocation();
 				await this.fetchAndRender( loc );
 				return;
@@ -101,9 +110,11 @@
 			this.element.insertBefore( consentEl, this.element.querySelector( '.jeo-stories-near-you__error' ) );
 
 			consentEl.querySelector( '.jeo-stories-near-you__consent-button' ).addEventListener( 'click', async () => {
-				if ( window.localStorage ) {
-					localStorage.setItem( CONSENT_KEY, '1' );
+				if ( this.waterfallTrigger ) {
+					await this.waterfallTrigger();
+					return;
 				}
+				localStorage.setItem( CONSENT_KEY, '1' );
 				consentEl.remove();
 				this.showSkeleton();
 				const location = await this.geolocationProvider.getLocation();
@@ -192,6 +203,7 @@
 
 				const data = await response.json();
 				this.renderedPostIds = [ ...this.renderedPostIds, ...( data.postIds || [] ) ];
+				this.hasRendered = true;
 				this.renderResponse( data.html );
 			} catch ( e ) {
 				this.showError();
@@ -255,7 +267,7 @@
 			return null;
 		}
 
-		if ( window.localStorage && localStorage.getItem( CONSENT_KEY ) === '1' ) {
+		if ( localStorage.getItem( CONSENT_KEY ) === '1' ) {
 			return provider.getLocation();
 		}
 
@@ -274,11 +286,55 @@
 			return;
 		}
 
-		const sharedLocation = await resolveSharedLocation( provider );
-		const allRenderedIds = [];
+		const instances = [];
+		let waterfallPromise = null;
+
+		const triggerWaterfall = async () => {
+			if ( waterfallPromise ) {
+				return waterfallPromise;
+			}
+
+			localStorage.setItem( CONSENT_KEY, '1' );
+
+			waterfallPromise = ( async () => {
+				const location = await provider.getLocation();
+
+				for ( const inst of instances ) {
+					const consentEl = inst.element.querySelector( '.jeo-stories-near-you__consent' );
+					if ( consentEl ) {
+						consentEl.remove();
+					}
+					if ( ! inst.hasRendered && ! inst.element.querySelector( '.jeo-stories-near-you__skeleton' ) ) {
+						inst.showSkeleton();
+					}
+				}
+
+				const allRenderedIds = [];
+				for ( const inst of instances ) {
+					if ( inst.hasRendered ) {
+						allRenderedIds.push( ...inst.getRenderedPostIds() );
+						continue;
+					}
+					inst.setExcludeIds( allRenderedIds );
+					await inst.fetchAndRender( location );
+					const ids = inst.getRenderedPostIds();
+					allRenderedIds.push( ...ids );
+				}
+			} )();
+
+			return waterfallPromise;
+		};
 
 		for ( const element of elements ) {
 			const instance = new StoriesNearYou( element, provider );
+			instance.setWaterfallTrigger( triggerWaterfall );
+			instances.push( instance );
+		}
+
+		const sharedLocation = await resolveSharedLocation( provider );
+		const allRenderedIds = [];
+
+		for ( const instance of instances ) {
 			instance.setExcludeIds( allRenderedIds );
 			await instance.init( sharedLocation );
 			const ids = instance.getRenderedPostIds();
