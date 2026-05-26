@@ -1,46 +1,42 @@
 # Map block
 
-After [creating maps](map-post.md), it is possible to display them apart or inside a block. This functionality makes possible to group maps, increasing your post organization.
+After [creating maps](map-post.md), you can display them inside any post using the **JEO Map** block.
 
-## Displaying a map apart
+## Adding a map to a post
 
-When creating a new post, note that is available a new block category: **JEO**.
+When creating a new post, you'll find a new block category: **JEO**.
 
 ![JEO block](img/JEO-block.png)
 
-Selecting **JEO Map** block, you can search for any map you've created.
+Select the **JEO Map** block and search for any map you've created.
 
 ![JEO block - Search Bar](img/JEO-block-search-bar.png)
 
-With a map selected, you are able to choose an optional alignment (`Left`, `Right`, `Centre`, `Wide Width` or `Full Width`). `Centre` is the standard alignment.
+### Alignment options
 
-![Map Alignment](img/map-alignment.png)
+With a map selected, you can choose an alignment:
 
-### Left
+| Alignment | Description |
+|-----------|-------------|
+| Center | Default. Map is centered within the content area |
+| Left | Map floats left with text wrapping around it |
+| Right | Map floats right with text wrapping around it |
+| Wide Width | Map extends beyond the content area |
+| Full Width | Map spans the full width of the page |
 
 ![Map Alignment - Left](img/map-alignment-left.png)
 
-### Right
-
-![Map Alignment - Right](img/map-alignment-right.png)
-
-### Wide Width
-
-![Map Alignment - Wide Width](img/map-alignment-wide-width.png)
-
-### Full Width
-
 ![Map Alignment - Full Width](img/map-alignment-full-width.png)
 
-## Displaying grouped maps
+## Grouping maps
 
-Besides the alignment option, there's also a group functionality available to arrange maps.
+Besides the alignment option, there's also a group functionality available to arrange multiple maps together.
 
 ![map-group](img/map-group.png)
 
-## Visualizing a map into a post
+## Layer swapping
 
-If your map has more than one layer, you can swap them and select which one do you want to see, depending on the map layer settings. [Check out more about map layers here](layer-post.md)
+If your map has more than one layer, you can swap them and select which one you want to see, depending on the map layer settings. [Check out more about map layers here](layer-post.md)
 
 ![Swapping layers - Example 1](img/swapping-layers-example1.png)
 

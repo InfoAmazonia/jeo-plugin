@@ -11,6 +11,8 @@ JEO supports four layer types out-of-the-box:
 - [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/) (MVTs)
 - [TileLayers](https://en.wikipedia.org/wiki/Tiled_web_map)
 
+Additionally, JEO can generate custom layers using AI (see [AI-Generated Map](#ai-generated-map)).
+
 ## Map
 
 A map is composed of one or more layers and can be associated with related geolocated posts, that'll be rendered as markers on the map.
@@ -20,3 +22,23 @@ A map post is used for reusable map interactions, that can be embedded in any po
 ## One-time Map
 
 Instead of creating a reusable map any time you want to add a map interaction, you can create and configure an inline single-use map via the [One-Time Map block](one-time-map-block.md) for Gutenberg.
+
+## Geolocating Posts
+
+Posts can be geolocated manually by searching and adding points in the Geolocation sidebar, or automatically using AI georeferencing — which analyzes the post content and suggests locations with confidence scores. See [Geolocating posts](geolocating-posts.md) and [AI Georeferencing](ai-georeferencing.md).
+
+## AI-Generated Map
+
+An AI-assisted map block that generates contextual maps from a text prompt or post content, with a chat interface for refinement. It can also generate custom map layers when a Mapbox key is configured. See [Minimap](minimap.md).
+
+## Story Map
+
+A Story Map is a scrollytelling experience: each **slide** has a location, layers, and text. As the reader scrolls, the map transitions between slides. See [Story Map](story-map.md).
+
+## Discovery
+
+A full-page interactive map where readers can explore geolocated stories, toggle layers from different maps, and share a customized view. See [Discovery](discovery.md).
+
+## Stories Near You
+
+A block that displays geolocated posts closest to the reader's location, with consent-based browser geolocation and automatic fallback. See [Stories Near You](stories-near-you.md).
