@@ -132,8 +132,18 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 			el.innerHTML = safe;
 			el.style.position = 'fixed';
 			el.style.left = '-9999px';
-			el.style.opacity = '0';
+			el.style.top = '0';
+			el.style.width = '1px';
+			el.style.height = '1px';
+			el.style.overflow = 'hidden';
+			el.setAttribute( 'aria-hidden', 'true' );
 			document.body.appendChild( el );
+
+			// Force reflow so the browser registers the element.
+			// eslint-disable-next-line no-unused-expressions
+			el.offsetHeight;
+
+			window.focus();
 
 			const selection = window.getSelection();
 			const range = document.createRange();
