@@ -68,11 +68,14 @@ bash .docker/start.sh              # Start WordPress + MariaDB containers
   - **Agent factory**: `Context_Agent::create()` in `class-context-agent.php`. Uses `AssistantConfig` with `outputClass: Context_Generation_Output`, `conversationStorage: WP_Storage(post)`, `learningStorage: WP_Option_Storage`, `userMemoryStorage: WP_User_Memory_Storage`, `autoLearn: true`, `autoDelegate: true`. Do not remove these storages or the conversation history will break.
   - **System prompt**: Defaults to `default_system_prompt()`. Overridden by `ai_context_prompt` setting (JEO AI Settings → Context Assistant tab). When editing the prompt, preserve the `## User Preferences` and `## Additional Context` injection points or user memory and live state will be lost.
   - **Tools**: `retrieve_knowledge` (RAG retrieval from `jeo_knowledge`) and `get_post_content` (for the `post_analyzer` sub-agent). Both are registered in `Tool_Registry`. Removing either will break the agent.
-  - **REST handler**: `Context_Handler` (`class-context-handler.php`), Singleton, registers `/jeo/v1/context/setup`, `/jeo/v1/context/chat`, and `/jeo/v1/context/state`. Uses the same `inject_history` / `persist_history` pattern as `Minimap` **for AI context only**.
+  - **REST handler**: `Context_Handler` (`class-context-handler.php`), Singleton, registers `/jeo/v1/context/setup`, `/jeo/v1/context/chat`, `/jeo/v1/context/state`, and `/jeo/v1/context/clear`. Uses the same `inject_history` / `persist_history` pattern as `Minimap` **for AI context only**.
+  - **Retry logic**: `run_agent()` retries up to 2 additional times (with 1s sleep) when the AI returns an empty response (`TypeError` on `getJson()`). After exhausting retries, it throws a user-friendly exception.
+  - **Content validation**: `api_setup()` checks the post content length. If fewer than 100 characters (after stripping tags), it returns immediately without calling the AI, asking the user to write more or specify what they want.
   - **Chat message storage (dual storage)**: The UI chat history is stored separately from the AI context history to avoid JSON schema pollution from structured output:
-    - `_jeo_ai_context_chat_messages` (object array) — clean messages for UI display only. Populated explicitly in `api_setup()` and `api_chat()` with the original user message and the `assistant_message` from the DTO.
+    - `_jeo_ai_context_chat_messages` (object array) — clean messages for UI display only. Populated explicitly in `api_setup()` and `api_chat()` with the original user message and the `assistant_message` from the DTO. Each user message stores `user_id` so the UI can display the author's username.
     - `_jeo_ai_context_conversation_id` + `ConversationStore` (via `WP_Storage`) — raw history for AI context continuity. This storage may contain schema-injected messages; do not use it directly for UI rendering.
     - `api_get_state()` reads from `_jeo_ai_context_chat_messages` for `messages`, and from `_jeo_ai_context_last_response` for `paragraphs`/`references`. It does **not** read from `ConversationStore`.
+    - `api_clear()` deletes all three meta keys, resetting the conversation completely.
   - **Paragraph format**: The `text` field in `Context_Generation_Output::$paragraphs` supports basic inline HTML: `<strong>`, `<em>`, `<a href="...">`, `<br>`. The system prompt and schema description instruct the AI to use these tags. The frontend sanitizes HTML before rendering (whitelist: `strong`, `b`, `em`, `i`, `br`, `a`).
   - **Frontend**: Entry point `contextSidebar` (webpack). Uses `registerPlugin('jeo-context-sidebar')` with `PluginDocumentSettingPanel`. The panel is **not** auto-triggered; the user must click "Generate Suggestions" to call `/context/setup`. Subsequent messages go to `/context/chat`.
   - **Editor integration (Insert)**: Creates a `core/paragraph` block with `content: sanitizedHtml`. The `content` attribute accepts inline HTML (`<strong>`, `<em>`, `<a>`), which Gutenberg preserves.
@@ -80,6 +83,11 @@ bash .docker/start.sh              # Start WordPress + MariaDB containers
     1. `navigator.clipboard.write()` with `ClipboardItem` (`text/html` + `text/plain`)
     2. DOM selection + `document.execCommand('copy')` (most reliable in Gutenberg iframe)
     3. `navigator.clipboard.writeText()` (plain text only)
+  - **UI controls**: Below the textarea there are three buttons:
+    - **Send** — submits the user's message to `/context/chat`.
+    - **Retry** — sends an implicit "Generate new suggestions" message to `/context/chat` without requiring user input.
+    - **Clear** — calls `/context/clear` and resets all local state (messages, paragraphs, conversation ID).
+  - **User badge**: User messages display a discreet username badge in the top-right corner (from `msg.username` returned by `api_get_state()`), useful for collaborative editing.
   - **State persistence**: Conversation ID, last suggestions, and clean chat messages are persisted in post meta. On mount, the frontend calls `GET /jeo/v1/context/state` to restore the previous session. This allows closing/reopening the panel or refreshing the page without losing context.
   - **Post type gate**: Only loads for post types in `enabled_post_types` (same filter as geolocation and minimap). The asset `jeo-context-sidebar` is enqueued in `class-jeo.php::enqueue_blocks_assets()` alongside `jeo-js`.
   - **Settings**: `ai_context_prompt` is a textarea in the AI Settings "Context Assistant" tab. Default is empty (uses built-in prompt). Sanitized with `sanitize_textarea_field()` in `Settings::sanitize_settings()`.
