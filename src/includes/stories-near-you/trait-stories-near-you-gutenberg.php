@@ -52,14 +52,19 @@ trait Stories_Near_You_Gutenberg {
 	 * @return string Rendered HTML from core/latest-posts.
 	 */
 	protected function render_posts_gutenberg( $post_ids, $atts ) {
-		$mapped = $this->map_gutenberg_attrs( $atts );
+		$mapped   = $this->map_gutenberg_attrs( $atts );
+		$captured = false;
 
-		$filter = function ( $query ) use ( $post_ids, &$filter ) {
-			remove_action( 'pre_get_posts', $filter );
+		$filter = function ( $query ) use ( $post_ids, &$captured ) {
+			if ( $captured || $query->get( 'jeo_snu_captured' ) ) {
+				return;
+			}
+			$captured = true;
 			$query->set( 'post__in', $post_ids );
 			$query->set( 'orderby', 'post__in' );
 			$query->set( 'posts_per_page', count( $post_ids ) );
 			$query->set( 'no_found_rows', true );
+			$query->set( 'jeo_snu_captured', true );
 		};
 
 		add_action( 'pre_get_posts', $filter );
@@ -73,6 +78,8 @@ trait Stories_Near_You_Gutenberg {
 				'innerContent' => array(),
 			)
 		);
+
+		remove_action( 'pre_get_posts', $filter );
 
 		return $html;
 	}

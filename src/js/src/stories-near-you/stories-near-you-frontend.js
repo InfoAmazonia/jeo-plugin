@@ -130,13 +130,13 @@
 		}
 
 		showSkeleton() {
-			const skeleton = document.createElement( 'div' );
-			skeleton.className = 'jeo-stories-near-you__skeleton jeo-stories-near-you__grid';
-			if ( this.attrs.postsPerRow ) {
-				skeleton.classList.add( 'jeo-stories-near-you__grid--cols-' + this.attrs.postsPerRow );
+			const skeleton = document.createElement( 'ul' );
+			skeleton.className = 'wp-block-latest-posts__list jeo-stories-near-you__skeleton';
+			if ( this.attrs.postLayout !== 'list' && this.attrs.postsPerRow ) {
+				skeleton.classList.add( 'is-grid', 'columns-' + this.attrs.postsPerRow );
 			}
 			for ( let i = 0; i < ( this.attrs.postsPerPage || 3 ); i++ ) {
-				const card = document.createElement( 'article' );
+				const card = document.createElement( 'li' );
 				card.className = 'jeo-stories-near-you__skeleton-card';
 				card.innerHTML = '<div class="jeo-stories-near-you__skeleton-thumb"></div><div class="jeo-stories-near-you__skeleton-content"><div class="jeo-stories-near-you__skeleton-line jeo-stories-near-you__skeleton-line--title"></div></div>';
 				skeleton.appendChild( card );

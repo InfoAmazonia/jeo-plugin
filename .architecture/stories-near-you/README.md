@@ -229,6 +229,27 @@ Uses `ST_Distance_Sphere()` to sort by proximity. UNION of primary (`_geocode_la
 
 ## HTML Structure — Gutenberg Path
 
+### Skeleton (initial load / consent pending)
+
+```html
+<div class="wp-block-jeo-stories-near-you">
+  <ul class="wp-block-latest-posts__list is-grid columns-3 jeo-stories-near-you__skeleton">
+    <li class="jeo-stories-near-you__skeleton-card">
+      <div class="jeo-stories-near-you__skeleton-thumb"></div>
+      <div class="jeo-stories-near-you__skeleton-content">
+        <div class="jeo-stories-near-you__skeleton-line jeo-stories-near-you__skeleton-line--title"></div>
+      </div>
+    </li>
+  </ul>
+  <div class="jeo-stories-near-you__error hidden">...</div>
+  <script type="application/json" class="jeo-stories-near-you-attrs">...</script>
+</div>
+```
+
+Skeleton uses core `wp-block-latest-posts__list is-grid columns-N` classes so the grid layout matches the rendered output (provided by WordPress core block library CSS). The `jeo-stories-near-you__skeleton` class is a marker for JS removal. For `list` layout, `is-grid` and `columns-N` are omitted.
+
+### Rendered content
+
 ```html
 <div class="wp-block-jeo-stories-near-you">
   <ul class="wp-block-latest-posts wp-block-latest-posts__list is-grid columns-3 has-dates has-author">

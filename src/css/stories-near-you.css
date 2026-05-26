@@ -1,4 +1,10 @@
 /* Skeleton loading cards */
+.jeo-stories-near-you__skeleton {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
 .jeo-stories-near-you__skeleton-card {
 	display: flex;
 	flex-direction: column;

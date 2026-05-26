@@ -356,11 +356,15 @@ class Stories_Near_You {
 		}
 
 		ob_start();
+		$skeleton_classes = 'wp-block-latest-posts__list jeo-stories-near-you__skeleton';
+		if ( 'grid' === $atts['postLayout'] ) {
+			$skeleton_classes .= ' is-grid columns-' . (int) $atts['postsPerRow'];
+		}
 		?>
 		<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
-			<div class="jeo-stories-near-you__skeleton jeo-stories-near-you__grid jeo-stories-near-you__grid--cols-<?php echo (int) $atts['postsPerRow']; ?>">
+			<ul class="<?php echo esc_attr( $skeleton_classes ); ?>">
 				<?php for ( $i = 0; $i < (int) $atts['postsPerPage']; $i++ ) : ?>
-				<article class="jeo-stories-near-you__skeleton-card">
+				<li class="jeo-stories-near-you__skeleton-card">
 					<?php if ( $atts['showThumbnail'] ) : ?>
 					<div class="jeo-stories-near-you__skeleton-thumb"></div>
 					<?php endif; ?>
@@ -382,9 +386,9 @@ class Stories_Near_You {
 						<div class="jeo-stories-near-you__skeleton-line jeo-stories-near-you__skeleton-line--short"></div>
 						<?php endif; ?>
 					</div>
-				</article>
+				</li>
 				<?php endfor; ?>
-			</div>
+			</ul>
 			<div class="jeo-stories-near-you__error hidden">
 				<p><?php esc_html_e( 'Unable to load stories near you.', 'jeo' ); ?></p>
 			</div>
