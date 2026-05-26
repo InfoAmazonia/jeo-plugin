@@ -5,6 +5,18 @@
 	margin: 0;
 }
 
+.jeo-stories-near-you__skeleton.is-grid {
+	display: grid;
+	gap: 24px;
+}
+
+.jeo-stories-near-you__skeleton.is-grid.columns-1 { grid-template-columns: 1fr; }
+.jeo-stories-near-you__skeleton.is-grid.columns-2 { grid-template-columns: repeat(2, 1fr); }
+.jeo-stories-near-you__skeleton.is-grid.columns-3 { grid-template-columns: repeat(3, 1fr); }
+.jeo-stories-near-you__skeleton.is-grid.columns-4 { grid-template-columns: repeat(4, 1fr); }
+.jeo-stories-near-you__skeleton.is-grid.columns-5 { grid-template-columns: repeat(5, 1fr); }
+.jeo-stories-near-you__skeleton.is-grid.columns-6 { grid-template-columns: repeat(6, 1fr); }
+
 .jeo-stories-near-you__skeleton-card {
 	display: flex;
 	flex-direction: column;
