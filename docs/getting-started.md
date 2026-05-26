@@ -33,4 +33,4 @@ Under **Jeo → AI**, you can configure AI-powered features:
 
 See [AI Settings](ai-settings.md) for detailed instructions.
 
-<!-- TODO: screenshot of AI settings page -->
+![JEO AI Settings](img/ai-settings-provider.png)

@@ -25,7 +25,7 @@ Select one of the 10 supported AI providers and enter your API key:
 
 After selecting a provider and entering the key, click **Test Connection** to verify it works.
 
-<!-- TODO: screenshot of Provider tab -->
+![AI Provider settings](img/ai-settings-provider.png)
 
 ### Knowledge Base tab
 
@@ -38,7 +38,7 @@ The Knowledge Base (RAG) stores vectorized versions of your posts and layers, al
 - **Search results (topK)**: Maximum number of semantic matches returned per search (1–50, default 10).
 - **Actions**: Manually trigger indexing for posts or layers, backup/restore the vector store, or clear it.
 
-<!-- TODO: screenshot of Knowledge Base tab -->
+![Knowledge Base settings](img/ai-settings-knowledge-base.png)
 
 ### Embedded Data tab
 
@@ -55,5 +55,3 @@ When enabled (default), the AI returns results in a strict JSON format enforced 
 ## Cost tracking
 
 JEO tracks AI usage in **Jeo → AI Debug Logs**. Each log entry records the provider, model, input/output tokens, and the prompt and response. Use this to monitor costs and troubleshoot responses.
-
-<!-- TODO: screenshot of AI Debug Logs page -->

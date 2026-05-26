@@ -2,7 +2,7 @@
 
 The **Stories Near You** block (`jeo/stories-near-you`) displays geolocated posts that are closest to the reader's current location. It uses the browser's geolocation API (with explicit user consent) to find nearby stories and presents them in a customizable card layout.
 
-<!-- TODO: screenshot of Stories Near You block in editor -->
+![Stories Near You block](img/stories-near-you-block.png)
 
 ## Inserting the block
 
@@ -24,7 +24,7 @@ When a visitor loads a page with this block:
 
 The **User location precision** setting (in JEO → Settings → General) controls how many decimal places are kept from the browser geolocation. Range: 1–5, default: 2. Lower values mean less precision but more privacy.
 
-<!-- TODO: screenshot of geolocation precision setting -->
+![Stories Near You settings](img/stories-near-you-settings.png)
 
 ## Block settings
 
@@ -71,7 +71,7 @@ The Inspector panels provide extensive customization:
 
 Text and link colors use the native Gutenberg color settings (not a separate panel).
 
-<!-- TODO: screenshot of Inspector panels -->
+![Stories Near You block](img/stories-near-you-block2.png)
 
 ## Cross-block deduplication
 

@@ -10,7 +10,7 @@ The Minimap block (`jeo/ai-minimap`) generates contextual interactive maps insid
    - **From post content**: Automatically generates a map based on the current post's content and geolocation points.
    - **From prompt**: Describe the map you want in a text field.
 
-<!-- TODO: screenshot of Minimap block placeholder (idle state) -->
+![Minimap block](img/minimap-block-edit.png)
 
 ## Generating a map
 
@@ -27,7 +27,7 @@ Type a description of the map you want (e.g., "A map of the Amazon region showin
 3. Geocode relevant locations.
 4. Return a complete map with layers, center, zoom, and pins.
 
-<!-- TODO: screenshot of prompt input and generated map -->
+![Minimap block](img/minimap-block-edit2.png)
 
 ## Chat refinement
 
@@ -40,13 +40,11 @@ Once a map is generated, the block enters **ready** state. An **Inspector Panel*
 
 The AI remembers your conversation, so each refinement builds on the previous context.
 
-<!-- TODO: screenshot of chat panel in inspector -->
+![Minimap block chat](img/minimap-block-edit3.png)
 
 ## AI-generated layers (Minilayer)
 
 If you have a Mapbox API key configured, the AI can **generate custom map layers** when existing layers don't cover what you need. During chat, ask the AI to create a layer (e.g., "Can you generate a deforestation heatmap for the Amazon?"). The AI will ask for your confirmation before generating — it never creates layers without explicit approval. The new layer is added to the map automatically with AI-suggested styling (colors and filters) that you can later override in the layer settings modal via the **"Use AI Default Style"** checkbox.
-
-<!-- TODO: screenshot of "Use AI Default Style" checkbox in layer settings -->
 
 ## Map features
 
