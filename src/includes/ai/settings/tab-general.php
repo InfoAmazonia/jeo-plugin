@@ -51,5 +51,19 @@
 				</div>
 			</td>
 		</tr>
+
+		<tr>
+			<th scope="row"><?php esc_html_e( 'Embedded Data', 'jeo' ); ?></th>
+			<td>
+				<p class="description">
+					<?php esc_html_e( 'View locally embedded geographic dictionaries used to improve AI precision. This feature is experimental and not yet fully integrated.', 'jeo' ); ?>
+				</p>
+				<p>
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=jeo-ai-settings&tab=embedded' ) ); ?>" class="button">
+						<?php esc_html_e( 'View Embedded Data', 'jeo' ); ?>
+					</a>
+				</p>
+			</td>
+		</tr>
 	</tbody>
 </table>

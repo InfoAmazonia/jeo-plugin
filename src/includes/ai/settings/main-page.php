@@ -79,9 +79,6 @@
 				case 'knowledge':
 					include 'tab-knowledge.php';
 					break;
-				case 'embedded':
-					include 'tab-embedded.php';
-					break;
 				case 'bulk':
 					include 'tab-bulk.php';
 					break;
@@ -90,6 +87,9 @@
 					break;
 				case 'settings':
 					include 'tab-general.php';
+					break;
+				case 'embedded':
+					include 'tab-embedded.php';
 					break;
 			}
 			?>
