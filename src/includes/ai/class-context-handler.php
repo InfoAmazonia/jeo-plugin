@@ -317,6 +317,11 @@ class Context_Handler {
 		}
 
 		$state_context = $this->build_state_context( $request );
+		$post          = get_post( $post_id );
+		$live_context  = 'A post is being edited (post_id: ' . $post_id . ', title: "' . ( $post ? $post->post_title : '' ) . '"). Use its content for context when generating suggestions.';
+		if ( ! empty( $state_context ) ) {
+			$live_context .= "\n\n" . $state_context;
+		}
 
 		try {
 			$result = $this->run_agent(
@@ -324,7 +329,7 @@ class Context_Handler {
 				$conversation_id,
 				$user_id,
 				$message,
-				$state_context
+				$live_context
 			);
 
 			$response = $result->to_rest_response();
@@ -678,8 +683,9 @@ class Context_Handler {
 		}
 
 		$entry = array(
-			'role'    => $role,
-			'content' => $content,
+			'role'      => $role,
+			'content'   => $content,
+			'timestamp' => current_time( 'mysql' ),
 		);
 		if ( null !== $user_id ) {
 			$entry['user_id'] = $user_id;

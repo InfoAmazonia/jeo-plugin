@@ -266,12 +266,21 @@ const ContextChatPanel = ( { postId } ) => {
 						key={ index }
 						className={ `jeo-context-chat__message jeo-context-chat__message--${ msg.role }` }
 					>
-						{ 'user' === msg.role && msg.username && (
-							<span className="jeo-context-chat__user-badge">
-								{ msg.username }
-							</span>
-						) }
-						{ msg.content }
+						<div className="jeo-context-chat__message-content">
+							{ msg.content }
+						</div>
+						<div className="jeo-context-chat__message-meta">
+							{ msg.timestamp && (
+								<span className="jeo-context-chat__timestamp">
+									{ msg.timestamp }
+								</span>
+							) }
+							{ 'user' === msg.role && msg.username && (
+								<span className="jeo-context-chat__user-badge">
+									{ msg.username }
+								</span>
+							) }
+						</div>
 					</div>
 				) ) }
 

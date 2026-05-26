@@ -96,14 +96,19 @@ const sanitizeHtml = ( rawHtml ) => {
  */
 const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 	const [ copiedIndex, setCopiedIndex ] = useState( null );
+	const [ insertedIndices, setInsertedIndices ] = useState( new Set() );
 
 	if ( ! paragraphs || paragraphs.length === 0 ) {
 		return null;
 	}
 
-	const handleInsert = ( html ) => {
+	const handleInsert = ( html, index ) => {
+		if ( insertedIndices.has( index ) ) {
+			return;
+		}
 		const safe = sanitizeHtml( html );
 		insertParagraph( safe );
+		setInsertedIndices( ( prev ) => new Set( prev ).add( index ) );
 		if ( onInsertBlock ) {
 			onInsertBlock( safe );
 		}
@@ -222,10 +227,11 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 							<Button
 								variant="secondary"
 								size="small"
-								onClick={ () => handleInsert( paragraph.text ) }
+								onClick={ () => handleInsert( paragraph.text, index ) }
+								disabled={ insertedIndices.has( index ) }
 								className="jeo-context-suggestion__insert"
 							>
-								{ __( 'Insert into article', 'jeo' ) }
+								{ insertedIndices.has( index ) ? __( 'Inserted', 'jeo' ) : __( 'Insert into article', 'jeo' ) }
 							</Button>
 							<Button
 								variant="tertiary"
