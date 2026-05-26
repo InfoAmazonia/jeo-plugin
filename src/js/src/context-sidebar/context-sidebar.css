@@ -1,0 +1,224 @@
+/* AI Context Sidebar Styles */
+
+.jeo-context-sidebar-panel .components-panel__body-title button {
+	font-weight: 600;
+}
+
+.jeo-context-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.jeo-context-panel__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 4px;
+}
+
+.jeo-context-panel__title {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.jeo-context-panel__expand {
+	padding: 2px !important;
+	min-width: auto !important;
+	height: auto !important;
+}
+
+.jeo-context-panel__expand svg {
+	display: block;
+}
+
+/* Chat */
+
+.jeo-context-chat {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.jeo-context-chat--compact .jeo-context-chat__messages {
+	max-height: 220px;
+	overflow-y: auto;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	padding: 10px;
+	background: #f6f7f7;
+}
+
+.jeo-context-chat--modal .jeo-context-chat__messages {
+	max-height: 55vh;
+	overflow-y: auto;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	padding: 14px;
+	background: #f6f7f7;
+}
+
+.jeo-context-chat__intro {
+	text-align: center;
+	padding: 16px 8px;
+}
+
+.jeo-context-chat__placeholder {
+	color: #757575;
+	font-size: 12px;
+	margin: 0 0 12px;
+	line-height: 1.5;
+}
+
+.jeo-context-chat__start {
+	width: 100%;
+	justify-content: center;
+}
+
+.jeo-context-chat__message {
+	padding: 8px 12px;
+	border-radius: 10px;
+	margin-bottom: 8px;
+	font-size: 12px;
+	line-height: 1.5;
+	word-wrap: break-word;
+}
+
+.jeo-context-chat__message--user {
+	background: #e3f2fd;
+	margin-left: 20px;
+}
+
+.jeo-context-chat__message--assistant {
+	background: #ffffff;
+	border: 1px solid #e0e0e0;
+	margin-right: 20px;
+}
+
+.jeo-context-chat__loading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px;
+	font-size: 12px;
+	color: #757575;
+}
+
+.jeo-context-chat__input-area {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.jeo-context-chat__textarea textarea {
+	font-size: 12px !important;
+	padding: 8px !important;
+	resize: vertical;
+}
+
+.jeo-context-chat__send {
+	align-self: flex-end;
+}
+
+.jeo-context-chat__error {
+	margin: 0;
+}
+
+/* Suggestions */
+
+.jeo-context-suggestions {
+	margin-top: 4px;
+}
+
+.jeo-context-suggestions__title,
+.jeo-context-references__title {
+	font-size: 12px;
+	font-weight: 600;
+	margin: 10px 0 6px;
+}
+
+.jeo-context-suggestion {
+	background: #ffffff;
+	border: 1px solid #c5c5c5;
+	border-radius: 6px;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.jeo-context-suggestion__text {
+	font-size: 12px;
+	line-height: 1.6;
+	margin: 0 0 10px;
+	white-space: pre-wrap;
+}
+
+.jeo-context-suggestion__actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.jeo-context-suggestion__insert,
+.jeo-context-suggestion__copy {
+	font-size: 11px !important;
+	padding: 4px 10px !important;
+	height: auto !important;
+}
+
+.jeo-context-suggestion__inline-link {
+	font-weight: 500;
+	text-decoration: underline;
+}
+
+/* References */
+
+.jeo-context-references {
+	margin-top: 10px;
+}
+
+.jeo-context-references__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.jeo-context-reference {
+	font-size: 12px;
+	margin-bottom: 6px;
+	padding: 8px;
+	background: #f0f0f1;
+	border-radius: 4px;
+}
+
+.jeo-context-reference a {
+	font-weight: 500;
+}
+
+.jeo-context-reference__reason {
+	display: block;
+	font-size: 11px;
+	color: #757575;
+	margin-top: 4px;
+	line-height: 1.4;
+}
+
+/* Modal */
+
+.jeo-context-modal .components-modal__content {
+	padding: 0;
+}
+
+.jeo-context-modal .components-modal__header {
+	padding: 16px 24px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.jeo-context-modal .components-modal__header-heading {
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.jeo-context-modal .jeo-context-chat--modal {
+	padding: 20px 24px 24px;
+}

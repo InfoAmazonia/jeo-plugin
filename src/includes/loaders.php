@@ -117,6 +117,15 @@ function jeo_minimap() {
 }
 
 /**
+ * Gets the instance of the Context Handler Class
+ *
+ * @return \Jeo\AI\Context_Handler Context_Handler instance
+ */
+function jeo_context_handler() {
+	return \Jeo\AI\Context_Handler::get_instance();
+}
+
+/**
  * Gets the instance of the main Jeo Class
  *
  * @return \Jeo Jeo instance

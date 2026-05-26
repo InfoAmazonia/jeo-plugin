@@ -47,6 +47,7 @@ class AI_Settings {
 			'knowledge' => __( 'Knowledge Base', 'jeo' ),
 			'embedded'  => __( 'Embedded Data', 'jeo' ),
 			'bulk'      => __( 'Bulk Geolocation', 'jeo' ),
+			'context'   => __( 'Context Assistant', 'jeo' ),
 			'settings'  => __( 'Settings', 'jeo' ),
 		);
 	}

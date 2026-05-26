@@ -58,6 +58,7 @@ class Jeo {
 		\jeo_storymap();
 		\jeo_stories_near_you();
 		\jeo_minimap();
+		\jeo_context_handler();
 
 		add_filter( 'load_textdomain_mofile', array( $this, 'fallback_translation_mofile' ), 10, 2 );
 		add_filter( 'load_script_translation_file', array( $this, 'fallback_script_translation_file' ), 10, 3 );
@@ -779,6 +780,28 @@ class Jeo {
 
 		wp_set_script_translations( 'jeo-js', 'jeo', JEO_BASEPATH . 'languages' );
 
+		// Context Sidebar asset.
+		$context_asset_file = file_exists( JEO_BASEPATH . '/js/build/contextSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/contextSidebar.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
+		wp_register_style( 'jeo-context-sidebar', JEO_BASEURL . '/js/build/contextSidebar.css', array(), JEO_VERSION );
+		wp_register_script(
+			'jeo-context-sidebar',
+			JEO_BASEURL . '/js/build/contextSidebar.js',
+			$context_asset_file['dependencies'] ?? array(),
+			$context_asset_file['version'],
+			true,
+		);
+		wp_localize_script(
+			'jeo-context-sidebar',
+			'jeoContext',
+			array(
+				'rest_url' => rest_url( 'jeo/v1' ),
+				'nonce'    => wp_create_nonce( 'wp_rest' ),
+			)
+		);
+
 		$map_runtime_requested = $this->get_requested_map_runtime();
 		$mapgl_script_deps     = array();
 		$mapgl_style_deps      = array();
@@ -1243,6 +1266,8 @@ class Jeo {
 		if ( in_array( $post->post_type, $post_types, true ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
+			wp_enqueue_script( 'jeo-context-sidebar' );
+			wp_enqueue_style( 'jeo-context-sidebar' );
 		}
 	}
 

@@ -31,6 +31,7 @@ module.exports = {
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
+		contextSidebar: './src/js/src/context-sidebar/index.js',
 
 		jeoMap: {
 			import: './src/js/src/jeo-map/index.js',

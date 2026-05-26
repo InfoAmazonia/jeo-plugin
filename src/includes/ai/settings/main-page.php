@@ -85,6 +85,9 @@
 				case 'bulk':
 					include 'tab-bulk.php';
 					break;
+				case 'context':
+					include 'tab-context.php';
+					break;
 				case 'settings':
 					include 'tab-general.php';
 					break;
