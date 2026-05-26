@@ -6,7 +6,7 @@ You can post geotagged stories and create richly designed pages for each one of 
 
 JEO wants to help journalists and NGOs to improve storytelling with maps. Creating a child theme with all its functionality is easy since it contains all the necessary hooks to customize layouts and data visualization.
 
-### [Get Started](getting-started.md)
+[Get Started](getting-started.md)
 
 ## Features
 
