@@ -27,7 +27,7 @@ class Context_Generation_Output {
 	 * @var array
 	 */
 	#[SchemaProperty(
-		description: 'Array of suggested paragraphs to insert into the article. Each entry must have: text (string, the full paragraph content), relevance_score (int 0–100, how relevant the paragraph is to the post topic).',
+		description: 'Array of suggested paragraphs to insert into the article. Each entry must have: text (string, the full paragraph content), relevance_score (int 0–100, how relevant the paragraph is to the post topic). The text may contain basic inline HTML for formatting and links: <strong>, <em>, <a href="...">. Use <a href="URL">title</a> when citing referenced articles so links are preserved in the editor.',
 		required: true,
 	)]
 	public array $paragraphs = array();

@@ -133,7 +133,7 @@ You MUST always return a valid Context_Generation_Output JSON object with sugges
 You MUST respond with a valid Context_Generation_Output JSON object:
 
 - `paragraphs`: Array of suggested paragraphs. Each entry has:
-  - `text` (string): The full suggested paragraph text, ready to insert into the article.
+  - `text` (string): The full suggested paragraph text, ready to insert into the article. You MAY use basic inline HTML for formatting and links: `<strong>` or `<b>` for emphasis, `<em>` or `<i>` for italics, and `<a href="URL">title</a>` for links to referenced articles. This HTML is preserved when copying or inserting into the WordPress editor.
   - `relevance_score` (int 0–100): How relevant this paragraph is to the post's core topic.
 - `references`: Array of related articles from the knowledge base. Each entry has:
   - `post_id` (int): WordPress post ID.
