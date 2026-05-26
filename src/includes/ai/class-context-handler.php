@@ -48,6 +48,13 @@ class Context_Handler {
 	const LAST_RESPONSE_META_KEY = '_jeo_ai_context_last_response';
 
 	/**
+	 * Meta key for storing clean chat messages (user + assistant_message only).
+	 *
+	 * @var string
+	 */
+	const CHAT_MESSAGES_META_KEY = '_jeo_ai_context_chat_messages';
+
+	/**
 	 * Bootstrap hooks.
 	 *
 	 * @return void
@@ -80,6 +87,17 @@ class Context_Handler {
 			register_post_meta(
 				$post_type,
 				self::LAST_RESPONSE_META_KEY,
+				array(
+					'show_in_rest'  => true,
+					'single'        => true,
+					'type'          => 'object',
+					'auth_callback' => fn() => current_user_can( 'edit_posts' ),
+				)
+			);
+
+			register_post_meta(
+				$post_type,
+				self::CHAT_MESSAGES_META_KEY,
 				array(
 					'show_in_rest'  => true,
 					'single'        => true,
@@ -177,10 +195,21 @@ class Context_Handler {
 				$initial_context
 			);
 
-			$this->persist_initial_context( $post_id, $conversation_id, $result->to_rest_response() );
-			$this->save_context_state( $post_id, $conversation_id, $result->to_rest_response() );
+			$response = $result->to_rest_response();
+			$this->persist_initial_context( $post_id, $conversation_id, $response );
+			$this->save_context_state( $post_id, $conversation_id, $response );
+			$this->save_chat_message(
+				$post_id,
+				'user',
+				__( 'Generate editorial suggestions for this post based on its content.', 'jeo' )
+			);
+			$this->save_chat_message(
+				$post_id,
+				'assistant',
+				$response['assistant_message'] ?? __( 'Suggestions generated.', 'jeo' )
+			);
 
-			return new \WP_REST_Response( $result->to_rest_response(), 200 );
+			return new \WP_REST_Response( $response, 200 );
 		} catch ( \Exception $e ) {
 			return new \WP_REST_Response(
 				array(
@@ -266,7 +295,15 @@ class Context_Handler {
 				$state_context
 			);
 
-			return new \WP_REST_Response( $result->to_rest_response(), 200 );
+			$response = $result->to_rest_response();
+			$this->save_chat_message( $post_id, 'user', $message );
+			$this->save_chat_message(
+				$post_id,
+				'assistant',
+				$response['assistant_message'] ?? __( 'Suggestions updated.', 'jeo' )
+			);
+
+			return new \WP_REST_Response( $response, 200 );
 		} catch ( \Exception $e ) {
 			return new \WP_REST_Response(
 				array(
@@ -485,12 +522,11 @@ class Context_Handler {
 			);
 		}
 
-		$store    = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
-		$raw_msgs = $store->loadThread( $conversation_id );
-		$messages = array();
+		$chat_messages = get_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY, true );
+		$messages      = array();
 
-		if ( ! empty( $raw_msgs ) && is_array( $raw_msgs ) ) {
-			foreach ( $raw_msgs as $msg ) {
+		if ( ! empty( $chat_messages ) && is_array( $chat_messages ) ) {
+			foreach ( $chat_messages as $msg ) {
 				if ( ! is_array( $msg ) || empty( $msg['role'] ) || empty( $msg['content'] ) ) {
 					continue;
 				}
@@ -500,8 +536,6 @@ class Context_Handler {
 				);
 			}
 		}
-
-		$messages = $this->sanitize_chat_messages( $messages );
 
 		$response = array(
 			'success'         => true,
@@ -542,56 +576,23 @@ class Context_Handler {
 	}
 
 	/**
-	 * Sanitize chat messages by removing assistant messages that contain
-	 * JSON schema declarations, raw JSON blocks, or structured output noise.
+	 * Append a clean chat message to the dedicated chat messages meta.
 	 *
-	 * @param array $messages Raw messages from conversation store.
-	 * @return array Cleaned messages for UI display.
+	 * @param int    $post_id Post ID.
+	 * @param string $role    'user' or 'assistant'.
+	 * @param string $content Message content.
 	 */
-	private function sanitize_chat_messages( array $messages ): array {
-		$clean = array();
-
-		foreach ( $messages as $msg ) {
-			if ( ! is_array( $msg ) || empty( $msg['role'] ) || empty( $msg['content'] ) ) {
-				continue;
-			}
-
-			if ( 'assistant' === $msg['role'] ) {
-				$content = $msg['content'];
-
-				// Strip everything from "Respond using this JSON schema:" onwards.
-				$schema_pos = stripos( $content, 'Respond using this JSON schema:' );
-				if ( false !== $schema_pos ) {
-					$content = trim( substr( $content, 0, $schema_pos ) );
-				}
-
-				// Also strip standalone JSON schema declarations.
-				$schema_pos = stripos( $content, 'JSON schema:' );
-				if ( false !== $schema_pos ) {
-					$content = trim( substr( $content, 0, $schema_pos ) );
-				}
-
-				// If the remaining content is empty, skip the message entirely.
-				if ( '' === $content ) {
-					continue;
-				}
-
-				// Skip raw JSON code blocks.
-				if ( preg_match( '/^\s*```(?:json)?\s*\{/s', $content ) ) {
-					continue;
-				}
-
-				// Skip raw structured output that looks like a JSON object with paragraphs.
-				if ( preg_match( '/^\s*\{\s*"paragraphs"\s*:/s', $content ) ) {
-					continue;
-				}
-
-				$msg['content'] = $content;
-			}
-
-			$clean[] = $msg;
+	private function save_chat_message( int $post_id, string $role, string $content ): void {
+		$messages = get_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY, true );
+		if ( ! is_array( $messages ) ) {
+			$messages = array();
 		}
 
-		return $clean;
+		$messages[] = array(
+			'role'    => $role,
+			'content' => $content,
+		);
+
+		update_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY, $messages );
 	}
 }
