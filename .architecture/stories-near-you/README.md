@@ -109,9 +109,15 @@ sequenceDiagram
 
 ## Location Resolution (3-tier fallback)
 
-1. **Browser Geolocation API** → lat/lng sent to REST endpoint
+1. **Browser Geolocation API** → lat/lng sent to REST endpoint (rounded to `geolocation_precision` decimal places)
 2. _(future)_ **IP Geolocation** → resolved server-side from `$_SERVER['REMOTE_ADDR']`
 3. **Map center defaults** → from JEO settings (`map_default_lat`, `map_default_lng`)
+
+### User Location Precision (`geolocation_precision`)
+
+Global plugin setting (Settings > General > User location precision) controlling how many decimal places are kept from the browser geolocation result before sending to the REST endpoint. Range: 1–5, default: 2. Lower values = less precision, more privacy. Does **not** affect post geocoding or stored coordinates — only the user's browser-reported location.
+
+Passed to frontend via `wp_localize_script` as `jeo_snu_config.geolocationPrecision`. Applied in `BrowserGeolocationProvider.getLocation()` using `toFixed()`.
 
 ## Block Attributes
 

@@ -39,6 +39,7 @@ class Settings {
 		'mapbox_key'                      => '',
 		'active_geocoder'                 => 'nominatim',
 		'show_storymaps_on_post_archives' => true,
+		'geolocation_precision'           => 2,
 
 		// AI.
 		'ai_default_provider'             => 'gemini',
@@ -304,6 +305,14 @@ class Settings {
 			$input['ai_rag_topk'] = absint( $input['ai_rag_topk'] );
 			if ( $input['ai_rag_topk'] < 1 || $input['ai_rag_topk'] > 50 ) {
 				$input['ai_rag_topk'] = 10;
+			}
+		}
+
+		// Geolocation precision sanitization.
+		if ( isset( $input['geolocation_precision'] ) ) {
+			$input['geolocation_precision'] = absint( $input['geolocation_precision'] );
+			if ( $input['geolocation_precision'] < 1 || $input['geolocation_precision'] > 5 ) {
+				$input['geolocation_precision'] = 2;
 			}
 		}
 

@@ -10,12 +10,14 @@
 				return Promise.resolve( null );
 			}
 
+			const precision = globalThis.jeo_snu_config?.geolocationPrecision || 2;
+
 			return new Promise( ( resolve ) => {
 				navigator.geolocation.getCurrentPosition(
 					( position ) => {
 						resolve( {
-							lat: position.coords.latitude,
-							lng: position.coords.longitude,
+							lat: Number.parseFloat( position.coords.latitude.toFixed( precision ) ),
+							lng: Number.parseFloat( position.coords.longitude.toFixed( precision ) ),
 						} );
 					},
 					( error ) => {

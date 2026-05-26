@@ -633,6 +633,14 @@ class Stories_Near_You {
 			$asset_file['version'] ?? JEO_VERSION,
 			true
 		);
+
+		wp_localize_script(
+			'jeo-stories-near-you',
+			'jeo_snu_config',
+			array(
+				'geolocationPrecision' => absint( \jeo_settings()->get_option( 'geolocation_precision', 2 ) ),
+			)
+		);
 	}
 
 	/**
