@@ -115,27 +115,83 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 		plain.innerHTML = safe;
 		const plainText = plain.textContent || plain.innerText || '';
 
-		if ( navigator.clipboard.write ) {
+		const markCopied = () => {
+			setCopiedIndex( index );
+			setTimeout( () => setCopiedIndex( null ), 2000 );
+		};
+
+		/**
+		 * Copy rich text using the native DOM selection + execCommand method.
+		 * This is the most reliable cross-browser way to copy HTML to the
+		 * clipboard with both text/html and text/plain formats.
+		 *
+		 * @return {boolean} Whether the copy command was successful.
+		 */
+		const copyViaSelection = () => {
+			const el = document.createElement( 'div' );
+			el.innerHTML = safe;
+			el.style.position = 'fixed';
+			el.style.left = '-9999px';
+			el.style.opacity = '0';
+			document.body.appendChild( el );
+
+			const selection = window.getSelection();
+			const range = document.createRange();
+			range.selectNodeContents( el );
+			selection.removeAllRanges();
+			selection.addRange( range );
+
+			let success = false;
+			try {
+				success = document.execCommand( 'copy' );
+			} catch ( err ) {
+				success = false;
+			}
+
+			selection.removeAllRanges();
+			document.body.removeChild( el );
+			return success;
+		};
+
+		/**
+		 * Copy rich text using the modern ClipboardItem API.
+		 *
+		 * @return {Promise<void>}
+		 */
+		const copyViaClipboardItem = () => {
 			const blobHtml = new Blob( [ safe ], { type: 'text/html' } );
 			const blobText = new Blob( [ plainText ], { type: 'text/plain' } );
 			const data = new ClipboardItem( {
 				'text/html': blobHtml,
 				'text/plain': blobText,
 			} );
-			navigator.clipboard.write( [ data ] ).then( () => {
-				setCopiedIndex( index );
-				setTimeout( () => setCopiedIndex( null ), 2000 );
-			} ).catch( () => {
-				navigator.clipboard.writeText( plainText ).then( () => {
-					setCopiedIndex( index );
-					setTimeout( () => setCopiedIndex( null ), 2000 );
-				} );
+			return navigator.clipboard.write( [ data ] );
+		};
+
+		/**
+		 * Copy plain text only.
+		 *
+		 * @return {Promise<void>}
+		 */
+		const copyPlain = () => {
+			return navigator.clipboard.writeText( plainText );
+		};
+
+		// Try ClipboardItem first (modern, clean API).
+		if ( navigator.clipboard && navigator.clipboard.write ) {
+			copyViaClipboardItem().then( markCopied ).catch( () => {
+				// Fallback to DOM selection + execCommand (most reliable for rich text).
+				if ( copyViaSelection() ) {
+					markCopied();
+				} else {
+					// Final fallback to plain text.
+					copyPlain().then( markCopied );
+				}
 			} );
-		} else {
-			navigator.clipboard.writeText( plainText ).then( () => {
-				setCopiedIndex( index );
-				setTimeout( () => setCopiedIndex( null ), 2000 );
-			} );
+		} else if ( copyViaSelection() ) {
+			markCopied();
+		} else if ( navigator.clipboard && navigator.clipboard.writeText ) {
+			copyPlain().then( markCopied );
 		}
 	};
 
