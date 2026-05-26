@@ -49,6 +49,7 @@ class Settings {
 		'ai_use_structured_output'        => true,
 		'ai_include_taxonomies'           => false,
 		'ai_context_prompt'               => '',
+		'ai_use_context_custom_prompt'    => false,
 		'ai_embedding_model'              => '',
 		'ai_cal_granularity'              => 'balanced',
 		'ai_cal_confidence'               => 50,
@@ -298,6 +299,11 @@ class Settings {
 			if ( $input['ai_cal_secondary_max'] < 1 || $input['ai_cal_secondary_max'] > 100 ) {
 				$input['ai_cal_secondary_max'] = 10;
 			}
+		}
+
+		// Context prompt settings.
+		if ( isset( $input['ai_use_context_custom_prompt'] ) ) {
+			$input['ai_use_context_custom_prompt'] = ! empty( $input['ai_use_context_custom_prompt'] );
 		}
 
 		// Context prompt sanitization.

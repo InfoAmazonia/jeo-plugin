@@ -84,8 +84,9 @@ class Context_Agent {
 	 * @return string
 	 */
 	private static function system_prompt( string $user_prefs = '', ?string $initial_context = null ): string {
+		$use_custom    = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt', false );
 		$custom_prompt = \jeo_settings()->get_option( 'ai_context_prompt' );
-		if ( ! empty( $custom_prompt ) ) {
+		if ( $use_custom && ! empty( $custom_prompt ) ) {
 			$prompt = $custom_prompt;
 		} else {
 			$prompt = self::default_system_prompt();
@@ -107,7 +108,7 @@ class Context_Agent {
 	 *
 	 * @return string
 	 */
-	private static function default_system_prompt(): string {
+	public static function default_system_prompt(): string {
 		return <<<'PROMPT'
 You are an editorial AI assistant embedded in a WordPress block editor. Your task is to suggest new paragraphs and related references that enrich journalistic and editorial posts.
 
