@@ -65,19 +65,19 @@ class AI_Handler {
 	 */
 	public function api_download_dict() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( 'Unauthorized' );
+			wp_die( esc_html__( 'Unauthorized access.', 'jeo' ) );
 		}
 
 		check_admin_referer( 'jeo_download_dict' );
 
 		$file = isset( $_GET['file'] ) ? sanitize_file_name( wp_unslash( $_GET['file'] ) ) : '';
 		if ( empty( $file ) || strpos( $file, '.json' ) === false ) {
-			wp_die( 'Invalid file' );
+			wp_die( esc_html__( 'Invalid file.', 'jeo' ) );
 		}
 
 		$path = JEO_BASEPATH . '/includes/ai/data/' . $file;
 		if ( ! file_exists( $path ) ) {
-			wp_die( 'File not found' );
+			wp_die( esc_html__( 'File not found.', 'jeo' ) );
 		}
 
 		header( 'Content-Type: application/json' );
@@ -113,6 +113,7 @@ class AI_Handler {
 			'Layers'                                       => 'Camadas',
 			'Story Map'                                    => 'Mapas de História',
 			'Story Maps'                                   => 'Mapas de História',
+			'AI (new)'                                     => 'IA (novo)',
 			'AI (v3.5)'                                    => 'IA (v3.5)',
 			'Active AI Provider'                           => 'Provedor de IA Ativo',
 			'Gemini API Key'                               => 'Chave de API do Gemini',
@@ -221,6 +222,100 @@ class AI_Handler {
 			'Checking...'                                  => 'Verificando...',
 			'Please enter an API Key for the selected provider before saving.' => 'Por favor, insira uma Chave de API para o provedor selecionado antes de salvar.',
 			'Warning: Deactivating JEO will remove your AI API Keys for security reasons. Other settings will be preserved. Do you want to proceed?' => 'Atenção: Desativar o JEO removerá suas chaves de API de Inteligência Artificial por motivos de segurança. Outras configurações serão preservadas. Deseja continuar?',
+			'[System] Console cleared.'                    => '[Sistema] Console limpo.',
+			'Missing Configuration'                        => 'Configuração Faltando',
+			'Active'                                       => 'Ativo',
+			'Invalid'                                      => 'Inválido',
+			'Failed'                                       => 'Falhou',
+			'Request Failed'                               => 'Falha na Requisição',
+			'Loading...'                                   => 'Carregando...',
+			'Change Model'                                 => 'Alterar Modelo',
+			'Select or type a model...'                    => 'Selecione ou digite um modelo...',
+			' (Non-chat)'                                  => ' (Não-chat)',
+			'Please enter an API Key first.'               => 'Por favor, insira uma Chave de API primeiro.',
+			'Failed to fetch models: '                     => 'Falha ao buscar modelos: ',
+			'Unknown error'                                => 'Erro desconhecido',
+			'Error fetching models. Check your key and connection.' => 'Erro ao buscar modelos. Verifique sua chave e conexão.',
+			'Please type a description first.'             => 'Por favor, descreva o comportamento desejado primeiro.',
+			'Asking AI...'                                 => 'Consultando IA...',
+			'Generating...'                                => 'Gerando...',
+			'✨ Applied above.'                             => '✨ Aplicado acima.',
+			'Error generating prompt.'                     => 'Erro ao gerar o prompt.',
+			'Testing...'                                   => 'Testando...',
+			'✅ Valid'                                      => '✅ Válido',
+			'❌ Invalid'                                    => '❌ Inválido',
+			'Validate Prompt'                              => 'Validar Prompt',
+			'Loading backups...'                           => 'Carregando backups...',
+			'File'                                         => 'Arquivo',
+			'Date'                                         => 'Data',
+			'Size'                                         => 'Tamanho',
+			'Download'                                     => 'Baixar',
+			'Delete'                                       => 'Excluir',
+			'No backups found.'                            => 'Nenhum backup encontrado.',
+			'Delete?'                                      => 'Excluir?',
+			'Vectorizing...'                               => 'Vetorizando...',
+			'Vectorize Now'                                => 'Vetorizar Agora',
+			'Clear knowledge base?'                        => 'Limpar base de conhecimento?',
+			'Fetching post and generating vector embeddings...' => 'Buscando post e gerando embeddings vetoriais...',
+			'Success!'                                     => 'Sucesso!',
+			'Post Extracted:'                              => 'Post Extraído:',
+			'Vector Dimensions:'                           => 'Dimensões do Vetor:',
+			'Text Snippet:'                                => 'Trecho de Texto:',
+			'Vector Preview:'                              => 'Pré-visualização do Vetor:',
+			'Run Test on Random Post'                      => 'Executar Teste em Post Aleatório',
+			'Searching...'                                 => 'Pesquisando...',
+			'Searching the knowledge base '                => 'Pesquisando na base de conhecimento ',
+			'No documents found. Have you run vectorization?' => 'Nenhum documento encontrado. Você já executou a vetorização?',
+			'Score / Relevance'                            => 'Pontuação / Relevância',
+			'Metadata'                                     => 'Metadados',
+			'Untitled'                                     => 'Sem título',
+			'Error'                                        => 'Erro',
+			'Processing...'                                => 'Processando...',
+			'Clearing...'                                  => 'Limpando...',
+			'This will schedule clearing ALL AI-geolocated posts in the background. Continue?' => 'Isso irá agendar a limpeza de TODOS os posts geolocalizados pela IA em segundo plano. Deseja continuar?',
+			'ARE YOU SURE? This cannot be undone and will require full re-vectorization for these posts.' => 'TEM CERTEZA? Esta ação não pode ser desfeita e exigirá uma nova vetorização completa para estes posts.',
+			'Bulk clearing started in background.'         => 'Limpeza em massa iniciada em segundo plano.',
+			'Expand'                                       => 'Expandir',
+			'Collapse'                                     => 'Recolher',
+			'Back'                                         => 'Voltar',
+			'Low'                                          => 'Baixo',
+			'Fair'                                         => 'Regular',
+			'Optimal'                                      => 'Ótimo',
+			'API call failed'                              => 'Falha na chamada da API',
+			'Process 1 Batch Now'                          => 'Processar 1 Lote Agora',
+			'Clear 1 Batch'                                => 'Limpar 1 Lote',
+			'Delete log file?'                             => 'Excluir arquivo de log?',
+			'No matching layers found.'                    => 'Nenhuma camada correspondente encontrada.',
+			' matching layers:'                            => ' camadas correspondentes:',
+			'Edit'                                         => 'Editar',
+			'Search'                                       => 'Pesquisar',
+			'Clear layer store?'                           => 'Limpar armazenamento de camadas?',
+			'Please enter a post ID or search text.'       => 'Por favor, insira um ID de post ou texto de busca.',
+			'Tokens'                                       => 'Tokens',
+			'reqs'                                         => 'reqs',
+			'In (Prompt):'                                 => 'Entrada (Prompt):',
+			'Out (Compl.):'                                => 'Saída (Compl.):',
+			'Total'                                        => 'Total',
+			'Prompt:'                                      => 'Prompt:',
+			'Completion:'                                  => 'Complemento:',
+			'View Post'                                    => 'Ver Post',
+			'Edit Post'                                    => 'Editar Post',
+			'Select Taxonomy...'                           => 'Selecionar Taxonomia...',
+			'Select Term...'                               => 'Selecionar Termo...',
+			' locations found.'                            => ' locais encontrados.',
+			'Unauthorized access.'                         => 'Acesso não autorizado.',
+			'Invalid file.'                                => 'Arquivo inválido.',
+			'File not found.'                              => 'Arquivo não encontrado.',
+			'Brazilian Biomes'                             => 'Biomas Brasileiros',
+			'Indigenous Territories'                       => 'Terras Indígenas',
+			'Quilombola Territories'                       => 'Territórios Quilombolas',
+			'Extractive Reserves (Resex)'                  => 'Reservas Extrativistas (Resex)',
+			'Conservation Units'                           => 'Unidades de Conservação',
+			'Riverside Communities'                        => 'Comunidades Ribeirinhas',
+			'Agrarian Reform Settlements'                  => 'Assentamentos de Reforma Agrária',
+			'Indigenous Peoples (Ethnicities)'             => 'Povos Indígenas (Etnias)',
+			'Legal Amazon and Boundaries'                  => 'Amazônia Legal e Limites',
+			'Hydrographic Basins'                          => 'Bacias Hidrográficas',
 		);
 
 		if ( isset( $translations[ $text ] ) ) {
@@ -1622,7 +1717,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	public function api_delete_backup( $request ) {
 		$filename = $request->get_param( 'filename' );
 		if ( empty( $filename ) ) {
-			return new \WP_REST_Response( array( 'error' => 'Missing filename' ), 400 );
+			return new \WP_REST_Response( array( 'error' => __( 'Missing filename', 'jeo' ) ), 400 );
 		}
 
 		$uploads   = wp_upload_dir();
@@ -1633,6 +1728,6 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return new \WP_REST_Response( array( 'success' => true ), 200 );
 		}
 
-		return new \WP_REST_Response( array( 'error' => 'File not found' ), 404 );
+		return new \WP_REST_Response( array( 'error' => __( 'File not found', 'jeo' ) ), 404 );
 	}
 }

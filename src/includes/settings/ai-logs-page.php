@@ -13,7 +13,7 @@
 
 	<?php
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( 'Unauthorized access.' );
+		wp_die( esc_html__( 'Unauthorized access.', 'jeo' ) );
 	}
 
 		// Handle "Clear Logs" action.
@@ -72,15 +72,15 @@
 							<div style="font-size: 12px; color: #646970; font-family: monospace;">' . esc_html( $model_name ) . '</div>
 						</div>
 						<div style="background: #f0f0f1; padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; color: #50575e;">
-							' . esc_html( number_format_i18n( $stat->total_requests ) ) . ' reqs
+							' . esc_html( number_format_i18n( $stat->total_requests ) ) . ' ' . esc_html__( 'reqs', 'jeo' ) . '
 						</div>
 					</div>
 					<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #2271b1;">
-						' . esc_html( number_format_i18n( $stat->total_tokens ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+						' . esc_html( number_format_i18n( $stat->total_tokens ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">' . esc_html__( 'Tokens', 'jeo' ) . '</span>
 					</div>
 					<div style="display: flex; justify-content: space-between; font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
-						<div><strong>In (Prompt):</strong> ' . esc_html( number_format_i18n( $stat->total_input ) ) . '</div>
-						<div><strong>Out (Compl.):</strong> ' . esc_html( number_format_i18n( $stat->total_output ) ) . '</div>
+						<div><strong>' . esc_html__( 'In (Prompt):', 'jeo' ) . '</strong> ' . esc_html( number_format_i18n( $stat->total_input ) ) . '</div>
+						<div><strong>' . esc_html__( 'Out (Compl.):', 'jeo' ) . '</strong> ' . esc_html( number_format_i18n( $stat->total_output ) ) . '</div>
 					</div>
 				</div>';
 			}
@@ -101,7 +101,7 @@
 			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #46b450; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
 				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Document Vectorization', 'jeo' ) . '</div>
 				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #46b450;">
-					' . esc_html( number_format_i18n( $embedding_tokens['vectorize'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+					' . esc_html( number_format_i18n( $embedding_tokens['vectorize'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">' . esc_html__( 'Tokens', 'jeo' ) . '</span>
 				</div>
 				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
 					' . esc_html__( 'Tokens used inserting posts to Vector Store.', 'jeo' ) . '
@@ -113,7 +113,7 @@
 			<div style="background: #fff; border: 1px solid #ccd0d4; padding: 20px; border-radius: 6px; border-left: 5px solid #f56e28; box-shadow: 0 1px 3px rgba(0,0,0,0.05);">
 				<div style="font-size: 14px; color: #1d2327; font-weight: 700; text-transform: uppercase; margin-bottom: 12px;">' . esc_html__( 'Semantic Retrieval', 'jeo' ) . '</div>
 				<div style="font-size: 32px; font-weight: 300; line-height: 1; margin-bottom: 15px; color: #f56e28;">
-					' . esc_html( number_format_i18n( $embedding_tokens['retrieve'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">Tokens</span>
+					' . esc_html( number_format_i18n( $embedding_tokens['retrieve'] ) ) . ' <span style="font-size: 14px; font-weight: 400; color: #8c8f94;">' . esc_html__( 'Tokens', 'jeo' ) . '</span>
 				</div>
 				<div style="font-size: 12px; color: #50575e; border-top: 1px solid #f0f0f1; padding-top: 12px;">
 					' . esc_html__( 'Tokens used mapping user queries to vectors.', 'jeo' ) . '
@@ -235,8 +235,8 @@
 							<?php endif; ?>
 						</td>
 						<td>
-							<strong style="font-size: 14px;"><?php echo esc_html( $tot_tok ); ?> Total</strong><br/>
-							<small style="color:#555;">Prompt: <?php echo esc_html( $in_tok ); ?> | Completion: <?php echo esc_html( $out_tok ); ?></small>
+							<strong style="font-size: 14px;"><?php echo esc_html( $tot_tok ); ?> <?php esc_html_e( 'Total', 'jeo' ); ?></strong><br/>
+							<small style="color:#555;"><?php esc_html_e( 'Prompt:', 'jeo' ); ?> <?php echo esc_html( $in_tok ); ?> | <?php esc_html_e( 'Completion:', 'jeo' ); ?> <?php echo esc_html( $out_tok ); ?></small>
 						</td>
 						<td><code><?php echo esc_html( $output_preview ); ?></code></td>
 						<td>

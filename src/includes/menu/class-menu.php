@@ -57,11 +57,11 @@ class Menu {
 			array( $this, 'render_dashboard_page' )
 		);
 
-		// 4. Submenu AI (novo) - Posicionado após Dashboard e antes dos CPTs (Maps, Layers)
+		// 4. Submenu AI (new) - Posicionado após Dashboard e antes dos CPTs (Maps, Layers)
 		add_submenu_page(
 			'jeo-main-menu',
-			__( 'AI (novo)', 'jeo' ),
-			__( 'AI (novo)', 'jeo' ),
+			__( 'AI (new)', 'jeo' ),
+			__( 'AI (new)', 'jeo' ),
 			'manage_options',
 			'jeo-ai-settings',
 			array( \jeo_ai_settings(), 'render_settings_page' )
