@@ -1,4 +1,4 @@
-import { Button, ClipboardButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
@@ -25,9 +25,23 @@ const insertParagraph = ( html ) => {
  */
 const ALLOWED_TAGS = new Set( [ 'strong', 'b', 'em', 'i', 'br', 'a' ] );
 
+/**
+ * Decode HTML entities (e.g. &lt; → <) so structured-output escaped strings
+ * are rendered correctly.
+ *
+ * @param {string} input String that may contain HTML entities.
+ * @return {string} Decoded string.
+ */
+const decodeHtmlEntities = ( input ) => {
+	const textarea = document.createElement( 'textarea' );
+	textarea.innerHTML = input;
+	return textarea.value;
+};
+
 const sanitizeHtml = ( rawHtml ) => {
+	const decoded = decodeHtmlEntities( rawHtml );
 	const div = document.createElement( 'div' );
-	div.innerHTML = rawHtml;
+	div.innerHTML = decoded;
 
 	const walk = ( node ) => {
 		if ( node.nodeType === Node.TEXT_NODE ) {
@@ -147,15 +161,14 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 							>
 								{ __( 'Insert into article', 'jeo' ) }
 							</Button>
-							<ClipboardButton
+							<Button
 								variant="tertiary"
 								size="small"
-								text={ safeHtml }
-								onCopy={ () => handleCopy( paragraph.text, index ) }
+								onClick={ () => handleCopy( paragraph.text, index ) }
 								className="jeo-context-suggestion__copy"
 							>
 								{ copiedIndex === index ? __( 'Copied!', 'jeo' ) : __( 'Copy', 'jeo' ) }
-							</ClipboardButton>
+							</Button>
 						</div>
 					</div>
 				);
