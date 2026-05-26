@@ -559,8 +559,20 @@ class Context_Handler {
 			if ( 'assistant' === $msg['role'] ) {
 				$content = $msg['content'];
 
-				// Skip JSON schema instructions.
-				if ( false !== strpos( $content, 'JSON schema:' ) ) {
+				// Strip everything from "Respond using this JSON schema:" onwards.
+				$schema_pos = stripos( $content, 'Respond using this JSON schema:' );
+				if ( false !== $schema_pos ) {
+					$content = trim( substr( $content, 0, $schema_pos ) );
+				}
+
+				// Also strip standalone JSON schema declarations.
+				$schema_pos = stripos( $content, 'JSON schema:' );
+				if ( false !== $schema_pos ) {
+					$content = trim( substr( $content, 0, $schema_pos ) );
+				}
+
+				// If the remaining content is empty, skip the message entirely.
+				if ( '' === $content ) {
 					continue;
 				}
 
@@ -573,6 +585,8 @@ class Context_Handler {
 				if ( preg_match( '/^\s*\{\s*"paragraphs"\s*:/s', $content ) ) {
 					continue;
 				}
+
+				$msg['content'] = $content;
 			}
 
 			$clean[] = $msg;
