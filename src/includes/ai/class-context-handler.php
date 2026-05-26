@@ -149,6 +149,18 @@ class Context_Handler {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/context/clear',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear' ),
+				'permission_callback' => function () {
+					return current_user_can( 'edit_posts' );
+				},
+			)
+		);
 	}
 
 	/**
@@ -186,6 +198,25 @@ class Context_Handler {
 
 		$initial_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '"). Generate editorial suggestions based on its content.';
 
+		// If the post has very little content, ask the user for more info instead of calling the AI.
+		$content_length = strlen( trim( wp_strip_all_tags( $post->post_content ) ) );
+		if ( $content_length < 100 ) {
+			$assistant_message = __( 'The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles).', 'jeo' );
+			$this->save_chat_message( $post_id, 'user', __( 'Generate editorial suggestions for this post based on its content.', 'jeo' ), $user_id );
+			$this->save_chat_message( $post_id, 'assistant', $assistant_message );
+
+			return new \WP_REST_Response(
+				array(
+					'success'           => true,
+					'paragraphs'        => array(),
+					'references'        => array(),
+					'message'           => __( 'Waiting for more content or directions.', 'jeo' ),
+					'assistant_message' => $assistant_message,
+				),
+				200
+			);
+		}
+
 		try {
 			$result = $this->run_agent(
 				$post_id,
@@ -201,7 +232,8 @@ class Context_Handler {
 			$this->save_chat_message(
 				$post_id,
 				'user',
-				__( 'Generate editorial suggestions for this post based on its content.', 'jeo' )
+				__( 'Generate editorial suggestions for this post based on its content.', 'jeo' ),
+				$user_id
 			);
 			$this->save_chat_message(
 				$post_id,
@@ -296,7 +328,7 @@ class Context_Handler {
 			);
 
 			$response = $result->to_rest_response();
-			$this->save_chat_message( $post_id, 'user', $message );
+			$this->save_chat_message( $post_id, 'user', $message, $user_id );
 			$this->save_chat_message(
 				$post_id,
 				'assistant',
@@ -328,24 +360,40 @@ class Context_Handler {
 	 * @throws \TypeError On unexpected type errors from the AI library.
 	 */
 	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message, ?string $state_context = null ): Context_Generation_Output {
-		$assistant = Context_Agent::create( $post_id, $conversation_id, $user_id ? $user_id : null, $state_context );
+		$max_retries = 2;
+		$last_error  = null;
 
-		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
-		$this->inject_history( $assistant, $store, $conversation_id );
-
-		try {
-			$result = $assistant->structured( new UserMessage( $message ) );
-		} catch ( \TypeError $e ) {
-			if ( false !== strpos( $e->getMessage(), 'getJson()' ) ) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception message, not HTML output.
-				throw new \Exception( esc_html__( 'The AI returned an empty response. Please try again.', 'jeo' ), 0, $e );
+		for ( $attempt = 0; $attempt <= $max_retries; $attempt++ ) {
+			if ( $attempt > 0 ) {
+				sleep( 1 );
 			}
-			throw $e;
+
+			try {
+				$assistant = Context_Agent::create( $post_id, $conversation_id, $user_id ? $user_id : null, $state_context );
+				$store     = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
+				$this->inject_history( $assistant, $store, $conversation_id );
+
+				$result = $assistant->structured( new UserMessage( $message ) );
+				$this->persist_history( $assistant, $store, $conversation_id );
+
+				return $result;
+			} catch ( \TypeError $e ) {
+				$last_error = $e;
+				if ( false === strpos( $e->getMessage(), 'getJson()' ) ) {
+					throw $e;
+				}
+				// Empty response — retry.
+			} catch ( \Exception $e ) {
+				throw $e;
+			}
 		}
 
-		$this->persist_history( $assistant, $store, $conversation_id );
-
-		return $result;
+		throw new \Exception(
+			esc_html__( 'The AI did not respond after multiple attempts. Please try again or rephrase your request.', 'jeo' ),
+			0,
+			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- previous exception object, not HTML output.
+			$last_error
+		);
 	}
 
 	/**
@@ -530,10 +578,17 @@ class Context_Handler {
 				if ( ! is_array( $msg ) || empty( $msg['role'] ) || empty( $msg['content'] ) ) {
 					continue;
 				}
-				$messages[] = array(
+				$formatted = array(
 					'role'    => $msg['role'],
 					'content' => $msg['content'],
 				);
+				if ( 'user' === $msg['role'] && ! empty( $msg['user_id'] ) ) {
+					$user = get_userdata( (int) $msg['user_id'] );
+					if ( $user ) {
+						$formatted['username'] = $user->display_name;
+					}
+				}
+				$messages[] = $formatted;
 			}
 		}
 
@@ -553,6 +608,39 @@ class Context_Handler {
 		}
 
 		return new \WP_REST_Response( $response, 200 );
+	}
+
+	/**
+	 * REST callback: clear all context assistant state for a post.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_clear( $request ) {
+		$post_id = (int) $request->get_param( 'post_id' );
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Post not found.', 'jeo' ),
+				),
+				404
+			);
+		}
+
+		delete_post_meta( $post_id, self::CONVERSATION_META_KEY );
+		delete_post_meta( $post_id, self::LAST_RESPONSE_META_KEY );
+		delete_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY );
+
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => __( 'Conversation cleared.', 'jeo' ),
+			),
+			200
+		);
 	}
 
 	/**
@@ -578,20 +666,26 @@ class Context_Handler {
 	/**
 	 * Append a clean chat message to the dedicated chat messages meta.
 	 *
-	 * @param int    $post_id Post ID.
-	 * @param string $role    'user' or 'assistant'.
-	 * @param string $content Message content.
+	 * @param int      $post_id Post ID.
+	 * @param string   $role    'user' or 'assistant'.
+	 * @param string   $content Message content.
+	 * @param int|null $user_id WordPress user ID (only for user messages).
 	 */
-	private function save_chat_message( int $post_id, string $role, string $content ): void {
+	private function save_chat_message( int $post_id, string $role, string $content, ?int $user_id = null ): void {
 		$messages = get_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY, true );
 		if ( ! is_array( $messages ) ) {
 			$messages = array();
 		}
 
-		$messages[] = array(
+		$entry = array(
 			'role'    => $role,
 			'content' => $content,
 		);
+		if ( null !== $user_id ) {
+			$entry['user_id'] = $user_id;
+		}
+
+		$messages[] = $entry;
 
 		update_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY, $messages );
 	}

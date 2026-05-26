@@ -25,8 +25,6 @@ const generateUUID = () => {
  *
  * @param {Object} props         Component props.
  * @param {number} props.postId  Current post ID.
- * @param {string} props.title   Post title.
- * @param {string} props.content Post content.
  * @return {JSX.Element}
  */
 const ContextChatPanel = ( { postId } ) => {
@@ -135,14 +133,18 @@ const ContextChatPanel = ( { postId } ) => {
 
 	/**
 	 * Send a chat message to refine suggestions.
+	 *
+	 * @param {string|null} explicitMessage Optional explicit message to send (used by retry).
 	 */
-	const sendMessage = async () => {
-		if ( ! inputValue.trim() || isLoading ) {
+	const sendMessage = async ( explicitMessage = null ) => {
+		const userMessage = explicitMessage || inputValue.trim();
+		if ( ! userMessage || isLoading ) {
 			return;
 		}
 
-		const userMessage = inputValue.trim();
-		setInputValue( '' );
+		if ( ! explicitMessage ) {
+			setInputValue( '' );
+		}
 		setMessages( ( prev ) => [ ...prev, { role: 'user', content: userMessage } ] );
 		setIsLoading( true );
 		setError( null );
@@ -171,6 +173,42 @@ const ContextChatPanel = ( { postId } ) => {
 			}
 		} catch ( err ) {
 			setError( err.message || __( 'Error contacting AI.', 'jeo' ) );
+		} finally {
+			setIsLoading( false );
+		}
+	};
+
+	/**
+	 * Retry: ask the AI to generate new suggestions without explicit user input.
+	 */
+	const handleRetry = () => {
+		sendMessage( __( 'Generate new editorial suggestions based on the current post content.', 'jeo' ) );
+	};
+
+	/**
+	 * Clear: reset the conversation and all suggestions.
+	 */
+	const handleClear = async () => {
+		if ( ! postId || isLoading ) {
+			return;
+		}
+		setIsLoading( true );
+		setError( null );
+
+		try {
+			await apiFetch( {
+				path: 'jeo/v1/context/clear',
+				method: 'POST',
+				data: { post_id: postId },
+			} );
+
+			setConversationId( generateUUID() );
+			setMessages( [] );
+			setSuggestedParagraphs( [] );
+			setReferences( [] );
+			setHasStarted( false );
+		} catch ( err ) {
+			setError( err.message || __( 'Failed to clear conversation.', 'jeo' ) );
 		} finally {
 			setIsLoading( false );
 		}
@@ -228,6 +266,11 @@ const ContextChatPanel = ( { postId } ) => {
 						key={ index }
 						className={ `jeo-context-chat__message jeo-context-chat__message--${ msg.role }` }
 					>
+						{ 'user' === msg.role && msg.username && (
+							<span className="jeo-context-chat__user-badge">
+								{ msg.username }
+							</span>
+						) }
 						{ msg.content }
 					</div>
 				) ) }
@@ -263,14 +306,36 @@ const ContextChatPanel = ( { postId } ) => {
 					disabled={ isLoading || isRestoring }
 					rows={ isModal ? 4 : 3 }
 				/>
-				<Button
-					variant="primary"
-					onClick={ sendMessage }
-					disabled={ isLoading || isRestoring || ! inputValue.trim() }
-					className="jeo-context-chat__send"
-				>
-					{ __( 'Send', 'jeo' ) }
-				</Button>
+				<div className="jeo-context-chat__actions">
+					<Button
+						variant="primary"
+						onClick={ () => sendMessage() }
+						disabled={ isLoading || isRestoring || ! inputValue.trim() }
+						className="jeo-context-chat__send"
+					>
+						{ __( 'Send', 'jeo' ) }
+					</Button>
+					<div className="jeo-context-chat__secondary-actions">
+						<Button
+							variant="secondary"
+							size="small"
+							onClick={ handleRetry }
+							disabled={ isLoading || isRestoring || ! hasStarted }
+							className="jeo-context-chat__retry"
+						>
+							{ __( 'Retry', 'jeo' ) }
+						</Button>
+						<Button
+							variant="tertiary"
+							size="small"
+							onClick={ handleClear }
+							disabled={ isLoading || isRestoring }
+							className="jeo-context-chat__clear"
+						>
+							{ __( 'Clear', 'jeo' ) }
+						</Button>
+					</div>
+				</div>
 			</div>
 		</div>
 	);
