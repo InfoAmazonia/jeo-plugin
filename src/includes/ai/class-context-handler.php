@@ -367,12 +367,12 @@ class Context_Handler {
 	 * @throws \TypeError On unexpected type errors from the AI library.
 	 */
 	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message, ?string $state_context = null ): Context_Generation_Output {
-		$max_retries = 2;
+		$max_retries = 3;
 		$last_error  = null;
 
 		for ( $attempt = 0; $attempt <= $max_retries; $attempt++ ) {
 			if ( $attempt > 0 ) {
-				sleep( 1 );
+				sleep( min( $attempt * 2, 8 ) );
 			}
 
 			try {
@@ -391,7 +391,19 @@ class Context_Handler {
 				}
 				// Empty response — retry.
 			} catch ( \Exception $e ) {
-				throw $e;
+				$last_error = $e;
+				$msg        = $e->getMessage();
+
+				// Non-retryable errors: auth, invalid config, rate limit (4xx except 429).
+				if ( preg_match( '/\b4(?:0[0-9]|1[0-7]|2[2-9]|[3-9][0-9])\b/', $msg ) ) {
+					throw $e;
+				}
+
+				// Retryable: network errors, 5xx, 429, timeouts, empty responses, empty body.
+				if ( $attempt >= $max_retries ) {
+					break;
+				}
+				// Continue to next retry.
 			}
 		}
 
