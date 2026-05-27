@@ -15,11 +15,17 @@ nav:
       - Maps: map-post.md
       - Discovery: discovery.md
       - Story map: story-map.md
+      - Stories near you: stories-near-you.md
+      - Minimap: minimap.md
       - Map shortcode: map-shortcode.md
       - Map block: map-block.md
       - One-time map block: one-time-map-block.md
       - Map embed: map-embed.md
       - Geolocating posts: geolocating-posts.md
+  - AI:
+      - AI Settings: ai-settings.md
+      - AI Georeferencing: ai-georeferencing.md
+      - AI Bulk Geolocation: ai-bulk-geolocation.md
   - Developer:
       - Geo information: dev/geo-information.md
       - Geocoders: dev/geocoders.md
@@ -27,6 +33,8 @@ nav:
       - Layer types API: dev/layer-types-api.md
       - Migration: dev/migration.md
       - PHP compatibility: dev/php-compatibility.md
+      - WordPress.org compliance: dev/wordpress-org-compliance.md
+      - WordPress.org audit report: dev/wordpress-org-audit-report.md
       - Dependency upgrade report: dev/dependency-upgrade-report.md
       - Dependency upgrade smoke tests: dev/dependency-upgrade-smoke-tests.md
 exclude_docs: |

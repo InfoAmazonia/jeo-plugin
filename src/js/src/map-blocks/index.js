@@ -368,6 +368,13 @@ registerBlockType( 'jeo/stories-near-you', {
 	icon: MapIcon,
 	supports: {
 		align: true,
+		color: {
+			text: true,
+			custom: true,
+			background: false,
+			gradients: false,
+			link: true,
+		},
 	},
 	attributes: {
 		postsPerPage: {
@@ -385,6 +392,10 @@ registerBlockType( 'jeo/stories-near-you', {
 		tag: {
 			type: 'number',
 			default: 0,
+		},
+		cardLayout: {
+			type: 'string',
+			default: '',
 		},
 		showThumbnail: {
 			type: 'boolean',
@@ -413,6 +424,82 @@ registerBlockType( 'jeo/stories-near-you', {
 		lng: {
 			type: 'number',
 			default: 0,
+		},
+		postLayout: {
+			type: 'string',
+			default: 'grid',
+		},
+		mediaPosition: {
+			type: 'string',
+			default: 'top',
+		},
+		imageShape: {
+			type: 'string',
+			default: 'landscape',
+		},
+		excerptLength: {
+			type: 'number',
+			default: 55,
+		},
+		showReadMore: {
+			type: 'boolean',
+			default: false,
+		},
+		readMoreLabel: {
+			type: 'string',
+			default: '',
+		},
+		showAvatar: {
+			type: 'boolean',
+			default: true,
+		},
+		colGap: {
+			type: 'number',
+			default: 3,
+		},
+		typeScale: {
+			type: 'number',
+			default: 4,
+		},
+		imageScale: {
+			type: 'number',
+			default: 3,
+		},
+		minHeight: {
+			type: 'number',
+			default: 0,
+		},
+		categories: {
+			type: 'string',
+			default: '',
+		},
+		tags: {
+			type: 'string',
+			default: '',
+		},
+		categoryExclusions: {
+			type: 'string',
+			default: '',
+		},
+		tagExclusions: {
+			type: 'string',
+			default: '',
+		},
+		customTaxonomies: {
+			type: 'string',
+			default: '',
+		},
+		postType: {
+			type: 'string',
+			default: '',
+		},
+		imageSize: {
+			type: 'string',
+			default: 'medium_large',
+		},
+		imageAsLink: {
+			type: 'boolean',
+			default: false,
 		},
 	},
 	edit: StoriesNearYouEditor,

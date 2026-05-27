@@ -75,6 +75,18 @@
 						</tr>
 
 						<tr>
+							<th scope="row"><label for="geolocation_precision"><?php esc_html_e( 'User location precision', 'jeo' ); ?></label></th>
+							<td>
+								<input name="<?php echo esc_html( $this->get_field_name( 'geolocation_precision' ) ); ?>" type="range" id="geolocation_precision" min="1" max="5" value="<?php echo esc_attr( $this->get_option( 'geolocation_precision' ) ); ?>">
+								<output for="geolocation_precision" id="geolocation_precision_value"><?php echo esc_html( $this->get_option( 'geolocation_precision' ) ); ?></output>
+								<p class="description">
+									<?php esc_html_e( 'Lower = less precision, more privacy.', 'jeo' ); ?>
+									<a href="<?php echo esc_url( __( 'https://en.wikipedia.org/wiki/Decimal_degrees#Precision', 'jeo' ) ); ?>" target="_blank" rel="noopener noreferrer"><?php esc_html_e( 'Learn more about decimal degree precision.', 'jeo' ); ?></a>
+								</p>
+							</td>
+						</tr>
+
+						<tr>
 							<th scope="row"><label for="show_storymaps_on_post_archives"><?php esc_html_e( 'Show Storymaps on Post Archives', 'jeo' ); ?></label></th>
 							<td>
 								<input name="<?php echo esc_html( $this->get_field_name( 'show_storymaps_on_post_archives' ) ); ?>" type="checkbox" id="show_storymaps_on_post_archives" value="1" <?php checked( $this->get_option( 'show_storymaps_on_post_archives' ), 1 ); ?>>
@@ -262,4 +274,25 @@
 	.jeo-settings-submit input {
 		padding: 6px 24px;
 	}
+	#geolocation_precision {
+		vertical-align: middle;
+	}
+	#geolocation_precision_value {
+		display: inline-block;
+		min-width: 1em;
+		text-align: center;
+		font-weight: 600;
+		vertical-align: middle;
+	}
 </style>
+<script>
+	document.addEventListener( 'DOMContentLoaded', function() {
+		var slider = document.getElementById( 'geolocation_precision' );
+		var output = document.getElementById( 'geolocation_precision_value' );
+		if ( slider && output ) {
+			slider.addEventListener( 'input', function() {
+				output.textContent = slider.value;
+			} );
+		}
+	} );
+</script>

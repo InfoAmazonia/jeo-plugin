@@ -521,7 +521,7 @@
 
 				postTypeSelect.addEventListener('change', function() {
 					var pt = data.post_types.find(t => t.slug === this.value);
-					taxSelect.innerHTML = '<option value="">Select Taxonomy...</option>';
+					taxSelect.innerHTML = '<option value=""><?php echo esc_js( esc_html__( 'Select Taxonomy...', 'jeo' ) ); ?></option>';
 					if (pt && pt.taxonomies.length > 0) {
 						pt.taxonomies.forEach(tax => {
 							var opt = document.createElement('option');
@@ -539,7 +539,7 @@
 				taxSelect.addEventListener('change', function() {
 					var pt = data.post_types.find(t => t.slug === postTypeSelect.value);
 					var tax = pt ? pt.taxonomies.find(x => x.slug === this.value) : null;
-					termSelect.innerHTML = '<option value="">Select Term...</option>';
+					termSelect.innerHTML = '<option value=""><?php echo esc_js( esc_html__( 'Select Term...', 'jeo' ) ); ?></option>';
 					if (tax && tax.terms.length > 0) {
 						tax.terms.forEach(term => {
 							var opt = document.createElement('option');
@@ -602,7 +602,7 @@
 					if (map.getSource('jeo-dashboard-pins')) map.removeSource('jeo-dashboard-pins');
 				}
 
-				document.getElementById('jeo-pin-count').innerText = pins.length + ' locations found.';
+				document.getElementById('jeo-pin-count').innerText = pins.length + '<?php echo esc_js( esc_html__( ' locations found.', 'jeo' ) ); ?>';
 				if (pins.length === 0) return;
 
 				var features = [];
@@ -614,7 +614,7 @@
 					features.push({
 						type: 'Feature',
 						properties: {
-							title: pin.title || 'Untitled',
+							title: pin.title || '<?php echo esc_js( esc_html__( 'Untitled', 'jeo' ) ); ?>',
 							name: pin.name || '',
 							quote: pin.quote || '',
 							view_url: pin.view_url || '#',
@@ -701,10 +701,10 @@
 						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 					}
 					var popupHTML = '<div class="jeo-dashboard-popup" style="padding:10px;min-width:200px;">' +
-						'<h3 style="margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #eee;padding-bottom:5px;">' + (p.title || 'Untitled') + '</h3>' +
+						'<h3 style="margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #eee;padding-bottom:5px;">' + (p.title || '<?php echo esc_js( esc_html__( 'Untitled', 'jeo' ) ); ?>') + '</h3>' +
 						'<p style="margin:0 0 10px 0;font-size:12px;color:#1d2327;"><strong>' + p.name + '</strong></p>';
 					if (p.quote) popupHTML += '<blockquote style="margin:0 0 15px 0;padding:8px 12px;border-left:3px solid #007cba;background:#f0f7ff;font-style:italic;font-size:12px;line-height:1.4;color:#2c3338;">"' + p.quote + '"</blockquote>';
-					popupHTML += '<div style="display:flex;gap:10px;margin-top:10px;"><a href="' + p.view_url + '" class="button button-small" target="_blank">View Post</a><a href="' + p.edit_url + '" class="button button-small" target="_blank">Edit Post</a></div></div>';
+					popupHTML += '<div style="display:flex;gap:10px;margin-top:10px;"><a href="' + p.view_url + '" class="button button-small" target="_blank"><?php echo esc_js( esc_html__( 'View Post', 'jeo' ) ); ?></a><a href="' + p.edit_url + '" class="button button-small" target="_blank"><?php echo esc_js( esc_html__( 'Edit Post', 'jeo' ) ); ?></a></div></div>';
 					new glObject.Popup({ offset: 15, closeOnClick: true })
 						.setLngLat(coordinates)
 						.setHTML(popupHTML)

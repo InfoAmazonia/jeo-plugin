@@ -414,7 +414,7 @@
 			var context = $input.val();
 
 			if (!context) {
-				$status.text('Please type a description first.').css('color', 'red');
+				$status.text(i18n.type_description || 'Please type a description first.').css('color', 'red');
 				return;
 			}
 
@@ -463,8 +463,8 @@
 				apiData.secondary_max = parseInt($('#jeo-ai-cal-secondary-max').val(), 10);
 			}
 
-			$btn.prop('disabled', true).text('Generating...');
-			$status.text('Asking LLM...').css('color', '#007cba');
+			$btn.prop('disabled', true).text(i18n.generating || 'Generating...');
+			$status.text(i18n.asking_llm || 'Asking AI...').css('color', '#007cba');
 
 			loggedApiFetch({
 				path: '/jeo/v1/ai-chat-prompt-generator',
@@ -473,12 +473,12 @@
 			}).then(function(res) {
 				if (res && res.prompt) {
 					$('#ai_system_prompt').val(res.prompt);
-					$status.text('✨ Applied above.').css('color', 'green');
+					$status.text(i18n.applied_above || '✨ Applied above.').css('color', 'green');
 				}
 			}).catch(function(err) {
-				$status.text('Error generating prompt.').css('color', 'red');
+				$status.text(i18n.error_generating || 'Error generating prompt.').css('color', 'red');
 			}).finally(function() {
-				$btn.prop('disabled', false).text('Generate Prompt');
+				$btn.prop('disabled', false).text(i18n.generate_prompt || 'Generate Prompt');
 			});
 		});
 
@@ -498,15 +498,15 @@
 			var apiData = { prompt: prompt, provider: provider, model: model };
 			if (!isMasked) apiData.api_key = key;
 
-			$btn.prop('disabled', true).text('Testing...');
+			$btn.prop('disabled', true).text(i18n.testing || 'Testing...');
 			loggedApiFetch({
 				path: '/jeo/v1/ai-validate-prompt',
 				method: 'POST',
 				data: apiData
 			}).then(function(res) {
-				$status.text(res.success ? '✅ Valid' : '❌ Invalid').css('color', res.success ? 'green' : 'red');
+				$status.text(res.success ? (i18n.valid || '✅ Valid') : (i18n.invalid_prompt || '❌ Invalid')).css('color', res.success ? 'green' : 'red');
 			}).finally(function() {
-				$btn.prop('disabled', false).text('Validate Prompt');
+				$btn.prop('disabled', false).text(i18n.validate_prompt || 'Validate Prompt');
 			});
 		});
 
@@ -607,7 +607,7 @@
 		$('.jeo-ai-clear-layer-store-btn').click(function(e) {
 			e.preventDefault();
 			var i18n = jeo_settings.i18n || {};
-			if (!confirm(i18n.confirm_clear_store || 'Clear layer store?')) return;
+			if (!confirm(i18n.clear_layer_store || 'Clear layer store?')) return;
 			var $btn = $(this).prop('disabled', true);
 			loggedApiFetch({ path: '/jeo/v1/ai-clear-layer-store', method: 'POST' }).then(function(res) {
 				alert(res.message); location.reload();
@@ -630,7 +630,7 @@
 			if (query) data.query = query;
 
 			if (!postId && !query) {
-				alert(i18n.error || 'Please enter a post ID or search text.');
+				alert(i18n.enter_post_or_query || 'Please enter a post ID or search text.');
 				$btn.prop('disabled', false);
 				return;
 			}
@@ -639,16 +639,16 @@
 
 			loggedApiFetch({ path: '/jeo/v1/ai-suggest-layers', method: 'POST', data: data }).then(function(res) {
 				if (!res.success || !res.results || res.results.length === 0) {
-					$results.html('<p style="color: #8c8f94;">' + (res.message || 'No matching layers found.') + '</p>').show();
+					$results.html('<p style="color: #8c8f94;">' + (res.message || (i18n.no_matching_layers || 'No matching layers found.')) + '</p>').show();
 					return;
 				}
-				var html = '<h5 style="margin-top:0;">' + res.results.length + ' matching layers:</h5><ul style="margin:0;padding:0;list-style:none;">';
+				var html = '<h5 style="margin-top:0;">' + res.results.length + (i18n.matching_layers || ' matching layers:') + '</h5><ul style="margin:0;padding:0;list-style:none;">';
 				$.each(res.results, function(i, layer) {
 					var score = layer.score ? ' (score: ' + layer.score.toFixed(4) + ')' : '';
 					html += '<li style="margin-bottom:8px;padding:10px;background:#f6f7f7;border-left:3px solid #d63638;border-radius:3px;">';
-					html += '<strong>' + (layer.title || 'Untitled') + '</strong>';
+					html += '<strong>' + (layer.title || (i18n.untitled || 'Untitled')) + '</strong>';
 					html += '<span style="color:#8c8f94;font-size:11px;margin-left:8px;">' + (layer.layer_type || '') + score + '</span>';
-					if (layer.edit_url) html += ' <a href="' + layer.edit_url + '" target="_blank" style="font-size:11px;">Edit</a>';
+					if (layer.edit_url) html += ' <a href="' + layer.edit_url + '" target="_blank" style="font-size:11px;">' + (i18n.edit || 'Edit') + '</a>';
 					html += '<p style="margin:4px 0 0 0;font-size:11px;color:#646970;">' + (layer.content || '') + '</p>';
 					html += '</li>';
 				});
@@ -742,7 +742,7 @@
 					$status.text((i18n.failed || 'Failed') + ': ' + (res.message || res.error || (i18n.unknown_error || 'Unknown error'))).css('color', 'red');
 				}
 			}).catch(function(err) {
-				$status.text('Error: ' + (err.message || err.error || 'API call failed')).css('color', 'red');
+				$status.text((i18n.error || 'Error') + ': ' + (err.message || err.error || (i18n.api_call_failed || 'API call failed'))).css('color', 'red');
 			}).finally(function() {
 				$btn.prop('disabled', false).text(i18n.run_test || 'Run Test on Random Post');
 			});
@@ -799,9 +799,9 @@
 					$resultsContainer.html('<p style="color: #d63638;">' + (res.message || res.error || (i18n.unknown_error || 'Unknown error')) + '</p>');
 				}
 			}).catch(function(err) {
-				$resultsContainer.html('<p style="color: #d63638;">' + (err.message || err.error || 'API call failed') + '</p>');
+				$resultsContainer.html('<p style="color: #d63638;">' + (err.message || err.error || (i18n.api_call_failed || 'API call failed')) + '</p>');
 			}).finally(function() {
-				$btn.prop('disabled', false).text(i18n.searching ? i18n.searching.replace('...', '') : 'Search');
+				$btn.prop('disabled', false).text(i18n.search_btn || 'Search');
 			});
 		});
 
@@ -828,7 +828,7 @@
 				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
 				alert((i18n.error || 'Error') + ': ' + msg);
 			}).finally(function() {
-				$btn.prop('disabled', false).text('Process 1 Batch Now');
+				$btn.prop('disabled', false).text(i18n.process_batch_now || 'Process 1 Batch Now');
 			});
 		});
 
@@ -845,7 +845,7 @@
 				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
 				alert((i18n.error || 'Error') + ': ' + msg);
 			}).finally(function() {
-				$btn.prop('disabled', false).text('Clear 1 Batch');
+				$btn.prop('disabled', false).text(i18n.clear_batch || 'Clear 1 Batch');
 			});
 		});
 
@@ -872,7 +872,7 @@
 
 		$('#jeo-bulk-clear-logs-btn').click(function(e) {
 			e.preventDefault();
-			if (!confirm('Delete log file?')) return;
+			if (!confirm(i18n.delete_log_confirm || 'Delete log file?')) return;
 			loggedApiFetch({ path: '/jeo/v1/bulk-ai-clear-logs', method: 'POST' }).then(function() {
 				location.reload();
 			});

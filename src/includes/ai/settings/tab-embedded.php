@@ -15,16 +15,16 @@
 		$data_dir = JEO_BASEPATH . '/includes/ai/data/';
 
 		$friendly_names = array(
-			'biomes.json'                      => 'Biomas Brasileiros',
-			'indigenous-territories.json'      => 'Terras Indígenas',
-			'quilombola-territories.json'      => 'Territórios Quilombolas',
-			'extractive-reserves.json'         => 'Reservas Extrativistas (Resex)',
-			'conservation-units.json'          => 'Unidades de Conservação',
-			'riverside-communities.json'       => 'Comunidades Ribeirinhas',
-			'agrarian-reform-settlements.json' => 'Assentamentos de Reforma Agrária',
-			'indigenous-peoples.json'          => 'Povos Indígenas (Etnias)',
-			'legal-amazon.json'                => 'Amazônia Legal e Limites',
-			'hydrographic-basins.json'         => 'Bacias Hidrográficas',
+			'biomes.json'                      => __( 'Brazilian Biomes', 'jeo' ),
+			'indigenous-territories.json'      => __( 'Indigenous Territories', 'jeo' ),
+			'quilombola-territories.json'      => __( 'Quilombola Territories', 'jeo' ),
+			'extractive-reserves.json'         => __( 'Extractive Reserves (Resex)', 'jeo' ),
+			'conservation-units.json'          => __( 'Conservation Units', 'jeo' ),
+			'riverside-communities.json'       => __( 'Riverside Communities', 'jeo' ),
+			'agrarian-reform-settlements.json' => __( 'Agrarian Reform Settlements', 'jeo' ),
+			'indigenous-peoples.json'          => __( 'Indigenous Peoples (Ethnicities)', 'jeo' ),
+			'legal-amazon.json'                => __( 'Legal Amazon and Boundaries', 'jeo' ),
+			'hydrographic-basins.json'         => __( 'Hydrographic Basins', 'jeo' ),
 		);
 
 		if ( is_dir( $data_dir ) ) {

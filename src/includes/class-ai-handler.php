@@ -32,7 +32,6 @@ class AI_Handler {
 	 */
 	protected function init() {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
-		add_filter( 'gettext', array( $this, 'dynamic_pt_br_translations' ), 10, 3 );
 		add_action( 'admin_post_jeo_download_dict', array( $this, 'api_download_dict' ) );
 		add_action( 'admin_footer', array( $this, 'deactivation_confirmation_js' ) );
 	}
@@ -65,19 +64,19 @@ class AI_Handler {
 	 */
 	public function api_download_dict() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( 'Unauthorized' );
+			wp_die( esc_html__( 'Unauthorized access.', 'jeo' ) );
 		}
 
 		check_admin_referer( 'jeo_download_dict' );
 
 		$file = isset( $_GET['file'] ) ? sanitize_file_name( wp_unslash( $_GET['file'] ) ) : '';
 		if ( empty( $file ) || strpos( $file, '.json' ) === false ) {
-			wp_die( 'Invalid file' );
+			wp_die( esc_html__( 'Invalid file.', 'jeo' ) );
 		}
 
 		$path = JEO_BASEPATH . '/includes/ai/data/' . $file;
 		if ( ! file_exists( $path ) ) {
-			wp_die( 'File not found' );
+			wp_die( esc_html__( 'File not found.', 'jeo' ) );
 		}
 
 		header( 'Content-Type: application/json' );
@@ -85,149 +84,6 @@ class AI_Handler {
 		header( 'Pragma: no-cache' );
 		readfile( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
 		exit;
-	}
-
-	/**
-	 * Dynamically translate new AI strings to pt_BR without recompiling .mo files.
-	 *
-	 * @param string $translation Translated text.
-	 * @param string $text        Text to translate.
-	 * @param string $domain      Text domain.
-	 */
-	public function dynamic_pt_br_translations( $translation, $text, $domain ) {
-		if ( 'jeo' !== $domain || ( ! is_admin() && ! wp_is_json_request() ) ) {
-			return $translation;
-		}
-
-		$locale = determine_locale();
-		if ( 'pt_BR' !== $locale ) {
-			return $translation;
-		}
-
-		$translations = array(
-			'Welcome'                                      => 'Boas-vindas',
-			'Dashboard'                                    => 'Experimental',
-			'Settings'                                     => 'Configurações',
-			'AI Debug Logs'                                => 'Logs de Depuração IA',
-			'Maps'                                         => 'Mapas',
-			'Layers'                                       => 'Camadas',
-			'Story Map'                                    => 'Mapas de História',
-			'Story Maps'                                   => 'Mapas de História',
-			'AI (v3.5)'                                    => 'IA (v3.5)',
-			'Active AI Provider'                           => 'Provedor de IA Ativo',
-			'Gemini API Key'                               => 'Chave de API do Gemini',
-			'OpenAI API Key'                               => 'Chave de API da OpenAI',
-			'DeepSeek API Key'                             => 'Chave de API do DeepSeek',
-			'Custom System Prompt'                         => 'Prompt de Sistema Personalizado',
-			'Leave empty to use the default prompt.'       => 'Deixe em branco para usar o prompt otimizado padrão.',
-			'Default Prompt Guide:'                        => 'Guia do Prompt Padrão:',
-			'Enable AI Debug Mode'                         => 'Ativar Modo de Depuração (Debug)',
-			'If enabled, raw AI inputs and outputs will be saved to src/jeo-ai-debug.log for refinement.' => 'Se ativado, os envios e retornos brutos da IA serão salvos no arquivo jeo-ai-debug.log para análise.',
-			'Loading settings... (A completely revamped panel is coming in JEO v4.0)' => 'Carregando painel... (Uma interface totalmente nova chegará no JEO v4.0)',
-			'AI Debug Logs (Last 10 entries)'              => 'Logs de Depuração da IA (Últimos 10)',
-			'No logs found yet. Try georeferencing a post with AI first.' => 'Nenhum log encontrado. Tente georreferenciar um post usando IA primeiro.',
-			'Date/Time'                                    => 'Data / Hora',
-			'Provider'                                     => 'Provedor LLM',
-			'Status / Output Preview'                      => 'Prévia da Resposta',
-			'Actions'                                      => 'Ações',
-			'View Details'                                 => 'Ver Detalhes',
-			'AI Interaction Details'                       => 'Detalhes da Interação com a IA',
-			'Close'                                        => 'Fechar',
-			'Timestamp'                                    => 'Registro de Tempo',
-			'Input (Prompt sent)'                          => 'Entrada (Prompt Enviado)',
-			'Output (Raw Response)'                        => 'Saída (Retorno Bruto)',
-			'Processing AI...'                             => 'Processando com IA...',
-			'Geolocate with AI'                            => 'Geolocalizar com IA',
-			'Review AI Suggestions'                        => 'Revisar Sugestões da IA',
-			'I identified these locations in your text. Review and select which ones to add to the map:' => 'Identifiquei os seguintes locais no texto. Revise e selecione quais deseja adicionar ao mapa:',
-			'(No context snippet found for this location)' => '(Nenhum trecho de contexto encontrado para este local)',
-			'Discard All'                                  => 'Descartar Todos',
-			'Add to Map'                                   => 'Adicionar ao Mapa',
-			'AI Context:'                                  => 'Contexto da IA:',
-			'Verified Address:'                            => 'Endereço Verificado:',
-			'Enrich Data'                                  => 'Enriquecer Dados',
-			'Enriched via Geocoder'                        => 'Enriquecido via Geocoder',
-			'Validate Custom Prompt'                       => 'Validar Prompt Customizado',
-			'System Prompt Configuration'                  => 'Configuração do Prompt de Sistema',
-			'Use Custom System Prompt'                     => 'Usar Prompt de Sistema Personalizado',
-			'Check this to override the default behavior. Uncheck to temporarily disable and return to the optimized default prompt.' => 'Marque esta opção para substituir o comportamento padrão. Desmarque para desativar temporariamente e retornar ao prompt padrão otimizado.',
-			'Clear Text'                                   => 'Limpar Texto',
-			'AI Prompt Engineer Assistant'                 => 'Assistente de Engenharia de Prompt IA',
-			'Describe how you want the AI to behave (e.g., "Only map cities in Brazil" or "Ignore street names"). The active LLM will generate a highly optimized System Prompt for you, strictly adhering to JEO formatting rules.' => 'Descreva como você quer que a IA se comporte (ex: "Mapeie apenas cidades no Brasil" ou "Ignore nomes de ruas"). A LLM ativa vai gerar um Prompt de Sistema altamente otimizado para você, aderindo estritamente às regras de formatação do JEO.',
-			'Ex: I want to map only locations inside Europe. Press Shift+Enter for new line, or Enter to generate.' => 'Ex: Quero mapear apenas locais dentro da Europa. Aperte Shift+Enter para pular linha, ou Enter para gerar.',
-			'Generate Prompt'                              => 'Gerar Prompt',
-			'JEO AI Debug Logs'                            => 'Logs de Depuração da IA do JEO',
-			'Here you can view the most recent AI interactions, raw inputs, and raw outputs for debugging.' => 'Aqui você pode visualizar as interações mais recentes da IA, entradas e saídas brutas para depuração.',
-			'Search logs:'                                 => 'Pesquisar logs:',
-			'Search Logs'                                  => 'Pesquisar Logs',
-			'Prompt successfully validated! The AI returned a valid JSON array.' => 'Prompt validado com sucesso! A IA retornou um array JSON válido.',
-			'Validation failed: The AI did not return the expected JSON schema (missing name, lat, lon, or quote).' => 'Falha na validação: A IA não retornou o esquema JSON esperado (faltando name, lat, lon ou quote).',
-			'Context is required.'                         => 'O contexto é obrigatório.',
-			'Prompt is required.'                          => 'O prompt é obrigatório.',
-			'Knowledge Base'                               => 'Base de Conhecimento',
-			'Bulk Geolocation'                             => 'Geolocalização em Massa',
-			'Background Processing'                        => 'Processamento em Segundo Plano',
-			'Enable background AI geolocalization for legacy posts.' => 'Ativa a geolocalização automática por IA para posts antigos em segundo plano.',
-			'Batch Size'                                   => 'Tamanho do Lote',
-			'Number of posts to process per cron run.'     => 'Número de posts a processar por ciclo.',
-			'Target Post Types'                            => 'Tipos de Post Alvo',
-			'Cron Interval'                                => 'Intervalo de Execução',
-			'Every Minute'                                 => 'A cada minuto',
-			'Every 5 Minutes'                              => 'A cada 5 minutos',
-			'Every 15 Minutes'                             => 'A cada 15 minutos',
-			'Hourly'                                       => 'De hora em hora',
-			'Twice Daily'                                  => 'Duas vezes ao dia',
-			'Processing Status'                            => 'Status do Processamento',
-			'Recent Logs'                                  => 'Logs Recentes',
-			'Manual Actions'                               => 'Ações Manuais',
-			'Run 1 Batch Now'                              => 'Processar 1 Lote Agora',
-			'Clear Logs'                                   => 'Limpar Logs',
-			'Bulk Approval Threshold'                      => 'Limite de Aprovação em Massa',
-			'Minimum average confidence required to auto-approve locations during bulk actions.' => 'Confiança média mínima necessária para auto-aprovar locais durante ações em massa.',
-			'Average AI Confidence'                        => 'Confiança Média da IA',
-			'Geolocated'                                   => 'Geolocalizado',
-			'Pending AI Approval'                          => 'Pendente de Aprovação IA',
-			'No Locations Found'                           => 'Nenhum Local Encontrado',
-			'AI Error'                                     => 'Erro na IA',
-			'Not Processed'                                => 'Não Processado',
-			'Approve AI'                                   => 'Aprovar IA',
-			'Approve JEO AI Geolocations'                  => 'Aprovar Geolocalizações IA do JEO',
-			'Background Indexing'                          => 'Indexação em Segundo Plano',
-			'Automatically vectorize your posts in small batches using WP-Cron.' => 'Vetoriza seus posts automaticamente em pequenos lotes usando WP-Cron.',
-			'Enable Auto-indexing'                         => 'Ativar Auto-indexação',
-			'Manual Indexing'                              => 'Indexação Manual',
-			'Trigger a single batch vectorization immediately.' => 'Dispara a vetorização de um único lote imediatamente.',
-			'Vectorize 1 Batch Now'                        => 'Vetorizar 1 Lote Agora',
-			'Indexing Progress'                            => 'Progresso da Indexação',
-			'%d of %d posts indexed.'                      => '%d de %d posts indexados.',
-			'Alternative: Use WP-CLI for large databases:' => 'Alternativa: Use WP-CLI para bases de dados grandes:',
-			'Successfully vectorized %d posts.'            => 'Vetorizado com sucesso %d posts.',
-			'No more posts to vectorize.'                  => 'Não há mais posts para vetorizar.',
-			'Data Dictionaries'                            => 'Dicionários de Dados',
-			'Embedded Brazilian Territories'               => 'Territórios Brasileiros Embarcados',
-			'The following geographic dictionaries are available locally to improve AI precision:' => 'Os seguintes dicionários geográficos estão disponíveis localmente para melhorar a precisão da IA:',
-			'Advanced RAG Connections (Coming Soon)'       => 'Conexões RAG Avançadas (Em breve)',
-			'Connect your own external databases to provide custom context to the LLM.' => 'Conecte seus próprios bancos de dados externos para fornecer contexto personalizado à LLM.',
-			'Connect Supabase (PostgreSQL)'                => 'Conectar Supabase (PostgreSQL)',
-			'Connect SQLite Local'                         => 'Conectar SQLite Local',
-			'Connect N8N Webhook'                          => 'Conectar Webhook N8N',
-			'File:'                                        => 'Arquivo:',
-			'Entries found:'                               => 'Entradas encontradas:',
-			'API Key is valid and active!'                 => 'A Chave de API é válida e está ativa!',
-			'Invalid provider.'                            => 'Provedor inválido.',
-			'Test API Key'                                 => 'Testar Chave de API',
-			'Testing key...'                               => 'Testando chave...',
-			'API Status:'                                  => 'Status da API:',
-			'Checking...'                                  => 'Verificando...',
-			'Please enter an API Key for the selected provider before saving.' => 'Por favor, insira uma Chave de API para o provedor selecionado antes de salvar.',
-			'Warning: Deactivating JEO will remove your AI API Keys for security reasons. Other settings will be preserved. Do you want to proceed?' => 'Atenção: Desativar o JEO removerá suas chaves de API de Inteligência Artificial por motivos de segurança. Outras configurações serão preservadas. Deseja continuar?',
-		);
-
-		if ( isset( $translations[ $text ] ) ) {
-			return $translations[ $text ];
-		}
-
-		return $translation;
 	}
 
 	/**
@@ -1622,7 +1478,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	public function api_delete_backup( $request ) {
 		$filename = $request->get_param( 'filename' );
 		if ( empty( $filename ) ) {
-			return new \WP_REST_Response( array( 'error' => 'Missing filename' ), 400 );
+			return new \WP_REST_Response( array( 'error' => __( 'Missing filename', 'jeo' ) ), 400 );
 		}
 
 		$uploads   = wp_upload_dir();
@@ -1633,6 +1489,6 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return new \WP_REST_Response( array( 'success' => true ), 200 );
 		}
 
-		return new \WP_REST_Response( array( 'error' => 'File not found' ), 404 );
+		return new \WP_REST_Response( array( 'error' => __( 'File not found', 'jeo' ) ), 404 );
 	}
 }
