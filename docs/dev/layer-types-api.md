@@ -55,16 +55,16 @@ The `source` of a layer is the name of a source description to be user for this 
 
 Your settings of a layer should be something like:
 
-```js
-    "layers": [{
-        "id": "water",
-        "source": "mapbox-streets",
-        "source-layer": "water",
-        "type": "fill",
-        "paint": {
-        "fill-color": "#00ffff"
-        }
-    }]
+```json
+"layers": [{
+    "id": "water",
+    "source": "mapbox-streets",
+    "source-layer": "water",
+    "type": "fill",
+    "paint": {
+    "fill-color": "#00ffff"
+    }
+}]
 ```
 
 More at [MapLibre GL Layer docs](https://maplibre.org/maplibre-gl-js/docs/API/classes/Layer/) and [Mapbox Spec Layers](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/).
@@ -76,18 +76,17 @@ JEO re-exports `Map`, `Source` and `Layer` from `react-map-gl/maplibre` via the 
 Using `react-map-gl/maplibre`, we can set a `<Layer>` component as a child of the `<Map>`:
 
 ```js
-    import { Layer, Source } from '../lib/mapgl-react';
+import { Layer, Source } from '../lib/mapgl-react';
 
-    ...
+...
 
-    <Source id="mapbox-streets" type="vector" url="mapbox://mapbox.streets">
-      <Layer
-        id="water"
-        source-layer="water"
-        type="fill"
-        paint={{ "fill-color": "#00ffff" }} />
-    </Source>
-
+<Source id="mapbox-streets" type="vector" url="mapbox://mapbox.streets">
+  <Layer
+    id="water"
+    source-layer="water"
+    type="fill"
+    paint={{ "fill-color": "#00ffff" }} />
+</Source>
 ```
 
 More at [react-map-gl Layer docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/layer).
@@ -115,96 +114,95 @@ Note that the following examples are based on a `vector` source type.
 
 * **JSON settings**
 
-  Your settings of a source should be something like:
+Your settings of a source should be something like:
 
-  -  `tiles`:
+-  `tiles`:
 
+```json
+"mapbox-streets": {
+    "type": "vector",
+    "tiles": [
+        "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
+        "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
+    ],
+    "maxzoom": 14
+}
+```
 
-        ```js
-            "mapbox-streets": {
-                "type": "vector",
-                "tiles": [
-                    "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
-                    "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
-                ],
-                "maxzoom": 14
-            }
-        ```
+- `url`:
 
-    - `url`:
+```json
+"mapbox-streets": {
+    "type": "vector",
+    "url": "http://api.example.com/tilejson.json"
+}
+```
 
-        ```js
-            "mapbox-streets": {
-                "type": "vector",
-                "url": "http://api.example.com/tilejson.json"
-            }
-        ```
 More at [react-map-gl Source docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
 
 * **React Map GL**
 
-    Using `react-map-gl/maplibre`, `<Source>` and `<Layer>` are rendered as children of the `<Map>`:
+Using `react-map-gl/maplibre`, `<Source>` and `<Layer>` are rendered as children of the `<Map>`:
 
-    - `tiles`:
+- `tiles`:
 
-        ```js
-            import { Source, Layer } from '../lib/mapgl-react';
+```js
+import { Source, Layer } from '../lib/mapgl-react';
 
-            ...
+...
 
-            const SOURCE_OPTIONS = {
-                type: "vector",
-                tiles: [
-                    "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
-                    "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
-                ],
-                maxzoom: 14
-            };
+const SOURCE_OPTIONS = {
+    type: "vector",
+    tiles: [
+        "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
+        "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
+    ],
+    maxzoom: 14
+};
 
-            <Source id="source_id" {...SOURCE_OPTIONS}>
-              <Layer id="layer_id" />
-            </Source>
-        ```
-    - `url`:
+<Source id="source_id" {...SOURCE_OPTIONS}>
+  <Layer id="layer_id" />
+</Source>
+```
 
-        ```js
-            import { Source, Layer } from '../lib/mapgl-react';
+- `url`:
 
-            ...
+```js
+import { Source, Layer } from '../lib/mapgl-react';
 
-            const SOURCE_OPTIONS = {
-                url: "http://api.example.com/tilejson.json",
-                type: "vector",
-            };
+...
 
-            <Source id="source_id" {...SOURCE_OPTIONS}>
-              <Layer id="layer_id" source-layer={source_layer} />
-            </Source>
-        ```
+const SOURCE_OPTIONS = {
+    url: "http://api.example.com/tilejson.json",
+    type: "vector",
+};
 
-    For a `raster` source, we can define like this:
+<Source id="source_id" {...SOURCE_OPTIONS}>
+  <Layer id="layer_id" source-layer={source_layer} />
+</Source>
+```
 
-    ```js
-        import { Source, Layer } from '../lib/mapgl-react';
+For a `raster` source, we can define like this:
 
-        ...
+```js
+import { Source, Layer } from '../lib/mapgl-react';
 
-        const RASTER_SOURCE_OPTIONS = {
-            type: "raster",
-            tiles: [
-                "https://someurl.com/512/{z}/{x}/{y}",
-            ],
-            tileSize: 512
-        };
+...
 
-        <Source id="source_id" {...RASTER_SOURCE_OPTIONS}>
-          <Layer id="layer_id" type="raster" />
-        </Source>
-    ```
-    More about how to configure a Source component at [react-map-gl Source docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
+const RASTER_SOURCE_OPTIONS = {
+    type: "raster",
+    tiles: [
+        "https://someurl.com/512/{z}/{x}/{y}",
+    ],
+    tileSize: 512
+};
 
+<Source id="source_id" {...RASTER_SOURCE_OPTIONS}>
+  <Layer id="layer_id" type="raster" />
+</Source>
+```
 
-
+More about how to configure a Source component at [react-map-gl Source docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
 
 ### [On `sourceLayer` attribute of a Source component](#on-sourcelayer-attribute-of-a-source-component)
 
@@ -212,16 +210,15 @@ If your `Layer` is of the `vector` type, your `sourceLayer` will indicate an *in
 
 Otherwise, if your `Layer` have a `raster` type, this property **will be ignored**.
 
-
 ```jsx
-    <Source
-        id="source_id"
-        type="raster"
-        tiles={["https://example.com/{z}/{x}/{y}.png"]}
-    />
-    <Layer
-        type="raster"
-        source-layer="anything" // this info will be ignored
-        id="layer_id"
-    />
+<Source
+    id="source_id"
+    type="raster"
+    tiles={["https://example.com/{z}/{x}/{y}.png"]}
+/>
+<Layer
+    type="raster"
+    source-layer="anything" // this info will be ignored
+    id="layer_id"
+/>
 ```

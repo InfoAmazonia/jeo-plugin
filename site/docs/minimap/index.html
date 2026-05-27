@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/docs/minimap/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Minimap - JEO</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Minimap";
+        var mkdocs_page_input_path = "minimap.md";
+        var mkdocs_page_url = "/docs/minimap/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../stories-near-you/">Stories near you</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">Minimap</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#inserting-the-block">Inserting the block</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generating-a-map">Generating a map</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#from-post-content">From post content</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#from-prompt">From prompt</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#chat-refinement">Chat refinement</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ai-generated-layers-minilayer">AI-generated layers (Minilayer)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#map-features">Map features</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-settings/">AI Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-context-assistant/">AI Context Assistant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-georeferencing/">AI Georeferencing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-bulk-geolocation/">AI Bulk Geolocation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-compliance/">WordPress.org compliance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-audit-report/">WordPress.org audit report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-upgrade-smoke-tests/">Dependency upgrade smoke tests</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Plugin</li>
+      <li class="breadcrumb-item active">Minimap</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/minimap.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="minimap-ai-assisted-map-block">Minimap — AI-Assisted Map Block</h1>
+<p>The Minimap block (<code>jeo/ai-minimap</code>) generates contextual interactive maps inside the Gutenberg editor using AI. Describe what you need in natural language, and the AI builds a map with appropriate layers, center point, zoom level, and geolocation pins.</p>
+<h2 id="inserting-the-block">Inserting the block</h2>
+<ol>
+<li>In the Gutenberg editor, click the <strong>+</strong> button to add a new block.</li>
+<li>Search for <strong>JEO AI Minimap</strong> and select it.</li>
+<li>The block starts in <strong>idle</strong> state with two generation modes:</li>
+<li><strong>From post content</strong>: Automatically generates a map based on the current post's content and geolocation points.</li>
+<li><strong>From prompt</strong>: Describe the map you want in a text field.</li>
+</ol>
+<p><img alt="Minimap block" src="../img/minimap-block-edit.png" /></p>
+<h2 id="generating-a-map">Generating a map</h2>
+<h3 id="from-post-content">From post content</h3>
+<p>Click <strong>Generate from content</strong>. The system searches your existing layers and post geolocation data to build a contextual map. No AI prompt is needed — it uses RAG (Retrieval-Augmented Generation) to find relevant layers automatically.</p>
+<h3 id="from-prompt">From prompt</h3>
+<p>Type a description of the map you want (e.g., "A map of the Amazon region showing deforestation data and rivers") and click <strong>Generate</strong>. The AI agent will:</p>
+<ol>
+<li>Analyze your prompt and the current post content.</li>
+<li>Search for relevant existing layers in your Knowledge Base.</li>
+<li>Geocode relevant locations.</li>
+<li>Return a complete map with layers, center, zoom, and pins.</li>
+</ol>
+<p><img alt="Minimap block" src="../img/minimap-block-edit2.png" /></p>
+<h2 id="chat-refinement">Chat refinement</h2>
+<p>Once a map is generated, the block enters <strong>ready</strong> state. An <strong>Inspector Panel</strong> opens in the Gutenberg sidebar where you can refine the map through chat:</p>
+<ul>
+<li><strong>Text messages</strong>: Type instructions like "Zoom in on São Paulo" or "Remove the water layer".</li>
+<li><strong>Regenerate</strong>: Start fresh with a completely new map suggestion.</li>
+<li><strong>New prompt</strong>: Enter a new description to generate a different map (keeps the conversation context).</li>
+<li><strong>Base layer variant</strong>: Switch between dark, light, and satellite base layers.</li>
+</ul>
+<p>The AI remembers your conversation, so each refinement builds on the previous context.</p>
+<p><img alt="Minimap block chat" src="../img/minimap-block-edit3.png" /></p>
+<h2 id="ai-generated-layers-minilayer">AI-generated layers (Minilayer)</h2>
+<p>If you have a Mapbox API key configured, the AI can <strong>generate custom map layers</strong> when existing layers don't cover what you need. During chat, ask the AI to create a layer (e.g., "Can you generate a deforestation heatmap for the Amazon?"). The AI will ask for your confirmation before generating — it never creates layers without explicit approval. The new layer is added to the map automatically with AI-suggested styling (colors and filters) that you can later override in the layer settings modal via the <strong>"Use AI Default Style"</strong> checkbox.</p>
+<h2 id="map-features">Map features</h2>
+<p>After generation, the minimap behaves like any JEO map:</p>
+<ul>
+<li><strong>Pan and zoom</strong>: Drag to pan, scroll to zoom.</li>
+<li><strong>Layers</strong>: Thematic layers with legends.</li>
+<li><strong>Pins</strong>: Geolocation pins from the post's geolocation data.</li>
+<li><strong>Base layer</strong>: Automatically chosen (dark/light) based on layer colors, or manually selected.</li>
+</ul>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>An AI provider must be configured in <strong>Jeo → AI</strong> (see <a href="../ai-settings/">AI Settings</a>).</li>
+<li>For best results, index your posts and layers in the Knowledge Base (RAG tab).</li>
+<li>For AI-generated layers, a Mapbox API key is also required.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../stories-near-you/" class="btn btn-neutral float-left" title="Stories near you"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../map-shortcode/" class="btn btn-neutral float-right" title="Map shortcode">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../stories-near-you/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../map-shortcode/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
