@@ -48,6 +48,15 @@ JEO ships with built-in Brazilian geographic dictionaries (biomes, conservation 
 
 Configure batch geolocation settings for processing many posts at once. See [AI Bulk Geolocation](ai-bulk-geolocation.md) for details.
 
+### Context Assistant tab
+
+Customize the system prompt used by the [AI Context Assistant](ai-context-assistant.md) — the editorial suggestions sidebar in the Gutenberg editor.
+
+- **Use custom prompt**: Check this box to override the built-in default prompt with your own.
+- **Custom prompt**: Editable textarea for your custom system prompt. When unchecked, the tab shows the default prompt in a read-only field for reference.
+
+Leave the custom prompt empty to use the built-in default, which is optimized for journalistic editorial assistance with RAG integration.
+
 ## Structured output
 
 When enabled (default), the AI returns results in a strict JSON format enforced by the provider. This improves accuracy for georeferencing and map generation. You can disable it in the AI settings if your provider does not support it.

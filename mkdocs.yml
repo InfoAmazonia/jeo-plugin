@@ -24,6 +24,7 @@ nav:
       - Geolocating posts: geolocating-posts.md
   - AI:
       - AI Settings: ai-settings.md
+      - AI Context Assistant: ai-context-assistant.md
       - AI Georeferencing: ai-georeferencing.md
       - AI Bulk Geolocation: ai-bulk-geolocation.md
   - Developer:

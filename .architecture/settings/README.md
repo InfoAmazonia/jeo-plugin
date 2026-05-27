@@ -32,6 +32,7 @@ All config in a single array option `jeo-settings`.
 |-----|------|
 | Provider | `ai_provider`, `ai_{provider}_key`, `ai_{provider}_model` |
 | Knowledge Base | `rag_auto_index`, `rag_post_types` |
+| Context Assistant | `ai_use_context_custom_prompt`, `ai_context_prompt` |
 | Bulk | `bulk_ai_enabled`, `bulk_ai_post_types`, `bulk_confidence_threshold` |
 | Embedded Data | Reference to JSONs in `ai/data/` |
 

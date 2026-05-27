@@ -35,4 +35,4 @@ src/js/src/context-sidebar/
 
 ---
 
-📎 Documentação completa: `docs/ai-context-assistant-issue.md`
+📎 User documentation: `docs/ai-context-assistant.md`
