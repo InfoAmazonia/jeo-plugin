@@ -24,7 +24,13 @@ With a map selected, you can choose an alignment:
 | Wide Width | Map extends beyond the content area |
 | Full Width | Map spans the full width of the page |
 
+![Map Alignment](img/map-alignment.png)
+
 ![Map Alignment - Left](img/map-alignment-left.png)
+
+![Map Alignment - Right](img/map-alignment-right.png)
+
+![Map Alignment - Wide Width](img/map-alignment-wide-width.png)
 
 ![Map Alignment - Full Width](img/map-alignment-full-width.png)
 
