@@ -227,7 +227,10 @@ class Context_Handler {
 				$initial_context
 			);
 
-			$response = $result->to_rest_response();
+			$response                      = $result->to_rest_response();
+			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
+			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
+
 			$this->persist_initial_context( $post_id, $conversation_id, $response );
 			$this->save_context_state( $post_id, $conversation_id, $response );
 			$this->save_chat_message(
@@ -334,7 +337,10 @@ class Context_Handler {
 				$live_context
 			);
 
-			$response = $result->to_rest_response();
+			$response                      = $result->to_rest_response();
+			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
+			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
+
 			$this->save_chat_message( $post_id, 'user', $message, $user_id );
 			$this->save_chat_message(
 				$post_id,

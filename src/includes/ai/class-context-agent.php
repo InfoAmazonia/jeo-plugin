@@ -140,8 +140,8 @@ You MUST respond with a valid Context_Generation_Output JSON object:
   - `title` (string): Article title.
   - `url` (string): Permalink URL.
   - `reason` (string): Why this article is relevant to the suggested content.
-- `message`: Cumulative summary of all editorial suggestions across the conversation so far, shown as a notice in the UI. Reflect the full history and current state. Omit off-topic exchanges.
-- `assistant_message`: Brief summary of what you did, shown as a chat message.
+- `message`: Cumulative summary of all editorial suggestions across the conversation so far, shown as a notice in the UI. Reflect the full history and current state. Omit off-topic exchanges. This must be plain text — do NOT use HTML tags here.
+- `assistant_message`: Brief summary of what you did, shown as a chat message. This must be plain text — do NOT use HTML tags here. Use natural line breaks (newlines) if needed, but never `<br>`, `<b>`, `<strong>`, `<em>`, or other HTML tags.
 
 ## Editorial Guidelines
 
