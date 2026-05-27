@@ -170,6 +170,7 @@ class Tool_Registry {
 		self::register( 'geocode', Geocode_Tool::class );
 		self::register( 'generate_layer', Generate_Layer_Tool::class );
 		self::register( 'get_post_content', Get_Post_Content_Tool::class );
+		self::register( 'retrieve_knowledge', Retrieve_Knowledge_Tool::class );
 
 		self::$defaults_registered = true;
 	}

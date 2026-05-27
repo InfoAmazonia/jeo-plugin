@@ -33,6 +33,10 @@
 | `src/includes/ai/class-search-layers-tool.php` | Agent tool — wraps RAG_Worker::find_matching_layers() |
 | `src/includes/ai/class-geocode-tool.php` | Agent tool — active geocoder → Mapbox fallback → defaults |
 | `src/includes/ai/class-get-post-content-tool.php` | Agent tool — post content + _related_point meta for sub-agent |
+| `src/includes/ai/class-retrieve-knowledge-tool.php` | Agent tool — semantic retrieval from `jeo_knowledge` vector store |
+| `src/includes/ai/class-context-agent.php` | Context Assistant agent factory (Assistant::configure with retrieve_knowledge tool, sub-agents, structured output). Uses custom `ai_context_prompt` from settings when available |
+| `src/includes/ai/class-context-handler.php` | Context Assistant REST endpoints (setup + chat) |
+| `src/includes/ai/class-context-generation-output.php` | Structured output DTO for suggested paragraphs and references |
 | `src/includes/ai/class-wp-storage.php` | StorageInterface adapter for post_meta / user_meta |
 | `src/includes/ai/class-wp-option-storage.php` | StorageInterface adapter for wp_options (global learning storage) |
 | `src/includes/ai/data/*.json` | Brazilian geographic dictionaries |
@@ -82,6 +86,9 @@
 | `/jeo/v1/minimap/setup` | POST | Generate minimap from post content (RAG + post geopoints) |
 | `/jeo/v1/minimap/setup-prompt` | POST | Generate minimap from text prompt via AI agent |
 | `/jeo/v1/minimap/chat` | POST | Multi-turn conversation for map refinement via AI agent |
+| `/jeo/v1/context/setup` | POST | Generate initial editorial suggestions from post content |
+| `/jeo/v1/context/chat` | POST | Multi-turn conversation for refining editorial suggestions |
+| `/jeo/v1/context/state` | GET | Load persisted conversation state (messages, suggestions, conversation_id) |
 
 ## AI Georeferencing
 
@@ -275,6 +282,63 @@ The `jeo/ai-minimap` block provides:
 | `src/includes/ai/class-get-post-content-tool.php` | Post content tool for post_analyzer sub-agent |
 | `src/includes/ai/class-wp-storage.php` | Post/user meta storage adapter |
 | `src/includes/ai/class-wp-option-storage.php` | WP options storage adapter (global learning) |
+
+## AI Context Assistant (Editorial Suggestions)
+
+The AI Context Assistant is a Gutenberg sidebar plugin that suggests new paragraphs and related article references for editorial posts. It uses the same Assistant architecture as the minimap: structured output, sub-agents, tools, conversation storage in `post_meta`, and user memory in `user_meta`.
+
+### Flow
+
+```mermaid
+sequenceDiagram
+    participant JS as Context Sidebar
+    participant REST as /context/setup | /context/chat
+    participant H as Context_Handler
+    participant A as Context_Agent
+    participant LLM as Provider
+    participant RAG as RAG_Agent (jeo_knowledge)
+
+    JS->>REST: POST {post_id, conversation_id, message?}
+    REST->>H: api_setup() | api_chat()
+    H->>A: Context_Agent::create()
+    A->>A: Inject conversation history
+    A->>LLM: structured(user_message)
+    LLM-->>A: Context_Generation_Output
+    A->>RAG: retrieve_knowledge tool (optional)
+    RAG-->>A: Related articles
+    A-->>H: Parsed result
+    H->>H: Persist history
+    H-->>REST: {paragraphs, references, message}
+    REST-->>JS: Suggestions + chat response
+```
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `src/includes/ai/class-context-agent.php` | Agent factory with `retrieve_knowledge` and `get_post_content` tools, `post_analyzer` sub-agent |
+| `src/includes/ai/class-context-handler.php` | REST handler: `/context/setup`, `/context/chat`, `/context/state`. Dual storage: `ConversationStore` for AI context, `_jeo_ai_context_chat_messages` for clean UI messages |
+| `src/includes/ai/class-context-generation-output.php` | Structured output DTO: paragraphs (text may contain inline HTML), references, message, assistant_message |
+| `src/includes/ai/class-retrieve-knowledge-tool.php` | NeuronAI tool that queries `jeo_knowledge` via `RAG_Agent::resolveRetrieval()` |
+| `src/js/src/context-sidebar/index.js` | Gutenberg plugin entry point (`registerPlugin`) |
+| `src/js/src/context-sidebar/context-chat-panel.js` | Chat UI, state management, API calls |
+| `src/js/src/context-sidebar/suggested-paragraphs.js` | Renders suggested paragraphs with inline HTML support. "Insert" creates `core/paragraph` with HTML content; "Copy" uses triple-fallback rich-text clipboard |
+
+### Features
+- **Manual setup**: User clicks "Generate Suggestions" to start; no automatic trigger on panel open.
+- **Content validation**: `api_setup()` checks post content length. If fewer than 100 characters, it returns immediately (without calling the AI) asking the user to write more or specify what they want.
+- **Retry logic**: `run_agent()` retries up to 2 additional times with 1s sleep when the AI returns an empty response. After exhausting retries, it returns a user-friendly error.
+- **State persistence**: Conversation ID, last suggestions, and clean chat messages are stored in post meta (`_jeo_ai_context_conversation_id`, `_jeo_ai_context_last_response`, `_jeo_ai_context_chat_messages`). Closing/reopening the panel or refreshing the page restores the session via `GET /context/state`.
+- **Dual conversation storage**: `ConversationStore` (backed by `WP_Storage` on post meta) holds the raw AI conversation history, including schema-injected messages required for structured output continuity. A separate `_jeo_ai_context_chat_messages` meta holds clean, human-readable messages (user text + `assistant_message`, plus `user_id` for username display) for UI display only. The REST state endpoint reads from the clean meta, never from the raw store.
+- **Rich-text paragraphs**: Suggested paragraphs support inline HTML (`<strong>`, `<em>`, `<a href="...">`) generated by the AI. The frontend sanitizes HTML before rendering and preserves formatting on both Copy (rich-text clipboard) and Insert (`core/paragraph` block).
+- **Chat refinement**: Multi-turn conversation for iterative editorial changes.
+- **Expand modal**: Button in the compact sidebar opens a larger modal for better chat UX.
+- **Copy / Insert**: Each suggested paragraph has both "Copy to clipboard" (triple-fallback rich text: `ClipboardItem` → `execCommand` → plain text) and "Insert into article" (creates `core/paragraph` block with sanitized HTML).
+- **Retry & Clear controls**: Below the textarea, "Retry" generates new suggestions without explicit user input, and "Clear" calls `/context/clear` to reset the conversation and all suggestions.
+- **User badge**: User messages show a discreet username badge in the top-right corner, helpful for collaborative editing.
+- **Customizable prompt**: System prompt can be edited via **JEO → AI Configuration → Context Assistant** tab (`ai_context_prompt`).
+- **RAG integration**: Automatically queries the site's knowledge base (`jeo_knowledge`) for related articles.
+- **Post type gate**: Only appears for post types in `enabled_post_types` (same rule as geolocation and minimap).
 
 ## Minilayer (AI-Generated Layers)
 

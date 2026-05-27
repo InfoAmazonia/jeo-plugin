@@ -45,8 +45,8 @@ class AI_Settings {
 		return array(
 			'provider'  => __( 'AI Provider', 'jeo' ),
 			'knowledge' => __( 'Knowledge Base', 'jeo' ),
-			'embedded'  => __( 'Embedded Data', 'jeo' ),
 			'bulk'      => __( 'Bulk Geolocation', 'jeo' ),
+			'context'   => __( 'Context Assistant', 'jeo' ),
 			'settings'  => __( 'Settings', 'jeo' ),
 		);
 	}
