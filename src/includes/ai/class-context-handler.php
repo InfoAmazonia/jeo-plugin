@@ -196,7 +196,7 @@ class Context_Handler {
 			);
 		}
 
-		$initial_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '"). Generate editorial suggestions based on its content.';
+		$initial_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '").';
 
 		// If the post has very little content, ask the user for more info instead of calling the AI.
 		$content_length = strlen( trim( wp_strip_all_tags( $post->post_content ) ) );
@@ -222,7 +222,7 @@ class Context_Handler {
 				$post_id,
 				$conversation_id,
 				$user_id,
-				'Generate editorial suggestions for this post based on its content.',
+				'Analyze this post and ask the user 1-2 clarifying questions about what editorial suggestions they would like, considering the territories and entities mentioned. Do NOT generate paragraph suggestions yet.',
 				$initial_context
 			);
 
