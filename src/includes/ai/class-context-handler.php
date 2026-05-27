@@ -196,7 +196,8 @@ class Context_Handler {
 			);
 		}
 
-		$initial_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '").';
+		$locale          = get_locale();
+		$initial_context = 'A post is available for analysis (post_id: ' . $post_id . ', title: "' . $post->post_title . '"). The WordPress site language is ' . $locale . '. You MUST respond in this language for all messages, questions, and suggestions.';
 
 		// If the post has very little content, ask the user for more info instead of calling the AI.
 		$content_length = strlen( trim( wp_strip_all_tags( $post->post_content ) ) );
@@ -318,7 +319,8 @@ class Context_Handler {
 
 		$state_context = $this->build_state_context( $request );
 		$post          = get_post( $post_id );
-		$live_context  = 'A post is being edited (post_id: ' . $post_id . ', title: "' . ( $post ? $post->post_title : '' ) . '"). Use its content for context when generating suggestions.';
+		$locale        = get_locale();
+		$live_context  = 'A post is being edited (post_id: ' . $post_id . ', title: "' . ( $post ? $post->post_title : '' ) . '"). Use its content for context when generating suggestions. The WordPress site language is ' . $locale . '. You MUST respond in this language for all messages, questions, and suggestions.';
 		if ( ! empty( $state_context ) ) {
 			$live_context .= "\n\n" . $state_context;
 		}
