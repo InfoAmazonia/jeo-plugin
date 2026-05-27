@@ -99,7 +99,7 @@
 .jeo-stories-near-you__consent-text {
 	margin: 0 0 16px;
 	font-size: 1em;
-	color: var(--snu-consent-text);
+	color: var(--snu-consent-text) !important;
 }
 
 .wp-block-jeo-stories-near-you .jeo-stories-near-you__consent-button,
