@@ -1,5 +1,7 @@
-# Mapbox Sources, Layers and JEO 
-How sources and layers settings works at Mapbox API and how JEO deals with them
+# Mapbox Sources, Layers and JEO
+How sources and layers settings work with the Mapbox Style Specification and how JEO deals with them
+
+> **Map runtime**: JEO supports two map rendering runtimes — [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/API/) (default) and [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/api/). Both share the same [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/) for defining sources, layers, and styles. The examples below use Mapbox API terminology, but they apply equally to MapLibre GL. The active runtime is configured in **Jeo → Settings → Map Runtime**.
 
 ## [Table of Contents](#table-of-contents)
 - [Mapbox Sources, Layers and JEO](#mapbox-sources-layers-and-jeo)
@@ -10,25 +12,23 @@ How sources and layers settings works at Mapbox API and how JEO deals with them
     - [Types and Sources of a Layer](#types-and-sources-of-a-layer)
   - [Mapbox Sources](#mapbox-sources)
     - [On `sourceLayer` attribute of a Source component](#on-sourcelayer-attribute-of-a-source-component)
-  - [How the Layer Settings page of JEO Plugin works](#how-the-layer-settings-page-of-jeo-plugin-works)
-  - [Corner cases and other observations](#corner-cases-and-other-observations)
 
 ## [Introduction](#introduction)
 
-This document describes how to interact with Mapbox, MapboxGL and React MapboxGL APIs. It is organised in a way that summarize key infos of those tools docs and gives examples of we are using them at our code.
+This document describes how to interact with the Mapbox Style Specification as used by both MapLibre GL JS and Mapbox GL JS in JEO. It summarizes key concepts from their docs and provides examples of how JEO uses them.
 
 ## [Mapbox Styles](#mapbox-styles)
 
-Mapbox Maps service is composed of several APIs and every type of layer has some particularities which we must pay attention.
+The Mapbox Maps service is composed of several APIs and every type of layer has some particularities to be aware of.
 
-Accordingly which Mapbox docs, a Mapbox style consists of a set of root properties, some of which describe a single global propertie and some of which contain nested properties, like version, and name and metadata and does not influence over the appearance or behavior of your map. Others, like layers and sources determine our map features and what they will look like. 
+According to the Mapbox docs, a style consists of a set of root properties. Some, like version, name and metadata, do not influence the appearance or behavior of your map. Others, like layers and sources, determine our map features and what they will look like.
 
-Those are the particularities that we will further discuss from now.
+These are the particularities discussed below.
 
 More at [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec//).
 
 ## [Mapbox Layers](#mapbox-layers)
-A style's layers property lists all the layers available in that style.  
+A style's layers property lists all the layers available in that style.
 
 ### [Types and Sources of a Layer](#types-and-sources-of-a-layer)
 
@@ -38,10 +38,10 @@ For type `vector`:
 -  background;
 -  fill;
 -  line;
--  symbol; 
--  circle; 
+-  symbol;
+-  circle;
 -  fill-extrusion;
--  heatmap; 
+-  heatmap;
 -  hillshade.
 
 For type `raster`:
@@ -55,7 +55,7 @@ The `source` of a layer is the name of a source description to be user for this 
 
 Your settings of a layer should be something like:
 
-```
+```js
     "layers": [{
         "id": "water",
         "source": "mapbox-streets",
@@ -66,59 +66,61 @@ Your settings of a layer should be something like:
         }
     }]
 ```
-More at [Mapbox Spec Layers](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/).
 
-* **MapboxGL React**
+More at [MapLibre GL Layer docs](https://maplibre.org/maplibre-gl-js/docs/API/classes/Layer/) and [Mapbox Spec Layers](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/).
 
-We can set a `<Layer>` component like:
+* **React Map GL**
 
-```
-    import { Layer } from "react-mapbox-gl";
+JEO re-exports `Map`, `Source` and `Layer` from `react-map-gl/maplibre` via the `src/js/src/lib/mapgl-react.js` facade. Always import from `'../lib/mapgl-react'` — never import `react-map-gl` directly, so the plugin can swap the underlying runtime without touching consumer code.
+
+Using `react-map-gl/maplibre`, we can set a `<Layer>` component as a child of the `<Map>`:
+
+```js
+    import { Layer, Source } from '../lib/mapgl-react';
 
     ...
 
-    <Layer
-        type="symbol"
-        id="water",
-        source="mapbox-streets",
-        sourceLayer="water", // by definition, the source type must be vector type
-        type="fill",
-        paint={{ "fill-color": "#00ffff" }}>
-    </Layer>
+    <Source id="mapbox-streets" type="vector" url="mapbox://mapbox.streets">
+      <Layer
+        id="water"
+        source-layer="water"
+        type="fill"
+        paint={{ "fill-color": "#00ffff" }} />
+    </Source>
 
 ```
 
-More at [react-mapbox-gl <Layer> docs](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md#layer).
+More at [react-map-gl Layer docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/layer).
 
 ## [Mapbox Sources](#mapbox-sources)
 
-Sources state which data the map should display. Specify the type of source with the `type` property, which must be one of: 
+Sources state which data the map should display. Specify the type of source with the `type` property, which must be one of:
 
-- vector; 
-- raster; 
-- raster-dem; 
-- geojson; 
-- image; 
-- video. 
+- vector;
+- raster;
+- raster-dem;
+- geojson;
+- image;
+- video.
 
-**Please note that a `Layer` can have a `type` and a `source`. And a `Source` is not the same as the `layer source` and this `Source` has a `type`.** 
+**Please note that a `Layer` can have a `type` and a `source`. And a `Source` is not the same as the `layer source` and this `Source` has a `type`.**
 
-Adding a *source isn't enough to make data appear on the map* because **sources don't contain styling** details like color or width. 
+Adding a *source isn't enough to make data appear on the map* because **sources don't contain styling** details like color or width.
 
 **Tiled sources, vector and raster, must specify their details according to the TileJSON specification**.
 
 At JEO plugin you can supply those infos as `tiles` or as `url`.
 
-Note that the following exams is based on a `source vector type`.
+Note that the following examples are based on a `vector` source type.
 
 * **JSON settings**
-  
+
   Your settings of a source should be something like:
 
   -  `tiles`:
 
 
-        ```
+        ```js
             "mapbox-streets": {
                 "type": "vector",
                 "tiles": [
@@ -129,99 +131,80 @@ Note that the following exams is based on a `source vector type`.
             }
         ```
 
-    - `url`: 
-    
-        ```
+    - `url`:
+
+        ```js
             "mapbox-streets": {
                 "type": "vector",
                 "url": "http://api.example.com/tilejson.json"
             }
         ```
-More at [react-mapbox-gl docs](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md#layer).
- 
-* **MapboxGL React**
+More at [react-map-gl Source docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
 
-    We can set up a `<Source/>` component like:
-    
+* **React Map GL**
+
+    Using `react-map-gl/maplibre`, `<Source>` and `<Layer>` are rendered as children of the `<Map>`:
+
     - `tiles`:
 
-        ```
-            import { Source } from "react-mapbox-gl";
+        ```js
+            import { Source, Layer } from '../lib/mapgl-react';
 
             ...
 
             const SOURCE_OPTIONS = {
-                "type": "vector",  // note this line
-                "tiles": [
-                        "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
-                        "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
+                type: "vector",
+                tiles: [
+                    "http://a.example.com/tiles/{z}/{x}/{y}.pbf",
+                    "http://b.example.com/tiles/{z}/{x}/{y}.pbf"
                 ],
-                "maxzoom": 14
+                maxzoom: 14
             };
 
-            <Source 
-                id="source_id" 
-                tileJsonSource={SOURCE_OPTIONS} 
-            />
-            <Layer 
-                type="vector" // note this line
-                id="layer_id" 
-                sourceId="source_id" 
-            /> 
+            <Source id="source_id" {...SOURCE_OPTIONS}>
+              <Layer id="layer_id" />
+            </Source>
         ```
     - `url`:
 
-        ```
-            import { Source } from "react-mapbox-gl";
+        ```js
+            import { Source, Layer } from '../lib/mapgl-react';
 
             ...
 
             const SOURCE_OPTIONS = {
-                "url": "http://api.example.com/tilejson.json",
-                "type": "vector", // note this line
+                url: "http://api.example.com/tilejson.json",
+                type: "vector",
             };
 
-            <Source 
-                id="source_id" 
-                tileJsonSource={SOURCE_OPTIONS} 
-            />
-            <Layer 
-                type="vector" // note this line
-                id="layer_id"
-                sourceId="source_id" 
-                sourceLayer={ source_layer } // see onSource section for more info
-            />
+            <Source id="source_id" {...SOURCE_OPTIONS}>
+              <Layer id="layer_id" source-layer={source_layer} />
+            </Source>
         ```
 
     For a `raster` source, we can define like this:
 
-    ```
-        import { Source } from "react-mapbox-gl";
+    ```js
+        import { Source, Layer } from '../lib/mapgl-react';
 
         ...
 
         const RASTER_SOURCE_OPTIONS = {
-            "type": "raster", // note this line
-            "tiles": [
+            type: "raster",
+            tiles: [
                 "https://someurl.com/512/{z}/{x}/{y}",
             ],
-            "tileSize": 512
+            tileSize: 512
         };
 
-        <Source 
-            id="source_id" 
-            tileJsonSource={RASTER_SOURCE_OPTIONS} 
-        />
-        <Layer 
-            type="raster" // note this line
-            id="layer_id" 
-            sourceId="source_id"   
-        />
+        <Source id="source_id" {...RASTER_SOURCE_OPTIONS}>
+          <Layer id="layer_id" type="raster" />
+        </Source>
     ```
-    More about how to configure a Source component at [react-mapbox-gl docs](https://github.com/alex3165/react-mapbox-gl/blob/master/docs/API.md#source).
+    More about how to configure a Source component at [react-map-gl Source docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
 
 
-    
+
 
 ### [On `sourceLayer` attribute of a Source component](#on-sourcelayer-attribute-of-a-source-component)
 
@@ -230,21 +213,15 @@ If your `Layer` is of the `vector` type, your `sourceLayer` will indicate an *in
 Otherwise, if your `Layer` have a `raster` type, this property **will be ignored**.
 
 
-```
-    <Source 
-        id="source_id" 
-        tileJsonSource={{
-            type: "raster" // note this line
-        }} 
+```jsx
+    <Source
+        id="source_id"
+        type="raster"
+        tiles={["https://example.com/{z}/{x}/{y}.png"]}
     />
-    <Layer 
-        type="raster" // note this line
-        sourceLayer="anything" // this info will be ignored
-        id="layer_id" 
-        sourceId="source_id"   
+    <Layer
+        type="raster"
+        source-layer="anything" // this info will be ignored
+        id="layer_id"
     />
 ```
-
-## How the Layer Settings page of JEO Plugin works
-
-## Corner cases and other observations

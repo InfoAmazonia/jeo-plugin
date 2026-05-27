@@ -13,7 +13,7 @@ The Bulk Geolocation system processes posts in batches using WordPress cron (WP-
 3. Select the post types to process, set the confidence threshold, and configure the batch size.
 4. Start the bulk process.
 
-<!-- TODO: screenshot of Bulk Geolocation tab -->
+![AI Bulk Geolocation - Settings](img/ai-bulk-geolocation.png)
 
 ## Processing
 
@@ -23,7 +23,7 @@ Once started, the system processes posts in the background:
 - A **JEO AI Status** column appears in the WordPress admin post list, showing the georeferencing status for each post.
 - Processed posts are marked for review — they are not published automatically.
 
-<!-- TODO: screenshot of JEO AI Status column in post list -->
+![AI Bulk Geolocation - Post status](img/ai-bulk-geolocation2.png)
 
 ## Reviewing results
 
@@ -34,9 +34,11 @@ After processing, you can review the AI-suggested geolocation for each post:
 3. The Geolocation sidebar will show the AI-suggested points.
 4. Approve or adjust the points as needed.
 
-You can also use the **Bulk Approval** screen to preview and approve multiple posts at once. This screen shows a table with each post, its suggested location, confidence score, and an approve/reject action.
+![AI Bulk Geolocation - Review](img/ai-bulk-geolocation3.png)
 
-<!-- TODO: screenshot of Bulk Approval screen -->
+![AI Bulk Geolocation - Review](img/ai-bulk-geolocation4.png)
+
+You can also use the **bulk action** on the WordPress post list (`edit.php`) to approve multiple posts at once. Select the posts, choose **Approve JEO AI Geolocations** from the bulk actions dropdown, and a preview modal will appear showing each post's suggested locations, confidence scores, and an approve/reject action.
 
 ## Monitoring
 
