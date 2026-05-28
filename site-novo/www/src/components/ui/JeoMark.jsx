@@ -1,52 +1,43 @@
 /**
- * The JEO pillar mark — three fluted classical columns ("JJ" + upright),
- * a nod to journalism's institutional roots. Rendered as crisp SVG so it
- * scales from favicon to footer without losing the metallic sheen.
+ * The official JEO "J" pillar mark (from Figma node 208:407) — three nested
+ * J strokes with decreasing opacity plus the top bar. White strokes, sized to
+ * the brand artwork; scales cleanly from header to footer.
  */
 export default function JeoMark({ className = '', title = 'JEO' }) {
   return (
     <svg
-      viewBox="0 0 120 150"
+      viewBox="0 0 27 47"
       className={className}
       role="img"
       aria-label={title}
       fill="none"
     >
-      <defs>
-        <linearGradient id="jeoSteel" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#ffffff" />
-          <stop offset="45%" stopColor="#cdd6da" />
-          <stop offset="100%" stopColor="#7f8a90" />
-        </linearGradient>
-        <linearGradient id="jeoSteelSoft" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor="#e9eef0" />
-          <stop offset="100%" stopColor="#9aa4aa" />
-        </linearGradient>
-      </defs>
-
-      {/* Column 1 — J */}
       <path
-        d="M14 6 h26 v92 a30 30 0 0 1 -30 30 h-2 v-22 h2 a8 8 0 0 0 8 -8 V6 Z"
-        fill="url(#jeoSteelSoft)"
-        opacity="0.85"
+        d="M2.42236 43.622C2.42236 43.622 12.4989 45.6827 12.4989 36.5655C12.4989 27.4483 12.4989 2.25615 12.4989 2.25615"
+        stroke="white"
+        strokeWidth="3.35885"
+        strokeLinecap="square"
       />
-      {/* Column 2 — J (front) */}
       <path
-        d="M40 6 h26 v92 a30 30 0 0 1 -30 30 h-4 v-22 h4 a8 8 0 0 0 8 -8 V6 Z"
-        fill="url(#jeoSteel)"
+        opacity="0.7"
+        d="M7.70068 43.9813C7.70068 43.9813 11.501 44.0299 12.6686 43.9638C16.7141 43.7348 18.7369 41.2631 18.7369 36.5486C18.7369 27.4358 18.7369 2.25615 18.7369 2.25615"
+        stroke="white"
+        strokeWidth="3.35885"
+        strokeLinecap="square"
       />
-      {/* Column 3 — upright pillar */}
-      <rect x="74" y="6" width="26" height="118" rx="2" fill="url(#jeoSteel)" />
-
-      {/* Flute highlights */}
-      <g stroke="#ffffff" strokeOpacity="0.55" strokeWidth="1.5">
-        <line x1="48" y1="14" x2="48" y2="96" />
-        <line x1="82" y1="14" x2="82" y2="118" />
-      </g>
-      <g stroke="#5c666c" strokeOpacity="0.6" strokeWidth="1.5">
-        <line x1="58" y1="14" x2="58" y2="96" />
-        <line x1="92" y1="14" x2="92" y2="118" />
-      </g>
+      <path
+        opacity="0.5"
+        d="M6.26074 43.9813C6.26074 43.9813 17.5911 44.0299 18.7824 43.9638C22.9104 43.7348 24.9744 41.2631 24.9744 36.5486C24.9744 27.4358 24.9744 2.25615 24.9744 2.25615"
+        stroke="white"
+        strokeWidth="3.35885"
+        strokeLinecap="square"
+      />
+      <path
+        d="M7.70068 2.01622H24.9748"
+        stroke="white"
+        strokeWidth="3.35885"
+        strokeLinecap="square"
+      />
     </svg>
   )
 }

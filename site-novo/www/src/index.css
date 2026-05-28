@@ -9,6 +9,7 @@
 
   html {
     scroll-behavior: smooth;
+    scroll-padding-top: 5rem; /* keep anchor targets clear of the fixed header */
   }
 
   body {
@@ -33,7 +34,7 @@
     border: 3px solid #11161a;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #2cb2bd;
+    background: #2fbac6;
   }
 }
 

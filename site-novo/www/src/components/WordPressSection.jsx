@@ -5,53 +5,25 @@ import WordPressIcon from './ui/WordPressIcon.jsx'
 const STEPS = [
   {
     n: 1,
-    parts: [
-      'Instale o ',
-      { strong: 'plugin JEO' },
-      ' no seu painel WordPress.',
-    ],
+    lead: 'Instale o plugin no WordPress',
+    rest: 'Ative o Jeo e os módulos de IA no ambiente que sua redação já usa.',
   },
   {
     n: 2,
-    parts: [
-      'Redija sua matéria ou ',
-      { strong: 'suba sua base de dados' },
-      ' diretamente no editor de blocos (Gutenberg).',
-    ],
+    lead: 'Escreva ou edite sua reportagem',
+    rest: 'O sistema analisa o texto e identifica lugares, temas e conexões com o acervo.',
   },
   {
     n: 3,
-    parts: [
-      'Deixe a IA processar o texto e ',
-      { strong: 'visualize o mapa interativo' },
-      ' gerado ao lado do conteúdo.',
-    ],
+    lead: 'Revise as sugestões da IA',
+    rest: 'Confirme localizações, ajuste mapas, aprove ou edite o contexto adicional.',
   },
   {
     n: 4,
-    parts: [
-      'Publique e ofereça uma ',
-      { strong: 'experiência imersiva' },
-      ' e rica para seus leitores.',
-    ],
+    lead: 'Publique com mais contexto',
+    rest: 'A reportagem pode ganhar mini-mapa, Leia Também inteligente e informações adicionais para orientar melhor o leitor.',
   },
 ]
-
-function StepText({ parts }) {
-  return (
-    <p className="text-sm leading-relaxed text-slate-200">
-      {parts.map((p, i) =>
-        typeof p === 'string' ? (
-          <span key={i}>{p}</span>
-        ) : (
-          <strong key={i} className="font-semibold text-brand-light">
-            {p.strong}
-          </strong>
-        ),
-      )}
-    </p>
-  )
-}
 
 export default function WordPressSection() {
   const reduce = useReducedMotion()
@@ -59,24 +31,25 @@ export default function WordPressSection() {
   return (
     <section id="integracao" className="bg-base py-10">
       <div className="section-shell">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-dark via-brand to-brand-light bg-[length:200%_200%] p-8 shadow-card animate-gradient-pan sm:p-12 lg:p-16">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand via-brand-dark to-muted-3 p-8 shadow-card sm:p-12 lg:p-14">
           {/* subtle texture */}
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.15),transparent_45%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
 
           {/* Banner header */}
-          <div className="relative flex flex-col items-center gap-8 text-center md:flex-row md:items-center md:gap-12 md:text-left">
+          <div className="relative flex flex-col items-center gap-6 text-center md:flex-row md:items-center md:gap-10 md:text-left">
             <motion.div
               initial={reduce ? { opacity: 0 } : { opacity: 0, scale: 0.8, rotate: -10 }}
               whileInView={{ opacity: 1, scale: 1, rotate: 0 }}
               viewport={{ once: true, amount: 0.5 }}
               transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
             >
-              <WordPressIcon className="h-28 w-28 text-ink/80 drop-shadow-lg sm:h-36 sm:w-36" />
+              <WordPressIcon className="h-24 w-24 text-ink/85 drop-shadow-lg sm:h-32 sm:w-32" />
             </motion.div>
 
             <Reveal>
               <h2 className="font-display text-4xl font-extrabold uppercase leading-[1.02] tracking-tight text-ink sm:text-5xl">
-                Integrado ao<br className="hidden sm:block" /> ecossistema que<br className="hidden sm:block" /> você já usa
+                Funciona dentro
+                <br className="hidden sm:block" /> do WordPress
               </h2>
             </Reveal>
           </div>
@@ -94,8 +67,13 @@ export default function WordPressSection() {
                       {step.n}
                     </span>
                   </div>
-                  <div className="mt-3 rounded-lg border-t-2 border-brand-light/60 bg-ink/85 p-5 backdrop-blur-sm transition-transform duration-300 group-hover:-translate-y-1">
-                    <StepText parts={step.parts} />
+                  <div className="mt-3 h-full rounded-lg border-t-2 border-brand-light/70 bg-ink/85 p-5 backdrop-blur-sm transition-transform duration-300 group-hover:-translate-y-1">
+                    <p className="text-sm leading-relaxed text-slate-200">
+                      <strong className="font-semibold text-brand-light">
+                        {step.lead}
+                      </strong>
+                      : {step.rest}
+                    </p>
                   </div>
                 </div>
               </Reveal>

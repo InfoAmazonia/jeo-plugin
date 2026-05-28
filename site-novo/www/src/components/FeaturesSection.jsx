@@ -1,38 +1,39 @@
 import { motion } from 'framer-motion'
-import { LocateFixed, SlidersHorizontal, Database, Layers, PlayCircle, FileText } from 'lucide-react'
+import { MapPin, Map, Recycle, Sparkles, Navigation, PlayCircle, FileText } from 'lucide-react'
 import Reveal from './ui/Reveal.jsx'
+import ParallaxImage from './ui/ParallaxImage.jsx'
+import featuresBg from '../assets/features-bg.jpg'
 
 const FEATURES = [
   {
-    icon: LocateFixed,
-    title: 'Georreferenciamento autônomo',
-    subtitle: 'Extração geográfica automatizada por IA',
-    body: 'Escreva sua reportagem normalmente. Nossa IA lê o texto em tempo real, identifica menções a localidades, ruas, cidades ou coordenadas e sugere automaticamente a plotagem correta no mapa.',
-    highlight: 'Economize até 80% do tempo de inserção manual de dados.',
+    icon: MapPin,
+    title: 'Geolocalização assistida por IA',
+    subtitle: 'A base para mapas, recomendações e contexto',
+    body: 'O sistema analisa reportagens novas e antigas, identifica lugares mencionados e sugere localizações primárias e secundárias no WordPress. Editores revisam e aprovam antes da publicação.',
   },
   {
-    icon: SlidersHorizontal,
-    title: 'Human-in-the-loop',
-    tag: '(Humano no circuito)',
-    subtitle: 'Controle editorial total e IA assistida',
-    body: 'A tecnologia apoia, mas a decisão final é sempre sua. Interface intuitiva de revisão onde jornalistas e editores validam, refinam e editam as marcações sugeridas pela IA antes da publicação.',
-    highlight: 'Precisão jornalística combinada com automação tecnológica.',
+    icon: Map,
+    title: 'Mini-mapas por reportagem',
+    subtitle: 'Mostre onde a história acontece',
+    body: 'Inclua mapas diretamente nas matérias, com pontos, áreas ou camadas temáticas relacionadas ao conteúdo. A ferramenta ajuda a transformar localização em contexto visual para o leitor e ainda possibilita que ele navegue por outras reportagens sobre o mesmo território.',
   },
   {
-    icon: Database,
-    title: 'Base de conhecimento RAG',
-    tag: '(Retrieval-Augmented Generation)',
-    subtitle: 'Contextualização profunda com dados históricos',
-    body: 'Conecte o JEO às suas próprias bases de dados, relatórios antigos ou acervos públicos. A IA utiliza essa base de conhecimento especializada para enriquecer as novas reportagens com cruzamentos históricos precisos.',
-    highlight: 'Checagem e profundidade baseadas no seu próprio repositório confiável.',
+    icon: Recycle,
+    title: 'Leia Também inteligente',
+    subtitle: 'Melhore a experiência do leitor e recircule seu acervo',
+    body: 'Recomende outras reportagens a partir da combinação entre tema e proximidade geográfica. Uma matéria sobre mineração no Amapá pode levar o leitor a outras coberturas sobre mineração na mesma região ou em territórios relacionados.',
   },
   {
-    icon: Layers,
-    title: 'Contextualização automatizada de termos',
-    tag: '(Múltiplos renderizadores)',
-    subtitle: 'Flexibilidade visual para qualquer narrativa',
-    body: 'Escolha como sua história deve ser contada. Alterne facilmente entre diferentes estilos de visualização: mapas de calor (heatmaps), clusters de pontos, linhas de tempo geográficas ou polígonos de dados socioambientais.',
-    highlight: 'Mapbox, OpenStreetMap e múltiplos layouts integrados.',
+    icon: Sparkles,
+    title: 'Contexto adicional por IA',
+    subtitle: 'Mais contexto, com revisão editorial',
+    body: 'A partir do acervo da redação, a IA sugere parágrafos curtos de contexto sobre o tema da reportagem. O editor revisa, ajusta e publica apenas o que fizer sentido. Utilize a memória editorial da sua redação com mais frequência e eficácia.',
+  },
+  {
+    icon: Navigation,
+    title: 'Histórias perto de mim',
+    subtitle: 'Personalização da experiência do leitor por território',
+    body: 'Organize reportagens por localidade e permita que leitores encontrem conteúdos relacionados a seus territórios de interesse. A funcionalidade pode ser usada como página própria, aba ou experiência dentro de uma página já existente em seu site.',
   },
 ]
 
@@ -43,32 +44,24 @@ function FeatureCard({ feature, index }) {
       <motion.article
         whileHover={{ y: -6 }}
         transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-        className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-brand/25 bg-card-teal/80 p-7 shadow-card"
+        className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-brand/20 bg-brand-darkest/30 p-7 shadow-card backdrop-blur-sm"
       >
         {/* top accent bar */}
         <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent opacity-60" />
         {/* hover sheen */}
         <div className="pointer-events-none absolute -inset-px bg-gradient-to-br from-brand/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
-        <div className="relative">
+        <div className="relative flex-1">
           <span className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-brand/15 text-brand ring-1 ring-brand/30 transition-all duration-300 group-hover:bg-brand/25 group-hover:text-brand-light">
             <Icon className="h-6 w-6" />
           </span>
 
-          <h3 className="mt-6 font-display text-xl font-bold uppercase leading-tight tracking-wide text-brand-light">
+          <h3 className="mt-6 font-display text-xl font-bold uppercase leading-tight tracking-wide text-brand">
             {feature.title}
-            {feature.tag && (
-              <span className="mt-1 block text-sm font-semibold text-brand/70">
-                {feature.tag}
-              </span>
-            )}
           </h3>
 
           <p className="mt-4 font-semibold text-white">{feature.subtitle}</p>
-          <p className="mt-3 text-sm leading-relaxed text-slate-400">{feature.body}</p>
-          <p className="mt-5 text-sm font-medium leading-relaxed text-brand-light/90">
-            {feature.highlight}
-          </p>
+          <p className="mt-3 text-sm leading-relaxed text-muted">{feature.body}</p>
         </div>
 
         <div className="relative mt-7 flex flex-wrap gap-3 pt-1">
@@ -94,11 +87,27 @@ function FeatureCard({ feature, index }) {
 
 export default function FeaturesSection() {
   return (
-    <section id="recursos" className="relative bg-base py-24 sm:py-28">
-      <div className="section-shell">
+    <section id="recursos" className="relative overflow-hidden bg-base py-24 sm:py-28">
+      {/* Subtle topographic texture (Figma / Freepik asset) */}
+      {/* Topographic texture with pointer parallax + motion afterimage (subtle) */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.08] [mask-image:linear-gradient(to_bottom,transparent,black_15%,black_70%,transparent)]"
+      >
+        <ParallaxImage
+          src={featuresBg}
+          range={22}
+          scale={1.15}
+          trailScale={1.24}
+          trailOpacity={0.55}
+          className="absolute inset-0 h-full w-full"
+        />
+      </div>
+
+      <div className="section-shell relative z-10">
         <Reveal className="mx-auto max-w-3xl text-center">
           <h2 className="font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-white sm:text-4xl">
-            <span className="text-brand">Recursos inteligentes</span> para
+            Recursos <span className="text-brand">inteligentes</span> para
             <br className="hidden sm:block" /> potencializar suas coberturas
           </h2>
         </Reveal>

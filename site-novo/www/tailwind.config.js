@@ -4,21 +4,26 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Deep backgrounds
-        ink: '#0a1113', // hero / deepest
-        base: '#1b2127', // main page background
-        panel: '#21272c', // raised panels
-        'card-dark': '#262c31', // "Atualmente" neutral cards
-        'card-teal': '#15282c', // teal-tinted feature cards
-        footer: '#30363c', // lighter footer band
+        // Deep backgrounds (exact values from Figma V2)
+        ink: '#12181d', // deepest — text on teal buttons
+        base: '#191E23', // main page background
+        panel: '#21262B', // raised panels
+        'card-dark': '#32373C', // "Atualmente" neutral cards
+        'card-teal': '#12464A', // teal-tinted cards
+        footer: '#30363C', // lighter footer band
         // Brand teal
         brand: {
-          DEFAULT: '#2cb2bd',
-          light: '#3fc7d2',
-          bright: '#2eb9c5',
-          dark: '#1f8d97',
-          deep: '#13585f',
+          DEFAULT: '#2FBAC6',
+          light: '#3FC7D2',
+          bright: '#2FBAC5',
+          dark: '#25939C',
+          deep: '#1C6C73',
+          darkest: '#12464A',
         },
+        // Neutral text grays (from Figma)
+        muted: '#ABACAF',
+        'muted-2': '#87898C',
+        'muted-3': '#5B5F62',
       },
       fontFamily: {
         display: ['Archivo', 'system-ui', 'sans-serif'],
@@ -28,7 +33,7 @@ export default {
         content: '1180px',
       },
       boxShadow: {
-        'glow-brand': '0 0 0 1px rgba(44,178,189,0.35), 0 18px 60px -18px rgba(44,178,189,0.55)',
+        'glow-brand': '0 0 0 1px rgba(47,186,198,0.35), 0 18px 60px -18px rgba(47,186,198,0.55)',
         card: '0 24px 60px -28px rgba(0,0,0,0.75)',
       },
       keyframes: {

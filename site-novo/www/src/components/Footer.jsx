@@ -1,5 +1,6 @@
-import { Leaf, Code2 } from 'lucide-react'
 import JeoMark from './ui/JeoMark.jsx'
+import infoamazonia from '../assets/infoamazonia.png'
+import codesinfo from '../assets/codesinfo.png'
 
 const NAV = ['BRAINS', 'THEME', 'PLUGIN']
 
@@ -7,7 +8,7 @@ export default function Footer() {
   return (
     <footer className="bg-footer">
       {/* Main band */}
-      <div className="section-shell flex flex-col items-center gap-10 py-14 md:flex-row md:justify-between">
+      <div className="section-shell flex flex-col items-center gap-10 py-16 md:flex-row md:justify-between">
         <a href="#top" className="flex items-center gap-4">
           <JeoMark className="h-16 w-auto" />
           <span className="font-display text-4xl font-bold tracking-tight text-white">
@@ -35,24 +36,23 @@ export default function Footer() {
         </nav>
       </div>
 
-      {/* Bottom bar */}
-      <div className="border-t border-white/5 bg-ink/60">
+      {/* Bottom bar — dark, matches the InfoAmazonia logo background */}
+      <div className="bg-base">
         <div className="section-shell flex flex-col items-center gap-6 py-6 text-center md:flex-row md:justify-between md:text-left">
-          <a href="#termos" className="text-sm text-slate-400 transition-colors hover:text-slate-200">
+          <a
+            href="#termos"
+            className="text-sm text-slate-400 transition-colors hover:text-slate-200"
+          >
             Termos de uso e privacidade
           </a>
 
           <div className="flex flex-col items-center gap-3 md:items-end">
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-              <span className="flex items-center gap-1.5 font-display text-sm font-bold tracking-wide text-white">
-                INFOAMAZONIA <Leaf className="h-4 w-4 text-green-500" />
-              </span>
-              <span className="text-sm font-bold text-white">
+            <div className="flex flex-wrap items-center justify-center gap-x-7 gap-y-3">
+              <img src={infoamazonia} alt="InfoAmazonia" className="h-6 w-auto" />
+              <span className="font-display text-lg font-bold text-white">
                 hacklab<span className="text-brand">/</span>
               </span>
-              <span className="flex items-center gap-1.5 text-sm font-bold text-white">
-                <Code2 className="h-4 w-4 text-purple-400" /> codesinfo
-              </span>
+              <img src={codesinfo} alt="codesinfo" className="h-6 w-auto" />
             </div>
             <p className="text-xs text-slate-500">
               Uma produção de{' '}

@@ -1,4 +1,5 @@
 import { motion, useScroll, useSpring } from 'framer-motion'
+import Header from './components/Header.jsx'
 import Hero from './components/Hero.jsx'
 import WhySection from './components/WhySection.jsx'
 import FeaturesSection from './components/FeaturesSection.jsx'
@@ -24,6 +25,8 @@ export default function App() {
         style={{ scaleX }}
         className="fixed inset-x-0 top-0 z-50 h-1 origin-left bg-gradient-to-r from-brand to-brand-light"
       />
+
+      <Header />
 
       <main>
         <Hero />
