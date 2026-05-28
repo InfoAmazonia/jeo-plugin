@@ -1,8 +1,9 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { Download, BookOpen, GraduationCap, ChevronDown } from 'lucide-react'
 import JeoMark from './ui/JeoMark.jsx'
-import ParallaxImage from './ui/ParallaxImage.jsx'
-import heroBg from '../assets/hero-bg.jpg'
+import heroPoster from '../assets/hero-bg.jpg'
+import heroVideo from '../assets/hero-background.mp4'
+import jeoWordmark from '../assets/jeo-brains-wordmark.svg'
 
 export default function Hero() {
   const reduce = useReducedMotion()
@@ -22,15 +23,27 @@ export default function Hero() {
 
   return (
     <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-base">
-      {/* Topographic backdrop with pointer parallax + motion afterimage */}
-      <ParallaxImage
-        src={heroBg}
-        className="pointer-events-none absolute inset-0 overflow-hidden"
-        range={34}
-        scale={1.22}
-        trailScale={1.32}
-        trailOpacity={0.45}
-      />
+      {/* Looping background video — poster (the former still bg) shows until it plays.
+          Under reduced motion only the static poster renders. */}
+      {reduce ? (
+        <img
+          src={heroPoster}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
+        <video
+          className="absolute inset-0 h-full w-full object-cover"
+          src={heroVideo}
+          poster={heroPoster}
+          autoPlay
+          loop
+          muted
+          playsInline
+          aria-hidden="true"
+        />
+      )}
       {/* Darkening + teal tint + fade into next section */}
       <div className="pointer-events-none absolute inset-0 bg-brand-deep/25 mix-blend-multiply" />
       <div className="pointer-events-none absolute inset-0 bg-black/70" />
@@ -42,15 +55,14 @@ export default function Hero() {
         animate="show"
         className="section-shell relative z-10 flex flex-col items-center py-28 text-center"
       >
-        {/* Wordmark: JEO BR[AI]NS */}
+        {/* Wordmark: J pillar mark + the JEO BRAINS logotype (SVG from Figma) */}
         <motion.div variants={item} className="flex items-center gap-4 sm:gap-5">
           <JeoMark className="h-16 w-auto drop-shadow-[0_6px_24px_rgba(0,0,0,0.6)] sm:h-20" />
-          <span className="font-display text-5xl tracking-tight text-white sm:text-6xl">
-            <span className="font-bold">JEO</span>{' '}
-            <span className="font-light">
-              BR<span className="text-brand">AI</span>NS
-            </span>
-          </span>
+          <img
+            src={jeoWordmark}
+            alt="JEO BRAINS"
+            className="h-11 w-auto drop-shadow-[0_6px_24px_rgba(0,0,0,0.6)] sm:h-[3.25rem]"
+          />
         </motion.div>
 
         <motion.p

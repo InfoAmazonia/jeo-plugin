@@ -26,8 +26,8 @@ export default {
         'muted-3': '#5B5F62',
       },
       fontFamily: {
-        display: ['Archivo', 'system-ui', 'sans-serif'],
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        display: ['"Open Sans"', 'system-ui', 'sans-serif'],
+        sans: ['"Open Sans"', 'system-ui', 'sans-serif'],
       },
       maxWidth: {
         content: '1180px',

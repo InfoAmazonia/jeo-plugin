@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import JeoMark from './ui/JeoMark.jsx'
+import jeoWordmark from '../assets/jeo-wordmark.svg'
 
 const NAV = [
-  { label: 'Brains', href: '#top', active: true },
+  { label: 'Brains', href: '#top' },
   { label: 'Theme', href: '#recursos' },
   { label: 'Plugin', href: '#integracao' },
 ]
@@ -11,10 +12,19 @@ const NAV = [
 export default function Header() {
   const reduce = useReducedMotion()
   const [visible, setVisible] = useState(false)
+  const [activeId, setActiveId] = useState('#top')
 
-  // Reveal once the page is scrolled past ~50% of the hero (≈ half the viewport)
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > window.innerHeight * 0.5)
+    const onScroll = () => {
+      setVisible(window.scrollY > window.innerHeight * 0.5)
+      // Scroll spy: the active link is the last section scrolled near the top.
+      let current = NAV[0].href
+      for (const { href } of NAV) {
+        const el = document.querySelector(href)
+        if (el && el.getBoundingClientRect().top <= 140) current = href
+      }
+      setActiveId(current)
+    }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
@@ -37,9 +47,7 @@ export default function Header() {
         {/* Logo lockup */}
         <a href="#top" className="flex items-center gap-3">
           <JeoMark className="h-9 w-auto" />
-          <span className="font-display text-2xl font-bold uppercase tracking-tight text-white">
-            JEO
-          </span>
+          <img src={jeoWordmark} alt="JEO" className="h-6 w-auto" />
           <span className="hidden text-sm text-muted-2 sm:inline">
             Geojournalism Platform
           </span>
@@ -48,19 +56,26 @@ export default function Header() {
         {/* Nav */}
         <nav className="flex items-center gap-6 sm:gap-10">
           <div className="hidden items-center gap-7 sm:flex lg:gap-9">
-            {NAV.map((n) => (
-              <a
-                key={n.label}
-                href={n.href}
-                className={`text-sm font-semibold uppercase tracking-wide transition-colors ${
-                  n.active
-                    ? 'border-b-2 border-brand pb-0.5 text-white'
-                    : 'text-slate-300 hover:text-white'
-                }`}
-              >
-                {n.label}
-              </a>
-            ))}
+            {NAV.map((n) => {
+              const active = activeId === n.href
+              return (
+                <a
+                  key={n.label}
+                  href={n.href}
+                  aria-current={active ? 'true' : undefined}
+                  className={`group relative pb-1 text-sm font-semibold uppercase tracking-wide transition-colors ${
+                    active ? 'text-white' : 'text-slate-300 hover:text-white'
+                  }`}
+                >
+                  {n.label}
+                  <span
+                    className={`absolute -bottom-0.5 left-0 h-0.5 bg-brand transition-all duration-300 ${
+                      active ? 'w-full' : 'w-0 group-hover:w-full'
+                    }`}
+                  />
+                </a>
+              )
+            })}
           </div>
           <a
             href="#download"

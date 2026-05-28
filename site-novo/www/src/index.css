@@ -65,6 +65,13 @@
   }
 }
 
+@layer utilities {
+  /* Open Sans Condensed via the variable font's width axis (matches Figma headings) */
+  .font-condensed {
+    font-stretch: 75%;
+  }
+}
+
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *,

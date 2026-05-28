@@ -31,7 +31,7 @@ export default function WordPressSection() {
   return (
     <section id="integracao" className="bg-base py-10">
       <div className="section-shell">
-        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand via-brand-dark to-muted-3 p-8 shadow-card sm:p-12 lg:p-14">
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-b from-brand to-muted-3 bg-[length:200%_200%] p-8 shadow-card animate-gradient-pan [animation-duration:14s] sm:p-12 lg:p-14">
           {/* subtle texture */}
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(255,255,255,0.18),transparent_45%)]" />
 
@@ -47,7 +47,7 @@ export default function WordPressSection() {
             </motion.div>
 
             <Reveal>
-              <h2 className="font-display text-4xl font-extrabold uppercase leading-[1.02] tracking-tight text-ink sm:text-5xl">
+              <h2 className="font-condensed font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight text-ink sm:text-5xl">
                 Funciona dentro
                 <br className="hidden sm:block" /> do WordPress
               </h2>
@@ -57,17 +57,17 @@ export default function WordPressSection() {
           {/* Steps */}
           <div className="relative mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step, i) => (
-              <Reveal key={step.n} delay={i * 0.08}>
-                <div className="group">
-                  <div className="flex items-baseline gap-2">
-                    <span className="font-display text-sm font-bold uppercase tracking-[0.2em] text-ink/70">
+              <Reveal key={step.n} delay={i * 0.08} className="h-full">
+                <div className="group flex h-full flex-col">
+                  <div className="flex items-baseline gap-2 text-ink/80">
+                    <span className="font-condensed font-display text-2xl font-bold uppercase tracking-wide">
                       Passo
                     </span>
-                    <span className="font-display text-4xl font-black leading-none text-ink/90">
+                    <span className="font-condensed font-display text-5xl font-bold leading-none sm:text-6xl">
                       {step.n}
                     </span>
                   </div>
-                  <div className="mt-3 h-full rounded-lg border-t-2 border-brand-light/70 bg-ink/85 p-5 backdrop-blur-sm transition-transform duration-300 group-hover:-translate-y-1">
+                  <div className="mt-3 flex-1 rounded-lg border-t-2 border-brand bg-gradient-to-b from-card-dark to-base p-5 backdrop-blur-sm transition-transform duration-300 group-hover:-translate-y-1">
                     <p className="text-sm leading-relaxed text-slate-200">
                       <strong className="font-semibold text-brand-light">
                         {step.lead}

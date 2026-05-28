@@ -1,62 +1,72 @@
 import { motion } from 'framer-motion'
-import { MapPin, Map, Recycle, Sparkles, Navigation, PlayCircle, FileText } from 'lucide-react'
+import { PlayCircle, FileText } from 'lucide-react'
 import Reveal from './ui/Reveal.jsx'
 import ParallaxImage from './ui/ParallaxImage.jsx'
 import featuresBg from '../assets/features-bg.jpg'
+import iconGeoloc from '../assets/icons/recursos-geoloc.svg'
+import iconMinimapa from '../assets/icons/recursos-minimapa.svg'
+import iconLeiaTambem from '../assets/icons/recursos-leia-tambem.svg'
+import iconContexto from '../assets/icons/recursos-contexto.svg'
+import iconHistorias from '../assets/icons/recursos-historias.svg'
 
 const FEATURES = [
   {
-    icon: MapPin,
+    icon: iconGeoloc,
     title: 'Geolocalização assistida por IA',
     subtitle: 'A base para mapas, recomendações e contexto',
     body: 'O sistema analisa reportagens novas e antigas, identifica lugares mencionados e sugere localizações primárias e secundárias no WordPress. Editores revisam e aprovam antes da publicação.',
   },
   {
-    icon: Map,
+    icon: iconMinimapa,
     title: 'Mini-mapas por reportagem',
     subtitle: 'Mostre onde a história acontece',
     body: 'Inclua mapas diretamente nas matérias, com pontos, áreas ou camadas temáticas relacionadas ao conteúdo. A ferramenta ajuda a transformar localização em contexto visual para o leitor e ainda possibilita que ele navegue por outras reportagens sobre o mesmo território.',
   },
   {
-    icon: Recycle,
+    icon: iconLeiaTambem,
     title: 'Leia Também inteligente',
     subtitle: 'Melhore a experiência do leitor e recircule seu acervo',
     body: 'Recomende outras reportagens a partir da combinação entre tema e proximidade geográfica. Uma matéria sobre mineração no Amapá pode levar o leitor a outras coberturas sobre mineração na mesma região ou em territórios relacionados.',
   },
   {
-    icon: Sparkles,
+    icon: iconContexto,
     title: 'Contexto adicional por IA',
     subtitle: 'Mais contexto, com revisão editorial',
     body: 'A partir do acervo da redação, a IA sugere parágrafos curtos de contexto sobre o tema da reportagem. O editor revisa, ajusta e publica apenas o que fizer sentido. Utilize a memória editorial da sua redação com mais frequência e eficácia.',
   },
   {
-    icon: Navigation,
+    icon: iconHistorias,
     title: 'Histórias perto de mim',
     subtitle: 'Personalização da experiência do leitor por território',
     body: 'Organize reportagens por localidade e permita que leitores encontrem conteúdos relacionados a seus territórios de interesse. A funcionalidade pode ser usada como página própria, aba ou experiência dentro de uma página já existente em seu site.',
   },
 ]
 
-function FeatureCard({ feature, index }) {
-  const Icon = feature.icon
+function FeatureCard({ feature, index, isLast }) {
   return (
-    <Reveal delay={(index % 2) * 0.1} className="h-full">
+    <Reveal
+      delay={(index % 2) * 0.1}
+      className={`h-full ${isLast ? 'md:col-span-2 md:mx-auto md:w-[calc(50%-0.75rem)]' : ''}`}
+    >
       <motion.article
         whileHover={{ y: -6 }}
         transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-        className="group relative flex h-full flex-col overflow-hidden rounded-xl border border-brand/20 bg-brand-darkest/30 p-7 shadow-card backdrop-blur-sm"
+        className="group relative flex h-full flex-col rounded-xl border border-brand/20 bg-brand-darkest/30 p-7 shadow-card backdrop-blur-sm"
       >
+        {/* Icon (no box) floating ~50% above the card's top edge — "vazado" effect */}
+        <img
+          src={feature.icon}
+          alt=""
+          aria-hidden="true"
+          className="absolute -top-9 left-7 h-[60px] w-auto drop-shadow-[0_6px_18px_rgba(0,0,0,0.55)]"
+        />
         {/* top accent bar */}
         <span className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent opacity-60" />
         {/* hover sheen */}
         <div className="pointer-events-none absolute -inset-px bg-gradient-to-br from-brand/10 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
 
         <div className="relative flex-1">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-lg bg-brand/15 text-brand ring-1 ring-brand/30 transition-all duration-300 group-hover:bg-brand/25 group-hover:text-brand-light">
-            <Icon className="h-6 w-6" />
-          </span>
-
-          <h3 className="mt-6 font-display text-xl font-bold uppercase leading-tight tracking-wide text-brand">
+          <h3 className="font-display text-xl font-bold uppercase leading-tight tracking-wide text-brand">
             {feature.title}
           </h3>
 
@@ -88,7 +98,6 @@ function FeatureCard({ feature, index }) {
 export default function FeaturesSection() {
   return (
     <section id="recursos" className="relative overflow-hidden bg-base py-24 sm:py-28">
-      {/* Subtle topographic texture (Figma / Freepik asset) */}
       {/* Topographic texture with pointer parallax + motion afterimage (subtle) */}
       <div
         aria-hidden="true"
@@ -106,15 +115,20 @@ export default function FeaturesSection() {
 
       <div className="section-shell relative z-10">
         <Reveal className="mx-auto max-w-3xl text-center">
-          <h2 className="font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-white sm:text-4xl">
+          <h2 className="font-condensed font-display text-3xl font-extrabold uppercase leading-tight tracking-tight text-white sm:text-4xl">
             Recursos <span className="text-brand">inteligentes</span> para
             <br className="hidden sm:block" /> potencializar suas coberturas
           </h2>
         </Reveal>
 
-        <div className="mt-16 grid gap-6 md:grid-cols-2">
+        <div className="mt-20 grid gap-x-6 gap-y-14 md:grid-cols-2">
           {FEATURES.map((f, i) => (
-            <FeatureCard key={f.title} feature={f} index={i} />
+            <FeatureCard
+              key={f.title}
+              feature={f}
+              index={i}
+              isLast={i === FEATURES.length - 1}
+            />
           ))}
         </div>
       </div>

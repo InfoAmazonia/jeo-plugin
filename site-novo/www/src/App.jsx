@@ -9,6 +9,7 @@ import NewsletterSection from './components/NewsletterSection.jsx'
 import WorkshopsSection from './components/WorkshopsSection.jsx'
 import TransparencySection from './components/TransparencySection.jsx'
 import Footer from './components/Footer.jsx'
+import ConsentBanner from './components/ConsentBanner.jsx'
 
 export default function App() {
   const { scrollYProgress } = useScroll()
@@ -39,6 +40,7 @@ export default function App() {
         <TransparencySection />
       </main>
       <Footer />
+      <ConsentBanner />
     </div>
   )
 }

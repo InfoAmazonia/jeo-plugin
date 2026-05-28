@@ -47,20 +47,24 @@ export default function WhySection() {
   return (
     <section id="por-que" className="relative bg-base py-24 sm:py-28">
       <div className="section-shell grid items-start gap-14 lg:grid-cols-[0.8fr_1.2fr] lg:gap-20">
-        {/* Heading */}
-        <Reveal>
-          <h2 className="font-display text-4xl font-extrabold uppercase leading-[1.08] tracking-tight text-white sm:text-5xl lg:sticky lg:top-24">
-            Como a{' '}
-            <span className="text-brand">inteligência geográfica</span> pode
-            beneficiar a minha redação?
-          </h2>
-        </Reveal>
+        {/* Heading — sticky on desktop so it frames the cards column as it scrolls.
+            Sticky lives on the grid item (not the animated Reveal) so the entrance
+            transform doesn't fight the sticky offset. */}
+        <div className="lg:sticky lg:top-24">
+          <Reveal>
+            <h2 className="font-condensed font-display text-4xl font-extrabold uppercase leading-[1.08] tracking-tight text-white sm:text-5xl lg:text-right">
+              Como a{' '}
+              <span className="text-brand">inteligência geográfica</span> pode
+              beneficiar a minha redação?
+            </h2>
+          </Reveal>
+        </div>
 
         {/* Pain points */}
         <div className="flex flex-col gap-10">
           {PAINS.map((p, i) => (
             <Reveal key={p.title} delay={(i % 2) * 0.08}>
-              <h3 className="mb-4 flex items-center gap-2 font-display text-xl font-bold uppercase tracking-wide text-brand">
+              <h3 className="mb-4 flex items-center gap-2 font-condensed font-display text-xl font-bold uppercase tracking-wide text-brand">
                 <span aria-hidden="true">→</span>
                 {p.title}
               </h3>

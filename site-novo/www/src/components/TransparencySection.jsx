@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion'
-import { Github, Terminal, ShieldQuestion } from 'lucide-react'
 import Reveal from './ui/Reveal.jsx'
+import iconGithub from '../assets/icons/trans-github.svg'
+import iconDocs from '../assets/icons/trans-docs.svg'
+import iconPrivacy from '../assets/icons/trans-privacy.svg'
 
 const LINKS = [
-  { icon: Github, label: 'Repositório no GitHub', href: '#github' },
-  { icon: Terminal, label: 'Documentação Técnica', href: '#docs' },
-  { icon: ShieldQuestion, label: 'Privacidade e LGPD', href: '#lgpd' },
+  { icon: iconGithub, label: 'Repositório no GitHub', href: '#github' },
+  { icon: iconDocs, label: 'Documentação Técnica', href: '#docs' },
+  { icon: iconPrivacy, label: 'Privacidade e LGPD', href: '#lgpd' },
 ]
 
 export default function TransparencySection() {
@@ -15,31 +17,28 @@ export default function TransparencySection() {
         {/* Action links */}
         <Reveal className="order-2 lg:order-1">
           <div className="flex flex-col gap-5">
-            {LINKS.map((l, i) => {
-              const Icon = l.icon
-              return (
-                <motion.a
-                  key={l.label}
-                  href={l.href}
-                  whileHover={{ x: 6 }}
-                  transition={{ type: 'spring', stiffness: 320, damping: 24 }}
-                  className="group flex items-center justify-center gap-3 rounded-lg border border-brand/50 bg-brand-darkest/20 px-6 py-5 transition-all duration-300 hover:border-brand hover:bg-brand-darkest/50 hover:shadow-glow-brand"
-                  style={{ transitionDelay: `${i * 40}ms` }}
-                >
-                  <Icon className="h-5 w-5 text-brand transition-colors duration-300 group-hover:text-brand-light" />
-                  <span className="font-semibold text-slate-100 group-hover:text-white">
-                    {l.label}
-                  </span>
-                </motion.a>
-              )
-            })}
+            {LINKS.map((l, i) => (
+              <motion.a
+                key={l.label}
+                href={l.href}
+                whileHover={{ x: 6 }}
+                transition={{ type: 'spring', stiffness: 320, damping: 24 }}
+                className="group flex items-center justify-center gap-3 rounded-lg border border-brand/50 bg-brand-darkest/20 px-6 py-5 transition-all duration-300 hover:border-brand hover:bg-brand-darkest/50 hover:shadow-glow-brand"
+                style={{ transitionDelay: `${i * 40}ms` }}
+              >
+                <img src={l.icon} alt="" aria-hidden="true" className="h-6 w-6" />
+                <span className="font-semibold text-slate-100 group-hover:text-white">
+                  {l.label}
+                </span>
+              </motion.a>
+            ))}
           </div>
         </Reveal>
 
         {/* Copy */}
         <div className="order-1 lg:order-2">
           <Reveal>
-            <h2 className="font-display text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-white sm:text-5xl">
+            <h2 className="font-condensed font-display text-4xl font-extrabold uppercase leading-[1.05] tracking-tight text-white sm:text-5xl">
               Transparência, autonomia e código aberto
             </h2>
           </Reveal>
