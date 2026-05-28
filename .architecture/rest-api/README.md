@@ -30,6 +30,15 @@ See [`ai/README.md`](../ai/README.md) for full details.
 | `/jeo/v1/minimap/setup-prompt` | POST | `api_setup_prompt` | Generate map from text prompt via AI agent |
 | `/jeo/v1/minimap/chat` | POST | `api_chat` | Multi-turn map refinement via AI agent (requires `conversation_id`) |
 
+### AI Context (Editorial Suggestions)
+
+| Route | Method | Callback | Description |
+|-------|--------|----------|-------------|
+| `/jeo/v1/context/setup` | POST | `api_setup` | Generate initial editorial suggestions from post content |
+| `/jeo/v1/context/chat` | POST | `api_chat` | Multi-turn conversation for refining suggestions (requires `conversation_id`) |
+| `/jeo/v1/context/state` | GET | `api_get_state` | Load persisted conversation state (messages, suggestions, conversation_id) |
+| `/jeo/v1/context/clear` | POST | `api_clear` | Reset conversation and all suggestions |
+
 ### Dashboard
 
 | Route | Method | Description |

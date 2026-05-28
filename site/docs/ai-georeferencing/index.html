@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/docs/ai-georeferencing/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>AI Georeferencing - JEO</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "AI Georeferencing";
+        var mkdocs_page_input_path = "ai-georeferencing.md";
+        var mkdocs_page_url = "/docs/ai-georeferencing/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../stories-near-you/">Stories near you</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../minimap/">Minimap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-settings/">AI Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-context-assistant/">AI Context Assistant</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="./">AI Georeferencing</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#how-it-works">How it works</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#flow">Flow</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#georeferencing-with-custom-prompts">Georeferencing with custom prompts</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#calibration">Calibration</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#multi-turn-refinement">Multi-turn refinement</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-bulk-geolocation/">AI Bulk Geolocation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-compliance/">WordPress.org compliance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-audit-report/">WordPress.org audit report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-upgrade-smoke-tests/">Dependency upgrade smoke tests</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">AI</li>
+      <li class="breadcrumb-item active">AI Georeferencing</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/ai-georeferencing.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ai-georeferencing">AI Georeferencing</h1>
+<p>JEO can automatically georeference your posts using AI. Instead of manually searching and adding geolocation points, the AI analyzes your post content and suggests relevant locations with coordinates and confidence scores.</p>
+<h2 id="how-it-works">How it works</h2>
+<p>When editing a post, the <strong>Geolocation</strong> sidebar panel includes an <strong>Geolocate with AI</strong> button. Clicking it sends your post title and content to the configured AI provider, which returns suggested geolocation points.</p>
+<p><img alt="AI Georeferencing" src="../img/ai-geolocation.png" /></p>
+<p><img alt="AI Georeferencing" src="../img/ai-geolocation2.png" /></p>
+<h3 id="flow">Flow</h3>
+<ol>
+<li>Click <strong>Geolocate with AI</strong> in the Geolocation sidebar panel.</li>
+<li>The AI analyzes the post content and identifies geographic references.</li>
+<li>Suggested points appear with location name, coordinates, and a confidence score.</li>
+<li>Review and approve or adjust the suggested points.</li>
+<li>The points are saved as geolocation data for the post.</li>
+</ol>
+<h2 id="georeferencing-with-custom-prompts">Georeferencing with custom prompts</h2>
+<p>Under <strong>Jeo → AI → Provider</strong>, you'll find the <strong>AI Prompt Engineer Assistant</strong> section. Describe how you want the AI to behave (e.g., "Only map cities in Brazil" or "Ignore street names") and the active LLM will generate an optimized system prompt that incorporates your calibration settings. The generated prompt can be reviewed and edited before use.</p>
+<p><img alt="AI Georeferencing - Custom prompts" src="../img/ai-geolocation3.png" /></p>
+<h3 id="calibration">Calibration</h3>
+<p>Under <strong>Jeo → AI → Provider</strong>, in the <strong>Georeferencing Calibration</strong> section, you can fine-tune georeferencing behavior:</p>
+<ul>
+<li><strong>Location Granularity</strong>: Controls the level of geographic detail — Broad (countries, regions), Balanced (cities + neighborhoods), or Fine (streets, landmarks, POIs).</li>
+<li><strong>Minimum Confidence</strong>: Minimum confidence score for a point to be suggested (0–100).</li>
+<li><strong>Primary Threshold</strong>: Confidence score above which a location is classified as PRIMARY (main geographic focus).</li>
+<li><strong>Primary Points</strong>: Maximum number of PRIMARY locations the AI can suggest.</li>
+<li><strong>Secondary Threshold</strong>: Confidence score range for SECONDARY locations (mentioned but not central).</li>
+<li><strong>Secondary Points</strong>: Maximum number of SECONDARY locations the AI can suggest.</li>
+<li><strong>Prioritize Title Mentions</strong>: How much the post title influences the AI's location detection (0–100%).</li>
+<li><strong>Max Tokens</strong>: Token budget for the generated system prompt.</li>
+</ul>
+<p>Each setting has a <strong>Use</strong> toggle — disable it to exclude that rule from the AI prompt.</p>
+<p><img alt="AI Georeferencing - Calibration" src="../img/ai-geolocation4.png" /></p>
+<h2 id="multi-turn-refinement">Multi-turn refinement</h2>
+<p>After the initial georeferencing, you can chat with the AI to refine the results. For example, you can ask it to add a specific city, remove an incorrect point, or adjust the confidence of a suggestion.</p>
+<p>The conversation history is preserved per post, so you can continue refining in subsequent editing sessions.</p>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>An AI provider must be configured in <strong>Jeo → AI</strong> (see <a href="../ai-settings/">AI Settings</a>).</li>
+<li>The post must have a title and/or content for the AI to analyze.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ai-context-assistant/" class="btn btn-neutral float-left" title="AI Context Assistant"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ai-bulk-geolocation/" class="btn btn-neutral float-right" title="AI Bulk Geolocation">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../ai-context-assistant/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ai-bulk-geolocation/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

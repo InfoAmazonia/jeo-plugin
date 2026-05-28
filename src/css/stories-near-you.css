@@ -76,33 +76,49 @@
 
 /* Geolocation consent */
 .jeo-stories-near-you__consent {
+	--snu-consent-bg: #f6f7f7;
+	--snu-consent-text: #1e1e1e;
+	--snu-btn-bg: #0073aa;
+	--snu-btn-text: #fff;
+	--snu-btn-border: #0073aa;
+	--snu-skip-text: #0073aa;
 	padding: 40px 20px;
 	text-align: center;
-	background: #f6f7f7;
+	background: var(--snu-consent-bg);
 	border-radius: 4px;
+}
+
+.dark-theme .jeo-stories-near-you__consent,
+.is-dark-theme .jeo-stories-near-you__consent {
+	--snu-consent-bg: #2a2f34;
+	--snu-consent-text: #e8e8e8;
+	--snu-btn-border: #3a3f44;
+	--snu-skip-text: #6dc3e8;
 }
 
 .jeo-stories-near-you__consent-text {
 	margin: 0 0 16px;
 	font-size: 1em;
+	color: var(--snu-consent-text) !important;
 }
 
-.jeo-stories-near-you__consent-button,
-.jeo-stories-near-you__consent-skip {
+.wp-block-jeo-stories-near-you .jeo-stories-near-you__consent-button,
+.wp-block-jeo-stories-near-you .jeo-stories-near-you__consent-skip {
+	display: inline-block;
 	padding: 8px 16px;
 	border-radius: 4px;
-	border: 1px solid #0073aa;
+	border: 1px solid var(--snu-btn-border);
 	font-size: 0.95em;
 	cursor: pointer;
 }
 
-.jeo-stories-near-you__consent-button {
-	background: #0073aa;
-	color: #fff;
+.wp-block-jeo-stories-near-you .jeo-stories-near-you__consent-button {
+	background: var(--snu-btn-bg);
+	color: var(--snu-btn-text);
 	margin-right: 8px;
 }
 
-.jeo-stories-near-you__consent-skip {
+.wp-block-jeo-stories-near-you .jeo-stories-near-you__consent-skip {
 	background: transparent;
-	color: #0073aa;
+	color: var(--snu-skip-text);
 }
