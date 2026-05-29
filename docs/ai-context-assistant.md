@@ -17,7 +17,7 @@ Click **Generate Suggestions**. The AI will analyze your article's content and t
 
 The generation is **not automatic** — you control when it runs to avoid unnecessary API calls.
 
-<!-- ![AI Context panel — idle state](img/ai-context-panel.png) -->
+![AI Context panel — idle state](img/ai-context-panel.png)
 
 ## Using suggested paragraphs
 
@@ -35,7 +35,7 @@ Click **Copy** to copy the paragraph as rich text (HTML with links) to your clip
 2. DOM selection + `execCommand('copy')` (works in Gutenberg iframes)
 3. Plain text only (universal fallback)
 
-<!-- ![AI Context panel — suggestions and chat](img/ai-context-suggestions.png) -->
+![AI Context panel — suggestions and chat](img/ai-context-suggestions.png)
 
 ## Refining with chat
 
@@ -60,7 +60,7 @@ Click **Clear** to reset the entire conversation and remove all suggestions. A n
 
 Click the **expand** button (top-right corner of the panel) to open the chat interface in a larger modal. This provides a better experience for longer conversations. The modal shares the same state as the compact panel.
 
-<!-- ![AI Context panel — expanded modal](img/ai-context-modal.png) -->
+![AI Context panel — expanded modal](img/ai-context-modal.png)
 
 ## Persistence
 
