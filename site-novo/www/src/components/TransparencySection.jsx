@@ -3,11 +3,12 @@ import Reveal from './ui/Reveal.jsx'
 import iconGithub from '../assets/icons/trans-github.svg'
 import iconDocs from '../assets/icons/trans-docs.svg'
 import iconPrivacy from '../assets/icons/trans-privacy.svg'
+import { DOCS_URL, GITHUB_URL } from '../links.js'
 
 const LINKS = [
-  { icon: iconGithub, label: 'Repositório no GitHub', href: '#github' },
-  { icon: iconDocs, label: 'Documentação Técnica', href: '#docs' },
-  { icon: iconPrivacy, label: 'Privacidade e LGPD', href: '#lgpd' },
+  { icon: iconGithub, label: 'Repositório no GitHub', href: GITHUB_URL },
+  { icon: iconDocs, label: 'Documentação Técnica', href: DOCS_URL },
+  { icon: iconPrivacy, label: 'Privacidade e LGPD', href: DOCS_URL },
 ]
 
 export default function TransparencySection() {
@@ -21,6 +22,8 @@ export default function TransparencySection() {
               <motion.a
                 key={l.label}
                 href={l.href}
+                target="_blank"
+                rel="noopener noreferrer"
                 whileHover={{ x: 6 }}
                 transition={{ type: 'spring', stiffness: 320, damping: 24 }}
                 className="group flex items-center justify-center gap-3 rounded-lg border border-brand/50 bg-brand-darkest/20 px-6 py-5 transition-all duration-300 hover:border-brand hover:bg-brand-darkest/50 hover:shadow-glow-brand"

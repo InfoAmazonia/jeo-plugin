@@ -6,6 +6,7 @@ import infoamazonia from '../assets/infoamazonia.png'
 import codesinfo from '../assets/codesinfo.png'
 import hacklabLogo from '../assets/hacklab-logo.svg'
 import jeoWordmark from '../assets/jeo-wordmark.svg'
+import { DOWNLOAD_URL } from '../links.js'
 
 const NAV = ['BRAINS', 'THEME', 'PLUGIN']
 
@@ -67,7 +68,9 @@ export default function Footer() {
             </a>
           ))}
           <a
-            href="#download"
+            href={DOWNLOAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-md bg-brand/90 px-6 py-3 text-sm font-bold text-ink transition-all duration-300 hover:bg-brand hover:shadow-glow-brand"
           >
             Install free
@@ -88,8 +91,22 @@ export default function Footer() {
 
           <div className="flex flex-col items-center gap-3">
             <div className="flex flex-wrap items-center justify-center gap-x-12 gap-y-3">
-              <img src={infoamazonia} alt="InfoAmazonia" className="h-7 w-auto" />
-              <img src={hacklabLogo} alt="hacklab/" className="h-[11px] w-auto" />
+              <a
+                href="https://infoamazonia.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-80"
+              >
+                <img src={infoamazonia} alt="InfoAmazonia" className="h-7 w-auto" />
+              </a>
+              <a
+                href="https://hacklab.com.br/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transition-opacity hover:opacity-80"
+              >
+                <img src={hacklabLogo} alt="hacklab/" className="h-[11px] w-auto" />
+              </a>
               <img src={codesinfo} alt="codesinfo" className="h-7 w-auto" />
             </div>
             <p className="text-xs text-muted">

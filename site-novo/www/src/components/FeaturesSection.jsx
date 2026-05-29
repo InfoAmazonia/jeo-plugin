@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { PlayCircle, FileText } from 'lucide-react'
+import { FileText } from 'lucide-react'
 import Reveal from './ui/Reveal.jsx'
 import ParallaxImage from './ui/ParallaxImage.jsx'
 import featuresBg from '../assets/features-bg.jpg'
@@ -15,30 +15,35 @@ const FEATURES = [
     title: 'Geolocalização assistida por IA',
     subtitle: 'A base para mapas, recomendações e contexto',
     body: 'O sistema analisa reportagens novas e antigas, identifica lugares mencionados e sugere localizações primárias e secundárias no WordPress. Editores revisam e aprovam antes da publicação.',
+    docUrl: 'https://jeowp.org/docs/ai-georeferencing/',
   },
   {
     icon: iconMinimapa,
     title: 'Mini-mapas por reportagem',
     subtitle: 'Mostre onde a história acontece',
     body: 'Inclua mapas diretamente nas matérias, com pontos, áreas ou camadas temáticas relacionadas ao conteúdo. A ferramenta ajuda a transformar localização em contexto visual para o leitor e ainda possibilita que ele navegue por outras reportagens sobre o mesmo território.',
+    docUrl: 'https://jeowp.org/docs/minimap/',
   },
   {
     icon: iconLeiaTambem,
     title: 'Leia Também inteligente',
     subtitle: 'Melhore a experiência do leitor e recircule seu acervo',
     body: 'Recomende outras reportagens a partir da combinação entre tema e proximidade geográfica. Uma matéria sobre mineração no Amapá pode levar o leitor a outras coberturas sobre mineração na mesma região ou em territórios relacionados.',
+    docUrl: 'https://jeowp.org/docs/ai-bulk-geolocation/',
   },
   {
     icon: iconContexto,
     title: 'Contexto adicional por IA',
     subtitle: 'Mais contexto, com revisão editorial',
     body: 'A partir do acervo da redação, a IA sugere parágrafos curtos de contexto sobre o tema da reportagem. O editor revisa, ajusta e publica apenas o que fizer sentido. Utilize a memória editorial da sua redação com mais frequência e eficácia.',
+    docUrl: 'https://jeowp.org/docs/ai-context-assistant/',
   },
   {
     icon: iconHistorias,
     title: 'Histórias perto de mim',
     subtitle: 'Personalização da experiência do leitor por território',
     body: 'Organize reportagens por localidade e permita que leitores encontrem conteúdos relacionados a seus territórios de interesse. A funcionalidade pode ser usada como página própria, aba ou experiência dentro de uma página já existente em seu site.',
+    docUrl: 'https://jeowp.org/docs/stories-near-you/',
   },
 ]
 
@@ -76,18 +81,13 @@ function FeatureCard({ feature, index, isLast }) {
 
         <div className="relative mt-7 flex flex-wrap gap-3 pt-1">
           <a
-            href="#tutoriais"
-            className="inline-flex items-center gap-2 rounded-md bg-brand px-4 py-2 text-xs font-semibold text-ink transition-all duration-300 hover:bg-brand-light hover:shadow-glow-brand"
-          >
-            <PlayCircle className="h-4 w-4" />
-            Vídeo tutorial
-          </a>
-          <a
-            href="#tutoriais"
+            href={feature.docUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-md border border-white/15 px-4 py-2 text-xs font-semibold text-slate-200 transition-all duration-300 hover:border-brand/60 hover:bg-brand/10 hover:text-white"
           >
             <FileText className="h-4 w-4" />
-            Tutorial em PDF
+            Ver Documentação
           </a>
         </div>
       </motion.article>

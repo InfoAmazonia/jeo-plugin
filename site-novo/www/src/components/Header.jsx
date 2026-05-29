@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Menu, X } from 'lucide-react'
 import JeoMark from './ui/JeoMark.jsx'
 import jeoWordmark from '../assets/jeo-wordmark.svg'
+import { DOWNLOAD_URL } from '../links.js'
 
 const NAV = [
   { label: 'Brains', href: '#top' },
@@ -13,6 +15,7 @@ export default function Header() {
   const reduce = useReducedMotion()
   const [visible, setVisible] = useState(false)
   const [activeId, setActiveId] = useState('#top')
+  const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
     const onScroll = () => {
@@ -78,13 +81,68 @@ export default function Header() {
             })}
           </div>
           <a
-            href="#download"
-            className="rounded-md bg-brand/90 px-5 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:bg-brand hover:shadow-glow-brand"
+            href={DOWNLOAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden rounded-md bg-brand/90 px-5 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:bg-brand hover:shadow-glow-brand sm:inline-flex"
           >
             Install free
           </a>
+          {/* Mobile hamburger */}
+          <button
+            type="button"
+            onClick={() => setMenuOpen((o) => !o)}
+            aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={menuOpen}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-200 transition-colors hover:bg-white/10 hover:text-white sm:hidden"
+          >
+            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </nav>
       </div>
+
+      {/* Mobile menu */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-t border-white/5 sm:hidden"
+          >
+            <div className="section-shell flex flex-col gap-1 py-4">
+              {NAV.map((n) => {
+                const active = activeId === n.href
+                return (
+                  <a
+                    key={n.label}
+                    href={n.href}
+                    onClick={() => setMenuOpen(false)}
+                    aria-current={active ? 'true' : undefined}
+                    className={`rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide transition-colors ${
+                      active
+                        ? 'bg-brand/10 text-white'
+                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                    }`}
+                  >
+                    {n.label}
+                  </a>
+                )
+              })}
+              <a
+                href={DOWNLOAD_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMenuOpen(false)}
+                className="mt-2 rounded-md bg-brand/90 px-3 py-3 text-center text-sm font-semibold text-ink transition-all duration-300 hover:bg-brand"
+              >
+                Install free
+              </a>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.header>
   )
 }
