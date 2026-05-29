@@ -2,6 +2,8 @@
 
 JEO can automatically georeference your posts using AI. Instead of manually searching and adding geolocation points, the AI analyzes your post content and suggests relevant locations with coordinates and confidence scores.
 
+See [AI in JEO](ai-in-jeo.md) for an overview of how the AI system works.
+
 ## How it works
 
 When editing a post, the **Geolocation** sidebar panel includes an **Geolocate with AI** button. Clicking it sends your post title and content to the configured AI provider, which returns suggested geolocation points.

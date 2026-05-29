@@ -2,157 +2,130 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://www.jeowp.org/docs/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/ai-bulk-geolocation/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/ai-context-assistant-issue/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/ai-context-assistant-report/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/ai-context-assistant/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/ai-georeferencing/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
+    </url>
+    <url>
+         <loc>https://www.jeowp.org/docs/ai-in-jeo/</loc>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/ai-settings/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/concepts/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/discovery/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/geolocating-posts/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/getting-started/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/index-plugin/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/layer-post/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/map-block/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/map-embed/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/map-post/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/map-shortcode/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/minimap/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/one-time-map-block/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/stories-near-you/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/story-map/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/dependency-upgrade-report/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/dependency-upgrade-smoke-tests/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/geo-information/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/geocoders/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/layer-types-api/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/layer-types/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/migration/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/php-compatibility/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/wordpress-org-audit-report/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
     <url>
          <loc>https://www.jeowp.org/docs/dev/wordpress-org-compliance/</loc>
-         <lastmod>2026-05-27</lastmod>
-         <changefreq>daily</changefreq>
+         <lastmod>2026-05-29</lastmod>
     </url>
 </urlset>

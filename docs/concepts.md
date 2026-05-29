@@ -27,6 +27,10 @@ Instead of creating a reusable map any time you want to add a map interaction, y
 
 Posts can be geolocated manually by searching and adding points in the Geolocation sidebar, or automatically using AI georeferencing — which analyzes the post content and suggests locations with confidence scores. See [Geolocating posts](geolocating-posts.md) and [AI Georeferencing](ai-georeferencing.md).
 
+## AI Features
+
+JEO's AI features are powered by a configurable external AI provider with a built-in knowledge base (RAG), specialized agents, and structured output. See [AI in JEO](ai-in-jeo.md) for a detailed explanation of how these pieces work together.
+
 ## AI-Generated Map
 
 An AI-assisted map block that generates contextual maps from a text prompt or post content, with a chat interface for refinement. It can also generate custom map layers when a Mapbox key is configured. See [Minimap](minimap.md).

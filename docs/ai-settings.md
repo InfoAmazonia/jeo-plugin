@@ -2,6 +2,8 @@
 
 JEO includes built-in AI capabilities for georeferencing posts, generating maps, and creating custom map layers. Before using these features, you need to configure an AI provider.
 
+See [AI in JEO](ai-in-jeo.md) for an overview of the AI architecture and how each piece works.
+
 ## Configuring an AI provider
 
 Navigate to **Jeo → AI** in the WordPress dashboard. The settings page is organized into tabs:

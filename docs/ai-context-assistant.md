@@ -2,6 +2,8 @@
 
 The AI Context Assistant is a Gutenberg sidebar panel that helps you enrich your articles with AI-suggested paragraphs and references to related content from your site's knowledge base.
 
+See [AI in JEO](ai-in-jeo.md) to learn how RAG, agents, and conversation memory power this feature.
+
 ## Opening the panel
 
 1. Open or create a post in the Gutenberg editor (the post type must be enabled in **JEO Settings → General**).

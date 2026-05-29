@@ -23,6 +23,7 @@ nav:
       - Map embed: map-embed.md
       - Geolocating posts: geolocating-posts.md
   - AI:
+      - AI in JEO: ai-in-jeo.md
       - AI Settings: ai-settings.md
       - AI Context Assistant: ai-context-assistant.md
       - AI Georeferencing: ai-georeferencing.md

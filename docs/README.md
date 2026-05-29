@@ -18,7 +18,7 @@ JEO wants to help journalists and NGOs to improve storytelling with maps. Creati
 - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
 - Map markers query integrated to posts query.
 - Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilingual plugins
-- AI-powered georeferencing with 10 AI providers
+- AI-powered georeferencing with multiple AI providers
 - AI-assisted map generation (Minimap) with chat refinement
 - Stories Near You block with geolocation-based post discovery
 
@@ -41,6 +41,7 @@ JEO wants to help journalists and NGOs to improve storytelling with maps. Creati
 
 - **AI Features**
 
+  - [AI in JEO](ai-in-jeo.md)
   - [AI Settings](ai-settings.md)
   - [Minimap — AI-Assisted Map Block](minimap.md)
 

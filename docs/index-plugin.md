@@ -14,7 +14,7 @@ You can post geolocated stories and create richly designed pages for each one of
 - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
 - Map markers query integrated to posts query.
 - Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilingual plugins
-- AI-powered georeferencing, bulk geolocation, and map generation (10 AI providers)
+- AI-powered georeferencing, bulk geolocation, and map generation (multiple AI providers)
 - Stories Near You block with geolocation-based post discovery
 - AI-assisted map block (Minimap) with chat refinement and auto-generated layers
 

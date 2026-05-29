@@ -2,6 +2,8 @@
 
 The Minimap block (`jeo/ai-minimap`) generates contextual interactive maps inside the Gutenberg editor using AI. Describe what you need in natural language, and the AI builds a map with appropriate layers, center point, zoom level, and geolocation pins.
 
+See [AI in JEO](ai-in-jeo.md) to learn how RAG, agents, and tools power this feature.
+
 ## Inserting the block
 
 1. In the Gutenberg editor, click the **+** button to add a new block.
