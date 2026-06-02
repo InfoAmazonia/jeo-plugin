@@ -24,10 +24,10 @@ class CircleEditor extends Component {
 					...legendData.attributes,
 					legend_type_options: {
 						...legendData.attributes.legend_type_options,
-						circles: [ ...legendData.attributes.legend_type_options.circles.map( ( item ) => {
+						circles: [ ...legendData.attributes.legend_type_options.circles.map( ( item, index ) => {
 							return {
 								...item,
-								id: crypto.randomUUID(),
+								id: item.id || `circle-${ index }`,
 							};
 						} ) ],
 					},
@@ -50,7 +50,7 @@ class CircleEditor extends Component {
 			const circles = this.state.legendObject.attributes.legend_type_options.circles;
 
 			circles.push(
-				{ label: __( 'Default label', 'jeo' ), radius: 50, id: generateUUID() },
+				{ label: __( 'Default label', 'jeo' ), radius: 50, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.circles = circles;
