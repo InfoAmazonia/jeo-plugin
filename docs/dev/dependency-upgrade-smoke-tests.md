@@ -16,7 +16,7 @@ Use this checklist for both the completed stabilization track and the current pl
 - At the start of every dependency review or planning batch that can touch editor or runtime behavior, regenerate the dependency report and record the resolved React, ReactDOM and Gutenberg editor package versions plus peer ranges from the frontend runtime snapshot.
 - Test both editor and frontend behavior whenever a batch touches runtime code.
 - Treat `.github/workflows/node-frontend.yml`, `.github/workflows/php-compat.yml` and `.github/workflows/wordpress-smoke.yml` as the mandatory CI gates.
-- Run `npm run check:env` before local installs or frontend checks so unsupported Node versions fail early.
+- Run `npm ci` before local frontend checks so npm's native engine validation rejects unsupported Node versions.
 - When the local WordPress smoke runs from a clean worktree, make sure the ignored `src/js/build` assets have been generated first, or record the resulting asset-include warnings explicitly in the batch report.
 - If the local WordPress smoke script cannot complete because the machine is missing the expected database or wp-cli runtime setup, record the failure details in the batch report and use the GitHub workflow as the authoritative runtime gate.
 - Treat a blocked evaluation as a valid batch outcome only after recording the blocker, the evidence and the next step in the report.
@@ -32,7 +32,7 @@ Use this checklist for both the completed stabilization track and the current pl
 - Batch 5: do not start local execution until upstream Gutenberg and react-leaflet support a compatible React line; once that external blocker moves, run `npm ci`, `npm run build`, `npm run test:unit`, `vendor/bin/phpcs --standard=phpcs-compat.xml.dist` and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
 - Batch 6: run `composer validate --no-check-publish`, `vendor/bin/phpcs --standard=phpcs-compat.xml.dist`, the local WordPress smoke on PHP `8.4`, and the local WordPress smoke on PHP `8.5`, recording any third-party `wp-cli` deprecation noise separately from repository-owned warnings.
 - Batch 7: run `composer validate --no-check-publish`, `vendor/bin/phpcs --standard=phpcs-compat.xml.dist`, `vendor/bin/phpcs --standard=phpcs.xml.dist`, and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh` if runtime-touching PHP files changed.
-- Sanity Batch 0: run `npm run check:env`, `npm ci`, `npm run build`, and `npm run build:report`.
+- Sanity Batch 0: run `npm ci`, `npm run build`, and `npm run build:report`.
 - Sanity Batch 1: run `npm ci`, `npm audit --package-lock-only`, `npm audit --omit=dev`, and `composer audit --locked`.
 - Sanity Batch 2: run `npm ci`, `npm run test:unit`, `npm run build`, `vendor/bin/phpcs --standard=phpcs-compat.xml.dist`, and `WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php WP_DIR=/tmp/jeo-plugin-wordpress-smoke bash scripts/wordpress-smoke.sh`.
 - Sanity Batch 3: run `npm run test:unit`, `npm run build`, and `npm run build:report`.

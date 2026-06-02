@@ -29,14 +29,13 @@ Test script coverage:
 
 - `phpcs-compat.xml.dist` runs PHPCompatibilityWP for generic PHP cross-version compatibility checks against the plugin source.
 - `scripts/wordpress-smoke.sh` can be forced onto PHP `8.5` with `WP_CLI_PHP`, so the plugin's runtime smoke can be exercised on that line locally and in CI.
-- `scripts/check-node-version.mjs` enforces the supported frontend runtime before `npm ci` or `npm install` continue.
+- `package.json` and `.npmrc` enforce the supported Node runtime through npm's native engine checks before installs continue.
 - `scripts/report-bundle-sizes.mjs` enforces explicit bundle budgets instead of relying on generic webpack performance warnings.
 
 Local commands:
 
 ```bash
 nvm use
-npm run check:env
 npm ci
 npm run build
 npm run build:report
