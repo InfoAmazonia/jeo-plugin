@@ -1047,9 +1047,9 @@ class Jeo {
 			'mapPreferences',
 			array(
 				'map_defaults' => array(
-					'zoom' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ),
-					'lat'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lng'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
+					'zoom' => intval( sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ) ),
+					'lat'  => floatval( sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ) ),
+					'lng'  => floatval( sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ) ),
 				),
 			)
 		);
