@@ -933,15 +933,26 @@ class Jeo {
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() ) {
 			$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
+			$jeo_map_assets        = include JEO_BASEPATH . '/js/build/jeoMap.asset.php';
+			$jeo_map_version       = $jeo_map_assets['version'] ?? JEO_VERSION;
+			$jeo_map_dependencies  = array_values(
+				array_unique(
+					array_merge(
+						$jeo_map_assets['dependencies'] ?? array(),
+						array( 'mapgl', 'jquery' ),
+						$legend_script_handles
+					)
+				)
+			);
 
 			wp_enqueue_style( 'mapgl' );
 			wp_enqueue_script( 'mapgl' );
-			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), JEO_VERSION );
+			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), $jeo_map_version );
 			wp_enqueue_script(
 				'jeo-map',
 				JEO_BASEURL . '/js/build/jeoMap.js',
-				array_merge( array( 'mapgl', 'jquery' ), $legend_script_handles ),
-				JEO_VERSION,
+				$jeo_map_dependencies,
+				$jeo_map_version,
 				true
 			);
 
