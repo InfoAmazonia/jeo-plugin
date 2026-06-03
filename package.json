@@ -77,6 +77,7 @@
 		"use-debounce": "^10.1.0"
 	},
 	"devDependencies": {
+		"@wordpress/env": "^11.7.0",
 		"@wordpress/scripts": "^31.6.0",
 		"ajv": "^8.18.0",
 		"css-loader": "^7.1.4",
