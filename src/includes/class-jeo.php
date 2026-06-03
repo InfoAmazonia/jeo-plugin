@@ -933,15 +933,26 @@ class Jeo {
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() ) {
 			$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
+			$jeo_map_assets        = include JEO_BASEPATH . '/js/build/jeoMap.asset.php';
+			$jeo_map_version       = $jeo_map_assets['version'] ?? JEO_VERSION;
+			$jeo_map_dependencies  = array_values(
+				array_unique(
+					array_merge(
+						$jeo_map_assets['dependencies'] ?? array(),
+						array( 'mapgl', 'jquery' ),
+						$legend_script_handles
+					)
+				)
+			);
 
 			wp_enqueue_style( 'mapgl' );
 			wp_enqueue_script( 'mapgl' );
-			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), JEO_VERSION );
+			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), $jeo_map_version );
 			wp_enqueue_script(
 				'jeo-map',
 				JEO_BASEURL . '/js/build/jeoMap.js',
-				array_merge( array( 'mapgl', 'jquery' ), $legend_script_handles ),
-				JEO_VERSION,
+				$jeo_map_dependencies,
+				$jeo_map_version,
 				true
 			);
 
@@ -1036,9 +1047,9 @@ class Jeo {
 			'mapPreferences',
 			array(
 				'map_defaults' => array(
-					'zoom' => sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ),
-					'lat'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lng'  => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
+					'zoom' => intval( sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ) ),
+					'lat'  => floatval( sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ) ),
+					'lng'  => floatval( sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ) ),
 				),
 			)
 		);
@@ -1239,7 +1250,7 @@ class Jeo {
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/layer-editor' ) ) {
-				$response->data['content']['raw'] = '<!-- wp:jeo/layer-editor {"align":"full"} /-->';
+				$response->data['content']['raw'] = '<!-- wp:jeo/layer-editor {"align":"full"} /-->' . $raw;
 			}
 		}
 		return $response;
@@ -1297,10 +1308,18 @@ class Jeo {
 			}
 
 			if ( isset( $wp_post_types['map-layer'] ) ) {
-				$wp_post_types['map-layer']->template      = array(
-					array( 'jeo/layer-editor', array( 'align' => 'full' ) ),
+				$wp_post_types['map-layer']->template = array(
+					array(
+						'jeo/layer-editor',
+						array(
+							'align' => 'full',
+							'lock'  => array(
+								'move'   => true,
+								'remove' => true,
+							),
+						),
+					),
 				);
-				$wp_post_types['map-layer']->template_lock = 'all';
 			}
 		}
 	}

@@ -144,8 +144,15 @@ class Discovery extends Component {
 		};
 
 		if ( this.getParamFromUrl( 'discovery' ) || this.getParamFromUrl( 'share' ) ) {
-			additionalMapOptions.center = this.getParamFromUrl( 'center' );
-			additionalMapOptions.zoom = this.getParamFromUrl( 'zoom' );
+			const urlCenter = this.getParamFromUrl( 'center' );
+			if ( urlCenter ) {
+				additionalMapOptions.center = urlCenter;
+			}
+
+			const urlZoom = this.getParamFromUrl( 'zoom' );
+			if ( urlZoom ) {
+				additionalMapOptions.zoom = urlZoom;
+			}
 		}
 
 		const map = createMap({
