@@ -1,4 +1,4 @@
-import { withDispatch, withSelect } from '@wordpress/data';
+import { select, withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -15,15 +15,14 @@ import './maps-sidebar.scss';
 
 function MapsSidebar( {
 	postId,
-	postMeta,
+	postMeta = {},
 	relatedPosts,
 	setPostMeta,
-	setRelatedPosts,
 } ) {
 	const [ modal, setModal ] = useState( false );
 
 	const layerIds = useMemo( () => {
-		return postMeta.layers.map( ( layer ) => layer.id );
+		return ( postMeta.layers || [] ).map( ( layer ) => layer.id );
 	}, [ postMeta.layers ] );
 
 	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
@@ -35,6 +34,14 @@ function MapsSidebar( {
 
 	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
 	const openModal = useCallback( () => setModal( true ), [ setModal ] );
+	const setRelatedPosts = useCallback(
+		( value ) => {
+			setPostMeta( {
+				related_posts: normalizeRelatedPosts( value ),
+			} );
+		},
+		[ setPostMeta ]
+	);
 
 	const embedUrl =
 		postId && `${ jeo_settings.site_url }/embed/?map_id=${ postId }`;
@@ -79,20 +86,21 @@ function MapsSidebar( {
 
 export default withDispatch( ( dispatch ) => ( {
 	setPostMeta: ( meta ) => {
-		dispatch( 'core/editor' ).editPost( { meta } );
-	},
-	setRelatedPosts: ( value ) => {
+		const currentMeta =
+			select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
 		dispatch( 'core/editor' ).editPost( {
-			meta: { related_posts: normalizeRelatedPosts( value ) },
+			meta: { ...currentMeta, ...meta },
 		} );
 	},
 } ) )(
-	withSelect( ( select ) => ( {
-		postId: select( 'core/editor' ).getCurrentPostId(),
-		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
-		relatedPosts: normalizeRelatedPosts(
-			select( 'core/editor' ).getEditedPostAttribute( 'meta' )
-				.related_posts
-		),
-	} ) )( MapsSidebar )
+	withSelect( ( select ) => {
+		const postMeta =
+			select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+
+		return {
+			postId: select( 'core/editor' ).getCurrentPostId(),
+			postMeta,
+			relatedPosts: normalizeRelatedPosts( postMeta.related_posts ),
+		};
+	} )( MapsSidebar )
 );
