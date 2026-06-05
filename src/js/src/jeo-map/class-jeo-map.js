@@ -9,6 +9,8 @@ import { buildRelatedPostsGeoJson } from '../shared/story-geojson';
 import { EMPTY_STYLE } from '../shared/styles';
 import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
+import { toFiniteNumber } from './map-numbers';
+import { getPanLimitsMaxBounds } from './pan-limits';
 import { compileEtaTemplate } from './template-compiler';
 
 import '../../../css/jeo-map.scss';
@@ -126,11 +128,17 @@ export default class JeoMap {
 				});
 
 				if ( this.getArg( 'layers' ) && this.getArg( 'layers' ).length > 0 ) {
-					map.setZoom( this.getArg( 'initial_zoom' ) );
-					map.setCenter( [
-						this.getArg( 'center_lon' ),
-						this.getArg( 'center_lat' ),
-					] );
+					const initialZoom = toFiniteNumber( this.getArg( 'initial_zoom' ) );
+					const centerLon = toFiniteNumber( this.getArg( 'center_lon' ) );
+					const centerLat = toFiniteNumber( this.getArg( 'center_lat' ) );
+
+					if ( initialZoom !== null ) {
+						map.setZoom( initialZoom );
+					}
+
+					if ( centerLon !== null && centerLat !== null ) {
+						map.setCenter( [ centerLon, centerLat ] );
+					}
 
 					map.addControl(
 						new mapgl.NavigationControl( { showCompass: false } ),
@@ -154,24 +162,22 @@ export default class JeoMap {
 						map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
 					}
 
-					if (
-						this.getArg( 'pan_limits' ) &&
-						this.getArg( 'pan_limits' ).east &&
-						this.getArg( 'pan_limits' ).north &&
-						this.getArg( 'pan_limits' ).south &&
-						this.getArg( 'pan_limits' ).west
-					) {
-						map.setMaxBounds( [
-							[this.getArg( 'pan_limits' ).south, this.getArg( 'pan_limits' ).west], // Southwest coordinates
-							[this.getArg( 'pan_limits' ).north, this.getArg( 'pan_limits' ).east] // Northeast coordinates
-						] );
+					const panLimitsMaxBounds = getPanLimitsMaxBounds(
+						this.getArg( 'pan_limits' )
+					);
+
+					if ( panLimitsMaxBounds ) {
+						map.setMaxBounds( panLimitsMaxBounds );
 					}
 
-					if ( this.getArg( 'min_zoom' ) ) {
-						map.setMinZoom( this.getArg( 'min_zoom' ) );
+					const minZoom = toFiniteNumber( this.getArg( 'min_zoom' ) );
+					const maxZoom = toFiniteNumber( this.getArg( 'max_zoom' ) );
+
+					if ( minZoom !== null ) {
+						map.setMinZoom( minZoom );
 					}
-					if ( this.getArg( 'max_zoom' ) ) {
-						map.setMaxZoom( this.getArg( 'max_zoom' ) );
+					if ( maxZoom !== null ) {
+						map.setMaxZoom( maxZoom );
 					}
 
 					// Only used for manipulating the map from outside Jeo

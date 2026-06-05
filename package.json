@@ -10,9 +10,19 @@
 		"node": "^24.0.0",
 		"npm": ">=10"
 	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": "^24.0.0",
+			"onFail": "error"
+		},
+		"packageManager": {
+			"name": "npm",
+			"version": ">=10",
+			"onFail": "error"
+		}
+	},
 	"scripts": {
-		"check:env": "node scripts/check-node-version.mjs",
-		"preinstall": "node scripts/check-node-version.mjs",
 		"sync:version": "node scripts/sync-plugin-version.mjs",
 		"check:wporg-compliance": "node scripts/check-wporg-compliance.mjs",
 		"start": "wp-scripts start",
@@ -20,11 +30,10 @@
 		"i18n:json": "node scripts/make-i18n-json.mjs",
 		"build": "npm run build:assets && npm run i18n:json",
 		"build:release": "npm run build",
-		"build:report": "node scripts/report-bundle-sizes.mjs",
+		"build:report": "size-limit",
 		"test:unit": "wp-scripts test-unit-js",
 		"audit:npm": "npm audit --package-lock-only",
-		"audit:composer": "composer audit --locked",
-		"deps:report": "node scripts/dependency-review.mjs --write"
+		"audit:composer": "composer audit --locked"
 	},
 	"repository": {
 		"type": "git",
@@ -84,6 +93,15 @@
 		"use-debounce": "^10.1.0"
 	},
 	"devDependencies": {
-		"@wordpress/scripts": "^32.2.0"
+		"@size-limit/file": "^12.1.0",
+		"@wordpress/scripts": "^32.2.0",
+		"ajv": "^8.18.0",
+		"css-loader": "^7.1.4",
+		"postcss": "^8.5.8",
+		"sass": "^1.98.0",
+		"sass-loader": "^16.0.7",
+		"size-limit": "^12.1.0",
+		"style-loader": "^4.0.0",
+		"webpack": "^5.105.4"
 	}
 }

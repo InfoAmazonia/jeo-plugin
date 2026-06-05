@@ -1,6 +1,6 @@
 === JEO Maps ===
 Contributors: infoamazonia
-Tested up to: 6.9
+Tested up to: 7.0
 Stable tag: 3.0.0-rc.3
 Requires PHP: 8.0
 Requires at least: 6.6
