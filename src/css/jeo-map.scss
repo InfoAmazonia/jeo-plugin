@@ -1014,6 +1014,10 @@
 	justify-content: center;
 	align-items: center;
 
+	a {
+		line-height: 0;
+	}
+
 	img {
 		height: 30px;
 	}
