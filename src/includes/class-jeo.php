@@ -718,13 +718,49 @@ class Jeo {
 	 */
 	public function embedded_story_map_dynamic_render_callback( $block_attributes, $content ) {
 		$content = json_decode( $this->extract_json_from_block_content( $content ) );
+		if ( ! is_object( $content ) || empty( $content->attributes->storyID ) ) {
+			return '';
+		}
 
-		$story_id                       = $content->attributes->storyID;
-		$story                          = get_post( $story_id );
-		$story_block                    = parse_blocks( $story->post_content )[0];
+		$story_id = absint( $content->attributes->storyID );
+		$story    = get_post( $story_id );
+		if ( ! $story instanceof WP_Post ) {
+			return '';
+		}
+
+		$story_blocks = parse_blocks( $story->post_content );
+		$story_block  = $story_blocks[0] ?? null;
+		if ( ! is_array( $story_block ) || empty( $story_block['attrs'] ) ) {
+			return '';
+		}
+
 		$story_block['attrs']['postID'] = $story_id;
 
 		return $this->story_map_dynamic_render_callback( $block_attributes, wp_json_encode( $story_block['attrs'] ) );
+	}
+
+	/**
+	 * Add REST endpoint information for the post shown in the story map header.
+	 *
+	 * @param object $saved_data Story map saved data.
+	 * @param int    $post_id    Post ID to expose.
+	 * @return void
+	 */
+	private function set_story_map_post_rest_data( $saved_data, int $post_id ) {
+		if ( ! $post_id ) {
+			return;
+		}
+
+		$post_type = get_post_type( $post_id );
+		if ( ! $post_type ) {
+			return;
+		}
+
+		$post_type_object = get_post_type_object( $post_type );
+		$rest_base        = ! empty( $post_type_object->rest_base ) ? $post_type_object->rest_base : $post_type;
+
+		$saved_data->{'postID'}       = $post_id;
+		$saved_data->{'postRestBase'} = $rest_base;
 	}
 
 	/**
@@ -752,15 +788,30 @@ class Jeo {
 	 * @return bool
 	 */
 	private function layer_still_exists( array $map_layers, $selected_layer ) {
-		$layer_status = get_post_status( $selected_layer->id );
+		if ( ! is_object( $selected_layer ) || ! isset( $selected_layer->id ) ) {
+			return false;
+		}
+
+		$selected_layer_id = absint( $selected_layer->id );
+		if ( ! $selected_layer_id ) {
+			return false;
+		}
+
+		$layer_status = get_post_status( $selected_layer_id );
 		if ( 'trash' === $layer_status || false === $layer_status || 'private' === $layer_status ) {
 			return false;
 		}
 
 		foreach ( $map_layers as $layer ) {
-			if ( $layer['id'] === $selected_layer->id ) {
-				$selected_layer->meta->type               = get_post_meta( $layer['id'], 'type', true );
-				$selected_layer->meta->layer_type_options = (object) get_post_meta( $layer['id'], 'layer_type_options', true );
+			$map_layer_id = absint( $layer['id'] ?? 0 );
+			if ( $map_layer_id === $selected_layer_id ) {
+				if ( ! isset( $selected_layer->meta ) || ! is_object( $selected_layer->meta ) ) {
+					$selected_layer->meta = new \stdClass();
+				}
+
+				$selected_layer->id                       = $selected_layer_id;
+				$selected_layer->meta->type               = get_post_meta( $selected_layer_id, 'type', true );
+				$selected_layer->meta->layer_type_options = (object) get_post_meta( $selected_layer_id, 'layer_type_options', true );
 				return true;
 			}
 		}
@@ -797,13 +848,19 @@ class Jeo {
 	 *
 	 * @param array  $block_attributes Block attributes.
 	 * @param string $content Saved block content.
+	 * @param object $block Block instance.
 	 * @return string
 	 */
-	public function story_map_dynamic_render_callback( $block_attributes, $content ) {
+	public function story_map_dynamic_render_callback( $block_attributes, $content, $block = null ) {
+		unset( $block );
+
 		$saved_data = json_decode( $this->extract_json_from_block_content( $content ) );
 		if ( ! is_object( $saved_data ) ) {
 			return '';
 		}
+
+		$post_id = absint( $saved_data->{'postID'} ?? get_the_ID() );
+		$this->set_story_map_post_rest_data( $saved_data, $post_id );
 
 		$map_id     = isset( $saved_data->map_id ) ? (int) $saved_data->map_id : 0;
 		$map_layers = get_post_meta( $map_id, 'layers', true );
@@ -830,7 +887,7 @@ class Jeo {
 
 			foreach ( $map_layers as $layer ) {
 				foreach ( $selected_layers as $selected_layer ) {
-					if ( $selected_layer->id === $layer['id'] ) {
+					if ( absint( $selected_layer->id ?? 0 ) === absint( $layer['id'] ?? 0 ) ) {
 						$selected_layers_order[] = $selected_layer;
 					}
 				}
@@ -846,7 +903,7 @@ class Jeo {
 
 		foreach ( $map_layers as $layer ) {
 			foreach ( $navigate_map_layers as $index => $navigate_layer ) {
-				if ( $navigate_layer->id === $layer['id'] ) {
+				if ( absint( $navigate_layer->id ?? 0 ) === absint( $layer['id'] ?? 0 ) ) {
 					// Update the saved metadata and layer types.
 					if ( ! $this->layer_still_exists( $map_layers, $navigate_layer ) ) {
 						array_splice( $navigate_map_layers, $index, 1 );

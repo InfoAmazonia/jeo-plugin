@@ -340,12 +340,20 @@ class StoryMapDisplay extends Component {
 			}
 		}
 
-		const url = `${ window.jeoMapVars.jsonUrl }storymap/${ this.props.postID }`;
+		const postRestBase = this.props.postRestBase || 'storymap';
+		const url = `${ window.jeoMapVars.jsonUrl }${ postRestBase }/${ this.props.postID }`;
 		window.fetch( url )
 			.then( ( response ) => {
+				if ( ! response.ok ) {
+					return null;
+				}
 				return response.json();
 			} )
-			.then( ( json ) => this.setState( { ...this.state, postData: json } ) );
+			.then( ( json ) => {
+				if ( json ) {
+					this.setState( { ...this.state, postData: json } );
+				}
+			} );
 
 		document.addEventListener( 'fullscreenchange', this.handleFullscreenChange );
 	}
