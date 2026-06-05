@@ -29,8 +29,9 @@ let storyCounter = 0;
 
 function getAuthorsLinks( storymap ) {
 	if ( storymap?.jeo_authors ) {
+		const authorsList = joinList( storymap.jeo_authors.map( ( author ) => `<a href="${author.permalink}">${author.name}</a>` ) );
 		// translators: %s is the authors list
-		return sprintf( __( 'By %s', 'jeo' ), joinList( storymap.jeo_authors.map( ( author ) => `<a href="${author.permalink}">${author.name}</a>` ) ) );
+		return sprintf( __( 'By %s', 'jeo' ), authorsList );
 	} else {
 		return '';
 	}
