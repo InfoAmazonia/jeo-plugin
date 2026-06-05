@@ -1176,6 +1176,8 @@ class Jeo {
 			$selected_layers = is_string( $selected_layers ) ? sanitize_text_field( $selected_layers ) : '';
 
 			add_filter( 'show_admin_bar', '__return_false' );
+			show_admin_bar( false );
+			remove_action( 'wp_head', '_admin_bar_bump_cb' );
 			if ( $storymap_id ) {
 				$post = get_post( $storymap_id );
 				setup_postdata( $post );
