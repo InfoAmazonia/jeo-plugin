@@ -29,7 +29,10 @@ let storyCounter = 0;
 
 function getAuthorsLinks( storymap ) {
 	if ( storymap?.jeo_authors ) {
-		const authorsList = joinList( storymap.jeo_authors.map( ( author ) => `<a href="${author.permalink}">${author.name}</a>` ) );
+		// Arrow function is not recognized by `wp i18n make-json`.
+		const authorsList = joinList( storymap.jeo_authors.map( function ( author ) {
+			return `<a href="${author.permalink}">${author.name}</a>`;
+		} ) );
 		// translators: %s is the authors list
 		return sprintf( __( 'By %s', 'jeo' ), authorsList );
 	} else {
