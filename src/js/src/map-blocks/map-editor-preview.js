@@ -1,6 +1,6 @@
 import { useBlockProps } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { select, useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -20,9 +20,16 @@ export default function MapEditorPreview() {
 	const blockProps = useBlockProps();
 
 	const postMeta = useSelect( ( select ) =>
-		select( 'core/editor' ).getEditedPostAttribute( 'meta' ), [] );
+		select( 'core/editor' ).getEditedPostAttribute( 'meta' ), [] ) || {};
 	const { editPost } = useDispatch( 'core/editor' );
-	const setPostMeta = useCallback( ( meta ) => editPost( { meta } ), [ editPost ] );
+	const setPostMeta = useCallback(
+		( meta ) => {
+			const currentMeta =
+				select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+			editPost( { meta: { ...currentMeta, ...meta } } );
+		},
+		[ editPost ]
+	);
 
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const [ key, setKey ] = useState( 0 );

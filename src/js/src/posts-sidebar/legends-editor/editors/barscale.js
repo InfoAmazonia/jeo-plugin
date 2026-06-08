@@ -23,7 +23,7 @@ class BarscaleEditor extends Component {
 					...legendData.attributes,
 					legend_type_options: {
 						...legendData.attributes.legend_type_options,
-						colors: [ ...legendData.attributes.legend_type_options.colors.map( ( item ) => {
+						colors: [ ...legendData.attributes.legend_type_options.colors.map( ( item, index ) => {
 							let result = {};
 
 							if ( typeof item === 'string' ) {
@@ -33,18 +33,12 @@ class BarscaleEditor extends Component {
 							}
 							return {
 								...result,
-								id: crypto.randomUUID(),
+								id: item?.id || `barscale-color-${ index }`,
 							};
 						} ) ],
 					},
 				},
 			},
-		};
-	}
-
-	static getDerivedStateFromProps( nextProps ) {
-		return {
-			legendObject: nextProps.legendObject,
 		};
 	}
 

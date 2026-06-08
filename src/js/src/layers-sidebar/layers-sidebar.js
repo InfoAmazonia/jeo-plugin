@@ -1,22 +1,23 @@
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import AttributionSettings from './attribution-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { select, withDispatch, withSelect } from '@wordpress/data';
+import { useCallback, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { isEmpty, isEqual } from 'lodash-es';
+import { isEmpty } from 'lodash-es';
 import { useDebounce } from 'use-debounce';
 import LayerSettings from './layer-settings';
 import { getEditorLayerTypeSchema } from './layer-type-definitions';
 import './layers-sidebar.scss';
 
 const LayersSidebar = ( {
-	postMeta,
+	postMeta = {},
 	setPostMeta,
 	sendNotice,
 	removeNotice,
 	lockPostAutoSaving,
 	lockPostSaving,
+	unlockPostAutoSaving,
 	unlockPostSaving,
 } ) => {
 	const [ layerTypeSchema, setLayerTypeSchema ] = useState( {} );
@@ -26,7 +27,6 @@ const LayersSidebar = ( {
 		status: 'incomplete_form',
 	} );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
-	const prevPostMeta = useRef( {} );
 
 	const createNotice = useCallback( ( type, message, options = {} ) => {
 		sendNotice( type, message, { id: 'layer_notices', isDismissible: false, ...options } );
@@ -96,40 +96,39 @@ const LayersSidebar = ( {
 			case 'ready':
 				removeNotice( 'layer_notices' );
 				unlockPostSaving( 'layer_lock_key' );
+				unlockPostAutoSaving( 'layer_lock_key' );
 				break;
 		}
 	}, [ renderControl.status ] );
 
 	useEffect( () => {
 		const debouncedLayerTypeOptions = debouncedPostMeta.layer_type_options || {};
-		const prevLayerTypeOptions = prevPostMeta.current.layer_type_options || {};
-		if ( Object.keys( debouncedLayerTypeOptions ).length && Object.keys( layerTypeSchema ).length ) {
-			const optionsKeys = Object.keys( layerTypeSchema.properties );
-			let anyEmpty = false;
-			optionsKeys.some( ( k ) => {
-				if (
-					isEmpty( debouncedLayerTypeOptions[ k ] ) &&
-					layerTypeSchema.required.includes( k )
-				) {
-					anyEmpty = true;
-					setRenderControl( {
-						status: 'incomplete_form',
-					} );
-					return anyEmpty;
-				}
-				return false;
+		const requiredOptions = Array.isArray( layerTypeSchema.required )
+			? layerTypeSchema.required
+			: [];
+		const hasSchema = Object.keys( layerTypeSchema ).length > 0;
+
+		if ( ! debouncedPostMeta.type || ! hasSchema ) {
+			setRenderControl( {
+				status: 'incomplete_form',
 			} );
-			if (
-				! anyEmpty &&
-				renderControl != 'ready' &&
-				! isEqual( debouncedLayerTypeOptions, prevLayerTypeOptions )
-			) {
-				setRenderControl( {
-					status: 'ready',
-				} );
-			}
-			prevPostMeta.current = debouncedPostMeta;
+			return;
 		}
+
+		const hasEmptyRequiredOption = requiredOptions.some( ( key ) =>
+			isEmpty( debouncedLayerTypeOptions[ key ] )
+		);
+
+		if ( hasEmptyRequiredOption ) {
+			setRenderControl( {
+				status: 'incomplete_form',
+			} );
+			return;
+		}
+
+		setRenderControl( {
+			status: 'ready',
+		} );
 	}, [ debouncedPostMeta.layer_type_options, layerTypeSchema ] );
 
 	return (
@@ -159,7 +158,12 @@ const LayersSidebar = ( {
 };
 export default withDispatch( ( dispatch ) => ( {
 	setPostMeta: ( meta ) => {
-		dispatch( 'core/editor' ).editPost( { meta } );
+		const currentMeta =
+			select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+
+		dispatch( 'core/editor' ).editPost( {
+			meta: { ...currentMeta, ...meta },
+		} );
 	},
 	sendNotice: ( type, message, options ) => {
 		dispatch( 'core/notices' ).createNotice( type, message, options );
@@ -173,11 +177,14 @@ export default withDispatch( ( dispatch ) => ( {
 	lockPostAutoSaving: ( key ) => {
 		dispatch( 'core/editor' ).lockPostAutosaving( key );
 	},
+	unlockPostAutoSaving: ( key ) => {
+		dispatch( 'core/editor' ).unlockPostAutosaving( key );
+	},
 	unlockPostSaving: ( key ) => {
 		dispatch( 'core/editor' ).unlockPostSaving( key );
 	},
 } ) )(
 	withSelect( ( select ) => ( {
-		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
+		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {},
 	} ) )( LayersSidebar )
 );

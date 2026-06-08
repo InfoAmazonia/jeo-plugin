@@ -5,6 +5,12 @@ function isPlainObject( value ) {
 	return Boolean( value ) && typeof value === 'object' && ! Array.isArray( value );
 }
 
+function omitEditorId( item ) {
+	const result = { ...item };
+	delete result.id;
+	return result;
+}
+
 function normalizeBarscaleColors( colors ) {
 	if ( ! Array.isArray( colors ) ) {
 		return [];
@@ -15,14 +21,12 @@ function normalizeBarscaleColors( colors ) {
 			if ( typeof color === 'string' ) {
 				return {
 					color,
-					id: generateUUID(),
 				};
 			}
 
 			if ( isPlainObject( color ) && typeof color.color === 'string' && color.color ) {
 				return {
 					...color,
-					id: color.id || generateUUID(),
 				};
 			}
 
@@ -185,14 +189,13 @@ class JeoLegend {
 			barscale: {
 				left_label: '0',
 				right_label: '100',
-				colors: [ {
-					color: '#ff0909',
-					id: crypto.randomUUID(),
+				colors: [
+					{
+						color: '#ff0909',
 					},
 					{
-					color:'#000',
-					id: crypto.randomUUID(),
-					}
+						color: '#000',
+					},
 				],
 			},
 		};
@@ -333,9 +336,7 @@ class JeoLegend {
 			case 'barscale':
 				adicionalProps.left_label = normalizedLegendTypeOptions.left_label;
 				adicionalProps.right_label = normalizedLegendTypeOptions.right_label;
-				adicionalProps.colors = [
-					...normalizedLegendTypeOptions.colors,
-				];
+				adicionalProps.colors = normalizedLegendTypeOptions.colors.map( omitEditorId );
 				break;
 		}
 
