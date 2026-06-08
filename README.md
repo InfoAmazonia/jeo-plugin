@@ -206,6 +206,8 @@ and is generated with Vite.
 The published site is deployed from the `gh-pages` branch. The landing page is
 published at the branch root, MkDocs is published under `docs/`, and GitHub Pages
 metadata such as `.nojekyll` and `CNAME` is preserved during deploys.
+Generated site output is intentionally ignored and should not be committed from
+development branches.
 
 To rebuild it locally:
 

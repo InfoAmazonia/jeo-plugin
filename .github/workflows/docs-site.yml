@@ -134,7 +134,7 @@ jobs:
 
           rm -rf "${DEPLOY_DIR}/docs"
           mkdir -p "${DEPLOY_DIR}/docs"
-          cp -a site/docs/. "${DEPLOY_DIR}/docs/"
+          cp -a .build/mkdocs/. "${DEPLOY_DIR}/docs/"
 
           touch "${DEPLOY_DIR}/.nojekyll"
           cp "${cname_file}" "${DEPLOY_DIR}/CNAME"

@@ -35,3 +35,5 @@ dump.sql
 .DS_Store
 Thumbs.db
 dist/
+/.build/
+/site/
