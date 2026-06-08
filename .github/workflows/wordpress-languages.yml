@@ -23,6 +23,7 @@ jobs:
 
       - name: Test WordPress language files
         id: language-files
+        continue-on-error: true
         uses: holyhope/test-wordpress-languages-github-action@v4.0.2
         with:
           slug: jeo
@@ -30,18 +31,8 @@ jobs:
           pot_file: src/languages/jeo.pot
           domain: jeo
           exclude: assets
-          fail_on_diff: false  # Changed to false to allow auto-fix
-          fail_on_warning: true
-
-      - name: Commit language file changes
-        if: steps.language-files.outputs.patch_path != ''
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git apply ${{ steps.language-files.outputs.patch_path }}
-          git add src/languages/
-          git commit -m "chore: update POT and PO files" || true
-          git push
+          fail_on_diff: false
+          fail_on_warning: false
 
       - name: Upload language file patch
         if: always() && steps.language-files.outputs.patch_path != ''
@@ -58,3 +49,63 @@ jobs:
           name: wordpress-language-files-warnings
           path: ${{ steps.language-files.outputs.warnings_path }}
           if-no-files-found: ignore
+
+      - name: Validate language file results
+        if: always()
+        shell: bash
+        env:
+          ACTION_OUTCOME: ${{ steps.language-files.outcome }}
+          PATCH_PATH: ${{ steps.language-files.outputs.patch_path }}
+          WARNINGS_PATH: ${{ steps.language-files.outputs.warnings_path }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${WARNINGS_PATH}" && -s "${WARNINGS_PATH}" ]]; then
+            echo "::group::Language file warnings"
+            cat "${WARNINGS_PATH}"
+            echo "::endgroup::"
+            echo "::error::WordPress language file generation produced warnings."
+            exit 1
+          fi
+
+          if [[ -z "${PATCH_PATH}" ]]; then
+            if [[ "${ACTION_OUTCOME}" != "success" ]]; then
+              echo "::error::WordPress language file validation failed before producing a patch."
+              exit 1
+            fi
+
+            echo "No language file patch was generated."
+            exit 0
+          fi
+
+          if [[ ! -f "${PATCH_PATH}" ]]; then
+            echo "::error::WordPress language file validation did not produce the expected patch file."
+            exit 1
+          fi
+
+          if [[ ! -s "${PATCH_PATH}" ]]; then
+            echo "WordPress language files are up to date."
+            exit 0
+          fi
+
+          changed_lines="$(mktemp)"
+          awk '
+            /^(\+\+\+|---) / { next }
+            /^[+-]/ {
+              line = substr($0, 2)
+              if (line ~ /# Copyright \(C\)/) next
+              if (line ~ /"POT-Creation-Date:/) next
+              if (line ~ /X-Generator:/) next
+              print
+            }
+          ' "${PATCH_PATH}" > "${changed_lines}"
+
+          if [[ -s "${changed_lines}" ]]; then
+            echo "::group::Language file changes"
+            cat "${PATCH_PATH}"
+            echo "::endgroup::"
+            echo "::error::WordPress language files are out of date. Apply the uploaded wordpress-language-files-patch artifact and commit the result."
+            exit 1
+          fi
+
+          echo "Only ignored language file metadata changed."
