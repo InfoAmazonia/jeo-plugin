@@ -30,8 +30,18 @@ jobs:
           pot_file: src/languages/jeo.pot
           domain: jeo
           exclude: assets
-          fail_on_diff: true
+          fail_on_diff: false  # Changed to false to allow auto-fix
           fail_on_warning: true
+
+      - name: Commit language file changes
+        if: steps.language-files.outputs.patch_path != ''
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git apply ${{ steps.language-files.outputs.patch_path }}
+          git add src/languages/
+          git commit -m "chore: update POT and PO files" || true
+          git push
 
       - name: Upload language file patch
         if: always() && steps.language-files.outputs.patch_path != ''
