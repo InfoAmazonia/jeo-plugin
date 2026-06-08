@@ -199,8 +199,13 @@ installation in WordPress.
 
 ## Documentation
 
-The documentation source lives in `docs/`.
-The published static site lives in `site/` and is generated with MkDocs.
+The documentation source lives in `docs/` and is generated with MkDocs.
+When the standalone landing page source is available, it lives in `site-novo/www`
+and is generated with Vite.
+
+The published site is deployed from the `gh-pages` branch. The landing page is
+published at the branch root, MkDocs is published under `docs/`, and GitHub Pages
+metadata such as `.nojekyll` and `CNAME` is preserved during deploys.
 
 To rebuild it locally:
 
@@ -209,4 +214,14 @@ python3 -m pip install -r requirements-docs.txt
 python3 -m mkdocs build --clean
 ```
 
-Changes to `docs/`, `mkdocs.yml` or `requirements-docs.txt` on `master` automatically regenerate and commit `site/` through `.github/workflows/docs-site.yml`.
+To rebuild the landing page locally when `site-novo/www` is present:
+
+```bash
+npm ci --prefix site-novo/www
+npm run build --prefix site-novo/www
+```
+
+Pull requests that change `docs/`, `mkdocs.yml`, `requirements-docs.txt`,
+`site-novo/` or the documentation workflow must pass the documentation build.
+Changes merged to `master` deploy the generated output to `gh-pages` through
+`.github/workflows/docs-site.yml`.
