@@ -593,7 +593,7 @@ class Jeo {
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
 			array( 'mapgl', 'mapgl-react-style' ),
-			JEO_VERSION,
+			$map_blocks_assets['version'] ?? JEO_VERSION,
 		);
 		wp_register_script(
 			'jeo-map-blocks',

@@ -394,6 +394,82 @@ function configureSingleLineEditor( editor ) {
 	}, true );
 }
 
+function stabilizeStorymapEditorScroll( editor ) {
+	const editableElement = editor.ui.getEditableElement();
+
+	if ( ! editableElement || editableElement.dataset.jeoStableOuterScroll === 'true' ) {
+		return;
+	}
+
+	editableElement.dataset.jeoStableOuterScroll = 'true';
+
+	const getScrollContainer = () => (
+		editableElement.closest( '.interface-interface-skeleton__content' ) ||
+		document.querySelector( '.interface-interface-skeleton__content' )
+	);
+
+	let anchoredScrollTop = null;
+	let lastCaptureTime = 0;
+
+	const captureScroll = () => {
+		const scrollContainer = getScrollContainer();
+
+		if ( ! scrollContainer ) {
+			return;
+		}
+
+		anchoredScrollTop = scrollContainer.scrollTop;
+		lastCaptureTime = Date.now();
+	};
+
+	const restoreScroll = () => {
+		const scrollContainer = getScrollContainer();
+
+		if (
+			! scrollContainer ||
+			anchoredScrollTop === null ||
+			Date.now() - lastCaptureTime > 1000
+		) {
+			return;
+		}
+
+		const restoreIfStillEditing = () => {
+			if (
+				document.activeElement !== editableElement &&
+				! editableElement.contains( document.activeElement )
+			) {
+				return;
+			}
+
+			if ( Math.abs( scrollContainer.scrollTop - anchoredScrollTop ) > 1 ) {
+				scrollContainer.scrollTop = anchoredScrollTop;
+			}
+		};
+
+		window.requestAnimationFrame( restoreIfStillEditing );
+		window.setTimeout( restoreIfStillEditing, 0 );
+		window.setTimeout( restoreIfStillEditing, 80 );
+	};
+
+	const shouldStabilizeKey = ( event ) => (
+		! event.metaKey &&
+		! event.ctrlKey &&
+		! event.altKey &&
+		( event.key.length === 1 || [ 'Enter', 'Backspace', 'Delete' ].includes( event.key ) )
+	);
+
+	editableElement.addEventListener( 'beforeinput', captureScroll, true );
+	editableElement.addEventListener( 'keydown', ( event ) => {
+		if ( shouldStabilizeKey( event ) ) {
+			captureScroll();
+		}
+	}, true );
+	editableElement.addEventListener( 'input', restoreScroll, true );
+	editableElement.addEventListener( 'keyup', restoreScroll, true );
+
+	editor.model.document.on( 'change:data', restoreScroll );
+}
+
 export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps( { className: 'jeo-mapblock storymap' } );
 	const instanceId = useId();
@@ -649,6 +725,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		if ( options.singleLine ) {
 			configureSingleLineEditor( editor );
 		}
+
+		if ( options.stabilizeOuterScroll ) {
+			stabilizeStorymapEditorScroll( editor );
+		}
 	};
 
 	const moveSlide = ( fromIndex, toIndex ) => {
@@ -768,18 +848,22 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 									</Button>
 								</div>
 								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
-								<CKEditor
-									editor={ ClassicEditor }
-									data={ attributes.description }
-									config={ editorConfig }
-									onReady={ setupEditor }
-									onChange={ ( event, editor ) =>  {
-										setAttributes( {
-											...attributes,
-											description: editor.getData(),
-										} );
-									} }
-								/>
+								<div className="storymap-description-editor">
+									<CKEditor
+										editor={ ClassicEditor }
+										data={ attributes.description }
+										config={ editorConfig }
+										onReady={ ( editor ) => setupEditor( editor, {
+											stabilizeOuterScroll: true,
+										} ) }
+										onChange={ ( event, editor ) =>  {
+											setAttributes( {
+												...attributes,
+												description: editor.getData(),
+											} );
+										} }
+									/>
+								</div>
 								<CheckboxControl
 									className="introduction-button"
 									label={ __( 'Show story map introduction', 'jeo'  ) }
@@ -1042,7 +1126,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	editor={ ClassicEditor }
 																	data={ slide.title }
 																	config={ titleEditorConfig }
-																	onReady={ ( editor ) => setupEditor( editor, { singleLine: true } ) }
+																	onReady={ ( editor ) => setupEditor( editor, {
+																		singleLine: true,
+																		stabilizeOuterScroll: true,
+																	} ) }
 																	onChange={ ( event, editor ) => {
 																		setCurrentSlideIndex( slideIndex );
 
@@ -1061,6 +1148,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														) }</span>
 														{ /* Same isolation for the content editor. */ }
 														<div
+															className="storymap-content-editor"
 															onMouseDown={ ( e ) => e.stopPropagation() }
 															onKeyDown={ ( e ) => e.stopPropagation() }
 														>
@@ -1068,7 +1156,9 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																editor={ ClassicEditor }
 																data={ slide.content }
 																config={ editorConfig }
-																onReady={ setupEditor }
+																onReady={ ( editor ) => setupEditor( editor, {
+																	stabilizeOuterScroll: true,
+																} ) }
 																onChange={ ( event, editor ) => {
 																	setCurrentSlideIndex( slideIndex );
 
