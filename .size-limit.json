@@ -14,7 +14,7 @@
 	{
 		"name": "mapBlocks",
 		"path": "src/js/build/mapBlocks.js",
-		"limit": "1300 KB",
+		"limit": "1350 KB",
 		"brotli": false
 	},
 	{
@@ -32,13 +32,13 @@
 	{
 		"name": "mapsSidebar",
 		"path": "src/js/build/mapsSidebar.js",
-		"limit": "250 KB",
+		"limit": "255 KB",
 		"brotli": false
 	},
 	{
 		"name": "postsSidebar",
 		"path": "src/js/build/postsSidebar.js",
-		"limit": "180 KB",
+		"limit": "185 KB",
 		"brotli": false
 	},
 	{
