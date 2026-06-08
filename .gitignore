@@ -8,6 +8,7 @@ node_modules
 !.docker/start.sh
 !.docker/switch-php.sh
 src/js/build
+src/languages/*.mo
 src/languages/*.json
 jeo.zip
 .env
