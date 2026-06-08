@@ -56,44 +56,35 @@
 	"homepage": "https://www.jeowp.org/",
 	"overrides": {
 		"react-autosize-textarea": "file:npm-overrides/react-autosize-textarea",
-		"js-yaml": "^4.1.1",
-		"webpack-dev-server": "^5.2.3",
-		"@typescript-eslint/typescript-estree": {
-			"minimatch": "^9.0.9"
-		},
-		"markdownlint-cli": {
-			"minimatch": "^3.1.5"
-		},
-		"copy-webpack-plugin": {
-			"serialize-javascript": "^7.0.4"
-		}
+		"webpack-dev-server": "^5.2.4",
+		"markdownlint-cli": "^0.48.0",
+		"copy-webpack-plugin": "^14.0.0"
 	},
 	"dependencies": {
-		"@ckeditor/ckeditor5-react": "^11.0.1",
-		"@nazka/map-gl-js-spiderfy": "^1.2.10",
-		"@rjsf/core": "^6.4.1",
-		"@rjsf/validator-ajv8": "^6.4.1",
-		"@wordpress/edit-post": "^8.41.0",
-		"@wordpress/editor": "^14.41.0",
-		"@wordpress/plugins": "^7.41.0",
-		"ckeditor5": "^47.6.1",
+		"@ckeditor/ckeditor5-react": "^11.1.2",
+		"@nazka/map-gl-js-spiderfy": "^2.0.0",
+		"@rjsf/core": "^6.5.3",
+		"@rjsf/validator-ajv8": "^6.5.3",
+		"@wordpress/editor": "^14.46.0",
+		"ckeditor5": "^48.1.1",
 		"classnames": "^2.5.1",
-		"eta": "^4.5.1",
+		"date-fns": "^4.2.1",
+		"eta": "^4.6.0",
 		"leaflet": "^1.9.4",
 		"lodash-es": "^4.17.23",
 		"map-gl-utils": "^0.50.4",
-		"maplibre-gl": "^5.20.1",
+		"maplibre-gl": "^5.24.0",
 		"maplibregl-mapbox-request-transformer": "^0.0.3",
 		"react-datepicker": "^9.1.0",
 		"react-leaflet": "^4.2.1",
-		"react-map-gl": "^8.1.0",
+		"react-map-gl": "^8.1.1",
 		"react-movable": "^3.4.0",
 		"scrollama": "^3.2.0",
 		"use-debounce": "^10.1.0"
 	},
 	"devDependencies": {
 		"@size-limit/file": "^12.1.0",
-		"@wordpress/scripts": "^31.6.0",
+		"@wordpress/scripts": "^32.2.0",
 		"ajv": "^8.18.0",
 		"css-loader": "^7.1.4",
 		"postcss": "^8.5.8",
