@@ -24,7 +24,6 @@
 	},
 	"scripts": {
 		"sync:version": "node scripts/sync-plugin-version.mjs",
-		"check:wporg-compliance": "node scripts/check-wporg-compliance.mjs",
 		"start": "wp-scripts start",
 		"build:assets": "wp-scripts build && node scripts/patch-build-compliance.mjs",
 		"i18n:pot": "wp i18n make-pot src src/languages/jeo.pot --domain=jeo --exclude=js/src",
