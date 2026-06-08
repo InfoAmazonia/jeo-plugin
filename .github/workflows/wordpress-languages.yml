@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - uses: shivammathur/setup-php@v2
         with:
@@ -36,7 +36,7 @@ jobs:
 
       - name: Upload language file patch
         if: always() && steps.language-files.outputs.patch_path != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wordpress-language-files-patch
           path: ${{ steps.language-files.outputs.patch_path }}
@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload language file warnings
         if: always() && steps.language-files.outputs.warnings_path != ''
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: wordpress-language-files-warnings
           path: ${{ steps.language-files.outputs.warnings_path }}

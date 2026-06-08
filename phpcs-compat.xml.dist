@@ -8,8 +8,8 @@
 	<!-- Show sniff codes in all reports. -->
 	<arg value="s"/>
 
-	<!-- JEO declares PHP 8.0+ and monitors the PHP 8.5 line experimentally. -->
-	<config name="testVersion" value="8.0-8.5"/>
+	<!-- JEO declares PHP 8.2+ and monitors the PHP 8.5 line experimentally. -->
+	<config name="testVersion" value="8.2-8.5"/>
 
 	<file>src</file>
 
