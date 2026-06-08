@@ -11,54 +11,53 @@ At the same time, by simply imputing the ids of layers hosted on [Mapbox](https:
 This repository currently declares `Requires PHP: 8.0`, with primary validation focused on PHP `8.2` to `8.4` and experimental monitoring on PHP `8.5`.
 The frontend runtime targets Node `24` as the supported project baseline.
 
-Compatibility snapshot validated on March 17, 2026:
+Compatibility snapshot validated on May 21, 2026:
 
 - Primary support: PHP `8.2`, `8.3`, and `8.4`.
 - Experimental monitoring: PHP `8.5`.
-- Stable WordPress gate: `WordPress 6.9.4` on PHP `8.2`, `8.3`, and `8.4`.
-- Experimental WordPress gate: `WordPress 6.9.4` on PHP `8.5`.
+- Stable WordPress gate: `WordPress 7.0` on PHP `8.2`, `8.3`, and `8.4`.
+- Experimental WordPress gate: `WordPress 7.0` on PHP `8.5`.
 - Backward-compatibility smoke tests: `WordPress 6.6` on PHP `8.0` and `8.1`.
-- Forward-compatibility smoke tests: `WordPress 7.0-beta4` on PHP `8.2`, `8.3`, `8.4`, and experimentally on `8.5`.
 
 Automation:
 
 - Frontend asset checks run in `.github/workflows/node-frontend.yml`.
-- Static PHP checks run in `.github/workflows/php-compat.yml`, including an experimental PHP `8.5` job.
-- WordPress runtime smoke tests run in `.github/workflows/wordpress-smoke.yml`, including experimental PHP `8.5` jobs for `WordPress 6.9.4` and `WordPress 7.0-beta4`.
+- Static PHP compatibility checks run in `.github/workflows/php-compat.yml` through PHPCompatibilityWP, configured for PHP `8.0-8.5`.
+- WordPress runtime smoke tests run in `.github/workflows/wordpress-smoke.yml`, including an experimental PHP `8.5` job for `WordPress 7.0`.
 
 Test script coverage:
 
-- `scripts/check-php-compat.php` now validates repository-owned compatibility from PHP `8.0` through `8.5`, including PHP `8.5`-specific deprecation heuristics.
+- `phpcs-compat.xml.dist` runs PHPCompatibilityWP for generic PHP cross-version compatibility checks against the plugin source.
 - `scripts/wordpress-smoke.sh` can be forced onto PHP `8.5` with `WP_CLI_PHP`, so the plugin's runtime smoke can be exercised on that line locally and in CI.
-- `scripts/check-node-version.mjs` enforces the supported frontend runtime before `npm ci` or `npm install` continue.
-- `scripts/report-bundle-sizes.mjs` enforces explicit bundle budgets instead of relying on generic webpack performance warnings.
+- `package.json` and `.npmrc` enforce the supported Node runtime through npm's native engine checks before installs continue.
+- Size Limit enforces explicit bundle budgets from `.size-limit.json` instead of relying on generic webpack performance warnings.
 
 Local commands:
 
 ```bash
 nvm use
-npm run check:env
 npm ci
 npm run build
 npm run build:report
 npm run test:unit
 npm run audit:npm
 composer audit --locked
-php scripts/check-php-compat.php
-/opt/homebrew/opt/php@8.5/bin/php scripts/check-php-compat.php
+composer install --no-interaction --no-progress --prefer-dist
+vendor/bin/phpcs --standard=phpcs.xml.dist
+vendor/bin/phpcs --standard=phpcs-compat.xml.dist
 
 WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php \
 WP_DB_HOST=localhost \
 WP_DB_NAME=wordpress \
 WP_DB_USER=your-user \
 WP_DB_PASSWORD='' \
-WP_VERSION=7.0-beta4 \
+WP_VERSION=7.0 \
 bash scripts/wordpress-smoke.sh
 ```
 
 `scripts/wordpress-smoke.sh` honors `WP_CLI_PHP`, which is useful on Homebrew installs where `/opt/homebrew/bin/wp` otherwise follows the default `php` in `PATH`.
 For local frontend work, use Node `24`.
-Use PHP `8.5` for local smoke only when you specifically want to inspect the experimental runtime line. WordPress core 6.9 treats PHP `8.5` as beta support, while stable `wp-cli` support for PHP `8.5` is still planned upstream and `wp-cli` 2.12.0 still emits third-party deprecation noise there.
+Use PHP `8.5` for local smoke only when you specifically want to inspect the experimental runtime line. Stable `wp-cli` support for PHP `8.5` is still planned upstream and `wp-cli` 2.12.0 still emits third-party deprecation noise there.
 
 ## Setting up local environment
 
@@ -81,7 +80,8 @@ ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
 ## Building the plugin
 
 The plugin root for local development and release packaging is `src/`.
-Builds compile JavaScript and CSS assets into `src/js/build`.
+Builds compile JavaScript and CSS assets into `src/js/build`, then compile
+runtime translation artifacts into `src/languages`.
 
 Use these commands during local development:
 
@@ -91,16 +91,61 @@ npm run build
 ```
 
 - `npm run start` watches the source tree and rebuilds assets while you develop.
-- `npm run build` performs a production build and regenerates JavaScript translation JSON catalogs in `src/languages`.
+- `npm run build` performs a production build and regenerates compiled translation catalogs in `src/languages`.
 
-To generate JavaScript translation JSON catalogs on their own, run:
+These scripts expect `wp` (WP-CLI) to be available on your `PATH`.
+
+### Translation workflow
+
+Translation source files are versioned in Git:
+
+- `src/languages/jeo.pot`
+- `src/languages/*.po`
+
+Compiled translation files are generated artifacts and are not versioned in Git:
+
+- `src/languages/*.mo`
+- `src/languages/*.json`
+
+When source strings change, refresh the source catalogs after building assets:
 
 ```bash
+npm run i18n:refresh
+```
+
+This runs `npm run build:assets`, regenerates `src/languages/jeo.pot`, and
+updates the existing `*.po` catalogs. Review the updated `*.po` translations
+before compiling release artifacts. If you want to run each step manually, use:
+
+```bash
+npm run build:assets
+npm run i18n:pot
+npm run i18n:po
+```
+
+After human review of the `*.po` catalogs, compile the generated runtime files:
+
+```bash
+npm run i18n:compile
+```
+
+You can also run each compile step directly:
+
+```bash
+npm run i18n:mo
 npm run i18n:json
 ```
 
-These scripts expect `wp` (WP-CLI) to be available on your `PATH`. If it lives elsewhere, set `WP_CLI_BIN` when running the command.
-The generated `src/languages/*.json` catalogs are release artifacts and are intentionally not versioned in Git.
+Before committing translation changes, validate changed PO catalogs with
+`msgfmt --check --statistics`. For example:
+
+```bash
+msgfmt --check --statistics -o /tmp/jeo-pt_BR.mo src/languages/jeo-pt_BR.po
+```
+
+Commit reviewed `*.po` and `jeo.pot` changes. Do not commit generated `*.mo`
+or `*.json` files; `npm run build` and `npm run build:release` regenerate
+them for local testing and release packaging.
 
 If you prefer copying files instead of symlinking them into a local WordPress install, use:
 
@@ -145,8 +190,9 @@ npm run build
 ```
 
 The attached `jeo.zip` mirrors the WordPress.org deploy package: it contains
-the built contents of `src/` under the `jeo/` plugin slug directory, ready for
-manual installation in WordPress.
+the built contents of `src/` under the `jeo/` plugin slug directory, including
+generated `*.mo` and `*.json` translation catalogs, ready for manual
+installation in WordPress.
 
 ## Documentation
 

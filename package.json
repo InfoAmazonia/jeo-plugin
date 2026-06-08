@@ -10,21 +10,35 @@
 		"node": "^24.0.0",
 		"npm": ">=10"
 	},
+	"devEngines": {
+		"runtime": {
+			"name": "node",
+			"version": "^24.0.0",
+			"onFail": "error"
+		},
+		"packageManager": {
+			"name": "npm",
+			"version": ">=10",
+			"onFail": "error"
+		}
+	},
 	"scripts": {
-		"check:env": "node scripts/check-node-version.mjs",
-		"preinstall": "node scripts/check-node-version.mjs",
 		"sync:version": "node scripts/sync-plugin-version.mjs",
 		"check:wporg-compliance": "node scripts/check-wporg-compliance.mjs",
 		"start": "wp-scripts start",
 		"build:assets": "wp-scripts build && node scripts/patch-build-compliance.mjs",
-		"i18n:json": "node scripts/make-i18n-json.mjs",
-		"build": "npm run build:assets && npm run i18n:json",
+		"i18n:pot": "wp i18n make-pot src src/languages/jeo.pot --domain=jeo --exclude=js/src",
+		"i18n:po": "wp i18n update-po src/languages/jeo.pot src/languages",
+		"i18n:mo": "wp i18n make-mo src/languages",
+		"i18n:json": "wp i18n make-json src/languages --no-purge",
+		"i18n:compile": "npm run i18n:mo && npm run i18n:json",
+		"i18n:refresh": "npm run build:assets && npm run i18n:pot && npm run i18n:po",
+		"build": "npm run build:assets && npm run i18n:compile",
 		"build:release": "npm run build",
-		"build:report": "node scripts/report-bundle-sizes.mjs",
+		"build:report": "size-limit",
 		"test:unit": "wp-scripts test-unit-js",
 		"audit:npm": "npm audit --package-lock-only",
-		"audit:composer": "composer audit --locked",
-		"deps:report": "node scripts/dependency-review.mjs --write"
+		"audit:composer": "composer audit --locked"
 	},
 	"repository": {
 		"type": "git",
@@ -78,12 +92,14 @@
 		"use-debounce": "^10.1.0"
 	},
 	"devDependencies": {
+		"@size-limit/file": "^12.1.0",
 		"@wordpress/scripts": "^31.6.0",
 		"ajv": "^8.18.0",
 		"css-loader": "^7.1.4",
 		"postcss": "^8.5.8",
 		"sass": "^1.98.0",
 		"sass-loader": "^16.0.7",
+		"size-limit": "^12.1.0",
 		"style-loader": "^4.0.0",
 		"webpack": "^5.105.4"
 	}

@@ -1,5 +1,9 @@
 import {
+	createLayerIdSet,
+	getLayerId,
+	layerIdsMatch,
 	moveActiveIndex,
+	reconcileSelectedLayersWithAvailableLayers,
 	reorderList,
 	reorderSlides,
 	reorderStorymapLayers,
@@ -15,6 +19,16 @@ describe( 'storymap ordering helpers', () => {
 		expect( moveActiveIndex( 1, 0, 2 ) ).toBe( 0 );
 		expect( moveActiveIndex( 1, 2, 0 ) ).toBe( 2 );
 		expect( moveActiveIndex( 2, 2, 0 ) ).toBe( 0 );
+	} );
+
+	it( 'normalizes layer IDs from saved storymap data', () => {
+		expect( getLayerId( { id: '12' } ) ).toBe( 12 );
+		expect( getLayerId( { id: 12 } ) ).toBe( 12 );
+		expect( getLayerId( { id: 'missing' } ) ).toBeNull();
+		expect( layerIdsMatch( { id: '12' }, { id: 12 } ) ).toBe( true );
+		expect( createLayerIdSet( [ { id: '12' }, { id: 13 } ] ) ).toEqual(
+			new Set( [ 12, 13 ] )
+		);
 	} );
 
 	it( 'reorders slides and preserves the active slide identity', () => {
@@ -41,6 +55,35 @@ describe( 'storymap ordering helpers', () => {
 			{ id: 1, name: 'Layer 1' },
 			{ id: 2, name: 'Layer 2' },
 			{ id: 999, name: 'Detached' },
+		] );
+	} );
+
+	it( 'sorts selected layers when saved IDs are strings', () => {
+		expect(
+			sortSelectedLayersByMapOrder(
+				[ { id: '2', name: 'Layer 2' }, { id: '1', name: 'Layer 1' } ],
+				[ { id: 1 }, { id: 2 } ]
+			)
+		).toEqual( [
+			{ id: '1', name: 'Layer 1' },
+			{ id: '2', name: 'Layer 2' },
+		] );
+	} );
+
+	it( 'reconciles selected layers against available map-layer records', () => {
+		expect(
+			reconcileSelectedLayersWithAvailableLayers(
+				[
+					{ id: '2', name: 'Layer 2' },
+					{ id: '1', name: 'Layer 1' },
+					{ id: '999', name: 'Detached' },
+				],
+				[ { id: 1 }, { id: 2 }, { id: 3 } ],
+				[ { id: 1 }, { id: 2 } ]
+			)
+		).toEqual( [
+			{ id: 1, name: 'Layer 1' },
+			{ id: 2, name: 'Layer 2' },
 		] );
 	} );
 

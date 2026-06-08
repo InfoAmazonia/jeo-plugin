@@ -40,7 +40,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 	} = { ...mapDefaults, ...attributes };
 
 	const attributeUpdater = ( attribute ) => ( value ) => {
-		setAttributes( { ...attributes, [ attribute ]: value } );
+		setAttributes( { [ attribute ]: value } );
 	};
 
 	const editingMap = useRef( false );
@@ -176,7 +176,12 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 							label={ __( 'North', 'jeo' ) }
 							value={ attributes.pan_limits?.north || "__"}
 							onChange={ ( value ) => {
-								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, north: parseNumber(value) }});
+								return setAttributes({
+									pan_limits: {
+										...attributes.pan_limits,
+										north: parseNumber(value),
+									},
+								});
 							} }
 						/>
 
@@ -185,7 +190,12 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 							label={ __( 'East', 'jeo' ) }
 							value={ attributes.pan_limits?.east || "__" }
 							onChange={ ( value ) => {
-								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, east: parseNumber(value) }});
+								return setAttributes({
+									pan_limits: {
+										...attributes.pan_limits,
+										east: parseNumber(value),
+									},
+								});
 							} }
 						/>
 
@@ -195,7 +205,12 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 							label={ __( 'South', 'jeo' ) }
 							value={ attributes.pan_limits?.south || "__"}
 							onChange={ ( value ) => {
-								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, south: parseNumber(value) }});
+								return setAttributes({
+									pan_limits: {
+										...attributes.pan_limits,
+										south: parseNumber(value),
+									},
+								});
 							} }
 						/>
 
@@ -204,7 +219,12 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 							label={ __( 'West', 'jeo' ) }
 							value={ attributes.pan_limits?.west || "__"}
 							onChange={ ( value ) => {
-								return setAttributes({ ...attributes, 'pan_limits': { ...attributes.pan_limits, west: parseNumber(value) }});
+								return setAttributes({
+									pan_limits: {
+										...attributes.pan_limits,
+										west: parseNumber(value),
+									},
+								});
 							} }
 						/>
 					</div>

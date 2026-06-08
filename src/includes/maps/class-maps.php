@@ -39,6 +39,7 @@ class Maps {
 		add_filter( 'single_template', array( $this, 'override_template' ) );
 		add_filter( 'the_content', array( $this, 'the_content_filter' ) );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
+		add_action( 'add_meta_boxes', array( $this, 'remove_custom_fields_meta_box' ), 99 );
 		$this->register_rest_meta_validation();
 	}
 
@@ -408,6 +409,19 @@ class Maps {
 				'description'       => __( 'Disable embed', 'jeo' ),
 			)
 		);
+	}
+
+	/**
+	 * Keep REST metadata support enabled while hiding the legacy custom fields UI.
+	 *
+	 * JEO map metadata is edited through dedicated editor sidebars. Leaving the
+	 * core custom fields metabox visible can resubmit stale values after a REST
+	 * editor save and overwrite the sidebar state.
+	 *
+	 * @return void
+	 */
+	public function remove_custom_fields_meta_box() {
+		remove_meta_box( 'postcustom', $this->post_type, 'normal' );
 	}
 
 	/**
