@@ -4,14 +4,6 @@ class JeoLayerTypes {
 	}
 
 	emitChange() {
-		if (
-			typeof window === 'undefined' ||
-			typeof window.dispatchEvent !== 'function' ||
-			typeof CustomEvent !== 'function'
-		) {
-			return;
-		}
-
 		window.dispatchEvent(
 			new CustomEvent( 'jeo-layer-types-changed', {
 				detail: {

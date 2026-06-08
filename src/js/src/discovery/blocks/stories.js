@@ -186,76 +186,302 @@ class Stories extends Component {
 			} );
 		}
 
-
 		map.on('mousemove', 'unclustered-points', (e) => {
-			if (e.features.length > 0 && map.selectedTab.name === "stories") {
-				// if (this.state.hoveredPostId) {
-				// 	map.setFeatureState(
-				// 		{ source: 'storiesSource', id: this.state.hoveredPostId },
-				// 		{ hover: false }
-				// 	);
-				// }
-				// console.log( this.state.hoveredPostId,  e.features[0].id  );
-
-				this.setState({
-					// ...this.state,
-					hoveredPostId: e.features[0].id,
-				})
-
-				map.setFeatureState(
-					{ source: 'storiesSource', id: e.features[0].id },
-					{ hover: true }
-				);
-
-
-
-
+			if ( e.features.length > 0 && this.isStoriesTabActive() ) {
+				const hoveredFeature = e.features[0];
+				this.replaceHoveredFeatureState( getHoveredFeatureIds( hoveredFeature ) );
+				this.setState( {
+					hoveredPostId: getHoveredStoryId( hoveredFeature ),
+				} );
 			}
 		});
 
 		map.on('mouseleave', 'unclustered-points', () => {
-			if(map.selectedTab.name === "stories"){
-				// console.log("mouseleave", this.state.hoveredPostId);
-				if (this.state.hoveredPostId) {
-					map.setFeatureState(
-						{ source: 'storiesSource', id: this.state.hoveredPostId },
-						{ hover: false }
-					);
-				}
-
-				this.setState({
-					...this.state,
+			if ( this.isStoriesTabActive() ) {
+				this.clearHoveredFeatureState();
+				this.setState( {
 					hoveredPostId: null,
 				})
-
-
 			}
 		});
 
-		map.on('mousemove', 'cluster-0', (e) => {
-			const features = map.queryRenderedFeatures(e.point, { layers: ['cluster-0'] });
-			const clusterId = features[0].properties.cluster_id,
-			pointCount = features[0].properties.point_count,
-			clusterSource = map.getSource('storiesSource');
+		const handleClusterMouseMove = ( event ) => {
+			if ( ! this.isStoriesTabActive() ) {
+				return;
+			}
 
-			// Get all points under a cluster
-			getClusterLeaves(clusterSource, clusterId, pointCount, 0).then((aFeatures) => {
-				const postsIds = ( aFeatures ?? [] ).map( ( post ) => post.id)
+			getClusterHoverData( map, event ).then( ( { clusterId, postsIds } ) => {
+				if ( ! this.isStoriesTabActive() ) {
+					return;
+				}
 
+				this.replaceHoveredClusterState( clusterId );
 				this.setState( {
 					...this.state,
 					hoveredClusterPostsId: postsIds
 				} )
 			})
-		});
-
+		};
 
 		map.on('mouseleave', 'cluster-0', () => {
 			this.setState( {
-				...this.state,
-				hoveredClusterPostsId: []
+				hoveredClusterPostsId: [],
+			} );
+		} );
+
+		[ 'cluster-layer', 'cluster-count' ].forEach( ( layerId ) => {
+			map.on( 'mousemove', layerId, handleClusterMouseMove );
+			map.on( 'mouseleave', layerId, handleClusterMouseLeave );
+		} );
+	}
+
+	componentWillUnmount() {
+		this.clearHoveredFeatureState();
+		this.clearHoveredClusterState();
+	}
+
+	isStoriesTabActive() {
+		return this.props.map?.selectedTab?.name === 'stories';
+	}
+
+	componentDidUpdate( prevProps, prevState ) {
+		if ( ! this.isStoriesTabActive() ) {
+			return;
+		}
+
+		if ( prevState.hoveredPostId !== this.state.hoveredPostId ) {
+			this.scrollStoryIntoView( this.state.hoveredPostId );
+			return;
+		}
+
+		const clusterHoverChanged =
+			prevState.hoveredClusterPostsId.length !==
+				this.state.hoveredClusterPostsId.length ||
+			prevState.hoveredClusterPostsId.some(
+				( storyId, index ) =>
+					storyId !== this.state.hoveredClusterPostsId[ index ]
+			);
+
+		if ( clusterHoverChanged && this.state.hoveredClusterPostsId.length ) {
+			const firstClusterStoryId = this.props.stories.find( ( story ) =>
+				this.state.hoveredClusterPostsId.includes( story.id )
+			)?.id;
+
+			this.scrollStoryIntoView( firstClusterStoryId ?? null );
+		}
+	}
+
+	clearHoveredFeatureState() {
+		const map = this.props.map;
+		const source = map?.getSource?.( STORIES_SOURCE_ID );
+
+		if ( ! source || ! this.hoveredFeatureIds.length ) {
+			this.hoveredFeatureIds = [];
+			return;
+		}
+
+		this.hoveredFeatureIds.forEach( ( featureId ) => {
+			map.setFeatureState(
+				{ source: STORIES_SOURCE_ID, id: featureId },
+				{ hover: false }
+			);
+		} );
+
+		this.hoveredFeatureIds = [];
+	}
+
+	replaceHoveredFeatureState( featureIds = [] ) {
+		const nextFeatureIds = Array.from(
+			new Set( ( featureIds ?? [] ).filter( Boolean ) )
+		);
+		const sameFeatureIds =
+			nextFeatureIds.length === this.hoveredFeatureIds.length &&
+			nextFeatureIds.every(
+				( featureId, index ) => featureId === this.hoveredFeatureIds[ index ]
+			);
+
+		if ( sameFeatureIds ) {
+			return;
+		}
+
+		this.clearHoveredFeatureState();
+
+		const map = this.props.map;
+		const source = map?.getSource?.( STORIES_SOURCE_ID );
+
+		if ( ! source || ! nextFeatureIds.length ) {
+			return;
+		}
+
+		nextFeatureIds.forEach( ( featureId ) => {
+			map.setFeatureState(
+				{ source: STORIES_SOURCE_ID, id: featureId },
+				{ hover: true }
+			);
+		} );
+
+		this.hoveredFeatureIds = nextFeatureIds;
+	}
+
+	clearHoveredClusterState() {
+		const map = this.props.map;
+
+		if ( ! map?.getLayer?.( HOVERED_CLUSTER_LAYER_ID ) ) {
+			this.hoveredClusterIds = [];
+			return;
+		}
+
+		map.setFilter( HOVERED_CLUSTER_LAYER_ID, buildHoveredClusterFilter() );
+		this.hoveredClusterIds = [];
+	}
+
+	replaceHoveredClusterState( clusterIds = [] ) {
+		const nextClusterIds = normalizeClusterIds( clusterIds );
+		const map = this.props.map;
+		const sameClusterIds =
+			nextClusterIds.length === this.hoveredClusterIds.length &&
+			nextClusterIds.every(
+				( clusterId, index ) => clusterId === this.hoveredClusterIds[ index ]
+			);
+
+		if ( sameClusterIds ) {
+			return;
+		}
+
+		if ( ! map?.getLayer?.( HOVERED_CLUSTER_LAYER_ID ) ) {
+			this.hoveredClusterIds = nextClusterIds;
+			return;
+		}
+
+		if ( ! nextClusterIds.length ) {
+			map.setFilter( HOVERED_CLUSTER_LAYER_ID, buildHoveredClusterFilter() );
+			this.hoveredClusterIds = [];
+			return;
+		}
+
+		map.setFilter( HOVERED_CLUSTER_LAYER_ID, [
+			'all',
+			[ 'has', 'point_count' ],
+			[
+				'any',
+				...nextClusterIds.map( ( clusterId ) => [
+					'==',
+					[ 'get', 'cluster_id' ],
+					clusterId,
+				] ),
+			],
+		] );
+		this.hoveredClusterIds = nextClusterIds;
+	}
+
+	findStoryClusterIds( story ) {
+		const map = this.props.map;
+		const clusterSource = map?.getSource?.( STORIES_SOURCE_ID );
+
+		if ( ! clusterSource || ! map?.queryRenderedFeatures ) {
+			return Promise.resolve( [] );
+		}
+
+		const clusterFeatures = getClusterFeaturesInView( map );
+
+		if ( ! clusterFeatures.length ) {
+			return Promise.resolve( [] );
+		}
+
+		return Promise.all(
+			clusterFeatures.map( ( clusterFeature ) => {
+				const clusterId = Number.parseInt(
+					clusterFeature?.properties?.cluster_id,
+					10
+				);
+				const pointCount = Number.parseInt(
+					clusterFeature?.properties?.point_count,
+					10
+				);
+
+				if ( ! Number.isFinite( clusterId ) || ! Number.isFinite( pointCount ) ) {
+					return null;
+				}
+
+				return getClusterLeaves(
+					clusterSource,
+					clusterId,
+					pointCount,
+					0
+				).then( ( clusterFeaturesList ) => {
+					const hasStory = clusterFeaturesList.some(
+						( clusterStoryFeature ) =>
+							getHoveredStoryId( clusterStoryFeature ) === story.id
+					);
+
+					return hasStory ? clusterId : null;
+				} );
 			} )
-		});
+		).then( ( clusterIds ) => normalizeClusterIds( clusterIds.filter( Boolean ) ) );
+	}
+
+	syncHoveredStoryClusterState( story ) {
+		return this.findStoryClusterIds( story ).then( ( clusterIds ) => {
+			if ( this.listHoveredStoryId !== story.id ) {
+				return;
+			}
+
+			this.replaceHoveredClusterState( clusterIds );
+		} );
+	}
+
+	registerStoriesList( element ) {
+		this.storiesListRef = element;
+	}
+
+	registerStoryCard( storyId, element ) {
+		if ( ! element ) {
+			this.storyCardElements.delete( storyId );
+			return;
+		}
+
+		this.storyCardElements.set( storyId, element );
+	}
+
+	scrollStoryIntoView( storyId ) {
+		if ( ! storyId || ! this.isStoriesTabActive() ) {
+			return;
+		}
+
+		const container =
+			this.storiesListRef?.closest?.( '.togable-panel' ) ?? this.storiesListRef;
+		const storyElement = this.storyCardElements.get( storyId );
+
+		if ( ! container || ! storyElement ) {
+			return;
+		}
+
+		const containerRect = container.getBoundingClientRect();
+		const storyRect = storyElement.getBoundingClientRect();
+		const elementTop =
+			storyRect.top - containerRect.top + container.scrollTop;
+		const elementBottom = elementTop + storyRect.height;
+		const viewportTop = container.scrollTop;
+		const viewportBottom = viewportTop + container.clientHeight;
+
+		if ( elementTop < viewportTop ) {
+			container.scrollTo( {
+				top: elementTop,
+				behavior: 'smooth',
+			} );
+			return;
+		}
+
+		if ( elementBottom > viewportBottom ) {
+			container.scrollTo( {
+				top: elementBottom - container.clientHeight,
+				behavior: 'smooth',
+			} );
+		}
+	}
+
+	markListScrolling() {
+		this.hoverSuppressedUntil = Date.now() + 600;
 	}
 
 	buildPostsGeoJson( stories ) {

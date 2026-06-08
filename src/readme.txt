@@ -1,6 +1,6 @@
-=== JEO ===
-Contributors: earthjournalism
-Tested up to: 6.8.2
+=== JEO Maps ===
+Contributors: infoamazonia
+Tested up to: 7.0
 Tags: maps, geolocation, gutenberg, storymap, cartography, mapbox, maplibre, blocks, interactive, journalism, openstreetmap, spatial
 Stable tag: 3.6.5
 Requires PHP: 8.2

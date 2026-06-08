@@ -71,8 +71,14 @@ class MapLayers extends Component {
 					( data ) => data[ 0 ]
 				);
 				this.fetchLayers( requestedLayerIds ).then( ( layers ) => {
-					this.toggleLayersBatch( layers.reverse() );
-					this.applyLayersChanges();
+					const { selectedLayers, layersQueue } =
+						this.buildSelectionState( layers.reverse() );
+
+					this.props.updateState( {
+						selectedLayers,
+						layersQueue,
+					} );
+					this.applyLayersChanges( layersQueue, selectedLayers );
 				} );
 			} else {
 				const urlParams = new URLSearchParams( window.location.search );

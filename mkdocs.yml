@@ -39,6 +39,6 @@ nav:
       - WordPress.org audit report: dev/wordpress-org-audit-report.md
       - Dependency upgrade report: dev/dependency-upgrade-report.md
       - Dependency upgrade smoke tests: dev/dependency-upgrade-smoke-tests.md
+      - Dependency maintenance: dev/dependency-maintenance.md
 exclude_docs: |
-  dev/dependency-upgrade-report.json
   README.md

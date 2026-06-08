@@ -250,8 +250,9 @@ registerBlockType( 'jeo/ai-minimap', {
 	save: ( props ) => <MinimapDisplay { ...props } />,
 } );
 
-const storyMapCleanUp = (props) => {
+const storyMapCleanUp = (props, options = {}) => {
 	const propsCopy = cloneDeep(props);
+	const { removeYoastHeadJson = true } = options;
 
 	const attributesStructure = {
 		map_id: null,
@@ -271,33 +272,78 @@ const storyMapCleanUp = (props) => {
 	}
 
 	function removeYoastTagsFromObject(object) {
-		if( object && object.hasOwnProperty('yoast_head') ) {
-			delete object.yoast_head;
+		if(! object || typeof object !== 'object') {
+			return;
+		}
+
+		delete object.yoast_head;
+
+		if(removeYoastHeadJson) {
+			delete object.yoast_head_json;
 		}
 	}
 
-	attributesStructure.navigateMapLayers.forEach( item => {
-		removeYoastTagsFromObject(item);
-		delete item.content;
-	})
-
-	attributesStructure.slides.forEach( slide => {
-		slide.selectedLayers.forEach( layer => {
-			// Remove yoast tags that are unecessary
-			removeYoastTagsFromObject(layer);
-
-			// Remove slide content from future JSON
-			if(layer.content) {
-				delete layer.content;
+	if(Array.isArray(attributesStructure.navigateMapLayers)) {
+		attributesStructure.navigateMapLayers.forEach( item => {
+			removeYoastTagsFromObject(item);
+			if(item && typeof item === 'object') {
+				delete item.content;
 			}
-		} )
-	})
+		})
+	}
+
+	if(Array.isArray(attributesStructure.slides)) {
+		attributesStructure.slides.forEach( slide => {
+			if(! slide || ! Array.isArray(slide.selectedLayers)) {
+				return;
+			}
+
+			slide.selectedLayers.forEach( layer => {
+				// Remove yoast tags that are unecessary
+				removeYoastTagsFromObject(layer);
+
+				// Remove slide content from future JSON
+				if(layer && typeof layer === 'object' && layer.content) {
+					delete layer.content;
+				}
+			} )
+		})
+	}
 
 	// Loaded layers aren't used properly
 	attributesStructure.loadedLayers = [];
 
 	return attributesStructure;
 }
+
+const legacyStoryMapCleanUp = (props) => storyMapCleanUp(props, { removeYoastHeadJson: false });
+
+const storymapAttributes = {
+	map_id: {
+		type: 'number',
+	},
+	description: {
+		type: 'string',
+	},
+	slides: {
+		type: 'array'
+	},
+	navigateButton: {
+		type: 'boolean',
+	},
+	hasIntroduction: {
+		type: 'boolean',
+	},
+	loadedLayers: {
+		type: 'array',
+	},
+	navigateMapLayers: {
+		type: 'array'
+	},
+	postID : {
+		type: 'number',
+	},
+};
 
 registerBlockType( 'jeo/storymap', {
 	title: __( 'Story Map', 'jeo' ),
@@ -339,6 +385,29 @@ registerBlockType( 'jeo/storymap', {
 		const attributesStructure = storyMapCleanUp(props);
 		return JSON.stringify(attributesStructure)
 	},
+	deprecated: [
+		// Compatibility for storymaps saved before PR #564 started stripping
+		// yoast_head_json; Gutenberg needs this exact legacy markup to validate.
+		{
+			attributes: storymapAttributes,
+			save: ( { attributes } ) => {
+				const blockProps = useBlockProps.save();
+				const attributesStructure = legacyStoryMapCleanUp( { attributes } );
+				return (
+					<div { ...blockProps }>
+						{ JSON.stringify( attributesStructure ) }
+					</div>
+				);
+			},
+		},
+		{
+			attributes: storymapAttributes,
+			save: ( props ) => {
+				const attributesStructure = legacyStoryMapCleanUp(props);
+				return JSON.stringify(attributesStructure)
+			},
+		},
+	],
 } );
 
 registerBlockType( 'jeo/embedded-storymap', {

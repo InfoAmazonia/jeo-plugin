@@ -1,4 +1,4 @@
-import { useDispatch, useSelect } from '@wordpress/data';
+import { select, useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '../shared/wp-form-controls';
 
@@ -16,12 +16,23 @@ const PostsSelector = ( {
 	renderPanel: Panel,
 } ) => {
 	const postMeta = useSelect(
-		( select ) => select( 'core/editor' ).getEditedPostAttribute( 'meta' ),
+		( select ) =>
+			select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {},
 		[]
 	);
 	const normalizedRelatedPosts = normalizeRelatedPosts( relatedPosts );
 	const { editPost } = useDispatch( 'core/editor' );
-	const setPostMeta = ( meta ) => editPost( { meta } );
+	const setPostMeta = ( meta ) => {
+		const currentMeta =
+			select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+
+		editPost( {
+			meta: {
+				...currentMeta,
+				...meta,
+			},
+		} );
+	};
 
 	return (
 		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
@@ -31,7 +42,6 @@ const PostsSelector = ( {
 				checked={ postMeta.relate_posts }
 				onChange={ () => {
 					setPostMeta( {
-						...postMeta,
 						relate_posts: ! postMeta.relate_posts,
 						related_posts: normalizedRelatedPosts,
 					} );

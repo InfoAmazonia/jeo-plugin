@@ -71,7 +71,7 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 									}
 								}
 							} }
-							style={ { height: '50vh' } }
+							style={ { height: '100%', width: '100%' } }
 							latitude={ loadedMap.meta.center_lat || mapDefaults.lat }
 							longitude={ loadedMap.meta.center_lon || mapDefaults.lng }
 							zoom={ loadedMap.meta.initial_zoom || mapDefaults.zoom }

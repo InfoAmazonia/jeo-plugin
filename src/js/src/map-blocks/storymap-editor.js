@@ -41,9 +41,11 @@ import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import {
+	getLayerId,
+	layerIdsMatch,
 	moveActiveIndex,
+	reconcileSelectedLayersWithAvailableLayers,
 	reorderSlides,
-	sortSelectedLayersByMapOrder,
 } from './storymap-ordering';
 import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
@@ -391,6 +393,82 @@ function configureSingleLineEditor( editor ) {
 	}, true );
 }
 
+function stabilizeStorymapEditorScroll( editor ) {
+	const editableElement = editor.ui.getEditableElement();
+
+	if ( ! editableElement || editableElement.dataset.jeoStableOuterScroll === 'true' ) {
+		return;
+	}
+
+	editableElement.dataset.jeoStableOuterScroll = 'true';
+
+	const getScrollContainer = () => (
+		editableElement.closest( '.interface-interface-skeleton__content' ) ||
+		document.querySelector( '.interface-interface-skeleton__content' )
+	);
+
+	let anchoredScrollTop = null;
+	let lastCaptureTime = 0;
+
+	const captureScroll = () => {
+		const scrollContainer = getScrollContainer();
+
+		if ( ! scrollContainer ) {
+			return;
+		}
+
+		anchoredScrollTop = scrollContainer.scrollTop;
+		lastCaptureTime = Date.now();
+	};
+
+	const restoreScroll = () => {
+		const scrollContainer = getScrollContainer();
+
+		if (
+			! scrollContainer ||
+			anchoredScrollTop === null ||
+			Date.now() - lastCaptureTime > 1000
+		) {
+			return;
+		}
+
+		const restoreIfStillEditing = () => {
+			if (
+				document.activeElement !== editableElement &&
+				! editableElement.contains( document.activeElement )
+			) {
+				return;
+			}
+
+			if ( Math.abs( scrollContainer.scrollTop - anchoredScrollTop ) > 1 ) {
+				scrollContainer.scrollTop = anchoredScrollTop;
+			}
+		};
+
+		window.requestAnimationFrame( restoreIfStillEditing );
+		window.setTimeout( restoreIfStillEditing, 0 );
+		window.setTimeout( restoreIfStillEditing, 80 );
+	};
+
+	const shouldStabilizeKey = ( event ) => (
+		! event.metaKey &&
+		! event.ctrlKey &&
+		! event.altKey &&
+		( event.key.length === 1 || [ 'Enter', 'Backspace', 'Delete' ].includes( event.key ) )
+	);
+
+	editableElement.addEventListener( 'beforeinput', captureScroll, true );
+	editableElement.addEventListener( 'keydown', ( event ) => {
+		if ( shouldStabilizeKey( event ) ) {
+			captureScroll();
+		}
+	}, true );
+	editableElement.addEventListener( 'input', restoreScroll, true );
+	editableElement.addEventListener( 'keyup', restoreScroll, true );
+
+	editor.model.document.on( 'change:data', restoreScroll );
+}
+
 export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	const blockProps = useBlockProps( { className: 'jeo-mapblock storymap' } );
 	const instanceId = useId();
@@ -466,7 +544,12 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
 	}, [ JSON.stringify( loadedMap?.meta.layers?.map( ( l ) => l.id ) || [] ) ] );
 
-	const { records: loadedLayers = [] } = useRecordsByIds( {
+	const {
+		records: loadedLayers = [],
+		isLoading: loadingLayers,
+		error: layersError,
+		hasResolved: layersResolved,
+	} = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
@@ -478,7 +561,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 				selectedLayers:
 					attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [],
 				navigateLayers:
-					attributes.navigateMapLayers?.map( ( layer ) => layer.id ) || [],
+					attributes.navigateMapLayers?.map( getLayerId ) || [],
 			} ),
 		[ attributes.slides, attributes.navigateMapLayers, currentSlideIndex ]
 	);
@@ -540,26 +623,24 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 	}, [ highlightedSlideKey ] );
 
 	useEffect( () => {
-		// Post already exists
-		if ( attributes.slides && loadedMap && loadedLayers ) {
-			const loadedMapLayerIds = new Set(
-				loadedMap.meta.layers.map( ( layer ) => layer.id )
-			);
-			const availableLayerIds = new Set(
-				loadedLayers.map( ( layer ) => layer.id )
-			);
-			const newSlides = attributes.slides.map( ( slide ) => {
-				const selectedLayers = ( slide.selectedLayers ?? [] ).filter(
-					( selectedLayer ) =>
-						loadedMapLayerIds.has( selectedLayer.id ) &&
-						availableLayerIds.has( selectedLayer.id )
-				);
+		if ( ! loadedMap || ! layersResolved || loadingLayers || layersError ) {
+			return;
+		}
 
+		if ( layerIds.length > 0 && loadedLayers.length === 0 ) {
+			return;
+		}
+
+		// Post already exists
+		if ( attributes.slides ) {
+			const loadedMapLayers = loadedMap.meta.layers ?? [];
+			const newSlides = attributes.slides.map( ( slide ) => {
 				return {
 					...slide,
-					selectedLayers: sortSelectedLayersByMapOrder(
-						selectedLayers,
-						loadedMap.meta.layers
+					selectedLayers: reconcileSelectedLayersWithAvailableLayers(
+						slide.selectedLayers,
+						loadedMapLayers,
+						loadedLayers
 					),
 				};
 			} );
@@ -580,7 +661,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			loadedLayers: [],
 			navigateMapLayers: loadedLayers ?? [],
 		} );
-	}, [ loadedMap, loadedLayers ] );
+	}, [ loadedMap, loadedLayers, layerIds.length, layersResolved, loadingLayers, layersError ] );
 
 	const editorConfig = useMemo( () => {
 		const layerColors = (loadedLayers ?? []).flatMap( ( layer ) => {
@@ -642,6 +723,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 		if ( options.singleLine ) {
 			configureSingleLineEditor( editor );
+		}
+
+		if ( options.stabilizeOuterScroll ) {
+			stabilizeStorymapEditorScroll( editor );
 		}
 	};
 
@@ -734,7 +819,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								( layer ) => {
 									if(attributes.navigateMapLayers) {
 										const layerOptions = attributes.navigateMapLayers.find(
-											( { id } ) => id === layer.id
+											( item ) => layerIdsMatch( item, layer )
 										);
 										if ( layerOptions ) {
 											return renderLayer( {
@@ -762,18 +847,22 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 									</Button>
 								</div>
 								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
-								<CKEditor
-									editor={ ClassicEditor }
-									data={ attributes.description }
-									config={ editorConfig }
-									onReady={ setupEditor }
-									onChange={ ( event, editor ) =>  {
-										setAttributes( {
-											...attributes,
-											description: editor.getData(),
-										} );
-									} }
-								/>
+								<div className="storymap-description-editor">
+									<CKEditor
+										editor={ ClassicEditor }
+										data={ attributes.description }
+										config={ editorConfig }
+										onReady={ ( editor ) => setupEditor( editor, {
+											stabilizeOuterScroll: true,
+										} ) }
+										onChange={ ( event, editor ) =>  {
+											setAttributes( {
+												...attributes,
+												description: editor.getData(),
+											} );
+										} }
+									/>
+								</div>
 								<CheckboxControl
 									className="introduction-button"
 									label={ __( 'Show story map introduction', 'jeo'  ) }
@@ -875,15 +964,15 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	background: 'rgb(240, 240, 240)',
 																};
 
-																attributes.slides[ slideIndex ].selectedLayers.map(
-																	( selectedLayer ) => {
-																		if ( selectedLayer.id === item.id ) {
-																			layerButtonStyle = {
-																				background: 'rgb(200, 200, 200)',
-																			};
+																	attributes.slides[ slideIndex ].selectedLayers.map(
+																		( selectedLayer ) => {
+																			if ( layerIdsMatch( selectedLayer, item ) ) {
+																				layerButtonStyle = {
+																					background: 'rgb(200, 200, 200)',
+																				};
+																			}
 																		}
-																	}
-																);
+																	);
 
 																if ( ! item ) {
 																	return null;
@@ -891,45 +980,45 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 
 																return (
 																	<Button
-																		style={ layerButtonStyle }
-																		className="layer"
-																		key={ item.id }
-																		onClick={ () => {
-																			setCurrentSlideIndex( slideIndex );
+																			style={ layerButtonStyle }
+																			className="layer"
+																			key={ item.id }
+																			onClick={ () => {
+																				setCurrentSlideIndex( slideIndex );
 
-																			const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
-																			let hasBeenRemoved = false;
+																				const oldSlides = JSON.parse(JSON.stringify(attributes.slides));
+																				let hasBeenRemoved = false;
 
-																			oldSlides[ slideIndex ].selectedLayers.map(
-																				( selectedLayer, indexOfLayer ) => {
-																					if ( selectedLayer.id === item.id ) {
-																						oldSlides[
-																							slideIndex
-																						].selectedLayers.splice(
-																							indexOfLayer,
-																							1
-																						);
-																						hasBeenRemoved = true;
-																					}
-																				}
-																			);
-
-																			if ( ! hasBeenRemoved ) {
-
-																				let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
-																				let itemPosition = false;
-
-																				const findItemPostion = (item) => {
-																					let itemPosition = -1;
-
-																					loadedMap.meta.layers.forEach( (layer, index) => {
-																						if( item.id === layer.id ) {
-																							itemPosition = index;
+																				oldSlides[ slideIndex ].selectedLayers.map(
+																					( selectedLayer, indexOfLayer ) => {
+																						if ( layerIdsMatch( selectedLayer, item ) ) {
+																							oldSlides[
+																								slideIndex
+																							].selectedLayers.splice(
+																								indexOfLayer,
+																								1
+																							);
+																							hasBeenRemoved = true;
 																						}
-																					})
+																					}
+																				);
 
-																					return itemPosition;
-																				}
+																				if ( ! hasBeenRemoved ) {
+
+																					let defaultOrder = Array(loadedMap.meta.layers.length).fill(null);
+																					let itemPosition = false;
+
+																					const findItemPostion = (item) => {
+																						let itemPosition = -1;
+
+																						loadedMap.meta.layers.forEach( (layer, index) => {
+																							if( layerIdsMatch( item, layer ) ) {
+																								itemPosition = index;
+																							}
+																						})
+
+																						return itemPosition;
+																					}
 
 																				oldSlides[ slideIndex ].selectedLayers.map( (layer) => {
 																					const position = findItemPostion(layer);
@@ -1036,7 +1125,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	editor={ ClassicEditor }
 																	data={ slide.title }
 																	config={ titleEditorConfig }
-																	onReady={ ( editor ) => setupEditor( editor, { singleLine: true } ) }
+																	onReady={ ( editor ) => setupEditor( editor, {
+																		singleLine: true,
+																		stabilizeOuterScroll: true,
+																	} ) }
 																	onChange={ ( event, editor ) => {
 																		setCurrentSlideIndex( slideIndex );
 
@@ -1055,6 +1147,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														) }</span>
 														{ /* Same isolation for the content editor. */ }
 														<div
+															className="storymap-content-editor"
 															onMouseDown={ ( e ) => e.stopPropagation() }
 															onKeyDown={ ( e ) => e.stopPropagation() }
 														>
@@ -1062,7 +1155,9 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																editor={ ClassicEditor }
 																data={ slide.content }
 																config={ editorConfig }
-																onReady={ setupEditor }
+																onReady={ ( editor ) => setupEditor( editor, {
+																	stabilizeOuterScroll: true,
+																} ) }
 																onChange={ ( event, editor ) => {
 																	setCurrentSlideIndex( slideIndex );
 

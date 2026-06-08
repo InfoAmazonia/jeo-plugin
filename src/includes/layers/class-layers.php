@@ -34,6 +34,7 @@ class Layers {
 	protected function init() {
 		add_action( 'init', array( $this, 'register_post_type' ), 20 );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
+		add_action( 'add_meta_boxes', array( $this, 'remove_custom_fields_meta_box' ), 99 );
 		add_filter( "rest_{$this->post_type}_collection_params", array( $this, 'rest_collection_params' ) );
 		$this->register_rest_meta_validation();
 	}
@@ -246,6 +247,19 @@ class Layers {
 				'description'   => __( 'AI-suggested default style with optional filter, paint, and layout for mapbox-tileset-vector layers', 'jeo' ),
 			)
 		);
+	}
+
+	/**
+	 * Keep REST metadata support enabled while hiding the legacy custom fields UI.
+	 *
+	 * JEO layer metadata is edited through dedicated editor sidebars. Leaving the
+	 * core custom fields metabox visible can resubmit stale values after a REST
+	 * editor save and overwrite the sidebar state.
+	 *
+	 * @return void
+	 */
+	public function remove_custom_fields_meta_box() {
+		remove_meta_box( 'postcustom', $this->post_type, 'normal' );
 	}
 
 	/**

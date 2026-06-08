@@ -153,19 +153,37 @@
 	width: 100%;
 }
 
-/* Content editor map blocks need an explicit width when floated left/right.
-   Otherwise the wrapper can shrink to 0 because the interactive map internals
-   are absolutely positioned. */
-.wp-block-jeo-map.alignleft,
-.wp-block-jeo-map.alignright {
-	--jeo-aligned-map-base-width: var( --wp--style--global--content-size, 645px );
-	--jeo-aligned-map-expanded-width: calc( var( --jeo-aligned-map-base-width ) * 1.6 );
-	box-sizing: border-box;
-	display: table;
-	max-width: none;
-	width: auto;
+/* The map component is absolutely positioned internally, so the editor preview
+   needs a real container size before the map runtime can measure it. */
+.wp-block-jeo-map .jeo-preview-area {
+	height: 50vh;
+	max-height: 500px;
+	min-height: 320px;
+	width: 100%;
 }
 
+.wp-block-jeo-map .mapboxgl-map,
+.wp-block-jeo-map .maplibregl-map {
+	height: 100%;
+	width: 100%;
+}
+
+/* In the block editor, alignment may live on Gutenberg's wrapper as
+   data-align rather than on the JEO block element itself. */
+.wp-block[data-align="left"] > .wp-block-jeo-map,
+.wp-block[data-align="right"] > .wp-block-jeo-map,
+.wp-block-jeo-map.alignleft,
+.wp-block-jeo-map.alignright {
+	--jeo-aligned-map-width: 420px;
+	--jeo-aligned-map-aspect-ratio: 8 / 9;
+	box-sizing: border-box;
+	display: table;
+	max-width: min( 50%, calc( 100vw - 2rem ) );
+	min-width: 0;
+	width: min( var( --jeo-aligned-map-width ), 50%, calc( 100vw - 2rem ) );
+}
+
+.wp-block[data-align="left"] > .wp-block-jeo-map,
 .wp-block-jeo-map.alignleft {
 	margin-right: 1em;
 	margin-left: 0;
@@ -173,6 +191,7 @@
 	margin-bottom: 0.5em;
 }
 
+.wp-block[data-align="right"] > .wp-block-jeo-map,
 .wp-block-jeo-map.alignright {
 	margin-left: 1em;
 	margin-right: 0;
@@ -180,38 +199,61 @@
 	margin-bottom: 0.5em;
 }
 
+.wp-block[data-align="left"] > .wp-block-jeo-map .jeo-preview-area,
+.wp-block[data-align="right"] > .wp-block-jeo-map .jeo-preview-area,
 .wp-block-jeo-map.alignleft .jeo-preview-area,
 .wp-block-jeo-map.alignright .jeo-preview-area,
+.wp-block[data-align="left"] > .wp-block-jeo-map .mapboxgl-map,
+.wp-block[data-align="right"] > .wp-block-jeo-map .mapboxgl-map,
 .wp-block-jeo-map.alignleft .mapboxgl-map,
 .wp-block-jeo-map.alignright .mapboxgl-map,
+.wp-block[data-align="left"] > .wp-block-jeo-map .maplibregl-map,
+.wp-block[data-align="right"] > .wp-block-jeo-map .maplibregl-map,
 .wp-block-jeo-map.alignleft .maplibregl-map,
 .wp-block-jeo-map.alignright .maplibregl-map {
 	max-width: none;
 	width: 100%;
 }
 
+.wp-block[data-align="left"] > .wp-block-jeo-map .jeo-preview-area,
+.wp-block[data-align="right"] > .wp-block-jeo-map .jeo-preview-area,
 .wp-block-jeo-map.alignleft .jeo-preview-area,
 .wp-block-jeo-map.alignright .jeo-preview-area {
-	min-width: min( var( --jeo-aligned-map-base-width ), calc( 100vw - 2rem ) );
-	width: min( var( --jeo-aligned-map-expanded-width ), calc( 100vw - 2rem ) );
+	aspect-ratio: var( --jeo-aligned-map-aspect-ratio );
+	height: auto;
+	max-height: none;
+	min-height: 0;
 }
 
 @media (max-width: 782px) {
+	.wp-block[data-align="left"] > .wp-block-jeo-map,
+	.wp-block[data-align="right"] > .wp-block-jeo-map,
 	.wp-block-jeo-map.alignleft,
 	.wp-block-jeo-map.alignright {
 		display: block;
 		float: none;
+		max-width: none;
 		margin-left: 0;
 		margin-right: 0;
 		width: 100%;
 	}
 
+	.wp-block[data-align="left"] > .wp-block-jeo-map .jeo-preview-area,
+	.wp-block[data-align="right"] > .wp-block-jeo-map .jeo-preview-area,
 	.wp-block-jeo-map.alignleft .jeo-preview-area,
 	.wp-block-jeo-map.alignright .jeo-preview-area,
+	.wp-block[data-align="left"] > .wp-block-jeo-map .mapboxgl-map,
+	.wp-block[data-align="right"] > .wp-block-jeo-map .mapboxgl-map,
 	.wp-block-jeo-map.alignleft .mapboxgl-map,
 	.wp-block-jeo-map.alignright .mapboxgl-map,
+	.wp-block[data-align="left"] > .wp-block-jeo-map .maplibregl-map,
+	.wp-block[data-align="right"] > .wp-block-jeo-map .maplibregl-map,
 	.wp-block-jeo-map.alignleft .maplibregl-map,
 	.wp-block-jeo-map.alignright .maplibregl-map {
+		aspect-ratio: auto;
+		height: 50vh;
+		max-height: 500px;
+		min-height: 320px;
 		min-width: 0;
 		width: 100%;
 	}

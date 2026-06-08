@@ -120,7 +120,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 				<Map
 					key={ `${ key }:${ currentZoom }:${ layerSettingsKey }` }
 					ref={ mapRef }
-					style={ { height: '50vh' } }
+					style={ { height: '100%', width: '100%' } }
 					latitude={ normalizedAttributes.center_lat }
 					longitude={ normalizedAttributes.center_lon }
 					zoom={ currentZoom || mapDefaults.zoom }

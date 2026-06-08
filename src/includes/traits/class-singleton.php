@@ -84,7 +84,18 @@ trait Singleton {
 	 * @return bool
 	 */
 	public function should_load_discovery_assets() {
-		return is_page_template( 'discovery.php' );
+		if ( is_page_template( 'discovery.php' ) ) {
+			return true;
+		}
+
+		if ( get_query_var( 'jeo_embed' ) === 'map' ) {
+			$discovery = filter_input( INPUT_GET, 'discovery', FILTER_DEFAULT );
+			$discovery = is_string( $discovery ) ? sanitize_text_field( $discovery ) : false;
+
+			return ! empty( $discovery );
+		}
+
+		return false;
 	}
 
 	/**

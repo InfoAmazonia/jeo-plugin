@@ -109,7 +109,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 	}, [ attributes ] );
 
 	const setLayers = useCallback( ( layers ) => {
-		setAttributes( { ...attributesRef.current, layers } );
+		setAttributes( { layers } );
 	}, [ setAttributes ] );
 
 	const widths = useMemo( () => [], [] );
@@ -498,7 +498,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 													<p
 														onClick={ () => {
 															setAttributes( {
-																...attributes,
 																layers: [ ...attributes.layers, setLayer( layer.id ) ],
 															} );
 														} }

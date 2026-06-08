@@ -107,9 +107,17 @@ export const useRecordsByIds = ( {
 		[ normalizedIds, chunkSize ]
 	);
 	const queryKey = JSON.stringify( query );
+	const requestKey = JSON.stringify( {
+		enabled: Boolean( enabled && path && normalizedIds.length > 0 ),
+		path: path || '',
+		ids: normalizedIds,
+		query: queryKey,
+	} );
 	const [ records, setRecords ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ error, setError ] = useState( null );
+	const [ resolvedRequestKey, setResolvedRequestKey ] = useState( null );
+	const hasResolved = resolvedRequestKey === requestKey;
 
 	useEffect( () => {
 		let isCancelled = false;
@@ -118,6 +126,7 @@ export const useRecordsByIds = ( {
 			setRecords( [] );
 			setIsLoading( false );
 			setError( null );
+			setResolvedRequestKey( requestKey );
 			return undefined;
 		}
 
@@ -144,11 +153,13 @@ export const useRecordsByIds = ( {
 				setRecords(
 					mergeRecordsByIdOrder( normalizedIds, chunkedRecords.flat() )
 				);
+				setResolvedRequestKey( requestKey );
 			} )
 			.catch( ( nextError ) => {
 				if ( ! isCancelled ) {
 					setError( nextError );
 					setRecords( [] );
+					setResolvedRequestKey( requestKey );
 				}
 			} )
 			.finally( () => {
@@ -160,9 +171,9 @@ export const useRecordsByIds = ( {
 		return () => {
 			isCancelled = true;
 		};
-	}, [ enabled, idChunks, normalizedIds, path, queryKey ] );
+	}, [ enabled, idChunks, normalizedIds, path, queryKey, requestKey ] );
 
-	return { records, isLoading, error };
+	return { records, isLoading, error, hasResolved };
 };
 
 export const usePaginatedRecords = ( {
