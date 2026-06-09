@@ -1,63 +1,30 @@
 import { toFiniteNumber } from './map-numbers';
 
-const LATITUDE_MAX = 90;
-const LATITUDE_MIN = -90;
-const LONGITUDE_MAX = 180;
-const LONGITUDE_MIN = -180;
-
-function isWithinRange( value, min, max ) {
-	return value >= min && value <= max;
-}
-
-function isValidCoordinatePair( longitude, latitude ) {
+function hasValidLatitudes( south, north ) {
 	return (
-		isWithinRange( longitude, LONGITUDE_MIN, LONGITUDE_MAX ) &&
-		isWithinRange( latitude, LATITUDE_MIN, LATITUDE_MAX )
-	);
-}
-
-function isValidBounds( bounds ) {
-	if ( ! Array.isArray( bounds ) || bounds.length !== 2 ) {
-		return false;
-	}
-
-	const [ southWest, northEast ] = bounds;
-
-	if ( ! Array.isArray( southWest ) || ! Array.isArray( northEast ) ) {
-		return false;
-	}
-
-	const [ west, south ] = southWest;
-	const [ east, north ] = northEast;
-
-	return (
-		isValidCoordinatePair( west, south ) &&
-		isValidCoordinatePair( east, north ) &&
+		south >= -90 &&
+		south <= 90 &&
+		north >= -90 &&
+		north <= 90 &&
 		south <= north
 	);
 }
 
-function boundsContainCenter( bounds, center ) {
-	if ( ! Array.isArray( center ) || center.length !== 2 ) {
-		return false;
-	}
-
-	const [ longitude, latitude ] = center;
-
-	if ( ! isValidCoordinatePair( longitude, latitude ) ) {
-		return false;
-	}
-
-	const [ [ west, south ], [ east, north ] ] = bounds;
+function containsCenter( west, south, east, north, center ) {
+	const [ longitude, latitude ] = center || [];
 	const containsLongitude = west <= east ?
 		longitude >= west && longitude <= east :
 		longitude >= west || longitude <= east;
 
-	return containsLongitude && latitude >= south && latitude <= north;
+	return (
+		containsLongitude &&
+		latitude >= south &&
+		latitude <= north
+	);
 }
 
-export function getPanLimitsMaxBounds( panLimits, options = {} ) {
-	if ( ! panLimits || typeof panLimits !== 'object' ) {
+export function getPanLimitsMaxBounds( panLimits, center = null ) {
+	if ( ! panLimits ) {
 		return null;
 	}
 
@@ -66,40 +33,31 @@ export function getPanLimitsMaxBounds( panLimits, options = {} ) {
 	const south = toFiniteNumber( panLimits.south );
 	const west = toFiniteNumber( panLimits.west );
 
-	if ( [ east, north, south, west ].some( ( value ) => value === null ) ) {
+	if ( [ east, north, south, west ].includes( null ) ) {
 		return null;
 	}
 
-	const standardBounds = [
+	const standardIsValid = hasValidLatitudes( south, north );
+	const legacyIsValid = hasValidLatitudes( west, east );
+
+	if (
+		legacyIsValid &&
+		(
+			! standardIsValid ||
+			(
+				containsCenter( south, west, north, east, center ) &&
+				! containsCenter( west, south, east, north, center )
+			)
+		)
+	) {
+		return [
+			[ south, west ],
+			[ north, east ],
+		];
+	}
+
+	return standardIsValid ? [
 		[ west, south ],
 		[ east, north ],
-	];
-	const legacyBounds = [
-		[ south, west ],
-		[ north, east ],
-	];
-	const standardIsValid = isValidBounds( standardBounds );
-	const legacyIsValid = isValidBounds( legacyBounds );
-
-	if ( ! standardIsValid && ! legacyIsValid ) {
-		return null;
-	}
-
-	if ( standardIsValid && ! legacyIsValid ) {
-		return standardBounds;
-	}
-
-	if ( ! standardIsValid && legacyIsValid ) {
-		return legacyBounds;
-	}
-
-	const center = options.center;
-	const standardContainsCenter = boundsContainCenter( standardBounds, center );
-	const legacyContainsCenter = boundsContainCenter( legacyBounds, center );
-
-	if ( legacyContainsCenter && ! standardContainsCenter ) {
-		return legacyBounds;
-	}
-
-	return standardBounds;
+	] : null;
 }

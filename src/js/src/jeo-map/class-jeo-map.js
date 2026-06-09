@@ -169,7 +169,7 @@ export default class JeoMap {
 
 					const panLimitsMaxBounds = getPanLimitsMaxBounds(
 						this.getArg( 'pan_limits' ),
-						{ center: initialCenter }
+						initialCenter
 					);
 
 					if ( panLimitsMaxBounds ) {

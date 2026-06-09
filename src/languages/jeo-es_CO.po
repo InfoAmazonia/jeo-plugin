@@ -96,7 +96,7 @@ msgstr "Ciudad sub-nivel 1"
 
 #: includes/layers/class-layers.php:50
 #: includes/layers/class-layers.php:61
-#: js/src/jeo-map/class-jeo-map.js:1846
+#: js/src/jeo-map/class-jeo-map.js:1850
 #: js/src/map-blocks/storymap-editor.js:961
 msgid "Layers"
 msgstr "Capas"
@@ -701,12 +701,12 @@ msgstr "Volver al inicio"
 
 #: templates/map-content-layers-list.php:18
 #: templates/map-content-layers-list.php:20
-#: js/src/jeo-map/class-jeo-map.js:774
+#: js/src/jeo-map/class-jeo-map.js:778
 msgid "Attribution:"
 msgstr "Atribución:"
 
 #: templates/map-content-layers-list.php:25
-#: js/src/jeo-map/class-jeo-map.js:795
+#: js/src/jeo-map/class-jeo-map.js:799
 msgid "Download from source"
 msgstr "Descargar desde la fuente"
 
@@ -1113,57 +1113,57 @@ msgid "Map layers"
 msgstr "Capas de mapa"
 
 #: js/src/discovery/index.js:540
-#: js/src/jeo-map/class-jeo-map.js:658
+#: js/src/jeo-map/class-jeo-map.js:662
 #: js/src/layers-sidebar/layers-sidebar.js:152
 msgid "Legend"
 msgstr "Leyenda"
 
-#: js/src/jeo-map/class-jeo-map.js:378
+#: js/src/jeo-map/class-jeo-map.js:382
 msgid "This map doesn't have layers"
 msgstr "Este mapa no tiene capas"
 
-#: js/src/jeo-map/class-jeo-map.js:808
+#: js/src/jeo-map/class-jeo-map.js:812
 msgid "Close popup"
 msgstr "Cerrar ventana emergente"
 
-#: js/src/jeo-map/class-jeo-map.js:733
-#: js/src/jeo-map/class-jeo-map.js:826
+#: js/src/jeo-map/class-jeo-map.js:737
+#: js/src/jeo-map/class-jeo-map.js:830
 msgid "Info"
 msgstr "Información"
 
-#: js/src/jeo-map/class-jeo-map.js:1508
+#: js/src/jeo-map/class-jeo-map.js:1512
 msgid "Show previous post"
 msgstr "Mostrar la entrada anterior"
 
-#: js/src/jeo-map/class-jeo-map.js:1512
+#: js/src/jeo-map/class-jeo-map.js:1516
 msgid "Show next post"
 msgstr "Mostrar la entrada siguiente"
 
 #. translators: %d: number of markers in the current map area.
-#: js/src/jeo-map/class-jeo-map.js:1551
+#: js/src/jeo-map/class-jeo-map.js:1555
 #, js-format
 msgid "%d marker in this area"
 msgid_plural "%d markers in this area"
 msgstr[0] "%d marcador en esta área"
 msgstr[1] "%d marcadores en esta área"
 
-#: js/src/jeo-storymap/storymap-display.js:505
+#: js/src/jeo-storymap/storymap-display.js:553
 msgid "at"
 msgstr "en"
 
-#: js/src/jeo-storymap/storymap-display.js:518
+#: js/src/jeo-storymap/storymap-display.js:566
 msgid "START"
 msgstr "INICIAR"
 
-#: js/src/jeo-storymap/storymap-display.js:532
+#: js/src/jeo-storymap/storymap-display.js:580
 msgid "skip intro"
 msgstr "saltar introducción"
 
-#: js/src/jeo-storymap/storymap-display.js:625
+#: js/src/jeo-storymap/storymap-display.js:673
 msgid "Back to top"
 msgstr "Volver al inicio"
 
-#: js/src/jeo-storymap/storymap-display.js:671
+#: js/src/jeo-storymap/storymap-display.js:719
 msgid "NAVIGATE THE MAP"
 msgstr "NAVEGAR EL MAPA"
 
@@ -1872,7 +1872,7 @@ msgid "Ex. https://example.com/wp-content/uploads/fonts/jeo-story-font.css"
 msgstr "Ej. https://ejemplo.com/wp-content/uploads/fonts/jeo-story-font.css"
 
 #. translators: %s is the authors list
-#: js/src/jeo-storymap/storymap-display.js:37
+#: js/src/jeo-storymap/storymap-display.js:39
 #, js-format
 msgid "By %s"
 msgstr "Por %s"
