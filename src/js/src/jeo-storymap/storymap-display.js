@@ -9,6 +9,7 @@ import { renderLayer } from '../map-blocks/map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
 import { formatDate, formatHour, joinList } from '../shared/intl';
 import { EMPTY_STYLE } from '../shared/styles';
+import { setMapLayerVisibility } from './layer-visibility';
 
 import './storymap-display.scss';
 
@@ -246,41 +247,8 @@ class StoryMapDisplay extends Component {
 		attributionButton?.setAttribute( 'hidden', 'hidden' );
 	}
 
-	isMapStyleReady() {
-		if ( ! this.map ) {
-			return false;
-		}
-
-		if ( typeof this.map.isStyleLoaded !== 'function' ) {
-			return true;
-		}
-
-		try {
-			return this.map.isStyleLoaded();
-		} catch ( error ) {
-			return false;
-		}
-	}
-
 	setStoryLayerVisibility( layerSlug, visibility ) {
-		if ( ! layerSlug || ! this.isMapStyleReady() || ! this.map?.getLayer?.( layerSlug ) ) {
-			return;
-		}
-
-		try {
-			this.map.setLayoutProperty( layerSlug, 'visibility', visibility );
-		} catch ( error ) {
-			const message = error?.message || '';
-
-			if (
-				message.includes( 'Style is not done loading' ) ||
-				message.includes( 'does not exist in the map' )
-			) {
-				return;
-			}
-
-			throw error;
-		}
+		setMapLayerVisibility( this.map, layerSlug, visibility );
 	}
 
 	applyChapterLayerVisibility( chapter, showAllLayers = false ) {
