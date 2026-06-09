@@ -207,8 +207,8 @@ msgstr "Tipo de camada não registrado"
 #. translators: Explore is the name of JEO's discovery page feature.
 #: includes/loaders.php:490
 #: templates/embed-discovery.php:18
-#: js/src/discovery/blocks/sidebar.js:192
-#: js/src/discovery/index.js:462
+#: js/src/discovery/blocks/sidebar.js:291
+#: js/src/discovery/index.js:514
 msgid "Explore"
 msgstr "Explorar"
 
@@ -588,7 +588,7 @@ msgstr "Cor do botão de fechar"
 msgid "Embed"
 msgstr "Embed"
 
-#: js/src/discovery/index.js:490
+#: js/src/discovery/index.js:542
 msgctxt "discovery share action"
 msgid "Embed"
 msgstr "Embed"
@@ -913,28 +913,31 @@ msgstr "Uma lista de rótulos e cores"
 msgid "Choose Image"
 msgstr "Escolher imagem"
 
-#: js/src/discovery/blocks/date-range-filter.js:125
-#: js/src/discovery/blocks/map-item.js:165
+#: js/src/discovery/blocks/date-range-filter.js:248
+#: js/src/discovery/blocks/map-item.js:169
+#: js/src/discovery/blocks/stories.js:1303
 #: js/src/map-blocks/layers-settings.js:136
 msgid "Clear"
 msgstr "Limpar"
 
-#: js/src/discovery/blocks/date-range-filter.js:142
-#: js/src/discovery/blocks/map-item.js:165
-#: js/src/discovery/blocks/stories.js:212
+#: js/src/discovery/blocks/date-range-filter.js:265
+#: js/src/discovery/blocks/map-item.js:169
+#: js/src/discovery/blocks/stories.js:294
 msgid "Apply"
 msgstr "Aplicar"
 
-#: js/src/discovery/blocks/tag-filter-control.js:54
+#: js/src/discovery/blocks/stories.js:1203
+#: js/src/discovery/blocks/tag-filter-control.js:93
 #: js/src/posts-selector/index.js:67
 msgid "Tags"
 msgstr "Tags"
 
-#: js/src/discovery/blocks/tag-filter-control.js:55
+#: js/src/discovery/blocks/tag-filter-control.js:94
 msgid "Filter stories by tag"
 msgstr "Filtrar histórias por tag"
 
-#: js/src/discovery/blocks/tag-filter-control.js:127
+#. translators: %s: selected tag name.
+#: js/src/discovery/blocks/tag-filter-control.js:126
 #, js-format
 msgid "Remove tag %s"
 msgstr "Remover tag %s"
@@ -955,221 +958,234 @@ msgstr "Ano"
 msgid "Next month"
 msgstr "Próximo mês"
 
-#: js/src/discovery/blocks/stories.js:210
+#: js/src/discovery/blocks/stories.js:292
 msgid "MM/DD/YYYY"
 msgstr "DD/MM/YYYY"
 
-#: js/src/discovery/blocks/stories.js:211
+#: js/src/discovery/blocks/stories.js:293
 msgid " - "
 msgstr " - "
 
-#: js/src/discovery/blocks/stories.js:213
+#: js/src/discovery/blocks/stories.js:295
 #: js/src/map-blocks/map-editor.js:146
 #: js/src/map-blocks/storymap-editor.js:1356
 #: js/src/posts-sidebar/geo-posts.js:448
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: js/src/discovery/blocks/stories.js:214
+#: js/src/discovery/blocks/stories.js:296
 msgid "From"
 msgstr "De"
 
-#: js/src/discovery/blocks/stories.js:215
+#: js/src/discovery/blocks/stories.js:297
 msgid "To"
 msgstr "Até"
 
-#: js/src/discovery/blocks/stories.js:216
+#: js/src/discovery/blocks/stories.js:298
 msgid "Custom"
 msgstr "Personalizado"
 
-#: js/src/discovery/blocks/stories.js:218
+#: js/src/discovery/blocks/stories.js:300
 msgid "Su"
 msgstr "Do"
 
-#: js/src/discovery/blocks/stories.js:219
+#: js/src/discovery/blocks/stories.js:301
 msgid "Mo"
 msgstr "Se"
 
-#: js/src/discovery/blocks/stories.js:220
+#: js/src/discovery/blocks/stories.js:302
 msgid "Tu"
 msgstr "Te"
 
-#: js/src/discovery/blocks/stories.js:221
+#: js/src/discovery/blocks/stories.js:303
 msgid "We"
 msgstr "Qu"
 
-#: js/src/discovery/blocks/stories.js:222
+#: js/src/discovery/blocks/stories.js:304
 msgid "Th"
 msgstr "Qu"
 
-#: js/src/discovery/blocks/stories.js:223
+#: js/src/discovery/blocks/stories.js:305
 msgid "Fr"
 msgstr "Se"
 
-#: js/src/discovery/blocks/stories.js:224
+#: js/src/discovery/blocks/stories.js:306
 msgid "Sa"
 msgstr "Sá"
 
-#: js/src/discovery/blocks/stories.js:227
+#: js/src/discovery/blocks/date-range-filter.js:84
+#: js/src/discovery/blocks/stories.js:309
 msgid "January"
 msgstr "Janeiro"
 
-#: js/src/discovery/blocks/stories.js:228
+#: js/src/discovery/blocks/date-range-filter.js:85
+#: js/src/discovery/blocks/stories.js:310
 msgid "February"
 msgstr "Fevereiro"
 
-#: js/src/discovery/blocks/stories.js:229
+#: js/src/discovery/blocks/date-range-filter.js:86
+#: js/src/discovery/blocks/stories.js:311
 msgid "March"
 msgstr "Março"
 
-#: js/src/discovery/blocks/stories.js:230
+#: js/src/discovery/blocks/date-range-filter.js:87
+#: js/src/discovery/blocks/stories.js:312
 msgid "April"
 msgstr "Abril"
 
-#: js/src/discovery/blocks/stories.js:231
+#: js/src/discovery/blocks/date-range-filter.js:88
+#: js/src/discovery/blocks/stories.js:313
 msgid "May"
 msgstr "Maio"
 
-#: js/src/discovery/blocks/stories.js:232
+#: js/src/discovery/blocks/date-range-filter.js:89
+#: js/src/discovery/blocks/stories.js:314
 msgid "June"
 msgstr "Junho"
 
-#: js/src/discovery/blocks/stories.js:233
+#: js/src/discovery/blocks/date-range-filter.js:90
+#: js/src/discovery/blocks/stories.js:315
 msgid "July"
 msgstr "Julho"
 
-#: js/src/discovery/blocks/stories.js:234
+#: js/src/discovery/blocks/date-range-filter.js:91
+#: js/src/discovery/blocks/stories.js:316
 msgid "August"
 msgstr "Agosto"
 
-#: js/src/discovery/blocks/stories.js:235
+#: js/src/discovery/blocks/date-range-filter.js:92
+#: js/src/discovery/blocks/stories.js:317
 msgid "September"
 msgstr "Setembro"
 
-#: js/src/discovery/blocks/stories.js:236
+#: js/src/discovery/blocks/date-range-filter.js:93
+#: js/src/discovery/blocks/stories.js:318
 msgid "October"
 msgstr "Outubro"
 
-#: js/src/discovery/blocks/stories.js:237
+#: js/src/discovery/blocks/date-range-filter.js:94
+#: js/src/discovery/blocks/stories.js:319
 msgid "November"
 msgstr "Novembro"
 
-#: js/src/discovery/blocks/stories.js:238
+#: js/src/discovery/blocks/date-range-filter.js:95
+#: js/src/discovery/blocks/stories.js:320
 msgid "December"
 msgstr "Dezembro"
 
-#: js/src/discovery/blocks/stories.js:1015
+#: js/src/discovery/blocks/stories.js:1191
+#: js/src/discovery/blocks/stories.js:1230
+#: js/src/discovery/blocks/stories.js:1231
 msgid "Search story"
 msgstr "Buscar história"
 
-#: js/src/discovery/blocks/stories.js:1063
+#: js/src/discovery/blocks/stories.js:1272
 msgid "Hide filters"
 msgstr "Ocultar filtros"
 
-#: js/src/discovery/blocks/stories.js:1064
+#: js/src/discovery/blocks/stories.js:1273
 msgid "Show filters"
 msgstr "Exibir filtros"
 
-#: js/src/discovery/blocks/stories.js:1069
+#: js/src/discovery/blocks/stories.js:1197
+#: js/src/discovery/blocks/stories.js:1278
 msgid "Date range"
 msgstr "Intervalo de data"
 
-#: js/src/discovery/blocks/stories.js:1088
+#: js/src/discovery/blocks/stories.js:1210
 msgid "Loading stories…"
 msgstr "Carregando histórias…"
 
-#: js/src/discovery/blocks/stories.js:1048
+#: js/src/discovery/blocks/stories.js:1185
 msgid "Displayed stories"
 msgstr "Histórias exibidas"
 
-#: js/src/discovery/blocks/stories.js:1091
+#: js/src/discovery/blocks/stories.js:1216
 msgid "Loading more stories…"
 msgstr "Carregando mais histórias…"
 
-#: js/src/discovery/blocks/stories.js:1094
+#: js/src/discovery/blocks/stories.js:1222
 msgid "No stories found for the current filters."
 msgstr "Nenhuma história encontrada para os filtros atuais."
 
-#: js/src/discovery/blocks/stories.js:1095
+#: js/src/discovery/blocks/stories.js:1223
 msgid "No stories available."
 msgstr "Nenhuma história disponível."
 
-#: js/src/discovery/blocks/stories.js:1179
+#: js/src/discovery/blocks/stories.js:1299
 msgid "Updating stories…"
 msgstr "Atualizando histórias…"
 
-#: js/src/discovery/blocks/stories.js:1190
+#: js/src/discovery/blocks/stories.js:1310
 msgid "Active filters"
 msgstr "Filtros ativos"
 
-#: js/src/discovery/blocks/stories.js:1169
+#: js/src/discovery/blocks/stories.js:1421
 msgid "View in map"
 msgstr "Ver no mapa"
 
-#: js/src/discovery/blocks/map-item.js:148
+#: js/src/discovery/blocks/map-item.js:146
 msgid "layers"
 msgstr "camadas"
 
-#: js/src/discovery/blocks/map-item.js:170
+#: js/src/discovery/blocks/map-item.js:168
+#: js/src/discovery/blocks/map-item.js:174
 msgid "Loading layers…"
 msgstr "Carregando camadas…"
 
-#: js/src/discovery/blocks/map-layers.js:194
+#: js/src/discovery/blocks/map-layers.js:196
 msgid "Unable to load map layers right now."
 msgstr "Não foi possível carregar as camadas do mapa agora."
 
-#: js/src/discovery/blocks/map-layers.js:671
+#: js/src/discovery/blocks/map-layers.js:660
+#: js/src/discovery/blocks/map-layers.js:661
 msgid "Search map"
 msgstr "Buscar mapa"
 
-#: js/src/discovery/blocks/map-layers.js:710
-#: js/src/discovery/blocks/map-layers.js:727
+#: js/src/discovery/blocks/map-layers.js:696
+#: js/src/discovery/blocks/map-layers.js:717
 msgid "Changes applied"
 msgstr "Mudanças aplicadas"
 
-#: js/src/discovery/blocks/map-layers.js:710
+#: js/src/discovery/blocks/map-layers.js:696
 msgid "Not applied"
 msgstr "Não aplicado"
 
-#: js/src/discovery/blocks/map-layers.js:716
+#: js/src/discovery/blocks/map-layers.js:702
 #: js/src/map-blocks/layers-settings.js:243
 msgid "Selected layers"
 msgstr "Camadas selecionadas"
 
-#: js/src/discovery/blocks/map-layers.js:721
+#: js/src/discovery/blocks/map-layers.js:707
 msgid "No layers selected"
 msgstr "Nenhuma camada selecionada"
 
-#: js/src/discovery/blocks/map-layers.js:734
+#: js/src/discovery/blocks/map-layers.js:724
 msgid "Apply changes"
 msgstr "Aplicar mudanças"
 
-#: js/src/discovery/blocks/map-layers.js:743
+#: js/src/discovery/blocks/map-layers.js:733
 msgid "Loading more maps…"
 msgstr "Carregando mais mapas…"
 
-#: js/src/discovery/blocks/map-layers.js:747
-msgid "Load more maps"
-msgstr "Carregar mais mapas"
-
-#: js/src/discovery/blocks/sidebar.js:152
+#: js/src/discovery/blocks/sidebar.js:250
 msgid "Stories"
 msgstr "Histórias"
 
-#: js/src/discovery/blocks/sidebar.js:180
+#: js/src/discovery/blocks/sidebar.js:278
 #: js/src/map-blocks/layers-panel.js:25
 msgid "Map layers"
 msgstr "Camadas do mapa"
 
-#: js/src/discovery/blocks/sidebar.js:209
+#: js/src/discovery/blocks/sidebar.js:308
 msgid "Collapse discovery panel"
 msgstr "Recolher painel Discovery"
 
-#: js/src/discovery/blocks/sidebar.js:210
+#: js/src/discovery/blocks/sidebar.js:309
 msgid "Expand discovery panel"
 msgstr "Expandir painel Discovery"
 
-#: js/src/discovery/index.js:540
+#: js/src/discovery/index.js:592
 #: js/src/jeo-map/class-jeo-map.js:658
 #: js/src/layers-sidebar/layers-sidebar.js:152
 msgid "Legend"

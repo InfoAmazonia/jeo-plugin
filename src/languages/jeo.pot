@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-08T20:34:31+00:00\n"
+"POT-Creation-Date: 2026-06-09T05:07:57+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeo\n"
@@ -221,8 +221,8 @@ msgstr ""
 #. translators: Explore is the name of JEO's discovery page feature.
 #: includes/loaders.php:490
 #: templates/embed-discovery.php:18
-#: js/src/discovery/blocks/sidebar.js:192
-#: js/src/discovery/index.js:462
+#: js/src/discovery/blocks/sidebar.js:291
+#: js/src/discovery/index.js:514
 msgid "Explore"
 msgstr ""
 
@@ -923,211 +923,284 @@ msgstr ""
 msgid "Choose Image"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:125
-#: js/src/discovery/blocks/map-item.js:165
+#: js/src/discovery/blocks/date-range-filter.js:84
+#: js/src/discovery/blocks/stories.js:309
+msgid "January"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:85
+#: js/src/discovery/blocks/stories.js:310
+msgid "February"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:86
+#: js/src/discovery/blocks/stories.js:311
+msgid "March"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:87
+#: js/src/discovery/blocks/stories.js:312
+msgid "April"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:88
+#: js/src/discovery/blocks/stories.js:313
+msgid "May"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:89
+#: js/src/discovery/blocks/stories.js:314
+msgid "June"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:90
+#: js/src/discovery/blocks/stories.js:315
+msgid "July"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:91
+#: js/src/discovery/blocks/stories.js:316
+msgid "August"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:92
+#: js/src/discovery/blocks/stories.js:317
+msgid "September"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:93
+#: js/src/discovery/blocks/stories.js:318
+msgid "October"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:94
+#: js/src/discovery/blocks/stories.js:319
+msgid "November"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:95
+#: js/src/discovery/blocks/stories.js:320
+msgid "December"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:116
+msgid "Previous month"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:133
+msgid "Month"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:145
+msgid "Year"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:158
+msgid "Next month"
+msgstr ""
+
+#: js/src/discovery/blocks/date-range-filter.js:248
+#: js/src/discovery/blocks/map-item.js:169
+#: js/src/discovery/blocks/stories.js:1303
 #: js/src/map-blocks/layers-settings.js:136
 msgid "Clear"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:142
-#: js/src/discovery/blocks/map-item.js:165
-#: js/src/discovery/blocks/stories.js:212
+#: js/src/discovery/blocks/date-range-filter.js:265
+#: js/src/discovery/blocks/map-item.js:169
+#: js/src/discovery/blocks/stories.js:294
 msgid "Apply"
 msgstr ""
 
-#: js/src/discovery/blocks/map-item.js:148
+#: js/src/discovery/blocks/map-item.js:146
 msgid "layers"
 msgstr ""
 
-#: js/src/discovery/blocks/map-item.js:170
+#: js/src/discovery/blocks/map-item.js:168
+#: js/src/discovery/blocks/map-item.js:174
 msgid "Loading layers…"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:194
+#: js/src/discovery/blocks/map-layers.js:196
 msgid "Unable to load map layers right now."
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:671
+#: js/src/discovery/blocks/map-layers.js:660
+#: js/src/discovery/blocks/map-layers.js:661
 msgid "Search map"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:710
-#: js/src/discovery/blocks/map-layers.js:727
+#: js/src/discovery/blocks/map-layers.js:696
+#: js/src/discovery/blocks/map-layers.js:717
 msgid "Changes applied"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:710
+#: js/src/discovery/blocks/map-layers.js:696
 msgid "Not applied"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:716
+#: js/src/discovery/blocks/map-layers.js:702
 #: js/src/map-blocks/layers-settings.js:243
 msgid "Selected layers"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:721
+#: js/src/discovery/blocks/map-layers.js:707
 msgid "No layers selected"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:734
+#: js/src/discovery/blocks/map-layers.js:724
 msgid "Apply changes"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:743
+#: js/src/discovery/blocks/map-layers.js:733
 msgid "Loading more maps…"
 msgstr ""
 
-#: js/src/discovery/blocks/map-layers.js:747
-msgid "Load more maps"
-msgstr ""
-
-#: js/src/discovery/blocks/sidebar.js:152
+#: js/src/discovery/blocks/sidebar.js:250
 msgid "Stories"
 msgstr ""
 
-#: js/src/discovery/blocks/sidebar.js:180
+#: js/src/discovery/blocks/sidebar.js:278
 #: js/src/map-blocks/layers-panel.js:25
 msgid "Map layers"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:210
+#: js/src/discovery/blocks/sidebar.js:308
+msgid "Collapse discovery panel"
+msgstr ""
+
+#: js/src/discovery/blocks/sidebar.js:309
+msgid "Expand discovery panel"
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:292
 msgid "MM/DD/YYYY"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:211
+#: js/src/discovery/blocks/stories.js:293
 msgid " - "
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:213
+#: js/src/discovery/blocks/stories.js:295
 #: js/src/map-blocks/map-editor.js:146
 #: js/src/map-blocks/storymap-editor.js:1356
 #: js/src/posts-sidebar/geo-posts.js:448
 msgid "Cancel"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:214
+#: js/src/discovery/blocks/stories.js:296
 msgid "From"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:215
+#: js/src/discovery/blocks/stories.js:297
 msgid "To"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:216
+#: js/src/discovery/blocks/stories.js:298
 msgid "Custom"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:218
+#: js/src/discovery/blocks/stories.js:300
 msgid "Su"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:219
+#: js/src/discovery/blocks/stories.js:301
 msgid "Mo"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:220
+#: js/src/discovery/blocks/stories.js:302
 msgid "Tu"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:221
+#: js/src/discovery/blocks/stories.js:303
 msgid "We"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:222
+#: js/src/discovery/blocks/stories.js:304
 msgid "Th"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:223
+#: js/src/discovery/blocks/stories.js:305
 msgid "Fr"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:224
+#: js/src/discovery/blocks/stories.js:306
 msgid "Sa"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:227
-msgid "January"
+#: js/src/discovery/blocks/stories.js:1185
+msgid "Displayed stories"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:228
-msgid "February"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:229
-msgid "March"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:230
-msgid "April"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:231
-msgid "May"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:232
-msgid "June"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:233
-msgid "July"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:234
-msgid "August"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:235
-msgid "September"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:236
-msgid "October"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:237
-msgid "November"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:238
-msgid "December"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1015
+#: js/src/discovery/blocks/stories.js:1191
+#: js/src/discovery/blocks/stories.js:1230
+#: js/src/discovery/blocks/stories.js:1231
 msgid "Search story"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:1063
-msgid "Hide filters"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1064
-msgid "Show filters"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1069
+#: js/src/discovery/blocks/stories.js:1197
+#: js/src/discovery/blocks/stories.js:1278
 msgid "Date range"
 msgstr ""
 
-#: js/src/discovery/blocks/stories.js:1169
-msgid "View in map"
-msgstr ""
-
-#: js/src/discovery/blocks/tag-filter-control.js:54
+#: js/src/discovery/blocks/stories.js:1203
+#: js/src/discovery/blocks/tag-filter-control.js:93
 #: js/src/posts-selector/index.js:67
 msgid "Tags"
 msgstr ""
 
-#: js/src/discovery/blocks/tag-filter-control.js:55
+#: js/src/discovery/blocks/stories.js:1210
+msgid "Loading stories…"
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1216
+msgid "Loading more stories…"
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1222
+msgid "No stories found for the current filters."
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1223
+msgid "No stories available."
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1272
+msgid "Hide filters"
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1273
+msgid "Show filters"
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1299
+msgid "Updating stories…"
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1310
+msgid "Active filters"
+msgstr ""
+
+#: js/src/discovery/blocks/stories.js:1421
+msgid "View in map"
+msgstr ""
+
+#: js/src/discovery/blocks/tag-filter-control.js:94
 msgid "Filter stories by tag"
 msgstr ""
 
-#: js/src/discovery/index.js:490
+#. translators: %s: selected tag name.
+#: js/src/discovery/blocks/tag-filter-control.js:126
+#, js-format
+msgid "Remove tag %s"
+msgstr ""
+
+#: js/src/discovery/index.js:542
 msgctxt "discovery share action"
 msgid "Embed"
 msgstr ""
 
-#: js/src/discovery/index.js:540
+#: js/src/discovery/index.js:592
 #: js/src/jeo-map/class-jeo-map.js:658
 #: js/src/layers-sidebar/layers-sidebar.js:152
 msgid "Legend"
