@@ -45,3 +45,15 @@ While the page is scrolled, the current slide changes to the next one and the ma
 
 ![Story Map edit](img/story-map-edit9.png)
 
+## Theme integration
+
+The public story map output includes a stable map container for theme integrations:
+
+```html
+<div class="story-map-element jeo-storymap-map js-jeo-storymap-map"></div>
+```
+
+Themes that need to position or measure the story map should target `jeo-storymap-map`
+or `js-jeo-storymap-map` instead of runtime classes such as `mapboxgl-map` or
+`maplibregl-map`. The JEO classes are present before the map runtime initializes,
+while runtime classes are added asynchronously by the map library.

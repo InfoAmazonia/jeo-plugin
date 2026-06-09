@@ -132,13 +132,16 @@ export default class JeoMap {
 					const initialZoom = toFiniteNumber( this.getArg( 'initial_zoom' ) );
 					const centerLon = toFiniteNumber( this.getArg( 'center_lon' ) );
 					const centerLat = toFiniteNumber( this.getArg( 'center_lat' ) );
+					const initialCenter = centerLon !== null && centerLat !== null ?
+						[ centerLon, centerLat ] :
+						null;
 
 					if ( initialZoom !== null ) {
 						map.setZoom( initialZoom );
 					}
 
-					if ( centerLon !== null && centerLat !== null ) {
-						map.setCenter( [ centerLon, centerLat ] );
+					if ( initialCenter ) {
+						map.setCenter( initialCenter );
 					}
 
 					map.addControl(
@@ -165,7 +168,8 @@ export default class JeoMap {
 					}
 
 					const panLimitsMaxBounds = getPanLimitsMaxBounds(
-						this.getArg( 'pan_limits' )
+						this.getArg( 'pan_limits' ),
+						initialCenter
 					);
 
 					if ( panLimitsMaxBounds ) {

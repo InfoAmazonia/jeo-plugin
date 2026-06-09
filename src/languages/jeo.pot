@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-08T20:34:31+00:00\n"
+"POT-Creation-Date: 2026-06-09T13:07:17+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeo\n"
@@ -104,7 +104,7 @@ msgstr ""
 
 #: includes/layers/class-layers.php:50
 #: includes/layers/class-layers.php:61
-#: js/src/jeo-map/class-jeo-map.js:1846
+#: js/src/jeo-map/class-jeo-map.js:1850
 #: js/src/map-blocks/storymap-editor.js:961
 msgid "Layers"
 msgstr ""
@@ -711,12 +711,12 @@ msgstr ""
 
 #: templates/map-content-layers-list.php:18
 #: templates/map-content-layers-list.php:20
-#: js/src/jeo-map/class-jeo-map.js:774
+#: js/src/jeo-map/class-jeo-map.js:778
 msgid "Attribution:"
 msgstr ""
 
 #: templates/map-content-layers-list.php:25
-#: js/src/jeo-map/class-jeo-map.js:795
+#: js/src/jeo-map/class-jeo-map.js:799
 msgid "Download from source"
 msgstr ""
 
@@ -1128,34 +1128,34 @@ msgid "Embed"
 msgstr ""
 
 #: js/src/discovery/index.js:540
-#: js/src/jeo-map/class-jeo-map.js:658
+#: js/src/jeo-map/class-jeo-map.js:662
 #: js/src/layers-sidebar/layers-sidebar.js:152
 msgid "Legend"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:378
+#: js/src/jeo-map/class-jeo-map.js:382
 msgid "This map doesn't have layers"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:733
-#: js/src/jeo-map/class-jeo-map.js:826
+#: js/src/jeo-map/class-jeo-map.js:737
+#: js/src/jeo-map/class-jeo-map.js:830
 msgid "Info"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:808
+#: js/src/jeo-map/class-jeo-map.js:812
 msgid "Close popup"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:1508
+#: js/src/jeo-map/class-jeo-map.js:1512
 msgid "Show previous post"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:1512
+#: js/src/jeo-map/class-jeo-map.js:1516
 msgid "Show next post"
 msgstr ""
 
 #. translators: %d: number of markers in the current map area.
-#: js/src/jeo-map/class-jeo-map.js:1551
+#: js/src/jeo-map/class-jeo-map.js:1555
 #, js-format
 msgid "%d marker in this area"
 msgid_plural "%d markers in this area"
@@ -1163,28 +1163,28 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s is the authors list
-#: js/src/jeo-storymap/storymap-display.js:37
+#: js/src/jeo-storymap/storymap-display.js:40
 #, js-format
 msgid "By %s"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:505
+#: js/src/jeo-storymap/storymap-display.js:521
 msgid "at"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:518
+#: js/src/jeo-storymap/storymap-display.js:534
 msgid "START"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:532
+#: js/src/jeo-storymap/storymap-display.js:548
 msgid "skip intro"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:625
+#: js/src/jeo-storymap/storymap-display.js:641
 msgid "Back to top"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:671
+#: js/src/jeo-storymap/storymap-display.js:687
 msgid "NAVIGATE THE MAP"
 msgstr ""
 
