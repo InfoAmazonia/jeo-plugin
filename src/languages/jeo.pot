@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-09T18:42:34+00:00\n"
+"POT-Creation-Date: 2026-06-09T18:48:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeo\n"
@@ -944,94 +944,6 @@ msgstr ""
 msgid "Choose Image"
 msgstr ""
 
-#: js/build/contextSidebar.js:1
-msgid "Suggested Paragraphs"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Inserted"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Insert into article"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Copied!"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Copy"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Failed to generate suggestions."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Error contacting AI."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Failed to process message."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Generate new editorial suggestions based on the current post content."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Failed to clear conversation."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Restoring conversation..."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Use the AI Context Assistant to generate editorial suggestions based on your article and the site's knowledge base."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Generate Suggestions"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Thinking..."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Ask for changes or new paragraphs... (Ctrl+Enter to send)"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Send"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Retry"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-#: js/build/discovery.js:1
-#: js/build/discovery.js:6
-#: js/build/mapBlocks.js:3
-#: js/build/mapsSidebar.js:1
-msgid "Clear"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "AI Context"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Expand"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "AI Context Assistant"
-msgstr ""
-
 #: js/build/discovery.js:1
 #: js/build/discovery.js:2
 msgid "January"
@@ -1106,6 +1018,13 @@ msgstr ""
 
 #: js/build/discovery.js:1
 msgid "Next month"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:6
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Clear"
 msgstr ""
 
 #: js/build/discovery.js:1

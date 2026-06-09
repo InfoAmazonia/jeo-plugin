@@ -934,7 +934,6 @@ msgstr "Un arreglo de etiquetas y colores"
 msgid "Choose Image"
 msgstr "Elegir imagen"
 
-#: js/build/contextSidebar.js:1
 #: js/build/discovery.js:1
 #: js/build/discovery.js:6
 #: js/build/mapBlocks.js:3
@@ -2020,83 +2019,3 @@ msgstr "Ej. https://ejemplo.com/wp-content/uploads/fonts/jeo-story-font.css"
 #, js-format
 msgid "By %s"
 msgstr "Por %s"
-
-#: js/build/contextSidebar.js:1
-msgid "Suggested Paragraphs"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Inserted"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Insert into article"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Copied!"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Copy"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Failed to generate suggestions."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Error contacting AI."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Failed to process message."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Generate new editorial suggestions based on the current post content."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Failed to clear conversation."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Restoring conversation..."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Use the AI Context Assistant to generate editorial suggestions based on your article and the site's knowledge base."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Generate Suggestions"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Thinking..."
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Ask for changes or new paragraphs... (Ctrl+Enter to send)"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Send"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Retry"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "AI Context"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "Expand"
-msgstr ""
-
-#: js/build/contextSidebar.js:1
-msgid "AI Context Assistant"
-msgstr ""
