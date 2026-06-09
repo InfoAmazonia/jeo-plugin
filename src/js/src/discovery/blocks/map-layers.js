@@ -6,6 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 
 import { mapboxToken } from '../../lib/mapgl-loader';
 import { chunkRecordIds, mergeRecordsByIdOrder } from '../../shared/rest-records';
+import LoadingSpinner from './loading-spinner';
 import MapItem from './map-item';
 import Search from './search';
 
@@ -63,6 +64,7 @@ class MapLayers extends Component {
 		this.buildSelectionState = this.buildSelectionState.bind( this );
 		this.loadMapLayers = this.loadMapLayers.bind( this );
 		this.fetchMapsByIds = this.fetchMapsByIds.bind( this );
+		this.canLoadMoreMaps = this.canLoadMoreMaps.bind( this );
 		this.loadMoreMaps = this.loadMoreMaps.bind( this );
 
 		if ( ! this.props.mapsLoaded ) {
@@ -525,12 +527,20 @@ class MapLayers extends Component {
 		this.fetchMaps( { ...params } ).catch( () => {} );
 	}
 
+	canLoadMoreMaps() {
+		return (
+			this.props.mapsLoaded &&
+			! this.state.isLoadingMaps &&
+			this.state.mapsPage < this.state.mapsTotalPages
+		);
+	}
+
 	loadMoreMaps() {
-		if ( this.state.mapsPage >= this.state.mapsTotalPages ) {
-			return;
+		if ( ! this.canLoadMoreMaps() ) {
+			return Promise.resolve();
 		}
 
-		this.fetchMaps( {
+		return this.fetchMaps( {
 			page: this.state.mapsPage + 1,
 			search: this.state.currentSearch,
 			cumulative: true,
@@ -588,10 +598,6 @@ class MapLayers extends Component {
 						>
 							<svg
 								aria-hidden="true"
-								focusable="false"
-								data-prefix="fas"
-								data-icon="grip-vertical"
-								role="img"
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 320 512"
 								className="drag-icon"
@@ -615,10 +621,6 @@ class MapLayers extends Component {
 							>
 								<svg
 									aria-hidden="true"
-									focusable="false"
-									data-prefix="fas"
-									data-icon="times"
-									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 352 512"
 								>
@@ -649,26 +651,25 @@ class MapLayers extends Component {
 		);
 
 		const loading = ! this.props.mapsLoaded ? (
-			<svg
-				aria-hidden="true"
-				focusable="false"
-				data-prefix="fas"
-				data-icon="spinner"
-				role="img"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 512 512"
-				className="svg-inline--fa fa-spinner fa-w-16 fa-3x"
+			<div
+				className="maps-loading"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
 			>
-				<path
-					fill="currentColor"
-					d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-				></path>
-			</svg>
+				<LoadingSpinner />
+			</div>
 		) : null;
 
 		return (
 			<div className="maps-tab" style={ this.props.style }>
-				<Search searchPlaceholder={ __( 'Search map', 'jeo' ) } update={ this.updateMaps } />
+				<Search
+					searchPlaceholder={ __( 'Search map', 'jeo' ) }
+					searchButtonLabel={ __( 'Search map', 'jeo' ) }
+					update={ this.updateMaps }
+					searchField={ this.state.currentSearch }
+					disabled={ this.state.isLoadingMaps }
+				/>
 
 				<div className="selected-layers">
 					<div className="status">
@@ -676,10 +677,6 @@ class MapLayers extends Component {
 							{ ! isApplied ? (
 								<svg
 									aria-hidden="true"
-									focusable="false"
-									data-prefix="fas"
-									data-icon="times"
-									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 352 512"
 								>
@@ -691,10 +688,6 @@ class MapLayers extends Component {
 							) : (
 								<svg
 									aria-hidden="true"
-									focusable="false"
-									data-prefix="fas"
-									data-icon="check"
-									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 512 512"
 								>
@@ -723,7 +716,11 @@ class MapLayers extends Component {
 				</div>
 
 				{ isApplied ? (
-					<button className="apply-changes disabled">
+					<button
+						className="apply-changes disabled"
+						disabled
+						aria-disabled="true"
+					>
 						{ __( 'Changes applied', 'jeo' ) }
 					</button>
 				) : (
@@ -740,12 +737,14 @@ class MapLayers extends Component {
 				) : null }
 				<div className="map-itens">{ mapItens }</div>
 				{ this.state.isLoadingMaps && this.props.mapsLoaded ? (
-					<div className="maps-loading">{ __( 'Loading more maps…', 'jeo' ) }</div>
-				) : null }
-				{ this.state.mapsPage < this.state.mapsTotalPages ? (
-					<button className="load-more-maps" onClick={ this.loadMoreMaps }>
-						{ __( 'Load more maps', 'jeo' ) }
-					</button>
+					<div
+						className="maps-loading"
+						role="status"
+						aria-live="polite"
+						aria-label={ __( 'Loading…', 'jeo' ) }
+					>
+						<LoadingSpinner />
+					</div>
 				) : null }
 			</div>
 		);

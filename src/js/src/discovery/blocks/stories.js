@@ -1,8 +1,9 @@
 import { Component } from '@wordpress/element';
 import Search from './search';
 import LazyImage from './lazy-image';
+import LoadingSpinner from './loading-spinner';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 import DateRangeFilter, { formatDateRangeValue } from './date-range-filter';
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
@@ -11,14 +12,22 @@ import {
 	getStoryFeatureIds,
 	getStoryRelatedCoordinates,
 } from '../../shared/story-geojson';
+import { chunkRecordIds } from '../../shared/rest-records';
 import TagFilterControl from './tag-filter-control';
 import {
 	mergeUniqueStoriesById,
+	normalizeStoriesTagIds,
+	resolveStoryDateLocale,
 	resolveStoriesPage,
 } from './stories-helpers';
 
 const POSTS_PER_PAGE = 30;
+const POST_COLLECTION_FIELDS =
+	'id,link,title,date_gmt,categories,featured_media,meta._related_point';
+const MEDIA_COLLECTION_FIELDS = 'id,source_url,alt_text';
+const CATEGORY_COLLECTION_FIELDS = 'id,name';
 const MEMOIZED_CATEGORIES = {};
+const MEMOIZED_MEDIA = {};
 const STORIES_SOURCE_ID = 'storiesSource';
 const HOVERED_CLUSTER_LAYER_ID = 'hover-cluster-layer';
 const HOVERED_CLUSTER_COLOR = '#b1b1b1';
@@ -54,6 +63,24 @@ function buildHoveredClusterFilter( clusterId = -1 ) {
 		[ 'has', 'point_count' ],
 		[ '==', [ 'get', 'cluster_id' ], clusterId ],
 	];
+}
+
+function setStoryMapCursor( map, cursor = '' ) {
+	const canvas = map?.getCanvas?.();
+
+	if ( ! canvas ) {
+		return;
+	}
+
+	canvas.style.cursor = cursor;
+}
+
+function clearStoryMapCursor( map ) {
+	const canvas = map?.getCanvas?.();
+
+	if ( canvas?.style?.cursor === 'pointer' ) {
+		canvas.style.cursor = '';
+	}
 }
 
 function getHoveredClusterFeature( map, event ) {
@@ -165,6 +192,51 @@ function buildStoryBounds( coordinates = [] ) {
 	);
 }
 
+function normalizeRecordIds( ids = [] ) {
+	return Array.from(
+		new Set(
+			ids
+				.map( ( id ) => Number.parseInt( id, 10 ) )
+				.filter( ( id ) => Number.isFinite( id ) && id > 0 )
+		)
+	);
+}
+
+function getStoryMediaIds( stories = [] ) {
+	return normalizeRecordIds(
+		stories.map( ( story ) => story?.featured_media )
+	);
+}
+
+function getStoryCategoryIds( stories = [] ) {
+	return normalizeRecordIds(
+		stories.flatMap( ( story ) =>
+			Array.isArray( story?.categories ) ? story.categories : []
+		)
+	).filter( ( categoryId ) => categoryId !== 1 );
+}
+
+function appendLanguageParam( url ) {
+	if ( 'languageParams' in window && window.languageParams?.currentLang ) {
+		url.searchParams.append( 'lang', window.languageParams.currentLang );
+	}
+}
+
+function appendGeolocatedPostsQuery( url ) {
+	url.searchParams.append( 'meta_query[0][key]', '_related_point' );
+	url.searchParams.append( 'meta_query[0][compare]', 'EXISTS' );
+}
+
+function mapRecordsById( records = [] ) {
+	return new Map(
+		records
+			.filter( ( record ) =>
+				Number.isFinite( Number.parseInt( record?.id, 10 ) )
+			)
+			.map( ( record ) => [ Number.parseInt( record.id, 10 ), record ] )
+	);
+}
+
 class Stories extends Component {
 	constructor( props ) {
 		super( props );
@@ -176,9 +248,11 @@ class Stories extends Component {
 			dateRangeObject: { after: new Date(), before: new Date() },
 			hoveredPostId: null,
 			hoveredClusterPostsId: [],
+			selectedTagLabel: '',
 		};
 		this.hoveredFeatureIds = [];
 		this.hoveredClusterIds = [];
+		this.hoveredClusterKey = null;
 		this.listHoveredStoryId = null;
 		this.storiesListRef = null;
 		this.storyCardElements = new Map();
@@ -187,6 +261,7 @@ class Stories extends Component {
 		// Story bindings
 		this.storyHovered = this.storyHovered.bind( this );
 		this.storyUnhover = this.storyUnhover.bind( this );
+		this.viewStoryInMap = this.viewStoryInMap.bind( this );
 		this.markListScrolling = this.markListScrolling.bind( this );
 		this.clearHoveredFeatureState = this.clearHoveredFeatureState.bind( this );
 		this.clearHoveredClusterState = this.clearHoveredClusterState.bind( this );
@@ -199,6 +274,11 @@ class Stories extends Component {
 		this.registerStoryCard = this.registerStoryCard.bind( this );
 		this.scrollStoryIntoView = this.scrollStoryIntoView.bind( this );
 		this.updateStories = this.updateStories.bind( this );
+		this.fetchRecordsByIds = this.fetchRecordsByIds.bind( this );
+		this.fetchMediaByIds = this.fetchMediaByIds.bind( this );
+		this.fetchCategoriesByIds = this.fetchCategoriesByIds.bind( this );
+		this.enrichStoriesWithMetadata =
+			this.enrichStoriesWithMetadata.bind( this );
 
 		// Filters bind
 		// DateRangePicker
@@ -206,6 +286,8 @@ class Stories extends Component {
 		this.dateRangePickerCancel = this.dateRangePickerCancel.bind( this );
 
 		this.handleTagChange = this.handleTagChange.bind( this );
+		this.setSelectedTagLabel = this.setSelectedTagLabel.bind( this );
+		this.clearStoryFilters = this.clearStoryFilters.bind( this );
 		this.localeInfo = {
 			"format": __("MM/DD/YYYY", "jeo"),
 			"separator": __(" - ", "jeo"),
@@ -361,15 +443,26 @@ class Stories extends Component {
 
 		map.on('mousemove', 'unclustered-points', (e) => {
 			if ( e.features.length > 0 && this.isStoriesTabActive() ) {
+				setStoryMapCursor( map, 'pointer' );
 				const hoveredFeature = e.features[0];
+				const hoveredPostId = getHoveredStoryId( hoveredFeature );
 				this.replaceHoveredFeatureState( getHoveredFeatureIds( hoveredFeature ) );
-				this.setState( {
-					hoveredPostId: getHoveredStoryId( hoveredFeature ),
-				} );
+
+				if ( this.state.hoveredPostId !== hoveredPostId ) {
+					this.setState( {
+						hoveredPostId,
+					} );
+				}
+
+				return;
 			}
+
+			clearStoryMapCursor( map );
 		});
 
 		map.on('mouseleave', 'unclustered-points', () => {
+			clearStoryMapCursor( map );
+
 			if ( this.isStoriesTabActive() ) {
 				this.clearHoveredFeatureState();
 				this.setState( {
@@ -380,15 +473,51 @@ class Stories extends Component {
 
 		const handleClusterMouseMove = ( event ) => {
 			if ( ! this.isStoriesTabActive() ) {
+				clearStoryMapCursor( map );
 				return;
 			}
 
-			getClusterHoverData( map, event ).then( ( { clusterId, postsIds } ) => {
+			setStoryMapCursor( map, 'pointer' );
+
+			const hoveredClusterFeature = getHoveredClusterFeature( map, event );
+			const clusterId = hoveredClusterFeature?.properties?.cluster_id;
+			const pointCount = hoveredClusterFeature?.properties?.point_count;
+
+			if ( ! clusterId || ! pointCount ) {
+				this.hoveredClusterKey = null;
+				this.clearHoveredClusterState();
+
+				if ( this.state.hoveredClusterPostsId.length ) {
+					this.setState( {
+						hoveredClusterPostsId: [],
+					} );
+				}
+
+				return;
+			}
+
+			const hoveredClusterKey = `${ clusterId }:${ pointCount }`;
+
+			if (
+				clusterId &&
+				pointCount &&
+				this.hoveredClusterKey === hoveredClusterKey
+			) {
+				return;
+			}
+
+			this.hoveredClusterKey = hoveredClusterKey;
+
+			getClusterHoverData( map, {
+				...event,
+				features: hoveredClusterFeature ? [ hoveredClusterFeature ] : [],
+			} ).then( ( { clusterId: nextClusterId, postsIds } ) => {
 				if ( ! this.isStoriesTabActive() ) {
+					clearStoryMapCursor( map );
 					return;
 				}
 
-				this.replaceHoveredClusterState( clusterId );
+				this.replaceHoveredClusterState( nextClusterId );
 				this.setState( {
 					hoveredClusterPostsId: postsIds,
 				} );
@@ -396,6 +525,8 @@ class Stories extends Component {
 		};
 
 		const handleClusterMouseLeave = () => {
+			clearStoryMapCursor( map );
+			this.hoveredClusterKey = null;
 			this.clearHoveredClusterState();
 			this.setState( {
 				hoveredClusterPostsId: [],
@@ -409,6 +540,7 @@ class Stories extends Component {
 	}
 
 	componentWillUnmount() {
+		clearStoryMapCursor( this.props.map );
 		this.clearHoveredFeatureState();
 		this.clearHoveredClusterState();
 	}
@@ -419,6 +551,7 @@ class Stories extends Component {
 
 	componentDidUpdate( prevProps, prevState ) {
 		if ( ! this.isStoriesTabActive() ) {
+			clearStoryMapCursor( this.props.map );
 			return;
 		}
 
@@ -498,6 +631,7 @@ class Stories extends Component {
 
 	clearHoveredClusterState() {
 		const map = this.props.map;
+		this.hoveredClusterKey = null;
 
 		if ( ! map?.getLayer?.( HOVERED_CLUSTER_LAYER_ID ) ) {
 			this.hoveredClusterIds = [];
@@ -661,6 +795,101 @@ class Stories extends Component {
 		return buildRelatedPostsGeoJson( stories );
 	}
 
+	fetchRecordsByIds( {
+		baseUrl,
+		ids = [],
+		fields = '',
+		cache = {},
+		includeLanguage = false,
+	} ) {
+		const normalizedIds = normalizeRecordIds( ids );
+		const missingIds = normalizedIds.filter( ( id ) => ! cache[ id ] );
+
+		if ( ! missingIds.length ) {
+			return Promise.resolve(
+				normalizedIds.map( ( id ) => cache[ id ] ).filter( Boolean )
+			);
+		}
+
+		const requests = chunkRecordIds( missingIds ).map( ( chunk ) => {
+			const recordsUrl = new URL( baseUrl );
+			recordsUrl.searchParams.append( 'include', chunk.join( ',' ) );
+			recordsUrl.searchParams.append( 'orderby', 'include' );
+			recordsUrl.searchParams.append( 'per_page', chunk.length );
+
+			if ( fields ) {
+				recordsUrl.searchParams.append( '_fields', fields );
+			}
+
+			if ( includeLanguage ) {
+				appendLanguageParam( recordsUrl );
+			}
+
+			return fetch( recordsUrl )
+				.then( ( response ) => response.json() )
+				.then( ( records ) => ( Array.isArray( records ) ? records : [] ) );
+		} );
+
+		return Promise.all( requests ).then( ( chunkedRecords ) => {
+			chunkedRecords.flat().forEach( ( record ) => {
+				const recordId = Number.parseInt( record?.id, 10 );
+
+				if ( Number.isFinite( recordId ) ) {
+					cache[ recordId ] = record;
+				}
+			} );
+
+			return normalizedIds.map( ( id ) => cache[ id ] ).filter( Boolean );
+		} );
+	}
+
+	fetchMediaByIds( mediaIds = [] ) {
+		return this.fetchRecordsByIds( {
+			baseUrl: jeoMapVars.jsonUrl + 'media/',
+			ids: mediaIds,
+			fields: MEDIA_COLLECTION_FIELDS,
+			cache: MEMOIZED_MEDIA,
+		} );
+	}
+
+	fetchCategoriesByIds( categoryIds = [] ) {
+		return this.fetchRecordsByIds( {
+			baseUrl: jeoMapVars.jsonUrl + 'categories/',
+			ids: categoryIds,
+			fields: CATEGORY_COLLECTION_FIELDS,
+			cache: MEMOIZED_CATEGORIES,
+			includeLanguage: true,
+		} );
+	}
+
+	enrichStoriesWithMetadata( stories = [] ) {
+		return Promise.all( [
+			this.fetchMediaByIds( getStoryMediaIds( stories ) ).catch( () => [] ),
+			this.fetchCategoriesByIds( getStoryCategoryIds( stories ) ).catch(
+				() => []
+			),
+		] ).then( ( [ mediaRecords, categoryRecords ] ) => {
+			const mediaById = mapRecordsById( mediaRecords );
+			const categoryById = mapRecordsById( categoryRecords );
+
+			return stories.map( ( story ) => {
+				const featuredMediaId = Number.parseInt( story?.featured_media, 10 );
+				const queriedFeaturedImage = mediaById.get( featuredMediaId );
+				const queriedCategories = ( story?.categories ?? [] )
+					.map( ( categoryId ) =>
+						categoryById.get( Number.parseInt( categoryId, 10 ) )
+					)
+					.filter( Boolean );
+
+				return {
+					...story,
+					...( queriedFeaturedImage ? { queriedFeaturedImage } : {} ),
+					queriedCategories,
+				};
+			} );
+		} );
+	}
+
 	fetchStories( params = {} ) {
 		const defaultParams = { cumulative: false };
 		const pageInfo = this.props.pageInfo;
@@ -690,14 +919,14 @@ class Stories extends Component {
 
 		const postsUrl = new URL( jeoMapVars.jsonUrl + 'posts/' );
 		for ( const key of Object.keys( params ) ) {
-			if ( params[ key ] ) {
+			if ( key !== 'cumulative' && params[ key ] ) {
 				postsUrl.searchParams.append( key, params[ key ] )
 			}
 		}
 
-		if("languageParams" in window){
-			postsUrl.searchParams.append( 'lang', languageParams.currentLang );
-		}
+		postsUrl.searchParams.append( '_fields', POST_COLLECTION_FIELDS );
+		appendGeolocatedPostsQuery( postsUrl );
+		appendLanguageParam( postsUrl );
 
 		return fetch( postsUrl )
 			.then( ( response ) => {
@@ -712,7 +941,9 @@ class Stories extends Component {
 			.then(
 				( stories ) => {
 					const geolocatedStories = stories.filter(
-						( story ) => story.meta._related_point.length > 0
+						( story ) =>
+							Array.isArray( story?.meta?._related_point ) &&
+							story.meta._related_point.length > 0
 					);
 
 					let storiesCumulative = params.cumulative
@@ -722,100 +953,14 @@ class Stories extends Component {
 						)
 						: geolocatedStories;
 
-					// Fetch medias
-					const storiesMediasPromises = geolocatedStories.map(
-						async ( story ) => {
-							const mediaApiUrl = new URL(
-								jeoMapVars.jsonUrl + 'media/' + story.featured_media
-							);
-
-							// If featured media is not set
-							if ( ! story.featured_media ) {
-								return;
-							}
-
-							return fetch( mediaApiUrl )
-								.then( ( data ) => data.json() )
-								.then( ( media ) => {
-									story.queriedFeaturedImage = media;
-									return media;
-								} );
-						}
-					);
-
-					// Fetch categories
-					const storiesCategoriesPromises = geolocatedStories.map(
-						( story ) => {
-							return Promise.all(
-								story.categories.map( async ( category ) => {
-									const categoriesApiUrl = new URL(
-										jeoMapVars.jsonUrl + 'categories/' + category
-									);
-
-									// If category is not set (remove Uncategorized)
-									if( !category || category === 1 ) {
-										return;
-									}
-
-									const categoryId = category;
-
-									if(MEMOIZED_CATEGORIES[categoryId]) {
-										category = await MEMOIZED_CATEGORIES[categoryId];
-
-										if (
-											story.queriedCategories &&
-											story.queriedCategories.length
-										) {
-											story.queriedCategories = [
-												...story.queriedCategories,
-												category,
-											];
-										} else {
-											story.queriedCategories = [ category ];
-										}
-
-										return MEMOIZED_CATEGORIES[categoryId];
-									}
-
-									const categoryPromisse = fetch( categoriesApiUrl )
-										.then( ( data ) => data.json() )
-										.then( ( category ) => {
-											if (
-												story.queriedCategories &&
-												story.queriedCategories.length
-											) {
-												story.queriedCategories = [
-													...story.queriedCategories,
-													category,
-												];
-											} else {
-												story.queriedCategories = [ category ];
-											}
-
-											return category;
-									} );
-
-									MEMOIZED_CATEGORIES[categoryId] = categoryPromisse;
-									return categoryPromisse;
-								} )
-							);
-						}
-					);
-
-					// When its all resolved, update state
-					return Promise.all( storiesMediasPromises ).then( () =>
-						// Use reduce stategy to force series processing to make memoization possible
-						storiesCategoriesPromises.reduce(
-							(accumulator, currentValue) =>
-								accumulator.then(_ => currentValue),
-							Promise.resolve()
-						).then( () => {
+					return this.enrichStoriesWithMetadata( geolocatedStories ).then(
+						( enrichedStories ) => {
 							storiesCumulative = params.cumulative
 								? mergeUniqueStoriesById(
 									this.props.stories,
-									geolocatedStories
+									enrichedStories
 								)
-								: geolocatedStories;
+								: enrichedStories;
 
 							const reusableParams = {...params};
 
@@ -831,27 +976,7 @@ class Stories extends Component {
 							} );
 
 							return Promise.resolve( storiesCumulative );
-						})
-
-						// Promise.all( storiesCategoriesPromises ).then( () => {
-						// 	storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
-
-						// 	const reusableParams = {...params};
-
-						// 	// These params are not reusable, they refer directly to a episodic state
-						// 	delete reusableParams.cumulative;
-						// 	delete reusableParams.page;
-						// 	delete reusableParams.per_page;
-
-						// 	this.props.updateState( {
-						// 		storiesLoaded: true,
-						// 		stories: storiesCumulative,
-						// 		queryParams: reusableParams,
-						// 	} );
-
-						// 	return Promise.resolve( storiesCumulative );
-						// } )
-
+						}
 					);
 				},
 				( error ) => {
@@ -883,7 +1008,7 @@ class Stories extends Component {
 			...params,
 		}
 
-		this.fetchStories( { ...params } )
+		return this.fetchStories( { ...params } )
 			.then( ( stories ) => {
 				const sourceData = this.buildPostsGeoJson( stories );
 				map.getSource( 'storiesSource' ).setData( sourceData );
@@ -900,7 +1025,13 @@ class Stories extends Component {
 			return;
 		}
 
-		const map = this.props.map;
+		if (
+			this.listHoveredStoryId === story.id &&
+			this.state.hoveredPostId === story.id
+		) {
+			return;
+		}
+
 		const coordinates = getStoryRelatedCoordinates( story );
 		const featureIds = getStoryFeatureIds( story );
 
@@ -915,6 +1046,23 @@ class Stories extends Component {
 		} );
 		this.replaceHoveredFeatureState( featureIds );
 		this.clearHoveredClusterState();
+
+		window.requestAnimationFrame( () => {
+			if ( this.listHoveredStoryId === story.id ) {
+				this.syncHoveredStoryClusterState( story );
+			}
+		} );
+	}
+
+	viewStoryInMap( story ) {
+		this.storyHovered( story );
+
+		const map = this.props.map;
+		const coordinates = getStoryRelatedCoordinates( story );
+
+		if ( ! coordinates.length ) {
+			return;
+		}
 
 		if ( coordinates.length === 1 ) {
 			map.flyTo( {
@@ -974,47 +1122,127 @@ class Stories extends Component {
 		this.updateStories( { cumulative: false, page: 1, clearDate: true } );
 	}
 
-	handleTagChange( value ) {
-		const tagId = Number.parseInt( value, 10 );
-		const hasValidTag = Number.isFinite( tagId ) && tagId > 0;
+	handleTagChange( value, label = '' ) {
+		const tagIds = normalizeStoriesTagIds( value );
+		const hasValidTags = tagIds.length > 0;
 
-		this.props.updateState( {
-			selectedTag: hasValidTag ? tagId : -1,
+		this.setState( {
+			selectedTagLabel: hasValidTags ? label : '',
 		} );
 
-		if ( ! hasValidTag ) {
+		this.props.updateState( {
+			selectedTag: tagIds,
+		} );
+
+		if ( ! hasValidTags ) {
 			this.updateStories( { cumulative: false, page: 1, clearTag: true } );
 			return;
 		}
 
-		this.updateStories( { cumulative: false, tags: tagId, page: 1 } );
+		this.updateStories( { cumulative: false, tags: tagIds.join( ',' ), page: 1 } );
+	}
+
+	setSelectedTagLabel( label ) {
+		if ( label !== this.state.selectedTagLabel ) {
+			this.setState( { selectedTagLabel: label } );
+		}
+	}
+
+	clearStoryFilters() {
+		this.setState( { selectedTagLabel: '' } );
+		this.props.updateState( {
+			dateRangeInputValue: '',
+			selectedTag: [],
+		} );
+		this.updateStories( {
+			search: '',
+			cumulative: false,
+			page: 1,
+			clearDate: true,
+			clearTag: true,
+		} );
 	}
 
 	render() {
-		const loading = ! this.props.storiesLoaded ? (
-			<svg
-				aria-hidden="true"
-				focusable="false"
-				data-prefix="fas"
-				data-icon="spinner"
-				role="img"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 512 512"
-				className="svg-inline--fa fa-spinner fa-w-16 fa-3x"
+		const queryParams = this.props.queryParams || {};
+		const selectedTagIds = normalizeStoriesTagIds( this.props.selectedTag );
+		const currentPage =
+			Number.parseInt( this.props.pageInfo?.currentPage, 10 ) || 1;
+		const isLoadingMoreStories =
+			! this.props.storiesLoaded &&
+			this.props.stories.length > 0 &&
+			currentPage > 1;
+		const hasActiveFilters = Boolean(
+			queryParams.search ||
+			queryParams.after ||
+			queryParams.before ||
+			selectedTagIds.length > 0
+		);
+		const activeFilters = [];
+		const hoveredClusterPostsSet = new Set( this.state.hoveredClusterPostsId );
+		const storiesCountLabel = sprintf(
+			/* translators: %d is the number of stories currently displayed. */
+			__( 'Displayed stories: %d', 'jeo' ),
+			this.props.stories.length
+		);
+
+		if ( queryParams.search ) {
+			activeFilters.push(
+				/* translators: %s is the active story search query. */
+				sprintf( __( 'Search story: %s', 'jeo' ), queryParams.search )
+			);
+		}
+
+		if ( this.props.dateRangeInputValue ) {
+			activeFilters.push(
+				/* translators: %s is the active story date range. */
+				sprintf( __( 'Date range: %s', 'jeo' ), this.props.dateRangeInputValue )
+			);
+		}
+
+		if ( this.state.selectedTagLabel ) {
+			activeFilters.push(
+				/* translators: %s is the list of active story tags. */
+				sprintf( __( 'Tags: %s', 'jeo' ), this.state.selectedTagLabel )
+			);
+		}
+
+		const loading = ! this.props.storiesLoaded && ! isLoadingMoreStories ? (
+			<div
+				className="stories-status stories-status--loading"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
 			>
-				<path
-					fill="currentColor"
-					d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-				></path>
-			</svg>
+				<LoadingSpinner />
+			</div>
+		) : null;
+		const loadingMore = isLoadingMoreStories ? (
+			<div
+				className="stories-status stories-status--loading stories-status--loading-more"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
+			>
+				<LoadingSpinner />
+			</div>
+		) : null;
+		const emptyMessage = this.props.storiesLoaded && ! this.props.stories.length ? (
+			<div className="stories-status stories-status--empty" role="status">
+				{ hasActiveFilters
+					? __( 'No stories found for the current filters.', 'jeo' )
+					: __( 'No stories available.', 'jeo' ) }
+			</div>
 		) : null;
 
 		return (
 			<div className="stories-tab" style={ this.props.style }>
 				<Search
 					searchPlaceholder={ __("Search story", "jeo") }
+					searchButtonLabel={ __( 'Search story', 'jeo' ) }
 					update={ this.updateStories }
 					searchField={ this.props.queryParams.search?? "" }
+					disabled={ ! this.props.storiesLoaded }
 				/>
 
 				<button
@@ -1030,10 +1258,6 @@ class Stories extends Component {
 					{ this.state.showFilters ? (
 						<svg
 							aria-hidden="true"
-							focusable="false"
-							data-prefix="fas"
-							data-icon="times-circle"
-							role="img"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 512 512"
 						>
@@ -1045,10 +1269,6 @@ class Stories extends Component {
 					) : (
 						<svg
 							aria-hidden="true"
-							focusable="false"
-							data-prefix="fas"
-							data-icon="plus-circle"
-							role="img"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 512 512"
 						>
@@ -1075,19 +1295,46 @@ class Stories extends Component {
 							onCancel={ this.dateRangePickerCancel }
 						/>
 							<TagFilterControl
-								value={ this.props.selectedTag > 0 ? this.props.selectedTag : '' }
+								value={ selectedTagIds }
 								onChange={ this.handleTagChange }
+								onSelectedLabelChange={ this.setSelectedTagLabel }
 							/>
 
 						<div></div>
 					</div>
 				) }
+				<div className="stories-results-summary" role="status" aria-live="polite">
+					<span>
+						{ this.props.storiesLoaded || isLoadingMoreStories
+							? storiesCountLabel
+							: __( 'Updating stories…', 'jeo' ) }
+					</span>
+					{ hasActiveFilters ? (
+						<button type="button" onClick={ this.clearStoryFilters }>
+							{ __( 'Clear', 'jeo' ) }
+						</button>
+					) : null }
+				</div>
+				{ activeFilters.length ? (
+					<div
+						className="stories-active-filters"
+						aria-label={ __( 'Active filters', 'jeo' ) }
+					>
+						{ activeFilters.map( ( filterLabel ) => (
+							<span className="stories-active-filters__item" key={ filterLabel }>
+								{ filterLabel }
+							</span>
+						) ) }
+					</div>
+				) : null }
+				{ loading }
 
 				<div
 					className="stories"
 					ref={ this.registerStoriesList }
 					onWheelCapture={ this.markListScrolling }
 					onTouchMove={ this.markListScrolling }
+					aria-busy={ ! this.props.storiesLoaded }
 				>
 					{ this.props.stories.map( ( story, index ) => {
 						return (
@@ -1095,18 +1342,20 @@ class Stories extends Component {
 								cardRef={ ( element ) =>
 									this.registerStoryCard( story.id, element )
 								}
-								className={ (story.id === this.state.hoveredPostId || this.state.hoveredClusterPostsId.includes(story.id) ? 'active' : '') }
+								className={ (story.id === this.state.hoveredPostId || hoveredClusterPostsSet.has(story.id) ? 'active' : '') }
 								onHover={ () => this.storyHovered( story ) }
 								onUnhover={ () => this.storyUnhover( story ) }
+								onViewInMap={ () => this.viewStoryInMap( story ) }
 								story={ story }
 								key={ story.id }
 								map={ this.props.map }
 							/>
 						);
 					} ) }
+					{ loadingMore }
 				</div>
 
-				{ loading }
+				{ emptyMessage }
 			</div>
 		);
 	}
@@ -1115,11 +1364,18 @@ class Stories extends Component {
 export default Stories;
 
 class Storie extends Component {
+	shouldComponentUpdate( nextProps ) {
+		return (
+			this.props.story !== nextProps.story ||
+			this.props.className !== nextProps.className
+		);
+	}
+
 	render() {
 		const story = this.props.story;
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 		const storyDate = new Date( story.date_gmt ).toLocaleDateString(
-			navigator.language? navigator.language : undefined,
+			resolveStoryDateLocale(),
 			dateOptions
 		);
 
@@ -1139,11 +1395,8 @@ class Storie extends Component {
 		}
 
 		return (
-			<a
+			<article
 				ref={ this.props.cardRef }
-				href={ story.link }
-				target="_blank"
-				rel="noreferrer"
 				onMouseEnter={ this.props.onHover }
 				onMouseLeave={ this.props.onUnhover }
 				className={
@@ -1160,16 +1413,27 @@ class Storie extends Component {
 				<div className="sideway">
 					<div className="categories">{ finalCategories }</div>
 
-					<div className="title">
+					<a
+						className="title"
+						href={ story.link }
+						target="_blank"
+						rel="noreferrer"
+					>
 						{ decodeEntities(story.title.rendered) }
-					</div>
+					</a>
 
 					<div className="date">{ storyDate }</div>
 					<div>
-						<small className="view-in-map">{ __( 'View in map', 'jeo' ) }</small>
+						<button
+							type="button"
+							className="view-in-map"
+							onClick={ this.props.onViewInMap }
+						>
+							{ __( 'View in map', 'jeo' ) }
+						</button>
 					</div>
 				</div>
-			</a>
+			</article>
 		);
 	}
 }

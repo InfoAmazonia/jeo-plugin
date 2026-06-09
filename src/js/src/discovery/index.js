@@ -27,7 +27,7 @@ function parseInitialDiscoveryState() {
 			queryParams: {},
 			dateRangeInputValue: '',
 			searchField: { searchStorie: '', searchMap: '' },
-			selectedTag: -1,
+			selectedTag: [],
 		};
 	}
 
@@ -36,8 +36,8 @@ function parseInitialDiscoveryState() {
 	const search = parseUrlStateParam( urlParams, 'search' );
 	const after = parseUrlStateParam( urlParams, 'after' );
 	const before = parseUrlStateParam( urlParams, 'before' );
-	const rawTagId = parseUrlStateParam( urlParams, 'tags' );
-	const tagId = Number.parseInt( rawTagId, 10 );
+	const rawTags = parseUrlStateParam( urlParams, 'tags' );
+	const tagIds = normalizeTagIds( rawTags );
 
 	if ( typeof search === 'string' && search.trim().length ) {
 		queryParams.search = search;
@@ -51,8 +51,8 @@ function parseInitialDiscoveryState() {
 		queryParams.before = before;
 	}
 
-	if ( Number.isFinite( tagId ) && tagId > 0 ) {
-		queryParams.tags = tagId;
+	if ( tagIds.length ) {
+		queryParams.tags = tagIds.join( ',' );
 	}
 
 	let dateRangeInputValue = '';
@@ -76,9 +76,22 @@ function parseInitialDiscoveryState() {
 			searchStorie: queryParams.search ?? '',
 			searchMap: '',
 		},
-		selectedTag:
-			Number.isFinite( tagId ) && tagId > 0 ? tagId : -1,
+		selectedTag: tagIds,
 	};
+}
+
+function normalizeTagIds( value ) {
+	const values = Array.isArray( value )
+		? value
+		: String( value ?? '' ).split( ',' );
+
+	return Array.from(
+		new Set(
+			values
+				.map( ( tagId ) => Number.parseInt( tagId, 10 ) )
+				.filter( ( tagId ) => Number.isFinite( tagId ) && tagId > 0 )
+		)
+	);
 }
 
 class Discovery extends Component {
@@ -89,6 +102,7 @@ class Discovery extends Component {
 		// map can't be a state, trust me.
 		this.map = null;
 		this.attributionResizeObserver = null;
+		this.discoveryBlock = null;
 
 		// general state
 		this.state = {
@@ -135,9 +149,15 @@ class Discovery extends Component {
 
 		// methods bindings
 		this.updateState = this.updateState.bind( this );
+		this.syncViewportHeight = this.syncViewportHeight.bind( this );
 	}
 
 	componentDidMount() {
+		this.syncViewportHeight();
+		window.addEventListener( 'resize', this.syncViewportHeight );
+		window.addEventListener( 'orientationchange', this.syncViewportHeight );
+		window.addEventListener( 'load', this.syncViewportHeight );
+
 		const additionalMapOptions = {
 			center: [ mapPreferences.map_defaults.lng, mapPreferences.map_defaults.lat],
 			zoom: mapPreferences.map_defaults.zoom,
@@ -171,15 +191,14 @@ class Discovery extends Component {
 
 			this.map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
 			this.syncAttributionSpacing();
+			this.syncViewportHeight();
 			this.setState( { ...this.state, mapLoaded: true } );
 		} );
 
-		this.map.on( 'move', () => {
-			this.setState( { ...this.state } );
-		} );
-
-		this.map.on( 'zoom', () => {
-			this.setState( { ...this.state } );
+		this.map.on( 'moveend', () => {
+			if ( this.state.showShareOptions || this.state.showEmbedTooltip ) {
+				this.setState( { ...this.state } );
+			}
 		} );
 	}
 
@@ -188,6 +207,10 @@ class Discovery extends Component {
 			this.attributionResizeObserver.disconnect();
 			this.attributionResizeObserver = null;
 		}
+
+		window.removeEventListener( 'resize', this.syncViewportHeight );
+		window.removeEventListener( 'orientationchange', this.syncViewportHeight );
+		window.removeEventListener( 'load', this.syncViewportHeight );
 	}
 
 	getParamFromUrl( paramKey ) {
@@ -223,6 +246,32 @@ class Discovery extends Component {
 			...currentState,
 			...state,
 		} ) );
+	}
+
+	syncViewportHeight() {
+		if ( this.props.embed || ! this.discoveryBlock || typeof window === 'undefined' ) {
+			return;
+		}
+
+		const blockRect = this.discoveryBlock.getBoundingClientRect();
+		const viewportHeight =
+			window.innerHeight || document.documentElement.clientHeight;
+		const availableHeight = Math.max(
+			320,
+			viewportHeight - Math.max( 0, blockRect.top )
+		);
+
+		this.discoveryBlock.style.setProperty(
+			'--jeo-discovery-block-height',
+			`${ Math.floor( availableHeight ) }px`
+		);
+
+		if ( this.map?.resize ) {
+			window.requestAnimationFrame( () => {
+				this.map.resize();
+				this.syncAttributionSpacing();
+			} );
+		}
 	}
 
 	syncAttributionSpacing() {
@@ -370,6 +419,9 @@ class Discovery extends Component {
 
 		return (
 			<div
+				ref={ ( element ) => {
+					this.discoveryBlock = element;
+				} }
 				className={
 					'discovery-block' +
 					( this.props.embed ? ' embed' : '' ) +
