@@ -74,20 +74,66 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 == Changelog ==
 
 = 3.0.0 =
-This is a major release. Here are some highlights:
-* Support for MapLibreGL as an alternative rendering library (for compatibility, MapboxGL is still the default library)
-* When using MapLibreGL without Mapbox-hosted layers, the use of Mapbox API key is not required anymore
-* Removed support for Carto integration (reducing plugin size in ~60%)
+This is a major release with all changes since 2.15.1.
 
-Full changelog:
-* Support for MapLibreGL  as an alternative rendering library
-* When using MapLibreGL without Mapbox-hosted layers, the use of Mapbox API key is not required anymore
-* Improved performance in Gutenberg editors
-* Upgraded `react-map-gl` library
-* BREAKING: Removed support for Carto integrations
-* BREAKING: Replaced [`mapboxgl-spiderifier`](https://github.com/bewithjonam/mapboxgl-spiderifier) with more modern [`map-gl-js-spiderfy`](https://github.com/nazka/map-gl-js-spiderfy) as default spiderifier library; `MapboxGLMapboxglSpiderifier` global variable is not available anymore, being replaced by `Spiderfy` global variable (with different API)
-* BREAKING: Some JS and CSS assets had their handles renamed to better reflect the new architecture
-* BREAKING: When using MapLibreGL, some CSS classes use the `maplibregl-` instead of the `mapboxgl-` prefix
+Highlights:
+* Added MapLibreGL support and made MapLibreGL the default rendering library.
+* Kept MapboxGL available as an optional external rendering library.
+* Removed the Mapbox API key requirement for sites that use MapLibreGL without Mapbox-hosted resources.
+* Removed the Carto integration and bundled AWS SDK, substantially reducing the distributed plugin size.
+* Modernized the WordPress block editor experience for maps, layers, one-time maps, storymaps, and embedded storymaps.
+* Improved Discovery maps, embeds, loading states, filters, sharing, and marker synchronization.
+* Added release automation for WordPress.org packaging, Plugin Check, language files, PHP compatibility, and WordPress smoke tests.
+
+Breaking changes and upgrade notes:
+* Removed support for Carto integrations. Existing Carto-based layers should be migrated to supported layer types before updating.
+* Replaced `mapboxgl-spiderifier` with `map-gl-js-spiderfy`; the `MapboxGLMapboxglSpiderifier` global is no longer available and `Spiderfy` has a different API.
+* Some JavaScript and CSS asset handles were renamed as part of the runtime and build restructuring.
+* MapLibreGL uses `maplibregl-` CSS class names in places where MapboxGL used `mapboxgl-` class names.
+* The plugin now requires WordPress 6.6 or newer and PHP 8.0 or newer.
+
+Maps, layers, and rendering:
+* Added runtime loaders for MapLibreGL and external MapboxGL.
+* Added Mapbox URL and style transformation support for MapLibreGL.
+* Added a default MapLibre preview style based on OpenStreetMap raster tiles.
+* Improved Mapbox-hosted style rendering inside MapLibreGL.
+* Improved marker loading, cluster icons, popup positioning, and popup behavior with multiple mouseover interactions.
+* Fixed public map numeric option parsing, bounds ordering, pan limits, and layer visibility handling.
+* Fixed style layer detection, unloaded layer handling, map settings synchronization, and layer schema loading.
+* Added schema-driven layer type options and tests for layer type behavior.
+
+Editors and blocks:
+* Migrated blocks toward current WordPress block APIs and iframe-compatible editor behavior.
+* Preserved block wrapper attributes and map blocks during editor insertion.
+* Added inline map and layer preview blocks for the post type content area and sidebars.
+* Improved one-time map, map, layer, legend, and storymap editor performance.
+* Restored layer description editing and storymap layer selections after editor hydration.
+* Improved map drag handling, fullscreen controls, sidebar portals, lock buttons, and cross-document iframe compatibility.
+* Replaced deprecated Gutenberg controls and storymap Dashicons with current WordPress components/icons.
+* Stabilized storymap rich text editing panels, slide ordering, navigation mode, and post embed display state.
+* Optimized storymap admin listing queries and disabled expensive hierarchy loading for JEO post types.
+
+Discovery and embeds:
+* Improved Discovery loading, lazy images, sidebar behavior, stories fetching, marker synchronization, sharing, and filters.
+* Added or improved Discovery date range, tag, and search handling.
+* Fixed Discovery embed rendering, center/zoom parsing, cluster hover, and story fetching regressions.
+* Improved map and storymap embed rendering, embed footer styling, footer logo handling, and embed asset loading.
+* Added support for disabling map embeds from map settings.
+
+Geocoding and metadata:
+* Improved Nominatim geocoding with accent-insensitive fallback.
+* Stabilized geocoding address updates and REST meta validation.
+* Persisted map and layer editor metadata more consistently.
+* Fixed public legend runtime UUID handling and related post popup/tracking behavior.
+
+Internationalization, compatibility, and release process:
+* Standardized the i18n build and release flow.
+* Refreshed Portuguese and Colombian Spanish translation sources and removed generated locale artifacts from version control.
+* Added WordPress language-file validation in CI.
+* Added PHPCompatibilityWP checks and WordPress smoke tests across supported and experimental PHP/WordPress combinations.
+* Added WordPress Plugin Check gates for pull requests and stable WordPress.org releases.
+* Added automated release metadata validation, package version synchronization, GitHub release zip artifacts, and WordPress.org deploy packaging.
+* Added frontend dependency guardrails, Size Limit bundle budgets, Dependabot configuration, and GitHub-native dependency maintenance workflows.
 
 = 2.15.2 =
 * bugfix: Popup behavior when there's more than one mouseover interaction
@@ -272,6 +318,9 @@ JEO Plugin was updated to be compatible with WordPress version > 5.6.0.
 * Second release.
 
 == Upgrade Notice ==
+
+= 3.0.0 =
+Major release. Review Carto-based layers, custom code that depends on old map runtime globals, and custom CSS that targets MapboxGL class names before updating. After updating, check JEO settings and test maps, layers, storymaps, Discovery pages, and embeds.
 
 = 0.1.0=
 * First release.
