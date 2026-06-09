@@ -934,6 +934,27 @@ msgstr "Tags"
 msgid "Filter stories by tag"
 msgstr "Filtrar histórias por tag"
 
+#: js/src/discovery/blocks/tag-filter-control.js:127
+#, js-format
+msgid "Remove tag %s"
+msgstr "Remover tag %s"
+
+#: js/src/discovery/blocks/date-range-filter.js:116
+msgid "Previous month"
+msgstr "Mês anterior"
+
+#: js/src/discovery/blocks/date-range-filter.js:133
+msgid "Month"
+msgstr "Mês"
+
+#: js/src/discovery/blocks/date-range-filter.js:145
+msgid "Year"
+msgstr "Ano"
+
+#: js/src/discovery/blocks/date-range-filter.js:158
+msgid "Next month"
+msgstr "Próximo mês"
+
 #: js/src/discovery/blocks/stories.js:210
 msgid "MM/DD/YYYY"
 msgstr "DD/MM/YYYY"
@@ -1053,6 +1074,34 @@ msgstr "Exibir filtros"
 msgid "Date range"
 msgstr "Intervalo de data"
 
+#: js/src/discovery/blocks/stories.js:1088
+msgid "Loading stories…"
+msgstr "Carregando histórias…"
+
+#: js/src/discovery/blocks/stories.js:1048
+msgid "Displayed stories"
+msgstr "Histórias exibidas"
+
+#: js/src/discovery/blocks/stories.js:1091
+msgid "Loading more stories…"
+msgstr "Carregando mais histórias…"
+
+#: js/src/discovery/blocks/stories.js:1094
+msgid "No stories found for the current filters."
+msgstr "Nenhuma história encontrada para os filtros atuais."
+
+#: js/src/discovery/blocks/stories.js:1095
+msgid "No stories available."
+msgstr "Nenhuma história disponível."
+
+#: js/src/discovery/blocks/stories.js:1179
+msgid "Updating stories…"
+msgstr "Atualizando histórias…"
+
+#: js/src/discovery/blocks/stories.js:1190
+msgid "Active filters"
+msgstr "Filtros ativos"
+
 #: js/src/discovery/blocks/stories.js:1169
 msgid "View in map"
 msgstr "Ver no mapa"
@@ -1076,7 +1125,7 @@ msgstr "Buscar mapa"
 #: js/src/discovery/blocks/map-layers.js:710
 #: js/src/discovery/blocks/map-layers.js:727
 msgid "Changes applied"
-msgstr "Mundanças aplicadas"
+msgstr "Mudanças aplicadas"
 
 #: js/src/discovery/blocks/map-layers.js:710
 msgid "Not applied"
@@ -1111,6 +1160,14 @@ msgstr "Histórias"
 #: js/src/map-blocks/layers-panel.js:25
 msgid "Map layers"
 msgstr "Camadas do mapa"
+
+#: js/src/discovery/blocks/sidebar.js:209
+msgid "Collapse discovery panel"
+msgstr "Recolher painel Discovery"
+
+#: js/src/discovery/blocks/sidebar.js:210
+msgid "Expand discovery panel"
+msgstr "Expandir painel Discovery"
 
 #: js/src/discovery/index.js:540
 #: js/src/jeo-map/class-jeo-map.js:658
