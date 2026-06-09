@@ -58,6 +58,11 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
@@ -67,6 +72,12 @@ jobs:
 
       - name: Show PHP version
         run: php -v
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build plugin assets
+        run: npm run build:assets
 
       - name: Wait for MariaDB
         env:

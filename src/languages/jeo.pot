@@ -44,15 +44,15 @@ msgstr ""
 msgid "Request context."
 msgstr ""
 
-#: includes/class-jeo.php:561
+#: includes/class-jeo.php:568
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:562
+#: includes/class-jeo.php:569
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:1026
+#: includes/class-jeo.php:1039
 msgid "Read more"
 msgstr ""
 
@@ -221,7 +221,7 @@ msgid "<p>JEO can connect to third-party services depending on your configuratio
 msgstr ""
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:490
+#: includes/loaders.php:492
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:6
 msgid "Explore"
