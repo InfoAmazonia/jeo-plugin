@@ -27,7 +27,7 @@ jobs:
           cache: npm
 
       - name: Setup WP-CLI
-        uses: holyhope/install-wp-cli-github-action@v1.3.0
+        uses: holyhope/install-wp-cli-github-action@v1.0.0
 
       - name: Build assets
         run: |
