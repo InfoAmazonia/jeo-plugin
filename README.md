@@ -161,7 +161,7 @@ When a stable release tag is pushed, the workflow also creates a GitHub Release
 that keeps GitHub's source-code archives and attaches a built `jeo.zip`
 artifact generated from `src/`.
 
-Prerelease branches may carry a SemVer prerelease such as `3.0.0-rc.3` while
+Prerelease branches may carry a SemVer prerelease such as `3.1.0-rc.1` while
 WordPress.org stays on the latest stable release. Before creating a stable
 release tag, run `npm run sync:version` and keep these files aligned:
 
