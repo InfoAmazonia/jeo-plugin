@@ -926,7 +926,6 @@ msgstr "Limpiar"
 msgid "Apply"
 msgstr "Aplicar"
 
-#: js/src/discovery/blocks/stories.js:1203
 #: js/src/discovery/blocks/tag-filter-control.js:93
 #: js/src/posts-selector/index.js:67
 msgid "Tags"
@@ -1073,11 +1072,16 @@ msgstr "Noviembre"
 msgid "December"
 msgstr "Diciembre"
 
-#: js/src/discovery/blocks/stories.js:1191
 #: js/src/discovery/blocks/stories.js:1230
 #: js/src/discovery/blocks/stories.js:1231
 msgid "Search story"
 msgstr "Buscar historia"
+
+#. translators: %s is the active story search query.
+#: js/src/discovery/blocks/stories.js:1192
+#, js-format
+msgid "Search story: %s"
+msgstr "Buscar historia: %s"
 
 #: js/src/discovery/blocks/stories.js:1272
 msgid "Hide filters"
@@ -1087,18 +1091,31 @@ msgstr "Ocultar filtros"
 msgid "Show filters"
 msgstr "Mostrar filtros"
 
-#: js/src/discovery/blocks/stories.js:1197
 #: js/src/discovery/blocks/stories.js:1278
 msgid "Date range"
 msgstr "Rango de fechas"
 
+#. translators: %s is the active story date range.
+#: js/src/discovery/blocks/stories.js:1199
+#, js-format
+msgid "Date range: %s"
+msgstr "Rango de fechas: %s"
+
+#. translators: %d is the number of stories currently displayed.
 #: js/src/discovery/blocks/stories.js:1185
-msgid "Displayed stories"
-msgstr "Historias mostradas"
+#, js-format
+msgid "Displayed stories: %d"
+msgstr "Historias mostradas: %d"
 
 #: js/src/discovery/blocks/stories.js:1210
 msgid "Loading stories…"
 msgstr "Cargando historias…"
+
+#. translators: %s is the list of active story tags.
+#: js/src/discovery/blocks/stories.js:1206
+#, js-format
+msgid "Tags: %s"
+msgstr "Etiquetas: %s"
 
 #: js/src/discovery/blocks/stories.js:1216
 msgid "Loading more stories…"

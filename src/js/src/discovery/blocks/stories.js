@@ -1180,27 +1180,30 @@ class Stories extends Component {
 		);
 		const activeFilters = [];
 		const hoveredClusterPostsSet = new Set( this.state.hoveredClusterPostsId );
+		/* translators: %d is the number of stories currently displayed. */
 		const storiesCountLabel = sprintf(
-			'%s: %d',
-			__( 'Displayed stories', 'jeo' ),
+			__( 'Displayed stories: %d', 'jeo' ),
 			this.props.stories.length
 		);
 
 		if ( queryParams.search ) {
+			/* translators: %s is the active story search query. */
 			activeFilters.push(
-				sprintf( '%s: %s', __( 'Search story', 'jeo' ), queryParams.search )
+				sprintf( __( 'Search story: %s', 'jeo' ), queryParams.search )
 			);
 		}
 
 		if ( this.props.dateRangeInputValue ) {
+			/* translators: %s is the active story date range. */
 			activeFilters.push(
-				sprintf( '%s: %s', __( 'Date range', 'jeo' ), this.props.dateRangeInputValue )
+				sprintf( __( 'Date range: %s', 'jeo' ), this.props.dateRangeInputValue )
 			);
 		}
 
 		if ( this.state.selectedTagLabel ) {
+			/* translators: %s is the list of active story tags. */
 			activeFilters.push(
-				sprintf( '%s: %s', __( 'Tags', 'jeo' ), this.state.selectedTagLabel )
+				sprintf( __( 'Tags: %s', 'jeo' ), this.state.selectedTagLabel )
 			);
 		}
 
