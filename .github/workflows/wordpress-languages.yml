@@ -12,23 +12,6 @@ jobs:
   wordpress-language-files:
     name: Validate WordPress language files
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_DATABASE: wordpress
-          MYSQL_ROOT_PASSWORD: root
-        ports:
-          - '3306:3306'
-        options: >-
-          --health-cmd="mysqladmin ping -h 127.0.0.1 -uroot -proot"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=10
-    env:
-      WP_PATH: /tmp/wordpress
-      PLUGIN_BUILD_DIR: /tmp/plugin-check-build/jeo
-      PLUGIN_CHECK_RESULTS: /tmp/plugin-check-results.txt
 
     steps:
       - uses: actions/checkout@v6
@@ -42,6 +25,11 @@ jobs:
         with:
           node-version: 24
           cache: npm
+
+      - name: Setup WP-CLI
+        uses: holyhope/install-wp-cli-github-action@main
+        with:
+          version: 'latest'
 
       - name: Build assets
         run: |
