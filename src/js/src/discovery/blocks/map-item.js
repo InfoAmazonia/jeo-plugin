@@ -2,6 +2,8 @@ import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
+import LoadingSpinner from './loading-spinner';
+
 class MapItem extends Component {
 	constructor( props ) {
 		super( props );
@@ -40,10 +42,6 @@ class MapItem extends Component {
 			return (
 				<svg
 					aria-hidden="true"
-					focusable="false"
-					data-prefix="fas"
-					data-icon="toggle-off"
-					role="img"
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 576 512"
 					className="svg-inline--fa fa-toggle-off fa-w-18 fa-3x"
@@ -56,10 +54,6 @@ class MapItem extends Component {
 		return (
 			<svg
 				aria-hidden="true"
-				focusable="false"
-				data-prefix="fas"
-				data-icon="toggle-on"
-				role="img"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 576 512"
 				className="svg-inline--fa fa-toggle-on fa-w-18 fa-3x"
@@ -160,27 +154,13 @@ class MapItem extends Component {
 					aria-busy={ loadingMapLayers ? 'true' : undefined }
 				>
 					{ ! applyRemoveButton && loadingMapLayers ? (
-						<svg
-							aria-hidden="true"
-							focusable="false"
-							data-prefix="fas"
-							data-icon="spinner"
-							role="img"
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 512 512"
-							className="map-item__loading-icon"
-						>
-							<path
-								fill="currentColor"
-								d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-							></path>
-						</svg>
+						<LoadingSpinner className="map-item__loading-icon" />
 					) : applyRemoveButton ? (
-						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="minus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 							<path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
 						</svg>
 					) : (
-						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 							<path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
 						</svg>
 					) }

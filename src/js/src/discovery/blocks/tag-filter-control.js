@@ -121,7 +121,11 @@ export default function TagFilterControl( { value, onChange, onSelectedLabelChan
 							<span>{ term.name }</span>
 							<button
 								type="button"
-								aria-label={ sprintf( __( 'Remove tag %s', 'jeo' ), term.name ) }
+								aria-label={ sprintf(
+									/* translators: %s: selected tag name. */
+									__( 'Remove tag %s', 'jeo' ),
+									term.name
+								) }
 								onClick={ () =>
 									commitSelection(
 										selectedIds.filter(

@@ -6,6 +6,7 @@ import { addQueryArgs } from '@wordpress/url';
 
 import { mapboxToken } from '../../lib/mapgl-loader';
 import { chunkRecordIds, mergeRecordsByIdOrder } from '../../shared/rest-records';
+import LoadingSpinner from './loading-spinner';
 import MapItem from './map-item';
 import Search from './search';
 
@@ -597,10 +598,6 @@ class MapLayers extends Component {
 						>
 							<svg
 								aria-hidden="true"
-								focusable="false"
-								data-prefix="fas"
-								data-icon="grip-vertical"
-								role="img"
 								xmlns="http://www.w3.org/2000/svg"
 								viewBox="0 0 320 512"
 								className="drag-icon"
@@ -624,10 +621,6 @@ class MapLayers extends Component {
 							>
 								<svg
 									aria-hidden="true"
-									focusable="false"
-									data-prefix="fas"
-									data-icon="times"
-									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 352 512"
 								>
@@ -658,21 +651,7 @@ class MapLayers extends Component {
 		);
 
 		const loading = ! this.props.mapsLoaded ? (
-			<svg
-				aria-hidden="true"
-				focusable="false"
-				data-prefix="fas"
-				data-icon="spinner"
-				role="img"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 512 512"
-				className="svg-inline--fa fa-spinner fa-w-16 fa-3x"
-			>
-				<path
-					fill="currentColor"
-					d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-				></path>
-			</svg>
+			<LoadingSpinner />
 		) : null;
 
 		return (
@@ -691,10 +670,6 @@ class MapLayers extends Component {
 							{ ! isApplied ? (
 								<svg
 									aria-hidden="true"
-									focusable="false"
-									data-prefix="fas"
-									data-icon="times"
-									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 352 512"
 								>
@@ -706,10 +681,6 @@ class MapLayers extends Component {
 							) : (
 								<svg
 									aria-hidden="true"
-									focusable="false"
-									data-prefix="fas"
-									data-icon="check"
-									role="img"
 									xmlns="http://www.w3.org/2000/svg"
 									viewBox="0 0 512 512"
 								>
