@@ -50,6 +50,7 @@ class Storymap {
 		add_filter( 'the_posts', array( $this, 'prime_lightweight_admin_list_cache' ), 10, 2 );
 		add_filter( 'manage_' . $this->post_type . '_posts_columns', array( $this, 'remove_expensive_admin_list_columns' ), 20 );
 		add_filter( 'quick_edit_dropdown_pages_args', array( $this, 'disable_admin_parent_dropdown' ) );
+		add_filter( 'heartbeat_received', array( $this, 'disable_admin_list_lock_heartbeat' ), 9, 3 );
 		add_action( 'shutdown', array( $this, 'clear_lightweight_admin_list_cache' ) );
 
 		add_filter( 'rest_prepare_storymap', array( $this, 'prepare_rest_response' ), 10, 2 );
@@ -86,7 +87,7 @@ class Storymap {
 
 		$args = array(
 			'labels'              => $labels,
-			'hierarchical'        => true,
+			'hierarchical'        => false,
 			'description'         => __( 'JEO Story Map', 'jeo' ),
 			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks', 'revisions' ),
 			'rewrite'             => array( 'slug' => 'storymap' ),
@@ -391,6 +392,32 @@ class Storymap {
 		$dropdown_args['post_type'] = '__jeo_no_storymap_parent_options';
 
 		return $dropdown_args;
+	}
+
+	/**
+	 * Disable list-table edit-lock checks for storymaps.
+	 *
+	 * The posts list heartbeat sends every visible row to wp_check_locked_posts().
+	 * On content-heavy storymap screens, that AJAX request can exhaust memory even
+	 * after the initial list query has been made lightweight. Post edit screens
+	 * still keep their regular heartbeat lock behavior.
+	 *
+	 * @param array  $response  Heartbeat response.
+	 * @param array  $data      Heartbeat request data.
+	 * @param string $screen_id Current screen ID.
+	 * @return array
+	 */
+	public function disable_admin_list_lock_heartbeat( $response, $data, $screen_id ) {
+		if ( 'edit-' . $this->post_type !== $screen_id ) {
+			return $response;
+		}
+		if ( empty( $data['wp-check-locked-posts'] ) ) {
+			return $response;
+		}
+
+		remove_filter( 'heartbeat_received', 'wp_check_locked_posts', 10 );
+
+		return $response;
 	}
 
 	/**

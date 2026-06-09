@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-09T18:48:36+00:00\n"
+"POT-Creation-Date: 2026-06-09T18:53:33+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeo\n"
@@ -632,70 +632,70 @@ msgid "Save Changes"
 msgstr ""
 
 #. translators: Story Map is the name of JEO's storytelling map feature.
-#: includes/storymap/class-storymap.php:68
 #: includes/storymap/class-storymap.php:69
+#: includes/storymap/class-storymap.php:70
 #: js/build/mapBlocks.js:3
 msgid "Story Map"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:70
 #: includes/storymap/class-storymap.php:71
+#: includes/storymap/class-storymap.php:72
 msgid "Add new Story Map"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:72
+#: includes/storymap/class-storymap.php:73
 msgid "Edit Story Map"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:73
+#: includes/storymap/class-storymap.php:74
 msgid "New Story Map"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:74
+#: includes/storymap/class-storymap.php:75
 msgid "View Story Map"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:75
+#: includes/storymap/class-storymap.php:76
 msgid "View Story Maps"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:76
+#: includes/storymap/class-storymap.php:77
 msgid "Search Story Maps"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:77
+#: includes/storymap/class-storymap.php:78
 msgid "No Story Map found"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:78
+#: includes/storymap/class-storymap.php:79
 msgid "No Story Map found in the trash"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:79
+#: includes/storymap/class-storymap.php:80
 msgid "Story Maps"
 msgstr ""
 
-#: includes/storymap/class-storymap.php:80
+#: includes/storymap/class-storymap.php:81
 msgid "Story Map published."
 msgstr ""
 
-#: includes/storymap/class-storymap.php:81
+#: includes/storymap/class-storymap.php:82
 msgid "Story Map published privately."
 msgstr ""
 
-#: includes/storymap/class-storymap.php:82
+#: includes/storymap/class-storymap.php:83
 msgid "Story Map reverted to draft."
 msgstr ""
 
-#: includes/storymap/class-storymap.php:83
+#: includes/storymap/class-storymap.php:84
 msgid "Story Map scheduled."
 msgstr ""
 
-#: includes/storymap/class-storymap.php:84
+#: includes/storymap/class-storymap.php:85
 msgid "Story Map updated."
 msgstr ""
 
-#: includes/storymap/class-storymap.php:90
+#: includes/storymap/class-storymap.php:91
 msgid "JEO Story Map"
 msgstr ""
 

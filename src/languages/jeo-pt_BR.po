@@ -622,70 +622,70 @@ msgid "JEO could not save this asset URL. Use a valid http(s) or root-relative U
 msgstr "O JEO não pôde salvar esta URL de recurso. Use uma URL http(s) válida ou relativa à raiz."
 
 #. translators: Story Map is the name of JEO's storytelling map feature.
-#: includes/storymap/class-storymap.php:68
 #: includes/storymap/class-storymap.php:69
+#: includes/storymap/class-storymap.php:70
 #: js/build/mapBlocks.js:3
 msgid "Story Map"
 msgstr "Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:70
 #: includes/storymap/class-storymap.php:71
+#: includes/storymap/class-storymap.php:72
 msgid "Add new Story Map"
 msgstr "Adicionar novo Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:72
+#: includes/storymap/class-storymap.php:73
 msgid "Edit Story Map"
 msgstr "Editar Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:73
+#: includes/storymap/class-storymap.php:74
 msgid "New Story Map"
 msgstr "Novo Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:74
+#: includes/storymap/class-storymap.php:75
 msgid "View Story Map"
 msgstr "Ver Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:75
+#: includes/storymap/class-storymap.php:76
 msgid "View Story Maps"
 msgstr "Ver Mapas Narrativos"
 
-#: includes/storymap/class-storymap.php:76
+#: includes/storymap/class-storymap.php:77
 msgid "Search Story Maps"
 msgstr "Pesquisar Mapas Narrativos"
 
-#: includes/storymap/class-storymap.php:77
+#: includes/storymap/class-storymap.php:78
 msgid "No Story Map found"
 msgstr "Nenhum Mapa Narrativo encontrado"
 
-#: includes/storymap/class-storymap.php:78
+#: includes/storymap/class-storymap.php:79
 msgid "No Story Map found in the trash"
 msgstr "Nenhum Mapa Narrativo encontrado na lixeira"
 
-#: includes/storymap/class-storymap.php:79
+#: includes/storymap/class-storymap.php:80
 msgid "Story Maps"
 msgstr "Mapas Narrativos"
 
-#: includes/storymap/class-storymap.php:80
+#: includes/storymap/class-storymap.php:81
 msgid "Story Map published."
 msgstr "Mapa Narrativo publicado."
 
-#: includes/storymap/class-storymap.php:81
+#: includes/storymap/class-storymap.php:82
 msgid "Story Map published privately."
 msgstr "Mapa Narrativo publicado como privado."
 
-#: includes/storymap/class-storymap.php:82
+#: includes/storymap/class-storymap.php:83
 msgid "Story Map reverted to draft."
 msgstr "Mapa Narrativo revertido para rascunho."
 
-#: includes/storymap/class-storymap.php:83
+#: includes/storymap/class-storymap.php:84
 msgid "Story Map scheduled."
 msgstr "Mapa Narrativo agendado."
 
-#: includes/storymap/class-storymap.php:84
+#: includes/storymap/class-storymap.php:85
 msgid "Story Map updated."
 msgstr "Mapa Narrativo atualizado."
 
-#: includes/storymap/class-storymap.php:90
+#: includes/storymap/class-storymap.php:91
 msgid "JEO Story Map"
 msgstr "Mapa Narrativo do JEO"
 
