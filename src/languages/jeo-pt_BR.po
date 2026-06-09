@@ -1147,23 +1147,23 @@ msgid_plural "%d markers in this area"
 msgstr[0] "%d marcador nesta área"
 msgstr[1] "%d marcadores nesta área"
 
-#: js/src/jeo-storymap/storymap-display.js:553
+#: js/src/jeo-storymap/storymap-display.js:521
 msgid "at"
 msgstr "em"
 
-#: js/src/jeo-storymap/storymap-display.js:566
+#: js/src/jeo-storymap/storymap-display.js:534
 msgid "START"
 msgstr "INICIAR"
 
-#: js/src/jeo-storymap/storymap-display.js:580
+#: js/src/jeo-storymap/storymap-display.js:548
 msgid "skip intro"
 msgstr "pular introdução"
 
-#: js/src/jeo-storymap/storymap-display.js:673
+#: js/src/jeo-storymap/storymap-display.js:641
 msgid "Back to top"
 msgstr "Voltar ao topo"
 
-#: js/src/jeo-storymap/storymap-display.js:719
+#: js/src/jeo-storymap/storymap-display.js:687
 msgid "NAVIGATE THE MAP"
 msgstr "Navegar no mapa"
 
@@ -1872,7 +1872,7 @@ msgid "Ex. https://example.com/wp-content/uploads/fonts/jeo-story-font.css"
 msgstr "Ex. https://exemplo.com/wp-content/uploads/fonts/jeo-story-font.css"
 
 #. translators: %s is the authors list
-#: js/src/jeo-storymap/storymap-display.js:39
+#: js/src/jeo-storymap/storymap-display.js:40
 #, js-format
 msgid "By %s"
 msgstr "Por %s"
