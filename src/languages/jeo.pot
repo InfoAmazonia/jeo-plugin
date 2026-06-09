@@ -3,13 +3,13 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: JEO Maps 3.0.0-rc.3\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeo\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/src\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-09T05:07:57+00:00\n"
+"POT-Creation-Date: 2026-06-09T18:42:34+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeo\n"
@@ -65,12 +65,14 @@ msgid "Metadata storing the locations related to the post. Each location is an o
 msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:247
-#: js/src/map-blocks/map-settings.js:59
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Latitude"
 msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:261
-#: js/src/map-blocks/map-settings.js:69
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Longitude"
 msgstr ""
 
@@ -104,8 +106,8 @@ msgstr ""
 
 #: includes/layers/class-layers.php:50
 #: includes/layers/class-layers.php:61
-#: js/src/jeo-map/class-jeo-map.js:1846
-#: js/src/map-blocks/storymap-editor.js:961
+#: js/build/jeoMap.js:2
+#: js/build/mapBlocks.js:1
 msgid "Layers"
 msgstr ""
 
@@ -199,12 +201,12 @@ msgid "Legend type-specific options"
 msgstr ""
 
 #: includes/layers/class-layers.php:203
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:159
+#: js/build/layersSidebar.js:7
 msgid "Use legend"
 msgstr ""
 
 #: includes/layers/class-layers.php:215
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:180
+#: js/build/layersSidebar.js:7
 msgid "Legend title"
 msgstr ""
 
@@ -221,8 +223,7 @@ msgstr ""
 #. translators: Explore is the name of JEO's discovery page feature.
 #: includes/loaders.php:490
 #: templates/embed-discovery.php:18
-#: js/src/discovery/blocks/sidebar.js:291
-#: js/src/discovery/index.js:514
+#: js/build/discovery.js:6
 msgid "Explore"
 msgstr ""
 
@@ -335,22 +336,22 @@ msgid "The map Layers"
 msgstr ""
 
 #: includes/maps/class-maps.php:211
-#: js/src/map-blocks/onetime-map-config.js:67
+#: js/build/mapBlocks.js:1
 msgid "East pan limit"
 msgstr ""
 
 #: includes/maps/class-maps.php:215
-#: js/src/map-blocks/onetime-map-config.js:71
+#: js/build/mapBlocks.js:1
 msgid "North pan limit"
 msgstr ""
 
 #: includes/maps/class-maps.php:219
-#: js/src/map-blocks/onetime-map-config.js:75
+#: js/build/mapBlocks.js:1
 msgid "South pan limit"
 msgstr ""
 
 #: includes/maps/class-maps.php:223
-#: js/src/map-blocks/onetime-map-config.js:79
+#: js/build/mapBlocks.js:1
 msgid "West pan limit"
 msgstr ""
 
@@ -411,7 +412,8 @@ msgid "Maximum zoom level"
 msgstr ""
 
 #: includes/maps/class-maps.php:396
-#: js/src/map-blocks/map-settings.js:251
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Hide in discovery"
 msgstr ""
 
@@ -438,7 +440,7 @@ msgstr ""
 
 #: includes/settings/class-settings.php:347
 #: includes/settings/class-settings.php:348
-#: js/src/layers-sidebar/layers-sidebar.js:138
+#: js/build/layersSidebar.js:7
 msgid "Settings"
 msgstr ""
 
@@ -632,7 +634,7 @@ msgstr ""
 #. translators: Story Map is the name of JEO's storytelling map feature.
 #: includes/storymap/class-storymap.php:68
 #: includes/storymap/class-storymap.php:69
-#: js/src/map-blocks/index.js:169
+#: js/build/mapBlocks.js:3
 msgid "Story Map"
 msgstr ""
 
@@ -711,117 +713,130 @@ msgstr ""
 
 #: templates/map-content-layers-list.php:18
 #: templates/map-content-layers-list.php:20
-#: js/src/jeo-map/class-jeo-map.js:774
+#: js/build/jeoMap.js:1
 msgid "Attribution:"
 msgstr ""
 
 #: templates/map-content-layers-list.php:25
-#: js/src/jeo-map/class-jeo-map.js:795
+#: js/build/jeoMap.js:1
 msgid "Download from source"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:10
-#: js/src/map-blocks/layers-settings.js:49
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Raster Mapbox Tiled Source"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:68
 #: includes/layer-types/mapbox-tileset-vector.js:70
-#: js/src/layers-sidebar/layer-type-definitions.js:114
-#: js/src/layers-sidebar/layer-type-definitions.js:143
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Tileset ID"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:69
 #: includes/layer-types/mapbox-tileset-vector.js:71
-#: js/src/layers-sidebar/layer-type-definitions.js:115
-#: js/src/layers-sidebar/layer-type-definitions.js:144
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Example: username.tilesetid"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:72
 #: includes/layer-types/mapbox-tileset-vector.js:99
 #: includes/layer-types/mvt.js:101
-#: js/src/layers-sidebar/layer-type-definitions.js:99
-#: js/src/layers-sidebar/layer-type-definitions.js:118
-#: js/src/layers-sidebar/layer-type-definitions.js:171
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Style Source Type"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:73
 #: includes/layer-types/mvt.js:102
-#: js/src/layers-sidebar/layer-type-definitions.js:100
-#: js/src/layers-sidebar/layer-type-definitions.js:119
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Which data the map should display"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:79
 #: includes/layer-types/mapbox-tileset-vector.js:79
-#: js/src/layers-sidebar/layer-type-definitions.js:125
-#: js/src/layers-sidebar/layer-type-definitions.js:152
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Layer Type"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:81
 #: includes/layer-types/mapbox-tileset-vector.js:81
-#: js/src/layers-sidebar/layer-type-definitions.js:126
-#: js/src/layers-sidebar/layer-type-definitions.js:153
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Layers take the data that they get from a source, optionally filter features, and then define how those features are styled."
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-vector.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:6
-#: js/src/map-blocks/layers-settings.js:48
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Vector Mapbox Tiled Source"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-vector.js:75
 #: includes/layer-types/mvt.js:83
-#: js/src/layers-sidebar/layer-type-definitions.js:78
-#: js/src/layers-sidebar/layer-type-definitions.js:148
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Source layer"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-vector.js:76
-#: js/src/layers-sidebar/layer-type-definitions.js:149
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Which data the map should display."
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-vector.js:100
-#: js/src/layers-sidebar/layer-type-definitions.js:172
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "The layer source type style"
 msgstr ""
 
 #: includes/layer-types/mapbox.js:10
-#: js/src/layers-sidebar/layer-type-definitions.js:4
-#: js/src/map-blocks/layers-settings.js:47
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Mapbox Style"
 msgstr ""
 
 #: includes/layer-types/mapbox.js:155
-#: js/src/layers-sidebar/layer-type-definitions.js:26
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr ""
 
 #: includes/layer-types/mapbox.js:157
-#: js/src/layers-sidebar/layer-type-definitions.js:27
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
 msgstr ""
 
 #: includes/layer-types/mapbox.js:164
-#: js/src/layers-sidebar/layer-type-definitions.js:34
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Access token"
 msgstr ""
 
 #: includes/layer-types/mapbox.js:166
-#: js/src/layers-sidebar/layer-type-definitions.js:35
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
 msgstr ""
 
 #: includes/layer-types/mvt.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:14
-#: js/src/map-blocks/layers-settings.js:51
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Mapbox Vector Tiles (MVT)"
 msgstr ""
 
@@ -829,44 +844,51 @@ msgstr ""
 #: includes/layer-types/tilelayer.js:57
 #: includes/legend-types/circles.js:25
 #: includes/legend-types/icons.js:25
-#: js/src/layers-sidebar/layer-type-definitions.js:49
-#: js/src/layers-sidebar/layer-type-definitions.js:74
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "URL"
 msgstr ""
 
 #: includes/layer-types/mvt.js:84
-#: js/src/layers-sidebar/layer-type-definitions.js:79
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Layer to use from a vector tile source."
 msgstr ""
 
 #: includes/layer-types/tilelayer.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:13
-#: js/src/map-blocks/layers-settings.js:50
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Raster Tiled Source"
 msgstr ""
 
 #: includes/layer-types/tilelayer.js:61
-#: js/src/layers-sidebar/layer-type-definitions.js:53
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Scheme"
 msgstr ""
 
 #: includes/layer-types/tilelayer.js:62
-#: js/src/layers-sidebar/layer-type-definitions.js:54
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Influences the Y direction of the tile coordinates."
 msgstr ""
 
 #: includes/layer-types/tilelayer.js:65
-#: js/src/layers-sidebar/layer-type-definitions.js:60
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Slippy Map tilenames (XYZ)"
 msgstr ""
 
 #: includes/layer-types/tilelayer.js:66
-#: js/src/layers-sidebar/layer-type-definitions.js:61
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "OSGeo spec (TMS)"
 msgstr ""
 
 #: includes/legend-types/barscale.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:9
+#: js/build/layersSidebar.js:7
 msgid "Color scale"
 msgstr ""
 
@@ -883,7 +905,7 @@ msgid "An array of hexadecimal color values"
 msgstr ""
 
 #: includes/legend-types/circles.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:12
+#: js/build/layersSidebar.js:7
 msgid "Circle sizes"
 msgstr ""
 
@@ -892,7 +914,7 @@ msgid "An array of labels and radius values"
 msgstr ""
 
 #: includes/legend-types/icons.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:11
+#: js/build/layersSidebar.js:7
 msgid "Icon categories"
 msgstr ""
 
@@ -903,14 +925,13 @@ msgstr ""
 #: includes/legend-types/JeoLegend.js:177
 #: includes/legend-types/JeoLegend.js:181
 #: includes/legend-types/JeoLegend.js:186
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:53
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:60
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:103
+#: js/build/JeoLegend.js:1
+#: js/build/layersSidebar.js:7
 msgid "Default label"
 msgstr ""
 
 #: includes/legend-types/simple-color.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:10
+#: js/build/layersSidebar.js:7
 msgid "Color categories"
 msgstr ""
 
@@ -923,329 +944,407 @@ msgstr ""
 msgid "Choose Image"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:84
-#: js/src/discovery/blocks/stories.js:309
-msgid "January"
+#: js/build/contextSidebar.js:1
+msgid "Suggested Paragraphs"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:85
-#: js/src/discovery/blocks/stories.js:310
-msgid "February"
+#: js/build/contextSidebar.js:1
+msgid "Inserted"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:86
-#: js/src/discovery/blocks/stories.js:311
-msgid "March"
+#: js/build/contextSidebar.js:1
+msgid "Insert into article"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:87
-#: js/src/discovery/blocks/stories.js:312
-msgid "April"
+#: js/build/contextSidebar.js:1
+msgid "Copied!"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:88
-#: js/src/discovery/blocks/stories.js:313
-msgid "May"
+#: js/build/contextSidebar.js:1
+msgid "Copy"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:89
-#: js/src/discovery/blocks/stories.js:314
-msgid "June"
+#: js/build/contextSidebar.js:1
+msgid "Failed to generate suggestions."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:90
-#: js/src/discovery/blocks/stories.js:315
-msgid "July"
+#: js/build/contextSidebar.js:1
+msgid "Error contacting AI."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:91
-#: js/src/discovery/blocks/stories.js:316
-msgid "August"
+#: js/build/contextSidebar.js:1
+msgid "Failed to process message."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:92
-#: js/src/discovery/blocks/stories.js:317
-msgid "September"
+#: js/build/contextSidebar.js:1
+msgid "Generate new editorial suggestions based on the current post content."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:93
-#: js/src/discovery/blocks/stories.js:318
-msgid "October"
+#: js/build/contextSidebar.js:1
+msgid "Failed to clear conversation."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:94
-#: js/src/discovery/blocks/stories.js:319
-msgid "November"
+#: js/build/contextSidebar.js:1
+msgid "Restoring conversation..."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:95
-#: js/src/discovery/blocks/stories.js:320
-msgid "December"
+#: js/build/contextSidebar.js:1
+msgid "Use the AI Context Assistant to generate editorial suggestions based on your article and the site's knowledge base."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:116
-msgid "Previous month"
+#: js/build/contextSidebar.js:1
+msgid "Generate Suggestions"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:133
-msgid "Month"
+#: js/build/contextSidebar.js:1
+msgid "Thinking..."
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:145
-msgid "Year"
+#: js/build/contextSidebar.js:1
+msgid "Ask for changes or new paragraphs... (Ctrl+Enter to send)"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:158
-msgid "Next month"
+#: js/build/contextSidebar.js:1
+msgid "Send"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:248
-#: js/src/discovery/blocks/map-item.js:169
-#: js/src/discovery/blocks/stories.js:1303
-#: js/src/map-blocks/layers-settings.js:136
+#: js/build/contextSidebar.js:1
+msgid "Retry"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+#: js/build/discovery.js:1
+#: js/build/discovery.js:6
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Clear"
 msgstr ""
 
-#: js/src/discovery/blocks/date-range-filter.js:265
-#: js/src/discovery/blocks/map-item.js:169
-#: js/src/discovery/blocks/stories.js:294
+#: js/build/contextSidebar.js:1
+msgid "AI Context"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Expand"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "AI Context Assistant"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "January"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "February"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "March"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "April"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "May"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "June"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "July"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "August"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "September"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "October"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "November"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+msgid "December"
+msgstr ""
+
+#: js/build/discovery.js:1
+msgid "Previous month"
+msgstr ""
+
+#: js/build/discovery.js:1
+msgid "Month"
+msgstr ""
+
+#: js/build/discovery.js:1
+msgid "Year"
+msgstr ""
+
+#: js/build/discovery.js:1
+msgid "Next month"
+msgstr ""
+
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+#: js/build/discovery.js:6
 msgid "Apply"
 msgstr ""
 
-#: js/src/discovery/blocks/map-item.js:146
-msgid "layers"
-msgstr ""
-
-#: js/src/discovery/blocks/map-item.js:168
-#: js/src/discovery/blocks/map-item.js:174
-msgid "Loading layers…"
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:196
-msgid "Unable to load map layers right now."
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:660
-#: js/src/discovery/blocks/map-layers.js:661
-msgid "Search map"
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:696
-#: js/src/discovery/blocks/map-layers.js:717
-msgid "Changes applied"
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:696
-msgid "Not applied"
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:702
-#: js/src/map-blocks/layers-settings.js:243
-msgid "Selected layers"
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:707
-msgid "No layers selected"
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:724
-msgid "Apply changes"
-msgstr ""
-
-#: js/src/discovery/blocks/map-layers.js:733
-msgid "Loading more maps…"
-msgstr ""
-
-#: js/src/discovery/blocks/sidebar.js:250
-msgid "Stories"
-msgstr ""
-
-#: js/src/discovery/blocks/sidebar.js:278
-#: js/src/map-blocks/layers-panel.js:25
-msgid "Map layers"
-msgstr ""
-
-#: js/src/discovery/blocks/sidebar.js:308
-msgid "Collapse discovery panel"
-msgstr ""
-
-#: js/src/discovery/blocks/sidebar.js:309
-msgid "Expand discovery panel"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:292
-msgid "MM/DD/YYYY"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:293
-msgid " - "
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:295
-#: js/src/map-blocks/map-editor.js:146
-#: js/src/map-blocks/storymap-editor.js:1356
-#: js/src/posts-sidebar/geo-posts.js:448
-msgid "Cancel"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:296
-msgid "From"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:297
-msgid "To"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:298
-msgid "Custom"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:300
-msgid "Su"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:301
-msgid "Mo"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:302
-msgid "Tu"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:303
-msgid "We"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:304
-msgid "Th"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:305
-msgid "Fr"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:306
-msgid "Sa"
-msgstr ""
-
-#. translators: %d is the number of stories currently displayed.
-#: js/src/discovery/blocks/stories.js:1185
-#, js-format
-msgid "Displayed stories: %d"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1230
-#: js/src/discovery/blocks/stories.js:1231
-msgid "Search story"
-msgstr ""
-
-#. translators: %s is the active story search query.
-#: js/src/discovery/blocks/stories.js:1192
-#, js-format
-msgid "Search story: %s"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1278
-msgid "Date range"
-msgstr ""
-
-#. translators: %s is the active story date range.
-#: js/src/discovery/blocks/stories.js:1199
-#, js-format
-msgid "Date range: %s"
-msgstr ""
-
-#: js/src/discovery/blocks/tag-filter-control.js:93
-#: js/src/posts-selector/index.js:67
+#: js/build/discovery.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
 msgid "Tags"
 msgstr ""
 
-#. translators: %s is the list of active story tags.
-#: js/src/discovery/blocks/stories.js:1206
-#, js-format
-msgid "Tags: %s"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1210
-msgid "Loading stories…"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1216
-msgid "Loading more stories…"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1222
-msgid "No stories found for the current filters."
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1223
-msgid "No stories available."
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1272
-msgid "Hide filters"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1273
-msgid "Show filters"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1299
-msgid "Updating stories…"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1310
-msgid "Active filters"
-msgstr ""
-
-#: js/src/discovery/blocks/stories.js:1421
-msgid "View in map"
-msgstr ""
-
-#: js/src/discovery/blocks/tag-filter-control.js:94
+#: js/build/discovery.js:1
 msgid "Filter stories by tag"
 msgstr ""
 
 #. translators: %s: selected tag name.
-#: js/src/discovery/blocks/tag-filter-control.js:126
+#: js/build/discovery.js:2
 #, js-format
 msgid "Remove tag %s"
 msgstr ""
 
-#: js/src/discovery/index.js:542
+#: js/build/discovery.js:2
+msgid "MM/DD/YYYY"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid " - "
+msgstr ""
+
+#: js/build/discovery.js:2
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
+msgid "Cancel"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "From"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "To"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "Custom"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "Su"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "Mo"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "Tu"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "We"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "Th"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "Fr"
+msgstr ""
+
+#: js/build/discovery.js:2
+msgid "Sa"
+msgstr ""
+
+#. translators: %d is the number of stories currently displayed.
+#: js/build/discovery.js:3
+#, js-format
+msgid "Displayed stories: %d"
+msgstr ""
+
+#. translators: %s is the active story search query.
+#: js/build/discovery.js:4
+#, js-format
+msgid "Search story: %s"
+msgstr ""
+
+#. translators: %s is the active story date range.
+#: js/build/discovery.js:5
+#, js-format
+msgid "Date range: %s"
+msgstr ""
+
+#. translators: %s is the list of active story tags.
+#: js/build/discovery.js:6
+#, js-format
+msgid "Tags: %s"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Loading stories…"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Loading more stories…"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "No stories found for the current filters."
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "No stories available."
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Search story"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Hide filters"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Show filters"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Date range"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Updating stories…"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Active filters"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "View in map"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "layers"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Loading layers…"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Unable to load map layers right now."
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Search map"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Changes applied"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Not applied"
+msgstr ""
+
+#: js/build/discovery.js:6
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Selected layers"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "No layers selected"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Apply changes"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Loading more maps…"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Stories"
+msgstr ""
+
+#: js/build/discovery.js:6
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Map layers"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Collapse discovery panel"
+msgstr ""
+
+#: js/build/discovery.js:6
+msgid "Expand discovery panel"
+msgstr ""
+
+#: js/build/discovery.js:6
 msgctxt "discovery share action"
 msgid "Embed"
 msgstr ""
 
-#: js/src/discovery/index.js:592
-#: js/src/jeo-map/class-jeo-map.js:658
-#: js/src/layers-sidebar/layers-sidebar.js:152
+#: js/build/discovery.js:6
+#: js/build/jeoMap.js:1
+#: js/build/layersSidebar.js:7
 msgid "Legend"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:378
+#: js/build/jeoMap.js:1
 msgid "This map doesn't have layers"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:733
-#: js/src/jeo-map/class-jeo-map.js:826
+#: js/build/jeoMap.js:1
 msgid "Info"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:808
+#: js/build/jeoMap.js:1
 msgid "Close popup"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:1508
+#: js/build/jeoMap.js:1
 msgid "Show previous post"
 msgstr ""
 
-#: js/src/jeo-map/class-jeo-map.js:1512
+#: js/build/jeoMap.js:1
 msgid "Show next post"
 msgstr ""
 
 #. translators: %d: number of markers in the current map area.
-#: js/src/jeo-map/class-jeo-map.js:1551
+#: js/build/jeoMap.js:2
 #, js-format
 msgid "%d marker in this area"
 msgid_plural "%d markers in this area"
@@ -1253,715 +1352,750 @@ msgstr[0] ""
 msgstr[1] ""
 
 #. translators: %s is the authors list
-#: js/src/jeo-storymap/storymap-display.js:37
+#: js/build/jeoStorymap.js:3
 #, js-format
 msgid "By %s"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:505
+#: js/build/jeoStorymap.js:3
 msgid "at"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:518
+#: js/build/jeoStorymap.js:3
 msgid "START"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:532
+#: js/build/jeoStorymap.js:3
 msgid "skip intro"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:625
+#: js/build/jeoStorymap.js:3
 msgid "Back to top"
 msgstr ""
 
-#: js/src/jeo-storymap/storymap-display.js:671
+#: js/build/jeoStorymap.js:3
 msgid "NAVIGATE THE MAP"
 msgstr ""
 
-#: js/src/layers-sidebar/attribution-settings.js:11
+#: js/build/layersSidebar.js:7
+msgid "Select an option"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
 msgid "Source data download link"
 msgstr ""
 
-#: js/src/layers-sidebar/attribution-settings.js:12
+#: js/build/layersSidebar.js:7
 msgid "Data attribution link"
 msgstr ""
 
-#: js/src/layers-sidebar/attribution-settings.js:13
+#: js/build/layersSidebar.js:7
 msgid "Data attribution name"
 msgstr ""
 
-#: js/src/layers-sidebar/interaction-settings.js:19
-msgid "No"
-msgstr ""
-
-#: js/src/layers-sidebar/interaction-settings.js:20
-msgid "On click"
-msgstr ""
-
-#: js/src/layers-sidebar/interaction-settings.js:21
-msgid "On hover"
-msgstr ""
-
-#: js/src/layers-sidebar/interaction-settings.js:120
-msgid "Show popup?"
-msgstr ""
-
-#: js/src/layers-sidebar/interaction-settings.js:128
-#: js/src/map-blocks/storymap-editor.js:1118
-msgid "Title"
-msgstr ""
-
-#: js/src/layers-sidebar/interaction-settings.js:139
-msgid "Fields"
-msgstr ""
-
-#: js/src/layers-sidebar/interaction-settings.js:166
-msgid "Add field"
-msgstr ""
-
-#: js/src/layers-sidebar/interaction-settings.js:175
-#: js/src/map-blocks/storymap-editor.js:1246
-#: js/src/posts-selector/meta-selector.js:79
-msgid "Add"
-msgstr ""
-
-#: js/src/layers-sidebar/interactions-settings.js:86
-msgid "Interactions"
-msgstr ""
-
-#: js/src/layers-sidebar/interactions-settings.js:114
-#: js/src/map-blocks/layers-settings.js:421
-msgid "Done"
-msgstr ""
-
-#: js/src/layers-sidebar/layer-settings.js:24
-#: js/src/map-blocks/layer-settings.js:89
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:202
-msgid "Type"
-msgstr ""
-
-#: js/src/layers-sidebar/layer-settings.js:242
-msgid "Edit interactions"
-msgstr ""
-
-#: js/src/layers-sidebar/layers-sidebar.js:65
-msgid "Please fill all required fields, you will not be able to publish or update until that."
-msgstr ""
-
-#: js/src/layers-sidebar/layers-sidebar.js:72
-msgid "Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings."
-msgstr ""
-
-#: js/src/layers-sidebar/layers-sidebar.js:75
-msgid "Your layer was not found. You will not be able to publish or update. Please check your settings."
-msgstr ""
-
-#: js/src/layers-sidebar/layers-sidebar.js:78
-msgid "Error loading your layer, you will not be able to publish or update. Please check your settings."
-msgstr ""
-
-#: js/src/layers-sidebar/layers-sidebar.js:85
-msgid "Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update."
-msgstr ""
-
-#: js/src/layers-sidebar/layers-sidebar.js:89
-msgid "Please, check your settings."
-msgstr ""
-
-#: js/src/layers-sidebar/layers-sidebar.js:145
-msgid "Attributions"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:6
-msgid "Black"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:7
-msgid "90% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:8
-msgid "80% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:9
-msgid "70% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:10
-msgid "60% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:11
-msgid "50% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:12
-msgid "40% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:13
-msgid "30% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:14
-msgid "20% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:15
-msgid "10% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:16
-msgid "7.5% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:17
-msgid "5% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:18
-msgid "2.5% Gray"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:19
-msgid "White"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:20
-msgid "Maroon"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:21
-msgid "Red"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:22
-msgid "Olive"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:23
-msgid "Yellow"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:24
-msgid "Green"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:25
-msgid "Lime"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:26
-msgid "Teal"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:27
-msgid "Aqua"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:28
-msgid "Navy"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:29
-msgid "Blue"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:30
-msgid "Purple"
-msgstr ""
-
-#: js/src/map-blocks/color-palettes.js:31
-msgid "Fuchsia"
-msgstr ""
-
-#: js/src/map-blocks/embedded-story-map-editor.js:17
-msgid "Insert a story map from the library"
-msgstr ""
-
-#: js/src/map-blocks/embedded-story-map-editor.js:22
-msgid "Type a story name"
-msgstr ""
-
-#: js/src/map-blocks/index.js:19
-msgid "JEO Map"
-msgstr ""
-
-#: js/src/map-blocks/index.js:20
-#: js/src/map-blocks/index.js:50
-msgid "Display maps with layers and data"
-msgstr ""
-
-#: js/src/map-blocks/index.js:49
-msgid "JEO One-time Map"
-msgstr ""
-
-#: js/src/map-blocks/index.js:170
-#: js/src/map-blocks/index.js:216
-msgid "Display maps with storytelling"
-msgstr ""
-
-#: js/src/map-blocks/index.js:215
-msgid "Embedded Story Map"
-msgstr ""
-
-#: js/src/map-blocks/index.js:256
-msgid "Map Editor Preview"
-msgstr ""
-
-#: js/src/map-blocks/index.js:257
-msgid "Interactive map preview for the Map post type editor."
-msgstr ""
-
-#: js/src/map-blocks/index.js:284
-msgid "Layer Editor Preview"
-msgstr ""
-
-#: js/src/map-blocks/index.js:285
-msgid "Interactive layer preview for the Map Layer post type editor."
-msgstr ""
-
-#: js/src/map-blocks/layer-settings.js:86
-msgid "Base layer should be fixed"
-msgstr ""
-
-#: js/src/map-blocks/layer-settings.js:99
-#: js/src/map-blocks/layer-settings.js:106
-msgid "Should be displayed by default."
-msgstr ""
-
-#: js/src/map-blocks/layer-settings.js:116
-msgid "Load interactions"
-msgstr ""
-
-#: js/src/map-blocks/layer-settings.js:126
-msgid "No legend"
-msgstr ""
-
-#: js/src/map-blocks/layer-settings.js:131
-msgid "Show legend"
-msgstr ""
-
-#: js/src/map-blocks/layer-settings.js:190
-msgid "If the layer is not visible in Mapbox Studio, we will not be able to control its visibility."
-msgstr ""
-
-#: js/src/map-blocks/layers-panel.js:29
-msgid "Loading layers data..."
-msgstr ""
-
-#: js/src/map-blocks/layers-panel.js:44
-msgid "Default"
-msgstr ""
-
-#: js/src/map-blocks/layers-panel.js:52
-#: js/src/map-blocks/onetime-map-editor.js:154
-msgid "Edit layers settings"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings-modal.js:16
-msgid "Layers settings"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:59
-msgid "Select a layer type"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:111
-msgid "Enter keywords to search layers"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:120
-msgid "Layer type"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:150
-msgid "New Layer"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:157
-msgid "Search layers by name or type to browse the library."
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:204
-msgid "Add to map"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:210
-#: js/src/map-blocks/layers-settings.js:374
-msgid "Do you really want to delete this layer?"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:220
-msgid "Remove from map"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:232
-msgid "No layers matched the current search filters."
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:239
-msgid "Load more layers"
-msgstr ""
-
-#: js/src/map-blocks/layers-settings.js:246
-msgid "No layers have been added to this map."
-msgstr ""
-
-#: js/src/map-blocks/map-editor-preview.js:112
-msgid "Preview zoom controls"
-msgstr ""
-
-#: js/src/map-blocks/map-editor-preview.js:124
-msgid "Initial Zoom"
-msgstr ""
-
-#: js/src/map-blocks/map-editor-preview.js:139
-msgid "Min Zoom"
-msgstr ""
-
-#: js/src/map-blocks/map-editor-preview.js:154
-msgid "Max Zoom"
-msgstr ""
-
-#: js/src/map-blocks/map-editor.js:115
-msgid "(Select another map)"
-msgstr ""
-
-#: js/src/map-blocks/map-editor.js:123
-#: js/src/map-blocks/storymap-editor.js:1316
-msgid "Insert a map from the library"
-msgstr ""
-
-#: js/src/map-blocks/map-editor.js:127
-#: js/src/map-blocks/storymap-editor.js:1320
-msgid "Type a map name"
-msgstr ""
-
-#: js/src/map-blocks/map-panel.js:63
-msgid "Map settings"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:56
-msgid "Center"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:79
-msgid "Zoom"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:81
-msgid "Initial zoom"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:98
-msgid "Min zoom"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:115
-msgid "Max zoom"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:132
-msgid "Scroll zoom on post"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:141
-msgid "Drag rotation on post"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:150
-msgid "Map navigation on post"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:159
-msgid "Fullscreen button on post"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:171
-msgid "Pan limits"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:176
-msgid "North"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:190
-msgid "East"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:205
-msgid "South"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:219
-msgid "West"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:242
-msgid "Use current map view"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:248
-msgid "For public maps only"
-msgstr ""
-
-#: js/src/map-blocks/map-settings.js:261
-msgid "Disable embed map"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:840
-#: js/src/map-blocks/storymap-editor.js:893
-msgid "Story settings"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:850
-msgid "Brief description"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:869
-msgid "Show story map introduction"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:880
-msgid "Use \"Navigate to map\" button"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:908
-#: js/src/map-blocks/storymap-editor.js:1253
-msgid "Slides settings"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:932
-msgid "Move slide up"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:939
-msgid "Move slide down"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:948
-#: js/src/map-blocks/storymap-editor.js:1268
-msgid "Slide"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1073
-#: js/src/map-blocks/storymap-editor.js:1094
-msgid "Lock current spot"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1114
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:180
-msgid "Preview"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1146
-msgid "Content"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1179
-msgid "The minimum number of slides is 1."
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1185
-msgid "Do you really want to remove this slide?"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1208
-#: js/src/posts-selector/meta-selector.js:67
-#: js/src/posts-sidebar/legends-editor/editors/barscale.js:192
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:170
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:176
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:158
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:174
-msgid "Remove"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1268
-msgid "Current slide:"
-msgstr ""
-
-#: js/src/map-blocks/storymap-editor.js:1307
-msgid "Map:"
-msgstr ""
-
-#: js/src/map-blocks/utils.js:9
-msgid "Fixed"
-msgstr ""
-
-#: js/src/map-blocks/utils.js:10
-msgid "Swappable"
-msgstr ""
-
-#: js/src/map-blocks/utils.js:11
-msgid "Switchable"
-msgstr ""
-
-#: js/src/maps-sidebar/map-embed-url.js:10
-msgid "Embed URL"
-msgstr ""
-
-#: js/src/posts-selector/index.js:38
-msgid "Related posts"
-msgstr ""
-
-#: js/src/posts-selector/index.js:41
-msgid "Use related posts"
-msgstr ""
-
-#: js/src/posts-selector/index.js:55
-msgid "Categories"
-msgstr ""
-
-#: js/src/posts-selector/index.js:80
-msgid "Start date"
-msgstr ""
-
-#: js/src/posts-selector/index.js:81
-msgid "End date"
-msgstr ""
-
-#: js/src/posts-selector/index.js:103
-msgid "Meta queries"
-msgstr ""
-
-#: js/src/posts-selector/meta-selector.js:31
-msgid "Key"
-msgstr ""
-
-#: js/src/posts-selector/meta-selector.js:41
-msgid "Comparator"
-msgstr ""
-
-#: js/src/posts-selector/meta-selector.js:52
-msgid "Value"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-auto-complete.js:77
-msgid "Unable to load address suggestions."
-msgstr ""
-
-#: js/src/posts-sidebar/geo-auto-complete.js:143
-#: js/src/posts-sidebar/geo-auto-complete.js:144
-msgid "Search address"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-auto-complete.js:180
-msgid "Search"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:197
-msgid "Unable to retrieve the address for the selected point."
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:421
-msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:428
-msgid "Move marker to nearest address"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:433
-msgid "Relevance"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:438
-msgid "Primary"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:439
-msgid "Secondary"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:456
-msgid "Update selected point"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:457
-msgid "Save new point"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:476
-#: js/src/posts-sidebar/geo-posts.js:480
-msgid "Add new point"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:488
-msgid "Current points"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:490
-msgid "No points"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:514
-msgid "Delete"
-msgstr ""
-
-#: js/src/posts-sidebar/geo-posts.js:522
-msgid "Edit"
-msgstr ""
-
-#: js/src/posts-sidebar/index.js:22
-#: js/src/posts-sidebar/index.js:26
-msgid "Geolocate this post"
-msgstr ""
-
-#: js/src/posts-sidebar/index.js:50
-msgid "Geolocation"
-msgstr ""
-
-#: js/src/posts-sidebar/legends-editor/editors/barscale.js:130
-msgid "Left Label"
-msgstr ""
-
-#: js/src/posts-sidebar/legends-editor/editors/barscale.js:144
-msgid "Right Label"
-msgstr ""
-
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:115
+#: js/build/layersSidebar.js:7
 msgid "Circles color"
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:131
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:105
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:123
+#: js/build/layersSidebar.js:7
 msgid "Add new label"
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:153
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:169
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:146
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:167
+#: js/build/layersSidebar.js:7
 msgid "Label"
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:159
+#: js/build/layersSidebar.js:7
 msgid "Radius"
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:174
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Remove"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
 msgid "See preview"
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:96
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+msgid "Preview"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Left Label"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Right Label"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
 msgid "Minimum size: 60x60 pixels"
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:122
+#: js/build/layersSidebar.js:7
 msgid "Icon legend"
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:127
+#: js/build/layersSidebar.js:7
 msgid "The uploaded icon is too small. The minimum size required is 60x60 pixels."
 msgstr ""
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:138
+#: js/build/layersSidebar.js:7
 msgid "Ok"
 msgstr ""
 
-#: js/src/shared/schema-form.js:129
-msgid "Select an option"
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Type"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "No"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "On click"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "On hover"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Show popup?"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+msgid "Title"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Fields"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Add field"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Add"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Interactions"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Done"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Edit interactions"
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Please fill all required fields, you will not be able to publish or update until that."
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings."
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Your layer was not found. You will not be able to publish or update. Please check your settings."
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Error loading your layer, you will not be able to publish or update. Please check your settings."
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update."
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Please, check your settings."
+msgstr ""
+
+#: js/build/layersSidebar.js:7
+msgid "Attributions"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Insert a story map from the library"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Type a story name"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "(Select another map)"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Insert a map from the library"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Type a map name"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Preview zoom controls"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Initial Zoom"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Min Zoom"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Max Zoom"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Edit layers settings"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Black"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "90% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "80% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "70% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "60% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "50% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "40% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "30% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "20% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "10% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "7.5% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "5% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "2.5% Gray"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "White"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Maroon"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Red"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Olive"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Yellow"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Green"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Lime"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Teal"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Aqua"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Navy"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Blue"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Purple"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Fuchsia"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
+msgid "Unable to load address suggestions."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
+msgid "Search address"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
+msgid "Search"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Story settings"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Brief description"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show story map introduction"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Use \"Navigate to map\" button"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Slides settings"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Move slide up"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Move slide down"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Slide"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Lock current spot"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Content"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "The minimum number of slides is 1."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Do you really want to remove this slide?"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Current slide:"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Map:"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "JEO Map"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Display maps with layers and data"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "JEO One-time Map"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Display maps with storytelling"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Embedded Story Map"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Map Editor Preview"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Interactive map preview for the Map post type editor."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Layer Editor Preview"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Interactive layer preview for the Map Layer post type editor."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Loading layers data..."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Default"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Base layer should be fixed"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Should be displayed by default."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Load interactions"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "No legend"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Show legend"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "If the layer is not visible in Mapbox Studio, we will not be able to control its visibility."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Select a layer type"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Enter keywords to search layers"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Layer type"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "New Layer"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Search layers by name or type to browse the library."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Add to map"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Do you really want to delete this layer?"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Remove from map"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "No layers matched the current search filters."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Load more layers"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "No layers have been added to this map."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Layers settings"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Center"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Zoom"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Initial zoom"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Min zoom"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Max zoom"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Scroll zoom on post"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Drag rotation on post"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Map navigation on post"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Fullscreen button on post"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Pan limits"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "North"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "East"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "South"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "West"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Use current map view"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "For public maps only"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Disable embed map"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Map settings"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Fixed"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Swappable"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Switchable"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Key"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Comparator"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Value"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Related posts"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Use related posts"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Categories"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Start date"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "End date"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Meta queries"
+msgstr ""
+
+#: js/build/mapsSidebar.js:1
+msgid "Embed URL"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Unable to retrieve the address for the selected point."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Move marker to nearest address"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Relevance"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Primary"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Secondary"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Update selected point"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Save new point"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Add new point"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Current points"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "No points"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Delete"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Edit"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Geolocate this post"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Geolocation"
 msgstr ""
