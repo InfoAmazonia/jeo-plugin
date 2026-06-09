@@ -152,6 +152,11 @@ class MapItem extends Component {
 					onClick={ applyRemoveButton ? this.clearAllLayers : this.applyAllLayers }
 					disabled={ loadingMapLayers }
 					aria-busy={ loadingMapLayers ? 'true' : undefined }
+					aria-label={
+						! applyRemoveButton && loadingMapLayers
+							? __( 'Loading…', 'jeo' )
+							: undefined
+					}
 				>
 					{ ! applyRemoveButton && loadingMapLayers ? (
 						<LoadingSpinner className="map-item__loading-icon" />
@@ -165,13 +170,20 @@ class MapItem extends Component {
 						</svg>
 					) }
 					{ ! applyRemoveButton && loadingMapLayers
-						? __( 'Loading layers…', 'jeo' )
+						? null
 						: applyRemoveButton ? __( 'Clear', 'jeo' ) : __( 'Apply', 'jeo' ) }
 				</button>
 
 				<div className="layers-toggles">
 					{ this.state.displayLayers && loadingMapLayers ? (
-						<div className="layers-toggles__loading">{ __( 'Loading layers…', 'jeo' ) }</div>
+						<div
+							className="layers-toggles__loading"
+							role="status"
+							aria-live="polite"
+							aria-label={ __( 'Loading…', 'jeo' ) }
+						>
+							<LoadingSpinner />
+						</div>
 					) : null }
 					{ this.state.displayLayers ? layersToggle : null }
 				</div>

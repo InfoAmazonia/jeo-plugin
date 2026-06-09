@@ -1127,19 +1127,11 @@ msgstr "Rango de fechas: %s"
 msgid "Displayed stories: %d"
 msgstr "Historias mostradas: %d"
 
-#: js/build/discovery.js:6
-msgid "Loading stories…"
-msgstr "Cargando historias…"
-
 #. translators: %s is the list of active story tags.
 #: js/build/discovery.js:6
 #, js-format
 msgid "Tags: %s"
 msgstr "Etiquetas: %s"
-
-#: js/build/discovery.js:6
-msgid "Loading more stories…"
-msgstr "Cargando más historias…"
 
 #: js/build/discovery.js:6
 msgid "No stories found for the current filters."
@@ -1166,8 +1158,8 @@ msgid "layers"
 msgstr "capas"
 
 #: js/build/discovery.js:6
-msgid "Loading layers…"
-msgstr "Cargando capas…"
+msgid "Loading…"
+msgstr "Cargando…"
 
 #: js/build/discovery.js:6
 msgid "Unable to load map layers right now."
@@ -1198,10 +1190,6 @@ msgstr "Ninguna capa seleccionada"
 #: js/build/discovery.js:6
 msgid "Apply changes"
 msgstr "Aplicar cambios"
-
-#: js/build/discovery.js:6
-msgid "Loading more maps…"
-msgstr "Cargando más mapas…"
 
 #: js/build/discovery.js:6
 msgid "Stories"

@@ -1208,15 +1208,23 @@ class Stories extends Component {
 		}
 
 		const loading = ! this.props.storiesLoaded && ! isLoadingMoreStories ? (
-			<div className="stories-status stories-status--loading" role="status" aria-live="polite">
+			<div
+				className="stories-status stories-status--loading"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
+			>
 				<LoadingSpinner />
-				<span>{ __( 'Loading stories…', 'jeo' ) }</span>
 			</div>
 		) : null;
 		const loadingMore = isLoadingMoreStories ? (
-			<div className="stories-status stories-status--loading stories-status--loading-more" role="status" aria-live="polite">
+			<div
+				className="stories-status stories-status--loading stories-status--loading-more"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
+			>
 				<LoadingSpinner />
-				<span>{ __( 'Loading more stories…', 'jeo' ) }</span>
 			</div>
 		) : null;
 		const emptyMessage = this.props.storiesLoaded && ! this.props.stories.length ? (

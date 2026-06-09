@@ -1128,14 +1128,6 @@ msgid "Tags: %s"
 msgstr ""
 
 #: js/build/discovery.js:6
-msgid "Loading stories…"
-msgstr ""
-
-#: js/build/discovery.js:6
-msgid "Loading more stories…"
-msgstr ""
-
-#: js/build/discovery.js:6
 msgid "No stories found for the current filters."
 msgstr ""
 
@@ -1176,7 +1168,7 @@ msgid "layers"
 msgstr ""
 
 #: js/build/discovery.js:6
-msgid "Loading layers…"
+msgid "Loading…"
 msgstr ""
 
 #: js/build/discovery.js:6
@@ -1207,10 +1199,6 @@ msgstr ""
 
 #: js/build/discovery.js:6
 msgid "Apply changes"
-msgstr ""
-
-#: js/build/discovery.js:6
-msgid "Loading more maps…"
 msgstr ""
 
 #: js/build/discovery.js:6

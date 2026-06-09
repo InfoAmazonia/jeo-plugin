@@ -983,8 +983,11 @@ $font: var(--jeo-font, inherit);
 				animation: jeo-discovery-spin 1s linear infinite;
 			}
 
-			.stories-status--loading-more {
+			.stories-status--loading {
 				justify-content: center;
+			}
+
+			.stories-status--loading-more {
 				margin: 18px 0 0;
 				padding: 14px 0 0;
 			}
@@ -1239,12 +1242,28 @@ $font: var(--jeo-font, inherit);
 
 						.map-item__loading-icon {
 							animation: jeo-discovery-spin 1s linear infinite;
+							margin-inline-end: 0;
 						}
 					}
 
 					.layers-toggles {
 						display: flex;
 						flex-direction: column;
+
+						&__loading {
+							align-items: center;
+							color: $primary;
+							display: flex;
+							justify-content: center;
+							margin-top: 13px;
+							padding: 8px 0;
+
+							svg {
+								animation: jeo-discovery-spin 1s linear infinite;
+								height: 18px;
+								width: 18px;
+							}
+						}
 
 						.layer-toggle {
 							align-items: center;
@@ -1303,13 +1322,16 @@ $font: var(--jeo-font, inherit);
 
 			.maps-loading {
 				align-items: center;
+				color: $primary;
 				display: flex;
-				gap: 8px;
 				justify-content: center;
 				margin-top: 16px;
-				color: #555d66;
-				font-size: 14px;
-				font-weight: 700;
+
+				svg {
+					animation: jeo-discovery-spin 1s linear infinite;
+					height: 18px;
+					width: 18px;
+				}
 			}
 
 			.load-more-maps {

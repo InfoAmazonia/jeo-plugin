@@ -651,7 +651,14 @@ class MapLayers extends Component {
 		);
 
 		const loading = ! this.props.mapsLoaded ? (
-			<LoadingSpinner />
+			<div
+				className="maps-loading"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
+			>
+				<LoadingSpinner />
+			</div>
 		) : null;
 
 		return (
@@ -730,7 +737,14 @@ class MapLayers extends Component {
 				) : null }
 				<div className="map-itens">{ mapItens }</div>
 				{ this.state.isLoadingMaps && this.props.mapsLoaded ? (
-					<div className="maps-loading">{ __( 'Loading more maps…', 'jeo' ) }</div>
+					<div
+						className="maps-loading"
+						role="status"
+						aria-live="polite"
+						aria-label={ __( 'Loading…', 'jeo' ) }
+					>
+						<LoadingSpinner />
+					</div>
 				) : null }
 			</div>
 		);

@@ -1121,19 +1121,11 @@ msgstr "Intervalo de data"
 msgid "Date range: %s"
 msgstr "Intervalo de data: %s"
 
-#: js/build/discovery.js:6
-msgid "Loading stories…"
-msgstr "Carregando histórias…"
-
 #. translators: %d is the number of stories currently displayed.
 #: js/build/discovery.js:3
 #, js-format
 msgid "Displayed stories: %d"
 msgstr "Histórias exibidas: %d"
-
-#: js/build/discovery.js:6
-msgid "Loading more stories…"
-msgstr "Carregando mais histórias…"
 
 #. translators: %s is the list of active story tags.
 #: js/build/discovery.js:6
@@ -1166,8 +1158,8 @@ msgid "layers"
 msgstr "camadas"
 
 #: js/build/discovery.js:6
-msgid "Loading layers…"
-msgstr "Carregando camadas…"
+msgid "Loading…"
+msgstr "Carregando…"
 
 #: js/build/discovery.js:6
 msgid "Unable to load map layers right now."
@@ -1198,10 +1190,6 @@ msgstr "Nenhuma camada selecionada"
 #: js/build/discovery.js:6
 msgid "Apply changes"
 msgstr "Aplicar mudanças"
-
-#: js/build/discovery.js:6
-msgid "Loading more maps…"
-msgstr "Carregando mais mapas…"
 
 #: js/build/discovery.js:6
 msgid "Stories"
