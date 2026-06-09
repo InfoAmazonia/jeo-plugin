@@ -24,6 +24,10 @@ class MapItem extends Component {
 	}
 
 	async applyAllLayers() {
+		if ( this.props.loadingMapLayers ) {
+			return;
+		}
+
 		const queriedLayers = await this.props.loadMapLayers( this.props.map );
 
 		if ( queriedLayers.length ) {
@@ -152,8 +156,26 @@ class MapItem extends Component {
 				<button
 					className={ `apply-remove-all${ applyRemoveButton ? ' clear' : '' }` }
 					onClick={ applyRemoveButton ? this.clearAllLayers : this.applyAllLayers }
+					disabled={ loadingMapLayers }
+					aria-busy={ loadingMapLayers ? 'true' : undefined }
 				>
-					{ applyRemoveButton ? (
+					{ ! applyRemoveButton && loadingMapLayers ? (
+						<svg
+							aria-hidden="true"
+							focusable="false"
+							data-prefix="fas"
+							data-icon="spinner"
+							role="img"
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 512 512"
+							className="map-item__loading-icon"
+						>
+							<path
+								fill="currentColor"
+								d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
+							></path>
+						</svg>
+					) : applyRemoveButton ? (
 						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="minus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 							<path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
 						</svg>
@@ -162,7 +184,9 @@ class MapItem extends Component {
 							<path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
 						</svg>
 					) }
-					{ applyRemoveButton ? __( 'Clear', 'jeo' ) : __( 'Apply', 'jeo' ) }
+					{ ! applyRemoveButton && loadingMapLayers
+						? __( 'Loading layers…', 'jeo' )
+						: applyRemoveButton ? __( 'Clear', 'jeo' ) : __( 'Apply', 'jeo' ) }
 				</button>
 
 				<div className="layers-toggles">

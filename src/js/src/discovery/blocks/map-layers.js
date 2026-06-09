@@ -63,6 +63,7 @@ class MapLayers extends Component {
 		this.buildSelectionState = this.buildSelectionState.bind( this );
 		this.loadMapLayers = this.loadMapLayers.bind( this );
 		this.fetchMapsByIds = this.fetchMapsByIds.bind( this );
+		this.canLoadMoreMaps = this.canLoadMoreMaps.bind( this );
 		this.loadMoreMaps = this.loadMoreMaps.bind( this );
 
 		if ( ! this.props.mapsLoaded ) {
@@ -525,12 +526,20 @@ class MapLayers extends Component {
 		this.fetchMaps( { ...params } ).catch( () => {} );
 	}
 
+	canLoadMoreMaps() {
+		return (
+			this.props.mapsLoaded &&
+			! this.state.isLoadingMaps &&
+			this.state.mapsPage < this.state.mapsTotalPages
+		);
+	}
+
 	loadMoreMaps() {
-		if ( this.state.mapsPage >= this.state.mapsTotalPages ) {
-			return;
+		if ( ! this.canLoadMoreMaps() ) {
+			return Promise.resolve();
 		}
 
-		this.fetchMaps( {
+		return this.fetchMaps( {
 			page: this.state.mapsPage + 1,
 			search: this.state.currentSearch,
 			cumulative: true,
@@ -668,7 +677,13 @@ class MapLayers extends Component {
 
 		return (
 			<div className="maps-tab" style={ this.props.style }>
-				<Search searchPlaceholder={ __( 'Search map', 'jeo' ) } update={ this.updateMaps } />
+				<Search
+					searchPlaceholder={ __( 'Search map', 'jeo' ) }
+					searchButtonLabel={ __( 'Search map', 'jeo' ) }
+					update={ this.updateMaps }
+					searchField={ this.state.currentSearch }
+					disabled={ this.state.isLoadingMaps }
+				/>
 
 				<div className="selected-layers">
 					<div className="status">
@@ -723,7 +738,11 @@ class MapLayers extends Component {
 				</div>
 
 				{ isApplied ? (
-					<button className="apply-changes disabled">
+					<button
+						className="apply-changes disabled"
+						disabled
+						aria-disabled="true"
+					>
 						{ __( 'Changes applied', 'jeo' ) }
 					</button>
 				) : (
@@ -741,11 +760,6 @@ class MapLayers extends Component {
 				<div className="map-itens">{ mapItens }</div>
 				{ this.state.isLoadingMaps && this.props.mapsLoaded ? (
 					<div className="maps-loading">{ __( 'Loading more maps…', 'jeo' ) }</div>
-				) : null }
-				{ this.state.mapsPage < this.state.mapsTotalPages ? (
-					<button className="load-more-maps" onClick={ this.loadMoreMaps }>
-						{ __( 'Load more maps', 'jeo' ) }
-					</button>
 				) : null }
 			</div>
 		);
