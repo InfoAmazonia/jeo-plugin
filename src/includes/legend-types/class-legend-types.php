@@ -161,11 +161,11 @@ class Legend_Types {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file = include JEO_BASEPATH . '/js/build/JeoLegend.asset.php';
+		$asset_file = require JEO_BASEPATH . '/js/build/JeoLegend.asset.php';
 		wp_register_script(
 			'jeo-legend',
 			JEO_BASEURL . '/js/build/JeoLegend.js',
-			array( 'mapgl' ),
+			array_merge( $asset_file['dependencies'], array( 'mapgl' ) ),
 			$asset_file['version'],
 			true,
 		);

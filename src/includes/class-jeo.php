@@ -466,17 +466,22 @@ class Jeo {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file            = include JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
+		$asset_file            = require JEO_BASEPATH . '/js/build/postsSidebar.asset.php';
 		$layer_type_handles    = \Jeo\Layer_Types::get_instance()->get_layer_type_script_handles();
 		$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
 
 		$deps = array_merge(
 			array( 'lodash' ),
-			$asset_file['dependencies'] ?? array(),
+			$asset_file['dependencies'],
 			$legend_script_handles
 		);
 
-		wp_register_style( 'jeo-js', JEO_BASEURL . '/js/build/postsSidebar.css', array(), JEO_VERSION );
+		wp_register_style(
+			'jeo-js',
+			JEO_BASEURL . '/js/build/postsSidebar.css',
+			array(),
+			$asset_file['version']
+		);
 		wp_register_script(
 			'jeo-js',
 			JEO_BASEURL . '/js/build/postsSidebar.js',
@@ -525,11 +530,13 @@ class Jeo {
 			)
 		);
 
+		$mapgl_loader_assets = require JEO_BASEPATH . '/js/build/mapglLoader.asset.php';
+
 		wp_register_script(
 			'mapgl',
 			JEO_BASEURL . '/js/build/mapglLoader.js',
-			$mapgl_script_deps,
-			JEO_VERSION,
+			array_merge( $mapgl_loader_assets['dependencies'], $mapgl_script_deps ),
+			$mapgl_loader_assets['version'],
 			true,
 		);
 
@@ -537,7 +544,7 @@ class Jeo {
 			'mapgl',
 			JEO_BASEURL . '/js/build/mapglLoader.css',
 			$mapgl_style_deps,
-			JEO_VERSION,
+			$mapgl_loader_assets['version'],
 		);
 
 		wp_localize_script(
@@ -570,36 +577,38 @@ class Jeo {
 			)
 		);
 
-		$mapgl_react_assets = include JEO_BASEPATH . '/js/build/mapglReact.asset.php';
+		$mapgl_react_assets = require JEO_BASEPATH . '/js/build/mapglReact.asset.php';
 
 		wp_register_script(
 			'mapgl-react',
 			JEO_BASEURL . '/js/build/mapglReact.js',
-			array_merge( $mapgl_react_assets['dependencies'] ?? array(), array( 'mapgl' ) ),
-			$mapgl_react_assets['version'] ?? JEO_VERSION,
+			array_merge( $mapgl_react_assets['dependencies'], array( 'mapgl' ) ),
+			$mapgl_react_assets['version'],
 			true,
 		);
 
+		// phpcs:disable WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Virtual style dependency handle has no source URL.
 		wp_register_style(
 			'mapgl-react-style',
 			false,
 			array( 'mapgl' ),
-			JEO_VERSION,
+			null,
 		);
+		// phpcs:enable WordPress.WP.EnqueuedResourceParameters.MissingVersion
 
-		$map_blocks_assets = include JEO_BASEPATH . '/js/build/mapBlocks.asset.php';
+		$map_blocks_assets = require JEO_BASEPATH . '/js/build/mapBlocks.asset.php';
 
 		wp_register_style(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.css',
 			array( 'mapgl', 'mapgl-react-style' ),
-			$map_blocks_assets['version'] ?? JEO_VERSION,
+			$map_blocks_assets['version'],
 		);
 		wp_register_script(
 			'jeo-map-blocks',
 			JEO_BASEURL . '/js/build/mapBlocks.js',
 			array_merge(
-				$map_blocks_assets['dependencies'] ?? array(),
+				$map_blocks_assets['dependencies'],
 				array( 'jeo-layer', 'mapgl-react' ),
 				$layer_type_handles,
 				$legend_script_handles
@@ -990,12 +999,11 @@ class Jeo {
 	public function enqueue_scripts() {
 		if ( $this->should_load_assets() ) {
 			$legend_script_handles = \jeo_legend_types()->get_registered_script_handles();
-			$jeo_map_assets        = include JEO_BASEPATH . '/js/build/jeoMap.asset.php';
-			$jeo_map_version       = $jeo_map_assets['version'] ?? JEO_VERSION;
+			$jeo_map_assets        = require JEO_BASEPATH . '/js/build/jeoMap.asset.php';
 			$jeo_map_dependencies  = array_values(
 				array_unique(
 					array_merge(
-						$jeo_map_assets['dependencies'] ?? array(),
+						$jeo_map_assets['dependencies'],
 						array( 'mapgl', 'jquery' ),
 						$legend_script_handles
 					)
@@ -1004,12 +1012,17 @@ class Jeo {
 
 			wp_enqueue_style( 'mapgl' );
 			wp_enqueue_script( 'mapgl' );
-			wp_enqueue_style( 'jeo-map', JEO_BASEURL . '/js/build/jeoMap.css', array( 'mapgl' ), $jeo_map_version );
+			wp_enqueue_style(
+				'jeo-map',
+				JEO_BASEURL . '/js/build/jeoMap.css',
+				array( 'mapgl' ),
+				$jeo_map_assets['version']
+			);
 			wp_enqueue_script(
 				'jeo-map',
 				JEO_BASEURL . '/js/build/jeoMap.js',
 				$jeo_map_dependencies,
-				$jeo_map_version,
+				$jeo_map_assets['version'],
 				true
 			);
 
@@ -1044,20 +1057,36 @@ class Jeo {
 						'jeomap_js_images',
 						array(
 							'/js/src/icons/news-marker' => array(
-								'url'       => JEO_BASEURL . '/js/src/icons/news-marker.png',
+								'url'       => add_query_arg(
+									'ver',
+									JEO_VERSION,
+									JEO_BASEURL . '/js/src/icons/news-marker.png'
+								),
 								'icon_size' => 0.1,
 							),
 							'/js/src/icons/news-marker-hover' => array(
-								'url'       => JEO_BASEURL . '/js/src/icons/news-marker-hover.png',
+								'url'       => add_query_arg(
+									'ver',
+									JEO_VERSION,
+									JEO_BASEURL . '/js/src/icons/news-marker-hover.png'
+								),
 								'icon_size' => 0.1,
 							),
 							'/js/src/icons/news'        => array(
-								'url'        => JEO_BASEURL . '/js/src/icons/news.png',
+								'url'        => add_query_arg(
+									'ver',
+									JEO_VERSION,
+									JEO_BASEURL . '/js/src/icons/news.png'
+								),
 								'icon_size'  => 0.13,
 								'text_color' => '#202202',
 							),
 							'/js/src/icons/cluster'     => array(
-								'url' => JEO_BASEURL . '/js/src/icons/cluster.png',
+								'url' => add_query_arg(
+									'ver',
+									JEO_VERSION,
+									JEO_BASEURL . '/js/src/icons/cluster.png'
+								),
 							),
 						)
 					),
@@ -1082,9 +1111,20 @@ class Jeo {
 	public function enqueue_discovery_scripts() {
 		$current_language = $this->get_current_language();
 
-		$discovery_assets = include JEO_BASEPATH . '/js/build/discovery.asset.php';
-		wp_enqueue_style( 'discovery-map', JEO_BASEURL . '/js/build/discovery.css', array(), JEO_VERSION );
-		wp_enqueue_script( 'discovery-map', JEO_BASEURL . '/js/build/discovery.js', array_merge( $discovery_assets['dependencies'] ?? array(), array( 'jeo-map' ) ), JEO_VERSION, true );
+		$discovery_assets = require JEO_BASEPATH . '/js/build/discovery.asset.php';
+		wp_enqueue_style(
+			'discovery-map',
+			JEO_BASEURL . '/js/build/discovery.css',
+			array(),
+			$discovery_assets['version']
+		);
+		wp_enqueue_script(
+			'discovery-map',
+			JEO_BASEURL . '/js/build/discovery.js',
+			array_merge( $discovery_assets['dependencies'], array( 'jeo-map' ) ),
+			$discovery_assets['version'],
+			true
+		);
 
 		wp_set_script_translations( 'discovery-map', 'jeo', JEO_BASEPATH . 'languages' );
 
@@ -1118,9 +1158,20 @@ class Jeo {
 	 * @return void
 	 */
 	public function enqueue_storymap_scripts() {
-		$storymap_assets = include JEO_BASEPATH . '/js/build/jeoStorymap.asset.php';
-		wp_enqueue_style( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.css', array( 'jeo-map' ), JEO_VERSION );
-		wp_enqueue_script( 'jeo-storymap', JEO_BASEURL . '/js/build/jeoStorymap.js', array_merge( $storymap_assets['dependencies'] ?? array(), array( 'jeo-map', 'mapgl-react' ) ), JEO_VERSION, true );
+		$storymap_assets = require JEO_BASEPATH . '/js/build/jeoStorymap.asset.php';
+		wp_enqueue_style(
+			'jeo-storymap',
+			JEO_BASEURL . '/js/build/jeoStorymap.css',
+			array( 'jeo-map' ),
+			$storymap_assets['version']
+		);
+		wp_enqueue_script(
+			'jeo-storymap',
+			JEO_BASEURL . '/js/build/jeoStorymap.js',
+			array_merge( $storymap_assets['dependencies'], array( 'jeo-map', 'mapgl-react' ) ),
+			$storymap_assets['version'],
+			true
+		);
 
 		wp_set_script_translations( 'jeo-storymap', 'jeo', JEO_BASEPATH . 'languages' );
 	}
