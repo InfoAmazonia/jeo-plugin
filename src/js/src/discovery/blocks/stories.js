@@ -498,11 +498,7 @@ class Stories extends Component {
 
 			const hoveredClusterKey = `${ clusterId }:${ pointCount }`;
 
-			if (
-				clusterId &&
-				pointCount &&
-				this.hoveredClusterKey === hoveredClusterKey
-			) {
+			if ( this.hoveredClusterKey === hoveredClusterKey ) {
 				return;
 			}
 
