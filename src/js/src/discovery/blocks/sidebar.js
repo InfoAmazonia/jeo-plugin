@@ -9,14 +9,29 @@ class Sidebar extends Component {
 		super( props );
 
 		this.storiesRef = createRef();
+		this.mapLayersRef = createRef();
+		this.sidebarRef = createRef();
 		this.lastStoriesScrollTop = 0;
+		this.lastMapLayersScrollTop = 0;
 		this.pendingStoriesPage = null;
+		this.ensureStoriesFillScroll = this.ensureStoriesFillScroll.bind( this );
+		this.ensureMapsFillScroll = this.ensureMapsFillScroll.bind( this );
 		this.handleScroll = this.handleScroll.bind( this );
+		this.queueNextStoriesPage = this.queueNextStoriesPage.bind( this );
+		this.queueNextMapsPage = this.queueNextMapsPage.bind( this );
 	}
 
 	componentDidUpdate( prevProps ) {
 		if ( ! prevProps.storiesLoaded && this.props.storiesLoaded ) {
 			this.pendingStoriesPage = null;
+			window.requestAnimationFrame( this.ensureStoriesFillScroll );
+		}
+
+		if (
+			( ! prevProps.mapsLoaded && this.props.mapsLoaded ) ||
+			prevProps.maps?.length !== this.props.maps?.length
+		) {
+			window.requestAnimationFrame( this.ensureMapsFillScroll );
 		}
 	}
 
@@ -70,12 +85,12 @@ class Sidebar extends Component {
 			if ( tab.name === 'stories' ) {
 				tabRenderer = 	(<>
 									<Stories { ...storiesProps }  />
-									<MapLayers { ...mapLayersProps } style={ { display: "none" } } />
+									<MapLayers { ...mapLayersProps } ref={ this.mapLayersRef } style={ { display: "none" } } />
 								</>);
 			} else {
 				tabRenderer = 	(<>
 									<Stories { ...storiesProps }  style={ { display: "none" } }  />
-									<MapLayers { ...mapLayersProps } />
+									<MapLayers { ...mapLayersProps } ref={ this.mapLayersRef } />
 								</>);
 			}
 		}
@@ -83,44 +98,127 @@ class Sidebar extends Component {
 		return tabRenderer;
 	}
 
-	handleScroll( e ) {
-		if ( ! this.props.storiesLoaded || this.props.map?.selectedTab?.name !== 'stories' ) {
-			return;
-		}
+	getStoriesScrollPanel() {
+		return this.sidebarRef.current?.querySelector?.( '.togable-panel' ) ?? null;
+	}
 
-		this.storiesRef.current?.markListScrolling?.();
-
-		const element = e.target?.closest?.( '.togable-panel' ) ?? e.target;
-		const totalPages = Number.parseInt( this.props.pageInfo.totalPages, 10 );
-		const currentPage = Number.parseInt( this.props.pageInfo.currentPage, 10 ) || 1;
-		const currentScrollTop = element.scrollTop;
-		const isScrollingDown = currentScrollTop > this.lastStoriesScrollTop;
-
-		this.lastStoriesScrollTop = currentScrollTop;
-
-		if ( ! isScrollingDown ) {
-			return;
-		}
-
-		if ( Number.isFinite( totalPages ) && currentPage >= totalPages ) {
-			return;
-		}
-
+	getCanLoadMoreStories() {
 		if (
-			( element.scrollHeight - element.scrollTop - 100 ) <= element.clientHeight &&
-			this.storiesRef.current
+			! this.props.storiesLoaded ||
+			this.props.map?.selectedTab?.name !== 'stories'
 		) {
-			const nextPage = currentPage + 1;
+			return false;
+		}
 
-			if ( this.pendingStoriesPage === nextPage ) {
+		const totalPages = Number.parseInt( this.props.pageInfo.totalPages, 10 );
+		const currentPage =
+			Number.parseInt( this.props.pageInfo.currentPage, 10 ) || 1;
+
+		return ! Number.isFinite( totalPages ) || currentPage < totalPages;
+	}
+
+	getCanLoadMoreMaps() {
+		return (
+			this.props.mapsLoaded &&
+			this.props.map?.selectedTab?.name === 'mapLayers' &&
+			Boolean( this.mapLayersRef.current?.canLoadMoreMaps?.() )
+		);
+	}
+
+	queueNextStoriesPage() {
+		if ( ! this.getCanLoadMoreStories() || ! this.storiesRef.current ) {
+			return;
+		}
+
+		const currentPage =
+			Number.parseInt( this.props.pageInfo.currentPage, 10 ) || 1;
+		const nextPage = currentPage + 1;
+
+		if ( this.pendingStoriesPage === nextPage ) {
+			return;
+		}
+
+		this.pendingStoriesPage = nextPage;
+		this.storiesRef.current.updateStories( {
+			cumulative: true,
+			page: nextPage,
+		} );
+	}
+
+	queueNextMapsPage() {
+		if ( ! this.getCanLoadMoreMaps() ) {
+			return;
+		}
+
+		this.mapLayersRef.current.loadMoreMaps();
+	}
+
+	ensureStoriesFillScroll() {
+		const element = this.getStoriesScrollPanel();
+
+		if ( ! element || ! this.getCanLoadMoreStories() ) {
+			return;
+		}
+
+		if ( element.scrollHeight <= element.clientHeight + 80 ) {
+			this.queueNextStoriesPage();
+		}
+	}
+
+	ensureMapsFillScroll() {
+		const element = this.getStoriesScrollPanel();
+
+		if ( ! element || ! this.getCanLoadMoreMaps() ) {
+			return;
+		}
+
+		if ( element.scrollHeight <= element.clientHeight + 80 ) {
+			this.queueNextMapsPage();
+		}
+	}
+
+	handleScroll( e ) {
+		const element = e.target?.closest?.( '.togable-panel' ) ?? e.target;
+		const currentScrollTop = element.scrollTop;
+		const currentTabName = this.props.map?.selectedTab?.name;
+
+		if ( currentTabName === 'stories' ) {
+			if ( ! this.props.storiesLoaded ) {
 				return;
 			}
 
-			this.pendingStoriesPage = nextPage;
-			this.storiesRef.current.updateStories( {
-				cumulative: true,
-				page: nextPage,
-			} );
+			this.storiesRef.current?.markListScrolling?.();
+
+			const isScrollingDown = currentScrollTop > this.lastStoriesScrollTop;
+			this.lastStoriesScrollTop = currentScrollTop;
+
+			if (
+				isScrollingDown &&
+				this.getCanLoadMoreStories() &&
+				( element.scrollHeight - element.scrollTop - 100 ) <= element.clientHeight &&
+				this.storiesRef.current
+			) {
+				this.queueNextStoriesPage();
+			}
+
+			return;
+		}
+
+		if ( currentTabName === 'mapLayers' ) {
+			if ( ! this.props.mapsLoaded ) {
+				return;
+			}
+
+			const isScrollingDown = currentScrollTop > this.lastMapLayersScrollTop;
+			this.lastMapLayersScrollTop = currentScrollTop;
+
+			if (
+				isScrollingDown &&
+				this.getCanLoadMoreMaps() &&
+				( element.scrollHeight - element.scrollTop - 100 ) <= element.clientHeight
+			) {
+				this.queueNextMapsPage();
+			}
 		}
 	}
 
@@ -186,6 +284,7 @@ class Sidebar extends Component {
 
 		return (
 			<div
+				ref={ this.sidebarRef }
 				onScrollCapture={ this.handleScroll }
 				className={ this.props.isEmbed ? 'is-embed' : 'default-sidebar' }
 			>
@@ -203,6 +302,12 @@ class Sidebar extends Component {
 
 				<button
 					className="collapse-toolbar"
+					aria-expanded={ this.props.showSidebar }
+					aria-label={
+						this.props.showSidebar
+							? __( 'Collapse discovery panel', 'jeo' )
+							: __( 'Expand discovery panel', 'jeo' )
+					}
 					onClick={ () => {
 						this.props.updateState( { showSidebar: ! this.props.showSidebar } );
 						window.setTimeout( () => {
@@ -234,7 +339,7 @@ class Sidebar extends Component {
 							role="img"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 448 512"
-							class="svg-inline--fa fa-chevron-double-right fa-w-14 fa-3x"
+							className="svg-inline--fa fa-chevron-double-right fa-w-14 fa-3x"
 						>
 							<path
 								fill="currentColor"

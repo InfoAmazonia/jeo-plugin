@@ -421,11 +421,13 @@ add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
 function jeo_scripts_typography() {
 	$primary_font_url = jeo_normalize_asset_url( \jeo_settings()->get_option( 'jeo_typography' ) );
 	if ( '' !== $primary_font_url ) {
-		wp_enqueue_style( 'jeo-font', $primary_font_url, array(), JEO_VERSION );
+		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Administrator-configured URLs should manage their own cache policy.
+		wp_enqueue_style( 'jeo-font', $primary_font_url, array(), null );
 	}
 	$secondary_font_url = jeo_normalize_asset_url( \jeo_settings()->get_option( 'jeo_typography-stories' ) );
 	if ( '' !== $secondary_font_url ) {
-		wp_enqueue_style( 'jeo-font-stories', $secondary_font_url, array(), JEO_VERSION );
+		// phpcs:ignore WordPress.WP.EnqueuedResourceParameters.MissingVersion -- Administrator-configured URLs should manage their own cache policy.
+		wp_enqueue_style( 'jeo-font-stories', $secondary_font_url, array(), null );
 	}
 }
 add_action( 'wp_enqueue_scripts', 'jeo_scripts_typography' );

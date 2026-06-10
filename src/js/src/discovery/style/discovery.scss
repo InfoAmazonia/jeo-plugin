@@ -1,12 +1,30 @@
-$primary: var(--jeo-primary-color);
-$font: var(--jeo-font);
+$primary: var(--jeo-primary-color, currentColor);
+$font: var(--jeo-font, inherit);
+
+@keyframes jeo-discovery-spin {
+	100% {
+		transform: rotate(360deg);
+	}
+}
 
 .discovery-block {
+	--jeo-discovery-action-color: #{$primary};
+	--jeo-discovery-action-hover-color: #{$primary};
+	--jeo-discovery-action-hover-bg: transparent;
+	--jeo-discovery-action-focus-color: #{$primary};
+	--jeo-discovery-control-border-color: #555d66b8;
+	--jeo-discovery-control-text-color: #555d66;
+	--jeo-discovery-surface-color: #fff;
 	position: relative;
 	display: flex;
-	height: calc( 100vh );
+	height: var( --jeo-discovery-block-height, 100vh );
 	overflow: hidden;
 	background-color: white;
+
+	@supports (background: color-mix(in srgb, red 10%, transparent)) {
+		--jeo-discovery-action-hover-bg: color-mix(in srgb, #{$primary} 10%, transparent);
+		--jeo-discovery-action-focus-color: color-mix(in srgb, #{$primary} 28%, transparent);
+	}
 
 	> *, button, input, select, textarea {
 		font-family: $font;
@@ -66,6 +84,8 @@ $font: var(--jeo-font);
 		color: #555d66;
 
 		&:hover {
+			background-color: transparent;
+			color: var( --jeo-discovery-action-hover-color );
 			text-decoration: none;
 		}
 	}
@@ -286,14 +306,6 @@ $font: var(--jeo-font);
 			}
 		}
 
-		button:is(.mapboxgl-ctrl, .maplibregl-ctrl)  {
-
-			:is(.maplibregl-ctrl-zoom-out, .maplibregl-ctrl-zoom-in, .maplibregl-ctrl-fullscreen) {
-				border-radius: 0;
-				border-top: 0;
-			}
-		}
-
 		.mapboxgl-control-container {
 
 			.mapboxgl-ctrl-top-left {
@@ -316,6 +328,52 @@ $font: var(--jeo-font);
 
 				.maplibregl-ctrl-group:not(:empty) {
 					display: flex;
+				}
+			}
+		}
+
+		:is(.mapboxgl-ctrl-group, .maplibregl-ctrl-group) {
+			background: var( --jeo-discovery-surface-color );
+			border-radius: 5px;
+			box-shadow: 0 0 0 2px rgba( 0, 0, 0, 0.1 );
+			display: flex;
+			overflow: hidden;
+
+			button {
+				background-color: var( --jeo-discovery-surface-color ) !important;
+				border: 0;
+				border-radius: 0;
+				box-shadow: none;
+				color: var( --jeo-discovery-control-text-color );
+				display: block;
+				filter: none;
+				height: 32px;
+				min-height: 32px;
+				min-width: 32px;
+				padding: 0;
+				width: 32px;
+
+				&:hover,
+				&:focus,
+				&:active {
+					background-color: var( --jeo-discovery-surface-color ) !important;
+					box-shadow: inset 0 0 0 2px var( --jeo-discovery-action-focus-color );
+					color: var( --jeo-discovery-control-text-color );
+					filter: none;
+					outline: none;
+				}
+
+				& + button {
+					border-inline-start: 1px solid rgba( 0, 0, 0, 0.14 );
+				}
+
+				.mapboxgl-ctrl-icon,
+				.maplibregl-ctrl-icon {
+					background-position: center;
+					background-repeat: no-repeat;
+					display: block;
+					height: 100%;
+					width: 100%;
 				}
 			}
 		}
@@ -438,22 +496,38 @@ $font: var(--jeo-font);
 				height: 50px;
 				border-inline-end: 0px;
 				font-weight: bold;
+
+				&:disabled {
+					opacity: 0.75;
+				}
 			}
 
-			button {
-				flex: 0 0 77px;
-				height: 50px;
+				button {
+					flex: 0 0 77px;
+					height: 50px;
 				padding: 0;
 				display: flex;
 				justify-content: center;
 				align-items: center;
 				border-radius: 0 10px 10px 0;
-				background-color: $primary;
-				color: white;
+					background-color: $primary;
+					color: white;
 
-				svg {
-					width: 19px;
-					height: 20px;
+					&:hover,
+					&:focus {
+						background-color: $primary;
+						color: white;
+						filter: brightness( 0.95 );
+					}
+
+					svg {
+						width: 19px;
+						height: 20px;
+				}
+
+				&:disabled {
+					cursor: wait;
+					opacity: 0.75;
 				}
 			}
 		}
@@ -468,28 +542,42 @@ $font: var(--jeo-font);
 				letter-spacing: 0;
 				margin-top: 5px;
 				margin-bottom: 15px;
+				color: var( --jeo-discovery-control-text-color );
+				border-radius: 4px;
+				cursor: pointer;
 
 				svg {
 					width: 16px;
 					margin-inline-end: 9px;
 				}
+
+				&:hover,
+				&:focus,
+				&:active {
+					background: transparent;
+					color: var( --jeo-discovery-action-hover-color );
+					filter: none;
+					outline: none;
+				}
 			}
 
 			.filters {
 				display: grid;
-				grid-template-columns: 50% 50%;
+				grid-template-columns: repeat(2, minmax(0, 1fr));
 				grid-column-gap: 10px;
 				margin-bottom: 15px;
 
 				select,
-				input {
+				input,
+				.jeo-date-range-filter__toggle {
 					padding: 7px 6px;
 					font-size: 14px;
 					border-radius: 5px;
-					background: transparent;
-					border: 2px solid #555d66b8;
+					background: #fff;
+					border: 2px solid var( --jeo-discovery-control-border-color );
 					font-weight: bold;
-					color: #555d66;
+					color: var( --jeo-discovery-control-text-color );
+					min-height: 40px;
 				}
 
 				.jeo-date-range-filter {
@@ -506,11 +594,22 @@ $font: var(--jeo-font);
 					color: #777;
 				}
 
+				.jeo-date-range-filter__toggle:hover,
+				.jeo-date-range-filter__toggle:focus,
+				.jeo-date-range-filter__toggle:active,
+				.jeo-date-range-filter__toggle[aria-expanded="true"] {
+					background: #fff;
+					border-color: $primary;
+					color: var( --jeo-discovery-control-text-color );
+					filter: none;
+					outline: none;
+				}
+
 				.jeo-date-range-filter__popover {
 					position: absolute;
 					top: calc( 100% + 8px );
 					inset-inline-start: 0;
-					z-index: 4;
+					z-index: 6;
 					background: #fff;
 					border: 1px solid rgba( 0, 0, 0, 0.12 );
 					border-radius: 8px;
@@ -545,6 +644,19 @@ $font: var(--jeo-font);
 					color: #fff;
 				}
 
+				.jeo-date-range-filter__action:hover,
+				.jeo-date-range-filter__action:focus {
+					background: var( --jeo-discovery-action-hover-bg );
+					color: #1d2327;
+				}
+
+				.jeo-date-range-filter__action--primary:hover,
+				.jeo-date-range-filter__action--primary:focus {
+					background: $primary;
+					color: #fff;
+					filter: brightness( 0.95 );
+				}
+
 				.jeo-date-range-filter__action:disabled {
 					opacity: 0.5;
 					cursor: default;
@@ -553,7 +665,338 @@ $font: var(--jeo-font);
 				.react-datepicker {
 					border: 0;
 					font-family: inherit;
+					width: 100%;
 				}
+
+				.react-datepicker__month-container {
+					width: 100%;
+				}
+
+				.jeo-date-range-filter__header {
+					align-items: center;
+					display: grid;
+					grid-template-columns: 32px minmax(120px, 1fr) 82px 32px;
+					gap: 6px;
+					padding: 6px 4px 10px;
+				}
+
+				.jeo-date-range-filter__navigation {
+					align-items: center;
+					background: transparent;
+					border: 0;
+					border-radius: 4px;
+					color: var( --jeo-discovery-control-text-color );
+					cursor: pointer;
+					display: flex;
+					filter: none;
+					height: 32px;
+					justify-content: center;
+					min-height: 32px;
+					min-width: 32px;
+					padding: 0;
+					width: 32px;
+
+					svg {
+						height: 18px;
+						width: 18px;
+					}
+
+					&:hover,
+					&:focus,
+					&:active {
+						background: var( --jeo-discovery-action-hover-bg );
+						box-shadow: none;
+						color: var( --jeo-discovery-action-hover-color );
+						filter: none;
+						outline: none;
+					}
+
+					&:disabled {
+						cursor: default;
+						opacity: 0.45;
+					}
+				}
+
+				.jeo-date-range-filter__month-select,
+				.jeo-date-range-filter__year-select {
+					background: #fff;
+					border: 1px solid var( --jeo-discovery-control-border-color );
+					border-radius: 4px;
+					box-shadow: none;
+					color: var( --jeo-discovery-control-text-color );
+					font-size: 13px;
+					font-weight: 600;
+					height: 32px;
+					line-height: 18px;
+					min-height: 32px;
+					padding: 4px 6px;
+					width: 100%;
+
+					&:hover,
+					&:focus,
+					&:active {
+						border-color: $primary;
+						box-shadow: 0 0 0 1px $primary;
+						filter: none;
+						outline: none;
+					}
+				}
+
+				.discovery-tag-filter {
+					min-width: 0;
+
+					.components-base-control,
+					.components-base-control__field,
+					.components-combobox-control,
+					.components-form-token-field,
+					.components-form-token-field__input-container {
+						margin: 0;
+						min-height: 0;
+					}
+
+					.components-combobox-control__suggestions-container {
+						background: transparent;
+						border: 0;
+						box-shadow: none;
+						display: block;
+						margin: 0;
+						max-height: none;
+						overflow: visible;
+						position: relative;
+						z-index: auto;
+					}
+
+					.components-combobox-control__suggestions-container > .components-flex {
+						align-items: center;
+						background: #fff;
+						border: 2px solid var( --jeo-discovery-control-border-color );
+						border-radius: 5px;
+						box-sizing: border-box;
+						min-height: 40px;
+						overflow: hidden;
+						width: 100%;
+					}
+
+					.components-combobox-control__suggestions-container:focus-within > .components-flex {
+						border-color: $primary;
+						box-shadow: 0 0 0 1px $primary;
+					}
+
+					.components-combobox-control__input.components-form-token-field__input {
+						background: #fff;
+						border: 0;
+						box-shadow: none;
+						color: var( --jeo-discovery-control-text-color );
+						font-family: $font;
+						font-size: 14px;
+						font-weight: bold;
+						height: 36px;
+						line-height: 20px;
+						min-height: 36px;
+						padding: 7px 6px;
+						width: 100%;
+
+						&:focus {
+							border: 0;
+							box-shadow: none;
+							outline: none;
+						}
+					}
+
+					.components-button.is-small.has-icon {
+						align-items: center;
+						background: transparent;
+						border: 0;
+						color: #555d66;
+						display: flex;
+						flex: 0 0 32px;
+						height: 36px;
+						justify-content: center;
+						min-width: 32px;
+						padding: 0;
+
+						&:disabled {
+							display: none;
+						}
+
+						&:hover,
+						&:focus {
+							background: var( --jeo-discovery-action-hover-bg );
+							color: var( --jeo-discovery-action-hover-color );
+						}
+					}
+
+					.components-form-token-field__suggestions-list {
+						background: #fff;
+						border: 1px solid #dcdcde;
+						border-radius: 6px;
+						box-shadow: 0 10px 24px rgba( 0, 0, 0, 0.12 );
+						inset-inline: 0;
+						margin: 0;
+						max-height: 240px;
+						overflow: auto;
+						padding: 4px;
+						position: absolute;
+						top: calc( 100% + 6px );
+						z-index: 7;
+					}
+
+					.components-form-token-field__suggestion {
+						border-radius: 4px;
+						color: #1d2327;
+						font-family: $font;
+						font-size: 14px;
+						line-height: 18px;
+						padding: 8px 10px;
+
+						&.is-selected,
+						&:hover {
+							background: var( --jeo-discovery-action-hover-bg );
+							color: #1d2327;
+						}
+					}
+
+					&__tokens {
+						display: flex;
+						flex-wrap: wrap;
+						gap: 6px;
+						margin-top: 6px;
+					}
+
+					&__token {
+						align-items: center;
+						border: 1px solid var( --jeo-discovery-control-border-color );
+						border-radius: 5px;
+						color: var( --jeo-discovery-control-text-color );
+						display: inline-flex;
+						font-size: 12px;
+						font-weight: bold;
+						gap: 4px;
+						line-height: 16px;
+						max-width: 100%;
+						padding: 3px 4px 3px 7px;
+
+						> span {
+							overflow: hidden;
+							text-overflow: ellipsis;
+							white-space: nowrap;
+						}
+
+						button {
+							align-items: center;
+							background: transparent;
+							border: 0;
+							border-radius: 4px;
+							color: inherit;
+							cursor: pointer;
+							display: flex;
+							filter: none;
+							height: 20px;
+							justify-content: center;
+							min-height: 20px;
+							min-width: 20px;
+							padding: 0;
+							width: 20px;
+
+							svg {
+								height: 14px;
+								width: 14px;
+							}
+
+							&:hover,
+							&:focus,
+							&:active {
+								background: var( --jeo-discovery-action-hover-bg );
+								box-shadow: none;
+								color: var( --jeo-discovery-action-hover-color );
+								filter: none;
+								outline: none;
+							}
+						}
+					}
+				}
+			}
+
+			.stories-results-summary {
+				align-items: center;
+				color: #555d66;
+				display: flex;
+				font-size: 13px;
+				font-weight: bold;
+				justify-content: space-between;
+				line-height: 18px;
+				margin: 0 0 12px;
+
+				button {
+					border: 1px solid $primary;
+					border-radius: 5px;
+					color: $primary;
+					font-size: 12px;
+					font-weight: bold;
+					padding: 4px 8px;
+
+					&:hover,
+					&:focus {
+						background: var( --jeo-discovery-action-hover-bg );
+						color: var( --jeo-discovery-action-hover-color );
+					}
+				}
+			}
+
+			.stories-active-filters {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 6px;
+				margin: -4px 0 14px;
+
+				&__item {
+					background: #f5f5f5;
+					border: 1px solid #dddddd;
+					border-radius: 5px;
+					color: #555d66;
+					font-size: 12px;
+					font-weight: bold;
+					line-height: 16px;
+					padding: 4px 7px;
+				}
+			}
+
+			.stories-status {
+				align-items: center;
+				color: #555d66;
+				display: flex;
+				font-size: 14px;
+				font-weight: bold;
+				gap: 8px;
+				line-height: 20px;
+				margin: 12px 0;
+				padding: 10px 0;
+
+				svg {
+					color: $primary;
+					height: 18px;
+					width: 18px;
+				}
+			}
+
+			.stories-status--loading svg {
+				animation: jeo-discovery-spin 1s linear infinite;
+			}
+
+			.stories-status--loading {
+				justify-content: center;
+			}
+
+			.stories-status--loading-more {
+				margin: 18px 0 0;
+				padding: 14px 0 0;
+			}
+
+			.stories-status--empty {
+				background: #f7f7f7;
+				border: 1px solid #dddddd;
+				border-radius: 6px;
+				padding: 14px;
 			}
 
 			.stories {
@@ -588,10 +1031,18 @@ $font: var(--jeo-font);
 						}
 
 						.title {
+							color: inherit;
+							display: block;
 							font-weight: bold;
 							font-size: 18px;
 							padding-bottom: 5px;
 							line-height: 22px;
+							text-decoration: none;
+
+							&:hover {
+								color: $primary;
+								text-decoration: none;
+							}
 						}
 
 						.date {
@@ -603,8 +1054,21 @@ $font: var(--jeo-font);
 							text-decoration: none;
 						}
 
-						small.view-in-map {
+						button.view-in-map {
+							color: $primary;
 							cursor: pointer;
+							font-size: 13px;
+							font-weight: bold;
+							line-height: 18px;
+							text-align: left;
+
+							&:hover,
+							&:focus {
+								background: transparent;
+								color: var( --jeo-discovery-action-hover-color );
+								text-decoration: underline;
+								text-underline-offset: 3px;
+							}
 						}
 					}
 
@@ -676,9 +1140,17 @@ $font: var(--jeo-font);
 				text-decoration: none;
 				font-weight: bold;
 
+				&:hover,
+				&:focus {
+					background: $primary;
+					color: white;
+					filter: brightness( 0.95 );
+				}
+
 				&.disabled {
 					opacity: 0.7;
 					cursor: not-allowed;
+					filter: none;
 				}
 			}
 
@@ -710,6 +1182,12 @@ $font: var(--jeo-font);
 						color: #555d66;
 						cursor: pointer;
 
+						&:hover,
+						&:focus {
+							background: transparent;
+							color: var( --jeo-discovery-action-hover-color );
+						}
+
 						svg {
 							width: 16px;
 							margin-inline-end: 5px;
@@ -731,15 +1209,40 @@ $font: var(--jeo-font);
 						font-size: 14px;
 						font-weight: bold;
 
+						&:hover,
+						&:focus {
+							background-color: $primary;
+							color: white;
+							filter: brightness( 0.95 );
+						}
+
+						&:disabled {
+							cursor: wait;
+							opacity: 0.8;
+							filter: none;
+						}
+
 						&.clear {
 							background: none;
 							border: 1px solid $primary;
 							color: $primary;
+
+							&:hover,
+							&:focus {
+								background: var( --jeo-discovery-action-hover-bg );
+								color: var( --jeo-discovery-action-hover-color );
+								filter: none;
+							}
 						}
 
 						svg {
 							width: 13px;
 							margin-inline-end: 7px;
+						}
+
+						.map-item__loading-icon {
+							animation: jeo-discovery-spin 1s linear infinite;
+							margin-inline-end: 0;
 						}
 					}
 
@@ -747,11 +1250,44 @@ $font: var(--jeo-font);
 						display: flex;
 						flex-direction: column;
 
+						&__loading {
+							align-items: center;
+							color: $primary;
+							display: flex;
+							justify-content: center;
+							margin-top: 13px;
+							padding: 8px 0;
+
+							svg {
+								animation: jeo-discovery-spin 1s linear infinite;
+								height: 18px;
+								width: 18px;
+							}
+						}
+
 						.layer-toggle {
+							align-items: center;
+							background: transparent;
+							border: 0;
+							border-radius: 4px;
+							box-shadow: none;
 							display: flex;
 							color: #0a0a0a;
+							cursor: pointer;
+							filter: none;
 							font-size: 14px;
+							padding: 2px 0;
 							text-align: inline-start;
+							width: 100%;
+
+							&:hover,
+							&:focus,
+							&:active {
+								background: transparent;
+								box-shadow: none;
+								color: var( --jeo-discovery-action-hover-color );
+								filter: none;
+							}
 
 							&:first-child {
 								margin-top: 13px;
@@ -760,6 +1296,16 @@ $font: var(--jeo-font);
 							&.no-current-map-layer {
 								cursor: not-allowed;
 								opacity: 0.6;
+							}
+
+							&.current-map-layer {
+								color: #0a0a0a;
+
+								&:hover,
+								&:focus,
+								&:active {
+									color: var( --jeo-discovery-action-hover-color );
+								}
 							}
 
 							span {
@@ -775,9 +1321,17 @@ $font: var(--jeo-font);
 			}
 
 			.maps-loading {
+				align-items: center;
+				color: $primary;
+				display: flex;
+				justify-content: center;
 				margin-top: 16px;
-				color: #555d66;
-				font-size: 14px;
+
+				svg {
+					animation: jeo-discovery-spin 1s linear infinite;
+					height: 18px;
+					width: 18px;
+				}
 			}
 
 			.load-more-maps {
@@ -789,6 +1343,12 @@ $font: var(--jeo-font);
 				color: $primary;
 				font-weight: 700;
 				text-align: center;
+
+				&:hover,
+				&:focus {
+					background: var( --jeo-discovery-action-hover-bg );
+					color: var( --jeo-discovery-action-hover-color );
+				}
 			}
 		}
 	}
@@ -943,6 +1503,7 @@ $font: var(--jeo-font);
 }
 
 .layer-item {
+	font-family: $font;
 	font-size: 14px;
 	z-index: 1;
 	cursor: grab;
@@ -950,14 +1511,29 @@ $font: var(--jeo-font);
 	position: relative;
 	margin-bottom: 15px;
 
-	&--map {
-		text-transform: uppercase;
-		font-size: 13px;
-		font-weight: bold;
+	* {
+		font-family: inherit;
 	}
 
-	svg {
-		&.drag-icon {
+		&--map {
+			text-transform: uppercase;
+			font-size: 13px;
+			font-weight: bold;
+		}
+
+		&--content {
+			flex: 1 1 auto;
+			min-width: 0;
+			padding-inline-end: 34px;
+		}
+
+		&--map,
+		&--layer {
+			overflow-wrap: anywhere;
+		}
+
+		svg {
+			&.drag-icon {
 			width: 8px;
 			opacity: 0.5;
 			margin-inline-end: 5px;
@@ -980,10 +1556,32 @@ $font: var(--jeo-font);
 	}
 
 	.remove-layer {
+		align-items: center;
+		background: transparent;
+		border: 0;
+		border-radius: 4px;
+		box-shadow: none;
+		color: #555d66;
+		display: flex;
+		filter: none;
+		height: 22px;
+		justify-content: center;
 		position: absolute;
 		inset-inline-end: 0;
 		opacity: 0.7;
 		cursor: pointer;
+		width: 22px;
+
+		&:hover,
+		&:focus,
+		&:active {
+			background: var( --jeo-discovery-action-hover-bg, transparent );
+			box-shadow: none;
+			color: var( --jeo-discovery-action-hover-color, #{$primary} );
+			filter: none;
+			opacity: 1;
+			outline: none;
+		}
 
 		svg {
 			width: 10px;

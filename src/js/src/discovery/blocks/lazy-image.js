@@ -1,23 +1,21 @@
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 import '../style/lazy-image.scss';
 
 const LazyImage = ( { src, alt } ) => {
-	const refPlaceholder = useRef( undefined );
-
-	const removePlaceholder = () => {
-		refPlaceholder.current.remove();
-	};
+	const [ isLoaded, setIsLoaded ] = useState( false );
 
 	return (
 		<div className="jeo-lazy-image__wrapper">
-			<div className="jeo-lazy-image__placeholder" ref={ refPlaceholder } />
-			<div className="jeo-lazy-image"
-				onLoad={ removePlaceholder }
-				onError={ removePlaceholder }
+			{ ! isLoaded && <div className="jeo-lazy-image__placeholder" /> }
+			<img
+				className="jeo-lazy-image"
+				onLoad={ () => setIsLoaded( true ) }
+				onError={ () => setIsLoaded( true ) }
 				src={ src }
-				alt={ alt }
+				alt={ alt || '' }
 				loading="lazy"
+				decoding="async"
 			/>
 		</div>
 	);

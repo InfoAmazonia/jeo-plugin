@@ -9,6 +9,7 @@ import { renderLayer } from '../map-blocks/map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
 import { formatDate, formatHour, joinList } from '../shared/intl';
 import { EMPTY_STYLE } from '../shared/styles';
+import { setMapLayerVisibility } from './layer-visibility';
 
 import './storymap-display.scss';
 
@@ -18,6 +19,8 @@ const MAP_DIM = 0.5;
 const { map_defaults: mapDefaults } = jeo_settings;
 
 const isSingle = !!document.querySelector('.single-storymap');
+const STORYMAP_MAP_CONTAINER_CLASS = 'jeo-storymap-map';
+const STORYMAP_MAP_CONTAINER_JS_CLASS = 'js-jeo-storymap-map';
 
 const alignments = {
     'left': 'lefty',
@@ -244,6 +247,40 @@ class StoryMapDisplay extends Component {
 		attributionButton?.setAttribute( 'hidden', 'hidden' );
 	}
 
+	setStoryLayerVisibility( layerSlug, visibility ) {
+		setMapLayerVisibility( this.map, layerSlug, visibility );
+	}
+
+	applyChapterLayerVisibility( chapter, showAllLayers = false ) {
+		if ( ! chapter ) {
+			return;
+		}
+
+		const selectedLayers = chapter.selectedLayers || [];
+
+		this.props.navigateMapLayers.forEach( ( layer ) => {
+			const isLayerUsed = selectedLayers.some(
+				( selectedLayer ) =>
+					selectedLayer.slug === layer.slug || selectedLayer.id === layer.id
+			);
+
+			if ( isLayerUsed || showAllLayers ) {
+				this.setStoryLayerVisibility( layer.slug, 'visible' );
+			}
+		} );
+
+		this.props.navigateMapLayers.forEach( ( layer ) => {
+			const isLayerUsed = selectedLayers.some(
+				( selectedLayer ) =>
+					selectedLayer.slug === layer.slug || selectedLayer.id === layer.id
+			);
+
+			if ( ! isLayerUsed && ! showAllLayers ) {
+				this.setStoryLayerVisibility( layer.slug, 'none' );
+			}
+		} );
+	}
+
 	eagerInitStorymap() {
 		const config = this.config;
 		const firstChapter = config.chapters[0];
@@ -276,26 +313,16 @@ class StoryMapDisplay extends Component {
 					return chap.id == response.element.dataset.id;
 				});
 
+				if ( ! chapter ) {
+					return;
+				}
+
 				this.setState( { ...this.state, currentChapter: chapter } );
 				this.map?.flyTo(chapter.location);
-
-				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
-				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
-
-					if( isLayerUsed || response.index === config.chapters.length - 1) {
-						this.map?.setLayoutProperty(layer.slug, 'visibility', 'visible');
-					}
-				})
-
-
-				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = chapter.selectedLayers.some(selectedLayer => selectedLayer.id === layer.id);
-
-					if ( !isLayerUsed ) {
-						this.map?.setLayoutProperty(layer.slug, 'visibility', 'none');
-					}
-				})
+				this.applyChapterLayerVisibility(
+					chapter,
+					response.index === config.chapters.length - 1
+				);
 		})
 		.onStepExit(response => {
 			if ( this.isIntroductionActive() ) {
@@ -308,23 +335,7 @@ class StoryMapDisplay extends Component {
 				}
 
 				this.setState( { ...this.state, inSlides: false, mapBrightness: MAP_DIM } );
-
-				// show the ones we need and just after hide the ones we dont need (this forces the map to always have at least one layer)
-				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
-
-					if( isLayerUsed ) {
-						this.map?.setLayoutProperty(layer.slug, 'visibility', 'visible');
-					}
-				})
-
-				this.props.navigateMapLayers.forEach(layer => {
-					const isLayerUsed = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
-
-					if ( !isLayerUsed ) {
-						this.map?.setLayoutProperty(layer.slug, 'visibility', 'none');
-					}
-				})
+				this.applyChapterLayerVisibility( firstChapter );
 			}
 		});
 
@@ -416,6 +427,7 @@ class StoryMapDisplay extends Component {
 				const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: layer.slug, visible: isInitialLayer });
 				jeoLayer.addLayer(map);
 			});
+			this.applyChapterLayerVisibility( this.state.currentChapter || firstChapter );
 
 			const mapEl = this.el?.querySelector( `.${MAP_RUNTIME}-map` );
 			if ( mapEl ) {
@@ -489,7 +501,11 @@ class StoryMapDisplay extends Component {
 				>
 					<div
 						ref={ ( el ) => ( this.mapContainer = el ) }
-						className="story-map-element"
+						className={ classNames(
+							'story-map-element',
+							STORYMAP_MAP_CONTAINER_CLASS,
+							STORYMAP_MAP_CONTAINER_JS_CLASS
+						) }
 					>
 					</div>
 

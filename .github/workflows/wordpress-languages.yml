@@ -21,6 +21,19 @@ jobs:
           php-version: '8.4'
           coverage: none
 
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Setup WP-CLI
+        uses: holyhope/install-wp-cli-github-action@v1.0.0
+
+      - name: Build assets
+        run: |
+          npm ci
+          npm run build:assets
+
       - name: Test WordPress language files
         id: language-files
         continue-on-error: true
@@ -30,7 +43,7 @@ jobs:
           source: src
           pot_file: src/languages/jeo.pot
           domain: jeo
-          exclude: assets
+          exclude: js/src
           fail_on_diff: false
           fail_on_warning: false
 

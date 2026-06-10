@@ -56,10 +56,10 @@ for ( const file of TRANSLATION_FILES ) {
 	const contents = fs.readFileSync( file, 'utf8' );
 	let matched = false;
 	const nextContents = contents.replace(
-		/"Project-Id-Version:\s*.+\\n"/,
-		() => {
+		/"Project-Id-Version:\s*(.+?)\s+\d+\.\d+\.\d+(?:-[^\\"]+)?\\n"/,
+		( _match, projectName ) => {
 			matched = true;
-			return `"Project-Id-Version: JEO ${ headerVersion }\\n"`;
+			return `"Project-Id-Version: ${ projectName } ${ headerVersion }\\n"`;
 		}
 	);
 
