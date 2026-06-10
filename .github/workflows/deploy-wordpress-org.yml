@@ -1,4 +1,4 @@
-name: Deploy to WordPress.org
+name: Release
 on:
   push:
     tags:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 jobs:
   tag:
-    name: Stable tag deploy
+    name: Stable tag release
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -43,19 +43,26 @@ jobs:
         build-dir: ${{ runner.temp }}/plugin-check-build/jeo
         slug: jeo
         include-experimental: false
+    - name: Build GitHub release zip
+      run: |
+        rm -rf "${RUNNER_TEMP}/github-release"
+        mkdir -p "${RUNNER_TEMP}/github-release/jeo"
+        rsync -a --delete src/ "${RUNNER_TEMP}/github-release/jeo/"
+        cd "${RUNNER_TEMP}/github-release"
+        zip -qr "${RUNNER_TEMP}/jeo.zip" jeo
+    - name: Publish GitHub release
+      uses: softprops/action-gh-release@v3
+      with:
+        files: ${{ runner.temp }}/jeo.zip
+        generate_release_notes: true
     - name: WordPress Plugin Deploy
-      id: wordpress_org_deploy
+      if: vars.WPORG_DEPLOY_ENABLED == 'true'
       uses: 10up/action-wordpress-plugin-deploy@stable
       with:
-        generate-zip: true
+        generate-zip: false
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
         SLUG: jeo # optional, remove if GitHub repo name matches SVN slug, including capitalization
         BUILD_DIR: src
         ASSETS_DIR: .wordpress-org
-    - name: Publish GitHub release
-      uses: softprops/action-gh-release@v3
-      with:
-        files: ${{ steps.wordpress_org_deploy.outputs.zip-path }}
-        generate_release_notes: true
