@@ -57,69 +57,12 @@ jobs:
           mkdir -p "$PLUGIN_BUILD_DIR"
           rsync -a --delete src/ "$PLUGIN_BUILD_DIR/"
 
-      - name: Install WordPress and Plugin Check
-        run: |
-          wp core download --path="$WP_PATH" --version=latest --force
-          wp config create \
-            --path="$WP_PATH" \
-            --dbname=wordpress \
-            --dbuser=root \
-            --dbpass=root \
-            --dbhost=127.0.0.1:3306 \
-            --skip-check \
-            --force
-          wp core install \
-            --path="$WP_PATH" \
-            --url=http://localhost:8880 \
-            --title="Plugin Check" \
-            --admin_user=admin \
-            --admin_password=password \
-            --admin_email=admin@example.com \
-            --skip-email
-          wp plugin install \
-            --path="$WP_PATH" \
-            https://downloads.wordpress.org/plugin/plugin-check.zip \
-            --activate
-          rsync -a --delete "$PLUGIN_BUILD_DIR/" "$WP_PATH/wp-content/plugins/jeo/"
-
       - name: Run WordPress Plugin Check
-        run: |
-          echo "::group::Debugging information"
-          wp --path="$WP_PATH" cli info
-          wp --path="$WP_PATH" plugin list
-          wp --path="$WP_PATH" --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" plugin list-checks
-          wp --path="$WP_PATH" --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" plugin list-check-categories
-          echo "::endgroup::"
-
-          echo "::group::Install dependencies"
-          DEPENDENCIES_RAW=$(wp --path="$WP_PATH" plugin get jeo --field=requires_plugins | tr ',' ' ')
-
-          if [ -z "$DEPENDENCIES_RAW" ]; then
-            echo "Plugin has no dependencies"
-          else
-            read -r -a DEPENDENCIES <<< "$DEPENDENCIES_RAW"
-            echo "Installing plugin dependencies: $DEPENDENCIES_RAW"
-            wp --path="$WP_PATH" plugin install --activate "${DEPENDENCIES[@]}"
-          fi
-          echo "::endgroup::"
-
-          wp --path="$WP_PATH" plugin activate jeo
-
-          echo "::group::Run Plugin Check"
-          set +e
-          wp --path="$WP_PATH" \
-            --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" \
-            plugin check jeo \
-            --format=json \
-            --slug=jeo \
-            --exclude-files=.wp-env.json \
-            > "$PLUGIN_CHECK_RESULTS"
-          status=$?
-          set -e
-          cat "$PLUGIN_CHECK_RESULTS"
-          echo "::endgroup::"
-
-          exit "$status"
+        uses: ./.github/actions/wordpress-plugin-check
+        with:
+          plugin-build-dir: ${{ env.PLUGIN_BUILD_DIR }}
+          results-path: ${{ env.PLUGIN_CHECK_RESULTS }}
+          wp-path: ${{ env.WP_PATH }}
 
       - name: Upload Plugin Check results
         uses: actions/upload-artifact@v7
