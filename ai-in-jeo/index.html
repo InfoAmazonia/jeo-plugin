@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/ai-in-jeo/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>AI in JEO - JEO</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "AI in JEO";
+        var mkdocs_page_input_path = "ai-in-jeo.md";
+        var mkdocs_page_url = "/ai-in-jeo/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../stories-near-you/">Stories near you</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../minimap/">Minimap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">AI in JEO</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ai-providers">AI providers</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#knowledge-base-rag">Knowledge Base (RAG)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#how-it-works">How it works</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#indexing">Indexing</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#embedding-models">Embedding models</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#search-results-topk">Search results (topK)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-each-feature-uses-rag">How each feature uses RAG</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#structured-output">Structured output</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#agents-and-tools">Agents and tools</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#the-tools">The tools</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#sub-agents">Sub-agents</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#conversation-memory">Conversation memory</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#learning-and-user-memory">Learning and user memory</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#mcp-model-context-protocol">MCP (Model Context Protocol)</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#privacy-and-data">Privacy and data</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#token-usage">Token usage</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#feature-concept-matrix">Feature — concept matrix</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#next-steps">Next steps</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-settings/">AI Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-context-assistant/">AI Context Assistant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-georeferencing/">AI Georeferencing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-bulk-geolocation/">AI Bulk Geolocation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-compliance/">WordPress.org compliance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-audit-report/">WordPress.org audit report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-maintenance/">Dependency maintenance</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">AI</li>
+      <li class="breadcrumb-item active">AI in JEO</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/ai-in-jeo.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ai-in-jeo">AI in JEO</h1>
+<p>JEO includes built-in AI capabilities for georeferencing posts, generating maps, and suggesting editorial content. This page explains the underlying concepts so you can understand what happens behind the scenes and how to get the best results.</p>
+<h2 id="overview">Overview</h2>
+<p>JEO's AI features are powered by a configurable external AI provider. The plugin never runs its own AI model — instead, it sends requests to the provider you choose (such as OpenAI, Google Gemini, or a local Ollama instance) and processes the results.</p>
+<p>All AI features are <strong>optional</strong>. They activate only after you configure a provider in <strong>Jeo → AI</strong> (see <a href="../ai-settings/">AI Settings</a>).</p>
+<p>The key idea is that each AI feature is a specialized <strong>agent</strong> — an AI assistant with a specific role, a set of <strong>tools</strong> it can use, and access to your site's content through a <strong>knowledge base</strong>.</p>
+<h2 id="ai-providers">AI providers</h2>
+<p>JEO supports multiple AI providers through <a href="https://docs.neuron-ai.dev/providers/ai-provider">NeuronAI</a>. Most providers run in the cloud and require an API key, while others (such as Ollama) run locally on your own server — meaning no data ever leaves your server.</p>
+<p>You select a provider and model in <strong>Jeo → AI → Provider</strong>. The same provider is used across all AI features. The list of available providers is shown on the settings page and may grow over time as NeuronAI adds new integrations.</p>
+<h2 id="knowledge-base-rag">Knowledge Base (RAG)</h2>
+<p><strong>RAG</strong> stands for <em>Retrieval-Augmented Generation</em>. It is a technique that lets the AI search your own content before answering, so its responses are grounded in your site's data rather than generic knowledge.</p>
+<h3 id="how-it-works">How it works</h3>
+<p>JEO maintains <strong>two separate knowledge bases</strong> (called <em>vector stores</em>):</p>
+<table>
+<thead>
+<tr>
+<th>Knowledge base</th>
+<th>Content</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Posts</strong> (<code>jeo_knowledge</code>)</td>
+<td>Your published posts — titles and body text</td>
+<td><a href="../ai-context-assistant/">Context Assistant</a></td>
+</tr>
+<tr>
+<td><strong>Layers</strong> (<code>jeo_layers_knowledge</code>)</td>
+<td>Your map layers — titles, types, legends, and descriptions</td>
+<td><a href="../minimap/">Minimap</a></td>
+</tr>
+</tbody>
+</table>
+<p>Each item is converted into a numerical representation (an <em>embedding</em>) and stored in a local file-based index. When an AI feature needs context, it:</p>
+<ol>
+<li>Converts the query into an embedding using the same model.</li>
+<li>Searches the index for the most similar entries.</li>
+<li>Passes the matching content to the AI along with the original request.</li>
+</ol>
+<p>This means the AI can reference your actual articles and layers when generating results.</p>
+<h3 id="indexing">Indexing</h3>
+<p>Content is added to the knowledge base through <em>indexing</em>. You control this in <strong>Jeo → AI → Knowledge Base</strong>:</p>
+<ul>
+<li><strong>Auto-indexing</strong> runs in the background via WordPress cron and picks up new or updated posts and layers.</li>
+<li><strong>Manual indexing</strong> lets you trigger a full or partial re-index from the settings page.</li>
+<li><strong>WP-CLI</strong> is also available for large-scale indexing: <code>wp jeo ai vectorize --store=posts --batch_size=20</code>.</li>
+</ul>
+<h3 id="embedding-models">Embedding models</h3>
+<p>Embeddings are generated by a separate model from your AI provider. You configure the embedding model in the Knowledge Base tab. Common choices include <code>text-embedding-3-small</code> (OpenAI), <code>text-embedding-004</code> (Gemini), or <code>nomic-embed-text</code> (Ollama).</p>
+<p>Once a knowledge base is created with a specific embedding model, that model is <em>locked</em> — changing it requires clearing and rebuilding the store, because embeddings from different models are not comparable.</p>
+<h3 id="search-results-topk">Search results (topK)</h3>
+<p>The <strong>topK</strong> setting (in Knowledge Base tab, range 1–50, default 10) controls how many documents are returned per search. Higher values give the AI more context but increase token usage. For most use cases, 10 is a good default.</p>
+<h2 id="how-each-feature-uses-rag">How each feature uses RAG</h2>
+<table>
+<thead>
+<tr>
+<th>Feature</th>
+<th>Uses RAG?</th>
+<th>Knowledge base</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../ai-georeferencing/">AI Georeferencing</a></td>
+<td>Optional</td>
+<td>—</td>
+<td>Can include taxonomy context; does not use the vector store directly</td>
+</tr>
+<tr>
+<td><a href="../minimap/">Minimap</a></td>
+<td>Yes</td>
+<td>Layers (<code>jeo_layers_knowledge</code>)</td>
+<td>Searches for relevant map layers to include in the generated map</td>
+</tr>
+<tr>
+<td><a href="../ai-context-assistant/">Context Assistant</a></td>
+<td>Yes</td>
+<td>Posts (<code>jeo_knowledge</code>)</td>
+<td>Finds related articles to reference in suggestions</td>
+</tr>
+<tr>
+<td><a href="../ai-bulk-geolocation/">AI Bulk Geolocation</a></td>
+<td>No</td>
+<td>—</td>
+<td>Processes posts individually without RAG</td>
+</tr>
+<tr>
+<td>Minilayer</td>
+<td>No</td>
+<td>—</td>
+<td>Uses MCP instead (see below)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="structured-output">Structured output</h2>
+<p>When the AI returns data — such as geolocation points or map configurations — JEO needs to parse it reliably. <strong>Structured output</strong> is a mechanism where the AI provider enforces a specific JSON schema at the API level, guaranteeing the response matches the expected format.</p>
+<p>This is enabled by default and used by:</p>
+<ul>
+<li><strong>Georeferencing</strong> — returns locations with name, coordinates, confidence score, and primary/secondary classification.</li>
+<li><strong>Minimap</strong> — returns the complete map configuration (layers, center, zoom, pins).</li>
+<li><strong>Context Assistant</strong> — returns paragraphs and references.</li>
+</ul>
+<p>If your provider does not support structured output, or if it fails for any reason, JEO automatically falls back to a free-text mode that extracts the data using pattern matching. You don't need to configure anything — the fallback is transparent.</p>
+<h2 id="agents-and-tools">Agents and tools</h2>
+<p>Each AI feature is built around an <strong>agent</strong> — an AI assistant configured for a specific task. Agents are given a system prompt (instructions), a set of <strong>tools</strong> they can call, and optionally access to <strong>sub-agents</strong> for delegated work.</p>
+<h3 id="the-tools">The tools</h3>
+<table>
+<thead>
+<tr>
+<th>Tool</th>
+<th>What it does</th>
+<th>Used by</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>search_layers</code></td>
+<td>Searches the layer knowledge base for relevant layers</td>
+<td>Minimap</td>
+</tr>
+<tr>
+<td><code>geocode</code></td>
+<td>Converts a location name into latitude/longitude coordinates</td>
+<td>Minimap</td>
+</tr>
+<tr>
+<td><code>retrieve_knowledge</code></td>
+<td>Searches the post knowledge base for related articles</td>
+<td>Context Assistant</td>
+</tr>
+<tr>
+<td><code>get_post_content</code></td>
+<td>Retrieves a post's title, content, categories, tags, and geolocations</td>
+<td>Minimap, Context Assistant</td>
+</tr>
+<tr>
+<td><code>generate_layer</code></td>
+<td>Creates a new Mapbox style and layer CPT from a description</td>
+<td>Minimap (requires Mapbox key)</td>
+</tr>
+</tbody>
+</table>
+<p>When you ask the Minimap to "show deforestation data in the Amazon," the agent might:</p>
+<ol>
+<li>Use <code>get_post_content</code> to understand the current article.</li>
+<li>Use <code>search_layers</code> to find layers about deforestation.</li>
+<li>Use <code>geocode</code> to locate the Amazon region.</li>
+<li>Return a complete map configuration.</li>
+</ol>
+<h3 id="sub-agents">Sub-agents</h3>
+<p>Some agents delegate work to specialized sub-agents. Both Minimap and Context Assistant use a <strong>post analyzer</strong> sub-agent that reads the post content and extracts topics, locations, tone, and suggested search queries. This analysis guides the main agent's decisions.</p>
+<h2 id="conversation-memory">Conversation memory</h2>
+<p>AI features that support chat (Minimap, Context Assistant, and Georeferencing) maintain <strong>conversation history</strong> per post. This means:</p>
+<ul>
+<li>You can refine results through back-and-forth chat without repeating context.</li>
+<li>Conversations persist across page reloads — closing the editor and returning later resumes where you left off.</li>
+<li>Each post has its own independent conversation.</li>
+</ul>
+<h3 id="learning-and-user-memory">Learning and user memory</h3>
+<p>The Minimap and Context Assistant agents can <strong>learn</strong> from interactions. Over time, they accumulate knowledge about patterns and preferences. They also store per-user memory (e.g., preferred writing style), so suggestions become more personalized the more you use them.</p>
+<h2 id="mcp-model-context-protocol">MCP (Model Context Protocol)</h2>
+<p><strong>MCP</strong> is a protocol that connects AI agents to external services. In JEO, it is used exclusively by the <strong>Minilayer</strong> feature to communicate with the Mapbox MCP DevKit — an external service that generates Mapbox map styles.</p>
+<p>When you ask the AI to create a custom layer (e.g., "generate a deforestation heatmap for the Amazon"), the Minilayer agent:</p>
+<ol>
+<li>Connects to the Mapbox MCP server using your Mapbox API key.</li>
+<li>Uses Mapbox's tools to build, validate, and preview the style.</li>
+<li>Creates a new layer post in WordPress with the generated style.</li>
+</ol>
+<p>MCP requires a Mapbox API key configured in <strong>Jeo → Settings</strong>. It is not used by any other feature.</p>
+<h2 id="privacy-and-data">Privacy and data</h2>
+<p>Understanding what data is sent where:</p>
+<table>
+<thead>
+<tr>
+<th>Data point</th>
+<th>Sent to</th>
+<th>Stored</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Post content (for analysis)</td>
+<td>Your configured AI provider</td>
+<td>No — used transiently</td>
+</tr>
+<tr>
+<td>Geolocation queries</td>
+<td>Your configured AI provider</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Embeddings (knowledge base)</td>
+<td>Your configured AI provider (during indexing)</td>
+<td>Yes — stored locally in <code>wp-content/uploads/jeo-ai-store/</code></td>
+</tr>
+<tr>
+<td>Conversation history</td>
+<td>Not sent to AI provider after initial call</td>
+<td>Yes — stored in WordPress post meta</td>
+</tr>
+<tr>
+<td>User preferences (memory)</td>
+<td>Not sent externally</td>
+<td>Yes — stored in WordPress user meta</td>
+</tr>
+<tr>
+<td>Mapbox styles (MCP only)</td>
+<td>Mapbox MCP DevKit</td>
+<td>Yes — stored as layer posts in WordPress</td>
+</tr>
+</tbody>
+</table>
+<p>If you use a <strong>local provider</strong> (Ollama), no data leaves your server at all.</p>
+<h3 id="token-usage">Token usage</h3>
+<p>JEO tracks AI token usage in <strong>Jeo → AI Debug Logs</strong>. Each log entry records the provider, model, input and output tokens, and the prompt and response. Use this to monitor costs and troubleshoot results.</p>
+<h2 id="feature-concept-matrix">Feature — concept matrix</h2>
+<p>A quick reference for which concepts apply to each feature:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th style="text-align: center;">Provider</th>
+<th style="text-align: center;">RAG</th>
+<th style="text-align: center;">Structured output</th>
+<th style="text-align: center;">Tools</th>
+<th style="text-align: center;">Conversation memory</th>
+<th style="text-align: center;">MCP</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="../ai-georeferencing/">AI Georeferencing</a></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td><a href="../ai-bulk-geolocation/">AI Bulk Geolocation</a></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td><a href="../minimap/">Minimap</a></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td><a href="../ai-context-assistant/">Context Assistant</a></td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td>Minilayer</td>
+<td style="text-align: center;">✓</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✓</td>
+</tr>
+</tbody>
+</table>
+<h2 id="next-steps">Next steps</h2>
+<ul>
+<li><strong>Configure a provider</strong>: <a href="../ai-settings/">AI Settings</a></li>
+<li><strong>Index your content</strong>: Knowledge Base tab in <strong>Jeo → AI</strong></li>
+<li><strong>Start using features</strong>:</li>
+<li><a href="../ai-georeferencing/">AI Georeferencing</a> — auto-tag posts with locations</li>
+<li><a href="../minimap/">Minimap</a> — generate maps from text or post content</li>
+<li><a href="../ai-context-assistant/">Context Assistant</a> — get AI-powered editorial suggestions</li>
+<li><a href="../ai-bulk-geolocation/">AI Bulk Geolocation</a> — process many posts at once</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../geolocating-posts/" class="btn btn-neutral float-left" title="Geolocating posts"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ai-settings/" class="btn btn-neutral float-right" title="AI Settings">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../geolocating-posts/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ai-settings/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

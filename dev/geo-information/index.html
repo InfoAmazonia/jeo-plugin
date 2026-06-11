@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/dev/geo-information/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>Geo information - JEO</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Geo information";
+        var mkdocs_page_input_path = "dev/geo-information.md";
+        var mkdocs_page_url = "/dev/geo-information/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../stories-near-you/">Stories near you</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../minimap/">Minimap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-in-jeo/">AI in JEO</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-settings/">AI Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-context-assistant/">AI Context Assistant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-georeferencing/">AI Georeferencing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-bulk-geolocation/">AI Bulk Geolocation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul class="current">
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">Geo information</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#how-geographical-information-is-stored">How geographical information is stored</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#ai-generated-geolocation-fields">AI-generated geolocation fields</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#how-to-search-for-posts-by-geoinformation-indexes">How to search for posts by geoinformation? (indexes)</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#fetching-posts-by-geoinformation">Fetching posts by geoinformation</a>
+    </li>
+        </ul>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../wordpress-org-compliance/">WordPress.org compliance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../wordpress-org-audit-report/">WordPress.org audit report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-maintenance/">Dependency maintenance</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer</li>
+      <li class="breadcrumb-item active">Geo information</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/dev/geo-information.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="geographical-information-of-a-post">Geographical Information of a post</h1>
+<p>Each post can be related to one or more points on the map.</p>
+<p>For each point, JEO collects geographical information such as city and country names. For complete information on this, see <a href="../geocoders/">Geocoders</a>.</p>
+<h2 id="how-geographical-information-is-stored">How geographical information is stored</h2>
+<p>Each related point is stored as one entry of the <code>_related_point</code> metadata key. Each entry is an object with all the information retrieved by the geocoder or, when using AI georeferencing, by the AI model.</p>
+<p>Here is an example of two entries related to the same post, that could be get using:</p>
+<pre><code class="language-php">get_post_meta( $post_id, '_related_point' );
+</code></pre>
+<pre><code class="language-php">'_related_point' =&gt; [
+    'relevance' =&gt; 'primary',
+    '_geocode_lat' =&gt; '-23,54659435',
+    '_geocode_lon' =&gt; '-46,644533061712',
+    '_geocode_full_address' =&gt; 'Edifício Copan, Rua Araújo, Vila Buarque, República, São Paulo, Região Imediata de São Paulo, Região Metropolitana de São Paulo, Região Intermediária de São Paulo, São Paulo, Região Sudeste, 01046-010, Brasil',
+    '_geocode_country' =&gt; 'Brasil',
+    '_geocode_country_code' =&gt; '',
+    '_geocode_city' =&gt; 'São Paulo',
+    '_geocode_region_level_2' =&gt; 'São Paulo',
+    '_geocode_region_level_3' =&gt; 'Região Intermediária de São Paulo',
+    '_geocode_city_level_1' =&gt; 'Vila Buarque',
+],
+'_related_point' =&gt; [
+    'relevance' =&gt; 'secondary',
+    '_geocode_lat' =&gt; '-23,183525102463',
+    '_geocode_lon' =&gt; '-46,898231506348',
+    '_geocode_full_address' =&gt; 'Rua Jorge Gebran, Parque do Colégio, Chácara Urbana, Jundiaí, Região Imediata de Jundiaí, Região Intermediária de Campinas, São Paulo, Região Sudeste, 13209-090, Brasil',
+    '_geocode_country' =&gt; 'Brasil',
+    '_geocode_country_code' =&gt; '',
+    '_geocode_city' =&gt; 'Jundiaí',
+    '_geocode_region_level_2' =&gt; 'São Paulo',
+    '_geocode_region_level_3' =&gt; 'Região Intermediária de Campinas',
+    '_geocode_city_level_1' =&gt; 'Parque do Colégio',
+        ]
+    ]
+]
+</code></pre>
+<h2 id="ai-generated-geolocation-fields">AI-generated geolocation fields</h2>
+<p>When a point is generated by AI georeferencing (rather than manual geocoding), the <code>_related_point</code> entry includes an additional field:</p>
+<ul>
+<li><code>_ai_quote</code> (string) — the excerpt from the post content that the AI identified as referencing this location.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-php">'_related_point' =&gt; [
+    'relevance' =&gt; 'primary',
+    '_geocode_lat' =&gt; '-3.1303',
+    '_geocode_lon' =&gt; '-60.0234',
+    '_geocode_full_address' =&gt; 'Teatro Amazonas, Manaus, Amazonas, Brasil',
+    '_geocode_country' =&gt; 'Brasil',
+    '_geocode_country_code' =&gt; '',
+    '_geocode_city' =&gt; 'Manaus',
+    '_geocode_region_level_2' =&gt; 'Amazonas',
+    '_geocode_region_level_3' =&gt; '',
+    '_geocode_city_level_1' =&gt; '',
+    '_ai_quote' =&gt; 'O Teatro Amazonas, localizado no centro de Manaus, reabriu após restauro.',
+],
+</code></pre>
+<p>The AI also produces a <code>confidence</code> score (0–100) during georeferencing, but this is <strong>not</strong> stored in <code>_related_point</code> — it is used only during the approval workflow in the bulk processor. See <a href="../../ai-georeferencing/">AI Georeferencing</a> and <a href="../../ai-bulk-geolocation/">AI Bulk Geolocation</a>.</p>
+<h2 id="how-to-search-for-posts-by-geoinformation-indexes">How to search for posts by geoinformation? (indexes)</h2>
+<p>When you save geographical information of the points, JEO also creates other metadata that will allow developers to query posts by specific geographical information.</p>
+<p>Since each point is stored as a serialized data in the database, this would not allow us to filter posts by <code>country_code</code> for example. That's why we create indexes.</p>
+<p>For the example above, this post would also have one individual metadata entry for each information, like this:</p>
+<pre><code class="language-php">[
+    '_geocode_lat_p' =&gt; '-23,54659435',
+    '_geocode_lon_p' =&gt; '-46,644533061712',
+    '_geocode_country_p' =&gt; 'Brasil',
+    '_geocode_country_code_p' =&gt; '',
+    '_geocode_city_p' =&gt; 'São Paulo',
+    '_geocode_region_level_2_p' =&gt; 'São Paulo',
+    '_geocode_region_level_3_p' =&gt; 'Região Intermediária de São Paulo',
+    '_geocode_city_level_1_p' =&gt; 'Vila Buarque',
+    '_geocode_lat_s' =&gt; '-23,183525102463',
+    '_geocode_lon_s' =&gt; '-46,898231506348',
+    '_geocode_country_s' =&gt; 'Brasil',
+    '_geocode_country_code_s' =&gt; '',
+    '_geocode_city_s' =&gt; 'Jundiaí',
+    '_geocode_region_level_2_s' =&gt; 'São Paulo',
+    '_geocode_region_level_3_s' =&gt; 'Região Intermediária de Campinas',
+    '_geocode_city_level_1_s' =&gt; 'Parque do Colégio',
+]
+</code></pre>
+<p>Note: <code>_s</code> and <code>_p</code> suffixes indicate if the relevance of that information is primary or secondary.</p>
+<p>Note 2: Full addresses are not indexed</p>
+<p>Now we have all the information as individual metadata and this allows me to query by them, however, the pairs are disconnected (if I had more than one primary point, it would be impossible to know what are the latitude-longitude pairs. That's why the information we actually use is the serialized object).</p>
+<h3 id="fetching-posts-by-geoinformation">Fetching posts by geoinformation</h3>
+<p>Give me all the posts that have primary points with the country code <code>'BR'</code>:</p>
+<pre><code class="language-php">$posts = new WP_Query([
+    'meta_query' =&gt; [
+        [
+            'key' =&gt; '_geocode_country_code_p',
+            'value' =&gt; 'BR'
+        ]
+    ]
+]);
+</code></pre>
+<p>Give me all the posts whose city is <code>'Manaus'</code>:</p>
+<pre><code class="language-php">$posts = new WP_Query([
+    'meta_query' =&gt; [
+        [
+            'key' =&gt; '_geocode_city_s',
+            'value' =&gt; 'Manaus'
+        ],
+        [
+            'key' =&gt; '_geocode_city_p',
+            'value' =&gt; 'Manaus'
+        ],
+        'relation' =&gt; 'OR'
+    ]
+]);
+</code></pre>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../../ai-bulk-geolocation/" class="btn btn-neutral float-left" title="AI Bulk Geolocation"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../geocoders/" class="btn btn-neutral float-right" title="Geocoders">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../../ai-bulk-geolocation/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../geocoders/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

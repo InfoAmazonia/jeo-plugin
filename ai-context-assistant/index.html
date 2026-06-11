@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/ai-context-assistant/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>AI Context Assistant - JEO</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "AI Context Assistant";
+        var mkdocs_page_input_path = "ai-context-assistant.md";
+        var mkdocs_page_url = "/ai-context-assistant/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../stories-near-you/">Stories near you</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../minimap/">Minimap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-in-jeo/">AI in JEO</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-settings/">AI Settings</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">AI Context Assistant</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#opening-the-panel">Opening the panel</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#generating-suggestions">Generating suggestions</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#using-suggested-paragraphs">Using suggested paragraphs</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#insert-into-article">Insert into article</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#copy">Copy</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#refining-with-chat">Refining with chat</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#retry">Retry</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#clear">Clear</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#expanding-the-panel">Expanding the panel</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#persistence">Persistence</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#customizing-the-ai-prompt">Customizing the AI prompt</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#requirements">Requirements</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-georeferencing/">AI Georeferencing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-bulk-geolocation/">AI Bulk Geolocation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-compliance/">WordPress.org compliance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-audit-report/">WordPress.org audit report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-maintenance/">Dependency maintenance</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">AI</li>
+      <li class="breadcrumb-item active">AI Context Assistant</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/ai-context-assistant.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="ai-context-assistant-editorial-suggestions">AI Context Assistant — Editorial Suggestions</h1>
+<p>The AI Context Assistant is a Gutenberg sidebar panel that helps you enrich your articles with AI-suggested paragraphs and references to related content from your site's knowledge base.</p>
+<p>See <a href="../ai-in-jeo/">AI in JEO</a> to learn how RAG, agents, and conversation memory power this feature.</p>
+<h2 id="opening-the-panel">Opening the panel</h2>
+<ol>
+<li>Open or create a post in the Gutenberg editor (the post type must be enabled in <strong>JEO Settings → General</strong>).</li>
+<li>In the <strong>Document</strong> sidebar, find the <strong>AI Context</strong> panel.</li>
+<li>If the panel is collapsed, click its title to expand it.</li>
+</ol>
+<h2 id="generating-suggestions">Generating suggestions</h2>
+<p>Click <strong>Generate Suggestions</strong>. The AI will analyze your article's content and the site's vectorized article archive to produce:</p>
+<ul>
+<li><strong>Suggested paragraphs</strong> — ready-to-insert text blocks that complement your article. Paragraphs may include inline formatting (bold, italic) and links to related articles.</li>
+<li><strong>Related references</strong> — articles from your knowledge base that are relevant to the topic.</li>
+</ul>
+<p>The generation is <strong>not automatic</strong> — you control when it runs to avoid unnecessary API calls.</p>
+<p><img alt="AI Context panel — idle state" src="../img/ai-context-panel.png" /></p>
+<h2 id="using-suggested-paragraphs">Using suggested paragraphs</h2>
+<p>Each suggested paragraph has two actions:</p>
+<h3 id="insert-into-article">Insert into article</h3>
+<p>Click <strong>Insert into article</strong> to add the paragraph as a Gutenberg <code>core/paragraph</code> block at the end of the document. Inline formatting and links are preserved. Once inserted, the button changes to <strong>Inserted</strong> to prevent duplicates.</p>
+<h3 id="copy">Copy</h3>
+<p>Click <strong>Copy</strong> to copy the paragraph as rich text (HTML with links) to your clipboard. You can then paste it anywhere — the WordPress editor, Google Docs, Word, etc. The copy uses a triple-fallback mechanism for maximum compatibility:</p>
+<ol>
+<li>Modern <code>ClipboardItem</code> API (HTML + plain text)</li>
+<li>DOM selection + <code>execCommand('copy')</code> (works in Gutenberg iframes)</li>
+<li>Plain text only (universal fallback)</li>
+</ol>
+<p><img alt="AI Context panel — suggestions and chat" src="../img/ai-context-suggestions.png" /></p>
+<h2 id="refining-with-chat">Refining with chat</h2>
+<p>After the initial generation, you can refine suggestions through the chat textarea:</p>
+<ul>
+<li><strong>"Make it shorter"</strong> — condenses the suggested paragraphs.</li>
+<li><strong>"Focus on environmental impact"</strong> — rewrites with a specific angle.</li>
+<li><strong>"Add more historical context"</strong> — expands with additional background.</li>
+<li><strong>"Include data about the Amazon region"</strong> — adds region-specific content.</li>
+</ul>
+<p>Press <strong>Ctrl+Enter</strong> or click <strong>Send</strong> to submit your message.</p>
+<h3 id="retry">Retry</h3>
+<p>Click <strong>Retry</strong> to ask the AI to generate new suggestions without typing a message. Useful when you want a different take on the same topic.</p>
+<h3 id="clear">Clear</h3>
+<p>Click <strong>Clear</strong> to reset the entire conversation and remove all suggestions. A new conversation starts fresh on the next "Generate Suggestions" click.</p>
+<h2 id="expanding-the-panel">Expanding the panel</h2>
+<p>Click the <strong>expand</strong> button (top-right corner of the panel) to open the chat interface in a larger modal. This provides a better experience for longer conversations. The modal shares the same state as the compact panel.</p>
+<p><img alt="AI Context panel — expanded modal" src="../img/ai-context-modal.png" /></p>
+<h2 id="persistence">Persistence</h2>
+<p>Your conversation is saved automatically. If you close the panel, refresh the page, or reopen the editor later, your chat history and last suggestions are restored.</p>
+<h2 id="customizing-the-ai-prompt">Customizing the AI prompt</h2>
+<p>By default, the Context Assistant uses a built-in system prompt optimized for editorial suggestions. You can customize it:</p>
+<ol>
+<li>Go to <strong>JEO → AI Configuration → Context Assistant</strong> tab.</li>
+<li>Check <strong>"Use a custom system prompt"</strong>.</li>
+<li>Edit the prompt in the textarea.</li>
+<li>Save settings.</li>
+</ol>
+<p>When unchecked, the tab shows the default prompt in a read-only field for reference.</p>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>An AI provider must be configured in <strong>JEO → AI</strong> (see <a href="../ai-settings/">AI Settings</a>).</li>
+<li>For best results, index your posts in the Knowledge Base (<strong>JEO → AI → Knowledge Base</strong> tab). The assistant uses RAG to find related articles from the vectorized archive.</li>
+<li>The article must have at least 100 characters of content before the AI can generate suggestions. If the article is too short, the assistant will ask you to write more or specify what you want.</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../ai-settings/" class="btn btn-neutral float-left" title="AI Settings"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../ai-georeferencing/" class="btn btn-neutral float-right" title="AI Georeferencing">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../ai-settings/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../ai-georeferencing/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
