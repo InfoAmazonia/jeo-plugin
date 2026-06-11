@@ -4,6 +4,9 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { getDateFnsLocale, normalizeLocaleCode } from '../../shared/locale';
 
+const DEFAULT_MIN_YEAR = 1900;
+const DEFAULT_MAX_YEAR_OFFSET = 1;
+
 export function createLegacyDateRangePickerValue( startDate, endDate ) {
 	const wrapDate = ( date ) => ( {
 		toDate: () => date,
@@ -29,6 +32,31 @@ export function formatDateRangeValue( startDate, endDate ) {
 	);
 }
 
+export function getDateRangeYearOptions(
+	date,
+	{
+		minYear = DEFAULT_MIN_YEAR,
+		maxYear = new Date().getFullYear() + DEFAULT_MAX_YEAR_OFFSET,
+	} = {}
+) {
+	const selectedYear = date?.getFullYear?.();
+	const years = [];
+	const firstYear = Math.min(
+		minYear,
+		Number.isFinite( selectedYear ) ? selectedYear : minYear
+	);
+	const lastYear = Math.max(
+		maxYear,
+		Number.isFinite( selectedYear ) ? selectedYear : maxYear
+	);
+
+	for ( let year = lastYear; year >= firstYear; year-- ) {
+		years.push( year );
+	}
+
+	return years;
+}
+
 function parseDateValue( value ) {
 	if ( ! value ) {
 		return null;
@@ -52,6 +80,98 @@ export default function DateRangeFilter( {
 	const [ draftStartDate, setDraftStartDate ] = useState( parseDateValue( startDate ) );
 	const [ draftEndDate, setDraftEndDate ] = useState( parseDateValue( endDate ) );
 	const datePickerLocale = useMemo( () => getDateFnsLocale(), [] );
+	const monthNames = localeInfo?.monthNames || [
+		__( 'January', 'jeo' ),
+		__( 'February', 'jeo' ),
+		__( 'March', 'jeo' ),
+		__( 'April', 'jeo' ),
+		__( 'May', 'jeo' ),
+		__( 'June', 'jeo' ),
+		__( 'July', 'jeo' ),
+		__( 'August', 'jeo' ),
+		__( 'September', 'jeo' ),
+		__( 'October', 'jeo' ),
+		__( 'November', 'jeo' ),
+		__( 'December', 'jeo' ),
+	];
+	const minYear = Number.parseInt( localeInfo?.minYear, 10 );
+	const maxYear = Number.parseInt( localeInfo?.maxYear, 10 );
+	const yearOptionsConfig = {
+		...( Number.isFinite( minYear ) ? { minYear } : {} ),
+		...( Number.isFinite( maxYear ) ? { maxYear } : {} ),
+	};
+	const renderDatePickerHeader = ( {
+		date,
+		changeYear,
+		changeMonth,
+		decreaseMonth,
+		increaseMonth,
+		prevMonthButtonDisabled,
+		nextMonthButtonDisabled,
+	} ) => (
+		<div className="jeo-date-range-filter__header">
+			<button
+				type="button"
+				className="jeo-date-range-filter__navigation"
+				aria-label={ __( 'Previous month', 'jeo' ) }
+				disabled={ prevMonthButtonDisabled }
+				onClick={ decreaseMonth }
+			>
+				<svg
+					aria-hidden="true"
+					focusable="false"
+					viewBox="0 0 24 24"
+				>
+					<path
+						fill="currentColor"
+						d="M14.7 6.7 10.4 12l4.3 5.3-1.4 1.4L8.6 12l4.7-6.7z"
+					/>
+				</svg>
+			</button>
+			<select
+				className="jeo-date-range-filter__month-select"
+				aria-label={ __( 'Month', 'jeo' ) }
+				value={ date.getMonth() }
+				onChange={ ( event ) => changeMonth( Number( event.target.value ) ) }
+			>
+				{ monthNames.map( ( monthName, monthIndex ) => (
+					<option key={ monthName } value={ monthIndex }>
+						{ monthName }
+					</option>
+				) ) }
+			</select>
+			<select
+				className="jeo-date-range-filter__year-select"
+				aria-label={ __( 'Year', 'jeo' ) }
+				value={ date.getFullYear() }
+				onChange={ ( event ) => changeYear( Number( event.target.value ) ) }
+			>
+				{ getDateRangeYearOptions( date, yearOptionsConfig ).map( ( year ) => (
+					<option key={ year } value={ year }>
+						{ year }
+					</option>
+				) ) }
+			</select>
+			<button
+				type="button"
+				className="jeo-date-range-filter__navigation"
+				aria-label={ __( 'Next month', 'jeo' ) }
+				disabled={ nextMonthButtonDisabled }
+				onClick={ increaseMonth }
+			>
+				<svg
+					aria-hidden="true"
+					focusable="false"
+					viewBox="0 0 24 24"
+				>
+					<path
+						fill="currentColor"
+						d="M9.3 18.7 13.6 12 9.3 6.7l1.4-1.4 4.7 6.7-4.7 6.7z"
+					/>
+				</svg>
+			</button>
+		</div>
+	);
 
 	useEffect( () => {
 		if ( isOpen ) {
@@ -92,6 +212,8 @@ export default function DateRangeFilter( {
 			<button
 				type="button"
 				className={ `jeo-date-range-filter__toggle${ value ? ' has-value' : '' }` }
+				aria-expanded={ isOpen }
+				aria-haspopup="dialog"
 				onClick={ () => setIsOpen( ( currentValue ) => ! currentValue ) }
 			>
 				{ buttonLabel }
@@ -105,6 +227,7 @@ export default function DateRangeFilter( {
 						locale={ datePickerLocale }
 						startDate={ draftStartDate }
 						endDate={ draftEndDate }
+						renderCustomHeader={ renderDatePickerHeader }
 						onChange={ ( [ nextStartDate, nextEndDate ] ) => {
 							setDraftStartDate( nextStartDate );
 							setDraftEndDate( nextEndDate );

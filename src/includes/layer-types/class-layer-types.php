@@ -168,14 +168,11 @@ class Layer_Types {
 	 * @return void
 	 */
 	public function register_assets() {
-		$asset_file = file_exists( JEO_BASEPATH . '/js/build/JeoLayer.asset.php' ) ? include JEO_BASEPATH . '/js/build/JeoLayer.asset.php' : array(
-			'dependencies' => array(),
-			'version'      => JEO_VERSION,
-		);
+		$asset_file = require JEO_BASEPATH . '/js/build/JeoLayer.asset.php';
 		wp_register_script(
 			'jeo-layer',
 			JEO_BASEURL . '/js/build/JeoLayer.js',
-			array( 'mapgl' ),
+			array_merge( $asset_file['dependencies'], array( 'mapgl' ) ),
 			$asset_file['version'],
 			true,
 		);

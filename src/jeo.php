@@ -5,11 +5,16 @@
  * @package           Jeo
  *
  * @wordpress-plugin
- * Plugin Name:       JEO WP
- * Description:       A professional geojournalism platform for WordPress. Features an AI-powered Georeferencing Co-Pilot, interactive mapping blocks, and a centralized territorial Knowledge Base. Start with our [Welcome Guide](admin.php?page=jeo-welcome) or view your [Geographic Dashboard](admin.php?page=jeo-dashboard).
+ * Plugin Name:       JEO Maps
+ * Plugin URI:        https://www.jeowp.org/
+ * Description:       Interactive maps for the WordPress block editor
  * Version:           3.6.5
- * License:           GPL-2.0+
- * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
+ * Author:            InfoAmazonia
+ * Author URI:        https://www.jeowp.org/
+ * Requires at least: 6.6
+ * Requires PHP:      8.0
+ * License:           GPL-3.0-only
+ * License URI:       https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
  * Text Domain:       jeo
  * Domain Path:       /languages
  */

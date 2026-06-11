@@ -1,24 +1,19 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: JEO 3.6.5\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/src\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeo\n"
 "Last-Translator: Stefano Wrobleski\n"
 "Language-Team: InfoAmazonia\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-03-21T05:31:47+00:00\n"
-"PO-Revision-Date: 2026-06-08 15:21-0300\n"
+"POT-Creation-Date: 2026-06-09T19:53:28+00:00\n"
+"PO-Revision-Date: 2026-06-09T19:53:28+00:00\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.9\n"
 "X-Domain: jeo\n"
 "X-Loco-Version: 2.5.0; wp-5.7\n"
-
-#: includes/menu/class-menu.php:37
-#: includes/menu/class-menu.php:38
-msgid "JEO"
-msgstr "JEO"
 
 #. Plugin URI of the plugin
 #. Author URI of the plugin
@@ -36,68 +31,65 @@ msgstr "Mapas interativos para o editor de blocos do WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:561
+#: includes/class-jeo.php:914
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas nenhuma chave de API do Mapbox está configurada. Voltando para MapLibre."
 
-#: includes/class-jeo.php:562
+#: includes/class-jeo.php:915
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas o SDK externo do Mapbox não pôde ser carregado. Voltando para MapLibre."
 
-#: includes/class-jeo.php:1026
+#: includes/class-jeo.php:1395
+#: js/build/mapBlocks.js:1
 msgid "Read more"
 msgstr "Ler mais"
 
-#: includes/geocode/class-geocode-handler.php:130
-msgid "Geocoding service provided by OpenStreetMap at https://nominatim.openstreetmap.org/."
-msgstr "Serviço de geocodificação fornecido pelo OpenStreetMap em https://nominatim.openstreetmap.org/."
-
-#: includes/geocode/class-geocode-handler.php:231
-msgid "Metadata storing the locations related to the post. Each location is an object with latitude, longitude, and geocode attributes."
-msgstr "Metadados que armazenam as localizações relacionadas ao post. Cada localização é um objeto com atributos de latitude, longitude e geocodificação."
-
-#: includes/geocode/class-geocode-handler.php:247
-#: js/src/map-blocks/map-settings.js:59
+#: includes/ai/settings/tab-embedded.php:74
+#: includes/geocode/class-geocode-handler.php:255
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Latitude"
 msgstr "Latitude"
 
-#: includes/geocode/class-geocode-handler.php:261
-#: js/src/map-blocks/map-settings.js:69
+#: includes/ai/settings/tab-embedded.php:75
+#: includes/geocode/class-geocode-handler.php:269
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Longitude"
 msgstr "Longitude"
 
-#: includes/geocode/class-geocode-handler.php:275
+#: includes/geocode/class-geocode-handler.php:283
 msgid "Country"
 msgstr "País"
 
-#: includes/geocode/class-geocode-handler.php:289
+#: includes/geocode/class-geocode-handler.php:297
 msgid "Country code"
 msgstr "Código do país"
 
-#: includes/geocode/class-geocode-handler.php:303
+#: includes/geocode/class-geocode-handler.php:311
 msgid "Region level 1"
 msgstr "Região nível 1"
 
-#: includes/geocode/class-geocode-handler.php:317
+#: includes/geocode/class-geocode-handler.php:325
 msgid "Region level 2"
 msgstr "Região nível 2"
 
-#: includes/geocode/class-geocode-handler.php:331
+#: includes/geocode/class-geocode-handler.php:339
 msgid "Region level 3"
 msgstr "Região nível 3"
 
-#: includes/geocode/class-geocode-handler.php:345
+#: includes/geocode/class-geocode-handler.php:353
 msgid "City"
 msgstr "Cidade"
 
-#: includes/geocode/class-geocode-handler.php:359
+#: includes/geocode/class-geocode-handler.php:367
 msgid "City sub-level 1"
 msgstr "Sub-nível de cidade 1"
 
 #: includes/layers/class-layers.php:50
 #: includes/layers/class-layers.php:61
-#: js/src/jeo-map/class-jeo-map.js:1846
-#: js/src/map-blocks/storymap-editor.js:961
+#: js/build/jeoMap.js:1
+#: js/build/mapBlocks.js:1
 msgid "Layers"
 msgstr "Camadas"
 
@@ -191,24 +183,21 @@ msgid "Legend type-specific options"
 msgstr "Opções específicas do tipo de legenda"
 
 #: includes/layers/class-layers.php:203
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:159
+#: js/build/layersSidebar.js:7
 msgid "Use legend"
 msgstr "Usar legenda"
 
 #: includes/layers/class-layers.php:215
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:180
+#: js/build/layersSidebar.js:7
 msgid "Legend title"
 msgstr "Título da legenda"
 
-#: includes/layers/class-layers.php:278
+#: includes/layers/class-layers.php:310
 msgid "Layer type not registered"
 msgstr "Tipo de camada não registrado"
 
-#. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:490
 #: templates/embed-discovery.php:18
-#: js/src/discovery/blocks/sidebar.js:192
-#: js/src/discovery/index.js:462
+#: js/build/discovery.js:6
 msgid "Explore"
 msgstr "Explorar"
 
@@ -218,7 +207,6 @@ msgid "Maps"
 msgstr "Mapas"
 
 #: includes/maps/class-maps.php:55
-#: includes/settings/settings-page.php:34
 msgid "Map"
 msgstr "Mapa"
 
@@ -272,6 +260,7 @@ msgid "Map scheduled."
 msgstr "Mapa agendado."
 
 #: includes/maps/class-maps.php:70
+#: js/build/mapBlocks.js:1
 msgid "Map updated."
 msgstr "Mapa atualizado."
 
@@ -322,368 +311,227 @@ msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 msgid "Indicates if the legend of this layer should be displayed or not"
 msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 
-#: includes/maps/class-maps.php:198
+#: includes/maps/class-maps.php:212
 msgid "The map Layers"
 msgstr "Camadas do mapa"
 
-#: includes/maps/class-maps.php:211
-#: js/src/map-blocks/onetime-map-config.js:67
+#: includes/maps/class-maps.php:225
+#: js/build/mapBlocks.js:1
 msgid "East pan limit"
 msgstr "Limite de panorâmica leste"
 
-#: includes/maps/class-maps.php:215
-#: js/src/map-blocks/onetime-map-config.js:71
+#: includes/maps/class-maps.php:229
+#: js/build/mapBlocks.js:1
 msgid "North pan limit"
 msgstr "Limite de panorâmica norte"
 
-#: includes/maps/class-maps.php:219
-#: js/src/map-blocks/onetime-map-config.js:75
+#: includes/maps/class-maps.php:233
+#: js/build/mapBlocks.js:1
 msgid "South pan limit"
 msgstr "Limite de panorâmica sul"
 
-#: includes/maps/class-maps.php:223
-#: js/src/map-blocks/onetime-map-config.js:79
+#: includes/maps/class-maps.php:237
+#: js/build/mapBlocks.js:1
 msgid "West pan limit"
 msgstr "Limite de panorâmica oeste"
 
-#: includes/maps/class-maps.php:233
+#: includes/maps/class-maps.php:247
 msgid "Map pan limits"
 msgstr "Limites de panorâmica do mapa"
 
-#: includes/maps/class-maps.php:246
+#: includes/maps/class-maps.php:260
 msgid "List of category IDs related posts must have"
 msgstr "Lista de IDs das categorias que os posts relacionados devem ter"
 
-#: includes/maps/class-maps.php:253
+#: includes/maps/class-maps.php:267
 msgid "List of tag IDs related posts must have"
 msgstr "Lista de IDs das etiquetas que os posts relacionados devem ter"
 
-#: includes/maps/class-maps.php:260
+#: includes/maps/class-maps.php:274
 msgid "Maximum date for related posts"
 msgstr "Data máxima para posts relacionados"
 
-#: includes/maps/class-maps.php:264
+#: includes/maps/class-maps.php:278
 msgid "Minimum date for related posts"
 msgstr "Data mínima para posts relacionados"
 
-#: includes/maps/class-maps.php:268
+#: includes/maps/class-maps.php:282
 msgid "List of meta values related posts must have"
 msgstr "Lista de IDs dos meta-values que os posts relacionados devem ter"
 
-#: includes/maps/class-maps.php:292
+#: includes/maps/class-maps.php:306
 msgid "The map criteria to get related posts"
 msgstr "Os critérios do mapa para obter posts relacionados"
 
-#: includes/maps/class-maps.php:305
+#: includes/maps/class-maps.php:319
 msgid "Disable scroll zoom"
 msgstr "Desabilitar zoom"
 
-#: includes/maps/class-maps.php:318
+#: includes/maps/class-maps.php:332
 msgid "Disable drag pan"
 msgstr "Desabilitar arrastar"
 
-#: includes/maps/class-maps.php:331
+#: includes/maps/class-maps.php:345
 msgid "Disable drag rotation"
 msgstr "Desabilitar rotação"
 
-#: includes/maps/class-maps.php:344
+#: includes/maps/class-maps.php:358
 msgid "Enable fullscreen button"
 msgstr "Habilitar botão de tela cheia"
 
-#: includes/maps/class-maps.php:357
+#: includes/maps/class-maps.php:371
 msgid "Show all posts on map"
 msgstr "Mostrar todos os posts no mapa"
 
-#: includes/maps/class-maps.php:370
+#: includes/maps/class-maps.php:384
 msgid "Minimum Zoom level"
 msgstr "Nível mínimo de zoom"
 
-#: includes/maps/class-maps.php:383
+#: includes/maps/class-maps.php:397
 msgid "Maximum zoom level"
 msgstr "Nível máximo de zoom"
 
-#: includes/maps/class-maps.php:396
-#: js/src/map-blocks/map-settings.js:251
+#: includes/maps/class-maps.php:410
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Hide in discovery"
 msgstr "Ocultar na página Explorar"
 
-#: includes/maps/class-maps.php:409
+#: includes/maps/class-maps.php:423
 msgid "Disable embed"
 msgstr "Desabilitar incorporação"
 
-#: includes/maps/class-maps.php:565
+#: includes/maps/class-maps.php:579
 msgid "Map zoom must be between 1 and 14"
 msgstr "O Zoom do mapa deve estar entre 1 e 14"
 
-#: includes/settings/class-settings.php:179
-msgid "Mapbox requires a valid API key. The rendering library setting was not changed."
-msgstr "O Mapbox exige uma chave de API válida. A configuração da biblioteca de renderização não foi alterada."
-
-#: includes/settings/class-settings.php:347
-#: includes/settings/class-settings.php:348
-#: js/src/layers-sidebar/layers-sidebar.js:138
+#: includes/ai/class-ai-settings.php:50
+#: includes/settings/class-settings.php:547
+#: includes/settings/class-settings.php:548
+#: js/build/layersSidebar.js:7
 msgid "Settings"
 msgstr "Configurações"
 
-#: includes/settings/settings-page.php:16
-msgid "JEO Settings"
-msgstr "Configurações do JEO"
-
-#: includes/settings/settings-page.php:20
+#: includes/settings/class-settings.php:571
 msgid "General"
 msgstr "Geral"
 
-#: includes/settings/settings-page.php:23
+#: includes/settings/class-settings.php:572
 msgid "Geocoders"
 msgstr "Geocodificadores"
 
-#: includes/settings/settings-page.php:26
-msgid "Customize"
-msgstr "Personalização"
-
-#: includes/settings/settings-page.php:40
+#: includes/settings/settings-page.php:28
 msgid "Rendering library"
 msgstr "Biblioteca de renderização"
 
-#: includes/settings/settings-page.php:50
-msgid "Default map latitute"
-msgstr "Latitude padrão do mapa"
-
 #: includes/settings/settings-page.php:57
-msgid "Default map longitude"
-msgstr "Longitude padrão do mapa"
-
-#: includes/settings/settings-page.php:64
 msgid "Default map zoom"
 msgstr "Zoom padrão do mapa"
 
-#: includes/settings/settings-page.php:71
-msgid "Post types"
-msgstr "Tipos de post"
-
-#: includes/settings/settings-page.php:77
-msgid "Show story maps on post archives pages"
-msgstr "Mostrar mapas narrativos nas páginas de arquivo de posts"
-
-#: includes/settings/settings-page.php:84
-msgid "Enabled Post Types. Default: post,storymap"
-msgstr "Tipos de post habilitados. Padrão: post,storymap"
-
-#: includes/settings/settings-page.php:86
-msgid "Post types separated by comma, Ex: map,post,page"
-msgstr "Tipos de post separados por vírgula. Ex.: map,post,page"
-
-#: includes/settings/settings-page.php:91
+#: includes/settings/settings-page.php:98
 msgid "Mapbox"
 msgstr "Mapbox"
 
-#: includes/settings/settings-page.php:94
-msgid "When selected, Mapbox loads the official Mapbox GL JS assets from api.mapbox.com and uses Mapbox terms and privacy practices."
-msgstr "Quando selecionado, o Mapbox carrega os ativos oficiais do Mapbox GL JS de api.mapbox.com e usa os termos e práticas de privacidade do Mapbox."
-
-#: includes/settings/settings-page.php:97
-msgid "Visitors load Mapbox assets in the browser, and Mapbox receives the configured access token plus the visitor IP address and requested map resources."
-msgstr "Os visitantes carregam os ativos do Mapbox no navegador, e o Mapbox recebe o token de acesso configurado, além do endereço IP do visitante e dos recursos de mapa solicitados."
-
-#: includes/settings/settings-page.php:103
+#: includes/ai/settings/tab-provider.php:27
 msgid "API Key"
 msgstr "Chave de API"
 
-#: includes/settings/settings-page.php:105
+#: includes/settings/settings-page.php:104
 msgid "Ex. pk.eyJ3..."
 msgstr "Ex.: pk.eyJ3..."
 
-#: includes/settings/settings-page.php:107
-msgid "This key is required only when the rendering library is set to Mapbox."
-msgstr "Esta chave é necessária apenas quando a biblioteca de renderização está definida como Mapbox."
-
-#: includes/settings/settings-page.php:121
-msgid "Active Geocoder"
-msgstr "Geocodificador ativo"
-
-#: includes/settings/settings-page.php:134
-msgid "The built-in Nominatim geocoder sends the address you submit, or the coordinates selected on the map, to nominatim.openstreetmap.org only when you explicitly run a search or reverse-geocode a point."
-msgstr "O geocodificador Nominatim integrado envia o endereço informado, ou as coordenadas selecionadas no mapa, para nominatim.openstreetmap.org somente quando você executa explicitamente uma busca ou uma geocodificação reversa de um ponto."
-
-#. translators: %s is the geocoder name. Example: Nominatim options.
-#: includes/settings/settings-page.php:154
-#, php-format
-msgctxt "geocoder_options"
-msgid "%s options"
-msgstr "%s opções"
-
-#: includes/settings/settings-page.php:198
+#: includes/settings/settings-page.php:126
 msgid "Typography"
 msgstr "Tipografia"
 
-#: includes/settings/settings-page.php:201
-msgid "Typography URL"
-msgstr "URL da tipografia"
-
-#: includes/settings/settings-page.php:205
-#: includes/settings/settings-page.php:220
-msgid "You may use a local or external stylesheet URL. If you choose an external host, your visitors will request that asset directly from that provider."
-msgstr "Você pode usar uma URL local ou externa de folha de estilo. Se escolher um host externo, os visitantes solicitarão esse recurso diretamente a esse provedor."
-
-#: includes/settings/settings-page.php:210
-msgid "Typography name"
-msgstr "Nome da tipografia"
-
-#: includes/settings/settings-page.php:212
-msgid "Ex. Open Sans"
-msgstr "Ex.: Open Sans"
-
-#: includes/settings/settings-page.php:216
-msgid "Secondary Typography URL"
-msgstr "URL da tipografia secundária"
-
-#: includes/settings/settings-page.php:225
-msgid "Secondary Typography name"
-msgstr "Nome da tipografia secundária"
-
-#: includes/settings/settings-page.php:227
-msgid "Ex. Libre Baskerville"
-msgstr "Ex.: Libre Baskerville"
-
-#: includes/settings/settings-page.php:231
-msgid "Info button font-size (rem)"
-msgstr "Tamanho da fonte do botão Info (rem)"
-
-#: includes/settings/settings-page.php:238
+#: includes/settings/settings-page.php:163
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Colors"
 msgstr "Cores"
 
-#: includes/settings/settings-page.php:242
-msgid "Primary color"
-msgstr "Cor primária"
-
-#: includes/settings/settings-page.php:244
-#: includes/settings/settings-page.php:258
-#: includes/settings/settings-page.php:264
-#: includes/settings/settings-page.php:276
-msgid "Ex. #ffffff"
-msgstr "Ex. #ffffff"
-
-#: includes/settings/settings-page.php:249
-msgid "Text over primary color"
-msgstr "Texto sobre a cor primária"
-
-#: includes/settings/settings-page.php:256
+#: includes/settings/settings-page.php:173
 msgid "Info button background color"
 msgstr "Cor de fundo do botão Info"
 
-#: includes/settings/settings-page.php:262
-msgid "Info button color"
-msgstr "Cor do botão Info"
-
-#: includes/settings/settings-page.php:268
+#: includes/settings/settings-page.php:185
 msgid "Close button background color"
 msgstr "Cor de fundo do botão de fechar"
 
-#: includes/settings/settings-page.php:274
-msgid "Close button color"
-msgstr "Cor do botão de fechar"
-
-#: includes/settings/settings-page.php:281
-msgid "Embed"
-msgstr "Embed"
-
-#: js/src/discovery/index.js:490
+#: js/build/discovery.js:6
 msgctxt "discovery share action"
 msgid "Embed"
 msgstr "Embed"
 
-#: includes/settings/settings-page.php:285
-msgid "Company logo"
-msgstr "Logotipo da empresa"
-
-#: includes/settings/settings-page.php:289
-msgid "You may use a local or external image URL. Large logos will be scaled down automatically in the embed footer."
-msgstr "Você pode usar uma URL local ou externa de imagem. Logos grandes serão reduzidos automaticamente no rodapé do embed."
-
-#. translators: 1: Mapbox terms URL, 2: Mapbox privacy URL, 3: Nominatim usage policy URL, 4: OSMF privacy URL, 5: OSM tile policy URL.
-#: includes/loaders.php:292
-#, php-format
-msgid "<p>JEO can connect to third-party services depending on your configuration.</p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the rendering library or when a map uses Mapbox-hosted resources. In that case the site loads JavaScript/CSS from Mapbox and sends the configured access token plus the visitor&#8217;s IP address, browser details and requested map resources to Mapbox. Terms: <a href=\"%1$s\">Mapbox Terms of Service</a>. Privacy Policy: <a href=\"%2$s\">Mapbox Privacy Policy</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly runs an address search or reverse geocoding request in the post geolocation UI. The typed address or selected coordinates, the site URL in the user agent string and the server IP address are sent to the Nominatim service. Usage Policy: <a href=\"%3$s\">Nominatim Usage Policy</a>. Privacy Policy: <a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview style requests map tiles from the OpenStreetMap tile service, which receives the visitor&#8217;s IP address, browser details and requested tile URLs. Tile Policy: <a href=\"%5$s\">OpenStreetMap Tile Usage Policy</a>. Privacy Policy: <a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>Optional external asset URLs configured by the site administrator</strong>: if you configure an external typography stylesheet or footer logo URL, visitors&#8217; browsers will request that asset directly from the selected host. That host may receive the visitor&#8217;s IP address, browser details and referrer according to its own terms and privacy policy.</li></ul>"
-msgstr "<p>O JEO pode se conectar a serviços de terceiros dependendo da sua configuração.</p><ul><li><strong>Mapbox</strong>: usado apenas quando o Mapbox é selecionado como biblioteca de renderização ou quando um mapa usa recursos hospedados no Mapbox. Nesse caso, o site carrega JavaScript/CSS do Mapbox e envia o token de acesso configurado, além do endereço IP do visitante, detalhes do navegador e recursos de mapa solicitados ao Mapbox. Termos: <a href=\"%1$s\">Termos de Serviço do Mapbox</a>. Política de Privacidade: <a href=\"%2$s\">Política de Privacidade do Mapbox</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: usado quando um editor executa explicitamente uma busca de endereço ou uma solicitação de geocodificação reversa na interface de geolocalização de posts. O endereço digitado ou as coordenadas selecionadas, a URL do site na string do user agent e o endereço IP do servidor são enviados ao serviço Nominatim. Política de Uso: <a href=\"%3$s\">Política de Uso do Nominatim</a>. Política de Privacidade: <a href=\"%4$s\">Política de Privacidade da OpenStreetMap Foundation</a>.</li><li><strong>Tiles raster do OpenStreetMap</strong>: o estilo padrão de pré-visualização do MapLibre solicita tiles ao serviço de tiles do OpenStreetMap, que recebe o endereço IP do visitante, detalhes do navegador e URLs de tiles solicitadas. Política de Tiles: <a href=\"%5$s\">Política de Uso de Tiles do OpenStreetMap</a>. Política de Privacidade: <a href=\"%4$s\">Política de Privacidade da OpenStreetMap Foundation</a>.</li><li><strong>URLs externas opcionais de assets configuradas pelo administrador do site</strong>: se você configurar uma URL externa para a folha de estilo tipográfica ou para o logo do rodapé, os navegadores dos visitantes solicitarão esse recurso diretamente ao host selecionado. Esse host pode receber o endereço IP do visitante, detalhes do navegador e o referenciador, de acordo com seus próprios termos e política de privacidade.</li></ul>"
-
-#: includes/settings/settings-page.php:291
-msgid "Insert Image"
-msgstr "Inserir imagem"
-
-#: includes/settings/settings-page.php:301
+#: includes/settings/settings-page.php:267
 msgid "Save Changes"
 msgstr "Salvar alterações"
 
-#: includes/settings/class-settings.php:317
-msgid "JEO could not save this asset URL. Use a valid http(s) or root-relative URL."
-msgstr "O JEO não pôde salvar esta URL de recurso. Use uma URL http(s) válida ou relativa à raiz."
-
 #. translators: Story Map is the name of JEO's storytelling map feature.
-#: includes/storymap/class-storymap.php:68
 #: includes/storymap/class-storymap.php:69
-#: js/src/map-blocks/index.js:169
+#: includes/storymap/class-storymap.php:70
+#: js/build/mapBlocks.js:1
 msgid "Story Map"
 msgstr "Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:70
 #: includes/storymap/class-storymap.php:71
+#: includes/storymap/class-storymap.php:72
 msgid "Add new Story Map"
 msgstr "Adicionar novo Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:72
+#: includes/storymap/class-storymap.php:73
 msgid "Edit Story Map"
 msgstr "Editar Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:73
+#: includes/storymap/class-storymap.php:74
 msgid "New Story Map"
 msgstr "Novo Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:74
+#: includes/storymap/class-storymap.php:75
 msgid "View Story Map"
 msgstr "Ver Mapa Narrativo"
 
-#: includes/storymap/class-storymap.php:75
+#: includes/storymap/class-storymap.php:76
 msgid "View Story Maps"
 msgstr "Ver Mapas Narrativos"
 
-#: includes/storymap/class-storymap.php:76
+#: includes/storymap/class-storymap.php:77
 msgid "Search Story Maps"
 msgstr "Pesquisar Mapas Narrativos"
 
-#: includes/storymap/class-storymap.php:77
+#: includes/storymap/class-storymap.php:78
 msgid "No Story Map found"
 msgstr "Nenhum Mapa Narrativo encontrado"
 
-#: includes/storymap/class-storymap.php:78
+#: includes/storymap/class-storymap.php:79
 msgid "No Story Map found in the trash"
 msgstr "Nenhum Mapa Narrativo encontrado na lixeira"
 
-#: includes/storymap/class-storymap.php:79
+#: includes/storymap/class-storymap.php:80
 msgid "Story Maps"
 msgstr "Mapas Narrativos"
 
-#: includes/storymap/class-storymap.php:80
+#: includes/storymap/class-storymap.php:81
 msgid "Story Map published."
 msgstr "Mapa Narrativo publicado."
 
-#: includes/storymap/class-storymap.php:81
+#: includes/storymap/class-storymap.php:82
 msgid "Story Map published privately."
 msgstr "Mapa Narrativo publicado como privado."
 
-#: includes/storymap/class-storymap.php:82
+#: includes/storymap/class-storymap.php:83
 msgid "Story Map reverted to draft."
 msgstr "Mapa Narrativo revertido para rascunho."
 
-#: includes/storymap/class-storymap.php:83
+#: includes/storymap/class-storymap.php:84
 msgid "Story Map scheduled."
 msgstr "Mapa Narrativo agendado."
 
-#: includes/storymap/class-storymap.php:84
+#: includes/storymap/class-storymap.php:85
 msgid "Story Map updated."
 msgstr "Mapa Narrativo atualizado."
 
-#: includes/storymap/class-storymap.php:90
+#: includes/storymap/class-storymap.php:91
 msgid "JEO Story Map"
 msgstr "Mapa Narrativo do JEO"
 
@@ -701,162 +549,176 @@ msgstr "Voltar para página inicial"
 
 #: templates/map-content-layers-list.php:18
 #: templates/map-content-layers-list.php:20
-#: js/src/jeo-map/class-jeo-map.js:774
 msgid "Attribution:"
 msgstr "Atribuição:"
 
 #: templates/map-content-layers-list.php:25
-#: js/src/jeo-map/class-jeo-map.js:795
 msgid "Download from source"
 msgstr "Baixar da fonte"
 
 #: includes/layer-types/mapbox-tileset-raster.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:10
-#: js/src/map-blocks/layers-settings.js:49
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Raster Mapbox Tiled Source"
 msgstr "Fonte raster de tiles do Mapbox"
 
 #: includes/layer-types/mapbox-tileset-raster.js:68
-#: includes/layer-types/mapbox-tileset-vector.js:70
-#: js/src/layers-sidebar/layer-type-definitions.js:114
-#: js/src/layers-sidebar/layer-type-definitions.js:143
+#: includes/layer-types/mapbox-tileset-vector.js:86
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Tileset ID"
 msgstr "ID do tileset"
 
 #: includes/layer-types/mapbox-tileset-raster.js:69
-#: includes/layer-types/mapbox-tileset-vector.js:71
-#: js/src/layers-sidebar/layer-type-definitions.js:115
-#: js/src/layers-sidebar/layer-type-definitions.js:144
+#: includes/layer-types/mapbox-tileset-vector.js:87
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Example: username.tilesetid"
 msgstr "Exemplo: username.tilesetid"
 
 #: includes/layer-types/mapbox-tileset-raster.js:72
-#: includes/layer-types/mapbox-tileset-vector.js:99
-#: includes/layer-types/mvt.js:101
-#: js/src/layers-sidebar/layer-type-definitions.js:99
-#: js/src/layers-sidebar/layer-type-definitions.js:118
-#: js/src/layers-sidebar/layer-type-definitions.js:171
+#: includes/layer-types/mapbox-tileset-vector.js:115
+#: includes/layer-types/mvt.js:86
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Style Source Type"
 msgstr "Tipo de fonte do estilo"
 
 #: includes/layer-types/mapbox-tileset-raster.js:73
-#: includes/layer-types/mvt.js:102
-#: js/src/layers-sidebar/layer-type-definitions.js:100
-#: js/src/layers-sidebar/layer-type-definitions.js:119
+#: includes/layer-types/mvt.js:87
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Which data the map should display"
 msgstr "Quais dados o mapa deve exibir"
 
 #: includes/layer-types/mapbox-tileset-raster.js:79
-#: includes/layer-types/mapbox-tileset-vector.js:79
-#: js/src/layers-sidebar/layer-type-definitions.js:125
-#: js/src/layers-sidebar/layer-type-definitions.js:152
+#: includes/layer-types/mapbox-tileset-vector.js:95
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Layer Type"
 msgstr "Tipo da camada"
 
 #: includes/layer-types/mapbox-tileset-raster.js:81
-#: includes/layer-types/mapbox-tileset-vector.js:81
-#: js/src/layers-sidebar/layer-type-definitions.js:126
-#: js/src/layers-sidebar/layer-type-definitions.js:153
+#: includes/layer-types/mapbox-tileset-vector.js:97
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Layers take the data that they get from a source, optionally filter features, and then define how those features are styled."
 msgstr "As camadas usam os dados que recebem de uma fonte, podem filtrar feições e então definem como essas feições são estilizadas."
 
 #: includes/layer-types/mapbox-tileset-vector.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:6
-#: js/src/map-blocks/layers-settings.js:48
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Vector Mapbox Tiled Source"
 msgstr "Fonte vetorial de tiles do Mapbox"
 
-#: includes/layer-types/mapbox-tileset-vector.js:75
-#: includes/layer-types/mvt.js:83
-#: js/src/layers-sidebar/layer-type-definitions.js:78
-#: js/src/layers-sidebar/layer-type-definitions.js:148
+#: includes/layer-types/mapbox-tileset-vector.js:91
+#: includes/layer-types/mvt.js:68
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Source layer"
 msgstr "Camada de origem"
 
-#: includes/layer-types/mapbox-tileset-vector.js:76
-#: js/src/layers-sidebar/layer-type-definitions.js:149
+#: includes/layer-types/mapbox-tileset-vector.js:92
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Which data the map should display."
 msgstr "Quais dados o mapa deve exibir."
 
-#: includes/layer-types/mapbox-tileset-vector.js:100
-#: js/src/layers-sidebar/layer-type-definitions.js:172
+#: includes/layer-types/mapbox-tileset-vector.js:116
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "The layer source type style"
 msgstr "O tipo de fonte do estilo da camada"
 
 #: includes/layer-types/mapbox.js:10
-#: js/src/layers-sidebar/layer-type-definitions.js:4
-#: js/src/map-blocks/layers-settings.js:47
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Mapbox Style"
 msgstr "Estilo do Mapbox"
 
 #: includes/layer-types/mapbox.js:155
-#: js/src/layers-sidebar/layer-type-definitions.js:26
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr "ID do estilo"
 
 #: includes/layer-types/mapbox.js:157
-#: js/src/layers-sidebar/layer-type-definitions.js:27
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
 msgstr "O ID do estilo do Mapbox inclui o nome de usuário e o ID. Exemplo: username/id ou mapbox://styles/username/id"
 
 #: includes/layer-types/mapbox.js:164
-#: js/src/layers-sidebar/layer-type-definitions.js:34
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Access token"
 msgstr "Token de acesso"
 
 #: includes/layer-types/mapbox.js:166
-#: js/src/layers-sidebar/layer-type-definitions.js:35
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
 msgstr "Opcional. Se esta camada precisar de um token de acesso diferente do definido em Configurações, informe-o aqui."
 
 #: includes/layer-types/mvt.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:14
-#: js/src/map-blocks/layers-settings.js:51
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Mapbox Vector Tiles (MVT)"
 msgstr "Tiles vetoriais do Mapbox (MVT)"
 
-#: includes/layer-types/mvt.js:79
+#: includes/ai/settings/tab-provider.php:27
+#: includes/layer-types/mvt.js:64
 #: includes/layer-types/tilelayer.js:57
 #: includes/legend-types/circles.js:25
 #: includes/legend-types/icons.js:25
-#: js/src/layers-sidebar/layer-type-definitions.js:49
-#: js/src/layers-sidebar/layer-type-definitions.js:74
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "URL"
 msgstr "URL"
 
-#: includes/layer-types/mvt.js:84
-#: js/src/layers-sidebar/layer-type-definitions.js:79
+#: includes/layer-types/mvt.js:69
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Layer to use from a vector tile source."
 msgstr "Camada a ser usada de uma fonte de tiles vetoriais."
 
 #: includes/layer-types/tilelayer.js:5
-#: js/src/layers-sidebar/layer-type-definitions.js:13
-#: js/src/map-blocks/layers-settings.js:50
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Raster Tiled Source"
 msgstr "Fonte raster de tiles"
 
 #: includes/layer-types/tilelayer.js:61
-#: js/src/layers-sidebar/layer-type-definitions.js:53
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Scheme"
 msgstr "Esquema"
 
 #: includes/layer-types/tilelayer.js:62
-#: js/src/layers-sidebar/layer-type-definitions.js:54
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Influences the Y direction of the tile coordinates."
 msgstr "Influencia a direção Y das coordenadas dos tiles."
 
 #: includes/layer-types/tilelayer.js:65
-#: js/src/layers-sidebar/layer-type-definitions.js:60
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Slippy Map tilenames (XYZ)"
 msgstr "Nomes de tiles do Slippy Map (XYZ)"
 
 #: includes/layer-types/tilelayer.js:66
-#: js/src/layers-sidebar/layer-type-definitions.js:61
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "OSGeo spec (TMS)"
 msgstr "Especificação OSGeo (TMS)"
 
 #: includes/legend-types/barscale.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:9
+#: js/build/layersSidebar.js:7
 msgid "Color scale"
 msgstr "Escala de cores"
 
@@ -873,7 +735,7 @@ msgid "An array of hexadecimal color values"
 msgstr "Uma lista de valores hexadecimais de cor"
 
 #: includes/legend-types/circles.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:12
+#: js/build/layersSidebar.js:7
 msgid "Circle sizes"
 msgstr "Tamanhos de círculos"
 
@@ -882,7 +744,7 @@ msgid "An array of labels and radius values"
 msgstr "Uma lista de rótulos e valores de raio"
 
 #: includes/legend-types/icons.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:11
+#: js/build/layersSidebar.js:7
 msgid "Icon categories"
 msgstr "Categorias de ícones"
 
@@ -893,14 +755,13 @@ msgstr "Uma lista de rótulos e ícones"
 #: includes/legend-types/JeoLegend.js:177
 #: includes/legend-types/JeoLegend.js:181
 #: includes/legend-types/JeoLegend.js:186
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:53
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:60
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:103
+#: js/build/JeoLegend.js:1
+#: js/build/layersSidebar.js:7
 msgid "Default label"
 msgstr "Rótulo padrão"
 
 #: includes/legend-types/simple-color.js:5
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:10
+#: js/build/layersSidebar.js:7
 msgid "Color categories"
 msgstr "Categorias de cores"
 
@@ -908,971 +769,3701 @@ msgstr "Categorias de cores"
 msgid "An array of labels and colors"
 msgstr "Uma lista de rótulos e cores"
 
-#: includes/settings/settings-page.js:37
-#: includes/settings/settings-page.js:39
-msgid "Choose Image"
-msgstr "Escolher imagem"
-
-#: js/src/discovery/blocks/date-range-filter.js:125
-#: js/src/discovery/blocks/map-item.js:165
-#: js/src/map-blocks/layers-settings.js:136
+#: js/build/contextSidebar.js:1
+#: js/build/discovery.js:1
+#: js/build/discovery.js:6
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Clear"
 msgstr "Limpar"
 
-#: js/src/discovery/blocks/date-range-filter.js:142
-#: js/src/discovery/blocks/map-item.js:165
-#: js/src/discovery/blocks/stories.js:212
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
+#: js/build/discovery.js:6
 msgid "Apply"
 msgstr "Aplicar"
 
-#: js/src/discovery/blocks/tag-filter-control.js:54
-#: js/src/posts-selector/index.js:67
+#: js/build/discovery.js:1
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Tags"
 msgstr "Tags"
 
-#: js/src/discovery/blocks/tag-filter-control.js:55
+#: js/build/discovery.js:1
 msgid "Filter stories by tag"
 msgstr "Filtrar histórias por tag"
 
-#: js/src/discovery/blocks/stories.js:210
+#. translators: %s: selected tag name.
+#: js/build/discovery.js:2
+#, js-format
+msgid "Remove tag %s"
+msgstr "Remover tag %s"
+
+#: js/build/discovery.js:1
+msgid "Previous month"
+msgstr "Mês anterior"
+
+#: js/build/discovery.js:1
+msgid "Month"
+msgstr "Mês"
+
+#: js/build/discovery.js:1
+msgid "Year"
+msgstr "Ano"
+
+#: js/build/discovery.js:1
+msgid "Next month"
+msgstr "Próximo mês"
+
+#: js/build/discovery.js:2
 msgid "MM/DD/YYYY"
 msgstr "DD/MM/YYYY"
 
-#: js/src/discovery/blocks/stories.js:211
+#: js/build/discovery.js:2
 msgid " - "
 msgstr " - "
 
-#: js/src/discovery/blocks/stories.js:213
-#: js/src/map-blocks/map-editor.js:146
-#: js/src/map-blocks/storymap-editor.js:1356
-#: js/src/posts-sidebar/geo-posts.js:448
+#: includes/admin/uninstall-page.php:76
+#: includes/ai/class-bulk-processor.php:671
+#: js/build/discovery.js:2
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: js/src/discovery/blocks/stories.js:214
+#: js/build/discovery.js:2
 msgid "From"
 msgstr "De"
 
-#: js/src/discovery/blocks/stories.js:215
+#: js/build/discovery.js:2
 msgid "To"
 msgstr "Até"
 
-#: js/src/discovery/blocks/stories.js:216
+#: js/build/discovery.js:2
 msgid "Custom"
 msgstr "Personalizado"
 
-#: js/src/discovery/blocks/stories.js:218
+#: js/build/discovery.js:2
 msgid "Su"
 msgstr "Do"
 
-#: js/src/discovery/blocks/stories.js:219
+#: js/build/discovery.js:2
 msgid "Mo"
 msgstr "Se"
 
-#: js/src/discovery/blocks/stories.js:220
+#: js/build/discovery.js:2
 msgid "Tu"
 msgstr "Te"
 
-#: js/src/discovery/blocks/stories.js:221
+#: js/build/discovery.js:2
 msgid "We"
 msgstr "Qu"
 
-#: js/src/discovery/blocks/stories.js:222
+#: js/build/discovery.js:2
 msgid "Th"
 msgstr "Qu"
 
-#: js/src/discovery/blocks/stories.js:223
+#: js/build/discovery.js:2
 msgid "Fr"
 msgstr "Se"
 
-#: js/src/discovery/blocks/stories.js:224
+#: js/build/discovery.js:2
 msgid "Sa"
 msgstr "Sá"
 
-#: js/src/discovery/blocks/stories.js:227
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "January"
 msgstr "Janeiro"
 
-#: js/src/discovery/blocks/stories.js:228
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "February"
 msgstr "Fevereiro"
 
-#: js/src/discovery/blocks/stories.js:229
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "March"
 msgstr "Março"
 
-#: js/src/discovery/blocks/stories.js:230
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "April"
 msgstr "Abril"
 
-#: js/src/discovery/blocks/stories.js:231
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "May"
 msgstr "Maio"
 
-#: js/src/discovery/blocks/stories.js:232
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "June"
 msgstr "Junho"
 
-#: js/src/discovery/blocks/stories.js:233
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "July"
 msgstr "Julho"
 
-#: js/src/discovery/blocks/stories.js:234
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "August"
 msgstr "Agosto"
 
-#: js/src/discovery/blocks/stories.js:235
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "September"
 msgstr "Setembro"
 
-#: js/src/discovery/blocks/stories.js:236
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "October"
 msgstr "Outubro"
 
-#: js/src/discovery/blocks/stories.js:237
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "November"
 msgstr "Novembro"
 
-#: js/src/discovery/blocks/stories.js:238
+#: js/build/discovery.js:1
+#: js/build/discovery.js:2
 msgid "December"
 msgstr "Dezembro"
 
-#: js/src/discovery/blocks/stories.js:1015
+#: js/build/discovery.js:6
 msgid "Search story"
 msgstr "Buscar história"
 
-#: js/src/discovery/blocks/stories.js:1063
+#. translators: %s is the active story search query.
+#: js/build/discovery.js:4
+#, js-format
+msgid "Search story: %s"
+msgstr "Buscar história: %s"
+
+#: js/build/discovery.js:6
 msgid "Hide filters"
 msgstr "Ocultar filtros"
 
-#: js/src/discovery/blocks/stories.js:1064
+#: js/build/discovery.js:6
 msgid "Show filters"
 msgstr "Exibir filtros"
 
-#: js/src/discovery/blocks/stories.js:1069
+#: js/build/discovery.js:6
 msgid "Date range"
 msgstr "Intervalo de data"
 
-#: js/src/discovery/blocks/stories.js:1169
+#. translators: %s is the active story date range.
+#: js/build/discovery.js:5
+#, js-format
+msgid "Date range: %s"
+msgstr "Intervalo de data: %s"
+
+#. translators: %d is the number of stories currently displayed.
+#: js/build/discovery.js:3
+#, js-format
+msgid "Displayed stories: %d"
+msgstr "Histórias exibidas: %d"
+
+#. translators: %s is the list of active story tags.
+#: js/build/discovery.js:6
+#, js-format
+msgid "Tags: %s"
+msgstr "Tags: %s"
+
+#: js/build/discovery.js:6
+msgid "No stories found for the current filters."
+msgstr "Nenhuma história encontrada para os filtros atuais."
+
+#: js/build/discovery.js:6
+msgid "No stories available."
+msgstr "Nenhuma história disponível."
+
+#: js/build/discovery.js:6
+msgid "Updating stories…"
+msgstr "Atualizando histórias…"
+
+#: js/build/discovery.js:6
+msgid "Active filters"
+msgstr "Filtros ativos"
+
+#: js/build/discovery.js:6
 msgid "View in map"
 msgstr "Ver no mapa"
 
-#: js/src/discovery/blocks/map-item.js:148
+#: js/build/discovery.js:6
 msgid "layers"
 msgstr "camadas"
 
-#: js/src/discovery/blocks/map-item.js:170
-msgid "Loading layers…"
-msgstr "Carregando camadas…"
+#: js/build/discovery.js:6
+msgid "Loading…"
+msgstr "Carregando…"
 
-#: js/src/discovery/blocks/map-layers.js:194
+#: js/build/discovery.js:6
 msgid "Unable to load map layers right now."
 msgstr "Não foi possível carregar as camadas do mapa agora."
 
-#: js/src/discovery/blocks/map-layers.js:671
+#: js/build/discovery.js:6
 msgid "Search map"
 msgstr "Buscar mapa"
 
-#: js/src/discovery/blocks/map-layers.js:710
-#: js/src/discovery/blocks/map-layers.js:727
+#: js/build/discovery.js:6
 msgid "Changes applied"
-msgstr "Mundanças aplicadas"
+msgstr "Mudanças aplicadas"
 
-#: js/src/discovery/blocks/map-layers.js:710
+#: js/build/discovery.js:6
 msgid "Not applied"
 msgstr "Não aplicado"
 
-#: js/src/discovery/blocks/map-layers.js:716
-#: js/src/map-blocks/layers-settings.js:243
+#: js/build/discovery.js:6
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Selected layers"
 msgstr "Camadas selecionadas"
 
-#: js/src/discovery/blocks/map-layers.js:721
+#: js/build/discovery.js:6
 msgid "No layers selected"
 msgstr "Nenhuma camada selecionada"
 
-#: js/src/discovery/blocks/map-layers.js:734
+#: js/build/discovery.js:6
 msgid "Apply changes"
 msgstr "Aplicar mudanças"
 
-#: js/src/discovery/blocks/map-layers.js:743
-msgid "Loading more maps…"
-msgstr "Carregando mais mapas…"
-
-#: js/src/discovery/blocks/map-layers.js:747
-msgid "Load more maps"
-msgstr "Carregar mais mapas"
-
-#: js/src/discovery/blocks/sidebar.js:152
+#: js/build/discovery.js:6
 msgid "Stories"
 msgstr "Histórias"
 
-#: js/src/discovery/blocks/sidebar.js:180
-#: js/src/map-blocks/layers-panel.js:25
+#: js/build/discovery.js:6
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Map layers"
 msgstr "Camadas do mapa"
 
-#: js/src/discovery/index.js:540
-#: js/src/jeo-map/class-jeo-map.js:658
-#: js/src/layers-sidebar/layers-sidebar.js:152
+#: js/build/discovery.js:6
+msgid "Collapse discovery panel"
+msgstr "Recolher painel Discovery"
+
+#: js/build/discovery.js:6
+msgid "Expand discovery panel"
+msgstr "Expandir painel Discovery"
+
+#: js/build/discovery.js:6
+#: js/build/jeoMap.js:1
+#: js/build/layersSidebar.js:7
 msgid "Legend"
 msgstr "Legenda"
 
-#: js/src/jeo-map/class-jeo-map.js:378
-msgid "This map doesn't have layers"
-msgstr "Este mapa não tem camadas"
-
-#: js/src/jeo-map/class-jeo-map.js:808
-msgid "Close popup"
-msgstr "Fechar pop-up"
-
-#: js/src/jeo-map/class-jeo-map.js:733
-#: js/src/jeo-map/class-jeo-map.js:826
+#: js/build/jeoMap.js:1
 msgid "Info"
 msgstr "Informações"
 
-#: js/src/jeo-map/class-jeo-map.js:1508
-msgid "Show previous post"
-msgstr "Mostrar post anterior"
-
-#: js/src/jeo-map/class-jeo-map.js:1512
-msgid "Show next post"
-msgstr "Mostrar próximo post"
-
-#. translators: %d: number of markers in the current map area.
-#: js/src/jeo-map/class-jeo-map.js:1551
-#, js-format
-msgid "%d marker in this area"
-msgid_plural "%d markers in this area"
-msgstr[0] "%d marcador nesta área"
-msgstr[1] "%d marcadores nesta área"
-
-#: js/src/jeo-storymap/storymap-display.js:505
+#: js/build/jeoStorymap.js:3
 msgid "at"
 msgstr "em"
 
-#: js/src/jeo-storymap/storymap-display.js:518
+#: js/build/jeoStorymap.js:3
 msgid "START"
 msgstr "INICIAR"
 
-#: js/src/jeo-storymap/storymap-display.js:532
+#: js/build/jeoStorymap.js:3
 msgid "skip intro"
 msgstr "pular introdução"
 
-#: js/src/jeo-storymap/storymap-display.js:625
+#: js/build/jeoStorymap.js:3
 msgid "Back to top"
 msgstr "Voltar ao topo"
 
-#: js/src/jeo-storymap/storymap-display.js:671
+#: js/build/jeoStorymap.js:3
 msgid "NAVIGATE THE MAP"
 msgstr "Navegar no mapa"
 
-#: js/src/shared/schema-form.js:129
+#: js/build/layersSidebar.js:7
 msgid "Select an option"
 msgstr "Selecione uma opção"
 
-#: js/src/layers-sidebar/attribution-settings.js:11
+#: js/build/layersSidebar.js:7
 msgid "Source data download link"
 msgstr "Link para baixar os dados da fonte"
 
-#: js/src/layers-sidebar/attribution-settings.js:12
+#: js/build/layersSidebar.js:7
 msgid "Data attribution link"
 msgstr "Link de atribuição de dados"
 
-#: js/src/layers-sidebar/attribution-settings.js:13
+#: js/build/layersSidebar.js:7
 msgid "Data attribution name"
 msgstr "Nome da atribuição de dados"
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:115
+#: js/build/layersSidebar.js:7
 msgid "Circles color"
 msgstr "Cor dos círculos"
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:131
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:105
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:123
+#: js/build/layersSidebar.js:7
 msgid "Add new label"
 msgstr "Adicionar nova etiqueta"
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:153
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:169
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:146
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:167
+#: js/build/layersSidebar.js:7
 msgid "Label"
 msgstr "Rótulo"
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:159
+#: js/build/layersSidebar.js:7
 msgid "Radius"
 msgstr "Raio"
 
-#: js/src/map-blocks/storymap-editor.js:1208
-#: js/src/posts-selector/meta-selector.js:67
-#: js/src/posts-sidebar/legends-editor/editors/barscale.js:192
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:170
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:176
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:158
-#: js/src/posts-sidebar/legends-editor/editors/simplecolor.js:174
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Remove"
 msgstr "Remover"
 
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:174
+#: js/build/layersSidebar.js:7
 msgid "See preview"
 msgstr "Ver prévisualização"
 
-#: js/src/map-blocks/storymap-editor.js:1114
-#: js/src/posts-sidebar/legends-editor/editors/circle.js:180
+#: includes/ai/settings/tab-embedded.php:54
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Preview"
 msgstr "Previsualização"
 
-#: js/src/posts-sidebar/legends-editor/editors/barscale.js:130
+#: js/build/layersSidebar.js:7
 msgid "Left Label"
 msgstr "Rótulo esquerdo"
 
-#: js/src/posts-sidebar/legends-editor/editors/barscale.js:144
+#: js/build/layersSidebar.js:7
 msgid "Right Label"
 msgstr "Rótulo direito"
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:96
+#: js/build/layersSidebar.js:7
 msgid "Minimum size: 60x60 pixels"
 msgstr "Tamanho mínimo: 60x60 pixels"
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:122
+#: js/build/layersSidebar.js:7
 msgid "Icon legend"
 msgstr "Legenda de ícones"
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:127
+#: js/build/layersSidebar.js:7
 msgid "The uploaded icon is too small. The minimum size required is 60x60 pixels."
 msgstr "O ícone enviado é pequeno demais. O tamanho mínimo exigido é de 60x60 pixels."
 
-#: js/src/posts-sidebar/legends-editor/editors/icons.js:138
+#: js/build/layersSidebar.js:7
 msgid "Ok"
 msgstr "Ok"
 
-#: js/src/layers-sidebar/layer-settings.js:24
-#: js/src/map-blocks/layer-settings.js:89
-#: js/src/posts-sidebar/legends-editor/legend-editor.js:202
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Type"
 msgstr "Tipo"
 
-#: js/src/layers-sidebar/interaction-settings.js:19
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "No"
 msgstr "Não"
 
-#: js/src/layers-sidebar/interaction-settings.js:20
+#: js/build/layersSidebar.js:7
 msgid "On click"
 msgstr "No clique"
 
-#: js/src/layers-sidebar/interaction-settings.js:21
+#: js/build/layersSidebar.js:7
 msgid "On hover"
 msgstr "No hover"
 
-#: js/src/layers-sidebar/interaction-settings.js:120
+#: js/build/layersSidebar.js:7
 msgid "Show popup?"
 msgstr "Mostrar popup?"
 
-#: js/src/layers-sidebar/interaction-settings.js:128
-#: js/src/map-blocks/storymap-editor.js:1118
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Title"
 msgstr "Título"
 
-#: js/src/layers-sidebar/interaction-settings.js:139
+#: js/build/layersSidebar.js:7
 msgid "Fields"
 msgstr "Campos"
 
-#: js/src/layers-sidebar/interaction-settings.js:166
+#: js/build/layersSidebar.js:7
 msgid "Add field"
 msgstr "Adicionar campo"
 
-#: js/src/layers-sidebar/interaction-settings.js:175
-#: js/src/map-blocks/storymap-editor.js:1246
-#: js/src/posts-selector/meta-selector.js:79
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Add"
 msgstr "Adicionar"
 
-#: js/src/layers-sidebar/interactions-settings.js:86
+#: js/build/layersSidebar.js:7
 msgid "Interactions"
 msgstr "Interações"
 
-#: js/src/layers-sidebar/interactions-settings.js:114
-#: js/src/map-blocks/layers-settings.js:421
+#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Done"
 msgstr "Feito"
 
-#: js/src/layers-sidebar/layer-settings.js:242
+#: js/build/layersSidebar.js:7
 msgid "Edit interactions"
 msgstr "Editar interações"
 
-#: js/src/layers-sidebar/layers-sidebar.js:65
+#: js/build/layersSidebar.js:7
 msgid "Please fill all required fields, you will not be able to publish or update until that."
 msgstr "Por favor preencha os campos requeridos, você não poderá publicar ou atualizar até lá."
 
-#: js/src/layers-sidebar/layers-sidebar.js:72
+#: js/build/layersSidebar.js:7
 msgid "Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings."
 msgstr "Seu token de acesso do Mapbox pode ser inválido. Você não poderá publicar ou atualizar. Por favor, verifique suas configurações."
 
-#: js/src/layers-sidebar/layers-sidebar.js:75
+#: js/build/layersSidebar.js:7
 msgid "Your layer was not found. You will not be able to publish or update. Please check your settings."
 msgstr "Sua camada não foi encontrada. Você não poderá publicar ou atualizar. Por favor, verifique suas configurações."
 
-#: js/src/layers-sidebar/layers-sidebar.js:78
+#: js/build/layersSidebar.js:7
 msgid "Error loading your layer, you will not be able to publish or update. Please check your settings."
 msgstr "Erro ao carregar sua camada, você não poderá publicar ou atualizar. Por favor verifique as configurações."
 
-#: js/src/layers-sidebar/layers-sidebar.js:85
+#: js/build/layersSidebar.js:7
 msgid "Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update."
 msgstr "Sua chave API do Mapbox não foi encontrada nas configurações do JEO. Você não poderá publicar ou atualizar."
 
-#: js/src/layers-sidebar/layers-sidebar.js:89
+#: js/build/layersSidebar.js:7
 msgid "Please, check your settings."
 msgstr "Por favor, verifique suas configurações."
 
-#: js/src/layers-sidebar/layers-sidebar.js:145
+#: js/build/layersSidebar.js:7
 msgid "Attributions"
 msgstr "Atribuições"
 
-#: js/src/map-blocks/embedded-story-map-editor.js:17
+#: js/build/mapBlocks.js:1
 msgid "Insert a story map from the library"
 msgstr "Insira um mapa narrativo da biblioteca"
 
-#: js/src/map-blocks/embedded-story-map-editor.js:22
+#: js/build/mapBlocks.js:1
 msgid "Type a story name"
 msgstr "Insira o nome da história"
 
-#: js/src/map-blocks/map-editor.js:115
+#: js/build/mapBlocks.js:1
 msgid "(Select another map)"
 msgstr "(Selecionar outro mapa)"
 
-#: js/src/map-blocks/map-editor.js:123
-#: js/src/map-blocks/storymap-editor.js:1316
+#: js/build/mapBlocks.js:1
 msgid "Insert a map from the library"
 msgstr "Insira um mapa da biblioteca"
 
-#: js/src/map-blocks/map-editor.js:127
-#: js/src/map-blocks/storymap-editor.js:1320
+#: js/build/mapBlocks.js:1
 msgid "Type a map name"
 msgstr "Insira o nome do mapa"
 
-#: js/src/map-blocks/map-editor-preview.js:112
+#: js/build/mapBlocks.js:1
 msgid "Preview zoom controls"
 msgstr "Prévia dos controles de zoom"
 
-#: js/src/map-blocks/map-editor-preview.js:124
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Initial Zoom"
 msgstr "Zoom inicial"
 
-#: js/src/map-blocks/map-editor-preview.js:139
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Min Zoom"
 msgstr "Zoom mínimo"
 
-#: js/src/map-blocks/map-editor-preview.js:154
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Max Zoom"
 msgstr "Zoom máximo"
 
-#: js/src/map-blocks/layers-panel.js:52
-#: js/src/map-blocks/onetime-map-editor.js:154
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Edit layers settings"
 msgstr "Editar configurações de camadas"
 
-#: js/src/map-blocks/color-palettes.js:6
+#: js/build/mapBlocks.js:1
 msgid "Black"
 msgstr "Preto"
 
-#: js/src/map-blocks/color-palettes.js:7
+#: js/build/mapBlocks.js:1
 msgid "90% Gray"
 msgstr "Cinza 90%"
 
-#: js/src/map-blocks/color-palettes.js:8
+#: js/build/mapBlocks.js:1
 msgid "80% Gray"
 msgstr "Cinza 80%"
 
-#: js/src/map-blocks/color-palettes.js:9
+#: js/build/mapBlocks.js:1
 msgid "70% Gray"
 msgstr "Cinza 70%"
 
-#: js/src/map-blocks/color-palettes.js:10
+#: js/build/mapBlocks.js:1
 msgid "60% Gray"
 msgstr "Cinza 60%"
 
-#: js/src/map-blocks/color-palettes.js:11
+#: js/build/mapBlocks.js:1
 msgid "50% Gray"
 msgstr "Cinza 50%"
 
-#: js/src/map-blocks/color-palettes.js:12
+#: js/build/mapBlocks.js:1
 msgid "40% Gray"
 msgstr "Cinza 40%"
 
-#: js/src/map-blocks/color-palettes.js:13
+#: js/build/mapBlocks.js:1
 msgid "30% Gray"
 msgstr "Cinza 30%"
 
-#: js/src/map-blocks/color-palettes.js:14
+#: js/build/mapBlocks.js:1
 msgid "20% Gray"
 msgstr "Cinza 20%"
 
-#: js/src/map-blocks/color-palettes.js:15
+#: js/build/mapBlocks.js:1
 msgid "10% Gray"
 msgstr "Cinza 10%"
 
-#: js/src/map-blocks/color-palettes.js:16
+#: js/build/mapBlocks.js:1
 msgid "7.5% Gray"
 msgstr "Cinza 7,5%"
 
-#: js/src/map-blocks/color-palettes.js:17
+#: js/build/mapBlocks.js:1
 msgid "5% Gray"
 msgstr "Cinza 5%"
 
-#: js/src/map-blocks/color-palettes.js:18
+#: js/build/mapBlocks.js:1
 msgid "2.5% Gray"
 msgstr "Cinza 2,5%"
 
-#: js/src/map-blocks/color-palettes.js:19
+#: js/build/mapBlocks.js:1
 msgid "White"
 msgstr "Branco"
 
-#: js/src/map-blocks/color-palettes.js:20
+#: js/build/mapBlocks.js:1
 msgid "Maroon"
 msgstr "Bordô"
 
-#: js/src/map-blocks/color-palettes.js:21
+#: js/build/mapBlocks.js:1
 msgid "Red"
 msgstr "Vermelho"
 
-#: js/src/map-blocks/color-palettes.js:22
+#: js/build/mapBlocks.js:1
 msgid "Olive"
 msgstr "Oliva"
 
-#: js/src/map-blocks/color-palettes.js:23
+#: js/build/mapBlocks.js:1
 msgid "Yellow"
 msgstr "Amarelo"
 
-#: js/src/map-blocks/color-palettes.js:24
+#: js/build/mapBlocks.js:1
 msgid "Green"
 msgstr "Verde"
 
-#: js/src/map-blocks/color-palettes.js:25
+#: js/build/mapBlocks.js:1
 msgid "Lime"
 msgstr "Verde-limão"
 
-#: js/src/map-blocks/color-palettes.js:26
+#: js/build/mapBlocks.js:1
 msgid "Teal"
 msgstr "Verde-azulado"
 
-#: js/src/map-blocks/color-palettes.js:27
+#: js/build/mapBlocks.js:1
 msgid "Aqua"
 msgstr "Aqua"
 
-#: js/src/map-blocks/color-palettes.js:28
+#: js/build/mapBlocks.js:1
 msgid "Navy"
 msgstr "Azul-marinho"
 
-#: js/src/map-blocks/color-palettes.js:29
+#: js/build/mapBlocks.js:1
 msgid "Blue"
 msgstr "Azul"
 
-#: js/src/map-blocks/color-palettes.js:30
+#: js/build/mapBlocks.js:1
 msgid "Purple"
 msgstr "Roxo"
 
-#: js/src/map-blocks/color-palettes.js:31
+#: js/build/mapBlocks.js:1
 msgid "Fuchsia"
 msgstr "Fúcsia"
 
-#: js/src/posts-sidebar/geo-auto-complete.js:77
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
 msgid "Unable to load address suggestions."
 msgstr "Não foi possível carregar as sugestões de endereço."
 
-#: js/src/posts-sidebar/geo-auto-complete.js:143
-#: js/src/posts-sidebar/geo-auto-complete.js:144
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
 msgid "Search address"
 msgstr "Pesquisar endereço"
 
-#: js/src/posts-sidebar/geo-auto-complete.js:180
+#: includes/ai/settings/tab-knowledge.php:301
+#: includes/settings/class-settings.php:504
+#: js/build/mapBlocks.js:1
+#: js/build/postsSidebar.js:1
 msgid "Search"
 msgstr "Pesquisar"
 
-#: js/src/map-blocks/storymap-editor.js:840
-#: js/src/map-blocks/storymap-editor.js:893
+#: js/build/mapBlocks.js:1
 msgid "Story settings"
 msgstr "Configurações da história"
 
-#: js/src/map-blocks/storymap-editor.js:850
+#: js/build/mapBlocks.js:1
 msgid "Brief description"
 msgstr "Descrição breve"
 
-#: js/src/map-blocks/storymap-editor.js:869
+#: js/build/mapBlocks.js:1
 msgid "Show story map introduction"
 msgstr "Mostrar introdução do mapa narrativo"
 
-#: js/src/map-blocks/storymap-editor.js:880
+#: js/build/mapBlocks.js:1
 msgid "Use \"Navigate to map\" button"
 msgstr "Usar botão \"Navegar no mapa\""
 
-#: js/src/map-blocks/storymap-editor.js:908
-#: js/src/map-blocks/storymap-editor.js:1253
+#: js/build/mapBlocks.js:1
 msgid "Slides settings"
 msgstr "Configurações dos slides"
 
-#: js/src/map-blocks/storymap-editor.js:932
+#: js/build/mapBlocks.js:1
 msgid "Move slide up"
 msgstr "Mover slide para cima"
 
-#: js/src/map-blocks/storymap-editor.js:939
+#: js/build/mapBlocks.js:1
 msgid "Move slide down"
 msgstr "Mover slide para baixo"
 
-#: js/src/map-blocks/storymap-editor.js:948
-#: js/src/map-blocks/storymap-editor.js:1268
+#: js/build/mapBlocks.js:1
 msgid "Slide"
 msgstr "Slide"
 
-#: js/src/map-blocks/storymap-editor.js:1073
-#: js/src/map-blocks/storymap-editor.js:1094
+#: js/build/mapBlocks.js:1
 msgid "Lock current spot"
 msgstr "Marcar ponto atual"
 
-#: js/src/map-blocks/storymap-editor.js:1146
+#: js/build/mapBlocks.js:1
 msgid "Content"
 msgstr "Conteúdo"
 
-#: js/src/map-blocks/storymap-editor.js:1179
+#: js/build/mapBlocks.js:1
 msgid "The minimum number of slides is 1."
 msgstr "O número mínimo de slides é 1."
 
-#: js/src/map-blocks/storymap-editor.js:1185
+#: js/build/mapBlocks.js:1
 msgid "Do you really want to remove this slide?"
 msgstr "Você realmente quer remover esse slide?"
 
-#: js/src/map-blocks/storymap-editor.js:1268
+#: js/build/mapBlocks.js:1
 msgid "Current slide:"
 msgstr "Slide atual:"
 
-#: js/src/map-blocks/storymap-editor.js:1307
+#: js/build/mapBlocks.js:1
 msgid "Map:"
 msgstr "Mapa:"
 
-#: js/src/map-blocks/index.js:19
+#: js/build/mapBlocks.js:1
 msgid "JEO Map"
 msgstr "Mapa JEO"
 
-#: js/src/map-blocks/index.js:20
-#: js/src/map-blocks/index.js:50
+#: js/build/mapBlocks.js:1
 msgid "Display maps with layers and data"
 msgstr "Exibir mapas com camadas e dados"
 
-#: js/src/map-blocks/index.js:49
+#: js/build/mapBlocks.js:1
 msgid "JEO One-time Map"
 msgstr "JEO One-time Map"
 
-#: js/src/map-blocks/index.js:170
-#: js/src/map-blocks/index.js:216
+#: js/build/mapBlocks.js:1
 msgid "Display maps with storytelling"
 msgstr "Exibir mapas com narrativa"
 
-#: js/src/map-blocks/index.js:215
+#: js/build/mapBlocks.js:1
 msgid "Embedded Story Map"
 msgstr "Mapa Narrativo Incorporado"
 
-#: js/src/map-blocks/index.js:256
-msgid "Map Editor Preview"
-msgstr "Prévia do editor de mapas"
-
-#: js/src/map-blocks/index.js:257
-msgid "Interactive map preview for the Map post type editor."
-msgstr "Prévia interativa do mapa para o editor do tipo de post Mapa."
-
-#: js/src/map-blocks/index.js:284
-msgid "Layer Editor Preview"
-msgstr "Prévia do editor de camadas"
-
-#: js/src/map-blocks/index.js:285
-msgid "Interactive layer preview for the Map Layer post type editor."
-msgstr "Prévia interativa da camada para o editor do tipo de post Camada de Mapa."
-
-#: js/src/map-blocks/layers-panel.js:29
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Loading layers data..."
 msgstr "Carregando dados das camadas..."
 
-#: js/src/map-blocks/layers-panel.js:44
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Default"
 msgstr "Padrão"
 
-#: js/src/map-blocks/layer-settings.js:86
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Base layer should be fixed"
 msgstr "A camada base deve ser fixada"
 
-#: js/src/map-blocks/layer-settings.js:99
-#: js/src/map-blocks/layer-settings.js:106
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Should be displayed by default."
 msgstr "Deve ser exibido por padrão."
 
-#: js/src/map-blocks/layer-settings.js:116
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Load interactions"
 msgstr "Carregar interações"
 
-#: js/src/map-blocks/layer-settings.js:126
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "No legend"
 msgstr "Sem legenda"
 
-#: js/src/map-blocks/layer-settings.js:131
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Show legend"
 msgstr "Mostrar legenda"
 
-#: js/src/map-blocks/layer-settings.js:190
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "If the layer is not visible in Mapbox Studio, we will not be able to control its visibility."
 msgstr "Se a camada não estiver visível no Mapbox Studio, não será possível controlar sua visibilidade."
 
-#: js/src/map-blocks/layers-settings.js:59
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Select a layer type"
 msgstr "Selecione um tipo de camada"
 
-#: js/src/map-blocks/layers-settings.js:111
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Enter keywords to search layers"
 msgstr "Insira palavras-chave para pesquisar camadas"
 
-#: js/src/map-blocks/layers-settings.js:120
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Layer type"
 msgstr "Tipo da camada"
 
-#: js/src/map-blocks/layers-settings.js:150
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "New Layer"
 msgstr "Nova camada"
 
-#: js/src/map-blocks/layers-settings.js:157
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Search layers by name or type to browse the library."
 msgstr "Pesquise camadas por nome ou tipo para navegar pela biblioteca."
 
-#: js/src/map-blocks/layers-settings.js:204
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Add to map"
 msgstr "Adicionar ao mapa"
 
-#: js/src/map-blocks/layers-settings.js:210
-#: js/src/map-blocks/layers-settings.js:374
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Do you really want to delete this layer?"
 msgstr "Você realmente quer remover essa camada?"
 
-#: js/src/map-blocks/layers-settings.js:220
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Remove from map"
 msgstr "Remover do mapa"
 
-#: js/src/map-blocks/layers-settings.js:232
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "No layers matched the current search filters."
 msgstr "Nenhuma camada corresponde aos filtros de pesquisa atuais."
 
-#: js/src/map-blocks/layers-settings.js:239
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Load more layers"
 msgstr "Carregar mais camadas"
 
-#: js/src/map-blocks/layers-settings.js:246
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "No layers have been added to this map."
 msgstr "Nenhuma camada foi adicionada a este mapa."
 
-#: js/src/map-blocks/layers-settings-modal.js:16
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Layers settings"
 msgstr "Configurações de camadas"
 
-#: js/src/map-blocks/map-settings.js:56
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Center"
 msgstr "Centro"
 
-#: js/src/map-blocks/map-settings.js:79
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Zoom"
 msgstr "Zoom"
 
-#: js/src/map-blocks/map-settings.js:81
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Initial zoom"
 msgstr "Zoom inicial"
 
-#: js/src/map-blocks/map-settings.js:98
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Min zoom"
 msgstr "Zoom mínimo"
 
-#: js/src/map-blocks/map-settings.js:115
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Max zoom"
 msgstr "Zoom máximo"
 
-#: js/src/map-blocks/map-settings.js:132
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Scroll zoom on post"
 msgstr "Zoom com rolagem no post"
 
-#: js/src/map-blocks/map-settings.js:141
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Drag rotation on post"
 msgstr "Rotação no post"
 
-#: js/src/map-blocks/map-settings.js:150
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Map navigation on post"
 msgstr "Navegação do mapa no post"
 
-#: js/src/map-blocks/map-settings.js:159
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Fullscreen button on post"
 msgstr "Botão de tela cheia no post"
 
-#: js/src/map-blocks/map-settings.js:171
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Pan limits"
 msgstr "Limites de panorâmica"
 
-#: js/src/map-blocks/map-settings.js:176
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "North"
 msgstr "Norte"
 
-#: js/src/map-blocks/map-settings.js:190
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "East"
 msgstr "Leste"
 
-#: js/src/map-blocks/map-settings.js:205
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "South"
 msgstr "Sul"
 
-#: js/src/map-blocks/map-settings.js:219
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "West"
 msgstr "Oeste"
 
-#: js/src/map-blocks/map-settings.js:242
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Use current map view"
 msgstr "Usar vista atual do mapa"
 
-#: js/src/map-blocks/map-settings.js:248
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "For public maps only"
 msgstr "Apenas para mapas públicos"
 
-#: js/src/map-blocks/map-settings.js:261
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Disable embed map"
 msgstr "Desabilitar incorporação"
 
-#: js/src/map-blocks/map-panel.js:63
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Map settings"
 msgstr "Configurações do mapa"
 
-#: js/src/map-blocks/utils.js:9
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Fixed"
 msgstr "Fixado"
 
-#: js/src/map-blocks/utils.js:10
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Swappable"
 msgstr "Trocável"
 
-#: js/src/map-blocks/utils.js:11
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Switchable"
 msgstr "Comutável"
 
-#: js/src/posts-selector/meta-selector.js:31
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Key"
 msgstr "Chave"
 
-#: js/src/posts-selector/meta-selector.js:41
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Comparator"
 msgstr "Comparador"
 
-#: js/src/posts-selector/meta-selector.js:52
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Value"
 msgstr "Valor"
 
-#: js/src/posts-selector/index.js:38
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Related posts"
 msgstr "Posts relacionados"
 
-#: js/src/posts-selector/index.js:41
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Use related posts"
 msgstr "Usar posts relacionados"
 
-#: js/src/posts-selector/index.js:55
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Categories"
 msgstr "Categorias"
 
-#: js/src/posts-selector/index.js:80
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Start date"
 msgstr "Data de início"
 
-#: js/src/posts-selector/index.js:81
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "End date"
 msgstr "Data final"
 
-#: js/src/posts-selector/index.js:103
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
 msgid "Meta queries"
 msgstr "Consultas de metadados"
 
-#: js/src/maps-sidebar/map-embed-url.js:10
+#: js/build/mapsSidebar.js:1
 msgid "Embed URL"
 msgstr "URL de incorporação"
 
-#: js/src/posts-sidebar/geo-posts.js:197
-msgid "Unable to retrieve the address for the selected point."
-msgstr "Não foi possível obter o endereço do ponto selecionado."
-
-#: js/src/posts-sidebar/geo-posts.js:421
-msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
-msgstr "Digite um endereço e depois clique em Pesquisar ou pressione Enter. Você também pode arrastar o marcador pelo mapa."
-
-#: js/src/posts-sidebar/geo-posts.js:428
+#: js/build/postsSidebar.js:1
 msgid "Move marker to nearest address"
 msgstr "Mover o marcador para o endereço mais próximo"
 
-#: js/src/posts-sidebar/geo-posts.js:433
+#: js/build/postsSidebar.js:1
 msgid "Relevance"
 msgstr "Relevância"
 
-#: js/src/posts-sidebar/geo-posts.js:438
+#: js/build/postsSidebar.js:1
 msgid "Primary"
 msgstr "Primário"
 
-#: js/src/posts-sidebar/geo-posts.js:439
+#: js/build/postsSidebar.js:1
 msgid "Secondary"
 msgstr "Secundário"
 
-#: js/src/posts-sidebar/geo-posts.js:456
+#: js/build/postsSidebar.js:1
 msgid "Update selected point"
 msgstr "Atualizar ponto selecionado"
 
-#: js/src/posts-sidebar/geo-posts.js:457
+#: js/build/postsSidebar.js:1
 msgid "Save new point"
 msgstr "Salvar novo ponto"
 
-#: js/src/posts-sidebar/geo-posts.js:476
-#: js/src/posts-sidebar/geo-posts.js:480
+#: js/build/postsSidebar.js:1
 msgid "Add new point"
 msgstr "Adicionar novo ponto"
 
-#: js/src/posts-sidebar/geo-posts.js:488
+#: js/build/postsSidebar.js:1
 msgid "Current points"
 msgstr "Pontos atuais"
 
-#: js/src/posts-sidebar/geo-posts.js:490
+#: js/build/postsSidebar.js:1
 msgid "No points"
 msgstr "Nenhum ponto"
 
-#: js/src/posts-sidebar/geo-posts.js:514
+#: includes/settings/class-settings.php:466
+#: js/build/postsSidebar.js:1
 msgid "Delete"
 msgstr "Apagar"
 
-#: js/src/posts-sidebar/geo-posts.js:522
+#: includes/settings/class-settings.php:503
+#: js/build/postsSidebar.js:1
 msgid "Edit"
 msgstr "Editar"
 
-#: js/src/posts-sidebar/index.js:22
-#: js/src/posts-sidebar/index.js:26
+#: js/build/postsSidebar.js:1
 msgid "Geolocate this post"
 msgstr "Geolocalizar este post"
 
-#: js/src/posts-sidebar/index.js:50
+#: js/build/postsSidebar.js:1
 msgid "Geolocation"
 msgstr "Geolocalização"
 
-#: includes/class-jeo.php:367
+#: includes/class-jeo.php:657
 msgid "Ordered list of map-layer IDs to return."
 msgstr "Lista ordenada dos IDs das camadas a serem retornados."
 
-#: includes/class-jeo.php:372
+#: includes/class-jeo.php:662
 msgid "Request context."
 msgstr "Contexto da requisição."
 
-#: includes/settings/settings-page.php:203
-msgid "Ex. https://example.com/wp-content/uploads/fonts/jeo-font.css"
-msgstr "Ex. https://exemplo.com/wp-content/uploads/fonts/jeo-font.css"
-
-#: includes/settings/settings-page.php:218
-msgid "Ex. https://example.com/wp-content/uploads/fonts/jeo-story-font.css"
-msgstr "Ex. https://exemplo.com/wp-content/uploads/fonts/jeo-story-font.css"
-
 #. translators: %s is the authors list
-#: js/src/jeo-storymap/storymap-display.js:37
+#: js/build/jeoStorymap.js:3
 #, js-format
 msgid "By %s"
 msgstr "Por %s"
+
+#: includes/admin/dashboard-page.php:306
+msgid "Toggle panel"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:308
+msgid "JEO Platform"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:309
+msgid "Loading geodata..."
+msgstr ""
+
+#: includes/admin/dashboard-page.php:310
+msgid "Minimize Dashboard"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:317
+msgid "Search terms"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:318
+msgid "Title or content..."
+msgstr ""
+
+#: includes/admin/dashboard-page.php:322
+msgid "Post Type"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:324
+msgid "All Types"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:329
+msgid "Taxonomy"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:334
+msgid "Term"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:339
+msgid "Apply Filters"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:344
+msgid "Timeline Range"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:361
+msgid "Gathering geodata and initializing JEO Engine..."
+msgstr ""
+
+#: includes/admin/dashboard-page.php:524
+#: includes/settings/class-settings.php:516
+msgid "Select Taxonomy..."
+msgstr ""
+
+#: includes/admin/dashboard-page.php:542
+#: includes/settings/class-settings.php:517
+msgid "Select Term..."
+msgstr ""
+
+#: includes/admin/dashboard-page.php:605
+#: includes/settings/class-settings.php:518
+msgid " locations found."
+msgstr ""
+
+#: includes/admin/dashboard-page.php:617
+#: includes/admin/dashboard-page.php:704
+#: includes/settings/class-settings.php:484
+msgid "Untitled"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:707
+#: includes/settings/class-settings.php:514
+msgid "View Post"
+msgstr ""
+
+#: includes/admin/dashboard-page.php:707
+#: includes/settings/class-settings.php:515
+msgid "Edit Post"
+msgstr ""
+
+#: includes/admin/uninstall-handler.php:30
+#: includes/admin/uninstall-handler.php:48
+#: includes/admin/uninstall-handler.php:49
+msgid "Uninstall JEO"
+msgstr ""
+
+#: includes/admin/uninstall-handler.php:31
+msgid "Uninstall"
+msgstr ""
+
+#: includes/admin/uninstall-handler.php:63
+#: includes/admin/uninstall-page.php:23
+msgid "You do not have permission to uninstall plugins."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:50
+msgid "Warning: This action cannot be undone."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:53
+msgid "Uninstalling JEO will permanently delete the following data from your site:"
+msgstr ""
+
+#: includes/admin/uninstall-page.php:56
+msgid "All plugin settings stored in the database (map defaults, API keys, appearance settings, etc.)."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:57
+msgid "All AI usage logs (private posts of type \"jeo-ai-log\")."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:58
+msgid "All geolocation metadata attached to posts (_related_point, _geocode_* index fields)."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:59
+msgid "Cached geocoding results (Nominatim transients)."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:60
+msgid "Bulk AI cron logs and embedding token counters."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:61
+msgid "RAG vector store files from the uploads directory (wp-content/uploads/jeo-ai-store/)."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:62
+msgid "Scheduled cron jobs created by the plugin."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:65
+msgid "Your regular posts, pages, maps, layers, and storymaps will remain, but any geolocation data associated with them will be lost."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:72
+msgid "I understand that all data listed above will be permanently deleted."
+msgstr ""
+
+#: includes/admin/uninstall-page.php:75
+msgid "Confirm and Uninstall JEO"
+msgstr ""
+
+#: includes/admin/uninstall-page.php:75
+msgid "Are you absolutely sure? This cannot be undone."
+msgstr ""
+
+#: includes/ai/class-ai-logger.php:39
+msgctxt "Post Type General Name"
+msgid "AI Usage Logs"
+msgstr ""
+
+#: includes/ai/class-ai-logger.php:40
+msgctxt "Post Type Singular Name"
+msgid "AI Usage Log"
+msgstr ""
+
+#: includes/ai/class-ai-logger.php:41
+msgid "AI Logs (Costs)"
+msgstr ""
+
+#: includes/ai/class-ai-logger.php:42
+msgid "All AI Logs"
+msgstr ""
+
+#: includes/ai/class-ai-logger.php:43
+msgid "View Log"
+msgstr ""
+
+#: includes/ai/class-ai-logger.php:47
+msgid "AI Usage Log"
+msgstr ""
+
+#: includes/ai/class-ai-logger.php:48
+msgid "Internal logs for AI token usage and costs."
+msgstr ""
+
+#: includes/ai/class-ai-settings.php:46
+#: includes/ai/settings/tab-provider.php:12
+msgid "AI Provider"
+msgstr ""
+
+#: includes/ai/class-ai-settings.php:47
+msgid "Knowledge Base"
+msgstr ""
+
+#: includes/ai/class-ai-settings.php:48
+msgid "Bulk Geolocation"
+msgstr ""
+
+#: includes/ai/class-ai-settings.php:49
+msgid "Context Assistant"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:170
+msgid "Bulk clearing started (Background)."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:174
+msgid "Bulk clearing started in background. Posts will be reset in batches."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:194
+#: includes/ai/class-rag-worker.php:101
+#: includes/settings/class-settings.php:485
+msgid "Error"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:194
+#: includes/ai/class-rag-worker.php:101
+msgid "Success"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:223
+#: includes/ai/class-rag-worker.php:68
+#: includes/ai/settings/tab-bulk.php:49
+#: includes/ai/settings/tab-knowledge.php:157
+msgid "Every Minute"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:229
+#: includes/ai/class-rag-worker.php:74
+#: includes/ai/settings/tab-bulk.php:50
+#: includes/ai/settings/tab-knowledge.php:158
+msgid "Every 5 Minutes"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:235
+#: includes/ai/class-rag-worker.php:80
+#: includes/ai/settings/tab-bulk.php:51
+#: includes/ai/settings/tab-knowledge.php:159
+msgid "Every 15 Minutes"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:344
+msgid "No post types selected for bulk processing."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:364
+msgid "No more posts to process. Deactivating worker."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:381
+msgid "CRITICAL: No active AI adapter found for bulk processing."
+msgstr ""
+
+#. translators: %d: number of posts processed.
+#: includes/ai/class-bulk-processor.php:407
+#, php-format
+msgid "Processed batch of %d posts."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:434
+msgid "No more posts to clear."
+msgstr ""
+
+#. translators: %d: number of posts cleared.
+#: includes/ai/class-bulk-processor.php:452
+#, php-format
+msgid "Cleared batch of %d posts."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:602
+msgid "No posts selected."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:664
+msgid "Review Bulk AI Approval"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:667
+#: includes/ai/class-bulk-processor.php:703
+msgid "Analyzing selected posts..."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:672
+msgid "Confirm & Apply"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:698
+msgid "Please select at least one post."
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:772
+msgid "JEO AI Status"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:793
+msgid "Geolocated"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:795
+msgid "Pending Approval"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:797
+msgid "No Locations Found"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:799
+msgid "AI Error"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:801
+msgid "Not Processed"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:841
+msgid "Approve AI"
+msgstr ""
+
+#: includes/ai/class-bulk-processor.php:852
+msgid "Approve JEO AI Geolocations"
+msgstr ""
+
+#: includes/ai/class-context-handler.php:182
+#: includes/ai/class-context-handler.php:296
+#: includes/ai/class-context-handler.php:579
+#: includes/ai/class-context-handler.php:652
+#: includes/ai/class-rag-worker.php:223
+#: includes/minimap/class-minimap.php:141
+#: includes/minimap/class-minimap.php:235
+#: includes/minimap/class-minimap.php:313
+msgid "Post not found."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:193
+#: includes/ai/class-context-handler.php:317
+#: includes/ai/class-minilayer-handler.php:85
+#: includes/ai/class-minilayer-service.php:41
+#: includes/minimap/class-minimap.php:246
+#: includes/minimap/class-minimap.php:334
+msgid "No AI provider configured. Set one in JEO AI Settings."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:205
+msgid "The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles)."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:206
+#: includes/ai/class-context-handler.php:239
+msgid "Generate editorial suggestions for this post based on its content."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:214
+msgid "Waiting for more content or directions."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:245
+msgid "Suggestions generated."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:276
+#: includes/minimap/class-minimap.php:293
+msgid "conversation_id is required."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:286
+#: includes/minimap/class-minimap.php:224
+#: includes/minimap/class-minimap.php:303
+msgid "A post ID is required."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:306
+#: includes/minimap/class-minimap.php:323
+msgid "A message is required."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:348
+msgid "Suggestions updated."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:417
+msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:665
+msgid "Conversation cleared."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:72
+#: includes/minimap/class-minimap.php:214
+msgid "A prompt is required."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:84
+#: includes/ai/class-minilayer-service.php:33
+msgid "Mapbox API key is not configured. Set it in JEO Settings."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:86
+msgid "Could not generate the map style. Please try again."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:87
+msgid "The AI returned an unexpected response. Please try again."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:88
+msgid "The AI did not create a valid style. Please try again."
+msgstr ""
+
+#: includes/ai/class-minilayer-service.php:121
+msgid "Failed to parse AI response as JSON."
+msgstr ""
+
+#: includes/ai/class-minilayer-service.php:128
+msgid "AI response did not include a style_id."
+msgstr ""
+
+#. translators: %s: Mapbox style ID.
+#: includes/ai/class-minilayer-service.php:167
+#, php-format
+msgid "Minilayer: %s"
+msgstr ""
+
+#: includes/ai/class-neuron-factory.php:191
+msgid "No Embedding Model configured. Please select one in the JEO AI settings."
+msgstr ""
+
+#. translators: %s: directory path
+#: includes/ai/class-rag-agent.php:64
+#, php-format
+msgid "The RAG Vector Store directory (%s) could not be created. Please check your uploads folder permissions."
+msgstr ""
+
+#. translators: %s: directory path
+#: includes/ai/class-rag-agent.php:70
+#, php-format
+msgid "The RAG Vector Store directory (%s) is not writable. Local Vectorization is disabled."
+msgstr ""
+
+#: includes/ai/class-rag-agent.php:76
+msgid "No AI Provider is configured. Please set up a provider (Gemini, OpenAI, etc.) before using RAG."
+msgstr ""
+
+#: includes/ai/class-rag-agent.php:89
+msgid "No Embedding Model selected. Please choose a model in the Knowledge Base tab."
+msgstr ""
+
+#. translators: %s: provider name
+#: includes/ai/class-rag-agent.php:108
+#, php-format
+msgid "The selected embedding provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for Vector Store features."
+msgstr ""
+
+#. translators: %s: provider name
+#: includes/ai/class-rag-agent.php:119
+#, php-format
+msgid "The API Key for the Embedding provider (%s) is missing. RAG requires a valid connection to generate embeddings."
+msgstr ""
+
+#: includes/ai/class-rag-backup.php:41
+msgid "The PHP ZipArchive extension is required to create backups."
+msgstr ""
+
+#: includes/ai/class-rag-backup.php:92
+msgid "No vector store found to backup."
+msgstr ""
+
+#: includes/ai/class-rag-backup.php:99
+msgid "Failed to create the ZIP archive."
+msgstr ""
+
+#: includes/ai/class-rag-worker.php:209
+msgid "Either post_id or query is required."
+msgstr ""
+
+#. translators: %s: pipeline name
+#: includes/ai/class-rag-worker.php:347
+#, php-format
+msgid "Unknown pipeline: %s"
+msgstr ""
+
+#. translators: 1: locked model name, 2: current model name
+#: includes/ai/class-rag-worker.php:377
+#, php-format
+msgid "Vector Store mismatch for %1$s! Expected %2$s, found %3$s."
+msgstr ""
+
+#. translators: %s: pipeline name
+#: includes/ai/class-rag-worker.php:403
+#, php-format
+msgid "No more %s to vectorize."
+msgstr ""
+
+#. translators: %d: number of items vectorized
+#: includes/ai/class-rag-worker.php:428
+#, php-format
+msgid "Successfully vectorized %1$d %2$s."
+msgstr ""
+
+#. translators: %s: pipeline name
+#: includes/ai/class-rag-worker.php:437
+#, php-format
+msgid "Batch skipped for %s (no content found)."
+msgstr ""
+
+#: includes/ai/settings/main-page.php:10
+msgid "JEO AI Configuration"
+msgstr ""
+
+#: includes/ai/settings/main-page.php:99
+msgid "Save AI Settings"
+msgstr ""
+
+#: includes/ai/settings/main-page.php:107
+#: includes/ai/settings/tab-general.php:22
+msgid "JEO AI API Debugger"
+msgstr ""
+
+#: includes/ai/settings/main-page.php:109
+msgid "Clear logs"
+msgstr ""
+
+#: includes/ai/settings/main-page.php:115
+msgid "[System] Console initialized. Awaiting API activity..."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:12
+msgid "Background Processing"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:15
+msgid "Enable background AI geolocalization"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:16
+msgid "When active, JEO will scan legacy posts and suggest locations based on their content."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:20
+#: includes/ai/settings/tab-knowledge.php:151
+msgid "Batch Size"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:23
+msgid "Number of posts to process per batch."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:27
+msgid "Target Post Types"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:46
+#: includes/ai/settings/tab-knowledge.php:155
+msgid "Cron Interval"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:52
+#: includes/ai/settings/tab-knowledge.php:160
+msgid "Hourly"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:53
+msgid "Twice Daily"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:59
+msgid "Execution Logs"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:62
+msgid "Recent Background Activity"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:68
+msgid "No recent activity recorded."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:87
+msgid "Manual Control"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:91
+#: includes/settings/class-settings.php:498
+msgid "Process 1 Batch Now"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:94
+#: includes/settings/class-settings.php:499
+msgid "Clear 1 Batch"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:97
+msgid "Reset All Posts"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:100
+msgid "Manual Batch: Processes legacy posts immediately. Clear Batch: Resets the \"processed\" flag for a small group. Reset All: Schedules a background task to clear all posts (Double confirmation required)."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:105
+msgid "Processing Status"
+msgstr ""
+
+#. translators: %1$d: processed posts, %2$d: total posts, %3$d: percentage
+#: includes/ai/settings/tab-bulk.php:139
+#, php-format
+msgid "Geolocalization Progress: %1$d of %2$d posts marked as processed (%3$d%%)."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:146
+msgid "Auto-Approval Threshold"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:149
+msgid "Minimum average confidence required to auto-approve locations when using bulk approval actions in the post list."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:154
+msgid "Internal Debug Log"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:157
+msgid "Enable detailed file-based logging (jeo-bulk-ai.log) for technical troubleshooting."
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:161
+msgid "Open Log File"
+msgstr ""
+
+#: includes/ai/settings/tab-bulk.php:162
+msgid "Delete Log File"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:18
+msgid "Context Assistant System Prompt"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:31
+msgid "Check this to use a custom system prompt. Uncheck to use the built-in default prompt."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:44
+msgid "Custom system prompt used by the AI Context Assistant. Leave empty to use the built-in default."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:50
+msgid "Default System Prompt (reference)"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:60
+msgid "This is the built-in default prompt. Enable the custom prompt checkbox above to override it."
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:10
+msgid "Embedded Brazilian Territories"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:11
+msgid "The following geographic dictionaries are available locally to improve AI precision:"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:18
+#: includes/settings/class-settings.php:522
+msgid "Brazilian Biomes"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:19
+#: includes/settings/class-settings.php:523
+msgid "Indigenous Territories"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:20
+#: includes/settings/class-settings.php:524
+msgid "Quilombola Territories"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:21
+#: includes/settings/class-settings.php:525
+msgid "Extractive Reserves (Resex)"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:22
+#: includes/settings/class-settings.php:526
+msgid "Conservation Units"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:23
+#: includes/settings/class-settings.php:527
+msgid "Riverside Communities"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:24
+#: includes/settings/class-settings.php:528
+msgid "Agrarian Reform Settlements"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:25
+#: includes/settings/class-settings.php:529
+msgid "Indigenous Peoples (Ethnicities)"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:26
+#: includes/settings/class-settings.php:530
+msgid "Legal Amazon and Boundaries"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:27
+#: includes/settings/class-settings.php:531
+msgid "Hydrographic Basins"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:46
+msgid "File:"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:47
+msgid "Entries found:"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:57
+#: includes/settings/class-settings.php:465
+msgid "Download"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:65
+#: includes/ai/settings/tab-knowledge.php:291
+#: includes/settings/ai-logs-page.php:250
+msgid "Close"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:69
+msgid "Item List"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:73
+msgid "Name"
+msgstr ""
+
+#: includes/ai/settings/tab-embedded.php:89
+msgid "JSON Raw"
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:14
+msgid "Debug Mode"
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:17
+msgid "Enable internal logging of all AI calls (Inputs/Outputs) for 24 hours. Useful for debugging prompt regressions."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:25
+msgid "Show the floating API debugger console on AI settings pages. Displays real-time request/response logs."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:30
+msgid "NeuronAI Structured Output"
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:33
+msgid "Use native schema enforcement instead of prompt-based JSON extraction. Falls back to text parsing if structured output fails."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:36
+msgid "Limitations:"
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:38
+msgid "Token usage tracking is unavailable when structured output is active (shows 0 in logs)."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:39
+msgid "If the provider does not support native schema enforcement, the system will automatically fall back to text parsing."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:40
+msgid "Some internal tools (e.g. prompt generator test connection) automatically bypass structured output."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:45
+msgid "Recommendations by provider:"
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:47
+msgid "Full support. Recommended to keep this option enabled."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:48
+msgid "Supported via NeuronAI. Test with your model to confirm."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:49
+msgid "Variable support depending on model and local configuration. Disable if you encounter errors."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:56
+msgid "Embedded Data"
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:59
+msgid "View locally embedded geographic dictionaries used to improve AI precision. This feature is experimental and not yet fully integrated."
+msgstr ""
+
+#: includes/ai/settings/tab-general.php:63
+msgid "View Embedded Data"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:19
+msgid "AI Provider Required"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:21
+msgid "You need to configure an AI Provider before you can use the Knowledge Base. Set up your API key and choose a model in the Provider tab first."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:24
+msgid "Configure AI Provider"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:37
+msgid "RAG Knowledge Base (Vector Store)"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:38
+msgid "Vectorize your WordPress posts to allow the JEO AI to contextually answer questions and cross-reference territorial data."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:43
+msgid "Embedding Model"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:59
+msgid "Model selection is locked."
+msgstr ""
+
+#. translators: %s: locked embedding model name
+#: includes/ai/settings/tab-knowledge.php:64
+#, php-format
+msgid "This Vector Store was initialized with %s. To use a different model, you must clear the current store first."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:72
+msgid "Select an embedding model..."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:100
+msgid "Select the specific embedding model. You can mix providers (e.g. use Gemini for chat and OpenAI for embeddings)."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:112
+msgid "RAG Knowledge Base is not available"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:117
+msgid "How to fix this:"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:120
+msgid "Please select an Embedding Model from the dropdown above and click \"Save AI Settings\"."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:122
+msgid "Ensure you have an active AI Provider (Gemini, OpenAI, or Ollama) configured in the \"AI Provider\" tab."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:123
+msgid "Check if the \"wp-content/uploads\" directory exists and is writable."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:128
+msgid "Go to AI Provider Settings"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:136
+msgid "Background Indexing"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:137
+msgid "Automatically vectorize your posts in small batches using WP-Cron."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:142
+msgid "Enable Auto-indexing"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:145
+msgid "Note: WP-Cron only runs when your site receives visitor traffic. If you are on a local development server with no traffic, indexing will pause until pages are loaded."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:164
+msgid "Search Results (topK)"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:166
+msgid "Max semantic matches returned per search."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:171
+msgid "Recent Background Logs"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:177
+msgid "No indexing jobs have run recently."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:194
+msgid "Manual Indexing"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:195
+msgid "Trigger a single batch vectorization immediately."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:198
+#: includes/ai/settings/tab-knowledge.php:321
+msgid "Vectorize 1 Batch Now"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:230
+msgid "Indexing Progress"
+msgstr ""
+
+#. translators: %1$d: vectorized count, %2$d: total posts count
+#: includes/ai/settings/tab-knowledge.php:239
+#, php-format
+msgid "%1$d of %2$d posts indexed."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:248
+#: includes/ai/settings/tab-knowledge.php:405
+msgid "Status:"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:250
+msgid "Active (Local File Store)"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:254
+msgid "Alternative: Use WP-CLI for large databases:"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:259
+msgid "Backup Store"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:262
+msgid "Clear & Reset Model"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:268
+msgid "Available Backups (Last 3)"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:270
+#: includes/settings/class-settings.php:467
+msgid "No backups found."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:277
+msgid "Test Embeddings & RAG Retrieval"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:278
+msgid "Test your configured Embedding Model on a random post to ensure it works correctly before indexing your entire database. This uses a temporary testing store."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:281
+#: includes/settings/class-settings.php:478
+msgid "Run Test on Random Post"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:282
+msgid "Test Vector Retrieval"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:290
+msgid "Test Local Vector Retrieval"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:297
+msgid "Search Production Store"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:298
+msgid "Search Test Store"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:300
+msgid "Search the Vector Store for semantic meaning (e.g., \"Indigenous lands in Amazon\")"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:304
+msgid "Enter a semantic search query to retrieve similar vectors from your local store."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:312
+msgid "Layer Store (Vectorized Map Layers)"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:313
+msgid "Vectorize your map layers to enable AI-powered semantic search and layer suggestions based on post content."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:317
+msgid "Manual Layer Indexing"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:318
+msgid "Trigger a single batch vectorization for map layers. Layers are also auto-indexed on the background cron schedule and when saved."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:346
+msgid "Layer Indexing Progress"
+msgstr ""
+
+#. translators: %1$d: vectorized count, %2$d: total layers count
+#: includes/ai/settings/tab-knowledge.php:355
+#, php-format
+msgid "%1$d of %2$d layers indexed."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:361
+msgid "Recent Layer Logs"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:367
+msgid "No layer indexing jobs have run recently."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:384
+msgid "Suggest Layers"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:385
+msgid "Test semantic layer matching. Enter a post ID or text to find layers that match the content."
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:389
+msgid "Post ID"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:390
+msgid "e.g. 123"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:393
+msgid "Or search text"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:394
+msgid "e.g., deforestation in Amazon rainforest"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:396
+msgid "Find Layers"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:407
+msgid "Active (Shared embedding model with Posts Store)"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:411
+msgid "WP-CLI:"
+msgstr ""
+
+#: includes/ai/settings/tab-knowledge.php:416
+msgid "Clear Layer Store"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:53
+msgid "Paste your API key here..."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:58
+msgid "Set New Key"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:63
+msgid "Status: Unknown"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:66
+msgid "Test Connection"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:73
+msgid "Model"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:79
+#: includes/settings/class-settings.php:443
+msgid "Change Model"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:87
+msgid "System Prompt Configuration"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:91
+msgid "Check this to override the default behavior. Uncheck to temporarily disable and return to the optimized default prompt."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:95
+msgid "Include post categories and tags in the AI georeferencing request to improve location accuracy."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:100
+#: includes/ai/settings/tab-provider.php:280
+#: includes/settings/class-settings.php:493
+msgid "Back"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:103
+#: includes/ai/settings/tab-provider.php:282
+#: includes/settings/class-settings.php:491
+#: js/build/contextSidebar.js:1
+msgid "Expand"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:104
+msgid "Validate Custom Prompt"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:105
+msgid "Clear Text"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:116
+msgid "AI Prompt Engineer Assistant"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:117
+msgid "Describe how you want the AI to behave (e.g., \"Only map cities in Brazil\" or \"Ignore street names\"). The active LLM will generate a highly optimized System Prompt for you, strictly adhering to JEO formatting rules."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:279
+msgid "Ex: I want to map only locations inside Europe. Press Shift+Enter for new line, or Enter to generate."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:283
+msgid "Shift+Enter for new line"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:288
+msgid "Georeferencing Calibration"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:292
+#: includes/ai/settings/tab-provider.php:304
+#: includes/ai/settings/tab-provider.php:313
+#: includes/ai/settings/tab-provider.php:322
+#: includes/ai/settings/tab-provider.php:331
+#: includes/ai/settings/tab-provider.php:340
+#: includes/ai/settings/tab-provider.php:349
+#: includes/ai/settings/tab-provider.php:358
+msgid "Use"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:294
+msgid "Location Granularity"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:296
+msgid "Broad (countries, regions, cities)"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:297
+msgid "Balanced (cities + neighborhoods)"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:298
+msgid "Fine (streets, landmarks, POIs)"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:306
+msgid "Minimum Confidence"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:315
+msgid "Primary Threshold"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:324
+msgid "Primary Points"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:333
+msgid "Secondary Threshold"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:342
+msgid "Secondary Points"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:351
+msgid "Prioritize Title Mentions"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:360
+msgid "Prompt Token Budget"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:366
+msgid "Higher budgets allow the AI to process longer articles but increase cost and latency."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:373
+msgid "Balanced"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:377
+msgid "No token limit set. The LLM will use as many tokens as it deems necessary to produce the result."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:384
+msgid "Output Language"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:386
+msgid "English (Optimized)"
+msgstr ""
+
+#. translators: %s: site language
+#: includes/ai/settings/tab-provider.php:387
+#, php-format
+msgid "Site Language (%s)"
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:390
+msgid "LLMs usually follow English instructions with higher precision and lower latency. We recommend English for complex rules, even if your posts are in other languages."
+msgstr ""
+
+#: includes/ai/settings/tab-provider.php:395
+#: includes/settings/class-settings.php:455
+msgid "Generate Prompt"
+msgstr ""
+
+#: includes/class-ai-adapter.php:165
+msgid "Empty response from AI."
+msgstr ""
+
+#: includes/class-ai-handler.php:48
+msgid "Warning: Deactivating JEO will permanently remove all API Keys and AI settings for security reasons. Do you want to proceed?"
+msgstr ""
+
+#: includes/class-ai-handler.php:67
+#: includes/settings/ai-logs-page.php:16
+#: includes/settings/class-settings.php:519
+msgid "Unauthorized access."
+msgstr ""
+
+#: includes/class-ai-handler.php:74
+#: includes/settings/class-settings.php:520
+msgid "Invalid file."
+msgstr ""
+
+#: includes/class-ai-handler.php:79
+#: includes/settings/class-settings.php:521
+msgid "File not found."
+msgstr ""
+
+#: includes/class-ai-handler.php:106
+msgid "Google Gemini"
+msgstr ""
+
+#: includes/class-ai-handler.php:107
+msgid "OpenAI"
+msgstr ""
+
+#: includes/class-ai-handler.php:108
+msgid "DeepSeek"
+msgstr ""
+
+#: includes/class-ai-handler.php:109
+msgid "Anthropic Claude"
+msgstr ""
+
+#: includes/class-ai-handler.php:110
+msgid "Ollama (Local/Custom)"
+msgstr ""
+
+#: includes/class-ai-handler.php:111
+msgid "Mistral AI"
+msgstr ""
+
+#: includes/class-ai-handler.php:112
+msgid "Zhipu AI (GLM)"
+msgstr ""
+
+#: includes/class-ai-handler.php:113
+msgid "HuggingFace Inference"
+msgstr ""
+
+#: includes/class-ai-handler.php:114
+msgid "Grok (xAI)"
+msgstr ""
+
+#: includes/class-ai-handler.php:115
+msgid "Cohere"
+msgstr ""
+
+#. translators: %s: AI provider name
+#: includes/class-ai-handler.php:144
+#, php-format
+msgid "No API key configured for %s. Please add it in JEO → AI Settings."
+msgstr ""
+
+#: includes/class-ai-handler.php:397
+msgid "Invalid store type."
+msgstr ""
+
+#. translators: %s: Store type name.
+#: includes/class-ai-handler.php:423
+#, php-format
+msgid "%s store cleared successfully."
+msgstr ""
+
+#: includes/class-ai-handler.php:466
+msgid "Layer store cleared successfully."
+msgstr ""
+
+#: includes/class-ai-handler.php:493
+msgid "Query is required."
+msgstr ""
+
+#: includes/class-ai-handler.php:514
+msgid "No matches found in the selected Vector Store. Try vectorizing some posts first."
+msgstr ""
+
+#: includes/class-ai-handler.php:568
+msgid "No posts available to test."
+msgstr ""
+
+#: includes/class-ai-handler.php:576
+msgid "The selected random post has no usable text content."
+msgstr ""
+
+#: includes/class-ai-handler.php:592
+msgid "The embedding provider returned an empty vector."
+msgstr ""
+
+#: includes/class-ai-handler.php:607
+msgid "Embedding created and saved to Test Store!"
+msgstr ""
+
+#: includes/class-ai-handler.php:648
+msgid "API Key or URL is required to list models."
+msgstr ""
+
+#: includes/class-ai-handler.php:681
+msgid "Model fetching not officially supported dynamically for Zhipu AI."
+msgstr ""
+
+#: includes/class-ai-handler.php:837
+msgid "Model fetching is not supported for this provider yet. Please enter the model ID manually."
+msgstr ""
+
+#: includes/class-ai-handler.php:845
+msgid "No models found. Check your API key or permissions."
+msgstr ""
+
+#: includes/class-ai-handler.php:881
+msgid "No API Key provided or found in settings."
+msgstr ""
+
+#: includes/class-ai-handler.php:891
+msgid "Invalid provider."
+msgstr ""
+
+#: includes/class-ai-handler.php:914
+msgid "API Key is valid and active!"
+msgstr ""
+
+#: includes/class-ai-handler.php:924
+msgid "The AI provider returned an unexpected response format."
+msgstr ""
+
+#: includes/class-ai-handler.php:969
+msgid "Context is required."
+msgstr ""
+
+#: includes/class-ai-handler.php:1001
+#: includes/class-ai-handler.php:1161
+#: includes/class-ai-handler.php:1249
+#: includes/class-ai-handler.php:1298
+msgid "No active AI adapter found."
+msgstr ""
+
+#: includes/class-ai-handler.php:1117
+msgid "AI failed to generate prompt."
+msgstr ""
+
+#: includes/class-ai-handler.php:1135
+msgid "Prompt is required."
+msgstr ""
+
+#: includes/class-ai-handler.php:1183
+msgid "Prompt successfully validated! The AI understood your instructions and returned a valid JSON array."
+msgstr ""
+
+#: includes/class-ai-handler.php:1187
+msgid "Validation failed: The AI did not return a valid JSON array."
+msgstr ""
+
+#: includes/class-ai-handler.php:1192
+msgid "Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects."
+msgstr ""
+
+#: includes/class-ai-handler.php:1197
+msgid "Validation failed: The AI returned an invalid is_primary value (must be boolean)."
+msgstr ""
+
+#: includes/class-ai-handler.php:1203
+msgid "Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text."
+msgstr ""
+
+#: includes/class-ai-handler.php:1262
+msgid "An unexpected error occurred while processing the AI request."
+msgstr ""
+
+#: includes/class-ai-handler.php:1331
+msgid "An unexpected error occurred while processing the AI chat request."
+msgstr ""
+
+#: includes/class-ai-handler.php:1460
+msgid "Backup created successfully!"
+msgstr ""
+
+#: includes/class-ai-handler.php:1481
+msgid "Missing filename"
+msgstr ""
+
+#: includes/class-ai-handler.php:1492
+msgid "File not found"
+msgstr ""
+
+#: includes/geocode/class-geocode-handler.php:113
+msgid "Service provided by Open Street Maps at https://nominatim.openstreetmap.org/"
+msgstr ""
+
+#: includes/geocode/class-geocode-handler.php:122
+msgid "Service provided by Mapbox (requires API Key)."
+msgstr ""
+
+#: includes/geocode/class-geocode-handler.php:239
+msgid "Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes"
+msgstr ""
+
+#: includes/layers/class-layers.php:247
+msgid "AI-suggested default style with optional filter, paint, and layout for mapbox-tileset-vector layers"
+msgstr ""
+
+#: includes/loaders.php:464
+#: includes/settings/class-settings.php:574
+msgid "Discovery"
+msgstr ""
+
+#: includes/maps/class-maps.php:190
+msgid "Per-instance paint and layout overrides for vector layers"
+msgstr ""
+
+#: includes/maps/class-maps.php:194
+msgid "Map paint properties"
+msgstr ""
+
+#: includes/maps/class-maps.php:198
+msgid "Map layout properties"
+msgstr ""
+
+#: includes/menu/class-menu.php:31
+msgid "Jeo"
+msgstr ""
+
+#: includes/menu/class-menu.php:43
+#: includes/menu/class-menu.php:44
+msgid "Welcome"
+msgstr ""
+
+#: includes/menu/class-menu.php:53
+#: includes/menu/class-menu.php:54
+msgid "Dashboard"
+msgstr ""
+
+#: includes/menu/class-menu.php:63
+#: includes/menu/class-menu.php:64
+msgid "AI (new)"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:170
+msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
+msgstr ""
+
+#: includes/minimap/class-minimap.php:391
+msgid "The AI returned an empty response. Please try again."
+msgstr ""
+
+#: includes/minimap/class-minimap.php:901
+msgid "Dark Base (Mapbox)"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:908
+msgid "Terrain Base (Mapbox)"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:915
+msgid "Satellite Base (Mapbox)"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:926
+msgid "Dark Base"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:935
+msgid "Light Base"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:944
+msgid "Satellite Base"
+msgstr ""
+
+#: includes/privacy.php:20
+msgid "JEO collects and stores geolocation metadata for posts when authors explicitly geotag content. This may include latitude, longitude, and reverse-geocoded address components (city, region, country, postcode). This data is attached to the post and is available to anyone with access to the post."
+msgstr ""
+
+#: includes/privacy.php:21
+msgid "When the \"Stories Near You\" feature is enabled, visitors may opt in to share their browser geolocation. This location is sent to the site server solely to retrieve nearby posts and is not stored."
+msgstr ""
+
+#: includes/privacy.php:22
+msgid "If AI-powered georeferencing is enabled, post titles and content may be sent to external AI providers (e.g., OpenAI, Google Gemini). AI usage logs (provider name, token counts) are stored locally as private posts and are not shared externally."
+msgstr ""
+
+#: includes/privacy.php:23
+msgid "Geocoding requests may be sent to third-party services such as Nominatim (OpenStreetMap) or Mapbox, depending on the active geocoder."
+msgstr ""
+
+#: includes/privacy.php:40
+#: includes/privacy.php:126
+msgid "JEO Geolocation Metadata"
+msgstr ""
+
+#: includes/privacy.php:106
+msgid "JEO Geolocation"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:10
+msgid "AI Cost Dashboard & Debug Logs"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:11
+msgid "Here you can view the most recent AI interactions powered by Neuron AI, along with their detailed token usage (Input/Output)."
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:31
+msgid "All AI logs have been permanently deleted."
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:75
+#: includes/settings/class-settings.php:508
+msgid "reqs"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:79
+#: includes/settings/ai-logs-page.php:104
+#: includes/settings/ai-logs-page.php:116
+#: includes/settings/class-settings.php:507
+msgid "Tokens"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:82
+#: includes/settings/class-settings.php:509
+msgid "In (Prompt):"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:83
+#: includes/settings/class-settings.php:510
+msgid "Out (Compl.):"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:94
+msgid "RAG & Vectorization Estimates"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:95
+msgid "These numbers represent the estimated tokens consumed to create and query your RAG Knowledge Base. Since embedding models do not natively report their specific usage, the system estimates the token count via mathematical approximation."
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:102
+msgid "Document Vectorization"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:107
+msgid "Tokens used inserting posts to Vector Store."
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:114
+msgid "Semantic Retrieval"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:119
+msgid "Tokens used mapping user queries to vectors."
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:147
+msgid "Search logs:"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:149
+msgid "Search Logs"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:156
+msgid "Are you sure you want to delete ALL logs?"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:157
+msgid "Clear All Logs"
+msgstr ""
+
+#. translators: %s: Number of log items.
+#: includes/settings/ai-logs-page.php:164
+#, php-format
+msgid "%s item"
+msgid_plural "%s items"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/settings/ai-logs-page.php:189
+msgid "Date/Time"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:190
+msgid "Provider"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:191
+msgid "Tokens (In / Out)"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:192
+msgid "Status / Output Preview"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:193
+#: includes/settings/class-settings.php:464
+msgid "Actions"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:198
+msgid "No logs found yet. Ensure Debug Mode is enabled and georeference a post."
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:238
+#: includes/settings/class-settings.php:511
+msgid "Total"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:239
+#: includes/settings/class-settings.php:512
+msgid "Prompt:"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:239
+#: includes/settings/class-settings.php:513
+msgid "Completion:"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:244
+msgid "View Details"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:249
+msgid "AI Interaction Details"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:254
+msgid "Timestamp"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:255
+msgid "Input Tokens"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:256
+msgid "Output Tokens"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:259
+msgid "Input (Prompt sent)"
+msgstr ""
+
+#: includes/settings/ai-logs-page.php:262
+msgid "Output (Raw Response)"
+msgstr ""
+
+#: includes/settings/class-settings.php:435
+msgid "[System] Console cleared."
+msgstr ""
+
+#: includes/settings/class-settings.php:436
+msgid "Missing Configuration"
+msgstr ""
+
+#: includes/settings/class-settings.php:437
+msgid "Checking..."
+msgstr ""
+
+#: includes/settings/class-settings.php:438
+msgid "Active"
+msgstr ""
+
+#: includes/settings/class-settings.php:439
+msgid "Invalid"
+msgstr ""
+
+#: includes/settings/class-settings.php:440
+msgid "Failed"
+msgstr ""
+
+#: includes/settings/class-settings.php:441
+msgid "Request Failed"
+msgstr ""
+
+#: includes/settings/class-settings.php:442
+msgid "Loading..."
+msgstr ""
+
+#: includes/settings/class-settings.php:444
+msgid "Select or type a model..."
+msgstr ""
+
+#: includes/settings/class-settings.php:445
+msgid " (Non-chat)"
+msgstr ""
+
+#: includes/settings/class-settings.php:446
+msgid "Please enter an API Key first."
+msgstr ""
+
+#: includes/settings/class-settings.php:447
+msgid "Failed to fetch models: "
+msgstr ""
+
+#: includes/settings/class-settings.php:448
+msgid "Unknown error"
+msgstr ""
+
+#: includes/settings/class-settings.php:449
+msgid "Error fetching models. Check your key and connection."
+msgstr ""
+
+#: includes/settings/class-settings.php:450
+msgid "Please type a description first."
+msgstr ""
+
+#: includes/settings/class-settings.php:451
+msgid "Asking AI..."
+msgstr ""
+
+#: includes/settings/class-settings.php:452
+msgid "Generating..."
+msgstr ""
+
+#: includes/settings/class-settings.php:453
+msgid "✨ Applied above."
+msgstr ""
+
+#: includes/settings/class-settings.php:454
+msgid "Error generating prompt."
+msgstr ""
+
+#: includes/settings/class-settings.php:456
+msgid "Testing..."
+msgstr ""
+
+#: includes/settings/class-settings.php:457
+msgid "✅ Valid"
+msgstr ""
+
+#: includes/settings/class-settings.php:458
+msgid "❌ Invalid"
+msgstr ""
+
+#: includes/settings/class-settings.php:459
+msgid "Validate Prompt"
+msgstr ""
+
+#: includes/settings/class-settings.php:460
+msgid "Loading backups..."
+msgstr ""
+
+#: includes/settings/class-settings.php:461
+msgid "File"
+msgstr ""
+
+#: includes/settings/class-settings.php:462
+msgid "Date"
+msgstr ""
+
+#: includes/settings/class-settings.php:463
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Size"
+msgstr ""
+
+#: includes/settings/class-settings.php:468
+msgid "Delete?"
+msgstr ""
+
+#: includes/settings/class-settings.php:469
+msgid "Vectorizing..."
+msgstr ""
+
+#: includes/settings/class-settings.php:470
+msgid "Vectorize Now"
+msgstr ""
+
+#: includes/settings/class-settings.php:471
+msgid "Clear knowledge base?"
+msgstr ""
+
+#: includes/settings/class-settings.php:472
+msgid "Fetching post and generating vector embeddings..."
+msgstr ""
+
+#: includes/settings/class-settings.php:473
+msgid "Success!"
+msgstr ""
+
+#: includes/settings/class-settings.php:474
+msgid "Post Extracted:"
+msgstr ""
+
+#: includes/settings/class-settings.php:475
+msgid "Vector Dimensions:"
+msgstr ""
+
+#: includes/settings/class-settings.php:476
+msgid "Text Snippet:"
+msgstr ""
+
+#: includes/settings/class-settings.php:477
+msgid "Vector Preview:"
+msgstr ""
+
+#: includes/settings/class-settings.php:479
+msgid "Searching..."
+msgstr ""
+
+#: includes/settings/class-settings.php:480
+msgid "Searching the knowledge base "
+msgstr ""
+
+#: includes/settings/class-settings.php:481
+msgid "No documents found. Have you run vectorization?"
+msgstr ""
+
+#: includes/settings/class-settings.php:482
+msgid "Score / Relevance"
+msgstr ""
+
+#: includes/settings/class-settings.php:483
+msgid "Metadata"
+msgstr ""
+
+#: includes/settings/class-settings.php:486
+msgid "Processing..."
+msgstr ""
+
+#: includes/settings/class-settings.php:487
+msgid "Clearing..."
+msgstr ""
+
+#: includes/settings/class-settings.php:488
+msgid "This will schedule clearing ALL AI-geolocated posts in the background. Continue?"
+msgstr ""
+
+#: includes/settings/class-settings.php:489
+msgid "ARE YOU SURE? This cannot be undone and will require full re-vectorization for these posts."
+msgstr ""
+
+#: includes/settings/class-settings.php:490
+msgid "Bulk clearing started in background."
+msgstr ""
+
+#: includes/settings/class-settings.php:492
+msgid "Collapse"
+msgstr ""
+
+#: includes/settings/class-settings.php:494
+msgid "Low"
+msgstr ""
+
+#: includes/settings/class-settings.php:495
+msgid "Fair"
+msgstr ""
+
+#: includes/settings/class-settings.php:496
+msgid "Optimal"
+msgstr ""
+
+#: includes/settings/class-settings.php:497
+msgid "API call failed"
+msgstr ""
+
+#: includes/settings/class-settings.php:500
+msgid "Delete log file?"
+msgstr ""
+
+#: includes/settings/class-settings.php:501
+msgid "No matching layers found."
+msgstr ""
+
+#: includes/settings/class-settings.php:502
+msgid " matching layers:"
+msgstr ""
+
+#: includes/settings/class-settings.php:505
+msgid "Clear layer store?"
+msgstr ""
+
+#: includes/settings/class-settings.php:506
+msgid "Please enter a post ID or search text."
+msgstr ""
+
+#: includes/settings/class-settings.php:556
+#: includes/settings/class-settings.php:557
+msgid "AI Debug Logs"
+msgstr ""
+
+#: includes/settings/class-settings.php:573
+msgid "Appearance"
+msgstr ""
+
+#: includes/settings/settings-page.php:10
+msgid "Jeo Settings"
+msgstr ""
+
+#: includes/settings/settings-page.php:38
+msgid "Enabled Post Types"
+msgstr ""
+
+#: includes/settings/settings-page.php:64
+msgid "Default map center (latitude)"
+msgstr ""
+
+#: includes/settings/settings-page.php:71
+msgid "Default map center (longitude)"
+msgstr ""
+
+#: includes/settings/settings-page.php:78
+msgid "User location precision"
+msgstr ""
+
+#: includes/settings/settings-page.php:83
+msgid "Lower = less precision, more privacy."
+msgstr ""
+
+#: includes/settings/settings-page.php:84
+msgid "https://en.wikipedia.org/wiki/Decimal_degrees#Precision"
+msgstr ""
+
+#: includes/settings/settings-page.php:84
+msgid "Learn more about decimal degree precision."
+msgstr ""
+
+#: includes/settings/settings-page.php:90
+msgid "Show Storymaps on Post Archives"
+msgstr ""
+
+#: includes/settings/settings-page.php:93
+msgid "Enable this to display relevant storymaps at the top of category and tag archive pages."
+msgstr ""
+
+#: includes/settings/settings-page.php:102
+msgid "Mapbox API Key"
+msgstr ""
+
+#: includes/settings/settings-page.php:113
+msgid "Geocoder service"
+msgstr ""
+
+#: includes/settings/settings-page.php:120
+msgid "Select the service used to translate addresses into coordinates. Mapbox requires an API Key configured in the General tab."
+msgstr ""
+
+#: includes/settings/settings-page.php:130
+msgid "Font URL"
+msgstr ""
+
+#: includes/settings/settings-page.php:136
+msgid "Font Name"
+msgstr ""
+
+#: includes/settings/settings-page.php:142
+msgid "Secondary Font URL"
+msgstr ""
+
+#: includes/settings/settings-page.php:148
+msgid "Secondary Font Name"
+msgstr ""
+
+#: includes/settings/settings-page.php:154
+msgid "Info button font size (rem)"
+msgstr ""
+
+#: includes/settings/settings-page.php:167
+msgid "Primary Color"
+msgstr ""
+
+#: includes/settings/settings-page.php:179
+msgid "Info button text color"
+msgstr ""
+
+#: includes/settings/settings-page.php:191
+msgid "Close button text color"
+msgstr ""
+
+#: includes/settings/settings-page.php:197
+msgid "Secondary Color"
+msgstr ""
+
+#: includes/settings/settings-page.php:203
+msgid "Map widgets background color"
+msgstr ""
+
+#: includes/settings/settings-page.php:209
+msgid "Map widgets text color"
+msgstr ""
+
+#: includes/settings/settings-page.php:215
+msgid "Map widgets background color (hover)"
+msgstr ""
+
+#: includes/settings/settings-page.php:224
+msgid "Map Marker Icons"
+msgstr ""
+
+#: includes/settings/settings-page.php:228
+msgid "Primary Pin URL"
+msgstr ""
+
+#: includes/settings/settings-page.php:231
+msgid "URL for the primary location marker icon. Leave empty to use the default blue marker."
+msgstr ""
+
+#: includes/settings/settings-page.php:235
+msgid "Secondary Pin URL"
+msgstr ""
+
+#: includes/settings/settings-page.php:238
+msgid "URL for the secondary location marker icon. Leave empty to use the default grey marker."
+msgstr ""
+
+#: includes/settings/settings-page.php:247
+msgid "Discovery page"
+msgstr ""
+
+#: includes/settings/settings-page.php:254
+msgid "Select a page"
+msgstr ""
+
+#: includes/settings/settings-page.php:258
+msgid "Select the page where the JEO Discovery block is located."
+msgstr ""
+
+#: includes/stories-near-you/class-stories-near-you.php:393
+msgid "Unable to load stories near you."
+msgstr ""
+
+#: includes/stories-near-you/class-stories-near-you.php:920
+msgid "No stories found near you."
+msgstr ""
+
+#: jeo.php:36
+msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Suggested Paragraphs"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Inserted"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Insert into article"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Copied!"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Copy"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Failed to generate suggestions."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Error contacting AI."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Failed to process message."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Generate new editorial suggestions based on the current post content."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Failed to clear conversation."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Restoring conversation..."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Use the AI Context Assistant to generate editorial suggestions based on your article and the site's knowledge base."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Generate Suggestions"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Thinking..."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Ask for changes or new paragraphs... (Ctrl+Enter to send)"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Send"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Retry"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "AI Context"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "AI Context Assistant"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Analyzing content…"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Searching for map layers…"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Generating map configuration…"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Map generated from post content."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Failed to suggest layers."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Request failed."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Failed to update map."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Map generated from prompt."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Failed to generate from prompt."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Map regenerated from post content."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "AI-Assisted Map"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "AI will analyze your content and suggest relevant map layers, center point, and zoom level."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Generate from post content"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Generate from prompt"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Map prompt"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Generate map"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Base Layer"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Base terrain"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Dark"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Light"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Satellite"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "None"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Geolocation Pins"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show pins"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Yes"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "AI Assistant"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Assistant"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "You"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Typing…"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Ask the AI to refine the map…"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Send message"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Regenerate"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "New prompt"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Describe the map you want…"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Generate"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Display an AI-generated contextual map with layers and geolocation pins"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Stories Near You"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Display geolocated posts sorted by proximity to the reader"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "— None —"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "All geo-enabled types"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Location Preview"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Post Card"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Layout"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Grid"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "List"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Columns"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Media position"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Top"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Left"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Right"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Behind"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Image shape"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Landscape"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Portrait"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Square"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Uncropped"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Image size"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Link featured image"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Query Settings"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Posts per page"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Post type"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Filters"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Exclude categories"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Exclude tags"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Display"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show featured image"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show category"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show date"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show excerpt"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Excerpt length"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show author"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show avatar"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Show read more link"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Read more label"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Typography & Spacing"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Type scale"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Image scale"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Column gap"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Min height (vh)"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Layer Preview"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Map Preview"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Fill Color"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Outline Color"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Line Color"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Circle Color"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Stroke Color"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Fill Opacity"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Line Opacity"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Circle Opacity"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Line Width"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Circle Radius"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Stroke Width"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Layer Style"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Styling is only supported for fill, line, and circle layer types."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "AI Default Style"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Use AI-suggested default style"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Filter:"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Paint:"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Opacity"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+#: js/build/mapsSidebar.js:1
+msgid "Style layer"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "You can also drag the marker across the map."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+#, js-format
+msgid "Points (%d)"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Expand panel"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Minimize panel"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+#, js-format
+msgid "AI Suggestions (%d selected)"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Review AI Suggestions"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Select locations to add to the map:"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Enriched via Geocoder"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "AI flagged this as primary location"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Enrich"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Context:"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Verified:"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Score too low for reliable mapping."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Discard All"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Retrying..."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Retry AI"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Add to Map"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Invalid response from AI."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "No locations found by the AI."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Error processing AI georeference."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgctxt "Artifical Intelligence"
+msgid "AI"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+#, js-format
+msgid "AI found %d locations during bulk processing."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Review Suggestions"
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Processing AI..."
+msgstr ""
+
+#: js/build/postsSidebar.js:1
+msgid "Geolocate with AI"
+msgstr ""

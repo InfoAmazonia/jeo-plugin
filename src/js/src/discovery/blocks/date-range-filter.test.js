@@ -1,6 +1,7 @@
 import {
 	createLegacyDateRangePickerValue,
 	formatDateRangeValue,
+	getDateRangeYearOptions,
 } from './date-range-filter';
 
 describe( 'createLegacyDateRangePickerValue', () => {
@@ -24,5 +25,16 @@ describe( 'formatDateRangeValue', () => {
 		expect(
 			formatDateRangeValue( startDate, endDate )
 		).toBe( '03/01/26 - 03/31/26' );
+	} );
+} );
+
+describe( 'getDateRangeYearOptions', () => {
+	it( 'returns descending years and keeps the selected year available', () => {
+		expect(
+			getDateRangeYearOptions( new Date( 1995, 0, 1 ), {
+				minYear: 2000,
+				maxYear: 2002,
+			} )
+		).toEqual( [ 2002, 2001, 2000, 1999, 1998, 1997, 1996, 1995 ] );
 	} );
 } );

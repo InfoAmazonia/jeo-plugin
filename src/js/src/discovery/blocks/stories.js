@@ -1,15 +1,241 @@
 import { Component } from '@wordpress/element';
 import Search from './search';
 import LazyImage from './lazy-image';
-import DateRangePicker from 'react-bootstrap-daterangepicker';
-import 'bootstrap-daterangepicker/daterangepicker.css';
+import LoadingSpinner from './loading-spinner';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
+import DateRangeFilter, { formatDateRangeValue } from './date-range-filter';
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
+import {
+	buildRelatedPostsGeoJson,
+	getStoryFeatureIds,
+	getStoryRelatedCoordinates,
+} from '../../shared/story-geojson';
+import { chunkRecordIds } from '../../shared/rest-records';
+import TagFilterControl from './tag-filter-control';
+import {
+	mergeUniqueStoriesById,
+	normalizeStoriesTagIds,
+	resolveStoryDateLocale,
+	resolveStoriesPage,
+} from './stories-helpers';
 
-const POSTS_PER_PAGE = 10;
+const POSTS_PER_PAGE = 30;
+const POST_COLLECTION_FIELDS =
+	'id,link,title,date_gmt,categories,featured_media,meta._related_point';
+const MEDIA_COLLECTION_FIELDS = 'id,source_url,alt_text';
+const CATEGORY_COLLECTION_FIELDS = 'id,name';
 const MEMOIZED_CATEGORIES = {};
+const MEMOIZED_MEDIA = {};
+const STORIES_SOURCE_ID = 'storiesSource';
+const HOVERED_CLUSTER_LAYER_ID = 'hover-cluster-layer';
+const HOVERED_CLUSTER_COLOR = '#b1b1b1';
+const CLUSTER_INTERACTION_LAYER_IDS = [ 'cluster-layer', 'cluster-count' ];
+
+function getHoveredStoryId( feature ) {
+	return feature?.properties?.id ?? feature?.id ?? null;
+}
+
+function getUniqueStoryIds( features = [] ) {
+	return Array.from(
+		new Set(
+			( features ?? [] )
+				.map( getHoveredStoryId )
+				.filter( ( storyId ) => storyId !== null )
+		)
+	);
+}
+
+function getHoveredFeatureIds( feature ) {
+	const storyFeatureIds = getStoryFeatureIds( feature?.properties );
+
+	if ( storyFeatureIds.length ) {
+		return storyFeatureIds;
+	}
+
+	return feature?.id ? [ feature.id ] : [];
+}
+
+function buildHoveredClusterFilter( clusterId = -1 ) {
+	return [
+		'all',
+		[ 'has', 'point_count' ],
+		[ '==', [ 'get', 'cluster_id' ], clusterId ],
+	];
+}
+
+function setStoryMapCursor( map, cursor = '' ) {
+	const canvas = map?.getCanvas?.();
+
+	if ( ! canvas ) {
+		return;
+	}
+
+	canvas.style.cursor = cursor;
+}
+
+function clearStoryMapCursor( map ) {
+	const canvas = map?.getCanvas?.();
+
+	if ( canvas?.style?.cursor === 'pointer' ) {
+		canvas.style.cursor = '';
+	}
+}
+
+function getHoveredClusterFeature( map, event ) {
+	if ( event?.features?.length ) {
+		return event.features[ 0 ];
+	}
+
+	const clusterLayers = CLUSTER_INTERACTION_LAYER_IDS.filter( ( layerId ) =>
+		map?.getLayer?.( layerId )
+	);
+
+	if ( ! clusterLayers.length ) {
+		return null;
+	}
+
+	const features = map.queryRenderedFeatures( event.point, {
+		layers: clusterLayers,
+	} );
+
+	return features?.[ 0 ] ?? null;
+}
+
+function getClusterHoverData( map, event ) {
+	const hoveredClusterFeature = getHoveredClusterFeature( map, event );
+	const clusterId = hoveredClusterFeature?.properties?.cluster_id;
+	const pointCount = hoveredClusterFeature?.properties?.point_count;
+	const clusterSource = map.getSource( STORIES_SOURCE_ID );
+
+	if ( ! clusterId || ! pointCount || ! clusterSource ) {
+		return Promise.resolve( {
+			clusterId: null,
+			postsIds: [],
+		} );
+	}
+
+	return getClusterLeaves( clusterSource, clusterId, pointCount, 0 ).then( ( clusterFeatures ) => ( {
+		clusterId,
+		postsIds: getUniqueStoryIds( clusterFeatures ),
+	} ) );
+}
+
+function normalizeClusterIds( clusterIds = [] ) {
+	return Array.from(
+		new Set(
+			( Array.isArray( clusterIds ) ? clusterIds : [ clusterIds ] )
+				.map( ( clusterId ) => Number.parseInt( clusterId, 10 ) )
+				.filter( Number.isFinite )
+		)
+	).sort( ( firstClusterId, secondClusterId ) => firstClusterId - secondClusterId );
+}
+
+function getClusterFeaturesInView( map ) {
+	const canvas = map?.getCanvas?.();
+	const clusterLayers = CLUSTER_INTERACTION_LAYER_IDS.filter( ( layerId ) =>
+		map?.getLayer?.( layerId )
+	);
+
+	if ( ! canvas || ! clusterLayers.length ) {
+		return [];
+	}
+
+	const clusterFeatures = map.queryRenderedFeatures(
+		[
+			[ 0, 0 ],
+			[ canvas.width, canvas.height ],
+		],
+		{
+			layers: clusterLayers,
+		}
+	);
+	const uniqueClusterFeatures = new Map();
+
+	clusterFeatures.forEach( ( clusterFeature ) => {
+		const clusterId = Number.parseInt(
+			clusterFeature?.properties?.cluster_id,
+			10
+		);
+
+		if ( Number.isFinite( clusterId ) && ! uniqueClusterFeatures.has( clusterId ) ) {
+			uniqueClusterFeatures.set( clusterId, clusterFeature );
+		}
+	} );
+
+	return Array.from( uniqueClusterFeatures.values() );
+}
+
+function buildStoryBounds( coordinates = [] ) {
+	if ( ! Array.isArray( coordinates ) || ! coordinates.length ) {
+		return [];
+	}
+
+	return coordinates.reduce(
+		( bounds, [ longitude, latitude ] ) => {
+			return [
+				[
+					Math.min( bounds[ 0 ][ 0 ], longitude ),
+					Math.min( bounds[ 0 ][ 1 ], latitude ),
+				],
+				[
+					Math.max( bounds[ 1 ][ 0 ], longitude ),
+					Math.max( bounds[ 1 ][ 1 ], latitude ),
+				],
+			];
+		},
+		[
+			[ coordinates[ 0 ][ 0 ], coordinates[ 0 ][ 1 ] ],
+			[ coordinates[ 0 ][ 0 ], coordinates[ 0 ][ 1 ] ],
+		]
+	);
+}
+
+function normalizeRecordIds( ids = [] ) {
+	return Array.from(
+		new Set(
+			ids
+				.map( ( id ) => Number.parseInt( id, 10 ) )
+				.filter( ( id ) => Number.isFinite( id ) && id > 0 )
+		)
+	);
+}
+
+function getStoryMediaIds( stories = [] ) {
+	return normalizeRecordIds(
+		stories.map( ( story ) => story?.featured_media )
+	);
+}
+
+function getStoryCategoryIds( stories = [] ) {
+	return normalizeRecordIds(
+		stories.flatMap( ( story ) =>
+			Array.isArray( story?.categories ) ? story.categories : []
+		)
+	).filter( ( categoryId ) => categoryId !== 1 );
+}
+
+function appendLanguageParam( url ) {
+	if ( 'languageParams' in window && window.languageParams?.currentLang ) {
+		url.searchParams.append( 'lang', window.languageParams.currentLang );
+	}
+}
+
+function appendGeolocatedPostsQuery( url ) {
+	url.searchParams.append( 'meta_query[0][key]', '_related_point' );
+	url.searchParams.append( 'meta_query[0][compare]', 'EXISTS' );
+}
+
+function mapRecordsById( records = [] ) {
+	return new Map(
+		records
+			.filter( ( record ) =>
+				Number.isFinite( Number.parseInt( record?.id, 10 ) )
+			)
+			.map( ( record ) => [ Number.parseInt( record.id, 10 ), record ] )
+	);
+}
 
 class Stories extends Component {
 	constructor( props ) {
@@ -22,12 +248,37 @@ class Stories extends Component {
 			dateRangeObject: { after: new Date(), before: new Date() },
 			hoveredPostId: null,
 			hoveredClusterPostsId: [],
+			selectedTagLabel: '',
 		};
+		this.hoveredFeatureIds = [];
+		this.hoveredClusterIds = [];
+		this.hoveredClusterKey = null;
+		this.listHoveredStoryId = null;
+		this.storiesListRef = null;
+		this.storyCardElements = new Map();
+		this.hoverSuppressedUntil = 0;
 
 		// Story bindings
 		this.storyHovered = this.storyHovered.bind( this );
 		this.storyUnhover = this.storyUnhover.bind( this );
+		this.viewStoryInMap = this.viewStoryInMap.bind( this );
+		this.markListScrolling = this.markListScrolling.bind( this );
+		this.clearHoveredFeatureState = this.clearHoveredFeatureState.bind( this );
+		this.clearHoveredClusterState = this.clearHoveredClusterState.bind( this );
+		this.replaceHoveredFeatureState = this.replaceHoveredFeatureState.bind( this );
+		this.replaceHoveredClusterState = this.replaceHoveredClusterState.bind( this );
+		this.findStoryClusterIds = this.findStoryClusterIds.bind( this );
+		this.syncHoveredStoryClusterState =
+			this.syncHoveredStoryClusterState.bind( this );
+		this.registerStoriesList = this.registerStoriesList.bind( this );
+		this.registerStoryCard = this.registerStoryCard.bind( this );
+		this.scrollStoryIntoView = this.scrollStoryIntoView.bind( this );
 		this.updateStories = this.updateStories.bind( this );
+		this.fetchRecordsByIds = this.fetchRecordsByIds.bind( this );
+		this.fetchMediaByIds = this.fetchMediaByIds.bind( this );
+		this.fetchCategoriesByIds = this.fetchCategoriesByIds.bind( this );
+		this.enrichStoriesWithMetadata =
+			this.enrichStoriesWithMetadata.bind( this );
 
 		// Filters bind
 		// DateRangePicker
@@ -35,6 +286,8 @@ class Stories extends Component {
 		this.dateRangePickerCancel = this.dateRangePickerCancel.bind( this );
 
 		this.handleTagChange = this.handleTagChange.bind( this );
+		this.setSelectedTagLabel = this.setSelectedTagLabel.bind( this );
+		this.clearStoryFilters = this.clearStoryFilters.bind( this );
 		this.localeInfo = {
 			"format": __("MM/DD/YYYY", "jeo"),
 			"separator": __(" - ", "jeo"),
@@ -72,22 +325,10 @@ class Stories extends Component {
 		const map = this.props.map;
 
 		if ( this.props.firstLoad && this.props.useStories ) {
-			// Future optimization - fetching all categories is faster than getting them one by one
-			// this.fetchCategories().then( categories => {
-			// 	// console.log(categories);
-			// 	this.props.updateState( {
-			// 		categories
-			// 	} )
-			// } );
-
-			this.fetchTags().then( ( tags ) => {
-				// console.log(tags);
-				this.props.updateState( {
-					tags,
-				} );
-			} );
-
-			this.fetchStories( { page: 1 } ).then( ( stories ) => {
+			this.fetchStories( {
+				page: 1,
+				...this.props.queryParams,
+			} ).then( ( stories ) => {
 				const sourceData = this.buildPostsGeoJson( stories );
 				map.addSource( 'storiesSource', {
 					type: 'geojson',
@@ -154,6 +395,20 @@ class Stories extends Component {
 								},
 							} );
 
+							map.addLayer( {
+								id: HOVERED_CLUSTER_LAYER_ID,
+								type: 'circle',
+								source: 'storiesSource',
+								filter: buildHoveredClusterFilter(),
+								paint: {
+									'circle-color': HOVERED_CLUSTER_COLOR,
+									'circle-radius': 20,
+									'circle-stroke-color': HOVERED_CLUSTER_COLOR,
+									'circle-stroke-opacity': 0.4,
+									'circle-stroke-width': 9,
+								},
+							} );
+
 							// cluster number layer
 							map.addLayer( {
 								id: 'cluster-count',
@@ -188,46 +443,91 @@ class Stories extends Component {
 
 		map.on('mousemove', 'unclustered-points', (e) => {
 			if ( e.features.length > 0 && this.isStoriesTabActive() ) {
+				setStoryMapCursor( map, 'pointer' );
 				const hoveredFeature = e.features[0];
+				const hoveredPostId = getHoveredStoryId( hoveredFeature );
 				this.replaceHoveredFeatureState( getHoveredFeatureIds( hoveredFeature ) );
-				this.setState( {
-					hoveredPostId: getHoveredStoryId( hoveredFeature ),
-				} );
+
+				if ( this.state.hoveredPostId !== hoveredPostId ) {
+					this.setState( {
+						hoveredPostId,
+					} );
+				}
+
+				return;
 			}
+
+			clearStoryMapCursor( map );
 		});
 
 		map.on('mouseleave', 'unclustered-points', () => {
+			clearStoryMapCursor( map );
+
 			if ( this.isStoriesTabActive() ) {
 				this.clearHoveredFeatureState();
 				this.setState( {
 					hoveredPostId: null,
-				})
+				} );
 			}
 		});
 
 		const handleClusterMouseMove = ( event ) => {
 			if ( ! this.isStoriesTabActive() ) {
+				clearStoryMapCursor( map );
 				return;
 			}
 
-			getClusterHoverData( map, event ).then( ( { clusterId, postsIds } ) => {
+			setStoryMapCursor( map, 'pointer' );
+
+			const hoveredClusterFeature = getHoveredClusterFeature( map, event );
+			const clusterId = hoveredClusterFeature?.properties?.cluster_id;
+			const pointCount = hoveredClusterFeature?.properties?.point_count;
+
+			if ( ! clusterId || ! pointCount ) {
+				this.hoveredClusterKey = null;
+				this.clearHoveredClusterState();
+
+				if ( this.state.hoveredClusterPostsId.length ) {
+					this.setState( {
+						hoveredClusterPostsId: [],
+					} );
+				}
+
+				return;
+			}
+
+			const hoveredClusterKey = `${ clusterId }:${ pointCount }`;
+
+			if ( this.hoveredClusterKey === hoveredClusterKey ) {
+				return;
+			}
+
+			this.hoveredClusterKey = hoveredClusterKey;
+
+			getClusterHoverData( map, {
+				...event,
+				features: hoveredClusterFeature ? [ hoveredClusterFeature ] : [],
+			} ).then( ( { clusterId: nextClusterId, postsIds } ) => {
 				if ( ! this.isStoriesTabActive() ) {
+					clearStoryMapCursor( map );
 					return;
 				}
 
-				this.replaceHoveredClusterState( clusterId );
+				this.replaceHoveredClusterState( nextClusterId );
 				this.setState( {
-					...this.state,
-					hoveredClusterPostsId: postsIds
-				} )
-			})
+					hoveredClusterPostsId: postsIds,
+				} );
+			} );
 		};
 
-		map.on('mouseleave', 'cluster-0', () => {
+		const handleClusterMouseLeave = () => {
+			clearStoryMapCursor( map );
+			this.hoveredClusterKey = null;
+			this.clearHoveredClusterState();
 			this.setState( {
 				hoveredClusterPostsId: [],
 			} );
-		} );
+		};
 
 		[ 'cluster-layer', 'cluster-count' ].forEach( ( layerId ) => {
 			map.on( 'mousemove', layerId, handleClusterMouseMove );
@@ -236,6 +536,7 @@ class Stories extends Component {
 	}
 
 	componentWillUnmount() {
+		clearStoryMapCursor( this.props.map );
 		this.clearHoveredFeatureState();
 		this.clearHoveredClusterState();
 	}
@@ -246,6 +547,7 @@ class Stories extends Component {
 
 	componentDidUpdate( prevProps, prevState ) {
 		if ( ! this.isStoriesTabActive() ) {
+			clearStoryMapCursor( this.props.map );
 			return;
 		}
 
@@ -325,6 +627,7 @@ class Stories extends Component {
 
 	clearHoveredClusterState() {
 		const map = this.props.map;
+		this.hoveredClusterKey = null;
 
 		if ( ! map?.getLayer?.( HOVERED_CLUSTER_LAYER_ID ) ) {
 			this.hoveredClusterIds = [];
@@ -485,33 +788,102 @@ class Stories extends Component {
 	}
 
 	buildPostsGeoJson( stories ) {
-		const finalFeatures = {
-			type: 'FeatureCollection',
-			features: [],
-		};
+		return buildRelatedPostsGeoJson( stories );
+	}
 
-		stories.map( ( story ) => {
-			const storyRelatedPoints = story.meta._related_point ?? [];
-			const storyPoints = storyRelatedPoints.map( ( point ) => {
-				return [ point._geocode_lon, point._geocode_lat ];
-			} );
+	fetchRecordsByIds( {
+		baseUrl,
+		ids = [],
+		fields = '',
+		cache = {},
+		includeLanguage = false,
+	} ) {
+		const normalizedIds = normalizeRecordIds( ids );
+		const missingIds = normalizedIds.filter( ( id ) => ! cache[ id ] );
 
-			finalFeatures.features.push(
-				...storyPoints.map( ( point ) => {
-					return {
-						id: story.id,
-						type: 'Feature',
-						properties: story,
-						geometry: {
-							type: 'Point',
-							coordinates: point,
-						},
-					};
-				} )
+		if ( ! missingIds.length ) {
+			return Promise.resolve(
+				normalizedIds.map( ( id ) => cache[ id ] ).filter( Boolean )
 			);
+		}
+
+		const requests = chunkRecordIds( missingIds ).map( ( chunk ) => {
+			const recordsUrl = new URL( baseUrl );
+			recordsUrl.searchParams.append( 'include', chunk.join( ',' ) );
+			recordsUrl.searchParams.append( 'orderby', 'include' );
+			recordsUrl.searchParams.append( 'per_page', chunk.length );
+
+			if ( fields ) {
+				recordsUrl.searchParams.append( '_fields', fields );
+			}
+
+			if ( includeLanguage ) {
+				appendLanguageParam( recordsUrl );
+			}
+
+			return fetch( recordsUrl )
+				.then( ( response ) => response.json() )
+				.then( ( records ) => ( Array.isArray( records ) ? records : [] ) );
 		} );
 
-		return finalFeatures;
+		return Promise.all( requests ).then( ( chunkedRecords ) => {
+			chunkedRecords.flat().forEach( ( record ) => {
+				const recordId = Number.parseInt( record?.id, 10 );
+
+				if ( Number.isFinite( recordId ) ) {
+					cache[ recordId ] = record;
+				}
+			} );
+
+			return normalizedIds.map( ( id ) => cache[ id ] ).filter( Boolean );
+		} );
+	}
+
+	fetchMediaByIds( mediaIds = [] ) {
+		return this.fetchRecordsByIds( {
+			baseUrl: jeoMapVars.jsonUrl + 'media/',
+			ids: mediaIds,
+			fields: MEDIA_COLLECTION_FIELDS,
+			cache: MEMOIZED_MEDIA,
+		} );
+	}
+
+	fetchCategoriesByIds( categoryIds = [] ) {
+		return this.fetchRecordsByIds( {
+			baseUrl: jeoMapVars.jsonUrl + 'categories/',
+			ids: categoryIds,
+			fields: CATEGORY_COLLECTION_FIELDS,
+			cache: MEMOIZED_CATEGORIES,
+			includeLanguage: true,
+		} );
+	}
+
+	enrichStoriesWithMetadata( stories = [] ) {
+		return Promise.all( [
+			this.fetchMediaByIds( getStoryMediaIds( stories ) ).catch( () => [] ),
+			this.fetchCategoriesByIds( getStoryCategoryIds( stories ) ).catch(
+				() => []
+			),
+		] ).then( ( [ mediaRecords, categoryRecords ] ) => {
+			const mediaById = mapRecordsById( mediaRecords );
+			const categoryById = mapRecordsById( categoryRecords );
+
+			return stories.map( ( story ) => {
+				const featuredMediaId = Number.parseInt( story?.featured_media, 10 );
+				const queriedFeaturedImage = mediaById.get( featuredMediaId );
+				const queriedCategories = ( story?.categories ?? [] )
+					.map( ( categoryId ) =>
+						categoryById.get( Number.parseInt( categoryId, 10 ) )
+					)
+					.filter( Boolean );
+
+				return {
+					...story,
+					...( queriedFeaturedImage ? { queriedFeaturedImage } : {} ),
+					queriedCategories,
+				};
+			} );
+		} );
 	}
 
 	fetchStories( params = {} ) {
@@ -521,19 +893,11 @@ class Stories extends Component {
 		params = { ...defaultParams, ...params };
 
 		// Use constant POSTS_PER_PAGE if param per_page is not set
-		if ( ! params.hasOwnProperty( 'per_page' ) )
+		if ( ! Object.hasOwn( params, 'per_page' ) )
 			params.per_page = POSTS_PER_PAGE;
 
 		// Set or use param page
-		if ( ! params.hasOwnProperty( 'page' ) ) {
-			params.page = pageInfo.currentPage;
-
-			if ( ! ( params.page > pageInfo.totalPages ) ) {
-				params.page++;
-			}
-		} else {
-			params.page = 1;
-		}
+		params.page = resolveStoriesPage( params, pageInfo );
 
 		// Update storiesLoaded to display loading & set current page to param
 		this.props.updateState( {
@@ -542,7 +906,7 @@ class Stories extends Component {
 		} );
 
 		// Update using cumulative param for stories - infinite scrolling
-		if ( params.hasOwnProperty( 'cumulative' ) && params.cumulative ) {
+		if ( Object.hasOwn( params, 'cumulative' ) && params.cumulative ) {
 			// Cancel request if page exceed the max page;
 			if ( params.page > pageInfo.totalPages ) {
 				return Promise.reject();
@@ -550,13 +914,15 @@ class Stories extends Component {
 		}
 
 		const postsUrl = new URL( jeoMapVars.jsonUrl + 'posts/' );
-		Object.keys( params ).forEach( ( key ) =>
-			postsUrl.searchParams.append( key, params[ key ] )
-		);
-
-		if("languageParams" in window){
-			postsUrl.searchParams.append( 'lang', languageParams.currentLang );
+		for ( const key of Object.keys( params ) ) {
+			if ( key !== 'cumulative' && params[ key ] ) {
+				postsUrl.searchParams.append( key, params[ key ] )
+			}
 		}
+
+		postsUrl.searchParams.append( '_fields', POST_COLLECTION_FIELDS );
+		appendGeolocatedPostsQuery( postsUrl );
+		appendLanguageParam( postsUrl );
 
 		return fetch( postsUrl )
 			.then( ( response ) => {
@@ -571,105 +937,26 @@ class Stories extends Component {
 			.then(
 				( stories ) => {
 					const geolocatedStories = stories.filter(
-						( story ) => story.meta._related_point.length > 0
+						( story ) =>
+							Array.isArray( story?.meta?._related_point ) &&
+							story.meta._related_point.length > 0
 					);
-
-					// console.log("stories", stories);
 
 					let storiesCumulative = params.cumulative
-						? [ ...this.props.stories, ...geolocatedStories ]
+						? mergeUniqueStoriesById(
+							this.props.stories,
+							geolocatedStories
+						)
 						: geolocatedStories;
 
-					// Fetch medias
-					const storiesMediasPromises = geolocatedStories.map(
-						async ( story ) => {
-							const mediaApiUrl = new URL(
-								jeoMapVars.jsonUrl + 'media/' + story.featured_media
-							);
-
-							// If featured media is not set
-							if ( ! story.featured_media ) {
-								return;
-							}
-
-							return fetch( mediaApiUrl )
-								.then( ( data ) => data.json() )
-								.then( ( media ) => {
-									story.queriedFeaturedImage = media;
-									return media;
-								} );
-						}
-					);
-
-					// Fetch categories
-					const storiesCategoriesPromises = geolocatedStories.map(
-						( story ) => {
-							// console.log(MEMOIZED_CATEGORIES);
-							return Promise.all(
-								story.categories.map( async ( category ) => {
-									const categoriesApiUrl = new URL(
-										jeoMapVars.jsonUrl + 'categories/' + category
-									);
-
-									// If category is not set (remove Uncategorized)
-									if( !category || category === 1 ) {
-										return;
-									}
-
-									const categoryId = category;
-
-									if(MEMOIZED_CATEGORIES[categoryId]) {
-										category = await MEMOIZED_CATEGORIES[categoryId];
-
-										if (
-											story.queriedCategories &&
-											story.queriedCategories.length
-										) {
-											story.queriedCategories = [
-												...story.queriedCategories,
-												category,
-											];
-										} else {
-											story.queriedCategories = [ category ];
-										}
-
-										return MEMOIZED_CATEGORIES[categoryId];
-									}
-
-									const categoryPromisse = fetch( categoriesApiUrl )
-										.then( ( data ) => data.json() )
-										.then( ( category ) => {
-											if (
-												story.queriedCategories &&
-												story.queriedCategories.length
-											) {
-												story.queriedCategories = [
-													...story.queriedCategories,
-													category,
-												];
-											} else {
-												story.queriedCategories = [ category ];
-											}
-
-											return category;
-									} );
-
-									MEMOIZED_CATEGORIES[categoryId] = categoryPromisse;
-									return categoryPromisse;
-								} )
-							);
-						}
-					);
-
-					// When its all resolved, update state
-					return Promise.all( storiesMediasPromises ).then( () =>
-						// Use reduce stategy to force series processing to make memoization possible
-						storiesCategoriesPromises.reduce(
-							(accumulator, currentValue) =>
-								accumulator.then(_ => currentValue),
-							Promise.resolve()
-						).then( () => {
-							storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
+					return this.enrichStoriesWithMetadata( geolocatedStories ).then(
+						( enrichedStories ) => {
+							storiesCumulative = params.cumulative
+								? mergeUniqueStoriesById(
+									this.props.stories,
+									enrichedStories
+								)
+								: enrichedStories;
 
 							const reusableParams = {...params};
 
@@ -685,27 +972,7 @@ class Stories extends Component {
 							} );
 
 							return Promise.resolve( storiesCumulative );
-						})
-
-						// Promise.all( storiesCategoriesPromises ).then( () => {
-						// 	storiesCumulative = params.cumulative? [ ...this.props.stories, ...geolocatedStories ] : geolocatedStories;
-
-						// 	const reusableParams = {...params};
-
-						// 	// These params are not reusable, they refer directly to a episodic state
-						// 	delete reusableParams.cumulative;
-						// 	delete reusableParams.page;
-						// 	delete reusableParams.per_page;
-
-						// 	this.props.updateState( {
-						// 		storiesLoaded: true,
-						// 		stories: storiesCumulative,
-						// 		queryParams: reusableParams,
-						// 	} );
-
-						// 	return Promise.resolve( storiesCumulative );
-						// } )
-
+						}
 					);
 				},
 				( error ) => {
@@ -717,36 +984,9 @@ class Stories extends Component {
 			);
 	}
 
-	fetchCategories() {
-		const categoriesApiUrl = new URL( jeoMapVars.jsonUrl + 'categories/' );
-
-		return fetch( categoriesApiUrl )
-			.then( ( data ) => data.json() )
-			.then( ( categories ) => {
-				return categories;
-			} );
-	}
-
-	fetchTags() {
-		const tagsApiUrl = new URL( jeoMapVars.jsonUrl + 'tags/' );
-		tagsApiUrl.searchParams.set('custom_per_page', '1000');
-		tagsApiUrl.searchParams.set('orderby', 'count');
-		tagsApiUrl.searchParams.set('order', 'desc');
-
-		if("languageParams" in window){
-			tagsApiUrl.searchParams.append( 'lang', languageParams.currentLang );
-		}
-
-		return fetch( tagsApiUrl )
-			.then( ( data ) => data.json() )
-			.then( ( tags ) => {
-				return tags;
-			} );
-	}
-
 	updateStories( params ) {
 		const map = this.props.map;
-		const prevQueryParams = this.props.queryParams;
+		const prevQueryParams = { ...this.props.queryParams };
 
 		if(params.clearDate) {
 			delete prevQueryParams.after;
@@ -754,12 +994,17 @@ class Stories extends Component {
 			params.clearDate = false;
 		}
 
+		if ( params.clearTag ) {
+			delete prevQueryParams.tags;
+			delete params.clearTag;
+		}
+
 		params = {
 			...prevQueryParams,
 			...params,
 		}
 
-		this.fetchStories( { ...params } )
+		return this.fetchStories( { ...params } )
 			.then( ( stories ) => {
 				const sourceData = this.buildPostsGeoJson( stories );
 				map.getSource( 'storiesSource' ).setData( sourceData );
@@ -772,27 +1017,100 @@ class Stories extends Component {
 	}
 
 	storyHovered( story ) {
-		this.props.storyHovered( story );
+		if ( Date.now() < this.hoverSuppressedUntil || ! this.props.storiesLoaded ) {
+			return;
+		}
+
+		if (
+			this.listHoveredStoryId === story.id &&
+			this.state.hoveredPostId === story.id
+		) {
+			return;
+		}
+
+		const coordinates = getStoryRelatedCoordinates( story );
+		const featureIds = getStoryFeatureIds( story );
+
+		if ( ! coordinates.length ) {
+			return;
+		}
+
+		this.listHoveredStoryId = story.id;
+		this.setState( {
+			hoveredPostId: story.id,
+			hoveredClusterPostsId: [],
+		} );
+		this.replaceHoveredFeatureState( featureIds );
+		this.clearHoveredClusterState();
+
+		window.requestAnimationFrame( () => {
+			if ( this.listHoveredStoryId === story.id ) {
+				this.syncHoveredStoryClusterState( story );
+			}
+		} );
+	}
+
+	viewStoryInMap( story ) {
+		this.storyHovered( story );
+
+		const map = this.props.map;
+		const coordinates = getStoryRelatedCoordinates( story );
+
+		if ( ! coordinates.length ) {
+			return;
+		}
+
+		if ( coordinates.length === 1 ) {
+			map.flyTo( {
+				center: {
+					lng: coordinates[ 0 ][ 0 ],
+					lat: coordinates[ 0 ][ 1 ],
+				},
+				zoom: 7,
+			} );
+		} else {
+			map.fitBounds( buildStoryBounds( coordinates ), { padding: 100 } );
+		}
+
+		window.requestAnimationFrame( () => {
+			if ( this.listHoveredStoryId === story.id ) {
+				this.syncHoveredStoryClusterState( story );
+			}
+		} );
+
+		map.once( 'idle', () => {
+			if ( this.listHoveredStoryId === story.id ) {
+				this.syncHoveredStoryClusterState( story );
+			}
+		} );
 	}
 
 	storyUnhover( story ) {
-		this.props.storyUnhover( story );
+		if ( this.listHoveredStoryId !== story.id ) {
+			return;
+		}
+
+		this.listHoveredStoryId = null;
+		this.clearHoveredFeatureState();
+		this.clearHoveredClusterState();
+		this.setState( {
+			hoveredPostId: null,
+			hoveredClusterPostsId: [],
+		} );
 	}
 
 	dateRangePickerApply( ev, picker ) {
-		const dateOptions = [ undefined, { year:"2-digit", month:"2-digit", day:"2-digit" } ];
-
 		this.props.updateState( {
-			dateRangeInputValue:
-				picker.startDate.toDate().toLocaleDateString( ...dateOptions ) +
-				' - ' +
-				picker.endDate.toDate().toLocaleDateString( ...dateOptions ),
+			dateRangeInputValue: formatDateRangeValue(
+				picker.startDate.toDate(),
+				picker.endDate.toDate()
+			),
 		} );
 
 		this.updateStories( { cumulative: false, after: picker.startDate.toISOString(), before: picker.endDate.toISOString(), page: 1 } );
 	}
 
-	dateRangePickerCancel(ev, picker) {
+	dateRangePickerCancel() {
 		this.props.updateState( {
 			dateRangeInputValue: '',
 		} );
@@ -800,39 +1118,127 @@ class Stories extends Component {
 		this.updateStories( { cumulative: false, page: 1, clearDate: true } );
 	}
 
-	handleTagChange( event ) {
-		const value = event.target.value;
-		this.props.updateState( {
-			selectedTag: value,
+	handleTagChange( value, label = '' ) {
+		const tagIds = normalizeStoriesTagIds( value );
+		const hasValidTags = tagIds.length > 0;
+
+		this.setState( {
+			selectedTagLabel: hasValidTags ? label : '',
 		} );
-		this.updateStories( { cumulative: false, tags: value, page: 1 } );
+
+		this.props.updateState( {
+			selectedTag: tagIds,
+		} );
+
+		if ( ! hasValidTags ) {
+			this.updateStories( { cumulative: false, page: 1, clearTag: true } );
+			return;
+		}
+
+		this.updateStories( { cumulative: false, tags: tagIds.join( ',' ), page: 1 } );
+	}
+
+	setSelectedTagLabel( label ) {
+		if ( label !== this.state.selectedTagLabel ) {
+			this.setState( { selectedTagLabel: label } );
+		}
+	}
+
+	clearStoryFilters() {
+		this.setState( { selectedTagLabel: '' } );
+		this.props.updateState( {
+			dateRangeInputValue: '',
+			selectedTag: [],
+		} );
+		this.updateStories( {
+			search: '',
+			cumulative: false,
+			page: 1,
+			clearDate: true,
+			clearTag: true,
+		} );
 	}
 
 	render() {
-		const loading = ! this.props.storiesLoaded ? (
-			<svg
-				aria-hidden="true"
-				focusable="false"
-				data-prefix="fas"
-				data-icon="spinner"
-				role="img"
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 512 512"
-				className="svg-inline--fa fa-spinner fa-w-16 fa-3x"
+		const queryParams = this.props.queryParams || {};
+		const selectedTagIds = normalizeStoriesTagIds( this.props.selectedTag );
+		const currentPage =
+			Number.parseInt( this.props.pageInfo?.currentPage, 10 ) || 1;
+		const isLoadingMoreStories =
+			! this.props.storiesLoaded &&
+			this.props.stories.length > 0 &&
+			currentPage > 1;
+		const hasActiveFilters = Boolean(
+			queryParams.search ||
+			queryParams.after ||
+			queryParams.before ||
+			selectedTagIds.length > 0
+		);
+		const activeFilters = [];
+		const hoveredClusterPostsSet = new Set( this.state.hoveredClusterPostsId );
+		const storiesCountLabel = sprintf(
+			/* translators: %d is the number of stories currently displayed. */
+			__( 'Displayed stories: %d', 'jeo' ),
+			this.props.stories.length
+		);
+
+		if ( queryParams.search ) {
+			activeFilters.push(
+				/* translators: %s is the active story search query. */
+				sprintf( __( 'Search story: %s', 'jeo' ), queryParams.search )
+			);
+		}
+
+		if ( this.props.dateRangeInputValue ) {
+			activeFilters.push(
+				/* translators: %s is the active story date range. */
+				sprintf( __( 'Date range: %s', 'jeo' ), this.props.dateRangeInputValue )
+			);
+		}
+
+		if ( this.state.selectedTagLabel ) {
+			activeFilters.push(
+				/* translators: %s is the list of active story tags. */
+				sprintf( __( 'Tags: %s', 'jeo' ), this.state.selectedTagLabel )
+			);
+		}
+
+		const loading = ! this.props.storiesLoaded && ! isLoadingMoreStories ? (
+			<div
+				className="stories-status stories-status--loading"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
 			>
-				<path
-					fill="currentColor"
-					d="M304 48c0 26.51-21.49 48-48 48s-48-21.49-48-48 21.49-48 48-48 48 21.49 48 48zm-48 368c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zm208-208c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.49-48-48-48zM96 256c0-26.51-21.49-48-48-48S0 229.49 0 256s21.49 48 48 48 48-21.49 48-48zm12.922 99.078c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.491-48-48-48zm294.156 0c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48c0-26.509-21.49-48-48-48zM108.922 60.922c-26.51 0-48 21.49-48 48s21.49 48 48 48 48-21.49 48-48-21.491-48-48-48z"
-				></path>
-			</svg>
+				<LoadingSpinner />
+			</div>
+		) : null;
+		const loadingMore = isLoadingMoreStories ? (
+			<div
+				className="stories-status stories-status--loading stories-status--loading-more"
+				role="status"
+				aria-live="polite"
+				aria-label={ __( 'Loading…', 'jeo' ) }
+			>
+				<LoadingSpinner />
+			</div>
+		) : null;
+		const emptyMessage = this.props.storiesLoaded && ! this.props.stories.length ? (
+			<div className="stories-status stories-status--empty" role="status">
+				{ hasActiveFilters
+					? __( 'No stories found for the current filters.', 'jeo' )
+					: __( 'No stories available.', 'jeo' ) }
+			</div>
 		) : null;
 
 		return (
 			<div className="stories-tab" style={ this.props.style }>
 				<Search
 					searchPlaceholder={ __("Search story", "jeo") }
+					searchButtonLabel={ __( 'Search story', 'jeo' ) }
 					update={ this.updateStories }
 					searchField={ this.props.queryParams.search?? "" }
+					disabled={ ! this.props.storiesLoaded }
 				/>
 
 				<button
@@ -848,10 +1254,6 @@ class Stories extends Component {
 					{ this.state.showFilters ? (
 						<svg
 							aria-hidden="true"
-							focusable="false"
-							data-prefix="fas"
-							data-icon="times-circle"
-							role="img"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 512 512"
 						>
@@ -863,10 +1265,6 @@ class Stories extends Component {
 					) : (
 						<svg
 							aria-hidden="true"
-							focusable="false"
-							data-prefix="fas"
-							data-icon="plus-circle"
-							role="img"
 							xmlns="http://www.w3.org/2000/svg"
 							viewBox="0 0 512 512"
 						>
@@ -883,36 +1281,77 @@ class Stories extends Component {
 				</button>
 				{ this.state.showFilters && (
 					<div className="filters">
-						<DateRangePicker initialSettings={ { autoUpdateInput: false, locale: this.localeInfo } } onApply={ this.dateRangePickerApply } onCancel={ this.dateRangePickerCancel }>
-							<input
-								placeholder={ __( 'Date range', 'jeo' ) }
-								readOnly="true"
-								value={ this.props.dateRangeInputValue }
-							></input>
-						</DateRangePicker>
-						<select name="tags" onChange={ this.handleTagChange }>
-							<option value="">{ __( 'Tags', 'jeo' ) }</option>
-							{ this.props.tags.map( ( tag ) => (
-								<option value={ tag.id } key={ tag.id } selected={ this.props.selectedTag == tag.id? "selected" : "" }>
-									{ ' ' }
-									{ tag.name }{ ' ' }
-								</option>
-							) ) }
-						</select>
+						<DateRangeFilter
+							placeholder={ __( 'Date range', 'jeo' ) }
+							value={ this.props.dateRangeInputValue }
+							startDate={ this.props.queryParams.after }
+							endDate={ this.props.queryParams.before }
+							localeInfo={ this.localeInfo }
+							onApply={ this.dateRangePickerApply }
+							onCancel={ this.dateRangePickerCancel }
+						/>
+							<TagFilterControl
+								value={ selectedTagIds }
+								onChange={ this.handleTagChange }
+								onSelectedLabelChange={ this.setSelectedTagLabel }
+							/>
 
 						<div></div>
 					</div>
 				) }
+				<div className="stories-results-summary" role="status" aria-live="polite">
+					<span>
+						{ this.props.storiesLoaded || isLoadingMoreStories
+							? storiesCountLabel
+							: __( 'Updating stories…', 'jeo' ) }
+					</span>
+					{ hasActiveFilters ? (
+						<button type="button" onClick={ this.clearStoryFilters }>
+							{ __( 'Clear', 'jeo' ) }
+						</button>
+					) : null }
+				</div>
+				{ activeFilters.length ? (
+					<div
+						className="stories-active-filters"
+						aria-label={ __( 'Active filters', 'jeo' ) }
+					>
+						{ activeFilters.map( ( filterLabel ) => (
+							<span className="stories-active-filters__item" key={ filterLabel }>
+								{ filterLabel }
+							</span>
+						) ) }
+					</div>
+				) : null }
+				{ loading }
 
-				<div className="stories">
+				<div
+					className="stories"
+					ref={ this.registerStoriesList }
+					onWheelCapture={ this.markListScrolling }
+					onTouchMove={ this.markListScrolling }
+					aria-busy={ ! this.props.storiesLoaded }
+				>
 					{ this.props.stories.map( ( story, index ) => {
 						return (
-							<Storie className={ (story.id === this.state.hoveredPostId || this.state.hoveredClusterPostsId.includes(story.id) ? 'active' : '') } story={ story } key={ index } map={ this.props.map } />
+							<Storie
+								cardRef={ ( element ) =>
+									this.registerStoryCard( story.id, element )
+								}
+								className={ (story.id === this.state.hoveredPostId || hoveredClusterPostsSet.has(story.id) ? 'active' : '') }
+								onHover={ () => this.storyHovered( story ) }
+								onUnhover={ () => this.storyUnhover( story ) }
+								onViewInMap={ () => this.viewStoryInMap( story ) }
+								story={ story }
+								key={ story.id }
+								map={ this.props.map }
+							/>
 						);
 					} ) }
+					{ loadingMore }
 				</div>
 
-				{ loading }
+				{ emptyMessage }
 			</div>
 		);
 	}
@@ -921,56 +1360,10 @@ class Stories extends Component {
 export default Stories;
 
 class Storie extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.storyHovered = this.storyHovered.bind( this );
-		this.storyUnhover = this.storyUnhover.bind( this );
-	}
-
-	componentDidMount() {}
-
-	storyHovered() {
-		const map = this.props.map;
-		const story = this.props.story;
-		const average = { lat: 0, lng: 0 };
-		const bounds = [];
-
-		story.meta._related_point.forEach( ( point ) => {
-			const LngLat = {
-				lat: parseFloat( point._geocode_lat ),
-				lng: parseFloat( point._geocode_lon ),
-			};
-
-			bounds.push([parseFloat( point._geocode_lon ), parseFloat( point._geocode_lat )])
-
-			// average.lat += LngLat.lat/story.meta._related_point.length
-			// average.lng += LngLat.lng/story.meta._related_point.length
-
-			average.lat = LngLat.lat;
-			average.lng = LngLat.lng;
-		} );
-
-
-		if(bounds.length === 1){
-			map.flyTo( { center: average, zoom: 7 } );
-		} else {
-			map.fitBounds( bounds, { padding: 100} );
-		}
-
-		map.setFeatureState(
-			{ source: 'storiesSource', id: story.id },
-			{ hover: true }
-		);
-	}
-
-	storyUnhover() {
-		const story = this.props.story;
-		const map = this.props.map;
-
-		map.setFeatureState(
-			{ source: 'storiesSource', id: story.id },
-			{ hover: false }
+	shouldComponentUpdate( nextProps ) {
+		return (
+			this.props.story !== nextProps.story ||
+			this.props.className !== nextProps.className
 		);
 	}
 
@@ -978,7 +1371,7 @@ class Storie extends Component {
 		const story = this.props.story;
 		const dateOptions = { year: 'numeric', month: 'long', day: 'numeric' };
 		const storyDate = new Date( story.date_gmt ).toLocaleDateString(
-			navigator.language? navigator.language : undefined,
+			resolveStoryDateLocale(),
 			dateOptions
 		);
 
@@ -998,10 +1391,10 @@ class Storie extends Component {
 		}
 
 		return (
-			<a
-				href={ story.link }
-				target="_blank"
-				rel="noreferrer"
+			<article
+				ref={ this.props.cardRef }
+				onMouseEnter={ this.props.onHover }
+				onMouseLeave={ this.props.onUnhover }
 				className={
 					'card' + ( ! story.queriedFeaturedImage ? ' no-thumb' : '' ) + (this.props.className.length? (' ' + this.props.className) : '')
 				}
@@ -1016,17 +1409,27 @@ class Storie extends Component {
 				<div className="sideway">
 					<div className="categories">{ finalCategories }</div>
 
-					<div className="title">
+					<a
+						className="title"
+						href={ story.link }
+						target="_blank"
+						rel="noreferrer"
+					>
 						{ decodeEntities(story.title.rendered) }
-					</div>
+					</a>
 
 					<div className="date">{ storyDate }</div>
 					<div>
-						<small onMouseEnter={ this.storyHovered }
-							onMouseLeave={ this.storyUnhover }>{ __( 'View in map', 'jeo' ) }</small>
+						<button
+							type="button"
+							className="view-in-map"
+							onClick={ this.props.onViewInMap }
+						>
+							{ __( 'View in map', 'jeo' ) }
+						</button>
 					</div>
 				</div>
-			</a>
+			</article>
 		);
 	}
 }

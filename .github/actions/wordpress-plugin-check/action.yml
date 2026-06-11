@@ -1,0 +1,126 @@
+name: WordPress Plugin Check
+description: Install WordPress, install the Plugin Check plugin, and run checks against a built plugin directory.
+
+inputs:
+  plugin-slug:
+    description: WordPress plugin slug to install and check.
+    default: jeo
+  plugin-build-dir:
+    description: Built plugin directory to copy into the WordPress installation.
+    required: true
+  results-path:
+    description: Path where the JSON Plugin Check output should be written.
+    required: true
+  wp-path:
+    description: WordPress installation path.
+    default: /tmp/wordpress
+  wp-version:
+    description: WordPress version to install.
+    default: latest
+  wp-url:
+    description: Local WordPress site URL.
+    default: http://localhost:8880
+  db-name:
+    description: WordPress database name.
+    default: wordpress
+  db-user:
+    description: WordPress database user.
+    default: root
+  db-pass:
+    description: WordPress database password.
+    default: root
+  db-host:
+    description: WordPress database host.
+    default: 127.0.0.1:3306
+
+runs:
+  using: composite
+  steps:
+    - name: Install WordPress and Plugin Check
+      shell: bash
+      env:
+        DB_HOST: ${{ inputs.db-host }}
+        DB_NAME: ${{ inputs.db-name }}
+        DB_PASS: ${{ inputs.db-pass }}
+        DB_USER: ${{ inputs.db-user }}
+        PLUGIN_BUILD_DIR: ${{ inputs.plugin-build-dir }}
+        PLUGIN_SLUG: ${{ inputs.plugin-slug }}
+        WP_PATH: ${{ inputs.wp-path }}
+        WP_URL: ${{ inputs.wp-url }}
+        WP_VERSION: ${{ inputs.wp-version }}
+      run: |
+        set -euo pipefail
+
+        rm -rf "$WP_PATH"
+
+        wp core download --path="$WP_PATH" --version="$WP_VERSION" --force
+        wp config create \
+          --path="$WP_PATH" \
+          --dbname="$DB_NAME" \
+          --dbuser="$DB_USER" \
+          --dbpass="$DB_PASS" \
+          --dbhost="$DB_HOST" \
+          --skip-check \
+          --force
+        wp core install \
+          --path="$WP_PATH" \
+          --url="$WP_URL" \
+          --title="Plugin Check" \
+          --admin_user=admin \
+          --admin_password=password \
+          --admin_email=admin@example.com \
+          --skip-email
+        wp plugin install \
+          --path="$WP_PATH" \
+          https://downloads.wordpress.org/plugin/plugin-check.zip \
+          --activate
+
+        rm -rf "$WP_PATH/wp-content/plugins/$PLUGIN_SLUG"
+        mkdir -p "$WP_PATH/wp-content/plugins/$PLUGIN_SLUG"
+        rsync -a --delete "$PLUGIN_BUILD_DIR/" "$WP_PATH/wp-content/plugins/$PLUGIN_SLUG/"
+
+    - name: Run WordPress Plugin Check
+      shell: bash
+      env:
+        PLUGIN_CHECK_RESULTS: ${{ inputs.results-path }}
+        PLUGIN_SLUG: ${{ inputs.plugin-slug }}
+        WP_PATH: ${{ inputs.wp-path }}
+      run: |
+        set -euo pipefail
+
+        echo "::group::Debugging information"
+        wp --path="$WP_PATH" cli info
+        wp --path="$WP_PATH" plugin list
+        wp --path="$WP_PATH" --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" plugin list-checks
+        wp --path="$WP_PATH" --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" plugin list-check-categories
+        echo "::endgroup::"
+
+        echo "::group::Install dependencies"
+        DEPENDENCIES_RAW=$(wp --path="$WP_PATH" plugin get "$PLUGIN_SLUG" --field=requires_plugins | tr ',' ' ' | xargs || true)
+
+        if [ -z "$DEPENDENCIES_RAW" ]; then
+          echo "Plugin has no dependencies"
+        else
+          read -r -a DEPENDENCIES <<< "$DEPENDENCIES_RAW"
+          echo "Installing plugin dependencies: $DEPENDENCIES_RAW"
+          wp --path="$WP_PATH" plugin install --activate "${DEPENDENCIES[@]}"
+        fi
+        echo "::endgroup::"
+
+        wp --path="$WP_PATH" plugin activate "$PLUGIN_SLUG"
+
+        echo "::group::Run Plugin Check"
+        set +e
+        wp --path="$WP_PATH" \
+          --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" \
+          plugin check "$PLUGIN_SLUG" \
+          --format=json \
+          --slug="$PLUGIN_SLUG" \
+          --exclude-files=.wp-env.json \
+          > "$PLUGIN_CHECK_RESULTS"
+        status=$?
+        set -e
+        cat "$PLUGIN_CHECK_RESULTS"
+        echo "::endgroup::"
+
+        exit "$status"

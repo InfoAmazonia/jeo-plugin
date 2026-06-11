@@ -68,7 +68,7 @@ class Layers {
 
 		$args = array(
 			'labels'              => $labels,
-			'hierarchical'        => true,
+			'hierarchical'        => false,
 			'description'         => __( 'JEO Layers', 'jeo' ),
 			'supports'            => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'layers' ),

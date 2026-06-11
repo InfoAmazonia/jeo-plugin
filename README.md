@@ -156,13 +156,14 @@ rsync --archive --progress --human-readable --delete ./src/ /path/to/wordpress/w
 
 ## Releasing
 
-WordPress.org releases are built from `src/`, not from the repository root.
-The deploy workflow also publishes assets from `.wordpress-org/`.
-When a stable release tag is pushed, the workflow also creates a GitHub Release
-that keeps GitHub's source-code archives and attaches a built `jeo.zip`
-artifact generated from `src/`.
+Release packages are built from `src/`, not from the repository root.
+When a stable release tag is pushed, the release workflow creates a GitHub
+Release that keeps GitHub's source-code archives and attaches a built `jeo.zip`
+artifact generated from `src/`. WordPress.org deployment uses the same `src/`
+tree and publishes assets from `.wordpress-org/`, but it only runs when the
+`WPORG_DEPLOY_ENABLED` repository variable is set to `true`.
 
-Prerelease branches may carry a SemVer prerelease such as `3.0.0-rc.3` while
+Prerelease branches may carry a SemVer prerelease such as `3.1.0-rc.1` while
 WordPress.org stays on the latest stable release. Before creating a stable
 release tag, run `npm run sync:version` and keep these files aligned:
 
@@ -172,7 +173,7 @@ release tag, run `npm run sync:version` and keep these files aligned:
 - `package-lock.json`
 - `.wordpress-org/`
 
-The deploy workflow now validates that:
+The release workflow now validates that:
 
 - the plugin version in `src/jeo.php` matches `JEO_VERSION`
 - `package.json` and the root package entry in `package-lock.json` match the plugin version
@@ -182,8 +183,11 @@ The deploy workflow now validates that:
 
 Pull requests and pushes also run the same staged Plugin Check build through `.github/workflows/plugin-check.yml`, so WordPress.org compliance failures are caught before the release tag workflow.
 
-Pre-release tags such as `-rc` are intentionally blocked from the WordPress.org deploy pipeline.
-Stable tag releases only proceed to WordPress.org deployment after Plugin Check passes; a failing check blocks the release before any publish step runs.
+Pre-release tags such as `-rc` are intentionally blocked from the stable release pipeline.
+Stable tag releases only publish a GitHub Release after Plugin Check passes; a
+failing check blocks all publish steps. WordPress.org deployment runs after the
+GitHub Release step only when `WPORG_DEPLOY_ENABLED=true`, so the same tag
+workflow can be rerun later after WordPress.org SVN access is available.
 
 Release validation and packaging should use:
 

@@ -2,6 +2,8 @@ import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
 import { __ } from '@wordpress/i18n';
 
+import LoadingSpinner from './loading-spinner';
+
 class MapItem extends Component {
 	constructor( props ) {
 		super( props );
@@ -24,6 +26,10 @@ class MapItem extends Component {
 	}
 
 	async applyAllLayers() {
+		if ( this.props.loadingMapLayers ) {
+			return;
+		}
+
 		const queriedLayers = await this.props.loadMapLayers( this.props.map );
 
 		if ( queriedLayers.length ) {
@@ -36,10 +42,6 @@ class MapItem extends Component {
 			return (
 				<svg
 					aria-hidden="true"
-					focusable="false"
-					data-prefix="fas"
-					data-icon="toggle-off"
-					role="img"
 					xmlns="http://www.w3.org/2000/svg"
 					viewBox="0 0 576 512"
 					className="svg-inline--fa fa-toggle-off fa-w-18 fa-3x"
@@ -52,10 +54,6 @@ class MapItem extends Component {
 		return (
 			<svg
 				aria-hidden="true"
-				focusable="false"
-				data-prefix="fas"
-				data-icon="toggle-on"
-				role="img"
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 576 512"
 				className="svg-inline--fa fa-toggle-on fa-w-18 fa-3x"
@@ -152,22 +150,40 @@ class MapItem extends Component {
 				<button
 					className={ `apply-remove-all${ applyRemoveButton ? ' clear' : '' }` }
 					onClick={ applyRemoveButton ? this.clearAllLayers : this.applyAllLayers }
+					disabled={ loadingMapLayers }
+					aria-busy={ loadingMapLayers ? 'true' : undefined }
+					aria-label={
+						! applyRemoveButton && loadingMapLayers
+							? __( 'Loading…', 'jeo' )
+							: undefined
+					}
 				>
-					{ applyRemoveButton ? (
-						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="minus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+					{ ! applyRemoveButton && loadingMapLayers ? (
+						<LoadingSpinner className="map-item__loading-icon" />
+					) : applyRemoveButton ? (
+						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 							<path fill="currentColor" d="M416 208H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h384c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
 						</svg>
 					) : (
-						<svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="plus" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+						<svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
 							<path fill="currentColor" d="M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z"></path>
 						</svg>
 					) }
-					{ applyRemoveButton ? __( 'Clear', 'jeo' ) : __( 'Apply', 'jeo' ) }
+					{ ! applyRemoveButton && loadingMapLayers
+						? null
+						: applyRemoveButton ? __( 'Clear', 'jeo' ) : __( 'Apply', 'jeo' ) }
 				</button>
 
 				<div className="layers-toggles">
 					{ this.state.displayLayers && loadingMapLayers ? (
-						<div className="layers-toggles__loading">{ __( 'Loading layers…', 'jeo' ) }</div>
+						<div
+							className="layers-toggles__loading"
+							role="status"
+							aria-live="polite"
+							aria-label={ __( 'Loading…', 'jeo' ) }
+						>
+							<LoadingSpinner />
+						</div>
 					) : null }
 					{ this.state.displayLayers ? layersToggle : null }
 				</div>

@@ -72,7 +72,7 @@ class Maps {
 
 		$args = array(
 			'labels'              => $labels,
-			'hierarchical'        => true,
+			'hierarchical'        => false,
 			'description'         => __( 'JEO Maps', 'jeo' ),
 			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks', 'revisions' ),
 			'rewrite'             => array( 'slug' => 'maps' ),
