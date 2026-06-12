@@ -3,7 +3,7 @@ import Search from './search';
 import LazyImage from './lazy-image';
 import LoadingSpinner from './loading-spinner';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 
 import DateRangeFilter, { formatDateRangeValue } from './date-range-filter';
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
@@ -1177,8 +1177,7 @@ class Stories extends Component {
 		const activeFilters = [];
 		const hoveredClusterPostsSet = new Set( this.state.hoveredClusterPostsId );
 		const storiesCountLabel = sprintf(
-			/* translators: %d is the number of stories currently displayed. */
-			__( 'Displayed stories: %d', 'jeo' ),
+			_n( 'Displayed story: %d', 'Displayed stories: %d', this.props.stories.length, 'jeo' ),
 			this.props.stories.length
 		);
 

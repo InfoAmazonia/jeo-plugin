@@ -1,5 +1,5 @@
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 import { layerUseLabels, loadLayer } from './utils';
 import { decodeHtmlEntity } from '../shared/html';
@@ -36,7 +36,7 @@ export default function ( {
 									{ layerUseLabels[ settings.use ] }
 									{ settings.use !== 'fixed' &&
 										settings.default &&
-										' - ' + __( 'Default', 'jeo' ) }
+										' - ' + _x( 'Default', 'layer usage default label', 'jeo' ) }
 								</li>
 							)
 						);

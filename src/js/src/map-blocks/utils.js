@@ -1,4 +1,4 @@
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 export function loadLayer ( layers, settings ) {
 	const layer = ( layers || [] ).find( ( layer ) => layer.id === settings.id );
@@ -6,7 +6,7 @@ export function loadLayer ( layers, settings ) {
 }
 
 export const layerUseLabels = {
-	fixed: __( 'Fixed', 'jeo' ),
-	swappable: __( 'Swappable', 'jeo' ),
-	switchable: __( 'Switchable', 'jeo' ),
+	fixed: _x( 'Fixed', 'layer', 'jeo' ),
+	swappable: _x( 'Swappable', 'layer', 'jeo' ),
+	switchable: _x( 'Switchable', 'layer', 'jeo' ),
 };

@@ -2,7 +2,7 @@ import { registerPlugin } from '@wordpress/plugins';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { Component, Fragment } from '@wordpress/element';
 import { Modal, Button, Notice } from '@wordpress/components';
-import { sprintf, __, _x } from '@wordpress/i18n';
+import { sprintf, __, _x, _n } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import JeoGeocodePosts from './geo-posts';
@@ -253,7 +253,7 @@ const JeoGeocodePanel = ( props ) => {
 		<Fragment>
 			{ pendingLocations.length > 0 && (
 				<Notice status="warning" isDismissible={ false }>
-					<p>{ sprintf( __( 'AI found %d locations during bulk processing.', 'jeo' ), pendingLocations.length ) }</p>
+					<p>{ sprintf( _n( 'AI found %d location during bulk processing.', 'AI found %d locations during bulk processing.', pendingLocations.length, 'jeo' ), pendingLocations.length ) }</p>
 					<Button variant="primary" onClick={ handleReviewPending }>
 						{ __( 'Review Suggestions', 'jeo' ) }
 					</Button>

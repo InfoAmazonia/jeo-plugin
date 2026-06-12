@@ -1,6 +1,6 @@
 import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { List, arrayMove } from 'react-movable';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -700,7 +700,7 @@ class MapLayers extends Component {
 						</div>
 
 						<div className="status-message">
-							{ isApplied ? __( 'Changes applied', 'jeo' ) : __( 'Not applied', 'jeo' ) }
+							{ isApplied ? _x( 'Changes applied', 'layer application status', 'jeo' ) : _x( 'Not applied', 'layer application status', 'jeo' ) }
 						</div>
 					</div>
 
@@ -721,7 +721,7 @@ class MapLayers extends Component {
 						disabled
 						aria-disabled="true"
 					>
-						{ __( 'Changes applied', 'jeo' ) }
+						{ _x( 'Changes applied', 'layer application status', 'jeo' ) }
 					</button>
 				) : (
 					<button

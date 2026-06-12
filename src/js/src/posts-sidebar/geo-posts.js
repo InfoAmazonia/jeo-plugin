@@ -1,6 +1,6 @@
 import { Button, CheckboxControl, RadioControl } from '@wordpress/components';
 import { Component, createRef, Fragment } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import classNames from 'classnames';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
@@ -560,7 +560,7 @@ class JeoGeocodePosts extends Component {
 							style={ { userSelect: 'none' } }
 						>
 							{ isPanelMinimized
-								? sprintf( __( 'Points (%d)', 'jeo' ), pointsList.length )
+								? sprintf( _n( 'Point (%d)', 'Points (%d)', pointsList.length, 'jeo' ), pointsList.length )
 								: __( 'Geolocate this post', 'jeo' )
 							}
 						</h3>

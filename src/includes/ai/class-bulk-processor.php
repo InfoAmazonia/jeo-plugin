@@ -404,7 +404,7 @@ class Bulk_Processor {
 			++$processed_count;
 		}
 
-		$msg = sprintf( /* translators: %d: number of posts processed. */ __( 'Processed batch of %d posts.', 'jeo' ), $processed_count );
+		$msg = sprintf( /* translators: %d: number of posts processed. */ _n( 'Processed batch of %d post.', 'Processed batch of %d posts.', $processed_count, 'jeo' ), $processed_count );
 		$this->log_action( $msg );
 		return $msg;
 	}
@@ -449,7 +449,7 @@ class Bulk_Processor {
 			++$cleared_count;
 		}
 
-		$msg = sprintf( /* translators: %d: number of posts cleared. */ __( 'Cleared batch of %d posts.', 'jeo' ), $cleared_count );
+		$msg = sprintf( /* translators: %d: number of posts cleared. */ _n( 'Cleared batch of %d post.', 'Cleared batch of %d posts.', $cleared_count, 'jeo' ), $cleared_count );
 		$this->log_action( $msg );
 		return $msg;
 	}
@@ -688,7 +688,7 @@ class Bulk_Processor {
 
 				if ( action === 'jeo_approve_ai' && ! isConfirmed ) {
 					e.preventDefault();
-					
+
 					var postIds = [];
 					$('input[name="post[]"]:checked').each(function() {
 						postIds.push($(this).val());
@@ -722,7 +722,7 @@ class Bulk_Processor {
 
 							html += '<table class="wp-list-table widefat fixed striped" style="margin-top:15px; border:1px solid #e0e0e0;">';
 							html += '<thead><tr><th>Post Title</th><th style="width:80px; text-align:center;">Locs</th><th style="width:100px; text-align:center;">Confidence</th></tr></thead><tbody>';
-							
+
 							res.details.forEach(function(d) {
 								var color = d.status === 'ready' ? '#46b450' : '#d63638';
 								html += '<tr>';
@@ -790,15 +790,15 @@ class Bulk_Processor {
 
 		// 1. Render Status Badge
 		if ( $has_points ) {
-			echo '<span class="badge badge-success" style="background:#46b450; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'Geolocated', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-success" style="background:#46b450; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Geolocated', 'post geolocation status', 'jeo' ) . '</span>';
 		} elseif ( 'pending_approval' === $status ) {
-			echo '<span class="badge badge-warning" style="background:#ffb900; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'Pending Approval', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-warning" style="background:#ffb900; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Pending Approval', 'post geolocation status', 'jeo' ) . '</span>';
 		} elseif ( 'no_locations' === $status ) {
 			echo '<span class="badge badge-info" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'No Locations Found', 'jeo' ) . '</span>';
 		} elseif ( 'error' === $status ) {
 			echo '<span class="badge badge-error" style="background:#d63638; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'AI Error', 'jeo' ) . '</span>';
 		} else {
-			echo '<span class="badge" style="background:#f0f0f1; color:#646970; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'Not Processed', 'jeo' ) . '</span>';
+			echo '<span class="badge" style="background:#f0f0f1; color:#646970; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Not Processed', 'post geolocation status', 'jeo' ) . '</span>';
 		}
 
 		// 2. Render Confidence Score (Below Badge)

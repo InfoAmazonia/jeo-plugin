@@ -3,7 +3,7 @@ import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { Button, Notice, PanelBody, Placeholder, Spinner } from '@wordpress/components';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { debounce } from 'lodash';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
@@ -654,10 +654,10 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						label={ __( 'Base terrain', 'jeo' ) }
 						value={ baseVariant }
 						options={ [
-							{ label: __( 'Dark', 'jeo' ), value: 'dark' },
-							{ label: __( 'Light', 'jeo' ), value: 'light' },
-							{ label: __( 'Satellite', 'jeo' ), value: 'satellite' },
-							{ label: __( 'None', 'jeo' ), value: 'none' },
+							{ label: _x( 'Dark', 'base terrain', 'jeo' ), value: 'dark' },
+							{ label: _x( 'Light', 'base terrain', 'jeo' ), value: 'light' },
+							{ label: _x( 'Satellite', 'base terrain', 'jeo' ), value: 'satellite' },
+							{ label: _x( 'None', 'base terrain', 'jeo' ), value: 'none' },
 						] }
 						onChange={ handleBaseVariantChange }
 					/>

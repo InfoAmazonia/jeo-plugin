@@ -1,7 +1,7 @@
 import { Button, CheckboxControl, ToggleControl, Spinner } from '@wordpress/components';
 import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
 import { useDraggable } from './use-draggable';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { MapContainer, Marker, TileLayer } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -169,7 +169,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 							style={ { userSelect: 'none' } }
 						>
 							{ isMinimized
-								? sprintf( __( 'AI Suggestions (%d selected)', 'jeo' ), selectedCount )
+								? sprintf( _n( 'AI Suggestion (%d selected)', 'AI Suggestions (%d selected)', selectedCount, 'jeo' ), selectedCount )
 								: __( 'Review AI Suggestions', 'jeo' )
 							}
 						</h3>
