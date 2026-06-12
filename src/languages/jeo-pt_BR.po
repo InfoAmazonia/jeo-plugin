@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: JEO 3.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeo\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowp\n"
 "Last-Translator: Stefano Wrobleski\n"
 "Language-Team: InfoAmazonia\n"
 "MIME-Version: 1.0\n"

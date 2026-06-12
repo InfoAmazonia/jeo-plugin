@@ -4,7 +4,7 @@ description: Install WordPress, install the Plugin Check plugin, and run checks 
 inputs:
   plugin-slug:
     description: WordPress plugin slug to install and check.
-    default: jeo
+    default: jeowp
   plugin-build-dir:
     description: Built plugin directory to copy into the WordPress installation.
     required: true
