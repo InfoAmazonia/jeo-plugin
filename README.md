@@ -99,7 +99,7 @@ These scripts expect `wp` (WP-CLI) to be available on your `PATH`.
 
 Translation source files are versioned in Git:
 
-- `src/languages/jeo.pot`
+- `src/languages/jeowp.pot`
 - `src/languages/*.po`
 
 Compiled translation files are generated artifacts and are not versioned in Git:
@@ -113,7 +113,7 @@ When source strings change, refresh the source catalogs after building assets:
 npm run i18n:refresh
 ```
 
-This runs `npm run build:assets`, regenerates `src/languages/jeo.pot`, and
+This runs `npm run build:assets`, regenerates `src/languages/jeowp.pot`, and
 updates the existing `*.po` catalogs. Review the updated `*.po` translations
 before compiling release artifacts. If you want to run each step manually, use:
 
@@ -140,10 +140,10 @@ Before committing translation changes, validate changed PO catalogs with
 `msgfmt --check --statistics`. For example:
 
 ```bash
-msgfmt --check --statistics -o /tmp/jeo-pt_BR.mo src/languages/jeo-pt_BR.po
+msgfmt --check --statistics -o /tmp/jeowp-pt_BR.mo src/languages/jeowp-pt_BR.po
 ```
 
-Commit reviewed `*.po` and `jeo.pot` changes. Do not commit generated `*.mo`
+Commit reviewed `*.po` and `jeowp.pot` changes. Do not commit generated `*.mo`
 or `*.json` files; `npm run build` and `npm run build:release` regenerate
 them for local testing and release packaging.
 

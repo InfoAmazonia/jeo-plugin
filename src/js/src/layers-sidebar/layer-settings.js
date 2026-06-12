@@ -21,7 +21,7 @@ import {
 const baseLayerSchema = {
 	type: 'object',
 	properties: {
-		type: { title: __( 'Type', 'jeo' ), type: 'string' },
+		type: { title: __( 'Type', 'jeowp' ), type: 'string' },
 	},
 	required: [ 'type' ],
 };
@@ -239,7 +239,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 					) }
 
 					<Button variant="primary" onClick={ openModal }>
-						{ __( 'Edit interactions', 'jeo' ) }
+						{ __( 'Edit interactions', 'jeowp' ) }
 					</Button>
 				</Fragment>
 			) }

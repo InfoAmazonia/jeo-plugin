@@ -247,7 +247,7 @@ class Sidebar extends Component {
 							) }
 						/>
 
-						<span>{ __('Stories', 'jeo') }</span>
+						<span>{ __('Stories', 'jeowp') }</span>
 					</div>
 				),
 				className: 'stories-tab',
@@ -275,7 +275,7 @@ class Sidebar extends Component {
 							) }
 						/>
 
-						<span>{ __('Map layers', 'jeo') }</span>
+						<span>{ __('Map layers', 'jeowp') }</span>
 					</div>
 				),
 				className: 'stories-tab',
@@ -288,7 +288,7 @@ class Sidebar extends Component {
 				onScrollCapture={ this.handleScroll }
 				className={ this.props.isEmbed ? 'is-embed' : 'default-sidebar' }
 			>
-				<div className="discovery-title">{ __( 'Explore', 'jeo' ) }</div>
+				<div className="discovery-title">{ __( 'Explore', 'jeowp' ) }</div>
 				<TabPanel
 					className="togable-panel"
 					activeClass="active-tab"
@@ -305,8 +305,8 @@ class Sidebar extends Component {
 					aria-expanded={ this.props.showSidebar }
 					aria-label={
 						this.props.showSidebar
-							? __( 'Collapse discovery panel', 'jeo' )
-							: __( 'Expand discovery panel', 'jeo' )
+							? __( 'Collapse discovery panel', 'jeowp' )
+							: __( 'Expand discovery panel', 'jeowp' )
 					}
 					onClick={ () => {
 						this.props.updateState( { showSidebar: ! this.props.showSidebar } );

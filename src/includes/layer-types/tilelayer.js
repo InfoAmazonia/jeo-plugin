@@ -2,7 +2,7 @@
 	const { __ } = wp.i18n;
 
 	window.JeoLayerTypes.registerLayerType( 'tilelayer', {
-	label: __( 'Raster Tiled Source', 'jeo' ),
+	label: __( 'Raster Tiled Source', 'jeowp' ),
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -54,16 +54,16 @@
 			properties: {
 				url: {
 					type: 'string',
-					title: __( 'URL', 'jeo' ),
+					title: __( 'URL', 'jeowp' ),
 				},
 				scheme: {
 					type: 'string',
-					title: __( 'Scheme', 'jeo' ),
-					description: __( 'Influences the Y direction of the tile coordinates.', 'jeo' ),
+					title: __( 'Scheme', 'jeowp' ),
+					description: __( 'Influences the Y direction of the tile coordinates.', 'jeowp' ),
 					enum: ['xyz', 'tms'],
 					enumNames: [
-						__( 'Slippy Map tilenames (XYZ)', 'jeo' ),
-						__( 'OSGeo spec (TMS)', 'jeo' ),
+						__( 'Slippy Map tilenames (XYZ)', 'jeowp' ),
+						__( 'OSGeo spec (TMS)', 'jeowp' ),
 					],
 					default: 'xyz',
 				}

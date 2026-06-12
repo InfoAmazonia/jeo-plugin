@@ -81,18 +81,18 @@ export default function DateRangeFilter( {
 	const [ draftEndDate, setDraftEndDate ] = useState( parseDateValue( endDate ) );
 	const datePickerLocale = useMemo( () => getDateFnsLocale(), [] );
 	const monthNames = localeInfo?.monthNames || [
-		__( 'January', 'jeo' ),
-		__( 'February', 'jeo' ),
-		__( 'March', 'jeo' ),
-		__( 'April', 'jeo' ),
-		__( 'May', 'jeo' ),
-		__( 'June', 'jeo' ),
-		__( 'July', 'jeo' ),
-		__( 'August', 'jeo' ),
-		__( 'September', 'jeo' ),
-		__( 'October', 'jeo' ),
-		__( 'November', 'jeo' ),
-		__( 'December', 'jeo' ),
+		__( 'January', 'jeowp' ),
+		__( 'February', 'jeowp' ),
+		__( 'March', 'jeowp' ),
+		__( 'April', 'jeowp' ),
+		__( 'May', 'jeowp' ),
+		__( 'June', 'jeowp' ),
+		__( 'July', 'jeowp' ),
+		__( 'August', 'jeowp' ),
+		__( 'September', 'jeowp' ),
+		__( 'October', 'jeowp' ),
+		__( 'November', 'jeowp' ),
+		__( 'December', 'jeowp' ),
 	];
 	const minYear = Number.parseInt( localeInfo?.minYear, 10 );
 	const maxYear = Number.parseInt( localeInfo?.maxYear, 10 );
@@ -113,7 +113,7 @@ export default function DateRangeFilter( {
 			<button
 				type="button"
 				className="jeo-date-range-filter__navigation"
-				aria-label={ __( 'Previous month', 'jeo' ) }
+				aria-label={ __( 'Previous month', 'jeowp' ) }
 				disabled={ prevMonthButtonDisabled }
 				onClick={ decreaseMonth }
 			>
@@ -130,7 +130,7 @@ export default function DateRangeFilter( {
 			</button>
 			<select
 				className="jeo-date-range-filter__month-select"
-				aria-label={ __( 'Month', 'jeo' ) }
+				aria-label={ __( 'Month', 'jeowp' ) }
 				value={ date.getMonth() }
 				onChange={ ( event ) => changeMonth( Number( event.target.value ) ) }
 			>
@@ -142,7 +142,7 @@ export default function DateRangeFilter( {
 			</select>
 			<select
 				className="jeo-date-range-filter__year-select"
-				aria-label={ __( 'Year', 'jeo' ) }
+				aria-label={ __( 'Year', 'jeowp' ) }
 				value={ date.getFullYear() }
 				onChange={ ( event ) => changeYear( Number( event.target.value ) ) }
 			>
@@ -155,7 +155,7 @@ export default function DateRangeFilter( {
 			<button
 				type="button"
 				className="jeo-date-range-filter__navigation"
-				aria-label={ __( 'Next month', 'jeo' ) }
+				aria-label={ __( 'Next month', 'jeowp' ) }
 				disabled={ nextMonthButtonDisabled }
 				onClick={ increaseMonth }
 			>
@@ -245,7 +245,7 @@ export default function DateRangeFilter( {
 								onCancel?.();
 							} }
 						>
-							{ localeInfo?.cancelLabel || __( 'Clear', 'jeo' ) }
+							{ localeInfo?.cancelLabel || __( 'Clear', 'jeowp' ) }
 						</button>
 						<button
 							type="button"
@@ -262,7 +262,7 @@ export default function DateRangeFilter( {
 								);
 							} }
 						>
-							{ localeInfo?.applyLabel || __( 'Apply', 'jeo' ) }
+							{ localeInfo?.applyLabel || __( 'Apply', 'jeowp' ) }
 						</button>
 					</div>
 				</div>

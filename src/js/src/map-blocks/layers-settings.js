@@ -44,11 +44,11 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 	} );
 
 	const fallbackLayerTypeOptions = [
-		{ label: __( 'Mapbox Style', 'jeo' ), value: 'mapbox' },
-		{ label: __( 'Vector Mapbox Tiled Source', 'jeo' ), value: 'mapbox-tileset-vector' },
-		{ label: __( 'Raster Mapbox Tiled Source', 'jeo' ), value: 'mapbox-tileset-raster' },
-		{ label: __( 'Raster Tiled Source', 'jeo' ), value: 'tilelayer' },
-		{ label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ), value: 'mvt' },
+		{ label: __( 'Mapbox Style', 'jeowp' ), value: 'mapbox' },
+		{ label: __( 'Vector Mapbox Tiled Source', 'jeowp' ), value: 'mapbox-tileset-vector' },
+		{ label: __( 'Raster Mapbox Tiled Source', 'jeowp' ), value: 'mapbox-tileset-raster' },
+		{ label: __( 'Raster Tiled Source', 'jeowp' ), value: 'tilelayer' },
+		{ label: __( 'Mapbox Vector Tiles (MVT)', 'jeowp' ), value: 'mvt' },
 	];
 	const registeredLayerTypeOptions =
 		window.JeoLayerTypes?.getLayerTypes?.().map( ( slug ) => ( {
@@ -56,7 +56,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 			value: slug,
 		} ) ) ?? [];
 	const layerTypeOptions = [
-		{ label: __( 'Select a layer type', 'jeo' ), value: '' },
+		{ label: __( 'Select a layer type', 'jeowp' ), value: '' },
 		...mergeLayerTypeOptions(
 			fallbackLayerTypeOptions,
 			registeredLayerTypeOptions
@@ -108,7 +108,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 					<div>
 						<form action="javascript:void(0);" style={ { display: "flex" }}>
 							<TextControl
-								placeholder={ __( 'Enter keywords to search layers', 'jeo' ) }
+								placeholder={ __( 'Enter keywords to search layers', 'jeowp' ) }
 								value={ layerNameFilter }
 								onChange={ ( value ) => {
 									setLayerNameFilter( value );
@@ -117,7 +117,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 							<SelectControl
 								className="jeo-layers-library-filters"
 								hideLabelFromVision={ true }
-								label={ __( 'Layer type', 'jeo' ) }
+								label={ __( 'Layer type', 'jeowp' ) }
 								options={ layerTypeOptions }
 								value={ layerTypeFilter }
 								onChange={ ( value ) => {
@@ -133,7 +133,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 									setLayerNameFilter('');
 								} }
 							>
-								{ __( 'Clear', 'jeo' ) }
+								{ __( 'Clear', 'jeowp' ) }
 							</Button>
 						</form>
 					</div>
@@ -147,14 +147,14 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 						target="_blank"
 						rel="noopener noreferrer"
 					>
-						{ __( 'New Layer', 'jeo' ) }
+						{ __( 'New Layer', 'jeowp' ) }
 					</Button>
 				</div>
 			</div>
 				<div name="map-layers" className="jeo-layers-panel">
 					<ul className="jeo-layers-list">
 						{ ! searchEnabled && (
-							<p>{ __( 'Search layers by name or type to browse the library.', 'jeo' ) }</p>
+							<p>{ __( 'Search layers by name or type to browse the library.', 'jeowp' ) }</p>
 						) }
 						{ searchEnabled && searchingLayers && ! searchedLayers.length && (
 							<Spinner />
@@ -201,13 +201,13 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 														} }
 														className="add-button"
 													>
-														{ __( 'Add to map', 'jeo' ) }
+														{ __( 'Add to map', 'jeowp' ) }
 													</p>
 												) }
 												{ inUse && (
 													<p
 														onClick={ () => {
-															const confirmation = confirm( __( 'Do you really want to delete this layer?', 'jeo' ) );
+															const confirmation = confirm( __( 'Do you really want to delete this layer?', 'jeowp' ) );
 
 															if ( confirmation ) {
 																return setLayers(
@@ -217,7 +217,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 														} }
 														className="remove-button"
 													>
-														{ __( 'Remove from map', 'jeo' ) }
+														{ __( 'Remove from map', 'jeowp' ) }
 													</p>
 												) }
 											</div>
@@ -229,21 +229,21 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 						} ) }
 					</ul>
 					{ searchEnabled && ! searchingLayers && ! searchedLayers.length && (
-						<p>{ __( 'No layers matched the current search filters.', 'jeo' ) }</p>
+						<p>{ __( 'No layers matched the current search filters.', 'jeowp' ) }</p>
 					) }
 					{ hasMoreSearchedLayers && (
 						<Button
 							variant="secondary"
 							onClick={ loadMoreSearchedLayers }
 						>
-							{ __( 'Load more layers', 'jeo' ) }
+							{ __( 'Load more layers', 'jeowp' ) }
 						</Button>
 					) }
 				</div>
-			<h2 className="selected-layers-title" >{ __( 'Selected layers', 'jeo' ) }</h2>
+			<h2 className="selected-layers-title" >{ __( 'Selected layers', 'jeowp' ) }</h2>
 			{ ! loadingLayers && ! attributes.layers.length && (
 				<p className="jeo-layers-list">
-					{ __( 'No layers have been added to this map.', 'jeo' ) }
+					{ __( 'No layers have been added to this map.', 'jeowp' ) }
 				</p>
 			) }
 
@@ -371,7 +371,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 
 									const removeLayer = () => {
 										const confirmation = confirm(
-											__( 'Do you really want to delete this layer?', 'jeo' )
+											__( 'Do you really want to delete this layer?', 'jeowp' )
 										);
 
 										if ( confirmation ) {
@@ -418,7 +418,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 				rel="noopener noreferrer"
 				onClick={ closeModal }
 			>
-				{ __( 'Done', 'jeo' ) }
+				{ __( 'Done', 'jeowp' ) }
 			</Button>
 		</Fragment>
 	);

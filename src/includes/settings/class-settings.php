@@ -176,7 +176,7 @@ class Settings {
 			add_settings_error(
 				$this->option_key,
 				'jeo_mapbox_key_required',
-				__( 'Mapbox requires a valid API key. The rendering library setting was not changed.', 'jeo' ),
+				__( 'Mapbox requires a valid API key. The rendering library setting was not changed.', 'jeowp' ),
 				'error'
 			);
 
@@ -314,7 +314,7 @@ class Settings {
 			add_settings_error(
 				$this->option_key,
 				'jeo_invalid_' . sanitize_key( $field ),
-				__( 'JEO could not save this asset URL. Use a valid http(s) or root-relative URL.', 'jeo' ),
+				__( 'JEO could not save this asset URL. Use a valid http(s) or root-relative URL.', 'jeowp' ),
 				'warning'
 			);
 		}
@@ -332,7 +332,7 @@ class Settings {
 		if ( 'jeo_page_jeo-settings' === $page ) {
 			wp_enqueue_media();
 			wp_enqueue_script( 'jeo-settings', JEO_BASEURL . '/includes/settings/settings-page.js', array( 'jquery', 'wp-i18n' ), JEO_VERSION, true );
-			wp_set_script_translations( 'jeo-settings', 'jeo', JEO_BASEPATH . 'languages' );
+			wp_set_script_translations( 'jeo-settings', 'jeowp', JEO_BASEPATH . 'languages' );
 		}
 	}
 
@@ -344,8 +344,8 @@ class Settings {
 	public function add_menu_item() {
 		add_submenu_page(
 			'jeo-main-menu',
-			__( 'Settings', 'jeo' ),
-			__( 'Settings', 'jeo' ),
+			__( 'Settings', 'jeowp' ),
+			__( 'Settings', 'jeowp' ),
 			'manage_options',
 			'jeo-settings',
 			array( $this, 'admin_page' ),

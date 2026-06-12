@@ -16,9 +16,9 @@ import { SelectControl, TextControl } from '../shared/wp-form-controls';
 import './interaction-settings.css';
 
 const eventOptions = [
-	{ label: __( 'No', 'jeo' ), value: 'none' },
-	{ label: __( 'On click', 'jeo' ), value: 'click' },
-	{ label: __( 'On hover', 'jeo' ), value: 'mouseover' },
+	{ label: __( 'No', 'jeowp' ), value: 'none' },
+	{ label: __( 'On click', 'jeowp' ), value: 'click' },
+	{ label: __( 'On hover', 'jeowp' ), value: 'mouseover' },
 ];
 
 export default function InteractionSettings( {
@@ -117,7 +117,7 @@ export default function InteractionSettings( {
 			initialOpen={ interactive }
 		>
 			<SelectControl
-				label={ __( 'Show popup?', 'jeo' ) }
+				label={ __( 'Show popup?', 'jeowp' ) }
 				value={ interaction.on }
 				options={ eventOptions }
 				onChange={ changeEvent }
@@ -125,7 +125,7 @@ export default function InteractionSettings( {
 			{ interactive && (
 				<Fragment>
 					<div>
-						<span>{ __( 'Title', 'jeo' ) }</span>
+						<span>{ __( 'Title', 'jeowp' ) }</span>
 						<span className="jeo-interaction-fields__field_required"> * </span>
 						<SelectControl
 							value={ interaction.title }
@@ -136,7 +136,7 @@ export default function InteractionSettings( {
 
 					{ fieldKeys.length > 0 && (
 						<fieldset className="jeo-interaction-fields">
-							<legend>{ __( 'Fields', 'jeo' ) }</legend>
+							<legend>{ __( 'Fields', 'jeowp' ) }</legend>
 
 							{ interaction.fields.length > 0 && (
 								<div className="jeo-interaction-fields__grid">
@@ -163,7 +163,7 @@ export default function InteractionSettings( {
 							{ unusedFieldOptions.length > 0 && (
 								<div className="jeo-interaction-add-field">
 									<label htmlFor={ `${ layer.field }__add-field` }>
-										{ __( 'Add field', 'jeo' ) }
+										{ __( 'Add field', 'jeowp' ) }
 									</label>
 									<SelectControl
 										id={ `${ layer.field }__add-field` }
@@ -172,7 +172,7 @@ export default function InteractionSettings( {
 										onChange={ setNewField }
 									/>
 									<Button variant="primary" onClick={ addField }>
-										{ __( 'Add', 'jeo' ) }
+										{ __( 'Add', 'jeowp' ) }
 									</Button>
 								</div>
 							) }

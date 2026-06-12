@@ -53,10 +53,10 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 		<Fragment>
 			<form className="jeo-map-settings">
 				<section className="center">
-					<h3>{ __( 'Center', 'jeo' ) }</h3>
+					<h3>{ __( 'Center', 'jeowp' ) }</h3>
 					<TextControl
 						type="number"
-						label={ __( 'Latitude', 'jeo' ) }
+						label={ __( 'Latitude', 'jeowp' ) }
 						value={ centerLat }
 						onChange={ ( value ) => {
 							editingMap.current = true;
@@ -66,7 +66,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					/>
 					<TextControl
 						type="number"
-						label={ __( 'Longitude', 'jeo' ) }
+						label={ __( 'Longitude', 'jeowp' ) }
 						value={ centerLon }
 						onChange={ ( value ) => {
 							editingMap.current = true;
@@ -76,9 +76,9 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					/>
 				</section>
 				<section className="zoom">
-					<h3>{ __( 'Zoom', 'jeo' ) }</h3>
+					<h3>{ __( 'Zoom', 'jeowp' ) }</h3>
 					<RangeControl
-						label={ __( 'Initial zoom', 'jeo' ) }
+						label={ __( 'Initial zoom', 'jeowp' ) }
 						initialPosition={ 11 }
 						min={ minZoom }
 						max={ maxZoom }
@@ -95,7 +95,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 					<RangeControl
-						label={ __( 'Min zoom', 'jeo' ) }
+						label={ __( 'Min zoom', 'jeowp' ) }
 						initialPosition={ 0 }
 						min={ 0 }
 						max={ initialZoom }
@@ -112,7 +112,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 					<RangeControl
-						label={ __( 'Max zoom', 'jeo' ) }
+						label={ __( 'Max zoom', 'jeowp' ) }
 						initialPosition={ 20 }
 						min={ initialZoom }
 						max={ 20 }
@@ -129,7 +129,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Scroll zoom on post', 'jeo' ) }
+						label={ __( 'Scroll zoom on post', 'jeowp' ) }
 						checked={ ! attributes.disable_scroll_zoom }
 						onChange={ () => {
 							attributeUpdater( 'disable_scroll_zoom' )(
@@ -138,7 +138,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Drag rotation on post', 'jeo' ) }
+						label={ __( 'Drag rotation on post', 'jeowp' ) }
 						checked={ ! attributes.disable_drag_rotate }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_rotate' )(
@@ -147,7 +147,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Map navigation on post', 'jeo' ) }
+						label={ __( 'Map navigation on post', 'jeowp' ) }
 						checked={ ! attributes.disable_drag_pan }
 						onChange={ () => {
 							attributeUpdater( 'disable_drag_pan' )(
@@ -156,7 +156,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 					<CheckboxControl
-						label={ __( 'Fullscreen button on post', 'jeo' ) }
+						label={ __( 'Fullscreen button on post', 'jeowp' ) }
 						checked={ attributes.enable_fullscreen }
 						onChange={ () => {
 							attributeUpdater( 'enable_fullscreen' )(
@@ -168,12 +168,12 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 				</section>
 
 				<section className="pan-limits">
-					<h3>{ __( 'Pan limits', 'jeo' ) }</h3>
+					<h3>{ __( 'Pan limits', 'jeowp' ) }</h3>
 					<p>
 					<div className="pan-wrapper">
 						<TextControl
 							type="number"
-							label={ __( 'North', 'jeo' ) }
+							label={ __( 'North', 'jeowp' ) }
 							value={ attributes.pan_limits?.north || "__"}
 							onChange={ ( value ) => {
 								return setAttributes({
@@ -187,7 +187,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 
 						<TextControl
 							type="number"
-							label={ __( 'East', 'jeo' ) }
+							label={ __( 'East', 'jeowp' ) }
 							value={ attributes.pan_limits?.east || "__" }
 							onChange={ ( value ) => {
 								return setAttributes({
@@ -202,7 +202,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 
 						<TextControl
 							type="number"
-							label={ __( 'South', 'jeo' ) }
+							label={ __( 'South', 'jeowp' ) }
 							value={ attributes.pan_limits?.south || "__"}
 							onChange={ ( value ) => {
 								return setAttributes({
@@ -216,7 +216,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 
 						<TextControl
 							type="number"
-							label={ __( 'West', 'jeo' ) }
+							label={ __( 'West', 'jeowp' ) }
 							value={ attributes.pan_limits?.west || "__"}
 							onChange={ ( value ) => {
 								return setAttributes({
@@ -239,16 +239,16 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 								setPanLimitsFromMap();
 							} }
 						>
-							{ __( 'Use current map view', 'jeo' ) }
+							{ __( 'Use current map view', 'jeowp' ) }
 						</Button>
 					</p>
 				</section>
 
 				<section className="public-maps">
-					<h3>{ __( 'For public maps only', 'jeo' ) }</h3>
+					<h3>{ __( 'For public maps only', 'jeowp' ) }</h3>
 
 					<CheckboxControl
-						label={ __( 'Hide in discovery', 'jeo' ) }
+						label={ __( 'Hide in discovery', 'jeowp' ) }
 						checked={ attributes.hide_in_discovery }
 						onChange={ () => {
 							attributeUpdater( 'hide_in_discovery' )(
@@ -258,7 +258,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					/>
 
 					<CheckboxControl
-						label={ __( 'Disable embed map', 'jeo' ) }
+						label={ __( 'Disable embed map', 'jeowp' ) }
 						checked={ attributes.disable_embed }
 						onChange={ () => {
 							attributeUpdater( 'disable_embed' )(

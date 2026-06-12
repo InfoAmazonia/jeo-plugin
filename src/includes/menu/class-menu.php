@@ -34,8 +34,8 @@ class Menu {
 	 */
 	public function add_main_menu() {
 		add_menu_page(
-			__( 'JEO', 'jeo' ),
-			__( 'JEO', 'jeo' ),
+			__( 'JEO', 'jeowp' ),
+			__( 'JEO', 'jeowp' ),
 			'read',
 			'jeo-main-menu',
 			'',

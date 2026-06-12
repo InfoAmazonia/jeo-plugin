@@ -15,7 +15,7 @@ $site_name = get_bloginfo( 'name' );
 <html>
 	<head>
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<title><?php echo esc_html( $site_name ); ?> - <?php esc_html_e( 'Explore', 'jeo' ); ?></title>
+		<title><?php echo esc_html( $site_name ); ?> - <?php esc_html_e( 'Explore', 'jeowp' ); ?></title>
 		<?php wp_head(); ?>
 	</head>
 

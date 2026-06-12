@@ -6,10 +6,10 @@ import { __ } from '@wordpress/i18n';
 import LegendTypeEdition from './legend-type-edition';
 
 const CORE_LEGEND_TYPES = [
-	{ value: 'barscale', label: __( 'Color scale', 'jeo' ) },
-	{ value: 'simple-color', label: __( 'Color categories', 'jeo' ) },
-	{ value: 'icons', label: __( 'Icon categories', 'jeo' ) },
-	{ value: 'circles', label: __( 'Circle sizes', 'jeo' ) },
+	{ value: 'barscale', label: __( 'Color scale', 'jeowp' ) },
+	{ value: 'simple-color', label: __( 'Color categories', 'jeowp' ) },
+	{ value: 'icons', label: __( 'Icon categories', 'jeowp' ) },
+	{ value: 'circles', label: __( 'Circle sizes', 'jeowp' ) },
 ];
 
 function isPlainObject( value ) {
@@ -156,7 +156,7 @@ class LegendEditor extends Component {
 		return (
 			<Fragment>
 				<CheckboxControl
-					label={ __( 'Use legend', 'jeo' ) }
+					label={ __( 'Use legend', 'jeowp' ) }
 					checked={ legendObject.attributes.use_legend }
 					onChange={ () => {
 						const metadata =
@@ -177,7 +177,7 @@ class LegendEditor extends Component {
 
 				{ legendObject.attributes.use_legend && <TextControl
 					className="label-input-wrapper"
-					label={ __( 'Legend title', 'jeo' ) }
+					label={ __( 'Legend title', 'jeowp' ) }
 					value={ legendObject.attributes.legend_title }
 					onChange={ ( value ) => {
 						const metadata =
@@ -199,7 +199,7 @@ class LegendEditor extends Component {
 				{ legendObject.attributes.use_legend && (
 					<>
 						<SelectControl
-							label={ __( 'Type', 'jeo' ) }
+							label={ __( 'Type', 'jeowp' ) }
 							value={ legendType }
 							options={ this.legendTypes }
 							onChange={ ( newLegendType ) => {

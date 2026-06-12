@@ -13,7 +13,7 @@ export default function LayersSettingsModal( {
 	return (
 		<Modal
 			className="jeo-layers-modal"
-			title={ __( 'Layers settings', 'jeo' ) }
+			title={ __( 'Layers settings', 'jeowp' ) }
 			onRequestClose={ closeModal }
 		>
 			<LayersSettings

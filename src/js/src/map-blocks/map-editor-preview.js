@@ -109,7 +109,7 @@ export default function MapEditorPreview() {
 					<div
 						className="button-group-div"
 						role="group"
-						aria-label={ __( 'Preview zoom controls', 'jeo' ) }
+						aria-label={ __( 'Preview zoom controls', 'jeowp' ) }
 					>
 						<Button
 							style={ buttonStyle( zoomState === 'initial_zoom' ) }
@@ -121,7 +121,7 @@ export default function MapEditorPreview() {
 								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
-							{ __( 'Initial Zoom', 'jeo' ) }
+							{ __( 'Initial Zoom', 'jeowp' ) }
 						</Button>
 						<Button
 							style={ buttonStyle( zoomState === 'min_zoom' ) }
@@ -136,7 +136,7 @@ export default function MapEditorPreview() {
 								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
-							{ __( 'Min Zoom', 'jeo' ) }
+							{ __( 'Min Zoom', 'jeowp' ) }
 						</Button>
 						<Button
 							style={ buttonStyle( zoomState === 'max_zoom' ) }
@@ -151,7 +151,7 @@ export default function MapEditorPreview() {
 								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
-							{ __( 'Max Zoom', 'jeo' ) }
+							{ __( 'Max Zoom', 'jeowp' ) }
 						</Button>
 					</div>
 				</div>

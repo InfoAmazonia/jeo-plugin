@@ -8,9 +8,9 @@ import SchemaForm from '../shared/schema-form';
 const layerSchema = {
 	type: 'object',
 	properties: {
-		source_url: { title: __( 'Source data download link', 'jeo' ), type: 'string' },
-		attribution: { title: __( 'Data attribution link', 'jeo' ), type: 'string' },
-		attribution_name: { title: __( 'Data attribution name', 'jeo' ), type: 'string' },
+		source_url: { title: __( 'Source data download link', 'jeowp' ), type: 'string' },
+		attribution: { title: __( 'Data attribution link', 'jeowp' ), type: 'string' },
+		attribution_name: { title: __( 'Data attribution name', 'jeowp' ), type: 'string' },
 	},
 };
 

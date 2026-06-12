@@ -83,7 +83,7 @@ export default function InteractionsSettings( {
 	return (
 		<Modal
 			className="jeo-interactions-settings__modal"
-			title={ __( 'Interactions', 'jeo' ) }
+			title={ __( 'Interactions', 'jeowp' ) }
 			onRequestClose={ onDone }
 		>
 			<Panel className="jeo-interactions-settings">
@@ -111,7 +111,7 @@ export default function InteractionsSettings( {
 				variant="primary"
 				onClick={ onDone }
 			>
-				{ __( 'Done', 'jeo' ) }
+				{ __( 'Done', 'jeowp' ) }
 			</Button>
 		</Modal>
 	);

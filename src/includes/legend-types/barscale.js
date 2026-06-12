@@ -2,7 +2,7 @@
 	const { __ } = wp.i18n;
 
 	window.JeoLegendTypes.registerLegendType( 'barscale', {
-	label: __( 'Color scale', 'jeo' ),
+	label: __( 'Color scale', 'jeowp' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type
@@ -13,15 +13,15 @@
 			properties: {
 				left_label: {
 					type: 'string',
-					description: __( 'The label shown at the left end of the bar', 'jeo' ),
+					description: __( 'The label shown at the left end of the bar', 'jeowp' ),
 				},
 				right_label: {
 					type: 'string',
-					description: __( 'The label shown at the right end of the bar', 'jeo' ),
+					description: __( 'The label shown at the right end of the bar', 'jeowp' ),
 				},
 				colors: {
 					type: 'array',
-					description: __( 'An array of hexadecimal color values', 'jeo' ),
+					description: __( 'An array of hexadecimal color values', 'jeowp' ),
 					items: {
 						type: 'string',
 					},

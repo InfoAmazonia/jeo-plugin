@@ -50,7 +50,7 @@ class CircleEditor extends Component {
 			const circles = this.state.legendObject.attributes.legend_type_options.circles;
 
 			circles.push(
-				{ label: __( 'Default label', 'jeo' ), radius: 50, id: crypto.randomUUID() },
+				{ label: __( 'Default label', 'jeowp' ), radius: 50, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.circles = circles;
@@ -112,7 +112,7 @@ class CircleEditor extends Component {
 	render() {
 		return (
 			<Fragment>
-				{ __( 'Circles color', 'jeo' ) }
+				{ __( 'Circles color', 'jeowp' ) }
 				<ColorPicker
 					color={ this.state.legendObject.attributes.legend_type_options.color }
 					onChangeComplete={ ( color ) => {
@@ -128,7 +128,7 @@ class CircleEditor extends Component {
 				}
 
 				<Button variant="secondary" isButton isLarge onClick={ this.addNew } className="full-width-button">
-					{ __( 'Add new label', 'jeo' ) }
+					{ __( 'Add new label', 'jeowp' ) }
 				</Button>
 			</Fragment>
 
@@ -150,13 +150,13 @@ function CircleItem( { color, item, itemChanged, removeLabel } ) {
 		<div className={ 'legend-wrapper' } >
 
 			<TextControl
-				label={ __( 'Label', 'jeo' ) }
+				label={ __( 'Label', 'jeowp' ) }
 				value={ item.label }
 				onChange={ ( label ) => itemChanged( { ...item, label } ) }
 			/>
 
 			<RangeControl
-				label={ __( 'Radius', 'jeo' ) }
+				label={ __( 'Radius', 'jeowp' ) }
 				value={ item.radius }
 				onChange={ ( radius ) => itemChanged( { ...item, radius } ) }
 				min={ 1 }
@@ -167,17 +167,17 @@ function CircleItem( { color, item, itemChanged, removeLabel } ) {
 				renderToggle={ ( { isOpen, onToggle } ) => (
 					<div className="buttonsList">
 						<Button isDestructive isButton variant="secondary" onClick={ () => removeLabel( item.id ) } >
-							{ __( 'Remove', 'jeo' ) }
+							{ __( 'Remove', 'jeowp' ) }
 						</Button>
 
 						<Button variant="secondary" isButton aria-expanded={ isOpen } onClick={ onToggle } >
-							{ __( 'See preview', 'jeo' ) }
+							{ __( 'See preview', 'jeowp' ) }
 						</Button>
 					</div>
 				) }
 				renderContent={ () => (
 					<div className={ 'circle-wrapper' } >
-						{ __( 'Preview', 'jeo' ) }
+						{ __( 'Preview', 'jeowp' ) }
 						<div className="circle" style={ styles.circle } />
 					</div>
 				) }

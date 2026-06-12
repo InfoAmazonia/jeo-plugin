@@ -16,8 +16,8 @@ import { AsyncModeProvider } from '@wordpress/data';
 
 registerBlockType( 'jeo/map', {
 	apiVersion: 3,
-	title: __( 'JEO Map', 'jeo' ),
-	description: __( 'Display maps with layers and data', 'jeo' ),
+	title: __( 'JEO Map', 'jeowp' ),
+	description: __( 'Display maps with layers and data', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -46,8 +46,8 @@ registerBlockType( 'jeo/map', {
 
 registerBlockType( 'jeo/onetime-map', {
 	apiVersion: 3,
-	title: __( 'JEO One-time Map', 'jeo' ),
-	description: __( 'Display maps with layers and data', 'jeo' ),
+	title: __( 'JEO One-time Map', 'jeowp' ),
+	description: __( 'Display maps with layers and data', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -166,8 +166,8 @@ const storymapAttributes = {
 registerBlockType( 'jeo/storymap', {
 	apiVersion: 3,
 	// translators: Story Map is the name of JEO's storytelling map feature.
-	title: __( 'Story Map', 'jeo' ),
-	description: __( 'Display maps with storytelling', 'jeo' ),
+	title: __( 'Story Map', 'jeowp' ),
+	description: __( 'Display maps with storytelling', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	attributes: storymapAttributes,
@@ -212,8 +212,8 @@ registerBlockType( 'jeo/storymap', {
 
 registerBlockType( 'jeo/embedded-storymap', {
 	apiVersion: 3,
-	title: __( 'Embedded Story Map', 'jeo' ),
-	description: __( 'Display maps with storytelling', 'jeo' ),
+	title: __( 'Embedded Story Map', 'jeowp' ),
+	description: __( 'Display maps with storytelling', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	attributes: {
@@ -253,8 +253,8 @@ registerBlockType( 'jeo/embedded-storymap', {
 
 registerBlockType( 'jeo/map-editor', {
 	apiVersion: 3,
-	title: __( 'Map Editor Preview', 'jeo' ),
-	description: __( 'Interactive map preview for the Map post type editor.', 'jeo' ),
+	title: __( 'Map Editor Preview', 'jeowp' ),
+	description: __( 'Interactive map preview for the Map post type editor.', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -281,8 +281,8 @@ registerBlockType( 'jeo/map-editor', {
 
 registerBlockType( 'jeo/layer-editor', {
 	apiVersion: 3,
-	title: __( 'Layer Editor Preview', 'jeo' ),
-	description: __( 'Interactive layer preview for the Map Layer post type editor.', 'jeo' ),
+	title: __( 'Layer Editor Preview', 'jeowp' ),
+	description: __( 'Interactive layer preview for the Map Layer post type editor.', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {

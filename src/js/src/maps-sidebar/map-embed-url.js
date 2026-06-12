@@ -7,7 +7,7 @@ import './map-embed-url.css';
 export default function MapEmbedUrl( { url } ) {
 	return (
 		<PluginPostStatusInfo className="jeo-embed-url">
-			<span>{ __( 'Embed URL', 'jeo' ) } </span>
+			<span>{ __( 'Embed URL', 'jeowp' ) } </span>
 			<TextControl readOnly value={ url } />
 		</PluginPostStatusInfo>
 	);
