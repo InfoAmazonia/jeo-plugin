@@ -7,7 +7,7 @@
 	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
 
 	window.JeoLayerTypes.registerLayerType( 'mapbox', {
-	label: __( 'Mapbox Style', 'jeo' ),
+	label: __( 'Mapbox Style', 'jeowp' ),
 
 	addStyle( map, attributes ) {
 		const styleUrl = this.getStyleUrl( attributes );
@@ -152,7 +152,7 @@
 			properties: {
 				style_id: {
 					type: 'string',
-					title: __( 'Style ID', 'jeo' ),
+					title: __( 'Style ID', 'jeowp' ),
 					description:
 						__(
 							'The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
@@ -161,7 +161,7 @@
 				},
 				access_token: {
 					type: 'string',
-					title: __( 'Access token', 'jeo' ),
+					title: __( 'Access token', 'jeowp' ),
 					description:
 						__(
 							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',

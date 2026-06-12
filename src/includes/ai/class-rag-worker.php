@@ -65,19 +65,19 @@ class RAG_Worker {
 		if ( ! isset( $schedules['every_minute'] ) ) {
 			$schedules['every_minute'] = array(
 				'interval' => 60,
-				'display'  => __( 'Every Minute', 'jeo' ),
+				'display'  => __( 'Every Minute', 'jeowp' ),
 			);
 		}
 		if ( ! isset( $schedules['every_5_mins'] ) ) {
 			$schedules['every_5_mins'] = array(
 				'interval' => 300,
-				'display'  => __( 'Every 5 Minutes', 'jeo' ),
+				'display'  => __( 'Every 5 Minutes', 'jeowp' ),
 			);
 		}
 		if ( ! isset( $schedules['every_15_mins'] ) ) {
 			$schedules['every_15_mins'] = array(
 				'interval' => 900,
-				'display'  => __( 'Every 15 Minutes', 'jeo' ),
+				'display'  => __( 'Every 15 Minutes', 'jeowp' ),
 			);
 		}
 		return $schedules;
@@ -98,7 +98,7 @@ class RAG_Worker {
 
 		$time   = current_time( 'Y-m-d H:i:s' );
 		$source = current_action() === 'jeo_rag_index_cron_hook' ? 'Cron' : 'Manual';
-		$status = $is_error ? __( 'Error', 'jeo' ) : __( 'Success', 'jeo' );
+		$status = $is_error ? __( 'Error', 'jeowp' ) : __( 'Success', 'jeowp' );
 
 		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
 		$logs = array_slice( $logs, 0, 5 );
@@ -206,7 +206,7 @@ class RAG_Worker {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Either post_id or query is required.', 'jeo' ),
+					'message' => __( 'Either post_id or query is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -220,7 +220,7 @@ class RAG_Worker {
 				return new \WP_REST_Response(
 					array(
 						'success' => false,
-						'message' => __( 'Post not found.', 'jeo' ),
+						'message' => __( 'Post not found.', 'jeowp' ),
 					),
 					404
 				);
@@ -344,7 +344,7 @@ class RAG_Worker {
 		$config = $this->pipelines[ $pipeline_name ] ?? null;
 		if ( ! $config ) {
 			/* translators: %s: pipeline name */
-			return new \WP_Error( 'invalid_pipeline', sprintf( __( 'Unknown pipeline: %s', 'jeo' ), $pipeline_name ) );
+			return new \WP_Error( 'invalid_pipeline', sprintf( __( 'Unknown pipeline: %s', 'jeowp' ), $pipeline_name ) );
 		}
 
 		return $this->process_batch_for_config( $config );
@@ -374,7 +374,7 @@ class RAG_Worker {
 		if ( ! empty( $locked_model ) && ! empty( $current_model ) ) {
 			if ( $locked_model !== $current_model && $locked_model !== $current_model_basename ) {
 				/* translators: 1: locked model name, 2: current model name */
-				$err_msg = sprintf( __( 'Vector Store mismatch for %1$s! Expected %2$s, found %3$s.', 'jeo' ), $config->name, $locked_model, $current_model );
+				$err_msg = sprintf( __( 'Vector Store mismatch for %1$s! Expected %2$s, found %3$s.', 'jeowp' ), $config->name, $locked_model, $current_model );
 				$this->log_cron_run( $err_msg, true, $config->cron_log_option );
 				return new \WP_Error( 'model_mismatch', $err_msg );
 			}
@@ -400,7 +400,7 @@ class RAG_Worker {
 
 		if ( ! $query->have_posts() ) {
 			/* translators: %s: pipeline name */
-			$msg = sprintf( __( 'No more %s to vectorize.', 'jeo' ), $config->name );
+			$msg = sprintf( __( 'No more %s to vectorize.', 'jeowp' ), $config->name );
 			$this->log_cron_run( $msg, false, $config->cron_log_option );
 			return $msg;
 		}
@@ -425,7 +425,7 @@ class RAG_Worker {
 				}
 
 				/* translators: %d: number of items vectorized */
-				$msg = sprintf( __( 'Successfully vectorized %1$d %2$s.', 'jeo' ), count( $posts ), $config->name );
+				$msg = sprintf( __( 'Successfully vectorized %1$d %2$s.', 'jeowp' ), count( $posts ), $config->name );
 				$this->log_cron_run( $msg, false, $config->cron_log_option );
 				return $msg;
 			} else {
@@ -434,7 +434,7 @@ class RAG_Worker {
 					update_post_meta( $post->ID, $config->meta_key, $now );
 				}
 				/* translators: %s: pipeline name */
-				$msg = sprintf( __( 'Batch skipped for %s (no content found).', 'jeo' ), $config->name );
+				$msg = sprintf( __( 'Batch skipped for %s (no content found).', 'jeowp' ), $config->name );
 				$this->log_cron_run( $msg, false, $config->cron_log_option );
 				return $msg;
 			}

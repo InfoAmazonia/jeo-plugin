@@ -167,11 +167,11 @@ class Bulk_Processor {
 			wp_schedule_event( time(), 'every_minute', 'jeo_bulk_ai_clear_cron_hook' );
 		}
 
-		$this->log_action( __( 'Bulk clearing started (Background).', 'jeo' ) );
+		$this->log_action( __( 'Bulk clearing started (Background).', 'jeowp' ) );
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => __( 'Bulk clearing started in background. Posts will be reset in batches.', 'jeo' ),
+				'message' => __( 'Bulk clearing started in background. Posts will be reset in batches.', 'jeowp' ),
 			),
 			200
 		);
@@ -191,7 +191,7 @@ class Bulk_Processor {
 
 		$time   = current_time( 'Y-m-d H:i:s' );
 		$source = current_action() === 'jeo_bulk_ai_cron_hook' || current_action() === 'jeo_bulk_ai_clear_cron_hook' ? 'Cron' : 'Manual';
-		$status = $is_error ? '❌ ' . __( 'Error', 'jeo' ) : '✅ ' . __( 'Success', 'jeo' );
+		$status = $is_error ? '❌ ' . __( 'Error', 'jeowp' ) : '✅ ' . __( 'Success', 'jeowp' );
 
 		array_unshift( $logs, compact( 'time', 'source', 'status', 'message' ) );
 		$logs = array_slice( $logs, 0, 5 );
@@ -220,19 +220,19 @@ class Bulk_Processor {
 		if ( ! isset( $schedules['every_minute'] ) ) {
 			$schedules['every_minute'] = array(
 				'interval' => 900,
-				'display'  => __( 'Every Minute', 'jeo' ),
+				'display'  => __( 'Every Minute', 'jeowp' ),
 			);
 		}
 		if ( ! isset( $schedules['every_5_mins'] ) ) {
 			$schedules['every_5_mins'] = array(
 				'interval' => 300,
-				'display'  => __( 'Every 5 Minutes', 'jeo' ),
+				'display'  => __( 'Every 5 Minutes', 'jeowp' ),
 			);
 		}
 		if ( ! isset( $schedules['every_15_mins'] ) ) {
 			$schedules['every_15_mins'] = array(
 				'interval' => 900,
-				'display'  => __( 'Every 15 Minutes', 'jeo' ),
+				'display'  => __( 'Every 15 Minutes', 'jeowp' ),
 			);
 		}
 		return $schedules;
@@ -341,7 +341,7 @@ class Bulk_Processor {
 		$batch_size = (int) \jeo_settings()->get_option( 'jeo_bulk_batch_size', 5 );
 
 		if ( empty( $post_types ) ) {
-			$err = __( 'No post types selected for bulk processing.', 'jeo' );
+			$err = __( 'No post types selected for bulk processing.', 'jeowp' );
 			$this->log_action( $err, true );
 			return new \WP_Error( 'no_post_types', $err );
 		}
@@ -361,7 +361,7 @@ class Bulk_Processor {
 		$query = new \WP_Query( $query_args );
 
 		if ( ! $query->have_posts() ) {
-			$msg = __( 'No more posts to process. Deactivating worker.', 'jeo' );
+			$msg = __( 'No more posts to process. Deactivating worker.', 'jeowp' );
 			$this->log_action( $msg );
 
 			$options                       = get_option( 'jeo-settings' );
@@ -378,7 +378,7 @@ class Bulk_Processor {
 			return new \WP_Error( 'no_adapter', $err );
 		}
 		if ( ! $adapter ) {
-			$err = __( 'CRITICAL: No active AI adapter found for bulk processing.', 'jeo' );
+			$err = __( 'CRITICAL: No active AI adapter found for bulk processing.', 'jeowp' );
 			$this->log_action( $err, true );
 			return new \WP_Error( 'no_adapter', $err );
 		}
@@ -404,7 +404,7 @@ class Bulk_Processor {
 			++$processed_count;
 		}
 
-		$msg = sprintf( /* translators: %d: number of posts processed. */ _n( 'Processed batch of %d post.', 'Processed batch of %d posts.', $processed_count, 'jeo' ), $processed_count );
+		$msg = sprintf( /* translators: %d: number of posts processed. */ _n( 'Processed batch of %d post.', 'Processed batch of %d posts.', $processed_count, 'jeowp' ), $processed_count );
 		$this->log_action( $msg );
 		return $msg;
 	}
@@ -431,7 +431,7 @@ class Bulk_Processor {
 		$query = new \WP_Query( $query_args );
 
 		if ( ! $query->have_posts() ) {
-			$msg = __( 'No more posts to clear.', 'jeo' );
+			$msg = __( 'No more posts to clear.', 'jeowp' );
 			$this->log_action( $msg );
 			wp_clear_scheduled_hook( 'jeo_bulk_ai_clear_cron_hook' );
 			return $msg;
@@ -449,7 +449,7 @@ class Bulk_Processor {
 			++$cleared_count;
 		}
 
-		$msg = sprintf( /* translators: %d: number of posts cleared. */ _n( 'Cleared batch of %d post.', 'Cleared batch of %d posts.', $cleared_count, 'jeo' ), $cleared_count );
+		$msg = sprintf( /* translators: %d: number of posts cleared. */ _n( 'Cleared batch of %d post.', 'Cleared batch of %d posts.', $cleared_count, 'jeowp' ), $cleared_count );
 		$this->log_action( $msg );
 		return $msg;
 	}
@@ -599,7 +599,7 @@ class Bulk_Processor {
 	public function api_preview_approval( $request ) {
 		$post_ids = $request->get_param( 'post_ids' );
 		if ( empty( $post_ids ) || ! is_array( $post_ids ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No posts selected.', 'jeo' ) ), 400 );
+			return new \WP_REST_Response( array( 'error' => __( 'No posts selected.', 'jeowp' ) ), 400 );
 		}
 
 		$threshold = (int) \jeo_settings()->get_option( 'jeo_bulk_confidence_threshold', 0 );
@@ -661,15 +661,15 @@ class Bulk_Processor {
 		?>
 		<div id="jeo-bulk-ai-modal" style="display:none; position:fixed; z-index:99999; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); overflow:hidden;">
 			<div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:25px; border-radius:8px; width:600px; max-width:90%; max-height:85vh; display:flex; flex-direction:column; box-shadow: 0 5px 20px rgba(0,0,0,0.3);">
-				<h2 style="margin-top:0; border-bottom:1px solid #ccc; padding-bottom:10px; font-weight:600; color:#1d2327;">✨ <?php esc_html_e( 'Review Bulk AI Approval', 'jeo' ); ?></h2>
+				<h2 style="margin-top:0; border-bottom:1px solid #ccc; padding-bottom:10px; font-weight:600; color:#1d2327;">✨ <?php esc_html_e( 'Review Bulk AI Approval', 'jeowp' ); ?></h2>
 				<div id="jeo-bulk-ai-modal-content" style="overflow-y:auto; flex-grow:1; margin-bottom:20px;">
 					<p style="text-align:center; padding:20px; color:#666; font-style:italic;">
-						<?php esc_html_e( 'Analyzing selected posts...', 'jeo' ); ?>
+						<?php esc_html_e( 'Analyzing selected posts...', 'jeowp' ); ?>
 					</p>
 				</div>
 				<div style="border-top:1px solid #ccc; padding-top:15px; text-align:right;">
-					<button type="button" class="button button-secondary" id="jeo-bulk-ai-cancel"><?php esc_html_e( 'Cancel', 'jeo' ); ?></button>
-					<button type="button" class="button button-primary" id="jeo-bulk-ai-confirm" style="margin-left:10px;"><?php esc_html_e( 'Confirm & Apply', 'jeo' ); ?></button>
+					<button type="button" class="button button-secondary" id="jeo-bulk-ai-cancel"><?php esc_html_e( 'Cancel', 'jeowp' ); ?></button>
+					<button type="button" class="button button-primary" id="jeo-bulk-ai-confirm" style="margin-left:10px;"><?php esc_html_e( 'Confirm & Apply', 'jeowp' ); ?></button>
 				</div>
 			</div>
 		</div>
@@ -695,12 +695,12 @@ class Bulk_Processor {
 					});
 
 					if (postIds.length === 0) {
-						alert('<?php esc_js( __( 'Please select at least one post.', 'jeo' ) ); ?>');
+						alert('<?php esc_js( __( 'Please select at least one post.', 'jeowp' ) ); ?>');
 						return;
 					}
 
 					$modal.show();
-					$content.html('<p style="text-align:center; padding:20px; color:#666; font-style:italic;"><?php esc_js( __( 'Analyzing selected posts...', 'jeo' ) ); ?></p>');
+					$content.html('<p style="text-align:center; padding:20px; color:#666; font-style:italic;"><?php esc_js( __( 'Analyzing selected posts...', 'jeowp' ) ); ?></p>');
 
 					$.ajax({
 						url: '<?php echo esc_url_raw( rest_url( 'jeo/v1/bulk-ai-preview-approval' ) ); ?>',
@@ -769,7 +769,7 @@ class Bulk_Processor {
 	 * @return array
 	 */
 	public function add_status_column( $columns ) {
-		$columns['jeo_ai_status'] = __( 'JEO AI Status', 'jeo' );
+		$columns['jeo_ai_status'] = __( 'JEO AI Status', 'jeowp' );
 		return $columns;
 	}
 
@@ -790,15 +790,15 @@ class Bulk_Processor {
 
 		// 1. Render Status Badge
 		if ( $has_points ) {
-			echo '<span class="badge badge-success" style="background:#46b450; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Geolocated', 'post geolocation status', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-success" style="background:#46b450; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Geolocated', 'post geolocation status', 'jeowp' ) . '</span>';
 		} elseif ( 'pending_approval' === $status ) {
-			echo '<span class="badge badge-warning" style="background:#ffb900; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Pending Approval', 'post geolocation status', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-warning" style="background:#ffb900; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Pending Approval', 'post geolocation status', 'jeowp' ) . '</span>';
 		} elseif ( 'no_locations' === $status ) {
-			echo '<span class="badge badge-info" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'No Locations Found', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-info" style="background:#ccd0d4; color:#32373c; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'No Locations Found', 'jeowp' ) . '</span>';
 		} elseif ( 'error' === $status ) {
-			echo '<span class="badge badge-error" style="background:#d63638; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'AI Error', 'jeo' ) . '</span>';
+			echo '<span class="badge badge-error" style="background:#d63638; color:#fff; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html__( 'AI Error', 'jeowp' ) . '</span>';
 		} else {
-			echo '<span class="badge" style="background:#f0f0f1; color:#646970; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Not Processed', 'post geolocation status', 'jeo' ) . '</span>';
+			echo '<span class="badge" style="background:#f0f0f1; color:#646970; padding:2px 8px; border-radius:4px; display:inline-block; margin-bottom:4px;">' . esc_html_x( 'Not Processed', 'post geolocation status', 'jeowp' ) . '</span>';
 		}
 
 		// 2. Render Confidence Score (Below Badge)
@@ -838,7 +838,7 @@ class Bulk_Processor {
 			);
 			$approve_url = wp_nonce_url( $approve_url, 'jeo_approve_ai_' . $post_id );
 
-			echo '<div class="row-actions" style="margin-top:4px;"><span><a href="' . esc_url( $approve_url ) . '">' . esc_html__( 'Approve AI', 'jeo' ) . '</a></span></div>';
+			echo '<div class="row-actions" style="margin-top:4px;"><span><a href="' . esc_url( $approve_url ) . '">' . esc_html__( 'Approve AI', 'jeowp' ) . '</a></span></div>';
 		}
 	}
 
@@ -849,7 +849,7 @@ class Bulk_Processor {
 	 * @return array
 	 */
 	public function add_bulk_actions( $bulk_actions ) {
-		$bulk_actions['jeo_approve_ai'] = __( 'Approve JEO AI Geolocations', 'jeo' );
+		$bulk_actions['jeo_approve_ai'] = __( 'Approve JEO AI Geolocations', 'jeowp' );
 		return $bulk_actions;
 	}
 

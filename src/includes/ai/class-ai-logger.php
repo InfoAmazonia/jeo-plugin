@@ -36,16 +36,16 @@ class AI_Logger {
 	 */
 	public function register_post_type() {
 		$labels = array(
-			'name'          => _x( 'AI Usage Logs', 'Post Type General Name', 'jeo' ),
-			'singular_name' => _x( 'AI Usage Log', 'Post Type Singular Name', 'jeo' ),
-			'menu_name'     => __( 'AI Logs (Costs)', 'jeo' ),
-			'all_items'     => __( 'All AI Logs', 'jeo' ),
-			'view_item'     => __( 'View Log', 'jeo' ),
+			'name'          => _x( 'AI Usage Logs', 'Post Type General Name', 'jeowp' ),
+			'singular_name' => _x( 'AI Usage Log', 'Post Type Singular Name', 'jeowp' ),
+			'menu_name'     => __( 'AI Logs (Costs)', 'jeowp' ),
+			'all_items'     => __( 'All AI Logs', 'jeowp' ),
+			'view_item'     => __( 'View Log', 'jeowp' ),
 		);
 
 		$args = array(
-			'label'               => __( 'AI Usage Log', 'jeo' ),
-			'description'         => __( 'Internal logs for AI token usage and costs.', 'jeo' ),
+			'label'               => __( 'AI Usage Log', 'jeowp' ),
+			'description'         => __( 'Internal logs for AI token usage and costs.', 'jeowp' ),
 			'labels'              => $labels,
 			'supports'            => array( 'title', 'custom-fields' ), // Only title and meta.
 			'hierarchical'        => false,

@@ -57,7 +57,7 @@ class IconEditor extends Component {
 			const icons = this.state.legendObject.attributes.legend_type_options.icons;
 
 			icons.push(
-				{ label: __( 'Default label', 'jeo' ), icon: null, id: crypto.randomUUID() },
+				{ label: __( 'Default label', 'jeowp' ), icon: null, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.icons = icons;
@@ -93,7 +93,7 @@ class IconEditor extends Component {
 				<div className="size-warning">
 					<span className="warning-character">* </span>
 					<span className="warning-text">
-						{ __( 'Minimum size: 60x60 pixels', 'jeo' ) }
+						{ __( 'Minimum size: 60x60 pixels', 'jeowp' ) }
 					</span>
 				</div>
 				{
@@ -102,7 +102,7 @@ class IconEditor extends Component {
 					} )
 				}
 				<Button variant="secondary" isButton isLarge onClick={ this.addLabel } className="full-width-button">
-					{ __( 'Add new label', 'jeo' ) }
+					{ __( 'Add new label', 'jeowp' ) }
 				</Button>
 			</Fragment>
 		);
@@ -119,7 +119,7 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 			{ openModal && (
 				<Modal
 					className="jeo-interactions-settings__modal"
-					title={ __( 'Icon legend', 'jeo' ) }
+					title={ __( 'Icon legend', 'jeowp' ) }
 					isDismissible={ false }
 					onRequestClose={ () => setOpenModal( false ) }
 				>
@@ -135,7 +135,7 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 						style={ { marginTop: '10px' } }
 						onClick={ () => setOpenModal( false ) }
 					>
-						{ __( 'Ok', 'jeo' ) }
+						{ __( 'Ok', 'jeowp' ) }
 					</Button>
 				</Modal>
 			) }
@@ -166,14 +166,14 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 								</div>
 								<div className="buttons-inputs">
 									<TextControl
-										label={ __( 'Label', 'jeo' ) }
+										label={ __( 'Label', 'jeowp' ) }
 										value={ item.label }
 										onChange={ ( label ) => itemChanged( { ...item, label } ) }
 									/>
 
 									<Button
 										icon="minus"
-										label={ __( 'Remove', 'jeo' ) }
+										label={ __( 'Remove', 'jeowp' ) }
 										onClick={ () => removeLabel( item.id ) }
 										className="remove-button"
 									/>

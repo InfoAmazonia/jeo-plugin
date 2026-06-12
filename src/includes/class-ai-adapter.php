@@ -162,7 +162,7 @@ abstract class AI_Adapter {
 	 */
 	protected function parse_json_from_text( $text ) {
 		if ( empty( $text ) ) {
-			return new \WP_Error( 'empty_response', __( 'Empty response from AI.', 'jeo' ) );
+			return new \WP_Error( 'empty_response', __( 'Empty response from AI.', 'jeowp' ) );
 		}
 
 		// 1. Remove "Thinking" or "Thought" blocks often returned by models like DeepSeek or Gemini 2.5

@@ -461,7 +461,7 @@ add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
 function add_template_page_discovery( $post_templates ) {
 
 	// Add custom template named template-custom.php to select dropdown.
-	$post_templates['discovery.php'] = __( 'Discovery', 'jeo' );
+	$post_templates['discovery.php'] = __( 'Discovery', 'jeowp' );
 
 	return $post_templates;
 }

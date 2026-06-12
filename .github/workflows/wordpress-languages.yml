@@ -39,10 +39,10 @@ jobs:
         continue-on-error: true
         uses: holyhope/test-wordpress-languages-github-action@v4.0.2
         with:
-          slug: jeo
+          slug: jeowp
           source: src
-          pot_file: src/languages/jeo.pot
-          domain: jeo
+          pot_file: src/languages/jeowp.pot
+          domain: jeowp
           exclude: js/src
           fail_on_diff: false
           fail_on_warning: false

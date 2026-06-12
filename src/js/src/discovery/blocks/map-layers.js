@@ -193,7 +193,7 @@ class MapLayers extends Component {
 			.catch( ( error ) => {
 				this.setState( {
 					isLoadingMaps: false,
-					mapsError: __( 'Unable to load map layers right now.', 'jeo' ),
+					mapsError: __( 'Unable to load map layers right now.', 'jeowp' ),
 				} );
 
 				throw error;
@@ -655,7 +655,7 @@ class MapLayers extends Component {
 				className="maps-loading"
 				role="status"
 				aria-live="polite"
-				aria-label={ __( 'Loading…', 'jeo' ) }
+				aria-label={ __( 'Loading…', 'jeowp' ) }
 			>
 				<LoadingSpinner />
 			</div>
@@ -664,8 +664,8 @@ class MapLayers extends Component {
 		return (
 			<div className="maps-tab" style={ this.props.style }>
 				<Search
-					searchPlaceholder={ __( 'Search map', 'jeo' ) }
-					searchButtonLabel={ __( 'Search map', 'jeo' ) }
+					searchPlaceholder={ __( 'Search map', 'jeowp' ) }
+					searchButtonLabel={ __( 'Search map', 'jeowp' ) }
 					update={ this.updateMaps }
 					searchField={ this.state.currentSearch }
 					disabled={ this.state.isLoadingMaps }
@@ -700,18 +700,18 @@ class MapLayers extends Component {
 						</div>
 
 						<div className="status-message">
-							{ isApplied ? _x( 'Changes applied', 'layer application status', 'jeo' ) : _x( 'Not applied', 'layer application status', 'jeo' ) }
+							{ isApplied ? _x( 'Changes applied', 'layer application status', 'jeowp' ) : _x( 'Not applied', 'layer application status', 'jeowp' ) }
 						</div>
 					</div>
 
 					<div className="selected-layers--title">
 						{ ' ' }
-						{ __( 'Selected layers', 'jeo' ) }{ ' ' }
+						{ __( 'Selected layers', 'jeowp' ) }{ ' ' }
 					</div>
 					<div className="selected-layers--content">
 						{ Object.keys( this.props.selectedLayers ).length > 0
 							? selectedLayersRender
-							: __( 'No layers selected', 'jeo' ) }
+							: __( 'No layers selected', 'jeowp' ) }
 					</div>
 				</div>
 
@@ -721,14 +721,14 @@ class MapLayers extends Component {
 						disabled
 						aria-disabled="true"
 					>
-						{ _x( 'Changes applied', 'layer application status', 'jeo' ) }
+						{ _x( 'Changes applied', 'layer application status', 'jeowp' ) }
 					</button>
 				) : (
 					<button
 						className="apply-changes"
 						onClick={ () => this.applyLayersChanges() }
 					>
-						{ __( 'Apply changes', 'jeo' ) }
+						{ __( 'Apply changes', 'jeowp' ) }
 					</button>
 				) }
 				{ loading }
@@ -741,7 +741,7 @@ class MapLayers extends Component {
 						className="maps-loading"
 						role="status"
 						aria-live="polite"
-						aria-label={ __( 'Loading…', 'jeo' ) }
+						aria-label={ __( 'Loading…', 'jeowp' ) }
 					>
 						<LoadingSpinner />
 					</div>

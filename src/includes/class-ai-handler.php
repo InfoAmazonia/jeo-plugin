@@ -45,7 +45,7 @@ class AI_Handler {
 			return;
 		}
 
-		$msg = __( 'Warning: Deactivating JEO will permanently remove all API Keys and AI settings for security reasons. Do you want to proceed?', 'jeo' );
+		$msg = __( 'Warning: Deactivating JEO will permanently remove all API Keys and AI settings for security reasons. Do you want to proceed?', 'jeowp' );
 		?>
 		<script>
 			jQuery(function($) {
@@ -64,19 +64,19 @@ class AI_Handler {
 	 */
 	public function api_download_dict() {
 		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Unauthorized access.', 'jeo' ) );
+			wp_die( esc_html__( 'Unauthorized access.', 'jeowp' ) );
 		}
 
 		check_admin_referer( 'jeo_download_dict' );
 
 		$file = isset( $_GET['file'] ) ? sanitize_file_name( wp_unslash( $_GET['file'] ) ) : '';
 		if ( empty( $file ) || strpos( $file, '.json' ) === false ) {
-			wp_die( esc_html__( 'Invalid file.', 'jeo' ) );
+			wp_die( esc_html__( 'Invalid file.', 'jeowp' ) );
 		}
 
 		$path = JEO_BASEPATH . '/includes/ai/data/' . $file;
 		if ( ! file_exists( $path ) ) {
-			wp_die( esc_html__( 'File not found.', 'jeo' ) );
+			wp_die( esc_html__( 'File not found.', 'jeowp' ) );
 		}
 
 		header( 'Content-Type: application/json' );
@@ -103,16 +103,16 @@ class AI_Handler {
 	 */
 	public function get_adapters() {
 		return array(
-			'gemini'      => __( 'Google Gemini', 'jeo' ),
-			'openai'      => __( 'OpenAI', 'jeo' ),
-			'deepseek'    => __( 'DeepSeek', 'jeo' ),
-			'anthropic'   => __( 'Anthropic Claude', 'jeo' ),
-			'ollama'      => __( 'Ollama (Local/Custom)', 'jeo' ),
-			'mistral'     => __( 'Mistral AI', 'jeo' ),
-			'zai'         => __( 'Zhipu AI (GLM)', 'jeo' ),
-			'huggingface' => __( 'HuggingFace Inference', 'jeo' ),
-			'grok'        => __( 'Grok (xAI)', 'jeo' ),
-			'cohere'      => __( 'Cohere', 'jeo' ),
+			'gemini'      => __( 'Google Gemini', 'jeowp' ),
+			'openai'      => __( 'OpenAI', 'jeowp' ),
+			'deepseek'    => __( 'DeepSeek', 'jeowp' ),
+			'anthropic'   => __( 'Anthropic Claude', 'jeowp' ),
+			'ollama'      => __( 'Ollama (Local/Custom)', 'jeowp' ),
+			'mistral'     => __( 'Mistral AI', 'jeowp' ),
+			'zai'         => __( 'Zhipu AI (GLM)', 'jeowp' ),
+			'huggingface' => __( 'HuggingFace Inference', 'jeowp' ),
+			'grok'        => __( 'Grok (xAI)', 'jeowp' ),
+			'cohere'      => __( 'Cohere', 'jeowp' ),
 		);
 	}
 
@@ -141,7 +141,7 @@ class AI_Handler {
 				'jeo_ai_no_key',
 				sprintf(
 					/* translators: %s: AI provider name */
-					__( 'No API key configured for %s. Please add it in JEO → AI Settings.', 'jeo' ),
+					__( 'No API key configured for %s. Please add it in JEO → AI Settings.', 'jeowp' ),
 					esc_html( $this->get_adapters()[ $active ] ?? $active )
 				)
 			);
@@ -394,7 +394,7 @@ class AI_Handler {
 		try {
 			$store = $request->get_param( 'store' );
 			if ( ! in_array( $store, array( 'test', 'production' ), true ) ) {
-				return new \WP_REST_Response( array( 'error' => __( 'Invalid store type.', 'jeo' ) ), 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'Invalid store type.', 'jeowp' ) ), 400 );
 			}
 
 			$upload_dir = wp_upload_dir();
@@ -420,7 +420,7 @@ class AI_Handler {
 				array(
 					'success' => true,
 					/* translators: %s: Store type name. */
-					'message' => sprintf( __( '%s store cleared successfully.', 'jeo' ), ucfirst( $store ) ),
+					'message' => sprintf( __( '%s store cleared successfully.', 'jeowp' ), ucfirst( $store ) ),
 				),
 				200
 			);
@@ -463,7 +463,7 @@ class AI_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => true,
-					'message' => __( 'Layer store cleared successfully.', 'jeo' ),
+					'message' => __( 'Layer store cleared successfully.', 'jeowp' ),
 				),
 				200
 			);
@@ -490,7 +490,7 @@ class AI_Handler {
 			$store = $request->get_param( 'store' );
 
 			if ( empty( $query ) ) {
-				return new \WP_REST_Response( array( 'error' => __( 'Query is required.', 'jeo' ) ), 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'Query is required.', 'jeowp' ) ), 400 );
 			}
 
 			// Initialize the RAG Agent to access Vector Store.
@@ -511,7 +511,7 @@ class AI_Handler {
 					array(
 						'success'   => true,
 						'documents' => array(),
-						'message'   => __( 'No matches found in the selected Vector Store. Try vectorizing some posts first.', 'jeo' ),
+						'message'   => __( 'No matches found in the selected Vector Store. Try vectorizing some posts first.', 'jeowp' ),
 					),
 					200
 				);
@@ -565,7 +565,7 @@ class AI_Handler {
 			);
 
 			if ( empty( $query->posts ) ) {
-				return new \WP_REST_Response( array( 'error' => __( 'No posts available to test.', 'jeo' ) ), 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'No posts available to test.', 'jeowp' ) ), 400 );
 			}
 
 			$post = $query->posts[0];
@@ -573,7 +573,7 @@ class AI_Handler {
 			// Load into Document.
 			$documents = \Jeo\AI\WP_Post_Data_Loader::load( array( $post ) );
 			if ( empty( $documents ) ) {
-				return new \WP_REST_Response( array( 'error' => __( 'The selected random post has no usable text content.', 'jeo' ) ), 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'The selected random post has no usable text content.', 'jeowp' ) ), 400 );
 			}
 
 			$test_doc = $documents[0];
@@ -589,7 +589,7 @@ class AI_Handler {
 			$vector       = $embedded_doc->getEmbedding();
 
 			if ( empty( $vector ) ) {
-				return new \WP_REST_Response( array( 'error' => __( 'The embedding provider returned an empty vector.', 'jeo' ) ), 500 );
+				return new \WP_REST_Response( array( 'error' => __( 'The embedding provider returned an empty vector.', 'jeowp' ) ), 500 );
 			}
 
 			// Save the embedded document to the TEST Vector Store so we can retrieve it later.
@@ -604,7 +604,7 @@ class AI_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => true,
-					'message' => __( 'Embedding created and saved to Test Store!', 'jeo' ),
+					'message' => __( 'Embedding created and saved to Test Store!', 'jeowp' ),
 					'details' => array(
 						'post_id'         => $post->ID,
 						'post_title'      => $post->post_title,
@@ -645,7 +645,7 @@ class AI_Handler {
 		}
 
 		if ( empty( $api_key ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'API Key or URL is required to list models.', 'jeo' ) ), 400 );
+			return new \WP_REST_Response( array( 'error' => __( 'API Key or URL is required to list models.', 'jeowp' ) ), 400 );
 		}
 
 		$models = array();
@@ -678,7 +678,7 @@ class AI_Handler {
 				}
 				// Zhipu AI usually implements OpenAI's v1/models compat too if used via SDK endpoint, but can fail if unsupported.
 				if ( 'zai' === $provider ) {
-					return new \WP_REST_Response( array( 'error' => __( 'Model fetching not officially supported dynamically for Zhipu AI.', 'jeo' ) ), 400 );
+					return new \WP_REST_Response( array( 'error' => __( 'Model fetching not officially supported dynamically for Zhipu AI.', 'jeowp' ) ), 400 );
 				}
 
 				$response = wp_remote_get( $url, $args );
@@ -834,7 +834,7 @@ class AI_Handler {
 				break;
 
 			default:
-				return new \WP_REST_Response( array( 'error' => __( 'Model fetching is not supported for this provider yet. Please enter the model ID manually.', 'jeo' ) ), 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'Model fetching is not supported for this provider yet. Please enter the model ID manually.', 'jeowp' ) ), 400 );
 		}
 
 		if ( is_wp_error( $response ) ) {
@@ -842,7 +842,7 @@ class AI_Handler {
 		}
 
 		if ( empty( $models ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No models found. Check your API key or permissions.', 'jeo' ) ), 404 );
+			return new \WP_REST_Response( array( 'error' => __( 'No models found. Check your API key or permissions.', 'jeowp' ) ), 404 );
 		}
 
 		return new \WP_REST_Response(
@@ -878,7 +878,7 @@ class AI_Handler {
 			}
 
 			if ( empty( $api_key ) ) {
-				return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeo' ) ), 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeowp' ) ), 400 );
 			}
 
 			$adapter = null;
@@ -888,7 +888,7 @@ class AI_Handler {
 			}
 
 			if ( ! $adapter ) {
-				return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeo' ) ), 400 );
+				return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeowp' ) ), 400 );
 			}
 
 			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
@@ -911,7 +911,7 @@ class AI_Handler {
 				return new \WP_REST_Response(
 					array(
 						'success' => true,
-						'message' => __( 'API Key is valid and active!', 'jeo' ),
+						'message' => __( 'API Key is valid and active!', 'jeowp' ),
 						'data'    => $result,
 					),
 					200
@@ -921,7 +921,7 @@ class AI_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'The AI provider returned an unexpected response format.', 'jeo' ),
+					'message' => __( 'The AI provider returned an unexpected response format.', 'jeowp' ),
 				),
 				200
 			);
@@ -966,7 +966,7 @@ class AI_Handler {
 		$use_secondary_limit     = $request->get_param( 'use_secondary_limit' ) ? $request->get_param( 'use_secondary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false );
 
 		if ( empty( $context ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeo' ) ), 400 );
+			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeowp' ) ), 400 );
 		}
 
 		$lang_instruction = ( 'en' === $lang )
@@ -998,7 +998,7 @@ class AI_Handler {
 		}
 
 		if ( ! $adapter ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
 		}
 
 		// Prompt Optimizer: Appends model-specific guidelines to the meta-prompt.
@@ -1114,7 +1114,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 		$generated_prompt = isset( $result[0]['quote'] ) ? $result[0]['quote'] : '';
 		if ( empty( $generated_prompt ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'AI failed to generate prompt.', 'jeo' ) ), 500 );
+			return new \WP_REST_Response( array( 'error' => __( 'AI failed to generate prompt.', 'jeowp' ) ), 500 );
 		}
 
 		return new \WP_REST_Response( array( 'prompt' => $generated_prompt ), 200 );
@@ -1132,7 +1132,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		$model         = $request->get_param( 'model' );
 
 		if ( empty( $custom_prompt ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'Prompt is required.', 'jeo' ) ), 400 );
+			return new \WP_REST_Response( array( 'error' => __( 'Prompt is required.', 'jeowp' ) ), 400 );
 		}
 
 		if ( empty( $api_key ) ) {
@@ -1158,7 +1158,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		}
 
 		if ( ! $adapter ) {
-			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
 		}
 
 		// Use a diverse global text so validation succeeds regardless of regional prompt restrictions (Europe, Brazil, etc.).
@@ -1180,27 +1180,27 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 
 		// Strict schema validation.
 		$is_valid = true;
-		$msg      = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeo' );
+		$msg      = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeowp' );
 
 		if ( ! is_array( $result ) ) {
 			$is_valid = false;
-			$msg      = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeo' );
+			$msg      = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeowp' );
 		} elseif ( count( $result ) > 0 ) {
 			foreach ( $result as $item ) {
 				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lon', $item ) || ! isset( $item['quote'] ) ) {
 					$is_valid = false;
-					$msg      = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeo' );
+					$msg      = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeowp' );
 					break;
 				}
 				if ( isset( $item['is_primary'] ) && ! is_bool( $item['is_primary'] ) && ! in_array( $item['is_primary'], array( true, false, 1, 0, 'true', 'false' ), true ) ) {
 					$is_valid = false;
-					$msg      = __( 'Validation failed: The AI returned an invalid is_primary value (must be boolean).', 'jeo' );
+					$msg      = __( 'Validation failed: The AI returned an invalid is_primary value (must be boolean).', 'jeowp' );
 					break;
 				}
 			}
 		} else {
 			// Array is empty (count == 0). This is VALID if the AI correctly filtered out locations based on user prompt.
-			$msg = __( 'Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text.', 'jeo' );
+			$msg = __( 'Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text.', 'jeowp' );
 		}
 
 		return new \WP_REST_Response(
@@ -1246,7 +1246,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			}
 
 			if ( ! $adapter ) {
-				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
 			}
 
 			$result = $adapter->georeference( $title, $content );
@@ -1259,7 +1259,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		} catch ( \Throwable $e ) {
 			return new \WP_REST_Response(
 				array(
-					'error' => __( 'An unexpected error occurred while processing the AI request.', 'jeo' ) . ' ' . $e->getMessage(),
+					'error' => __( 'An unexpected error occurred while processing the AI request.', 'jeowp' ) . ' ' . $e->getMessage(),
 				),
 				500
 			);
@@ -1295,7 +1295,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			}
 
 			if ( ! $adapter ) {
-				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeo' ) ), 500 );
+				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
 			}
 
 			// First interaction: store the initial post context.
@@ -1328,7 +1328,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		} catch ( \Throwable $e ) {
 			return new \WP_REST_Response(
 				array(
-					'error' => __( 'An unexpected error occurred while processing the AI chat request.', 'jeo' ) . ' ' . $e->getMessage(),
+					'error' => __( 'An unexpected error occurred while processing the AI chat request.', 'jeowp' ) . ' ' . $e->getMessage(),
 				),
 				500
 			);
@@ -1457,7 +1457,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => __( 'Backup created successfully!', 'jeo' ),
+				'message' => __( 'Backup created successfully!', 'jeowp' ),
 			),
 			200
 		);
@@ -1478,7 +1478,7 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 	public function api_delete_backup( $request ) {
 		$filename = $request->get_param( 'filename' );
 		if ( empty( $filename ) ) {
-			return new \WP_REST_Response( array( 'error' => __( 'Missing filename', 'jeo' ) ), 400 );
+			return new \WP_REST_Response( array( 'error' => __( 'Missing filename', 'jeowp' ) ), 400 );
 		}
 
 		$uploads   = wp_upload_dir();
@@ -1489,6 +1489,6 @@ Output ONLY the generated prompt text without any markdown wrappers or conversat
 			return new \WP_REST_Response( array( 'success' => true ), 200 );
 		}
 
-		return new \WP_REST_Response( array( 'error' => __( 'File not found', 'jeo' ) ), 404 );
+		return new \WP_REST_Response( array( 'error' => __( 'File not found', 'jeowp' ) ), 404 );
 	}
 }

@@ -138,7 +138,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Post not found.', 'jeo' ),
+					'message' => __( 'Post not found.', 'jeowp' ),
 				),
 				404
 			);
@@ -167,7 +167,7 @@ class Minimap {
 		}
 
 		if ( empty( $layers ) ) {
-			$rag_message = $rag_message ? $rag_message : __( 'No matching layers found. Add layers manually or run the RAG indexer in JEO Settings.', 'jeo' );
+			$rag_message = $rag_message ? $rag_message : __( 'No matching layers found. Add layers manually or run the RAG indexer in JEO Settings.', 'jeowp' );
 		}
 
 		$base_variant = $this->determine_base_variant( $layers );
@@ -211,7 +211,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'A prompt is required.', 'jeo' ),
+					'message' => __( 'A prompt is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -221,7 +221,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'A post ID is required.', 'jeo' ),
+					'message' => __( 'A post ID is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -232,7 +232,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Post not found.', 'jeo' ),
+					'message' => __( 'Post not found.', 'jeowp' ),
 				),
 				404
 			);
@@ -243,7 +243,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
+					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
 				),
 				400
 			);
@@ -290,7 +290,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'conversation_id is required.', 'jeo' ),
+					'message' => __( 'conversation_id is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -300,7 +300,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'A post ID is required.', 'jeo' ),
+					'message' => __( 'A post ID is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -310,7 +310,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Post not found.', 'jeo' ),
+					'message' => __( 'Post not found.', 'jeowp' ),
 				),
 				404
 			);
@@ -320,7 +320,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'A message is required.', 'jeo' ),
+					'message' => __( 'A message is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -331,7 +331,7 @@ class Minimap {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
+					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
 				),
 				400
 			);
@@ -388,7 +388,7 @@ class Minimap {
 		} catch ( \TypeError $e ) {
 			if ( false !== strpos( $e->getMessage(), 'getJson()' ) ) {
 				// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- exception message, not HTML output.
-				throw new \Exception( esc_html__( 'The AI returned an empty response. Please try again.', 'jeo' ), 0, $e );
+				throw new \Exception( esc_html__( 'The AI returned an empty response. Please try again.', 'jeowp' ), 0, $e );
 			}
 			throw $e;
 		}
@@ -898,21 +898,21 @@ class Minimap {
 			return array(
 				array(
 					'variant'            => 'dark',
-					'title'              => __( 'Dark Base (Mapbox)', 'jeo' ),
+					'title'              => __( 'Dark Base (Mapbox)', 'jeowp' ),
 					'type'               => 'mapbox',
 					'layer_type_options' => array( 'style_id' => 'mapbox/dark-v11' ),
 					'attribution'        => '&copy; <a href="https://www.mapbox.com/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
 				),
 				array(
 					'variant'            => 'light',
-					'title'              => __( 'Terrain Base (Mapbox)', 'jeo' ),
+					'title'              => __( 'Terrain Base (Mapbox)', 'jeowp' ),
 					'type'               => 'mapbox',
 					'layer_type_options' => array( 'style_id' => 'mapbox/outdoors-v12' ),
 					'attribution'        => '&copy; <a href="https://www.mapbox.com/">Mapbox</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
 				),
 				array(
 					'variant'            => 'satellite',
-					'title'              => __( 'Satellite Base (Mapbox)', 'jeo' ),
+					'title'              => __( 'Satellite Base (Mapbox)', 'jeowp' ),
 					'type'               => 'mapbox',
 					'layer_type_options' => array( 'style_id' => 'mapbox/satellite-streets-v12' ),
 					'attribution'        => '&copy; <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -923,7 +923,7 @@ class Minimap {
 		return array(
 			array(
 				'variant'            => 'dark',
-				'title'              => __( 'Dark Base', 'jeo' ),
+				'title'              => __( 'Dark Base', 'jeowp' ),
 				'type'               => 'tilelayer',
 				'layer_type_options' => array(
 					'url' => 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
@@ -932,7 +932,7 @@ class Minimap {
 			),
 			array(
 				'variant'            => 'light',
-				'title'              => __( 'Light Base', 'jeo' ),
+				'title'              => __( 'Light Base', 'jeowp' ),
 				'type'               => 'tilelayer',
 				'layer_type_options' => array(
 					'url' => 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -941,7 +941,7 @@ class Minimap {
 			),
 			array(
 				'variant'            => 'satellite',
-				'title'              => __( 'Satellite Base', 'jeo' ),
+				'title'              => __( 'Satellite Base', 'jeowp' ),
 				'type'               => 'tilelayer',
 				'layer_type_options' => array(
 					'url' => 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',

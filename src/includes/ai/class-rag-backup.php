@@ -38,7 +38,7 @@ class RAG_Backup {
 		$backup_dir = $store_dir . '/backups';
 
 		if ( ! class_exists( 'ZipArchive' ) ) {
-			return new \WP_Error( 'missing_ziparchive', __( 'The PHP ZipArchive extension is required to create backups.', 'jeo' ) );
+			return new \WP_Error( 'missing_ziparchive', __( 'The PHP ZipArchive extension is required to create backups.', 'jeowp' ) );
 		}
 
 		if ( ! file_exists( $backup_dir ) ) {
@@ -89,14 +89,14 @@ class RAG_Backup {
 
 			if ( ! $files_added ) {
 				wp_delete_file( $zip_file );
-				return new \WP_Error( 'empty_store', __( 'No vector store found to backup.', 'jeo' ) );
+				return new \WP_Error( 'empty_store', __( 'No vector store found to backup.', 'jeowp' ) );
 			}
 
 			$this->rotate_backups( $backup_dir );
 			return true;
 		}
 
-		return new \WP_Error( 'zip_failed', __( 'Failed to create the ZIP archive.', 'jeo' ) );
+		return new \WP_Error( 'zip_failed', __( 'Failed to create the ZIP archive.', 'jeowp' ) );
 	}
 	/**
 	 * Keep only the 3 latest backups.

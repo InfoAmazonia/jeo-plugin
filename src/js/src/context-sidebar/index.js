@@ -23,7 +23,7 @@ registerPlugin( 'jeo-context-sidebar', {
 
 		return (
 			<PluginDocumentSettingPanel
-				title={ wp.i18n.__( 'AI Context', 'jeo' ) }
+				title={ wp.i18n.__( 'AI Context', 'jeowp' ) }
 				className="jeo-context-sidebar-panel"
 			>
 				<ContextChatPanel

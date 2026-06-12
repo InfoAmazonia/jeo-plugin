@@ -122,10 +122,10 @@ const ContextChatPanel = ( { postId } ) => {
 				}
 				setHasStarted( true );
 			} else {
-				setError( response.message || __( 'Failed to generate suggestions.', 'jeo' ) );
+				setError( response.message || __( 'Failed to generate suggestions.', 'jeowp' ) );
 			}
 		} catch ( err ) {
-			setError( err.message || __( 'Error contacting AI.', 'jeo' ) );
+			setError( err.message || __( 'Error contacting AI.', 'jeowp' ) );
 		} finally {
 			setIsLoading( false );
 		}
@@ -169,10 +169,10 @@ const ContextChatPanel = ( { postId } ) => {
 				] );
 				setHasStarted( true );
 			} else {
-				setError( response.message || __( 'Failed to process message.', 'jeo' ) );
+				setError( response.message || __( 'Failed to process message.', 'jeowp' ) );
 			}
 		} catch ( err ) {
-			setError( err.message || __( 'Error contacting AI.', 'jeo' ) );
+			setError( err.message || __( 'Error contacting AI.', 'jeowp' ) );
 		} finally {
 			setIsLoading( false );
 		}
@@ -182,7 +182,7 @@ const ContextChatPanel = ( { postId } ) => {
 	 * Retry: ask the AI to generate new suggestions without explicit user input.
 	 */
 	const handleRetry = () => {
-		sendMessage( __( 'Generate new editorial suggestions based on the current post content.', 'jeo' ) );
+		sendMessage( __( 'Generate new editorial suggestions based on the current post content.', 'jeowp' ) );
 	};
 
 	/**
@@ -208,7 +208,7 @@ const ContextChatPanel = ( { postId } ) => {
 			setReferences( [] );
 			setHasStarted( false );
 		} catch ( err ) {
-			setError( err.message || __( 'Failed to clear conversation.', 'jeo' ) );
+			setError( err.message || __( 'Failed to clear conversation.', 'jeowp' ) );
 		} finally {
 			setIsLoading( false );
 		}
@@ -232,14 +232,14 @@ const ContextChatPanel = ( { postId } ) => {
 			{ isRestoring && (
 				<div className="jeo-context-chat__loading">
 					<Spinner />
-					<span>{ __( 'Restoring conversation...', 'jeo' ) }</span>
+					<span>{ __( 'Restoring conversation...', 'jeowp' ) }</span>
 				</div>
 			) }
 
 			{ ! isRestoring && ! hasStarted && messages.length === 0 && ! isLoading && (
 				<div className="jeo-context-chat__intro">
 					<p className="jeo-context-chat__placeholder">
-						{ __( 'Use the AI Context Assistant to generate editorial suggestions based on your article and the site\'s knowledge base.', 'jeo' ) }
+						{ __( 'Use the AI Context Assistant to generate editorial suggestions based on your article and the site\'s knowledge base.', 'jeowp' ) }
 					</p>
 					<Button
 						variant="primary"
@@ -248,7 +248,7 @@ const ContextChatPanel = ( { postId } ) => {
 						isBusy={ isLoading }
 						className="jeo-context-chat__start"
 					>
-						{ __( 'Generate Suggestions', 'jeo' ) }
+						{ __( 'Generate Suggestions', 'jeowp' ) }
 					</Button>
 				</div>
 			) }
@@ -287,7 +287,7 @@ const ContextChatPanel = ( { postId } ) => {
 				{ ! isRestoring && isLoading && (
 					<div className="jeo-context-chat__loading">
 						<Spinner />
-						<span>{ __( 'Thinking...', 'jeo' ) }</span>
+						<span>{ __( 'Thinking...', 'jeowp' ) }</span>
 					</div>
 				) }
 
@@ -310,7 +310,7 @@ const ContextChatPanel = ( { postId } ) => {
 					value={ inputValue }
 					onChange={ setInputValue }
 					onKeyDown={ handleKeyDown }
-					placeholder={ __( 'Ask for changes or new paragraphs... (Ctrl+Enter to send)', 'jeo' ) }
+					placeholder={ __( 'Ask for changes or new paragraphs... (Ctrl+Enter to send)', 'jeowp' ) }
 					className="jeo-context-chat__textarea"
 					disabled={ isLoading || isRestoring }
 					rows={ isModal ? 4 : 3 }
@@ -322,7 +322,7 @@ const ContextChatPanel = ( { postId } ) => {
 						disabled={ isLoading || isRestoring || ! inputValue.trim() }
 						className="jeo-context-chat__send"
 					>
-						{ __( 'Send', 'jeo' ) }
+						{ __( 'Send', 'jeowp' ) }
 					</Button>
 					<div className="jeo-context-chat__secondary-actions">
 						<Button
@@ -332,7 +332,7 @@ const ContextChatPanel = ( { postId } ) => {
 							disabled={ isLoading || isRestoring || ! hasStarted }
 							className="jeo-context-chat__retry"
 						>
-							{ __( 'Retry', 'jeo' ) }
+							{ __( 'Retry', 'jeowp' ) }
 						</Button>
 						<Button
 							variant="tertiary"
@@ -341,7 +341,7 @@ const ContextChatPanel = ( { postId } ) => {
 							disabled={ isLoading || isRestoring }
 							className="jeo-context-chat__clear"
 						>
-							{ __( 'Clear', 'jeo' ) }
+							{ __( 'Clear', 'jeowp' ) }
 						</Button>
 					</div>
 				</div>
@@ -353,7 +353,7 @@ const ContextChatPanel = ( { postId } ) => {
 		<div className="jeo-context-panel">
 			<div className="jeo-context-panel__header">
 				<h3 className="jeo-context-panel__title">
-					{ __( 'AI Context', 'jeo' ) }
+					{ __( 'AI Context', 'jeowp' ) }
 				</h3>
 				<Button
 					variant="tertiary"
@@ -364,7 +364,7 @@ const ContextChatPanel = ( { postId } ) => {
 							<path d="M4 8V4M4 4H8M4 4L9 9M20 8V4M20 4H16M20 4L15 9M4 16V20M4 20H8M4 20L9 15M20 16V20M20 20H16M20 20L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 						</svg>
 					}
-					label={ __( 'Expand', 'jeo' ) }
+					label={ __( 'Expand', 'jeowp' ) }
 					className="jeo-context-panel__expand"
 				/>
 			</div>
@@ -373,7 +373,7 @@ const ContextChatPanel = ( { postId } ) => {
 
 			{ isExpanded && (
 				<Modal
-					title={ __( 'AI Context Assistant', 'jeo' ) }
+					title={ __( 'AI Context Assistant', 'jeowp' ) }
 					onRequestClose={ () => setIsExpanded( false ) }
 					className="jeo-context-modal"
 					isFullScreen={ false }

@@ -87,7 +87,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 	}, [] );
 
 	const categoryOptions = [
-		{ label: __( '— None —', 'jeo' ), value: '' },
+		{ label: __( '— None —', 'jeowp' ), value: '' },
 		...( categoryList || [] ).map( ( c ) => ( {
 			label: c.name,
 			value: String( c.id ),
@@ -95,7 +95,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 	];
 
 	const tagOptions = [
-		{ label: __( '— None —', 'jeo' ), value: '' },
+		{ label: __( '— None —', 'jeowp' ), value: '' },
 		...( tagList || [] ).map( ( t ) => ( {
 			label: t.name,
 			value: String( t.id ),
@@ -103,7 +103,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 	];
 
 	const postTypeOptions = [
-		{ label: __( 'All geo-enabled types', 'jeo' ), value: '' },
+		{ label: __( 'All geo-enabled types', 'jeowp' ), value: '' },
 		...enabledPostTypes.map( ( t ) => ( {
 			label: t.labels?.name || t.slug,
 			value: t.slug,
@@ -134,11 +134,11 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		<div { ...blockProps }>
 			<InspectorControls>
 				<PanelBody
-					title={ __( 'Location Preview', 'jeo' ) }
+					title={ __( 'Location Preview', 'jeowp' ) }
 					initialOpen={ true }
 				>
 					<TextControl
-						label={ __( 'Latitude', 'jeo' ) }
+						label={ __( 'Latitude', 'jeowp' ) }
 						type="number"
 						step="any"
 						min={ -90 }
@@ -147,7 +147,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						onChange={ ( val ) => setPreviewLat( Number.parseFloat( val ) || 0 ) }
 					/>
 					<TextControl
-						label={ __( 'Longitude', 'jeo' ) }
+						label={ __( 'Longitude', 'jeowp' ) }
 						type="number"
 						step="any"
 						min={ -180 }
@@ -158,21 +158,21 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 				</PanelBody>
 
 				<PanelBody
-					title={ __( 'Post Card', 'jeo' ) }
+					title={ __( 'Post Card', 'jeowp' ) }
 					initialOpen={ true }
 				>
 					<SelectControl
-						label={ __( 'Layout', 'jeo' ) }
+						label={ __( 'Layout', 'jeowp' ) }
 						value={ postLayout }
 						options={ [
-							{ label: __( 'Grid', 'jeo' ), value: 'grid' },
-							{ label: __( 'List', 'jeo' ), value: 'list' },
+							{ label: __( 'Grid', 'jeowp' ), value: 'grid' },
+							{ label: __( 'List', 'jeowp' ), value: 'list' },
 						] }
 						onChange={ ( val ) => setAttributes( { postLayout: val } ) }
 					/>
 					{ postLayout === 'grid' && (
 						<RangeControl
-							label={ __( 'Columns', 'jeo' ) }
+							label={ __( 'Columns', 'jeowp' ) }
 							value={ postsPerRow }
 							onChange={ ( val ) => setAttributes( { postsPerRow: val } ) }
 							min={ 1 }
@@ -182,24 +182,24 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 					{ hasNewspack && (
 						<>
 							<SelectControl
-								label={ __( 'Media position', 'jeo' ) }
+								label={ __( 'Media position', 'jeowp' ) }
 								value={ mediaPosition }
 								options={ [
-									{ label: __( 'Top', 'jeo' ), value: 'top' },
-									{ label: __( 'Left', 'jeo' ), value: 'left' },
-									{ label: __( 'Right', 'jeo' ), value: 'right' },
-									{ label: __( 'Behind', 'jeo' ), value: 'behind' },
+									{ label: __( 'Top', 'jeowp' ), value: 'top' },
+									{ label: __( 'Left', 'jeowp' ), value: 'left' },
+									{ label: __( 'Right', 'jeowp' ), value: 'right' },
+									{ label: __( 'Behind', 'jeowp' ), value: 'behind' },
 								] }
 								onChange={ ( val ) => setAttributes( { mediaPosition: val } ) }
 							/>
 							<SelectControl
-								label={ __( 'Image shape', 'jeo' ) }
+								label={ __( 'Image shape', 'jeowp' ) }
 								value={ imageShape }
 								options={ [
-									{ label: __( 'Landscape', 'jeo' ), value: 'landscape' },
-									{ label: __( 'Portrait', 'jeo' ), value: 'portrait' },
-									{ label: __( 'Square', 'jeo' ), value: 'square' },
-									{ label: __( 'Uncropped', 'jeo' ), value: 'uncropped' },
+									{ label: __( 'Landscape', 'jeowp' ), value: 'landscape' },
+									{ label: __( 'Portrait', 'jeowp' ), value: 'portrait' },
+									{ label: __( 'Square', 'jeowp' ), value: 'square' },
+									{ label: __( 'Uncropped', 'jeowp' ), value: 'uncropped' },
 								] }
 								onChange={ ( val ) => setAttributes( { imageShape: val } ) }
 							/>
@@ -208,13 +208,13 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 					{ ! hasNewspack && (
 						<>
 							<SelectControl
-								label={ __( 'Image size', 'jeo' ) }
+								label={ __( 'Image size', 'jeowp' ) }
 								value={ imageSize }
 								options={ imageSizeOptions }
 								onChange={ ( val ) => setAttributes( { imageSize: val } ) }
 							/>
 							<ToggleControl
-								label={ __( 'Link featured image', 'jeo' ) }
+								label={ __( 'Link featured image', 'jeowp' ) }
 								checked={ imageAsLink }
 								onChange={ ( val ) => setAttributes( { imageAsLink: val } ) }
 							/>
@@ -223,11 +223,11 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 				</PanelBody>
 
 				<PanelBody
-					title={ __( 'Query Settings', 'jeo' ) }
+					title={ __( 'Query Settings', 'jeowp' ) }
 					initialOpen={ false }
 				>
 					<RangeControl
-						label={ __( 'Posts per page', 'jeo' ) }
+						label={ __( 'Posts per page', 'jeowp' ) }
 						value={ postsPerPage }
 						onChange={ ( val ) => setAttributes( { postsPerPage: val } ) }
 						min={ 1 }
@@ -235,7 +235,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 					/>
 					{ enabledPostTypes.length > 1 && (
 						<SelectControl
-							label={ __( 'Post type', 'jeo' ) }
+							label={ __( 'Post type', 'jeowp' ) }
 							value={ postType || '' }
 							options={ postTypeOptions }
 							onChange={ ( val ) => setAttributes( { postType: val } ) }
@@ -244,32 +244,32 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 				</PanelBody>
 
 				<PanelBody
-					title={ __( 'Filters', 'jeo' ) }
+					title={ __( 'Filters', 'jeowp' ) }
 					initialOpen={ false }
 				>
 					<SelectControl
-						label={ __( 'Categories', 'jeo' ) }
+						label={ __( 'Categories', 'jeowp' ) }
 						multiple
 						value={ selectedCategories }
 						options={ categoryOptions }
 						onChange={ ( val ) => setAttributes( { categories: parseMultiSelect( val ) } ) }
 					/>
 					<SelectControl
-						label={ __( 'Tags', 'jeo' ) }
+						label={ __( 'Tags', 'jeowp' ) }
 						multiple
 						value={ selectedTags }
 						options={ tagOptions }
 						onChange={ ( val ) => setAttributes( { tags: parseMultiSelect( val ) } ) }
 					/>
 					<SelectControl
-						label={ __( 'Exclude categories', 'jeo' ) }
+						label={ __( 'Exclude categories', 'jeowp' ) }
 						multiple
 						value={ selectedCatExcl }
 						options={ categoryOptions }
 						onChange={ ( val ) => setAttributes( { categoryExclusions: parseMultiSelect( val ) } ) }
 					/>
 					<SelectControl
-						label={ __( 'Exclude tags', 'jeo' ) }
+						label={ __( 'Exclude tags', 'jeowp' ) }
 						multiple
 						value={ selectedTagExcl }
 						options={ tagOptions }
@@ -278,34 +278,34 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 				</PanelBody>
 
 				<PanelBody
-					title={ __( 'Display', 'jeo' ) }
+					title={ __( 'Display', 'jeowp' ) }
 					initialOpen={ false }
 				>
 					<ToggleControl
-						label={ __( 'Show featured image', 'jeo' ) }
+						label={ __( 'Show featured image', 'jeowp' ) }
 						checked={ showThumbnail }
 						onChange={ ( val ) => setAttributes( { showThumbnail: val } ) }
 					/>
 					{ hasNewspack && (
 						<ToggleControl
-							label={ __( 'Show category', 'jeo' ) }
+							label={ __( 'Show category', 'jeowp' ) }
 							checked={ showCategory }
 							onChange={ ( val ) => setAttributes( { showCategory: val } ) }
 						/>
 					) }
 					<ToggleControl
-						label={ __( 'Show date', 'jeo' ) }
+						label={ __( 'Show date', 'jeowp' ) }
 						checked={ showDate }
 						onChange={ ( val ) => setAttributes( { showDate: val } ) }
 					/>
 					<ToggleControl
-						label={ __( 'Show excerpt', 'jeo' ) }
+						label={ __( 'Show excerpt', 'jeowp' ) }
 						checked={ showExcerpt }
 						onChange={ ( val ) => setAttributes( { showExcerpt: val } ) }
 					/>
 					{ showExcerpt && (
 						<RangeControl
-							label={ __( 'Excerpt length', 'jeo' ) }
+							label={ __( 'Excerpt length', 'jeowp' ) }
 							value={ excerptLength }
 							onChange={ ( val ) => setAttributes( { excerptLength: val } ) }
 							min={ 5 }
@@ -313,13 +313,13 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						/>
 					) }
 					<ToggleControl
-						label={ __( 'Show author', 'jeo' ) }
+						label={ __( 'Show author', 'jeowp' ) }
 						checked={ showAuthor }
 						onChange={ ( val ) => setAttributes( { showAuthor: val } ) }
 					/>
 					{ hasNewspack && showAuthor && (
 						<ToggleControl
-							label={ __( 'Show avatar', 'jeo' ) }
+							label={ __( 'Show avatar', 'jeowp' ) }
 							checked={ showAvatar }
 							onChange={ ( val ) => setAttributes( { showAvatar: val } ) }
 						/>
@@ -327,16 +327,16 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 					{ hasNewspack && (
 						<>
 							<ToggleControl
-								label={ __( 'Show read more link', 'jeo' ) }
+								label={ __( 'Show read more link', 'jeowp' ) }
 								checked={ showReadMore }
 								onChange={ ( val ) => setAttributes( { showReadMore: val } ) }
 							/>
 							{ showReadMore && (
 								<TextControl
-									label={ __( 'Read more label', 'jeo' ) }
+									label={ __( 'Read more label', 'jeowp' ) }
 									type="text"
 									value={ readMoreLabel }
-									placeholder={ __( 'Read more', 'jeo' ) }
+									placeholder={ __( 'Read more', 'jeowp' ) }
 									onChange={ ( val ) => setAttributes( { readMoreLabel: val } ) }
 								/>
 							) }
@@ -346,32 +346,32 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 
 				{ hasNewspack && (
 					<PanelBody
-						title={ __( 'Typography & Spacing', 'jeo' ) }
+						title={ __( 'Typography & Spacing', 'jeowp' ) }
 						initialOpen={ false }
 					>
 						<RangeControl
-							label={ __( 'Type scale', 'jeo' ) }
+							label={ __( 'Type scale', 'jeowp' ) }
 							value={ typeScale }
 							onChange={ ( val ) => setAttributes( { typeScale: val } ) }
 							min={ 1 }
 							max={ 10 }
 						/>
 						<RangeControl
-							label={ __( 'Image scale', 'jeo' ) }
+							label={ __( 'Image scale', 'jeowp' ) }
 							value={ imageScale }
 							onChange={ ( val ) => setAttributes( { imageScale: val } ) }
 							min={ 1 }
 							max={ 4 }
 						/>
 						<RangeControl
-							label={ __( 'Column gap', 'jeo' ) }
+							label={ __( 'Column gap', 'jeowp' ) }
 							value={ colGap }
 							onChange={ ( val ) => setAttributes( { colGap: val } ) }
 							min={ 1 }
 							max={ 3 }
 						/>
 						<RangeControl
-							label={ __( 'Min height (vh)', 'jeo' ) }
+							label={ __( 'Min height (vh)', 'jeowp' ) }
 							value={ minHeight }
 							onChange={ ( val ) => setAttributes( { minHeight: val } ) }
 							min={ 0 }

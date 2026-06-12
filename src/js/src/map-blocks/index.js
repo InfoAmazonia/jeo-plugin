@@ -16,8 +16,8 @@ import { cloneDeep } from 'lodash';
 import { AsyncModeProvider } from '@wordpress/data';
 
 registerBlockType( 'jeo/map', {
-	title: __( 'JEO Map', 'jeo' ),
-	description: __( 'Display maps with layers and data', 'jeo' ),
+	title: __( 'JEO Map', 'jeowp' ),
+	description: __( 'Display maps with layers and data', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -37,8 +37,8 @@ registerBlockType( 'jeo/map', {
 } );
 
 registerBlockType( 'jeo/onetime-map', {
-	title: __( 'JEO One-time Map', 'jeo' ),
-	description: __( 'Display maps with layers and data', 'jeo' ),
+	title: __( 'JEO One-time Map', 'jeowp' ),
+	description: __( 'Display maps with layers and data', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -89,19 +89,19 @@ registerBlockType( 'jeo/onetime-map', {
 			type: 'object',
 			'properties': {
 				'east': {
-					'description': __('East pan limit', 'jeo'),
+					'description': __('East pan limit', 'jeowp'),
 					'type': 'number'
 				},
 				'north': {
-					'description': __('North pan limit', 'jeo'),
+					'description': __('North pan limit', 'jeowp'),
 					'type': 'number'
 				},
 				'south': {
-					'description': __('South pan limit', 'jeo'),
+					'description': __('South pan limit', 'jeowp'),
 					'type': 'number'
 				},
 				'west': {
-					'description': __('West pan limit', 'jeo'),
+					'description': __('West pan limit', 'jeowp'),
 
 					'type': 'number'
 				},
@@ -149,8 +149,8 @@ registerBlockType( 'jeo/onetime-map', {
 } );
 
 registerBlockType( 'jeo/ai-minimap', {
-	title: __( 'AI-Assisted Map', 'jeo' ),
-	description: __( 'Display an AI-generated contextual map with layers and geolocation pins', 'jeo' ),
+	title: __( 'AI-Assisted Map', 'jeowp' ),
+	description: __( 'Display an AI-generated contextual map with layers and geolocation pins', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -346,8 +346,8 @@ const storymapAttributes = {
 };
 
 registerBlockType( 'jeo/storymap', {
-	title: __( 'Story Map', 'jeo' ),
-	description: __( 'Display maps with storytelling', 'jeo' ),
+	title: __( 'Story Map', 'jeowp' ),
+	description: __( 'Display maps with storytelling', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	attributes: {
@@ -411,8 +411,8 @@ registerBlockType( 'jeo/storymap', {
 } );
 
 registerBlockType( 'jeo/embedded-storymap', {
-	title: __( 'Embedded Story Map', 'jeo' ),
-	description: __( 'Display maps with storytelling', 'jeo' ),
+	title: __( 'Embedded Story Map', 'jeowp' ),
+	description: __( 'Display maps with storytelling', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	attributes: {
@@ -431,8 +431,8 @@ registerBlockType( 'jeo/embedded-storymap', {
 });
 
 registerBlockType( 'jeo/stories-near-you', {
-	title: __( 'Stories Near You', 'jeo' ),
-	description: __( 'Display geolocated posts sorted by proximity to the reader', 'jeo' ),
+	title: __( 'Stories Near You', 'jeowp' ),
+	description: __( 'Display geolocated posts sorted by proximity to the reader', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -576,7 +576,7 @@ registerBlockType( 'jeo/stories-near-you', {
 } );
 
 registerBlockType( 'jeo/layer-editor', {
-	title: __( 'Layer Preview', 'jeo' ),
+	title: __( 'Layer Preview', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -587,7 +587,7 @@ registerBlockType( 'jeo/layer-editor', {
 } );
 
 registerBlockType( 'jeo/map-editor', {
-	title: __( 'Map Preview', 'jeo' ),
+	title: __( 'Map Preview', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {

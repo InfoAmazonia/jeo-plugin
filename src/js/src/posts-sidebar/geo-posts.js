@@ -435,25 +435,25 @@ class JeoGeocodePosts extends Component {
 						onChange={ this.handleSearchValue }
 					/>
 					<span className="jeo-geocode-search__hint">
-						{ __( 'You can also drag the marker across the map.', 'jeo' ) }
+						{ __( 'You can also drag the marker across the map.', 'jeowp' ) }
 					</span>
 				</div>
 				<div>
 					{ ! isDisabled && (
 						<Fragment>
 							<CheckboxControl
-								label={ __( 'Move marker to nearest address', 'jeo' ) }
+								label={ __( 'Move marker to nearest address', 'jeowp' ) }
 								checked={ magneticMarkers }
 								onChange={ this.toggleMagnet }
 							/>
 							<RadioControl
-								label={ __( 'Relevance', 'jeo' ) }
+								label={ __( 'Relevance', 'jeowp' ) }
 								selected={
 									points.length ? selectedPoint.relevance || 'primary' : 'primary'
 								}
 								options={ [
-									{ label: __( 'Primary', 'jeo' ), value: 'primary' },
-									{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
+									{ label: __( 'Primary', 'jeowp' ), value: 'primary' },
+									{ label: __( 'Secondary', 'jeowp' ), value: 'secondary' },
 								] }
 								onChange={ this.relevanceClick }
 							/>
@@ -462,7 +462,7 @@ class JeoGeocodePosts extends Component {
 					<div className="jeo-geocode-posts__row">
 						<div className="jeo-geocode-posts__buttons-list">
 							<Button variant="secondary" onClick={ this.onClickCancel }>
-								{ __( 'Cancel', 'jeo' ) }
+								{ __( 'Cancel', 'jeowp' ) }
 							</Button>
 							<Button
 								variant="primary"
@@ -470,8 +470,8 @@ class JeoGeocodePosts extends Component {
 								disabled={ isDisabled }
 							>
 								{ formMode === 'edit'
-									? __( 'Update selected point', 'jeo' )
-									: __( 'Save new point', 'jeo' ) }
+									? __( 'Update selected point', 'jeowp' )
+									: __( 'Save new point', 'jeowp' ) }
 							</Button>
 						</div>
 					</div>
@@ -560,15 +560,15 @@ class JeoGeocodePosts extends Component {
 							style={ { userSelect: 'none' } }
 						>
 							{ isPanelMinimized
-								? sprintf( _n( 'Point (%d)', 'Points (%d)', pointsList.length, 'jeo' ), pointsList.length )
-								: __( 'Geolocate this post', 'jeo' )
+								? sprintf( _n( 'Point (%d)', 'Points (%d)', pointsList.length, 'jeowp' ), pointsList.length )
+								: __( 'Geolocate this post', 'jeowp' )
 							}
 						</h3>
 						<button
 							className="jeo-geocode-modal__panel-toggle"
 							onClick={ ( e ) => { e.stopPropagation(); this.togglePanel(); } }
 							type="button"
-							aria-label={ isPanelMinimized ? __( 'Expand panel', 'jeo' ) : __( 'Minimize panel', 'jeo' ) }
+							aria-label={ isPanelMinimized ? __( 'Expand panel', 'jeowp' ) : __( 'Minimize panel', 'jeowp' ) }
 						>
 							{ isPanelMinimized ? '▶' : '◀' }
 						</button>
@@ -577,11 +577,11 @@ class JeoGeocodePosts extends Component {
 					{ ! isPanelMinimized && (
 						<div className="jeo-geocode-modal__panel-content">
 							<div>
-								<h2 style={ { fontSize: '1.2rem', marginTop: 0 } }>{ __( 'Add new point', 'jeo' ) }</h2>
+								<h2 style={ { fontSize: '1.2rem', marginTop: 0 } }>{ __( 'Add new point', 'jeowp' ) }</h2>
 								<div>
 									{ formMode === 'view' ? (
 										<Button variant="primary" onClick={ this.onClickNewPoint }>
-											{ __( 'Add new point', 'jeo' ) }
+											{ __( 'Add new point', 'jeowp' ) }
 										</Button>
 									) : formMode === 'new' ? (
 										this.renderForm()
@@ -589,9 +589,9 @@ class JeoGeocodePosts extends Component {
 								</div>
 							</div>
 							<div style={ { marginTop: '20px' } }>
-								<h2 style={ { fontSize: '1.2rem' } }>{ __( 'Current points', 'jeo' ) }</h2>
+								<h2 style={ { fontSize: '1.2rem' } }>{ __( 'Current points', 'jeowp' ) }</h2>
 								{ pointsList.length === 0 ? (
-									__( 'No points', 'jeo' )
+									__( 'No points', 'jeowp' )
 								) : (
 									<ul style={ { padding: 0, margin: 0, listStyle: 'none' } }>
 										{ pointsList.map( ( point, i ) => (
@@ -615,14 +615,14 @@ class JeoGeocodePosts extends Component {
 															variant="link"
 															onClick={ ( e ) => { e.stopPropagation(); this.onClickDelete( i ); } }
 														>
-															{ __( 'Delete', 'jeo' ) }
+															{ __( 'Delete', 'jeowp' ) }
 														</Button>
 														<span> | </span>
 														<Button
 															variant="link"
 															onClick={ ( e ) => { e.stopPropagation(); this.onClickEdit( i ); } }
 														>
-															{ __( 'Edit', 'jeo' ) }
+															{ __( 'Edit', 'jeowp' ) }
 														</Button>
 													</Fragment>
 												) : (

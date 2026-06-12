@@ -390,7 +390,7 @@ class Stories_Near_You {
 				<?php endfor; ?>
 			</ul>
 			<div class="jeo-stories-near-you__error hidden">
-				<p><?php esc_html_e( 'Unable to load stories near you.', 'jeo' ); ?></p>
+				<p><?php esc_html_e( 'Unable to load stories near you.', 'jeowp' ); ?></p>
 			</div>
 			<script type="application/json" class="jeo-stories-near-you-attrs"><?php echo wp_json_encode( array_merge( $atts, array( 'excludeIds' => $rendered_ids ) ) ); ?></script>
 		</div>
@@ -917,7 +917,7 @@ class Stories_Near_You {
 		ob_start();
 		?>
 		<div class="jeo-stories-near-you__empty">
-			<p><?php esc_html_e( 'No stories found near you.', 'jeo' ); ?></p>
+			<p><?php esc_html_e( 'No stories found near you.', 'jeowp' ); ?></p>
 		</div>
 		<?php
 		return ob_get_clean();

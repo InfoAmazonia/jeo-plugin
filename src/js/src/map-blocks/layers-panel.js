@@ -17,11 +17,11 @@ export default function ( {
 	return (
 		<Panel
 			name="map-layers"
-			title={ __( 'Map layers', 'jeo' ) }
+			title={ __( 'Map layers', 'jeowp' ) }
 			className="jeo-layers-panel"
 		>
 			{ loadingLayers ? (
-				<p>{ __( 'Loading layers data...', 'jeo' ) }</p>
+				<p>{ __( 'Loading layers data...', 'jeowp' ) }</p>
 			) : (
 				<ol>
 					{ layers.map( ( layerSettings ) => {
@@ -36,7 +36,7 @@ export default function ( {
 									{ layerUseLabels[ settings.use ] }
 									{ settings.use !== 'fixed' &&
 										settings.default &&
-										' - ' + _x( 'Default', 'layer usage default label', 'jeo' ) }
+										' - ' + _x( 'Default', 'layer usage default label', 'jeowp' ) }
 								</li>
 							)
 						);
@@ -44,7 +44,7 @@ export default function ( {
 				</ol>
 			) }
 			<Button variant="primary" isLarge onClick={ openModal }>
-				{ __( 'Edit layers settings', 'jeo' ) }
+				{ __( 'Edit layers settings', 'jeowp' ) }
 			</Button>
 		</Panel>
 	);

@@ -16,14 +16,14 @@ get_header(); ?>
 
 	<div class="discovery-mobile-warning">
 		<h1>
-			<?php esc_html_e( 'Sorry!', 'jeo' ); ?>
+			<?php esc_html_e( 'Sorry!', 'jeowp' ); ?>
 		</h1>
 		<h4>
-			<?php esc_html_e( "This page can't be viewed on mobile devices.", 'jeo' ); ?>
+			<?php esc_html_e( "This page can't be viewed on mobile devices.", 'jeowp' ); ?>
 		</h4>
 
 		<a href="/">
-			<?php esc_html_e( 'Back to homepage', 'jeo' ); ?>
+			<?php esc_html_e( 'Back to homepage', 'jeowp' ); ?>
 		</a>
 	</div>
 </main>

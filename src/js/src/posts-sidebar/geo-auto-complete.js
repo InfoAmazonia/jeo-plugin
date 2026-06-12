@@ -74,7 +74,7 @@ export default function JeoGeoAutoComplete( {
 			.then( ( response ) => {
 				if ( ! response.ok ) {
 					throw new Error(
-						__( 'Unable to load address suggestions.', 'jeo' )
+						__( 'Unable to load address suggestions.', 'jeowp' )
 					);
 				}
 
@@ -140,8 +140,8 @@ export default function JeoGeoAutoComplete( {
 					inputValue={ currentValue }
 					selectedValue={ currentValue || null }
 					isLoading={ isLoading }
-					placeholder={ __( 'Search address', 'jeo' ) }
-					ariaLabel={ __( 'Search address', 'jeo' ) }
+					placeholder={ __( 'Search address', 'jeowp' ) }
+					ariaLabel={ __( 'Search address', 'jeowp' ) }
 					getOptionLabel={ ( suggestion ) => suggestion.full_address }
 					getOptionValue={ ( suggestion ) => suggestion.full_address }
 					onInputValueChange={ ( nextValue ) => {
@@ -177,7 +177,7 @@ export default function JeoGeoAutoComplete( {
 				onClick={ () => loadSuggestions( currentValue ) }
 				disabled={ isSearchDisabled }
 			>
-				{ __( 'Search', 'jeo' ) }
+				{ __( 'Search', 'jeowp' ) }
 			</Button>
 		</div>
 	);

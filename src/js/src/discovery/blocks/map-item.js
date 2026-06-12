@@ -143,7 +143,7 @@ class MapItem extends Component {
 
 					{ map.meta.layers.length }
 					{ ' ' }
-					{ __( 'layers', 'jeo' ) }
+					{ __( 'layers', 'jeowp' ) }
 					{ this.state.displayLayers ? ' ▴' : ' ▾' }
 				</button>
 
@@ -154,7 +154,7 @@ class MapItem extends Component {
 					aria-busy={ loadingMapLayers ? 'true' : undefined }
 					aria-label={
 						! applyRemoveButton && loadingMapLayers
-							? __( 'Loading…', 'jeo' )
+							? __( 'Loading…', 'jeowp' )
 							: undefined
 					}
 				>
@@ -171,7 +171,7 @@ class MapItem extends Component {
 					) }
 					{ ! applyRemoveButton && loadingMapLayers
 						? null
-						: applyRemoveButton ? __( 'Clear', 'jeo' ) : __( 'Apply', 'jeo' ) }
+						: applyRemoveButton ? __( 'Clear', 'jeowp' ) : __( 'Apply', 'jeowp' ) }
 				</button>
 
 				<div className="layers-toggles">
@@ -180,7 +180,7 @@ class MapItem extends Component {
 							className="layers-toggles__loading"
 							role="status"
 							aria-live="polite"
-							aria-label={ __( 'Loading…', 'jeo' ) }
+							aria-label={ __( 'Loading…', 'jeowp' ) }
 						>
 							<LoadingSpinner />
 						</div>

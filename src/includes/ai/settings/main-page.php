@@ -7,7 +7,7 @@
 
 ?>
 <div class="wrap">
-	<h1><?php esc_html_e( 'JEO AI Configuration', 'jeo' ); ?></h1>
+	<h1><?php esc_html_e( 'JEO AI Configuration', 'jeowp' ); ?></h1>
 
 	<nav class="nav-tab-wrapper wp-clearfix">
 		<?php foreach ( $tabs as $slug => $label ) : ?>
@@ -96,7 +96,7 @@
 		</div>
 
 		<div class="jeo-settings-submit" style="margin-top: 20px;">
-			<input type="submit" class="button-primary" value="<?php esc_attr_e( 'Save AI Settings', 'jeo' ); ?>" />
+			<input type="submit" class="button-primary" value="<?php esc_attr_e( 'Save AI Settings', 'jeowp' ); ?>" />
 		</div>
 	</form>
 </div>
@@ -104,15 +104,15 @@
 <?php if ( \jeo_settings()->get_option( 'ai_debug_console' ) ) : ?>
 <div id="jeo-ai-debug-console" style="position: fixed; bottom: 0; right: 20px; width: 450px; background: #1d2327; color: #fff; border: 1px solid #3c434a; border-bottom: 0; border-radius: 6px 6px 0 0; z-index: 99999; font-family: monospace; display: flex; flex-direction: column; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); transition: transform 0.3s ease;">
 	<div id="jeo-ai-debug-header" style="padding: 8px 15px; background: #2c3338; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-radius: 6px 6px 0 0;">
-		<span style="font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">📡 <?php esc_html_e( 'JEO AI API Debugger', 'jeo' ); ?></span>
+		<span style="font-weight: bold; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">📡 <?php esc_html_e( 'JEO AI API Debugger', 'jeowp' ); ?></span>
 		<div style="display: flex; gap: 10px; align-items: center;">
-			<span id="jeo-ai-debug-clear" title="<?php esc_attr_e( 'Clear logs', 'jeo' ); ?>" style="cursor:pointer; font-size: 14px;">🧹</span>
+			<span id="jeo-ai-debug-clear" title="<?php esc_attr_e( 'Clear logs', 'jeowp' ); ?>" style="cursor:pointer; font-size: 14px;">🧹</span>
 			<span id="jeo-ai-debug-toggle" style="font-size: 12px;">▲</span>
 		</div>
 	</div>
 	<div id="jeo-ai-debug-body" style="height: 300px; overflow-y: auto; padding: 15px; display: none; background: #1d2327;">
 		<div id="jeo-ai-debug-log-container">
-			<div style="color: #8c8f94; font-style: italic;"><?php esc_html_e( '[System] Console initialized. Awaiting API activity...', 'jeo' ); ?></div>
+			<div style="color: #8c8f94; font-style: italic;"><?php esc_html_e( '[System] Console initialized. Awaiting API activity...', 'jeowp' ); ?></div>
 		</div>
 	</div>
 </div>

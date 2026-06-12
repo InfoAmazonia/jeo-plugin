@@ -110,7 +110,7 @@ class Geocode_Handler {
 			array(
 				'slug'        => 'nominatim',
 				'name'        => 'Nominatim',
-				'description' => __( 'Service provided by Open Street Maps at https://nominatim.openstreetmap.org/', 'jeo' ),
+				'description' => __( 'Service provided by Open Street Maps at https://nominatim.openstreetmap.org/', 'jeowp' ),
 				'class_name'  => '\Jeo\Geocoders\Nominatim',
 			)
 		);
@@ -119,7 +119,7 @@ class Geocode_Handler {
 			array(
 				'slug'        => 'mapbox',
 				'name'        => 'Mapbox',
-				'description' => __( 'Service provided by Mapbox (requires API Key).', 'jeo' ),
+				'description' => __( 'Service provided by Mapbox (requires API Key).', 'jeowp' ),
 				'class_name'  => '\Jeo\Geocoders\Mapbox',
 			)
 		);
@@ -236,7 +236,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'              => 'object',
-						'description'       => __( 'Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeo' ),
+						'description'       => __( 'Multiple metadata that holds locations related to the post. Each location is an object composed of lat, lon and geocode attributes', 'jeowp' ),
 					)
 				);
 
@@ -252,7 +252,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'number',
-						'description'   => __( 'Latitude', 'jeo' ),
+						'description'   => __( 'Latitude', 'jeowp' ),
 					)
 				);
 
@@ -266,7 +266,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'number',
-						'description'   => __( 'Longitude', 'jeo' ),
+						'description'   => __( 'Longitude', 'jeowp' ),
 					)
 				);
 
@@ -280,7 +280,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'string',
-						'description'   => __( 'Country', 'jeo' ),
+						'description'   => __( 'Country', 'jeowp' ),
 					)
 				);
 
@@ -294,7 +294,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'string',
-						'description'   => __( 'Country code', 'jeo' ),
+						'description'   => __( 'Country code', 'jeowp' ),
 					)
 				);
 
@@ -308,7 +308,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'string',
-						'description'   => __( 'Region level 1', 'jeo' ),
+						'description'   => __( 'Region level 1', 'jeowp' ),
 					)
 				);
 
@@ -322,7 +322,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'string',
-						'description'   => __( 'Region level 2', 'jeo' ),
+						'description'   => __( 'Region level 2', 'jeowp' ),
 					)
 				);
 
@@ -336,7 +336,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'string',
-						'description'   => __( 'Region level 3', 'jeo' ),
+						'description'   => __( 'Region level 3', 'jeowp' ),
 					)
 				);
 
@@ -350,7 +350,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'string',
-						'description'   => __( 'City', 'jeo' ),
+						'description'   => __( 'City', 'jeowp' ),
 					)
 				);
 
@@ -364,7 +364,7 @@ class Geocode_Handler {
 							return current_user_can( 'edit_posts' );
 						},
 						'type'          => 'string',
-						'description'   => __( 'City sub-level 1', 'jeo' ),
+						'description'   => __( 'City sub-level 1', 'jeowp' ),
 					)
 				);
 

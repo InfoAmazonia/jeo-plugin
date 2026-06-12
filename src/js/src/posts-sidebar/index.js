@@ -63,7 +63,7 @@ const JeoGeocodePanel = ( props ) => {
 
 			if ( locations && Array.isArray( locations ) ) {
 				if ( locations.length === 0 ) {
-					setState( ( prev ) => ( { ...prev, isAIProcessing: false, aiError: __( 'No locations found by the AI.', 'jeo' ) } ) );
+					setState( ( prev ) => ( { ...prev, isAIProcessing: false, aiError: __( 'No locations found by the AI.', 'jeowp' ) } ) );
 					return;
 				}
 
@@ -116,13 +116,13 @@ const JeoGeocodePanel = ( props ) => {
 					isAIProcessing: false
 				} ) );
 			} else {
-				throw new Error( __( 'Invalid response from AI.', 'jeo' ) );
+				throw new Error( __( 'Invalid response from AI.', 'jeowp' ) );
 			}
 		} catch ( error ) {
 			setState( ( prev ) => ( {
 				...prev,
 				isAIProcessing: false,
-				aiError: error.message || __( 'Error processing AI georeference.', 'jeo' ),
+				aiError: error.message || __( 'Error processing AI georeference.', 'jeowp' ),
 			} ) );
 		}
 	};
@@ -247,15 +247,15 @@ const JeoGeocodePanel = ( props ) => {
 	};
 
 	const { isOpen, isAIProcessing, aiError, isApprovalModalOpen, aiSuggestedLocations } = state;
-	const aiProviderName = globalThis.jeo?.ai_provider_name ?? _x( 'AI', 'Artifical Intelligence', 'jeo' );
+	const aiProviderName = globalThis.jeo?.ai_provider_name ?? _x( 'AI', 'Artifical Intelligence', 'jeowp' );
 
 	return (
 		<Fragment>
 			{ pendingLocations.length > 0 && (
 				<Notice status="warning" isDismissible={ false }>
-					<p>{ sprintf( _n( 'AI found %d location during bulk processing.', 'AI found %d locations during bulk processing.', pendingLocations.length, 'jeo' ), pendingLocations.length ) }</p>
+					<p>{ sprintf( _n( 'AI found %d location during bulk processing.', 'AI found %d locations during bulk processing.', pendingLocations.length, 'jeowp' ), pendingLocations.length ) }</p>
 					<Button variant="primary" onClick={ handleReviewPending }>
-						{ __( 'Review Suggestions', 'jeo' ) }
+						{ __( 'Review Suggestions', 'jeowp' ) }
 					</Button>
 				</Notice>
 			) }
@@ -266,7 +266,7 @@ const JeoGeocodePanel = ( props ) => {
 					onClick={ () => setState( ( prev ) => ( { ...prev, isOpen: true } ) ) }
 					style={ { width: '100%', justifyContent: 'center' } }
 				>
-					{ __( 'Geolocate this post', 'jeo' ) }
+					{ __( 'Geolocate this post', 'jeowp' ) }
 				</Button>
 				<Button
 					variant="secondary"
@@ -276,8 +276,8 @@ const JeoGeocodePanel = ( props ) => {
 					style={ { width: '100%', justifyContent: 'center' } }
 				>
 					{ isAIProcessing
-						? __( 'Processing AI...', 'jeo' )
-						: __( 'Geolocate with AI', 'jeo' )
+						? __( 'Processing AI...', 'jeowp' )
+						: __( 'Geolocate with AI', 'jeowp' )
 					}
 				</Button>
 			</div>
@@ -290,7 +290,7 @@ const JeoGeocodePanel = ( props ) => {
 
 			{ isApprovalModalOpen && (
 				<Modal
-					title={ __( 'Review AI Suggestions', 'jeo' ) }
+					title={ __( 'Review AI Suggestions', 'jeowp' ) }
 					onRequestClose={ () => setState( ( prev ) => ( { ...prev, isApprovalModalOpen: false } ) ) }
 					className="jeo-geocode-modal"
 					isFullScreen={ true }
@@ -309,7 +309,7 @@ const JeoGeocodePanel = ( props ) => {
 
 			{ isOpen && (
 				<Modal
-					title={ __( 'Geolocate this post', 'jeo' ) }
+					title={ __( 'Geolocate this post', 'jeowp' ) }
 					onRequestClose={ () => setState( ( prev ) => ( { ...prev, isOpen: false } ) ) }
 					className="jeo-geocode-modal"
 					isFullScreen={ true }
@@ -340,7 +340,7 @@ registerPlugin( 'jeo-posts-sidebar', {
 		return (
 			<div>
 				{ postData.postType ?
-					<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
+					<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeowp' ) }>
 						<JeoGeocodePanel
 							postId={ postData.postId }
 							title={ postData.title }

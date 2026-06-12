@@ -5,37 +5,37 @@ import { RangeControl, TextControl } from './wp-form-controls';
 
 const COLOR_FIELDS = {
 	fill: [
-		{ key: 'fill-color', label: __( 'Fill Color', 'jeo' ), default: '#000000' },
-		{ key: 'fill-outline-color', label: __( 'Outline Color', 'jeo' ), default: '#000000' },
+		{ key: 'fill-color', label: __( 'Fill Color', 'jeowp' ), default: '#000000' },
+		{ key: 'fill-outline-color', label: __( 'Outline Color', 'jeowp' ), default: '#000000' },
 	],
 	line: [
-		{ key: 'line-color', label: __( 'Line Color', 'jeo' ), default: '#000000' },
+		{ key: 'line-color', label: __( 'Line Color', 'jeowp' ), default: '#000000' },
 	],
 	circle: [
-		{ key: 'circle-color', label: __( 'Circle Color', 'jeo' ), default: '#000000' },
-		{ key: 'circle-stroke-color', label: __( 'Stroke Color', 'jeo' ), default: '#000000' },
+		{ key: 'circle-color', label: __( 'Circle Color', 'jeowp' ), default: '#000000' },
+		{ key: 'circle-stroke-color', label: __( 'Stroke Color', 'jeowp' ), default: '#000000' },
 	],
 };
 
 const OPACITY_FIELDS = {
 	fill: [
-		{ key: 'fill-opacity', label: __( 'Fill Opacity', 'jeo' ), min: 0, max: 1, step: 0.05, default: 0.6 },
+		{ key: 'fill-opacity', label: __( 'Fill Opacity', 'jeowp' ), min: 0, max: 1, step: 0.05, default: 0.6 },
 	],
 	line: [
-		{ key: 'line-opacity', label: __( 'Line Opacity', 'jeo' ), min: 0, max: 1, step: 0.05, default: 1 },
+		{ key: 'line-opacity', label: __( 'Line Opacity', 'jeowp' ), min: 0, max: 1, step: 0.05, default: 1 },
 	],
 	circle: [
-		{ key: 'circle-opacity', label: __( 'Circle Opacity', 'jeo' ), min: 0, max: 1, step: 0.05, default: 1 },
+		{ key: 'circle-opacity', label: __( 'Circle Opacity', 'jeowp' ), min: 0, max: 1, step: 0.05, default: 1 },
 	],
 };
 
 const NUMERIC_FIELDS = {
 	line: [
-		{ key: 'line-width', label: __( 'Line Width', 'jeo' ), min: 0, max: 20, step: 0.5, default: 1 },
+		{ key: 'line-width', label: __( 'Line Width', 'jeowp' ), min: 0, max: 20, step: 0.5, default: 1 },
 	],
 	circle: [
-		{ key: 'circle-radius', label: __( 'Circle Radius', 'jeo' ), min: 0, max: 50, step: 0.5, default: 5 },
-		{ key: 'circle-stroke-width', label: __( 'Stroke Width', 'jeo' ), min: 0, max: 20, step: 0.5, default: 0 },
+		{ key: 'circle-radius', label: __( 'Circle Radius', 'jeowp' ), min: 0, max: 50, step: 0.5, default: 5 },
+		{ key: 'circle-stroke-width', label: __( 'Stroke Width', 'jeowp' ), min: 0, max: 20, step: 0.5, default: 0 },
 	],
 };
 
@@ -119,10 +119,10 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 		return (
 			<Modal
 				className="jeo-style-editor-modal"
-				title={ __( 'Layer Style', 'jeo' ) }
+				title={ __( 'Layer Style', 'jeowp' ) }
 				onRequestClose={ onClose }
 			>
-				<p>{ __( 'Styling is only supported for fill, line, and circle layer types.', 'jeo' ) }</p>
+				<p>{ __( 'Styling is only supported for fill, line, and circle layer types.', 'jeowp' ) }</p>
 			</Modal>
 		);
 	}
@@ -134,17 +134,17 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 	return (
 		<Modal
 			className="jeo-style-editor-modal"
-			title={ __( 'Layer Style', 'jeo' ) }
+			title={ __( 'Layer Style', 'jeowp' ) }
 			onRequestClose={ onClose }
 		>
 			<div style={ { minWidth: 360, maxWidth: 480 } }>
 				{ defaultStyle && (
 					<fieldset style={ { border: '1px solid #007cba', borderRadius: 6, padding: '12px 16px', marginBottom: 16 } }>
 						<legend style={ { fontWeight: 600, padding: '0 8px' } }>
-							{ __( 'AI Default Style', 'jeo' ) }
+							{ __( 'AI Default Style', 'jeowp' ) }
 						</legend>
 						<CheckboxControl
-							label={ __( 'Use AI-suggested default style', 'jeo' ) }
+							label={ __( 'Use AI-suggested default style', 'jeowp' ) }
 							checked={ useDefault }
 							onChange={ handleToggleDefault }
 						/>
@@ -152,12 +152,12 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 							<div style={ { marginTop: 8, fontSize: '0.85em', color: '#666' } }>
 								{ defaultStyle.filter && (
 									<p style={ { margin: '4px 0' } }>
-										{ __( 'Filter:', 'jeo' ) } <code>{ JSON.stringify( defaultStyle.filter ) }</code>
+										{ __( 'Filter:', 'jeowp' ) } <code>{ JSON.stringify( defaultStyle.filter ) }</code>
 									</p>
 								) }
 								{ defaultStyle.paint && (
 									<p style={ { margin: '4px 0' } }>
-										{ __( 'Paint:', 'jeo' ) } <code>{ JSON.stringify( defaultStyle.paint ) }</code>
+										{ __( 'Paint:', 'jeowp' ) } <code>{ JSON.stringify( defaultStyle.paint ) }</code>
 									</p>
 								) }
 							</div>
@@ -167,7 +167,7 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 
 				{ colorFields.length > 0 && (
 					<fieldset style={ { border: '1px solid #e0e0e0', borderRadius: 6, padding: '12px 16px', marginBottom: 16 } }>
-						<legend style={ { fontWeight: 600, padding: '0 8px' } }>{ __( 'Colors', 'jeo' ) }</legend>
+						<legend style={ { fontWeight: 600, padding: '0 8px' } }>{ __( 'Colors', 'jeowp' ) }</legend>
 						{ colorFields.map( ( field ) => (
 							<ColorPickerField
 								key={ field.key }
@@ -182,7 +182,7 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 
 				{ opacityFields.length > 0 && (
 					<fieldset style={ { border: '1px solid #e0e0e0', borderRadius: 6, padding: '12px 16px', marginBottom: 16 } }>
-						<legend style={ { fontWeight: 600, padding: '0 8px' } }>{ __( 'Opacity', 'jeo' ) }</legend>
+						<legend style={ { fontWeight: 600, padding: '0 8px' } }>{ __( 'Opacity', 'jeowp' ) }</legend>
 						{ opacityFields.map( ( field ) => (
 							<RangeControl
 								key={ field.key }
@@ -200,7 +200,7 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 
 				{ numericFields.length > 0 && (
 					<fieldset style={ { border: '1px solid #e0e0e0', borderRadius: 6, padding: '12px 16px', marginBottom: 16 } }>
-						<legend style={ { fontWeight: 600, padding: '0 8px' } }>{ __( 'Size', 'jeo' ) }</legend>
+						<legend style={ { fontWeight: 600, padding: '0 8px' } }>{ __( 'Size', 'jeowp' ) }</legend>
 						{ numericFields.map( ( field ) => (
 							<RangeControl
 								key={ field.key }

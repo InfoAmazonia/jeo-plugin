@@ -179,7 +179,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Post not found.', 'jeo' ),
+					'message' => __( 'Post not found.', 'jeowp' ),
 				),
 				404
 			);
@@ -190,7 +190,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
+					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
 				),
 				400
 			);
@@ -202,8 +202,8 @@ class Context_Handler {
 		// If the post has very little content, ask the user for more info instead of calling the AI.
 		$content_length = strlen( trim( wp_strip_all_tags( $post->post_content ) ) );
 		if ( $content_length < 100 ) {
-			$assistant_message = __( 'The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles).', 'jeo' );
-			$this->save_chat_message( $post_id, 'user', __( 'Generate editorial suggestions for this post based on its content.', 'jeo' ), $user_id );
+			$assistant_message = __( 'The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles).', 'jeowp' );
+			$this->save_chat_message( $post_id, 'user', __( 'Generate editorial suggestions for this post based on its content.', 'jeowp' ), $user_id );
 			$this->save_chat_message( $post_id, 'assistant', $assistant_message );
 
 			return new \WP_REST_Response(
@@ -211,7 +211,7 @@ class Context_Handler {
 					'success'           => true,
 					'paragraphs'        => array(),
 					'references'        => array(),
-					'message'           => __( 'Waiting for more content or directions.', 'jeo' ),
+					'message'           => __( 'Waiting for more content or directions.', 'jeowp' ),
 					'assistant_message' => $assistant_message,
 				),
 				200
@@ -236,13 +236,13 @@ class Context_Handler {
 			$this->save_chat_message(
 				$post_id,
 				'user',
-				__( 'Generate editorial suggestions for this post based on its content.', 'jeo' ),
+				__( 'Generate editorial suggestions for this post based on its content.', 'jeowp' ),
 				$user_id
 			);
 			$this->save_chat_message(
 				$post_id,
 				'assistant',
-				$response['assistant_message'] ?? __( 'Suggestions generated.', 'jeo' )
+				$response['assistant_message'] ?? __( 'Suggestions generated.', 'jeowp' )
 			);
 
 			return new \WP_REST_Response( $response, 200 );
@@ -273,7 +273,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'conversation_id is required.', 'jeo' ),
+					'message' => __( 'conversation_id is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -283,7 +283,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'A post ID is required.', 'jeo' ),
+					'message' => __( 'A post ID is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -293,7 +293,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Post not found.', 'jeo' ),
+					'message' => __( 'Post not found.', 'jeowp' ),
 				),
 				404
 			);
@@ -303,7 +303,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'A message is required.', 'jeo' ),
+					'message' => __( 'A message is required.', 'jeowp' ),
 				),
 				400
 			);
@@ -314,7 +314,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
+					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
 				),
 				400
 			);
@@ -345,7 +345,7 @@ class Context_Handler {
 			$this->save_chat_message(
 				$post_id,
 				'assistant',
-				$response['assistant_message'] ?? __( 'Suggestions updated.', 'jeo' )
+				$response['assistant_message'] ?? __( 'Suggestions updated.', 'jeowp' )
 			);
 
 			return new \WP_REST_Response( $response, 200 );
@@ -414,7 +414,7 @@ class Context_Handler {
 		}
 
 		throw new \Exception(
-			esc_html__( 'The AI did not respond after multiple attempts. Please try again or rephrase your request.', 'jeo' ),
+			esc_html__( 'The AI did not respond after multiple attempts. Please try again or rephrase your request.', 'jeowp' ),
 			0,
 			// phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped -- previous exception object, not HTML output.
 			$last_error
@@ -576,7 +576,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Post not found.', 'jeo' ),
+					'message' => __( 'Post not found.', 'jeowp' ),
 				),
 				404
 			);
@@ -649,7 +649,7 @@ class Context_Handler {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => __( 'Post not found.', 'jeo' ),
+					'message' => __( 'Post not found.', 'jeowp' ),
 				),
 				404
 			);
@@ -662,7 +662,7 @@ class Context_Handler {
 		return new \WP_REST_Response(
 			array(
 				'success' => true,
-				'message' => __( 'Conversation cleared.', 'jeo' ),
+				'message' => __( 'Conversation cleared.', 'jeowp' ),
 			),
 			200
 		);

@@ -7,9 +7,9 @@ const PLUGIN_FILE = path.join( ROOT, 'src', 'jeo.php' );
 const PACKAGE_JSON_FILE = path.join( ROOT, 'package.json' );
 const PACKAGE_LOCK_FILE = path.join( ROOT, 'package-lock.json' );
 const TRANSLATION_FILES = [
-	path.join( ROOT, 'src', 'languages', 'jeo.pot' ),
-	path.join( ROOT, 'src', 'languages', 'jeo-pt_BR.po' ),
-	path.join( ROOT, 'src', 'languages', 'jeo-es_CO.po' ),
+	path.join( ROOT, 'src', 'languages', 'jeowp.pot' ),
+	path.join( ROOT, 'src', 'languages', 'jeowp-pt_BR.po' ),
+	path.join( ROOT, 'src', 'languages', 'jeowp-es_CO.po' ),
 ];
 
 function fail( message ) {

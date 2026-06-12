@@ -15,7 +15,7 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 		<tr>
 			<th scope="row">
 				<label for="ai_use_context_custom_prompt">
-					<?php esc_html_e( 'Context Assistant System Prompt', 'jeo' ); ?>
+					<?php esc_html_e( 'Context Assistant System Prompt', 'jeowp' ); ?>
 				</label>
 			</th>
 			<td>
@@ -28,7 +28,7 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 						<?php checked( 1, $use_custom ); ?>
 					/>
 					<span class="description">
-						<?php esc_html_e( 'Check this to use a custom system prompt. Uncheck to use the built-in default prompt.', 'jeo' ); ?>
+						<?php esc_html_e( 'Check this to use a custom system prompt. Uncheck to use the built-in default prompt.', 'jeowp' ); ?>
 					</span>
 				</div>
 
@@ -41,13 +41,13 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 						style="font-family: monospace; width: 100%;"
 					><?php echo esc_textarea( \jeo_settings()->get_option( 'ai_context_prompt' ) ); ?></textarea>
 					<p class="description">
-						<?php esc_html_e( 'Custom system prompt used by the AI Context Assistant. Leave empty to use the built-in default.', 'jeo' ); ?>
+						<?php esc_html_e( 'Custom system prompt used by the AI Context Assistant. Leave empty to use the built-in default.', 'jeowp' ); ?>
 					</p>
 				</div>
 
 				<div id="ai_context_default_prompt_wrapper" style="display: <?php echo $use_custom ? 'none' : 'block'; ?>;">
 					<label for="ai_context_default_prompt" style="display: block; margin-bottom: 4px; font-weight: 600;">
-						<?php esc_html_e( 'Default System Prompt (reference)', 'jeo' ); ?>
+						<?php esc_html_e( 'Default System Prompt (reference)', 'jeowp' ); ?>
 					</label>
 					<textarea
 						id="ai_context_default_prompt"
@@ -57,7 +57,7 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 						readonly
 					><?php echo esc_textarea( Context_Agent::default_system_prompt() ); ?></textarea>
 					<p class="description">
-						<?php esc_html_e( 'This is the built-in default prompt. Enable the custom prompt checkbox above to override it.', 'jeo' ); ?>
+						<?php esc_html_e( 'This is the built-in default prompt. Enable the custom prompt checkbox above to override it.', 'jeowp' ); ?>
 					</p>
 				</div>
 			</td>

@@ -188,7 +188,7 @@ class Neuron_Factory {
 		$configured_embedding_model = \jeo_settings()->get_option( 'ai_embedding_model' );
 
 		if ( empty( $configured_embedding_model ) ) {
-			throw new \Exception( esc_html( __( 'No Embedding Model configured. Please select one in the JEO AI settings.', 'jeo' ) ) );
+			throw new \Exception( esc_html( __( 'No Embedding Model configured. Please select one in the JEO AI settings.', 'jeowp' ) ) );
 		}
 
 		$api_key         = '';

@@ -65,31 +65,31 @@ const LayersSidebar = ( {
 		}
 		switch ( renderControl.status ) {
 			case 'incomplete_form':
-				createNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeo' ) );
+				createNotice( 'warning', __( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeowp' ) );
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;
 			case 'request_error':
 				switch ( renderControl.statusCode ) {
 					case 401:
-						createNotice( 'error', __( 'Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings.', 'jeo' ) );
+						createNotice( 'error', __( 'Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings.', 'jeowp' ) );
 						break;
 					case 404:
-						createNotice( 'error', __( 'Your layer was not found. You will not be able to publish or update. Please check your settings.', 'jeo' ) );
+						createNotice( 'error', __( 'Your layer was not found. You will not be able to publish or update. Please check your settings.', 'jeowp' ) );
 						break;
 					default:
-						createNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeo' ) );
+						createNotice( 'error', __( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeowp' ) );
 						break;
 				}
 				lockPostSaving( 'layer_lock_key' );
 				lockPostAutoSaving( 'layer_lock_key' );
 				break;
 			case 'incomplete_settings':
-				createNotice( 'warning', __( 'Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update.', 'jeo' ), {
+				createNotice( 'warning', __( 'Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update.', 'jeowp' ), {
 					actions: [
 						{
 							url: '/wp-admin/admin.php?page=jeo-settings',
-							label: __( 'Please, check your settings.', 'jeo' ),
+							label: __( 'Please, check your settings.', 'jeowp' ),
 						},
 					],
 				} );
@@ -184,21 +184,21 @@ const LayersSidebar = ( {
 
 			<PluginDocumentSettingPanel
 				name="settings"
-				title={ __( 'Settings', 'jeo' ) }
+				title={ __( 'Settings', 'jeowp' ) }
 			>
 				<LayerSettings />
 			</PluginDocumentSettingPanel>
 
 			<PluginDocumentSettingPanel
 				name="attribution-settings"
-				title={ __( 'Attributions', 'jeo' ) }
+				title={ __( 'Attributions', 'jeowp' ) }
 			>
 				<AttributionSettings />
 			</PluginDocumentSettingPanel>
 
 			<PluginDocumentSettingPanel
 				name="legend-settings"
-				title={ __( 'Legend', 'jeo' ) }
+				title={ __( 'Legend', 'jeowp' ) }
 			>
 				<LegendsEditor />
 			</PluginDocumentSettingPanel>

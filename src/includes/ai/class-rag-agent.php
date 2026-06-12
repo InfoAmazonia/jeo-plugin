@@ -61,19 +61,19 @@ class RAG_Agent extends RAG {
 		if ( ! is_dir( $store_dir ) ) {
 			if ( ! wp_mkdir_p( $store_dir ) ) {
 				/* translators: %s: directory path */
-				return new \WP_Error( 'rag_dir_error', sprintf( __( 'The RAG Vector Store directory (%s) could not be created. Please check your uploads folder permissions.', 'jeo' ), 'wp-content/uploads/jeo-ai-store' ) );
+				return new \WP_Error( 'rag_dir_error', sprintf( __( 'The RAG Vector Store directory (%s) could not be created. Please check your uploads folder permissions.', 'jeowp' ), 'wp-content/uploads/jeo-ai-store' ) );
 			}
 		}
 
 		if ( ! is_writable( $store_dir ) ) { // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_is_writable
 			/* translators: %s: directory path */
-			return new \WP_Error( 'rag_write_error', sprintf( __( 'The RAG Vector Store directory (%s) is not writable. Local Vectorization is disabled.', 'jeo' ), 'wp-content/uploads/jeo-ai-store' ) );
+			return new \WP_Error( 'rag_write_error', sprintf( __( 'The RAG Vector Store directory (%s) is not writable. Local Vectorization is disabled.', 'jeowp' ), 'wp-content/uploads/jeo-ai-store' ) );
 		}
 
 		// 2. Check if an AI provider is configured
 		$active = \jeo_settings()->get_option( 'ai_default_provider' );
 		if ( empty( $active ) ) {
-			return new \WP_Error( 'rag_no_provider', __( 'No AI Provider is configured. Please set up a provider (Gemini, OpenAI, etc.) before using RAG.', 'jeo' ) );
+			return new \WP_Error( 'rag_no_provider', __( 'No AI Provider is configured. Please set up a provider (Gemini, OpenAI, etc.) before using RAG.', 'jeowp' ) );
 		}
 
 		// 3. Determine Embedding Provider
@@ -86,7 +86,7 @@ class RAG_Agent extends RAG {
 		}
 
 		if ( empty( $embedding_model_setting ) ) {
-			return new \WP_Error( 'rag_no_embedding_model', __( 'No Embedding Model selected. Please choose a model in the Knowledge Base tab.', 'jeo' ) );
+			return new \WP_Error( 'rag_no_embedding_model', __( 'No Embedding Model selected. Please choose a model in the Knowledge Base tab.', 'jeowp' ) );
 		}
 
 		$embedding_provider = '';
@@ -105,7 +105,7 @@ class RAG_Agent extends RAG {
 		$compatible_providers = array( 'openai', 'gemini', 'ollama' );
 		if ( ! in_array( $embedding_provider, $compatible_providers, true ) ) {
 			/* translators: %s: provider name */
-			return new \WP_Error( 'rag_incompatible_provider', sprintf( __( 'The selected embedding provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for Vector Store features.', 'jeo' ), ucfirst( $embedding_provider ) ) );
+			return new \WP_Error( 'rag_incompatible_provider', sprintf( __( 'The selected embedding provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for Vector Store features.', 'jeowp' ), ucfirst( $embedding_provider ) ) );
 		}
 
 		// 5. Check API Key
@@ -116,7 +116,7 @@ class RAG_Agent extends RAG {
 
 		if ( empty( $api_key ) ) {
 			/* translators: %s: provider name */
-			return new \WP_Error( 'rag_no_key', sprintf( __( 'The API Key for the Embedding provider (%s) is missing. RAG requires a valid connection to generate embeddings.', 'jeo' ), ucfirst( $embedding_provider ) ) );
+			return new \WP_Error( 'rag_no_key', sprintf( __( 'The API Key for the Embedding provider (%s) is missing. RAG requires a valid connection to generate embeddings.', 'jeowp' ), ucfirst( $embedding_provider ) ) );
 		}
 
 		return true;

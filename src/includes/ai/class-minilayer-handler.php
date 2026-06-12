@@ -69,7 +69,7 @@ class Minilayer_Handler {
 
 		if ( empty( $prompt ) ) {
 			return new \WP_REST_Response(
-				array( 'error' => __( 'A prompt is required.', 'jeo' ) ),
+				array( 'error' => __( 'A prompt is required.', 'jeowp' ) ),
 				400
 			);
 		}
@@ -81,11 +81,11 @@ class Minilayer_Handler {
 			$status = ( 'minilayer_parse_error' === $code || 'minilayer_missing_style_id' === $code ) ? 502 : 400;
 
 			$messages = array(
-				'minilayer_no_mapbox_key'    => __( 'Mapbox API key is not configured. Set it in JEO Settings.', 'jeo' ),
-				'minilayer_no_provider'      => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' ),
-				'minilayer_agent_error'      => __( 'Could not generate the map style. Please try again.', 'jeo' ),
-				'minilayer_parse_error'      => __( 'The AI returned an unexpected response. Please try again.', 'jeo' ),
-				'minilayer_missing_style_id' => __( 'The AI did not create a valid style. Please try again.', 'jeo' ),
+				'minilayer_no_mapbox_key'    => __( 'Mapbox API key is not configured. Set it in JEO Settings.', 'jeowp' ),
+				'minilayer_no_provider'      => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
+				'minilayer_agent_error'      => __( 'Could not generate the map style. Please try again.', 'jeowp' ),
+				'minilayer_parse_error'      => __( 'The AI returned an unexpected response. Please try again.', 'jeowp' ),
+				'minilayer_missing_style_id' => __( 'The AI did not create a valid style. Please try again.', 'jeowp' ),
 			);
 
 			return new \WP_REST_Response(

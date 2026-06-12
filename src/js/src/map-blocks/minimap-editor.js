@@ -18,9 +18,9 @@ import './onetime-map-editor.css';
 const { map_defaults: mapDefaults } = globalThis.jeo_settings;
 
 const LOADING_MESSAGES = [
-	__( 'Analyzing content…', 'jeo' ),
-	__( 'Searching for map layers…', 'jeo' ),
-	__( 'Generating map configuration…', 'jeo' ),
+	__( 'Analyzing content…', 'jeowp' ),
+	__( 'Searching for map layers…', 'jeowp' ),
+	__( 'Generating map configuration…', 'jeowp' ),
 ];
 
 function generateUUID() {
@@ -126,7 +126,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							...( attrsRef.current.conversation || [] ),
 							{
 								role: 'assistant',
-								text: response.message || __( 'Map generated from post content.', 'jeo' ),
+								text: response.message || __( 'Map generated from post content.', 'jeowp' ),
 								ts: new Date().toISOString(),
 							},
 						],
@@ -140,14 +140,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				} else {
 					setAttributes( {
 						status: 'error',
-						message: response.message || __( 'Failed to suggest layers.', 'jeo' ),
+						message: response.message || __( 'Failed to suggest layers.', 'jeowp' ),
 					} );
 				}
 			} )
 			.catch( ( error ) => {
 				setAttributes( {
 					status: 'error',
-					message: error.message || __( 'Request failed.', 'jeo' ),
+					message: error.message || __( 'Request failed.', 'jeowp' ),
 				} );
 			} );
 	}, [ setAttributes ] );
@@ -197,7 +197,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				if ( response.success ) {
 					convUpdates.push( {
 						role: 'assistant',
-						text: response.assistant_message || response.message || __( 'Map updated.', 'jeo' ),
+						text: response.assistant_message || response.message || __( 'Map updated.', 'jeowp' ),
 						ts: new Date().toISOString(),
 					} );
 
@@ -218,7 +218,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				} else {
 					convUpdates.push( {
 						role: 'assistant',
-						text: response.message || __( 'Failed to update map.', 'jeo' ),
+						text: response.message || __( 'Failed to update map.', 'jeowp' ),
 						ts: new Date().toISOString(),
 					} );
 					setAttributes( {
@@ -231,7 +231,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				setAttributes( {
 					conversation: [ ...( attrs.conversation || [] ), {
 						role: 'assistant',
-						text: error.message || __( 'Request failed.', 'jeo' ),
+						text: error.message || __( 'Request failed.', 'jeowp' ),
 						ts: new Date().toISOString(),
 					} ],
 				} );
@@ -272,7 +272,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				if ( response.success ) {
 					convUpdates.push( {
 						role: 'assistant',
-						text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeo' ),
+						text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeowp' ),
 						ts: new Date().toISOString(),
 					} );
 
@@ -294,7 +294,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				} else {
 					convUpdates.push( {
 						role: 'assistant',
-						text: response.message || __( 'Failed to generate from prompt.', 'jeo' ),
+						text: response.message || __( 'Failed to generate from prompt.', 'jeowp' ),
 						ts: new Date().toISOString(),
 					} );
 					setAttributes( {
@@ -307,7 +307,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				setAttributes( {
 					conversation: [ ...( currentAttrs.conversation || [] ), {
 						role: 'assistant',
-						text: error.message || __( 'Request failed.', 'jeo' ),
+						text: error.message || __( 'Request failed.', 'jeowp' ),
 						ts: new Date().toISOString(),
 					} ],
 				} );
@@ -352,7 +352,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						conversation: [
 							{
 								role: 'assistant',
-								text: response.message || __( 'Map regenerated from post content.', 'jeo' ),
+								text: response.message || __( 'Map regenerated from post content.', 'jeowp' ),
 								ts: new Date().toISOString(),
 							},
 						],
@@ -366,14 +366,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				} else {
 					setAttributes( {
 						status: 'error',
-						message: response.message || __( 'Failed to suggest layers.', 'jeo' ),
+						message: response.message || __( 'Failed to suggest layers.', 'jeowp' ),
 					} );
 				}
 			} )
 			.catch( ( error ) => {
 				setAttributes( {
 					status: 'error',
-					message: error.message || __( 'Request failed.', 'jeo' ),
+					message: error.message || __( 'Request failed.', 'jeowp' ),
 				} );
 			} );
 	}, [ sendChat, setAttributes ] );
@@ -403,7 +403,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						{ role: 'user', text: attributes.prompt, ts: new Date().toISOString() },
 						{
 							role: 'assistant',
-							text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeo' ),
+							text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeowp' ),
 							ts: new Date().toISOString(),
 						},
 					];
@@ -429,14 +429,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				} else {
 					setAttributes( {
 						status: 'error',
-						message: response.message || __( 'Failed to generate from prompt.', 'jeo' ),
+						message: response.message || __( 'Failed to generate from prompt.', 'jeowp' ),
 					} );
 				}
 			} )
 			.catch( ( error ) => {
 				setAttributes( {
 					status: 'error',
-					message: error.message || __( 'Request failed.', 'jeo' ),
+					message: error.message || __( 'Request failed.', 'jeowp' ),
 				} );
 			} );
 	}, [ attributes.prompt, setAttributes ] );
@@ -545,7 +545,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			<div { ...blockProps }>
 				<Placeholder
 					icon="map"
-					label={ __( 'AI-Assisted Map', 'jeo' ) }
+					label={ __( 'AI-Assisted Map', 'jeowp' ) }
 					isColumnLayout={ true }
 					className="jeo-minimap-placeholder"
 				>
@@ -565,12 +565,12 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			<div { ...blockProps }>
 				<Placeholder
 					icon="map"
-					label={ __( 'AI-Assisted Map', 'jeo' ) }
+					label={ __( 'AI-Assisted Map', 'jeowp' ) }
 					isColumnLayout={ true }
 					className="jeo-minimap-placeholder"
 				>
 					<p className="jeo-minimap-placeholder__description">
-						{ __( 'AI will analyze your content and suggest relevant map layers, center point, and zoom level.', 'jeo' ) }
+						{ __( 'AI will analyze your content and suggest relevant map layers, center point, and zoom level.', 'jeowp' ) }
 					</p>
 					{ attributes.status === 'error' && (
 						<Notice status="error" isDismissible={ false } className="jeo-minimap-placeholder__error">
@@ -580,14 +580,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					<RadioControl
 						selected={ generationMode }
 						options={ [
-							{ label: __( 'Generate from post content', 'jeo' ), value: 'content' },
-							{ label: __( 'Generate from prompt', 'jeo' ), value: 'prompt' },
+							{ label: __( 'Generate from post content', 'jeowp' ), value: 'content' },
+							{ label: __( 'Generate from prompt', 'jeowp' ), value: 'prompt' },
 						] }
 						onChange={ setGenerationMode }
 					/>
 					{ generationMode === 'prompt' && (
 						<TextareaControl
-							label={ __( 'Map prompt', 'jeo' ) }
+							label={ __( 'Map prompt', 'jeowp' ) }
 							value={ attributes.prompt || '' }
 							onChange={ ( v ) => setAttributes( { prompt: v } ) }
 						/>
@@ -598,7 +598,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						disabled={ generationMode === 'prompt' && ! attributes.prompt?.trim() }
 						className="jeo-minimap-placeholder__generate"
 					>
-						{ __( 'Generate map', 'jeo' ) }
+						{ __( 'Generate map', 'jeowp' ) }
 					</Button>
 				</Placeholder>
 			</div>
@@ -647,39 +647,39 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				/>
 				<PanelBody
 					name="minimap-base"
-					title={ __( 'Base Layer', 'jeo' ) }
+					title={ __( 'Base Layer', 'jeowp' ) }
 					className="jeo-minimap-base-panel"
 				>
 					<SelectControl
-						label={ __( 'Base terrain', 'jeo' ) }
+						label={ __( 'Base terrain', 'jeowp' ) }
 						value={ baseVariant }
 						options={ [
-							{ label: _x( 'Dark', 'base terrain', 'jeo' ), value: 'dark' },
-							{ label: _x( 'Light', 'base terrain', 'jeo' ), value: 'light' },
-							{ label: _x( 'Satellite', 'base terrain', 'jeo' ), value: 'satellite' },
-							{ label: _x( 'None', 'base terrain', 'jeo' ), value: 'none' },
+							{ label: _x( 'Dark', 'base terrain', 'jeowp' ), value: 'dark' },
+							{ label: _x( 'Light', 'base terrain', 'jeowp' ), value: 'light' },
+							{ label: _x( 'Satellite', 'base terrain', 'jeowp' ), value: 'satellite' },
+							{ label: _x( 'None', 'base terrain', 'jeowp' ), value: 'none' },
 						] }
 						onChange={ handleBaseVariantChange }
 					/>
 				</PanelBody>
 				<PanelBody
 					name="minimap-pins"
-					title={ __( 'Geolocation Pins', 'jeo' ) }
+					title={ __( 'Geolocation Pins', 'jeowp' ) }
 					className="jeo-minimap-pins-panel"
 				>
 					<SelectControl
-						label={ __( 'Show pins', 'jeo' ) }
+						label={ __( 'Show pins', 'jeowp' ) }
 						value={ attributes.show_pins ? 'yes' : 'no' }
 						options={ [
-							{ label: __( 'Yes', 'jeo' ), value: 'yes' },
-							{ label: __( 'No', 'jeo' ), value: 'no' },
+							{ label: __( 'Yes', 'jeowp' ), value: 'yes' },
+							{ label: __( 'No', 'jeowp' ), value: 'no' },
 						] }
 						onChange={ ( v ) => setAttributes( { show_pins: v === 'yes' } ) }
 					/>
 				</PanelBody>
 				<PanelBody
 					name="minimap-chat"
-					title={ __( 'AI Assistant', 'jeo' ) }
+					title={ __( 'AI Assistant', 'jeowp' ) }
 					className="jeo-minimap-chat-panel"
 					initialOpen={ true }
 				>
@@ -691,15 +691,15 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 									className={ `jeo-chat-message jeo-chat-message--${ msg.role }` }
 								>
 									<span className="jeo-chat-message__role">
-										{ 'assistant' === msg.role ? __( 'Assistant', 'jeo' ) : __( 'You', 'jeo' ) }
+										{ 'assistant' === msg.role ? __( 'Assistant', 'jeowp' ) : __( 'You', 'jeowp' ) }
 									</span>
 									<span className="jeo-chat-message__text">{ msg.text }</span>
 								</div>
 							) ) }
 							{ chatLoading && (
 								<div className="jeo-chat-message jeo-chat-message--assistant jeo-chat-message--typing">
-									<span className="jeo-chat-message__role">{ __( 'Assistant', 'jeo' ) }</span>
-									<span className="jeo-chat-typing-dots" aria-label={ __( 'Typing…', 'jeo' ) }>
+									<span className="jeo-chat-message__role">{ __( 'Assistant', 'jeowp' ) }</span>
+									<span className="jeo-chat-typing-dots" aria-label={ __( 'Typing…', 'jeowp' ) }>
 										<span /><span /><span />
 									</span>
 								</div>
@@ -711,7 +711,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						<TextareaControl
 							value={ chatInput }
 							onChange={ setChatInput }
-							placeholder={ __( 'Ask the AI to refine the map…', 'jeo' ) }
+							placeholder={ __( 'Ask the AI to refine the map…', 'jeowp' ) }
 						/>
 						<Button
 							variant="primary"
@@ -719,7 +719,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							disabled={ chatLoading || ! chatInput.trim() }
 							isSmall
 							icon="arrow-right-alt2"
-							aria-label={ __( 'Send message', 'jeo' ) }
+							aria-label={ __( 'Send message', 'jeowp' ) }
 						/>
 					</div>
 					<div className="jeo-chat-actions">
@@ -729,7 +729,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							disabled={ chatLoading }
 							isSmall
 						>
-							{ __( 'Regenerate', 'jeo' ) }
+							{ __( 'Regenerate', 'jeowp' ) }
 						</Button>
 						<Button
 							variant="secondary"
@@ -737,7 +737,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							disabled={ chatLoading }
 							isSmall
 						>
-							{ __( 'New prompt', 'jeo' ) }
+							{ __( 'New prompt', 'jeowp' ) }
 						</Button>
 					</div>
 					{ chatPromptVisible && (
@@ -745,7 +745,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							<TextareaControl
 								value={ chatPrompt }
 								onChange={ setChatPrompt }
-								placeholder={ __( 'Describe the map you want…', 'jeo' ) }
+								placeholder={ __( 'Describe the map you want…', 'jeowp' ) }
 							/>
 							<Button
 								variant="primary"
@@ -753,7 +753,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 								disabled={ chatLoading || ! chatPrompt.trim() }
 								isSmall
 							>
-								{ __( 'Generate', 'jeo' ) }
+								{ __( 'Generate', 'jeowp' ) }
 							</Button>
 						</div>
 					) }
@@ -797,7 +797,7 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 			<div className="jeo-preview-controls">
 				<Button variant="primary" isLarge onClick={ openModal }>
-					{ __( 'Edit layers settings', 'jeo' ) }
+					{ __( 'Edit layers settings', 'jeowp' ) }
 				</Button>
 			</div>
 		</div>

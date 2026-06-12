@@ -289,35 +289,35 @@ class Stories extends Component {
 		this.setSelectedTagLabel = this.setSelectedTagLabel.bind( this );
 		this.clearStoryFilters = this.clearStoryFilters.bind( this );
 		this.localeInfo = {
-			"format": __("MM/DD/YYYY", "jeo"),
-			"separator": __(" - ", "jeo"),
-			"applyLabel": __("Apply", "jeo"),
-			"cancelLabel": __("Cancel", "jeo"),
-			"fromLabel": __("From", "jeo"),
-			"toLabel": __("To", "jeo"),
-			"customRangeLabel": __("Custom", "jeo"),
+			"format": __("MM/DD/YYYY", "jeowp"),
+			"separator": __(" - ", "jeowp"),
+			"applyLabel": __("Apply", "jeowp"),
+			"cancelLabel": __("Cancel", "jeowp"),
+			"fromLabel": __("From", "jeowp"),
+			"toLabel": __("To", "jeowp"),
+			"customRangeLabel": __("Custom", "jeowp"),
 			"daysOfWeek": [
-				__("Su", "jeo"),
-				__("Mo", "jeo"),
-				__("Tu", "jeo"),
-				__("We", "jeo"),
-				__("Th", "jeo"),
-				__("Fr", "jeo"),
-				__("Sa", "jeo")
+				__("Su", "jeowp"),
+				__("Mo", "jeowp"),
+				__("Tu", "jeowp"),
+				__("We", "jeowp"),
+				__("Th", "jeowp"),
+				__("Fr", "jeowp"),
+				__("Sa", "jeowp")
 			],
 			"monthNames": [
-				__("January", "jeo"),
-				__("February", "jeo"),
-				__("March", "jeo"),
-				__("April", "jeo"),
-				__("May", "jeo"),
-				__("June", "jeo"),
-				__("July", "jeo"),
-				__("August", "jeo"),
-				__("September", "jeo"),
-				__("October", "jeo"),
-				__("November", "jeo"),
-				__("December", "jeo")
+				__("January", "jeowp"),
+				__("February", "jeowp"),
+				__("March", "jeowp"),
+				__("April", "jeowp"),
+				__("May", "jeowp"),
+				__("June", "jeowp"),
+				__("July", "jeowp"),
+				__("August", "jeowp"),
+				__("September", "jeowp"),
+				__("October", "jeowp"),
+				__("November", "jeowp"),
+				__("December", "jeowp")
 			],
 			"firstDay": 1
 		};
@@ -1177,28 +1177,28 @@ class Stories extends Component {
 		const activeFilters = [];
 		const hoveredClusterPostsSet = new Set( this.state.hoveredClusterPostsId );
 		const storiesCountLabel = sprintf(
-			_n( 'Displayed story: %d', 'Displayed stories: %d', this.props.stories.length, 'jeo' ),
+			_n( 'Displayed story: %d', 'Displayed stories: %d', this.props.stories.length, 'jeowp' ),
 			this.props.stories.length
 		);
 
 		if ( queryParams.search ) {
 			activeFilters.push(
 				/* translators: %s is the active story search query. */
-				sprintf( __( 'Search story: %s', 'jeo' ), queryParams.search )
+				sprintf( __( 'Search story: %s', 'jeowp' ), queryParams.search )
 			);
 		}
 
 		if ( this.props.dateRangeInputValue ) {
 			activeFilters.push(
 				/* translators: %s is the active story date range. */
-				sprintf( __( 'Date range: %s', 'jeo' ), this.props.dateRangeInputValue )
+				sprintf( __( 'Date range: %s', 'jeowp' ), this.props.dateRangeInputValue )
 			);
 		}
 
 		if ( this.state.selectedTagLabel ) {
 			activeFilters.push(
 				/* translators: %s is the list of active story tags. */
-				sprintf( __( 'Tags: %s', 'jeo' ), this.state.selectedTagLabel )
+				sprintf( __( 'Tags: %s', 'jeowp' ), this.state.selectedTagLabel )
 			);
 		}
 
@@ -1207,7 +1207,7 @@ class Stories extends Component {
 				className="stories-status stories-status--loading"
 				role="status"
 				aria-live="polite"
-				aria-label={ __( 'Loading…', 'jeo' ) }
+				aria-label={ __( 'Loading…', 'jeowp' ) }
 			>
 				<LoadingSpinner />
 			</div>
@@ -1217,7 +1217,7 @@ class Stories extends Component {
 				className="stories-status stories-status--loading stories-status--loading-more"
 				role="status"
 				aria-live="polite"
-				aria-label={ __( 'Loading…', 'jeo' ) }
+				aria-label={ __( 'Loading…', 'jeowp' ) }
 			>
 				<LoadingSpinner />
 			</div>
@@ -1225,16 +1225,16 @@ class Stories extends Component {
 		const emptyMessage = this.props.storiesLoaded && ! this.props.stories.length ? (
 			<div className="stories-status stories-status--empty" role="status">
 				{ hasActiveFilters
-					? __( 'No stories found for the current filters.', 'jeo' )
-					: __( 'No stories available.', 'jeo' ) }
+					? __( 'No stories found for the current filters.', 'jeowp' )
+					: __( 'No stories available.', 'jeowp' ) }
 			</div>
 		) : null;
 
 		return (
 			<div className="stories-tab" style={ this.props.style }>
 				<Search
-					searchPlaceholder={ __("Search story", "jeo") }
-					searchButtonLabel={ __( 'Search story', 'jeo' ) }
+					searchPlaceholder={ __( 'Search story', 'jeowp' ) }
+					searchButtonLabel={ __( 'Search story', 'jeowp' ) }
 					update={ this.updateStories }
 					searchField={ this.props.queryParams.search?? "" }
 					disabled={ ! this.props.storiesLoaded }
@@ -1275,13 +1275,13 @@ class Stories extends Component {
 					) }
 
 					{ this.state.showFilters
-						? __( 'Hide filters', 'jeo' )
-						: __( 'Show filters', 'jeo' ) }
+						? __( 'Hide filters', 'jeowp' )
+						: __( 'Show filters', 'jeowp' ) }
 				</button>
 				{ this.state.showFilters && (
 					<div className="filters">
 						<DateRangeFilter
-							placeholder={ __( 'Date range', 'jeo' ) }
+							placeholder={ __( 'Date range', 'jeowp' ) }
 							value={ this.props.dateRangeInputValue }
 							startDate={ this.props.queryParams.after }
 							endDate={ this.props.queryParams.before }
@@ -1302,18 +1302,18 @@ class Stories extends Component {
 					<span>
 						{ this.props.storiesLoaded || isLoadingMoreStories
 							? storiesCountLabel
-							: __( 'Updating stories…', 'jeo' ) }
+							: __( 'Updating stories…', 'jeowp' ) }
 					</span>
 					{ hasActiveFilters ? (
 						<button type="button" onClick={ this.clearStoryFilters }>
-							{ __( 'Clear', 'jeo' ) }
+							{ __( 'Clear', 'jeowp' ) }
 						</button>
 					) : null }
 				</div>
 				{ activeFilters.length ? (
 					<div
 						className="stories-active-filters"
-						aria-label={ __( 'Active filters', 'jeo' ) }
+						aria-label={ __( 'Active filters', 'jeowp' ) }
 					>
 						{ activeFilters.map( ( filterLabel ) => (
 							<span className="stories-active-filters__item" key={ filterLabel }>
@@ -1424,7 +1424,7 @@ class Storie extends Component {
 							className="view-in-map"
 							onClick={ this.props.onViewInMap }
 						>
-							{ __( 'View in map', 'jeo' ) }
+							{ __( 'View in map', 'jeowp' ) }
 						</button>
 					</div>
 				</div>

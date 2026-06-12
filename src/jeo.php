@@ -15,7 +15,7 @@
  * Requires PHP:      8.0
  * License:           GPL-3.0-only
  * License URI:       https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
- * Text Domain:       jeo
+ * Text Domain:       jeowp
  * Domain Path:       /languages
  */
 
@@ -33,7 +33,7 @@ if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
 		function () {
 			printf(
 				'<div class="notice notice-error"><p>%s</p></div>',
-				esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated.', 'jeo' )
+				esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated.', 'jeowp' )
 			);
 		}
 	);

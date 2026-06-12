@@ -30,7 +30,7 @@ class Minilayer_Service {
 		if ( empty( $mapbox_key ) ) {
 			return new \WP_Error(
 				'minilayer_no_mapbox_key',
-				__( 'Mapbox API key is not configured. Set it in JEO Settings.', 'jeo' )
+				__( 'Mapbox API key is not configured. Set it in JEO Settings.', 'jeowp' )
 			);
 		}
 
@@ -38,7 +38,7 @@ class Minilayer_Service {
 		if ( empty( $active_provider ) ) {
 			return new \WP_Error(
 				'minilayer_no_provider',
-				__( 'No AI provider configured. Set one in JEO AI Settings.', 'jeo' )
+				__( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' )
 			);
 		}
 
@@ -118,14 +118,14 @@ class Minilayer_Service {
 		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $parsed ) ) {
 			return new \WP_Error(
 				'minilayer_parse_error',
-				__( 'Failed to parse AI response as JSON.', 'jeo' )
+				__( 'Failed to parse AI response as JSON.', 'jeowp' )
 			);
 		}
 
 		if ( empty( $parsed['style_id'] ) ) {
 			return new \WP_Error(
 				'minilayer_missing_style_id',
-				__( 'AI response did not include a style_id.', 'jeo' )
+				__( 'AI response did not include a style_id.', 'jeowp' )
 			);
 		}
 
@@ -164,7 +164,7 @@ class Minilayer_Service {
 	public static function create_layer( array $style_data, $layer_name = '' ) {
 		$style_id = $style_data['style_id'];
 		/* translators: %s: Mapbox style ID. */
-		$fallback   = sprintf( __( 'Minilayer: %s', 'jeo' ), $style_id );
+		$fallback   = sprintf( __( 'Minilayer: %s', 'jeowp' ), $style_id );
 		$post_title = ! empty( $layer_name )
 			? $layer_name
 			: ( $style_data['layer_title'] ?? $style_data['style_name'] ?? $fallback );

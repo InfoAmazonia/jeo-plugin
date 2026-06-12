@@ -43,11 +43,11 @@ class AI_Settings {
 	 */
 	public function get_tabs() {
 		return array(
-			'provider'  => __( 'AI Provider', 'jeo' ),
-			'knowledge' => __( 'Knowledge Base', 'jeo' ),
-			'bulk'      => __( 'Bulk Geolocation', 'jeo' ),
-			'context'   => __( 'Context Assistant', 'jeo' ),
-			'settings'  => __( 'Settings', 'jeo' ),
+			'provider'  => __( 'AI Provider', 'jeowp' ),
+			'knowledge' => __( 'Knowledge Base', 'jeowp' ),
+			'bulk'      => __( 'Bulk Geolocation', 'jeowp' ),
+			'context'   => __( 'Context Assistant', 'jeowp' ),
+			'settings'  => __( 'Settings', 'jeowp' ),
 		);
 	}
 

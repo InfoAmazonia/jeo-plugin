@@ -38,7 +38,7 @@ function getAuthorsLinks( storymap ) {
 			return `<a href="${author.permalink}">${author.name}</a>`;
 		} ) );
 		// translators: %s is the authors list
-		return sprintf( __( 'By %s', 'jeo' ), authorsList );
+		return sprintf( __( 'By %s', 'jeowp' ), authorsList );
 	} else {
 		return '';
 	}
@@ -513,7 +513,7 @@ class StoryMapDisplay extends Component {
 										<div className="post-info">
 											<p className="author" dangerouslySetInnerHTML={ { __html: getAuthorsLinks( this.state.postData ) } } />
 											{ storyDate && (
-												<p className="date">{ `${formatDate(storyDate)} ${ __('at', 'jeo') } ${formatHour(storyDate)}` }</p>
+												<p className="date">{ `${formatDate(storyDate)} ${ __('at', 'jeowp') } ${formatHour(storyDate)}` }</p>
 											) }
 										</div>
 									</>
@@ -526,7 +526,7 @@ class StoryMapDisplay extends Component {
 									className="storymap-start-button"
 									onClick={ () => this.startStorymapDisplay() }
 								>
-									{ __('START', 'jeo') }
+									{ __('START', 'jeowp') }
 								</button>
 
 								{ this.props.navigateButton && (
@@ -540,7 +540,7 @@ class StoryMapDisplay extends Component {
 												this.el?.querySelector( '.navigate-button-display' )?.click();
 											} }
 										>
-											{ __('skip intro', 'jeo') }
+											{ __('skip intro', 'jeowp') }
 										</p>
 										<div
 											className="skip-intro-icon"
@@ -633,7 +633,7 @@ class StoryMapDisplay extends Component {
 						<p
 							onClick={ () => this.exitNavigationMode() }
 						>
-							{ __('Back to top', 'jeo') }
+							{ __('Back to top', 'jeowp') }
 						</p>
 					</div>
 				</div>
@@ -679,7 +679,7 @@ function Chapter({ index, id, theme, title, image, description, currentChapterID
 						className="navigate-button-display"
 						onClick={ onClickFunction }
 					>
-						{ __('NAVIGATE THE MAP', 'jeo') }
+						{ __('NAVIGATE THE MAP', 'jeowp') }
 					</button>
 				</div>
 			) }

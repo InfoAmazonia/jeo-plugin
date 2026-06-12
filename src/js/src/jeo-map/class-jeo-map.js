@@ -707,7 +707,7 @@ export default class JeoMap {
 
 			const moreInfoText = document.createElement( 'span' );
 			moreInfoText.classList.add( 'text' );
-			moreInfoText.innerText = ` ${ __( 'Info', 'jeo' ) } `;
+			moreInfoText.innerText = ` ${ __( 'Info', 'jeowp' ) } `;
 
 			moreInfoTextIcon.appendChild( moreInfoIcon );
 			moreInfoTextIcon.appendChild( moreInfoText );
@@ -808,7 +808,7 @@ export default class JeoMap {
 
 		const moreButton = document.createElement( 'a' );
 		moreButton.classList.add( 'more-info-button' );
-		moreButton.innerHTML = __( 'Info', 'jeo' );
+		moreButton.innerHTML = __( 'Info', 'jeowp' );
 
 		moreButton.onclick = ( e ) => {
 			e.preventDefault();

@@ -28,8 +28,8 @@ class Menu {
 	public function add_main_menu() {
 		// 1. O Menu Principal (Pai) agora aponta para a Welcome Page por padrão
 		add_menu_page(
-			__( 'Jeo', 'jeo' ),
-			'Jeo',
+			__( 'JEO', 'jeowp' ),
+			__( 'JEO', 'jeowp' ),
 			'read',
 			'jeo-main-menu',
 			array( $this, 'render_welcome_page' ),
@@ -40,8 +40,8 @@ class Menu {
 		// 2. Submenu Welcome (Ocupa a primeira posição, slug igual ao pai para ser o default)
 		add_submenu_page(
 			'jeo-main-menu',
-			__( 'Welcome', 'jeo' ),
-			__( 'Welcome', 'jeo' ),
+			__( 'Welcome', 'jeowp' ),
+			__( 'Welcome', 'jeowp' ),
 			'read',
 			'jeo-main-menu',
 			array( $this, 'render_welcome_page' )
@@ -50,8 +50,8 @@ class Menu {
 		// 3. Submenu Dashboard (Segunda posição, agora chamado de Experimental)
 		add_submenu_page(
 			'jeo-main-menu',
-			__( 'Dashboard', 'jeo' ),
-			__( 'Dashboard', 'jeo' ),
+			__( 'Dashboard', 'jeowp' ),
+			__( 'Dashboard', 'jeowp' ),
 			'read',
 			'jeo-dashboard',
 			array( $this, 'render_dashboard_page' )
@@ -60,8 +60,8 @@ class Menu {
 		// 4. Submenu AI (new) - Posicionado após Dashboard e antes dos CPTs (Maps, Layers)
 		add_submenu_page(
 			'jeo-main-menu',
-			__( 'AI (new)', 'jeo' ),
-			__( 'AI (new)', 'jeo' ),
+			__( 'AI (new)', 'jeowp' ),
+			__( 'AI (new)', 'jeowp' ),
 			'manage_options',
 			'jeo-ai-settings',
 			array( \jeo_ai_settings(), 'render_settings_page' )

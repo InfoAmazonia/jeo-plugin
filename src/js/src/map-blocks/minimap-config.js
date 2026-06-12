@@ -65,19 +65,19 @@ export const minimapAttributes = {
 		type: 'object',
 		properties: {
 			east: {
-				description: __( 'East pan limit', 'jeo' ),
+				description: __( 'East pan limit', 'jeowp' ),
 				type: 'number',
 			},
 			north: {
-				description: __( 'North pan limit', 'jeo' ),
+				description: __( 'North pan limit', 'jeowp' ),
 				type: 'number',
 			},
 			south: {
-				description: __( 'South pan limit', 'jeo' ),
+				description: __( 'South pan limit', 'jeowp' ),
 				type: 'number',
 			},
 			west: {
-				description: __( 'West pan limit', 'jeo' ),
+				description: __( 'West pan limit', 'jeowp' ),
 				type: 'number',
 			},
 		},

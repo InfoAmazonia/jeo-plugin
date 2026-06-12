@@ -17,10 +17,10 @@ function jeo_add_privacy_policy_content() {
 		return;
 	}
 
-	$content  = '<p>' . __( 'JEO collects and stores geolocation metadata for posts when authors explicitly geotag content. This may include latitude, longitude, and reverse-geocoded address components (city, region, country, postcode). This data is attached to the post and is available to anyone with access to the post.', 'jeo' ) . '</p>';
-	$content .= '<p>' . __( 'When the "Stories Near You" feature is enabled, visitors may opt in to share their browser geolocation. This location is sent to the site server solely to retrieve nearby posts and is not stored.', 'jeo' ) . '</p>';
-	$content .= '<p>' . __( 'If AI-powered georeferencing is enabled, post titles and content may be sent to external AI providers (e.g., OpenAI, Google Gemini). AI usage logs (provider name, token counts) are stored locally as private posts and are not shared externally.', 'jeo' ) . '</p>';
-	$content .= '<p>' . __( 'Geocoding requests may be sent to third-party services such as Nominatim (OpenStreetMap) or Mapbox, depending on the active geocoder.', 'jeo' ) . '</p>';
+	$content  = '<p>' . __( 'JEO collects and stores geolocation metadata for posts when authors explicitly geotag content. This may include latitude, longitude, and reverse-geocoded address components (city, region, country, postcode). This data is attached to the post and is available to anyone with access to the post.', 'jeowp' ) . '</p>';
+	$content .= '<p>' . __( 'When the "Stories Near You" feature is enabled, visitors may opt in to share their browser geolocation. This location is sent to the site server solely to retrieve nearby posts and is not stored.', 'jeowp' ) . '</p>';
+	$content .= '<p>' . __( 'If AI-powered georeferencing is enabled, post titles and content may be sent to external AI providers (e.g., OpenAI, Google Gemini). AI usage logs (provider name, token counts) are stored locally as private posts and are not shared externally.', 'jeowp' ) . '</p>';
+	$content .= '<p>' . __( 'Geocoding requests may be sent to third-party services such as Nominatim (OpenStreetMap) or Mapbox, depending on the active geocoder.', 'jeowp' ) . '</p>';
 
 	wp_add_privacy_policy_content(
 		'JEO',
@@ -37,7 +37,7 @@ add_action( 'admin_init', 'jeo_add_privacy_policy_content' );
  */
 function jeo_register_personal_data_exporter( $exporters ) {
 	$exporters['jeo-geolocation'] = array(
-		'exporter_friendly_name' => __( 'JEO Geolocation Metadata', 'jeo' ),
+		'exporter_friendly_name' => __( 'JEO Geolocation Metadata', 'jeowp' ),
 		'callback'               => 'jeo_geolocation_personal_data_exporter',
 	);
 	return $exporters;
@@ -103,7 +103,7 @@ function jeo_geolocation_personal_data_exporter( $email_address, $page = 1 ) {
 
 		$export_items[] = array(
 			'group_id'    => 'jeo-geolocation',
-			'group_label' => __( 'JEO Geolocation', 'jeo' ),
+			'group_label' => __( 'JEO Geolocation', 'jeowp' ),
 			'item_id'     => 'post-' . $post->ID,
 			'data'        => $item_data,
 		);
@@ -123,7 +123,7 @@ function jeo_geolocation_personal_data_exporter( $email_address, $page = 1 ) {
  */
 function jeo_register_personal_data_eraser( $erasers ) {
 	$erasers['jeo-geolocation'] = array(
-		'eraser_friendly_name' => __( 'JEO Geolocation Metadata', 'jeo' ),
+		'eraser_friendly_name' => __( 'JEO Geolocation Metadata', 'jeowp' ),
 		'callback'             => 'jeo_geolocation_personal_data_eraser',
 	);
 	return $erasers;

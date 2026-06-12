@@ -152,7 +152,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 
 			<div className="jeo-preview-controls">
 				<Button variant="primary" isLarge onClick={ openModal }>
-					{ __( 'Edit layers settings', 'jeo' ) }
+					{ __( 'Edit layers settings', 'jeowp' ) }
 				</Button>
 			</div>
 		</div>

@@ -501,7 +501,7 @@ class Jeo {
 	 * @return string
 	 */
 	public function fallback_translation_mofile( $mofile, $domain ) {
-		if ( 'jeo' !== $domain || is_readable( $mofile ) ) {
+		if ( 'jeowp' !== $domain || is_readable( $mofile ) ) {
 			return $mofile;
 		}
 
@@ -510,7 +510,7 @@ class Jeo {
 			return $mofile;
 		}
 
-		$fallback_mofile = JEO_BASEPATH . 'languages/jeo-' . $fallback_locale . '.mo';
+		$fallback_mofile = JEO_BASEPATH . 'languages/jeowp-' . $fallback_locale . '.mo';
 
 		return is_readable( $fallback_mofile ) ? $fallback_mofile : $mofile;
 	}
@@ -654,12 +654,12 @@ class Jeo {
 				'permission_callback' => '__return_true',
 				'args'                => array(
 					'include' => array(
-						'description'       => __( 'Ordered list of map-layer IDs to return.', 'jeo' ),
+						'description'       => __( 'Ordered list of map-layer IDs to return.', 'jeowp' ),
 						'sanitize_callback' => array( $this, 'sanitize_rest_include_ids' ),
 						'default'           => array(),
 					),
 					'context' => array(
-						'description'       => __( 'Request context.', 'jeo' ),
+						'description'       => __( 'Request context.', 'jeowp' ),
 						'sanitize_callback' => 'sanitize_key',
 						'default'           => 'view',
 						'validate_callback' => static function ( $value ) {
@@ -780,7 +780,7 @@ class Jeo {
 			true,
 		);
 
-		wp_set_script_translations( 'jeo-js', 'jeo', JEO_BASEPATH . 'languages' );
+		wp_set_script_translations( 'jeo-js', 'jeowp', JEO_BASEPATH . 'languages' );
 
 		// Context Sidebar asset.
 		$context_asset_file = file_exists( JEO_BASEPATH . '/js/build/contextSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/contextSidebar.asset.php' : array(
@@ -911,7 +911,7 @@ class Jeo {
 				'map_runtime'           => $map_runtime_requested,
 				'map_runtime_requested' => $map_runtime_requested,
 				'runtime_messages'      => array(
-					'mapbox_missing_token'       => __( 'Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre.', 'jeo' ),
+					'mapbox_missing_token'       => __( 'Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre.', 'jeowp' ),
 					'mapbox_runtime_unavailable' => __(
 						'Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre.',
 						'jeo'
@@ -963,7 +963,7 @@ class Jeo {
 			true,
 		);
 
-		wp_set_script_translations( 'jeo-map-blocks', 'jeo', JEO_BASEPATH . 'languages' );
+		wp_set_script_translations( 'jeo-map-blocks', 'jeowp', JEO_BASEPATH . 'languages' );
 	}
 
 	/**
@@ -1382,7 +1382,7 @@ class Jeo {
 				true
 			);
 
-			wp_set_script_translations( 'jeo-map', 'jeo', JEO_BASEPATH . 'languages' );
+			wp_set_script_translations( 'jeo-map', 'jeowp', JEO_BASEPATH . 'languages' );
 
 			$current_language = $this->get_current_language();
 
@@ -1392,7 +1392,7 @@ class Jeo {
 				array(
 					'jsonUrl'          => rest_url( 'wp/v2/' ),
 					'layersUrl'        => rest_url( 'jeo/v1/map-layer' ),
-					'string_read_more' => esc_html__( 'Read more', 'jeo' ),
+					'string_read_more' => esc_html__( 'Read more', 'jeowp' ),
 					'jeoUrl'           => JEO_BASEURL,
 					'nonce'            => $this->get_rest_nonce(),
 					'currentLang'      => $current_language,
@@ -1486,7 +1486,7 @@ class Jeo {
 			true
 		);
 
-		wp_set_script_translations( 'discovery-map', 'jeo', JEO_BASEPATH . 'languages' );
+		wp_set_script_translations( 'discovery-map', 'jeowp', JEO_BASEPATH . 'languages' );
 
 		// Check if the site uses WPML.
 		if ( function_exists( 'icl_object_id' ) ) {
@@ -1533,7 +1533,7 @@ class Jeo {
 			true
 		);
 
-		wp_set_script_translations( 'jeo-storymap', 'jeo', JEO_BASEPATH . 'languages' );
+		wp_set_script_translations( 'jeo-storymap', 'jeowp', JEO_BASEPATH . 'languages' );
 	}
 
 	/**

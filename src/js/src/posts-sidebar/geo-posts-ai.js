@@ -169,15 +169,15 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 							style={ { userSelect: 'none' } }
 						>
 							{ isMinimized
-								? sprintf( _n( 'AI Suggestion (%d selected)', 'AI Suggestions (%d selected)', selectedCount, 'jeo' ), selectedCount )
-								: __( 'Review AI Suggestions', 'jeo' )
+								? sprintf( _n( 'AI Suggestion (%d selected)', 'AI Suggestions (%d selected)', selectedCount, 'jeowp' ), selectedCount )
+								: __( 'Review AI Suggestions', 'jeowp' )
 							}
 						</h3>
 						<button
 							className="jeo-geocode-modal__panel-toggle"
 							onClick={ ( e ) => { e.stopPropagation(); setIsMinimized( ! isMinimized ); } }
 							type="button"
-							aria-label={ isMinimized ? __( 'Expand panel', 'jeo' ) : __( 'Minimize panel', 'jeo' ) }
+							aria-label={ isMinimized ? __( 'Expand panel', 'jeowp' ) : __( 'Minimize panel', 'jeowp' ) }
 						>
 							{ isMinimized ? '▶' : '◀' }
 						</button>
@@ -186,7 +186,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 					{ ! isMinimized && (
 						<div className="jeo-geocode-modal__panel-content">
 							<p style={ { fontSize: '13px', color: '#50575e', margin: '0 0 12px 0' } }>
-								{ __( 'Select locations to add to the map:', 'jeo' ) }
+								{ __( 'Select locations to add to the map:', 'jeowp' ) }
 							</p>
 							<div style={ {
 								display: 'flex',
@@ -220,8 +220,8 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 													/>
 													<span style={ { fontSize: '14px', fontWeight: '600', color: '#1e1e1e' } }>
 														{ loc._geocode_full_address }
-														{ loc._is_enriched && <span title={ __( 'Enriched via Geocoder', 'jeo' ) } style={ { marginLeft: '4px', fontSize: '12px' } }>✅</span> }
-														{ isPrimary && <span title={ __( 'AI flagged this as primary location', 'jeo' ) } style={ { marginLeft: '4px', fontSize: '11px', background: '#e0f0fa', color: '#005a9e', padding: '1px 6px', borderRadius: '10px', fontWeight: '600' } }>★ { __( 'Primary', 'jeo' ) }</span> }
+														{ loc._is_enriched && <span title={ __( 'Enriched via Geocoder', 'jeowp' ) } style={ { marginLeft: '4px', fontSize: '12px' } }>✅</span> }
+														{ isPrimary && <span title={ __( 'AI flagged this as primary location', 'jeowp' ) } style={ { marginLeft: '4px', fontSize: '11px', background: '#e0f0fa', color: '#005a9e', padding: '1px 6px', borderRadius: '10px', fontWeight: '600' } }>★ { __( 'Primary', 'jeowp' ) }</span> }
 													</span>
 												</div>
 												<div style={ { 
@@ -249,12 +249,12 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 															onClick={ ( e ) => { e.stopPropagation(); handleEnrich( index, loc._geocode_lat, loc._geocode_lon ); } }
 															disabled={ enriching[ index ] || loc._disabled || !loc._selected }
 														>
-															{ enriching[ index ] ? <Spinner /> : __( 'Enrich', 'jeo' ) }
+															{ enriching[ index ] ? <Spinner /> : __( 'Enrich', 'jeowp' ) }
 														</Button>
 
 														<div onClick={ (e) => e.stopPropagation() }>
 															<ToggleControl
-																label={ isPrimary ? __( 'Primary', 'jeo' ) : __( 'Secondary', 'jeo' ) }
+																label={ isPrimary ? __( 'Primary', 'jeowp' ) : __( 'Secondary', 'jeowp' ) }
 																checked={ isPrimary }
 																disabled={ loc._disabled || !loc._selected }
 																onChange={ () => changeRelevance( index, isPrimary ? 'secondary' : 'primary' ) }
@@ -276,7 +276,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 														color: '#2c3338',
 														marginBottom: loc._is_enriched ? '8px' : '0'
 													} }>
-														<strong>{ __( 'Context:', 'jeo' ) }</strong> "{ loc._ai_quote }"
+														<strong>{ __( 'Context:', 'jeowp' ) }</strong> "{ loc._ai_quote }"
 													</div>
 												) : null }
 
@@ -290,13 +290,13 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 														lineHeight: '1.4',
 														color: '#1e4620'
 													} }>
-														<strong>{ __( 'Verified:', 'jeo' ) }</strong> { loc._geocode_full_address }
+														<strong>{ __( 'Verified:', 'jeowp' ) }</strong> { loc._geocode_full_address }
 													</div>
 												) }
 												
 												{ loc._disabled && (
 													<p style={ { color: '#d63638', fontSize: '11px', marginTop: '6px', fontWeight: '500' } }>
-														{ __( 'Score too low for reliable mapping.', 'jeo' ) }
+														{ __( 'Score too low for reliable mapping.', 'jeowp' ) }
 													</p>
 												) }
 											</div>
@@ -309,7 +309,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 										onClick={ onCancel }
 										style={ { color: '#cc1818' } }
 									>
-										{ __( 'Discard All', 'jeo' ) }
+										{ __( 'Discard All', 'jeowp' ) }
 									</Button>
 									<Button
 										variant="secondary"
@@ -318,7 +318,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 										onClick={ onRetry }
 										style={ { height: '36px' } }
 									>
-										{ isAIProcessing ? __( 'Retrying...', 'jeo' ) : __( 'Retry AI', 'jeo' ) }
+										{ isAIProcessing ? __( 'Retrying...', 'jeowp' ) : __( 'Retry AI', 'jeowp' ) }
 									</Button>
 									<Button
 										variant="primary"
@@ -326,7 +326,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 										disabled={ ! aiSuggestedLocations.some( l => l._selected ) || isAIProcessing }
 										style={ { height: '36px', padding: '0 20px' } }
 									>
-										{ __( 'Add to Map', 'jeo' ) }
+										{ __( 'Add to Map', 'jeowp' ) }
 									</Button>
 								</div>
 							</div>

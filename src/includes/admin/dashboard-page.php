@@ -303,45 +303,45 @@
 
 	<div class="jeo-dashboard-header" id="jeo-header-box">
 		<div class="jeo-dashboard-header-main">
-			<div class="jeo-dashboard-logo" id="jeo-header-logo" title="<?php esc_attr_e( 'Toggle panel', 'jeo' ); ?>"></div>
+			<div class="jeo-dashboard-logo" id="jeo-header-logo" title="<?php esc_attr_e( 'Toggle panel', 'jeowp' ); ?>"></div>
 			<div class="jeo-dashboard-header-content">
-				<h1><?php esc_html_e( 'JEO Platform', 'jeo' ); ?></h1>
-				<p id="jeo-pin-count"><?php esc_html_e( 'Loading geodata...', 'jeo' ); ?></p>
-				<div class="jeo-dashboard-header-toggle" id="jeo-header-collapse" title="<?php esc_attr_e( 'Minimize Dashboard', 'jeo' ); ?>">&times;</div>
+				<h1><?php esc_html_e( 'JEO Platform', 'jeowp' ); ?></h1>
+				<p id="jeo-pin-count"><?php esc_html_e( 'Loading geodata...', 'jeowp' ); ?></p>
+				<div class="jeo-dashboard-header-toggle" id="jeo-header-collapse" title="<?php esc_attr_e( 'Minimize Dashboard', 'jeowp' ); ?>">&times;</div>
 			</div>
 		</div>
 
 		<div class="jeo-dashboard-filters">
 			<div class="jeo-filter-row">
 				<div class="jeo-filter-group">
-					<label for="jeo-search-filter"><?php esc_html_e( 'Search terms', 'jeo' ); ?></label>
-					<input type="text" id="jeo-search-filter" placeholder="<?php esc_attr_e( 'Title or content...', 'jeo' ); ?>">
+					<label for="jeo-search-filter"><?php esc_html_e( 'Search terms', 'jeowp' ); ?></label>
+					<input type="text" id="jeo-search-filter" placeholder="<?php esc_attr_e( 'Title or content...', 'jeowp' ); ?>">
 				</div>
 
 				<div class="jeo-filter-group">
-					<label for="jeo-post-type-filter"><?php esc_html_e( 'Post Type', 'jeo' ); ?></label>
+					<label for="jeo-post-type-filter"><?php esc_html_e( 'Post Type', 'jeowp' ); ?></label>
 					<select id="jeo-post-type-filter">
-						<option value=""><?php esc_html_e( 'All Types', 'jeo' ); ?></option>
+						<option value=""><?php esc_html_e( 'All Types', 'jeowp' ); ?></option>
 					</select>
 				</div>
 
 				<div class="jeo-filter-group" id="jeo-tax-group" style="display:none;">
-					<label for="jeo-taxonomy-filter"><?php esc_html_e( 'Taxonomy', 'jeo' ); ?></label>
+					<label for="jeo-taxonomy-filter"><?php esc_html_e( 'Taxonomy', 'jeowp' ); ?></label>
 					<select id="jeo-taxonomy-filter"></select>
 				</div>
 
 				<div class="jeo-filter-group" id="jeo-term-group" style="display:none;">
-					<label for="jeo-term-filter"><?php esc_html_e( 'Term', 'jeo' ); ?></label>
+					<label for="jeo-term-filter"><?php esc_html_e( 'Term', 'jeowp' ); ?></label>
 					<select id="jeo-term-filter"></select>
 				</div>
 
 				<button type="button" class="button button-primary" id="jeo-apply-filters" style="height:37px;">
-					<?php esc_html_e( 'Apply Filters', 'jeo' ); ?>
+					<?php esc_html_e( 'Apply Filters', 'jeowp' ); ?>
 				</button>
 			</div>
 
 			<div class="jeo-filter-group">
-				<label><?php esc_html_e( 'Timeline Range', 'jeo' ); ?></label>
+				<label><?php esc_html_e( 'Timeline Range', 'jeowp' ); ?></label>
 				<div class="jeo-range-slider-container">
 					<div class="jeo-range-slider-track"></div>
 					<div class="jeo-range-slider-active-track" id="jeo-range-active-track"></div>
@@ -358,7 +358,7 @@
 
 	<div class="jeo-dashboard-loader" id="jeo-dashboard-loader">
 		<div class="jeo-pulse-icon"></div>
-		<div class="jeo-loading-text"><?php esc_html_e( 'Gathering geodata and initializing JEO Engine...', 'jeo' ); ?></div>
+		<div class="jeo-loading-text"><?php esc_html_e( 'Gathering geodata and initializing JEO Engine...', 'jeowp' ); ?></div>
 	</div>
 
 	<?php
@@ -521,7 +521,7 @@
 
 				postTypeSelect.addEventListener('change', function() {
 					var pt = data.post_types.find(t => t.slug === this.value);
-					taxSelect.innerHTML = '<option value=""><?php echo esc_js( esc_html__( 'Select Taxonomy...', 'jeo' ) ); ?></option>';
+					taxSelect.innerHTML = '<option value=""><?php echo esc_js( esc_html__( 'Select Taxonomy...', 'jeowp' ) ); ?></option>';
 					if (pt && pt.taxonomies.length > 0) {
 						pt.taxonomies.forEach(tax => {
 							var opt = document.createElement('option');
@@ -539,7 +539,7 @@
 				taxSelect.addEventListener('change', function() {
 					var pt = data.post_types.find(t => t.slug === postTypeSelect.value);
 					var tax = pt ? pt.taxonomies.find(x => x.slug === this.value) : null;
-					termSelect.innerHTML = '<option value=""><?php echo esc_js( esc_html__( 'Select Term...', 'jeo' ) ); ?></option>';
+					termSelect.innerHTML = '<option value=""><?php echo esc_js( esc_html__( 'Select Term...', 'jeowp' ) ); ?></option>';
 					if (tax && tax.terms.length > 0) {
 						tax.terms.forEach(term => {
 							var opt = document.createElement('option');
@@ -602,7 +602,7 @@
 					if (map.getSource('jeo-dashboard-pins')) map.removeSource('jeo-dashboard-pins');
 				}
 
-				document.getElementById('jeo-pin-count').innerText = pins.length + '<?php echo esc_js( esc_html__( ' locations found.', 'jeo' ) ); ?>';
+				document.getElementById('jeo-pin-count').innerText = pins.length + '<?php echo esc_js( esc_html__( ' locations found.', 'jeowp' ) ); ?>';
 				if (pins.length === 0) return;
 
 				var features = [];
@@ -614,7 +614,7 @@
 					features.push({
 						type: 'Feature',
 						properties: {
-							title: pin.title || '<?php echo esc_js( esc_html__( 'Untitled', 'jeo' ) ); ?>',
+							title: pin.title || '<?php echo esc_js( esc_html__( 'Untitled', 'jeowp' ) ); ?>',
 							name: pin.name || '',
 							quote: pin.quote || '',
 							view_url: pin.view_url || '#',
@@ -701,10 +701,10 @@
 						coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
 					}
 					var popupHTML = '<div class="jeo-dashboard-popup" style="padding:10px;min-width:200px;">' +
-						'<h3 style="margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #eee;padding-bottom:5px;">' + (p.title || '<?php echo esc_js( esc_html__( 'Untitled', 'jeo' ) ); ?>') + '</h3>' +
+						'<h3 style="margin:0 0 8px 0;font-size:15px;border-bottom:1px solid #eee;padding-bottom:5px;">' + (p.title || '<?php echo esc_js( esc_html__( 'Untitled', 'jeowp' ) ); ?>') + '</h3>' +
 						'<p style="margin:0 0 10px 0;font-size:12px;color:#1d2327;"><strong>' + p.name + '</strong></p>';
 					if (p.quote) popupHTML += '<blockquote style="margin:0 0 15px 0;padding:8px 12px;border-left:3px solid #007cba;background:#f0f7ff;font-style:italic;font-size:12px;line-height:1.4;color:#2c3338;">"' + p.quote + '"</blockquote>';
-					popupHTML += '<div style="display:flex;gap:10px;margin-top:10px;"><a href="' + p.view_url + '" class="button button-small" target="_blank"><?php echo esc_js( esc_html__( 'View Post', 'jeo' ) ); ?></a><a href="' + p.edit_url + '" class="button button-small" target="_blank"><?php echo esc_js( esc_html__( 'Edit Post', 'jeo' ) ); ?></a></div></div>';
+					popupHTML += '<div style="display:flex;gap:10px;margin-top:10px;"><a href="' + p.view_url + '" class="button button-small" target="_blank"><?php echo esc_js( esc_html__( 'View Post', 'jeowp' ) ); ?></a><a href="' + p.edit_url + '" class="button button-small" target="_blank"><?php echo esc_js( esc_html__( 'Edit Post', 'jeowp' ) ); ?></a></div></div>';
 					new glObject.Popup({ offset: 15, closeOnClick: true })
 						.setLngLat(coordinates)
 						.setHTML(popupHTML)

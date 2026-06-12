@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * public function validate_meta_zoom($value) {
  *   $val = intval($value);
  *   if ( $val < 1 || $val > 14 ) {
- *       return new \WP_Error( 'rest_invalid_field', __( 'Map zoom must be between 1 and 14', 'jeo' ), array( 'status' => 400 ) );
+ *       return new \WP_Error( 'rest_invalid_field', __( 'Map zoom must be between 1 and 14', 'jeowp' ), array( 'status' => 400 ) );
  *   }
  *
  * Please note:

@@ -187,7 +187,7 @@ function MapsSidebar( {
 								setKey( key + 1 );
 							} }
 						>
-							{ __( 'Initial Zoom', 'jeo' ) }
+							{ __( 'Initial Zoom', 'jeowp' ) }
 						</Button>
 						<Button
 							style={ minButtonStyle }
@@ -207,7 +207,7 @@ function MapsSidebar( {
 								setKey( key + 1 );
 							} }
 						>
-							{ __( 'Min Zoom', 'jeo' ) }
+							{ __( 'Min Zoom', 'jeowp' ) }
 						</Button>
 						<Button
 							style={ maxButtonStyle }
@@ -227,7 +227,7 @@ function MapsSidebar( {
 								setKey( key + 1 );
 							} }
 						>
-							{ __( 'Max Zoom', 'jeo' ) }
+							{ __( 'Max Zoom', 'jeowp' ) }
 						</Button>
 					</ButtonGroup>
 				</div>

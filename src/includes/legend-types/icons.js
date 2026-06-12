@@ -2,7 +2,7 @@
 	const { __ } = wp.i18n;
 
 	window.JeoLegendTypes.registerLegendType( 'icons', {
-	label: __( 'Icon categories', 'jeo' ),
+	label: __( 'Icon categories', 'jeowp' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type
@@ -13,7 +13,7 @@
 			properties: {
 				colors: {
 					type: 'array',
-					description: __( 'An array of labels and icons', 'jeo' ),
+					description: __( 'An array of labels and icons', 'jeowp' ),
 					items: {
 						type: 'object',
 						properties: {
@@ -22,7 +22,7 @@
 							},
 							icon: {
 								type: 'string',
-								description: __( 'URL', 'jeo' ),
+								description: __( 'URL', 'jeowp' ),
 							},
 						},
 					},

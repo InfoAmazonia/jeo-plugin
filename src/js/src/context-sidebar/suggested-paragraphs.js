@@ -213,7 +213,7 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 	return (
 		<div className="jeo-context-suggestions">
 			<h4 className="jeo-context-suggestions__title">
-				{ __( 'Suggested Paragraphs', 'jeo' ) }
+				{ __( 'Suggested Paragraphs', 'jeowp' ) }
 			</h4>
 			{ paragraphs.map( ( paragraph, index ) => {
 				const safeHtml = sanitizeHtml( paragraph.text );
@@ -231,7 +231,7 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 								disabled={ insertedIndices.has( index ) }
 								className="jeo-context-suggestion__insert"
 							>
-								{ insertedIndices.has( index ) ? __( 'Inserted', 'jeo' ) : __( 'Insert into article', 'jeo' ) }
+								{ insertedIndices.has( index ) ? __( 'Inserted', 'jeowp' ) : __( 'Insert into article', 'jeowp' ) }
 							</Button>
 							<Button
 								variant="tertiary"
@@ -239,7 +239,7 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 								onClick={ () => handleCopy( paragraph.text, index ) }
 								className="jeo-context-suggestion__copy"
 							>
-								{ copiedIndex === index ? __( 'Copied!', 'jeo' ) : __( 'Copy', 'jeo' ) }
+								{ copiedIndex === index ? __( 'Copied!', 'jeowp' ) : __( 'Copy', 'jeowp' ) }
 							</Button>
 						</div>
 					</div>

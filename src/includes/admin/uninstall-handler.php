@@ -27,8 +27,8 @@ function jeo_modify_delete_link( $actions, $plugin_file ) {
 		$actions['delete'] = sprintf(
 			'<a href="%s" class="delete" aria-label="%s">%s</a>',
 			esc_url( admin_url( 'admin.php?page=jeo-uninstall-confirm' ) ),
-			esc_attr__( 'Uninstall JEO', 'jeo' ),
-			esc_html__( 'Uninstall', 'jeo' )
+			esc_attr__( 'Uninstall JEO', 'jeowp' ),
+			esc_html__( 'Uninstall', 'jeowp' )
 		);
 	}
 
@@ -45,8 +45,8 @@ add_action( 'admin_menu', 'jeo_register_uninstall_page' );
 function jeo_register_uninstall_page() {
 	add_submenu_page(
 		null, // No parent menu — hidden page.
-		__( 'Uninstall JEO', 'jeo' ),
-		__( 'Uninstall JEO', 'jeo' ),
+		__( 'Uninstall JEO', 'jeowp' ),
+		__( 'Uninstall JEO', 'jeowp' ),
 		'activate_plugins',
 		'jeo-uninstall-confirm',
 		'jeo_render_uninstall_page'
@@ -60,7 +60,7 @@ function jeo_register_uninstall_page() {
  */
 function jeo_render_uninstall_page() {
 	if ( ! current_user_can( 'activate_plugins' ) ) {
-		wp_die( esc_html__( 'You do not have permission to uninstall plugins.', 'jeo' ) );
+		wp_die( esc_html__( 'You do not have permission to uninstall plugins.', 'jeowp' ) );
 	}
 
 	require_once __DIR__ . '/uninstall-page.php';
