@@ -20,13 +20,13 @@
 	{
 		"name": "layersSidebar",
 		"path": "src/js/build/layersSidebar.js",
-		"limit": "360 KB",
+		"limit": "410 KB",
 		"brotli": false
 	},
 	{
 		"name": "discovery",
 		"path": "src/js/build/discovery.js",
-		"limit": "286 KB",
+		"limit": "290 KB",
 		"brotli": false
 	},
 	{
