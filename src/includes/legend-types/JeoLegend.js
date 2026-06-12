@@ -174,16 +174,16 @@ class JeoLegend {
 			'simple-color': {
 				left_label: '0',
 				right_label: '0',
-				colors: [ { label: __( 'Default label', 'jeo' ), color: '#ff0909' } ],
+				colors: [ { label: __( 'Default label', 'jeowp' ), color: '#ff0909' } ],
 			},
 
 			icons: {
-				icons: [ { label: __( 'Default label', 'jeo' ), icon: null } ],
+				icons: [ { label: __( 'Default label', 'jeowp' ), icon: null } ],
 			},
 
 			circles: {
 				color: '#000',
-				circles: [ { label: __( 'Default label', 'jeo' ), radius: 8 } ],
+				circles: [ { label: __( 'Default label', 'jeowp' ), radius: 8 } ],
 			},
 
 			barscale: {

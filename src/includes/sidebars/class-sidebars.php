@@ -71,7 +71,7 @@ class Sidebars {
 			true
 		);
 
-		wp_set_script_translations( 'jeo-layers-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
+		wp_set_script_translations( 'jeo-layers-sidebar', 'jeowp', JEO_BASEPATH . 'languages' );
 
 		wp_enqueue_style(
 			'jeo-maps-sidebar',
@@ -91,6 +91,6 @@ class Sidebars {
 			true
 		);
 
-		wp_set_script_translations( 'jeo-maps-sidebar', 'jeo', JEO_BASEPATH . 'languages' );
+		wp_set_script_translations( 'jeo-maps-sidebar', 'jeowp', JEO_BASEPATH . 'languages' );
 	}
 }

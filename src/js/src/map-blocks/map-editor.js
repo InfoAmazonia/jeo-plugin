@@ -112,7 +112,7 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 								} );
 							} }
 						>
-							<em>{ __( '(Select another map)', 'jeo' ) }</em>
+							<em>{ __( '(Select another map)', 'jeowp' ) }</em>
 						</Button>
 					</div>
 				</>
@@ -120,11 +120,11 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 			{ ! attributes.map_id && (
 				<>
 					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
-						{ __( 'Insert a map from the library', 'jeo' ) + ':' }
+						{ __( 'Insert a map from the library', 'jeowp' ) + ':' }
 					</label>
 					<JeoAutosuggest
 						inputProps={ {
-							placeholder: __( 'Type a map name', 'jeo' ),
+							placeholder: __( 'Type a map name', 'jeowp' ),
 							id: `jeo-map-autosuggest-${ instanceId }`,
 						} }
 						postType="map"
@@ -143,7 +143,7 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 								setAttributes( { ...attributes, map_id: previous_map } );
 							} }
 						>
-							{ __( 'Cancel', 'jeo' ) }
+							{ __( 'Cancel', 'jeowp' ) }
 						</Button>
 					) }
 				</>

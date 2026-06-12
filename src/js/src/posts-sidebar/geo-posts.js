@@ -196,7 +196,7 @@ class JeoGeocodePosts extends Component {
 					throw new Error(
 						__(
 							'Unable to retrieve the address for the selected point.',
-							'jeo'
+							'jeowp'
 						)
 					);
 				}
@@ -418,25 +418,25 @@ class JeoGeocodePosts extends Component {
 						onSearchRequest={ () => this.setState( { loadStatus: 'pending' } ) }
 					/>
 					<span className="jeo-geocode-search__hint">
-						{ __( 'Type an address, then click Search or press Enter. You can also drag the marker across the map.', 'jeo' ) }
+						{ __( 'Type an address, then click Search or press Enter. You can also drag the marker across the map.', 'jeowp' ) }
 					</span>
 				</div>
 				<div>
 					{ ! isDisabled && (
 						<Fragment>
 							<CheckboxControl
-								label={ __( 'Move marker to nearest address', 'jeo' ) }
+								label={ __( 'Move marker to nearest address', 'jeowp' ) }
 								checked={ magneticMarkers }
 								onChange={ this.toggleMagnet }
 							/>
 							<RadioControl
-								label={ __( 'Relevance', 'jeo' ) }
+								label={ __( 'Relevance', 'jeowp' ) }
 								selected={
 									points.length ? selectedPoint.relevance || 'primary' : 'primary'
 								}
 								options={ [
-									{ label: __( 'Primary', 'jeo' ), value: 'primary' },
-									{ label: __( 'Secondary', 'jeo' ), value: 'secondary' },
+									{ label: __( 'Primary', 'jeowp' ), value: 'primary' },
+									{ label: __( 'Secondary', 'jeowp' ), value: 'secondary' },
 								] }
 								onChange={ this.relevanceClick }
 							/>
@@ -445,7 +445,7 @@ class JeoGeocodePosts extends Component {
 					<div className="jeo-geocode-posts__row">
 						<div className="jeo-geocode-posts__buttons-list">
 							<Button variant="secondary" onClick={ this.onClickCancel }>
-								{ __( 'Cancel', 'jeo' ) }
+								{ __( 'Cancel', 'jeowp' ) }
 							</Button>
 							<Button
 								variant="primary"
@@ -453,8 +453,8 @@ class JeoGeocodePosts extends Component {
 								disabled={ isDisabled }
 							>
 								{ formMode === 'edit'
-									? __( 'Update selected point', 'jeo' )
-									: __( 'Save new point', 'jeo' ) }
+									? __( 'Update selected point', 'jeowp' )
+									: __( 'Save new point', 'jeowp' ) }
 							</Button>
 						</div>
 					</div>
@@ -473,11 +473,11 @@ class JeoGeocodePosts extends Component {
 			<div className="jeo-geocode-posts">
 				<div className="jeo-geocode-posts__column">
 					<div>
-						<h2>{ __( 'Add new point', 'jeo' ) }</h2>
+						<h2>{ __( 'Add new point', 'jeowp' ) }</h2>
 						<div>
 							{ formMode === 'view' ? (
 								<Button variant="primary" onClick={ this.onClickNewPoint }>
-									{ __( 'Add new point', 'jeo' ) }
+									{ __( 'Add new point', 'jeowp' ) }
 								</Button>
 							) : formMode === 'new' ? (
 								this.renderForm()
@@ -485,9 +485,9 @@ class JeoGeocodePosts extends Component {
 						</div>
 					</div>
 					<div>
-						<h2>{ __( 'Current points', 'jeo' ) }</h2>
+						<h2>{ __( 'Current points', 'jeowp' ) }</h2>
 						{ pointsList.length === 0 ? (
-							__( 'No points', 'jeo' )
+							__( 'No points', 'jeowp' )
 						) : (
 							<ul>
 								{ pointsList.map( ( point, i ) => (
@@ -511,7 +511,7 @@ class JeoGeocodePosts extends Component {
 													onClick={ this.onClickDelete }
 													marker_index={ i }
 												>
-													{ __( 'Delete', 'jeo' ) }
+													{ __( 'Delete', 'jeowp' ) }
 												</Button>
 												<span> | </span>
 												<Button
@@ -519,7 +519,7 @@ class JeoGeocodePosts extends Component {
 													onClick={ this.onClickEdit }
 													marker_index={ i }
 												>
-													{ __( 'Edit', 'jeo' ) }
+													{ __( 'Edit', 'jeowp' ) }
 												</Button>
 											</Fragment>
 										) : (

@@ -126,7 +126,7 @@ function SelectWidget( {
 	const enumOptions = options.enumOptions || [];
 	const selectOptions = [
 		{
-			label: required ? '' : placeholder || __( 'Select an option', 'jeo' ),
+			label: required ? '' : placeholder || __( 'Select an option', 'jeowp' ),
 			value: '',
 			disabled: required,
 		},

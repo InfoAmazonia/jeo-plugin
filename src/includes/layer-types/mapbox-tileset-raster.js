@@ -2,7 +2,7 @@
 	const { __ } = wp.i18n;
 
 	window.JeoLayerTypes.registerLayerType( 'mapbox-tileset-raster', {
-	label: __( 'Raster Mapbox Tiled Source', 'jeo' ),
+	label: __( 'Raster Mapbox Tiled Source', 'jeowp' ),
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -65,22 +65,22 @@
 			properties: {
 				tileset_id: {
 					type: 'string',
-					title: __( 'Tileset ID', 'jeo' ),
-					description: __( 'Example: username.tilesetid', 'jeo' ),
+					title: __( 'Tileset ID', 'jeowp' ),
+					description: __( 'Example: username.tilesetid', 'jeowp' ),
 				},
 				style_source_type: {
-					title: __( 'Style Source Type', 'jeo' ),
-					description: __( 'Which data the map should display', 'jeo' ),
+					title: __( 'Style Source Type', 'jeowp' ),
+					description: __( 'Which data the map should display', 'jeowp' ),
 					type: 'string',
 					default: 'raster',
 					enum: [ 'raster', 'raster-dem' ],
 				},
 				type: {
-					title: __( 'Layer Type', 'jeo' ),
+					title: __( 'Layer Type', 'jeowp' ),
 					description:
 						__(
 							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
-							'jeo'
+							'jeowp'
 						),
 					type: 'string',
 					default: 'raster',

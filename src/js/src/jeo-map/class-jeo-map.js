@@ -381,7 +381,7 @@ export default class JeoMap {
 		const layers = document.createElement( 'div' );
 		layers.innerHTML += `<p class="jeomap-no-layers__text">${ __(
 			"This map doesn't have layers",
-			'jeo'
+			'jeowp'
 		) }</p>`;
 		this.element.appendChild( layers );
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
@@ -661,7 +661,7 @@ export default class JeoMap {
 			legendTextIcon.appendChild( layerIcon );
 			legendTextIcon.innerHTML += `<span class="text"> ${ __(
 				'Legend',
-				'jeo'
+				'jeowp'
 			) } </span>`;
 
 			legendsTitle.appendChild( legendTextIcon );
@@ -734,7 +734,7 @@ export default class JeoMap {
 
 			const moreInfoText = document.createElement( 'span' );
 			moreInfoText.classList.add( 'text' );
-			moreInfoText.innerText = ` ${ __( 'Info', 'jeo' ) } `;
+			moreInfoText.innerText = ` ${ __( 'Info', 'jeowp' ) } `;
 
 			moreInfoTextIcon.appendChild( moreInfoIcon );
 			moreInfoTextIcon.appendChild( moreInfoText );
@@ -777,7 +777,7 @@ export default class JeoMap {
 					const attributionLabel = attributionName || attributionLink;
 					innerHTML += `<p>${ __(
 						'Attribution:',
-						'jeo'
+						'jeowp'
 					) } <a href="${ attributionLink }">${ attributionLabel }</a></p>`;
 				}
 				if ( sourceLink ) {
@@ -798,7 +798,7 @@ export default class JeoMap {
 									transition: all .2 ease-in-out;"
 									href="${ sourceLink }" class="download-source">${ __(
 										'Download from source',
-										'jeo'
+										'jeowp'
 									) }
 								  </a>`;
 				}
@@ -811,7 +811,7 @@ export default class JeoMap {
 		closeButton.innerHTML =
 			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="${ __(
 				'Close popup',
-				'jeo'
+				'jeowp'
 			) }"><span>×</span></button>`;
 
 		closeButton.click( function ( e ) {} );
@@ -827,7 +827,7 @@ export default class JeoMap {
 
 		const moreButton = document.createElement( 'a' );
 		moreButton.classList.add( 'more-info-button' );
-		moreButton.innerHTML = __( 'Info', 'jeo' );
+		moreButton.innerHTML = __( 'Info', 'jeowp' );
 
 		moreButton.onclick = ( e ) => {
 			e.preventDefault();
@@ -1511,11 +1511,11 @@ export default class JeoMap {
 				<div class="jeo-popup-navigator__controls">
 					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--previous" aria-label="${ __(
 						'Show previous post',
-						'jeo'
+						'jeowp'
 					) }">${ chevronLeftSmallIcon }</button>
 					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--next" aria-label="${ __(
 						'Show next post',
-						'jeo'
+						'jeowp'
 					) }">${ chevronRightSmallIcon }</button>
 				</div>
 			</div>
@@ -1556,7 +1556,7 @@ export default class JeoMap {
 							'%d marker in this area',
 							'%d markers in this area',
 							totalCount,
-							'jeo'
+							'jeowp'
 						),
 						totalCount
 					)
@@ -1849,7 +1849,7 @@ export default class JeoMap {
 			legendTextIcon.appendChild( layerIcon );
 			legendTextIcon.innerHTML += `<span class="text"> ${ __(
 				'Layers',
-				'jeo'
+				'jeowp'
 			) } </span>`;
 
 			legendsTitle.appendChild( legendTextIcon );

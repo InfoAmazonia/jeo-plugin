@@ -14,12 +14,12 @@ function EmbeddedStorymapEditor ({ attributes, loadedStory, setAttributes }) {
 	return (
 		<div { ...blockProps }>
 			<label htmlFor={ inputId }>
-				{ __( 'Insert a story map from the library', 'jeo' ) + ':' }
+				{ __( 'Insert a story map from the library', 'jeowp' ) + ':' }
 			</label>
 			<JeoAutosuggest
 				inputProps={ {
 					id: inputId,
-					placeholder: loadedStory ? loadedStory.title.raw : __( 'Type a story name', 'jeo' ),
+					placeholder: loadedStory ? loadedStory.title.raw : __( 'Type a story name', 'jeowp' ),
 				} }
 				postType="storymap"
 				onSuggestionSelected={ ( e, { suggestion } ) => {

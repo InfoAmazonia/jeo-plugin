@@ -19,11 +19,11 @@ const JeoGeocodePanel = class JeoGeocodePanel extends Component {
 		return (
 			<Fragment>
 				<Button variant="secondary" onClick={ () => this.setState( { isOpen: true } ) }>
-					{ __( 'Geolocate this post', 'jeo' ) }
+					{ __( 'Geolocate this post', 'jeowp' ) }
 				</Button>
 				{ isOpen && (
 					<Modal
-						title={ __( 'Geolocate this post', 'jeo' ) }
+						title={ __( 'Geolocate this post', 'jeowp' ) }
 						onRequestClose={ () => this.setState( { isOpen: false } ) }
 					>
 						<JeoGeocodePosts
@@ -47,7 +47,7 @@ registerPlugin( 'jeo-posts-sidebar', {
 		return (
 			<div>
 				{ currentPostType ?
-					<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeo' ) }>
+					<PluginDocumentSettingPanel title={ __( 'Geolocation', 'jeowp' ) }>
 						<JeoGeocodePanel />
 					</PluginDocumentSettingPanel>
 				: null };

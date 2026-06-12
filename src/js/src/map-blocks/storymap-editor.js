@@ -837,7 +837,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 						{ showStorySettings && (
 							<div className="story-settings">
 								<div className="heading">
-									<span className="section-title">{ __( 'Story settings', 'jeo' ) }</span>
+									<span className="section-title">{ __( 'Story settings', 'jeowp' ) }</span>
 									<Button
 										className="hide-button"
 										onClick={ () => {
@@ -847,7 +847,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 										<Icon icon={ chevronDown } />
 									</Button>
 								</div>
-								<label className="input-label">{ __('Brief description', 'jeo' ) }</label>
+								<label className="input-label">{ __('Brief description', 'jeowp' ) }</label>
 								<div className="storymap-description-editor">
 									<CKEditor
 										editor={ ClassicEditor }
@@ -866,7 +866,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								</div>
 								<CheckboxControl
 									className="introduction-button"
-									label={ __( 'Show story map introduction', 'jeo'  ) }
+									label={ __( 'Show story map introduction', 'jeowp'  ) }
 									checked={ attributes.hasIntroduction }
 									onChange={ ( newHasIntroduction ) => {
 										setAttributes( {
@@ -877,7 +877,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								/>
 								<CheckboxControl
 									className="navigate-button"
-									label={ __( 'Use "Navigate to map" button', 'jeo'  ) }
+									label={ __( 'Use "Navigate to map" button', 'jeowp'  ) }
 									checked={ attributes.navigateButton }
 									onChange={ ( newNavigateButton ) => {
 										setAttributes( {
@@ -890,7 +890,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 						) }
 						{ ! showStorySettings && (
 							<div className="story-settings-hide">
-								<span className="section-title">{ __( 'Story settings', 'jeo'  ) }</span>
+								<span className="section-title">{ __( 'Story settings', 'jeowp'  ) }</span>
 								<Button
 									className="show-button"
 									disabled={ ! loadedMap }
@@ -905,7 +905,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 						{ showSlidesSettings && (
 							<div className="slides-settings">
 								<div className="heading">
-									<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
+									<span className="section-title">{ __( 'Slides settings', 'jeowp' ) }</span>
 									<Button
 										className="hide-button"
 										onClick={ () => {
@@ -929,14 +929,14 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 												<Button
 													className="slide-order-button"
 													icon={ chevronUp }
-													label={ __( 'Move slide up', 'jeo' ) }
+													label={ __( 'Move slide up', 'jeowp' ) }
 													disabled={ slideIndex === 0 }
 													onClick={ () => moveSlide( slideIndex, slideIndex - 1 ) }
 												/>
 												<Button
 													className="slide-order-button"
 													icon={ chevronDown }
-													label={ __( 'Move slide down', 'jeo' ) }
+													label={ __( 'Move slide down', 'jeowp' ) }
 													disabled={
 														slideIndex === attributes.slides.length - 1
 													}
@@ -945,7 +945,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 											</div>
 												<Panel className="slide-panel">
 													<PanelBody
-														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( slideIndex + 1 ) }
+														title={ slide.title? removeTags( slide.title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeowp' ) + ' ' + ( slideIndex + 1 ) }
 														opened={ slideIndex === openSlideIndex }
 														scrollAfterOpen={ false }
 														onToggle={ ( next ) => {
@@ -958,7 +958,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 															}
 														} }
 													>
-														<span className="input-label">{ __("Layers", "jeo") }</span>
+														<span className="input-label">{ __("Layers", "jeowp") }</span>
 														<div className="layers">
 															{ ( attributes.navigateMapLayers ?? [] ).map( ( item ) => {
 																let layerButtonStyle = {
@@ -1070,7 +1070,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	>
 																		<div className="flex-center">
 																			<Icon icon={ unlock } />
-																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
+																			<span>{ __( 'Lock current spot', 'jeowp' ) }</span>
 																		</div>
 																	</Button>
 																)
@@ -1091,7 +1091,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 																	>
 																		<div>
 																			<Icon icon={ lock } />
-																			<span>{ __( 'Lock current spot', 'jeo' ) }</span>
+																			<span>{ __( 'Lock current spot', 'jeowp' ) }</span>
 																		</div>
 																	</Button>
 																)
@@ -1111,11 +1111,11 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														>
 															<div className="flex-center">
 																<Icon icon={ seen } />
-																<span>{ __( 'Preview', 'jeo'  ) }</span>
+																<span>{ __( 'Preview', 'jeowp'  ) }</span>
 															</div>
 														</Button>
 
-															<span className="input-label">{ __( 'Title', 'jeo' ) }</span>
+															<span className="input-label">{ __( 'Title', 'jeowp' ) }</span>
 															{ /* Keep editor interactions isolated from the outer slide drag handlers. */ }
 															<div
 																className="storymap-title-editor"
@@ -1144,7 +1144,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 															/>
 														</div>
 														<span className="input-label">{ __(
-																'Content', 'jeo'
+																'Content', 'jeowp'
 														) }</span>
 														{ /* Same isolation for the content editor. */ }
 														<div
@@ -1176,13 +1176,13 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 															className="remove-button"
 															onClick={ () => {
 																if ( attributes.slides.length <= 1 ) {
-																	alert( __( 'The minimum number of slides is 1.', 'jeo' ) );
+																	alert( __( 'The minimum number of slides is 1.', 'jeowp' ) );
 
 																	return;
 																}
 
 																const confirmation = confirm(
-																	__( 'Do you really want to remove this slide?', 'jeo' )
+																	__( 'Do you really want to remove this slide?', 'jeowp' )
 																);
 																if (
 																	confirmation &&
@@ -1205,7 +1205,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 														>
 															<div className="flex-center">
 																<Icon icon={ trash } />
-																<span>{ __( 'Remove', 'jeo' ) }</span>
+																<span>{ __( 'Remove', 'jeowp' ) }</span>
 															</div>
 														</Button>
 													</PanelBody>
@@ -1243,14 +1243,14 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								>
 									<div className="flex-center">
 										<Icon icon={ plus } />
-										<span>{ __( 'Add', 'jeo' ) }</span>
+										<span>{ __( 'Add', 'jeowp' ) }</span>
 									</div>
 								</Button>
 							</div>
 						) }
 						{ ! showSlidesSettings && (
 							<div className="slides-settings-hide">
-								<span className="section-title">{ __( 'Slides settings', 'jeo' ) }</span>
+								<span className="section-title">{ __( 'Slides settings', 'jeowp' ) }</span>
 								<Button
 									className="show-button"
 									disabled={ ! loadedMap }
@@ -1265,7 +1265,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 						<div className="current-slide-box">
 							<div>
 								<strong>
-								{ __('Current slide:', 'jeo' ) + ' ' }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeo' ) + ' ' + ( currentSlideIndex + 1 ) }
+								{ __('Current slide:', 'jeowp' ) + ' ' }{ attributes.slides[ currentSlideIndex ].title ? removeTags( attributes.slides[ currentSlideIndex ].title ).replace(/\&nbsp;/g, '') : __( 'Slide', 'jeowp' ) + ' ' + ( currentSlideIndex + 1 ) }
 								</strong>
 							</div>
 						</div>
@@ -1304,7 +1304,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 					<div className="jeo-preview-controls">
 						<span>
 							<strong>
-								{ __("Map:", "jeo") + ' ' }
+								{ __("Map:", "jeowp") + ' ' }
 								{ decodeHtmlEntity( loadedMap.title.rendered ) }</strong>
 						</span>
 					</div>
@@ -1313,11 +1313,11 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			{ ! attributes.map_id && (
 				<Fragment>
 					<label htmlFor={ `jeo-map-autosuggest-${ instanceId }` }>
-						{ __( 'Insert a map from the library', 'jeo' ) + ':' }
+						{ __( 'Insert a map from the library', 'jeowp' ) + ':' }
 					</label>
 					<JeoAutosuggest
 						inputProps={ {
-							placeholder: __( 'Type a map name', 'jeo' ),
+							placeholder: __( 'Type a map name', 'jeowp' ),
 							id: `jeo-map-autosuggest-${ instanceId }`,
 						} }
 						postType="map"
@@ -1353,7 +1353,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 								setAttributes( { ...attributes, map_id: previous_map } );
 							} }
 						>
-							{ __( 'Cancel', 'jeo' ) }
+							{ __( 'Cancel', 'jeowp' ) }
 						</Button>
 					) }
 				</Fragment>

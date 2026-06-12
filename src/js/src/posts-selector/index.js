@@ -35,10 +35,10 @@ const PostsSelector = ( {
 	};
 
 	return (
-		<Panel name="related-posts" title={ __( 'Related posts', 'jeo' ) }>
+		<Panel name="related-posts" title={ __( 'Related posts', 'jeowp' ) }>
 			<CheckboxControl
 				className="related-posts-checkbox"
-				label={ __( 'Use related posts', 'jeo' ) }
+				label={ __( 'Use related posts', 'jeowp' ) }
 				checked={ postMeta.relate_posts }
 				onChange={ () => {
 					setPostMeta( {
@@ -52,7 +52,7 @@ const PostsSelector = ( {
 				<>
 					<AsyncTokensSelector
 						path="/wp/v2/categories"
-						label={ __( 'Categories', 'jeo' ) }
+						label={ __( 'Categories', 'jeowp' ) }
 						value={ normalizedRelatedPosts.categories }
 						onChange={ ( tokens ) => {
 							setRelatedPosts( {
@@ -64,7 +64,7 @@ const PostsSelector = ( {
 
 					<AsyncTokensSelector
 						path="/wp/v2/tags"
-						label={ __( 'Tags', 'jeo' ) }
+						label={ __( 'Tags', 'jeowp' ) }
 						value={ normalizedRelatedPosts.tags }
 						onChange={ ( tokens ) => {
 							setRelatedPosts( {
@@ -77,8 +77,8 @@ const PostsSelector = ( {
 					<IntervalSelector
 						startDate={ normalizedRelatedPosts.after }
 						endDate={ normalizedRelatedPosts.before }
-						startLabel={ __( 'Start date', 'jeo' ) }
-						endLabel={ __( 'End date', 'jeo' ) }
+						startLabel={ __( 'Start date', 'jeowp' ) }
+						endLabel={ __( 'End date', 'jeowp' ) }
 						onStartChange={ ( date ) => {
 							setRelatedPosts(
 								updateRelatedPostsDate(
@@ -100,7 +100,7 @@ const PostsSelector = ( {
 					/>
 
 					<MetaSelector
-						label={ __( 'Meta queries', 'jeo' ) }
+						label={ __( 'Meta queries', 'jeowp' ) }
 						value={ normalizedRelatedPosts.meta_query }
 						onChange={ ( queries ) => {
 							setRelatedPosts( {

@@ -6,7 +6,7 @@ export function loadLayer ( layers, settings ) {
 }
 
 export const layerUseLabels = {
-	fixed: __( 'Fixed', 'jeo' ),
-	swappable: __( 'Swappable', 'jeo' ),
-	switchable: __( 'Switchable', 'jeo' ),
+	fixed: __( 'Fixed', 'jeowp' ),
+	swappable: __( 'Swappable', 'jeowp' ),
+	switchable: __( 'Switchable', 'jeowp' ),
 };

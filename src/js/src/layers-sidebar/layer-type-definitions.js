@@ -1,17 +1,17 @@
 import { __ } from '@wordpress/i18n';
 
 export const coreLayerTypeOptions = [
-	{ label: __( 'Mapbox Style', 'jeo' ), value: 'mapbox' },
+	{ label: __( 'Mapbox Style', 'jeowp' ), value: 'mapbox' },
 	{
-		label: __( 'Vector Mapbox Tiled Source', 'jeo' ),
+		label: __( 'Vector Mapbox Tiled Source', 'jeowp' ),
 		value: 'mapbox-tileset-vector',
 	},
 	{
-		label: __( 'Raster Mapbox Tiled Source', 'jeo' ),
+		label: __( 'Raster Mapbox Tiled Source', 'jeowp' ),
 		value: 'mapbox-tileset-raster',
 	},
-	{ label: __( 'Raster Tiled Source', 'jeo' ), value: 'tilelayer' },
-	{ label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ), value: 'mvt' },
+	{ label: __( 'Raster Tiled Source', 'jeowp' ), value: 'tilelayer' },
+	{ label: __( 'Mapbox Vector Tiles (MVT)', 'jeowp' ), value: 'mvt' },
 ];
 
 function getFallbackLayerTypeSchema( attributes = {} ) {
@@ -23,18 +23,18 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 				properties: {
 					style_id: {
 						type: 'string',
-						title: __( 'Style ID', 'jeo' ),
+						title: __( 'Style ID', 'jeowp' ),
 						description: __(
 							'The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
-							'jeo'
+							'jeowp'
 						),
 					},
 					access_token: {
 						type: 'string',
-						title: __( 'Access token', 'jeo' ),
+						title: __( 'Access token', 'jeowp' ),
 						description: __(
 							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
-							'jeo'
+							'jeowp'
 						),
 					},
 				},
@@ -46,19 +46,19 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 				properties: {
 					url: {
 						type: 'string',
-						title: __( 'URL', 'jeo' ),
+						title: __( 'URL', 'jeowp' ),
 					},
 					scheme: {
 						type: 'string',
-						title: __( 'Scheme', 'jeo' ),
+						title: __( 'Scheme', 'jeowp' ),
 						description: __(
 							'Influences the Y direction of the tile coordinates.',
-							'jeo'
+							'jeowp'
 						),
 						enum: [ 'xyz', 'tms' ],
 						enumNames: [
-							__( 'Slippy Map tilenames (XYZ)', 'jeo' ),
-							__( 'OSGeo spec (TMS)', 'jeo' ),
+							__( 'Slippy Map tilenames (XYZ)', 'jeowp' ),
+							__( 'OSGeo spec (TMS)', 'jeowp' ),
 						],
 						default: 'xyz',
 					},
@@ -71,14 +71,14 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 				properties: {
 					url: {
 						type: 'string',
-						title: __( 'URL', 'jeo' ),
+						title: __( 'URL', 'jeowp' ),
 					},
 					source_layer: {
 						type: 'string',
-						title: __( 'Source layer', 'jeo' ),
+						title: __( 'Source layer', 'jeowp' ),
 						description: __(
 							'Layer to use from a vector tile source.',
-							'jeo'
+							'jeowp'
 						),
 					},
 					type: {
@@ -96,8 +96,8 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						],
 					},
 					style_source_type: {
-						title: __( 'Style Source Type', 'jeo' ),
-						description: __( 'Which data the map should display', 'jeo' ),
+						title: __( 'Style Source Type', 'jeowp' ),
+						description: __( 'Which data the map should display', 'jeowp' ),
 						type: 'string',
 						default: 'vector',
 						disabled: true,
@@ -111,21 +111,21 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 				properties: {
 					tileset_id: {
 						type: 'string',
-						title: __( 'Tileset ID', 'jeo' ),
-						description: __( 'Example: username.tilesetid', 'jeo' ),
+						title: __( 'Tileset ID', 'jeowp' ),
+						description: __( 'Example: username.tilesetid', 'jeowp' ),
 					},
 					style_source_type: {
-						title: __( 'Style Source Type', 'jeo' ),
-						description: __( 'Which data the map should display', 'jeo' ),
+						title: __( 'Style Source Type', 'jeowp' ),
+						description: __( 'Which data the map should display', 'jeowp' ),
 						type: 'string',
 						default: 'raster',
 						enum: [ 'raster', 'raster-dem' ],
 					},
 					type: {
-						title: __( 'Layer Type', 'jeo' ),
+						title: __( 'Layer Type', 'jeowp' ),
 						description: __(
 							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
-							'jeo'
+							'jeowp'
 						),
 						type: 'string',
 						default: 'raster',
@@ -140,19 +140,19 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 				properties: {
 					tileset_id: {
 						type: 'string',
-						title: __( 'Tileset ID', 'jeo' ),
-						description: __( 'Example: username.tilesetid', 'jeo' ),
+						title: __( 'Tileset ID', 'jeowp' ),
+						description: __( 'Example: username.tilesetid', 'jeowp' ),
 					},
 					source_layer: {
 						type: 'string',
-						title: __( 'Source layer', 'jeo' ),
-						description: __( 'Which data the map should display.', 'jeo' ),
+						title: __( 'Source layer', 'jeowp' ),
+						description: __( 'Which data the map should display.', 'jeowp' ),
 					},
 					type: {
-						title: __( 'Layer Type', 'jeo' ),
+						title: __( 'Layer Type', 'jeowp' ),
 						description: __(
 							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
-							'jeo'
+							'jeowp'
 						),
 						type: 'string',
 						default: 'fill',
@@ -168,8 +168,8 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						],
 					},
 					style_source_type: {
-						title: __( 'Style Source Type', 'jeo' ),
-						description: __( 'The layer source type style', 'jeo' ),
+						title: __( 'Style Source Type', 'jeowp' ),
+						description: __( 'The layer source type style', 'jeowp' ),
 						type: 'string',
 						default: 'vector',
 						disabled: true,
