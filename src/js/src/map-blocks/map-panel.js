@@ -60,7 +60,7 @@ export default function MapPanel( {
 	return (
 		<Panel
 			name="map-settings"
-			title={ __( 'Map settings', 'jeo' ) }
+			title={ __( 'Map settings', 'jeowp' ) }
 			className="jeo-map-panel"
 		>
 			<MapSettings

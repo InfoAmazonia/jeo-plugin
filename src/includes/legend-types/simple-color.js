@@ -2,7 +2,7 @@
 	const { __ } = wp.i18n;
 
 	window.JeoLegendTypes.registerLegendType( 'simple-color', {
-	label: __( 'Color categories', 'jeo' ),
+	label: __( 'Color categories', 'jeowp' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type
@@ -13,7 +13,7 @@
 			properties: {
 				colors: {
 					type: 'array',
-					description: __( 'An array of labels and colors', 'jeo' ),
+					description: __( 'An array of labels and colors', 'jeowp' ),
 					items: {
 						type: 'object',
 						properties: {

@@ -90,8 +90,8 @@ export default function TagFilterControl( { value, onChange, onSelectedLabelChan
 				inputValue={ searchValue }
 				selectedValue={ null }
 				isLoading={ isLoading }
-				placeholder={ __( 'Tags', 'jeo' ) }
-				ariaLabel={ __( 'Filter stories by tag', 'jeo' ) }
+				placeholder={ __( 'Tags', 'jeowp' ) }
+				ariaLabel={ __( 'Filter stories by tag', 'jeowp' ) }
 				getOptionLabel={ ( suggestion ) => suggestion.name }
 				getOptionValue={ ( suggestion ) => suggestion.id }
 				onInputValueChange={ ( nextValue ) => {
@@ -123,7 +123,7 @@ export default function TagFilterControl( { value, onChange, onSelectedLabelChan
 								type="button"
 								aria-label={ sprintf(
 									/* translators: %s: selected tag name. */
-									__( 'Remove tag %s', 'jeo' ),
+									__( 'Remove tag %s', 'jeowp' ),
 									term.name
 								) }
 								onClick={ () =>

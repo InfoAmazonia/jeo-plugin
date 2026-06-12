@@ -83,10 +83,10 @@ const LayerSettings = (
 					</div>
 					<div className="use-control" style={ setWidth( 2 ) }>
 						{ layerIndex === 0 ? (
-							<span>{ __( 'Base layer should be fixed', 'jeo' ) }</span>
+							<span>{ __( 'Base layer should be fixed', 'jeowp' ) }</span>
 						) : (
 							<SelectControl
-								label={ __( 'Type', 'jeo' ) }
+								label={ __( 'Type', 'jeowp' ) }
 								value={ settings.use }
 								options={ useOptions }
 								onChange={ updateUse }
@@ -96,14 +96,14 @@ const LayerSettings = (
 					<div className="default-control" style={ setWidth( 3 ) }>
 						{ settings.use === 'switchable' && (
 							<CheckboxControl
-								label={ __( 'Should be displayed by default.', 'jeo' ) }
+								label={ __( 'Should be displayed by default.', 'jeowp' ) }
 								checked={ settings.default }
 								onChange={ switchDefault }
 							/>
 						) }
 						{ settings.use === 'swappable' && (
 							<RadioControl
-								label={ __( 'Should be displayed by default.', 'jeo' ) }
+								label={ __( 'Should be displayed by default.', 'jeowp' ) }
 								checked={ settings.default }
 								onChange={ swapDefault }
 							/>
@@ -113,7 +113,7 @@ const LayerSettings = (
 					<div className="default-control" style={ setWidth( 4 ) }>
 						{ settings.layer.meta.type === 'mapbox' && (
 							<RadioControl
-								label={ __( 'Load interactions', 'jeo' ) }
+								label={ __( 'Load interactions', 'jeowp' ) }
 								checked={ settings.load_as_style }
 								onChange={ switchUseStyle }
 							/>
@@ -123,12 +123,12 @@ const LayerSettings = (
 					<div className="default-control" style={ setWidth( 5 ) }>
 						{ ! settings.layer.meta.use_legend && (
 							<p>
-								<em>{ __( 'No legend', 'jeo' ) }</em>
+								<em>{ __( 'No legend', 'jeowp' ) }</em>
 							</p>
 						) }
 						{ settings.layer.meta.use_legend && (
 							<CheckboxControl
-								label={ __( 'Show legend', 'jeo' ) }
+								label={ __( 'Show legend', 'jeowp' ) }
 								checked={ settings.show_legend !== false }
 								onChange={ switchShowLegend }
 							/>
@@ -187,7 +187,7 @@ const LayerSettings = (
 					{ settings.load_as_style && showStyleLayers && (
 						<>
 							<div className="informative-message">
-								{ __( 'If the layer is not visible in Mapbox Studio, we will not be able to control its visibility.', 'jeo' ) }
+								{ __( 'If the layer is not visible in Mapbox Studio, we will not be able to control its visibility.', 'jeowp' ) }
 							</div>
 
 							<div className="layers-selector">

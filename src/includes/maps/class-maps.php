@@ -51,29 +51,29 @@ class Maps {
 	public function register_post_type() {
 
 		$labels = array(
-			'name'                     => __( 'Maps', 'jeo' ),
-			'singular_name'            => __( 'Map', 'jeo' ),
-			'add_new'                  => __( 'Add new map', 'jeo' ),
-			'add_new_item'             => __( 'Add new map', 'jeo' ),
-			'edit_item'                => __( 'Edit map', 'jeo' ),
-			'new_item'                 => __( 'New map', 'jeo' ),
-			'view_item'                => __( 'View map', 'jeo' ),
-			'view_items'               => __( 'View maps', 'jeo' ),
-			'search_items'             => __( 'Search maps', 'jeo' ),
-			'not_found'                => __( 'No map found', 'jeo' ),
-			'not_found_in_trash'       => __( 'No map found in the trash', 'jeo' ),
-			'menu_name'                => __( 'Maps', 'jeo' ),
-			'item_published'           => __( 'Map published.', 'jeo' ),
-			'item_published_privately' => __( 'Map published privately.', 'jeo' ),
-			'item_reverted_to_draft'   => __( 'Map reverted to draft.', 'jeo' ),
-			'item_scheduled'           => __( 'Map scheduled.', 'jeo' ),
-			'item_updated'             => __( 'Map updated.', 'jeo' ),
+			'name'                     => __( 'Maps', 'jeowp' ),
+			'singular_name'            => __( 'Map', 'jeowp' ),
+			'add_new'                  => __( 'Add new map', 'jeowp' ),
+			'add_new_item'             => __( 'Add new map', 'jeowp' ),
+			'edit_item'                => __( 'Edit map', 'jeowp' ),
+			'new_item'                 => __( 'New map', 'jeowp' ),
+			'view_item'                => __( 'View map', 'jeowp' ),
+			'view_items'               => __( 'View maps', 'jeowp' ),
+			'search_items'             => __( 'Search maps', 'jeowp' ),
+			'not_found'                => __( 'No map found', 'jeowp' ),
+			'not_found_in_trash'       => __( 'No map found in the trash', 'jeowp' ),
+			'menu_name'                => __( 'Maps', 'jeowp' ),
+			'item_published'           => __( 'Map published.', 'jeowp' ),
+			'item_published_privately' => __( 'Map published privately.', 'jeowp' ),
+			'item_reverted_to_draft'   => __( 'Map reverted to draft.', 'jeowp' ),
+			'item_scheduled'           => __( 'Map scheduled.', 'jeowp' ),
+			'item_updated'             => __( 'Map updated.', 'jeowp' ),
 		);
 
 		$args = array(
 			'labels'              => $labels,
 			'hierarchical'        => false,
-			'description'         => __( 'JEO Maps', 'jeo' ),
+			'description'         => __( 'JEO Maps', 'jeowp' ),
 			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks', 'revisions' ),
 			'rewrite'             => array( 'slug' => 'maps' ),
 			'public'              => true,
@@ -109,7 +109,7 @@ class Maps {
 				'auth_callback'     => '__return_true',
 				'sanitize_callback' => array( $this, 'sanitize_meta_initial_zoom' ),
 				'type'              => 'number',
-				'description'       => __( 'The map initial zoom level', 'jeo' ),
+				'description'       => __( 'The map initial zoom level', 'jeowp' ),
 			)
 		);
 
@@ -122,7 +122,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'number',
-				'description'       => __( 'The map initial latitude', 'jeo' ),
+				'description'       => __( 'The map initial latitude', 'jeowp' ),
 			)
 		);
 
@@ -135,7 +135,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'number',
-				'description'       => __( 'The map initial longitude', 'jeo' ),
+				'description'       => __( 'The map initial longitude', 'jeowp' ),
 			)
 		);
 
@@ -150,40 +150,40 @@ class Maps {
 							'type'       => 'object',
 							'properties' => array(
 								'id'            => array(
-									'description' => __( 'The Layer ID', 'jeo' ),
+									'description' => __( 'The Layer ID', 'jeowp' ),
 									'type'        => 'integer',
 								),
 								'use'           => array(
-									'description' => __( 'How this layer is used in this map. Can be fixed, switchable or swappable', 'jeo' ),
+									'description' => __( 'How this layer is used in this map. Can be fixed, switchable or swappable', 'jeowp' ),
 									'type'        => 'string',
 								),
 								'load_as_style' => array(
-									'description' => __( 'If the layer is loaded into the mapbox as a style (setStyle) or layer (addLayer)', 'jeo' ),
+									'description' => __( 'If the layer is loaded into the mapbox as a style (setStyle) or layer (addLayer)', 'jeowp' ),
 									'type'        => 'boolean',
 								),
 								'style_layers'  => array(
-									'description' => __( 'Mapbox style layers', 'jeo' ),
+									'description' => __( 'Mapbox style layers', 'jeowp' ),
 									'type'        => 'array',
 									'items'       => array(
 										'type'       => 'object',
 										'properties' => array(
 											'id'   => array(
-												'description' => __( 'The Layer ID', 'jeo' ),
+												'description' => __( 'The Layer ID', 'jeowp' ),
 												'type' => 'string',
 											),
 											'show' => array(
-												'description' => __( 'If the style should render the layer', 'jeo' ),
+												'description' => __( 'If the style should render the layer', 'jeowp' ),
 												'type' => 'boolean',
 											),
 										),
 									),
 								),
 								'default'       => array(
-									'description' => __( 'Indicates whether this layer is visible by default', 'jeo' ),
+									'description' => __( 'Indicates whether this layer is visible by default', 'jeowp' ),
 									'type'        => 'boolean',
 								),
 								'show_legend'   => array(
-									'description' => __( 'Indicates if the legend of this layer should be displayed or not', 'jeo' ),
+									'description' => __( 'Indicates if the legend of this layer should be displayed or not', 'jeowp' ),
 									'type'        => 'boolean',
 								),
 							),
@@ -195,7 +195,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'array',
-				'description'       => __( 'The map Layers', 'jeo' ),
+				'description'       => __( 'The map Layers', 'jeowp' ),
 			)
 		);
 
@@ -208,19 +208,19 @@ class Maps {
 					'schema' => array(
 						'properties' => array(
 							'east'  => array(
-								'description' => __( 'East pan limit', 'jeo' ),
+								'description' => __( 'East pan limit', 'jeowp' ),
 								'type'        => 'number',
 							),
 							'north' => array(
-								'description' => __( 'North pan limit', 'jeo' ),
+								'description' => __( 'North pan limit', 'jeowp' ),
 								'type'        => 'number',
 							),
 							'south' => array(
-								'description' => __( 'South pan limit', 'jeo' ),
+								'description' => __( 'South pan limit', 'jeowp' ),
 								'type'        => 'number',
 							),
 							'west'  => array(
-								'description' => __( 'West pan limit', 'jeo' ),
+								'description' => __( 'West pan limit', 'jeowp' ),
 
 								'type'        => 'number',
 							),
@@ -230,7 +230,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'object',
-				'description'       => __( 'Map pan limits', 'jeo' ),
+				'description'       => __( 'Map pan limits', 'jeowp' ),
 			)
 		);
 
@@ -243,29 +243,29 @@ class Maps {
 					'schema' => array(
 						'properties' => array(
 							'categories' => array(
-								'description' => __( 'List of category IDs related posts must have', 'jeo' ),
+								'description' => __( 'List of category IDs related posts must have', 'jeowp' ),
 								'type'        => 'array',
 								'items'       => array(
 									'type' => 'integer',
 								),
 							),
 							'tags'       => array(
-								'description' => __( 'List of tag IDs related posts must have', 'jeo' ),
+								'description' => __( 'List of tag IDs related posts must have', 'jeowp' ),
 								'type'        => 'array',
 								'items'       => array(
 									'type' => 'integer',
 								),
 							),
 							'before'     => array(
-								'description' => __( 'Maximum date for related posts', 'jeo' ),
+								'description' => __( 'Maximum date for related posts', 'jeowp' ),
 								'type'        => 'string',
 							),
 							'after'      => array(
-								'description' => __( 'Minimum date for related posts', 'jeo' ),
+								'description' => __( 'Minimum date for related posts', 'jeowp' ),
 								'type'        => 'string',
 							),
 							'meta_query' => array(
-								'description' => __( 'List of meta values related posts must have', 'jeo' ),
+								'description' => __( 'List of meta values related posts must have', 'jeowp' ),
 								'type'        => 'array',
 								'items'       => array(
 									'type'       => 'object',
@@ -289,7 +289,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'object',
-				'description'       => __( 'The map criteria to get related posts', 'jeo' ),
+				'description'       => __( 'The map criteria to get related posts', 'jeowp' ),
 			)
 		);
 
@@ -302,7 +302,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'boolean',
-				'description'       => __( 'Disable scroll zoom', 'jeo' ),
+				'description'       => __( 'Disable scroll zoom', 'jeowp' ),
 			)
 		);
 
@@ -315,7 +315,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'boolean',
-				'description'       => __( 'Disable drag pan', 'jeo' ),
+				'description'       => __( 'Disable drag pan', 'jeowp' ),
 			)
 		);
 
@@ -328,7 +328,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'boolean',
-				'description'       => __( 'Disable drag rotation', 'jeo' ),
+				'description'       => __( 'Disable drag rotation', 'jeowp' ),
 			)
 		);
 
@@ -341,7 +341,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'boolean',
-				'description'       => __( 'Enable fullscreen button', 'jeo' ),
+				'description'       => __( 'Enable fullscreen button', 'jeowp' ),
 			)
 		);
 
@@ -354,7 +354,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'boolean',
-				'description'       => __( 'Show all posts on map', 'jeo' ),
+				'description'       => __( 'Show all posts on map', 'jeowp' ),
 			)
 		);
 
@@ -367,7 +367,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'number',
-				'description'       => __( 'Minimum Zoom level', 'jeo' ),
+				'description'       => __( 'Minimum Zoom level', 'jeowp' ),
 			)
 		);
 
@@ -380,7 +380,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'number',
-				'description'       => __( 'Maximum zoom level', 'jeo' ),
+				'description'       => __( 'Maximum zoom level', 'jeowp' ),
 			)
 		);
 
@@ -393,7 +393,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'boolean',
-				'description'       => __( 'Hide in discovery', 'jeo' ),
+				'description'       => __( 'Hide in discovery', 'jeowp' ),
 			)
 		);
 
@@ -406,7 +406,7 @@ class Maps {
 				'single'            => true,
 				'auth_callback'     => '__return_true',
 				'type'              => 'boolean',
-				'description'       => __( 'Disable embed', 'jeo' ),
+				'description'       => __( 'Disable embed', 'jeowp' ),
 			)
 		);
 	}
@@ -562,7 +562,7 @@ class Maps {
 
 		$val = intval( $value );
 		if ( $val < 1 || $val > 14 ) {
-			return new \WP_Error( 'rest_invalid_field', __( 'Map zoom must be between 1 and 14', 'jeo' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'rest_invalid_field', __( 'Map zoom must be between 1 and 14', 'jeowp' ), array( 'status' => 400 ) );
 		}
 	}
 

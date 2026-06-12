@@ -177,7 +177,7 @@ class Layer_Types {
 			true,
 		);
 
-		wp_set_script_translations( 'jeo-layer', 'jeo', JEO_BASEPATH . 'languages' );
+		wp_set_script_translations( 'jeo-layer', 'jeowp', JEO_BASEPATH . 'languages' );
 
 		foreach ( $this->get_registered_layer_types() as $slug => $layer_type ) {
 			$deps = isset( $layer_type['dependencies'] ) ? $layer_type['dependencies'] : array();
@@ -191,7 +191,7 @@ class Layer_Types {
 				true,
 			);
 
-			wp_set_script_translations( 'layer-type-' . $slug, 'jeo', JEO_BASEPATH . 'languages' );
+			wp_set_script_translations( 'layer-type-' . $slug, 'jeowp', JEO_BASEPATH . 'languages' );
 		}
 	}
 

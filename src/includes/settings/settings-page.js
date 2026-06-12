@@ -34,9 +34,9 @@
 				return;
 			}
 			mediaUploader = wp.media.frames.file_frame = wp.media({
-				title: __( 'Choose Image', 'jeo' ),
+				title: __( 'Choose Image', 'jeowp' ),
 				button: {
-					text: __( 'Choose Image', 'jeo' )
+					text: __( 'Choose Image', 'jeowp' )
 				}, multiple: false
 			});
 			mediaUploader.on('select', function () {

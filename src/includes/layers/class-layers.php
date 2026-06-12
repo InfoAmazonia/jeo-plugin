@@ -47,29 +47,29 @@ class Layers {
 	public function register_post_type() {
 
 		$labels = array(
-			'name'                     => __( 'Layers', 'jeo' ),
-			'singular_name'            => __( 'Layer', 'jeo' ),
-			'add_new'                  => __( 'Add new layer', 'jeo' ),
-			'add_new_item'             => __( 'Add new layer', 'jeo' ),
-			'edit_item'                => __( 'Edit layer', 'jeo' ),
-			'new_item'                 => __( 'New layer', 'jeo' ),
-			'view_item'                => __( 'View layer', 'jeo' ),
-			'view_items'               => __( 'View layers', 'jeo' ),
-			'search_items'             => __( 'Search layers', 'jeo' ),
-			'not_found'                => __( 'No layer found', 'jeo' ),
-			'not_found_in_trash'       => __( 'No layer found in the trash', 'jeo' ),
-			'menu_name'                => __( 'Layers', 'jeo' ),
-			'item_published'           => __( 'Layer published.', 'jeo' ),
-			'item_published_privately' => __( 'Layer published privately.', 'jeo' ),
-			'item_reverted_to_draft'   => __( 'Layer reverted to draft.', 'jeo' ),
-			'item_scheduled'           => __( 'Layer scheduled.', 'jeo' ),
-			'item_updated'             => __( 'Layer updated.', 'jeo' ),
+			'name'                     => __( 'Layers', 'jeowp' ),
+			'singular_name'            => __( 'Layer', 'jeowp' ),
+			'add_new'                  => __( 'Add new layer', 'jeowp' ),
+			'add_new_item'             => __( 'Add new layer', 'jeowp' ),
+			'edit_item'                => __( 'Edit layer', 'jeowp' ),
+			'new_item'                 => __( 'New layer', 'jeowp' ),
+			'view_item'                => __( 'View layer', 'jeowp' ),
+			'view_items'               => __( 'View layers', 'jeowp' ),
+			'search_items'             => __( 'Search layers', 'jeowp' ),
+			'not_found'                => __( 'No layer found', 'jeowp' ),
+			'not_found_in_trash'       => __( 'No layer found in the trash', 'jeowp' ),
+			'menu_name'                => __( 'Layers', 'jeowp' ),
+			'item_published'           => __( 'Layer published.', 'jeowp' ),
+			'item_published_privately' => __( 'Layer published privately.', 'jeowp' ),
+			'item_reverted_to_draft'   => __( 'Layer reverted to draft.', 'jeowp' ),
+			'item_scheduled'           => __( 'Layer scheduled.', 'jeowp' ),
+			'item_updated'             => __( 'Layer updated.', 'jeowp' ),
 		);
 
 		$args = array(
 			'labels'              => $labels,
 			'hierarchical'        => false,
-			'description'         => __( 'JEO Layers', 'jeo' ),
+			'description'         => __( 'JEO Layers', 'jeowp' ),
 			'supports'            => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'layers' ),
 			'show_in_rest'        => true,
@@ -106,7 +106,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'The layer type', 'jeo' ),
+				'description'   => __( 'The layer type', 'jeowp' ),
 			)
 		);
 
@@ -118,7 +118,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'Layer attribution as text or HTML with a link', 'jeo' ),
+				'description'   => __( 'Layer attribution as text or HTML with a link', 'jeowp' ),
 			)
 		);
 
@@ -135,7 +135,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'object',
-				'description'   => __( 'Layer type-specific options', 'jeo' ),
+				'description'   => __( 'Layer type-specific options', 'jeowp' ),
 			)
 		);
 
@@ -147,7 +147,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'The URL to download the source data of the layer', 'jeo' ),
+				'description'   => __( 'The URL to download the source data of the layer', 'jeowp' ),
 			)
 		);
 
@@ -159,7 +159,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'Label for the attribution URL link', 'jeo' ),
+				'description'   => __( 'Label for the attribution URL link', 'jeowp' ),
 			)
 		);
 
@@ -171,7 +171,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'The legend type', 'jeo' ),
+				'description'   => __( 'The legend type', 'jeowp' ),
 			)
 		);
 
@@ -188,7 +188,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'object',
-				'description'   => __( 'Legend type-specific options', 'jeo' ),
+				'description'   => __( 'Legend type-specific options', 'jeowp' ),
 			)
 		);
 
@@ -200,7 +200,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'boolean',
-				'description'   => __( 'Use legend', 'jeo' ),
+				'description'   => __( 'Use legend', 'jeowp' ),
 			)
 		);
 
@@ -212,7 +212,7 @@ class Layers {
 				'single'        => true,
 				'auth_callback' => '__return_true',
 				'type'          => 'string',
-				'description'   => __( 'Legend title', 'jeo' ),
+				'description'   => __( 'Legend title', 'jeowp' ),
 			)
 		);
 	}
@@ -275,7 +275,7 @@ class Layers {
 	 */
 	public function validate_meta_type( $meta_value ) {
 		if ( ! \jeo_layer_types()->is_layer_type_registered( $meta_value ) ) {
-			return new \WP_Error( 'rest_invalid_field', __( 'Layer type not registered', 'jeo' ), array( 'status' => 400 ) );
+			return new \WP_Error( 'rest_invalid_field', __( 'Layer type not registered', 'jeowp' ), array( 'status' => 400 ) );
 		}
 
 		return true;

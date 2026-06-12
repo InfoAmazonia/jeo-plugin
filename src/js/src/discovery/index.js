@@ -511,7 +511,7 @@ class Discovery extends Component {
 								</a>
 
 								<a
-									href={ `mailto:?subject=${ encodeURIComponent( __( 'Explore', 'jeo' ) ) }&body=${ encodedMailBody }` }
+									href={ `mailto:?subject=${ encodeURIComponent( __( 'Explore', 'jeowp' ) ) }&body=${ encodedMailBody }` }
 									target="_blank"
 									rel="noreferrer"
 								>
@@ -539,7 +539,7 @@ class Discovery extends Component {
 										} )
 									}
 								>
-									{ _x( 'Embed', 'discovery share action', 'jeo' ) }
+									{ _x( 'Embed', 'discovery share action', 'jeowp' ) }
 								</button>
 
 								{ this.state.showEmbedTooltip && (
@@ -589,7 +589,7 @@ class Discovery extends Component {
 						<div className="legends-title">
 							<div className="text-icon">
 								<i className="legend-icon"></i>
-								<span className="text">{ __( 'Legend', 'jeo' ) }</span>
+								<span className="text">{ __( 'Legend', 'jeowp' ) }</span>
 							</div>
 							<i
 								onClick={ () =>

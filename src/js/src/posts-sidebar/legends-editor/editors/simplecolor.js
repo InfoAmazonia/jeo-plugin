@@ -100,7 +100,7 @@ class SimplecolorEditor extends Component {
 			}
 
 			colors.push(
-				{ label: __( 'Default label', 'jeo' ), color: randomColor, id: crypto.randomUUID() },
+				{ label: __( 'Default label', 'jeowp' ), color: randomColor, id: crypto.randomUUID() },
 			);
 
 			legendObject.attributes.legend_type_options.colors = colors;
@@ -120,7 +120,7 @@ class SimplecolorEditor extends Component {
 					{ colors.map( ( item ) => <ColorItem item={ item } key={ item.id } itemChanged={ this.itemChanged } removeItem={ this.removeItem } />
 					) }
 					<Button variant="secondary" isButton isLarge onClick={ this.addItem } className="full-width-button">
-						{ __( 'Add new label', 'jeo' ) }
+						{ __( 'Add new label', 'jeowp' ) }
 					</Button>
 				</div>
 			</Fragment>
@@ -143,7 +143,7 @@ function ColorItem( { item, itemChanged, removeItem } ) {
 					<div>
 						<TextControl
 							className="label-input-wrapper"
-							label={ __( 'Label', 'jeo' ) }
+							label={ __( 'Label', 'jeowp' ) }
 							value={ item.label }
 							onChange={ ( label ) => itemChanged( { ...item, label } ) }
 						/>
@@ -155,7 +155,7 @@ function ColorItem( { item, itemChanged, removeItem } ) {
 						/>
 
 						<Button className="full-width-button" isDestructive isButton variant="secondary" onClick={ () => removeItem( item.id ) } >
-							{ __( 'Remove', 'jeo' ) }
+							{ __( 'Remove', 'jeowp' ) }
 						</Button>
 					</div>
 
@@ -164,14 +164,14 @@ function ColorItem( { item, itemChanged, removeItem } ) {
 			<div className="buttons-inputs">
 				<TextControl
 					className="label-input-wrapper"
-					label={ __( 'Label', 'jeo') }
+					label={ __( 'Label', 'jeowp') }
 					value={ item.label }
 					onChange={ ( label ) => itemChanged( { ...item, label } ) }
 				/>
 
 				<Button
 					icon="minus"
-					label={ __( 'Remove', 'jeo' ) }
+					label={ __( 'Remove', 'jeowp' ) }
 					onClick={ () => removeItem( item.id ) }
 					className="remove-button"
 				/>

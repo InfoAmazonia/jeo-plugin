@@ -2,7 +2,7 @@
 	const { __ } = wp.i18n;
 
 	window.JeoLayerTypes.registerLayerType( 'mvt', {
-	label: __( 'Mapbox Vector Tiles (MVT)', 'jeo' ),
+	label: __( 'Mapbox Vector Tiles (MVT)', 'jeowp' ),
 
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
@@ -76,12 +76,12 @@
 			properties: {
 				url: {
 					type: 'string',
-					title: __( 'URL', 'jeo' ),
+					title: __( 'URL', 'jeowp' ),
 				},
 				source_layer: {
 					type: 'string',
-					title: __( 'Source layer', 'jeo' ),
-					description: __( 'Layer to use from a vector tile source.', 'jeo' ),
+					title: __( 'Source layer', 'jeowp' ),
+					description: __( 'Layer to use from a vector tile source.', 'jeowp' ),
 				},
 				type: {
 					type: 'string',
@@ -98,8 +98,8 @@
 					],
 				},
 				style_source_type: {
-					title: __( 'Style Source Type', 'jeo' ),
-					description: __( 'Which data the map should display', 'jeo' ),
+					title: __( 'Style Source Type', 'jeowp' ),
+					description: __( 'Which data the map should display', 'jeowp' ),
 					type: 'string',
 					default: 'vector',
 					disabled: true,

@@ -2,7 +2,7 @@
 	const { __ } = wp.i18n;
 
 	window.JeoLegendTypes.registerLegendType( 'circles', {
-	label: __( 'Circle sizes', 'jeo' ),
+	label: __( 'Circle sizes', 'jeowp' ),
 
 	/**
 	 * Returns the schema fo the legend_type_options for this legend type
@@ -13,7 +13,7 @@
 			properties: {
 				colors: {
 					type: 'array',
-					description: __( 'An array of labels and radius values', 'jeo' ),
+					description: __( 'An array of labels and radius values', 'jeowp' ),
 					items: {
 						type: 'object',
 						properties: {
@@ -22,7 +22,7 @@
 							},
 							circle: {
 								type: 'string',
-								description: __( 'URL', 'jeo' ),
+								description: __( 'URL', 'jeowp' ),
 							},
 						},
 					},
