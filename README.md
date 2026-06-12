@@ -71,10 +71,10 @@ git clone git@github.com:InfoAmazonia/jeo-plugin.git
 Set up a WordPress installation. This could be a dedicated installation to develop Jeo or you can use an existing instance you have.
 (Note: This plugin requires WordPress 6.6+)
 
-Then create a symbolic link inside of `wp-content/plugins/jeo` pointing to the `src` folder in this repository.
+Then create a symbolic link inside of `wp-content/plugins/jeowp` pointing to the `src` folder in this repository.
 
 ```bash
-ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeo
+ln -s /path/to/jeo-plugin/src /path/to/wordpress/wp-content/plugins/jeowp
 ```
 
 ## Building the plugin
@@ -150,14 +150,14 @@ them for local testing and release packaging.
 If you prefer copying files instead of symlinking them into a local WordPress install, use:
 
 ```bash
-rsync --archive --progress --human-readable --delete ./src/ /path/to/wordpress/wp-content/plugins/jeo/
+rsync --archive --progress --human-readable --delete ./src/ /path/to/wordpress/wp-content/plugins/jeowp/
 ```
 
 ## Releasing
 
 Release packages are built from `src/`, not from the repository root.
 When a stable release tag is pushed, the release workflow creates a GitHub
-Release that keeps GitHub's source-code archives and attaches a built `jeo.zip`
+Release that keeps GitHub's source-code archives and attaches a built `jeowp.zip`
 artifact generated from `src/`. WordPress.org deployment uses the same `src/`
 tree and publishes assets from `.wordpress-org/`, but it only runs when the
 `WPORG_DEPLOY_ENABLED` repository variable is set to `true`.
@@ -178,7 +178,7 @@ The release workflow now validates that:
 - `package.json` and the root package entry in `package-lock.json` match the plugin version
 - the `Stable tag` in `src/readme.txt` matches the plugin version for the tagged stable release
 - the release tag is a stable `x.y.z` version
-- the built release tree from `src/` passes WordPress Plugin Check when staged as `jeo/`
+- the built release tree from `src/` passes WordPress Plugin Check when staged as `jeowp/`
 
 Pull requests and pushes also run the same staged Plugin Check build through `.github/workflows/plugin-check.yml`, so WordPress.org compliance failures are caught before the release tag workflow.
 
@@ -195,8 +195,8 @@ npm ci
 npm run build
 ```
 
-The attached `jeo.zip` mirrors the WordPress.org deploy package: it contains
-the built contents of `src/` under the `jeo/` plugin slug directory, including
+The attached `jeowp.zip` mirrors the WordPress.org deploy package: it contains
+the built contents of `src/` under the `jeowp/` plugin slug directory, including
 generated `*.mo` and `*.json` translation catalogs, ready for manual
 installation in WordPress.
 

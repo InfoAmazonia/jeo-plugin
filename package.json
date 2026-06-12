@@ -1,5 +1,5 @@
 {
-	"name": "jeo",
+	"name": "jeowp",
 	"version": "3.0.0",
 	"description": "Interactive maps for the WordPress block editor",
 	"main": "index.js",
@@ -26,7 +26,7 @@
 		"sync:version": "node scripts/sync-plugin-version.mjs",
 		"start": "wp-scripts start",
 		"build:assets": "wp-scripts build && node scripts/patch-build-compliance.mjs",
-		"i18n:pot": "wp i18n make-pot src src/languages/jeo.pot --slug=jeo --domain=jeo --exclude=js/src",
+		"i18n:pot": "wp i18n make-pot src src/languages/jeo.pot --slug=jeowp --domain=jeo --exclude=js/src",
 		"i18n:po": "wp i18n update-po src/languages/jeo.pot src/languages",
 		"i18n:mo": "wp i18n make-mo src/languages",
 		"i18n:json": "wp i18n make-json src/languages --no-purge",
