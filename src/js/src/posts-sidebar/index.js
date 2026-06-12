@@ -137,7 +137,7 @@ const JeoGeocodePanel = ( props ) => {
 	const changeRelevance = ( index, relevance, enrichment = {} ) => {
 		const newLocations = [ ...state.aiSuggestedLocations ];
 		newLocations[ index ].relevance = relevance;
-		
+
 		// If enrichment data is provided, merge it into the location
 		if ( Object.keys( enrichment ).length > 0 ) {
 			newLocations[ index ] = { ...newLocations[ index ], ...enrichment };

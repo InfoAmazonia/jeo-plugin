@@ -156,7 +156,7 @@
 					description:
 						__(
 							'The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
-							'jeo'
+							'jeowp'
 						),
 				},
 				access_token: {
@@ -165,7 +165,7 @@
 					description:
 						__(
 							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
-							'jeo'
+							'jeowp'
 						),
 				},
 			},

@@ -1,9 +1,8 @@
 === JEO Maps ===
 Contributors: infoamazonia
 Tested up to: 7.0
-Tags: maps, geolocation, gutenberg, storymap, cartography, mapbox, maplibre, blocks, interactive, journalism, openstreetmap, spatial
 Stable tag: 3.6.5
-Requires PHP: 8.3
+Requires PHP: 8.2
 Requires at least: 6.6
 License: GPL-3.0-only
 License URI: https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
@@ -17,7 +16,7 @@ JEO helps newsrooms build interactive maps, geolocate posts, and publish storyma
 
 == Installation ==
 
-1. Upload `jeo.php` to the `/wp-content/plugins/` directory;
+1. Upload the plugin directory to `/wp-content/plugins/`, or install it through Plugins > Add New in WordPress;
 2. Activate the plugin through the 'Plugins' menu in WordPress;
 3. Select JEO on the admin menu.
 

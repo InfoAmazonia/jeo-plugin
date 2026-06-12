@@ -896,7 +896,6 @@
 				$('.jeo-tab-content-wrapper').fadeIn('fast');
 				$('.jeo-settings-submit').fadeIn('fast'); 
 
-				// Auto test on load if on provider tab (after skeleton is gone)
 				var isProviderTab = window.location.search.includes('tab=provider') || 
 								   (!window.location.search.includes('tab=') && window.location.search.includes('page=jeo-ai-settings'));
 				
@@ -905,6 +904,21 @@
 					var $initBtn = $('.jeo-ai-provider-settings[data-provider="' + activeProvider + '"]').find('.jeo-ai-test-key-btn');
 					runApiKeyTest($initBtn);
 				}
+			});
+		}, 400);
+
+		var mediaUploader;
+		$('#upload_image_button').click(function (e) {
+			e.preventDefault();
+			if (mediaUploader) {
+				mediaUploader.open();
+				return;
+			}
+			mediaUploader = wp.media.frames.file_frame = wp.media({
+				title: __( 'Choose Image', 'jeowp' ),
+				button: {
+					text: __( 'Choose Image', 'jeowp' )
+				}, multiple: false
 			});
 		}, 400);
 	});

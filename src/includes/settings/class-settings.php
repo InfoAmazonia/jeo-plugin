@@ -199,13 +199,13 @@ class Settings {
 	 * @return array
 	 */
 	public function sanitize_settings( $input ) {
-		// 1. Get existing options to merge
 		$existing_options = get_option( $this->option_key );
 		if ( ! is_array( $existing_options ) ) {
 			$existing_options = $this->default_options;
 		}
 
-		// 2. Handle specific field sanitization within $input
+		$input = is_array( $input ) ? $input : array();
+
 		if ( isset( $input['enabled_post_types'] ) ) {
 			if ( ! is_array( $input['enabled_post_types'] ) ) {
 				if ( empty( trim( $input['enabled_post_types'] ) ) ) {
@@ -224,11 +224,9 @@ class Settings {
 			}
 		}
 
-		// Identify the current tab submitted, so we only reset checkboxes that belong to this tab.
 		$current_tab = isset( $input['current_tab'] ) ? sanitize_text_field( $input['current_tab'] ) : '';
 		unset( $input['current_tab'] );
 
-		// Checkboxes grouped by tab.
 		$booleans_by_tab = array(
 			'general'   => array( 'show_storymaps_on_post_archives' ),
 			'provider'  => array( 'ai_use_custom_prompt', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold', 'ai_cal_use_primary_limit', 'ai_cal_use_secondary_limit' ),
@@ -237,13 +235,11 @@ class Settings {
 			'knowledge' => array( 'jeo_rag_auto_index' ),
 		);
 
-		// Handle booleans (checkboxes) - if the tab was submitted, assume unchecked if absent.
 		if ( ! empty( $current_tab ) && isset( $booleans_by_tab[ $current_tab ] ) ) {
 			foreach ( $booleans_by_tab[ $current_tab ] as $bool_key ) {
 				$input[ $bool_key ] = isset( $input[ $bool_key ] ) ? true : false;
 			}
 		} else {
-			// Fallback if no tab identifier (e.g. direct API updates or older logic).
 			$all_booleans = array( 'jeo_bulk_ai_active', 'jeo_bulk_logging', 'jeo_rag_auto_index', 'ai_debug_mode', 'ai_debug_console', 'ai_use_structured_output', 'ai_use_custom_prompt', 'ai_include_taxonomies', 'show_storymaps_on_post_archives', 'ai_cal_use_granularity', 'ai_cal_use_confidence', 'ai_cal_use_title_weight', 'ai_cal_use_max_tokens', 'ai_cal_use_primary_threshold', 'ai_cal_use_secondary_threshold', 'ai_cal_use_primary_limit', 'ai_cal_use_secondary_limit' );
 			foreach ( $all_booleans as $bool_key ) {
 				if ( isset( $input[ $bool_key ] ) ) {
@@ -252,7 +248,6 @@ class Settings {
 			}
 		}
 
-		// AI Calibration controls sanitization.
 		if ( isset( $input['ai_cal_granularity'] ) ) {
 			$input['ai_cal_granularity'] = sanitize_text_field( $input['ai_cal_granularity'] );
 			if ( ! in_array( $input['ai_cal_granularity'], array( 'broad', 'balanced', 'fine' ), true ) ) {
@@ -302,17 +297,14 @@ class Settings {
 			}
 		}
 
-		// Context prompt settings.
 		if ( isset( $input['ai_use_context_custom_prompt'] ) ) {
 			$input['ai_use_context_custom_prompt'] = ! empty( $input['ai_use_context_custom_prompt'] );
 		}
 
-		// Context prompt sanitization.
 		if ( isset( $input['ai_context_prompt'] ) ) {
 			$input['ai_context_prompt'] = sanitize_textarea_field( $input['ai_context_prompt'] );
 		}
 
-		// RAG topK sanitization.
 		if ( isset( $input['ai_rag_topk'] ) ) {
 			$input['ai_rag_topk'] = absint( $input['ai_rag_topk'] );
 			if ( $input['ai_rag_topk'] < 1 || $input['ai_rag_topk'] > 50 ) {
@@ -320,7 +312,6 @@ class Settings {
 			}
 		}
 
-		// Geolocation precision sanitization.
 		if ( isset( $input['geolocation_precision'] ) ) {
 			$input['geolocation_precision'] = absint( $input['geolocation_precision'] );
 			if ( $input['geolocation_precision'] < 1 || $input['geolocation_precision'] > 5 ) {
@@ -328,7 +319,6 @@ class Settings {
 			}
 		}
 
-		// Pin icon URLs.
 		if ( isset( $input['jeo_pin_primary_url'] ) ) {
 			$input['jeo_pin_primary_url'] = esc_url_raw( $input['jeo_pin_primary_url'] );
 		}
@@ -336,7 +326,6 @@ class Settings {
 			$input['jeo_pin_secondary_url'] = esc_url_raw( $input['jeo_pin_secondary_url'] );
 		}
 
-		// Secure API Key handling: If the input contains the visual mask, revert to existing stored value.
 		$sensitive_keys = array(
 			'gemini_api_key',
 			'openai_api_key',
@@ -353,14 +342,12 @@ class Settings {
 
 		foreach ( $sensitive_keys as $s_key ) {
 			if ( isset( $input[ $s_key ] ) && strpos( $input[ $s_key ], '********' ) !== false ) {
-				// Restore the real key from DB if it exists.
 				if ( isset( $existing_options[ $s_key ] ) ) {
 					$input[ $s_key ] = $existing_options[ $s_key ];
 				}
 			}
 		}
 
-		// Sanitize Appearance - Colors.
 		$color_fields = array(
 			'jeo_primary-color',
 			'jeo_secondary-color',
@@ -378,7 +365,6 @@ class Settings {
 			}
 		}
 
-		// Sanitize Appearance - Typography & Others.
 		$text_fields = array(
 			'jeo_font-url',
 			'jeo_font-family',
@@ -393,7 +379,6 @@ class Settings {
 			}
 		}
 
-		// Reject Mapbox runtime without a valid API key.
 		if ( isset( $input['map_runtime'] ) && 'mapboxgl' === $input['map_runtime'] ) {
 			$mapbox_key = isset( $input['mapbox_key'] ) ? trim( $input['mapbox_key'] ) : '';
 			if ( '' === $mapbox_key ) {
@@ -401,8 +386,57 @@ class Settings {
 			}
 		}
 
-		// 3. FINAL MERGE: Overwrite existing options with sanitized new input
+		if ( isset( $input['geocoders'] ) && is_array( $input['geocoders'] ) ) {
+			$input['geocoders'] = $this->sanitize_geocoder_settings_payload( $input['geocoders'] );
+		}
+
 		return array_merge( $existing_options, $input );
+	}
+
+	/**
+	 * Sanitize a recursive geocoder settings payload.
+	 *
+	 * @param array $payload Raw payload.
+	 * @return array
+	 */
+	private function sanitize_geocoder_settings_payload( array $payload ) {
+		$sanitized = array();
+
+		foreach ( $payload as $key => $value ) {
+			$key = sanitize_key( (string) $key );
+
+			if ( is_array( $value ) ) {
+				$sanitized[ $key ] = $this->sanitize_geocoder_settings_payload( $value );
+				continue;
+			}
+
+			$sanitized[ $key ] = sanitize_text_field( (string) $value );
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize an optional asset URL setting.
+	 *
+	 * @param string $field Field slug.
+	 * @param mixed  $value Raw URL value.
+	 * @return string
+	 */
+	private function sanitize_asset_url_setting( $field, $value ) {
+		$value      = trim( (string) $value );
+		$normalized = \jeo_normalize_asset_url( $value );
+
+		if ( '' !== $value && '' === $normalized ) {
+			add_settings_error(
+				$this->option_key,
+				'jeo_invalid_' . sanitize_key( $field ),
+				__( 'JEO could not save this asset URL. Use a valid http(s) or root-relative URL.', 'jeowp' ),
+				'warning'
+			);
+		}
+
+		return $normalized;
 	}
 
 	/**

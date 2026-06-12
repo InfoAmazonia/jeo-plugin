@@ -524,7 +524,7 @@ class Jeo {
 	 * @return string|false
 	 */
 	public function fallback_script_translation_file( $file, $handle, $domain ) {
-		if ( 'jeo' !== $domain || ! $file || is_readable( $file ) ) {
+		if ( 'jeowp' !== $domain || ! $file || is_readable( $file ) ) {
 			return $file;
 		}
 
@@ -804,6 +804,7 @@ class Jeo {
 			)
 		);
 
+
 		$map_runtime_requested = $this->get_requested_map_runtime();
 		$mapgl_script_deps     = array();
 		$mapgl_style_deps      = array();
@@ -914,7 +915,7 @@ class Jeo {
 					'mapbox_missing_token'       => __( 'Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre.', 'jeowp' ),
 					'mapbox_runtime_unavailable' => __(
 						'Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre.',
-						'jeo'
+						'jeowp'
 					),
 				),
 				'nonce'                 => $this->get_rest_nonce(),

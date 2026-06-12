@@ -196,6 +196,15 @@ class JeoGeocodePosts extends Component {
 				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lng=' + lng
 			)
 			.then( ( response ) => {
+				if ( ! response.ok ) {
+					throw new Error(
+						__(
+							'Unable to retrieve the address for the selected point.',
+							'jeowp'
+						)
+					);
+				}
+
 				return response.json();
 			} );
 	}
@@ -261,7 +270,7 @@ class JeoGeocodePosts extends Component {
 	onLocationFound( location ) {
 		const lat = parseFloat( location.lat );
 		const lng = parseFloat( location.lng );
-		
+
 		if ( isNaN( lat ) || isNaN( lng ) ) {
 			console.error( 'JEO: Invalid coordinates received', location );
 			return;
@@ -419,7 +428,7 @@ class JeoGeocodePosts extends Component {
 			loadStatus,
 			magneticMarkers,
 		} = this.state;
-		
+
 		const currentSearchValue = searchValue || '';
 		const isDisabled = ! (
 			loadStatus === 'resolved' && currentSearchValue.replace( /\s/g, '' ).length
@@ -435,7 +444,7 @@ class JeoGeocodePosts extends Component {
 						onChange={ this.handleSearchValue }
 					/>
 					<span className="jeo-geocode-search__hint">
-						{ __( 'You can also drag the marker across the map.', 'jeowp' ) }
+						{ __( 'Type an address, then click Search or press Enter. You can also drag the marker across the map.', 'jeowp' ) }
 					</span>
 				</div>
 				<div>

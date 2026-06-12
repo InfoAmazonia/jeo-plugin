@@ -32,8 +32,8 @@ foreach ( $required_post_types as $required_post_type ) {
 }
 
 $active_plugins = (array) get_option( 'active_plugins', array() );
-if ( ! in_array( 'jeo/jeo.php', $active_plugins, true ) ) {
-	fwrite( STDERR, "Plugin jeo/jeo.php is not active.\n" );
+if ( ! in_array( 'jeowp/jeo.php', $active_plugins, true ) ) {
+	fwrite( STDERR, "Plugin jeowp/jeo.php is not active.\n" );
 	exit( 1 );
 }
 

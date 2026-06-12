@@ -16,6 +16,7 @@ import { cloneDeep } from 'lodash';
 import { AsyncModeProvider } from '@wordpress/data';
 
 registerBlockType( 'jeo/map', {
+	apiVersion: 3,
 	title: __( 'JEO Map', 'jeowp' ),
 	description: __( 'Display maps with layers and data', 'jeowp' ),
 	category: 'jeo',
@@ -37,6 +38,7 @@ registerBlockType( 'jeo/map', {
 } );
 
 registerBlockType( 'jeo/onetime-map', {
+	apiVersion: 3,
 	title: __( 'JEO One-time Map', 'jeowp' ),
 	description: __( 'Display maps with layers and data', 'jeowp' ),
 	category: 'jeo',
@@ -346,6 +348,8 @@ const storymapAttributes = {
 };
 
 registerBlockType( 'jeo/storymap', {
+	apiVersion: 3,
+	// translators: Story Map is the name of JEO's storytelling map feature.
 	title: __( 'Story Map', 'jeowp' ),
 	description: __( 'Display maps with storytelling', 'jeowp' ),
 	category: 'jeo',
@@ -411,6 +415,7 @@ registerBlockType( 'jeo/storymap', {
 } );
 
 registerBlockType( 'jeo/embedded-storymap', {
+	apiVersion: 3,
 	title: __( 'Embedded Story Map', 'jeowp' ),
 	description: __( 'Display maps with storytelling', 'jeowp' ),
 	category: 'jeo',
@@ -431,6 +436,7 @@ registerBlockType( 'jeo/embedded-storymap', {
 });
 
 registerBlockType( 'jeo/stories-near-you', {
+	apiVersion: 3,
 	title: __( 'Stories Near You', 'jeowp' ),
 	description: __( 'Display geolocated posts sorted by proximity to the reader', 'jeowp' ),
 	category: 'jeo',
@@ -576,7 +582,9 @@ registerBlockType( 'jeo/stories-near-you', {
 } );
 
 registerBlockType( 'jeo/layer-editor', {
-	title: __( 'Layer Preview', 'jeowp' ),
+	apiVersion: 3,
+	title: __( 'Layer Editor Preview', 'jeowp' ),
+	description: __( 'Interactive layer preview for the Map Layer post type editor.', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
@@ -587,7 +595,9 @@ registerBlockType( 'jeo/layer-editor', {
 } );
 
 registerBlockType( 'jeo/map-editor', {
-	title: __( 'Map Preview', 'jeowp' ),
+	apiVersion: 3,
+	title: __( 'Map Editor Preview', 'jeowp' ),
+	description: __( 'Interactive map preview for the Map post type editor.', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {

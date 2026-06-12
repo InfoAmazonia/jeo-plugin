@@ -27,7 +27,7 @@ jobs:
           --health-retries=10
     env:
       WP_PATH: /tmp/wordpress
-      PLUGIN_BUILD_DIR: /tmp/plugin-check-build/jeo
+      PLUGIN_BUILD_DIR: /tmp/plugin-check-build/jeowp
       PLUGIN_CHECK_RESULTS: /tmp/plugin-check-results.txt
 
     steps:
@@ -68,6 +68,6 @@ jobs:
         uses: actions/upload-artifact@v7
         if: ${{ always() }}
         with:
-          name: plugin-check-results-jeo
+          name: plugin-check-results-jeowp
           path: ${{ env.PLUGIN_CHECK_RESULTS }}
           if-no-files-found: ignore

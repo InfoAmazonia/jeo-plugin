@@ -11,6 +11,7 @@ src/js/build
 src/languages/*.mo
 src/languages/*.json
 jeo.zip
+jeowp.zip
 .env
 
 /wordpress/

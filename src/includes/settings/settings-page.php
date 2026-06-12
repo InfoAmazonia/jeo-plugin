@@ -94,6 +94,29 @@
 							</td>
 						</tr>
 
+						<?php
+						foreach ( jeo_geocode_handler()->get_registered_geocoders() as $gslug => $geocoder ) :
+							$geo_object = jeo_geocode_handler()->initialize_geocoder( $gslug );
+							?>
+
+							<?php
+							if ( false === $geo_object->get_settings() ) {
+								continue;}
+							?>
+
+							<tr class="geocoder_options" id="geocoder_options_<?php echo esc_attr( $gslug ); ?>">
+								<th scope="row">
+										<label for="input_id">
+										<?php // translators: %s is the geocoder name. Example: Nominatim options. ?>
+										<?php printf( esc_html_x( '%s options', 'geocoder_options', 'jeowp' ), esc_html( $geocoder['name'] ) ); ?>
+									</label>
+								</th>
+								<td>
+									<?php $geo_object->get_settings(); ?>
+								</td>
+							</tr>
+						<?php endforeach; ?>
+
 						<tr class="mapbox_options" style="display: <?php echo $this->get_option( 'map_runtime' ) === 'mapboxgl' ? 'table-row' : 'none'; ?>;">
 							<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e( 'Mapbox', 'jeowp' ); ?></h2></th>
 							<td></td>
@@ -240,6 +263,23 @@
 						</tr>
 					</tbody>
 				</table>
+
+				<hr>
+				<h2><?php esc_html_e( 'Embed', 'jeowp' ); ?></h2>
+				<table class="form-table">
+					<tbody>
+						<tr>
+							<th scope="row"><label for="background_image"><?php esc_html_e( 'Company logo', 'jeowp' ); ?></label></th>
+							<td>
+								<input id="background_image" type="text" name="<?php echo esc_attr( $this->get_field_name( 'jeo_footer-logo' ) ); ?>" value="<?php echo esc_attr( $this->get_option( 'jeo_footer-logo' ) ); ?>" />
+								<p class="description">
+									<?php esc_html_e( 'You may use a local or external image URL. Large logos will be scaled down automatically in the embed footer.', 'jeowp' ); ?>
+								</p>
+								<input id="upload_image_button" type="button" class="button-primary" value="<?php esc_attr_e( 'Insert Image', 'jeowp' ); ?>" />
+							</td>
+						</tr>
+					</tbody>
+				</table>
 			<?php elseif ( 'discovery' === $current_tab ) : ?>
 				<table class="form-table">
 					<tbody>
@@ -270,7 +310,6 @@
 </div>
 
 <style>
-	/* Fix WP standard button spacing slightly */
 	.jeo-settings-submit input {
 		padding: 6px 24px;
 	}

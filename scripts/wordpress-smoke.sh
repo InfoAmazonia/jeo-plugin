@@ -19,7 +19,7 @@ WP_DB_NAME="${WP_DB_NAME:-wordpress}"
 WP_DB_USER="${WP_DB_USER:-wordpress}"
 WP_DB_PASSWORD="${WP_DB_PASSWORD:-wordpress}"
 WP_DB_HOST="${WP_DB_HOST:-127.0.0.1:3306}"
-PLUGIN_SLUG="${PLUGIN_SLUG:-jeo}"
+PLUGIN_SLUG="${PLUGIN_SLUG:-jeowp}"
 PLUGIN_SOURCE="${PLUGIN_SOURCE:-${REPO_ROOT}/src}"
 
 if [[ -n "${WP_CLI_PHP}" ]]; then

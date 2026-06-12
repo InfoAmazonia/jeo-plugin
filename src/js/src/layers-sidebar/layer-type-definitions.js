@@ -26,7 +26,7 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						title: __( 'Style ID', 'jeowp' ),
 						description: __(
 							'The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id',
-							'jeo'
+							'jeowp'
 						),
 					},
 					access_token: {
@@ -34,7 +34,7 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						title: __( 'Access token', 'jeowp' ),
 						description: __(
 							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
-							'jeo'
+							'jeowp'
 						),
 					},
 				},
@@ -53,7 +53,7 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						title: __( 'Scheme', 'jeowp' ),
 						description: __(
 							'Influences the Y direction of the tile coordinates.',
-							'jeo'
+							'jeowp'
 						),
 						enum: [ 'xyz', 'tms' ],
 						enumNames: [
@@ -78,7 +78,7 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						title: __( 'Source layer', 'jeowp' ),
 						description: __(
 							'Layer to use from a vector tile source.',
-							'jeo'
+							'jeowp'
 						),
 					},
 					type: {
@@ -125,7 +125,7 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						title: __( 'Layer Type', 'jeowp' ),
 						description: __(
 							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
-							'jeo'
+							'jeowp'
 						),
 						type: 'string',
 						default: 'raster',
@@ -152,7 +152,7 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						title: __( 'Layer Type', 'jeowp' ),
 						description: __(
 							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
-							'jeo'
+							'jeowp'
 						),
 						type: 'string',
 						default: 'fill',

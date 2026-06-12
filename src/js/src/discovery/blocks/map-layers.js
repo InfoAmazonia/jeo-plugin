@@ -700,7 +700,7 @@ class MapLayers extends Component {
 						</div>
 
 						<div className="status-message">
-							{ isApplied ? _x( 'Changes applied', 'layer application status', 'jeowp' ) : _x( 'Not applied', 'layer application status', 'jeowp' ) }
+							{ isApplied ? __( 'Changes applied', 'jeowp' ) : __( 'Not applied', 'jeowp' ) }
 						</div>
 					</div>
 
@@ -721,7 +721,7 @@ class MapLayers extends Component {
 						disabled
 						aria-disabled="true"
 					>
-						{ _x( 'Changes applied', 'layer application status', 'jeowp' ) }
+						{ __( 'Changes applied', 'jeowp' ) }
 					</button>
 				) : (
 					<button

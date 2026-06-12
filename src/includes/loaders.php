@@ -311,7 +311,67 @@ function jeo_sanitize_css_font_family( $font ) {
 /**
  * Generate dynamic CSS from JEO appearance settings.
  *
- * @return string Safe CSS string.
+ * @param string $font_name Raw font-family string.
+ * @return string
+ */
+function jeo_sanitize_font_family( $font_name ) {
+	$font_name = sanitize_text_field( (string) $font_name );
+	$font_name = preg_replace( '/[^A-Za-z0-9 \-_]/', '', $font_name );
+	$font_name = preg_replace( '/\s+/', ' ', $font_name );
+
+	return trim( (string) $font_name );
+}
+
+/**
+ * Sanitize a numeric CSS value used with a fixed unit.
+ *
+ * @param mixed $value Raw numeric value.
+ * @return string
+ */
+function jeo_sanitize_css_number( $value ) {
+	if ( ! is_numeric( $value ) ) {
+		return '';
+	}
+
+	$normalized = sprintf( '%.4F', (float) $value );
+	$normalized = rtrim( rtrim( $normalized, '0' ), '.' );
+
+	return $normalized;
+}
+
+/**
+ * Register privacy policy text for JEO third-party services.
+ *
+ * @return void
+ */
+function jeo_add_privacy_policy_content() {
+	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
+		return;
+	}
+
+	$content = sprintf(
+		wp_kses_post(
+			/* translators: 1: Mapbox terms URL, 2: Mapbox privacy URL, 3: Nominatim usage policy URL, 4: OSMF privacy URL, 5: OSM tile policy URL. */
+			__(
+				'<p>JEO can connect to third-party services depending on your configuration.</p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the rendering library or when a map uses Mapbox-hosted resources. In that case the site loads JavaScript/CSS from Mapbox and sends the configured access token plus the visitor&#8217;s IP address, browser details and requested map resources to Mapbox. Terms: <a href="%1$s">Mapbox Terms of Service</a>. Privacy Policy: <a href="%2$s">Mapbox Privacy Policy</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly runs an address search or reverse geocoding request in the post geolocation UI. The typed address or selected coordinates, the site URL in the user agent string and the server IP address are sent to the Nominatim service. Usage Policy: <a href="%3$s">Nominatim Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview style requests map tiles from the OpenStreetMap tile service, which receives the visitor&#8217;s IP address, browser details and requested tile URLs. Tile Policy: <a href="%5$s">OpenStreetMap Tile Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>Optional external asset URLs configured by the site administrator</strong>: if you configure an external typography stylesheet or footer logo URL, visitors&#8217; browsers will request that asset directly from the selected host. That host may receive the visitor&#8217;s IP address, browser details and referrer according to its own terms and privacy policy.</li></ul>',
+				'jeowp'
+			)
+		),
+		'https://www.mapbox.com/legal/tos',
+		'https://www.mapbox.com/legal/privacy',
+		'https://operations.osmfoundation.org/policies/nominatim/',
+		'https://osmfoundation.org/wiki/Privacy_Policy',
+		'https://operations.osmfoundation.org/policies/tiles/'
+	);
+
+	wp_add_privacy_policy_content( 'JEO', $content );
+}
+add_action( 'admin_init', 'jeo_add_privacy_policy_content' );
+
+/**
+ * Build custom CSS from plugin settings.
+ *
+ * @return string
  */
 function jeo_custom_settings_css() {
 	$theme_css = '';
@@ -460,8 +520,8 @@ add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
  */
 function add_template_page_discovery( $post_templates ) {
 
-	// Add custom template named template-custom.php to select dropdown.
-	$post_templates['discovery.php'] = __( 'Discovery', 'jeowp' );
+	// translators: Explore is the name of JEO's discovery page feature.
+	$post_templates['discovery.php'] = __( 'Explore', 'jeowp' );
 
 	return $post_templates;
 }

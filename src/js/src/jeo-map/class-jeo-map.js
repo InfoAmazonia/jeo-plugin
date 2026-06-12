@@ -354,8 +354,10 @@ export default class JeoMap {
 
 	addMapWithoutLayersMessage() {
 		const layers = document.createElement( 'div' );
-		layers.innerHTML +=
-			'<p class="jeomap-no-layers__text">This map doesn\'t have layers</p>';
+		layers.innerHTML += `<p class="jeomap-no-layers__text">${ __(
+			"This map doesn't have layers",
+			'jeowp'
+		) }</p>`;
 		this.element.appendChild( layers );
 		jQuery( this.element ).addClass( 'jeo-without-layers' );
 		jQuery( this.element ).find( '.mapboxgl-control-container, .maplibregl-control-container' ).remove();
@@ -634,7 +636,7 @@ export default class JeoMap {
 			legendTextIcon.appendChild( layerIcon );
 			legendTextIcon.innerHTML += `<span class="text"> ${ __(
 				'Legend',
-				'jeo'
+				'jeowp'
 			) } </span>`;
 
 			legendsTitle.appendChild( legendTextIcon );
@@ -765,7 +767,11 @@ export default class JeoMap {
 				}
 
 				if ( attributionLink ) {
-					innerHTML += `<p>Attribution: <a href="${ attributionLink }">${ attributionName }</a></p>`;
+					const attributionLabel = attributionName || attributionLink;
+					innerHTML += `<p>${ __(
+						'Attribution:',
+						'jeowp'
+					) } <a href="${ attributionLink }">${ attributionLabel }</a></p>`;
 				}
 				if ( sourceLink ) {
 					innerHTML += `<a
@@ -783,7 +789,10 @@ export default class JeoMap {
 									font-size: 16px;
 									font-weight: bold;
 									transition: all .2 ease-in-out;"
-									href="${ sourceLink }" class="download-source">Download from source
+									href="${ sourceLink }" class="download-source">${ __(
+										'Download from source',
+										'jeowp'
+									) }
 								  </a>`;
 				}
 			} );
@@ -793,7 +802,10 @@ export default class JeoMap {
 		const closeButton = document.createElement( 'div' );
 		closeButton.classList.add( 'more-info-close' );
 		closeButton.innerHTML =
-			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="Close popup"><span>×</span></button>`;
+			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="${ __(
+				'Close popup',
+				'jeowp'
+			) }"><span>×</span></button>`;
 
 		closeButton.click( function ( e ) {} );
 
@@ -1166,6 +1178,201 @@ export default class JeoMap {
 			read_more: jeoMapVars.string_read_more,
 			show_featured_media: false,
 		} );
+	}
+
+	createPopupArticleNode( feature ) {
+		const popupWrapper = document.createElement( 'div' );
+		popupWrapper.innerHTML = this.buildPopupHTML( feature ).trim();
+		return popupWrapper.firstElementChild;
+	}
+
+	createPopupNavigatorContent( popupFeatures, options = {} ) {
+		const totalCount = Number.isFinite( options.totalCount )
+			? options.totalCount
+			: popupFeatures.length;
+
+		if ( popupFeatures.length === 1 && totalCount === popupFeatures.length ) {
+			return this.createPopupArticleNode( popupFeatures[ 0 ] );
+		}
+
+		const navigator = document.createElement( 'div' );
+		navigator.className = 'jeo-popup-navigator';
+		navigator.innerHTML = `
+			<div class="jeo-popup-navigator__header">
+				<div class="jeo-popup-navigator__header-copy">
+					<div class="jeo-popup-navigator__counter"></div>
+					<div class="jeo-popup-navigator__meta"></div>
+				</div>
+				<div class="jeo-popup-navigator__controls">
+					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--previous" aria-label="${ __(
+						'Show previous post',
+						'jeowp'
+					) }">${ chevronLeftSmallIcon }</button>
+					<button type="button" class="jeo-popup-navigator__button jeo-popup-navigator__button--next" aria-label="${ __(
+						'Show next post',
+						'jeowp'
+					) }">${ chevronRightSmallIcon }</button>
+				</div>
+			</div>
+			<div class="jeo-popup-navigator__viewport"></div>
+		`;
+
+		const counter = navigator.querySelector(
+			'.jeo-popup-navigator__counter'
+		);
+		const meta = navigator.querySelector( '.jeo-popup-navigator__meta' );
+		const previousButton = navigator.querySelector(
+			'.jeo-popup-navigator__button--previous'
+		);
+		const nextButton = navigator.querySelector(
+			'.jeo-popup-navigator__button--next'
+		);
+		const viewport = navigator.querySelector(
+			'.jeo-popup-navigator__viewport'
+		);
+
+		let currentIndex = 0;
+		let currentFrame = this.createPopupArticleNode( popupFeatures[ 0 ] );
+		let isTransitioning = false;
+		currentFrame.classList.add(
+			'jeo-popup-navigator__frame',
+			'is-current',
+			'is-active'
+		);
+		viewport.appendChild( currentFrame );
+
+		const updateCounter = () => {
+			counter.textContent = `${ currentIndex + 1 } / ${ popupFeatures.length }`;
+			meta.textContent =
+				totalCount !== popupFeatures.length
+					? sprintf(
+						/* translators: %d: number of markers in the current map area. */
+						_n(
+							'%d marker in this area',
+							'%d markers in this area',
+							totalCount,
+							'jeowp'
+						),
+						totalCount
+					)
+					: '';
+			previousButton.disabled = currentIndex === 0 || isTransitioning;
+			nextButton.disabled =
+				currentIndex === popupFeatures.length - 1 || isTransitioning;
+		};
+
+		const transitionToIndex = ( nextIndex ) => {
+			if (
+				isTransitioning ||
+				nextIndex < 0 ||
+				nextIndex >= popupFeatures.length ||
+				nextIndex === currentIndex
+			) {
+				return;
+			}
+
+			const direction = nextIndex > currentIndex ? 'next' : 'previous';
+			isTransitioning = true;
+			updateCounter();
+			viewport.style.height = `${ currentFrame.offsetHeight }px`;
+
+			const enterNextFrame = () => {
+				if ( ! currentFrame?.isConnected ) {
+					return;
+				}
+
+				const nextFrame = this.createPopupArticleNode(
+					popupFeatures[ nextIndex ]
+				);
+				nextFrame.classList.add(
+					'jeo-popup-navigator__frame',
+					`is-entering-${ direction }`
+				);
+
+				currentFrame.replaceWith( nextFrame );
+				currentFrame = nextFrame;
+				currentIndex = nextIndex;
+				viewport.style.height = `${ nextFrame.offsetHeight }px`;
+
+				const finalizeEnter = () => {
+					if ( ! nextFrame?.isConnected ) {
+						return;
+					}
+
+					nextFrame.classList.remove( `is-entering-${ direction }` );
+					nextFrame.classList.add( 'is-current', 'is-active' );
+					isTransitioning = false;
+					viewport.style.height = '';
+					updateCounter();
+				};
+
+				window.requestAnimationFrame( () => {
+					nextFrame.classList.add( 'is-active' );
+				} );
+
+				nextFrame.addEventListener(
+					'transitionend',
+					( event ) => {
+						if ( event.target === nextFrame ) {
+							finalizeEnter();
+						}
+					},
+					{ once: true }
+				);
+
+				window.setTimeout( finalizeEnter, 240 );
+			};
+
+			window.requestAnimationFrame( () => {
+				currentFrame.classList.remove( 'is-active', 'is-current' );
+				currentFrame.classList.add( `is-exiting-${ direction }` );
+			} );
+
+			currentFrame.addEventListener(
+				'transitionend',
+				( event ) => {
+					if ( event.target === currentFrame ) {
+						enterNextFrame();
+					}
+				},
+				{ once: true }
+			);
+
+			window.setTimeout( enterNextFrame, 240 );
+		};
+
+		previousButton.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+			transitionToIndex( currentIndex - 1 );
+		} );
+
+		nextButton.addEventListener( 'click', ( event ) => {
+			event.preventDefault();
+			event.stopPropagation();
+			transitionToIndex( currentIndex + 1 );
+		} );
+
+		updateCounter();
+
+		return navigator;
+	}
+
+	showPostPopup( featureOrFeatures, lngLat, options = {} ) {
+		this.popup?.remove();
+
+		const popupFeatures = this.getPopupFeatures(
+			Array.isArray( featureOrFeatures ) ? featureOrFeatures : [ featureOrFeatures ]
+		);
+
+		if ( ! popupFeatures.length ) {
+			return;
+		}
+
+		const popupContent = this.createPopupNavigatorContent(
+			popupFeatures,
+			options
+		);
 
 		this.popup = new mapgl.Popup( { closeOnClick: false } )
 			.setLngLat( lngLat )
@@ -1435,7 +1642,7 @@ export default class JeoMap {
 			legendTextIcon.appendChild( layerIcon );
 			legendTextIcon.innerHTML += `<span class="text"> ${ __(
 				'Layers',
-				'jeo'
+				'jeowp'
 			) } </span>`;
 
 			legendsTitle.appendChild( legendTextIcon );

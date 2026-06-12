@@ -26,7 +26,7 @@ jobs:
           --health-retries=10
     env:
       WP_PATH: /tmp/wordpress
-      PLUGIN_BUILD_DIR: /tmp/plugin-check-build/jeo
+      PLUGIN_BUILD_DIR: /tmp/plugin-check-build/jeowp
       PLUGIN_CHECK_RESULTS: /tmp/plugin-check-results.txt
     steps:
     - uses: actions/checkout@v6
@@ -65,20 +65,20 @@ jobs:
       uses: actions/upload-artifact@v7
       if: ${{ always() }}
       with:
-        name: plugin-check-results-jeo
+        name: plugin-check-results-jeowp
         path: ${{ env.PLUGIN_CHECK_RESULTS }}
         if-no-files-found: ignore
     - name: Build GitHub release zip
       run: |
         rm -rf "${RUNNER_TEMP}/github-release"
-        mkdir -p "${RUNNER_TEMP}/github-release/jeo"
-        rsync -a --delete src/ "${RUNNER_TEMP}/github-release/jeo/"
+        mkdir -p "${RUNNER_TEMP}/github-release/jeowp"
+        rsync -a --delete src/ "${RUNNER_TEMP}/github-release/jeowp/"
         cd "${RUNNER_TEMP}/github-release"
-        zip -qr "${RUNNER_TEMP}/jeo.zip" jeo
+        zip -qr "${RUNNER_TEMP}/jeowp.zip" jeowp
     - name: Publish GitHub release
       uses: softprops/action-gh-release@v3
       with:
-        files: ${{ runner.temp }}/jeo.zip
+        files: ${{ runner.temp }}/jeowp.zip
         generate_release_notes: true
     - name: WordPress Plugin Deploy
       if: vars.WPORG_DEPLOY_ENABLED == 'true'
@@ -88,6 +88,6 @@ jobs:
       env:
         SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
         SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
-        SLUG: jeo # optional, remove if GitHub repo name matches SVN slug, including capitalization
+        SLUG: jeowp # optional, remove if GitHub repo name matches SVN slug, including capitalization
         BUILD_DIR: src
         ASSETS_DIR: .wordpress-org

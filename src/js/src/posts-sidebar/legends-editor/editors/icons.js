@@ -126,7 +126,7 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 					<h4>
 						{ __(
 							'The uploaded icon is too small. The minimum size required is 60x60 pixels.',
-							'jeo'
+							'jeowp'
 						) }
 					</h4>
 					<Button

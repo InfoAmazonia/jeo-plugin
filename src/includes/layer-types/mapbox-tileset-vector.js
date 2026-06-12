@@ -96,7 +96,7 @@
 					description:
 						__(
 							'Layers take the data that they get from a source, optionally filter features, and then define how those features are styled.',
-							'jeo'
+							'jeowp'
 						),
 					type: 'string',
 					default: 'fill',
