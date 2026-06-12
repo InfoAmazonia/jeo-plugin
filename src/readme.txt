@@ -16,7 +16,7 @@ JEO helps newsrooms build interactive maps, geolocate posts, and publish storyma
 
 == Installation ==
 
-1. Upload `jeo.php` to the `/wp-content/plugins/` directory;
+1. Upload the plugin directory to `/wp-content/plugins/`, or install it through Plugins > Add New in WordPress;
 2. Activate the plugin through the 'Plugins' menu in WordPress;
 3. Select JEO on the admin menu.
 
