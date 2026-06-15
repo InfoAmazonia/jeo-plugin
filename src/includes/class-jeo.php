@@ -804,7 +804,6 @@ class Jeo {
 			)
 		);
 
-
 		$map_runtime_requested = $this->get_requested_map_runtime();
 		$mapgl_script_deps     = array();
 		$mapgl_style_deps      = array();
