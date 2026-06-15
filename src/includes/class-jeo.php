@@ -1018,6 +1018,7 @@ class Jeo {
 				array( 'mapgl' ),
 				$jeo_map_assets['version']
 			);
+			wp_add_inline_style( 'jeo-map', jeo_custom_settings_css() );
 			wp_enqueue_script(
 				'jeo-map',
 				JEO_BASEURL . '/js/build/jeoMap.js',
