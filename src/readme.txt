@@ -5,7 +5,7 @@ Stable tag: 3.0.0
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-3.0-only
-License URI: https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
+License URI: https://github.com/InfoAmazonia/jeo-plugin/blob/master/LICENSE
 Version: 3.0.0
 
 Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
