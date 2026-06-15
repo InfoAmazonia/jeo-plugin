@@ -113,6 +113,18 @@ sequenceDiagram
 2. _(future)_ **IP Geolocation** → resolved server-side from `$_SERVER['REMOTE_ADDR']`
 3. **Map center defaults** → from JEO settings (`map_default_lat`, `map_default_lng`)
 
+### Geolocation Timeout (`GEOLOCATION_OVERALL_TIMEOUT`)
+
+The W3C Geolocation API's `timeout` option (10s, `GEOLOCATION_TIMEOUT`) only starts counting **after** the user grants permission. If the user dismisses or ignores the browser's permission dialog, neither the success nor error callback fires, leaving the returned Promise — and the skeleton loader — pending indefinitely.
+
+To guard against this, `BrowserGeolocationProvider.getLocation()` wraps its Promise in a `Promise.race` with a hard `GEOLOCATION_OVERALL_TIMEOUT` (20s). If the overall timeout fires first, `getLocation()` resolves `null`, which triggers the server-side map-center fallback via `fetchAndRender(null)`. This covers three scenarios:
+
+- **Saved consent + ignored prompt on page reload** — server-rendered skeleton is replaced after timeout.
+- **Multi-block pages (`resolveSharedLocation`)** — all blocks' skeletons resolve after the shared timeout.
+- **Consent click + ignored prompt** — dynamically-shown skeleton resolves; consent UI was already removed, so the fallback renders directly.
+
+The orphaned `getCurrentPosition` callback (if permission is granted late) calls `resolve()` on an already-settled Promise — a harmless no-op.
+
 ### User Location Precision (`geolocation_precision`)
 
 Global plugin setting (Settings > General > User location precision) controlling how many decimal places are kept from the browser geolocation result before sending to the REST endpoint. Range: 1–5, default: 2. Lower values = less precision, more privacy. Does **not** affect post geocoding or stored coordinates — only the user's browser-reported location.

@@ -2,6 +2,7 @@
 	const CONTAINER_SELECTOR = '.wp-block-jeo-stories-near-you';
 	const REST_ENDPOINT = '/wp-json/jeo/v1/stories-near-you';
 	const GEOLOCATION_TIMEOUT = 10000;
+	const GEOLOCATION_OVERALL_TIMEOUT = 20000;
 	const CONSENT_KEY = 'jeo_stories_near_you_consent';
 
 	class BrowserGeolocationProvider {
@@ -12,7 +13,7 @@
 
 			const precision = globalThis.jeo_snu_config?.geolocationPrecision || 2;
 
-			return new Promise( ( resolve ) => {
+			const locationPromise = new Promise( ( resolve ) => {
 				navigator.geolocation.getCurrentPosition(
 					( position ) => {
 						resolve( {
@@ -33,6 +34,12 @@
 					}
 				);
 			} );
+
+			const overallTimeoutPromise = new Promise( ( resolve ) => {
+				setTimeout( () => resolve( null ), GEOLOCATION_OVERALL_TIMEOUT );
+			} );
+
+			return Promise.race( [ locationPromise, overallTimeoutPromise ] );
 		}
 	}
 
