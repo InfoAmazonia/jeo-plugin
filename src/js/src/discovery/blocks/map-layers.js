@@ -158,8 +158,8 @@ class MapLayers extends Component {
 			mapsUrl.searchParams.append( key, requestParams[ key ] )
 		);
 
-		if ( 'languageParams' in window ) {
-			mapsUrl.searchParams.append( 'lang', languageParams.currentLang );
+		if ( window.jeowpLanguageParams?.currentLang ) {
+			mapsUrl.searchParams.append( 'lang', window.jeowpLanguageParams.currentLang );
 		}
 
 		return fetch( mapsUrl )
@@ -208,8 +208,8 @@ class MapLayers extends Component {
 				orderby: 'include',
 				per_page: chunk.length,
 				_fields: MAP_COLLECTION_FIELDS,
-				...( 'languageParams' in window && window.languageParams?.currentLang
-					? { lang: languageParams.currentLang }
+				...( 'jeowpLanguageParams' in window && window.jeowpLanguageParams?.currentLang
+					? { lang: window.jeowpLanguageParams.currentLang }
 					: {} ),
 			} );
 
@@ -229,8 +229,8 @@ class MapLayers extends Component {
 			const path = addQueryArgs( jeoMapVars.layersUrl, {
 				include: chunk,
 				context: 'view',
-				...( "languageParams" in window && window.languageParams?.currentLang
-					? { lang: languageParams.currentLang }
+				...( 'jeowpLanguageParams' in window && window.jeowpLanguageParams?.currentLang
+					? { lang: window.jeowpLanguageParams.currentLang }
 					: {} ),
 			} );
 
