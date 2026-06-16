@@ -931,8 +931,43 @@ class Jeo {
 		add_filter( 'option_use_smilies', '__return_false' );
 
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'story-map-container' ) );
+		$properties_json    = wp_json_encode( $saved_data );
+		if ( false === $properties_json ) {
+			$properties_json = '{}';
+		}
 
-		return '<div ' . $wrapper_attributes . ' data-properties="' . htmlentities( wp_json_encode( $saved_data ) ) . '" ></div>';
+		return '<div ' . $wrapper_attributes . ' data-properties="' . esc_attr( $properties_json ) . '" ></div>';
+	}
+
+	/**
+	 * Return the HTML allowlist for rendered story map content.
+	 *
+	 * Story map rendering stores its frontend payload in data attributes, so the
+	 * default post allowlist needs a small extension for those attributes.
+	 *
+	 * @return array
+	 */
+	private function get_storymap_allowed_html() {
+		$allowed = wp_kses_allowed_html( 'post' );
+
+		$allowed['div'] = array_merge(
+			$allowed['div'] ?? array(),
+			array(
+				'data-*' => true,
+			)
+		);
+
+		return $allowed;
+	}
+
+	/**
+	 * Sanitize rendered story map block output before returning it to the screen.
+	 *
+	 * @param string $content Rendered story map HTML.
+	 * @return string
+	 */
+	private function sanitize_storymap_content( string $content ): string {
+		return wp_kses( $content, $this->get_storymap_allowed_html() );
 	}
 
 	/**
@@ -1320,7 +1355,7 @@ class Jeo {
 
 			$preview_post = $this->get_preview_post( $post_id );
 			if ( $preview_post instanceof WP_Post ) {
-				return do_blocks( $preview_post->post_content );
+				return $this->sanitize_storymap_content( do_blocks( $preview_post->post_content ) );
 			}
 		}
 
