@@ -1168,7 +1168,7 @@ class Jeo {
 		if ( function_exists( 'icl_object_id' ) ) {
 			wp_localize_script(
 				'discovery-map',
-				'languageParams',
+				'jeowpLanguageParams',
 				array(
 					'currentLang' => $current_language,
 				)
@@ -1177,7 +1177,7 @@ class Jeo {
 
 		wp_localize_script(
 			'discovery-map',
-			'mapPreferences',
+			'jeowpMapPreferences',
 			array(
 				'map_defaults' => array(
 					'zoom' => intval( sanitize_text_field( \jeo_settings()->get_option( 'map_default_zoom' ) ) ),

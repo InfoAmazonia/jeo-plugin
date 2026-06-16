@@ -158,9 +158,10 @@ class Discovery extends Component {
 		window.addEventListener( 'orientationchange', this.syncViewportHeight );
 		window.addEventListener( 'load', this.syncViewportHeight );
 
+		const mapDefaults = window.jeowpMapPreferences.map_defaults;
 		const additionalMapOptions = {
-			center: [ mapPreferences.map_defaults.lng, mapPreferences.map_defaults.lat],
-			zoom: mapPreferences.map_defaults.zoom,
+			center: [ mapDefaults.lng, mapDefaults.lat ],
+			zoom: mapDefaults.zoom,
 		};
 
 		if ( this.getParamFromUrl( 'discovery' ) || this.getParamFromUrl( 'share' ) ) {
