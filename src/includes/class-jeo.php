@@ -1330,6 +1330,23 @@ class Jeo {
 	}
 
 	/**
+	 * Stop or defer rendering for embeds that need a special response.
+	 *
+	 * @param WP_Post $post Embed post.
+	 * @return void
+	 */
+	private function enforce_embed_rendering_rules( WP_Post $post ): void {
+		if ( $this->is_embed_disabled( $post ) ) {
+			wp_safe_redirect( home_url() );
+			exit();
+		}
+
+		if ( post_password_required( $post ) ) {
+			$this->render_embed_password_form( $post );
+		}
+	}
+
+	/**
 	 * Serve the public embed templates for maps, story maps, and discovery.
 	 *
 	 * @return void
@@ -1361,14 +1378,7 @@ class Jeo {
 
 			setup_postdata( $post );
 
-			if ( $this->is_embed_disabled( $post ) ) {
-				wp_safe_redirect( home_url() );
-				exit();
-			}
-
-			if ( post_password_required( $post ) ) {
-				$this->render_embed_password_form( $post );
-			}
+			$this->enforce_embed_rendering_rules( $post );
 
 			add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 
@@ -1390,14 +1400,7 @@ class Jeo {
 			$this->wp_die_embed_not_available();
 		}
 
-		if ( $this->is_embed_disabled( $map_post ) ) {
-			wp_safe_redirect( home_url() );
-			exit();
-		}
-
-		if ( post_password_required( $map_post ) ) {
-			$this->render_embed_password_form( $map_post );
-		}
+		$this->enforce_embed_rendering_rules( $map_post );
 
 		$map_meta = get_post_meta( $map_id );
 		$args     = array();
