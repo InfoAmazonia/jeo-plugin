@@ -1246,90 +1246,210 @@ class Jeo {
 	}
 
 	/**
+	 * Determine whether a post can be rendered through a public embed request.
+	 *
+	 * @param WP_Post $post Post requested by the embed endpoint.
+	 * @return bool
+	 */
+	private function can_render_embed_post( WP_Post $post ): bool {
+		if ( is_post_publicly_viewable( $post ) ) {
+			return true;
+		}
+
+		return current_user_can( 'read_post', $post->ID ) || current_user_can( 'edit_post', $post->ID );
+	}
+
+	/**
+	 * Return a validated post for an embed request.
+	 *
+	 * @param int    $post_id   Requested post ID.
+	 * @param string $post_type Expected post type.
+	 * @return WP_Post|null
+	 */
+	private function get_embed_post( int $post_id, string $post_type ) {
+		$post = get_post( $post_id );
+
+		if ( ! $post instanceof WP_Post || $post_type !== $post->post_type ) {
+			return null;
+		}
+
+		if ( ! $this->can_render_embed_post( $post ) ) {
+			return null;
+		}
+
+		return $post;
+	}
+
+	/**
+	 * Determine whether a post has embeds disabled.
+	 *
+	 * @param WP_Post $post Embed post.
+	 * @return bool
+	 */
+	private function is_embed_disabled( WP_Post $post ): bool {
+		return '1' === get_post_meta( $post->ID, 'disable_embed', true );
+	}
+
+	/**
+	 * Stop rendering an unavailable embed.
+	 *
+	 * @return never
+	 */
+	private function wp_die_embed_not_available() {
+		wp_die(
+			esc_html__( 'This JEO embed is not available.', 'jeowp' ),
+			esc_html__( 'Embed not available', 'jeowp' ),
+			array( 'response' => 404 )
+		);
+	}
+
+	/**
+	 * Render the standard WordPress password form inside the embed shell.
+	 *
+	 * @param WP_Post $post Password-protected post.
+	 * @return never
+	 */
+	private function render_embed_password_form( WP_Post $post ) {
+		?>
+		<!DOCTYPE html>
+		<html style="margin: 0 !important;">
+			<head>
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
+				<title><?php echo esc_html( get_the_title( $post ) ); ?></title>
+				<?php wp_head(); ?>
+			</head>
+			<body style="margin: 0 !important; padding: 1rem !important;">
+				<?php
+				echo get_the_password_form( $post ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core renders the password form markup for protected posts.
+				?>
+				<?php wp_footer(); ?>
+			</body>
+		</html>
+		<?php
+		exit();
+	}
+
+	/**
 	 * Serve the public embed templates for maps, story maps, and discovery.
 	 *
 	 * @return void
 	 */
 	public function register_embed_template_redirect() {
-		if ( get_query_var( 'jeo_embed' ) === 'map' ) {
-			$storymap_id     = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
-			$discovery       = filter_input( INPUT_GET, 'discovery', FILTER_DEFAULT );
-			$discovery       = is_string( $discovery ) ? sanitize_text_field( $discovery ) : false;
-			$map_id          = filter_input( INPUT_GET, 'map_id', FILTER_VALIDATE_INT );
-			$full_width      = filter_input( INPUT_GET, 'width', FILTER_VALIDATE_INT );
-			$popup_width_arg = filter_input( INPUT_GET, 'popup_width', FILTER_VALIDATE_INT );
-			$height          = filter_input( INPUT_GET, 'height', FILTER_VALIDATE_INT );
-			$selected_layers = filter_input( INPUT_GET, 'selected-layers', FILTER_DEFAULT );
-			$selected_layers = is_string( $selected_layers ) ? sanitize_text_field( $selected_layers ) : '';
+		if ( get_query_var( 'jeo_embed' ) !== 'map' ) {
+			return;
+		}
 
-			add_filter( 'show_admin_bar', '__return_false' );
-			show_admin_bar( false );
-			remove_action( 'wp_head', '_admin_bar_bump_cb' );
-			if ( $storymap_id ) {
-				$post = get_post( $storymap_id );
-				setup_postdata( $post );
-				add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
+		$storymap_id     = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
+		$discovery       = filter_input( INPUT_GET, 'discovery', FILTER_DEFAULT );
+		$discovery       = is_string( $discovery ) ? sanitize_text_field( $discovery ) : false;
+		$map_id          = filter_input( INPUT_GET, 'map_id', FILTER_VALIDATE_INT );
+		$full_width      = filter_input( INPUT_GET, 'width', FILTER_VALIDATE_INT );
+		$popup_width_arg = filter_input( INPUT_GET, 'popup_width', FILTER_VALIDATE_INT );
+		$height          = filter_input( INPUT_GET, 'height', FILTER_VALIDATE_INT );
+		$selected_layers = filter_input( INPUT_GET, 'selected-layers', FILTER_DEFAULT );
+		$selected_layers = is_string( $selected_layers ) ? sanitize_text_field( $selected_layers ) : '';
 
-				require JEO_BASEPATH . '/templates/embed-storymap.php';
+		add_filter( 'show_admin_bar', '__return_false' );
+		show_admin_bar( false );
+		remove_action( 'wp_head', '_admin_bar_bump_cb' );
+
+		if ( $storymap_id ) {
+			$post = $this->get_embed_post( $storymap_id, 'storymap' );
+			if ( ! $post instanceof WP_Post ) {
+				$this->wp_die_embed_not_available();
+			}
+
+			setup_postdata( $post );
+
+			if ( $this->is_embed_disabled( $post ) ) {
+				wp_safe_redirect( home_url() );
 				exit();
 			}
-			if ( ! $discovery ) {
-				if ( $map_id ) {
-					$map_meta = get_post_meta( $map_id );
-					$args     = (array) maybe_unserialize( $map_meta['related_posts'][0] );
 
-					$args['per_page'] = 1;
-					$request          = new WP_REST_Request( 'GET', '/wp/v2/posts' );
-					$request->set_query_params( $args );
-					$response = rest_do_request( $request );
-					$server   = rest_get_server();
-					$data     = $server->response_to_data( $response, false );
+			if ( post_password_required( $post ) ) {
+				$this->render_embed_password_form( $post );
+			}
 
-					$have_related_posts = ( ! empty( $map_meta['relate_posts'][0] ) && ! empty( $data ) );
+			add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 
-					if ( $full_width ) {
-						$popup_width = $popup_width_arg ? $popup_width_arg : 220;
-						$map_width   = $full_width ? $full_width : 600;
+			require JEO_BASEPATH . '/templates/embed-storymap.php';
+			exit();
+		}
 
-						if ( $have_related_posts ) {
-							$map_width = $full_width - $popup_width;
-						}
+		if ( $discovery ) {
+			require JEO_BASEPATH . '/templates/embed-discovery.php';
+			exit();
+		}
 
-						$height = $height ? $height : 600;
+		if ( ! $map_id ) {
+			return;
+		}
 
-						$map_style       = "width: {$map_width}px; height: {$height}px;";
-						$container_style = "position: fixed; width: {$full_width}px; height: {$height}px;";
-						$popup_style     = "width: {$popup_width}px; height: {$height}px;";
-					} else {
-						$container_style = 'position: fixed; width: 100%; height: 100%;';
+		$map_post = $this->get_embed_post( $map_id, 'map' );
+		if ( ! $map_post instanceof WP_Post ) {
+			$this->wp_die_embed_not_available();
+		}
 
-						if ( $have_related_posts ) {
-							$map_style   = 'width: 70%; height: calc(100% - 35px);';
-							$popup_style = 'width: 30%; height: calc(100% - 35px);';
-						} else {
-							$map_style   = 'width: 100%; height: calc(100% - 35px);';
-							$popup_style = $container_style;
-						}
-					}
+		if ( $this->is_embed_disabled( $map_post ) ) {
+			wp_safe_redirect( home_url() );
+			exit();
+		}
 
-					if ( function_exists( 'wpml_get_language_information' ) ) {
-						global $sitepress;
-						$post_language_information = wpml_get_language_information( null, $map_id );
-						if ( ! is_wp_error( $post_language_information ) ) {
-							$sitepress->switch_lang( $post_language_information['language_code'], true );
-							switch_to_locale( $post_language_information['locale'] );
-						}
-					}
+		if ( post_password_required( $map_post ) ) {
+			$this->render_embed_password_form( $map_post );
+		}
 
-					require JEO_BASEPATH . '/templates/embed.php';
-					exit();
+		$map_meta = get_post_meta( $map_id );
+		$args     = array();
+		if ( isset( $map_meta['related_posts'][0] ) ) {
+			$args = (array) maybe_unserialize( $map_meta['related_posts'][0] );
+		}
 
-				}
+		$args['per_page'] = 1;
+		$request          = new WP_REST_Request( 'GET', '/wp/v2/posts' );
+		$request->set_query_params( $args );
+		$response = rest_do_request( $request );
+		$server   = rest_get_server();
+		$data     = $server->response_to_data( $response, false );
+
+		$have_related_posts = ( ! empty( $map_meta['relate_posts'][0] ) && ! empty( $data ) );
+
+		if ( $full_width ) {
+			$popup_width = $popup_width_arg ? $popup_width_arg : 220;
+			$map_width   = $full_width ? $full_width : 600;
+
+			if ( $have_related_posts ) {
+				$map_width = $full_width - $popup_width;
+			}
+
+			$height = $height ? $height : 600;
+
+			$map_style       = "width: {$map_width}px; height: {$height}px;";
+			$container_style = "position: fixed; width: {$full_width}px; height: {$height}px;";
+			$popup_style     = "width: {$popup_width}px; height: {$height}px;";
+		} else {
+			$container_style = 'position: fixed; width: 100%; height: 100%;';
+
+			if ( $have_related_posts ) {
+				$map_style   = 'width: 70%; height: calc(100% - 35px);';
+				$popup_style = 'width: 30%; height: calc(100% - 35px);';
 			} else {
-				require JEO_BASEPATH . '/templates/embed-discovery.php';
-				exit();
+				$map_style   = 'width: 100%; height: calc(100% - 35px);';
+				$popup_style = $container_style;
 			}
 		}
+
+		if ( function_exists( 'wpml_get_language_information' ) ) {
+			global $sitepress;
+			$post_language_information = wpml_get_language_information( null, $map_id );
+			if ( ! is_wp_error( $post_language_information ) ) {
+				$sitepress->switch_lang( $post_language_information['language_code'], true );
+				switch_to_locale( $post_language_information['locale'] );
+			}
+		}
+
+		require JEO_BASEPATH . '/templates/embed.php';
+		exit();
 	}
 
 	/**
@@ -1355,6 +1475,10 @@ class Jeo {
 
 			$preview_post = $this->get_preview_post( $post_id );
 			if ( $preview_post instanceof WP_Post ) {
+				if ( post_password_required( $preview_post ) ) {
+					return get_the_password_form( $preview_post );
+				}
+
 				return $this->sanitize_storymap_content( do_blocks( $preview_post->post_content ) );
 			}
 		}
