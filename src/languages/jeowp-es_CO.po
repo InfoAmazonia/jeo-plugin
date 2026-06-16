@@ -44,7 +44,7 @@ msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no hay ningun
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no se pudo cargar el SDK externo de Mapbox. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:1039
+#: includes/class-jeo.php:1075
 msgid "Read more"
 msgstr "Leer más"
 
@@ -96,118 +96,118 @@ msgstr "Ciudad"
 msgid "City sub-level 1"
 msgstr "Ciudad sub-nivel 1"
 
-#: includes/layers/class-layers.php:50
-#: includes/layers/class-layers.php:61
+#: includes/layers/class-layers.php:49
+#: includes/layers/class-layers.php:60
 #: js/build/jeoMap.js:2
 #: js/build/mapBlocks.js:1
 msgid "Layers"
 msgstr "Capas"
 
-#: includes/layers/class-layers.php:51
+#: includes/layers/class-layers.php:50
 msgid "Layer"
 msgstr "Capa"
 
+#: includes/layers/class-layers.php:51
 #: includes/layers/class-layers.php:52
-#: includes/layers/class-layers.php:53
 msgid "Add new layer"
 msgstr "Añadir nueva capa"
 
-#: includes/layers/class-layers.php:54
+#: includes/layers/class-layers.php:53
 msgid "Edit layer"
 msgstr "Editar capa"
 
-#: includes/layers/class-layers.php:55
+#: includes/layers/class-layers.php:54
 msgid "New layer"
 msgstr "Nueva capa"
 
-#: includes/layers/class-layers.php:56
+#: includes/layers/class-layers.php:55
 msgid "View layer"
 msgstr "Ver capa"
 
-#: includes/layers/class-layers.php:57
+#: includes/layers/class-layers.php:56
 msgid "View layers"
 msgstr "Ver capas"
 
-#: includes/layers/class-layers.php:58
+#: includes/layers/class-layers.php:57
 msgid "Search layers"
 msgstr "Buscar capas"
 
-#: includes/layers/class-layers.php:59
+#: includes/layers/class-layers.php:58
 msgid "No layer found"
 msgstr "Ninguna capa encontrada"
 
-#: includes/layers/class-layers.php:60
+#: includes/layers/class-layers.php:59
 msgid "No layer found in the trash"
 msgstr "Ninguna capa encontrada en la papelera"
 
-#: includes/layers/class-layers.php:62
+#: includes/layers/class-layers.php:61
 msgid "Layer published."
 msgstr "Capa publicada."
 
-#: includes/layers/class-layers.php:63
+#: includes/layers/class-layers.php:62
 msgid "Layer published privately."
 msgstr "Capa publicada como privada."
 
-#: includes/layers/class-layers.php:64
+#: includes/layers/class-layers.php:63
 msgid "Layer reverted to draft."
 msgstr "Capa revertida a borrador."
 
-#: includes/layers/class-layers.php:65
+#: includes/layers/class-layers.php:64
 msgid "Layer scheduled."
 msgstr "Capa programada."
 
-#: includes/layers/class-layers.php:66
+#: includes/layers/class-layers.php:65
 msgid "Layer updated."
 msgstr "Capa actualizada."
 
-#: includes/layers/class-layers.php:72
+#: includes/layers/class-layers.php:71
 msgid "JEO Layers"
 msgstr "Capas JEO"
 
-#: includes/layers/class-layers.php:109
+#: includes/layers/class-layers.php:108
 msgid "The layer type"
 msgstr "Tipo de capa"
 
-#: includes/layers/class-layers.php:121
+#: includes/layers/class-layers.php:120
 msgid "Layer attribution as text or HTML with a link"
 msgstr "Atribución de la capa como texto o HTML con un enlace"
 
-#: includes/layers/class-layers.php:138
+#: includes/layers/class-layers.php:137
 msgid "Layer type-specific options"
 msgstr "Opciones específicas del tipo de capa"
 
-#: includes/layers/class-layers.php:150
+#: includes/layers/class-layers.php:149
 msgid "The URL to download the source data of the layer"
 msgstr "URL para descargar los datos de la fuente de la capa"
 
-#: includes/layers/class-layers.php:162
+#: includes/layers/class-layers.php:161
 msgid "Label for the attribution URL link"
 msgstr "Etiqueta del enlace de URL de atribución"
 
-#: includes/layers/class-layers.php:174
+#: includes/layers/class-layers.php:173
 msgid "The legend type"
 msgstr "Tipo de leyenda"
 
-#: includes/layers/class-layers.php:191
+#: includes/layers/class-layers.php:190
 msgid "Legend type-specific options"
 msgstr "Opciones específicas del tipo de leyenda"
 
-#: includes/layers/class-layers.php:203
+#: includes/layers/class-layers.php:202
 #: js/build/layersSidebar.js:7
 msgid "Use legend"
 msgstr "Usar leyenda"
 
-#: includes/layers/class-layers.php:215
+#: includes/layers/class-layers.php:214
 #: js/build/layersSidebar.js:7
 msgid "Legend title"
 msgstr "Título de leyenda"
 
-#: includes/layers/class-layers.php:278
+#: includes/layers/class-layers.php:265
 msgid "Layer type not registered"
 msgstr "Tipo de capa no registrada"
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:492
+#: includes/loaders.php:476
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:6
 msgid "Explore"
@@ -2007,3 +2007,11 @@ msgstr "Ej. https://ejemplo.com/wp-content/uploads/fonts/jeo-story-font.css"
 #, js-format
 msgid "By %s"
 msgstr "Por %s"
+
+#: includes/class-jeo.php:1300
+msgid "This JEO embed is not available."
+msgstr "Este embed de JEO no está disponible."
+
+#: includes/class-jeo.php:1301
+msgid "Embed not available"
+msgstr "Embed no disponible"
