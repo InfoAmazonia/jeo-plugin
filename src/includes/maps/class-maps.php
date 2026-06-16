@@ -710,7 +710,7 @@ class Maps {
 				$source_url       = get_post_meta( $layer_post->ID, 'source_url', true );
 				$attribution      = get_post_meta( $layer_post->ID, 'attribution', true );
 				$attribution_name = get_post_meta( $layer_post->ID, 'attribution_name', true );
-				$layer_content    = $this->render_layer_content( $layer_post );
+				$layer_content    = wp_kses_post( $this->render_layer_content( $layer_post ) );
 
 				if ( $source_url || $attribution || $attribution_name ) {
 					include $template;
