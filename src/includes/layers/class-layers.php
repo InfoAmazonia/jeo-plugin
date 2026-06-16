@@ -35,7 +35,6 @@ class Layers {
 		add_action( 'init', array( $this, 'register_post_type' ) );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
 		add_action( 'add_meta_boxes', array( $this, 'remove_custom_fields_meta_box' ), 99 );
-		add_filter( "rest_{$this->post_type}_collection_params", array( $this, 'rest_collection_params' ) );
 		$this->register_rest_meta_validation();
 	}
 
@@ -253,18 +252,6 @@ class Layers {
 
 			$role_obj->add_cap( 'delete_map-layer' );
 		}
-	}
-
-	/**
-	 * Relax the REST per_page limit for layers.
-	 *
-	 * @param array $params REST collection params.
-	 * @return array
-	 */
-	public function rest_collection_params( $params ) {
-		$params['per_page']['minimum'] = -1;
-		unset( $params['per_page']['maximum'] );
-		return $params;
 	}
 
 	/**

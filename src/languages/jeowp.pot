@@ -2,14 +2,14 @@
 # This file is distributed under the GPL-3.0-only.
 msgid ""
 msgstr ""
-"Project-Id-Version: JEO Maps 3.0.0\n"
+"Project-Id-Version: JEO Maps 3.0.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowp\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-12T19:44:32+00:00\n"
+"POT-Creation-Date: 2026-06-16T16:48:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -52,8 +52,16 @@ msgstr ""
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:1039
+#: includes/class-jeo.php:1075
 msgid "Read more"
+msgstr ""
+
+#: includes/class-jeo.php:1300
+msgid "This JEO embed is not available."
+msgstr ""
+
+#: includes/class-jeo.php:1301
+msgid "Embed not available"
 msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:130
@@ -104,113 +112,113 @@ msgstr ""
 msgid "City sub-level 1"
 msgstr ""
 
-#: includes/layers/class-layers.php:50
-#: includes/layers/class-layers.php:61
+#: includes/layers/class-layers.php:49
+#: includes/layers/class-layers.php:60
 #: js/build/jeoMap.js:2
 #: js/build/mapBlocks.js:1
 msgid "Layers"
 msgstr ""
 
-#: includes/layers/class-layers.php:51
+#: includes/layers/class-layers.php:50
 msgid "Layer"
 msgstr ""
 
+#: includes/layers/class-layers.php:51
 #: includes/layers/class-layers.php:52
-#: includes/layers/class-layers.php:53
 msgid "Add new layer"
 msgstr ""
 
-#: includes/layers/class-layers.php:54
+#: includes/layers/class-layers.php:53
 msgid "Edit layer"
 msgstr ""
 
-#: includes/layers/class-layers.php:55
+#: includes/layers/class-layers.php:54
 msgid "New layer"
 msgstr ""
 
-#: includes/layers/class-layers.php:56
+#: includes/layers/class-layers.php:55
 msgid "View layer"
 msgstr ""
 
-#: includes/layers/class-layers.php:57
+#: includes/layers/class-layers.php:56
 msgid "View layers"
 msgstr ""
 
-#: includes/layers/class-layers.php:58
+#: includes/layers/class-layers.php:57
 msgid "Search layers"
 msgstr ""
 
-#: includes/layers/class-layers.php:59
+#: includes/layers/class-layers.php:58
 msgid "No layer found"
 msgstr ""
 
-#: includes/layers/class-layers.php:60
+#: includes/layers/class-layers.php:59
 msgid "No layer found in the trash"
 msgstr ""
 
-#: includes/layers/class-layers.php:62
+#: includes/layers/class-layers.php:61
 msgid "Layer published."
 msgstr ""
 
-#: includes/layers/class-layers.php:63
+#: includes/layers/class-layers.php:62
 msgid "Layer published privately."
 msgstr ""
 
-#: includes/layers/class-layers.php:64
+#: includes/layers/class-layers.php:63
 msgid "Layer reverted to draft."
 msgstr ""
 
-#: includes/layers/class-layers.php:65
+#: includes/layers/class-layers.php:64
 msgid "Layer scheduled."
 msgstr ""
 
-#: includes/layers/class-layers.php:66
+#: includes/layers/class-layers.php:65
 msgid "Layer updated."
 msgstr ""
 
-#: includes/layers/class-layers.php:72
+#: includes/layers/class-layers.php:71
 msgid "JEO Layers"
 msgstr ""
 
-#: includes/layers/class-layers.php:109
+#: includes/layers/class-layers.php:108
 msgid "The layer type"
 msgstr ""
 
-#: includes/layers/class-layers.php:121
+#: includes/layers/class-layers.php:120
 msgid "Layer attribution as text or HTML with a link"
 msgstr ""
 
-#: includes/layers/class-layers.php:138
+#: includes/layers/class-layers.php:137
 msgid "Layer type-specific options"
 msgstr ""
 
-#: includes/layers/class-layers.php:150
+#: includes/layers/class-layers.php:149
 msgid "The URL to download the source data of the layer"
 msgstr ""
 
-#: includes/layers/class-layers.php:162
+#: includes/layers/class-layers.php:161
 msgid "Label for the attribution URL link"
 msgstr ""
 
-#: includes/layers/class-layers.php:174
+#: includes/layers/class-layers.php:173
 msgid "The legend type"
 msgstr ""
 
-#: includes/layers/class-layers.php:191
+#: includes/layers/class-layers.php:190
 msgid "Legend type-specific options"
 msgstr ""
 
-#: includes/layers/class-layers.php:203
+#: includes/layers/class-layers.php:202
 #: js/build/layersSidebar.js:7
 msgid "Use legend"
 msgstr ""
 
-#: includes/layers/class-layers.php:215
+#: includes/layers/class-layers.php:214
 #: js/build/layersSidebar.js:7
 msgid "Legend title"
 msgstr ""
 
-#: includes/layers/class-layers.php:278
+#: includes/layers/class-layers.php:265
 msgid "Layer type not registered"
 msgstr ""
 
@@ -221,7 +229,7 @@ msgid "<p>JEO can connect to third-party services depending on your configuratio
 msgstr ""
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:492
+#: includes/loaders.php:476
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:6
 msgid "Explore"

@@ -8,13 +8,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-$disable_embed = get_post_meta( $map_id, 'disable_embed', true ) === '1';
-
-if ( $disable_embed ) {
-	wp_safe_redirect( home_url() );
-	exit();
-}
 ?>
 <!DOCTYPE html>
 <html style="margin: 0px !important;">

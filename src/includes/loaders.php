@@ -398,22 +398,6 @@ function jeo_custom_settings_css() {
 }
 
 /**
- * Print custom CSS generated from plugin settings.
- *
- * @return void
- */
-function jeo_custom_settings_css_wrap() {
-	?>
-	<style type="text/css" id="custom-jeo-css">
-		<?php
-		echo jeo_custom_settings_css(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		?>
-	</style>
-	<?php
-}
-add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
-
-/**
  * Enqueue configured typography assets.
  *
  * @return void

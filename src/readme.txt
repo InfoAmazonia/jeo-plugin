@@ -1,12 +1,12 @@
 === JEO Maps ===
 Contributors: infoamazonia
 Tested up to: 7.0
-Stable tag: 3.0.0
+Stable tag: 3.0.1
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-3.0-only
-License URI: https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
-Version: 3.0.0
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
+Version: 3.0.1
 
 Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
 
@@ -74,6 +74,16 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 8. Browse geolocated stories and map clusters in the Discovery interface.
 
 == Changelog ==
+
+= 3.0.1 =
+* Fixed WordPress.org review findings for release metadata, inline style loading, escaped callback output, admin menu placement, REST pagination limits, public embed visibility, and generic Discovery runtime globals.
+* Replaced the invalid repository license URL with the official GNU GPLv3 license URL.
+* Moved custom CSS output to WordPress enqueue APIs using the `jeo-map` style handle.
+* Hardened rendered story map and map layer content escaping.
+* Moved the JEO admin menu out of the core admin group.
+* Restored native REST pagination limits for map layer collections while keeping the dedicated JEO layer lookup endpoint for selected layer IDs.
+* Enforced WordPress-like visibility handling for map and story map embeds, including non-public posts, disabled embeds, and password-protected content.
+* Renamed generic Discovery runtime globals to `jeowpLanguageParams` and `jeowpMapPreferences`.
 
 = 3.0.0 =
 This is a major release. Here are some highlights:
@@ -293,6 +303,9 @@ JEO Plugin was updated to be compatible with WordPress version > 5.6.0.
 * Second release.
 
 == Upgrade Notice ==
+
+= 3.0.1 =
+Maintenance release for WordPress.org review readiness. No manual migration is required.
 
 = 3.0.0 =
 Major release: MapLibreGL is now the default renderer, Carto support was removed, and editor/map internals were modernized. Review Mapbox-hosted layers, custom integrations, and any code relying on old Carto or spiderifier APIs before upgrading.

@@ -8,13 +8,13 @@
  * Plugin Name:       JEO Maps
  * Plugin URI:        https://www.jeowp.org/
  * Description:       Interactive maps for the WordPress block editor
- * Version:           3.0.0
+ * Version:           3.0.1
  * Author:            InfoAmazonia
  * Author URI:        https://www.jeowp.org/
  * Requires at least: 6.6
  * Requires PHP:      8.0
  * License:           GPL-3.0-only
- * License URI:       https://github.com/InfoAmazonia/jeo-plugin/blob/main/LICENSE
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       jeowp
  * Domain Path:       /languages
  */
@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'JEO_VERSION', '3.0.0' );
+define( 'JEO_VERSION', '3.0.1' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );
