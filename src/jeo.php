@@ -14,7 +14,7 @@
  * Requires at least: 6.6
  * Requires PHP:      8.0
  * License:           GPL-3.0-only
- * License URI:       https://github.com/InfoAmazonia/jeo-plugin/blob/master/LICENSE
+ * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       jeowp
  * Domain Path:       /languages
  */
