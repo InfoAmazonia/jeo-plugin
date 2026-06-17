@@ -31,15 +31,15 @@ msgstr "Mapas interativos para o editor de blocos do WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:915
+#: includes/class-jeo.php:914
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas nenhuma chave de API do Mapbox está configurada. Voltando para MapLibre."
 
-#: includes/class-jeo.php:916
+#: includes/class-jeo.php:915
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas o SDK externo do Mapbox não pôde ser carregado. Voltando para MapLibre."
 
-#: includes/class-jeo.php:1396
+#: includes/class-jeo.php:1395
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Ler mais"
@@ -197,7 +197,7 @@ msgid "Layer type not registered"
 msgstr "Tipo de camada não registrado"
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:524
+#: includes/loaders.php:532
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:5
 msgid "Explore"
@@ -4477,12 +4477,6 @@ msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:239
 msgid "Metadata storing the locations related to the post. Each location is an object with latitude, longitude, and geocode attributes."
-msgstr ""
-
-#. translators: 1: Mapbox terms URL, 2: Mapbox privacy URL, 3: Nominatim usage policy URL, 4: OSMF privacy URL, 5: OSM tile policy URL.
-#: includes/loaders.php:355
-#, php-format
-msgid "<p>JEO can connect to third-party services depending on your configuration.</p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the rendering library or when a map uses Mapbox-hosted resources. In that case the site loads JavaScript/CSS from Mapbox and sends the configured access token plus the visitor&#8217;s IP address, browser details and requested map resources to Mapbox. Terms: <a href=\"%1$s\">Mapbox Terms of Service</a>. Privacy Policy: <a href=\"%2$s\">Mapbox Privacy Policy</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly runs an address search or reverse geocoding request in the post geolocation UI. The typed address or selected coordinates, the site URL in the user agent string and the server IP address are sent to the Nominatim service. Usage Policy: <a href=\"%3$s\">Nominatim Usage Policy</a>. Privacy Policy: <a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview style requests map tiles from the OpenStreetMap tile service, which receives the visitor&#8217;s IP address, browser details and requested tile URLs. Tile Policy: <a href=\"%5$s\">OpenStreetMap Tile Usage Policy</a>. Privacy Policy: <a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>Optional external asset URLs configured by the site administrator</strong>: if you configure an external typography stylesheet or footer logo URL, visitors&#8217; browsers will request that asset directly from the selected host. That host may receive the visitor&#8217;s IP address, browser details and referrer according to its own terms and privacy policy.</li></ul>"
 msgstr ""
 
 #: includes/menu/class-menu.php:31

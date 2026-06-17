@@ -290,6 +290,43 @@ function jeo_register_embedder( $id, $base_url ) {
 	wp_embed_register_handler( $id, $regex, $embedder );
 }
 
+/**
+ * Normalize an optional asset URL.
+ *
+ * @param string $url Raw URL value.
+ * @return string
+ */
+function jeo_normalize_asset_url( $url ) {
+	$url = trim( (string) $url );
+	if ( '' === $url ) {
+		return '';
+	}
+
+	if ( 0 === strpos( $url, '/' ) && 0 !== strpos( $url, '//' ) ) {
+		$url = home_url( $url );
+	}
+
+	$normalized = esc_url_raw( $url );
+	if ( '' === $normalized ) {
+		return '';
+	}
+
+	$target = wp_parse_url( $normalized );
+	if ( ! is_array( $target ) ) {
+		return '';
+	}
+
+	if ( empty( $target['host'] ) ) {
+		return '';
+	}
+
+	if ( ! empty( $target['scheme'] ) && ! in_array( strtolower( $target['scheme'] ), array( 'http', 'https' ), true ) ) {
+		return '';
+	}
+
+	return $normalized;
+}
+
 /* New JEO Plugin Settings */
 /**
  * Generate dynamic CSS for typography, colors, and CSS variables based on JEO appearance settings.
@@ -338,35 +375,6 @@ function jeo_sanitize_css_number( $value ) {
 
 	return $normalized;
 }
-
-/**
- * Register privacy policy text for JEO third-party services.
- *
- * @return void
- */
-function jeo_add_privacy_policy_content() {
-	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
-		return;
-	}
-
-	$content = sprintf(
-		wp_kses_post(
-			/* translators: 1: Mapbox terms URL, 2: Mapbox privacy URL, 3: Nominatim usage policy URL, 4: OSMF privacy URL, 5: OSM tile policy URL. */
-			__(
-				'<p>JEO can connect to third-party services depending on your configuration.</p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the rendering library or when a map uses Mapbox-hosted resources. In that case the site loads JavaScript/CSS from Mapbox and sends the configured access token plus the visitor&#8217;s IP address, browser details and requested map resources to Mapbox. Terms: <a href="%1$s">Mapbox Terms of Service</a>. Privacy Policy: <a href="%2$s">Mapbox Privacy Policy</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly runs an address search or reverse geocoding request in the post geolocation UI. The typed address or selected coordinates, the site URL in the user agent string and the server IP address are sent to the Nominatim service. Usage Policy: <a href="%3$s">Nominatim Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview style requests map tiles from the OpenStreetMap tile service, which receives the visitor&#8217;s IP address, browser details and requested tile URLs. Tile Policy: <a href="%5$s">OpenStreetMap Tile Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>Optional external asset URLs configured by the site administrator</strong>: if you configure an external typography stylesheet or footer logo URL, visitors&#8217; browsers will request that asset directly from the selected host. That host may receive the visitor&#8217;s IP address, browser details and referrer according to its own terms and privacy policy.</li></ul>',
-				'jeowp'
-			)
-		),
-		'https://www.mapbox.com/legal/tos',
-		'https://www.mapbox.com/legal/privacy',
-		'https://operations.osmfoundation.org/policies/nominatim/',
-		'https://osmfoundation.org/wiki/Privacy_Policy',
-		'https://operations.osmfoundation.org/policies/tiles/'
-	);
-
-	wp_add_privacy_policy_content( 'JEO', $content );
-}
-add_action( 'admin_init', 'jeo_add_privacy_policy_content' );
 
 /**
  * Build custom CSS from plugin settings.
