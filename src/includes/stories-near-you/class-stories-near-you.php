@@ -754,7 +754,7 @@ class Stories_Near_You {
 	 * @param int   $limit       Maximum number of posts to return.
 	 * @param int[] $exclude_ids Post IDs to exclude from results.
 	 * @param array $filters     Taxonomy/post type filters.
-	 * @return int[] Post IDs ordered by ascending distance.
+	 * @return int[] Post IDs ordered by ascending distance, then descending date.
 	 */
 	protected function get_nearby_posts( $lat, $lng, $limit, $exclude_ids = array(), $filters = array() ) {
 		global $wpdb;
@@ -843,7 +843,7 @@ class Stories_Near_You {
 		}
 
 		$primary_template = "
-			SELECT p.ID,
+			SELECT p.ID, p.post_date,
 				ST_Distance_Sphere(POINT(%f, %f), POINT(CAST(tlon.meta_value AS DECIMAL(10,6)), CAST(tlat.meta_value AS DECIMAL(10,6)))) AS distance
 			FROM {$wpdb->posts} p
 			INNER JOIN (
@@ -872,7 +872,7 @@ class Stories_Near_You {
 			$primary_template
 		);
 
-		$union_sql    = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY distance ASC LIMIT %d';
+		$union_sql    = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY distance ASC, post_date DESC LIMIT %d';
 		$all_params   = array_merge( array( $lng, $lat ), $types, array( $lng, $lat ), $types, array( $limit ) );
 		$prepared_sql = $wpdb->prepare( $union_sql, $all_params ); // phpcs:ignore WordPress.DB.PreparedSQL
 		$results      = $wpdb->get_results( $prepared_sql ); // phpcs:ignore WordPress.DB.PreparedSQL
