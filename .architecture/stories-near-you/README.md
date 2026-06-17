@@ -131,6 +131,8 @@ Global plugin setting (Settings > General > User location precision) controlling
 
 Passed to frontend via `wp_localize_script` as `jeo_snu_config.geolocationPrecision`. Applied in `BrowserGeolocationProvider.getLocation()` using `toFixed()`.
 
+Also controls the `DECIMAL(10,N)` cast precision for post coordinates in `get_nearby_posts()` SQL queries, using `precision + 1` (range 2–6). This avoids false-precision distance computations against low-resolution user locations: at precision 2 (default), post coordinates are resolved to 3 decimal places (~111 m), so the dominant distance error comes from the user's rounding only. At precision 5, post coordinates use the full 6 decimal places (unchanged from original behavior).
+
 ## Block Attributes
 
 | Attribute | Type | Default | Purpose |

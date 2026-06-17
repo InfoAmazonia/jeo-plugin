@@ -763,6 +763,9 @@ class Stories_Near_You {
 		$lat   = (float) $lat;
 		$lng   = (float) $lng;
 
+		$coord_precision = absint( \jeo_settings()->get_option( 'geolocation_precision', 2 ) );
+		$coord_precision = max( 1, min( 5, $coord_precision ) ) + 1;
+
 		$enabled = array_map( 'sanitize_key', \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) ) );
 		$enabled = array_filter( $enabled );
 		if ( empty( $enabled ) ) {
@@ -844,7 +847,7 @@ class Stories_Near_You {
 
 		$primary_template = "
 			SELECT p.ID, p.post_date,
-				ST_Distance_Sphere(POINT(%f, %f), POINT(CAST(tlon.meta_value AS DECIMAL(10,6)), CAST(tlat.meta_value AS DECIMAL(10,6)))) AS distance
+				ST_Distance_Sphere(POINT(%f, %f), POINT(CAST(tlon.meta_value AS DECIMAL(10,{$coord_precision})), CAST(tlat.meta_value AS DECIMAL(10,{$coord_precision})))) AS distance
 			FROM {$wpdb->posts} p
 			INNER JOIN (
 				SELECT post_id, meta_value
