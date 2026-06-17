@@ -180,9 +180,7 @@ class StoryMapDisplay extends Component {
 	}
 
 	syncIntroductionScrollLock() {
-		this.setIntroductionScrollLocked(
-			Boolean( isSingle && this.isIntroductionActive() && ! this.state.isNavigating )
-		);
+		this.setIntroductionScrollLocked( false );
 	}
 
 	isIntroductionActive() {
