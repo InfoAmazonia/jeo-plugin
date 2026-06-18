@@ -12,6 +12,7 @@ import MapPanel from '../map-blocks/map-panel';
 import MapEmbedUrl from './map-embed-url';
 import MapPreviewPortal from './map-preview-portal';
 import PostsSelector from '../posts-selector';
+import { normalizeRelatedPosts } from '../posts-selector/defaults';
 import { renderLayer } from '../map-blocks/map-preview-layer';
 
 import './maps-sidebar.scss';
