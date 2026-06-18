@@ -6,6 +6,11 @@ import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
+import {
+	applyStyleLayerFiltering,
+	findStyleLayer,
+	styleLayerMapProps,
+} from './use-style-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import { decodeHtmlEntity } from '../shared/html';
 import { useRecordsByIds } from '../shared/rest-records';
@@ -45,15 +50,28 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 		query: { context: 'edit' },
 	} );
 
+	const styleBase = useMemo(
+		() => loadedMap?.meta?.layers ? findStyleLayer( loadedLayers, loadedMap.meta.layers ) : null,
+		[ loadedLayers, loadedMap?.meta?.layers ]
+	);
+
 	return (
 		<div { ...blockProps }>
 			{ attributes.map_id && ( loadingMap || !loadedMap ) && <Spinner /> }
 			{ attributes.map_id && ! loadingMap && loadedMap && (
 				<>
 					<div className="jeo-preview-area">
+						{ styleBase && (
+							<div className="jeo-style-preview-badge">
+								{ __( 'Vector style preview', 'jeowp' ) }
+							</div>
+						) }
 						<Map
-							key={ `${ key }:${ layerSettingsKey }` }
+							key={ `${ key }:${ layerSettingsKey }${
+								styleBase ? ':style-' + styleBase.instance.id : ''
+							}` }
 							ref={ mapRef }
+							{ ...styleLayerMapProps( styleBase ) }
 							onStyleData={ () => {
 								const { current: map } = mapRef;
 								if ( map ) {
@@ -68,6 +86,13 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 
 									if ( loadedMap.meta.disable_drag_rotate ) {
 										map.dragRotate?.disable();
+									}
+
+									if ( styleBase ) {
+										applyStyleLayerFiltering(
+											map,
+											styleBase.instance
+										);
 									}
 								}
 							} }

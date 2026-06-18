@@ -93,6 +93,48 @@ Re-exports from `react-map-gl/maplibre`:
 | `shared/styles.js` | `EMPTY_STYLE` | Empty MapLibre style |
 | `shared/url-normalization.js` | `normalizeOptionalUrl` | URL helper |
 
+## Editor↔Frontend Layer Rendering Parity
+
+The editor (`map-blocks/`) and frontend (`jeo-map/`) use **separate rendering code** but must produce visually consistent results. The key divergence point is `load_as_style` for `mapbox`-type layers.
+
+### `load_as_style` (Mapbox Style as Base)
+
+When a `mapbox` layer instance has `load_as_style: true`, the full Mapbox vector style replaces the map's base:
+
+| Context | Mechanism |
+|---------|-----------|
+| **Frontend** | `class-jeo-map.js::getStyleLayer()` returns the style URL as the map's initial `mapStyle`. `mapbox.js::addStyle()` calls `map.setStyle()`. `style_layers` filtering applied after load. |
+| **Editor** | `use-style-layer.js::findStyleLayer()` detects the style layer, passes the URL as `<Map mapStyle={...}>`. `map-preview-layer.js::renderLayer()` returns `null` for style layers. `applyStyleLayerFiltering()` applies `style_layers` filtering in `onStyleData`. |
+
+### Shared Utility: `use-style-layer.js`
+
+| Export | Purpose |
+|--------|---------|
+| `getMapboxStyleUrl(layer, instance)` | Builds the Mapbox Styles API URL (mirrors `mapbox.js::getStyleUrl()`) |
+| `findStyleLayer(loadedLayers, instances)` | Finds the first instance with `load_as_style`, returns `{ instance, url, transformRequest }` |
+| `styleLayerMapProps(styleBase)` | Returns `{ mapStyle, transformRequest? }` ready to spread on `<Map>` |
+| `applyStyleLayerFiltering(map, instance)` | Removes/hides sub-layers per `style_layers` config (mirrors `class-jeo-map.js` lines 208-231) |
+
+### Editors with `load_as_style` Support
+
+| Editor | File | Status |
+|--------|------|--------|
+| Minimap | `minimap-editor.js` | ✅ Supported |
+| Map block | `map-editor.js` | ✅ Supported |
+| Onetime map | `onetime-map-editor.js` | ✅ Supported |
+| Storymap | `storymap-editor.js` | ✅ Supported |
+
+### Token Handling
+
+The Mapbox token (`mapbox_key`) is localized identically in both contexts via the shared `mapgl` script. Per-layer `access_token` overrides are fully supported in both editor and frontend:
+
+| Context | `load_as_style: false` | `load_as_style: true` |
+|---------|------------------------|-----------------------|
+| **Frontend** | Inline `access_token` in raster URL (`mapbox.js:25`) | Inline in style URL (`mapbox.js:177`) + `checkCustomToken`/`transformRequestUrl` re-signs derived requests (`class-jeo-map.js:1823-1871`) |
+| **Editor** | Inline `access_token` in raster URL (`map-preview-layer.js:31`) | Inline in style URL + `createTokenAwareTransformRequest` re-signs derived requests (composed on top of runtime's `mapboxTransformRequest`/native `accessToken`) |
+
+The editor's token-aware transform (`use-style-layer.js::createTokenAwareTransformRequest()`) mirrors the frontend's `transformRequestUrl` logic. It matches the Mapbox username extracted from `style_id` and replaces `access_token` on any matching request, then delegates to the runtime's default transformRequest. Works for both MapLibre and Mapbox runtimes.
+
 ## Webpack Entry Points
 
 | Entry | File | `dependOn` |
