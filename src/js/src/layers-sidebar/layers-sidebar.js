@@ -2,7 +2,7 @@ import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import AttributionSettings from './attribution-settings';
 import LegendsEditor from '../posts-sidebar/legends-editor/legend-editor';
 import { select, withDispatch, withSelect } from '@wordpress/data';
-import { useCallback, useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Map } from '../lib/mapgl-react';
 import { MemoizedRenderLayer } from '../map-blocks/map-preview-layer';
