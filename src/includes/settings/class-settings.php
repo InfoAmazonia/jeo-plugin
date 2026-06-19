@@ -461,9 +461,9 @@ class Settings {
 					'nonce'        => wp_create_nonce( 'wp_rest' ),
 					'map_runtime'  => $this->get_option( 'map_runtime' ),
 					'map_defaults' => array(
-						'zoom' => $this->get_option( 'map_default_zoom' ),
-						'lat'  => $this->get_option( 'map_default_lat' ),
-						'lon'  => $this->get_option( 'map_default_lng' ),
+						'zoom' => floatval( $this->get_option( 'map_default_zoom' ) ),
+						'lat'  => floatval( $this->get_option( 'map_default_lat' ) ),
+						'lon'  => floatval( $this->get_option( 'map_default_lng' ) ),
 					),
 					'i18n'         => array(
 						'console_cleared'        => __( '[System] Console cleared.', 'jeowp' ),
