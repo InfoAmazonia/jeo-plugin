@@ -13,7 +13,7 @@ The AI Context Assistant is a Gutenberg sidebar plugin that suggests new paragra
 | `src/includes/ai/class-context-generation-output.php` | Structured output DTO: `paragraphs` (with inline HTML), `references`, `message`, `assistant_message` |
 | `src/includes/ai/class-retrieve-knowledge-tool.php` | NeuronAI tool — queries `jeo_knowledge` via `RAG_Agent::resolveRetrieval()` |
 | `src/includes/ai/class-get-post-content-tool.php` | NeuronAI tool — post content + `_related_point` meta for sub-agent |
-| `src/includes/ai/settings/tab-context.php` | Settings tab template — custom prompt textarea, default prompt reference, "Suggest initial prompt" and "Optimize prompt with AI" buttons |
+| `src/includes/ai/settings/tab-context.php` | Settings tab template — custom prompt textarea, default prompt reference, "Suggest initial prompt" button, and "AI Context Prompt Engineer Assistant" with a separate natural-language description box whose content is saved to localStorage |
 
 ### Frontend (JS)
 
@@ -117,17 +117,17 @@ Deletes all three meta keys for the post, resetting the conversation completely.
 
 Response: `{ success, message }`
 
-### `POST /jeo/v1/context/engineer-prompt` — Optimize a custom system prompt
+### `POST /jeo/v1/context/engineer-prompt` — Generate a custom system prompt
 
-Uses the configured AI provider to rewrite a user-provided custom system prompt while preserving the user's intent and enforcing the plugin's critical rules. Requires `manage_options`.
+Uses the configured AI provider to turn a natural-language description into a highly optimized system prompt while preserving the user's intent and enforcing the plugin's critical rules. Requires `manage_options`.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `prompt` | string | Yes | Custom prompt to optimize |
+| `prompt` | string | Yes | Natural-language description of the desired assistant behavior |
 
 Response: `{ success, prompt }` or `{ success: false, message }`
 
-This endpoint powers the **"Optimize prompt with AI"** button in the Context Assistant settings tab.
+This endpoint powers the **"Generate Custom Prompt"** button in the AI Context Prompt Engineer Assistant card on the Context Assistant settings tab.
 
 ## Agent Architecture
 
@@ -372,10 +372,14 @@ The Context Assistant settings are in **JEO → AI Configuration → Context Ass
 | Custom prompt | `ai_context_prompt` | textarea | empty | Custom system prompt. Empty = use built-in default |
 | Default prompt (read-only) | — | textarea (readonly) | Built-in | Shows the default prompt for reference |
 
-When `ai_use_context_custom_prompt` is unchecked, the tab shows the default prompt in a readonly textarea for reference. When checked, it shows an editable textarea for the custom prompt plus two helper buttons:
+When `ai_use_context_custom_prompt` is unchecked, the tab shows the default prompt in a readonly textarea for reference. When checked, it shows an editable textarea for the custom prompt plus a helper button:
 
 - **Suggest initial prompt** — copies the built-in default prompt into the custom textarea as a starting point.
-- **Optimize prompt with AI** — calls `POST /jeo/v1/context/engineer-prompt` to rewrite the custom prompt while injecting the critical rules and preserving the `## User Preferences` / `## Additional Context` injection points.
+
+Below the prompt editor, an **AI Context Prompt Engineer Assistant** card mirrors the Provider tab layout:
+
+- A separate natural-language description textarea where editors describe the desired assistant behavior. The description is automatically saved to `localStorage` (`jeo_context_prompt_description`) so it survives page reloads.
+- A **Generate Custom Prompt** button that calls `POST /jeo/v1/context/engineer-prompt` and writes the generated system prompt into the custom prompt textarea above, automatically enabling the custom prompt toggle so the result is visible.
 
 ## Conventions
 

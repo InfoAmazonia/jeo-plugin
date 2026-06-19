@@ -33,6 +33,9 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 				</div>
 
 				<div id="ai_context_prompt_wrapper" style="display: <?php echo $use_custom ? 'block' : 'none'; ?>;">
+					<label for="ai_context_prompt" style="display: block; margin-bottom: 4px; font-weight: 600;">
+						<?php esc_html_e( 'Custom System Prompt', 'jeowp' ); ?>
+					</label>
 					<textarea
 						name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_context_prompt' ) ); ?>"
 						id="ai_context_prompt"
@@ -41,26 +44,8 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 						style="font-family: monospace; width: 100%;"
 					><?php echo esc_textarea( \jeo_settings()->get_option( 'ai_context_prompt' ) ); ?></textarea>
 					<p class="description">
-						<?php esc_html_e( 'Custom system prompt used by the AI Context Assistant. Leave empty to use the built-in default.', 'jeowp' ); ?>
+						<?php esc_html_e( 'Custom system prompt used by the AI Context Assistant. Use the assistant below to generate or refine it.', 'jeowp' ); ?>
 					</p>
-					<div style="margin-top: 10px;">
-						<button
-							type="button"
-							id="ai_context_suggest_prompt"
-							class="button"
-							style="margin-right: 8px;"
-						>
-							<?php esc_html_e( 'Suggest initial prompt', 'jeowp' ); ?>
-						</button>
-						<button
-							type="button"
-							id="ai_context_engineer_prompt"
-							class="button"
-						>
-							<?php esc_html_e( 'Optimize prompt with AI', 'jeowp' ); ?>
-						</button>
-						<span id="ai_context_engineer_status" class="description" style="margin-left: 10px; display: none;"></span>
-					</div>
 				</div>
 
 				<div id="ai_context_default_prompt_wrapper" style="display: <?php echo $use_custom ? 'none' : 'block'; ?>;">
@@ -83,6 +68,63 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 	</tbody>
 </table>
 
+<div id="jeo-context-prompt-generator-wrapper" style="margin-top: 30px; background: #fff; padding: 25px; border: 1px solid #ccd0d4; box-shadow: 0 1px 1px rgba(0,0,0,.04); max-width: 900px;">
+	<h3 style="margin-top: 0;">✨ <?php esc_html_e( 'AI Context Prompt Engineer Assistant', 'jeowp' ); ?></h3>
+	<p style="font-size: 14px; color: #50575e;">
+		<?php esc_html_e( 'Describe how you want the Context Assistant to behave (e.g., "Always link place names to the original article" or "Ground every claim with a verbatim quote"). The active LLM will generate a highly optimized system prompt for you, strictly adhering to JEO formatting rules.', 'jeowp' ); ?>
+	</p>
+
+	<style>
+		#ai_context_prompt_description {
+			width: 100%;
+			min-height: 160px;
+			padding: 14px;
+			font-size: 14px;
+			line-height: 1.6;
+			border: 1px solid #c5c5c5;
+			border-radius: 6px;
+			resize: vertical;
+			transition: border-color 0.2s, box-shadow 0.2s;
+		}
+		#ai_context_prompt_description:focus {
+			border-color: #2271b1;
+			box-shadow: 0 0 0 1px #2271b1;
+			outline: none;
+		}
+		.jeo-context-ai-toolbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 8px;
+			gap: 10px;
+			flex-wrap: wrap;
+		}
+		.jeo-context-ai-actions {
+			display: flex;
+			align-items: center;
+			gap: 15px;
+			margin-top: 16px;
+		}
+	</style>
+
+	<div style="position: relative;">
+		<textarea id="ai_context_prompt_description" placeholder="<?php esc_attr_e( 'Ex: I want the assistant to always include inline contextual links and cite the exact sentence from the article that supports each location.', 'jeowp' ); ?>"></textarea>
+		<div class="jeo-context-ai-toolbar">
+			<span style="font-size: 12px; color: #646970;"><?php esc_html_e( 'Your description is saved automatically in this browser.', 'jeowp' ); ?></span>
+		</div>
+	</div>
+
+	<div class="jeo-context-ai-actions">
+		<button type="button" class="button button-primary" id="ai_context_engineer_prompt" style="min-width: 160px; justify-content: center;">
+			<?php esc_html_e( 'Generate Custom Prompt', 'jeowp' ); ?>
+		</button>
+		<button type="button" class="button button-secondary" id="ai_context_suggest_prompt">
+			<?php esc_html_e( 'Suggest initial prompt', 'jeowp' ); ?>
+		</button>
+		<span id="ai_context_engineer_status" class="description" style="display: none;"></span>
+	</div>
+</div>
+
 <script>
 	document.addEventListener( 'DOMContentLoaded', function() {
 		var toggle = document.getElementById( 'ai_use_context_custom_prompt' );
@@ -104,8 +146,30 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 		var suggestButton = document.getElementById( 'ai_context_suggest_prompt' );
 		var engineerButton = document.getElementById( 'ai_context_engineer_prompt' );
 		var promptTextarea = document.getElementById( 'ai_context_prompt' );
+		var descriptionTextarea = document.getElementById( 'ai_context_prompt_description' );
 		var defaultPromptTextarea = document.getElementById( 'ai_context_default_prompt' );
 		var statusSpan = document.getElementById( 'ai_context_engineer_status' );
+		var storageKey = 'jeo_context_prompt_description';
+
+		// Restore saved natural-language description.
+		if ( descriptionTextarea ) {
+			try {
+				var saved = window.localStorage.getItem( storageKey );
+				if ( saved ) {
+					descriptionTextarea.value = saved;
+				}
+			} catch ( e ) {
+				// localStorage may be unavailable in private mode.
+			}
+
+			descriptionTextarea.addEventListener( 'input', function() {
+				try {
+					window.localStorage.setItem( storageKey, descriptionTextarea.value );
+				} catch ( e ) {
+					// Ignore storage errors.
+				}
+			} );
+		}
 
 		if ( suggestButton && promptTextarea && defaultPromptTextarea && toggle && customWrapper && defaultWrapper ) {
 			suggestButton.addEventListener( 'click', function() {
@@ -119,36 +183,43 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 			} );
 		}
 
-		if ( engineerButton && promptTextarea && statusSpan ) {
+		if ( engineerButton && promptTextarea && descriptionTextarea && statusSpan ) {
 			engineerButton.addEventListener( 'click', function() {
-				var prompt = promptTextarea.value.trim();
-				if ( ! prompt ) {
-					statusSpan.textContent = '<?php echo esc_js( __( 'Please write a custom prompt first.', 'jeowp' ) ); ?>';
+				var description = descriptionTextarea.value.trim();
+				if ( ! description ) {
+					statusSpan.textContent = '<?php echo esc_js( __( 'Please describe how you want the assistant to behave first.', 'jeowp' ) ); ?>';
 					statusSpan.style.display = 'inline';
 					statusSpan.style.color = '#d63638';
 					return;
 				}
 
 				engineerButton.disabled = true;
-				statusSpan.textContent = '<?php echo esc_js( __( 'Optimizing...', 'jeowp' ) ); ?>';
+				statusSpan.textContent = '<?php echo esc_js( __( 'Generating...', 'jeowp' ) ); ?>';
 				statusSpan.style.display = 'inline';
 				statusSpan.style.color = '#2271b1';
+
+				// Ensure the custom prompt section is visible so the user sees the result.
+				if ( toggle && customWrapper && defaultWrapper ) {
+					toggle.checked = true;
+					customWrapper.style.display = 'block';
+					defaultWrapper.style.display = 'none';
+				}
 
 				wp.apiFetch( {
 					path: '/jeo/v1/context/engineer-prompt',
 					method: 'POST',
-					data: { prompt: prompt }
+					data: { prompt: description }
 				} ).then( function( response ) {
 					if ( response.success && response.prompt ) {
 						promptTextarea.value = response.prompt;
-						statusSpan.textContent = '<?php echo esc_js( __( 'Prompt optimized. Remember to save the settings.', 'jeowp' ) ); ?>';
+						statusSpan.textContent = '<?php echo esc_js( __( 'Custom prompt generated. Remember to save the settings.', 'jeowp' ) ); ?>';
 						statusSpan.style.color = '#008a20';
 					} else {
-						statusSpan.textContent = response.message || '<?php echo esc_js( __( 'Optimization failed.', 'jeowp' ) ); ?>';
+						statusSpan.textContent = response.message || '<?php echo esc_js( __( 'Generation failed.', 'jeowp' ) ); ?>';
 						statusSpan.style.color = '#d63638';
 					}
 				} ).catch( function( error ) {
-					statusSpan.textContent = error.message || '<?php echo esc_js( __( 'Optimization failed.', 'jeowp' ) ); ?>';
+					statusSpan.textContent = error.message || '<?php echo esc_js( __( 'Generation failed.', 'jeowp' ) ); ?>';
 					statusSpan.style.color = '#d63638';
 				} ).finally( function() {
 					engineerButton.disabled = false;
