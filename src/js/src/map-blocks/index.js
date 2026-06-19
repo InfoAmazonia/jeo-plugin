@@ -590,7 +590,11 @@ registerBlockType( 'jeo/layer-editor', {
 	supports: {
 		align: true,
 	},
-	edit: ( props ) => <LayerEditorPreview { ...props } />,
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<LayerEditorPreview { ...props } />
+		</AsyncModeProvider>
+	),
 	save: () => null,
 } );
 
@@ -603,6 +607,10 @@ registerBlockType( 'jeo/map-editor', {
 	supports: {
 		align: true,
 	},
-	edit: ( props ) => <MapEditorPreview { ...props } />,
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<MapEditorPreview { ...props } />
+		</AsyncModeProvider>
+	),
 	save: () => null,
 } );

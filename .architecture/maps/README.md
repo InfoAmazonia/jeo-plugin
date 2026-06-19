@@ -61,11 +61,18 @@ Single map content (`the_content` filter) injects:
 ## Sidebar Editor (Gutenberg)
 
 The `jeo-maps-sidebar` provides:
-- Live map preview (MapLibre)
-- Zoom controls (initial, min, max)
 - Layer selector with drag-and-drop
 - Related posts selector
 - Copyable embed URL
+- Map settings panel (center, zoom, pan limits, etc.)
+
+The live map preview with zoom controls (initial, min, max) is handled by the `jeo/map-editor` block (`map-blocks/map-editor-preview.js`), which runs inside the Gutenberg content area (iframe in Block API v3). This block:
+- Renders the MapLibre/Mapbox preview with all selected layers
+- Provides zoom mode buttons (initial/min/max)
+- Uses local `viewState` for responsive dragging (no `editPost` per pixel)
+- Persists center coordinates on `onMoveEnd` and zoom on `onZoomEnd` only
+- Updates the map in-place (no `key`-based remount)
+- Bridges pan-limits to the sidebar via `window.parent.__jeoSetPanLimitsFromMap`
 
 ## Data Flow
 
