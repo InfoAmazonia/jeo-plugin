@@ -8,6 +8,11 @@ import { __, _x } from '@wordpress/i18n';
 import { Map } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
 import { MemoizedRenderLayer } from './map-preview-layer';
+import {
+	applyStyleLayerFiltering,
+	findStyleLayer,
+	styleLayerMapProps,
+} from './use-style-layer';
 import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
@@ -94,6 +99,11 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
 	} );
+
+	const styleBase = useMemo(
+		() => findStyleLayer( loadedLayers, allLayers ),
+		[ loadedLayers, allLayers ]
+	);
 
 	const generate = useCallback( () => {
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
@@ -771,14 +781,33 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			) }
 
 			<div className="jeo-preview-area">
+				{ styleBase && (
+					<div className="jeo-style-preview-badge">
+						{ __( 'Vector style preview', 'jeowp' ) }
+					</div>
+				) }
 				<Map
+					key={
+						styleBase
+							? `style-${ styleBase.instance.id }`
+							: 'default'
+					}
 					ref={ mapRef }
+					{ ...styleLayerMapProps( styleBase ) }
 					style={ { height: '50vh' } }
 					latitude={ normalizedAttributes.center_lat }
 					longitude={ normalizedAttributes.center_lon }
 					zoom={ currentZoom || mapDefaults.zoom }
 					onMove={ debouncedOnMove }
 					onZoom={ debouncedOnZoom }
+					onStyleData={ () => {
+						if ( styleBase ) {
+							applyStyleLayerFiltering(
+								mapRef.current,
+								styleBase.instance
+							);
+						}
+					} }
 				>
 					{ loadedLayers.length > 0 &&
 						allLayers.map( ( layer ) => {

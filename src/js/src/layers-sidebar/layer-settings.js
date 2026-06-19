@@ -11,7 +11,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import InteractionsSettings from './interactions-settings';
 import { isEmpty, isEqual } from 'lodash-es';
-import { useDebounce } from 'use-debounce';
+import { useDebounce, useDebouncedCallback } from 'use-debounce';
 import SchemaForm, { mergeSchemaFormData } from '../shared/schema-form';
 import { mergeLayerTypeOptions } from '../map-blocks/layer-type-options';
 import {
@@ -108,6 +108,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const prevLayerType = usePrevious( formData.type );
 	const serializedPostMeta = JSON.stringify( normalizeLayerFormData( postMeta ) );
 	const [ debouncedFormData ] = useDebounce( formData, 1500 );
+	const debouncedSetPostMeta = useDebouncedCallback( setPostMeta, 500 );
 
 	const schema = useMemo(
 		() => ( {
@@ -224,7 +225,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 					window.layerFormData = nextFormData;
 					if ( ! isEqual( nextFormData, formData ) ) {
 						setFormData( nextFormData );
-						setPostMeta( nextFormData );
+						debouncedSetPostMeta( nextFormData );
 					}
 				} }
 			>

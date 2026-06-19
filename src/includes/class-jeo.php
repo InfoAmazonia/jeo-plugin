@@ -901,8 +901,8 @@ class Jeo {
 				'mapbox_key'            => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' ) ),
 				'map_defaults'          => array(
 					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
-					'lat'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lon'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
+					'lat'                 => floatval( \jeo_settings()->get_option( 'map_default_lat' ) ),
+					'lon'                 => floatval( \jeo_settings()->get_option( 'map_default_lng' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
 					'enable_fullscreen'   => true,

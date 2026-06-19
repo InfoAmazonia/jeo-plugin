@@ -15,6 +15,10 @@ export function renderLayer( { layer, instance } ) {
 		return null;
 	}
 
+	if ( instance.load_as_style ) {
+		return null;
+	}
+
 	const options = layer.layer_type_options;
 	const layerId = `layer_${ instance.id }`;
 	const sourceId = `source_${ instance.id }`;

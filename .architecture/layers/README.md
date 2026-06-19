@@ -87,12 +87,18 @@ Located in `posts-sidebar/legends-editor/legend-editor.js`, with type-specific e
 ## Editing Sidebar
 
 The `jeo-layers-sidebar` provides:
-- Live map preview with the layer
-- Dynamic form via JSON Schema (`@rjsf/core`)
+- Dynamic form via JSON Schema (`@rjsf/core`) with debounced dispatch (500ms)
 - Attribution settings
 - Legend settings
 - Interaction settings (popup on click/hover)
-- Post save lock until form is complete
+
+The live map preview and post save lock / notices are handled by the `jeo/layer-editor` block (`map-blocks/layer-editor-preview.js`), which runs inside the Gutenberg content area (iframe in Block API v3). This block:
+- Renders the MapLibre/Mapbox preview with the current layer options
+- Manages `renderControl` status: `incomplete_form`, `ready`, `loaded`, `request_error`
+- Dispatches notices and locks/unlocks post saving based on layer load status
+- Runs in async mode (`AsyncModeProvider`) to batch re-renders
+- Uses `loadedRef` guard on `onSourceData` to avoid redundant re-renders during tile loading
+- Updates the map in-place (no `key`-based remount) when layer options change
 
 ## Layer Usage Modes
 
