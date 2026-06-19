@@ -48,8 +48,12 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		imageAsLink,
 	} = attributes;
 
-	const [ previewLat, setPreviewLat ] = useState( DEFAULT_LAT );
-	const [ previewLng, setPreviewLng ] = useState( DEFAULT_LNG );
+	const [ previewLat, setPreviewLat ] = useState(
+		attributes.lat ? Number.parseFloat( attributes.lat ) : DEFAULT_LAT
+	);
+	const [ previewLng, setPreviewLng ] = useState(
+		attributes.lng ? Number.parseFloat( attributes.lng ) : DEFAULT_LNG
+	);
 
 	const hasNewspack = useSelect( ( select ) => {
 		return !! select( 'core/blocks' ).getBlockType( 'newspack-blocks/homepage-articles' );
@@ -144,7 +148,11 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						min={ -90 }
 						max={ 90 }
 						value={ previewLat }
-						onChange={ ( val ) => setPreviewLat( Number.parseFloat( val ) || 0 ) }
+						onChange={ ( val ) => {
+							const lat = Number.parseFloat( val ) || 0;
+							setPreviewLat( lat );
+							setAttributes( { lat } );
+						} }
 					/>
 					<TextControl
 						label={ __( 'Longitude', 'jeowp' ) }
@@ -153,7 +161,18 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						min={ -180 }
 						max={ 180 }
 						value={ previewLng }
-						onChange={ ( val ) => setPreviewLng( Number.parseFloat( val ) || 0 ) }
+						onChange={ ( val ) => {
+							const lng = Number.parseFloat( val ) || 0;
+							setPreviewLng( lng );
+							setAttributes( { lng } );
+						} }
+					/>
+					<RangeControl
+						label={ __( 'Maximum radius (km)', 'jeowp' ) }
+						value={ attributes.radiusKm || 100 }
+						min={ 1 }
+						max={ 500 }
+						onChange={ ( val ) => setAttributes( { radiusKm: val } ) }
 					/>
 				</PanelBody>
 

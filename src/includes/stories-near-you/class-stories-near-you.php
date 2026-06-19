@@ -219,6 +219,7 @@ class Stories_Near_You {
 				'showAuthor'         => true,
 				'lat'                => 0,
 				'lng'                => 0,
+				'radiusKm'           => 100,
 				'postLayout'         => 'grid',
 				'mediaPosition'      => 'top',
 				'imageShape'         => 'landscape',
@@ -283,6 +284,7 @@ class Stories_Near_You {
 		$atts['imageScale'] = max( 1, min( 4, (int) $atts['imageScale'] ) );
 		$atts['colGap']     = max( 1, min( 3, (int) $atts['colGap'] ) );
 		$atts['minHeight']  = max( 0, min( 100, (int) $atts['minHeight'] ) );
+		$atts['radiusKm']   = max( 1, min( 2000, (int) $atts['radiusKm'] ) );
 
 		if ( empty( $atts['categories'] ) && ! empty( $atts['category'] ) ) {
 			$atts['categories'] = (string) (int) $atts['category'];
@@ -336,17 +338,17 @@ class Stories_Near_You {
 		$wrapper_attrs = get_block_wrapper_attributes( array( 'class' => $wrapper_classes ) );
 
 		if ( $use_preview_coords ) {
-			$lat          = (float) $atts['lat'];
-			$lng          = (float) $atts['lng'];
-			$filters      = $this->build_filters( $atts );
-			$post_ids     = $this->get_nearby_posts( $lat, $lng, $atts['postsPerPage'], $rendered_ids, $filters );
-			$rendered_ids = array_merge( $rendered_ids, $post_ids );
+			$lat       = (float) $atts['lat'];
+			$lng       = (float) $atts['lng'];
+			$radius_km = (int) $atts['radiusKm'];
+			$filters   = $this->build_filters( $atts );
+			$post_ids  = $this->get_nearby_posts( $lat, $lng, $atts['postsPerPage'], $rendered_ids, $filters, $radius_km );
 
 			ob_start();
 			?>
 			<div <?php echo $wrapper_attrs; // phpcs:ignore WordPress.Security.EscapeOutput ?>>
 				<?php if ( empty( $post_ids ) ) : ?>
-					<?php echo $this->render_empty_state(); // phpcs:ignore WordPress.Security.EscapeOutput ?>
+					<?php echo $this->render_empty_state( $radius_km ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<?php else : ?>
 					<?php echo $this->render_posts( $post_ids, $atts ); // phpcs:ignore WordPress.Security.EscapeOutput ?>
 				<?php endif; ?>
@@ -546,6 +548,12 @@ class Stories_Near_You {
 						'minimum' => 0,
 						'maximum' => 100,
 					),
+					'radiusKm'           => array(
+						'type'    => 'integer',
+						'default' => 100,
+						'minimum' => 1,
+						'maximum' => 2000,
+					),
 					'categories'         => array(
 						'type'    => 'string',
 						'default' => '',
@@ -672,8 +680,17 @@ class Stories_Near_You {
 
 		if ( null === $lat || null === $lng ) {
 			$location = $this->resolve_server_location();
-			$lat      = $location['lat'];
-			$lng      = $location['lng'];
+			if ( null === $location ) {
+				return new \WP_REST_Response(
+					array(
+						'html'    => '<div class="jeo-stories-near-you__empty"><p>' . esc_html__( 'Please enable location access or set a default location in JEO Settings.', 'jeowp' ) . '</p></div>',
+						'postIds' => array(),
+					),
+					200
+				);
+			}
+			$lat = $location['lat'];
+			$lng = $location['lng'];
 		}
 
 		$atts = array(
@@ -695,6 +712,7 @@ class Stories_Near_You {
 			'typeScale'          => (int) $request->get_param( 'typeScale' ),
 			'imageScale'         => (int) $request->get_param( 'imageScale' ),
 			'minHeight'          => (int) $request->get_param( 'minHeight' ),
+			'radiusKm'           => (int) $request->get_param( 'radiusKm' ),
 			'categories'         => $request->get_param( 'categories' ),
 			'tags'               => $request->get_param( 'tags' ),
 			'categoryExclusions' => $request->get_param( 'categoryExclusions' ),
@@ -708,12 +726,12 @@ class Stories_Near_You {
 		$atts        = $this->sanitize_atts( $atts );
 		$exclude_ids = $this->parse_id_list( $request->get_param( 'excludeIds' ) );
 		$filters     = $this->build_filters( $atts );
-		$post_ids    = $this->get_nearby_posts( $lat, $lng, $atts['postsPerPage'], $exclude_ids, $filters );
+		$post_ids    = $this->get_nearby_posts( $lat, $lng, $atts['postsPerPage'], $exclude_ids, $filters, $atts['radiusKm'] );
 
 		if ( empty( $post_ids ) ) {
 			return new \WP_REST_Response(
 				array(
-					'html'    => $this->render_empty_state(),
+					'html'    => $this->render_empty_state( $atts['radiusKm'] ),
 					'postIds' => array(),
 				),
 				200
@@ -740,9 +758,13 @@ class Stories_Near_You {
 		$lat = \jeo_settings()->get_option( 'map_default_lat' );
 		$lng = \jeo_settings()->get_option( 'map_default_lng' );
 
+		if ( empty( $lat ) || empty( $lng ) ) {
+			return null;
+		}
+
 		return array(
-			'lat' => $lat ? (float) $lat : -23.549985,
-			'lng' => $lng ? (float) $lng : -46.633519,
+			'lat' => (float) $lat,
+			'lng' => (float) $lng,
 		);
 	}
 
@@ -754,14 +776,16 @@ class Stories_Near_You {
 	 * @param int   $limit       Maximum number of posts to return.
 	 * @param int[] $exclude_ids Post IDs to exclude from results.
 	 * @param array $filters     Taxonomy/post type filters.
+	 * @param int   $radius_km   Maximum radius in kilometers.
 	 * @return int[] Post IDs ordered by ascending distance, then descending date.
 	 */
-	protected function get_nearby_posts( $lat, $lng, $limit, $exclude_ids = array(), $filters = array() ) {
+	protected function get_nearby_posts( $lat, $lng, $limit, $exclude_ids = array(), $filters = array(), $radius_km = 100 ) {
 		global $wpdb;
 
-		$limit = max( 1, min( 36, (int) $limit ) );
-		$lat   = (float) $lat;
-		$lng   = (float) $lng;
+		$limit     = max( 1, min( 36, (int) $limit ) );
+		$lat       = (float) $lat;
+		$lng       = (float) $lng;
+		$radius_km = max( 1, min( 2000, (int) $radius_km ) );
 
 		$coord_precision = absint( \jeo_settings()->get_option( 'geolocation_precision', 2 ) );
 		$coord_precision = max( 1, min( 5, $coord_precision ) ) + 1;
@@ -867,7 +891,8 @@ class Stories_Near_You {
 				AND p.post_type IN ({$types_placeholders})
 				{$taxonomy_where}
 				{$wpml_where}
-				{$exclude_clause}";
+				{$exclude_clause}
+			HAVING distance <= %d";
 
 		$secondary_template = str_replace(
 			array( '_geocode_lon_p', '_geocode_lat_p' ),
@@ -876,7 +901,7 @@ class Stories_Near_You {
 		);
 
 		$union_sql    = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY distance ASC, post_date DESC LIMIT %d';
-		$all_params   = array_merge( array( $lng, $lat ), $types, array( $lng, $lat ), $types, array( $limit ) );
+		$all_params   = array_merge( array( $lng, $lat ), $types, array( $radius_km * 1000 ), array( $lng, $lat ), $types, array( $radius_km * 1000, $limit ) );
 		$prepared_sql = $wpdb->prepare( $union_sql, $all_params ); // phpcs:ignore WordPress.DB.PreparedSQL
 		$results      = $wpdb->get_results( $prepared_sql ); // phpcs:ignore WordPress.DB.PreparedSQL
 
@@ -914,13 +939,24 @@ class Stories_Near_You {
 	/**
 	 * Render the empty state when no posts are found.
 	 *
+	 * @param int $radius_km Maximum radius in kilometers.
+	 *
 	 * @return string
 	 */
-	protected function render_empty_state() {
+	protected function render_empty_state( $radius_km = 0 ) {
 		ob_start();
 		?>
 		<div class="jeo-stories-near-you__empty">
-			<p><?php esc_html_e( 'No stories found near you.', 'jeowp' ); ?></p>
+			<p>
+				<?php
+				if ( $radius_km > 0 ) {
+					/* translators: %d: radius in kilometers */
+					echo esc_html( sprintf( /* translators: %d: radius in kilometers */ __( 'No stories found within %d km.', 'jeowp' ), $radius_km ) );
+				} else {
+					esc_html_e( 'No stories found near you.', 'jeowp' );
+				}
+				?>
+			</p>
 		</div>
 		<?php
 		return ob_get_clean();

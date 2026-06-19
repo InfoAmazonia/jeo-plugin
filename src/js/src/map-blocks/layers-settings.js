@@ -13,7 +13,7 @@ import { usePaginatedRecords } from '../shared/rest-records';
 
 import './layers-settings.css';
 
-const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
+const setLayer = ( id ) => ( { id, use: 'fixed', default: true, show_legend: true } );
 
 const anySwapDefault = ( settings ) => {
 	return settings.some( ( s ) => s.use === 'swappable' && s.default );
@@ -497,6 +497,10 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 												{ ! inUse && (
 													<p
 														onClick={ () => {
+															const existingIds = new Set( attributes.layers.map( ( l ) => l.id ) );
+															if ( existingIds.has( layer.id ) ) {
+																return;
+															}
 															setAttributes( {
 																layers: [ ...attributes.layers, setLayer( layer.id ) ],
 															} );

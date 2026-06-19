@@ -107,11 +107,12 @@ sequenceDiagram
     end
 ```
 
-## Location Resolution (3-tier fallback)
+## Location Resolution
 
-1. **Browser Geolocation API** → lat/lng sent to REST endpoint (rounded to `geolocation_precision` decimal places)
-2. _(future)_ **IP Geolocation** → resolved server-side from `$_SERVER['REMOTE_ADDR']`
+1. **Manual block coordinates** → `lat`/`lng` attributes (persisted by the editor, used directly by the frontend)
+2. **Browser Geolocation API** → lat/lng sent to REST endpoint (rounded to `geolocation_precision` decimal places)
 3. **Map center defaults** → from JEO settings (`map_default_lat`, `map_default_lng`)
+4. **No fallback** → if no source above is available, the block shows a message asking the user to enable location or the editor to set a default location
 
 ### Geolocation Timeout (`GEOLOCATION_OVERALL_TIMEOUT`)
 
@@ -145,6 +146,9 @@ Also controls the `DECIMAL(10,N)` cast precision for post coordinates in `get_ne
 | `typeScale` | number | 4 | Typography scale 1–10 (maps to em values) |
 | `imageScale` | number | 3 | Image width in horizontal layouts 1–4 |
 | `colGap` | number | 3 | Column gap 1–3 (8px / 16px / 32px) |
+| `lat` | number | 0 | Preview/reference latitude (persisted; used by frontend when browser geolocation is unavailable) |
+| `lng` | number | 0 | Preview/reference longitude (persisted; used by frontend when browser geolocation is unavailable) |
+| `radiusKm` | number | `100` | Maximum search radius in kilometers (1–2000) |
 | `minHeight` | number | 0 | Min height in vh for featured layout (0–100) |
 | `showThumbnail` | boolean | true | Toggle featured image |
 | `showCategory` | boolean | true | Toggle category badge |
@@ -204,13 +208,13 @@ Sequential fetching means N blocks take ~N×200ms instead of ~200ms total. Accep
 
 `GET /jeo/v1/stories-near-you`
 
-Params: `lat`, `lng`, `postsPerPage`, `postsPerRow`, `postLayout`, `mediaPosition`, `imageShape`, `showThumbnail`, `showCategory`, `showDate`, `showExcerpt`, `showAuthor`, `showAvatar`, `showReadMore`, `readMoreLabel`, `excerptLength`, `colGap`, `typeScale`, `imageScale`, `minHeight`, `excludeIds`, `categories`, `tags`, `categoryExclusions`, `tagExclusions`, `customTaxonomies`, `postType`
+Params: `lat`, `lng`, `radiusKm`, `postsPerPage`, `postsPerRow`, `postLayout`, `mediaPosition`, `imageShape`, `showThumbnail`, `showCategory`, `showDate`, `showExcerpt`, `showAuthor`, `showAvatar`, `showReadMore`, `readMoreLabel`, `excerptLength`, `colGap`, `typeScale`, `imageScale`, `minHeight`, `excludeIds`, `categories`, `tags`, `categoryExclusions`, `tagExclusions`, `customTaxonomies`, `postType`
 
 Returns: `{ html: "..." }` — rendered HTML using the active context's classes.
 
 ## SQL Query
 
-Uses `ST_Distance_Sphere()` to sort by proximity. UNION of primary (`_geocode_lat_p`/`_geocode_lon_p`) and secondary (`_geocode_lat_s`/`_geocode_lon_s`) coordinate indexes. Dynamic taxonomy JOINs for category/tag/custom taxonomy filtering. Exclusion sub-queries for category/tag exclusions. Deduplicates post IDs after UNION. Supports `excludeIds` via `NOT IN` clause for cross-block non-repetition.
+Uses `ST_Distance_Sphere()` to sort by proximity. UNION of primary (`_geocode_lat_p`/`_geocode_lon_p`) and secondary (`_geocode_lat_s`/`_geocode_lon_s`) coordinate indexes. Each SELECT includes a `HAVING distance <= radius_km * 1000` clause to enforce the configured maximum radius. Dynamic taxonomy JOINs for category/tag/custom taxonomy filtering. Exclusion sub-queries for category/tag exclusions. Deduplicates post IDs after UNION. Supports `excludeIds` via `NOT IN` clause for cross-block non-repetition.
 
 ## Webpack Entry
 
@@ -299,7 +303,7 @@ Skeleton uses core `wp-block-latest-posts__list is-grid columns-N` classes so th
 
 The editor (`stories-near-you-editor.js`) provides these InspectorControls panels:
 
-1. **Location Preview** — Lat/Lng for ServerSideRender preview
+1. **Location Preview** — Lat/Lng for ServerSideRender preview (now persisted as `lat`/`lng` attributes and used by the frontend as the primary location source), plus maximum radius (`radiusKm`)
 2. **Post Card** — Layout (`postLayout`), Media position (`mediaPosition`), Image shape, Columns
 3. **Query Settings** — Posts per page, Post type (only shown if >1 geo-enabled types)
 4. **Filters** — Categories/Tags (multi-select), Category/Tag exclusions

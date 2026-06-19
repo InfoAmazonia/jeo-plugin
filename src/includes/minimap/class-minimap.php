@@ -131,7 +131,8 @@ class Minimap {
 		$post_id         = (int) $request->get_param( 'post_id' );
 		$conversation_id = sanitize_text_field( $request->get_param( 'conversation_id' ) );
 		$raw_top_k       = $request->get_param( 'top_k' );
-		$top_k           = $raw_top_k ? (int) $raw_top_k : 5;
+		$top_k           = $raw_top_k ? (int) $raw_top_k : \jeo_settings()->get_option( 'ai_rag_topk', 10 );
+		$top_k           = max( 3, min( 20, $top_k ) );
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
@@ -149,6 +150,8 @@ class Minimap {
 		$layers      = array();
 		$rag_message = '';
 
+		$removed_ids = array();
+
 		try {
 			$results = RAG_Worker::find_matching_layers( $search_text, $top_k );
 			foreach ( $results as $result ) {
@@ -160,14 +163,24 @@ class Minimap {
 						'default'     => true,
 						'show_legend' => true,
 					);
+				} elseif ( $layer_id > 0 ) {
+					$removed_ids[] = $layer_id;
 				}
 			}
 		} catch ( \Exception $e ) {
 			$rag_message = $e->getMessage();
 		}
 
+		$removed_ids = array_values( array_unique( $removed_ids ) );
+
 		if ( empty( $layers ) ) {
 			$rag_message = $rag_message ? $rag_message : __( 'No matching layers found. Add layers manually or run the RAG indexer in JEO Settings.', 'jeowp' );
+		}
+
+		if ( ! empty( $removed_ids ) ) {
+			/* translators: %s: comma-separated layer IDs */
+			$notice      = sprintf( __( 'Some suggested layers could not be loaded and were removed (IDs: %s).', 'jeowp' ), implode( ', ', $removed_ids ) );
+			$rag_message = $rag_message ? $rag_message . "\n" . $notice : $notice;
 		}
 
 		$base_variant = $this->determine_base_variant( $layers );
@@ -187,6 +200,10 @@ class Minimap {
 			'pins'         => $pins,
 			'message'      => $rag_message,
 		);
+
+		if ( ! empty( $removed_ids ) ) {
+			$response_data['removed_layers'] = $removed_ids;
+		}
 
 		if ( ! empty( $conversation_id ) ) {
 			$this->persist_initial_context( $post_id, $conversation_id, $response_data );
@@ -404,7 +421,18 @@ class Minimap {
 			$result->pins = $this->get_pins( $post_id );
 		}
 
-		$result->layers = $this->validate_layers( $result->layers );
+		$validation_report = $this->validate_layers_report( $result->layers );
+		$result->layers    = $validation_report['valid'];
+		if ( ! empty( $validation_report['removed'] ) ) {
+			$result->removed_layers = $validation_report['removed'];
+			/* translators: %s: comma-separated layer IDs */
+			$notice = sprintf( __( 'Some suggested layers could not be loaded and were removed (IDs: %s).', 'jeowp' ), implode( ', ', $validation_report['removed'] ) );
+			if ( ! empty( $result->message ) ) {
+				$result->message .= "\n" . $notice;
+			} else {
+				$result->message = $notice;
+			}
+		}
 
 		if ( ! empty( $result->base_layer ) && ! $this->is_valid_layer( $result->base_layer['id'] ?? 0 ) ) {
 			$result->base_layer = null;
@@ -632,14 +660,32 @@ class Minimap {
 	 * @return array Valid layer definitions only.
 	 */
 	private function validate_layers( array $layers ): array {
-		$valid = array();
+		return $this->validate_layers_report( $layers )['valid'];
+	}
+
+	/**
+	 * Validate layer definitions and report which IDs were removed.
+	 *
+	 * @param array $layers Layer definitions from agent output.
+	 * @return array { valid: array, removed: int[] }
+	 */
+	private function validate_layers_report( array $layers ): array {
+		$valid   = array();
+		$removed = array();
+
 		foreach ( $layers as $layer_def ) {
 			$layer_id = (int) ( $layer_def['id'] ?? 0 );
 			if ( $this->is_valid_layer( $layer_id ) ) {
 				$valid[] = $layer_def;
+			} elseif ( $layer_id > 0 ) {
+				$removed[] = $layer_id;
 			}
 		}
-		return $valid;
+
+		return array(
+			'valid'   => $valid,
+			'removed' => array_values( array_unique( $removed ) ),
+		);
 	}
 
 	/**

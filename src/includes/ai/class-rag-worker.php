@@ -461,17 +461,15 @@ class RAG_Worker {
 
 		\jeo_ai_logger()->add_embedding_tokens( 'suggest_layers', strlen( $text ) );
 
-		$results = array();
-		$count   = 0;
+		$by_id = array();
+
 		foreach ( $retrieved_docs as $doc ) {
-			if ( $count >= $top_k ) {
-				break;
-			}
-
 			$layer_id = (int) ( $doc->metadata['layer_id'] ?? 0 );
-			$post     = $layer_id ? get_post( $layer_id ) : null;
-
-			$results[] = array(
+			if ( $layer_id <= 0 || isset( $by_id[ $layer_id ] ) ) {
+				continue;
+			}
+			$post               = get_post( $layer_id );
+			$by_id[ $layer_id ] = array(
 				'layer_id'   => $layer_id,
 				'title'      => $post ? $post->post_title : ( $doc->metadata['title'] ?? '' ),
 				'layer_type' => $doc->metadata['layer_type'] ?? '',
@@ -480,9 +478,48 @@ class RAG_Worker {
 				'content'    => mb_strimwidth( $doc->getContent(), 0, 300, '...' ),
 				'edit_url'   => $layer_id ? get_edit_post_link( $layer_id, 'raw' ) : '',
 			);
-			++$count;
 		}
 
-		return $results;
+		// Supplement semantic results with a direct text search on layer titles/content.
+		$text_query = new \WP_Query(
+			array(
+				'post_type'      => 'map-layer',
+				'post_status'    => 'publish',
+				'posts_per_page' => 50,
+				's'              => $text,
+				'fields'         => 'ids',
+			)
+		);
+
+		foreach ( $text_query->posts as $layer_id ) {
+			$layer_id = (int) $layer_id;
+			if ( $layer_id <= 0 || isset( $by_id[ $layer_id ] ) ) {
+				continue;
+			}
+			$post = get_post( $layer_id );
+			if ( ! $post ) {
+				continue;
+			}
+			$by_id[ $layer_id ] = array(
+				'layer_id'   => $layer_id,
+				'title'      => $post->post_title,
+				'layer_type' => get_post_meta( $layer_id, 'type', true ),
+				'source_url' => get_post_meta( $layer_id, 'source_url', true ),
+				'score'      => 0.5,
+				'content'    => mb_strimwidth( Layer_Data_Loader::build_embedding_text( $post ), 0, 300, '...' ),
+				'edit_url'   => get_edit_post_link( $layer_id, 'raw' ),
+			);
+		}
+
+		// Sort by score descending and return up to top_k.
+		$results = array_values( $by_id );
+		usort(
+			$results,
+			function ( $a, $b ) {
+				return $b['score'] <=> $a['score'];
+			}
+		);
+
+		return array_slice( $results, 0, $top_k );
 	}
 }

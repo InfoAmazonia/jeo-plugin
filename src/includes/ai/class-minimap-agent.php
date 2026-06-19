@@ -118,7 +118,7 @@ You MUST always return a valid minimap configuration with layers, center coordin
 
 You MUST respond with a valid Minimap_Output JSON object:
 
-- `layers`: Array of layer definitions. Each has: `id` (int, from search_layers results), `use` ("fixed"), `default` (true), `show_legend` (true/false).
+- `layers`: Array of layer definitions. Each has: `id` (int, from search_layers results), `use` ("fixed"), `default` (true), `show_legend` (true/false). Optionally include a `reason` field with a one-sentence explanation of why the layer was chosen.
 - `base_layer`: Object with `id`, `use`, `default`, `show_legend`, `load_as_style`, `variant`. If you don't know a specific base layer ID, set this to null and the system will create one.
 - `center_lat`, `center_lon`: Map center coordinates.
 - `initial_zoom`: Zoom level (0–20). Use ~2–4 for country/region, ~8–12 for city-level.
@@ -138,6 +138,7 @@ You MUST respond with a valid Minimap_Output JSON object:
 - Choose zoom levels appropriate to the geographic scope.
 - Consider editorial context: environmental stories may benefit from satellite base, political stories from light base.
 - When refining, only change what the user asked — preserve good aspects of the current map.
+- Respect the geographic scope of the request. When the scope is local or regional (city, municipality, state), reject overly broad national layers such as generic country hydrography, full-country administrative boundaries, or continental base maps as thematic overlays. Use them only as base layers when appropriate. Prefer local or thematic vector layers that match the requested scope.
 
 ## Language
 
@@ -227,7 +228,14 @@ Use the `get_post_content` tool to retrieve the post data (pass the `post_id` fr
 - `locations`: Array of location names mentioned (e.g. ["Manaus", "Amazonas", "Brazil"])
 - `geographic_scope`: One of "local", "regional", "national", "international"
 - `summary`: 1–2 sentence summary of the post's geographic relevance
-- `suggested_search_queries`: Array of 3–5 search queries for finding relevant map layers. Be specific and varied (e.g. ["deforestation Amazon satellite", "indigenous territories Brazil", "forest cover loss Amazonas"])
+- `suggested_search_queries`: Array of 5–8 search queries for finding relevant map layers. Generate queries across these categories when relevant:
+  - Administrative boundaries (city, municipality, state, country)
+  - Hydrography / rivers
+  - Deforestation and forest cover
+  - Indigenous territories and protected areas
+  - Mining, oil, gas, and infrastructure
+  - Land use and settlements
+  Include location names from the post in each query when applicable. Use synonyms and alternate phrasings (e.g. "Altamira boundaries", "rios Xingu", "desmatamento Altamira Prodes", "terras indigenas Altamira").
 
 Focus on extracting information that will help find relevant map layers and determine appropriate map center/zoom.
 

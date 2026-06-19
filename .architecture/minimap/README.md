@@ -75,7 +75,7 @@ Legacy RAG-based endpoint (no AI agent). Uses `RAG_Worker::find_matching_layers(
 | `top_k` | int | No | Max layers (default 5) |
 | `conversation_id` | string | No | UUID — if provided, persists initial context for chat continuity |
 
-Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom, pins[], message }`
+Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom, pins[], message, removed_layers? }`
 
 ### `POST /jeo/v1/minimap/setup-prompt` — Generate from prompt (AI agent)
 
@@ -87,7 +87,7 @@ Uses the full AI agent with structured output. The agent receives context about 
 | `post_id` | int | Yes | Post ID — enables post content analysis via post_analyzer and conversation storage |
 | `conversation_id` | string | No | UUID for conversation continuity |
 
-Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom, pins[], message, assistant_message, base_variant? }`
+Response: `{ success, layers[], base_layer, center_lat, center_lon, initial_zoom, pins[], message, assistant_message, base_variant?, removed_layers? }`
 
 ### `POST /jeo/v1/minimap/chat` — Multi-turn refinement (AI agent)
 
@@ -178,7 +178,7 @@ sequenceDiagram
     GL-->>A: JSON result
     A-->>M: Minimap_Output (with new layer_id)
     M-->>R: to_rest_response()
-    R-->>E: {success, layers, ..., assistant_message}
+    R-->>E: {success, layers, ..., assistant_message, removed_layers?}
     E-->>U: Updated map with generated layer
 ```
 
@@ -196,7 +196,7 @@ The agent always returns a `Minimap_Output` DTO via NeuronAI structured output:
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `layers` | `array` | Thematic layer definitions (`id`, `use`, `default`, `show_legend`) |
+| `layers` | `array` | Thematic layer definitions (`id`, `use`, `default`, `show_legend`, optional `reason`) |
 | `base_layer` | `?array` | Base terrain layer with `variant` (dark/light/satellite) |
 | `center_lat` | `float` | Map center latitude |
 | `center_lon` | `float` | Map center longitude |
@@ -205,6 +205,7 @@ The agent always returns a `Minimap_Output` DTO via NeuronAI structured output:
 | `base_variant` | `?string` | Agent-chosen variant (null = luminance heuristic fallback) |
 | `message` | `string` | Info/warning for the block editor |
 | `assistant_message` | `string` | Chat message shown in the inspector panel |
+| `removed_layers` | `int[]` | IDs returned by the agent that were discarded because they do not correspond to published map-layer posts |
 
 ### Conversation History Persistence
 
@@ -354,7 +355,7 @@ sequenceDiagram
     M->>M: Apply base layer fallback
     M->>M: Apply pins fallback
     M-->>R: Minimap_Output.to_rest_response()
-    R-->>E: {success, layers, base_layer, ..., assistant_message}
+    R-->>E: {success, layers, base_layer, ..., assistant_message, removed_layers?}
     E->>E: setAttributes({status: 'ready', conversation_id, conversation: [user_msg, assistant_msg]})
     E-->>U: Map preview + chat panel in inspector
 ```
@@ -380,7 +381,7 @@ sequenceDiagram
     Note over A: Agent sees full chat context<br/>from post_meta + new user message
     A-->>M: Minimap_Output (updated map)
     M-->>R: to_rest_response()
-    R-->>E: {success, layers, base_layer, ..., assistant_message}
+    R-->>E: {success, layers, base_layer, ..., assistant_message, removed_layers?}
     E->>E: Append user + assistant messages to conversation
     E->>E: Update map attributes
     E-->>U: Updated map + new chat messages
@@ -413,3 +414,6 @@ Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 - **Layer generation authorization**: When Mapbox is available, the agent must always ask for explicit user confirmation via chat before generating custom layers (`generate_layer` tool). Initial auto-generation never creates custom layers
 - **Debounced map interaction**: `onMove` and `onZoom` handlers use 300 ms lodash debounce to avoid excessive `setAttributes` calls and re-renders during map pan/zoom
 - **Layer render guard**: The map preview only attempts to render layers when `loadedLayers.length > 0`, preventing an empty-map flash while REST metadata is still loading
+- **Layer validation reporting**: Invalid or non-published layer IDs returned by the agent are silently removed, and `removed_layers` is included in the REST response so the UI can warn the user
+- **Geographic scope guard**: The system prompt instructs the agent to avoid overly broad national layers as thematic overlays when the requested scope is local/regional
+- **Hybrid layer retrieval**: `RAG_Worker::find_matching_layers()` combines semantic RAG results with a direct `WP_Query` text search on layer titles/content, giving priority to RAG scores while ensuring literal matches are included

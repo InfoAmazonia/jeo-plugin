@@ -60,7 +60,9 @@ class Search_Layers_Tool extends Tool {
 	 * @return string JSON-encoded results.
 	 */
 	public function __invoke( string $query, ?int $top_k = null ): string {
-		$limit = $top_k ?? 5;
+		$default_top_k = \jeo_settings()->get_option( 'ai_rag_topk', 10 );
+		$limit         = $top_k ?? $default_top_k;
+		$limit         = max( 3, min( 20, $limit ) );
 
 		try {
 			$results = RAG_Worker::find_matching_layers( $query, $limit );
