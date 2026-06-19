@@ -21,30 +21,58 @@ When making significant code changes (creating/removing/modifying components, bl
 - MapLibre GL JS (default) / Mapbox GL JS (optional)
 - NeuronAI (10 providers) | Webpack 5, @wordpress/scripts | Node 24+
 
+### Version Consistency
+
+Keep PHP version enforcement in sync across three locations:
+1. `src/jeo.php` plugin header: `Requires PHP:`
+2. `src/readme.txt`: `Requires PHP:`
+3. Runtime check in `src/jeo.php`: `version_compare( PHP_VERSION, '8.2', '<' )`
+
+All three must match the supported PHP floor (currently 8.2).
+
 ## Commands
 
 ```bash
 # JS / Build
 npm start                          # Dev (webpack watch)
-npm run build                      # Production build + i18n JSON (requires WP-CLI)
+npm run build:assets               # Webpack production build + compliance patch
+npm run build                      # Full release build: assets + i18n compile (requires WP-CLI)
+npm run build:release              # Alias for npm run build
+npm run build:report               # Bundle size budgets (size-limit)
 npm run test:unit                  # Jest
+
+# i18n (requires WP-CLI)
+npm run i18n:pot                   # Regenerate src/languages/jeowp.pot
+npm run i18n:po                    # Update PO files from POT
+npm run i18n:mo                    # Compile MO files
+npm run i18n:json                  # Generate Jed JSON translations
+npm run i18n:compile               # MO + JSON
+npm run i18n:refresh               # assets + POT + PO (use before committing string changes)
 
 # PHP
 vendor/bin/phpcs src/              # PHP lint (WPCS) — scope to src/ to avoid .tmp/ noise
 php scripts/check-php-compat.php   # Static PHP compatibility check
+
+# Audits
+npm run audit:npm                  # npm audit --package-lock-only
+npm run audit:composer             # composer audit --locked
 
 # Local WordPress (Docker)
 bash .docker/start.sh              # Start WordPress + MariaDB containers
 # WordPress: http://localhost:8081
 # DB:        localhost:3307 (jeo/jeo/jeo)
 # Plugin src/ is mounted live — no need to reinstall after edits.
-# Stop: docker compose -f .docker/docker-compose.yml down
+# Stop:   docker compose -f .docker/docker-compose.yml down
+# WP-CLI: docker compose -f .docker/docker-compose.yml --profile cli run --rm jeo-dev-wpcli <command>
+#         or bash .docker/wp.sh <command>
 ```
 
 ## Conventions
 
 - **PHP**: PSR-0 autoload (`Jeo\ClassName` → `class-class-name.php`), WPCS, `Jeo\Singleton` trait, PHPDoc required on all classes and methods
-- **Accessors**: `jeo()`, `jeo_maps()`, `jeo_layers()`, `jeo_settings()`, `jeo_context_handler()`, etc.
+- **Accessors**: `jeo()`, `jeo_maps()`, `jeo_layers()`, `jeo_settings()`, `jeo_context_handler()`, `jeo_minimap()`, `jeo_minilayer_handler()`, etc.
+- **Text domain**: All internationalized strings must use the WordPress.org slug **`jeowp`** (e.g. `__( '...', 'jeowp' )`). Never use the old `jeo` text domain.
+- **Plugin slug**: WordPress.org distribution slug is **`jeowp`**. Release packages, CI workflows, smoke tests, and language file names (`jeowp.pot`, `jeowp-pt_BR.po`) must use this slug.
 - **Map runtime**: Always via `lib/mapgl-loader.js`, never import maplibre/mapbox directly
 - **WP form controls**: Use `shared/wp-form-controls.js` (not `@wordpress/components` directly)
 - **Webpack**: `splitChunks: false` — each entry is self-contained
@@ -64,11 +92,21 @@ bash .docker/start.sh              # Start WordPress + MariaDB containers
   5. The structured output schema description if it affects filtering behavior (`class-georeference-result.php`)
 - **AI Architecture**: All new AI features should use `JEO_AI_Factory` to create `Assistant` instances. Tools must be registered in `Tool_Registry`. REST endpoints must use `AI_REST_Permissions`. MCP servers are passed declaratively via `AssistantConfig::$mcps`.
 - **Minilayer**: Uses `JEO_AI_Factory::create_minilayer_assistant()` with native MCP config. The old `extends Agent` pattern is deprecated.
+- **Minimap**: AI-assisted map block (`jeo/ai-minimap`). Follows the same Assistant architecture as Minilayer/Context Assistant with structured output (`Minimap_Output`), conversation storage (`WP_Storage`), and optional Minilayer integration. See `.architecture/minimap/README.md` before modifying endpoints, tools, or editor state.
+- **Composer dependencies**: Dependencies are segregated:
+  - Root `composer.json` / `composer.lock` → **dev only** (PHPCS, WPCS, PHPCompatibility)
+  - `src/composer.json` / `src/composer.lock` → **production only** (`neuron-core/neuron-ai`, `hacklabr/ai-assistant`)
+  - Root `post-install-cmd` / `post-update-cmd` automatically install production deps into `src/vendor/`
+  - Release builds must include `src/vendor/` from the production Composer install
 - **AI Context Assistant**: Editorial suggestion sidebar for posts. Uses the same Assistant architecture as the minimap but with distinct agent, tools, and output DTO. Key patterns and regression guards:
   - **Agent factory**: `Context_Agent::create()` in `class-context-agent.php`. Uses `AssistantConfig` with `outputClass: Context_Generation_Output`, `conversationStorage: WP_Storage(post)`, `learningStorage: WP_Option_Storage`, `userMemoryStorage: WP_User_Memory_Storage`, `autoLearn: true`, `autoDelegate: true`. Do not remove these storages or the conversation history will break.
   - **System prompt**: Defaults to `default_system_prompt()`. Overridden by `ai_context_prompt` setting (JEO AI Settings → Context Assistant tab). When editing the prompt, preserve the `## User Preferences` and `## Additional Context` injection points or user memory and live state will be lost.
+  - **Critical prompt rules**: `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links and factual grounding. The default prompt concatenates these rules automatically. Custom prompts should preserve them; use the **Prompt Engineering Assistant** to enforce them.
+  - **Inline contextual links**: Paragraph `text` may contain `<a href="URL">anchor text</a>`. The anchor MUST be the specific phrase, name, fact, or number the reference supports — never the full article title. Example: `"The death of <a href=\"URL\">leader Gabriel Ferreira</a> highlights..."`.
+  - **Factual grounding**: Every factual claim must come from `get_post_content` or `retrieve_knowledge`. The agent must NOT invent names, terms, dates, statistics, or events. If references are insufficient, it should say so in `assistant_message` instead of writing a generic paragraph.
+  - **Prompt Engineering Assistant**: `Context_Agent::engineer_custom_prompt()` and REST endpoint `POST /jeo/v1/context/engineer-prompt` (permission: `manage_options`) rewrite a user-provided custom prompt while injecting the critical rules and preserving injection points. The JEO AI Settings UI exposes an "Optimize prompt with AI" button that calls this endpoint. A companion "Suggest initial prompt" button copies the built-in default prompt into the custom prompt field as a starting point.
   - **Tools**: `retrieve_knowledge` (RAG retrieval from `jeo_knowledge`) and `get_post_content` (for the `post_analyzer` sub-agent). Both are registered in `Tool_Registry`. Removing either will break the agent.
-  - **REST handler**: `Context_Handler` (`class-context-handler.php`), Singleton, registers `/jeo/v1/context/setup`, `/jeo/v1/context/chat`, `/jeo/v1/context/state`, and `/jeo/v1/context/clear`. Uses the same `inject_history` / `persist_history` pattern as `Minimap` **for AI context only**.
+  - **REST handler**: `Context_Handler` (`class-context-handler.php`), Singleton, registers `/jeo/v1/context/setup`, `/jeo/v1/context/chat`, `/jeo/v1/context/state`, `/jeo/v1/context/clear`, and `/jeo/v1/context/engineer-prompt`. Uses the same `inject_history` / `persist_history` pattern as `Minimap` **for AI context only**.
   - **Retry logic**: `run_agent()` retries up to 2 additional times (with 1s sleep) when the AI returns an empty response (`TypeError` on `getJson()`). After exhausting retries, it throws a user-friendly exception.
   - **Content validation**: `api_setup()` checks the post content length. If fewer than 100 characters (after stripping tags), it returns immediately without calling the AI, asking the user to write more or specify what they want.
   - **Chat message storage (dual storage)**: The UI chat history is stored separately from the AI context history to avoid JSON schema pollution from structured output:
@@ -111,9 +149,19 @@ The repository maintains the following automated checks. All must pass before a 
 - `npm run test:unit` — Jest unit tests
 - `npm run build:report` — Bundle size budgets
 
+### CI/CD
+
+GitHub Actions run via **9 workflows** in `.github/workflows/` plus a shared composite action in `.github/actions/wordpress-plugin-check/`. Notable flows:
+- `deploy-wordpress-org.yml` — GitHub Release + WordPress.org deploy (can be split via workflow input)
+- `plugin-check.yml` — WordPress Plugin Check, now reuses `.github/actions/wordpress-plugin-check`
+- `wordpress-smoke.yml` — Builds webpack assets once, uploads artifact, and downloads it across the WordPress/PHP matrix
+- `wordpress-languages.yml` — Validates POT/PO catalogs match source strings
+
 ### WordPress.org Compliance Rules
 
+- `src/jeo.php` **must** contain `Requires PHP:` in the plugin header, aligned with `src/readme.txt` and the runtime check (currently 8.2+).
 - `src/readme.txt` **must** contain `Tags:` (1–12) and `Requires PHP:` aligned with runtime enforcement (8.2+).
+- The plugin **Text Domain** must be `jeowp` in `src/jeo.php` and in every `__()` / `_e()` / `_x()` call.
 - `src/readme.txt` **must** contain a `== Third Party Services ==` section.
 - Forbidden URLs in any `src/` text file: `raw.githubusercontent.com`, `fonts.openmaptiles.org`.
 - Use `cdn.jsdelivr.net/gh` as an alternative for GitHub raw assets.

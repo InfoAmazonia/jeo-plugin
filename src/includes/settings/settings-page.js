@@ -1,6 +1,8 @@
 (function($) {
 	$(document).ready(function() {
-		
+
+		var i18n = ( typeof jeo_settings !== 'undefined' && jeo_settings.i18n ) ? jeo_settings.i18n : {};
+
 		console.log('JEO Settings JS loaded.');
 
 		// ------------------------------------

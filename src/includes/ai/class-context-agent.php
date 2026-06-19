@@ -29,6 +29,53 @@ if ( ! defined( 'WPINC' ) ) {
 class Context_Agent {
 
 	/**
+	 * Critical rules that must be present in every Context Assistant system prompt,
+	 * whether default or custom. Used by the prompt engineering assistant to validate
+	 * and patch custom prompts.
+	 *
+	 * @return string
+	 */
+	public static function critical_prompt_rules(): string {
+		return <<<'RULES'
+## Critical Rules (do not remove or weaken)
+
+### 1. Inline Contextual Links
+
+Paragraphs may contain basic inline HTML: `<strong>` or `<b>`, `<em>` or `<i>`, and `<a href="URL">anchor text</a>`.
+
+When linking to a referenced article, the link MUST be applied to the specific phrase, fact, name, or number that the article supports. Never use the full article title as the visible link text.
+
+Examples:
+- GOOD: "The death of <a href="URL">leader Gabriel Ferreira</a> highlights the escalation of violence against indigenous people in Roraima."
+- BAD:  "The death of leader Gabriel Ferreira highlights the escalation of violence, as reported in <a href="URL">Leader Gabriel Ferreira found dead near highway, organizations demand investigation</a>."
+- GOOD: "According to <a href="URL">Cimi data</a>, murders of indigenous people rose in the region."
+- BAD:  "According to Cimi data, murders of indigenous people rose in the region (<a href="URL">Amazonas leads number of indigenous murders in 2021, says new Cimi report</a>)."
+
+Use at most 1–3 contextual links per paragraph. If a sentence has no natural anchor for a reference, add the reference to the `references` array without forcing a link into the text.
+
+### 2. Factual Grounding
+
+- Every factual claim must be grounded in either (a) the current post content retrieved via `get_post_content`, or (b) an article explicitly returned by `retrieve_knowledge`.
+- Do NOT invent names, terms, dates, statistics, places, or events to make a paragraph more complete.
+- Do NOT mix up references: if two articles mention similar topics, keep their facts separate and cite each one correctly.
+- If the retrieved references are insufficient to write a concrete, well-supported paragraph, say so in `assistant_message` and ask the user for a more specific angle. Do not write a generic paragraph in that case.
+- When citing data or specific facts, mention the source in the text (e.g. "according to a previous InfoAmazonia report", "Cimi data show", "the survey points out").
+
+### 3. References Array
+
+Every article used to build the paragraph must also appear in the `references` array with:
+- `post_id`: WordPress post ID.
+- `title`: Article title.
+- `url`: Permalink URL.
+- `reason`: One-sentence explanation of why it supports the suggestion.
+
+### 4. Language
+
+Respond in the same language as the article being edited.
+RULES;
+	}
+
+	/**
 	 * Create a configured Assistant instance for context generation.
 	 *
 	 * @param int         $post_id         Post ID for conversation storage.
@@ -133,7 +180,7 @@ You MUST always return a valid Context_Generation_Output JSON object with sugges
 You MUST respond with a valid Context_Generation_Output JSON object:
 
 - `paragraphs`: Array of suggested paragraphs. Each entry has:
-  - `text` (string): The full suggested paragraph text, ready to insert into the article. You MAY use basic inline HTML for formatting and links: `<strong>` or `<b>` for emphasis, `<em>` or `<i>` for italics, and `<a href="URL">title</a>` for links to referenced articles. This HTML is preserved when copying or inserting into the WordPress editor.
+  - `text` (string): The full suggested paragraph text, ready to insert into the article. You MAY use basic inline HTML for formatting and links: `<strong>` or `<b>` for emphasis, `<em>` or `<i>` for italics, and `<a href="URL">anchor text</a>` for links to referenced articles. The link anchor MUST be the specific phrase, name, fact, or number that the reference supports — never the full article title. This HTML is preserved when copying or inserting into the WordPress editor.
   - `relevance_score` (int 0–100): How relevant this paragraph is to the post's core topic.
 - `references`: Array of related articles from the knowledge base. Each entry has:
   - `post_id` (int): WordPress post ID.
@@ -162,7 +209,74 @@ When a tool returns an error or no results:
 1. DO NOT treat it as fatal. Continue generating suggestions based on available context.
 2. If `retrieve_knowledge` returns no results, mention the gap in `assistant_message` and suggest paragraphs based on the post content alone.
 3. NEVER expose technical error details (WP_Error, stack traces, API codes) to the user.
-PROMPT;
+PROMPT
+		. "\n\n"
+		. self::critical_prompt_rules();
+	}
+
+	/**
+	 * Use the configured AI provider to review and improve a custom system prompt.
+	 *
+	 * The user's custom prompt is preserved in spirit, but the following guarantees
+	 * are enforced:
+	 * - Critical rules (inline contextual links, factual grounding, references) are present.
+	 * - The `## User Preferences` and `## Additional Context` injection points are preserved.
+	 * - The prompt remains compatible with structured output (Context_Generation_Output).
+	 *
+	 * @param string $user_prompt The custom prompt written by the user.
+	 * @return string|\WP_Error The engineered prompt, or an error if the AI is unavailable.
+	 */
+	public static function engineer_custom_prompt( string $user_prompt ) {
+		$provider_name = \jeo_settings()->get_option( 'ai_default_provider', 'gemini' );
+		$api_key       = \jeo_settings()->get_option( $provider_name . '_api_key' );
+		$model         = \jeo_settings()->get_option( $provider_name . '_model' );
+
+		if ( empty( $api_key ) ) {
+			return new \WP_Error( 'no_ai_provider', __( 'No AI provider is configured. Set one in JEO AI Settings.', 'jeowp' ) );
+		}
+
+		$agent = new Neuron_Agent( $provider_name, (string) $api_key, (string) $model );
+
+		$meta_prompt = sprintf(
+			<<<'META'
+You are a prompt engineering assistant for a WordPress plugin called JEO. A user has written a custom system prompt for the "AI Context Assistant" feature, which suggests editorial paragraphs and references for journalistic articles.
+
+Your task is to rewrite the user's prompt so that it:
+1. Keeps the user's original intent, tone, and any special instructions.
+2. Includes the CRITICAL RULES below exactly as written (do not summarize or weaken them).
+3. Preserves the injection points `## User Preferences` and `## Additional Context` if the user already has them, or adds them at the end if missing.
+4. Remains compatible with structured output: the AI must return a JSON object matching `Context_Generation_Output` with fields `paragraphs`, `references`, `message`, and `assistant_message`.
+5. Uses Markdown headers (##) for sections.
+6. Responds in the same language as the user's prompt.
+
+CRITICAL RULES TO INSERT VERBATIM:
+
+%s
+
+USER'S CUSTOM PROMPT:
+
+%s
+
+REWRITTEN PROMPT:
+META,
+			self::critical_prompt_rules(),
+			$user_prompt
+		);
+
+		try {
+			$agent->setInstructions( $meta_prompt );
+			$response   = $agent->chat( new UserMessage( 'Rewrite the custom prompt according to the instructions above. Output only the rewritten prompt, with no extra commentary.' ) );
+			$message    = $response->getMessage();
+			$engineered = $message->getContent();
+
+			if ( empty( $engineered ) ) {
+				return new \WP_Error( 'empty_prompt_engineering_response', __( 'The AI returned an empty prompt engineering response.', 'jeowp' ) );
+			}
+
+			return $engineered;
+		} catch ( \Throwable $e ) {
+			return new \WP_Error( 'prompt_engineering_error', $e->getMessage() );
+		}
 	}
 
 	/**

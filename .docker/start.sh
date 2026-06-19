@@ -30,9 +30,11 @@ if [ $? -eq 0 ]; then
     echo "  2. Complete WordPress installation"
     echo "  3. Activate the JEO plugin from wp-admin"
     echo ""
-    echo "Logs:  docker compose -f .docker/docker-compose.yml logs -f"
-    echo "Stop:  docker compose -f .docker/docker-compose.yml down"
-    echo "Shell: docker exec -it jeo-dev-wordpress bash"
+    echo "Logs:   docker compose -f .docker/docker-compose.yml logs -f"
+    echo "Stop:   docker compose -f .docker/docker-compose.yml down"
+    echo "Shell:  docker exec -it jeo-dev-wordpress bash"
+    echo "WP-CLI: docker compose -f .docker/docker-compose.yml --profile cli run --rm jeo-dev-wpcli <command>"
+    echo "        or bash .docker/wp.sh <command>"
 else
     echo "❌ Failed to start containers."
     exit 1

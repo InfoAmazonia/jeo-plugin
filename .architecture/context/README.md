@@ -13,7 +13,7 @@ The AI Context Assistant is a Gutenberg sidebar plugin that suggests new paragra
 | `src/includes/ai/class-context-generation-output.php` | Structured output DTO: `paragraphs` (with inline HTML), `references`, `message`, `assistant_message` |
 | `src/includes/ai/class-retrieve-knowledge-tool.php` | NeuronAI tool — queries `jeo_knowledge` via `RAG_Agent::resolveRetrieval()` |
 | `src/includes/ai/class-get-post-content-tool.php` | NeuronAI tool — post content + `_related_point` meta for sub-agent |
-| `src/includes/ai/settings/tab-context.php` | Settings tab template — custom prompt textarea + default prompt reference |
+| `src/includes/ai/settings/tab-context.php` | Settings tab template — custom prompt textarea, default prompt reference, "Suggest initial prompt" and "Optimize prompt with AI" buttons |
 
 ### Frontend (JS)
 
@@ -22,6 +22,7 @@ The AI Context Assistant is a Gutenberg sidebar plugin that suggests new paragra
 | `src/js/src/context-sidebar/index.js` | Entry point — `registerPlugin('jeo-context-sidebar')` with `PluginDocumentSettingPanel` |
 | `src/js/src/context-sidebar/context-chat-panel.js` | Chat UI, state management, API calls, expand modal |
 | `src/js/src/context-sidebar/suggested-paragraphs.js` | Renders suggested paragraphs with inline HTML support. "Insert" creates `core/paragraph` block; "Copy" uses triple-fallback rich-text clipboard |
+| `src/includes/ai/class-neuron-agent.php` | Base `Neuron_Agent` extending `NeuronAI\Agent\Agent`; reused by the prompt engineering assistant |
 | `src/js/src/context-sidebar/context-sidebar.css` | Styles for panel, chat, suggestions, modal |
 
 ## Architecture Overview
@@ -116,6 +117,18 @@ Deletes all three meta keys for the post, resetting the conversation completely.
 
 Response: `{ success, message }`
 
+### `POST /jeo/v1/context/engineer-prompt` — Optimize a custom system prompt
+
+Uses the configured AI provider to rewrite a user-provided custom system prompt while preserving the user's intent and enforcing the plugin's critical rules. Requires `manage_options`.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `prompt` | string | Yes | Custom prompt to optimize |
+
+Response: `{ success, prompt }` or `{ success: false, message }`
+
+This endpoint powers the **"Optimize prompt with AI"** button in the Context Assistant settings tab.
+
 ## Agent Architecture
 
 ### Context_Agent Factory
@@ -153,9 +166,10 @@ graph LR
 The system prompt is loaded via `Context_Agent::system_prompt()`:
 
 1. **Custom prompt** — If `ai_use_context_custom_prompt` is enabled and `ai_context_prompt` is non-empty, uses it as the base.
-2. **Default prompt** — Otherwise, uses `Context_Agent::default_system_prompt()` which defines the editorial assistant role, workflow, tool usage rules, output schema, editorial guidelines, off-topic handling, and tool error handling.
-3. **User Preferences** — Appends `## User Preferences` section from `WP_User_Memory_Storage` (if any preferences exist).
-4. **Additional Context** — Appends `## Additional Context` section with post metadata and locale from the caller.
+2. **Default prompt** — Otherwise, uses `Context_Agent::default_system_prompt()` which defines the editorial assistant role, workflow, tool usage rules, output schema, editorial guidelines, off-topic handling, and tool error handling. The default prompt always appends `Context_Agent::critical_prompt_rules()`.
+3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding, references array, and language. They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant.
+4. **User Preferences** — Appends `## User Preferences` section from `WP_User_Memory_Storage` (if any preferences exist).
+5. **Additional Context** — Appends `## Additional Context` section with post metadata and locale from the caller.
 
 When editing the prompt, preserve the `## User Preferences` and `## Additional Context` injection points or user memory and live state will be lost.
 
@@ -176,7 +190,7 @@ The `post_analyzer` sub-agent uses `Get_Post_Content_Tool` to read the post and 
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `paragraphs` | `array` | Suggested paragraphs. Each has `text` (supports inline HTML: `<strong>`, `<em>`, `<a href="...">`) and `relevance_score` (int 0–100) |
+| `paragraphs` | `array` | Suggested paragraphs. Each has `text` (supports inline HTML: `<strong>`, `<em>`, `<a href="...">`) and `relevance_score` (int 0–100). Link anchors must be the specific phrase, name, fact, or number the reference supports — never the full article title |
 | `references` | `array` | Related articles from the knowledge base. Each has `post_id` (int), `title` (string), `url` (string), `reason` (string) |
 | `message` | `string` | Cumulative summary shown as UI notice. Plain text — no HTML |
 | `assistant_message` | `string` | Chat message shown in the panel. Plain text — no HTML |
@@ -358,7 +372,10 @@ The Context Assistant settings are in **JEO → AI Configuration → Context Ass
 | Custom prompt | `ai_context_prompt` | textarea | empty | Custom system prompt. Empty = use built-in default |
 | Default prompt (read-only) | — | textarea (readonly) | Built-in | Shows the default prompt for reference |
 
-When `ai_use_context_custom_prompt` is unchecked, the tab shows the default prompt in a readonly textarea for reference. When checked, it shows an editable textarea for the custom prompt.
+When `ai_use_context_custom_prompt` is unchecked, the tab shows the default prompt in a readonly textarea for reference. When checked, it shows an editable textarea for the custom prompt plus two helper buttons:
+
+- **Suggest initial prompt** — copies the built-in default prompt into the custom textarea as a starting point.
+- **Optimize prompt with AI** — calls `POST /jeo/v1/context/engineer-prompt` to rewrite the custom prompt while injecting the critical rules and preserving the `## User Preferences` / `## Additional Context` injection points.
 
 ## Conventions
 
@@ -366,6 +383,8 @@ When `ai_use_context_custom_prompt` is unchecked, the tab shows the default prom
 - **Content gate**: Setup returns early if post content < 100 characters.
 - **Dual storage**: `ConversationStore` for AI context (may contain schema messages), separate `post_meta` for clean UI messages. Never mix them.
 - **Inline HTML**: Paragraph `text` supports `<strong>`, `<em>`, `<a href="...">`, `<br>`. Frontend sanitizes before rendering/inserting/copying.
+- **Inline contextual links**: Link anchors must be specific phrases, names, facts, or numbers from the referenced article. Never use the full article title as link text.
+- **Factual grounding**: Every factual claim must come from `get_post_content` or `retrieve_knowledge`. The agent must not invent names, dates, statistics, places, or events.
 - **Plain text messages**: `message` and `assistant_message` fields must be plain text — no HTML tags. `wp_strip_all_tags()` is applied in the handler.
 - **Retry with backoff**: Up to 3 attempts with exponential sleep on transient errors.
 - **Post type gate**: Only loads for post types in `enabled_post_types` (same filter as geolocation and minimap).

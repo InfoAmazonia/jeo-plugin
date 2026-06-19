@@ -45,11 +45,42 @@ services:
         define( 'WP_DEBUG_DISPLAY', false );
         define( 'FS_METHOD', 'direct' );
     volumes:
+      - jeo-wordpress-core:/var/www/html
       - ../src:/var/www/html/wp-content/plugins/jeo
       - ../vendor:/var/www/html/wp-content/plugins/jeo/vendor
       - ./uploads:/var/www/html/wp-content/uploads
     networks:
       - jeo-dev-network
+
+  jeo-dev-wpcli:
+    image: wordpress:cli
+    container_name: jeo-dev-wpcli
+    hostname: jeo-dev-wpcli
+    depends_on:
+      jeo-dev-mariadb:
+        condition: service_healthy
+      jeo-dev-wordpress:
+        condition: service_started
+    environment:
+      WORDPRESS_DB_HOST: jeo-dev-mariadb:3306
+      WORDPRESS_DB_NAME: jeo
+      WORDPRESS_DB_USER: jeo
+      WORDPRESS_DB_PASSWORD: jeo
+    volumes:
+      - jeo-wordpress-core:/var/www/html
+      - ../src:/var/www/html/wp-content/plugins/jeo
+      - ../vendor:/var/www/html/wp-content/plugins/jeo/vendor
+      - ./uploads:/var/www/html/wp-content/uploads
+      - jeo-wpcli-cache:/var/www/.wp-cli
+    networks:
+      - jeo-dev-network
+    entrypoint: [ 'wp', '--allow-root' ]
+    profiles:
+      - cli
+
+volumes:
+  jeo-wordpress-core:
+  jeo-wpcli-cache:
 
 networks:
   jeo-dev-network:

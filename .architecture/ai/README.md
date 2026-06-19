@@ -34,8 +34,8 @@
 | `src/includes/ai/class-geocode-tool.php` | Agent tool — active geocoder → Mapbox fallback → defaults |
 | `src/includes/ai/class-get-post-content-tool.php` | Agent tool — post content + _related_point meta for sub-agent |
 | `src/includes/ai/class-retrieve-knowledge-tool.php` | Agent tool — semantic retrieval from `jeo_knowledge` vector store |
-| `src/includes/ai/class-context-agent.php` | Context Assistant agent factory (Assistant::configure with retrieve_knowledge tool, sub-agents, structured output). Uses custom `ai_context_prompt` from settings when available |
-| `src/includes/ai/class-context-handler.php` | Context Assistant REST endpoints (setup + chat) |
+| `src/includes/ai/class-context-agent.php` | Context Assistant agent factory (Assistant::configure with retrieve_knowledge tool, sub-agents, structured output). Uses custom `ai_context_prompt` from settings when available. Includes `critical_prompt_rules()` and `engineer_custom_prompt()` for the prompt engineering assistant |
+| `src/includes/ai/class-context-handler.php` | Context Assistant REST endpoints (setup, chat, state, clear, engineer-prompt) |
 | `src/includes/ai/class-context-generation-output.php` | Structured output DTO for suggested paragraphs and references |
 | `src/includes/ai/class-wp-storage.php` | StorageInterface adapter for post_meta / user_meta |
 | `src/includes/ai/class-wp-option-storage.php` | StorageInterface adapter for wp_options (global learning storage) |
@@ -89,6 +89,8 @@
 | `/jeo/v1/context/setup` | POST | Generate initial editorial suggestions from post content |
 | `/jeo/v1/context/chat` | POST | Multi-turn conversation for refining editorial suggestions |
 | `/jeo/v1/context/state` | GET | Load persisted conversation state (messages, suggestions, conversation_id) |
+| `/jeo/v1/context/clear` | POST | Reset conversation and suggestions |
+| `/jeo/v1/context/engineer-prompt` | POST | Optimize custom system prompt while enforcing critical rules (requires `manage_options`) |
 
 ## AI Georeferencing
 

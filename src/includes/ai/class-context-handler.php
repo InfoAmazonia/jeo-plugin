@@ -161,6 +161,25 @@ class Context_Handler {
 				},
 			)
 		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/context/engineer-prompt',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_engineer_prompt' ),
+				'permission_callback' => function () {
+					return current_user_can( 'manage_options' );
+				},
+				'args'                => array(
+					'prompt' => array(
+						'required'  => true,
+						'type'      => 'string',
+						'minLength' => 1,
+					),
+				),
+			)
+		);
 	}
 
 	/**
@@ -663,6 +682,46 @@ class Context_Handler {
 			array(
 				'success' => true,
 				'message' => __( 'Conversation cleared.', 'jeowp' ),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST callback: use the configured AI provider to engineer a custom system prompt.
+	 *
+	 * @param \WP_REST_Request $request REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_engineer_prompt( $request ) {
+		$prompt = sanitize_textarea_field( $request->get_param( 'prompt' ) );
+
+		if ( empty( $prompt ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'Prompt is required.', 'jeowp' ),
+				),
+				400
+			);
+		}
+
+		$result = Context_Agent::engineer_custom_prompt( $prompt );
+
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				500
+			);
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'prompt'  => $result,
 			),
 			200
 		);

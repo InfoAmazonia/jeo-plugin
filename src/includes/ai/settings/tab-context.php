@@ -43,6 +43,24 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 					<p class="description">
 						<?php esc_html_e( 'Custom system prompt used by the AI Context Assistant. Leave empty to use the built-in default.', 'jeowp' ); ?>
 					</p>
+					<div style="margin-top: 10px;">
+						<button
+							type="button"
+							id="ai_context_suggest_prompt"
+							class="button"
+							style="margin-right: 8px;"
+						>
+							<?php esc_html_e( 'Suggest initial prompt', 'jeowp' ); ?>
+						</button>
+						<button
+							type="button"
+							id="ai_context_engineer_prompt"
+							class="button"
+						>
+							<?php esc_html_e( 'Optimize prompt with AI', 'jeowp' ); ?>
+						</button>
+						<span id="ai_context_engineer_status" class="description" style="margin-left: 10px; display: none;"></span>
+					</div>
 				</div>
 
 				<div id="ai_context_default_prompt_wrapper" style="display: <?php echo $use_custom ? 'none' : 'block'; ?>;">
@@ -80,6 +98,61 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 					customWrapper.style.display = 'none';
 					defaultWrapper.style.display = 'block';
 				}
+			} );
+		}
+
+		var suggestButton = document.getElementById( 'ai_context_suggest_prompt' );
+		var engineerButton = document.getElementById( 'ai_context_engineer_prompt' );
+		var promptTextarea = document.getElementById( 'ai_context_prompt' );
+		var defaultPromptTextarea = document.getElementById( 'ai_context_default_prompt' );
+		var statusSpan = document.getElementById( 'ai_context_engineer_status' );
+
+		if ( suggestButton && promptTextarea && defaultPromptTextarea && toggle && customWrapper && defaultWrapper ) {
+			suggestButton.addEventListener( 'click', function() {
+				promptTextarea.value = defaultPromptTextarea.value;
+				toggle.checked = true;
+				customWrapper.style.display = 'block';
+				defaultWrapper.style.display = 'none';
+				statusSpan.textContent = '<?php echo esc_js( __( 'Initial prompt loaded. Edit and save the settings.', 'jeowp' ) ); ?>';
+				statusSpan.style.display = 'inline';
+				statusSpan.style.color = '#008a20';
+			} );
+		}
+
+		if ( engineerButton && promptTextarea && statusSpan ) {
+			engineerButton.addEventListener( 'click', function() {
+				var prompt = promptTextarea.value.trim();
+				if ( ! prompt ) {
+					statusSpan.textContent = '<?php echo esc_js( __( 'Please write a custom prompt first.', 'jeowp' ) ); ?>';
+					statusSpan.style.display = 'inline';
+					statusSpan.style.color = '#d63638';
+					return;
+				}
+
+				engineerButton.disabled = true;
+				statusSpan.textContent = '<?php echo esc_js( __( 'Optimizing...', 'jeowp' ) ); ?>';
+				statusSpan.style.display = 'inline';
+				statusSpan.style.color = '#2271b1';
+
+				wp.apiFetch( {
+					path: '/jeo/v1/context/engineer-prompt',
+					method: 'POST',
+					data: { prompt: prompt }
+				} ).then( function( response ) {
+					if ( response.success && response.prompt ) {
+						promptTextarea.value = response.prompt;
+						statusSpan.textContent = '<?php echo esc_js( __( 'Prompt optimized. Remember to save the settings.', 'jeowp' ) ); ?>';
+						statusSpan.style.color = '#008a20';
+					} else {
+						statusSpan.textContent = response.message || '<?php echo esc_js( __( 'Optimization failed.', 'jeowp' ) ); ?>';
+						statusSpan.style.color = '#d63638';
+					}
+				} ).catch( function( error ) {
+					statusSpan.textContent = error.message || '<?php echo esc_js( __( 'Optimization failed.', 'jeowp' ) ); ?>';
+					statusSpan.style.color = '#d63638';
+				} ).finally( function() {
+					engineerButton.disabled = false;
+				} );
 			} );
 		}
 	} );
