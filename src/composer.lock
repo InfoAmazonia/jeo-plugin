@@ -462,21 +462,21 @@
         },
         {
             "name": "neuron-core/neuron-ai",
-            "version": "3.15.13",
+            "version": "3.15.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/neuron-core/neuron-ai.git",
-                "reference": "96f47bbb4594973deaadc4da020f115eb2f9c19e"
+                "reference": "93b6dd7b73c66119a361cc7f2eaba909f13d5188"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/neuron-core/neuron-ai/zipball/96f47bbb4594973deaadc4da020f115eb2f9c19e",
-                "reference": "96f47bbb4594973deaadc4da020f115eb2f9c19e",
+                "url": "https://api.github.com/repos/neuron-core/neuron-ai/zipball/93b6dd7b73c66119a361cc7f2eaba909f13d5188",
+                "reference": "93b6dd7b73c66119a361cc7f2eaba909f13d5188",
                 "shasum": ""
             },
             "require": {
                 "guzzlehttp/guzzle": "^7.0",
-                "inspector-apm/inspector-php": "^3.16.12",
+                "inspector-apm/inspector-php": "^3.18",
                 "php": "^8.1",
                 "psr/http-message": "^1.0|^2.0"
             },
@@ -522,7 +522,7 @@
             "description": "The PHP Agentic Framework.",
             "support": {
                 "issues": "https://github.com/neuron-core/neuron-ai/issues",
-                "source": "https://github.com/neuron-core/neuron-ai/tree/3.15.13"
+                "source": "https://github.com/neuron-core/neuron-ai/tree/3.15.14"
             },
             "funding": [
                 {
@@ -530,7 +530,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2026-06-19T14:25:45+00:00"
+            "time": "2026-06-19T16:33:32+00:00"
         },
         {
             "name": "phpoffice/math",

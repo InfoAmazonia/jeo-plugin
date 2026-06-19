@@ -165,13 +165,15 @@ graph LR
 
 The system prompt is loaded via `Context_Agent::system_prompt()`:
 
-1. **Custom prompt** — If `ai_use_context_custom_prompt` is enabled and `ai_context_prompt` is non-empty, uses it as the base.
+1. **Custom prompt** — If `ai_use_context_custom_prompt` is enabled and `ai_context_prompt` is non-empty, uses it as the base. The stored value may be either a legacy plain-text prompt or a structured-output JSON object such as `{"prompt": "..."}`. Always route the stored value through `Context_Agent::extract_prompt_text()` before using it as a system prompt; this keeps the runtime unaffected even if the storage format changes later.
 2. **Default prompt** — Otherwise, uses `Context_Agent::default_system_prompt()` which defines the editorial assistant role, workflow, tool usage rules, output schema, editorial guidelines, off-topic handling, and tool error handling. The default prompt always appends `Context_Agent::critical_prompt_rules()`.
 3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding, references array, and language. They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant.
 4. **User Preferences** — Appends `## User Preferences` section from `WP_User_Memory_Storage` (if any preferences exist).
 5. **Additional Context** — Appends `## Additional Context` section with post metadata and locale from the caller.
 
 When editing the prompt, preserve the `## User Preferences` and `## Additional Context` injection points or user memory and live state will be lost.
+
+> **Storage format note:** The settings UI stores `ai_context_prompt` as structured-output JSON (`{"prompt":"..."}`) while rendering it as plain text. Any code that reads this option for runtime use must call `Context_Agent::extract_prompt_text()` instead of using the raw option value directly.
 
 ### post_analyzer Sub-Agent
 
@@ -369,7 +371,7 @@ The Context Assistant settings are in **JEO → AI Configuration → Context Ass
 | Setting | Key | Type | Default | Description |
 |---------|-----|------|---------|-------------|
 | Use custom prompt | `ai_use_context_custom_prompt` | checkbox | `false` | Toggle between default and custom system prompt |
-| Custom prompt | `ai_context_prompt` | textarea | empty | Custom system prompt. Empty = use built-in default |
+| Custom prompt | `ai_context_prompt` | textarea (stored as structured-output JSON) | empty | Custom system prompt text. The UI stores it internally as `{"prompt":"..."}`, but displays and edits it as plain text. Empty = use built-in default |
 | Default prompt (read-only) | — | textarea (readonly) | Built-in | Shows the default prompt for reference |
 
 When `ai_use_context_custom_prompt` is unchecked, the tab shows the default prompt in a readonly textarea for reference. When checked, it shows an editable textarea for the custom prompt plus a helper button:
