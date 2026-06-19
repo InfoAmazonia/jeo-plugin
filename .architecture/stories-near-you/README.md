@@ -96,11 +96,11 @@ sequenceDiagram
     loop Sequential: for each block instance
         JS->>REST: GET with lat/lng + excludeIds + postLayout + mediaPosition + filters
         REST->>REST: is_newspack_active()? → render_posts_newspack() or render_posts_gutenberg()
-        REST->>DB: UNION query with ST_Distance_Sphere + NOT IN (excludeIds) + taxonomy JOINs
+        REST->>DB: UNION query with ST_Distance_Sphere + HAVING distance <= radius + NOT IN (excludeIds) + taxonomy JOINs
         alt No user coords
             REST->>REST: Fallback to JEO map center defaults
         end
-        DB-->>REST: Post IDs sorted by distance
+        DB-->>REST: Post IDs filtered by radius, sorted by date
         REST-->>JS: {html: rendered posts}
         JS->>HTML: Replace skeleton with rendered posts
         JS->>JS: Collect data-post-id from rendered articles, add to excludeIds accumulator
@@ -139,6 +139,7 @@ Also controls the `DECIMAL(10,N)` cast precision for post coordinates in `get_ne
 |-----------|------|---------|---------|
 | `postsPerPage` | number | 6 | Total posts to display (max 36) |
 | `postsPerRow` | number | 3 | Columns in grid layout (max 6, grid only) |
+| `radius` | number | 100 | Search radius in km (1–2000); filters posts within distance |
 | `postLayout` | string | `"grid"` | Layout: `grid` / `list` |
 | `mediaPosition` | string | `"top"` | Media position: `top` / `left` / `right` / `behind` |
 | `imageShape` | string | `"landscape"` | Image crop: `landscape` / `portrait` / `square` / `uncropped` |
@@ -204,13 +205,13 @@ Sequential fetching means N blocks take ~N×200ms instead of ~200ms total. Accep
 
 `GET /jeo/v1/stories-near-you`
 
-Params: `lat`, `lng`, `postsPerPage`, `postsPerRow`, `postLayout`, `mediaPosition`, `imageShape`, `showThumbnail`, `showCategory`, `showDate`, `showExcerpt`, `showAuthor`, `showAvatar`, `showReadMore`, `readMoreLabel`, `excerptLength`, `colGap`, `typeScale`, `imageScale`, `minHeight`, `excludeIds`, `categories`, `tags`, `categoryExclusions`, `tagExclusions`, `customTaxonomies`, `postType`
+Params: `lat`, `lng`, `postsPerPage`, `postsPerRow`, `postLayout`, `mediaPosition`, `imageShape`, `showThumbnail`, `showCategory`, `showDate`, `showExcerpt`, `showAuthor`, `showAvatar`, `showReadMore`, `readMoreLabel`, `excerptLength`, `colGap`, `typeScale`, `imageScale`, `minHeight`, `excludeIds`, `categories`, `tags`, `categoryExclusions`, `tagExclusions`, `customTaxonomies`, `postType`, `radius`
 
 Returns: `{ html: "..." }` — rendered HTML using the active context's classes.
 
 ## SQL Query
 
-Uses `ST_Distance_Sphere()` to sort by proximity. UNION of primary (`_geocode_lat_p`/`_geocode_lon_p`) and secondary (`_geocode_lat_s`/`_geocode_lon_s`) coordinate indexes. Dynamic taxonomy JOINs for category/tag/custom taxonomy filtering. Exclusion sub-queries for category/tag exclusions. Deduplicates post IDs after UNION. Supports `excludeIds` via `NOT IN` clause for cross-block non-repetition.
+Uses `ST_Distance_Sphere()` to compute distance for radius filtering. UNION of primary (`_geocode_lat_p`/`_geocode_lon_p`) and secondary (`_geocode_lat_s`/`_geocode_lon_s`) coordinate indexes. Each SELECT includes a `HAVING distance <= radius_meters` clause that filters posts to within the configured `radius` (km × 1000). Results are ordered by `post_date DESC` (most recent first). Dynamic taxonomy JOINs for category/tag/custom taxonomy filtering. Exclusion sub-queries for category/tag exclusions. Deduplicates post IDs after UNION. Supports `excludeIds` via `NOT IN` clause for cross-block non-repetition. When no posts are found within the radius, an explanatory empty state is rendered.
 
 ## Webpack Entry
 
@@ -301,7 +302,7 @@ The editor (`stories-near-you-editor.js`) provides these InspectorControls panel
 
 1. **Location Preview** — Lat/Lng for ServerSideRender preview
 2. **Post Card** — Layout (`postLayout`), Media position (`mediaPosition`), Image shape, Columns
-3. **Query Settings** — Posts per page, Post type (only shown if >1 geo-enabled types)
+3. **Query Settings** — Posts per page, Search radius (km, 1–2000), Post type (only shown if >1 geo-enabled types)
 4. **Filters** — Categories/Tags (multi-select), Category/Tag exclusions
 5. **Display** — Thumbnail, Category, Date, Excerpt (with length), Author (with avatar), Read more (with label)
 6. **Typography & Spacing** — Type scale (1–10), Image scale (1–4, horizontal only), Column gap (1–3), Min height (featured only)

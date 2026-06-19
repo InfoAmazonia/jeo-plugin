@@ -46,6 +46,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		postType,
 		imageSize,
 		imageAsLink,
+		radius,
 	} = attributes;
 
 	const [ previewLat, setPreviewLat ] = useState( DEFAULT_LAT );
@@ -232,6 +233,13 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						onChange={ ( val ) => setAttributes( { postsPerPage: val } ) }
 						min={ 1 }
 						max={ 36 }
+					/>
+					<RangeControl
+						label={ __( 'Search radius (km)', 'jeowp' ) }
+						value={ radius }
+						onChange={ ( val ) => setAttributes( { radius: val } ) }
+						min={ 1 }
+						max={ 2000 }
 					/>
 					{ enabledPostTypes.length > 1 && (
 						<SelectControl

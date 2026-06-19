@@ -186,6 +186,7 @@
 				'postType',
 				'imageSize',
 				'imageAsLink',
+				'radius',
 			];
 
 			keys.forEach( ( key ) => {
