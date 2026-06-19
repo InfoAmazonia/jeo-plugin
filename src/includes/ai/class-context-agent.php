@@ -124,6 +124,28 @@ RULES;
 	}
 
 	/**
+	 * Extract the human-readable prompt text from a stored value.
+	 *
+	 * Supports legacy plain-text prompts and new structured-output JSON
+	 * objects such as {"prompt": "..."}.
+	 *
+	 * @param string $stored_value Raw value from the ai_context_prompt option.
+	 * @return string The prompt text, or the original value if extraction fails.
+	 */
+	public static function extract_prompt_text( string $stored_value ): string {
+		if ( empty( $stored_value ) ) {
+			return '';
+		}
+
+		$decoded = json_decode( trim( $stored_value ), true );
+		if ( is_array( $decoded ) && isset( $decoded['prompt'] ) && is_string( $decoded['prompt'] ) ) {
+			return $decoded['prompt'];
+		}
+
+		return $stored_value;
+	}
+
+	/**
 	 * Build the system prompt for the editorial context assistant.
 	 *
 	 * @param string      $user_prefs      User preferences section (empty if none).
@@ -134,7 +156,7 @@ RULES;
 		$use_custom    = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt', false );
 		$custom_prompt = \jeo_settings()->get_option( 'ai_context_prompt' );
 		if ( $use_custom && ! empty( $custom_prompt ) ) {
-			$prompt = $custom_prompt;
+			$prompt = self::extract_prompt_text( $custom_prompt );
 		} else {
 			$prompt = self::default_system_prompt();
 		}

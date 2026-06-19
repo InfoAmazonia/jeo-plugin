@@ -36,15 +36,17 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 					<label for="ai_context_prompt" style="display: block; margin-bottom: 4px; font-weight: 600;">
 						<?php esc_html_e( 'Custom System Prompt', 'jeowp' ); ?>
 					</label>
+					<?php $stored_custom_prompt = (string) \jeo_settings()->get_option( 'ai_context_prompt' ); ?>
 					<textarea
 						name="<?php echo esc_html( \jeo_settings()->get_field_name( 'ai_context_prompt' ) ); ?>"
 						id="ai_context_prompt"
 						rows="20"
 						class="large-text code"
 						style="font-family: monospace; width: 100%;"
-					><?php echo esc_textarea( \jeo_settings()->get_option( 'ai_context_prompt' ) ); ?></textarea>
+						data-structured-output="true"
+					><?php echo esc_textarea( Context_Agent::extract_prompt_text( $stored_custom_prompt ) ); ?></textarea>
 					<p class="description">
-						<?php esc_html_e( 'Custom system prompt used by the AI Context Assistant. Use the assistant below to generate or refine it.', 'jeowp' ); ?>
+						<?php esc_html_e( 'Custom system prompt used by the AI Context Assistant. Use the assistant below to generate or refine it. This value is stored as structured output JSON internally, but shown here as plain text for editing.', 'jeowp' ); ?>
 					</p>
 				</div>
 
@@ -224,6 +226,19 @@ $use_custom = (bool) \jeo_settings()->get_option( 'ai_use_context_custom_prompt'
 				} ).finally( function() {
 					engineerButton.disabled = false;
 				} );
+			} );
+		}
+
+		// Convert the human-readable custom prompt into structured-output JSON before saving.
+		var settingsForm = promptTextarea ? promptTextarea.closest( 'form' ) : null;
+		if ( settingsForm ) {
+			settingsForm.addEventListener( 'submit', function() {
+				var plainText = promptTextarea.value;
+				try {
+					promptTextarea.value = JSON.stringify( { prompt: plainText } );
+				} catch ( e ) {
+					// Fallback: keep plain text if JSON.stringify fails unexpectedly.
+				}
 			} );
 		}
 	} );
