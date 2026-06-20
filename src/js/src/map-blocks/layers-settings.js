@@ -497,8 +497,13 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 												{ ! inUse && (
 													<p
 														onClick={ () => {
+															const new_layer = setLayer( layer.id );
+															const existing_ids = new Set( attributes.layers.map( ( l ) => l.id ) );
+															if ( existing_ids.has( new_layer.id ) ) {
+																return;
+															}
 															setAttributes( {
-																layers: [ ...attributes.layers, setLayer( layer.id ) ],
+																layers: [ ...attributes.layers, new_layer ],
 															} );
 														} }
 														className="add-button"

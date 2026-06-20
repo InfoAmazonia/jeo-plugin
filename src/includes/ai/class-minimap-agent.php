@@ -118,7 +118,7 @@ You MUST always return a valid minimap configuration with layers, center coordin
 
 You MUST respond with a valid Minimap_Output JSON object:
 
-- `layers`: Array of layer definitions. Each has: `id` (int, from search_layers results), `use` ("fixed"), `default` (true), `show_legend` (true/false).
+- `layers`: Array of layer definitions. Each has: `id` (int, from search_layers results), `use` ("fixed"), `default` (true), `show_legend` (true/false), `reason` (optional string — briefly explain why this layer is relevant to the map).
 - `base_layer`: Object with `id`, `use`, `default`, `show_legend`, `load_as_style`, `variant`. If you don't know a specific base layer ID, set this to null and the system will create one.
 - `center_lat`, `center_lon`: Map center coordinates.
 - `initial_zoom`: Zoom level (0–20). Use ~2–4 for country/region, ~8–12 for city-level.
@@ -138,6 +138,7 @@ You MUST respond with a valid Minimap_Output JSON object:
 - Choose zoom levels appropriate to the geographic scope.
 - Consider editorial context: environmental stories may benefit from satellite base, political stories from light base.
 - When refining, only change what the user asked — preserve good aspects of the current map.
+- Avoid overly generic national layers as thematic overlays when the requested scope is local or regional. For example, do NOT use "hydrography of Brazil", "administrative boundaries of Brazil", or "country outline" as a thematic layer for a city, municipality, or state-level map. Prefer local or topic-specific vector layers.
 
 ## Refinement Rules
 

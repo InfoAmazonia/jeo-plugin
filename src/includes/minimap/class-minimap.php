@@ -131,7 +131,8 @@ class Minimap {
 		$post_id         = (int) $request->get_param( 'post_id' );
 		$conversation_id = sanitize_text_field( $request->get_param( 'conversation_id' ) );
 		$raw_top_k       = $request->get_param( 'top_k' );
-		$top_k           = $raw_top_k ? (int) $raw_top_k : 5;
+		$top_k           = $raw_top_k ? (int) $raw_top_k : (int) \jeo_settings()->get_option( 'ai_rag_topk', 10 );
+		$top_k           = max( 1, min( 50, $top_k ) );
 
 		$post = get_post( $post_id );
 		if ( ! $post ) {
@@ -417,6 +418,12 @@ class Minimap {
 		$validated              = $this->validate_layers( $result->layers );
 		$result->layers         = $validated['valid'];
 		$result->removed_layers = $validated['removed'];
+
+		if ( ! empty( $result->removed_layers ) ) {
+			/* translators: %d: number of removed layers */
+			$removed_notice  = sprintf( __( '%d layer(s) returned by the AI were discarded because they are not published map layers.', 'jeowp' ), count( $result->removed_layers ) );
+			$result->message = trim( $result->message . "\n" . $removed_notice );
+		}
 
 		if ( ! empty( $result->base_layer ) && ! $this->is_valid_layer( $result->base_layer['id'] ?? 0 ) ) {
 			$result->base_layer = null;

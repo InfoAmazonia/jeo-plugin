@@ -445,13 +445,61 @@ class RAG_Worker {
 	}
 
 	/**
-	 * Find layers that semantically match the given text.
+	 * Find layers that match the given text using a hybrid search.
+	 *
+	 * Combines semantic RAG results with a direct text search on layer titles
+	 * and content. Returns up to $top_k unique results, giving priority to
+	 * semantic matches while ensuring literal keyword hits are included.
 	 *
 	 * @param string $text  Text to search against the layer store.
 	 * @param int    $top_k Number of results to return.
 	 * @return array Array of matched documents with metadata.
 	 */
 	public static function find_matching_layers( string $text, int $top_k = 5 ): array {
+		$semantic = self::find_matching_layers_semantic( $text, $top_k );
+		$textual  = self::find_matching_layers_by_text( $text, $top_k * 2 );
+
+		$by_id = array();
+		foreach ( $semantic as $r ) {
+			$by_id[ $r['layer_id'] ] = $r;
+		}
+
+		$max_semantic_score = 0.0;
+		foreach ( $semantic as $r ) {
+			if ( $r['score'] > $max_semantic_score ) {
+				$max_semantic_score = $r['score'];
+			}
+		}
+		$fallback_score = $max_semantic_score > 0 ? $max_semantic_score * 0.8 : 0.5;
+
+		foreach ( $textual as $r ) {
+			$layer_id = $r['layer_id'];
+			if ( ! isset( $by_id[ $layer_id ] ) ) {
+				$r['score']         = $fallback_score;
+				$by_id[ $layer_id ] = $r;
+			}
+		}
+
+		uasort(
+			$by_id,
+			function ( $a, $b ) {
+				$b_score = $b['score'] ?? 0;
+				$a_score = $a['score'] ?? 0;
+				return $b_score <=> $a_score;
+			}
+		);
+
+		return array_slice( array_values( $by_id ), 0, $top_k );
+	}
+
+	/**
+	 * Find layers that semantically match the given text.
+	 *
+	 * @param string $text  Text to search against the layer store.
+	 * @param int    $top_k Number of results to return.
+	 * @return array Array of matched documents with metadata.
+	 */
+	private static function find_matching_layers_semantic( string $text, int $top_k = 5 ): array {
 		$config = RAG_Pipeline_Config::layers();
 
 		$rag = new RAG_Agent( $config->store_name );
@@ -481,6 +529,39 @@ class RAG_Worker {
 				'edit_url'   => $layer_id ? get_edit_post_link( $layer_id, 'raw' ) : '',
 			);
 			++$count;
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Find layers by searching titles and content via WP_Query.
+	 *
+	 * @param string $text  Text to search.
+	 * @param int    $top_k Number of results to return.
+	 * @return array Array of matched layer metadata.
+	 */
+	private static function find_matching_layers_by_text( string $text, int $top_k = 5 ): array {
+		$query = new \WP_Query(
+			array(
+				'post_type'      => 'map-layer',
+				'post_status'    => 'publish',
+				'posts_per_page' => $top_k,
+				's'              => sanitize_text_field( $text ),
+			)
+		);
+
+		$results = array();
+		foreach ( $query->posts as $post ) {
+			$results[] = array(
+				'layer_id'   => $post->ID,
+				'title'      => $post->post_title,
+				'layer_type' => get_post_meta( $post->ID, 'layer_type', true ),
+				'source_url' => get_post_meta( $post->ID, 'source_url', true ),
+				'score'      => 0,
+				'content'    => mb_strimwidth( wp_strip_all_tags( $post->post_content ), 0, 300, '...' ),
+				'edit_url'   => get_edit_post_link( $post->ID, 'raw' ),
+			);
 		}
 
 		return $results;

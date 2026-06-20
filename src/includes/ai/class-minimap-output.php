@@ -27,7 +27,7 @@ class Minimap_Output {
 	 * @var array
 	 */
 	#[SchemaProperty(
-		description: 'Thematic map layer definitions. Each entry has: id (int), use ("fixed"), default (true), show_legend (bool), style (optional object). The style object can contain: use_default (bool — when true, use the layer\'s AI-suggested default_style), filter (array — MapLibre filter expression like ["==", "class", "wood"]), paint (object — paint properties like {"fill-color": "#2d5a27", "fill-opacity": 0.6}), layout (object — layout properties).',
+		description: 'Thematic map layer definitions. Each entry has: id (int), use ("fixed"), default (true), show_legend (bool), reason (optional string — briefly explain why this layer was selected), style (optional object). The style object can contain: use_default (bool — when true, use the layer\'s AI-suggested default_style), filter (array — MapLibre filter expression like ["==", "class", "wood"]), paint (object — paint properties like {"fill-color": "#2d5a27", "fill-opacity": 0.6}), layout (object — layout properties).',
 		required: true,
 	)]
 	public array $layers = array();
@@ -123,6 +123,14 @@ class Minimap_Output {
 	public string $assistant_message = '';
 
 	/**
+	 * IDs of layers returned by the agent that were discarded because they do
+	 * not correspond to published map-layer posts.
+	 *
+	 * @var int[]
+	 */
+	public array $removed_layers = array();
+
+	/**
 	 * Convert to the array format expected by the minimap block attributes.
 	 *
 	 * @return array
@@ -155,6 +163,7 @@ class Minimap_Output {
 			'pins'              => $this->pins,
 			'message'           => $this->message,
 			'assistant_message' => $this->assistant_message,
+			'removed_layers'    => $this->removed_layers,
 		);
 
 		if ( null !== $this->base_variant ) {

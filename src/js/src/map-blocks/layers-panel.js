@@ -33,6 +33,9 @@ export default function ( {
 										{ decodeHtmlEntity( settings.layer.title.rendered ) } -{ ' ' }
 										{ settings.layer.meta.type }
 									</h2>
+									{ layerSettings.reason && (
+										<p className="jeo-layer-reason">{ layerSettings.reason }</p>
+									) }
 									{ layerUseLabels[ settings.use ] }
 									{ settings.use !== 'fixed' &&
 										settings.default &&
