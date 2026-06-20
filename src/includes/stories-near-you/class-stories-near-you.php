@@ -30,6 +30,8 @@ class Stories_Near_You {
 	const POST_LAYOUTS    = array( 'grid', 'list' );
 	const MEDIA_POSITIONS = array( 'top', 'left', 'right', 'behind' );
 	const IMAGE_SHAPES    = array( 'landscape', 'portrait', 'square', 'uncropped' );
+	const ORDER_BY        = array( 'nearest', 'recent', 'relevance' );
+	const MAX_AGE_DAYS    = 3650;
 
 	/**
 	 * Initialize hooks.
@@ -196,6 +198,22 @@ class Stories_Near_You {
 						'type'    => 'number',
 						'default' => 100,
 					),
+					'orderBy'            => array(
+						'type'    => 'string',
+						'default' => 'recent',
+					),
+					'maxAgeDays'         => array(
+						'type'    => 'number',
+						'default' => 0,
+					),
+					'distanceWeight'     => array(
+						'type'    => 'number',
+						'default' => 1,
+					),
+					'dateWeight'         => array(
+						'type'    => 'number',
+						'default' => 1,
+					),
 				),
 			)
 		);
@@ -243,6 +261,10 @@ class Stories_Near_You {
 				'imageSize'          => 'medium_large',
 				'imageAsLink'        => false,
 				'radius'             => 100,
+				'orderBy'            => 'recent',
+				'maxAgeDays'         => 0,
+				'distanceWeight'     => 1,
+				'dateWeight'         => 1,
 			)
 		);
 
@@ -284,11 +306,18 @@ class Stories_Near_You {
 			$atts['imageSize'] = 'medium_large';
 		}
 
-		$atts['typeScale']  = max( 1, min( 10, (int) $atts['typeScale'] ) );
-		$atts['imageScale'] = max( 1, min( 4, (int) $atts['imageScale'] ) );
-		$atts['colGap']     = max( 1, min( 3, (int) $atts['colGap'] ) );
-		$atts['minHeight']  = max( 0, min( 100, (int) $atts['minHeight'] ) );
-		$atts['radius']     = max( 1, min( 2000, (float) $atts['radius'] ) );
+		$atts['typeScale']      = max( 1, min( 10, (int) $atts['typeScale'] ) );
+		$atts['imageScale']     = max( 1, min( 4, (int) $atts['imageScale'] ) );
+		$atts['colGap']         = max( 1, min( 3, (int) $atts['colGap'] ) );
+		$atts['minHeight']      = max( 0, min( 100, (int) $atts['minHeight'] ) );
+		$atts['radius']         = max( 1, min( 2000, (float) $atts['radius'] ) );
+		$atts['maxAgeDays']     = max( 0, min( self::MAX_AGE_DAYS, (int) $atts['maxAgeDays'] ) );
+		$atts['distanceWeight'] = max( 0, min( 10, (float) $atts['distanceWeight'] ) );
+		$atts['dateWeight']     = max( 0, min( 10, (float) $atts['dateWeight'] ) );
+
+		if ( ! in_array( $atts['orderBy'], self::ORDER_BY, true ) ) {
+			$atts['orderBy'] = 'recent';
+		}
 
 		if ( empty( $atts['categories'] ) && ! empty( $atts['category'] ) ) {
 			$atts['categories'] = (string) (int) $atts['category'];
@@ -417,6 +446,10 @@ class Stories_Near_You {
 		$filters['tags']                = $this->parse_id_list( $atts['tags'] );
 		$filters['category_exclusions'] = $this->parse_id_list( $atts['categoryExclusions'] );
 		$filters['tag_exclusions']      = $this->parse_id_list( $atts['tagExclusions'] );
+		$filters['order_by']            = ! empty( $atts['orderBy'] ) ? $atts['orderBy'] : 'recent';
+		$filters['max_age_days']        = ! empty( $atts['maxAgeDays'] ) ? (int) $atts['maxAgeDays'] : 0;
+		$filters['distance_weight']     = isset( $atts['distanceWeight'] ) ? (float) $atts['distanceWeight'] : 1;
+		$filters['date_weight']         = isset( $atts['dateWeight'] ) ? (float) $atts['dateWeight'] : 1;
 
 		if ( ! empty( $atts['postType'] ) ) {
 			$filters['post_type'] = array_map( 'sanitize_key', explode( ',', $atts['postType'] ) );
@@ -591,6 +624,29 @@ class Stories_Near_You {
 						'minimum' => 1,
 						'maximum' => 2000,
 					),
+					'orderBy'            => array(
+						'type'    => 'string',
+						'default' => 'recent',
+						'enum'    => self::ORDER_BY,
+					),
+					'maxAgeDays'         => array(
+						'type'    => 'integer',
+						'default' => 0,
+						'minimum' => 0,
+						'maximum' => self::MAX_AGE_DAYS,
+					),
+					'distanceWeight'     => array(
+						'type'    => 'number',
+						'default' => 1,
+						'minimum' => 0,
+						'maximum' => 10,
+					),
+					'dateWeight'         => array(
+						'type'    => 'number',
+						'default' => 1,
+						'minimum' => 0,
+						'maximum' => 10,
+					),
 				),
 			)
 		);
@@ -716,6 +772,10 @@ class Stories_Near_You {
 			'imageSize'          => $request->get_param( 'imageSize' ),
 			'imageAsLink'        => filter_var( $request->get_param( 'imageAsLink' ), FILTER_VALIDATE_BOOLEAN ),
 			'radius'             => (float) $request->get_param( 'radius' ),
+			'orderBy'            => $request->get_param( 'orderBy' ),
+			'maxAgeDays'         => (int) $request->get_param( 'maxAgeDays' ),
+			'distanceWeight'     => (float) $request->get_param( 'distanceWeight' ),
+			'dateWeight'         => (float) $request->get_param( 'dateWeight' ),
 		);
 
 		$atts        = $this->sanitize_atts( $atts );
@@ -861,6 +921,21 @@ class Stories_Near_You {
 
 		$radius_meters = (float) $radius * 1000;
 
+		$date_clause = '';
+		if ( ! empty( $filters['max_age_days'] ) ) {
+			$date_clause = ' AND p.post_date >= DATE_SUB(NOW(), INTERVAL %d DAY)';
+		}
+
+		$order_by     = ! empty( $filters['order_by'] ) && in_array( $filters['order_by'], self::ORDER_BY, true ) ? $filters['order_by'] : 'recent';
+		$order_by_sql = 'post_date DESC';
+		if ( 'nearest' === $order_by ) {
+			$order_by_sql = 'distance ASC';
+		} elseif ( 'relevance' === $order_by ) {
+			$distance_weight = ! empty( $filters['distance_weight'] ) ? (float) $filters['distance_weight'] : 1;
+			$date_weight     = ! empty( $filters['date_weight'] ) ? (float) $filters['date_weight'] : 1;
+			$order_by_sql    = "( (distance / {$radius_meters}) * {$distance_weight} ) + ( (DATEDIFF(NOW(), p.post_date) / 365) * {$date_weight} ) ASC";
+		}
+
 		$primary_template = "
 			SELECT p.ID, p.post_date,
 				ST_Distance_Sphere(POINT(%f, %f), POINT(CAST(tlon.meta_value AS DECIMAL(10,{$coord_precision})), CAST(tlat.meta_value AS DECIMAL(10,{$coord_precision})))) AS distance
@@ -884,6 +959,7 @@ class Stories_Near_You {
 				{$taxonomy_where}
 				{$wpml_where}
 				{$exclude_clause}
+				{$date_clause}
 			HAVING distance <= %f";
 
 		$secondary_template = str_replace(
@@ -892,8 +968,14 @@ class Stories_Near_You {
 			$primary_template
 		);
 
-		$union_sql    = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY post_date DESC LIMIT %d';
-		$all_params   = array_merge( array( $lng, $lat ), $types, array( $radius_meters ), array( $lng, $lat ), $types, array( $radius_meters ), array( $limit ) );
+		$union_sql  = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY ' . $order_by_sql . ' LIMIT %d';
+		$all_params = array_merge( array( $lng, $lat ), $types, array( $radius_meters ), array( $lng, $lat ), $types, array( $radius_meters ), array( $limit ) );
+
+		if ( ! empty( $filters['max_age_days'] ) ) {
+			$max_age_days = max( 1, (int) $filters['max_age_days'] );
+			$all_params   = array_merge( array( $max_age_days ), $all_params, array( $max_age_days ) );
+		}
+
 		$prepared_sql = $wpdb->prepare( $union_sql, $all_params ); // phpcs:ignore WordPress.DB.PreparedSQL
 		$results      = $wpdb->get_results( $prepared_sql ); // phpcs:ignore WordPress.DB.PreparedSQL
 

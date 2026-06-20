@@ -187,6 +187,10 @@
 				'imageSize',
 				'imageAsLink',
 				'radius',
+				'orderBy',
+				'maxAgeDays',
+				'distanceWeight',
+				'dateWeight',
 			];
 
 			keys.forEach( ( key ) => {

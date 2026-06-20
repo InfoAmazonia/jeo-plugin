@@ -47,6 +47,10 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 		imageSize,
 		imageAsLink,
 		radius,
+		orderBy,
+		maxAgeDays,
+		distanceWeight,
+		dateWeight,
 	} = attributes;
 
 	const [ previewLat, setPreviewLat ] = useState( DEFAULT_LAT );
@@ -241,6 +245,43 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 						min={ 1 }
 						max={ 2000 }
 					/>
+					<SelectControl
+						label={ __( 'Order by', 'jeowp' ) }
+						value={ orderBy || 'recent' }
+						options={ [
+							{ label: __( 'Most recent nearby', 'jeowp' ), value: 'recent' },
+							{ label: __( 'Nearest first', 'jeowp' ), value: 'nearest' },
+							{ label: __( 'Relevance (distance + date)', 'jeowp' ), value: 'relevance' },
+						] }
+						onChange={ ( val ) => setAttributes( { orderBy: val } ) }
+					/>
+					<RangeControl
+						label={ __( 'Max age (days, 0 = no limit)', 'jeowp' ) }
+						value={ maxAgeDays || 0 }
+						onChange={ ( val ) => setAttributes( { maxAgeDays: val } ) }
+						min={ 0 }
+						max={ 3650 }
+					/>
+					{ orderBy === 'relevance' && (
+						<>
+							<RangeControl
+								label={ __( 'Distance weight', 'jeowp' ) }
+								value={ distanceWeight || 1 }
+								onChange={ ( val ) => setAttributes( { distanceWeight: val } ) }
+								min={ 0 }
+								max={ 10 }
+								step={ 0.1 }
+							/>
+							<RangeControl
+								label={ __( 'Date weight', 'jeowp' ) }
+								value={ dateWeight || 1 }
+								onChange={ ( val ) => setAttributes( { dateWeight: val } ) }
+								min={ 0 }
+								max={ 10 }
+								step={ 0.1 }
+							/>
+						</>
+					) }
 					{ enabledPostTypes.length > 1 && (
 						<SelectControl
 							label={ __( 'Post type', 'jeowp' ) }

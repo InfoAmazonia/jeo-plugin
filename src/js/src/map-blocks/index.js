@@ -576,6 +576,26 @@ registerBlockType( 'jeo/stories-near-you', {
 			type: 'boolean',
 			default: false,
 		},
+		radius: {
+			type: 'number',
+			default: 100,
+		},
+		orderBy: {
+			type: 'string',
+			default: 'recent',
+		},
+		maxAgeDays: {
+			type: 'number',
+			default: 0,
+		},
+		distanceWeight: {
+			type: 'number',
+			default: 1,
+		},
+		dateWeight: {
+			type: 'number',
+			default: 1,
+		},
 	},
 	edit: StoriesNearYouEditor,
 	save: () => null,
