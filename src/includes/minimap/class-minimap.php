@@ -178,18 +178,20 @@ class Minimap {
 		$pins = $this->get_pins( $post_id );
 
 		$response_data = array(
-			'success'      => true,
-			'layers'       => $layers,
-			'base_layer'   => $base_layer,
-			'center_lat'   => $center_zoom['lat'],
-			'center_lon'   => $center_zoom['lon'],
-			'initial_zoom' => $center_zoom['zoom'],
-			'pins'         => $pins,
-			'message'      => $rag_message,
+			'success'        => true,
+			'layers'         => $layers,
+			'base_layer'     => $base_layer,
+			'center_lat'     => $center_zoom['lat'],
+			'center_lon'     => $center_zoom['lon'],
+			'initial_zoom'   => $center_zoom['zoom'],
+			'pins'           => $pins,
+			'message'        => $rag_message,
+			'removed_layers' => array(),
 		);
 
 		if ( ! empty( $conversation_id ) ) {
 			$this->persist_initial_context( $post_id, $conversation_id, $response_data );
+			$this->persist_minimap_summary( $post_id, $conversation_id, (object) $response_data, __( 'Generate a map for this post based on its content.', 'jeowp' ) );
 		}
 
 		return new \WP_REST_Response( $response_data, 200 );
@@ -341,13 +343,19 @@ class Minimap {
 
 		$state_context = $this->build_state_context( $request );
 
+		$current_map_state = $request->get_param( 'current_map_state' );
+		$previous_state    = is_array( $current_map_state ) ? $current_map_state : null;
+		$is_refinement     = 'regenerate' !== $type;
+
 		try {
 			$result = $this->run_agent(
 				$post_id,
 				$conversation_id,
 				$user_id,
 				$resolved_message,
-				$state_context
+				$state_context,
+				$previous_state,
+				$is_refinement
 			);
 
 			return new \WP_REST_Response( $result->to_rest_response(), 200 );
@@ -373,11 +381,13 @@ class Minimap {
 	 * @param int         $user_id         User ID.
 	 * @param string      $message         User message to the agent.
 	 * @param string|null $state_context   Current map state context for the system prompt.
+	 * @param array|null  $previous_state  Previous map state for diff guard.
+	 * @param bool        $is_refinement   Whether this call refines an existing map.
 	 * @return Minimap_Output
 	 * @throws \Exception On agent failure or empty AI response.
 	 * @throws \TypeError On unexpected type errors from the AI library.
 	 */
-	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message, ?string $state_context = null ): Minimap_Output {
+	private function run_agent( int $post_id, string $conversation_id, int $user_id, string $message, ?string $state_context = null, ?array $previous_state = null, bool $is_refinement = false ): Minimap_Output {
 		$assistant = Minimap_Agent::create( $post_id, $conversation_id, $user_id ? $user_id : null, $state_context );
 
 		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
@@ -404,11 +414,19 @@ class Minimap {
 			$result->pins = $this->get_pins( $post_id );
 		}
 
-		$result->layers = $this->validate_layers( $result->layers );
+		$validated              = $this->validate_layers( $result->layers );
+		$result->layers         = $validated['valid'];
+		$result->removed_layers = $validated['removed'];
 
 		if ( ! empty( $result->base_layer ) && ! $this->is_valid_layer( $result->base_layer['id'] ?? 0 ) ) {
 			$result->base_layer = null;
 		}
+
+		if ( $is_refinement && ! empty( $previous_state ) ) {
+			$result = $this->apply_diff_guard( $previous_state, $result, $message );
+		}
+
+		$this->persist_minimap_summary( $post_id, $conversation_id, $result, $message );
 
 		return $result;
 	}
@@ -568,9 +586,10 @@ class Minimap {
 				}
 				$layer_post    = get_post( $layer_id );
 				$name          = $layer_post ? $layer_post->post_title : "Layer #{$layer_id}";
-				$layer_lines[] = "{$name} (ID: {$layer_id})";
+				$reason        = ! empty( $layer_def['reason'] ) ? ' — ' . $layer_def['reason'] : '';
+				$layer_lines[] = "{$name} (ID: {$layer_id}){$reason}";
 			}
-			$parts[] = 'Layers: ' . ( ! empty( $layer_lines ) ? implode( ', ', $layer_lines ) : '(none)' );
+			$parts[] = 'Layers: ' . ( ! empty( $layer_lines ) ? "\n- " . implode( "\n- ", $layer_lines ) : '(none)' );
 		} else {
 			$parts[] = 'Layers: (none)';
 		}
@@ -590,11 +609,191 @@ class Minimap {
 		$pins = $raw_state['pins'] ?? array();
 		if ( ! empty( $pins ) ) {
 			$parts[] = sprintf( 'Pins: %d geolocation point(s)', count( $pins ) );
+			foreach ( $pins as $i => $pin ) {
+				$parts[] = sprintf(
+					'  Pin %d: %.6f, %.6f (%s)',
+					$i + 1,
+					(float) ( $pin['lat'] ?? 0 ),
+					(float) ( $pin['lon'] ?? 0 ),
+					! empty( $pin['address'] ) ? $pin['address'] : 'no address'
+				);
+			}
 		}
 
-		$parts[] = "\nWhen refining, preserve the existing map configuration unless the user explicitly asks to change it.";
+		$summary = $this->load_minimap_summary( $request->get_param( 'post_id' ), $request->get_param( 'conversation_id' ) );
+		if ( ! empty( $summary['original_intent'] ) ) {
+			$parts[] = "\nOriginal intent: " . $summary['original_intent'];
+		}
+		if ( ! empty( $summary['topics_searched'] ) ) {
+			$parts[] = 'Topics searched: ' . implode( ', ', $summary['topics_searched'] );
+		}
+
+		$parts[] = "\nWhen refining, make ONLY the minimum change requested. Keep all existing layers, center, zoom and base layer unless the user explicitly asks to change them. If the user asks to add or remove a specific layer, do that without regenerating the rest of the map.";
 
 		return implode( "\n", $parts );
+	}
+
+	/**
+	 * Build the meta key used to store/retrieve a minimap technical summary.
+	 *
+	 * @param string $conversation_id Conversation UUID.
+	 * @return string
+	 */
+	private function summary_meta_key( string $conversation_id ): string {
+		return "_jeo_minimap_summary_{$conversation_id}";
+	}
+
+	/**
+	 * Persist a technical summary of the current minimap configuration.
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @param object $result          Agent output or stdClass with map data.
+	 * @param string $message         Current user message.
+	 * @return void
+	 */
+	private function persist_minimap_summary( int $post_id, string $conversation_id, object $result, string $message ): void {
+		$meta_key = $this->summary_meta_key( $conversation_id );
+		$existing = get_post_meta( $post_id, $meta_key, true );
+		$existing = is_array( $existing ) ? $existing : array();
+
+		$layer_ids = array();
+		$layers    = $result->layers ?? array();
+		foreach ( $layers as $layer_def ) {
+			$layer_ids[] = (int) ( $layer_def['id'] ?? 0 );
+		}
+
+		$base_layer   = $result->base_layer ?? null;
+		$base_variant = null;
+		if ( is_array( $base_layer ) && ! empty( $base_layer['variant'] ) ) {
+			$base_variant = $base_layer['variant'];
+		} elseif ( ! empty( $result->base_variant ) ) {
+			$base_variant = $result->base_variant;
+		}
+
+		$summary = array(
+			'timestamp'       => current_time( 'mysql' ),
+			'original_intent' => ! empty( $existing['original_intent'] ) ? $existing['original_intent'] : $message,
+			'topics_searched' => $this->extract_topics( $message ),
+			'layers_found'    => array_values( array_filter( $layer_ids ) ),
+			'layers_removed'  => $result->removed_layers ?? array(),
+			'base_variant'    => $base_variant,
+			'center_lat'      => $result->center_lat ?? null,
+			'center_lon'      => $result->center_lon ?? null,
+			'initial_zoom'    => $result->initial_zoom ?? null,
+			'pins_count'      => count( $result->pins ?? array() ),
+			'message'         => $result->message ?? '',
+		);
+
+		update_post_meta( $post_id, $meta_key, $summary );
+	}
+
+	/**
+	 * Load the persisted technical summary for a conversation.
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @return array
+	 */
+	private function load_minimap_summary( int $post_id, string $conversation_id ): array {
+		$summary = get_post_meta( $post_id, $this->summary_meta_key( $conversation_id ), true );
+		return is_array( $summary ) ? $summary : array();
+	}
+
+	/**
+	 * Extract simple topic keywords from a message.
+	 *
+	 * @param string $message User message.
+	 * @return array
+	 */
+	private function extract_topics( string $message ): array {
+		$stop_words = array( 'a', 'o', 'as', 'os', 'de', 'do', 'da', 'dos', 'das', 'em', 'no', 'na', 'nos', 'nas', 'e', 'ou', 'para', 'pra', 'por', 'com', 'sem', 'sobre', 'que', 'se', 'um', 'uma', 'the', 'a', 'an', 'and', 'or', 'of', 'in', 'on', 'at', 'to', 'for', 'with', 'without', 'about' );
+		$words      = preg_split( '/[^\p{L}\p{N}]+/u', strtolower( $message ), -1, PREG_SPLIT_NO_EMPTY );
+		if ( false === $words ) {
+			$words = array();
+		}
+		$topics = array();
+		foreach ( $words as $word ) {
+			if ( strlen( $word ) < 3 || in_array( $word, $stop_words, true ) ) {
+				continue;
+			}
+			$topics[] = $word;
+		}
+		return array_values( array_unique( $topics ) );
+	}
+
+	/**
+	 * Guard against unsolicited large changes during refinement.
+	 *
+	 * Compares the new agent output with the previous block state. If too many
+	 * layers changed without an explicit regeneration request, preserve the
+	 * previous layers and add a warning to the result message.
+	 *
+	 * @param array          $previous_state Previous map state from the block.
+	 * @param Minimap_Output $result         Agent output.
+	 * @param string         $message        Resolved user message.
+	 * @return Minimap_Output
+	 */
+	private function apply_diff_guard( array $previous_state, Minimap_Output $result, string $message ): Minimap_Output {
+		$previous_layers = $previous_state['layers'] ?? array();
+		if ( empty( $previous_layers ) ) {
+			return $result;
+		}
+
+		$previous_ids = array();
+		foreach ( $previous_layers as $layer_def ) {
+			$layer_id = (int) ( $layer_def['id'] ?? 0 );
+			if ( $layer_id ) {
+				$previous_ids[] = $layer_id;
+			}
+		}
+		$previous_ids = array_unique( $previous_ids );
+
+		$new_ids = array();
+		foreach ( $result->layers as $layer_def ) {
+			$layer_id = (int) ( $layer_def['id'] ?? 0 );
+			if ( $layer_id ) {
+				$new_ids[] = $layer_id;
+			}
+		}
+		$new_ids = array_unique( $new_ids );
+
+		$removed_ids = array_diff( $previous_ids, $new_ids );
+		if ( empty( $removed_ids ) ) {
+			return $result;
+		}
+
+		$removed_count  = count( $removed_ids );
+		$previous_count = count( $previous_ids );
+
+		// Allow broad changes only when the user explicitly asks for them.
+		$explicit_change = false;
+		$change_markers  = array( 'new', 'nova', 'novo', 'reset', 'reseta', 'refazer', 'recomeçar', 'do zero', 'from scratch', 'regenerate', 'completely' );
+		$lower_message   = strtolower( $message );
+		foreach ( $change_markers as $marker ) {
+			if ( false !== strpos( $lower_message, $marker ) ) {
+				$explicit_change = true;
+				break;
+			}
+		}
+
+		$threshold = max( 1, (int) round( $previous_count * 0.5 ) );
+		if ( $removed_count > $threshold && ! $explicit_change ) {
+			$restored = array();
+			foreach ( $previous_layers as $layer_def ) {
+				$layer_id = (int) ( $layer_def['id'] ?? 0 );
+				if ( $layer_id && in_array( $layer_id, $removed_ids, true ) && $this->is_valid_layer( $layer_id ) ) {
+					$restored[] = $layer_def;
+				}
+			}
+
+			$result->layers = array_merge( $result->layers, $restored );
+
+			$warning         = __( 'The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map.', 'jeowp' );
+			$result->message = trim( $result->message . "\n" . $warning );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -629,17 +828,23 @@ class Minimap {
 	 * Validate a list of layer definitions, filtering out invalid or non-publish IDs.
 	 *
 	 * @param array $layers Layer definitions from agent output.
-	 * @return array Valid layer definitions only.
+	 * @return array Array with 'valid' layer definitions and 'removed' IDs.
 	 */
 	private function validate_layers( array $layers ): array {
-		$valid = array();
+		$valid   = array();
+		$removed = array();
 		foreach ( $layers as $layer_def ) {
 			$layer_id = (int) ( $layer_def['id'] ?? 0 );
 			if ( $this->is_valid_layer( $layer_id ) ) {
 				$valid[] = $layer_def;
+			} else {
+				$removed[] = $layer_id;
 			}
 		}
-		return $valid;
+		return array(
+			'valid'   => $valid,
+			'removed' => $removed,
+		);
 	}
 
 	/**
