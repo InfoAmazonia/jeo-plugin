@@ -305,9 +305,31 @@ The editor (`stories-near-you-editor.js`) provides these InspectorControls panel
 
 1. **Location Preview** — Lat/Lng for ServerSideRender preview (now persisted as `lat`/`lng` attributes and used by the frontend as the primary location source), plus maximum radius (`radiusKm`)
 2. **Post Card** — Layout (`postLayout`), Media position (`mediaPosition`), Image shape, Columns
-3. **Query Settings** — Posts per page, Post type (only shown if >1 geo-enabled types)
+3. **Query Settings** — Posts per page, Search radius (km, 1–2000), Order by (`recent`/`nearest`/`relevance`), Max age (days, 0 = no limit), Distance/Date weights for relevance mode, Post type (only shown if >1 geo-enabled types)
 4. **Filters** — Categories/Tags (multi-select), Category/Tag exclusions
 5. **Display** — Thumbnail, Category, Date, Excerpt (with length), Author (with avatar), Read more (with label)
 6. **Typography & Spacing** — Type scale (1–10), Image scale (1–4, horizontal only), Column gap (1–3), Min height (featured only)
 
 Text color uses native Gutenberg `supports.color` (not a custom attribute). Link color also supported.
+
+## Ordering and Scoring
+
+The block supports three ordering modes via the `orderBy` attribute:
+
+| Mode | SQL `ORDER BY` | Description |
+|---|---|---|
+| `recent` | `post_date DESC` | Most recent posts within the radius |
+| `nearest` | `distance ASC` | Closest posts first |
+| `relevance` | Combined score | Weighted combination of normalized distance and normalized age |
+
+The relevance score is computed as:
+
+```sql
+(distance / radius_meters) * distance_weight + (DATEDIFF(NOW(), post_date) / 365) * date_weight
+```
+
+Both weights default to `1` and can be adjusted from `0` to `10` in the editor.
+
+## Max Age Filter
+
+The `maxAgeDays` attribute adds a SQL `WHERE p.post_date >= DATE_SUB(NOW(), INTERVAL %d DAY)` clause. Set to `0` to disable the filter. Maximum allowed value is `3650` days.

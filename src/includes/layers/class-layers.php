@@ -98,6 +98,29 @@ class Layers {
 
 		register_post_type( $this->post_type, $args );
 
+		$theme_labels = array(
+			'name'          => __( 'Layer Themes', 'jeowp' ),
+			'singular_name' => __( 'Layer Theme', 'jeowp' ),
+			'add_new_item'  => __( 'Add New Layer Theme', 'jeowp' ),
+			'edit_item'     => __( 'Edit Layer Theme', 'jeowp' ),
+		);
+
+		register_taxonomy(
+			'layer-theme',
+			$this->post_type,
+			array(
+				'labels'            => $theme_labels,
+				'hierarchical'      => true,
+				'public'            => false,
+				'show_ui'           => true,
+				'show_admin_column' => true,
+				'show_in_rest'      => true,
+				'rewrite'           => false,
+			)
+		);
+
+		$this->seed_layer_theme_terms();
+
 		register_post_meta(
 			$this->post_type,
 			'type',
@@ -215,6 +238,36 @@ class Layers {
 				'description'   => __( 'Legend title', 'jeowp' ),
 			)
 		);
+	}
+
+	/**
+	 * Seed default layer theme terms if they do not exist.
+	 *
+	 * @return void
+	 */
+	private function seed_layer_theme_terms(): void {
+		$default_terms = array(
+			__( 'Deforestation', 'jeowp' ),
+			__( 'Hydrography', 'jeowp' ),
+			__( 'Indigenous Lands', 'jeowp' ),
+			__( 'Protected Areas', 'jeowp' ),
+			__( 'Mining', 'jeowp' ),
+			__( 'Oil and Gas', 'jeowp' ),
+			__( 'Land Use', 'jeowp' ),
+			__( 'Agriculture', 'jeowp' ),
+			__( 'Infrastructure', 'jeowp' ),
+			__( 'Administrative Boundaries', 'jeowp' ),
+			__( 'Socioeconomic', 'jeowp' ),
+			__( 'Biodiversity', 'jeowp' ),
+			__( 'Fire', 'jeowp' ),
+			__( 'Climate', 'jeowp' ),
+		);
+
+		foreach ( $default_terms as $term_name ) {
+			if ( ! term_exists( $term_name, 'layer-theme' ) ) {
+				wp_insert_term( $term_name, 'layer-theme' );
+			}
+		}
 	}
 
 	/**

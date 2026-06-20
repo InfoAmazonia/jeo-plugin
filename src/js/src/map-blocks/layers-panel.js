@@ -26,6 +26,8 @@ export default function ( {
 				<ol>
 					{ layers.map( ( layerSettings ) => {
 						const settings = loadLayer( loadedLayers, layerSettings );
+						const attribution = settings.layer?.meta?.attribution || '';
+						const themes = layerSettings.themes || settings.layer?.meta?.themes || '';
 						return (
 							settings.layer && (
 								<li className="jeo-setting-layer" key={ settings.id }>
@@ -35,6 +37,16 @@ export default function ( {
 									</h2>
 									{ layerSettings.reason && (
 										<p className="jeo-layer-reason">{ layerSettings.reason }</p>
+									) }
+									{ themes && (
+										<p className="jeo-layer-meta">
+											<strong>{ __( 'Themes:', 'jeowp' ) }</strong> { themes }
+										</p>
+									) }
+									{ attribution && (
+										<p className="jeo-layer-meta">
+											<strong>{ __( 'Source:', 'jeowp' ) }</strong> { attribution }
+										</p>
 									) }
 									{ layerUseLabels[ settings.use ] }
 									{ settings.use !== 'fixed' &&

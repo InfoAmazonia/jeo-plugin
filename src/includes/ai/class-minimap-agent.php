@@ -140,6 +140,18 @@ You MUST respond with a valid Minimap_Output JSON object:
 - When refining, only change what the user asked — preserve good aspects of the current map.
 - Respect the geographic scope of the request. When the scope is local or regional (city, municipality, state), reject overly broad national layers such as generic country hydrography, full-country administrative boundaries, or continental base maps as thematic overlays. Use them only as base layers when appropriate. Prefer local or thematic vector layers that match the requested scope.
 
+## Refinement Rules
+
+When the user asks to CHANGE an existing map (refinement), follow these rules strictly:
+
+1. **Preserve by default**: Keep all existing layers, center coordinates, zoom, base layer, and pins unless the user EXPLICITLY asks to change them.
+2. **Minimal change**: Make only the specific change requested. Do NOT regenerate the whole map.
+3. **Adding layers**: If the user asks to add a layer about a topic, run `search_layers` for that topic and append the new layer(s) to the EXISTING layer list. Do NOT remove existing layers.
+4. **Removing layers**: If the user asks to remove a specific layer, remove only that layer. Do NOT change other layers.
+5. **Changing base layer**: If the user asks to change the base variant (e.g. "switch to satellite"), update only `base_layer`/`base_variant`. Do NOT touch thematic layers, center or zoom.
+6. **Regeneration only when explicit**: Only generate a completely new map when the user explicitly asks for it with phrases like "start over", "regenerate", "from scratch", "new map" or "do it again".
+7. **Explain changes**: In `assistant_message`, briefly state what changed and what was preserved.
+
 ## Language
 
 Always respond in the same language the user used in their message.
@@ -163,12 +175,19 @@ When a tool returns a JSON object with "success": false:
    - Keep the current map state unchanged.
 4. NEVER expose technical error details (WP_Error, stack traces, API error codes) to the user. Translate errors into user-friendly messages.
 
+## Layer Themes
+
+The layer catalog is organized by themes. When searching, prefer layers whose themes match the map topic. Available themes: THEMES_LIST
+
 ## Layer Default Styles
 
 When a mapbox-tileset-vector layer has a `default_style` in its REST metadata (containing filter and paint), and the user hasn't requested specific styling, set the layer instance's style to `{ "use_default": true }`. This activates the AI-suggested filter and paint (e.g. filtering landuse to show only "wood" class in green).
 
 If the user later asks to change the styling, set `"use_default": false` and provide the custom paint values in `style.paint`.
 PROMPT;
+
+		$themes_list = self::get_layer_theme_list();
+		$prompt      = str_replace( 'THEMES_LIST', $themes_list, $prompt );
 
 		if ( $has_mapbox ) {
 			$prompt .= "\n\n" . <<<'PROMPT'
@@ -177,10 +196,10 @@ PROMPT;
 You have access to `generate_layer(prompt, layer_name)` which creates custom Mapbox map styles from a text description and creates a new layer. This has cost implications (AI tokens + Mapbox API usage).
 
 Rules:
-- NEVER call `generate_layer` without explicit user authorization via chat.
-- When `search_layers` returns insufficient results, mention what's missing in `assistant_message` and ask the user if they would like you to generate a custom layer.
-- Only call `generate_layer` after the user explicitly confirms (e.g. "yes", "go ahead", "generate it").
-- On the initial auto-generation (from post content or prompt), do NOT generate custom layers — use existing ones only. Report gaps in `assistant_message`.
+- NEVER call `generate_layer` without explicit user authorization via chat, EXCEPT for simple administrative boundary layers (municipal or state limits) using public data. For those, you MAY generate proactively when `search_layers` finds no suitable option.
+- When `search_layers` returns insufficient results for non-administrative topics, mention what's missing in `assistant_message` and ask the user if they would like you to generate a custom layer.
+- Only call `generate_layer` for non-administrative layers after the user explicitly confirms (e.g. "yes", "go ahead", "generate it").
+- On the initial auto-generation (from post content or prompt), do NOT generate custom layers except simple administrative boundaries — use existing ones only. Report gaps in `assistant_message`.
 - When generate_layer returns success with a "limitations" field, include the limitations information in assistant_message so the user understands what the layer actually shows.
 - When the user provides an external URL (GeoJSON, tile service), pass it in the prompt to generate_layer so the minilayer agent can include it as a source in the style.
 PROMPT;
@@ -201,6 +220,27 @@ PROMPT;
 		}
 
 		return $prompt;
+	}
+
+	/**
+	 * Get a comma-separated list of layer theme names.
+	 *
+	 * @return string
+	 */
+	private static function get_layer_theme_list(): string {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'layer-theme',
+				'hide_empty' => false,
+				'fields'     => 'names',
+			)
+		);
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return 'deforestation, hydrography, indigenous lands, protected areas, mining, oil and gas, land use, agriculture, infrastructure, administrative boundaries, socioeconomic, biodiversity, fire, climate';
+		}
+
+		return implode( ', ', $terms );
 	}
 
 	/**
@@ -228,14 +268,15 @@ Use the `get_post_content` tool to retrieve the post data (pass the `post_id` fr
 - `locations`: Array of location names mentioned (e.g. ["Manaus", "Amazonas", "Brazil"])
 - `geographic_scope`: One of "local", "regional", "national", "international"
 - `summary`: 1–2 sentence summary of the post's geographic relevance
-- `suggested_search_queries`: Array of 5–8 search queries for finding relevant map layers. Generate queries across these categories when relevant:
-  - Administrative boundaries (city, municipality, state, country)
-  - Hydrography / rivers
-  - Deforestation and forest cover
-  - Indigenous territories and protected areas
-  - Mining, oil, gas, and infrastructure
-  - Land use and settlements
-  Include location names from the post in each query when applicable. Use synonyms and alternate phrasings (e.g. "Altamira boundaries", "rios Xingu", "desmatamento Altamira Prodes", "terras indigenas Altamira").
+- `suggested_search_queries`: Array of 4–6 search queries for finding relevant map layers. Build queries by combining the locations above with the most relevant themes below. Use Portuguese terms when the post is in Portuguese. Include queries for different data types when relevant:
+  - Administrative boundaries: e.g. "limites municipais [local]", "limites estaduais [local]"
+  - Deforestation / forest cover: e.g. "desmatamento [local]", "perda florestal [local]"
+  - Hydrography / rivers: e.g. "rios [local]", "hidrografia [local]"
+  - Indigenous territories: e.g. "terras indigenas [local]", "TI [local]"
+  - Protected areas / conservation units: e.g. "unidades de conservacao [local]"
+  - Mining / oil / gas: e.g. "mineração [local]", "petroleo gas [local]"
+  - Land use / soil / agriculture: e.g. "uso do solo [local]", "agricultura [local]"
+  - Socioeconomic / infrastructure: e.g. "rodovias [local]", "assentamentos [local]"
 
 Focus on extracting information that will help find relevant map layers and determine appropriate map center/zoom.
 

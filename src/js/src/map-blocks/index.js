@@ -576,6 +576,26 @@ registerBlockType( 'jeo/stories-near-you', {
 			type: 'boolean',
 			default: false,
 		},
+		radiusKm: {
+			type: 'number',
+			default: 100,
+		},
+		orderBy: {
+			type: 'string',
+			default: 'recent',
+		},
+		maxAgeDays: {
+			type: 'number',
+			default: 0,
+		},
+		distanceWeight: {
+			type: 'number',
+			default: 1,
+		},
+		dateWeight: {
+			type: 'number',
+			default: 1,
+		},
 	},
 	edit: StoriesNearYouEditor,
 	save: () => null,
@@ -590,7 +610,11 @@ registerBlockType( 'jeo/layer-editor', {
 	supports: {
 		align: true,
 	},
-	edit: ( props ) => <LayerEditorPreview { ...props } />,
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<LayerEditorPreview { ...props } />
+		</AsyncModeProvider>
+	),
 	save: () => null,
 } );
 
@@ -603,6 +627,10 @@ registerBlockType( 'jeo/map-editor', {
 	supports: {
 		align: true,
 	},
-	edit: ( props ) => <MapEditorPreview { ...props } />,
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<MapEditorPreview { ...props } />
+		</AsyncModeProvider>
+	),
 	save: () => null,
 } );
