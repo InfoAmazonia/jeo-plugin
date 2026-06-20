@@ -11,6 +11,10 @@ const MAPBOX_RASTER_ATTRIBUTION =
 	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
 
 export function renderLayer( { layer, instance } ) {
+	if ( instance.load_as_style ) {
+		return null;
+	}
+
 	if ( [ 'swappable', 'switchable' ].includes( instance.use ) && ! instance.default ) {
 		return null;
 	}

@@ -38,6 +38,11 @@ import { createUploadAdapter } from './cke5-image-upload';
 import { baseColors } from './color-palettes';
 import { Map as MapPreview } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
+import {
+	applyStyleLayerFiltering,
+	findStyleLayer,
+	styleLayerMapProps,
+} from './use-style-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import {
@@ -566,6 +571,17 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		[ attributes.slides, attributes.navigateMapLayers, currentSlideIndex ]
 	);
 
+	const currentSlideLayers =
+		attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [];
+	const styleBase = useMemo(
+		() =>
+			findStyleLayer(
+				attributes.navigateMapLayers || [],
+				currentSlideLayers
+			),
+		[ attributes.navigateMapLayers, currentSlideLayers ]
+	);
+
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
 		setViewState( {
@@ -800,9 +816,17 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			{ attributes.map_id && loadedMap && (
 				<Fragment>
 					<div className="jeo-preview-area">
+						{ styleBase && (
+							<div className="jeo-style-preview-badge">
+								{ __( 'Vector style preview', 'jeowp' ) }
+							</div>
+						) }
 						<MapPreview
 							ref={ mapRef }
-							key={ `${ key }:${ currentSlideIndex }:${ currentSlidePreviewKey }` }
+							key={ `${ key }:${ currentSlideIndex }:${ currentSlidePreviewKey }${
+								styleBase ? ':style-' + styleBase.instance.id : ''
+							}` }
+							{ ...styleLayerMapProps( styleBase ) }
 							controls={ `top-${inlineEnd}` }
 							fullscreen={ loadedMap.meta.enable_fullscreen }
 							style={ { height: '85vh' } }
@@ -813,6 +837,14 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 							pitch={ viewState.pitch }
 							onMove={ ( event ) => {
 								setViewState( event.viewState );
+							} }
+							onStyleData={ () => {
+								if ( styleBase ) {
+									applyStyleLayerFiltering(
+										mapRef.current,
+										styleBase.instance
+									);
+								}
 							} }
 						>
 							{ attributes.slides[ currentSlideIndex ].selectedLayers.map(

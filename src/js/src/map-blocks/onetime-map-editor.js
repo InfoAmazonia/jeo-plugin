@@ -6,6 +6,11 @@ import { __ } from '@wordpress/i18n';
 import { Map } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
 import { renderLayer } from './map-preview-layer';
+import {
+	applyStyleLayerFiltering,
+	findStyleLayer,
+	styleLayerMapProps,
+} from './use-style-layer';
 import { coerceOnetimeMapAttributes } from './onetime-map-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
@@ -63,6 +68,11 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 		query: { context: 'edit' },
 	} );
 
+	const styleBase = useMemo(
+		() => findStyleLayer( loadedLayers, normalizedAttributes.layers ),
+		[ loadedLayers, normalizedAttributes.layers ]
+	);
+
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
 		if ( map ) {
@@ -117,9 +127,17 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			<div className="jeo-preview-area">
+				{ styleBase && (
+					<div className="jeo-style-preview-badge">
+						{ __( 'Vector style preview', 'jeowp' ) }
+					</div>
+				) }
 				<Map
-					key={ `${ key }:${ currentZoom }:${ layerSettingsKey }` }
+					key={ `${ key }:${ currentZoom }:${ layerSettingsKey }${
+						styleBase ? ':style-' + styleBase.instance.id : ''
+					}` }
 					ref={ mapRef }
+					{ ...styleLayerMapProps( styleBase ) }
 					style={ { height: '100%', width: '100%' } }
 					latitude={ normalizedAttributes.center_lat }
 					longitude={ normalizedAttributes.center_lon }
@@ -133,6 +151,14 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 					onZoom={ ( { viewState } ) => {
 						const zoom = Math.round( viewState.zoom * 10 ) / 10;
 						setAttributes( { [ zoomState ]: zoom } );
+					} }
+					onStyleData={ () => {
+						if ( styleBase ) {
+							applyStyleLayerFiltering(
+								mapRef.current,
+								styleBase.instance
+							);
+						}
 					} }
 				>
 					{ loadedLayers &&

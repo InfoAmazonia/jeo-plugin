@@ -11,7 +11,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import InteractionsSettings from './interactions-settings';
 import { isEmpty, isEqual } from 'lodash-es';
-import { useDebounce } from 'use-debounce';
+import { useDebounce, useDebouncedCallback } from 'use-debounce';
 import SchemaForm, { mergeSchemaFormData } from '../shared/schema-form';
 import { mergeLayerTypeOptions } from '../map-blocks/layer-type-options';
 import {
@@ -88,6 +88,8 @@ function usePrevious( value ) {
 }
 
 const LayerSettings = ( { postMeta, setPostMeta } ) => {
+	const debouncedSetPostMeta = useDebouncedCallback( setPostMeta, 500 );
+
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
 	const [ formData, setFormData ] = useState( () =>
@@ -224,7 +226,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 					window.layerFormData = nextFormData;
 					if ( ! isEqual( nextFormData, formData ) ) {
 						setFormData( nextFormData );
-						setPostMeta( nextFormData );
+						debouncedSetPostMeta( nextFormData );
 					}
 				} }
 			>

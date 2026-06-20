@@ -11,7 +11,7 @@ import { useRecordsByIds } from '../shared/rest-records';
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lng,
+	center_lon: jeo_settings.map_defaults.lon,
 	min_zoom: 0,
 	max_zoom: 20,
 };
@@ -19,8 +19,8 @@ const mapDefaults = {
 export default function MapEditorPreview() {
 	const blockProps = useBlockProps();
 
-	const postMeta = useSelect( ( select ) =>
-		select( 'core/editor' ).getEditedPostAttribute( 'meta' ), [] ) || {};
+	const postMeta = useSelect( ( selectFn ) =>
+		selectFn( 'core/editor' ).getEditedPostAttribute( 'meta' ), [] ) || {};
 	const { editPost } = useDispatch( 'core/editor' );
 	const setPostMeta = useCallback(
 		( meta ) => {
@@ -32,17 +32,26 @@ export default function MapEditorPreview() {
 	);
 
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
-	const [ key, setKey ] = useState( 0 );
 	const mapRef = useRef( undefined );
 
-	// Expose setPanLimitsFromMap for the sidebar MapSettings button.
-	// Since the block runs inside the iframe and the sidebar in the parent,
-	// we use the editor data store to bridge them: MapSettings dispatches
-	// a custom action, and this block listens via a window message (future).
-	// For now, store the function on the iframe window so MapPanel can
-	// call it via cross-frame messaging if needed.
+	const [ viewState, setViewState ] = useState( {
+		latitude: postMeta.center_lat || mapDefaults.center_lat,
+		longitude: postMeta.center_lon || mapDefaults.center_lon,
+		zoom: postMeta.initial_zoom || mapDefaults.initial_zoom,
+	} );
+
+	// Sync zoom from store when zoom mode changes (e.g. clicking "Min Zoom").
+	// Deliberately does NOT re-run on every postMeta change — only on mode switch.
 	useEffect( () => {
-		window.__jeoSetPanLimitsFromMap = () => {
+		const targetZoom =
+			postMeta[ zoomState ] || postMeta.initial_zoom || mapDefaults.initial_zoom;
+		setViewState( ( prev ) => ( { ...prev, zoom: targetZoom } ) );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ zoomState ] );
+
+	// Bridge pan-limits to the sidebar (parent document) via parent window.
+	useEffect( () => {
+		const fn = () => {
 			const { current: map } = mapRef;
 			if ( map ) {
 				const bounds = map.getBounds();
@@ -58,26 +67,22 @@ export default function MapEditorPreview() {
 				} );
 			}
 		};
-		return () => {
-			delete window.__jeoSetPanLimitsFromMap;
-		};
+		try {
+			window.parent.__jeoSetPanLimitsFromMap = fn;
+			return () => {
+				delete window.parent.__jeoSetPanLimitsFromMap;
+			};
+		} catch ( e ) {
+			window.__jeoSetPanLimitsFromMap = fn;
+			return () => {
+				delete window.__jeoSetPanLimitsFromMap;
+			};
+		}
 	}, [ setPostMeta ] );
-
-	const {
-		center_lat: centerLat,
-		center_lon: centerLon,
-		initial_zoom: initialZoom,
-	} = { ...mapDefaults, ...postMeta };
-
-	const currentZoom = postMeta[ zoomState ];
 
 	const layerIds = useMemo( () => {
 		return ( postMeta.layers || [] ).map( ( layer ) => layer.id );
 	}, [ postMeta.layers ] );
-	const layerSettingsKey = useMemo(
-		() => JSON.stringify( postMeta.layers || [] ),
-		[ postMeta.layers ]
-	);
 
 	const { records: loadedLayers = [] } = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
@@ -92,8 +97,6 @@ export default function MapEditorPreview() {
 		border: 0,
 	} );
 
-	// Stop mouse events from propagating to the block editor's selection
-	// handler so the map remains draggable inside the block.
 	const stopPropagation = useCallback( ( e ) => e.stopPropagation(), [] );
 
 	return (
@@ -116,10 +119,7 @@ export default function MapEditorPreview() {
 							className="zoom-button"
 							variant="primary"
 							isLarge
-							onClick={ () => {
-								setZoomState( 'initial_zoom' );
-								setKey( ( currentKey ) => currentKey + 1 );
-							} }
+							onClick={ () => setZoomState( 'initial_zoom' ) }
 						>
 							{ __( 'Initial Zoom', 'jeowp' ) }
 						</Button>
@@ -133,7 +133,6 @@ export default function MapEditorPreview() {
 									setPostMeta( { min_zoom: 0.1 } );
 								}
 								setZoomState( 'min_zoom' );
-								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
 							{ __( 'Min Zoom', 'jeowp' ) }
@@ -148,7 +147,6 @@ export default function MapEditorPreview() {
 									setPostMeta( { max_zoom: 0.1 } );
 								}
 								setZoomState( 'max_zoom' );
-								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
 							{ __( 'Max Zoom', 'jeowp' ) }
@@ -156,20 +154,28 @@ export default function MapEditorPreview() {
 					</div>
 				</div>
 				<Map
-					key={ `${ key }:${ zoomState }:${ layerSettingsKey }` }
 					ref={ mapRef }
 					style={ { height: '500px', width: '100%' } }
-					latitude={ centerLat || 0 }
-					longitude={ centerLon || 0 }
-					zoom={ currentZoom || initialZoom || 11 }
-					onMove={ ( { viewState } ) => {
-						setPostMeta( {
-							center_lat: viewState.latitude,
-							center_lon: viewState.longitude,
+					latitude={ viewState.latitude }
+					longitude={ viewState.longitude }
+					zoom={ viewState.zoom }
+					onMove={ ( { viewState: vs } ) => {
+						setViewState( {
+							latitude: vs.latitude,
+							longitude: vs.longitude,
+							zoom: vs.zoom,
 						} );
 					} }
-					onZoom={ ( { viewState } ) => {
-						let zoom = Math.round( viewState.zoom * 10 ) / 10;
+					onMoveEnd={ ( { viewState: vs } ) => {
+						setPostMeta( {
+							center_lat: vs.latitude,
+							center_lon: vs.longitude,
+						} );
+					} }
+					onZoomEnd={ () => {
+						const map = mapRef.current;
+						if ( ! map ) return;
+						const zoom = Math.round( map.getZoom() * 10 ) / 10;
 						setPostMeta( { [ zoomState ]: zoom } );
 					} }
 				>

@@ -28,8 +28,8 @@ Registered in `class-jeo.php` on `init` hook:
 | `jeo/map-blocks` | Server-side (`render_callback`) | Selectable map from library |
 | `jeo/storymap` | Server-side | Scrollytelling storymap with chapters |
 | `jeo/embedded-storymap` | Server-side | Embeddable storymap |
-| `jeo/map-editor` | Dynamic (iframe) | Inline map preview in editor |
-| `jeo/layer-editor` | Dynamic (iframe) | Inline layer preview in editor |
+| `jeo/map-editor` | Dynamic (iframe) | Inline map preview in editor; also manages zoom controls and pan-limits bridge via `window.parent` |
+| `jeo/layer-editor` | Dynamic (iframe) | Inline layer preview in editor; also manages notices and post save locking based on layer load status |
 | `jeo/stories-near-you` | Skeleton + JS (self-registered) | Geolocated posts sorted by proximity — see [`stories-near-you/README.md`](../stories-near-you/README.md) |
 | `jeo/ai-minimap` | Client-side save (`<div class="jeomap">`) | AI-assisted contextual map with agent-powered generation and multi-turn chat refinement. See [`minimap/README.md`](../minimap/README.md) |
 
@@ -37,8 +37,8 @@ Registered in `class-jeo.php` on `init` hook:
 
 | Plugin | Entry Point | Post Type | Description |
 |--------|------------|-----------|-------------|
-| `jeo-layers-sidebar` | `layers-sidebar/index.js` | `map-layer` | Layer editing with preview |
-| `jeo-maps-sidebar` | `maps-sidebar/index.js` | `map`, `storymap` | Map/storymap editing |
+| `jeo-layers-sidebar` | `layers-sidebar/index.js` | `map-layer` | Layer editing forms (settings, attribution, legend). Map preview is in the `jeo/layer-editor` block |
+| `jeo-maps-sidebar` | `maps-sidebar/index.js` | `map`, `storymap` | Map/storymap editing forms (layers, related posts, settings). Map preview is in the `jeo/map-editor` block |
 | `jeo-posts-sidebar` | `posts-sidebar/index.js` | All | Post geolocation |
 
 ## Block Creation Pattern
