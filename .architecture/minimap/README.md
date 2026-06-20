@@ -414,3 +414,26 @@ Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 - **Debounced map interaction**: `onMove` and `onZoom` handlers use 300 ms lodash debounce to avoid excessive `setAttributes` calls and re-renders during map pan/zoom
 - **Layer render guard**: The map preview only attempts to render layers when `loadedLayers.length > 0`, preventing an empty-map flash while REST metadata is still loading
 - **`load_as_style` parity**: When a `mapbox`-type layer has `load_as_style: true`, the editor preview uses the Mapbox style URL as the map's base style via `use-style-layer.js::findStyleLayer()` (same mechanism as the frontend's `class-jeo-map.js::getStyleLayer()`). The style layer is skipped in `renderLayer` (returns `null`), and `style_layers` filtering is applied via `applyStyleLayerFiltering()` in `onStyleData`. A `key` prop on `<Map>` forces remount when toggling `load_as_style`. See [`.architecture/frontend/README.md`](../frontend/README.md) for the full parity table.
+
+## Refinement Stability (Phase 3)
+
+To prevent the agent from "breaking" an existing map during chat refinement, the backend applies three mechanisms:
+
+1. **Technical summary persistence** — `Minimap::persist_minimap_summary()` stores a per-conversation snapshot in `post_meta` (`_jeo_minimap_summary_{conversation_id}`) containing: original intent, topics searched, layers found/removed, base variant, center/zoom and pin count.
+2. **Enriched state context** — `build_state_context()` sends the live block state to the agent, including layer reasons, full pin coordinates, original intent and searched topics, plus an explicit instruction to make only the requested change.
+3. **Diff guard** — `apply_diff_guard()` compares the agent output with the previous block state. If too many layers are removed without an explicit regeneration request, the previous layers are restored and a warning is added to `message`.
+
+The system prompt also includes **Refinement Rules** that forbid whole-map regeneration unless the user explicitly asks for it.
+
+## Layer Themes & Explain Mode (Phase 4)
+
+- The `layer-theme` taxonomy is registered for the `map-layer` CPT (`src/includes/layers/class-layers.php`). Default terms cover common journalistic themes: Deforestation, Hydrography, Indigenous Lands, Protected Areas, Mining, Oil and Gas, Land Use, Agriculture, Infrastructure, Administrative Boundaries, Socioeconomic, Biodiversity, Fire, Climate.
+- `Layer_Data_Loader` indexes theme terms into the RAG embedding text and metadata.
+- `RAG_Worker::find_matching_layers()` returns `themes` for each result.
+- `Minimap_Agent::system_prompt()` lists the available themes so the agent can prefer theme-matching layers.
+- `Minimap::enrich_layer_metadata()` adds `theme`, `themes` and `attribution` to each layer returned to the editor.
+- `layers-panel.js` displays reason, themes and source in the inspector.
+
+### Proactive administrative boundary generation
+
+When a Mapbox key is configured, the agent may generate simple municipal/state administrative boundary layers proactively if `search_layers` finds no suitable existing layer. All other layer types still require explicit user confirmation before `generate_layer` is called.
