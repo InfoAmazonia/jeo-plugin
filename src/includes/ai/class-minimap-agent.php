@@ -175,12 +175,19 @@ When a tool returns a JSON object with "success": false:
    - Keep the current map state unchanged.
 4. NEVER expose technical error details (WP_Error, stack traces, API error codes) to the user. Translate errors into user-friendly messages.
 
+## Layer Themes
+
+The layer catalog is organized by themes. When searching, prefer layers whose themes match the map topic. Available themes: THEMES_LIST
+
 ## Layer Default Styles
 
 When a mapbox-tileset-vector layer has a `default_style` in its REST metadata (containing filter and paint), and the user hasn't requested specific styling, set the layer instance's style to `{ "use_default": true }`. This activates the AI-suggested filter and paint (e.g. filtering landuse to show only "wood" class in green).
 
 If the user later asks to change the styling, set `"use_default": false` and provide the custom paint values in `style.paint`.
 PROMPT;
+
+		$themes_list = self::get_layer_theme_list();
+		$prompt      = str_replace( 'THEMES_LIST', $themes_list, $prompt );
 
 		if ( $has_mapbox ) {
 			$prompt .= "\n\n" . <<<'PROMPT'
@@ -189,10 +196,10 @@ PROMPT;
 You have access to `generate_layer(prompt, layer_name)` which creates custom Mapbox map styles from a text description and creates a new layer. This has cost implications (AI tokens + Mapbox API usage).
 
 Rules:
-- NEVER call `generate_layer` without explicit user authorization via chat.
-- When `search_layers` returns insufficient results, mention what's missing in `assistant_message` and ask the user if they would like you to generate a custom layer.
-- Only call `generate_layer` after the user explicitly confirms (e.g. "yes", "go ahead", "generate it").
-- On the initial auto-generation (from post content or prompt), do NOT generate custom layers — use existing ones only. Report gaps in `assistant_message`.
+- NEVER call `generate_layer` without explicit user authorization via chat, EXCEPT for simple administrative boundary layers (municipal or state limits) using public data. For those, you MAY generate proactively when `search_layers` finds no suitable option.
+- When `search_layers` returns insufficient results for non-administrative topics, mention what's missing in `assistant_message` and ask the user if they would like you to generate a custom layer.
+- Only call `generate_layer` for non-administrative layers after the user explicitly confirms (e.g. "yes", "go ahead", "generate it").
+- On the initial auto-generation (from post content or prompt), do NOT generate custom layers except simple administrative boundaries — use existing ones only. Report gaps in `assistant_message`.
 - When generate_layer returns success with a "limitations" field, include the limitations information in assistant_message so the user understands what the layer actually shows.
 - When the user provides an external URL (GeoJSON, tile service), pass it in the prompt to generate_layer so the minilayer agent can include it as a source in the style.
 PROMPT;
@@ -213,6 +220,27 @@ PROMPT;
 		}
 
 		return $prompt;
+	}
+
+	/**
+	 * Get a comma-separated list of layer theme names.
+	 *
+	 * @return string
+	 */
+	private static function get_layer_theme_list(): string {
+		$terms = get_terms(
+			array(
+				'taxonomy'   => 'layer-theme',
+				'hide_empty' => false,
+				'fields'     => 'names',
+			)
+		);
+
+		if ( is_wp_error( $terms ) || empty( $terms ) ) {
+			return 'deforestation, hydrography, indigenous lands, protected areas, mining, oil and gas, land use, agriculture, infrastructure, administrative boundaries, socioeconomic, biodiversity, fire, climate';
+		}
+
+		return implode( ', ', $terms );
 	}
 
 	/**

@@ -8,3 +8,13 @@
 	margin: 4px 0 8px;
 	font-style: italic;
 }
+
+.jeo-layer-meta {
+	font-size: 0.8em;
+	color: #666;
+	margin: 2px 0 6px;
+}
+
+.jeo-layer-meta strong {
+	color: #333;
+}

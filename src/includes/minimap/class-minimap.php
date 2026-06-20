@@ -419,6 +419,8 @@ class Minimap {
 		$result->layers         = $validated['valid'];
 		$result->removed_layers = $validated['removed'];
 
+		$result->layers = $this->enrich_layer_metadata( $result->layers );
+
 		if ( ! empty( $result->removed_layers ) ) {
 			/* translators: %d: number of removed layers */
 			$removed_notice  = sprintf( __( '%d layer(s) returned by the AI were discarded because they are not published map layers.', 'jeowp' ), count( $result->removed_layers ) );
@@ -727,6 +729,37 @@ class Minimap {
 			$topics[] = $word;
 		}
 		return array_values( array_unique( $topics ) );
+	}
+
+	/**
+	 * Enrich layer definitions with metadata from the layer CPT.
+	 *
+	 * Adds attribution and theme information so the editor UI can display
+	 * provenance and context for each selected layer.
+	 *
+	 * @param array $layers Layer definitions from agent output.
+	 * @return array Layer definitions with metadata.
+	 */
+	private function enrich_layer_metadata( array $layers ): array {
+		foreach ( $layers as $index => $layer_def ) {
+			$layer_id = (int) ( $layer_def['id'] ?? 0 );
+			if ( ! $layer_id ) {
+				continue;
+			}
+
+			$attribution = get_post_meta( $layer_id, 'attribution', true );
+			if ( ! empty( $attribution ) ) {
+				$layers[ $index ]['attribution'] = wp_strip_all_tags( $attribution );
+			}
+
+			$themes = wp_get_post_terms( $layer_id, 'layer-theme', array( 'fields' => 'names' ) );
+			if ( ! empty( $themes ) && ! is_wp_error( $themes ) ) {
+				$layers[ $index ]['themes'] = implode( ', ', $themes );
+				$layers[ $index ]['theme']  = reset( $themes );
+			}
+		}
+
+		return $layers;
 	}
 
 	/**

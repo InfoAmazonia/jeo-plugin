@@ -55,6 +55,7 @@ class Layer_Data_Loader {
 				'layer_type' => get_post_meta( $post->ID, 'type', true ),
 				'source_url' => get_post_meta( $post->ID, 'source_url', true ),
 				'title'      => $post->post_title,
+				'themes'     => implode( ', ', wp_get_post_terms( $post->ID, 'layer-theme', array( 'fields' => 'names' ) ) ),
 			);
 
 			$doc = new Document( $text );
@@ -95,6 +96,8 @@ class Layer_Data_Loader {
 
 		self::append_source_info( $sections, $post );
 
+		self::append_theme_info( $sections, $post );
+
 		self::append_legend_info( $sections, $post );
 
 		if ( ! empty( $post->post_content ) ) {
@@ -107,6 +110,20 @@ class Layer_Data_Loader {
 		}
 
 		return implode( "\n", $sections );
+	}
+
+	/**
+	 * Append theme taxonomy information.
+	 *
+	 * @param array    $sections Reference to sections array.
+	 * @param \WP_Post $post     The layer post.
+	 * @return void
+	 */
+	private static function append_theme_info( array &$sections, \WP_Post $post ): void {
+		$themes = wp_get_post_terms( $post->ID, 'layer-theme', array( 'fields' => 'names' ) );
+		if ( ! empty( $themes ) && ! is_wp_error( $themes ) ) {
+			$sections[] = 'Themes: ' . implode( ', ', $themes );
+		}
 	}
 
 	/**
