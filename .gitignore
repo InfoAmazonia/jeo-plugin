@@ -37,3 +37,6 @@ dump.sql
 .DS_Store
 Thumbs.db
 dist/
+
+# Intermediate output of scripts/relatorio-to-pdf.mjs
+build-pdf/
