@@ -63,6 +63,15 @@
 
 		if ( effectiveStyle.paint ) {
 			layer.paint = { ...effectiveStyle.paint };
+		} else {
+			// No saved/AI style: apply a visible fallback so catalog layers picked
+			// by the Minimap don't render invisibly (see JeoLayerTypes.getFallbackPaint).
+			const fallbackPaint = window.JeoLayerTypes?.getFallbackPaint?.(
+				attributes.layer_type_options.type
+			);
+			if ( fallbackPaint ) {
+				layer.paint = fallbackPaint;
+			}
 		}
 
 		if ( effectiveStyle.layout ) {

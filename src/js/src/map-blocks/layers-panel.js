@@ -38,6 +38,14 @@ export default function ( {
 									{ layerSettings.reason && (
 										<p className="jeo-layer-reason">{ layerSettings.reason }</p>
 									) }
+									{ layerSettings.auto_style && (
+										<p className="jeo-layer-autostyle">
+											{ __(
+												'Automatic style applied (this layer had no saved style). Edit layer settings to customize it.',
+												'jeowp'
+											) }
+										</p>
+									) }
 									{ themes && (
 										<p className="jeo-layer-meta">
 											<strong>{ __( 'Themes:', 'jeowp' ) }</strong> { themes }

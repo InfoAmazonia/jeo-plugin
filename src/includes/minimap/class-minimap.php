@@ -776,9 +776,32 @@ class Minimap {
 				$layers[ $index ]['themes'] = implode( ', ', $themes );
 				$layers[ $index ]['theme']  = reset( $themes );
 			}
+
+			// Flag vector layers that have no saved style so the editor can show that
+			// an automatic (editable) fallback paint is being applied on the map.
+			if ( $this->layer_uses_fallback_style( $layer_id ) ) {
+				$layers[ $index ]['auto_style'] = true;
+			}
 		}
 
 		return $layers;
+	}
+
+	/**
+	 * Whether a vector layer will be rendered with the automatic fallback paint
+	 * because it has no saved style of its own.
+	 *
+	 * @param int $layer_id Layer CPT post ID.
+	 * @return bool
+	 */
+	private function layer_uses_fallback_style( int $layer_id ): bool {
+		$layer_type = get_post_meta( $layer_id, 'type', true );
+		if ( ! in_array( $layer_type, array( 'mvt', 'mapbox-tileset-vector' ), true ) ) {
+			return false;
+		}
+
+		$default_style = get_post_meta( $layer_id, 'default_style', true );
+		return empty( $default_style['paint'] );
 	}
 
 	/**
@@ -929,7 +952,48 @@ class Minimap {
 			return false;
 		}
 		$post = get_post( $layer_id );
-		return $post instanceof \WP_Post && 'map-layer' === $post->post_type && 'publish' === $post->post_status;
+		if ( ! ( $post instanceof \WP_Post && 'map-layer' === $post->post_type && 'publish' === $post->post_status ) ) {
+			return false;
+		}
+
+		return $this->is_renderable_layer( $layer_id );
+	}
+
+	/**
+	 * Check whether a published map-layer has the minimum configuration needed to
+	 * actually render on the map.
+	 *
+	 * A layer can be a valid, published CPT yet be impossible to render because its
+	 * source configuration is incomplete (e.g. a vector tileset without a tileset_id
+	 * or source_layer). Such layers were previously kept and silently produced an
+	 * empty map ("only the pins show up"). We treat them as not renderable so they
+	 * are reported as removed instead of appearing invisibly.
+	 *
+	 * Note: a missing *style* (paint) does NOT make a layer unrenderable — the
+	 * frontend applies a visible fallback paint for styleless vector layers
+	 * (see JeoLayerTypes.getFallbackPaint). This only checks structural fields.
+	 *
+	 * @param int $layer_id Layer CPT post ID.
+	 * @return bool
+	 */
+	private function is_renderable_layer( int $layer_id ): bool {
+		$layer_type = get_post_meta( $layer_id, 'type', true );
+		$options    = get_post_meta( $layer_id, 'layer_type_options', true );
+		if ( ! is_array( $options ) ) {
+			$options = array();
+		}
+
+		switch ( $layer_type ) {
+			case 'mvt':
+				return ! empty( $options['url'] ) && ! empty( $options['source_layer'] );
+			case 'mapbox-tileset-vector':
+				return ! empty( $options['tileset_id'] ) && ! empty( $options['source_layer'] );
+			case 'mapbox':
+				return ! empty( $options['style_id'] );
+			default:
+				// Other types (geojson, csv, raster, etc.) are assumed renderable.
+				return true;
+		}
 	}
 
 	/**

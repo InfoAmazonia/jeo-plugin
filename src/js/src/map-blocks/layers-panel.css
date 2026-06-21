@@ -18,3 +18,13 @@
 .jeo-layer-meta strong {
 	color: #333;
 }
+
+.jeo-layer-autostyle {
+	margin: 2px 0 6px;
+	padding: 4px 8px;
+	font-size: 0.8em;
+	color: #8a5300;
+	background: #fff4e0;
+	border-left: 3px solid #e15a2d;
+	border-radius: 2px;
+}

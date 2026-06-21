@@ -98,7 +98,10 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 	const [ copiedIndex, setCopiedIndex ] = useState( null );
 	const [ insertedIndices, setInsertedIndices ] = useState( new Set() );
 
-	if ( ! paragraphs || paragraphs.length === 0 ) {
+	const hasParagraphs = paragraphs && paragraphs.length > 0;
+	const hasReferences = references && references.length > 0;
+
+	if ( ! hasParagraphs && ! hasReferences ) {
 		return null;
 	}
 
@@ -212,10 +215,12 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 
 	return (
 		<div className="jeo-context-suggestions">
+			{ hasParagraphs && (
 			<h4 className="jeo-context-suggestions__title">
 				{ __( 'Suggested Paragraphs', 'jeowp' ) }
 			</h4>
-			{ paragraphs.map( ( paragraph, index ) => {
+			) }
+			{ hasParagraphs && paragraphs.map( ( paragraph, index ) => {
 				const safeHtml = sanitizeHtml( paragraph.text );
 				return (
 					<div key={ index } className="jeo-context-suggestion">
@@ -245,6 +250,31 @@ const SuggestedParagraphs = ( { paragraphs, references, onInsertBlock } ) => {
 					</div>
 				);
 			} ) }
+
+			{ hasReferences && (
+				<div className="jeo-context-references">
+					<h4 className="jeo-context-references__title">
+						{ __( 'References used', 'jeowp' ) }
+					</h4>
+					<ul className="jeo-context-references__list">
+						{ references.map( ( reference, index ) => (
+							<li key={ index } className="jeo-context-reference">
+								{ reference.url ? (
+									<a
+										href={ reference.url }
+										target="_blank"
+										rel="noopener noreferrer"
+									>
+										{ reference.title || reference.url }
+									</a>
+								) : (
+									reference.title
+								) }
+							</li>
+						) ) }
+					</ul>
+				</div>
+			) }
 		</div>
 	);
 };
