@@ -58,6 +58,21 @@
 	100% { background-position: -200% 0; }
 }
 
+/* Featured images in the native (core/latest-posts) results.
+   Keep images responsive and consistently cropped so cards line up even when
+   the theme doesn't constrain them. */
+.wp-block-jeo-stories-near-you .wp-block-latest-posts__featured-image img {
+	width: 100%;
+	height: auto;
+	display: block;
+}
+
+.wp-block-jeo-stories-near-you .wp-block-latest-posts.is-grid .wp-block-latest-posts__featured-image img {
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	height: auto;
+}
+
 /* Empty state */
 .jeo-stories-near-you__empty {
 	padding: 40px 20px;

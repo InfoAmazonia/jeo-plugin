@@ -81,6 +81,10 @@ $meta_keys = array(
 	'_geocode_address_number',
 	'_geocode_postcode',
 	'_geocode_full_address',
+	'_jeo_ai_context_conversation_id',
+	'_jeo_ai_context_last_response',
+	'_jeo_ai_context_chat_messages',
+	'_jeo_ai_context_suggestion_history',
 );
 
 global $wpdb;

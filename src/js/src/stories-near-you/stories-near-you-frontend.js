@@ -80,9 +80,24 @@
 			return this.renderedPostIds;
 		}
 
+		getManualLocation() {
+			const lat = parseFloat( this.attrs.lat );
+			const lng = parseFloat( this.attrs.lng );
+			if ( lat && lng ) {
+				return { lat, lng };
+			}
+			return null;
+		}
+
 		async init( location ) {
 			if ( location !== undefined ) {
 				await this.fetchAndRender( location );
+				return;
+			}
+
+			const manualLocation = this.getManualLocation();
+			if ( manualLocation ) {
+				await this.fetchAndRender( manualLocation );
 				return;
 			}
 
@@ -110,9 +125,10 @@
 
 			const consentEl = document.createElement( 'div' );
 			consentEl.className = 'jeo-stories-near-you__consent';
+			const hasManualLocation = this.getManualLocation() !== null;
 			consentEl.innerHTML = `
-				<p class="jeo-stories-near-you__consent-text">${ this.attrs.consentText || 'Show stories near my current location.' }</p>
-				<button type="button" class="jeo-stories-near-you__consent-button">${ this.attrs.consentButton || 'Use my location' }</button>
+				<p class="jeo-stories-near-you__consent-text">${ this.attrs.consentText || ( hasManualLocation ? 'Show stories near the configured location.' : 'Show stories near my current location.' ) }</p>
+				<button type="button" class="jeo-stories-near-you__consent-button">${ this.attrs.consentButton || ( hasManualLocation ? 'Use configured location' : 'Use my location' ) }</button>
 				<button type="button" class="jeo-stories-near-you__consent-skip">${ this.attrs.consentSkip || 'Skip' }</button>
 			`;
 
@@ -132,7 +148,8 @@
 
 			consentEl.querySelector( '.jeo-stories-near-you__consent-skip' ).addEventListener( 'click', async () => {
 				consentEl.remove();
-				await this.fetchAndRender( null );
+				const manualLocation = this.getManualLocation();
+				await this.fetchAndRender( manualLocation );
 			} );
 		}
 
@@ -178,6 +195,11 @@
 				'typeScale',
 				'imageScale',
 				'minHeight',
+			'radiusKm',
+				'orderBy',
+				'maxAgeDays',
+				'distanceWeight',
+				'dateWeight',
 				'categories',
 				'tags',
 				'categoryExclusions',
@@ -295,7 +317,8 @@
 		if ( elements.length <= 1 ) {
 			elements.forEach( ( element ) => {
 				const instance = new StoriesNearYou( element, provider );
-				instance.init();
+				const manual = instance.getManualLocation();
+				instance.init( manual !== null ? manual : undefined );
 			} );
 			return;
 		}
@@ -350,7 +373,8 @@
 
 		for ( const instance of instances ) {
 			instance.setExcludeIds( allRenderedIds );
-			await instance.init( sharedLocation );
+			const manual = instance.getManualLocation();
+			await instance.init( manual !== null ? manual : sharedLocation );
 			const ids = instance.getRenderedPostIds();
 			allRenderedIds.push( ...ids );
 		}

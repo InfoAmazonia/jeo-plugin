@@ -98,6 +98,8 @@ class Layer_Data_Loader {
 
 		self::append_theme_info( $sections, $post );
 
+		self::append_keyword_aliases( $sections, $post );
+
 		self::append_legend_info( $sections, $post );
 
 		if ( ! empty( $post->post_content ) ) {
@@ -110,6 +112,58 @@ class Layer_Data_Loader {
 		}
 
 		return implode( "\n", $sections );
+	}
+
+	/**
+	 * Concept aliases used to enrich the embedding text so semantic search matches
+	 * layers regardless of the exact wording used in the query.
+	 *
+	 * Editors reported that layers were hard to find by name (e.g. several "rivers"
+	 * layers, but only the one literally named with the word was retrieved). Adding
+	 * domain synonyms (PT/EN) to the indexed text widens recall for those queries.
+	 *
+	 * Keys are lowercase trigger substrings; values are extra terms to append.
+	 *
+	 * @var array<string, string>
+	 */
+	private static $keyword_aliases = array(
+		'rio'                    => 'rios river rivers hidrografia hydrography drenagem bacia hidrográfica curso d\'água',
+		'hidrografia'            => 'rios river hydrography drenagem bacia hidrográfica água',
+		'desmatamento'           => 'deforestation prodes deter alerta de desmatamento corte raso supressão de vegetação',
+		'terra indígena'         => 'territorio indigena indigenous land TI funai demarcação',
+		'indígena'               => 'indigenous povos originários território etnia',
+		'mineração'              => 'mining garimpo extração mineral lavra requerimento mineral',
+		'unidade de conservação' => 'conservation unit UC área protegida parque reserva',
+		'queimada'               => 'fire focos de calor incêndio burned area área queimada',
+		'estrada'                => 'rodovia road highway via',
+		'bioma'                  => 'biome vegetação cobertura vegetal',
+		'limite'                 => 'boundary boundaries divisa fronteira administrative limits município estado',
+	);
+
+	/**
+	 * Append domain synonyms/aliases based on the layer title and themes, widening
+	 * semantic-search recall for differently-worded queries.
+	 *
+	 * @param array    $sections Reference to sections array.
+	 * @param \WP_Post $post     The layer post.
+	 * @return void
+	 */
+	private static function append_keyword_aliases( array &$sections, \WP_Post $post ): void {
+		$themes   = wp_get_post_terms( $post->ID, 'layer-theme', array( 'fields' => 'names' ) );
+		$haystack = strtolower(
+			$post->post_title . ' ' . ( is_array( $themes ) ? implode( ' ', $themes ) : '' )
+		);
+
+		$aliases = array();
+		foreach ( self::$keyword_aliases as $trigger => $terms ) {
+			if ( false !== strpos( $haystack, $trigger ) ) {
+				$aliases[] = $terms;
+			}
+		}
+
+		if ( ! empty( $aliases ) ) {
+			$sections[] = 'Related terms: ' . implode( ' ', array_unique( $aliases ) );
+		}
 	}
 
 	/**

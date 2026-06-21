@@ -55,6 +55,21 @@ class Context_Handler {
 	const CHAT_MESSAGES_META_KEY = '_jeo_ai_context_chat_messages';
 
 	/**
+	 * Meta key for storing the archive of suggestion versions, so the editor can
+	 * browse and reuse previous suggestions that were replaced during refinement.
+	 *
+	 * @var string
+	 */
+	const SUGGESTION_HISTORY_META_KEY = '_jeo_ai_context_suggestion_history';
+
+	/**
+	 * Maximum number of suggestion versions to keep in the archive.
+	 *
+	 * @var int
+	 */
+	const SUGGESTION_HISTORY_LIMIT = 20;
+
+	/**
 	 * Bootstrap hooks.
 	 *
 	 * @return void
@@ -98,6 +113,17 @@ class Context_Handler {
 			register_post_meta(
 				$post_type,
 				self::CHAT_MESSAGES_META_KEY,
+				array(
+					'show_in_rest'  => true,
+					'single'        => true,
+					'type'          => 'object',
+					'auth_callback' => fn() => current_user_can( 'edit_posts' ),
+				)
+			);
+
+			register_post_meta(
+				$post_type,
+				self::SUGGESTION_HISTORY_META_KEY,
 				array(
 					'show_in_rest'  => true,
 					'single'        => true,
@@ -252,6 +278,11 @@ class Context_Handler {
 
 			$this->persist_initial_context( $post_id, $conversation_id, $response );
 			$this->save_context_state( $post_id, $conversation_id, $response );
+			$this->append_suggestion_history(
+				$post_id,
+				__( 'Initial suggestions', 'jeowp' ),
+				$response
+			);
 			$this->save_chat_message(
 				$post_id,
 				'user',
@@ -360,6 +391,10 @@ class Context_Handler {
 			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
 			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
 
+			// Persist the refined response so it is restored on reload, and archive
+			// this version so the editor can revisit it after further refinement.
+			$this->save_context_state( $post_id, $conversation_id, $response );
+			$this->append_suggestion_history( $post_id, $message, $response );
 			$this->save_chat_message( $post_id, 'user', $message, $user_id );
 			$this->save_chat_message(
 				$post_id,
@@ -651,6 +686,9 @@ class Context_Handler {
 			}
 		}
 
+		$history             = get_post_meta( $post_id, self::SUGGESTION_HISTORY_META_KEY, true );
+		$response['history'] = is_array( $history ) ? $history : array();
+
 		return new \WP_REST_Response( $response, 200 );
 	}
 
@@ -677,6 +715,7 @@ class Context_Handler {
 		delete_post_meta( $post_id, self::CONVERSATION_META_KEY );
 		delete_post_meta( $post_id, self::LAST_RESPONSE_META_KEY );
 		delete_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY );
+		delete_post_meta( $post_id, self::SUGGESTION_HISTORY_META_KEY );
 
 		return new \WP_REST_Response(
 			array(
@@ -745,6 +784,44 @@ class Context_Handler {
 				'message'    => $response_data['message'] ?? '',
 			)
 		);
+	}
+
+	/**
+	 * Append a suggestion version to the archive so the editor can revisit and reuse
+	 * suggestions that were later replaced during refinement.
+	 *
+	 * Only versions that actually contain paragraphs are archived (the initial setup
+	 * turn typically only asks clarifying questions). The archive is capped to
+	 * SUGGESTION_HISTORY_LIMIT entries (oldest dropped first).
+	 *
+	 * @param int    $post_id       Post ID.
+	 * @param string $label         Short label (e.g. the user message that produced it).
+	 * @param array  $response_data Response data containing paragraphs/references.
+	 * @return void
+	 */
+	private function append_suggestion_history( int $post_id, string $label, array $response_data ): void {
+		$paragraphs = $response_data['paragraphs'] ?? array();
+		if ( empty( $paragraphs ) ) {
+			return;
+		}
+
+		$history = get_post_meta( $post_id, self::SUGGESTION_HISTORY_META_KEY, true );
+		if ( ! is_array( $history ) ) {
+			$history = array();
+		}
+
+		$history[] = array(
+			'label'      => $label,
+			'paragraphs' => $paragraphs,
+			'references' => $response_data['references'] ?? array(),
+			'timestamp'  => current_time( 'mysql' ),
+		);
+
+		if ( count( $history ) > self::SUGGESTION_HISTORY_LIMIT ) {
+			$history = array_slice( $history, -self::SUGGESTION_HISTORY_LIMIT );
+		}
+
+		update_post_meta( $post_id, self::SUGGESTION_HISTORY_META_KEY, $history );
 	}
 
 	/**

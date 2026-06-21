@@ -38,13 +38,29 @@
 			'source-layer': attributes.layer_type_options.source_layer,
 		};
 
-		if ( attributes.style ) {
-			if ( attributes.style.paint ) {
-				layer.paint = { ...attributes.style.paint };
+		const effectiveStyle = attributes.style?.use_default
+			? attributes.default_style || {}
+			: attributes.style || {};
+
+		if ( effectiveStyle.filter ) {
+			layer.filter = effectiveStyle.filter;
+		}
+
+		if ( effectiveStyle.paint ) {
+			layer.paint = { ...effectiveStyle.paint };
+		} else {
+			// No saved/AI style: apply a visible fallback so catalog layers picked
+			// by the Minimap don't render invisibly (see JeoLayerTypes.getFallbackPaint).
+			const fallbackPaint = window.JeoLayerTypes?.getFallbackPaint?.(
+				attributes.layer_type_options.type
+			);
+			if ( fallbackPaint ) {
+				layer.paint = fallbackPaint;
 			}
-			if ( attributes.style.layout ) {
-				layer.layout = { ...attributes.style.layout };
-			}
+		}
+
+		if ( effectiveStyle.layout ) {
+			layer.layout = { ...effectiveStyle.layout };
 		}
 
 		if ( addLayerParams ) {

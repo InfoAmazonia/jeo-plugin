@@ -36,6 +36,7 @@ const ContextChatPanel = ( { postId } ) => {
 	const [ error, setError ] = useState( null );
 	const [ suggestedParagraphs, setSuggestedParagraphs ] = useState( [] );
 	const [ references, setReferences ] = useState( [] );
+	const [ suggestionHistory, setSuggestionHistory ] = useState( [] );
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ hasStarted, setHasStarted ] = useState( false );
 	const messagesEndRef = useRef( null );
@@ -69,6 +70,7 @@ const ContextChatPanel = ( { postId } ) => {
 				setMessages( response.messages || [] );
 				setSuggestedParagraphs( response.paragraphs || [] );
 				setReferences( response.references || [] );
+				setSuggestionHistory( response.history || [] );
 				setHasStarted( true );
 			} else {
 				setConversationId( generateUUID() );
@@ -115,6 +117,11 @@ const ContextChatPanel = ( { postId } ) => {
 			if ( response.success ) {
 				setSuggestedParagraphs( response.paragraphs || [] );
 				setReferences( response.references || [] );
+				archiveVersion(
+					__( 'Initial suggestions', 'jeowp' ),
+					response.paragraphs,
+					response.references
+				);
 				if ( response.assistant_message ) {
 					setMessages( [
 						{ role: 'assistant', content: response.assistant_message },
@@ -163,6 +170,7 @@ const ContextChatPanel = ( { postId } ) => {
 			if ( response.success ) {
 				setSuggestedParagraphs( response.paragraphs || [] );
 				setReferences( response.references || [] );
+				archiveVersion( userMessage, response.paragraphs, response.references );
 				setMessages( ( prev ) => [
 					...prev,
 					{ role: 'assistant', content: response.assistant_message || response.message || '' },
@@ -176,6 +184,40 @@ const ContextChatPanel = ( { postId } ) => {
 		} finally {
 			setIsLoading( false );
 		}
+	};
+
+	/**
+	 * Archive a generated suggestion version locally so the editor can revisit it
+	 * after further refinement. Only versions with paragraphs are kept. The backend
+	 * keeps the authoritative copy; this mirrors it for the live session.
+	 *
+	 * @param {string} label      Short label (initial / user message).
+	 * @param {Array}  paragraphs Suggested paragraphs.
+	 * @param {Array}  refs       References.
+	 */
+	const archiveVersion = ( label, paragraphs, refs ) => {
+		if ( ! paragraphs || paragraphs.length === 0 ) {
+			return;
+		}
+		setSuggestionHistory( ( prev ) => [
+			...prev,
+			{
+				label,
+				paragraphs,
+				references: refs || [],
+				timestamp: new Date().toLocaleString(),
+			},
+		] );
+	};
+
+	/**
+	 * Restore a previous suggestion version into the current view.
+	 *
+	 * @param {Object} version Archived version entry.
+	 */
+	const restoreVersion = ( version ) => {
+		setSuggestedParagraphs( version.paragraphs || [] );
+		setReferences( version.references || [] );
 	};
 
 	/**
@@ -206,6 +248,7 @@ const ContextChatPanel = ( { postId } ) => {
 			setMessages( [] );
 			setSuggestedParagraphs( [] );
 			setReferences( [] );
+			setSuggestionHistory( [] );
 			setHasStarted( false );
 		} catch ( err ) {
 			setError( err.message || __( 'Failed to clear conversation.', 'jeowp' ) );
@@ -258,6 +301,52 @@ const ContextChatPanel = ( { postId } ) => {
 					paragraphs={ suggestedParagraphs }
 					references={ references }
 				/>
+			) }
+
+			{ ! isRestoring && isModal && suggestionHistory.length > 1 && (
+				<details className="jeo-context-history">
+					<summary className="jeo-context-history__summary">
+						{ __( 'Previous suggestions', 'jeowp' ) } ({ suggestionHistory.length })
+					</summary>
+					<ul className="jeo-context-history__list">
+						{ suggestionHistory
+							.map( ( version, index ) => ( { version, index } ) )
+							.reverse()
+							.map( ( { version, index } ) => {
+								const firstText =
+									version.paragraphs?.[ 0 ]?.text?.replace( /<[^>]+>/g, '' ) || '';
+								const preview =
+									firstText.length > 120
+										? firstText.slice( 0, 120 ) + '…'
+										: firstText;
+								return (
+									<li key={ index } className="jeo-context-history__item">
+										<div className="jeo-context-history__meta">
+											<span className="jeo-context-history__label">
+												{ version.label }
+											</span>
+											{ version.timestamp && (
+												<span className="jeo-context-history__timestamp">
+													{ version.timestamp }
+												</span>
+											) }
+										</div>
+										{ preview && (
+											<p className="jeo-context-history__preview">{ preview }</p>
+										) }
+										<Button
+											variant="secondary"
+											size="small"
+											onClick={ () => restoreVersion( version ) }
+											className="jeo-context-history__restore"
+										>
+											{ __( 'View this version', 'jeowp' ) }
+										</Button>
+									</li>
+								);
+							} ) }
+					</ul>
+				</details>
 			) }
 
 			<div className="jeo-context-chat__messages">

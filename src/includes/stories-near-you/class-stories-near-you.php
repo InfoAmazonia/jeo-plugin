@@ -200,7 +200,7 @@ class Stories_Near_You {
 					),
 					'orderBy'            => array(
 						'type'    => 'string',
-						'default' => 'recent',
+						'default' => 'relevance',
 					),
 					'maxAgeDays'         => array(
 						'type'    => 'number',
@@ -261,7 +261,7 @@ class Stories_Near_You {
 				'imageSize'          => 'medium_large',
 				'imageAsLink'        => false,
 				'radius'             => 100,
-				'orderBy'            => 'recent',
+				'orderBy'            => 'relevance',
 				'maxAgeDays'         => 0,
 				'distanceWeight'     => 1,
 				'dateWeight'         => 1,
@@ -316,7 +316,7 @@ class Stories_Near_You {
 		$atts['dateWeight']     = max( 0, min( 10, (float) $atts['dateWeight'] ) );
 
 		if ( ! in_array( $atts['orderBy'], self::ORDER_BY, true ) ) {
-			$atts['orderBy'] = 'recent';
+			$atts['orderBy'] = 'relevance';
 		}
 
 		if ( empty( $atts['categories'] ) && ! empty( $atts['category'] ) ) {
@@ -358,6 +358,10 @@ class Stories_Near_You {
 	 */
 	public function render_callback( $attributes ) {
 		static $rendered_ids = array();
+
+		// Guarantee frontend assets load even when has_block() fails to detect the
+		// block (reusable blocks, template parts, widgets, Newspack, etc.).
+		$this->ensure_frontend_assets();
 
 		$atts = $this->sanitize_atts( $attributes );
 
@@ -446,7 +450,7 @@ class Stories_Near_You {
 		$filters['tags']                = $this->parse_id_list( $atts['tags'] );
 		$filters['category_exclusions'] = $this->parse_id_list( $atts['categoryExclusions'] );
 		$filters['tag_exclusions']      = $this->parse_id_list( $atts['tagExclusions'] );
-		$filters['order_by']            = ! empty( $atts['orderBy'] ) ? $atts['orderBy'] : 'recent';
+		$filters['order_by']            = ! empty( $atts['orderBy'] ) ? $atts['orderBy'] : 'relevance';
 		$filters['max_age_days']        = ! empty( $atts['maxAgeDays'] ) ? (int) $atts['maxAgeDays'] : 0;
 		$filters['distance_weight']     = isset( $atts['distanceWeight'] ) ? (float) $atts['distanceWeight'] : 1;
 		$filters['date_weight']         = isset( $atts['dateWeight'] ) ? (float) $atts['dateWeight'] : 1;
@@ -626,7 +630,7 @@ class Stories_Near_You {
 					),
 					'orderBy'            => array(
 						'type'    => 'string',
-						'default' => 'recent',
+						'default' => 'relevance',
 						'enum'    => self::ORDER_BY,
 					),
 					'maxAgeDays'         => array(
@@ -675,30 +679,13 @@ class Stories_Near_You {
 			array(),
 			JEO_VERSION
 		);
-	}
-
-	/**
-	 * Enqueue frontend CSS and JS when the block is present on the page.
-	 *
-	 * @return void
-	 */
-	public function enqueue_frontend_assets() {
-		if ( ! has_block( 'jeo/stories-near-you' ) ) {
-			return;
-		}
-
-		if ( $this->is_newspack_active() ) {
-			$this->enqueue_newspack_styles();
-		}
 
 		$asset_file = file_exists( JEO_BASEPATH . '/js/build/storiesNearYou.asset.php' ) ? include JEO_BASEPATH . '/js/build/storiesNearYou.asset.php' : array(
 			'dependencies' => array(),
 			'version'      => JEO_VERSION,
 		);
 
-		wp_enqueue_style( 'jeo-stories-near-you' );
-
-		wp_enqueue_script(
+		wp_register_script(
 			'jeo-stories-near-you',
 			JEO_BASEURL . '/js/build/storiesNearYou.js',
 			$asset_file['dependencies'] ?? array(),
@@ -713,6 +700,54 @@ class Stories_Near_You {
 				'geolocationPrecision' => absint( \jeo_settings()->get_option( 'geolocation_precision', 2 ) ),
 			)
 		);
+	}
+
+	/**
+	 * Enqueue frontend CSS and JS when the block is present on the page.
+	 *
+	 * Runs on wp_enqueue_scripts as an early/head enqueue when has_block() detects
+	 * the block in the main content. This detection is unreliable for blocks nested
+	 * in reusable blocks, template parts, widgets or Newspack contexts, so
+	 * render_callback() also calls ensure_frontend_assets() as a guaranteed fallback.
+	 *
+	 * @return void
+	 */
+	public function enqueue_frontend_assets() {
+		if ( ! has_block( 'jeo/stories-near-you' ) ) {
+			return;
+		}
+
+		$this->ensure_frontend_assets();
+	}
+
+	/**
+	 * Idempotently enqueue the block's frontend assets. Safe to call multiple times
+	 * and from within render_callback(), which is the most reliable signal that the
+	 * block is actually on the page.
+	 *
+	 * @return void
+	 */
+	public function ensure_frontend_assets() {
+		if ( wp_script_is( 'jeo-stories-near-you', 'enqueued' ) ) {
+			return;
+		}
+
+		// Ensure handles exist even if register_assets() didn't run (defensive).
+		if ( ! wp_script_is( 'jeo-stories-near-you', 'registered' ) ) {
+			$this->register_assets();
+		}
+
+		if ( $this->is_newspack_active() ) {
+			$this->enqueue_newspack_styles();
+		} elseif ( wp_style_is( 'wp-block-latest-posts', 'registered' ) ) {
+			// The native path renders core/latest-posts dynamically via render_block(),
+			// so WordPress doesn't auto-enqueue that block's stylesheet. Without it the
+			// featured images and grid/list layout render broken. Enqueue it explicitly.
+			wp_enqueue_style( 'wp-block-latest-posts' );
+		}
+
+		wp_enqueue_style( 'jeo-stories-near-you' );
+		wp_enqueue_script( 'jeo-stories-near-you' );
 	}
 
 	/**
@@ -936,6 +971,16 @@ class Stories_Near_You {
 			$order_by_sql    = "( (distance / {$radius_meters}) * {$distance_weight} ) + ( (DATEDIFF(NOW(), p.post_date) / 365) * {$date_weight} ) ASC";
 		}
 
+		// Discard rows with invalid or sentinel coordinates (out of range, or the
+		// (0,0) placeholder left by failed/empty geocoding). Without this guard,
+		// posts with bad coordinates surface as bogus "nearby" results.
+		$lon_expr    = "CAST(tlon.meta_value AS DECIMAL(10,{$coord_precision}))";
+		$lat_expr    = "CAST(tlat.meta_value AS DECIMAL(10,{$coord_precision}))";
+		$coord_guard = "
+				AND {$lon_expr} BETWEEN -180 AND 180
+				AND {$lat_expr} BETWEEN -90 AND 90
+				AND NOT ( {$lon_expr} = 0 AND {$lat_expr} = 0 )";
+
 		$primary_template = "
 			SELECT p.ID, p.post_date,
 				ST_Distance_Sphere(POINT(%f, %f), POINT(CAST(tlon.meta_value AS DECIMAL(10,{$coord_precision})), CAST(tlat.meta_value AS DECIMAL(10,{$coord_precision})))) AS distance
@@ -960,6 +1005,7 @@ class Stories_Near_You {
 				{$wpml_where}
 				{$exclude_clause}
 				{$date_clause}
+				{$coord_guard}
 			HAVING distance <= %f";
 
 		$secondary_template = str_replace(

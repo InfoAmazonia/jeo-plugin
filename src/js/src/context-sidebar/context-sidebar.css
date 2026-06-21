@@ -268,6 +268,58 @@
 	line-height: 1.4;
 }
 
+/* Suggestion history (archive) */
+
+.jeo-context-history {
+	margin: 8px 0 12px;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	padding: 6px 10px;
+	background: #fbfbfc;
+}
+
+.jeo-context-history__summary {
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.jeo-context-history__list {
+	list-style: none;
+	padding: 0;
+	margin: 8px 0 0;
+}
+
+.jeo-context-history__item {
+	border-top: 1px solid #eee;
+	padding: 8px 0;
+}
+
+.jeo-context-history__meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	align-items: baseline;
+}
+
+.jeo-context-history__label {
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.jeo-context-history__timestamp {
+	font-size: 10px;
+	color: #757575;
+	white-space: nowrap;
+}
+
+.jeo-context-history__preview {
+	font-size: 11px;
+	color: #555;
+	margin: 4px 0 6px;
+	line-height: 1.4;
+}
+
 /* Modal */
 
 .jeo-context-modal .components-modal__content {

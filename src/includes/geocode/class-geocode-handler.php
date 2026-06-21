@@ -258,7 +258,10 @@ class Geocode_Handler {
 
 				register_post_meta(
 					$type,
-					'_geocode_lng_' . $relevance,
+					// Must match the index meta actually written in update_meta_indexes()
+					// (derived from $geo_attributes, which uses `_geocode_lon`). Registering
+					// `_geocode_lng_*` here left the real index meta unregistered.
+					'_geocode_lon_' . $relevance,
 					array(
 						'show_in_rest'  => false,
 						'single'        => false,
