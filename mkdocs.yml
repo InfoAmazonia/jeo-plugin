@@ -2,7 +2,7 @@ site_name: JEO
 site_url: https://www.jeowp.org/docs/
 repo_url: https://github.com/InfoAmazonia/jeo-plugin
 docs_dir: docs
-site_dir: site/docs
+site_dir: .build/mkdocs
 theme:
   name: readthedocs
 nav:
