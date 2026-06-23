@@ -8,6 +8,7 @@ const ngrokHosts = ['.ngrok-free.app', '.ngrok.app', '.ngrok.io', '.ngrok.dev']
 
 // https://vitejs.dev/config/
 export default defineConfig({
+	base: 'novo',
   plugins: [react()],
   server: {
     host: true, // listen on all interfaces so the tunnel can reach it

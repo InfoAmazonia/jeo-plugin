@@ -107,15 +107,43 @@ export default function Footer() {
               >
                 <img src={hacklabLogo} alt="hacklab/" className="h-[11px] w-auto" />
               </a>
-              <img src={codesinfo} alt="codesinfo" className="h-7 w-auto" />
+							<a
+								href="https://codesinfo.com.br/"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="transition-opacity hover:opacity-80"
+							>
+              	<img src={codesinfo} alt="codesinfo" className="h-7 w-auto" />
+							</a>
             </div>
             <p className="text-xs text-muted">
               Uma produção de{' '}
-              <strong className="font-bold text-white underline">infomazonia</strong>{' '}
-              com desenvolvimento de{' '}
-              <strong className="font-bold text-white underline">hacklab/</strong> e
-              financiado pelo{' '}
-              <strong className="font-bold text-white underline">codesinfo</strong>
+              <a
+								href="https://infoamazonia.org/"
+                target="_blank"
+                rel="noopener noreferrer"
+								className="font-bold text-white underline"
+							>
+								infomazonia
+							</a>
+              {' '}com desenvolvimento de{' '}
+              <a
+							  href="https://hacklab.com.br/"
+                target="_blank"
+                rel="noopener noreferrer"
+								className="font-bold text-white underline"
+							>
+								hacklab/
+							</a>
+							{' '}e financiado pelo{' '}
+              <a
+								href="https://codesinfo.com.br/"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="font-bold text-white underline"
+							>
+								codesinfo
+							</a>
             </p>
           </div>
         </div>
