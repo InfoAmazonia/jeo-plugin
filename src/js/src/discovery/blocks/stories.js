@@ -217,8 +217,8 @@ function getStoryCategoryIds( stories = [] ) {
 }
 
 function appendLanguageParam( url ) {
-	if ( 'languageParams' in window && window.languageParams?.currentLang ) {
-		url.searchParams.append( 'lang', window.languageParams.currentLang );
+	if ( 'jeowpLanguageParams' in window && window.jeowpLanguageParams?.currentLang ) {
+		url.searchParams.append( 'lang', window.jeowpLanguageParams.currentLang );
 	}
 }
 

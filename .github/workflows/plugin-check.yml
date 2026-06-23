@@ -31,7 +31,7 @@ jobs:
       PLUGIN_CHECK_RESULTS: /tmp/plugin-check-results.txt
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-node@v6
         with:

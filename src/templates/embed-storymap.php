@@ -8,14 +8,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-$disable_embed = get_post_meta( get_the_ID(), 'disable_embed', true ) === '1';
-$storymap_id   = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
-
-if ( $disable_embed ) {
-	wp_safe_redirect( home_url() );
-	exit();
-}
 ?>
 <!DOCTYPE html>
 <html style="margin: 0px !important;">

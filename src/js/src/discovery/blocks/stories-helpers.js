@@ -44,7 +44,7 @@ export function normalizeStoriesTagIds( value ) {
 
 export function resolveStoryDateLocale( {
 	siteLocale = typeof window !== 'undefined'
-		? window.languageParams?.currentLang
+		? window.jeowpLanguageParams?.currentLang
 		: '',
 	documentLocale = typeof document !== 'undefined'
 		? document.documentElement?.lang

@@ -1,8 +1,8 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: JEO 3.6.5\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeo\n"
-"Last-Translator: Stefano Wrobleski\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowpdevelopStefano Wrobleski\n"
+"Last-Translator: \n"
 "Language-Team: InfoAmazonia\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -10,6 +10,7 @@ msgstr ""
 "POT-Creation-Date: 2026-06-09T19:53:28+00:00\n"
 "PO-Revision-Date: 2026-06-09T19:53:28+00:00\n"
 "Language: es_CO\n"
+": HEADJEO 3.6.5\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.9\n"
 "X-Domain: jeowp\n"
@@ -39,7 +40,7 @@ msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no hay ningun
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no se pudo cargar el SDK externo de Mapbox. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:1395
+#: includes/class-jeo.php:1431
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Leer más"
@@ -52,152 +53,152 @@ msgid "Latitude"
 msgstr "Latitud"
 
 #: includes/ai/settings/tab-embedded.php:75
-#: includes/geocode/class-geocode-handler.php:269
+#: includes/geocode/class-geocode-handler.php:272
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Longitude"
 msgstr "Longitud"
 
-#: includes/geocode/class-geocode-handler.php:283
+#: includes/geocode/class-geocode-handler.php:286
 msgid "Country"
 msgstr "País"
 
-#: includes/geocode/class-geocode-handler.php:297
+#: includes/geocode/class-geocode-handler.php:300
 msgid "Country code"
 msgstr "Código de país"
 
-#: includes/geocode/class-geocode-handler.php:311
+#: includes/geocode/class-geocode-handler.php:314
 msgid "Region level 1"
 msgstr "Región nivel 1"
 
-#: includes/geocode/class-geocode-handler.php:325
+#: includes/geocode/class-geocode-handler.php:328
 msgid "Region level 2"
 msgstr "Región nivel 2"
 
-#: includes/geocode/class-geocode-handler.php:339
+#: includes/geocode/class-geocode-handler.php:342
 msgid "Region level 3"
 msgstr "Región nivel 3"
 
-#: includes/geocode/class-geocode-handler.php:353
+#: includes/geocode/class-geocode-handler.php:356
 msgid "City"
 msgstr "Ciudad"
 
-#: includes/geocode/class-geocode-handler.php:367
+#: includes/geocode/class-geocode-handler.php:370
 msgid "City sub-level 1"
 msgstr "Ciudad sub-nivel 1"
 
-#: includes/layers/class-layers.php:50
-#: includes/layers/class-layers.php:61
+#: includes/layers/class-layers.php:49
+#: includes/layers/class-layers.php:60
 #: js/build/jeoMap.js:2
 #: js/build/mapBlocks.js:1
 msgid "Layers"
 msgstr "Capas"
 
-#: includes/layers/class-layers.php:51
+#: includes/layers/class-layers.php:50
 msgid "Layer"
 msgstr "Capa"
 
+#: includes/layers/class-layers.php:51
 #: includes/layers/class-layers.php:52
-#: includes/layers/class-layers.php:53
 msgid "Add new layer"
 msgstr "Añadir nueva capa"
 
-#: includes/layers/class-layers.php:54
+#: includes/layers/class-layers.php:53
 msgid "Edit layer"
 msgstr "Editar capa"
 
-#: includes/layers/class-layers.php:55
+#: includes/layers/class-layers.php:54
 msgid "New layer"
 msgstr "Nueva capa"
 
-#: includes/layers/class-layers.php:56
+#: includes/layers/class-layers.php:55
 msgid "View layer"
 msgstr "Ver capa"
 
-#: includes/layers/class-layers.php:57
+#: includes/layers/class-layers.php:56
 msgid "View layers"
 msgstr "Ver capas"
 
-#: includes/layers/class-layers.php:58
+#: includes/layers/class-layers.php:57
 msgid "Search layers"
 msgstr "Buscar capas"
 
-#: includes/layers/class-layers.php:59
+#: includes/layers/class-layers.php:58
 msgid "No layer found"
 msgstr "Ninguna capa encontrada"
 
-#: includes/layers/class-layers.php:60
+#: includes/layers/class-layers.php:59
 msgid "No layer found in the trash"
 msgstr "Ninguna capa encontrada en la papelera"
 
-#: includes/layers/class-layers.php:62
+#: includes/layers/class-layers.php:61
 msgid "Layer published."
 msgstr "Capa publicada."
 
-#: includes/layers/class-layers.php:63
+#: includes/layers/class-layers.php:62
 msgid "Layer published privately."
 msgstr "Capa publicada como privada."
 
-#: includes/layers/class-layers.php:64
+#: includes/layers/class-layers.php:63
 msgid "Layer reverted to draft."
 msgstr "Capa revertida a borrador."
 
-#: includes/layers/class-layers.php:65
+#: includes/layers/class-layers.php:64
 msgid "Layer scheduled."
 msgstr "Capa programada."
 
-#: includes/layers/class-layers.php:66
+#: includes/layers/class-layers.php:65
 msgid "Layer updated."
 msgstr "Capa actualizada."
 
-#: includes/layers/class-layers.php:72
+#: includes/layers/class-layers.php:71
 msgid "JEO Layers"
 msgstr "Capas JEO"
 
-#: includes/layers/class-layers.php:109
+#: includes/layers/class-layers.php:131
 msgid "The layer type"
 msgstr "Tipo de capa"
 
-#: includes/layers/class-layers.php:121
+#: includes/layers/class-layers.php:143
 msgid "Layer attribution as text or HTML with a link"
 msgstr "Atribución de la capa como texto o HTML con un enlace"
 
-#: includes/layers/class-layers.php:138
+#: includes/layers/class-layers.php:160
 msgid "Layer type-specific options"
 msgstr "Opciones específicas del tipo de capa"
 
-#: includes/layers/class-layers.php:150
+#: includes/layers/class-layers.php:172
 msgid "The URL to download the source data of the layer"
 msgstr "URL para descargar los datos de la fuente de la capa"
 
-#: includes/layers/class-layers.php:162
+#: includes/layers/class-layers.php:184
 msgid "Label for the attribution URL link"
 msgstr "Etiqueta del enlace de URL de atribución"
 
-#: includes/layers/class-layers.php:174
+#: includes/layers/class-layers.php:196
 msgid "The legend type"
 msgstr "Tipo de leyenda"
 
-#: includes/layers/class-layers.php:191
+#: includes/layers/class-layers.php:213
 msgid "Legend type-specific options"
 msgstr "Opciones específicas del tipo de leyenda"
 
-#: includes/layers/class-layers.php:203
+#: includes/layers/class-layers.php:225
 #: js/build/layersSidebar.js:7
 msgid "Use legend"
 msgstr "Usar leyenda"
 
-#: includes/layers/class-layers.php:215
+#: includes/layers/class-layers.php:237
 #: js/build/layersSidebar.js:7
 msgid "Legend title"
 msgstr "Título de leyenda"
 
-#: includes/layers/class-layers.php:278
+#: includes/layers/class-layers.php:318
 msgid "Layer type not registered"
 msgstr "Tipo de capa no registrada"
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:532
+#: includes/loaders.php:517
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:5
 msgid "Explore"
@@ -569,43 +570,43 @@ msgid "Raster Mapbox Tiled Source"
 msgstr "Fuente ráster de teselas de Mapbox"
 
 #: includes/layer-types/mapbox-tileset-raster.js:68
-#: includes/layer-types/mapbox-tileset-vector.js:86
+#: includes/layer-types/mapbox-tileset-vector.js:95
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Tileset ID"
 msgstr "ID del tileset"
 
 #: includes/layer-types/mapbox-tileset-raster.js:69
-#: includes/layer-types/mapbox-tileset-vector.js:87
+#: includes/layer-types/mapbox-tileset-vector.js:96
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Example: username.tilesetid"
 msgstr "Ejemplo: username.tilesetid"
 
 #: includes/layer-types/mapbox-tileset-raster.js:72
-#: includes/layer-types/mapbox-tileset-vector.js:115
-#: includes/layer-types/mvt.js:86
+#: includes/layer-types/mapbox-tileset-vector.js:124
+#: includes/layer-types/mvt.js:102
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Style Source Type"
 msgstr "Tipo de fuente del estilo"
 
 #: includes/layer-types/mapbox-tileset-raster.js:73
-#: includes/layer-types/mvt.js:87
+#: includes/layer-types/mvt.js:103
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display"
 msgstr "Qué datos debe mostrar el mapa"
 
 #: includes/layer-types/mapbox-tileset-raster.js:79
-#: includes/layer-types/mapbox-tileset-vector.js:95
+#: includes/layer-types/mapbox-tileset-vector.js:104
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layer Type"
 msgstr "Tipo de capa"
 
 #: includes/layer-types/mapbox-tileset-raster.js:81
-#: includes/layer-types/mapbox-tileset-vector.js:97
+#: includes/layer-types/mapbox-tileset-vector.js:106
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layers take the data that they get from a source, optionally filter features, and then define how those features are styled."
@@ -619,20 +620,20 @@ msgstr "Las capas toman los datos que reciben de una fuente, opcionalmente filtr
 msgid "Vector Mapbox Tiled Source"
 msgstr "Fuente vectorial de teselas de Mapbox"
 
-#: includes/layer-types/mapbox-tileset-vector.js:91
-#: includes/layer-types/mvt.js:68
+#: includes/layer-types/mapbox-tileset-vector.js:100
+#: includes/layer-types/mvt.js:84
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Source layer"
 msgstr "Capa de origen"
 
-#: includes/layer-types/mapbox-tileset-vector.js:92
+#: includes/layer-types/mapbox-tileset-vector.js:101
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display."
 msgstr "Qué datos debe mostrar el mapa."
 
-#: includes/layer-types/mapbox-tileset-vector.js:116
+#: includes/layer-types/mapbox-tileset-vector.js:125
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "The layer source type style"
@@ -679,7 +680,7 @@ msgid "Mapbox Vector Tiles (MVT)"
 msgstr "Teselas vectoriales de Mapbox (MVT)"
 
 #: includes/ai/settings/tab-provider.php:27
-#: includes/layer-types/mvt.js:64
+#: includes/layer-types/mvt.js:80
 #: includes/layer-types/tilelayer.js:57
 #: includes/legend-types/circles.js:25
 #: includes/legend-types/icons.js:25
@@ -688,7 +689,7 @@ msgstr "Teselas vectoriales de Mapbox (MVT)"
 msgid "URL"
 msgstr "URL"
 
-#: includes/layer-types/mvt.js:69
+#: includes/layer-types/mvt.js:85
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layer to use from a vector tile source."
@@ -1202,29 +1203,21 @@ msgstr "Hecho"
 msgid "Edit interactions"
 msgstr "Editar interacciones"
 
-#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Please fill all required fields, you will not be able to publish or update until that."
 msgstr "Complete todos los campos obligatorios, no podrá publicar ni actualizar hasta ese momento."
 
-#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings."
 msgstr "Es posible que su token de acceso de Mapbox no sea válido. No podrá publicar ni actualizar. Por favor revise su configuración."
 
-#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Your layer was not found. You will not be able to publish or update. Please check your settings."
 msgstr "No se encontró la capa. No podrá publicar ni actualizar. Por favor revise su configuración."
 
-#: js/build/layersSidebar.js:7
+#: js/build/mapBlocks.js:1
 msgid "Error loading your layer, you will not be able to publish or update. Please check your settings."
 msgstr "Error al cargar la capa, no podrá publicar ni actualizar. Compruebe la configuración."
-
-#: js/build/layersSidebar.js:7
-msgid "Your Mapbox API Key was not found in your JEO Settings. You will not be able to publish or update."
-msgstr "No se encontró la clave de API de Mapbox en la configuración de JEO. No podrá publicar ni actualizar."
-
-#: js/build/layersSidebar.js:7
-msgid "Please, check your settings."
-msgstr "Por favor, revise su configuración."
 
 #: js/build/layersSidebar.js:7
 msgid "Attributions"
@@ -1255,17 +1248,14 @@ msgid "Preview zoom controls"
 msgstr "Vista previa de los controles de zoom"
 
 #: js/build/mapBlocks.js:1
-#: js/build/mapsSidebar.js:1
 msgid "Initial Zoom"
 msgstr "Zoom inicial"
 
 #: js/build/mapBlocks.js:1
-#: js/build/mapsSidebar.js:1
 msgid "Min Zoom"
 msgstr "Mín. zoom"
 
 #: js/build/mapBlocks.js:1
-#: js/build/mapsSidebar.js:1
 msgid "Max Zoom"
 msgstr "Máx. zoom"
 
@@ -2067,73 +2057,73 @@ msgstr ""
 msgid "Approve JEO AI Geolocations"
 msgstr ""
 
-#: includes/ai/class-context-handler.php:182
-#: includes/ai/class-context-handler.php:296
-#: includes/ai/class-context-handler.php:579
-#: includes/ai/class-context-handler.php:652
+#: includes/ai/class-context-handler.php:227
+#: includes/ai/class-context-handler.php:346
+#: includes/ai/class-context-handler.php:633
+#: includes/ai/class-context-handler.php:709
 #: includes/ai/class-rag-worker.php:223
-#: includes/minimap/class-minimap.php:141
-#: includes/minimap/class-minimap.php:235
-#: includes/minimap/class-minimap.php:313
+#: includes/minimap/class-minimap.php:142
+#: includes/minimap/class-minimap.php:238
+#: includes/minimap/class-minimap.php:316
 msgid "Post not found."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:193
-#: includes/ai/class-context-handler.php:317
+#: includes/ai/class-context-handler.php:238
+#: includes/ai/class-context-handler.php:367
 #: includes/ai/class-minilayer-handler.php:85
 #: includes/ai/class-minilayer-service.php:41
-#: includes/minimap/class-minimap.php:246
-#: includes/minimap/class-minimap.php:334
+#: includes/minimap/class-minimap.php:249
+#: includes/minimap/class-minimap.php:337
 msgid "No AI provider configured. Set one in JEO AI Settings."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:205
+#: includes/ai/class-context-handler.php:250
 msgid "The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles)."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:206
-#: includes/ai/class-context-handler.php:239
+#: includes/ai/class-context-handler.php:251
+#: includes/ai/class-context-handler.php:289
 msgid "Generate editorial suggestions for this post based on its content."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:214
+#: includes/ai/class-context-handler.php:259
 msgid "Waiting for more content or directions."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:245
+#: includes/ai/class-context-handler.php:295
 msgid "Suggestions generated."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:276
-#: includes/minimap/class-minimap.php:293
+#: includes/ai/class-context-handler.php:326
+#: includes/minimap/class-minimap.php:296
 msgid "conversation_id is required."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:286
-#: includes/minimap/class-minimap.php:224
-#: includes/minimap/class-minimap.php:303
+#: includes/ai/class-context-handler.php:336
+#: includes/minimap/class-minimap.php:227
+#: includes/minimap/class-minimap.php:306
 msgid "A post ID is required."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:306
-#: includes/minimap/class-minimap.php:323
+#: includes/ai/class-context-handler.php:356
+#: includes/minimap/class-minimap.php:326
 msgid "A message is required."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:348
+#: includes/ai/class-context-handler.php:402
 msgid "Suggestions updated."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:417
+#: includes/ai/class-context-handler.php:471
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:665
+#: includes/ai/class-context-handler.php:723
 msgid "Conversation cleared."
 msgstr ""
 
 #: includes/ai/class-minilayer-handler.php:72
-#: includes/minimap/class-minimap.php:214
+#: includes/minimap/class-minimap.php:217
 msgid "A prompt is required."
 msgstr ""
 
@@ -2386,15 +2376,11 @@ msgstr ""
 msgid "Check this to use a custom system prompt. Uncheck to use the built-in default prompt."
 msgstr ""
 
-#: includes/ai/settings/tab-context.php:44
-msgid "Custom system prompt used by the AI Context Assistant. Leave empty to use the built-in default."
-msgstr ""
-
-#: includes/ai/settings/tab-context.php:50
+#: includes/ai/settings/tab-context.php:55
 msgid "Default System Prompt (reference)"
 msgstr ""
 
-#: includes/ai/settings/tab-context.php:60
+#: includes/ai/settings/tab-context.php:65
 msgid "This is the built-in default prompt. Enable the custom prompt checkbox above to override it."
 msgstr ""
 
@@ -3136,6 +3122,7 @@ msgstr ""
 msgid "AI failed to generate prompt."
 msgstr ""
 
+#: includes/ai/class-context-handler.php:742
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr ""
@@ -3200,50 +3187,50 @@ msgstr ""
 msgid "Map layout properties"
 msgstr ""
 
-#: includes/menu/class-menu.php:43
 #: includes/menu/class-menu.php:44
+#: includes/menu/class-menu.php:45
 msgid "Welcome"
 msgstr ""
 
-#: includes/menu/class-menu.php:53
 #: includes/menu/class-menu.php:54
+#: includes/menu/class-menu.php:55
 msgid "Dashboard"
 msgstr ""
 
-#: includes/menu/class-menu.php:63
 #: includes/menu/class-menu.php:64
+#: includes/menu/class-menu.php:65
 msgid "AI (new)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:170
+#: includes/minimap/class-minimap.php:171
 msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:391
+#: includes/minimap/class-minimap.php:402
 msgid "The AI returned an empty response. Please try again."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:901
+#: includes/minimap/class-minimap.php:1210
 msgid "Dark Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:908
+#: includes/minimap/class-minimap.php:1217
 msgid "Terrain Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:915
+#: includes/minimap/class-minimap.php:1224
 msgid "Satellite Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:926
+#: includes/minimap/class-minimap.php:1235
 msgid "Dark Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:935
+#: includes/minimap/class-minimap.php:1244
 msgid "Light Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:944
+#: includes/minimap/class-minimap.php:1253
 msgid "Satellite Base"
 msgstr ""
 
@@ -3478,6 +3465,7 @@ msgstr ""
 msgid "Asking AI..."
 msgstr ""
 
+#: includes/ai/settings/tab-context.php:199
 #: includes/settings/class-settings.php:486
 msgid "Generating..."
 msgstr ""
@@ -3785,16 +3773,8 @@ msgstr ""
 msgid "Select the page where the JEO Discovery block is located."
 msgstr ""
 
-#: includes/stories-near-you/class-stories-near-you.php:393
+#: includes/stories-near-you/class-stories-near-you.php:432
 msgid "Unable to load stories near you."
-msgstr ""
-
-#: includes/stories-near-you/class-stories-near-you.php:920
-msgid "No stories found near you."
-msgstr ""
-
-#: jeo.php:36
-msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
 msgstr ""
 
 #: js/build/contextSidebar.js:1
@@ -4511,8 +4491,8 @@ msgstr ""
 msgid "Insert Image"
 msgstr ""
 
-#: includes/settings/settings-page.js:918
 #: includes/settings/settings-page.js:920
+#: includes/settings/settings-page.js:922
 msgid "Choose Image"
 msgstr ""
 
@@ -4566,6 +4546,233 @@ msgstr ""
 
 #: js/build/postsSidebar.js:1
 msgid "Unable to retrieve the address for the selected point."
+msgstr ""
+
+#: includes/class-jeo.php:1660
+msgid "This JEO embed is not available."
+msgstr "Este embed de JEO no está disponible."
+
+#: includes/class-jeo.php:1661
+msgid "Embed not available"
+msgstr ""
+"Embed no disponible\n"
+"develop"
+
+#: includes/ai/class-context-agent.php:260
+msgid "No AI provider is configured. Set one in JEO AI Settings."
+msgstr ""
+
+#: includes/ai/class-context-agent.php:298
+msgid "The AI returned an empty prompt engineering response."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:283
+#: js/build/contextSidebar.js:1
+msgid "Initial suggestions"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:37
+msgid "Custom System Prompt"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:49
+msgid "Custom system prompt used by the AI Context Assistant. Use the assistant below to generate or refine it. This value is stored as structured output JSON internally, but shown here as plain text for editing."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:74
+msgid "AI Context Prompt Engineer Assistant"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:76
+msgid "Describe how you want the Context Assistant to behave (e.g., \"Always link place names to the original article\" or \"Ground every claim with a verbatim quote\"). The active LLM will generate a highly optimized system prompt for you, strictly adhering to JEO formatting rules."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:113
+msgid "Ex: I want the assistant to always include inline contextual links and cite the exact sentence from the article that supports each location."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:115
+msgid "Your description is saved automatically in this browser."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:121
+msgid "Generate Custom Prompt"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:124
+msgid "Suggest initial prompt"
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:182
+msgid "Initial prompt loaded. Edit and save the settings."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:192
+msgid "Please describe how you want the assistant to behave first."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:217
+msgid "Custom prompt generated. Remember to save the settings."
+msgstr ""
+
+#: includes/ai/settings/tab-context.php:220
+#: includes/ai/settings/tab-context.php:224
+msgid "Generation failed."
+msgstr ""
+
+#: includes/layers/class-layers.php:101
+msgid "Layer Themes"
+msgstr ""
+
+#: includes/layers/class-layers.php:102
+msgid "Layer Theme"
+msgstr ""
+
+#: includes/layers/class-layers.php:103
+msgid "Add New Layer Theme"
+msgstr ""
+
+#: includes/layers/class-layers.php:104
+msgid "Edit Layer Theme"
+msgstr ""
+
+#: includes/layers/class-layers.php:249
+msgid "Deforestation"
+msgstr ""
+
+#: includes/layers/class-layers.php:250
+msgid "Hydrography"
+msgstr ""
+
+#: includes/layers/class-layers.php:251
+msgid "Indigenous Lands"
+msgstr ""
+
+#: includes/layers/class-layers.php:252
+msgid "Protected Areas"
+msgstr ""
+
+#: includes/layers/class-layers.php:253
+msgid "Mining"
+msgstr ""
+
+#: includes/layers/class-layers.php:254
+msgid "Oil and Gas"
+msgstr ""
+
+#: includes/layers/class-layers.php:255
+msgid "Land Use"
+msgstr ""
+
+#: includes/layers/class-layers.php:256
+msgid "Agriculture"
+msgstr ""
+
+#: includes/layers/class-layers.php:257
+msgid "Infrastructure"
+msgstr ""
+
+#: includes/layers/class-layers.php:258
+msgid "Administrative Boundaries"
+msgstr ""
+
+#: includes/layers/class-layers.php:259
+msgid "Socioeconomic"
+msgstr ""
+
+#: includes/layers/class-layers.php:260
+msgid "Biodiversity"
+msgstr ""
+
+#: includes/layers/class-layers.php:261
+msgid "Fire"
+msgstr ""
+
+#: includes/layers/class-layers.php:262
+msgid "Climate"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:195
+msgid "Generate a map for this post based on its content."
+msgstr ""
+
+#. translators: %d: number of removed layers
+#: includes/minimap/class-minimap.php:426
+#, php-format
+msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
+msgstr ""
+
+#: includes/minimap/class-minimap.php:855
+msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
+msgstr ""
+
+#. translators: %s: search radius in kilometers
+#: includes/stories-near-you/class-stories-near-you.php:1073
+#, php-format
+msgid "No stories found within %s km of your location."
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "References used"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "Previous suggestions"
+msgstr ""
+
+#: js/build/contextSidebar.js:1
+msgid "View this version"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Vector style preview"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Search radius (km)"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Order by"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Most recent nearby"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Nearest first"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Relevance (distance + date)"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Max age (days, 0 = no limit)"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Distance weight"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+msgid "Date weight"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Automatic style applied (this layer had no saved style). Edit layer settings to customize it."
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Themes:"
+msgstr ""
+
+#: js/build/mapBlocks.js:3
+#: js/build/mapsSidebar.js:1
+msgid "Source:"
 msgstr ""
 
 #: js/build/postsSidebar.js:1

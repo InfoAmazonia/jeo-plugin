@@ -10,11 +10,11 @@ const appendLanguageQuery = ( query = {} ) => {
 
 	if (
 		typeof window !== 'undefined' &&
-		'languageParams' in window &&
-		window.languageParams?.currentLang &&
+		'jeowpLanguageParams' in window &&
+		window.jeowpLanguageParams?.currentLang &&
 		typeof nextQuery.lang === 'undefined'
 	) {
-		nextQuery.lang = window.languageParams.currentLang;
+		nextQuery.lang = window.jeowpLanguageParams.currentLang;
 	}
 
 	return nextQuery;
