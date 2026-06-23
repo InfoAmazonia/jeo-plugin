@@ -91,6 +91,39 @@ jeo_ensure_node_24() {
 	ok "Node $(node -v) active (via nvm)"
 }
 
+# ── Required PHP extensions ──────────────────────────────────────────────────
+# Verifies the PHP CLI has the extensions the production Composer dependencies
+# need (phpoffice/phpword pulls ext-dom/ext-xml/ext-zip). Fails early with an
+# actionable apt hint instead of letting `composer install` error cryptically.
+jeo_ensure_php_extensions() {
+	require_command php
+
+	local php_minor missing=() ext
+	php_minor="$(php -r 'echo PHP_MAJOR_VERSION.".".PHP_MINOR_VERSION;' 2>/dev/null)"
+
+	for ext in dom xml zip mbstring; do
+		if ! php -m 2>/dev/null | grep -qix "$ext"; then
+			missing+=( "$ext" )
+		fi
+	done
+
+	if [[ ${#missing[@]} -gt 0 ]]; then
+		local pkgs=""
+		for ext in "${missing[@]}"; do
+			case "$ext" in
+				dom|xml) pkgs="${pkgs} php${php_minor:-8.x}-xml" ;;
+				zip)     pkgs="${pkgs} php${php_minor:-8.x}-zip" ;;
+				mbstring) pkgs="${pkgs} php${php_minor:-8.x}-mbstring" ;;
+			esac
+		done
+		# De-duplicate package list.
+		pkgs="$(echo "$pkgs" | tr ' ' '\n' | sort -u | tr '\n' ' ' | sed 's/^ *//;s/ *$//')"
+		fail "Missing PHP extension(s): ${missing[*]}. Install with: sudo apt-get install ${pkgs} && sudo phpenmod ${missing[*]}"
+	fi
+
+	ok "PHP extensions OK (dom, xml, zip, mbstring)"
+}
+
 # ── WordPress-ready ZIP packaging ────────────────────────────────────────────
 # Packages src/ into dist/jeo-{version}.zip with the plugin root folder named
 # "jeo", stripping development artifacts from vendor/ and js/build/. Exports the
