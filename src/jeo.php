@@ -1,3 +1,4 @@
+<?php
 /**
  * JEO WP — Geojournalism platform for WordPress.
  *
