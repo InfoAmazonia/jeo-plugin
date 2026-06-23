@@ -442,22 +442,7 @@ function jeo_custom_settings_css() {
 }
 
 /**
- * Output the custom JEO CSS in a `<style>` tag in the frontend `<head>`.
- *
- * @return void
- */
-function jeo_custom_settings_css_wrap() {
-	$css = jeo_custom_settings_css();
-	if ( empty( $css ) ) {
-		return;
-	}
-	// Values are individually sanitized in jeo_custom_settings_css().
-	echo '<style type="text/css" id="custom-jeo-css">' . $css . '</style>' . "\n"; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-}
-add_action( 'wp_head', 'jeo_custom_settings_css_wrap' );
-
-/**
- * Enqueue Google Fonts stylesheets for primary and stories typography when configured.
+ * Enqueue configured typography assets.
  *
  * @return void
  */

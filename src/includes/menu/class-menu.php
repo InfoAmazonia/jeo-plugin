@@ -30,11 +30,12 @@ class Menu {
 		add_menu_page(
 			__( 'JEO', 'jeowp' ),
 			__( 'JEO', 'jeowp' ),
-			'read',
+			// phpcs:ignore WordPress.WP.Capabilities.Unknown -- Registered by Maps::add_capabilities().
+			'edit_maps',
 			'jeo-main-menu',
 			array( $this, 'render_welcome_page' ),
-			'data:image/svg+xml;base64,' . base64_encode( file_get_contents( JEO_BASEPATH . '/js/src/icons/jeo.svg' ) ), // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode, WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
-			10
+			// phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode,WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Encodes a bundled local SVG into a menu-icon data URI.
+			'data:image/svg+xml;base64,' . base64_encode( file_get_contents( JEO_BASEPATH . '/js/src/icons/jeo.svg' ) )
 		);
 
 		// 2. Submenu Welcome (Ocupa a primeira posição, slug igual ao pai para ser o default)
