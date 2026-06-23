@@ -8,9 +8,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-06-09T19:53:28+00:00\n"
-"PO-Revision-Date: 2026-06-09T19:53:28+00:00\n"
+"PO-Revision-Date: 2026-06-23 15:37-0300\n"
 "Language: pt_BR\n"
-": HEADJEO 3.6.5\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.9\n"
 "X-Domain: jeowp\n"
@@ -1766,296 +1765,296 @@ msgstr "Por %s"
 
 #: includes/admin/dashboard-page.php:306
 msgid "Toggle panel"
-msgstr ""
+msgstr "Alternar painel"
 
 #: includes/admin/dashboard-page.php:308
 msgid "JEO Platform"
-msgstr ""
+msgstr "Plataforma JEO"
 
 #: includes/admin/dashboard-page.php:309
 msgid "Loading geodata..."
-msgstr ""
+msgstr "Carregando geodados..."
 
 #: includes/admin/dashboard-page.php:310
 msgid "Minimize Dashboard"
-msgstr ""
+msgstr "Minimizar painel"
 
 #: includes/admin/dashboard-page.php:317
 msgid "Search terms"
-msgstr ""
+msgstr "Termos de busca"
 
 #: includes/admin/dashboard-page.php:318
 msgid "Title or content..."
-msgstr ""
+msgstr "Título ou conteúdo..."
 
 #: includes/admin/dashboard-page.php:322
 msgid "Post Type"
-msgstr ""
+msgstr "Tipo de post"
 
 #: includes/admin/dashboard-page.php:324
 msgid "All Types"
-msgstr ""
+msgstr "Todos os tipos"
 
 #: includes/admin/dashboard-page.php:329
 msgid "Taxonomy"
-msgstr ""
+msgstr "Taxonomia"
 
 #: includes/admin/dashboard-page.php:334
 msgid "Term"
-msgstr ""
+msgstr "Termo"
 
 #: includes/admin/dashboard-page.php:339
 msgid "Apply Filters"
-msgstr ""
+msgstr "Aplicar filtros"
 
 #: includes/admin/dashboard-page.php:344
 msgid "Timeline Range"
-msgstr ""
+msgstr "Período da linha do tempo"
 
 #: includes/admin/dashboard-page.php:361
 msgid "Gathering geodata and initializing JEO Engine..."
-msgstr ""
+msgstr "Coletando geodados e inicializando o JEO Engine..."
 
 #: includes/admin/dashboard-page.php:524
 #: includes/settings/class-settings.php:550
 msgid "Select Taxonomy..."
-msgstr ""
+msgstr "Selecionar taxonomia..."
 
 #: includes/admin/dashboard-page.php:542
 #: includes/settings/class-settings.php:551
 msgid "Select Term..."
-msgstr ""
+msgstr "Selecionar termo..."
 
 #: includes/admin/dashboard-page.php:605
 #: includes/settings/class-settings.php:552
 msgid " locations found."
-msgstr ""
+msgstr " localizações encontradas."
 
 #: includes/admin/dashboard-page.php:617
 #: includes/admin/dashboard-page.php:704
 msgid "Untitled"
-msgstr ""
+msgstr "Sem título"
 
 #: includes/admin/dashboard-page.php:707
 #: includes/settings/class-settings.php:548
 msgid "View Post"
-msgstr ""
+msgstr "Ver post"
 
 #: includes/admin/dashboard-page.php:707
 #: includes/settings/class-settings.php:549
 msgid "Edit Post"
-msgstr ""
+msgstr "Editar post"
 
 #: includes/admin/uninstall-handler.php:30
 #: includes/admin/uninstall-handler.php:48
 #: includes/admin/uninstall-handler.php:49
 msgid "Uninstall JEO"
-msgstr ""
+msgstr "Desinstalar JEO"
 
 #: includes/admin/uninstall-handler.php:31
 msgid "Uninstall"
-msgstr ""
+msgstr "Desinstalar"
 
 #: includes/admin/uninstall-handler.php:63
 #: includes/admin/uninstall-page.php:23
 msgid "You do not have permission to uninstall plugins."
-msgstr ""
+msgstr "Você não tem permissão para desinstalar plugins."
 
 #: includes/admin/uninstall-page.php:50
 msgid "Warning: This action cannot be undone."
-msgstr ""
+msgstr "Aviso: Esta ação não pode ser desfeita."
 
 #: includes/admin/uninstall-page.php:53
 msgid "Uninstalling JEO will permanently delete the following data from your site:"
-msgstr ""
+msgstr "Desinstalar o JEO excluirá permanentemente os seguintes dados do seu site:"
 
 #: includes/admin/uninstall-page.php:56
 msgid "All plugin settings stored in the database (map defaults, API keys, appearance settings, etc.)."
-msgstr ""
+msgstr "Todas as configurações do plugin armazenadas no banco de dados (padrões de mapa, chaves de API, configurações de aparência, etc.)."
 
 #: includes/admin/uninstall-page.php:57
 msgid "All AI usage logs (private posts of type \"jeo-ai-log\")."
-msgstr ""
+msgstr "Todos os logs de uso da IA (posts privados do tipo \"jeo-ai-log\")."
 
 #: includes/admin/uninstall-page.php:58
 msgid "All geolocation metadata attached to posts (_related_point, _geocode_* index fields)."
-msgstr ""
+msgstr "Todos os metadados de geolocalização anexados aos posts (_related_point, campos de índice _geocode_*)."
 
 #: includes/admin/uninstall-page.php:59
 msgid "Cached geocoding results (Nominatim transients)."
-msgstr ""
+msgstr "Resultados de geocodificação em cache (transientes do Nominatim)."
 
 #: includes/admin/uninstall-page.php:60
 msgid "Bulk AI cron logs and embedding token counters."
-msgstr ""
+msgstr "Logs de Cron da IA em lote e contadores de Tokens de Embedding."
 
 #: includes/admin/uninstall-page.php:61
 msgid "RAG vector store files from the uploads directory (wp-content/uploads/jeo-ai-store/)."
-msgstr ""
+msgstr "Arquivos do Armazenamento de Vetores do RAG do diretório de uploads (wp-content/uploads/jeo-ai-store/)."
 
 #: includes/admin/uninstall-page.php:62
 msgid "Scheduled cron jobs created by the plugin."
-msgstr ""
+msgstr "Tarefas Cron agendadas criadas pelo plugin."
 
 #: includes/admin/uninstall-page.php:65
-msgid "Your regular posts, pages, maps, layers, and storymaps will remain, but any geolocation data associated with them will be lost."
-msgstr ""
+msgid "Your regular posts, pages, maps, layers, and story maps will remain, but any geolocation data associated with them will be lost."
+msgstr "Seus posts, páginas, mapas, camadas e mapas narrativos normais permanecerão, mas qualquer dado de geolocalização associado a eles será perdido."
 
 #: includes/admin/uninstall-page.php:72
 msgid "I understand that all data listed above will be permanently deleted."
-msgstr ""
+msgstr "Entendo que todos os dados listados acima serão permanentemente excluídos."
 
 #: includes/admin/uninstall-page.php:75
 msgid "Confirm and Uninstall JEO"
-msgstr ""
+msgstr "Confirmar e Desinstalar JEO"
 
 #: includes/admin/uninstall-page.php:75
 msgid "Are you absolutely sure? This cannot be undone."
-msgstr ""
+msgstr "Você tem certeza absoluta? Isso não pode ser desfeito."
 
 #: includes/ai/class-ai-logger.php:39
 msgctxt "Post Type General Name"
 msgid "AI Usage Logs"
-msgstr ""
+msgstr "Logs de Uso da IA"
 
 #: includes/ai/class-ai-logger.php:40
 msgctxt "Post Type Singular Name"
 msgid "AI Usage Log"
-msgstr ""
+msgstr "Log de Uso da IA"
 
 #: includes/ai/class-ai-logger.php:41
 msgid "AI Logs (Costs)"
-msgstr ""
+msgstr "Logs da IA (Custos)"
 
 #: includes/ai/class-ai-logger.php:42
 msgid "All AI Logs"
-msgstr ""
+msgstr "Todos os Logs da IA"
 
 #: includes/ai/class-ai-logger.php:43
 msgid "View Log"
-msgstr ""
+msgstr "Ver log"
 
 #: includes/ai/class-ai-logger.php:47
 msgid "AI Usage Log"
-msgstr ""
+msgstr "Log de Uso da IA"
 
 #: includes/ai/class-ai-logger.php:48
 msgid "Internal logs for AI token usage and costs."
-msgstr ""
+msgstr "Logs internos para uso de Tokens e custos da IA."
 
 #: includes/ai/class-ai-settings.php:46
 #: includes/ai/settings/tab-provider.php:12
 msgid "AI Provider"
-msgstr ""
+msgstr "Provedor de IA"
 
 #: includes/ai/class-ai-settings.php:47
 msgid "Knowledge Base"
-msgstr ""
+msgstr "Base de Conhecimento"
 
 #: includes/ai/class-ai-settings.php:48
 msgid "Bulk Geolocation"
-msgstr ""
+msgstr "Geolocalização em lote"
 
 #: includes/ai/class-ai-settings.php:49
 msgid "Context Assistant"
-msgstr ""
+msgstr "Assistente de Contexto"
 
 #: includes/ai/class-bulk-processor.php:170
 msgid "Bulk clearing started (Background)."
-msgstr ""
+msgstr "Limpeza em lote iniciada (segundo plano)."
 
 #: includes/ai/class-bulk-processor.php:174
 msgid "Bulk clearing started in background. Posts will be reset in batches."
-msgstr ""
+msgstr "Limpeza em lote iniciada em segundo plano. Os posts serão redefinidos em lotes."
 
 #: includes/ai/class-bulk-processor.php:194
 #: includes/ai/class-rag-worker.php:101
 #: includes/settings/class-settings.php:519
 msgid "Error"
-msgstr ""
+msgstr "Erro"
 
 #: includes/ai/class-bulk-processor.php:194
 #: includes/ai/class-rag-worker.php:101
 msgid "Success"
-msgstr ""
+msgstr "Sucesso"
 
 #: includes/ai/class-bulk-processor.php:223
 #: includes/ai/class-rag-worker.php:68
 #: includes/ai/settings/tab-bulk.php:49
 #: includes/ai/settings/tab-knowledge.php:157
 msgid "Every Minute"
-msgstr ""
+msgstr "A cada minuto"
 
 #: includes/ai/class-bulk-processor.php:229
 #: includes/ai/class-rag-worker.php:74
 #: includes/ai/settings/tab-bulk.php:50
 #: includes/ai/settings/tab-knowledge.php:158
 msgid "Every 5 Minutes"
-msgstr ""
+msgstr "A cada 5 minutos"
 
 #: includes/ai/class-bulk-processor.php:235
 #: includes/ai/class-rag-worker.php:80
 #: includes/ai/settings/tab-bulk.php:51
 #: includes/ai/settings/tab-knowledge.php:159
 msgid "Every 15 Minutes"
-msgstr ""
+msgstr "A cada 15 minutos"
 
 #: includes/ai/class-bulk-processor.php:344
 msgid "No post types selected for bulk processing."
-msgstr ""
+msgstr "Nenhum tipo de post selecionado para processamento em lote."
 
 #: includes/ai/class-bulk-processor.php:364
 msgid "No more posts to process. Deactivating worker."
-msgstr ""
+msgstr "Não há mais posts para processar. Desativando o worker."
 
 #: includes/ai/class-bulk-processor.php:381
 msgid "CRITICAL: No active AI adapter found for bulk processing."
-msgstr ""
+msgstr "CRÍTICO: Nenhum adaptador de IA ativo encontrado para processamento em lote."
 
 #: includes/ai/class-bulk-processor.php:434
 msgid "No more posts to clear."
-msgstr ""
+msgstr "Não há mais posts para limpar."
 
 #: includes/ai/class-bulk-processor.php:602
 msgid "No posts selected."
-msgstr ""
+msgstr "Nenhum post selecionado."
 
 #: includes/ai/class-bulk-processor.php:664
 msgid "Review Bulk AI Approval"
-msgstr ""
+msgstr "Revisar aprovação da IA em lote"
 
 #: includes/ai/class-bulk-processor.php:667
 #: includes/ai/class-bulk-processor.php:703
 msgid "Analyzing selected posts..."
-msgstr ""
+msgstr "Analisando posts selecionados..."
 
 #: includes/ai/class-bulk-processor.php:672
 msgid "Confirm & Apply"
-msgstr ""
+msgstr "Confirmar e aplicar"
 
 #: includes/ai/class-bulk-processor.php:698
 msgid "Please select at least one post."
-msgstr ""
+msgstr "Selecione pelo menos um post."
 
 #: includes/ai/class-bulk-processor.php:772
 msgid "JEO AI Status"
-msgstr ""
+msgstr "Status da IA do JEO"
 
 #: includes/ai/class-bulk-processor.php:797
 msgid "No Locations Found"
-msgstr ""
+msgstr "Nenhuma localização encontrada"
 
 #: includes/ai/class-bulk-processor.php:799
 msgid "AI Error"
-msgstr ""
+msgstr "Erro da IA"
 
 #: includes/ai/class-bulk-processor.php:841
 msgid "Approve AI"
-msgstr ""
+msgstr "Aprovar IA"
 
 #: includes/ai/class-bulk-processor.php:852
 msgid "Approve JEO AI Geolocations"
-msgstr ""
+msgstr "Aprovar geolocalizações da IA do JEO"
 
 #: includes/ai/class-context-handler.php:227
 #: includes/ai/class-context-handler.php:346
@@ -2066,7 +2065,7 @@ msgstr ""
 #: includes/minimap/class-minimap.php:238
 #: includes/minimap/class-minimap.php:316
 msgid "Post not found."
-msgstr ""
+msgstr "Post não encontrado."
 
 #: includes/ai/class-context-handler.php:238
 #: includes/ai/class-context-handler.php:367
@@ -2075,807 +2074,807 @@ msgstr ""
 #: includes/minimap/class-minimap.php:249
 #: includes/minimap/class-minimap.php:337
 msgid "No AI provider configured. Set one in JEO AI Settings."
-msgstr ""
+msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA do JEO."
 
 #: includes/ai/class-context-handler.php:250
 msgid "The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles)."
-msgstr ""
+msgstr "O artigo parece ter muito pouco conteúdo. Escreva um pouco mais sobre o tema, ou diga sobre o que você gostaria de sugestões (ex.: território, entidades, ângulos)."
 
 #: includes/ai/class-context-handler.php:251
 #: includes/ai/class-context-handler.php:289
 msgid "Generate editorial suggestions for this post based on its content."
-msgstr ""
+msgstr "Gerar sugestões editoriais para este post com base no seu conteúdo."
 
 #: includes/ai/class-context-handler.php:259
 msgid "Waiting for more content or directions."
-msgstr ""
+msgstr "Aguardando mais conteúdo ou instruções."
 
 #: includes/ai/class-context-handler.php:295
 msgid "Suggestions generated."
-msgstr ""
+msgstr "Sugestões geradas."
 
 #: includes/ai/class-context-handler.php:326
 #: includes/minimap/class-minimap.php:296
 msgid "conversation_id is required."
-msgstr ""
+msgstr "conversation_id é obrigatório."
 
 #: includes/ai/class-context-handler.php:336
 #: includes/minimap/class-minimap.php:227
 #: includes/minimap/class-minimap.php:306
 msgid "A post ID is required."
-msgstr ""
+msgstr "Um ID de post é obrigatório."
 
 #: includes/ai/class-context-handler.php:356
 #: includes/minimap/class-minimap.php:326
 msgid "A message is required."
-msgstr ""
+msgstr "Uma mensagem é obrigatória."
 
 #: includes/ai/class-context-handler.php:402
 msgid "Suggestions updated."
-msgstr ""
+msgstr "Sugestões atualizadas."
 
 #: includes/ai/class-context-handler.php:471
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
-msgstr ""
+msgstr "A IA não responde após várias tentativas. Tente novamente ou reformule sua solicitação."
 
 #: includes/ai/class-context-handler.php:723
 msgid "Conversation cleared."
-msgstr ""
+msgstr "Conversa limpa."
 
 #: includes/ai/class-minilayer-handler.php:72
 #: includes/minimap/class-minimap.php:217
 msgid "A prompt is required."
-msgstr ""
+msgstr "Um prompt é obrigatório."
 
 #: includes/ai/class-minilayer-handler.php:84
 #: includes/ai/class-minilayer-service.php:33
 msgid "Mapbox API key is not configured. Set it in JEO Settings."
-msgstr ""
+msgstr "A chave de API do Mapbox não está configurada. Defina-a nas configurações do JEO."
 
 #: includes/ai/class-minilayer-handler.php:86
 msgid "Could not generate the map style. Please try again."
-msgstr ""
+msgstr "Não foi possível gerar o estilo do mapa. Tente novamente."
 
 #: includes/ai/class-minilayer-handler.php:87
 msgid "The AI returned an unexpected response. Please try again."
-msgstr ""
+msgstr "A IA retornou uma resposta inesperada. Tente novamente."
 
 #: includes/ai/class-minilayer-handler.php:88
 msgid "The AI did not create a valid style. Please try again."
-msgstr ""
+msgstr "A IA não criou um estilo válido. Tente novamente."
 
 #: includes/ai/class-minilayer-service.php:121
 msgid "Failed to parse AI response as JSON."
-msgstr ""
+msgstr "Falha ao analisar a resposta da IA como JSON."
 
 #: includes/ai/class-minilayer-service.php:128
 msgid "AI response did not include a style_id."
-msgstr ""
+msgstr "A resposta da IA não incluiu um style_id."
 
 #. translators: %s: Mapbox style ID.
 #: includes/ai/class-minilayer-service.php:167
 #, php-format
 msgid "Minilayer: %s"
-msgstr ""
+msgstr "Minilayer: %s"
 
 #: includes/ai/class-neuron-factory.php:191
 msgid "No Embedding Model configured. Please select one in the JEO AI settings."
-msgstr ""
+msgstr "Nenhum modelo de Embedding configurado. Selecione um nas configurações de IA do JEO."
 
 #. translators: %s: directory path
 #: includes/ai/class-rag-agent.php:64
 #, php-format
 msgid "The RAG Vector Store directory (%s) could not be created. Please check your uploads folder permissions."
-msgstr ""
+msgstr "O diretório do Armazenamento de Vetores do RAG (%s) não pôde ser criado. Verifique as permissões da pasta de uploads."
 
 #. translators: %s: directory path
 #: includes/ai/class-rag-agent.php:70
 #, php-format
 msgid "The RAG Vector Store directory (%s) is not writable. Local Vectorization is disabled."
-msgstr ""
+msgstr "O diretório do Armazenamento de Vetores do RAG (%s) não tem permissão de escrita. A Vetorização local está desativada."
 
 #: includes/ai/class-rag-agent.php:76
 msgid "No AI Provider is configured. Please set up a provider (Gemini, OpenAI, etc.) before using RAG."
-msgstr ""
+msgstr "Nenhum provedor de IA configurado. Configure um provedor (Gemini, OpenAI, etc.) antes de usar o RAG."
 
 #: includes/ai/class-rag-agent.php:89
 msgid "No Embedding Model selected. Please choose a model in the Knowledge Base tab."
-msgstr ""
+msgstr "Nenhum modelo de Embedding selecionado. Escolha um modelo na aba Base de Conhecimento."
 
 #. translators: %s: provider name
 #: includes/ai/class-rag-agent.php:108
 #, php-format
 msgid "The selected embedding provider (%s) does not support native Embeddings in JEO yet. Please use OpenAI, Gemini or Ollama for Vector Store features."
-msgstr ""
+msgstr "O provedor de Embedding selecionado (%s) ainda não suporta Embeddings nativos no JEO. Use OpenAI, Gemini ou Ollama para recursos do Armazenamento de Vetores."
 
 #. translators: %s: provider name
 #: includes/ai/class-rag-agent.php:119
 #, php-format
 msgid "The API Key for the Embedding provider (%s) is missing. RAG requires a valid connection to generate embeddings."
-msgstr ""
+msgstr "A chave de API do provedor de Embedding (%s) está ausente. O RAG requer uma conexão válida para gerar Embeddings."
 
 #: includes/ai/class-rag-backup.php:41
 msgid "The PHP ZipArchive extension is required to create backups."
-msgstr ""
+msgstr "A extensão ZipArchive do PHP é necessária para criar backups."
 
 #: includes/ai/class-rag-backup.php:92
 msgid "No vector store found to backup."
-msgstr ""
+msgstr "Nenhum armazenamento de vetores encontrado para backup."
 
 #: includes/ai/class-rag-backup.php:99
 msgid "Failed to create the ZIP archive."
-msgstr ""
+msgstr "Falha ao criar o arquivo ZIP."
 
 #: includes/ai/class-rag-worker.php:209
 msgid "Either post_id or query is required."
-msgstr ""
+msgstr "É obrigatório informar post_id ou query."
 
 #. translators: %s: pipeline name
 #: includes/ai/class-rag-worker.php:347
 #, php-format
 msgid "Unknown pipeline: %s"
-msgstr ""
+msgstr "Pipeline desconhecido: %s"
 
 #. translators: 1: locked model name, 2: current model name
 #: includes/ai/class-rag-worker.php:377
 #, php-format
 msgid "Vector Store mismatch for %1$s! Expected %2$s, found %3$s."
-msgstr ""
+msgstr "Incompatibilidade de Armazenamento de Vetores para %1$s! Esperado %2$s, encontrado %3$s."
 
 #. translators: %s: pipeline name
 #: includes/ai/class-rag-worker.php:403
 #, php-format
 msgid "No more %s to vectorize."
-msgstr ""
+msgstr "Não há mais %s para vetorizar."
 
 #. translators: %d: number of items vectorized
 #: includes/ai/class-rag-worker.php:428
 #, php-format
 msgid "Successfully vectorized %1$d %2$s."
-msgstr ""
+msgstr "%1$d %2$s vetorizados com sucesso."
 
 #. translators: %s: pipeline name
 #: includes/ai/class-rag-worker.php:437
 #, php-format
 msgid "Batch skipped for %s (no content found)."
-msgstr ""
+msgstr "Lote ignorado para %s (nenhum conteúdo encontrado)."
 
 #: includes/ai/settings/main-page.php:10
 msgid "JEO AI Configuration"
-msgstr ""
+msgstr "Configuração de IA do JEO"
 
 #: includes/ai/settings/main-page.php:99
 msgid "Save AI Settings"
-msgstr ""
+msgstr "Salvar configurações de IA"
 
 #: includes/ai/settings/main-page.php:107
 #: includes/ai/settings/tab-general.php:22
 msgid "JEO AI API Debugger"
-msgstr ""
+msgstr "Depurador de API da IA do JEO"
 
 #: includes/ai/settings/main-page.php:109
 msgid "Clear logs"
-msgstr ""
+msgstr "Limpar logs"
 
 #: includes/ai/settings/main-page.php:115
 msgid "[System] Console initialized. Awaiting API activity..."
-msgstr ""
+msgstr "[Sistema] Console inicializado. Aguardando atividade da API..."
 
 #: includes/ai/settings/tab-bulk.php:12
 msgid "Background Processing"
-msgstr ""
+msgstr "Processamento em segundo plano"
 
 #: includes/ai/settings/tab-bulk.php:15
 msgid "Enable background AI geolocalization"
-msgstr ""
+msgstr "Ativar geolocalização por IA em segundo plano"
 
 #: includes/ai/settings/tab-bulk.php:16
 msgid "When active, JEO will scan legacy posts and suggest locations based on their content."
-msgstr ""
+msgstr "Quando ativo, o JEO examinará posts existentes e sugerirá localizações com base no seu conteúdo."
 
 #: includes/ai/settings/tab-bulk.php:20
 #: includes/ai/settings/tab-knowledge.php:151
 msgid "Batch Size"
-msgstr ""
+msgstr "Tamanho do lote"
 
 #: includes/ai/settings/tab-bulk.php:23
 msgid "Number of posts to process per batch."
-msgstr ""
+msgstr "Número de posts a processar por lote."
 
 #: includes/ai/settings/tab-bulk.php:27
 msgid "Target Post Types"
-msgstr ""
+msgstr "Tipos de post alvo"
 
 #: includes/ai/settings/tab-bulk.php:46
 #: includes/ai/settings/tab-knowledge.php:155
 msgid "Cron Interval"
-msgstr ""
+msgstr "Intervalo do Cron"
 
 #: includes/ai/settings/tab-bulk.php:52
 #: includes/ai/settings/tab-knowledge.php:160
 msgid "Hourly"
-msgstr ""
+msgstr "Horário"
 
 #: includes/ai/settings/tab-bulk.php:53
 msgid "Twice Daily"
-msgstr ""
+msgstr "Duas vezes ao dia"
 
 #: includes/ai/settings/tab-bulk.php:59
 msgid "Execution Logs"
-msgstr ""
+msgstr "Logs de execução"
 
 #: includes/ai/settings/tab-bulk.php:62
 msgid "Recent Background Activity"
-msgstr ""
+msgstr "Atividade recente em segundo plano"
 
 #: includes/ai/settings/tab-bulk.php:68
 msgid "No recent activity recorded."
-msgstr ""
+msgstr "Nenhuma atividade recente registrada."
 
 #: includes/ai/settings/tab-bulk.php:87
 msgid "Manual Control"
-msgstr ""
+msgstr "Controle manual"
 
 #: includes/ai/settings/tab-bulk.php:91
 #: includes/settings/class-settings.php:532
 msgid "Process 1 Batch Now"
-msgstr ""
+msgstr "Processar 1 lote agora"
 
 #: includes/ai/settings/tab-bulk.php:94
 #: includes/settings/class-settings.php:533
 msgid "Clear 1 Batch"
-msgstr ""
+msgstr "Limpar 1 lote"
 
 #: includes/ai/settings/tab-bulk.php:97
 msgid "Reset All Posts"
-msgstr ""
+msgstr "Redefinir todos os posts"
 
 #: includes/ai/settings/tab-bulk.php:100
 msgid "Manual Batch: Processes legacy posts immediately. Clear Batch: Resets the \"processed\" flag for a small group. Reset All: Schedules a background task to clear all posts (Double confirmation required)."
-msgstr ""
+msgstr "Lote manual: processa posts existentes imediatamente. Limpar lote: redefine o sinalizador \"processado\" para um pequeno grupo. Redefinir tudo: agenda uma tarefa em segundo plano para limpar todos os posts (confirmação dupla necessária)."
 
 #: includes/ai/settings/tab-bulk.php:105
 msgid "Processing Status"
-msgstr ""
+msgstr "Status de processamento"
 
 #. translators: %1$d: processed posts, %2$d: total posts, %3$d: percentage
 #: includes/ai/settings/tab-bulk.php:139
 #, php-format
 msgid "Geolocalization Progress: %1$d of %2$d posts marked as processed (%3$d%%)."
-msgstr ""
+msgstr "Progresso da geolocalização: %1$d de %2$d posts marcados como processados (%3$d%%)."
 
 #: includes/ai/settings/tab-bulk.php:146
 msgid "Auto-Approval Threshold"
-msgstr ""
+msgstr "Limite de aprovação automática"
 
 #: includes/ai/settings/tab-bulk.php:149
 msgid "Minimum average confidence required to auto-approve locations when using bulk approval actions in the post list."
-msgstr ""
+msgstr "Confiança média mínima necessária para aprovar automaticamente localizações ao usar ações de aprovação em lote na lista de posts."
 
 #: includes/ai/settings/tab-bulk.php:154
 msgid "Internal Debug Log"
-msgstr ""
+msgstr "Log de Debug interno"
 
 #: includes/ai/settings/tab-bulk.php:157
 msgid "Enable detailed file-based logging (jeo-bulk-ai.log) for technical troubleshooting."
-msgstr ""
+msgstr "Ativar registro detalhado em arquivo (jeo-bulk-ai.log) para solução de problemas técnicos."
 
 #: includes/ai/settings/tab-bulk.php:161
 msgid "Open Log File"
-msgstr ""
+msgstr "Abrir arquivo de log"
 
 #: includes/ai/settings/tab-bulk.php:162
 msgid "Delete Log File"
-msgstr ""
+msgstr "Excluir arquivo de log"
 
 #: includes/ai/settings/tab-context.php:18
 msgid "Context Assistant System Prompt"
-msgstr ""
+msgstr "Prompt do sistema do Assistente de Contexto"
 
 #: includes/ai/settings/tab-context.php:31
 msgid "Check this to use a custom system prompt. Uncheck to use the built-in default prompt."
-msgstr ""
+msgstr "Marque para usar um prompt do sistema personalizado. Desmarque para usar o prompt padrão integrado."
 
 #: includes/ai/settings/tab-context.php:55
 msgid "Default System Prompt (reference)"
-msgstr ""
+msgstr "Prompt do sistema padrão (referência)"
 
 #: includes/ai/settings/tab-context.php:65
 msgid "This is the built-in default prompt. Enable the custom prompt checkbox above to override it."
-msgstr ""
+msgstr "Este é o prompt padrão integrado. Ative a caixa de seleção de prompt personalizado acima para substituí-lo."
 
 #: includes/ai/settings/tab-embedded.php:10
 msgid "Embedded Brazilian Territories"
-msgstr ""
+msgstr "Territórios brasileiros incorporados"
 
 #: includes/ai/settings/tab-embedded.php:11
 msgid "The following geographic dictionaries are available locally to improve AI precision:"
-msgstr ""
+msgstr "Os seguintes dicionários geográficos estão disponíveis localmente para melhorar a precisão da IA:"
 
 #: includes/ai/settings/tab-embedded.php:18
 #: includes/settings/class-settings.php:556
 msgid "Brazilian Biomes"
-msgstr ""
+msgstr "Biomas brasileiros"
 
 #: includes/ai/settings/tab-embedded.php:19
 #: includes/settings/class-settings.php:557
 msgid "Indigenous Territories"
-msgstr ""
+msgstr "Territórios indígenas"
 
 #: includes/ai/settings/tab-embedded.php:20
 #: includes/settings/class-settings.php:558
 msgid "Quilombola Territories"
-msgstr ""
+msgstr "Territórios quilombolas"
 
 #: includes/ai/settings/tab-embedded.php:21
 #: includes/settings/class-settings.php:559
 msgid "Extractive Reserves (Resex)"
-msgstr ""
+msgstr "Reservas extrativistas (Resex)"
 
 #: includes/ai/settings/tab-embedded.php:22
 #: includes/settings/class-settings.php:560
 msgid "Conservation Units"
-msgstr ""
+msgstr "Unidades de conservação"
 
 #: includes/ai/settings/tab-embedded.php:23
 #: includes/settings/class-settings.php:561
 msgid "Riverside Communities"
-msgstr ""
+msgstr "Comunidades ribeirinhas"
 
 #: includes/ai/settings/tab-embedded.php:24
 #: includes/settings/class-settings.php:562
 msgid "Agrarian Reform Settlements"
-msgstr ""
+msgstr "Assentamentos de reforma agrária"
 
 #: includes/ai/settings/tab-embedded.php:25
 #: includes/settings/class-settings.php:563
 msgid "Indigenous Peoples (Ethnicities)"
-msgstr ""
+msgstr "Povos indígenas (Etnias)"
 
 #: includes/ai/settings/tab-embedded.php:26
 #: includes/settings/class-settings.php:564
 msgid "Legal Amazon and Boundaries"
-msgstr ""
+msgstr "Amazônia legal e limites"
 
 #: includes/ai/settings/tab-embedded.php:27
 #: includes/settings/class-settings.php:565
 msgid "Hydrographic Basins"
-msgstr ""
+msgstr "Bacias hidrográficas"
 
 #: includes/ai/settings/tab-embedded.php:46
 msgid "File:"
-msgstr ""
+msgstr "Arquivo:"
 
 #: includes/ai/settings/tab-embedded.php:47
 msgid "Entries found:"
-msgstr ""
+msgstr "Entradas encontradas:"
 
 #: includes/ai/settings/tab-embedded.php:57
 #: includes/settings/class-settings.php:499
 msgid "Download"
-msgstr ""
+msgstr "Baixar"
 
 #: includes/ai/settings/tab-embedded.php:65
 #: includes/ai/settings/tab-knowledge.php:291
 #: includes/settings/ai-logs-page.php:250
 msgid "Close"
-msgstr ""
+msgstr "Fechar"
 
 #: includes/ai/settings/tab-embedded.php:69
 msgid "Item List"
-msgstr ""
+msgstr "Lista de itens"
 
 #: includes/ai/settings/tab-embedded.php:73
 msgid "Name"
-msgstr ""
+msgstr "Nome"
 
 #: includes/ai/settings/tab-embedded.php:89
 msgid "JSON Raw"
-msgstr ""
+msgstr "JSON bruto"
 
 #: includes/ai/settings/tab-general.php:14
 msgid "Debug Mode"
-msgstr ""
+msgstr "Modo de Debug"
 
 #: includes/ai/settings/tab-general.php:17
 msgid "Enable internal logging of all AI calls (Inputs/Outputs) for 24 hours. Useful for debugging prompt regressions."
-msgstr ""
+msgstr "Ativar registro interno de todas as chamadas da IA (entradas/saídas) por 24 horas. Útil para depurar regressões de prompt."
 
 #: includes/ai/settings/tab-general.php:25
 msgid "Show the floating API debugger console on AI settings pages. Displays real-time request/response logs."
-msgstr ""
+msgstr "Mostrar o console flutuante do depurador de API nas páginas de configuração da IA. Exibe logs de requisição/resposta em tempo real."
 
 #: includes/ai/settings/tab-general.php:30
 msgid "NeuronAI Structured Output"
-msgstr ""
+msgstr "Saída estruturada do NeuronAI"
 
 #: includes/ai/settings/tab-general.php:33
 msgid "Use native schema enforcement instead of prompt-based JSON extraction. Falls back to text parsing if structured output fails."
-msgstr ""
+msgstr "Usar imposição nativa de esquema em vez de extração de JSON baseada em prompt. Recorre à análise de texto se a saída estruturada falhar."
 
 #: includes/ai/settings/tab-general.php:36
 msgid "Limitations:"
-msgstr ""
+msgstr "Limitações:"
 
 #: includes/ai/settings/tab-general.php:38
 msgid "Token usage tracking is unavailable when structured output is active (shows 0 in logs)."
-msgstr ""
+msgstr "O rastreamento de uso de Tokens está indisponível quando a saída estruturada está ativa (mostra 0 nos logs)."
 
 #: includes/ai/settings/tab-general.php:39
 msgid "If the provider does not support native schema enforcement, the system will automatically fall back to text parsing."
-msgstr ""
+msgstr "Se o provedor não suportar imposição nativa de esquema, o sistema recorrerá automaticamente à análise de texto."
 
 #: includes/ai/settings/tab-general.php:40
 msgid "Some internal tools (e.g. prompt generator test connection) automatically bypass structured output."
-msgstr ""
+msgstr "Algumas ferramentas internas (ex.: teste de conexão do gerador de prompt) ignoram automaticamente a saída estruturada."
 
 #: includes/ai/settings/tab-general.php:45
 msgid "Recommendations by provider:"
-msgstr ""
+msgstr "Recomendações por provedor:"
 
 #: includes/ai/settings/tab-general.php:47
 msgid "Full support. Recommended to keep this option enabled."
-msgstr ""
+msgstr "Suporte total. Recomendado manter esta opção ativada."
 
 #: includes/ai/settings/tab-general.php:48
 msgid "Supported via NeuronAI. Test with your model to confirm."
-msgstr ""
+msgstr "Suportado via NeuronAI. Teste com seu modelo para confirmar."
 
 #: includes/ai/settings/tab-general.php:49
 msgid "Variable support depending on model and local configuration. Disable if you encounter errors."
-msgstr ""
+msgstr "Suporte variável dependendo do modelo e configuração local. Desative se encontrar erros."
 
 #: includes/ai/settings/tab-general.php:56
 msgid "Embedded Data"
-msgstr ""
+msgstr "Dados incorporados"
 
 #: includes/ai/settings/tab-general.php:59
 msgid "View locally embedded geographic dictionaries used to improve AI precision. This feature is experimental and not yet fully integrated."
-msgstr ""
+msgstr "Ver dicionários geográficos incorporados localmente usados para melhorar a precisão da IA. Este recurso é experimental e ainda não está totalmente integrado."
 
 #: includes/ai/settings/tab-general.php:63
 msgid "View Embedded Data"
-msgstr ""
+msgstr "Ver dados incorporados"
 
 #: includes/ai/settings/tab-knowledge.php:19
 msgid "AI Provider Required"
-msgstr ""
+msgstr "Provedor de IA necessário"
 
 #: includes/ai/settings/tab-knowledge.php:21
 msgid "You need to configure an AI Provider before you can use the Knowledge Base. Set up your API key and choose a model in the Provider tab first."
-msgstr ""
+msgstr "Você precisa configurar um provedor de IA antes de usar a Base de Conhecimento. Configure sua chave de API e escolha um modelo na aba Provedor primeiro."
 
 #: includes/ai/settings/tab-knowledge.php:24
 msgid "Configure AI Provider"
-msgstr ""
+msgstr "Configurar provedor de IA"
 
 #: includes/ai/settings/tab-knowledge.php:37
 msgid "RAG Knowledge Base (Vector Store)"
-msgstr ""
+msgstr "Base de Conhecimento RAG (Armazenamento de Vetores)"
 
 #: includes/ai/settings/tab-knowledge.php:38
 msgid "Vectorize your WordPress posts to allow the JEO AI to contextually answer questions and cross-reference territorial data."
-msgstr ""
+msgstr "Vetorize seus posts do WordPress para permitir que a IA do JEO responda perguntas contextualmente e faça referência cruzada de dados territoriais."
 
 #: includes/ai/settings/tab-knowledge.php:43
 msgid "Embedding Model"
-msgstr ""
+msgstr "Modelo de Embedding"
 
 #: includes/ai/settings/tab-knowledge.php:59
 msgid "Model selection is locked."
-msgstr ""
+msgstr "Seleção de modelo bloqueada."
 
 #. translators: %s: locked embedding model name
 #: includes/ai/settings/tab-knowledge.php:64
 #, php-format
 msgid "This Vector Store was initialized with %s. To use a different model, you must clear the current store first."
-msgstr ""
+msgstr "Este Armazenamento de Vetores foi inicializado com %s. Para usar um modelo diferente, você deve limpar o armazenamento atual primeiro."
 
 #: includes/ai/settings/tab-knowledge.php:72
 msgid "Select an embedding model..."
-msgstr ""
+msgstr "Selecione um modelo de Embedding..."
 
 #: includes/ai/settings/tab-knowledge.php:100
 msgid "Select the specific embedding model. You can mix providers (e.g. use Gemini for chat and OpenAI for embeddings)."
-msgstr ""
+msgstr "Selecione o modelo de Embedding específico. Você pode misturar provedores (ex.: usar Gemini para chat e OpenAI para Embeddings)."
 
 #: includes/ai/settings/tab-knowledge.php:112
 msgid "RAG Knowledge Base is not available"
-msgstr ""
+msgstr "A Base de Conhecimento RAG não está disponível"
 
 #: includes/ai/settings/tab-knowledge.php:117
 msgid "How to fix this:"
-msgstr ""
+msgstr "Como corrigir:"
 
 #: includes/ai/settings/tab-knowledge.php:120
 msgid "Please select an Embedding Model from the dropdown above and click \"Save AI Settings\"."
-msgstr ""
+msgstr "Selecione um modelo de Embedding no menu suspenso acima e clique em \"Salvar configurações de IA\"."
 
 #: includes/ai/settings/tab-knowledge.php:122
 msgid "Ensure you have an active AI Provider (Gemini, OpenAI, or Ollama) configured in the \"AI Provider\" tab."
-msgstr ""
+msgstr "Certifique-se de ter um provedor de IA ativo (Gemini, OpenAI ou Ollama) configurado na aba \"Provedor de IA\"."
 
 #: includes/ai/settings/tab-knowledge.php:123
 msgid "Check if the \"wp-content/uploads\" directory exists and is writable."
-msgstr ""
+msgstr "Verifique se o diretório \"wp-content/uploads\" existe e tem permissão de escrita."
 
 #: includes/ai/settings/tab-knowledge.php:128
 msgid "Go to AI Provider Settings"
-msgstr ""
+msgstr "Ir para configurações do provedor de IA"
 
 #: includes/ai/settings/tab-knowledge.php:136
 msgid "Background Indexing"
-msgstr ""
+msgstr "Indexação em segundo plano"
 
 #: includes/ai/settings/tab-knowledge.php:137
 msgid "Automatically vectorize your posts in small batches using WP-Cron."
-msgstr ""
+msgstr "Vetorize automaticamente seus posts em pequenos lotes usando o WP-Cron."
 
 #: includes/ai/settings/tab-knowledge.php:142
 msgid "Enable Auto-indexing"
-msgstr ""
+msgstr "Ativar indexação automática"
 
 #: includes/ai/settings/tab-knowledge.php:145
 msgid "Note: WP-Cron only runs when your site receives visitor traffic. If you are on a local development server with no traffic, indexing will pause until pages are loaded."
-msgstr ""
+msgstr "Nota: O WP-Cron só é executado quando seu site recebe tráfego de visitantes. Se você estiver em um servidor de desenvolvimento local sem tráfego, a indexação será pausada até que as páginas sejam carregadas."
 
 #: includes/ai/settings/tab-knowledge.php:164
 msgid "Search Results (topK)"
-msgstr ""
+msgstr "Resultados da busca (topK)"
 
 #: includes/ai/settings/tab-knowledge.php:166
 msgid "Max semantic matches returned per search."
-msgstr ""
+msgstr "Máximo de correspondências semânticas retornadas por busca."
 
 #: includes/ai/settings/tab-knowledge.php:171
 msgid "Recent Background Logs"
-msgstr ""
+msgstr "Logs recentes em segundo plano"
 
 #: includes/ai/settings/tab-knowledge.php:177
 msgid "No indexing jobs have run recently."
-msgstr ""
+msgstr "Nenhum trabalho de indexação executado recentemente."
 
 #: includes/ai/settings/tab-knowledge.php:194
 msgid "Manual Indexing"
-msgstr ""
+msgstr "Indexação manual"
 
 #: includes/ai/settings/tab-knowledge.php:195
 msgid "Trigger a single batch vectorization immediately."
-msgstr ""
+msgstr "Disparar uma única vetorização em lote imediatamente."
 
 #: includes/ai/settings/tab-knowledge.php:198
 #: includes/ai/settings/tab-knowledge.php:321
 msgid "Vectorize 1 Batch Now"
-msgstr ""
+msgstr "Vetorizar 1 lote agora"
 
 #: includes/ai/settings/tab-knowledge.php:230
 msgid "Indexing Progress"
-msgstr ""
+msgstr "Progresso da indexação"
 
 #. translators: %1$d: vectorized count, %2$d: total posts count
 #: includes/ai/settings/tab-knowledge.php:239
 #, php-format
 msgid "%1$d of %2$d posts indexed."
-msgstr ""
+msgstr "%1$d de %2$d posts indexados."
 
 #: includes/ai/settings/tab-knowledge.php:248
 #: includes/ai/settings/tab-knowledge.php:405
 msgid "Status:"
-msgstr ""
+msgstr "Status:"
 
 #: includes/ai/settings/tab-knowledge.php:250
 msgid "Active (Local File Store)"
-msgstr ""
+msgstr "Ativo (Armazenamento de arquivos local)"
 
 #: includes/ai/settings/tab-knowledge.php:254
 msgid "Alternative: Use WP-CLI for large databases:"
-msgstr ""
+msgstr "Alternativa: Use WP-CLI para grandes bancos de dados:"
 
 #: includes/ai/settings/tab-knowledge.php:259
 msgid "Backup Store"
-msgstr ""
+msgstr "Armazenamento de backup"
 
 #: includes/ai/settings/tab-knowledge.php:262
 msgid "Clear & Reset Model"
-msgstr ""
+msgstr "Limpar e redefinir modelo"
 
 #: includes/ai/settings/tab-knowledge.php:268
 msgid "Available Backups (Last 3)"
-msgstr ""
+msgstr "Backups disponíveis (últimos 3)"
 
 #: includes/ai/settings/tab-knowledge.php:270
 #: includes/settings/class-settings.php:501
 msgid "No backups found."
-msgstr ""
+msgstr "Nenhum backup encontrado."
 
 #: includes/ai/settings/tab-knowledge.php:277
 msgid "Test Embeddings & RAG Retrieval"
-msgstr ""
+msgstr "Testar Embeddings e recuperação RAG"
 
 #: includes/ai/settings/tab-knowledge.php:278
 msgid "Test your configured Embedding Model on a random post to ensure it works correctly before indexing your entire database. This uses a temporary testing store."
-msgstr ""
+msgstr "Teste seu modelo de Embedding configurado em um post aleatório para garantir que funcione corretamente antes de indexar todo o seu banco de dados. Usa um armazenamento de teste temporário."
 
 #: includes/ai/settings/tab-knowledge.php:281
 #: includes/settings/class-settings.php:512
 msgid "Run Test on Random Post"
-msgstr ""
+msgstr "Executar teste em post aleatório"
 
 #: includes/ai/settings/tab-knowledge.php:282
 msgid "Test Vector Retrieval"
-msgstr ""
+msgstr "Testar recuperação de vetores"
 
 #: includes/ai/settings/tab-knowledge.php:290
 msgid "Test Local Vector Retrieval"
-msgstr ""
+msgstr "Testar recuperação local de vetores"
 
 #: includes/ai/settings/tab-knowledge.php:297
 msgid "Search Production Store"
-msgstr ""
+msgstr "Buscar no armazenamento de produção"
 
 #: includes/ai/settings/tab-knowledge.php:298
 msgid "Search Test Store"
-msgstr ""
+msgstr "Buscar no armazenamento de teste"
 
 #: includes/ai/settings/tab-knowledge.php:300
 msgid "Search the Vector Store for semantic meaning (e.g., \"Indigenous lands in Amazon\")"
-msgstr ""
+msgstr "Busque no Armazenamento de Vetores por significado semântico (ex.: \"Terras indígenas na Amazônia\")"
 
 #: includes/ai/settings/tab-knowledge.php:304
 msgid "Enter a semantic search query to retrieve similar vectors from your local store."
-msgstr ""
+msgstr "Digite uma consulta de busca semântica para recuperar vetores similares do seu armazenamento local."
 
 #: includes/ai/settings/tab-knowledge.php:312
 msgid "Layer Store (Vectorized Map Layers)"
-msgstr ""
+msgstr "Armazenamento de camadas (camadas de mapa vetorizadas)"
 
 #: includes/ai/settings/tab-knowledge.php:313
 msgid "Vectorize your map layers to enable AI-powered semantic search and layer suggestions based on post content."
-msgstr ""
+msgstr "Vetorize suas camadas de mapa para ativar a busca semântica com IA e sugestões de camadas com base no conteúdo do post."
 
 #: includes/ai/settings/tab-knowledge.php:317
 msgid "Manual Layer Indexing"
-msgstr ""
+msgstr "Indexação manual de camadas"
 
 #: includes/ai/settings/tab-knowledge.php:318
 msgid "Trigger a single batch vectorization for map layers. Layers are also auto-indexed on the background cron schedule and when saved."
-msgstr ""
+msgstr "Dispare uma única vetorização em lote para camadas de mapa. As camadas também são indexadas automaticamente no Cron em segundo plano e ao salvar."
 
 #: includes/ai/settings/tab-knowledge.php:346
 msgid "Layer Indexing Progress"
-msgstr ""
+msgstr "Progresso da indexação de camadas"
 
 #. translators: %1$d: vectorized count, %2$d: total layers count
 #: includes/ai/settings/tab-knowledge.php:355
 #, php-format
 msgid "%1$d of %2$d layers indexed."
-msgstr ""
+msgstr "%1$d de %2$d camadas indexadas."
 
 #: includes/ai/settings/tab-knowledge.php:361
 msgid "Recent Layer Logs"
-msgstr ""
+msgstr "Logs recentes de camadas"
 
 #: includes/ai/settings/tab-knowledge.php:367
 msgid "No layer indexing jobs have run recently."
-msgstr ""
+msgstr "Nenhum trabalho de indexação de camadas executado recentemente."
 
 #: includes/ai/settings/tab-knowledge.php:384
 msgid "Suggest Layers"
-msgstr ""
+msgstr "Sugerir camadas"
 
 #: includes/ai/settings/tab-knowledge.php:385
 msgid "Test semantic layer matching. Enter a post ID or text to find layers that match the content."
-msgstr ""
+msgstr "Teste a correspondência semântica de camadas. Digite um ID de post ou texto para encontrar camadas que correspondam ao conteúdo."
 
 #: includes/ai/settings/tab-knowledge.php:389
 msgid "Post ID"
-msgstr ""
+msgstr "ID do post"
 
 #: includes/ai/settings/tab-knowledge.php:390
 msgid "e.g. 123"
-msgstr ""
+msgstr "ex. 123"
 
 #: includes/ai/settings/tab-knowledge.php:393
 msgid "Or search text"
-msgstr ""
+msgstr "Ou texto de busca"
 
 #: includes/ai/settings/tab-knowledge.php:394
 msgid "e.g., deforestation in Amazon rainforest"
-msgstr ""
+msgstr "ex.: desmatamento na floresta amazônica"
 
 #: includes/ai/settings/tab-knowledge.php:396
 msgid "Find Layers"
-msgstr ""
+msgstr "Encontrar camadas"
 
 #: includes/ai/settings/tab-knowledge.php:407
 msgid "Active (Shared embedding model with Posts Store)"
-msgstr ""
+msgstr "Ativo (Modelo de Embedding compartilhado com o Armazenamento de Posts)"
 
 #: includes/ai/settings/tab-knowledge.php:411
 msgid "WP-CLI:"
-msgstr ""
+msgstr "WP-CLI:"
 
 #: includes/ai/settings/tab-knowledge.php:416
 msgid "Clear Layer Store"
-msgstr ""
+msgstr "Limpar armazenamento de camadas"
 
 #: includes/ai/settings/tab-provider.php:53
 msgid "Paste your API key here..."
-msgstr ""
+msgstr "Cole sua chave de API aqui..."
 
 #: includes/ai/settings/tab-provider.php:58
 msgid "Set New Key"
-msgstr ""
+msgstr "Definir nova chave"
 
 #: includes/ai/settings/tab-provider.php:63
 msgid "Status: Unknown"
-msgstr ""
+msgstr "Status: desconhecido"
 
 #: includes/ai/settings/tab-provider.php:66
 msgid "Test Connection"
-msgstr ""
+msgstr "Testar conexão"
 
 #: includes/ai/settings/tab-provider.php:73
 msgid "Model"
-msgstr ""
+msgstr "Modelo"
 
 #: includes/ai/settings/tab-provider.php:79
 #: includes/settings/class-settings.php:477
 msgid "Change Model"
-msgstr ""
+msgstr "Alterar modelo"
 
 #: includes/ai/settings/tab-provider.php:87
 msgid "System Prompt Configuration"
-msgstr ""
+msgstr "Configuração de Prompt do sistema"
 
 #: includes/ai/settings/tab-provider.php:91
 msgid "Check this to override the default behavior. Uncheck to temporarily disable and return to the optimized default prompt."
-msgstr ""
+msgstr "Marque para substituir o comportamento padrão. Desmarque para desativar temporariamente e voltar ao prompt padrão otimizado."
 
 #: includes/ai/settings/tab-provider.php:95
 msgid "Include post categories and tags in the AI georeferencing request to improve location accuracy."
-msgstr ""
+msgstr "Incluir categorias e tags do post na solicitação de georreferenciamento da IA para melhorar a precisão da localização."
 
 #: includes/ai/settings/tab-provider.php:100
 #: includes/ai/settings/tab-provider.php:280
 #: includes/settings/class-settings.php:527
 msgid "Back"
-msgstr ""
+msgstr "Voltar"
 
 #: includes/ai/settings/tab-provider.php:103
 #: includes/ai/settings/tab-provider.php:282
 #: includes/settings/class-settings.php:525
 #: js/build/contextSidebar.js:1
 msgid "Expand"
-msgstr ""
+msgstr "Expandir"
 
 #: includes/ai/settings/tab-provider.php:104
 msgid "Validate Custom Prompt"
-msgstr ""
+msgstr "Validar prompt personalizado"
 
 #: includes/ai/settings/tab-provider.php:105
 msgid "Clear Text"
-msgstr ""
+msgstr "Limpar texto"
 
 #: includes/ai/settings/tab-provider.php:116
 msgid "AI Prompt Engineer Assistant"
-msgstr ""
+msgstr "Assistente de Engenharia de Prompt da IA"
 
 #: includes/ai/settings/tab-provider.php:117
 msgid "Describe how you want the AI to behave (e.g., \"Only map cities in Brazil\" or \"Ignore street names\"). The active LLM will generate a highly optimized System Prompt for you, strictly adhering to JEO formatting rules."
-msgstr ""
+msgstr "Descreva como você quer que a IA se comporte (ex.: \"Mapear apenas cidades no Brasil\" ou \"Ignorar nomes de ruas\"). O LLM ativo gerará um Prompt do sistema altamente otimizado para você, seguindo estritamente as regras de formatação do JEO."
 
 #: includes/ai/settings/tab-provider.php:279
 msgid "Ex: I want to map only locations inside Europe. Press Shift+Enter for new line, or Enter to generate."
-msgstr ""
+msgstr "Ex.: Quero mapear apenas localizações dentro da Europa. Pressione Shift+Enter para nova linha, ou Enter para gerar."
 
 #: includes/ai/settings/tab-provider.php:283
 msgid "Shift+Enter for new line"
-msgstr ""
+msgstr "Shift+Enter para nova linha"
 
 #: includes/ai/settings/tab-provider.php:288
 msgid "Georeferencing Calibration"
-msgstr ""
+msgstr "Calibração de georreferenciamento"
 
 #: includes/ai/settings/tab-provider.php:292
 #: includes/ai/settings/tab-provider.php:304
@@ -2886,1667 +2885,1667 @@ msgstr ""
 #: includes/ai/settings/tab-provider.php:349
 #: includes/ai/settings/tab-provider.php:358
 msgid "Use"
-msgstr ""
+msgstr "Usar"
 
 #: includes/ai/settings/tab-provider.php:294
 msgid "Location Granularity"
-msgstr ""
+msgstr "Granularidade da localização"
 
 #: includes/ai/settings/tab-provider.php:296
 msgid "Broad (countries, regions, cities)"
-msgstr ""
+msgstr "Ampla (países, regiões, cidades)"
 
 #: includes/ai/settings/tab-provider.php:297
 msgid "Balanced (cities + neighborhoods)"
-msgstr ""
+msgstr "Equilibrada (cidades + bairros)"
 
 #: includes/ai/settings/tab-provider.php:298
 msgid "Fine (streets, landmarks, POIs)"
-msgstr ""
+msgstr "Fina (ruas, pontos de referência, POIs)"
 
 #: includes/ai/settings/tab-provider.php:306
 msgid "Minimum Confidence"
-msgstr ""
+msgstr "Confiança mínima"
 
 #: includes/ai/settings/tab-provider.php:315
 msgid "Primary Threshold"
-msgstr ""
+msgstr "Limite principal"
 
 #: includes/ai/settings/tab-provider.php:324
 msgid "Primary Points"
-msgstr ""
+msgstr "Pontos principais"
 
 #: includes/ai/settings/tab-provider.php:333
 msgid "Secondary Threshold"
-msgstr ""
+msgstr "Limite secundário"
 
 #: includes/ai/settings/tab-provider.php:342
 msgid "Secondary Points"
-msgstr ""
+msgstr "Pontos secundários"
 
 #: includes/ai/settings/tab-provider.php:351
 msgid "Prioritize Title Mentions"
-msgstr ""
+msgstr "Priorizar menções no título"
 
 #: includes/ai/settings/tab-provider.php:360
 msgid "Prompt Token Budget"
-msgstr ""
+msgstr "Orçamento de Tokens do Prompt"
 
 #: includes/ai/settings/tab-provider.php:366
 msgid "Higher budgets allow the AI to process longer articles but increase cost and latency."
-msgstr ""
+msgstr "Orçamentos maiores permitem que a IA processe artigos mais longos, mas aumentam o custo e a latência."
 
 #: includes/ai/settings/tab-provider.php:373
 msgid "Balanced"
-msgstr ""
+msgstr "Equilibrado"
 
 #: includes/ai/settings/tab-provider.php:377
 msgid "No token limit set. The LLM will use as many tokens as it deems necessary to produce the result."
-msgstr ""
+msgstr "Nenhum limite de Tokens definido. O LLM usará tantos Tokens quanto julgar necessário para produzir o resultado."
 
 #: includes/ai/settings/tab-provider.php:384
 msgid "Output Language"
-msgstr ""
+msgstr "Idioma de saída"
 
 #: includes/ai/settings/tab-provider.php:386
 msgid "English (Optimized)"
-msgstr ""
+msgstr "Inglês (otimizado)"
 
 #. translators: %s: site language
 #: includes/ai/settings/tab-provider.php:387
 #, php-format
 msgid "Site Language (%s)"
-msgstr ""
+msgstr "Idioma do site (%s)"
 
 #: includes/ai/settings/tab-provider.php:390
 msgid "LLMs usually follow English instructions with higher precision and lower latency. We recommend English for complex rules, even if your posts are in other languages."
-msgstr ""
+msgstr "LLMs geralmente seguem instruções em inglês com maior precisão e menor latência. Recomendamos inglês para regras complexas, mesmo que seus posts estejam em outros idiomas."
 
 #: includes/ai/settings/tab-provider.php:395
 #: includes/settings/class-settings.php:489
 msgid "Generate Prompt"
-msgstr ""
+msgstr "Gerar prompt"
 
 #: includes/class-ai-adapter.php:165
 msgid "Empty response from AI."
-msgstr ""
+msgstr "Resposta vazia da IA."
 
 #: includes/class-ai-handler.php:48
 msgid "Warning: Deactivating JEO will permanently remove all API Keys and AI settings for security reasons. Do you want to proceed?"
-msgstr ""
+msgstr "Aviso: Desativar o JEO removerá permanentemente todas as chaves de API e configurações de IA por motivos de segurança. Deseja continuar?"
 
 #: includes/class-ai-handler.php:67
 #: includes/settings/ai-logs-page.php:16
 #: includes/settings/class-settings.php:553
 msgid "Unauthorized access."
-msgstr ""
+msgstr "Acesso não autorizado."
 
 #: includes/class-ai-handler.php:74
 #: includes/settings/class-settings.php:554
 msgid "Invalid file."
-msgstr ""
+msgstr "Arquivo inválido."
 
 #: includes/class-ai-handler.php:79
 #: includes/settings/class-settings.php:555
 msgid "File not found."
-msgstr ""
+msgstr "Arquivo não encontrado."
 
 #: includes/class-ai-handler.php:106
 msgid "Google Gemini"
-msgstr ""
+msgstr "Google Gemini"
 
 #: includes/class-ai-handler.php:107
 msgid "OpenAI"
-msgstr ""
+msgstr "OpenAI"
 
 #: includes/class-ai-handler.php:108
 msgid "DeepSeek"
-msgstr ""
+msgstr "DeepSeek"
 
 #: includes/class-ai-handler.php:109
 msgid "Anthropic Claude"
-msgstr ""
+msgstr "Anthropic Claude"
 
 #: includes/class-ai-handler.php:110
 msgid "Ollama (Local/Custom)"
-msgstr ""
+msgstr "Ollama (Local/Personalizado)"
 
 #: includes/class-ai-handler.php:111
 msgid "Mistral AI"
-msgstr ""
+msgstr "Mistral AI"
 
 #: includes/class-ai-handler.php:112
 msgid "Zhipu AI (GLM)"
-msgstr ""
+msgstr "Zhipu AI (GLM)"
 
 #: includes/class-ai-handler.php:113
 msgid "HuggingFace Inference"
-msgstr ""
+msgstr "HuggingFace Inference"
 
 #: includes/class-ai-handler.php:114
 msgid "Grok (xAI)"
-msgstr ""
+msgstr "Grok (xAI)"
 
 #: includes/class-ai-handler.php:115
 msgid "Cohere"
-msgstr ""
+msgstr "Cohere"
 
 #. translators: %s: AI provider name
 #: includes/class-ai-handler.php:144
 #, php-format
 msgid "No API key configured for %s. Please add it in JEO → AI Settings."
-msgstr ""
+msgstr "Nenhuma chave de API configurada para %s. Adicione-a em JEO → Configurações de IA."
 
 #: includes/class-ai-handler.php:397
 msgid "Invalid store type."
-msgstr ""
+msgstr "Tipo de armazenamento inválido."
 
 #. translators: %s: Store type name.
 #: includes/class-ai-handler.php:423
 #, php-format
 msgid "%s store cleared successfully."
-msgstr ""
+msgstr "Armazenamento %s limpo com sucesso."
 
 #: includes/class-ai-handler.php:466
 msgid "Layer store cleared successfully."
-msgstr ""
+msgstr "Armazenamento de camadas limpo com sucesso."
 
 #: includes/class-ai-handler.php:493
 msgid "Query is required."
-msgstr ""
+msgstr "Consulta é obrigatória."
 
 #: includes/class-ai-handler.php:514
 msgid "No matches found in the selected Vector Store. Try vectorizing some posts first."
-msgstr ""
+msgstr "Nenhuma correspondência encontrada no Armazenamento de Vetores selecionado. Tente vetorizar alguns posts primeiro."
 
 #: includes/class-ai-handler.php:568
 msgid "No posts available to test."
-msgstr ""
+msgstr "Nenhum post disponível para teste."
 
 #: includes/class-ai-handler.php:576
 msgid "The selected random post has no usable text content."
-msgstr ""
+msgstr "O post aleatório selecionado não tem conteúdo de texto utilizável."
 
 #: includes/class-ai-handler.php:592
 msgid "The embedding provider returned an empty vector."
-msgstr ""
+msgstr "O provedor de Embedding retornou um vetor vazio."
 
 #: includes/class-ai-handler.php:607
 msgid "Embedding created and saved to Test Store!"
-msgstr ""
+msgstr "Embedding criado e salvo no Armazenamento de teste!"
 
 #: includes/class-ai-handler.php:648
 msgid "API Key or URL is required to list models."
-msgstr ""
+msgstr "Chave de API ou URL é obrigatória para listar modelos."
 
 #: includes/class-ai-handler.php:681
 msgid "Model fetching not officially supported dynamically for Zhipu AI."
-msgstr ""
+msgstr "A busca de modelos não é oficialmente suportada dinamicamente para Zhipu AI."
 
 #: includes/class-ai-handler.php:837
 msgid "Model fetching is not supported for this provider yet. Please enter the model ID manually."
-msgstr ""
+msgstr "A busca de modelos não é suportada para este provedor ainda. Insira o ID do modelo manualmente."
 
 #: includes/class-ai-handler.php:845
 msgid "No models found. Check your API key or permissions."
-msgstr ""
+msgstr "Nenhum modelo encontrado. Verifique sua chave de API ou permissões."
 
 #: includes/class-ai-handler.php:881
 msgid "No API Key provided or found in settings."
-msgstr ""
+msgstr "Nenhuma chave de API fornecida ou encontrada nas configurações."
 
 #: includes/class-ai-handler.php:891
 msgid "Invalid provider."
-msgstr ""
+msgstr "Provedor inválido."
 
 #: includes/class-ai-handler.php:914
 msgid "API Key is valid and active!"
-msgstr ""
+msgstr "A chave de API é válida e está ativa!"
 
 #: includes/class-ai-handler.php:924
 msgid "The AI provider returned an unexpected response format."
-msgstr ""
+msgstr "O provedor de IA retornou um formato de resposta inesperado."
 
 #: includes/class-ai-handler.php:969
 msgid "Context is required."
-msgstr ""
+msgstr "Contexto é obrigatório."
 
 #: includes/class-ai-handler.php:1001
 #: includes/class-ai-handler.php:1161
 #: includes/class-ai-handler.php:1249
 #: includes/class-ai-handler.php:1298
 msgid "No active AI adapter found."
-msgstr ""
+msgstr "Nenhum adaptador de IA ativo encontrado."
 
 #: includes/class-ai-handler.php:1117
 msgid "AI failed to generate prompt."
-msgstr ""
+msgstr "A IA falhou ao gerar o prompt."
 
 #: includes/ai/class-context-handler.php:742
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
-msgstr ""
+msgstr "Prompt é obrigatório."
 
 #: includes/class-ai-handler.php:1183
 msgid "Prompt successfully validated! The AI understood your instructions and returned a valid JSON array."
-msgstr ""
+msgstr "Prompt validado com sucesso! A IA compreendeu suas instruções e retornou um array JSON válido."
 
 #: includes/class-ai-handler.php:1187
 msgid "Validation failed: The AI did not return a valid JSON array."
-msgstr ""
+msgstr "Falha na validação: A IA não retornou um array JSON válido."
 
 #: includes/class-ai-handler.php:1192
 msgid "Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects."
-msgstr ""
+msgstr "Falha na validação: A IA não incluiu chaves obrigatórias (name, lat, lon, quote) em seus objetos JSON."
 
 #: includes/class-ai-handler.php:1197
 msgid "Validation failed: The AI returned an invalid is_primary value (must be boolean)."
-msgstr ""
+msgstr "Falha na validação: A IA retornou um valor is_primary inválido (deve ser booleano)."
 
 #: includes/class-ai-handler.php:1203
 msgid "Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text."
-msgstr ""
+msgstr "Prompt validado com sucesso! A IA retornou um array vazio, o que significa que suas regras de filtragem funcionaram perfeitamente para o texto de teste."
 
 #: includes/class-ai-handler.php:1262
 msgid "An unexpected error occurred while processing the AI request."
-msgstr ""
+msgstr "Ocorreu um erro inesperado ao processar a solicitação da IA."
 
 #: includes/class-ai-handler.php:1331
 msgid "An unexpected error occurred while processing the AI chat request."
-msgstr ""
+msgstr "Ocorreu um erro inesperado ao processar a solicitação de chat da IA."
 
 #: includes/class-ai-handler.php:1460
 msgid "Backup created successfully!"
-msgstr ""
+msgstr "Backup criado com sucesso!"
 
 #: includes/class-ai-handler.php:1481
 msgid "Missing filename"
-msgstr ""
+msgstr "Nome de arquivo ausente"
 
 #: includes/class-ai-handler.php:1492
 msgid "File not found"
-msgstr ""
+msgstr "Arquivo não encontrado"
 
 #: includes/geocode/class-geocode-handler.php:122
 msgid "Service provided by Mapbox (requires API Key)."
-msgstr ""
+msgstr "Serviço fornecido pelo Mapbox (requer chave de API)."
 
 #: includes/settings/class-settings.php:608
 msgid "Discovery"
-msgstr ""
+msgstr "Discovery"
 
 #: includes/maps/class-maps.php:190
 msgid "Per-instance paint and layout overrides for vector layers"
-msgstr ""
+msgstr "Substituições de paint e layout por instância para camadas vetoriais"
 
 #: includes/maps/class-maps.php:194
 msgid "Map paint properties"
-msgstr ""
+msgstr "Propriedades de paint do mapa"
 
 #: includes/maps/class-maps.php:198
 msgid "Map layout properties"
-msgstr ""
+msgstr "Propriedades de layout do mapa"
 
 #: includes/menu/class-menu.php:44
 #: includes/menu/class-menu.php:45
 msgid "Welcome"
-msgstr ""
+msgstr "Bem-vindo"
 
 #: includes/menu/class-menu.php:54
 #: includes/menu/class-menu.php:55
 msgid "Dashboard"
-msgstr ""
+msgstr "Painel"
 
 #: includes/menu/class-menu.php:64
 #: includes/menu/class-menu.php:65
 msgid "AI (new)"
-msgstr ""
+msgstr "IA (novo)"
 
 #: includes/minimap/class-minimap.php:171
 msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
-msgstr ""
+msgstr "Nenhuma camada correspondente encontrada. Adicione camadas manualmente ou execute o indexador RAG nas configurações do JEO."
 
 #: includes/minimap/class-minimap.php:402
 msgid "The AI returned an empty response. Please try again."
-msgstr ""
+msgstr "A IA retornou uma resposta vazia. Tente novamente."
 
 #: includes/minimap/class-minimap.php:1210
 msgid "Dark Base (Mapbox)"
-msgstr ""
+msgstr "Base escura (Mapbox)"
 
 #: includes/minimap/class-minimap.php:1217
 msgid "Terrain Base (Mapbox)"
-msgstr ""
+msgstr "Base de terreno (Mapbox)"
 
 #: includes/minimap/class-minimap.php:1224
 msgid "Satellite Base (Mapbox)"
-msgstr ""
+msgstr "Base de satélite (Mapbox)"
 
 #: includes/minimap/class-minimap.php:1235
 msgid "Dark Base"
-msgstr ""
+msgstr "Base escura"
 
 #: includes/minimap/class-minimap.php:1244
 msgid "Light Base"
-msgstr ""
+msgstr "Base clara"
 
 #: includes/minimap/class-minimap.php:1253
 msgid "Satellite Base"
-msgstr ""
+msgstr "Base de satélite"
 
 #: includes/privacy.php:20
 msgid "JEO collects and stores geolocation metadata for posts when authors explicitly geotag content. This may include latitude, longitude, and reverse-geocoded address components (city, region, country, postcode). This data is attached to the post and is available to anyone with access to the post."
-msgstr ""
+msgstr "O JEO coleta e armazena metadados de geolocalização para posts quando os autores georreferenciam explicitamente o conteúdo. Isso pode incluir latitude, longitude e componentes de endereço geocodificados (cidade, região, país, código postal). Esses dados são anexados ao post e estão disponíveis para qualquer pessoa com acesso ao post."
 
 #: includes/privacy.php:21
 msgid "When the \"Stories Near You\" feature is enabled, visitors may opt in to share their browser geolocation. This location is sent to the site server solely to retrieve nearby posts and is not stored."
-msgstr ""
+msgstr "Quando o recurso \"Histórias próximas a você\" está ativado, os visitantes podem optar por compartilhar sua geolocalização do navegador. Essa localização é enviada ao servidor do site apenas para recuperar posts próximos e não é armazenada."
 
 #: includes/privacy.php:22
 msgid "If AI-powered georeferencing is enabled, post titles and content may be sent to external AI providers (e.g., OpenAI, Google Gemini). AI usage logs (provider name, token counts) are stored locally as private posts and are not shared externally."
-msgstr ""
+msgstr "Se o georreferenciamento por IA estiver ativado, títulos e conteúdo de posts podem ser enviados a provedores de IA externos (ex.: OpenAI, Google Gemini). Logs de uso da IA (nome do provedor, contagens de Tokens) são armazenados localmente como posts privados e não são compartilhados externamente."
 
 #: includes/privacy.php:23
 msgid "Geocoding requests may be sent to third-party services such as Nominatim (OpenStreetMap) or Mapbox, depending on the active geocoder."
-msgstr ""
+msgstr "Solicitações de geocodificação podem ser enviadas a serviços de terceiros como Nominatim (OpenStreetMap) ou Mapbox, dependendo do geocodificador ativo."
 
 #: includes/privacy.php:40
 #: includes/privacy.php:126
 msgid "JEO Geolocation Metadata"
-msgstr ""
+msgstr "Metadados de geolocalização do JEO"
 
 #: includes/privacy.php:106
 msgid "JEO Geolocation"
-msgstr ""
+msgstr "Geolocalização do JEO"
 
 #: includes/settings/ai-logs-page.php:10
 msgid "AI Cost Dashboard & Debug Logs"
-msgstr ""
+msgstr "Painel de custos da IA e logs de Debug"
 
 #: includes/settings/ai-logs-page.php:11
 msgid "Here you can view the most recent AI interactions powered by Neuron AI, along with their detailed token usage (Input/Output)."
-msgstr ""
+msgstr "Aqui você pode visualizar as interações mais recentes da IA com tecnologia Neuron AI, junto com o uso detalhado de Tokens (entrada/saída)."
 
 #: includes/settings/ai-logs-page.php:31
 msgid "All AI logs have been permanently deleted."
-msgstr ""
+msgstr "Todos os logs da IA foram excluídos permanentemente."
 
 #: includes/settings/ai-logs-page.php:75
 #: includes/settings/class-settings.php:542
 msgid "reqs"
-msgstr ""
+msgstr "reqs"
 
 #: includes/settings/ai-logs-page.php:79
 #: includes/settings/ai-logs-page.php:104
 #: includes/settings/ai-logs-page.php:116
 #: includes/settings/class-settings.php:541
 msgid "Tokens"
-msgstr ""
+msgstr "Tokens"
 
 #: includes/settings/ai-logs-page.php:82
 #: includes/settings/class-settings.php:543
 msgid "In (Prompt):"
-msgstr ""
+msgstr "Entrada (Prompt):"
 
 #: includes/settings/ai-logs-page.php:83
 #: includes/settings/class-settings.php:544
 msgid "Out (Compl.):"
-msgstr ""
+msgstr "Saída (Compl.):"
 
 #: includes/settings/ai-logs-page.php:94
 msgid "RAG & Vectorization Estimates"
-msgstr ""
+msgstr "Estimativas de RAG e vetorização"
 
 #: includes/settings/ai-logs-page.php:95
 msgid "These numbers represent the estimated tokens consumed to create and query your RAG Knowledge Base. Since embedding models do not natively report their specific usage, the system estimates the token count via mathematical approximation."
-msgstr ""
+msgstr "Esses números representam os Tokens estimados consumidos para criar e consultar sua Base de Conhecimento RAG. Como os modelos de Embedding não relatam nativamente seu uso específico, o sistema estima a contagem de Tokens por aproximação matemática."
 
 #: includes/settings/ai-logs-page.php:102
 msgid "Document Vectorization"
-msgstr ""
+msgstr "Vetorização de documentos"
 
 #: includes/settings/ai-logs-page.php:107
 msgid "Tokens used inserting posts to Vector Store."
-msgstr ""
+msgstr "Tokens usados inserindo posts no Armazenamento de Vetores."
 
 #: includes/settings/ai-logs-page.php:114
 msgid "Semantic Retrieval"
-msgstr ""
+msgstr "Recuperação semântica"
 
 #: includes/settings/ai-logs-page.php:119
 msgid "Tokens used mapping user queries to vectors."
-msgstr ""
+msgstr "Tokens usados mapeando consultas de usuários para vetores."
 
 #: includes/settings/ai-logs-page.php:147
 msgid "Search logs:"
-msgstr ""
+msgstr "Buscar logs:"
 
 #: includes/settings/ai-logs-page.php:149
 msgid "Search Logs"
-msgstr ""
+msgstr "Buscar logs"
 
 #: includes/settings/ai-logs-page.php:156
 msgid "Are you sure you want to delete ALL logs?"
-msgstr ""
+msgstr "Tem certeza de que deseja excluir TODOS os logs?"
 
 #: includes/settings/ai-logs-page.php:157
 msgid "Clear All Logs"
-msgstr ""
+msgstr "Limpar todos os logs"
 
 #. translators: %s: Number of log items.
 #: includes/settings/ai-logs-page.php:164
 #, php-format
 msgid "%s item"
 msgid_plural "%s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%s item"
+msgstr[1] "%s itens"
 
 #: includes/settings/ai-logs-page.php:189
 msgid "Date/Time"
-msgstr ""
+msgstr "Data/Hora"
 
 #: includes/settings/ai-logs-page.php:190
 msgid "Provider"
-msgstr ""
+msgstr "Provedor"
 
 #: includes/settings/ai-logs-page.php:191
 msgid "Tokens (In / Out)"
-msgstr ""
+msgstr "Tokens (Entrada / Saída)"
 
 #: includes/settings/ai-logs-page.php:192
 msgid "Status / Output Preview"
-msgstr ""
+msgstr "Status / pré-visualização da saída"
 
 #: includes/settings/ai-logs-page.php:193
 #: includes/settings/class-settings.php:498
 msgid "Actions"
-msgstr ""
+msgstr "Ações"
 
 #: includes/settings/ai-logs-page.php:198
 msgid "No logs found yet. Ensure Debug Mode is enabled and georeference a post."
-msgstr ""
+msgstr "Nenhum log encontrado ainda. Certifique-se de que o modo de Debug está ativado e georreferencie um post."
 
 #: includes/settings/ai-logs-page.php:238
 #: includes/settings/class-settings.php:545
 msgid "Total"
-msgstr ""
+msgstr "Total"
 
 #: includes/settings/ai-logs-page.php:239
 #: includes/settings/class-settings.php:546
 msgid "Prompt:"
-msgstr ""
+msgstr "Prompt:"
 
 #: includes/settings/ai-logs-page.php:239
 #: includes/settings/class-settings.php:547
 msgid "Completion:"
-msgstr ""
+msgstr "Conclusão:"
 
 #: includes/settings/ai-logs-page.php:244
 msgid "View Details"
-msgstr ""
+msgstr "Ver detalhes"
 
 #: includes/settings/ai-logs-page.php:249
 msgid "AI Interaction Details"
-msgstr ""
+msgstr "Detalhes da interação da IA"
 
 #: includes/settings/ai-logs-page.php:254
 msgid "Timestamp"
-msgstr ""
+msgstr "Data/hora"
 
 #: includes/settings/ai-logs-page.php:255
 msgid "Input Tokens"
-msgstr ""
+msgstr "Tokens de entrada"
 
 #: includes/settings/ai-logs-page.php:256
 msgid "Output Tokens"
-msgstr ""
+msgstr "Tokens de saída"
 
 #: includes/settings/ai-logs-page.php:259
 msgid "Input (Prompt sent)"
-msgstr ""
+msgstr "Entrada (Prompt enviado)"
 
 #: includes/settings/ai-logs-page.php:262
 msgid "Output (Raw Response)"
-msgstr ""
+msgstr "Saída (resposta bruta)"
 
 #: includes/settings/class-settings.php:469
 msgid "[System] Console cleared."
-msgstr ""
+msgstr "[Sistema] Console limpo."
 
 #: includes/settings/class-settings.php:470
 msgid "Missing Configuration"
-msgstr ""
+msgstr "Configuração ausente"
 
 #: includes/settings/class-settings.php:471
 msgid "Checking..."
-msgstr ""
+msgstr "Verificando..."
 
 #: includes/settings/class-settings.php:474
 msgid "Failed"
-msgstr ""
+msgstr "Falhou"
 
 #: includes/settings/class-settings.php:475
 msgid "Request Failed"
-msgstr ""
+msgstr "Falha na solicitação"
 
 #: includes/settings/class-settings.php:476
 msgid "Loading..."
-msgstr ""
+msgstr "Carregando..."
 
 #: includes/settings/class-settings.php:478
 msgid "Select or type a model..."
-msgstr ""
+msgstr "Selecione ou digite um modelo..."
 
 #: includes/settings/class-settings.php:479
 msgid " (Non-chat)"
-msgstr ""
+msgstr " (Não-chat)"
 
 #: includes/settings/class-settings.php:480
 msgid "Please enter an API Key first."
-msgstr ""
+msgstr "Insira uma chave de API primeiro."
 
 #: includes/settings/class-settings.php:481
 msgid "Failed to fetch models: "
-msgstr ""
+msgstr "Falha ao buscar modelos: "
 
 #: includes/settings/class-settings.php:482
 msgid "Unknown error"
-msgstr ""
+msgstr "Erro desconhecido"
 
 #: includes/settings/class-settings.php:483
 msgid "Error fetching models. Check your key and connection."
-msgstr ""
+msgstr "Erro ao buscar modelos. Verifique sua chave e conexão."
 
 #: includes/settings/class-settings.php:484
 msgid "Please type a description first."
-msgstr ""
+msgstr "Digite uma descrição primeiro."
 
 #: includes/settings/class-settings.php:485
 msgid "Asking AI..."
-msgstr ""
+msgstr "Perguntando à IA..."
 
 #: includes/ai/settings/tab-context.php:199
 #: includes/settings/class-settings.php:486
 msgid "Generating..."
-msgstr ""
+msgstr "Gerando..."
 
 #: includes/settings/class-settings.php:487
 msgid "✨ Applied above."
-msgstr ""
+msgstr "✨ Aplicado acima."
 
 #: includes/settings/class-settings.php:488
 msgid "Error generating prompt."
-msgstr ""
+msgstr "Erro ao gerar prompt."
 
 #: includes/settings/class-settings.php:490
 msgid "Testing..."
-msgstr ""
+msgstr "Testando..."
 
 #: includes/settings/class-settings.php:491
 msgid "✅ Valid"
-msgstr ""
+msgstr "✅ Válido"
 
 #: includes/settings/class-settings.php:492
 msgid "❌ Invalid"
-msgstr ""
+msgstr "❌ Inválido"
 
 #: includes/settings/class-settings.php:493
 msgid "Validate Prompt"
-msgstr ""
+msgstr "Validar prompt"
 
 #: includes/settings/class-settings.php:494
 msgid "Loading backups..."
-msgstr ""
+msgstr "Carregando backups..."
 
 #: includes/settings/class-settings.php:495
 msgid "File"
-msgstr ""
+msgstr "Arquivo"
 
 #: includes/settings/class-settings.php:496
 msgid "Date"
-msgstr ""
+msgstr "Data"
 
 #: includes/settings/class-settings.php:497
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Size"
-msgstr ""
+msgstr "Tamanho"
 
 #: includes/settings/class-settings.php:502
 msgid "Delete?"
-msgstr ""
+msgstr "Excluir?"
 
 #: includes/settings/class-settings.php:503
 msgid "Vectorizing..."
-msgstr ""
+msgstr "Vetorizando..."
 
 #: includes/settings/class-settings.php:504
 msgid "Vectorize Now"
-msgstr ""
+msgstr "Vetorizar agora"
 
 #: includes/settings/class-settings.php:505
 msgid "Clear knowledge base?"
-msgstr ""
+msgstr "Limpar a base de conhecimento?"
 
 #: includes/settings/class-settings.php:506
 msgid "Fetching post and generating vector embeddings..."
-msgstr ""
+msgstr "Obtendo post e gerando Embeddings de vetores..."
 
 #: includes/settings/class-settings.php:507
 msgid "Success!"
-msgstr ""
+msgstr "Sucesso!"
 
 #: includes/settings/class-settings.php:508
 msgid "Post Extracted:"
-msgstr ""
+msgstr "Post extraído:"
 
 #: includes/settings/class-settings.php:509
 msgid "Vector Dimensions:"
-msgstr ""
+msgstr "Dimensões do vetor:"
 
 #: includes/settings/class-settings.php:510
 msgid "Text Snippet:"
-msgstr ""
+msgstr "Trecho de texto:"
 
 #: includes/settings/class-settings.php:511
 msgid "Vector Preview:"
-msgstr ""
+msgstr "Pré-visualização do vetor:"
 
 #: includes/settings/class-settings.php:513
 msgid "Searching..."
-msgstr ""
+msgstr "Buscando..."
 
 #: includes/settings/class-settings.php:514
 msgid "Searching the knowledge base "
-msgstr ""
+msgstr "Buscando na base de conhecimento "
 
 #: includes/settings/class-settings.php:515
 msgid "No documents found. Have you run vectorization?"
-msgstr ""
+msgstr "Nenhum documento encontrado. Você executou a vetorização?"
 
 #: includes/settings/class-settings.php:516
 msgid "Score / Relevance"
-msgstr ""
+msgstr "Pontuação / Relevância"
 
 #: includes/settings/class-settings.php:517
 msgid "Metadata"
-msgstr ""
+msgstr "Metadados"
 
 #: includes/settings/class-settings.php:520
 msgid "Processing..."
-msgstr ""
+msgstr "Processando..."
 
 #: includes/settings/class-settings.php:521
 msgid "Clearing..."
-msgstr ""
+msgstr "Limpando..."
 
 #: includes/settings/class-settings.php:522
 msgid "This will schedule clearing ALL AI-geolocated posts in the background. Continue?"
-msgstr ""
+msgstr "Isso agendará a limpeza de TODOS os posts geolocalizados pela IA em segundo plano. Continuar?"
 
 #: includes/settings/class-settings.php:523
 msgid "ARE YOU SURE? This cannot be undone and will require full re-vectorization for these posts."
-msgstr ""
+msgstr "VOCÊ TEM CERTEZA? Isso não pode ser desfeito e exigirá nova vetorização completa para esses posts."
 
 #: includes/settings/class-settings.php:524
 msgid "Bulk clearing started in background."
-msgstr ""
+msgstr "Limpeza em lote iniciada em segundo plano."
 
 #: includes/settings/class-settings.php:526
 msgid "Collapse"
-msgstr ""
+msgstr "Recolher"
 
 #: includes/settings/class-settings.php:528
 msgid "Low"
-msgstr ""
+msgstr "Baixo"
 
 #: includes/settings/class-settings.php:529
 msgid "Fair"
-msgstr ""
+msgstr "Razoável"
 
 #: includes/settings/class-settings.php:530
 msgid "Optimal"
-msgstr ""
+msgstr "Ótimo"
 
 #: includes/settings/class-settings.php:531
 msgid "API call failed"
-msgstr ""
+msgstr "Falha na chamada da API"
 
 #: includes/settings/class-settings.php:534
 msgid "Delete log file?"
-msgstr ""
+msgstr "Excluir arquivo de log?"
 
 #: includes/settings/class-settings.php:535
 msgid "No matching layers found."
-msgstr ""
+msgstr "Nenhuma camada correspondente encontrada."
 
 #: includes/settings/class-settings.php:536
 msgid " matching layers:"
-msgstr ""
+msgstr " camadas correspondentes:"
 
 #: includes/settings/class-settings.php:539
 msgid "Clear layer store?"
-msgstr ""
+msgstr "Limpar armazenamento de camadas?"
 
 #: includes/settings/class-settings.php:540
 msgid "Please enter a post ID or search text."
-msgstr ""
+msgstr "Digite um ID de post ou texto de busca."
 
 #: includes/settings/class-settings.php:590
 #: includes/settings/class-settings.php:591
 msgid "AI Debug Logs"
-msgstr ""
+msgstr "Logs de Debug da IA"
 
 #: includes/settings/class-settings.php:607
 msgid "Appearance"
-msgstr ""
+msgstr "Aparência"
 
 #: includes/settings/settings-page.php:10
 msgid "Jeo Settings"
-msgstr ""
+msgstr "Configurações do Jeo"
 
 #: includes/settings/settings-page.php:38
 msgid "Enabled Post Types"
-msgstr ""
+msgstr "Tipos de post ativados"
 
 #: includes/settings/settings-page.php:64
 msgid "Default map center (latitude)"
-msgstr ""
+msgstr "Centro padrão do mapa (latitude)"
 
 #: includes/settings/settings-page.php:71
 msgid "Default map center (longitude)"
-msgstr ""
+msgstr "Centro padrão do mapa (longitude)"
 
 #: includes/settings/settings-page.php:78
 msgid "User location precision"
-msgstr ""
+msgstr "Precisão da localização do usuário"
 
 #: includes/settings/settings-page.php:83
 msgid "Lower = less precision, more privacy."
-msgstr ""
+msgstr "Menor = menos precisão, mais privacidade."
 
 #: includes/settings/settings-page.php:84
 msgid "https://en.wikipedia.org/wiki/Decimal_degrees#Precision"
-msgstr ""
+msgstr "https://en.wikipedia.org/wiki/Decimal_degrees#Precision"
 
 #: includes/settings/settings-page.php:84
 msgid "Learn more about decimal degree precision."
-msgstr ""
+msgstr "Saiba mais sobre precisão de graus decimais."
 
 #: includes/settings/settings-page.php:90
-msgid "Show Storymaps on Post Archives"
-msgstr ""
+msgid "Show Story Maps on Post Archives"
+msgstr "Mostrar mapas narrativos nos arquivos de posts"
 
 #: includes/settings/settings-page.php:93
-msgid "Enable this to display relevant storymaps at the top of category and tag archive pages."
-msgstr ""
+msgid "Enable this to display relevant story maps at the top of category and tag archive pages."
+msgstr "Ative para exibir mapas narrativos relevantes no topo das páginas de arquivo de categorias e tags."
 
 #: includes/settings/settings-page.php:125
 msgid "Mapbox API Key"
-msgstr ""
+msgstr "Chave de API do Mapbox"
 
 #: includes/settings/settings-page.php:136
 msgid "Geocoder service"
-msgstr ""
+msgstr "Serviço de geocodificação"
 
 #: includes/settings/settings-page.php:143
 msgid "Select the service used to translate addresses into coordinates. Mapbox requires an API Key configured in the General tab."
-msgstr ""
+msgstr "Selecione o serviço usado para traduzir endereços em coordenadas. O Mapbox requer uma chave de API configurada na aba Geral."
 
 #: includes/settings/settings-page.php:153
 msgid "Font URL"
-msgstr ""
+msgstr "URL da fonte"
 
 #: includes/settings/settings-page.php:159
 msgid "Font Name"
-msgstr ""
+msgstr "Nome da fonte"
 
 #: includes/settings/settings-page.php:165
 msgid "Secondary Font URL"
-msgstr ""
+msgstr "URL da fonte secundária"
 
 #: includes/settings/settings-page.php:171
 msgid "Secondary Font Name"
-msgstr ""
+msgstr "Nome da fonte secundária"
 
 #: includes/settings/settings-page.php:177
 msgid "Info button font size (rem)"
-msgstr ""
+msgstr "Tamanho da fonte do botão de informação (rem)"
 
 #: includes/settings/settings-page.php:190
 msgid "Primary Color"
-msgstr ""
+msgstr "Cor primária"
 
 #: includes/settings/settings-page.php:202
 msgid "Info button text color"
-msgstr ""
+msgstr "Cor do texto do botão de informação"
 
 #: includes/settings/settings-page.php:214
 msgid "Close button text color"
-msgstr ""
+msgstr "Cor do texto do botão de fechar"
 
 #: includes/settings/settings-page.php:220
 msgid "Secondary Color"
-msgstr ""
+msgstr "Cor secundária"
 
 #: includes/settings/settings-page.php:226
 msgid "Map widgets background color"
-msgstr ""
+msgstr "Cor de fundo dos widgets do mapa"
 
 #: includes/settings/settings-page.php:232
 msgid "Map widgets text color"
-msgstr ""
+msgstr "Cor do texto dos widgets do mapa"
 
 #: includes/settings/settings-page.php:238
 msgid "Map widgets background color (hover)"
-msgstr ""
+msgstr "Cor de fundo dos widgets do mapa (ao passar o mouse)"
 
 #: includes/settings/settings-page.php:247
 msgid "Map Marker Icons"
-msgstr ""
+msgstr "Ícones de marcadores do mapa"
 
 #: includes/settings/settings-page.php:251
 msgid "Primary Pin URL"
-msgstr ""
+msgstr "URL do pino primário"
 
 #: includes/settings/settings-page.php:254
 msgid "URL for the primary location marker icon. Leave empty to use the default blue marker."
-msgstr ""
+msgstr "URL do ícone do marcador de localização primário. Deixe vazio para usar o marcador azul padrão."
 
 #: includes/settings/settings-page.php:258
 msgid "Secondary Pin URL"
-msgstr ""
+msgstr "URL do pino secundário"
 
 #: includes/settings/settings-page.php:261
 msgid "URL for the secondary location marker icon. Leave empty to use the default grey marker."
-msgstr ""
+msgstr "URL do ícone do marcador de localização secundário. Deixe vazio para usar o marcador cinza padrão."
 
 #: includes/settings/settings-page.php:287
 msgid "Discovery page"
-msgstr ""
+msgstr "Página do Discovery"
 
 #: includes/settings/settings-page.php:294
 msgid "Select a page"
-msgstr ""
+msgstr "Selecione uma página"
 
 #: includes/settings/settings-page.php:298
 msgid "Select the page where the JEO Discovery block is located."
-msgstr ""
+msgstr "Selecione a página onde o bloco Discovery do JEO está localizado."
 
 #: includes/stories-near-you/class-stories-near-you.php:432
 msgid "Unable to load stories near you."
-msgstr ""
+msgstr "Não foi possível carregar histórias próximas a você."
 
 #: js/build/contextSidebar.js:1
 msgid "Suggested Paragraphs"
-msgstr ""
+msgstr "Parágrafos sugeridos"
 
 #: js/build/contextSidebar.js:1
 msgid "Inserted"
-msgstr ""
+msgstr "Inserido"
 
 #: js/build/contextSidebar.js:1
 msgid "Insert into article"
-msgstr ""
+msgstr "Inserir no artigo"
 
 #: js/build/contextSidebar.js:1
 msgid "Copied!"
-msgstr ""
+msgstr "Copiado!"
 
 #: js/build/contextSidebar.js:1
 msgid "Copy"
-msgstr ""
+msgstr "Copiar"
 
 #: js/build/contextSidebar.js:1
 msgid "Failed to generate suggestions."
-msgstr ""
+msgstr "Falha ao gerar sugestões."
 
 #: js/build/contextSidebar.js:1
 msgid "Error contacting AI."
-msgstr ""
+msgstr "Erro ao contatar a IA."
 
 #: js/build/contextSidebar.js:1
 msgid "Failed to process message."
-msgstr ""
+msgstr "Falha ao processar a mensagem."
 
 #: js/build/contextSidebar.js:1
 msgid "Generate new editorial suggestions based on the current post content."
-msgstr ""
+msgstr "Gerar novas sugestões editoriais com base no conteúdo atual do post."
 
 #: js/build/contextSidebar.js:1
 msgid "Failed to clear conversation."
-msgstr ""
+msgstr "Falha ao limpar a conversa."
 
 #: js/build/contextSidebar.js:1
 msgid "Restoring conversation..."
-msgstr ""
+msgstr "Restaurando conversa..."
 
 #: js/build/contextSidebar.js:1
 msgid "Use the AI Context Assistant to generate editorial suggestions based on your article and the site's knowledge base."
-msgstr ""
+msgstr "Use o Assistente de Contexto da IA para gerar sugestões editoriais com base no seu artigo e na base de conhecimento do site."
 
 #: js/build/contextSidebar.js:1
 msgid "Generate Suggestions"
-msgstr ""
+msgstr "Gerar sugestões"
 
 #: js/build/contextSidebar.js:1
 msgid "Thinking..."
-msgstr ""
+msgstr "Pensando..."
 
 #: js/build/contextSidebar.js:1
 msgid "Ask for changes or new paragraphs... (Ctrl+Enter to send)"
-msgstr ""
+msgstr "Peça alterações ou novos parágrafos... (Ctrl+Enter para enviar)"
 
 #: js/build/contextSidebar.js:1
 msgid "Send"
-msgstr ""
+msgstr "Enviar"
 
 #: js/build/contextSidebar.js:1
 msgid "Retry"
-msgstr ""
+msgstr "Tentar novamente"
 
 #: js/build/contextSidebar.js:1
 msgid "AI Context"
-msgstr ""
+msgstr "Contexto da IA"
 
 #: js/build/contextSidebar.js:1
 msgid "AI Context Assistant"
-msgstr ""
+msgstr "Assistente de Contexto da IA"
 
 #: js/build/mapBlocks.js:1
 msgid "Analyzing content…"
-msgstr ""
+msgstr "Analisando conteúdo…"
 
 #: js/build/mapBlocks.js:1
 msgid "Searching for map layers…"
-msgstr ""
+msgstr "Buscando camadas de mapa…"
 
 #: js/build/mapBlocks.js:1
 msgid "Generating map configuration…"
-msgstr ""
+msgstr "Gerando configuração do mapa…"
 
 #: js/build/mapBlocks.js:1
 msgid "Map generated from post content."
-msgstr ""
+msgstr "Mapa gerado a partir do conteúdo do post."
 
 #: js/build/mapBlocks.js:1
 msgid "Failed to suggest layers."
-msgstr ""
+msgstr "Falha ao sugerir camadas."
 
 #: js/build/mapBlocks.js:1
 msgid "Request failed."
-msgstr ""
+msgstr "Falha na solicitação."
 
 #: js/build/mapBlocks.js:1
 msgid "Failed to update map."
-msgstr ""
+msgstr "Falha ao atualizar o mapa."
 
 #: js/build/mapBlocks.js:1
 msgid "Map generated from prompt."
-msgstr ""
+msgstr "Mapa gerado a partir do prompt."
 
 #: js/build/mapBlocks.js:1
 msgid "Failed to generate from prompt."
-msgstr ""
+msgstr "Falha ao gerar a partir do prompt."
 
 #: js/build/mapBlocks.js:1
 msgid "Map regenerated from post content."
-msgstr ""
+msgstr "Mapa regenerado a partir do conteúdo do post."
 
 #: js/build/mapBlocks.js:1
 msgid "AI-Assisted Map"
-msgstr ""
+msgstr "Mapa assistido por IA"
 
 #: js/build/mapBlocks.js:1
 msgid "AI will analyze your content and suggest relevant map layers, center point, and zoom level."
-msgstr ""
+msgstr "A IA analisará seu conteúdo e sugerirá camadas de mapa relevantes, ponto central e nível de zoom."
 
 #: js/build/mapBlocks.js:1
 msgid "Generate from post content"
-msgstr ""
+msgstr "Gerar a partir do conteúdo do post"
 
 #: js/build/mapBlocks.js:1
 msgid "Generate from prompt"
-msgstr ""
+msgstr "Gerar a partir do prompt"
 
 #: js/build/mapBlocks.js:1
 msgid "Map prompt"
-msgstr ""
+msgstr "Prompt do mapa"
 
 #: js/build/mapBlocks.js:1
 msgid "Generate map"
-msgstr ""
+msgstr "Gerar mapa"
 
 #: js/build/mapBlocks.js:1
 msgid "Base Layer"
-msgstr ""
+msgstr "Camada base"
 
 #: js/build/mapBlocks.js:1
 msgid "Base terrain"
-msgstr ""
+msgstr "Terreno base"
 
 #: js/build/mapBlocks.js:1
 msgid "Geolocation Pins"
-msgstr ""
+msgstr "Pinos de geolocalização"
 
 #: js/build/mapBlocks.js:1
 msgid "Show pins"
-msgstr ""
+msgstr "Mostrar pinos"
 
 #: js/build/mapBlocks.js:1
 msgid "Yes"
-msgstr ""
+msgstr "Sim"
 
 #: js/build/mapBlocks.js:1
 msgid "AI Assistant"
-msgstr ""
+msgstr "Assistente de IA"
 
 #: js/build/mapBlocks.js:1
 msgid "Assistant"
-msgstr ""
+msgstr "Assistente"
 
 #: js/build/mapBlocks.js:1
 msgid "You"
-msgstr ""
+msgstr "Você"
 
 #: js/build/mapBlocks.js:1
 msgid "Typing…"
-msgstr ""
+msgstr "Digitando…"
 
 #: js/build/mapBlocks.js:1
 msgid "Ask the AI to refine the map…"
-msgstr ""
+msgstr "Peça à IA para refinar o mapa…"
 
 #: js/build/mapBlocks.js:1
 msgid "Send message"
-msgstr ""
+msgstr "Enviar mensagem"
 
 #: js/build/mapBlocks.js:1
 msgid "Regenerate"
-msgstr ""
+msgstr "Regenerar"
 
 #: js/build/mapBlocks.js:1
 msgid "New prompt"
-msgstr ""
+msgstr "Novo prompt"
 
 #: js/build/mapBlocks.js:1
 msgid "Describe the map you want…"
-msgstr ""
+msgstr "Descreva o mapa que você quer…"
 
 #: js/build/mapBlocks.js:1
 msgid "Generate"
-msgstr ""
+msgstr "Gerar"
 
 #: js/build/mapBlocks.js:1
 msgid "Display an AI-generated contextual map with layers and geolocation pins"
-msgstr ""
+msgstr "Exibe um mapa contextual gerado por IA com camadas e pinos de geolocalização"
 
 #: js/build/mapBlocks.js:3
 msgid "Stories Near You"
-msgstr ""
+msgstr "Histórias próximas a você"
 
 #: js/build/mapBlocks.js:3
 msgid "Display geolocated posts sorted by proximity to the reader"
-msgstr ""
+msgstr "Exibe posts geolocalizados ordenados por proximidade com o leitor"
 
 #: js/build/mapBlocks.js:3
 msgid "— None —"
-msgstr ""
+msgstr "— Nenhum —"
 
 #: js/build/mapBlocks.js:3
 msgid "All geo-enabled types"
-msgstr ""
+msgstr "Todos os tipos com geolocalização"
 
 #: js/build/mapBlocks.js:3
 msgid "Location Preview"
-msgstr ""
+msgstr "Pré-visualização da localização"
 
 #: js/build/mapBlocks.js:3
 msgid "Post Card"
-msgstr ""
+msgstr "Cartão de post"
 
 #: js/build/mapBlocks.js:3
 msgid "Layout"
-msgstr ""
+msgstr "Layout"
 
 #: js/build/mapBlocks.js:3
 msgid "Grid"
-msgstr ""
+msgstr "Grade"
 
 #: js/build/mapBlocks.js:3
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 #: js/build/mapBlocks.js:3
 msgid "Columns"
-msgstr ""
+msgstr "Colunas"
 
 #: js/build/mapBlocks.js:3
 msgid "Media position"
-msgstr ""
+msgstr "Posição da mídia"
 
 #: js/build/mapBlocks.js:3
 msgid "Top"
-msgstr ""
+msgstr "Topo"
 
 #: js/build/mapBlocks.js:3
 msgid "Left"
-msgstr ""
+msgstr "Esquerda"
 
 #: js/build/mapBlocks.js:3
 msgid "Right"
-msgstr ""
+msgstr "Direita"
 
 #: js/build/mapBlocks.js:3
 msgid "Behind"
-msgstr ""
+msgstr "Atrás"
 
 #: js/build/mapBlocks.js:3
 msgid "Image shape"
-msgstr ""
+msgstr "Formato da imagem"
 
 #: js/build/mapBlocks.js:3
 msgid "Landscape"
-msgstr ""
+msgstr "Paisagem"
 
 #: js/build/mapBlocks.js:3
 msgid "Portrait"
-msgstr ""
+msgstr "Retrato"
 
 #: js/build/mapBlocks.js:3
 msgid "Square"
-msgstr ""
+msgstr "Quadrado"
 
 #: js/build/mapBlocks.js:3
 msgid "Uncropped"
-msgstr ""
+msgstr "Sem recorte"
 
 #: js/build/mapBlocks.js:3
 msgid "Image size"
-msgstr ""
+msgstr "Tamanho da imagem"
 
 #: js/build/mapBlocks.js:3
 msgid "Link featured image"
-msgstr ""
+msgstr "Vincular imagem destacada"
 
 #: js/build/mapBlocks.js:3
 msgid "Query Settings"
-msgstr ""
+msgstr "Configurações de consulta"
 
 #: js/build/mapBlocks.js:3
 msgid "Posts per page"
-msgstr ""
+msgstr "Posts por página"
 
 #: js/build/mapBlocks.js:3
 msgid "Post type"
-msgstr ""
+msgstr "Tipo de post"
 
 #: js/build/mapBlocks.js:3
 msgid "Filters"
-msgstr ""
+msgstr "Filtros"
 
 #: js/build/mapBlocks.js:3
 msgid "Exclude categories"
-msgstr ""
+msgstr "Excluir categorias"
 
 #: js/build/mapBlocks.js:3
 msgid "Exclude tags"
-msgstr ""
+msgstr "Excluir tags"
 
 #: js/build/mapBlocks.js:3
 msgid "Display"
-msgstr ""
+msgstr "Exibição"
 
 #: js/build/mapBlocks.js:3
 msgid "Show featured image"
-msgstr ""
+msgstr "Mostrar imagem destacada"
 
 #: js/build/mapBlocks.js:3
 msgid "Show category"
-msgstr ""
+msgstr "Mostrar categoria"
 
 #: js/build/mapBlocks.js:3
 msgid "Show date"
-msgstr ""
+msgstr "Mostrar data"
 
 #: js/build/mapBlocks.js:3
 msgid "Show excerpt"
-msgstr ""
+msgstr "Mostrar resumo"
 
 #: js/build/mapBlocks.js:3
 msgid "Excerpt length"
-msgstr ""
+msgstr "Comprimento do resumo"
 
 #: js/build/mapBlocks.js:3
 msgid "Show author"
-msgstr ""
+msgstr "Mostrar autor"
 
 #: js/build/mapBlocks.js:3
 msgid "Show avatar"
-msgstr ""
+msgstr "Mostrar avatar"
 
 #: js/build/mapBlocks.js:3
 msgid "Show read more link"
-msgstr ""
+msgstr "Mostrar link 'ler mais'"
 
 #: js/build/mapBlocks.js:3
 msgid "Read more label"
-msgstr ""
+msgstr "Texto do link 'ler mais'"
 
 #: js/build/mapBlocks.js:3
 msgid "Typography & Spacing"
-msgstr ""
+msgstr "Tipografia e espaçamento"
 
 #: js/build/mapBlocks.js:3
 msgid "Type scale"
-msgstr ""
+msgstr "Escala de tipografia"
 
 #: js/build/mapBlocks.js:3
 msgid "Image scale"
-msgstr ""
+msgstr "Escala de imagem"
 
 #: js/build/mapBlocks.js:3
 msgid "Column gap"
-msgstr ""
+msgstr "Espaço entre colunas"
 
 #: js/build/mapBlocks.js:3
 msgid "Min height (vh)"
-msgstr ""
+msgstr "Altura mínima (vh)"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Fill Color"
-msgstr ""
+msgstr "Cor de preenchimento"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Outline Color"
-msgstr ""
+msgstr "Cor do contorno"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Line Color"
-msgstr ""
+msgstr "Cor da linha"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Circle Color"
-msgstr ""
+msgstr "Cor do círculo"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Stroke Color"
-msgstr ""
+msgstr "Cor do traçado"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Fill Opacity"
-msgstr ""
+msgstr "Opacidade do preenchimento"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Line Opacity"
-msgstr ""
+msgstr "Opacidade da linha"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Circle Opacity"
-msgstr ""
+msgstr "Opacidade do círculo"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Line Width"
-msgstr ""
+msgstr "Largura da linha"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Circle Radius"
-msgstr ""
+msgstr "Raio do círculo"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Stroke Width"
-msgstr ""
+msgstr "Largura do traçado"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Layer Style"
-msgstr ""
+msgstr "Estilo da camada"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Styling is only supported for fill, line, and circle layer types."
-msgstr ""
+msgstr "A estilização é suportada apenas para tipos de camada de preenchimento, linha e círculo."
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "AI Default Style"
-msgstr ""
+msgstr "Estilo padrão da IA"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Use AI-suggested default style"
-msgstr ""
+msgstr "Usar estilo padrão sugerido pela IA"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Filter:"
-msgstr ""
+msgstr "Filtro:"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Paint:"
-msgstr ""
+msgstr "Paint:"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Opacity"
-msgstr ""
+msgstr "Opacidade"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Style layer"
-msgstr ""
+msgstr "Camada de estilo"
 
 #: js/build/postsSidebar.js:1
 msgid "Expand panel"
-msgstr ""
+msgstr "Expandir painel"
 
 #: js/build/postsSidebar.js:1
 msgid "Minimize panel"
-msgstr ""
+msgstr "Minimizar painel"
 
 #: js/build/postsSidebar.js:1
 msgid "Review AI Suggestions"
-msgstr ""
+msgstr "Revisar sugestões da IA"
 
 #: js/build/postsSidebar.js:1
 msgid "Select locations to add to the map:"
-msgstr ""
+msgstr "Selecione as localizações para adicionar ao mapa:"
 
 #: js/build/postsSidebar.js:1
 msgid "Enriched via Geocoder"
-msgstr ""
+msgstr "Enriquecido via geocodificador"
 
 #: js/build/postsSidebar.js:1
 msgid "AI flagged this as primary location"
-msgstr ""
+msgstr "A IA marcou esta como localização principal"
 
 #: js/build/postsSidebar.js:1
 msgid "Enrich"
-msgstr ""
+msgstr "Enriquecer"
 
 #: js/build/postsSidebar.js:1
 msgid "Context:"
-msgstr ""
+msgstr "Contexto:"
 
 #: js/build/postsSidebar.js:1
 msgid "Verified:"
-msgstr ""
+msgstr "Verificado:"
 
 #: js/build/postsSidebar.js:1
 msgid "Score too low for reliable mapping."
-msgstr ""
+msgstr "Pontuação baixa demais para mapeamento confiável."
 
 #: js/build/postsSidebar.js:1
 msgid "Discard All"
-msgstr ""
+msgstr "Descartar tudo"
 
 #: js/build/postsSidebar.js:1
 msgid "Retrying..."
-msgstr ""
+msgstr "Tentando novamente..."
 
 #: js/build/postsSidebar.js:1
 msgid "Retry AI"
-msgstr ""
+msgstr "Tentar novamente a IA"
 
 #: js/build/postsSidebar.js:1
 msgid "Add to Map"
-msgstr ""
+msgstr "Adicionar ao mapa"
 
 #: js/build/postsSidebar.js:1
 msgid "Invalid response from AI."
-msgstr ""
+msgstr "Resposta inválida da IA."
 
 #: js/build/postsSidebar.js:1
 msgid "No locations found by the AI."
-msgstr ""
+msgstr "Nenhuma localização encontrada pela IA."
 
 #: js/build/postsSidebar.js:1
 msgid "Error processing AI georeference."
-msgstr ""
+msgstr "Erro ao processar georreferenciamento da IA."
 
 #: js/build/postsSidebar.js:1
 msgctxt "Artifical Intelligence"
 msgid "AI"
-msgstr ""
+msgstr "IA"
 
 #: js/build/postsSidebar.js:1
 msgid "Review Suggestions"
-msgstr ""
+msgstr "Revisar sugestões"
 
 #: js/build/postsSidebar.js:1
 msgid "Processing AI..."
-msgstr ""
+msgstr "Processando IA..."
 
 #: js/build/postsSidebar.js:1
 msgid "Geolocate with AI"
-msgstr ""
+msgstr "Geolocalizar com IA"
 
 #. translators: %d: number of posts processed.
 #: includes/ai/class-bulk-processor.php:407
 #, php-format
 msgid "Processed batch of %d post."
 msgid_plural "Processed batch of %d posts."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lote de %d post processado."
+msgstr[1] "Lote de %d posts processado."
 
 #. translators: %d: number of posts cleared.
 #: includes/ai/class-bulk-processor.php:452
 #, php-format
 msgid "Cleared batch of %d post."
 msgid_plural "Cleared batch of %d posts."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Lote de %d post limpo."
+msgstr[1] "Lote de %d posts limpo."
 
 #: includes/ai/class-bulk-processor.php:793
 msgctxt "post geolocation status"
 msgid "Geolocated"
-msgstr ""
+msgstr "Geolocalizado"
 
 #: includes/ai/class-bulk-processor.php:795
 msgctxt "post geolocation status"
 msgid "Pending Approval"
-msgstr ""
+msgstr "Aguardando aprovação"
 
 #: includes/ai/class-bulk-processor.php:801
 msgctxt "post geolocation status"
 msgid "Not Processed"
-msgstr ""
+msgstr "Não processado"
 
 #: includes/settings/class-settings.php:472
 msgctxt "geocoder status"
 msgid "Active"
-msgstr ""
+msgstr "Ativo"
 
 #: includes/settings/class-settings.php:473
 msgctxt "geocoder status"
 msgid "Invalid"
-msgstr ""
+msgstr "Inválido"
 
 #: includes/settings/class-settings.php:518
 msgctxt "fallback post title"
 msgid "Untitled"
-msgstr ""
+msgstr "Sem título"
 
 #: js/build/discovery.js:2
 #, js-format
 msgid "Displayed story: %d"
 msgid_plural "Displayed stories: %d"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Story exibida: %d"
+msgstr[1] "Stories exibidas: %d"
 
 #: js/build/mapBlocks.js:1
 msgctxt "base terrain"
 msgid "Dark"
-msgstr ""
+msgstr "Escuro"
 
 #: js/build/mapBlocks.js:1
 msgctxt "base terrain"
 msgid "Light"
-msgstr ""
+msgstr "Claro"
 
 #: js/build/mapBlocks.js:1
 msgctxt "base terrain"
 msgid "Satellite"
-msgstr ""
+msgstr "Satélite"
 
 #: js/build/mapBlocks.js:1
 msgctxt "base terrain"
 msgid "None"
-msgstr ""
+msgstr "Nenhum"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgctxt "layer usage default label"
 msgid "Default"
-msgstr ""
+msgstr "Padrão"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgctxt "layer"
 msgid "Fixed"
-msgstr ""
+msgstr "Fixo"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgctxt "layer"
 msgid "Swappable"
-msgstr ""
+msgstr "Substituível"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgctxt "layer"
 msgid "Switchable"
-msgstr ""
+msgstr "Alternável"
 
 #: js/build/postsSidebar.js:1
 #, js-format
 msgid "Point (%d)"
 msgid_plural "Points (%d)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Ponto (%d)"
+msgstr[1] "Pontos (%d)"
 
 #: js/build/postsSidebar.js:1
 #, js-format
 msgid "AI Suggestion (%d selected)"
 msgid_plural "AI Suggestions (%d selected)"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Sugestão da IA (%d selecionada)"
+msgstr[1] "Sugestões da IA (%d selecionadas)"
 
 #: js/build/postsSidebar.js:1
 #, js-format
 msgid "AI found %d location during bulk processing."
 msgid_plural "AI found %d locations during bulk processing."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A IA encontrou %d localização durante o processamento em lote."
+msgstr[1] "A IA encontrou %d localizações durante o processamento em lote."
 
 #: includes/geocode/class-geocode-handler.php:113
 msgid "Geocoding service provided by OpenStreetMap at https://nominatim.openstreetmap.org/."
-msgstr ""
+msgstr "Serviço de geocodificação fornecido pelo OpenStreetMap em https://nominatim.openstreetmap.org/."
 
 #: includes/geocode/class-geocode-handler.php:239
 msgid "Metadata storing the locations related to the post. Each location is an object with latitude, longitude, and geocode attributes."
-msgstr ""
+msgstr "Metadados que armazenam as localizações relacionadas ao post. Cada localização é um objeto com latitude, longitude e atributos de geocódigo."
 
 #: includes/menu/class-menu.php:31
 #: includes/menu/class-menu.php:32
 msgid "JEO"
-msgstr ""
+msgstr "JEO"
 
 #: includes/settings/class-settings.php:434
 msgid "JEO could not save this asset URL. Use a valid http(s) or root-relative URL."
-msgstr ""
+msgstr "O JEO não pôde salvar esta URL de asset. Use uma URL http(s) ou relativa à raiz válida."
 
 #. translators: %s is the geocoder name. Example: Nominatim options.
 #: includes/settings/settings-page.php:111
 #, php-format
 msgctxt "geocoder_options"
 msgid "%s options"
-msgstr ""
+msgstr "Opções de %s"
 
 #: includes/settings/settings-page.php:268
 msgid "Embed"
-msgstr ""
+msgstr "Embed"
 
 #: includes/settings/settings-page.php:272
 msgid "Company logo"
-msgstr ""
+msgstr "Logo da empresa"
 
 #: includes/settings/settings-page.php:276
 msgid "You may use a local or external image URL. Large logos will be scaled down automatically in the embed footer."
-msgstr ""
+msgstr "Você pode usar uma URL de imagem local ou externa. Logos grandes serão reduzidos automaticamente no rodapé do embed."
 
 #: includes/settings/settings-page.php:278
 msgid "Insert Image"
-msgstr ""
+msgstr "Inserir imagem"
 
 #: includes/settings/settings-page.js:920
 #: includes/settings/settings-page.js:922
 msgid "Choose Image"
-msgstr ""
+msgstr "Escolher imagem"
 
 #: js/build/discovery.js:5
 msgid "Changes applied"
-msgstr ""
+msgstr "Alterações aplicadas"
 
 #: js/build/discovery.js:5
 msgid "Not applied"
-msgstr ""
+msgstr "Não aplicado"
 
 #: js/build/jeoMap.js:1
 msgid "This map doesn't have layers"
-msgstr ""
+msgstr "Este mapa não tem camadas"
 
 #: js/build/jeoMap.js:1
 msgid "Close popup"
-msgstr ""
+msgstr "Fechar popup"
 
 #: js/build/jeoMap.js:1
 msgid "Show previous post"
-msgstr ""
+msgstr "Mostrar post anterior"
 
 #: js/build/jeoMap.js:1
 msgid "Show next post"
-msgstr ""
+msgstr "Mostrar próximo post"
 
 #. translators: %d: number of markers in the current map area.
 #: js/build/jeoMap.js:2
 #, js-format
 msgid "%d marker in this area"
 msgid_plural "%d markers in this area"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d marcador nesta área"
+msgstr[1] "%d marcadores nesta área"
 
 #: js/build/mapBlocks.js:3
 msgid "Layer Editor Preview"
-msgstr ""
+msgstr "Pré-visualização do editor de camadas"
 
 #: js/build/mapBlocks.js:3
 msgid "Interactive layer preview for the Map Layer post type editor."
-msgstr ""
+msgstr "Pré-visualização interativa de camadas para o editor do tipo de post Map Layer."
 
 #: js/build/mapBlocks.js:3
 msgid "Map Editor Preview"
-msgstr ""
+msgstr "Pré-visualização do editor de mapas"
 
 #: js/build/mapBlocks.js:3
 msgid "Interactive map preview for the Map post type editor."
-msgstr ""
+msgstr "Pré-visualização interativa de mapa para o editor do tipo de post Map."
 
 #: js/build/postsSidebar.js:1
 msgid "Unable to retrieve the address for the selected point."
-msgstr ""
+msgstr "Não foi possível obter o endereço para o ponto selecionado."
 
 #: includes/class-jeo.php:1660
 msgid "This JEO embed is not available."
@@ -4560,221 +4559,225 @@ msgstr ""
 
 #: includes/ai/class-context-agent.php:260
 msgid "No AI provider is configured. Set one in JEO AI Settings."
-msgstr ""
+msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA do JEO."
 
 #: includes/ai/class-context-agent.php:298
 msgid "The AI returned an empty prompt engineering response."
-msgstr ""
+msgstr "A IA retornou uma resposta vazia de engenharia de prompt."
 
 #: includes/ai/class-context-handler.php:283
 #: js/build/contextSidebar.js:1
 msgid "Initial suggestions"
-msgstr ""
+msgstr "Sugestões iniciais"
 
 #: includes/ai/settings/tab-context.php:37
 msgid "Custom System Prompt"
-msgstr ""
+msgstr "Prompt do sistema personalizado"
 
 #: includes/ai/settings/tab-context.php:49
 msgid "Custom system prompt used by the AI Context Assistant. Use the assistant below to generate or refine it. This value is stored as structured output JSON internally, but shown here as plain text for editing."
-msgstr ""
+msgstr "Prompt do sistema personalizado usado pelo Assistente de Contexto da IA. Use o assistente abaixo para gerá-lo ou refiná-lo. Este valor é armazenado internamente como JSON de saída estruturada, mas exibido aqui como texto simples para edição."
 
 #: includes/ai/settings/tab-context.php:74
 msgid "AI Context Prompt Engineer Assistant"
-msgstr ""
+msgstr "Assistente de Engenharia de Prompt do Contexto da IA"
 
 #: includes/ai/settings/tab-context.php:76
 msgid "Describe how you want the Context Assistant to behave (e.g., \"Always link place names to the original article\" or \"Ground every claim with a verbatim quote\"). The active LLM will generate a highly optimized system prompt for you, strictly adhering to JEO formatting rules."
-msgstr ""
+msgstr "Descreva como você quer que o Assistente de Contexto se comporte (ex.: \"Sempre vincular nomes de lugares ao artigo original\" ou \"Embasar cada afirmação com uma citação literal\"). O LLM ativo gerará um prompt do sistema altamente otimizado para você, seguindo estritamente as regras de formatação do JEO."
 
 #: includes/ai/settings/tab-context.php:113
 msgid "Ex: I want the assistant to always include inline contextual links and cite the exact sentence from the article that supports each location."
-msgstr ""
+msgstr "Ex.: Quero que o assistente sempre inclua links contextuais inline e cite a frase exata do artigo que sustenta cada localização."
 
 #: includes/ai/settings/tab-context.php:115
 msgid "Your description is saved automatically in this browser."
-msgstr ""
+msgstr "Sua descrição é salva automaticamente neste navegador."
 
 #: includes/ai/settings/tab-context.php:121
 msgid "Generate Custom Prompt"
-msgstr ""
+msgstr "Gerar prompt personalizado"
 
 #: includes/ai/settings/tab-context.php:124
 msgid "Suggest initial prompt"
-msgstr ""
+msgstr "Sugerir prompt inicial"
 
 #: includes/ai/settings/tab-context.php:182
 msgid "Initial prompt loaded. Edit and save the settings."
-msgstr ""
+msgstr "Prompt inicial carregado. Edite e salve as configurações."
 
 #: includes/ai/settings/tab-context.php:192
 msgid "Please describe how you want the assistant to behave first."
-msgstr ""
+msgstr "Descreva como você quer que o assistente se comporte primeiro."
 
 #: includes/ai/settings/tab-context.php:217
 msgid "Custom prompt generated. Remember to save the settings."
-msgstr ""
+msgstr "Prompt personalizado gerado. Lembre-se de salvar as configurações."
 
 #: includes/ai/settings/tab-context.php:220
 #: includes/ai/settings/tab-context.php:224
 msgid "Generation failed."
-msgstr ""
+msgstr "Falha na geração."
 
 #: includes/layers/class-layers.php:101
 msgid "Layer Themes"
-msgstr ""
+msgstr "Temas de camadas"
 
 #: includes/layers/class-layers.php:102
 msgid "Layer Theme"
-msgstr ""
+msgstr "Tema de camada"
 
 #: includes/layers/class-layers.php:103
 msgid "Add New Layer Theme"
-msgstr ""
+msgstr "Adicionar novo tema de camada"
 
 #: includes/layers/class-layers.php:104
 msgid "Edit Layer Theme"
-msgstr ""
+msgstr "Editar tema de camada"
 
 #: includes/layers/class-layers.php:249
 msgid "Deforestation"
-msgstr ""
+msgstr "Desmatamento"
 
 #: includes/layers/class-layers.php:250
 msgid "Hydrography"
-msgstr ""
+msgstr "Hidrografia"
 
 #: includes/layers/class-layers.php:251
 msgid "Indigenous Lands"
-msgstr ""
+msgstr "Terras indígenas"
 
 #: includes/layers/class-layers.php:252
 msgid "Protected Areas"
-msgstr ""
+msgstr "Áreas protegidas"
 
 #: includes/layers/class-layers.php:253
 msgid "Mining"
-msgstr ""
+msgstr "Mineração"
 
 #: includes/layers/class-layers.php:254
 msgid "Oil and Gas"
-msgstr ""
+msgstr "Petróleo e gás"
 
 #: includes/layers/class-layers.php:255
 msgid "Land Use"
-msgstr ""
+msgstr "Uso da terra"
 
 #: includes/layers/class-layers.php:256
 msgid "Agriculture"
-msgstr ""
+msgstr "Agricultura"
 
 #: includes/layers/class-layers.php:257
 msgid "Infrastructure"
-msgstr ""
+msgstr "Infraestrutura"
 
 #: includes/layers/class-layers.php:258
 msgid "Administrative Boundaries"
-msgstr ""
+msgstr "Limites administrativos"
 
 #: includes/layers/class-layers.php:259
 msgid "Socioeconomic"
-msgstr ""
+msgstr "Socioeconômico"
 
 #: includes/layers/class-layers.php:260
 msgid "Biodiversity"
-msgstr ""
+msgstr "Biodiversidade"
 
 #: includes/layers/class-layers.php:261
 msgid "Fire"
-msgstr ""
+msgstr "Queimadas"
 
 #: includes/layers/class-layers.php:262
 msgid "Climate"
-msgstr ""
+msgstr "Clima"
 
 #: includes/minimap/class-minimap.php:195
 msgid "Generate a map for this post based on its content."
-msgstr ""
+msgstr "Gerar um mapa para este post com base no seu conteúdo."
 
 #. translators: %d: number of removed layers
 #: includes/minimap/class-minimap.php:426
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
-msgstr ""
+msgstr "%d camada(s) retornada(s) pela IA foi(ram) descartada(s) porque não são camadas de mapa publicadas."
 
 #: includes/minimap/class-minimap.php:855
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
-msgstr ""
+msgstr "O agente tentou remover várias camadas existentes sem uma solicitação explícita. Elas foram mantidas para preservar o mapa atual."
 
 #. translators: %s: search radius in kilometers
 #: includes/stories-near-you/class-stories-near-you.php:1073
 #, php-format
 msgid "No stories found within %s km of your location."
-msgstr ""
+msgstr "Nenhuma história encontrada num raio de %s km da sua localização."
 
 #: js/build/contextSidebar.js:1
 msgid "References used"
-msgstr ""
+msgstr "Referências usadas"
 
 #: js/build/contextSidebar.js:1
 msgid "Previous suggestions"
-msgstr ""
+msgstr "Sugestões anteriores"
 
 #: js/build/contextSidebar.js:1
 msgid "View this version"
-msgstr ""
+msgstr "Ver esta versão"
 
 #: js/build/mapBlocks.js:1
 msgid "Vector style preview"
-msgstr ""
+msgstr "Pré-visualização do estilo vetorial"
 
 #: js/build/mapBlocks.js:3
 msgid "Search radius (km)"
-msgstr ""
+msgstr "Raio de busca (km)"
 
 #: js/build/mapBlocks.js:3
 msgid "Order by"
-msgstr ""
+msgstr "Ordenar por"
 
 #: js/build/mapBlocks.js:3
 msgid "Most recent nearby"
-msgstr ""
+msgstr "Mais recentes próximos"
 
 #: js/build/mapBlocks.js:3
 msgid "Nearest first"
-msgstr ""
+msgstr "Mais próximos primeiro"
 
 #: js/build/mapBlocks.js:3
 msgid "Relevance (distance + date)"
-msgstr ""
+msgstr "Relevância (distância + data)"
 
 #: js/build/mapBlocks.js:3
 msgid "Max age (days, 0 = no limit)"
-msgstr ""
+msgstr "Idade máxima (dias, 0 = sem limite)"
 
 #: js/build/mapBlocks.js:3
 msgid "Distance weight"
-msgstr ""
+msgstr "Peso da distância"
 
 #: js/build/mapBlocks.js:3
 msgid "Date weight"
-msgstr ""
+msgstr "Peso da data"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Automatic style applied (this layer had no saved style). Edit layer settings to customize it."
-msgstr ""
+msgstr "Estilo automático aplicado (esta camada não tinha estilo salvo). Edite as configurações da camada para personalizá-lo."
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Themes:"
-msgstr ""
+msgstr "Temas:"
 
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Source:"
-msgstr ""
+msgstr "Fonte:"
 
 #: js/build/postsSidebar.js:1
 msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
-msgstr ""
+msgstr "Digite um endereço, depois clique em Buscar ou pressione Enter. Você também pode arrastar o marcador pelo mapa."
+
+#: jeo.php:36
+msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
+msgstr "Erro no plugin JEO: Sua versão do PHP é muito antiga. Os recursos de IA do JEO exigem PHP 8.2 ou superior. O plugin permanecerá desativado."

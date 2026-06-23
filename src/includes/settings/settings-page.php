@@ -87,10 +87,10 @@
 						</tr>
 
 						<tr>
-							<th scope="row"><label for="show_storymaps_on_post_archives"><?php esc_html_e( 'Show Storymaps on Post Archives', 'jeowp' ); ?></label></th>
+							<th scope="row"><label for="show_storymaps_on_post_archives"><?php esc_html_e( 'Show Story Maps on Post Archives', 'jeowp' ); ?></label></th>
 							<td>
 								<input name="<?php echo esc_html( $this->get_field_name( 'show_storymaps_on_post_archives' ) ); ?>" type="checkbox" id="show_storymaps_on_post_archives" value="1" <?php checked( $this->get_option( 'show_storymaps_on_post_archives' ), 1 ); ?>>
-								<span class="description"><?php esc_html_e( 'Enable this to display relevant storymaps at the top of category and tag archive pages.', 'jeowp' ); ?></span>
+								<span class="description"><?php esc_html_e( 'Enable this to display relevant story maps at the top of category and tag archive pages.', 'jeowp' ); ?></span>
 							</td>
 						</tr>
 

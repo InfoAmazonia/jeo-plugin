@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-23T14:54:12+00:00\n"
+"POT-Creation-Date: 2026-06-23T18:39:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -170,7 +170,7 @@ msgid "Scheduled cron jobs created by the plugin."
 msgstr ""
 
 #: includes/admin/uninstall-page.php:65
-msgid "Your regular posts, pages, maps, layers, and storymaps will remain, but any geolocation data associated with them will be lost."
+msgid "Your regular posts, pages, maps, layers, and story maps will remain, but any geolocation data associated with them will be lost."
 msgstr ""
 
 #: includes/admin/uninstall-page.php:72
@@ -2611,11 +2611,11 @@ msgid "Learn more about decimal degree precision."
 msgstr ""
 
 #: includes/settings/settings-page.php:90
-msgid "Show Storymaps on Post Archives"
+msgid "Show Story Maps on Post Archives"
 msgstr ""
 
 #: includes/settings/settings-page.php:93
-msgid "Enable this to display relevant storymaps at the top of category and tag archive pages."
+msgid "Enable this to display relevant story maps at the top of category and tag archive pages."
 msgstr ""
 
 #. translators: %s is the geocoder name. Example: Nominatim options.
@@ -2839,6 +2839,10 @@ msgstr ""
 
 #: includes/storymap/class-storymap.php:91
 msgid "JEO Story Map"
+msgstr ""
+
+#: jeo.php:36
+msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
 msgstr ""
 
 #: templates/discovery.php:19
