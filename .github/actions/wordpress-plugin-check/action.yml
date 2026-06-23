@@ -32,6 +32,9 @@ inputs:
   db-host:
     description: WordPress database host.
     default: 127.0.0.1:3306
+  fail-on-warnings:
+    description: Whether to fail the check when warnings are found (not just errors).
+    default: 'false'
 
 runs:
   using: composite
@@ -82,6 +85,7 @@ runs:
     - name: Run WordPress Plugin Check
       shell: bash
       env:
+        FAIL_ON_WARNINGS: ${{ inputs.fail-on-warnings }}
         PLUGIN_CHECK_RESULTS: ${{ inputs.results-path }}
         PLUGIN_SLUG: ${{ inputs.plugin-slug }}
         WP_PATH: ${{ inputs.wp-path }}
@@ -109,18 +113,59 @@ runs:
 
         wp --path="$WP_PATH" plugin activate "$PLUGIN_SLUG"
 
+        # NOTE: wp plugin check never returns a non-zero exit code when errors or
+        # warnings are found — it only exits non-zero on runner/CLI failures.
+        # We therefore use strict-json (a single valid JSON array) and parse the
+        # results ourselves to determine pass/fail.
         echo "::group::Run Plugin Check"
         set +e
         wp --path="$WP_PATH" \
           --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" \
           plugin check "$PLUGIN_SLUG" \
-          --format=json \
+          --format=strict-json \
           --slug="$PLUGIN_SLUG" \
           --exclude-files=.wp-env.json \
           > "$PLUGIN_CHECK_RESULTS"
-        status=$?
+        cli_status=$?
         set -e
+
         cat "$PLUGIN_CHECK_RESULTS"
+        echo
         echo "::endgroup::"
 
-        exit "$status"
+        # Fail immediately if the wp CLI command itself crashed.
+        if [ "$cli_status" -ne 0 ]; then
+          echo "::error::Plugin Check command failed with exit code $cli_status"
+          exit 1
+        fi
+
+        # Parse the JSON results with jq.
+        ERROR_COUNT=$(jq '[.[] | select(.type == "ERROR")] | length' "$PLUGIN_CHECK_RESULTS")
+        WARNING_COUNT=$(jq '[.[] | select(.type == "WARNING")] | length' "$PLUGIN_CHECK_RESULTS")
+
+        echo "Plugin Check results: $ERROR_COUNT error(s), $WARNING_COUNT warning(s)."
+
+        # Emit GitHub Actions annotations for visibility.
+        if [ "$ERROR_COUNT" -gt 0 ]; then
+          jq -r '.[] | select(.type == "ERROR") | "::error file=\(.file // ""),line=\(.line // 1)::[\(.code)] \(.message)"' \
+            "$PLUGIN_CHECK_RESULTS"
+        fi
+        if [ "$WARNING_COUNT" -gt 0 ]; then
+          jq -r '.[] | select(.type == "WARNING") | "::warning file=\(.file // ""),line=\(.line // 1)::[\(.code)] \(.message)"' \
+            "$PLUGIN_CHECK_RESULTS"
+        fi
+
+        # Errors always fail.
+        if [ "$ERROR_COUNT" -gt 0 ]; then
+          echo "::error::Plugin Check found $ERROR_COUNT error(s)."
+          exit 1
+        fi
+
+        # Warnings fail only when explicitly requested.
+        if [ "$FAIL_ON_WARNINGS" = "true" ] && [ "$WARNING_COUNT" -gt 0 ]; then
+          echo "::error::Plugin Check found $WARNING_COUNT warning(s) and fail-on-warnings is enabled."
+          exit 1
+        fi
+
+        echo "Plugin Check passed."
+        exit 0
