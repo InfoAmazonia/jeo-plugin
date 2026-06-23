@@ -199,7 +199,7 @@ msgstr "Tipo de capa no registrada"
 #. translators: Explore is the name of JEO's discovery page feature.
 #: includes/loaders.php:517
 #: templates/embed-discovery.php:18
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Explore"
 msgstr "Explorar"
 
@@ -460,7 +460,7 @@ msgstr "Color de fondo del botón Info"
 msgid "Close button background color"
 msgstr "Color de fondo del botón de cierre"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgctxt "discovery share action"
 msgid "Embed"
 msgstr "Embed"
@@ -780,7 +780,7 @@ msgstr "Un arreglo de etiquetas y colores"
 
 #: js/build/contextSidebar.js:1
 #: js/build/discovery.js:1
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Clear"
@@ -788,7 +788,7 @@ msgstr "Limpiar"
 
 #: js/build/discovery.js:1
 #: js/build/discovery.js:2
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Apply"
 msgstr "Aplicar"
 
@@ -940,109 +940,109 @@ msgstr "Noviembre"
 msgid "December"
 msgstr "Diciembre"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Search story"
 msgstr "Buscar historia"
 
 #. translators: %s is the active story search query.
-#: js/build/discovery.js:3
+#: js/build/discovery.js:4
 #, js-format
 msgid "Search story: %s"
 msgstr "Buscar historia: %s"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Hide filters"
 msgstr "Ocultar filtros"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Show filters"
 msgstr "Mostrar filtros"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Date range"
 msgstr "Rango de fechas"
 
 #. translators: %s is the active story date range.
-#: js/build/discovery.js:4
+#: js/build/discovery.js:5
 #, js-format
 msgid "Date range: %s"
 msgstr "Rango de fechas: %s"
 
 #. translators: %s is the list of active story tags.
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 #, js-format
 msgid "Tags: %s"
 msgstr "Etiquetas: %s"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "No stories found for the current filters."
 msgstr "No se encontraron historias para los filtros actuales."
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "No stories available."
 msgstr "No hay historias disponibles."
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Updating stories…"
 msgstr "Actualizando historias…"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Active filters"
 msgstr "Filtros activos"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "View in map"
 msgstr "Ver en el mapa"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "layers"
 msgstr "capas"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Loading…"
 msgstr "Cargando…"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Unable to load map layers right now."
 msgstr "No se pueden cargar las capas del mapa en este momento."
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Search map"
 msgstr "Buscar mapa"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Selected layers"
 msgstr "Capas seleccionadas"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "No layers selected"
 msgstr "Ninguna capa seleccionada"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Apply changes"
 msgstr "Aplicar cambios"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Stories"
 msgstr "Historias"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Map layers"
 msgstr "Capas del mapa"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Collapse discovery panel"
 msgstr "Contraer panel Discovery"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Expand discovery panel"
 msgstr "Expandir panel Discovery"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 #: js/build/jeoMap.js:1
 #: js/build/layersSidebar.js:7
 msgid "Legend"
@@ -1704,10 +1704,12 @@ msgid "Relevance"
 msgstr "Relevancia"
 
 #: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Primary"
 msgstr "Primario"
 
 #: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Secondary"
 msgstr "Secundario"
 
@@ -1719,33 +1721,34 @@ msgstr "Actualizar punto seleccionado"
 msgid "Save new point"
 msgstr "Guardar nuevo punto"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
 msgid "Add new point"
 msgstr "Añadir nuevo punto"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
 msgid "Current points"
 msgstr "Puntos actuales"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
 msgid "No points"
 msgstr "Sin puntos"
 
 #: includes/settings/class-settings.php:500
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
 msgid "Delete"
 msgstr "Borrar"
 
 #: includes/settings/class-settings.php:537
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
 msgid "Edit"
 msgstr "Editar"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
+#: js/build/postsSidebar.js:4
 msgid "Geolocate this post"
 msgstr "Geolocalizar este post"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:4
 msgid "Geolocation"
 msgstr "Geolocalización"
 
@@ -4247,88 +4250,91 @@ msgstr "Opacidad"
 msgid "Style layer"
 msgstr "Capa de estilo"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
+#: js/build/postsSidebar.js:3
 msgid "Expand panel"
 msgstr "Expandir panel"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:2
+#: js/build/postsSidebar.js:3
 msgid "Minimize panel"
 msgstr "Minimizar panel"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
+#: js/build/postsSidebar.js:4
 msgid "Review AI Suggestions"
 msgstr "Revisar sugerencias de IA"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Select locations to add to the map:"
 msgstr "Seleccione las ubicaciones para añadir al mapa:"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Enriched via Geocoder"
 msgstr "Enriquecido vía geocodificador"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "AI flagged this as primary location"
 msgstr "La IA marcó esta como ubicación principal"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Enrich"
 msgstr "Enriquecer"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Context:"
 msgstr "Contexto:"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Verified:"
 msgstr "Verificado:"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Score too low for reliable mapping."
 msgstr "Puntuación demasiado baja para un mapeo confiable."
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Discard All"
 msgstr "Descartar todo"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Retrying..."
 msgstr "Reintentando..."
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Retry AI"
 msgstr "Reintentar IA"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Add to Map"
 msgstr "Añadir al mapa"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Invalid response from AI."
 msgstr "Respuesta inválida de la IA."
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "No locations found by the AI."
 msgstr "La IA no encontró ubicaciones."
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgid "Error processing AI georeference."
 msgstr "Error al procesar georreferenciación de IA."
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:3
 msgctxt "Artifical Intelligence"
 msgid "AI"
 msgstr "IA"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:4
 msgid "Review Suggestions"
 msgstr "Revisar sugerencias"
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:4
 msgid "Processing AI..."
 msgstr "Procesando IA..."
 
-#: js/build/postsSidebar.js:1
+#: js/build/postsSidebar.js:4
 msgid "Geolocate with AI"
 msgstr "Geolocalizar con IA"
 
@@ -4378,7 +4384,8 @@ msgctxt "fallback post title"
 msgid "Untitled"
 msgstr "Sin título"
 
-#: js/build/discovery.js:2
+#. translators: %d: number of displayed stories.
+#: js/build/discovery.js:3
 #, js-format
 msgid "Displayed story: %d"
 msgid_plural "Displayed stories: %d"
@@ -4429,21 +4436,24 @@ msgctxt "layer"
 msgid "Switchable"
 msgstr "Conmutable"
 
-#: js/build/postsSidebar.js:1
+#. translators: %d: number of geolocation points.
+#: js/build/postsSidebar.js:2
 #, js-format
 msgid "Point (%d)"
 msgid_plural "Points (%d)"
 msgstr[0] "Punto (%d)"
 msgstr[1] "Puntos (%d)"
 
-#: js/build/postsSidebar.js:1
+#. translators: %d: number of selected AI suggestions.
+#: js/build/postsSidebar.js:3
 #, js-format
 msgid "AI Suggestion (%d selected)"
 msgid_plural "AI Suggestions (%d selected)"
 msgstr[0] "Sugerencia de IA (%d seleccionada)"
 msgstr[1] "Sugerencias de IA (%d seleccionadas)"
 
-#: js/build/postsSidebar.js:1
+#. translators: %d: number of locations found during bulk AI processing.
+#: js/build/postsSidebar.js:4
 #, js-format
 msgid "AI found %d location during bulk processing."
 msgid_plural "AI found %d locations during bulk processing."
@@ -4495,11 +4505,11 @@ msgstr "Insertar imagen"
 msgid "Choose Image"
 msgstr "Elegir imagen"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Changes applied"
 msgstr "Cambios aplicados"
 
-#: js/build/discovery.js:5
+#: js/build/discovery.js:6
 msgid "Not applied"
 msgstr "No aplicado"
 

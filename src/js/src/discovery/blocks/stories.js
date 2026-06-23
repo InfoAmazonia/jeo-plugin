@@ -1177,6 +1177,7 @@ class Stories extends Component {
 		const activeFilters = [];
 		const hoveredClusterPostsSet = new Set( this.state.hoveredClusterPostsId );
 		const storiesCountLabel = sprintf(
+			/* translators: %d: number of displayed stories. */
 			_n( 'Displayed story: %d', 'Displayed stories: %d', this.props.stories.length, 'jeowp' ),
 			this.props.stories.length
 		);

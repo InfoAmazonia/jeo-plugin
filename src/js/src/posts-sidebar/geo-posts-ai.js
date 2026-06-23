@@ -169,7 +169,11 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 							style={ { userSelect: 'none' } }
 						>
 							{ isMinimized
-								? sprintf( _n( 'AI Suggestion (%d selected)', 'AI Suggestions (%d selected)', selectedCount, 'jeowp' ), selectedCount )
+								? sprintf(
+										/* translators: %d: number of selected AI suggestions. */
+										_n( 'AI Suggestion (%d selected)', 'AI Suggestions (%d selected)', selectedCount, 'jeowp' ),
+										selectedCount
+								  )
 								: __( 'Review AI Suggestions', 'jeowp' )
 							}
 						</h3>
