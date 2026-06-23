@@ -1,95 +1,107 @@
 #!/usr/bin/env bash
 #
-# Build a WordPress-ready ZIP from src/ for upload to wordpress.org.
+# Build a WordPress-ready release ZIP of the JEO plugin (dist/jeo-{version}.zip).
+#
+# This is the single canonical release builder. It validates the Node runtime
+# (switching to Node 24 via nvm when needed), checks release metadata, installs
+# production PHP dependencies, builds JS/CSS assets and translations, then
+# packages a self-contained ZIP ready for upload to any WordPress install.
 #
 # Usage:
-#   scripts/build.sh              # builds dist/jeo-{version}.zip
-#   scripts/build.sh --skip-build # skips npm/composer, just re-zips
+#   scripts/build.sh                 # node check + meta + composer + assets + i18n + zip
+#   scripts/build.sh --skip-assets   # reuse existing src/js/build/
+#   scripts/build.sh --skip-composer # reuse existing src/vendor/
+#   scripts/build.sh --skip-i18n     # do not (re)generate translations
+#   scripts/build.sh --skip-build    # skip all build steps, just (re)zip
 #
 
 set -euo pipefail
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
-DIST_DIR="${REPO_ROOT}/dist"
+# shellcheck source=lib/common.sh
+source "$(dirname "${BASH_SOURCE[0]}")/lib/common.sh"
 
-PLUGIN_FILE="${REPO_ROOT}/src/jeo.php"
-README_FILE="${REPO_ROOT}/src/readme.txt"
+usage() {
+	echo "Usage: $(basename "$0") [--skip-assets] [--skip-composer] [--skip-i18n] [--skip-build]"
+}
 
-echo "========================================"
-echo "  JEO Plugin Release Builder"
-echo "========================================"
-echo
+SKIP_ASSETS=false
+SKIP_COMPOSER=false
+SKIP_I18N=false
 
-# ── Extract version ──────────────────────────────────────────────────────────
-VERSION=""
-if [[ -f "$PLUGIN_FILE" ]]; then
-	VERSION=$(sed -n 's/^\s*\*\s*Version:\s*\([0-9.]*\).*/\1/p' "$PLUGIN_FILE" | head -1 || true)
-fi
-if [[ -z "$VERSION" ]]; then
-	VERSION=$(sed -n "s/define(\s*'JEO_VERSION',\s*'\([0-9.]*\)'\s*);/\1/p" "$PLUGIN_FILE" | head -1 || true)
-fi
-if [[ -z "$VERSION" ]]; then
-	echo "❌ Could not extract version from ${PLUGIN_FILE}"
-	exit 1
-fi
-echo "📦 Version: ${VERSION}"
-echo
+for arg in "$@"; do
+	case "$arg" in
+		--skip-assets)   SKIP_ASSETS=true ;;
+		--skip-composer) SKIP_COMPOSER=true ;;
+		--skip-i18n)     SKIP_I18N=true ;;
+		--skip-build)    SKIP_ASSETS=true; SKIP_COMPOSER=true; SKIP_I18N=true ;;
+		-h|--help)       usage; exit 0 ;;
+		*)               echo "❌ Unknown option: $arg"; usage; exit 1 ;;
+	esac
+done
 
-# ── Validate release metadata ────────────────────────────────────────────────
-echo "🔍 Validating release metadata..."
-node "${SCRIPT_DIR}/validate-release-meta.mjs"
-echo "✅ Metadata valid"
-echo
+step "JEO Plugin Release Builder"
+require_command composer
+require_command zip
 
-# ── Run builds (unless skipped) ──────────────────────────────────────────────
-SKIP_BUILD=false
-if [[ "${1:-}" == "--skip-build" ]]; then
-	SKIP_BUILD=true
-fi
+VERSION="$(jeo_plugin_version)" || fail "Could not extract version from ${JEO_PLUGIN_FILE}"
+ok "Plugin version: ${VERSION}"
 
-if [[ "$SKIP_BUILD" == false ]]; then
-	echo "📦 Installing PHP dependencies (no-dev) in src/..."
-	composer install --no-dev --optimize-autoloader --quiet --working-dir="${REPO_ROOT}/src"
-	echo "✅ Composer done"
-	echo
+# ── Node 24 ──────────────────────────────────────────────────────────────────
+step "Checking Node.js version"
+jeo_ensure_node_24
 
-	echo "📦 Building JS/CSS assets..."
-	npm run build
-	echo "✅ npm build done"
-	echo
+# ── Release metadata ─────────────────────────────────────────────────────────
+step "Validating release metadata"
+node "${JEO_SCRIPTS_DIR}/validate-release-meta.mjs" || fail "Release metadata validation failed"
+ok "Metadata valid"
+
+# ── Composer (production) ────────────────────────────────────────────────────
+if [[ "$SKIP_COMPOSER" == false ]]; then
+	step "Installing production Composer dependencies (src/)"
+	rm -rf "${JEO_SRC_DIR}/vendor"
+	composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader \
+		--working-dir="${JEO_SRC_DIR}" || fail "Composer install failed"
+	ok "Composer dependencies installed"
 else
-	echo "⏭️  Skipping npm/composer builds (--skip-build)"
-	echo
+	step "Skipping Composer install (--skip-composer)"
+	[[ -f "${JEO_SRC_DIR}/vendor/autoload.php" ]] || fail "src/vendor/ is missing. Remove --skip-composer."
+	ok "Using existing src/vendor/"
 fi
 
-# ── Create ZIP ───────────────────────────────────────────────────────────────
-mkdir -p "$DIST_DIR"
-ZIP_NAME="jeo-${VERSION}.zip"
-ZIP_PATH="${DIST_DIR}/${ZIP_NAME}"
+# ── Assets ───────────────────────────────────────────────────────────────────
+if [[ "$SKIP_ASSETS" == false ]]; then
+	step "Building JS/CSS assets"
+	npm run build:assets || fail "Asset build failed"
+	ok "Assets built"
+else
+	step "Skipping asset build (--skip-assets)"
+	[[ -d "${JEO_SRC_DIR}/js/build" ]] || fail "src/js/build/ is missing. Remove --skip-assets."
+	ok "Using existing src/js/build/"
+fi
 
-echo "🗜️  Creating ${ZIP_NAME}..."
-(
-	cd "$REPO_ROOT"
-	# Create a temp staging dir so the ZIP root folder is named "jeo/"
-	STAGE=$(mktemp -d)
-	cp -a src "${STAGE}/jeo"
-	(
-		cd "$STAGE"
-		zip -r "$ZIP_PATH" jeo -x "*/node_modules/*" -x "*/.git/*" -x "*/.DS_Store" >/dev/null
-	)
-	rm -rf "$STAGE"
-)
+# ── Translations ─────────────────────────────────────────────────────────────
+if [[ "$SKIP_I18N" == false ]]; then
+	step "Compiling translation files"
+	if command -v wp >/dev/null 2>&1; then
+		npm run i18n:compile || warn "i18n compile failed"
+		ok "Translations compiled"
+	else
+		warn "WP-CLI not found. Skipping translation compilation."
+		warn "Install WP-CLI and rerun without --skip-i18n to build .mo/.json files."
+	fi
+else
+	step "Skipping translation compilation (--skip-i18n)"
+fi
 
-echo "✅ ZIP created: ${ZIP_PATH}"
-echo
+# ── Validate build output ────────────────────────────────────────────────────
+step "Validating build output"
+[[ -f "${JEO_SRC_DIR}/vendor/autoload.php" ]] || fail "src/vendor/autoload.php is missing"
+[[ -d "${JEO_SRC_DIR}/js/build" ]] || fail "src/js/build/ is missing"
+ok "Build output looks good"
 
-# ── Report size ──────────────────────────────────────────────────────────────
-SIZE=$(du -h "$ZIP_PATH" | cut -f1)
-echo "📊 Size: ${SIZE}"
-echo
+# ── ZIP ──────────────────────────────────────────────────────────────────────
+step "Creating WordPress-ready ZIP"
+jeo_create_zip
 
-echo "========================================"
-echo "  Build complete!"
-echo "  ${ZIP_PATH}"
-echo "========================================"
+step "Build complete!"
+echo "  ${JEO_ZIP_PATH}"

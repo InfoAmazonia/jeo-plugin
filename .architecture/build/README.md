@@ -68,6 +68,25 @@ bash .docker/start.sh   # Start WordPress + MariaDB
 | PHP compat | `scripts/check-php-compat.php` | Checks PHP compatibility |
 | Smoke test | `scripts/wordpress-smoke.sh` | WordPress smoke test |
 
+## Release Build Scripts
+
+All release/packaging logic is consolidated to avoid duplication. Shared
+helpers (logging, Node 24 check with nvm fallback, version extraction, ZIP
+packaging) live in **`scripts/lib/common.sh`**, which the entry-point scripts
+source.
+
+| Script | Role |
+|--------|------|
+| `scripts/lib/common.sh` | Shared functions: `step/ok/warn/fail`, `jeo_plugin_version`, `jeo_ensure_node_24`, `jeo_create_zip`. Sourced, not executed. |
+| `scripts/build.sh` | **Canonical release builder.** Node check → validate metadata → composer (prod) → assets → i18n → `dist/jeo-{version}.zip`. Flags: `--skip-assets`, `--skip-composer`, `--skip-i18n`, `--skip-build`. |
+| `scripts/install-and-build.sh` | Clean reinstall (wipes `node_modules` + `vendor` root/src, `npm ci`, composer), then delegates build+zip to `build.sh --skip-composer`. Flag: `--no-zip`. |
+| `scripts/build-wordpress-zip.sh` | Deprecated thin alias that `exec`s `build.sh` (same flags). |
+
+**Node 24 enforcement:** `jeo_ensure_node_24` loads nvm and switches to Node 24
+*before* any npm step runs (so the build never hits `EBADDEVENGINES`).
+`scripts/check-node-version.mjs` is the JS-side assertion of the Node 24.x
+requirement, used after the switch.
+
 ## CI/CD (GitHub Actions)
 
 | Workflow | File | Trigger |
