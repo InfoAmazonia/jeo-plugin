@@ -57,6 +57,9 @@ ok "Metadata valid"
 
 # ── Composer (production) ────────────────────────────────────────────────────
 if [[ "$SKIP_COMPOSER" == false ]]; then
+	step "Checking required PHP extensions"
+	jeo_ensure_php_extensions
+
 	step "Installing production Composer dependencies (src/)"
 	rm -rf "${JEO_SRC_DIR}/vendor"
 	composer install --no-interaction --prefer-dist --no-dev --optimize-autoloader \
