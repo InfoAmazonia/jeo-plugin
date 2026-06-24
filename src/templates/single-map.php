@@ -47,7 +47,7 @@ if ( isset( $post->ID ) && jeo()->is_preview_request_for_post( $post->ID ) && cu
 </html>
 
 <?php else : ?>
-	<?php get_header(); ?>
+	<?php jeo_template_header(); ?>
 	<main id="site-content" role="main">
 		<?php get_the_title(); ?>
 		<div
@@ -57,5 +57,5 @@ if ( isset( $post->ID ) && jeo()->is_preview_request_for_post( $post->ID ) && cu
 			<?php endif; ?>
 		></div>
 	</main>
-	<?php get_footer(); ?>
+	<?php jeo_template_footer(); ?>
 <?php endif; ?>

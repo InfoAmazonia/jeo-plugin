@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-get_header();
+jeo_template_header();
 the_post();
 ?>
 
@@ -17,4 +17,4 @@ the_post();
 	<?php the_content(); ?>
 </div>
 
-<?php get_footer(); ?>
+<?php jeo_template_footer(); ?>
