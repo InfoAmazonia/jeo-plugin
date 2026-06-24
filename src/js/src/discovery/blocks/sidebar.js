@@ -14,7 +14,8 @@ class Sidebar extends Component {
 		this.lastStoriesScrollTop = 0;
 		this.lastMapLayersScrollTop = 0;
 		this.pendingStoriesPage = null;
-		this.ensureStoriesFillScroll = this.ensureStoriesFillScroll.bind( this );
+		this.ensureStoriesFillScroll =
+			this.ensureStoriesFillScroll.bind( this );
 		this.ensureMapsFillScroll = this.ensureMapsFillScroll.bind( this );
 		this.handleScroll = this.handleScroll.bind( this );
 		this.queueNextStoriesPage = this.queueNextStoriesPage.bind( this );
@@ -68,6 +69,7 @@ class Sidebar extends Component {
 			applyLayersChanges: this.props.applyLayersChanges,
 			layersQueue: this.props.layersQueue,
 			appliedLayers: this.props.appliedLayers,
+			registerLayerCustomToken: this.props.registerLayerCustomToken,
 
 			isEmbed: this.props.isEmbed,
 		};
@@ -83,15 +85,29 @@ class Sidebar extends Component {
 			);
 		} else {
 			if ( tab.name === 'stories' ) {
-				tabRenderer = 	(<>
-									<Stories { ...storiesProps }  />
-									<MapLayers { ...mapLayersProps } ref={ this.mapLayersRef } style={ { display: "none" } } />
-								</>);
+				tabRenderer = (
+					<>
+						<Stories { ...storiesProps } />
+						<MapLayers
+							{ ...mapLayersProps }
+							ref={ this.mapLayersRef }
+							style={ { display: 'none' } }
+						/>
+					</>
+				);
 			} else {
-				tabRenderer = 	(<>
-									<Stories { ...storiesProps }  style={ { display: "none" } }  />
-									<MapLayers { ...mapLayersProps } ref={ this.mapLayersRef } />
-								</>);
+				tabRenderer = (
+					<>
+						<Stories
+							{ ...storiesProps }
+							style={ { display: 'none' } }
+						/>
+						<MapLayers
+							{ ...mapLayersProps }
+							ref={ this.mapLayersRef }
+						/>
+					</>
+				);
 			}
 		}
 
@@ -99,7 +115,9 @@ class Sidebar extends Component {
 	}
 
 	getStoriesScrollPanel() {
-		return this.sidebarRef.current?.querySelector?.( '.togable-panel' ) ?? null;
+		return (
+			this.sidebarRef.current?.querySelector?.( '.togable-panel' ) ?? null
+		);
 	}
 
 	getCanLoadMoreStories() {
@@ -110,7 +128,10 @@ class Sidebar extends Component {
 			return false;
 		}
 
-		const totalPages = Number.parseInt( this.props.pageInfo.totalPages, 10 );
+		const totalPages = Number.parseInt(
+			this.props.pageInfo.totalPages,
+			10
+		);
 		const currentPage =
 			Number.parseInt( this.props.pageInfo.currentPage, 10 ) || 1;
 
@@ -189,13 +210,15 @@ class Sidebar extends Component {
 
 			this.storiesRef.current?.markListScrolling?.();
 
-			const isScrollingDown = currentScrollTop > this.lastStoriesScrollTop;
+			const isScrollingDown =
+				currentScrollTop > this.lastStoriesScrollTop;
 			this.lastStoriesScrollTop = currentScrollTop;
 
 			if (
 				isScrollingDown &&
 				this.getCanLoadMoreStories() &&
-				( element.scrollHeight - element.scrollTop - 100 ) <= element.clientHeight &&
+				element.scrollHeight - element.scrollTop - 100 <=
+					element.clientHeight &&
 				this.storiesRef.current
 			) {
 				this.queueNextStoriesPage();
@@ -209,13 +232,15 @@ class Sidebar extends Component {
 				return;
 			}
 
-			const isScrollingDown = currentScrollTop > this.lastMapLayersScrollTop;
+			const isScrollingDown =
+				currentScrollTop > this.lastMapLayersScrollTop;
 			this.lastMapLayersScrollTop = currentScrollTop;
 
 			if (
 				isScrollingDown &&
 				this.getCanLoadMoreMaps() &&
-				( element.scrollHeight - element.scrollTop - 100 ) <= element.clientHeight
+				element.scrollHeight - element.scrollTop - 100 <=
+					element.clientHeight
 			) {
 				this.queueNextMapsPage();
 			}
@@ -247,7 +272,7 @@ class Sidebar extends Component {
 							) }
 						/>
 
-						<span>{ __('Stories', 'jeowp') }</span>
+						<span>{ __( 'Stories', 'jeowp' ) }</span>
 					</div>
 				),
 				className: 'stories-tab',
@@ -275,7 +300,7 @@ class Sidebar extends Component {
 							) }
 						/>
 
-						<span>{ __('Map layers', 'jeowp') }</span>
+						<span>{ __( 'Map layers', 'jeowp' ) }</span>
 					</div>
 				),
 				className: 'stories-tab',
@@ -286,9 +311,13 @@ class Sidebar extends Component {
 			<div
 				ref={ this.sidebarRef }
 				onScrollCapture={ this.handleScroll }
-				className={ this.props.isEmbed ? 'is-embed' : 'default-sidebar' }
+				className={
+					this.props.isEmbed ? 'is-embed' : 'default-sidebar'
+				}
 			>
-				<div className="discovery-title">{ __( 'Explore', 'jeowp' ) }</div>
+				<div className="discovery-title">
+					{ __( 'Explore', 'jeowp' ) }
+				</div>
 				<TabPanel
 					className="togable-panel"
 					activeClass="active-tab"
@@ -309,7 +338,9 @@ class Sidebar extends Component {
 							: __( 'Expand discovery panel', 'jeowp' )
 					}
 					onClick={ () => {
-						this.props.updateState( { showSidebar: ! this.props.showSidebar } );
+						this.props.updateState( {
+							showSidebar: ! this.props.showSidebar,
+						} );
 						window.setTimeout( () => {
 							this.props.map.resize();
 						}, 200 );
