@@ -96,7 +96,8 @@ function getHoveredClusterFeature( map, event ) {
 		return null;
 	}
 
-	const features = map.queryRenderedFeatures( event.point, {
+	const point = { x: event.point.x, y: event.point.y };
+	const features = map.queryRenderedFeatures( point, {
 		layers: clusterLayers,
 	} );
 
