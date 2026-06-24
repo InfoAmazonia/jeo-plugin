@@ -1,12 +1,12 @@
 === JEO Maps ===
 Contributors: infoamazonia
 Tested up to: 7.0
-Stable tag: 3.0.1
+Stable tag: 3.0.2
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
-Version: 3.0.1
+Version: 3.0.2
 
 Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
 
@@ -74,6 +74,11 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 8. Browse geolocated stories and map clusters in the Discovery interface.
 
 == Changelog ==
+
+= 3.0.2 =
+* Fixed story map introductions being cut off when they contained long text.
+* Fixed display of embedded story maps.
+* Fixed compatibility notices when viewing maps and story maps on block themes.
 
 = 3.0.1 =
 * Fixed WordPress.org review findings for release metadata, inline style loading, escaped callback output, admin menu placement, REST pagination limits, public embed visibility, and generic Discovery runtime globals.

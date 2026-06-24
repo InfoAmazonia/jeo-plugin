@@ -8,7 +8,7 @@
  * Plugin Name:       JEO Maps
  * Plugin URI:        https://www.jeowp.org/
  * Description:       Interactive maps for the WordPress block editor
- * Version:           3.0.1
+ * Version:           3.0.2
  * Author:            InfoAmazonia
  * Author URI:        https://www.jeowp.org/
  * Requires at least: 6.6
@@ -29,7 +29,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'JEO_VERSION', '3.0.1' );
+define( 'JEO_VERSION', '3.0.2' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );
