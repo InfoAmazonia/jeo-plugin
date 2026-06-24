@@ -160,6 +160,56 @@ function jeo_get_template( $template_name ) {
 }
 
 /**
+ * Render the site header for plugin templates.
+ *
+ * Classic themes delegate to get_header(). Block themes get a
+ * plugin-owned document shell with the theme's header template
+ * part, avoiding the "Theme without header.php" deprecation
+ * notice that fires when a block theme lacks header.php.
+ *
+ * @return void
+ */
+function jeo_template_header() {
+	if ( ! wp_is_block_theme() ) {
+		get_header();
+		return;
+	}
+	?>
+	<!DOCTYPE html>
+	<html <?php language_attributes(); ?>>
+	<head>
+		<meta charset="<?php bloginfo( 'charset' ); ?>" />
+		<?php wp_head(); ?>
+	</head>
+	<body <?php body_class(); ?>>
+	<?php wp_body_open(); ?>
+	<?php block_template_part( 'header' ); ?>
+	<?php
+}
+
+/**
+ * Render the site footer for plugin templates.
+ *
+ * Classic themes delegate to get_footer(). Block themes get the
+ * theme's footer template part inside the plugin-owned document
+ * shell.
+ *
+ * @return void
+ */
+function jeo_template_footer() {
+	if ( ! wp_is_block_theme() ) {
+		get_footer();
+		return;
+	}
+	?>
+	<?php block_template_part( 'footer' ); ?>
+	<?php wp_footer(); ?>
+	</body>
+	</html>
+	<?php
+}
+
+/**
  * Register an embedder for a JEO-capable site
  *
  * @param string $id Unique ID for the source.
