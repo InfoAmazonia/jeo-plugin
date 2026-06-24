@@ -36,15 +36,15 @@ msgstr "Mapas interactivos para el editor de bloques de WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:568
+#: includes/class-jeo.php:569
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no hay ninguna clave de API de Mapbox configurada. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:569
+#: includes/class-jeo.php:570
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no se pudo cargar el SDK externo de Mapbox. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:1075
+#: includes/class-jeo.php:1091
 msgid "Read more"
 msgstr "Leer más"
 
@@ -207,7 +207,7 @@ msgid "Layer type not registered"
 msgstr "Tipo de capa no registrada"
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:526
+#: includes/loaders.php:535
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:6
 msgid "Explore"
@@ -604,7 +604,7 @@ msgid "You may use a local or external image URL. Large logos will be scaled dow
 msgstr "Puedes usar una URL local o externa de imagen. Los logotipos grandes se reducirán automáticamente en el pie de la incrustación."
 
 #. translators: 1: Mapbox terms URL, 2: Mapbox privacy URL, 3: Nominatim usage policy URL, 4: OSMF privacy URL, 5: OSM tile policy URL.
-#: includes/loaders.php:342
+#: includes/loaders.php:351
 #, php-format
 msgid "<p>JEO can connect to third-party services depending on your configuration.</p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the rendering library or when a map uses Mapbox-hosted resources. In that case the site loads JavaScript/CSS from Mapbox and sends the configured access token plus the visitor&#8217;s IP address, browser details and requested map resources to Mapbox. Terms: <a href=\"%1$s\">Mapbox Terms of Service</a>. Privacy Policy: <a href=\"%2$s\">Mapbox Privacy Policy</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly runs an address search or reverse geocoding request in the post geolocation UI. The typed address or selected coordinates, the site URL in the user agent string and the server IP address are sent to the Nominatim service. Usage Policy: <a href=\"%3$s\">Nominatim Usage Policy</a>. Privacy Policy: <a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview style requests map tiles from the OpenStreetMap tile service, which receives the visitor&#8217;s IP address, browser details and requested tile URLs. Tile Policy: <a href=\"%5$s\">OpenStreetMap Tile Usage Policy</a>. Privacy Policy: <a href=\"%4$s\">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>Optional external asset URLs configured by the site administrator</strong>: if you configure an external typography stylesheet or footer logo URL, visitors&#8217; browsers will request that asset directly from the selected host. That host may receive the visitor&#8217;s IP address, browser details and referrer according to its own terms and privacy policy.</li></ul>"
 msgstr "<p>JEO puede conectarse a servicios de terceros según tu configuración.</p><ul><li><strong>Mapbox</strong>: solo se usa cuando Mapbox se selecciona como biblioteca de renderizado o cuando un mapa usa recursos alojados en Mapbox. En ese caso, el sitio carga JavaScript/CSS desde Mapbox y envía el token de acceso configurado, además de la dirección IP del visitante, detalles del navegador y los recursos de mapa solicitados a Mapbox. Términos: <a href=\"%1$s\">Términos de Servicio de Mapbox</a>. Política de Privacidad: <a href=\"%2$s\">Política de Privacidad de Mapbox</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: se usa cuando un editor ejecuta explícitamente una búsqueda de dirección o una solicitud de geocodificación inversa en la interfaz de geolocalización de entradas. La dirección escrita o las coordenadas seleccionadas, la URL del sitio en la cadena del user agent y la dirección IP del servidor se envían al servicio Nominatim. Política de Uso: <a href=\"%3$s\">Política de Uso de Nominatim</a>. Política de Privacidad: <a href=\"%4$s\">Política de Privacidad de la OpenStreetMap Foundation</a>.</li><li><strong>Teselas ráster de OpenStreetMap</strong>: el estilo de vista previa predeterminado de MapLibre solicita teselas al servicio de teselas de OpenStreetMap, que recibe la dirección IP del visitante, detalles del navegador y las URL de teselas solicitadas. Política de Teselas: <a href=\"%5$s\">Política de Uso de Teselas de OpenStreetMap</a>. Política de Privacidad: <a href=\"%4$s\">Política de Privacidad de la OpenStreetMap Foundation</a>.</li><li><strong>URLs externas opcionales de recursos configuradas por el administrador del sitio</strong>: si configuras una URL externa para la hoja de estilos tipográfica o para el logotipo del pie, los navegadores de los visitantes solicitarán ese recurso directamente al host seleccionado. Ese host puede recibir la dirección IP del visitante, detalles del navegador y el referente, según sus propios términos y política de privacidad.</li></ul>"
@@ -790,7 +790,7 @@ msgstr "Qué datos debe mostrar el mapa."
 msgid "The layer source type style"
 msgstr "El tipo de fuente del estilo de la capa"
 
-#: includes/layer-types/mapbox.js:10
+#: includes/layer-types/mapbox.js:5
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 #: js/build/mapBlocks.js:3
@@ -798,25 +798,25 @@ msgstr "El tipo de fuente del estilo de la capa"
 msgid "Mapbox Style"
 msgstr "Estilo de Mapbox"
 
-#: includes/layer-types/mapbox.js:155
+#: includes/layer-types/mapbox.js:117
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr "ID del estilo"
 
-#: includes/layer-types/mapbox.js:157
+#: includes/layer-types/mapbox.js:119
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
 msgstr "El ID del estilo de Mapbox incluye el nombre de usuario y el ID. Ejemplo: username/id o mapbox://styles/username/id"
 
-#: includes/layer-types/mapbox.js:164
+#: includes/layer-types/mapbox.js:126
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Access token"
 msgstr "Token de acceso"
 
-#: includes/layer-types/mapbox.js:166
+#: includes/layer-types/mapbox.js:128
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
@@ -1219,10 +1219,12 @@ msgstr "Leyenda"
 msgid "This map doesn't have layers"
 msgstr "Este mapa no tiene capas"
 
+#: js/build/discovery.js:6
 #: js/build/jeoMap.js:1
 msgid "Close popup"
 msgstr "Cerrar ventana emergente"
 
+#: js/build/discovery.js:6
 #: js/build/jeoMap.js:1
 msgid "Info"
 msgstr "Información"
@@ -1986,11 +1988,11 @@ msgstr "Geolocalizar este post"
 msgid "Geolocation"
 msgstr "Geolocalización"
 
-#: includes/class-jeo.php:367
+#: includes/class-jeo.php:368
 msgid "Ordered list of map-layer IDs to return."
 msgstr "Lista ordenada de IDs de capas de mapa que se devolverán."
 
-#: includes/class-jeo.php:372
+#: includes/class-jeo.php:373
 msgid "Request context."
 msgstr "Contexto de la solicitud."
 
@@ -2008,10 +2010,123 @@ msgstr "Ej. https://ejemplo.com/wp-content/uploads/fonts/jeo-story-font.css"
 msgid "By %s"
 msgstr "Por %s"
 
-#: includes/class-jeo.php:1300
+#: includes/class-jeo.php:1316
 msgid "This JEO embed is not available."
 msgstr "Este embed de JEO no está disponible."
 
-#: includes/class-jeo.php:1301
+#: includes/class-jeo.php:1317
 msgid "Embed not available"
 msgstr "Embed no disponible"
+
+#: includes/maps/class-map-style-composer.php:424
+#: includes/maps/class-map-style-composer.php:477
+msgid "Mapbox composed styles are disabled."
+msgstr "Los estilos compuestos de Mapbox están desactivados."
+
+#: includes/maps/class-map-style-composer.php:449
+#: includes/maps/class-map-style-composer.php:501
+msgid "Could not create the Mapbox composed style cache directory."
+msgstr "No fue posible crear el directorio de caché de estilos compuestos de Mapbox."
+
+#: includes/maps/class-map-style-composer.php:589
+msgid "Map not found."
+msgstr "Mapa no encontrado."
+
+#: includes/maps/class-map-style-composer.php:599
+#: includes/maps/class-map-style-composer.php:662
+msgid "A Mapbox access token is required to compose Mapbox styles."
+msgstr "Se requiere un token de acceso de Mapbox para componer estilos de Mapbox."
+
+#: includes/maps/class-map-style-composer.php:639
+msgid "Public payload composition is only available for one-time maps."
+msgstr "La composición con datos públicos solo está disponible para mapas de un solo uso."
+
+#: includes/maps/class-map-style-composer.php:645
+msgid "The map preview payload is too large."
+msgstr "Los datos de la vista previa del mapa son demasiado grandes."
+
+#: includes/maps/class-map-style-composer.php:657
+msgid "The map preview has too many layers to compose."
+msgstr "La vista previa del mapa tiene demasiadas capas para componer."
+
+#: includes/maps/class-map-style-composer.php:668
+msgid "The map preview does not include any renderable layers."
+msgstr "La vista previa del mapa no incluye ninguna capa renderizable."
+
+#: includes/maps/class-map-style-composer.php:690
+msgid "Map preview"
+msgstr "Vista previa del mapa"
+
+#: includes/maps/class-map-style-composer.php:931
+msgid "Invalid composed style hash."
+msgstr "Hash de estilo compuesto no válido."
+
+#: includes/maps/class-map-style-composer.php:1019
+msgid "One or more Mapbox styles could not be fetched."
+msgstr "No fue posible obtener uno o más estilos de Mapbox."
+
+#: includes/maps/class-map-style-composer.php:1404
+msgid "The PHP GD extension is required to merge Mapbox sprites."
+msgstr "Se requiere la extensión PHP GD para fusionar sprites de Mapbox."
+
+#: includes/maps/class-map-style-composer.php:1521
+msgid "Could not decode a Mapbox sprite image."
+msgstr "No fue posible decodificar una imagen de sprite de Mapbox."
+
+#: includes/maps/class-map-style-composer.php:2238
+msgid "Composed style artifact was not found."
+msgstr "No se encontró el artefacto del estilo compuesto."
+
+#: js/build/discovery.js:6
+msgid "Mapbox style composition is unavailable."
+msgstr "La composición de estilos de Mapbox no está disponible."
+
+#: js/build/discovery.js:6
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition is unavailable for this map."
+msgstr "La composición de estilos de Mapbox no está disponible para este mapa."
+
+#: js/build/discovery.js:6
+msgid "Unable to load map information right now."
+msgstr "No fue posible cargar la información del mapa en este momento."
+
+#: js/build/discovery.js:6
+msgid "Map information"
+msgstr "Información del mapa"
+
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition did not return renderable layers for this map."
+msgstr "La composición de estilos de Mapbox no devolvió capas renderizables para este mapa."
+
+#: js/build/jeoMap.js:1
+msgid "Unable to load composed Mapbox style for this map."
+msgstr "No fue posible cargar el estilo compuesto de Mapbox para este mapa."
+
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition is unavailable for this one-time map."
+msgstr "La composición de estilos de Mapbox no está disponible para este mapa de un solo uso."
+
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition did not return renderable layers for this one-time map."
+msgstr "La composición de estilos de Mapbox no devolvió capas renderizables para este mapa de un solo uso."
+
+#: js/build/jeoMap.js:1
+msgid "Unable to load composed Mapbox style for this one-time map."
+msgstr "No fue posible cargar el estilo compuesto de Mapbox para este mapa de un solo uso."
+
+#: js/build/jeoMap.js:1
+#: js/build/jeoStorymap.js:3
+msgid "Mapbox style layers could not be loaded because the composed style is unavailable."
+msgstr "No fue posible cargar las capas de estilo de Mapbox porque el estilo compuesto no está disponible."
+
+#: js/build/jeoStorymap.js:3
+msgid "Mapbox style composition is unavailable for this storymap."
+msgstr "La composición de estilos de Mapbox no está disponible para este mapa narrativo."
+
+#: js/build/jeoStorymap.js:3
+msgid "Mapbox style composition did not return renderable layers for this storymap."
+msgstr "La composición de estilos de Mapbox no devolvió capas renderizables para este mapa narrativo."
+
+#: js/build/jeoStorymap.js:3
+msgid "Unable to load composed Mapbox style for this storymap."
+msgstr "No fue posible cargar el estilo compuesto de Mapbox para este mapa narrativo."
