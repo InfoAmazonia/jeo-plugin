@@ -46,6 +46,7 @@ class Jeo {
 	protected function init() {
 		\jeo_menu();
 		\jeo_maps();
+		\jeo_map_style_composer();
 		\jeo_layers();
 		\jeo_geocode_handler();
 		\jeo_settings();
@@ -618,6 +619,19 @@ class Jeo {
 		);
 
 		wp_set_script_translations( 'jeo-map-blocks', 'jeowp', JEO_BASEPATH . 'languages' );
+
+		wp_localize_script(
+			'jeo-map-blocks',
+			'jeoMapVars',
+			array(
+				'jsonUrl'                 => rest_url( 'wp/v2/' ),
+				'layersUrl'               => rest_url( 'jeo/v1/map-layer' ),
+				'composedStyleUrlBase'    => rest_url( 'jeo/v1/map-style/' ),
+				'composedStyleComposeUrl' => rest_url( 'jeo/v1/map-style/compose' ),
+				'nonce'                   => $this->get_rest_nonce(),
+				'currentLang'             => $this->get_current_language(),
+			)
+		);
 	}
 
 	/**
@@ -1070,26 +1084,28 @@ class Jeo {
 				'jeo-map',
 				'jeoMapVars',
 				array(
-					'jsonUrl'          => rest_url( 'wp/v2/' ),
-					'layersUrl'        => rest_url( 'jeo/v1/map-layer' ),
-					'string_read_more' => esc_html__( 'Read more', 'jeowp' ),
-					'jeoUrl'           => JEO_BASEURL,
-					'nonce'            => $this->get_rest_nonce(),
-					'currentLang'      => $current_language,
+					'jsonUrl'                 => rest_url( 'wp/v2/' ),
+					'layersUrl'               => rest_url( 'jeo/v1/map-layer' ),
+					'composedStyleUrlBase'    => rest_url( 'jeo/v1/map-style/' ),
+					'composedStyleComposeUrl' => rest_url( 'jeo/v1/map-style/compose' ),
+					'string_read_more'        => esc_html__( 'Read more', 'jeowp' ),
+					'jeoUrl'                  => JEO_BASEURL,
+					'nonce'                   => $this->get_rest_nonce(),
+					'currentLang'             => $current_language,
 						// phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bundled templates are read from the local plugin directory at runtime.
-					'templates'        => array(
+					'templates'               => array(
 						'moreInfo'  => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup'     => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
 						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) ),
 					),
 						// phpcs:enable
-					'cluster'          => apply_filters(
+					'cluster'                 => apply_filters(
 						'jeomap_js_cluster',
 						array(
 							'circle_color' => '#ffffff',
 						)
 					),
-					'images'           => apply_filters(
+					'images'                  => apply_filters(
 						'jeomap_js_images',
 						array(
 							'/js/src/icons/news-marker' => array(
