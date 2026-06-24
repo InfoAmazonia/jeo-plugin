@@ -1,5 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
-import { Button } from '@wordpress/components';
+import { Button, Spinner } from '@wordpress/components';
 import { select, useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -7,6 +7,13 @@ import { __ } from '@wordpress/i18n';
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import { useRecordsByIds } from '../shared/rest-records';
+import {
+	applyComposedVisibilityFromSettings,
+	handleEditorMapPreviewError,
+	hasMapboxStyleLayers,
+	useComposedPayloadPreviewStyle,
+	useEditorMapboxTransformRequest,
+} from './mapbox-style-preview';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -21,6 +28,10 @@ export default function MapEditorPreview() {
 
 	const postMeta = useSelect( ( select ) =>
 		select( 'core/editor' ).getEditedPostAttribute( 'meta' ), [] ) || {};
+	const postId = useSelect( ( select ) =>
+		select( 'core/editor' ).getCurrentPostId(), [] );
+	const isSavingPost = useSelect( ( select ) =>
+		select( 'core/editor' ).isSavingPost(), [] );
 	const { editPost } = useDispatch( 'core/editor' );
 	const setPostMeta = useCallback(
 		( meta ) => {
@@ -79,12 +90,60 @@ export default function MapEditorPreview() {
 		[ postMeta.layers ]
 	);
 
-	const { records: loadedLayers = [] } = useRecordsByIds( {
+	const {
+		records: loadedLayers = [],
+		isLoading: loadingLayers,
+		hasResolved: hasResolvedLayers,
+	} = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
 	} );
+	const hasMapboxLayers = hasMapboxStyleLayers( loadedLayers );
+	const composedPayload = useMemo( () => ( {
+		scope: 'preview',
+		kind: 'map-preview',
+		postId,
+		layers: postMeta.layers || [],
+	} ), [ postId, layerSettingsKey ] );
+	const composedPreview = useComposedPayloadPreviewStyle( {
+		enabled: hasMapboxLayers,
+		payload: composedPayload,
+		refreshKey: `${ layerSettingsKey }:${ isSavingPost ? 'saving' : 'idle' }`,
+	} );
+	const useComposedPreview = Boolean(
+		hasMapboxLayers && composedPreview.style
+	);
+	const isPreparingLayerPreview = Boolean(
+		layerIds.length > 0 && ( loadingLayers || ! hasResolvedLayers )
+	);
+	const isPreparingComposedPreview = Boolean(
+		! isPreparingLayerPreview &&
+			hasMapboxLayers &&
+			! composedPreview.style &&
+			! composedPreview.error
+	);
+	const shouldRenderMap = ! isPreparingLayerPreview && ! isPreparingComposedPreview;
+	const transformRequest = useEditorMapboxTransformRequest( loadedLayers );
+
+	const applyComposedVisibility = useCallback( () => {
+		if ( useComposedPreview ) {
+			applyComposedVisibilityFromSettings(
+				mapRef.current,
+				composedPreview.manifest,
+				postMeta.layers || []
+			);
+		}
+	}, [
+		composedPreview.manifest,
+		postMeta.layers,
+		useComposedPreview,
+	] );
+
+	useEffect( () => {
+		applyComposedVisibility();
+	}, [ applyComposedVisibility, layerSettingsKey ] );
 
 	const buttonStyle = ( selected ) => ( {
 		color: selected ? '#fff' : '#000',
@@ -155,37 +214,44 @@ export default function MapEditorPreview() {
 						</Button>
 					</div>
 				</div>
-				<Map
-					key={ `${ key }:${ zoomState }:${ layerSettingsKey }` }
-					ref={ mapRef }
-					style={ { height: '500px', width: '100%' } }
-					latitude={ centerLat || 0 }
-					longitude={ centerLon || 0 }
-					zoom={ currentZoom || initialZoom || 11 }
-					onMove={ ( { viewState } ) => {
-						setPostMeta( {
-							center_lat: viewState.latitude,
-							center_lon: viewState.longitude,
-						} );
-					} }
-					onZoom={ ( { viewState } ) => {
-						let zoom = Math.round( viewState.zoom * 10 ) / 10;
-						setPostMeta( { [ zoomState ]: zoom } );
-					} }
-				>
-					{ loadedLayers &&
-						( postMeta.layers || [] ).map( ( layer ) => {
-							const layerOptions = loadedLayers.find(
-								( { id } ) => id === layer.id
-							);
-							if ( layerOptions ) {
-								return renderLayer( {
-									layer: layerOptions.meta,
-									instance: layer,
-								} );
-							}
-						} ) }
-				</Map>
+				{ ! shouldRenderMap && <Spinner /> }
+				{ shouldRenderMap && (
+					<Map
+						key={ `${ key }:${ zoomState }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
+						ref={ mapRef }
+						mapStyle={ useComposedPreview ? composedPreview.style : undefined }
+						style={ { height: '500px', width: '100%' } }
+						transformRequest={ transformRequest }
+						latitude={ centerLat || 0 }
+						longitude={ centerLon || 0 }
+						zoom={ currentZoom || initialZoom || 11 }
+						onError={ handleEditorMapPreviewError }
+						onStyleData={ applyComposedVisibility }
+						onMove={ ( { viewState } ) => {
+							setPostMeta( {
+								center_lat: viewState.latitude,
+								center_lon: viewState.longitude,
+							} );
+						} }
+						onZoom={ ( { viewState } ) => {
+							let zoom = Math.round( viewState.zoom * 10 ) / 10;
+							setPostMeta( { [ zoomState ]: zoom } );
+						} }
+					>
+						{ ! useComposedPreview && loadedLayers &&
+							( postMeta.layers || [] ).map( ( layer ) => {
+								const layerOptions = loadedLayers.find(
+									( { id } ) => id === layer.id
+								);
+								if ( layerOptions ) {
+									return renderLayer( {
+										layer: layerOptions.meta,
+										instance: layer,
+									} );
+								}
+							} ) }
+					</Map>
+				) }
 			</div>
 		</div>
 	);
