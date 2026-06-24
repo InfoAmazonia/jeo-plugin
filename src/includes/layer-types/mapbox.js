@@ -1,11 +1,6 @@
 ( () => {
 	const { __ } = wp.i18n;
 
-	const MAPBOX_RASTER_ATTRIBUTION =
-	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
-	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
-
 	window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	label: __( 'Mapbox Style', 'jeowp' ),
 
@@ -15,40 +10,6 @@
 		if ( styleUrl ) {
 			return map.setStyle( styleUrl );
 		}
-	},
-
-	addLayer( map, attributes, addLayerParams = null ) {
-		const layerId = attributes.layer_id;
-		const layerTypeOptions = attributes.layer_type_options || {};
-
-		if ( ! map.getSource( layerId ) ) {
-			const accessToken = layerTypeOptions.access_token || jeo_settings.mapbox_key;
-
-			const styleId = layerTypeOptions.style_id?.replace( 'mapbox://styles/', '' );
-
-			map.addSource( layerId, {
-				type: 'raster',
-				tiles: [
-					`https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`,
-				],
-				attribution: MAPBOX_RASTER_ATTRIBUTION,
-			} );
-		}
-
-		const layer = {
-			id: layerId,
-			source: layerId,
-			type: 'raster',
-			layout: {
-				visibility: attributes.visible ? 'visible' : 'none',
-			},
-		};
-
-		if ( addLayerParams ) {
-			return map.addLayer( layer, ...addLayerParams );
-		}
-
-		return map.addLayer( layer );
 	},
 
 	_groupInteractionsByEventType( interactions ) {
@@ -129,7 +90,8 @@
 					} );
 
 					map.on( 'mousemove', function ( e ) {
-						const features = map.queryRenderedFeatures( e.point );
+						const point = { x: e.point.x, y: e.point.y };
+						const features = map.queryRenderedFeatures( point );
 						const isOverlapping = features.some( f => interactionsIds.includes( f.layer.id ) );
 						if ( isOverlapping ) {
 							map.getCanvas().style.cursor = 'pointer';
