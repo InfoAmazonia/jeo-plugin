@@ -497,6 +497,16 @@
 		}
 	}
 
+	.maplibregl-ctrl-group {
+		.maplibregl-ctrl-zoom-in {
+			border-radius: 5px 5px 0 0;
+		}
+
+		.maplibregl-ctrl-zoom-out {
+			border-radius: 0 0 5px 5px;
+		}
+	}
+
 	.layers-wrapper a {
 		text-decoration: none !important;
 	}
