@@ -117,6 +117,12 @@ trait Singleton {
 			}
 		}
 
+		if ( get_query_var( 'jeo_embed' ) === 'map' ) {
+			$storymap_id = filter_input( INPUT_GET, 'storymap_id', FILTER_VALIDATE_INT );
+
+			$should_load_assets = ! empty( $storymap_id );
+		}
+
 		return apply_filters( 'jeo_should_load_storymap_assets', $should_load_assets );
 	}
 
