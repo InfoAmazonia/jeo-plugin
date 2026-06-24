@@ -64,8 +64,6 @@ class StoryMapDisplay extends Component {
 		this.navigateMap = null;
 		this.cid = ++storyCounter;
 		this.isIntroductionScrollLocked = false;
-		this.previousBodyOverflow = null;
-		this.previousDocumentOverflow = null;
 		this.handleFullscreenChange = () => {
 			const returnToSlidesContainer = this.el?.querySelector( '.return-to-slides-container' );
 
@@ -152,36 +150,14 @@ class StoryMapDisplay extends Component {
 	}
 
 	componentWillUnmount() {
-		this.setIntroductionScrollLocked( false );
+		this.isIntroductionScrollLocked = false;
 		window.removeEventListener( 'resize', this.scroller.resize );
 		document.removeEventListener( 'fullscreenchange', this.handleFullscreenChange );
 	}
 
-	setIntroductionScrollLocked( locked ) {
-		const ownerDocument = this.el?.ownerDocument || document;
-		const documentElement = ownerDocument.documentElement;
-		const body = ownerDocument.body;
-
-		if ( ! documentElement || ! body || this.isIntroductionScrollLocked === locked ) {
-			return;
-		}
-
-		if ( locked ) {
-			this.previousDocumentOverflow = documentElement.style.overflow;
-			this.previousBodyOverflow = body.style.overflow;
-			documentElement.style.overflow = 'hidden';
-			body.style.overflow = 'hidden';
-		} else {
-			documentElement.style.overflow = this.previousDocumentOverflow ?? '';
-			body.style.overflow = this.previousBodyOverflow ?? '';
-		}
-
-		this.isIntroductionScrollLocked = locked;
-	}
-
 	syncIntroductionScrollLock() {
-		this.setIntroductionScrollLocked(
-			Boolean( isSingle && this.isIntroductionActive() && ! this.state.isNavigating )
+		this.isIntroductionScrollLocked = Boolean(
+			isSingle && this.isIntroductionActive() && ! this.state.isNavigating
 		);
 	}
 
@@ -190,7 +166,7 @@ class StoryMapDisplay extends Component {
 	}
 
 	startStorymapDisplay() {
-		this.setIntroductionScrollLocked( false );
+		this.isIntroductionScrollLocked = false;
 		this.setState( { ...this.state, mapBrightness: 1, inSlides: true, hasStartedStorymap: true }, () => {
 			window.requestAnimationFrame( () => {
 				this.scroller.resize();
