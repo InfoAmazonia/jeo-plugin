@@ -2,6 +2,13 @@ import Spiderfy from '@nazka/map-gl-js-spiderfy';
 import { __, _n, sprintf } from '@wordpress/i18n';
 
 import { createMap, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
+import { loadComposedStyleData } from '../shared/composed-style-data';
+import {
+	addComposedInteractions,
+	getComposedLayerVisibility,
+	hasComposedStyle,
+	setComposedLayerVisibility,
+} from '../shared/composed-style-layers';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { onFirstIntersection } from '../shared/intersect';
 import { appendRestQueryParams } from '../shared/rest-query';
@@ -64,6 +71,10 @@ export default class JeoMap {
 		this.markers = [];
 		this.layers = [];
 		this.legends = [];
+		this.composedStyleMetadata = null;
+		this.composedManifest = null;
+		this.usingComposedStyle = false;
+		this.composedStyleError = null;
 		this.initialized = false;
 		this.popup = null;
 		this.attributionResizeObserver = null;
@@ -205,70 +216,27 @@ export default class JeoMap {
 						this.getArg( 'layers' ).length > 0 &&
 						amountLayers > 0
 					) {
-						const mapLayersSettings = this.getArg( 'layers' );
+						const usingComposedStyle = this.hasComposedStyle();
 
-						let firstStyleLayerId;
-						let styleLayerIndex;
-
-						layers.forEach( ( layer, index ) => {
-							const currentLayerSettings = mapLayersSettings.find(
-								( item ) => item.id === layer.attributes.layer_post_id
-							);
-
+						layers.forEach( ( layer ) => {
 							// Register custom accessTokens, if found, to request transformer
 							this.checkCustomToken( layer.attributes );
-
-							if ( currentLayerSettings.load_as_style ) {
-								layer.addStyle( map );
-								styleLayerIndex = index;
-							}
 						} );
 
 						// When style is done loading (don't try to add layers before style is ready)
-						this.mapLoaded.then(() => {
-							// Remove not selected layers and toggle visibility
-							mapLayersSettings.forEach( ( layer ) => {
-								if ( layer.load_as_style ) {
-									const styleLayers = layer.style_layers;
-
-									styleLayers.forEach( ( styleLayer ) => {
-										if ( ! styleLayer.show ) {
-											if ( map.getLayer( styleLayer.id ) ) {
-												map.removeLayer( styleLayer.id );
-											}
-										}
-
-										// In the future individual style layers will have their own toggles/swaps
-										if ( ! layer.default ) {
-											if ( map.getLayer( styleLayer.id ) ) {
-												map.setLayoutProperty(
-													styleLayer.id,
-													'visibility',
-													'none'
-												);
-											}
-										}
-									} );
-								}
-							} );
-
-							// Select reference pointers
-							firstStyleLayerId = map.style._order[ 0 ];
-
-							this.styleLoaded.then( () => {
-								layers.forEach( ( layer, index ) => {
-									if ( index === styleLayerIndex ) {
-										layer.addInteractions( map );
-									} else {
-										// If the current layer is below the style, add using first syle layer reference
-										if ( index < styleLayerIndex ) {
-											layer.addLayer( map, [ firstStyleLayerId ] );
-										} else {
-											layer.addLayer( map );
-										}
+						this.mapLoaded.then( () => {
+							if ( usingComposedStyle ) {
+								addComposedInteractions( map, this.composedManifest );
+							} else {
+								this.addComposedStyleWarningMessage();
+								layers.forEach( ( layer ) => {
+									if ( this.isMapboxStyleLayer( layer ) ) {
+										return;
 									}
+
+									layer.addLayer( map );
 								} );
-							} );
+							}
 
 							// Add attributions
 							const customAttribution = [];
@@ -322,7 +290,7 @@ export default class JeoMap {
 							map.on( 'resize', () => this.queueCompactAttributionCollapse() );
 
 							this.getRelatedPosts();
-						});
+						} );
 
 						this.addLayersControl( amountLayers );
 						this.addMoreButtonAndLegends();
@@ -369,11 +337,122 @@ export default class JeoMap {
 			this.map_post_object = data;
 
 			await this.getLayers();
+			await this.fetchComposedStyleData( data.id );
 		} else if ( this.getArg( 'layers' ) ) {
 			// One-time maps have no map_id but store layer settings
 			// in the data-layers attribute. We still need to fetch
-			// the full layer objects so getStyleLayer() can resolve.
+			// the full layer objects so direct layer types can render.
 			await this.getLayers();
+			await this.fetchOnetimeComposedStyleData();
+		}
+	}
+
+	async fetchComposedStyleData( mapId ) {
+		if (
+			! mapId ||
+			! window.jeoMapVars?.composedStyleUrlBase
+		) {
+			return;
+		}
+
+		await this.loadComposedStyleData(
+			() => loadComposedStyleData( {
+				mapId,
+				unavailableMessage: __(
+					'Mapbox style composition is unavailable for this map.',
+					'jeowp'
+				),
+				emptyManifestMessage: __(
+					'Mapbox style composition did not return renderable layers for this map.',
+					'jeowp'
+				),
+			} ),
+			__(
+				'Unable to load composed Mapbox style for this map.',
+				'jeowp'
+			),
+			'Unable to load composed Mapbox style. Mapbox style layers will be omitted.'
+		);
+	}
+
+	async fetchOnetimeComposedStyleData() {
+		if (
+			! window.jeoMapVars?.composedStyleComposeUrl ||
+			! this.layers.some( ( layer ) => this.isMapboxStyleLayer( layer ) )
+		) {
+			return;
+		}
+
+		await this.loadComposedStyleData(
+			() => loadComposedStyleData( {
+				payload: this.getOnetimeComposedStylePayload(),
+				unavailableMessage: __(
+					'Mapbox style composition is unavailable for this one-time map.',
+					'jeowp'
+				),
+				emptyManifestMessage: __(
+					'Mapbox style composition did not return renderable layers for this one-time map.',
+					'jeowp'
+				),
+			} ),
+			__(
+				'Unable to load composed Mapbox style for this one-time map.',
+				'jeowp'
+			),
+			'Unable to load composed Mapbox style for one-time map. Mapbox style layers will be omitted.'
+		);
+	}
+
+	async loadComposedStyleData( fetchData, fallbackErrorMessage, consoleMessage ) {
+		try {
+			const { manifest, metadata } = await fetchData();
+
+			this.composedStyleMetadata = metadata;
+			this.composedManifest = manifest;
+			this.usingComposedStyle = true;
+			this.composedStyleError = null;
+		} catch ( error ) {
+			this.composedStyleMetadata = null;
+			this.composedManifest = null;
+			this.usingComposedStyle = false;
+			this.composedStyleError = error?.message || fallbackErrorMessage;
+			console.warn( consoleMessage, error );
+		}
+	}
+
+	getOnetimeComposedStylePayload() {
+		return {
+			scope: 'onetime',
+			kind: 'onetime-map',
+			layers: this.layersDefinitions || this.getArg( 'layers' ) || [],
+			center_lat: this.getArg( 'center_lat' ) || null,
+			center_lon: this.getArg( 'center_lon' ) || null,
+			initial_zoom: this.getArg( 'initial_zoom' ) || null,
+		};
+	}
+
+	isMapboxStyleLayer( layer ) {
+		return layer?.attributes?.layer_type === 'mapbox';
+	}
+
+	addComposedStyleWarningMessage() {
+		if (
+			! this.layers.some( ( layer ) => this.isMapboxStyleLayer( layer ) ) ||
+			this.element.querySelector( '.jeomap-composed-style-warning' )
+		) {
+			return;
+		}
+
+		const warning = document.createElement( 'div' );
+		warning.className = 'jeomap-composed-style-warning';
+		warning.innerHTML = `<p class="jeomap-no-layers__text">${ __(
+			'Mapbox style layers could not be loaded because the composed style is unavailable.',
+			'jeowp'
+		) }</p>`;
+		this.element.appendChild( warning );
+
+		if ( this.composedStyleError ) {
+			console.warn( this.composedStyleError );
 		}
 	}
 
@@ -616,14 +695,115 @@ export default class JeoMap {
 	}
 
 	/**
-	 * Adds the "More" button that will open the Content of the Map post in an overlayer
-	 *
-	 * This will only work for maps stored in the database and not for one-time use maps
+	 * Adds the "More" button that opens map post content or layer source
+	 * information in an overlayer.
 	 */
+	hasMeaningfulHtml( html = '' ) {
+		if ( ! html ) {
+			return false;
+		}
+
+		if ( typeof document !== 'undefined' ) {
+			const wrapper = document.createElement( 'div' );
+			wrapper.innerHTML = html;
+
+			const textContent = ( wrapper.textContent || '' )
+				.replace( /\u00a0/g, ' ' )
+				.trim();
+
+			if ( textContent.length ) {
+				return true;
+			}
+
+			return Boolean(
+				wrapper.querySelector(
+					'img,video,audio,iframe,table,ul,ol,svg'
+				)
+			);
+		}
+
+		return String( html )
+			.replace( /<[^>]+>/g, '' )
+			.replace( /&nbsp;|&#160;/gi, ' ' )
+			.trim().length > 0;
+	}
+
+	getMoreInfoContent() {
+		if ( this.map_post_object ) {
+			if (
+				! this.hasMeaningfulHtml(
+					this.map_post_object?.content?.rendered
+				)
+			) {
+				return '';
+			}
+
+			return this.moreInfoTemplate( {
+				map: this.map_post_object,
+			} );
+		}
+
+		let innerHTML = '';
+
+		this.layers.forEach( ( layer ) => {
+			const layerInfo = [];
+			const attributionLink = normalizeOptionalUrl(
+				layer.attributes.attribution
+			);
+			const attributionName = layer.attributes.attribution_name;
+			const sourceLink = normalizeOptionalUrl( layer.source_url );
+
+			if ( attributionLink ) {
+				const attributionLabel = attributionName || attributionLink;
+				layerInfo.push(
+					`<p>${ __(
+						'Attribution:',
+						'jeowp'
+					) } <a href="${ attributionLink }">${ attributionLabel }</a></p>`
+				);
+			}
+
+			if ( sourceLink ) {
+				layerInfo.push(
+					`<a
+						style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+						background: #fff;
+						border: 1px solid rgba(0,0,0,0.4);
+						color: #404040;
+						margin-top: 8px;
+						padding: 4px 10px;
+						text-decoration: none;
+						border-bottom: 1px solid rgba(0,0,0,0.25);
+						text-align: center;
+						cursor: pointer;
+						display: inline-block;
+						font-size: 16px;
+						font-weight: bold;
+						transition: all .2 ease-in-out;"
+						href="${ sourceLink }" class="download-source">${ __(
+							'Download from source',
+							'jeowp'
+						) }
+					</a>`
+				);
+			}
+
+			if ( layerInfo.length ) {
+				innerHTML += `<h3>${ layer.attributes.layer_name }</h3>${ layerInfo.join(
+					''
+				) }`;
+			}
+		} );
+
+		return innerHTML;
+	}
+
 	addMoreButtonAndLegends() {
 		const container = document.createElement( 'div' );
 		container.classList.add( 'legend-container' );
 		const startCollapsed = this.shouldStartControlsCollapsed();
+		const moreInfoHtml = this.getMoreInfoContent();
+		const hasMoreInfo = Boolean( moreInfoHtml.trim() );
 
 		const hideableContent = document.createElement( 'div' );
 		hideableContent.classList.add( 'hideable-content' );
@@ -715,6 +895,10 @@ export default class JeoMap {
 			} );
 		}
 
+		if ( ! hasAppearingLegends && ! hasMoreInfo ) {
+			return;
+		}
+
 		if ( ! hasAppearingLegends ) {
 			if ( startCollapsed ) {
 				container.classList.add( 'hidden' );
@@ -755,92 +939,48 @@ export default class JeoMap {
 			} );
 		}
 
-		const moreDiv = document.createElement( 'div' );
+		if ( hasMoreInfo ) {
+			const moreDiv = document.createElement( 'div' );
 
-		moreDiv.classList.add( 'more-info-overlayer' );
-		if ( this.map_post_object ) {
-			moreDiv.innerHTML = this.moreInfoTemplate( {
-				map: this.map_post_object,
-			} );
-		} else {
-			let innerHTML = '';
-			this.layers.forEach( ( layer ) => {
-				innerHTML += `<h3>${ layer.attributes.layer_name }</h1>`;
+			moreDiv.classList.add( 'more-info-overlayer' );
+			moreDiv.innerHTML = moreInfoHtml;
 
-				const attributionLink = normalizeOptionalUrl(
-					layer.attributes.attribution
-				);
-				const attributionName = layer.attributes.attribution_name;
-				const sourceLink = normalizeOptionalUrl( layer.source_url );
+			const closeButton = document.createElement( 'div' );
+			closeButton.classList.add( 'more-info-close' );
+			closeButton.innerHTML =
+				`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="${ __(
+					'Close popup',
+					'jeowp'
+				) }"><span>×</span></button>`;
 
-				if ( attributionLink ) {
-					const attributionLabel = attributionName || attributionLink;
-					innerHTML += `<p>${ __(
-						'Attribution:',
-						'jeowp'
-					) } <a href="${ attributionLink }">${ attributionLabel }</a></p>`;
-				}
-				if ( sourceLink ) {
-					innerHTML += `<a
-									style="font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
-									background: #fff;
-									border: 1px solid rgba(0,0,0,0.4);
-									color: #404040;
-									margin-top: 8px;
-									padding: 4px 10px;
-									text-decoration: none;
-									border-bottom: 1px solid rgba(0,0,0,0.25);
-									text-align: center;
-									cursor: pointer;
-									display: inline-block;
-									font-size: 16px;
-									font-weight: bold;
-									transition: all .2 ease-in-out;"
-									href="${ sourceLink }" class="download-source">${ __(
-										'Download from source',
-										'jeowp'
-									) }
-								  </a>`;
-				}
-			} );
-			moreDiv.innerHTML = innerHTML;
+			closeButton.click( function ( e ) {} );
+
+			closeButton.onclick = ( e ) => {
+				e.preventDefault();
+				e.stopPropagation();
+
+				jQuery( e.currentTarget ).parent().hide();
+			};
+
+			moreDiv.appendChild( closeButton );
+
+			const moreButton = document.createElement( 'a' );
+			moreButton.classList.add( 'more-info-button' );
+			moreButton.innerHTML = __( 'Info', 'jeowp' );
+
+			moreButton.onclick = ( e ) => {
+				e.preventDefault();
+				e.stopPropagation();
+				jQuery( e.currentTarget )
+					.parent()
+					.parent()
+					.siblings( '.more-info-overlayer' )
+					.show();
+			};
+
+			this.element.appendChild( moreDiv );
+			hideableContent.appendChild( moreButton );
 		}
-
-		const closeButton = document.createElement( 'div' );
-		closeButton.classList.add( 'more-info-close' );
-		closeButton.innerHTML =
-			`<button class="${MAP_RUNTIME}-popup-close-button" type="button" aria-label="${ __(
-				'Close popup',
-				'jeowp'
-			) }"><span>×</span></button>`;
-
-		closeButton.click( function ( e ) {} );
-
-		closeButton.onclick = ( e ) => {
-			e.preventDefault();
-			e.stopPropagation();
-
-			jQuery( e.currentTarget ).parent().hide();
-		};
-
-		moreDiv.appendChild( closeButton );
-
-		const moreButton = document.createElement( 'a' );
-		moreButton.classList.add( 'more-info-button' );
-		moreButton.innerHTML = __( 'Info', 'jeowp' );
-
-		moreButton.onclick = ( e ) => {
-			e.preventDefault();
-			e.stopPropagation();
-			jQuery( e.currentTarget )
-				.parent()
-				.parent()
-				.siblings( '.more-info-overlayer' )
-				.show();
-		};
-
-		this.element.appendChild( moreDiv );
-		hideableContent.appendChild( moreButton );
 
 		container.appendChild( hideableContent );
 		this.element.appendChild( container );
@@ -907,6 +1047,7 @@ export default class JeoMap {
 									new window.JeoLayer( layerObject.meta.type, {
 										layer_post_id: layerObject.id,
 										layer_id: layerObject.slug,
+										layer_type: layerObject.meta.type,
 										layer_name: layerObject.title.rendered,
 										attribution: layerObject.meta.attribution,
 										attribution_name: layerObject.meta.attribution_name,
@@ -942,23 +1083,14 @@ export default class JeoMap {
 		} );
 	}
 
+	hasComposedStyle() {
+		return this.usingComposedStyle &&
+			hasComposedStyle( this.composedStyleMetadata, this.composedManifest );
+	}
+
 	getStyleLayer() {
-		const mapLayersSettings = this.getArg( 'layers' );
-		const layers = this.layers;
-
-		for ( const layerSettings of mapLayersSettings ) {
-			if ( layerSettings.load_as_style ) {
-				const layer = layers.find(
-					( layer ) => layer.attributes.layer_post_id === layerSettings.id
-				);
-
-				if ( layer ) {
-					const styleUrl = layer.getStyleUrl();
-					if ( styleUrl ) {
-						return styleUrl;
-					}
-				}
-			}
+		if ( this.hasComposedStyle() ) {
+			return this.composedStyleMetadata.style;
 		}
 
 		return EMPTY_STYLE;
@@ -1086,8 +1218,11 @@ export default class JeoMap {
 						map.on( 'click', 'unclustered-points', () => {} );
 
 						map.on( 'click', 'unclustered-points-hitarea', ( e ) => {
+							const point = e.point
+								? { x: e.point.x, y: e.point.y }
+								: null;
 							const featuresAtPoint = e.point
-								? map.queryRenderedFeatures( e.point, {
+								? map.queryRenderedFeatures( point, {
 									layers: [ 'unclustered-points-hitarea' ],
 								} )
 								: e.features;
@@ -1913,7 +2048,13 @@ export default class JeoMap {
 
 					let visibility = false;
 
-					if ( layerSetting.load_as_style ) {
+					if ( this.hasComposedStyle() ) {
+						visibility = getComposedLayerVisibility(
+							this.map,
+							this.composedManifest,
+							clickedLayer
+						);
+					} else if ( layerSetting.load_as_style ) {
 						if (
 							layerSetting.style_layers &&
 							layerSetting.style_layers.length
@@ -1927,7 +2068,7 @@ export default class JeoMap {
 								}
 							} );
 						}
-					} else {
+					} else if ( this.map.getLayer( clickedLayer ) ) {
 						visibility = this.map.getLayoutProperty(
 							clickedLayer,
 							'visibility'
@@ -1994,6 +2135,16 @@ export default class JeoMap {
 	}
 
 	changeLayerVisibitly( layer_id, visibility ) {
+		if ( this.hasComposedStyle() ) {
+			setComposedLayerVisibility(
+				this.map,
+				this.composedManifest,
+				layer_id,
+				visibility
+			);
+			return;
+		}
+
 		const mapLayersSettings = this.getArg( 'layers' );
 		const layers = this.layers;
 
@@ -2019,7 +2170,9 @@ export default class JeoMap {
 								}
 							} );
 						} else {
-							this.map.setLayoutProperty( layer_id, 'visibility', visibility );
+							if ( this.map.getLayer( layer_id ) ) {
+								this.map.setLayoutProperty( layer_id, 'visibility', visibility );
+							}
 						}
 					}
 				} );
@@ -2059,6 +2212,13 @@ export default class JeoMap {
 	}
 
 	transformRequestUrl( url, resourceType ) {
+		const tokenPlaceholder = '__JEO_MAPBOX_ACCESS_TOKEN__';
+		if ( url.includes( tokenPlaceholder ) ) {
+			url = url.split( tokenPlaceholder ).join(
+				encodeURIComponent( jeo_settings.mapbox_key || '' )
+			);
+		}
+
 		for ( const user of Object.keys( this.customTokens ) ) {
 			if ( url.includes( `${user}/` ) || url.includes( `${user}.` ) ) {
 				const accessToken = this.customTokens[ user ];
