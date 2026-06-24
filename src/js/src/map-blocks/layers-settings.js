@@ -294,12 +294,30 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 									}
 
 									const switchUseStyle = ( def ) => {
+										if ( ! def ) {
+											setLayers(
+												attributes.layers.map( ( settings ) => {
+													return settings.id === layer.id
+														? { ...settings, load_as_style: false, style_layers: [] }
+														: settings;
+												} )
+											);
+											return;
+										}
+
 										const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === layer.id);
+										if ( ! currentJeoLayerProps ) {
+											return;
+										}
+
 										const layerType = window.JeoLayerTypes.getLayerType(
 											currentJeoLayerProps.meta.type
 										);
+										if ( ! layerType?._getStyleDefinition ) {
+											return;
+										}
 
-										if(def) {
+										if ( def ) {
 											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
 												if(!response) {
 													return;
@@ -325,7 +343,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 													attributes.layers.map( ( settings ) => {
 														return settings.id === layer.id?
 															{ ...settings, load_as_style: true, style_layers: styleLayers }
-															: { ...settings, load_as_style: false, style_layers: [] }
+															: settings
 													} )
 												);
 											} );
@@ -334,7 +352,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 												attributes.layers.map( ( settings ) => {
 													return settings.id === layer.id?
 														{ ...settings, load_as_style: true, style_layers: [] }
-														: { ...settings, load_as_style: false, style_layers: [] }
+														: settings
 												} )
 											);
 										}
