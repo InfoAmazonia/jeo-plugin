@@ -8,6 +8,13 @@ import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import { useRecordsByIds } from '../shared/rest-records';
+import {
+	applyComposedVisibilityFromSettings,
+	handleEditorMapPreviewError,
+	hasMapboxStyleLayers,
+	useComposedMapPreviewStyle,
+	useEditorMapboxTransformRequest,
+} from './mapbox-style-preview';
 import './map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
@@ -43,12 +50,50 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 		[ loadedMap?.meta.layers ]
 	);
 
-	const { records: loadedLayers = [] } = useRecordsByIds( {
+	const {
+		records: loadedLayers = [],
+		isLoading: loadingLayers,
+		hasResolved: hasResolvedLayers,
+	} = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
 	} );
+	const hasMapboxLayers = hasMapboxStyleLayers( loadedLayers );
+	const composedPreview = useComposedMapPreviewStyle( {
+		enabled: hasMapboxLayers,
+		mapId: attributes.map_id,
+		refreshKey: layerSettingsKey,
+	} );
+	const useComposedPreview = Boolean(
+		hasMapboxLayers && composedPreview.style
+	);
+	const isPreparingLayerPreview = Boolean(
+		layerIds.length > 0 && ( loadingLayers || ! hasResolvedLayers )
+	);
+	const isPreparingComposedPreview = Boolean(
+		! isPreparingLayerPreview &&
+			hasMapboxLayers &&
+			! composedPreview.style &&
+			! composedPreview.error
+	);
+	const shouldRenderMap = ! isPreparingLayerPreview && ! isPreparingComposedPreview;
+	const transformRequest = useEditorMapboxTransformRequest( loadedLayers );
+
+	const applyComposedVisibility = () => {
+		if ( useComposedPreview ) {
+			applyComposedVisibilityFromSettings(
+				mapRef.current,
+				composedPreview.manifest,
+				loadedMap?.meta?.layers || []
+			);
+		}
+	};
+
+	useEffect( () => {
+		applyComposedVisibility();
+	}, [ useComposedPreview, composedPreview.manifest, layerSettingsKey ] );
 
 	return (
 		<div { ...blockProps }>
@@ -56,44 +101,51 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 			{ attributes.map_id && ! loadingMap && loadedMap && (
 				<>
 					<div className="jeo-preview-area">
-						<Map
-							key={ `${ key }:${ layerSettingsKey }` }
-							ref={ mapRef }
-							onStyleData={ () => {
-								const { current: map } = mapRef;
-								if ( map ) {
-									if ( loadedMap.meta.disable_scroll_zoom ) {
-										map.scrollZoom?.disable();
-									}
+						{ ! shouldRenderMap && <Spinner /> }
+						{ shouldRenderMap && (
+							<Map
+								key={ `${ key }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
+								ref={ mapRef }
+								mapStyle={ useComposedPreview ? composedPreview.style : undefined }
+								transformRequest={ transformRequest }
+								onError={ handleEditorMapPreviewError }
+								onStyleData={ () => {
+									const { current: map } = mapRef;
+									if ( map ) {
+										if ( loadedMap.meta.disable_scroll_zoom ) {
+											map.scrollZoom?.disable();
+										}
 
-									if ( loadedMap.meta.disable_drag_pan ) {
-										map.dragPan.disable();
-										map.touchZoomRotate?.disable();
-									}
+										if ( loadedMap.meta.disable_drag_pan ) {
+											map.dragPan.disable();
+											map.touchZoomRotate?.disable();
+										}
 
-									if ( loadedMap.meta.disable_drag_rotate ) {
-										map.dragRotate?.disable();
+										if ( loadedMap.meta.disable_drag_rotate ) {
+											map.dragRotate?.disable();
+										}
 									}
-								}
-							} }
-							style={ { height: '100%', width: '100%' } }
-							latitude={ loadedMap.meta.center_lat || mapDefaults.lat }
-							longitude={ loadedMap.meta.center_lon || mapDefaults.lng }
-							zoom={ loadedMap.meta.initial_zoom || mapDefaults.zoom }
-						>
-							{ loadedLayers &&
-								loadedMap.meta.layers.map( ( layer ) => {
-									const layerOptions = loadedLayers.find(
-										( { id } ) => id === layer.id
-									);
-									if ( layerOptions ) {
-										return renderLayer( {
-											layer: layerOptions.meta,
-											instance: layer,
-										} );
-									}
-								} ) }
-						</Map>
+									applyComposedVisibility();
+								} }
+								style={ { height: '100%', width: '100%' } }
+								latitude={ loadedMap.meta.center_lat || mapDefaults.lat }
+								longitude={ loadedMap.meta.center_lon || mapDefaults.lng }
+								zoom={ loadedMap.meta.initial_zoom || mapDefaults.zoom }
+							>
+								{ ! useComposedPreview && loadedLayers &&
+									loadedMap.meta.layers.map( ( layer ) => {
+										const layerOptions = loadedLayers.find(
+											( { id } ) => id === layer.id
+										);
+										if ( layerOptions ) {
+											return renderLayer( {
+												layer: layerOptions.meta,
+												instance: layer,
+											} );
+										}
+									} ) }
+							</Map>
+						) }
 					</div>
 					<div className="jeo-preview-controls">
 						<p>

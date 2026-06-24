@@ -1,4 +1,5 @@
 import { useBlockProps } from '@wordpress/block-editor';
+import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useDebounce } from 'use-debounce';
@@ -6,6 +7,12 @@ import { useDebounce } from 'use-debounce';
 import { Map } from '../lib/mapgl-react';
 import { MemoizedRenderLayer } from './map-preview-layer';
 import { getEditorLayerTypeSchema } from '../layers-sidebar/layer-type-definitions';
+import {
+	getMapboxStyleUrl,
+	handleEditorMapPreviewError,
+	useMapboxStylePreview,
+	useEditorMapboxTransformRequest,
+} from './mapbox-style-preview';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -30,6 +37,28 @@ export default function LayerEditorPreview() {
 	const [ renderControl, setRenderControl ] = useState( { status: 'incomplete_form' } );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
+	const mapboxStyleUrl =
+		debouncedPostMeta?.type === 'mapbox' &&
+		[ 'ready', 'loaded' ].includes( renderControl.status )
+			? getMapboxStyleUrl( debouncedPostMeta.layer_type_options )
+			: null;
+	const mapboxStylePreview = useMapboxStylePreview( mapboxStyleUrl );
+	const transformRequest = useEditorMapboxTransformRequest( [
+		{ meta: debouncedPostMeta },
+	] );
+	const shouldRenderMap =
+		debouncedPostMeta?.type !== 'mapbox' ||
+		Boolean( mapboxStylePreview.style ) ||
+		Boolean( mapboxStylePreview.error );
+
+	useEffect( () => {
+		if ( mapboxStylePreview.viewState ) {
+			setViewState( ( currentViewState ) => ( {
+				...currentViewState,
+				...mapboxStylePreview.viewState,
+			} ) );
+		}
+	}, [ mapboxStylePreview.viewState ] );
 
 	useEffect( () => {
 		if ( ! postMeta.type ) {
@@ -78,33 +107,42 @@ export default function LayerEditorPreview() {
 				onMouseDown={ stopPropagation }
 				onTouchStart={ stopPropagation }
 			>
-				<Map
-					key={ key }
-					onError={ () => {
-						setRenderControl( { status: 'request_error', statusCode: 400 } );
-					} }
-					onSourceData={ () => {
-						setRenderControl( { status: 'loaded' } );
-					} }
-					style={ { height: '500px', width: '100%' } }
-					latitude={ viewState.latitude || 0 }
-					longitude={ viewState.longitude || 0 }
-					zoom={ viewState.zoom || 0 }
-					onMove={ ( { viewState } ) => {
-						setViewState( {
-							latitude: viewState.latitude,
-							longitude: viewState.longitude,
-							zoom: Math.round( viewState.zoom * 10 ) / 10,
-						} );
-					} }
-				>
-					{ [ 'ready', 'loaded' ].includes( renderControl.status ) && (
-						<MemoizedRenderLayer
-							layer={ debouncedPostMeta }
-							instance={ { id: 1, use: 'fixed' } }
-						/>
-					) }
-				</Map>
+				{ ! shouldRenderMap && <Spinner /> }
+				{ shouldRenderMap && (
+					<Map
+						key={ `${ key }:${ mapboxStyleUrl || 'default' }` }
+						mapStyle={ mapboxStylePreview.style || undefined }
+						transformRequest={ transformRequest }
+						onError={ ( error ) => {
+							handleEditorMapPreviewError( error );
+							if ( debouncedPostMeta?.type !== 'mapbox' ) {
+								setRenderControl( { status: 'request_error', statusCode: 400 } );
+							}
+						} }
+						onSourceData={ () => {
+							setRenderControl( { status: 'loaded' } );
+						} }
+						style={ { height: '500px', width: '100%' } }
+						latitude={ viewState.latitude || 0 }
+						longitude={ viewState.longitude || 0 }
+						zoom={ viewState.zoom || 0 }
+						onMove={ ( { viewState } ) => {
+							setViewState( {
+								latitude: viewState.latitude,
+								longitude: viewState.longitude,
+								zoom: Math.round( viewState.zoom * 10 ) / 10,
+							} );
+						} }
+					>
+						{ [ 'ready', 'loaded' ].includes( renderControl.status ) &&
+							debouncedPostMeta?.type !== 'mapbox' && (
+							<MemoizedRenderLayer
+								layer={ debouncedPostMeta }
+								instance={ { id: 1, use: 'fixed' } }
+							/>
+						) }
+					</Map>
+				) }
 			</div>
 		</div>
 	);

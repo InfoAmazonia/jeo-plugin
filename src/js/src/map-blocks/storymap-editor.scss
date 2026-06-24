@@ -17,6 +17,8 @@
 			border-radius: 7px;
 			box-sizing: border-box;
 			box-shadow: 1px 3px 4px 0 rgba(0,0,0,.1);
+			contain: paint;
+			transform: translateZ(0);
 
 			.heading {
 				display: flex;
