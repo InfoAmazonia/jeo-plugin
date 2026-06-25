@@ -80,6 +80,19 @@ Legacy `cardLayout` (`grid`/`list`/`list-reverse`/`featured`) is auto-migrated t
 
 CSS classes: `.jeo-snu-is-1` through `.jeo-snu-is-4` (Gutenberg path only; Newspack uses its own `is-N` classes).
 
+## SQL Safety
+
+`get_nearby_posts()` builds the `UNION` query with `$wpdb->prepare()` placeholders for:
+- Reference point coordinates (`%f`)
+- Post type slugs (`%s`)
+- Radius in meters (`%f`)
+- Taxonomy term IDs (`%d`) and taxonomy slugs (`%s`)
+- Excluded post IDs (`%d`)
+- Max-age days (`%d`)
+- Relevance weights (`%f`)
+
+All dynamic lists use placeholder arrays rather than string interpolation, with `absint`/`sanitize_key` sanitization before preparation.
+
 ## Data Flow
 
 ```mermaid
@@ -100,7 +113,7 @@ sequenceDiagram
         alt No user coords
             REST->>REST: Fallback to JEO map center defaults
         end
-        DB-->>REST: Post IDs filtered by radius, sorted by date
+        DB-->>REST: Post IDs filtered by radius and age, sorted by selected order (default `recent`)
         REST-->>JS: {html: rendered posts}
         JS->>HTML: Replace skeleton with rendered posts
         JS->>JS: Collect data-post-id from rendered articles, add to excludeIds accumulator
@@ -140,6 +153,8 @@ Also controls the `DECIMAL(10,N)` cast precision for post coordinates in `get_ne
 | `postsPerPage` | number | 6 | Total posts to display (max 36) |
 | `postsPerRow` | number | 3 | Columns in grid layout (max 6, grid only) |
 | `radius` | number | 100 | Search radius in km (1–2000); filters posts within distance |
+| `orderBy` | string | `"recent"` | Sorting: `recent` (default), `nearest`, `relevance` |
+| `maxAgeDays` | number | 365 | Only include posts published within this many days (0 = no limit) |
 | `postLayout` | string | `"grid"` | Layout: `grid` / `list` |
 | `mediaPosition` | string | `"top"` | Media position: `top` / `left` / `right` / `behind` |
 | `imageShape` | string | `"landscape"` | Image crop: `landscape` / `portrait` / `square` / `uncropped` |

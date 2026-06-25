@@ -20,6 +20,10 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/js/src/map-blocks/minimap-display.js` | Save component — renders `<div class="jeomap">` for frontend JS |
 | `src/js/src/map-blocks/index.js` | Block registration with `conversation_id` and `conversation` attributes |
 | `src/js/src/map-blocks/minimap-config.js` | Attribute coercion helpers |
+| `src/js/src/map-blocks/layers-panel.js` | Sidebar summary of selected layers with metadata |
+| `src/js/src/map-blocks/layers-settings.js` | Modal layer library / selected layers editor |
+| `src/js/src/map-blocks/layer-settings.js` | Per-layer controls (use, default, legend, opacity) |
+| `src/js/src/map-blocks/map-preview-layer.js` | Editor preview rendering for all layer types |
 
 ## Architecture Overview
 
@@ -138,6 +142,25 @@ When a Mapbox API key is configured, `Minimap_Agent::create()` registers `Genera
 **Authorization gate:** The system prompt instructs the agent to NEVER call `generate_layer` without explicit user authorization via chat. On the initial auto-generation (from post content or prompt), the agent only uses existing layers and reports gaps in `assistant_message`. The user must explicitly confirm (e.g. "yes", "go ahead") before the agent invokes the tool.
 
 When no Mapbox key is configured, the tool is omitted entirely and the prompt includes a "Layer Limitations" section instructing the agent to suggest connecting a Mapbox key.
+
+### Layer Metadata in the Editor
+
+The layer library and selected-layer panels show friendly metadata to help editors understand why a layer was picked:
+
+- **Title + type** (existing)
+- **Excerpt / content** — `excerpt.rendered` falls back to `content.rendered`, stripped of HTML
+- **Attribution / source**
+- **Layer themes** (`layer-theme` taxonomy terms)
+
+The CPT `map-layer` registers `'excerpt'` in `supports` so editors can write a dedicated short description.
+
+### Per-Layer Opacity
+
+Each selected layer has an opacity slider in `layer-settings.js`. The value is persisted as `layers[i].opacity` (number 0–1) and applied in both the editor preview (`map-preview-layer.js`) and the frontend layer type handlers (`src/includes/layer-types/*.js`).
+
+### Manual Search Disambiguation
+
+The layer library search results display type, source, themes, and excerpt so editors can distinguish similarly named layers (e.g. multiple "river" layers).
 
 ### Default Style from Generated Layers
 

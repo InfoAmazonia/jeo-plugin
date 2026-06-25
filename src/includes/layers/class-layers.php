@@ -69,7 +69,7 @@ class Layers {
 			'labels'              => $labels,
 			'hierarchical'        => false,
 			'description'         => __( 'JEO Layers', 'jeowp' ),
-			'supports'            => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
+			'supports'            => array( 'title', 'editor', 'excerpt', 'page-attributes', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'layers' ),
 			'show_in_rest'        => true,
 			'public'              => true,

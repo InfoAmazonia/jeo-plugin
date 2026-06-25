@@ -170,6 +170,7 @@ registerBlockType( 'jeo/ai-minimap', {
 					default: { type: 'boolean' },
 					show_legend: { type: 'boolean' },
 					load_as_style: { type: 'boolean' },
+					opacity: { type: 'number' },
 				},
 			},
 		},
@@ -586,7 +587,7 @@ registerBlockType( 'jeo/stories-near-you', {
 		},
 		maxAgeDays: {
 			type: 'number',
-			default: 0,
+			default: 365,
 		},
 		distanceWeight: {
 			type: 'number',

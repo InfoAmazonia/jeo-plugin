@@ -41,6 +41,7 @@ export const minimapAttributes = {
 				default: { type: 'boolean' },
 				show_legend: { type: 'boolean' },
 				load_as_style: { type: 'boolean' },
+				opacity: { type: 'number' },
 			},
 		},
 	},

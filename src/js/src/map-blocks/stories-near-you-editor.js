@@ -247,7 +247,7 @@ export default function StoriesNearYouEditor( { attributes, setAttributes } ) {
 					/>
 					<SelectControl
 						label={ __( 'Order by', 'jeowp' ) }
-						value={ orderBy || 'relevance' }
+						value={ orderBy || 'recent' }
 						options={ [
 							{ label: __( 'Most recent nearby', 'jeowp' ), value: 'recent' },
 							{ label: __( 'Nearest first', 'jeowp' ), value: 'nearest' },

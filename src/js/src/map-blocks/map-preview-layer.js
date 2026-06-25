@@ -34,12 +34,38 @@ export function renderLayer( { layer, instance } ) {
 		return inst.style || {};
 	};
 
+	const applyOpacity = ( style, opacity ) => {
+		if ( typeof opacity !== 'number' || opacity >= 1 ) {
+			return style;
+		}
+
+		const paint = style.paint ? { ...style.paint } : {};
+		const opacity_props = [
+			'fill-opacity',
+			'line-opacity',
+			'circle-opacity',
+			'symbol-opacity',
+			'raster-opacity',
+			'heatmap-opacity',
+			'fill-extrusion-opacity',
+		];
+
+		opacity_props.forEach( ( prop ) => {
+			if ( typeof paint[ prop ] === 'number' ) {
+				paint[ prop ] = paint[ prop ] * opacity;
+			}
+		} );
+
+		return { ...style, paint };
+	};
+
 	switch ( layer.type ) {
 		case 'mapbox': {
 			const accessToken = options.access_token || mapboxToken;
 
 			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
 			const styleUrl = `https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`
+			const opacity = typeof instance.opacity === 'number' ? instance.opacity : 1;
 
 			return (
 				<Source
@@ -49,7 +75,7 @@ export function renderLayer( { layer, instance } ) {
 					tiles={ [ styleUrl ] }
 					attribution={ MAPBOX_RASTER_ATTRIBUTION }
 				>
-					<Layer id={ layerId } type="raster" />
+					<Layer id={ layerId } type="raster" paint={ { 'raster-opacity': opacity } } />
 				</Source>
 			);
 		}
@@ -57,10 +83,11 @@ export function renderLayer( { layer, instance } ) {
 		case 'mapbox-tileset-raster': {
 			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
+			const opacity = typeof instance.opacity === 'number' ? instance.opacity : 1;
 
 			return (
 				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
-					<Layer id={ layerId } type={ options.type } />
+					<Layer id={ layerId } type={ options.type } paint={ { 'raster-opacity': opacity } } />
 				</Source>
 			);
 		}
@@ -68,7 +95,7 @@ export function renderLayer( { layer, instance } ) {
 		case 'mapbox-tileset-vector': {
 			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' ) ? tilesetId : `mapbox://${ tilesetId }`;
-			const effectiveStyle = resolveStyle( instance, layer );
+			const effectiveStyle = applyOpacity( resolveStyle( instance, layer ), instance.opacity );
 
 			return (
 				<Source key={ tilesetUrl } id={ sourceId } type={ options.style_source_type } url={ tilesetUrl }>
@@ -78,7 +105,7 @@ export function renderLayer( { layer, instance } ) {
 		}
 
 		case 'mvt': {
-			const effectiveStyle = resolveStyle( instance, layer );
+			const effectiveStyle = applyOpacity( resolveStyle( instance, layer ), instance.opacity );
 
 			return (
 				<Source key={ options.url } id={ sourceId } type={ options.style_source_type } tiles={ [ options.url ] }>
@@ -88,9 +115,10 @@ export function renderLayer( { layer, instance } ) {
 		}
 
 		case 'tilelayer': {
+			const opacity = typeof instance.opacity === 'number' ? instance.opacity : 1;
 			return (
 				<Source id={ sourceId } type="raster" tiles={ [ resolveTileUrl( options.url ) ] } tileSize={ 256 } scheme={ options.scheme || 'xyz' }>
-					<Layer id={ layerId } type="raster" />
+					<Layer id={ layerId } type="raster" paint={ { 'raster-opacity': opacity } } />
 				</Source>
 			);
 		}

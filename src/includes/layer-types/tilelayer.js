@@ -26,6 +26,7 @@
 	},
 
 	addLayer( map, attributes, addLayerParams = null ) {
+		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
 		const layer = {
 			id: attributes.layer_id,
 			source: {
@@ -37,6 +38,9 @@
 			type: 'raster',
 			layout: {
 				visibility: attributes.visible ? 'visible' : 'none',
+			},
+			paint: {
+				'raster-opacity': opacity,
 			},
 		};
 

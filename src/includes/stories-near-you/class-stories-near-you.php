@@ -200,11 +200,11 @@ class Stories_Near_You {
 					),
 					'orderBy'            => array(
 						'type'    => 'string',
-						'default' => 'relevance',
+						'default' => 'recent',
 					),
 					'maxAgeDays'         => array(
 						'type'    => 'number',
-						'default' => 0,
+						'default' => 365,
 					),
 					'distanceWeight'     => array(
 						'type'    => 'number',
@@ -261,8 +261,8 @@ class Stories_Near_You {
 				'imageSize'          => 'medium_large',
 				'imageAsLink'        => false,
 				'radius'             => 100,
-				'orderBy'            => 'relevance',
-				'maxAgeDays'         => 0,
+				'orderBy'            => 'recent',
+				'maxAgeDays'         => 365,
 				'distanceWeight'     => 1,
 				'dateWeight'         => 1,
 			)
@@ -450,8 +450,8 @@ class Stories_Near_You {
 		$filters['tags']                = $this->parse_id_list( $atts['tags'] );
 		$filters['category_exclusions'] = $this->parse_id_list( $atts['categoryExclusions'] );
 		$filters['tag_exclusions']      = $this->parse_id_list( $atts['tagExclusions'] );
-		$filters['order_by']            = ! empty( $atts['orderBy'] ) ? $atts['orderBy'] : 'relevance';
-		$filters['max_age_days']        = ! empty( $atts['maxAgeDays'] ) ? (int) $atts['maxAgeDays'] : 0;
+		$filters['order_by']            = ! empty( $atts['orderBy'] ) ? $atts['orderBy'] : 'recent';
+		$filters['max_age_days']        = ! empty( $atts['maxAgeDays'] ) ? (int) $atts['maxAgeDays'] : 365;
 		$filters['distance_weight']     = isset( $atts['distanceWeight'] ) ? (float) $atts['distanceWeight'] : 1;
 		$filters['date_weight']         = isset( $atts['dateWeight'] ) ? (float) $atts['dateWeight'] : 1;
 
@@ -630,12 +630,12 @@ class Stories_Near_You {
 					),
 					'orderBy'            => array(
 						'type'    => 'string',
-						'default' => 'relevance',
+						'default' => 'recent',
 						'enum'    => self::ORDER_BY,
 					),
 					'maxAgeDays'         => array(
 						'type'    => 'integer',
-						'default' => 0,
+						'default' => 365,
 						'minimum' => 0,
 						'maximum' => self::MAX_AGE_DAYS,
 					),
@@ -903,21 +903,26 @@ class Stories_Near_You {
 			}
 		}
 
-		$taxonomy_join  = '';
-		$taxonomy_where = '';
+		$taxonomy_join   = '';
+		$taxonomy_where  = '';
+		$taxonomy_params = array();
 
 		if ( ! empty( $filters['categories'] ) ) {
-			$cat_ids         = implode( ',', array_map( 'absint', $filters['categories'] ) );
-			$taxonomy_join  .= " INNER JOIN {$wpdb->term_relationships} tr_cat ON p.ID = tr_cat.object_id";
-			$taxonomy_join  .= " INNER JOIN {$wpdb->term_taxonomy} tt_cat ON tr_cat.term_taxonomy_id = tt_cat.term_taxonomy_id";
-			$taxonomy_where .= " AND tt_cat.taxonomy = 'category' AND tt_cat.term_id IN ({$cat_ids})";
+			$cat_ids          = array_map( 'absint', $filters['categories'] );
+			$cat_placeholders = implode( ',', array_fill( 0, count( $cat_ids ), '%d' ) );
+			$taxonomy_join   .= " INNER JOIN {$wpdb->term_relationships} tr_cat ON p.ID = tr_cat.object_id";
+			$taxonomy_join   .= " INNER JOIN {$wpdb->term_taxonomy} tt_cat ON tr_cat.term_taxonomy_id = tt_cat.term_taxonomy_id";
+			$taxonomy_where  .= " AND tt_cat.taxonomy = 'category' AND tt_cat.term_id IN ({$cat_placeholders})";
+			$taxonomy_params  = array_merge( $taxonomy_params, $cat_ids );
 		}
 
 		if ( ! empty( $filters['tags'] ) ) {
-			$tag_ids         = implode( ',', array_map( 'absint', $filters['tags'] ) );
-			$taxonomy_join  .= " INNER JOIN {$wpdb->term_relationships} tr_tag ON p.ID = tr_tag.object_id";
-			$taxonomy_join  .= " INNER JOIN {$wpdb->term_taxonomy} tt_tag ON tr_tag.term_taxonomy_id = tt_tag.term_taxonomy_id";
-			$taxonomy_where .= " AND tt_tag.taxonomy = 'post_tag' AND tt_tag.term_id IN ({$tag_ids})";
+			$tag_ids          = array_map( 'absint', $filters['tags'] );
+			$tag_placeholders = implode( ',', array_fill( 0, count( $tag_ids ), '%d' ) );
+			$taxonomy_join   .= " INNER JOIN {$wpdb->term_relationships} tr_tag ON p.ID = tr_tag.object_id";
+			$taxonomy_join   .= " INNER JOIN {$wpdb->term_taxonomy} tt_tag ON tr_tag.term_taxonomy_id = tt_tag.term_taxonomy_id";
+			$taxonomy_where  .= " AND tt_tag.taxonomy = 'post_tag' AND tt_tag.term_id IN ({$tag_placeholders})";
+			$taxonomy_params  = array_merge( $taxonomy_params, $tag_ids );
 		}
 
 		$tx_idx = 0;
@@ -926,49 +931,66 @@ class Stories_Near_You {
 				if ( empty( $tax['slug'] ) || empty( $tax['terms'] ) ) {
 					continue;
 				}
-				$idx      = ++$tx_idx;
-				$tr_alias = "tr_ctx{$idx}";
-				$tt_alias = "tt_ctx{$idx}";
-				$slug     = sanitize_key( $tax['slug'] );
-				$terms    = implode( ',', array_map( 'absint', $tax['terms'] ) );
+				$idx               = ++$tx_idx;
+				$tr_alias          = "tr_ctx{$idx}";
+				$tt_alias          = "tt_ctx{$idx}";
+				$slug              = sanitize_key( $tax['slug'] );
+				$term_ids          = array_map( 'absint', $tax['terms'] );
+				$term_placeholders = implode( ',', array_fill( 0, count( $term_ids ), '%d' ) );
 
-				$taxonomy_join  .= " INNER JOIN {$wpdb->term_relationships} {$tr_alias} ON p.ID = {$tr_alias}.object_id";
-				$taxonomy_join  .= " INNER JOIN {$wpdb->term_taxonomy} {$tt_alias} ON {$tr_alias}.term_taxonomy_id = {$tt_alias}.term_taxonomy_id";
-				$taxonomy_where .= " AND {$tt_alias}.taxonomy = '{$slug}' AND {$tt_alias}.term_id IN ({$terms})";
+				$taxonomy_join    .= " INNER JOIN {$wpdb->term_relationships} {$tr_alias} ON p.ID = {$tr_alias}.object_id";
+				$taxonomy_join    .= " INNER JOIN {$wpdb->term_taxonomy} {$tt_alias} ON {$tr_alias}.term_taxonomy_id = {$tt_alias}.term_taxonomy_id";
+				$taxonomy_where   .= " AND {$tt_alias}.taxonomy = %s AND {$tt_alias}.term_id IN ({$term_placeholders})";
+				$taxonomy_params[] = $slug;
+				$taxonomy_params   = array_merge( $taxonomy_params, $term_ids );
 			}
 		}
 
 		$exclude_clause = '';
+		$exclude_params = array();
+
 		if ( ! empty( $exclude_ids ) ) {
-			$exclude_list   = implode( ',', array_map( 'absint', $exclude_ids ) );
-			$exclude_clause = " AND p.ID NOT IN ({$exclude_list})";
+			$exclude_ids_clean    = array_map( 'absint', $exclude_ids );
+			$exclude_placeholders = implode( ',', array_fill( 0, count( $exclude_ids_clean ), '%d' ) );
+			$exclude_clause       = " AND p.ID NOT IN ({$exclude_placeholders})";
+			$exclude_params       = array_merge( $exclude_params, $exclude_ids_clean );
 		}
 
 		if ( ! empty( $filters['category_exclusions'] ) ) {
-			$exc_ids         = implode( ',', array_map( 'absint', $filters['category_exclusions'] ) );
-			$exclude_clause .= " AND p.ID NOT IN ( SELECT tr_exc.object_id FROM {$wpdb->term_relationships} tr_exc INNER JOIN {$wpdb->term_taxonomy} tt_exc ON tr_exc.term_taxonomy_id = tt_exc.term_taxonomy_id WHERE tt_exc.taxonomy = 'category' AND tt_exc.term_id IN ({$exc_ids}) )";
+			$exc_ids          = array_map( 'absint', $filters['category_exclusions'] );
+			$exc_placeholders = implode( ',', array_fill( 0, count( $exc_ids ), '%d' ) );
+			$exclude_clause  .= " AND p.ID NOT IN ( SELECT tr_exc.object_id FROM {$wpdb->term_relationships} tr_exc INNER JOIN {$wpdb->term_taxonomy} tt_exc ON tr_exc.term_taxonomy_id = tt_exc.term_taxonomy_id WHERE tt_exc.taxonomy = 'category' AND tt_exc.term_id IN ({$exc_placeholders}) )";
+			$exclude_params   = array_merge( $exclude_params, $exc_ids );
 		}
 
 		if ( ! empty( $filters['tag_exclusions'] ) ) {
-			$exc_ids         = implode( ',', array_map( 'absint', $filters['tag_exclusions'] ) );
-			$exclude_clause .= " AND p.ID NOT IN ( SELECT tr_exc.object_id FROM {$wpdb->term_relationships} tr_exc INNER JOIN {$wpdb->term_taxonomy} tt_exc ON tr_exc.term_taxonomy_id = tt_exc.term_taxonomy_id WHERE tt_exc.taxonomy = 'post_tag' AND tt_exc.term_id IN ({$exc_ids}) )";
+			$exc_ids          = array_map( 'absint', $filters['tag_exclusions'] );
+			$exc_placeholders = implode( ',', array_fill( 0, count( $exc_ids ), '%d' ) );
+			$exclude_clause  .= " AND p.ID NOT IN ( SELECT tr_exc.object_id FROM {$wpdb->term_relationships} tr_exc INNER JOIN {$wpdb->term_taxonomy} tt_exc ON tr_exc.term_taxonomy_id = tt_exc.term_taxonomy_id WHERE tt_exc.taxonomy = 'post_tag' AND tt_exc.term_id IN ({$exc_placeholders}) )";
+			$exclude_params   = array_merge( $exclude_params, $exc_ids );
 		}
 
 		$radius_meters = (float) $radius * 1000;
 
 		$date_clause = '';
+		$date_params = array();
 		if ( ! empty( $filters['max_age_days'] ) ) {
-			$date_clause = ' AND p.post_date >= DATE_SUB(NOW(), INTERVAL %d DAY)';
+			$date_clause   = ' AND p.post_date >= DATE_SUB(NOW(), INTERVAL %d DAY)';
+			$date_params[] = max( 1, (int) $filters['max_age_days'] );
 		}
 
 		$order_by     = ! empty( $filters['order_by'] ) && in_array( $filters['order_by'], self::ORDER_BY, true ) ? $filters['order_by'] : 'recent';
 		$order_by_sql = 'post_date DESC';
+		$order_params = array();
 		if ( 'nearest' === $order_by ) {
 			$order_by_sql = 'distance ASC';
 		} elseif ( 'relevance' === $order_by ) {
 			$distance_weight = ! empty( $filters['distance_weight'] ) ? (float) $filters['distance_weight'] : 1;
 			$date_weight     = ! empty( $filters['date_weight'] ) ? (float) $filters['date_weight'] : 1;
-			$order_by_sql    = "( (distance / {$radius_meters}) * {$distance_weight} ) + ( (DATEDIFF(NOW(), p.post_date) / 365) * {$date_weight} ) ASC";
+			$order_by_sql    = '( (distance / %f) * %f ) + ( (DATEDIFF(NOW(), p.post_date) / 365) * %f ) ASC';
+			$order_params[]  = $radius_meters;
+			$order_params[]  = $distance_weight;
+			$order_params[]  = $date_weight;
 		}
 
 		// Discard rows with invalid or sentinel coordinates (out of range, or the
@@ -1015,12 +1037,22 @@ class Stories_Near_You {
 		);
 
 		$union_sql  = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY ' . $order_by_sql . ' LIMIT %d';
-		$all_params = array_merge( array( $lng, $lat ), $types, array( $radius_meters ), array( $lng, $lat ), $types, array( $radius_meters ), array( $limit ) );
-
-		if ( ! empty( $filters['max_age_days'] ) ) {
-			$max_age_days = max( 1, (int) $filters['max_age_days'] );
-			$all_params   = array_merge( array( $max_age_days ), $all_params, array( $max_age_days ) );
-		}
+		$all_params = array_merge(
+			$date_params,
+			array( $lng, $lat ),
+			$types,
+			array( $radius_meters ),
+			$taxonomy_params,
+			$exclude_params,
+			$date_params,
+			array( $lng, $lat ),
+			$types,
+			array( $radius_meters ),
+			$taxonomy_params,
+			$exclude_params,
+			$order_params,
+			array( $limit )
+		);
 
 		$prepared_sql = $wpdb->prepare( $union_sql, $all_params ); // phpcs:ignore WordPress.DB.PreparedSQL
 		$results      = $wpdb->get_results( $prepared_sql ); // phpcs:ignore WordPress.DB.PreparedSQL

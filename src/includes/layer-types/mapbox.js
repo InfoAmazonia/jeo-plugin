@@ -35,12 +35,16 @@
 			} );
 		}
 
+		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
 		const layer = {
 			id: layerId,
 			source: layerId,
 			type: 'raster',
 			layout: {
 				visibility: attributes.visible ? 'visible' : 'none',
+			},
+			paint: {
+				'raster-opacity': opacity,
 			},
 		};
 

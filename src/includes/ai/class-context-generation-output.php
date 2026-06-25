@@ -27,7 +27,7 @@ class Context_Generation_Output {
 	 * @var array
 	 */
 	#[SchemaProperty(
-		description: 'Array of suggested paragraphs to insert into the article. Each entry must have: text (string, the full paragraph content), relevance_score (int 0–100, how relevant the paragraph is to the post topic). The text may contain basic inline HTML for formatting and links: <strong>, <em>, <a href="...">. Use <a href="URL">anchor text</a> when citing referenced articles. The anchor MUST be the specific phrase, name, fact, or number the reference supports — never the full article title.',
+		description: 'Array of suggested paragraphs to insert into the article. Each entry must have: text (string, the full paragraph content), relevance_score (int 0–100, how relevant the paragraph is to the post topic). The text may contain basic inline HTML for formatting and links: <strong>, <em>, <a href="...">. Use <a href="URL">anchor text</a> when citing referenced articles. The anchor MUST be the specific phrase, name, fact, or number the reference supports — never the full article title. The anchor text MUST be verifiable in the referenced article (title, excerpt, or content). Do not combine facts from multiple references into a single claim.',
 		required: true,
 	)]
 	public array $paragraphs = array();

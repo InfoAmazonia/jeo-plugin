@@ -37,6 +37,7 @@ const LayerListItem = memo(
 		handleUpdateUse,
 		handleUpdateStyle,
 		handleUpdateStyleLayers,
+		handleUpdateOpacity,
 	} ) => {
 		const loadedLayer = useMemo( () => loadLayer( loadedLayers, layer ), [
 			loadedLayers,
@@ -75,6 +76,10 @@ const LayerListItem = memo(
 			handleUpdateStyleLayers,
 			layer.id,
 		] );
+		const updateOpacity = useCallback( ( opacity ) => handleUpdateOpacity( layer.id, opacity ), [
+			handleUpdateOpacity,
+			layer.id,
+		] );
 
 		if ( ! loadedLayer.layer ) {
 			return null;
@@ -97,6 +102,7 @@ const LayerListItem = memo(
 				updateStyle={ updateStyle }
 				widths={ widths }
 				updateStyleLayers={ updateStyleLayers }
+				handleUpdateOpacity={ updateOpacity }
 			/>
 		);
 	}
@@ -365,6 +371,17 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		[ setLayers ]
 	);
 
+	const handleUpdateOpacity = useCallback(
+		( id, opacity ) => {
+			setLayers(
+				attributesRef.current.layers.map( ( settings ) =>
+					settings.id === id ? { ...settings, opacity } : settings
+				)
+			);
+		},
+		[ setLayers ]
+	);
+
 	const renderLayerListItem = useCallback(
 		( { value: layer, props, isDragged, isSelected, isOutOfBounds, index } ) => {
 			return (
@@ -386,6 +403,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 					handleUpdateUse={ handleUpdateUse }
 					handleUpdateStyle={ handleUpdateStyle }
 					handleUpdateStyleLayers={ handleUpdateStyleLayers }
+					handleUpdateOpacity={ handleUpdateOpacity }
 				/>
 			);
 		},
@@ -400,6 +418,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 			handleUpdateUse,
 			handleUpdateStyle,
 			handleUpdateStyleLayers,
+			handleUpdateOpacity,
 		]
 	);
 
@@ -493,6 +512,25 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 													<strong className="layer-title">{ decodeHtmlEntity( layer.title.rendered ) }</strong> | { layer.meta.type }
 												</a>
 											</p>
+											{ ( layer.excerpt?.rendered || layer.content?.rendered ) && (
+												<p className="layer-description">
+													{ decodeHtmlEntity( ( layer.excerpt?.rendered || layer.content?.rendered ).replace( /<[^>]+>/g, '' ) ) }
+												</p>
+											) }
+											{ ( layer.meta.attribution || layer['layer-theme']?.length > 0 ) && (
+												<p className="layer-meta">
+													{ layer.meta.attribution && (
+														<span className="layer-source">
+															<strong>{ __( 'Source:', 'jeowp' ) }</strong> { layer.meta.attribution }
+														</span>
+													) }
+													{ layer['layer-theme']?.length > 0 && (
+														<span className="layer-themes">
+															<strong>{ __( 'Themes:', 'jeowp' ) }</strong> { layer['layer-theme'].map( ( t ) => t.name ).join( ', ' ) }
+														</span>
+													) }
+												</p>
+											) }
 											<div className="layer-buttons">
 												{ ! inUse && (
 													<p

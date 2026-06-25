@@ -48,7 +48,21 @@
 
 		if ( effectiveStyle.paint ) {
 			layer.paint = { ...effectiveStyle.paint };
-		} else {
+		}
+
+		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
+		if ( opacity < 1 ) {
+			const opacityProps = [ 'fill-opacity', 'line-opacity', 'circle-opacity', 'symbol-opacity', 'heatmap-opacity', 'fill-extrusion-opacity' ];
+			const paint = layer.paint || {};
+			opacityProps.forEach( ( prop ) => {
+				if ( typeof paint[ prop ] === 'number' ) {
+					paint[ prop ] = paint[ prop ] * opacity;
+				}
+			} );
+			layer.paint = paint;
+		}
+
+		if ( ! layer.paint ) {
 			// No saved/AI style: apply a visible fallback so catalog layers picked
 			// by the Minimap don't render invisibly (see JeoLayerTypes.getFallbackPaint).
 			const fallbackPaint = window.JeoLayerTypes?.getFallbackPaint?.(

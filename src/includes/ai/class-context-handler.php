@@ -273,6 +273,7 @@ class Context_Handler {
 			);
 
 			$response                      = $result->to_rest_response();
+			$response                      = $this->validate_generated_output( $response );
 			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
 			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
 
@@ -388,6 +389,7 @@ class Context_Handler {
 			);
 
 			$response                      = $result->to_rest_response();
+			$response                      = $this->validate_generated_output( $response );
 			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
 			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
 
@@ -585,6 +587,97 @@ class Context_Handler {
 				),
 			)
 		);
+	}
+
+	/**
+	 * Verify that every contextual link in generated paragraphs points to a known
+	 * reference and that the anchor text is present in the referenced article.
+	 *
+	 * Links that fail validation are converted to plain text and a note is appended
+	 * to `assistant_message`. This reduces hallucinated citations and references
+	 * that do not actually support the linked phrase.
+	 *
+	 * @param array $response Raw response from the agent.
+	 * @return array Validated response.
+	 */
+	private function validate_generated_output( array $response ): array {
+		$paragraphs = $response['paragraphs'] ?? array();
+		$references = $response['references'] ?? array();
+		if ( empty( $paragraphs ) || empty( $references ) ) {
+			return $response;
+		}
+
+		$refs_by_url = array();
+		foreach ( $references as $ref ) {
+			$url = $ref['url'] ?? '';
+			if ( $url ) {
+				$refs_by_url[ $url ] = $ref;
+			}
+		}
+
+		$warnings = array();
+
+		foreach ( $paragraphs as $idx => $paragraph ) {
+			$text = $paragraph['text'] ?? '';
+			if ( empty( $text ) ) {
+				continue;
+			}
+
+			$new_text = preg_replace_callback(
+				'/<a\s+href=["\']([^"\']+)["\']\s*>(.*?)<\/a>/i',
+				function ( $matches ) use ( $refs_by_url, &$warnings ) {
+					$url    = $matches[1];
+					$anchor = wp_strip_all_tags( $matches[2] );
+
+					if ( ! isset( $refs_by_url[ $url ] ) ) {
+						$warnings[] = sprintf(
+							/* translators: %s: linked URL */
+							__( 'Link to %s removed: not listed in references.', 'jeowp' ),
+							esc_url( $url )
+						);
+						return $anchor;
+					}
+
+					$ref      = $refs_by_url[ $url ];
+					$ref_post = get_post( $ref['post_id'] ?? 0 );
+
+					if ( $ref_post ) {
+						$haystack = $ref_post->post_title . ' ' . $ref_post->post_excerpt . ' ' . wp_strip_all_tags( $ref_post->post_content );
+					} else {
+						$haystack = ( $ref['title'] ?? '' ) . ' ' . ( $ref['reason'] ?? '' );
+					}
+
+					$haystack_lower = mb_strtolower( $haystack );
+					$needle_lower   = mb_strtolower( $anchor );
+
+					// Strip punctuation for a tolerant match.
+					$needle_clean   = preg_replace( '/[^\p{L}\p{N}\s]/u', '', $needle_lower );
+					$haystack_clean = preg_replace( '/[^\p{L}\p{N}\s]/u', '', $haystack_lower );
+
+					if ( empty( $needle_clean ) || false === strpos( $haystack_clean, $needle_clean ) ) {
+						$warnings[] = sprintf(
+							/* translators: %s: link anchor text */
+							__( 'Link to "%s" removed: anchor not found in reference.', 'jeowp' ),
+							$anchor
+						);
+						return $anchor;
+					}
+
+					return $matches[0];
+				},
+				$text
+			);
+
+			if ( $new_text !== $text ) {
+				$response['paragraphs'][ $idx ]['text'] = $new_text;
+			}
+		}
+
+		if ( ! empty( $warnings ) && ! empty( $response['assistant_message'] ) ) {
+			$response['assistant_message'] .= "\n\n" . __( 'Verification notes:', 'jeowp' ) . "\n" . implode( "\n", array_unique( $warnings ) );
+		}
+
+		return $response;
 	}
 
 	/**

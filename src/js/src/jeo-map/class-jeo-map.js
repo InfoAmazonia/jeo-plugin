@@ -910,6 +910,7 @@ export default class JeoMap {
 											source_url: layerObject.meta.source_url,
 											style: layersDefinitions[ i ].style,
 											default_style: layerObject.meta.default_style,
+		opacity: layersDefinitions[ i ].opacity,
 										} )
 									);
 

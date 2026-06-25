@@ -6,6 +6,7 @@ import { isEqual } from 'lodash-es';
 import { decodeHtmlEntity } from '../shared/html';
 import LayerStyleEditor, { isStyleableLayerType } from '../shared/layer-style-editor';
 import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
+import { RangeControl } from '@wordpress/components';
 
 import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';
@@ -34,6 +35,7 @@ const LayerSettings = (
 		switchDefault,
 		updateUse,
 		updateStyle,
+		handleUpdateOpacity,
 		widths,
 	}
 ) => {
@@ -133,7 +135,17 @@ const LayerSettings = (
 							/>
 						) }
 					</div>
-					<div className="layer-actions" style={ setWidth( 6 ) }>
+					<div className="opacity-control" style={ setWidth( 6 ) }>
+						<RangeControl
+							label={ __( 'Opacity', 'jeowp' ) }
+							value={ typeof settings.opacity === 'number' ? settings.opacity : 1 }
+							onChange={ handleUpdateOpacity }
+							min={ 0 }
+							max={ 1 }
+							step={ 0.05 }
+						/>
+					</div>
+					<div className="layer-actions" style={ setWidth( 7 ) }>
 						{ updateStyle && settings.layer && isStyleableLayerType( settings.layer.meta?.layer_type_options?.type ) && (
 							<button
 								onClick={ () => setShowStyleModal( true ) }

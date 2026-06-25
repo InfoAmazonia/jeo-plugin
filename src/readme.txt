@@ -1,5 +1,6 @@
 === JEO Maps ===
 Contributors: infoamazonia
+Tags: maps, geolocation, gutenberg, storymap, map, geocoding, journalism, interactive-maps, blocks, openstreetmap, news, maplibre
 Tested up to: 7.0
 Stable tag: 3.6.5
 Requires PHP: 8.2

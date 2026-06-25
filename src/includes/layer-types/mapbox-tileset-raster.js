@@ -42,12 +42,16 @@
 			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
 		} );
 
+		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
 		const layer = {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
 			layout: {
 				visibility: attributes.visible ? 'visible' : 'none',
+			},
+			paint: {
+				'raster-opacity': opacity,
 			},
 		};
 

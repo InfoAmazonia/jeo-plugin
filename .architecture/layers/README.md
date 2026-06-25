@@ -21,6 +21,7 @@
 | `type` | string | Layer type (mapbox, tilelayer, mvt, etc.) |
 | `attribution` | string | Attribution text |
 | `source_url` | string | Source URL |
+| `excerpt` | string | Short description shown in layer selectors (CPT supports `excerpt`) |
 | `layer_type_options` | object | Type-specific options |
 | `legend_type` | string | Legend type |
 | `legend_type_options` | object | Legend options |
@@ -121,6 +122,25 @@ graph LR
     D -->|No| F{mvt/tileset?}
     F -->|Yes| G[Source: vector + layer type styling]
 ```
+
+## Per-Instance Layer Opacity
+
+Every layer instance in a map (including raster types) supports an `opacity` property in `[0, 1]`. It is stored per map/block instance, not on the layer CPT, so the same layer can have different opacity in different maps.
+
+| File | Role |
+|------|------|
+| `src/js/src/map-blocks/layer-settings.js` | Opacity `RangeControl` per selected layer |
+| `src/js/src/map-blocks/layers-settings.js` | `handleUpdateOpacity` callback wired to `layers[i].opacity` |
+| `src/js/src/map-blocks/minimap-config.js` / `src/js/src/map-blocks/index.js` | `opacity` property in layer instance schema |
+| `src/js/src/map-blocks/map-preview-layer.js` | Applies opacity to vector paints and raster layers in the editor preview |
+| `src/includes/layer-types/*.js` | Applies opacity on frontend `map.addLayer()` |
+| `src/js/src/jeo-map/class-jeo-map.js` | Forwards `opacity` from `layersDefinitions` to `JeoLayer` attributes |
+
+### Opacity Application Rules
+
+- **Vector layers** (`mvt`, `mapbox-tileset-vector`): opacity multiplies existing paint opacity properties (`fill-opacity`, `line-opacity`, `circle-opacity`, `symbol-opacity`, `heatmap-opacity`, `fill-extrusion-opacity`). If no paint exists, opacity has no visible effect unless a fallback paint is applied.
+- **Raster layers** (`mapbox`, `mapbox-tileset-raster`, `tilelayer`): sets `raster-opacity` paint property.
+- Default opacity is `1` (fully opaque). Existing maps without `opacity` retain previous behavior.
 
 ## Per-Instance Vector Layer Styling
 

@@ -24,6 +24,7 @@ The AI Context Assistant is a Gutenberg sidebar plugin that suggests new paragra
 | `src/js/src/context-sidebar/suggested-paragraphs.js` | Renders suggested paragraphs with inline HTML support. "Insert" creates `core/paragraph` block; "Copy" uses triple-fallback rich-text clipboard |
 | `src/includes/ai/class-neuron-agent.php` | Base `Neuron_Agent` extending `NeuronAI\Agent\Agent`; reused by the prompt engineering assistant |
 | `src/js/src/context-sidebar/context-sidebar.css` | Styles for panel, chat, suggestions, modal |
+| `src/includes/ai/class-context-validator.php` | Post-generation link/reference validation *(planned)* |
 
 ## Architecture Overview
 
@@ -167,7 +168,7 @@ The system prompt is loaded via `Context_Agent::system_prompt()`:
 
 1. **Custom prompt** — If `ai_use_context_custom_prompt` is enabled and `ai_context_prompt` is non-empty, uses it as the base. The stored value may be either a legacy plain-text prompt or a structured-output JSON object such as `{"prompt": "..."}`. Always route the stored value through `Context_Agent::extract_prompt_text()` before using it as a system prompt; this keeps the runtime unaffected even if the storage format changes later.
 2. **Default prompt** — Otherwise, uses `Context_Agent::default_system_prompt()` which defines the editorial assistant role, workflow, tool usage rules, output schema, editorial guidelines, off-topic handling, and tool error handling. The default prompt always appends `Context_Agent::critical_prompt_rules()`.
-3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding, references array, and language. They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant.
+3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding, references array, and language. They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant. Additional rules forbid combining facts from multiple references into a single unattributed claim and require retracting terms/facts that the user marks as unsupported.
 4. **User Preferences** — Appends `## User Preferences` section from `WP_User_Memory_Storage` (if any preferences exist).
 5. **Additional Context** — Appends `## Additional Context` section with post metadata and locale from the caller.
 
@@ -196,6 +197,17 @@ The `post_analyzer` sub-agent uses `Get_Post_Content_Tool` to read the post and 
 | `references` | `array` | Related articles from the knowledge base. Each has `post_id` (int), `title` (string), `url` (string), `reason` (string) |
 | `message` | `string` | Cumulative summary shown as UI notice. Plain text — no HTML |
 | `assistant_message` | `string` | Chat message shown in the panel. Plain text — no HTML |
+
+## Post-Generation Validation
+
+`Context_Handler::validate_generated_output()` runs after every AI response in `api_setup()` and `api_chat()`:
+
+1. Extracts all `<a href="URL">anchor</a>` tags from paragraph texts.
+2. Verifies the URL exists in the `references` array.
+3. Verifies the anchor text appears in the referenced article (title, excerpt, or content) using a tolerant lowercase/punctuation-stripped match.
+4. Links that fail validation are converted to plain text; a note is appended to `assistant_message`.
+
+This reduces hallucinated citations and links whose anchor is not supported by the referenced article.
 
 ## Dual Conversation Storage
 
