@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-23T18:50:15+00:00\n"
+"POT-Creation-Date: 2026-06-25T13:36:26+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -1845,7 +1845,7 @@ msgid "Layer type not registered"
 msgstr ""
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:517
+#: includes/loaders.php:567
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:6
 msgid "Explore"

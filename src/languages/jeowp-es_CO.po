@@ -1,15 +1,16 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowpdevelopStefano Wrobleski\n"
-"Last-Translator: \n"
-"Language-Team: InfoAmazonia\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowp\n"
+"Last-Translator: Stefano WrobleskidevelopInfoAmazonia\n"
+"Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-06-09T19:53:28+00:00\n"
 "PO-Revision-Date: 2026-06-23 15:39-0300\n"
 "Language: es_CO\n"
+": HEAD\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.9\n"
 "X-Domain: jeowp\n"
@@ -197,7 +198,7 @@ msgid "Layer type not registered"
 msgstr "Tipo de capa no registrada"
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:517
+#: includes/loaders.php:567
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:6
 msgid "Explore"
@@ -464,6 +465,18 @@ msgstr "Color de fondo del botón de cierre"
 msgctxt "discovery share action"
 msgid "Embed"
 msgstr "Embed"
+
+#: includes/settings/settings-page.php:272
+msgid "Company logo"
+msgstr "Logotipo de la empresa"
+
+#: includes/settings/settings-page.php:276
+msgid "You may use a local or external image URL. Large logos will be scaled down automatically in the embed footer."
+msgstr "Puedes usar una URL local o externa de imagen. Los logotipos grandes se reducirán automáticamente en el pie de la incrustación."
+
+#: includes/settings/settings-page.php:278
+msgid "Insert Image"
+msgstr "Insertar imagen"
 
 #: includes/settings/settings-page.php:307
 msgid "Save Changes"
@@ -4487,18 +4500,6 @@ msgstr "Opciones de %s"
 #: includes/settings/settings-page.php:268
 msgid "Embed"
 msgstr "Embed"
-
-#: includes/settings/settings-page.php:272
-msgid "Company logo"
-msgstr "Logo de la empresa"
-
-#: includes/settings/settings-page.php:276
-msgid "You may use a local or external image URL. Large logos will be scaled down automatically in the embed footer."
-msgstr "Puede usar una URL de imagen local o externa. Los logos grandes se reducirán automáticamente en el pie de página del embed."
-
-#: includes/settings/settings-page.php:278
-msgid "Insert Image"
-msgstr "Insertar imagen"
 
 #: includes/settings/settings-page.js:920
 #: includes/settings/settings-page.js:922
