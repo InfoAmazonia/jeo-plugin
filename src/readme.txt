@@ -76,6 +76,11 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 
 == Changelog ==
 
+= 3.0.2 =
+* Fixed story map introductions being cut off when they contained long text.
+* Fixed display of embedded story maps.
+* Fixed compatibility notices when viewing maps and story maps on block themes.
+
 = 3.0.1 =
 * Fixed WordPress.org review findings for release metadata, inline style loading, escaped callback output, admin menu placement, REST pagination limits, public embed visibility, and generic Discovery runtime globals.
 * Replaced the invalid repository license URL with the official GNU GPLv3 license URL.

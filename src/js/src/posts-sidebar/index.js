@@ -253,7 +253,11 @@ const JeoGeocodePanel = ( props ) => {
 		<Fragment>
 			{ pendingLocations.length > 0 && (
 				<Notice status="warning" isDismissible={ false }>
-					<p>{ sprintf( _n( 'AI found %d location during bulk processing.', 'AI found %d locations during bulk processing.', pendingLocations.length, 'jeowp' ), pendingLocations.length ) }</p>
+					<p>{ sprintf(
+					/* translators: %d: number of locations found during bulk AI processing. */
+					_n( 'AI found %d location during bulk processing.', 'AI found %d locations during bulk processing.', pendingLocations.length, 'jeowp' ),
+					pendingLocations.length
+				) }</p>
 					<Button variant="primary" onClick={ handleReviewPending }>
 						{ __( 'Review Suggestions', 'jeowp' ) }
 					</Button>

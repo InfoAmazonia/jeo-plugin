@@ -569,7 +569,11 @@ class JeoGeocodePosts extends Component {
 							style={ { userSelect: 'none' } }
 						>
 							{ isPanelMinimized
-								? sprintf( _n( 'Point (%d)', 'Points (%d)', pointsList.length, 'jeowp' ), pointsList.length )
+								? sprintf(
+									/* translators: %d: number of geolocation points. */
+									_n( 'Point (%d)', 'Points (%d)', pointsList.length, 'jeowp' ),
+									pointsList.length
+							  )
 								: __( 'Geolocate this post', 'jeowp' )
 							}
 						</h3>

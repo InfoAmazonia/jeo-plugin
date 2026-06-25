@@ -62,7 +62,7 @@ if ( isset( $_POST['jeo_confirm_uninstall'], $_POST['jeo_uninstall_nonce'] ) ) {
 		<li><?php esc_html_e( 'Scheduled cron jobs created by the plugin.', 'jeowp' ); ?></li>
 	</ul>
 
-	<p><?php esc_html_e( 'Your regular posts, pages, maps, layers, and storymaps will remain, but any geolocation data associated with them will be lost.', 'jeowp' ); ?></p>
+	<p><?php esc_html_e( 'Your regular posts, pages, maps, layers, and story maps will remain, but any geolocation data associated with them will be lost.', 'jeowp' ); ?></p>
 
 	<form method="post" action="">
 		<?php wp_nonce_field( 'jeo_uninstall_action', 'jeo_uninstall_nonce' ); ?>
