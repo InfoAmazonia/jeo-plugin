@@ -47,7 +47,6 @@ services:
     volumes:
       - jeo-wordpress-core:/var/www/html
       - ../src:/var/www/html/wp-content/plugins/jeo
-      - ../vendor:/var/www/html/wp-content/plugins/jeo/vendor
       - ./uploads:/var/www/html/wp-content/uploads
     networks:
       - jeo-dev-network
@@ -69,7 +68,6 @@ services:
     volumes:
       - jeo-wordpress-core:/var/www/html
       - ../src:/var/www/html/wp-content/plugins/jeo
-      - ../vendor:/var/www/html/wp-content/plugins/jeo/vendor
       - ./uploads:/var/www/html/wp-content/uploads
       - jeo-wpcli-cache:/var/www/.wp-cli
     networks:

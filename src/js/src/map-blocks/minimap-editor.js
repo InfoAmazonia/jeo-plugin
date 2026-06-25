@@ -29,7 +29,29 @@ const LOADING_MESSAGES = [
 ];
 
 function generateUUID() {
-	return crypto.randomUUID();
+	if ( typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function' ) {
+		try {
+			return crypto.randomUUID();
+		} catch ( e ) {
+			// Fall through to manual UUID.
+		}
+	}
+
+	const bytes = new Uint8Array( 16 );
+	if ( typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function' ) {
+		crypto.getRandomValues( bytes );
+	} else {
+		for ( let i = 0; i < 16; i++ ) {
+			bytes[ i ] = Math.floor( Math.random() * 256 );
+		}
+	}
+
+	// Set version (4) and variant (RFC4122) bits.
+	bytes[ 6 ] = ( bytes[ 6 ] & 0x0f ) | 0x40;
+	bytes[ 8 ] = ( bytes[ 8 ] & 0x3f ) | 0x80;
+
+	const hex = Array.from( bytes, ( b ) => b.toString( 16 ).padStart( 2, '0' ) ).join( '' );
+	return `${ hex.slice( 0, 8 ) }-${ hex.slice( 8, 12 ) }-${ hex.slice( 12, 16 ) }-${ hex.slice( 16, 20 ) }-${ hex.slice( 20 ) }`;
 }
 
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
@@ -108,6 +130,12 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const generate = useCallback( () => {
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
+			// eslint-disable-next-line no-console
+			console.error( '[JEO Minimap] Cannot generate: post ID is not available yet. Save the post first.' );
+			setAttributes( {
+				status: 'error',
+				message: __( 'Save the post before generating the map.', 'jeowp' ),
+			} );
 			return;
 		}
 
@@ -115,51 +143,62 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 		const convId = attrsRef.current.conversation_id || generateUUID();
 
-		apiFetch( {
-			path: '/jeo/v1/minimap/setup',
-			method: 'POST',
-			data: { post_id: postId, conversation_id: convId },
-		} )
-			.then( ( response ) => {
-				if ( response.success ) {
-					const updates = {
-						status: 'ready',
-						layers: response.layers || [],
-						base_layer: response.base_layer || null,
-						center_lat: response.center_lat,
-						center_lon: response.center_lon,
-						initial_zoom: response.initial_zoom,
-						pins: response.pins || [],
-						message: response.message || '',
-						conversation_id: convId,
-						conversation: [
-							...( attrsRef.current.conversation || [] ),
-							{
-								role: 'assistant',
-								text: response.message || __( 'Map generated from post content.', 'jeowp' ),
-								ts: new Date().toISOString(),
-							},
-						],
-					};
+		try {
+			apiFetch( {
+				path: '/jeo/v1/minimap/setup',
+				method: 'POST',
+				data: { post_id: postId, conversation_id: convId },
+			} )
+				.then( ( response ) => {
+					if ( response.success ) {
+						const updates = {
+							status: 'ready',
+							layers: response.layers || [],
+							base_layer: response.base_layer || null,
+							center_lat: response.center_lat,
+							center_lon: response.center_lon,
+							initial_zoom: response.initial_zoom,
+							pins: response.pins || [],
+							message: response.message || '',
+							conversation_id: convId,
+							conversation: [
+								...( attrsRef.current.conversation || [] ),
+								{
+									role: 'assistant',
+									text: response.message || __( 'Map generated from post content.', 'jeowp' ),
+									ts: new Date().toISOString(),
+								},
+							],
+						};
 
-					if ( response.base_layer?.variant ) {
-						setBaseVariant( response.base_layer.variant );
+						if ( response.base_layer?.variant ) {
+							setBaseVariant( response.base_layer.variant );
+						}
+
+						setAttributes( updates );
+					} else {
+						setAttributes( {
+							status: 'error',
+							message: response.message || __( 'Failed to suggest layers.', 'jeowp' ),
+						} );
 					}
-
-					setAttributes( updates );
-				} else {
+				} )
+				.catch( ( error ) => {
+					// eslint-disable-next-line no-console
+					console.error( '[JEO Minimap] Setup request failed:', error );
 					setAttributes( {
 						status: 'error',
-						message: response.message || __( 'Failed to suggest layers.', 'jeowp' ),
+						message: error.message || __( 'Request failed.', 'jeowp' ),
 					} );
-				}
-			} )
-			.catch( ( error ) => {
-				setAttributes( {
-					status: 'error',
-					message: error.message || __( 'Request failed.', 'jeowp' ),
 				} );
+		} catch ( syncError ) {
+			// eslint-disable-next-line no-console
+			console.error( '[JEO Minimap] Synchronous error during setup:', syncError );
+			setAttributes( {
+				status: 'error',
+				message: syncError.message || __( 'Could not start map generation.', 'jeowp' ),
 			} );
+		}
 	}, [ setAttributes ] );
 
 	const sendChat = useCallback( ( message, type = 'text', payload = {} ) => {
@@ -179,26 +218,27 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 		setChatLoading( true );
 
-		apiFetch( {
-			path: '/jeo/v1/minimap/chat',
-			method: 'POST',
-			data: {
-				conversation_id: convId,
-				post_id: wp.data.select( 'core/editor' ).getCurrentPostId(),
-				message: text,
-				type,
-				payload,
-				current_map_state: {
-					layers: attrs.layers || [],
-					base_layer: attrs.base_layer || null,
-					center_lat: attrs.center_lat,
-					center_lon: attrs.center_lon,
-					initial_zoom: attrs.initial_zoom,
-					pins: attrs.pins || [],
+		try {
+			apiFetch( {
+				path: '/jeo/v1/minimap/chat',
+				method: 'POST',
+				data: {
+					conversation_id: convId,
+					post_id: wp.data.select( 'core/editor' ).getCurrentPostId(),
+					message: text,
+					type,
+					payload,
+					current_map_state: {
+						layers: attrs.layers || [],
+						base_layer: attrs.base_layer || null,
+						center_lat: attrs.center_lat,
+						center_lon: attrs.center_lon,
+						initial_zoom: attrs.initial_zoom,
+						pins: attrs.pins || [],
+					},
 				},
-			},
-		} )
-			.then( ( response ) => {
+			} )
+				.then( ( response ) => {
 				const convUpdates = [];
 				if ( text.trim() && 'regenerate' !== type ) {
 					convUpdates.push( { role: 'user', text, ts: new Date().toISOString() } );
@@ -250,6 +290,20 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				setChatLoading( false );
 				setChatInput( '' );
 			} );
+		} catch ( syncError ) {
+			// eslint-disable-next-line no-console
+			console.error( '[JEO Minimap] Synchronous error during chat:', syncError );
+			const currentAttrs = attrsRef.current;
+			setAttributes( {
+				conversation: [ ...( currentAttrs.conversation || [] ), {
+					role: 'assistant',
+					text: syncError.message || __( 'Could not send message.', 'jeowp' ),
+					ts: new Date().toISOString(),
+				} ],
+			} );
+			setChatLoading( false );
+			setChatInput( '' );
+		}
 	}, [ chatLoading, setAttributes ] );
 
 	const generateFromChatPrompt = useCallback( () => {
@@ -261,19 +315,29 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		const convId = attrs.conversation_id || generateUUID();
 		const userMsg = chatPrompt.trim();
 
+		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
+		if ( ! postId ) {
+			setAttributes( {
+				status: 'error',
+				message: __( 'Save the post before generating the map.', 'jeowp' ),
+			} );
+			return;
+		}
+
 		setChatLoading( true );
 		setChatPromptVisible( false );
 
-		apiFetch( {
-			path: '/jeo/v1/minimap/setup-prompt',
-			method: 'POST',
-			data: {
-				prompt: userMsg,
-				post_id: wp.data.select( 'core/editor' ).getCurrentPostId(),
-				conversation_id: convId,
-			},
-		} )
-			.then( ( response ) => {
+		try {
+			apiFetch( {
+				path: '/jeo/v1/minimap/setup-prompt',
+				method: 'POST',
+				data: {
+					prompt: userMsg,
+					post_id: postId,
+					conversation_id: convId,
+				},
+			} )
+				.then( ( response ) => {
 				const currentAttrs = attrsRef.current;
 				const convUpdates = [
 					{ role: 'user', text: userMsg, ts: new Date().toISOString() },
@@ -326,6 +390,20 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				setChatLoading( false );
 				setChatPrompt( '' );
 			} );
+		} catch ( syncError ) {
+			// eslint-disable-next-line no-console
+			console.error( '[JEO Minimap] Synchronous error during chat prompt:', syncError );
+			const currentAttrs = attrsRef.current;
+			setAttributes( {
+				conversation: [ ...( currentAttrs.conversation || [] ), {
+					role: 'assistant',
+					text: syncError.message || __( 'Could not generate from prompt.', 'jeowp' ),
+					ts: new Date().toISOString(),
+				} ],
+			} );
+			setChatLoading( false );
+			setChatPrompt( '' );
+		}
 	}, [ chatPrompt, chatLoading, setAttributes ] );
 
 	const resuggest = useCallback( () => {
@@ -336,56 +414,71 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		if ( ! postId ) {
+			setAttributes( {
+				status: 'error',
+				message: __( 'Save the post before generating the map.', 'jeowp' ),
+			} );
 			return;
 		}
 
 		const convId = generateUUID();
 		setAttributes( { status: 'loading', message: '' } );
 
-		apiFetch( {
-			path: '/jeo/v1/minimap/setup',
-			method: 'POST',
-			data: { post_id: postId, conversation_id: convId },
-		} )
-			.then( ( response ) => {
-				if ( response.success ) {
-					const updates = {
-						status: 'ready',
-						layers: response.layers || [],
-						base_layer: response.base_layer || null,
-						center_lat: response.center_lat,
-						center_lon: response.center_lon,
-						initial_zoom: response.initial_zoom,
-						pins: response.pins || [],
-						message: response.message || '',
-						conversation_id: convId,
-						conversation: [
-							{
-								role: 'assistant',
-								text: response.message || __( 'Map regenerated from post content.', 'jeowp' ),
-								ts: new Date().toISOString(),
-							},
-						],
-					};
+		try {
+			apiFetch( {
+				path: '/jeo/v1/minimap/setup',
+				method: 'POST',
+				data: { post_id: postId, conversation_id: convId },
+			} )
+				.then( ( response ) => {
+					if ( response.success ) {
+						const updates = {
+							status: 'ready',
+							layers: response.layers || [],
+							base_layer: response.base_layer || null,
+							center_lat: response.center_lat,
+							center_lon: response.center_lon,
+							initial_zoom: response.initial_zoom,
+							pins: response.pins || [],
+							message: response.message || '',
+							conversation_id: convId,
+							conversation: [
+								{
+									role: 'assistant',
+									text: response.message || __( 'Map regenerated from post content.', 'jeowp' ),
+									ts: new Date().toISOString(),
+								},
+							],
+						};
 
-					if ( response.base_layer?.variant ) {
-						setBaseVariant( response.base_layer.variant );
+						if ( response.base_layer?.variant ) {
+							setBaseVariant( response.base_layer.variant );
+						}
+
+						setAttributes( updates );
+					} else {
+						setAttributes( {
+							status: 'error',
+							message: response.message || __( 'Failed to suggest layers.', 'jeowp' ),
+						} );
 					}
-
-					setAttributes( updates );
-				} else {
+				} )
+				.catch( ( error ) => {
+					// eslint-disable-next-line no-console
+					console.error( '[JEO Minimap] Resuggest request failed:', error );
 					setAttributes( {
 						status: 'error',
-						message: response.message || __( 'Failed to suggest layers.', 'jeowp' ),
+						message: error.message || __( 'Request failed.', 'jeowp' ),
 					} );
-				}
-			} )
-			.catch( ( error ) => {
-				setAttributes( {
-					status: 'error',
-					message: error.message || __( 'Request failed.', 'jeowp' ),
 				} );
+		} catch ( syncError ) {
+			// eslint-disable-next-line no-console
+			console.error( '[JEO Minimap] Synchronous error during resuggest:', syncError );
+			setAttributes( {
+				status: 'error',
+				message: syncError.message || __( 'Could not start map generation.', 'jeowp' ),
 			} );
+		}
 	}, [ sendChat, setAttributes ] );
 
 	const generateFromPrompt = useCallback( () => {
@@ -393,62 +486,81 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			return;
 		}
 
+		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
+		if ( ! postId ) {
+			setAttributes( {
+				status: 'error',
+				message: __( 'Save the post before generating the map.', 'jeowp' ),
+			} );
+			return;
+		}
+
 		setAttributes( { status: 'loading' } );
 
-		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 		const convId = attrsRef.current.conversation_id || generateUUID();
 
-		apiFetch( {
-			path: '/jeo/v1/minimap/setup-prompt',
-			method: 'POST',
-			data: {
-				prompt: attributes.prompt,
-				post_id: postId,
-				conversation_id: convId,
-			},
-		} )
-			.then( ( response ) => {
-				if ( response.success ) {
-					const convUpdates = [
-						{ role: 'user', text: attributes.prompt, ts: new Date().toISOString() },
-						{
-							role: 'assistant',
-							text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeowp' ),
-							ts: new Date().toISOString(),
-						},
-					];
+		try {
+			apiFetch( {
+				path: '/jeo/v1/minimap/setup-prompt',
+				method: 'POST',
+				data: {
+					prompt: attributes.prompt,
+					post_id: postId,
+					conversation_id: convId,
+				},
+			} )
+				.then( ( response ) => {
+					if ( response.success ) {
+						const convUpdates = [
+							{ role: 'user', text: attributes.prompt, ts: new Date().toISOString() },
+							{
+								role: 'assistant',
+								text: response.assistant_message || response.message || __( 'Map generated from prompt.', 'jeowp' ),
+								ts: new Date().toISOString(),
+							},
+						];
 
-					const updates = {
-						status: 'ready',
-						layers: response.layers || [],
-						base_layer: response.base_layer || null,
-						center_lat: response.center_lat,
-						center_lon: response.center_lon,
-						initial_zoom: response.initial_zoom,
-						pins: response.pins || [],
-						message: response.message || '',
-						conversation_id: convId,
-						conversation: [ ...( attrsRef.current.conversation || [] ), ...convUpdates ],
-					};
+						const updates = {
+							status: 'ready',
+							layers: response.layers || [],
+							base_layer: response.base_layer || null,
+							center_lat: response.center_lat,
+							center_lon: response.center_lon,
+							initial_zoom: response.initial_zoom,
+							pins: response.pins || [],
+							message: response.message || '',
+							conversation_id: convId,
+							conversation: [ ...( attrsRef.current.conversation || [] ), ...convUpdates ],
+						};
 
-					if ( response.base_layer?.variant ) {
-						setBaseVariant( response.base_layer.variant );
+						if ( response.base_layer?.variant ) {
+							setBaseVariant( response.base_layer.variant );
+						}
+
+						setAttributes( updates );
+					} else {
+						setAttributes( {
+							status: 'error',
+							message: response.message || __( 'Failed to generate from prompt.', 'jeowp' ),
+						} );
 					}
-
-					setAttributes( updates );
-				} else {
+				} )
+				.catch( ( error ) => {
+					// eslint-disable-next-line no-console
+					console.error( '[JEO Minimap] Prompt request failed:', error );
 					setAttributes( {
 						status: 'error',
-						message: response.message || __( 'Failed to generate from prompt.', 'jeowp' ),
+						message: error.message || __( 'Request failed.', 'jeowp' ),
 					} );
-				}
-			} )
-			.catch( ( error ) => {
-				setAttributes( {
-					status: 'error',
-					message: error.message || __( 'Request failed.', 'jeowp' ),
 				} );
+		} catch ( syncError ) {
+			// eslint-disable-next-line no-console
+			console.error( '[JEO Minimap] Synchronous error during prompt setup:', syncError );
+			setAttributes( {
+				status: 'error',
+				message: syncError.message || __( 'Could not start map generation.', 'jeowp' ),
 			} );
+		}
 	}, [ attributes.prompt, setAttributes ] );
 
 	const handleBaseVariantChange = useCallback( ( newVariant ) => {
@@ -464,29 +576,34 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			return;
 		}
 
-		apiFetch( {
-			path: '/jeo/v1/minimap/setup',
-			method: 'POST',
-			data: { post_id: postId },
-		} ).then( ( response ) => {
-			if ( response.success && response.base_layer ) {
-				let chosen = response.base_layer;
+		try {
+			apiFetch( {
+				path: '/jeo/v1/minimap/setup',
+				method: 'POST',
+				data: { post_id: postId },
+			} ).then( ( response ) => {
+				if ( response.success && response.base_layer ) {
+					let chosen = response.base_layer;
 
-				if ( newVariant !== 'none' && response.base_layer.variant !== newVariant ) {
-					apiFetch( {
-						path: '/jeo/v1/minimap/setup',
-						method: 'POST',
-						data: { post_id: postId, base_variant: newVariant },
-					} ).then( ( r2 ) => {
-						if ( r2.success && r2.base_layer ) {
-							setAttributes( { base_layer: r2.base_layer } );
-						}
-					} );
-				} else {
-					setAttributes( { base_layer: chosen } );
+					if ( newVariant !== 'none' && response.base_layer.variant !== newVariant ) {
+						apiFetch( {
+							path: '/jeo/v1/minimap/setup',
+							method: 'POST',
+							data: { post_id: postId, base_variant: newVariant },
+						} ).then( ( r2 ) => {
+							if ( r2.success && r2.base_layer ) {
+								setAttributes( { base_layer: r2.base_layer } );
+							}
+						} );
+					} else {
+						setAttributes( { base_layer: chosen } );
+					}
 				}
-			}
-		} );
+			} );
+		} catch ( syncError ) {
+			// eslint-disable-next-line no-console
+			console.error( '[JEO Minimap] Synchronous error during base variant change:', syncError );
+		}
 	}, [ sendChat, setAttributes ] );
 
 	const closeModal = useCallback( () => setModal( false ), [] );

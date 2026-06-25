@@ -1038,18 +1038,18 @@ class Stories_Near_You {
 
 		$union_sql  = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY ' . $order_by_sql . ' LIMIT %d';
 		$all_params = array_merge(
-			$date_params,
 			array( $lng, $lat ),
 			$types,
-			array( $radius_meters ),
 			$taxonomy_params,
 			$exclude_params,
 			$date_params,
+			array( $radius_meters ),
 			array( $lng, $lat ),
 			$types,
-			array( $radius_meters ),
 			$taxonomy_params,
 			$exclude_params,
+			$date_params,
+			array( $radius_meters ),
 			$order_params,
 			array( $limit )
 		);
