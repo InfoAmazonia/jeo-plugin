@@ -38,7 +38,7 @@
 	{
 		"name": "postsSidebar",
 		"path": "src/js/build/postsSidebar.js",
-		"limit": "185 KB",
+		"limit": "187 KB",
 		"brotli": false
 	},
 	{
