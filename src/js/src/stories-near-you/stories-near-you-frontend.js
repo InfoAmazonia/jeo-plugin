@@ -11,9 +11,24 @@
 				return Promise.reject( { error: 'not_supported' } );
 			}
 
+			const attemptPromise = this.tryGetCurrentPosition( true ).catch( ( e ) => {
+				if ( e.error === 'denied' ) {
+					throw e;
+				}
+				return this.tryGetCurrentPosition( false );
+			} );
+
+			const overallTimeoutPromise = new Promise( ( resolve, reject ) => {
+				setTimeout( () => reject( { error: 'timeout' } ), GEOLOCATION_OVERALL_TIMEOUT );
+			} );
+
+			return Promise.race( [ attemptPromise, overallTimeoutPromise ] );
+		}
+
+		tryGetCurrentPosition( enableHighAccuracy ) {
 			const precision = globalThis.jeo_snu_config?.geolocationPrecision || 2;
 
-			const locationPromise = new Promise( ( resolve, reject ) => {
+			return new Promise( ( resolve, reject ) => {
 				navigator.geolocation.getCurrentPosition(
 					( position ) => {
 						resolve( {
@@ -26,22 +41,16 @@
 							localStorage.removeItem( CONSENT_KEY );
 							reject( { error: 'denied' } );
 						} else {
-							reject( { error: 'unavailable', code: error.code } );
+							reject( { error: 'unavailable' } );
 						}
 					},
 					{
-						enableHighAccuracy: true,
+						enableHighAccuracy,
 						timeout: GEOLOCATION_TIMEOUT,
 						maximumAge: 300000,
 					}
 				);
 			} );
-
-			const overallTimeoutPromise = new Promise( ( resolve, reject ) => {
-				setTimeout( () => reject( { error: 'timeout' } ), GEOLOCATION_OVERALL_TIMEOUT );
-			} );
-
-			return Promise.race( [ locationPromise, overallTimeoutPromise ] );
 		}
 	}
 
