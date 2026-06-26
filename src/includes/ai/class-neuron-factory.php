@@ -49,10 +49,35 @@ class Neuron_Factory {
 				if ( ! $agent_mode ) {
 					$generation_config['responseMimeType'] = 'application/json';
 				}
+				$safety_settings = array(
+					array(
+						'category'  => 'HARM_CATEGORY_HARASSMENT',
+						'threshold' => 'BLOCK_NONE',
+					),
+					array(
+						'category'  => 'HARM_CATEGORY_HATE_SPEECH',
+						'threshold' => 'BLOCK_NONE',
+					),
+					array(
+						'category'  => 'HARM_CATEGORY_SEXUALLY_EXPLICIT',
+						'threshold' => 'BLOCK_NONE',
+					),
+					array(
+						'category'  => 'HARM_CATEGORY_DANGEROUS_CONTENT',
+						'threshold' => 'BLOCK_NONE',
+					),
+					array(
+						'category'  => 'HARM_CATEGORY_CIVIC_INTEGRITY',
+						'threshold' => 'BLOCK_NONE',
+					),
+				);
 				return new Gemini_Provider(
 					key: $api_key,
 					model: $model,
-					parameters: array( 'generationConfig' => $generation_config ),
+					parameters: array(
+						'generationConfig' => $generation_config,
+						'safetySettings'   => $safety_settings,
+					),
 				);
 			case 'openai':
 				return new OpenAI(
