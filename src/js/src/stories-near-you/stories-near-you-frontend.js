@@ -1,19 +1,19 @@
 ( function () {
 	const CONTAINER_SELECTOR = '.wp-block-jeo-stories-near-you';
 	const REST_ENDPOINT = '/wp-json/jeo/v1/stories-near-you';
-	const GEOLOCATION_TIMEOUT = 10000;
-	const GEOLOCATION_OVERALL_TIMEOUT = 20000;
+	const GEOLOCATION_TIMEOUT = 15000;
+	const GEOLOCATION_OVERALL_TIMEOUT = 25000;
 	const CONSENT_KEY = 'jeo_stories_near_you_consent';
 
 	class BrowserGeolocationProvider {
 		getLocation() {
 			if ( ! navigator.geolocation ) {
-				return Promise.resolve( null );
+				return Promise.reject( { error: 'not_supported' } );
 			}
 
 			const precision = globalThis.jeo_snu_config?.geolocationPrecision || 2;
 
-			const locationPromise = new Promise( ( resolve ) => {
+			const locationPromise = new Promise( ( resolve, reject ) => {
 				navigator.geolocation.getCurrentPosition(
 					( position ) => {
 						resolve( {
@@ -24,19 +24,21 @@
 					( error ) => {
 						if ( error.code === error.PERMISSION_DENIED ) {
 							localStorage.removeItem( CONSENT_KEY );
+							reject( { error: 'denied' } );
+						} else {
+							reject( { error: 'unavailable', code: error.code } );
 						}
-						resolve( null );
 					},
 					{
-						enableHighAccuracy: false,
+						enableHighAccuracy: true,
 						timeout: GEOLOCATION_TIMEOUT,
 						maximumAge: 300000,
 					}
 				);
 			} );
 
-			const overallTimeoutPromise = new Promise( ( resolve ) => {
-				setTimeout( () => resolve( null ), GEOLOCATION_OVERALL_TIMEOUT );
+			const overallTimeoutPromise = new Promise( ( resolve, reject ) => {
+				setTimeout( () => reject( { error: 'timeout' } ), GEOLOCATION_OVERALL_TIMEOUT );
 			} );
 
 			return Promise.race( [ locationPromise, overallTimeoutPromise ] );
@@ -83,10 +85,13 @@
 		getManualLocation() {
 			const lat = parseFloat( this.attrs.lat );
 			const lng = parseFloat( this.attrs.lng );
-			if ( lat && lng ) {
-				return { lat, lng };
+			if ( Number.isNaN( lat ) || Number.isNaN( lng ) ) {
+				return null;
 			}
-			return null;
+			if ( lat === 0 && lng === 0 ) {
+				return null;
+			}
+			return { lat, lng };
 		}
 
 		async init( location ) {
@@ -102,13 +107,17 @@
 			}
 
 			if ( ! navigator.geolocation ) {
-				await this.fetchAndRender( null );
+				this.showError();
 				return;
 			}
 
 			if ( localStorage.getItem( CONSENT_KEY ) === '1' ) {
-				const loc = await this.geolocationProvider.getLocation();
-				await this.fetchAndRender( loc );
+				try {
+					const loc = await this.geolocationProvider.getLocation();
+					await this.fetchAndRender( loc );
+				} catch ( e ) {
+					this.showError();
+				}
 				return;
 			}
 
@@ -142,8 +151,12 @@
 				localStorage.setItem( CONSENT_KEY, '1' );
 				consentEl.remove();
 				this.showSkeleton();
-				const location = await this.geolocationProvider.getLocation();
-				await this.fetchAndRender( location );
+				try {
+					const location = await this.geolocationProvider.getLocation();
+					await this.fetchAndRender( location );
+				} catch ( e ) {
+					this.showError();
+				}
 			} );
 
 			consentEl.querySelector( '.jeo-stories-near-you__consent-skip' ).addEventListener( 'click', async () => {
@@ -295,7 +308,7 @@
 
 	async function resolveSharedLocation( provider ) {
 		if ( ! navigator.geolocation ) {
-			return null;
+			throw { error: 'not_supported' };
 		}
 
 		if ( localStorage.getItem( CONSENT_KEY ) === '1' ) {
@@ -329,7 +342,23 @@
 			localStorage.setItem( CONSENT_KEY, '1' );
 
 			waterfallPromise = ( async () => {
-				const location = await provider.getLocation();
+				let location;
+				try {
+					location = await provider.getLocation();
+				} catch ( e ) {
+					for ( const inst of instances ) {
+						const consentEl = inst.element.querySelector( '.jeo-stories-near-you__consent' );
+						if ( consentEl ) {
+							consentEl.remove();
+						}
+						const skeleton = inst.element.querySelector( '.jeo-stories-near-you__skeleton' );
+						if ( skeleton ) {
+							skeleton.remove();
+						}
+						inst.showError();
+					}
+					return;
+				}
 
 				for ( const inst of instances ) {
 					const consentEl = inst.element.querySelector( '.jeo-stories-near-you__consent' );
@@ -363,8 +392,18 @@
 			instances.push( instance );
 		}
 
-		const sharedLocation = await resolveSharedLocation( provider );
+		const sharedLocation = await resolveSharedLocation( provider ).catch( ( error ) => {
+			console.error( error );
+			return null;
+		} );
 		const allRenderedIds = [];
+
+		if ( sharedLocation === null ) {
+			for ( const instance of instances ) {
+				instance.showError();
+			}
+			return;
+		}
 
 		for ( const instance of instances ) {
 			instance.setExcludeIds( allRenderedIds );
