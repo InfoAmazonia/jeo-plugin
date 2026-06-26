@@ -17,7 +17,7 @@
 			sources: {
 				[ name ]: {
 					type: attributes.layer_type_options.style_source_type,
-					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+					url: tileset_id,
 				},
 			},
 			layers: [
@@ -39,7 +39,7 @@
 
 		map.addSource( attributes.layer_id, {
 			type: attributes.layer_type_options.style_source_type,
-			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+			url: tileset_id,
 		} );
 
 		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
