@@ -121,15 +121,15 @@ class Discovery extends Component {
 			// toggles
 			showLegends: false,
 			showShareOptions: false,
-				showEmbedTooltip: false,
-				showSidebar: true,
-				showMoreInfo: false,
-				moreInfoLoading: false,
-				moreInfoError: null,
-				infoMapsById: {},
+			showEmbedTooltip: false,
+			showSidebar: true,
+			showMoreInfo: false,
+			moreInfoLoading: false,
+			moreInfoError: null,
+			infoMapsById: {},
 
-				// maps
-				maps: [],
+			// maps
+			maps: [],
 			mapsLoaded: false,
 
 			// markers
