@@ -102,14 +102,14 @@ class Discovery extends Component {
 
 		// map can't be a state, trust me.
 		this.map = null;
-			this.attributionResizeObserver = null;
-			this.discoveryBlock = null;
-			this.customTokens = {};
-			this.moreInfoTemplate =
-				window.jeoMapVars?.templates?.moreInfo || null;
+		this.attributionResizeObserver = null;
+		this.discoveryBlock = null;
+		this.customTokens = {};
+		this.moreInfoTemplate =
+			window.jeoMapVars?.templates?.moreInfo || null;
 
-			// general state
-			this.state = {
+		// general state
+		this.state = {
 			// component
 			embedUrl: '',
 			firstLoad: true,
@@ -158,14 +158,14 @@ class Discovery extends Component {
 		// methods bindings
 		this.updateState = this.updateState.bind( this );
 		this.syncViewportHeight = this.syncViewportHeight.bind( this );
-			this.registerLayerCustomToken =
-				this.registerLayerCustomToken.bind( this );
-			this.transformRequestUrl = this.transformRequestUrl.bind( this );
-			this.openMoreInfo = this.openMoreInfo.bind( this );
-			this.closeMoreInfo = this.closeMoreInfo.bind( this );
-			this.handleMoreInfoTitleKeyDown =
-				this.handleMoreInfoTitleKeyDown.bind( this );
-		}
+		this.registerLayerCustomToken =
+			this.registerLayerCustomToken.bind( this );
+		this.transformRequestUrl = this.transformRequestUrl.bind( this );
+		this.openMoreInfo = this.openMoreInfo.bind( this );
+		this.closeMoreInfo = this.closeMoreInfo.bind( this );
+		this.handleMoreInfoTitleKeyDown =
+			this.handleMoreInfoTitleKeyDown.bind( this );
+	}
 
 	componentDidMount() {
 		this.syncViewportHeight();
