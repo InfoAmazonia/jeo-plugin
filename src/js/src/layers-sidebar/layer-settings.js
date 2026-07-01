@@ -146,6 +146,7 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 			const refreshed = Number.parseInt( response?.refreshed || 0, 10 );
 			const failed = Number.parseInt( response?.failed || 0, 10 );
 			const refreshedLabel = sprintf(
+				/* translators: %d: number of maps whose composed style cache was refreshed. */
 				_n(
 					'%d map',
 					'%d maps',
@@ -155,6 +156,7 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 				refreshed
 			);
 			const failedLabel = sprintf(
+				/* translators: %d: number of map refresh failures. */
 				_n(
 					'%d failure',
 					'%d failures',
@@ -168,6 +170,7 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 				sendNotice(
 					'warning',
 					sprintf(
+						/* translators: 1: refreshed maps count label, 2: failed refresh count label. */
 						__( 'Composed style cache refreshed for %1$s, with %2$s.', 'jeowp' ),
 						refreshedLabel,
 						failedLabel
@@ -176,7 +179,11 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 			} else {
 				sendNotice(
 					'success',
-					sprintf( __( 'Composed style cache refreshed for %s.', 'jeowp' ), refreshedLabel )
+					sprintf(
+						/* translators: %s: refreshed maps count label. */
+						__( 'Composed style cache refreshed for %s.', 'jeowp' ),
+						refreshedLabel
+					)
 				);
 			}
 		} catch ( error ) {

@@ -2489,5 +2489,4 @@ class Map_Style_Composer {
 	private function is_false( $value ) {
 		return false === $value || 0 === $value || '0' === $value || 'false' === $value || '' === $value;
 	}
-
 }
