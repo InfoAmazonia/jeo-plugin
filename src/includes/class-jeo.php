@@ -638,13 +638,13 @@ class Jeo {
 			'jeo-map-blocks',
 			'jeoMapVars',
 			array(
-				'jsonUrl'                 => rest_url( 'wp/v2/' ),
-				'layersUrl'               => rest_url( 'jeo/v1/map-layer' ),
-				'composedStyleUrlBase'    => rest_url( 'jeo/v1/map-style/' ),
-				'composedStyleComposeUrl' => rest_url( 'jeo/v1/map-style/compose' ),
+				'jsonUrl'                    => rest_url( 'wp/v2/' ),
+				'layersUrl'                  => rest_url( 'jeo/v1/map-layer' ),
+				'composedStyleUrlBase'       => rest_url( 'jeo/v1/map-style/' ),
+				'composedStyleComposeUrl'    => rest_url( 'jeo/v1/map-style/compose' ),
 				'composedStyleDefaultGlyphs' => $this->get_composed_style_default_glyphs(),
-				'nonce'                   => $this->get_rest_nonce(),
-				'currentLang'             => $this->get_current_language(),
+				'nonce'                      => $this->get_rest_nonce(),
+				'currentLang'                => $this->get_current_language(),
 			)
 		);
 	}
@@ -1099,29 +1099,29 @@ class Jeo {
 				'jeo-map',
 				'jeoMapVars',
 				array(
-					'jsonUrl'                 => rest_url( 'wp/v2/' ),
-					'layersUrl'               => rest_url( 'jeo/v1/map-layer' ),
-					'composedStyleUrlBase'    => rest_url( 'jeo/v1/map-style/' ),
-					'composedStyleComposeUrl' => rest_url( 'jeo/v1/map-style/compose' ),
+					'jsonUrl'                    => rest_url( 'wp/v2/' ),
+					'layersUrl'                  => rest_url( 'jeo/v1/map-layer' ),
+					'composedStyleUrlBase'       => rest_url( 'jeo/v1/map-style/' ),
+					'composedStyleComposeUrl'    => rest_url( 'jeo/v1/map-style/compose' ),
 					'composedStyleDefaultGlyphs' => $this->get_composed_style_default_glyphs(),
-					'string_read_more'        => esc_html__( 'Read more', 'jeowp' ),
-					'jeoUrl'                  => JEO_BASEURL,
-					'nonce'                   => $this->get_rest_nonce(),
-					'currentLang'             => $current_language,
+					'string_read_more'           => esc_html__( 'Read more', 'jeowp' ),
+					'jeoUrl'                     => JEO_BASEURL,
+					'nonce'                      => $this->get_rest_nonce(),
+					'currentLang'                => $current_language,
 						// phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bundled templates are read from the local plugin directory at runtime.
-					'templates'               => array(
+					'templates'                  => array(
 						'moreInfo'  => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup'     => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
 						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) ),
 					),
 						// phpcs:enable
-					'cluster'                 => apply_filters(
+					'cluster'                    => apply_filters(
 						'jeomap_js_cluster',
 						array(
 							'circle_color' => '#ffffff',
 						)
 					),
-					'images'                  => apply_filters(
+					'images'                     => apply_filters(
 						'jeomap_js_images',
 						array(
 							'/js/src/icons/news-marker' => array(
