@@ -148,7 +148,7 @@
 	getStyleLayers( attributes ) {
 		return new Promise( ( resolve, reject ) => {
 			if ( ! attributes ) {
-				resolve( null );
+				return resolve( null );
 			}
 
 			let formLayers = [];
@@ -183,7 +183,7 @@
 		return new Promise( function ( resolve ) {
 			// cache
 			if ( self._styleDefinitions[ attributes.layer_id ] ) {
-				resolve( self._styleDefinitions[ attributes.layer_id ] );
+				return resolve( self._styleDefinitions[ attributes.layer_id ] );
 			}
 
 			const layerTypeOptions = attributes.layer_type_options || {};
@@ -209,7 +209,7 @@
 		return new Promise( function ( resolve, reject ) {
 			// cache
 			if ( self._styleLayers[ attributes.layer_id ] ) {
-				resolve( self._styleLayers[ attributes.layer_id ] );
+				return resolve( self._styleLayers[ attributes.layer_id ] );
 			}
 
 			const layerTypeOptions = attributes.layer_type_options || {};
