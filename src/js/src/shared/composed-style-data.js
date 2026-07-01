@@ -77,6 +77,7 @@ export async function loadComposedStyleData( {
 	includeStyle = false,
 	mapId,
 	payload,
+	signal,
 	unavailableMessage = DEFAULT_COMPOSITION_UNAVAILABLE_MESSAGE,
 	emptyManifestMessage = DEFAULT_EMPTY_MANIFEST_MESSAGE,
 } = {} ) {
@@ -88,7 +89,7 @@ export async function loadComposedStyleData( {
 			throw new Error( unavailableMessage );
 		}
 
-		metadata = await postJson( composedStyleComposeUrl, payload );
+		metadata = await postJson( composedStyleComposeUrl, payload, { signal } );
 	} else {
 		if ( ! mapId || ! composedStyleUrlBase ) {
 			throw new Error( unavailableMessage );
@@ -98,7 +99,7 @@ export async function loadComposedStyleData( {
 			`${ composedStyleUrlBase }${ mapId }`,
 			forceRefresh ? { refresh: true } : {}
 		);
-		metadata = await fetchJson( metadataUrl );
+		metadata = await fetchJson( metadataUrl, { signal } );
 	}
 
 	if ( ! metadata?.enabled || ! metadata.style || ! metadata.manifest ) {
@@ -106,8 +107,8 @@ export async function loadComposedStyleData( {
 	}
 
 	const [ manifest, style ] = await Promise.all( [
-		fetchJson( metadata.manifest ),
-		includeStyle ? fetchJson( metadata.style ) : Promise.resolve( null ),
+		fetchJson( metadata.manifest, { signal } ),
+		includeStyle ? fetchJson( metadata.style, { signal } ) : Promise.resolve( null ),
 	] );
 
 	if ( ! manifest?.layers?.length ) {
