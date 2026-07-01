@@ -270,9 +270,10 @@ export function useEditorMapboxTransformRequest( layers = [] ) {
 			let transformed = { url: nextUrl };
 
 			if ( nextUrl.includes( TOKEN_PLACEHOLDER ) ) {
-				nextUrl = nextUrl
-					.split( TOKEN_PLACEHOLDER )
-					.join( encodeURIComponent( mapboxToken || '' ) );
+				nextUrl = nextUrl.replaceAll(
+				    TOKEN_PLACEHOLDER,
+					encodeURIComponent( mapboxToken || '' )
+				);
 			}
 
 			if ( typeof baseTransformRequest === 'function' ) {
