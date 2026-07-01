@@ -143,7 +143,7 @@ function getSourceTilesetIds( source ) {
 		.filter( Boolean );
 }
 
-async function getTileJsonViewState( style, styleUrl ) {
+async function getTileJsonViewState( style, styleUrl, options = {} ) {
 	const sourceTilesets = Object.values( style?.sources || {} )
 		.flatMap( getSourceTilesetIds );
 	const preferredTilesets =
@@ -162,7 +162,7 @@ async function getTileJsonViewState( style, styleUrl ) {
 		url.searchParams.set( 'access_token', accessToken );
 
 		try {
-			const tileJson = await fetchJson( url.toString() );
+			const tileJson = await fetchJson( url.toString(), options );
 			const viewState =
 				getViewStateFromCenter( tileJson.center ) ||
 				getViewStateFromBounds(
@@ -174,6 +174,10 @@ async function getTileJsonViewState( style, styleUrl ) {
 				return viewState;
 			}
 		} catch ( error ) {
+			if ( isAbortError( error ) ) {
+				throw error;
+			}
+
 			// Try the next tileset; the style itself can still render without this.
 		}
 	}
@@ -184,7 +188,7 @@ async function getTileJsonViewState( style, styleUrl ) {
 export function isAbortError( error ) {
 	const message = String( error?.message || error || '' );
 
-	return /aborted|aborterror/i.test( message );
+	return error?.name === 'AbortError' || /aborted|aborterror/i.test( message );
 }
 
 export function handleEditorMapPreviewError( event ) {
@@ -271,7 +275,7 @@ export function useEditorMapboxTransformRequest( layers = [] ) {
 
 			if ( nextUrl.includes( TOKEN_PLACEHOLDER ) ) {
 				nextUrl = nextUrl.replaceAll(
-				    TOKEN_PLACEHOLDER,
+					TOKEN_PLACEHOLDER,
 					encodeURIComponent( mapboxToken || '' )
 				);
 			}
@@ -323,10 +327,11 @@ export function useComposedMapPreviewStyle( {
 			enabled &&
 			Boolean( mapId ) &&
 			Boolean( window.jeoMapVars?.composedStyleUrlBase ),
-		loadPreview: () => loadComposedStyleData( {
+		loadPreview: ( { signal } ) => loadComposedStyleData( {
 			forceRefresh,
 			includeStyle: true,
 			mapId,
+			signal,
 		} ),
 		warningMessage:
 			'Unable to load composed Mapbox style in the editor preview.',
@@ -346,9 +351,10 @@ export function useComposedPayloadPreviewStyle( {
 			enabled &&
 			Boolean( payload ) &&
 			Boolean( window.jeoMapVars?.composedStyleComposeUrl ),
-		loadPreview: () => loadComposedStyleData( {
+		loadPreview: ( { signal } ) => loadComposedStyleData( {
 			includeStyle: true,
 			payload,
+			signal,
 		} ),
 		warningMessage:
 			'Unable to load composed Mapbox style payload in the editor preview.',
@@ -382,13 +388,14 @@ function useComposedPreviewStyle( {
 		}
 
 		let didCancel = false;
+		const abortController = new AbortController();
 		setState( ( currentState ) => ( {
 			...currentState,
 			error: null,
 			isLoading: true,
 		} ) );
 
-		loadPreview()
+		loadPreview( { signal: abortController.signal } )
 			.then( ( { manifest, metadata, style } ) => {
 				if ( didCancel ) {
 					return;
@@ -407,7 +414,9 @@ function useComposedPreviewStyle( {
 					return;
 				}
 
-				console.warn( warningMessage, error );
+				if ( ! isAbortError( error ) ) {
+					console.warn( warningMessage, error );
+				}
 				setState( {
 					error,
 					isLoading: false,
@@ -419,6 +428,7 @@ function useComposedPreviewStyle( {
 
 		return () => {
 			didCancel = true;
+			abortController.abort();
 		};
 	}, dependencies );
 
@@ -445,6 +455,7 @@ export function useMapboxStylePreview( styleUrl ) {
 		}
 
 		let didCancel = false;
+		const abortController = new AbortController();
 
 		setState( ( currentState ) => ( {
 			...currentState,
@@ -452,11 +463,13 @@ export function useMapboxStylePreview( styleUrl ) {
 			isLoading: true,
 		} ) );
 
-		fetchJson( styleUrl )
+		fetchJson( styleUrl, { signal: abortController.signal } )
 			.then( async ( style ) => {
 				const viewState =
 					getStyleViewState( style ) ||
-					( await getTileJsonViewState( style, styleUrl ) );
+					( await getTileJsonViewState( style, styleUrl, {
+						signal: abortController.signal,
+					} ) );
 
 				if ( didCancel ) {
 					return;
@@ -488,6 +501,7 @@ export function useMapboxStylePreview( styleUrl ) {
 
 		return () => {
 			didCancel = true;
+			abortController.abort();
 		};
 	}, [ styleUrl ] );
 
