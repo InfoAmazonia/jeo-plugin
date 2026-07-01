@@ -108,6 +108,21 @@ class Map_Style_Composer {
 
 		register_rest_route(
 			'jeo/v1',
+			'/map-style/layer/(?P<id>\d+)/refresh',
+			array(
+				'methods'             => WP_REST_Server::CREATABLE,
+				'callback'            => array( $this, 'refresh_layer_cache_response' ),
+				'permission_callback' => array( $this, 'can_refresh_layer_request' ),
+				'args'                => array(
+					'id' => array(
+						'sanitize_callback' => 'absint',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
 			'/map-style/(?P<scope>preview|onetime)/(?P<hash>[a-f0-9]{16})/style',
 			array(
 				'methods'             => WP_REST_Server::READABLE,
@@ -183,6 +198,21 @@ class Map_Style_Composer {
 	}
 
 	/**
+	 * Check whether the current request can force refresh a layer cache.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @return bool
+	 */
+	public function can_refresh_layer_request( WP_REST_Request $request ) {
+		$layer_id = absint( $request['id'] );
+		$post     = get_post( $layer_id );
+
+		return $post instanceof WP_Post &&
+			'map-layer' === $post->post_type &&
+			current_user_can( 'edit_post', $layer_id );
+	}
+
+	/**
 	 * Check whether the current request can read a virtual artifact.
 	 *
 	 * @param WP_REST_Request $request REST request.
@@ -205,9 +235,13 @@ class Map_Style_Composer {
 	 * @return WP_REST_Response
 	 */
 	public function get_metadata_response( WP_REST_Request $request ) {
+		$map_id        = absint( $request['id'] );
+		$force_refresh = rest_sanitize_boolean( $request->get_param( 'refresh' ) ) &&
+			current_user_can( 'edit_post', $map_id );
+
 		$result = $this->get_or_create_artifacts(
-			absint( $request['id'] ),
-			rest_sanitize_boolean( $request->get_param( 'refresh' ) )
+			$map_id,
+			$force_refresh
 		);
 
 		if ( is_wp_error( $result ) ) {
@@ -338,6 +372,49 @@ class Map_Style_Composer {
 	}
 
 	/**
+	 * Force refresh composed map style artifacts for maps using a layer.
+	 *
+	 * @param WP_REST_Request $request REST request.
+	 * @return WP_REST_Response
+	 */
+	public function refresh_layer_cache_response( WP_REST_Request $request ) {
+		$layer_id  = absint( $request['id'] );
+		$map_ids   = $this->get_map_ids_for_layer( $layer_id );
+		$results   = array();
+		$refreshed = 0;
+		$failed    = 0;
+
+		foreach ( $map_ids as $map_id ) {
+			$result = $this->get_or_create_artifacts( absint( $map_id ), true );
+
+			if ( is_wp_error( $result ) ) {
+				++$failed;
+				$results[] = array(
+					'mapId' => absint( $map_id ),
+					'error' => $result->get_error_message(),
+				);
+				continue;
+			}
+
+			++$refreshed;
+			$results[] = array(
+				'mapId' => absint( $map_id ),
+				'hash'  => $result['hash'] ?? null,
+			);
+		}
+
+		return rest_ensure_response(
+			array(
+				'layerId'   => $layer_id,
+				'mapIds'    => array_map( 'absint', $map_ids ),
+				'refreshed' => $refreshed,
+				'failed'    => $failed,
+				'results'   => $results,
+			)
+		);
+	}
+
+	/**
 	 * Clear map cache metadata when a map changes.
 	 *
 	 * @param int     $post_id Post ID.
@@ -363,6 +440,18 @@ class Map_Style_Composer {
 	public function invalidate_layer_cache( $post_id, $post, $update ) {
 		unset( $post, $update );
 
+		foreach ( $this->get_map_ids_for_layer( $post_id ) as $map_id ) {
+			$this->invalidate_map_cache( absint( $map_id ), null, true );
+		}
+	}
+
+	/**
+	 * Get map IDs that reference a layer in serialized map settings.
+	 *
+	 * @param int $layer_id Layer post ID.
+	 * @return int[]
+	 */
+	private function get_map_ids_for_layer( $layer_id ) {
 		$maps = get_posts(
 			array(
 				'post_type'      => 'map',
@@ -372,16 +461,14 @@ class Map_Style_Composer {
 				'meta_query'     => array(
 					array(
 						'key'     => 'layers',
-						'value'   => 's:2:"id";i:' . absint( $post_id ) . ';',
+						'value'   => 's:2:"id";i:' . absint( $layer_id ) . ';',
 						'compare' => 'LIKE',
 					),
 				),
 			)
 		);
 
-		foreach ( $maps as $map_id ) {
-			$this->invalidate_map_cache( absint( $map_id ), null, true );
-		}
+		return array_map( 'absint', $maps );
 	}
 
 	/**
