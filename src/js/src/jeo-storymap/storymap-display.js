@@ -157,8 +157,9 @@ class StoryMapDisplay extends Component {
 		}
 
 		this.initialized = false;
+		this.composedInteractionCleanups = [];
 
-        this.state = {
+		this.state = {
 			currentChapter: config.chapters[0],
 			// map: null,
 			isNavigating: false,
@@ -167,8 +168,8 @@ class StoryMapDisplay extends Component {
 			hiddenLayersIds: [],
 			inSlides,
 			hasStartedStorymap: ! props.hasIntroduction,
-        };
-    }
+		};
+	}
 
 	componentDidMount() {
 		this.eagerInitStorymap();
@@ -179,6 +180,7 @@ class StoryMapDisplay extends Component {
 
 	componentWillUnmount() {
 		this.isIntroductionScrollLocked = false;
+		this.cleanupComposedInteractions();
 		window.removeEventListener( 'resize', this.handleScrollerResize );
 		this.pauseStoryScroller();
 		document.removeEventListener( 'fullscreenchange', this.handleFullscreenChange );
@@ -353,6 +355,29 @@ class StoryMapDisplay extends Component {
 		if ( this.composedStyleError ) {
 			console.warn( this.composedStyleError );
 		}
+	}
+
+	addComposedInteractions( map ) {
+		this.cleanupComposedInteractions();
+		this.composedInteractionCleanups = addComposedInteractions(
+			map,
+			this.composedManifest
+		);
+
+		if ( typeof map?.once === 'function' ) {
+			map.once( 'remove', () => this.cleanupComposedInteractions() );
+		}
+	}
+
+	cleanupComposedInteractions() {
+		this.composedInteractionCleanups.forEach( ( cleanup ) => {
+			try {
+				cleanup();
+			} catch ( error ) {
+				// Map layers may already be gone when the map runtime tears down.
+			}
+		} );
+		this.composedInteractionCleanups = [];
 	}
 
 	setStoryLayerVisibility( layerSlug, visibility ) {
@@ -545,7 +570,7 @@ class StoryMapDisplay extends Component {
 			map.on( 'resize', () => this.syncMapLibreAttributionControl() );
 
 			if ( this.hasComposedStyle() ) {
-				addComposedInteractions( map, this.composedManifest );
+				this.addComposedInteractions( map );
 			} else {
 				( this.props.navigateMapLayers || [] ).forEach(layer => {
 					if ( this.isMapboxStyleLayer( layer ) ) {
