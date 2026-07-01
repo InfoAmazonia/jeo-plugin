@@ -25,9 +25,9 @@ class Map_Style_Composer {
 	use Singleton;
 
 	const CACHE_DIR               = 'jeo-mapbox-composed-styles';
-	const CACHE_VERSION           = 11;
+	const CACHE_VERSION           = 12;
 	const TOKEN_PLACEHOLDER       = '__JEO_MAPBOX_ACCESS_TOKEN__';
-	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/streets-v11';
+	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/standard';
 	const VIRTUAL_SCOPE_PREVIEW   = 'preview';
 	const VIRTUAL_SCOPE_ONETIME   = 'onetime';
 
