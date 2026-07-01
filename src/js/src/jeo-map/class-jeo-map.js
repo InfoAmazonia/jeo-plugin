@@ -75,6 +75,7 @@ export default class JeoMap {
 		this.composedManifest = null;
 		this.usingComposedStyle = false;
 		this.composedStyleError = null;
+		this.composedInteractionCleanups = [];
 		this.initialized = false;
 		this.popup = null;
 		this.attributionResizeObserver = null;
@@ -226,7 +227,7 @@ export default class JeoMap {
 						// When style is done loading (don't try to add layers before style is ready)
 						this.mapLoaded.then( () => {
 							if ( usingComposedStyle ) {
-								addComposedInteractions( map, this.composedManifest );
+								this.addComposedInteractions( map );
 							} else {
 								this.addComposedStyleWarningMessage();
 								layers.forEach( ( layer ) => {
@@ -454,6 +455,29 @@ export default class JeoMap {
 		if ( this.composedStyleError ) {
 			console.warn( this.composedStyleError );
 		}
+	}
+
+	addComposedInteractions( map ) {
+		this.cleanupComposedInteractions();
+		this.composedInteractionCleanups = addComposedInteractions(
+			map,
+			this.composedManifest
+		);
+
+		if ( typeof map?.once === 'function' ) {
+			map.once( 'remove', () => this.cleanupComposedInteractions() );
+		}
+	}
+
+	cleanupComposedInteractions() {
+		this.composedInteractionCleanups.forEach( ( cleanup ) => {
+			try {
+				cleanup();
+			} catch ( error ) {
+				// Map layers may already be gone when the map runtime tears down.
+			}
+		} );
+		this.composedInteractionCleanups = [];
 	}
 
 	addMapWithoutLayersMessage() {
