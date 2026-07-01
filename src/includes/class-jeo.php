@@ -109,6 +109,20 @@ class Jeo {
 	}
 
 	/**
+	 * Return the default glyph endpoint used when composed styles omit glyphs.
+	 *
+	 * @return string
+	 */
+	private function get_composed_style_default_glyphs(): string {
+		return trim(
+			(string) apply_filters(
+				'jeo_mapbox_composed_style_default_glyphs',
+				'mapbox://fonts/mapbox/{fontstack}/{range}.pbf'
+			)
+		);
+	}
+
+	/**
 	 * Determine whether the current request is a preview for the given post.
 	 *
 	 * @param int $post_id Post ID.
@@ -628,6 +642,7 @@ class Jeo {
 				'layersUrl'               => rest_url( 'jeo/v1/map-layer' ),
 				'composedStyleUrlBase'    => rest_url( 'jeo/v1/map-style/' ),
 				'composedStyleComposeUrl' => rest_url( 'jeo/v1/map-style/compose' ),
+				'composedStyleDefaultGlyphs' => $this->get_composed_style_default_glyphs(),
 				'nonce'                   => $this->get_rest_nonce(),
 				'currentLang'             => $this->get_current_language(),
 			)
@@ -1088,6 +1103,7 @@ class Jeo {
 					'layersUrl'               => rest_url( 'jeo/v1/map-layer' ),
 					'composedStyleUrlBase'    => rest_url( 'jeo/v1/map-style/' ),
 					'composedStyleComposeUrl' => rest_url( 'jeo/v1/map-style/compose' ),
+					'composedStyleDefaultGlyphs' => $this->get_composed_style_default_glyphs(),
 					'string_read_more'        => esc_html__( 'Read more', 'jeowp' ),
 					'jeoUrl'                  => JEO_BASEURL,
 					'nonce'                   => $this->get_rest_nonce(),
