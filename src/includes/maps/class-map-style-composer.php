@@ -372,7 +372,7 @@ class Map_Style_Composer {
 				'meta_query'     => array(
 					array(
 						'key'     => 'layers',
-						'value'   => (string) absint( $post_id ),
+						'value'   => 's:2:"id";i:' . absint( $post_id ) . ';',
 						'compare' => 'LIKE',
 					),
 				),
