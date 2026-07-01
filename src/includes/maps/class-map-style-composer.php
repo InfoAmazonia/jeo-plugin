@@ -24,12 +24,12 @@ class Map_Style_Composer {
 
 	use Singleton;
 
-	const CACHE_DIR             = 'jeo-mapbox-composed-styles';
-	const CACHE_VERSION         = 11;
-	const TOKEN_PLACEHOLDER     = '__JEO_MAPBOX_ACCESS_TOKEN__';
-	const FALLBACK_SPRITE       = 'mapbox://sprites/mapbox/streets-v11';
-	const VIRTUAL_SCOPE_PREVIEW = 'preview';
-	const VIRTUAL_SCOPE_ONETIME = 'onetime';
+	const CACHE_DIR               = 'jeo-mapbox-composed-styles';
+	const CACHE_VERSION           = 11;
+	const TOKEN_PLACEHOLDER       = '__JEO_MAPBOX_ACCESS_TOKEN__';
+	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/streets-v11';
+	const VIRTUAL_SCOPE_PREVIEW   = 'preview';
+	const VIRTUAL_SCOPE_ONETIME   = 'onetime';
 
 	/**
 	 * Register hooks.
@@ -1372,6 +1372,22 @@ class Map_Style_Composer {
 	}
 
 	/**
+	 * Return the fallback sprite root used for common missing Mapbox icons.
+	 *
+	 * Return an empty value from the filter to disable fallback sprite loading.
+	 *
+	 * @return string
+	 */
+	private function get_fallback_sprite() {
+		return trim(
+			(string) apply_filters(
+				'jeo_mapbox_composed_style_fallback_sprite',
+				self::DEFAULT_FALLBACK_SPRITE
+			)
+		);
+	}
+
+	/**
 	 * Merge sprites used by remote styles.
 	 *
 	 * @param array $bundles Style bundles.
@@ -1403,6 +1419,8 @@ class Map_Style_Composer {
 		if ( ! function_exists( 'imagecreatefromstring' ) ) {
 			return new WP_Error( 'jeo_mapbox_composer_gd_missing', __( 'The PHP GD extension is required to merge Mapbox sprites.', 'jeowp' ) );
 		}
+
+		$fallback_sprite = $this->get_fallback_sprite();
 
 		foreach ( array( 1, 2 ) as $ratio ) {
 			$entries        = array();
@@ -1440,8 +1458,8 @@ class Map_Style_Composer {
 				}
 
 				$missing = array_diff( $this->collect_style_image_names( $bundle['style'] ), array_keys( $fetched['json'] ) );
-				if ( ! empty( $missing ) && null === $fallback_cache ) {
-					$fallback_cache = $this->fetch_sprite( self::FALLBACK_SPRITE, $bundle['ref']['token'], $ratio );
+				if ( ! empty( $missing ) && null === $fallback_cache && '' !== $fallback_sprite ) {
+					$fallback_cache = $this->fetch_sprite( $fallback_sprite, $bundle['ref']['token'], $ratio );
 				}
 
 				if ( ! empty( $missing ) && is_array( $fallback_cache ) ) {

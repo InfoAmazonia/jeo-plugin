@@ -268,11 +268,12 @@ class Discovery extends Component {
 			return defaultStyle;
 		}
 
+		const defaultGlyphs = window.jeoMapVars?.composedStyleDefaultGlyphs || '';
+		const glyphs = defaultStyle.glyphs || defaultGlyphs;
+
 		return {
 			...defaultStyle,
-			glyphs:
-				defaultStyle.glyphs ||
-				'mapbox://fonts/mapbox/{fontstack}/{range}.pbf',
+			...( glyphs ? { glyphs } : {} ),
 		};
 	}
 

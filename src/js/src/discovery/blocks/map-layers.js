@@ -15,7 +15,6 @@ import Search from './search';
 
 const MAPS_PER_PAGE = 20;
 const MAP_COLLECTION_FIELDS = 'id,title,excerpt,meta';
-const DEFAULT_GLYPHS = 'mapbox://fonts/mapbox/{fontstack}/{range}.pbf';
 const STATIC_IMAGE_EXPRESSION_OPS = new Set( [
 	'step',
 	'case',
@@ -765,8 +764,12 @@ class MapLayers extends Component {
 			return;
 		}
 
+		const defaultGlyphs = window.jeoMapVars?.composedStyleDefaultGlyphs || '';
+
 		if ( map.style?.stylesheet ) {
-			map.style.stylesheet.glyphs = glyphs || DEFAULT_GLYPHS;
+			if ( glyphs || defaultGlyphs ) {
+				map.style.stylesheet.glyphs = glyphs || defaultGlyphs;
+			}
 		}
 	}
 
