@@ -1785,7 +1785,7 @@ class Map_Style_Composer {
 					++$count;
 				}
 				foreach ( array_keys( $section ) as $key ) {
-					if ( $this->ends_with( $key, '-pattern' ) ) {
+					if ( str_ends_with( $key, '-pattern' ) ) {
 						++$count;
 					}
 				}
@@ -1812,7 +1812,7 @@ class Map_Style_Composer {
 					$names = array_merge( $names, $this->collect_literal_image_names( $section['icon-image'] ) );
 				}
 				foreach ( $section as $key => $value ) {
-					if ( $this->ends_with( $key, '-pattern' ) ) {
+					if ( str_ends_with( $key, '-pattern' ) ) {
 						$names = array_merge( $names, $this->collect_literal_image_names( $value ) );
 					}
 				}
@@ -1898,7 +1898,7 @@ class Map_Style_Composer {
 				continue;
 			}
 			foreach ( $layer[ $section_name ] as $key => $value ) {
-				if ( $this->ends_with( $key, '-pattern' ) ) {
+				if ( str_ends_with( $key, '-pattern' ) ) {
 					$layer[ $section_name ][ $key ] = $this->rewrite_image_expression( $value, $image_prefix, $warnings );
 				}
 			}
@@ -2038,7 +2038,7 @@ class Map_Style_Composer {
 		if ( '' === $tileset_id ) {
 			return null;
 		}
-		return $this->starts_with( $tileset_id, 'mapbox://' ) ? $tileset_id : 'mapbox://' . $tileset_id;
+		return str_starts_with( $tileset_id, 'mapbox://' ) ? $tileset_id : 'mapbox://' . $tileset_id;
 	}
 
 	/**
@@ -2115,7 +2115,7 @@ class Map_Style_Composer {
 	 * @return string
 	 */
 	private function sprite_asset_url( $sprite, $token, $suffix, $extension ) {
-		if ( $this->starts_with( $sprite, 'mapbox://sprites/' ) ) {
+		if ( str_starts_with( $sprite, 'mapbox://sprites/' ) ) {
 			$path = trim( substr( $sprite, strlen( 'mapbox://sprites/' ) ), '/' );
 			$root = sprintf( 'https://api.mapbox.com/styles/v1/%s/sprite', $path );
 		} else {
@@ -2385,30 +2385,4 @@ class Map_Style_Composer {
 		return false === $value || 0 === $value || '0' === $value || 'false' === $value || '' === $value;
 	}
 
-	/**
-	 * Check a string prefix without requiring PHP 8.
-	 *
-	 * @param string $haystack Haystack.
-	 * @param string $needle Needle.
-	 * @return bool
-	 */
-	private function starts_with( $haystack, $needle ) {
-		return 0 === strpos( (string) $haystack, (string) $needle );
-	}
-
-	/**
-	 * Check a string suffix without requiring PHP 8.
-	 *
-	 * @param string $haystack Haystack.
-	 * @param string $needle Needle.
-	 * @return bool
-	 */
-	private function ends_with( $haystack, $needle ) {
-		$haystack = (string) $haystack;
-		$needle   = (string) $needle;
-		if ( '' === $needle ) {
-			return true;
-		}
-		return substr( $haystack, -strlen( $needle ) ) === $needle;
-	}
 }
