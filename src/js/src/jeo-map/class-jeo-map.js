@@ -2214,7 +2214,8 @@ export default class JeoMap {
 	transformRequestUrl( url, resourceType ) {
 		const tokenPlaceholder = '__JEO_MAPBOX_ACCESS_TOKEN__';
 		if ( url.includes( tokenPlaceholder ) ) {
-			url = url.split( tokenPlaceholder ).join(
+			url = url.replaceAll(
+			    tokenPlaceholder,
 				encodeURIComponent( jeo_settings.mapbox_key || '' )
 			);
 		}
