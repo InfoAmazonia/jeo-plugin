@@ -387,17 +387,17 @@ function useComposedPreviewStyle( {
 			return undefined;
 		}
 
-		let didCancel = false;
 		const abortController = new AbortController();
+		const { signal } = abortController;
 		setState( ( currentState ) => ( {
 			...currentState,
 			error: null,
 			isLoading: true,
 		} ) );
 
-		loadPreview( { signal: abortController.signal } )
+		loadPreview( { signal } )
 			.then( ( { manifest, metadata, style } ) => {
-				if ( didCancel ) {
+				if ( signal.aborted ) {
 					return;
 				}
 
@@ -410,13 +410,11 @@ function useComposedPreviewStyle( {
 				} );
 			} )
 			.catch( ( error ) => {
-				if ( didCancel ) {
+				if ( signal.aborted || isAbortError( error ) ) {
 					return;
 				}
 
-				if ( ! isAbortError( error ) ) {
-					console.warn( warningMessage, error );
-				}
+				console.warn( warningMessage, error );
 				setState( {
 					error,
 					isLoading: false,
@@ -427,7 +425,6 @@ function useComposedPreviewStyle( {
 			} );
 
 		return () => {
-			didCancel = true;
 			abortController.abort();
 		};
 	}, dependencies );
@@ -454,8 +451,8 @@ export function useMapboxStylePreview( styleUrl ) {
 			return undefined;
 		}
 
-		let didCancel = false;
 		const abortController = new AbortController();
+		const { signal } = abortController;
 
 		setState( ( currentState ) => ( {
 			...currentState,
@@ -463,15 +460,15 @@ export function useMapboxStylePreview( styleUrl ) {
 			isLoading: true,
 		} ) );
 
-		fetchJson( styleUrl, { signal: abortController.signal } )
+		fetchJson( styleUrl, { signal } )
 			.then( async ( style ) => {
 				const viewState =
 					getStyleViewState( style ) ||
 					( await getTileJsonViewState( style, styleUrl, {
-						signal: abortController.signal,
+						signal,
 					} ) );
 
-				if ( didCancel ) {
+				if ( signal.aborted ) {
 					return;
 				}
 
@@ -483,13 +480,11 @@ export function useMapboxStylePreview( styleUrl ) {
 				} );
 			} )
 			.catch( ( error ) => {
-				if ( didCancel ) {
+				if ( signal.aborted || isAbortError( error ) ) {
 					return;
 				}
 
-				if ( ! isAbortError( error ) ) {
-					console.warn( 'Unable to load Mapbox style preview.', error );
-				}
+				console.warn( 'Unable to load Mapbox style preview.', error );
 
 				setState( {
 					error,
@@ -500,7 +495,6 @@ export function useMapboxStylePreview( styleUrl ) {
 			} );
 
 		return () => {
-			didCancel = true;
 			abortController.abort();
 		};
 	}, [ styleUrl ] );
