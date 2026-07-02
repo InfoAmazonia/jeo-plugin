@@ -110,7 +110,7 @@ Messages include a `username` field for user messages (resolved from `user_id`).
 
 ### `POST /jeo/v1/context/clear` — Reset conversation and suggestions
 
-Deletes all three meta keys for the post, resetting the conversation completely.
+Deletes all four meta keys for the post and removes the raw AI conversation thread from `ConversationStore`, resetting the conversation completely.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -216,7 +216,7 @@ The system uses two separate storage mechanisms to avoid JSON schema pollution f
 ```mermaid
 graph TB
     subgraph "AI Context Storage (raw)"
-        CS[ConversationStore<br/>WP_Storage → post_meta] --> K1[_jeo_ai_context_conversation_{uuid}]
+        CS[ConversationStore<br/>WP_Storage → post_meta] --> K1[_jeo_ai_conversations_{uuid}]
         K1 --> |Schema-injected messages<br/>tool calls/results| AI[Agent reads on next call]
     end
 
@@ -283,7 +283,7 @@ stateDiagram-v2
 
 | Storage | Class | Backend | Key | Purpose |
 |---------|-------|---------|-----|---------|
-| Conversation | `WP_Storage` → `ConversationStore` | `post_meta` | `_jeo_ai_context_conversation_{uuid}` | Raw AI history (includes schema messages) |
+| Conversation | `WP_Storage` → `ConversationStore` | `post_meta` | `_jeo_ai_conversations_{uuid}` | Raw AI history (includes schema messages) |
 | UI Messages | Direct `update_post_meta()` | `post_meta` | `_jeo_ai_context_chat_messages` | Clean messages for UI (user text + assistant_message + user_id) |
 | Last Response | Direct `update_post_meta()` | `post_meta` | `_jeo_ai_context_last_response` | Latest paragraphs + references + message |
 | Conversation ID | Direct `update_post_meta()` | `post_meta` | `_jeo_ai_context_conversation_id` | UUID for thread lookup |

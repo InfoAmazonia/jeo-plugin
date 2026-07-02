@@ -277,7 +277,6 @@ class Context_Handler {
 			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
 			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
 
-			$this->persist_initial_context( $post_id, $conversation_id, $response );
 			$this->save_context_state( $post_id, $conversation_id, $response );
 			$this->append_suggestion_history(
 				$post_id,
@@ -554,9 +553,9 @@ class Context_Handler {
 
 		$paragraphs = $response_data['paragraphs'] ?? array();
 		if ( ! empty( $paragraphs ) ) {
-			$parts[] = '\nSuggested paragraphs: ' . count( $paragraphs );
+			$parts[] = "\nSuggested paragraphs: " . count( $paragraphs );
 		} else {
-			$parts[] = '\nSuggested paragraphs: none';
+			$parts[] = "\nSuggested paragraphs: none";
 		}
 
 		$references = $response_data['references'] ?? array();
@@ -696,12 +695,22 @@ class Context_Handler {
 
 		$paragraphs = $raw_state['paragraphs'] ?? array();
 		if ( ! empty( $paragraphs ) ) {
-			$parts[] = 'Previously suggested paragraphs: ' . count( $paragraphs );
+			$parts[] = 'Previously suggested paragraphs (' . count( $paragraphs ) . '):';
+			foreach ( $paragraphs as $i => $para ) {
+				$text    = isset( $para['text'] ) ? wp_strip_all_tags( $para['text'] ) : '';
+				$parts[] = sprintf( '  %d. %s', $i + 1, $text );
+			}
 		}
 
 		$references = $raw_state['references'] ?? array();
 		if ( ! empty( $references ) ) {
-			$parts[] = 'Previously suggested references: ' . count( $references );
+			$ref_lines = array();
+			foreach ( $references as $ref ) {
+				$title       = $ref['title'] ?? '';
+				$post_id     = $ref['post_id'] ?? 0;
+				$ref_lines[] = "  - {$title} (ID: {$post_id})";
+			}
+			$parts[] = 'Previously suggested references (' . count( $references ) . "):\n" . implode( "\n", $ref_lines );
 		}
 
 		$parts[] = "\nWhen refining, preserve the existing suggestions unless the user explicitly asks to change them.";
@@ -805,10 +814,17 @@ class Context_Handler {
 			);
 		}
 
+		$conversation_id = get_post_meta( $post_id, self::CONVERSATION_META_KEY, true );
+
 		delete_post_meta( $post_id, self::CONVERSATION_META_KEY );
 		delete_post_meta( $post_id, self::LAST_RESPONSE_META_KEY );
 		delete_post_meta( $post_id, self::CHAT_MESSAGES_META_KEY );
 		delete_post_meta( $post_id, self::SUGGESTION_HISTORY_META_KEY );
+
+		if ( ! empty( $conversation_id ) ) {
+			$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
+			$store->deleteThread( $conversation_id );
+		}
 
 		return new \WP_REST_Response(
 			array(

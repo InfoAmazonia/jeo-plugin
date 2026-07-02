@@ -580,44 +580,44 @@ msgstr "Baixar da fonte"
 msgid "Raster Mapbox Tiled Source"
 msgstr "Fonte raster de tiles do Mapbox"
 
-#: includes/layer-types/mapbox-tileset-raster.js:68
-#: includes/layer-types/mapbox-tileset-vector.js:95
+#: includes/layer-types/mapbox-tileset-raster.js:72
+#: includes/layer-types/mapbox-tileset-vector.js:109
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Tileset ID"
 msgstr "ID do tileset"
 
-#: includes/layer-types/mapbox-tileset-raster.js:69
-#: includes/layer-types/mapbox-tileset-vector.js:96
+#: includes/layer-types/mapbox-tileset-raster.js:73
+#: includes/layer-types/mapbox-tileset-vector.js:110
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Example: username.tilesetid"
 msgstr "Exemplo: username.tilesetid"
 
-#: includes/layer-types/mapbox-tileset-raster.js:72
-#: includes/layer-types/mapbox-tileset-vector.js:124
-#: includes/layer-types/mvt.js:102
+#: includes/layer-types/mapbox-tileset-raster.js:76
+#: includes/layer-types/mapbox-tileset-vector.js:138
+#: includes/layer-types/mvt.js:116
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Style Source Type"
 msgstr "Tipo de fonte do estilo"
 
-#: includes/layer-types/mapbox-tileset-raster.js:73
-#: includes/layer-types/mvt.js:103
+#: includes/layer-types/mapbox-tileset-raster.js:77
+#: includes/layer-types/mvt.js:117
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display"
 msgstr "Quais dados o mapa deve exibir"
 
-#: includes/layer-types/mapbox-tileset-raster.js:79
-#: includes/layer-types/mapbox-tileset-vector.js:104
+#: includes/layer-types/mapbox-tileset-raster.js:83
+#: includes/layer-types/mapbox-tileset-vector.js:118
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layer Type"
 msgstr "Tipo da camada"
 
-#: includes/layer-types/mapbox-tileset-raster.js:81
-#: includes/layer-types/mapbox-tileset-vector.js:106
+#: includes/layer-types/mapbox-tileset-raster.js:85
+#: includes/layer-types/mapbox-tileset-vector.js:120
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layers take the data that they get from a source, optionally filter features, and then define how those features are styled."
@@ -631,20 +631,20 @@ msgstr "As camadas usam os dados que recebem de uma fonte, podem filtrar feiçõ
 msgid "Vector Mapbox Tiled Source"
 msgstr "Fonte vetorial de tiles do Mapbox"
 
-#: includes/layer-types/mapbox-tileset-vector.js:100
-#: includes/layer-types/mvt.js:84
+#: includes/layer-types/mapbox-tileset-vector.js:114
+#: includes/layer-types/mvt.js:98
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Source layer"
 msgstr "Camada de origem"
 
-#: includes/layer-types/mapbox-tileset-vector.js:101
+#: includes/layer-types/mapbox-tileset-vector.js:115
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display."
 msgstr "Quais dados o mapa deve exibir."
 
-#: includes/layer-types/mapbox-tileset-vector.js:125
+#: includes/layer-types/mapbox-tileset-vector.js:139
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "The layer source type style"
@@ -658,25 +658,25 @@ msgstr "O tipo de fonte do estilo da camada"
 msgid "Mapbox Style"
 msgstr "Estilo do Mapbox"
 
-#: includes/layer-types/mapbox.js:155
+#: includes/layer-types/mapbox.js:159
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr "ID do estilo"
 
-#: includes/layer-types/mapbox.js:157
+#: includes/layer-types/mapbox.js:161
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
 msgstr "O ID do estilo do Mapbox inclui o nome de usuário e o ID. Exemplo: username/id ou mapbox://styles/username/id"
 
-#: includes/layer-types/mapbox.js:164
+#: includes/layer-types/mapbox.js:168
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Access token"
 msgstr "Token de acesso"
 
-#: includes/layer-types/mapbox.js:166
+#: includes/layer-types/mapbox.js:170
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
@@ -691,8 +691,8 @@ msgid "Mapbox Vector Tiles (MVT)"
 msgstr "Tiles vetoriais do Mapbox (MVT)"
 
 #: includes/ai/settings/tab-provider.php:27
-#: includes/layer-types/mvt.js:80
-#: includes/layer-types/tilelayer.js:57
+#: includes/layer-types/mvt.js:94
+#: includes/layer-types/tilelayer.js:61
 #: includes/legend-types/circles.js:25
 #: includes/legend-types/icons.js:25
 #: js/build/layersSidebar.js:7
@@ -700,7 +700,7 @@ msgstr "Tiles vetoriais do Mapbox (MVT)"
 msgid "URL"
 msgstr "URL"
 
-#: includes/layer-types/mvt.js:85
+#: includes/layer-types/mvt.js:99
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layer to use from a vector tile source."
@@ -714,25 +714,25 @@ msgstr "Camada a ser usada de uma fonte de tiles vetoriais."
 msgid "Raster Tiled Source"
 msgstr "Fonte raster de tiles"
 
-#: includes/layer-types/tilelayer.js:61
+#: includes/layer-types/tilelayer.js:65
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Scheme"
 msgstr "Esquema"
 
-#: includes/layer-types/tilelayer.js:62
+#: includes/layer-types/tilelayer.js:66
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Influences the Y direction of the tile coordinates."
 msgstr "Influencia a direção Y das coordenadas dos tiles."
 
-#: includes/layer-types/tilelayer.js:65
+#: includes/layer-types/tilelayer.js:69
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Slippy Map tilenames (XYZ)"
 msgstr "Nomes de tiles do Slippy Map (XYZ)"
 
-#: includes/layer-types/tilelayer.js:66
+#: includes/layer-types/tilelayer.js:70
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "OSGeo spec (TMS)"
@@ -2073,8 +2073,8 @@ msgstr "Aprovar geolocalizações da IA do JEO"
 
 #: includes/ai/class-context-handler.php:227
 #: includes/ai/class-context-handler.php:346
-#: includes/ai/class-context-handler.php:633
-#: includes/ai/class-context-handler.php:709
+#: includes/ai/class-context-handler.php:735
+#: includes/ai/class-context-handler.php:811
 #: includes/ai/class-rag-worker.php:223
 #: includes/minimap/class-minimap.php:142
 #: includes/minimap/class-minimap.php:238
@@ -2124,15 +2124,15 @@ msgstr "Um ID de post é obrigatório."
 msgid "A message is required."
 msgstr "Uma mensagem é obrigatória."
 
-#: includes/ai/class-context-handler.php:402
+#: includes/ai/class-context-handler.php:403
 msgid "Suggestions updated."
 msgstr "Sugestões atualizadas."
 
-#: includes/ai/class-context-handler.php:471
+#: includes/ai/class-context-handler.php:472
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr "A IA não responde após várias tentativas. Tente novamente ou reformule sua solicitação."
 
-#: includes/ai/class-context-handler.php:723
+#: includes/ai/class-context-handler.php:832
 msgid "Conversation cleared."
 msgstr "Conversa limpa."
 
@@ -2172,7 +2172,7 @@ msgstr "A resposta da IA não incluiu um style_id."
 msgid "Minilayer: %s"
 msgstr "Minilayer: %s"
 
-#: includes/ai/class-neuron-factory.php:191
+#: includes/ai/class-neuron-factory.php:216
 msgid "No Embedding Model configured. Please select one in the JEO AI settings."
 msgstr "Nenhum modelo de Embedding configurado. Selecione um nas configurações de IA do JEO."
 
@@ -3136,7 +3136,7 @@ msgstr "Nenhum adaptador de IA ativo encontrado."
 msgid "AI failed to generate prompt."
 msgstr "A IA falhou ao gerar o prompt."
 
-#: includes/ai/class-context-handler.php:742
+#: includes/ai/class-context-handler.php:851
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr "Prompt é obrigatório."
@@ -4567,11 +4567,11 @@ msgstr ""
 "Embed indisponível\n"
 "develop"
 
-#: includes/ai/class-context-agent.php:260
+#: includes/ai/class-context-agent.php:263
 msgid "No AI provider is configured. Set one in JEO AI Settings."
 msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA do JEO."
 
-#: includes/ai/class-context-agent.php:298
+#: includes/ai/class-context-agent.php:301
 msgid "The AI returned an empty prompt engineering response."
 msgstr "A IA retornou uma resposta vazia de engenharia de prompt."
 
@@ -4716,7 +4716,7 @@ msgid "The agent tried to remove several existing layers without an explicit req
 msgstr "O agente tentou remover várias camadas existentes sem uma solicitação explícita. Elas foram mantidas para preservar o mapa atual."
 
 #. translators: %s: search radius in kilometers
-#: includes/stories-near-you/class-stories-near-you.php:1073
+#: includes/stories-near-you/class-stories-near-you.php:1105
 #, php-format
 msgid "No stories found within %s km of your location."
 msgstr "Nenhuma história encontrada num raio de %s km da sua localização."
@@ -4791,3 +4791,35 @@ msgstr "Digite um endereço, depois clique em Buscar ou pressione Enter. Você t
 #: jeo.php:36
 msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
 msgstr "Erro no plugin JEO: Sua versão do PHP é muito antiga. Os recursos de IA do JEO exigem PHP 8.2 ou superior. O plugin permanecerá desativado."
+
+#. translators: %s: linked URL
+#: includes/ai/class-context-handler.php:634
+#, php-format
+msgid "Link to %s removed: not listed in references."
+msgstr ""
+
+#. translators: %s: link anchor text
+#: includes/ai/class-context-handler.php:659
+#, php-format
+msgid "Link to \"%s\" removed: anchor not found in reference."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:676
+msgid "Verification notes:"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Save the post before generating the map."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not start map generation."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not send message."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not generate from prompt."
+msgstr ""

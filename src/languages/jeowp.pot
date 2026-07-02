@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-06-25T14:35:04+00:00\n"
+"POT-Creation-Date: 2026-07-02T21:20:46+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -375,18 +375,18 @@ msgstr ""
 msgid "Approve JEO AI Geolocations"
 msgstr ""
 
-#: includes/ai/class-context-agent.php:260
+#: includes/ai/class-context-agent.php:263
 msgid "No AI provider is configured. Set one in JEO AI Settings."
 msgstr ""
 
-#: includes/ai/class-context-agent.php:298
+#: includes/ai/class-context-agent.php:301
 msgid "The AI returned an empty prompt engineering response."
 msgstr ""
 
 #: includes/ai/class-context-handler.php:227
 #: includes/ai/class-context-handler.php:346
-#: includes/ai/class-context-handler.php:633
-#: includes/ai/class-context-handler.php:709
+#: includes/ai/class-context-handler.php:735
+#: includes/ai/class-context-handler.php:811
 #: includes/ai/class-rag-worker.php:223
 #: includes/minimap/class-minimap.php:142
 #: includes/minimap/class-minimap.php:238
@@ -441,19 +441,35 @@ msgstr ""
 msgid "A message is required."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:402
+#: includes/ai/class-context-handler.php:403
 msgid "Suggestions updated."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:471
+#: includes/ai/class-context-handler.php:472
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:723
+#. translators: %s: linked URL
+#: includes/ai/class-context-handler.php:634
+#, php-format
+msgid "Link to %s removed: not listed in references."
+msgstr ""
+
+#. translators: %s: link anchor text
+#: includes/ai/class-context-handler.php:659
+#, php-format
+msgid "Link to \"%s\" removed: anchor not found in reference."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:676
+msgid "Verification notes:"
+msgstr ""
+
+#: includes/ai/class-context-handler.php:832
 msgid "Conversation cleared."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:742
+#: includes/ai/class-context-handler.php:851
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr ""
@@ -494,7 +510,7 @@ msgstr ""
 msgid "Minilayer: %s"
 msgstr ""
 
-#: includes/ai/class-neuron-factory.php:191
+#: includes/ai/class-neuron-factory.php:216
 msgid "No Embedding Model configured. Please select one in the JEO AI settings."
 msgstr ""
 
@@ -1217,8 +1233,8 @@ msgid "Clear Layer Store"
 msgstr ""
 
 #: includes/ai/settings/tab-provider.php:27
-#: includes/layer-types/mvt.js:80
-#: includes/layer-types/tilelayer.js:57
+#: includes/layer-types/mvt.js:94
+#: includes/layer-types/tilelayer.js:61
 #: includes/legend-types/circles.js:25
 #: includes/legend-types/icons.js:25
 #: js/build/layersSidebar.js:7
@@ -2768,7 +2784,7 @@ msgid "Unable to load stories near you."
 msgstr ""
 
 #. translators: %s: search radius in kilometers
-#: includes/stories-near-you/class-stories-near-you.php:1073
+#: includes/stories-near-you/class-stories-near-you.php:1105
 #, php-format
 msgid "No stories found within %s km of your location."
 msgstr ""
@@ -2876,44 +2892,44 @@ msgstr ""
 msgid "Raster Mapbox Tiled Source"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-raster.js:68
-#: includes/layer-types/mapbox-tileset-vector.js:95
+#: includes/layer-types/mapbox-tileset-raster.js:72
+#: includes/layer-types/mapbox-tileset-vector.js:109
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Tileset ID"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-raster.js:69
-#: includes/layer-types/mapbox-tileset-vector.js:96
+#: includes/layer-types/mapbox-tileset-raster.js:73
+#: includes/layer-types/mapbox-tileset-vector.js:110
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Example: username.tilesetid"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-raster.js:72
-#: includes/layer-types/mapbox-tileset-vector.js:124
-#: includes/layer-types/mvt.js:102
+#: includes/layer-types/mapbox-tileset-raster.js:76
+#: includes/layer-types/mapbox-tileset-vector.js:138
+#: includes/layer-types/mvt.js:116
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Style Source Type"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-raster.js:73
-#: includes/layer-types/mvt.js:103
+#: includes/layer-types/mapbox-tileset-raster.js:77
+#: includes/layer-types/mvt.js:117
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-raster.js:79
-#: includes/layer-types/mapbox-tileset-vector.js:104
+#: includes/layer-types/mapbox-tileset-raster.js:83
+#: includes/layer-types/mapbox-tileset-vector.js:118
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layer Type"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-raster.js:81
-#: includes/layer-types/mapbox-tileset-vector.js:106
+#: includes/layer-types/mapbox-tileset-raster.js:85
+#: includes/layer-types/mapbox-tileset-vector.js:120
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layers take the data that they get from a source, optionally filter features, and then define how those features are styled."
@@ -2927,20 +2943,20 @@ msgstr ""
 msgid "Vector Mapbox Tiled Source"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-vector.js:100
-#: includes/layer-types/mvt.js:84
+#: includes/layer-types/mapbox-tileset-vector.js:114
+#: includes/layer-types/mvt.js:98
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Source layer"
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-vector.js:101
+#: includes/layer-types/mapbox-tileset-vector.js:115
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display."
 msgstr ""
 
-#: includes/layer-types/mapbox-tileset-vector.js:125
+#: includes/layer-types/mapbox-tileset-vector.js:139
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "The layer source type style"
@@ -2954,25 +2970,25 @@ msgstr ""
 msgid "Mapbox Style"
 msgstr ""
 
-#: includes/layer-types/mapbox.js:155
+#: includes/layer-types/mapbox.js:159
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr ""
 
-#: includes/layer-types/mapbox.js:157
+#: includes/layer-types/mapbox.js:161
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
 msgstr ""
 
-#: includes/layer-types/mapbox.js:164
+#: includes/layer-types/mapbox.js:168
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Access token"
 msgstr ""
 
-#: includes/layer-types/mapbox.js:166
+#: includes/layer-types/mapbox.js:170
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
@@ -2986,7 +3002,7 @@ msgstr ""
 msgid "Mapbox Vector Tiles (MVT)"
 msgstr ""
 
-#: includes/layer-types/mvt.js:85
+#: includes/layer-types/mvt.js:99
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Layer to use from a vector tile source."
@@ -3000,25 +3016,25 @@ msgstr ""
 msgid "Raster Tiled Source"
 msgstr ""
 
-#: includes/layer-types/tilelayer.js:61
+#: includes/layer-types/tilelayer.js:65
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Scheme"
 msgstr ""
 
-#: includes/layer-types/tilelayer.js:62
+#: includes/layer-types/tilelayer.js:66
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Influences the Y direction of the tile coordinates."
 msgstr ""
 
-#: includes/layer-types/tilelayer.js:65
+#: includes/layer-types/tilelayer.js:69
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "Slippy Map tilenames (XYZ)"
 msgstr ""
 
-#: includes/layer-types/tilelayer.js:66
+#: includes/layer-types/tilelayer.js:70
 #: js/build/layersSidebar.js:7
 #: js/build/mapBlocks.js:1
 msgid "OSGeo spec (TMS)"
@@ -3703,6 +3719,10 @@ msgid "Generating map configuration…"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
+msgid "Save the post before generating the map."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
 msgid "Map generated from post content."
 msgstr ""
 
@@ -3715,7 +3735,15 @@ msgid "Request failed."
 msgstr ""
 
 #: js/build/mapBlocks.js:1
+msgid "Could not start map generation."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
 msgid "Failed to update map."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not send message."
 msgstr ""
 
 #: js/build/mapBlocks.js:1
@@ -3724,6 +3752,10 @@ msgstr ""
 
 #: js/build/mapBlocks.js:1
 msgid "Failed to generate from prompt."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not generate from prompt."
 msgstr ""
 
 #: js/build/mapBlocks.js:1

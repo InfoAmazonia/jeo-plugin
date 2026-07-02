@@ -164,6 +164,10 @@ const ContextChatPanel = ( { postId } ) => {
 					post_id: postId,
 					conversation_id: conversationId,
 					message: userMessage,
+					current_state: {
+						paragraphs: suggestedParagraphs,
+						references,
+					},
 				},
 			} );
 
