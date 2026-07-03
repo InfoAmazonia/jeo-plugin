@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: JEO 3.0.2\n"
+"Project-Id-Version: JEO 3.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowp\n"
 "Last-Translator: Stefano Wrobleski\n"
 "Language-Team: InfoAmazonia\n"
@@ -2136,37 +2136,37 @@ msgstr "Não foi possível carregar o estilo composto do Mapbox para este mapa n
 #, js-format
 msgid "%d map"
 msgid_plural "%d maps"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d mapa"
+msgstr[1] "%d mapas"
 
 #. translators: %d: number of map refresh failures.
 #: js/build/layersSidebar.js:9
 #, js-format
 msgid "%d failure"
 msgid_plural "%d failures"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d falha"
+msgstr[1] "%d falhas"
 
 #. translators: 1: refreshed maps count label, 2: failed refresh count label.
 #: js/build/layersSidebar.js:10
 #, js-format
 msgid "Composed style cache refreshed for %1$s, with %2$s."
-msgstr ""
+msgstr "Cache de estilos compostos atualizado para %1$s, com %2$s."
 
 #. translators: %s: refreshed maps count label.
 #: js/build/layersSidebar.js:11
 #, js-format
 msgid "Composed style cache refreshed for %s."
-msgstr ""
+msgstr "Cache de estilos compostos atualizado para %s."
 
 #: js/build/layersSidebar.js:11
 msgid "Unable to refresh composed style cache."
-msgstr ""
+msgstr "Não foi possível atualizar o cache de estilos compostos."
 
 #: js/build/layersSidebar.js:11
 msgid "Refreshing composed style cache"
-msgstr ""
+msgstr "Atualizando cache de estilos compostos"
 
 #: js/build/layersSidebar.js:11
 msgid "Refresh composed style cache"
-msgstr ""
+msgstr "Atualizar cache de estilos compostos"

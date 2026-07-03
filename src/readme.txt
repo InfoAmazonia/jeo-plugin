@@ -1,12 +1,12 @@
 === JEO Maps ===
 Contributors: infoamazonia
 Tested up to: 7.0
-Stable tag: 3.0.2
+Stable tag: 3.1.0
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
-Version: 3.0.2
+Version: 3.1.0
 
 Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
 
@@ -74,6 +74,16 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 8. Browse geolocated stories and map clusters in the Discovery interface.
 
 == Changelog ==
+
+= 3.1.0 =
+* Replaced Mapbox Static Tiles overlays for Mapbox style layers with composed Mapbox GL styles for maps, storymaps, Discovery, embeds, and editor previews.
+* Preserved the existing editorial workflow for layer ordering, default visibility, switchable/swappable layers, legends, storymaps, Discovery maps, and one-time map previews.
+* Added support for enabling interactions on multiple composed Mapbox style layers.
+* Added composed Mapbox style loading to Discovery, including embeds, custom access tokens, sprite preloading, and layer interaction popups.
+* Added temporary composed style previews for unsaved editor and one-time map states.
+* Improved MapLibre compatibility for composed Mapbox styles.
+* Added cache refresh and performance improvements for composed Mapbox styles.
+* Removed the legacy Static Tiles rendering path for Mapbox style layers.
 
 = 3.0.2 =
 * Fixed story map introductions being cut off when they contained long text.
