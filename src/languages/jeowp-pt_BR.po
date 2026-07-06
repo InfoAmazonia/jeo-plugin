@@ -2028,52 +2028,52 @@ msgstr "Os estilos compostos do Mapbox estão desativados."
 msgid "Could not create the Mapbox composed style cache directory."
 msgstr "Não foi possível criar o diretório de cache dos estilos compostos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:676
+#: includes/maps/class-map-style-composer.php:684
 msgid "Map not found."
 msgstr "Mapa não encontrado."
 
-#: includes/maps/class-map-style-composer.php:686
-#: includes/maps/class-map-style-composer.php:749
+#: includes/maps/class-map-style-composer.php:694
+#: includes/maps/class-map-style-composer.php:757
 msgid "A Mapbox access token is required to compose Mapbox styles."
 msgstr "Um token de acesso do Mapbox é necessário para compor estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:726
+#: includes/maps/class-map-style-composer.php:734
 msgid "Public payload composition is only available for one-time maps."
 msgstr "A composição com dados públicos está disponível apenas para mapas de uso único."
 
-#: includes/maps/class-map-style-composer.php:732
+#: includes/maps/class-map-style-composer.php:740
 msgid "The map preview payload is too large."
 msgstr "Os dados da prévia do mapa são grandes demais."
 
-#: includes/maps/class-map-style-composer.php:744
+#: includes/maps/class-map-style-composer.php:752
 msgid "The map preview has too many layers to compose."
 msgstr "A prévia do mapa tem camadas demais para compor."
 
-#: includes/maps/class-map-style-composer.php:755
+#: includes/maps/class-map-style-composer.php:763
 msgid "The map preview does not include any renderable layers."
 msgstr "A prévia do mapa não inclui nenhuma camada renderizável."
 
-#: includes/maps/class-map-style-composer.php:777
+#: includes/maps/class-map-style-composer.php:785
 msgid "Map preview"
 msgstr "Prévia do mapa"
 
-#: includes/maps/class-map-style-composer.php:1018
+#: includes/maps/class-map-style-composer.php:1026
 msgid "Invalid composed style hash."
 msgstr "Hash do estilo composto inválido."
 
-#: includes/maps/class-map-style-composer.php:1106
+#: includes/maps/class-map-style-composer.php:1114
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "Não foi possível obter um ou mais estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1507
+#: includes/maps/class-map-style-composer.php:1515
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "A extensão PHP GD é necessária para mesclar sprites do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1626
+#: includes/maps/class-map-style-composer.php:1634
 msgid "Could not decode a Mapbox sprite image."
 msgstr "Não foi possível decodificar uma imagem de sprite do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2343
+#: includes/maps/class-map-style-composer.php:2351
 msgid "Composed style artifact was not found."
 msgstr "O artefato do estilo composto não foi encontrado."
 

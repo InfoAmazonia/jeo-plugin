@@ -317,10 +317,14 @@ export default class JeoMap {
 		if ( previewMapPayload ) {
 			try {
 				this.map_post_object = JSON.parse( previewMapPayload );
-				await this.getLayers();
-				return;
 			} catch ( error ) {
 				console.warn( 'Unable to parse preview map payload. Falling back to REST data.', error );
+			}
+
+			if ( this.map_post_object ) {
+				await this.getLayers();
+				await this.fetchPreviewComposedStyleData();
+				return;
 			}
 		}
 
@@ -376,6 +380,34 @@ export default class JeoMap {
 		);
 	}
 
+	async fetchPreviewComposedStyleData() {
+		if (
+			! window.jeoMapVars?.composedStyleComposeUrl ||
+			! this.layers.some( ( layer ) => this.isMapboxStyleLayer( layer ) )
+		) {
+			return;
+		}
+
+		await this.loadComposedStyleData(
+			() => loadComposedStyleData( {
+				payload: this.getPreviewComposedStylePayload(),
+				unavailableMessage: __(
+					'Mapbox style composition is unavailable for this map.',
+					'jeowp'
+				),
+				emptyManifestMessage: __(
+					'Mapbox style composition did not return renderable layers for this map.',
+					'jeowp'
+				),
+			} ),
+			__(
+				'Unable to load composed Mapbox style for this map.',
+				'jeowp'
+			),
+			'Unable to load composed Mapbox style for preview map. Mapbox style layers will be omitted.'
+		);
+	}
+
 	async fetchOnetimeComposedStyleData() {
 		if (
 			! window.jeoMapVars?.composedStyleComposeUrl ||
@@ -419,6 +451,22 @@ export default class JeoMap {
 			this.composedStyleError = error?.message || fallbackErrorMessage;
 			console.warn( consoleMessage, error );
 		}
+	}
+
+	getPreviewComposedStylePayload() {
+		const meta = this.map_post_object?.meta || {};
+
+		return {
+			scope: 'preview',
+			kind: 'map-preview',
+			postId: this.map_post_object?.id || null,
+			title: this.map_post_object?.title?.rendered || '',
+			url: globalThis.location?.href || '',
+			layers: this.layersDefinitions || meta.layers || [],
+			center_lat: meta.center_lat ?? null,
+			center_lon: meta.center_lon ?? null,
+			initial_zoom: meta.initial_zoom ?? null,
+		};
 	}
 
 	getOnetimeComposedStylePayload() {
@@ -1050,14 +1098,21 @@ export default class JeoMap {
 
 			if ( layersDefinitions ) {
 				const layersIds = layersDefinitions.map( ( el ) => el.id );
+				const requestContext = this.map_post_object ? 'edit' : 'view';
 
-				jQuery.get(
-					jeoMapVars.layersUrl,
-					{
+				jQuery.ajax( {
+					type: 'GET',
+					url: jeoMapVars.layersUrl,
+					data: {
 						include: layersIds,
-						context: 'view',
+						context: requestContext,
 					},
-					( data ) => {
+					beforeSend: function ( request ) {
+						if ( 'edit' === requestContext && jeoMapVars.nonce ) {
+							request.setRequestHeader( 'X-WP-Nonce', jeoMapVars.nonce );
+						}
+					},
+					success: ( data ) => {
 						const returnLayers = [];
 						const returnLegends = [];
 						const ordered = [];
@@ -1101,8 +1156,9 @@ export default class JeoMap {
 						this.layers = returnLayers;
 						this.legends = returnLegends;
 						resolve( returnLayers );
-					}
-				);
+					},
+					error: reject,
+				} );
 			}
 		} );
 	}
