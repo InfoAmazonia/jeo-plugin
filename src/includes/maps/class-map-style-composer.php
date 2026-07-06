@@ -652,12 +652,20 @@ class Map_Style_Composer {
 			$warnings = $report['warnings'];
 		}
 
+		$style_url    = rest_url( sprintf( 'jeo/v1/map-style/%s/%s/style', $scope, rawurlencode( $hash ) ) );
+		$manifest_url = rest_url( sprintf( 'jeo/v1/map-style/%s/%s/manifest', $scope, rawurlencode( $hash ) ) );
+		if ( self::VIRTUAL_SCOPE_PREVIEW === $scope && is_user_logged_in() ) {
+			$nonce        = wp_create_nonce( 'wp_rest' );
+			$style_url    = add_query_arg( '_wpnonce', $nonce, $style_url );
+			$manifest_url = add_query_arg( '_wpnonce', $nonce, $manifest_url );
+		}
+
 		return array(
 			'enabled'      => true,
 			'scope'        => $scope,
 			'hash'         => $hash,
-			'style'        => rest_url( sprintf( 'jeo/v1/map-style/%s/%s/style', $scope, rawurlencode( $hash ) ) ),
-			'manifest'     => rest_url( sprintf( 'jeo/v1/map-style/%s/%s/manifest', $scope, rawurlencode( $hash ) ) ),
+			'style'        => $style_url,
+			'manifest'     => $manifest_url,
 			'warnings'     => $warnings,
 			'stylePath'    => $paths['stylePath'],
 			'manifestPath' => $paths['manifestPath'],
