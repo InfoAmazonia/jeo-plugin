@@ -49,6 +49,16 @@ Storymap blocks are restricted to 1 per post.
 6. Manages layer visibility per chapter
 7. Optional final step: "Navigate the map" → full `JeoMap` instance
 
+### Composed Mapbox Styles
+
+Storymap renders `mapbox`-type layers via the **Map Style Composer** when available
+(`fetchComposedStyleData(mapId)` → `loadComposedStyleData`). The composite style is set
+as the map's base `style`; per-slide layer visibility delegates to
+`setComposedLayerVisibility` via `getVisibilityLayerRefs()` (returns manifest layers).
+Interactions and the composition-failure warning mirror `JeoMap`. The storymap editor
+(`storymap-editor.js`) uses `useComposedMapPreviewStyle` + `applyComposedVisibilityFromSelection`
+per slide. See [`composed-styles/README.md`](../composed-styles/README.md).
+
 ```mermaid
 sequenceDiagram
     participant U as User

@@ -5,6 +5,7 @@
 | File | Role |
 |------|------|
 | `src/includes/maps/class-maps.php` | `Jeo\Maps` class — CPT, meta, shortcode |
+| `src/includes/maps/class-map-style-composer.php` | `Jeo\Map_Style_Composer` — merges Mapbox styles into cached composite Style JSON (see [`composed-styles/README.md`](../composed-styles/README.md)) |
 | `src/js/src/jeo-map/class-jeo-map.js` | `JeoMap` class — frontend rendering |
 | `src/js/src/jeo-map/index.js` | Entry point, DOM scan |
 | `src/js/src/maps-sidebar/` | Gutenberg sidebar for editing |
@@ -32,6 +33,14 @@
 | `show_markers` | boolean | Show markers |
 | `map_layers_load_as_style` | boolean | Load layers as style |
 
+#### Composed Style Meta (managed by `Map_Style_Composer`)
+
+| Meta Key | Type | Description |
+|----------|------|-------------|
+| `_jeo_mapbox_composed_style_hash` | string (16 hex) | Current cache hash; changes on any map/layer edit |
+| `_jeo_mapbox_composed_style_warnings` | array | Composition warnings (sprite conflicts, unsupported expressions, etc.) |
+| `_jeo_mapbox_composed_style_error` | string | Last composition error (cleared on success) |
+
 ### Shortcode
 
 ```
@@ -42,6 +51,7 @@
 
 - `GET /wp-json/wp/v2/map` — List (standard WP CPT)
 - `GET /wp-json/jeo/v1/map/{id}` — Full data for frontend rendering
+- `GET /wp-json/jeo/v1/map-style/{id}` — Composed style metadata (style/manifest URLs) — see [`composed-styles/README.md`](../composed-styles/README.md)
 
 ## Frontend Rendering
 
@@ -73,6 +83,22 @@ The live map preview with zoom controls (initial, min, max) is handled by the `j
 - Persists center coordinates on `onMoveEnd` and zoom on `onZoomEnd` only
 - Updates the map in-place (no `key`-based remount)
 - Bridges pan-limits to the sidebar via `window.parent.__jeoSetPanLimitsFromMap`
+
+## Composed Mapbox Styles
+
+When a map contains `mapbox`-type layers, the **Map Style Composer**
+(`Jeo\Map_Style_Composer`) merges them into a single cached composite Mapbox Style JSON
+renderable by MapLibre. This replaces the legacy Static Tiles overlay path (removed 3.1.0).
+
+- **Backend**: see [`composed-styles/README.md`](../composed-styles/README.md) for the
+  full architecture (composition, caching, REST endpoints, filters).
+- **Frontend** (`JeoMap`): when composed style is available, the composite style is set as
+  the map's base `style`; per-JEO-layer visibility and interactions are driven by the
+  manifest. If composition fails, a `.jeomap-composed-style-warning` is shown and mapbox
+  layers are omitted. Non-mapbox layers still render via the legacy individual-add path.
+- **Editor**: the `jeo/map-editor` block and CPT preview use
+  `mapbox-style-preview.js` hooks (`useComposedMapPreviewStyle` / `useComposedPayloadPreviewStyle`)
+  to load composed styles with an AbortSignal stale-state guard.
 
 ## Data Flow
 
