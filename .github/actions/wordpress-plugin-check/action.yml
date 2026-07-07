@@ -121,22 +121,23 @@ runs:
 
         # NOTE: wp plugin check never returns a non-zero exit code when errors or
         # warnings are found — it only exits non-zero on runner/CLI failures.
-        # We therefore use strict-json (a single valid JSON array) and parse the
-        # results ourselves to determine pass/fail.
+        # We use the CSV format because it is the only machine-readable output
+        # that includes the file path (via "FILE:" section headers); the
+        # strict-json format omits file paths entirely. We parse the CSV into a
+        # JSON array ourselves for counting, annotations, and the summary table.
         echo "::group::Run Plugin Check"
+        PLUGIN_CHECK_RAW="${PLUGIN_CHECK_RESULTS}.raw"
         set +e
         wp --path="$WP_PATH" \
           --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" \
           plugin check "$PLUGIN_SLUG" \
-          --format=strict-json \
+          --format=csv \
           --slug="$PLUGIN_SLUG" \
           --exclude-files=.wp-env.json \
-          > "$PLUGIN_CHECK_RESULTS"
+          > "$PLUGIN_CHECK_RAW"
         cli_status=$?
         set -e
 
-        cat "$PLUGIN_CHECK_RESULTS"
-        echo
         echo "::endgroup::"
 
         # Fail immediately if the wp CLI command itself crashed.
@@ -144,6 +145,48 @@ runs:
           echo "::error::Plugin Check command failed with exit code $cli_status"
           exit 1
         fi
+
+        # Parse the CSV output (with "FILE:" section headers) into a JSON array
+        # so we can use jq for counting, annotations, and the summary table.
+        python3 - "$PLUGIN_CHECK_RAW" "$PLUGIN_CHECK_RESULTS" <<'PYEOF'
+        import csv
+        import json
+        import sys
+
+        def safe_int(value):
+            try:
+                return int(value)
+            except (ValueError, TypeError):
+                return 0
+
+        results = []
+        current_file = ""
+        with open(sys.argv[1], newline="") as f:
+            for row in csv.reader(f):
+                if not row or not row[0]:
+                    continue
+                if row[0].startswith("FILE:"):
+                    current_file = ",".join(row)[len("FILE:"):].strip()
+                    continue
+                if row[0] == "line":
+                    continue  # CSV header row
+                if len(row) < 5:
+                    continue
+
+                results.append({
+                    "file": current_file,
+                    "line": safe_int(row[0]),
+                    "type": row[2] if len(row) > 2 else "",
+                    "code": row[3] if len(row) > 3 else "",
+                    "message": row[4] if len(row) > 4 else "",
+                    "docs": row[5] if len(row) > 5 else "",
+                })
+
+        with open(sys.argv[2], "w") as out:
+            json.dump(results, out)
+        PYEOF
+
+        echo "Parsed $(jq 'length' "$PLUGIN_CHECK_RESULTS") Plugin Check result(s)."
 
         # Parse the JSON results with jq.
         ERROR_COUNT=$(jq '[.[] | select(.type == "ERROR")] | length' "$PLUGIN_CHECK_RESULTS")
