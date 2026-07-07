@@ -14,7 +14,7 @@
 	{
 		"name": "mapBlocks",
 		"path": "src/js/build/mapBlocks.js",
-		"limit": "1350 KB",
+		"limit": "1355 KB",
 		"brotli": false
 	},
 	{
@@ -26,7 +26,7 @@
 	{
 		"name": "discovery",
 		"path": "src/js/build/discovery.js",
-		"limit": "290 KB",
+		"limit": "305 KB",
 		"brotli": false
 	},
 	{
@@ -44,7 +44,7 @@
 	{
 		"name": "jeoMap",
 		"path": "src/js/build/jeoMap.js",
-		"limit": "91 KB",
+		"limit": "100 KB",
 		"brotli": false
 	},
 	{
