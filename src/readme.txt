@@ -76,6 +76,20 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 
 == Changelog ==
 
+= 3.1.1 =
+* Fixed authenticated previews for unpublished maps that use composed Mapbox style layers.
+* Added preview nonce handling so Mapbox GL can load generated preview style and manifest URLs directly.
+
+= 3.1.0 =
+* Replaced Mapbox Static Tiles overlays for Mapbox style layers with composed Mapbox GL styles for maps, storymaps, Discovery, embeds, and editor previews.
+* Preserved the existing editorial workflow for layer ordering, default visibility, switchable/swappable layers, legends, storymaps, Discovery maps, and one-time map previews.
+* Added support for enabling interactions on multiple composed Mapbox style layers.
+* Added composed Mapbox style loading to Discovery, including embeds, custom access tokens, sprite preloading, and layer interaction popups.
+* Added temporary composed style previews for unsaved editor and one-time map states.
+* Improved MapLibre compatibility for composed Mapbox styles.
+* Added cache refresh and performance improvements for composed Mapbox styles.
+* Removed the legacy Static Tiles rendering path for Mapbox style layers.
+
 = 3.0.2 =
 * Fixed story map introductions being cut off when they contained long text.
 * Fixed display of embedded story maps.

@@ -258,7 +258,7 @@ function ensureMapboxRuntimePatched() {
 /** @type string */
 export const mapboxToken = jeo_settings.mapbox_key
 
-export const defaultStyle = 'mapbox://styles/mapbox/streets-v11'
+export const defaultStyle = 'mapbox://styles/mapbox/standard'
 export const transformRequest = undefined
 
 export function getMapLibrary() {

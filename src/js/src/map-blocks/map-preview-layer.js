@@ -1,14 +1,8 @@
 import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
 
-import { mapboxToken } from '../lib/mapgl-loader';
 import { Layer, Source } from '../lib/mapgl-react';
 import { resolveTileUrl } from '../shared/styles';
-
-const MAPBOX_RASTER_ATTRIBUTION =
-	'&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a> ' +
-	'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-	'<a href="https://www.mapbox.com/map-feedback/">Improve this map</a>';
 
 export function renderLayer( { layer, instance } ) {
 	if ( instance.load_as_style ) {
@@ -61,23 +55,7 @@ export function renderLayer( { layer, instance } ) {
 
 	switch ( layer.type ) {
 		case 'mapbox': {
-			const accessToken = options.access_token || mapboxToken;
-
-			const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
-			const styleUrl = `https://api.mapbox.com/styles/v1/${ styleId }/tiles/512/{z}/{x}/{y}@2x?access_token=${ accessToken }`
-			const opacity = typeof instance.opacity === 'number' ? instance.opacity : 1;
-
-			return (
-				<Source
-					key={ styleUrl }
-					id={ sourceId }
-					type="raster"
-					tiles={ [ styleUrl ] }
-					attribution={ MAPBOX_RASTER_ATTRIBUTION }
-				>
-					<Layer id={ layerId } type="raster" paint={ { 'raster-opacity': opacity } } />
-				</Source>
-			);
+			return null;
 		}
 
 		case 'mapbox-tileset-raster': {

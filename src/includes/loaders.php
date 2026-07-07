@@ -144,6 +144,15 @@ function jeo_maps() {
 }
 
 /**
+ * Gets the instance of the Map Style Composer Class
+ *
+ * @return \Jeo\Map_Style_Composer Map style composer instance
+ */
+function jeo_map_style_composer() {
+	return \Jeo\Map_Style_Composer::get_instance();
+}
+
+/**
  * Gets the instance of the main Layers Class
  *
  * @return \Jeo\Layers Layers instance

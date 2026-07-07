@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/jeowp\n"
+"Report-Msgid-Bugs-To: \n"
 "Last-Translator: Stefano WrobleskidevelopInfoAmazonia\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -31,15 +31,15 @@ msgstr "Mapas interativos para o editor de blocos do WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:914
+#: includes/class-jeo.php:929
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas nenhuma chave de API do Mapbox está configurada. Voltando para MapLibre."
 
-#: includes/class-jeo.php:915
+#: includes/class-jeo.php:930
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas o SDK externo do Mapbox não pôde ser carregado. Voltando para MapLibre."
 
-#: includes/class-jeo.php:1431
+#: includes/class-jeo.php:1463
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Ler mais"
@@ -197,7 +197,7 @@ msgid "Layer type not registered"
 msgstr "Tipo de camada não registrado"
 
 #. translators: Explore is the name of JEO's discovery page feature.
-#: includes/loaders.php:567
+#: includes/loaders.php:576
 #: templates/embed-discovery.php:18
 #: js/build/discovery.js:6
 msgid "Explore"
@@ -410,7 +410,7 @@ msgstr "O Zoom do mapa deve estar entre 1 e 14"
 #: includes/ai/class-ai-settings.php:50
 #: includes/settings/class-settings.php:581
 #: includes/settings/class-settings.php:582
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 msgid "Settings"
 msgstr "Configurações"
 
@@ -573,117 +573,117 @@ msgid "Download from source"
 msgstr "Baixar da fonte"
 
 #: includes/layer-types/mapbox-tileset-raster.js:5
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Raster Mapbox Tiled Source"
 msgstr "Fonte raster de tiles do Mapbox"
 
-#: includes/layer-types/mapbox-tileset-raster.js:68
-#: includes/layer-types/mapbox-tileset-vector.js:95
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-raster.js:72
+#: includes/layer-types/mapbox-tileset-vector.js:109
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Tileset ID"
 msgstr "ID do tileset"
 
-#: includes/layer-types/mapbox-tileset-raster.js:69
-#: includes/layer-types/mapbox-tileset-vector.js:96
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-raster.js:73
+#: includes/layer-types/mapbox-tileset-vector.js:110
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Example: username.tilesetid"
 msgstr "Exemplo: username.tilesetid"
 
-#: includes/layer-types/mapbox-tileset-raster.js:72
-#: includes/layer-types/mapbox-tileset-vector.js:124
-#: includes/layer-types/mvt.js:102
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-raster.js:76
+#: includes/layer-types/mapbox-tileset-vector.js:138
+#: includes/layer-types/mvt.js:116
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Style Source Type"
 msgstr "Tipo de fonte do estilo"
 
-#: includes/layer-types/mapbox-tileset-raster.js:73
-#: includes/layer-types/mvt.js:103
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-raster.js:77
+#: includes/layer-types/mvt.js:117
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display"
 msgstr "Quais dados o mapa deve exibir"
 
-#: includes/layer-types/mapbox-tileset-raster.js:79
-#: includes/layer-types/mapbox-tileset-vector.js:104
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-raster.js:83
+#: includes/layer-types/mapbox-tileset-vector.js:118
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Layer Type"
 msgstr "Tipo da camada"
 
-#: includes/layer-types/mapbox-tileset-raster.js:81
-#: includes/layer-types/mapbox-tileset-vector.js:106
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-raster.js:85
+#: includes/layer-types/mapbox-tileset-vector.js:120
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Layers take the data that they get from a source, optionally filter features, and then define how those features are styled."
 msgstr "As camadas usam os dados que recebem de uma fonte, podem filtrar feições e então definem como essas feições são estilizadas."
 
 #: includes/layer-types/mapbox-tileset-vector.js:5
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Vector Mapbox Tiled Source"
 msgstr "Fonte vetorial de tiles do Mapbox"
 
-#: includes/layer-types/mapbox-tileset-vector.js:100
-#: includes/layer-types/mvt.js:84
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-vector.js:114
+#: includes/layer-types/mvt.js:98
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Source layer"
 msgstr "Camada de origem"
 
-#: includes/layer-types/mapbox-tileset-vector.js:101
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-vector.js:115
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display."
 msgstr "Quais dados o mapa deve exibir."
 
-#: includes/layer-types/mapbox-tileset-vector.js:125
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox-tileset-vector.js:139
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "The layer source type style"
 msgstr "O tipo de fonte do estilo da camada"
 
-#: includes/layer-types/mapbox.js:10
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox.js:5
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Mapbox Style"
 msgstr "Estilo do Mapbox"
 
-#: includes/layer-types/mapbox.js:155
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox.js:117
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr "ID do estilo"
 
-#: includes/layer-types/mapbox.js:157
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox.js:119
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
 msgstr "O ID do estilo do Mapbox inclui o nome de usuário e o ID. Exemplo: username/id ou mapbox://styles/username/id"
 
-#: includes/layer-types/mapbox.js:164
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox.js:126
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Access token"
 msgstr "Token de acesso"
 
-#: includes/layer-types/mapbox.js:166
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mapbox.js:128
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
 msgstr "Opcional. Se esta camada precisar de um token de acesso diferente do definido em Configurações, informe-o aqui."
 
 #: includes/layer-types/mvt.js:5
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
@@ -691,49 +691,49 @@ msgid "Mapbox Vector Tiles (MVT)"
 msgstr "Tiles vetoriais do Mapbox (MVT)"
 
 #: includes/ai/settings/tab-provider.php:27
-#: includes/layer-types/mvt.js:80
-#: includes/layer-types/tilelayer.js:57
+#: includes/layer-types/mvt.js:94
+#: includes/layer-types/tilelayer.js:61
 #: includes/legend-types/circles.js:25
 #: includes/legend-types/icons.js:25
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "URL"
 msgstr "URL"
 
-#: includes/layer-types/mvt.js:85
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/mvt.js:99
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Layer to use from a vector tile source."
 msgstr "Camada a ser usada de uma fonte de tiles vetoriais."
 
 #: includes/layer-types/tilelayer.js:5
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Raster Tiled Source"
 msgstr "Fonte raster de tiles"
 
-#: includes/layer-types/tilelayer.js:61
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/tilelayer.js:65
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Scheme"
 msgstr "Esquema"
 
-#: includes/layer-types/tilelayer.js:62
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/tilelayer.js:66
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Influences the Y direction of the tile coordinates."
 msgstr "Influencia a direção Y das coordenadas dos tiles."
 
-#: includes/layer-types/tilelayer.js:65
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/tilelayer.js:69
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Slippy Map tilenames (XYZ)"
 msgstr "Nomes de tiles do Slippy Map (XYZ)"
 
-#: includes/layer-types/tilelayer.js:66
-#: js/build/layersSidebar.js:7
+#: includes/layer-types/tilelayer.js:70
+#: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "OSGeo spec (TMS)"
 msgstr "Especificação OSGeo (TMS)"
@@ -1056,10 +1056,20 @@ msgstr "Expandir painel Discovery"
 
 #: js/build/discovery.js:6
 #: js/build/jeoMap.js:1
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 msgid "Legend"
 msgstr "Legenda"
 
+#: js/build/jeoMap.js:1
+msgid "This map doesn't have layers"
+msgstr "Este mapa não tem camadas"
+
+#: js/build/discovery.js:6
+#: js/build/jeoMap.js:1
+msgid "Close popup"
+msgstr "Fechar pop-up"
+
+#: js/build/discovery.js:6
 #: js/build/jeoMap.js:1
 msgid "Info"
 msgstr "Informações"
@@ -1210,7 +1220,7 @@ msgstr "Interações"
 msgid "Done"
 msgstr "Feito"
 
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 msgid "Edit interactions"
 msgstr "Editar interações"
 
@@ -1230,7 +1240,7 @@ msgstr "Sua camada não foi encontrada. Você não poderá publicar ou atualizar
 msgid "Error loading your layer, you will not be able to publish or update. Please check your settings."
 msgstr "Erro ao carregar sua camada, você não poderá publicar ou atualizar. Por favor verifique as configurações."
 
-#: js/build/layersSidebar.js:7
+#: js/build/layersSidebar.js:11
 msgid "Attributions"
 msgstr "Atribuições"
 
@@ -1764,11 +1774,11 @@ msgstr "Geolocalizar este post"
 msgid "Geolocation"
 msgstr "Geolocalização"
 
-#: includes/class-jeo.php:657
+#: includes/class-jeo.php:672
 msgid "Ordered list of map-layer IDs to return."
 msgstr "Lista ordenada dos IDs das camadas a serem retornados."
 
-#: includes/class-jeo.php:662
+#: includes/class-jeo.php:677
 msgid "Request context."
 msgstr "Contexto da requisição."
 
@@ -2072,9 +2082,9 @@ msgid "Approve JEO AI Geolocations"
 msgstr "Aprovar geolocalizações da IA do JEO"
 
 #: includes/ai/class-context-handler.php:227
-#: includes/ai/class-context-handler.php:346
-#: includes/ai/class-context-handler.php:633
-#: includes/ai/class-context-handler.php:709
+#: includes/ai/class-context-handler.php:347
+#: includes/ai/class-context-handler.php:726
+#: includes/ai/class-context-handler.php:802
 #: includes/ai/class-rag-worker.php:223
 #: includes/minimap/class-minimap.php:142
 #: includes/minimap/class-minimap.php:238
@@ -2083,7 +2093,7 @@ msgid "Post not found."
 msgstr "Post não encontrado."
 
 #: includes/ai/class-context-handler.php:238
-#: includes/ai/class-context-handler.php:367
+#: includes/ai/class-context-handler.php:368
 #: includes/ai/class-minilayer-handler.php:85
 #: includes/ai/class-minilayer-service.php:41
 #: includes/minimap/class-minimap.php:249
@@ -2096,7 +2106,7 @@ msgid "The article seems to have very little content. Please write a bit more ab
 msgstr "O artigo parece ter muito pouco conteúdo. Escreva um pouco mais sobre o tema, ou diga sobre o que você gostaria de sugestões (ex.: território, entidades, ângulos)."
 
 #: includes/ai/class-context-handler.php:251
-#: includes/ai/class-context-handler.php:289
+#: includes/ai/class-context-handler.php:290
 msgid "Generate editorial suggestions for this post based on its content."
 msgstr "Gerar sugestões editoriais para este post com base no seu conteúdo."
 
@@ -2104,35 +2114,35 @@ msgstr "Gerar sugestões editoriais para este post com base no seu conteúdo."
 msgid "Waiting for more content or directions."
 msgstr "Aguardando mais conteúdo ou instruções."
 
-#: includes/ai/class-context-handler.php:295
+#: includes/ai/class-context-handler.php:296
 msgid "Suggestions generated."
 msgstr "Sugestões geradas."
 
-#: includes/ai/class-context-handler.php:326
+#: includes/ai/class-context-handler.php:327
 #: includes/minimap/class-minimap.php:296
 msgid "conversation_id is required."
 msgstr "conversation_id é obrigatório."
 
-#: includes/ai/class-context-handler.php:336
+#: includes/ai/class-context-handler.php:337
 #: includes/minimap/class-minimap.php:227
 #: includes/minimap/class-minimap.php:306
 msgid "A post ID is required."
 msgstr "Um ID de post é obrigatório."
 
-#: includes/ai/class-context-handler.php:356
+#: includes/ai/class-context-handler.php:357
 #: includes/minimap/class-minimap.php:326
 msgid "A message is required."
 msgstr "Uma mensagem é obrigatória."
 
-#: includes/ai/class-context-handler.php:402
+#: includes/ai/class-context-handler.php:404
 msgid "Suggestions updated."
 msgstr "Sugestões atualizadas."
 
-#: includes/ai/class-context-handler.php:471
+#: includes/ai/class-context-handler.php:473
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr "A IA não responde após várias tentativas. Tente novamente ou reformule sua solicitação."
 
-#: includes/ai/class-context-handler.php:723
+#: includes/ai/class-context-handler.php:816
 msgid "Conversation cleared."
 msgstr "Conversa limpa."
 
@@ -3136,7 +3146,7 @@ msgstr "Nenhum adaptador de IA ativo encontrado."
 msgid "AI failed to generate prompt."
 msgstr "A IA falhou ao gerar o prompt."
 
-#: includes/ai/class-context-handler.php:742
+#: includes/ai/class-context-handler.php:835
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr "Prompt é obrigatório."
@@ -4514,14 +4524,6 @@ msgid "Not applied"
 msgstr "Não aplicado"
 
 #: js/build/jeoMap.js:1
-msgid "This map doesn't have layers"
-msgstr "Este mapa não tem camadas"
-
-#: js/build/jeoMap.js:1
-msgid "Close popup"
-msgstr "Fechar popup"
-
-#: js/build/jeoMap.js:1
 msgid "Show previous post"
 msgstr "Mostrar post anterior"
 
@@ -4557,25 +4559,25 @@ msgstr "Pré-visualização interativa de mapa para o editor do tipo de post Map
 msgid "Unable to retrieve the address for the selected point."
 msgstr "Não foi possível obter o endereço para o ponto selecionado."
 
-#: includes/class-jeo.php:1660
+#: includes/class-jeo.php:1692
 msgid "This JEO embed is not available."
 msgstr "Este embed JEO não está disponível."
 
-#: includes/class-jeo.php:1661
+#: includes/class-jeo.php:1693
 msgid "Embed not available"
 msgstr ""
 "Embed indisponível\n"
 "develop"
 
-#: includes/ai/class-context-agent.php:260
+#: includes/ai/class-context-agent.php:263
 msgid "No AI provider is configured. Set one in JEO AI Settings."
 msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA do JEO."
 
-#: includes/ai/class-context-agent.php:298
+#: includes/ai/class-context-agent.php:301
 msgid "The AI returned an empty prompt engineering response."
 msgstr "A IA retornou uma resposta vazia de engenharia de prompt."
 
-#: includes/ai/class-context-handler.php:283
+#: includes/ai/class-context-handler.php:284
 #: js/build/contextSidebar.js:1
 msgid "Initial suggestions"
 msgstr "Sugestões iniciais"
@@ -4716,7 +4718,7 @@ msgid "The agent tried to remove several existing layers without an explicit req
 msgstr "O agente tentou remover várias camadas existentes sem uma solicitação explícita. Elas foram mantidas para preservar o mapa atual."
 
 #. translators: %s: search radius in kilometers
-#: includes/stories-near-you/class-stories-near-you.php:1073
+#: includes/stories-near-you/class-stories-near-you.php:1105
 #, php-format
 msgid "No stories found within %s km of your location."
 msgstr "Nenhuma história encontrada num raio de %s km da sua localização."
@@ -4788,6 +4790,193 @@ msgstr "Fonte:"
 msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
 msgstr "Digite um endereço, depois clique em Buscar ou pressione Enter. Você também pode arrastar o marcador pelo mapa."
 
+#: includes/maps/class-map-style-composer.php:511
+#: includes/maps/class-map-style-composer.php:564
+msgid "Mapbox composed styles are disabled."
+msgstr "Os estilos compostos do Mapbox estão desativados."
+
+#: includes/maps/class-map-style-composer.php:536
+#: includes/maps/class-map-style-composer.php:588
+msgid "Could not create the Mapbox composed style cache directory."
+msgstr "Não foi possível criar o diretório de cache dos estilos compostos do Mapbox."
+
+#: includes/maps/class-map-style-composer.php:684
+msgid "Map not found."
+msgstr "Mapa não encontrado."
+
+#: includes/maps/class-map-style-composer.php:694
+#: includes/maps/class-map-style-composer.php:757
+msgid "A Mapbox access token is required to compose Mapbox styles."
+msgstr "Um token de acesso do Mapbox é necessário para compor estilos do Mapbox."
+
+#: includes/maps/class-map-style-composer.php:734
+msgid "Public payload composition is only available for one-time maps."
+msgstr "A composição com dados públicos está disponível apenas para mapas de uso único."
+
+#: includes/maps/class-map-style-composer.php:740
+msgid "The map preview payload is too large."
+msgstr "Os dados da prévia do mapa são grandes demais."
+
+#: includes/maps/class-map-style-composer.php:752
+msgid "The map preview has too many layers to compose."
+msgstr "A prévia do mapa tem camadas demais para compor."
+
+#: includes/maps/class-map-style-composer.php:763
+msgid "The map preview does not include any renderable layers."
+msgstr "A prévia do mapa não inclui nenhuma camada renderizável."
+
+#: includes/maps/class-map-style-composer.php:785
+msgid "Map preview"
+msgstr "Prévia do mapa"
+
+#: includes/maps/class-map-style-composer.php:1026
+msgid "Invalid composed style hash."
+msgstr "Hash do estilo composto inválido."
+
+#: includes/maps/class-map-style-composer.php:1114
+msgid "One or more Mapbox styles could not be fetched."
+msgstr "Não foi possível obter um ou mais estilos do Mapbox."
+
+#: includes/maps/class-map-style-composer.php:1515
+msgid "The PHP GD extension is required to merge Mapbox sprites."
+msgstr "A extensão PHP GD é necessária para mesclar sprites do Mapbox."
+
+#: includes/maps/class-map-style-composer.php:1634
+msgid "Could not decode a Mapbox sprite image."
+msgstr "Não foi possível decodificar uma imagem de sprite do Mapbox."
+
+#: includes/maps/class-map-style-composer.php:2351
+msgid "Composed style artifact was not found."
+msgstr "O artefato do estilo composto não foi encontrado."
+
+#: js/build/discovery.js:6
+msgid "Mapbox style composition is unavailable."
+msgstr "A composição de estilos do Mapbox está indisponível."
+
+#: js/build/discovery.js:6
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition is unavailable for this map."
+msgstr "A composição de estilos do Mapbox está indisponível para este mapa."
+
+#: js/build/discovery.js:6
+msgid "Unable to load map information right now."
+msgstr "Não foi possível carregar as informações do mapa agora."
+
+#: js/build/discovery.js:6
+msgid "Map information"
+msgstr "Informações do mapa"
+
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition did not return renderable layers for this map."
+msgstr "A composição de estilos do Mapbox não retornou camadas renderizáveis para este mapa."
+
+#: js/build/jeoMap.js:1
+msgid "Unable to load composed Mapbox style for this map."
+msgstr "Não foi possível carregar o estilo composto do Mapbox para este mapa."
+
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition is unavailable for this one-time map."
+msgstr "A composição de estilos do Mapbox está indisponível para este mapa de uso único."
+
+#: js/build/jeoMap.js:1
+msgid "Mapbox style composition did not return renderable layers for this one-time map."
+msgstr "A composição de estilos do Mapbox não retornou camadas renderizáveis para este mapa de uso único."
+
+#: js/build/jeoMap.js:1
+msgid "Unable to load composed Mapbox style for this one-time map."
+msgstr "Não foi possível carregar o estilo composto do Mapbox para este mapa de uso único."
+
+#: js/build/jeoMap.js:1
+#: js/build/jeoStorymap.js:3
+msgid "Mapbox style layers could not be loaded because the composed style is unavailable."
+msgstr "Não foi possível carregar as camadas de estilo do Mapbox porque o estilo composto está indisponível."
+
+#: js/build/jeoStorymap.js:3
+msgid "Mapbox style composition is unavailable for this storymap."
+msgstr "A composição de estilos do Mapbox está indisponível para este mapa narrativo."
+
+#: js/build/jeoStorymap.js:3
+msgid "Mapbox style composition did not return renderable layers for this storymap."
+msgstr "A composição de estilos do Mapbox não retornou camadas renderizáveis para este mapa narrativo."
+
+#: js/build/jeoStorymap.js:3
+msgid "Unable to load composed Mapbox style for this storymap."
+msgstr "Não foi possível carregar o estilo composto do Mapbox para este mapa narrativo."
+
+#. translators: %d: number of maps whose composed style cache was refreshed.
+#: js/build/layersSidebar.js:8
+#, js-format
+msgid "%d map"
+msgid_plural "%d maps"
+msgstr[0] "%d mapa"
+msgstr[1] "%d mapas"
+
+#. translators: %d: number of map refresh failures.
+#: js/build/layersSidebar.js:9
+#, js-format
+msgid "%d failure"
+msgid_plural "%d failures"
+msgstr[0] "%d falha"
+msgstr[1] "%d falhas"
+
+#. translators: 1: refreshed maps count label, 2: failed refresh count label.
+#: js/build/layersSidebar.js:10
+#, js-format
+msgid "Composed style cache refreshed for %1$s, with %2$s."
+msgstr "Cache de estilos compostos atualizado para %1$s, com %2$s."
+
+#. translators: %s: refreshed maps count label.
+#: js/build/layersSidebar.js:11
+#, js-format
+msgid "Composed style cache refreshed for %s."
+msgstr "Cache de estilos compostos atualizado para %s."
+
+#: js/build/layersSidebar.js:11
+msgid "Unable to refresh composed style cache."
+msgstr "Não foi possível atualizar o cache de estilos compostos."
+
+#: js/build/layersSidebar.js:11
+msgid "Refreshing composed style cache"
+msgstr "Atualizando cache de estilos compostos"
+
+#: js/build/layersSidebar.js:11
+msgid "Refresh composed style cache"
+msgstr ""
+"Atualizar cache de estilos compostos\n"
+"develop"
+
+#. translators: %s: linked URL
+#: includes/ai/class-context-handler.php:635
+#, php-format
+msgid "Link to %s removed: not listed in references."
+msgstr ""
+
+#. translators: %s: link anchor text
+#: includes/ai/class-context-handler.php:660
+#, php-format
+msgid "Link to \"%s\" removed: anchor not found in reference."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:677
+msgid "Verification notes:"
+msgstr ""
+
 #: jeo.php:36
 msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
-msgstr "Erro no plugin JEO: Sua versão do PHP é muito antiga. Os recursos de IA do JEO exigem PHP 8.2 ou superior. O plugin permanecerá desativado."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Save the post before generating the map."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not start map generation."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not send message."
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "Could not generate from prompt."
+msgstr ""

@@ -1,22 +1,26 @@
-import U from 'map-gl-utils'
-import MapLibreGL from 'maplibre-gl'
-import { isMapboxURL, transformMapboxStyle, transformMapboxUrl } from 'maplibregl-mapbox-request-transformer'
+import U from 'map-gl-utils';
+import MapLibreGL from 'maplibre-gl';
+import {
+	isMapboxURL,
+	transformMapboxStyle,
+	transformMapboxUrl,
+} from 'maplibregl-mapbox-request-transformer';
 
-import 'maplibre-gl/dist/maplibre-gl.css'
+import 'maplibre-gl/dist/maplibre-gl.css';
 
 if ( typeof MapLibreGL.Map?.prototype?.getLight === 'function' ) {
 	try {
 		Object.defineProperty( MapLibreGL.Map.prototype, 'getLight', {
 			value: function () {
-				return this.style?.getLight?.() ?? null
+				return this.style?.getLight?.() ?? null;
 			},
 			configurable: true,
 			writable: true,
-		} )
+		} );
 	} catch ( error ) {
 		MapLibreGL.Map.prototype.getLight = function () {
-			return this.style?.getLight?.() ?? null
-		}
+			return this.style?.getLight?.() ?? null;
+		};
 	}
 }
 
@@ -48,7 +52,8 @@ function patchInstanceOf( Ctor, duckTest ) {
 	try {
 		Object.defineProperty( Ctor, Symbol.hasInstance, {
 			value: function ( instance ) {
-				if ( instance == null || typeof instance !== 'object' ) return false;
+				if ( instance == null || typeof instance !== 'object' )
+					return false;
 				// Base class: use duck-typing
 				if ( this === Ctor ) {
 					return duckTest( instance );
@@ -73,13 +78,21 @@ function patchInstanceOf( Ctor, duckTest ) {
 patchInstanceOf( HTMLElement, ( i ) => i.nodeType === 1 );
 
 // MouseEvent — duck-type: has clientX/clientY and is an Event
-patchInstanceOf( MouseEvent, ( i ) =>
-	typeof i.clientX === 'number' && typeof i.clientY === 'number' && typeof i.type === 'string'
+patchInstanceOf(
+	MouseEvent,
+	( i ) =>
+		typeof i.clientX === 'number' &&
+		typeof i.clientY === 'number' &&
+		typeof i.type === 'string'
 );
 
 // WheelEvent — duck-type: has deltaY and is a MouseEvent
-patchInstanceOf( WheelEvent, ( i ) =>
-	typeof i.deltaY === 'number' && typeof i.clientX === 'number' && typeof i.type === 'string'
+patchInstanceOf(
+	WheelEvent,
+	( i ) =>
+		typeof i.deltaY === 'number' &&
+		typeof i.clientX === 'number' &&
+		typeof i.type === 'string'
 );
 
 // Fix: Patch FullscreenControl for cross-document (iframe) compatibility.
@@ -110,9 +123,13 @@ patchInstanceOf( WheelEvent, ( i ) =>
 
 		// 1. Move fullscreenchange listener from parent doc to iframe doc
 		const oldFSChange = this._onFullscreenChange;
-		window.document.removeEventListener( this._fullscreenchange, oldFSChange );
+		window.document.removeEventListener(
+			this._fullscreenchange,
+			oldFSChange
+		);
 		this._onFullscreenChange = function () {
-			let fse = ownerDoc.fullscreenElement ||
+			let fse =
+				ownerDoc.fullscreenElement ||
 				ownerDoc.mozFullScreenElement ||
 				ownerDoc.webkitFullscreenElement ||
 				ownerDoc.msFullscreenElement;
@@ -123,7 +140,10 @@ patchInstanceOf( WheelEvent, ( i ) =>
 				self._handleFullscreenChange();
 			}
 		};
-		ownerDoc.addEventListener( this._fullscreenchange, this._onFullscreenChange );
+		ownerDoc.addEventListener(
+			this._fullscreenchange,
+			this._onFullscreenChange
+		);
 
 		// 2. Replace click handler to exit on the correct document
 		const oldClick = this._onClickFullscreen;
@@ -145,26 +165,36 @@ patchInstanceOf( WheelEvent, ( i ) =>
 			}
 		};
 		this._fullscreenButton.removeEventListener( 'click', oldClick );
-		this._fullscreenButton.addEventListener( 'click', this._onClickFullscreen );
+		this._fullscreenButton.addEventListener(
+			'click',
+			this._onClickFullscreen
+		);
 
 		return result;
 	};
 
 	// onRemove: clean up from the correct document
 	proto.onRemove = function () {
-		const ownerDoc = ( this._container && this._container.ownerDocument ) || window.document;
-		ownerDoc.removeEventListener( this._fullscreenchange, this._onFullscreenChange );
+		const ownerDoc =
+			( this._container && this._container.ownerDocument ) ||
+			window.document;
+		ownerDoc.removeEventListener(
+			this._fullscreenchange,
+			this._onFullscreenChange
+		);
 		if ( this._controlContainer && this._controlContainer.parentNode ) {
-			this._controlContainer.parentNode.removeChild( this._controlContainer );
+			this._controlContainer.parentNode.removeChild(
+				this._controlContainer
+			);
 		}
 		this._map = null;
 	};
 } )();
 
 /** @type string */
-export const mapboxToken = jeo_settings.mapbox_key
+export const mapboxToken = jeo_settings.mapbox_key;
 
-export const mapgl = MapLibreGL
+export const mapgl = MapLibreGL;
 
 export const defaultStyle = {
 	version: 8,
@@ -187,65 +217,169 @@ export const defaultStyle = {
 			source: 'osm',
 		},
 	],
-}
+};
 
-export function mapboxTransformRequest(url, resourceType) {
-	if (isMapboxURL(url)) {
-		return transformMapboxUrl(url, resourceType, mapboxToken)
-  	} else if (url.includes('tiles.mapbox.com') && url.includes('.jpg?')) {
-		// MapLibreGL don't remove black backgrounds from Mapbox JPEG static tiles
-		return { url: url.replace('.jpg?', '.webp?') }
-	}
-	    return { url }
-}
+function extractMapboxAccessToken( url ) {
+	try {
+		const parsedUrl = new URL( url );
+		const accessToken = parsedUrl.searchParams.get( 'access_token' );
 
-export const transformRequest = mapboxTransformRequest
-
-function createTransformRequest(baseTransformRequest) {
-	if (baseTransformRequest) {
-		return (url, resourceType) => {
-			const { url: baseUrl } = baseTransformRequest(url, resourceType)
-			return mapboxTransformRequest(baseUrl, resourceType)
+		if ( ! accessToken ) {
+			return { url, accessToken: null };
 		}
-	} else {
-		return mapboxTransformRequest
+
+		parsedUrl.searchParams.delete( 'access_token' );
+		return {
+			url: parsedUrl.toString(),
+			accessToken,
+		};
+	} catch ( error ) {
+		const queryStart = url.indexOf( '?' );
+		if ( queryStart === -1 ) {
+			return { url, accessToken: null };
+		}
+
+		const baseUrl = url.slice( 0, queryStart );
+		const params = url
+			.slice( queryStart + 1 )
+			.split( '&' )
+			.filter( Boolean );
+		let accessToken = null;
+		const nextParams = [];
+
+		params.forEach( ( param ) => {
+			const [ key, ...valueParts ] = param.split( '=' );
+
+			if ( decodeURIComponent( key ) === 'access_token' ) {
+				accessToken =
+					accessToken || decodeURIComponent( valueParts.join( '=' ) );
+				return;
+			}
+
+			nextParams.push( param );
+		} );
+
+		if ( ! accessToken ) {
+			return { url, accessToken: null };
+		}
+
+		return {
+			url: nextParams.length
+				? `${ baseUrl }?${ nextParams.join( '&' ) }`
+				: baseUrl,
+			accessToken,
+		};
 	}
 }
 
-export function createMap({ container, style, transformRequest, ...options }) {
-	const map = new MapLibreGL.Map({
+function normalizeMapboxTerrainDemTileUrl( url ) {
+	try {
+		const parsedUrl = new URL( url );
+		if (
+			! parsedUrl.hostname.endsWith( 'tiles.mapbox.com' ) ||
+			! parsedUrl.pathname.startsWith(
+				'/raster/v1/mapbox.mapbox-terrain-dem-v1/'
+			)
+		) {
+			return null;
+		}
+
+		const tilePath = parsedUrl.pathname
+			.replace( '/raster/v1/', '/v4/' )
+			.replace( /\.png$/, '.pngraw' );
+
+		const nextUrl = new URL( `https://api.mapbox.com${ tilePath }` );
+		parsedUrl.searchParams.forEach( ( value, key ) => {
+			nextUrl.searchParams.set( key, value );
+		} );
+		if ( ! nextUrl.searchParams.has( 'access_token' ) ) {
+			nextUrl.searchParams.set( 'access_token', mapboxToken );
+		}
+
+		return nextUrl.toString();
+	} catch ( error ) {
+		return null;
+	}
+}
+
+export function mapboxTransformRequest( url, resourceType ) {
+	const terrainDemTileUrl = normalizeMapboxTerrainDemTileUrl( url );
+
+	if ( isMapboxURL( url ) ) {
+		const transformedUrl = extractMapboxAccessToken( url );
+		return (
+			transformMapboxUrl(
+				transformedUrl.url,
+				resourceType,
+				transformedUrl.accessToken || mapboxToken
+			) || { url: transformedUrl.url }
+		);
+	} else if ( terrainDemTileUrl ) {
+		return { url: terrainDemTileUrl };
+	} else if (
+		url.includes( 'tiles.mapbox.com' ) &&
+		url.includes( '.jpg?' )
+	) {
+		// MapLibreGL don't remove black backgrounds from Mapbox JPEG static tiles
+		return { url: url.replace( '.jpg?', '.webp?' ) };
+	}
+	return { url };
+}
+
+export const transformRequest = mapboxTransformRequest;
+
+function createTransformRequest( baseTransformRequest ) {
+	if ( baseTransformRequest ) {
+		return ( url, resourceType ) => {
+			const { url: baseUrl } = baseTransformRequest( url, resourceType );
+			return mapboxTransformRequest( baseUrl, resourceType );
+		};
+	} else {
+		return mapboxTransformRequest;
+	}
+}
+
+export function createMap( {
+	container,
+	style,
+	transformRequest,
+	...options
+} ) {
+	const map = new MapLibreGL.Map( {
 		container: container,
 		maplibreLogo: false,
 		projection: 'equirectangular',
 		validateStyle: false,
-		transformRequest: createTransformRequest(transformRequest),
+		transformRequest: createTransformRequest( transformRequest ),
 		...options,
-	})
+	} );
 
-	map.setStyle(style ?? defaultStyle, {
+	map.setStyle( style ?? defaultStyle, {
 		transformStyle: transformMapboxStyle,
-	})
+	} );
 
-	U.init(map, MapLibreGL)
+	U.init( map, MapLibreGL );
 
-	return map
+	return map;
 }
 
 /**
  * @param {import('maplibre-gl').GeoJSONSource} source
  */
-export function getClusterLeaves(source, cluster, limit, offset) {
-	return source.getClusterLeaves(cluster, limit, offset)
+export function getClusterLeaves( source, cluster, limit, offset ) {
+	return source.getClusterLeaves( cluster, limit, offset );
 }
 
 /**
  * @param {import('maplibre-gl').Map} map
  */
-export function loadImage(map, id, url) {
-	return new Promise((resolve, reject) => {
-		map.loadImage(url).then((image) => {
-			map.addImage(id, image.data)
-			resolve(id)
-		}).catch(reject)
-	})
+export function loadImage( map, id, url ) {
+	return new Promise( ( resolve, reject ) => {
+		map.loadImage( url )
+			.then( ( image ) => {
+				map.addImage( id, image.data );
+				resolve( id );
+			} )
+			.catch( reject );
+	} );
 }
