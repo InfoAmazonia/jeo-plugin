@@ -1,6 +1,7 @@
 import apiFetch from '@wordpress/api-fetch';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { Button, Notice, PanelBody, Placeholder, Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { debounce } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
@@ -13,6 +14,13 @@ import {
 	findStyleLayer,
 	styleLayerMapProps,
 } from './use-style-layer';
+import {
+	applyComposedVisibilityFromSettings,
+	handleEditorMapPreviewError,
+	hasMapboxStyleLayers,
+	useComposedPayloadPreviewStyle,
+	useEditorMapboxTransformRequest,
+} from './mapbox-style-preview';
 import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
@@ -56,6 +64,8 @@ function generateUUID() {
 
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
+	const postId = useSelect( ( select ) =>
+		select( 'core/editor' ).getCurrentPostId(), [] );
 	const [ modal, setModal ] = useState( false );
 	const [ baseVariant, setBaseVariant ] = useState(
 		attributes.base_layer?.variant || 'dark'
@@ -126,6 +136,51 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 		() => findStyleLayer( loadedLayers, allLayers ),
 		[ loadedLayers, allLayers ]
 	);
+
+	const layerSettingsKey = useMemo(
+		() => JSON.stringify( allLayers || [] ),
+		[ allLayers ]
+	);
+	const hasMapboxLayers = hasMapboxStyleLayers( loadedLayers );
+	const composedPayload = useMemo( () => ( {
+		scope: 'preview',
+		kind: 'minimap',
+		postId,
+		blockId: clientId,
+		layers: allLayers || [],
+	} ), [ postId, clientId, layerSettingsKey ] );
+	const composedPreview = useComposedPayloadPreviewStyle( {
+		enabled: hasMapboxLayers,
+		payload: composedPayload,
+		refreshKey: layerSettingsKey,
+	} );
+	const useComposedPreview = Boolean(
+		hasMapboxLayers && composedPreview.style
+	);
+	const isPreparingComposedPreview = Boolean(
+		! loadingLayers &&
+			hasMapboxLayers &&
+			! composedPreview.style &&
+			! composedPreview.error
+	);
+	const transformRequest = useEditorMapboxTransformRequest( loadedLayers );
+	const applyComposedVisibility = useCallback( () => {
+		if ( useComposedPreview ) {
+			applyComposedVisibilityFromSettings(
+				mapRef.current,
+				composedPreview.manifest,
+				allLayers || []
+			);
+		}
+	}, [
+		composedPreview.manifest,
+		layerSettingsKey,
+		useComposedPreview,
+	] );
+
+	useEffect( () => {
+		applyComposedVisibility();
+	}, [ applyComposedVisibility ] );
 
 	const generate = useCallback( () => {
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
@@ -898,19 +953,23 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			) }
 
 			<div className="jeo-preview-area">
-				{ styleBase && (
+				{ isPreparingComposedPreview && <Spinner /> }
+				{ ( styleBase || useComposedPreview ) && (
 					<div className="jeo-style-preview-badge">
 						{ __( 'Vector style preview', 'jeowp' ) }
 					</div>
 				) }
+				{ ! isPreparingComposedPreview && (
 				<Map
-					key={
-						styleBase
-							? `style-${ styleBase.instance.id }`
-							: 'default'
-					}
+					key={ `${ styleBase ? `style-${ styleBase.instance.id }` : 'default' }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
 					ref={ mapRef }
-					{ ...styleLayerMapProps( styleBase ) }
+					{ ...( useComposedPreview
+						? {
+								mapStyle: composedPreview.style,
+								transformRequest,
+								onError: handleEditorMapPreviewError,
+						  }
+						: styleLayerMapProps( styleBase ) ) }
 					style={ { height: '50vh' } }
 					latitude={ normalizedAttributes.center_lat }
 					longitude={ normalizedAttributes.center_lon }
@@ -918,7 +977,9 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					onMove={ debouncedOnMove }
 					onZoom={ debouncedOnZoom }
 					onStyleData={ () => {
-						if ( styleBase ) {
+						if ( useComposedPreview ) {
+							applyComposedVisibility();
+						} else if ( styleBase ) {
 							applyStyleLayerFiltering(
 								mapRef.current,
 								styleBase.instance
@@ -936,9 +997,18 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 								return null;
 							}
 
+							if ( useComposedPreview ) {
+								return null;
+							}
+
+							if ( hasMapboxLayers && layerRecord.meta.type === 'mapbox' ) {
+								return null;
+							}
+
 							return <MemoizedRenderLayer key={ layer.id } layer={ layerRecord.meta } instance={ layer } />;
 						} ) }
 				</Map>
+				) }
 			</div>
 
 			<div className="jeo-preview-controls">
