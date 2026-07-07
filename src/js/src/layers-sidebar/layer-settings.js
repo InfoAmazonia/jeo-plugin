@@ -1,3 +1,4 @@
+import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import { select, withDispatch, withSelect } from '@wordpress/data';
 import {
@@ -8,7 +9,7 @@ import {
 	useState,
 	useRef,
 } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import InteractionsSettings from './interactions-settings';
 import { isEmpty, isEqual } from 'lodash-es';
 import { useDebounce, useDebouncedCallback } from 'use-debounce';
@@ -87,7 +88,7 @@ function usePrevious( value ) {
 	return ref.current;
 }
 
-const LayerSettings = ( { postMeta, setPostMeta } ) => {
+const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 	const [ widgets, setWidgets ] = useState( {} );
 	const [ options, setOptions ] = useState( {} );
 	const [ formData, setFormData ] = useState( () =>
@@ -99,6 +100,7 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const [ styleLayers, setStyleLayers ] = useState( null );
 	const [ styleDefinition, setStyleDefinition ]= useState( null );
 	const [ modalOpen, setModalStatus ] = useState( false );
+	const [ isRefreshingComposerCache, setIsRefreshingComposerCache ] = useState( false );
 	const closeModal = useCallback( () => setModalStatus( false ), [
 		setModalStatus,
 	] );
@@ -130,6 +132,72 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 	const interactions = useMemo( () => {
 		return formData.layer_type_options?.interactions || [];
 	}, [ formData.layer_type_options?.interactions ] );
+
+	const refreshComposerCache = useCallback( async () => {
+		if ( ! postId || isRefreshingComposerCache ) {
+			return;
+		}
+
+		setIsRefreshingComposerCache( true );
+
+		try {
+			const response = await apiFetch( {
+				path: `/jeo/v1/map-style/layer/${ postId }/refresh`,
+				method: 'POST',
+			} );
+			const refreshed = Number.parseInt( response?.refreshed || 0, 10 );
+			const failed = Number.parseInt( response?.failed || 0, 10 );
+			const refreshedLabel = sprintf(
+				/* translators: %d: number of maps whose composed style cache was refreshed. */
+				_n(
+					'%d map',
+					'%d maps',
+					refreshed,
+					'jeowp'
+				),
+				refreshed
+			);
+			const failedLabel = sprintf(
+				/* translators: %d: number of map refresh failures. */
+				_n(
+					'%d failure',
+					'%d failures',
+					failed,
+					'jeowp'
+				),
+				failed
+			);
+
+			if ( failed > 0 ) {
+				sendNotice(
+					'warning',
+					sprintf(
+						/* translators: 1: refreshed maps count label, 2: failed refresh count label. */
+						__( 'Composed style cache refreshed for %1$s, with %2$s.', 'jeowp' ),
+						refreshedLabel,
+						failedLabel
+					)
+				);
+			} else {
+				sendNotice(
+					'success',
+					sprintf(
+						/* translators: %s: refreshed maps count label. */
+						__( 'Composed style cache refreshed for %s.', 'jeowp' ),
+						refreshedLabel
+					)
+				);
+			}
+		} catch ( error ) {
+			sendNotice(
+				'error',
+				error?.message ||
+					__( 'Unable to refresh composed style cache.', 'jeowp' )
+			);
+		} finally {
+			setIsRefreshingComposerCache( false );
+		}
+	}, [ isRefreshingComposerCache, postId, sendNotice ] );
 
 	useEffect( () => {
 		const next = normalizeLayerFormData( postMeta );
@@ -233,6 +301,19 @@ const LayerSettings = ( { postMeta, setPostMeta } ) => {
 				<div />
 			</SchemaForm>
 
+			{ formData.type === 'mapbox' && (
+				<Button
+					isBusy={ isRefreshingComposerCache }
+					disabled={ isRefreshingComposerCache || ! postId }
+					onClick={ refreshComposerCache }
+					variant="secondary"
+				>
+					{ isRefreshingComposerCache
+						? __( 'Refreshing composed style cache', 'jeowp' )
+						: __( 'Refresh composed style cache', 'jeowp' ) }
+				</Button>
+			) }
+
 			{ styleLayers && interactions && (
 				<Fragment>
 					{ modalOpen && (
@@ -263,8 +344,15 @@ export default withDispatch( ( dispatch ) => ( {
 			meta: { ...currentMeta, ...meta },
 		} );
 	},
+	sendNotice: ( type, message ) => {
+		dispatch( 'core/notices' ).createNotice( type, message, {
+			id: 'jeo-layer-composer-cache-refresh',
+			isDismissible: true,
+		} );
+	},
 } ) )(
 	withSelect( ( select ) => ( {
+		postId: select( 'core/editor' ).getCurrentPostId(),
 		postMeta: select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {},
 	} ) )( LayerSettings )
 );

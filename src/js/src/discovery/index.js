@@ -1,9 +1,10 @@
 import { Component, createRoot } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 import Sidebar from './blocks/sidebar';
 import { formatDateRangeValue } from './blocks/date-range-filter';
-import { createMap, mapgl } from '../lib/mapgl-loader';
+import { createMap, defaultStyle, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { computeInlineStart } from '../shared/direction';
 import './style/discovery.scss';
 
@@ -103,6 +104,9 @@ class Discovery extends Component {
 		this.map = null;
 		this.attributionResizeObserver = null;
 		this.discoveryBlock = null;
+		this.customTokens = {};
+		this.moreInfoTemplate =
+			window.jeoMapVars?.templates?.moreInfo || null;
 
 		// general state
 		this.state = {
@@ -119,6 +123,10 @@ class Discovery extends Component {
 			showShareOptions: false,
 			showEmbedTooltip: false,
 			showSidebar: true,
+			showMoreInfo: false,
+			moreInfoLoading: false,
+			moreInfoError: null,
+			infoMapsById: {},
 
 			// maps
 			maps: [],
@@ -150,6 +158,13 @@ class Discovery extends Component {
 		// methods bindings
 		this.updateState = this.updateState.bind( this );
 		this.syncViewportHeight = this.syncViewportHeight.bind( this );
+		this.registerLayerCustomToken =
+			this.registerLayerCustomToken.bind( this );
+		this.transformRequestUrl = this.transformRequestUrl.bind( this );
+		this.openMoreInfo = this.openMoreInfo.bind( this );
+		this.closeMoreInfo = this.closeMoreInfo.bind( this );
+		this.handleMoreInfoTitleKeyDown =
+			this.handleMoreInfoTitleKeyDown.bind( this );
 	}
 
 	componentDidMount() {
@@ -164,7 +179,10 @@ class Discovery extends Component {
 			zoom: mapDefaults.zoom,
 		};
 
-		if ( this.getParamFromUrl( 'discovery' ) || this.getParamFromUrl( 'share' ) ) {
+		if (
+			this.getParamFromUrl( 'discovery' ) ||
+			this.getParamFromUrl( 'share' )
+		) {
 			const urlCenter = this.getParamFromUrl( 'center' );
 			if ( urlCenter ) {
 				additionalMapOptions.center = urlCenter;
@@ -176,10 +194,12 @@ class Discovery extends Component {
 			}
 		}
 
-		const map = createMap({
+		const map = createMap( {
 			container: this.mapContainer,
+			style: this.getInitialMapStyle(),
+			transformRequest: this.transformRequestUrl,
 			...additionalMapOptions,
-		});
+		} );
 
 		this.map = map;
 		const inlineStart = computeInlineStart();
@@ -187,10 +207,13 @@ class Discovery extends Component {
 		this.map.on( 'load', () => {
 			this.map.addControl(
 				new mapgl.NavigationControl( { showCompass: false } ),
-				`top-${inlineStart}`
+				`top-${ inlineStart }`
 			);
 
-			this.map.addControl( new mapgl.FullscreenControl(), `top-${inlineStart}` );
+			this.map.addControl(
+				new mapgl.FullscreenControl(),
+				`top-${ inlineStart }`
+			);
 			this.syncAttributionSpacing();
 			this.syncViewportHeight();
 			this.setState( { ...this.state, mapLoaded: true } );
@@ -203,6 +226,23 @@ class Discovery extends Component {
 		} );
 	}
 
+	componentDidUpdate( prevProps, prevState ) {
+		const previousMapIds = this.getAppliedMoreInfoMapIds(
+			prevState.appliedLayers
+		);
+		const nextMapIds = this.getAppliedMoreInfoMapIds();
+
+		if ( previousMapIds.join( ',' ) === nextMapIds.join( ',' ) ) {
+			return;
+		}
+
+		if ( ! nextMapIds.length && this.state.showMoreInfo ) {
+			this.setState( { showMoreInfo: false } );
+		}
+
+		this.fetchMoreInfoMaps( nextMapIds );
+	}
+
 	componentWillUnmount() {
 		if ( this.attributionResizeObserver ) {
 			this.attributionResizeObserver.disconnect();
@@ -210,7 +250,10 @@ class Discovery extends Component {
 		}
 
 		window.removeEventListener( 'resize', this.syncViewportHeight );
-		window.removeEventListener( 'orientationchange', this.syncViewportHeight );
+		window.removeEventListener(
+			'orientationchange',
+			this.syncViewportHeight
+		);
 		window.removeEventListener( 'load', this.syncViewportHeight );
 	}
 
@@ -218,6 +261,72 @@ class Discovery extends Component {
 		const urlParams = new URLSearchParams( window.location.search );
 		const value = parseUrlStateParam( urlParams, paramKey );
 		return value ?? false;
+	}
+
+	getInitialMapStyle() {
+		if ( ! defaultStyle || typeof defaultStyle !== 'object' ) {
+			return defaultStyle;
+		}
+
+		const defaultGlyphs = window.jeoMapVars?.composedStyleDefaultGlyphs || '';
+		const glyphs = defaultStyle.glyphs || defaultGlyphs;
+
+		return {
+			...defaultStyle,
+			...( glyphs ? { glyphs } : {} ),
+		};
+	}
+
+	registerLayerCustomToken( layer ) {
+		const options = layer?.meta?.layer_type_options || {};
+		const accessToken = options.access_token;
+
+		if ( ! accessToken ) {
+			return;
+		}
+
+		const styleId = options.style_id?.replace( 'mapbox://styles/', '' );
+		const tilesetId = options.tileset_id?.replace( 'mapbox://', '' );
+		const owner =
+			styleId?.split( '/' )[ 0 ] || tilesetId?.split( '.' )[ 0 ];
+
+		if ( owner ) {
+			this.customTokens[ owner ] = accessToken;
+		}
+	}
+
+	transformRequestUrl( url, resourceType ) {
+		const tokenPlaceholder = '__JEO_MAPBOX_ACCESS_TOKEN__';
+		if ( url.includes( tokenPlaceholder ) ) {
+			url = url
+				.split( tokenPlaceholder )
+				.join( encodeURIComponent( jeo_settings.mapbox_key || '' ) );
+		}
+
+		for ( const owner of Object.keys( this.customTokens ) ) {
+			if (
+				! url.includes( `${ owner }/` ) &&
+				! url.includes( `${ owner }.` )
+			) {
+				continue;
+			}
+
+			try {
+				const parsedUrl = new URL( url );
+				const parsedParams = new URLSearchParams( parsedUrl.search );
+				const accessToken = this.customTokens[ owner ];
+
+				if ( parsedParams.get( 'access_token' ) !== accessToken ) {
+					parsedParams.set( 'access_token', accessToken );
+					parsedUrl.search = '?' + parsedParams.toString();
+					return { url: parsedUrl.toString() };
+				}
+			} catch ( error ) {
+				return { url };
+			}
+		}
+
+		return { url };
 	}
 
 	buildUrlParamsString(
@@ -250,7 +359,11 @@ class Discovery extends Component {
 	}
 
 	syncViewportHeight() {
-		if ( this.props.embed || ! this.discoveryBlock || typeof window === 'undefined' ) {
+		if (
+			this.props.embed ||
+			! this.discoveryBlock ||
+			typeof window === 'undefined'
+		) {
 			return;
 		}
 
@@ -275,8 +388,9 @@ class Discovery extends Component {
 		}
 	}
 
-	syncAttributionSpacing() {
-		const discoveryMapElement = this.mapContainer?.closest( '.discovery-map' );
+		syncAttributionSpacing() {
+			const discoveryMapElement =
+				this.mapContainer?.closest( '.discovery-map' );
 		if ( ! discoveryMapElement ) {
 			return;
 		}
@@ -306,15 +420,216 @@ class Discovery extends Component {
 			'.mapboxgl-ctrl-attrib, .maplibregl-ctrl-attrib'
 		);
 		if ( attributionControl && typeof ResizeObserver !== 'undefined' ) {
-			this.attributionResizeObserver = new ResizeObserver( updateSpacing );
+			this.attributionResizeObserver = new ResizeObserver(
+				updateSpacing
+			);
 			this.attributionResizeObserver.observe( attributionControl );
 		}
 
-		window.requestAnimationFrame( updateSpacing );
-	}
+			window.requestAnimationFrame( updateSpacing );
+		}
 
-	render() {
-		const props = {
+		hasMeaningfulHtml( html = '' ) {
+			if ( ! html ) {
+				return false;
+			}
+
+			if ( typeof document !== 'undefined' ) {
+				const wrapper = document.createElement( 'div' );
+				wrapper.innerHTML = html;
+
+				const textContent = ( wrapper.textContent || '' )
+					.replace( /\u00a0/g, ' ' )
+					.trim();
+
+				if ( textContent.length ) {
+					return true;
+				}
+
+				return Boolean(
+					wrapper.querySelector(
+						'img,video,audio,iframe,table,ul,ol,svg'
+					)
+				);
+			}
+
+			return String( html )
+				.replace( /<[^>]+>/g, '' )
+				.replace( /&nbsp;|&#160;/gi, ' ' )
+				.trim().length > 0;
+		}
+
+		hasMoreInfoContent( map ) {
+			return this.hasMeaningfulHtml( map?.content?.rendered );
+		}
+
+		getAppliedMoreInfoMapIds( appliedLayers = this.state.appliedLayers ) {
+			const mapIds = [];
+
+			appliedLayers.forEach( ( layer ) => {
+				const mapId = Number.parseInt( layer?.map?.id, 10 );
+				if ( Number.isFinite( mapId ) && ! mapIds.includes( mapId ) ) {
+					mapIds.push( mapId );
+				}
+			} );
+
+			return mapIds;
+		}
+
+		getMoreInfoMapById( mapId ) {
+			return (
+				this.state.infoMapsById[ mapId ] ||
+				this.state.appliedLayers.find(
+					( layer ) =>
+						Number.parseInt( layer?.map?.id, 10 ) === mapId
+				)?.map ||
+				null
+			);
+		}
+
+		fetchMoreInfoMaps( mapIds = this.getAppliedMoreInfoMapIds() ) {
+			const missingMapIds = mapIds.filter( ( mapId ) => {
+				const map = this.state.infoMapsById[ mapId ];
+				return map?.content?.rendered === undefined;
+			} );
+
+			if ( ! missingMapIds.length ) {
+				return Promise.resolve();
+			}
+
+			const path = addQueryArgs( jeoMapVars.jsonUrl + 'map/', {
+				include: missingMapIds,
+				orderby: 'include',
+				per_page: missingMapIds.length,
+				_fields: 'id,title,content,link',
+				...( 'jeowpLanguageParams' in window &&
+				window.jeowpLanguageParams?.currentLang
+					? { lang: window.jeowpLanguageParams.currentLang }
+					: {} ),
+			} );
+
+			this.setState( {
+				moreInfoLoading: true,
+				moreInfoError: null,
+			} );
+
+			return fetch( path, {
+				headers: jeoMapVars?.nonce
+					? {
+							'X-WP-Nonce': jeoMapVars.nonce,
+					  }
+					: {},
+			} )
+				.then( ( response ) => {
+					if ( ! response.ok ) {
+						throw new Error(
+							`${ response.status } ${ response.statusText }`
+						);
+					}
+
+					return response.json();
+				} )
+				.then( ( response ) => {
+					const maps = Array.isArray( response ) ? response : [];
+					const nextInfoMapsById = {};
+
+					maps.forEach( ( map ) => {
+						nextInfoMapsById[ map.id ] = map;
+					} );
+
+					this.setState( ( currentState ) => ( {
+						infoMapsById: {
+							...currentState.infoMapsById,
+							...nextInfoMapsById,
+						},
+						moreInfoLoading: false,
+					} ) );
+				} )
+				.catch( ( error ) => {
+					console.warn(
+						'Unable to load map information in Discovery.',
+						error
+					);
+					this.setState( {
+						moreInfoLoading: false,
+						moreInfoError: __(
+							'Unable to load map information right now.',
+							'jeowp'
+						),
+					} );
+				} );
+		}
+
+		getMoreInfoFallbackTitle( map ) {
+			if ( typeof map?.title?.rendered === 'string' ) {
+				return map.title.rendered;
+			}
+
+			if ( typeof map?.title === 'string' ) {
+				return map.title;
+			}
+
+			return __( 'Map information', 'jeowp' );
+		}
+
+		renderMoreInfoMapContent( map ) {
+			const title = map?.title?.rendered || '';
+			const content = map?.content?.rendered || '';
+
+			if ( this.moreInfoTemplate ) {
+				return this.moreInfoTemplate
+					.replace( /<%[~=]\s*map\.title\.rendered\s*%>/g, title )
+					.replace(
+						/<%[~=]\s*map\.content\.rendered\s*%>/g,
+						content
+					);
+			}
+
+			return `<h2>${ title }</h2>${ content }`;
+		}
+
+		renderMoreInfoContent( maps ) {
+			const sections = maps
+				.filter( ( map ) => this.hasMoreInfoContent( map ) )
+				.map( ( map ) => this.renderMoreInfoMapContent( map ) );
+
+			if ( this.state.moreInfoError ) {
+				sections.push( `<p>${ this.state.moreInfoError }</p>` );
+			}
+
+			return sections.join( '' );
+		}
+
+		openMoreInfo( e ) {
+			e?.preventDefault?.();
+			e?.stopPropagation?.();
+
+			const mapIds = this.getAppliedMoreInfoMapIds();
+
+			this.setState( {
+				showMoreInfo: true,
+				moreInfoError: null,
+			} );
+			this.fetchMoreInfoMaps( mapIds );
+		}
+
+		closeMoreInfo( e ) {
+			e?.preventDefault?.();
+			e?.stopPropagation?.();
+
+			this.setState( {
+				showMoreInfo: false,
+			} );
+		}
+
+		handleMoreInfoTitleKeyDown( e ) {
+			if ( e.key === 'Enter' || e.key === ' ' ) {
+				this.openMoreInfo( e );
+			}
+		}
+
+		render() {
+			const props = {
 			map: this.map,
 			stories: this.state.stories,
 			storiesLoaded: this.state.storiesLoaded,
@@ -338,6 +653,7 @@ class Discovery extends Component {
 			applyLayersChanges: this.applyLayersChanges,
 
 			updateState: this.updateState,
+			registerLayerCustomToken: this.registerLayerCustomToken,
 			pageInfo: {
 				currentPage: this.state.currentPage,
 				totalPages: this.state.totalPages,
@@ -361,21 +677,36 @@ class Discovery extends Component {
 				} );
 			} );
 
-		let renderedLegends = legends.map( ( legendObj ) => legendObj.render() );
-		renderedLegends = renderedLegends.map( ( legendRender, index ) => {
-			return (
+		let renderedLegends = legends.map( ( legendObj ) =>
+			legendObj.render()
+		);
+			renderedLegends = renderedLegends.map( ( legendRender, index ) => {
+				return (
 				<>
 					{ legends[ index ].attributes.legend_title && (
 						<div className="legend-single-title">
 							{ legends[ index ].attributes.legend_title }
 						</div>
 					) }
-					<span dangerouslySetInnerHTML={ { __html: legendRender.outerHTML } } />
-				</>
-			);
-		} );
+					<span
+						dangerouslySetInnerHTML={ {
+							__html: legendRender.outerHTML,
+						} }
+					/>
+					</>
+				);
+			} );
+			const moreInfoMapIds = this.getAppliedMoreInfoMapIds();
+			const moreInfoMaps = moreInfoMapIds
+				.map( ( mapId ) => this.getMoreInfoMapById( mapId ) )
+				.filter( ( map ) => this.hasMoreInfoContent( map ) );
+			const hasMoreInfo = moreInfoMaps.length > 0;
+			const moreInfoHtml = hasMoreInfo
+				? this.renderMoreInfoContent( moreInfoMaps )
+				: '';
+			const hasLegendPanel = renderedLegends.length || hasMoreInfo;
 
-		const buildURLParams = {
+			const buildURLParams = {
 			'selected-layers': this.state.appliedLayers.map( ( layer ) => {
 				if ( layer.map ) {
 					return [ layer.id, layer.map.id ];
@@ -402,7 +733,7 @@ class Discovery extends Component {
 		const generatedEmbedUrl = this.buildUrlParamsString( buildURLParams );
 		const notEncodedUrlEmbed = this.buildUrlParamsString(
 			buildURLParams,
-			false,
+			false
 		);
 
 		const notEncodedUrl = this.buildUrlParamsString(
@@ -437,7 +768,10 @@ class Discovery extends Component {
 				{ this.state.mapLoaded ? <Sidebar { ...props } /> : '' }
 
 				<div className="discovery-map">
-					<div className="discovery-map__container" ref={ ( el ) => ( this.mapContainer = el ) }>
+					<div
+						className="discovery-map__container"
+						ref={ ( el ) => ( this.mapContainer = el ) }
+					>
 						{ /* Map container should be empty */ }
 					</div>
 					{ ! this.props.embed && (
@@ -494,7 +828,11 @@ class Discovery extends Component {
 									<svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="weixin" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M385.2 167.6c6.4 0 12.6.3 18.8 1.1C387.4 90.3 303.3 32 207.7 32 100.5 32 13 104.8 13 197.4c0 53.4 29.3 97.5 77.9 131.6l-19.3 58.6 68-34.1c24.4 4.8 43.8 9.7 68.2 9.7 6.2 0 12.1-.3 18.3-.8-4-12.9-6.2-26.6-6.2-40.8-.1-84.9 72.9-154 165.3-154zm-104.5-52.9c14.5 0 24.2 9.7 24.2 24.4 0 14.5-9.7 24.2-24.2 24.2-14.8 0-29.3-9.7-29.3-24.2.1-14.7 14.6-24.4 29.3-24.4zm-136.4 48.6c-14.5 0-29.3-9.7-29.3-24.2 0-14.8 14.8-24.4 29.3-24.4 14.8 0 24.4 9.7 24.4 24.4 0 14.6-9.6 24.2-24.4 24.2zM563 319.4c0-77.9-77.9-141.3-165.4-141.3-92.7 0-165.4 63.4-165.4 141.3S305 460.7 397.6 460.7c19.3 0 38.9-5.1 58.6-9.9l53.4 29.3-14.8-48.6C534 402.1 563 363.2 563 319.4zm-219.1-24.5c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.8 0 24.4 9.7 24.4 19.3 0 10-9.7 19.6-24.4 19.6zm107.1 0c-9.7 0-19.3-9.7-19.3-19.6 0-9.7 9.7-19.3 19.3-19.3 14.5 0 24.4 9.7 24.4 19.3.1 10-9.9 19.6-24.4 19.6z"></path></svg>
 								</a> */ }
 
-								<a href={ notEncodedUrl } target="_blank" rel="noreferrer">
+								<a
+									href={ notEncodedUrl }
+									target="_blank"
+									rel="noreferrer"
+								>
 									<svg
 										aria-hidden="true"
 										focusable="false"
@@ -512,7 +850,9 @@ class Discovery extends Component {
 								</a>
 
 								<a
-									href={ `mailto:?subject=${ encodeURIComponent( __( 'Explore', 'jeowp' ) ) }&body=${ encodedMailBody }` }
+									href={ `mailto:?subject=${ encodeURIComponent(
+										__( 'Explore', 'jeowp' )
+									) }&body=${ encodedMailBody }` }
 									target="_blank"
 									rel="noreferrer"
 								>
@@ -536,11 +876,16 @@ class Discovery extends Component {
 									onClick={ () =>
 										this.setState( {
 											...this.state,
-											showEmbedTooltip: ! this.state.showEmbedTooltip,
+											showEmbedTooltip:
+												! this.state.showEmbedTooltip,
 										} )
 									}
 								>
-									{ _x( 'Embed', 'discovery share action', 'jeowp' ) }
+									{ _x(
+										'Embed',
+										'discovery share action',
+										'jeowp'
+									) }
 								</button>
 
 								{ this.state.showEmbedTooltip && (
@@ -557,7 +902,8 @@ class Discovery extends Component {
 								onClick={ () =>
 									this.setState( {
 										...this.state,
-										showShareOptions: ! this.state.showShareOptions,
+										showShareOptions:
+											! this.state.showShareOptions,
 									} )
 								}
 							>
@@ -581,54 +927,118 @@ class Discovery extends Component {
 					) }
 				</div>
 
-				{ renderedLegends.length ? (
-					<div
-						className={
-							'legend-container' + ( this.state.showLegends ? ' active' : '' )
-						}
-					>
-						<div className="legends-title">
-							<div className="text-icon">
-								<i className="legend-icon"></i>
-								<span className="text">{ __( 'Legend', 'jeowp' ) }</span>
-							</div>
-							<i
-								onClick={ () =>
-									this.setState( {
-										...this.state,
-										showLegends: ! this.state.showLegends,
-									} )
-								}
-								className={
-									'arrow-icon' + ( this.state.showLegends ? ' active' : '' )
-								}
-							>
-								<svg
-									aria-hidden="true"
-									focusable="false"
-									data-prefix="fas"
-									data-icon="chevron-down"
-									role="img"
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 448 512"
+					{ hasLegendPanel ? (
+						<div
+							className={
+								'legend-container' +
+								( this.state.showLegends ? ' active' : '' ) +
+								( ! renderedLegends.length && hasMoreInfo
+									? ' has-more-info-only'
+									: '' )
+							}
+						>
+							{ renderedLegends.length ? (
+								<>
+									<div className="legends-title">
+										<div className="text-icon">
+											<i className="legend-icon"></i>
+											<span className="text">
+												{ __( 'Legend', 'jeowp' ) }
+											</span>
+										</div>
+										<i
+											onClick={ () =>
+												this.setState( {
+													...this.state,
+													showLegends:
+														! this.state.showLegends,
+												} )
+											}
+											className={
+												'arrow-icon' +
+												( this.state.showLegends
+													? ' active'
+													: '' )
+											}
+										>
+											<svg
+												aria-hidden="true"
+												focusable="false"
+												data-prefix="fas"
+												data-icon="chevron-down"
+												role="img"
+												xmlns="http://www.w3.org/2000/svg"
+												viewBox="0 0 448 512"
+											>
+												<path
+													fill="currentColor"
+													d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"
+												></path>
+											</svg>
+										</i>
+									</div>
+									<div className="hideable-content">
+										<div className="legends-wrapper">
+											{ renderedLegends }
+										</div>
+										{ hasMoreInfo ? (
+											<a
+												href="#more-info"
+												className="more-info-button"
+												onClick={ this.openMoreInfo }
+											>
+												{ __( 'Info', 'jeowp' ) }
+											</a>
+										) : (
+											''
+										) }
+									</div>
+								</>
+							) : (
+								<div
+									className="legends-title more-info-title"
+									role="button"
+									tabIndex="0"
+									onClick={ this.openMoreInfo }
+									onKeyDown={ this.handleMoreInfoTitleKeyDown }
 								>
-									<path
-										fill="currentColor"
-										d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z"
-									></path>
-								</svg>
-							</i>
+									<div className="text-icon">
+										<i className="info-icon"></i>
+										<span className="text">
+											{ __( 'Info', 'jeowp' ) }
+										</span>
+									</div>
+								</div>
+							) }
 						</div>
-						<div className="hideable-content">
-							<div className="legends-wrapper">{ renderedLegends }</div>
+					) : (
+						''
+					) }
+					{ hasMoreInfo && this.state.showMoreInfo ? (
+						<div className="more-info-overlayer">
+							<div className="more-info-close">
+								<button
+									className={ `${ MAP_RUNTIME }-popup-close-button` }
+									type="button"
+									aria-label={ __( 'Close popup', 'jeowp' ) }
+									onClick={ this.closeMoreInfo }
+								>
+									<span>&times;</span>
+								</button>
+							</div>
+							<div
+								className="more-info-content"
+								dangerouslySetInnerHTML={ {
+									__html: moreInfoHtml,
+								} }
+							/>
 						</div>
-					</div>
-				) : (
-					''
-				) }
-			</div>
-		);
-	}
+					) : (
+						''
+					) }
+				</div>
+			);
+		}
 }
 
 if ( document.querySelector( '.discovery-embed' ) ) {

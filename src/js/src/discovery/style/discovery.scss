@@ -1403,9 +1403,113 @@ $font: var(--jeo-font, inherit);
 		color: var(--jeo-primary-color);
 	}
 
-	.is-embed {
-		display: none;
-	}
+		.is-embed {
+			display: none;
+		}
+
+		div.more-info-overlayer {
+			box-sizing: border-box;
+			background-color: white;
+			position: absolute;
+			top: 10px;
+			inset-inline-start: 10px;
+			z-index: 10;
+			width: calc(100% - 250px);
+			height: calc(100% - 70px);
+			max-width: calc(100% - 20px);
+			max-height: calc(100% - 70px);
+			margin-top: 50px;
+			overflow-y: auto;
+			padding: 0 20px 20px;
+		}
+
+		&.active:not(.embed) {
+			div.more-info-overlayer {
+				inset-inline-start: calc(30% + 10px);
+				width: calc(70% - 250px);
+				max-width: calc(70% - 20px);
+			}
+		}
+
+		.more-info-overlayer {
+			font-family: $font;
+
+			.more-info-close {
+				position: absolute;
+				top: 10px;
+				inset-inline-end: 10px;
+				z-index: 11;
+				cursor: pointer;
+			}
+
+			:is(.mapboxgl-popup-close-button, .maplibregl-popup-close-button) {
+				border-radius: 0;
+				cursor: pointer;
+				width: 22px;
+				height: 22px;
+				display: block;
+				padding: 0;
+				font-size: 18px;
+				background: var(--jeo_close-bkg-color);
+				color: var(--jeo_close-color);
+
+				&:hover {
+					text-decoration: none;
+					background-color: var(--jeo_more-bkg-color-darker-15);
+				}
+
+				span {
+					font-size: 24px;
+					font-weight: 100;
+					line-height: 18px;
+				}
+			}
+
+			.more-info-content {
+				font-family: $font;
+				padding-top: 20px;
+
+				h2 {
+					font-family: $font;
+				}
+
+				p {
+					font-family: $font;
+				}
+			}
+
+			.map-content-layers-list {
+				font-size: 16px;
+				line-height: 25px;
+				font-family: $font;
+
+				a.download-source {
+					font-family: $font;
+					background: #fff;
+					border: 1px solid rgba(0, 0, 0, 0.4);
+					color: #404040;
+					margin-top: 8px;
+					padding: 4px 10px;
+					text-decoration: none;
+					border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+					text-align: center;
+					cursor: pointer;
+					display: inline-block;
+					font-size: 16px;
+					font-weight: bold;
+					transition: all 0.2s ease-in-out;
+
+					&:hover {
+						background: rgba(0, 0, 0, 0.05);
+						transition: all 0.2s ease-in-out;
+					}
+				}
+
+				h3 {
+					font-family: $font;
+				}
+			}
+		}
 
 		div.legend-container {
 			background: #fff;
@@ -1427,27 +1531,69 @@ $font: var(--jeo-font, inherit);
 
 			@extend .scroll-bar-style;
 
+			.legend-single-title {
+				margin-bottom: 15px;
+				font-size: 16px;
+				color: #333;
+				font-weight: bold;
+				display: block;
+				font-family: $font;
+			}
+
 			h4 {
 				margin: 15px 0;
 				font-size: 2.2rem;
 			}
 		}
 
-		.legends-title {
-			background: #191e23;
-			padding: 9px 20px;
-			color: white;
+			.legends-title {
+				background: #191e23;
+				padding: 9px 20px;
+				color: white;
 			font-size: 16px;
 			font-weight: 600;
 			display: flex;
 			justify-content: space-between;
-			align-items: center;
-		}
+				align-items: center;
+			}
 
-		i.arrow-icon {
-			width: 14px;
-			color: white;
-			cursor: pointer;
+			.more-info-title {
+				cursor: pointer;
+			}
+
+			.text-icon {
+				display: flex;
+				align-items: center;
+			}
+
+			.text-icon {
+				.legend-icon {
+					width: 14px;
+					height: 16px;
+					background-size: cover;
+					background-image: url("data:image/svg+xml,%3Csvg aria-hidden='true' focusable='false' data-prefix='fas' data-icon='list' role='img' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512' class='svg-inline--fa fa-list fa-w-16 fa-3x'%3E%3Cpath fill='%23333' d='M80 368H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm0-320H16A16 16 0 0 0 0 64v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16V64a16 16 0 0 0-16-16zm0 160H16a16 16 0 0 0-16 16v64a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-64a16 16 0 0 0-16-16zm416 176H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm0-320H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16V80a16 16 0 0 0-16-16zm0 160H176a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h320a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16z' class=''%3E%3C/path%3E%3C/svg%3E");
+					background-position: center;
+					cursor: pointer;
+					margin-inline-end: 12px;
+					filter: brightness(0) invert(1);
+				}
+
+				.info-icon {
+					width: 16px;
+					height: 16px;
+					background-size: cover;
+					background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23333' d='M11 10h2v7h-2zm0-3h2v2h-2z'/%3E%3Cpath fill='%23333' d='M12 2a10 10 0 100 20 10 10 0 000-20zm0 18a8 8 0 110-16 8 8 0 010 16z'/%3E%3C/svg%3E");
+					background-position: center;
+					cursor: pointer;
+					margin-inline-end: 12px;
+					filter: brightness(0) invert(1);
+				}
+			}
+
+			i.arrow-icon {
+				width: 14px;
+				color: white;
+				cursor: pointer;
 		}
 
 		i.arrow-icon.active {
@@ -1455,22 +1601,26 @@ $font: var(--jeo-font, inherit);
 		}
 
 		a.more-info-button {
-			background: white;
-			color: #555d66;
+			background: var(--jeo_more-bkg-color);
+			color: var(--jeo_more-color);
 			margin: 20px auto 20px auto;
-			border: 2px solid #555d66;
-			padding: 5px 10px;
+			padding: 3px;
+			border-radius: 5px;
 			text-decoration: none;
 			text-align: center;
 			cursor: pointer;
 			width: calc( 100% - 40px );
 			display: block;
-			font-size: 16px;
 			font-weight: bold;
+			font-family: $font;
+			font-size: 8px;
+			line-height: 20px;
 			transition: all 0.1s ease-in-out;
+			text-transform: uppercase;
 
 			&:hover {
-				color: #555d66;
+				background-color: var(--jeo_more-bkg-color-darker-15);
+				color: var(--jeo_more-color);
 				transition: all 0.1s ease-in-out;
 			}
 		}
@@ -1500,9 +1650,125 @@ $font: var(--jeo-font, inherit);
 			margin-bottom: 27px;
 		}
 	}
-}
 
-.layer-item {
+	:is(.mapboxgl-popup, .maplibregl-popup):not(:last-child) {
+		display: none;
+	}
+
+	:is(.mapboxgl-popup .mapboxgl-popup-content, .maplibregl-popup .maplibregl-popup-content) {
+		background-color: white;
+		border-radius: 5px;
+		box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+
+			h2 {
+				font-family: $font;
+			}
+		}
+
+		:is(.mapboxgl-popup, .maplibregl-popup):not(.jeo-popup__mouseover) {
+			:is(.mapboxgl-popup-content, .maplibregl-popup-content) {
+				h3 {
+					margin-top: 1.2rem;
+				}
+			}
+	}
+
+		:is(.mapboxgl-popup-content, .maplibregl-popup-content) {
+			h3,
+			p {
+			color: #111 !important;
+			font-size: 16px;
+			}
+
+			h3 {
+				font-family: 'Helvetica Neue', Arial, Helvetica, sans-serif;
+				font-weight: 700;
+				line-height: 1.3;
+				margin: 0 0 0.45rem;
+		}
+
+		p {
+			font-family: $font;
+			line-height: 1.4;
+			margin: 0;
+		}
+
+		p + p {
+			margin-top: 0.35rem;
+		}
+
+			strong {
+				font-weight: 700;
+			}
+		}
+
+		:is(.mapboxgl-popup-close-button, .maplibregl-popup-close-button) {
+			position: absolute;
+			inset-inline-end: 6px;
+			top: 6px;
+			border-radius: 0;
+			cursor: pointer;
+			width: 22px;
+			height: 22px;
+			display: block;
+			padding: 0;
+			font-size: 18px;
+			background: var(--jeo_close-bkg-color);
+			color: var(--jeo_close-color);
+
+			&:hover {
+				text-decoration: none;
+				background-color: var(--jeo_more-bkg-color-darker-15);
+			}
+
+			span {
+				font-size: 24px;
+				font-weight: 100;
+				line-height: 18px;
+			}
+		}
+
+		:is(.mapboxgl-popup.mapboxgl-popup-anchor-bottom, .maplibregl-popup.maplibregl-popup-anchor-bottom) {
+			&:not(.jeo-popup__mouseover) {
+			margin-top: -28px;
+		}
+	}
+
+		:is(.mapboxgl-popup.mapboxgl-popup-anchor-top, .maplibregl-popup.maplibregl-popup-anchor-top) {
+			&:not(.jeo-popup__mouseover) {
+				margin-top: 28px;
+			}
+		}
+
+		.jeo-popup__mouseover {
+			font-size: 16px;
+			transform: none !important;
+			inset-inline-start: 5px;
+			inset-inline-end: auto;
+			top: 110px !important;
+			max-width: min(300px, calc(100vw - 24px));
+			padding: 5px;
+			pointer-events: none;
+
+			* {
+				font-size: 16px;
+			}
+
+			:is(.mapboxgl-popup-tip, .maplibregl-popup-tip) {
+				display: none !important;
+			}
+		}
+
+		.mapboxgl-popup.jeo-popup__mouseover {
+			top: 122px !important;
+		}
+
+		&:not(.embed) .jeo-popup__mouseover {
+			inset-inline-start: 52px;
+		}
+	}
+
+	.layer-item {
 	font-family: $font;
 	font-size: 14px;
 	z-index: 1;

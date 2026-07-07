@@ -1,5 +1,6 @@
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import { Button, PanelBody } from '@wordpress/components';
+import { Button, PanelBody, Spinner } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -16,12 +17,21 @@ import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import PostsSelector from '../posts-selector';
 import { useRecordsByIds } from '../shared/rest-records';
+import {
+	applyComposedVisibilityFromSettings,
+	handleEditorMapPreviewError,
+	hasMapboxStyleLayers,
+	useComposedPayloadPreviewStyle,
+	useEditorMapboxTransformRequest,
+} from './mapbox-style-preview';
 import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults } = window.jeo_settings;
 
-export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
+export default function OnetimeMapEditor ( { attributes, setAttributes, clientId } ) {
 	const blockProps = useBlockProps();
+	const postId = useSelect( ( select ) =>
+		select( 'core/editor' ).getCurrentPostId(), [] );
 	const [ modal, setModal ] = useState( false );
 	const [ key, setKey ] = useState( 0 );
 	const normalizedAttributes = useMemo( () => {
@@ -61,12 +71,59 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 		[ normalizedAttributes.layers ]
 	);
 
-	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
+	const {
+		records: loadedLayers = [],
+		isLoading: loadingLayers,
+		hasResolved: hasResolvedLayers,
+	} = useRecordsByIds( {
 		path: '/jeo/v1/map-layer',
 		ids: layerIds,
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
 	} );
+	const hasMapboxLayers = hasMapboxStyleLayers( loadedLayers );
+	const composedPayload = useMemo( () => ( {
+		scope: 'preview',
+		kind: 'onetime-map',
+		postId,
+		blockId: clientId,
+		layers: normalizedAttributes.layers || [],
+	} ), [ postId, clientId, layerSettingsKey ] );
+	const composedPreview = useComposedPayloadPreviewStyle( {
+		enabled: hasMapboxLayers,
+		payload: composedPayload,
+		refreshKey: layerSettingsKey,
+	} );
+	const useComposedPreview = Boolean(
+		hasMapboxLayers && composedPreview.style
+	);
+	const isPreparingLayerPreview = Boolean(
+		layerIds.length > 0 && ( loadingLayers || ! hasResolvedLayers )
+	);
+	const isPreparingComposedPreview = Boolean(
+		! isPreparingLayerPreview &&
+			hasMapboxLayers &&
+			! composedPreview.style &&
+			! composedPreview.error
+	);
+	const transformRequest = useEditorMapboxTransformRequest( loadedLayers );
+	const applyComposedVisibility = useCallback( () => {
+		if ( useComposedPreview ) {
+			applyComposedVisibilityFromSettings(
+				mapRef.current,
+				composedPreview.manifest,
+				normalizedAttributes.layers || []
+			);
+		}
+	}, [
+		composedPreview.manifest,
+		layerSettingsKey,
+		useComposedPreview,
+	] );
+
+	useEffect( () => {
+		applyComposedVisibility();
+	}, [ applyComposedVisibility ] );
 
 	const styleBase = useMemo(
 		() => findStyleLayer( loadedLayers, normalizedAttributes.layers ),
@@ -127,53 +184,52 @@ export default function OnetimeMapEditor ( { attributes, setAttributes } ) {
 			</InspectorControls>
 
 			<div className="jeo-preview-area">
-				{ styleBase && (
-					<div className="jeo-style-preview-badge">
-						{ __( 'Vector style preview', 'jeowp' ) }
-					</div>
+				{ ( isPreparingLayerPreview || isPreparingComposedPreview ) && <Spinner /> }
+				{ ! isPreparingLayerPreview && ! isPreparingComposedPreview && (
+					<Map
+						key={ `${ key }:${ currentZoom }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
+						ref={ mapRef }
+						mapStyle={ useComposedPreview ? composedPreview.style : undefined }
+						transformRequest={ transformRequest }
+						onError={ handleEditorMapPreviewError }
+						onStyleData={ applyComposedVisibility }
+						style={ { height: '100%', width: '100%' } }
+						latitude={ normalizedAttributes.center_lat }
+						longitude={ normalizedAttributes.center_lon }
+						zoom={ currentZoom || mapDefaults.zoom }
+						onMove={ ( { viewState } ) => {
+							setAttributes( {
+								center_lat: viewState.latitude,
+								center_lon: viewState.longitude,
+							} );
+						} }
+						onZoom={ ( { viewState } ) => {
+							const zoom = Math.round( viewState.zoom * 10 ) / 10;
+							setAttributes( { [ zoomState ]: zoom } );
+						} }
+					>
+						{ loadedLayers &&
+							normalizedAttributes.layers.map( ( layer ) => {
+								const layerRecord = loadedLayers.find(
+									( { id } ) => id === layer.id
+								);
+
+								if ( ! layerRecord?.meta ) {
+									return null;
+								}
+
+								if ( useComposedPreview ) {
+									return null;
+								}
+
+								if ( hasMapboxLayers && layerRecord.meta.type === 'mapbox' ) {
+									return null;
+								}
+
+								return renderLayer( { layer: layerRecord.meta, instance: layer } );
+							} ) }
+					</Map>
 				) }
-				<Map
-					key={ `${ key }:${ currentZoom }:${ layerSettingsKey }${
-						styleBase ? ':style-' + styleBase.instance.id : ''
-					}` }
-					ref={ mapRef }
-					{ ...styleLayerMapProps( styleBase ) }
-					style={ { height: '100%', width: '100%' } }
-					latitude={ normalizedAttributes.center_lat }
-					longitude={ normalizedAttributes.center_lon }
-					zoom={ currentZoom || mapDefaults.zoom }
-					onMove={ ( { viewState } ) => {
-						setAttributes( {
-							center_lat: viewState.latitude,
-							center_lon: viewState.longitude,
-						} );
-					} }
-					onZoom={ ( { viewState } ) => {
-						const zoom = Math.round( viewState.zoom * 10 ) / 10;
-						setAttributes( { [ zoomState ]: zoom } );
-					} }
-					onStyleData={ () => {
-						if ( styleBase ) {
-							applyStyleLayerFiltering(
-								mapRef.current,
-								styleBase.instance
-							);
-						}
-					} }
-				>
-					{ loadedLayers &&
-						normalizedAttributes.layers.map( ( layer ) => {
-							const layerRecord = loadedLayers.find(
-								( { id } ) => id === layer.id
-							);
-
-							if ( ! layerRecord?.meta ) {
-								return null;
-							}
-
-							return renderLayer( { layer: layerRecord.meta, instance: layer } );
-						} ) }
-				</Map>
 			</div>
 
 			<div className="jeo-preview-controls">

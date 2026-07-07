@@ -382,46 +382,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		[ setLayers ]
 	);
 
-	const renderLayerListItem = useCallback(
-		( { value: layer, props, isDragged, isSelected, isOutOfBounds, index } ) => {
-			return (
-				<LayerListItem
-					key={ layer.id }
-					layer={ layer }
-					index={ index }
-					isDragged={ isDragged }
-					isSelected={ isSelected }
-					isOutOfBounds={ isOutOfBounds }
-					itemProps={ props }
-					loadedLayers={ loadedLayers }
-					widths={ widths }
-					handleRemoveLayer={ handleRemoveLayer }
-					handleSwitchUseStyle={ handleSwitchUseStyle }
-					handleSwitchDefault={ handleSwitchDefault }
-					handleSwitchShowLegend={ handleSwitchShowLegend }
-					handleSwapDefault={ handleSwapDefault }
-					handleUpdateUse={ handleUpdateUse }
-					handleUpdateStyle={ handleUpdateStyle }
-					handleUpdateStyleLayers={ handleUpdateStyleLayers }
-					handleUpdateOpacity={ handleUpdateOpacity }
-				/>
-			);
-		},
-		[
-			loadedLayers,
-			widths,
-			handleRemoveLayer,
-			handleSwitchUseStyle,
-			handleSwitchDefault,
-			handleSwitchShowLegend,
-			handleSwapDefault,
-			handleUpdateUse,
-			handleUpdateStyle,
-			handleUpdateStyleLayers,
-			handleUpdateOpacity,
-		]
-	);
-
 	return (
 		<Fragment>
 			<div className="jeo-layers-library-controls">
@@ -601,7 +561,176 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 							{ children }
 						</div>
 					) }
-					renderItem={ renderLayerListItem }
+					renderItem={ ( {
+						value: layer,
+						props,
+						isDragged,
+						isSelected,
+						isOutOfBounds,
+						index,
+					} ) => {
+									const switchDefault = ( def ) =>
+										setLayers(
+											attributes.layers.map( ( settings ) =>
+												settings.id === layer.id
+													? { ...settings, default: def }
+													: settings
+											)
+										);
+
+									const switchShowLegend = ( def ) => {
+										setLayers(
+											attributes.layers.map( ( settings ) =>
+												settings.id === layer.id
+													? { ...settings, show_legend: def }
+													: settings
+											)
+										);
+									};
+
+									const updateStyleLayers = (def) => {
+										setLayers(
+											attributes.layers.map( ( settings ) =>
+												settings.id === layer.id
+													? { ...settings, style_layers: def }
+													: settings
+											)
+										);
+									}
+
+									const switchUseStyle = ( def ) => {
+										if ( ! def ) {
+											setLayers(
+												attributes.layers.map( ( settings ) => {
+													return settings.id === layer.id
+														? { ...settings, load_as_style: false, style_layers: [] }
+														: settings;
+												} )
+											);
+											return;
+										}
+
+										const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === layer.id);
+										if ( ! currentJeoLayerProps ) {
+											return;
+										}
+
+										const layerType = window.JeoLayerTypes.getLayerType(
+											currentJeoLayerProps.meta.type
+										);
+										if ( ! layerType?._getStyleDefinition ) {
+											return;
+										}
+
+										if ( def ) {
+											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
+												if(!response) {
+													return;
+												}
+
+												let styleLayers = response.layers;
+
+												styleLayers = styleLayers.map(layer => {
+													if(layer.layout && typeof layer.layout.visibility !== 'undefined' && layer.layout.visibility === 'none') {
+														return {
+															id: layer.id,
+															show: false,
+														}
+													}
+
+													return {
+														id: layer.id,
+														show: true,
+													}
+												})
+
+												setLayers(
+													attributes.layers.map( ( settings ) => {
+														return settings.id === layer.id?
+															{ ...settings, load_as_style: true, style_layers: styleLayers }
+															: settings
+													} )
+												);
+											} );
+
+											setLayers(
+												attributes.layers.map( ( settings ) => {
+													return settings.id === layer.id?
+														{ ...settings, load_as_style: true, style_layers: [] }
+														: settings
+												} )
+											);
+										}
+									};
+
+									const swapDefault = ( def ) =>
+										def && // radio-like behavior: can only be turned on.
+										setLayers(
+											attributes.layers.map( ( settings ) => ( {
+												...settings,
+												default:
+													settings.use === 'swappable' // update only the swappable layers
+														? settings.id === layer.id // radio-like behavior: turn off all other swappable layers
+														: settings.default,
+											} ) )
+										);
+
+									const updateUse = ( use ) =>
+										setLayers(
+											attributes.layers.map( ( settings ) => {
+												if ( settings.id !== layer.id ) {
+													return settings;
+												}
+												return {
+													...settings,
+													use,
+													default:
+														use === 'swappable' ? ! anySwapDefault( attributes.layers ) :
+														use === 'fixed' ? true :
+														settings.default,
+												};
+											} )
+										);
+
+									const removeLayer = () => {
+										const confirmation = confirm(
+											__( 'Do you really want to delete this layer?', 'jeowp' )
+										);
+
+										if ( confirmation ) {
+											return setLayers(
+												attributes.layers.filter(
+													( settings ) => settings.id !== layer.id
+												)
+											);
+										}
+									};
+
+									const loadedLayer = loadLayer( loadedLayers, layer );
+
+									if(!loadedLayer.layer) {
+										// TODO: Remove deleted layers
+										return null;
+									}
+
+									return <LayerSettings
+										itemProps={ props }
+										index={ index }
+										isDragged={ isDragged }
+										isSelected={ isSelected }
+										isOutOfBounds={ isOutOfBounds }
+										removeLayer={ removeLayer }
+										settings={ loadedLayer }
+										switchUseStyle={ switchUseStyle }
+										switchDefault={ switchDefault }
+										switchShowLegend={ switchShowLegend }
+										swapDefault={ swapDefault }
+										updateUse={ updateUse }
+										widths={ widths }
+										updateStyleLayers={ updateStyleLayers }
+										key={ index }
+									/>;
+								} }
 				/>
 			) }
 			<Button

@@ -30,7 +30,7 @@ import { Button, Icon, Panel, PanelBody, Spinner } from '@wordpress/components';
 import { chevronDown, chevronUp, lock, unlock, seen, trash, plus } from '@wordpress/icons';
 import { useEntityRecord } from '@wordpress/core-data';
 import { useSelect, select } from '@wordpress/data';
-import { Fragment, useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useId, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { CheckboxControl } from '../shared/wp-form-controls';
 
@@ -56,6 +56,13 @@ import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
 import { decodeHtmlEntity } from '../shared/html';
 import { getCKEditorLanguage } from '../shared/locale';
+import {
+	applyComposedVisibilityFromSelection,
+	handleEditorMapPreviewError,
+	hasMapboxStyleLayers,
+	useComposedMapPreviewStyle,
+	useEditorMapboxTransformRequest,
+} from './mapbox-style-preview';
 import './map-editor.css';
 import './storymap-editor.scss';
 
@@ -560,6 +567,31 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		enabled: layerIds.length > 0,
 		query: { context: 'edit' },
 	} );
+	const previewLayers = attributes.navigateMapLayers?.length
+		? attributes.navigateMapLayers
+		: loadedLayers;
+	const hasMapboxLayers = hasMapboxStyleLayers( previewLayers );
+	const composedPreview = useComposedMapPreviewStyle( {
+		enabled: hasMapboxLayers,
+		mapId: attributes.map_id,
+		refreshKey: layerIds.join( ',' ),
+	} );
+	const useComposedPreview = Boolean(
+		hasMapboxLayers && composedPreview.style
+	);
+	const isPreparingLayerPreview = Boolean(
+		! attributes.navigateMapLayers?.length &&
+			layerIds.length > 0 &&
+			( loadingLayers || ! layersResolved )
+	);
+	const isPreparingComposedPreview = Boolean(
+		! isPreparingLayerPreview &&
+			hasMapboxLayers &&
+			! composedPreview.style &&
+			! composedPreview.error
+	);
+	const shouldRenderMap = ! isPreparingLayerPreview && ! isPreparingComposedPreview;
+	const transformRequest = useEditorMapboxTransformRequest( previewLayers );
 	const currentSlidePreviewKey = useMemo(
 		() =>
 			JSON.stringify( {
@@ -570,6 +602,21 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			} ),
 		[ attributes.slides, attributes.navigateMapLayers, currentSlideIndex ]
 	);
+	const currentSlideSelectedLayers =
+		attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [];
+	const applyCurrentSlideComposedVisibility = useCallback( () => {
+		if ( useComposedPreview ) {
+			applyComposedVisibilityFromSelection(
+				mapRef.current,
+				composedPreview.manifest,
+				currentSlideSelectedLayers
+			);
+		}
+	}, [
+		composedPreview.manifest,
+		currentSlidePreviewKey,
+		useComposedPreview,
+	] );
 
 	const currentSlideLayers =
 		attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [];
@@ -592,6 +639,10 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			pitch: currentSlide?.pitch || 0,
 		} );
 	}, [ attributes.slides, currentSlideIndex, setViewState ] );
+
+	useEffect( () => {
+		applyCurrentSlideComposedVisibility();
+	}, [ applyCurrentSlideComposedVisibility ] );
 
 	useEffect( () => {
 		if ( ! attributes.slides?.length ) {
@@ -816,52 +867,44 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			{ attributes.map_id && loadedMap && (
 				<Fragment>
 					<div className="jeo-preview-area">
-						{ styleBase && (
-							<div className="jeo-style-preview-badge">
-								{ __( 'Vector style preview', 'jeowp' ) }
-							</div>
-						) }
-						<MapPreview
-							ref={ mapRef }
-							key={ `${ key }:${ currentSlideIndex }:${ currentSlidePreviewKey }${
-								styleBase ? ':style-' + styleBase.instance.id : ''
-							}` }
-							{ ...styleLayerMapProps( styleBase ) }
-							controls={ `top-${inlineEnd}` }
-							fullscreen={ loadedMap.meta.enable_fullscreen }
-							style={ { height: '85vh' } }
-							latitude={ viewState.latitude }
-							longitude={ viewState.longitude }
-							zoom={ viewState.zoom }
-							bearing={ viewState.bearing }
-							pitch={ viewState.pitch }
-							onMove={ ( event ) => {
-								setViewState( event.viewState );
-							} }
-							onStyleData={ () => {
-								if ( styleBase ) {
-									applyStyleLayerFiltering(
-										mapRef.current,
-										styleBase.instance
-									);
-								}
-							} }
-						>
-							{ attributes.slides[ currentSlideIndex ].selectedLayers.map( ( layer ) => {
-									if(attributes.navigateMapLayers) {
-										const layerOptions = attributes.navigateMapLayers.find(
-											( item ) => layerIdsMatch( item, layer )
-										);
-										if ( layerOptions ) {
-											return renderLayer( {
-												layer: layerOptions.meta,
-												instance: layer,
-											} );
+						{ ! shouldRenderMap && <Spinner /> }
+						{ shouldRenderMap && (
+							<MapPreview
+								ref={ mapRef }
+								key={ `${ key }:${ currentSlideIndex }:${ currentSlidePreviewKey }:${ composedPreview.metadata?.hash || 'default' }` }
+								controls={ `top-${inlineEnd}` }
+								fullscreen={ loadedMap.meta.enable_fullscreen }
+								mapStyle={ useComposedPreview ? composedPreview.style : undefined }
+								style={ { height: '85vh' } }
+								transformRequest={ transformRequest }
+								latitude={ viewState.latitude }
+								longitude={ viewState.longitude }
+								zoom={ viewState.zoom }
+								bearing={ viewState.bearing }
+								pitch={ viewState.pitch }
+								onError={ handleEditorMapPreviewError }
+								onStyleData={ applyCurrentSlideComposedVisibility }
+								onMove={ ( event ) => {
+									setViewState( event.viewState );
+								} }
+							>
+								{ ! useComposedPreview && attributes.slides[ currentSlideIndex ].selectedLayers.map(
+									( layer ) => {
+										if(attributes.navigateMapLayers) {
+											const layerOptions = attributes.navigateMapLayers.find(
+												( item ) => layerIdsMatch( item, layer )
+											);
+											if ( layerOptions ) {
+												return renderLayer( {
+													layer: layerOptions.meta,
+													instance: layer,
+												} );
+											}
 										}
 									}
-								}
-							) }
-						</MapPreview>
+								) }
+							</MapPreview>
+						) }
 					</div>
 					<div className="storymap-controls">
 						{ showStorySettings && (

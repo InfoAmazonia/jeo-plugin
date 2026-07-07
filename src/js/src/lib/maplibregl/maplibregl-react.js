@@ -4,6 +4,8 @@ import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/map
 import { computeInlineStart } from '../../shared/direction';
 import { defaultStyle, mapgl, transformRequest } from '../mapgl-loader'
 
+const defaultProjection = { name: 'equirectangular' };
+
 // Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
 // Depending on how webpack groups the runtime and vendor code, react-map-gl may
 // still evaluate against a different HTMLElement reference from the loader chunk.
@@ -128,6 +130,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, onLoad, ...
 			ref={ setRef }
 			mapLib={ mapgl }
 			mapStyle={ defaultStyle }
+			projection={ defaultProjection }
 			reuseMaps={ false }
 			transformRequest={ transformRequest }
 			onLoad={ handleLoad }
