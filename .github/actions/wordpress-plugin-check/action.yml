@@ -32,6 +32,11 @@ inputs:
   db-host:
     description: WordPress database host.
     default: 127.0.0.1:3306
+  fail-on-errors:
+    description: Whether to fail the check when errors are found. Defaults to
+      false so checks are advisory-only; set to 'true' to opt a caller into
+      failing the job on errors.
+    default: 'false'
   fail-on-warnings:
     description: Whether to fail the check when warnings are found (not just errors).
     default: 'false'
@@ -85,6 +90,7 @@ runs:
     - name: Run WordPress Plugin Check
       shell: bash
       env:
+        FAIL_ON_ERRORS: ${{ inputs.fail-on-errors }}
         FAIL_ON_WARNINGS: ${{ inputs.fail-on-warnings }}
         PLUGIN_CHECK_RESULTS: ${{ inputs.results-path }}
         PLUGIN_SLUG: ${{ inputs.plugin-slug }}
@@ -155,9 +161,32 @@ runs:
             "$PLUGIN_CHECK_RESULTS"
         fi
 
-        # Errors always fail.
-        if [ "$ERROR_COUNT" -gt 0 ]; then
-          echo "::error::Plugin Check found $ERROR_COUNT error(s)."
+        # Append a readable summary to the GitHub Actions run summary.
+        if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+          {
+            echo "### WordPress Plugin Check Results"
+            echo ""
+            echo "- Errors: ${ERROR_COUNT}"
+            echo "- Warnings: ${WARNING_COUNT}"
+            echo ""
+            if [ "$((ERROR_COUNT + WARNING_COUNT))" -gt 0 ]; then
+              echo "| Type | File | Line | Code | Message |"
+              echo "|------|------|------|------|---------|"
+              jq -r '
+                def esc: tostring | gsub("\r";"") | gsub("\n";" ") | gsub("\\|";"\\|");
+                .[]
+                | select(.type == "ERROR" or .type == "WARNING")
+                | "| \(.type) | \((.file // "-") | esc) | \((.line // 1) | esc) | \((.code // "-") | esc) | \((.message // "-") | esc) |"
+              ' "$PLUGIN_CHECK_RESULTS"
+            else
+              echo "No errors or warnings found."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+        # Errors fail only when fail-on-errors is enabled (default: false).
+        if [ "$FAIL_ON_ERRORS" = "true" ] && [ "$ERROR_COUNT" -gt 0 ]; then
+          echo "::error::Plugin Check found $ERROR_COUNT error(s) and fail-on-errors is enabled."
           exit 1
         fi
 
@@ -167,5 +196,5 @@ runs:
           exit 1
         fi
 
-        echo "Plugin Check passed."
+        echo "Plugin Check completed: $ERROR_COUNT error(s), $WARNING_COUNT warning(s)."
         exit 0

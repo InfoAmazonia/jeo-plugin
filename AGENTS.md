@@ -174,7 +174,7 @@ The repository maintains the following automated checks. All must pass before a 
 
 GitHub Actions run via **9 workflows** in `.github/workflows/` plus a shared composite action in `.github/actions/wordpress-plugin-check/`. Notable flows:
 - `deploy-wordpress-org.yml` — GitHub Release + WordPress.org deploy (can be split via workflow input)
-- `plugin-check.yml` — WordPress Plugin Check, now reuses `.github/actions/wordpress-plugin-check`
+- `plugin-check.yml` — WordPress Plugin Check, now reuses `.github/actions/wordpress-plugin-check`. Advisory by default: results (errors/warnings with file + line) surface as annotations, a `$GITHUB_STEP_SUMMARY` table, and an uploaded artifact, but the job stays green. Set the composite action input `fail-on-errors: true` on any caller to opt back into failing on errors.
 - `wordpress-smoke.yml` — Builds webpack assets once, uploads artifact, and downloads it across the WordPress/PHP matrix
 - `wordpress-languages.yml` — Validates POT/PO catalogs match source strings
 - `php-compat.yml` — PHP 8.2-8.5 compatibility check
