@@ -1,12 +1,12 @@
 === JEO Maps ===
 Contributors: infoamazonia
 Tested up to: 7.0
-Stable tag: 3.1.1
+Stable tag: 3.1.2
 Requires PHP: 8.0
 Requires at least: 6.6
 License: GPL-3.0-only
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
-Version: 3.1.1
+Version: 3.1.2
 
 Geojournalism platform for building maps, geolocating posts, and publishing interactive storymaps in WordPress.
 
@@ -74,6 +74,9 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 8. Browse geolocated stories and map clusters in the Discovery interface.
 
 == Changelog ==
+
+= 3.1.2 =
+* Fixed public map embeds loading layer data with the authenticated preview REST context.
 
 = 3.1.1 =
 * Fixed authenticated previews for unpublished maps that use composed Mapbox style layers.
