@@ -3798,6 +3798,7 @@ msgid "Select the page where the JEO Discovery block is located."
 msgstr "Seleccione la página donde se encuentra el bloque Discovery de JEO."
 
 #: includes/stories-near-you/class-stories-near-you.php:432
+#: js/build/storiesNearYou.js:1
 msgid "Unable to load stories near you."
 msgstr "No se pudieron cargar historias cerca de usted."
 
@@ -4979,4 +4980,24 @@ msgstr ""
 
 #: jeo.php:36
 msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "You denied location access. Please enable location permissions in your browser settings."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "Location request timed out. Please try again or use the configured location."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "This browser does not support location services."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "Unable to load stories. Please check your connection and try again."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "Your browser could not determine your location. This may be due to strict privacy settings or because GPS is unavailable on your device."
 msgstr ""

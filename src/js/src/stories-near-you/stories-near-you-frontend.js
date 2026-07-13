@@ -1,3 +1,5 @@
+import { __ } from '@wordpress/i18n';
+
 ( function () {
 	const CONTAINER_SELECTOR = '.wp-block-jeo-stories-near-you';
 	const REST_ENDPOINT = '/wp-json/jeo/v1/stories-near-you';
@@ -116,7 +118,7 @@
 			}
 
 			if ( ! navigator.geolocation ) {
-				this.showError();
+				this.showError( 'not_supported' );
 				return;
 			}
 
@@ -125,7 +127,7 @@
 					const loc = await this.geolocationProvider.getLocation();
 					await this.fetchAndRender( loc );
 				} catch ( e ) {
-					this.showError();
+					this.showError( e?.error );
 				}
 				return;
 			}
@@ -164,7 +166,7 @@
 					const location = await this.geolocationProvider.getLocation();
 					await this.fetchAndRender( location );
 				} catch ( e ) {
-					this.showError();
+					this.showError( e?.error );
 				}
 			} );
 
@@ -259,7 +261,7 @@
 				this.hasRendered = true;
 				this.renderResponse( data.html );
 			} catch ( e ) {
-				this.showError();
+				this.showError( 'network' );
 			}
 		}
 
@@ -291,7 +293,18 @@
 			}
 		}
 
-		showError() {
+		getErrorMessage( errorType ) {
+			const messages = {
+				denied: __( 'You denied location access. Please enable location permissions in your browser settings.', 'jeowp' ),
+				unavailable: __( 'Your browser could not determine your location. This may be due to strict privacy settings or because GPS is unavailable on your device.', 'jeowp' ),
+				timeout: __( 'Location request timed out. Please try again or use the configured location.', 'jeowp' ),
+				not_supported: __( 'This browser does not support location services.', 'jeowp' ),
+				network: __( 'Unable to load stories. Please check your connection and try again.', 'jeowp' ),
+			};
+			return messages[ errorType ] || __( 'Unable to load stories near you.', 'jeowp' );
+		}
+
+		showError( errorType ) {
 			const skeleton = this.element.querySelector(
 				'.jeo-stories-near-you__skeleton'
 			);
@@ -310,6 +323,10 @@
 			}
 
 			if ( errorEl ) {
+				const messageEl = errorEl.querySelector( 'p' );
+				if ( messageEl ) {
+					messageEl.textContent = this.getErrorMessage( errorType );
+				}
 				errorEl.classList.remove( 'hidden' );
 			}
 		}
@@ -364,7 +381,7 @@
 						if ( skeleton ) {
 							skeleton.remove();
 						}
-						inst.showError();
+						inst.showError( e?.error );
 					}
 					return;
 				}
@@ -401,15 +418,17 @@
 			instances.push( instance );
 		}
 
+		let sharedError = null;
 		const sharedLocation = await resolveSharedLocation( provider ).catch( ( error ) => {
 			console.error( error );
+			sharedError = error?.error || 'not_supported';
 			return null;
 		} );
 		const allRenderedIds = [];
 
 		if ( sharedLocation === null ) {
 			for ( const instance of instances ) {
-				instance.showError();
+				instance.showError( sharedError );
 			}
 			return;
 		}

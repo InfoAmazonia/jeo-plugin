@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-07T19:17:19+00:00\n"
+"POT-Creation-Date: 2026-07-13T19:01:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -2839,6 +2839,7 @@ msgid "Save Changes"
 msgstr ""
 
 #: includes/stories-near-you/class-stories-near-you.php:432
+#: js/build/storiesNearYou.js:1
 msgid "Unable to load stories near you."
 msgstr ""
 
@@ -4974,4 +4975,24 @@ msgstr ""
 
 #: js/build/postsSidebar.js:4
 msgid "Geolocation"
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "You denied location access. Please enable location permissions in your browser settings."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "Your browser could not determine your location. This may be due to strict privacy settings or because GPS is unavailable on your device."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "Location request timed out. Please try again or use the configured location."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "This browser does not support location services."
+msgstr ""
+
+#: js/build/storiesNearYou.js:1
+msgid "Unable to load stories. Please check your connection and try again."
 msgstr ""

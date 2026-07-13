@@ -138,6 +138,19 @@ To guard against this, `BrowserGeolocationProvider.getLocation()` wraps its Prom
 
 The orphaned `getCurrentPosition` callback (if permission is granted late) calls `resolve()` on an already-settled Promise — a harmless no-op.
 
+### Differentiated Error Messages
+
+| Error code | Cause | Message (EN) |
+|---|---|---|
+| `denied` | User explicitly denied permission (`PERMISSION_DENIED`) | "You denied location access. Please enable location permissions in your browser settings." |
+| `unavailable` | Position could not be determined — GPS signal, device hardware, or browser privacy settings (`POSITION_UNAVAILABLE`) | "Your browser could not determine your location. This may be due to strict privacy settings or because GPS is unavailable on your device." |
+| `timeout` | Overall timeout (20s) fired before geolocation resolved | "Location request timed out. Please try again or use the configured location." |
+| `not_supported` | `navigator.geolocation` is undefined | "This browser does not support location services." |
+| `network` | REST fetch failed (network error, HTTP non-200, JSON parse) | "Unable to load stories. Please check your connection and try again." |
+| _(default)_ | Fallback for unhandled error codes | "Unable to load stories near you." |
+
+The `denied` and `unavailable` codes are distinct because browsers with strict privacy settings (e.g. Brave Shields) may return `POSITION_UNAVAILABLE` instead of `PERMISSION_DENIED` — the user didn't explicitly deny anything. The `denied` error code also clears the stored consent (`localStorage.removeItem(CONSENT_KEY)`) so that subsequent visits re-prompt instead of silently failing.
+
 ### User Location Precision (`geolocation_precision`)
 
 Global plugin setting (Settings > General > User location precision) controlling how many decimal places are kept from the browser geolocation result before sending to the REST endpoint. Range: 1–5, default: 2. Lower values = less precision, more privacy. Does **not** affect post geocoding or stored coordinates — only the user's browser-reported location.
