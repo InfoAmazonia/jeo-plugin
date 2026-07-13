@@ -8,6 +8,7 @@
 |------|------|
 | Create/modify Gutenberg blocks | [`blocks/README.md`](blocks/README.md) |
 | Work with maps (CPT `map`) | [`maps/README.md`](maps/README.md) |
+| Composed Mapbox styles (style composer) | [`composed-styles/README.md`](composed-styles/README.md) |
 | Work with layers | [`layers/README.md`](layers/README.md) |
 | Geocoding, post geolocation | [`geocoding/README.md`](geocoding/README.md) |
 | Storymap (scrollytelling) | [`storymap/README.md`](storymap/README.md) |
@@ -58,7 +59,7 @@ jeo-plugin/
 │   │   │   ├── jeo-storymap/     # Storymap display
 │   │   │   ├── discovery/        # Discovery app
 │   │   │   ├── icons/            # SVG/PNG assets
-│   │   │   └── shared/           # Hooks, utils, shared components
+│   │   │   └── shared/           # Hooks, utils, shared components (incl. composed-style-*.js)
 │   │   └── build/                # Build output (webpack)
 │   ├── css/                      # SCSS
 │   ├── templates/                # PHP + EJS templates
@@ -87,6 +88,7 @@ jeo-plugin/
 - **Global accessors**: `jeo()`, `jeo_maps()`, `jeo_layers()`, `jeo_settings()`, etc.
 - **Meta REST**: `_related_point` for geolocation, registered with full REST schema
 - **Iframe compat**: Extensive patching for Block API v3 (Gutenberg iframe editor)
+- **Composed Mapbox styles**: `mapbox`-type layers are merged into a single cached Mapbox Style JSON by `Map_Style_Composer`, rendered natively by MapLibre (legacy Static Tiles overlay removed in 3.1.0). See [`composed-styles/README.md`](composed-styles/README.md).
 - **JS entries**: Each webpack entry point is independent; `dependOn` for shared chunks
 
 ## Architecture Diagram (C4 Container)
@@ -97,13 +99,17 @@ graph TB
     WP --> JEO[JEO Plugin PHP]
     JEO --> DB[(WordPress DB)]
     JEO --> REST[REST API /jeo/v1/]
+    JEO --> MSC[Map Style Composer]
+    MSC --> |cached style.json/manifest.json| CACHE[(Uploads Cache)]
     REST --> GB[Gutenberg Blocks/Sidebars]
     GB --> ML[MapLibre GL / Mapbox GL]
+    ML --> MSC
     JEO --> AI[AI Providers]
     JEO --> GEO[Geocoding APIs]
     JEO --> MCP[Mapbox DevKit MCP]
     AI --> RAG[RAG Vector Store]
     ML --> Tiles[Tile Servers]
+    MSC --> MBX[Mapbox Styles API]
     
     subgraph Frontend JS
         GB
@@ -114,6 +120,7 @@ graph TB
         AI
         GEO
         Tiles
+        MBX
     end
 ```
 
@@ -137,6 +144,8 @@ erDiagram
         json layers
         json pan_limits
         json related_posts
+        string composed_style_hash
+        json composed_style_warnings
     }
     MAP_LAYER {
         int ID PK

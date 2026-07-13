@@ -16,7 +16,7 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/includes/ai/class-wp-storage.php` | `StorageInterface` adapter for `post_meta` and `user_meta` |
 | `src/includes/ai/class-wp-user-memory-storage.php` | `StorageInterface` adapter for `user_meta` memories — strips redundant user ID from the namespace so preferences are reusable across contexts |
 | `src/includes/ai/class-wp-option-storage.php` | `StorageInterface` adapter for `wp_options` (single option per namespace, `autoload=false`) |
-| `src/js/src/map-blocks/minimap-editor.js` | Edit component — placeholder, map preview, inspector chat panel |
+| `src/js/src/map-blocks/minimap-editor.js` | Edit component — placeholder, map preview, inspector chat panel (composed Mapbox style support) |
 | `src/js/src/map-blocks/minimap-display.js` | Save component — renders `<div class="jeomap">` for frontend JS |
 | `src/js/src/map-blocks/index.js` | Block registration with `conversation_id` and `conversation` attributes |
 | `src/js/src/map-blocks/minimap-config.js` | Attribute coercion helpers |
@@ -24,6 +24,7 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/js/src/map-blocks/layers-settings.js` | Modal layer library / selected layers editor |
 | `src/js/src/map-blocks/layer-settings.js` | Per-layer controls (use, default, legend, opacity) |
 | `src/js/src/map-blocks/map-preview-layer.js` | Editor preview rendering for all layer types |
+| `src/js/src/map-blocks/mapbox-style-preview.js` | Composed Mapbox style adapter — see [`composed-styles/README.md`](../composed-styles/README.md) |
 
 ## Architecture Overview
 
@@ -436,7 +437,8 @@ Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 - **Layer generation authorization**: When Mapbox is available, the agent must always ask for explicit user confirmation via chat before generating custom layers (`generate_layer` tool). Initial auto-generation never creates custom layers
 - **Debounced map interaction**: `onMove` and `onZoom` handlers use 300 ms lodash debounce to avoid excessive `setAttributes` calls and re-renders during map pan/zoom
 - **Layer render guard**: The map preview only attempts to render layers when `loadedLayers.length > 0`, preventing an empty-map flash while REST metadata is still loading
-- **`load_as_style` parity**: When a `mapbox`-type layer has `load_as_style: true`, the editor preview uses the Mapbox style URL as the map's base style via `use-style-layer.js::findStyleLayer()` (same mechanism as the frontend's `class-jeo-map.js::getStyleLayer()`). The style layer is skipped in `renderLayer` (returns `null`), and `style_layers` filtering is applied via `applyStyleLayerFiltering()` in `onStyleData`. A `key` prop on `<Map>` forces remount when toggling `load_as_style`. See [`.architecture/frontend/README.md`](../frontend/README.md) for the full parity table.
+- **`load_as_style` parity**: When a `mapbox`-type layer has `load_as_style: true`, the editor preview uses the Mapbox style URL as the map's base style via `use-style-layer.js::findStyleLayer()` (same mechanism as the frontend's `class-jeo-map.js::getStyleLayer()`). The style layer is skipped in `renderLayer` (returns `null`), and `style_layers` filtering is applied via `applyStyleLayerFiltering()` in `onStyleData`. See [`.architecture/frontend/README.md`](../frontend/README.md) for the full parity table.
+- **Composed Mapbox styles**: When the loaded layers include any `mapbox`-type layer, the editor preview composes all mapbox layers into a single composite style via `useComposedPayloadPreviewStyle` (payload `{scope:'preview', kind:'minimap'}`). The `<Map>` uses the composed style as `mapStyle` with `useEditorMapboxTransformRequest` for token handling, and `applyComposedVisibilityFromSettings` drives per-layer visibility from the manifest. Falls back to the single `load_as_style` base when composition is unavailable. An `AbortSignal` cancels stale requests on rapid layer changes. The frontend rides on `JeoMap` (onetime composed-style branch) — no separate rendering path. See [`composed-styles/README.md`](../composed-styles/README.md).
 
 ## Refinement Stability (Phase 3)
 

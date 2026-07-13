@@ -37,11 +37,17 @@ Types are registered via `Jeo\Layer_Types::register_layer_type()` on the `jeo_re
 
 | Type | Description | JS File |
 |------|-------------|---------|
-| `mapbox` | Mapbox raster style | `mapbox.js` |
+| `mapbox` | Mapbox style (composed via `Map_Style_Composer` — see [`composed-styles/README.md`](../composed-styles/README.md)) | `mapbox.js` |
 | `tilelayer` | Generic tiled raster | `tilelayer.js` |
 | `mvt` | Mapbox Vector Tiles | `mvt.js` |
 | `mapbox-tileset-raster` | Mapbox raster tileset | `mapbox-tileset-raster.js` |
 | `mapbox-tileset-vector` | Mapbox vector tileset | `mapbox-tileset-vector.js` |
+
+> **Note (3.1.0):** The legacy Static Tiles raster-overlay rendering path for `mapbox`
+> layers was removed. `mapbox`-type layers are now merged into a single composite Mapbox
+> Style JSON by the backend `Map_Style_Composer` and rendered natively by MapLibre. The
+> other types (`tilelayer`, `mvt`, `mapbox-tileset-*`) still render via the legacy
+> individual-add path.
 
 ### Schema per Type (JSON Schema for @rjsf/core)
 
@@ -92,6 +98,9 @@ The `jeo-layers-sidebar` provides:
 - Attribution settings
 - Legend settings
 - Interaction settings (popup on click/hover)
+- **Refresh composed style cache** button (`mapbox` layers only) — calls
+  `POST /jeo/v1/map-style/layer/{id}/refresh` to force-regenerate the composite styles for
+  all maps referencing this layer, showing a notice with the refreshed/failed map counts
 
 The live map preview and post save lock / notices are handled by the `jeo/layer-editor` block (`map-blocks/layer-editor-preview.js`), which runs inside the Gutenberg content area (iframe in Block API v3). This block:
 - Renders the MapLibre/Mapbox preview with the current layer options

@@ -12,6 +12,21 @@ All registered in `class-jeo.php` and `class-ai-handler.php` via `rest_api_init`
 | `/jeo/v1/all-pins` | GET | `get_all_pins` | All geolocated points |
 | `/jeo/v1/dashboard-stats` | GET | `get_dashboard_stats` | Dashboard statistics |
 
+### Composed Mapbox Styles
+
+Registered by `Map_Style_Composer` (`class-map-style-composer.php`). See
+[`composed-styles/README.md`](../composed-styles/README.md) for the full architecture.
+
+| Route | Method | Permission | Description |
+|-------|--------|------------|-------------|
+| `/jeo/v1/map-style/{id}` | GET | `can_read_map` | Composed style metadata (style/manifest URLs, warnings). Arg `refresh` forces regeneration |
+| `/jeo/v1/map-style/{id}/style` | GET | `can_read_map` | Serves `style.json` (composite Mapbox Style v8) |
+| `/jeo/v1/map-style/{id}/manifest` | GET | `can_read_map` | Serves `manifest.json` (layer ID → composite layer ID mapping) |
+| `/jeo/v1/map-style/compose` | POST | `can_create_virtual` | Compose from payload (scope/kind/postId/layers). `onetime`=public, `preview`=`edit_posts` |
+| `/jeo/v1/map-style/layer/{id}/refresh` | POST | `can_refresh_layer` | Force-regenerate all maps referencing a layer |
+| `/jeo/v1/map-style/{scope}/{hash}/style` | GET | `can_read_virtual` | Virtual (preview/onetime) style artifact |
+| `/jeo/v1/map-style/{scope}/{hash}/manifest` | GET | `can_read_virtual` | Virtual (preview/onetime) manifest artifact |
+
 ### AI (12+ routes)
 
 See [`ai/README.md`](../ai/README.md) for full details.

@@ -92,6 +92,8 @@ Re-exports from `react-map-gl/maplibre`:
 | `shared/intl.js` | `formatDate`, `formatHour` | Intl API wrappers |
 | `shared/styles.js` | `EMPTY_STYLE` | Empty MapLibre style |
 | `shared/url-normalization.js` | `normalizeOptionalUrl` | URL helper |
+| `shared/composed-style-data.js` | `loadComposedStyleData`, `fetchJson`, `postJson` | Composed style loader (AbortSignal-aware, nonce injection) — see [`composed-styles/README.md`](../composed-styles/README.md) |
+| `shared/composed-style-layers.js` | `hasComposedStyle`, `setComposedLayerVisibility`, `addComposedInteractions`, etc. | Manifest-driven visibility/interactions over composite style layers |
 
 ## Editor↔Frontend Layer Rendering Parity
 
@@ -134,6 +136,35 @@ The Mapbox token (`mapbox_key`) is localized identically in both contexts via th
 | **Editor** | Inline `access_token` in raster URL (`map-preview-layer.js:31`) | Inline in style URL + `createTokenAwareTransformRequest` re-signs derived requests (composed on top of runtime's `mapboxTransformRequest`/native `accessToken`) |
 
 The editor's token-aware transform (`use-style-layer.js::createTokenAwareTransformRequest()`) mirrors the frontend's `transformRequestUrl` logic. It matches the Mapbox username extracted from `style_id` and replaces `access_token` on any matching request, then delegates to the runtime's default transformRequest. Works for both MapLibre and Mapbox runtimes.
+
+## Composed Mapbox Styles
+
+`mapbox`-type layers are no longer rendered as individual Static Tiles overlays. The
+**Map Style Composer** merges all mapbox layers into a single cached composite Mapbox
+Style JSON, set as the map's base `style`, with per-JEO-layer visibility/interactions
+driven by a **manifest**. Full details in [`composed-styles/README.md`](../composed-styles/README.md).
+
+### Token Placeholder Handling
+
+Tokens are scrubbed to `__JEO_MAPBOX_ACCESS_TOKEN__` before persistence. Each rendering
+context replaces the placeholder at request time and applies per-owner custom tokens:
+
+| Context | Mechanism |
+|---------|-----------|
+| **Frontend** (`class-jeo-map.js::transformRequestUrl`) | Placeholder → `encodeURIComponent(mapbox_key)` + per-owner `customTokens` |
+| **Editor** (`mapbox-style-preview.js::useEditorMapboxTransformRequest`) | Mirrors frontend on top of `mapgl-loader.transformRequest` |
+| **Discovery** (`discovery/index.js::transformRequestUrl`) | Same logic + `registerLayerCustomToken` (owner from `style_id`/`tileset_id`) |
+
+### Editor Adapter (`mapbox-style-preview.js`)
+
+| Hook | Used by |
+|------|---------|
+| `useComposedMapPreviewStyle` | `map-editor.js`, `storymap-editor.js` (saved-map preview) |
+| `useComposedPayloadPreviewStyle` | `map-editor-preview.js`, `onetime-map-editor.js` (payload preview via POST `/compose`) |
+| `useMapboxStylePreview` | `layer-editor-preview.js` (single raw style, NOT the composer) |
+
+All composed editor hooks use an `AbortController` per effect run to cancel stale in-flight
+requests when layers/settings change rapidly.
 
 ## Webpack Entry Points
 
