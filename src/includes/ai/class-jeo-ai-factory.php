@@ -128,9 +128,9 @@ class JEO_AI_Factory {
 	): Assistant {
 		return self::create_assistant(
 			instructions:        $instructions,
-			outputClass:         Structured\Georeference_Result::class,
+			output_class:        Structured\Georeference_Result::class,
 			provider:            $provider,
-			structuredRetries:   self::DEFAULT_STRUCTURED_RETRIES,
+			structured_retries:  self::DEFAULT_STRUCTURED_RETRIES,
 		);
 	}
 
@@ -148,7 +148,7 @@ class JEO_AI_Factory {
 		return self::create_assistant(
 			instructions:        $instructions,
 			provider:            $provider,
-			structuredRetries:   1,
+			structured_retries:  1,
 		);
 	}
 
@@ -176,7 +176,7 @@ class JEO_AI_Factory {
 					'timeout' => 60,
 				),
 			),
-			structuredRetries: 3,
+			structured_retries: 3,
 		);
 	}
 }

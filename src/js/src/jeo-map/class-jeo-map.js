@@ -14,6 +14,7 @@ import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { decodeHtmlEntity } from '../shared/html';
 import { onFirstIntersection } from '../shared/intersect';
 import { EMPTY_STYLE, resolveTileUrl } from '../shared/styles';
+import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
 import { toFiniteNumber } from './map-numbers';
 import { getPanLimitsMaxBounds } from './pan-limits';
