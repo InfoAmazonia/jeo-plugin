@@ -30,7 +30,7 @@ export function JeoGeocodePostsAI ({ aiSuggestedLocations, isAIProcessing, onCan
 		
 		try {
 			const response = await window.fetch(
-				globalThis.jeo?.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lon=' + lng
+				globalThis.jeo?.ajax_url + '?action=jeo_reverse_geocode&nonce=' + ( globalThis.jeo?.geocode_nonce || '' ) + '&lat=' + lat + '&lon=' + lng
 			);
 			const result = await response.json();
 

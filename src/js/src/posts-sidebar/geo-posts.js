@@ -193,7 +193,7 @@ class JeoGeocodePosts extends Component {
 	fetchReverseGeocode( lat, lng ) {
 		return window
 			.fetch(
-				jeo.ajax_url + '?action=jeo_reverse_geocode&lat=' + lat + '&lng=' + lng
+				jeo.ajax_url + '?action=jeo_reverse_geocode&nonce=' + jeo.geocode_nonce + '&lat=' + lat + '&lon=' + lng
 			)
 			.then( ( response ) => {
 				if ( ! response.ok ) {

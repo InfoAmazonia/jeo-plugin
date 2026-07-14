@@ -541,7 +541,7 @@ class Geocode_Handler {
 	public function disable_update_post_meta( $check, $object_id, $meta_key ) {
 
 		// The name of the meta without the last _s or _p suffix.
-		$raw_key = substr( $meta_key, 0, strlen( $meta_key ) );
+		$raw_key = substr( $meta_key, 0, -2 );
 		if ( in_array( $raw_key, $this->geo_attributes, true ) ) {
 			return false;
 		}
