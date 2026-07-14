@@ -45,21 +45,6 @@ export default function MapEditorPreview() {
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
 	const mapRef = useRef( undefined );
 
-	const [ viewState, setViewState ] = useState( {
-		latitude: postMeta.center_lat || mapDefaults.center_lat,
-		longitude: postMeta.center_lon || mapDefaults.center_lon,
-		zoom: postMeta.initial_zoom || mapDefaults.initial_zoom,
-	} );
-
-	// Sync zoom from store when zoom mode changes (e.g. clicking "Min Zoom").
-	// Deliberately does NOT re-run on every postMeta change — only on mode switch.
-	useEffect( () => {
-		const targetZoom =
-			postMeta[ zoomState ] || postMeta.initial_zoom || mapDefaults.initial_zoom;
-		setViewState( ( prev ) => ( { ...prev, zoom: targetZoom } ) );
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ zoomState ] );
-
 	// Bridge pan-limits to the sidebar (parent document) via parent window.
 	useEffect( () => {
 		const fn = () => {
@@ -91,9 +76,21 @@ export default function MapEditorPreview() {
 		}
 	}, [ setPostMeta ] );
 
+	const {
+		center_lat: centerLat,
+		center_lon: centerLon,
+		initial_zoom: initialZoom,
+	} = { ...mapDefaults, ...postMeta };
+
+	const currentZoom = postMeta[ zoomState ];
+
 	const layerIds = useMemo( () => {
 		return ( postMeta.layers || [] ).map( ( layer ) => layer.id );
 	}, [ postMeta.layers ] );
+	const layerSettingsKey = useMemo(
+		() => JSON.stringify( postMeta.layers || [] ),
+		[ postMeta.layers ]
+	);
 
 	const {
 		records: loadedLayers = [],
