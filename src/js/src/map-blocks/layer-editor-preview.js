@@ -37,6 +37,7 @@ export default function LayerEditorPreview() {
 	} );
 
 	const loadedRef = useRef( false );
+	const [ key, setKey ] = useState( 0 );
 	const [ renderControl, setRenderControl ] = useState( { status: 'incomplete_form' } );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
 	const prevPostMeta = useRef( {} );
@@ -148,6 +149,7 @@ export default function LayerEditorPreview() {
 		if ( ! anyEmpty && JSON.stringify( opts ) !== JSON.stringify( prevOpts ) ) {
 			loadedRef.current = false;
 			setRenderControl( { status: 'ready' } );
+			setKey( ( prev ) => prev + 1 );
 		}
 		prevPostMeta.current = debouncedPostMeta;
 	}, [ debouncedPostMeta.layer_type_options, postMeta.type ] );

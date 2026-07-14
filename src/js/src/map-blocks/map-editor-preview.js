@@ -215,7 +215,7 @@ export default function MapEditorPreview() {
 				{ ! shouldRenderMap && <Spinner /> }
 				{ shouldRenderMap && (
 					<Map
-						key={ `${ key }:${ zoomState }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
+						key={ `${ zoomState }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
 						ref={ mapRef }
 						mapStyle={ useComposedPreview ? composedPreview.style : undefined }
 						style={ { height: '500px', width: '100%' } }
