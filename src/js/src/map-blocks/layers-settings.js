@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, Spinner } from '@wordpress/components';
-import { Fragment, memo, useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl, TextControl } from '../shared/wp-form-controls';
 
@@ -18,95 +18,6 @@ const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
 const anySwapDefault = ( settings ) => {
 	return settings.some( ( s ) => s.use === 'swappable' && s.default );
 }
-
-const LayerListItem = memo(
-	( {
-		layer,
-		index,
-		isDragged,
-		isSelected,
-		isOutOfBounds,
-		itemProps,
-		loadedLayers,
-		widths,
-		handleRemoveLayer,
-		handleSwitchUseStyle,
-		handleSwitchDefault,
-		handleSwitchShowLegend,
-		handleSwapDefault,
-		handleUpdateUse,
-		handleUpdateStyle,
-		handleUpdateStyleLayers,
-		handleUpdateOpacity,
-	} ) => {
-		const loadedLayer = useMemo( () => loadLayer( loadedLayers, layer ), [
-			loadedLayers,
-			layer,
-		] );
-
-		const removeLayer = useCallback( () => handleRemoveLayer( layer.id ), [
-			handleRemoveLayer,
-			layer.id,
-		] );
-		const switchUseStyle = useCallback( ( def ) => handleSwitchUseStyle( layer.id, def ), [
-			handleSwitchUseStyle,
-			layer.id,
-		] );
-		const switchDefault = useCallback( ( def ) => handleSwitchDefault( layer.id, def ), [
-			handleSwitchDefault,
-			layer.id,
-		] );
-		const switchShowLegend = useCallback( ( def ) => handleSwitchShowLegend( layer.id, def ), [
-			handleSwitchShowLegend,
-			layer.id,
-		] );
-		const swapDefault = useCallback( ( def ) => handleSwapDefault( layer.id, def ), [
-			handleSwapDefault,
-			layer.id,
-		] );
-		const updateUse = useCallback( ( use ) => handleUpdateUse( layer.id, use ), [
-			handleUpdateUse,
-			layer.id,
-		] );
-		const updateStyle = useCallback( ( style ) => handleUpdateStyle( layer.id, style ), [
-			handleUpdateStyle,
-			layer.id,
-		] );
-		const updateStyleLayers = useCallback( ( def ) => handleUpdateStyleLayers( layer.id, def ), [
-			handleUpdateStyleLayers,
-			layer.id,
-		] );
-		const updateOpacity = useCallback( ( opacity ) => handleUpdateOpacity( layer.id, opacity ), [
-			handleUpdateOpacity,
-			layer.id,
-		] );
-
-		if ( ! loadedLayer.layer ) {
-			return null;
-		}
-
-		return (
-			<LayerSettings
-				itemProps={ itemProps }
-				index={ index }
-				isDragged={ isDragged }
-				isSelected={ isSelected }
-				isOutOfBounds={ isOutOfBounds }
-				removeLayer={ removeLayer }
-				settings={ loadedLayer }
-				switchUseStyle={ switchUseStyle }
-				switchDefault={ switchDefault }
-				switchShowLegend={ switchShowLegend }
-				swapDefault={ swapDefault }
-				updateUse={ updateUse }
-				updateStyle={ updateStyle }
-				widths={ widths }
-				updateStyleLayers={ updateStyleLayers }
-				handleUpdateOpacity={ updateOpacity }
-			/>
-		);
-	}
-);
 
 export default function LayersSettings ( { attributes, setAttributes, loadedLayers, loadingLayers, closeModal } ) {
 	const attributesRef = useRef( attributes );
@@ -365,17 +276,6 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 			setLayers(
 				attributesRef.current.layers.map( ( settings ) =>
 					settings.id === id ? { ...settings, style } : settings
-				)
-			);
-		},
-		[ setLayers ]
-	);
-
-	const handleUpdateOpacity = useCallback(
-		( id, opacity ) => {
-			setLayers(
-				attributesRef.current.layers.map( ( settings ) =>
-					settings.id === id ? { ...settings, opacity } : settings
 				)
 			);
 		},
