@@ -1,3 +1,7 @@
+.editor-styles-wrapper .wp-block-jeo-stories-near-you {
+	pointer-events: none;
+}
+
 /* Skeleton loading cards */
 .jeo-stories-near-you__skeleton {
 	list-style: none;
