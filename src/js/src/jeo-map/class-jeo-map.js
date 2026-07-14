@@ -2089,12 +2089,13 @@ export default class JeoMap {
 
 	checkCustomToken( attributes ) {
 		if ( attributes.layer_type_options.access_token ) {
-			if ( attributes.layer_type_options.style_id ) {
-				const accessToken = attributes.layer_type_options.access_token;
+			const accessToken = attributes.layer_type_options.access_token;
 
-				const styleId = attributes.layer_type_options.style_id.replace( 'mapbox://styles/', '' );
-				const mapboxUser = styleId.split( '/' )[0];
+			const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+			const tilesetId = attributes.layer_type_options.tileset_id?.replace( 'mapbox://', '' );
+			const mapboxUser = styleId?.split( '/' )[0] || tilesetId?.split( '.' )[0];
 
+			if ( mapboxUser ) {
 				this.customTokens[ mapboxUser ] = accessToken;
 			}
 		}

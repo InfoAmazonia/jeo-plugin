@@ -261,6 +261,11 @@ All token values are scrubbed to `TOKEN_PLACEHOLDER` before persistence
 Per-layer `layer_type_options.access_token` overrides the global Mapbox key; the composer
 assigns it per-bundle and the frontend injects it per-owner via `transformRequest`.
 
+For **MVT** layers with a per-layer `access_token`, the composer appends the token directly
+to the tile URL (via `add_query_arg`) and bypasses `sanitize_tokens_in_value`, so the real
+token reaches the client rather than being replaced by `TOKEN_PLACEHOLDER`. When no per-layer
+token is set, the existing sanitize-to-placeholder behavior is preserved.
+
 ## Notes
 
 - **GD extension**: Sprite merging (`build_composite_sprite`) requires PHP GD

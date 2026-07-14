@@ -128,12 +128,16 @@ When a `mapbox` layer instance has `load_as_style: true`, the full Mapbox vector
 
 ### Token Handling
 
-The Mapbox token (`mapbox_key`) is localized identically in both contexts via the shared `mapgl` script. Per-layer `access_token` overrides are fully supported in both editor and frontend:
+The Mapbox token (`mapbox_key`) is localized identically in both contexts via the shared `mapgl` script. Per-layer `access_token` overrides are fully supported in both editor and frontend for all Mapbox-dependent layer types (`mapbox`, `mvt`, `mapbox-tileset-raster`, `mapbox-tileset-vector`):
 
 | Context | `load_as_style: false` | `load_as_style: true` |
 |---------|------------------------|-----------------------|
-| **Frontend** | Inline `access_token` in raster URL (`mapbox.js:25`) | Inline in style URL (`mapbox.js:177`) + `checkCustomToken`/`transformRequestUrl` re-signs derived requests (`class-jeo-map.js:1823-1871`) |
+| **Frontend** | Inline `access_token` in raster URL (`mapbox.js:25`) | Inline in style URL (`mapbox.js:177`) + `checkCustomToken`/`transformRequestUrl` re-signs derived requests (`class-jeo-map.js`) |
 | **Editor** | Inline `access_token` in raster URL (`map-preview-layer.js:31`) | Inline in style URL + `createTokenAwareTransformRequest` re-signs derived requests (composed on top of runtime's `mapboxTransformRequest`/native `accessToken`) |
+
+For **tileset** types, `checkCustomToken` extracts the Mapbox owner from `tileset_id` (format `username.tilesetid`) and registers it in `customTokens`. The `transformRequestUrl` function then matches `${owner}.` in request URLs and overrides the token. The editor (`mapbox-style-preview.js::getMapboxOwner`) and discovery widget (`discovery/index.js::registerLayerCustomToken`) already handle `tileset_id` extraction.
+
+For **MVT** layers, the per-layer `access_token` is appended directly to the tile URL as a `?access_token=` query parameter (via `mvt.js::_resolveUrl`). The old pattern of embedding the token directly in the URL string is preserved when the `access_token` field is empty. In composed styles, the PHP `build_direct_layer` appends the per-layer token and bypasses placeholder sanitization.
 
 The editor's token-aware transform (`use-style-layer.js::createTokenAwareTransformRequest()`) mirrors the frontend's `transformRequestUrl` logic. It matches the Mapbox username extracted from `style_id` and replaces `access_token` on any matching request, then delegates to the runtime's default transformRequest. Works for both MapLibre and Mapbox runtimes.
 

@@ -4,6 +4,23 @@
 	window.JeoLayerTypes.registerLayerType( 'mvt', {
 	label: __( 'Mapbox Vector Tiles (MVT)', 'jeowp' ),
 
+	_resolveUrl( attributes ) {
+		const options = attributes.layer_type_options || {};
+		let url = options.url;
+
+		if ( options.access_token && url ) {
+			try {
+				const parsedUrl = new URL( url );
+				parsedUrl.searchParams.set( 'access_token', options.access_token );
+				url = parsedUrl.toString();
+			} catch {
+				url += ( url.includes( '?' ) ? '&' : '?' ) + 'access_token=' + encodeURIComponent( options.access_token );
+			}
+		}
+
+		return url;
+	},
+
 	addStyle( map, attributes ) {
 		const name = attributes.layer_id;
 		return map.setStyle( {
@@ -11,7 +28,7 @@
 			sources: {
 				[ name ]: {
 					type: 'vector',
-					tiles: [ attributes.layer_type_options.url ],
+					tiles: [ this._resolveUrl( attributes ) ],
 				},
 			},
 			layers: [
@@ -28,7 +45,7 @@
 	addLayer( map, attributes, addLayerParams = null ) {
 		map.addSource( attributes.layer_id, {
 			type: 'vector',
-			tiles: [ attributes.layer_type_options.url ],
+			tiles: [ this._resolveUrl( attributes ) ],
 		} );
 
 		const layer = {
@@ -118,6 +135,14 @@
 					type: 'string',
 					default: 'vector',
 					disabled: true,
+				},
+				access_token: {
+					type: 'string',
+					title: __( 'Access token', 'jeowp' ),
+					description: __(
+						'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+						'jeowp'
+					),
 				},
 			},
 		};

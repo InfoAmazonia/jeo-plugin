@@ -57,9 +57,9 @@ Defined in `layers-sidebar/layer-type-definitions.js`:
 |------|--------|
 | `mapbox` | `style_id`, `access_token` |
 | `tilelayer` | `url`, `scheme` |
-| `mvt` | `url`, `source_layer`, `type`, `style_source_type` |
-| `mapbox-tileset-raster` | `tileset_id`, `style_source_type`, `type` |
-| `mapbox-tileset-vector` | `tileset_id`, `source_layer`, `type`, `style_source_type` |
+| `mvt` | `url`, `source_layer`, `type`, `style_source_type`, `access_token` |
+| `mapbox-tileset-raster` | `tileset_id`, `style_source_type`, `type`, `access_token` |
+| `mapbox-tileset-vector` | `tileset_id`, `source_layer`, `type`, `style_source_type`, `access_token` |
 
 ### Extensibility
 
@@ -209,3 +209,25 @@ Layers modal → Style button → LayerStyleEditor modal
 - Existing `layers[]` items without `style` → renderer defaults (unchanged behavior)
 - REST schema allows additional properties → no breaking change
 - `style` is optional everywhere; renderers check `if (attributes.style?.paint)` before merging
+
+## Per-Layer Access Token
+
+All Mapbox-dependent layer types (`mapbox`, `mvt`, `mapbox-tileset-raster`, `mapbox-tileset-vector`) support an optional `access_token` field in `layer_type_options`. When set, it overrides the global `mapbox_key` setting for that layer only.
+
+| Type | Token Mechanism |
+|------|----------------|
+| `mapbox` | Inline in style URL; `checkCustomToken` registers per-owner token for derived requests |
+| `mapbox-tileset-raster` | `checkCustomToken` extracts owner from `tileset_id` (`username.tilesetid`); `transformRequestUrl` re-signs requests |
+| `mapbox-tileset-vector` | Same as raster tileset |
+| `mvt` | Token appended to the tile URL as `?access_token=` query param (replaces any existing token); old pattern of embedding token directly in URL is preserved when field is empty |
+
+### Key Files
+
+| File | Role |
+|------|------|
+| `src/js/src/jeo-map/class-jeo-map.js` (`checkCustomToken`) | Registers per-owner custom tokens from `access_token` + `style_id` or `tileset_id` |
+| `src/js/src/jeo-map/class-jeo-map.js` (`transformRequestUrl`) | Overrides `access_token` query param for requests matching registered owners |
+| `src/includes/layer-types/mvt.js` (`_resolveUrl`) | Appends per-layer token to MVT tile URL |
+| `src/includes/maps/class-map-style-composer.php` (`build_direct_layer`) | Appends per-layer token for MVT in composed styles (bypasses placeholder sanitization) |
+| `src/js/src/map-blocks/mapbox-style-preview.js` (`getMapboxOwner`) | Editor: extracts owner from `style_id` or `tileset_id` — already tileset-aware |
+| `src/js/src/discovery/index.js` (`registerLayerCustomToken`) | Discovery: already tileset-aware |

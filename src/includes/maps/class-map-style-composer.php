@@ -1392,9 +1392,15 @@ class Map_Style_Composer {
 			if ( empty( $options['url'] ) ) {
 				return null;
 			}
+			$mvt_url = $options['url'];
+			if ( ! empty( $options['access_token'] ) ) {
+				$mvt_url = add_query_arg( 'access_token', $options['access_token'], $mvt_url );
+			} else {
+				$mvt_url = $this->sanitize_tokens_in_value( $mvt_url );
+			}
 			$source = array(
 				'type'  => 'vector',
-				'tiles' => array( $this->sanitize_tokens_in_value( $options['url'] ) ),
+				'tiles' => array( $mvt_url ),
 			);
 			$layer  = array(
 				'id'     => $layer_id,

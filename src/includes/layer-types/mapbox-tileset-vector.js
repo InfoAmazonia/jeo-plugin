@@ -141,6 +141,14 @@
 					default: 'vector',
 					disabled: true,
 				},
+				access_token: {
+					type: 'string',
+					title: __( 'Access token', 'jeowp' ),
+					description: __(
+						'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+						'jeowp'
+					),
+				},
 			},
 		};
 	},

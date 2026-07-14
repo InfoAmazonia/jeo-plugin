@@ -85,6 +85,7 @@ bash .docker/switch-php.sh         # Switch Docker PHP version for local testing
 - **Text domain**: All internationalized strings must use the WordPress.org slug **`jeowp`** (e.g. `__( '...', 'jeowp' )`). Never use the old `jeo` text domain.
 - **Plugin slug**: WordPress.org distribution slug is **`jeowp`**. Release packages, CI workflows, smoke tests, and language file names (`jeowp.pot`, `jeowp-pt_BR.po`) must use this slug.
 - **Map runtime**: Always via `lib/mapgl-loader.js`, never import maplibre/mapbox directly
+- **Per-layer access tokens**: All Mapbox-dependent layer types (`mapbox`, `mvt`, `mapbox-tileset-raster`, `mapbox-tileset-vector`) support an optional `access_token` in `layer_type_options` that overrides the global `mapbox_key`. Tilesets use owner-based `transformRequest` matching; MVT appends the token to the tile URL via `_resolveUrl` / `add_query_arg`.
 - **WP form controls**: Use `shared/wp-form-controls.js` (not `@wordpress/components` directly)
 - **Webpack**: `splitChunks: false` — each entry is self-contained
 - **Meta REST**: `_related_point` for geolocation, with full REST schema (14+ fields including `_ai_quote`). Generated index metas `_geocode_lat_*_p` / `_geocode_lon_*_p` (primary) and `_geocode_lat_*_s` / `_geocode_lon_*_s` (secondary) support spatial queries.
