@@ -17,13 +17,14 @@ const insertParagraph = ( html ) => {
  * Sanitize HTML to only allow basic inline tags.
  *
  * Uses the browser's DOM parser for accuracy. Only <strong>, <b>, <em>,
- * <i>, <br>, and <a> (with href) are preserved. All other tags are
+ * <i>, <br>, <a> (with href), and <span> (with arbitrary attributes
+ * except on* event handlers) are preserved. All other tags are
  * stripped but their text content is kept.
  *
  * @param {string} rawHtml Raw HTML string.
  * @return {string} Sanitized HTML string.
  */
-const ALLOWED_TAGS = new Set( [ 'strong', 'b', 'em', 'i', 'br', 'a' ] );
+const ALLOWED_TAGS = new Set( [ 'strong', 'b', 'em', 'i', 'br', 'a', 'span' ] );
 
 /**
  * Decode HTML entities (e.g. &lt; → <) so structured-output escaped strings
@@ -57,21 +58,29 @@ const sanitizeHtml = ( rawHtml ) => {
 					.join( '' );
 			}
 
-			if ( tag === 'br' ) {
-				return '<br>';
-			}
+		if ( tag === 'br' ) {
+			return '<br>';
+		}
 
-			const inner = Array.from( node.childNodes )
-				.map( walk )
-				.join( '' );
+		const inner = Array.from( node.childNodes )
+			.map( walk )
+			.join( '' );
 
-			if ( tag === 'a' ) {
-				const href = node.getAttribute( 'href' ) || '';
-				const safeHref = href.replace( /"/g, '&quot;' );
-				return `<a href="${ safeHref }" target="_blank" rel="noopener noreferrer">${ inner }</a>`;
-			}
+		if ( tag === 'a' ) {
+			const href = node.getAttribute( 'href' ) || '';
+			const safeHref = href.replace( /"/g, '&quot;' );
+			return `<a href="${ safeHref }" target="_blank" rel="noopener noreferrer">${ inner }</a>`;
+		}
 
-			return `<${ tag }>${ inner }</${ tag }>`;
+		if ( tag === 'span' ) {
+			const attrs = Array.from( node.attributes )
+				.filter( ( attr ) => ! attr.name.toLowerCase().startsWith( 'on' ) )
+				.map( ( attr ) => `${ attr.name }="${ attr.value.replace( /"/g, '&quot;' ) }"` )
+				.join( ' ' );
+			return attrs ? `<span ${ attrs }>${ inner }</span>` : `<span>${ inner }</span>`;
+		}
+
+		return `<${ tag }>${ inner }</${ tag }>`;
 		}
 
 		return '';

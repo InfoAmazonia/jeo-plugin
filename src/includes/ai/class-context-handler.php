@@ -680,6 +680,46 @@ class Context_Handler {
 	}
 
 	/**
+	 * Strip all HTML tags except inline formatting and link tags.
+	 *
+	 * Preserves <a>, <strong>, <b>, <em>, <i>, <br> so the AI can see
+	 * existing links and formatting when refining suggestions.
+	 *
+	 * @param string $html HTML content to filter.
+	 * @return string Filtered content with only inline tags preserved.
+	 */
+	private static function strip_non_inline_tags( string $html ): string {
+		$allowed = array(
+			'a'      => array(
+				'href' => true,
+			),
+			'strong' => array(),
+			'b'      => array(),
+			'em'     => array(),
+			'i'      => array(),
+			'br'     => array(),
+			'span'   => array(),
+		);
+
+		if ( false !== stripos( $html, '<span' ) ) {
+			if ( preg_match_all( '/<span\s+([^>]*)>/i', $html, $matches ) ) {
+				foreach ( $matches[1] as $attr_string ) {
+					if ( preg_match_all( '/([a-zA-Z_:][-a-zA-Z0-9_:.]*)\s*=/i', $attr_string, $attr_matches ) ) {
+						foreach ( $attr_matches[1] as $attr_name ) {
+							$attr_lower = strtolower( $attr_name );
+							if ( 0 !== strpos( $attr_lower, 'on' ) ) {
+								$allowed['span'][ $attr_lower ] = true;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		return wp_kses( $html, $allowed );
+	}
+
+	/**
 	 * Build a context string describing the current state from the request.
 	 *
 	 * @param \WP_REST_Request $request REST request containing current_state.
@@ -697,7 +737,7 @@ class Context_Handler {
 		if ( ! empty( $paragraphs ) ) {
 			$parts[] = 'Previously suggested paragraphs (' . count( $paragraphs ) . '):';
 			foreach ( $paragraphs as $i => $para ) {
-				$text    = isset( $para['text'] ) ? wp_strip_all_tags( $para['text'] ) : '';
+				$text    = isset( $para['text'] ) ? self::strip_non_inline_tags( $para['text'] ) : '';
 				$parts[] = sprintf( '  %d. %s', $i + 1, $text );
 			}
 		}
@@ -713,7 +753,7 @@ class Context_Handler {
 			$parts[] = 'Previously suggested references (' . count( $references ) . "):\n" . implode( "\n", $ref_lines );
 		}
 
-		$parts[] = "\nWhen refining, preserve the existing suggestions unless the user explicitly asks to change them.";
+		$parts[] = "\nWhen refining, you MUST return the FULL set of paragraphs (including unmodified ones) with the requested changes applied. Do NOT return an empty paragraphs array when the user asks to modify, add a link to, or adjust an existing suggestion. To add a link to a specific paragraph, identify it by its content or number, add the <a href=\"URL\">anchor</a> tag around the relevant phrase, ensure the referenced article is in the references array, and return all paragraphs.";
 
 		return implode( "\n", $parts );
 	}
