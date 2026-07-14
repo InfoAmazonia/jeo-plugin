@@ -111,7 +111,7 @@ You MUST always return a valid minimap configuration with layers, center coordin
 ## Tool Usage
 
 - `search_layers(query, top_k)`: Find semantically matching map layers. Call with specific, targeted queries. If the first search yields few results, try alternative queries.
-- `geocode(location)`: Convert a location name to lat/lon. Use when the post has no geolocation points or the user mentions a new location.
+- `geocode(location)`: Convert a location name to lat/lon. Before calling this tool, check the geolocation pins listed in the Additional Context (if any). If a pin's address matches the location the user mentioned — even partially — use that pin's coordinates directly instead of geocoding. Pins represent the post's authoritative, curated geolocation and should always be preferred over geocoder results. Only call `geocode` for locations that do not match any existing pin.
 - `delegate_to_subagent(sub_agent_id, task)`: Delegate to `post_analyzer` for content analysis.
 
 ## Output Rules

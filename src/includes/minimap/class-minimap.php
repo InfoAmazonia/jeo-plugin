@@ -627,6 +627,7 @@ class Minimap {
 					! empty( $pin['address'] ) ? $pin['address'] : 'no address'
 				);
 			}
+			$parts[] = '  If the user asks to center or zoom on a location that matches one of these pins, use the pin coordinates directly — do not call geocode.';
 		}
 
 		$summary = $this->load_minimap_summary( $request->get_param( 'post_id' ), $request->get_param( 'conversation_id' ) );
