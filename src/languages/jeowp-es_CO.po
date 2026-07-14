@@ -31,15 +31,15 @@ msgstr "Mapas interactivos para el editor de bloques de WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:929
+#: includes/class-jeo.php:930
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no hay ninguna clave de API de Mapbox configurada. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:930
+#: includes/class-jeo.php:931
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no se pudo cargar el SDK externo de Mapbox. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:1463
+#: includes/class-jeo.php:1464
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Leer más"
@@ -596,14 +596,14 @@ msgstr "Ejemplo: username.tilesetid"
 
 #: includes/layer-types/mapbox-tileset-raster.js:76
 #: includes/layer-types/mapbox-tileset-vector.js:138
-#: includes/layer-types/mvt.js:116
+#: includes/layer-types/mvt.js:133
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Style Source Type"
 msgstr "Tipo de fuente del estilo"
 
 #: includes/layer-types/mapbox-tileset-raster.js:77
-#: includes/layer-types/mvt.js:117
+#: includes/layer-types/mvt.js:134
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Which data the map should display"
@@ -632,7 +632,7 @@ msgid "Vector Mapbox Tiled Source"
 msgstr "Fuente vectorial de teselas de Mapbox"
 
 #: includes/layer-types/mapbox-tileset-vector.js:114
-#: includes/layer-types/mvt.js:98
+#: includes/layer-types/mvt.js:115
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Source layer"
@@ -670,13 +670,19 @@ msgstr "ID del estilo"
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
 msgstr "El ID del estilo de Mapbox incluye el nombre de usuario y el ID. Ejemplo: username/id o mapbox://styles/username/id"
 
+#: includes/layer-types/mapbox-tileset-raster.js:95
+#: includes/layer-types/mapbox-tileset-vector.js:146
 #: includes/layer-types/mapbox.js:126
+#: includes/layer-types/mvt.js:141
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Access token"
 msgstr "Token de acceso"
 
+#: includes/layer-types/mapbox-tileset-raster.js:96
+#: includes/layer-types/mapbox-tileset-vector.js:147
 #: includes/layer-types/mapbox.js:128
+#: includes/layer-types/mvt.js:142
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Optional. If this layer needs a different access token from the one set in Settings, inform it here."
@@ -691,7 +697,7 @@ msgid "Mapbox Vector Tiles (MVT)"
 msgstr "Teselas vectoriales de Mapbox (MVT)"
 
 #: includes/ai/settings/tab-provider.php:27
-#: includes/layer-types/mvt.js:94
+#: includes/layer-types/mvt.js:111
 #: includes/layer-types/tilelayer.js:61
 #: includes/legend-types/circles.js:25
 #: includes/legend-types/icons.js:25
@@ -700,7 +706,7 @@ msgstr "Teselas vectoriales de Mapbox (MVT)"
 msgid "URL"
 msgstr "URL"
 
-#: includes/layer-types/mvt.js:99
+#: includes/layer-types/mvt.js:116
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Layer to use from a vector tile source."
@@ -2083,8 +2089,8 @@ msgstr "Aprobar geolocalizaciones de IA de JEO"
 
 #: includes/ai/class-context-handler.php:227
 #: includes/ai/class-context-handler.php:346
-#: includes/ai/class-context-handler.php:735
-#: includes/ai/class-context-handler.php:811
+#: includes/ai/class-context-handler.php:775
+#: includes/ai/class-context-handler.php:851
 #: includes/ai/class-rag-worker.php:223
 #: includes/minimap/class-minimap.php:142
 #: includes/minimap/class-minimap.php:238
@@ -2142,7 +2148,7 @@ msgstr "Sugerencias actualizadas."
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr "La IA no respondió después de varios intentos. Intente nuevamente o reformule su solicitud."
 
-#: includes/ai/class-context-handler.php:832
+#: includes/ai/class-context-handler.php:872
 msgid "Conversation cleared."
 msgstr "Conversación borrada."
 
@@ -3146,7 +3152,7 @@ msgstr "No se encontró ningún adaptador de IA activo."
 msgid "AI failed to generate prompt."
 msgstr "La IA falló al generar el prompt."
 
-#: includes/ai/class-context-handler.php:851
+#: includes/ai/class-context-handler.php:891
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr "Se requiere un prompt."
@@ -3234,27 +3240,27 @@ msgstr "No se encontraron capas coincidentes. Añada capas manualmente o ejecute
 msgid "The AI returned an empty response. Please try again."
 msgstr "La IA devolvió una respuesta vacía. Intente nuevamente."
 
-#: includes/minimap/class-minimap.php:1210
+#: includes/minimap/class-minimap.php:1211
 msgid "Dark Base (Mapbox)"
 msgstr "Base oscura (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1217
+#: includes/minimap/class-minimap.php:1218
 msgid "Terrain Base (Mapbox)"
 msgstr "Base de terreno (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1224
+#: includes/minimap/class-minimap.php:1225
 msgid "Satellite Base (Mapbox)"
 msgstr "Base de satélite (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1235
+#: includes/minimap/class-minimap.php:1236
 msgid "Dark Base"
 msgstr "Base oscura"
 
-#: includes/minimap/class-minimap.php:1244
+#: includes/minimap/class-minimap.php:1245
 msgid "Light Base"
 msgstr "Base clara"
 
-#: includes/minimap/class-minimap.php:1253
+#: includes/minimap/class-minimap.php:1254
 msgid "Satellite Base"
 msgstr "Base de satélite"
 
@@ -4560,21 +4566,21 @@ msgstr "Vista previa interactiva de mapa para el editor del tipo de contenido Ma
 msgid "Unable to retrieve the address for the selected point."
 msgstr "No se pudo obtener la dirección para el punto seleccionado."
 
-#: includes/class-jeo.php:1692
+#: includes/class-jeo.php:1693
 msgid "This JEO embed is not available."
 msgstr "Este embed de JEO no está disponible."
 
-#: includes/class-jeo.php:1693
+#: includes/class-jeo.php:1694
 msgid "Embed not available"
 msgstr ""
 "Embed no disponible\n"
 "develop"
 
-#: includes/ai/class-context-agent.php:263
+#: includes/ai/class-context-agent.php:265
 msgid "No AI provider is configured. Set one in JEO AI Settings."
 msgstr "Ningún proveedor de IA configurado. Configure uno en los ajustes de IA de JEO."
 
-#: includes/ai/class-context-agent.php:301
+#: includes/ai/class-context-agent.php:303
 msgid "The AI returned an empty prompt engineering response."
 msgstr "La IA devolvió una respuesta vacía de ingeniería de prompt."
 
@@ -4714,7 +4720,7 @@ msgstr "Generar un mapa para esta entrada basado en su contenido."
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr "%d capa(s) devuelta(s) por la IA fue(ron) descartada(s) porque no son capas de mapa publicadas."
 
-#: includes/minimap/class-minimap.php:855
+#: includes/minimap/class-minimap.php:856
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr "El agente intentó eliminar varias capas existentes sin una solicitud explícita. Se mantuvieron para preservar el mapa actual."
 
@@ -4838,15 +4844,15 @@ msgstr "Hash de estilo compuesto no válido."
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "No fue posible obtener uno o más estilos de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1515
+#: includes/maps/class-map-style-composer.php:1521
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "Se requiere la extensión PHP GD para fusionar sprites de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1634
+#: includes/maps/class-map-style-composer.php:1640
 msgid "Could not decode a Mapbox sprite image."
 msgstr "No fue posible decodificar una imagen de sprite de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2351
+#: includes/maps/class-map-style-composer.php:2357
 msgid "Composed style artifact was not found."
 msgstr "No se encontró el artefacto del estilo compuesto."
 
