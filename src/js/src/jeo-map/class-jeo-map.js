@@ -330,6 +330,9 @@ export default class JeoMap {
 			} );
 
 			this.map_post_object = data;
+
+			await this.getLayers();
+			await this.fetchComposedStyleData( data.id );
 		} else if ( this.getArg( 'layers' ) ) {
 			// One-time maps have no map_id but store layer settings
 			// in the data-layers attribute. We still need to fetch
