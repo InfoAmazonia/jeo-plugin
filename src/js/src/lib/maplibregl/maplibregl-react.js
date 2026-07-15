@@ -87,7 +87,7 @@ function patchIframeAndResize( map ) {
  * @typedef {import('react-map-gl/maplibre').MapProps} MapProps
  * @param {MapProps} props
  */
-function MapGL( { children, controls = undefined, fullscreen = true, onLoad, ...props }, ref ) {
+function MapGL( { children, controls = undefined, fullscreen = true, mapStyle = defaultStyle, onLoad, ...props }, ref ) {
 	const [ inlineStart ] = useState( computeInlineStart );
 	const controlsPosition = controls ?? `top-${inlineStart}`;
 
@@ -129,7 +129,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, onLoad, ...
 		<MapLibre
 			ref={ setRef }
 			mapLib={ mapgl }
-			mapStyle={ defaultStyle }
+			mapStyle={ mapStyle }
 			projection={ defaultProjection }
 			reuseMaps={ false }
 			transformRequest={ transformRequest }
