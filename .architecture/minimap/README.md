@@ -450,6 +450,27 @@ To prevent the agent from "breaking" an existing map during chat refinement, the
 
 The system prompt also includes **Refinement Rules** that forbid whole-map regeneration unless the user explicitly asks for it.
 
+### Layer Provenance & Manual Layer Preservation
+
+Each layer object carries an optional `provenance` field (`'manual'` | `'ai'`) that tracks its origin:
+
+- **`'manual'`** — Added by the editor via the layer library modal (`layers-settings.js::setLayer()`). Backward-compatible default: layers in saved blocks without `provenance` are treated as `'manual'`.
+- **`'ai'`** — Added by the AI agent during generation or refinement.
+
+Three backend methods work together to protect manual layers during `/minimap/chat` refinements:
+
+| Method | Runs when | Purpose |
+|--------|-----------|---------|
+| `tag_layer_provenance()` | Any `run_agent()` with `$previous_state` | Propagates `provenance` from previous state to matching AI-returned layers; tags all others as `'ai'` |
+| `apply_diff_guard()` | `$is_refinement` only | Existing threshold guard: restores layers when >50% are removed |
+| `preserve_manual_layers()` | `$is_refinement` only | Merges back any `provenance: 'manual'` layers the AI dropped |
+
+**Explicit removal**: `preserve_manual_layers()` respects intentional removals via `Minimap_Output::$removed_layer_ids` — a structured-output field the AI populates when the user explicitly asks to remove a specific layer. This is language-agnostic (no keyword lists); the AI declares its intent directly.
+
+**Regenerate**: Manual layers are NOT preserved on regenerate (`type=regenerate`) — the AI gets a fresh start.
+
+The `build_state_context()` method annotates manual layers with `[manually added]` in the AI prompt context so the agent is aware of them.
+
 ## Layer Themes & Explain Mode (Phase 4)
 
 - The `layer-theme` taxonomy is registered for the `map-layer` CPT (`src/includes/layers/class-layers.php`). Default terms cover common journalistic themes: Deforestation, Hydrography, Indigenous Lands, Protected Areas, Mining, Oil and Gas, Land Use, Agriculture, Infrastructure, Administrative Boundaries, Socioeconomic, Biodiversity, Fire, Climate.
