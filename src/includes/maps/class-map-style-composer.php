@@ -752,11 +752,7 @@ class Map_Style_Composer {
 			return new WP_Error( 'jeo_mapbox_composer_too_many_layers', __( 'The map preview has too many layers to compose.', 'jeowp' ) );
 		}
 
-		$token = trim( (string) \jeo_settings()->get_option( 'mapbox_key' ) );
-		if ( '' === $token ) {
-			return new WP_Error( 'jeo_mapbox_composer_missing_token', __( 'A Mapbox access token is required to compose Mapbox styles.', 'jeowp' ) );
-		}
-
+		$token           = trim( (string) \jeo_settings()->get_option( 'mapbox_key' ) );
 		$include_private = self::VIRTUAL_SCOPE_PREVIEW === $scope;
 		$refs            = $this->build_refs_from_settings( $settings, $token, $include_private );
 		if ( empty( $refs ) ) {
@@ -845,6 +841,11 @@ class Map_Style_Composer {
 				continue;
 			}
 
+			$resolved_token = ! empty( $options['access_token'] ) ? (string) $options['access_token'] : $token;
+			if ( 'mapbox' === $type && '' === $resolved_token ) {
+				continue;
+			}
+
 			$refs[] = array(
 				'index'                => (int) $index,
 				'layerId'              => $layer_id,
@@ -852,7 +853,7 @@ class Map_Style_Composer {
 				'slug'                 => $layer_post->post_name ? $layer_post->post_name : (string) $layer_id,
 				'type'                 => $type,
 				'options'              => $options,
-				'token'                => ! empty( $options['access_token'] ) ? (string) $options['access_token'] : $token,
+				'token'                => $resolved_token,
 				'styleId'              => $style_id,
 				'loadAsStyle'          => $this->to_bool( $setting['load_as_style'] ?? false ),
 				'use'                  => $setting['use'] ?? null,
