@@ -4812,7 +4812,6 @@ msgid "Map not found."
 msgstr "Mapa no encontrado."
 
 #: includes/maps/class-map-style-composer.php:694
-#: includes/maps/class-map-style-composer.php:757
 msgid "A Mapbox access token is required to compose Mapbox styles."
 msgstr "Se requiere un token de acceso de Mapbox para componer estilos de Mapbox."
 
@@ -4828,31 +4827,31 @@ msgstr "Los datos de la vista previa del mapa son demasiado grandes."
 msgid "The map preview has too many layers to compose."
 msgstr "La vista previa del mapa tiene demasiadas capas para componer."
 
-#: includes/maps/class-map-style-composer.php:763
+#: includes/maps/class-map-style-composer.php:759
 msgid "The map preview does not include any renderable layers."
 msgstr "La vista previa del mapa no incluye ninguna capa renderizable."
 
-#: includes/maps/class-map-style-composer.php:785
+#: includes/maps/class-map-style-composer.php:781
 msgid "Map preview"
 msgstr "Vista previa del mapa"
 
-#: includes/maps/class-map-style-composer.php:1026
+#: includes/maps/class-map-style-composer.php:1027
 msgid "Invalid composed style hash."
 msgstr "Hash de estilo compuesto no válido."
 
-#: includes/maps/class-map-style-composer.php:1114
+#: includes/maps/class-map-style-composer.php:1115
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "No fue posible obtener uno o más estilos de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1521
+#: includes/maps/class-map-style-composer.php:1522
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "Se requiere la extensión PHP GD para fusionar sprites de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1640
+#: includes/maps/class-map-style-composer.php:1641
 msgid "Could not decode a Mapbox sprite image."
 msgstr "No fue posible decodificar una imagen de sprite de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2357
+#: includes/maps/class-map-style-composer.php:2358
 msgid "Composed style artifact was not found."
 msgstr "No se encontró el artefacto del estilo compuesto."
 

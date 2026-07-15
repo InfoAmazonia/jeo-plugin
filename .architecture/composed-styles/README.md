@@ -258,8 +258,14 @@ All token values are scrubbed to `TOKEN_PLACEHOLDER` before persistence
 | **Editor** (`mapbox-style-preview.js`) | `useEditorMapboxTransformRequest` mirrors the same logic on top of `mapgl-loader.transformRequest` |
 | **Discovery** (`discovery/index.js`) | `transformRequestUrl` + `registerLayerCustomToken` (owner from `style_id`/`tileset_id`) |
 
-Per-layer `layer_type_options.access_token` overrides the global Mapbox key; the composer
-assigns it per-bundle and the frontend injects it per-owner via `transformRequest`.
+Per-layer `layer_type_options.access_token` overrides the global Mapbox key. The composer
+resolves tokens per-layer in `build_refs_from_settings()`: if the layer has an `access_token`,
+it is used; otherwise the global `mapbox_key` is used. Mapbox-type layers with no resolved token
+(neither per-layer nor global) are **skipped** during composition rather than blocking the entire
+request. Non-mapbox layers (tilelayer, mvt, etc.) do not require tokens and are always included.
+
+The composer assigns the resolved token per-bundle and the frontend injects it per-owner via
+`transformRequest`.
 
 For **MVT** layers with a per-layer `access_token`, the composer appends the token directly
 to the tile URL (via `add_query_arg`) and bypasses `sanitize_tokens_in_value`, so the real
