@@ -3240,27 +3240,27 @@ msgstr "No se encontraron capas coincidentes. Añada capas manualmente o ejecute
 msgid "The AI returned an empty response. Please try again."
 msgstr "La IA devolvió una respuesta vacía. Intente nuevamente."
 
-#: includes/minimap/class-minimap.php:1211
+#: includes/minimap/class-minimap.php:1309
 msgid "Dark Base (Mapbox)"
 msgstr "Base oscura (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1218
+#: includes/minimap/class-minimap.php:1316
 msgid "Terrain Base (Mapbox)"
 msgstr "Base de terreno (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1225
+#: includes/minimap/class-minimap.php:1323
 msgid "Satellite Base (Mapbox)"
 msgstr "Base de satélite (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1236
+#: includes/minimap/class-minimap.php:1334
 msgid "Dark Base"
 msgstr "Base oscura"
 
-#: includes/minimap/class-minimap.php:1245
+#: includes/minimap/class-minimap.php:1343
 msgid "Light Base"
 msgstr "Base clara"
 
-#: includes/minimap/class-minimap.php:1254
+#: includes/minimap/class-minimap.php:1352
 msgid "Satellite Base"
 msgstr "Base de satélite"
 
@@ -4715,12 +4715,12 @@ msgid "Generate a map for this post based on its content."
 msgstr "Generar un mapa para esta entrada basado en su contenido."
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:426
+#: includes/minimap/class-minimap.php:430
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr "%d capa(s) devuelta(s) por la IA fue(ron) descartada(s) porque no son capas de mapa publicadas."
 
-#: includes/minimap/class-minimap.php:856
+#: includes/minimap/class-minimap.php:862
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr "El agente intentó eliminar varias capas existentes sin una solicitud explícita. Se mantuvieron para preservar el mapa actual."
 
@@ -5005,4 +5005,10 @@ msgstr ""
 
 #: js/build/storiesNearYou.js:1
 msgid "Your browser could not determine your location. This may be due to strict privacy settings or because GPS is unavailable on your device."
+msgstr ""
+
+#. translators: %d: number of preserved layers
+#: includes/minimap/class-minimap.php:954
+#, php-format
+msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr ""

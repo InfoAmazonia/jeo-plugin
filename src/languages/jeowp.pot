@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-15T20:13:22+00:00\n"
+"POT-Creation-Date: 2026-07-15T21:12:02+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -2168,36 +2168,42 @@ msgid "The AI returned an empty response. Please try again."
 msgstr ""
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:426
+#: includes/minimap/class-minimap.php:430
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:856
+#: includes/minimap/class-minimap.php:862
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1211
+#. translators: %d: number of preserved layers
+#: includes/minimap/class-minimap.php:954
+#, php-format
+msgid "%d manually-added layer(s) were preserved during AI refinement."
+msgstr ""
+
+#: includes/minimap/class-minimap.php:1309
 msgid "Dark Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1218
+#: includes/minimap/class-minimap.php:1316
 msgid "Terrain Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1225
+#: includes/minimap/class-minimap.php:1323
 msgid "Satellite Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1236
+#: includes/minimap/class-minimap.php:1334
 msgid "Dark Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1245
+#: includes/minimap/class-minimap.php:1343
 msgid "Light Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1254
+#: includes/minimap/class-minimap.php:1352
 msgid "Satellite Base"
 msgstr ""
 
