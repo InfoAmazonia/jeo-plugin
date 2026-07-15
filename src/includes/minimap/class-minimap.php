@@ -421,6 +421,10 @@ class Minimap {
 
 		$result->layers = $this->enrich_layer_metadata( $result->layers );
 
+		if ( ! empty( $previous_state ) ) {
+			$result->layers = $this->tag_layer_provenance( $previous_state, $result->layers );
+		}
+
 		if ( ! empty( $result->removed_layers ) ) {
 			/* translators: %d: number of removed layers */
 			$removed_notice  = sprintf( __( '%d layer(s) returned by the AI were discarded because they are not published map layers.', 'jeowp' ), count( $result->removed_layers ) );
@@ -433,6 +437,7 @@ class Minimap {
 
 		if ( $is_refinement && ! empty( $previous_state ) ) {
 			$result = $this->apply_diff_guard( $previous_state, $result, $message );
+			$result = $this->preserve_manual_layers( $previous_state, $result );
 		}
 
 		$this->persist_minimap_summary( $post_id, $conversation_id, $result, $message );
@@ -596,7 +601,8 @@ class Minimap {
 				$layer_post    = get_post( $layer_id );
 				$name          = $layer_post ? $layer_post->post_title : "Layer #{$layer_id}";
 				$reason        = ! empty( $layer_def['reason'] ) ? ' — ' . $layer_def['reason'] : '';
-				$layer_lines[] = "{$name} (ID: {$layer_id}){$reason}";
+				$manual_tag    = ( ( $layer_def['provenance'] ?? '' ) === 'manual' ) ? ' [manually added]' : '';
+				$layer_lines[] = "{$name} (ID: {$layer_id}){$reason}{$manual_tag}";
 			}
 			$parts[] = 'Layers: ' . ( ! empty( $layer_lines ) ? "\n- " . implode( "\n- ", $layer_lines ) : '(none)' );
 		} else {
@@ -855,6 +861,98 @@ class Minimap {
 
 			$warning         = __( 'The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map.', 'jeowp' );
 			$result->message = trim( $result->message . "\n" . $warning );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Tag each AI-returned layer with its provenance.
+	 *
+	 * Layers that existed in the previous state with `provenance: 'manual'`
+	 * keep that tag. All other AI-returned layers are tagged `provenance: 'ai'`.
+	 * Layers in the previous state without a `provenance` field default to
+	 * `'manual'` for backward compatibility.
+	 *
+	 * @param array $previous_state Previous map state from the block.
+	 * @param array $layers         AI-returned layer definitions.
+	 * @return array
+	 */
+	private function tag_layer_provenance( array $previous_state, array $layers ): array {
+		$previous_manual_ids = array();
+
+		foreach ( $previous_state['layers'] ?? array() as $layer_def ) {
+			$layer_id   = (int) ( $layer_def['id'] ?? 0 );
+			$provenance = $layer_def['provenance'] ?? 'manual';
+			if ( $layer_id && 'manual' === $provenance ) {
+				$previous_manual_ids[] = $layer_id;
+			}
+		}
+
+		foreach ( $layers as &$layer_def ) {
+			$layer_id = (int) ( $layer_def['id'] ?? 0 );
+			if ( $layer_id && in_array( $layer_id, $previous_manual_ids, true ) ) {
+				$layer_def['provenance'] = 'manual';
+			} else {
+				$layer_def['provenance'] = 'ai';
+			}
+		}
+		unset( $layer_def );
+
+		return $layers;
+	}
+
+	/**
+	 * Preserve manually-added layers that the AI dropped during refinement.
+	 *
+	 * Layers listed in `$result->removed_layer_ids` are treated as intentional
+	 * removals and are NOT merged back.
+	 *
+	 * @param array          $previous_state Previous map state from the block.
+	 * @param Minimap_Output $result         Agent output.
+	 * @return Minimap_Output
+	 */
+	private function preserve_manual_layers( array $previous_state, Minimap_Output $result ): Minimap_Output {
+		$previous_layers = $previous_state['layers'] ?? array();
+		if ( empty( $previous_layers ) ) {
+			return $result;
+		}
+
+		$intentionally_removed = array();
+		foreach ( $result->removed_layer_ids as $rid ) {
+			$intentionally_removed[] = (int) $rid;
+		}
+
+		$new_ids = array();
+		foreach ( $result->layers as $layer_def ) {
+			$layer_id = (int) ( $layer_def['id'] ?? 0 );
+			if ( $layer_id ) {
+				$new_ids[] = $layer_id;
+			}
+		}
+
+		$restored = array();
+		foreach ( $previous_layers as $layer_def ) {
+			$layer_id   = (int) ( $layer_def['id'] ?? 0 );
+			$provenance = $layer_def['provenance'] ?? 'manual';
+
+			if (
+				$layer_id
+				&& 'manual' === $provenance
+				&& ! in_array( $layer_id, $new_ids, true )
+				&& ! in_array( $layer_id, $intentionally_removed, true )
+				&& $this->is_valid_layer( $layer_id )
+			) {
+				$restored[] = $layer_def;
+			}
+		}
+
+		if ( ! empty( $restored ) ) {
+			$result->layers = array_merge( $result->layers, $restored );
+
+			/* translators: %d: number of preserved layers */
+			$notice          = sprintf( __( '%d manually-added layer(s) were preserved during AI refinement.', 'jeowp' ), count( $restored ) );
+			$result->message = trim( $result->message . "\n" . $notice );
 		}
 
 		return $result;

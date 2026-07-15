@@ -131,6 +131,20 @@ class Minimap_Output {
 	public array $removed_layers = array();
 
 	/**
+	 * Layer IDs that the agent intentionally removed at the user's request.
+	 *
+	 * Populated by the AI during refinement when the user explicitly asks to
+	 * remove specific layers. Used by `preserve_manual_layers()` to respect
+	 * intentional removals of manually-added layers.
+	 *
+	 * @var int[]
+	 */
+	#[SchemaProperty(
+		description: 'IDs of layers you intentionally REMOVED because the user explicitly asked to remove them. When refining and the user asks to delete or remove a specific layer, include its ID here so the system knows the removal was intentional. Leave empty if no layers were intentionally removed.',
+	)]
+	public array $removed_layer_ids = array();
+
+	/**
 	 * Convert to the array format expected by the minimap block attributes.
 	 *
 	 * @return array

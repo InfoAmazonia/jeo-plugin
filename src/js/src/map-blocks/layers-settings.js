@@ -13,7 +13,7 @@ import { usePaginatedRecords } from '../shared/rest-records';
 
 import './layers-settings.css';
 
-const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
+const setLayer = ( id ) => ( { id, use: 'fixed', default: true, provenance: 'manual' } );
 
 const anySwapDefault = ( settings ) => {
 	return settings.some( ( s ) => s.use === 'swappable' && s.default );
