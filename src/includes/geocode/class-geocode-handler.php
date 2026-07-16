@@ -68,15 +68,25 @@ class Geocode_Handler {
 			wp_send_json_error( array( 'message' => 'Unauthorized.' ), 403 );
 		}
 
-		$geocoder = $this->get_active_geocoder();
-
-		if ( $geocoder ) {
-			echo wp_json_encode( $geocoder->geocode( sanitize_text_field( wp_unslash( $_GET['search'] ) ) ) );
-		} else {
-			echo wp_json_encode( array() );
+		$search = '';
+		if ( isset( $_GET['search'] ) ) {
+			$search = sanitize_text_field( wp_unslash( $_GET['search'] ) );
 		}
 
-		die;
+		$geocoder = $this->get_active_geocoder();
+
+		if ( ! $geocoder || empty( $search ) ) {
+			wp_send_json( array() );
+		}
+
+		$results         = $geocoder->geocode( $search );
+		$fallback_search = remove_accents( $search );
+
+		if ( empty( $results ) && $fallback_search !== $search ) {
+			$results = $geocoder->geocode( $fallback_search );
+		}
+
+		wp_send_json( $results );
 	}
 
 	/**
@@ -483,19 +493,19 @@ class Geocode_Handler {
 	public function sanitize_points( $value ) {
 
 		if ( isset( $value['_geocode_lat'] ) ) {
-			$value['_geocode_lat'] = (float) str_replace( ',', '.', $value['_geocode_lat'] );
+			$value['_geocode_lat'] = str_replace( ',', '.', $value['_geocode_lat'] );
 		}
 
 		if ( isset( $value['_geocode_lon'] ) ) {
-			$value['_geocode_lon'] = (float) str_replace( ',', '.', $value['_geocode_lon'] );
+			$value['_geocode_lon'] = str_replace( ',', '.', $value['_geocode_lon'] );
 		}
 
 		if ( isset( $value->_geocode_lat ) ) {
-			$value->_geocode_lat = (float) str_replace( ',', '.', $value->_geocode_lat );
+			$value->_geocode_lat = str_replace( ',', '.', $value->_geocode_lat );
 		}
 
 		if ( isset( $value->_geocode_lon ) ) {
-			$value->_geocode_lon = (float) str_replace( ',', '.', $value->_geocode_lon );
+			$value->_geocode_lon = str_replace( ',', '.', $value->_geocode_lon );
 		}
 
 		return $value;

@@ -1,5 +1,5 @@
 import Spiderfy from '@nazka/map-gl-js-spiderfy';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { Eta } from 'eta';
 
 import { createMap, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
@@ -13,11 +13,14 @@ import {
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
 import { decodeHtmlEntity } from '../shared/html';
 import { onFirstIntersection } from '../shared/intersect';
+import { appendRestQueryParams } from '../shared/rest-query';
+import { buildRelatedPostsGeoJson } from '../shared/story-geojson';
 import { EMPTY_STYLE, resolveTileUrl } from '../shared/styles';
 import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
 import { toFiniteNumber } from './map-numbers';
 import { getPanLimitsMaxBounds } from './pan-limits';
+import { getLayerRequestContext } from './layer-request-context';
 import { compileEtaTemplate } from './template-compiler';
 
 import '../../../css/jeo-map.scss';
@@ -26,6 +29,18 @@ globalThis.jeoResolveTileUrl = resolveTileUrl;
 
 const RELATED_POSTS_CLUSTER_BADGE_PREFIX = 'jeo-related-posts-cluster-badge-';
 const SMALL_MAP_CONTROL_MAX_WIDTH = 420;
+
+const chevronLeftSmallIcon = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<path d="m13.1 16-3.4-4 3.4-4 1.1 1-2.6 3 2.6 3-1.1 1z" />
+	</svg>
+`;
+
+const chevronRightSmallIcon = `
+	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+		<path d="M10.8622 8.04053L14.2805 12.0286L10.8622 16.0167L9.72327 15.0405L12.3049 12.0286L9.72327 9.01672L10.8622 8.04053Z" />
+	</svg>
+`;
 
 function mergeUniqueStoriesById( currentStories = [], nextStories = [] ) {
 	const storiesById = new Map();
@@ -63,6 +78,7 @@ export default class JeoMap {
 		this.composedInteractionCleanups = [];
 		this.initialized = false;
 		this.popup = null;
+		this.isPreviewMapPayload = false;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
 
@@ -307,7 +323,9 @@ export default class JeoMap {
 		if ( previewMapPayload ) {
 			try {
 				this.map_post_object = JSON.parse( previewMapPayload );
+				this.isPreviewMapPayload = Boolean( this.map_post_object );
 			} catch ( error ) {
+				this.isPreviewMapPayload = false;
 				console.warn( 'Unable to parse preview map payload. Falling back to REST data.', error );
 			}
 
@@ -1079,9 +1097,19 @@ export default class JeoMap {
 			const layersDefinitions = this.getArg( 'layers' );
 			this.layersDefinitions = layersDefinitions;
 
+			if ( ! Array.isArray( layersDefinitions ) || layersDefinitions.length === 0 ) {
+				this.layers = [];
+				this.legends = [];
+				resolve( [] );
+				return;
+			}
+
 			if ( layersDefinitions ) {
 				const layersIds = layersDefinitions.map( ( el ) => el.id );
-				const requestContext = this.map_post_object ? 'edit' : 'view';
+				const requestContext = getLayerRequestContext( {
+					isPreviewMapPayload: this.isPreviewMapPayload,
+					nonce: jeoMapVars.nonce,
+				} );
 
 				jQuery.ajax( {
 					type: 'GET',
@@ -1160,213 +1188,244 @@ export default class JeoMap {
 	}
 
 	getRelatedPosts() {
-		return new Promise( ( resolve, reject ) => {
-			const self = this;
-			const relatedPostsCriteria = this.getArg( 'related_posts' );
-			this.relatedPostsCriteria = relatedPostsCriteria;
+		return ( async () => {
+			try {
+				const relatedPostsCriteria = this.getArg( 'related_posts' ) || {};
+				this.relatedPostsCriteria = relatedPostsCriteria;
 
-			const relatePosts = this.getArg( 'relate_posts' );
-			if ( ! relatePosts ) {
-				resolve( [] );
-				return;
-			}
+				if ( ! this.getArg( 'relate_posts' ) ) {
+					return [];
+				}
 
-			const query = {};
-			query.per_page = 100;
+				const query = {
+					per_page: 100,
+					_fields: 'id,meta,title,link,date,featured_media,categories',
+				};
 
-			if ( this.relatedPostsCriteria.after || this.relatedPostsCriteria.before ) {
-				query.orderby = 'date';
-				query.order = 'desc';
-			}
+				if ( relatedPostsCriteria.after || relatedPostsCriteria.before ) {
+					query.orderby = 'date';
+					query.order = 'desc';
+				}
 
-			const keys = Object.keys( relatedPostsCriteria );
+				Object.entries( relatedPostsCriteria ).forEach( ( [ key, value ] ) => {
+					if ( value !== undefined && value !== null && value !== '' ) {
+						query[ key ] = value;
+					}
+				} );
 
-			for ( const i in keys ) {
-				query[ keys[ i ] ] = relatedPostsCriteria[ keys[ i ] ];
-			}
+				const buildRelatedPostsUrl = ( page = null ) => {
+					const targetUrl = new URL( jeoMapVars.jsonUrl + 'posts' );
+					appendRestQueryParams( targetUrl.searchParams, query );
 
-			if ( keys.length < 1 ) {
-				resolve( [] );
-			}
+					if ( page !== null ) {
+						targetUrl.searchParams.set( 'page', page );
+					}
 
-			query._fields = ['id', 'meta', 'title', 'link', 'date'];
+					if ( jeoMapVars.currentLang ) {
+						targetUrl.searchParams.append( 'lang', jeoMapVars.currentLang );
+					}
+					return targetUrl;
+				};
 
-			const targetURL = new URL(jeoMapVars.jsonUrl + 'posts');
-			Object.keys(query).forEach(key => targetURL.searchParams.append(key, query[key]));
-			targetURL.searchParams.append('lang', jeoMapVars.currentLang);
+				const fetchPostsPage = async ( page = null ) => {
+					const response = await fetch( buildRelatedPostsUrl( page ), {
+						cache: 'no-store',
+					} );
+					const data = await response.json();
 
-			fetch(targetURL)
-				.then(async (response) => {
-					const jsonResponse = await response.json();
-					return { data: jsonResponse, totalPages: response.headers.get("x-wp-totalpages") };
-				})
-				.then(({ data, totalPages }) => {
-					// Save first page results
-					let cumulativePosts = data;
+					return {
+						data: Array.isArray( data ) ? data : [],
+						totalPages: Number.parseInt(
+							response.headers.get( 'x-wp-totalpages' ) || '1',
+							10
+						),
+					};
+				};
 
-					const buildRelatedPosts = ( map ) => {
-						const sourceData = this.buildPostsGeoJson( cumulativePosts );
-						this.relatedPostsGeoJson = sourceData;
+				const { data, totalPages } = await fetchPostsPage();
+				let cumulativePosts = data;
 
-						map.addSource( 'storiesSource', {
-							type: 'geojson',
-							data: sourceData,
-							cluster: true,
-							clusterRadius: 40,
-						} );
+				const buildRelatedPosts = ( map ) => {
+					const sourceData = this.buildPostsGeoJson( cumulativePosts );
+					this.relatedPostsGeoJson = sourceData;
 
-						const relatedPostsImages = [
-							loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
-							loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
-							loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
-						];
+					map.addSource( 'storiesSource', {
+						type: 'geojson',
+						data: sourceData,
+						cluster: true,
+						clusterRadius: 40,
+					} );
 
-						if ( MAP_RUNTIME !== 'mapboxgl' ) {
-							relatedPostsImages.push(
-								loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url )
-							);
+					const relatedPostsImages = [
+						loadImage( map, 'cluster', jeoMapVars.images['/js/src/icons/cluster'].url ),
+						loadImage( map, 'news-marker', jeoMapVars.images['/js/src/icons/news-marker'].url ),
+						loadImage( map, 'news-marker-hover', jeoMapVars.images['/js/src/icons/news-marker-hover'].url ),
+					];
+
+					if ( MAP_RUNTIME !== 'mapboxgl' ) {
+						relatedPostsImages.push(
+							loadImage( map, 'news-no-marker', jeoMapVars.images['/js/src/icons/news'].url )
+						);
+					}
+
+					Promise.all( relatedPostsImages ).then( () => {
+						if ( MAP_RUNTIME === 'mapboxgl' ) {
+							this.registerRelatedPostsClusterBadgeHandler( map );
 						}
 
-						Promise.all( relatedPostsImages ).then( () => {
-							if ( MAP_RUNTIME === 'mapboxgl' ) {
-								this.registerRelatedPostsClusterBadgeHandler( map );
-							}
+						map.addLayer( {
+							id: 'unclustered-points-hitarea',
+							type: 'symbol',
+							source: 'storiesSource',
+							filter: [ '!', [ 'has', 'point_count' ] ],
+							layout: {
+								'icon-image': 'news-marker',
+								'icon-size': parseFloat(
+									jeoMapVars.images['/js/src/icons/news-marker'].icon_size
+								) * 1.6,
+								'icon-allow-overlap': true,
+							},
+							paint: {
+								'icon-opacity': 0.001,
+							},
+						} );
 
-							map.addLayer( {
-								id: 'unclustered-points-hitarea',
-								type: 'symbol',
-								source: 'storiesSource',
-								filter: [ '!', [ 'has', 'point_count' ] ],
-								layout: {
-									'icon-image': 'news-marker',
-									'icon-size': parseFloat(
-										jeoMapVars.images['/js/src/icons/news-marker'].icon_size
-									) * 1.6,
-									'icon-allow-overlap': true,
-								},
-								paint: {
-									'icon-opacity': 0.001,
-								},
-							} );
+						map.addLayer( {
+							id: 'unclustered-points',
+							type: 'symbol',
+							source: 'storiesSource',
+							layout: {
+								'icon-allow-overlap': true,
+								'icon-image': [
+									'case',
+									[ 'boolean', [ 'has', 'point_count' ], false ],
+									'cluster',
+									'news-marker',
+								],
+								'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
+							},
+						} );
 
-							map.addLayer( {
-								id: 'unclustered-points',
-								type: 'symbol',
-								source: 'storiesSource',
-								layout: {
-									'icon-allow-overlap': true,
-									'icon-image': [
-										'case',
-										[ 'boolean', [ 'has', 'point_count' ], false ],
-										'cluster',
-										'news-marker',
-									],
-									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
-								},
-							} );
+						map.on( 'click', 'unclustered-points', () => {} );
 
-							map.on( 'click', 'unclustered-points', () => {} );
+						map.on( 'click', 'unclustered-points-hitarea', ( e ) => {
+							const point = e.point
+								? { x: e.point.x, y: e.point.y }
+								: null;
+							const featuresAtPoint = e.point
+								? map.queryRenderedFeatures( point, {
+									layers: [ 'unclustered-points-hitarea' ],
+								} )
+								: e.features;
+							const relatedCoordinateFeatures = this.resolvePopupFeatures(
+								featuresAtPoint
+							);
 
-							map.on( 'click', 'unclustered-points-hitarea', ( e ) => {
-								const point = e.point
-									? { x: e.point.x, y: e.point.y }
-									: null;
-								const featuresAtPoint = e.point
-									? map.queryRenderedFeatures( point, {
-										layers: [ 'unclustered-points-hitarea' ],
-									} )
-									: e.features;
-								const relatedCoordinateFeatures = this.resolvePopupFeatures(
-									featuresAtPoint
+							if ( relatedCoordinateFeatures.length ) {
+								this.showPostPopup(
+									relatedCoordinateFeatures,
+									e.lngLat ?? relatedCoordinateFeatures[ 0 ].geometry.coordinates
 								);
+							}
+						} );
 
-								if ( relatedCoordinateFeatures.length ) {
-									this.showPostPopup(
-										relatedCoordinateFeatures,
-										e.lngLat ?? relatedCoordinateFeatures[ 0 ].geometry.coordinates
-									);
-								}
-							} );
+						map.addLayer( {
+							id: 'cluster-layer',
+							type: 'circle',
+							source: 'storiesSource',
+							filter: [ 'has', 'point_count' ],
+							paint: {
+								'circle-color': jeoMapVars.cluster.circle_color,
+								'circle-radius': 20,
+								'circle-stroke-color': '#ffffff',
+								'circle-stroke-opacity': 0.4,
+								'circle-stroke-width': 9,
+							},
+						} );
 
-							map.addLayer( {
-								id: 'cluster-layer',
-								type: 'circle',
-								source: 'storiesSource',
-								filter: [ 'has', 'point_count' ],
-								paint: {
-									'circle-color': jeoMapVars.cluster.circle_color,
-									'circle-radius': 20,
-									'circle-stroke-color': '#ffffff',
-									'circle-stroke-opacity': 0.4,
-									'circle-stroke-width': 9,
-								},
-							} );
-
-							map.addLayer( {
-								id: 'cluster-count',
-								type: 'symbol',
-								source: 'storiesSource',
-								filter: [ 'has', 'point_count' ],
-								layout: MAP_RUNTIME === 'mapboxgl'
-									? {
-										'icon-image': [
-											'concat',
-											RELATED_POSTS_CLUSTER_BADGE_PREFIX,
+						map.addLayer( {
+							id: 'cluster-count',
+							type: 'symbol',
+							source: 'storiesSource',
+							filter: [ 'has', 'point_count' ],
+							layout: MAP_RUNTIME === 'mapboxgl'
+								? {
+									'icon-image': [
+										'concat',
+										RELATED_POSTS_CLUSTER_BADGE_PREFIX,
+										[
+											'to-string',
 											[
-												'to-string',
-												[
-													'coalesce',
-													[ 'get', 'point_count_abbreviated' ],
-													[ 'get', 'point_count' ],
-												],
+												'coalesce',
+												[ 'get', 'point_count_abbreviated' ],
+												[ 'get', 'point_count' ],
 											],
 										],
-										'icon-size': 1,
-										'icon-allow-overlap': true,
-										'icon-ignore-placement': true,
-									}
-									: {
-										'icon-image': 'news-no-marker',
-										'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
-										'icon-allow-overlap': true,
-										'icon-ignore-placement': true,
-										'icon-offset': [ 0, -30 ],
-										'text-field': '{point_count}',
-										'text-font': [ 'Open Sans Bold' ],
-										'text-size': 12,
-										'text-transform': 'uppercase',
-										'text-letter-spacing': 0.05,
-										'text-offset': [ 0, 0.8 ],
-										'text-allow-overlap': true,
-										'text-ignore-placement': true,
-									},
-								paint: MAP_RUNTIME === 'mapboxgl'
-									? {}
-									: {
-										'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
-									},
-							} );
-
-							map.on( 'click', 'cluster-layer', ( e ) => {
-								this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
-							} );
-
-							map.on( 'click', 'cluster-count', ( e ) => {
-								this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
-							} );
-
-							map.on( 'mouseenter', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
-								map.getCanvas().style.cursor = 'pointer';
-							} );
-							map.on( 'mouseleave', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
-								map.getCanvas().style.cursor = '';
-							} );
+									],
+									'icon-size': 1,
+									'icon-allow-overlap': true,
+									'icon-ignore-placement': true,
+								}
+								: {
+									'icon-image': 'news-no-marker',
+									'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news'].icon_size ),
+									'icon-allow-overlap': true,
+									'icon-ignore-placement': true,
+									'icon-offset': [ 0, -30 ],
+									'text-field': '{point_count}',
+									'text-font': [ 'Open Sans Bold' ],
+									'text-size': 12,
+									'text-transform': 'uppercase',
+									'text-letter-spacing': 0.05,
+									'text-offset': [ 0, 0.8 ],
+									'text-allow-overlap': true,
+									'text-ignore-placement': true,
+								},
+							paint: MAP_RUNTIME === 'mapboxgl'
+								? {}
+								: {
+									'text-color': jeoMapVars.images['/js/src/icons/news'].text_color,
+								},
 						} );
-					};
 
-					buildRelatedPosts(this.map);
-			});
-		} );
+						map.on( 'click', 'cluster-layer', ( e ) => {
+							this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+						} );
+
+						map.on( 'click', 'cluster-count', ( e ) => {
+							this.openClusterPostsPopup( e.features?.[ 0 ], e.lngLat );
+						} );
+
+						map.on( 'mouseenter', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
+							map.getCanvas().style.cursor = 'pointer';
+						} );
+						map.on( 'mouseleave', [ 'unclustered-points-hitarea', 'cluster-layer', 'cluster-count' ], () => {
+							map.getCanvas().style.cursor = '';
+						} );
+					} );
+				};
+
+				buildRelatedPosts( this.map );
+
+				const maxPage = Number.isFinite( totalPages ) ? Math.min( totalPages, 99 ) : 1;
+				for ( let page = 2; page <= maxPage; page++ ) {
+					const { data: moreResults } = await fetchPostsPage( page );
+					cumulativePosts = mergeUniqueStoriesById(
+						cumulativePosts,
+						moreResults
+					);
+
+					const sourceData = this.buildPostsGeoJson( cumulativePosts );
+					this.relatedPostsGeoJson = sourceData;
+					this.map.getSource( 'storiesSource' )?.setData( sourceData );
+				}
+
+				return cumulativePosts;
+			} catch ( error ) {
+				console.error( 'Unable to load related posts.', error );
+				return [];
+			}
+		} )();
 	}
 
 	getCircleSvg( { fill, radius = 20 } ) {
@@ -1376,57 +1435,278 @@ export default class JeoMap {
 		</svg>`
 	}
 
-	buildPostsGeoJson( stories ) {
-		const finalFeatures = {
-			type: 'FeatureCollection',
-			features: [],
-		};
-
-		stories.map( ( story ) => {
-			const storyRelatedPoints = story.meta._related_point ?? [];
-			const storyPoints = storyRelatedPoints
-				.map( ( point ) => {
-					const lat = parseFloat( point._geocode_lat );
-					const lng = parseFloat( point._geocode_lon );
-					return ( isNaN( lat ) || isNaN( lng ) ) ? null : [ lng, lat ];
-				} )
-				.filter( c => c !== null );
-
-			finalFeatures.features.push(
-				...storyPoints.map( ( point ) => {
-					return {
-						id: story.id,
-						type: 'Feature',
-						properties: story,
-						geometry: {
-							type: 'Point',
-							coordinates: point,
-						},
-					};
-				} )
-			);
-		} );
-
-		return finalFeatures;
+	getRelatedPostsClusterBadgeImageId( label ) {
+		return `${ RELATED_POSTS_CLUSTER_BADGE_PREFIX }${ label }`;
 	}
 
-	showPostPopup( feature, lngLat ) {
-		this.popup?.remove();
+	getRelatedPostsClusterBadgeLabel( value ) {
+		const count = Number.parseInt( value, 10 );
 
-		const title = typeof feature.properties.title === 'string'
-			? JSON.parse( feature.properties.title )
-			: feature.properties.title;
+		if ( ! Number.isFinite( count ) ) {
+			return String( value ?? '' );
+		}
 
-		const post = {
-			date: feature.properties.date,
-			link: feature.properties.link,
+		if ( count >= 1000000 ) {
+			return `${ Math.round( count / 100000 ) / 10 }m`.replace( '.0m', 'm' );
+		}
+
+		if ( count >= 1000 ) {
+			return `${ Math.round( count / 100 ) / 10 }k`.replace( '.0k', 'k' );
+		}
+
+		return String( count );
+	}
+
+	getRelatedPostsClusterBadgeBaseImage() {
+		if ( this.relatedPostsClusterBadgeBaseImage ) {
+			return this.relatedPostsClusterBadgeBaseImage;
+		}
+
+		this.relatedPostsClusterBadgeBaseImage = new Promise( ( resolve, reject ) => {
+			const image = new Image();
+			image.decoding = 'async';
+			image.crossOrigin = 'anonymous';
+			image.onload = () => resolve( image );
+			image.onerror = () => reject( new Error( 'Unable to load cluster badge icon.' ) );
+			image.src = jeoMapVars.images['/js/src/icons/news'].url;
+		} );
+
+		return this.relatedPostsClusterBadgeBaseImage;
+	}
+
+	async createRelatedPostsClusterBadgeImage( label ) {
+		const iconImage = await this.getRelatedPostsClusterBadgeBaseImage();
+		const pixelRatio = 2;
+		const displaySize = 40;
+		const size = displaySize * pixelRatio;
+		const canvas = document.createElement( 'canvas' );
+		canvas.width = size;
+		canvas.height = size;
+
+		const context = canvas.getContext( '2d' );
+
+		if ( ! context ) {
+			throw new Error( 'Unable to create cluster badge canvas.' );
+		}
+
+		context.clearRect( 0, 0, size, size );
+		context.drawImage( iconImage, 20, 12, 40, 28 );
+
+		const safeLabel = String( label ?? '' ).trim();
+		const fontSize = safeLabel.length >= 4 ? 22 : safeLabel.length === 3 ? 24 : 28;
+
+		context.fillStyle = jeoMapVars.images['/js/src/icons/news'].text_color || '#202202';
+		context.textAlign = 'center';
+		context.textBaseline = 'middle';
+		context.font = `700 ${ fontSize }px sans-serif`;
+		context.fillText( safeLabel, size / 2, 58 );
+
+		const imageData = context.getImageData( 0, 0, size, size );
+
+		return {
+			width: imageData.width,
+			height: imageData.height,
+			data: imageData.data,
+			pixelRatio,
+		};
+	}
+
+	registerRelatedPostsClusterBadgeHandler( map ) {
+		if ( MAP_RUNTIME !== 'mapboxgl' || this.relatedPostsClusterBadgeHandlerRegistered ) {
+			return;
+		}
+
+		this.relatedPostsClusterBadgeHandlerRegistered = true;
+
+		map.on( 'styleimagemissing', async ( event ) => {
+			const imageId = event?.id;
+
+			if (
+				typeof imageId !== 'string' ||
+				! imageId.startsWith( RELATED_POSTS_CLUSTER_BADGE_PREFIX ) ||
+				map.hasImage( imageId )
+			) {
+				return;
+			}
+
+			const label = imageId.slice( RELATED_POSTS_CLUSTER_BADGE_PREFIX.length );
+
+			try {
+				const image = await this.createRelatedPostsClusterBadgeImage( label );
+
+				if ( ! map.hasImage( imageId ) ) {
+					map.addImage( imageId, image, { pixelRatio: image.pixelRatio } );
+				}
+			} catch ( error ) {
+				console.error( 'Unable to build related posts cluster badge.', error );
+			}
+		} );
+	}
+
+	buildPostsGeoJson( stories ) {
+		return buildRelatedPostsGeoJson( stories );
+	}
+
+	getPopupFeatures( features = [] ) {
+		const seenFeatures = new Set();
+
+		return ( features ?? [] )
+			.filter(
+				( feature ) =>
+					! feature?.properties?.cluster && ! feature?.properties?.point_count
+			)
+			.filter( ( feature ) => {
+				const coordinates = feature?.geometry?.coordinates ?? [];
+				const uniqueKey =
+					feature?.properties?.link ||
+					`${ feature?.id ?? 'story' }:${ coordinates.join( ',' ) }`;
+
+				if ( seenFeatures.has( uniqueKey ) ) {
+					return false;
+				}
+
+				seenFeatures.add( uniqueKey );
+				return true;
+			} );
+	}
+
+	getPopupFeaturesForCoordinates( coordinates ) {
+		const coordinateKey = this.getCoordinatesKey( coordinates );
+
+		if ( ! coordinateKey ) {
+			return [];
+		}
+
+		return this.getPopupFeatures(
+			( this.relatedPostsGeoJson?.features ?? [] ).filter(
+				( feature ) =>
+					this.getCoordinatesKey( feature?.geometry?.coordinates ) ===
+					coordinateKey
+			)
+		);
+	}
+
+	getPopupFeaturesForFeature( feature ) {
+		const sourceFeatures = this.relatedPostsGeoJson?.features ?? [];
+		const coordinateKey = this.getCoordinatesKey( feature?.geometry?.coordinates );
+		const featureId = feature?.id ?? feature?.properties?.id ?? null;
+		const featureLink = feature?.properties?.link ?? null;
+
+		return this.getPopupFeatures(
+			sourceFeatures.filter( ( sourceFeature ) => {
+				if ( featureLink && sourceFeature?.properties?.link === featureLink ) {
+					return true;
+				}
+
+				if (
+					featureId !== null &&
+					( sourceFeature?.id === featureId ||
+						sourceFeature?.properties?.id === featureId )
+				) {
+					return true;
+				}
+
+				if (
+					coordinateKey &&
+					this.getCoordinatesKey( sourceFeature?.geometry?.coordinates ) ===
+						coordinateKey
+				) {
+					return true;
+				}
+
+				return false;
+			} )
+		);
+	}
+
+	resolvePopupFeatures( features = [] ) {
+		const popupFeatures = this.getPopupFeatures( features );
+
+		if ( ! popupFeatures.length ) {
+			return [];
+		}
+
+		const sourceResolvedFeatures = popupFeatures.flatMap( ( feature ) =>
+			this.getPopupFeaturesForFeature( feature )
+		);
+
+		if ( sourceResolvedFeatures.length ) {
+			return this.getPopupFeatures( sourceResolvedFeatures );
+		}
+
+		if ( popupFeatures.length === 1 ) {
+			return this.getPopupFeaturesForCoordinates(
+				popupFeatures[ 0 ]?.geometry?.coordinates
+			);
+		}
+
+		return popupFeatures;
+	}
+
+	getCoordinatesKey( coordinates ) {
+		if ( ! Array.isArray( coordinates ) || coordinates.length < 2 ) {
+			return null;
+		}
+
+		return coordinates
+			.slice( 0, 2 )
+			.map( ( value ) => Number.parseFloat( value ).toFixed( 6 ) )
+			.join( ':' );
+	}
+
+	openClusterPostsPopup( feature, lngLat ) {
+		const clusterId = feature?.properties?.cluster_id;
+		const pointCount = feature?.properties?.point_count;
+
+		if ( ! clusterId || ! pointCount ) {
+			return;
+		}
+
+		getClusterLeaves(
+			this.map.getSource( 'storiesSource' ),
+			clusterId,
+			pointCount,
+			0
+		).then( ( leaves ) => {
+			const popupFeatures = this.getPopupFeatures( leaves );
+
+			if ( popupFeatures.length ) {
+				this.showPostPopup(
+					popupFeatures,
+					lngLat ?? feature.geometry.coordinates,
+					{ totalCount: pointCount }
+				);
+			}
+		} );
+	}
+
+	parsePopupTitle( title ) {
+		if ( typeof title !== 'string' ) {
+			return title;
+		}
+
+		try {
+			return JSON.parse( title );
+		} catch ( error ) {
+			return { rendered: title };
+		}
+	}
+
+	buildPopupPost( feature ) {
+		const title = this.parsePopupTitle( feature?.properties?.title );
+
+		return {
+			date: feature?.properties?.date,
+			link: feature?.properties?.link,
 			title: {
 				rendered: title?.rendered,
 			},
 		};
+	}
 
-		const popupHTML = this.popupTemplate( {
-			post,
+	buildPopupHTML( feature ) {
+		return this.popupTemplate( {
+			post: this.buildPopupPost( feature ),
 			read_more: jeoMapVars.string_read_more,
 			show_featured_media: false,
 		} );
@@ -1628,7 +1908,7 @@ export default class JeoMap {
 
 		this.popup = new mapgl.Popup( { closeOnClick: false } )
 			.setLngLat( lngLat )
-			.setHTML( popupHTML )
+			.setDOMContent( popupContent )
 			.addTo( this.map );
 	}
 

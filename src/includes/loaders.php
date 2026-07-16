@@ -5,6 +5,10 @@
  * @package Jeo
  */
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
 	require_once JEO_BASEPATH . 'vendor/autoload.php';
 }
@@ -327,23 +331,34 @@ function jeo_register_embedder( $id, $base_url ) {
 	};
 
 	$embedder = function ( $matches ) use ( $get_param ) {
-		$url    = $matches[0];
-		$height = $get_param( $url, 'height' );
-		$width  = $get_param( $url, 'width' );
+		$url         = esc_url( $matches[0] );
+		$height      = absint( $get_param( $matches[0], 'height' ) );
+		$width       = absint( $get_param( $matches[0], 'width' ) );
+		$storymap_id = absint( $get_param( $matches[0], 'storymap_id' ) );
 
-		$html = "<iframe src='$url'";
-		if ( ! empty( $height ) ) {
-			$html .= " height='$height'";
+		if ( '' === $url ) {
+			return '';
 		}
-		if ( ! empty( $width ) ) {
-			$html .= " width='$width'";
-		}
-		if ( ! empty( $get_param( $url, 'storymap_id' ) ) ) {
-			$html .= " class='embed-storymap' seamless scrolling='yes'";
-		}
-		$html .= " frameborder='0' loading='lazy'></iframe>";
 
-		return $html;
+		$attributes = array(
+			sprintf( 'src="%s"', $url ),
+			'frameborder="0"',
+			'loading="lazy"',
+		);
+
+		if ( $height > 0 ) {
+			$attributes[] = sprintf( 'height="%d"', $height );
+		}
+		if ( $width > 0 ) {
+			$attributes[] = sprintf( 'width="%d"', $width );
+		}
+		if ( $storymap_id > 0 ) {
+			$attributes[] = 'class="embed-storymap"';
+			$attributes[] = 'seamless';
+			$attributes[] = 'scrolling="yes"';
+		}
+
+		return '<iframe ' . implode( ' ', $attributes ) . '></iframe>';
 	};
 
 	wp_embed_register_handler( $id, $regex, $embedder );

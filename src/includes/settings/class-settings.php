@@ -184,6 +184,32 @@ class Settings {
 	}
 
 	/**
+	 * Return all options for a geocoder, merged with defaults.
+	 *
+	 * @param string $geocoder_slug Geocoder slug.
+	 * @return array
+	 */
+	public function get_geocoder_options( $geocoder_slug ) {
+		$options  = $this->get_option( 'geocoders' );
+		$geocoder = \jeo_geocode_handler()->initialize_geocoder( $geocoder_slug );
+		$defaults = $geocoder->get_default_options();
+		$current  = isset( $options[ $geocoder_slug ] ) ? $options[ $geocoder_slug ] : array();
+		return array_merge( $defaults, $current );
+	}
+
+	/**
+	 * Return a single geocoder option.
+	 *
+	 * @param string $geocoder_slug Geocoder slug.
+	 * @param string $option_name   Option name.
+	 * @return string
+	 */
+	public function get_geocoder_option( $geocoder_slug, $option_name ) {
+		$options = $this->get_geocoder_options( $geocoder_slug );
+		return isset( $options[ $option_name ] ) ? $options[ $option_name ] : '';
+	}
+
+	/**
 	 * Register the JEO settings group for the settings API.
 	 *
 	 * @return void
@@ -388,6 +414,16 @@ class Settings {
 
 		if ( isset( $input['geocoders'] ) && is_array( $input['geocoders'] ) ) {
 			$input['geocoders'] = $this->sanitize_geocoder_settings_payload( $input['geocoders'] );
+		}
+
+		if ( isset( $input['map_default_zoom'] ) ) {
+			$input['map_default_zoom'] = is_numeric( $input['map_default_zoom'] ) ? absint( $input['map_default_zoom'] ) : $existing_options['map_default_zoom'] ?? $this->default_options['map_default_zoom'];
+		}
+		if ( isset( $input['map_default_lat'] ) ) {
+			$input['map_default_lat'] = is_numeric( $input['map_default_lat'] ) ? (float) $input['map_default_lat'] : $existing_options['map_default_lat'] ?? $this->default_options['map_default_lat'];
+		}
+		if ( isset( $input['map_default_lng'] ) ) {
+			$input['map_default_lng'] = is_numeric( $input['map_default_lng'] ) ? (float) $input['map_default_lng'] : $existing_options['map_default_lng'] ?? $this->default_options['map_default_lng'];
 		}
 
 		return array_merge( $existing_options, $input );

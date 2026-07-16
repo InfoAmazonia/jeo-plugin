@@ -111,9 +111,25 @@
 										<?php printf( esc_html_x( '%s options', 'geocoder_options', 'jeowp' ), esc_html( $geocoder['name'] ) ); ?>
 									</label>
 								</th>
-								<td>
-									<?php $geo_object->get_settings(); ?>
-								</td>
+							<td>
+								<?php if ( ! empty( $geocoder['description'] ) ) : ?>
+									<p class="description">
+										<?php echo esc_html( $geocoder['description'] ); ?>
+									</p>
+								<?php endif; ?>
+								<?php foreach ( $geo_object->get_settings() as $settings ) : ?>
+									<label for="<?php echo esc_attr( $settings['slug'] ); ?>">
+										<strong><?php echo esc_html( $settings['name'] ); ?></strong> <br/>
+									</label>
+									<input name="<?php echo esc_attr( $this->get_field_name( 'geocoders' ) ); ?>[<?php echo esc_attr( $gslug ); ?>][<?php echo esc_attr( $settings['slug'] ); ?>]" type="text" id="<?php echo esc_attr( $settings['slug'] ); ?>" value="<?php echo esc_attr( $this->get_geocoder_option( $gslug, $settings['slug'] ) ); ?>" class="regular-text">
+									<p class="description">
+									<?php echo esc_html( $settings['description'] ); ?>
+									</p>
+								<?php endforeach; ?>
+
+								<?php $geo_object->settings_footer( $this ); ?>
+
+							</td>
 							</tr>
 						<?php endforeach; ?>
 

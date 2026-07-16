@@ -922,6 +922,11 @@
 					text: __( 'Choose Image', 'jeowp' )
 				}, multiple: false
 			});
-		}, 400);
+			mediaUploader.on('select', function () {
+				var attachment = mediaUploader.state().get('selection').first().toJSON();
+				$('#background_image').val(attachment.url);
+			});
+			mediaUploader.open();
+		});
 	});
 })(jQuery);
