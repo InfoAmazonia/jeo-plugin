@@ -53,7 +53,7 @@ Examples:
 
 Use at most 1–3 contextual links per paragraph. If a sentence has no natural anchor for a reference, add the reference to the `references` array without forcing a link into the text.
 
-Before returning a paragraph, verify that the linked phrase, name, fact, or number actually appears in the referenced article (title, excerpt, or content). If it does not, remove the link and keep the text plain, or drop the claim.
+CRITICAL — Anchor grounding: The linked phrase MUST be grounded in the referenced article. Whenever possible, prefer a short, specific anchor that appears in or closely reflects the source (a name, a date, a number, a concrete fact). Paraphrased anchors are acceptable only when they faithfully represent content that the referenced article genuinely discusses. Do NOT attach a real URL to a phrase the source does not support — the human editor reviews every suggestion, so accuracy of the anchor-to-source relationship is essential.
 
 ### 2. Factual Grounding
 

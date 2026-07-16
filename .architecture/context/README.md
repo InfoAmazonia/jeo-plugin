@@ -203,11 +203,12 @@ The `post_analyzer` sub-agent uses `Get_Post_Content_Tool` to read the post and 
 `Context_Handler::validate_generated_output()` runs after every AI response in `api_setup()` and `api_chat()`:
 
 1. Extracts all `<a href="URL">anchor</a>` tags from paragraph texts.
-2. Verifies the URL exists in the `references` array.
-3. Verifies the anchor text appears in the referenced article (title, excerpt, or content) using a tolerant lowercase/punctuation-stripped match.
-4. Links that fail validation are converted to plain text; a note is appended to `assistant_message`.
+2. Removes self-references from the `references` array (entries whose `post_id` or `url` match the post being edited).
+3. Strips self-links from paragraph text (links pointing to the post's own permalink are converted to plain text silently).
+4. Verifies remaining link URLs exist in the `references` array.
+5. Links to URLs not listed in references are converted to plain text; a verification note is appended to `assistant_message`.
 
-This reduces hallucinated citations and links whose anchor is not supported by the referenced article.
+Anchor quality (whether the linked phrase is grounded in the referenced article) is enforced by the system prompt (`Context_Agent::critical_prompt_rules()`) and verified by the human editor. The prompt instructs the AI to prefer short, specific anchors that closely reflect the source, and to never attach a real URL to a phrase the source does not support.
 
 ## Dual Conversation Storage
 

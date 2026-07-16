@@ -273,7 +273,7 @@ class Context_Handler {
 			);
 
 			$response                      = $result->to_rest_response();
-			$response                      = $this->validate_generated_output( $response );
+			$response                      = $this->validate_generated_output( $response, $post_id );
 			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
 			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
 
@@ -388,7 +388,7 @@ class Context_Handler {
 			);
 
 			$response                      = $result->to_rest_response();
-			$response                      = $this->validate_generated_output( $response );
+			$response                      = $this->validate_generated_output( $response, $post_id );
 			$response['assistant_message'] = wp_strip_all_tags( $response['assistant_message'] ?? '' );
 			$response['message']           = wp_strip_all_tags( $response['message'] ?? '' );
 
@@ -590,20 +590,51 @@ class Context_Handler {
 
 	/**
 	 * Verify that every contextual link in generated paragraphs points to a known
-	 * reference and that the anchor text is present in the referenced article.
+	 * reference (i.e. a URL listed in the references array).
 	 *
-	 * Links that fail validation are converted to plain text and a note is appended
-	 * to `assistant_message`. This reduces hallucinated citations and references
-	 * that do not actually support the linked phrase.
+	 * Links pointing to URLs not in the references array are converted to plain
+	 * text and a verification note is appended to `assistant_message`. This
+	 * prevents hallucinated citations and links to articles that were not
+	 * retrieved by the RAG pipeline.
+	 *
+	 * The post being edited is never allowed as a reference or link target —
+	 * self-references and self-links are stripped silently from the references
+	 * array and from paragraph text.
+	 *
+	 * Anchor quality (whether the linked phrase is grounded in the referenced
+	 * article) is enforced by the system prompt and verified by the human editor,
+	 * not by an automated check. The prompt instructs the AI to use specific,
+	 * grounded anchors; the editor has final say.
 	 *
 	 * @param array $response Raw response from the agent.
+	 * @param int   $post_id  Post ID being edited (used to filter self-references).
 	 * @return array Validated response.
 	 */
-	private function validate_generated_output( array $response ): array {
+	private function validate_generated_output( array $response, int $post_id = 0 ): array {
 		$paragraphs = $response['paragraphs'] ?? array();
 		$references = $response['references'] ?? array();
 		if ( empty( $paragraphs ) || empty( $references ) ) {
 			return $response;
+		}
+
+		// Resolve the permalink of the post being edited for self-link detection.
+		$self_url = $post_id > 0 ? (string) get_permalink( $post_id ) : '';
+
+		// Filter self-references from the references array.
+		if ( $post_id > 0 && ! empty( $references ) ) {
+			$references             = array_filter(
+				$references,
+				function ( $ref ) use ( $post_id, $self_url ) {
+					if ( isset( $ref['post_id'] ) && (int) $ref['post_id'] === $post_id ) {
+						return false;
+					}
+					if ( $self_url && isset( $ref['url'] ) && $ref['url'] === $self_url ) {
+						return false;
+					}
+					return true;
+				}
+			);
+			$response['references'] = array_values( $references );
 		}
 
 		$refs_by_url = array();
@@ -624,40 +655,20 @@ class Context_Handler {
 
 			$new_text = preg_replace_callback(
 				'/<a\s+href=["\']([^"\']+)["\']\s*>(.*?)<\/a>/i',
-				function ( $matches ) use ( $refs_by_url, &$warnings ) {
+				function ( $matches ) use ( $refs_by_url, &$warnings, $self_url ) {
 					$url    = $matches[1];
 					$anchor = wp_strip_all_tags( $matches[2] );
+
+					// Strip self-links silently (no warning needed).
+					if ( $self_url && $url === $self_url ) {
+						return $anchor;
+					}
 
 					if ( ! isset( $refs_by_url[ $url ] ) ) {
 						$warnings[] = sprintf(
 							/* translators: %s: linked URL */
 							__( 'Link to %s removed: not listed in references.', 'jeowp' ),
 							esc_url( $url )
-						);
-						return $anchor;
-					}
-
-					$ref      = $refs_by_url[ $url ];
-					$ref_post = get_post( $ref['post_id'] ?? 0 );
-
-					if ( $ref_post ) {
-						$haystack = $ref_post->post_title . ' ' . $ref_post->post_excerpt . ' ' . wp_strip_all_tags( $ref_post->post_content );
-					} else {
-						$haystack = ( $ref['title'] ?? '' ) . ' ' . ( $ref['reason'] ?? '' );
-					}
-
-					$haystack_lower = mb_strtolower( $haystack );
-					$needle_lower   = mb_strtolower( $anchor );
-
-					// Strip punctuation for a tolerant match.
-					$needle_clean   = preg_replace( '/[^\p{L}\p{N}\s]/u', '', $needle_lower );
-					$haystack_clean = preg_replace( '/[^\p{L}\p{N}\s]/u', '', $haystack_lower );
-
-					if ( empty( $needle_clean ) || false === strpos( $haystack_clean, $needle_clean ) ) {
-						$warnings[] = sprintf(
-							/* translators: %s: link anchor text */
-							__( 'Link to "%s" removed: anchor not found in reference.', 'jeowp' ),
-							$anchor
 						);
 						return $anchor;
 					}
