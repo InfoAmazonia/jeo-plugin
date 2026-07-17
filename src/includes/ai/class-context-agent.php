@@ -61,6 +61,7 @@ CRITICAL — Anchor grounding: The linked phrase MUST be grounded in the referen
 - Do NOT invent names, terms, dates, statistics, places, or events to make a paragraph more complete.
 - Do NOT mix up references: if two articles mention similar topics, keep their facts separate and cite each one correctly.
 - Do NOT combine facts from multiple references into a single claim unless each fact is individually attributed to its source. One reference must not silently support another reference's fact.
+- Do NOT reference or link to the post being edited. The current article is NEVER a valid source for its own suggested paragraphs: never use its permalink as a link target, never include it in the `references` array, and never mention it in paragraph text (e.g. "as this article reports", "in this report", "as discussed earlier"). The suggested paragraphs must stand on their own, grounded in OTHER articles from the knowledge base.
 - If the retrieved references are insufficient to write a concrete, well-supported paragraph, say so in `assistant_message` and ask the user for a more specific angle. Do not write a generic paragraph in that case.
 - When citing data or specific facts, mention the source in the text (e.g. "according to a previous InfoAmazonia report", "Cimi data show", "the survey points out").
 - Do NOT introduce specific named terms, nicknames, or labels (e.g. a stretch of a highway called "X") unless that exact term appears verbatim in the post content or in a retrieved reference. Do NOT blend two distinct terms from different sources into a new one.

@@ -168,7 +168,7 @@ The system prompt is loaded via `Context_Agent::system_prompt()`:
 
 1. **Custom prompt** — If `ai_use_context_custom_prompt` is enabled and `ai_context_prompt` is non-empty, uses it as the base. The stored value may be either a legacy plain-text prompt or a structured-output JSON object such as `{"prompt": "..."}`. Always route the stored value through `Context_Agent::extract_prompt_text()` before using it as a system prompt; this keeps the runtime unaffected even if the storage format changes later.
 2. **Default prompt** — Otherwise, uses `Context_Agent::default_system_prompt()` which defines the editorial assistant role, workflow, tool usage rules, output schema, editorial guidelines, off-topic handling, and tool error handling. The default prompt always appends `Context_Agent::critical_prompt_rules()`.
-3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding, references array, and language. They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant. Additional rules forbid combining facts from multiple references into a single unattributed claim and require retracting terms/facts that the user marks as unsupported.
+3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding (including a no-self-reference rule: the post being edited must never appear as a source, link target, or text reference in generated paragraphs), references array, and language. They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant. Additional rules forbid combining facts from multiple references into a single unattributed claim and require retracting terms/facts that the user marks as unsupported.
 4. **User Preferences** — Appends `## User Preferences` section from `WP_User_Memory_Storage` (if any preferences exist).
 5. **Additional Context** — Appends `## Additional Context` section with post metadata and locale from the caller.
 
@@ -209,6 +209,8 @@ The `post_analyzer` sub-agent uses `Get_Post_Content_Tool` to read the post and 
 5. Links to URLs not listed in references are converted to plain text; a verification note is appended to `assistant_message`.
 
 Anchor quality (whether the linked phrase is grounded in the referenced article) is enforced by the system prompt (`Context_Agent::critical_prompt_rules()`) and verified by the human editor. The prompt instructs the AI to prefer short, specific anchors that closely reflect the source, and to never attach a real URL to a phrase the source does not support.
+
+Self-referencing is also enforced at the prompt level: `critical_prompt_rules()` forbids the AI from referencing the post being edited (as a source, link target, or text mention) in generated paragraphs. The backend validation (steps 2–3 above) serves as a safety net for any self-links that slip through.
 
 ## Dual Conversation Storage
 
