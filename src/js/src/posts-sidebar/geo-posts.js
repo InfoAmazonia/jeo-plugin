@@ -269,7 +269,7 @@ class JeoGeocodePosts extends Component {
 
 	onLocationFound( location ) {
 		const lat = parseFloat( location.lat );
-		const lng = parseFloat( location.lng );
+		const lng = parseFloat( location.lon );
 
 		if ( isNaN( lat ) || isNaN( lng ) ) {
 			console.error( 'JEO: Invalid coordinates received', location );
