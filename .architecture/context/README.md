@@ -307,9 +307,18 @@ All three are registered per post type via `register_post_meta()` for each type 
 
 - **Max attempts**: 3 (initial + 2 retries)
 - **Backoff**: `sleep(min(attempt * 2, 8))` seconds between retries
-- **Retryable**: Network errors, 5xx, 429, timeouts, empty AI response (`TypeError` on `getJson()`)
-- **Non-retryable**: 4xx errors (except 429) — auth failures, invalid config, rate limits
+- **Retryable**: Network errors, 5xx, 429 (rate limit), timeouts, empty AI response (`TypeError` on `getJson()`)
+- **Non-retryable**: 4xx errors (except 429) — auth failures, invalid config, bad requests. Classification uses `HttpException->response->statusCode` (numeric), not string matching.
 - **Exhausted retries**: Throws user-friendly exception: "The AI did not respond after multiple attempts. Please try again or rephrase your request."
+
+## Error Persistence
+
+When `run_agent()` exhausts all retries, the user message is still persisted to **both** storage layers before throwing:
+
+1. **UI messages** (`_jeo_ai_context_chat_messages`) — saved in `api_chat()` **before** calling `run_agent()`, so it survives any AI failure.
+2. **ConversationStore** (AI thread) — appended via `appendToThread()` after the retry loop exits, so the next successful call sees the unanswered message via `inject_history()`.
+
+This ensures the user's message is visible after a page reload and the AI retains context for subsequent turns. `api_setup()` does **not** persist on error (system-generated message, no prior context to lose).
 
 ## Content Validation
 

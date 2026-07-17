@@ -265,6 +265,19 @@ class Minimap {
 
 			return new \WP_REST_Response( $result->to_rest_response(), 200 );
 		} catch ( \Exception $e ) {
+			// Persist the user prompt to the AI conversation thread so context
+			// is not lost on the next successful call.
+			$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
+			$store->appendToThread(
+				$conversation_id,
+				array(
+					array(
+						'role'    => 'user',
+						'content' => $prompt,
+					),
+				)
+			);
+
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
@@ -361,6 +374,21 @@ class Minimap {
 
 			return new \WP_REST_Response( $result->to_rest_response(), 200 );
 		} catch ( \Exception $e ) {
+			// Persist the user message to the AI conversation thread so context
+			// is not lost on the next successful call. Skip regenerate (fresh start).
+			if ( 'regenerate' !== $type && ! empty( $resolved_message ) ) {
+				$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
+				$store->appendToThread(
+					$conversation_id,
+					array(
+						array(
+							'role'    => 'user',
+							'content' => $resolved_message,
+						),
+					)
+				);
+			}
+
 			return new \WP_REST_Response(
 				array(
 					'success' => false,

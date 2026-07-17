@@ -257,6 +257,15 @@ sequenceDiagram
 
 **Injection**: Prior messages are loaded and added to the assistant's chat history via `addMessage()` BEFORE `structured()` is called. This works because `resolveState()` is lazy — the state is created once and reused, and `init()` resets `toolRuns`/`steps` but NOT the chat history.
 
+#### Error Persistence
+
+When `run_agent()` throws (AI error, empty response, etc.), both layers preserve the user message:
+
+1. **Block attributes** (`conversation[]`) — the frontend (`minimap-editor.js`) includes the user message in `.catch()` and `syncError` handlers alongside the error response, so it is visible in the chat panel and persists with the post.
+2. **ConversationStore** (AI thread) — `api_chat()` and `api_setup_prompt()` append the user message via `appendToThread()` in their `catch` blocks (skipped for `type=regenerate`), so the next successful `inject_history()` includes the unanswered message.
+
+The minimap `run_agent()` does **not** have a retry loop (unlike the Context Handler); a single failure throws immediately.
+
 #### Content-based generation context (persist_initial_context)
 
 When a map is generated from post content via `/minimap/setup`, the RAG-based flow does not use the AI agent and therefore produces no conversation history. To ensure chat refinement works, `persist_initial_context()` stores a synthetic thread:

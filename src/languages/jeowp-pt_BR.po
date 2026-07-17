@@ -2087,68 +2087,68 @@ msgstr "Aprovar IA"
 msgid "Approve JEO AI Geolocations"
 msgstr "Aprovar geolocalizações da IA do JEO"
 
-#: includes/ai/class-context-handler.php:227
-#: includes/ai/class-context-handler.php:346
-#: includes/ai/class-context-handler.php:786
-#: includes/ai/class-context-handler.php:862
+#: includes/ai/class-context-handler.php:228
+#: includes/ai/class-context-handler.php:347
+#: includes/ai/class-context-handler.php:806
+#: includes/ai/class-context-handler.php:882
 #: includes/ai/class-rag-worker.php:223
 #: includes/minimap/class-minimap.php:142
 #: includes/minimap/class-minimap.php:238
-#: includes/minimap/class-minimap.php:316
+#: includes/minimap/class-minimap.php:329
 msgid "Post not found."
 msgstr "Post não encontrado."
 
-#: includes/ai/class-context-handler.php:238
-#: includes/ai/class-context-handler.php:367
+#: includes/ai/class-context-handler.php:239
+#: includes/ai/class-context-handler.php:368
 #: includes/ai/class-minilayer-handler.php:85
 #: includes/ai/class-minilayer-service.php:41
 #: includes/minimap/class-minimap.php:249
-#: includes/minimap/class-minimap.php:337
+#: includes/minimap/class-minimap.php:350
 msgid "No AI provider configured. Set one in JEO AI Settings."
 msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA do JEO."
 
-#: includes/ai/class-context-handler.php:250
+#: includes/ai/class-context-handler.php:251
 msgid "The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles)."
 msgstr "O artigo parece ter muito pouco conteúdo. Escreva um pouco mais sobre o tema, ou diga sobre o que você gostaria de sugestões (ex.: território, entidades, ângulos)."
 
-#: includes/ai/class-context-handler.php:251
-#: includes/ai/class-context-handler.php:289
+#: includes/ai/class-context-handler.php:252
+#: includes/ai/class-context-handler.php:290
 msgid "Generate editorial suggestions for this post based on its content."
 msgstr "Gerar sugestões editoriais para este post com base no seu conteúdo."
 
-#: includes/ai/class-context-handler.php:259
+#: includes/ai/class-context-handler.php:260
 msgid "Waiting for more content or directions."
 msgstr "Aguardando mais conteúdo ou instruções."
 
-#: includes/ai/class-context-handler.php:295
+#: includes/ai/class-context-handler.php:296
 msgid "Suggestions generated."
 msgstr "Sugestões geradas."
 
-#: includes/ai/class-context-handler.php:326
-#: includes/minimap/class-minimap.php:296
+#: includes/ai/class-context-handler.php:327
+#: includes/minimap/class-minimap.php:309
 msgid "conversation_id is required."
 msgstr "conversation_id é obrigatório."
 
-#: includes/ai/class-context-handler.php:336
+#: includes/ai/class-context-handler.php:337
 #: includes/minimap/class-minimap.php:227
-#: includes/minimap/class-minimap.php:306
+#: includes/minimap/class-minimap.php:319
 msgid "A post ID is required."
 msgstr "Um ID de post é obrigatório."
 
-#: includes/ai/class-context-handler.php:356
-#: includes/minimap/class-minimap.php:326
+#: includes/ai/class-context-handler.php:357
+#: includes/minimap/class-minimap.php:339
 msgid "A message is required."
 msgstr "Uma mensagem é obrigatória."
 
-#: includes/ai/class-context-handler.php:403
+#: includes/ai/class-context-handler.php:407
 msgid "Suggestions updated."
 msgstr "Sugestões atualizadas."
 
-#: includes/ai/class-context-handler.php:472
+#: includes/ai/class-context-handler.php:492
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr "A IA não responde após várias tentativas. Tente novamente ou reformule sua solicitação."
 
-#: includes/ai/class-context-handler.php:883
+#: includes/ai/class-context-handler.php:903
 msgid "Conversation cleared."
 msgstr "Conversa limpa."
 
@@ -3152,7 +3152,7 @@ msgstr "Nenhum adaptador de IA ativo encontrado."
 msgid "AI failed to generate prompt."
 msgstr "A IA falhou ao gerar o prompt."
 
-#: includes/ai/class-context-handler.php:902
+#: includes/ai/class-context-handler.php:922
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr "Prompt é obrigatório."
@@ -3236,31 +3236,31 @@ msgstr "IA (novo)"
 msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
 msgstr "Nenhuma camada correspondente encontrada. Adicione camadas manualmente ou execute o indexador RAG nas configurações do JEO."
 
-#: includes/minimap/class-minimap.php:402
+#: includes/minimap/class-minimap.php:430
 msgid "The AI returned an empty response. Please try again."
 msgstr "A IA retornou uma resposta vazia. Tente novamente."
 
-#: includes/minimap/class-minimap.php:1339
+#: includes/minimap/class-minimap.php:1367
 msgid "Dark Base (Mapbox)"
 msgstr "Base escura (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1346
+#: includes/minimap/class-minimap.php:1374
 msgid "Terrain Base (Mapbox)"
 msgstr "Base de terreno (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1353
+#: includes/minimap/class-minimap.php:1381
 msgid "Satellite Base (Mapbox)"
 msgstr "Base de satélite (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1364
+#: includes/minimap/class-minimap.php:1392
 msgid "Dark Base"
 msgstr "Base escura"
 
-#: includes/minimap/class-minimap.php:1373
+#: includes/minimap/class-minimap.php:1401
 msgid "Light Base"
 msgstr "Base clara"
 
-#: includes/minimap/class-minimap.php:1382
+#: includes/minimap/class-minimap.php:1410
 msgid "Satellite Base"
 msgstr "Base de satélite"
 
@@ -4582,7 +4582,7 @@ msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA d
 msgid "The AI returned an empty prompt engineering response."
 msgstr "A IA retornou uma resposta vazia de engenharia de prompt."
 
-#: includes/ai/class-context-handler.php:283
+#: includes/ai/class-context-handler.php:284
 #: js/build/contextSidebar.js:1
 msgid "Initial suggestions"
 msgstr "Sugestões iniciais"
@@ -4713,12 +4713,12 @@ msgid "Generate a map for this post based on its content."
 msgstr "Gerar um mapa para este post com base no seu conteúdo."
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:430
+#: includes/minimap/class-minimap.php:458
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr "%d camada(s) retornada(s) pela IA foi(ram) descartada(s) porque não são camadas de mapa publicadas."
 
-#: includes/minimap/class-minimap.php:867
+#: includes/minimap/class-minimap.php:895
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr "O agente tentou remover várias camadas existentes sem uma solicitação explícita. Elas foram mantidas para preservar o mapa atual."
 
@@ -4948,12 +4948,12 @@ msgid "Refresh composed style cache"
 msgstr "Atualizar cache de estilos compostos"
 
 #. translators: %s: linked URL
-#: includes/ai/class-context-handler.php:670
+#: includes/ai/class-context-handler.php:690
 #, php-format
 msgid "Link to %s removed: not listed in references."
 msgstr "Link para %s removido: não listado nas referências."
 
-#: includes/ai/class-context-handler.php:687
+#: includes/ai/class-context-handler.php:707
 msgid "Verification notes:"
 msgstr "Notas de verificação:"
 
@@ -4998,7 +4998,7 @@ msgid "Your browser could not determine your location. This may be due to strict
 msgstr "Seu navegador não conseguiu determinar sua localização. Isso pode ocorrer por configurações rigorosas de privacidade ou porque o GPS está indisponível no seu dispositivo."
 
 #. translators: %d: number of preserved layers
-#: includes/minimap/class-minimap.php:984
+#: includes/minimap/class-minimap.php:1012
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d camada(s) adicionada(s) manualmente preservada(s) durante o refinamento da IA."

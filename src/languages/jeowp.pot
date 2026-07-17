@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-17T13:21:12+00:00\n"
+"POT-Creation-Date: 2026-07-17T14:56:24+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -383,87 +383,87 @@ msgstr ""
 msgid "The AI returned an empty prompt engineering response."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:227
-#: includes/ai/class-context-handler.php:346
-#: includes/ai/class-context-handler.php:786
-#: includes/ai/class-context-handler.php:862
+#: includes/ai/class-context-handler.php:228
+#: includes/ai/class-context-handler.php:347
+#: includes/ai/class-context-handler.php:806
+#: includes/ai/class-context-handler.php:882
 #: includes/ai/class-rag-worker.php:223
 #: includes/minimap/class-minimap.php:142
 #: includes/minimap/class-minimap.php:238
-#: includes/minimap/class-minimap.php:316
+#: includes/minimap/class-minimap.php:329
 msgid "Post not found."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:238
-#: includes/ai/class-context-handler.php:367
+#: includes/ai/class-context-handler.php:239
+#: includes/ai/class-context-handler.php:368
 #: includes/ai/class-minilayer-handler.php:85
 #: includes/ai/class-minilayer-service.php:41
 #: includes/minimap/class-minimap.php:249
-#: includes/minimap/class-minimap.php:337
+#: includes/minimap/class-minimap.php:350
 msgid "No AI provider configured. Set one in JEO AI Settings."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:250
+#: includes/ai/class-context-handler.php:251
 msgid "The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles)."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:251
-#: includes/ai/class-context-handler.php:289
+#: includes/ai/class-context-handler.php:252
+#: includes/ai/class-context-handler.php:290
 msgid "Generate editorial suggestions for this post based on its content."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:259
+#: includes/ai/class-context-handler.php:260
 msgid "Waiting for more content or directions."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:283
+#: includes/ai/class-context-handler.php:284
 #: js/build/contextSidebar.js:1
 msgid "Initial suggestions"
 msgstr ""
 
-#: includes/ai/class-context-handler.php:295
+#: includes/ai/class-context-handler.php:296
 msgid "Suggestions generated."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:326
-#: includes/minimap/class-minimap.php:296
+#: includes/ai/class-context-handler.php:327
+#: includes/minimap/class-minimap.php:309
 msgid "conversation_id is required."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:336
+#: includes/ai/class-context-handler.php:337
 #: includes/minimap/class-minimap.php:227
-#: includes/minimap/class-minimap.php:306
+#: includes/minimap/class-minimap.php:319
 msgid "A post ID is required."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:356
-#: includes/minimap/class-minimap.php:326
+#: includes/ai/class-context-handler.php:357
+#: includes/minimap/class-minimap.php:339
 msgid "A message is required."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:403
+#: includes/ai/class-context-handler.php:407
 msgid "Suggestions updated."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:472
+#: includes/ai/class-context-handler.php:492
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr ""
 
 #. translators: %s: linked URL
-#: includes/ai/class-context-handler.php:670
+#: includes/ai/class-context-handler.php:690
 #, php-format
 msgid "Link to %s removed: not listed in references."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:687
+#: includes/ai/class-context-handler.php:707
 msgid "Verification notes:"
 msgstr ""
 
-#: includes/ai/class-context-handler.php:883
+#: includes/ai/class-context-handler.php:903
 msgid "Conversation cleared."
 msgstr ""
 
-#: includes/ai/class-context-handler.php:902
+#: includes/ai/class-context-handler.php:922
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr ""
@@ -2157,47 +2157,47 @@ msgstr ""
 msgid "Generate a map for this post based on its content."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:402
+#: includes/minimap/class-minimap.php:430
 msgid "The AI returned an empty response. Please try again."
 msgstr ""
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:430
+#: includes/minimap/class-minimap.php:458
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:867
+#: includes/minimap/class-minimap.php:895
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr ""
 
 #. translators: %d: number of preserved layers
-#: includes/minimap/class-minimap.php:984
+#: includes/minimap/class-minimap.php:1012
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1339
+#: includes/minimap/class-minimap.php:1367
 msgid "Dark Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1346
+#: includes/minimap/class-minimap.php:1374
 msgid "Terrain Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1353
+#: includes/minimap/class-minimap.php:1381
 msgid "Satellite Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1364
+#: includes/minimap/class-minimap.php:1392
 msgid "Dark Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1373
+#: includes/minimap/class-minimap.php:1401
 msgid "Light Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1382
+#: includes/minimap/class-minimap.php:1410
 msgid "Satellite Base"
 msgstr ""
 

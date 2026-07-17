@@ -333,12 +333,17 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			} )
 			.catch( ( error ) => {
 				const attrs = attrsRef.current;
+				const convUpdates = [];
+				if ( text.trim() && 'regenerate' !== type ) {
+					convUpdates.push( { role: 'user', text, ts: new Date().toISOString() } );
+				}
+				convUpdates.push( {
+					role: 'assistant',
+					text: error.message || __( 'Request failed.', 'jeowp' ),
+					ts: new Date().toISOString(),
+				} );
 				setAttributes( {
-					conversation: [ ...( attrs.conversation || [] ), {
-						role: 'assistant',
-						text: error.message || __( 'Request failed.', 'jeowp' ),
-						ts: new Date().toISOString(),
-					} ],
+					conversation: [ ...( attrs.conversation || [] ), ...convUpdates ],
 				} );
 			} )
 			.finally( () => {
@@ -349,12 +354,17 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			// eslint-disable-next-line no-console
 			console.error( '[JEO Minimap] Synchronous error during chat:', syncError );
 			const currentAttrs = attrsRef.current;
+			const convUpdates = [];
+			if ( text.trim() && 'regenerate' !== type ) {
+				convUpdates.push( { role: 'user', text, ts: new Date().toISOString() } );
+			}
+			convUpdates.push( {
+				role: 'assistant',
+				text: syncError.message || __( 'Could not send message.', 'jeowp' ),
+				ts: new Date().toISOString(),
+			} );
 			setAttributes( {
-				conversation: [ ...( currentAttrs.conversation || [] ), {
-					role: 'assistant',
-					text: syncError.message || __( 'Could not send message.', 'jeowp' ),
-					ts: new Date().toISOString(),
-				} ],
+				conversation: [ ...( currentAttrs.conversation || [] ), ...convUpdates ],
 			} );
 			setChatLoading( false );
 			setChatInput( '' );
@@ -434,11 +444,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			.catch( ( error ) => {
 				const currentAttrs = attrsRef.current;
 				setAttributes( {
-					conversation: [ ...( currentAttrs.conversation || [] ), {
-						role: 'assistant',
-						text: error.message || __( 'Request failed.', 'jeowp' ),
-						ts: new Date().toISOString(),
-					} ],
+					conversation: [ ...( currentAttrs.conversation || [] ),
+						{ role: 'user', text: userMsg, ts: new Date().toISOString() },
+						{
+							role: 'assistant',
+							text: error.message || __( 'Request failed.', 'jeowp' ),
+							ts: new Date().toISOString(),
+						},
+					],
 				} );
 			} )
 			.finally( () => {
@@ -450,11 +463,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			console.error( '[JEO Minimap] Synchronous error during chat prompt:', syncError );
 			const currentAttrs = attrsRef.current;
 			setAttributes( {
-				conversation: [ ...( currentAttrs.conversation || [] ), {
-					role: 'assistant',
-					text: syncError.message || __( 'Could not generate from prompt.', 'jeowp' ),
-					ts: new Date().toISOString(),
-				} ],
+				conversation: [ ...( currentAttrs.conversation || [] ),
+					{ role: 'user', text: userMsg, ts: new Date().toISOString() },
+					{
+						role: 'assistant',
+						text: syncError.message || __( 'Could not generate from prompt.', 'jeowp' ),
+						ts: new Date().toISOString(),
+					},
+				],
 			} );
 			setChatLoading( false );
 			setChatPrompt( '' );
@@ -606,6 +622,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					setAttributes( {
 						status: 'error',
 						message: error.message || __( 'Request failed.', 'jeowp' ),
+						conversation: [ ...( attrsRef.current.conversation || [] ),
+							{ role: 'user', text: attributes.prompt, ts: new Date().toISOString() },
+							{
+								role: 'assistant',
+								text: error.message || __( 'Request failed.', 'jeowp' ),
+								ts: new Date().toISOString(),
+							},
+						],
 					} );
 				} );
 		} catch ( syncError ) {
@@ -614,6 +638,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 			setAttributes( {
 				status: 'error',
 				message: syncError.message || __( 'Could not start map generation.', 'jeowp' ),
+				conversation: [ ...( attrsRef.current.conversation || [] ),
+					{ role: 'user', text: attributes.prompt, ts: new Date().toISOString() },
+					{
+						role: 'assistant',
+						text: syncError.message || __( 'Could not start map generation.', 'jeowp' ),
+						ts: new Date().toISOString(),
+					},
+				],
 			} );
 		}
 	}, [ attributes.prompt, setAttributes ] );

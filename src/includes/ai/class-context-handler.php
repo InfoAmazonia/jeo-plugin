@@ -13,6 +13,7 @@ use NeuronAI\Chat\Messages\AssistantMessage;
 use NeuronAI\Chat\Messages\ToolCallMessage;
 use NeuronAI\Chat\Messages\ToolResultMessage;
 use NeuronAI\Chat\Messages\UserMessage;
+use NeuronAI\Exceptions\HttpException;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -379,6 +380,10 @@ class Context_Handler {
 		}
 
 		try {
+			// Persist the user message before calling the agent so it survives
+			// AI failures and is restored on reload.
+			$this->save_chat_message( $post_id, 'user', $message, $user_id );
+
 			$result = $this->run_agent(
 				$post_id,
 				$conversation_id,
@@ -396,7 +401,6 @@ class Context_Handler {
 			// this version so the editor can revisit it after further refinement.
 			$this->save_context_state( $post_id, $conversation_id, $response );
 			$this->append_suggestion_history( $post_id, $message, $response );
-			$this->save_chat_message( $post_id, 'user', $message, $user_id );
 			$this->save_chat_message(
 				$post_id,
 				'assistant',
@@ -453,20 +457,36 @@ class Context_Handler {
 				// Empty response — retry.
 			} catch ( \Exception $e ) {
 				$last_error = $e;
-				$msg        = $e->getMessage();
 
-				// Non-retryable errors: auth, invalid config, rate limit (4xx except 429).
-				if ( preg_match( '/\b4(?:0[0-9]|1[0-7]|2[2-9]|[3-9][0-9])\b/', $msg ) ) {
-					throw $e;
+				// Non-retryable errors: 4xx except 429 (auth, invalid config, bad request).
+				// 429 (rate limit) is retryable.
+				if ( $e instanceof HttpException && $e->response ) {
+					$status = $e->response->statusCode;
+					if ( $status >= 400 && $status < 500 && 429 !== $status ) {
+						throw $e;
+					}
 				}
 
 				// Retryable: network errors, 5xx, 429, timeouts, empty responses, empty body.
 				if ( $attempt >= $max_retries ) {
 					break;
 				}
-				// Continue to next retry.
 			}
 		}
+
+		// Persist the user message to the AI conversation thread so context
+		// is not lost on the next successful call. Using appendToThread (not
+		// saveThread) to avoid clobbering prior history.
+		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
+		$store->appendToThread(
+			$conversation_id,
+			array(
+				array(
+					'role'    => 'user',
+					'content' => $message,
+				),
+			)
+		);
 
 		throw new \Exception(
 			esc_html__( 'The AI did not respond after multiple attempts. Please try again or rephrase your request.', 'jeowp' ),
