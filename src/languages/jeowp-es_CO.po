@@ -3240,27 +3240,27 @@ msgstr "No se encontraron capas coincidentes. Añada capas manualmente o ejecute
 msgid "The AI returned an empty response. Please try again."
 msgstr "La IA devolvió una respuesta vacía. Intente nuevamente."
 
-#: includes/minimap/class-minimap.php:1309
+#: includes/minimap/class-minimap.php:1339
 msgid "Dark Base (Mapbox)"
 msgstr "Base oscura (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1316
+#: includes/minimap/class-minimap.php:1346
 msgid "Terrain Base (Mapbox)"
 msgstr "Base de terreno (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1323
+#: includes/minimap/class-minimap.php:1353
 msgid "Satellite Base (Mapbox)"
 msgstr "Base de satélite (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1334
+#: includes/minimap/class-minimap.php:1364
 msgid "Dark Base"
 msgstr "Base oscura"
 
-#: includes/minimap/class-minimap.php:1343
+#: includes/minimap/class-minimap.php:1373
 msgid "Light Base"
 msgstr "Base clara"
 
-#: includes/minimap/class-minimap.php:1352
+#: includes/minimap/class-minimap.php:1382
 msgid "Satellite Base"
 msgstr "Base de satélite"
 
@@ -4720,7 +4720,7 @@ msgstr "Generar un mapa para esta entrada basado en su contenido."
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr "%d capa(s) devuelta(s) por la IA fue(ron) descartada(s) porque no son capas de mapa publicadas."
 
-#: includes/minimap/class-minimap.php:862
+#: includes/minimap/class-minimap.php:867
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr "El agente intentó eliminar varias capas existentes sin una solicitud explícita. Se mantuvieron para preservar el mapa actual."
 
@@ -4843,15 +4843,15 @@ msgstr "Hash de estilo compuesto no válido."
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "No fue posible obtener uno o más estilos de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1522
+#: includes/maps/class-map-style-composer.php:1528
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "Se requiere la extensión PHP GD para fusionar sprites de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1641
+#: includes/maps/class-map-style-composer.php:1647
 msgid "Could not decode a Mapbox sprite image."
 msgstr "No fue posible decodificar una imagen de sprite de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2358
+#: includes/maps/class-map-style-composer.php:2364
 msgid "Composed style artifact was not found."
 msgstr "No se encontró el artefacto del estilo compuesto."
 
@@ -5002,7 +5002,7 @@ msgid "Your browser could not determine your location. This may be due to strict
 msgstr ""
 
 #. translators: %d: number of preserved layers
-#: includes/minimap/class-minimap.php:954
+#: includes/minimap/class-minimap.php:984
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr ""

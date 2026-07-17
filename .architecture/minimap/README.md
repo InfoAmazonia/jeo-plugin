@@ -283,6 +283,10 @@ After the agent returns, `Minimap::run_agent()` applies two safety nets:
 1. **Base layer fallback**: If `base_layer` is null, creates one using the agent's `base_variant` or the luminance heuristic (`determine_base_variant()`)
 2. **Pin fallback**: If the agent returned no pins and a `post_id` exists, fills pins from `_related_point` post meta
 
+After the refinement guards (`apply_diff_guard`, `preserve_manual_layers`), a third normalization runs:
+
+3. **`default` normalization** (`normalize_layer_defaults()`): Non-toggle layers (`use` not in `swappable`/`switchable`, e.g. `fixed`) are forced `default: true`. This mirrors the composer's visibility-baking rule and the editor's `shouldDisplayLayerInstance`, and guards against the AI omitting or falsifying `default` on fixed layers — which would otherwise render them hidden on the frontend.
+
 ## Editor State Machine
 
 ```mermaid

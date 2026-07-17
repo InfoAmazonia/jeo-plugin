@@ -45,7 +45,7 @@ Registered in `Jeo::init()` (`class-jeo.php:49`).
 | Constant | Value | Purpose |
 |----------|-------|---------|
 | `CACHE_DIR` | `jeo-mapbox-composed-styles` | Subdirectory under `wp_upload_dir()['basedir']` |
-| `CACHE_VERSION` | `12` | Bump to invalidate all artifacts; embedded in hash & metadata |
+| `CACHE_VERSION` | `13` | Bump to invalidate all artifacts; embedded in hash & metadata |
 | `TOKEN_PLACEHOLDER` | `__JEO_MAPBOX_ACCESS_TOKEN__` | Replaces raw `access_token=...` in stored style JSON |
 | `DEFAULT_FALLBACK_SPRITE` | `mapbox://sprites/mapbox/standard` | Used when source sprites lack icons |
 | `VIRTUAL_SCOPE_PREVIEW` | `preview` | Editor preview scope (requires `edit_posts`) |
@@ -82,6 +82,22 @@ Three JSON files written to disk:
 The **manifest** maps JEO layer post IDs → composite style-layer IDs. The **style** is the
 renderable Mapbox Style JSON. Frontend uses the manifest to drive per-JEO-layer visibility,
 interactions, and popups over the composite style layers.
+
+### Initial Visibility Semantics
+
+The composer bakes each layer's initial `layout.visibility` into `style.json` using a
+rule that mirrors the editor's `shouldDisplayLayerInstance`
+(`mapbox-style-preview.js:34-39`):
+
+- **Non-toggle layers** (`use` not in `swappable`/`switchable`, e.g. `fixed`) → **visible**
+  by default, regardless of `default`.
+- **Toggle layers** (`use` ∈ `swappable`/`switchable`) → visible only when
+  `default === true`.
+
+The frontend (`class-jeo-map.js`) does **not** re-derive visibility at runtime — it trusts
+the baked value. The editor (`mapbox-style-preview.js::applyComposedVisibilityFromSettings`)
+applies the same rule on top of the baked artifact, so editor and frontend stay consistent.
+If you change this rule, bump `CACHE_VERSION` so stale artifacts regenerate.
 
 ## REST Endpoints
 

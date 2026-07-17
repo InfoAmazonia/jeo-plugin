@@ -25,7 +25,7 @@ class Map_Style_Composer {
 	use Singleton;
 
 	const CACHE_DIR               = 'jeo-mapbox-composed-styles';
-	const CACHE_VERSION           = 12;
+	const CACHE_VERSION           = 13;
 	const TOKEN_PLACEHOLDER       = '__JEO_MAPBOX_ACCESS_TOKEN__';
 	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/standard';
 	const VIRTUAL_SCOPE_PREVIEW   = 'preview';
@@ -1212,7 +1212,10 @@ class Map_Style_Composer {
 			}
 
 			$manifest_layers = array();
-			$initial_visible = true === $bundle['ref']['default'];
+			// Visibility mirrors the editor's shouldDisplayLayerInstance semantics:
+			// a layer is visible unless it is a non-default toggle (swappable/switchable) layer.
+			$is_toggle       = in_array( $bundle['ref']['use'] ?? '', array( 'swappable', 'switchable' ), true );
+			$initial_visible = ! $is_toggle || true === $bundle['ref']['default'];
 			foreach ( $bundle['style']['layers'] ?? array() as $layer ) {
 				if ( ! is_array( $layer ) || empty( $layer['id'] ) || ! isset( $layer_id_map[ $layer['id'] ] ) ) {
 					continue;
@@ -1366,7 +1369,10 @@ class Map_Style_Composer {
 		$prefix    = $this->make_prefix( $context, $ref );
 		$source_id = $prefix . 'src_' . $this->slug_id( $ref['slug'] );
 		$layer_id  = $prefix . $this->slug_id( $ref['slug'] );
-		$visible   = true === $ref['default'];
+		// Visibility mirrors the editor's shouldDisplayLayerInstance semantics:
+		// a layer is visible unless it is a non-default toggle (swappable/switchable) layer.
+		$is_toggle = in_array( $ref['use'] ?? '', array( 'swappable', 'switchable' ), true );
+		$visible   = ! $is_toggle || true === $ref['default'];
 
 		if ( in_array( $ref['type'], array( 'mapbox-tileset-raster', 'mapbox-tileset-vector' ), true ) ) {
 			$tileset_url = $this->normalize_tileset_url( $options['tileset_id'] ?? '' );

@@ -77,7 +77,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		const [ firstLayer, ...otherLayers ] = attributes.layers;
 		if ( firstLayer && firstLayer.use !== 'fixed' ) {
 			setLayers( [
-				{ ...firstLayer, use: 'fixed', default: false },
+				{ ...firstLayer, use: 'fixed', default: true },
 				...otherLayers,
 			] );
 		}

@@ -440,6 +440,11 @@ class Minimap {
 			$result = $this->preserve_manual_layers( $previous_state, $result );
 		}
 
+		// Normalize `default` so non-toggle layers are always visible by default.
+		// Mirrors the editor's shouldDisplayLayerInstance + the composer's
+		// visibility-baking rule, guarding against AI omitting or falsifying the field.
+		$result->layers = $this->normalize_layer_defaults( $result->layers );
+
 		$this->persist_minimap_summary( $post_id, $conversation_id, $result, $message );
 
 		return $result;
@@ -895,6 +900,31 @@ class Minimap {
 				$layer_def['provenance'] = 'manual';
 			} else {
 				$layer_def['provenance'] = 'ai';
+			}
+		}
+		unset( $layer_def );
+
+		return $layers;
+	}
+
+	/**
+	 * Normalize the `default` field of each layer.
+	 *
+	 * Non-toggle layers (use not in swappable/switchable, e.g. fixed) are forced
+	 * `default: true`, mirroring the editor's shouldDisplayLayerInstance semantics
+	 * and the composer's visibility-baking rule. Toggle layers keep their value.
+	 *
+	 * Guards against AI output omitting or falsifying `default` on fixed layers,
+	 * which would otherwise render them hidden on the frontend.
+	 *
+	 * @param array $layers Layer definitions.
+	 * @return array
+	 */
+	private function normalize_layer_defaults( array $layers ): array {
+		foreach ( $layers as &$layer_def ) {
+			$use = $layer_def['use'] ?? 'fixed';
+			if ( ! in_array( $use, array( 'swappable', 'switchable' ), true ) ) {
+				$layer_def['default'] = true;
 			}
 		}
 		unset( $layer_def );
