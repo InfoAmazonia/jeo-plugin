@@ -8,7 +8,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "POT-Creation-Date: 2026-06-09T19:53:28+00:00\n"
-"PO-Revision-Date: 2026-06-23 15:37-0300\n"
+"PO-Revision-Date: 2026-07-17 12:00-0300\n"
 "Language: pt_BR\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: Poedit 3.9\n"
@@ -4572,9 +4572,7 @@ msgstr "Este embed JEO não está disponível."
 
 #: includes/class-jeo.php:1694
 msgid "Embed not available"
-msgstr ""
-"Embed indisponível\n"
-"develop"
+msgstr "Embed indisponível"
 
 #: includes/ai/class-context-agent.php:265
 msgid "No AI provider is configured. Set one in JEO AI Settings."
@@ -4947,39 +4945,37 @@ msgstr "Atualizando cache de estilos compostos"
 
 #: js/build/layersSidebar.js:11
 msgid "Refresh composed style cache"
-msgstr ""
-"Atualizar cache de estilos compostos\n"
-"develop"
+msgstr "Atualizar cache de estilos compostos"
 
 #. translators: %s: linked URL
 #: includes/ai/class-context-handler.php:670
 #, php-format
 msgid "Link to %s removed: not listed in references."
-msgstr ""
+msgstr "Link para %s removido: não listado nas referências."
 
 #: includes/ai/class-context-handler.php:687
 msgid "Verification notes:"
-msgstr ""
+msgstr "Notas de verificação:"
 
 #: js/build/mapBlocks.js:1
 msgid "Save the post before generating the map."
-msgstr ""
+msgstr "Salve o post antes de gerar o mapa."
 
 #: js/build/mapBlocks.js:1
 msgid "Could not start map generation."
-msgstr ""
+msgstr "Não foi possível iniciar a geração do mapa."
 
 #: js/build/mapBlocks.js:1
 msgid "Could not send message."
-msgstr ""
+msgstr "Não foi possível enviar a mensagem."
 
 #: js/build/mapBlocks.js:1
 msgid "Could not generate from prompt."
-msgstr ""
+msgstr "Não foi possível gerar a partir do prompt."
 
 #: jeo.php:36
 msgid "JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated."
-msgstr ""
+msgstr "Erro no Plugin JEO: Sua versão do PHP é muito antiga. Os recursos de IA do JEO exigem PHP 8.2 ou superior. O plugin permanecerá desativado."
 
 #: js/build/storiesNearYou.js:1
 msgid "You denied location access. Please enable location permissions in your browser settings."
@@ -5005,4 +5001,4 @@ msgstr "Seu navegador não conseguiu determinar sua localização. Isso pode oco
 #: includes/minimap/class-minimap.php:984
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
-msgstr ""
+msgstr "%d camada(s) adicionada(s) manualmente preservada(s) durante o refinamento da IA."
