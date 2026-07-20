@@ -239,7 +239,7 @@ Returns: `{ html: "..." }` — rendered HTML using the active context's classes.
 
 ## SQL Query
 
-Uses `ST_Distance_Sphere()` to compute distance for radius filtering. UNION of primary (`_geocode_lat_p`/`_geocode_lon_p`) and secondary (`_geocode_lat_s`/`_geocode_lon_s`) coordinate indexes. Each SELECT includes a `HAVING distance <= radius_meters` clause that filters posts to within the configured `radius` (km × 1000). Results are ordered by `post_date DESC` (most recent first). Dynamic taxonomy JOINs for category/tag/custom taxonomy filtering. Exclusion sub-queries for category/tag exclusions. Deduplicates post IDs after UNION. Supports `excludeIds` via `NOT IN` clause for cross-block non-repetition. When no posts are found within the radius, an explanatory empty state is rendered.
+Uses `ST_Distance_Sphere()` to compute distance per geolocated point. Coordinates are paired with `ROW_NUMBER()` over the primary (`_geocode_lat_p` / `_geocode_lon_p`) and secondary (`_geocode_lat_s` / `_geocode_lon_s`) index metas, so posts with multiple points are evaluated using each point individually. The results are aggregated per post with `MIN(distance)`, and the outer `HAVING MIN(distance) <= radius_meters` keeps posts where **any** point is within the configured `radius` (km × 1000). Results are ordered by `post_date DESC` (most recent first) by default, with `nearest` and `relevance` modes also available. Dynamic taxonomy JOINs for category/tag/custom taxonomy filtering. Exclusion sub-queries for category/tag exclusions. Supports `excludeIds` via `NOT IN` clause for cross-block non-repetition. When no posts are found within the radius, an explanatory empty state is rendered.
 
 ## Webpack Entry
 

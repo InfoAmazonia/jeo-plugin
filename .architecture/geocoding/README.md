@@ -89,7 +89,7 @@ sequenceDiagram
     S->>L: Renders Leaflet map
     S->>AJAX: Fetches existing points (_related_point)
     L-->>S: Shows existing markers
-    
+
     Note over S: User clicks on map
     L->>AJAX: reverse_geocode(lat, lon)
     AJAX-->>L: Full address

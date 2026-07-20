@@ -993,32 +993,61 @@ class Stories_Near_You {
 			$order_params[]  = $date_weight;
 		}
 
+		// Pair latitude and longitude for each point using ROW_NUMBER().
+		// The index metas _geocode_lat_* and _geocode_lon_* are stored as
+		// separate multi-value rows, so we use the meta insertion order to keep
+		// each coordinate pair aligned. This allows posts with multiple
+		// geolocated points to be evaluated correctly (nearest point wins).
+		$points_template = "
+			SELECT lon.post_id,
+				CAST(lon.meta_value AS DECIMAL(10,{$coord_precision})) AS lon,
+				CAST(lat.meta_value AS DECIMAL(10,{$coord_precision})) AS lat
+			FROM (
+				SELECT post_id, meta_value,
+					ROW_NUMBER() OVER (PARTITION BY post_id ORDER BY meta_id) AS rn
+				FROM {$wpdb->postmeta}
+				WHERE meta_key = '_geocode_lon_p'
+			) lon
+			INNER JOIN (
+				SELECT post_id, meta_value,
+					ROW_NUMBER() OVER (PARTITION BY post_id ORDER BY meta_id) AS rn
+				FROM {$wpdb->postmeta}
+				WHERE meta_key = '_geocode_lat_p'
+			) lat
+			ON lon.post_id = lat.post_id AND lon.rn = lat.rn
+		";
+
+		$primary_points   = $points_template;
+		$secondary_points = str_replace(
+			array( '_geocode_lon_p', '_geocode_lat_p' ),
+			array( '_geocode_lon_s', '_geocode_lat_s' ),
+			$points_template
+		);
+
 		// Discard rows with invalid or sentinel coordinates (out of range, or the
 		// (0,0) placeholder left by failed/empty geocoding). Without this guard,
 		// posts with bad coordinates surface as bogus "nearby" results.
-		$lon_expr    = "CAST(tlon.meta_value AS DECIMAL(10,{$coord_precision}))";
-		$lat_expr    = "CAST(tlat.meta_value AS DECIMAL(10,{$coord_precision}))";
-		$coord_guard = "
-				AND {$lon_expr} BETWEEN -180 AND 180
-				AND {$lat_expr} BETWEEN -90 AND 90
-				AND NOT ( {$lon_expr} = 0 AND {$lat_expr} = 0 )";
+		$coord_guard = '
+			WHERE all_points.lon BETWEEN -180 AND 180
+				AND all_points.lat BETWEEN -90 AND 90
+				AND NOT (all_points.lon = 0 AND all_points.lat = 0)';
 
-		$primary_template = "
-			SELECT p.ID, p.post_date,
-				ST_Distance_Sphere(POINT(%f, %f), POINT(CAST(tlon.meta_value AS DECIMAL(10,{$coord_precision})), CAST(tlat.meta_value AS DECIMAL(10,{$coord_precision})))) AS distance
+		$sql = "
+			SELECT p.ID, p.post_date, MIN(pts.distance) AS distance
 			FROM {$wpdb->posts} p
 			INNER JOIN (
-				SELECT post_id, meta_value
-				FROM {$wpdb->postmeta}
-				WHERE meta_key = '_geocode_lon_p'
-				GROUP BY post_id
-			) tlon ON p.ID = tlon.post_id
-			INNER JOIN (
-				SELECT post_id, meta_value
-				FROM {$wpdb->postmeta}
-				WHERE meta_key = '_geocode_lat_p'
-				GROUP BY post_id
-			) tlat ON p.ID = tlat.post_id
+				SELECT post_id,
+					ST_Distance_Sphere(
+						POINT(%f, %f),
+						POINT(all_points.lon, all_points.lat)
+					) AS distance
+				FROM (
+					{$primary_points}
+					UNION ALL
+					{$secondary_points}
+				) all_points
+				{$coord_guard}
+			) pts ON p.ID = pts.post_id
 			{$taxonomy_join}
 			{$wpml_join}
 			WHERE p.post_status = 'publish'
@@ -1027,23 +1056,12 @@ class Stories_Near_You {
 				{$wpml_where}
 				{$exclude_clause}
 				{$date_clause}
-				{$coord_guard}
-			HAVING distance <= %f";
+			GROUP BY p.ID, p.post_date
+			HAVING MIN(pts.distance) <= %f
+			ORDER BY {$order_by_sql}
+			LIMIT %d";
 
-		$secondary_template = str_replace(
-			array( '_geocode_lon_p', '_geocode_lat_p' ),
-			array( '_geocode_lon_s', '_geocode_lat_s' ),
-			$primary_template
-		);
-
-		$union_sql  = $primary_template . ' UNION ' . $secondary_template . ' ORDER BY ' . $order_by_sql . ' LIMIT %d';
 		$all_params = array_merge(
-			array( $lng, $lat ),
-			$types,
-			$taxonomy_params,
-			$exclude_params,
-			$date_params,
-			array( $radius_meters ),
 			array( $lng, $lat ),
 			$types,
 			$taxonomy_params,
@@ -1054,7 +1072,7 @@ class Stories_Near_You {
 			array( $limit )
 		);
 
-		$prepared_sql = $wpdb->prepare( $union_sql, $all_params ); // phpcs:ignore WordPress.DB.PreparedSQL
+		$prepared_sql = $wpdb->prepare( $sql, $all_params ); // phpcs:ignore WordPress.DB.PreparedSQL
 		$results      = $wpdb->get_results( $prepared_sql ); // phpcs:ignore WordPress.DB.PreparedSQL
 
 		if ( empty( $results ) ) {

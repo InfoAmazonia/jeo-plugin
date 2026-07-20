@@ -4723,7 +4723,7 @@ msgid "The agent tried to remove several existing layers without an explicit req
 msgstr "O agente tentou remover várias camadas existentes sem uma solicitação explícita. Elas foram mantidas para preservar o mapa atual."
 
 #. translators: %s: search radius in kilometers
-#: includes/stories-near-you/class-stories-near-you.php:1105
+#: includes/stories-near-you/class-stories-near-you.php:1123
 #, php-format
 msgid "No stories found within %s km of your location."
 msgstr "Nenhuma história encontrada num raio de %s km da sua localização."
