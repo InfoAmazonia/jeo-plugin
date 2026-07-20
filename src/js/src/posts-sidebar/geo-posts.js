@@ -283,7 +283,7 @@ class JeoGeocodePosts extends Component {
 			}
 
 			const rawLat = this.state.magneticMarkers ? this.getProperty( result, 'lat' ) : lat;
-			const rawLon = this.state.magneticMarkers ? this.getProperty( result, 'lng' ) : lng;
+			const rawLon = this.state.magneticMarkers ? this.getProperty( result, 'lon' ) : lng;
 
 			const foundPoint = {
 				_geocode_lat: parseFloat( String( rawLat || 0 ).replace( ',', '.' ) ),
@@ -356,7 +356,7 @@ class JeoGeocodePosts extends Component {
 	onMarkerDragged( e ) {
 		const marker = e.target;
 		const latLng = marker.getLatLng();
-		this.onLocationFound( { lat: latLng.lat, lng: latLng.lng } );
+		this.onLocationFound( { lat: latLng.lat, lon: latLng.lng } );
 		this.setState( { loadStatus: 'pending' } );
 	}
 
