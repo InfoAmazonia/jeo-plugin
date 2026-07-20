@@ -30,7 +30,7 @@ jobs:
       PLUGIN_CHECK_RESULTS: /tmp/plugin-check-results.txt
     steps:
     - uses: actions/checkout@v7
-    - uses: actions/setup-node@v6
+    - uses: actions/setup-node@v7
       with:
         node-version: 24
         cache: npm
