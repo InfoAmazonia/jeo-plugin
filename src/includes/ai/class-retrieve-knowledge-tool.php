@@ -27,7 +27,7 @@ class Retrieve_Knowledge_Tool extends Tool {
 	public function __construct() {
 		parent::__construct(
 			name: 'retrieve_knowledge',
-			description: 'Search the site\'s vectorized knowledge base for articles semantically related to a given query. Returns post titles, excerpts, URLs, and relevance scores.',
+			description: 'Search the site\'s vectorized knowledge base for articles semantically related to a given query. Returns post titles, excerpts, URLs, publication dates, and relevance scores.',
 		);
 	}
 
@@ -94,11 +94,21 @@ class Retrieve_Knowledge_Tool extends Tool {
 				$post_id = (int) ( $doc->metadata['post_id'] ?? 0 );
 				$post    = $post_id ? get_post( $post_id ) : null;
 
+				$doc_date = $doc->metadata['date'] ?? ( $post ? $post->post_date : '' );
+				$iso_date = '';
+				if ( $doc_date ) {
+					$timestamp = strtotime( $doc_date );
+					if ( false !== $timestamp ) {
+						$iso_date = gmdate( 'Y-m-d', $timestamp );
+					}
+				}
+
 				$results[] = array(
 					'post_id' => $post_id,
 					'title'   => $post ? $post->post_title : ( $doc->metadata['title'] ?? '' ),
 					'excerpt' => $post ? get_the_excerpt( $post ) : mb_strimwidth( $doc->getContent(), 0, 300, '...' ),
 					'url'     => $post_id ? get_permalink( $post_id ) : '',
+					'date'    => $iso_date,
 					'score'   => $doc->getScore(),
 				);
 				++$count;

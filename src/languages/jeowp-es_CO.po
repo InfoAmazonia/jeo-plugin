@@ -4574,11 +4574,11 @@ msgstr "Este embed de JEO no está disponible."
 msgid "Embed not available"
 msgstr "Embed no disponible"
 
-#: includes/ai/class-context-agent.php:266
+#: includes/ai/class-context-agent.php:270
 msgid "No AI provider is configured. Set one in JEO AI Settings."
 msgstr "Ningún proveedor de IA configurado. Configure uno en los ajustes de IA de JEO."
 
-#: includes/ai/class-context-agent.php:304
+#: includes/ai/class-context-agent.php:308
 msgid "The AI returned an empty prompt engineering response."
 msgstr "La IA devolvió una respuesta vacía de ingeniería de prompt."
 

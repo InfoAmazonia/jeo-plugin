@@ -79,6 +79,10 @@ Every article used to build the paragraph must also appear in the `references` a
 ### 4. Language
 
 Respond in the same language as the article being edited.
+
+### 5. Recency Tie-Breaking
+
+When two or more retrieved articles have similar relevance scores (i.e. no clear semantic winner), prefer the more recently published one. Each `retrieve_knowledge` result includes a `date` field (ISO `Y-m-d`) for this purpose. Recency is a tie-breaker ONLY — a clearly more relevant older article still wins over a marginally more recent one. Do not favor recent articles when their content is demonstrably less on-topic.
 RULES;
 	}
 
