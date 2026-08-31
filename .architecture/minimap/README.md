@@ -292,9 +292,16 @@ After the agent returns, `Minimap::run_agent()` applies two safety nets:
 1. **Base layer fallback**: If `base_layer` is null, creates one using the agent's `base_variant` or the luminance heuristic (`determine_base_variant()`)
 2. **Pin fallback**: If the agent returned no pins and a `post_id` exists, fills pins from `_related_point` post meta
 
-After the refinement guards (`apply_diff_guard`, `preserve_manual_layers`), a third normalization runs:
+After the refinement guards (`apply_diff_guard`, `preserve_manual_layers`), two normalizations run:
 
 3. **`default` normalization** (`normalize_layer_defaults()`): Non-toggle layers (`use` not in `swappable`/`switchable`, e.g. `fixed`) are forced `default: true`. This mirrors the composer's visibility-baking rule and the editor's `shouldDisplayLayerInstance`, and guards against the AI omitting or falsifying `default` on fixed layers — which would otherwise render them hidden on the frontend.
+
+4. **Render order normalization** (`normalize_layer_render_order()`): Layers are stable-sorted bottom-to-top as **raster → vector** so opaque rasters never hide vector data behind them. The base layer is stored separately and always rendered below everything. Classification comes from the layer CPT `type` meta:
+    - Raster group (bottom): `tilelayer`, `mapbox-tileset-raster`, and `mapbox` styles whose style JSON contains any `type: "raster"` sub-layer (fetched from the Mapbox Styles API with per-layer token fallback, cached in a transient — 24h on success, 5min on failure).
+    - Vector group (top): `mvt`, `mapbox-tileset-vector`, purely vector `mapbox` styles, and unknown types.
+    - **Conservative fallback**: when a `mapbox` style cannot be fetched/parsed it is treated as raster, so genuine vector layers always stay visible above it.
+
+    All render paths (editor preview, frontend `JeoMap`, and the composed Mapbox style composer) stack layers in the `layers` array order, so this single normalization covers them all. The same normalization is applied in the legacy `/minimap/setup` RAG path. Blocks saved before this rule and manual library additions keep their stored order until the next AI interaction (the diff guard compares IDs only, so reordering never triggers it).
 
 ## Editor State Machine
 

@@ -118,7 +118,7 @@ You MUST always return a valid minimap configuration with layers, center coordin
 
 You MUST respond with a valid Minimap_Output JSON object:
 
-- `layers`: Array of layer definitions. Each has: `id` (int, from search_layers results), `use` ("fixed"), `default` (true), `show_legend` (true/false), `reason` (optional string — briefly explain why this layer is relevant to the map).
+- `layers`: Array of layer definitions, ordered bottom-to-top: raster layers first, then vector layers (opaque rasters must never hide vector data). Each has: `id` (int, from search_layers results), `use` ("fixed"), `default` (true), `show_legend` (true/false), `reason` (optional string — briefly explain why this layer is relevant to the map).
 - `base_layer`: Object with `id`, `use`, `default`, `show_legend`, `load_as_style`, `variant`. If you don't know a specific base layer ID, set this to null and the system will create one.
 - `center_lat`, `center_lon`: Map center coordinates.
 - `initial_zoom`: Zoom level (0–20). Use ~2–4 for country/region, ~8–12 for city-level.
@@ -134,6 +134,7 @@ You MUST respond with a valid Minimap_Output JSON object:
 ## Design Principles
 
 - Prioritize vector layers over raster for thematic data.
+- Order `layers` bottom-to-top: raster layers first, vector layers last — raster imagery is often opaque and would hide vector data rendered below it.
 - Keep the number of layers reasonable (3–7 typically).
 - Choose zoom levels appropriate to the geographic scope.
 - Consider editorial context: environmental stories may benefit from satellite base, political stories from light base.

@@ -171,6 +171,10 @@ class Minimap {
 			$rag_message = $rag_message ? $rag_message : __( 'No matching layers found. Add layers manually or run the RAG indexer in JEO Settings.', 'jeowp' );
 		}
 
+		// Enforce render order: raster layers below vector layers so opaque
+		// rasters never hide vector data.
+		$layers = $this->normalize_layer_render_order( $layers );
+
 		$base_variant = $this->determine_base_variant( $layers );
 		$base_layer   = $this->get_or_create_base_layer( $base_variant );
 
@@ -472,6 +476,11 @@ class Minimap {
 		// Mirrors the editor's shouldDisplayLayerInstance + the composer's
 		// visibility-baking rule, guarding against AI omitting or falsifying the field.
 		$result->layers = $this->normalize_layer_defaults( $result->layers );
+
+		// Enforce render order: raster layers below vector layers so opaque
+		// rasters never hide vector data. Runs after every guard so restored
+		// or merged layers are ordered as well.
+		$result->layers = $this->normalize_layer_render_order( $result->layers );
 
 		$this->persist_minimap_summary( $post_id, $conversation_id, $result, $message );
 
@@ -958,6 +967,165 @@ class Minimap {
 		unset( $layer_def );
 
 		return $layers;
+	}
+
+	/**
+	 * Normalize the render order of the returned layers.
+	 *
+	 * Raster layers (tilelayer, mapbox-tileset-raster, and Mapbox styles whose
+	 * style JSON contains raster sub-layers) are placed before vector layers
+	 * (mvt, mapbox-tileset-vector, and purely vector Mapbox styles). Opaque
+	 * rasters can therefore never hide vector data behind them. The base layer
+	 * is stored separately and always rendered below every thematic layer.
+	 *
+	 * usort() is stable since PHP 8.0, so the relative order inside each
+	 * group is preserved. Editor preview, frontend rendering, and the composed
+	 * Mapbox style all stack layers in this array order.
+	 *
+	 * @param array $layers Layer definitions.
+	 * @return array
+	 */
+	private function normalize_layer_render_order( array $layers ): array {
+		if ( count( $layers ) < 2 ) {
+			return $layers;
+		}
+
+		$groups = array();
+		foreach ( $layers as $layer_def ) {
+			$layer_id = (int) ( $layer_def['id'] ?? 0 );
+			if ( ! isset( $groups[ $layer_id ] ) ) {
+				$groups[ $layer_id ] = $this->get_layer_render_group( $layer_id );
+			}
+		}
+
+		usort(
+			$layers,
+			function ( $a, $b ) use ( $groups ) {
+				$group_a = $groups[ (int) ( $a['id'] ?? 0 ) ] ?? 1;
+				$group_b = $groups[ (int) ( $b['id'] ?? 0 ) ] ?? 1;
+				return $group_a <=> $group_b;
+			}
+		);
+
+		return $layers;
+	}
+
+	/**
+	 * Return the render group of a layer: 0 = raster (bottom), 1 = vector (top).
+	 *
+	 * @param int $layer_id Layer CPT post ID.
+	 * @return int
+	 */
+	private function get_layer_render_group( int $layer_id ): int {
+		if ( ! $layer_id ) {
+			return 1;
+		}
+
+		$layer_type = get_post_meta( $layer_id, 'type', true );
+
+		if ( in_array( $layer_type, array( 'tilelayer', 'mapbox-tileset-raster' ), true ) ) {
+			return 0;
+		}
+
+		if ( 'mapbox' === $layer_type ) {
+			return $this->mapbox_style_has_raster_layers( $layer_id ) ? 0 : 1;
+		}
+
+		// mvt, mapbox-tileset-vector and unknown types render above rasters.
+		return 1;
+	}
+
+	/**
+	 * Whether a Mapbox style layer contains raster sub-layers.
+	 *
+	 * Fetches the style JSON from the Mapbox Styles API and checks whether any
+	 * of its layers is of type "raster". Results are cached in a transient so
+	 * chat refinements do not trigger an API call per message.
+	 *
+	 * Conservative fallback: when the style cannot be fetched or parsed the
+	 * layer is treated as raster (bottom group) so genuine vector layers
+	 * always stay visible above it.
+	 *
+	 * @param int $layer_id Layer CPT post ID.
+	 * @return bool
+	 */
+	private function mapbox_style_has_raster_layers( int $layer_id ): bool {
+		$options = get_post_meta( $layer_id, 'layer_type_options', true );
+		$options = is_array( $options ) ? $options : array();
+
+		$style_id = ! empty( $options['style_id'] )
+			? $this->normalize_mapbox_style_id( (string) $options['style_id'] )
+			: null;
+
+		if ( ! $style_id ) {
+			return true;
+		}
+
+		$token = ! empty( $options['access_token'] )
+			? (string) $options['access_token']
+			: (string) \jeo_settings()->get_option( 'mapbox_key', '' );
+
+		if ( '' === $token ) {
+			return true;
+		}
+
+		$cache_key = 'jeo_minimap_mapbox_style_raster_' . md5( $style_id . '|' . $token );
+		$cached    = get_transient( $cache_key );
+		if ( false !== $cached ) {
+			return 'raster' === $cached;
+		}
+
+		$response = wp_remote_get(
+			add_query_arg(
+				'access_token',
+				$token,
+				'https://api.mapbox.com/styles/v1/' . ltrim( $style_id, '/' )
+			),
+			array( 'timeout' => 10 )
+		);
+
+		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+			// Short TTL so transient failures self-heal.
+			set_transient( $cache_key, 'raster', 5 * MINUTE_IN_SECONDS );
+			return true;
+		}
+
+		$style = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( ! is_array( $style ) ) {
+			set_transient( $cache_key, 'raster', 5 * MINUTE_IN_SECONDS );
+			return true;
+		}
+
+		$has_raster = false;
+		foreach ( $style['layers'] ?? array() as $style_layer ) {
+			if ( isset( $style_layer['type'] ) && 'raster' === $style_layer['type'] ) {
+				$has_raster = true;
+				break;
+			}
+		}
+
+		set_transient( $cache_key, $has_raster ? 'raster' : 'vector', DAY_IN_SECONDS );
+		return $has_raster;
+	}
+
+	/**
+	 * Normalize a Mapbox style ID to its "username/id" form.
+	 *
+	 * @param string $value Raw style ID (may be a mapbox:// or API URL).
+	 * @return string|null Normalized ID or null when empty.
+	 */
+	private function normalize_mapbox_style_id( string $value ): ?string {
+		$value = trim( $value );
+		if ( '' === $value ) {
+			return null;
+		}
+
+		$value = preg_replace( '#^mapbox://styles/#', '', $value );
+		$value = preg_replace( '#^https://api\.mapbox\.com/styles/v1/#', '', $value );
+		$value = strtok( $value, '?' );
+		$value = trim( (string) $value, '/' );
+
+		return '' === $value ? null : $value;
 	}
 
 	/**
