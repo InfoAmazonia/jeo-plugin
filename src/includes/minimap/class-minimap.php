@@ -1038,9 +1038,10 @@ class Minimap {
 	/**
 	 * Whether a Mapbox style layer contains raster sub-layers.
 	 *
-	 * Fetches the style JSON from the Mapbox Styles API and checks whether any
-	 * of its layers is of type "raster". Results are cached in a transient so
-	 * chat refinements do not trigger an API call per message.
+	 * Fetches the style JSON via the shared `Jeo::fetch_mapbox_style()` helper
+	 * (transient-cached) and checks whether any of its layers is of type
+	 * "raster". The classification itself is cached in a longer transient so
+	 * chat refinements do not reclassify layers on every message.
 	 *
 	 * Conservative fallback: when the style cannot be fetched or parsed the
 	 * layer is treated as raster (bottom group) so genuine vector layers
@@ -1054,7 +1055,7 @@ class Minimap {
 		$options = is_array( $options ) ? $options : array();
 
 		$style_id = ! empty( $options['style_id'] )
-			? $this->normalize_mapbox_style_id( (string) $options['style_id'] )
+			? \Jeo::normalize_mapbox_style_id( (string) $options['style_id'] )
 			: null;
 
 		if ( ! $style_id ) {
@@ -1063,7 +1064,7 @@ class Minimap {
 
 		$token = ! empty( $options['access_token'] )
 			? (string) $options['access_token']
-			: (string) \jeo_settings()->get_option( 'mapbox_key', '' );
+			: trim( (string) \jeo_settings()->get_option( 'mapbox_key' ) );
 
 		if ( '' === $token ) {
 			return true;
@@ -1075,23 +1076,10 @@ class Minimap {
 			return 'raster' === $cached;
 		}
 
-		$response = wp_remote_get(
-			add_query_arg(
-				'access_token',
-				$token,
-				'https://api.mapbox.com/styles/v1/' . ltrim( $style_id, '/' )
-			),
-			array( 'timeout' => 10 )
-		);
+		$style = \Jeo::fetch_mapbox_style( $style_id, $token, array( 'timeout' => 10 ) );
 
-		if ( is_wp_error( $response ) || 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+		if ( is_wp_error( $style ) ) {
 			// Short TTL so transient failures self-heal.
-			set_transient( $cache_key, 'raster', 5 * MINUTE_IN_SECONDS );
-			return true;
-		}
-
-		$style = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( ! is_array( $style ) ) {
 			set_transient( $cache_key, 'raster', 5 * MINUTE_IN_SECONDS );
 			return true;
 		}
@@ -1106,26 +1094,6 @@ class Minimap {
 
 		set_transient( $cache_key, $has_raster ? 'raster' : 'vector', DAY_IN_SECONDS );
 		return $has_raster;
-	}
-
-	/**
-	 * Normalize a Mapbox style ID to its "username/id" form.
-	 *
-	 * @param string $value Raw style ID (may be a mapbox:// or API URL).
-	 * @return string|null Normalized ID or null when empty.
-	 */
-	private function normalize_mapbox_style_id( string $value ): ?string {
-		$value = trim( $value );
-		if ( '' === $value ) {
-			return null;
-		}
-
-		$value = preg_replace( '#^mapbox://styles/#', '', $value );
-		$value = preg_replace( '#^https://api\.mapbox\.com/styles/v1/#', '', $value );
-		$value = strtok( $value, '?' );
-		$value = trim( (string) $value, '/' );
-
-		return '' === $value ? null : $value;
 	}
 
 	/**

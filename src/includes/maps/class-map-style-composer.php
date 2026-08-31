@@ -440,8 +440,52 @@ class Map_Style_Composer {
 	public function invalidate_layer_cache( $post_id, $post, $update ) {
 		unset( $post, $update );
 
+		$this->purge_layer_style_cache( absint( $post_id ) );
+
 		foreach ( $this->get_map_ids_for_layer( $post_id ) as $map_id ) {
 			$this->invalidate_map_cache( absint( $map_id ), null, true );
+		}
+	}
+
+	/**
+	 * Purge the shared Mapbox style JSON cache for a layer post.
+	 *
+	 * Resolves the layer's style ID and token the same way the composer refs
+	 * do (per-layer token with global fallback) so the cache key matches.
+	 *
+	 * @param int $layer_id Layer post ID.
+	 * @return void
+	 */
+	private function purge_layer_style_cache( $layer_id ) {
+		if ( 'mapbox' !== (string) get_post_meta( $layer_id, 'type', true ) ) {
+			return;
+		}
+
+		$options = get_post_meta( $layer_id, 'layer_type_options', true );
+		if ( ! is_array( $options ) || empty( $options['style_id'] ) ) {
+			return;
+		}
+
+		$token = ! empty( $options['access_token'] )
+			? (string) $options['access_token']
+			: trim( (string) \jeo_settings()->get_option( 'mapbox_key' ) );
+
+		\Jeo::delete_mapbox_style_cache( (string) $options['style_id'], $token );
+	}
+
+	/**
+	 * Purge the shared Mapbox style JSON cache for the mapbox refs of a context.
+	 *
+	 * @param array $refs Composer refs.
+	 * @return void
+	 */
+	private function purge_ref_style_caches( array $refs ) {
+		foreach ( $refs as $ref ) {
+			if ( 'mapbox' !== ( $ref['type'] ?? '' ) || empty( $ref['styleId'] ) ) {
+				continue;
+			}
+
+			\Jeo::delete_mapbox_style_cache( (string) $ref['styleId'], (string) ( $ref['token'] ?? '' ) );
 		}
 	}
 
@@ -534,6 +578,12 @@ class Map_Style_Composer {
 
 		if ( ! wp_mkdir_p( $paths['dir'] ) ) {
 			return new WP_Error( 'jeo_mapbox_composer_cache_dir', __( 'Could not create the Mapbox composed style cache directory.', 'jeowp' ) );
+		}
+
+		if ( $force_refresh ) {
+			// Force-refresh must also bypass the shared style JSON cache,
+			// otherwise recomposition would reuse stale Mapbox styles.
+			$this->purge_ref_style_caches( $context['refs'] );
 		}
 
 		$composed = $this->compose_context( $context, $paths );
@@ -836,7 +886,7 @@ class Map_Style_Composer {
 				continue;
 			}
 
-			$style_id = 'mapbox' === $type ? $this->normalize_style_id( $options['style_id'] ?? '' ) : null;
+			$style_id = 'mapbox' === $type ? \Jeo::normalize_mapbox_style_id( $options['style_id'] ?? '' ) : null;
 			if ( 'mapbox' === $type && ! $style_id ) {
 				continue;
 			}
@@ -1064,7 +1114,14 @@ class Map_Style_Composer {
 				continue;
 			}
 
-			$style = $this->fetch_mapbox_style( $ref['styleId'], $ref['token'] );
+			$style = \Jeo::fetch_mapbox_style(
+				$ref['styleId'],
+				$ref['token'],
+				array(
+					'timeout'    => 45,
+					'user-agent' => 'jeo-mapbox-style-composer/' . self::CACHE_VERSION,
+				)
+			);
 			if ( is_wp_error( $style ) ) {
 				$failed_styles[] = array(
 					'layerId' => $ref['layerId'],
@@ -1333,28 +1390,6 @@ class Map_Style_Composer {
 			'manifest' => $manifest,
 			'report'   => $report,
 		);
-	}
-
-	/**
-	 * Fetch a Mapbox style.
-	 *
-	 * @param string $style_id Style ID.
-	 * @param string $token Access token.
-	 * @return array|WP_Error
-	 */
-	private function fetch_mapbox_style( $style_id, $token ) {
-		$url = add_query_arg(
-			'access_token',
-			$token,
-			sprintf( 'https://api.mapbox.com/styles/v1/%s', ltrim( $style_id, '/' ) )
-		);
-
-		$data = $this->remote_json( $url );
-		if ( is_wp_error( $data ) ) {
-			return $data;
-		}
-
-		return $this->normalize_array( $data );
 	}
 
 	/**
@@ -2133,24 +2168,6 @@ class Map_Style_Composer {
 		}
 
 		return $value;
-	}
-
-	/**
-	 * Normalize a Mapbox style ID.
-	 *
-	 * @param string $value Raw style ID.
-	 * @return string|null
-	 */
-	private function normalize_style_id( $value ) {
-		$value = trim( (string) $value );
-		if ( '' === $value ) {
-			return null;
-		}
-		$value = preg_replace( '#^mapbox://styles/#', '', $value );
-		$value = preg_replace( '#^https://api\.mapbox\.com/styles/v1/#', '', $value );
-		$value = strtok( $value, '?' );
-		$value = trim( $value, '/' );
-		return '' === $value ? null : $value;
 	}
 
 	/**

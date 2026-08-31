@@ -297,7 +297,7 @@ After the refinement guards (`apply_diff_guard`, `preserve_manual_layers`), two 
 3. **`default` normalization** (`normalize_layer_defaults()`): Non-toggle layers (`use` not in `swappable`/`switchable`, e.g. `fixed`) are forced `default: true`. This mirrors the composer's visibility-baking rule and the editor's `shouldDisplayLayerInstance`, and guards against the AI omitting or falsifying `default` on fixed layers — which would otherwise render them hidden on the frontend.
 
 4. **Render order normalization** (`normalize_layer_render_order()`): Layers are stable-sorted bottom-to-top as **raster → vector** so opaque rasters never hide vector data behind them. The base layer is stored separately and always rendered below everything. Classification comes from the layer CPT `type` meta:
-    - Raster group (bottom): `tilelayer`, `mapbox-tileset-raster`, and `mapbox` styles whose style JSON contains any `type: "raster"` sub-layer (fetched from the Mapbox Styles API with per-layer token fallback, cached in a transient — 24h on success, 5min on failure).
+    - Raster group (bottom): `tilelayer`, `mapbox-tileset-raster`, and `mapbox` styles whose style JSON contains any `type: "raster"` sub-layer. Styles are fetched via the shared `Jeo::fetch_mapbox_style()` helper (per-layer token with global fallback; style JSON transient-cached 1h, filter `jeo_mapbox_style_cache_ttl`). The raster/vector **classification** is cached separately in a minimap transient — 24h on success, 5min on failure.
     - Vector group (top): `mvt`, `mapbox-tileset-vector`, purely vector `mapbox` styles, and unknown types.
     - **Conservative fallback**: when a `mapbox` style cannot be fetched/parsed it is treated as raster, so genuine vector layers always stay visible above it.
 

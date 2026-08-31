@@ -38,7 +38,7 @@ Registered in `Jeo::init()` (`class-jeo.php:49`).
 |------|----------|---------|
 | `rest_api_init` | `register_rest_routes()` | 7 REST routes (see [REST API](#rest-endpoints)) |
 | `save_post_map` | `invalidate_map_cache()` | Clears map composition meta on save |
-| `save_post_map-layer` | `invalidate_layer_cache()` | Finds all maps using a layer, invalidates each |
+| `save_post_map-layer` | `invalidate_layer_cache()` | Purges the layer's shared style JSON transient (`Jeo::delete_mapbox_style_cache()`), finds all maps using a layer, invalidates each |
 
 ### Constants
 
@@ -57,7 +57,9 @@ Registered in `Jeo::init()` (`class-jeo.php:49`).
 build_context(map_id) / build_virtual_context(payload)
   → build_refs_from_settings()     // resolve map-layer posts → refs (type, token, styleId, loadAsStyle, ...)
   → compose_context()
-       ├── fetch_mapbox_style()    // GET api.mapbox.com/styles/v1/{styleId} per mapbox ref
+       ├── Jeo::fetch_mapbox_style() // GET api.mapbox.com/styles/v1/{styleId} per mapbox ref
+       │                             // shared helper, transient-cached (jeo_mapbox_style_json_*)
+       │                             // purged on layer save + forced refresh; TTL filter jeo_mapbox_style_cache_ttl (default 1h)
        ├── build_composite_sprite()// GD: merge sprites (1x + @2x), prefix image names, pack 2048px canvas
        ├── select_glyphs()         // first bundle with text-font, else first glyphs URL
        ├── merge root properties   // projection, light, terrain, fog (warns on conflicts)
