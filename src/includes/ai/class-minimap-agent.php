@@ -56,6 +56,7 @@ class Minimap_Agent {
 		$tool_ids = array( 'search_layers', 'geocode' );
 		if ( $has_mapbox ) {
 			$tool_ids[] = 'generate_layer';
+			$tool_ids[] = 'generate_boundary_layer';
 		}
 
 		$tools = Tool_Registry::get_instances_by_id( $tool_ids );
@@ -112,6 +113,7 @@ You MUST always return a valid minimap configuration with layers, center coordin
 
 - `search_layers(query, top_k)`: Find semantically matching map layers. Call with specific, targeted queries. If the first search yields few results, try alternative queries.
 - `geocode(location)`: Convert a location name to lat/lon. Before calling this tool, check the geolocation pins listed in the Additional Context (if any). If a pin's address matches the location the user mentioned — even partially — use that pin's coordinates directly instead of geocoding. Pins represent the post's authoritative, curated geolocation and should always be preferred over geocoder results. Only call `geocode` for locations that do not match any existing pin.
+- `generate_boundary_layer(place_name, entity_type?, context?, layer_name?)`: Generate a boundary polygon layer for a named place (municipality, state, department, indigenous land, etc.) using authoritative public sources. Use this when `search_layers` does not return a suitable boundary layer. This tool is allowed proactively for administrative and indigenous-land boundaries.
 - `delegate_to_subagent(sub_agent_id, task)`: Delegate to `post_analyzer` for content analysis.
 
 ## Output Rules
@@ -146,8 +148,10 @@ You MUST respond with a valid Minimap_Output JSON object:
 
 When the user asks for a map that shows the BOUNDARY of a place AND highlights a THEME within it (e.g. "show the limits of Altamira and highlight the 2024 Prodes deforestation"), you MUST produce BOTH:
 
-1. The administrative boundary of the named place. Search for it via `search_layers`; if none exists, generate it proactively (administrative boundaries are always allowed — see Layer Generation) or, at minimum, geocode the place and center/zoom the map on it.
+1. The boundary of the named place. Search for it via `search_layers`; if none exists, generate it with `generate_boundary_layer(place_name)`. Administrative boundaries (municipality, state, department) and indigenous lands are always allowed proactively. Only fall back to a geocoded pin if the boundary tool fails.
 2. The thematic overlay (e.g. deforestation). Search for it via `search_layers` with specific queries and synonyms.
+
+When the user asks ONLY for a boundary (e.g. "limits of Altamira" or "outline of Amazonas, Colombia"), use `generate_boundary_layer` directly when `search_layers` has no good match — do NOT return just a pin.
 
 NEVER collapse such a request into a single pin. If the thematic layer cannot be found in the catalog, KEEP the boundary layer and the correct center/zoom, and clearly state in `assistant_message` that the thematic data was not found (and, when Mapbox is available, offer to generate it). A boundary with an honest "theme not found" notice is far better than dropping a lone pin.
 
@@ -189,7 +193,11 @@ When a tool returns a JSON object with "success": false:
    - Set message to a helpful notice (e.g. "No matching layers found for '[topic]'.")
    - Keep the map with base_layer + any pins. Do NOT set status to error.
    - Mention what topics lack coverage in assistant_message.
-3. If generate_layer returns success: false:
+3. If generate_boundary_layer returns success: false:
+   - Explain in assistant_message that the boundary could not be generated (e.g. "I couldn't find an authoritative boundary for X. Falling back to the location center.")
+   - If you have a geocoded center for the place, keep the map centered on it.
+   - Do NOT ask the user to retry automatically; only retry if the user asks.
+4. If generate_layer returns success: false:
    - Explain in assistant_message what happened (e.g. "Layer generation failed. You can try again or create the layer manually.")
    - Do NOT retry without asking the user first.
    - Keep the current map state unchanged.
@@ -213,13 +221,31 @@ PROMPT;
 			$prompt .= "\n\n" . <<<'PROMPT'
 ## Layer Generation (Mapbox)
 
-You have access to `generate_layer(prompt, layer_name)` which creates custom Mapbox map styles from a text description and creates a new layer. This has cost implications (AI tokens + Mapbox API usage).
+You have two generation tools. Both have cost implications (AI tokens + Mapbox API usage).
+
+### `generate_boundary_layer(place_name, entity_type?, context?, layer_name?)`
+
+Creates a boundary polygon layer from authoritative public sources:
+- Brazilian municipalities and states: IBGE.
+- Brazilian indigenous lands: FUNAI.
+- International places: OpenStreetMap via Nominatim + Overpass.
 
 Rules:
-- NEVER call `generate_layer` without explicit user authorization via chat, EXCEPT for simple administrative boundary layers (municipal or state limits) using public data. For those, you MAY generate proactively when `search_layers` finds no suitable option.
-- When `search_layers` returns insufficient results for non-administrative topics, mention what's missing in `assistant_message` and ask the user if they would like you to generate a custom layer.
-- Only call `generate_layer` for non-administrative layers after the user explicitly confirms (e.g. "yes", "go ahead", "generate it").
-- On the initial auto-generation (from post content or prompt), do NOT generate custom layers except simple administrative boundaries — use existing ones only. Report gaps in `assistant_message`.
+- You MAY call this tool proactively for administrative boundaries and indigenous lands when `search_layers` finds no suitable existing layer.
+- Pass `entity_type` when you know it ("municipality", "state", "indigenous_land", "other").
+- Pass `context` when the place name is ambiguous (e.g. "Amazonas" with context "Colombia" or "Brazil").
+- On the initial auto-generation (from post content or prompt), you MAY generate administrative/indigenous boundaries proactively if needed; report other gaps instead of generating them.
+- If the tool returns `success: false`, keep the map with the information you have and explain the failure in `assistant_message`.
+
+### `generate_layer(prompt, layer_name)`
+
+Creates custom Mapbox styles from a text description. This is the fallback for non-boundary, thematic layers.
+
+Rules:
+- NEVER call `generate_layer` without explicit user authorization via chat.
+- When `search_layers` returns insufficient results for non-boundary topics, mention what's missing in `assistant_message` and ask the user if they would like you to generate a custom layer.
+- Only call `generate_layer` after the user explicitly confirms (e.g. "yes", "go ahead", "generate it").
+- On the initial auto-generation (from post content or prompt), do NOT generate custom layers — use existing ones only. Report gaps in `assistant_message`.
 - When generate_layer returns success with a "limitations" field, include the limitations information in assistant_message so the user understands what the layer actually shows.
 - When the user provides an external URL (GeoJSON, tile service), pass it in the prompt to generate_layer so the minilayer agent can include it as a source in the style.
 PROMPT;

@@ -12,6 +12,9 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/includes/ai/class-search-layers-tool.php` | Agent tool: semantic layer search via `RAG_Worker::find_matching_layers()` |
 | `src/includes/ai/class-geocode-tool.php` | Agent tool: geocoding with fallback chain (active geocoder → Mapbox → defaults) |
 | `src/includes/ai/class-generate-layer-tool.php` | Agent tool (conditional): generates custom Mapbox styles and creates layer CPTs via `Minilayer_Service`. Only available when a Mapbox API key is configured. |
+| `src/includes/ai/class-generate-boundary-layer-tool.php` | Agent tool (conditional): resolves a place name into an authoritative boundary polygon and creates a layer CPT via `Place_Polygon_Service`. |
+| `src/includes/ai/class-place-polygon-service.php` | `Place_Polygon_Service` + adapters — deterministic polygon resolver using IBGE, FUNAI, and OpenStreetMap. |
+| `src/includes/ai/class-mapbox-style-builder.php` | Deterministic Mapbox style builder; publishes GeoJSON-backed boundary styles to the Mapbox Styles API. |
 | `src/includes/ai/class-get-post-content-tool.php` | Agent tool: post content + `_related_point` meta (used by post_analyzer sub-agent) |
 | `src/includes/ai/class-wp-storage.php` | `StorageInterface` adapter for `post_meta` and `user_meta` |
 | `src/includes/ai/class-wp-user-memory-storage.php` | `StorageInterface` adapter for `user_meta` memories — strips redundant user ID from the namespace so preferences are reusable across contexts |
@@ -48,9 +51,15 @@ graph TB
         MAIN --> T1[Search_Layers_Tool]
         MAIN --> T2[Geocode_Tool]
         MAIN -.->|Mapbox key only| T4[Generate_Layer_Tool]
+        MAIN -.->|Mapbox key only| T5[Generate_Boundary_Layer_Tool]
         SUB --> T3[Get_Post_Content_Tool]
         T4 -.-> MLS[Minilayer_Service]
         MLS -.-> MLA[Minilayer_Agent]
+        T5 -.-> PPS[Place_Polygon_Service]
+        PPS --> IBGE[IBGE Adapter]
+        PPS --> FUNAI[FUNAI Adapter]
+        PPS --> OSM[OSM Adapter]
+        PPS --> MSB[Mapbox_Style_Builder]
         MAIN --> OUT[Structured Output<br/>Minimap_Output]
     end
 
@@ -138,11 +147,16 @@ graph LR
 
 ### Optional Minilayer Integration
 
-When a Mapbox API key is configured, `Minimap_Agent::create()` registers `Generate_Layer_Tool` alongside the standard tools. This tool allows the agent to generate custom Mapbox styles and create new layer CPTs when existing layers are insufficient.
+When a Mapbox API key is configured, `Minimap_Agent::create()` registers two generation tools alongside the standard tools:
 
-**Authorization gate:** The system prompt instructs the agent to NEVER call `generate_layer` without explicit user authorization via chat. On the initial auto-generation (from post content or prompt), the agent only uses existing layers and reports gaps in `assistant_message`. The user must explicitly confirm (e.g. "yes", "go ahead") before the agent invokes the tool.
+- `Generate_Layer_Tool` — creates custom Mapbox styles from a text prompt via `Minilayer_Service`.
+- `Generate_Boundary_Layer_Tool` — resolves a place name into an authoritative boundary polygon via `Place_Polygon_Service` and publishes a Mapbox style.
 
-When no Mapbox key is configured, the tool is omitted entirely and the prompt includes a "Layer Limitations" section instructing the agent to suggest connecting a Mapbox key.
+**Authorization gates:**
+- `generate_layer` requires explicit user authorization via chat for non-boundary layers.
+- `generate_boundary_layer` may be called proactively for administrative boundaries (municipality, state, department) and indigenous lands when `search_layers` finds no suitable existing layer.
+
+When no Mapbox key is configured, both tools are omitted and the prompt includes a "Layer Limitations" section instructing the agent to suggest connecting a Mapbox key.
 
 ### Layer Metadata in the Editor
 
@@ -555,4 +569,12 @@ sequenceDiagram
 
 ### Proactive administrative boundary generation
 
-When a Mapbox key is configured, the agent may generate simple municipal/state administrative boundary layers proactively if `search_layers` finds no suitable existing layer. All other layer types still require explicit user confirmation before `generate_layer` is called.
+When a Mapbox key is configured, the agent may call `generate_boundary_layer` proactively for:
+
+- Brazilian municipalities and states (IBGE malhas v3)
+- Brazilian indigenous lands (FUNAI WFS)
+- International administrative boundaries (OpenStreetMap relation + Overpass outer-ring assembly)
+
+`Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. `Mapbox_Style_Builder` then creates a simple line + fill style and publishes it to the Mapbox Styles API. The resulting `mapbox` layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, and `attribution`.
+
+All non-boundary layer types still require explicit user confirmation before `generate_layer` is called.

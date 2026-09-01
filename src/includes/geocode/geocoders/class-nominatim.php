@@ -36,12 +36,19 @@ class Nominatim extends \Jeo\Geocoder {
 			return is_array( $cached['value'] ) ? $cached['value'] : array();
 		}
 
+		$locale       = get_locale();
+		$accept_langs = array( $locale, substr( $locale, 0, 2 ) );
+		$accept_langs = array_values( array_unique( array_filter( $accept_langs ) ) );
+
 		$r = wp_remote_get(
 			add_query_arg( $params, 'https://nominatim.openstreetmap.org/search' ),
 			array(
 				'timeout'     => 10,
 				'redirection' => 3,
 				'user-agent'  => 'JEO geocoder/' . JEO_VERSION . '; ' . home_url( '/' ),
+				'headers'     => array(
+					'Accept-Language' => implode( ',', $accept_langs ),
+				),
 			)
 		);
 
@@ -90,12 +97,19 @@ class Nominatim extends \Jeo\Geocoder {
 			return is_array( $cached['value'] ) ? $cached['value'] : null;
 		}
 
+		$locale       = get_locale();
+		$accept_langs = array( $locale, substr( $locale, 0, 2 ) );
+		$accept_langs = array_values( array_unique( array_filter( $accept_langs ) ) );
+
 		$r = wp_remote_get(
 			add_query_arg( $params, 'https://nominatim.openstreetmap.org/reverse' ),
 			array(
 				'timeout'     => 10,
 				'redirection' => 3,
 				'user-agent'  => 'JEO geocoder/' . JEO_VERSION . '; ' . home_url( '/' ),
+				'headers'     => array(
+					'Accept-Language' => implode( ',', $accept_langs ),
+				),
 			)
 		);
 
