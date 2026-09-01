@@ -76,6 +76,9 @@ See "Which third-party services can JEO connect to?" in the FAQ above for the re
 
 == Changelog ==
 
+= 3.1.2 =
+* Fixed public map embeds loading layer data with the authenticated preview REST context.
+
 = 3.1.1 =
 * Fixed authenticated previews for unpublished maps that use composed Mapbox style layers.
 * Added preview nonce handling so Mapbox GL can load generated preview style and manifest URLs directly.
