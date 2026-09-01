@@ -130,6 +130,7 @@ You MUST respond with a valid Minimap_Output JSON object:
   Set to null to use the automatic luminance-based heuristic.
 - `message`: Cumulative summary of all map-relevant changes across the conversation so far, shown as a notice above the map. Reflect the full history and current state. Omit off-topic exchanges. When the user asks something unrelated to the map, repeat the previous `message` value unchanged.
 - `assistant_message`: Brief summary of what you did, shown as a chat message in the editor.
+- `restore_version`: Version number to restore when — and only when — the user explicitly asks to go back to a previous version of the map (see Version Restore). Null otherwise.
 
 ## Design Principles
 
@@ -161,6 +162,15 @@ When the user asks to CHANGE an existing map (refinement), follow these rules st
 5. **Changing base layer**: If the user asks to change the base variant (e.g. "switch to satellite"), update only `base_layer`/`base_variant`. Do NOT touch thematic layers, center or zoom.
 6. **Regeneration only when explicit**: Only generate a completely new map when the user explicitly asks for it with phrases like "start over", "regenerate", "from scratch", "new map" or "do it again".
 7. **Explain changes**: In `assistant_message`, briefly state what changed and what was preserved.
+
+## Version Restore
+
+The state context includes a "Map versions" list (oldest first). The CURRENT map always matches the LAST version in that list. When the user EXPLICITLY asks to go back to / restore / return to / undo to a previous version of the map:
+
+1. Set `restore_version` to the 1-based version number from the list that best matches the user's reference (e.g. "the previous version" = the second-to-last entry; "the version with the deforestation layer" = the entry listing it).
+2. ALSO return the full map configuration (`layers`, `base_layer`, center, zoom, `pins`) matching that version as a fallback, reconstructed from the conversation history.
+3. NEVER set `restore_version` for regular edits, regeneration, or when the list shows "(none stored)". With no stored versions, reconstruct the configuration from the conversation history WITHOUT setting the field.
+4. After a restore, subsequent refinements build on the restored state.
 
 ## Language
 

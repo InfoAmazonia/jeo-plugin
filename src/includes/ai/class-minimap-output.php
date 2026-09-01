@@ -145,6 +145,31 @@ class Minimap_Output {
 	public array $removed_layer_ids = array();
 
 	/**
+	 * Declared version restore (1-based), or null.
+	 *
+	 * Populated by the AI when — and only when — the user explicitly asks to
+	 * go back to / restore / return to a previous version of the map. The
+	 * backend applies the stored snapshot deterministically; the re-emitted
+	 * configuration is only a fallback.
+	 *
+	 * @var int|null
+	 */
+	#[SchemaProperty(
+		description: 'Version number to restore, set ONLY when the user explicitly asks to go back to / restore / return to / undo to a previous version of the map. Use the 1-based number from the "Map versions" list in the context ("the previous version" = the second-to-last entry, since the current map matches the last one). Always also return the full map configuration matching that version as a fallback. Leave null in every other case — NEVER set this for regular edits or regeneration.',
+	)]
+	public ?int $restore_version = null;
+
+	/**
+	 * Version actually restored by the backend (post-validation), or null.
+	 *
+	 * Backend-populated; not part of the AI schema. Null when the declared
+	 * version was invalid or missing (legacy conversations).
+	 *
+	 * @var int|null
+	 */
+	public ?int $restored_version = null;
+
+	/**
 	 * Convert to the array format expected by the minimap block attributes.
 	 *
 	 * @return array
@@ -178,6 +203,7 @@ class Minimap_Output {
 			'message'           => $this->message,
 			'assistant_message' => $this->assistant_message,
 			'removed_layers'    => $this->removed_layers,
+			'restored_version'  => $this->restored_version,
 		);
 
 		if ( null !== $this->base_variant ) {

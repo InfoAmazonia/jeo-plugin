@@ -227,6 +227,8 @@ The agent always returns a `Minimap_Output` DTO via NeuronAI structured output:
 | `initial_zoom` | `int` | Zoom level (0-20) |
 | `pins` | `array` | Geolocation pins from post |
 | `base_variant` | `?string` | Agent-chosen variant (null = luminance heuristic fallback) |
+| `restore_version` | `?int` | 1-based version number to restore — set only when the user explicitly asks to go back to a previous version (see [Version History & Restore](#version-history--restore)) |
+| `restored_version` | `?int` | Backend-populated: version actually applied after validation (null = no valid restore) |
 | `message` | `string` | Info/warning for the block editor |
 | `assistant_message` | `string` | Chat message shown in the inspector panel |
 
@@ -292,6 +294,8 @@ After the agent returns, `Minimap::run_agent()` applies two safety nets:
 1. **Base layer fallback**: If `base_layer` is null, creates one using the agent's `base_variant` or the luminance heuristic (`determine_base_variant()`)
 2. **Pin fallback**: If the agent returned no pins and a `post_id` exists, fills pins from `_related_point` post meta
 
+Before the refinement guards, a declared **version restore** is applied deterministically (`apply_version_restore()`, see [Version History & Restore](#version-history--restore)): a valid `restore_version` replaces layers/base/center/zoom/pins with the stored snapshot; an invalid one keeps the agent's own reconstruction with a notice. Restore turns skip `tag_layer_provenance`, `apply_diff_guard`, and `preserve_manual_layers` — the snapshot is authoritative user intent.
+
 After the refinement guards (`apply_diff_guard`, `preserve_manual_layers`), two normalizations run:
 
 3. **`default` normalization** (`normalize_layer_defaults()`): Non-toggle layers (`use` not in `swappable`/`switchable`, e.g. `fixed`) are forced `default: true`. This mirrors the composer's visibility-baking rule and the editor's `shouldDisplayLayerInstance`, and guards against the AI omitting or falsifying `default` on fixed layers — which would otherwise render them hidden on the frontend.
@@ -302,6 +306,8 @@ After the refinement guards (`apply_diff_guard`, `preserve_manual_layers`), two 
     - **Conservative fallback**: when a `mapbox` style cannot be fetched/parsed it is treated as raster, so genuine vector layers always stay visible above it.
 
     All render paths (editor preview, frontend `JeoMap`, and the composed Mapbox style composer) stack layers in the `layers` array order, so this single normalization covers them all. The same normalization is applied in the legacy `/minimap/setup` RAG path. Blocks saved before this rule and manual library additions keep their stored order until the next AI interaction (the diff guard compares IDs only, so reordering never triggers it).
+
+Finally, the post-normalization state is appended to the version history (`append_version()`) and the summary is persisted.
 
 ## Editor State Machine
 
@@ -481,15 +487,62 @@ Three backend methods work together to protect manual layers during `/minimap/ch
 
 | Method | Runs when | Purpose |
 |--------|-----------|---------|
-| `tag_layer_provenance()` | Any `run_agent()` with `$previous_state` | Propagates `provenance` from previous state to matching AI-returned layers; tags all others as `'ai'` |
-| `apply_diff_guard()` | `$is_refinement` only | Existing threshold guard: restores layers when >50% are removed |
-| `preserve_manual_layers()` | `$is_refinement` only | Merges back any `provenance: 'manual'` layers the AI dropped |
+| `tag_layer_provenance()` | Any `run_agent()` with `$previous_state` (skipped on version restore — stored provenance is authoritative) | Propagates `provenance` from previous state to matching AI-returned layers; tags all others as `'ai'` |
+| `apply_diff_guard()` | `$is_refinement` only (skipped on version restore) | Existing threshold guard: restores layers when >50% are removed |
+| `preserve_manual_layers()` | `$is_refinement` only (skipped on version restore — restores are exact snapshots) | Merges back any `provenance: 'manual'` layers the AI dropped |
 
 **Explicit removal**: `preserve_manual_layers()` respects intentional removals via `Minimap_Output::$removed_layer_ids` — a structured-output field the AI populates when the user explicitly asks to remove a specific layer. This is language-agnostic (no keyword lists); the AI declares its intent directly.
 
 **Regenerate**: Manual layers are NOT preserved on regenerate (`type=regenerate`) — the AI gets a fresh start.
 
 The `build_state_context()` method annotates manual layers with `[manually added]` in the AI prompt context so the agent is aware of them.
+
+## Version History & Restore
+
+Conversations store a capped version history so "return to the previous version" works deterministically instead of relying on the model re-reading JSON blobs from the chat thread.
+
+### Storage
+
+- **Meta**: `_jeo_minimap_versions_{conversation_id}` (post_meta), capped to `Minimap::VERSIONS_LIMIT = 20` entries (oldest dropped first — same pattern as the Context Assistant's `SUGGESTION_HISTORY_LIMIT`).
+- **Snapshot**: taken at the end of every successful turn, after all post-processing (metadata, provenance, defaults, render order) — `label` (truncated triggering message), `timestamp`, `layers`, `base_layer`, `center_lat/lon`, `initial_zoom`, `pins`.
+- **Timeline semantics**: a restore appends a new entry (like a git revert), so version numbers always refer to stored history and never shift.
+- Appended by `run_agent()` (all AI paths) and by the legacy `api_setup()` (RAG, label "Initial generation from post content").
+
+### Restore flow
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant E as minimap-editor.js
+    participant R as /minimap/chat
+    participant M as run_agent()
+    participant V as _jeo_minimap_versions_*
+
+    U->>E: "volta para a versão anterior"
+    E->>R: POST {message, current_map_state}
+    R->>M: run_agent()
+    M-->>M: build_state_context() includes version list
+    M->>M: AI sets restore_version (1-based)
+    alt Valid index
+        M->>V: load_versions()
+        M->>M: Snapshot replaces layers/base/center/zoom/pins
+        M->>M: Skip provenance tagging + diff guard + preserve_manual
+        M->>M: Notice: "Restored map version N."
+    else Invalid / legacy (no history)
+        M->>M: Keep AI reconstruction, skip guards
+        M->>M: Notice: version not found; fallback applied
+    end
+    M->>V: append_version() — restored state becomes new entry
+    M-->>R: to_rest_response() (includes restored_version)
+```
+
+### Key properties
+
+- **Deterministic**: the stored snapshot wins over the model's re-emitted config. The model's output is only a fallback for legacy conversations without history.
+- **Restoration-aware guards**: restore turns skip `apply_diff_guard`/`preserve_manual_layers` (option B) — the diff between two snapshots is user intent, not an AI mistake. Declared via the structured field `Minimap_Output::$restore_version` (language-agnostic, same pattern as `removed_layer_ids`).
+- **Exact restore**: manual layers added after the restored version are dropped (snapshot semantics); the `message` notice reports the restore.
+- **Backward compatible**: old conversations have no version meta — `load_versions()` returns `[]`, the state context shows "(none stored)", the prompt tells the AI not to set `restore_version`, and an invalid declaration falls back gracefully with a notice. Never crashes.
+- **Additive API**: `to_rest_response()` includes `restored_version` (int|null); the frontend ignores unknown fields and needed no changes.
 
 ## Layer Themes & Explain Mode (Phase 4)
 

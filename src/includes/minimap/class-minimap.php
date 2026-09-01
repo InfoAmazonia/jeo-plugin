@@ -41,6 +41,13 @@ class Minimap {
 	const BASE_LAYER_META_KEY = '_jeo_is_base_layer';
 
 	/**
+	 * Maximum number of stored map versions per conversation (oldest dropped).
+	 *
+	 * @var int
+	 */
+	const VERSIONS_LIMIT = 20;
+
+	/**
 	 * JEO core CPT slugs that should not receive the minimap block.
 	 *
 	 * @var string[]
@@ -197,6 +204,7 @@ class Minimap {
 		if ( ! empty( $conversation_id ) ) {
 			$this->persist_initial_context( $post_id, $conversation_id, $response_data );
 			$this->persist_minimap_summary( $post_id, $conversation_id, (object) $response_data, __( 'Generate a map for this post based on its content.', 'jeowp' ) );
+			$this->append_version( $post_id, $conversation_id, (object) $response_data, __( 'Initial generation from post content', 'jeowp' ) );
 		}
 
 		return new \WP_REST_Response( $response_data, 200 );
@@ -438,6 +446,20 @@ class Minimap {
 
 		$this->persist_history( $assistant, $store, $conversation_id );
 
+		// Version restore: when the agent declares one, apply the stored
+		// snapshot deterministically (fallback: keep the agent's own
+		// reconstruction). Restore turns bypass the refinement guards below —
+		// the "removals" are intentional snapshots, not AI mistakes.
+		$is_restore     = null !== $result->restore_version;
+		$restore_notice = '';
+		if ( $is_restore ) {
+			$restore_notice = $this->apply_version_restore(
+				$result,
+				$this->load_versions( $post_id, $conversation_id ),
+				(int) $result->restore_version
+			);
+		}
+
 		if ( null === $result->base_layer ) {
 			$base_variant       = $result->base_variant ? $result->base_variant : $this->determine_base_variant( $result->layers );
 			$result->base_layer = $this->get_or_create_base_layer( $base_variant );
@@ -453,7 +475,8 @@ class Minimap {
 
 		$result->layers = $this->enrich_layer_metadata( $result->layers );
 
-		if ( ! empty( $previous_state ) ) {
+		// On restore the stored provenance is authoritative — skip re-tagging.
+		if ( ! empty( $previous_state ) && ! $is_restore ) {
 			$result->layers = $this->tag_layer_provenance( $previous_state, $result->layers );
 		}
 
@@ -467,7 +490,9 @@ class Minimap {
 			$result->base_layer = null;
 		}
 
-		if ( $is_refinement && ! empty( $previous_state ) ) {
+		// Restoration-aware guard: an explicit version restore is user intent,
+		// so the diff guard and manual-layer preservation must not fight it.
+		if ( $is_refinement && ! empty( $previous_state ) && ! $is_restore ) {
 			$result = $this->apply_diff_guard( $previous_state, $result, $message );
 			$result = $this->preserve_manual_layers( $previous_state, $result );
 		}
@@ -482,7 +507,15 @@ class Minimap {
 		// or merged layers are ordered as well.
 		$result->layers = $this->normalize_layer_render_order( $result->layers );
 
+		if ( '' !== $restore_notice ) {
+			$result->message = trim( $result->message . "\n" . $restore_notice );
+		}
+
 		$this->persist_minimap_summary( $post_id, $conversation_id, $result, $message );
+
+		// Append the final state as a new version (timeline semantics — a
+		// restore creates a new entry, like a git revert).
+		$this->append_version( $post_id, $conversation_id, $result, $message );
 
 		return $result;
 	}
@@ -686,6 +719,9 @@ class Minimap {
 			$parts[] = 'Topics searched: ' . implode( ', ', $summary['topics_searched'] );
 		}
 
+		$versions = $this->load_versions( (int) $request->get_param( 'post_id' ), (string) $request->get_param( 'conversation_id' ) );
+		$parts[]  = "\n" . $this->format_versions_for_context( $versions );
+
 		$parts[] = "\nWhen refining, make ONLY the minimum change requested. Keep all existing layers, center, zoom and base layer unless the user explicitly asks to change them. If the user asks to add or remove a specific layer, do that without regenerating the rest of the map.";
 
 		return implode( "\n", $parts );
@@ -756,6 +792,155 @@ class Minimap {
 	private function load_minimap_summary( int $post_id, string $conversation_id ): array {
 		$summary = get_post_meta( $post_id, $this->summary_meta_key( $conversation_id ), true );
 		return is_array( $summary ) ? $summary : array();
+	}
+
+	/**
+	 * Build the meta key used to store the version history of a conversation.
+	 *
+	 * @param string $conversation_id Conversation UUID.
+	 * @return string
+	 */
+	private function versions_meta_key( string $conversation_id ): string {
+		return "_jeo_minimap_versions_{$conversation_id}";
+	}
+
+	/**
+	 * Load the stored map version history for a conversation.
+	 *
+	 * Legacy conversations have no history — an empty array is returned, which
+	 * the restore flow treats as a graceful fallback.
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @return array
+	 */
+	private function load_versions( int $post_id, string $conversation_id ): array {
+		$versions = get_post_meta( $post_id, $this->versions_meta_key( $conversation_id ), true );
+		return is_array( $versions ) ? $versions : array();
+	}
+
+	/**
+	 * Append the final map state of a turn as a new version.
+	 *
+	 * Snapshots are taken after all post-processing (metadata, provenance,
+	 * defaults, render order) so restores are exact. The history is capped to
+	 * VERSIONS_LIMIT entries (oldest dropped first). Runs on every successful
+	 * turn, including restores — timeline semantics, like a git revert.
+	 *
+	 * @param int    $post_id         Post ID.
+	 * @param string $conversation_id Conversation UUID.
+	 * @param object $result          Agent output with the final map state.
+	 * @param string $label           User message that produced this version.
+	 * @return void
+	 */
+	private function append_version( int $post_id, string $conversation_id, object $result, string $label ): void {
+		$versions = $this->load_versions( $post_id, $conversation_id );
+
+		$versions[] = array(
+			'label'        => wp_trim_words( $label, 20, '…' ),
+			'timestamp'    => current_time( 'mysql' ),
+			'layers'       => is_array( $result->layers ?? null ) ? $result->layers : array(),
+			'base_layer'   => is_array( $result->base_layer ?? null ) ? $result->base_layer : null,
+			'center_lat'   => is_numeric( $result->center_lat ?? null ) ? (float) $result->center_lat : null,
+			'center_lon'   => is_numeric( $result->center_lon ?? null ) ? (float) $result->center_lon : null,
+			'initial_zoom' => is_numeric( $result->initial_zoom ?? null ) ? (int) $result->initial_zoom : null,
+			'pins'         => is_array( $result->pins ?? null ) ? $result->pins : array(),
+		);
+
+		if ( count( $versions ) > self::VERSIONS_LIMIT ) {
+			$versions = array_slice( $versions, -self::VERSIONS_LIMIT );
+		}
+
+		update_post_meta( $post_id, $this->versions_meta_key( $conversation_id ), $versions );
+	}
+
+	/**
+	 * Apply a declared version restore to the agent result.
+	 *
+	 * When a valid 1-based version index is declared, the stored snapshot
+	 * replaces the agent's output deterministically — the model's re-emitted
+	 * configuration is only a fallback. When the index is invalid or no
+	 * history exists (legacy conversations), the agent output is kept as-is.
+	 * Either way a notice is returned for the result message; nothing fails.
+	 *
+	 * @param Minimap_Output $result        Agent output (modified in place).
+	 * @param array          $versions      Stored version history.
+	 * @param int            $version_index Declared 1-based version number.
+	 * @return string Notice appended to the result message.
+	 */
+	private function apply_version_restore( Minimap_Output $result, array $versions, int $version_index ): string {
+		$version = ( $version_index >= 1 && isset( $versions[ $version_index - 1 ] ) )
+			? $versions[ $version_index - 1 ]
+			: null;
+
+		if ( ! is_array( $version ) || ! is_array( $version['layers'] ?? null ) ) {
+			/* translators: %d: version number. */
+			return sprintf( __( 'Version %d was not found in the stored history. The configuration reconstructed from the conversation context was applied instead.', 'jeowp' ), $version_index );
+		}
+
+		$result->layers       = $version['layers'];
+		$result->base_layer   = is_array( $version['base_layer'] ?? null ) ? $version['base_layer'] : null;
+		$result->center_lat   = is_numeric( $version['center_lat'] ?? null ) ? (float) $version['center_lat'] : $result->center_lat;
+		$result->center_lon   = is_numeric( $version['center_lon'] ?? null ) ? (float) $version['center_lon'] : $result->center_lon;
+		$result->initial_zoom = is_numeric( $version['initial_zoom'] ?? null ) ? (int) $version['initial_zoom'] : $result->initial_zoom;
+		$result->pins         = is_array( $version['pins'] ?? null ) ? $version['pins'] : array();
+
+		$result->restored_version = $version_index;
+
+		/* translators: %d: version number. */
+		return sprintf( __( 'Restored map version %d.', 'jeowp' ), $version_index );
+	}
+
+	/**
+	 * Format the stored version history for the agent's state context.
+	 *
+	 * @param array $versions Stored version history.
+	 * @return string
+	 */
+	private function format_versions_for_context( array $versions ): string {
+		if ( empty( $versions ) ) {
+			return 'Map versions: (none stored)';
+		}
+
+		$lines = array( 'Map versions (oldest first, most recent last — the current map matches the last version):' );
+		foreach ( $versions as $index => $version ) {
+			if ( ! is_array( $version ) ) {
+				continue;
+			}
+
+			$layer_names = array();
+			foreach ( ( is_array( $version['layers'] ?? null ) ? $version['layers'] : array() ) as $layer_def ) {
+				$layer_id = (int) ( is_array( $layer_def ) ? ( $layer_def['id'] ?? 0 ) : 0 );
+				if ( ! $layer_id ) {
+					continue;
+				}
+				$layer_post    = get_post( $layer_id );
+				$layer_names[] = $layer_post ? $layer_post->post_title : "Layer #{$layer_id}";
+			}
+
+			$layers_summary = sprintf(
+				'%d layer(s)%s',
+				count( $layer_names ),
+				$layer_names
+					? ' (' . implode( ', ', array_slice( $layer_names, 0, 3 ) ) . ( count( $layer_names ) > 3 ? ', …' : '' ) . ')'
+					: ''
+			);
+
+			$base_variant = ( is_array( $version['base_layer'] ?? null ) && ! empty( $version['base_layer']['variant'] ) )
+				? $version['base_layer']['variant']
+				: 'none';
+
+			$lines[] = sprintf(
+				'- Version %d (%s): %s, base: %s%s',
+				(int) $index + 1,
+				! empty( $version['timestamp'] ) ? $version['timestamp'] : '?',
+				$layers_summary,
+				$base_variant,
+				! empty( $version['label'] ) ? ' — ' . $version['label'] : ''
+			);
+		}
+
+		return implode( "\n", $lines );
 	}
 
 	/**
