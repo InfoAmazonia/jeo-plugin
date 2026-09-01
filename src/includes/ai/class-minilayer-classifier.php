@@ -1,85 +1,90 @@
 <?php
 /**
- * Minilayer AI agent factory — creates Mapbox styles from text prompts via MCP.
+ * Deterministic classifier for minilayer generation.
  *
- * Uses the hacklabr/ai-assistant Assistant with native MCP integration.
+ * Maps a natural-language prompt to a structured Layer_Spec_Output without
+ * invoking the Mapbox DevKit MCP. A single structured-output LLM call decides
+ * whether the request can be approximated with built-in tilesets, external
+ * sources, or not at all.
  *
  * @package Jeo
  */
 
 namespace Jeo\AI;
 
-use HackLab\AIAssistant\Assistant;
-use NeuronAI\Chat\Messages\UserMessage;
-
 if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
 /**
- * Factory that builds an Assistant configured to connect to the Mapbox DevKit
- * MCP server for generating map styles from natural-language prompts.
+ * Classifier that turns a user prompt into a deterministic layer spec.
  */
-class Minilayer_Agent {
+class Minilayer_Classifier {
 
 	/**
-	 * Mapbox DevKit MCP hosted endpoint.
+	 * Classify a user prompt into a Layer_Spec_Output.
 	 *
-	 * @var string
+	 * @param string $prompt User prompt.
+	 * @return Layer_Spec_Output|\WP_Error
 	 */
-	const MCP_ENDPOINT = 'https://mcp-devkit.mapbox.com/mcp';
+	public static function classify( string $prompt ) {
+		$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
+		if ( empty( $active_provider ) ) {
+			return new \WP_Error(
+				'minilayer_no_provider',
+				__( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' )
+			);
+		}
 
-	/**
-	 * Create a configured Assistant for minilayer generation.
-	 *
-	 * @param string $mapbox_token Mapbox public or secret access token.
-	 * @return Assistant
-	 */
-	public static function create( string $mapbox_token ): Assistant {
-		return JEO_AI_Factory::create_minilayer_assistant(
-			instructions: self::instructions(),
-			mapbox_token: $mapbox_token,
-		);
+		try {
+			$assistant = JEO_AI_Factory::create_assistant(
+				instructions: self::instructions(),
+				output_class: Layer_Spec_Output::class,
+				structured_retries: 3,
+			);
+
+			$response = $assistant->structured( new \NeuronAI\Chat\Messages\UserMessage( $prompt ) );
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'minilayer_classifier_error',
+				$e->getMessage()
+			);
+		}
+
+		if ( ! $response instanceof Layer_Spec_Output ) {
+			return new \WP_Error(
+				'minilayer_classifier_invalid',
+				__( 'The classifier returned an unexpected response.', 'jeowp' )
+			);
+		}
+
+		return $response;
 	}
 
 	/**
-	 * Run the minilayer generation.
-	 *
-	 * @param string $prompt User's text description of the desired map style.
-	 * @param string $mapbox_token Mapbox API token.
-	 * @return string Raw response from the AI.
-	 * @throws \Exception On agent failure.
-	 */
-	public static function generate( string $prompt, string $mapbox_token ): string {
-		$assistant = self::create( $mapbox_token );
-		$message   = $assistant->chat( new UserMessage( $prompt ) )->getMessage();
-		return $message->getContent();
-	}
-
-	/**
-	 * System prompt for the cartographer agent.
+	 * System prompt for the classifier.
 	 *
 	 * @return string
 	 */
 	public static function instructions(): string {
 		return <<<'PROMPT'
 You are a professional cartographer and Mapbox style designer.
-Your task is to create map styles from text descriptions using the Mapbox MCP tools.
+Your task is to classify a user's prompt into a deterministic layer specification.
+
+You MUST respond with a valid Layer_Spec_Output JSON object.
 
 ## Workflow
 
 1. Analyze the user's prompt to understand the desired theme, region, and emphasis.
-2. Determine the layer type (see Layer Type Decision below) BEFORE creating the style.
-3. Create the style via Mapbox tools:
-   - Prefer StyleBuilderTool for conversational creation.
-   - Use CreateStyleTool for precise style JSON control (external sources, complex compositions).
-4. Validate with ValidateStyleTool.
-5. Generate a preview with PreviewStyleTool.
-6. Return a JSON object with style details, suggested_filter, suggested_paint, and limitations.
+2. Decide whether the request CAN be approximated with the available data sources below.
+3. Choose the simplest layer type that satisfies the request:
+   - Prefer "mapbox-tileset-vector" whenever possible.
+   - Use "mapbox" only for external sources, multiple tilesets, raster overlays, or complex composition.
+4. Return the specification with honest limitations.
 
 ## Available Mapbox Tilesets
 
-### mapbox-streets-v8 (vector, ID: mapbox.mapbox-streets-v8)
+### mapbox-streets-v8 (ID: mapbox.mapbox-streets-v8)
 
 | Source Layer | Geometry | Key Classes / Fields | Use For |
 |---|---|---|---|
@@ -98,19 +103,12 @@ Your task is to create map styles from text descriptions using the Mapbox MCP to
 | housenum_label | point | house_num | House numbers |
 | transit_stop_label | point | type: bus, rail, rail-metro, rail-light, ferry | Transit stops |
 
-### mapbox-terrain-v2 (vector, ID: mapbox.mapbox-terrain-v2)
+### mapbox-terrain-v2 (ID: mapbox.mapbox-terrain-v2)
 
-| Source Layer | Geometry | Use For |
+| Source Layer | Geometry | Use |
 |---|---|---|
 | contour | line | Elevation contour lines |
 | hillshade | polygon | Terrain shading / relief |
-
-### Raster sources (no source-layer)
-
-| Source | Type | Use For |
-|---|---|---|
-| mapbox.satellite | raster | Satellite imagery |
-| mapbox.mapbox-terrain-dem-v1 | raster-dem | 3D terrain (hillshade) |
 
 ## Layer Type Decision
 
@@ -122,11 +120,12 @@ PREFER mapbox-tileset-vector whenever possible. Only use mapbox when necessary.
 3. The geometry type is vector (fill, line, symbol, circle, fill-extrusion, heatmap)
 4. No external sources needed (GeoJSON URLs, third-party tiles)
 5. No raster overlays as non-base layers (satellite, hillshade)
-6. A single solid color per paint property is sufficient, OR the consumer can apply a
-   suggested_filter to narrow which features appear
+6. A single solid color per paint property is sufficient, OR a suggested_filter can narrow which features appear
 
-In this case set: layer_type, tileset_id, source_layer, layer_geometry_type, plus
-suggested_filter and suggested_paint when applicable.
+In this case set:
+- layer_type: "mapbox-tileset-vector"
+- tileset_id, source_layer, layer_geometry_type
+- suggested_filter and suggested_paint
 
 ### Use mapbox when ANY of these apply:
 1. External sources are needed (GeoJSON URL from user, third-party tile URLs)
@@ -136,7 +135,10 @@ suggested_filter and suggested_paint when applicable.
 5. Complex multi-layer composition
 6. The user provides a custom URL to include as a source
 
-In this case set: layer_type "mapbox" with style_id.
+In this case set:
+- layer_type: "mapbox"
+- style_json: complete Mapbox GL style JSON (version, sources, layers)
+- external_sources: map of source IDs to URLs
 
 ## Capability Boundaries & Approximation Guide
 
@@ -168,66 +170,32 @@ Mapbox tilesets contain BASE MAP data only. They do NOT contain:
 
 ### When the request CANNOT be approximated with tileset data:
 
-If the user requests data that does not exist in any tileset (e.g. "deforestation in Amazon",
-"socioeconomic data by municipality"), you MUST:
-1. Create the best visual approximation using available data
-2. Set layer_type to "mapbox" for maximum style control
-3. Include a "limitations" field explaining what the style actually shows vs. what was requested
+If the user requests data that does not exist in any tileset (e.g. "deforestation in Amazon", "socioeconomic data by municipality"):
+1. Set can_approximate to false.
+2. Provide a clear limitations string explaining what is missing.
+3. Omit tileset_id, source_layer, layer_geometry_type, style_json, etc.
 
 ### When the user provides an external source URL:
 
 If the user provides a URL to a GeoJSON file or tile service:
-1. Include it as a source in the style JSON (use CreateStyleTool for full control)
-2. Set layer_type to "mapbox"
-3. Create appropriate layers referencing the external source with styling
-4. The external URL must be publicly accessible (no authentication required)
+1. Set layer_type to "mapbox".
+2. Include the URL as a source in style_json.
+3. Add the source ID → URL mapping in external_sources.
+4. Create appropriate layers referencing the external source with styling.
+5. The external URL must be publicly accessible (no authentication required).
 
-## Response Format
+## Theme and Metadata
 
-Respond ONLY with a raw JSON object. No markdown, no conversational text.
-
-### mapbox-tileset-vector response:
-{
-  "style_id": "username/abc123",
-  "style_name": "Human-readable style name",
-  "layer_title": "Short descriptive title",
-  "style_url": "mapbox://styles/username/abc123",
-  "preview_url": "https://...",
-  "style_json": { ... },
-  "layer_type": "mapbox-tileset-vector",
-  "tileset_id": "mapbox.mapbox-streets-v8",
-  "source_layer": "landuse",
-  "layer_geometry_type": "fill",
-  "suggested_filter": ["==", "class", "wood"],
-  "suggested_paint": { "fill-color": "#2d5a27", "fill-opacity": 0.6 },
-  "limitations": "Shows land use classified as 'wood' from OpenStreetMap. Does not include actual forest monitoring data."
-}
-
-### mapbox response:
-{
-  "style_id": "username/abc123",
-  "style_name": "Human-readable style name",
-  "layer_title": "Short descriptive title",
-  "style_url": "mapbox://styles/username/abc123",
-  "preview_url": "https://...",
-  "style_json": { ... },
-  "layer_type": "mapbox",
-  "limitations": "Shows water bodies and rivers from OpenStreetMap. Does not include flood monitoring data."
-}
-
-### Optional fields (include when applicable):
-- "suggested_filter": array — MapLibre filter expression for client-side filtering.
-- "suggested_paint": object — Default paint values for the consumer to apply.
-- "limitations": string — Human-readable description of what the style cannot show.
-- "external_sources": object — Map of source IDs to URLs for third-party sources
-  included in the style. e.g. {"rondonia-boundary": "https://example.com/rondonia.geojson"}
+- layer_title: Provide a short, descriptive title (max 6 words) that clearly says what the layer shows.
+- theme: Choose the best matching theme from this list for catalog organization:
+  Deforestation, Hydrography, Indigenous Lands, Protected Areas, Mining, Oil and Gas, Land Use, Agriculture, Infrastructure, Administrative Boundaries, Socioeconomic, Biodiversity, Fire, Climate.
+  Use the theme most relevant to the user's prompt, not a generic one.
+- limitations: Always explain what data is used and any limitations (e.g. base-map approximation, missing specific attributes).
 
 ## Design Principles
 
-1. PREFER mapbox-tileset-vector over mapbox whenever possible (vector is interactive,
-   lighter, and sharper at all zoom levels).
-2. RELEVANCE FIRST: Match the style to the user's intent. If they ask about "rivers",
-   the water/waterway layers should be the PRIMARY visual focus.
+1. PREFER mapbox-tileset-vector over mapbox whenever possible (vector is interactive, lighter, and sharper at all zoom levels).
+2. RELEVANCE FIRST: Match the style to the user's intent — if they ask about "rivers", water/waterway layers should be the PRIMARY visual focus.
 3. VISUAL HIERARCHY: Emphasize relevant layers, de-emphasize irrelevant ones.
 4. LAYER MINIMIZATION: Only include layers that contribute to the user's theme.
 5. COLOR PALETTES by theme:
@@ -236,10 +204,8 @@ Respond ONLY with a raw JSON object. No markdown, no conversational text.
    - Urban / infrastructure: grays / oranges (#5d6d7e, #e67e22)
    - Administrative: purples / reds (#8e44ad, #c0392b)
    - Terrain / elevation: browns (#795548, #a1887f)
-6. HONESTY: Never claim the style shows data it doesn't contain. Use the "limitations"
-   field when the approximation is imperfect.
-7. EXTERNAL SOURCES: When the user provides a URL, include it in the style as a source
-   with appropriate layers and styling.
+6. HONESTY: Never claim the style shows data it doesn't contain. Use the limitations field when the approximation is imperfect.
+7. EXTERNAL SOURCES: When the user provides a URL, include it in the style as a source with appropriate layers and styling.
 PROMPT;
 	}
 }

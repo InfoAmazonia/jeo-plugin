@@ -77,15 +77,28 @@ class Minilayer_Handler {
 		$result = Minilayer_Service::generate_and_create( $prompt, $layer_name );
 
 		if ( is_wp_error( $result ) ) {
-			$code   = $result->get_error_code();
-			$status = ( 'minilayer_parse_error' === $code || 'minilayer_missing_style_id' === $code ) ? 502 : 400;
+			$code = $result->get_error_code();
+
+			$server_error_codes = array(
+				'minilayer_parse_error',
+				'minilayer_missing_style_id',
+				'minilayer_classifier_invalid',
+			);
+			$status             = in_array( $code, $server_error_codes, true ) ? 502 : 400;
 
 			$messages = array(
-				'minilayer_no_mapbox_key'    => __( 'Mapbox API key is not configured. Set it in JEO Settings.', 'jeowp' ),
-				'minilayer_no_provider'      => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
-				'minilayer_agent_error'      => __( 'Could not generate the map style. Please try again.', 'jeowp' ),
-				'minilayer_parse_error'      => __( 'The AI returned an unexpected response. Please try again.', 'jeowp' ),
-				'minilayer_missing_style_id' => __( 'The AI did not create a valid style. Please try again.', 'jeowp' ),
+				'minilayer_no_mapbox_key'         => __( 'Mapbox API key is not configured. Set it in JEO Settings.', 'jeowp' ),
+				'minilayer_no_provider'           => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
+				'minilayer_agent_error'           => __( 'Could not generate the map style. Please try again.', 'jeowp' ),
+				'minilayer_parse_error'           => __( 'The AI returned an unexpected response. Please try again.', 'jeowp' ),
+				'minilayer_missing_style_id'      => __( 'The AI did not create a valid style. Please try again.', 'jeowp' ),
+				'minilayer_classifier_error'      => __( 'Could not classify the layer request. Please try again.', 'jeowp' ),
+				'minilayer_classifier_invalid'    => __( 'The classifier returned an unexpected response. Please try again.', 'jeowp' ),
+				'minilayer_not_approximable'      => __( 'The request cannot be approximated with available map data.', 'jeowp' ),
+				'minilayer_invalid_type'          => __( 'The AI returned an unsupported layer type.', 'jeowp' ),
+				'minilayer_missing_tileset_field' => __( 'The AI response is missing a required tileset field.', 'jeowp' ),
+				'minilayer_invalid_geometry'      => __( 'The AI returned an invalid geometry type.', 'jeowp' ),
+				'minilayer_missing_json'          => __( 'The AI response is missing composed style JSON.', 'jeowp' ),
 			);
 
 			return new \WP_REST_Response(

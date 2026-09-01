@@ -27,7 +27,7 @@ class Generate_Layer_Tool extends Tool {
 	public function __construct() {
 		parent::__construct(
 			name: 'generate_layer',
-			description: 'Generate a custom Mapbox map style from a text description and create a new layer. Requires a Mapbox API key. Has cost implications (AI tokens + Mapbox API). Only use when the user explicitly authorizes layer generation.',
+			description: 'Generate a thematic map layer from a text description and create a new layer. Uses built-in Mapbox tilesets when possible, or publishes a composed style for external sources. Requires a Mapbox API key. Has cost implications (AI tokens + Mapbox API). Only use when the user explicitly authorizes layer generation.',
 		);
 	}
 

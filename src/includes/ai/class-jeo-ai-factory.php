@@ -151,32 +151,4 @@ class JEO_AI_Factory {
 			structured_retries:  1,
 		);
 	}
-
-	/**
-	 * Create an Assistant pre-configured for minilayer (Mapbox style generation).
-	 *
-	 * @param string                   $instructions   System prompt.
-	 * @param string                   $mapbox_token   Mapbox API token.
-	 * @param AIProviderInterface|null $provider       Override provider.
-	 * @return Assistant
-	 */
-	public static function create_minilayer_assistant(
-		string $instructions,
-		string $mapbox_token,
-		?AIProviderInterface $provider = null
-	): Assistant {
-		return self::create_assistant(
-			instructions:      $instructions,
-			provider:          $provider,
-			mcps:              array(
-				array(
-					'type'    => 'sse',
-					'url'     => 'https://mcp-devkit.mapbox.com/mcp',
-					'token'   => $mapbox_token,
-					'timeout' => 60,
-				),
-			),
-			structured_retries: 3,
-		);
-	}
 }

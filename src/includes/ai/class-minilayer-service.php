@@ -1,6 +1,6 @@
 <?php
 /**
- * Minilayer shared service — AI style generation → JEO layer CPT creation pipeline.
+ * Minilayer shared service — deterministic classifier → JEO layer CPT creation.
  *
  * @package Jeo
  */
@@ -12,14 +12,14 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
- * Stateless service that orchestrates AI layer generation and CPT creation.
+ * Stateless service that orchestrates deterministic layer generation and CPT creation.
  *
  * Shared by Minilayer_Handler (REST endpoint) and Generate_Layer_Tool (agent tool).
  */
 class Minilayer_Service {
 
 	/**
-	 * Full pipeline: generate a Mapbox style from a prompt and create a layer CPT.
+	 * Full pipeline: classify a prompt and create a layer CPT.
 	 *
 	 * @param string $prompt     Text description of the desired map style.
 	 * @param string $layer_name Optional custom title for the layer.
@@ -42,138 +42,83 @@ class Minilayer_Service {
 			);
 		}
 
-		try {
-			$raw = Minilayer_Agent::generate( $prompt, $mapbox_key );
-		} catch ( \Exception $e ) {
+		$spec = Minilayer_Classifier::classify( $prompt );
+		if ( is_wp_error( $spec ) ) {
+			return $spec;
+		}
+
+		if ( ! $spec->can_approximate ) {
 			return new \WP_Error(
-				'minilayer_agent_error',
-				$e->getMessage()
+				'minilayer_not_approximable',
+				$spec->limitations
+					? $spec->limitations
+					: __( 'The request cannot be approximated with available map data.', 'jeowp' )
 			);
 		}
 
-		$parsed = self::parse_response( $raw );
-		if ( is_wp_error( $parsed ) ) {
-			return $parsed;
+		if ( 'mapbox-tileset-vector' === $spec->layer_type ) {
+			return self::create_tileset_vector_layer( $spec, $layer_name );
 		}
 
-		return self::create_layer( $parsed, $layer_name );
+		if ( 'mapbox' === $spec->layer_type ) {
+			return self::create_composed_layer( $spec, $layer_name, $mapbox_key );
+		}
+
+		return new \WP_Error(
+			'minilayer_invalid_type',
+			sprintf(
+				/* translators: %s: layer type. */
+				__( 'Unsupported layer type: %s.', 'jeowp' ),
+				esc_html( $spec->layer_type )
+			)
+		);
 	}
 
 	/**
-	 * Parse the raw AI response and extract the style JSON object.
+	 * Create a mapbox-tileset-vector layer directly from a classified spec.
 	 *
-	 * @param string $raw Raw text from the AI agent.
-	 * @return array|\WP_Error Parsed style data or error.
+	 * @param Layer_Spec_Output $spec       Classified spec.
+	 * @param string            $layer_name Optional custom title.
+	 * @return array|\WP_Error Layer info or error.
 	 */
-	public static function parse_response( string $raw ) {
-		$text = preg_replace( '/<(thought|thinking)>.*?<\/\1>/is', '', $raw );
-
-		if ( preg_match( '/```(?:json)?\s*(.*?)\s*```/is', $text, $matches ) ) {
-			$text = $matches[1];
-		}
-
-		$start = strpos( $text, '{' );
-		if ( false !== $start ) {
-			$depth     = 0;
-			$len       = strlen( $text );
-			$in_string = false;
-			$escape    = false;
-
-			for ( $i = $start; $i < $len; $i++ ) {
-				$ch = $text[ $i ];
-
-				if ( $escape ) {
-					$escape = false;
-					continue;
-				}
-
-				if ( '\\' === $ch ) {
-					$escape = true;
-					continue;
-				}
-
-				if ( '"' === $ch ) {
-					$in_string = ! $in_string;
-					continue;
-				}
-
-				if ( $in_string ) {
-					continue;
-				}
-
-				if ( '{' === $ch ) {
-					++$depth;
-				} elseif ( '}' === $ch ) {
-					--$depth;
-					if ( 0 === $depth ) {
-						$text = substr( $text, $start, $i - $start + 1 );
-						break;
-					}
-				}
-			}
-		}
-
-		$parsed = json_decode( trim( $text ), true );
-
-		if ( JSON_ERROR_NONE !== json_last_error() || ! is_array( $parsed ) ) {
-			return new \WP_Error(
-				'minilayer_parse_error',
-				__( 'Failed to parse AI response as JSON.', 'jeowp' )
-			);
-		}
-
-		if ( empty( $parsed['style_id'] ) ) {
-			return new \WP_Error(
-				'minilayer_missing_style_id',
-				__( 'AI response did not include a style_id.', 'jeowp' )
-			);
-		}
-
-		return $parsed;
-	}
-
-	/**
-	 * Determine whether the style data qualifies as a mapbox-tileset-vector layer.
-	 *
-	 * @param array $style_data Parsed style data from the AI.
-	 * @return bool
-	 */
-	public static function is_tileset_vector( array $style_data ): bool {
-		if ( ( $style_data['layer_type'] ?? '' ) !== 'mapbox-tileset-vector' ) {
-			return false;
-		}
-
+	private static function create_tileset_vector_layer( Layer_Spec_Output $spec, string $layer_name = '' ) {
 		$required = array( 'tileset_id', 'source_layer', 'layer_geometry_type' );
 		foreach ( $required as $key ) {
-			if ( empty( $style_data[ $key ] ) ) {
-				return false;
+			if ( empty( $spec->$key ) ) {
+				return new \WP_Error(
+					'minilayer_missing_tileset_field',
+					sprintf(
+						/* translators: %s: missing field name. */
+						__( 'Missing required tileset field: %s.', 'jeowp' ),
+						esc_html( $key )
+					)
+				);
 			}
 		}
 
 		$vector_types = array( 'fill', 'line', 'symbol', 'circle', 'fill-extrusion', 'heatmap' );
-		return in_array( $style_data['layer_geometry_type'], $vector_types, true );
-	}
+		if ( ! in_array( $spec->layer_geometry_type, $vector_types, true ) ) {
+			return new \WP_Error(
+				'minilayer_invalid_geometry',
+				__( 'Invalid layer geometry type for tileset-vector.', 'jeowp' )
+			);
+		}
 
-	/**
-	 * Create a map-layer CPT post from the generated style data.
-	 *
-	 * @param array  $style_data Parsed style data from the AI.
-	 * @param string $layer_name Optional custom title for the layer.
-	 * @return array|\WP_Error Layer info array or error.
-	 */
-	public static function create_layer( array $style_data, $layer_name = '' ) {
-		$style_id = $style_data['style_id'];
-		/* translators: %s: Mapbox style ID. */
-		$fallback   = sprintf( __( 'Minilayer: %s', 'jeowp' ), $style_id );
-		$post_title = ! empty( $layer_name )
-			? $layer_name
-			: ( $style_data['layer_title'] ?? $style_data['style_name'] ?? $fallback );
+		$post_title = self::layer_title( $spec, $layer_name );
+		$theme      = $spec->theme ?? Minilayer_Metadata::theme_for_tileset_vector( $spec->source_layer, $spec->suggested_filter ?? array() );
 
 		$post_id = wp_insert_post(
 			array(
-				'post_type'   => 'map-layer',
-				'post_title'  => $post_title,
-				'post_status' => 'publish',
+				'post_type'    => 'map-layer',
+				'post_title'   => $post_title,
+				'post_status'  => 'publish',
+				'post_excerpt' => Minilayer_Metadata::build_excerpt(
+					$post_title,
+					$spec->tileset_id,
+					'',
+					$spec->limitations,
+					'mapbox-tileset-vector'
+				),
 			)
 		);
 
@@ -181,52 +126,188 @@ class Minilayer_Service {
 			return $post_id;
 		}
 
-		if ( self::is_tileset_vector( $style_data ) ) {
-			$layer_type         = 'mapbox-tileset-vector';
-			$layer_type_options = array(
-				'tileset_id'        => $style_data['tileset_id'],
-				'source_layer'      => $style_data['source_layer'],
-				'type'              => $style_data['layer_geometry_type'],
-				'style_source_type' => 'vector',
-			);
-		} else {
-			$layer_type         = 'mapbox';
-			$layer_type_options = array(
-				'style_id' => $style_id,
-			);
-		}
+		$layer_type         = 'mapbox-tileset-vector';
+		$layer_type_options = array(
+			'tileset_id'        => $spec->tileset_id,
+			'source_layer'      => $spec->source_layer,
+			'type'              => $spec->layer_geometry_type,
+			'style_source_type' => 'vector',
+		);
 
 		update_post_meta( $post_id, 'type', $layer_type );
 		update_post_meta( $post_id, 'layer_type_options', $layer_type_options );
 
 		$default_style = array();
-		if ( ! empty( $style_data['suggested_filter'] ) ) {
-			$default_style['filter'] = $style_data['suggested_filter'];
+		if ( ! empty( $spec->suggested_filter ) ) {
+			$default_style['filter'] = $spec->suggested_filter;
 		}
-		if ( ! empty( $style_data['suggested_paint'] ) ) {
-			$default_style['paint'] = $style_data['suggested_paint'];
+		if ( ! empty( $spec->suggested_paint ) ) {
+			$default_style['paint'] = $spec->suggested_paint;
 		}
 		if ( ! empty( $default_style ) ) {
 			update_post_meta( $post_id, 'default_style', $default_style );
 		}
 
+		$attribution = $spec->limitations
+			? $spec->limitations
+			: sprintf(
+				/* translators: %s: tileset ID. */
+				__( 'Data from Mapbox tileset %s.', 'jeowp' ),
+				$spec->tileset_id
+			);
+		update_post_meta( $post_id, 'attribution', $attribution );
+
+		Minilayer_Metadata::assign_theme( $post_id, $theme );
+
+		$legend_color = Minilayer_Metadata::extract_color_from_paint( $spec->suggested_paint ?? array() );
+		$legend       = Minilayer_Metadata::build_simple_color_legend( $post_title, $legend_color );
+		self::store_legend_meta( $post_id, $legend );
+
 		self::assign_current_language( $post_id );
 
-		$result = array(
-			'id'       => $post_id,
-			'title'    => $post_title,
-			'type'     => $layer_type,
-			'style_id' => $style_id,
-			'edit_url' => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
+		return array(
+			'id'                  => $post_id,
+			'title'               => $post_title,
+			'type'                => $layer_type,
+			'tileset_id'          => $spec->tileset_id,
+			'source_layer'        => $spec->source_layer,
+			'layer_geometry_type' => $spec->layer_geometry_type,
+			'default_style'       => $default_style,
+			'limitations'         => $spec->limitations,
+			'theme'               => $theme,
+			'edit_url'            => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
 		);
+	}
 
-		if ( 'mapbox-tileset-vector' === $layer_type ) {
-			$result['tileset_id']          = $style_data['tileset_id'];
-			$result['source_layer']        = $style_data['source_layer'];
-			$result['layer_geometry_type'] = $style_data['layer_geometry_type'];
+	/**
+	 * Create a composed mapbox layer from a classified spec.
+	 *
+	 * @param Layer_Spec_Output $spec       Classified spec.
+	 * @param string            $layer_name Optional custom title.
+	 * @param string            $mapbox_key Mapbox access token.
+	 * @return array|\WP_Error Layer info or error.
+	 */
+	private static function create_composed_layer( Layer_Spec_Output $spec, string $layer_name = '', string $mapbox_key = '' ) {
+		$style_json = Mapbox_Style_Builder::build_from_spec( $spec );
+		if ( is_wp_error( $style_json ) ) {
+			return $style_json;
 		}
 
-		return $result;
+		$post_title = self::layer_title( $spec, $layer_name );
+		$published  = Mapbox_Style_Builder::publish_style( $style_json, $post_title, $mapbox_key );
+		if ( is_wp_error( $published ) ) {
+			return $published;
+		}
+
+		$source_label = $spec->external_sources ? __( 'External sources', 'jeowp' ) : __( 'Mapbox composed style', 'jeowp' );
+
+		$post_id = wp_insert_post(
+			array(
+				'post_type'    => 'map-layer',
+				'post_title'   => $post_title,
+				'post_status'  => 'publish',
+				'post_excerpt' => Minilayer_Metadata::build_excerpt(
+					$post_title,
+					$source_label,
+					'',
+					$spec->limitations,
+					'mapbox'
+				),
+			)
+		);
+
+		if ( is_wp_error( $post_id ) ) {
+			return $post_id;
+		}
+
+		update_post_meta( $post_id, 'type', 'mapbox' );
+		update_post_meta(
+			$post_id,
+			'layer_type_options',
+			array(
+				'style_id' => $published['style_id'],
+			)
+		);
+
+		$attribution = $spec->limitations
+			? $spec->limitations
+			: __( 'Composed Mapbox style with external sources.', 'jeowp' );
+		update_post_meta( $post_id, 'attribution', $attribution );
+
+		Minilayer_Metadata::assign_theme( $post_id, $spec->theme );
+
+		$legend_color = self::extract_first_layer_color( $spec->style_json ?? array() );
+		if ( $legend_color ) {
+			$legend = Minilayer_Metadata::build_simple_color_legend( $post_title, $legend_color );
+			self::store_legend_meta( $post_id, $legend );
+		}
+
+		self::assign_current_language( $post_id );
+
+		return array(
+			'id'          => $post_id,
+			'title'       => $post_title,
+			'type'        => 'mapbox',
+			'style_id'    => $published['style_id'],
+			'style_url'   => $published['style_url'],
+			'limitations' => $spec->limitations,
+			'theme'       => $spec->theme,
+			'edit_url'    => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
+		);
+	}
+
+	/**
+	 * Store legend metadata on a layer post.
+	 *
+	 * @param int   $post_id Post ID.
+	 * @param array $legend  Legend metadata.
+	 * @return void
+	 */
+	private static function store_legend_meta( int $post_id, array $legend ): void {
+		update_post_meta( $post_id, 'use_legend', $legend['use_legend'] );
+		update_post_meta( $post_id, 'legend_title', $legend['legend_title'] );
+		update_post_meta( $post_id, 'legend_type', $legend['legend_type'] );
+		update_post_meta( $post_id, 'legend_type_options', $legend['legend_type_options'] );
+	}
+
+	/**
+	 * Extract the first usable color from a composed style's layers.
+	 *
+	 * @param array $style_json Mapbox GL style JSON.
+	 * @return string|null Hex color or null.
+	 */
+	private static function extract_first_layer_color( array $style_json ): ?string {
+		$layers = $style_json['layers'] ?? array();
+		foreach ( $layers as $layer ) {
+			$paint = $layer['paint'] ?? array();
+			if ( ! is_array( $paint ) ) {
+				continue;
+			}
+			$color = Minilayer_Metadata::extract_color_from_paint( $paint );
+			if ( '#888888' !== $color ) {
+				return $color;
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * Resolve the layer title from the spec or the custom name.
+	 *
+	 * @param Layer_Spec_Output $spec       Classified spec.
+	 * @param string            $layer_name Optional custom title.
+	 * @return string
+	 */
+	private static function layer_title( Layer_Spec_Output $spec, string $layer_name = '' ): string {
+		if ( '' !== $layer_name ) {
+			return $layer_name;
+		}
+
+		if ( '' !== $spec->layer_title ) {
+			return $spec->layer_title;
+		}
+
+		return __( 'Minilayer', 'jeowp' );
 	}
 
 	/**

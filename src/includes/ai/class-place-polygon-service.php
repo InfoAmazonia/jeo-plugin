@@ -119,13 +119,14 @@ class Place_Polygon_Service {
 		}
 
 		$style_name = $layer_name ? $layer_name : $result['display_name'];
+		$fill_color = '#8e44ad';
 		$style_json = Mapbox_Style_Builder::build_boundary_style(
 			$geojson_url,
 			$style_name,
 			array(
-				'fill_color'   => '#8e44ad',
+				'fill_color'   => $fill_color,
 				'fill_opacity' => 0.15,
-				'line_color'   => '#8e44ad',
+				'line_color'   => $fill_color,
 				'line_width'   => 2,
 			)
 		);
@@ -141,11 +142,20 @@ class Place_Polygon_Service {
 			$result['display_name']
 		);
 
+		$theme = ( 'funai' === $result['source'] ) ? 'Indigenous Lands' : 'Administrative Boundaries';
+
 		$post_id = wp_insert_post(
 			array(
-				'post_type'   => 'map-layer',
-				'post_title'  => $post_title,
-				'post_status' => 'publish',
+				'post_type'    => 'map-layer',
+				'post_title'   => $post_title,
+				'post_status'  => 'publish',
+				'post_excerpt' => Minilayer_Metadata::build_excerpt(
+					$post_title,
+					$result['source'],
+					$result['attribution'],
+					__( 'Geometry simplified for interactive display; use authoritative source for legal boundaries.', 'jeowp' ),
+					'mapbox'
+				),
 			)
 		);
 
@@ -165,6 +175,14 @@ class Place_Polygon_Service {
 		update_post_meta( $post_id, '_jeo_boundary_source', $result['source'] );
 		update_post_meta( $post_id, '_jeo_boundary_geojson_url', $geojson_url );
 
+		Minilayer_Metadata::assign_theme( $post_id, $theme );
+
+		$legend = Minilayer_Metadata::build_simple_color_legend( $post_title, $fill_color );
+		update_post_meta( $post_id, 'use_legend', $legend['use_legend'] );
+		update_post_meta( $post_id, 'legend_title', $legend['legend_title'] );
+		update_post_meta( $post_id, 'legend_type', $legend['legend_type'] );
+		update_post_meta( $post_id, 'legend_type_options', $legend['legend_type_options'] );
+
 		return array(
 			'id'           => $post_id,
 			'title'        => $post_title,
@@ -175,6 +193,7 @@ class Place_Polygon_Service {
 			'bbox'         => $result['bbox'],
 			'display_name' => $result['display_name'],
 			'attribution'  => $result['attribution'],
+			'theme'        => $theme,
 		);
 	}
 

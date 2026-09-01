@@ -168,6 +168,53 @@ class Mapbox_Style_Builder {
 	}
 
 	/**
+	 * Build a composed Mapbox style from a minilayer spec.
+	 *
+	 * @param Layer_Spec_Output $spec Classified layer spec.
+	 * @return array|\WP_Error Normalized style JSON or error.
+	 */
+	public static function build_from_spec( Layer_Spec_Output $spec ) {
+		if ( 'mapbox' !== $spec->layer_type ) {
+			return new \WP_Error(
+				'jeo_mapbox_style_invalid_type',
+				__( 'Only "mapbox" layer specs can be built into a composed style.', 'jeowp' )
+			);
+		}
+
+		$style_json = $spec->style_json;
+		if ( empty( $style_json ) || ! is_array( $style_json ) ) {
+			return new \WP_Error(
+				'jeo_mapbox_style_missing_json',
+				__( 'Composed style spec is missing style_json.', 'jeowp' )
+			);
+		}
+
+		$required = array( 'sources', 'layers' );
+		foreach ( $required as $key ) {
+			if ( empty( $style_json[ $key ] ) || ! is_array( $style_json[ $key ] ) ) {
+				return new \WP_Error(
+					'jeo_mapbox_style_invalid',
+					sprintf(
+						/* translators: %s: missing style key. */
+						__( 'Composed style is missing required key: %s.', 'jeowp' ),
+						esc_html( $key )
+					)
+				);
+			}
+		}
+
+		$style_json['version'] = (int) ( $style_json['version'] ?? 8 );
+		$style_json['name']    = sanitize_text_field( $spec->layer_title );
+
+		if ( empty( $style_json['metadata'] ) || ! is_array( $style_json['metadata'] ) ) {
+			$style_json['metadata'] = array();
+		}
+		$style_json['metadata']['jeo:source'] = 'minilayer-composed';
+
+		return $style_json;
+	}
+
+	/**
 	 * Extract the Mapbox username from an access token.
 	 *
 	 * Mapbox access tokens use a JWT-like shape. The second segment is a
