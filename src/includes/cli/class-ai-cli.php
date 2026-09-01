@@ -29,6 +29,9 @@ class AI_CLI {
 	 *
 	 * ## OPTIONS
 	 *
+	 * <prompt>
+	 * : Natural-language description of the desired layer.
+	 *
 	 * [--layer_name=<name>]
 	 * : Optional custom title for the generated layer.
 	 *
@@ -36,6 +39,8 @@ class AI_CLI {
 	 *
 	 *     wp jeo ai generate-layer "Show rivers in Brazil"
 	 *     wp jeo ai generate-layer "Agriculture areas" --layer_name="Agriculture"
+	 *
+	 * @alias generate-layer
 	 *
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
@@ -73,6 +78,9 @@ class AI_CLI {
 	 *
 	 * ## OPTIONS
 	 *
+	 * <place>
+	 * : Place name to resolve into a boundary polygon.
+	 *
 	 * [--type=<type>]
 	 * : Optional entity type hint: municipality, state, indigenous_land, other.
 	 *
@@ -86,6 +94,8 @@ class AI_CLI {
 	 *
 	 *     wp jeo ai generate-boundary "São Paulo"
 	 *     wp jeo ai generate-boundary "Terra Indígena Yanomami" --type=indigenous_land
+	 *
+	 * @alias generate-boundary
 	 *
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
@@ -124,9 +134,16 @@ class AI_CLI {
 	/**
 	 * Test the minilayer classifier without creating a layer.
 	 *
+	 * ## OPTIONS
+	 *
+	 * <prompt>
+	 * : Natural-language description of the desired layer.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp jeo ai test-minilayer "Show rivers in Brazil"
+	 *
+	 * @alias test-minilayer
 	 *
 	 * @param array $args       Positional arguments.
 	 * @param array $assoc_args Associative arguments.
