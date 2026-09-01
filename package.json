@@ -65,7 +65,7 @@
 		"@rjsf/core": "^6.5.3",
 		"@rjsf/validator-ajv8": "^6.5.3",
 		"@wordpress/editor": "^14.46.0",
-		"ckeditor5": "^48.1.1",
+		"ckeditor5": "^48.4.0",
 		"classnames": "^2.5.1",
 		"date-fns": "^4.2.1",
 		"eta": "^4.6.0",
