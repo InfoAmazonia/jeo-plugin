@@ -11,6 +11,9 @@ use Jeo\AI\RAG_Agent;
 use Jeo\AI\RAG_Pipeline_Config;
 use Jeo\AI\WP_Post_Data_Loader;
 use Jeo\AI\Layer_Data_Loader;
+use Jeo\AI\Minilayer_Classifier;
+use Jeo\AI\Minilayer_Service;
+use Jeo\AI\Place_Polygon_Service;
 
 if ( ! defined( 'WPINC' ) ) {
 	die;
@@ -20,6 +23,134 @@ if ( ! defined( 'WPINC' ) ) {
  * WP-CLI commands for JEO AI features.
  */
 class AI_CLI {
+
+	/**
+	 * Generate a thematic map-layer from a natural-language prompt.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--layer_name=<name>]
+	 * : Optional custom title for the generated layer.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp jeo ai generate-layer "Show rivers in Brazil"
+	 *     wp jeo ai generate-layer "Agriculture areas" --layer_name="Agriculture"
+	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Associative arguments.
+	 *
+	 * @when after_wp_load
+	 */
+	public function generate_layer( $args, $assoc_args ) {
+		if ( empty( $args[0] ) ) {
+			\WP_CLI::error( __( 'A prompt is required.', 'jeowp' ) );
+		}
+
+		$prompt     = $args[0];
+		$layer_name = \WP_CLI\Utils\get_flag_value( $assoc_args, 'layer_name', '' );
+
+		\WP_CLI::log( __( 'Classifying prompt...', 'jeowp' ) );
+		$result = Minilayer_Service::generate_and_create( $prompt, $layer_name );
+
+		if ( is_wp_error( $result ) ) {
+			\WP_CLI::error( $result->get_error_message() );
+		}
+
+		\WP_CLI::success(
+			sprintf(
+				/* translators: 1: layer title, 2: post ID. */
+				__( 'Layer created: %1$s (ID %2$d)', 'jeowp' ),
+				$result['title'],
+				$result['id']
+			)
+		);
+		\WP_CLI::log( wp_json_encode( $result, JSON_PRETTY_PRINT ) );
+	}
+
+	/**
+	 * Generate a boundary map-layer from a place name.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--type=<type>]
+	 * : Optional entity type hint: municipality, state, indigenous_land, other.
+	 *
+	 * [--context=<context>]
+	 * : Optional geographic context (e.g. state or country name).
+	 *
+	 * [--layer_name=<name>]
+	 * : Optional custom title for the generated layer.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp jeo ai generate-boundary "São Paulo"
+	 *     wp jeo ai generate-boundary "Terra Indígena Yanomami" --type=indigenous_land
+	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Associative arguments.
+	 *
+	 * @when after_wp_load
+	 */
+	public function generate_boundary( $args, $assoc_args ) {
+		if ( empty( $args[0] ) ) {
+			\WP_CLI::error( __( 'A place name is required.', 'jeowp' ) );
+		}
+
+		$place      = $args[0];
+		$type       = \WP_CLI\Utils\get_flag_value( $assoc_args, 'type', null );
+		$context    = \WP_CLI\Utils\get_flag_value( $assoc_args, 'context', null );
+		$layer_name = \WP_CLI\Utils\get_flag_value( $assoc_args, 'layer_name', '' );
+
+		\WP_CLI::log( __( 'Resolving boundary polygon...', 'jeowp' ) );
+		$service = new Place_Polygon_Service();
+		$result  = $service->create_layer( $place, $type, $context, $layer_name );
+
+		if ( is_wp_error( $result ) ) {
+			\WP_CLI::error( $result->get_error_message() );
+		}
+
+		\WP_CLI::success(
+			sprintf(
+				/* translators: 1: layer title, 2: post ID. */
+				__( 'Boundary layer created: %1$s (ID %2$d)', 'jeowp' ),
+				$result['title'],
+				$result['id']
+			)
+		);
+		\WP_CLI::log( wp_json_encode( $result, JSON_PRETTY_PRINT ) );
+	}
+
+	/**
+	 * Test the minilayer classifier without creating a layer.
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     wp jeo ai test-minilayer "Show rivers in Brazil"
+	 *
+	 * @param array $args       Positional arguments.
+	 * @param array $assoc_args Associative arguments.
+	 *
+	 * @when after_wp_load
+	 */
+	public function test_minilayer( $args, $assoc_args ) {
+		$assoc_args = $assoc_args; // No flags supported; satisfies code analysis.
+
+		if ( empty( $args[0] ) ) {
+			\WP_CLI::error( __( 'A prompt is required.', 'jeowp' ) );
+		}
+
+		$prompt = $args[0];
+		\WP_CLI::log( __( 'Classifying prompt (no layer will be created)...', 'jeowp' ) );
+
+		$spec = Minilayer_Classifier::classify( $prompt );
+		if ( is_wp_error( $spec ) ) {
+			\WP_CLI::error( $spec->get_error_message() );
+		}
+
+		$data = json_decode( wp_json_encode( $spec ), true );
+		\WP_CLI::log( wp_json_encode( $data, JSON_PRETTY_PRINT ) );
+	}
 
 	/**
 	 * Vectorize content into the RAG Knowledge Base.

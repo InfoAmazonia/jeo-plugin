@@ -54,6 +54,11 @@ npm run i18n:json                  # Generate Jed JSON translations
 npm run i18n:compile               # MO + JSON
 npm run i18n:refresh               # assets + POT + PO (use before committing string changes)
 
+# WP-CLI (AI / Minilayer)
+wp jeo ai generate-layer "rivers in Brazil" [--layer_name="Rivers"]
+wp jeo ai generate-boundary "São Paulo" [--type=municipality] [--context="São Paulo, Brazil"]
+wp jeo ai test-minilayer "roads in Rio"
+
 # PHP
 vendor/bin/phpcs --standard=phpcs.xml.dist    # PHP lint (WPCS) — matches CI
 vendor/bin/phpcbf src/                        # Auto-fix WPCS issues

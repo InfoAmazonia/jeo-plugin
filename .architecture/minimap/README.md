@@ -575,6 +575,14 @@ When a Mapbox key is configured, the agent may call `generate_boundary_layer` pr
 - Brazilian indigenous lands (FUNAI WFS)
 - International administrative boundaries (OpenStreetMap relation + Overpass outer-ring assembly)
 
-`Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. `Mapbox_Style_Builder` then creates a simple line + fill style and publishes it to the Mapbox Styles API. The resulting `mapbox` layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, and `attribution`.
+`Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. `Mapbox_Style_Builder` then creates a simple line + fill style and publishes it to the Mapbox Styles API. The resulting `mapbox` layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, `attribution`, `theme`, and an auto-generated `simple-color` legend.
 
 All non-boundary layer types still require explicit user confirmation before `generate_layer` is called.
+
+### WP-CLI testing
+
+The `AI_CLI` class exposes commands for local testing and observability:
+
+- `wp jeo ai generate-layer "rivers in Brazil"` — runs the full thematic pipeline.
+- `wp jeo ai generate-boundary "São Paulo"` — resolves and publishes a boundary layer.
+- `wp jeo ai test-minilayer "roads in Rio"` — classifies a prompt without side effects.

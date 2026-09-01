@@ -58,6 +58,14 @@ class Minilayer_Classifier {
 			);
 		}
 
+		\jeo_ai_logger()->insert_log(
+			$active_provider ? $active_provider : 'unknown',
+			$prompt,
+			$response,
+			0,
+			0
+		);
+
 		return $response;
 	}
 

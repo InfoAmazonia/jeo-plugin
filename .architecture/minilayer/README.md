@@ -178,6 +178,21 @@ Legend generation:
 - Boundary layers use the boundary outline/fill color.
 - Composed `mapbox` styles attempt to extract the first usable color from `style_json.layers`; if none is found, no legend is generated.
 
+## WP-CLI Commands
+
+The `AI_CLI` class registers commands under `wp jeo ai` for local testing and observability:
+
+| Command | Purpose |
+|---------|---------|
+| `wp jeo ai generate-layer <prompt> [--layer_name=<name>]` | Runs `Minilayer_Service::generate_and_create()` and prints the created layer info. |
+| `wp jeo ai generate-boundary <place> [--type=<type>] [--context=<context>] [--layer_name=<name>]` | Runs `Place_Polygon_Service::create_layer()` and prints the boundary layer info. |
+| `wp jeo ai test-minilayer <prompt>` | Runs `Minilayer_Classifier::classify()` only — no side effects. |
+
+## Observability
+
+- Every `Minilayer_Classifier::classify()` call is logged via `AI_Logger::insert_log()` with the active provider, prompt, and resulting spec.
+- Structured-output mode reports 0 tokens (provider limitation), but the prompt and response are stored for debugging and cost review.
+
 ## Prompt Architecture
 
 The `Minilayer_Classifier::instructions()` prompt has 6 sections:
