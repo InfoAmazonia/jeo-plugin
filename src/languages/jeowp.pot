@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-23T17:05:09+00:00\n"
+"POT-Creation-Date: 2026-09-01T22:09:20+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -388,9 +388,9 @@ msgstr ""
 #: includes/ai/class-context-handler.php:806
 #: includes/ai/class-context-handler.php:882
 #: includes/ai/class-rag-worker.php:223
-#: includes/minimap/class-minimap.php:142
-#: includes/minimap/class-minimap.php:238
-#: includes/minimap/class-minimap.php:329
+#: includes/minimap/class-minimap.php:149
+#: includes/minimap/class-minimap.php:250
+#: includes/minimap/class-minimap.php:341
 msgid "Post not found."
 msgstr ""
 
@@ -398,8 +398,8 @@ msgstr ""
 #: includes/ai/class-context-handler.php:368
 #: includes/ai/class-minilayer-handler.php:85
 #: includes/ai/class-minilayer-service.php:41
-#: includes/minimap/class-minimap.php:249
-#: includes/minimap/class-minimap.php:350
+#: includes/minimap/class-minimap.php:261
+#: includes/minimap/class-minimap.php:362
 msgid "No AI provider configured. Set one in JEO AI Settings."
 msgstr ""
 
@@ -426,18 +426,18 @@ msgid "Suggestions generated."
 msgstr ""
 
 #: includes/ai/class-context-handler.php:327
-#: includes/minimap/class-minimap.php:309
+#: includes/minimap/class-minimap.php:321
 msgid "conversation_id is required."
 msgstr ""
 
 #: includes/ai/class-context-handler.php:337
-#: includes/minimap/class-minimap.php:227
-#: includes/minimap/class-minimap.php:319
+#: includes/minimap/class-minimap.php:239
+#: includes/minimap/class-minimap.php:331
 msgid "A post ID is required."
 msgstr ""
 
 #: includes/ai/class-context-handler.php:357
-#: includes/minimap/class-minimap.php:339
+#: includes/minimap/class-minimap.php:351
 msgid "A message is required."
 msgstr ""
 
@@ -469,7 +469,7 @@ msgid "Prompt is required."
 msgstr ""
 
 #: includes/ai/class-minilayer-handler.php:72
-#: includes/minimap/class-minimap.php:217
+#: includes/minimap/class-minimap.php:229
 msgid "A prompt is required."
 msgstr ""
 
@@ -1632,6 +1632,14 @@ msgstr ""
 msgid "Embed not available"
 msgstr ""
 
+#: includes/class-jeo.php:2042
+msgid "A Mapbox style ID and access token are required."
+msgstr ""
+
+#: includes/class-jeo.php:2086
+msgid "Unexpected Mapbox style payload."
+msgstr ""
+
 #: includes/geocode/class-geocode-handler.php:123
 msgid "Geocoding service provided by OpenStreetMap at https://nominatim.openstreetmap.org/."
 msgstr ""
@@ -1861,61 +1869,61 @@ msgstr ""
 msgid "Explore"
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:511
-#: includes/maps/class-map-style-composer.php:564
+#: includes/maps/class-map-style-composer.php:555
+#: includes/maps/class-map-style-composer.php:614
 msgid "Mapbox composed styles are disabled."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:536
-#: includes/maps/class-map-style-composer.php:588
+#: includes/maps/class-map-style-composer.php:580
+#: includes/maps/class-map-style-composer.php:638
 msgid "Could not create the Mapbox composed style cache directory."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:684
+#: includes/maps/class-map-style-composer.php:734
 msgid "Map not found."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:694
+#: includes/maps/class-map-style-composer.php:744
 msgid "A Mapbox access token is required to compose Mapbox styles."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:734
+#: includes/maps/class-map-style-composer.php:784
 msgid "Public payload composition is only available for one-time maps."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:740
+#: includes/maps/class-map-style-composer.php:790
 msgid "The map preview payload is too large."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:752
+#: includes/maps/class-map-style-composer.php:802
 msgid "The map preview has too many layers to compose."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:759
+#: includes/maps/class-map-style-composer.php:809
 msgid "The map preview does not include any renderable layers."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:781
+#: includes/maps/class-map-style-composer.php:831
 msgid "Map preview"
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1027
+#: includes/maps/class-map-style-composer.php:1077
 msgid "Invalid composed style hash."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1115
+#: includes/maps/class-map-style-composer.php:1172
 msgid "One or more Mapbox styles could not be fetched."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1528
+#: includes/maps/class-map-style-composer.php:1563
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1647
+#: includes/maps/class-map-style-composer.php:1682
 msgid "Could not decode a Mapbox sprite image."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:2364
+#: includes/maps/class-map-style-composer.php:2381
 msgid "Composed style artifact was not found."
 msgstr ""
 
@@ -2149,55 +2157,71 @@ msgstr ""
 msgid "AI (new)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:171
+#: includes/minimap/class-minimap.php:178
 msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:195
+#: includes/minimap/class-minimap.php:206
 msgid "Generate a map for this post based on its content."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:430
+#: includes/minimap/class-minimap.php:207
+msgid "Initial generation from post content"
+msgstr ""
+
+#: includes/minimap/class-minimap.php:442
 msgid "The AI returned an empty response. Please try again."
 msgstr ""
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:458
+#: includes/minimap/class-minimap.php:485
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:895
+#. translators: %d: version number.
+#: includes/minimap/class-minimap.php:878
+#, php-format
+msgid "Version %d was not found in the stored history. The configuration reconstructed from the conversation context was applied instead."
+msgstr ""
+
+#. translators: %d: version number.
+#: includes/minimap/class-minimap.php:891
+#, php-format
+msgid "Restored map version %d."
+msgstr ""
+
+#: includes/minimap/class-minimap.php:1089
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr ""
 
 #. translators: %d: number of preserved layers
-#: includes/minimap/class-minimap.php:1012
+#: includes/minimap/class-minimap.php:1333
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1367
+#: includes/minimap/class-minimap.php:1688
 msgid "Dark Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1374
+#: includes/minimap/class-minimap.php:1695
 msgid "Terrain Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1381
+#: includes/minimap/class-minimap.php:1702
 msgid "Satellite Base (Mapbox)"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1392
+#: includes/minimap/class-minimap.php:1713
 msgid "Dark Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1401
+#: includes/minimap/class-minimap.php:1722
 msgid "Light Base"
 msgstr ""
 
-#: includes/minimap/class-minimap.php:1410
+#: includes/minimap/class-minimap.php:1731
 msgid "Satellite Base"
 msgstr ""
 

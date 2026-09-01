@@ -18,10 +18,9 @@ import { buildRelatedPostsGeoJson } from '../shared/story-geojson';
 import { EMPTY_STYLE, resolveTileUrl } from '../shared/styles';
 import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
+import { getLayerRequestContext } from './layer-request-context';
 import { toFiniteNumber } from './map-numbers';
 import { getPanLimitsMaxBounds } from './pan-limits';
-import { getLayerRequestContext } from './layer-request-context';
-import { compileEtaTemplate } from './template-compiler';
 
 import '../../../css/jeo-map.scss';
 
@@ -78,6 +77,9 @@ export default class JeoMap {
 		this.composedInteractionCleanups = [];
 		this.initialized = false;
 		this.popup = null;
+		this.attributionResizeObserver = null;
+		this.relatedPostsClusterBadgeBaseImage = null;
+		this.relatedPostsClusterBadgeHandlerRegistered = false;
 		this.isPreviewMapPayload = false;
 
 		this.isEmbed = this.element.getAttribute( 'data-embed' );
@@ -327,6 +329,7 @@ export default class JeoMap {
 			} catch ( error ) {
 				this.isPreviewMapPayload = false;
 				console.warn( 'Unable to parse preview map payload. Falling back to REST data.', error );
+				this.isPreviewMapPayload = false;
 			}
 
 			if ( this.map_post_object ) {
