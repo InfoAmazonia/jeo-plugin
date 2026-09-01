@@ -184,6 +184,12 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	 * @return array|\WP_Error GeoJSON FeatureCollection or error.
 	 */
 	private function fetch_overpass_relation( int $relation_id ) {
+		$cache_key = 'jeo_osm_overpass_relation_' . $relation_id;
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
 		$overpass_query = sprintf(
 			"[out:json];\nrelation(%d);\nout tags;\nway(r:\"outer\");\nout geom;\n",
 			$relation_id
@@ -223,7 +229,7 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			$coordinates[] = array( $ring );
 		}
 
-		return array(
+		$geojson = array(
 			'type'     => 'FeatureCollection',
 			'features' => array(
 				array(
@@ -236,6 +242,9 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 				),
 			),
 		);
+
+		set_transient( $cache_key, $geojson, DAY_IN_SECONDS );
+		return $geojson;
 	}
 
 	/**
@@ -256,13 +265,24 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 
 		$last_error = null;
 		foreach ( $mirror_list as $mirror_url ) {
-			$response = $this->http_get(
-				$mirror_url,
-				array(
-					'timeout' => 45,
-					'body'    => array( 'data' => $overpass_query ),
-				)
+			$default_args = array(
+				'timeout' => 45,
+				'body'    => array( 'data' => $overpass_query ),
 			);
+
+			/**
+			 * Filter the HTTP request args for a specific Overpass mirror.
+			 *
+			 * Use this to inject authentication headers, custom timeouts, or
+			 * paid-mirror API keys.
+			 *
+			 * @param array  $args          WP_HTTP request args.
+			 * @param string $mirror_url    Mirror URL being tried.
+			 * @param string $overpass_query Overpass QL query.
+			 */
+			$args = apply_filters( 'jeo_overpass_request_args', $default_args, $mirror_url, $overpass_query );
+
+			$response = $this->http_get( $mirror_url, $args );
 
 			if ( is_wp_error( $response ) ) {
 				$last_error = $response;

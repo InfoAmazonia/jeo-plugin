@@ -114,7 +114,7 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	}
 
 	/**
-	 * Get the full IBGE municipality list, cached for one day.
+	 * Get the full IBGE municipality list, cached for one month.
 	 *
 	 * @return array
 	 */
@@ -135,7 +135,7 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			return array();
 		}
 
-		set_transient( $cache_key, $data, DAY_IN_SECONDS );
+		set_transient( $cache_key, $data, MONTH_IN_SECONDS );
 		return $data;
 	}
 
@@ -162,13 +162,8 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	private function find_state( string $place_name, string $context ): ?array {
 		unset( $context );
 
-		$response = $this->http_get( 'https://servicodados.ibge.gov.br/api/v1/localidades/estados' );
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
-			return null;
-		}
-
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( ! is_array( $data ) || empty( $data ) ) {
+		$data = $this->get_state_list();
+		if ( empty( $data ) ) {
 			return null;
 		}
 
@@ -184,6 +179,32 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get the full IBGE state list, cached for one month.
+	 *
+	 * @return array
+	 */
+	private function get_state_list(): array {
+		$cache_key = 'jeo_ibge_estados_list';
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$response = $this->http_get( 'https://servicodados.ibge.gov.br/api/v1/localidades/estados' );
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return array();
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( ! is_array( $data ) ) {
+			return array();
+		}
+
+		set_transient( $cache_key, $data, MONTH_IN_SECONDS );
+		return $data;
 	}
 
 	/**

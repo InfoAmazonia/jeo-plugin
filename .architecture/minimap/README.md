@@ -579,6 +579,22 @@ When a Mapbox key is configured, the agent may call `generate_boundary_layer` pr
 
 All non-boundary layer types still require explicit user confirmation before `generate_layer` is called.
 
+### Boundary resolver configuration
+
+| Filter | Purpose |
+|--------|---------|
+| `jeo_place_polygon_adapter_order` | Change the adapter order (`ibge`, `funai`, `osm`) or remove adapters. |
+| `jeo_overpass_mirrors` | Replace the default Overpass mirror list. Useful to remove the `.ru` mirror or use a private mirror. |
+| `jeo_overpass_request_args` | Inject per-mirror HTTP args (headers, auth tokens, timeouts) for paid/private Overpass instances. |
+| `jeo_osm_admin_prefixes` | Customize administrative prefixes stripped from Nominatim queries. |
+| `jeo_funai_wfs_name_attribute` | Change the FUNAI feature attribute used for name matching (default: `nome`). |
+
+### Caching
+
+* Polygon results (`jeo_polygon_<source>_...`): 24 hours.
+* IBGE municipality/state lists (`jeo_ibge_municipios_list`, `jeo_ibge_estados_list`): 30 days.
+* Overpass relation geometries (`jeo_osm_overpass_relation_<id>`): 24 hours.
+
 ### WP-CLI testing
 
 The `AI_CLI` class exposes commands for local testing and observability:
