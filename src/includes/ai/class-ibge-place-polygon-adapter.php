@@ -76,29 +76,32 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	/**
 	 * Find a municipality by name, optionally disambiguated by state.
 	 *
+	 * The IBGE endpoint ignores the "nome" query parameter, so we fetch the
+	 * full list once per day and filter it client-side.
+	 *
 	 * @param string $place_name Place name.
 	 * @param string $context    State name or abbreviation.
 	 * @return array|null Entity with id, name, type or null.
 	 */
 	private function find_municipality( string $place_name, string $context ): ?array {
-		$url = add_query_arg(
-			array(
-				'nome' => $place_name,
-			),
-			'https://servicodados.ibge.gov.br/api/v1/localidades/municipios'
+		$data = $this->get_municipality_list();
+		if ( empty( $data ) ) {
+			return null;
+		}
+
+		$place_lower = $this->normalize_for_compare( $place_name );
+		$matches     = array_filter(
+			$data,
+			function ( $item ) use ( $place_lower ) {
+				return $this->normalize_for_compare( $item['nome'] ?? '' ) === $place_lower;
+			}
 		);
 
-		$response = $this->http_get( $url );
-		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+		if ( empty( $matches ) ) {
 			return null;
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( ! is_array( $data ) || empty( $data ) ) {
-			return null;
-		}
-
-		$match = $this->disambiguate_ibge( $data, $context );
+		$match = $this->disambiguate_ibge( array_values( $matches ), $context );
 		if ( null === $match ) {
 			return null;
 		}
@@ -111,6 +114,45 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	}
 
 	/**
+	 * Get the full IBGE municipality list, cached for one day.
+	 *
+	 * @return array
+	 */
+	private function get_municipality_list(): array {
+		$cache_key = 'jeo_ibge_municipios_list';
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$response = $this->http_get( 'https://servicodados.ibge.gov.br/api/v1/localidades/municipios' );
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return array();
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( ! is_array( $data ) ) {
+			return array();
+		}
+
+		set_transient( $cache_key, $data, DAY_IN_SECONDS );
+		return $data;
+	}
+
+	/**
+	 * Normalize a string for case-insensitive, accent-insensitive comparison.
+	 *
+	 * @param string $value Raw value.
+	 * @return string
+	 */
+	private function normalize_for_compare( string $value ): string {
+		$value = remove_accents( $value );
+		$value = strtolower( $value );
+		$value = preg_replace( '/[^a-z0-9\s]/', '', $value );
+		return trim( $value );
+	}
+
+	/**
 	 * Find a state by name.
 	 *
 	 * @param string $place_name Place name.
@@ -120,14 +162,7 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	private function find_state( string $place_name, string $context ): ?array {
 		unset( $context );
 
-		$url = add_query_arg(
-			array(
-				'nome' => $place_name,
-			),
-			'https://servicodados.ibge.gov.br/api/v1/localidades/estados'
-		);
-
-		$response = $this->http_get( $url );
+		$response = $this->http_get( 'https://servicodados.ibge.gov.br/api/v1/localidades/estados' );
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 			return null;
 		}
@@ -137,12 +172,18 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			return null;
 		}
 
-		$match = $data[0];
-		return array(
-			'id'   => (int) $match['id'],
-			'name' => sanitize_text_field( $match['nome'] ),
-			'type' => 'state',
-		);
+		$place_lower = $this->normalize_for_compare( $place_name );
+		foreach ( $data as $state ) {
+			if ( $this->normalize_for_compare( $state['nome'] ?? '' ) === $place_lower ) {
+				return array(
+					'id'   => (int) $state['id'],
+					'name' => sanitize_text_field( $state['nome'] ),
+					'type' => 'state',
+				);
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -181,9 +222,9 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	 * @return array|\WP_Error GeoJSON geometry array or error.
 	 */
 	private function fetch_malha( int $id, string $type ) {
-		$path = 'municipios' === $type ? 'municipios' : 'estados';
+		$path = 'municipality' === $type ? 'municipios' : 'estados';
 		$url  = sprintf(
-			'https://servicodados.ibge.gov.br/api/v3/malhas/%s/%d?formato=application/json',
+			'https://servicodados.ibge.gov.br/api/v3/malhas/%s/%d?formato=application/vnd.geo+json',
 			$path,
 			$id
 		);

@@ -58,6 +58,8 @@ class Minilayer_Classifier {
 			);
 		}
 
+		$response->normalize();
+
 		\jeo_ai_logger()->insert_log(
 			$active_provider ? $active_provider : 'unknown',
 			$prompt,
@@ -134,6 +136,8 @@ In this case set:
 - layer_type: "mapbox-tileset-vector"
 - tileset_id, source_layer, layer_geometry_type
 - suggested_filter and suggested_paint
+
+CRITICAL: suggested_filter and suggested_paint must be plain JSON objects/arrays, never JSON-encoded strings. Example paint: {"line-color": "#2980b9", "line-width": 1.5}.
 
 ### Use mapbox when ANY of these apply:
 1. External sources are needed (GeoJSON URL from user, third-party tile URLs)

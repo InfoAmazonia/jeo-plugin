@@ -81,13 +81,28 @@ abstract class Abstract_Place_Polygon_Adapter implements Place_Polygon_Adapter {
 	}
 
 	/**
-	 * Compute a bounding box from a GeoJSON feature geometry.
+	 * Compute a bounding box from a GeoJSON geometry, Feature, or FeatureCollection.
 	 *
-	 * @param array $geometry GeoJSON geometry array.
+	 * @param array $geojson GeoJSON array.
 	 * @return array|null [west, south, east, north] or null.
 	 */
-	protected function compute_bbox( array $geometry ): ?array {
-		$coords = $this->extract_coordinates( $geometry );
+	protected function compute_bbox( array $geojson ): ?array {
+		$type = $geojson['type'] ?? '';
+
+		if ( 'FeatureCollection' === $type ) {
+			$all_coords = array();
+			foreach ( $geojson['features'] ?? array() as $feature ) {
+				$geometry   = $feature['geometry'] ?? array();
+				$coords     = $this->extract_coordinates( $geometry );
+				$all_coords = array_merge( $all_coords, $coords );
+			}
+			$coords = $all_coords;
+		} elseif ( 'Feature' === $type ) {
+			$coords = $this->extract_coordinates( $geojson['geometry'] ?? array() );
+		} else {
+			$coords = $this->extract_coordinates( $geojson );
+		}
+
 		if ( empty( $coords ) ) {
 			return null;
 		}

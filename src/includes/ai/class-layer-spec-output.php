@@ -146,6 +146,57 @@ class Layer_Spec_Output {
 	public string $limitations = '';
 
 	/**
+	 * Normalize fields that the model may return as JSON strings or flat arrays.
+	 *
+	 * @return void
+	 */
+	public function normalize(): void {
+		$this->suggested_paint  = self::normalize_json_field( $this->suggested_paint );
+		$this->suggested_filter = self::normalize_json_field( $this->suggested_filter );
+		$this->style_json       = self::normalize_json_field( $this->style_json );
+	}
+
+	/**
+	 * Normalize a field that should be an associative array.
+	 *
+	 * Handles models that return a JSON string, a flat key/value array, or
+	 * an array containing a single JSON string.
+	 *
+	 * @param mixed $value Raw field value.
+	 * @return array|null
+	 */
+	private static function normalize_json_field( $value ): ?array {
+		if ( null === $value ) {
+			return null;
+		}
+
+		if ( is_array( $value ) && count( $value ) === 1 && isset( $value[0] ) && is_string( $value[0] ) ) {
+			$decoded = json_decode( $value[0], true );
+			if ( is_array( $decoded ) ) {
+				return $decoded;
+			}
+		}
+
+		if ( is_string( $value ) ) {
+			$decoded = json_decode( $value, true );
+			return is_array( $decoded ) ? $decoded : null;
+		}
+
+		if ( is_array( $value ) && array_is_list( $value ) ) {
+			$value_count = count( $value );
+			if ( 0 === $value_count % 2 ) {
+				$pairs = array();
+				for ( $i = 0; $i < $value_count; $i += 2 ) {
+					$pairs[ $value[ $i ] ] = $value[ $i + 1 ];
+				}
+				return $pairs;
+			}
+		}
+
+		return is_array( $value ) ? $value : null;
+	}
+
+	/**
 	 * Convert the spec to a legacy-style array for backwards-compatible consumers.
 	 *
 	 * @return array
