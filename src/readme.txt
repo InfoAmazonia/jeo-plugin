@@ -51,10 +51,13 @@ JEO includes:
 
 JEO can connect to the following third-party services:
 
-* Mapbox, only when you select Mapbox as the rendering library or use Mapbox-hosted map resources. The site loads JavaScript/CSS from `api.mapbox.com`, and Mapbox receives the configured access token, visitor IP address, browser details, and requested map resources. Terms of Service: [https://www.mapbox.com/legal/tos](https://www.mapbox.com/legal/tos). Privacy Policy: [https://www.mapbox.com/legal/privacy](https://www.mapbox.com/legal/privacy).
+* Mapbox, only when you select Mapbox as the rendering library, use Mapbox-hosted map resources, or use AI-generated layers that publish composed styles or vector tilesets. The site loads JavaScript/CSS from `api.mapbox.com`, and Mapbox receives the configured access token, visitor IP address, browser details, and requested map resources. Terms of Service: [https://www.mapbox.com/legal/tos](https://www.mapbox.com/legal/tos). Privacy Policy: [https://www.mapbox.com/legal/privacy](https://www.mapbox.com/legal/privacy).
 * Nominatim (OpenStreetMap), only when an editor explicitly runs an address search or reverse-geocodes a point in the post geolocation UI. The typed address or selected coordinates, the site URL in the request user agent, and the server IP address are sent to `nominatim.openstreetmap.org`. Usage Policy: [https://operations.osmfoundation.org/policies/nominatim/](https://operations.osmfoundation.org/policies/nominatim/). Privacy Policy: [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy).
 * OpenStreetMap raster tiles, used by the default MapLibre preview style. The tile service receives the visitor IP address, browser details, and requested tile URLs. Tile Usage Policy: [https://operations.osmfoundation.org/policies/tiles/](https://operations.osmfoundation.org/policies/tiles/). Privacy Policy: [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy).
-* Optional external typography and footer logo URLs, only when the site administrator explicitly configures those fields with an external host. In that case the visitor browser requests the asset directly from the chosen host, which may receive the visitor IP address, browser details, and referrer according to that provider's own terms and privacy policy.
+* Overpass API (OpenStreetMap), only when the AI boundary resolver falls back to OpenStreetMap for international boundaries. The place name is sent to `overpass-api.de` (or another configured Overpass endpoint) and the server IP address is included in the request. Usage Policy: [https://wiki.openstreetmap.org/wiki/Overpass_API](https://wiki.openstreetmap.org/wiki/Overpass_API). Privacy Policy: [https://osmfoundation.org/wiki/Privacy_Policy](https://osmfoundation.org/wiki/Privacy_Policy).
+* IBGE (Brazilian Institute of Geography and Statistics), only when resolving Brazilian municipality or state boundaries. The place name is sent to `servicodados.ibge.gov.br` and the server IP address is included in the request. Terms of Use: [https://www.ibge.gov.br/](https://www.ibge.gov.br/). Privacy Policy: [https://www.ibge.gov.br/](https://www.ibge.gov.br/).
+* FUNAI (National Indian Foundation), only when resolving Brazilian indigenous land boundaries. The place name is sent to the FUNAI WFS endpoint and the server IP address is included in the request. Privacy Policy: [https://www.gov.br/funai/](https://www.gov.br/funai/).
+* AI providers (Gemini, OpenAI, Anthropic, etc.), only when an administrator configures an AI provider in JEO AI Settings and an editor uses an AI-powered feature (georeferencing, context suggestions, minimap layer generation, etc.). The prompt, post content, or layer description is sent to the configured provider's API using the administrator's API key. Data handling is governed by the chosen provider's terms and privacy policy.
 
 = Where can I find more tutorials and developer documentation? =
 
@@ -62,7 +65,15 @@ Visit [https://www.jeowp.org/](https://www.jeowp.org/) for tutorials, user guide
 
 == Third Party Services ==
 
-See "Which third-party services can JEO connect to?" in the FAQ above for the required service disclosures.
+JEO connects to the following third-party services only when the corresponding feature is enabled or explicitly used:
+
+* **Mapbox** — Map rendering library, hosted styles, vector/raster tilesets, and AI-generated style publishing. Requires a configured access token. [Terms](https://www.mapbox.com/legal/tos) · [Privacy](https://www.mapbox.com/legal/privacy).
+* **Nominatim / OpenStreetMap** — Address search and reverse geocoding in the post geolocation UI. [Usage Policy](https://operations.osmfoundation.org/policies/nominatim/) · [Privacy](https://osmfoundation.org/wiki/Privacy_Policy).
+* **OpenStreetMap tiles** — Default raster tile background in MapLibre previews. [Tile Policy](https://operations.osmfoundation.org/policies/tiles/) · [Privacy](https://osmfoundation.org/wiki/Privacy_Policy).
+* **Overpass API** — Boundary geometry fallback for international places. [Wiki](https://wiki.openstreetmap.org/wiki/Overpass_API) · [Privacy](https://osmfoundation.org/wiki/Privacy_Policy).
+* **IBGE** — Boundary geometry for Brazilian municipalities and states. [Terms](https://www.ibge.gov.br/).
+* **FUNAI** — Boundary geometry for Brazilian indigenous lands. [Site](https://www.gov.br/funai/).
+* **AI providers** (Gemini, OpenAI, Anthropic, etc.) — Used by JEO AI features when configured by an administrator. Governed by the selected provider's terms and privacy policy.
 
 == Screenshots ==
 1. Embed interactive maps in posts with reader-facing layer and legend controls.
