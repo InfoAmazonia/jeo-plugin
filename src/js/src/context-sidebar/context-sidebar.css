@@ -59,6 +59,10 @@
 	background: #f6f7f7;
 }
 
+.jeo-context-chat--modal .jeo-context-chat__messages::empty {
+	display: none;
+}
+
 .jeo-context-chat__intro {
 	text-align: center;
 	padding: 16px 8px;
@@ -318,6 +322,12 @@
 	color: #555;
 	margin: 4px 0 6px;
 	line-height: 1.4;
+}
+
+.jeo-context-chat--compact .jeo-context-history__list {
+	max-height: 600px;
+	overflow-y: auto;
+	padding-right: 4px;
 }
 
 /* Modal */

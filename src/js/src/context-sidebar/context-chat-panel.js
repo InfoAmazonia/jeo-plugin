@@ -307,7 +307,7 @@ const ContextChatPanel = ( { postId } ) => {
 				/>
 			) }
 
-			{ ! isRestoring && isModal && suggestionHistory.length > 1 && (
+			{ ! isRestoring && suggestionHistory.length > 1 && (
 				<details className="jeo-context-history">
 					<summary className="jeo-context-history__summary">
 						{ __( 'Previous suggestions', 'jeowp' ) } ({ suggestionHistory.length })
