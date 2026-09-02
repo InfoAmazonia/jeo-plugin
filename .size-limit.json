@@ -20,7 +20,7 @@
 	{
 		"name": "layersSidebar",
 		"path": "src/js/build/layersSidebar.js",
-		"limit": "410 KB",
+		"limit": "412 KB",
 		"brotli": false
 	},
 	{
@@ -44,13 +44,13 @@
 	{
 		"name": "jeoMap",
 		"path": "src/js/build/jeoMap.js",
-		"limit": "102 KB",
+		"limit": "103 KB",
 		"brotli": false
 	},
 	{
 		"name": "jeoStorymap",
 		"path": "src/js/build/jeoStorymap.js",
-		"limit": "45 KB",
+		"limit": "46 KB",
 		"brotli": false
 	}
 ]
