@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-01T22:09:20+00:00\n"
+"POT-Creation-Date: 2026-09-02T21:37:58+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -375,11 +375,11 @@ msgstr ""
 msgid "Approve JEO AI Geolocations"
 msgstr ""
 
-#: includes/ai/class-context-agent.php:270
+#: includes/ai/class-context-agent.php:274
 msgid "No AI provider is configured. Set one in JEO AI Settings."
 msgstr ""
 
-#: includes/ai/class-context-agent.php:308
+#: includes/ai/class-context-agent.php:312
 msgid "The AI returned an empty prompt engineering response."
 msgstr ""
 
@@ -396,7 +396,8 @@ msgstr ""
 
 #: includes/ai/class-context-handler.php:239
 #: includes/ai/class-context-handler.php:368
-#: includes/ai/class-minilayer-handler.php:85
+#: includes/ai/class-minilayer-classifier.php:35
+#: includes/ai/class-minilayer-handler.php:91
 #: includes/ai/class-minilayer-service.php:41
 #: includes/minimap/class-minimap.php:261
 #: includes/minimap/class-minimap.php:362
@@ -468,44 +469,269 @@ msgstr ""
 msgid "Prompt is required."
 msgstr ""
 
+#. translators: %d: HTTP status code.
+#: includes/ai/class-funai-place-polygon-adapter.php:76
+#, php-format
+msgid "FUNAI WFS returned HTTP %d."
+msgstr ""
+
+#: includes/ai/class-funai-place-polygon-adapter.php:86
+msgid "Could not parse FUNAI WFS response."
+msgstr ""
+
+#: includes/ai/class-funai-place-polygon-adapter.php:103
+msgid "Could not compute bounding box from FUNAI geometry."
+msgstr ""
+
+#: includes/ai/class-funai-place-polygon-adapter.php:110
+msgid "Source: FUNAI"
+msgstr ""
+
+#: includes/ai/class-generate-boundary-layer-tool.php:82
+msgid "You do not have permission to generate layers."
+msgstr ""
+
+#: includes/ai/class-generate-boundary-layer-tool.php:92
+msgid "Mapbox API key is not configured. Cannot publish boundary layers."
+msgstr ""
+
+#: includes/ai/class-ibge-place-polygon-adapter.php:60
+msgid "Could not compute bounding box from IBGE geometry."
+msgstr ""
+
+#: includes/ai/class-ibge-place-polygon-adapter.php:67
+msgid "Source: IBGE"
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/ai/class-ibge-place-polygon-adapter.php:264
+#, php-format
+msgid "IBGE API returned HTTP %d."
+msgstr ""
+
+#: includes/ai/class-ibge-place-polygon-adapter.php:274
+msgid "Could not parse IBGE geometry response."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/ai/class-mapbox-style-builder.php:140
+#, php-format
+msgid "Mapbox Styles API returned HTTP %d."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:150
+msgid "Mapbox returned an unexpected style payload."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:180
+msgid "Only \"mapbox\" layer specs can be built into a composed style."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:188
+msgid "Composed style spec is missing style_json."
+msgstr ""
+
+#. translators: %s: missing style key.
+#: includes/ai/class-mapbox-style-builder.php:199
+#, php-format
+msgid "Composed style is missing required key: %s."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:231
+msgid "Mapbox API key is not configured."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:239
+msgid "Mapbox API key format is not recognized."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:249
+msgid "Could not decode Mapbox API key."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:257
+msgid "Could not extract Mapbox username from API key."
+msgstr ""
+
+#: includes/ai/class-minilayer-classifier.php:57
+msgid "The classifier returned an unexpected response."
+msgstr ""
+
 #: includes/ai/class-minilayer-handler.php:72
+#: includes/cli/class-ai-cli.php:52
+#: includes/cli/class-ai-cli.php:157
 #: includes/minimap/class-minimap.php:229
 msgid "A prompt is required."
 msgstr ""
 
-#: includes/ai/class-minilayer-handler.php:84
+#: includes/ai/class-minilayer-handler.php:90
 #: includes/ai/class-minilayer-service.php:33
 msgid "Mapbox API key is not configured. Set it in JEO Settings."
 msgstr ""
 
-#: includes/ai/class-minilayer-handler.php:86
+#: includes/ai/class-minilayer-handler.php:92
 msgid "Could not generate the map style. Please try again."
 msgstr ""
 
-#: includes/ai/class-minilayer-handler.php:87
+#: includes/ai/class-minilayer-handler.php:93
 msgid "The AI returned an unexpected response. Please try again."
 msgstr ""
 
-#: includes/ai/class-minilayer-handler.php:88
+#: includes/ai/class-minilayer-handler.php:94
 msgid "The AI did not create a valid style. Please try again."
 msgstr ""
 
-#: includes/ai/class-minilayer-service.php:121
-msgid "Failed to parse AI response as JSON."
+#: includes/ai/class-minilayer-handler.php:95
+msgid "Could not classify the layer request. Please try again."
 msgstr ""
 
-#: includes/ai/class-minilayer-service.php:128
-msgid "AI response did not include a style_id."
+#: includes/ai/class-minilayer-handler.php:96
+msgid "The classifier returned an unexpected response. Please try again."
 msgstr ""
 
-#. translators: %s: Mapbox style ID.
-#: includes/ai/class-minilayer-service.php:167
+#: includes/ai/class-minilayer-handler.php:97
+#: includes/ai/class-minilayer-service.php:55
+msgid "The request cannot be approximated with available map data."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:98
+msgid "The AI returned an unsupported layer type."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:99
+msgid "The AI response is missing a required tileset field."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:100
+msgid "The AI returned an invalid geometry type."
+msgstr ""
+
+#: includes/ai/class-minilayer-handler.php:101
+msgid "The AI response is missing composed style JSON."
+msgstr ""
+
+#. translators: %s: layer title.
+#: includes/ai/class-minilayer-metadata.php:58
 #, php-format
-msgid "Minilayer: %s"
+msgid "AI-generated layer: %s."
+msgstr ""
+
+#. translators: %s: source name.
+#: includes/ai/class-minilayer-metadata.php:67
+#, php-format
+msgid "Data source: %s."
+msgstr ""
+
+#. translators: %s: limitations text.
+#: includes/ai/class-minilayer-metadata.php:75
+#, php-format
+msgid "Limitations: %s"
+msgstr ""
+
+#. translators: %s: layer type.
+#: includes/ai/class-minilayer-metadata.php:82
+#, php-format
+msgid "Layer type: %s."
+msgstr ""
+
+#. translators: %s: layer type.
+#: includes/ai/class-minilayer-service.php:71
+#, php-format
+msgid "Unsupported layer type: %s."
+msgstr ""
+
+#. translators: %s: missing field name.
+#: includes/ai/class-minilayer-service.php:92
+#, php-format
+msgid "Missing required tileset field: %s."
+msgstr ""
+
+#: includes/ai/class-minilayer-service.php:103
+msgid "Invalid layer geometry type for tileset-vector."
+msgstr ""
+
+#. translators: %s: tileset ID.
+#: includes/ai/class-minilayer-service.php:155
+#, php-format
+msgid "Data from Mapbox tileset %s."
+msgstr ""
+
+#: includes/ai/class-minilayer-service.php:202
+msgid "External sources"
+msgstr ""
+
+#: includes/ai/class-minilayer-service.php:202
+msgid "Mapbox composed style"
+msgstr ""
+
+#: includes/ai/class-minilayer-service.php:234
+msgid "Composed Mapbox style with external sources."
+msgstr ""
+
+#: includes/ai/class-minilayer-service.php:310
+msgid "Minilayer"
 msgstr ""
 
 #: includes/ai/class-neuron-factory.php:216
 msgid "No Embedding Model configured. Please select one in the JEO AI settings."
+msgstr ""
+
+#: includes/ai/class-osm-place-polygon-adapter.php:79
+msgid "Could not compute bounding box from OSM geometry."
+msgstr ""
+
+#: includes/ai/class-osm-place-polygon-adapter.php:86
+msgid "Source: OpenStreetMap contributors"
+msgstr ""
+
+#: includes/ai/class-osm-place-polygon-adapter.php:207
+msgid "Could not parse Overpass response."
+msgstr ""
+
+#: includes/ai/class-osm-place-polygon-adapter.php:223
+msgid "Could not assemble closed rings from OSM relation."
+msgstr ""
+
+#: includes/ai/class-osm-place-polygon-adapter.php:262
+msgid "No Overpass mirrors configured."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: includes/ai/class-osm-place-polygon-adapter.php:298
+#, php-format
+msgid "Overpass returned HTTP %d."
+msgstr ""
+
+#: includes/ai/class-osm-place-polygon-adapter.php:310
+msgid "All Overpass mirrors failed."
+msgstr ""
+
+#. translators: %s: place name.
+#: includes/ai/class-place-polygon-service.php:85
+#, php-format
+msgid "Could not find a boundary polygon for \"%s\"."
+msgstr ""
+
+#: includes/ai/class-place-polygon-service.php:107
+msgid "Mapbox API key is required to publish boundary layers."
+msgstr ""
+
+#. translators: %s: boundary display name.
+#: includes/ai/class-place-polygon-service.php:141
+#, php-format
+msgid "Boundary: %s"
+msgstr ""
+
+#: includes/ai/class-place-polygon-service.php:156
+msgid "Geometry simplified for interactive display; use authoritative source for legal boundaries."
+msgstr ""
+
+#: includes/ai/class-place-polygon-service.php:238
+msgid "Could not write boundary GeoJSON file."
+msgstr ""
+
+#: includes/ai/class-place-polygon-service.php:256
+msgid "Could not create boundary GeoJSON attachment."
 msgstr ""
 
 #. translators: %s: directory path
@@ -1638,6 +1864,34 @@ msgstr ""
 
 #: includes/class-jeo.php:2086
 msgid "Unexpected Mapbox style payload."
+msgstr ""
+
+#: includes/cli/class-ai-cli.php:58
+msgid "Classifying prompt..."
+msgstr ""
+
+#. translators: 1: layer title, 2: post ID.
+#: includes/cli/class-ai-cli.php:68
+#, php-format
+msgid "Layer created: %1$s (ID %2$d)"
+msgstr ""
+
+#: includes/cli/class-ai-cli.php:107
+msgid "A place name is required."
+msgstr ""
+
+#: includes/cli/class-ai-cli.php:115
+msgid "Resolving boundary polygon..."
+msgstr ""
+
+#. translators: 1: layer title, 2: post ID.
+#: includes/cli/class-ai-cli.php:126
+#, php-format
+msgid "Boundary layer created: %1$s (ID %2$d)"
+msgstr ""
+
+#: includes/cli/class-ai-cli.php:161
+msgid "Classifying prompt (no layer will be created)..."
 msgstr ""
 
 #: includes/geocode/class-geocode-handler.php:123
