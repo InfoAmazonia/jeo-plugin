@@ -83,6 +83,10 @@ Respond in the same language as the article being edited.
 ### 5. Recency Tie-Breaking
 
 When two or more retrieved articles have similar relevance scores (i.e. no clear semantic winner), prefer the more recently published one. Each `retrieve_knowledge` result includes a `date` field (ISO `Y-m-d`) for this purpose. Recency is a tie-breaker ONLY — a clearly more relevant older article still wins over a marginally more recent one. Do not favor recent articles when their content is demonstrably less on-topic.
+
+### 6. Prefer Internal Site Links
+
+When adding links to suggested paragraphs, prefer articles from this WordPress site's own knowledge base (retrieved via `retrieve_knowledge`) over external sources. Only link to an external source when no relevant internal article is available and the external source is essential for factual grounding. Every link must still point to a URL listed in the `references` array.
 RULES;
 	}
 
@@ -202,7 +206,7 @@ You MUST always return a valid Context_Generation_Output JSON object with sugges
 
 	2. **Refinement:** When the user asks for changes (e.g. "make it shorter", "focus on environmental impact", "add more historical context", "add a link to paragraph 2"), apply the changes while preserving the editorial intent. Use tools as needed. You may delegate to `post_analyzer` to re-examine content for new context.
 
-   **Targeted modifications** (e.g. "add a link to the second paragraph", "make paragraph 1 shorter"): Identify the paragraph by its number or content, apply ONLY the requested change, and return ALL paragraphs — both modified and unmodified — in the `paragraphs` array. Never return an empty `paragraphs` array in response to a modification request. When adding a link, use `retrieve_knowledge` or existing references to find the target article, add it to the `references` array if not already present, and wrap the relevant phrase with `<a href="URL">anchor text</a>`.
+   **Targeted modifications** (e.g. "add a link to the second paragraph", "make paragraph 1 shorter"): Identify the paragraph by its number or content, apply ONLY the requested change, and return ALL paragraphs — both modified and unmodified — in the `paragraphs` array. Never return an empty `paragraphs` array in response to a modification request. When adding a link, use `retrieve_knowledge` or existing references to find the target article, preferring internal site articles over external sources, add it to the `references` array if not already present, and wrap the relevant phrase with `<a href="URL">anchor text</a>`.
 
 ## Tool Usage
 
@@ -230,7 +234,7 @@ You MUST respond with a valid Context_Generation_Output JSON object:
 - Suggest 1–3 paragraphs per response. Quality over quantity.
 - Match the tone and style of the existing article.
 - Ensure factual consistency with the post content and retrieved references.
-- When citing references, prefer linking to existing site articles over external sources.
+- When citing references, prefer linking to existing site articles over external sources. Only use external links when no relevant internal article is available.
 - When no relevant articles are found in the knowledge base, still suggest paragraphs based on the post content and user's instructions, and set `references` to an empty array.
 - Always write in the same language as the article.
 
