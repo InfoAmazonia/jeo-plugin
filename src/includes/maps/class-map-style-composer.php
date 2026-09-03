@@ -1107,7 +1107,7 @@ class Map_Style_Composer {
 		$bundles       = array();
 		$failed_styles = array();
 		$warnings      = array();
-		$direct_types  = array( 'mapbox-tileset-raster', 'mapbox-tileset-vector', 'mvt', 'tilelayer' );
+		$direct_types  = array( 'mapbox-tileset-raster', 'mapbox-tileset-vector', 'mvt', 'tilelayer', 'geojson' );
 
 		foreach ( $context['refs'] as $ref ) {
 			if ( 'mapbox' !== $ref['type'] ) {
@@ -1239,8 +1239,10 @@ class Map_Style_Composer {
 					$direct = $this->build_direct_layer( $context, $ref );
 					if ( $direct ) {
 						$style['sources'][ $direct['sourceId'] ] = $direct['source'];
-						$style['layers'][]                       = $direct['layer'];
-						$manifest['layers'][]                    = $direct['manifest'];
+						foreach ( $direct['layers'] as $direct_layer ) {
+							$style['layers'][] = $direct_layer;
+						}
+						$manifest['layers'][] = $direct['manifest'];
 					}
 				}
 				continue;
@@ -1430,6 +1432,7 @@ class Map_Style_Composer {
 			if ( 'mapbox-tileset-vector' === $ref['type'] && ! empty( $options['source_layer'] ) ) {
 				$layer['source-layer'] = $options['source_layer'];
 			}
+			$layers = array( $layer );
 		} elseif ( 'mvt' === $ref['type'] ) {
 			if ( empty( $options['url'] ) ) {
 				return null;
@@ -1455,6 +1458,7 @@ class Map_Style_Composer {
 			if ( ! empty( $options['source_layer'] ) ) {
 				$layer['source-layer'] = $options['source_layer'];
 			}
+			$layers = array( $layer );
 		} elseif ( 'tilelayer' === $ref['type'] ) {
 			if ( empty( $options['url'] ) ) {
 				return null;
@@ -1474,20 +1478,117 @@ class Map_Style_Composer {
 					'visibility' => $visible ? 'visible' : 'none',
 				),
 			);
+			$layers = array( $layer );
+		} elseif ( 'geojson' === $ref['type'] ) {
+			// Inline GeoJSON takes precedence over the URL.
+			$inline_geojson = isset( $options['inline_geojson'] ) ? trim( (string) $options['inline_geojson'] ) : '';
+			$inline_decoded = null;
+			if ( '' !== $inline_geojson && in_array( $inline_geojson[0], array( '{', '[' ), true ) ) {
+				$decoded = json_decode( $inline_geojson, true );
+				if ( JSON_ERROR_NONE === json_last_error() ) {
+					$inline_decoded = $decoded;
+				}
+			}
+
+			if ( null !== $inline_decoded ) {
+				$source = array(
+					'type' => 'geojson',
+					'data' => $inline_decoded,
+				);
+			} else {
+				$data_url = isset( $options['data'] ) ? esc_url_raw( $options['data'] ) : '';
+				if ( '' === $data_url ) {
+					return null;
+				}
+				$source = array(
+					'type' => 'geojson',
+					'data' => $data_url,
+				);
+			}
+
+			// Defaults mirror JeoLayerTypes.getFallbackPaint('fill') in
+			// layer-types/JeoLayerTypes.js — keep both in sync.
+			$default_paint = array(
+				'fill-color'         => '#e15a2d',
+				'fill-opacity'       => 0.35,
+				'fill-outline-color' => '#b8431c',
+			);
+
+			$visibility  = $visible ? 'visible' : 'none';
+			$render_type = sanitize_key( $options['type'] ?? 'fill' );
+
+			// Merge a saved nested style ({ paint, layout }) over generated
+			// paint defaults; computed visibility wins over a saved layout.
+			$build_style = static function ( array $defaults, $saved ) use ( $visibility ) {
+				$saved  = is_array( $saved ) ? $saved : array();
+				$layout = isset( $saved['layout'] ) && is_array( $saved['layout'] ) ? $saved['layout'] : array();
+				unset( $layout['visibility'] );
+				$layout['visibility'] = $visibility;
+
+				return array(
+					'paint'  => array_merge( $defaults, isset( $saved['paint'] ) && is_array( $saved['paint'] ) ? $saved['paint'] : array() ),
+					'layout' => $layout,
+				);
+			};
+
+			// Only "fill" is exposed in the schema for now; the branch is the
+			// extension point for future render types (line, circle, ...).
+			if ( 'fill' === $render_type ) {
+				$style = $build_style( $default_paint, $options['style'] ?? null );
+
+				$layers = array(
+					array(
+						'id'     => $layer_id,
+						'type'   => 'fill',
+						'source' => $source_id,
+						'layout' => $style['layout'],
+						'paint'  => $style['paint'],
+					),
+				);
+			} else {
+				$single_style = $build_style( array(), $options['style'] ?? null );
+
+				$layers = array(
+					array(
+						'id'     => $layer_id,
+						'type'   => $render_type,
+						'source' => $source_id,
+						'layout' => $single_style['layout'],
+					),
+				);
+				if ( ! empty( $single_style['paint'] ) ) {
+					$layers[0]['paint'] = $single_style['paint'];
+				}
+			}
 		} else {
 			return null;
 		}
 
-		$layer['metadata']['jeo:source'] = array(
-			'layerPostId' => $ref['layerId'],
-			'layerTitle'  => $ref['title'],
-			'layerType'   => $ref['type'],
+		foreach ( $layers as &$direct_layer_item ) {
+			$direct_layer_item['metadata']['jeo:source'] = array(
+				'layerPostId' => $ref['layerId'],
+				'layerTitle'  => $ref['title'],
+				'layerType'   => $ref['type'],
+			);
+		}
+		unset( $direct_layer_item );
+
+		$composite_layers = array_map(
+			function ( $direct_layer_item ) use ( $ref ) {
+				return array(
+					'originalId'         => (string) $ref['layerId'],
+					'compositeId'        => $direct_layer_item['id'],
+					'type'               => $direct_layer_item['type'],
+					'visibleWhenLayerOn' => true,
+				);
+			},
+			$layers
 		);
 
 		return array(
 			'sourceId' => $source_id,
 			'source'   => $source,
-			'layer'    => $layer,
+			'layers'   => $layers,
 			'manifest' => array(
 				'layerPostId'     => $ref['layerId'],
 				'title'           => $ref['title'],
@@ -1502,14 +1603,7 @@ class Map_Style_Composer {
 				'prefix'          => $prefix,
 				'imagePrefix'     => null,
 				'interactions'    => array(),
-				'compositeLayers' => array(
-					array(
-						'originalId'         => (string) $ref['layerId'],
-						'compositeId'        => $layer_id,
-						'type'               => $layer['type'],
-						'visibleWhenLayerOn' => true,
-					),
-				),
+				'compositeLayers' => $composite_layers,
 			),
 		);
 	}

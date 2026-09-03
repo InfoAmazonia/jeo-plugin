@@ -12,9 +12,9 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/includes/ai/class-search-layers-tool.php` | Agent tool: semantic layer search via `RAG_Worker::find_matching_layers()` |
 | `src/includes/ai/class-geocode-tool.php` | Agent tool: geocoding with fallback chain (active geocoder → Mapbox → defaults) |
 | `src/includes/ai/class-generate-layer-tool.php` | Agent tool (conditional): generates custom Mapbox styles and creates layer CPTs via `Minilayer_Service`. Only available when a Mapbox API key is configured. |
-| `src/includes/ai/class-generate-boundary-layer-tool.php` | Agent tool (conditional): resolves a place name into an authoritative boundary polygon and creates a layer CPT via `Place_Polygon_Service`. |
+| `src/includes/ai/class-generate-boundary-layer-tool.php` | Agent tool: resolves a place name into an authoritative boundary polygon and creates a client-side `geojson` layer CPT via `Place_Polygon_Service`. Always available (no Mapbox key required). |
 | `src/includes/ai/class-place-polygon-service.php` | `Place_Polygon_Service` + adapters — deterministic polygon resolver using IBGE, FUNAI, and OpenStreetMap. |
-| `src/includes/ai/class-mapbox-style-builder.php` | Deterministic Mapbox style builder; publishes GeoJSON-backed boundary styles to the Mapbox Styles API. |
+| `src/includes/ai/class-mapbox-style-builder.php` | Deterministic Mapbox style builder; publishes minilayer composed styles to the Mapbox Styles API. Boundary layers do not use it — they render client-side from GeoJSON attachments. |
 | `src/includes/ai/class-get-post-content-tool.php` | Agent tool: post content + `_related_point` meta (used by post_analyzer sub-agent) |
 | `src/includes/ai/class-wp-storage.php` | `StorageInterface` adapter for `post_meta` and `user_meta` |
 | `src/includes/ai/class-wp-user-memory-storage.php` | `StorageInterface` adapter for `user_meta` memories — strips redundant user ID from the namespace so preferences are reusable across contexts |
@@ -147,16 +147,16 @@ graph LR
 
 ### Optional Minilayer Integration
 
-When a Mapbox API key is configured, `Minimap_Agent::create()` registers two generation tools alongside the standard tools:
+`Minimap_Agent::create()` always registers `Generate_Boundary_Layer_Tool` alongside the standard tools (it needs no Mapbox key). When a Mapbox API key is configured, `Generate_Layer_Tool` is also registered:
 
-- `Generate_Layer_Tool` — creates custom Mapbox styles from a text prompt via `Minilayer_Service`.
-- `Generate_Boundary_Layer_Tool` — resolves a place name into an authoritative boundary polygon via `Place_Polygon_Service` and publishes a Mapbox style.
+- `Generate_Boundary_Layer_Tool` — resolves a place name into an authoritative boundary polygon via `Place_Polygon_Service` and creates a client-side `geojson` layer CPT (GeoJSON published as a WordPress attachment).
+- `Generate_Layer_Tool` — creates custom Mapbox styles from a text prompt via `Minilayer_Service`. Only available when a Mapbox API key is configured.
 
 **Authorization gates:**
 - `generate_layer` requires explicit user authorization via chat for non-boundary layers.
 - `generate_boundary_layer` may be called proactively for administrative boundaries (municipality, state, department) and indigenous lands when `search_layers` finds no suitable existing layer.
 
-When no Mapbox key is configured, both tools are omitted and the prompt includes a "Layer Limitations" section instructing the agent to suggest connecting a Mapbox key.
+When no Mapbox key is configured, `generate_layer` is omitted and the prompt includes a "Layer Limitations" section instructing the agent to suggest connecting a Mapbox key.
 
 ### Layer Metadata in the Editor
 
@@ -188,9 +188,13 @@ The user can later toggle `use_default` off in the `LayerStyleEditor` modal (Gut
 The minimap agent's system prompt includes explicit instructions for handling tool failures gracefully:
 
 - **`search_layers` failure** → informational `assistant_message`, map renders with base layer + pins only
-- **`generate_layer` failure** → user-friendly explanation via `assistant_message`, suggests retrying or adjusting the prompt
-- **Technical error details** (WP_Error messages, API error codes, stack traces) are never exposed to the user
+- **`generate_layer` / `generate_boundary_layer` failure** → `assistant_message` must **name the failing service** (IBGE, FUNAI, OpenStreetMap/Overpass for boundaries; Mapbox for `generate_layer`) and **repeat the actionable guidance** from the tool's `error` field (e.g. the Mapbox token missing the `styles:write` scope on `generate_layer`) — the `error` sentences are user-facing copy, not technical internals
+- The AI must **never guess a cause**: "boundary not found" may only be reported when the tool error actually says no boundary was found
+- **Raw internals remain forbidden** (stack traces, PHP/WP_Error codes like `jeo_mapbox_style_publish_http`, file paths, class names)
 - The map is always rendered (with base layer + pins at minimum) even when tools fail
+- Tool failures are logged server-side via `error_log()` (prefixed `[JEO]`) in both generation tools and in `Mapbox_Style_Builder::publish_style()`, so admins can diagnose the exact `WP_Error` code and message from the PHP error log
+
+**Mapbox token requirement:** publishing minilayer composed styles calls `POST /styles/v1/{user}`, which needs a token with the **`styles:write` scope**. The default public token (`pk.…`) usually lacks it and fails with HTTP 403 — `publish_style()` translates 403/401 into actionable messages (create a secret token `sk.…` or add the scope at mapbox.com/account/access-tokens). The minilayer pipeline resolves the token via `jeo_settings()->get_mapbox_publish_token()`, which prefers the server-only `mapbox_secret_key` setting (never exposed to the frontend) and falls back to the public `mapbox_key`. Boundary layers do not publish styles at all — they render client-side as `geojson` layers, so the Mapbox Styles API restriction on `geojson` sources (HTTP 422) never applies.
 
 **Flow: Layer generation via chat**
 
@@ -569,13 +573,15 @@ sequenceDiagram
 
 ### Proactive administrative boundary generation
 
-When a Mapbox key is configured, the agent may call `generate_boundary_layer` proactively for:
+The agent may call `generate_boundary_layer` proactively (no Mapbox key required) for:
 
 - Brazilian municipalities and states (IBGE malhas v3)
 - Brazilian indigenous lands (FUNAI WFS)
 - International administrative boundaries (OpenStreetMap relation + Overpass outer-ring assembly)
 
-`Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. `Mapbox_Style_Builder` then creates a simple line + fill style and publishes it to the Mapbox Styles API. The resulting `mapbox` layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, `attribution`, `theme`, and an auto-generated `simple-color` legend.
+`Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. The layer is created with type `geojson` (`layer_type_options.data` = attachment URL + boundary paint defaults) and rendered client-side by the `geojson` layer type — the Mapbox Styles API rejects `geojson` sources in hosted styles (HTTP 422), so no style publishing is involved. The resulting layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, `attribution`, `theme`, and an auto-generated `simple-color` legend.
+
+**Adapter fallback semantics:** an adapter returning `null` means "not applicable" and the next adapter runs. A `WP_Error` is a hard failure of that source (e.g. IBGE API timeout) — the error is remembered, the remaining adapters still run, and the last error is returned only if no adapter produced a polygon. A transient outage of one source therefore does not abort resolution.
 
 All non-boundary layer types still require explicit user confirmation before `generate_layer` is called.
 

@@ -59,6 +59,13 @@ class Layer_Types {
 		);
 
 		$this->register_layer_type(
+			'geojson',
+			array(
+				'script_url' => JEO_BASEURL . '/includes/layer-types/geojson.js',
+			)
+		);
+
+		$this->register_layer_type(
 			'mvt',
 			array(
 				'script_url' => JEO_BASEURL . '/includes/layer-types/mvt.js',

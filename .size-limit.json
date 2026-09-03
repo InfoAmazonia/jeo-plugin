@@ -8,7 +8,7 @@
 	{
 		"name": "mapglReact",
 		"path": "src/js/build/mapglReact.js",
-		"limit": "25 KB",
+		"limit": "20 KB",
 		"brotli": false
 	},
 	{

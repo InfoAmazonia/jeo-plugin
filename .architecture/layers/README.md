@@ -60,6 +60,27 @@ Defined in `layers-sidebar/layer-type-definitions.js`:
 | `mvt` | `url`, `source_layer`, `type`, `style_source_type`, `access_token` |
 | `mapbox-tileset-raster` | `tileset_id`, `style_source_type`, `type`, `access_token` |
 | `mapbox-tileset-vector` | `tileset_id`, `source_layer`, `type`, `style_source_type`, `access_token` |
+| `geojson` | `data`, `inline_geojson`, `type`, `style` |
+
+The `geojson` type renders a public GeoJSON URL client-side as a single `fill`
+GL layer (used by AI-generated boundary layers). It needs no
+Mapbox token and is supported by the frontend registry (`layer-types/geojson.js`),
+the editor preview (`map-preview-layer.js`), and the Mapbox style composer
+(direct-type inlining with one manifest entry per GL layer). Source data can be
+a URL (`data`) or raw inline JSON (`inline_geojson`, takes precedence). The
+render type is keyed by `type` (`fill` only in the schema for now; the
+renderers are switches ready for future types). Styling lives in a single
+nested `style` object (`{ paint, layout }`) passed through raw to the GL layer:
+the outline is the `fill-outline-color` paint prop (~1px antialiasing halo —
+no configurable width/opacity; the old `{layer_id}__outline` companion line
+layer was replaced, and the legacy toggle in `class-jeo-map.js::changeLayerVisibitly`
+remains only for pre-switch layers). Paint defaults are shared via
+`JeoLayerTypes.getFallbackPaint('fill')` and mirrored in the composer's PHP
+default paint — keep both in sync. Instance opacity multiplies numeric opacity
+props. The schema declares the common props (`fill-color`, `fill-opacity`,
+`fill-outline-color`) as labeled fields and allows any other GL paint/layout
+prop via `additionalProperties`. Uses only style-spec v8 core APIs —
+compatible with both MapLibre GL JS and Mapbox GL JS runtimes.
 
 ### Extensibility
 

@@ -3,7 +3,8 @@
  * Deterministic Mapbox style builder for AI-generated layers.
  *
  * Replaces the Mapbox DevKit MCP with direct Styles API calls for
- * boundary and thematic layers that require composed styles.
+ * thematic layers that require composed styles. (Boundary layers are
+ * rendered client-side from GeoJSON attachments and do not use this.)
  *
  * @package Jeo
  */
@@ -18,71 +19,6 @@ if ( ! defined( 'WPINC' ) ) {
  * Build and publish Mapbox styles from structured specifications.
  */
 class Mapbox_Style_Builder {
-
-	/**
-	 * Default boundary styling.
-	 *
-	 * @var array<string,mixed>
-	 */
-	private const DEFAULT_BOUNDARY_STYLE = array(
-		'fill_color'   => '#8e44ad',
-		'fill_opacity' => 0.15,
-		'line_color'   => '#8e44ad',
-		'line_width'   => 2,
-		'line_opacity' => 0.9,
-	);
-
-	/**
-	 * Build a simple boundary style from a GeoJSON URL.
-	 *
-	 * @param string $geojson_url Public URL of the boundary GeoJSON.
-	 * @param string $display_name Human-readable name for the boundary.
-	 * @param array  $options     Optional styling overrides.
-	 * @return array Style definition as an associative array.
-	 */
-	public static function build_boundary_style( string $geojson_url, string $display_name, array $options = array() ): array {
-		$options = wp_parse_args( $options, self::DEFAULT_BOUNDARY_STYLE );
-
-		$source_id = 'boundary-source';
-		$fill_id   = 'boundary-fill';
-		$line_id   = 'boundary-line';
-
-		return array(
-			'version'  => 8,
-			'name'     => sanitize_text_field( $display_name ),
-			'metadata' => array(
-				'mapbox:type' => 'template',
-				'jeo:source'  => 'boundary',
-			),
-			'sources'  => array(
-				$source_id => array(
-					'type' => 'geojson',
-					'data' => esc_url_raw( $geojson_url ),
-				),
-			),
-			'layers'   => array(
-				array(
-					'id'     => $fill_id,
-					'type'   => 'fill',
-					'source' => $source_id,
-					'paint'  => array(
-						'fill-color'   => sanitize_hex_color( $options['fill_color'] ),
-						'fill-opacity' => (float) $options['fill_opacity'],
-					),
-				),
-				array(
-					'id'     => $line_id,
-					'type'   => 'line',
-					'source' => $source_id,
-					'paint'  => array(
-						'line-color'   => sanitize_hex_color( $options['line_color'] ),
-						'line-width'   => (float) $options['line_width'],
-						'line-opacity' => (float) $options['line_opacity'],
-					),
-				),
-			),
-		);
-	}
 
 	/**
 	 * Publish a style JSON to the Mapbox Styles API.

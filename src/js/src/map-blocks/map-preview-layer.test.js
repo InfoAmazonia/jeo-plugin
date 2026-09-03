@@ -130,3 +130,186 @@ describe( 'renderLayer vector layer specs', () => {
 		}
 	);
 } );
+
+describe( 'renderLayer geojson layer', () => {
+	const geojsonLayer = {
+		type: 'geojson',
+		layer_type_options: {
+			data: 'https://example.com/boundary.geojson',
+			style: {
+				paint: {
+					'fill-color': '#8e44ad',
+					'fill-opacity': 0.15,
+					'fill-outline-color': '#8e44ad',
+				},
+			},
+		},
+	};
+
+	it( 'renders a single fill layer with a fill-outline-color', () => {
+		const element = renderLayer( {
+			layer: geojsonLayer,
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		const layers = collectLayerElements( element );
+		expect( layers ).toHaveLength( 1 );
+		expect( layers[ 0 ].props.type ).toBe( 'fill' );
+		expect( layers[ 0 ].props.paint[ 'fill-outline-color' ] ).toBe(
+			'#8e44ad'
+		);
+	} );
+
+	it( 'applies instance opacity to the fill opacity', () => {
+		const element = renderLayer( {
+			layer: geojsonLayer,
+			instance: { id: 1, use: 'fixed', opacity: 0.5 },
+		} );
+
+		const [ fill ] = collectLayerElements( element );
+		expect( fill.props.paint[ 'fill-opacity' ] ).toBeCloseTo( 0.075 );
+	} );
+
+	it( 'falls back to default paint values', () => {
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {
+					data: 'https://example.com/boundary.geojson',
+				},
+			},
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		const [ fill ] = collectLayerElements( element );
+		expect( fill.props.paint ).toEqual( {
+			'fill-color': '#8e44ad',
+			'fill-opacity': 0.15,
+			'fill-outline-color': '#8e44ad',
+		} );
+	} );
+
+	it( 'uses inline GeoJSON when provided', () => {
+		const inline = {
+			type: 'FeatureCollection',
+			features: [],
+		};
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {
+					data: 'https://example.com/boundary.geojson',
+					inline_geojson: JSON.stringify( inline ),
+				},
+			},
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		expect( element.props.type ).toBe( 'geojson' );
+		expect( element.props.data ).toEqual( inline );
+	} );
+
+	it( 'prefers inline GeoJSON over the URL', () => {
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {
+					data: 'https://example.com/boundary.geojson',
+					inline_geojson: '{"type":"FeatureCollection","features":[]}',
+				},
+			},
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		expect( typeof element.props.data ).toBe( 'object' );
+	} );
+
+	it( 'falls back to the URL when inline GeoJSON is invalid', () => {
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {
+					data: 'https://example.com/boundary.geojson',
+					inline_geojson: '{invalid json',
+				},
+			},
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		expect( element.props.data ).toBe(
+			'https://example.com/boundary.geojson'
+		);
+	} );
+
+	it( 'renders nothing when neither inline JSON nor URL is set', () => {
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {},
+			},
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		expect( element ).toBeNull();
+	} );
+
+	it( 'renders a single layer for non-fill render types (extension point)', () => {
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {
+					data: 'https://example.com/roads.geojson',
+					type: 'line',
+				},
+			},
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		const layers = collectLayerElements( element );
+		expect( layers ).toHaveLength( 1 );
+		expect( layers[ 0 ].props.type ).toBe( 'line' );
+		expect( layers[ 0 ].props.id ).toBe( 'layer_1' );
+	} );
+
+	it( 'lets the nested style paint override the defaults', () => {
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {
+					data: 'https://example.com/boundary.geojson',
+					style: {
+						paint: {
+							'fill-color': '#222222',
+						},
+					},
+				},
+			},
+			instance: { id: 1, use: 'fixed' },
+		} );
+
+		const [ fill ] = collectLayerElements( element );
+		expect( fill.props.paint[ 'fill-color' ] ).toBe( '#222222' );
+		expect( fill.props.paint[ 'fill-outline-color' ] ).toBe( '#8e44ad' );
+	} );
+
+	it( 'applies instance opacity to a saved nested paint', () => {
+		const element = renderLayer( {
+			layer: {
+				type: 'geojson',
+				layer_type_options: {
+					data: 'https://example.com/boundary.geojson',
+					style: {
+						paint: {
+							'fill-color': '#222222',
+							'fill-opacity': 0.4,
+						},
+					},
+				},
+			},
+			instance: { id: 1, use: 'fixed', opacity: 0.5 },
+		} );
+
+		const [ fill ] = collectLayerElements( element );
+		expect( fill.props.paint[ 'fill-opacity' ] ).toBeCloseTo( 0.2 );
+	} );
+} );

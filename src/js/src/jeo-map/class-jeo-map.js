@@ -2362,11 +2362,16 @@ export default class JeoMap {
 									);
 								}
 							} );
-						} else {
-							if ( this.map.getLayer( layer_id ) ) {
-								this.map.setLayoutProperty( layer_id, 'visibility', visibility );
-							}
+					} else {
+						if ( this.map.getLayer( layer_id ) ) {
+							this.map.setLayoutProperty( layer_id, 'visibility', visibility );
 						}
+						// The geojson layer type adds a companion outline layer.
+						const outlineLayerId = layer_id + '__outline';
+						if ( this.map.getLayer( outlineLayerId ) ) {
+							this.map.setLayoutProperty( outlineLayerId, 'visibility', visibility );
+						}
+					}
 					}
 				} );
 			}

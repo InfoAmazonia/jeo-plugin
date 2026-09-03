@@ -53,10 +53,9 @@ class Minimap_Agent {
 		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
 		$has_mapbox = ! empty( $mapbox_key );
 
-		$tool_ids = array( 'search_layers', 'geocode' );
+		$tool_ids = array( 'search_layers', 'geocode', 'generate_boundary_layer' );
 		if ( $has_mapbox ) {
 			$tool_ids[] = 'generate_layer';
-			$tool_ids[] = 'generate_boundary_layer';
 		}
 
 		$tools = Tool_Registry::get_instances_by_id( $tool_ids );
@@ -113,8 +112,24 @@ You MUST always return a valid minimap configuration with layers, center coordin
 
 - `search_layers(query, top_k)`: Find semantically matching map layers. Call with specific, targeted queries. If the first search yields few results, try alternative queries.
 - `geocode(location)`: Convert a location name to lat/lon. Before calling this tool, check the geolocation pins listed in the Additional Context (if any). If a pin's address matches the location the user mentioned — even partially — use that pin's coordinates directly instead of geocoding. Pins represent the post's authoritative, curated geolocation and should always be preferred over geocoder results. Only call `geocode` for locations that do not match any existing pin.
-- `generate_boundary_layer(place_name, entity_type?, context?, layer_name?)`: Generate a boundary polygon layer for a named place (municipality, state, department, indigenous land, etc.) using authoritative public sources. Use this when `search_layers` does not return a suitable boundary layer. This tool is allowed proactively for administrative and indigenous-land boundaries.
+- `generate_boundary_layer(place_name, entity_type?, context?, layer_name?)`: Generate a boundary polygon layer for a named place (municipality, state, department, indigenous land, etc.) using authoritative public sources. Use this when `search_layers` does not return a suitable boundary layer. This tool is allowed proactively for administrative and indigenous-land boundaries and does NOT require a Mapbox API key.
 - `delegate_to_subagent(sub_agent_id, task)`: Delegate to `post_analyzer` for content analysis.
+
+## Boundary Layers
+
+`generate_boundary_layer(place_name, entity_type?, context?, layer_name?)` creates a boundary polygon layer from authoritative public sources:
+- Brazilian municipalities and states: IBGE.
+- Brazilian indigenous lands: FUNAI.
+- International places: OpenStreetMap via Nominatim + Overpass.
+
+The polygon is rendered client-side from a GeoJSON file published on this site — no Mapbox style publishing is involved.
+
+Rules:
+- You MAY call this tool proactively for administrative boundaries and indigenous lands when `search_layers` finds no suitable existing layer.
+- Pass `entity_type` when you know it ("municipality", "state", "indigenous_land", "other").
+- Pass `context` when the place name is ambiguous (e.g. "Amazonas" with context "Colombia" or "Brazil").
+- On the initial auto-generation (from post content or prompt), you MAY generate administrative/indigenous boundaries proactively if needed; report other gaps instead of generating them.
+- If the tool returns `success: false`, keep the map with the information you have and explain the failure in `assistant_message` — name the failing service and repeat the actionable guidance from the tool's `error` field.
 
 ## Output Rules
 
@@ -194,7 +209,8 @@ When a tool returns a JSON object with "success": false:
    - Keep the map with base_layer + any pins. Do NOT set status to error.
    - Mention what topics lack coverage in assistant_message.
 3. If generate_boundary_layer returns success: false:
-   - Explain in assistant_message that the boundary could not be generated (e.g. "I couldn't find an authoritative boundary for X. Falling back to the location center.")
+   - Read the "error" field carefully. It names the external service that failed (IBGE, FUNAI, OpenStreetMap/Overpass) and, when applicable, includes guidance on how to fix it.
+   - In assistant_message, name the service that failed and repeat the actionable guidance from the error (e.g. "The OpenStreetMap/Overpass service failed to resolve the boundary — try a more specific place name or add geographic context."). Only say the boundary was "not found" when the error actually says no boundary was found — never guess or invent a cause.
    - If you have a geocoded center for the place, keep the map centered on it.
    - Do NOT ask the user to retry automatically; only retry if the user asks.
 4. If generate_layer returns success: false:
@@ -221,21 +237,7 @@ PROMPT;
 			$prompt .= "\n\n" . <<<'PROMPT'
 ## Layer Generation (Mapbox)
 
-You have two generation tools. Both have cost implications (AI tokens + Mapbox API usage).
-
-### `generate_boundary_layer(place_name, entity_type?, context?, layer_name?)`
-
-Creates a boundary polygon layer from authoritative public sources:
-- Brazilian municipalities and states: IBGE.
-- Brazilian indigenous lands: FUNAI.
-- International places: OpenStreetMap via Nominatim + Overpass.
-
-Rules:
-- You MAY call this tool proactively for administrative boundaries and indigenous lands when `search_layers` finds no suitable existing layer.
-- Pass `entity_type` when you know it ("municipality", "state", "indigenous_land", "other").
-- Pass `context` when the place name is ambiguous (e.g. "Amazonas" with context "Colombia" or "Brazil").
-- On the initial auto-generation (from post content or prompt), you MAY generate administrative/indigenous boundaries proactively if needed; report other gaps instead of generating them.
-- If the tool returns `success: false`, keep the map with the information you have and explain the failure in `assistant_message`.
+The `generate_layer` tool has cost implications (AI tokens + Mapbox API usage).
 
 ### `generate_layer(prompt, layer_name)`
 

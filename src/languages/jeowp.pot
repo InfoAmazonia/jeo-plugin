@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-02T21:37:58+00:00\n"
+"POT-Creation-Date: 2026-09-03T22:07:01+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -479,20 +479,8 @@ msgstr ""
 msgid "Could not parse FUNAI WFS response."
 msgstr ""
 
-#: includes/ai/class-funai-place-polygon-adapter.php:103
-msgid "Could not compute bounding box from FUNAI geometry."
-msgstr ""
-
-#: includes/ai/class-funai-place-polygon-adapter.php:110
-msgid "Source: FUNAI"
-msgstr ""
-
-#: includes/ai/class-generate-boundary-layer-tool.php:82
+#: includes/ai/class-generate-boundary-layer-tool.php:83
 msgid "You do not have permission to generate layers."
-msgstr ""
-
-#: includes/ai/class-generate-boundary-layer-tool.php:92
-msgid "Mapbox API key is not configured. Cannot publish boundary layers."
 msgstr ""
 
 #: includes/ai/class-ibge-place-polygon-adapter.php:60
@@ -514,42 +502,50 @@ msgid "Could not parse IBGE geometry response."
 msgstr ""
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-mapbox-style-builder.php:140
+#: includes/ai/class-mapbox-style-builder.php:74
 #, php-format
 msgid "Mapbox Styles API returned HTTP %d."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:150
+#: includes/ai/class-mapbox-style-builder.php:79
+msgid "Mapbox denied the style publish request (HTTP 403): the configured Mapbox token likely lacks the styles:write scope. Use a secret token (sk.…) or add the styles:write scope to the token at mapbox.com/account/access-tokens, then update the key in JEO Settings."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:84
+msgid "Mapbox rejected the access token (HTTP 401): the Mapbox API key configured in JEO Settings is invalid or has expired."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:103
 msgid "Mapbox returned an unexpected style payload."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:180
+#: includes/ai/class-mapbox-style-builder.php:136
 msgid "Only \"mapbox\" layer specs can be built into a composed style."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:188
+#: includes/ai/class-mapbox-style-builder.php:144
 msgid "Composed style spec is missing style_json."
 msgstr ""
 
 #. translators: %s: missing style key.
-#: includes/ai/class-mapbox-style-builder.php:199
+#: includes/ai/class-mapbox-style-builder.php:155
 #, php-format
 msgid "Composed style is missing required key: %s."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:231
+#: includes/ai/class-mapbox-style-builder.php:187
 msgid "Mapbox API key is not configured."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:239
+#: includes/ai/class-mapbox-style-builder.php:195
 msgid "Mapbox API key format is not recognized."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:249
+#: includes/ai/class-mapbox-style-builder.php:205
 msgid "Could not decode Mapbox API key."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:257
+#: includes/ai/class-mapbox-style-builder.php:213
 msgid "Could not extract Mapbox username from API key."
 msgstr ""
 
@@ -712,25 +708,21 @@ msgstr ""
 msgid "Could not find a boundary polygon for \"%s\"."
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:107
-msgid "Mapbox API key is required to publish boundary layers."
-msgstr ""
-
 #. translators: %s: boundary display name.
-#: includes/ai/class-place-polygon-service.php:141
+#: includes/ai/class-place-polygon-service.php:126
 #, php-format
 msgid "Boundary: %s"
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:156
+#: includes/ai/class-place-polygon-service.php:143
 msgid "Geometry simplified for interactive display; use authoritative source for legal boundaries."
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:238
+#: includes/ai/class-place-polygon-service.php:237
 msgid "Could not write boundary GeoJSON file."
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:256
+#: includes/ai/class-place-polygon-service.php:255
 msgid "Could not create boundary GeoJSON attachment."
 msgstr ""
 
@@ -2169,15 +2161,15 @@ msgstr ""
 msgid "One or more Mapbox styles could not be fetched."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1563
+#: includes/maps/class-map-style-composer.php:1657
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:1682
+#: includes/maps/class-map-style-composer.php:1776
 msgid "Could not decode a Mapbox sprite image."
 msgstr ""
 
-#: includes/maps/class-map-style-composer.php:2381
+#: includes/maps/class-map-style-composer.php:2475
 msgid "Composed style artifact was not found."
 msgstr ""
 
@@ -3219,6 +3211,67 @@ msgstr ""
 #: templates/map-content-layers-list.php:25
 #: js/build/jeoMap.js:1
 msgid "Download from source"
+msgstr ""
+
+#: includes/layer-types/geojson.js:169
+msgid "GeoJSON"
+msgstr ""
+
+#: includes/layer-types/geojson.js:210
+msgid "GeoJSON URL"
+msgstr ""
+
+#: includes/layer-types/geojson.js:211
+msgid "Public URL of a GeoJSON file (usually a FeatureCollection). Used when no inline GeoJSON is provided."
+msgstr ""
+
+#: includes/layer-types/geojson.js:219
+msgid "Inline GeoJSON"
+msgstr ""
+
+#: includes/layer-types/geojson.js:220
+msgid "Optional. Paste a raw GeoJSON object or FeatureCollection. Takes precedence over the URL — useful for small geometries."
+msgstr ""
+
+#: includes/layer-types/geojson.js:227
+msgid "Layer style"
+msgstr ""
+
+#: includes/layer-types/geojson.js:228
+msgid "How the GeoJSON features are drawn."
+msgstr ""
+
+#: includes/layer-types/geojson.js:237
+msgid "Style"
+msgstr ""
+
+#: includes/layer-types/geojson.js:238
+msgid "Optional style overrides as raw GL properties. Empty fields fall back to the type defaults."
+msgstr ""
+
+#: includes/layer-types/geojson.js:245
+msgid "Paint"
+msgstr ""
+
+#: includes/layer-types/geojson.js:249
+msgid "Fill color"
+msgstr ""
+
+#: includes/layer-types/geojson.js:254
+msgid "Fill opacity"
+msgstr ""
+
+#: includes/layer-types/geojson.js:262
+msgid "Outline color"
+msgstr ""
+
+#: includes/layer-types/geojson.js:263
+msgid "Outline (about 1px) drawn by the fill antialiasing pass. Not rendered when antialiasing is disabled."
+msgstr ""
+
+#: includes/layer-types/geojson.js:280
+#: js/build/mapBlocks.js:3
+msgid "Layout"
 msgstr ""
 
 #: includes/layer-types/mapbox-tileset-raster.js:5
@@ -4527,10 +4580,6 @@ msgstr ""
 
 #: js/build/mapBlocks.js:3
 msgid "Post Card"
-msgstr ""
-
-#: js/build/mapBlocks.js:3
-msgid "Layout"
 msgstr ""
 
 #: js/build/mapBlocks.js:3

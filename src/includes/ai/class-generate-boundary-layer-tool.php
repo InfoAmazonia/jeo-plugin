@@ -17,7 +17,8 @@ if ( ! defined( 'WPINC' ) ) {
 
 /**
  * Tool that resolves a place name into an authoritative boundary polygon
- * and creates a JEO map-layer CPT backed by a Mapbox style.
+ * and creates a JEO map-layer CPT rendered client-side from a published
+ * GeoJSON attachment (no Mapbox style publishing required).
  */
 class Generate_Boundary_Layer_Tool extends Tool {
 
@@ -27,7 +28,7 @@ class Generate_Boundary_Layer_Tool extends Tool {
 	public function __construct() {
 		parent::__construct(
 			name: 'generate_boundary_layer',
-			description: 'Generate a boundary layer for a named place (municipality, state, indigenous land, department, etc.). Uses authoritative public sources when available (IBGE for Brazil, FUNAI for indigenous lands, OpenStreetMap as fallback). Requires a Mapbox API key.',
+			description: 'Generate a boundary layer for a named place (municipality, state, indigenous land, department, etc.). Uses authoritative public sources when available (IBGE for Brazil, FUNAI for indigenous lands, OpenStreetMap as fallback). Renders client-side from a GeoJSON file — no Mapbox API key required.',
 		);
 	}
 
@@ -84,16 +85,6 @@ class Generate_Boundary_Layer_Tool extends Tool {
 			);
 		}
 
-		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
-		if ( empty( $mapbox_key ) ) {
-			return wp_json_encode(
-				array(
-					'success' => false,
-					'error'   => __( 'Mapbox API key is not configured. Cannot publish boundary layers.', 'jeowp' ),
-				)
-			);
-		}
-
 		$service = new Place_Polygon_Service();
 		$result  = $service->create_layer(
 			$place_name,
@@ -123,8 +114,7 @@ class Generate_Boundary_Layer_Tool extends Tool {
 				'layer_id'     => $result['id'],
 				'title'        => $result['title'],
 				'type'         => $result['type'],
-				'style_id'     => $result['style_id'],
-				'style_url'    => $result['style_url'],
+				'geojson_url'  => $result['geojson_url'],
 				'edit_url'     => $result['edit_url'],
 				'bbox'         => $bbox,
 				'center_lat'   => $center['lat'],

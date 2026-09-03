@@ -100,14 +100,6 @@ class Place_Polygon_Service {
 	 * @return array|\WP_Error Layer info or error.
 	 */
 	public function create_layer( string $place_name, ?string $entity_type = null, ?string $context = null, string $layer_name = '' ) {
-		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
-		if ( empty( $mapbox_key ) ) {
-			return new \WP_Error(
-				'jeo_boundary_no_mapbox_key',
-				__( 'Mapbox API key is required to publish boundary layers.', 'jeowp' )
-			);
-		}
-
 		$result = $this->resolve( $place_name, $entity_type, $context );
 		if ( is_wp_error( $result ) ) {
 			return $result;
@@ -118,24 +110,6 @@ class Place_Polygon_Service {
 			return $geojson_url;
 		}
 
-		$style_name = $layer_name ? $layer_name : $result['display_name'];
-		$fill_color = '#8e44ad';
-		$style_json = Mapbox_Style_Builder::build_boundary_style(
-			$geojson_url,
-			$style_name,
-			array(
-				'fill_color'   => $fill_color,
-				'fill_opacity' => 0.15,
-				'line_color'   => $fill_color,
-				'line_width'   => 2,
-			)
-		);
-
-		$published = Mapbox_Style_Builder::publish_style( $style_json, $style_name, $mapbox_key );
-		if ( is_wp_error( $published ) ) {
-			return $published;
-		}
-
 		$post_title = $layer_name ? $layer_name : sprintf(
 			/* translators: %s: boundary display name. */
 			__( 'Boundary: %s', 'jeowp' ),
@@ -143,6 +117,8 @@ class Place_Polygon_Service {
 		);
 
 		$theme = ( 'funai' === $result['source'] ) ? 'Indigenous Lands' : 'Administrative Boundaries';
+
+		$fill_color = '#8e44ad';
 
 		$post_id = wp_insert_post(
 			array(
@@ -154,7 +130,7 @@ class Place_Polygon_Service {
 					$result['source'],
 					$result['attribution'],
 					__( 'Geometry simplified for interactive display; use authoritative source for legal boundaries.', 'jeowp' ),
-					'mapbox'
+					'geojson'
 				),
 			)
 		);
@@ -163,12 +139,25 @@ class Place_Polygon_Service {
 			return $post_id;
 		}
 
-		update_post_meta( $post_id, 'type', 'mapbox' );
+		// The boundary is rendered client-side from the published GeoJSON
+		// attachment — the Mapbox Styles API rejects geojson sources in
+		// hosted styles, so no style publishing is required. Styling is a
+		// single nested style object (raw paint pass-through): fill with a
+		// fill-outline-color.
+		update_post_meta( $post_id, 'type', 'geojson' );
 		update_post_meta(
 			$post_id,
 			'layer_type_options',
 			array(
-				'style_id' => $published['style_id'],
+				'data'  => $geojson_url,
+				'type'  => 'fill',
+				'style' => array(
+					'paint' => array(
+						'fill-color'         => $fill_color,
+						'fill-opacity'       => 0.15,
+						'fill-outline-color' => $fill_color,
+					),
+				),
 			)
 		);
 		update_post_meta( $post_id, 'attribution', $result['attribution'] );
@@ -186,9 +175,8 @@ class Place_Polygon_Service {
 		return array(
 			'id'           => $post_id,
 			'title'        => $post_title,
-			'type'         => 'mapbox',
-			'style_id'     => $published['style_id'],
-			'style_url'    => $published['style_url'],
+			'type'         => 'geojson',
+			'geojson_url'  => $geojson_url,
 			'edit_url'     => admin_url( 'post.php?post=' . $post_id . '&action=edit' ),
 			'bbox'         => $result['bbox'],
 			'display_name' => $result['display_name'],
