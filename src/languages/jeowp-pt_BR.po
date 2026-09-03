@@ -783,6 +783,7 @@ msgstr "Uma lista de rótulos e ícones"
 #: includes/legend-types/JeoLegend.js:181
 #: includes/legend-types/JeoLegend.js:186
 #: js/build/JeoLegend.js:1
+#: js/build/layersSidebar.js:1
 #: js/build/layersSidebar.js:7
 msgid "Default label"
 msgstr "Rótulo padrão"
@@ -4506,8 +4507,8 @@ msgstr "Opções de %s"
 msgid "Embed"
 msgstr "Embed"
 
-#: includes/settings/settings-page.js:920
-#: includes/settings/settings-page.js:922
+#: includes/settings/settings-page.js:916
+#: includes/settings/settings-page.js:918
 msgid "Choose Image"
 msgstr "Escolher imagem"
 

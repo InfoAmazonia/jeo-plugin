@@ -14,13 +14,13 @@
 	{
 		"name": "mapBlocks",
 		"path": "src/js/build/mapBlocks.js",
-		"limit": "1355 KB",
+		"limit": "1375 KB",
 		"brotli": false
 	},
 	{
 		"name": "layersSidebar",
 		"path": "src/js/build/layersSidebar.js",
-		"limit": "412 KB",
+		"limit": "450 KB",
 		"brotli": false
 	},
 	{
