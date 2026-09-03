@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-02T21:37:58+00:00\n"
+"POT-Creation-Date: 2026-09-03T16:32:11+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -514,42 +514,50 @@ msgid "Could not parse IBGE geometry response."
 msgstr ""
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-mapbox-style-builder.php:140
+#: includes/ai/class-mapbox-style-builder.php:138
 #, php-format
 msgid "Mapbox Styles API returned HTTP %d."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:150
+#: includes/ai/class-mapbox-style-builder.php:143
+msgid "Mapbox denied the style publish request (HTTP 403): the configured Mapbox token likely lacks the styles:write scope. Use a secret token (sk.…) or add the styles:write scope to the token at mapbox.com/account/access-tokens, then update the key in JEO Settings."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:148
+msgid "Mapbox rejected the access token (HTTP 401): the Mapbox API key configured in JEO Settings is invalid or has expired."
+msgstr ""
+
+#: includes/ai/class-mapbox-style-builder.php:167
 msgid "Mapbox returned an unexpected style payload."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:180
+#: includes/ai/class-mapbox-style-builder.php:200
 msgid "Only \"mapbox\" layer specs can be built into a composed style."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:188
+#: includes/ai/class-mapbox-style-builder.php:208
 msgid "Composed style spec is missing style_json."
 msgstr ""
 
 #. translators: %s: missing style key.
-#: includes/ai/class-mapbox-style-builder.php:199
+#: includes/ai/class-mapbox-style-builder.php:219
 #, php-format
 msgid "Composed style is missing required key: %s."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:231
+#: includes/ai/class-mapbox-style-builder.php:251
 msgid "Mapbox API key is not configured."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:239
+#: includes/ai/class-mapbox-style-builder.php:259
 msgid "Mapbox API key format is not recognized."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:249
+#: includes/ai/class-mapbox-style-builder.php:269
 msgid "Could not decode Mapbox API key."
 msgstr ""
 
-#: includes/ai/class-mapbox-style-builder.php:257
+#: includes/ai/class-mapbox-style-builder.php:277
 msgid "Could not extract Mapbox username from API key."
 msgstr ""
 
@@ -707,30 +715,30 @@ msgid "All Overpass mirrors failed."
 msgstr ""
 
 #. translators: %s: place name.
-#: includes/ai/class-place-polygon-service.php:85
+#: includes/ai/class-place-polygon-service.php:96
 #, php-format
 msgid "Could not find a boundary polygon for \"%s\"."
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:107
+#: includes/ai/class-place-polygon-service.php:118
 msgid "Mapbox API key is required to publish boundary layers."
 msgstr ""
 
 #. translators: %s: boundary display name.
-#: includes/ai/class-place-polygon-service.php:141
+#: includes/ai/class-place-polygon-service.php:152
 #, php-format
 msgid "Boundary: %s"
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:156
+#: includes/ai/class-place-polygon-service.php:167
 msgid "Geometry simplified for interactive display; use authoritative source for legal boundaries."
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:238
+#: includes/ai/class-place-polygon-service.php:249
 msgid "Could not write boundary GeoJSON file."
 msgstr ""
 
-#: includes/ai/class-place-polygon-service.php:256
+#: includes/ai/class-place-polygon-service.php:267
 msgid "Could not create boundary GeoJSON attachment."
 msgstr ""
 

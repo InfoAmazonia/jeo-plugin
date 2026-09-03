@@ -276,7 +276,12 @@ class Minimap {
 			);
 
 			return new \WP_REST_Response( $result->to_rest_response(), 200 );
-		} catch ( \Exception $e ) {
+		} catch ( \Throwable $e ) {
+			// Throwable (not just Exception) so TypeErrors from malformed AI
+			// output surface as a handled REST error instead of a critical error.
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( sprintf( '[JEO] Minimap setup-prompt failed (%s): %s', get_class( $e ), $e->getMessage() ) );
+
 			// Persist the user prompt to the AI conversation thread so context
 			// is not lost on the next successful call.
 			$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
@@ -385,7 +390,12 @@ class Minimap {
 			);
 
 			return new \WP_REST_Response( $result->to_rest_response(), 200 );
-		} catch ( \Exception $e ) {
+		} catch ( \Throwable $e ) {
+			// Throwable (not just Exception) so TypeErrors from malformed AI
+			// output surface as a handled REST error instead of a critical error.
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( sprintf( '[JEO] Minimap chat failed (%s): %s', get_class( $e ), $e->getMessage() ) );
+
 			// Persist the user message to the AI conversation thread so context
 			// is not lost on the next successful call. Skip regenerate (fresh start).
 			if ( 'regenerate' !== $type && ! empty( $resolved_message ) ) {
@@ -486,8 +496,16 @@ class Minimap {
 			$result->message = trim( $result->message . "\n" . $removed_notice );
 		}
 
-		if ( ! empty( $result->base_layer ) && ! $this->is_valid_layer( $result->base_layer['id'] ?? 0 ) ) {
-			$result->base_layer = null;
+		if ( ! empty( $result->base_layer ) ) {
+			// The AI may return the id as a non-numeric string (schema says int,
+			// but LLMs don't always comply) — coerce before the int-typed call
+			// and normalize so a string id never leaks to the block attributes.
+			$base_layer_id = (int) ( $result->base_layer['id'] ?? 0 );
+			if ( ! $this->is_valid_layer( $base_layer_id ) ) {
+				$result->base_layer = null;
+			} else {
+				$result->base_layer['id'] = $base_layer_id;
+			}
 		}
 
 		// Restoration-aware guard: an explicit version restore is user intent,

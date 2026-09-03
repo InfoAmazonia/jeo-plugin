@@ -56,13 +56,20 @@ class Place_Polygon_Service {
 	/**
 	 * Resolve a place name to a polygon result.
 	 *
+	 * Adapters returning null are "not applicable" and the next adapter is
+	 * tried. A WP_Error is a hard failure of that source (e.g. the IBGE API
+	 * timing out) — the error is remembered and the remaining adapters still
+	 * run, so a transient outage of one source does not abort resolution.
+	 * The last error is returned only when no adapter produced a polygon.
+	 *
 	 * @param string      $place_name  Place name.
 	 * @param string|null $entity_type Optional hint: municipality|state|indigenous_land|other.
 	 * @param string|null $context     Optional geographic context.
 	 * @return array|\WP_Error Result array or error.
 	 */
 	public function resolve( string $place_name, ?string $entity_type = null, ?string $context = null ) {
-		$order = $this->resolve_order( $entity_type );
+		$order      = $this->resolve_order( $entity_type );
+		$last_error = null;
 
 		foreach ( $order as $source ) {
 			if ( ! isset( $this->adapters[ $source ] ) ) {
@@ -70,12 +77,16 @@ class Place_Polygon_Service {
 			}
 
 			$result = $this->adapters[ $source ]->resolve( $place_name, $context );
-			if ( is_wp_error( $result ) ) {
-				return $result;
-			}
 			if ( is_array( $result ) ) {
 				return $result;
 			}
+			if ( is_wp_error( $result ) ) {
+				$last_error = $result;
+			}
+		}
+
+		if ( null !== $last_error ) {
+			return $last_error;
 		}
 
 		return new \WP_Error(

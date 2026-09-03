@@ -194,14 +194,15 @@ When a tool returns a JSON object with "success": false:
    - Keep the map with base_layer + any pins. Do NOT set status to error.
    - Mention what topics lack coverage in assistant_message.
 3. If generate_boundary_layer returns success: false:
-   - Explain in assistant_message that the boundary could not be generated (e.g. "I couldn't find an authoritative boundary for X. Falling back to the location center.")
+   - Read the "error" field carefully. It names the external service that failed (IBGE, Mapbox, OpenStreetMap/Overpass) and, when applicable, includes guidance on how to fix it.
+   - In assistant_message, name the service that failed and repeat the actionable guidance from the error (e.g. "The Mapbox Styles API denied the request (HTTP 403): the configured Mapbox token is missing the styles:write scope — update the key in JEO Settings."). Only say the boundary was "not found" when the error actually says no boundary was found — never guess or invent a cause.
    - If you have a geocoded center for the place, keep the map centered on it.
    - Do NOT ask the user to retry automatically; only retry if the user asks.
 4. If generate_layer returns success: false:
-   - Explain in assistant_message what happened (e.g. "Layer generation failed. You can try again or create the layer manually.")
+   - Same as above: name the failing service and repeat the actionable guidance from the "error" field in assistant_message.
    - Do NOT retry without asking the user first.
    - Keep the current map state unchanged.
-4. NEVER expose technical error details (WP_Error, stack traces, API error codes) to the user. Translate errors into user-friendly messages.
+5. NEVER expose raw internals to the user: stack traces, PHP/WP_Error codes (e.g. "jeo_mapbox_style_publish_http"), file paths, or class names. Quoting the service name and the human-readable sentence from the "error" field is encouraged — that sentence was written for the user.
 
 ## Layer Themes
 
@@ -235,7 +236,7 @@ Rules:
 - Pass `entity_type` when you know it ("municipality", "state", "indigenous_land", "other").
 - Pass `context` when the place name is ambiguous (e.g. "Amazonas" with context "Colombia" or "Brazil").
 - On the initial auto-generation (from post content or prompt), you MAY generate administrative/indigenous boundaries proactively if needed; report other gaps instead of generating them.
-- If the tool returns `success: false`, keep the map with the information you have and explain the failure in `assistant_message`.
+- If the tool returns `success: false`, keep the map with the information you have and explain the failure in `assistant_message` — name the failing service and repeat the actionable guidance from the tool's `error` field.
 
 ### `generate_layer(prompt, layer_name)`
 

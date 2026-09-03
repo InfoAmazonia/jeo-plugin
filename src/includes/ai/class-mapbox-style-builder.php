@@ -133,13 +133,30 @@ class Mapbox_Style_Builder {
 
 		$code = (int) wp_remote_retrieve_response_code( $response );
 		if ( $code < 200 || $code >= 300 ) {
+			$message = sprintf(
+				/* translators: %d: HTTP status code. */
+				__( 'Mapbox Styles API returned HTTP %d.', 'jeowp' ),
+				$code
+			);
+
+			if ( 403 === $code ) {
+				$message = __(
+					'Mapbox denied the style publish request (HTTP 403): the configured Mapbox token likely lacks the styles:write scope. Use a secret token (sk.…) or add the styles:write scope to the token at mapbox.com/account/access-tokens, then update the key in JEO Settings.',
+					'jeowp'
+				);
+			} elseif ( 401 === $code ) {
+				$message = __(
+					'Mapbox rejected the access token (HTTP 401): the Mapbox API key configured in JEO Settings is invalid or has expired.',
+					'jeowp'
+				);
+			}
+
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( sprintf( '[JEO] Mapbox style publish failed for "%s" (HTTP %d).', $name, $code ) );
+
 			return new \WP_Error(
 				'jeo_mapbox_style_publish_http',
-				sprintf(
-					/* translators: %d: HTTP status code. */
-					__( 'Mapbox Styles API returned HTTP %d.', 'jeowp' ),
-					$code
-				)
+				$message
 			);
 		}
 
@@ -156,6 +173,9 @@ class Mapbox_Style_Builder {
 		// Validate the published style can be fetched back.
 		$fetched = \Jeo::fetch_mapbox_style( $style_id, $token, array( 'bypass_cache' => true ) );
 		if ( is_wp_error( $fetched ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( sprintf( '[JEO] Published Mapbox style "%s" could not be fetched back: %s', $style_id, $fetched->get_error_message() ) );
+
 			return $fetched;
 		}
 

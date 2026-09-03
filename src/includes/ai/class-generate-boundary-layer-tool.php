@@ -103,6 +103,9 @@ class Generate_Boundary_Layer_Tool extends Tool {
 		);
 
 		if ( is_wp_error( $result ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( sprintf( '[JEO] generate_boundary_layer failed for "%s" (%s): %s', $place_name, $result->get_error_code(), $result->get_error_message() ) );
+
 			return wp_json_encode(
 				array(
 					'success' => false,
