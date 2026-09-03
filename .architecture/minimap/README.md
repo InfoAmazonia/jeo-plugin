@@ -188,9 +188,13 @@ The user can later toggle `use_default` off in the `LayerStyleEditor` modal (Gut
 The minimap agent's system prompt includes explicit instructions for handling tool failures gracefully:
 
 - **`search_layers` failure** → informational `assistant_message`, map renders with base layer + pins only
-- **`generate_layer` failure** → user-friendly explanation via `assistant_message`, suggests retrying or adjusting the prompt
-- **Technical error details** (WP_Error messages, API error codes, stack traces) are never exposed to the user
+- **`generate_layer` / `generate_boundary_layer` failure** → `assistant_message` must **name the failing service** (IBGE, Mapbox, OpenStreetMap/Overpass) and **repeat the actionable guidance** from the tool's `error` field (e.g. the Mapbox token missing the `styles:write` scope) — the `error` sentences are user-facing copy, not technical internals
+- The AI must **never guess a cause**: "boundary not found" may only be reported when the tool error actually says no boundary was found
+- **Raw internals remain forbidden** (stack traces, PHP/WP_Error codes like `jeo_mapbox_style_publish_http`, file paths, class names)
 - The map is always rendered (with base layer + pins at minimum) even when tools fail
+- Tool failures are logged server-side via `error_log()` (prefixed `[JEO]`) in both generation tools and in `Mapbox_Style_Builder::publish_style()`, so admins can diagnose the exact `WP_Error` code and message from the PHP error log
+
+**Mapbox token requirement:** publishing boundary/minilayer styles calls `POST /styles/v1/{user}`, which needs a token with the **`styles:write` scope**. The default public token (`pk.…`) usually lacks it and fails with HTTP 403 — `publish_style()` translates 403/401 into actionable messages (create a secret token `sk.…` or add the scope at mapbox.com/account/access-tokens).
 
 **Flow: Layer generation via chat**
 
@@ -305,8 +309,10 @@ In addition to conversation history, `/minimap/chat` also receives the current b
 
 After the agent returns, `Minimap::run_agent()` applies two safety nets:
 
-1. **Base layer fallback**: If `base_layer` is null, creates one using the agent's `base_variant` or the luminance heuristic (`determine_base_variant()`)
+1. **Base layer fallback**: If `base_layer` is null, creates one using the agent's `base_variant` or the luminance heuristic (`determine_base_variant()`). The AI-emitted `base_layer.id` is coerced with `(int)` before the int-typed `is_valid_layer()` check (LLMs sometimes return it as a non-numeric string, which previously caused an uncaught TypeError / WP critical error); non-numeric or invalid ids reset `base_layer` to null so the fallback runs, and a valid id is normalized to int so it never leaks to block attributes.
 2. **Pin fallback**: If the agent returned no pins and a `post_id` exists, fills pins from `_related_point` post meta
+
+Both AI endpoints (`/minimap/setup-prompt`, `/minimap/chat`) catch `\Throwable` (not just `\Exception`) around `run_agent()` and return a handled 500 REST error — residual TypeErrors from malformed AI output become a chat-visible message instead of a WordPress critical error.
 
 Before the refinement guards, a declared **version restore** is applied deterministically (`apply_version_restore()`, see [Version History & Restore](#version-history--restore)): a valid `restore_version` replaces layers/base/center/zoom/pins with the stored snapshot; an invalid one keeps the agent's own reconstruction with a notice. Restore turns skip `tag_layer_provenance`, `apply_diff_guard`, and `preserve_manual_layers` — the snapshot is authoritative user intent.
 
@@ -577,6 +583,8 @@ When a Mapbox key is configured, the agent may call `generate_boundary_layer` pr
 
 `Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. `Mapbox_Style_Builder` then creates a simple line + fill style and publishes it to the Mapbox Styles API. The resulting `mapbox` layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, `attribution`, `theme`, and an auto-generated `simple-color` legend.
 
+**Adapter fallback semantics:** an adapter returning `null` means "not applicable" and the next adapter runs. A `WP_Error` is a hard failure of that source (e.g. IBGE API timeout) — the error is remembered, the remaining adapters still run, and the last error is returned only if no adapter produced a polygon. A transient outage of one source therefore does not abort resolution.
+
 All non-boundary layer types still require explicit user confirmation before `generate_layer` is called.
 
 ### Boundary resolver configuration
@@ -587,7 +595,7 @@ All non-boundary layer types still require explicit user confirmation before `ge
 | `jeo_overpass_mirrors` | Replace the default Overpass mirror list. Useful to remove the `.ru` mirror or use a private mirror. |
 | `jeo_overpass_request_args` | Inject per-mirror HTTP args (headers, auth tokens, timeouts) for paid/private Overpass instances. |
 | `jeo_osm_admin_prefixes` | Customize administrative prefixes stripped from Nominatim queries. |
-| `jeo_funai_wfs_name_attribute` | Change the FUNAI feature attribute used for name matching (default: `nome`). |
+| `jeo_funai_wfs_name_attribute` | Change the FUNAI feature attribute used for name matching (default: `terrai_nome`; the current FUNAI GeoServer at `geoserver.funai.gov.br` renamed the old `nome` field). |
 
 ### Caching
 
