@@ -26,7 +26,7 @@ class Minilayer_Service {
 	 * @return array|\WP_Error Layer info array on success, WP_Error on failure.
 	 */
 	public static function generate_and_create( string $prompt, string $layer_name = '' ) {
-		$mapbox_key = \jeo_settings()->get_option( 'mapbox_key' );
+		$mapbox_key = \jeo_settings()->get_mapbox_publish_token();
 		if ( empty( $mapbox_key ) ) {
 			return new \WP_Error(
 				'minilayer_no_mapbox_key',

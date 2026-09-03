@@ -194,7 +194,7 @@ The minimap agent's system prompt includes explicit instructions for handling to
 - The map is always rendered (with base layer + pins at minimum) even when tools fail
 - Tool failures are logged server-side via `error_log()` (prefixed `[JEO]`) in both generation tools and in `Mapbox_Style_Builder::publish_style()`, so admins can diagnose the exact `WP_Error` code and message from the PHP error log
 
-**Mapbox token requirement:** publishing boundary/minilayer styles calls `POST /styles/v1/{user}`, which needs a token with the **`styles:write` scope**. The default public token (`pk.…`) usually lacks it and fails with HTTP 403 — `publish_style()` translates 403/401 into actionable messages (create a secret token `sk.…` or add the scope at mapbox.com/account/access-tokens).
+**Mapbox token requirement:** publishing boundary/minilayer styles calls `POST /styles/v1/{user}`, which needs a token with the **`styles:write` scope**. The default public token (`pk.…`) usually lacks it and fails with HTTP 403 — `publish_style()` translates 403/401 into actionable messages (create a secret token `sk.…` or add the scope at mapbox.com/account/access-tokens). Both AI pipelines resolve the token via `jeo_settings()->get_mapbox_publish_token()`, which prefers the server-only `mapbox_secret_key` setting (never exposed to the frontend) and falls back to the public `mapbox_key`.
 
 **Flow: Layer generation via chat**
 

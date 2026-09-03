@@ -133,14 +133,22 @@
 							</tr>
 						<?php endforeach; ?>
 
-						<tr class="mapbox_options" style="display: <?php echo $this->get_option( 'map_runtime' ) === 'mapboxgl' ? 'table-row' : 'none'; ?>;">
+						<tr class="mapbox_options">
 							<th scope="row"><h2 style="padding: 0; margin: 0"><?php esc_html_e( 'Mapbox', 'jeowp' ); ?></h2></th>
 							<td></td>
 						</tr>
-						<tr class="mapbox_options" style="display: <?php echo $this->get_option( 'map_runtime' ) === 'mapboxgl' ? 'table-row' : 'none'; ?>;">
+						<tr class="mapbox_options">
 							<th scope="row"><label for="mapbox_key"><?php esc_html_e( 'Mapbox API Key', 'jeowp' ); ?></label></th>
 							<td>
 								<input name="<?php echo esc_html( $this->get_field_name( 'mapbox_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. pk.eyJ3...', 'jeowp' ); ?>" type="text" id="mapbox_key" value="<?php echo esc_html( $this->get_option( 'mapbox_key' ) ); ?>" class="regular-text">
+								<p class="description"><?php esc_html_e( 'Public access token. Used for MapboxGL rendering, Mapbox layers, and AI layer generation. This token is exposed to site visitors (it is required to display maps), so keep its scopes read-only.', 'jeowp' ); ?></p>
+							</td>
+						</tr>
+						<tr class="mapbox_options">
+							<th scope="row"><label for="mapbox_secret_key"><?php esc_html_e( 'Mapbox Secret Key', 'jeowp' ); ?></label></th>
+							<td>
+								<input name="<?php echo esc_html( $this->get_field_name( 'mapbox_secret_key' ) ); ?>" placeholder="<?php esc_attr_e( 'Ex. sk.eyJ3...', 'jeowp' ); ?>" type="password" autocomplete="new-password" id="mapbox_secret_key" value="<?php echo esc_html( $this->get_option( 'mapbox_secret_key' ) ); ?>" class="regular-text">
+								<p class="description"><?php esc_html_e( 'Used to create AI-assisted layers (requires the styles:write scope). For security, use a secret token — the public token is visible to site visitors. If empty, publishing falls back to the public token.', 'jeowp' ); ?></p>
 							</td>
 						</tr>
 					</tbody>

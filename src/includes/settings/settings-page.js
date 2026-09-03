@@ -30,7 +30,7 @@
 			if (!$container.length) return;
 
 			var timestamp = new Date().toLocaleTimeString();
-			
+
 			// Anonymize API Key in logs
 			var displayPayload = $.extend(true, {}, payload);
 			if (displayPayload.api_key && typeof displayPayload.api_key === 'string') {
@@ -43,14 +43,14 @@
 			}
 
 			var payloadStr = (typeof displayPayload === 'string') ? displayPayload : JSON.stringify(displayPayload, null, 2);
-			
+
 			var entryHtml = '<div class="jeo-debug-entry">' +
-				'<span class="jeo-debug-label ' + (type === 'req' ? 'jeo-debug-request' : (type === 'err' ? 'jeo-debug-error' : 'jeo-debug-response')) + '">' + 
+				'<span class="jeo-debug-label ' + (type === 'req' ? 'jeo-debug-request' : (type === 'err' ? 'jeo-debug-error' : 'jeo-debug-response')) + '">' +
 				'[' + timestamp + '] ' + label + ' (' + (type === 'req' ? 'REQUEST' : (type === 'err' ? 'ERROR' : 'RESPONSE')) + ')</span>' +
-				'<pre class="jeo-debug-payload">' + 
-				(payloadStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')) + 
+				'<pre class="jeo-debug-payload">' +
+				(payloadStr.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')) +
 				'</pre></div>';
-			
+
 			$container.append(entryHtml);
 			var body = document.getElementById('jeo-ai-debug-body');
 			if(body) body.scrollTop = body.scrollHeight;
@@ -73,7 +73,7 @@
 		// ------------------------------------
 		function runApiKeyTest($btn) {
 			if (!$btn || !$btn.length) return;
-			
+
 			var provider = $btn.closest('tr').data('provider') || $('#ai_default_provider').val();
 			var $row = $btn.closest('tr');
 			var $input = $row.find('.jeo-ai-key-input');
@@ -87,8 +87,8 @@
 
 			// Security: Don't send masked keys via AJAX
 			var isMasked = key && key.indexOf('********') !== -1;
-			var apiData = { 
-				provider: provider, 
+			var apiData = {
+				provider: provider,
 				model: model
 			};
 
@@ -132,7 +132,7 @@
 			var initialProvider = $('#ai_default_provider').val();
 			$('.jeo-ai-provider-settings').hide();
 			$('.jeo-ai-provider-settings[data-provider="' + initialProvider + '"]').show();
-			
+
 			// Auto test on load if on provider tab
 			if (window.location.search.includes('tab=provider') || window.location.hash === '#tab-ai') {
 				var $initBtn = $('.jeo-ai-provider-settings[data-provider="' + initialProvider + '"]').find('.jeo-ai-test-key-btn');
@@ -144,7 +144,7 @@
 			var provider = $(this).val();
 			$('.jeo-ai-provider-settings').hide();
 			$('.jeo-ai-provider-settings[data-provider="' + provider + '"]').show();
-			
+
 			var $activeBtn = $('.jeo-ai-provider-settings[data-provider="' + provider + '"]').find('.jeo-ai-test-key-btn');
 			runApiKeyTest($activeBtn);
 		});
@@ -167,7 +167,7 @@
 				  .val('')
 				  .focus()
 				  .css({ 'background': '#fff', 'cursor': 'text' });
-			
+
 			$btn.fadeOut(200);
 		});
 
@@ -177,7 +177,7 @@
 			var $btn = $(this);
 			var provider = $btn.data('provider');
 			var $row = $btn.closest('tr');
-			
+
 			// Find the key in the PREVIOUS row (the one with the key input)
 			var $keyRow = $row.prev('tr');
 			var $keyInput = $keyRow.find('.jeo-ai-key-input');
@@ -209,7 +209,7 @@
 					var $modelContainer = $btn.closest('.jeo-ai-model-container');
 					var $readOnly = $modelContainer.find('input[type="text"]');
 					var $hidden = $modelContainer.find('input[type="hidden"]');
-					
+
 					// Convert input to Select2
 					var $select = $('<select class="jeo-ai-model-select" style="width: 300px;"></select>');
 					res.models.forEach(function(m) {
@@ -272,7 +272,7 @@
 		if (savedChatContext) {
 			$('#jeo-ai-chat-input').val(savedChatContext);
 		}
-		
+
 		$('#jeo-ai-chat-input').on('input', function() {
 			localStorage.setItem('jeo_ai_assistant_context', $(this).val());
 		});
@@ -552,13 +552,13 @@
 			var i18n = jeo_settings.i18n || {};
 			var $btn = $(this).prop('disabled', true).text(i18n.vectorizing || 'Vectorizing...');
 			loggedApiFetch({ path: '/jeo/v1/ai-rag-run-manual', method: 'POST' }).then(function(res) {
-				alert(res.message || (i18n.success || 'Success!')); 
+				alert(res.message || (i18n.success || 'Success!'));
 				location.reload();
 			}).catch(function(err) {
 				var msg = (err.responseJSON && err.responseJSON.message) ? err.responseJSON.message : (err.message || i18n.unknown_error || 'Unknown error');
 				alert((i18n.error || 'Error') + ': ' + msg);
-			}).finally(function() { 
-				$btn.prop('disabled', false).text(i18n.vectorize_now || 'Vectorize Now'); 
+			}).finally(function() {
+				$btn.prop('disabled', false).text(i18n.vectorize_now || 'Vectorize Now');
 			});
 		});
 
@@ -822,7 +822,7 @@
 			var i18n = jeo_settings.i18n || {};
 			var $btn = $(this);
 			$btn.prop('disabled', true).text(i18n.processing || 'Processing...');
-			
+
 			loggedApiFetch({ path: '/jeo/v1/bulk-ai-run', method: 'POST' }).then(function(res) {
 				alert(res.message || (i18n.success || 'Success'));
 				location.reload();
@@ -839,7 +839,7 @@
 			var i18n = jeo_settings.i18n || {};
 			var $btn = $(this);
 			$btn.prop('disabled', true).text(i18n.clearing || 'Clearing...');
-			
+
 			loggedApiFetch({ path: '/jeo/v1/bulk-ai-clear-batch', method: 'POST' }).then(function(res) {
 				alert(res.message || (i18n.success || 'Success'));
 				location.reload();
@@ -854,13 +854,13 @@
 		$('#jeo-bulk-clear-all-btn').click(function(e) {
 			e.preventDefault();
 			var i18n = jeo_settings.i18n || {};
-			
+
 			if (!confirm(i18n.confirm_clear_bulk || 'This will schedule a reset of ALL posts. Continue?')) return;
 			if (!confirm(i18n.confirm_clear_bulk_2 || 'ARE YOU SURE? This cannot be undone.')) return;
 
 			var $btn = $(this);
 			$btn.prop('disabled', true);
-			
+
 			loggedApiFetch({ path: '/jeo/v1/bulk-ai-clear-all', method: 'POST' }).then(function(res) {
 				alert(res.message || (i18n.bulk_clear_started || 'Bulk clearing started.'));
 				location.reload();
@@ -886,21 +886,17 @@
 			$('#geocoder_options_' + $(this).val()).show();
 		}).change();
 
-		$('#map_runtime').change(function() {
-			$('.mapbox_options').toggle($(this).val() === 'mapboxgl');
-		}).change();
-
 		// ------------------------------------
 		// Skeleton & Tab Auto-test
 		// ------------------------------------
 		setTimeout(function() {
-			$('#jeo-skeleton').fadeOut('fast', function() { 
+			$('#jeo-skeleton').fadeOut('fast', function() {
 				$('.jeo-tab-content-wrapper').fadeIn('fast');
-				$('.jeo-settings-submit').fadeIn('fast'); 
+				$('.jeo-settings-submit').fadeIn('fast');
 
-				var isProviderTab = window.location.search.includes('tab=provider') || 
+				var isProviderTab = window.location.search.includes('tab=provider') ||
 								   (!window.location.search.includes('tab=') && window.location.search.includes('page=jeo-ai-settings'));
-				
+
 				if (isProviderTab && $('#ai_default_provider').length) {
 					var activeProvider = $('#ai_default_provider').val();
 					var $initBtn = $('.jeo-ai-provider-settings[data-provider="' + activeProvider + '"]').find('.jeo-ai-test-key-btn');

@@ -21,7 +21,7 @@ All config in a single array option `jeo-settings`.
 
 | Tab | Section | Key Fields |
 |-----|---------|------------|
-| General | Map runtime, post types | `map_runtime_requested`, `post_types`, `default_zoom`, `default_center`, `mapbox_key` |
+| General | Map runtime, post types | `map_runtime_requested`, `post_types`, `default_zoom`, `default_center`, `mapbox_key`, `mapbox_secret_key` |
 | Geocoders | Geocoding service | `geocoding_service` |
 | Appearance | Typography, colors | `font_family`, `font_url`, `primary_color`, `secondary_color` |
 | Discovery | Discovery page | `discovery_page_id` |
@@ -76,3 +76,20 @@ Settings allow defining primary/secondary colors and typography, injected via:
 $settings = jeo_settings(); // Returns singleton instance of Jeo\Settings
 $value    = jeo_settings()->get_option( 'mapbox_key' );
 ```
+
+## Mapbox Tokens
+
+Two separate settings, both in the General tab (the Mapbox section is always
+visible, regardless of the selected map runtime):
+
+- `mapbox_key` (public `pk.…`): rendering (MapboxGL runtime, Mapbox layers) and
+  AI layer pipelines. **Exposed to frontend scripts** via `wp_localize_script`
+  — keep its scopes read-only.
+- `mapbox_secret_key` (secret `sk.…`): server-only, **never** localized or sent
+  to REST responses. Publishing AI-generated styles requires the
+  `styles:write` scope, which must not be granted to the public token.
+
+Consumers that publish styles resolve the token via
+`jeo_settings()->get_mapbox_publish_token()` (secret wins, fallback to public).
+The secret participates in the masked-sensitive-keys loop (submissions
+containing `********` keep the stored value) and is trimmed/sanitized on save.
