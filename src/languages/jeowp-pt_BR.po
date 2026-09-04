@@ -563,11 +563,12 @@ msgstr "Voltar para página inicial"
 
 #: templates/map-content-layers-list.php:18
 #: templates/map-content-layers-list.php:20
+#: templates/map-content-layers-list.php:22
 #: js/build/jeoMap.js:1
 msgid "Attribution:"
 msgstr "Atribuição:"
 
-#: templates/map-content-layers-list.php:25
+#: templates/map-content-layers-list.php:27
 #: js/build/jeoMap.js:1
 msgid "Download from source"
 msgstr "Baixar da fonte"
