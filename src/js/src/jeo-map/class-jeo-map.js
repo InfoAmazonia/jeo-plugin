@@ -238,36 +238,46 @@ export default class JeoMap {
 							} );
 						}
 
-							// Add attributions
-							const customAttribution = [];
-							layers.forEach( ( layer ) => {
-								if ( layer.attribution ) {
-									let attributionLink = layer.attribution;
-									const attributionName = layer.attribution_name;
-
-									const regex = new RegExp(
-										/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
-									);
-
-									if (
-										layer.attribution &&
-										! layer.attribution.includes( 'http' )
-									) {
-										if ( layer.attribution.match( regex ) ) {
-											attributionLink = `https://${ layer.attribution }`;
-										}
-									}
-									const attributionLabel = attributionName.replace(
-										/\s/g,
-										''
-									).length
-										? attributionName
-										: attributionLink;
-									customAttribution.push(
-										`<a href="${ attributionLink }">${ attributionLabel }</a>`
-									);
+						// Add attributions
+						const customAttribution = [];
+						layers.forEach( ( layer ) => {
+							if ( layer.attribution ) {
+								// HTML attributions (e.g. base layers: "&copy;
+								// <a href="...">OpenFreeMap</a>") are rendered
+								// as-is — wrapping them in another <a> would
+								// nest anchors, which is invalid HTML and
+								// breaks the attribution control.
+								if ( /<\s*a[\s>]/i.test( layer.attribution ) ) {
+									customAttribution.push( layer.attribution );
+									return;
 								}
-							} );
+
+							let attributionLink = layer.attribution;
+							const attributionName = layer.attribution_name;
+
+							const regex = new RegExp(
+								/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+							);
+
+							if (
+								layer.attribution &&
+								! layer.attribution.includes( 'http' )
+							) {
+								if ( layer.attribution.match( regex ) ) {
+									attributionLink = `https://${ layer.attribution }`;
+								}
+							}
+							const attributionLabel = attributionName.replace(
+								/\s/g,
+								''
+							).length
+								? attributionName
+								: attributionLink;
+							customAttribution.push(
+								`<a href="${ attributionLink }">${ attributionLabel }</a>`
+							);
+						}
+					} );
 
 							const isMobileViewport = window.matchMedia
 								? window.matchMedia( '(max-width: 599px)' ).matches

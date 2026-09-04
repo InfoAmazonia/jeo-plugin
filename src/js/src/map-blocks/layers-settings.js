@@ -8,7 +8,7 @@ import { List, arrayMove } from 'react-movable';
 import LayerSettings from './layer-settings';
 import { mergeLayerTypeOptions } from './layer-type-options';
 import { loadLayer } from './utils';
-import { decodeHtmlEntity } from '../shared/html';
+import { decodeHtmlEntity, sanitizeHtml } from '../shared/html';
 import { usePaginatedRecords } from '../shared/rest-records';
 
 import './layers-settings.css';
@@ -379,11 +379,12 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 											) }
 											{ ( layer.meta.attribution || layer['layer-theme']?.length > 0 ) && (
 												<p className="layer-meta">
-													{ layer.meta.attribution && (
-														<span className="layer-source">
-															<strong>{ __( 'Source:', 'jeowp' ) }</strong> { layer.meta.attribution }
-														</span>
-													) }
+												{ layer.meta.attribution && (
+													<span className="layer-source">
+														<strong>{ __( 'Source:', 'jeowp' ) }</strong>{ ' ' }
+														<span dangerouslySetInnerHTML={ { __html: sanitizeHtml( layer.meta.attribution ) } } />
+													</span>
+												) }
 													{ layer['layer-theme']?.length > 0 && (
 														<span className="layer-themes">
 															<strong>{ __( 'Themes:', 'jeowp' ) }</strong> { layer['layer-theme'].map( ( t ) => t.name ).join( ', ' ) }

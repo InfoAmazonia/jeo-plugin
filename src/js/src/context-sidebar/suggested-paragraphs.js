@@ -2,6 +2,7 @@ import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { sanitizeHtml } from '../shared/html';
 
 /**
  * Insert a paragraph block into the editor at the end of the document.
@@ -11,84 +12,6 @@ import { createBlock } from '@wordpress/blocks';
 const insertParagraph = ( html ) => {
 	const block = createBlock( 'core/paragraph', { content: html } );
 	wp.data.dispatch( 'core/block-editor' ).insertBlocks( block );
-};
-
-/**
- * Sanitize HTML to only allow basic inline tags.
- *
- * Uses the browser's DOM parser for accuracy. Only <strong>, <b>, <em>,
- * <i>, <br>, <a> (with href), and <span> (with arbitrary attributes
- * except on* event handlers) are preserved. All other tags are
- * stripped but their text content is kept.
- *
- * @param {string} rawHtml Raw HTML string.
- * @return {string} Sanitized HTML string.
- */
-const ALLOWED_TAGS = new Set( [ 'strong', 'b', 'em', 'i', 'br', 'a', 'span' ] );
-
-/**
- * Decode HTML entities (e.g. &lt; → <) so structured-output escaped strings
- * are rendered correctly.
- *
- * @param {string} input String that may contain HTML entities.
- * @return {string} Decoded string.
- */
-const decodeHtmlEntities = ( input ) => {
-	const textarea = document.createElement( 'textarea' );
-	textarea.innerHTML = input;
-	return textarea.value;
-};
-
-const sanitizeHtml = ( rawHtml ) => {
-	const decoded = decodeHtmlEntities( rawHtml );
-	const div = document.createElement( 'div' );
-	div.innerHTML = decoded;
-
-	const walk = ( node ) => {
-		if ( node.nodeType === Node.TEXT_NODE ) {
-			return node.textContent;
-		}
-
-		if ( node.nodeType === Node.ELEMENT_NODE ) {
-			const tag = node.tagName.toLowerCase();
-
-			if ( ! ALLOWED_TAGS.has( tag ) ) {
-				return Array.from( node.childNodes )
-					.map( walk )
-					.join( '' );
-			}
-
-		if ( tag === 'br' ) {
-			return '<br>';
-		}
-
-		const inner = Array.from( node.childNodes )
-			.map( walk )
-			.join( '' );
-
-		if ( tag === 'a' ) {
-			const href = node.getAttribute( 'href' ) || '';
-			const safeHref = href.replace( /"/g, '&quot;' );
-			return `<a href="${ safeHref }" target="_blank" rel="noopener noreferrer">${ inner }</a>`;
-		}
-
-		if ( tag === 'span' ) {
-			const attrs = Array.from( node.attributes )
-				.filter( ( attr ) => ! attr.name.toLowerCase().startsWith( 'on' ) )
-				.map( ( attr ) => `${ attr.name }="${ attr.value.replace( /"/g, '&quot;' ) }"` )
-				.join( ' ' );
-			return attrs ? `<span ${ attrs }>${ inner }</span>` : `<span>${ inner }</span>`;
-		}
-
-		return `<${ tag }>${ inner }</${ tag }>`;
-		}
-
-		return '';
-	};
-
-	return Array.from( div.childNodes )
-		.map( walk )
-		.join( '' );
 };
 
 /**

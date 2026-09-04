@@ -44,7 +44,7 @@
 	{
 		"name": "jeoMap",
 		"path": "src/js/build/jeoMap.js",
-		"limit": "103 KB",
+		"limit": "105 KB",
 		"brotli": false
 	},
 	{

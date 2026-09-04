@@ -2,7 +2,7 @@ import { Button } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
 import { layerUseLabels, loadLayer } from './utils';
-import { decodeHtmlEntity } from '../shared/html';
+import { decodeHtmlEntity, sanitizeHtml } from '../shared/html';
 import './layers-panel.css';
 
 export default function ( {
@@ -59,7 +59,8 @@ export default function ( {
 									) }
 									{ attribution && (
 										<p className="jeo-layer-meta">
-											<strong>{ __( 'Source:', 'jeowp' ) }</strong> { attribution }
+											<strong>{ __( 'Source:', 'jeowp' ) }</strong>{ ' ' }
+											<span dangerouslySetInnerHTML={ { __html: sanitizeHtml( attribution ) } } />
 										</p>
 									) }
 									{ layerUseLabels[ settings.use ] }
