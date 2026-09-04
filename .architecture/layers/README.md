@@ -60,7 +60,7 @@ Defined in `layers-sidebar/layer-type-definitions.js`:
 | `mvt` | `url`, `source_layer`, `type`, `style_source_type`, `access_token` |
 | `mapbox-tileset-raster` | `tileset_id`, `style_source_type`, `type`, `access_token` |
 | `mapbox-tileset-vector` | `tileset_id`, `source_layer`, `type`, `style_source_type`, `access_token` |
-| `geojson` | `data`, `inline_geojson`, `type`, `style` |
+| `geojson` | `data`, `inline_geojson`, `type` |
 
 The `geojson` type renders a public GeoJSON URL client-side as a single `fill`
 GL layer (used by AI-generated boundary layers). It needs no
@@ -69,17 +69,21 @@ the editor preview (`map-preview-layer.js`), and the Mapbox style composer
 (direct-type inlining with one manifest entry per GL layer). Source data can be
 a URL (`data`) or raw inline JSON (`inline_geojson`, takes precedence). The
 render type is keyed by `type` (`fill` only in the schema for now; the
-renderers are switches ready for future types). Styling lives in a single
-nested `style` object (`{ paint, layout }`) passed through raw to the GL layer:
-the outline is the `fill-outline-color` paint prop (~1px antialiasing halo —
+renderers are switches ready for future types). Styling lives **on the map
+layer instance** (`layers[i].style`, the same flat `{ use_default, paint, layout }`
+shape used by `mvt`/`mapbox-tileset-vector`) — never on the layer CPT. When the
+instance sets `use_default`, the layer's `default_style` post meta (exposed via
+REST, written by AI layer generation) takes over. All renderers resolve the
+effective style the same way: editor preview (`map-preview-layer.js`), frontend
+runtime (`geojson.js`, fed by `class-jeo-map.js`), and the composer
+(`resolve_effective_layer_style()` in `class-map-style-composer.php`). The
+outline is the `fill-outline-color` paint prop (~1px antialiasing halo —
 no configurable width/opacity; the old `{layer_id}__outline` companion line
 layer was replaced, and the legacy toggle in `class-jeo-map.js::changeLayerVisibitly`
 remains only for pre-switch layers). Paint defaults are shared via
 `JeoLayerTypes.getFallbackPaint('fill')` and mirrored in the composer's PHP
 default paint — keep both in sync. Instance opacity multiplies numeric opacity
-props. The schema declares the common props (`fill-color`, `fill-opacity`,
-`fill-outline-color`) as labeled fields and allows any other GL paint/layout
-prop via `additionalProperties`. Uses only style-spec v8 core APIs —
+props. Uses only style-spec v8 core APIs —
 compatible with both MapLibre GL JS and Mapbox GL JS runtimes.
 
 ### Extensibility
@@ -174,7 +178,7 @@ Every layer instance in a map (including raster types) supports an `opacity` pro
 
 ## Per-Instance Vector Layer Styling
 
-Vector layers (`mvt`, `mapbox-tileset-vector`) support per-instance paint/layout overrides stored on the map's `layers` meta, not on the layer CPT. This allows the same layer to have different styles in different maps.
+Vector layers (`mvt`, `mapbox-tileset-vector`) and the client-side `geojson` type support per-instance paint/layout overrides stored on the map's `layers` meta, not on the layer CPT. This allows the same layer to have different styles in different maps.
 
 ### Key Files
 
@@ -186,7 +190,10 @@ Vector layers (`mvt`, `mapbox-tileset-vector`) support per-instance paint/layout
 | `src/js/src/map-blocks/map-preview-layer.js` | Spreads `instance.style.paint/layout` into `<Layer>` |
 | `src/includes/layer-types/mvt.js` | Merges `attributes.style` into `map.addLayer()` |
 | `src/includes/layer-types/mapbox-tileset-vector.js` | Merges `attributes.style` into `map.addLayer()` |
-| `src/js/src/jeo-map/class-jeo-map.js` | Forwards `style` from `layersDefinitions` to `JeoLayer` |
+| `src/includes/layer-types/geojson.js` | Resolves `attributes.style`/`attributes.default_style` into the GL layer paint |
+| `src/js/src/jeo-map/class-jeo-map.js` | Forwards `style`/`default_style` from `layersDefinitions`/layer meta to `JeoLayer` |
+| `src/includes/maps/class-map-style-composer.php` | `resolve_effective_layer_style()` mirrors the same resolution in composed styles |
+| `src/includes/layers/class-layers.php` | Registers the `default_style` post meta (show_in_rest) |
 
 ### `style` Object Shape
 
@@ -220,9 +227,10 @@ Stored as a property on each `layers[]` item in the map's `layers` meta:
 ```
 Layers modal → Style button → LayerStyleEditor modal
   → onChange updates layers[i].style in map meta / block attrs
-  → Preview: map-preview-layer.js reads instance.style → <Layer paint={...} />
+  → Preview: map-preview-layer.js reads instance.style (use_default → layer.default_style) → <Layer paint={...} />
   → Frontend: class-jeo-map.js reads layersDefinitions[i].style → JeoLayer attributes
-  → mvt.js / mapbox-tileset-vector.js merge style.paint into map.addLayer()
+  → mvt.js / mapbox-tileset-vector.js / geojson.js merge style.paint into map.addLayer()
+  → Composer: class-map-style-composer.php resolve_effective_layer_style() merges the same style into composed styles
 ```
 
 ### Backwards Compatibility

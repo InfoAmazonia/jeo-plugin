@@ -37,6 +37,7 @@ class Settings {
 		'map_default_lat'                 => 0,
 		'map_default_lng'                 => 0,
 		'mapbox_key'                      => '',
+		'mapbox_secret_key'               => '',
 		'active_geocoder'                 => 'nominatim',
 		'show_storymaps_on_post_archives' => true,
 		'geolocation_precision'           => 2,
@@ -171,6 +172,26 @@ class Settings {
 		}
 
 		return $default_value;
+	}
+
+	/**
+	 * Resolve the Mapbox token used to PUBLISH styles (AI-generated layers).
+	 *
+	 * Publishing requires the styles:write scope, which must NOT be granted to
+	 * the public mapbox_key — that token is localized to frontend scripts and
+	 * visible to every site visitor. When the server-only mapbox_secret_key is
+	 * configured it wins; otherwise we fall back to the public key (which then
+	 * surfaces the actionable HTTP 403 message if it lacks the scope).
+	 *
+	 * @return string
+	 */
+	public function get_mapbox_publish_token(): string {
+		$secret = trim( (string) $this->get_option( 'mapbox_secret_key', '' ) );
+		if ( '' !== $secret ) {
+			return $secret;
+		}
+
+		return trim( (string) $this->get_option( 'mapbox_key', '' ) );
 	}
 
 	/**
@@ -363,6 +384,7 @@ class Settings {
 			'grok_api_key',
 			'cohere_api_key',
 			'mapbox_key',
+			'mapbox_secret_key',
 			'ollama_url',
 		);
 
@@ -403,6 +425,10 @@ class Settings {
 			if ( isset( $input[ $field ] ) ) {
 				$input[ $field ] = sanitize_text_field( $input[ $field ] );
 			}
+		}
+
+		if ( isset( $input['mapbox_secret_key'] ) ) {
+			$input['mapbox_secret_key'] = sanitize_text_field( trim( $input['mapbox_secret_key'] ) );
 		}
 
 		if ( isset( $input['map_runtime'] ) && 'mapboxgl' === $input['map_runtime'] ) {

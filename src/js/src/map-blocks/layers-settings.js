@@ -575,7 +575,16 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 											} ) )
 										);
 
-									const updateUse = ( use ) =>
+									const updateStyle = ( style ) =>
+									setLayers(
+										attributes.layers.map( ( settings ) =>
+											settings.id === layer.id
+												? { ...settings, style }
+												: settings
+										)
+									);
+
+								const updateUse = ( use ) =>
 										setLayers(
 											attributes.layers.map( ( settings ) => {
 												if ( settings.id !== layer.id ) {
@@ -625,8 +634,9 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										switchDefault={ switchDefault }
 										switchShowLegend={ switchShowLegend }
 										swapDefault={ swapDefault }
-										updateUse={ updateUse }
-										widths={ widths }
+									updateUse={ updateUse }
+									updateStyle={ updateStyle }
+									widths={ widths }
 										updateStyleLayers={ updateStyleLayers }
 										key={ index }
 									/>;

@@ -187,16 +187,24 @@ class Maps {
 									'type'        => 'boolean',
 								),
 								'style'         => array(
-									'description' => __( 'Per-instance paint and layout overrides for vector layers', 'jeowp' ),
+									'description' => __( 'Per-instance paint and layout overrides for vector and GeoJSON layers', 'jeowp' ),
 									'type'        => 'object',
 									'properties'  => array(
-										'paint'  => array(
+										'use_default' => array(
+											'description' => __( 'Whether to use the layer default_style meta instead of the instance paint', 'jeowp' ),
+											'type'        => 'boolean',
+										),
+										'paint'       => array(
 											'description' => __( 'Map paint properties', 'jeowp' ),
 											'type'        => 'object',
 										),
-										'layout' => array(
+										'layout'      => array(
 											'description' => __( 'Map layout properties', 'jeowp' ),
 											'type'        => 'object',
+										),
+										'filter'      => array(
+											'description' => __( 'MapLibre filter expression', 'jeowp' ),
+											'type'        => 'array',
 										),
 									),
 								),

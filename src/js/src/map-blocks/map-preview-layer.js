@@ -193,8 +193,19 @@ export function renderLayer( { layer, instance } ) {
 			const sourceKey =
 				typeof data === 'string' ? data : inlineRaw || 'inline';
 
-			// Merge a saved nested style ({ paint, layout }) over the shared
-			// defaults from JeoLayerTypes.getFallbackPaint().
+			// Instance style (or the layer's default_style when the instance
+			// defers to it) merged over the shared fill defaults.
+			const effectiveStyle = resolveStyle( instance, layer );
+			const instancePaint =
+				effectiveStyle.paint && typeof effectiveStyle.paint === 'object'
+					? effectiveStyle.paint
+					: {};
+			const instanceLayout =
+				effectiveStyle.layout && typeof effectiveStyle.layout === 'object'
+					? effectiveStyle.layout
+					: {};
+
+			// Merge over the shared defaults from JeoLayerTypes.getFallbackPaint().
 			const fallbackPaint =
 				window.JeoLayerTypes?.getFallbackPaint?.( 'fill' ) || {};
 			const paintDefaults = {
@@ -208,29 +219,6 @@ export function renderLayer( { layer, instance } ) {
 					fallbackPaint[ 'fill-color' ] ||
 					'#8e44ad',
 			};
-			const mergeStyle = ( defaults, saved ) => ( {
-				paint: { ...defaults, ...( saved?.paint || {} ) },
-				layout: { ...( saved?.layout || {} ) },
-			} );
-			const applyInstanceOpacity = ( paint ) => {
-				if ( typeof opacity !== 'number' || opacity >= 1 ) {
-					return paint;
-				}
-				const next = { ...paint };
-				[
-					'fill-opacity',
-					'line-opacity',
-					'circle-opacity',
-					'symbol-opacity',
-					'heatmap-opacity',
-					'fill-extrusion-opacity',
-				].forEach( ( prop ) => {
-					if ( typeof next[ prop ] === 'number' ) {
-						next[ prop ] = next[ prop ] * opacity;
-					}
-				} );
-				return next;
-			};
 
 			// Only "fill" is exposed in the schema for now; the switch is the
 			// extension point for future render types (line, circle, ...).
@@ -238,9 +226,11 @@ export function renderLayer( { layer, instance } ) {
 
 			if ( 'fill' !== renderType ) {
 				const fallback =
-					window.JeoLayerTypes?.getFallbackPaint?.( renderType );
-				const style = mergeStyle( fallback || {}, options.style );
-				const paint = applyInstanceOpacity( style.paint );
+					window.JeoLayerTypes?.getFallbackPaint?.( renderType ) || {};
+				const paint = applyOpacity(
+					{ paint: { ...fallback, ...instancePaint } },
+					opacity
+				).paint;
 				return (
 					<Source
 						key={ sourceKey }
@@ -251,6 +241,7 @@ export function renderLayer( { layer, instance } ) {
 						<Layer
 							id={ layerId }
 							type={ renderType }
+							layout={ instanceLayout }
 							{ ...( Object.keys( paint ).length
 								? { paint }
 								: {} ) }
@@ -259,7 +250,10 @@ export function renderLayer( { layer, instance } ) {
 				);
 			}
 
-			const style = mergeStyle( paintDefaults, options.style );
+			const paint = applyOpacity(
+				{ paint: { ...paintDefaults, ...instancePaint } },
+				opacity
+			).paint;
 
 			return (
 				<Source
@@ -271,7 +265,8 @@ export function renderLayer( { layer, instance } ) {
 					<Layer
 						id={ layerId }
 						type="fill"
-						paint={ applyInstanceOpacity( style.paint ) }
+						layout={ instanceLayout }
+						paint={ paint }
 					/>
 				</Source>
 			);

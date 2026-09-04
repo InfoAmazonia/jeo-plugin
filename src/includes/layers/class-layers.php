@@ -237,6 +237,23 @@ class Layers {
 				'description'   => __( 'Legend title', 'jeowp' ),
 			)
 		);
+
+		register_post_meta(
+			$this->post_type,
+			'default_style',
+			array(
+				'show_in_rest'  => array(
+					'schema' => array(
+						'properties'           => array(),
+						'additionalProperties' => true,
+					),
+				),
+				'single'        => true,
+				'auth_callback' => '__return_true',
+				'type'          => 'object',
+				'description'   => __( 'AI-suggested default style (filter/paint/layout) applied when a map layer instance sets style.use_default', 'jeowp' ),
+			)
+		);
 	}
 
 	/**

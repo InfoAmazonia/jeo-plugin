@@ -4,6 +4,11 @@
 	// Uses only style-spec v8 core APIs (geojson source with URL or inline
 	// data, fill layers with fill-outline-color, standard paint properties)
 	// so it works with both the MapLibre GL JS and the Mapbox GL JS runtimes.
+	//
+	// Styling lives on the map layer instance (`attributes.style`, the same
+	// flat { use_default, paint, layout } shape used by MVT and the minimap),
+	// never on the layer CPT. When the instance sets `use_default`, the
+	// layer's `default_style` meta (AI-suggested paint) takes over.
 
 	const DEFAULT_FILL_COLOR = '#8e44ad';
 	const DEFAULT_FILL_OPACITY = 0.15;
@@ -42,26 +47,27 @@
 	}
 
 	/**
-	 * Merge a saved style object ({ paint, layout }) over generated paint
-	 * defaults. The computed visibility always wins over a saved layout.
+	 * Resolve the effective style for a layer instance: the instance style
+	 * wins, except when it defers to the layer's default_style meta.
 	 *
-	 * @param {Object}         defaults   Generated paint defaults.
-	 * @param {Object|void}    saved      Saved style object, if any.
-	 * @param {string}         visibility GL visibility value.
-	 * @return {Object} Merged { paint, layout }.
+	 * @param {Object} attributes JeoLayer attributes.
+	 * @return {Object} Effective style object (may be empty).
 	 */
-	function mergeStyle( defaults, saved, visibility ) {
-		const savedLayout =
-			saved && typeof saved.layout === 'object' && saved.layout
-				? saved.layout
-				: {};
-		return {
-			paint: {
-				...defaults,
-				...( saved && typeof saved.paint === 'object' ? saved.paint : {} ),
-			},
-			layout: { ...savedLayout, visibility },
-		};
+	function resolveEffectiveStyle( attributes ) {
+		const instanceStyle =
+			attributes.style && typeof attributes.style === 'object'
+				? attributes.style
+				: null;
+		const defaultStyle =
+			attributes.default_style &&
+			typeof attributes.default_style === 'object'
+				? attributes.default_style
+				: null;
+
+		if ( instanceStyle?.use_default && defaultStyle ) {
+			return defaultStyle;
+		}
+		return instanceStyle || {};
 	}
 
 	/**
@@ -113,26 +119,37 @@
 	 *
 	 * Only "fill" (polygon with a fill-outline-color) is exposed in the
 	 * schema for now; the switch is the extension point for future render
-	 * types (line, circle, symbol, ...) keyed by layer_type_options.type.
-	 * A saved nested style (style.paint / style.layout) overrides the
-	 * shared defaults from JeoLayerTypes.getFallbackPaint().
+	 * types (line, circle, ...) keyed by layer_type_options.type. The
+	 * effective instance paint is merged over the shared defaults from
+	 * JeoLayerTypes.getFallbackPaint(); the computed visibility always
+	 * wins over a saved layout.
 	 *
 	 * @param {string} layerId   Layer instance id.
 	 * @param {Object} options   Layer type options.
+	 * @param {Object} attributes JeoLayer attributes (instance style).
 	 * @param {string} visibility GL visibility value.
 	 * @param {number} opacity   Layer instance opacity (0-1).
 	 * @return {Array} GL layer definitions.
 	 */
-	function buildLayers( layerId, options, visibility, opacity ) {
+	function buildLayers( layerId, options, attributes, visibility, opacity ) {
 		const renderType = options.type || 'fill';
+		const effectiveStyle = resolveEffectiveStyle( attributes );
+		const savedPaint =
+			effectiveStyle.paint && typeof effectiveStyle.paint === 'object'
+				? effectiveStyle.paint
+				: {};
+		const savedLayout =
+			effectiveStyle.layout && typeof effectiveStyle.layout === 'object'
+				? effectiveStyle.layout
+				: {};
+		const layout = { ...savedLayout, visibility };
 
 		if ( 'fill' === renderType ) {
 			// fill-outline-color draws a ~1px outline via the fill's
 			// antialiasing pass (fill-antialias defaults to true).
-			const style = mergeStyle(
-				getFillPaintDefaults(),
-				options.style,
-				visibility
+			const paint = applyOpacity(
+				{ ...getFillPaintDefaults(), ...savedPaint },
+				opacity
 			);
 
 			return [
@@ -140,24 +157,26 @@
 					id: layerId,
 					type: 'fill',
 					source: layerId,
-					layout: style.layout,
-					paint: applyOpacity( style.paint, opacity ),
+					layout,
+					paint,
 				},
 			];
 		}
 
 		// Future render types: single GL layer of the requested type. Saved
-		// style wins; otherwise fall back to a visible default paint.
+		// paint wins over the shared fallback paint table.
 		const fallbackPaint =
-			window.JeoLayerTypes?.getFallbackPaint?.( renderType );
-		const style = mergeStyle( fallbackPaint || {}, options.style, visibility );
-		const paint = applyOpacity( style.paint, opacity );
+			window.JeoLayerTypes?.getFallbackPaint?.( renderType ) || {};
+		const paint = applyOpacity(
+			{ ...fallbackPaint, ...savedPaint },
+			opacity
+		);
 
 		const layer = {
 			id: layerId,
 			type: renderType,
 			source: layerId,
-			layout: style.layout,
+			layout,
 		};
 		if ( Object.keys( paint ).length ) {
 			layer.paint = paint;
@@ -188,6 +207,7 @@
 			const layers = buildLayers(
 				attributes.layer_id,
 				options,
+				attributes,
 				visibility,
 				opacity
 			);
@@ -201,7 +221,6 @@
 		},
 
 		getSchema() {
-			const paintDefaults = getFillPaintDefaults();
 			return {
 				type: 'object',
 				properties: {
@@ -231,58 +250,6 @@
 						),
 						enum: [ 'fill' ],
 						default: 'fill',
-					},
-					style: {
-						type: 'object',
-						title: __( 'Style', 'jeowp' ),
-						description: __(
-							'Optional style overrides as raw GL properties. Empty fields fall back to the type defaults.',
-							'jeowp'
-						),
-						properties: {
-							paint: {
-								type: 'object',
-								title: __( 'Paint', 'jeowp' ),
-								properties: {
-									'fill-color': {
-										type: 'string',
-										title: __( 'Fill color', 'jeowp' ),
-										default: paintDefaults[ 'fill-color' ],
-									},
-									'fill-opacity': {
-										type: 'number',
-										title: __( 'Fill opacity', 'jeowp' ),
-										min: 0,
-										max: 1,
-										default:
-											paintDefaults[ 'fill-opacity' ],
-									},
-									'fill-outline-color': {
-										type: 'string',
-										title: __( 'Outline color', 'jeowp' ),
-										description: __(
-											'Outline (about 1px) drawn by the fill antialiasing pass. Not rendered when antialiasing is disabled.',
-											'jeowp'
-										),
-										default:
-											paintDefaults[
-												'fill-outline-color'
-											],
-									},
-								},
-								// Pass-through for any other GL paint prop.
-								additionalProperties: {
-									type: [ 'string', 'number' ],
-								},
-							},
-							layout: {
-								type: 'object',
-								title: __( 'Layout', 'jeowp' ),
-								additionalProperties: {
-									type: [ 'string', 'number', 'boolean' ],
-								},
-							},
-						},
 					},
 				},
 			};

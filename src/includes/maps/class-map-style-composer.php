@@ -908,6 +908,8 @@ class Map_Style_Composer {
 				'loadAsStyle'          => $this->to_bool( $setting['load_as_style'] ?? false ),
 				'use'                  => $setting['use'] ?? null,
 				'default'              => $this->to_bool( $setting['default'] ?? false ),
+				'style'                => $this->sanitize_layer_style( $setting['style'] ?? null ),
+				'defaultStyle'         => $this->sanitize_layer_style( get_post_meta( $layer_id, 'default_style', true ) ),
 				'styleLayerSettings'   => isset( $setting['style_layers'] ) && is_array( $setting['style_layers'] ) ? $this->normalize_array( $setting['style_layers'] ) : array(),
 				'modifiedGmt'          => $layer_post->post_modified_gmt,
 				'layerTypeOptionsHash' => sha1( wp_json_encode( $options ) ),
@@ -939,6 +941,7 @@ class Map_Style_Composer {
 				'default'       => $this->to_bool( $setting['default'] ?? false ),
 				'load_as_style' => $this->to_bool( $setting['load_as_style'] ?? false ),
 				'show_legend'   => ! array_key_exists( 'show_legend', $setting ) || $this->to_bool( $setting['show_legend'] ),
+				'style'         => $this->sanitize_layer_style( $setting['style'] ?? null ),
 				'style_layers'  => array(),
 			);
 
@@ -959,6 +962,96 @@ class Map_Style_Composer {
 		}
 
 		return $sanitized;
+	}
+
+	/**
+	 * Sanitize a per-instance layer style object ({ use_default, paint, layout, filter }).
+	 *
+	 * Only scalar paint/layout values and nested scalar arrays (expressions)
+	 * are kept; everything else is dropped.
+	 *
+	 * @param mixed $style Raw style value.
+	 * @return array
+	 */
+	private function sanitize_layer_style( $style ) {
+		if ( ! is_array( $style ) ) {
+			return array();
+		}
+
+		$style     = $this->normalize_array( $style );
+		$sanitized = array();
+
+		if ( array_key_exists( 'use_default', $style ) ) {
+			$sanitized['use_default'] = $this->to_bool( $style['use_default'] );
+		}
+
+		foreach ( array( 'paint', 'layout' ) as $key ) {
+			if ( isset( $style[ $key ] ) && is_array( $style[ $key ] ) ) {
+				$properties = array();
+				foreach ( $this->normalize_array( $style[ $key ] ) as $prop => $value ) {
+					$value = $this->sanitize_style_value( $value );
+					if ( null !== $value ) {
+						$properties[ sanitize_key( (string) $prop ) ] = $value;
+					}
+				}
+				if ( ! empty( $properties ) ) {
+					$sanitized[ $key ] = $properties;
+				}
+			}
+		}
+
+		if ( ! empty( $style['filter'] ) && is_array( $style['filter'] ) ) {
+			$sanitized['filter'] = $this->sanitize_style_value( $this->normalize_array( $style['filter'] ) );
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize a style value while preserving its scalar type (expression
+	 * arrays are sanitized recursively).
+	 *
+	 * @param mixed $value Raw value.
+	 * @return mixed Sanitized value or null when unsupported.
+	 */
+	private function sanitize_style_value( $value ) {
+		if ( is_string( $value ) ) {
+			return sanitize_text_field( $value );
+		}
+		if ( is_int( $value ) || is_float( $value ) ) {
+			return $value;
+		}
+		if ( is_bool( $value ) ) {
+			return $value;
+		}
+		if ( is_array( $value ) ) {
+			$sanitized = array();
+			foreach ( $this->normalize_array( $value ) as $key => $item ) {
+				$item = $this->sanitize_style_value( $item );
+				if ( null !== $item ) {
+					$sanitized[ $key ] = $item;
+				}
+			}
+			return $sanitized;
+		}
+		return null;
+	}
+
+	/**
+	 * Resolve the effective style for a layer instance: the instance style
+	 * wins, except when it defers to the layer's default_style meta.
+	 *
+	 * @param array $ref Layer reference.
+	 * @return array Effective style (may be empty).
+	 */
+	private function resolve_effective_layer_style( array $ref ) {
+		$instance = isset( $ref['style'] ) && is_array( $ref['style'] ) ? $ref['style'] : array();
+
+		if ( ! empty( $instance['use_default'] ) && ! empty( $ref['defaultStyle'] ) && is_array( $ref['defaultStyle'] ) ) {
+			return $ref['defaultStyle'];
+		}
+
+		return $instance;
 	}
 
 	/**
@@ -983,6 +1076,7 @@ class Map_Style_Composer {
 									'modifiedGmt'          => $ref['modifiedGmt'],
 									'type'                 => $ref['type'],
 									'styleId'              => $ref['styleId'],
+									'style'                => $ref['style'],
 									'layerTypeOptionsHash' => $ref['layerTypeOptionsHash'],
 								);
 							},
@@ -1406,6 +1500,10 @@ class Map_Style_Composer {
 		$prefix    = $this->make_prefix( $context, $ref );
 		$source_id = $prefix . 'src_' . $this->slug_id( $ref['slug'] );
 		$layer_id  = $prefix . $this->slug_id( $ref['slug'] );
+		// Per-instance style (paint/layout/filter); use_default resolves to the
+		// layer's default_style meta. Mirrors the editor preview and the
+		// frontend runtime resolution.
+		$effective_style = $this->resolve_effective_layer_style( $ref );
 		// Visibility mirrors the editor's shouldDisplayLayerInstance semantics:
 		// a layer is visible unless it is a non-default toggle (swappable/switchable) layer.
 		$is_toggle = in_array( $ref['use'] ?? '', array( 'swappable', 'switchable' ), true );
@@ -1432,6 +1530,14 @@ class Map_Style_Composer {
 			if ( 'mapbox-tileset-vector' === $ref['type'] && ! empty( $options['source_layer'] ) ) {
 				$layer['source-layer'] = $options['source_layer'];
 			}
+			if ( 'mapbox-tileset-vector' === $ref['type'] ) {
+				if ( ! empty( $effective_style['filter'] ) ) {
+					$layer['filter'] = $effective_style['filter'];
+				}
+				if ( ! empty( $effective_style['paint'] ) ) {
+					$layer['paint'] = $effective_style['paint'];
+				}
+			}
 			$layers = array( $layer );
 		} elseif ( 'mvt' === $ref['type'] ) {
 			if ( empty( $options['url'] ) ) {
@@ -1457,6 +1563,12 @@ class Map_Style_Composer {
 			);
 			if ( ! empty( $options['source_layer'] ) ) {
 				$layer['source-layer'] = $options['source_layer'];
+			}
+			if ( ! empty( $effective_style['filter'] ) ) {
+				$layer['filter'] = $effective_style['filter'];
+			}
+			if ( ! empty( $effective_style['paint'] ) ) {
+				$layer['paint'] = $effective_style['paint'];
 			}
 			$layers = array( $layer );
 		} elseif ( 'tilelayer' === $ref['type'] ) {
@@ -1517,8 +1629,18 @@ class Map_Style_Composer {
 			$visibility  = $visible ? 'visible' : 'none';
 			$render_type = sanitize_key( $options['type'] ?? 'fill' );
 
-			// Merge a saved nested style ({ paint, layout }) over generated
-			// paint defaults; computed visibility wins over a saved layout.
+			// Instance style (or the layer's default_style when the instance
+			// defers to it) as the nested { paint, layout } shape used below.
+			$saved_style = array();
+			if ( ! empty( $effective_style['paint'] ) ) {
+				$saved_style['paint'] = $effective_style['paint'];
+			}
+			if ( ! empty( $effective_style['layout'] ) ) {
+				$saved_style['layout'] = $effective_style['layout'];
+			}
+
+			// Merge the effective style over generated paint defaults; the
+			// computed visibility always wins over a saved layout.
 			$build_style = static function ( array $defaults, $saved ) use ( $visibility ) {
 				$saved  = is_array( $saved ) ? $saved : array();
 				$layout = isset( $saved['layout'] ) && is_array( $saved['layout'] ) ? $saved['layout'] : array();
@@ -1534,7 +1656,7 @@ class Map_Style_Composer {
 			// Only "fill" is exposed in the schema for now; the branch is the
 			// extension point for future render types (line, circle, ...).
 			if ( 'fill' === $render_type ) {
-				$style = $build_style( $default_paint, $options['style'] ?? null );
+				$style = $build_style( $default_paint, $saved_style );
 
 				$layers = array(
 					array(
@@ -1546,7 +1668,7 @@ class Map_Style_Composer {
 					),
 				);
 			} else {
-				$single_style = $build_style( array(), $options['style'] ?? null );
+				$single_style = $build_style( array(), $saved_style );
 
 				$layers = array(
 					array(

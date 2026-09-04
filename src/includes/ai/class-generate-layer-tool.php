@@ -75,6 +75,9 @@ class Generate_Layer_Tool extends Tool {
 		$result = Minilayer_Service::generate_and_create( $prompt, $name );
 
 		if ( is_wp_error( $result ) ) {
+			// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			error_log( sprintf( '[JEO] generate_layer failed (%s): %s', $result->get_error_code(), $result->get_error_message() ) );
+
 			return wp_json_encode(
 				array(
 					'success' => false,
