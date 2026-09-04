@@ -41,6 +41,14 @@ class Minimap {
 	const BASE_LAYER_META_KEY = '_jeo_is_base_layer';
 
 	/**
+	 * Version of the base layer migration. Bump when default base configs
+	 * change so existing sites re-run the one-time migration.
+	 *
+	 * @var int
+	 */
+	const BASE_LAYERS_MIGRATION_VERSION = 1;
+
+	/**
 	 * Maximum number of stored map versions per conversation (oldest dropped).
 	 *
 	 * @var int
@@ -61,6 +69,7 @@ class Minimap {
 	 */
 	protected function init() {
 		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+		add_action( 'admin_init', array( $this, 'maybe_migrate_base_layers' ) );
 		add_filter( 'block_type_metadata', array( $this, 'restrict_block_to_enabled_post_types' ) );
 	}
 
@@ -1580,16 +1589,55 @@ class Minimap {
 
 		if ( $query->have_posts() ) {
 			$post = $query->posts[0];
+			$this->repair_base_layer_if_legacy( $post->ID );
 			return $this->build_base_layer_response( $post->ID, $variant );
 		}
 
 		$by_title = $this->find_base_layer_by_heuristics( $variant );
 		if ( $by_title ) {
+			$this->repair_base_layer_if_legacy( $by_title );
 			update_post_meta( $by_title, self::BASE_LAYER_META_KEY, $variant );
 			return $this->build_base_layer_response( $by_title, $variant );
 		}
 
 		return null;
+	}
+
+	/**
+	 * One-time migration replacing legacy base layers (CARTO dark tiles) with
+	 * the current runtime-aware defaults. Runs on admin_init until the stored
+	 * migration version catches up; per-request lazy repair in
+	 * find_existing_base_layer covers layers created or edited later.
+	 *
+	 * @return void
+	 */
+	public function maybe_migrate_base_layers() {
+		$migrated = (int) get_option( 'jeo_base_migration', 0 );
+		if ( $migrated >= self::BASE_LAYERS_MIGRATION_VERSION ) {
+			return;
+		}
+
+		$query = new \WP_Query(
+			array(
+				'post_type'        => 'map-layer',
+				'post_status'      => 'any',
+				'posts_per_page'   => -1,
+				'fields'           => 'ids',
+				'meta_query'       => array(
+					array(
+						'key'     => self::BASE_LAYER_META_KEY,
+						'compare' => 'EXISTS',
+					),
+				),
+				'suppress_filters' => true, // Ensure WPML doesn't filter by language.
+			)
+		);
+
+		foreach ( $query->posts as $post_id ) {
+			$this->repair_base_layer_if_legacy( (int) $post_id );
+		}
+
+		update_option( 'jeo_base_migration', self::BASE_LAYERS_MIGRATION_VERSION );
 	}
 
 	/**
@@ -1620,7 +1668,7 @@ class Minimap {
 				'meta_query'     => array(
 					array(
 						'key'     => 'type',
-						'value'   => array( 'mapbox', 'tilelayer', 'mvt' ),
+						'value'   => array( 'mapbox', 'style-json', 'tilelayer', 'mvt' ),
 						'compare' => 'IN',
 					),
 				),
@@ -1646,21 +1694,10 @@ class Minimap {
 	 * @return array|null Base layer definition, or null on failure.
 	 */
 	private function create_base_layer( $variant ) {
-		$defaults = $this->get_default_base_layers();
-		$runtime  = $this->get_active_runtime();
-
-		$all = apply_filters( 'jeo_minimap_base_layers', $defaults, $runtime );
-
-		$config = null;
-		foreach ( $all as $layer_config ) {
-			if ( $layer_config['variant'] === $variant ) {
-				$config = $layer_config;
-				break;
-			}
-		}
+		$config = $this->resolve_base_layer_config( $variant );
 
 		if ( ! $config ) {
-			$config = $all[0];
+			return null;
 		}
 
 		$post_id = wp_insert_post(
@@ -1675,6 +1712,45 @@ class Minimap {
 			return null;
 		}
 
+		$this->write_base_layer_config( $post_id, $config );
+
+		$this->assign_default_language( $post_id );
+
+		return $this->build_base_layer_response( $post_id, $config['variant'] );
+	}
+
+	/**
+	 * Resolve the base layer config for a variant: runtime-aware defaults
+	 * filtered through `jeo_minimap_base_layers`.
+	 *
+	 * @param string $variant One of 'dark', 'light', 'satellite'.
+	 * @return array|null Config array, or null when no config is available.
+	 */
+	private function resolve_base_layer_config( $variant ) {
+		$defaults = $this->get_default_base_layers();
+		$runtime  = $this->get_active_runtime();
+
+		$all = apply_filters( 'jeo_minimap_base_layers', $defaults, $runtime );
+
+		foreach ( $all as $layer_config ) {
+			if ( $layer_config['variant'] === $variant ) {
+				return $layer_config;
+			}
+		}
+
+		return $all[0] ?? null;
+	}
+
+	/**
+	 * Write a base layer config onto an existing layer CPT, in place.
+	 *
+	 * Used both when creating base layers and when repairing legacy ones.
+	 *
+	 * @param int   $post_id Layer CPT post ID.
+	 * @param array $config  Base layer config from resolve_base_layer_config().
+	 * @return void
+	 */
+	private function write_base_layer_config( $post_id, array $config ) {
 		update_post_meta( $post_id, 'type', $config['type'] );
 		update_post_meta( $post_id, 'layer_type_options', $config['layer_type_options'] );
 
@@ -1683,10 +1759,76 @@ class Minimap {
 		}
 
 		update_post_meta( $post_id, self::BASE_LAYER_META_KEY, $config['variant'] );
+	}
 
-		$this->assign_default_language( $post_id );
+	/**
+	 * Known legacy base layer signatures that must be replaced in place.
+	 *
+	 * CARTO basemaps now require an API key (and the raster tiles are being
+	 * retired), so the old keyless dark base no longer works for anyone.
+	 *
+	 * @return array[] List of signatures shaped like base layer configs.
+	 */
+	private function get_legacy_base_signatures() {
+		return array(
+			array(
+				'type'               => 'tilelayer',
+				'layer_type_options' => array(
+					'url' => 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+				),
+			),
+		);
+	}
 
-		return $this->build_base_layer_response( $post_id, $config['variant'] );
+	/**
+	 * Replace a legacy base layer CPT with the current default config, in place.
+	 *
+	 * Only CPTs matching a known legacy signature are touched; layers
+	 * customized by the user are preserved.
+	 *
+	 * @param int $post_id Layer CPT post ID.
+	 * @return bool True when the layer was repaired.
+	 */
+	private function repair_base_layer_if_legacy( $post_id ) {
+		$type    = (string) get_post_meta( $post_id, 'type', true );
+		$options = get_post_meta( $post_id, 'layer_type_options', true );
+		if ( ! is_array( $options ) ) {
+			$options = array();
+		}
+
+		foreach ( $this->get_legacy_base_signatures() as $signature ) {
+			if ( $type !== $signature['type'] ) {
+				continue;
+			}
+
+			$matches = true;
+			foreach ( $signature['layer_type_options'] as $key => $value ) {
+				if ( ! array_key_exists( $key, $options ) || $options[ $key ] !== $value ) {
+					$matches = false;
+					break;
+				}
+			}
+
+			if ( ! $matches ) {
+				continue;
+			}
+
+			$variant = (string) get_post_meta( $post_id, self::BASE_LAYER_META_KEY, true );
+			if ( '' === $variant ) {
+				$variant = 'dark';
+			}
+
+			$config = $this->resolve_base_layer_config( $variant );
+			if ( ! $config ) {
+				return false;
+			}
+
+			$this->write_base_layer_config( $post_id, $config );
+
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -1729,11 +1871,11 @@ class Minimap {
 			array(
 				'variant'            => 'dark',
 				'title'              => __( 'Dark Base', 'jeowp' ),
-				'type'               => 'tilelayer',
+				'type'               => 'style-json',
 				'layer_type_options' => array(
-					'url' => 'https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+					'style_url' => 'https://tiles.openfreemap.org/styles/dark',
 				),
-				'attribution'        => '&copy; <a href="https://carto.com/">CARTO</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
+				'attribution'        => '&copy; <a href="https://openfreemap.org/">OpenFreeMap</a> &copy; <a href="https://www.openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/">OSM</a>',
 			),
 			array(
 				'variant'            => 'light',
@@ -1781,7 +1923,7 @@ class Minimap {
 	 */
 	private function build_base_layer_response( $post_id, $variant ) {
 		$layer_type    = get_post_meta( $post_id, 'type', true );
-		$load_as_style = ( 'mapbox' === $layer_type );
+		$load_as_style = \jeo_layer_types()->is_style( $layer_type );
 
 		return array(
 			'id'            => $post_id,

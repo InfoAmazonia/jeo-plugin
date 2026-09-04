@@ -225,16 +225,18 @@ export default class JeoMap {
 						this.mapLoaded.then( () => {
 							if ( usingComposedStyle ) {
 								this.addComposedInteractions( map );
-							} else {
-								this.addComposedStyleWarningMessage();
+						} else {
+							this.addComposedStyleWarningMessage();
+							this.applyBaseStyleLayer( map ).then( () => {
 								layers.forEach( ( layer ) => {
-									if ( this.isMapboxStyleLayer( layer ) ) {
+									if ( this.isStyleLayer( layer ) ) {
 										return;
 									}
 
 									layer.addLayer( map );
 								} );
-							}
+							} );
+						}
 
 							// Add attributions
 							const customAttribution = [];
@@ -493,6 +495,32 @@ export default class JeoMap {
 
 	isMapboxStyleLayer( layer ) {
 		return layer?.attributes?.layer_type === 'mapbox';
+	}
+
+	isStyleLayer( layer ) {
+		return layer?.isStyle === true;
+	}
+
+	/**
+	 * Apply the first resolvable style-type layer as the map's base style
+	 * when no composed style is in use. Keyless style types (style-json) load
+	 * their style directly; mapbox styles stay bound to the composed style
+	 * pipeline and are skipped here with the usual warning.
+	 *
+	 * @param {Object} map Map instance.
+	 * @return {Promise} Resolves when the base style has loaded.
+	 */
+	applyBaseStyleLayer( map ) {
+		const baseLayer = this.layers.find( ( layer ) => layer?.isStyle );
+
+		if ( ! baseLayer || ! baseLayer.getStyle?.() ) {
+			return Promise.resolve();
+		}
+
+		baseLayer.addStyle( map );
+		this.mapLoaded = waitMapEvent( map, 'load' );
+
+		return this.mapLoaded;
 	}
 
 	addComposedStyleWarningMessage() {

@@ -38,6 +38,7 @@ Types are registered via `Jeo\Layer_Types::register_layer_type()` on the `jeo_re
 | Type | Description | JS File |
 |------|-------------|---------|
 | `mapbox` | Mapbox style (composed via `Map_Style_Composer` — see [`composed-styles/README.md`](../composed-styles/README.md)) | `mapbox.js` |
+| `style-json` | Keyless MapLibre style JSON by URL or inline (OpenFreeMap, VersaTiles, self-hosted) | `style-json.js` |
 | `tilelayer` | Generic tiled raster | `tilelayer.js` |
 | `mvt` | Mapbox Vector Tiles | `mvt.js` |
 | `mapbox-tileset-raster` | Mapbox raster tileset | `mapbox-tileset-raster.js` |
@@ -49,6 +50,41 @@ Types are registered via `Jeo\Layer_Types::register_layer_type()` on the `jeo_re
 > other types (`tilelayer`, `mvt`, `mapbox-tileset-*`) still render via the legacy
 > individual-add path.
 
+### Style Types (`isStyle`)
+
+`mapbox` and `style-json` are **style types**: instead of being added as individual
+GL layers, they load a whole MapLibre GL style that becomes the map's **base style**.
+The contract is declared on the type itself, in both registries:
+
+- **JS**: `JeoLayerTypes.registerLayerType( slug, { isStyle: true, getStyleUrl?, getInlineStyle?, getStyle? } )`
+  (`JeoLayerTypes.isStyle( slug )`). The `JeoLayer` bridge exposes `isStyle` and
+  `getStyle()` (inline object takes precedence over URL; both are valid
+  `map.setStyle()` inputs).
+- **PHP**: `Layer_Types::register_layer_type( $slug, [ 'is_style' => true ] )`
+  (`Layer_Types::is_style( $slug )`, filterable via `jeo_layer_type_is_style` so
+  JS-only types can opt in).
+
+Consumers key off the flag instead of the type slug: editor hoisting
+(`use-style-layer.js::findStyleLayer`), frontend base handling
+(`class-jeo-map.js::applyBaseStyleLayer`, `storymap-display.js`), minimap
+`load_as_style` (`build_base_layer_response`), and composer bundle eligibility
+(any `is_style` type with `style_url`/`inline_style` in `layer_type_options` is
+fetched via `Jeo::fetch_style_json()` and merged as a bottom bundle; `mapbox`
+keeps its legacy `style_id` + token path). A future provider only needs the two
+registrations — no core changes.
+
+Editor-side detection goes through `shared/style-layer-types.js::isStyleLayerType()`,
+which reads the frontend registry. The registry itself is loaded inside the
+block-editor iframe by `Layer_Types::enqueue_iframe_assets()`
+(`enqueue_block_assets`, admin-only) — so `window.JeoLayerTypes` (with `isStyle`
+and `getSchema`) is available to editor bundles; without a registry the helper
+returns false instead of guessing from a hardcoded list.
+
+The `style-json` schema mirrors `geojson`: `style_url` (public style JSON URL)
+or `inline_style` (raw style JSON text, takes precedence). It requires no API
+key. Non-base `style-json` layers are skipped with a console warning — the type
+only supports the base layer position.
+
 ### Schema per Type (JSON Schema for @rjsf/core)
 
 Defined in `layers-sidebar/layer-type-definitions.js`:
@@ -56,6 +92,7 @@ Defined in `layers-sidebar/layer-type-definitions.js`:
 | Type | Fields |
 |------|--------|
 | `mapbox` | `style_id`, `access_token` |
+| `style-json` | `style_url`, `inline_style` |
 | `tilelayer` | `url`, `scheme` |
 | `mvt` | `url`, `source_layer`, `type`, `style_source_type`, `access_token` |
 | `mapbox-tileset-raster` | `tileset_id`, `style_source_type`, `type`, `access_token` |

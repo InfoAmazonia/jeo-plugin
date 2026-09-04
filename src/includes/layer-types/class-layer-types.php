@@ -34,6 +34,7 @@ class Layer_Types {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 		add_action( 'admin_print_scripts', array( $this, 'enqueue_scripts' ) );
+		add_action( 'enqueue_block_assets', array( $this, 'enqueue_iframe_assets' ) );
 	}
 
 	/**
@@ -48,6 +49,15 @@ class Layer_Types {
 			'mapbox',
 			array(
 				'script_url' => JEO_BASEURL . '/includes/layer-types/mapbox.js',
+				'is_style'   => true,
+			)
+		);
+
+		$this->register_layer_type(
+			'style-json',
+			array(
+				'script_url' => JEO_BASEURL . '/includes/layer-types/style-json.js',
+				'is_style'   => true,
 			)
 		);
 
@@ -108,6 +118,9 @@ class Layer_Types {
 	 *
 	 *     @type string $script_url   Full URL to the layer type JavaScript file.
 	 *     @type array  $dependencies Script handles that should be loaded first.
+	 *     @type bool   $is_style     Whether the type loads a whole map style
+	 *                                (rendered as the map's base style instead of
+	 *                                individual GL layers). Default false.
 	 * }
 	 * @return bool
 	 */
@@ -170,6 +183,33 @@ class Layer_Types {
 	}
 
 	/**
+	 * Check whether a layer type loads a whole map style.
+	 *
+	 * Style layer types (e.g. 'mapbox', 'style-json') are rendered as the map's
+	 * base style instead of being added as individual GL layers. This drives the
+	 * editor style hoisting, the frontend base-style handling, and the composer
+	 * bundle eligibility.
+	 *
+	 * @param string $layer_type_slug Layer type slug.
+	 * @return bool
+	 */
+	public function is_style( $layer_type_slug ) {
+		$definition = $this->get_layer_type( $layer_type_slug );
+		$is_style   = ! empty( $definition['is_style'] );
+
+		/**
+		 * Filter whether a layer type loads a whole map style.
+		 *
+		 * Allows layer types registered outside the PHP registry (e.g. JS-only
+		 * types) to opt into style-type behavior.
+		 *
+		 * @param bool   $is_style Whether the layer type is a style type.
+		 * @param string $layer_type_slug Layer type slug.
+		 */
+		return (bool) apply_filters( 'jeo_layer_type_is_style', $is_style, $layer_type_slug );
+	}
+
+	/**
 	 * Register shared layer scripts.
 	 *
 	 * @return void
@@ -226,6 +266,33 @@ class Layer_Types {
 		if ( ! $this->should_load_assets() ) {
 			return;
 		}
+
+		foreach ( $this->get_layer_type_script_handles() as $handle ) {
+			wp_enqueue_script( $handle );
+		}
+	}
+
+	/**
+	 * Enqueue the layer-type registry inside the block-editor iframe.
+	 *
+	 * Block API v3 renders the editor content in an iframe, which does not
+	 * inherit scripts printed by admin_print_scripts in the parent document.
+	 * Editor bundles running inside the iframe (block previews, layer CPT
+	 * schema forms) need the registry for style-type metadata (`isStyle`,
+	 * `getSchema`, `getStyleUrl`) — e.g. `map-blocks/use-style-layer.js` and
+	 * `layers-sidebar/layer-type-definitions.js::getEditorLayerTypeSchema`.
+	 *
+	 * Enqueueing `jeo-layer` also pulls the `mapgl` script, which carries the
+	 * `jeo_settings` localization used by the layer-type renderers.
+	 *
+	 * @return void
+	 */
+	public function enqueue_iframe_assets() {
+		if ( ! is_admin() || ! $this->should_load_assets() ) {
+			return;
+		}
+
+		wp_enqueue_script( 'jeo-layer' );
 
 		foreach ( $this->get_layer_type_script_handles() as $handle ) {
 			wp_enqueue_script( $handle );

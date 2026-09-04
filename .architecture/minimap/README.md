@@ -471,8 +471,9 @@ When the agent doesn't choose a `base_variant`, `determine_base_variant()` compu
 Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 
 1. **Find existing**: Query by meta key, then by title heuristics (keywords: "dark", "light", "satellite")
-2. **Create new**: `wp_insert_post()` with pre-configured tile URLs per runtime (Mapbox GL or tilelayer)
-3. **Filterable**: `jeo_minimap_base_layers` filter allows custom base layer definitions
+2. **Create new**: `wp_insert_post()` with the runtime-aware default config (`get_default_base_layers()`), filtered via `jeo_minimap_base_layers`
+3. **Style types**: The default `dark` base for the MapLibre runtime is a `style-json` layer (OpenFreeMap Dark, keyless — CARTO basemaps now require an API key); sites with a Mapbox key get `mapbox` styles instead. `build_base_layer_response()` sets `load_as_style` for any type where `Layer_Types::is_style()` is true, so the editor hoists it as the map's base style and the frontend applies it via `map.setStyle()` when no composed style is in use.
+4. **Legacy repair**: `repair_base_layer_if_legacy()` rewrites base CPTs matching a known legacy signature (CARTO dark raster tiles) with the current default config, in place — user-customized bases are untouched. It runs lazily on every `find_existing_base_layer()` and eagerly via `maybe_migrate_base_layers()` on `admin_init` (versioned by `BASE_LAYERS_MIGRATION_VERSION`).
 
 ## Conventions
 
@@ -483,7 +484,7 @@ Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 - **Layer generation authorization**: When Mapbox is available, the agent must always ask for explicit user confirmation via chat before generating custom layers (`generate_layer` tool). Initial auto-generation never creates custom layers
 - **Debounced map interaction**: `onMove` and `onZoom` handlers use 300 ms lodash debounce to avoid excessive `setAttributes` calls and re-renders during map pan/zoom
 - **Layer render guard**: The map preview only attempts to render layers when `loadedLayers.length > 0`, preventing an empty-map flash while REST metadata is still loading
-- **`load_as_style` parity**: When a `mapbox`-type layer has `load_as_style: true`, the editor preview uses the Mapbox style URL as the map's base style via `use-style-layer.js::findStyleLayer()` (same mechanism as the frontend's `class-jeo-map.js::getStyleLayer()`). The style layer is skipped in `renderLayer` (returns `null`), and `style_layers` filtering is applied via `applyStyleLayerFiltering()` in `onStyleData`. See [`.architecture/frontend/README.md`](../frontend/README.md) for the full parity table.
+- **`load_as_style` parity**: When a style-type layer (`mapbox` or `style-json`, see [`.architecture/layers/README.md`](../layers/README.md)) has `load_as_style: true`, the editor preview uses its resolved style (URL or inline object) as the map's base style via `use-style-layer.js::findStyleLayer()` (same mechanism as the frontend's `class-jeo-map.js::applyBaseStyleLayer()`). The style layer is skipped in `renderLayer` (returns `null`), and `style_layers` filtering is applied via `applyStyleLayerFiltering()` in `onStyleData`. See [`.architecture/frontend/README.md`](../frontend/README.md) for the full parity table.
 - **Composed Mapbox styles**: When the loaded layers include any `mapbox`-type layer, the editor preview composes all mapbox layers into a single composite style via `useComposedPayloadPreviewStyle` (payload `{scope:'preview', kind:'minimap'}`). The `<Map>` uses the composed style as `mapStyle` with `useEditorMapboxTransformRequest` for token handling, and `applyComposedVisibilityFromSettings` drives per-layer visibility from the manifest. Falls back to the single `load_as_style` base when composition is unavailable. An `AbortSignal` cancels stale requests on rapid layer changes. The frontend rides on `JeoMap` (onetime composed-style branch) — no separate rendering path. See [`composed-styles/README.md`](../composed-styles/README.md).
 
 ## Refinement Stability (Phase 3)

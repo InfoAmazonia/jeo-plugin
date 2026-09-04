@@ -8,12 +8,14 @@ import { useDebounce } from 'use-debounce';
 import { Map } from '../lib/mapgl-react';
 import { MemoizedRenderLayer } from './map-preview-layer';
 import { getEditorLayerTypeSchema } from '../layers-sidebar/layer-type-definitions';
+import { isStyleLayerType } from '../shared/style-layer-types';
 import {
 	getMapboxStyleUrl,
 	handleEditorMapPreviewError,
 	useMapboxStylePreview,
 	useEditorMapboxTransformRequest,
 } from './mapbox-style-preview';
+import { getStyleJsonStyle } from './use-style-layer';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
@@ -46,14 +48,21 @@ export default function LayerEditorPreview() {
 		[ 'ready', 'loaded' ].includes( renderControl.status )
 			? getMapboxStyleUrl( debouncedPostMeta.layer_type_options )
 			: null;
+	const isStyleType = isStyleLayerType( debouncedPostMeta?.type );
+	const styleJsonStyle =
+		debouncedPostMeta?.type === 'style-json' &&
+		[ 'ready', 'loaded' ].includes( renderControl.status )
+			? getStyleJsonStyle( debouncedPostMeta.layer_type_options )
+			: null;
 	const mapboxStylePreview = useMapboxStylePreview( mapboxStyleUrl );
 	const transformRequest = useEditorMapboxTransformRequest( [
 		{ meta: debouncedPostMeta },
 	] );
 	const shouldRenderMap =
-		debouncedPostMeta?.type !== 'mapbox' ||
+		! isStyleType ||
 		Boolean( mapboxStylePreview.style ) ||
-		Boolean( mapboxStylePreview.error );
+		Boolean( mapboxStylePreview.error ) ||
+		Boolean( styleJsonStyle );
 
 	useEffect( () => {
 		if ( mapboxStylePreview.viewState ) {
@@ -170,12 +179,12 @@ export default function LayerEditorPreview() {
 				{ ! shouldRenderMap && <Spinner /> }
 				{ shouldRenderMap && (
 					<Map
-						key={ `${ key }:${ mapboxStyleUrl || 'default' }` }
-						mapStyle={ mapboxStylePreview.style || undefined }
+						key={ `${ key }:${ mapboxStyleUrl || styleJsonStyle || 'default' }` }
+						mapStyle={ mapboxStylePreview.style || styleJsonStyle || undefined }
 						transformRequest={ transformRequest }
 						onError={ ( error ) => {
 							handleEditorMapPreviewError( error );
-							if ( debouncedPostMeta?.type !== 'mapbox' ) {
+							if ( ! isStyleType ) {
 								setRenderControl( { status: 'request_error', statusCode: 400 } );
 							}
 						} }
@@ -194,13 +203,13 @@ export default function LayerEditorPreview() {
 							} );
 						} }
 					>
-						{ [ 'ready', 'loaded' ].includes( renderControl.status ) &&
-							debouncedPostMeta?.type !== 'mapbox' && (
-							<MemoizedRenderLayer
-								layer={ debouncedPostMeta }
-								instance={ { id: 1, use: 'fixed' } }
-							/>
-						) }
+					{ [ 'ready', 'loaded' ].includes( renderControl.status ) &&
+						! isStyleType && (
+						<MemoizedRenderLayer
+							layer={ debouncedPostMeta }
+							instance={ { id: 1, use: 'fixed' } }
+						/>
+					) }
 					</Map>
 				) }
 			</div>

@@ -333,3 +333,53 @@ describe( 'renderLayer geojson layer', () => {
 		expect( fill.props.paint[ 'fill-opacity' ] ).toBeCloseTo( 0.3 );
 	} );
 } );
+
+describe( 'renderLayer style layer types', () => {
+	beforeEach( () => {
+		delete window.JeoLayerTypes;
+	} );
+
+	afterEach( () => {
+		delete window.JeoLayerTypes;
+	} );
+
+	it( 'renders nothing for style types (mapbox, style-json)', () => {
+		expect(
+			renderLayer( {
+				layer: {
+					type: 'mapbox',
+					layer_type_options: { style_id: 'mapbox/dark-v11' },
+				},
+				instance: { id: 1, use: 'fixed', default: true },
+			} )
+		).toBeNull();
+
+		expect(
+			renderLayer( {
+				layer: {
+					type: 'style-json',
+					layer_type_options: {
+						style_url: 'https://tiles.openfreemap.org/styles/dark',
+					},
+				},
+				instance: { id: 2, use: 'fixed', default: true },
+			} )
+		).toBeNull();
+	} );
+
+	it( 'recognizes style types registered with isStyle on the registry', () => {
+		window.JeoLayerTypes = {
+			isStyle: ( slug ) => 'my-future-style' === slug,
+		};
+
+		expect(
+			renderLayer( {
+				layer: {
+					type: 'my-future-style',
+					layer_type_options: { style_url: 'https://example.com/s.json' },
+				},
+				instance: { id: 3, use: 'fixed', default: true },
+			} )
+		).toBeNull();
+	} );
+} );

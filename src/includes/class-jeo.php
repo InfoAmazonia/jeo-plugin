@@ -2126,4 +2126,103 @@ class Jeo {
 	private static function mapbox_style_cache_key( $style_id, $token ) {
 		return 'jeo_mapbox_style_json_' . md5( $style_id . '|' . $token );
 	}
+
+	/**
+	 * Fetch a MapLibre GL style JSON from an arbitrary URL.
+	 *
+	 * Generic counterpart of `fetch_mapbox_style()` for keyless style
+	 * providers (OpenFreeMap, VersaTiles, self-hosted) and the `style-json`
+	 * layer type. Only http/https URLs are accepted.
+	 *
+	 * Successful responses are cached in a transient (filterable TTL via
+	 * `jeo_style_json_cache_ttl`, default 1 hour). The cache is purged when
+	 * the layer post is saved or a composed-style refresh is forced; pass
+	 * `bypass_cache => true` in `$args` to skip it. Failures are never cached.
+	 *
+	 * @param string $style_url Public URL of a style JSON file.
+	 * @param array  $args      Optional wp_remote_get arguments (timeout, user-agent) plus `bypass_cache`.
+	 * @return array|\WP_Error Style definition as an associative array.
+	 */
+	public static function fetch_style_json( $style_url, array $args = array() ) {
+		$style_url = esc_url_raw( trim( (string) $style_url ) );
+
+		if ( '' === $style_url || ! preg_match( '#^https?://#i', $style_url ) ) {
+			return new \WP_Error( 'jeo_style_json_invalid', __( 'A valid http(s) style URL is required.', 'jeowp' ) );
+		}
+
+		$bypass_cache = ! empty( $args['bypass_cache'] );
+		unset( $args['bypass_cache'] );
+
+		$cache_key = self::style_json_cache_key( $style_url );
+
+		if ( ! $bypass_cache ) {
+			$cached = get_transient( $cache_key );
+			if ( is_array( $cached ) ) {
+				return $cached;
+			}
+		}
+
+		$response = wp_remote_get( $style_url, $args );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( $code < 200 || $code >= 300 ) {
+			return new \WP_Error(
+				'jeo_style_json_http',
+				sprintf(
+					'Remote request failed with HTTP %1$d for %2$s.',
+					$code,
+					$style_url
+				)
+			);
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
+			return new \WP_Error( 'jeo_style_json_json', json_last_error_msg() );
+		}
+
+		if ( ! is_array( $data ) ) {
+			return new \WP_Error( 'jeo_style_json_payload', __( 'Unexpected style JSON payload.', 'jeowp' ) );
+		}
+
+		set_transient(
+			$cache_key,
+			$data,
+			(int) apply_filters( 'jeo_style_json_cache_ttl', HOUR_IN_SECONDS, $style_url )
+		);
+
+		return $data;
+	}
+
+	/**
+	 * Delete the cached style JSON for a style URL.
+	 *
+	 * Used by the composer's invalidation flows (layer save, forced refresh)
+	 * so the next fetch goes back to the source.
+	 *
+	 * @param string $style_url Public URL of a style JSON file.
+	 * @return bool True when a cached entry was deleted.
+	 */
+	public static function delete_style_json_cache( $style_url ) {
+		$style_url = esc_url_raw( trim( (string) $style_url ) );
+
+		if ( '' === $style_url ) {
+			return false;
+		}
+
+		return delete_transient( self::style_json_cache_key( $style_url ) );
+	}
+
+	/**
+	 * Build the transient cache key for a style JSON URL.
+	 *
+	 * @param string $style_url Public URL of a style JSON file.
+	 * @return string
+	 */
+	private static function style_json_cache_key( $style_url ) {
+		return 'jeo_style_json_' . md5( $style_url );
+	}
 }

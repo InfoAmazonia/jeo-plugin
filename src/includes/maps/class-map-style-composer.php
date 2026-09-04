@@ -457,7 +457,17 @@ class Map_Style_Composer {
 	 * @return void
 	 */
 	private function purge_layer_style_cache( $layer_id ) {
-		if ( 'mapbox' !== (string) get_post_meta( $layer_id, 'type', true ) ) {
+		$type = (string) get_post_meta( $layer_id, 'type', true );
+
+		if ( 'style-json' === $type ) {
+			$options = get_post_meta( $layer_id, 'layer_type_options', true );
+			if ( is_array( $options ) && ! empty( $options['style_url'] ) ) {
+				\Jeo::delete_style_json_cache( (string) $options['style_url'] );
+			}
+			return;
+		}
+
+		if ( 'mapbox' !== $type ) {
 			return;
 		}
 
@@ -474,13 +484,18 @@ class Map_Style_Composer {
 	}
 
 	/**
-	 * Purge the shared Mapbox style JSON cache for the mapbox refs of a context.
+	 * Purge the shared style JSON caches for the style refs of a context.
 	 *
 	 * @param array $refs Composer refs.
 	 * @return void
 	 */
 	private function purge_ref_style_caches( array $refs ) {
 		foreach ( $refs as $ref ) {
+			if ( ! empty( $ref['styleUrl'] ) ) {
+				\Jeo::delete_style_json_cache( (string) $ref['styleUrl'] );
+				continue;
+			}
+
 			if ( 'mapbox' !== ( $ref['type'] ?? '' ) || empty( $ref['styleId'] ) ) {
 				continue;
 			}
@@ -886,9 +901,27 @@ class Map_Style_Composer {
 				continue;
 			}
 
-			$style_id = 'mapbox' === $type ? \Jeo::normalize_mapbox_style_id( $options['style_id'] ?? '' ) : null;
-			if ( 'mapbox' === $type && ! $style_id ) {
-				continue;
+			$is_style = \jeo_layer_types()->is_style( $type );
+
+			$style_id     = null;
+			$style_url    = null;
+			$inline_style = null;
+
+			if ( $is_style ) {
+				if ( 'mapbox' === $type ) {
+					$style_id = \Jeo::normalize_mapbox_style_id( $options['style_id'] ?? '' );
+					if ( ! $style_id ) {
+						continue;
+					}
+				} else {
+					// Generic style types (style-json and future providers):
+					// inline JSON takes precedence over the style URL.
+					$inline_style = $this->parse_inline_style( $options['inline_style'] ?? '' );
+					$style_url    = $inline_style ? null : esc_url_raw( trim( (string) ( $options['style_url'] ?? '' ) ) );
+					if ( ! $inline_style && '' === $style_url ) {
+						continue;
+					}
+				}
 			}
 
 			$resolved_token = ! empty( $options['access_token'] ) ? (string) $options['access_token'] : $token;
@@ -905,6 +938,8 @@ class Map_Style_Composer {
 				'options'              => $options,
 				'token'                => $resolved_token,
 				'styleId'              => $style_id,
+				'styleUrl'             => $style_url,
+				'inlineStyle'          => $inline_style,
 				'loadAsStyle'          => $this->to_bool( $setting['load_as_style'] ?? false ),
 				'use'                  => $setting['use'] ?? null,
 				'default'              => $this->to_bool( $setting['default'] ?? false ),
@@ -917,6 +952,22 @@ class Map_Style_Composer {
 		}
 
 		return $refs;
+	}
+
+	/**
+	 * Parse an inline style JSON string stored in layer_type_options.
+	 *
+	 * @param mixed $raw Raw inline style value.
+	 * @return array|null Parsed style definition, or null when absent/invalid.
+	 */
+	private function parse_inline_style( $raw ) {
+		if ( ! is_string( $raw ) || '' === trim( $raw ) ) {
+			return null;
+		}
+
+		$decoded = json_decode( $raw, true );
+
+		return is_array( $decoded ) ? $decoded : null;
 	}
 
 	/**
@@ -1204,23 +1255,39 @@ class Map_Style_Composer {
 		$direct_types  = array( 'mapbox-tileset-raster', 'mapbox-tileset-vector', 'mvt', 'tilelayer', 'geojson' );
 
 		foreach ( $context['refs'] as $ref ) {
-			if ( 'mapbox' !== $ref['type'] ) {
+			// Bundles are style-type refs: Mapbox styles (styleId + token) or
+			// generic style JSON refs (inline style takes precedence over URL).
+			if ( empty( $ref['styleId'] ) && empty( $ref['styleUrl'] ) && empty( $ref['inlineStyle'] ) ) {
 				continue;
 			}
 
-			$style = \Jeo::fetch_mapbox_style(
-				$ref['styleId'],
-				$ref['token'],
-				array(
-					'timeout'    => 45,
-					'user-agent' => 'jeo-mapbox-style-composer/' . self::CACHE_VERSION,
-				)
-			);
+			if ( ! empty( $ref['inlineStyle'] ) ) {
+				$style = $ref['inlineStyle'];
+			} elseif ( ! empty( $ref['styleUrl'] ) ) {
+				$style = \Jeo::fetch_style_json(
+					$ref['styleUrl'],
+					array(
+						'timeout'    => 45,
+						'user-agent' => 'jeo-map-style-composer/' . self::CACHE_VERSION,
+					)
+				);
+			} else {
+				$style = \Jeo::fetch_mapbox_style(
+					$ref['styleId'],
+					$ref['token'],
+					array(
+						'timeout'    => 45,
+						'user-agent' => 'jeo-mapbox-style-composer/' . self::CACHE_VERSION,
+					)
+				);
+			}
+
 			if ( is_wp_error( $style ) ) {
 				$failed_styles[] = array(
-					'layerId' => $ref['layerId'],
-					'styleId' => $ref['styleId'],
-					'error'   => $style->get_error_message(),
+					'layerId'  => $ref['layerId'],
+					'styleId'  => $ref['styleId'] ?? null,
+					'styleUrl' => $ref['styleUrl'] ?? null,
+					'error'    => $style->get_error_message(),
 				);
 				continue;
 			}
@@ -1242,12 +1309,16 @@ class Map_Style_Composer {
 
 		if ( ! empty( $failed_styles ) ) {
 			foreach ( $failed_styles as $failed_style ) {
+				$source = ! empty( $failed_style['styleUrl'] )
+					? $failed_style['styleUrl']
+					: (string) ( $failed_style['styleId'] ?? '' );
+
 				$warnings[] = array(
 					'layerId' => $failed_style['layerId'],
-					'styleId' => $failed_style['styleId'],
+					'styleId' => $failed_style['styleId'] ?? null,
 					'warning' => sprintf(
-						'Skipped Mapbox style because it could not be fetched: %s',
-						$this->sanitize_tokens_in_value( $failed_style['error'] )
+						'Skipped style layer because its style could not be fetched: %s',
+						$this->sanitize_tokens_in_value( $source . ' — ' . $failed_style['error'] )
 					),
 				);
 			}
@@ -2481,7 +2552,14 @@ class Map_Style_Composer {
 			$root = preg_replace( '/(@2x)?\.(json|png)(\?.*)?$/', '', $sprite );
 		}
 
-		return add_query_arg( 'access_token', $token, sprintf( '%s%s.%s', $root, $suffix, $extension ) );
+		$url = sprintf( '%s%s.%s', $root, $suffix, $extension );
+
+		// Keyless styles (style-json) carry no token; do not append one.
+		if ( '' === trim( (string) $token ) ) {
+			return $url;
+		}
+
+		return add_query_arg( 'access_token', $token, $url );
 	}
 
 	/**

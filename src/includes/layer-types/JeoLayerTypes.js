@@ -28,6 +28,9 @@ class JeoLayerTypes {
 	getLayerType( layerTypeSlug ) {
 		return this.layerTypes[ layerTypeSlug ];
 	}
+	isStyle( layerTypeSlug ) {
+		return this.getLayerType( layerTypeSlug )?.isStyle === true;
+	}
 	getLayerTypeSchema( attributes ) {
 		return this.getLayerType( attributes.type )?.getSchema?.( attributes ) || null;
 	}

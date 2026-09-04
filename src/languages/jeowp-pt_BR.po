@@ -658,13 +658,13 @@ msgstr "O tipo de fonte do estilo da camada"
 msgid "Mapbox Style"
 msgstr "Estilo do Mapbox"
 
-#: includes/layer-types/mapbox.js:117
+#: includes/layer-types/mapbox.js:121
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr "ID do estilo"
 
-#: includes/layer-types/mapbox.js:119
+#: includes/layer-types/mapbox.js:123
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
@@ -672,7 +672,7 @@ msgstr "O ID do estilo do Mapbox inclui o nome de usuário e o ID. Exemplo: user
 
 #: includes/layer-types/mapbox-tileset-raster.js:95
 #: includes/layer-types/mapbox-tileset-vector.js:146
-#: includes/layer-types/mapbox.js:126
+#: includes/layer-types/mapbox.js:130
 #: includes/layer-types/mvt.js:141
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
@@ -681,7 +681,7 @@ msgstr "Token de acesso"
 
 #: includes/layer-types/mapbox-tileset-raster.js:96
 #: includes/layer-types/mapbox-tileset-vector.js:147
-#: includes/layer-types/mapbox.js:128
+#: includes/layer-types/mapbox.js:132
 #: includes/layer-types/mvt.js:142
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
@@ -2093,9 +2093,9 @@ msgstr "Aprovar geolocalizações da IA do JEO"
 #: includes/ai/class-context-handler.php:806
 #: includes/ai/class-context-handler.php:882
 #: includes/ai/class-rag-worker.php:223
-#: includes/minimap/class-minimap.php:149
-#: includes/minimap/class-minimap.php:250
-#: includes/minimap/class-minimap.php:346
+#: includes/minimap/class-minimap.php:158
+#: includes/minimap/class-minimap.php:259
+#: includes/minimap/class-minimap.php:355
 msgid "Post not found."
 msgstr "Post não encontrado."
 
@@ -2104,8 +2104,8 @@ msgstr "Post não encontrado."
 #: includes/ai/class-minilayer-classifier.php:35
 #: includes/ai/class-minilayer-handler.php:91
 #: includes/ai/class-minilayer-service.php:41
-#: includes/minimap/class-minimap.php:261
-#: includes/minimap/class-minimap.php:367
+#: includes/minimap/class-minimap.php:270
+#: includes/minimap/class-minimap.php:376
 msgid "No AI provider configured. Set one in JEO AI Settings."
 msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA do JEO."
 
@@ -2127,18 +2127,18 @@ msgid "Suggestions generated."
 msgstr "Sugestões geradas."
 
 #: includes/ai/class-context-handler.php:327
-#: includes/minimap/class-minimap.php:326
+#: includes/minimap/class-minimap.php:335
 msgid "conversation_id is required."
 msgstr "conversation_id é obrigatório."
 
 #: includes/ai/class-context-handler.php:337
-#: includes/minimap/class-minimap.php:239
-#: includes/minimap/class-minimap.php:336
+#: includes/minimap/class-minimap.php:248
+#: includes/minimap/class-minimap.php:345
 msgid "A post ID is required."
 msgstr "Um ID de post é obrigatório."
 
 #: includes/ai/class-context-handler.php:357
-#: includes/minimap/class-minimap.php:356
+#: includes/minimap/class-minimap.php:365
 msgid "A message is required."
 msgstr "Uma mensagem é obrigatória."
 
@@ -2157,7 +2157,7 @@ msgstr "Conversa limpa."
 #: includes/ai/class-minilayer-handler.php:72
 #: includes/cli/class-ai-cli.php:52
 #: includes/cli/class-ai-cli.php:157
-#: includes/minimap/class-minimap.php:229
+#: includes/minimap/class-minimap.php:238
 msgid "A prompt is required."
 msgstr "Um prompt é obrigatório."
 
@@ -3218,35 +3218,35 @@ msgstr "Painel"
 msgid "AI (new)"
 msgstr "IA (novo)"
 
-#: includes/minimap/class-minimap.php:178
+#: includes/minimap/class-minimap.php:187
 msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
 msgstr "Nenhuma camada correspondente encontrada. Adicione camadas manualmente ou execute o indexador RAG nas configurações do JEO."
 
-#: includes/minimap/class-minimap.php:452
+#: includes/minimap/class-minimap.php:461
 msgid "The AI returned an empty response. Please try again."
 msgstr "A IA retornou uma resposta vazia. Tente novamente."
 
-#: includes/minimap/class-minimap.php:1706
+#: includes/minimap/class-minimap.php:1848
 msgid "Dark Base (Mapbox)"
 msgstr "Base escura (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1713
+#: includes/minimap/class-minimap.php:1855
 msgid "Terrain Base (Mapbox)"
 msgstr "Base de terreno (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1720
+#: includes/minimap/class-minimap.php:1862
 msgid "Satellite Base (Mapbox)"
 msgstr "Base de satélite (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1731
+#: includes/minimap/class-minimap.php:1873
 msgid "Dark Base"
 msgstr "Base escura"
 
-#: includes/minimap/class-minimap.php:1740
+#: includes/minimap/class-minimap.php:1882
 msgid "Light Base"
 msgstr "Base clara"
 
-#: includes/minimap/class-minimap.php:1749
+#: includes/minimap/class-minimap.php:1891
 msgid "Satellite Base"
 msgstr "Base de satélite"
 
@@ -4694,17 +4694,17 @@ msgstr "Queimadas"
 msgid "Climate"
 msgstr "Clima"
 
-#: includes/minimap/class-minimap.php:206
+#: includes/minimap/class-minimap.php:215
 msgid "Generate a map for this post based on its content."
 msgstr "Gerar um mapa para este post com base no seu conteúdo."
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:495
+#: includes/minimap/class-minimap.php:504
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr "%d camada(s) retornada(s) pela IA foi(ram) descartada(s) porque não são camadas de mapa publicadas."
 
-#: includes/minimap/class-minimap.php:1107
+#: includes/minimap/class-minimap.php:1116
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr "O agente tentou remover várias camadas existentes sem uma solicitação explícita. Elas foram mantidas para preservar o mapa atual."
 
@@ -4781,61 +4781,61 @@ msgstr "Fonte:"
 msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
 msgstr "Digite um endereço, depois clique em Buscar ou pressione Enter. Você também pode arrastar o marcador pelo mapa."
 
-#: includes/maps/class-map-style-composer.php:555
-#: includes/maps/class-map-style-composer.php:614
+#: includes/maps/class-map-style-composer.php:570
+#: includes/maps/class-map-style-composer.php:629
 msgid "Mapbox composed styles are disabled."
 msgstr "Os estilos compostos do Mapbox estão desativados."
 
-#: includes/maps/class-map-style-composer.php:580
-#: includes/maps/class-map-style-composer.php:638
+#: includes/maps/class-map-style-composer.php:595
+#: includes/maps/class-map-style-composer.php:653
 msgid "Could not create the Mapbox composed style cache directory."
 msgstr "Não foi possível criar o diretório de cache dos estilos compostos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:734
+#: includes/maps/class-map-style-composer.php:749
 msgid "Map not found."
 msgstr "Mapa não encontrado."
 
-#: includes/maps/class-map-style-composer.php:744
+#: includes/maps/class-map-style-composer.php:759
 msgid "A Mapbox access token is required to compose Mapbox styles."
 msgstr "Um token de acesso do Mapbox é necessário para compor estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:784
+#: includes/maps/class-map-style-composer.php:799
 msgid "Public payload composition is only available for one-time maps."
 msgstr "A composição com dados públicos está disponível apenas para mapas de uso único."
 
-#: includes/maps/class-map-style-composer.php:790
+#: includes/maps/class-map-style-composer.php:805
 msgid "The map preview payload is too large."
 msgstr "Os dados da prévia do mapa são grandes demais."
 
-#: includes/maps/class-map-style-composer.php:802
+#: includes/maps/class-map-style-composer.php:817
 msgid "The map preview has too many layers to compose."
 msgstr "A prévia do mapa tem camadas demais para compor."
 
-#: includes/maps/class-map-style-composer.php:809
+#: includes/maps/class-map-style-composer.php:824
 msgid "The map preview does not include any renderable layers."
 msgstr "A prévia do mapa não inclui nenhuma camada renderizável."
 
-#: includes/maps/class-map-style-composer.php:831
+#: includes/maps/class-map-style-composer.php:846
 msgid "Map preview"
 msgstr "Prévia do mapa"
 
-#: includes/maps/class-map-style-composer.php:1171
+#: includes/maps/class-map-style-composer.php:1222
 msgid "Invalid composed style hash."
 msgstr "Hash do estilo composto inválido."
 
-#: includes/maps/class-map-style-composer.php:1266
+#: includes/maps/class-map-style-composer.php:1337
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "Não foi possível obter um ou mais estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1779
+#: includes/maps/class-map-style-composer.php:1850
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "A extensão PHP GD é necessária para mesclar sprites do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1898
+#: includes/maps/class-map-style-composer.php:1969
 msgid "Could not decode a Mapbox sprite image."
 msgstr "Não foi possível decodificar uma imagem de sprite do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2597
+#: includes/maps/class-map-style-composer.php:2675
 msgid "Composed style artifact was not found."
 msgstr "O artefato do estilo composto não foi encontrado."
 
@@ -4984,7 +4984,7 @@ msgid "Your browser could not determine your location. This may be due to strict
 msgstr "Seu navegador não conseguiu determinar sua localização. Isso pode ocorrer por configurações rigorosas de privacidade ou porque o GPS está indisponível no seu dispositivo."
 
 #. translators: %d: number of preserved layers
-#: includes/minimap/class-minimap.php:1351
+#: includes/minimap/class-minimap.php:1360
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d camada(s) adicionada(s) manualmente preservada(s) durante o refinamento da IA."
@@ -4997,18 +4997,18 @@ msgstr "Um ID de estilo do Mapbox e um token de acesso são obrigatórios."
 msgid "Unexpected Mapbox style payload."
 msgstr "Resposta de estilo do Mapbox inesperada."
 
-#: includes/minimap/class-minimap.php:207
+#: includes/minimap/class-minimap.php:216
 msgid "Initial generation from post content"
 msgstr "Geração inicial a partir do conteúdo do post"
 
 #. translators: %d: version number.
-#: includes/minimap/class-minimap.php:896
+#: includes/minimap/class-minimap.php:905
 #, php-format
 msgid "Version %d was not found in the stored history. The configuration reconstructed from the conversation context was applied instead."
 msgstr "A versão %d não foi encontrada no histórico armazenado. A configuração reconstruída a partir do contexto da conversa foi aplicada em seu lugar."
 
 #. translators: %d: version number.
-#: includes/minimap/class-minimap.php:909
+#: includes/minimap/class-minimap.php:918
 #, php-format
 msgid "Restored map version %d."
 msgstr "Versão %d do mapa restaurada."
@@ -5337,3 +5337,31 @@ msgstr ""
 #: includes/layer-types/geojson.js:247
 msgid "How the GeoJSON features are drawn."
 msgstr ""
+
+#: includes/class-jeo.php:2150
+msgid "A valid http(s) style URL is required."
+msgstr "Uma URL de estilo http(s) válida é obrigatória."
+
+#: includes/class-jeo.php:2188
+msgid "Unexpected style JSON payload."
+msgstr "Conteúdo inesperado no style JSON."
+
+#: includes/layer-types/style-json.js:5
+msgid "Style JSON"
+msgstr "Style JSON"
+
+#: includes/layer-types/style-json.js:34
+msgid "Style URL"
+msgstr "URL do estilo"
+
+#: includes/layer-types/style-json.js:35
+msgid "Public URL of a MapLibre GL style JSON file. Used when no inline style is provided. Works with keyless providers such as OpenFreeMap (e.g. https://tiles.openfreemap.org/styles/dark)."
+msgstr "URL pública de um arquivo de estilo MapLibre GL (style JSON). Usada quando nenhum estilo inline é fornecido. Funciona com provedores sem chave, como o OpenFreeMap (ex.: https://tiles.openfreemap.org/styles/dark)."
+
+#: includes/layer-types/style-json.js:43
+msgid "Inline style JSON"
+msgstr "Style JSON inline"
+
+#: includes/layer-types/style-json.js:44
+msgid "Optional. Paste a raw MapLibre GL style object. Takes precedence over the URL — useful for small, self-contained styles."
+msgstr "Opcional. Cole um objeto de estilo MapLibre GL bruto. Tem precedência sobre a URL — útil para estilos pequenos e autocontidos."

@@ -2,6 +2,7 @@ import { memo } from '@wordpress/element';
 import { isEqual } from 'lodash-es';
 
 import { Layer, Source } from '../lib/mapgl-react';
+import { isStyleLayerType } from '../shared/style-layer-types';
 import { resolveTileUrl } from '../shared/styles';
 
 export function getStyleProps( style = {} ) {
@@ -25,14 +26,16 @@ export function renderLayer( { layer, instance } ) {
 		return null;
 	}
 
+	// Style types (mapbox, style-json, …) render as the map's base style,
+	// hoisted via findStyleLayer — never as individual GL layers.
+	if ( isStyleLayerType( layer.type ) ) {
+		return null;
+	}
+
 	if (
 		[ 'swappable', 'switchable' ].includes( instance.use ) &&
 		! instance.default
 	) {
-		return null;
-	}
-
-	if ( instance.load_as_style ) {
 		return null;
 	}
 
@@ -73,10 +76,6 @@ export function renderLayer( { layer, instance } ) {
 	};
 
 	switch ( layer.type ) {
-		case 'mapbox': {
-			return null;
-		}
-
 		case 'mapbox-tileset-raster': {
 			const tilesetId = options.tileset_id ?? '';
 			const tilesetUrl = tilesetId.includes( 'mapbox://' )
