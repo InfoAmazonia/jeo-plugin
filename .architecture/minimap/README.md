@@ -277,12 +277,14 @@ sequenceDiagram
 
 **Injection**: Prior messages are loaded and added to the assistant's chat history via `addMessage()` BEFORE `structured()` is called. This works because `resolveState()` is lazy — the state is created once and reused, and `init()` resets `toolRuns`/`steps` but NOT the chat history.
 
+**Alternation guarantee**: The AI library validates strict user/assistant alternation on every `addMessage()` and throws `Invalid message sequence` on any same-role adjacency — a poisoned stored thread makes every subsequent turn fail. To prevent this, `inject_history()` replays threads through `Jeo\AI\Thread_Normalizer::normalize_thread_messages()` (shared trait, `src/includes/ai/trait-thread-normalizer.php`): it merges consecutive same-role messages, drops leading `assistant` messages and a trailing orphan `user`, and coerces unknown roles to `user`. This also self-heals threads poisoned before the fix (the Context Handler replays through the same normalizer).
+
 #### Error Persistence
 
 When `run_agent()` throws (AI error, empty response, etc.), both layers preserve the user message:
 
 1. **Block attributes** (`conversation[]`) — the frontend (`minimap-editor.js`) includes the user message in `.catch()` and `syncError` handlers alongside the error response, so it is visible in the chat panel and persists with the post.
-2. **ConversationStore** (AI thread) — `api_chat()` and `api_setup_prompt()` append the user message via `appendToThread()` in their `catch` blocks (skipped for `type=regenerate`), so the next successful `inject_history()` includes the unanswered message.
+2. **ConversationStore** (AI thread) — `api_chat()` and `api_setup_prompt()` append the message **pair** `user` + synthetic `assistant` failure note via `appendToThread()` in their `catch` blocks (skipped for `type=regenerate`), so the next successful `inject_history()` includes the unanswered message. The synthetic assistant reply is required: appending a bare `user` message leaves the thread ending in an unmatched `user`, which breaks alternation on the next replay.
 
 The minimap `run_agent()` does **not** have a retry loop (unlike the Context Handler); a single failure throws immediately.
 

@@ -318,9 +318,9 @@ All three are registered per post type via `register_post_meta()` for each type 
 When `run_agent()` exhausts all retries, the user message is still persisted to **both** storage layers before throwing:
 
 1. **UI messages** (`_jeo_ai_context_chat_messages`) — saved in `api_chat()` **before** calling `run_agent()`, so it survives any AI failure.
-2. **ConversationStore** (AI thread) — appended via `appendToThread()` after the retry loop exits, so the next successful call sees the unanswered message via `inject_history()`.
+2. **ConversationStore** (AI thread) — appended via `appendToThread()` after the retry loop exits as the pair `user` + synthetic `assistant` failure note, so the next successful call sees the unanswered message via `inject_history()`. The synthetic assistant reply is required: a bare `user` append would leave the thread ending in an unmatched `user`, and the AI library rejects the same-role adjacency with "Invalid message sequence" on the next replay (its alternation validator runs on every injected message).
 
-This ensures the user's message is visible after a page reload and the AI retains context for subsequent turns. `api_setup()` does **not** persist on error (system-generated message, no prior context to lose).
+This ensures the user's message is visible after a page reload and the AI retains context for subsequent turns. `api_setup()` does **not** persist on error (system-generated message, no prior context to lose). Both handlers replay threads through `Jeo\AI\Thread_Normalizer::normalize_thread_messages()`, which merges consecutive same-role messages and drops leading `assistant` / trailing orphan `user` entries — self-healing threads poisoned before the fix.
 
 ## Content Validation
 

@@ -20,14 +20,17 @@ const appendLanguageQuery = ( query = {} ) => {
 	return nextQuery;
 };
 
-export const chunkRecordIds = ( ids = [], chunkSize = DEFAULT_ID_CHUNK_SIZE ) => {
-	const normalizedIds = Array.from(
+export const normalizeRecordIds = ( ids = [] ) =>
+	Array.from(
 		new Set(
 			ids
 				.map( ( id ) => Number.parseInt( id, 10 ) )
 				.filter( ( id ) => Number.isFinite( id ) && id > 0 )
 		)
 	);
+
+export const chunkRecordIds = ( ids = [], chunkSize = DEFAULT_ID_CHUNK_SIZE ) => {
+	const normalizedIds = normalizeRecordIds( ids );
 	const chunks = [];
 
 	for ( let index = 0; index < normalizedIds.length; index += chunkSize ) {
@@ -91,16 +94,17 @@ export const useRecordsByIds = ( {
 	query = {},
 	chunkSize = DEFAULT_ID_CHUNK_SIZE,
 } ) => {
+	// Keyed by content, not array identity: callers frequently rebuild the IDs
+	// array on every render, and re-running the fetch effect would flip
+	// `isLoading` and unmount consumers (e.g. the layers list with open modals).
+	const normalizedIdsKey = normalizeRecordIds( ids ).join( ',' );
 	const normalizedIds = useMemo(
 		() =>
-			Array.from(
-				new Set(
-					ids
-						.map( ( id ) => Number.parseInt( id, 10 ) )
-						.filter( ( id ) => Number.isFinite( id ) && id > 0 )
-				)
-			),
-		[ ids ]
+			normalizedIdsKey
+				? normalizedIdsKey.split( ',' ).map( ( id ) => Number.parseInt( id, 10 ) )
+				: [],
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- content-keyed memo, see above
+		[ normalizedIdsKey ]
 	);
 	const idChunks = useMemo(
 		() => chunkRecordIds( normalizedIds, chunkSize ),

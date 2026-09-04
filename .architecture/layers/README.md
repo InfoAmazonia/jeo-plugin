@@ -232,6 +232,13 @@ Vector layers (`mvt`, `mapbox-tileset-vector`) and the client-side `geojson` typ
 | `src/includes/maps/class-map-style-composer.php` | `resolve_effective_layer_style()` mirrors the same resolution in composed styles |
 | `src/includes/layers/class-layers.php` | Registers the `default_style` post meta (show_in_rest) |
 
+### Editor stability guarantees
+
+The style modal (`layer-style-editor.js`) keeps its open state in `LayerSettings` local state, so the layers list must never unmount while the user edits. Two guards enforce this:
+
+- `shared/rest-records.js::useRecordsByIds` memoizes the normalized ID set **by content** (`normalizeRecordIds(...).join(',')`), not by array identity — attribute updates that rebuild the IDs array no longer re-trigger the fetch effect and its transient `isLoading` flip.
+- `map-blocks/layers-settings.js` renders the `List` whenever layers exist, even while refetching (`(!loadingLayers || (loadedLayers || []).length > 0)`), so per-item local state survives genuine id-set changes.
+
 ### `style` Object Shape
 
 Stored as a property on each `layers[]` item in the map's `layers` meta:

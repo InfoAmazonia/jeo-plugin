@@ -658,13 +658,13 @@ msgstr "El tipo de fuente del estilo de la capa"
 msgid "Mapbox Style"
 msgstr "Estilo de Mapbox"
 
-#: includes/layer-types/mapbox.js:121
+#: includes/layer-types/mapbox.js:119
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "Style ID"
 msgstr "ID del estilo"
 
-#: includes/layer-types/mapbox.js:123
+#: includes/layer-types/mapbox.js:121
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
 msgid "The Mapbox Style ID includes the user name and id. Example: username/id or mapbox://styles/username/id"
@@ -672,7 +672,7 @@ msgstr "El ID del estilo de Mapbox incluye el nombre de usuario y el ID. Ejemplo
 
 #: includes/layer-types/mapbox-tileset-raster.js:95
 #: includes/layer-types/mapbox-tileset-vector.js:146
-#: includes/layer-types/mapbox.js:130
+#: includes/layer-types/mapbox.js:128
 #: includes/layer-types/mvt.js:141
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
@@ -681,7 +681,7 @@ msgstr "Token de acceso"
 
 #: includes/layer-types/mapbox-tileset-raster.js:96
 #: includes/layer-types/mapbox-tileset-vector.js:147
-#: includes/layer-types/mapbox.js:132
+#: includes/layer-types/mapbox.js:130
 #: includes/layer-types/mvt.js:142
 #: js/build/layersSidebar.js:11
 #: js/build/mapBlocks.js:1
@@ -2088,76 +2088,76 @@ msgstr "Aprobar IA"
 msgid "Approve JEO AI Geolocations"
 msgstr "Aprobar geolocalizaciones de IA de JEO"
 
-#: includes/ai/class-context-handler.php:228
-#: includes/ai/class-context-handler.php:347
-#: includes/ai/class-context-handler.php:806
-#: includes/ai/class-context-handler.php:882
+#: includes/ai/class-context-handler.php:231
+#: includes/ai/class-context-handler.php:350
+#: includes/ai/class-context-handler.php:819
+#: includes/ai/class-context-handler.php:895
 #: includes/ai/class-rag-worker.php:223
-#: includes/minimap/class-minimap.php:158
-#: includes/minimap/class-minimap.php:259
-#: includes/minimap/class-minimap.php:355
+#: includes/minimap/class-minimap.php:162
+#: includes/minimap/class-minimap.php:263
+#: includes/minimap/class-minimap.php:365
 msgid "Post not found."
 msgstr "Entrada no encontrada."
 
-#: includes/ai/class-context-handler.php:239
-#: includes/ai/class-context-handler.php:368
+#: includes/ai/class-context-handler.php:242
+#: includes/ai/class-context-handler.php:371
 #: includes/ai/class-minilayer-classifier.php:35
 #: includes/ai/class-minilayer-handler.php:91
 #: includes/ai/class-minilayer-service.php:41
-#: includes/minimap/class-minimap.php:270
-#: includes/minimap/class-minimap.php:376
+#: includes/minimap/class-minimap.php:274
+#: includes/minimap/class-minimap.php:386
 msgid "No AI provider configured. Set one in JEO AI Settings."
 msgstr "Ningún proveedor de IA configurado. Configure uno en los ajustes de IA de JEO."
 
-#: includes/ai/class-context-handler.php:251
+#: includes/ai/class-context-handler.php:254
 msgid "The article seems to have very little content. Please write a bit more about the topic, or tell me what you would like suggestions about (e.g. territory, entities, angles)."
 msgstr "El artículo parece tener muy poco contenido. Escriba un poco más sobre el tema, o indique sobre qué le gustaría recibir sugerencias (ej.: territorio, entidades, ángulos)."
 
-#: includes/ai/class-context-handler.php:252
-#: includes/ai/class-context-handler.php:290
+#: includes/ai/class-context-handler.php:255
+#: includes/ai/class-context-handler.php:293
 msgid "Generate editorial suggestions for this post based on its content."
 msgstr "Generar sugerencias editoriales para esta entrada basadas en su contenido."
 
-#: includes/ai/class-context-handler.php:260
+#: includes/ai/class-context-handler.php:263
 msgid "Waiting for more content or directions."
 msgstr "Esperando más contenido o instrucciones."
 
-#: includes/ai/class-context-handler.php:296
+#: includes/ai/class-context-handler.php:299
 msgid "Suggestions generated."
 msgstr "Sugerencias generadas."
 
-#: includes/ai/class-context-handler.php:327
-#: includes/minimap/class-minimap.php:335
+#: includes/ai/class-context-handler.php:330
+#: includes/minimap/class-minimap.php:345
 msgid "conversation_id is required."
 msgstr "conversation_id es obligatorio."
 
-#: includes/ai/class-context-handler.php:337
-#: includes/minimap/class-minimap.php:248
-#: includes/minimap/class-minimap.php:345
+#: includes/ai/class-context-handler.php:340
+#: includes/minimap/class-minimap.php:252
+#: includes/minimap/class-minimap.php:355
 msgid "A post ID is required."
 msgstr "Un ID de entrada es obligatorio."
 
-#: includes/ai/class-context-handler.php:357
-#: includes/minimap/class-minimap.php:365
+#: includes/ai/class-context-handler.php:360
+#: includes/minimap/class-minimap.php:375
 msgid "A message is required."
 msgstr "Un mensaje es obligatorio."
 
-#: includes/ai/class-context-handler.php:407
+#: includes/ai/class-context-handler.php:410
 msgid "Suggestions updated."
 msgstr "Sugerencias actualizadas."
 
-#: includes/ai/class-context-handler.php:492
+#: includes/ai/class-context-handler.php:502
 msgid "The AI did not respond after multiple attempts. Please try again or rephrase your request."
 msgstr "La IA no respondió después de varios intentos. Intente nuevamente o reformule su solicitud."
 
-#: includes/ai/class-context-handler.php:903
+#: includes/ai/class-context-handler.php:916
 msgid "Conversation cleared."
 msgstr "Conversación borrada."
 
 #: includes/ai/class-minilayer-handler.php:72
 #: includes/cli/class-ai-cli.php:52
 #: includes/cli/class-ai-cli.php:157
-#: includes/minimap/class-minimap.php:238
+#: includes/minimap/class-minimap.php:242
 msgid "A prompt is required."
 msgstr "Un prompt es obligatorio."
 
@@ -3142,7 +3142,7 @@ msgstr "No se encontró ningún adaptador de IA activo."
 msgid "AI failed to generate prompt."
 msgstr "La IA falló al generar el prompt."
 
-#: includes/ai/class-context-handler.php:922
+#: includes/ai/class-context-handler.php:935
 #: includes/class-ai-handler.php:1135
 msgid "Prompt is required."
 msgstr "Se requiere un prompt."
@@ -3218,35 +3218,35 @@ msgstr "Panel"
 msgid "AI (new)"
 msgstr "IA (nuevo)"
 
-#: includes/minimap/class-minimap.php:187
+#: includes/minimap/class-minimap.php:191
 msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
 msgstr "No se encontraron capas coincidentes. Añada capas manualmente o ejecute el indexador RAG en los ajustes de JEO."
 
-#: includes/minimap/class-minimap.php:461
+#: includes/minimap/class-minimap.php:478
 msgid "The AI returned an empty response. Please try again."
 msgstr "La IA devolvió una respuesta vacía. Intente nuevamente."
 
-#: includes/minimap/class-minimap.php:1848
+#: includes/minimap/class-minimap.php:1868
 msgid "Dark Base (Mapbox)"
 msgstr "Base oscura (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1855
+#: includes/minimap/class-minimap.php:1875
 msgid "Terrain Base (Mapbox)"
 msgstr "Base de terreno (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1862
+#: includes/minimap/class-minimap.php:1882
 msgid "Satellite Base (Mapbox)"
 msgstr "Base de satélite (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1873
+#: includes/minimap/class-minimap.php:1893
 msgid "Dark Base"
 msgstr "Base oscura"
 
-#: includes/minimap/class-minimap.php:1882
+#: includes/minimap/class-minimap.php:1902
 msgid "Light Base"
 msgstr "Base clara"
 
-#: includes/minimap/class-minimap.php:1891
+#: includes/minimap/class-minimap.php:1911
 msgid "Satellite Base"
 msgstr "Base de satélite"
 
@@ -4568,7 +4568,7 @@ msgstr "Ningún proveedor de IA configurado. Configure uno en los ajustes de IA 
 msgid "The AI returned an empty prompt engineering response."
 msgstr "La IA devolvió una respuesta vacía de ingeniería de prompt."
 
-#: includes/ai/class-context-handler.php:284
+#: includes/ai/class-context-handler.php:287
 #: js/build/contextSidebar.js:1
 msgid "Initial suggestions"
 msgstr "Sugerencias iniciales"
@@ -4694,17 +4694,17 @@ msgstr "Incendios"
 msgid "Climate"
 msgstr "Clima"
 
-#: includes/minimap/class-minimap.php:215
+#: includes/minimap/class-minimap.php:219
 msgid "Generate a map for this post based on its content."
 msgstr "Generar un mapa para esta entrada basado en su contenido."
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:504
+#: includes/minimap/class-minimap.php:521
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr "%d capa(s) devuelta(s) por la IA fue(ron) descartada(s) porque no son capas de mapa publicadas."
 
-#: includes/minimap/class-minimap.php:1116
+#: includes/minimap/class-minimap.php:1136
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr "El agente intentó eliminar varias capas existentes sin una solicitud explícita. Se mantuvieron para preservar el mapa actual."
 
@@ -4934,12 +4934,12 @@ msgid "Refresh composed style cache"
 msgstr "Actualizar caché de estilos compuestos"
 
 #. translators: %s: linked URL
-#: includes/ai/class-context-handler.php:690
+#: includes/ai/class-context-handler.php:703
 #, php-format
 msgid "Link to %s removed: not listed in references."
 msgstr "Enlace a %s eliminado: no listado en las referencias."
 
-#: includes/ai/class-context-handler.php:707
+#: includes/ai/class-context-handler.php:720
 msgid "Verification notes:"
 msgstr "Notas de verificación:"
 
@@ -4984,7 +4984,7 @@ msgid "Your browser could not determine your location. This may be due to strict
 msgstr "Su navegador no pudo determinar su ubicación. Esto puede deberse a una configuración de privacidad estricta o a que el GPS no está disponible en su dispositivo."
 
 #. translators: %d: number of preserved layers
-#: includes/minimap/class-minimap.php:1360
+#: includes/minimap/class-minimap.php:1380
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d capa(s) añadida(s) manualmente preservada(s) durante el refinamiento de la IA."
@@ -4997,18 +4997,18 @@ msgstr "Se requiere un ID de estilo de Mapbox y un token de acceso."
 msgid "Unexpected Mapbox style payload."
 msgstr "Respuesta de estilo de Mapbox inesperada."
 
-#: includes/minimap/class-minimap.php:216
+#: includes/minimap/class-minimap.php:220
 msgid "Initial generation from post content"
 msgstr "Generación inicial a partir del contenido de la publicación"
 
 #. translators: %d: version number.
-#: includes/minimap/class-minimap.php:905
+#: includes/minimap/class-minimap.php:925
 #, php-format
 msgid "Version %d was not found in the stored history. The configuration reconstructed from the conversation context was applied instead."
 msgstr "La versión %d no fue encontrada en el historial almacenado. Se aplicó la configuración reconstruida a partir del contexto de la conversación."
 
 #. translators: %d: version number.
-#: includes/minimap/class-minimap.php:918
+#: includes/minimap/class-minimap.php:938
 #, php-format
 msgid "Restored map version %d."
 msgstr "Versión %d del mapa restaurada."
@@ -5350,18 +5350,24 @@ msgstr ""
 msgid "Style JSON"
 msgstr ""
 
-#: includes/layer-types/style-json.js:34
+#: includes/layer-types/style-json.js:30
 msgid "Style URL"
 msgstr ""
 
-#: includes/layer-types/style-json.js:35
+#: includes/layer-types/style-json.js:31
 msgid "Public URL of a MapLibre GL style JSON file. Used when no inline style is provided. Works with keyless providers such as OpenFreeMap (e.g. https://tiles.openfreemap.org/styles/dark)."
 msgstr ""
 
-#: includes/layer-types/style-json.js:43
+#: includes/layer-types/style-json.js:39
 msgid "Inline style JSON"
 msgstr ""
 
-#: includes/layer-types/style-json.js:44
+#: includes/layer-types/style-json.js:40
 msgid "Optional. Paste a raw MapLibre GL style object. Takes precedence over the URL — useful for small, self-contained styles."
+msgstr ""
+
+#: includes/ai/class-context-handler.php:496
+#: includes/minimap/class-minimap.php:312
+#: includes/minimap/class-minimap.php:434
+msgid "The previous request could not be processed. Please try again."
 msgstr ""

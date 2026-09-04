@@ -11,6 +11,7 @@ use HackLab\AIAssistant\Persistence\ConversationStore;
 use Jeo\AI\Minimap_Agent;
 use Jeo\AI\Minimap_Output;
 use Jeo\AI\RAG_Worker;
+use Jeo\AI\Thread_Normalizer;
 use Jeo\AI\WP_Storage;
 use Jeo\Singleton;
 use NeuronAI\Chat\Messages\AssistantMessage;
@@ -22,6 +23,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+require_once __DIR__ . '/../ai/trait-thread-normalizer.php';
+
 /**
  * AI-assisted minimap block backend.
  *
@@ -32,6 +35,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Minimap {
 
 	use Singleton;
+	use Thread_Normalizer;
 
 	/**
 	 * Meta key used to tag auto-created base layer CPTs.
@@ -292,7 +296,9 @@ class Minimap {
 			error_log( sprintf( '[JEO] Minimap setup-prompt failed (%s): %s', get_class( $e ), $e->getMessage() ) );
 
 			// Persist the user prompt to the AI conversation thread so context
-			// is not lost on the next successful call.
+			// is not lost on the next successful call. The synthetic assistant
+			// reply keeps the stored thread in strict user/assistant alternation
+			// (the AI library rejects same-role adjacencies when replaying).
 			$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
 			$store->appendToThread(
 				$conversation_id,
@@ -300,6 +306,10 @@ class Minimap {
 					array(
 						'role'    => 'user',
 						'content' => $prompt,
+					),
+					array(
+						'role'    => 'assistant',
+						'content' => __( 'The previous request could not be processed. Please try again.', 'jeowp' ),
 					),
 				)
 			);
@@ -407,6 +417,9 @@ class Minimap {
 
 			// Persist the user message to the AI conversation thread so context
 			// is not lost on the next successful call. Skip regenerate (fresh start).
+			// The synthetic assistant reply keeps the stored thread in strict
+			// user/assistant alternation (the AI library rejects same-role
+			// adjacencies when replaying).
 			if ( 'regenerate' !== $type && ! empty( $resolved_message ) ) {
 				$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
 				$store->appendToThread(
@@ -415,6 +428,10 @@ class Minimap {
 						array(
 							'role'    => 'user',
 							'content' => $resolved_message,
+						),
+						array(
+							'role'    => 'assistant',
+							'content' => __( 'The previous request could not be processed. Please try again.', 'jeowp' ),
 						),
 					)
 				);
@@ -555,7 +572,10 @@ class Minimap {
 	 * @param string                         $conversation_id Thread ID.
 	 */
 	private function inject_history( $assistant, ConversationStore $store, string $conversation_id ): void {
-		$raw_messages = $store->loadThread( $conversation_id );
+		// Normalize to strict user/assistant alternation: failed turns persist
+		// orphan trailing user messages, and the AI library rejects any
+		// same-role adjacency when replaying the thread.
+		$raw_messages = $this->normalize_thread_messages( $store->loadThread( $conversation_id ) );
 		if ( empty( $raw_messages ) ) {
 			return;
 		}

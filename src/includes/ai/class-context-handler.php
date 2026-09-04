@@ -19,6 +19,8 @@ if ( ! defined( 'WPINC' ) ) {
 	die;
 }
 
+require_once __DIR__ . '/trait-thread-normalizer.php';
+
 /**
  * AI-assisted editorial context generation backend.
  *
@@ -28,6 +30,7 @@ if ( ! defined( 'WPINC' ) ) {
 class Context_Handler {
 
 	use Singleton;
+	use Thread_Normalizer;
 
 	/**
 	 * Bootstrap hooks.
@@ -476,7 +479,10 @@ class Context_Handler {
 
 		// Persist the user message to the AI conversation thread so context
 		// is not lost on the next successful call. Using appendToThread (not
-		// saveThread) to avoid clobbering prior history.
+		// saveThread) to avoid clobbering prior history. The synthetic
+		// assistant reply keeps the stored thread in strict user/assistant
+		// alternation (the AI library rejects same-role adjacencies when
+		// replaying).
 		$store = new ConversationStore( new WP_Storage( $post_id, 'post' ) );
 		$store->appendToThread(
 			$conversation_id,
@@ -484,6 +490,10 @@ class Context_Handler {
 				array(
 					'role'    => 'user',
 					'content' => $message,
+				),
+				array(
+					'role'    => 'assistant',
+					'content' => __( 'The previous request could not be processed. Please try again.', 'jeowp' ),
 				),
 			)
 		);
@@ -504,7 +514,10 @@ class Context_Handler {
 	 * @param string                         $conversation_id Thread ID.
 	 */
 	private function inject_history( $assistant, ConversationStore $store, string $conversation_id ): void {
-		$raw_messages = $store->loadThread( $conversation_id );
+		// Normalize to strict user/assistant alternation: failed turns persist
+		// orphan trailing user messages, and the AI library rejects any
+		// same-role adjacency when replaying the thread.
+		$raw_messages = $this->normalize_thread_messages( $store->loadThread( $conversation_id ) );
 		if ( empty( $raw_messages ) ) {
 			return;
 		}

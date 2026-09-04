@@ -452,8 +452,8 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 				</p>
 			) }
 
-			{ ! loadingLayers && attributes.layers.length > 0 && (
-				<List
+		{ ( ! loadingLayers || ( loadedLayers || [] ).length > 0 ) && attributes.layers.length > 0 && (
+			<List
 					values={ attributes.layers }
 					onChange={ onLayerOrderChange }
 					renderList={ ( { children, props } ) => (
