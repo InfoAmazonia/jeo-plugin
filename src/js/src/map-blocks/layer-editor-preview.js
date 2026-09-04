@@ -1,26 +1,31 @@
 import { useBlockProps } from '@wordpress/block-editor';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { Spinner } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
 import { useDebounce } from 'use-debounce';
 
 import { Map } from '../lib/mapgl-react';
 import { MemoizedRenderLayer } from './map-preview-layer';
 import { getEditorLayerTypeSchema } from '../layers-sidebar/layer-type-definitions';
+import { isStyleLayerType } from '../shared/style-layer-types';
 import {
 	getMapboxStyleUrl,
 	handleEditorMapPreviewError,
 	useMapboxStylePreview,
 	useEditorMapboxTransformRequest,
 } from './mapbox-style-preview';
+import { getStyleJsonStyle } from './use-style-layer';
 
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lng,
+	center_lon: jeo_settings.map_defaults.lon,
 	min_zoom: 0,
 	max_zoom: 20,
 };
+
+const NOTICE_ID = 'layer_notices';
 
 export default function LayerEditorPreview() {
 	const blockProps = useBlockProps();
@@ -33,6 +38,7 @@ export default function LayerEditorPreview() {
 		zoom: mapDefaults.initial_zoom,
 	} );
 
+	const loadedRef = useRef( false );
 	const [ key, setKey ] = useState( 0 );
 	const [ renderControl, setRenderControl ] = useState( { status: 'incomplete_form' } );
 	const [ debouncedPostMeta ] = useDebounce( postMeta, 1500 );
@@ -42,14 +48,21 @@ export default function LayerEditorPreview() {
 		[ 'ready', 'loaded' ].includes( renderControl.status )
 			? getMapboxStyleUrl( debouncedPostMeta.layer_type_options )
 			: null;
+	const isStyleType = isStyleLayerType( debouncedPostMeta?.type );
+	const styleJsonStyle =
+		debouncedPostMeta?.type === 'style-json' &&
+		[ 'ready', 'loaded' ].includes( renderControl.status )
+			? getStyleJsonStyle( debouncedPostMeta.layer_type_options )
+			: null;
 	const mapboxStylePreview = useMapboxStylePreview( mapboxStyleUrl );
 	const transformRequest = useEditorMapboxTransformRequest( [
 		{ meta: debouncedPostMeta },
 	] );
 	const shouldRenderMap =
-		debouncedPostMeta?.type !== 'mapbox' ||
+		! isStyleType ||
 		Boolean( mapboxStylePreview.style ) ||
-		Boolean( mapboxStylePreview.error );
+		Boolean( mapboxStylePreview.error ) ||
+		Boolean( styleJsonStyle );
 
 	useEffect( () => {
 		if ( mapboxStylePreview.viewState ) {
@@ -59,6 +72,61 @@ export default function LayerEditorPreview() {
 			} ) );
 		}
 	}, [ mapboxStylePreview.viewState ] );
+
+	const { createNotice, removeNotice } = useDispatch( 'core/notices' );
+	const {
+		lockPostSaving,
+		unlockPostSaving,
+		lockPostAutosaving,
+		unlockPostAutosaving,
+	} = useDispatch( 'core/editor' );
+
+	useEffect( () => {
+		switch ( renderControl.status ) {
+			case 'incomplete_form':
+				createNotice(
+					'warning',
+					__( 'Please fill all required fields, you will not be able to publish or update until that.', 'jeowp' ),
+					{ id: NOTICE_ID, isDismissible: false }
+				);
+				lockPostSaving( 'layer_lock_key' );
+				lockPostAutosaving( 'layer_lock_key' );
+				break;
+			case 'request_error':
+				switch ( renderControl.statusCode ) {
+					case 401:
+						createNotice(
+							'error',
+							__( 'Your Mapbox access token may be invalid. You will not be able to publish or update. Please check your settings.', 'jeowp' ),
+							{ id: NOTICE_ID, isDismissible: false }
+						);
+						break;
+					case 404:
+						createNotice(
+							'error',
+							__( 'Your layer was not found. You will not be able to publish or update. Please check your settings.', 'jeowp' ),
+							{ id: NOTICE_ID, isDismissible: false }
+						);
+						break;
+					default:
+						createNotice(
+							'error',
+							__( 'Error loading your layer, you will not be able to publish or update. Please check your settings.', 'jeowp' ),
+							{ id: NOTICE_ID, isDismissible: false }
+						);
+						break;
+				}
+				lockPostSaving( 'layer_lock_key' );
+				lockPostAutosaving( 'layer_lock_key' );
+				break;
+			case 'ready':
+			case 'loaded':
+				removeNotice( NOTICE_ID );
+				unlockPostSaving( 'layer_lock_key' );
+				unlockPostAutosaving( 'layer_lock_key' );
+				break;
+		}
+	}, [ renderControl.status ] );
 
 	useEffect( () => {
 		if ( ! postMeta.type ) {
@@ -88,6 +156,7 @@ export default function LayerEditorPreview() {
 		} );
 
 		if ( ! anyEmpty && JSON.stringify( opts ) !== JSON.stringify( prevOpts ) ) {
+			loadedRef.current = false;
 			setRenderControl( { status: 'ready' } );
 			setKey( ( prev ) => prev + 1 );
 		}
@@ -110,12 +179,12 @@ export default function LayerEditorPreview() {
 				{ ! shouldRenderMap && <Spinner /> }
 				{ shouldRenderMap && (
 					<Map
-						key={ `${ key }:${ mapboxStyleUrl || 'default' }` }
-						mapStyle={ mapboxStylePreview.style || undefined }
+						key={ `${ key }:${ mapboxStyleUrl || styleJsonStyle || 'default' }` }
+						mapStyle={ mapboxStylePreview.style || styleJsonStyle || undefined }
 						transformRequest={ transformRequest }
 						onError={ ( error ) => {
 							handleEditorMapPreviewError( error );
-							if ( debouncedPostMeta?.type !== 'mapbox' ) {
+							if ( ! isStyleType ) {
 								setRenderControl( { status: 'request_error', statusCode: 400 } );
 							}
 						} }
@@ -134,13 +203,13 @@ export default function LayerEditorPreview() {
 							} );
 						} }
 					>
-						{ [ 'ready', 'loaded' ].includes( renderControl.status ) &&
-							debouncedPostMeta?.type !== 'mapbox' && (
-							<MemoizedRenderLayer
-								layer={ debouncedPostMeta }
-								instance={ { id: 1, use: 'fixed' } }
-							/>
-						) }
+					{ [ 'ready', 'loaded' ].includes( renderControl.status ) &&
+						! isStyleType && (
+						<MemoizedRenderLayer
+							layer={ debouncedPostMeta }
+							instance={ { id: 1, use: 'fixed' } }
+						/>
+					) }
 					</Map>
 				) }
 			</div>

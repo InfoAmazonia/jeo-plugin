@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, Spinner } from '@wordpress/components';
-import { Fragment, useEffect, useState } from '@wordpress/element';
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SelectControl, TextControl } from '../shared/wp-form-controls';
 
@@ -8,18 +8,28 @@ import { List, arrayMove } from 'react-movable';
 import LayerSettings from './layer-settings';
 import { mergeLayerTypeOptions } from './layer-type-options';
 import { loadLayer } from './utils';
+import { decodeHtmlEntity, sanitizeHtml } from '../shared/html';
 import { usePaginatedRecords } from '../shared/rest-records';
 
 import './layers-settings.css';
 
-const setLayer = ( id ) => ( { id, use: 'fixed', default: true } );
+const setLayer = ( id ) => ( { id, use: 'fixed', default: true, provenance: 'manual' } );
 
-const anySwapDefault = ( settings ) =>
-	settings.some( ( s ) => s.use === 'swappable' && s.default );
+const anySwapDefault = ( settings ) => {
+	return settings.some( ( s ) => s.use === 'swappable' && s.default );
+}
 
 export default function LayersSettings ( { attributes, setAttributes, loadedLayers, loadingLayers, closeModal } ) {
-	const setLayers = ( layers ) => setAttributes( { layers } );
-	let widths = [];
+	const attributesRef = useRef( attributes );
+	useEffect( () => {
+		attributesRef.current = attributes;
+	}, [ attributes ] );
+
+	const setLayers = useCallback( ( layers ) => {
+		setAttributes( { layers } );
+	}, [ setAttributes ] );
+
+	const widths = useMemo( () => [], [] );
 
 	const [ layerTypeFilter, setLayerTypeFilter ] = useState( '' );
 	const [ layerNameFilter, setLayerNameFilter ] = useState( '' );
@@ -67,39 +77,210 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		const [ firstLayer, ...otherLayers ] = attributes.layers;
 		if ( firstLayer && firstLayer.use !== 'fixed' ) {
 			setLayers( [
-				{ ...firstLayer, use: 'fixed', default: false },
+				{ ...firstLayer, use: 'fixed', default: true },
 				...otherLayers,
 			] );
 		}
 	}, [ attributes, setAttributes ] );
 
-	const decodeHtmlEntity = function ( str ) {
-		return str.replace( /&#(\d+);/g, function ( match, dec ) {
-			return String.fromCharCode( dec );
-		} );
-	};
-
-	const onLayerOrderChange = ( { oldIndex, newIndex } ) => {
-		if ( oldIndex === newIndex ) {
-			return;
-		}
-
-		const resultLayers = arrayMove( attributes.layers, oldIndex, newIndex );
-
-		// Set base layer always as fixed
-		if ( resultLayers.length ) {
-			resultLayers[0].use = 'fixed';
-		}
-
-		// Reset fixed default param
-		resultLayers.forEach( ( setting ) => {
-			if ( setting.use === 'fixed' ) {
-				setting.default = true;
+	const onLayerOrderChange = useCallback(
+		( { oldIndex, newIndex } ) => {
+			if ( oldIndex === newIndex ) {
+				return;
 			}
-		} );
 
-		setLayers( resultLayers );
-	};
+			const resultLayers = arrayMove(
+				attributesRef.current.layers,
+				oldIndex,
+				newIndex
+			);
+
+			// Set base layer always as fixed
+			if ( resultLayers.length ) {
+				resultLayers[ 0 ].use = 'fixed';
+			}
+
+			// Reset fixed default param
+			resultLayers.forEach( ( setting ) => {
+				if ( setting.use === 'fixed' ) {
+					setting.default = true;
+				}
+			} );
+
+			setLayers( resultLayers );
+		},
+		[ setLayers ]
+	);
+
+	const handleSwitchDefault = useCallback(
+		( id, def ) =>
+			setLayers(
+				attributesRef.current.layers.map( ( settings ) =>
+					settings.id === id ? { ...settings, default: def } : settings
+				)
+			),
+		[ setLayers ]
+	);
+
+	const handleSwitchShowLegend = useCallback(
+		( id, def ) => {
+			setLayers(
+				attributesRef.current.layers.map( ( settings ) =>
+					settings.id === id ? { ...settings, show_legend: def } : settings
+				)
+			);
+		},
+		[ setLayers ]
+	);
+
+	const handleUpdateStyleLayers = useCallback(
+		( id, def ) => {
+			setLayers(
+				attributesRef.current.layers.map( ( settings ) =>
+					settings.id === id ? { ...settings, style_layers: def } : settings
+				)
+			);
+		},
+		[ setLayers ]
+	);
+
+	const handleSwitchUseStyle = useCallback(
+		( id, def ) => {
+			const currentJeoLayerProps = loadedLayers.find(
+				( layerPost ) => layerPost.id === id
+			);
+			const layerType = window.JeoLayerTypes.getLayerType(
+				currentJeoLayerProps.meta.type
+			);
+
+			if ( def ) {
+				layerType
+					._getStyleDefinition( {
+						...currentJeoLayerProps.meta,
+						layer_id: currentJeoLayerProps.id,
+					} )
+					.then( ( response ) => {
+						if ( ! response ) {
+							return;
+						}
+
+						let styleLayers = response.layers;
+
+						styleLayers = styleLayers.map( ( layer ) => {
+							if (
+								layer.layout &&
+								typeof layer.layout.visibility !== 'undefined' &&
+								layer.layout.visibility === 'none'
+							) {
+								return {
+									id: layer.id,
+									show: false,
+								};
+							}
+
+							return {
+								id: layer.id,
+								show: true,
+							};
+						} );
+
+						setLayers(
+							attributesRef.current.layers.map( ( settings ) => {
+								return settings.id === id
+									? {
+											...settings,
+											load_as_style: true,
+											style_layers: styleLayers,
+									  }
+									: {
+											...settings,
+											load_as_style: false,
+											style_layers: [],
+									  };
+							} )
+						);
+					} );
+
+				setLayers(
+					attributesRef.current.layers.map( ( settings ) => {
+						return settings.id === id
+							? { ...settings, load_as_style: true, style_layers: [] }
+							: {
+									...settings,
+									load_as_style: false,
+									style_layers: [],
+							  };
+					} )
+				);
+			}
+		},
+		[ setLayers, loadedLayers ]
+	);
+
+	const handleSwapDefault = useCallback(
+		( id, def ) =>
+			def && // radio-like behavior: can only be turned on.
+			setLayers(
+				attributesRef.current.layers.map( ( settings ) => ( {
+					...settings,
+					default:
+						settings.use === 'swappable' // update only the swappable layers
+							? settings.id === id // radio-like behavior: turn off all other swappable layers
+							: settings.default,
+				} ) )
+			),
+		[ setLayers ]
+	);
+
+	const handleUpdateUse = useCallback(
+		( id, use ) =>
+			setLayers(
+				attributesRef.current.layers.map( ( settings ) => {
+					if ( settings.id !== id ) {
+						return settings;
+					}
+					return {
+						...settings,
+						use,
+						default:
+							use === 'swappable'
+								? ! anySwapDefault( attributesRef.current.layers )
+								: use === 'fixed'
+								? true
+								: settings.default,
+					};
+				} )
+			),
+		[ setLayers ]
+	);
+
+	const handleRemoveLayer = useCallback(
+		( id ) => {
+			const confirmation = confirm(
+				__( 'Do you really want to delete this layer?', 'jeowp' )
+			);
+
+			if ( confirmation ) {
+				return setLayers(
+					attributesRef.current.layers.filter(
+						( settings ) => settings.id !== id
+					)
+				);
+			}
+		},
+		[ setLayers ]
+	);
+
+	const handleUpdateStyle = useCallback(
+		( id, style ) => {
+			setLayers(
+				attributesRef.current.layers.map( ( settings ) =>
+					settings.id === id ? { ...settings, style } : settings
+				)
+			);
+		},
+		[ setLayers ]
+	);
 
 	return (
 		<Fragment>
@@ -191,12 +372,37 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 													<strong className="layer-title">{ decodeHtmlEntity( layer.title.rendered ) }</strong> | { layer.meta.type }
 												</a>
 											</p>
+											{ ( layer.excerpt?.rendered || layer.content?.rendered ) && (
+												<p className="layer-description">
+													{ decodeHtmlEntity( ( layer.excerpt?.rendered || layer.content?.rendered ).replace( /<[^>]+>/g, '' ) ) }
+												</p>
+											) }
+											{ ( layer.meta.attribution || layer['layer-theme']?.length > 0 ) && (
+												<p className="layer-meta">
+												{ layer.meta.attribution && (
+													<span className="layer-source">
+														<strong>{ __( 'Source:', 'jeowp' ) }</strong>{ ' ' }
+														<span dangerouslySetInnerHTML={ { __html: sanitizeHtml( layer.meta.attribution ) } } />
+													</span>
+												) }
+													{ layer['layer-theme']?.length > 0 && (
+														<span className="layer-themes">
+															<strong>{ __( 'Themes:', 'jeowp' ) }</strong> { layer['layer-theme'].map( ( t ) => t.name ).join( ', ' ) }
+														</span>
+													) }
+												</p>
+											) }
 											<div className="layer-buttons">
 												{ ! inUse && (
 													<p
 														onClick={ () => {
+															const new_layer = setLayer( layer.id );
+															const existing_ids = new Set( attributes.layers.map( ( l ) => l.id ) );
+															if ( existing_ids.has( new_layer.id ) ) {
+																return;
+															}
 															setAttributes( {
-																layers: [ ...attributes.layers, setLayer( layer.id ) ],
+																layers: [ ...attributes.layers, new_layer ],
 															} );
 														} }
 														className="add-button"
@@ -247,8 +453,8 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 				</p>
 			) }
 
-			{ ! loadingLayers && attributes.layers.length > 0 && (
-				<List
+		{ ( ! loadingLayers || ( loadedLayers || [] ).length > 0 ) && attributes.layers.length > 0 && (
+			<List
 					values={ attributes.layers }
 					onChange={ onLayerOrderChange }
 					renderList={ ( { children, props } ) => (
@@ -370,7 +576,16 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 											} ) )
 										);
 
-									const updateUse = ( use ) =>
+									const updateStyle = ( style ) =>
+									setLayers(
+										attributes.layers.map( ( settings ) =>
+											settings.id === layer.id
+												? { ...settings, style }
+												: settings
+										)
+									);
+
+								const updateUse = ( use ) =>
 										setLayers(
 											attributes.layers.map( ( settings ) => {
 												if ( settings.id !== layer.id ) {
@@ -420,8 +635,9 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										switchDefault={ switchDefault }
 										switchShowLegend={ switchShowLegend }
 										swapDefault={ swapDefault }
-										updateUse={ updateUse }
-										widths={ widths }
+									updateUse={ updateUse }
+									updateStyle={ updateStyle }
+									widths={ widths }
 										updateStyleLayers={ updateStyleLayers }
 										key={ index }
 									/>;

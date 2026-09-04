@@ -11,7 +11,7 @@
 			sources: {
 				[ name ]: {
 					type: 'raster',
-					tiles: [ attributes.layer_type_options.url ],
+					tiles: [ globalThis.jeoResolveTileUrl( attributes.layer_type_options.url ) ],
 					tileSize: 256,
 				},
 			},
@@ -26,17 +26,21 @@
 	},
 
 	addLayer( map, attributes, addLayerParams = null ) {
+		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
 		const layer = {
 			id: attributes.layer_id,
 			source: {
 				type: 'raster',
-				tiles: [ attributes.layer_type_options.url ],
+				tiles: [ globalThis.jeoResolveTileUrl( attributes.layer_type_options.url ) ],
 				tileSize: 256,
 				scheme: attributes.layer_type_options.scheme || 'xyz',
 			},
 			type: 'raster',
 			layout: {
 				visibility: attributes.visible ? 'visible' : 'none',
+			},
+			paint: {
+				'raster-opacity': opacity,
 			},
 		};
 

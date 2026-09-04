@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Parque Nacional da Chapada dos Veadeiros",
+    "type": "conservation_unit",
+    "lat": -14.083,
+    "lng": -47.666,
+    "aliases": ["Chapada dos Veadeiros", "Parna Chapada dos Veadeiros"]
+  },
+  {
+    "name": "Parque Nacional da Serra da Canastra",
+    "type": "conservation_unit",
+    "lat": -20.250,
+    "lng": -46.500,
+    "aliases": ["Serra da Canastra", "Parna Serra da Canastra"]
+  },
+  {
+    "name": "Área de Proteção Ambiental (APA) Costa dos Corais",
+    "type": "conservation_unit",
+    "lat": -9.100,
+    "lng": -35.250,
+    "aliases": ["APA Costa dos Corais", "Costa dos Corais"]
+  },
+  {
+    "name": "Parque Nacional do Iguaçu",
+    "type": "conservation_unit",
+    "lat": -25.683,
+    "lng": -54.433,
+    "aliases": ["Parna Iguaçu", "Cataratas do Iguaçu"]
+  },
+  {
+    "name": "Estação Ecológica da Terra do Meio",
+    "type": "conservation_unit",
+    "lat": -4.200,
+    "lng": -53.700,
+    "aliases": ["Esec Terra do Meio", "Terra do Meio"]
+  }
+]

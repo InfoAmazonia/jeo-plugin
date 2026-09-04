@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/docs/ai-context-assistant-issue/" />
+      <link rel="shortcut icon" href="../img/favicon.ico" />
+    <title>Issue: Geração de Contexto por IA (AI Context Assistant) - JEO</title>
+    <link rel="stylesheet" href="../css/theme.css" />
+    <link rel="stylesheet" href="../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "Issue: Gera\u00e7\u00e3o de Contexto por IA (AI Context Assistant)";
+        var mkdocs_page_input_path = "ai-context-assistant-issue.md";
+        var mkdocs_page_url = "/docs/ai-context-assistant-issue/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href=".." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../stories-near-you/">Stories near you</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../minimap/">Minimap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-in-jeo/">AI in JEO</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-settings/">AI Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-context-assistant/">AI Context Assistant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-georeferencing/">AI Georeferencing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../ai-bulk-geolocation/">AI Bulk Geolocation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-compliance/">WordPress.org compliance</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/wordpress-org-audit-report/">WordPress.org audit report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dev/dependency-upgrade-smoke-tests/">Dependency upgrade smoke tests</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".." class="icon icon-home" aria-label="Docs"></a></li>
+      <li class="breadcrumb-item active">Issue: Geração de Contexto por IA (AI Context Assistant)</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/ai-context-assistant-issue.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="issue-geracao-de-contexto-por-ia-ai-context-assistant">Issue: Geração de Contexto por IA (AI Context Assistant)</h1>
+<h2 id="resumo">Resumo</h2>
+<p>Implementação de um assistente editorial de IA integrado à barra lateral do editor Gutenberg. A funcionalidade sugere novos parágrafos para incorporar ao artigo com base no conteúdo já escrito, no acervo RAG vetorizado do site e em instruções complementares do usuário via chat.</p>
+<hr />
+<h2 id="objetivo">Objetivo</h2>
+<p>Auxiliar editorialmente a escrita de posts no WordPress, enriquecendo o conteúdo com:
+- Parágrafos sugeridos contextualmente pela IA
+- Referências e links para artigos do acervo do site (via RAG)
+- Chat conversacional multi-turn para refinamento iterativo</p>
+<hr />
+<h2 id="o-que-foi-implementado">O que foi implementado</h2>
+<h3 id="1-painel-na-sidebar-do-editor-gutenberg">1. Painel na sidebar do editor (Gutenberg)</h3>
+<ul>
+<li>Nova aba <strong>"AI Context"</strong> na sidebar Documento do editor</li>
+<li>Interface compacta com opção de expandir para modal maior</li>
+<li>Botão <strong>"Generate Suggestions"</strong> para iniciar a geração (não é automático)</li>
+<li>Textarea para chat com atalho <code>Ctrl+Enter</code> para enviar</li>
+<li>Sessão persistente — fecha/reabre a metabox ou atualiza a página sem perder o contexto</li>
+</ul>
+<h3 id="2-sugestoes-de-paragrafos">2. Sugestões de parágrafos</h3>
+<ul>
+<li>Cards com o texto sugerido</li>
+<li><strong>"Insert into article"</strong> — insere como bloco <code>core/paragraph</code> no editor, com links HTML inline para posts referenciados</li>
+<li><strong>"Copy"</strong> — copia o texto como rich text (HTML com links) ou texto puro (fallback)</li>
+<li>Links inteligentes: palavras ou títulos de artigos do acervo mencionados no parágrafo viram links clicáveis</li>
+</ul>
+<h3 id="3-chat-multi-turn-com-historico">3. Chat multi-turn com histórico</h3>
+<ul>
+<li>Após a primeira geração, o usuário pode dar instruções complementares</li>
+<li>Exemplos: <em>"deixe mais curto"</em>, <em>"foco em aspectos ambientais"</em>, <em>"adicione contexto histórico"</em></li>
+<li>Histórico de conversa persistido em <code>post_meta</code></li>
+</ul>
+<h3 id="4-configuracao-customizavel">4. Configuração customizável</h3>
+<ul>
+<li>Nova aba <strong>"Context Assistant"</strong> em <strong>JEO → AI Configuration</strong></li>
+<li>Campo textarea para editar o <code>system prompt</code> da IA (<code>ai_context_prompt</code>)</li>
+<li>Se vazio, usa o prompt padrão embutido no código</li>
+</ul>
+<hr />
+<h2 id="arquitetura-tecnica">Arquitetura técnica</h2>
+<h3 id="stack-utilizada">Stack utilizada</h3>
+<ul>
+<li><strong>Backend</strong>: PHP 8.2+ com <code>hacklabr/ai-assistant</code> + <code>neuron-ai</code></li>
+<li><strong>Frontend</strong>: React 18 + <code>@wordpress/scripts</code> (Webpack 5)</li>
+<li><strong>RAG</strong>: <code>FileVectorStore</code> (<code>jeo_knowledge</code>) com <code>RAG_Agent</code></li>
+<li><strong>Structured Output</strong>: DTO <code>Context_Generation_Output</code> com schema nativo</li>
+</ul>
+<h3 id="padrao-arquitetural">Padrão arquitetural</h3>
+<p>Baseado na mesma arquitetura do <strong>Minimap</strong>:
+- <code>AssistantConfig</code> com <code>outputClass</code>, <code>conversationStorage</code>, <code>learningStorage</code>, <code>userMemoryStorage</code>
+- <code>Tool_Registry</code> para registro centralizado de tools
+- <code>ConversationStore</code> + <code>WP_Storage</code> para persistência em <code>post_meta</code>
+- <code>SubAgentConfig</code> para o <code>post_analyzer</code></p>
+<hr />
+<h2 id="endpoints-rest">Endpoints REST</h2>
+<table>
+<thead>
+<tr>
+<th>Método</th>
+<th>Rota</th>
+<th>Descrição</th>
+<th>Permissão</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>POST</code></td>
+<td><code>/jeo/v1/context/setup</code></td>
+<td>Gera sugestões iniciais a partir do conteúdo do post</td>
+<td><code>edit_posts</code></td>
+</tr>
+<tr>
+<td><code>POST</code></td>
+<td><code>/jeo/v1/context/chat</code></td>
+<td>Chat multi-turn para refinamento</td>
+<td><code>edit_posts</code></td>
+</tr>
+<tr>
+<td><code>GET</code></td>
+<td><code>/jeo/v1/context/state?post_id={id}</code></td>
+<td>Carrega estado persistido (histórico + sugestões)</td>
+<td><code>edit_posts</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="fluxo-de-dados">Fluxo de dados</h2>
+<pre><code>┌─────────────────┐     POST /context/setup     ┌──────────────────┐
+│  Editor (JS)    │ ───────────────────────────&gt; │ Context_Handler  │
+│  Gutenberg      │                            │  (PHP)           │
+│                 │ &lt;────────────────────────── │                  │
+└─────────────────┘     {paragraphs, refs}      └────────┬─────────┘
+         │                                               │
+         │                                               ▼
+         │                                      ┌──────────────────┐
+         │                                      │  Context_Agent   │
+         │                                      │  (Assistant)     │
+         │                                      │                  │
+         │                                      │  • retrieve_knowledge
+         │                                      │  • get_post_content
+         │                                      │  • post_analyzer (sub-agent)
+         │                                      └──────────────────┘
+         │                                               │
+         │                                               ▼
+         │                                      ┌──────────────────┐
+         │                                      │  RAG_Agent       │
+         │                                      │  (jeo_knowledge) │
+         │                                      └──────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│  Persistência em post_meta:                                         │
+│  • _jeo_ai_context_conversation_id  → UUID da thread                │
+│  • _jeo_ai_context_last_response    → últimas sugestões + refs      │
+│  • _jeo_ai_conversation_{uuid}      → histórico completo (via WP_Storage) │
+└─────────────────────────────────────────────────────────────────────┘
+</code></pre>
+<hr />
+<h2 id="arquivos-criados">Arquivos criados</h2>
+<h3 id="backend-php">Backend (PHP)</h3>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/includes/ai/class-retrieve-knowledge-tool.php</code></td>
+<td>Tool NeuronAI para busca semântica no <code>jeo_knowledge</code></td>
+</tr>
+<tr>
+<td><code>src/includes/ai/class-context-generation-output.php</code></td>
+<td>DTO de structured output (parágrafos, referências, mensagens)</td>
+</tr>
+<tr>
+<td><code>src/includes/ai/class-context-agent.php</code></td>
+<td>Factory do Assistant com prompt editorial, tools e sub-agent</td>
+</tr>
+<tr>
+<td><code>src/includes/ai/class-context-handler.php</code></td>
+<td>REST handler com endpoints setup/chat/state + persistência</td>
+</tr>
+<tr>
+<td><code>src/includes/ai/settings/tab-context.php</code></td>
+<td>Template da aba de configuração do system prompt</td>
+</tr>
+</tbody>
+</table>
+<h3 id="frontend-js">Frontend (JS)</h3>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/js/src/context-sidebar/index.js</code></td>
+<td>Entry point — registra plugin Gutenberg</td>
+</tr>
+<tr>
+<td><code>src/js/src/context-sidebar/context-chat-panel.js</code></td>
+<td>Painel de chat, estado e API calls</td>
+</tr>
+<tr>
+<td><code>src/js/src/context-sidebar/suggested-paragraphs.js</code></td>
+<td>Cards de parágrafos + linkify + insert/copy</td>
+</tr>
+<tr>
+<td><code>src/js/src/context-sidebar/context-sidebar.css</code></td>
+<td>Estilos do painel, chat, sugestões e modal</td>
+</tr>
+</tbody>
+</table>
+<h3 id="documentacao">Documentação</h3>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Descrição</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.architecture/ai/README.md</code></td>
+<td>Seção "AI Context Assistant" com fluxo Mermaid</td>
+</tr>
+<tr>
+<td><code>AGENTS.md</code></td>
+<td>Convenções e pontos de regressão da feature</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="arquivos-modificados">Arquivos modificados</h2>
+<table>
+<thead>
+<tr>
+<th>Arquivo</th>
+<th>Mudança</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>src/includes/ai/class-tool-registry.php</code></td>
+<td>Registra <code>retrieve_knowledge</code></td>
+</tr>
+<tr>
+<td><code>src/includes/class-jeo.php</code></td>
+<td>Registra/enfileira asset <code>jeo-context-sidebar</code></td>
+</tr>
+<tr>
+<td><code>src/includes/loaders.php</code></td>
+<td>Adiciona <code>jeo_context_handler()</code></td>
+</tr>
+<tr>
+<td><code>src/includes/settings/class-settings.php</code></td>
+<td>Default + sanitize de <code>ai_context_prompt</code></td>
+</tr>
+<tr>
+<td><code>src/includes/ai/class-ai-settings.php</code></td>
+<td>Adiciona tab "Context Assistant"</td>
+</tr>
+<tr>
+<td><code>src/includes/ai/settings/main-page.php</code></td>
+<td>Case para incluir <code>tab-context.php</code></td>
+</tr>
+<tr>
+<td><code>webpack.config.js</code></td>
+<td>Entry point <code>contextSidebar</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="configuracoes">Configurações</h2>
+<h3 id="post-types-habilitados">Post types habilitados</h3>
+<p>A feature respeita a configuração existente <code>enabled_post_types</code> (mesma regra da geolocalização e minimap). O painel só aparece para post types habilitados em <strong>JEO Settings → General</strong>.</p>
+<h3 id="prompt-customizavel">Prompt customizável</h3>
+<ul>
+<li>Caminho: <strong>JEO → AI Configuration → Context Assistant</strong></li>
+<li>Opção: <code>ai_context_prompt</code> (textarea)</li>
+<li>Comportamento: vazio = prompt padrão; preenchido = sobrescreve completamente</li>
+</ul>
+<hr />
+<h2 id="decisoes-de-design">Decisões de design</h2>
+<table>
+<thead>
+<tr>
+<th>Decisão</th>
+<th>Justificativa</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Setup manual</strong> (botão "Generate Suggestions")</td>
+<td>Evita chamadas desnecessárias à API toda vez que o painel abre</td>
+</tr>
+<tr>
+<td><strong>Structured output</strong> (<code>Context_Generation_Output</code>)</td>
+<td>Garante que a IA sempre retorne parágrafos formatados corretamente</td>
+</tr>
+<tr>
+<td><strong>Persistência em <code>post_meta</code></strong></td>
+<td>Funciona entre dispositivos e sessões de browser</td>
+</tr>
+<tr>
+<td><strong>Links inline nos parágrafos</strong></td>
+<td>Experiência editorial mais fluida — o autor vê o link no contexto do texto</td>
+</tr>
+<tr>
+<td><strong>Copy como rich text</strong></td>
+<td>Preserva links ao colar em editores externos (Word, Google Docs, etc.)</td>
+</tr>
+<tr>
+<td><strong>Inserção como <code>core/paragraph</code></strong></td>
+<td>Integração nativa com o Gutenberg, sem blocos customizados</td>
+</tr>
+<tr>
+<td><strong>Sem nova config de post type</strong></td>
+<td>Reutiliza <code>enabled_post_types</code> existente para manter simplicidade</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="proximos-passos-sugeridos">Próximos passos sugeridos</h2>
+<ul>
+<li>[ ] <strong>Inserção na posição do cursor</strong>: hoje insere no final do documento; permitir inserir onde o cursor está</li>
+<li>[ ] <strong>Múltiplas sessões por post</strong>: permitir criar/gerenciar várias "conversas" de contexto no mesmo post</li>
+<li>[ ] <strong>Histórico de versões</strong>: salvar snapshots de sugestões para comparar diferentes iterações</li>
+<li>[ ] <strong>Avaliação de sugestões</strong>: thumbs up/down para feedback e fine-tuning do prompt</li>
+<li>[ ] <strong>Taxonomias no contexto</strong>: incluir categorias/tags do post no analysis do <code>post_analyzer</code></li>
+<li>[ ] <strong>Preview de links</strong>: tooltip com resumo do artigo referenciado ao hover</li>
+<li>[ ] <strong>Testes unitários Jest</strong>: cobrir os componentes React da sidebar</li>
+</ul>
+<hr />
+<h2 id="labels-sugeridos">Labels sugeridos</h2>
+<p><code>feature</code>, <code>ai</code>, <code>editorial</code>, <code>gutenberg</code>, <code>rag</code></p>
+              
+            </div>
+          </div><footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+    
+  </span>
+</div>
+    <script src="../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "..";</script>
+    <script src="../js/theme_extra.js"></script>
+    <script src="../js/theme.js"></script>
+      <script src="../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>

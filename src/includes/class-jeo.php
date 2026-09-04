@@ -50,10 +50,16 @@ class Jeo {
 		\jeo_layers();
 		\jeo_geocode_handler();
 		\jeo_settings();
+		\jeo_ai_logger();
+		\jeo_ai_handler();
+		\jeo_minilayer_handler();
 		\jeo_layer_types();
 		\jeo_legend_types();
 		\jeo_sidebars();
 		\jeo_storymap();
+		\jeo_stories_near_you();
+		\jeo_minimap();
+		\jeo_context_handler();
 
 		add_filter( 'load_textdomain_mofile', array( $this, 'fallback_translation_mofile' ), 10, 2 );
 		add_filter( 'load_script_translation_file', array( $this, 'fallback_script_translation_file' ), 10, 3 );
@@ -73,14 +79,281 @@ class Jeo {
 		add_action( 'init', array( $this, 'register_assets' ) );
 		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 
+		add_action( 'rest_api_init', array( $this, 'register_dashboard_routes' ) );
+
 		add_filter( 'rest_map-layer_query', array( $this, 'custom_layer_search_filters' ), 10, 2 );
 		add_filter( 'rest_map-layer_query', array( $this, 'order_rest_post_by_post_title' ), 10, 1 );
 		add_filter( 'rest_request_before_callbacks', array( $this, 'rest_authenticate_by_cookie' ), 10, 3 );
+		add_action( 'pre_get_posts', array( $this, 'suppress_wpml_for_map_layer_rest_queries' ), 10, 1 );
 
 		// Auto-inject editor preview blocks into existing map/layer posts.
 		// so they don't show the "template mismatch" warning.
 		add_filter( 'rest_prepare_map', array( $this, 'inject_editor_block_for_map' ), 10, 3 );
 		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
+	}
+
+	/**
+	 * Register REST routes for dashboard pins, stats, and readme endpoints.
+	 *
+	 * @return void
+	 */
+	public function register_dashboard_routes() {
+		register_rest_route(
+			'jeo/v1',
+			'/all-pins',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_all_pins' ),
+				'permission_callback' => function () {
+					return current_user_can( 'read' ); },
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/dashboard-stats',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_dashboard_stats' ),
+				'permission_callback' => function () {
+					return current_user_can( 'read' );
+				},
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/readme',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_get_readme' ),
+				'permission_callback' => function () {
+					return current_user_can( 'read' );
+				},
+			)
+		);
+	}
+
+	/**
+	 * Returns the content of all README*.md files found in the plugin root.
+	 * Also looks one level up to support Docker development environments where only src is mounted.
+	 */
+	public function api_get_readme() {
+		$paths = array(
+			JEO_BASEPATH . 'README*.md',
+			dirname( JEO_BASEPATH ) . '/README*.md',
+		);
+
+		$files = array();
+		foreach ( $paths as $path ) {
+			$found = glob( $path );
+			if ( is_array( $found ) ) {
+				$files = array_merge( $files, $found );
+			}
+		}
+
+		// Remove duplicates (same filename in different paths).
+		$unique_files = array();
+		foreach ( $files as $file ) {
+			$name = basename( $file );
+			if ( ! isset( $unique_files[ $name ] ) ) {
+				$unique_files[ $name ] = $file;
+			}
+		}
+
+		$readmes = array();
+
+		if ( empty( $unique_files ) ) {
+			return new \WP_REST_Response( array( 'error' => 'No README files found' ), 404 );
+		}
+
+		foreach ( $unique_files as $file_name => $file_path ) {
+			// Create a friendly label: README_BR.md -> BR, README.md -> Default.
+			$label = str_replace( array( 'README_', 'README', '.md' ), '', $file_name );
+			$label = empty( $label ) ? 'English' : str_replace( '_', ' ', $label );
+
+			// Map specific codes to names.
+			if ( 'BR' === $label ) {
+				$label = 'Português Brasil';
+			}
+
+			$readmes[] = array(
+				'label'   => $label,
+				'content' => file_get_contents( $file_path ), // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+			);
+		}
+
+		return new \WP_REST_Response( $readmes, 200 );
+	}
+
+	/**
+	 * REST callback that returns the earliest publish date and enabled post types with their taxonomies and terms.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function api_dashboard_stats() {
+		global $wpdb;
+		$min_date = $wpdb->get_var( "SELECT MIN(post_date) FROM {$wpdb->posts} WHERE post_status = 'publish'" );
+
+		$post_types = \jeo_settings()->get_option( 'enabled_post_types', array( 'post' ) );
+		$types_data = array();
+		foreach ( $post_types as $pt ) {
+			$obj = get_post_type_object( $pt );
+			if ( ! $obj ) {
+				continue;
+			}
+
+			$taxonomies = get_object_taxonomies( $pt, 'objects' );
+			$tax_data   = array();
+			foreach ( $taxonomies as $tax ) {
+				if ( ! $tax->public || ! $tax->show_ui ) {
+					continue;
+				}
+				$terms     = get_terms(
+					array(
+						'taxonomy'   => $tax->name,
+						'hide_empty' => true,
+					)
+				);
+				$term_list = array();
+				foreach ( $terms as $term ) {
+					$term_list[] = array(
+						'id'   => (int) $term->term_id,
+						'name' => (string) $term->name,
+					);
+				}
+				$tax_data[] = array(
+					'slug'  => (string) $tax->name,
+					'label' => (string) $tax->label,
+					'terms' => $term_list,
+				);
+			}
+
+			$types_data[] = array(
+				'slug'       => (string) $pt,
+				'label'      => (string) $obj->label,
+				'taxonomies' => $tax_data,
+			);
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'min_date'   => $min_date ? substr( $min_date, 0, 10 ) : gmdate( 'Y-m-d', strtotime( '-1 year' ) ),
+				'post_types' => $types_data,
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST callback that queries all geocoded posts filtered by search, date, post type, and taxonomy.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_all_pins( $request ) {
+		global $wpdb;
+
+		$search    = $request->get_param( 'search' );
+		$after     = $request->get_param( 'after' );
+		$before    = $request->get_param( 'before' );
+		$post_type = $request->get_param( 'post_type' );
+		$taxonomy  = $request->get_param( 'taxonomy' );
+		$term_id   = $request->get_param( 'term_id' );
+
+		$query_where = "pm.meta_key = '_related_point' AND pm.meta_value != ''";
+		$join        = '';
+		$params      = array();
+
+		if ( ! empty( $search ) || ! empty( $after ) || ! empty( $before ) || ! empty( $post_type ) || ! empty( $taxonomy ) ) {
+			$join .= " INNER JOIN {$wpdb->posts} p ON pm.post_id = p.ID";
+		}
+
+		if ( ! empty( $search ) ) {
+			$query_where .= ' AND (p.post_title LIKE %s OR p.post_content LIKE %s)';
+			$params[]     = '%' . $wpdb->esc_like( $search ) . '%';
+			$params[]     = '%' . $wpdb->esc_like( $search ) . '%';
+		}
+
+		if ( ! empty( $post_type ) ) {
+			$query_where .= ' AND p.post_type = %s';
+			$params[]     = $post_type;
+		}
+
+		if ( ! empty( $taxonomy ) && ! empty( $term_id ) ) {
+			$join        .= " INNER JOIN {$wpdb->term_relationships} tr ON p.ID = tr.object_id";
+			$join        .= " INNER JOIN {$wpdb->term_taxonomy} tt ON tr.term_taxonomy_id = tt.term_taxonomy_id";
+			$query_where .= ' AND tt.taxonomy = %s AND tt.term_id = %d';
+			$params[]     = $taxonomy;
+			$params[]     = (int) $term_id;
+		}
+
+		if ( ! empty( $after ) ) {
+			$query_where .= ' AND p.post_date >= %s';
+			$params[]     = $after . ' 00:00:00';
+		}
+		if ( ! empty( $before ) ) {
+			$query_where .= ' AND p.post_date <= %s';
+			$params[]     = $before . ' 23:59:59';
+		}
+
+		$sql = "SELECT pm.post_id, pm.meta_value FROM {$wpdb->postmeta} pm $join WHERE $query_where";
+
+		if ( ! empty( $params ) ) {
+			$sql = $wpdb->prepare( $sql, $params ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+		}
+
+		$results = $wpdb->get_results( $sql ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+
+		$unique_pins = array();
+		$hash_map    = array();
+
+		foreach ( $results as $row ) {
+			$post_id    = $row->post_id;
+			$meta_data  = maybe_unserialize( $row->meta_value );
+			$post_title = get_the_title( $post_id );
+			$view_url   = get_permalink( $post_id );
+			$edit_url   = get_edit_post_link( $post_id, '' );
+
+			// O WordPress pode retornar um array de pontos ou um ponto único
+			// dependendo de como o metadado foi registrado e salvo.
+			$points = array();
+			if ( is_array( $meta_data ) ) {
+				// Se o primeiro item for numérico, é um array de arrays (múltiplos pontos).
+				if ( isset( $meta_data[0] ) && is_array( $meta_data[0] ) ) {
+					$points = $meta_data;
+				} else {
+					// Caso contrário é um ponto único formatado como array associativo.
+					$points[] = $meta_data;
+				}
+			}
+
+			foreach ( $points as $point ) {
+				if ( isset( $point['_geocode_lat'] ) && isset( $point['_geocode_lon'] ) ) {
+
+					$lat = (float) str_replace( ',', '.', $point['_geocode_lat'] );
+					$lon = (float) str_replace( ',', '.', $point['_geocode_lon'] );
+
+					// Arredondamento para filtrar duplicatas.
+					$hash = round( $lat, 5 ) . '|' . round( $lon, 5 ) . '|' . $post_id;
+
+					if ( ! isset( $hash_map[ $hash ] ) ) {
+						$hash_map[ $hash ] = true;
+						$unique_pins[]     = array(
+							'post_id'  => $post_id,
+							'title'    => $post_title,
+							'view_url' => $view_url,
+							'edit_url' => $edit_url,
+							'name'     => isset( $point['_geocode_full_address'] ) ? $point['_geocode_full_address'] : '',
+							'lat'      => $lat,
+							'lon'      => $lon,
+							'quote'    => isset( $point['_ai_quote'] ) ? $point['_ai_quote'] : '',
+						);
+					}
+				}
+			}
+		}
+		return new \WP_REST_Response( $unique_pins, 200 );
 	}
 
 	/**
@@ -337,6 +610,23 @@ class Jeo {
 	}
 
 	/**
+	 * Skip WPML language filtering for map-layer REST queries.
+	 *
+	 * Base layers are language-agnostic tile styles. The REST endpoint
+	 * should return all matching layers regardless of language so the
+	 * editor and front-end can access them.
+	 *
+	 * @param WP_Query $query The WP_Query instance.
+	 * @return void
+	 */
+	public function suppress_wpml_for_map_layer_rest_queries( WP_Query $query ) {
+		if ( defined( 'REST_REQUEST' ) && REST_REQUEST
+			&& 'map-layer' === ( $query->query_vars['post_type'] ?? '' ) ) {
+			$query->set( 'suppress_filters', true );
+		}
+	}
+
+	/**
 	 * Add custom layer type and search filters to map-layer REST queries.
 	 *
 	 * @param array           $query REST query args.
@@ -507,9 +797,44 @@ class Jeo {
 
 		wp_set_script_translations( 'jeo-js', 'jeowp', JEO_BASEPATH . 'languages' );
 
+		// Context Sidebar asset.
+		$context_asset_file = file_exists( JEO_BASEPATH . '/js/build/contextSidebar.asset.php' ) ? include JEO_BASEPATH . '/js/build/contextSidebar.asset.php' : array(
+			'dependencies' => array(),
+			'version'      => JEO_VERSION,
+		);
+		wp_register_style( 'jeo-context-sidebar', JEO_BASEURL . '/js/build/contextSidebar.css', array(), JEO_VERSION );
+		wp_register_script(
+			'jeo-context-sidebar',
+			JEO_BASEURL . '/js/build/contextSidebar.js',
+			$context_asset_file['dependencies'] ?? array(),
+			$context_asset_file['version'],
+			true,
+		);
+		wp_localize_script(
+			'jeo-context-sidebar',
+			'jeoContext',
+			array(
+				'rest_url' => rest_url( 'jeo/v1' ),
+				'nonce'    => wp_create_nonce( 'wp_rest' ),
+			)
+		);
+
 		$map_runtime_requested = $this->get_requested_map_runtime();
 		$mapgl_script_deps     = array();
 		$mapgl_style_deps      = array();
+
+		$mapbox_key       = \jeo_settings()->get_option( 'mapbox_key' );
+		$default_lat_raw  = \jeo_settings()->get_option( 'map_default_lat' );
+		$default_lon_raw  = \jeo_settings()->get_option( 'map_default_lng' );
+		$default_zoom_raw = \jeo_settings()->get_option( 'map_default_zoom' );
+		$default_lat      = $default_lat_raw ? $default_lat_raw : -23.549985;
+		$default_lon      = $default_lon_raw ? $default_lon_raw : -46.633519;
+		$default_zoom     = $default_zoom_raw ? $default_zoom_raw : 5;
+
+		$ai_provider_raw  = \jeo_settings()->get_option( 'ai_default_provider' );
+		$ai_provider_slug = $ai_provider_raw ? $ai_provider_raw : 'gemini';
+		$ai_adapters      = \jeo_ai_handler()->get_adapters();
+		$ai_provider_name = isset( $ai_adapters[ $ai_provider_slug ] ) ? $ai_adapters[ $ai_provider_slug ] : 'AI';
 
 		if ( $this->should_load_external_mapbox_sdk() ) {
 			$mapbox_sdk = $this->get_mapbox_external_sdk();
@@ -540,8 +865,30 @@ class Jeo {
 			'jeo-js',
 			'jeo',
 			array(
-				'ajax_url'      => admin_url( 'admin-ajax.php' ),
-				'geocode_nonce' => wp_create_nonce( 'jeo_geocode' ),
+				'ajax_url'         => admin_url( 'admin-ajax.php' ),
+				'ai_provider_name' => $ai_provider_name,
+				'map_runtime'      => $map_runtime_requested,
+				'mapbox_key'       => $mapbox_key,
+				'default_lat'      => $default_lat,
+				'default_lon'      => $default_lon,
+				'default_zoom'     => $default_zoom,
+				'rest_url'         => rest_url( 'jeo/v1' ),
+				'nonce'            => wp_create_nonce( 'wp_rest' ),
+				'ai_thresholds'    => array(
+					'primary'   => (int) \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 ),
+					'secondary' => (int) \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ),
+				),
+				'ai_limits'        => array(
+					'use_primary_limit'   => (bool) \jeo_settings()->get_option( 'ai_cal_use_primary_limit', false ),
+					'primary_max'         => (int) \jeo_settings()->get_option( 'ai_cal_primary_max', 10 ),
+					'use_secondary_limit' => (bool) \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false ),
+					'secondary_max'       => (int) \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 ),
+				),
+				'geocode_nonce'    => wp_create_nonce( 'jeo_geocode_nonce' ),
+				'pin_urls'         => array(
+					'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png' ) ),
+					'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png' ) ),
+				),
 			)
 		);
 
@@ -570,8 +917,8 @@ class Jeo {
 				'mapbox_key'            => sanitize_text_field( \jeo_settings()->get_option( 'mapbox_key' ) ),
 				'map_defaults'          => array(
 					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
-					'lat'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lng'                 => sanitize_text_field( \jeo_settings()->get_option( 'map_default_lng' ) ),
+					'lat'                 => floatval( \jeo_settings()->get_option( 'map_default_lat' ) ),
+					'lon'                 => floatval( \jeo_settings()->get_option( 'map_default_lng' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
 					'enable_fullscreen'   => true,
@@ -712,6 +1059,14 @@ class Jeo {
 		);
 		register_block_type(
 			'jeo/layer-editor',
+			array(
+				'api_version'   => 3,
+				'editor_script' => 'jeo-map-blocks',
+				'editor_style'  => 'jeo-map-blocks',
+			)
+		);
+		register_block_type(
+			'jeo/ai-minimap',
 			array(
 				'api_version'   => 3,
 				'editor_script' => 'jeo-map-blocks',
@@ -1033,6 +1388,8 @@ class Jeo {
 		if ( in_array( $post->post_type, $post_types, true ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
+			wp_enqueue_script( 'jeo-context-sidebar' );
+			wp_enqueue_style( 'jeo-context-sidebar' );
 		}
 	}
 
@@ -1108,13 +1465,13 @@ class Jeo {
 					'jeoUrl'                     => JEO_BASEURL,
 					'nonce'                      => $this->get_rest_nonce(),
 					'currentLang'                => $current_language,
-						// phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bundled templates are read from the local plugin directory at runtime.
+					// phpcs:disable WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Bundled templates are read from the local plugin directory at runtime.
 					'templates'                  => array(
 						'moreInfo'  => file_get_contents( jeo_get_template( 'map-more-info.ejs' ) ),
 						'popup'     => file_get_contents( jeo_get_template( 'generic-popup.ejs' ) ),
 						'postPopup' => file_get_contents( jeo_get_template( 'post-popup.ejs' ) ),
 					),
-						// phpcs:enable
+					// phpcs:enable
 					'cluster'                    => apply_filters(
 						'jeomap_js_cluster',
 						array(
@@ -1157,6 +1514,10 @@ class Jeo {
 								),
 							),
 						)
+					),
+					'pin_urls'                   => array(
+						'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png' ) ),
+						'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png' ) ),
 					),
 				)
 			);
@@ -1592,10 +1953,12 @@ class Jeo {
 		if ( is_admin() ) {
 			global $wp_post_types;
 
-			$wp_post_types['storymap']->template      = array(
-				array( 'jeo/storymap' ),
-			);
-			$wp_post_types['storymap']->template_lock = 'all';
+			if ( isset( $wp_post_types['storymap'] ) ) {
+				$wp_post_types['storymap']->template      = array(
+					array( 'jeo/storymap' ),
+				);
+				$wp_post_types['storymap']->template_lock = 'all';
+			}
 
 			if ( isset( $wp_post_types['map'] ) ) {
 				$wp_post_types['map']->template = array(
@@ -1627,5 +1990,239 @@ class Jeo {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Normalize a Mapbox style ID to its "username/id" form.
+	 *
+	 * Accepts the raw forms stored across the plugin ("username/id",
+	 * "mapbox://styles/username/id", or a full Styles API URL) and strips
+	 * any query string.
+	 *
+	 * @param string $value Raw style ID.
+	 * @return string|null Normalized ID, or null when empty.
+	 */
+	public static function normalize_mapbox_style_id( $value ) {
+		$value = trim( (string) $value );
+		if ( '' === $value ) {
+			return null;
+		}
+
+		$value = preg_replace( '#^mapbox://styles/#', '', $value );
+		$value = preg_replace( '#^https://api\.mapbox\.com/styles/v1/#', '', $value );
+		$value = strtok( $value, '?' );
+		$value = trim( (string) $value, '/' );
+
+		return '' === $value ? null : $value;
+	}
+
+	/**
+	 * Fetch a Mapbox style JSON from the Mapbox Styles API.
+	 *
+	 * Shared helper used by the map style composer and the minimap render
+	 * order normalization. Access tokens are never exposed in error messages.
+	 *
+	 * Successful responses are cached in a transient (filterable TTL via
+	 * `jeo_mapbox_style_cache_ttl`, default 1 hour) so chat refinements and
+	 * editor previews do not hit the Mapbox API on every request. The cache
+	 * is purged when the layer post is saved or a composed-style refresh is
+	 * forced; pass `bypass_cache => true` in `$args` to skip it. Failures are
+	 * never cached.
+	 *
+	 * @param string $style_id Mapbox style ID ("username/id").
+	 * @param string $token    Access token (per-layer or global).
+	 * @param array  $args     Optional wp_remote_get arguments (timeout, user-agent) plus `bypass_cache`.
+	 * @return array|\WP_Error Style definition as an associative array.
+	 */
+	public static function fetch_mapbox_style( $style_id, $token, array $args = array() ) {
+		$style_id = self::normalize_mapbox_style_id( (string) $style_id );
+		$token    = trim( (string) $token );
+
+		if ( null === $style_id || '' === $token ) {
+			return new \WP_Error( 'jeo_mapbox_style_invalid', __( 'A Mapbox style ID and access token are required.', 'jeowp' ) );
+		}
+
+		$bypass_cache = ! empty( $args['bypass_cache'] );
+		unset( $args['bypass_cache'] );
+
+		$cache_key = self::mapbox_style_cache_key( $style_id, $token );
+
+		if ( ! $bypass_cache ) {
+			$cached = get_transient( $cache_key );
+			if ( is_array( $cached ) ) {
+				return $cached;
+			}
+		}
+
+		$url = add_query_arg(
+			'access_token',
+			$token,
+			'https://api.mapbox.com/styles/v1/' . ltrim( $style_id, '/' )
+		);
+
+		$response = wp_remote_get( $url, $args );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( $code < 200 || $code >= 300 ) {
+			return new \WP_Error(
+				'jeo_mapbox_style_http',
+				sprintf(
+					'Remote request failed with HTTP %1$d for %2$s.',
+					$code,
+					esc_url_raw( preg_replace( '/([?&]access_token=)[^&]+/', '$1***', $url ) )
+				)
+			);
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
+			return new \WP_Error( 'jeo_mapbox_style_json', json_last_error_msg() );
+		}
+
+		if ( ! is_array( $data ) ) {
+			return new \WP_Error( 'jeo_mapbox_style_json', __( 'Unexpected Mapbox style payload.', 'jeowp' ) );
+		}
+
+		set_transient(
+			$cache_key,
+			$data,
+			(int) apply_filters( 'jeo_mapbox_style_cache_ttl', HOUR_IN_SECONDS, $style_id )
+		);
+
+		return $data;
+	}
+
+	/**
+	 * Delete the cached Mapbox style JSON for a style ID and token pair.
+	 *
+	 * Used by the composer's invalidation flows (layer save, forced refresh)
+	 * so the next fetch goes back to the Mapbox API.
+	 *
+	 * @param string $style_id Mapbox style ID ("username/id").
+	 * @param string $token    Access token used to fetch the style.
+	 * @return bool True when a cached entry was deleted.
+	 */
+	public static function delete_mapbox_style_cache( $style_id, $token ) {
+		$style_id = self::normalize_mapbox_style_id( (string) $style_id );
+		$token    = trim( (string) $token );
+
+		if ( null === $style_id || '' === $token ) {
+			return false;
+		}
+
+		return delete_transient( self::mapbox_style_cache_key( $style_id, $token ) );
+	}
+
+	/**
+	 * Build the transient cache key for a Mapbox style.
+	 *
+	 * @param string $style_id Normalized style ID.
+	 * @param string $token    Access token.
+	 * @return string
+	 */
+	private static function mapbox_style_cache_key( $style_id, $token ) {
+		return 'jeo_mapbox_style_json_' . md5( $style_id . '|' . $token );
+	}
+
+	/**
+	 * Fetch a MapLibre GL style JSON from an arbitrary URL.
+	 *
+	 * Generic counterpart of `fetch_mapbox_style()` for keyless style
+	 * providers (OpenFreeMap, VersaTiles, self-hosted) and the `style-json`
+	 * layer type. Only http/https URLs are accepted.
+	 *
+	 * Successful responses are cached in a transient (filterable TTL via
+	 * `jeo_style_json_cache_ttl`, default 1 hour). The cache is purged when
+	 * the layer post is saved or a composed-style refresh is forced; pass
+	 * `bypass_cache => true` in `$args` to skip it. Failures are never cached.
+	 *
+	 * @param string $style_url Public URL of a style JSON file.
+	 * @param array  $args      Optional wp_remote_get arguments (timeout, user-agent) plus `bypass_cache`.
+	 * @return array|\WP_Error Style definition as an associative array.
+	 */
+	public static function fetch_style_json( $style_url, array $args = array() ) {
+		$style_url = esc_url_raw( trim( (string) $style_url ) );
+
+		if ( '' === $style_url || ! preg_match( '#^https?://#i', $style_url ) ) {
+			return new \WP_Error( 'jeo_style_json_invalid', __( 'A valid http(s) style URL is required.', 'jeowp' ) );
+		}
+
+		$bypass_cache = ! empty( $args['bypass_cache'] );
+		unset( $args['bypass_cache'] );
+
+		$cache_key = self::style_json_cache_key( $style_url );
+
+		if ( ! $bypass_cache ) {
+			$cached = get_transient( $cache_key );
+			if ( is_array( $cached ) ) {
+				return $cached;
+			}
+		}
+
+		$response = wp_remote_get( $style_url, $args );
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		if ( $code < 200 || $code >= 300 ) {
+			return new \WP_Error(
+				'jeo_style_json_http',
+				sprintf(
+					'Remote request failed with HTTP %1$d for %2$s.',
+					$code,
+					$style_url
+				)
+			);
+		}
+
+		$data = json_decode( wp_remote_retrieve_body( $response ), true );
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
+			return new \WP_Error( 'jeo_style_json_json', json_last_error_msg() );
+		}
+
+		if ( ! is_array( $data ) ) {
+			return new \WP_Error( 'jeo_style_json_payload', __( 'Unexpected style JSON payload.', 'jeowp' ) );
+		}
+
+		set_transient(
+			$cache_key,
+			$data,
+			(int) apply_filters( 'jeo_style_json_cache_ttl', HOUR_IN_SECONDS, $style_url )
+		);
+
+		return $data;
+	}
+
+	/**
+	 * Delete the cached style JSON for a style URL.
+	 *
+	 * Used by the composer's invalidation flows (layer save, forced refresh)
+	 * so the next fetch goes back to the source.
+	 *
+	 * @param string $style_url Public URL of a style JSON file.
+	 * @return bool True when a cached entry was deleted.
+	 */
+	public static function delete_style_json_cache( $style_url ) {
+		$style_url = esc_url_raw( trim( (string) $style_url ) );
+
+		if ( '' === $style_url ) {
+			return false;
+		}
+
+		return delete_transient( self::style_json_cache_key( $style_url ) );
+	}
+
+	/**
+	 * Build the transient cache key for a style JSON URL.
+	 *
+	 * @param string $style_url Public URL of a style JSON file.
+	 * @return string
+	 */
+	private static function style_json_cache_key( $style_url ) {
+		return 'jeo_style_json_' . md5( $style_url );
 	}
 }

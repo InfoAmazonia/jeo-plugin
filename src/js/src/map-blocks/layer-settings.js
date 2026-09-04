@@ -1,9 +1,11 @@
 import { Dashicon } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { memo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import classNames from 'classnames';
+import { isEqual } from 'lodash-es';
+import { decodeHtmlEntity } from '../shared/html';
+import LayerStyleEditor, { isStyleableLayerType } from '../shared/layer-style-editor';
 import { CheckboxControl, SelectControl } from '../shared/wp-form-controls';
-
 import RadioControl from './radio-control';
 import { layerUseLabels } from './utils';
 
@@ -14,12 +16,6 @@ const useOptions = [
 	{ label: layerUseLabels.swappable, value: 'swappable' },
 	{ label: layerUseLabels.switchable, value: 'switchable' },
 ];
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
 
 const LayerSettings = (
 	{
@@ -36,6 +32,7 @@ const LayerSettings = (
 		updateStyleLayers,
 		switchDefault,
 		updateUse,
+		updateStyle,
 		widths,
 	}
 ) => {
@@ -49,6 +46,7 @@ const LayerSettings = (
 	const rootProps = itemProps || {};
 
 	const [ showStyleLayers, setshowStyleLayers ] = useState( false );
+	const [ showStyleModal, setShowStyleModal ] = useState( false );
 
 	const setWidth = ( index ) =>
 		isDragged && widths.length ? { width: widths[ index ] } : {};
@@ -133,8 +131,17 @@ const LayerSettings = (
 								onChange={ switchShowLegend }
 							/>
 						) }
-					</div>
-					<div className="layer-actions" style={ setWidth( 6 ) }>
+				</div>
+				<div className="layer-actions" style={ setWidth( 6 ) }>
+						{ updateStyle && settings.layer && isStyleableLayerType( settings.layer.meta?.layer_type_options?.type ) && (
+							<button
+								onClick={ () => setShowStyleModal( true ) }
+								className="open-style-editor"
+								title={ __( 'Style layer', 'jeowp' ) }
+							>
+								<Dashicon icon="art" />
+							</button>
+						) }
 						{ settings.load_as_style && (
 							<button
 								onClick={ () => setshowStyleLayers( ! showStyleLayers ) }
@@ -168,7 +175,7 @@ const LayerSettings = (
 									>
 										<path
 											fill="currentColor"
-											d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z"
+											d="M240.971 130.524l194.343 194.343c9.373 9.373 9.373 24.569 0 33.941l-22.667 22.667c-9.357 9.357-24.522 9.375-33.901-.04L224 227.495 69.255 381.516c-9.379 9.335-24.544 9.317-33.901-.04l-22.667-22.667c-9.373-9.373-9.373-24.569 0-33.941L207.03 130.525c9.372-9.373 24.568-9.373 33.941-.001z"
 										></path>
 									</svg>
 								) }
@@ -246,10 +253,29 @@ const LayerSettings = (
 							</div>
 						</>
 					) }
+
+					{ showStyleModal && updateStyle && settings.layer && (
+						<LayerStyleEditor
+							style={ settings.style || {} }
+							layerType={ settings.layer.meta?.layer_type_options?.type }
+							defaultStyle={ settings.layer.meta?.default_style || null }
+							onChange={ updateStyle }
+							onClose={ () => setShowStyleModal( false ) }
+						/>
+					) }
 				</div>
 			) }
 		</>
 	);
 };
 
-export default LayerSettings;
+export default memo( LayerSettings, ( prevProps, nextProps ) => {
+	return (
+		prevProps.index === nextProps.index &&
+		prevProps.isDragged === nextProps.isDragged &&
+		prevProps.isSelected === nextProps.isSelected &&
+		prevProps.isOutOfBounds === nextProps.isOutOfBounds &&
+		isEqual( prevProps.settings, nextProps.settings ) &&
+		isEqual( prevProps.widths, nextProps.widths )
+	);
+} );

@@ -46,8 +46,10 @@ trait Singleton {
 		$mapblocks = array(
 			'jeo/map',
 			'jeo/onetime-map',
+			'jeo/ai-minimap',
 			'jeo/storymap',
 			'jeo/embedded-storymap',
+			'jeo/stories-near-you',
 		);
 
 		$should_load_assets = false;

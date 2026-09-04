@@ -1,5 +1,6 @@
 import Spiderfy from '@nazka/map-gl-js-spiderfy';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { Eta } from 'eta';
 
 import { createMap, getClusterLeaves, loadImage, mapgl, MAP_RUNTIME } from '../lib/mapgl-loader';
 import { loadComposedStyleData } from '../shared/composed-style-data';
@@ -10,24 +11,23 @@ import {
 	setComposedLayerVisibility,
 } from '../shared/composed-style-layers';
 import { computeInlineEnd, computeInlineStart } from '../shared/direction';
+import { decodeHtmlEntity } from '../shared/html';
 import { onFirstIntersection } from '../shared/intersect';
 import { appendRestQueryParams } from '../shared/rest-query';
 import { buildRelatedPostsGeoJson } from '../shared/story-geojson';
-import { EMPTY_STYLE } from '../shared/styles';
+import { EMPTY_STYLE, resolveTileUrl } from '../shared/styles';
 import { normalizeOptionalUrl } from '../shared/url-normalization';
 import { waitMapEvent } from '../shared/wait';
 import { getLayerRequestContext } from './layer-request-context';
 import { toFiniteNumber } from './map-numbers';
 import { getPanLimitsMaxBounds } from './pan-limits';
-import { compileEtaTemplate } from './template-compiler';
 
 import '../../../css/jeo-map.scss';
 
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, ( match, dec ) => {
-		return String.fromCharCode( dec );
-	} );
-};
+globalThis.jeoResolveTileUrl = resolveTileUrl;
+
+const RELATED_POSTS_CLUSTER_BADGE_PREFIX = 'jeo-related-posts-cluster-badge-';
+const SMALL_MAP_CONTROL_MAX_WIDTH = 420;
 
 const chevronLeftSmallIcon = `
 	<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -40,9 +40,6 @@ const chevronRightSmallIcon = `
 		<path d="M10.8622 8.04053L14.2805 12.0286L10.8622 16.0167L9.72327 15.0405L12.3049 12.0286L9.72327 9.01672L10.8622 8.04053Z" />
 	</svg>
 `;
-
-const RELATED_POSTS_CLUSTER_BADGE_PREFIX = 'jeo-related-posts-cluster-badge-';
-const SMALL_MAP_CONTROL_MAX_WIDTH = 420;
 
 function mergeUniqueStoriesById( currentStories = [], nextStories = [] ) {
 	const storiesById = new Map();
@@ -59,7 +56,8 @@ function mergeUniqueStoriesById( currentStories = [], nextStories = [] ) {
 }
 
 function compileTemplate ( template, config = {} ) {
-	return compileEtaTemplate( template, config );
+	const eta = new Eta( config );
+	return eta.compile( template ).bind( eta );
 }
 
 globalThis.Spiderfy = Spiderfy;
@@ -134,9 +132,6 @@ export default class JeoMap {
             			'icon-image': 'news-marker',
 						'icon-size': parseFloat( jeoMapVars.images['/js/src/icons/news-marker'].icon_size ),
         			},
-					spiderLeavesPaint: {
-						'icon-opacity': 1,
-					},
 					onLeafClick: (feature, e) => {
 						this.showPostPopup(feature, e.lngLat);
 					},
@@ -230,38 +225,59 @@ export default class JeoMap {
 						this.mapLoaded.then( () => {
 							if ( usingComposedStyle ) {
 								this.addComposedInteractions( map );
-							} else {
-								this.addComposedStyleWarningMessage();
+						} else {
+							this.addComposedStyleWarningMessage();
+							this.applyBaseStyleLayer( map ).then( () => {
 								layers.forEach( ( layer ) => {
-									if ( this.isMapboxStyleLayer( layer ) ) {
+									if ( this.isStyleLayer( layer ) ) {
 										return;
 									}
 
 									layer.addLayer( map );
 								} );
-							}
-
-							// Add attributions
-							const customAttribution = [];
-							layers.forEach( ( layer ) => {
-								if ( layer.attribution ) {
-									const attributionLink = normalizeOptionalUrl(
-										layer.attribution
-									);
-									const attributionName = layer.attribution_name;
-									const attributionLabel = String(
-										attributionName || ''
-									).replace(
-										/\s/g,
-										''
-									).length
-										? attributionName
-										: attributionLink;
-									customAttribution.push(
-										`<a href="${ attributionLink }">${ attributionLabel }</a>`
-									);
-								}
 							} );
+						}
+
+						// Add attributions
+						const customAttribution = [];
+						layers.forEach( ( layer ) => {
+							if ( layer.attribution ) {
+								// HTML attributions (e.g. base layers: "&copy;
+								// <a href="...">OpenFreeMap</a>") are rendered
+								// as-is — wrapping them in another <a> would
+								// nest anchors, which is invalid HTML and
+								// breaks the attribution control.
+								if ( /<\s*a[\s>]/i.test( layer.attribution ) ) {
+									customAttribution.push( layer.attribution );
+									return;
+								}
+
+							let attributionLink = layer.attribution;
+							const attributionName = layer.attribution_name;
+
+							const regex = new RegExp(
+								/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+							);
+
+							if (
+								layer.attribution &&
+								! layer.attribution.includes( 'http' )
+							) {
+								if ( layer.attribution.match( regex ) ) {
+									attributionLink = `https://${ layer.attribution }`;
+								}
+							}
+							const attributionLabel = attributionName.replace(
+								/\s/g,
+								''
+							).length
+								? attributionName
+								: attributionLink;
+							customAttribution.push(
+								`<a href="${ attributionLink }">${ attributionLabel }</a>`
+							);
+						}
+					} );
 
 							const isMobileViewport = window.matchMedia
 								? window.matchMedia( '(max-width: 599px)' ).matches
@@ -307,6 +323,8 @@ export default class JeoMap {
 				}
 			} )
 			.then( () => {
+				this.addOwnPins();
+
 				// Remove all empty jeo map blocks
 				jQuery(
 					`.jeomap.wp-block-jeo-map.${MAP_RUNTIME}-map:not([data-map_id])`
@@ -321,6 +339,7 @@ export default class JeoMap {
 				this.map_post_object = JSON.parse( previewMapPayload );
 				this.isPreviewMapPayload = Boolean( this.map_post_object );
 			} catch ( error ) {
+				this.isPreviewMapPayload = false;
 				console.warn( 'Unable to parse preview map payload. Falling back to REST data.', error );
 				this.isPreviewMapPayload = false;
 			}
@@ -486,6 +505,32 @@ export default class JeoMap {
 
 	isMapboxStyleLayer( layer ) {
 		return layer?.attributes?.layer_type === 'mapbox';
+	}
+
+	isStyleLayer( layer ) {
+		return layer?.isStyle === true;
+	}
+
+	/**
+	 * Apply the first resolvable style-type layer as the map's base style
+	 * when no composed style is in use. Keyless style types (style-json) load
+	 * their style directly; mapbox styles stay bound to the composed style
+	 * pipeline and are skipped here with the usual warning.
+	 *
+	 * @param {Object} map Map instance.
+	 * @return {Promise} Resolves when the base style has loaded.
+	 */
+	applyBaseStyleLayer( map ) {
+		const baseLayer = this.layers.find( ( layer ) => layer?.isStyle );
+
+		if ( ! baseLayer || ! baseLayer.getStyle?.() ) {
+			return Promise.resolve();
+		}
+
+		baseLayer.addStyle( map );
+		this.mapLoaded = waitMapEvent( map, 'load' );
+
+		return this.mapLoaded;
 	}
 
 	addComposedStyleWarningMessage() {
@@ -1140,6 +1185,8 @@ export default class JeoMap {
 										visible: layersDefinitions[ i ].default,
 										layer_type_options: layerObject.meta.layer_type_options,
 										source_url: layerObject.meta.source_url,
+										style: layersDefinitions[ i ].style,
+										default_style: layerObject.meta.default_style,
 									} )
 								);
 
@@ -1649,6 +1696,7 @@ export default class JeoMap {
 			.map( ( value ) => Number.parseFloat( value ).toFixed( 6 ) )
 			.join( ':' );
 	}
+
 	openClusterPostsPopup( feature, lngLat ) {
 		const clusterId = feature?.properties?.cluster_id;
 		const pointCount = feature?.properties?.point_count;
@@ -1929,9 +1977,14 @@ export default class JeoMap {
 
 		const popUp = new mapgl.Popup().setHTML( popupHTML );
 
+		const lat = parseFloat( point._geocode_lat );
+		const lng = parseFloat( point._geocode_lon );
+
+		if ( isNaN( lat ) || isNaN( lng ) ) return;
+
 		const LngLat = {
-			lat: parseFloat( point._geocode_lat ),
-			lon: parseFloat( point._geocode_lon ),
+			lat: lat,
+			lon: lng,
 		};
 
 		var el = document.createElement( 'div' );
@@ -1975,6 +2028,99 @@ export default class JeoMap {
 				marker._lngLat.lat === activeMarker._lngLat.lat &&
 				marker._lngLat.lon === activeMarker._lngLat.lon;
 			return marker.getElement().classList.toggle( 'marker-active', canToggle );
+		} );
+	}
+
+	addOwnPins() {
+		const pins = this.getArg( 'pins' );
+		const showPins = this.getArg( 'show_pins' );
+
+		if ( ! pins || ! Array.isArray( pins ) || pins.length === 0 ) {
+			return;
+		}
+
+		if ( showPins === 'false' || showPins === false ) {
+			return;
+		}
+
+		if ( ! this.map ) {
+			return;
+		}
+
+		const markerUrl = jeoMapVars.images['/js/src/icons/news-marker'];
+		const hoverUrl = jeoMapVars.images['/js/src/icons/news-marker-hover'];
+
+		if ( markerUrl ) {
+			this.map.loadImage(
+				markerUrl.url,
+				( err, img ) => {
+					if ( err || ! img ) {
+						this.addOwnPinsAsMarkers( pins );
+						return;
+					}
+					if ( ! this.map.hasImage( 'own-pin-primary' ) ) {
+						this.map.addImage( 'own-pin-primary', img, { sdf: false } );
+					}
+				}
+			);
+		}
+
+		if ( hoverUrl ) {
+			this.map.loadImage(
+				hoverUrl.url,
+				( err, img ) => {
+					if ( err || ! img ) {
+						return;
+					}
+					if ( ! this.map.hasImage( 'own-pin-secondary' ) ) {
+						this.map.addImage( 'own-pin-secondary', img, { sdf: false } );
+					}
+				}
+			);
+		}
+
+		this.addOwnPinsAsMarkers( pins );
+	}
+
+	addOwnPinsAsMarkers( pins ) {
+		pins.forEach( ( pin ) => {
+			const lat = parseFloat( pin.lat );
+			const lon = parseFloat( pin.lon );
+
+			if ( Number.isNaN( lat ) || Number.isNaN( lon ) ) {
+				return;
+			}
+
+			const isSecondary = pin.relevance === 'secondary';
+			const url = isSecondary
+				? `url(${ jeoMapVars.images['/js/src/icons/news-marker-hover'].url })`
+				: `url(${ jeoMapVars.images['/js/src/icons/news-marker'].url })`;
+
+			const el = document.createElement( 'div' );
+			el.className = 'marker';
+			el.style.background = url;
+			el.style.width = '27px';
+			el.style.height = '36px';
+			el.style.backgroundSize = 'cover';
+
+			const lngLat = { lat, lon };
+
+			const marker = new mapgl.Marker( { element: el, anchor: 'bottom' } )
+				.setLngLat( lngLat )
+				.addTo( this.map );
+
+			this.markers.push( marker );
+
+			if ( pin.address ) {
+				const popup = new mapgl.Popup( { offset: 25, closeButton: false } )
+					.setHTML( `<div class="popup popup-wmt"><p>${ pin.address }</p></div>` );
+
+				marker.setPopup( popup );
+
+				marker.getElement().addEventListener( 'click', () => {
+					this.map.flyTo( { center: lngLat } );
+				} );
+			}
 		} );
 	}
 
@@ -2256,11 +2402,16 @@ export default class JeoMap {
 									);
 								}
 							} );
-						} else {
-							if ( this.map.getLayer( layer_id ) ) {
-								this.map.setLayoutProperty( layer_id, 'visibility', visibility );
-							}
+					} else {
+						if ( this.map.getLayer( layer_id ) ) {
+							this.map.setLayoutProperty( layer_id, 'visibility', visibility );
 						}
+						// The geojson layer type adds a companion outline layer.
+						const outlineLayerId = layer_id + '__outline';
+						if ( this.map.getLayer( outlineLayerId ) ) {
+							this.map.setLayoutProperty( outlineLayerId, 'visibility', visibility );
+						}
+					}
 					}
 				} );
 			}
@@ -2269,12 +2420,13 @@ export default class JeoMap {
 
 	checkCustomToken( attributes ) {
 		if ( attributes.layer_type_options.access_token ) {
-			if ( attributes.layer_type_options.style_id ) {
-				const accessToken = attributes.layer_type_options.access_token;
+			const accessToken = attributes.layer_type_options.access_token;
 
-				const styleId = attributes.layer_type_options.style_id.replace( 'mapbox://styles/', '' );
-				const mapboxUser = styleId.split( '/' )[0];
+			const styleId = attributes.layer_type_options.style_id?.replace( 'mapbox://styles/', '' );
+			const tilesetId = attributes.layer_type_options.tileset_id?.replace( 'mapbox://', '' );
+			const mapboxUser = styleId?.split( '/' )[0] || tilesetId?.split( '.' )[0];
 
+			if ( mapboxUser ) {
 				this.customTokens[ mapboxUser ] = accessToken;
 			}
 		}

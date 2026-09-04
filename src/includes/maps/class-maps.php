@@ -34,7 +34,7 @@ class Maps {
 	 * @return void
 	 */
 	protected function init() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'register_post_type' ), 20 );
 		add_action( 'init', array( $this, 'register_shortcode' ) );
 		add_filter( 'single_template', array( $this, 'override_template' ) );
 		add_filter( 'the_content', array( $this, 'the_content_filter' ) );
@@ -185,6 +185,28 @@ class Maps {
 								'show_legend'   => array(
 									'description' => __( 'Indicates if the legend of this layer should be displayed or not', 'jeowp' ),
 									'type'        => 'boolean',
+								),
+								'style'         => array(
+									'description' => __( 'Per-instance paint and layout overrides for vector and GeoJSON layers', 'jeowp' ),
+									'type'        => 'object',
+									'properties'  => array(
+										'use_default' => array(
+											'description' => __( 'Whether to use the layer default_style meta instead of the instance paint', 'jeowp' ),
+											'type'        => 'boolean',
+										),
+										'paint'       => array(
+											'description' => __( 'Map paint properties', 'jeowp' ),
+											'type'        => 'object',
+										),
+										'layout'      => array(
+											'description' => __( 'Map layout properties', 'jeowp' ),
+											'type'        => 'object',
+										),
+										'filter'      => array(
+											'description' => __( 'MapLibre filter expression', 'jeowp' ),
+											'type'        => 'array',
+										),
+									),
 								),
 							),
 							'required'   => array( 'id', 'use' ),

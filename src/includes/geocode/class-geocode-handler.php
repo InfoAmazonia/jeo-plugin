@@ -1,25 +1,23 @@
 <?php
 /**
- * Geocoding registration and metadata indexing.
+ * Geocode Handler class file.
  *
  * @package Jeo
  */
 
 namespace Jeo;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 /**
- * Register geocoders, AJAX endpoints and geocode metadata.
+ * Handles geocoding operations, metadata registration, and geocoder management.
+ *
+ * @package Jeo
  */
 class Geocode_Handler {
 
 	use Singleton;
 
 	/**
-	 * Geocode metadata keys indexed per post.
+	 * List of geocode attribute keys.
 	 *
 	 * @var array
 	 */
@@ -33,10 +31,13 @@ class Geocode_Handler {
 		'_geocode_region_level_1',
 		'_geocode_country_code',
 		'_geocode_country',
+		'_geocode_address',
+		'_geocode_address_number',
+		'_geocode_postcode',
 	);
 
 	/**
-	 * Register geocoding hooks.
+	 * Initialize hooks and geocode metadata.
 	 *
 	 * @return void
 	 */
@@ -49,28 +50,29 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Registered geocoders keyed by slug.
+	 * Registered geocoder definitions.
 	 *
 	 * @var array
 	 */
 	private $registered_geocoders = array();
 
 	/**
-	 * Handle forward geocoding requests for authenticated editors.
+	 * AJAX handler that geocodes a search string using the active geocoder and returns JSON.
 	 *
 	 * @return void
 	 */
 	public function ajax_geocode() {
-		check_ajax_referer( 'jeo_geocode', 'nonce' );
+		check_ajax_referer( 'jeo_geocode_nonce', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array(), 403 );
+			wp_send_json_error( array( 'message' => 'Unauthorized.' ), 403 );
 		}
 
 		$search = '';
 		if ( isset( $_GET['search'] ) ) {
 			$search = sanitize_text_field( wp_unslash( $_GET['search'] ) );
 		}
+
 		$geocoder = $this->get_active_geocoder();
 
 		if ( ! $geocoder || empty( $search ) ) {
@@ -88,36 +90,27 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Handle reverse-geocoding requests for authenticated editors.
+	 * AJAX handler that reverse-geocodes lat/lon using the active geocoder.
 	 *
 	 * @return void
 	 */
 	public function ajax_reverse_geocode() {
-		check_ajax_referer( 'jeo_geocode', 'nonce' );
+		check_ajax_referer( 'jeo_geocode_nonce', 'nonce' );
 
 		if ( ! current_user_can( 'edit_posts' ) ) {
-			wp_send_json_error( array(), 403 );
+			wp_send_json_error( array( 'message' => 'Unauthorized.' ), 403 );
 		}
 
-		$lat      = filter_input( INPUT_GET, 'lat', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
-		$lon      = filter_input( INPUT_GET, 'lon', FILTER_SANITIZE_FULL_SPECIAL_CHARS );
 		$geocoder = $this->get_active_geocoder();
-
-		if ( ! $geocoder || null === $lat || null === $lon ) {
-			wp_send_json( array() );
+		if ( $geocoder ) {
+			echo wp_json_encode( $geocoder->reverse_geocode( sanitize_text_field( wp_unslash( $_GET['lat'] ) ), sanitize_text_field( wp_unslash( $_GET['lon'] ) ) ) );
 		}
-
-		wp_send_json(
-			$geocoder->reverse_geocode(
-				sanitize_text_field( $lat ),
-				sanitize_text_field( $lon )
-			)
-		);
+		die;
 	}
 
 	/**
 	 * Registers all core geocoders and fires the hook for
-	 * external geocoders to be registered.
+	 * extenals geocoders to be registered
 	 *
 	 * @return void
 	 */
@@ -131,9 +124,18 @@ class Geocode_Handler {
 				'class_name'  => '\Jeo\Geocoders\Nominatim',
 			)
 		);
+		// Register Mapbox geocoder.
+		$this->register_geocoder(
+			array(
+				'slug'        => 'mapbox',
+				'name'        => 'Mapbox',
+				'description' => __( 'Service provided by Mapbox (requires API Key).', 'jeowp' ),
+				'class_name'  => '\Jeo\Geocoders\Mapbox',
+			)
+		);
 
 		/**
-		 * Hook used to register geocoders.
+		 * Hook used to register geocoders
 		 *
 		 * Example:
 		 * add_action('jeo_register_geocoders', function($geocoders) {
@@ -145,13 +147,13 @@ class Geocode_Handler {
 		 *      ]);
 		 * });
 		 *
-		 * @param Jeo\Geocode_Handler $geocoders The Geocode_Handler instance.
+		 * @param Jeo\Geocode_Handler The Geocode_Handler instance
 		 */
 		do_action( 'jeo_register_geocoders', $this );
 	}
 
 	/**
-	 * Return the currently configured geocoder instance.
+	 * Return an instance of the currently active geocoder based on settings.
 	 *
 	 * @return Geocoder|false
 	 */
@@ -162,7 +164,7 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Register geocoding-related post meta.
+	 * Register the `_related_point` and all index metadata for enabled post types.
 	 *
 	 * @return void
 	 */
@@ -174,6 +176,10 @@ class Geocode_Handler {
 			$post_types = array( 'post' );
 		}
 		foreach ( $post_types as $type ) {
+
+				// Garante que o Post Type tenha suporte a custom-fields, essencial para a REST API expor a chave 'meta'.
+				add_post_type_support( $type, 'custom-fields' );
+
 				register_post_meta(
 					$type,
 					'_related_point',
@@ -181,16 +187,16 @@ class Geocode_Handler {
 						'show_in_rest'      => array(
 							'schema' => array(
 								'properties'           => array(
-									'_geocode_lat'     => array(
+									'_geocode_lat'      => array(
 										'type' => 'number',
 									),
-									'_geocode_lon'     => array(
+									'_geocode_lon'      => array(
 										'type' => 'number',
 									),
 									'_geocode_city_level_1' => array(
 										'type' => 'string',
 									),
-									'_geocode_city'    => array(
+									'_geocode_city'     => array(
 										'type' => 'string',
 									),
 									'_geocode_region_level_3' => array(
@@ -205,21 +211,33 @@ class Geocode_Handler {
 									'_geocode_country_code' => array(
 										'type' => 'string',
 									),
-									'_geocode_country' => array(
+									'_geocode_country'  => array(
+										'type' => 'string',
+									),
+									'_geocode_address'  => array(
+										'type' => 'string',
+									),
+									'_geocode_address_number' => array(
+										'type' => 'string',
+									),
+									'_geocode_postcode' => array(
 										'type' => 'string',
 									),
 									'_geocode_full_address' => array(
 										'type' => 'string',
 									),
-									'relevance'        => array(
+									'relevance'         => array(
 										'type' => 'string',
 										'enum' => array(
 											'primary',
 											'secondary',
 										),
 									),
+									'_ai_quote'         => array(
+										'type' => 'string',
+									),
 								),
-								'additionalProperties' => false,
+								'additionalProperties' => true,
 							),
 						),
 						'single'            => false,
@@ -235,7 +253,7 @@ class Geocode_Handler {
 			foreach ( array( 'p', 's' )  as $relevance ) {
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_lat_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -249,7 +267,10 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
+					// Must match the index meta actually written in update_meta_indexes()
+					// (derived from $geo_attributes, which uses `_geocode_lon`). Registering
+					// `_geocode_lng_*` here left the real index meta unregistered.
 					'_geocode_lon_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -263,7 +284,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_country_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -277,7 +298,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_country_code_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -291,7 +312,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_region_level_1_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -305,7 +326,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_region_level_2_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -319,7 +340,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_region_level_3_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -333,7 +354,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_city_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -347,7 +368,7 @@ class Geocode_Handler {
 				);
 
 				register_post_meta(
-					'post',
+					$type,
 					'_geocode_city_level_1_' . $relevance,
 					array(
 						'show_in_rest'  => false,
@@ -365,15 +386,15 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Register a geocoder definition.
+	 * Register Geocoder
 	 *
 	 * @param array $geocoder {
-	 *     Required. Array of arguments describing the geocoder.
+	 *     Required. Array or string of arguments describing the geocoder.
 	 *
-	 *     @type string $name        The name of the geocoder. e.g. 'Example geocoder'.
-	 *     @type string $slug        A unique slug for the geocoder. e.g. 'example-geocoder'.
-	 *     @type string $description The geocoder description.
-	 *     @type string $class_name  The geocoder class. e.g. '\Jeo\Geocoders\Test_Geocoder'.
+	 *     @type string      $name                  The name of the geocoder. e.g. 'Example geocoder'
+	 *     @type string      $slug                  A unique slug for the geocoder. e.g. 'example-geocoder'
+	 *     @type string      $description           The geocoder description. e.g. 'This is an example geocoder description'
+	 *     @type string      $class_name            The geocoder Class. e.g. '\Jeo\Geocoders\Test_geocoder'
 	 */
 	public function register_geocoder( array $geocoder ) {
 
@@ -387,9 +408,9 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Remove a registered geocoder.
+	 * Remove a registered geocoder by slug.
 	 *
-	 * @param string $geocoder_slug Geocoder slug.
+	 * @param string $geocoder_slug Unique geocoder slug.
 	 * @return void
 	 */
 	public function unregister_geocoder( $geocoder_slug ) {
@@ -397,7 +418,7 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Return the registered geocoder definitions.
+	 * Lazily initialize and return all registered geocoders.
 	 *
 	 * @return array
 	 */
@@ -409,9 +430,9 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Return a single geocoder definition.
+	 * Return the definition array for a single registered geocoder by slug.
 	 *
-	 * @param string $geocoder_slug Geocoder slug.
+	 * @param string $geocoder_slug Unique geocoder slug.
 	 * @return array|null
 	 */
 	public function get_geocoder( $geocoder_slug ) {
@@ -423,14 +444,14 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Return the geocoder definition that matches an instantiated object.
+	 * Look up a registered geocoder definition matching a Geocoder object instance by class name.
 	 *
-	 * @param \Jeo\Geocoder $geocoder_object Geocoder instance.
+	 * @param \Jeo\Geocoder $geocoder_object Geocoder instance to look up.
 	 * @return array|null
 	 */
 	public function get_geocoder_by_object( \Jeo\Geocoder $geocoder_object ) {
 		$class_name = get_class( $geocoder_object );
-		// Add the leading namespace separator expected by registered class names.
+		// Add first bracket.
 		$class_name = '\\' . $class_name;
 		$geocoders  = $this->get_registered_geocoders();
 		foreach ( $geocoders as $geocoder ) {
@@ -442,9 +463,9 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Instantiate a geocoder by slug.
+	 * Instantiate and return a Geocoder object for the given slug.
 	 *
-	 * @param string $geocoder_slug Geocoder slug.
+	 * @param string $geocoder_slug Unique geocoder slug.
 	 * @return Geocoder|false
 	 */
 	public function initialize_geocoder( $geocoder_slug ) {
@@ -460,14 +481,14 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Ensure coordinates are stored as strings with dots as decimal separators.
+	 * Makes sure coordinates are stores as strings with dots as decimal separator
 	 *
-	 * We do not store them as floats because updates had precision and serialization issues.
-	 * When the WordPress REST API updates values, it deletes older occurrences and passes the
-	 * value through wp_slash, converting floats to strings.
+	 * We dont store them as float because we had problems updating them that way. When
+	 * WordPress API tries to update values, it deletes older occurrences and passes the value
+	 * through wp_slash and coverts float to string. (In WP_REST_Meta_Fields::update_multi_meta_value())
 	 *
-	 * @param object|array $value Point payload.
-	 * @return object|array
+	 * @param object|array $value Sanitized value.
+	 * @return object|array $value
 	 */
 	public function sanitize_points( $value ) {
 
@@ -491,7 +512,7 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Register hooks that maintain the geocode index metadata.
+	 * Register the metadata filter and action hooks used to maintain geocode index meta.
 	 *
 	 * @return void
 	 */
@@ -505,7 +526,7 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Remove hooks that maintain the geocode index metadata.
+	 * Remove the metadata filter and action hooks to prevent recursion during index updates.
 	 *
 	 * @return void
 	 */
@@ -519,19 +540,18 @@ class Geocode_Handler {
 	}
 
 	/**
-	 * Block direct writes to derived geocode index metadata.
+	 * Metadata used as indexes are generated automatically when _primary_point and _secondary_point are updated
+	 * and should not be updated directly.
 	 *
-	 * Metadata used as indexes is generated automatically when related points are updated.
-	 *
-	 * @param mixed  $check Existing short-circuit value.
+	 * @param mixed  $check     Whether to allow update.
 	 * @param int    $object_id Post ID.
-	 * @param string $meta_key Meta key being written.
+	 * @param string $meta_key  Meta key.
 	 * @return mixed
 	 */
 	public function disable_update_post_meta( $check, $object_id, $meta_key ) {
 
 		// The name of the meta without the last _s or _p suffix.
-		$raw_key = substr( $meta_key, 0, strlen( $meta_key ) );
+		$raw_key = substr( $meta_key, 0, -2 );
 		if ( in_array( $raw_key, $this->geo_attributes, true ) ) {
 			return false;
 		}
@@ -545,9 +565,9 @@ class Geocode_Handler {
 	 *
 	 * This serves as an index so we can find posts by this information.
 	 *
-	 * @param int    $meta_id Meta row ID.
+	 * @param int    $meta_id   Meta ID.
 	 * @param int    $object_id Post ID.
-	 * @param string $meta_key Meta key being updated.
+	 * @param string $meta_key  Meta key.
 	 * @return void
 	 */
 	public function update_meta_indexes( $meta_id, $object_id, $meta_key ) {
@@ -566,7 +586,9 @@ class Geocode_Handler {
 
 				foreach ( $all_points as $point ) {
 
-					$suffix = 'primary' === $point['relevance'] ? '_p' : '_s';
+					// Fallback to secondary if relevance is missing to prevent PHP warnings.
+					$point_relevance = isset( $point['relevance'] ) ? $point['relevance'] : 'secondary';
+					$suffix          = 'primary' === $point_relevance ? '_p' : '_s';
 
 					if ( isset( $point[ $attr ] ) ) {
 						add_post_meta( $object_id, $attr . $suffix, $point[ $attr ] );
@@ -575,6 +597,7 @@ class Geocode_Handler {
 			}
 
 			$this->add_index_metadata_hooks();
+
 		}
 	}
 }

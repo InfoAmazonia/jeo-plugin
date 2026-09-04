@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Quilombo dos Palmares",
+    "type": "quilombola_territory",
+    "lat": -9.170,
+    "lng": -36.080,
+    "aliases": ["Palmares", "Serra da Barriga", "Território Quilombola dos Palmares"]
+  },
+  {
+    "name": "Quilombo Kalunga",
+    "type": "quilombola_territory",
+    "lat": -13.600,
+    "lng": -47.450,
+    "aliases": ["Território Kalunga", "Povo Kalunga", "Comunidade Kalunga"]
+  },
+  {
+    "name": "Quilombo de Alcântara",
+    "type": "quilombola_territory",
+    "lat": -2.400,
+    "lng": -44.400,
+    "aliases": ["Território Quilombola de Alcântara", "Comunidades de Alcântara"]
+  }
+]

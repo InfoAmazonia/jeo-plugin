@@ -12,7 +12,7 @@ import {
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lng,
+	center_lon: jeo_settings.map_defaults.lon,
 	min_zoom: 0,
 	max_zoom: 20,
 	disable_scroll_zoom: jeo_settings.map_defaults.disable_scroll_zoom,
@@ -30,7 +30,7 @@ function parseNumber( value ) {
 	return isNaN( numValue ) ? value : numValue;
 }
 
-export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
+export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = false } ) => {
 	const {
 		center_lat: centerLat,
 		center_lon: centerLon,
@@ -244,6 +244,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 					</p>
 				</section>
 
+				{ ! isMapBlock && (
 				<section className="public-maps">
 					<h3>{ __( 'For public maps only', 'jeowp' ) }</h3>
 
@@ -267,6 +268,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap } ) => {
 						} }
 					/>
 				</section>
+			) }
 			</form>
 		</Fragment>
 	);

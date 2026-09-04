@@ -1,14 +1,9 @@
 import { Button } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 import { layerUseLabels, loadLayer } from './utils';
+import { decodeHtmlEntity, sanitizeHtml } from '../shared/html';
 import './layers-panel.css';
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
 
 export default function ( {
 	attributes,
@@ -31,6 +26,9 @@ export default function ( {
 				<ol>
 					{ layers.map( ( layerSettings ) => {
 						const settings = loadLayer( loadedLayers, layerSettings );
+						const attribution = settings.layer?.meta?.attribution || '';
+						const themes = layerSettings.themes || settings.layer?.meta?.themes || '';
+						const description = settings.layer?.excerpt?.rendered || settings.layer?.content?.rendered || '';
 						return (
 							settings.layer && (
 								<li className="jeo-setting-layer" key={ settings.id }>
@@ -38,10 +36,37 @@ export default function ( {
 										{ decodeHtmlEntity( settings.layer.title.rendered ) } -{ ' ' }
 										{ settings.layer.meta.type }
 									</h2>
+									{ description && (
+										<p className="jeo-layer-description">
+											{ decodeHtmlEntity( description.replace( /<[^>]+>/g, '' ) ) }
+										</p>
+									) }
+									{ layerSettings.reason && (
+										<p className="jeo-layer-reason">{ layerSettings.reason }</p>
+									) }
+									{ layerSettings.auto_style && (
+										<p className="jeo-layer-autostyle">
+											{ __(
+												'Automatic style applied (this layer had no saved style). Edit layer settings to customize it.',
+												'jeowp'
+											) }
+										</p>
+									) }
+									{ themes && (
+										<p className="jeo-layer-meta">
+											<strong>{ __( 'Themes:', 'jeowp' ) }</strong> { themes }
+										</p>
+									) }
+									{ attribution && (
+										<p className="jeo-layer-meta">
+											<strong>{ __( 'Source:', 'jeowp' ) }</strong>{ ' ' }
+											<span dangerouslySetInnerHTML={ { __html: sanitizeHtml( attribution ) } } />
+										</p>
+									) }
 									{ layerUseLabels[ settings.use ] }
 									{ settings.use !== 'fixed' &&
 										settings.default &&
-										' - ' + __( 'Default', 'jeowp' ) }
+										' - ' + _x( 'Default', 'layer usage default label', 'jeowp' ) }
 								</li>
 							)
 						);

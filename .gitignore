@@ -1,6 +1,13 @@
 build-config.cfg
 tests/bootstrap-config.php
 node_modules
+.tmp/
+.docker/*
+!.docker/docker-compose.yml
+!.docker/.env
+!.docker/start.sh
+!.docker/switch-php.sh
+!.docker/wp.sh
 src/js/build
 src/languages/*.mo
 src/languages/*.json
@@ -11,6 +18,7 @@ jeowp.zip
 /wordpress/
 /test-environment/
 /vendor/
+/src/vendor/
 wp-content
 
 wp-content/*
@@ -28,3 +36,4 @@ dump.sql
 
 .DS_Store
 Thumbs.db
+dist/

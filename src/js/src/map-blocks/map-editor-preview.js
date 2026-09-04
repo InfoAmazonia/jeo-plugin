@@ -18,7 +18,7 @@ import {
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lng,
+	center_lon: jeo_settings.map_defaults.lon,
 	min_zoom: 0,
 	max_zoom: 20,
 };
@@ -43,17 +43,11 @@ export default function MapEditorPreview() {
 	);
 
 	const [ zoomState, setZoomState ] = useState( 'initial_zoom' );
-	const [ key, setKey ] = useState( 0 );
 	const mapRef = useRef( undefined );
 
-	// Expose setPanLimitsFromMap for the sidebar MapSettings button.
-	// Since the block runs inside the iframe and the sidebar in the parent,
-	// we use the editor data store to bridge them: MapSettings dispatches
-	// a custom action, and this block listens via a window message (future).
-	// For now, store the function on the iframe window so MapPanel can
-	// call it via cross-frame messaging if needed.
+	// Bridge pan-limits to the sidebar (parent document) via parent window.
 	useEffect( () => {
-		window.__jeoSetPanLimitsFromMap = () => {
+		const fn = () => {
 			const { current: map } = mapRef;
 			if ( map ) {
 				const bounds = map.getBounds();
@@ -69,9 +63,17 @@ export default function MapEditorPreview() {
 				} );
 			}
 		};
-		return () => {
-			delete window.__jeoSetPanLimitsFromMap;
-		};
+		try {
+			window.parent.__jeoSetPanLimitsFromMap = fn;
+			return () => {
+				delete window.parent.__jeoSetPanLimitsFromMap;
+			};
+		} catch ( e ) {
+			window.__jeoSetPanLimitsFromMap = fn;
+			return () => {
+				delete window.__jeoSetPanLimitsFromMap;
+			};
+		}
 	}, [ setPostMeta ] );
 
 	const {
@@ -151,8 +153,6 @@ export default function MapEditorPreview() {
 		border: 0,
 	} );
 
-	// Stop mouse events from propagating to the block editor's selection
-	// handler so the map remains draggable inside the block.
 	const stopPropagation = useCallback( ( e ) => e.stopPropagation(), [] );
 
 	return (
@@ -175,10 +175,7 @@ export default function MapEditorPreview() {
 							className="zoom-button"
 							variant="primary"
 							isLarge
-							onClick={ () => {
-								setZoomState( 'initial_zoom' );
-								setKey( ( currentKey ) => currentKey + 1 );
-							} }
+							onClick={ () => setZoomState( 'initial_zoom' ) }
 						>
 							{ __( 'Initial Zoom', 'jeowp' ) }
 						</Button>
@@ -192,7 +189,6 @@ export default function MapEditorPreview() {
 									setPostMeta( { min_zoom: 0.1 } );
 								}
 								setZoomState( 'min_zoom' );
-								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
 							{ __( 'Min Zoom', 'jeowp' ) }
@@ -207,7 +203,6 @@ export default function MapEditorPreview() {
 									setPostMeta( { max_zoom: 0.1 } );
 								}
 								setZoomState( 'max_zoom' );
-								setKey( ( currentKey ) => currentKey + 1 );
 							} }
 						>
 							{ __( 'Max Zoom', 'jeowp' ) }
@@ -217,7 +212,7 @@ export default function MapEditorPreview() {
 				{ ! shouldRenderMap && <Spinner /> }
 				{ shouldRenderMap && (
 					<Map
-						key={ `${ key }:${ zoomState }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
+						key={ `${ zoomState }:${ layerSettingsKey }:${ composedPreview.metadata?.hash || 'default' }` }
 						ref={ mapRef }
 						mapStyle={ useComposedPreview ? composedPreview.style : undefined }
 						style={ { height: '500px', width: '100%' } }
