@@ -64,7 +64,7 @@
 		"@nazka/map-gl-js-spiderfy": "^2.0.0",
 		"@rjsf/core": "^6.5.3",
 		"@rjsf/validator-ajv8": "^6.5.3",
-		"@wordpress/editor": "^14.46.0",
+		"@wordpress/editor": "^14.54.0",
 		"ckeditor5": "^48.1.1",
 		"classnames": "^2.5.1",
 		"date-fns": "^4.2.1",
