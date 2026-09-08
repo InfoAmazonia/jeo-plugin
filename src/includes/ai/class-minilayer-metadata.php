@@ -58,7 +58,9 @@ class Minilayer_Metadata {
 		$parts[] = sprintf( __( 'AI-generated layer: %s.', 'jeowp' ), $layer_title );
 
 		if ( '' !== $attribution ) {
-			$parts[] = $attribution;
+			// Keep the plain-text excerpt free of markup and encoded entities
+			// (e.g. "&copy; <a href=...>Source</a>" becomes "© Source").
+			$parts[] = html_entity_decode( wp_strip_all_tags( $attribution ), ENT_QUOTES, get_bloginfo( 'charset' ) );
 		}
 
 		if ( '' !== $source ) {

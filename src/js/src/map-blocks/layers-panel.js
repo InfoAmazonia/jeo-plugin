@@ -2,7 +2,7 @@ import { Button } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 
 import { layerUseLabels, loadLayer } from './utils';
-import { decodeHtmlEntity, sanitizeHtml } from '../shared/html';
+import { decodeHtmlEntity, decodeHtmlEntities, sanitizeHtml } from '../shared/html';
 import './layers-panel.css';
 
 export default function ( {
@@ -38,7 +38,7 @@ export default function ( {
 									</h2>
 									{ description && (
 										<p className="jeo-layer-description">
-											{ decodeHtmlEntity( description.replace( /<[^>]+>/g, '' ) ) }
+											{ decodeHtmlEntities( description.replace( /<[^>]+>/g, '' ) ) }
 										</p>
 									) }
 									{ layerSettings.reason && (

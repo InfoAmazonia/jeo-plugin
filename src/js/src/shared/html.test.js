@@ -10,6 +10,18 @@ describe( 'decodeHtmlEntities', () => {
 	it( 'decodes named and numeric entities', () => {
 		expect( decodeHtmlEntities( '&copy; &amp; &#169;' ) ).toBe( '© & ©' );
 	} );
+
+	it( 'decodes named entities embedded in AI layer explanations', () => {
+		// Shape returned by the WP REST API (`excerpt.rendered`) for AI-generated
+		// layers whose excerpt embeds the raw layer attribution.
+		const description =
+			'<p>AI-generated layer: Rivers. &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> Data source: osm.</p>';
+		expect(
+			decodeHtmlEntities( description.replace( /<[^>]+>/g, '' ) )
+		).toBe(
+			'AI-generated layer: Rivers. © OpenStreetMap Data source: osm.'
+		);
+	} );
 } );
 
 describe( 'sanitizeHtml', () => {

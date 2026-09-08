@@ -8,7 +8,7 @@ import { List, arrayMove } from 'react-movable';
 import LayerSettings from './layer-settings';
 import { mergeLayerTypeOptions } from './layer-type-options';
 import { loadLayer } from './utils';
-import { decodeHtmlEntity, sanitizeHtml } from '../shared/html';
+import { decodeHtmlEntity, decodeHtmlEntities, sanitizeHtml } from '../shared/html';
 import { usePaginatedRecords } from '../shared/rest-records';
 
 import './layers-settings.css';
@@ -374,7 +374,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 											</p>
 											{ ( layer.excerpt?.rendered || layer.content?.rendered ) && (
 												<p className="layer-description">
-													{ decodeHtmlEntity( ( layer.excerpt?.rendered || layer.content?.rendered ).replace( /<[^>]+>/g, '' ) ) }
+													{ decodeHtmlEntities( ( layer.excerpt?.rendered || layer.content?.rendered ).replace( /<[^>]+>/g, '' ) ) }
 												</p>
 											) }
 											{ ( layer.meta.attribution || layer['layer-theme']?.length > 0 ) && (
