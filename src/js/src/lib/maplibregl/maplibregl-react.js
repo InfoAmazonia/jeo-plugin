@@ -147,4 +147,4 @@ function MapGL( { children, controls = undefined, fullscreen = true, mapStyle = 
 
 export const Map = forwardRef(MapGL)
 
-export { Layer, Source } from 'react-map-gl/maplibre'
+export { Layer, Marker, Source } from 'react-map-gl/maplibre'

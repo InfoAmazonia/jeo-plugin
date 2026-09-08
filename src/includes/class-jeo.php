@@ -990,6 +990,7 @@ class Jeo {
 				'composedStyleUrlBase'       => rest_url( 'jeo/v1/map-style/' ),
 				'composedStyleComposeUrl'    => rest_url( 'jeo/v1/map-style/compose' ),
 				'composedStyleDefaultGlyphs' => $this->get_composed_style_default_glyphs(),
+				'images'                     => $this->get_map_icon_images(),
 				'nonce'                      => $this->get_rest_nonce(),
 				'currentLang'                => $this->get_current_language(),
 			)
@@ -1478,43 +1479,7 @@ class Jeo {
 							'circle_color' => '#ffffff',
 						)
 					),
-					'images'                     => apply_filters(
-						'jeomap_js_images',
-						array(
-							'/js/src/icons/news-marker' => array(
-								'url'       => add_query_arg(
-									'ver',
-									JEO_VERSION,
-									JEO_BASEURL . '/js/src/icons/news-marker.png'
-								),
-								'icon_size' => 0.1,
-							),
-							'/js/src/icons/news-marker-hover' => array(
-								'url'       => add_query_arg(
-									'ver',
-									JEO_VERSION,
-									JEO_BASEURL . '/js/src/icons/news-marker-hover.png'
-								),
-								'icon_size' => 0.1,
-							),
-							'/js/src/icons/news'        => array(
-								'url'        => add_query_arg(
-									'ver',
-									JEO_VERSION,
-									JEO_BASEURL . '/js/src/icons/news.png'
-								),
-								'icon_size'  => 0.13,
-								'text_color' => '#202202',
-							),
-							'/js/src/icons/cluster'     => array(
-								'url' => add_query_arg(
-									'ver',
-									JEO_VERSION,
-									JEO_BASEURL . '/js/src/icons/cluster.png'
-								),
-							),
-						)
-					),
+					'images'                     => $this->get_map_icon_images(),
 					'pin_urls'                   => array(
 						'primary'   => esc_url( \jeo_settings()->get_option( 'jeo_pin_primary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-blue.png' ) ),
 						'secondary' => esc_url( \jeo_settings()->get_option( 'jeo_pin_secondary_url', 'https://cdn.jsdelivr.net/gh/pointhi/leaflet-color-markers/img/marker-icon-grey.png' ) ),
@@ -1530,6 +1495,54 @@ class Jeo {
 		if ( $this->should_log_storymap_assets() ) {
 			$this->enqueue_storymap_scripts();
 		}
+	}
+
+	/**
+	 * Shared map icon definitions for script localization.
+	 *
+	 * Used by both the frontend runtime (`jeo-map`) and the editor blocks
+	 * bundle (`jeo-map-blocks`) so previews render the same marker icons.
+	 *
+	 * @return array
+	 */
+	private function get_map_icon_images() {
+		return apply_filters(
+			'jeomap_js_images',
+			array(
+				'/js/src/icons/news-marker'       => array(
+					'url'       => add_query_arg(
+						'ver',
+						JEO_VERSION,
+						JEO_BASEURL . '/js/src/icons/news-marker.png'
+					),
+					'icon_size' => 0.1,
+				),
+				'/js/src/icons/news-marker-hover' => array(
+					'url'       => add_query_arg(
+						'ver',
+						JEO_VERSION,
+						JEO_BASEURL . '/js/src/icons/news-marker-hover.png'
+					),
+					'icon_size' => 0.1,
+				),
+				'/js/src/icons/news'              => array(
+					'url'        => add_query_arg(
+						'ver',
+						JEO_VERSION,
+						JEO_BASEURL . '/js/src/icons/news.png'
+					),
+					'icon_size'  => 0.13,
+					'text_color' => '#202202',
+				),
+				'/js/src/icons/cluster'           => array(
+					'url' => add_query_arg(
+						'ver',
+						JEO_VERSION,
+						JEO_BASEURL . '/js/src/icons/cluster.png'
+					),
+				),
+			)
+		);
 	}
 
 	/**

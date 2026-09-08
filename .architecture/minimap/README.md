@@ -391,8 +391,8 @@ All actions use `chatLoading` state (not `status: 'loading'`) so the map preview
 | `center_lat` | `number` | — | Map center latitude |
 | `center_lon` | `number` | — | Map center longitude |
 | `initial_zoom` | `number` | — | Zoom level |
-| `pins` | `array` | `[]` | Geolocation pins (`lat`, `lon`, `relevance`, `address`) |
-| `show_pins` | `boolean` | `true` | Toggle pin visibility |
+| `pins` | `array` | `[]` | Geolocation pins (`lat`, `lon`, `relevance`, `address`). Rendered as markers in the editor preview when `show_pins` is enabled (see "Pin preview parity" below) |
+| `show_pins` | `boolean` | `true` | Toggle pin visibility (editor preview and frontend) |
 | `status` | `string` | `'idle'` | Block state: `idle` → `loading` → `ready` / `error` |
 | `message` | `string` | `''` | Info/warning message |
 | `prompt` | `string` | `''` | User's text prompt (for initial generation) |
@@ -488,6 +488,7 @@ Base layers are `map-layer` CPTs tagged with `_jeo_is_base_layer` meta:
 - **Layer render guard**: The map preview only attempts to render layers when `loadedLayers.length > 0`, preventing an empty-map flash while REST metadata is still loading
 - **`load_as_style` parity**: When a style-type layer (`mapbox` or `style-json`, see [`.architecture/layers/README.md`](../layers/README.md)) has `load_as_style: true`, the editor preview uses its resolved style (URL or inline object) as the map's base style via `use-style-layer.js::findStyleLayer()` (same mechanism as the frontend's `class-jeo-map.js::applyBaseStyleLayer()`). The style layer is skipped in `renderLayer` (returns `null`), and `style_layers` filtering is applied via `applyStyleLayerFiltering()` in `onStyleData`. See [`.architecture/frontend/README.md`](../frontend/README.md) for the full parity table.
 - **Composed Mapbox styles**: When the loaded layers include any `mapbox`-type layer, the editor preview composes all mapbox layers into a single composite style via `useComposedPayloadPreviewStyle` (payload `{scope:'preview', kind:'minimap'}`). The `<Map>` uses the composed style as `mapStyle` with `useEditorMapboxTransformRequest` for token handling, and `applyComposedVisibilityFromSettings` drives per-layer visibility from the manifest. Falls back to the single `load_as_style` base when composition is unavailable. An `AbortSignal` cancels stale requests on rapid layer changes. The frontend rides on `JeoMap` (onetime composed-style branch) — no separate rendering path. See [`composed-styles/README.md`](../composed-styles/README.md).
+- **Pin preview parity**: When `show_pins` is enabled and `pins` is non-empty, the editor preview renders each pin as a `<Marker>` child of `<Map>` (react-map-gl `Marker`, re-exported from `lib/mapgl-react.js`), mirroring the frontend's `class-jeo-map.js::addOwnPinsAsMarkers()`: primary pins use the `news-marker` icon, secondary ones (`relevance === 'secondary'`) use `news-marker-hover`, 27×36 px, `anchor: bottom`. Icon URLs come from `jeoMapVars.images` — shared by the frontend (`jeo-map`) and editor (`jeo-map-blocks`) localizations via `Jeo::get_map_icon_images()` (filter `jeomap_js_images`); a plain CSS dot is the fallback when icons are unavailable. Markers are non-interactive (`pointerEvents: none`, no popup). The `Marker` component resolves the active GL runtime (MapLibre or Mapbox) from the parent `<Map>` context, so pins render under both runtimes.
 
 ## Refinement Stability (Phase 3)
 

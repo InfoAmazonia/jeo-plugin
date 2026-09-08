@@ -6,7 +6,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from '@wordpress/el
 import { debounce } from 'lodash';
 import { __, _x } from '@wordpress/i18n';
 
-import { Map } from '../lib/mapgl-react';
+import { Map, Marker } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
 import { MemoizedRenderLayer } from './map-preview-layer';
 import {
@@ -29,6 +29,9 @@ import { RadioControl, SelectControl, TextareaControl } from '../shared/wp-form-
 import './onetime-map-editor.css';
 
 const { map_defaults: mapDefaults } = globalThis.jeo_settings;
+
+const PIN_ICON_PRIMARY = globalThis.jeoMapVars?.images?.[ '/js/src/icons/news-marker' ]?.url;
+const PIN_ICON_SECONDARY = globalThis.jeoMapVars?.images?.[ '/js/src/icons/news-marker-hover' ]?.url;
 
 const LOADING_MESSAGES = [
 	__( 'Analyzing content…', 'jeowp' ),
@@ -60,6 +63,61 @@ function generateUUID() {
 
 	const hex = Array.from( bytes, ( b ) => b.toString( 16 ).padStart( 2, '0' ) ).join( '' );
 	return `${ hex.slice( 0, 8 ) }-${ hex.slice( 8, 12 ) }-${ hex.slice( 12, 16 ) }-${ hex.slice( 16, 20 ) }-${ hex.slice( 20 ) }`;
+}
+
+/**
+ * Renders a geolocation pin as a non-interactive map marker.
+ *
+ * Mirrors the frontend rendering in `class-jeo-map.js::addOwnPinsAsMarkers()`:
+ * primary pins use the `news-marker` icon, secondary ones (`relevance === 'secondary'`)
+ * use `news-marker-hover`. Falls back to a plain CSS dot when the localized
+ * icon URLs are unavailable.
+ *
+ * The `Marker` component resolves the active runtime (MapLibre GL or Mapbox GL)
+ * from the parent `<Map>` context, so pins render under both runtimes.
+ *
+ * @param {Object} props
+ * @param {Object} props.pin Pin object (`lat`, `lon`, `relevance`, `address`).
+ */
+function MinimapPinMarker( { pin } ) {
+	const lat = parseFloat( pin.lat );
+	const lon = parseFloat( pin.lon );
+
+	if ( Number.isNaN( lat ) || Number.isNaN( lon ) ) {
+		return null;
+	}
+
+	const isSecondary = pin.relevance === 'secondary';
+	const iconUrl = isSecondary ? PIN_ICON_SECONDARY : PIN_ICON_PRIMARY;
+
+	const style = iconUrl
+		? {
+				backgroundImage: `url(${ iconUrl })`,
+				width: '27px',
+				height: '36px',
+				backgroundSize: 'cover',
+				pointerEvents: 'none',
+		  }
+		: {
+				// Fallback dot when localized icons are unavailable.
+				width: '14px',
+				height: '14px',
+				borderRadius: '50%',
+				backgroundColor: isSecondary ? '#9e9e9e' : '#e03e3e',
+				border: '2px solid #ffffff',
+				boxShadow: '0 1px 4px rgba(0,0,0,0.5)',
+				pointerEvents: 'none',
+		  };
+
+	return (
+		<Marker
+			latitude={ lat }
+			longitude={ lon }
+			anchor={ iconUrl ? 'bottom' : 'center' }
+		>
+			<div className="jeo-minimap-pin" style={ style } />
+		</Marker>
+	);
 }
 
 export default function MinimapEditor( { attributes, setAttributes, clientId } ) {
@@ -1039,6 +1097,13 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 
 							return <MemoizedRenderLayer key={ layer.id } layer={ layerRecord.meta } instance={ layer } />;
 						} ) }
+					{ attributes.show_pins &&
+						( attributes.pins || [] ).map( ( pin, i ) => (
+							<MinimapPinMarker
+								key={ `${ pin.lat },${ pin.lon },${ i }` }
+								pin={ pin }
+							/>
+						) ) }
 				</Map>
 				) }
 			</div>
