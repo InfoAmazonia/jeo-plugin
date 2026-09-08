@@ -237,7 +237,10 @@ Vector layers (`mvt`, `mapbox-tileset-vector`) and the client-side `geojson` typ
 The style modal (`layer-style-editor.js`) keeps its open state in `LayerSettings` local state, so the layers list must never unmount while the user edits. Two guards enforce this:
 
 - `shared/rest-records.js::useRecordsByIds` memoizes the normalized ID set **by content** (`normalizeRecordIds(...).join(',')`), not by array identity — attribute updates that rebuild the IDs array no longer re-trigger the fetch effect and its transient `isLoading` flip.
-- `map-blocks/layers-settings.js` renders the `List` whenever layers exist, even while refetching (`(!loadingLayers || (loadedLayers || []).length > 0)`), so per-item local state survives genuine id-set changes.
+- `map-blocks/layers-settings.js` renders the `List` whenever layers exist, even while refetching (`(!loadingLayers || stableLoadedLayers.length > 0)`), so per-item local state survives genuine id-set changes. `stableLoadedLayers` is a ref snapshot of the last non-empty `loadedLayers`, so a re-resolving query (`useEntityRecords` briefly returns `records: undefined, isResolving: true`) neither unmounts the `List` nor drops individual items.
+- `map-blocks/layers-settings.js` keys each `LayerSettings` by `layer.id` (never by array index): reordering via `react-movable` must remount nothing, or the whole list flashes and drag animations/state reset.
+- `map-blocks/layer-settings.js::memo` comparator **must** include `itemProps.style.visibility`/`zIndex`: react-movable signals drag state (hide the source item, lift the selected one) only through `itemProps.style`. A comparator that ignores `itemProps` leaves the dragged item stuck with `visibility: hidden` after a same-position drop, and lets the drag ghost overlap the source item during the drag.
+- `shared/layer-style-editor.js` keeps edits in a local draft and debounces the upstream `onChange` (300ms, flushing on unmount): every committed style change re-renders the host map editor and, when Mapbox layers are present, recomposes the style and remounts the `<Map>`. One dispatch per keystroke/slider-tick froze the main thread for seconds (measured ~3.2s of long tasks for 8 slider changes); with the debounce the same burst costs a single commit.
 
 ### `style` Object Shape
 

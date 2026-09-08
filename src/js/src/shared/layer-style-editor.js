@@ -1,4 +1,4 @@
-import { useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { CheckboxControl, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RangeControl, TextControl } from './wp-form-controls';
@@ -83,32 +83,61 @@ function ColorPickerField( { label, value, onChange, disabled } ) {
 	);
 }
 
+const COMMIT_DEBOUNCE_MS = 300;
+
 export default function LayerStyleEditor( { style, layerType, defaultStyle, onChange, onClose } ) {
 	const [ useDefault, setUseDefault ] = useState( !! ( defaultStyle && style?.use_default ) );
 
-	const paint = style?.paint || {};
+	const [ draftStyle, setDraftStyle ] = useState( style || {} );
+	const draftRef = useRef( draftStyle );
+	const debounceRef = useRef( null );
+
+	const paint = draftStyle.paint || {};
+
+	// Sync the draft when the parent style changes externally (e.g. AI
+	// refinement or another control editing the same layer).
+	useEffect( () => {
+		const external = style || {};
+		if ( JSON.stringify( external ) !== JSON.stringify( draftRef.current ) ) {
+			draftRef.current = external;
+			setDraftStyle( external );
+		}
+	}, [ style ] );
+
+	const commit = ( next ) => {
+		draftRef.current = next;
+		setDraftStyle( next );
+		clearTimeout( debounceRef.current );
+		debounceRef.current = setTimeout( () => onChange( next ), COMMIT_DEBOUNCE_MS );
+	};
+
+	// Flush any pending commit when the editor closes so no edit is lost.
+	useEffect( () => {
+		return () => {
+			clearTimeout( debounceRef.current );
+			if ( JSON.stringify( draftRef.current ) !== JSON.stringify( style || {} ) ) {
+				onChange( draftRef.current );
+			}
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps -- flush-on-unmount only
+	}, [] );
 
 	const handleToggleDefault = ( checked ) => {
 		setUseDefault( checked );
-		if ( checked ) {
-			onChange( { use_default: true } );
-		} else {
-			onChange( {} );
-		}
+		commit( checked ? { use_default: true } : {} );
 	};
 
 	const updatePaint = ( key, value ) => {
-		const next = { ...style, use_default: false, paint: { ...paint, [ key ]: value } };
-		onChange( next );
+		commit( { ...draftStyle, use_default: false, paint: { ...paint, [ key ]: value } } );
 	};
 
 	const removePaint = ( key ) => {
 		const { [ key ]: _, ...rest } = paint;
-		const nextStyle = { ...style, use_default: false, paint: rest };
+		const nextStyle = { ...draftStyle, use_default: false, paint: rest };
 		if ( Object.keys( rest ).length === 0 ) {
 			delete nextStyle.paint;
 		}
-		onChange( nextStyle );
+		commit( nextStyle );
 	};
 
 	const resetField = ( key, defaultValue ) => {

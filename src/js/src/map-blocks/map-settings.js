@@ -174,7 +174,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 						<TextControl
 							type="number"
 							label={ __( 'North', 'jeowp' ) }
-							value={ attributes.pan_limits?.north || "__"}
+							value={ attributes.pan_limits?.north ?? '' }
 							onChange={ ( value ) => {
 								return setAttributes({
 									pan_limits: {
@@ -188,7 +188,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 						<TextControl
 							type="number"
 							label={ __( 'East', 'jeowp' ) }
-							value={ attributes.pan_limits?.east || "__" }
+							value={ attributes.pan_limits?.east ?? '' }
 							onChange={ ( value ) => {
 								return setAttributes({
 									pan_limits: {
@@ -203,7 +203,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 						<TextControl
 							type="number"
 							label={ __( 'South', 'jeowp' ) }
-							value={ attributes.pan_limits?.south || "__"}
+							value={ attributes.pan_limits?.south ?? '' }
 							onChange={ ( value ) => {
 								return setAttributes({
 									pan_limits: {
@@ -217,7 +217,7 @@ export default ( { attributes, setAttributes, setPanLimitsFromMap, isMapBlock = 
 						<TextControl
 							type="number"
 							label={ __( 'West', 'jeowp' ) }
-							value={ attributes.pan_limits?.west || "__"}
+							value={ attributes.pan_limits?.west ?? '' }
 							onChange={ ( value ) => {
 								return setAttributes({
 									pan_limits: {

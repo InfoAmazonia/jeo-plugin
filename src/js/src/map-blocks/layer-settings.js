@@ -270,12 +270,16 @@ const LayerSettings = (
 };
 
 export default memo( LayerSettings, ( prevProps, nextProps ) => {
+	const prevStyle = prevProps.itemProps?.style || {};
+	const nextStyle = nextProps.itemProps?.style || {};
 	return (
 		prevProps.index === nextProps.index &&
 		prevProps.isDragged === nextProps.isDragged &&
 		prevProps.isSelected === nextProps.isSelected &&
 		prevProps.isOutOfBounds === nextProps.isOutOfBounds &&
 		isEqual( prevProps.settings, nextProps.settings ) &&
-		isEqual( prevProps.widths, nextProps.widths )
+		isEqual( prevProps.widths, nextProps.widths ) &&
+		prevStyle.visibility === nextStyle.visibility &&
+		prevStyle.zIndex === nextStyle.zIndex
 	);
 } );

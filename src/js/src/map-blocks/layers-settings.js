@@ -29,6 +29,19 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 		setAttributes( { layers } );
 	}, [ setAttributes ] );
 
+	// Keep the last non-empty loadedLayers snapshot so the list never unmounts
+	// (or drops items) while the entity query re-resolves after layers change.
+	const loadedLayersRef = useRef( loadedLayers );
+	useEffect( () => {
+		if ( ( loadedLayers || [] ).length > 0 ) {
+			loadedLayersRef.current = loadedLayers;
+		}
+	}, [ loadedLayers ] );
+	const stableLoadedLayers =
+		( loadedLayers || [] ).length > 0
+			? loadedLayers
+			: loadedLayersRef.current || [];
+
 	const widths = useMemo( () => [], [] );
 
 	const [ layerTypeFilter, setLayerTypeFilter ] = useState( '' );
@@ -146,7 +159,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 
 	const handleSwitchUseStyle = useCallback(
 		( id, def ) => {
-			const currentJeoLayerProps = loadedLayers.find(
+			const currentJeoLayerProps = stableLoadedLayers.find(
 				( layerPost ) => layerPost.id === id
 			);
 			const layerType = window.JeoLayerTypes.getLayerType(
@@ -214,7 +227,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 				);
 			}
 		},
-		[ setLayers, loadedLayers ]
+		[ setLayers, stableLoadedLayers ]
 	);
 
 	const handleSwapDefault = useCallback(
@@ -453,8 +466,8 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 				</p>
 			) }
 
-		{ ( ! loadingLayers || ( loadedLayers || [] ).length > 0 ) && attributes.layers.length > 0 && (
-			<List
+	{ ( ! loadingLayers || stableLoadedLayers.length > 0 ) && attributes.layers.length > 0 && (
+		<List
 					values={ attributes.layers }
 					onChange={ onLayerOrderChange }
 					renderList={ ( { children, props } ) => (
@@ -511,7 +524,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 											return;
 										}
 
-										const currentJeoLayerProps = loadedLayers.find(layerPost => layerPost.id === layer.id);
+										const currentJeoLayerProps = stableLoadedLayers.find(layerPost => layerPost.id === layer.id);
 										if ( ! currentJeoLayerProps ) {
 											return;
 										}
@@ -576,9 +589,9 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 											} ) )
 										);
 
-									const updateStyle = ( style ) =>
+								const updateStyle = ( style ) =>
 									setLayers(
-										attributes.layers.map( ( settings ) =>
+										attributesRef.current.layers.map( ( settings ) =>
 											settings.id === layer.id
 												? { ...settings, style }
 												: settings
@@ -616,7 +629,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										}
 									};
 
-									const loadedLayer = loadLayer( loadedLayers, layer );
+									const loadedLayer = loadLayer( stableLoadedLayers, layer );
 
 									if(!loadedLayer.layer) {
 										// TODO: Remove deleted layers
@@ -635,11 +648,11 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										switchDefault={ switchDefault }
 										switchShowLegend={ switchShowLegend }
 										swapDefault={ swapDefault }
-									updateUse={ updateUse }
-									updateStyle={ updateStyle }
-									widths={ widths }
+										updateUse={ updateUse }
+										updateStyle={ updateStyle }
+										widths={ widths }
 										updateStyleLayers={ updateStyleLayers }
-										key={ index }
+										key={ layer.id }
 									/>;
 								} }
 				/>
