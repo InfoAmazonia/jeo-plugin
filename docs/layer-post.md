@@ -12,13 +12,16 @@ Entering the Layer post editor, you'll see a preview of the current layer (or a 
 
 On the **Layer settings** panel, you can change the layer type.
 
-JEO supports four layer types out-of-the-box:
+JEO supports seven layer types out-of-the-box:
 
 | Type | Required fields | Optional fields | Best for |
 |------|-----------------|-----------------|----------|
 | [Mapbox styles](https://docs.mapbox.com/studio-manual/overview/map-styling/) | Style ID (`username/style-id`) | Access token | Complete styled maps created in Mapbox Studio |
-| [Mapbox tilesets](https://docs.mapbox.com/help/glossary/tileset/) | Tileset ID (`username.tilesetid`) | Access token | Raster data hosted on Mapbox |
-| [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/) (MVTs) | Tileset ID, source layer, geometry type | Access token | Vector data with interactive features |
+| [Style JSON](https://maplibre.org/maplibre-style-spec/) | Style URL or inline style JSON | — | Public MapLibre GL styles; works without an API key |
+| [Mapbox tilesets](https://docs.mapbox.com/help/glossary/tileset/) (raster) | Tileset ID (`username.tilesetid`) | Access token | Raster data hosted on Mapbox |
+| [Mapbox vector tilesets](https://docs.mapbox.com/vector-tiles/reference/) | Tileset ID, source layer | Access token | Vector data hosted on Mapbox |
+| [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/) (MVTs) | Tileset URL, source layer, geometry type | Access token | Vector data with interactive features |
+| [GeoJSON](https://geojson.org/) | GeoJSON URL or inline GeoJSON | Layer style | Client-side polygon data, including AI-generated boundary layers |
 | [TileLayers](https://en.wikipedia.org/wiki/Tiled_web_map) | Tile URL template (`https://.../{z}/{x}/{y}.png`) | — | Third-party tile servers (XYZ URLs) |
 
 If the **Access token** field is left empty, the layer will use the Mapbox API key configured in **Jeo → Settings**. You only need to fill this field when the layer requires a different token than the global one.

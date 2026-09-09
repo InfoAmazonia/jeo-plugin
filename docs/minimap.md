@@ -44,6 +44,18 @@ The AI remembers your conversation, so each refinement builds on the previous co
 
 ![Minimap block chat](img/minimap-block-edit3.png)
 
+## Understanding the chosen layers
+
+Ever wondered why the AI picked a specific layer? Below the map preview, click **Understand chosen layers** to open the **Map layers** panel in the block sidebar. For each layer, you'll see:
+
+- **Title and type** — e.g. "Deforestation alerts — mapbox".
+- **Description** — the layer's excerpt, when available.
+- **Why it was chosen** — the AI's own explanation for including the layer in this map.
+- **Automatic style notice** — when the AI had to style a layer that had no saved style, so you know it can be customized.
+- **Themes and source** — the layer's themes and data attribution, for disambiguation when similarly named layers exist.
+
+![Understand chosen layers](img/minimap-understand-layers.png)
+
 ## AI-generated layers (Minilayer)
 
 If you have a Mapbox API key configured, the AI can **generate custom map layers** when existing layers don't cover what you need. During chat, ask the AI to create a layer (e.g., "Can you generate a deforestation heatmap for the Amazon?"). The AI will ask for your confirmation before generating — it never creates layers without explicit approval. The new layer is added to the map automatically with AI-suggested styling (colors and filters) that you can later override in the layer settings modal via the **"Use AI Default Style"** checkbox.
@@ -54,11 +66,11 @@ After generation, the minimap behaves like any JEO map:
 
 - **Pan and zoom**: Drag to pan, scroll to zoom.
 - **Layers**: Thematic layers with legends.
-- **Pins**: Geolocation pins from the post's geolocation data.
+- **Pins**: Geolocation pins from the post's geolocation data. Use the **Geolocation Pins** panel (Show pins: Yes/No) to control them — they render live in the editor preview and on the frontend.
 - **Base layer**: Automatically chosen (dark/light) based on layer colors, or manually selected.
 
 ## Requirements
 
 - An AI provider must be configured in **Jeo → AI** (see [AI Settings](ai-settings.md)).
 - For best results, index your posts and layers in the Knowledge Base (RAG tab).
-- For AI-generated layers, a Mapbox API key is also required.
+- For AI-generated thematic layers, a Mapbox API key is also required. Boundary layers (municipalities, states, indigenous lands) are generated as GeoJSON and work without a Mapbox key.
