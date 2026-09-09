@@ -8,19 +8,19 @@
 	{
 		"name": "mapglReact",
 		"path": "src/js/build/mapglReact.js",
-		"limit": "25 KB",
+		"limit": "20 KB",
 		"brotli": false
 	},
 	{
 		"name": "mapBlocks",
 		"path": "src/js/build/mapBlocks.js",
-		"limit": "1310 KB",
+		"limit": "1375 KB",
 		"brotli": false
 	},
 	{
 		"name": "layersSidebar",
 		"path": "src/js/build/layersSidebar.js",
-		"limit": "360 KB",
+		"limit": "450 KB",
 		"brotli": false
 	},
 	{
@@ -32,25 +32,25 @@
 	{
 		"name": "mapsSidebar",
 		"path": "src/js/build/mapsSidebar.js",
-		"limit": "250 KB",
+		"limit": "255 KB",
 		"brotli": false
 	},
 	{
 		"name": "postsSidebar",
 		"path": "src/js/build/postsSidebar.js",
-		"limit": "180 KB",
+		"limit": "187 KB",
 		"brotli": false
 	},
 	{
 		"name": "jeoMap",
 		"path": "src/js/build/jeoMap.js",
-		"limit": "100 KB",
+		"limit": "105 KB",
 		"brotli": false
 	},
 	{
 		"name": "jeoStorymap",
 		"path": "src/js/build/jeoStorymap.js",
-		"limit": "45 KB",
+		"limit": "46 KB",
 		"brotli": false
 	}
 ]

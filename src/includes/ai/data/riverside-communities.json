@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Comunidade Ribeirinha de São Francisco do Caramuri",
+    "type": "riverside_community",
+    "lat": -3.200,
+    "lng": -60.200,
+    "aliases": ["São Francisco do Caramuri", "Ribeirinhos do Caramuri"]
+  },
+  {
+    "name": "Vila do Arumã",
+    "type": "riverside_community",
+    "lat": -3.850,
+    "lng": -61.500,
+    "aliases": ["Arumã", "Comunidade do Arumã"]
+  },
+  {
+    "name": "Ilha das Cinzas",
+    "type": "riverside_community",
+    "lat": -1.300,
+    "lng": -48.700,
+    "aliases": ["Ribeirinhos da Ilha das Cinzas", "Cinzas"]
+  }
+]

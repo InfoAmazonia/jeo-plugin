@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstrap the JEO plugin.
+ * JEO WP — Geojournalism platform for WordPress.
  *
  * @package           Jeo
  *
@@ -8,11 +8,11 @@
  * Plugin Name:       JEO Maps
  * Plugin URI:        https://www.jeowp.org/
  * Description:       Interactive maps for the WordPress block editor
- * Version:           3.1.2
+ * Version:           3.6.5
  * Author:            InfoAmazonia
  * Author URI:        https://www.jeowp.org/
  * Requires at least: 6.6
- * Requires PHP:      8.0
+ * Requires PHP:      8.2
  * License:           GPL-3.0-only
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html
  * Text Domain:       jeowp
@@ -25,11 +25,40 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 /**
+ * Check PHP Version Compatibility (Requires 8.2+)
+ */
+if ( version_compare( PHP_VERSION, '8.2', '<' ) ) {
+	add_action(
+		'admin_notices',
+		function () {
+			printf(
+				'<div class="notice notice-error"><p>%s</p></div>',
+				esc_html__( 'JEO Plugin Error: Your PHP version is too old. JEO AI features require PHP 8.2 or higher. The plugin will remain deactivated.', 'jeowp' )
+			);
+		}
+	);
+
+	if ( ! function_exists( 'deactivate_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	// Ensure we don't cause infinite loop on activation failure.
+	if ( is_plugin_active( plugin_basename( __FILE__ ) ) ) {
+		deactivate_plugins( plugin_basename( __FILE__ ) );
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( isset( $_GET['activate'] ) ) {
+			unset( $_GET['activate'] );
+		}
+	}
+	return;
+}
+
+/**
  * Currently plugin version.
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define( 'JEO_VERSION', '3.1.2' );
+define( 'JEO_VERSION', '3.6.5' );
 
 define( 'JEO_BASEPATH', plugin_dir_path( __FILE__ ) );
 define( 'JEO_BASEURL', plugins_url( '', __FILE__ ) );
@@ -51,6 +80,44 @@ function jeo_activate() {
 	flush_rewrite_rules();
 }
 
+/**
+ * Deactivation Hook
+ * Clear ONLY sensitive API Keys upon deactivation for security.
+ */
+function jeo_deactivate() {
+	// Clear ONLY sensitive AI keys.
+	$options = get_option( 'jeo-settings' );
+	if ( is_array( $options ) ) {
+		$options['gemini_api_key']   = '';
+		$options['openai_api_key']   = '';
+		$options['deepseek_api_key'] = '';
+		update_option( 'jeo-settings', $options );
+	}
+
+	// Clear residual debug logs for safety.
+	$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
+	if ( file_exists( $log_file ) ) {
+		wp_delete_file( $log_file );
+	}
+
+	$upload_dir       = wp_upload_dir();
+	$log_file_uploads = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
+	if ( file_exists( $log_file_uploads ) ) {
+		wp_delete_file( $log_file_uploads );
+	}
+
+	flush_rewrite_rules();
+}
+
 register_activation_hook( __FILE__, 'jeo_activate' );
+register_deactivation_hook( __FILE__, 'jeo_deactivate' );
+
+if ( defined( 'WP_CLI' ) && WP_CLI ) {
+	\WP_CLI::add_command( 'jeo ai', 'Jeo\CLI\AI_CLI' );
+}
 
 jeo();
+jeo_bulk_processor();
+jeo_rag_backup();
+jeo_rag_worker();
+jeo_ai_settings();

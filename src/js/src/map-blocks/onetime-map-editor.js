@@ -7,6 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { Map } from '../lib/mapgl-react';
 import LayersSettingsModal from './layers-settings-modal';
 import { renderLayer } from './map-preview-layer';
+import {
+	applyStyleLayerFiltering,
+	findStyleLayer,
+	styleLayerMapProps,
+} from './use-style-layer';
 import { coerceOnetimeMapAttributes } from './onetime-map-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
@@ -60,7 +65,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes, clientId
 
 	const layerIds = useMemo( () => {
 		return normalizedAttributes.layers.map( ( layer ) => layer.id );
-	}, [ normalizedAttributes.layers ] );
+	}, [ JSON.stringify( normalizedAttributes.layers.map( ( l ) => l.id ) ) ] );
 	const layerSettingsKey = useMemo(
 		() => JSON.stringify( normalizedAttributes.layers || [] ),
 		[ normalizedAttributes.layers ]
@@ -120,6 +125,11 @@ export default function OnetimeMapEditor ( { attributes, setAttributes, clientId
 		applyComposedVisibility();
 	}, [ applyComposedVisibility ] );
 
+	const styleBase = useMemo(
+		() => findStyleLayer( loadedLayers, normalizedAttributes.layers ),
+		[ loadedLayers, normalizedAttributes.layers ]
+	);
+
 	const setPanLimitsFromMap = () => {
 		const { current: map } = mapRef;
 		if ( map ) {
@@ -157,6 +167,7 @@ export default function OnetimeMapEditor ( { attributes, setAttributes, clientId
 					renderPanel={ PanelBody }
 					setZoomState={ setZoomState }
 					setPanLimitsFromMap={ setPanLimitsFromMap }
+					isMapBlock={ true }
 				/>
 				<LayersPanel
 					attributes={ normalizedAttributes }

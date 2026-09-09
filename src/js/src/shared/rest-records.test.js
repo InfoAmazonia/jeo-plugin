@@ -1,9 +1,26 @@
 import {
 	chunkRecordIds,
 	mergeRecordsByIdOrder,
+	normalizeRecordIds,
 } from './rest-records';
 
 describe( 'rest-records helpers', () => {
+	it( 'normalizes record IDs, dropping invalid values and duplicates', () => {
+		expect( normalizeRecordIds( [ 1, '2', 2, 3, null, 'foo', 0, -4 ] ) ).toEqual( [
+			1, 2, 3,
+		] );
+	} );
+
+	it( 'returns an empty list for missing input', () => {
+		expect( normalizeRecordIds() ).toEqual( [] );
+	} );
+
+	it( 'produces a stable content key regardless of array identity', () => {
+		const first = normalizeRecordIds( [ 1, 2, 3 ] );
+		const second = normalizeRecordIds( [ 1, 2, 3 ] );
+		expect( first.join( ',' ) ).toBe( second.join( ',' ) );
+	} );
+
 	it( 'chunks normalized IDs into stable groups', () => {
 		expect(
 			chunkRecordIds( [ 1, '2', 2, 3, null, 'foo', 4 ], 2 )

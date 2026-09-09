@@ -85,6 +85,18 @@ tr .dashicon:hover {
 	color: #444;
 }
 
+.jeo-map-layer-item button.open-style-editor {
+	background: none;
+	border: 0;
+	width: 34px;
+	padding: 0 10px;
+	cursor: pointer;
+	color: #444;
+}
+
+.jeo-map-layer-item button.open-style-editor:hover {
+	color: #007cba;
+}
 
 .jeo-map-layer-item > .layers-selector {
 	column-count: 4;

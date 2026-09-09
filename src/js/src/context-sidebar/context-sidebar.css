@@ -1,0 +1,351 @@
+/* AI Context Sidebar Styles */
+
+.jeo-context-sidebar-panel .components-panel__body-title button {
+	font-weight: 600;
+}
+
+.jeo-context-panel {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.jeo-context-panel__header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 4px;
+}
+
+.jeo-context-panel__title {
+	margin: 0;
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.jeo-context-panel__expand {
+	padding: 2px !important;
+	min-width: auto !important;
+	height: auto !important;
+}
+
+.jeo-context-panel__expand svg {
+	display: block;
+}
+
+/* Chat */
+
+.jeo-context-chat {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.jeo-context-chat--compact .jeo-context-chat__messages {
+	max-height: 220px;
+	overflow-y: auto;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	padding: 10px;
+	background: #f6f7f7;
+}
+
+.jeo-context-chat--modal .jeo-context-chat__messages {
+	max-height: 55vh;
+	overflow-y: auto;
+	border: 1px solid #e0e0e0;
+	border-radius: 4px;
+	padding: 14px;
+	background: #f6f7f7;
+}
+
+.jeo-context-chat--modal .jeo-context-chat__messages::empty {
+	display: none;
+}
+
+.jeo-context-chat__intro {
+	text-align: center;
+	padding: 16px 8px;
+}
+
+.jeo-context-chat__placeholder {
+	color: #757575;
+	font-size: 12px;
+	margin: 0 0 12px;
+	line-height: 1.5;
+}
+
+.jeo-context-chat__start {
+	width: 100%;
+	justify-content: center;
+}
+
+.jeo-context-chat__message {
+	padding: 8px 12px;
+	border-radius: 10px;
+	margin-bottom: 8px;
+	font-size: 12px;
+	line-height: 1.5;
+	word-wrap: break-word;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.jeo-context-chat__message--user {
+	background: #e3f2fd;
+	margin-left: 20px;
+}
+
+.jeo-context-chat__message--assistant {
+	background: #ffffff;
+	border: 1px solid #e0e0e0;
+	margin-right: 20px;
+}
+
+.jeo-context-chat__message-content {
+	padding-bottom: 4px;
+}
+
+.jeo-context-chat__message-meta {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	border-top: 1px solid rgba(0, 0, 0, 0.06);
+	padding-top: 4px;
+	margin-top: 2px;
+}
+
+.jeo-context-chat__timestamp {
+	font-size: 9px;
+	color: #757575;
+	font-style: italic;
+}
+
+.jeo-context-chat__user-badge {
+	font-size: 9px;
+	font-weight: 600;
+	color: #2271b1;
+	text-transform: uppercase;
+	letter-spacing: 0.3px;
+	background: rgba(255, 255, 255, 0.7);
+	padding: 1px 4px;
+	border-radius: 3px;
+}
+
+.jeo-context-chat__loading {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 10px;
+	font-size: 12px;
+	color: #757575;
+}
+
+.jeo-context-chat__input-area {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}
+
+.jeo-context-chat__textarea textarea {
+	font-size: 12px !important;
+	padding: 8px !important;
+	resize: vertical;
+}
+
+.jeo-context-chat__actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+}
+
+.jeo-context-chat__secondary-actions {
+	display: flex;
+	gap: 6px;
+}
+
+.jeo-context-chat__send {
+	font-size: 12px !important;
+	padding: 4px 12px !important;
+	height: auto !important;
+}
+
+.jeo-context-chat__retry,
+.jeo-context-chat__clear {
+	font-size: 11px !important;
+	padding: 3px 8px !important;
+	height: auto !important;
+}
+
+.jeo-context-chat__error {
+	margin: 0;
+}
+
+/* Suggestions */
+
+.jeo-context-suggestions {
+	margin-top: 4px;
+}
+
+.jeo-context-suggestions__title,
+.jeo-context-references__title {
+	font-size: 12px;
+	font-weight: 600;
+	margin: 10px 0 6px;
+}
+
+.jeo-context-suggestion {
+	background: #ffffff;
+	border: 1px solid #c5c5c5;
+	border-radius: 6px;
+	padding: 10px;
+	margin-bottom: 10px;
+}
+
+.jeo-context-suggestion__text {
+	font-size: 12px;
+	line-height: 1.6;
+	margin: 0 0 10px;
+	white-space: pre-wrap;
+}
+
+.jeo-context-suggestion__text strong,
+.jeo-context-suggestion__text b {
+	font-weight: 600;
+}
+
+.jeo-context-suggestion__text em,
+.jeo-context-suggestion__text i {
+	font-style: italic;
+}
+
+.jeo-context-suggestion__text a {
+	font-weight: 500;
+	text-decoration: underline;
+	color: #2271b1;
+}
+
+.jeo-context-suggestion__actions {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.jeo-context-suggestion__insert,
+.jeo-context-suggestion__copy {
+	font-size: 11px !important;
+	padding: 4px 10px !important;
+	height: auto !important;
+}
+
+/* References */
+
+.jeo-context-references {
+	margin-top: 10px;
+}
+
+.jeo-context-references__list {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+}
+
+.jeo-context-reference {
+	font-size: 12px;
+	margin-bottom: 6px;
+	padding: 8px;
+	background: #f0f0f1;
+	border-radius: 4px;
+}
+
+.jeo-context-reference a {
+	font-weight: 500;
+}
+
+.jeo-context-reference__reason {
+	display: block;
+	font-size: 11px;
+	color: #757575;
+	margin-top: 4px;
+	line-height: 1.4;
+}
+
+/* Suggestion history (archive) */
+
+.jeo-context-history {
+	margin: 8px 0 12px;
+	border: 1px solid #e0e0e0;
+	border-radius: 6px;
+	padding: 6px 10px;
+	background: #fbfbfc;
+}
+
+.jeo-context-history__summary {
+	font-size: 12px;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.jeo-context-history__list {
+	list-style: none;
+	padding: 0;
+	margin: 8px 0 0;
+}
+
+.jeo-context-history__item {
+	border-top: 1px solid #eee;
+	padding: 8px 0;
+}
+
+.jeo-context-history__meta {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	align-items: baseline;
+}
+
+.jeo-context-history__label {
+	font-size: 12px;
+	font-weight: 500;
+}
+
+.jeo-context-history__timestamp {
+	font-size: 10px;
+	color: #757575;
+	white-space: nowrap;
+}
+
+.jeo-context-history__preview {
+	font-size: 11px;
+	color: #555;
+	margin: 4px 0 6px;
+	line-height: 1.4;
+}
+
+.jeo-context-chat--compact .jeo-context-history__list {
+	max-height: 600px;
+	overflow-y: auto;
+	padding-right: 4px;
+}
+
+/* Modal */
+
+.jeo-context-modal .components-modal__content {
+	padding: 0;
+}
+
+.jeo-context-modal .components-modal__header {
+	padding: 16px 24px;
+	border-bottom: 1px solid #e0e0e0;
+}
+
+.jeo-context-modal .components-modal__header-heading {
+	font-size: 16px;
+	font-weight: 600;
+}
+
+.jeo-context-modal .jeo-context-chat--modal {
+	padding: 20px 24px 24px;
+}

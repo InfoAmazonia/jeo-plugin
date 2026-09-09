@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Bacia do Rio Amazonas",
+    "type": "hydrographic_basin",
+    "lat": -3.100,
+    "lng": -60.000,
+    "aliases": ["Bacia Amazônica", "Calha do Amazonas"]
+  },
+  {
+    "name": "Bacia do Rio Xingu",
+    "type": "hydrographic_basin",
+    "lat": -9.000,
+    "lng": -52.500,
+    "aliases": ["Xingu Basin", "Região do Xingu"]
+  },
+  {
+    "name": "Bacia do Rio Tapajós",
+    "type": "hydrographic_basin",
+    "lat": -4.500,
+    "lng": -56.300,
+    "aliases": ["Tapajós Basin", "Região do Tapajós"]
+  }
+]

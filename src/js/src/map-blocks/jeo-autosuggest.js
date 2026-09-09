@@ -3,12 +3,7 @@ import { useEffect, useMemo, useState } from '@wordpress/element';
 import { debounce } from 'lodash-es';
 
 import AsyncComboboxControl from '../shared/async-combobox-control';
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
+import { decodeHtmlEntity } from '../shared/html';
 
 const _filterSuggestions = () => true;
 const _getSuggestionValue = ( entityRecord ) =>

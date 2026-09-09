@@ -1,0 +1,1494 @@
+<?php
+/**
+ * AI Handler class.
+ *
+ * @package Jeo
+ */
+
+namespace Jeo;
+
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+/**
+ * AI Handler Class
+ *
+ * Manages LLM integrations for georeferencing.
+ */
+class AI_Handler {
+
+	use Singleton;
+
+	/**
+	 * Adapters registered.
+	 *
+	 * @var array
+	 */
+	private $adapters = array();
+
+	/**
+	 * Initialize the class.
+	 */
+	protected function init() {
+		add_action( 'rest_api_init', array( $this, 'register_rest_routes' ) );
+		add_action( 'admin_post_jeo_download_dict', array( $this, 'api_download_dict' ) );
+		add_action( 'admin_footer', array( $this, 'deactivation_confirmation_js' ) );
+	}
+
+	/**
+	 * Inject a confirmation JS on the plugins page to warn about data removal.
+	 */
+	public function deactivation_confirmation_js() {
+		$screen = get_current_screen();
+		if ( ! $screen || 'plugins' !== $screen->id ) {
+			return;
+		}
+
+		$msg = __( 'Warning: Deactivating JEO will permanently remove all API Keys and AI settings for security reasons. Do you want to proceed?', 'jeowp' );
+		?>
+		<script>
+			jQuery(function($) {
+				$('.wp-list-table tr[data-slug="jeo"] .deactivate a').on('click', function(e) {
+					if (!confirm("<?php echo esc_js( $msg ); ?>")) {
+						e.preventDefault();
+					}
+				});
+			});
+		</script>
+		<?php
+	}
+
+	/**
+	 * Securely download a dictionary JSON file.
+	 */
+	public function api_download_dict() {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Unauthorized access.', 'jeowp' ) );
+		}
+
+		check_admin_referer( 'jeo_download_dict' );
+
+		$file = isset( $_GET['file'] ) ? sanitize_file_name( wp_unslash( $_GET['file'] ) ) : '';
+		if ( empty( $file ) || strpos( $file, '.json' ) === false ) {
+			wp_die( esc_html__( 'Invalid file.', 'jeowp' ) );
+		}
+
+		$path = JEO_BASEPATH . '/includes/ai/data/' . $file;
+		if ( ! file_exists( $path ) ) {
+			wp_die( esc_html__( 'File not found.', 'jeowp' ) );
+		}
+
+		header( 'Content-Type: application/json' );
+		header( 'Content-Disposition: attachment; filename="' . $file . '"' );
+		header( 'Pragma: no-cache' );
+		readfile( $path ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_readfile
+		exit;
+	}
+
+	/**
+	 * Register an AI adapter.
+	 *
+	 * @param string $slug Adapter slug.
+	 * @param string $class_name Adapter class name.
+	 */
+	public function register_adapter( $slug, $class_name ) {
+		$this->adapters[ $slug ] = $class_name;
+	}
+
+	/**
+	 * Get available adapters.
+	 *
+	 * @return array
+	 */
+	public function get_adapters() {
+		return array(
+			'gemini'      => __( 'Google Gemini', 'jeowp' ),
+			'openai'      => __( 'OpenAI', 'jeowp' ),
+			'deepseek'    => __( 'DeepSeek', 'jeowp' ),
+			'anthropic'   => __( 'Anthropic Claude', 'jeowp' ),
+			'ollama'      => __( 'Ollama (Local/Custom)', 'jeowp' ),
+			'mistral'     => __( 'Mistral AI', 'jeowp' ),
+			'zai'         => __( 'Zhipu AI (GLM)', 'jeowp' ),
+			'huggingface' => __( 'HuggingFace Inference', 'jeowp' ),
+			'grok'        => __( 'Grok (xAI)', 'jeowp' ),
+			'cohere'      => __( 'Cohere', 'jeowp' ),
+		);
+	}
+
+	/**
+	 * Get the active adapter instance.
+	 *
+	 * @return AI_Adapter|null
+	 */
+	public function get_active_adapter() {
+		$active = \jeo_settings()->get_option( 'ai_default_provider' );
+		if ( ! $active ) {
+			$active = 'gemini';
+		}
+
+		// Dynamically fetch configured model and API key.
+		$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+		$model   = \jeo_settings()->get_option( $active . '_model' );
+
+		// Specific fallback for Ollama URL mapping.
+		if ( 'ollama' === $active ) {
+			$api_key = \jeo_settings()->get_option( 'ollama_url' );
+		}
+
+		if ( empty( $api_key ) ) {
+			return new \WP_Error(
+				'jeo_ai_no_key',
+				sprintf(
+					/* translators: %s: AI provider name */
+					__( 'No API key configured for %s. Please add it in JEO → AI Settings.', 'jeowp' ),
+					esc_html( $this->get_adapters()[ $active ] ?? $active )
+				)
+			);
+		}
+
+		if ( array_key_exists( $active, $this->get_adapters() ) ) {
+			return new AI\Neuron_Adapter( $active, (string) $api_key, (string) $model );
+		}
+
+		return null;
+	}
+
+	/**
+	 * Register REST API routes.
+	 */
+	public function register_rest_routes() {
+		register_rest_route(
+			'jeo/v1',
+			'/ai-georeference',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_georeference' ),
+				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+				'args'                => array(
+					'post_id' => array(
+						'required' => true,
+						'type'     => 'integer',
+						'minimum'  => 1,
+					),
+					'title'   => array(
+						'required'  => true,
+						'type'      => 'string',
+						'minLength' => 1,
+					),
+					'content' => array(
+						'required' => true,
+						'type'     => 'string',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-georeference-chat',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_georeference_chat' ),
+				'permission_callback' => AI\AI_REST_Permissions::edit_posts(),
+				'args'                => array(
+					'post_id'         => array(
+						'required' => true,
+						'type'     => 'integer',
+						'minimum'  => 1,
+					),
+					'conversation_id' => array(
+						'required' => true,
+						'type'     => 'string',
+						'format'   => 'uuid',
+					),
+					'message'         => array(
+						'required' => false,
+						'type'     => 'string',
+						'default'  => '',
+					),
+					'title'           => array(
+						'required' => false,
+						'type'     => 'string',
+						'default'  => '',
+					),
+					'content'         => array(
+						'required' => false,
+						'type'     => 'string',
+						'default'  => '',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-chat-prompt-generator',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_chat_prompt_generator' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-validate-prompt',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_validate_prompt' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-key',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_key' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'provider' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array_keys( $this->get_adapters() ),
+					),
+					'api_key'  => array(
+						'required' => false,
+						'type'     => 'string',
+					),
+					'model'    => array(
+						'required' => false,
+						'type'     => 'string',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-get-models',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_get_models' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'provider' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array_keys( $this->get_adapters() ),
+					),
+					'api_key'  => array(
+						'required' => false,
+						'type'     => 'string',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-embedding',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_embedding' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-test-retrieval',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_test_retrieval' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'query' => array(
+						'required'  => true,
+						'type'      => 'string',
+						'minLength' => 1,
+					),
+					'store' => array(
+						'required' => false,
+						'type'     => 'string',
+						'enum'     => array( 'test', 'production' ),
+						'default'  => 'production',
+					),
+				),
+			)
+		);
+		register_rest_route(
+			'jeo/v1',
+			'/ai-backup-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_backup_store' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-list-backups',
+			array(
+				'methods'             => 'GET',
+				'callback'            => array( $this, 'api_list_backups' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-delete-backup',
+			array(
+				'methods'             => 'DELETE',
+				'callback'            => array( $this, 'api_delete_backup' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'filename' => array(
+						'required' => true,
+						'type'     => 'string',
+						'pattern'  => '^[a-zA-Z0-9._-]+\.zip$',
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-clear-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_store' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+				'args'                => array(
+					'store' => array(
+						'required' => true,
+						'type'     => 'string',
+						'enum'     => array( 'test', 'production' ),
+					),
+				),
+			)
+		);
+
+		register_rest_route(
+			'jeo/v1',
+			'/ai-clear-layer-store',
+			array(
+				'methods'             => 'POST',
+				'callback'            => array( $this, 'api_clear_layer_store' ),
+				'permission_callback' => AI\AI_REST_Permissions::manage_options(),
+			)
+		);
+	}
+
+	/**
+	 * REST callback that clears the test or production vector store files and optionally resets postmeta.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_clear_store( $request ) {
+		try {
+			$store = $request->get_param( 'store' );
+			if ( ! in_array( $store, array( 'test', 'production' ), true ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'Invalid store type.', 'jeowp' ) ), 400 );
+			}
+
+			$upload_dir = wp_upload_dir();
+			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
+			$base_name  = ( 'test' === $store ) ? 'jeo_knowledge_test' : 'jeo_knowledge';
+
+			$file_path = $store_dir . '/' . $base_name . '.store';
+			$info_path = $store_dir . '/' . $base_name . '.model_info';
+
+			if ( file_exists( $file_path ) ) {
+				wp_delete_file( $file_path );
+			}
+			if ( file_exists( $info_path ) ) {
+				wp_delete_file( $info_path );
+			}
+
+			if ( 'production' === $store ) {
+				global $wpdb;
+				$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s", '_jeo_vectorized_at' ) );
+			}
+
+			return new \WP_REST_Response(
+				array(
+					'success' => true,
+					/* translators: %s: Store type name. */
+					'message' => sprintf( __( '%s store cleared successfully.', 'jeowp' ), ucfirst( $store ) ),
+				),
+				200
+			);
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
+		}
+	}
+
+	/**
+	 * REST callback that clears the layer vector store files and resets layer postmeta.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_clear_layer_store( $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		try {
+			$upload_dir = wp_upload_dir();
+			$store_dir  = $upload_dir['basedir'] . '/jeo-ai-store';
+			$base_name  = 'jeo_layers_knowledge';
+
+			$file_path = $store_dir . '/' . $base_name . '.store';
+			$info_path = $store_dir . '/' . $base_name . '.model_info';
+
+			if ( file_exists( $file_path ) ) {
+				wp_delete_file( $file_path );
+			}
+			if ( file_exists( $info_path ) ) {
+				wp_delete_file( $info_path );
+			}
+
+			global $wpdb;
+			$wpdb->query( $wpdb->prepare( "DELETE FROM {$wpdb->postmeta} WHERE meta_key = %s", '_jeo_layer_vectorized_at' ) );
+
+			return new \WP_REST_Response(
+				array(
+					'success' => true,
+					'message' => __( 'Layer store cleared successfully.', 'jeowp' ),
+				),
+				200
+			);
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
+		}
+	}
+
+	/**
+	 * REST callback that tests RAG retrieval by performing a similarity search against the vector store.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_test_retrieval( $request ) {
+		try {
+			$query = $request->get_param( 'query' );
+			$store = $request->get_param( 'store' );
+
+			if ( empty( $query ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'Query is required.', 'jeowp' ) ), 400 );
+			}
+
+			// Initialize the RAG Agent to access Vector Store.
+			$rag = new \Jeo\AI\RAG_Agent();
+			if ( 'test' === $store ) {
+				$rag->is_test_mode = true;
+			}
+
+			// Estimate tokens for the query.
+			\jeo_ai_logger()->add_embedding_tokens( 'retrieve', strlen( $query ) );
+
+			// Use the native SimilarityRetrieval logic.
+			$retrieval      = $rag->resolveRetrieval();
+			$retrieved_docs = $retrieval->retrieve( new \NeuronAI\Chat\Messages\UserMessage( $query ) );
+
+			if ( empty( $retrieved_docs ) ) {
+				return new \WP_REST_Response(
+					array(
+						'success'   => true,
+						'documents' => array(),
+						'message'   => __( 'No matches found in the selected Vector Store. Try vectorizing some posts first.', 'jeowp' ),
+					),
+					200
+				);
+			}
+
+			$formatted_docs = array();
+			foreach ( $retrieved_docs as $doc ) {
+				$formatted_docs[] = array(
+					'id'       => $doc->getId(),
+					'score'    => $doc->getScore(),
+					'content'  => mb_strimwidth( $doc->getContent(), 0, 150, '...' ),
+					'metadata' => $doc->metadata,
+				);
+			}
+
+			return new \WP_REST_Response(
+				array(
+					'success'   => true,
+					'documents' => $formatted_docs,
+				),
+				200
+			);
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
+		}
+	}
+
+	/**
+	 * REST callback that tests embedding generation on a random post and saves it to the test store.
+	 *
+	 * @param \WP_REST_Request $_request Current REST request.
+	 * @return \WP_REST_Response
+	 */
+	public function api_test_embedding( $_request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+		try {
+			// Select a random post.
+			$query = new \WP_Query(
+				array(
+					'post_type'      => 'post',
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+					'orderby'        => 'rand',
+				)
+			);
+
+			if ( empty( $query->posts ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No posts available to test.', 'jeowp' ) ), 400 );
+			}
+
+			$post = $query->posts[0];
+
+			// Load into Document.
+			$documents = \Jeo\AI\WP_Post_Data_Loader::load( array( $post ) );
+			if ( empty( $documents ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'The selected random post has no usable text content.', 'jeowp' ) ), 400 );
+			}
+
+			$test_doc = $documents[0];
+
+			// Estimate tokens used for embedding test doc.
+			\jeo_ai_logger()->add_embedding_tokens( 'vectorize', strlen( $test_doc->getContent() ) );
+
+			// Use the Factory to get the active embeddings provider.
+			$embed_provider = \Jeo\AI\Neuron_Factory::get_active_embeddings_provider();
+
+			// Test the embed operation directly.
+			$embedded_doc = $embed_provider->embedDocument( $test_doc );
+			$vector       = $embedded_doc->getEmbedding();
+
+			if ( empty( $vector ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'The embedding provider returned an empty vector.', 'jeowp' ) ), 500 );
+			}
+
+			// Save the embedded document to the TEST Vector Store so we can retrieve it later.
+			$rag               = new \Jeo\AI\RAG_Agent();
+			$rag->is_test_mode = true;
+			$rag->resolveVectorStore()->addDocument( $embedded_doc );
+
+			// Format dimensions text.
+			$dimensions     = count( $vector );
+			$preview_vector = array_slice( $vector, 0, 5 ); // Just show first 5 floats.
+
+			return new \WP_REST_Response(
+				array(
+					'success' => true,
+					'message' => __( 'Embedding created and saved to Test Store!', 'jeowp' ),
+					'details' => array(
+						'post_id'         => $post->ID,
+						'post_title'      => $post->post_title,
+						'content_snippet' => mb_strimwidth( $test_doc->getContent(), 0, 200, '...' ),
+						'dimensions'      => $dimensions,
+						'vector_start'    => $preview_vector,
+					),
+				),
+				200
+			);
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+				),
+				200
+			);
+		}
+	}
+
+	/**
+	 * Fetch available models dynamically from the LLM Provider's API.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 */
+	public function api_get_models( $request ) {
+		$provider = $request->get_param( 'provider' );
+		$api_key  = $request->get_param( 'api_key' );
+
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $api_key ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'API Key or URL is required to list models.', 'jeowp' ) ), 400 );
+		}
+
+		$models = array();
+		$args   = array(
+			'headers' => array(
+				'Authorization' => 'Bearer ' . $api_key,
+				'Content-Type'  => 'application/json',
+			),
+			'timeout' => 15,
+		);
+
+		switch ( $provider ) {
+			case 'openai':
+			case 'deepseek':
+			case 'mistral':
+			case 'grok':
+			case 'zai':
+				$url = '';
+				if ( 'openai' === $provider ) {
+					$url = 'https://api.openai.com/v1/models';
+				}
+				if ( 'deepseek' === $provider ) {
+					$url = 'https://api.deepseek.com/models';
+				}
+				if ( 'mistral' === $provider ) {
+					$url = 'https://api.mistral.ai/v1/models';
+				}
+				if ( 'grok' === $provider ) {
+					$url = 'https://api.x.ai/v1/models';
+				}
+				// Zhipu AI usually implements OpenAI's v1/models compat too if used via SDK endpoint, but can fail if unsupported.
+				if ( 'zai' === $provider ) {
+					return new \WP_REST_Response( array( 'error' => __( 'Model fetching not officially supported dynamically for Zhipu AI.', 'jeowp' ) ), 400 );
+				}
+
+				$response = wp_remote_get( $url, $args );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
+
+				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
+					foreach ( $data['data'] as $model ) {
+						$id = $model['id'];
+
+						$skip = false;
+
+						if ( 'openai' === $provider ) {
+							$id_lower = strtolower( $id );
+							$skip     = ! (
+								str_starts_with( $id, 'gpt-' )
+								|| str_starts_with( $id_lower, 'o1-' )
+								|| str_starts_with( $id_lower, 'o3-' )
+								|| str_starts_with( $id_lower, 'o4-' )
+								|| str_starts_with( $id_lower, 'chatgpt-' )
+							);
+							if ( ! $skip ) {
+								$skip = (
+									str_contains( $id_lower, 'audio' )
+									|| str_contains( $id_lower, 'realtime' )
+									|| str_contains( $id_lower, 'tts' )
+									|| str_contains( $id_lower, 'whisper' )
+									|| str_contains( $id_lower, 'dall-e' )
+									|| str_contains( $id_lower, 'embedding' )
+								);
+							}
+						}
+
+						if ( 'deepseek' === $provider ) {
+							$id_lower = strtolower( $id );
+							$skip     = str_contains( $id_lower, 'embedding' );
+						}
+
+						if ( 'mistral' === $provider ) {
+							$id_lower = strtolower( $id );
+							$skip     = str_contains( $id_lower, 'embed' );
+						}
+
+						if ( 'grok' === $provider ) {
+							$id_lower = strtolower( $id );
+							$skip     = (
+								str_contains( $id_lower, 'embedding' )
+								|| str_contains( $id_lower, 'grok-2-image' )
+								|| str_contains( $id_lower, 'aurora' )
+								|| str_contains( $id_lower, 'flux' )
+							);
+						}
+
+						if ( $skip ) {
+							continue;
+						}
+
+						$models[] = $id;
+					}
+				}
+				break;
+
+			case 'gemini':
+				$url      = 'https://generativelanguage.googleapis.com/v1beta/models?key=' . $api_key;
+				$response = wp_remote_get( $url, array( 'timeout' => 15 ) );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
+
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						$id       = str_replace( 'models/', '', $model['name'] );
+						$id_lower = strtolower( $id );
+						if ( ! isset( $model['supportedGenerationMethods'] )
+							|| ! in_array( 'generateContent', $model['supportedGenerationMethods'], true )
+							|| str_contains( $id_lower, 'embedding' )
+							|| str_contains( $id_lower, 'imagen' ) ) {
+							continue;
+						}
+						$models[] = $id;
+					}
+				}
+				break;
+
+			case 'anthropic':
+				$args['headers']['x-api-key']         = $api_key;
+				$args['headers']['anthropic-version'] = '2023-06-01';
+				unset( $args['headers']['Authorization'] );
+
+				$response = wp_remote_get( 'https://api.anthropic.com/v1/models', $args );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
+
+				if ( ! empty( $data['data'] ) && is_array( $data['data'] ) ) {
+					foreach ( $data['data'] as $model ) {
+						$id       = $model['id'];
+						$id_lower = strtolower( $id );
+						if ( str_contains( $id_lower, 'embedding' ) ) {
+							continue;
+						}
+						$models[] = $id;
+					}
+				}
+				break;
+
+			case 'ollama':
+				// Ex: http://localhost:11434/api.
+				$base_url = rtrim( str_replace( '/api', '', $api_key ), '/' );
+				$response = wp_remote_get( $base_url . '/api/tags', array( 'timeout' => 10 ) );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					$ollama_non_text_patterns = array(
+						'stable-diffusion',
+						'sd-',
+						'flux',
+						'imagegen',
+						'whisper',
+						'tts',
+						'nomic-embed',
+						'mxbai-embed',
+						'all-minilm',
+						'snowflake-arctic-embed',
+					);
+					foreach ( $data['models'] as $model ) {
+						$id_lower = strtolower( $model['name'] );
+						$skip     = false;
+						foreach ( $ollama_non_text_patterns as $pattern ) {
+							if ( str_contains( $id_lower, $pattern ) ) {
+								$skip = true;
+								break;
+							}
+						}
+						if ( $skip ) {
+							continue;
+						}
+						$models[] = $model['name'];
+					}
+				}
+				break;
+
+			case 'cohere':
+				$response = wp_remote_get( 'https://api.cohere.com/v1/models', $args );
+				$body     = wp_remote_retrieve_body( $response );
+				$data     = json_decode( $body, true );
+
+				if ( ! empty( $data['models'] ) && is_array( $data['models'] ) ) {
+					foreach ( $data['models'] as $model ) {
+						if ( isset( $model['endpoints'] ) && in_array( 'chat', $model['endpoints'], true ) ) {
+							$models[] = $model['name'];
+						}
+					}
+				}
+				break;
+
+			default:
+				return new \WP_REST_Response( array( 'error' => __( 'Model fetching is not supported for this provider yet. Please enter the model ID manually.', 'jeowp' ) ), 400 );
+		}
+
+		if ( is_wp_error( $response ) ) {
+			return new \WP_REST_Response( array( 'error' => $response->get_error_message() ), 500 );
+		}
+
+		if ( empty( $models ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No models found. Check your API key or permissions.', 'jeowp' ) ), 404 );
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'models'  => array_reverse( $models ),
+			),
+			200
+		);
+	}
+
+	/**
+	 * Callback to test if an API key is valid using a simple Hello World.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 */
+	public function api_test_key( $request ) {
+		try {
+			$provider = $request->get_param( 'provider' );
+			$api_key  = $request->get_param( 'api_key' );
+			$model    = $request->get_param( 'model' );
+
+			if ( empty( $api_key ) ) {
+				if ( 'ollama' === $provider ) {
+					$api_key = \jeo_settings()->get_option( 'ollama_url' );
+				} else {
+					$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+				}
+			}
+
+			if ( empty( $model ) ) {
+				$model = \jeo_settings()->get_option( $provider . '_model' );
+			}
+
+			if ( empty( $api_key ) ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No API Key provided or found in settings.', 'jeowp' ) ), 400 );
+			}
+
+			$adapter = null;
+
+			if ( array_key_exists( $provider, $this->get_adapters() ) ) {
+				$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+			}
+
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'Invalid provider.', 'jeowp' ) ), 400 );
+			}
+
+			// O teste precisa retornar um JSON válido com a estrutura esperada para não quebrar no parser do AI_Adapter
+			// Usamos [SKIP_ENFORCED_SCHEMA] para evitar que o JEO injete o prompt gigante de geolocalização durante o teste de conexão.
+			$test_prompt = AI\System_Prompt_Builder::for_test_connection();
+
+			$result = $adapter->georeference( 'SystemCheck', 'Status: Ping', $test_prompt );
+
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response(
+					array(
+						'success' => false,
+						'message' => $result->get_error_message(),
+					),
+					200
+				);
+			}
+
+			if ( is_array( $result ) ) {
+				return new \WP_REST_Response(
+					array(
+						'success' => true,
+						'message' => __( 'API Key is valid and active!', 'jeowp' ),
+						'data'    => $result,
+					),
+					200
+				);
+			}
+
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'The AI provider returned an unexpected response format.', 'jeowp' ),
+				),
+				200
+			);
+
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => 'System Error: ' . $e->getMessage(),
+				),
+				200
+			);
+		}
+	}
+
+	/**
+	 * Callback to generate an optimized prompt using the active LLM.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 */
+	public function api_chat_prompt_generator( $request ) {
+		$context                 = $request->get_param( 'context' );
+		$provider                = $request->get_param( 'provider' );
+		$api_key                 = $request->get_param( 'api_key' );
+		$model                   = $request->get_param( 'model' );
+		$lang                    = $request->get_param( 'lang' ) ? $request->get_param( 'lang' ) : 'en';
+		$granularity             = sanitize_text_field( $request->get_param( 'granularity' ) ? $request->get_param( 'granularity' ) : \jeo_settings()->get_option( 'ai_cal_granularity', 'balanced' ) );
+		$confidence              = absint( $request->get_param( 'confidence' ) ? $request->get_param( 'confidence' ) : \jeo_settings()->get_option( 'ai_cal_confidence', 50 ) );
+		$title_weight            = absint( $request->get_param( 'title_weight' ) ? $request->get_param( 'title_weight' ) : \jeo_settings()->get_option( 'ai_cal_title_weight', 70 ) );
+		$max_tokens              = absint( $request->get_param( 'max_tokens' ) ? $request->get_param( 'max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_max_tokens', 8000 ) );
+		$use_granularity         = $request->get_param( 'use_granularity' ) ? $request->get_param( 'use_granularity' ) : \jeo_settings()->get_option( 'ai_cal_use_granularity', true );
+		$use_confidence          = $request->get_param( 'use_confidence' ) ? $request->get_param( 'use_confidence' ) : \jeo_settings()->get_option( 'ai_cal_use_confidence', true );
+		$use_title_weight        = $request->get_param( 'use_title_weight' ) ? $request->get_param( 'use_title_weight' ) : \jeo_settings()->get_option( 'ai_cal_use_title_weight', true );
+		$use_max_tokens          = $request->get_param( 'use_max_tokens' ) ? $request->get_param( 'use_max_tokens' ) : \jeo_settings()->get_option( 'ai_cal_use_max_tokens', true );
+		$primary_threshold       = absint( $request->get_param( 'primary_threshold' ) ? $request->get_param( 'primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_primary_threshold', 75 ) );
+		$secondary_threshold     = absint( $request->get_param( 'secondary_threshold' ) ? $request->get_param( 'secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_secondary_threshold', 35 ) );
+		$use_primary_threshold   = $request->get_param( 'use_primary_threshold' ) ? $request->get_param( 'use_primary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_threshold', true );
+		$use_secondary_threshold = $request->get_param( 'use_secondary_threshold' ) ? $request->get_param( 'use_secondary_threshold' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_threshold', true );
+		$primary_max             = absint( $request->get_param( 'primary_max' ) ? $request->get_param( 'primary_max' ) : \jeo_settings()->get_option( 'ai_cal_primary_max', 10 ) );
+		$secondary_max           = absint( $request->get_param( 'secondary_max' ) ? $request->get_param( 'secondary_max' ) : \jeo_settings()->get_option( 'ai_cal_secondary_max', 10 ) );
+		$use_primary_limit       = $request->get_param( 'use_primary_limit' ) ? $request->get_param( 'use_primary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_primary_limit', false );
+		$use_secondary_limit     = $request->get_param( 'use_secondary_limit' ) ? $request->get_param( 'use_secondary_limit' ) : \jeo_settings()->get_option( 'ai_cal_use_secondary_limit', false );
+
+		if ( empty( $context ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'Context is required.', 'jeowp' ) ), 400 );
+		}
+
+		$lang_instruction = ( 'en' === $lang )
+			? 'IMPORTANT: You MUST write the generated prompt and all rules in English. Large Language Models process English instructions more accurately and reliably.'
+			: 'IMPORTANT: You MUST write the generated prompt and all rules in ' . get_bloginfo( 'language' ) . '.';
+
+		$context = $lang_instruction . "\n\nUser request: " . $context;
+
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) && ! empty( $api_key ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+		} else {
+			$adapter = $this->get_active_adapter();
+		}
+
+		if ( is_wp_error( $adapter ) ) {
+			return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+		}
+
+		if ( ! $adapter ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
+		}
+
+		// Prompt Optimizer: Appends model-specific guidelines to the meta-prompt.
+		$model_optimization = '';
+		switch ( $provider ) {
+			case 'gemini':
+				$model_optimization = 'Since the target model is Google Gemini, please use clear Markdown headers (##) and explicit step-by-step instructions. Gemini performs best when formatting is highly structured and unambiguous.';
+				break;
+			case 'openai':
+				$model_optimization = 'Since the target model is OpenAI (GPT), provide highly concise, abstract rules. GPT models are excellent at generalizing logic and understanding constraints without excessive verbosity.';
+				break;
+			case 'deepseek':
+				$model_optimization = 'Since the target model is DeepSeek, enclose critical thinking rules and constraints inside XML-like tags (e.g., <rules>...</rules>). DeepSeek is a reasoning model and heavily benefits from chain-of-thought and structured tag-based directives.';
+				break;
+			case 'anthropic':
+				$model_optimization = "Since the target model is Anthropic Claude, use conversational but highly detailed boundaries. Claude responds well to 'constitutional' style rules and clearly defined 'Do not do X' instructions.";
+				break;
+			default:
+				$model_optimization = 'Make the prompt robust, precise, and well-structured to ensure high accuracy in georeferencing tasks.';
+				break;
+		}
+
+		$calibration_rules = '';
+		if ( $use_granularity ) {
+			if ( 'broad' === $granularity ) {
+				$calibration_rules .= "- Prefer extracting large-scale locations (countries, regions, states, major cities). Avoid small neighborhoods, streets, or individual landmarks.\n";
+			} elseif ( 'fine' === $granularity ) {
+				$calibration_rules .= "- Prioritize extracting specific, fine-grained locations (streets, landmarks, neighborhoods, points of interest). Do not skip detailed addresses or place names.\n";
+			} else {
+				$calibration_rules .= "- Extract a balanced mix of locations: cities, neighborhoods, and notable landmarks. Use common sense to determine importance.\n";
+			}
+		}
+		if ( $use_confidence ) {
+			$calibration_rules .= "- Only output locations with a confidence level of at least {$confidence}. If uncertain, skip the location rather than guessing.\n";
+		}
+		if ( $use_title_weight ) {
+			$calibration_rules .= "- When a location is mentioned in the post title, apply a priority boost of {$title_weight} percent. Title mentions usually indicate the primary geographic focus of the content.\n";
+		}
+		if ( $use_max_tokens ) {
+			$calibration_rules .= "- The generated system prompt MUST be concise enough to fit within a {$max_tokens} token budget. Avoid redundant examples and verbose explanations. Focus on the most critical rules.\n";
+		}
+		if ( $use_primary_threshold ) {
+			$calibration_rules .= "- Locations with a confidence score of {$primary_threshold} or higher should be classified as PRIMARY (main geographic focus of the content).\n";
+		}
+		if ( $use_secondary_threshold ) {
+			$calibration_rules .= "- Locations with a confidence score below {$primary_threshold} but at least {$secondary_threshold} should be classified as SECONDARY (mentioned but not central).\n";
+			$calibration_rules .= "- Locations with a confidence score below {$secondary_threshold} should be discarded entirely (treated as disabled / not relevant enough).\n";
+		}
+		if ( $use_primary_limit ) {
+			$calibration_rules .= "- Return at most {$primary_max} PRIMARY location(s). Never exceed this limit.\n";
+		}
+		if ( $use_secondary_limit ) {
+			$calibration_rules .= "- Return at most {$secondary_max} SECONDARY location(s). Never exceed this limit.\n";
+		}
+		$calibration_rules .= "- CRITICAL: Each location object MUST include the boolean field 'is_primary'. Set it to true ONLY for locations that are the MAIN geographic focus of the content (where the story happens, the central territory, or the primary object of the report). Set it to false for all secondary, supporting, or contextual locations. Do NOT rely solely on confidence scores for this classification; use your editorial judgment based on the text analysis.\n";
+
+		$structured_active = \jeo_settings()->get_option( 'ai_use_structured_output' );
+
+		// When structured output is active the JSON schema is enforced natively by the provider.
+		// The generated system prompt should NOT include the aggressive CRITICAL INSTRUCTION block,
+		// otherwise it creates conflicting instructions.
+		if ( $structured_active ) {
+			$output_format_mandate = "### OUTPUT FORMAT MANDATE — ABSOLUTE RULE
+The JEO system now uses Native Structured Output (API-level schema enforcement). This means the AI provider automatically handles the JSON response format.
+
+YOU MUST OMIT the following from your generated system prompt:
+- ANY paragraph starting with 'CRITICAL INSTRUCTION' that mentions JSON arrays, keys, or response format.
+- ANY 'Example of the ONLY valid format' block.
+- ANY instruction like 'If no locations are found, return exactly []'.
+- ANY 'Output MUST start with [' or similar formatting rules.
+
+If you include these, the prompt will contain CONFLICTING INSTRUCTIONS and the AI will produce errors.
+Focus ONLY on editorial rules, calibration, and geographic logic.";
+		} else {
+			$output_format_mandate = "### OUTPUT FORMAT MANDATE
+You MUST conclude your response by appending the EXACT following block. DO NOT translate, do not rephrase, do not use markdown code blocks inside the prompt text itself. Just paste it:
+
+\"CRITICAL INSTRUCTION: You MUST respond ONLY with a raw, flat JSON array of objects. Do not nest the array inside a parent object.
+Each object inside the array MUST have EXACTLY these keys: 'name', 'lat', 'lon', 'quote', 'confidence'. Do NOT use any other keys like 'city', 'country', 'continent', 'type', or 'keywords'.
+- 'name': The location name.
+- 'lat': Latitude (string or float).
+- 'lon': Longitude (string or float).
+- 'quote': A short relevant snippet (10-15 words) from the provided text where this location is mentioned.
+- 'confidence': An integer between 0 and 100 representing your confidence level in this extraction.
+Example of the ONLY valid format: [{\"name\": \"Teatro Amazonas\", \"lat\": -3.1303, \"lon\": -60.0234, \"quote\": \"...localizado no centro...\", \"confidence\": 95}]
+If no locations are found, return exactly []. Do not use markdown backticks, no conversational text. Output MUST start with [ and end with ].\"";
+		}
+
+		// Meta-prompt instructed to build a JEO prompt.
+		$meta_prompt = "You are an expert Prompt Engineer for the JEO WordPress mapping plugin.
+The user wants to configure an AI georeferencing tool with specific editorial rules: '{$context}'.
+Write a clear, strict System Prompt that incorporates the user's rules.
+{$model_optimization}
+
+### CALIBRATION RULES
+{$calibration_rules}
+
+{$output_format_mandate}
+
+Output ONLY the generated prompt text without any markdown wrappers or conversational intro.";
+
+		// We "abuse" the georeference method signature by passing the meta_prompt as the 'content'
+		// and using a dummy system prompt so the LLM acts as an assistant.
+		$test_title         = 'Prompt Engineering Task';
+		$assistant_override = '[SKIP_ENFORCED_SCHEMA] You are an assistant. Just do as instructed in the text.';
+
+		$meta_prompt_json_hack = $meta_prompt . "\n\nCRITICAL SYSTEM OVERRIDE: Your ONLY output must be a single JSON array containing one object with the exact key 'quote'. The value of 'quote' MUST BE the entire generated prompt, INCLUDING the verbatim JSON instruction paragraph at the end. Do NOT omit the verbatim paragraph from the 'quote' value. Return your generated prompt inside this exact JSON format: [{\"name\": \"PROMPT_GENERATED\", \"lat\": 0, \"lng\": 0, \"quote\": \"<PUT_YOUR_GENERATED_PROMPT_HERE>\"}]";
+		$result                = $adapter->georeference( $test_title, $meta_prompt_json_hack, $assistant_override );
+
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
+		}
+
+		$generated_prompt = isset( $result[0]['quote'] ) ? $result[0]['quote'] : '';
+		if ( empty( $generated_prompt ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'AI failed to generate prompt.', 'jeowp' ) ), 500 );
+		}
+
+		return new \WP_REST_Response( array( 'prompt' => $generated_prompt ), 200 );
+	}
+
+	/**
+	 * Callback to validate a custom prompt.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 */
+	public function api_validate_prompt( $request ) {
+		$custom_prompt = $request->get_param( 'prompt' );
+		$provider      = $request->get_param( 'provider' );
+		$api_key       = $request->get_param( 'api_key' );
+		$model         = $request->get_param( 'model' );
+
+		if ( empty( $custom_prompt ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'Prompt is required.', 'jeowp' ) ), 400 );
+		}
+
+		if ( empty( $api_key ) ) {
+			if ( 'ollama' === $provider ) {
+				$api_key = \jeo_settings()->get_option( 'ollama_url' );
+			} else {
+				$api_key = \jeo_settings()->get_option( $provider . '_api_key' );
+			}
+		}
+
+		if ( empty( $model ) ) {
+			$model = \jeo_settings()->get_option( $provider . '_model' );
+		}
+
+		if ( array_key_exists( $provider, $this->get_adapters() ) && ! empty( $api_key ) ) {
+			$adapter = new AI\Neuron_Adapter( $provider, (string) $api_key, (string) $model );
+		} else {
+			$adapter = $this->get_active_adapter();
+		}
+
+		if ( is_wp_error( $adapter ) ) {
+			return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+		}
+
+		if ( ! $adapter ) {
+			return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
+		}
+
+		// Use a diverse global text so validation succeeds regardless of regional prompt restrictions (Europe, Brazil, etc.).
+		$test_title   = 'Global News Report: Environment and Economy';
+		$test_content = 'Today, leaders met in Paris, France to discuss the European economy. Meanwhile, a scientific expedition in the Amazon Rainforest left Manaus, Brazil, to explore the Encontro das Águas. In Asia, Tokyo, Japan reported new technological advancements.';
+
+		// Pass empty string for assistant override to let the adapter attach the enforced schema.
+		$result = $adapter->georeference( $test_title, $test_content, $custom_prompt );
+
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				200
+			); // Send 200 so UI can display the error nicely.
+		}
+
+		// Strict schema validation.
+		$is_valid = true;
+		$msg      = __( 'Prompt successfully validated! The AI understood your instructions and returned a valid JSON array.', 'jeowp' );
+
+		if ( ! is_array( $result ) ) {
+			$is_valid = false;
+			$msg      = __( 'Validation failed: The AI did not return a valid JSON array.', 'jeowp' );
+		} elseif ( count( $result ) > 0 ) {
+			foreach ( $result as $item ) {
+				if ( ! isset( $item['name'] ) || ! array_key_exists( 'lat', $item ) || ! array_key_exists( 'lon', $item ) || ! isset( $item['quote'] ) ) {
+					$is_valid = false;
+					$msg      = __( 'Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects.', 'jeowp' );
+					break;
+				}
+				if ( isset( $item['is_primary'] ) && ! is_bool( $item['is_primary'] ) && ! in_array( $item['is_primary'], array( true, false, 1, 0, 'true', 'false' ), true ) ) {
+					$is_valid = false;
+					$msg      = __( 'Validation failed: The AI returned an invalid is_primary value (must be boolean).', 'jeowp' );
+					break;
+				}
+			}
+		} else {
+			// Array is empty (count == 0). This is VALID if the AI correctly filtered out locations based on user prompt.
+			$msg = __( 'Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text.', 'jeowp' );
+		}
+
+		return new \WP_REST_Response(
+			array(
+				'success' => $is_valid,
+				'message' => $msg,
+				'data'    => $result,
+			),
+			200
+		);
+	}
+
+	/**
+	 * Callback for the AI georeference API.
+	 *
+	 * @param \WP_REST_Request $request The request object.
+	 * @return \WP_REST_Response
+	 */
+	public function api_georeference( $request ) {
+		$post_id = $request->get_param( 'post_id' );
+		$title   = $request->get_param( 'title' );
+		$content = $request->get_param( 'content' );
+
+		if ( empty( $title ) && ! empty( $post_id ) ) {
+			$post    = get_post( $post_id );
+			$title   = $post->post_title;
+			$content = $post->post_content;
+		}
+
+		// Optionally append taxonomy terms to provide extra context for georeferencing.
+		if ( ! empty( $post_id ) && \jeo_settings()->get_option( 'ai_include_taxonomies' ) ) {
+			$tax_context = $this->get_post_taxonomy_context( $post_id );
+			if ( ! empty( $tax_context ) ) {
+				$content .= "\n\n" . $tax_context;
+			}
+		}
+
+		try {
+			$adapter = $this->get_active_adapter();
+
+			if ( is_wp_error( $adapter ) ) {
+				return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+			}
+
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
+			}
+
+			$result = $adapter->georeference( $title, $content );
+
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
+			}
+
+			return new \WP_REST_Response( $result, 200 );
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'error' => __( 'An unexpected error occurred while processing the AI request.', 'jeowp' ) . ' ' . $e->getMessage(),
+				),
+				500
+			);
+		}
+	}
+
+		/**
+		 * Multi-turn georeferencing with conversation history.
+		 *
+		 * @param \WP_REST_Request $request Current REST request.
+		 * @return \WP_REST_Response
+		 */
+	public function api_georeference_chat( $request ) {
+		$post_id         = $request->get_param( 'post_id' );
+		$conversation_id = $request->get_param( 'conversation_id' );
+		$message         = trim( $request->get_param( 'message' ) );
+		$title           = $request->get_param( 'title' );
+		$content         = $request->get_param( 'content' );
+
+		if ( empty( $title ) && ! empty( $post_id ) ) {
+			$post    = get_post( $post_id );
+			$title   = $post->post_title;
+			$content = $post->post_content;
+		}
+
+		$conv = new AI\Georeferencing_Conversation( (int) $post_id, $conversation_id );
+
+		try {
+			$adapter = $this->get_active_adapter();
+
+			if ( is_wp_error( $adapter ) ) {
+				return new \WP_REST_Response( array( 'error' => $adapter->get_error_message() ), 400 );
+			}
+
+			if ( ! $adapter ) {
+				return new \WP_REST_Response( array( 'error' => __( 'No active AI adapter found.', 'jeowp' ) ), 500 );
+			}
+
+			// First interaction: store the initial post context.
+			if ( ! $conv->exists() ) {
+				$conv->start( $title, $content );
+			}
+
+			// If user sent a refinement message, add it to the thread.
+			if ( ! empty( $message ) ) {
+				$conv->add_user_message( $message );
+			}
+
+			// Run georeferencing (currently stateless; future Phase will inject history).
+			$result = $adapter->georeference( $title, $content );
+
+			if ( is_wp_error( $result ) ) {
+				return new \WP_REST_Response( array( 'error' => $result->get_error_message() ), 400 );
+			}
+
+			// Persist assistant response for future refinement context.
+			$conv->add_assistant_message( wp_json_encode( $result ) );
+
+			return new \WP_REST_Response(
+				array(
+					'locations'       => $result,
+					'conversation_id' => $conversation_id,
+				),
+				200
+			);
+		} catch ( \Throwable $e ) {
+			return new \WP_REST_Response(
+				array(
+					'error' => __( 'An unexpected error occurred while processing the AI chat request.', 'jeowp' ) . ' ' . $e->getMessage(),
+				),
+				500
+			);
+		}
+	}
+
+		/**
+		 * Build a taxonomy context string from a post's categories and tags.
+		 *
+		 * @param int $post_id Post ID.
+		 * @return string
+		 */
+	private function get_post_taxonomy_context( $post_id ) {
+		$lines = array();
+
+		$categories = get_the_category( $post_id );
+		if ( ! empty( $categories ) && ! is_wp_error( $categories ) ) {
+			$names   = wp_list_pluck( $categories, 'name' );
+			$lines[] = 'Categories: ' . implode( ', ', $names );
+		}
+
+		$tags = get_the_tags( $post_id );
+		if ( ! empty( $tags ) && ! is_wp_error( $tags ) ) {
+			$names   = wp_list_pluck( $tags, 'name' );
+			$lines[] = 'Tags: ' . implode( ', ', $names );
+		}
+
+		return empty( $lines ) ? '' : implode( "\n", $lines );
+	}
+
+	/**
+	 * Get the default system prompt for the AI adapters.
+	 *
+	 * @return string
+	 */
+	public function get_default_system_prompt() {
+		return AI_Adapter::get_calibration_aware_prompt();
+	}
+
+	/**
+	 * Parse the raw AI debug log and return the last $limit entries.
+	 *
+	 * @param int $limit Number of entries to return.
+	 * @return array
+	 */
+	public function get_last_logs( $limit = 10 ) {
+		$log_file = JEO_BASEPATH . 'jeo-ai-debug.log';
+
+		if ( ! file_exists( $log_file ) ) {
+			$upload_dir = wp_upload_dir();
+			$log_file   = trailingslashit( $upload_dir['basedir'] ) . 'jeo-ai-debug.log';
+		}
+
+		if ( ! file_exists( $log_file ) ) {
+			return array();
+		}
+
+		$content = file_get_contents( $log_file ); // phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
+		if ( false === $content || empty( $content ) ) {
+			return array();
+		}
+
+		// Split logs by the separator line.
+		$entries_raw = explode( str_repeat( '=', 80 ) . "\n\n", $content );
+
+		// Clean empty ends.
+		$entries_raw = array_filter( array_map( 'trim', $entries_raw ) );
+
+		$parsed_entries = array();
+
+		foreach ( $entries_raw as $raw_entry ) {
+			if ( empty( $raw_entry ) ) {
+				continue;
+			}
+
+			// Extract components using basic regex/strpos.
+			$timestamp = '';
+			$provider  = '';
+			$input     = '';
+			$output    = '';
+
+			if ( preg_match( '/^\[(.*?)\] PROVIDER: (.*?)\n/s', $raw_entry, $matches ) ) {
+				$timestamp = $matches[1];
+				$provider  = trim( $matches[2] );
+			}
+
+			// Find INPUT section.
+			if ( preg_match( '/INPUT \(Prompt\):\n(.*?)\nOUTPUT \(Raw Response\):/s', $raw_entry, $matches ) ) {
+				$input = trim( $matches[1] );
+			}
+
+			// Find OUTPUT section.
+			if ( preg_match( '/OUTPUT \(Raw Response\):\n(.*)$/s', $raw_entry, $matches ) ) {
+				$output = trim( $matches[1] );
+			}
+
+			if ( ! empty( $timestamp ) ) {
+				$parsed_entries[] = array(
+					'timestamp' => $timestamp,
+					'provider'  => $provider,
+					'input'     => $input,
+					'output'    => $output,
+				);
+			}
+		}
+
+		// Reverse to get newest first and slice.
+		$parsed_entries = array_reverse( $parsed_entries );
+		return array_slice( $parsed_entries, 0, $limit );
+	}
+
+	/**
+	 * REST Callback: Trigger a backup.
+	 */
+	public function api_backup_store() {
+		$result = \jeo_rag_backup()->do_backup();
+		if ( is_wp_error( $result ) ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => $result->get_error_message(),
+				),
+				500
+			);
+		}
+		return new \WP_REST_Response(
+			array(
+				'success' => true,
+				'message' => __( 'Backup created successfully!', 'jeowp' ),
+			),
+			200
+		);
+	}
+
+	/**
+	 * REST Callback: List backups.
+	 */
+	public function api_list_backups() {
+		return new \WP_REST_Response( \jeo_rag_backup()->get_backups(), 200 );
+	}
+
+	/**
+	 * REST Callback: Delete a backup.
+	 *
+	 * @param \WP_REST_Request $request Current REST request.
+	 */
+	public function api_delete_backup( $request ) {
+		$filename = $request->get_param( 'filename' );
+		if ( empty( $filename ) ) {
+			return new \WP_REST_Response( array( 'error' => __( 'Missing filename', 'jeowp' ) ), 400 );
+		}
+
+		$uploads   = wp_upload_dir();
+		$file_path = $uploads['basedir'] . '/jeo-ai-store/backups/' . sanitize_file_name( $filename );
+
+		if ( file_exists( $file_path ) && str_ends_with( $file_path, '.zip' ) ) {
+			wp_delete_file( $file_path );
+			return new \WP_REST_Response( array( 'success' => true ), 200 );
+		}
+
+		return new \WP_REST_Response( array( 'error' => __( 'File not found', 'jeowp' ) ), 404 );
+	}
+}

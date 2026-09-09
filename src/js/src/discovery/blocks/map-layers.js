@@ -1,6 +1,6 @@
 import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { List, arrayMove } from 'react-movable';
 import { addQueryArgs } from '@wordpress/url';
 

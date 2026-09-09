@@ -1,8 +1,8 @@
 site_name: JEO
-site_url: https://www.jeowp.org/
+site_url: https://www.jeowp.org/docs/
 repo_url: https://github.com/InfoAmazonia/jeo-plugin
 docs_dir: docs
-site_dir: site
+site_dir: site/docs
 theme:
   name: readthedocs
 nav:
@@ -15,11 +15,19 @@ nav:
       - Maps: map-post.md
       - Discovery: discovery.md
       - Story map: story-map.md
+      - Stories near you: stories-near-you.md
+      - Minimap: minimap.md
       - Map shortcode: map-shortcode.md
       - Map block: map-block.md
       - One-time map block: one-time-map-block.md
       - Map embed: map-embed.md
       - Geolocating posts: geolocating-posts.md
+  - AI:
+      - AI in JEO: ai-in-jeo.md
+      - AI Settings: ai-settings.md
+      - AI Context Assistant: ai-context-assistant.md
+      - AI Georeferencing: ai-georeferencing.md
+      - AI Bulk Geolocation: ai-bulk-geolocation.md
   - Developer:
       - Geo information: dev/geo-information.md
       - Geocoders: dev/geocoders.md
@@ -27,6 +35,8 @@ nav:
       - Layer types API: dev/layer-types-api.md
       - Migration: dev/migration.md
       - PHP compatibility: dev/php-compatibility.md
+      - WordPress.org compliance: dev/wordpress-org-compliance.md
+      - WordPress.org audit report: dev/wordpress-org-audit-report.md
       - Dependency maintenance: dev/dependency-maintenance.md
 exclude_docs: |
   README.md

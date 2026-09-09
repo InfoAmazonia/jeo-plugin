@@ -2,7 +2,7 @@
 
 The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is intuitive and interactive.
 
-You can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by configuring layers hosted on Mapbox and choosing between MapboxGL and MapLibreGL, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
+You can post geolocated stories and create richly designed pages for each one of the featured stories. At the same time, by configuring layers hosted on Mapbox and choosing between MapboxGL and MapLibreGL, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
 
 ## Features
 
@@ -14,6 +14,9 @@ You can post geotagged stories and create richly designed pages for each one of 
 - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
 - Map markers query integrated to posts query.
 - Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilingual plugins
+- AI-powered georeferencing, bulk geolocation, and map generation (multiple AI providers)
+- Stories Near You block with geolocation-based post discovery
+- AI-assisted map block (Minimap) with chat refinement and auto-generated layers
 
 ## User tutorials
 
@@ -41,10 +44,21 @@ You can post geotagged stories and create richly designed pages for each one of 
 ### Posts
 
 - [Geolocating posts](geolocating-posts.md)
+- [AI Georeferencing](ai-georeferencing.md)
+- [AI Bulk Geolocation](ai-bulk-geolocation.md)
 - [Using a map shortcode](map-shortcode.md)
 - [Using a map block](map-block.md)
 - [Using an one-time map block](one-time-map-block.md)
 - [Using a map embed](map-embed.md)
+
+### AI Features
+
+- [AI Settings](ai-settings.md)
+- [Minimap — AI-Assisted Map Block](minimap.md)
+
+### Stories Near You
+
+- [Stories Near You block](stories-near-you.md)
 
 ## Developer documentation
 

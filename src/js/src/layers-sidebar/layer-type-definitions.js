@@ -102,6 +102,14 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						default: 'vector',
 						disabled: true,
 					},
+					access_token: {
+						type: 'string',
+						title: __( 'Access token', 'jeowp' ),
+						description: __(
+							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+							'jeowp'
+						),
+					},
 				},
 			};
 		case 'mapbox-tileset-raster':
@@ -130,6 +138,14 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						type: 'string',
 						default: 'raster',
 						disabled: true,
+					},
+					access_token: {
+						type: 'string',
+						title: __( 'Access token', 'jeowp' ),
+						description: __(
+							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+							'jeowp'
+						),
 					},
 				},
 			};
@@ -173,6 +189,14 @@ function getFallbackLayerTypeSchema( attributes = {} ) {
 						type: 'string',
 						default: 'vector',
 						disabled: true,
+					},
+					access_token: {
+						type: 'string',
+						title: __( 'Access token', 'jeowp' ),
+						description: __(
+							'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+							'jeowp'
+						),
 					},
 				},
 			};
