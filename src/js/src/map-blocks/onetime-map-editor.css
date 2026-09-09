@@ -366,8 +366,13 @@ ul.jeo-layers-list .components-card {
 .jeo-setting + button {
 	margin-top: 1em;
 }
+.jeo-setting-layer {
+	line-height: 1.35;
+}
 .jeo-setting-layer h2 {
-	margin-bottom: 0;
+	font-size: 1em;
+	line-height: inherit;
+	margin-bottom: 0.5em;
 }
 
 /**
