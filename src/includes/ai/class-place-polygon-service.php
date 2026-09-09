@@ -136,12 +136,8 @@ class Place_Polygon_Service {
 				'post_type'    => 'map-layer',
 				'post_title'   => $post_title,
 				'post_status'  => 'publish',
-				'post_excerpt' => Minilayer_Metadata::build_excerpt(
-					$post_title,
-					$result['source'],
-					$result['attribution'],
-					__( 'Geometry simplified for interactive display; use authoritative source for legal boundaries.', 'jeowp' ),
-					'geojson'
+				'post_excerpt' => Minilayer_Metadata::build_description(
+					self::boundary_description( $result )
 				),
 			)
 		);
@@ -307,6 +303,48 @@ class Place_Polygon_Service {
 	private function sanitize_geojson_filename( string $display_name ): string {
 		$slug = sanitize_title( $display_name );
 		return '' !== $slug ? $slug : 'boundary';
+	}
+
+	/**
+	 * Build a deterministic, site-language description for a boundary layer.
+	 *
+	 * @param array $result Adapter result with display_name, entity_type, region.
+	 * @return string
+	 */
+	private static function boundary_description( array $result ): string {
+		$display_name = $result['display_name'];
+		$entity_type  = $result['entity_type'] ?? 'other';
+		$region       = $result['region'] ?? '';
+
+		switch ( $entity_type ) {
+			case 'municipality':
+				if ( '' !== $region ) {
+					$display_name = sprintf( '%s (%s)', $display_name, $region );
+				}
+				return sprintf(
+					/* translators: %s: municipality name with state abbreviation. */
+					__( 'Layer showing the area of the municipality of %s', 'jeowp' ),
+					$display_name
+				);
+			case 'state':
+				return sprintf(
+					/* translators: %s: state name. */
+					__( 'Layer showing the area of the state of %s', 'jeowp' ),
+					$display_name
+				);
+			case 'indigenous_land':
+				return sprintf(
+					/* translators: %s: indigenous land name. */
+					__( 'Layer showing the indigenous land %s', 'jeowp' ),
+					$display_name
+				);
+			default:
+				return sprintf(
+					/* translators: %s: place display name. */
+					__( 'Layer showing the area of %s', 'jeowp' ),
+					$display_name
+				);
+		}
 	}
 
 	/**

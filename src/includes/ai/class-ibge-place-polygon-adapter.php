@@ -64,7 +64,9 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 		$result = array(
 			'source'       => $this->get_source(),
 			'display_name' => $entity['name'],
-			'attribution'  => __( 'Source: IBGE', 'jeowp' ),
+			'attribution'  => __( 'IBGE', 'jeowp' ),
+			'entity_type'  => $entity['type'],
+			'region'       => $entity['region'] ?? '',
 			'geojson'      => $geojson,
 			'bbox'         => $bbox,
 		);
@@ -107,9 +109,10 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 		}
 
 		return array(
-			'id'   => (int) $match['id'],
-			'name' => sanitize_text_field( $match['nome'] ),
-			'type' => 'municipality',
+			'id'     => (int) $match['id'],
+			'name'   => sanitize_text_field( $match['nome'] ),
+			'type'   => 'municipality',
+			'region' => sanitize_text_field( $match['microrregiao']['mesorregiao']['UF']['sigla'] ?? '' ),
 		);
 	}
 

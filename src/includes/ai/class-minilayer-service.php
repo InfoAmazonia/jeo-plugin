@@ -112,13 +112,7 @@ class Minilayer_Service {
 				'post_type'    => 'map-layer',
 				'post_title'   => $post_title,
 				'post_status'  => 'publish',
-				'post_excerpt' => Minilayer_Metadata::build_excerpt(
-					$post_title,
-					$spec->tileset_id,
-					'',
-					$spec->limitations,
-					'mapbox-tileset-vector'
-				),
+				'post_excerpt' => Minilayer_Metadata::build_description( self::layer_description( $spec, $post_title ) ),
 			)
 		);
 
@@ -148,13 +142,13 @@ class Minilayer_Service {
 			update_post_meta( $post_id, 'default_style', $default_style );
 		}
 
-		$attribution = $spec->limitations
-			? $spec->limitations
-			: sprintf(
-				/* translators: %s: tileset ID. */
-				__( 'Data from Mapbox tileset %s.', 'jeowp' ),
-				$spec->tileset_id
-			);
+		// Attribution is a source credit, not the limitations text — the UI
+		// already labels the field ("Source:"/"Fonte:"), so keep it short.
+		$attribution = sprintf(
+			/* translators: %s: tileset ID. */
+			__( 'Mapbox tileset %s', 'jeowp' ),
+			$spec->tileset_id
+		);
 		update_post_meta( $post_id, 'attribution', $attribution );
 
 		Minilayer_Metadata::assign_theme( $post_id, $theme );
@@ -199,20 +193,12 @@ class Minilayer_Service {
 			return $published;
 		}
 
-		$source_label = $spec->external_sources ? __( 'External sources', 'jeowp' ) : __( 'Mapbox composed style', 'jeowp' );
-
 		$post_id = wp_insert_post(
 			array(
 				'post_type'    => 'map-layer',
 				'post_title'   => $post_title,
 				'post_status'  => 'publish',
-				'post_excerpt' => Minilayer_Metadata::build_excerpt(
-					$post_title,
-					$source_label,
-					'',
-					$spec->limitations,
-					'mapbox'
-				),
+				'post_excerpt' => Minilayer_Metadata::build_description( self::layer_description( $spec, $post_title ) ),
 			)
 		);
 
@@ -229,9 +215,11 @@ class Minilayer_Service {
 			)
 		);
 
-		$attribution = $spec->limitations
-			? $spec->limitations
-			: __( 'Composed Mapbox style with external sources.', 'jeowp' );
+		// Attribution is a source credit, not the limitations text — the UI
+		// already labels the field ("Source:"/"Fonte:"), so keep it short.
+		$attribution = $spec->external_sources
+			? __( 'External sources', 'jeowp' )
+			: __( 'Mapbox composed style', 'jeowp' );
 		update_post_meta( $post_id, 'attribution', $attribution );
 
 		Minilayer_Metadata::assign_theme( $post_id, $spec->theme );
@@ -308,6 +296,18 @@ class Minilayer_Service {
 		}
 
 		return __( 'Minilayer', 'jeowp' );
+	}
+
+	/**
+	 * Resolve the layer description from the spec, falling back to the title.
+	 *
+	 * @param Layer_Spec_Output $spec       Classified spec.
+	 * @param string            $post_title Resolved layer title.
+	 * @return string
+	 */
+	private static function layer_description( Layer_Spec_Output $spec, string $post_title ): string {
+		$description = trim( $spec->description );
+		return '' !== $description ? $description : $post_title;
 	}
 
 	/**

@@ -87,7 +87,8 @@ class FUNAI_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 		$result = array(
 			'source'       => $this->get_source(),
 			'display_name' => $display,
-			'attribution'  => __( 'Source: FUNAI', 'jeowp' ),
+			'attribution'  => __( 'FUNAI', 'jeowp' ),
+			'entity_type'  => 'indigenous_land',
 			'geojson'      => array(
 				'type'     => 'FeatureCollection',
 				'features' => array( $feature ),

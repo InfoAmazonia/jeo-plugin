@@ -83,7 +83,8 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 		$result = array(
 			'source'       => $this->get_source(),
 			'display_name' => sanitize_text_field( $match['display_name'] ?? $place_name ),
-			'attribution'  => __( 'Source: OpenStreetMap contributors', 'jeowp' ),
+			'attribution'  => __( 'OpenStreetMap contributors', 'jeowp' ),
+			'entity_type'  => 'other',
 			'geojson'      => $geojson,
 			'bbox'         => $bbox,
 		);

@@ -42,50 +42,18 @@ class Minilayer_Metadata {
 	);
 
 	/**
-	 * Build a useful post excerpt for a generated layer.
+	 * Build a plain-text post excerpt for a generated layer.
 	 *
-	 * @param string $layer_title Layer title.
-	 * @param string $source      Source identifier (e.g. 'ibge', 'osm', 'mapbox-streets-v8').
-	 * @param string $attribution Attribution text.
-	 * @param string $limitations Limitations text.
-	 * @param string $layer_type  CPT layer type.
+	 * The excerpt is a single descriptive paragraph (e.g. "Layer showing the
+	 * municipality of Manaus (AM)") with no disclaimers — attribution,
+	 * limitations and layer type are stored in their own meta fields and
+	 * labelled by the UI, so they must not be repeated here.
+	 *
+	 * @param string $description Description paragraph.
 	 * @return string
 	 */
-	public static function build_excerpt( string $layer_title, string $source, string $attribution, string $limitations, string $layer_type ): string {
-		$parts = array();
-
-		/* translators: %s: layer title. */
-		$parts[] = sprintf( __( 'AI-generated layer: %s.', 'jeowp' ), $layer_title );
-
-		if ( '' !== $attribution ) {
-			// Keep the plain-text excerpt free of markup and encoded entities
-			// (e.g. "&copy; <a href=...>Source</a>" becomes "© Source").
-			$parts[] = html_entity_decode( wp_strip_all_tags( $attribution ), ENT_QUOTES, get_bloginfo( 'charset' ) );
-		}
-
-		if ( '' !== $source ) {
-			$parts[] = sprintf(
-				/* translators: %s: source name. */
-				__( 'Data source: %s.', 'jeowp' ),
-				esc_html( $source )
-			);
-		}
-
-		if ( '' !== $limitations ) {
-			$parts[] = sprintf(
-				/* translators: %s: limitations text. */
-				__( 'Limitations: %s', 'jeowp' ),
-				$limitations
-			);
-		}
-
-		$parts[] = sprintf(
-			/* translators: %s: layer type. */
-			__( 'Layer type: %s.', 'jeowp' ),
-			esc_html( $layer_type )
-		);
-
-		return implode( ' ', $parts );
+	public static function build_description( string $description ): string {
+		return sanitize_text_field( $description );
 	}
 
 	/**

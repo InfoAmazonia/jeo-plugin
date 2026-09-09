@@ -5015,22 +5015,18 @@ msgid "Restored map version %d."
 msgstr "Versão %d do mapa restaurada."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-funai-place-polygon-adapter.php:150
+#: includes/ai/class-funai-place-polygon-adapter.php:151
 #, php-format
 msgid "FUNAI WFS returned HTTP %d."
 msgstr "O WFS da FUNAI retornou HTTP %d."
 
-#: includes/ai/class-funai-place-polygon-adapter.php:160
+#: includes/ai/class-funai-place-polygon-adapter.php:161
 msgid "Could not parse FUNAI WFS response."
 msgstr "Não foi possível analisar a resposta do WFS da FUNAI."
 
 #: includes/ai/class-funai-place-polygon-adapter.php:83
 msgid "Could not compute bounding box from FUNAI geometry."
 msgstr "Não foi possível calcular a caixa delimitadora a partir da geometria da FUNAI."
-
-#: includes/ai/class-funai-place-polygon-adapter.php:90
-msgid "Source: FUNAI"
-msgstr "Fonte: FUNAI"
 
 #: includes/ai/class-generate-boundary-layer-tool.php:83
 msgid "You do not have permission to generate layers."
@@ -5040,17 +5036,13 @@ msgstr "Você não tem permissão para gerar camadas."
 msgid "Could not compute bounding box from IBGE geometry."
 msgstr "Não foi possível calcular a caixa delimitadora a partir da geometria do IBGE."
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:67
-msgid "Source: IBGE"
-msgstr "Fonte: IBGE"
-
 #. translators: %d: HTTP status code.
-#: includes/ai/class-ibge-place-polygon-adapter.php:264
+#: includes/ai/class-ibge-place-polygon-adapter.php:267
 #, php-format
 msgid "IBGE API returned HTTP %d."
 msgstr "A API do IBGE retornou HTTP %d."
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:274
+#: includes/ai/class-ibge-place-polygon-adapter.php:277
 msgid "Could not parse IBGE geometry response."
 msgstr "Não foi possível analisar a resposta de geometria do IBGE."
 
@@ -5127,30 +5119,6 @@ msgstr "A IA retornou um tipo de geometria inválido."
 msgid "The AI response is missing composed style JSON."
 msgstr "A resposta da IA não tem o JSON de estilo composto."
 
-#. translators: %s: layer title.
-#: includes/ai/class-minilayer-metadata.php:58
-#, php-format
-msgid "AI-generated layer: %s."
-msgstr "Camada gerada por IA: %s."
-
-#. translators: %s: source name.
-#: includes/ai/class-minilayer-metadata.php:67
-#, php-format
-msgid "Data source: %s."
-msgstr "Fonte de dados: %s."
-
-#. translators: %s: limitations text.
-#: includes/ai/class-minilayer-metadata.php:75
-#, php-format
-msgid "Limitations: %s"
-msgstr "Limitações: %s"
-
-#. translators: %s: layer type.
-#: includes/ai/class-minilayer-metadata.php:82
-#, php-format
-msgid "Layer type: %s."
-msgstr "Tipo de camada: %s."
-
 #. translators: %s: layer type.
 #: includes/ai/class-minilayer-service.php:71
 #, php-format
@@ -5167,25 +5135,15 @@ msgstr "Campo tileset obrigatório ausente: %s."
 msgid "Invalid layer geometry type for tileset-vector."
 msgstr "Tipo de geometria de camada inválido para tileset-vector."
 
-#. translators: %s: tileset ID.
-#: includes/ai/class-minilayer-service.php:155
-#, php-format
-msgid "Data from Mapbox tileset %s."
-msgstr "Dados do tileset %s do Mapbox."
-
-#: includes/ai/class-minilayer-service.php:202
+#: includes/ai/class-minilayer-service.php:221
 msgid "External sources"
 msgstr "Fontes externas"
 
-#: includes/ai/class-minilayer-service.php:202
+#: includes/ai/class-minilayer-service.php:222
 msgid "Mapbox composed style"
 msgstr "Estilo composto do Mapbox"
 
-#: includes/ai/class-minilayer-service.php:234
-msgid "Composed Mapbox style with external sources."
-msgstr "Estilo composto do Mapbox com fontes externas."
-
-#: includes/ai/class-minilayer-service.php:310
+#: includes/ai/class-minilayer-service.php:298
 msgid "Minilayer"
 msgstr "Minilayer"
 
@@ -5193,29 +5151,25 @@ msgstr "Minilayer"
 msgid "Could not compute bounding box from OSM geometry."
 msgstr "Não foi possível calcular a caixa delimitadora a partir da geometria do OSM."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:86
-msgid "Source: OpenStreetMap contributors"
-msgstr "Fonte: Colaboradores do OpenStreetMap"
-
-#: includes/ai/class-osm-place-polygon-adapter.php:207
+#: includes/ai/class-osm-place-polygon-adapter.php:208
 msgid "Could not parse Overpass response."
 msgstr "Não foi possível analisar a resposta do Overpass."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:223
+#: includes/ai/class-osm-place-polygon-adapter.php:224
 msgid "Could not assemble closed rings from OSM relation."
 msgstr "Não foi possível montar anéis fechados a partir da relação do OSM."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:262
+#: includes/ai/class-osm-place-polygon-adapter.php:263
 msgid "No Overpass mirrors configured."
 msgstr "Nenhum espelho do Overpass configurado."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-osm-place-polygon-adapter.php:298
+#: includes/ai/class-osm-place-polygon-adapter.php:299
 #, php-format
 msgid "Overpass returned HTTP %d."
 msgstr "O Overpass retornou HTTP %d."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:310
+#: includes/ai/class-osm-place-polygon-adapter.php:311
 msgid "All Overpass mirrors failed."
 msgstr "Todos os espelhos do Overpass falharam."
 
@@ -5231,15 +5185,11 @@ msgstr "Não foi possível encontrar um polígono de limite para \"%s\"."
 msgid "Boundary: %s"
 msgstr "Limite: %s"
 
-#: includes/ai/class-place-polygon-service.php:143
-msgid "Geometry simplified for interactive display; use authoritative source for legal boundaries."
-msgstr "Geometria simplificada para exibição interativa; use a fonte oficial para limites legais."
-
-#: includes/ai/class-place-polygon-service.php:242
+#: includes/ai/class-place-polygon-service.php:238
 msgid "Could not write boundary GeoJSON file."
 msgstr "Não foi possível gravar o arquivo GeoJSON de limite."
 
-#: includes/ai/class-place-polygon-service.php:260
+#: includes/ai/class-place-polygon-service.php:256
 msgid "Could not create boundary GeoJSON attachment."
 msgstr "Não foi possível criar o anexo GeoJSON de limite."
 
@@ -5372,3 +5322,45 @@ msgstr "Opcional. Cole um objeto de estilo MapLibre GL bruto. Tem precedência s
 #: includes/minimap/class-minimap.php:434
 msgid "The previous request could not be processed. Please try again."
 msgstr "A solicitação anterior não pôde ser processada. Tente novamente."
+
+#: includes/ai/class-funai-place-polygon-adapter.php:90
+msgid "FUNAI"
+msgstr "FUNAI"
+
+#: includes/ai/class-ibge-place-polygon-adapter.php:67
+msgid "IBGE"
+msgstr "IBGE"
+
+#. translators: %s: tileset ID.
+#: includes/ai/class-minilayer-service.php:149
+#, php-format
+msgid "Mapbox tileset %s"
+msgstr "Tileset %s do Mapbox"
+
+#: includes/ai/class-osm-place-polygon-adapter.php:86
+msgid "OpenStreetMap contributors"
+msgstr "Colaboradores do OpenStreetMap"
+
+#. translators: %s: municipality name with state abbreviation.
+#: includes/ai/class-place-polygon-service.php:326
+#, php-format
+msgid "Layer showing the area of the municipality of %s"
+msgstr "Camada com área do município de %s"
+
+#. translators: %s: state name.
+#: includes/ai/class-place-polygon-service.php:332
+#, php-format
+msgid "Layer showing the area of the state of %s"
+msgstr "Camada com área do estado de %s"
+
+#. translators: %s: indigenous land name.
+#: includes/ai/class-place-polygon-service.php:338
+#, php-format
+msgid "Layer showing the indigenous land %s"
+msgstr "Camada com área da terra indígena %s"
+
+#. translators: %s: place display name.
+#: includes/ai/class-place-polygon-service.php:344
+#, php-format
+msgid "Layer showing the area of %s"
+msgstr "Camada com área de %s"
