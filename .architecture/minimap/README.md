@@ -19,7 +19,7 @@ The `jeo/ai-minimap` block generates interactive contextual maps inside the Gute
 | `src/includes/ai/class-wp-storage.php` | `StorageInterface` adapter for `post_meta` and `user_meta` |
 | `src/includes/ai/class-wp-user-memory-storage.php` | `StorageInterface` adapter for `user_meta` memories — strips redundant user ID from the namespace so preferences are reusable across contexts |
 | `src/includes/ai/class-wp-option-storage.php` | `StorageInterface` adapter for `wp_options` (single option per namespace, `autoload=false`) |
-| `src/js/src/map-blocks/minimap-editor.js` | Edit component — placeholder, map preview, inspector chat panel (composed Mapbox style support) |
+| `src/js/src/map-blocks/minimap-editor.js` | Edit component — placeholder, map preview, inspector chat panel (composed Mapbox style support), "Understand chosen layers" link that opens the block sidebar scrolled to the Map layers panel |
 | `src/js/src/map-blocks/minimap-display.js` | Save component — renders `<div class="jeomap">` for frontend JS |
 | `src/js/src/map-blocks/index.js` | Block registration with `conversation_id` and `conversation` attributes |
 | `src/js/src/map-blocks/minimap-config.js` | Attribute coercion helpers |
@@ -381,6 +381,15 @@ The inspector sidebar shows three action types when the block is in `ready` stat
 | **Base variant change** | `/minimap/chat` | `sendChat(text, 'base_variant', {variant})` | Structured control — backend resolves to natural language. Single API call (replaces old two-call approach) |
 
 All actions use `chatLoading` state (not `status: 'loading'`) so the map preview stays visible during processing.
+
+### Sidebar Navigation (Preview → Map Layers Panel)
+
+The preview area shows an "Understand chosen layers" link button (only when layers are selected) next to "Edit layers settings". Clicking it:
+
+1. Resolves the top window (`window.parent` — the block preview renders inside the editor iframe, the sidebar in the parent document), mirroring the `map-editor-preview.js` bridge pattern
+2. Dispatches `core/edit-post::openGeneralSidebar('edit-post/block')` on the **parent** registry (guaranteed to hit the UI-controlling store, regardless of store sync across the iframe)
+3. After ~100 ms, queries the parent document for `.jeo-layers-panel` (the `Map layers` PanelBody) and calls `scrollIntoView({ behavior: 'smooth' })`
+4. Fallback: if the panel is not mounted (inspector showing the Styles tab), finds the "Settings" tab inside `.block-editor-block-inspector`, clicks it, and retries the scroll
 
 ## Block Attributes
 

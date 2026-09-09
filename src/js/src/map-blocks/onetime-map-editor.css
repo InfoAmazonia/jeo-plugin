@@ -402,6 +402,16 @@ ul.jeo-layers-list .components-card {
 	margin-top: 16px;
 }
 
+/**
+ * Minimap Preview Controls
+ */
+.jeo-preview-controls {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 8px;
+}
+
 .jeo-minimap-placeholder__loading {
 	display: flex;
 	flex-direction: column;

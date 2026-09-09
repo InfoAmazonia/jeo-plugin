@@ -5364,3 +5364,7 @@ msgstr "Camada com área da terra indígena %s"
 #, php-format
 msgid "Layer showing the area of %s"
 msgstr "Camada com área de %s"
+
+#: js/build/mapBlocks.js:1
+msgid "Understand chosen layers"
+msgstr "Entender camadas escolhidas"

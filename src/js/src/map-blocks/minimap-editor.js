@@ -754,6 +754,46 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 	const closeModal = useCallback( () => setModal( false ), [] );
 	const openModal = useCallback( () => setModal( true ), [] );
 
+	// The minimap preview renders inside the editor iframe while the block
+	// sidebar (InspectorControls) lives in the parent document — resolve the
+	// top window and dispatch there, mirroring the iframe bridge pattern used
+	// by map-editor-preview.js.
+	const openSidebarToLayers = useCallback( () => {
+		let topWin;
+		try {
+			topWin = window.parent !== window ? window.parent : window;
+			topWin.wp.data.dispatch( 'core/edit-post' ).openGeneralSidebar( 'edit-post/block' );
+		} catch ( e ) {
+			return;
+		}
+
+		const scrollToLayersPanel = () => {
+			const panel = topWin.document.querySelector( '.jeo-layers-panel' );
+			if ( panel ) {
+				panel.scrollIntoView( { behavior: 'smooth', block: 'start' } );
+				return true;
+			}
+			return false;
+		};
+
+		topWin.setTimeout( () => {
+			if ( scrollToLayersPanel() ) {
+				return;
+			}
+			// The inspector may be showing the "Styles" tab, which unmounts the
+			// Settings panels — switch back to "Settings" and try again.
+			const settingsTab = Array.from(
+				topWin.document.querySelectorAll(
+					'.block-editor-block-inspector [role="tab"]'
+				)
+			).find( ( tab ) => /settings/i.test( tab.textContent ) );
+			if ( settingsTab ) {
+				settingsTab.click();
+				topWin.setTimeout( scrollToLayersPanel, 150 );
+			}
+		}, 100 );
+	}, [] );
+
 	const setPanLimitsFromMap = () => {
 		const map = mapRef.current;
 		if ( map ) {
@@ -1108,11 +1148,20 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 				) }
 			</div>
 
-			<div className="jeo-preview-controls">
-				<Button variant="primary" isLarge onClick={ openModal }>
-					{ __( 'Edit layers settings', 'jeowp' ) }
+		<div className="jeo-preview-controls">
+			<Button variant="primary" isLarge onClick={ openModal }>
+				{ __( 'Edit layers settings', 'jeowp' ) }
+			</Button>
+			{ allLayers.length > 0 && (
+				<Button
+					variant="link"
+					onClick={ openSidebarToLayers }
+					className="jeo-minimap-understand-layers"
+				>
+					{ __( 'Understand chosen layers', 'jeowp' ) }
 				</Button>
-			</div>
+			) }
+		</div>
 		</div>
 	);
 }

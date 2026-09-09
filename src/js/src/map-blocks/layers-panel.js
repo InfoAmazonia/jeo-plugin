@@ -33,7 +33,7 @@ export default function ( {
 							settings.layer && (
 								<li className="jeo-setting-layer" key={ settings.id }>
 									<h2>
-										{ decodeHtmlEntity( settings.layer.title.rendered ) } -{ ' ' }
+										{ decodeHtmlEntity( settings.layer.title.rendered ) } — { ' ' }
 										{ settings.layer.meta.type }
 									</h2>
 									{ description && (
