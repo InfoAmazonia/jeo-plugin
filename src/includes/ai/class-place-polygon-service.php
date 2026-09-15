@@ -76,7 +76,7 @@ class Place_Polygon_Service {
 				continue;
 			}
 
-			$result = $this->adapters[ $source ]->resolve( $place_name, $context );
+			$result = $this->adapters[ $source ]->resolve( $place_name, $entity_type, $context );
 			if ( is_array( $result ) ) {
 				return $result;
 			}

@@ -48,7 +48,7 @@ class Generate_Boundary_Layer_Tool extends Tool {
 			new ToolProperty(
 				name: 'entity_type',
 				type: PropertyType::STRING,
-				description: 'Optional type hint: "municipality", "state", "indigenous_land", or "other".',
+				description: 'Optional type hint: "municipality", "state", "indigenous_land", or "other". Use "state" for countries too (e.g. "France").',
 				required: false,
 			),
 			new ToolProperty(

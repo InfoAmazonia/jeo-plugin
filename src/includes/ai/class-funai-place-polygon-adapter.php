@@ -26,11 +26,12 @@ class FUNAI_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @param string      $place_name Place name.
-	 * @param string|null $context    Optional context (ignored for FUNAI).
+	 * @param string      $place_name  Place name.
+	 * @param string|null $entity_type Optional entity type hint (ignored for FUNAI).
+	 * @param string|null $context     Optional context (ignored for FUNAI).
 	 */
-	public function resolve( string $place_name, ?string $context = null ) {
-		unset( $context );
+	public function resolve( string $place_name, ?string $entity_type = null, ?string $context = null ) {
+		unset( $entity_type, $context );
 
 		$place_name = $this->normalize_name( $place_name );
 

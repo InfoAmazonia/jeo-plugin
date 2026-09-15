@@ -19,11 +19,12 @@ interface Place_Polygon_Adapter {
 	/**
 	 * Try to resolve a place name into a polygon result.
 	 *
-	 * @param string      $place_name Place name requested by the user.
-	 * @param string|null $context    Optional geographic context (state, country, etc.).
+	 * @param string      $place_name  Place name requested by the user.
+	 * @param string|null $entity_type Optional entity type hint (municipality|state|indigenous_land|other).
+	 * @param string|null $context     Optional geographic context (state, country, etc.).
 	 * @return array|\WP_Error|null Result array or error on failure; null when not applicable.
 	 */
-	public function resolve( string $place_name, ?string $context = null );
+	public function resolve( string $place_name, ?string $entity_type = null, ?string $context = null );
 
 	/**
 	 * Return the adapter identifier.

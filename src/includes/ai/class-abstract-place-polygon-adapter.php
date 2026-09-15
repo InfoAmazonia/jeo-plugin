@@ -81,83 +81,128 @@ abstract class Abstract_Place_Polygon_Adapter implements Place_Polygon_Adapter {
 	}
 
 	/**
+	 * Wrapper around wp_remote_post with consistent user-agent and timeout.
+	 *
+	 * @param string $url  Request URL.
+	 * @param array  $args Optional wp_remote_post args.
+	 * @return array|\WP_Error Response array or WP_Error.
+	 */
+	protected function http_post( string $url, array $args = array() ) {
+		$args = wp_parse_args(
+			$args,
+			array(
+				'timeout'     => 15,
+				'redirection' => 3,
+				'user-agent'  => 'JEO boundary resolver/' . JEO_VERSION . '; ' . home_url( '/' ),
+			)
+		);
+
+		return wp_remote_post( esc_url_raw( $url ), $args );
+	}
+
+	/**
 	 * Compute a bounding box from a GeoJSON geometry, Feature, or FeatureCollection.
+	 *
+	 * Walks the structure tracking min/max coordinates without materializing
+	 * a merged coordinate list — large country geometries (e.g. France with
+	 * overseas territories) would otherwise exhaust the memory limit.
 	 *
 	 * @param array $geojson GeoJSON array.
 	 * @return array|null [west, south, east, north] or null.
 	 */
 	protected function compute_bbox( array $geojson ): ?array {
-		$type = $geojson['type'] ?? '';
+		$min_lon = PHP_FLOAT_MAX;
+		$min_lat = PHP_FLOAT_MAX;
+		$max_lon = -PHP_FLOAT_MAX;
+		$max_lat = -PHP_FLOAT_MAX;
 
-		if ( 'FeatureCollection' === $type ) {
-			$all_coords = array();
-			foreach ( $geojson['features'] ?? array() as $feature ) {
-				$geometry   = $feature['geometry'] ?? array();
-				$coords     = $this->extract_coordinates( $geometry );
-				$all_coords = array_merge( $all_coords, $coords );
-			}
-			$coords = $all_coords;
-		} elseif ( 'Feature' === $type ) {
-			$coords = $this->extract_coordinates( $geojson['geometry'] ?? array() );
-		} else {
-			$coords = $this->extract_coordinates( $geojson );
-		}
+		$this->bbox_walk( $geojson, $min_lon, $min_lat, $max_lon, $max_lat );
 
-		if ( empty( $coords ) ) {
+		if ( PHP_FLOAT_MAX === $min_lon ) {
 			return null;
 		}
 
-		$lons = array_column( $coords, 0 );
-		$lats = array_column( $coords, 1 );
-
 		return array(
-			(float) min( $lons ),
-			(float) min( $lats ),
-			(float) max( $lons ),
-			(float) max( $lats ),
+			(float) $min_lon,
+			(float) $min_lat,
+			(float) $max_lon,
+			(float) $max_lat,
 		);
 	}
 
 	/**
-	 * Recursively extract [lon, lat] pairs from a GeoJSON geometry.
+	 * Recursively walk a GeoJSON structure updating bounding-box extremes.
 	 *
-	 * @param array $geometry GeoJSON geometry.
-	 * @return array<int,array{0:float,1:float}>
+	 * Handles FeatureCollection (features), Feature (geometry), bare
+	 * geometries (type + coordinates), GeometryCollection, and plain
+	 * coordinate arrays.
+	 *
+	 * @param array $node     GeoJSON node.
+	 * @param float $min_lon  Running min longitude (by reference).
+	 * @param float $min_lat  Running min latitude (by reference).
+	 * @param float $max_lon  Running max longitude (by reference).
+	 * @param float $max_lat  Running max latitude (by reference).
+	 * @return void
 	 */
-	protected function extract_coordinates( array $geometry ): array {
-		$type   = $geometry['type'] ?? '';
-		$coords = $geometry['coordinates'] ?? array();
-
-		switch ( $type ) {
-			case 'Point':
-				return array( $coords );
-			case 'MultiPoint':
-			case 'LineString':
-				return $coords;
-			case 'MultiLineString':
-			case 'Polygon':
-				$result = array();
-				foreach ( $coords as $ring ) {
-					$result = array_merge( $result, $ring );
-				}
-				return $result;
-			case 'MultiPolygon':
-				$result = array();
-				foreach ( $coords as $polygon ) {
-					foreach ( $polygon as $ring ) {
-						$result = array_merge( $result, $ring );
-					}
-				}
-				return $result;
-			case 'GeometryCollection':
-				$result = array();
-				foreach ( $geometry['geometries'] ?? array() as $g ) {
-					$result = array_merge( $result, $this->extract_coordinates( $g ) );
-				}
-				return $result;
+	private function bbox_walk( array $node, &$min_lon, &$min_lat, &$max_lon, &$max_lat ): void {
+		if ( isset( $node['type'], $node['coordinates'] ) && is_array( $node['coordinates'] ) ) {
+			$this->bbox_coords_walk( $node['coordinates'], $min_lon, $min_lat, $max_lon, $max_lat );
+			return;
 		}
 
-		return array();
+		if ( isset( $node['geometries'] ) && is_array( $node['geometries'] ) ) {
+			foreach ( $node['geometries'] as $geometry ) {
+				if ( is_array( $geometry ) ) {
+					$this->bbox_walk( $geometry, $min_lon, $min_lat, $max_lon, $max_lat );
+				}
+			}
+			return;
+		}
+
+		if ( isset( $node['features'] ) && is_array( $node['features'] ) ) {
+			foreach ( $node['features'] as $feature ) {
+				if ( is_array( $feature ) ) {
+					$this->bbox_walk( $feature, $min_lon, $min_lat, $max_lon, $max_lat );
+				}
+			}
+			return;
+		}
+
+		if ( isset( $node['geometry'] ) && is_array( $node['geometry'] ) ) {
+			$this->bbox_walk( $node['geometry'], $min_lon, $min_lat, $max_lon, $max_lat );
+			return;
+		}
+
+		$this->bbox_coords_walk( $node, $min_lon, $min_lat, $max_lon, $max_lat );
+	}
+
+	/**
+	 * Recursively walk a coordinate tree updating bounding-box extremes.
+	 *
+	 * @param array $coords   Coordinate node ([lon, lat] pairs at the leaves).
+	 * @param float $min_lon  Running min longitude (by reference).
+	 * @param float $min_lat  Running min latitude (by reference).
+	 * @param float $max_lon  Running max longitude (by reference).
+	 * @param float $max_lat  Running max latitude (by reference).
+	 * @return void
+	 */
+	private function bbox_coords_walk( array $coords, &$min_lon, &$min_lat, &$max_lon, &$max_lat ): void {
+		if ( isset( $coords[0], $coords[1] ) && is_numeric( $coords[0] ) && is_numeric( $coords[1] ) ) {
+			$lon = (float) $coords[0];
+			$lat = (float) $coords[1];
+
+			$min_lon = min( $min_lon, $lon );
+			$min_lat = min( $min_lat, $lat );
+			$max_lon = max( $max_lon, $lon );
+			$max_lat = max( $max_lat, $lat );
+			return;
+		}
+
+		foreach ( $coords as $value ) {
+			if ( is_array( $value ) ) {
+				$this->bbox_coords_walk( $value, $min_lon, $min_lat, $max_lon, $max_lat );
+			}
+		}
 	}
 
 	/**

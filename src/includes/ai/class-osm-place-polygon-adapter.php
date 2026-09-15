@@ -23,7 +23,7 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	 */
 	private const OVERPASS_MIRRORS = array(
 		'https://overpass-api.de/api/interpreter',
-		'https://overpass.kumi.systems/api/interpreter',
+		'https://overpass.osm.ch/api/interpreter',
 		'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
 	);
 
@@ -37,10 +37,19 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @param string      $place_name Place name.
-	 * @param string|null $context    Optional country/state context.
+	 * @param string      $place_name  Place name.
+	 * @param string|null $entity_type Optional entity type hint (unused — Nominatim matches freely).
+	 * @param string|null $context     Optional country/state context.
 	 */
-	public function resolve( string $place_name, ?string $context = null ) {
+	public function resolve( string $place_name, ?string $entity_type = null, ?string $context = null ) {
+		unset( $entity_type );
+		// Overpass geometry assembly can take 30s+ for large relations (e.g.
+		// countries with overseas territories) and the mirror fallback chain
+		// adds more requests on top — far beyond the 30s PHP default.
+		if ( function_exists( 'set_time_limit' ) ) {
+			set_time_limit( 120 );
+		}
+
 		$place_name = $this->normalize_name( $place_name );
 		$context    = $context ? $this->normalize_name( $context ) : '';
 
@@ -49,14 +58,15 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			return $cached;
 		}
 
-		$nominatim = new \Jeo\Geocoders\Nominatim();
-
 		$queries = $this->build_nominatim_queries( $place_name, $context );
 		$match   = null;
 
 		foreach ( $queries as $query ) {
-			$results = $nominatim->geocode( $query );
-			$match   = $this->find_relation_match( $results );
+			// polygon_geojson asks Nominatim for the full boundary geometry:
+			// one compact request instead of a multi-megabyte Overpass
+			// assembly that can exhaust the PHP memory limit (e.g. France
+			// with overseas territories).
+			$match = $this->find_relation_match( $this->nominatim_search( $query ) );
 			if ( null !== $match ) {
 				break;
 			}
@@ -66,13 +76,23 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			return null;
 		}
 
-		$relation_id = (int) $match['osm_id'];
-		$geojson     = $this->fetch_overpass_relation( $relation_id );
-		if ( is_wp_error( $geojson ) || empty( $geojson ) ) {
-			return $geojson;
+		$geojson = $this->build_geojson_from_nominatim( $match );
+
+		if ( null !== $geojson ) {
+			$bbox = $this->bbox_from_nominatim( $match );
+		} else {
+			// Nominatim did not return an outline for this relation — fall
+			// back to assembling the outer rings via Overpass.
+			$relation_id = (int) $match->osm_id;
+			$geojson     = $this->fetch_overpass_relation( $relation_id );
+
+			if ( is_wp_error( $geojson ) || empty( $geojson ) ) {
+				return $geojson;
+			}
+
+			$bbox = $this->compute_bbox( $geojson );
 		}
 
-		$bbox = $this->compute_bbox( $geojson );
 		if ( null === $bbox ) {
 			return new \WP_Error(
 				'jeo_osm_bbox',
@@ -82,15 +102,82 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 
 		$result = array(
 			'source'       => $this->get_source(),
-			'display_name' => sanitize_text_field( $match['display_name'] ?? $place_name ),
+			'display_name' => sanitize_text_field( $match->display_name ?? $place_name ),
 			'attribution'  => __( 'OpenStreetMap contributors', 'jeowp' ),
 			'entity_type'  => 'other',
 			'geojson'      => $geojson,
 			'bbox'         => $bbox,
 		);
 
-		$this->set_cached( $place_name, $result, $context );
+		// Serializing very large geometries into a transient duplicates them
+		// in memory and can exhaust the PHP memory limit — skip caching those
+		// (recreating them costs one Nominatim request).
+		if ( ! is_wp_error( $geojson ) && strlen( (string) wp_json_encode( $geojson ) ) < 1000000 ) {
+			$this->set_cached( $place_name, $result, $context );
+		}
+
 		return $result;
+	}
+
+	/**
+	 * Search Nominatim for a place, including the full boundary geometry.
+	 *
+	 * Decodes the response directly as arrays (the shared Nominatim geocoder
+	 * decodes to objects, which would double the memory footprint of the
+	 * multi-megabyte country geometries). Responses are cached for 6 hours.
+	 *
+	 * @param string $query Search query.
+	 * @return array<int,object> Raw Nominatim items (decoded as objects — much
+	 *                           lighter in memory than arrays for large geometries).
+	 */
+	private function nominatim_search( string $query ): array {
+		$cache_key = 'jeo_osm_nominatim_' . md5( $query );
+		$cached    = get_transient( $cache_key );
+		if ( is_array( $cached ) ) {
+			return $cached;
+		}
+
+		$locale       = get_locale();
+		$accept_langs = array_values( array_unique( array_filter( array( $locale, substr( $locale, 0, 2 ) ) ) ) );
+
+		$url = add_query_arg(
+			array(
+				'q'               => $query,
+				'format'          => 'json',
+				'addressdetails'  => 1,
+				'polygon_geojson' => 1,
+			),
+			'https://nominatim.openstreetmap.org/search'
+		);
+
+		$response = $this->http_get(
+			$url,
+			array(
+				'timeout' => 15,
+				'headers' => array(
+					'Accept-Language' => implode( ',', $accept_langs ),
+				),
+			)
+		);
+
+		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			return array();
+		}
+
+		$body = wp_remote_retrieve_body( $response );
+		$data = json_decode( $body ); // Objects are significantly lighter than arrays for large geometries.
+		if ( ! is_array( $data ) ) {
+			return array();
+		}
+
+		// Serializing multi-megabyte country geometries into a transient
+		// duplicates them in memory — skip caching those (the resolved
+		// polygon result is cached separately for 24 hours).
+		if ( strlen( $body ) < 1000000 ) {
+			set_transient( $cache_key, $data, 6 * HOUR_IN_SECONDS );
+		}
+
+		return $data;
 	}
 
 	/**
@@ -105,7 +192,9 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	private function build_nominatim_queries( string $place_name, string $context ): array {
 		$queries = array();
 
-		if ( '' !== $context ) {
+		// A context that just echoes the place name (e.g. "França, França")
+		// deranks the exact match — drop it.
+		if ( '' !== $context && $this->names_differ( $place_name, $context ) ) {
 			$queries[] = $place_name . ', ' . $context;
 		}
 
@@ -149,29 +238,96 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	}
 
 	/**
-	 * Find the first OSM relation result from Nominatim.
+	 * Check whether two names are meaningfully different (accent-insensitive).
 	 *
-	 * @param array $results Nominatim results.
-	 * @return array|null Raw Nominatim item with osm_id/osm_type.
+	 * @param string $a First name.
+	 * @param string $b Second name.
+	 * @return bool True when the names differ.
 	 */
-	private function find_relation_match( array $results ): ?array {
-		foreach ( $results as $result ) {
-			$raw = $result['raw'] ?? array();
-			if ( empty( $raw['osm_type'] ) || empty( $raw['osm_id'] ) ) {
+	private function names_differ( string $a, string $b ): bool {
+		$normalize = function ( string $value ): string {
+			return trim( (string) preg_replace( '/\s+/', ' ', strtolower( remove_accents( $value ) ) ) );
+		};
+
+		return $normalize( $a ) !== $normalize( $b );
+	}
+
+	/**
+	 * Build a GeoJSON FeatureCollection from a Nominatim match with polygon_geojson.
+	 *
+	 * The geometry is kept as a stdClass tree (decoded directly from the
+	 * Nominatim response) — converting it to arrays would double the memory
+	 * footprint of large country geometries. Downstream consumers treat it
+	 * opaquely and encode it with wp_json_encode().
+	 *
+	 * @param object $nominatim_match Raw Nominatim item (osm_id, display_name, geojson).
+	 * @return array|null FeatureCollection or null when no geometry was returned.
+	 */
+	private function build_geojson_from_nominatim( $nominatim_match ): ?array {
+		$geometry = $nominatim_match->geojson ?? null;
+
+		if ( ! is_object( $geometry ) || empty( $geometry->type ) || ! isset( $geometry->coordinates ) ) {
+			return null;
+		}
+
+		$display_name = sanitize_text_field( $nominatim_match->display_name ?? '' );
+
+		return array(
+			'type'     => 'FeatureCollection',
+			'features' => array(
+				array(
+					'type'       => 'Feature',
+					'properties' => array( 'name' => $display_name ),
+					'geometry'   => $geometry,
+				),
+			),
+		);
+	}
+
+	/**
+	 * Build a bounding box from a Nominatim item's boundingbox field.
+	 *
+	 * Nominatim returns [south, north, west, east]; this plugin uses
+	 * [west, south, east, north].
+	 *
+	 * @param object $nominatim_match Raw Nominatim item.
+	 * @return array|null [west, south, east, north] or null.
+	 */
+	private function bbox_from_nominatim( $nominatim_match ): ?array {
+		$box = $nominatim_match->boundingbox ?? null;
+
+		if ( ! is_array( $box ) || 4 !== count( $box ) ) {
+			return null;
+		}
+
+		return array(
+			(float) $box[2],
+			(float) $box[0],
+			(float) $box[3],
+			(float) $box[1],
+		);
+	}
+
+	/**
+	 * Find the first OSM relation result in raw Nominatim items.
+	 *
+	 * @param array $items Raw Nominatim response items.
+	 * @return object|null Item with osm_id/osm_type or null.
+	 */
+	private function find_relation_match( array $items ): ?object {
+		foreach ( $items as $item ) {
+			if ( ! is_object( $item ) || empty( $item->osm_type ) || empty( $item->osm_id ) ) {
 				continue;
 			}
-			if ( 'relation' === $raw['osm_type'] ) {
-				$raw['display_name'] = $result['full_address'] ?? ( $raw['display_name'] ?? '' );
-				return $raw;
+			if ( 'relation' === $item->osm_type ) {
+				return $item;
 			}
 		}
 
 		// Fallback: accept any polygon-ish result.
-		foreach ( $results as $result ) {
-			$raw = $result['raw'] ?? array();
-			if ( ! empty( $raw['osm_type'] ) && ! empty( $raw['osm_id'] ) ) {
-				$raw['display_name'] = $result['full_address'] ?? ( $raw['display_name'] ?? '' );
-				return $raw;
+		foreach ( $items as $item ) {
+			if ( is_object( $item ) && ! empty( $item->osm_type ) && ! empty( $item->osm_id ) ) {
+				return $item;
 			}
 		}
 
@@ -217,7 +373,12 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			}
 		}
 
-		$rings = $this->assemble_rings( $data['elements'] ?? array() );
+		$elements = $data['elements'] ?? array();
+		unset( $data ); // Free the raw multi-megabyte Overpass payload before assembling.
+
+		$rings = $this->assemble_rings( $elements );
+		unset( $elements );
+
 		if ( empty( $rings ) ) {
 			return new \WP_Error(
 				'jeo_osm_no_rings',
@@ -267,7 +428,7 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 		$last_error = null;
 		foreach ( $mirror_list as $mirror_url ) {
 			$default_args = array(
-				'timeout' => 45,
+				'timeout' => 25,
 				'body'    => array( 'data' => $overpass_query ),
 			);
 
@@ -283,7 +444,7 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			 */
 			$args = apply_filters( 'jeo_overpass_request_args', $default_args, $mirror_url, $overpass_query );
 
-			$response = $this->http_get( $mirror_url, $args );
+			$response = $this->http_post( $mirror_url, $args );
 
 			if ( is_wp_error( $response ) ) {
 				$last_error = $response;
@@ -330,6 +491,9 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 
 			$coords = array();
 			foreach ( $element['geometry'] ?? array() as $point ) {
+				if ( ! is_array( $point ) || ! isset( $point['lon'], $point['lat'] ) ) {
+					continue;
+				}
 				$coords[] = array(
 					(float) $point['lon'],
 					(float) $point['lat'],
@@ -343,7 +507,6 @@ class OSM_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			$ways[] = array(
 				'first'  => (int) $element['nodes'][0],
 				'last'   => (int) end( $element['nodes'] ),
-				'nodes'  => array_map( 'intval', $element['nodes'] ),
 				'coords' => $coords,
 			);
 		}

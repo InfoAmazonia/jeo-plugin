@@ -592,11 +592,15 @@ The agent may call `generate_boundary_layer` proactively (no Mapbox key required
 
 - Brazilian municipalities and states (IBGE malhas v3)
 - Brazilian indigenous lands (FUNAI WFS)
-- International administrative boundaries (OpenStreetMap relation + Overpass outer-ring assembly)
+- International administrative boundaries and protected areas (OpenStreetMap: Nominatim `polygon_geojson` geometry, Overpass outer-ring assembly as fallback)
 
-`Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. `Mapbox_Style_Builder` then creates a simple line + fill style and publishes it to the Mapbox Styles API. The resulting `mapbox` layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, `attribution`, `theme`, and an auto-generated `simple-color` legend.
+`Place_Polygon_Service` tries adapters in an order driven by the optional `entity_type` hint, caches results per place, and publishes the GeoJSON as a WordPress attachment for a stable public URL. The boundary is rendered client-side by the `geojson` layer type — no Mapbox style publishing is involved. The resulting `geojson` layer is returned to the agent with `bbox`, `center_lat`, `center_lon`, `attribution`, `theme`, and an auto-generated `simple-color` legend.
 
 **Adapter fallback semantics:** an adapter returning `null` means "not applicable" and the next adapter runs. A `WP_Error` is a hard failure of that source (e.g. IBGE API timeout) — the error is remembered, the remaining adapters still run, and the last error is returned only if no adapter produced a polygon. A transient outage of one source therefore does not abort resolution.
+
+**Adapter contract:** `Place_Polygon_Adapter::resolve( $place_name, $entity_type, $context )` receives the tool's `entity_type` hint. The IBGE adapter honors it (`state` skips the municipality lookup and vice versa) so that, e.g., "França" (France, `state`) does not accent-insensitively match Franca, a city in São Paulo. The IBGE adapter is Brazil-only: when a context is provided and matches no Brazilian state (UF), it returns `null` instead of silently guessing — "Franca, Europa" therefore falls through to OpenStreetMap. Without context or type hint, an accent-insensitive single match (e.g. plain "França") still resolves to the Brazilian city — a known ambiguity; the agent prompt instructs the LLM to pass `entity_type: "state"` for countries.
+
+**OSM geometry pipeline:** the primary path is a single Nominatim search with `polygon_geojson=1` — the full boundary geometry arrives ready-made (decoded as stdClass, which is markedly lighter in memory than arrays) and the bbox comes from Nominatim's `boundingbox` field. Overpass is only a fallback for relations Nominatim has no outline for; its mirrors are `overpass-api.de` → `overpass.osm.ch` → `maps.mail.ru` with a 25 s per-mirror timeout (the query is sent via POST), and `resolve()` calls `set_time_limit( 120 )` because large relations exceed the PHP 30 s default. Results whose encoded geometry exceeds 1 MB skip the 24 h polygon cache to avoid serializing multi-megabyte structures.
 
 All non-boundary layer types still require explicit user confirmation before `generate_layer` is called.
 
@@ -612,8 +616,9 @@ All non-boundary layer types still require explicit user confirmation before `ge
 
 ### Caching
 
-* Polygon results (`jeo_polygon_<source>_...`): 24 hours.
-* IBGE municipality/state lists (`jeo_ibge_municipios_list`, `jeo_ibge_estados_list`): 30 days.
+* Polygon results (`jeo_polygon_<source>_...`): 24 hours — skipped for OSM results whose encoded geometry exceeds 1 MB (e.g. France with overseas territories).
+* IBGE municipality/state lists (`jeo_ibge_municipios_list`, `jeo_ibge_estados_list`): 30 days. IBGE cache keys include the `entity_type` hint.
+* OSM Nominatim search responses (`jeo_osm_nominatim_<md5>`): 6 hours — only responses smaller than 1 MB are cached.
 * Overpass relation geometries (`jeo_osm_overpass_relation_<id>`): 24 hours.
 
 ### WP-CLI testing

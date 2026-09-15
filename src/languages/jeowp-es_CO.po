@@ -5015,16 +5015,16 @@ msgid "Restored map version %d."
 msgstr "Versión %d del mapa restaurada."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-funai-place-polygon-adapter.php:151
+#: includes/ai/class-funai-place-polygon-adapter.php:152
 #, php-format
 msgid "FUNAI WFS returned HTTP %d."
 msgstr "El WFS de FUNAI retornó HTTP %d."
 
-#: includes/ai/class-funai-place-polygon-adapter.php:161
+#: includes/ai/class-funai-place-polygon-adapter.php:162
 msgid "Could not parse FUNAI WFS response."
 msgstr "No se pudo analizar la respuesta del WFS de FUNAI."
 
-#: includes/ai/class-funai-place-polygon-adapter.php:83
+#: includes/ai/class-funai-place-polygon-adapter.php:84
 msgid "Could not compute bounding box from FUNAI geometry."
 msgstr "No se pudo calcular la caja delimitadora a partir de la geometría de FUNAI."
 
@@ -5032,17 +5032,17 @@ msgstr "No se pudo calcular la caja delimitadora a partir de la geometría de FU
 msgid "You do not have permission to generate layers."
 msgstr "No tienes permiso para generar capas."
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:60
+#: includes/ai/class-ibge-place-polygon-adapter.php:78
 msgid "Could not compute bounding box from IBGE geometry."
 msgstr "No se pudo calcular la caja delimitadora a partir de la geometría del IBGE."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-ibge-place-polygon-adapter.php:267
+#: includes/ai/class-ibge-place-polygon-adapter.php:289
 #, php-format
 msgid "IBGE API returned HTTP %d."
 msgstr "La API del IBGE retornó HTTP %d."
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:277
+#: includes/ai/class-ibge-place-polygon-adapter.php:299
 msgid "Could not parse IBGE geometry response."
 msgstr "No se pudo analizar la respuesta de geometría del IBGE."
 
@@ -5147,29 +5147,29 @@ msgstr "Estilo compuesto de Mapbox"
 msgid "Minilayer"
 msgstr "Minilayer"
 
-#: includes/ai/class-osm-place-polygon-adapter.php:79
+#: includes/ai/class-osm-place-polygon-adapter.php:99
 msgid "Could not compute bounding box from OSM geometry."
 msgstr "No se pudo calcular la caja delimitadora a partir de la geometría de OSM."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:208
+#: includes/ai/class-osm-place-polygon-adapter.php:364
 msgid "Could not parse Overpass response."
 msgstr "No se pudo analizar la respuesta de Overpass."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:224
+#: includes/ai/class-osm-place-polygon-adapter.php:385
 msgid "Could not assemble closed rings from OSM relation."
 msgstr "No se pudieron montar anillos cerrados a partir de la relación de OSM."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:263
+#: includes/ai/class-osm-place-polygon-adapter.php:424
 msgid "No Overpass mirrors configured."
 msgstr "No hay espejos de Overpass configurados."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-osm-place-polygon-adapter.php:299
+#: includes/ai/class-osm-place-polygon-adapter.php:460
 #, php-format
 msgid "Overpass returned HTTP %d."
 msgstr "Overpass retornó HTTP %d."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:311
+#: includes/ai/class-osm-place-polygon-adapter.php:472
 msgid "All Overpass mirrors failed."
 msgstr "Todos los espejos de Overpass fallaron."
 
@@ -5323,11 +5323,11 @@ msgstr ""
 msgid "The previous request could not be processed. Please try again."
 msgstr ""
 
-#: includes/ai/class-funai-place-polygon-adapter.php:90
+#: includes/ai/class-funai-place-polygon-adapter.php:91
 msgid "FUNAI"
 msgstr "FUNAI"
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:67
+#: includes/ai/class-ibge-place-polygon-adapter.php:85
 msgid "IBGE"
 msgstr "IBGE"
 
@@ -5337,7 +5337,7 @@ msgstr "IBGE"
 msgid "Mapbox tileset %s"
 msgstr "Tileset %s de Mapbox"
 
-#: includes/ai/class-osm-place-polygon-adapter.php:86
+#: includes/ai/class-osm-place-polygon-adapter.php:106
 msgid "OpenStreetMap contributors"
 msgstr "Colaboradores de OpenStreetMap"
 

@@ -5015,16 +5015,16 @@ msgid "Restored map version %d."
 msgstr "Versão %d do mapa restaurada."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-funai-place-polygon-adapter.php:151
+#: includes/ai/class-funai-place-polygon-adapter.php:152
 #, php-format
 msgid "FUNAI WFS returned HTTP %d."
 msgstr "O WFS da FUNAI retornou HTTP %d."
 
-#: includes/ai/class-funai-place-polygon-adapter.php:161
+#: includes/ai/class-funai-place-polygon-adapter.php:162
 msgid "Could not parse FUNAI WFS response."
 msgstr "Não foi possível analisar a resposta do WFS da FUNAI."
 
-#: includes/ai/class-funai-place-polygon-adapter.php:83
+#: includes/ai/class-funai-place-polygon-adapter.php:84
 msgid "Could not compute bounding box from FUNAI geometry."
 msgstr "Não foi possível calcular a caixa delimitadora a partir da geometria da FUNAI."
 
@@ -5032,17 +5032,17 @@ msgstr "Não foi possível calcular a caixa delimitadora a partir da geometria d
 msgid "You do not have permission to generate layers."
 msgstr "Você não tem permissão para gerar camadas."
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:60
+#: includes/ai/class-ibge-place-polygon-adapter.php:78
 msgid "Could not compute bounding box from IBGE geometry."
 msgstr "Não foi possível calcular a caixa delimitadora a partir da geometria do IBGE."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-ibge-place-polygon-adapter.php:267
+#: includes/ai/class-ibge-place-polygon-adapter.php:289
 #, php-format
 msgid "IBGE API returned HTTP %d."
 msgstr "A API do IBGE retornou HTTP %d."
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:277
+#: includes/ai/class-ibge-place-polygon-adapter.php:299
 msgid "Could not parse IBGE geometry response."
 msgstr "Não foi possível analisar a resposta de geometria do IBGE."
 
@@ -5147,29 +5147,29 @@ msgstr "Estilo composto do Mapbox"
 msgid "Minilayer"
 msgstr "Minilayer"
 
-#: includes/ai/class-osm-place-polygon-adapter.php:79
+#: includes/ai/class-osm-place-polygon-adapter.php:99
 msgid "Could not compute bounding box from OSM geometry."
 msgstr "Não foi possível calcular a caixa delimitadora a partir da geometria do OSM."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:208
+#: includes/ai/class-osm-place-polygon-adapter.php:364
 msgid "Could not parse Overpass response."
 msgstr "Não foi possível analisar a resposta do Overpass."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:224
+#: includes/ai/class-osm-place-polygon-adapter.php:385
 msgid "Could not assemble closed rings from OSM relation."
 msgstr "Não foi possível montar anéis fechados a partir da relação do OSM."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:263
+#: includes/ai/class-osm-place-polygon-adapter.php:424
 msgid "No Overpass mirrors configured."
 msgstr "Nenhum espelho do Overpass configurado."
 
 #. translators: %d: HTTP status code.
-#: includes/ai/class-osm-place-polygon-adapter.php:299
+#: includes/ai/class-osm-place-polygon-adapter.php:460
 #, php-format
 msgid "Overpass returned HTTP %d."
 msgstr "O Overpass retornou HTTP %d."
 
-#: includes/ai/class-osm-place-polygon-adapter.php:311
+#: includes/ai/class-osm-place-polygon-adapter.php:472
 msgid "All Overpass mirrors failed."
 msgstr "Todos os espelhos do Overpass falharam."
 
@@ -5323,11 +5323,11 @@ msgstr "Opcional. Cole um objeto de estilo MapLibre GL bruto. Tem precedência s
 msgid "The previous request could not be processed. Please try again."
 msgstr "A solicitação anterior não pôde ser processada. Tente novamente."
 
-#: includes/ai/class-funai-place-polygon-adapter.php:90
+#: includes/ai/class-funai-place-polygon-adapter.php:91
 msgid "FUNAI"
 msgstr "FUNAI"
 
-#: includes/ai/class-ibge-place-polygon-adapter.php:67
+#: includes/ai/class-ibge-place-polygon-adapter.php:85
 msgid "IBGE"
 msgstr "IBGE"
 
@@ -5337,7 +5337,7 @@ msgstr "IBGE"
 msgid "Mapbox tileset %s"
 msgstr "Tileset %s do Mapbox"
 
-#: includes/ai/class-osm-place-polygon-adapter.php:86
+#: includes/ai/class-osm-place-polygon-adapter.php:106
 msgid "OpenStreetMap contributors"
 msgstr "Colaboradores do OpenStreetMap"
 

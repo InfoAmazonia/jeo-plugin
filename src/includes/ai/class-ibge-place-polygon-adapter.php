@@ -26,22 +26,40 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 	/**
 	 * {@inheritDoc}
 	 *
-	 * @param string      $place_name Place name.
-	 * @param string|null $context    Optional state context.
+	 * @param string      $place_name  Place name.
+	 * @param string|null $entity_type Optional entity type hint.
+	 * @param string|null $context     Optional state context.
 	 */
-	public function resolve( string $place_name, ?string $context = null ) {
+	public function resolve( string $place_name, ?string $entity_type = null, ?string $context = null ) {
 		$place_name = $this->normalize_name( $place_name );
 		$context    = $context ? $this->normalize_name( $context ) : '';
 
-		$cached = $this->get_cached( $place_name, $context );
+		// Include the entity type in the cache key: a municipality hit for
+		// "França" must not be served when the caller asked for a state.
+		$cache_context = (string) $entity_type . '|' . $context;
+
+		$cached = $this->get_cached( $place_name, $cache_context );
 		if ( null !== $cached ) {
 			return $cached;
 		}
 
-		// Try municipality first, then state.
-		$entity = $this->find_municipality( $place_name, $context );
-		if ( null === $entity ) {
-			$entity = $this->find_state( $place_name, $context );
+		// Honor the entity type hint: a "state" query must not be answered
+		// with a municipality of the same (accent-insensitive) name — e.g.
+		// "França" (France) would otherwise match Franca, a city in SP.
+		$entity = null;
+		switch ( $entity_type ) {
+			case 'municipality':
+				$entity = $this->find_municipality( $place_name, $context );
+				break;
+			case 'state':
+				$entity = $this->find_state( $place_name, $context );
+				break;
+			default:
+				// Try municipality first, then state.
+				$entity = $this->find_municipality( $place_name, $context );
+				if ( null === $entity ) {
+					$entity = $this->find_state( $place_name, $context );
+				}
 		}
 
 		if ( null === $entity ) {
@@ -71,7 +89,7 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			'bbox'         => $bbox,
 		);
 
-		$this->set_cached( $place_name, $result, $context );
+		$this->set_cached( $place_name, $result, $cache_context );
 		return $result;
 	}
 
@@ -222,7 +240,7 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			return null;
 		}
 
-		if ( '' === $context || 1 === count( $results ) ) {
+		if ( '' === $context ) {
 			return $results[0];
 		}
 
@@ -235,7 +253,11 @@ class IBGE_Place_Polygon_Adapter extends Abstract_Place_Polygon_Adapter {
 			}
 		}
 
-		return $results[0];
+		// IBGE is a Brazil-only source: if a context was provided and it is
+		// not a Brazilian state, the adapter is not applicable (e.g.
+		// "França, Europa" must fall through to OpenStreetMap, not silently
+		// resolve to Franca, a city in São Paulo).
+		return null;
 	}
 
 	/**

@@ -126,7 +126,7 @@ The polygon is rendered client-side from a GeoJSON file published on this site �
 
 Rules:
 - You MAY call this tool proactively for administrative boundaries and indigenous lands when `search_layers` finds no suitable existing layer.
-- Pass `entity_type` when you know it ("municipality", "state", "indigenous_land", "other").
+- Pass `entity_type` when you know it ("municipality", "state" — also for countries, e.g. "France", "indigenous_land", "other").
 - Pass `context` when the place name is ambiguous (e.g. "Amazonas" with context "Colombia" or "Brazil").
 - On the initial auto-generation (from post content or prompt), you MAY generate administrative/indigenous boundaries proactively if needed; report other gaps instead of generating them.
 - If the tool returns `success: false`, keep the map with the information you have and explain the failure in `assistant_message` — name the failing service and repeat the actionable guidance from the tool's `error` field.
@@ -248,7 +248,7 @@ Creates a boundary polygon layer from authoritative public sources:
 
 Rules:
 - You MAY call this tool proactively for administrative boundaries and indigenous lands when `search_layers` finds no suitable existing layer.
-- Pass `entity_type` when you know it ("municipality", "state", "indigenous_land", "other").
+- Pass `entity_type` when you know it ("municipality", "state" — also for countries, e.g. "France", "indigenous_land", "other").
 - Pass `context` when the place name is ambiguous (e.g. "Amazonas" with context "Colombia" or "Brazil").
 - On the initial auto-generation (from post content or prompt), you MAY generate administrative/indigenous boundaries proactively if needed; report other gaps instead of generating them.
 - If the tool returns `success: false`, keep the map with the information you have and explain the failure in `assistant_message` — name the failing service and repeat the actionable guidance from the tool's `error` field.
