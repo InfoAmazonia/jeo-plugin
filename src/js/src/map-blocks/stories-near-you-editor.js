@@ -14,8 +14,8 @@ import ServerSideRender from '@wordpress/server-side-render';
 const DEFAULT_LAT = globalThis.jeo_settings?.map_defaults?.lat
 	? Number.parseFloat( globalThis.jeo_settings.map_defaults.lat )
 	: -23.549985;
-const DEFAULT_LNG = globalThis.jeo_settings?.map_defaults?.lon
-	? Number.parseFloat( globalThis.jeo_settings.map_defaults.lon )
+const DEFAULT_LNG = globalThis.jeo_settings?.map_defaults?.lng
+	? Number.parseFloat( globalThis.jeo_settings.map_defaults.lng )
 	: -46.633519;
 
 export default function StoriesNearYouEditor( { attributes, setAttributes } ) {

@@ -919,7 +919,7 @@ class Jeo {
 				'map_defaults'          => array(
 					'zoom'                => intval( \jeo_settings()->get_option( 'map_default_zoom' ) ),
 					'lat'                 => floatval( \jeo_settings()->get_option( 'map_default_lat' ) ),
-					'lon'                 => floatval( \jeo_settings()->get_option( 'map_default_lng' ) ),
+					'lng'                 => floatval( \jeo_settings()->get_option( 'map_default_lng' ) ),
 					'disable_scroll_zoom' => false,
 					'disable_drag_rotate' => false,
 					'enable_fullscreen'   => true,

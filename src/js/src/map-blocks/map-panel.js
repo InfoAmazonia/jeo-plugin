@@ -6,7 +6,7 @@ import MapSettings from './map-settings';
 const mapDefaults = {
 	initial_zoom: jeo_settings.map_defaults.zoom,
 	center_lat: jeo_settings.map_defaults.lat,
-	center_lon: jeo_settings.map_defaults.lon,
+	center_lon: jeo_settings.map_defaults.lng,
 	min_zoom: 0,
 	max_zoom: 20,
 };

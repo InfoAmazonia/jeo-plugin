@@ -525,7 +525,7 @@ class Settings {
 					'map_defaults' => array(
 						'zoom' => floatval( $this->get_option( 'map_default_zoom' ) ),
 						'lat'  => floatval( $this->get_option( 'map_default_lat' ) ),
-						'lon'  => floatval( $this->get_option( 'map_default_lng' ) ),
+						'lng'  => floatval( $this->get_option( 'map_default_lng' ) ),
 					),
 					'i18n'         => array(
 						'console_cleared'        => __( '[System] Console cleared.', 'jeowp' ),
