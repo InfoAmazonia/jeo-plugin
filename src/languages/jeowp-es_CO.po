@@ -4561,11 +4561,11 @@ msgstr "Este embed de JEO no está disponible."
 msgid "Embed not available"
 msgstr "Embed no disponible"
 
-#: includes/ai/class-context-agent.php:274
+#: includes/ai/class-context-agent.php:282
 msgid "No AI provider is configured. Set one in JEO AI Settings."
 msgstr "Ningún proveedor de IA configurado. Configure uno en los ajustes de IA de JEO."
 
-#: includes/ai/class-context-agent.php:312
+#: includes/ai/class-context-agent.php:320
 msgid "The AI returned an empty prompt engineering response."
 msgstr "La IA devolvió una respuesta vacía de ingeniería de prompt."
 
@@ -5368,3 +5368,7 @@ msgstr "Capa con el área de %s"
 #: js/build/mapBlocks.js:1
 msgid "Understand chosen layers"
 msgstr "Entender capas elegidas"
+
+#: includes/ai/class-retrieve-knowledge-tool.php:112
+msgid "Provide either \"query\" (string) or \"queries\" (array of strings)."
+msgstr "Proporcione \"query\" (cadena) o \"queries\" (matriz de cadenas)."

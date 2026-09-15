@@ -87,6 +87,10 @@ When two or more retrieved articles have similar relevance scores (i.e. no clear
 ### 6. Prefer Internal Site Links
 
 When adding links to suggested paragraphs, prefer articles from this WordPress site's own knowledge base (retrieved via `retrieve_knowledge`) over external sources. Only link to an external source when no relevant internal article is available and the external source is essential for factual grounding. Every link must still point to a URL listed in the `references` array.
+
+### 7. Multi-Theme Retrieval
+
+For requests combining N themes or angles (N ≥ 2), always run one `retrieve_knowledge` query per theme before writing — preferably as a single `queries` array call. Never merge multiple themes into a single search query. Prefer one integrated paragraph when the sources support it; fall back to one paragraph per theme — and say so in `assistant_message` — when the sources do not support synthesis.
 RULES;
 	}
 
@@ -128,7 +132,7 @@ RULES;
 			autoDelegate:         true,
 			requireLearningCheck: true,
 			outputClass:          Context_Generation_Output::class,
-			structuredMaxRetries: 1,
+			structuredMaxRetries: 3,
 			conversationStorage:  $conversation_storage,
 			learningStorage:      $learning_storage,
 			userMemoryStorage:    $user_memory_storage,
@@ -211,8 +215,11 @@ You MUST always return a valid Context_Generation_Output JSON object with sugges
 ## Tool Usage
 
 - `retrieve_knowledge(query, top_k)`: Search the site's vectorized article archive for semantically related content. Use specific, targeted queries. If the first search yields few results, try alternative queries or synonyms.
+- `retrieve_knowledge(queries, top_k)`: Same search, but with an array of queries executed and merged in one call. Use this when the request spans multiple themes — pass one targeted query per theme.
 - `get_post_content(post_id)`: Read the current post's title, content, categories, tags, and geolocation points. Use this to ground your suggestions in the existing text.
 - `delegate_to_subagent(sub_agent_id, task)`: Delegate to `post_analyzer` for content analysis.
+
+**Multi-theme requests:** When the user asks for content combining N themes or angles (N ≥ 2), call `retrieve_knowledge` with one targeted query per theme — preferably as a single `queries` array — before writing anything. Never blend all themes into a single search query.
 
 ## Output Rules
 
@@ -232,6 +239,7 @@ You MUST respond with a valid Context_Generation_Output JSON object:
 ## Editorial Guidelines
 
 - Suggest 1–3 paragraphs per response. Quality over quantity.
+- **Multi-theme paragraphs:** When the user asks to combine multiple themes, produce ONE paragraph that integrates the themes when the retrieved references genuinely support the synthesis — link each theme's supporting fact to its own source. If the references do not support a faithful cross-theme synthesis, do NOT force it: produce one paragraph per theme instead, and state plainly in `assistant_message` that the themes were kept separate because the sources do not support combining them.
 - Match the tone and style of the existing article.
 - Ensure factual consistency with the post content and retrieved references.
 - When citing references, prefer linking to existing site articles over external sources. Only use external links when no relevant internal article is available.

@@ -297,6 +297,7 @@ The Context Assistant is a Gutenberg sidebar plugin that suggests new paragraphs
 - **Retry with backoff**: Up to 3 attempts on transient errors.
 - **State persistence**: Conversation survives page refresh via `GET /context/state`.
 - **Customizable prompt**: `ai_context_prompt` setting in AI Settings → Context Assistant tab.
+- **Multi-theme retrieval**: requests combining N themes use one `retrieve_knowledge` query per theme (via the tool's `queries` array), merged/deduped with per-theme rank interleaving; generation prefers one integrated paragraph, falling back to one per theme with an explicit `assistant_message` note.
 
 ## Minilayer (AI-Generated Layers)
 

@@ -157,7 +157,7 @@ graph LR
 | `conversationStorage` | `WP_Storage(post_id, 'post')` | Chat history per post |
 | `learningStorage` | `WP_Option_Storage` | Global agent self-improvement |
 | `userMemoryStorage` | `WP_User_Memory_Storage(user_id)` | Per-user preferences |
-| `structuredMaxRetries` | 1 | One retry on schema violation |
+| `structuredMaxRetries` | 3 | Retries on schema violation (aligned with `run_agent()` exponential backoff) |
 | `contextWindow` | 200000 | Token context window |
 | `tools` | `retrieve_knowledge`, `get_post_content` | Registered via `Tool_Registry` |
 | `subAgents` | `post_analyzer` | Analyzes post content for topics/gaps |
@@ -168,7 +168,7 @@ The system prompt is loaded via `Context_Agent::system_prompt()`:
 
 1. **Custom prompt** — If `ai_use_context_custom_prompt` is enabled and `ai_context_prompt` is non-empty, uses it as the base. The stored value may be either a legacy plain-text prompt or a structured-output JSON object such as `{"prompt": "..."}`. Always route the stored value through `Context_Agent::extract_prompt_text()` before using it as a system prompt; this keeps the runtime unaffected even if the storage format changes later.
 2. **Default prompt** — Otherwise, uses `Context_Agent::default_system_prompt()` which defines the editorial assistant role, workflow, tool usage rules, output schema, editorial guidelines, off-topic handling, and tool error handling. The default prompt always appends `Context_Agent::critical_prompt_rules()`.
-3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding (including a no-self-reference rule: the post being edited must never appear as a source, link target, or text reference in generated paragraphs), references array, language, and recency tie-breaking (when retrieved articles have similar relevance scores, the more recently published one is preferred; recency is a tie-breaker only). They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant. Additional rules forbid combining facts from multiple references into a single unattributed claim and require retracting terms/facts that the user marks as unsupported.
+3. **Critical Rules** — `Context_Agent::critical_prompt_rules()` contains non-negotiable instructions for inline contextual links, factual grounding (including a no-self-reference rule: the post being edited must never appear as a source, link target, or text reference in generated paragraphs), references array, language, recency tie-breaking (when retrieved articles have similar relevance scores, the more recently published one is preferred; recency is a tie-breaker only), and multi-theme retrieval (one query per theme, integrated paragraph with per-theme fallback). They are automatically included in the default prompt and enforced in custom prompts by the prompt engineering assistant. Additional rules forbid combining facts from multiple references into a single unattributed claim and require retracting terms/facts that the user marks as unsupported.
 4. **User Preferences** — Appends `## User Preferences` section from `WP_User_Memory_Storage` (if any preferences exist).
 5. **Additional Context** — Appends `## Additional Context` section with post metadata and locale from the caller.
 
@@ -188,6 +188,14 @@ The `post_analyzer` sub-agent uses `Get_Post_Content_Tool` to read the post and 
 | `key_facts` | Important facts mentioned |
 | `target_audience` | Intended audience description |
 | `suggested_search_queries` | 3–5 queries for `retrieve_knowledge` |
+
+### Multi-Theme Retrieval
+
+When the user asks to combine N themes or angles (N ≥ 2), the prompt (default + critical rule 7) mandates **one targeted `retrieve_knowledge` query per theme, never a single blended query**. A blended multi-theme query dilutes dense vector similarity, so the top results concentrate on the 1–2 strongest themes and the rest lose coverage.
+
+`Retrieve_Knowledge_Tool` supports this via an optional `queries` array property (1–6 strings; the legacy single `query` string still works). A single call with `queries` runs one retrieval per theme, then merges and deduplicates by `post_id` (best score wins) and interleaves results by per-query rank — all first-ranked docs first — so every theme keeps representation before the global `top_k` cap (default 5, max 20) is applied.
+
+Generation follows the same contract: **one integrated paragraph when the retrieved references genuinely support the synthesis; one paragraph per theme as fallback, with a plain statement in `assistant_message`**, when the sources do not support combining. The model must never force a cross-theme paragraph without grounded sources.
 
 ## Structured Output (Context_Generation_Output)
 
