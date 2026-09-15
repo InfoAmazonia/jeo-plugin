@@ -79,6 +79,8 @@ graph TB
 
 ## REST Endpoints
 
+All three endpoints are gated by `AI_Handler::is_configured()` (defense in depth — the JS gates this earlier). When no AI provider is correctly configured (valid provider slug **and** its API key, or `ollama_url` for Ollama; filterable via `jeo_ai_is_configured`), they return a `400` with `"No AI provider configured. Set one in JEO AI Settings."`.
+
 ### `POST /jeo/v1/minimap/setup` — Generate from post content
 
 Legacy RAG-based endpoint (no AI agent). Uses `RAG_Worker::find_matching_layers()` directly. When a `conversation_id` is provided, the generated map state is persisted as a synthetic conversation thread so subsequent chat messages can build on the existing map.
@@ -332,6 +334,15 @@ After the refinement guards (`apply_diff_guard`, `preserve_manual_layers`), two 
 Finally, the post-normalization state is appended to the version history (`append_version()`) and the summary is persisted.
 
 ## Editor State Machine
+
+### AI Configuration Gate (editor UI)
+
+`minimap-editor.js` reads `globalThis.jeoMapVars.ai_configured` (localized in `class-jeo.php` from `AI_Handler::is_configured()`) once at module scope into `AI_CONFIGURED`. When the AI integration is not configured, every AI-only control is hidden — **completely** (no warning/CTA):
+
+- **idle/error placeholder**: description, generation-mode radio, prompt textarea, and "Generate map" button are hidden (label and error notices remain).
+- **ready state**: the "AI Assistant" inspector `PanelBody` is hidden. The map itself stays fully rendered and editable (Map settings, Map layers, Base Layer, Geolocation Pins) — only the chat is removed.
+
+### States
 
 ```mermaid
 stateDiagram-v2

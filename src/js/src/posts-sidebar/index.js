@@ -248,6 +248,7 @@ const JeoGeocodePanel = ( props ) => {
 
 	const { isOpen, isAIProcessing, aiError, isApprovalModalOpen, aiSuggestedLocations } = state;
 	const aiProviderName = globalThis.jeo?.ai_provider_name ?? _x( 'AI', 'Artifical Intelligence', 'jeowp' );
+	const aiConfigured = Boolean( globalThis.jeo?.ai_configured );
 
 	return (
 		<Fragment>
@@ -272,18 +273,20 @@ const JeoGeocodePanel = ( props ) => {
 				>
 					{ __( 'Geolocate this post', 'jeowp' ) }
 				</Button>
-				<Button
-					variant="secondary"
-					isBusy={ isAIProcessing }
-					disabled={ isAIProcessing }
-					onClick={ handleAIGeoreference }
-					style={ { width: '100%', justifyContent: 'center' } }
-				>
-					{ isAIProcessing
-						? __( 'Processing AI...', 'jeowp' )
-						: __( 'Geolocate with AI', 'jeowp' )
-					}
-				</Button>
+				{ aiConfigured && (
+					<Button
+						variant="secondary"
+						isBusy={ isAIProcessing }
+						disabled={ isAIProcessing }
+						onClick={ handleAIGeoreference }
+						style={ { width: '100%', justifyContent: 'center' } }
+					>
+						{ isAIProcessing
+							? __( 'Processing AI...', 'jeowp' )
+							: __( 'Geolocate with AI', 'jeowp' )
+						}
+					</Button>
+				) }
 			</div>
 
 			{ aiError && (

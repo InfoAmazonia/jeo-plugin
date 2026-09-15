@@ -17,6 +17,8 @@ The AI Context Assistant is a Gutenberg sidebar plugin that suggests new paragra
 
 ### Frontend (JS)
 
+The sidebar asset (`jeo-context-sidebar`) is only enqueued when the AI integration is correctly configured — see the gate in `class-jeo.php::enqueue_blocks_assets()` (`AI_Handler::is_configured()`). With no provider/key set, the "AI Context" panel does not exist in the editor at all.
+
 | File | Role |
 |------|------|
 | `src/js/src/context-sidebar/index.js` | Entry point — `registerPlugin('jeo-context-sidebar')` with `PluginDocumentSettingPanel` |

@@ -117,6 +117,31 @@ class AI_Handler {
 	}
 
 	/**
+	 * Check whether the AI integration is correctly configured.
+	 *
+	 * @return bool
+	 */
+	public function is_configured(): bool {
+		$active = \jeo_settings()->get_option( 'ai_default_provider' );
+		if ( ! $active ) {
+			$active = 'gemini';
+		}
+
+		if ( ! array_key_exists( $active, $this->get_adapters() ) ) {
+			return (bool) apply_filters( 'jeo_ai_is_configured', false, $active );
+		}
+
+		$api_key = \jeo_settings()->get_option( $active . '_api_key' );
+		if ( 'ollama' === $active ) {
+			$api_key = \jeo_settings()->get_option( 'ollama_url' );
+		}
+
+		$configured = ! empty( $api_key );
+
+		return (bool) apply_filters( 'jeo_ai_is_configured', $configured, $active );
+	}
+
+	/**
 	 * Get the active adapter instance.
 	 *
 	 * @return AI_Adapter|null

@@ -33,6 +33,8 @@ const { map_defaults: mapDefaults } = globalThis.jeo_settings;
 const PIN_ICON_PRIMARY = globalThis.jeoMapVars?.images?.[ '/js/src/icons/news-marker' ]?.url;
 const PIN_ICON_SECONDARY = globalThis.jeoMapVars?.images?.[ '/js/src/icons/news-marker-hover' ]?.url;
 
+const AI_CONFIGURED = Boolean( globalThis.jeoMapVars?.ai_configured );
+
 const LOADING_MESSAGES = [
 	__( 'Analyzing content…', 'jeowp' ),
 	__( 'Searching for map layers…', 'jeowp' ),
@@ -881,37 +883,43 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 					isColumnLayout={ true }
 					className="jeo-minimap-placeholder"
 				>
-					<p className="jeo-minimap-placeholder__description">
-						{ __( 'AI will analyze your content and suggest relevant map layers, center point, and zoom level.', 'jeowp' ) }
-					</p>
+					{ AI_CONFIGURED && (
+						<p className="jeo-minimap-placeholder__description">
+							{ __( 'AI will analyze your content and suggest relevant map layers, center point, and zoom level.', 'jeowp' ) }
+						</p>
+					) }
 					{ attributes.status === 'error' && (
-						<Notice status="error" isDismissible={ false } className="jeo-minimap-placeholder__error">
-							{ attributes.message }
-						</Notice>
-					) }
-					<RadioControl
-						selected={ generationMode }
-						options={ [
-							{ label: __( 'Generate from post content', 'jeowp' ), value: 'content' },
-							{ label: __( 'Generate from prompt', 'jeowp' ), value: 'prompt' },
-						] }
-						onChange={ setGenerationMode }
-					/>
-					{ generationMode === 'prompt' && (
-						<TextareaControl
-							label={ __( 'Map prompt', 'jeowp' ) }
-							value={ attributes.prompt || '' }
-							onChange={ ( v ) => setAttributes( { prompt: v } ) }
+					<Notice status="error" isDismissible={ false } className="jeo-minimap-placeholder__error">
+						{ attributes.message }
+					</Notice>
+				) }
+				{ AI_CONFIGURED && (
+					<>
+						<RadioControl
+							selected={ generationMode }
+							options={ [
+								{ label: __( 'Generate from post content', 'jeowp' ), value: 'content' },
+								{ label: __( 'Generate from prompt', 'jeowp' ), value: 'prompt' },
+							] }
+							onChange={ setGenerationMode }
 						/>
-					) }
-					<Button
-						variant="primary"
-						onClick={ handleGenerate }
-						disabled={ generationMode === 'prompt' && ! attributes.prompt?.trim() }
-						className="jeo-minimap-placeholder__generate"
-					>
-						{ __( 'Generate map', 'jeowp' ) }
-					</Button>
+						{ generationMode === 'prompt' && (
+							<TextareaControl
+								label={ __( 'Map prompt', 'jeowp' )}
+								value={ attributes.prompt || '' }
+								onChange={ ( v ) => setAttributes( { prompt: v } ) }
+							/>
+						) }
+						<Button
+							variant="primary"
+							onClick={ handleGenerate }
+							disabled={ generationMode === 'prompt' && ! attributes.prompt?.trim() }
+							className="jeo-minimap-placeholder__generate"
+						>
+							{ __( 'Generate map', 'jeowp' ) }
+						</Button>
+					</>
+				) }
 				</Placeholder>
 			</div>
 		);
@@ -989,13 +997,14 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						onChange={ ( v ) => setAttributes( { show_pins: v === 'yes' } ) }
 					/>
 				</PanelBody>
-				<PanelBody
-					name="minimap-chat"
-					title={ __( 'AI Assistant', 'jeowp' ) }
-					className="jeo-minimap-chat-panel"
-					initialOpen={ true }
-				>
-					{ attributes.conversation?.length > 0 && (
+			{ AI_CONFIGURED && (
+			<PanelBody
+				name="minimap-chat"
+				title={ __( 'AI Assistant', 'jeowp' ) }
+				className="jeo-minimap-chat-panel"
+				initialOpen={ true }
+			>
+				{ attributes.conversation?.length > 0 && (
 						<div className="jeo-chat-messages">
 							{ attributes.conversation.map( ( msg, i ) => (
 								<div
@@ -1069,7 +1078,8 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							</Button>
 						</div>
 					) }
-				</PanelBody>
+			</PanelBody>
+			) }
 			</InspectorControls>
 
 			{ attributes.message && (

@@ -31,15 +31,15 @@ msgstr "Mapas interativos para o editor de blocos do WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:930
+#: includes/class-jeo.php:931
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas nenhuma chave de API do Mapbox está configurada. Voltando para MapLibre."
 
-#: includes/class-jeo.php:931
+#: includes/class-jeo.php:932
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas o SDK externo do Mapbox não pôde ser carregado. Voltando para MapLibre."
 
-#: includes/class-jeo.php:1465
+#: includes/class-jeo.php:1470
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Ler mais"
@@ -1408,7 +1408,7 @@ msgstr "Não foi possível carregar as sugestões de endereço."
 msgid "Search address"
 msgstr "Pesquisar endereço"
 
-#: includes/ai/settings/tab-knowledge.php:301
+#: includes/ai/settings/tab-knowledge.php:299
 #: includes/settings/class-settings.php:600
 #: js/build/mapBlocks.js:1
 #: js/build/postsSidebar.js:1
@@ -2014,21 +2014,21 @@ msgstr "Sucesso"
 #: includes/ai/class-bulk-processor.php:223
 #: includes/ai/class-rag-worker.php:68
 #: includes/ai/settings/tab-bulk.php:49
-#: includes/ai/settings/tab-knowledge.php:157
+#: includes/ai/settings/tab-knowledge.php:155
 msgid "Every Minute"
 msgstr "A cada minuto"
 
 #: includes/ai/class-bulk-processor.php:229
 #: includes/ai/class-rag-worker.php:74
 #: includes/ai/settings/tab-bulk.php:50
-#: includes/ai/settings/tab-knowledge.php:158
+#: includes/ai/settings/tab-knowledge.php:156
 msgid "Every 5 Minutes"
 msgstr "A cada 5 minutos"
 
 #: includes/ai/class-bulk-processor.php:235
 #: includes/ai/class-rag-worker.php:80
 #: includes/ai/settings/tab-bulk.php:51
-#: includes/ai/settings/tab-knowledge.php:159
+#: includes/ai/settings/tab-knowledge.php:157
 msgid "Every 15 Minutes"
 msgstr "A cada 15 minutos"
 
@@ -2095,8 +2095,8 @@ msgstr "Aprovar geolocalizações da IA do JEO"
 #: includes/ai/class-context-handler.php:895
 #: includes/ai/class-rag-worker.php:223
 #: includes/minimap/class-minimap.php:162
-#: includes/minimap/class-minimap.php:263
-#: includes/minimap/class-minimap.php:365
+#: includes/minimap/class-minimap.php:273
+#: includes/minimap/class-minimap.php:374
 msgid "Post not found."
 msgstr "Post não encontrado."
 
@@ -2105,8 +2105,9 @@ msgstr "Post não encontrado."
 #: includes/ai/class-minilayer-classifier.php:35
 #: includes/ai/class-minilayer-handler.php:91
 #: includes/ai/class-minilayer-service.php:41
-#: includes/minimap/class-minimap.php:274
-#: includes/minimap/class-minimap.php:386
+#: includes/minimap/class-minimap.php:172
+#: includes/minimap/class-minimap.php:283
+#: includes/minimap/class-minimap.php:394
 msgid "No AI provider configured. Set one in JEO AI Settings."
 msgstr "Nenhum provedor de IA configurado. Defina um nas configurações de IA do JEO."
 
@@ -2128,18 +2129,18 @@ msgid "Suggestions generated."
 msgstr "Sugestões geradas."
 
 #: includes/ai/class-context-handler.php:330
-#: includes/minimap/class-minimap.php:345
+#: includes/minimap/class-minimap.php:354
 msgid "conversation_id is required."
 msgstr "conversation_id é obrigatório."
 
 #: includes/ai/class-context-handler.php:340
-#: includes/minimap/class-minimap.php:252
-#: includes/minimap/class-minimap.php:355
+#: includes/minimap/class-minimap.php:262
+#: includes/minimap/class-minimap.php:364
 msgid "A post ID is required."
 msgstr "Um ID de post é obrigatório."
 
 #: includes/ai/class-context-handler.php:360
-#: includes/minimap/class-minimap.php:375
+#: includes/minimap/class-minimap.php:384
 msgid "A message is required."
 msgstr "Uma mensagem é obrigatória."
 
@@ -2158,7 +2159,7 @@ msgstr "Conversa limpa."
 #: includes/ai/class-minilayer-handler.php:72
 #: includes/cli/class-ai-cli.php:52
 #: includes/cli/class-ai-cli.php:157
-#: includes/minimap/class-minimap.php:242
+#: includes/minimap/class-minimap.php:252
 msgid "A prompt is required."
 msgstr "Um prompt é obrigatório."
 
@@ -2295,7 +2296,7 @@ msgid "When active, JEO will scan legacy posts and suggest locations based on th
 msgstr "Quando ativo, o JEO examinará posts existentes e sugerirá localizações com base no seu conteúdo."
 
 #: includes/ai/settings/tab-bulk.php:20
-#: includes/ai/settings/tab-knowledge.php:151
+#: includes/ai/settings/tab-knowledge.php:149
 msgid "Batch Size"
 msgstr "Tamanho do lote"
 
@@ -2308,12 +2309,12 @@ msgid "Target Post Types"
 msgstr "Tipos de post alvo"
 
 #: includes/ai/settings/tab-bulk.php:46
-#: includes/ai/settings/tab-knowledge.php:155
+#: includes/ai/settings/tab-knowledge.php:153
 msgid "Cron Interval"
 msgstr "Intervalo do Cron"
 
 #: includes/ai/settings/tab-bulk.php:52
-#: includes/ai/settings/tab-knowledge.php:160
+#: includes/ai/settings/tab-knowledge.php:158
 msgid "Hourly"
 msgstr "Horário"
 
@@ -2477,7 +2478,7 @@ msgid "Download"
 msgstr "Baixar"
 
 #: includes/ai/settings/tab-embedded.php:65
-#: includes/ai/settings/tab-knowledge.php:291
+#: includes/ai/settings/tab-knowledge.php:289
 #: includes/settings/ai-logs-page.php:250
 msgid "Close"
 msgstr "Fechar"
@@ -2558,265 +2559,265 @@ msgstr "Ver dicionários geográficos incorporados localmente usados para melhor
 msgid "View Embedded Data"
 msgstr "Ver dados incorporados"
 
-#: includes/ai/settings/tab-knowledge.php:19
+#: includes/ai/settings/tab-knowledge.php:17
 msgid "AI Provider Required"
 msgstr "Provedor de IA necessário"
 
-#: includes/ai/settings/tab-knowledge.php:21
+#: includes/ai/settings/tab-knowledge.php:19
 msgid "You need to configure an AI Provider before you can use the Knowledge Base. Set up your API key and choose a model in the Provider tab first."
 msgstr "Você precisa configurar um provedor de IA antes de usar a Base de Conhecimento. Configure sua chave de API e escolha um modelo na aba Provedor primeiro."
 
-#: includes/ai/settings/tab-knowledge.php:24
+#: includes/ai/settings/tab-knowledge.php:22
 msgid "Configure AI Provider"
 msgstr "Configurar provedor de IA"
 
-#: includes/ai/settings/tab-knowledge.php:37
+#: includes/ai/settings/tab-knowledge.php:35
 msgid "RAG Knowledge Base (Vector Store)"
 msgstr "Base de Conhecimento RAG (Armazenamento de Vetores)"
 
-#: includes/ai/settings/tab-knowledge.php:38
+#: includes/ai/settings/tab-knowledge.php:36
 msgid "Vectorize your WordPress posts to allow the JEO AI to contextually answer questions and cross-reference territorial data."
 msgstr "Vetorize seus posts do WordPress para permitir que a IA do JEO responda perguntas contextualmente e faça referência cruzada de dados territoriais."
 
-#: includes/ai/settings/tab-knowledge.php:43
+#: includes/ai/settings/tab-knowledge.php:41
 msgid "Embedding Model"
 msgstr "Modelo de Embedding"
 
-#: includes/ai/settings/tab-knowledge.php:59
+#: includes/ai/settings/tab-knowledge.php:57
 msgid "Model selection is locked."
 msgstr "Seleção de modelo bloqueada."
 
 #. translators: %s: locked embedding model name
-#: includes/ai/settings/tab-knowledge.php:64
+#: includes/ai/settings/tab-knowledge.php:62
 #, php-format
 msgid "This Vector Store was initialized with %s. To use a different model, you must clear the current store first."
 msgstr "Este Armazenamento de Vetores foi inicializado com %s. Para usar um modelo diferente, você deve limpar o armazenamento atual primeiro."
 
-#: includes/ai/settings/tab-knowledge.php:72
+#: includes/ai/settings/tab-knowledge.php:70
 msgid "Select an embedding model..."
 msgstr "Selecione um modelo de Embedding..."
 
-#: includes/ai/settings/tab-knowledge.php:100
+#: includes/ai/settings/tab-knowledge.php:98
 msgid "Select the specific embedding model. You can mix providers (e.g. use Gemini for chat and OpenAI for embeddings)."
 msgstr "Selecione o modelo de Embedding específico. Você pode misturar provedores (ex.: usar Gemini para chat e OpenAI para Embeddings)."
 
-#: includes/ai/settings/tab-knowledge.php:112
+#: includes/ai/settings/tab-knowledge.php:110
 msgid "RAG Knowledge Base is not available"
 msgstr "A Base de Conhecimento RAG não está disponível"
 
-#: includes/ai/settings/tab-knowledge.php:117
+#: includes/ai/settings/tab-knowledge.php:115
 msgid "How to fix this:"
 msgstr "Como corrigir:"
 
-#: includes/ai/settings/tab-knowledge.php:120
+#: includes/ai/settings/tab-knowledge.php:118
 msgid "Please select an Embedding Model from the dropdown above and click \"Save AI Settings\"."
 msgstr "Selecione um modelo de Embedding no menu suspenso acima e clique em \"Salvar configurações de IA\"."
 
-#: includes/ai/settings/tab-knowledge.php:122
+#: includes/ai/settings/tab-knowledge.php:120
 msgid "Ensure you have an active AI Provider (Gemini, OpenAI, or Ollama) configured in the \"AI Provider\" tab."
 msgstr "Certifique-se de ter um provedor de IA ativo (Gemini, OpenAI ou Ollama) configurado na aba \"Provedor de IA\"."
 
-#: includes/ai/settings/tab-knowledge.php:123
+#: includes/ai/settings/tab-knowledge.php:121
 msgid "Check if the \"wp-content/uploads\" directory exists and is writable."
 msgstr "Verifique se o diretório \"wp-content/uploads\" existe e tem permissão de escrita."
 
-#: includes/ai/settings/tab-knowledge.php:128
+#: includes/ai/settings/tab-knowledge.php:126
 msgid "Go to AI Provider Settings"
 msgstr "Ir para configurações do provedor de IA"
 
-#: includes/ai/settings/tab-knowledge.php:136
+#: includes/ai/settings/tab-knowledge.php:134
 msgid "Background Indexing"
 msgstr "Indexação em segundo plano"
 
-#: includes/ai/settings/tab-knowledge.php:137
+#: includes/ai/settings/tab-knowledge.php:135
 msgid "Automatically vectorize your posts in small batches using WP-Cron."
 msgstr "Vetorize automaticamente seus posts em pequenos lotes usando o WP-Cron."
 
-#: includes/ai/settings/tab-knowledge.php:142
+#: includes/ai/settings/tab-knowledge.php:140
 msgid "Enable Auto-indexing"
 msgstr "Ativar indexação automática"
 
-#: includes/ai/settings/tab-knowledge.php:145
+#: includes/ai/settings/tab-knowledge.php:143
 msgid "Note: WP-Cron only runs when your site receives visitor traffic. If you are on a local development server with no traffic, indexing will pause until pages are loaded."
 msgstr "Nota: O WP-Cron só é executado quando seu site recebe tráfego de visitantes. Se você estiver em um servidor de desenvolvimento local sem tráfego, a indexação será pausada até que as páginas sejam carregadas."
 
-#: includes/ai/settings/tab-knowledge.php:164
+#: includes/ai/settings/tab-knowledge.php:162
 msgid "Search Results (topK)"
 msgstr "Resultados da busca (topK)"
 
-#: includes/ai/settings/tab-knowledge.php:166
+#: includes/ai/settings/tab-knowledge.php:164
 msgid "Max semantic matches returned per search."
 msgstr "Máximo de correspondências semânticas retornadas por busca."
 
-#: includes/ai/settings/tab-knowledge.php:171
+#: includes/ai/settings/tab-knowledge.php:169
 msgid "Recent Background Logs"
 msgstr "Logs recentes em segundo plano"
 
-#: includes/ai/settings/tab-knowledge.php:177
+#: includes/ai/settings/tab-knowledge.php:175
 msgid "No indexing jobs have run recently."
 msgstr "Nenhum trabalho de indexação executado recentemente."
 
-#: includes/ai/settings/tab-knowledge.php:194
+#: includes/ai/settings/tab-knowledge.php:192
 msgid "Manual Indexing"
 msgstr "Indexação manual"
 
-#: includes/ai/settings/tab-knowledge.php:195
+#: includes/ai/settings/tab-knowledge.php:193
 msgid "Trigger a single batch vectorization immediately."
 msgstr "Disparar uma única vetorização em lote imediatamente."
 
-#: includes/ai/settings/tab-knowledge.php:198
-#: includes/ai/settings/tab-knowledge.php:321
+#: includes/ai/settings/tab-knowledge.php:196
+#: includes/ai/settings/tab-knowledge.php:319
 msgid "Vectorize 1 Batch Now"
 msgstr "Vetorizar 1 lote agora"
 
-#: includes/ai/settings/tab-knowledge.php:230
+#: includes/ai/settings/tab-knowledge.php:228
 msgid "Indexing Progress"
 msgstr "Progresso da indexação"
 
 #. translators: %1$d: vectorized count, %2$d: total posts count
-#: includes/ai/settings/tab-knowledge.php:239
+#: includes/ai/settings/tab-knowledge.php:237
 #, php-format
 msgid "%1$d of %2$d posts indexed."
 msgstr "%1$d de %2$d posts indexados."
 
-#: includes/ai/settings/tab-knowledge.php:248
-#: includes/ai/settings/tab-knowledge.php:405
+#: includes/ai/settings/tab-knowledge.php:246
+#: includes/ai/settings/tab-knowledge.php:403
 msgid "Status:"
 msgstr "Status:"
 
-#: includes/ai/settings/tab-knowledge.php:250
+#: includes/ai/settings/tab-knowledge.php:248
 msgid "Active (Local File Store)"
 msgstr "Ativo (Armazenamento de arquivos local)"
 
-#: includes/ai/settings/tab-knowledge.php:254
+#: includes/ai/settings/tab-knowledge.php:252
 msgid "Alternative: Use WP-CLI for large databases:"
 msgstr "Alternativa: Use WP-CLI para grandes bancos de dados:"
 
-#: includes/ai/settings/tab-knowledge.php:259
+#: includes/ai/settings/tab-knowledge.php:257
 msgid "Backup Store"
 msgstr "Armazenamento de backup"
 
-#: includes/ai/settings/tab-knowledge.php:262
+#: includes/ai/settings/tab-knowledge.php:260
 msgid "Clear & Reset Model"
 msgstr "Limpar e redefinir modelo"
 
-#: includes/ai/settings/tab-knowledge.php:268
+#: includes/ai/settings/tab-knowledge.php:266
 msgid "Available Backups (Last 3)"
 msgstr "Backups disponíveis (últimos 3)"
 
-#: includes/ai/settings/tab-knowledge.php:270
+#: includes/ai/settings/tab-knowledge.php:268
 #: includes/settings/class-settings.php:563
 msgid "No backups found."
 msgstr "Nenhum backup encontrado."
 
-#: includes/ai/settings/tab-knowledge.php:277
+#: includes/ai/settings/tab-knowledge.php:275
 msgid "Test Embeddings & RAG Retrieval"
 msgstr "Testar Embeddings e recuperação RAG"
 
-#: includes/ai/settings/tab-knowledge.php:278
+#: includes/ai/settings/tab-knowledge.php:276
 msgid "Test your configured Embedding Model on a random post to ensure it works correctly before indexing your entire database. This uses a temporary testing store."
 msgstr "Teste seu modelo de Embedding configurado em um post aleatório para garantir que funcione corretamente antes de indexar todo o seu banco de dados. Usa um armazenamento de teste temporário."
 
-#: includes/ai/settings/tab-knowledge.php:281
+#: includes/ai/settings/tab-knowledge.php:279
 #: includes/settings/class-settings.php:574
 msgid "Run Test on Random Post"
 msgstr "Executar teste em post aleatório"
 
-#: includes/ai/settings/tab-knowledge.php:282
+#: includes/ai/settings/tab-knowledge.php:280
 msgid "Test Vector Retrieval"
 msgstr "Testar recuperação de vetores"
 
-#: includes/ai/settings/tab-knowledge.php:290
+#: includes/ai/settings/tab-knowledge.php:288
 msgid "Test Local Vector Retrieval"
 msgstr "Testar recuperação local de vetores"
 
-#: includes/ai/settings/tab-knowledge.php:297
+#: includes/ai/settings/tab-knowledge.php:295
 msgid "Search Production Store"
 msgstr "Buscar no armazenamento de produção"
 
-#: includes/ai/settings/tab-knowledge.php:298
+#: includes/ai/settings/tab-knowledge.php:296
 msgid "Search Test Store"
 msgstr "Buscar no armazenamento de teste"
 
-#: includes/ai/settings/tab-knowledge.php:300
+#: includes/ai/settings/tab-knowledge.php:298
 msgid "Search the Vector Store for semantic meaning (e.g., \"Indigenous lands in Amazon\")"
 msgstr "Busque no Armazenamento de Vetores por significado semântico (ex.: \"Terras indígenas na Amazônia\")"
 
-#: includes/ai/settings/tab-knowledge.php:304
+#: includes/ai/settings/tab-knowledge.php:302
 msgid "Enter a semantic search query to retrieve similar vectors from your local store."
 msgstr "Digite uma consulta de busca semântica para recuperar vetores similares do seu armazenamento local."
 
-#: includes/ai/settings/tab-knowledge.php:312
+#: includes/ai/settings/tab-knowledge.php:310
 msgid "Layer Store (Vectorized Map Layers)"
 msgstr "Armazenamento de camadas (camadas de mapa vetorizadas)"
 
-#: includes/ai/settings/tab-knowledge.php:313
+#: includes/ai/settings/tab-knowledge.php:311
 msgid "Vectorize your map layers to enable AI-powered semantic search and layer suggestions based on post content."
 msgstr "Vetorize suas camadas de mapa para ativar a busca semântica com IA e sugestões de camadas com base no conteúdo do post."
 
-#: includes/ai/settings/tab-knowledge.php:317
+#: includes/ai/settings/tab-knowledge.php:315
 msgid "Manual Layer Indexing"
 msgstr "Indexação manual de camadas"
 
-#: includes/ai/settings/tab-knowledge.php:318
+#: includes/ai/settings/tab-knowledge.php:316
 msgid "Trigger a single batch vectorization for map layers. Layers are also auto-indexed on the background cron schedule and when saved."
 msgstr "Dispare uma única vetorização em lote para camadas de mapa. As camadas também são indexadas automaticamente no Cron em segundo plano e ao salvar."
 
-#: includes/ai/settings/tab-knowledge.php:346
+#: includes/ai/settings/tab-knowledge.php:344
 msgid "Layer Indexing Progress"
 msgstr "Progresso da indexação de camadas"
 
 #. translators: %1$d: vectorized count, %2$d: total layers count
-#: includes/ai/settings/tab-knowledge.php:355
+#: includes/ai/settings/tab-knowledge.php:353
 #, php-format
 msgid "%1$d of %2$d layers indexed."
 msgstr "%1$d de %2$d camadas indexadas."
 
-#: includes/ai/settings/tab-knowledge.php:361
+#: includes/ai/settings/tab-knowledge.php:359
 msgid "Recent Layer Logs"
 msgstr "Logs recentes de camadas"
 
-#: includes/ai/settings/tab-knowledge.php:367
+#: includes/ai/settings/tab-knowledge.php:365
 msgid "No layer indexing jobs have run recently."
 msgstr "Nenhum trabalho de indexação de camadas executado recentemente."
 
-#: includes/ai/settings/tab-knowledge.php:384
+#: includes/ai/settings/tab-knowledge.php:382
 msgid "Suggest Layers"
 msgstr "Sugerir camadas"
 
-#: includes/ai/settings/tab-knowledge.php:385
+#: includes/ai/settings/tab-knowledge.php:383
 msgid "Test semantic layer matching. Enter a post ID or text to find layers that match the content."
 msgstr "Teste a correspondência semântica de camadas. Digite um ID de post ou texto para encontrar camadas que correspondam ao conteúdo."
 
-#: includes/ai/settings/tab-knowledge.php:389
+#: includes/ai/settings/tab-knowledge.php:387
 msgid "Post ID"
 msgstr "ID do post"
 
-#: includes/ai/settings/tab-knowledge.php:390
+#: includes/ai/settings/tab-knowledge.php:388
 msgid "e.g. 123"
 msgstr "ex. 123"
 
-#: includes/ai/settings/tab-knowledge.php:393
+#: includes/ai/settings/tab-knowledge.php:391
 msgid "Or search text"
 msgstr "Ou texto de busca"
 
-#: includes/ai/settings/tab-knowledge.php:394
+#: includes/ai/settings/tab-knowledge.php:392
 msgid "e.g., deforestation in Amazon rainforest"
 msgstr "ex.: desmatamento na floresta amazônica"
 
-#: includes/ai/settings/tab-knowledge.php:396
+#: includes/ai/settings/tab-knowledge.php:394
 msgid "Find Layers"
 msgstr "Encontrar camadas"
 
-#: includes/ai/settings/tab-knowledge.php:407
+#: includes/ai/settings/tab-knowledge.php:405
 msgid "Active (Shared embedding model with Posts Store)"
 msgstr "Ativo (Modelo de Embedding compartilhado com o Armazenamento de Posts)"
 
-#: includes/ai/settings/tab-knowledge.php:411
+#: includes/ai/settings/tab-knowledge.php:409
 msgid "WP-CLI:"
 msgstr "WP-CLI:"
 
-#: includes/ai/settings/tab-knowledge.php:416
+#: includes/ai/settings/tab-knowledge.php:414
 msgid "Clear Layer Store"
 msgstr "Limpar armazenamento de camadas"
 
@@ -3053,138 +3054,138 @@ msgid "Cohere"
 msgstr "Cohere"
 
 #. translators: %s: AI provider name
-#: includes/class-ai-handler.php:144
+#: includes/class-ai-handler.php:169
 #, php-format
 msgid "No API key configured for %s. Please add it in JEO → AI Settings."
 msgstr "Nenhuma chave de API configurada para %s. Adicione-a em JEO → Configurações de IA."
 
-#: includes/class-ai-handler.php:397
+#: includes/class-ai-handler.php:422
 msgid "Invalid store type."
 msgstr "Tipo de armazenamento inválido."
 
 #. translators: %s: Store type name.
-#: includes/class-ai-handler.php:423
+#: includes/class-ai-handler.php:448
 #, php-format
 msgid "%s store cleared successfully."
 msgstr "Armazenamento %s limpo com sucesso."
 
-#: includes/class-ai-handler.php:466
+#: includes/class-ai-handler.php:491
 msgid "Layer store cleared successfully."
 msgstr "Armazenamento de camadas limpo com sucesso."
 
-#: includes/class-ai-handler.php:493
+#: includes/class-ai-handler.php:518
 msgid "Query is required."
 msgstr "Consulta é obrigatória."
 
-#: includes/class-ai-handler.php:514
+#: includes/class-ai-handler.php:539
 msgid "No matches found in the selected Vector Store. Try vectorizing some posts first."
 msgstr "Nenhuma correspondência encontrada no Armazenamento de Vetores selecionado. Tente vetorizar alguns posts primeiro."
 
-#: includes/class-ai-handler.php:568
+#: includes/class-ai-handler.php:593
 msgid "No posts available to test."
 msgstr "Nenhum post disponível para teste."
 
-#: includes/class-ai-handler.php:576
+#: includes/class-ai-handler.php:601
 msgid "The selected random post has no usable text content."
 msgstr "O post aleatório selecionado não tem conteúdo de texto utilizável."
 
-#: includes/class-ai-handler.php:592
+#: includes/class-ai-handler.php:617
 msgid "The embedding provider returned an empty vector."
 msgstr "O provedor de Embedding retornou um vetor vazio."
 
-#: includes/class-ai-handler.php:607
+#: includes/class-ai-handler.php:632
 msgid "Embedding created and saved to Test Store!"
 msgstr "Embedding criado e salvo no Armazenamento de teste!"
 
-#: includes/class-ai-handler.php:648
+#: includes/class-ai-handler.php:673
 msgid "API Key or URL is required to list models."
 msgstr "Chave de API ou URL é obrigatória para listar modelos."
 
-#: includes/class-ai-handler.php:681
+#: includes/class-ai-handler.php:706
 msgid "Model fetching not officially supported dynamically for Zhipu AI."
 msgstr "A busca de modelos não é oficialmente suportada dinamicamente para Zhipu AI."
 
-#: includes/class-ai-handler.php:837
+#: includes/class-ai-handler.php:862
 msgid "Model fetching is not supported for this provider yet. Please enter the model ID manually."
 msgstr "A busca de modelos não é suportada para este provedor ainda. Insira o ID do modelo manualmente."
 
-#: includes/class-ai-handler.php:845
+#: includes/class-ai-handler.php:870
 msgid "No models found. Check your API key or permissions."
 msgstr "Nenhum modelo encontrado. Verifique sua chave de API ou permissões."
 
-#: includes/class-ai-handler.php:881
+#: includes/class-ai-handler.php:906
 msgid "No API Key provided or found in settings."
 msgstr "Nenhuma chave de API fornecida ou encontrada nas configurações."
 
-#: includes/class-ai-handler.php:891
+#: includes/class-ai-handler.php:916
 msgid "Invalid provider."
 msgstr "Provedor inválido."
 
-#: includes/class-ai-handler.php:914
+#: includes/class-ai-handler.php:939
 msgid "API Key is valid and active!"
 msgstr "A chave de API é válida e está ativa!"
 
-#: includes/class-ai-handler.php:924
+#: includes/class-ai-handler.php:949
 msgid "The AI provider returned an unexpected response format."
 msgstr "O provedor de IA retornou um formato de resposta inesperado."
 
-#: includes/class-ai-handler.php:969
+#: includes/class-ai-handler.php:994
 msgid "Context is required."
 msgstr "Contexto é obrigatório."
 
-#: includes/class-ai-handler.php:1001
-#: includes/class-ai-handler.php:1161
-#: includes/class-ai-handler.php:1249
-#: includes/class-ai-handler.php:1298
+#: includes/class-ai-handler.php:1026
+#: includes/class-ai-handler.php:1186
+#: includes/class-ai-handler.php:1274
+#: includes/class-ai-handler.php:1323
 msgid "No active AI adapter found."
 msgstr "Nenhum adaptador de IA ativo encontrado."
 
-#: includes/class-ai-handler.php:1117
+#: includes/class-ai-handler.php:1142
 msgid "AI failed to generate prompt."
 msgstr "A IA falhou ao gerar o prompt."
 
 #: includes/ai/class-context-handler.php:935
-#: includes/class-ai-handler.php:1135
+#: includes/class-ai-handler.php:1160
 msgid "Prompt is required."
 msgstr "Prompt é obrigatório."
 
-#: includes/class-ai-handler.php:1183
+#: includes/class-ai-handler.php:1208
 msgid "Prompt successfully validated! The AI understood your instructions and returned a valid JSON array."
 msgstr "Prompt validado com sucesso! A IA compreendeu suas instruções e retornou um array JSON válido."
 
-#: includes/class-ai-handler.php:1187
+#: includes/class-ai-handler.php:1212
 msgid "Validation failed: The AI did not return a valid JSON array."
 msgstr "Falha na validação: A IA não retornou um array JSON válido."
 
-#: includes/class-ai-handler.php:1192
+#: includes/class-ai-handler.php:1217
 msgid "Validation failed: The AI missed mandatory keys (name, lat, lon, quote) in its JSON objects."
 msgstr "Falha na validação: A IA não incluiu chaves obrigatórias (name, lat, lon, quote) em seus objetos JSON."
 
-#: includes/class-ai-handler.php:1197
+#: includes/class-ai-handler.php:1222
 msgid "Validation failed: The AI returned an invalid is_primary value (must be boolean)."
 msgstr "Falha na validação: A IA retornou um valor is_primary inválido (deve ser booleano)."
 
-#: includes/class-ai-handler.php:1203
+#: includes/class-ai-handler.php:1228
 msgid "Prompt successfully validated! The AI returned an empty array, which means your filtering rules worked perfectly for the test text."
 msgstr "Prompt validado com sucesso! A IA retornou um array vazio, o que significa que suas regras de filtragem funcionaram perfeitamente para o texto de teste."
 
-#: includes/class-ai-handler.php:1262
+#: includes/class-ai-handler.php:1287
 msgid "An unexpected error occurred while processing the AI request."
 msgstr "Ocorreu um erro inesperado ao processar a solicitação da IA."
 
-#: includes/class-ai-handler.php:1331
+#: includes/class-ai-handler.php:1356
 msgid "An unexpected error occurred while processing the AI chat request."
 msgstr "Ocorreu um erro inesperado ao processar a solicitação de chat da IA."
 
-#: includes/class-ai-handler.php:1460
+#: includes/class-ai-handler.php:1485
 msgid "Backup created successfully!"
 msgstr "Backup criado com sucesso!"
 
-#: includes/class-ai-handler.php:1481
+#: includes/class-ai-handler.php:1506
 msgid "Missing filename"
 msgstr "Nome de arquivo ausente"
 
-#: includes/class-ai-handler.php:1492
+#: includes/class-ai-handler.php:1517
 msgid "File not found"
 msgstr "Arquivo não encontrado"
 
@@ -3219,35 +3220,35 @@ msgstr "Painel"
 msgid "AI (new)"
 msgstr "IA (novo)"
 
-#: includes/minimap/class-minimap.php:191
+#: includes/minimap/class-minimap.php:201
 msgid "No matching layers found. Add layers manually or run the RAG indexer in JEO Settings."
 msgstr "Nenhuma camada correspondente encontrada. Adicione camadas manualmente ou execute o indexador RAG nas configurações do JEO."
 
-#: includes/minimap/class-minimap.php:478
+#: includes/minimap/class-minimap.php:486
 msgid "The AI returned an empty response. Please try again."
 msgstr "A IA retornou uma resposta vazia. Tente novamente."
 
-#: includes/minimap/class-minimap.php:1868
+#: includes/minimap/class-minimap.php:1876
 msgid "Dark Base (Mapbox)"
 msgstr "Base escura (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1875
+#: includes/minimap/class-minimap.php:1883
 msgid "Terrain Base (Mapbox)"
 msgstr "Base de terreno (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1882
+#: includes/minimap/class-minimap.php:1890
 msgid "Satellite Base (Mapbox)"
 msgstr "Base de satélite (Mapbox)"
 
-#: includes/minimap/class-minimap.php:1893
+#: includes/minimap/class-minimap.php:1901
 msgid "Dark Base"
 msgstr "Base escura"
 
-#: includes/minimap/class-minimap.php:1902
+#: includes/minimap/class-minimap.php:1910
 msgid "Light Base"
 msgstr "Base clara"
 
-#: includes/minimap/class-minimap.php:1911
+#: includes/minimap/class-minimap.php:1919
 msgid "Satellite Base"
 msgstr "Base de satélite"
 
@@ -4553,11 +4554,11 @@ msgstr "Pré-visualização interativa de mapa para o editor do tipo de post Map
 msgid "Unable to retrieve the address for the selected point."
 msgstr "Não foi possível obter o endereço para o ponto selecionado."
 
-#: includes/class-jeo.php:1706
+#: includes/class-jeo.php:1711
 msgid "This JEO embed is not available."
 msgstr "Este embed JEO não está disponível."
 
-#: includes/class-jeo.php:1707
+#: includes/class-jeo.php:1712
 msgid "Embed not available"
 msgstr "Embed indisponível"
 
@@ -4695,17 +4696,17 @@ msgstr "Queimadas"
 msgid "Climate"
 msgstr "Clima"
 
-#: includes/minimap/class-minimap.php:219
+#: includes/minimap/class-minimap.php:229
 msgid "Generate a map for this post based on its content."
 msgstr "Gerar um mapa para este post com base no seu conteúdo."
 
 #. translators: %d: number of removed layers
-#: includes/minimap/class-minimap.php:521
+#: includes/minimap/class-minimap.php:529
 #, php-format
 msgid "%d layer(s) returned by the AI were discarded because they are not published map layers."
 msgstr "%d camada(s) retornada(s) pela IA foi(ram) descartada(s) porque não são camadas de mapa publicadas."
 
-#: includes/minimap/class-minimap.php:1136
+#: includes/minimap/class-minimap.php:1144
 msgid "The agent tried to remove several existing layers without an explicit request. They were kept to preserve the current map."
 msgstr "O agente tentou remover várias camadas existentes sem uma solicitação explícita. Elas foram mantidas para preservar o mapa atual."
 
@@ -4985,31 +4986,31 @@ msgid "Your browser could not determine your location. This may be due to strict
 msgstr "Seu navegador não conseguiu determinar sua localização. Isso pode ocorrer por configurações rigorosas de privacidade ou porque o GPS está indisponível no seu dispositivo."
 
 #. translators: %d: number of preserved layers
-#: includes/minimap/class-minimap.php:1380
+#: includes/minimap/class-minimap.php:1388
 #, php-format
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d camada(s) adicionada(s) manualmente preservada(s) durante o refinamento da IA."
 
-#: includes/class-jeo.php:2055
+#: includes/class-jeo.php:2060
 msgid "A Mapbox style ID and access token are required."
 msgstr "Um ID de estilo do Mapbox e um token de acesso são obrigatórios."
 
-#: includes/class-jeo.php:2099
+#: includes/class-jeo.php:2104
 msgid "Unexpected Mapbox style payload."
 msgstr "Resposta de estilo do Mapbox inesperada."
 
-#: includes/minimap/class-minimap.php:220
+#: includes/minimap/class-minimap.php:230
 msgid "Initial generation from post content"
 msgstr "Geração inicial a partir do conteúdo do post"
 
 #. translators: %d: version number.
-#: includes/minimap/class-minimap.php:925
+#: includes/minimap/class-minimap.php:933
 #, php-format
 msgid "Version %d was not found in the stored history. The configuration reconstructed from the conversation context was applied instead."
 msgstr "A versão %d não foi encontrada no histórico armazenado. A configuração reconstruída a partir do contexto da conversa foi aplicada em seu lugar."
 
 #. translators: %d: version number.
-#: includes/minimap/class-minimap.php:938
+#: includes/minimap/class-minimap.php:946
 #, php-format
 msgid "Restored map version %d."
 msgstr "Versão %d do mapa restaurada."
@@ -5289,11 +5290,11 @@ msgstr ""
 msgid "How the GeoJSON features are drawn."
 msgstr ""
 
-#: includes/class-jeo.php:2163
+#: includes/class-jeo.php:2168
 msgid "A valid http(s) style URL is required."
 msgstr "Uma URL de estilo http(s) válida é obrigatória."
 
-#: includes/class-jeo.php:2201
+#: includes/class-jeo.php:2206
 msgid "Unexpected style JSON payload."
 msgstr "Conteúdo inesperado no style JSON."
 
@@ -5318,8 +5319,8 @@ msgid "Optional. Paste a raw MapLibre GL style object. Takes precedence over the
 msgstr "Opcional. Cole um objeto de estilo MapLibre GL bruto. Tem precedência sobre a URL — útil para estilos pequenos e autocontidos."
 
 #: includes/ai/class-context-handler.php:496
-#: includes/minimap/class-minimap.php:312
-#: includes/minimap/class-minimap.php:434
+#: includes/minimap/class-minimap.php:321
+#: includes/minimap/class-minimap.php:442
 msgid "The previous request could not be processed. Please try again."
 msgstr "A solicitação anterior não pôde ser processada. Tente novamente."
 

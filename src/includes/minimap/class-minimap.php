@@ -165,6 +165,16 @@ class Minimap {
 			);
 		}
 
+		if ( ! \jeo_ai_handler()->is_configured() ) {
+			return new \WP_REST_Response(
+				array(
+					'success' => false,
+					'message' => __( 'No AI provider configured. Set one in JEO AI Settings.', 'jeowp' ),
+				),
+				400
+			);
+		}
+
 		$search_text = $post->post_title . "\n\n" . wp_strip_all_tags( $post->post_content );
 
 		$layers      = array();
@@ -266,8 +276,7 @@ class Minimap {
 			);
 		}
 
-		$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
-		if ( empty( $active_provider ) ) {
+		if ( ! \jeo_ai_handler()->is_configured() ) {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
@@ -378,8 +387,7 @@ class Minimap {
 			);
 		}
 
-		$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
-		if ( empty( $active_provider ) ) {
+		if ( ! \jeo_ai_handler()->is_configured() ) {
 			return new \WP_REST_Response(
 				array(
 					'success' => false,

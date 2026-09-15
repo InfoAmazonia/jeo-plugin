@@ -867,6 +867,7 @@ class Jeo {
 			array(
 				'ajax_url'         => admin_url( 'admin-ajax.php' ),
 				'ai_provider_name' => $ai_provider_name,
+				'ai_configured'    => \jeo_ai_handler()->is_configured(),
 				'map_runtime'      => $map_runtime_requested,
 				'mapbox_key'       => $mapbox_key,
 				'default_lat'      => $default_lat,
@@ -993,6 +994,7 @@ class Jeo {
 				'images'                     => $this->get_map_icon_images(),
 				'nonce'                      => $this->get_rest_nonce(),
 				'currentLang'                => $this->get_current_language(),
+				'ai_configured'              => \jeo_ai_handler()->is_configured(),
 			)
 		);
 	}
@@ -1389,8 +1391,11 @@ class Jeo {
 		if ( in_array( $post->post_type, $post_types, true ) && $this->should_load_assets() ) {
 			wp_enqueue_script( 'jeo-js' );
 			wp_enqueue_style( 'jeo-js' );
-			wp_enqueue_script( 'jeo-context-sidebar' );
-			wp_enqueue_style( 'jeo-context-sidebar' );
+
+			if ( \jeo_ai_handler()->is_configured() ) {
+				wp_enqueue_script( 'jeo-context-sidebar' );
+				wp_enqueue_style( 'jeo-context-sidebar' );
+			}
 		}
 	}
 

@@ -5,10 +5,8 @@
  * @package Jeo
  */
 
-$active_provider = \jeo_settings()->get_option( 'ai_default_provider' );
-
 // Early exit: show friendly CTA when no AI provider is configured at all.
-if ( empty( $active_provider ) ) :
+if ( ! \jeo_ai_handler()->is_configured() ) :
 	?>
 	<style>
 		#jeo-skeleton { display: none !important; }

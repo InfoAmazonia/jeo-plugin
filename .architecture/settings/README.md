@@ -77,6 +77,23 @@ $settings = jeo_settings(); // Returns singleton instance of Jeo\Settings
 $value    = jeo_settings()->get_option( 'mapbox_key' );
 ```
 
+## AI Feature Gating
+
+`AI_Handler::is_configured()` (`src/includes/class-ai-handler.php`) is the single source of truth for "is the AI integration usable?" — a valid `ai_default_provider` slug **plus** its API key (or `ollama_url` for Ollama). It is filterable via `jeo_ai_is_configured`. Never gate AI features on `empty( ai_default_provider )` alone: the option defaults to `'gemini'`, so that check never fires.
+
+Consumers:
+
+| Gate | Location | Behavior when not configured |
+|------|----------|------------------------------|
+| JS flag `ai_configured` | `class-jeo.php` localizes (`jeo` and `jeoMapVars`) | Editor UI hides AI-only controls (posts-sidebar AI geolocate button, minimap generation form + AI Assistant panel) |
+| Context sidebar enqueue | `class-jeo.php::enqueue_blocks_assets()` | `jeo-context-sidebar` script not enqueued — no "AI Context" panel |
+| Minimap REST endpoints | `class-minimap.php` (`api_setup`, `api_setup_prompt`, `api_chat`) | `400` with actionable message |
+| Knowledge tab CTA | `ai/settings/tab-knowledge.php` | "AI Provider Required" call-to-action |
+
+## Map Defaults Localize
+
+The `jeo_settings.map_defaults` object (localized on the `mapgl` script) uses **`lng`** (MapLibre convention, unified — never `lon`). Read it in JS via `jeo_settings.map_defaults.lng`.
+
 ## Mapbox Tokens
 
 Two separate settings, both in the General tab (the Mapbox section is always
