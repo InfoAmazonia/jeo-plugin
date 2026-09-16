@@ -1,6 +1,6 @@
 <?php
 /**
- * Global loaders and helper functions.
+ * Carrega o Composer Autoloader dependendo do ambiente (Desenvolvimento ou Produção).
  *
  * @package Jeo
  */
@@ -9,10 +9,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( file_exists( JEO_BASEPATH . 'vendor/autoload.php' ) ) {
+	require_once JEO_BASEPATH . 'vendor/autoload.php';
+}
+
 spl_autoload_register( 'jeo_autoload' );
 
+require_once __DIR__ . '/privacy.php';
+require_once __DIR__ . '/admin/uninstall-handler.php';
+
 /**
- * Autoload plugin classes based on namespace and folder conventions.
+ * PSR-0-compatible autoloader that maps `Jeo\ClassName` to `class-class-name.php` across known directories.
  *
  * @param string $class_name Fully-qualified class name.
  * @return void
@@ -30,7 +37,7 @@ function jeo_autoload( $class_name ) {
 
 	$filename = 'class-' . strtolower( str_replace( '_', '-', $class_name ) ) . '.php';
 
-	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization' );
+	$folders = array( '.', 'traits', 'maps', 'layers', 'modules', 'admin', 'geocode', 'settings', 'layer-types', 'cli', 'legend-types', 'sidebars', 'menu', 'storymap', 'customization', 'ai', 'stories-near-you', 'minimap' );
 
 	foreach ( $folders as $folder ) {
 		$check = __DIR__ . DIRECTORY_SEPARATOR . $folder . DIRECTORY_SEPARATOR . $subfolder . $filename;
@@ -39,6 +46,87 @@ function jeo_autoload( $class_name ) {
 			break;
 		}
 	}
+}
+
+/**
+ * Gets the instance of the main AI Handler Class
+ *
+ * @return \Jeo\AI_Handler AI_Handler instance
+ */
+function jeo_ai_handler() {
+	return \Jeo\AI_Handler::get_instance();
+}
+
+/**
+ * Gets the instance of the AI Logger Class
+ *
+ * @return \Jeo\AI\AI_Logger AI_Logger instance
+ */
+function jeo_ai_logger() {
+	return \Jeo\AI\AI_Logger::get_instance();
+}
+
+/**
+ * Gets the instance of the Bulk Processor Class
+ *
+ * @return \Jeo\AI\Bulk_Processor Bulk_Processor instance
+ */
+function jeo_bulk_processor() {
+	return \Jeo\AI\Bulk_Processor::get_instance();
+}
+
+/**
+ * Gets the instance of the RAG Backup Class
+ *
+ * @return \Jeo\AI\RAG_Backup RAG_Backup instance
+ */
+function jeo_rag_backup() {
+	return \Jeo\AI\RAG_Backup::get_instance();
+}
+
+/**
+ * Gets the instance of the RAG Worker Class
+ *
+ * @return \Jeo\AI\RAG_Worker RAG_Worker instance
+ */
+function jeo_rag_worker() {
+	return \Jeo\AI\RAG_Worker::get_instance();
+}
+
+/**
+ * Gets the instance of the AI Settings Class
+ *
+ * @return \Jeo\AI\AI_Settings AI_Settings instance
+ */
+function jeo_ai_settings() {
+	return \Jeo\AI\AI_Settings::get_instance();
+}
+
+/**
+ * Gets the instance of the Minilayer Handler Class
+ *
+ * @return \Jeo\AI\Minilayer_Handler Minilayer_Handler instance
+ */
+function jeo_minilayer_handler() {
+	return \Jeo\AI\Minilayer_Handler::get_instance();
+}
+
+/**
+ * Gets the instance of the Minimap Class
+ *
+ * @return \Jeo\Minimap Minimap instance
+ */
+function jeo_minimap() {
+	return \Jeo\Minimap::get_instance();
+}
+
+/**
+ * Gets the instance of the Context Handler Class
+ *
+ * @return \Jeo\AI\Context_Handler Context_Handler instance
+ */
+function jeo_context_handler() {
+	return \Jeo\AI\Context_Handler::get_instance();
 }
 
 /**
@@ -141,6 +229,15 @@ function jeo_storymap() {
 }
 
 /**
+ * Gets the instance of the Stories_Near_You class
+ *
+ * @return \Stories_Near_You Stories_Near_You instance
+ */
+function jeo_stories_near_you() {
+	return \Jeo\Stories_Near_You::get_instance();
+}
+
+/**
  * Returns the URL to a JEO template file
  *
  * It can be overriden by a `jeo_get_template` filter, that receives two parameters:
@@ -222,7 +319,7 @@ function jeo_template_footer() {
  * Register an embedder for a JEO-capable site
  *
  * @param string $id Unique ID for the source.
- * @param string $base_url Site URL (e.g. `http://example.org`).
+ * @param string $base_url Site URL (e.g.` http://example.org`).
  */
 function jeo_register_embedder( $id, $base_url ) {
 	$regex = '#' . preg_quote( $base_url, '/' ) . '\/embed\/.*#';
@@ -304,8 +401,26 @@ function jeo_normalize_asset_url( $url ) {
 	return $normalized;
 }
 
+/* New JEO Plugin Settings */
 /**
- * Sanitize a font-family label for safe CSS output.
+ * Generate dynamic CSS for typography, colors, and CSS variables based on JEO appearance settings.
+ *
+ * @return string
+ */
+/**
+ * Sanitize a font-family name for safe use inside a CSS string.
+ *
+ * @param string $font Raw font name.
+ * @return string Sanitized font name.
+ */
+function jeo_sanitize_css_font_family( $font ) {
+	$font = sanitize_text_field( $font );
+	// Allow letters, numbers, spaces, hyphens, underscores, and common punctuation.
+	return preg_replace( '/[^A-Za-z0-9\s\-_.,&()\/]+/', '', $font );
+}
+
+/**
+ * Generate dynamic CSS from JEO appearance settings.
  *
  * @param string $font_name Raw font-family string.
  * @return string
@@ -336,121 +451,65 @@ function jeo_sanitize_css_number( $value ) {
 }
 
 /**
- * Register privacy policy text for JEO third-party services.
- *
- * @return void
- */
-function jeo_add_privacy_policy_content() {
-	if ( ! function_exists( 'wp_add_privacy_policy_content' ) ) {
-		return;
-	}
-
-	$content = sprintf(
-		wp_kses_post(
-			/* translators: 1: Mapbox terms URL, 2: Mapbox privacy URL, 3: Nominatim usage policy URL, 4: OSMF privacy URL, 5: OSM tile policy URL. */
-			__(
-				'<p>JEO can connect to third-party services depending on your configuration.</p><ul><li><strong>Mapbox</strong>: only used when Mapbox is selected as the rendering library or when a map uses Mapbox-hosted resources. In that case the site loads JavaScript/CSS from Mapbox and sends the configured access token plus the visitor&#8217;s IP address, browser details and requested map resources to Mapbox. Terms: <a href="%1$s">Mapbox Terms of Service</a>. Privacy Policy: <a href="%2$s">Mapbox Privacy Policy</a>.</li><li><strong>Nominatim (OpenStreetMap)</strong>: used when an editor explicitly runs an address search or reverse geocoding request in the post geolocation UI. The typed address or selected coordinates, the site URL in the user agent string and the server IP address are sent to the Nominatim service. Usage Policy: <a href="%3$s">Nominatim Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>OpenStreetMap raster tiles</strong>: the default MapLibre preview style requests map tiles from the OpenStreetMap tile service, which receives the visitor&#8217;s IP address, browser details and requested tile URLs. Tile Policy: <a href="%5$s">OpenStreetMap Tile Usage Policy</a>. Privacy Policy: <a href="%4$s">OpenStreetMap Foundation Privacy Policy</a>.</li><li><strong>Optional external asset URLs configured by the site administrator</strong>: if you configure an external typography stylesheet or footer logo URL, visitors&#8217; browsers will request that asset directly from the selected host. That host may receive the visitor&#8217;s IP address, browser details and referrer according to its own terms and privacy policy.</li></ul>',
-				'jeowp'
-			)
-		),
-		'https://www.mapbox.com/legal/tos',
-		'https://www.mapbox.com/legal/privacy',
-		'https://operations.osmfoundation.org/policies/nominatim/',
-		'https://osmfoundation.org/wiki/Privacy_Policy',
-		'https://operations.osmfoundation.org/policies/tiles/'
-	);
-
-	wp_add_privacy_policy_content( 'JEO', $content );
-}
-add_action( 'admin_init', 'jeo_add_privacy_policy_content' );
-
-/**
  * Build custom CSS from plugin settings.
  *
  * @return string
  */
 function jeo_custom_settings_css() {
 	$theme_css = '';
-	$jeo_font  = jeo_sanitize_font_family( \jeo_settings()->get_option( 'jeo_typography-name' ) );
-	if ( '' !== $jeo_font ) {
 
-		$theme_css .= '
-		.jeomap .legend-container a.more-info-button  {
-			font-family: "' . $jeo_font . '", "sans-serif";
-		}
-		:root {
-			--jeo-font: "' . $jeo_font . '", "sans-serif";
-		}
-		';
-	}
-	$jeo_font_stories = jeo_sanitize_font_family( \jeo_settings()->get_option( 'jeo_typography-name-stories' ) );
-	if ( '' !== $jeo_font_stories ) {
-
-		$theme_css .= '
-		:root {
-			--jeo-font-stories: "' . $jeo_font_stories . '", "sans-serif";
-		}
-		';
+	$font = jeo_sanitize_css_font_family( \jeo_settings()->get_option( 'jeo_typography-name', '' ) );
+	if ( ! empty( $font ) ) {
+		$theme_css .= '.jeomap .legend-container a.more-info-button { font-family: "' . esc_attr( $font ) . '", "sans-serif"; } :root { --jeo-font: "' . esc_attr( $font ) . '", "sans-serif"; }';
 	}
 
-	$jeo_info_font_size = jeo_sanitize_css_number( \jeo_settings()->get_option( 'jeo_more-font-size', '1' ) );
-	if ( '' !== $jeo_info_font_size ) {
-		$font_unit = 'rem';
-
-		$theme_css .= '
-		.jeomap div.legend-container a.more-info-button {
-			font-size: ' . $jeo_info_font_size . $font_unit . ';
-		}';
+	$font_stories = jeo_sanitize_css_font_family( \jeo_settings()->get_option( 'jeo_typography-name-stories', '' ) );
+	if ( ! empty( $font_stories ) ) {
+		$theme_css .= ':root { --jeo-font-stories: "' . esc_attr( $font_stories ) . '", "sans-serif"; }';
 	}
 
-	$css_variables  = '';
+	$info_font_size = floatval( \jeo_settings()->get_option( 'jeo_more-font-size', '1' ) );
+	if ( $info_font_size > 0 ) {
+		$theme_css .= '.jeomap div.legend-container a.more-info-button { font-size: ' . esc_attr( $info_font_size ) . 'rem; }';
+	}
+
+	$css_variables = '';
+
 	$color_more_bkg = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_more-bkg-color', '#fff' ) );
 	if ( ! empty( $color_more_bkg ) ) {
-
-		$color_css       = '--jeo_more-bkg-color: ' . $color_more_bkg . ';';
-		$color_css_hover = '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo( $color_more_bkg, -0.15 ) . ';';
-		$css_variables  .= $color_css . ' ' . $color_css_hover;
+		$css_variables .= '--jeo_more-bkg-color: ' . $color_more_bkg . ';';
+		$css_variables .= '--jeo_more-bkg-color-darker-15: ' . color_luminance_jeo( $color_more_bkg, -0.15 ) . ';';
 	}
 
 	$primary_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_primary-color', '#0073aa' ) );
 	if ( ! empty( $primary_color ) ) {
-		$color_css_primary      = '--jeo-primary-color: ' . $primary_color . ';';
-		$color_css_primary_dark = '--jeo-primary-color-darker-15: ' . color_luminance_jeo( $primary_color, -0.15 ) . ';';
-		$css_variables         .= $color_css_primary . ' ' . $color_css_primary_dark;
+		$css_variables .= '--jeo-primary-color: ' . $primary_color . ';';
+		$css_variables .= '--jeo-primary-color-darker-15: ' . color_luminance_jeo( $primary_color, -0.15 ) . ';';
 	}
 
 	$over_primary_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_text-over-primary-color', '#000000' ) );
 	if ( ! empty( $over_primary_color ) ) {
-		$color_css      = '--jeo-text-over-primary-color: ' . $over_primary_color . ';';
-		$css_variables .= $color_css;
+		$css_variables .= '--jeo-text-over-primary-color: ' . $over_primary_color . ';';
 	}
 
-	$color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_more-color', '#555D66' ) );
-	if ( ! empty( $color ) ) {
-		$color_css      = '--jeo_more-color: ' . $color . ';';
-		$css_variables .= $color_css;
+	$more_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_more-color', '#555D66' ) );
+	if ( ! empty( $more_color ) ) {
+		$css_variables .= '--jeo_more-color: ' . $more_color . ';';
 	}
 
-	$color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' ) );
-	if ( ! empty( $color ) ) {
-		$color_css      = '--jeo_close-bkg-color: ' . $color . ';';
-		$css_variables .= $color_css;
+	$close_bkg_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-bkg-color', '#fff' ) );
+	if ( ! empty( $close_bkg_color ) ) {
+		$css_variables .= '--jeo_close-bkg-color: ' . $close_bkg_color . ';';
 	}
 
-	$color_close_bkg = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-color', '#555D66' ) );
-	if ( ! empty( $color_close_bkg ) ) {
-
-		$color_css       = '--jeo_close-color: ' . $color_close_bkg . ';';
-		$color_css_hover = '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo( $color_close_bkg, -0.15 ) . ';';
-		$css_variables  .= $color_css . ' ' . $color_css_hover;
+	$close_color = sanitize_hex_color( \jeo_settings()->get_option( 'jeo_close-color', '#555D66' ) );
+	if ( ! empty( $close_color ) ) {
+		$css_variables .= '--jeo_close-color: ' . $close_color . ';';
+		$css_variables .= '--jeo_close-bkg-color-darker-15: ' . color_luminance_jeo( $close_color, -0.15 ) . ';';
 	}
 
-	if ( '' !== trim( $css_variables ) ) {
-		$theme_css .= '
-		:root {
-			' . trim( $css_variables ) . '
-		}
-		';
+	if ( ! empty( $css_variables ) ) {
+		$theme_css .= ':root { ' . $css_variables . ' }';
 	}
 
 	return $theme_css;
@@ -478,11 +537,11 @@ add_action( 'admin_enqueue_scripts', 'jeo_scripts_typography' );
 
 if ( ! function_exists( 'color_luminance_jeo' ) ) {
 	/**
-	 * Adjust luminance for a hex color value.
+	 * Adjust a hex color's luminance by a given percentage for lighter/darker variants.
 	 *
-	 * @param string    $hexcolor Base color.
-	 * @param float|int $percent Luminance delta.
-	 * @return string
+	 * @param string $hexcolor Hex color string (e.g. '#ff0000').
+	 * @param float  $percent  Percentage adjustment (-1.0 to 1.0).
+	 * @return string Adjusted hex color string.
 	 */
 	function color_luminance_jeo( $hexcolor, $percent ) {
 		if ( strlen( $hexcolor ) < 6 ) {
@@ -501,11 +560,10 @@ if ( ! function_exists( 'color_luminance_jeo' ) ) {
 	}
 }
 
-// Load the Discovery template when the page template slug matches.
+// Load template for discovery.
 add_filter( 'page_template', 'template_page_discovery' );
-
 /**
- * Swap in the bundled Discovery page template.
+ * Override the page template to the Discovery template when the `discovery.php` template slug is selected.
  *
  * @param string $page_template Current page template path.
  * @return string
@@ -518,15 +576,13 @@ function template_page_discovery( $page_template ) {
 	return $page_template;
 }
 
-/**
- * Add the Discovery template to the page-template selector.
- */
 add_filter( 'theme_page_templates', 'add_template_page_discovery', 10, 1 );
 
 /**
- * Expose the bundled Discovery template in the editor selector.
+ * Add "Discovery" template to page attirbute template section.
  *
- * @param array $post_templates Registered page templates.
+ * @param array $post_templates Existing page templates.
+ *
  * @return array
  */
 function add_template_page_discovery( $post_templates ) {

@@ -1,29 +1,21 @@
 import { getLayerRequestContext } from './layer-request-context';
 
 describe( 'getLayerRequestContext', () => {
-	it( 'uses view context for public maps even when a nonce is available', () => {
+	it( 'returns "edit" when preview payload and nonce are present', () => {
 		expect(
-			getLayerRequestContext( {
-				isPreviewMapPayload: false,
-				nonce: 'nonce',
-			} )
-		).toBe( 'view' );
-	} );
-
-	it( 'uses edit context for preview map payloads with a nonce', () => {
-		expect(
-			getLayerRequestContext( {
-				isPreviewMapPayload: true,
-				nonce: 'nonce',
-			} )
+			getLayerRequestContext( { isPreviewMapPayload: true, nonce: 'abc123' } )
 		).toBe( 'edit' );
 	} );
 
-	it( 'falls back to view context for preview map payloads without a nonce', () => {
+	it( 'returns "view" when preview payload is present but nonce is missing', () => {
 		expect(
-			getLayerRequestContext( {
-				isPreviewMapPayload: true,
-			} )
+			getLayerRequestContext( { isPreviewMapPayload: true, nonce: null } )
+		).toBe( 'view' );
+	} );
+
+	it( 'returns "view" for public embeds without a preview payload', () => {
+		expect(
+			getLayerRequestContext( { isPreviewMapPayload: false, nonce: 'abc123' } )
 		).toBe( 'view' );
 	} );
 } );

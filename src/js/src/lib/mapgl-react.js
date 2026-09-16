@@ -1,1 +1,1 @@
-export { Layer, Map, Source } from './maplibregl/maplibregl-react'
+export { Layer, Map, Marker, Source } from './maplibregl/maplibregl-react'

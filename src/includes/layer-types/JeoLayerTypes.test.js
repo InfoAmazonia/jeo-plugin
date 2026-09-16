@@ -22,4 +22,17 @@ describe( 'JeoLayerTypes', () => {
 
 		window.removeEventListener( 'jeo-layer-types-changed', handleChange );
 	} );
+
+	it( 'reports isStyle only for types registered with isStyle: true', () => {
+		const layerTypes = require( './JeoLayerTypes' ).default;
+
+		layerTypes.registerLayerType( 'mapbox', { label: 'Mapbox', isStyle: true } );
+		layerTypes.registerLayerType( 'style-json', { label: 'Style JSON', isStyle: true } );
+		layerTypes.registerLayerType( 'tilelayer', { label: 'Tile layer' } );
+
+		expect( layerTypes.isStyle( 'mapbox' ) ).toBe( true );
+		expect( layerTypes.isStyle( 'style-json' ) ).toBe( true );
+		expect( layerTypes.isStyle( 'tilelayer' ) ).toBe( false );
+		expect( layerTypes.isStyle( 'unregistered' ) ).toBe( false );
+	} );
 } );

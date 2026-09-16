@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Povo Guarani Kaiowá",
+    "type": "indigenous_people",
+    "lat": -23.000,
+    "lng": -54.800,
+    "aliases": ["Guarani Kaiowá", "Kaiowá"]
+  },
+  {
+    "name": "Povo Tikuna",
+    "type": "indigenous_people",
+    "lat": -3.500,
+    "lng": -69.500,
+    "aliases": ["Tikuna", "Maguta"]
+  },
+  {
+    "name": "Povo Ashaninka",
+    "type": "indigenous_people",
+    "lat": -9.300,
+    "lng": -72.800,
+    "aliases": ["Ashaninka", "Kampa"]
+  }
+]

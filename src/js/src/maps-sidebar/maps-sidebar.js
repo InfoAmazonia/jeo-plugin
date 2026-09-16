@@ -1,7 +1,7 @@
+import { useEntityRecords } from '@wordpress/core-data';
 import { select, withDispatch, withSelect } from '@wordpress/data';
 import { PluginDocumentSettingPanel } from '@wordpress/editor';
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 
 import LayersPanel from '../map-blocks/layers-panel';
 import LayersSettingsModal from '../map-blocks/layers-settings-modal';
@@ -9,9 +9,6 @@ import MapPanel from '../map-blocks/map-panel';
 import MapEmbedUrl from './map-embed-url';
 import PostsSelector from '../posts-selector';
 import { normalizeRelatedPosts } from '../posts-selector/defaults';
-import { useRecordsByIds } from '../shared/rest-records';
-
-import './maps-sidebar.scss';
 
 function MapsSidebar( {
 	postId,
@@ -25,15 +22,19 @@ function MapsSidebar( {
 		return ( postMeta.layers || [] ).map( ( layer ) => layer.id );
 	}, [ postMeta.layers ] );
 
-	const { records: loadedLayers = [], isLoading: loadingLayers } = useRecordsByIds( {
-		path: '/jeo/v1/map-layer',
-		ids: layerIds,
-		enabled: layerIds.length > 0,
-		query: { context: 'edit' },
-	} );
+	const { records: loadedLayers, isResolving: loadingLayers } = useEntityRecords(
+		'postType',
+		'map-layer',
+		{
+			include: layerIds,
+			per_page: -1,
+		},
+		{ enabled: layerIds.length > 0 }
+	);
 
-	const closeModal = useCallback( () => setModal( false ), [ setModal ] );
-	const openModal = useCallback( () => setModal( true ), [ setModal ] );
+	const closeModal = useCallback( () => setModal( false ), [] );
+	const openModal = useCallback( () => setModal( true ), [] );
+
 	const setRelatedPosts = useCallback(
 		( value ) => {
 			setPostMeta( {
@@ -43,9 +44,14 @@ function MapsSidebar( {
 		[ setPostMeta ]
 	);
 
+	const setPanLimitsFromMap = useCallback( () => {
+		if ( typeof window.__jeoSetPanLimitsFromMap === 'function' ) {
+			window.__jeoSetPanLimitsFromMap();
+		}
+	}, [] );
+
 	const embedUrl =
 		postId && `${ jeo_settings.site_url }/embed/?map_id=${ postId }`;
-
 
 	return (
 		<>
@@ -59,12 +65,15 @@ function MapsSidebar( {
 				/>
 			) }
 
-			{ embedUrl && !postMeta.disable_embed && <MapEmbedUrl url={ embedUrl } /> }
+			{ embedUrl && ! postMeta.disable_embed && (
+				<MapEmbedUrl url={ embedUrl } />
+			) }
 
 			<MapPanel
 				attributes={ postMeta }
 				setAttributes={ setPostMeta }
 				renderPanel={ PluginDocumentSettingPanel }
+				setPanLimitsFromMap={ setPanLimitsFromMap }
 			/>
 
 			<LayersPanel
@@ -88,6 +97,7 @@ export default withDispatch( ( dispatch ) => ( {
 	setPostMeta: ( meta ) => {
 		const currentMeta =
 			select( 'core/editor' ).getEditedPostAttribute( 'meta' ) || {};
+
 		dispatch( 'core/editor' ).editPost( {
 			meta: { ...currentMeta, ...meta },
 		} );
