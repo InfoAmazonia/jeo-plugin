@@ -3853,10 +3853,6 @@ msgid "Thinking..."
 msgstr "Pensando..."
 
 #: js/build/contextSidebar.js:1
-msgid "Ask for changes or new paragraphs... (Ctrl+Enter to send)"
-msgstr "Pida cambios o nuevos párrafos... (Ctrl+Enter para enviar)"
-
-#: js/build/contextSidebar.js:1
 msgid "Send"
 msgstr "Enviar"
 
@@ -3973,10 +3969,6 @@ msgid "Typing…"
 msgstr "Escribiendo…"
 
 #: js/build/mapBlocks.js:1
-msgid "Ask the AI to refine the map…"
-msgstr "Pida a la IA que refine el mapa…"
-
-#: js/build/mapBlocks.js:1
 msgid "Send message"
 msgstr "Enviar mensaje"
 
@@ -3987,10 +3979,6 @@ msgstr "Regenerar"
 #: js/build/mapBlocks.js:1
 msgid "New prompt"
 msgstr "Nuevo prompt"
-
-#: js/build/mapBlocks.js:1
-msgid "Describe the map you want…"
-msgstr "Describa el mapa que quiere…"
 
 #: js/build/mapBlocks.js:1
 msgid "Generate"
@@ -5373,3 +5361,15 @@ msgstr "Entender capas elegidas"
 #: includes/ai/class-retrieve-knowledge-tool.php:112
 msgid "Provide either \"query\" (string) or \"queries\" (array of strings)."
 msgstr "Proporcione \"query\" (cadena) o \"queries\" (matriz de cadenas)."
+
+#: js/build/contextSidebar.js:1
+msgid "Ask for changes or new paragraphs... (Shift+Enter for a line break)"
+msgstr "Pida cambios o nuevos párrafos... (Shift+Enter para nueva línea)"
+
+#: js/build/mapBlocks.js:1
+msgid "Ask the AI to refine the map… (Shift+Enter for a line break)"
+msgstr "Pida a la IA que refine el mapa… (Shift+Enter para nueva línea)"
+
+#: js/build/mapBlocks.js:1
+msgid "Describe the map you want… (Shift+Enter for a line break)"
+msgstr "Describa el mapa que quiere… (Shift+Enter para nueva línea)"

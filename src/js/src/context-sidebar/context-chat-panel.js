@@ -3,6 +3,7 @@ import { Button, TextareaControl, Modal, Spinner, Notice } from '@wordpress/comp
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import SuggestedParagraphs from './suggested-paragraphs';
+import { handleChatKeyDown } from '../shared/chat-input-keys';
 
 /**
  * Generate a simple UUID v4.
@@ -262,10 +263,7 @@ const ContextChatPanel = ( { postId } ) => {
 	};
 
 	const handleKeyDown = ( event ) => {
-		if ( event.key === 'Enter' && ( event.ctrlKey || event.metaKey ) ) {
-			event.preventDefault();
-			sendMessage();
-		}
+		handleChatKeyDown( event, () => sendMessage() );
 	};
 
 	/**
@@ -403,7 +401,7 @@ const ContextChatPanel = ( { postId } ) => {
 					value={ inputValue }
 					onChange={ setInputValue }
 					onKeyDown={ handleKeyDown }
-					placeholder={ __( 'Ask for changes or new paragraphs... (Ctrl+Enter to send)', 'jeowp' ) }
+					placeholder={ __( 'Ask for changes or new paragraphs... (Shift+Enter for a line break)', 'jeowp' ) }
 					className="jeo-context-chat__textarea"
 					disabled={ isLoading || isRestoring }
 					rows={ isModal ? 4 : 3 }

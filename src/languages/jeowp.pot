@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-09-15T19:48:12+00:00\n"
+"POT-Creation-Date: 2026-09-16T12:51:32+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -3598,7 +3598,7 @@ msgid "Thinking..."
 msgstr ""
 
 #: js/build/contextSidebar.js:1
-msgid "Ask for changes or new paragraphs... (Ctrl+Enter to send)"
+msgid "Ask for changes or new paragraphs... (Shift+Enter for a line break)"
 msgstr ""
 
 #: js/build/contextSidebar.js:1
@@ -4367,7 +4367,7 @@ msgid "Typing…"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-msgid "Ask the AI to refine the map…"
+msgid "Ask the AI to refine the map… (Shift+Enter for a line break)"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
@@ -4383,7 +4383,7 @@ msgid "New prompt"
 msgstr ""
 
 #: js/build/mapBlocks.js:1
-msgid "Describe the map you want…"
+msgid "Describe the map you want… (Shift+Enter for a line break)"
 msgstr ""
 
 #: js/build/mapBlocks.js:1

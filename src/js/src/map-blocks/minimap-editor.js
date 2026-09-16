@@ -25,6 +25,7 @@ import { coerceMinimapAttributes } from './minimap-config';
 import MapPanel from './map-panel';
 import LayersPanel from './layers-panel';
 import { useRecordsByIds } from '../shared/rest-records';
+import { handleChatKeyDown } from '../shared/chat-input-keys';
 import { RadioControl, SelectControl, TextareaControl } from '../shared/wp-form-controls';
 import './onetime-map-editor.css';
 
@@ -1032,7 +1033,8 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 						<TextareaControl
 							value={ chatInput }
 							onChange={ setChatInput }
-							placeholder={ __( 'Ask the AI to refine the map…', 'jeowp' ) }
+							onKeyDown={ ( e ) => handleChatKeyDown( e, () => sendChat( chatInput ) ) }
+							placeholder={ __( 'Ask the AI to refine the map… (Shift+Enter for a line break)', 'jeowp' ) }
 						/>
 						<Button
 							variant="primary"
@@ -1066,7 +1068,8 @@ export default function MinimapEditor( { attributes, setAttributes, clientId } )
 							<TextareaControl
 								value={ chatPrompt }
 								onChange={ setChatPrompt }
-								placeholder={ __( 'Describe the map you want…', 'jeowp' ) }
+								onKeyDown={ ( e ) => handleChatKeyDown( e, generateFromChatPrompt ) }
+								placeholder={ __( 'Describe the map you want… (Shift+Enter for a line break)', 'jeowp' ) }
 							/>
 							<Button
 								variant="primary"
