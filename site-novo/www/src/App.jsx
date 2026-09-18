@@ -1,14 +1,13 @@
 import { motion, useScroll, useSpring } from 'framer-motion'
+import { I18nProvider } from './i18n/index.jsx'
 import Header from './components/Header.jsx'
 import Hero from './components/Hero.jsx'
-import WhySection from './components/WhySection.jsx'
-import FeaturesSection from './components/FeaturesSection.jsx'
-import WordPressSection from './components/WordPressSection.jsx'
-import ReadySection from './components/ReadySection.jsx'
-import NewsletterSection from './components/NewsletterSection.jsx'
-import WorkshopsSection from './components/WorkshopsSection.jsx'
-import TransparencySection from './components/TransparencySection.jsx'
-import Footer from './components/Footer.jsx'
+import ResourceSlider from './components/ResourceSlider.jsx'
+import FeaturesShowcase from './components/FeaturesShowcase.jsx'
+import HowItWorks from './components/HowItWorks.jsx'
+import LiveDemo from './components/LiveDemo.jsx'
+import WorkshopsV3 from './components/WorkshopsV3.jsx'
+import FooterV3 from './components/FooterV3.jsx'
 import ConsentBanner from './components/ConsentBanner.jsx'
 
 export default function App() {
@@ -20,27 +19,27 @@ export default function App() {
   })
 
   return (
-    <div id="top">
-      {/* Scroll progress indicator */}
-      <motion.div
-        style={{ scaleX }}
-        className="fixed inset-x-0 top-0 z-50 h-1 origin-left bg-gradient-to-r from-brand to-brand-light"
-      />
+    <I18nProvider>
+      <div id="top">
+        {/* Scroll progress indicator — v3 mint accent (#00DBA6) */}
+        <motion.div
+          style={{ scaleX }}
+          className="fixed inset-x-0 top-0 z-50 h-1 origin-left bg-gradient-to-r from-v3-green to-[#6FF0D2]"
+        />
 
-      <Header />
+        <Header />
 
-      <main>
-        <Hero />
-        <WhySection />
-        <FeaturesSection />
-        <WordPressSection />
-        <ReadySection />
-        <NewsletterSection />
-        <WorkshopsSection />
-        <TransparencySection />
-      </main>
-      <Footer />
-      <ConsentBanner />
-    </div>
+        <main>
+          <Hero />
+          <ResourceSlider />
+          <FeaturesShowcase />
+          <HowItWorks />
+          <LiveDemo />
+          <WorkshopsV3 />
+        </main>
+        <FooterV3 />
+        <ConsentBanner />
+      </div>
+    </I18nProvider>
   )
 }

@@ -1,50 +1,64 @@
-# JEO BRAINS — Landing page
+# JEO Maps — Landing page
 
-Landing page responsiva do **JEO BRAINS** — Inteligência Artificial para criar e
-publicar geojornalismo interativo no WordPress. Construída como reprodução fiel
-do layout em `../desktop.png`.
+Single-page marketing site for **JEO Maps** — geographic intelligence in
+WordPress. A faithful reproduction of the approved **Figma v3 redesign**
+(frame `jeo-maps-landing-redesign`, node `133:1531`, rendered to
+`../figma-ref/desktop-v3.png`; token inventory in
+`../figma-ref/redesign-v3-tokens.md`), in PT-BR and English.
 
 ## Stack
 
-- **React 18** + **Vite 5**
-- **Tailwind CSS 3** (tema customizado: paleta dark + teal da marca)
-- **Framer Motion** — microinterações e animações de scroll
-- **lucide-react** — ícones
+- **React 18** + **Vite 5** (dev server at `/novo` — `base: '/novo'`)
+- **Tailwind CSS 3** — `v3-*` design tokens in `tailwind.config.js`
+- **Framer Motion** — scroll-in reveals and microinteractions
+- **lucide-react** — icons
+- **i18n** — dependency-free: React context + dictionaries in `src/i18n/`
+  (`pt-BR` default, `en`), persisted in `localStorage['jeo-lang']`
 
-## Como rodar
+## Running
 
 ```bash
 npm install
-npm run dev      # servidor de desenvolvimento (http://localhost:5173)
-npm run build    # build de produção em dist/
-npm run preview  # serve o build de produção
+npm run dev      # http://localhost:5173/novo
+npm run build    # production build → dist/
+npm run preview  # serve the production build
 ```
 
-## Estrutura
+No test runner or linter is configured — verify with `npm run build` and a
+visual pass (desktop 1920 + mobile 390, PT-BR + EN).
+
+## Structure
 
 ```
 src/
-├── App.jsx                  # composição das seções + barra de progresso de scroll
-├── index.css                # base Tailwind, tokens e componentes utilitários
+├── App.jsx                  # section composition + scroll-progress bar
+├── index.css                # Tailwind base + v3 component classes (@layer)
+├── links.js                 # external destinations (download, docs, github)
+├── i18n/
+│   ├── index.jsx            # provider/hook, language persistence
+│   └── pt-BR.js / en.js     # all user-facing copy (namespaced per section)
 └── components/
-    ├── Hero.jsx             # capa com fundo topográfico animado
-    ├── WhySection.jsx       # "Por que..." — comparativos Atualmente × JEO
-    ├── FeaturesSection.jsx  # 4 recursos inteligentes
-    ├── WordPressSection.jsx # banner de integração + passos 1–4
-    ├── ReadySection.jsx     # "Tudo pronto..." + mock do editor Gutenberg
-    ├── NewsletterSection.jsx# formulário de inscrição (com estado)
-    ├── WorkshopsSection.jsx # próximas oficinas
-    ├── TransparencySection.jsx
-    ├── Footer.jsx
-    └── ui/                  # peças reutilizáveis (logo, ícones, reveal, fundo)
+    ├── Header.jsx           # sticky navbar, anchors, language switcher
+    ├── Hero.jsx             # hero with layered animated illustration
+    ├── ResourceSlider.jsx   # resource tabs + panel cards (#recursos)
+    ├── FeaturesShowcase.jsx # 5 alternating feature rows (#inteligencia-artificial)
+    ├── HowItWorks.jsx       # 3 staggered step cards
+    ├── LiveDemo.jsx         # browser mockup + video + CTA (#experimente)
+    ├── WorkshopsV3.jsx      # workshop form (placeholder) + community box (#oficinas)
+    ├── FooterV3.jsx         # wordmark, nav, terms modal, partner logos
+    ├── ConsentBanner.jsx    # first-visit cookie/terms notice
+    └── ui/Reveal.jsx        # shared reduced-motion-aware scroll-in wrapper
 ```
 
-## Microinterações
+## Conventions
 
-- Barra de progresso de leitura fixa no topo
-- Entrada das seções com fade + slide ao entrar na viewport (`Reveal`)
-- Cards que levantam no hover, com brilho/sheen e borda teal
-- Banner do WordPress com gradiente animado
-- Mock do editor flutuando suavemente
-- Checkboxes e botões animados; estado de sucesso no formulário
-- Respeita `prefers-reduced-motion`
+- Copy lives only in the i18n dictionaries; headings use
+  `.font-condensed` + `uppercase` (mixed-case strings, CSS does the caps).
+- Containers use `.section-shell-v3` (1600px max-width + inset padding);
+  buttons use `.btn-v3-primary` / `-ghost` / `-secondary`; labels use
+  `.eyebrow-v3` — all defined in `src/index.css`.
+- Every animation guards `prefers-reduced-motion`; the demo video degrades
+  to its poster under it.
+- External links are centralized in `links.js` and always open in a new tab.
+- Assets under `src/assets/` are Figma exports (`v3-*`), plus the reused
+  `hacklab-logo.svg` and `print-animado.mp4` (Live Demo video).

@@ -1,27 +1,32 @@
-import { useEffect, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
-import { Download, BookOpen, GraduationCap, ChevronDown } from 'lucide-react'
-import JeoMark from './ui/JeoMark.jsx'
-import heroPoster from '../assets/hero-bg.jpg'
-import heroVideo from '../assets/hero-background.mp4'
-import jeoWordmark from '../assets/jeo-brains-wordmark.svg'
+import { useI18n } from '../i18n/index.jsx'
 import { DOWNLOAD_URL, DOCS_URL } from '../links.js'
+import infoamazoniaLogo from '../assets/v3-infoamazonia-logo.png'
+import heroBackground from '../assets/hero-background.mp4'
+import heroPoster from '../assets/hero-poster.jpg'
+import Lottie from './ui/Lottie.jsx'
+
+// Dynamic import: the 360 kB animation JSON (+ lottie player) load as async
+// chunks, keeping the main bundle lean. The aspect-ratio box below holds the
+// geometry while they stream in.
+const loadFindLocation = () => import('../assets/animations/find-location.json')
+
+// Waterfall: kick BOTH async chunks at module-evaluation time — right after
+// the main bundle parses — instead of waiting for the post-mount effect.
+// import() dedupes by module, so the Lottie wrapper's own calls resolve to
+// these already-in-flight promises. Saves ~600 ms on the animation onset
+// without adding a single byte to the critical path (a hashed <link
+// rel="modulepreload"> in index.html would break on every rebuild).
+void import('lottie-web/build/player/esm/lottie_svg.min.js')
+void loadFindLocation()
 
 export default function Hero() {
   const reduce = useReducedMotion()
-  const [showCue, setShowCue] = useState(true)
-
-  // Scroll cue is visible only near the very top of the page.
-  useEffect(() => {
-    const onScroll = () => setShowCue(window.scrollY < 100)
-    onScroll()
-    window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  const { t } = useI18n()
 
   const container = {
     hidden: {},
-    show: { transition: { staggerChildren: 0.12, delayChildren: 0.15 } },
+    show: { transition: { staggerChildren: 0.12, delayChildren: 0.1 } },
   }
   const item = {
     hidden: reduce ? { opacity: 0 } : { opacity: 0, y: 24 },
@@ -33,107 +38,132 @@ export default function Hero() {
   }
 
   return (
-    <section className="relative isolate flex min-h-[100svh] items-center overflow-hidden bg-base">
-      {/* Looping background video — poster (the former still bg) shows until it plays.
-          Under reduced motion only the static poster renders. */}
-      {reduce ? (
-        <img
-          src={heroPoster}
-          alt=""
-          aria-hidden="true"
-          className="absolute inset-0 h-full w-full object-cover"
-        />
-      ) : (
-        <video
-          className="absolute inset-0 h-full w-full object-cover"
-          src={heroVideo}
-          poster={heroPoster}
-          autoPlay
-          loop
-          muted
-          playsInline
-          aria-hidden="true"
-        />
-      )}
-      {/* Darkening + teal tint + fade into next section */}
-      <div className="pointer-events-none absolute inset-0 bg-brand-deep/25 mix-blend-multiply" />
-      <div className="pointer-events-none absolute inset-0 bg-black/70" />
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-base" />
-
-      <motion.div
-        variants={container}
-        initial="hidden"
-        animate="show"
-        className="section-shell relative z-10 flex flex-col items-center py-28 text-center"
-      >
-        {/* Wordmark: J pillar mark + the JEO BRAINS logotype (SVG from Figma) */}
-        <motion.div variants={item} className="flex items-center gap-4 sm:gap-5">
-          <JeoMark className="h-16 w-auto drop-shadow-[0_6px_24px_rgba(0,0,0,0.6)] sm:h-20" />
-          <img
-            src={jeoWordmark}
-            alt="JEO BRAINS"
-            className="h-11 w-auto drop-shadow-[0_6px_24px_rgba(0,0,0,0.6)] sm:h-[3.25rem]"
+    <section className="relative isolate overflow-hidden bg-v3-navy-hero">
+      {/* Official hero background per the 15/9 Figma delivery (frame
+          133:1553), fill stack bottom→top: the official video (opacity 0.8),
+          a #0A1628 COLOR-blend solid, a #0A1628 90% solid, and the vertical
+          gradient — transparent at the bottom, opaque navy at the top. The
+          video is the official asset restored from the V2 site history
+          (md5-confirmed byte-identical). All fills are -z-10 inside the
+          section's isolated stacking context, so DOM order = paint order and
+          the content/Lottie stay above. Under prefers-reduced-motion the
+          <video> is not rendered at all: the section navy + the gradient
+          (the previous static state) remain — no flash, since the navy is
+          the section's own background. */}
+      {!reduce && (
+        <>
+          <video
+            src={heroBackground}
+            /* First-frame JPG: paints instantly under the overlays while the
+               video streams — same frame 0, so the handover is seamless. */
+            poster={heroPoster}
+            autoPlay
+            loop
+            muted
+            playsInline
+            disablePictureInPicture
+            disableRemotePlayback
+            aria-hidden="true"
+            tabIndex={-1}
+            /* React sets `muted` as a property, not an attribute — Chrome
+               then blocks autoplay. Force it and kick playback manually. */
+            ref={(el) => {
+              if (el) {
+                el.muted = true
+                el.play().catch(() => {})
+              }
+            }}
+            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-80"
           />
-        </motion.div>
-
-        <motion.p
-          variants={item}
-          className="mt-10 max-w-2xl text-balance text-base leading-relaxed text-slate-300/90 sm:text-lg"
-        >
-          Um plugin aberto para ajudar redações a personalizar a experiência de
-          leitura, recircular melhor seu acervo e aproximar reportagens de seus
-          territórios.
-        </motion.p>
-
+          {/* Figma fill: #0A1628, blendMode COLOR. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-[#0A1628] mix-blend-color"
+          />
+          {/* Figma fill: #0A1628 at 90%. */}
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 -z-10 bg-[#0A1628]/90"
+          />
+        </>
+      )}
+      {/* Figma top fill: vertical gradient (the section's former own
+          background, hoisted into the stack). Always rendered — with the
+          navy it is the static reduced-motion backdrop. */}
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 -z-10 bg-gradient-to-t from-transparent to-v3-navy-hero"
+      />
+      <div className="section-shell-v3 grid items-center gap-12 section-pad-v3 sm:py-16 lg:min-h-[790px] lg:grid-cols-[687px_1fr] lg:gap-10 lg:py-20">
         <motion.div
-          variants={item}
-          className="mt-12 flex flex-col items-center gap-4 sm:flex-row"
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="flex max-w-2xl flex-col items-start"
         >
-          <a href="#oficinas" className="btn-ghost group w-full sm:w-auto">
-            <GraduationCap className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-6" />
-            Oficinas
-          </a>
-          <a
-            href={DOCS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-ghost group w-full sm:w-auto"
-          >
-            <BookOpen className="h-4 w-4 transition-transform duration-300 group-hover:-rotate-6" />
-            Documentação
-          </a>
-          <a
-            href={DOWNLOAD_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-brand group w-full sm:w-auto"
-          >
-            <Download className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
-            Download
-          </a>
-        </motion.div>
-      </motion.div>
+          <motion.p variants={item} className="eyebrow-v3">
+            {t.hero.eyebrow}
+            <img
+              src={infoamazoniaLogo}
+              alt="InfoAmazonia"
+              className="h-6 w-auto"
+            />
+          </motion.p>
 
-      {/* Scroll cue — centered via auto margins (no transform, so it can't fight
-          the Framer translateY animation); fades out once you scroll past 100px. */}
-      <motion.a
-        href="#por-que"
-        aria-label="Rolar para a próxima seção"
-        className={`absolute inset-x-0 bottom-8 z-10 mx-auto w-max text-slate-400 transition-colors hover:text-brand ${
-          showCue ? '' : 'pointer-events-none'
-        }`}
-        animate={
-          reduce
-            ? { opacity: showCue ? 1 : 0 }
-            : { y: [0, 8, 0], opacity: showCue ? 1 : 0 }
-        }
-        transition={{
-          y: { duration: 1.8, repeat: Infinity, ease: 'easeInOut' },
-          opacity: { duration: 0.3 },
-        }}
-      >
-        <ChevronDown className="h-7 w-7" />
-      </motion.a>
+          <motion.h1
+            variants={item}
+            className="font-condensed mt-16 text-4xl font-bold uppercase leading-[1.1] text-v3-light sm:text-5xl lg:mt-20 lg:text-[64px]"
+          >
+            {t.hero.title}
+          </motion.h1>
+
+          <motion.p
+            variants={item}
+            className="mt-16 text-lg leading-[1.5] text-v3-mint sm:text-xl lg:mt-20 lg:text-2xl"
+          >
+            {t.hero.subtitle}
+          </motion.p>
+
+          <motion.div
+            variants={item}
+            className="mt-14 flex w-full flex-col gap-4 sm:w-auto sm:flex-row lg:mt-20"
+          >
+            <a href="#oficinas" className="btn-v3-ghost h-[57px]">
+              {t.hero.workshops}
+            </a>
+            <a
+              href={DOCS_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-v3-ghost h-[57px]"
+            >
+              {t.hero.docs}
+            </a>
+            <a
+              href={DOWNLOAD_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-v3-primary h-[62px]"
+            >
+              {t.hero.download}
+            </a>
+          </motion.div>
+        </motion.div>
+
+        {/* Official hero-animate instance exported from Figma (793×480, 60fps,
+            4s). The JSON settles at the final frame with no return keyframes,
+            so it plays once and holds the settled state — the source of truth
+            replaces the former manual PNG-layer recreation. Same geometry as
+            the old composite: aspect-[793/480] inside max-w-[793px]. */}
+        <div className="mx-auto w-full max-w-[793px]">
+          <Lottie
+            loadAnimationData={loadFindLocation}
+            loop={false}
+            title={t.hero.illustrationAlt}
+            className="aspect-[793/480] w-full"
+          />
+        </div>
+      </div>
     </section>
   )
 }

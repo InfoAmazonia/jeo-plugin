@@ -1,28 +1,107 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
-import JeoMark from './ui/JeoMark.jsx'
-import jeoWordmark from '../assets/jeo-wordmark.svg'
+import { Menu, X, Globe, ChevronDown } from 'lucide-react'
+import { useI18n, LANGUAGES } from '../i18n/index.jsx'
+import wordmark from '../assets/v3-jeo-maps-wordmark.png'
 import { DOWNLOAD_URL } from '../links.js'
 
-const NAV = [
-  { label: 'Brains', href: '#top' },
-  { label: 'Theme', href: '#recursos' },
-  { label: 'Plugin', href: '#integracao' },
-]
+const ANCHORS = ['#top', '#recursos', '#inteligencia-artificial', '#experimente']
+
+const LANGUAGE_LABELS = { 'pt-BR': 'Português', en: 'English' }
+
+function LanguageSwitcher({ className = '', onSelect }) {
+  const { lang, setLang, t } = useI18n()
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onPointerDown = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    const onKeyDown = (e) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
+
+  return (
+    <div ref={ref} className={`relative ${className}`}>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={t.nav.language}
+        className="flex items-center gap-1 rounded-md p-1.5 text-v3-light/90 transition-colors hover:text-v3-light focus:outline-none focus-visible:ring-2 focus-visible:ring-v3-green"
+      >
+        <Globe className="h-6 w-6" strokeWidth={1.75} />
+        <ChevronDown
+          className={`h-4 w-4 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+        />
+      </button>
+      <AnimatePresence>
+        {open && (
+          <motion.ul
+            role="listbox"
+            aria-label={t.nav.language}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.15 }}
+            className="absolute right-0 top-full mt-2 min-w-[10rem] overflow-hidden rounded-lg border border-white/10 bg-v3-navy py-1 shadow-card"
+          >
+            {LANGUAGES.map(({ code, short }) => (
+              <li key={code}>
+                <button
+                  type="button"
+                  role="option"
+                  aria-selected={lang === code}
+                  onClick={() => {
+                    setLang(code)
+                    setOpen(false)
+                    onSelect?.()
+                  }}
+                  className={`flex w-full items-center gap-2 px-4 py-2.5 text-left text-sm font-bold transition-colors ${
+                    lang === code
+                      ? 'bg-v3-green/10 text-v3-green'
+                      : 'text-v3-light/90 hover:bg-white/5 hover:text-v3-light'
+                  }`}
+                >
+                  {short} — {LANGUAGE_LABELS[code]}
+                </button>
+              </li>
+            ))}
+          </motion.ul>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
 export default function Header() {
   const reduce = useReducedMotion()
-  const [visible, setVisible] = useState(false)
+  const { t } = useI18n()
   const [activeId, setActiveId] = useState('#top')
   const [menuOpen, setMenuOpen] = useState(false)
 
+  const NAV = [
+    { label: t.nav.home, href: '#top' },
+    { label: t.nav.features, href: '#recursos' },
+    { label: t.nav.ai, href: '#inteligencia-artificial' },
+    { label: t.nav.try, href: '#experimente' },
+  ]
+
+  // Scroll spy: the active link is the last section scrolled near the top.
   useEffect(() => {
     const onScroll = () => {
-      setVisible(window.scrollY > window.innerHeight * 0.5)
-      // Scroll spy: the active link is the last section scrolled near the top.
-      let current = NAV[0].href
-      for (const { href } of NAV) {
+      let current = ANCHORS[0]
+      for (const href of ANCHORS) {
         const el = document.querySelector(href)
         if (el && el.getBoundingClientRect().top <= 140) current = href
       }
@@ -34,115 +113,112 @@ export default function Header() {
   }, [])
 
   return (
-    <motion.header
-      initial={false}
-      animate={{ y: visible ? '0%' : '-100%' }}
-      transition={
-        reduce
-          ? { duration: 0 }
-          : { type: 'spring', stiffness: 260, damping: 30 }
-      }
-      className={`fixed inset-x-0 top-0 z-40 border-b border-white/5 bg-base/95 backdrop-blur-md ${
-        visible ? '' : 'pointer-events-none'
-      }`}
-    >
-      <div className="section-shell flex items-center justify-between py-3">
-        {/* Logo lockup */}
-        <a href="#top" className="flex items-center gap-3">
-          <JeoMark className="h-9 w-auto" />
-          <img src={jeoWordmark} alt="JEO" className="h-6 w-auto" />
-          <span className="hidden text-sm text-muted-2 sm:inline">
-            Geojournalism Platform
-          </span>
+    <header className="sticky inset-x-0 top-0 z-40 bg-v3-navy">
+      <div className="section-shell-v3 flex h-16 items-center justify-between gap-4 lg:h-[118px]">
+        {/* Wordmark */}
+        <a href="#top" className="flex shrink-0 items-center">
+          <img
+            src={wordmark}
+            alt="JEO Maps"
+            className="h-10 w-auto lg:h-[70px]"
+          />
         </a>
 
-        {/* Nav */}
-        <nav className="flex items-center gap-6 sm:gap-10">
-          <div className="hidden items-center gap-7 sm:flex lg:gap-9">
-            {NAV.map((n) => {
-              const active = activeId === n.href
-              return (
-                <a
-                  key={n.label}
-                  href={n.href}
-                  aria-current={active ? 'true' : undefined}
-                  className={`group relative pb-1 text-sm font-semibold uppercase tracking-wide transition-colors ${
-                    active ? 'text-white' : 'text-slate-300 hover:text-white'
+        {/* Nav links (desktop) */}
+        <nav className="hidden items-center gap-8 lg:flex xl:gap-14">
+          {NAV.map((n) => {
+            const active = activeId === n.href
+            return (
+              <a
+                key={n.href}
+                href={n.href}
+                aria-current={active ? 'true' : undefined}
+                className={`group relative py-1 text-base font-bold transition-colors xl:text-xl ${
+                  active
+                    ? 'text-v3-light'
+                    : 'text-v3-light/90 hover:text-v3-light'
+                }`}
+              >
+                {n.label}
+                <span
+                  className={`absolute -bottom-0.5 left-0 h-0.5 bg-v3-green transition-all duration-300 ${
+                    active ? 'w-full' : 'w-0 group-hover:w-full'
                   }`}
-                >
-                  {n.label}
-                  <span
-                    className={`absolute -bottom-0.5 left-0 h-0.5 bg-brand transition-all duration-300 ${
-                      active ? 'w-full' : 'w-0 group-hover:w-full'
-                    }`}
-                  />
-                </a>
-              )
-            })}
-          </div>
+                />
+              </a>
+            )
+          })}
+        </nav>
+
+        {/* Actions */}
+        <div className="flex items-center gap-2 lg:gap-5">
           <a
             href={DOWNLOAD_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="hidden rounded-md bg-brand/90 px-5 py-2.5 text-sm font-semibold text-ink transition-all duration-300 hover:bg-brand hover:shadow-glow-brand sm:inline-flex"
+            className="btn-v3-primary hidden h-[59px] px-6 lg:inline-flex"
           >
-            Install free
+            {t.nav.cta}
           </a>
+          <LanguageSwitcher className="hidden lg:block" />
           {/* Mobile hamburger */}
           <button
             type="button"
             onClick={() => setMenuOpen((o) => !o)}
-            aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-label={menuOpen ? t.nav.closeMenu : t.nav.openMenu}
             aria-expanded={menuOpen}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-slate-200 transition-colors hover:bg-white/10 hover:text-white sm:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md text-v3-light transition-colors hover:bg-white/10 lg:hidden"
           >
             {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
-        </nav>
+        </div>
       </div>
 
       {/* Mobile menu */}
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
+            initial={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
+            animate={reduce ? { opacity: 1 } : { height: 'auto', opacity: 1 }}
+            exit={reduce ? { opacity: 0 } : { height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-white/5 sm:hidden"
+            className="overflow-hidden border-t border-white/5 lg:hidden"
           >
-            <div className="section-shell flex flex-col gap-1 py-4">
+            <div className="section-shell-v3 flex flex-col gap-1 py-4">
               {NAV.map((n) => {
                 const active = activeId === n.href
                 return (
                   <a
-                    key={n.label}
+                    key={n.href}
                     href={n.href}
                     onClick={() => setMenuOpen(false)}
                     aria-current={active ? 'true' : undefined}
-                    className={`rounded-md px-3 py-3 text-sm font-semibold uppercase tracking-wide transition-colors ${
+                    className={`rounded-md px-3 py-3 text-base font-bold transition-colors ${
                       active
-                        ? 'bg-brand/10 text-white'
-                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                        ? 'bg-v3-green/10 text-v3-light'
+                        : 'text-v3-light/90 hover:bg-white/5 hover:text-v3-light'
                     }`}
                   >
                     {n.label}
                   </a>
                 )
               })}
-              <a
-                href={DOWNLOAD_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setMenuOpen(false)}
-                className="mt-2 rounded-md bg-brand/90 px-3 py-3 text-center text-sm font-semibold text-ink transition-all duration-300 hover:bg-brand"
-              >
-                Install free
-              </a>
+              <div className="mt-2 flex items-center justify-between gap-3">
+                <a
+                  href={DOWNLOAD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMenuOpen(false)}
+                  className="btn-v3-primary h-12 flex-1 text-base"
+                >
+                  {t.nav.cta}
+                </a>
+                <LanguageSwitcher onSelect={() => setMenuOpen(false)} />
+              </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.header>
+    </header>
   )
 }
