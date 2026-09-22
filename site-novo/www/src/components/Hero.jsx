@@ -94,13 +94,28 @@ export default function Hero() {
         aria-hidden="true"
         className="absolute inset-0 -z-10 bg-gradient-to-t from-transparent to-v3-navy-hero"
       />
-      <div className="section-shell-v3 grid items-center gap-12 section-pad-v3 sm:py-16 lg:min-h-[790px] lg:grid-cols-[687px_1fr] lg:gap-10 lg:py-20">
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="flex max-w-2xl flex-col items-start"
-        >
+      {/* Mobile stacking order (issue #669): eyebrow → H1 → subtitle →
+          animation → CTAs. Desktop (lg+) keeps the validated side-by-side
+          geometry: text column on the left, illustration on the right. The
+          grid is a single motion container so the framer stagger still
+          propagates to every variants={item} child (variant inheritance
+          flows through plain DOM elements). Three siblings with explicit lg
+          placement: text in col 1 row 1, CTAs in col 1 row 2, and the Lottie
+          spanning both rows in col 2 — vertically centered against the full
+          text+CTAs height, exactly as before. Row gap on lg is 20 (80px),
+          matching the former lg:mt-20 between subtitle and CTAs, so desktop
+          metrics are unchanged; mobile gap-12 (48px) separates all three.
+          lg:content-center keeps the two left rows vertically centered as a
+          single block inside min-h-[790px] (align-content would otherwise
+          stretch the free space into the rows and push subtitle and CTAs
+          apart — a desktop regression). */}
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="section-shell-v3 grid items-center gap-12 section-pad-v3 sm:py-16 lg:min-h-[790px] lg:grid-cols-[687px_1fr] lg:content-center lg:gap-x-10 lg:gap-y-20 lg:py-20"
+      >
+        <div className="flex max-w-2xl flex-col items-start lg:col-start-1 lg:row-start-1">
           <motion.p variants={item} className="eyebrow-v3">
             {t.hero.eyebrow}
             <img
@@ -119,43 +134,20 @@ export default function Hero() {
 
           <motion.p
             variants={item}
-            className="mt-16 text-lg leading-[1.5] text-v3-mint sm:text-xl lg:mt-20 lg:text-2xl"
+            /* Issue #669: mobile H1→subtitle gap is 32px (mt-8). Tablet keeps
+               the former 64px and desktop the Figma-validated 80px. */
+            className="mt-8 text-lg leading-[1.5] text-v3-mint sm:mt-16 sm:text-xl lg:mt-20 lg:text-2xl"
           >
             {t.hero.subtitle}
           </motion.p>
-
-          <motion.div
-            variants={item}
-            className="mt-14 flex w-full flex-col gap-4 sm:w-auto sm:flex-row lg:mt-20"
-          >
-            <a href="#oficinas" className="btn-v3-ghost h-[57px]">
-              {t.hero.workshops}
-            </a>
-            <a
-              href={DOCS_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-v3-ghost h-[57px]"
-            >
-              {t.hero.docs}
-            </a>
-            <a
-              href={DOWNLOAD_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-v3-primary h-[62px]"
-            >
-              {t.hero.download}
-            </a>
-          </motion.div>
-        </motion.div>
+        </div>
 
         {/* Official hero-animate instance exported from Figma (793×480, 60fps,
             4s). The JSON settles at the final frame with no return keyframes,
             so it plays once and holds the settled state — the source of truth
             replaces the former manual PNG-layer recreation. Same geometry as
             the old composite: aspect-[793/480] inside max-w-[793px]. */}
-        <div className="mx-auto w-full max-w-[793px]">
+        <div className="mx-auto w-full max-w-[793px] lg:col-start-2 lg:row-span-2 lg:row-start-1">
           <Lottie
             loadAnimationData={loadFindLocation}
             loop={false}
@@ -163,7 +155,32 @@ export default function Hero() {
             className="aspect-[793/480] w-full"
           />
         </div>
-      </div>
+
+        <motion.div
+          variants={item}
+          className="flex w-full flex-col gap-4 sm:w-auto sm:flex-row lg:col-start-1 lg:row-start-2"
+        >
+          <a href="#oficinas" className="btn-v3-ghost h-[57px]">
+            {t.hero.workshops}
+          </a>
+          <a
+            href={DOCS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-v3-ghost h-[57px]"
+          >
+            {t.hero.docs}
+          </a>
+          <a
+            href={DOWNLOAD_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="btn-v3-primary h-[62px]"
+          >
+            {t.hero.download}
+          </a>
+        </motion.div>
+      </motion.div>
     </section>
   )
 }

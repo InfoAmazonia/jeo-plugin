@@ -132,6 +132,29 @@ export default function ResourceSlider() {
   // native pan-x (inertia, overscroll) and keyboard/buttons are untouched —
   // the drag is purely an extra pointing-device affordance.
   const tablistRef = useRef(null)
+  // Tab buttons by id, for centering the active one in the scroll row.
+  const tabButtonsRef = useRef(new Map())
+
+  // Center the active tab in the scroll row on EVERY activation — manual
+  // click or auto-advance. block:'nearest' keeps the page's vertical scroll
+  // untouched. Guards:
+  // - first render is skipped: loading the page must not scroll the row,
+  //   only tab changes do;
+  // - desktop row (lg:overflow-visible, ≥1024px) is not scrollable — skip.
+  const firstRenderRef = useRef(true)
+  useEffect(() => {
+    if (firstRenderRef.current) {
+      firstRenderRef.current = false
+      return
+    }
+    if (window.matchMedia('(min-width: 1024px)').matches) return
+    tabButtonsRef.current.get(active)?.scrollIntoView({
+      inline: 'center',
+      block: 'nearest',
+      behavior: reduce ? 'auto' : 'smooth',
+    })
+  }, [active, reduce])
+
   // Live gesture bookkeeping: { pointerId, startX, startScrollLeft, dragged }.
   const dragRef = useRef(null)
   const suppressClickRef = useRef(false)
@@ -238,22 +261,18 @@ export default function ResourceSlider() {
                   aria-selected={selected}
                   aria-controls={`slider-panel-${tab.id}`}
                   id={`slider-tab-${tab.id}`}
-                  onClick={(e) => {
+                  ref={(el) => {
+                    if (el) tabButtonsRef.current.set(tab.id, el)
+                    else tabButtonsRef.current.delete(tab.id)
+                  }}
+                  onClick={() => {
                     setActive(tab.id)
                     setMediaKey((k) => k + 1)
                     // A manual selection restarts the auto-advance window —
-                    // the rotation continues from this tab.
+                    // the rotation continues from this tab. Centering the tab
+                    // in the scroll row is handled by the effect on `active`
+                    // above, so clicks and auto-advance share one code path.
                     scheduleRef.current?.()
-                    // Center the activated tab in the scroll row so partially
-                    // off-screen tabs reveal their neighbors. block:'nearest'
-                    // keeps the page's vertical scroll untouched. Desktop row
-                    // (lg:overflow-visible, ≥1024px) is not scrollable — skip.
-                    if (window.matchMedia('(min-width: 1024px)').matches) return
-                    e.currentTarget.scrollIntoView({
-                      inline: 'center',
-                      block: 'nearest',
-                      behavior: reduce ? 'auto' : 'smooth',
-                    })
                   }}
                   className={`flex shrink-0 flex-col items-start gap-3 border-b-4 px-2 py-4 text-left transition-opacity duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-v3-green sm:gap-5 sm:px-6 sm:py-6 lg:px-10 ${
                     dragging ? 'cursor-grabbing ' : ''

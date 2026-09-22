@@ -140,9 +140,10 @@ height — no jump between tabs.
 > through `ui/Lottie.jsx` like its siblings; the four missing photo bitmaps
 > were **fabricated** from the design render and ship as
 > `www/public/i/{ecbd0b36…,a043a878…,08621d54…,26bf3786…}.png`
-> (**PROVISIONAL** until the designer's masters — swap in place, the hashes
-> in the JSON stay), wired by `remapLottieAssets` (the export sets `e:1`, so
-> the prefix is folded into `p` — see the helper's docstring). Kept below for
+> (**REPLACED 2026-09-21 by the designer's official masters — see "Tab 2
+> official photo masters" below**), wired by `remapLottieAssets` (the export
+> sets `e:1`, so the prefix is folded into `p` — see the helper's
+> docstring). Kept below for
 > the record of the observed proto behavior (drop curve ±7 px overshoot,
 > onsets 0.02/0.32/0.58/0.92 s), still valid as the score `layers.json`
 > plays.
@@ -188,6 +189,103 @@ four layer diamonds as flat translucent vectors. The code composition below
   `layers.json` stays in the repo verbatim, **unloaded**; its 92 KB chunk is
   no longer fetched (replaced by ~575 KB of lazy JPEGs delivering the
   complete art).
+
+#### Tab 2 official photo masters (2026-09-21)
+
+The designer delivered the four diamond photos as `layer-1..4.png`
+(1267×~490 RGBA each, ~2× the strip size, **diamond alpha baked in** —
+~46 % transparent corners; layer-1's interior is alpha 239, the others are
+opaque 255). They **replace the fabricated crops** in `www/public/i/`
+(human decision: align layer-N with diamond N **in animation order**). The
+score/timings in `layers.json` are untouched — only the 4 asset `p` refs
+changed extension (`.png` → `.jpg`; hashes stay, `remapLottieAssets` needs
+no change):
+
+| Master | Diamond (animation order) | Photo layer | Asset (`public/i/`) | Final strip pos (comp) |
+|---|---|---|---|---|
+| `layer-1.png` (contour gradient, alpha 239) | d1 — first drop, **bottom** | `photo Vector 2` (ind 104) | `26bf3786….jpg` | (16.52, 170.95), 634×243 |
+| `layer-2.png` (city streets) | d2 | `photo Vector 1` (ind 103) | `08621d54….jpg` | (16.52, 120.88), 633×243 |
+| `layer-3.png` (teal abstract + dots) | d3 | `photo Vector 3` (ind 102) | `a043a878….jpg` | (16.52, 60.80), 633×243 |
+| `layer-4.png` (satellite) | d4 — last drop, **top** | `photo Vector 4` (ind 101) | `ecbd0b36….jpg` | (16.52, −3.29), 632×242 |
+
+Onset evidence for the order (baked keyframes, first frame moving): d1 f1
+(0.02 s) → d2 f19 (0.32 s) → d3 f35 (0.58 s) → d4 f55 (0.92 s).
+
+**Mask/geometry**: the diamond shape still comes from the Lottie itself —
+each `photo` layer is alpha-matted (`tt:1`) by the vector layer above it
+(`td:1`), an invisible 9-vert parallelogram (~623×236, beveled tips). The
+masters' baked diamond is full-bleed, so a naive drop-in would misplace the
+baked mint stroke ~5–11 px past the matte boundary (navy wedges inside the
+diamond). Instead each master was **perspective-warped so its four diamond
+tips land exactly on the vector diamond's four tips** (bevel midpoints:
+T(333.425, 0.84) R(644.01, 111.07) B(333.425, 236.905) L(21.12, 111.07) in
+layer space, anchor (332.5, 119), world = finalPos + v − anchor, strip-local
+= world − stripPos, output at 2× the declared strip size). Non-uniform
+scale ≤ 1.7 %, invisible on map art; the matte clips any residual. layer-1's
+alpha-239 translucency sits at the bottom of the z-stack (only the navy
+`#0A1629` media bg beneath), so flattening it over navy is pixel-identical
+to rendering the alpha. **JPEG q75 4:4:4** (display-size diff vs lossless:
+mean |Δ| ≈ 1.0–1.4, imperceptible): 53.6 + 120.1 + 51.2 + 66.5 =
+**291.3 kB total** (target ≤ ~300 kB; q88 was 442 kB). The fabricated PNGs
+were deleted (no other references).
+
+**Verification** (preview build, 2026-09-21): drop series sampled from the
+SVG transforms — onsets d1→d4 with gaps ≈ 0.3 s (score 0.30/0.26/0.34),
+overshoots +6.8/+7.1/+6.8 px (9.8–10.2 %; score ~7.3 px/10.5 %), settle
+exact to 4 decimals (170.9527/120.8820/60.7972/−3.2933), hold to op=227;
+diamond regions non-navy with each master's palette (navy bg reads exactly
+#0A1629); replay on re-click of the active tab restarts from frame 0;
+auto-advance deltas 8.01/8.08 s; reduced-motion shows the static settled
+frame (frozen at final transforms) with the new photos and no auto-advance;
+console clean; no horizontal overflow at 1920 or 390.
+
+**Tab 2 shadow removal + master permutation (2026-09-22).** The four matte
+donor layers (`Vector 1..4`, `td:1`) each carry an AE **Drop Shadow** effect
+(`ty:25`, color `#00DBA6`, opacity 255, angle 180, distance 8, blur 0).
+lottie-web renders the donors visibly and applies the effect as an SVG
+`feDropShadow`-style filter — the hard 8 px-down full-strength copy of each
+diamond read as a dark band under diamonds d2/d3/d4 (d1's copy falls below
+the comp bottom and is clipped by the container, so it never showed).
+Surgical fix: `opacity` param of the effect set **255 → 0** on `Vector 4`
+(ind 1), `Vector 3` (ind 2) and `Vector 1` (ind 3) only — the filter element
+is preserved (removing the whole `ef` drops the group's filter isolation and
+changes the stack's blend appearance; verified experimentally). `Vector 2`
+(d1) untouched at this step (zeroed later — see the follow-up note below). Same day: d1/d2 assets regenerated from the designer's
+updated masters — d1 ← `layer-2.png` (city streets, 1267×490, md5
+`aa07a3b5…`), d2 ← `layer-1.png` (contour gradient, alpha-239 interior
+flattened over navy as before); same warp recipe (master tips → vector bevel
+midpoints per diamond, 2× strip, JPEG q75 4:4:4), same asset hashes
+(`26bf3786…` md5 `3f749679…`, `08621d54…` md5 `a2137000…`). d3/d4 assets
+untouched (d4 keeps the brightness-1.30/contrast-1.05 fix, center luminance
+≈157). Timings/replay/auto-advance/reduced-motion untouched. Verified: band
+zones under d2/d3/d4 back to the underlying layer's pixels (no dark
+gradient), region below d1's tip flat navy (std 0.00), console clean at
+1920 and 390.
+
+**Tab 2 rim bake + warp v2 (2026-09-22, follow-up).** The green rim belongs
+to the masters, not to the Lottie effect: `layer-1..4.png` already carry a
+thin teal band (~#00DBA6) along the LOWER diamond edges (R–B, B–L and the
+L/R/B tips; upper edges have no rim) and no shadow. All four donor Drop
+Shadow effects are now `opacity 255 → 0` — `Vector 2` (d1) zeroed too, so
+the four rims come uniformly from the baked bitmaps. The four bitmaps were
+regenerated with warp v2 (`/tmp/opencode/gen-tab2.py`): instead of aligning
+the master tips to the matte's bevel midpoints (which ate 2–7 px of rim
+along the long edges and forced the −5.4/−5.5 px anchor nudge on d3/d4),
+the master's OUTER contour (rim included, from the alpha bbox tips
+T(633,0) R(1266,244) B(633,489) L(0,244)) now lands on the matte octagon's
+VIRTUAL SHARP TIPS (intersection of the extended long edges: T(333.43,0)
+R(665.0,110.6) B(333.42,238.0) L(0.01,110.6) in layer space). With full
+coverage the d3/d4 anchor nudge became redundant and was reverted — the
+four `photo Vector *` layers are back to `ks.a [0,0]`, exactly as exported.
+d4 keeps the alpha-flatten + brightness 1.30/contrast 1.05 treatment under
+the new warp (asset interior mean luminance ≈158). Timings, drop order,
+replay and auto-advance untouched (JSON diff = 4 opacity values only).
+Asset md5s: d1 `26bf3786…` `5a903a4e…`, d2 `08621d54…` `9f5e609c…`, d3
+`a043a878…` `46e238cd…`, d4 `ecbd0b36…` `d2143896…`. Verified (preview
+build, reduced-motion settled frame): teal rim sampled on R–B and B–L of
+all four diamonds at 1920 and 390 (20–37/37 hits), no navy sliver below
+d1's bottom tip (exact #0A1629), no dark band under d2/d3/d4, d4 asset
+luminance ≈158, console clean (only external CORB on googletagmanager).
 
 ## Features Showcase (133:1584)
 
@@ -587,8 +685,8 @@ What remains open:
    - F2 `feature-minimapa.json`: `b811828b…` (830×563), `536154ec…` (264×594),
      `10c3ea5b…` (830×482)
    - F4 `feature-historias.json`: `e734b5bd…` (792×688)
-   - Slider tab 2 `layers.json`: `ecbd0b36…`, `a043a878…`, `08621d54…`,
-     `26bf3786…` (~633×243 each)
+   - Slider tab 2 `layers.json`: **DELIVERED 2026-09-21** (`layer-1..4.png`)
+     and integrated — see "Tab 2 official photo masters (2026-09-21)" below.
 2. **F1 `feature-geolocalizacao.json` bitmap** `a7d3af06…` (1850×853) — the
    code reconstruction already ships the motion, so this only unblocks the
    OPTIONAL full-Lottie re-wire.
