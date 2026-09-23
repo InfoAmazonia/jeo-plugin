@@ -154,7 +154,7 @@ class Storymap {
 		global $post;
 
 		if ( is_singular( 'storymap' ) ) {
-			return JEO_BASEPATH . '/templates/single-storymap.php';
+			return jeo_get_template( 'single-storymap.php' );
 		}
 
 		return $template;

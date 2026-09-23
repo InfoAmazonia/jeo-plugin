@@ -1793,12 +1793,12 @@ class Jeo {
 
 			add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 
-			require JEO_BASEPATH . '/templates/embed-storymap.php';
+			require jeo_get_template( 'embed-storymap.php' );
 			exit();
 		}
 
 		if ( $discovery ) {
-			require JEO_BASEPATH . '/templates/embed-discovery.php';
+			require jeo_get_template( 'embed-discovery.php' );
 			exit();
 		}
 
@@ -1862,7 +1862,7 @@ class Jeo {
 			}
 		}
 
-		require JEO_BASEPATH . '/templates/embed.php';
+		require jeo_get_template( 'embed.php' );
 		exit();
 	}
 

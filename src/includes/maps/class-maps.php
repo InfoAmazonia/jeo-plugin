@@ -806,7 +806,7 @@ class Maps {
 		global $post;
 
 		if ( is_singular( 'map' ) ) {
-			return JEO_BASEPATH . '/templates/single-map.php';
+			return jeo_get_template( 'single-map.php' );
 		}
 
 		return $template;

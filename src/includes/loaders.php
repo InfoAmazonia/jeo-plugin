@@ -571,7 +571,7 @@ add_filter( 'page_template', 'template_page_discovery' );
 function template_page_discovery( $page_template ) {
 
 	if ( get_page_template_slug() === 'discovery.php' ) {
-		$page_template = JEO_BASEPATH . '/templates/discovery.php';
+		$page_template = jeo_get_template( 'discovery.php' );
 	}
 	return $page_template;
 }
