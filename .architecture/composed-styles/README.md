@@ -45,7 +45,7 @@ Registered in `Jeo::init()` (`class-jeo.php:49`).
 | Constant | Value | Purpose |
 |----------|-------|---------|
 | `CACHE_DIR` | `jeo-mapbox-composed-styles` | Subdirectory under `wp_upload_dir()['basedir']` |
-| `CACHE_VERSION` | `13` | Bump to invalidate all artifacts; embedded in hash & metadata |
+| `CACHE_VERSION` | `14` | Bump to invalidate all artifacts; embedded in hash & metadata |
 | `TOKEN_PLACEHOLDER` | `__JEO_MAPBOX_ACCESS_TOKEN__` | Replaces raw `access_token=...` in stored style JSON |
 | `DEFAULT_FALLBACK_SPRITE` | `mapbox://sprites/mapbox/standard` | Used when source sprites lack icons |
 | `VIRTUAL_SCOPE_PREVIEW` | `preview` | Editor preview scope (requires `edit_posts`) |
@@ -60,6 +60,7 @@ build_context(map_id) / build_virtual_context(payload)
        ├── Jeo::fetch_mapbox_style() // GET api.mapbox.com/styles/v1/{styleId} per mapbox ref
        │                             // shared helper, transient-cached (jeo_mapbox_style_json_*)
        │                             // purged on layer save + forced refresh; TTL filter jeo_mapbox_style_cache_ttl (default 1h)
+       ├── migrate_legacy_style_functions() // convert pre-expressions {base, stops} objects → interpolate/step/match expressions (MapLibre compat; see below)
        ├── build_composite_sprite()// GD: merge sprites (1x + @2x), prefix image names, pack 2048px canvas
        ├── select_glyphs()         // first bundle with text-font, else first glyphs URL
        ├── merge root properties   // projection, light, terrain, fog (warns on conflicts)
@@ -298,5 +299,20 @@ token is set, the existing sanitize-to-placeholder behavior is preserved.
 - **MapLibre compatibility**: `normalize_unsupported_expressions` replaces Mapbox-only
   expression operators (`pitch`, `distance-from-center`) with `0` so composed styles render
   under MapLibre.
+- **Legacy stop functions**: Old Mapbox styles (pre-expressions era, e.g. streets v7-based
+  styles) declare paint/layout values as `{base, stops}` function objects, which MapLibre
+  rejects with `Bare objects invalid. Use ["literal", {...}]`. Right after fetching each
+  bundle style, `migrate_legacy_style_functions()` converts them to expressions:
+  - zoom/property exponential (numeric, color, or `array<number>` outputs) →
+    `["interpolate", ["linear"|"exponential", base], ["zoom"|["get", p]], ...]` (array
+    outputs `["literal", ...]`-wrapped)
+  - interval or enum outputs → `["step", ...]`
+  - categorical property functions → `["match", ["get", p], ...]`; `type: "identity"` →
+    `["get", p]`
+  - composite zoom-and-property functions → `interpolate` over `zoom` with per-zoom
+    property expressions
+  Only layer `paint`/`layout` sections are walked — sources/GeoJSON are never touched.
+  Conversions are counted per style and reported as a composer warning. Bumping
+  `CACHE_VERSION` is required when changing conversion rules so cached artifacts regenerate.
 - **`jeo:composed` / `jeo:source` metadata**: Composite layers are tagged with `jeo:composed`
   and source-association metadata for traceability.

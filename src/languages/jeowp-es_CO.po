@@ -4813,19 +4813,19 @@ msgstr "Vista previa del mapa"
 msgid "Invalid composed style hash."
 msgstr "Hash de estilo compuesto no válido."
 
-#: includes/maps/class-map-style-composer.php:1337
+#: includes/maps/class-map-style-composer.php:1356
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "No fue posible obtener uno o más estilos de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1850
+#: includes/maps/class-map-style-composer.php:1869
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "Se requiere la extensión PHP GD para fusionar sprites de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1969
+#: includes/maps/class-map-style-composer.php:1988
 msgid "Could not decode a Mapbox sprite image."
 msgstr "No fue posible decodificar una imagen de sprite de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2675
+#: includes/maps/class-map-style-composer.php:2970
 msgid "Composed style artifact was not found."
 msgstr "No se encontró el artefacto del estilo compuesto."
 
@@ -5212,31 +5212,31 @@ msgstr "Clasificando prompt (no se creará ninguna capa)..."
 
 #: includes/ai/class-mapbox-style-builder.php:79
 msgid "Mapbox denied the style publish request (HTTP 403): the configured Mapbox token likely lacks the styles:write scope. Use a secret token (sk.…) or add the styles:write scope to the token at mapbox.com/account/access-tokens, then update the key in JEO Settings."
-msgstr ""
+msgstr "Mapbox rechazó la solicitud de publicación del estilo (HTTP 403): es probable que el token de Mapbox configurado no tenga el ámbito styles:write. Use un token secreto (sk.…) o agregue el ámbito styles:write al token en mapbox.com/account/access-tokens y luego actualice la clave en Configuraciones de JEO."
 
 #: includes/ai/class-mapbox-style-builder.php:84
 msgid "Mapbox rejected the access token (HTTP 401): the Mapbox API key configured in JEO Settings is invalid or has expired."
-msgstr ""
+msgstr "Mapbox rechazó el token de acceso (HTTP 401): la clave de API de Mapbox configurada en Configuraciones de JEO no es válida o ha caducado."
 
 #: includes/settings/settings-page.php:144
 msgid "Public access token. Used for MapboxGL rendering, Mapbox layers, and AI layer generation. This token is exposed to site visitors (it is required to display maps), so keep its scopes read-only."
-msgstr ""
+msgstr "Token de acceso público. Se usa para el renderizado con MapboxGL, las capas de Mapbox y la generación de capas con IA. Este token queda expuesto a los visitantes del sitio (es necesario para mostrar los mapas), así que mantenga sus ámbitos como de solo lectura."
 
 #: includes/settings/settings-page.php:148
 msgid "Mapbox Secret Key"
-msgstr ""
+msgstr "Clave secreta de Mapbox"
 
 #: includes/settings/settings-page.php:150
 msgid "Ex. sk.eyJ3..."
-msgstr ""
+msgstr "Ej. sk.eyJ3..."
 
 #: includes/settings/settings-page.php:151
 msgid "Used to create AI-assisted layers (requires the styles:write scope). For security, use a secret token — the public token is visible to site visitors. If empty, publishing falls back to the public token."
-msgstr ""
+msgstr "Se usa para crear capas asistidas por IA (requiere el ámbito styles:write). Por seguridad, use un token secreto; el token público es visible para los visitantes del sitio. Si está vacío, la publicación recurre al token público."
 
 #: includes/layers/class-layers.php:254
 msgid "AI-suggested default style (filter/paint/layout) applied when a map layer instance sets style.use_default"
-msgstr ""
+msgstr "Estilo predeterminado sugerido por IA (filter/paint/layout) que se aplica cuando una instancia de capa del mapa define style.use_default"
 
 #: includes/maps/class-maps.php:190
 msgid "Per-instance paint and layout overrides for vector and GeoJSON layers"
@@ -5244,73 +5244,73 @@ msgstr "Anulaciones de paint y layout por instancia para capas vectoriales y Geo
 
 #: includes/maps/class-maps.php:194
 msgid "Whether to use the layer default_style meta instead of the instance paint"
-msgstr ""
+msgstr "Indica si se usa el metadato default_style de la capa en lugar del paint de la instancia"
 
 #: includes/maps/class-maps.php:206
 msgid "MapLibre filter expression"
-msgstr ""
+msgstr "Expresión de filtro de MapLibre"
 
 #: includes/layer-types/geojson.js:188
 msgid "GeoJSON"
-msgstr ""
+msgstr "GeoJSON"
 
 #: includes/layer-types/geojson.js:229
 msgid "GeoJSON URL"
-msgstr ""
+msgstr "URL del GeoJSON"
 
 #: includes/layer-types/geojson.js:230
 msgid "Public URL of a GeoJSON file (usually a FeatureCollection). Used when no inline GeoJSON is provided."
-msgstr ""
+msgstr "URL pública de un archivo GeoJSON (normalmente una FeatureCollection). Se usa cuando no se proporciona un GeoJSON incrustado."
 
 #: includes/layer-types/geojson.js:238
 msgid "Inline GeoJSON"
-msgstr ""
+msgstr "GeoJSON incrustado"
 
 #: includes/layer-types/geojson.js:239
 msgid "Optional. Paste a raw GeoJSON object or FeatureCollection. Takes precedence over the URL — useful for small geometries."
-msgstr ""
+msgstr "Opcional. Pegue un objeto GeoJSON o una FeatureCollection sin procesar. Tiene prioridad sobre la URL; útil para geometrías pequeñas."
 
 #: includes/layer-types/geojson.js:246
 msgid "Layer style"
-msgstr ""
+msgstr "Estilo de la capa"
 
 #: includes/layer-types/geojson.js:247
 msgid "How the GeoJSON features are drawn."
-msgstr ""
+msgstr "Cómo se dibujan las entidades del GeoJSON."
 
 #: includes/class-jeo.php:2168
 msgid "A valid http(s) style URL is required."
-msgstr ""
+msgstr "Se requiere una URL de estilo http(s) válida."
 
 #: includes/class-jeo.php:2206
 msgid "Unexpected style JSON payload."
-msgstr ""
+msgstr "Contenido JSON de estilo inesperado."
 
 #: includes/layer-types/style-json.js:5
 msgid "Style JSON"
-msgstr ""
+msgstr "JSON de estilo"
 
 #: includes/layer-types/style-json.js:30
 msgid "Style URL"
-msgstr ""
+msgstr "URL del estilo"
 
 #: includes/layer-types/style-json.js:31
 msgid "Public URL of a MapLibre GL style JSON file. Used when no inline style is provided. Works with keyless providers such as OpenFreeMap (e.g. https://tiles.openfreemap.org/styles/dark)."
-msgstr ""
+msgstr "URL pública de un archivo JSON de estilo de MapLibre GL. Se usa cuando no se proporciona un estilo incrustado. Funciona con proveedores sin clave como OpenFreeMap (p. ej., https://tiles.openfreemap.org/styles/dark)."
 
 #: includes/layer-types/style-json.js:39
 msgid "Inline style JSON"
-msgstr ""
+msgstr "JSON de estilo incrustado"
 
 #: includes/layer-types/style-json.js:40
 msgid "Optional. Paste a raw MapLibre GL style object. Takes precedence over the URL — useful for small, self-contained styles."
-msgstr ""
+msgstr "Opcional. Pegue un objeto de estilo de MapLibre GL sin procesar. Tiene prioridad sobre la URL; útil para estilos pequeños y autónomos."
 
 #: includes/ai/class-context-handler.php:496
 #: includes/minimap/class-minimap.php:321
 #: includes/minimap/class-minimap.php:442
 msgid "The previous request could not be processed. Please try again."
-msgstr ""
+msgstr "No se pudo procesar la solicitud anterior. Intente nuevamente."
 
 #: includes/ai/class-funai-place-polygon-adapter.php:91
 msgid "FUNAI"
@@ -5373,3 +5373,9 @@ msgstr "Pida a la IA que refine el mapa… (Shift+Enter para nueva línea)"
 #: js/build/mapBlocks.js:1
 msgid "Describe the map you want… (Shift+Enter for a line break)"
 msgstr "Describa el mapa que quiere… (Shift+Enter para nueva línea)"
+
+#. translators: %d: number of converted style values.
+#: includes/maps/class-map-style-composer.php:1308
+#, php-format
+msgid "Converted %d legacy Mapbox stop-function value(s) to style-spec expressions for MapLibre compatibility."
+msgstr "Se convirtieron %d valor(es) de función de stops heredada de Mapbox en expresiones style-spec para compatibilidad con MapLibre."

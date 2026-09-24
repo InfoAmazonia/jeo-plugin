@@ -4813,19 +4813,19 @@ msgstr "Prévia do mapa"
 msgid "Invalid composed style hash."
 msgstr "Hash do estilo composto inválido."
 
-#: includes/maps/class-map-style-composer.php:1337
+#: includes/maps/class-map-style-composer.php:1356
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "Não foi possível obter um ou mais estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1850
+#: includes/maps/class-map-style-composer.php:1869
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "A extensão PHP GD é necessária para mesclar sprites do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1969
+#: includes/maps/class-map-style-composer.php:1988
 msgid "Could not decode a Mapbox sprite image."
 msgstr "Não foi possível decodificar uma imagem de sprite do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2675
+#: includes/maps/class-map-style-composer.php:2970
 msgid "Composed style artifact was not found."
 msgstr "O artefato do estilo composto não foi encontrado."
 
@@ -5236,7 +5236,7 @@ msgstr "Chave usada para a criação de camadas com auxílio de IA (requer escop
 
 #: includes/layers/class-layers.php:254
 msgid "AI-suggested default style (filter/paint/layout) applied when a map layer instance sets style.use_default"
-msgstr ""
+msgstr "Estilo padrão sugerido por IA (filter/paint/layout) aplicado quando uma instância de camada do mapa define style.use_default"
 
 #: includes/maps/class-maps.php:190
 msgid "Per-instance paint and layout overrides for vector and GeoJSON layers"
@@ -5244,39 +5244,39 @@ msgstr "Substituições de paint e layout por instância para camadas vetoriais 
 
 #: includes/maps/class-maps.php:194
 msgid "Whether to use the layer default_style meta instead of the instance paint"
-msgstr ""
+msgstr "Se deve usar o meta default_style da camada em vez do paint da instância"
 
 #: includes/maps/class-maps.php:206
 msgid "MapLibre filter expression"
-msgstr ""
+msgstr "Expressão de filtro do MapLibre"
 
 #: includes/layer-types/geojson.js:188
 msgid "GeoJSON"
-msgstr ""
+msgstr "GeoJSON"
 
 #: includes/layer-types/geojson.js:229
 msgid "GeoJSON URL"
-msgstr ""
+msgstr "URL do GeoJSON"
 
 #: includes/layer-types/geojson.js:230
 msgid "Public URL of a GeoJSON file (usually a FeatureCollection). Used when no inline GeoJSON is provided."
-msgstr ""
+msgstr "URL pública de um arquivo GeoJSON (geralmente uma FeatureCollection). Usada quando nenhum GeoJSON embutido é fornecido."
 
 #: includes/layer-types/geojson.js:238
 msgid "Inline GeoJSON"
-msgstr ""
+msgstr "GeoJSON embutido"
 
 #: includes/layer-types/geojson.js:239
 msgid "Optional. Paste a raw GeoJSON object or FeatureCollection. Takes precedence over the URL — useful for small geometries."
-msgstr ""
+msgstr "Opcional. Cole um objeto GeoJSON ou FeatureCollection bruto. Tem precedência sobre a URL — útil para geometrias pequenas."
 
 #: includes/layer-types/geojson.js:246
 msgid "Layer style"
-msgstr ""
+msgstr "Estilo da camada"
 
 #: includes/layer-types/geojson.js:247
 msgid "How the GeoJSON features are drawn."
-msgstr ""
+msgstr "Como as feições do GeoJSON são desenhadas."
 
 #: includes/class-jeo.php:2168
 msgid "A valid http(s) style URL is required."
@@ -5373,3 +5373,9 @@ msgstr "Peça à IA para refinar o mapa… (Shift+Enter para nova linha)"
 #: js/build/mapBlocks.js:1
 msgid "Describe the map you want… (Shift+Enter for a line break)"
 msgstr "Descreva o mapa que você quer… (Shift+Enter para nova linha)"
+
+#. translators: %d: number of converted style values.
+#: includes/maps/class-map-style-composer.php:1308
+#, php-format
+msgid "Converted %d legacy Mapbox stop-function value(s) to style-spec expressions for MapLibre compatibility."
+msgstr "Convertidos %d valor(es) de função de stops legada do Mapbox em expressões style-spec para compatibilidade com o MapLibre."

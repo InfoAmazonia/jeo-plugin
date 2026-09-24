@@ -25,7 +25,7 @@ class Map_Style_Composer {
 	use Singleton;
 
 	const CACHE_DIR               = 'jeo-mapbox-composed-styles';
-	const CACHE_VERSION           = 13;
+	const CACHE_VERSION           = 14;
 	const TOKEN_PLACEHOLDER       = '__JEO_MAPBOX_ACCESS_TOKEN__';
 	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/standard';
 	const VIRTUAL_SCOPE_PREVIEW   = 'preview';
@@ -1292,6 +1292,25 @@ class Map_Style_Composer {
 				continue;
 			}
 
+			// Older Mapbox styles (e.g. streets v7-era) declare paint/layout
+			// values as legacy {base, stops} function objects, which MapLibre
+			// rejects ("Bare objects invalid"). Migrate them to expressions
+			// before any bundle consumer reads the style.
+			$conversions = 0;
+			$style       = $this->migrate_legacy_style_functions( $style, $conversions );
+
+			if ( $conversions > 0 ) {
+				$warnings[] = array(
+					'layerId' => $ref['layerId'],
+					'styleId' => $ref['styleId'] ?? null,
+					'warning' => sprintf(
+						/* translators: %d: number of converted style values. */
+						__( 'Converted %d legacy Mapbox stop-function value(s) to style-spec expressions for MapLibre compatibility.', 'jeowp' ),
+						$conversions
+					),
+				);
+			}
+
 			$image_props              = $this->get_image_props( $style );
 			$prefix                   = $this->make_prefix( $context, $ref );
 			$bundles[ $ref['index'] ] = array(
@@ -2455,6 +2474,282 @@ class Map_Style_Composer {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Migrate legacy stop-function values in a style's layers.
+	 *
+	 * Only layer paint/layout sections are walked — source definitions and
+	 * their GeoJSON payloads must never be rewritten.
+	 *
+	 * @param array $style Style JSON.
+	 * @param int   $conversions Converted function count, passed by reference.
+	 * @return array
+	 */
+	private function migrate_legacy_style_functions( array $style, &$conversions ) {
+		foreach ( $style['layers'] ?? array() as $layer_index => $layer ) {
+			if ( ! is_array( $layer ) ) {
+				continue;
+			}
+
+			foreach ( array( 'paint', 'layout' ) as $section ) {
+				if ( isset( $layer[ $section ] ) ) {
+					$style['layers'][ $layer_index ][ $section ] = $this->migrate_legacy_functions( $layer[ $section ], $conversions );
+				}
+			}
+		}
+
+		return $style;
+	}
+
+	/**
+	 * Recursively convert legacy Mapbox GL "stop functions" to expressions.
+	 *
+	 * Old styles (GL JS style-spec pre-expressions era, e.g. streets v7)
+	 * declare paint/layout values as {base, stops} objects. MapLibre GL JS
+	 * only accepts expressions and fails with "Bare objects invalid".
+	 *
+	 * @param mixed $value Style fragment.
+	 * @param int   $conversions Converted function count, passed by reference.
+	 * @return mixed
+	 */
+	private function migrate_legacy_functions( $value, &$conversions ) {
+		if ( ! is_array( $value ) ) {
+			return $value;
+		}
+
+		// Recurse first so nested function outputs are converted before
+		// their container is inspected.
+		foreach ( $value as $key => $item ) {
+			$value[ $key ] = $this->migrate_legacy_functions( $item, $conversions );
+		}
+
+		if ( ! $this->is_legacy_function( $value ) ) {
+			return $value;
+		}
+
+		$converted = $this->convert_legacy_function( $value );
+
+		if ( null !== $converted ) {
+			++$conversions;
+			return $converted;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Return whether a decoded JSON value is a legacy stop function.
+	 *
+	 * Expressions are lists; stop functions are objects with a stops key.
+	 *
+	 * @param mixed $value Decoded value.
+	 * @return bool
+	 */
+	private function is_legacy_function( $value ) {
+		if ( ! is_array( $value ) || isset( $value[0] ) ) {
+			return false;
+		}
+
+		return isset( $value['stops'] ) && is_array( $value['stops'] );
+	}
+
+	/**
+	 * Convert one legacy stop function into a style-spec expression.
+	 *
+	 * Supports zoom functions (exponential and interval semantics), property
+	 * functions (categorical, interval, exponential, identity) and composite
+	 * zoom-and-property functions. Returns null when the function cannot be
+	 * represented, leaving the original value untouched.
+	 *
+	 * @param array $legacy_function Legacy function object.
+	 * @return mixed|null
+	 */
+	private function convert_legacy_function( array $legacy_function ) {
+		$stops = array();
+		foreach ( $legacy_function['stops'] as $stop ) {
+			if ( is_array( $stop ) && count( $stop ) >= 2 ) {
+				$stops[] = array( $stop[0], $stop[1] );
+			}
+		}
+
+		if ( empty( $stops ) ) {
+			return null;
+		}
+
+		$property = isset( $legacy_function['property'] ) && is_string( $legacy_function['property'] ) ? $legacy_function['property'] : null;
+		$type     = isset( $legacy_function['type'] ) && is_string( $legacy_function['type'] ) ? $legacy_function['type'] : null;
+		$base     = isset( $legacy_function['base'] ) && is_numeric( $legacy_function['base'] ) ? (float) $legacy_function['base'] : 1.0;
+
+		if ( 'identity' === $type ) {
+			return $property ? array( 'get', $property ) : null;
+		}
+
+		// Composite zoom-and-property functions carry {zoom, value} inputs.
+		if ( is_array( $stops[0][0] ) ) {
+			return $this->convert_composite_function( $stops, $property, $legacy_function['default'] ?? null, $base );
+		}
+
+		if ( 1 === count( $stops ) ) {
+			return $this->wrap_function_output( $stops[0][1] );
+		}
+
+		$input   = $property ? array( 'get', $property ) : array( 'zoom' );
+		$inputs  = wp_list_pluck( $stops, 0 );
+		$outputs = wp_list_pluck( $stops, 1 );
+		$in_num  = $this->all_numeric( $inputs );
+		$out_num = $this->all_numeric( $outputs );
+		$out_col = ! $out_num && $this->all_color_like( $outputs );
+		$out_arr = ! $out_num && ! $out_col && $this->all_numeric_arrays( $outputs );
+
+		if ( $in_num && ( $out_num || $out_col || $out_arr ) && 'interval' !== $type ) {
+			// Default exponential semantics: smooth interpolation.
+			$basis = 1.0 === $base ? array( 'linear' ) : array( 'exponential', $base );
+			$expr  = array( 'interpolate', $basis, $input );
+			foreach ( $stops as $stop ) {
+				$expr[] = $stop[0];
+				$expr[] = $this->wrap_function_output( $stop[1] );
+			}
+			return $expr;
+		}
+
+		if ( $in_num ) {
+			// Interval semantics (and enum outputs such as line-cap): the
+			// output changes discretely at each stop input.
+			$expr  = array( 'step', $input, $this->wrap_function_output( $stops[0][1] ) );
+			$count = count( $stops );
+			for ( $i = 1; $i < $count; $i++ ) {
+				$expr[] = $stops[ $i ][0];
+				$expr[] = $this->wrap_function_output( $stops[ $i ][1] );
+			}
+			return $expr;
+		}
+
+		if ( $property ) {
+			// Categorical property function.
+			$expr = array( 'match', array( 'get', $property ) );
+			foreach ( $stops as $stop ) {
+				$expr[] = $stop[0];
+				$expr[] = $this->wrap_function_output( $stop[1] );
+			}
+			$fallback = array_key_exists( 'default', $legacy_function )
+				? $this->wrap_function_output( $legacy_function['default'] )
+				: $this->wrap_function_output( $stops[0][1] );
+			$expr[]   = $fallback;
+			return $expr;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Convert a composite zoom-and-property function.
+	 *
+	 * Produces an interpolate over zoom whose outputs are per-zoom property
+	 * expressions — the documented expression replacement for composites.
+	 *
+	 * @param array       $stops Normalized stops with {zoom, value} inputs.
+	 * @param string|null $property Property name.
+	 * @param mixed       $default_value Optional categorical default.
+	 * @param float       $base Interpolation base.
+	 * @return mixed|null
+	 */
+	private function convert_composite_function( array $stops, $property, $default_value, $base ) {
+		if ( ! $property ) {
+			return null;
+		}
+
+		$groups = array();
+		foreach ( $stops as $stop ) {
+			$input = $stop[0];
+			if ( ! is_array( $input ) || ! isset( $input['zoom'], $input['value'] ) || ! is_numeric( $input['zoom'] ) ) {
+				return null;
+			}
+			$groups[ (float) $input['zoom'] ][] = array( $input['value'], $stop[1] );
+		}
+
+		ksort( $groups, SORT_NUMERIC );
+
+		$basis = 1.0 === $base ? array( 'linear' ) : array( 'exponential', $base );
+		$expr  = array( 'interpolate', $basis, array( 'zoom' ) );
+		foreach ( $groups as $zoom => $group ) {
+			$property_expr = $this->convert_legacy_function(
+				array(
+					'property' => $property,
+					'stops'    => $group,
+					'default'  => $default_value,
+				)
+			);
+			if ( null === $property_expr ) {
+				return null;
+			}
+			$expr[] = $zoom;
+			$expr[] = $property_expr;
+		}
+
+		// A single zoom group collapses to the property expression itself.
+		return 1 === count( $groups ) ? $expr[4] : $expr;
+	}
+
+	/**
+	 * Wrap a function output for use inside an expression.
+	 *
+	 * Array outputs (offsets, padding, translate) must be literal-wrapped.
+	 *
+	 * @param mixed $output Raw stop output.
+	 * @return mixed
+	 */
+	private function wrap_function_output( $output ) {
+		if ( is_array( $output ) ) {
+			return array( 'literal', $output );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Return whether every value is numeric.
+	 *
+	 * @param array $values Values.
+	 * @return bool
+	 */
+	private function all_numeric( array $values ) {
+		foreach ( $values as $value ) {
+			if ( ! is_int( $value ) && ! is_float( $value ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Return whether every value is a numeric array (interpolable output).
+	 *
+	 * @param array $values Values.
+	 * @return bool
+	 */
+	private function all_numeric_arrays( array $values ) {
+		foreach ( $values as $value ) {
+			if ( ! is_array( $value ) || ! isset( $value[0] ) || ! $this->all_numeric( $value ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Return whether every string value looks like a CSS color.
+	 *
+	 * @param array $values Values.
+	 * @return bool
+	 */
+	private function all_color_like( array $values ) {
+		foreach ( $values as $value ) {
+			if ( ! is_string( $value ) || ! preg_match( '/^(#[0-9a-f]{3,8}|rgba?\(|hsla?\()/i', trim( $value ) ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
