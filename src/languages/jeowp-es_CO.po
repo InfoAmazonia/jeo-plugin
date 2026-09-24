@@ -4825,7 +4825,7 @@ msgstr "Se requiere la extensión PHP GD para fusionar sprites de Mapbox."
 msgid "Could not decode a Mapbox sprite image."
 msgstr "No fue posible decodificar una imagen de sprite de Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2970
+#: includes/maps/class-map-style-composer.php:2954
 msgid "Composed style artifact was not found."
 msgstr "No se encontró el artefacto del estilo compuesto."
 

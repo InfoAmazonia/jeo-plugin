@@ -45,7 +45,7 @@ Registered in `Jeo::init()` (`class-jeo.php:49`).
 | Constant | Value | Purpose |
 |----------|-------|---------|
 | `CACHE_DIR` | `jeo-mapbox-composed-styles` | Subdirectory under `wp_upload_dir()['basedir']` |
-| `CACHE_VERSION` | `14` | Bump to invalidate all artifacts; embedded in hash & metadata |
+| `CACHE_VERSION` | `15` | Bump to invalidate all artifacts; embedded in hash & metadata |
 | `TOKEN_PLACEHOLDER` | `__JEO_MAPBOX_ACCESS_TOKEN__` | Replaces raw `access_token=...` in stored style JSON |
 | `DEFAULT_FALLBACK_SPRITE` | `mapbox://sprites/mapbox/standard` | Used when source sprites lack icons |
 | `VIRTUAL_SCOPE_PREVIEW` | `preview` | Editor preview scope (requires `edit_posts`) |
@@ -303,10 +303,12 @@ token is set, the existing sanitize-to-placeholder behavior is preserved.
   styles) declare paint/layout values as `{base, stops}` function objects, which MapLibre
   rejects with `Bare objects invalid. Use ["literal", {...}]`. Right after fetching each
   bundle style, `migrate_legacy_style_functions()` converts them to expressions:
-  - zoom/property exponential (numeric, color, or `array<number>` outputs) →
-    `["interpolate", ["linear"|"exponential", base], ["zoom"|["get", p]], ...]` (array
-    outputs `["literal", ...]`-wrapped)
-  - interval or enum outputs → `["step", ...]`
+  - zoom/property exponential (numeric or color outputs) →
+    `["interpolate", ["linear"|"exponential", base], ["zoom"|["get", p]], ...]`
+  - interval, enum, or `array<number>` outputs (e.g. `fill-translate`, `text-offset`,
+    `line-dasharray`) → `["step", ...]` with `["literal", ...]`-wrapped arrays — the
+    MapLibre runtime **rejects interpolated array outputs**
+    (`Type array<number> is not interpolatable`), so arrays must always go through `step`
   - categorical property functions → `["match", ["get", p], ...]`; `type: "identity"` →
     `["get", p]`
   - composite zoom-and-property functions → `interpolate` over `zoom` with per-zoom

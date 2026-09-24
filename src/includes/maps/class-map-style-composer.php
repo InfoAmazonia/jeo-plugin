@@ -25,7 +25,7 @@ class Map_Style_Composer {
 	use Singleton;
 
 	const CACHE_DIR               = 'jeo-mapbox-composed-styles';
-	const CACHE_VERSION           = 14;
+	const CACHE_VERSION           = 15;
 	const TOKEN_PLACEHOLDER       = '__JEO_MAPBOX_ACCESS_TOKEN__';
 	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/standard';
 	const VIRTUAL_SCOPE_PREVIEW   = 'preview';
@@ -2600,9 +2600,8 @@ class Map_Style_Composer {
 		$in_num  = $this->all_numeric( $inputs );
 		$out_num = $this->all_numeric( $outputs );
 		$out_col = ! $out_num && $this->all_color_like( $outputs );
-		$out_arr = ! $out_num && ! $out_col && $this->all_numeric_arrays( $outputs );
 
-		if ( $in_num && ( $out_num || $out_col || $out_arr ) && 'interval' !== $type ) {
+		if ( $in_num && ( $out_num || $out_col ) && 'interval' !== $type ) {
 			// Default exponential semantics: smooth interpolation.
 			$basis = 1.0 === $base ? array( 'linear' ) : array( 'exponential', $base );
 			$expr  = array( 'interpolate', $basis, $input );
@@ -2716,21 +2715,6 @@ class Map_Style_Composer {
 	private function all_numeric( array $values ) {
 		foreach ( $values as $value ) {
 			if ( ! is_int( $value ) && ! is_float( $value ) ) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * Return whether every value is a numeric array (interpolable output).
-	 *
-	 * @param array $values Values.
-	 * @return bool
-	 */
-	private function all_numeric_arrays( array $values ) {
-		foreach ( $values as $value ) {
-			if ( ! is_array( $value ) || ! isset( $value[0] ) || ! $this->all_numeric( $value ) ) {
 				return false;
 			}
 		}
