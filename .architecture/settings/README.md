@@ -43,6 +43,18 @@ All config in a single array option `jeo-settings`.
 - Colors: hex validation
 - Sensitive keys: preserved when input is empty
 
+### Array-Typed Options Read Coercion
+
+`Settings::ARRAY_OPTION_KEYS` (`enabled_post_types`, `jeo_bulk_post_types`) lists
+settings that must always be arrays. `Settings::get_option()` runs every stored
+value for these keys through `normalize_array_option()`, which converts legacy
+comma-separated strings (e.g. `'post,storymap'` written by older plugin versions
+or imported databases) into arrays and falls back to the default for empty
+strings. This self-heals reads without a DB migration — `foreach`/`in_array`
+consumers (meta registration, asset enqueue, bulk processor columns, context
+handler, privacy exporters, Stories Near You, RAG worker) always receive an
+array.
+
 ## Admin Menu
 
 ```
