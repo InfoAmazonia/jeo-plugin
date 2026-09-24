@@ -154,6 +154,17 @@ class Settings {
 	}
 
 	/**
+	 * Settings keys whose value must always be an array of slugs.
+	 *
+	 * Legacy databases (or older plugin versions) may store these as
+	 * comma-separated strings, which crashes array-only consumers
+	 * (foreach / in_array). They are coerced on read.
+	 *
+	 * @var string[]
+	 */
+	const ARRAY_OPTION_KEYS = array( 'enabled_post_types', 'jeo_bulk_post_types' );
+
+	/**
 	 * Retrieve a single option value from the JEO settings, falling back to defaults.
 	 *
 	 * @param string $key     Option key.
@@ -164,7 +175,7 @@ class Settings {
 		$options = get_option( $this->option_key );
 
 		if ( isset( $options[ $key ] ) ) {
-			return $options[ $key ];
+			return $this->normalize_array_option( $key, $options[ $key ] );
 		}
 
 		if ( isset( $this->default_options[ $key ] ) ) {
@@ -172,6 +183,31 @@ class Settings {
 		}
 
 		return $default_value;
+	}
+
+	/**
+	 * Coerce legacy scalar values for array-typed settings into arrays.
+	 *
+	 * Mirrors the comma-separated split already performed by
+	 * sanitize_settings() on save, so values written by older plugin
+	 * versions are self-healed on read without requiring a migration.
+	 *
+	 * @param string $key   Option key.
+	 * @param mixed  $value Raw stored value.
+	 * @return mixed
+	 */
+	private function normalize_array_option( $key, $value ) {
+		if ( ! in_array( $key, self::ARRAY_OPTION_KEYS, true ) || is_array( $value ) ) {
+			return $value;
+		}
+
+		$trimmed = trim( (string) $value );
+
+		if ( '' === $trimmed ) {
+			return $this->default_options[ $key ] ?? array();
+		}
+
+		return array_values( array_filter( array_map( 'trim', explode( ',', $trimmed ) ) ) );
 	}
 
 	/**
@@ -267,7 +303,13 @@ class Settings {
 
 		if ( isset( $input['jeo_bulk_post_types'] ) ) {
 			if ( ! is_array( $input['jeo_bulk_post_types'] ) ) {
-				$input['jeo_bulk_post_types'] = array( 'post' );
+				if ( empty( trim( (string) $input['jeo_bulk_post_types'] ) ) ) {
+					$input['jeo_bulk_post_types'] = array( 'post' );
+				} else {
+					$input['jeo_bulk_post_types'] = array_filter( array_map( 'trim', explode( ',', trim( (string) $input['jeo_bulk_post_types'] ) ) ) );
+				}
+			} else {
+				$input['jeo_bulk_post_types'] = array_filter( array_map( 'trim', $input['jeo_bulk_post_types'] ) );
 			}
 		}
 

@@ -408,17 +408,17 @@ msgid "Map zoom must be between 1 and 14"
 msgstr "El zoom del mapa debe estar entre 1 y 14"
 
 #: includes/ai/class-ai-settings.php:50
-#: includes/settings/class-settings.php:643
-#: includes/settings/class-settings.php:644
+#: includes/settings/class-settings.php:685
+#: includes/settings/class-settings.php:686
 #: js/build/layersSidebar.js:11
 msgid "Settings"
 msgstr "Configuraciones"
 
-#: includes/settings/class-settings.php:667
+#: includes/settings/class-settings.php:709
 msgid "General"
 msgstr "General"
 
-#: includes/settings/class-settings.php:668
+#: includes/settings/class-settings.php:710
 msgid "Geocoders"
 msgstr "Geocodificadores"
 
@@ -1409,7 +1409,7 @@ msgid "Search address"
 msgstr "Buscar dirección"
 
 #: includes/ai/settings/tab-knowledge.php:299
-#: includes/settings/class-settings.php:600
+#: includes/settings/class-settings.php:642
 #: js/build/mapBlocks.js:1
 #: js/build/postsSidebar.js:1
 msgid "Search"
@@ -1763,12 +1763,12 @@ msgstr "Puntos actuales"
 msgid "No points"
 msgstr "Sin puntos"
 
-#: includes/settings/class-settings.php:562
+#: includes/settings/class-settings.php:604
 #: js/build/postsSidebar.js:2
 msgid "Delete"
 msgstr "Borrar"
 
-#: includes/settings/class-settings.php:599
+#: includes/settings/class-settings.php:641
 #: js/build/postsSidebar.js:2
 msgid "Edit"
 msgstr "Editar"
@@ -1849,17 +1849,17 @@ msgid "Gathering geodata and initializing JEO Engine..."
 msgstr "Recopilando geodatos e inicializando JEO Engine..."
 
 #: includes/admin/dashboard-page.php:524
-#: includes/settings/class-settings.php:612
+#: includes/settings/class-settings.php:654
 msgid "Select Taxonomy..."
 msgstr "Seleccionar taxonomía..."
 
 #: includes/admin/dashboard-page.php:542
-#: includes/settings/class-settings.php:613
+#: includes/settings/class-settings.php:655
 msgid "Select Term..."
 msgstr "Seleccionar término..."
 
 #: includes/admin/dashboard-page.php:605
-#: includes/settings/class-settings.php:614
+#: includes/settings/class-settings.php:656
 msgid " locations found."
 msgstr " ubicaciones encontradas."
 
@@ -1869,12 +1869,12 @@ msgid "Untitled"
 msgstr "Sin título"
 
 #: includes/admin/dashboard-page.php:707
-#: includes/settings/class-settings.php:610
+#: includes/settings/class-settings.php:652
 msgid "View Post"
 msgstr "Ver entrada"
 
 #: includes/admin/dashboard-page.php:707
-#: includes/settings/class-settings.php:611
+#: includes/settings/class-settings.php:653
 msgid "Edit Post"
 msgstr "Editar entrada"
 
@@ -2002,7 +2002,7 @@ msgstr "Limpieza masiva iniciada en segundo plano. Las entradas se restablecerá
 
 #: includes/ai/class-bulk-processor.php:194
 #: includes/ai/class-rag-worker.php:101
-#: includes/settings/class-settings.php:581
+#: includes/settings/class-settings.php:623
 msgid "Error"
 msgstr "Error"
 
@@ -2339,12 +2339,12 @@ msgid "Manual Control"
 msgstr "Control manual"
 
 #: includes/ai/settings/tab-bulk.php:91
-#: includes/settings/class-settings.php:594
+#: includes/settings/class-settings.php:636
 msgid "Process 1 Batch Now"
 msgstr "Procesar 1 lote ahora"
 
 #: includes/ai/settings/tab-bulk.php:94
-#: includes/settings/class-settings.php:595
+#: includes/settings/class-settings.php:637
 msgid "Clear 1 Batch"
 msgstr "Limpiar 1 lote"
 
@@ -2415,52 +2415,52 @@ msgid "The following geographic dictionaries are available locally to improve AI
 msgstr "Los siguientes diccionarios geográficos están disponibles localmente para mejorar la precisión de la IA:"
 
 #: includes/ai/settings/tab-embedded.php:18
-#: includes/settings/class-settings.php:618
+#: includes/settings/class-settings.php:660
 msgid "Brazilian Biomes"
 msgstr "Biomas brasileños"
 
 #: includes/ai/settings/tab-embedded.php:19
-#: includes/settings/class-settings.php:619
+#: includes/settings/class-settings.php:661
 msgid "Indigenous Territories"
 msgstr "Territorios indígenas"
 
 #: includes/ai/settings/tab-embedded.php:20
-#: includes/settings/class-settings.php:620
+#: includes/settings/class-settings.php:662
 msgid "Quilombola Territories"
 msgstr "Territorios quilombolas"
 
 #: includes/ai/settings/tab-embedded.php:21
-#: includes/settings/class-settings.php:621
+#: includes/settings/class-settings.php:663
 msgid "Extractive Reserves (Resex)"
 msgstr "Reservas extractivas (Resex)"
 
 #: includes/ai/settings/tab-embedded.php:22
-#: includes/settings/class-settings.php:622
+#: includes/settings/class-settings.php:664
 msgid "Conservation Units"
 msgstr "Unidades de conservación"
 
 #: includes/ai/settings/tab-embedded.php:23
-#: includes/settings/class-settings.php:623
+#: includes/settings/class-settings.php:665
 msgid "Riverside Communities"
 msgstr "Comunidades ribereñas"
 
 #: includes/ai/settings/tab-embedded.php:24
-#: includes/settings/class-settings.php:624
+#: includes/settings/class-settings.php:666
 msgid "Agrarian Reform Settlements"
 msgstr "Asentamientos de reforma agraria"
 
 #: includes/ai/settings/tab-embedded.php:25
-#: includes/settings/class-settings.php:625
+#: includes/settings/class-settings.php:667
 msgid "Indigenous Peoples (Ethnicities)"
 msgstr "Pueblos indígenas (Etnias)"
 
 #: includes/ai/settings/tab-embedded.php:26
-#: includes/settings/class-settings.php:626
+#: includes/settings/class-settings.php:668
 msgid "Legal Amazon and Boundaries"
 msgstr "Amazonía legal y límites"
 
 #: includes/ai/settings/tab-embedded.php:27
-#: includes/settings/class-settings.php:627
+#: includes/settings/class-settings.php:669
 msgid "Hydrographic Basins"
 msgstr "Cuencas hidrográficas"
 
@@ -2473,7 +2473,7 @@ msgid "Entries found:"
 msgstr "Entradas encontradas:"
 
 #: includes/ai/settings/tab-embedded.php:57
-#: includes/settings/class-settings.php:561
+#: includes/settings/class-settings.php:603
 msgid "Download"
 msgstr "Descargar"
 
@@ -2706,7 +2706,7 @@ msgid "Available Backups (Last 3)"
 msgstr "Copias de seguridad disponibles (últimas 3)"
 
 #: includes/ai/settings/tab-knowledge.php:268
-#: includes/settings/class-settings.php:563
+#: includes/settings/class-settings.php:605
 msgid "No backups found."
 msgstr "No se encontraron copias de seguridad."
 
@@ -2719,7 +2719,7 @@ msgid "Test your configured Embedding Model on a random post to ensure it works 
 msgstr "Pruebe su modelo de Embedding configurado en una entrada aleatoria para asegurar que funcione correctamente antes de indexar toda su base de datos. Usa un almacén de prueba temporal."
 
 #: includes/ai/settings/tab-knowledge.php:279
-#: includes/settings/class-settings.php:574
+#: includes/settings/class-settings.php:616
 msgid "Run Test on Random Post"
 msgstr "Ejecutar prueba en entrada aleatoria"
 
@@ -2842,7 +2842,7 @@ msgid "Model"
 msgstr "Modelo"
 
 #: includes/ai/settings/tab-provider.php:79
-#: includes/settings/class-settings.php:539
+#: includes/settings/class-settings.php:581
 msgid "Change Model"
 msgstr "Cambiar modelo"
 
@@ -2860,13 +2860,13 @@ msgstr "Incluir categorías y etiquetas de la entrada en la solicitud de georref
 
 #: includes/ai/settings/tab-provider.php:100
 #: includes/ai/settings/tab-provider.php:280
-#: includes/settings/class-settings.php:589
+#: includes/settings/class-settings.php:631
 msgid "Back"
 msgstr "Atrás"
 
 #: includes/ai/settings/tab-provider.php:103
 #: includes/ai/settings/tab-provider.php:282
-#: includes/settings/class-settings.php:587
+#: includes/settings/class-settings.php:629
 #: js/build/contextSidebar.js:1
 msgid "Expand"
 msgstr "Expandir"
@@ -2985,7 +2985,7 @@ msgid "LLMs usually follow English instructions with higher precision and lower 
 msgstr "Los LLMs suelen seguir instrucciones en inglés con mayor precisión y menor latencia. Recomendamos inglés para reglas complejas, incluso si sus entradas están en otros idiomas."
 
 #: includes/ai/settings/tab-provider.php:395
-#: includes/settings/class-settings.php:551
+#: includes/settings/class-settings.php:593
 msgid "Generate Prompt"
 msgstr "Generar prompt"
 
@@ -2999,17 +2999,17 @@ msgstr "Advertencia: Desactivar JEO eliminará permanentemente todas las claves 
 
 #: includes/class-ai-handler.php:67
 #: includes/settings/ai-logs-page.php:16
-#: includes/settings/class-settings.php:615
+#: includes/settings/class-settings.php:657
 msgid "Unauthorized access."
 msgstr "Acceso no autorizado."
 
 #: includes/class-ai-handler.php:74
-#: includes/settings/class-settings.php:616
+#: includes/settings/class-settings.php:658
 msgid "Invalid file."
 msgstr "Archivo inválido."
 
 #: includes/class-ai-handler.php:79
-#: includes/settings/class-settings.php:617
+#: includes/settings/class-settings.php:659
 msgid "File not found."
 msgstr "Archivo no encontrado."
 
@@ -3193,7 +3193,7 @@ msgstr "Archivo no encontrado"
 msgid "Service provided by Mapbox (requires API Key)."
 msgstr "Servicio proporcionado por Mapbox (requiere clave de API)."
 
-#: includes/settings/class-settings.php:670
+#: includes/settings/class-settings.php:712
 msgid "Discovery"
 msgstr "Discovery"
 
@@ -3290,24 +3290,24 @@ msgid "All AI logs have been permanently deleted."
 msgstr "Todos los registros de IA han sido eliminados permanentemente."
 
 #: includes/settings/ai-logs-page.php:75
-#: includes/settings/class-settings.php:604
+#: includes/settings/class-settings.php:646
 msgid "reqs"
 msgstr "reqs"
 
 #: includes/settings/ai-logs-page.php:79
 #: includes/settings/ai-logs-page.php:104
 #: includes/settings/ai-logs-page.php:116
-#: includes/settings/class-settings.php:603
+#: includes/settings/class-settings.php:645
 msgid "Tokens"
 msgstr "Tokens"
 
 #: includes/settings/ai-logs-page.php:82
-#: includes/settings/class-settings.php:605
+#: includes/settings/class-settings.php:647
 msgid "In (Prompt):"
 msgstr "Entrada (Prompt):"
 
 #: includes/settings/ai-logs-page.php:83
-#: includes/settings/class-settings.php:606
+#: includes/settings/class-settings.php:648
 msgid "Out (Compl.):"
 msgstr "Salida (Compl.):"
 
@@ -3376,7 +3376,7 @@ msgid "Status / Output Preview"
 msgstr "Estado / vista previa de salida"
 
 #: includes/settings/ai-logs-page.php:193
-#: includes/settings/class-settings.php:560
+#: includes/settings/class-settings.php:602
 msgid "Actions"
 msgstr "Acciones"
 
@@ -3385,17 +3385,17 @@ msgid "No logs found yet. Ensure Debug Mode is enabled and georeference a post."
 msgstr "Aún no se encontraron registros. Asegúrese de que el modo Debug esté activado y georreferencie una entrada."
 
 #: includes/settings/ai-logs-page.php:238
-#: includes/settings/class-settings.php:607
+#: includes/settings/class-settings.php:649
 msgid "Total"
 msgstr "Total"
 
 #: includes/settings/ai-logs-page.php:239
-#: includes/settings/class-settings.php:608
+#: includes/settings/class-settings.php:650
 msgid "Prompt:"
 msgstr "Prompt:"
 
 #: includes/settings/ai-logs-page.php:239
-#: includes/settings/class-settings.php:609
+#: includes/settings/class-settings.php:651
 msgid "Completion:"
 msgstr "Completado:"
 
@@ -3427,235 +3427,235 @@ msgstr "Entrada (Prompt enviado)"
 msgid "Output (Raw Response)"
 msgstr "Salida (respuesta sin procesar)"
 
-#: includes/settings/class-settings.php:531
+#: includes/settings/class-settings.php:573
 msgid "[System] Console cleared."
 msgstr "[Sistema] Consola borrada."
 
-#: includes/settings/class-settings.php:532
+#: includes/settings/class-settings.php:574
 msgid "Missing Configuration"
 msgstr "Configuración faltante"
 
-#: includes/settings/class-settings.php:533
+#: includes/settings/class-settings.php:575
 msgid "Checking..."
 msgstr "Verificando..."
 
-#: includes/settings/class-settings.php:536
+#: includes/settings/class-settings.php:578
 msgid "Failed"
 msgstr "Falló"
 
-#: includes/settings/class-settings.php:537
+#: includes/settings/class-settings.php:579
 msgid "Request Failed"
 msgstr "Solicitud fallida"
 
-#: includes/settings/class-settings.php:538
+#: includes/settings/class-settings.php:580
 msgid "Loading..."
 msgstr "Cargando..."
 
-#: includes/settings/class-settings.php:540
+#: includes/settings/class-settings.php:582
 msgid "Select or type a model..."
 msgstr "Seleccione o escriba un modelo..."
 
-#: includes/settings/class-settings.php:541
+#: includes/settings/class-settings.php:583
 msgid " (Non-chat)"
 msgstr " (No chat)"
 
-#: includes/settings/class-settings.php:542
+#: includes/settings/class-settings.php:584
 msgid "Please enter an API Key first."
 msgstr "Ingrese una clave de API primero."
 
-#: includes/settings/class-settings.php:543
+#: includes/settings/class-settings.php:585
 msgid "Failed to fetch models: "
 msgstr "Error al obtener modelos: "
 
-#: includes/settings/class-settings.php:544
+#: includes/settings/class-settings.php:586
 msgid "Unknown error"
 msgstr "Error desconocido"
 
-#: includes/settings/class-settings.php:545
+#: includes/settings/class-settings.php:587
 msgid "Error fetching models. Check your key and connection."
 msgstr "Error al obtener modelos. Verifique su clave y conexión."
 
-#: includes/settings/class-settings.php:546
+#: includes/settings/class-settings.php:588
 msgid "Please type a description first."
 msgstr "Escriba una descripción primero."
 
-#: includes/settings/class-settings.php:547
+#: includes/settings/class-settings.php:589
 msgid "Asking AI..."
 msgstr "Preguntando a la IA..."
 
 #: includes/ai/settings/tab-context.php:199
-#: includes/settings/class-settings.php:548
+#: includes/settings/class-settings.php:590
 msgid "Generating..."
 msgstr "Generando..."
 
-#: includes/settings/class-settings.php:549
+#: includes/settings/class-settings.php:591
 msgid "✨ Applied above."
 msgstr "✨ Aplicado arriba."
 
-#: includes/settings/class-settings.php:550
+#: includes/settings/class-settings.php:592
 msgid "Error generating prompt."
 msgstr "Error al generar el prompt."
 
-#: includes/settings/class-settings.php:552
+#: includes/settings/class-settings.php:594
 msgid "Testing..."
 msgstr "Probando..."
 
-#: includes/settings/class-settings.php:553
+#: includes/settings/class-settings.php:595
 msgid "✅ Valid"
 msgstr "✅ Válido"
 
-#: includes/settings/class-settings.php:554
+#: includes/settings/class-settings.php:596
 msgid "❌ Invalid"
 msgstr "❌ Inválido"
 
-#: includes/settings/class-settings.php:555
+#: includes/settings/class-settings.php:597
 msgid "Validate Prompt"
 msgstr "Validar prompt"
 
-#: includes/settings/class-settings.php:556
+#: includes/settings/class-settings.php:598
 msgid "Loading backups..."
 msgstr "Cargando copias de seguridad..."
 
-#: includes/settings/class-settings.php:557
+#: includes/settings/class-settings.php:599
 msgid "File"
 msgstr "Archivo"
 
-#: includes/settings/class-settings.php:558
+#: includes/settings/class-settings.php:600
 msgid "Date"
 msgstr "Fecha"
 
-#: includes/settings/class-settings.php:559
+#: includes/settings/class-settings.php:601
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Size"
 msgstr "Tamaño"
 
-#: includes/settings/class-settings.php:564
+#: includes/settings/class-settings.php:606
 msgid "Delete?"
 msgstr "¿Eliminar?"
 
-#: includes/settings/class-settings.php:565
+#: includes/settings/class-settings.php:607
 msgid "Vectorizing..."
 msgstr "Vectorizando..."
 
-#: includes/settings/class-settings.php:566
+#: includes/settings/class-settings.php:608
 msgid "Vectorize Now"
 msgstr "Vectorizar ahora"
 
-#: includes/settings/class-settings.php:567
+#: includes/settings/class-settings.php:609
 msgid "Clear knowledge base?"
 msgstr "¿Limpiar la base de conocimiento?"
 
-#: includes/settings/class-settings.php:568
+#: includes/settings/class-settings.php:610
 msgid "Fetching post and generating vector embeddings..."
 msgstr "Obteniendo entrada y generando Embeddings de vectores..."
 
-#: includes/settings/class-settings.php:569
+#: includes/settings/class-settings.php:611
 msgid "Success!"
 msgstr "¡Éxito!"
 
-#: includes/settings/class-settings.php:570
+#: includes/settings/class-settings.php:612
 msgid "Post Extracted:"
 msgstr "Entrada extraída:"
 
-#: includes/settings/class-settings.php:571
+#: includes/settings/class-settings.php:613
 msgid "Vector Dimensions:"
 msgstr "Dimensiones del vector:"
 
-#: includes/settings/class-settings.php:572
+#: includes/settings/class-settings.php:614
 msgid "Text Snippet:"
 msgstr "Fragmento de texto:"
 
-#: includes/settings/class-settings.php:573
+#: includes/settings/class-settings.php:615
 msgid "Vector Preview:"
 msgstr "Vista previa del vector:"
 
-#: includes/settings/class-settings.php:575
+#: includes/settings/class-settings.php:617
 msgid "Searching..."
 msgstr "Buscando..."
 
-#: includes/settings/class-settings.php:576
+#: includes/settings/class-settings.php:618
 msgid "Searching the knowledge base "
 msgstr "Buscando en la base de conocimiento "
 
-#: includes/settings/class-settings.php:577
+#: includes/settings/class-settings.php:619
 msgid "No documents found. Have you run vectorization?"
 msgstr "No se encontraron documentos. ¿Ha ejecutado la vectorización?"
 
-#: includes/settings/class-settings.php:578
+#: includes/settings/class-settings.php:620
 msgid "Score / Relevance"
 msgstr "Puntuación / Relevancia"
 
-#: includes/settings/class-settings.php:579
+#: includes/settings/class-settings.php:621
 msgid "Metadata"
 msgstr "Metadatos"
 
-#: includes/settings/class-settings.php:582
+#: includes/settings/class-settings.php:624
 msgid "Processing..."
 msgstr "Procesando..."
 
-#: includes/settings/class-settings.php:583
+#: includes/settings/class-settings.php:625
 msgid "Clearing..."
 msgstr "Limpiando..."
 
-#: includes/settings/class-settings.php:584
+#: includes/settings/class-settings.php:626
 msgid "This will schedule clearing ALL AI-geolocated posts in the background. Continue?"
 msgstr "Esto programará la limpieza de TODAS las entradas geolocalizadas por IA en segundo plano. ¿Continuar?"
 
-#: includes/settings/class-settings.php:585
+#: includes/settings/class-settings.php:627
 msgid "ARE YOU SURE? This cannot be undone and will require full re-vectorization for these posts."
 msgstr "¿ESTÁ SEGURO? Esto no se puede deshacer y requerirá una re-vectorización completa para estas entradas."
 
-#: includes/settings/class-settings.php:586
+#: includes/settings/class-settings.php:628
 msgid "Bulk clearing started in background."
 msgstr "Limpieza masiva iniciada en segundo plano."
 
-#: includes/settings/class-settings.php:588
+#: includes/settings/class-settings.php:630
 msgid "Collapse"
 msgstr "Colapsar"
 
-#: includes/settings/class-settings.php:590
+#: includes/settings/class-settings.php:632
 msgid "Low"
 msgstr "Bajo"
 
-#: includes/settings/class-settings.php:591
+#: includes/settings/class-settings.php:633
 msgid "Fair"
 msgstr "Aceptable"
 
-#: includes/settings/class-settings.php:592
+#: includes/settings/class-settings.php:634
 msgid "Optimal"
 msgstr "Óptimo"
 
-#: includes/settings/class-settings.php:593
+#: includes/settings/class-settings.php:635
 msgid "API call failed"
 msgstr "Falló la llamada a la API"
 
-#: includes/settings/class-settings.php:596
+#: includes/settings/class-settings.php:638
 msgid "Delete log file?"
 msgstr "¿Eliminar archivo de registro?"
 
-#: includes/settings/class-settings.php:597
+#: includes/settings/class-settings.php:639
 msgid "No matching layers found."
 msgstr "No se encontraron capas coincidentes."
 
-#: includes/settings/class-settings.php:598
+#: includes/settings/class-settings.php:640
 msgid " matching layers:"
 msgstr " capas coincidentes:"
 
-#: includes/settings/class-settings.php:601
+#: includes/settings/class-settings.php:643
 msgid "Clear layer store?"
 msgstr "¿Limpiar almacén de capas?"
 
-#: includes/settings/class-settings.php:602
+#: includes/settings/class-settings.php:644
 msgid "Please enter a post ID or search text."
 msgstr "Ingrese un ID de entrada o texto de búsqueda."
 
-#: includes/settings/class-settings.php:652
-#: includes/settings/class-settings.php:653
+#: includes/settings/class-settings.php:694
+#: includes/settings/class-settings.php:695
 msgid "AI Debug Logs"
 msgstr "Registros de Debug de IA"
 
-#: includes/settings/class-settings.php:669
+#: includes/settings/class-settings.php:711
 msgid "Appearance"
 msgstr "Apariencia"
 
@@ -4374,17 +4374,17 @@ msgctxt "post geolocation status"
 msgid "Not Processed"
 msgstr "No procesado"
 
-#: includes/settings/class-settings.php:534
+#: includes/settings/class-settings.php:576
 msgctxt "geocoder status"
 msgid "Active"
 msgstr "Activo"
 
-#: includes/settings/class-settings.php:535
+#: includes/settings/class-settings.php:577
 msgctxt "geocoder status"
 msgid "Invalid"
 msgstr "Inválido"
 
-#: includes/settings/class-settings.php:580
+#: includes/settings/class-settings.php:622
 msgctxt "fallback post title"
 msgid "Untitled"
 msgstr "Sin título"
@@ -4478,7 +4478,7 @@ msgstr "Metadatos que almacenan las ubicaciones relacionadas con la entrada. Cad
 msgid "JEO"
 msgstr "JEO"
 
-#: includes/settings/class-settings.php:496
+#: includes/settings/class-settings.php:538
 msgid "JEO could not save this asset URL. Use a valid http(s) or root-relative URL."
 msgstr "JEO no pudo guardar esta URL de asset. Use una URL http(s) o relativa a la raíz válida."
 
