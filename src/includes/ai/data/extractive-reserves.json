@@ -1,0 +1,23 @@
+[
+  {
+    "name": "Reserva Extrativista Chico Mendes",
+    "type": "extractive_reserve",
+    "lat": -10.512,
+    "lng": -69.213,
+    "aliases": ["Resex Chico Mendes", "Reserva Chico Mendes"]
+  },
+  {
+    "name": "Reserva Extrativista Tapajós-Arapiuns",
+    "type": "extractive_reserve",
+    "lat": -2.650,
+    "lng": -55.200,
+    "aliases": ["Resex Tapajós-Arapiuns", "Tapajós-Arapiuns"]
+  },
+  {
+    "name": "Reserva Extrativista Marinha do Pirajubaé",
+    "type": "extractive_reserve",
+    "lat": -27.630,
+    "lng": -48.530,
+    "aliases": ["Resex Pirajubaé", "Pirajubaé"]
+  }
+]

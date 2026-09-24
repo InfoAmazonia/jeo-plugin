@@ -1,8 +1,26 @@
 const path = require( 'path' );
+const webpack = require( 'webpack' );
 const defaultConfig = require( './node_modules/@wordpress/scripts/config/webpack.config' );
 
 module.exports = {
 	...defaultConfig,
+	plugins: [
+		...( defaultConfig.plugins || [] ),
+		new webpack.NormalModuleReplacementPlugin(
+			/^node:(.*)$/,
+			( resource ) => {
+				resource.request = resource.request.replace( /^node:/, '' );
+			}
+		),
+	],
+	resolve: {
+		...defaultConfig.resolve,
+		fallback: {
+			...( defaultConfig.resolve?.fallback ),
+			fs: false,
+			path: false,
+		},
+	},
 	entry: {
 		mapglLoader: './src/js/src/lib/mapgl-loader.js',
 		mapglReact: {
@@ -13,6 +31,7 @@ module.exports = {
 		JeoLayer: './src/includes/layer-types/JeoLayer.js',
 		JeoLegend: './src/includes/legend-types/JeoLegend.js',
 		postsSidebar: './src/js/src/posts-sidebar/index.js',
+		contextSidebar: './src/js/src/context-sidebar/index.js',
 
 		jeoMap: {
 			import: './src/js/src/jeo-map/index.js',
@@ -39,6 +58,7 @@ module.exports = {
 			import: './src/js/src/maps-sidebar/index.js',
 			dependOn: ['mapglReact'],
 		},
+		storiesNearYou: './src/js/src/stories-near-you/stories-near-you-frontend.js',
 	},
 	output: {
 		path: path.resolve( __dirname, './src/js/build/' ),

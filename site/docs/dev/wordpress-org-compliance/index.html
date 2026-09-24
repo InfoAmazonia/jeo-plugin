@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><link rel="canonical" href="https://www.jeowp.org/docs/dev/wordpress-org-compliance/" />
+      <link rel="shortcut icon" href="../../img/favicon.ico" />
+    <title>WordPress.org compliance - JEO</title>
+    <link rel="stylesheet" href="../../css/theme.css" />
+    <link rel="stylesheet" href="../../css/theme_extra.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" />
+    
+      <script>
+        // Current page data
+        var mkdocs_page_name = "WordPress.org compliance";
+        var mkdocs_page_input_path = "dev/wordpress-org-compliance.md";
+        var mkdocs_page_url = "/docs/dev/wordpress-org-compliance/";
+      </script>
+    
+    <!--[if lt IE 9]>
+      <script src="../../js/html5shiv.min.js"></script>
+    <![endif]-->
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+      <script>hljs.highlightAll();</script> 
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+          <a href="../.." class="icon icon-home"> JEO
+        </a><div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+      <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+                <li class="toctree-l1"><a class="reference internal" href="../..">Home</a>
+                </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Plugin</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../index-plugin/">Overview</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../concepts/">Concepts</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../getting-started/">Getting started</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../layer-post/">Layers</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-post/">Maps</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../discovery/">Discovery</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../story-map/">Story map</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../stories-near-you/">Stories near you</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../minimap/">Minimap</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-shortcode/">Map shortcode</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-block/">Map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../one-time-map-block/">One-time map block</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../map-embed/">Map embed</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../geolocating-posts/">Geolocating posts</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">AI</span></p>
+              <ul>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-in-jeo/">AI in JEO</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-settings/">AI Settings</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-context-assistant/">AI Context Assistant</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-georeferencing/">AI Georeferencing</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../../ai-bulk-geolocation/">AI Bulk Geolocation</a>
+                  </li>
+              </ul>
+              <p class="caption"><span class="caption-text">Developer</span></p>
+              <ul class="current">
+                  <li class="toctree-l1"><a class="reference internal" href="../geo-information/">Geo information</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../geocoders/">Geocoders</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types/">Layer types</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../layer-types-api/">Layer types API</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../migration/">Migration</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../php-compatibility/">PHP compatibility</a>
+                  </li>
+                  <li class="toctree-l1 current"><a class="reference internal current" href="#">WordPress.org compliance</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#1-licenca">1. Licenca</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#2-responsabilidade-do-desenvolvedor">2. Responsabilidade do Desenvolvedor</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#3-versao-estavel-disponivel">3. Versao Estavel Disponivel</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#4-codigo-legivel">4. Codigo Legivel</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#5-sem-trialware">5. Sem Trialware</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#6-software-as-a-service-saas-permitido">6. Software as a Service (SaaS) Permitido</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#7-sem-rastreamento-sem-consentimento">7. Sem Rastreamento Sem Consentimento</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#8-sem-codigo-executavel-via-terceiros">8. Sem Codigo Executavel Via Terceiros</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#9-legalidade-e-etica">9. Legalidade e Etica</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#10-sem-linkscreditos-externos-sem-permissao">10. Sem Links/Creditos Externos Sem Permissao</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#11-nao-hijack-o-dashboard">11. Nao Hijack o Dashboard</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#12-readme-sem-spam">12. Readme Sem Spam</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#13-usar-bibliotecas-padrao-do-wordpress">13. Usar Bibliotecas Padrao do WordPress</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#14-evitar-commits-frequentes">14. Evitar Commits Frequentes</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#15-incrementar-versao-a-cada-release">15. Incrementar Versao a Cada Release</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#16-plugin-completo-na-submissao">16. Plugin Completo na Submissao</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#17-respeitar-marcas-registradas">17. Respeitar Marcas Registradas</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#requisitos-adicionais-de-seguranca-e-privacidade">Requisitos Adicionais de Seguranca e Privacidade</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#seguranca">Seguranca</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#privacidade">Privacidade</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#plugin-check-pcp">Plugin Check (PCP)</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#checklist-de-submissao">Checklist de Submissao</a>
+    </li>
+    </ul>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../wordpress-org-audit-report/">WordPress.org audit report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-report/">Dependency upgrade report</a>
+                  </li>
+                  <li class="toctree-l1"><a class="reference internal" href="../dependency-upgrade-smoke-tests/">Dependency upgrade smoke tests</a>
+                  </li>
+              </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+      <nav class="wy-nav-top" role="navigation" aria-label="Mobile navigation menu">
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../..">JEO</a>
+        
+      </nav>
+      <div class="wy-nav-content">
+        <div class="rst-content"><div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="../.." class="icon icon-home" aria-label="Docs"></a></li>
+          <li class="breadcrumb-item">Developer</li>
+      <li class="breadcrumb-item active">WordPress.org compliance</li>
+    <li class="wy-breadcrumbs-aside">
+          <a href="https://github.com/InfoAmazonia/jeo-plugin/edit/master/docs/dev/wordpress-org-compliance.md" class="icon icon-github"> Edit on GitHub</a>
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+            <div class="section" itemprop="articleBody">
+              
+                <h1 id="wordpressorg-plugin-directory-compliance-guidelines">WordPress.org Plugin Directory — Compliance Guidelines</h1>
+<blockquote>
+<p>Consolidado a partir das diretrizes oficiais do WordPress.org Plugin Directory.<br />
+Fonte: https://developer.wordpress.org/plugins/wordpress-org/detailed-plugin-guidelines/<br />
+Ultima atualizacao das diretrizes: Marco 2024</p>
+</blockquote>
+<hr />
+<h2 id="1-licenca">1. Licenca</h2>
+<p><strong>Diretriz:</strong> Plugins must be compatible with the GNU General Public License v2 (or later).</p>
+<ul>
+<li>Todo o codigo, dados e imagens hospedados no diretorio WordPress.org devem ser compativeis com GPL ou GPL-Compatible.</li>
+<li>Bibliotecas de terceiros incluidas tambem devem ser compativeis.</li>
+<li>Recomendado: usar a mesma licenca do WordPress — GPLv2 or later.</li>
+</ul>
+<hr />
+<h2 id="2-responsabilidade-do-desenvolvedor">2. Responsabilidade do Desenvolvedor</h2>
+<p><strong>Diretriz:</strong> Developers are responsible for the contents and actions of their plugins.</p>
+<ul>
+<li>O desenvolvedor e o unico responsavel por garantir que todos os arquivos do plugin estejam em conformidade.</li>
+<li>Escrever codigo intencionalmente para contornar diretrizes e proibido.</li>
+<li>Antes de fazer upload para SVN, confirmar a licenca de todos os arquivos (codigo, imagens, bibliotecas).</li>
+<li>Cumprir os termos de uso de todas as APIs e servicos de terceiros utilizados.</li>
+</ul>
+<hr />
+<h2 id="3-versao-estavel-disponivel">3. Versao Estavel Disponivel</h2>
+<p><strong>Diretriz:</strong> A stable version of a plugin must be available from its WordPress Plugin Directory page.</p>
+<ul>
+<li>A unica versao distribuida pelo WordPress.org e a do diretorio.</li>
+<li>Distribuir codigo por metodos alternativos sem manter o codigo hospedado atualizado pode resultar em remocao.</li>
+<li>O trunk/readme.txt deve sempre refletir a versao atual do plugin.</li>
+</ul>
+<hr />
+<h2 id="4-codigo-legivel">4. Codigo Legivel</h2>
+<p><strong>Diretriz:</strong> Code must be (mostly) human readable.</p>
+<ul>
+<li>Nao e permitido ofuscar codigo com tecnicas similares a p,a,c,k,e,r, uglify mangle, ou convencoes de nomes obscuras ($z12sdf813d).</li>
+<li>O codigo-fonte deve estar incluido no plugin ou haver um link no readme para o local de desenvolvimento.</li>
+<li>Recomendado documentar como usar as ferramentas de build.</li>
+</ul>
+<hr />
+<h2 id="5-sem-trialware">5. Sem Trialware</h2>
+<p><strong>Diretriz:</strong> Trialware is not permitted.</p>
+<ul>
+<li>Funcionalidade nao pode ser restrita ou bloqueada, liberada apenas por pagamento ou upgrade.</li>
+<li>Funcionalidade nao pode ser desabilitada apos periodo de trial ou quota atingida.</li>
+<li>Plugins que fornecem apenas acesso sandbox a APIs tambem sao proibidos.</li>
+<li>Permitido: upsell de produtos adicionais, desde que nao viole a diretriz 11 (hijacking).</li>
+</ul>
+<hr />
+<h2 id="6-software-as-a-service-saas-permitido">6. Software as a Service (SaaS) Permitido</h2>
+<p><strong>Diretriz:</strong> Software as a Service is permitted.</p>
+<ul>
+<li>Plugins que atuam como interface para servicos externos sao permitidos, mesmo pagos.</li>
+<li>O servico deve ter funcionalidade de substancia e ser documentado no readme.</li>
+<li>Nao permitido:</li>
+<li>Servico que existe apenas para validar licencas/keys.</li>
+<li>Mover codigo arbitrario para fora do plugin para o servico parecer fornecer funcionalidade extra.</li>
+<li>Storefronts que nao sao servicos.</li>
+</ul>
+<hr />
+<h2 id="7-sem-rastreamento-sem-consentimento">7. Sem Rastreamento Sem Consentimento</h2>
+<p><strong>Diretriz:</strong> Plugins may not track users without their consent.</p>
+<ul>
+<li>Plugins nao podem contatar servidores externos sem consentimento explicito e autorizado.</li>
+<li>Exemplos proibidos:</li>
+<li>Coleta automatizada de dados do usuario sem confirmacao explicita.</li>
+<li>Induzir usuarios a submeter informacao como requisito para usar o plugin.</li>
+<li>Offloading de assets (imagens, scripts) nao relacionados a um servico.</li>
+<li>Mecanismos de publicidade de terceiros que rastreiam uso/views.</li>
+<li>Excecao: SaaS como Twitter, Amazon CDN, Akismet — consentimento e implicito ao configurar.</li>
+</ul>
+<hr />
+<h2 id="8-sem-codigo-executavel-via-terceiros">8. Sem Codigo Executavel Via Terceiros</h2>
+<p><strong>Diretriz:</strong> Plugins may not send executable code via third-party systems.</p>
+<ul>
+<li>Externamente carregar codigo de servicos documentados e permitido, mas a comunicacao deve ser segura.</li>
+<li>Nao permitido:</li>
+<li>Instalar plugins, temas ou add-ons de servidores que nao sejam WordPress.org.</li>
+<li>Instalar versoes premium do mesmo plugin.</li>
+<li>Chamar CDN de terceiros por razoes que nao sejam inclusao de fontes; todo JS/CSS nao relacionado a servico deve ser incluido localmente.</li>
+<li>Usar iframes para conectar paginas de admin; APIs devem ser usadas para minimizar riscos.</li>
+</ul>
+<hr />
+<h2 id="9-legalidade-e-etica">9. Legalidade e Etica</h2>
+<p><strong>Diretriz:</strong> Developers and their plugins must not do anything illegal, dishonest, or morally offensive.</p>
+<ul>
+<li>Manipulacao artificial de resultados de busca (keyword stuffing, black hat SEO).</li>
+<li>Oferecer aumento de trafego.</li>
+<li>Compensar, enganar ou extorquir por reviews.</li>
+<li>Criar contas falsas para reviews (sockpuppeting).</li>
+<li>Utilizar recursos do servidor sem permissao (botnets, crypto-mining).</li>
+</ul>
+<hr />
+<h2 id="10-sem-linkscreditos-externos-sem-permissao">10. Sem Links/Creditos Externos Sem Permissao</h2>
+<p><strong>Diretriz:</strong> Plugins may not embed external links or credits on the public site without explicitly asking the user's permission.</p>
+<ul>
+<li>Nao adicionar links ou creditos no frontend sem opt-in explicito do usuario.</li>
+</ul>
+<hr />
+<h2 id="11-nao-hijack-o-dashboard">11. Nao Hijack o Dashboard</h2>
+<p><strong>Diretriz:</strong> Plugins should not hijack the admin dashboard.</p>
+<ul>
+<li>Nao adicionar widgets obrigatorios, notificacoes intrusivas, ou redirecionamentos forcados apos ativacao.</li>
+<li>Upsell deve ser moderado e nao interferir na experiencia de admin.</li>
+</ul>
+<hr />
+<h2 id="12-readme-sem-spam">12. Readme Sem Spam</h2>
+<p><strong>Diretriz:</strong> Public facing pages on WordPress.org (readmes) must not spam.</p>
+<ul>
+<li>Maximo de 12 tags.</li>
+<li>Sem affiliate links desnecessarios.</li>
+<li>Sem tags de plugins concorrentes.</li>
+<li>Sem keyword stuffing ou blackhat SEO.</li>
+<li>Readmes devem ser escritos para pessoas, nao bots.</li>
+<li>Links afiliados devem ser divulgados e apontar diretamente para o servico.</li>
+</ul>
+<hr />
+<h2 id="13-usar-bibliotecas-padrao-do-wordpress">13. Usar Bibliotecas Padrao do WordPress</h2>
+<p><strong>Diretriz:</strong> Plugins must use WordPress' default libraries.</p>
+<ul>
+<li>WordPress inclui jQuery, Atom Lib, SimplePie, PHPMailer, PHPass, etc.</li>
+<li>Plugins nao podem incluir essas bibliotecas no proprio codigo.</li>
+<li>Devem usar as versoes empacotadas com o WordPress.</li>
+</ul>
+<hr />
+<h2 id="14-evitar-commits-frequentes">14. Evitar Commits Frequentes</h2>
+<p><strong>Diretriz:</strong> Frequent commits to a plugin should be avoided.</p>
+<ul>
+<li>O repositorio SVN e de release, nao de desenvolvimento.</li>
+<li>Apenas codigo pronto para deploy deve ser enviado.</li>
+<li>Commits rapidos e repetidos que apenas ajustam aspectos menores podem ser vistos como gaming da lista Recently Updated.</li>
+</ul>
+<hr />
+<h2 id="15-incrementar-versao-a-cada-release">15. Incrementar Versao a Cada Release</h2>
+<p><strong>Diretriz:</strong> Plugin version numbers must be incremented for each new release.</p>
+<ul>
+<li>Usuarios so sao alertados de updates quando a versao aumenta.</li>
+<li>O readme.txt do trunk deve sempre refletir a versao atual.</li>
+</ul>
+<hr />
+<h2 id="16-plugin-completo-na-submissao">16. Plugin Completo na Submissao</h2>
+<p><strong>Diretriz:</strong> A complete plugin must be available at the time of submission.</p>
+<ul>
+<li>Nao e possivel reservar nomes para uso futuro.</li>
+<li>Um zip completo e exigido na submissao.</li>
+</ul>
+<hr />
+<h2 id="17-respeitar-marcas-registradas">17. Respeitar Marcas Registradas</h2>
+<p><strong>Diretriz:</strong> Plugins must respect trademarks, copyrights, and project names.</p>
+<ul>
+<li>Nao usar marcas registradas ou nomes de outros projetos como termo inicial do slug.</li>
+<li>Exemplo: nao usar wordpress no slug.</li>
+</ul>
+<hr />
+<h2 id="requisitos-adicionais-de-seguranca-e-privacidade">Requisitos Adicionais de Seguranca e Privacidade</h2>
+<h3 id="seguranca">Seguranca</h3>
+<ul>
+<li>Todo input do usuario deve ser validado e sanitizado.</li>
+<li>Todo output deve ser escapado.</li>
+<li>Usar nonces para proteger acoes.</li>
+<li>Verificar capabilities antes de executar acoes administrativas.</li>
+<li>Nao gerar notices/warnings com WP_DEBUG ativado.</li>
+</ul>
+<h3 id="privacidade">Privacidade</h3>
+<ul>
+<li>Plugins que coletam, usam, armazenam ou passam dados pessoais a terceiros devem usar wp_add_privacy_policy_content().</li>
+<li>Devem fornecer callbacks de Personal Data Exporter e Personal Data Eraser quando aplicavel.</li>
+<li>Devem documentar quais dados sao coletados, como sao usados e com quem sao compartilhados.</li>
+</ul>
+<h3 id="plugin-check-pcp">Plugin Check (PCP)</h3>
+<ul>
+<li>O WordPress.org exige que novos plugins passem no Plugin Check antes da aprovaao.</li>
+<li>Plugins re-listados apos problemas de seguranca tambem devem passar nos checks de seguranca.</li>
+<li>O PCP verifica: seguranca, performance, acessibilidade, i18n, e conformidade com diretrizes.</li>
+</ul>
+<hr />
+<h2 id="checklist-de-submissao">Checklist de Submissao</h2>
+<ul>
+<li>[ ] Licenca GPL compativel (GPLv2 ou later)</li>
+<li>[ ] readme.txt valido com todos os headers obrigatorios</li>
+<li>[ ] Codigo legivel, nao ofuscado</li>
+<li>[ ] Sem trialware</li>
+<li>[ ] Sem tracking sem consentimento explicito</li>
+<li>[ ] Sem codigo executavel de terceiros (exceto SaaS documentado)</li>
+<li>[ ] Sem hijack de dashboard</li>
+<li>[ ] Maximo 12 tags no readme</li>
+<li>[ ] Usa bibliotecas padrao do WordPress (nao inclui jQuery, etc.)</li>
+<li>[ ] Versao incrementada</li>
+<li>[ ] Plugin completo e funcional</li>
+<li>[ ] Nome do plugin nao viola marcas registradas</li>
+<li>[ ] Seguranca: input sanitizado, output escapado, nonces, capabilities</li>
+<li>[ ] Privacidade: wp_add_privacy_policy_content() se aplicavel</li>
+<li>[ ] Passa no Plugin Check (PCP)</li>
+</ul>
+              
+            </div>
+          </div><footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="Footer Navigation">
+        <a href="../php-compatibility/" class="btn btn-neutral float-left" title="PHP compatibility"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+        <a href="../wordpress-org-audit-report/" class="btn btn-neutral float-right" title="WordPress.org audit report">Next <span class="icon icon-circle-arrow-right"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+          
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="Versions">
+  <span class="rst-current-version" data-toggle="rst-current-version">
+    
+        <span>
+          <a href="https://github.com/InfoAmazonia/jeo-plugin" class="fa fa-github" style="color: #fcfcfc"> GitHub</a>
+        </span>
+    
+    
+      <span><a href="../php-compatibility/" style="color: #fcfcfc">&laquo; Previous</a></span>
+    
+    
+      <span><a href="../wordpress-org-audit-report/" style="color: #fcfcfc">Next &raquo;</a></span>
+    
+  </span>
+</div>
+    <script src="../../js/jquery-3.6.0.min.js"></script>
+    <script>var base_url = "../..";</script>
+    <script src="../../js/theme_extra.js"></script>
+    <script src="../../js/theme.js"></script>
+      <script src="../../search/main.js"></script>
+    <script>
+        jQuery(function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        });
+    </script>
+
+</body>
+</html>
