@@ -90,7 +90,7 @@ if [[ "$SKIP_I18N" == false ]]; then
 		ok "Translations compiled"
 	else
 		warn "WP-CLI not found. Skipping translation compilation."
-		warn "Install WP-CLI and rerun without --skip-i18n to build .mo/.json files."
+		warn "Install WP-CLI and rerun without --skip-i18n to build .mo/.l10n.php/.json files."
 	fi
 else
 	step "Skipping translation compilation (--skip-i18n)"

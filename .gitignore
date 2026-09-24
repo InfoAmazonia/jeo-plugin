@@ -11,6 +11,7 @@ node_modules
 src/js/build
 src/languages/*.mo
 src/languages/*.json
+src/languages/*.l10n.php
 jeo.zip
 jeowp.zip
 .env
