@@ -22,6 +22,17 @@ export default defineConfig({
   server: {
     host: true, // listen on all interfaces so the tunnel can reach it
     allowedHosts: ngrokHosts,
+    // Integrated local preview (`npm run dev:site`): the documentation
+    // dev server (VitePress on port 5174) is proxied under /docs so both
+    // halves of the site share one origin — the landing docs CTAs and
+    // the /docs/ redirect work unchanged during development.
+    proxy: {
+      '/docs': {
+        target: 'http://localhost:5174',
+        changeOrigin: true,
+        ws: true, // VitePress HMR websocket
+      },
+    },
   },
   preview: {
     host: true,
