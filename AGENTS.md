@@ -46,7 +46,7 @@ npm run test:unit -- path/to/file.test.js          # single file
 npm run test:unit -- -t "name of the test case"    # single test by name
 npm run sync:version               # Sync version across src/jeo.php, package.json, package-lock.json, and translation catalogs
 
-# Docs (VitePress — source docs/, output committed to site/docs/)
+# Docs (VitePress — source docs/, local build output in site/docs/, gitignored)
 npm --prefix docs run docs:dev     # Dev server with live reload
 npm --prefix docs run docs:build   # Production build into site/docs/
 
@@ -210,7 +210,7 @@ GitHub Actions run via **9 workflows** in `.github/workflows/` plus a shared com
 - `phpcs-wpcs.yml` — WPCS lint
 - `node-frontend.yml` — Node build + Jest tests
 - `dependency-review.yml` — Dependency security review
-- `docs-site.yml` — Complete site build (landing + docs, committed to `site/`)
+- `deploy-site.yml` — Builds the complete site (landing + docs) on push to master and publishes it to the `gh-pages` branch (GitHub Pages at jeowp.org, guarantees `.nojekyll` + `CNAME`)
 
 ### WordPress.org Compliance Rules
 

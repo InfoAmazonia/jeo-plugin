@@ -96,7 +96,7 @@ requirement, used after the switch.
 | PHP Compat | `php-compat.yml` | Push/PR |
 | WP Smoke | `wordpress-smoke.yml` | Push/PR |
 | Deploy WP.org | `deploy-wordpress-org.yml` | Tag push |
-| Docs | `docs-site.yml` | Push main |
+| Site (landing + docs) → gh-pages | `deploy-site.yml` | Push master |
 
 ## Node.js
 
