@@ -74,7 +74,7 @@ export default defineConfig({
     },
 
     nav: [
-      { text: 'Home', link: 'https://jeowp.org/' },
+      { text: 'Home', link: '/' },
       {
         text: 'Plugin',
         items: [
@@ -121,7 +121,7 @@ export default defineConfig({
     ],
 
     sidebar: [
-      { text: 'Home', link: 'https://jeowp.org/' },
+      { text: 'Home', link: '/' },
       {
         text: 'Plugin',
         items: [
