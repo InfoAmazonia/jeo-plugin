@@ -52,6 +52,7 @@ npm --prefix docs run docs:build   # Production build into site/docs/
 
 # Complete site (landing landing-page/ → site/, docs → site/docs/)
 npm run build:site                 # Builds both (installs deps first)
+npm run preview:site               # Serve site/ at http://localhost:4174 (landing + /docs/)
 LANDING_BASE=/novo npm --prefix landing-page run build    # Homolog under a subpath
 
 # i18n (requires WP-CLI)
