@@ -34,6 +34,7 @@
 		"i18n:compile": "npm run i18n:mo && npm run i18n:php && npm run i18n:json",
 		"i18n:refresh": "npm run build:assets && npm run i18n:pot && npm run i18n:po",
 		"build": "npm run build:assets && npm run i18n:compile",
+		"build:site": "npm --prefix site-novo/www install --no-audit --no-fund && npm --prefix site-novo/www run build && npm --prefix docs install --no-audit --no-fund && npm --prefix docs run docs:build",
 		"build:release": "npm run build",
 		"build:report": "size-limit",
 		"test:unit": "wp-scripts test-unit-js",

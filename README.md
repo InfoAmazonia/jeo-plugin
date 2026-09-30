@@ -203,18 +203,17 @@ installation in WordPress.
 
 ## Documentation
 
-The documentation source lives in `docs/` and is built with VitePress
-(Node 24). The published static site lives in `site/docs/` and is served at
-`https://www.jeowp.org/docs/`. The landing page itself lives outside this
-repository build and is served at `https://www.jeowp.org/`; `/docs/` redirects
-to it.
+The landing page lives in `site-novo/www/` (React + Vite) and is served at
+`https://www.jeowp.org/`. The documentation lives in `docs/` (VitePress,
+Node 24) and is served at `https://www.jeowp.org/docs/`. Both are published
+together: the landing build fills in `site/` and the docs build fills in
+`site/docs/`.
 
-To rebuild it locally:
+To build the complete site locally:
 
 ```bash
-npm --prefix docs ci
-npm --prefix docs run docs:build   # outputs to site/docs/
+npm run build:site   # landing → site/, docs → site/docs/
 ```
 
-Changes to `docs/` on `master` automatically regenerate and commit `site/`
-through `.github/workflows/docs-site.yml`.
+Changes to `docs/` or `site-novo/www/` on `master` automatically regenerate
+and commit `site/` through `.github/workflows/docs-site.yml`.

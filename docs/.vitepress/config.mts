@@ -27,7 +27,6 @@ const pages = [
   'one-time-map-block',
   'stories-near-you',
   'story-map',
-  'usability-issues',
 ]
 
 const devPages = [
