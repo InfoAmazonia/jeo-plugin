@@ -39,14 +39,6 @@ const devPages = [
   'php-compatibility',
 ]
 
-const rewrites: Record<string, string> = {}
-for (const page of pages) {
-  rewrites[`${page}.md`] = `${page}/index.md`
-}
-for (const page of devPages) {
-  rewrites[`dev/${page}.md`] = `dev/${page}/index.md`
-}
-
 export default defineConfig({
   lang: 'en',
   title: 'JEO Maps',
@@ -57,7 +49,6 @@ export default defineConfig({
   base: '/docs/',
   cleanUrls: true,
   srcExclude: ['README.md'],
-  rewrites,
 
   // Build straight into the committed site/ tree (same contract as MkDocs)
   outDir: '../site/docs',

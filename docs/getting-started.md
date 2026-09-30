@@ -31,6 +31,6 @@ Under **Jeo → AI**, you can configure AI-powered features:
 * Set up the Knowledge Base (RAG) to index your posts and layers for smarter AI results.
 * Configure bulk geolocation for processing posts in batches.
 
-See [AI Settings](/ai-settings/) for detailed instructions.
+See [AI Settings](ai-settings.md) for detailed instructions.
 
 ![JEO AI Settings](img/ai-settings-provider.png)
