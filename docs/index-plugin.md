@@ -22,52 +22,52 @@ You can post geolocated stories and create richly designed pages for each one of
 
 ### Getting started
 
-- [Concepts](concepts.md)
-- [Installing and configuring the plugin](getting-started.md)
+- [Concepts](/concepts/)
+- [Installing and configuring the plugin](/getting-started/)
 
 ### Layers
 
-- [Creating layers](layer-post.md)
+- [Creating layers](/layer-post/)
 
 ### Maps
 
-- [Creating maps](map-post.md)
+- [Creating maps](/map-post/)
 
 ### Discovery
 
-- [Using discovery](discovery.md)
+- [Using discovery](/discovery/)
 
 ### Story Map
 
-- [Creating and using Story Map](story-map.md)
+- [Creating and using Story Map](/story-map/)
 
 ### Posts
 
-- [Geolocating posts](geolocating-posts.md)
-- [AI Georeferencing](ai-georeferencing.md)
-- [AI Bulk Geolocation](ai-bulk-geolocation.md)
-- [Using a map shortcode](map-shortcode.md)
-- [Using a map block](map-block.md)
-- [Using an one-time map block](one-time-map-block.md)
-- [Using a map embed](map-embed.md)
+- [Geolocating posts](/geolocating-posts/)
+- [AI Georeferencing](/ai-georeferencing/)
+- [AI Bulk Geolocation](/ai-bulk-geolocation/)
+- [Using a map shortcode](/map-shortcode/)
+- [Using a map block](/map-block/)
+- [Using an one-time map block](/one-time-map-block/)
+- [Using a map embed](/map-embed/)
 
 ### AI Features
 
-- [AI Settings](ai-settings.md)
-- [Minimap — AI-Assisted Map Block](minimap.md)
+- [AI Settings](/ai-settings/)
+- [Minimap — AI-Assisted Map Block](/minimap/)
 
 ### Stories Near You
 
-- [Stories Near You block](stories-near-you.md)
+- [Stories Near You block](/stories-near-you/)
 
 ## Developer documentation
 
 ### Tutorials
 
-- [Adding new Layer Types](dev/layer-types.md)
-- [Geographical Information of a post](dev/geo-information.md)
-- [Writing a Geocoder](dev/geocoders.md)
+- [Adding new Layer Types](/dev/layer-types/)
+- [Geographical Information of a post](/dev/geo-information/)
+- [Writing a Geocoder](/dev/geocoders/)
 
 ### Differences between the old and the present JEO
 
-- [Migration](dev/migration.md)
+- [Migration](/dev/migration/)

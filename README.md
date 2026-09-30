@@ -203,14 +203,18 @@ installation in WordPress.
 
 ## Documentation
 
-The documentation source lives in `docs/`.
-The published static site lives in `site/` and is generated with MkDocs.
+The documentation source lives in `docs/` and is built with VitePress
+(Node 24). The published static site lives in `site/docs/` and is served at
+`https://www.jeowp.org/docs/`. The landing page itself lives outside this
+repository build and is served at `https://www.jeowp.org/`; `/docs/` redirects
+to it.
 
 To rebuild it locally:
 
 ```bash
-python3 -m pip install -r requirements-docs.txt
-python3 -m mkdocs build --clean
+npm --prefix docs ci
+npm --prefix docs run docs:build   # outputs to site/docs/
 ```
 
-Changes to `docs/`, `mkdocs.yml` or `requirements-docs.txt` on `master` automatically regenerate and commit `site/` through `.github/workflows/docs-site.yml`.
+Changes to `docs/` on `master` automatically regenerate and commit `site/`
+through `.github/workflows/docs-site.yml`.

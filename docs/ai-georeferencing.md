@@ -2,7 +2,7 @@
 
 JEO can automatically georeference your posts using AI. Instead of manually searching and adding geolocation points, the AI analyzes your post content and suggests relevant locations with coordinates and confidence scores.
 
-See [AI in JEO](ai-in-jeo.md) for an overview of how the AI system works.
+See [AI in JEO](/ai-in-jeo/) for an overview of how the AI system works.
 
 ## How it works
 
@@ -51,5 +51,5 @@ The conversation history is preserved per post, so you can continue refining in 
 
 ## Requirements
 
-- An AI provider must be configured in **Jeo → AI** (see [AI Settings](ai-settings.md)).
+- An AI provider must be configured in **Jeo → AI** (see [AI Settings](/ai-settings/)).
 - The post must have a title and/or content for the AI to analyze.

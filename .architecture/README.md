@@ -65,7 +65,7 @@ jeo-plugin/
 │   ├── templates/                # PHP + EJS templates
 │   └── languages/                # .pot / translations
 ├── scripts/                      # Build and CI scripts
-├── docs/                         # MkDocs documentation
+├── docs/                         # Documentation (VitePress → site/docs/)
 └── .github/workflows/            # CI/CD
 ```
 

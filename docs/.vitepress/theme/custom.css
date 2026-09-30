@@ -1,0 +1,40 @@
+/*
+ * JEO brand theme — palette from jeowp.org/novo:
+ * green #00DBA6, green-dark #019875, accent #00A67E,
+ * navy #0A1628, footer navy #101C2E, light #FAFAF8, mint #E8F0E8,
+ * elevated navy #13223A, gradient to #6FF0D2.
+ */
+
+:root {
+  --vp-c-brand-1: #019875;
+  --vp-c-brand-2: #00a67e;
+  --vp-c-brand-3: #00dba6;
+  --vp-c-brand-soft: rgba(0, 166, 126, 0.14);
+
+  --vp-font-family-base:
+    'Open Sans Variable', 'Open Sans', -apple-system, BlinkMacSystemFont,
+    'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+  --vp-home-hero-name-color: transparent;
+  --vp-home-hero-name-background: linear-gradient(120deg, #019875, #00dba6);
+
+  --vp-home-hero-image-background-image: linear-gradient(
+    -45deg,
+    rgba(1, 152, 117, 0.33),
+    rgba(0, 219, 166, 0.33)
+  );
+  --vp-home-hero-image-filter: blur(44px);
+}
+
+.dark {
+  --vp-c-brand-1: #00dba6;
+  --vp-c-brand-2: #00c79b;
+  --vp-c-brand-3: #6ff0d2;
+  --vp-c-brand-soft: rgba(0, 219, 166, 0.16);
+
+  /* Brand navy background (matches jeowp.org/novo) */
+  --vp-c-bg: #0a1628;
+  --vp-c-bg-alt: #0d1b30;
+  --vp-c-bg-elv: #13223a;
+  --vp-c-bg-soft: #13223a;
+}

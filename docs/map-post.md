@@ -38,7 +38,7 @@ Some layer types support custom styling. When using **Mapbox vector tiles** with
 
 ![Layer settings](img/layer-settings.png)
 
-[Check out how to create new layers here](layer-post.md)
+[Check out how to create new layers here](/layer-post/)
 
 ## Related posts
 

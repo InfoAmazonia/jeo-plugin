@@ -8,7 +8,7 @@ The Bulk Geolocation system processes posts in batches using WordPress cron (WP-
 
 ## Setting up
 
-1. Configure an AI provider in **Jeo → AI** (see [AI Settings](ai-settings.md)).
+1. Configure an AI provider in **Jeo → AI** (see [AI Settings](/ai-settings/)).
 2. Go to the **Bulk Geolocation** tab in **Jeo → AI**.
 3. Select the post types to process, set the confidence threshold, and configure the batch size.
 4. Start the bulk process.

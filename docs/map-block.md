@@ -1,6 +1,6 @@
 # Map block
 
-After [creating maps](map-post.md), you can display them inside any post using the **JEO Map** block.
+After [creating maps](/map-post/), you can display them inside any post using the **JEO Map** block.
 
 ## Adding a map to a post
 
@@ -42,7 +42,7 @@ Besides the alignment option, there's also a group functionality available to ar
 
 ## Layer swapping
 
-If your map has more than one layer, you can swap them and select which one you want to see, depending on the map layer settings. [Check out more about map layers here](layer-post.md)
+If your map has more than one layer, you can swap them and select which one you want to see, depending on the map layer settings. [Check out more about map layers here](/layer-post/)
 
 ![Swapping layers - Example 1](img/swapping-layers-example1.png)
 

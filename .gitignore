@@ -38,3 +38,8 @@ dump.sql
 .DS_Store
 Thumbs.db
 dist/
+
+# Docs (VitePress)
+docs/node_modules/
+docs/.vitepress/cache/
+docs/.vitepress/dist/

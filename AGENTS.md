@@ -46,6 +46,10 @@ npm run test:unit -- path/to/file.test.js          # single file
 npm run test:unit -- -t "name of the test case"    # single test by name
 npm run sync:version               # Sync version across src/jeo.php, package.json, package-lock.json, and translation catalogs
 
+# Docs (VitePress — source docs/, output committed to site/docs/)
+npm --prefix docs run docs:dev     # Dev server with live reload
+npm --prefix docs run docs:build   # Production build into site/docs/
+
 # i18n (requires WP-CLI)
 npm run i18n:pot                   # Regenerate src/languages/jeowp.pot
 npm run i18n:po                    # Update PO files from POT
@@ -200,7 +204,7 @@ GitHub Actions run via **9 workflows** in `.github/workflows/` plus a shared com
 - `phpcs-wpcs.yml` — WPCS lint
 - `node-frontend.yml` — Node build + Jest tests
 - `dependency-review.yml` — Dependency security review
-- `docs-site.yml` — Documentation site deploy
+- `docs-site.yml` — Documentation site (VitePress) build, committed to `site/docs/`
 
 ### WordPress.org Compliance Rules
 
