@@ -37,8 +37,6 @@ const devPages = [
   'layer-types-api',
   'migration',
   'php-compatibility',
-  'wordpress-org-audit-report',
-  'wordpress-org-compliance',
 ]
 
 const rewrites: Record<string, string> = {}
@@ -51,7 +49,7 @@ for (const page of devPages) {
 
 export default defineConfig({
   lang: 'en',
-  title: 'JEO',
+  title: 'JEO Maps',
   description:
     'Open geojournalism platform for WordPress: publish news stories as layers of information on interactive maps.',
 
@@ -69,12 +67,21 @@ export default defineConfig({
 
   themeConfig: {
     logo: {
-      light: '/logo-light.svg',
-      dark: '/logo-dark.svg',
+      light: { src: '/logo-light.svg', alt: 'JEO Maps' },
+      dark: { src: '/logo-dark.svg', alt: 'JEO Maps' },
     },
 
+    // The logo SVG already carries the "JEO Maps" wordmark — showing the
+    // site title next to it would duplicate the brand. The page-level
+    // `title` ("JEO Maps") still names browser tabs and search results.
+    siteTitle: false,
+
     nav: [
-      { text: 'Home', link: '/' },
+      // The landing lives at the site root, outside of /docs/ — an absolute
+      // URL is required because VitePress prefixes internal links with the
+      // base. `target: '_self'` keeps the default external-link "_blank"
+      // from applying.
+      { text: 'Home', link: 'https://jeowp.org/', target: '_self' },
       {
         text: 'Plugin',
         items: [
@@ -113,15 +120,14 @@ export default defineConfig({
           { text: 'Layer types API', link: '/dev/layer-types-api/' },
           { text: 'Migration', link: '/dev/migration/' },
           { text: 'PHP compatibility', link: '/dev/php-compatibility/' },
-          { text: 'WordPress.org compliance', link: '/dev/wordpress-org-compliance/' },
-          { text: 'WordPress.org audit report', link: '/dev/wordpress-org-audit-report/' },
           { text: 'Dependency maintenance', link: '/dev/dependency-maintenance/' },
         ],
       },
+      { text: 'Download', link: 'https://wordpress.org/plugins/jeowp/' },
     ],
 
     sidebar: [
-      { text: 'Home', link: '/' },
+      { text: 'Home', link: 'https://jeowp.org/', target: '_self' },
       {
         text: 'Plugin',
         items: [
@@ -160,8 +166,6 @@ export default defineConfig({
           { text: 'Layer types API', link: '/dev/layer-types-api/' },
           { text: 'Migration', link: '/dev/migration/' },
           { text: 'PHP compatibility', link: '/dev/php-compatibility/' },
-          { text: 'WordPress.org compliance', link: '/dev/wordpress-org-compliance/' },
-          { text: 'WordPress.org audit report', link: '/dev/wordpress-org-audit-report/' },
           { text: 'Dependency maintenance', link: '/dev/dependency-maintenance/' },
         ],
       },
