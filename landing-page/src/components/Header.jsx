@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { Menu, X, Globe, ChevronDown } from 'lucide-react'
 import { useI18n, LANGUAGES } from '../i18n/index.jsx'
-import wordmark from '../assets/v3-jeo-maps-wordmark.png'
+import wordmark from '../assets/v3-jeo-maps-wordmark.svg'
 import { DOWNLOAD_URL } from '../links.js'
 
 const ANCHORS = ['#top', '#recursos', '#inteligencia-artificial', '#experimente']
