@@ -70,6 +70,8 @@ export default defineConfig({
       light: { src: '/logo-light.svg', alt: 'JEO Maps' },
       dark: { src: '/logo-dark.svg', alt: 'JEO Maps' },
     },
+    // Logo click goes to the landing page, not the docs home.
+    logoLink: 'https://jeowp.org/',
 
     // The logo SVG already carries the "JEO Maps" wordmark — showing the
     // site title next to it would duplicate the brand. The page-level
@@ -77,11 +79,7 @@ export default defineConfig({
     siteTitle: false,
 
     nav: [
-      // The landing lives at the site root, outside of /docs/ — an absolute
-      // URL is required because VitePress prefixes internal links with the
-      // base. `target: '_self'` keeps the default external-link "_blank"
-      // from applying.
-      { text: 'Home', link: 'https://jeowp.org/', target: '_self' },
+      { text: 'Home', link: '/' },
       {
         text: 'Plugin',
         items: [
@@ -127,7 +125,7 @@ export default defineConfig({
     ],
 
     sidebar: [
-      { text: 'Home', link: 'https://jeowp.org/', target: '_self' },
+      { text: 'Home', link: '/' },
       {
         text: 'Plugin',
         items: [
