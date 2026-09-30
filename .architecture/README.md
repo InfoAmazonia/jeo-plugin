@@ -66,7 +66,7 @@ jeo-plugin/
 │   └── languages/                # .pot / translations
 ├── scripts/                      # Build and CI scripts
 ├── docs/                         # Documentation (VitePress → site/docs/)
-├── site-novo/www/                # Landing page (React + Vite → site/)
+├── landing-page/                 # Landing page (React + Vite → site/)
 └── .github/workflows/            # CI/CD
 ```
 

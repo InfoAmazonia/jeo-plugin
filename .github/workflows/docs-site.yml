@@ -6,7 +6,7 @@ on:
       - master
     paths:
       - docs/**
-      - site-novo/www/**
+      - landing-page/**
       - package.json
       - .github/workflows/docs-site.yml
   workflow_dispatch:
@@ -30,7 +30,7 @@ jobs:
           cache: npm
           cache-dependency-path: |
             docs/package-lock.json
-            site-novo/www/package-lock.json
+            landing-page/package-lock.json
 
       - name: Build site (landing + docs)
         run: npm run build:site

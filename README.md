@@ -203,7 +203,7 @@ installation in WordPress.
 
 ## Documentation
 
-The landing page lives in `site-novo/www/` (React + Vite) and is served at
+The landing page lives in `landing-page/` (React + Vite) and is served at
 `https://www.jeowp.org/`. The documentation lives in `docs/` (VitePress,
 Node 24) and is served at `https://www.jeowp.org/docs/`. Both are published
 together: the landing build fills in `site/` and the docs build fills in

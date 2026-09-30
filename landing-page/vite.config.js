@@ -15,7 +15,7 @@ export default defineConfig({
 	// subpath (e.g. jeowp.org/novo/), set LANDING_BASE=/novo.
 	base: process.env.LANDING_BASE ?? '/',
 	build: {
-		outDir: process.env.LANDING_OUT_DIR ?? '../../site',
+		outDir: process.env.LANDING_OUT_DIR ?? '../site',
 		emptyOutDir: true,
 	},
 	plugins: [react()],
