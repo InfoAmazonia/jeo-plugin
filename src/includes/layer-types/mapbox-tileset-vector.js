@@ -17,7 +17,7 @@
 			sources: {
 				[ name ]: {
 					type: attributes.layer_type_options.style_source_type,
-					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+					url: tileset_id,
 				},
 			},
 			layers: [
@@ -40,7 +40,7 @@
 
 		map.addSource( attributes.layer_id, {
 			type: attributes.layer_type_options.style_source_type,
-			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+			url: tileset_id,
 		} );
 
 		const layer = {
@@ -52,6 +52,45 @@
 				visibility: attributes.visible ? 'visible' : 'none',
 			},
 		};
+
+		const effectiveStyle = ( attributes.style?.use_default )
+			? ( attributes.default_style || {} )
+			: ( attributes.style || {} );
+
+		if ( effectiveStyle.filter ) {
+			layer.filter = effectiveStyle.filter;
+		}
+
+		if ( effectiveStyle.paint ) {
+			layer.paint = { ...effectiveStyle.paint };
+		}
+
+		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
+		if ( opacity < 1 ) {
+			const opacityProps = [ 'fill-opacity', 'line-opacity', 'circle-opacity', 'symbol-opacity', 'heatmap-opacity', 'fill-extrusion-opacity' ];
+			const paint = layer.paint || {};
+			opacityProps.forEach( ( prop ) => {
+				if ( typeof paint[ prop ] === 'number' ) {
+					paint[ prop ] = paint[ prop ] * opacity;
+				}
+			} );
+			layer.paint = paint;
+		}
+
+		if ( ! layer.paint ) {
+			// No saved/AI style: apply a visible fallback so catalog layers picked
+			// by the Minimap don't render invisibly (see JeoLayerTypes.getFallbackPaint).
+			const fallbackPaint = window.JeoLayerTypes?.getFallbackPaint?.(
+				attributes.layer_type_options.type
+			);
+			if ( fallbackPaint ) {
+				layer.paint = fallbackPaint;
+			}
+		}
+
+		if ( effectiveStyle.layout ) {
+			layer.layout = { ...layer.layout, ...effectiveStyle.layout };
+		}
 
 		if ( addLayerParams ) {
 			return map.addLayer( layer, ...addLayerParams );
@@ -101,6 +140,14 @@
 					type: 'string',
 					default: 'vector',
 					disabled: true,
+				},
+				access_token: {
+					type: 'string',
+					title: __( 'Access token', 'jeowp' ),
+					description: __(
+						'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+						'jeowp'
+					),
 				},
 			},
 		};

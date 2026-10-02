@@ -1,0 +1,37 @@
+[
+  {
+    "name": "Terra Indígena Yanomami",
+    "type": "indigenous_territory",
+    "lat": 1.543,
+    "lng": -63.535,
+    "aliases": ["TI Yanomami", "Reserva Yanomami", "Povo Yanomami", "Território Yanomami"]
+  },
+  {
+    "name": "Terra Indígena Raposa Serra do Sol",
+    "type": "indigenous_territory",
+    "lat": 4.120,
+    "lng": -60.150,
+    "aliases": ["TI Raposa Serra do Sol", "Raposa Serra do Sol"]
+  },
+  {
+    "name": "Terra Indígena Munduruku",
+    "type": "indigenous_territory",
+    "lat": -6.650,
+    "lng": -57.250,
+    "aliases": ["TI Munduruku", "Povo Munduruku"]
+  },
+  {
+    "name": "Parque Indígena do Xingu",
+    "type": "indigenous_territory",
+    "lat": -12.150,
+    "lng": -53.300,
+    "aliases": ["TI Xingu", "Território do Xingu", "Reserva do Xingu"]
+  },
+  {
+    "name": "Terra Indígena Kayapó",
+    "type": "indigenous_territory",
+    "lat": -7.850,
+    "lng": -52.000,
+    "aliases": ["TI Kayapó", "Povo Kayapó"]
+  }
+]

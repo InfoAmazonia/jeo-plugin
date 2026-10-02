@@ -4,7 +4,7 @@ This document describes how to register new Layer Types to be used in maps creat
 
 ## Introduction
 
-In JEO, maps are rendered using the [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/api/) JavaScript library. Any new layer type will have to interact with this library to add the layer to the map.
+In JEO, maps are rendered using either [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/API/) (default) or [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/api/), depending on the **map runtime** setting configured in **Jeo → Settings**. Both libraries share a compatible API based on the [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/), so any new layer type will work with either runtime. The initialized `map` object passed to layer type methods is a MapLibre GL or Mapbox GL `Map` instance — both expose the same core methods (`setStyle`, `addLayer`, `addSource`, etc.).
 
 Basically, to add a new layer type, there are 2 simple steps:
 
@@ -104,14 +104,14 @@ For example, the "Tile layer" layer type needs only a URL, so that's how its `ge
 
 **params**:
 
-- `map` - the initialized Mapbox [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object
+- `map` - the initialized MapLibre GL [Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/) or Mapbox GL [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object, depending on the configured map runtime
 - `attributes` - object with the layer attributes (See Layer attributes section below)
 
 **returns**:
 
 - The return of a call to [`map.setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle)
 
-In MapboxGL, every map has a [Style](https://docs.mapbox.com/mapbox-gl-js/style-spec/) as a base layer. This method will add the layer as the Map Style, using the [setStyle](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) method of the [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object.
+Both runtimes use the [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/) as a base layer. This method will add the layer as the Map Style, using the [`setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) method of the `Map` object.
 
 This method will be invoked when a layer of this type is added to the map as the base layer.
 
@@ -145,14 +145,14 @@ For example, the "Tile Layer" layer type sets the style as a raster layer:
 
 **params**:
 
-- `map` - the initialized Mapbox [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object
+- `map` - the initialized MapLibre GL [Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/) or Mapbox GL [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object, depending on the configured map runtime
 - `attributes` - object with the layer attributes (See Layer attributes section below)
 
 **returns**:
 
 - The return of a call to [`map.addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer)
 
-This method will add the layer to the map using the [addLayer](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer) method of the [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object.
+This method will add the layer to the map using the [`addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer) method of the `Map` object.
 
 This method will be invoked when a layer of this type is added to the map.
 

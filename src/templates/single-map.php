@@ -49,13 +49,17 @@ if ( isset( $post->ID ) && jeo()->is_preview_request_for_post( $post->ID ) && cu
 <?php else : ?>
 	<?php jeo_template_header(); ?>
 	<main id="site-content" role="main">
-		<?php get_the_title(); ?>
-		<div
-			class="jeomap map_id_<?php echo esc_attr( $post->ID ); ?>"
-			<?php if ( $preview_map ) : ?>
-				data-preview-map="<?php echo esc_attr( wp_json_encode( $preview_map ) ); ?>"
-			<?php endif; ?>
-		></div>
+		<header class="entry-header">
+			<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
+		</header>
+		<div class="entry-content">
+			<div
+				class="jeomap map_id_<?php echo esc_attr( $post->ID ); ?>"
+				<?php if ( $preview_map ) : ?>
+					data-preview-map="<?php echo esc_attr( wp_json_encode( $preview_map ) ); ?>"
+				<?php endif; ?>
+			></div>
+		</div>
 	</main>
 	<?php jeo_template_footer(); ?>
 <?php endif; ?>

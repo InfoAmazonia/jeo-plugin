@@ -6,7 +6,13 @@ import { __ } from '@wordpress/i18n';
 
 import { Map } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
+import {
+	applyStyleLayerFiltering,
+	findStyleLayer,
+	styleLayerMapProps,
+} from './use-style-layer';
 import JeoAutosuggest from './jeo-autosuggest';
+import { decodeHtmlEntity } from '../shared/html';
 import { useRecordsByIds } from '../shared/rest-records';
 import {
 	applyComposedVisibilityFromSettings,
@@ -26,12 +32,6 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 	useEffect( () => {
 		setKey( ( currentKey ) => currentKey + 1 );
 	}, [ attributes.align, window.screen.width ] );
-
-	const decodeHtmlEntity = function ( str ) {
-		return str.replace( /&#(\d+);/g, function ( match, dec ) {
-			return String.fromCharCode( dec );
-		} );
-	};
 
 	const mapRef = useRef( undefined );
 
@@ -94,6 +94,11 @@ export default function MapEditor ( {attributes, setAttributes } ) {
 	useEffect( () => {
 		applyComposedVisibility();
 	}, [ useComposedPreview, composedPreview.manifest, layerSettingsKey ] );
+
+	const styleBase = useMemo(
+		() => loadedMap?.meta?.layers ? findStyleLayer( loadedLayers, loadedMap.meta.layers ) : null,
+		[ loadedLayers, loadedMap?.meta?.layers ]
+	);
 
 	return (
 		<div { ...blockProps }>

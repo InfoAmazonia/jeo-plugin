@@ -6,10 +6,13 @@ import LayerEditorPreview from './layer-editor-preview';
 import MapDisplay, { MapSave } from './map-display';
 import MapEditor from './map-editor';
 import MapEditorPreview from './map-editor-preview';
+import MinimapDisplay from './minimap-display';
+import MinimapEditor from './minimap-editor';
 import { onetimeMapAttributes } from './onetime-map-config';
 import OnetimeMapDisplay, { OnetimeMapSave } from './onetime-map-display';
 import OnetimeMapEditor from './onetime-map-editor';
-import StorymapEditor from './storymap-editor'
+import StoriesNearYouEditor from './stories-near-you-editor';
+import StorymapEditor from './storymap-editor';
 import MapIcon from '../icons/ion/map';
 import { cloneDeep } from 'lodash';
 import { AsyncModeProvider } from '@wordpress/data';
@@ -66,6 +69,109 @@ registerBlockType( 'jeo/onetime-map', {
 			save: ( props ) => <OnetimeMapDisplay { ...props } />,
 		},
 	],
+} );
+
+registerBlockType( 'jeo/ai-minimap', {
+	title: __( 'AI-Assisted Map', 'jeowp' ),
+	description: __( 'Display an AI-generated contextual map with layers and geolocation pins', 'jeowp' ),
+	category: 'jeo',
+	icon: MapIcon,
+	supports: {
+		align: true,
+	},
+	attributes: {
+		layers: {
+			type: 'array',
+			default: [],
+			items: {
+				type: 'object',
+				properties: {
+					id: { type: 'number' },
+					use: { type: 'string' },
+					default: { type: 'boolean' },
+					show_legend: { type: 'boolean' },
+					load_as_style: { type: 'boolean' },
+					opacity: { type: 'number' },
+				},
+			},
+		},
+		base_layer: {
+			type: 'object',
+			default: null,
+		},
+		center_lat: {
+			type: 'number',
+		},
+		center_lon: {
+			type: 'number',
+		},
+		initial_zoom: {
+			type: 'number',
+		},
+		min_zoom: {
+			type: 'number',
+		},
+		max_zoom: {
+			type: 'number',
+		},
+		disable_scroll_zoom: {
+			type: 'boolean',
+		},
+		disable_drag_pan: {
+			type: 'boolean',
+		},
+		disable_drag_rotate: {
+			type: 'boolean',
+		},
+		enable_fullscreen: {
+			type: 'boolean',
+		},
+		pan_limits: {
+			type: 'object',
+		},
+		pins: {
+			type: 'array',
+			default: [],
+		},
+		show_pins: {
+			type: 'boolean',
+			default: true,
+		},
+		status: {
+			type: 'string',
+			default: 'idle',
+		},
+		message: {
+			type: 'string',
+			default: '',
+		},
+		prompt: {
+			type: 'string',
+			default: '',
+		},
+		conversation_id: {
+			type: 'string',
+			default: '',
+		},
+		conversation: {
+			type: 'array',
+			default: [],
+			items: {
+				type: 'object',
+				properties: {
+					role: { type: 'string' },
+					text: { type: 'string' },
+					ts: { type: 'string' },
+				},
+			},
+		},
+	},
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<MinimapEditor { ...props } />
+		</AsyncModeProvider>
+	),
+	save: ( props ) => <MinimapDisplay { ...props } />,
 } );
 
 const storyMapCleanUp = (props, options = {}) => {
@@ -170,7 +276,32 @@ registerBlockType( 'jeo/storymap', {
 	description: __( 'Display maps with storytelling', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
-	attributes: storymapAttributes,
+	attributes: {
+		map_id: {
+			type: 'number',
+		},
+		description: {
+			type: 'string',
+		},
+		slides: {
+			type: 'array'
+		},
+		navigateButton: {
+			type: 'boolean',
+		},
+		hasIntroduction: {
+			type: 'boolean',
+		},
+		loadedLayers: {
+			type: 'array',
+		},
+		navigateMapLayers: {
+			type: 'array'
+		},
+		postID : {
+			type: 'number',
+		},
+	},
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>
 			<StorymapEditor { ...props } />
@@ -246,36 +377,169 @@ registerBlockType( 'jeo/embedded-storymap', {
 	],
 });
 
-// Editor-only preview blocks for custom post types (map, map-layer).
-// These render the interactive map preview inside the block editor
-// content area, similar to how jeo/storymap works for storymap posts.
-// They are locked in the post type template and hidden from the inserter.
-
-registerBlockType( 'jeo/map-editor', {
+registerBlockType( 'jeo/stories-near-you', {
 	apiVersion: 3,
-	title: __( 'Map Editor Preview', 'jeowp' ),
-	description: __( 'Interactive map preview for the Map post type editor.', 'jeowp' ),
+	title: __( 'Stories Near You', 'jeowp' ),
+	description: __( 'Display geolocated posts sorted by proximity to the reader', 'jeowp' ),
 	category: 'jeo',
 	icon: MapIcon,
 	supports: {
-		inserter: false,
-		html: false,
-		reusable: false,
-		lock: false,
-		customClassName: false,
-		align: [ 'full' ],
-	},
-	attributes: {
-		align: {
-			type: 'string',
-			default: 'full',
+		align: true,
+		color: {
+			text: true,
+			custom: true,
+			background: false,
+			gradients: false,
+			link: true,
 		},
 	},
-	edit: ( props ) => (
-		<AsyncModeProvider value={ true }>
-			<MapEditorPreview { ...props } />
-		</AsyncModeProvider>
-	),
+	attributes: {
+		postsPerPage: {
+			type: 'number',
+			default: 6,
+		},
+		postsPerRow: {
+			type: 'number',
+			default: 3,
+		},
+		category: {
+			type: 'number',
+			default: 0,
+		},
+		tag: {
+			type: 'number',
+			default: 0,
+		},
+		cardLayout: {
+			type: 'string',
+			default: '',
+		},
+		showThumbnail: {
+			type: 'boolean',
+			default: true,
+		},
+		showCategory: {
+			type: 'boolean',
+			default: true,
+		},
+		showDate: {
+			type: 'boolean',
+			default: true,
+		},
+		showExcerpt: {
+			type: 'boolean',
+			default: true,
+		},
+		showAuthor: {
+			type: 'boolean',
+			default: true,
+		},
+		lat: {
+			type: 'number',
+			default: 0,
+		},
+		lng: {
+			type: 'number',
+			default: 0,
+		},
+		postLayout: {
+			type: 'string',
+			default: 'grid',
+		},
+		mediaPosition: {
+			type: 'string',
+			default: 'top',
+		},
+		imageShape: {
+			type: 'string',
+			default: 'landscape',
+		},
+		excerptLength: {
+			type: 'number',
+			default: 55,
+		},
+		showReadMore: {
+			type: 'boolean',
+			default: false,
+		},
+		readMoreLabel: {
+			type: 'string',
+			default: '',
+		},
+		showAvatar: {
+			type: 'boolean',
+			default: true,
+		},
+		colGap: {
+			type: 'number',
+			default: 3,
+		},
+		typeScale: {
+			type: 'number',
+			default: 4,
+		},
+		imageScale: {
+			type: 'number',
+			default: 3,
+		},
+		minHeight: {
+			type: 'number',
+			default: 0,
+		},
+		categories: {
+			type: 'string',
+			default: '',
+		},
+		tags: {
+			type: 'string',
+			default: '',
+		},
+		categoryExclusions: {
+			type: 'string',
+			default: '',
+		},
+		tagExclusions: {
+			type: 'string',
+			default: '',
+		},
+		customTaxonomies: {
+			type: 'string',
+			default: '',
+		},
+		postType: {
+			type: 'string',
+			default: '',
+		},
+		imageSize: {
+			type: 'string',
+			default: 'medium_large',
+		},
+		imageAsLink: {
+			type: 'boolean',
+			default: false,
+		},
+		radius: {
+			type: 'number',
+			default: 100,
+		},
+		orderBy: {
+			type: 'string',
+			default: 'recent',
+		},
+		maxAgeDays: {
+			type: 'number',
+			default: 365,
+		},
+		distanceWeight: {
+			type: 'number',
+			default: 1,
+		},
+		dateWeight: {
+			type: 'number',
+			default: 1,
+		},
+	},
+	edit: StoriesNearYouEditor,
 	save: () => null,
 } );
 
@@ -302,6 +566,34 @@ registerBlockType( 'jeo/layer-editor', {
 	edit: ( props ) => (
 		<AsyncModeProvider value={ true }>
 			<LayerEditorPreview { ...props } />
+		</AsyncModeProvider>
+	),
+	save: () => null,
+} );
+
+registerBlockType( 'jeo/map-editor', {
+	apiVersion: 3,
+	title: __( 'Map Editor Preview', 'jeowp' ),
+	description: __( 'Interactive map preview for the Map post type editor.', 'jeowp' ),
+	category: 'jeo',
+	icon: MapIcon,
+	supports: {
+		inserter: false,
+		html: false,
+		reusable: false,
+		lock: false,
+		customClassName: false,
+		align: [ 'full' ],
+	},
+	attributes: {
+		align: {
+			type: 'string',
+			default: 'full',
+		},
+	},
+	edit: ( props ) => (
+		<AsyncModeProvider value={ true }>
+			<MapEditorPreview { ...props } />
 		</AsyncModeProvider>
 	),
 	save: () => null,

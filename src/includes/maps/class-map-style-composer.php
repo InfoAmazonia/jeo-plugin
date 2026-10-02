@@ -25,7 +25,7 @@ class Map_Style_Composer {
 	use Singleton;
 
 	const CACHE_DIR               = 'jeo-mapbox-composed-styles';
-	const CACHE_VERSION           = 12;
+	const CACHE_VERSION           = 15;
 	const TOKEN_PLACEHOLDER       = '__JEO_MAPBOX_ACCESS_TOKEN__';
 	const DEFAULT_FALLBACK_SPRITE = 'mapbox://sprites/mapbox/standard';
 	const VIRTUAL_SCOPE_PREVIEW   = 'preview';
@@ -440,8 +440,67 @@ class Map_Style_Composer {
 	public function invalidate_layer_cache( $post_id, $post, $update ) {
 		unset( $post, $update );
 
+		$this->purge_layer_style_cache( absint( $post_id ) );
+
 		foreach ( $this->get_map_ids_for_layer( $post_id ) as $map_id ) {
 			$this->invalidate_map_cache( absint( $map_id ), null, true );
+		}
+	}
+
+	/**
+	 * Purge the shared Mapbox style JSON cache for a layer post.
+	 *
+	 * Resolves the layer's style ID and token the same way the composer refs
+	 * do (per-layer token with global fallback) so the cache key matches.
+	 *
+	 * @param int $layer_id Layer post ID.
+	 * @return void
+	 */
+	private function purge_layer_style_cache( $layer_id ) {
+		$type = (string) get_post_meta( $layer_id, 'type', true );
+
+		if ( 'style-json' === $type ) {
+			$options = get_post_meta( $layer_id, 'layer_type_options', true );
+			if ( is_array( $options ) && ! empty( $options['style_url'] ) ) {
+				\Jeo::delete_style_json_cache( (string) $options['style_url'] );
+			}
+			return;
+		}
+
+		if ( 'mapbox' !== $type ) {
+			return;
+		}
+
+		$options = get_post_meta( $layer_id, 'layer_type_options', true );
+		if ( ! is_array( $options ) || empty( $options['style_id'] ) ) {
+			return;
+		}
+
+		$token = ! empty( $options['access_token'] )
+			? (string) $options['access_token']
+			: trim( (string) \jeo_settings()->get_option( 'mapbox_key' ) );
+
+		\Jeo::delete_mapbox_style_cache( (string) $options['style_id'], $token );
+	}
+
+	/**
+	 * Purge the shared style JSON caches for the style refs of a context.
+	 *
+	 * @param array $refs Composer refs.
+	 * @return void
+	 */
+	private function purge_ref_style_caches( array $refs ) {
+		foreach ( $refs as $ref ) {
+			if ( ! empty( $ref['styleUrl'] ) ) {
+				\Jeo::delete_style_json_cache( (string) $ref['styleUrl'] );
+				continue;
+			}
+
+			if ( 'mapbox' !== ( $ref['type'] ?? '' ) || empty( $ref['styleId'] ) ) {
+				continue;
+			}
+
+			\Jeo::delete_mapbox_style_cache( (string) $ref['styleId'], (string) ( $ref['token'] ?? '' ) );
 		}
 	}
 
@@ -534,6 +593,12 @@ class Map_Style_Composer {
 
 		if ( ! wp_mkdir_p( $paths['dir'] ) ) {
 			return new WP_Error( 'jeo_mapbox_composer_cache_dir', __( 'Could not create the Mapbox composed style cache directory.', 'jeowp' ) );
+		}
+
+		if ( $force_refresh ) {
+			// Force-refresh must also bypass the shared style JSON cache,
+			// otherwise recomposition would reuse stale Mapbox styles.
+			$this->purge_ref_style_caches( $context['refs'] );
 		}
 
 		$composed = $this->compose_context( $context, $paths );
@@ -752,11 +817,7 @@ class Map_Style_Composer {
 			return new WP_Error( 'jeo_mapbox_composer_too_many_layers', __( 'The map preview has too many layers to compose.', 'jeowp' ) );
 		}
 
-		$token = trim( (string) \jeo_settings()->get_option( 'mapbox_key' ) );
-		if ( '' === $token ) {
-			return new WP_Error( 'jeo_mapbox_composer_missing_token', __( 'A Mapbox access token is required to compose Mapbox styles.', 'jeowp' ) );
-		}
-
+		$token           = trim( (string) \jeo_settings()->get_option( 'mapbox_key' ) );
 		$include_private = self::VIRTUAL_SCOPE_PREVIEW === $scope;
 		$refs            = $this->build_refs_from_settings( $settings, $token, $include_private );
 		if ( empty( $refs ) ) {
@@ -840,8 +901,31 @@ class Map_Style_Composer {
 				continue;
 			}
 
-			$style_id = 'mapbox' === $type ? $this->normalize_style_id( $options['style_id'] ?? '' ) : null;
-			if ( 'mapbox' === $type && ! $style_id ) {
+			$is_style = \jeo_layer_types()->is_style( $type );
+
+			$style_id     = null;
+			$style_url    = null;
+			$inline_style = null;
+
+			if ( $is_style ) {
+				if ( 'mapbox' === $type ) {
+					$style_id = \Jeo::normalize_mapbox_style_id( $options['style_id'] ?? '' );
+					if ( ! $style_id ) {
+						continue;
+					}
+				} else {
+					// Generic style types (style-json and future providers):
+					// inline JSON takes precedence over the style URL.
+					$inline_style = $this->parse_inline_style( $options['inline_style'] ?? '' );
+					$style_url    = $inline_style ? null : esc_url_raw( trim( (string) ( $options['style_url'] ?? '' ) ) );
+					if ( ! $inline_style && '' === $style_url ) {
+						continue;
+					}
+				}
+			}
+
+			$resolved_token = ! empty( $options['access_token'] ) ? (string) $options['access_token'] : $token;
+			if ( 'mapbox' === $type && '' === $resolved_token ) {
 				continue;
 			}
 
@@ -852,11 +936,15 @@ class Map_Style_Composer {
 				'slug'                 => $layer_post->post_name ? $layer_post->post_name : (string) $layer_id,
 				'type'                 => $type,
 				'options'              => $options,
-				'token'                => ! empty( $options['access_token'] ) ? (string) $options['access_token'] : $token,
+				'token'                => $resolved_token,
 				'styleId'              => $style_id,
+				'styleUrl'             => $style_url,
+				'inlineStyle'          => $inline_style,
 				'loadAsStyle'          => $this->to_bool( $setting['load_as_style'] ?? false ),
 				'use'                  => $setting['use'] ?? null,
 				'default'              => $this->to_bool( $setting['default'] ?? false ),
+				'style'                => $this->sanitize_layer_style( $setting['style'] ?? null ),
+				'defaultStyle'         => $this->sanitize_layer_style( get_post_meta( $layer_id, 'default_style', true ) ),
 				'styleLayerSettings'   => isset( $setting['style_layers'] ) && is_array( $setting['style_layers'] ) ? $this->normalize_array( $setting['style_layers'] ) : array(),
 				'modifiedGmt'          => $layer_post->post_modified_gmt,
 				'layerTypeOptionsHash' => sha1( wp_json_encode( $options ) ),
@@ -864,6 +952,22 @@ class Map_Style_Composer {
 		}
 
 		return $refs;
+	}
+
+	/**
+	 * Parse an inline style JSON string stored in layer_type_options.
+	 *
+	 * @param mixed $raw Raw inline style value.
+	 * @return array|null Parsed style definition, or null when absent/invalid.
+	 */
+	private function parse_inline_style( $raw ) {
+		if ( ! is_string( $raw ) || '' === trim( $raw ) ) {
+			return null;
+		}
+
+		$decoded = json_decode( $raw, true );
+
+		return is_array( $decoded ) ? $decoded : null;
 	}
 
 	/**
@@ -888,6 +992,7 @@ class Map_Style_Composer {
 				'default'       => $this->to_bool( $setting['default'] ?? false ),
 				'load_as_style' => $this->to_bool( $setting['load_as_style'] ?? false ),
 				'show_legend'   => ! array_key_exists( 'show_legend', $setting ) || $this->to_bool( $setting['show_legend'] ),
+				'style'         => $this->sanitize_layer_style( $setting['style'] ?? null ),
 				'style_layers'  => array(),
 			);
 
@@ -908,6 +1013,96 @@ class Map_Style_Composer {
 		}
 
 		return $sanitized;
+	}
+
+	/**
+	 * Sanitize a per-instance layer style object ({ use_default, paint, layout, filter }).
+	 *
+	 * Only scalar paint/layout values and nested scalar arrays (expressions)
+	 * are kept; everything else is dropped.
+	 *
+	 * @param mixed $style Raw style value.
+	 * @return array
+	 */
+	private function sanitize_layer_style( $style ) {
+		if ( ! is_array( $style ) ) {
+			return array();
+		}
+
+		$style     = $this->normalize_array( $style );
+		$sanitized = array();
+
+		if ( array_key_exists( 'use_default', $style ) ) {
+			$sanitized['use_default'] = $this->to_bool( $style['use_default'] );
+		}
+
+		foreach ( array( 'paint', 'layout' ) as $key ) {
+			if ( isset( $style[ $key ] ) && is_array( $style[ $key ] ) ) {
+				$properties = array();
+				foreach ( $this->normalize_array( $style[ $key ] ) as $prop => $value ) {
+					$value = $this->sanitize_style_value( $value );
+					if ( null !== $value ) {
+						$properties[ sanitize_key( (string) $prop ) ] = $value;
+					}
+				}
+				if ( ! empty( $properties ) ) {
+					$sanitized[ $key ] = $properties;
+				}
+			}
+		}
+
+		if ( ! empty( $style['filter'] ) && is_array( $style['filter'] ) ) {
+			$sanitized['filter'] = $this->sanitize_style_value( $this->normalize_array( $style['filter'] ) );
+		}
+
+		return $sanitized;
+	}
+
+	/**
+	 * Sanitize a style value while preserving its scalar type (expression
+	 * arrays are sanitized recursively).
+	 *
+	 * @param mixed $value Raw value.
+	 * @return mixed Sanitized value or null when unsupported.
+	 */
+	private function sanitize_style_value( $value ) {
+		if ( is_string( $value ) ) {
+			return sanitize_text_field( $value );
+		}
+		if ( is_int( $value ) || is_float( $value ) ) {
+			return $value;
+		}
+		if ( is_bool( $value ) ) {
+			return $value;
+		}
+		if ( is_array( $value ) ) {
+			$sanitized = array();
+			foreach ( $this->normalize_array( $value ) as $key => $item ) {
+				$item = $this->sanitize_style_value( $item );
+				if ( null !== $item ) {
+					$sanitized[ $key ] = $item;
+				}
+			}
+			return $sanitized;
+		}
+		return null;
+	}
+
+	/**
+	 * Resolve the effective style for a layer instance: the instance style
+	 * wins, except when it defers to the layer's default_style meta.
+	 *
+	 * @param array $ref Layer reference.
+	 * @return array Effective style (may be empty).
+	 */
+	private function resolve_effective_layer_style( array $ref ) {
+		$instance = isset( $ref['style'] ) && is_array( $ref['style'] ) ? $ref['style'] : array();
+
+		if ( ! empty( $instance['use_default'] ) && ! empty( $ref['defaultStyle'] ) && is_array( $ref['defaultStyle'] ) ) {
+			return $ref['defaultStyle'];
+		}
+
+		return $instance;
 	}
 
 	/**
@@ -932,6 +1127,7 @@ class Map_Style_Composer {
 									'modifiedGmt'          => $ref['modifiedGmt'],
 									'type'                 => $ref['type'],
 									'styleId'              => $ref['styleId'],
+									'style'                => $ref['style'],
 									'layerTypeOptionsHash' => $ref['layerTypeOptionsHash'],
 								);
 							},
@@ -1056,21 +1252,63 @@ class Map_Style_Composer {
 		$bundles       = array();
 		$failed_styles = array();
 		$warnings      = array();
-		$direct_types  = array( 'mapbox-tileset-raster', 'mapbox-tileset-vector', 'mvt', 'tilelayer' );
+		$direct_types  = array( 'mapbox-tileset-raster', 'mapbox-tileset-vector', 'mvt', 'tilelayer', 'geojson' );
 
 		foreach ( $context['refs'] as $ref ) {
-			if ( 'mapbox' !== $ref['type'] ) {
+			// Bundles are style-type refs: Mapbox styles (styleId + token) or
+			// generic style JSON refs (inline style takes precedence over URL).
+			if ( empty( $ref['styleId'] ) && empty( $ref['styleUrl'] ) && empty( $ref['inlineStyle'] ) ) {
 				continue;
 			}
 
-			$style = $this->fetch_mapbox_style( $ref['styleId'], $ref['token'] );
+			if ( ! empty( $ref['inlineStyle'] ) ) {
+				$style = $ref['inlineStyle'];
+			} elseif ( ! empty( $ref['styleUrl'] ) ) {
+				$style = \Jeo::fetch_style_json(
+					$ref['styleUrl'],
+					array(
+						'timeout'    => 45,
+						'user-agent' => 'jeo-map-style-composer/' . self::CACHE_VERSION,
+					)
+				);
+			} else {
+				$style = \Jeo::fetch_mapbox_style(
+					$ref['styleId'],
+					$ref['token'],
+					array(
+						'timeout'    => 45,
+						'user-agent' => 'jeo-mapbox-style-composer/' . self::CACHE_VERSION,
+					)
+				);
+			}
+
 			if ( is_wp_error( $style ) ) {
 				$failed_styles[] = array(
-					'layerId' => $ref['layerId'],
-					'styleId' => $ref['styleId'],
-					'error'   => $style->get_error_message(),
+					'layerId'  => $ref['layerId'],
+					'styleId'  => $ref['styleId'] ?? null,
+					'styleUrl' => $ref['styleUrl'] ?? null,
+					'error'    => $style->get_error_message(),
 				);
 				continue;
+			}
+
+			// Older Mapbox styles (e.g. streets v7-era) declare paint/layout
+			// values as legacy {base, stops} function objects, which MapLibre
+			// rejects ("Bare objects invalid"). Migrate them to expressions
+			// before any bundle consumer reads the style.
+			$conversions = 0;
+			$style       = $this->migrate_legacy_style_functions( $style, $conversions );
+
+			if ( $conversions > 0 ) {
+				$warnings[] = array(
+					'layerId' => $ref['layerId'],
+					'styleId' => $ref['styleId'] ?? null,
+					'warning' => sprintf(
+						/* translators: %d: number of converted style values. */
+						__( 'Converted %d legacy Mapbox stop-function value(s) to style-spec expressions for MapLibre compatibility.', 'jeowp' ),
+						$conversions
+					),
+				);
 			}
 
 			$image_props              = $this->get_image_props( $style );
@@ -1090,12 +1328,16 @@ class Map_Style_Composer {
 
 		if ( ! empty( $failed_styles ) ) {
 			foreach ( $failed_styles as $failed_style ) {
+				$source = ! empty( $failed_style['styleUrl'] )
+					? $failed_style['styleUrl']
+					: (string) ( $failed_style['styleId'] ?? '' );
+
 				$warnings[] = array(
 					'layerId' => $failed_style['layerId'],
-					'styleId' => $failed_style['styleId'],
+					'styleId' => $failed_style['styleId'] ?? null,
 					'warning' => sprintf(
-						'Skipped Mapbox style because it could not be fetched: %s',
-						$this->sanitize_tokens_in_value( $failed_style['error'] )
+						'Skipped style layer because its style could not be fetched: %s',
+						$this->sanitize_tokens_in_value( $source . ' — ' . $failed_style['error'] )
 					),
 				);
 			}
@@ -1181,8 +1423,10 @@ class Map_Style_Composer {
 					$direct = $this->build_direct_layer( $context, $ref );
 					if ( $direct ) {
 						$style['sources'][ $direct['sourceId'] ] = $direct['source'];
-						$style['layers'][]                       = $direct['layer'];
-						$manifest['layers'][]                    = $direct['manifest'];
+						foreach ( $direct['layers'] as $direct_layer ) {
+							$style['layers'][] = $direct_layer;
+						}
+						$manifest['layers'][] = $direct['manifest'];
 					}
 				}
 				continue;
@@ -1211,7 +1455,10 @@ class Map_Style_Composer {
 			}
 
 			$manifest_layers = array();
-			$initial_visible = true === $bundle['ref']['default'];
+			// Visibility mirrors the editor's shouldDisplayLayerInstance semantics:
+			// a layer is visible unless it is a non-default toggle (swappable/switchable) layer.
+			$is_toggle       = in_array( $bundle['ref']['use'] ?? '', array( 'swappable', 'switchable' ), true );
+			$initial_visible = ! $is_toggle || true === $bundle['ref']['default'];
 			foreach ( $bundle['style']['layers'] ?? array() as $layer ) {
 				if ( ! is_array( $layer ) || empty( $layer['id'] ) || ! isset( $layer_id_map[ $layer['id'] ] ) ) {
 					continue;
@@ -1332,28 +1579,6 @@ class Map_Style_Composer {
 	}
 
 	/**
-	 * Fetch a Mapbox style.
-	 *
-	 * @param string $style_id Style ID.
-	 * @param string $token Access token.
-	 * @return array|WP_Error
-	 */
-	private function fetch_mapbox_style( $style_id, $token ) {
-		$url = add_query_arg(
-			'access_token',
-			$token,
-			sprintf( 'https://api.mapbox.com/styles/v1/%s', ltrim( $style_id, '/' ) )
-		);
-
-		$data = $this->remote_json( $url );
-		if ( is_wp_error( $data ) ) {
-			return $data;
-		}
-
-		return $this->normalize_array( $data );
-	}
-
-	/**
 	 * Build a direct non-style layer.
 	 *
 	 * @param array $context Composer context.
@@ -1365,7 +1590,14 @@ class Map_Style_Composer {
 		$prefix    = $this->make_prefix( $context, $ref );
 		$source_id = $prefix . 'src_' . $this->slug_id( $ref['slug'] );
 		$layer_id  = $prefix . $this->slug_id( $ref['slug'] );
-		$visible   = true === $ref['default'];
+		// Per-instance style (paint/layout/filter); use_default resolves to the
+		// layer's default_style meta. Mirrors the editor preview and the
+		// frontend runtime resolution.
+		$effective_style = $this->resolve_effective_layer_style( $ref );
+		// Visibility mirrors the editor's shouldDisplayLayerInstance semantics:
+		// a layer is visible unless it is a non-default toggle (swappable/switchable) layer.
+		$is_toggle = in_array( $ref['use'] ?? '', array( 'swappable', 'switchable' ), true );
+		$visible   = ! $is_toggle || true === $ref['default'];
 
 		if ( in_array( $ref['type'], array( 'mapbox-tileset-raster', 'mapbox-tileset-vector' ), true ) ) {
 			$tileset_url = $this->normalize_tileset_url( $options['tileset_id'] ?? '' );
@@ -1388,13 +1620,28 @@ class Map_Style_Composer {
 			if ( 'mapbox-tileset-vector' === $ref['type'] && ! empty( $options['source_layer'] ) ) {
 				$layer['source-layer'] = $options['source_layer'];
 			}
+			if ( 'mapbox-tileset-vector' === $ref['type'] ) {
+				if ( ! empty( $effective_style['filter'] ) ) {
+					$layer['filter'] = $effective_style['filter'];
+				}
+				if ( ! empty( $effective_style['paint'] ) ) {
+					$layer['paint'] = $effective_style['paint'];
+				}
+			}
+			$layers = array( $layer );
 		} elseif ( 'mvt' === $ref['type'] ) {
 			if ( empty( $options['url'] ) ) {
 				return null;
 			}
+			$mvt_url = $options['url'];
+			if ( ! empty( $options['access_token'] ) ) {
+				$mvt_url = add_query_arg( 'access_token', $options['access_token'], $mvt_url );
+			} else {
+				$mvt_url = $this->sanitize_tokens_in_value( $mvt_url );
+			}
 			$source = array(
 				'type'  => 'vector',
-				'tiles' => array( $this->sanitize_tokens_in_value( $options['url'] ) ),
+				'tiles' => array( $mvt_url ),
 			);
 			$layer  = array(
 				'id'     => $layer_id,
@@ -1407,6 +1654,13 @@ class Map_Style_Composer {
 			if ( ! empty( $options['source_layer'] ) ) {
 				$layer['source-layer'] = $options['source_layer'];
 			}
+			if ( ! empty( $effective_style['filter'] ) ) {
+				$layer['filter'] = $effective_style['filter'];
+			}
+			if ( ! empty( $effective_style['paint'] ) ) {
+				$layer['paint'] = $effective_style['paint'];
+			}
+			$layers = array( $layer );
 		} elseif ( 'tilelayer' === $ref['type'] ) {
 			if ( empty( $options['url'] ) ) {
 				return null;
@@ -1426,20 +1680,127 @@ class Map_Style_Composer {
 					'visibility' => $visible ? 'visible' : 'none',
 				),
 			);
+			$layers = array( $layer );
+		} elseif ( 'geojson' === $ref['type'] ) {
+			// Inline GeoJSON takes precedence over the URL.
+			$inline_geojson = isset( $options['inline_geojson'] ) ? trim( (string) $options['inline_geojson'] ) : '';
+			$inline_decoded = null;
+			if ( '' !== $inline_geojson && in_array( $inline_geojson[0], array( '{', '[' ), true ) ) {
+				$decoded = json_decode( $inline_geojson, true );
+				if ( JSON_ERROR_NONE === json_last_error() ) {
+					$inline_decoded = $decoded;
+				}
+			}
+
+			if ( null !== $inline_decoded ) {
+				$source = array(
+					'type' => 'geojson',
+					'data' => $inline_decoded,
+				);
+			} else {
+				$data_url = isset( $options['data'] ) ? esc_url_raw( $options['data'] ) : '';
+				if ( '' === $data_url ) {
+					return null;
+				}
+				$source = array(
+					'type' => 'geojson',
+					'data' => $data_url,
+				);
+			}
+
+			// Defaults mirror JeoLayerTypes.getFallbackPaint('fill') in
+			// layer-types/JeoLayerTypes.js — keep both in sync.
+			$default_paint = array(
+				'fill-color'         => '#e15a2d',
+				'fill-opacity'       => 0.35,
+				'fill-outline-color' => '#b8431c',
+			);
+
+			$visibility  = $visible ? 'visible' : 'none';
+			$render_type = sanitize_key( $options['type'] ?? 'fill' );
+
+			// Instance style (or the layer's default_style when the instance
+			// defers to it) as the nested { paint, layout } shape used below.
+			$saved_style = array();
+			if ( ! empty( $effective_style['paint'] ) ) {
+				$saved_style['paint'] = $effective_style['paint'];
+			}
+			if ( ! empty( $effective_style['layout'] ) ) {
+				$saved_style['layout'] = $effective_style['layout'];
+			}
+
+			// Merge the effective style over generated paint defaults; the
+			// computed visibility always wins over a saved layout.
+			$build_style = static function ( array $defaults, $saved ) use ( $visibility ) {
+				$saved  = is_array( $saved ) ? $saved : array();
+				$layout = isset( $saved['layout'] ) && is_array( $saved['layout'] ) ? $saved['layout'] : array();
+				unset( $layout['visibility'] );
+				$layout['visibility'] = $visibility;
+
+				return array(
+					'paint'  => array_merge( $defaults, isset( $saved['paint'] ) && is_array( $saved['paint'] ) ? $saved['paint'] : array() ),
+					'layout' => $layout,
+				);
+			};
+
+			// Only "fill" is exposed in the schema for now; the branch is the
+			// extension point for future render types (line, circle, ...).
+			if ( 'fill' === $render_type ) {
+				$style = $build_style( $default_paint, $saved_style );
+
+				$layers = array(
+					array(
+						'id'     => $layer_id,
+						'type'   => 'fill',
+						'source' => $source_id,
+						'layout' => $style['layout'],
+						'paint'  => $style['paint'],
+					),
+				);
+			} else {
+				$single_style = $build_style( array(), $saved_style );
+
+				$layers = array(
+					array(
+						'id'     => $layer_id,
+						'type'   => $render_type,
+						'source' => $source_id,
+						'layout' => $single_style['layout'],
+					),
+				);
+				if ( ! empty( $single_style['paint'] ) ) {
+					$layers[0]['paint'] = $single_style['paint'];
+				}
+			}
 		} else {
 			return null;
 		}
 
-		$layer['metadata']['jeo:source'] = array(
-			'layerPostId' => $ref['layerId'],
-			'layerTitle'  => $ref['title'],
-			'layerType'   => $ref['type'],
+		foreach ( $layers as &$direct_layer_item ) {
+			$direct_layer_item['metadata']['jeo:source'] = array(
+				'layerPostId' => $ref['layerId'],
+				'layerTitle'  => $ref['title'],
+				'layerType'   => $ref['type'],
+			);
+		}
+		unset( $direct_layer_item );
+
+		$composite_layers = array_map(
+			function ( $direct_layer_item ) use ( $ref ) {
+				return array(
+					'originalId'         => (string) $ref['layerId'],
+					'compositeId'        => $direct_layer_item['id'],
+					'type'               => $direct_layer_item['type'],
+					'visibleWhenLayerOn' => true,
+				);
+			},
+			$layers
 		);
 
 		return array(
 			'sourceId' => $source_id,
 			'source'   => $source,
-			'layer'    => $layer,
+			'layers'   => $layers,
 			'manifest' => array(
 				'layerPostId'     => $ref['layerId'],
 				'title'           => $ref['title'],
@@ -1454,14 +1815,7 @@ class Map_Style_Composer {
 				'prefix'          => $prefix,
 				'imagePrefix'     => null,
 				'interactions'    => array(),
-				'compositeLayers' => array(
-					array(
-						'originalId'         => (string) $ref['layerId'],
-						'compositeId'        => $layer_id,
-						'type'               => $layer['type'],
-						'visibleWhenLayerOn' => true,
-					),
-				),
+				'compositeLayers' => $composite_layers,
 			),
 		);
 	}
@@ -2123,21 +2477,263 @@ class Map_Style_Composer {
 	}
 
 	/**
-	 * Normalize a Mapbox style ID.
+	 * Migrate legacy stop-function values in a style's layers.
 	 *
-	 * @param string $value Raw style ID.
-	 * @return string|null
+	 * Only layer paint/layout sections are walked — source definitions and
+	 * their GeoJSON payloads must never be rewritten.
+	 *
+	 * @param array $style Style JSON.
+	 * @param int   $conversions Converted function count, passed by reference.
+	 * @return array
 	 */
-	private function normalize_style_id( $value ) {
-		$value = trim( (string) $value );
-		if ( '' === $value ) {
+	private function migrate_legacy_style_functions( array $style, &$conversions ) {
+		foreach ( $style['layers'] ?? array() as $layer_index => $layer ) {
+			if ( ! is_array( $layer ) ) {
+				continue;
+			}
+
+			foreach ( array( 'paint', 'layout' ) as $section ) {
+				if ( isset( $layer[ $section ] ) ) {
+					$style['layers'][ $layer_index ][ $section ] = $this->migrate_legacy_functions( $layer[ $section ], $conversions );
+				}
+			}
+		}
+
+		return $style;
+	}
+
+	/**
+	 * Recursively convert legacy Mapbox GL "stop functions" to expressions.
+	 *
+	 * Old styles (GL JS style-spec pre-expressions era, e.g. streets v7)
+	 * declare paint/layout values as {base, stops} objects. MapLibre GL JS
+	 * only accepts expressions and fails with "Bare objects invalid".
+	 *
+	 * @param mixed $value Style fragment.
+	 * @param int   $conversions Converted function count, passed by reference.
+	 * @return mixed
+	 */
+	private function migrate_legacy_functions( $value, &$conversions ) {
+		if ( ! is_array( $value ) ) {
+			return $value;
+		}
+
+		// Recurse first so nested function outputs are converted before
+		// their container is inspected.
+		foreach ( $value as $key => $item ) {
+			$value[ $key ] = $this->migrate_legacy_functions( $item, $conversions );
+		}
+
+		if ( ! $this->is_legacy_function( $value ) ) {
+			return $value;
+		}
+
+		$converted = $this->convert_legacy_function( $value );
+
+		if ( null !== $converted ) {
+			++$conversions;
+			return $converted;
+		}
+
+		return $value;
+	}
+
+	/**
+	 * Return whether a decoded JSON value is a legacy stop function.
+	 *
+	 * Expressions are lists; stop functions are objects with a stops key.
+	 *
+	 * @param mixed $value Decoded value.
+	 * @return bool
+	 */
+	private function is_legacy_function( $value ) {
+		if ( ! is_array( $value ) || isset( $value[0] ) ) {
+			return false;
+		}
+
+		return isset( $value['stops'] ) && is_array( $value['stops'] );
+	}
+
+	/**
+	 * Convert one legacy stop function into a style-spec expression.
+	 *
+	 * Supports zoom functions (exponential and interval semantics), property
+	 * functions (categorical, interval, exponential, identity) and composite
+	 * zoom-and-property functions. Returns null when the function cannot be
+	 * represented, leaving the original value untouched.
+	 *
+	 * @param array $legacy_function Legacy function object.
+	 * @return mixed|null
+	 */
+	private function convert_legacy_function( array $legacy_function ) {
+		$stops = array();
+		foreach ( $legacy_function['stops'] as $stop ) {
+			if ( is_array( $stop ) && count( $stop ) >= 2 ) {
+				$stops[] = array( $stop[0], $stop[1] );
+			}
+		}
+
+		if ( empty( $stops ) ) {
 			return null;
 		}
-		$value = preg_replace( '#^mapbox://styles/#', '', $value );
-		$value = preg_replace( '#^https://api\.mapbox\.com/styles/v1/#', '', $value );
-		$value = strtok( $value, '?' );
-		$value = trim( $value, '/' );
-		return '' === $value ? null : $value;
+
+		$property = isset( $legacy_function['property'] ) && is_string( $legacy_function['property'] ) ? $legacy_function['property'] : null;
+		$type     = isset( $legacy_function['type'] ) && is_string( $legacy_function['type'] ) ? $legacy_function['type'] : null;
+		$base     = isset( $legacy_function['base'] ) && is_numeric( $legacy_function['base'] ) ? (float) $legacy_function['base'] : 1.0;
+
+		if ( 'identity' === $type ) {
+			return $property ? array( 'get', $property ) : null;
+		}
+
+		// Composite zoom-and-property functions carry {zoom, value} inputs.
+		if ( is_array( $stops[0][0] ) ) {
+			return $this->convert_composite_function( $stops, $property, $legacy_function['default'] ?? null, $base );
+		}
+
+		if ( 1 === count( $stops ) ) {
+			return $this->wrap_function_output( $stops[0][1] );
+		}
+
+		$input   = $property ? array( 'get', $property ) : array( 'zoom' );
+		$inputs  = wp_list_pluck( $stops, 0 );
+		$outputs = wp_list_pluck( $stops, 1 );
+		$in_num  = $this->all_numeric( $inputs );
+		$out_num = $this->all_numeric( $outputs );
+		$out_col = ! $out_num && $this->all_color_like( $outputs );
+
+		if ( $in_num && ( $out_num || $out_col ) && 'interval' !== $type ) {
+			// Default exponential semantics: smooth interpolation.
+			$basis = 1.0 === $base ? array( 'linear' ) : array( 'exponential', $base );
+			$expr  = array( 'interpolate', $basis, $input );
+			foreach ( $stops as $stop ) {
+				$expr[] = $stop[0];
+				$expr[] = $this->wrap_function_output( $stop[1] );
+			}
+			return $expr;
+		}
+
+		if ( $in_num ) {
+			// Interval semantics (and enum outputs such as line-cap): the
+			// output changes discretely at each stop input.
+			$expr  = array( 'step', $input, $this->wrap_function_output( $stops[0][1] ) );
+			$count = count( $stops );
+			for ( $i = 1; $i < $count; $i++ ) {
+				$expr[] = $stops[ $i ][0];
+				$expr[] = $this->wrap_function_output( $stops[ $i ][1] );
+			}
+			return $expr;
+		}
+
+		if ( $property ) {
+			// Categorical property function.
+			$expr = array( 'match', array( 'get', $property ) );
+			foreach ( $stops as $stop ) {
+				$expr[] = $stop[0];
+				$expr[] = $this->wrap_function_output( $stop[1] );
+			}
+			$fallback = array_key_exists( 'default', $legacy_function )
+				? $this->wrap_function_output( $legacy_function['default'] )
+				: $this->wrap_function_output( $stops[0][1] );
+			$expr[]   = $fallback;
+			return $expr;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Convert a composite zoom-and-property function.
+	 *
+	 * Produces an interpolate over zoom whose outputs are per-zoom property
+	 * expressions — the documented expression replacement for composites.
+	 *
+	 * @param array       $stops Normalized stops with {zoom, value} inputs.
+	 * @param string|null $property Property name.
+	 * @param mixed       $default_value Optional categorical default.
+	 * @param float       $base Interpolation base.
+	 * @return mixed|null
+	 */
+	private function convert_composite_function( array $stops, $property, $default_value, $base ) {
+		if ( ! $property ) {
+			return null;
+		}
+
+		$groups = array();
+		foreach ( $stops as $stop ) {
+			$input = $stop[0];
+			if ( ! is_array( $input ) || ! isset( $input['zoom'], $input['value'] ) || ! is_numeric( $input['zoom'] ) ) {
+				return null;
+			}
+			$groups[ (float) $input['zoom'] ][] = array( $input['value'], $stop[1] );
+		}
+
+		ksort( $groups, SORT_NUMERIC );
+
+		$basis = 1.0 === $base ? array( 'linear' ) : array( 'exponential', $base );
+		$expr  = array( 'interpolate', $basis, array( 'zoom' ) );
+		foreach ( $groups as $zoom => $group ) {
+			$property_expr = $this->convert_legacy_function(
+				array(
+					'property' => $property,
+					'stops'    => $group,
+					'default'  => $default_value,
+				)
+			);
+			if ( null === $property_expr ) {
+				return null;
+			}
+			$expr[] = $zoom;
+			$expr[] = $property_expr;
+		}
+
+		// A single zoom group collapses to the property expression itself.
+		return 1 === count( $groups ) ? $expr[4] : $expr;
+	}
+
+	/**
+	 * Wrap a function output for use inside an expression.
+	 *
+	 * Array outputs (offsets, padding, translate) must be literal-wrapped.
+	 *
+	 * @param mixed $output Raw stop output.
+	 * @return mixed
+	 */
+	private function wrap_function_output( $output ) {
+		if ( is_array( $output ) ) {
+			return array( 'literal', $output );
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Return whether every value is numeric.
+	 *
+	 * @param array $values Values.
+	 * @return bool
+	 */
+	private function all_numeric( array $values ) {
+		foreach ( $values as $value ) {
+			if ( ! is_int( $value ) && ! is_float( $value ) ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Return whether every string value looks like a CSS color.
+	 *
+	 * @param array $values Values.
+	 * @return bool
+	 */
+	private function all_color_like( array $values ) {
+		foreach ( $values as $value ) {
+			if ( ! is_string( $value ) || ! preg_match( '/^(#[0-9a-f]{3,8}|rgba?\(|hsla?\()/i', trim( $value ) ) ) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -2235,7 +2831,14 @@ class Map_Style_Composer {
 			$root = preg_replace( '/(@2x)?\.(json|png)(\?.*)?$/', '', $sprite );
 		}
 
-		return add_query_arg( 'access_token', $token, sprintf( '%s%s.%s', $root, $suffix, $extension ) );
+		$url = sprintf( '%s%s.%s', $root, $suffix, $extension );
+
+		// Keyless styles (style-json) carry no token; do not append one.
+		if ( '' === trim( (string) $token ) ) {
+			return $url;
+		}
+
+		return add_query_arg( 'access_token', $token, $url );
 	}
 
 	/**

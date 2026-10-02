@@ -32,6 +32,14 @@ inputs:
   db-host:
     description: WordPress database host.
     default: 127.0.0.1:3306
+  fail-on-errors:
+    description: Whether to fail the check when errors are found. Defaults to
+      false so checks are advisory-only; set to 'true' to opt a caller into
+      failing the job on errors.
+    default: 'false'
+  fail-on-warnings:
+    description: Whether to fail the check when warnings are found (not just errors).
+    default: 'false'
 
 runs:
   using: composite
@@ -82,6 +90,8 @@ runs:
     - name: Run WordPress Plugin Check
       shell: bash
       env:
+        FAIL_ON_ERRORS: ${{ inputs.fail-on-errors }}
+        FAIL_ON_WARNINGS: ${{ inputs.fail-on-warnings }}
         PLUGIN_CHECK_RESULTS: ${{ inputs.results-path }}
         PLUGIN_SLUG: ${{ inputs.plugin-slug }}
         WP_PATH: ${{ inputs.wp-path }}
@@ -109,18 +119,125 @@ runs:
 
         wp --path="$WP_PATH" plugin activate "$PLUGIN_SLUG"
 
+        # NOTE: wp plugin check never returns a non-zero exit code when errors or
+        # warnings are found — it only exits non-zero on runner/CLI failures.
+        # We use the CSV format because it is the only machine-readable output
+        # that includes the file path (via "FILE:" section headers); the
+        # strict-json format omits file paths entirely. We parse the CSV into a
+        # JSON array ourselves for counting, annotations, and the summary table.
         echo "::group::Run Plugin Check"
+        PLUGIN_CHECK_RAW="${PLUGIN_CHECK_RESULTS}.raw"
         set +e
         wp --path="$WP_PATH" \
           --require="$WP_PATH/wp-content/plugins/plugin-check/cli.php" \
           plugin check "$PLUGIN_SLUG" \
-          --format=json \
+          --format=csv \
           --slug="$PLUGIN_SLUG" \
           --exclude-files=.wp-env.json \
-          > "$PLUGIN_CHECK_RESULTS"
-        status=$?
+          > "$PLUGIN_CHECK_RAW"
+        cli_status=$?
         set -e
-        cat "$PLUGIN_CHECK_RESULTS"
+
         echo "::endgroup::"
 
-        exit "$status"
+        # Fail immediately if the wp CLI command itself crashed.
+        if [ "$cli_status" -ne 0 ]; then
+          echo "::error::Plugin Check command failed with exit code $cli_status"
+          exit 1
+        fi
+
+        # Parse the CSV output (with "FILE:" section headers) into a JSON array
+        # so we can use jq for counting, annotations, and the summary table.
+        python3 - "$PLUGIN_CHECK_RAW" "$PLUGIN_CHECK_RESULTS" <<'PYEOF'
+        import csv
+        import json
+        import sys
+
+        def safe_int(value):
+            try:
+                return int(value)
+            except (ValueError, TypeError):
+                return 0
+
+        results = []
+        current_file = ""
+        with open(sys.argv[1], newline="") as f:
+            for row in csv.reader(f):
+                if not row or not row[0]:
+                    continue
+                if row[0].startswith("FILE:"):
+                    current_file = ",".join(row)[len("FILE:"):].strip()
+                    continue
+                if row[0] == "line":
+                    continue  # CSV header row
+                if len(row) < 5:
+                    continue
+
+                results.append({
+                    "file": current_file,
+                    "line": safe_int(row[0]),
+                    "type": row[2] if len(row) > 2 else "",
+                    "code": row[3] if len(row) > 3 else "",
+                    "message": row[4] if len(row) > 4 else "",
+                    "docs": row[5] if len(row) > 5 else "",
+                })
+
+        with open(sys.argv[2], "w") as out:
+            json.dump(results, out)
+        PYEOF
+
+        echo "Parsed $(jq 'length' "$PLUGIN_CHECK_RESULTS") Plugin Check result(s)."
+
+        # Parse the JSON results with jq.
+        ERROR_COUNT=$(jq '[.[] | select(.type == "ERROR")] | length' "$PLUGIN_CHECK_RESULTS")
+        WARNING_COUNT=$(jq '[.[] | select(.type == "WARNING")] | length' "$PLUGIN_CHECK_RESULTS")
+
+        echo "Plugin Check results: $ERROR_COUNT error(s), $WARNING_COUNT warning(s)."
+
+        # Emit GitHub Actions annotations for visibility.
+        if [ "$ERROR_COUNT" -gt 0 ]; then
+          jq -r '.[] | select(.type == "ERROR") | "::error file=\(.file // ""),line=\(.line // 1)::[\(.code)] \(.message)"' \
+            "$PLUGIN_CHECK_RESULTS"
+        fi
+        if [ "$WARNING_COUNT" -gt 0 ]; then
+          jq -r '.[] | select(.type == "WARNING") | "::warning file=\(.file // ""),line=\(.line // 1)::[\(.code)] \(.message)"' \
+            "$PLUGIN_CHECK_RESULTS"
+        fi
+
+        # Append a readable summary to the GitHub Actions run summary.
+        if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+          {
+            echo "### WordPress Plugin Check Results"
+            echo ""
+            echo "- Errors: ${ERROR_COUNT}"
+            echo "- Warnings: ${WARNING_COUNT}"
+            echo ""
+            if [ "$((ERROR_COUNT + WARNING_COUNT))" -gt 0 ]; then
+              echo "| Type | File | Line | Code | Message |"
+              echo "|------|------|------|------|---------|"
+              jq -r '
+                def esc: tostring | gsub("\r";"") | gsub("\n";" ") | gsub("\\|";"\\|");
+                .[]
+                | select(.type == "ERROR" or .type == "WARNING")
+                | "| \(.type) | \((.file // "-") | esc) | \((.line // 1) | esc) | \((.code // "-") | esc) | \((.message // "-") | esc) |"
+              ' "$PLUGIN_CHECK_RESULTS"
+            else
+              echo "No errors or warnings found."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+        fi
+
+        # Errors fail only when fail-on-errors is enabled (default: false).
+        if [ "$FAIL_ON_ERRORS" = "true" ] && [ "$ERROR_COUNT" -gt 0 ]; then
+          echo "::error::Plugin Check found $ERROR_COUNT error(s) and fail-on-errors is enabled."
+          exit 1
+        fi
+
+        # Warnings fail only when explicitly requested.
+        if [ "$FAIL_ON_WARNINGS" = "true" ] && [ "$WARNING_COUNT" -gt 0 ]; then
+          echo "::error::Plugin Check found $WARNING_COUNT warning(s) and fail-on-warnings is enabled."
+          exit 1
+        fi
+
+        echo "Plugin Check completed: $ERROR_COUNT error(s), $WARNING_COUNT warning(s)."
+        exit 0

@@ -1,0 +1,44 @@
+[
+  {
+    "name": "Amazônia",
+    "type": "biome",
+    "lat": -3.465,
+    "lng": -62.215,
+    "aliases": ["Amazon Biome", "Bioma Amazônico", "Floresta Amazônica", "Selva Amazônica"]
+  },
+  {
+    "name": "Cerrado",
+    "type": "biome",
+    "lat": -15.123,
+    "lng": -48.325,
+    "aliases": ["Bioma Cerrado", "Savana Brasileira"]
+  },
+  {
+    "name": "Mata Atlântica",
+    "type": "biome",
+    "lat": -22.500,
+    "lng": -44.000,
+    "aliases": ["Atlantic Forest", "Bioma Mata Atlântica", "Floresta Atlântica"]
+  },
+  {
+    "name": "Caatinga",
+    "type": "biome",
+    "lat": -9.000,
+    "lng": -40.000,
+    "aliases": ["Bioma Caatinga", "Sertão"]
+  },
+  {
+    "name": "Pantanal",
+    "type": "biome",
+    "lat": -18.000,
+    "lng": -56.000,
+    "aliases": ["Bioma Pantanal", "Chaco Brasileiro"]
+  },
+  {
+    "name": "Pampa",
+    "type": "biome",
+    "lat": -31.000,
+    "lng": -53.000,
+    "aliases": ["Bioma Pampa", "Campos Sulinos", "Pampas Gaúchos"]
+  }
+]

@@ -17,7 +17,7 @@
 			sources: {
 				[ name ]: {
 					type: attributes.layer_type_options.style_source_type,
-					url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+					url: tileset_id,
 				},
 			},
 			layers: [
@@ -39,15 +39,19 @@
 
 		map.addSource( attributes.layer_id, {
 			type: attributes.layer_type_options.style_source_type,
-			url: 'mapbox://' + attributes.layer_type_options.tileset_id,
+			url: tileset_id,
 		} );
 
+		const opacity = typeof attributes.opacity === 'number' ? attributes.opacity : 1;
 		const layer = {
 			id: attributes.layer_id,
 			type: attributes.layer_type_options.type,
 			source: attributes.layer_id,
 			layout: {
 				visibility: attributes.visible ? 'visible' : 'none',
+			},
+			paint: {
+				'raster-opacity': opacity,
 			},
 		};
 
@@ -85,6 +89,14 @@
 					type: 'string',
 					default: 'raster',
 					disabled: true,
+				},
+				access_token: {
+					type: 'string',
+					title: __( 'Access token', 'jeowp' ),
+					description: __(
+						'Optional. If this layer needs a different access token from the one set in Settings, inform it here.',
+						'jeowp'
+					),
 				},
 			},
 		};

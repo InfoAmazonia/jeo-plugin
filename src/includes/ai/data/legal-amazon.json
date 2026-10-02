@@ -1,0 +1,16 @@
+[
+  {
+    "name": "Amazônia Legal",
+    "type": "region_limit",
+    "lat": -10.000,
+    "lng": -55.000,
+    "aliases": ["Limites da Amazônia Legal", "Região da Amazônia Legal"]
+  },
+  {
+    "name": "Arco do Desmatamento",
+    "type": "region_limit",
+    "lat": -9.500,
+    "lng": -52.000,
+    "aliases": ["Arco do Povoamento Adensado"]
+  }
+]

@@ -11,7 +11,8 @@ import {
 } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import InteractionsSettings from './interactions-settings';
-import { useDebounce } from 'use-debounce';
+import { isEmpty, isEqual } from 'lodash-es';
+import { useDebounce, useDebouncedCallback } from 'use-debounce';
 import SchemaForm, { mergeSchemaFormData } from '../shared/schema-form';
 import { mergeLayerTypeOptions } from '../map-blocks/layer-type-options';
 import {
@@ -109,6 +110,7 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 	const prevLayerType = usePrevious( formData.type );
 	const serializedPostMeta = JSON.stringify( normalizeLayerFormData( postMeta ) );
 	const [ debouncedFormData ] = useDebounce( formData, 1500 );
+	const debouncedSetPostMeta = useDebouncedCallback( setPostMeta, 500 );
 
 	const schema = useMemo(
 		() => ( {
@@ -198,7 +200,10 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 	}, [ isRefreshingComposerCache, postId, sendNotice ] );
 
 	useEffect( () => {
-		setFormData( normalizeLayerFormData( postMeta ) );
+		const next = normalizeLayerFormData( postMeta );
+		if ( ! isEqual( next, formData ) ) {
+			setFormData( next );
+		}
 	}, [ serializedPostMeta ] );
 
 	const setInteractions = useCallback(
@@ -286,8 +291,10 @@ const LayerSettings = ( { postId, postMeta, sendNotice, setPostMeta } ) => {
 						mergeSchemaFormData( formData, nextPartialFormData )
 					);
 					window.layerFormData = nextFormData;
-					setFormData( nextFormData );
-					setPostMeta( nextFormData );
+					if ( ! isEqual( nextFormData, formData ) ) {
+						setFormData( nextFormData );
+						debouncedSetPostMeta( nextFormData );
+					}
 				} }
 			>
 				{ /* Hide submit button */ }

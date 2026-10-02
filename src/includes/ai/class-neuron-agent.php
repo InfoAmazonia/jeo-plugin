@@ -1,0 +1,155 @@
+<?php
+/**
+ * NeuronAI geocoding agent.
+ *
+ * @package Jeo
+ */
+
+namespace Jeo\AI;
+
+use Jeo\AI_Adapter;
+use Jeo\AI\Structured\Georeference_Result;
+use NeuronAI\Agent\Agent;
+use NeuronAI\Chat\Messages\UserMessage;
+use NeuronAI\Providers\Gemini\Gemini;
+use NeuronAI\Providers\OpenAI\OpenAI;
+use NeuronAI\Providers\Deepseek\Deepseek;
+use NeuronAI\Providers\Anthropic\Anthropic;
+use NeuronAI\Providers\Ollama\Ollama;
+use NeuronAI\Providers\Mistral\Mistral;
+use NeuronAI\Providers\ZAI\ZAI;
+use NeuronAI\Providers\HuggingFace\HuggingFace;
+use NeuronAI\Providers\HuggingFace\InferenceProvider;
+use NeuronAI\Providers\XAI\Grok;
+use NeuronAI\Providers\Cohere\Cohere;
+use NeuronAI\Providers\AIProviderInterface;
+
+if ( ! defined( 'WPINC' ) ) {
+	die;
+}
+
+/**
+ * Neuron Geocode Agent
+ *
+ * Utilizes Neuron AI framework to standardise API calls and Token Usage extraction.
+ */
+class Neuron_Agent extends Agent {
+
+	/**
+	 * Provider name.
+	 *
+	 * @var string
+	 */
+	protected $provider_name;
+
+	/**
+	 * API key.
+	 *
+	 * @var string
+	 */
+	protected $api_key;
+
+	/**
+	 * Model identifier.
+	 *
+	 * @var string
+	 */
+	protected $model;
+
+	/**
+	 * Initialize the Neuron Agent with provider credentials.
+	 *
+	 * @param string $provider_name AI provider slug.
+	 * @param string $api_key       API key for the provider.
+	 * @param string $model         Model identifier to use.
+	 */
+	public function __construct( $provider_name, $api_key, $model ) {
+		$this->provider_name = $provider_name;
+		$this->api_key       = $api_key;
+		$this->model         = $model;
+		parent::__construct();
+	}
+
+	/**
+	 * Return the AI provider instance for the configured provider.
+	 *
+	 * @return AIProviderInterface
+	 */
+	protected function provider(): AIProviderInterface {
+		return Neuron_Factory::create_provider( $this->provider_name, $this->api_key, $this->model );
+	}
+
+	/**
+	 * Run the georeference task utilizing Neuron Structured Output.
+	 *
+	 * @param string $system_prompt The system prompt.
+	 * @param string $user_text     The user text.
+	 * @param int    $input_tokens  Input token count (passed by reference).
+	 * @param int    $output_tokens Output token count (passed by reference).
+	 * @param string $raw_output    Raw output (passed by reference).
+	 */
+	public function run_georeference( $system_prompt, $user_text, &$input_tokens, &$output_tokens, &$raw_output ) {
+		// Define the system instructions for the agent.
+		$this->setInstructions( $system_prompt );
+
+		// Execute chat with User text.
+		$message = $this->chat( new UserMessage( $user_text ) )->getMessage();
+
+		$raw_output = $message->getContent();
+		$usage      = $message->getUsage();
+
+		if ( $usage ) {
+			$input_tokens  = $usage->inputTokens; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$output_tokens = $usage->outputTokens; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+		}
+
+		return $raw_output;
+	}
+
+	/**
+	 * Run georeference using NeuronAI Structured Output.
+	 *
+	 * Uses schema enforcement, automatic retry on validation failures,
+	 * and returns a plain array for backward compatibility.
+	 *
+	 * @param string $system_prompt The system prompt.
+	 * @param string $user_text     The user text.
+	 * @param int    $input_tokens  Input token count (passed by reference).
+	 * @param int    $output_tokens Output token count (passed by reference).
+	 * @return array Array of location associative arrays.
+	 * @throws \Throwable If structured output fails after retries.
+	 */
+	public function run_georeference_structured( $system_prompt, $user_text, &$input_tokens, &$output_tokens ) {
+		$this->setInstructions( $system_prompt );
+
+		/**
+		 * Structured georeference result.
+		 *
+		 * @var Georeference_Result $result
+		 */
+		$result = $this->structured(
+			messages: new UserMessage( $user_text ),
+			class: Georeference_Result::class,
+			maxRetries: 3
+		);
+
+		$locations = array();
+		foreach ( $result->locations as $loc ) {
+			$locations[] = array(
+				'name'       => $loc->name,
+				'lat'        => $loc->lat,
+				'lon'        => $loc->lon,
+				'quote'      => $loc->quote,
+				'confidence' => $loc->confidence,
+				'is_primary' => $loc->is_primary,
+			);
+		}
+
+		// Token tracking is not directly available from structured() output,
+		// so we leave them at 0 unless the caller handles it separately.
+		$input_tokens  = 0;
+		$output_tokens = 0;
+
+		return $locations;
+	}
+}

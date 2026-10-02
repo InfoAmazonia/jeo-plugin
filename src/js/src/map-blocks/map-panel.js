@@ -15,7 +15,8 @@ export default function MapPanel( {
 	attributes,
 	setAttributes,
 	renderPanel: Panel,
-	setPanLimitsFromMap
+	setPanLimitsFromMap,
+	isMapBlock = false,
 } ) {
 	useEffect( () => {
 		const isNewMap = [
@@ -67,6 +68,7 @@ export default function MapPanel( {
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 				setPanLimitsFromMap={ handleSetPanLimitsFromMap }
+				isMapBlock={ isMapBlock }
 			/>
 		</Panel>
 	);

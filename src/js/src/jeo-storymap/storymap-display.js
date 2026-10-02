@@ -11,8 +11,10 @@ import {
 	setComposedLayerVisibility,
 } from '../shared/composed-style-layers';
 import { onFirstIntersection } from '../shared/intersect';
+import { isStyleLayerType } from '../shared/style-layer-types';
 import { renderLayer } from '../map-blocks/map-preview-layer';
 import JeoMap from '../jeo-map/class-jeo-map';
+import { decodeHtmlEntity } from '../shared/html';
 import { formatDate, formatHour, joinList } from '../shared/intl';
 import { EMPTY_STYLE } from '../shared/styles';
 import { setMapLayerVisibility } from './layer-visibility';
@@ -52,12 +54,6 @@ function getAuthorsLinks( storymap ) {
 function sleep( ms ) {
 	return new Promise( resolve => setTimeout( resolve, ms ) );
 }
-
-const decodeHtmlEntity = function ( str ) {
-	return str.replace( /&#(\d+);/g, function ( match, dec ) {
-		return String.fromCharCode( dec );
-	} );
-};
 
 class StoryMapDisplay extends Component {
     constructor( props ) {
@@ -336,6 +332,49 @@ class StoryMapDisplay extends Component {
 		return layer?.meta?.type === 'mapbox';
 	}
 
+	/**
+	 * Whether the layer is a style-type layer (mapbox, style-json). Style
+	 * layers render as the map's base style, never as individual GL layers.
+	 *
+	 * @param {Object} layer Layer definition with a `meta` object.
+	 * @return {boolean}
+	 */
+	isStyleLayer( layer ) {
+		return isStyleLayerType( layer?.meta?.type );
+	}
+
+	/**
+	 * Apply the first resolvable style-type layer as the map's base style
+	 * when no composed style is in use (keyless style-json bases).
+	 *
+	 * @param {Object} map Map instance.
+	 * @return {Promise} Resolves when the base style has loaded.
+	 */
+	applyBaseStyleLayer( map ) {
+		const baseLayer = ( this.props.navigateMapLayers || [] ).find(
+			( layer ) => this.isStyleLayer( layer )
+		);
+
+		if ( ! baseLayer ) {
+			return Promise.resolve();
+		}
+
+		const jeoBaseLayer = new window.JeoLayer( baseLayer.meta.type, {
+			...baseLayer.meta,
+			layer_id: baseLayer.slug,
+			visible: true,
+		} );
+
+		const style = jeoBaseLayer.getStyle?.();
+		if ( ! style ) {
+			return Promise.resolve();
+		}
+
+		map.setStyle( style );
+
+		return new Promise( ( resolve ) => map.once( 'load', resolve ) );
+	}
+
 	addComposedStyleWarningMessage() {
 		if (
 			! ( this.props.navigateMapLayers || [] ).some( ( layer ) => this.isMapboxStyleLayer( layer ) ) ||
@@ -571,26 +610,40 @@ class StoryMapDisplay extends Component {
 
 			if ( this.hasComposedStyle() ) {
 				this.addComposedInteractions( map );
+				this.applyChapterLayerVisibility( this.state.currentChapter || firstChapter );
+				this.finishMapLoad( map );
 			} else {
-				( this.props.navigateMapLayers || [] ).forEach(layer => {
-					if ( this.isMapboxStyleLayer( layer ) ) {
-						return;
-					}
-					const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
+				this.applyBaseStyleLayer( map ).then( () => {
+					( this.props.navigateMapLayers || [] ).forEach(layer => {
+						if ( this.isStyleLayer( layer ) ) {
+							return;
+						}
+						const isInitialLayer = firstChapter.selectedLayers.some(selectedLayer => selectedLayer.slug === layer.slug);
 
-					const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: layer.slug, visible: isInitialLayer });
-					jeoLayer.addLayer(map);
-				});
-				this.addComposedStyleWarningMessage();
+						const jeoLayer = new window.JeoLayer(layer.meta.type, { ...layer.meta, layer_id: layer.slug, visible: isInitialLayer });
+						jeoLayer.addLayer(map);
+					});
+					this.addComposedStyleWarningMessage();
+					this.applyChapterLayerVisibility( this.state.currentChapter || firstChapter );
+					this.finishMapLoad( map );
+				} );
 			}
-			this.applyChapterLayerVisibility( this.state.currentChapter || firstChapter );
-
-			const mapEl = this.el?.querySelector( `.${MAP_RUNTIME}-map` );
-			if ( mapEl ) {
-				mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
-			}
-			this.el?.querySelector( '.the-story' )?.classList.add( 'loaded' );
 		});
+	}
+
+	/**
+	 * Final map load steps shared by the composed-style and fallback paths:
+	 * brightness filter and the loaded class.
+	 *
+	 * @param {Object} map Map instance.
+	 * @return {void}
+	 */
+	finishMapLoad( map ) {
+		const mapEl = this.el?.querySelector( `.${MAP_RUNTIME}-map` );
+		if ( mapEl ) {
+			mapEl.style.filter = `brightness(${ this.state.mapBrightness })`;
+		}
+		this.el?.querySelector( '.the-story' )?.classList.add( 'loaded' );
 	}
 
 	componentDidUpdate() {
