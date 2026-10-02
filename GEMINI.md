@@ -1,4 +1,4 @@
-# JEO Plugin - Master Architecture Guide & Mandates (v3.6.5)
+# JEO Plugin - Master Architecture Guide & Mandates (v4.0.0)
 
 Este documento é a autoridade máxima sobre a arquitetura do plugin JEO. Qualquer alteração, refatoração ou adição de funcionalidade deve respeitar estritamente as diretrizes aqui estabelecidas para garantir a estabilidade e a integridade dos dados geográficos.
 
@@ -29,7 +29,7 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 ## 3. Motor de Inteligência Artificial (AI Engine)
 
 ### 3.1. Neuron Agent & Universal Adapters
-- **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas. 
+- **Centralização:** Toda chamada de IA deve passar pela classe `Jeo\AI\Neuron_Adapter`. Nunca faça chamadas HTTP diretas.
 - **O Contrato JSON Imutável:** Toda extração deve retornar um array plano de objetos com: `name`, `lat`, `lon`, `quote`, `confidence`.
 
 ### 3.2. Lógica de Relevância e Corte (UI/UX)
@@ -94,7 +94,7 @@ O JEO é um framework de geojornalismo para WordPress. Ele transforma posts em c
 - Injeta a pasta `vendor` na raiz e limpa arquivos de desenvolvimento.
 
 ### 6.2. Versionamento
-- Siga rigorosamente o SemVer. Versão atual: **3.6.5**.
+- Siga rigorosamente o SemVer. Versão atual: **4.0.0**.
 
 ---
 *Este guia é a defesa contra o caos técnico. Respeite os mandatos ou o sistema falhará.*

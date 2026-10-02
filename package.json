@@ -1,6 +1,6 @@
 {
 	"name": "jeowp",
-	"version": "3.6.5",
+	"version": "4.0.0-beta.1",
 	"description": "Interactive maps for the WordPress block editor",
 	"main": "index.js",
 	"directories": {
