@@ -43,3 +43,9 @@ dist/
 docs/node_modules/
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+
+# Generated site output — deployed to gh-pages by CI (deploy-site.yml)
+/site/
+
+# Legacy landing workspace (figma references, local notes)
+/site-novo/

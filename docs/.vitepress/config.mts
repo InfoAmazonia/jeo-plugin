@@ -1,52 +1,5 @@
 import { defineConfig } from 'vitepress'
 
-// Route map: source file → URL. Every content page is served as a directory
-// route (`/page/`) to keep URL parity with the previous MkDocs build
-// (`site_dir: site/docs`, directory URLs). Content pages keep relative
-// `img/...` references (resolved against the source file), but internal
-// links must use absolute routes (`/page/`, `/dev/page/`) because relative
-// `.md` links are resolved against the rewritten path and fail dead-link
-// checks.
-const pages = [
-  'ai-bulk-geolocation',
-  'ai-context-assistant',
-  'ai-georeferencing',
-  'ai-in-jeo',
-  'ai-settings',
-  'concepts',
-  'discovery',
-  'getting-started',
-  'geolocating-posts',
-  'index-plugin',
-  'layer-post',
-  'map-block',
-  'map-embed',
-  'map-post',
-  'map-shortcode',
-  'minimap',
-  'one-time-map-block',
-  'stories-near-you',
-  'story-map',
-]
-
-const devPages = [
-  'dependency-maintenance',
-  'geocoders',
-  'geo-information',
-  'layer-types',
-  'layer-types-api',
-  'migration',
-  'php-compatibility',
-]
-
-const rewrites: Record<string, string> = {}
-for (const page of pages) {
-  rewrites[`${page}.md`] = `${page}/index.md`
-}
-for (const page of devPages) {
-  rewrites[`dev/${page}.md`] = `dev/${page}/index.md`
-}
-
 export default defineConfig({
   lang: 'en',
   title: 'JEO Maps',
@@ -57,7 +10,6 @@ export default defineConfig({
   base: '/docs/',
   cleanUrls: true,
   srcExclude: ['README.md'],
-  rewrites,
 
   // Build straight into the committed site/ tree (same contract as MkDocs)
   outDir: '../site/docs',
@@ -70,6 +22,8 @@ export default defineConfig({
       light: { src: '/logo-light.svg', alt: 'JEO Maps' },
       dark: { src: '/logo-dark.svg', alt: 'JEO Maps' },
     },
+    // Logo click goes to the landing page, not the docs home.
+    logoLink: 'https://jeowp.org/',
 
     // The logo SVG already carries the "JEO Maps" wordmark — showing the
     // site title next to it would duplicate the brand. The page-level
@@ -77,11 +31,7 @@ export default defineConfig({
     siteTitle: false,
 
     nav: [
-      // The landing lives at the site root, outside of /docs/ — an absolute
-      // URL is required because VitePress prefixes internal links with the
-      // base. `target: '_self'` keeps the default external-link "_blank"
-      // from applying.
-      { text: 'Home', link: 'https://jeowp.org/', target: '_self' },
+      { text: 'Home', link: '/' },
       {
         text: 'Plugin',
         items: [
@@ -127,7 +77,7 @@ export default defineConfig({
     ],
 
     sidebar: [
-      { text: 'Home', link: 'https://jeowp.org/', target: '_self' },
+      { text: 'Home', link: '/' },
       {
         text: 'Plugin',
         items: [

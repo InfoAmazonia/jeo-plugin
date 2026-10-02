@@ -16,6 +16,6 @@ Maps with geolocated posts contain markers at the location of each post. Clickin
 
 ## AI Georeferencing
 
-Alternatively, JEO can georeference posts automatically using AI. The AI analyzes the post content and suggests geolocation points with confidence scores. You can then review and approve the suggestions. See [AI Georeferencing](/ai-georeferencing/).
+Alternatively, JEO can georeference posts automatically using AI. The AI analyzes the post content and suggests geolocation points with confidence scores. You can then review and approve the suggestions. See [AI Georeferencing](ai-georeferencing.md).
 
-For bulk processing many posts at once, see [AI Bulk Geolocation](/ai-bulk-geolocation/).
+For bulk processing many posts at once, see [AI Bulk Geolocation](ai-bulk-geolocation.md).
