@@ -1,44 +1,5 @@
 import { defineConfig } from 'vitepress'
 
-// Route map: source file → URL. Every content page is served as a directory
-// route (`/page/`) to keep URL parity with the previous MkDocs build
-// (`site_dir: site/docs`, directory URLs). Content pages keep relative
-// `img/...` references (resolved against the source file), but internal
-// links must use absolute routes (`/page/`, `/dev/page/`) because relative
-// `.md` links are resolved against the rewritten path and fail dead-link
-// checks.
-const pages = [
-  'ai-bulk-geolocation',
-  'ai-context-assistant',
-  'ai-georeferencing',
-  'ai-in-jeo',
-  'ai-settings',
-  'concepts',
-  'discovery',
-  'getting-started',
-  'geolocating-posts',
-  'index-plugin',
-  'layer-post',
-  'map-block',
-  'map-embed',
-  'map-post',
-  'map-shortcode',
-  'minimap',
-  'one-time-map-block',
-  'stories-near-you',
-  'story-map',
-]
-
-const devPages = [
-  'dependency-maintenance',
-  'geocoders',
-  'geo-information',
-  'layer-types',
-  'layer-types-api',
-  'migration',
-  'php-compatibility',
-]
-
 export default defineConfig({
   lang: 'en',
   title: 'JEO Maps',
