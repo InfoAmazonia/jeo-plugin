@@ -2,7 +2,7 @@
 
 JEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called `Embed map` and it's very easy to be done.
 
-When editing a [Map](/map-post/), one of the setting panels is `Status & Visibility`. There you can find the `embed URL` of that specific map.
+When editing a [Map](map-post.md), one of the setting panels is `Status & Visibility`. There you can find the `embed URL` of that specific map.
 
 ![Embed URL](img/embed-url.png)
 

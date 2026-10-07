@@ -2,7 +2,7 @@
 
 JEO includes built-in AI capabilities for georeferencing posts, generating maps, and creating custom map layers. Before using these features, you need to configure an AI provider.
 
-See [AI in JEO](/ai-in-jeo/) for an overview of the AI architecture and how each piece works.
+See [AI in JEO](ai-in-jeo.md) for an overview of the AI architecture and how each piece works.
 
 ## Configuring an AI provider
 
@@ -48,11 +48,11 @@ JEO ships with built-in Brazilian geographic dictionaries (biomes, conservation 
 
 ### Bulk Geolocation tab
 
-Configure batch geolocation settings for processing many posts at once. See [AI Bulk Geolocation](/ai-bulk-geolocation/) for details.
+Configure batch geolocation settings for processing many posts at once. See [AI Bulk Geolocation](ai-bulk-geolocation.md) for details.
 
 ### Context Assistant tab
 
-Customize the system prompt used by the [AI Context Assistant](/ai-context-assistant/) — the editorial suggestions sidebar in the Gutenberg editor.
+Customize the system prompt used by the [AI Context Assistant](ai-context-assistant.md) — the editorial suggestions sidebar in the Gutenberg editor.
 
 - **Use custom prompt**: Check this box to override the built-in default prompt with your own.
 - **Custom prompt**: Editable textarea for your custom system prompt. When unchecked, the tab shows the default prompt in a read-only field for reference.

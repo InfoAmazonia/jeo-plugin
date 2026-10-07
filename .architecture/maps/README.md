@@ -6,6 +6,7 @@
 |------|------|
 | `src/includes/maps/class-maps.php` | `Jeo\Maps` class — CPT, meta, shortcode |
 | `src/includes/maps/class-map-style-composer.php` | `Jeo\Map_Style_Composer` — merges Mapbox styles into cached composite Style JSON (see [`composed-styles/README.md`](../composed-styles/README.md)) |
+| `src/includes/maps/class-style-token-migrator.php` | `Jeo\Style_Token_Migrator` — converts legacy `{token}` strings to style-spec expressions (MapLibre compat) |
 | `src/js/src/jeo-map/class-jeo-map.js` | `JeoMap` class — frontend rendering |
 | `src/js/src/jeo-map/index.js` | Entry point, DOM scan |
 | `src/js/src/maps-sidebar/` | Gutenberg sidebar for editing |

@@ -215,5 +215,6 @@ To build the complete site locally:
 npm run build:site   # landing → site/, docs → site/docs/
 ```
 
-Changes to `docs/` or `site-novo/www/` on `master` automatically regenerate
-and commit `site/` through `.github/workflows/docs-site.yml`.
+Changes to `docs/` or `landing-page/` on `master` are built and published to
+the `gh-pages` branch (GitHub Pages at jeowp.org) through
+`.github/workflows/deploy-site.yml`.

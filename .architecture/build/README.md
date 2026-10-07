@@ -96,7 +96,43 @@ requirement, used after the switch.
 | PHP Compat | `php-compat.yml` | Push/PR |
 | WP Smoke | `wordpress-smoke.yml` | Push/PR |
 | Deploy WP.org | `deploy-wordpress-org.yml` | Tag push |
-| Docs | `docs-site.yml` | Push main |
+| Site (landing + docs) → gh-pages | `deploy-site.yml` | Push master |
+
+## Project Website (site/)
+
+Two independent builds published together under one origin (`jeowp.org`):
+
+- **Landing** — React + Vite, source in `landing-page/`, built to `site/` (Vite `outDir`; `LANDING_OUT_DIR` overrides it). `LANDING_BASE=/subpath` produces a homolog build under a subpath.
+- **Docs** — VitePress, source in `docs/`, built to `site/docs/`.
+
+Cross-navigation: the landing links into the docs via `landing-page/src/links.js` (`DOCS_URL = '/docs/'`); the docs navbar logo links back to the landing (`themeConfig.logoLink`).
+
+### Site commands
+
+| Command | Purpose |
+|---|---|
+| `npm run dev:site` | Both dev servers under one origin: http://localhost:5173 (landing, HMR) + `/docs/` (VitePress dev, proxied by the landing dev server) |
+| `npm run build:site` | Installs deps and builds both parts into `site/` (landing, then docs) |
+| `npm run preview:site` | Serves the built `site/` at http://localhost:4174 |
+| `npm --prefix docs run docs:dev` | Docs dev server only |
+| `npm --prefix docs run docs:build` | Docs production build only (into `site/docs/`) |
+| `LANDING_BASE=/novo npm --prefix landing-page run build` | Landing build under a subpath (homolog) |
+
+> Caveat: `preview:site` uses Python's `http.server`, which does not resolve extensionless URLs — `/docs/concepts` 404s locally while GitHub Pages serves it from `concepts.html`. Verify extensionless docs URLs on the deployed site (or request the `.html` locally).
+
+### Documentation conventions (docs/)
+
+- **Stack**: VitePress with `base: '/docs/'`, `cleanUrls: true`, `srcExclude: ['README.md']` (repo-only index). Output goes straight to `site/docs/` (`outDir`, `emptyOutDir`).
+- **Structure**: flat source pages — `docs/*.md` and `docs/dev/*.md`; the home is `docs/index.md`. No rewrites: every page builds to flat `x.html` and is served at the extensionless URL `/docs/x` (GitHub Pages resolves `/x` → `x.html`). Legacy trailing-slash URLs (`/docs/x/`, MkDocs era) are not served.
+- **Internal links**: relative `.md` anchors in natural source-space form — the same path you would use to open the target file from the linking page:
+  - root → root: `[AI Settings](ai-settings.md)`
+  - root → dev: `[Geocoders](dev/geocoders.md)`
+  - dev → dev sibling: `[Geocoders](geocoders.md)`
+  - dev → root: `[AI Settings](../ai-settings.md)`
+  - home → page: `[Read documentation](index-plugin.md)`
+- **Why relative `.md`**: VitePress fails the build on dead links for `.md`/`.html` targets only — absolute links (`/page/`) bypass the check. Relative anchors also resolve when browsing the repo on GitHub.
+- **Images**: shared `docs/img/` directory, referenced relatively (`![alt](img/foo.png)`) — valid because pages stay flat.
+- **Publishing**: `deploy-site.yml` builds the complete site (landing + docs) on every push to `master` and deploys it to the `gh-pages` branch. `site/` is gitignored. Builds are deterministic (content-hashed assets are stable across builds).
 
 ## Node.js
 
