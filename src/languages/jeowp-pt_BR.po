@@ -4771,61 +4771,61 @@ msgstr "Fonte:"
 msgid "Type an address, then click Search or press Enter. You can also drag the marker across the map."
 msgstr "Digite um endereço, depois clique em Buscar ou pressione Enter. Você também pode arrastar o marcador pelo mapa."
 
-#: includes/maps/class-map-style-composer.php:570
-#: includes/maps/class-map-style-composer.php:629
+#: includes/maps/class-map-style-composer.php:631
+#: includes/maps/class-map-style-composer.php:700
 msgid "Mapbox composed styles are disabled."
 msgstr "Os estilos compostos do Mapbox estão desativados."
 
-#: includes/maps/class-map-style-composer.php:595
-#: includes/maps/class-map-style-composer.php:653
+#: includes/maps/class-map-style-composer.php:656
+#: includes/maps/class-map-style-composer.php:724
 msgid "Could not create the Mapbox composed style cache directory."
 msgstr "Não foi possível criar o diretório de cache dos estilos compostos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:749
+#: includes/maps/class-map-style-composer.php:827
 msgid "Map not found."
 msgstr "Mapa não encontrado."
 
-#: includes/maps/class-map-style-composer.php:759
+#: includes/maps/class-map-style-composer.php:837
 msgid "A Mapbox access token is required to compose Mapbox styles."
 msgstr "Um token de acesso do Mapbox é necessário para compor estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:799
+#: includes/maps/class-map-style-composer.php:877
 msgid "Public payload composition is only available for one-time maps."
 msgstr "A composição com dados públicos está disponível apenas para mapas de uso único."
 
-#: includes/maps/class-map-style-composer.php:805
+#: includes/maps/class-map-style-composer.php:883
 msgid "The map preview payload is too large."
 msgstr "Os dados da prévia do mapa são grandes demais."
 
-#: includes/maps/class-map-style-composer.php:817
+#: includes/maps/class-map-style-composer.php:895
 msgid "The map preview has too many layers to compose."
 msgstr "A prévia do mapa tem camadas demais para compor."
 
-#: includes/maps/class-map-style-composer.php:824
+#: includes/maps/class-map-style-composer.php:902
 msgid "The map preview does not include any renderable layers."
 msgstr "A prévia do mapa não inclui nenhuma camada renderizável."
 
-#: includes/maps/class-map-style-composer.php:846
+#: includes/maps/class-map-style-composer.php:924
 msgid "Map preview"
 msgstr "Prévia do mapa"
 
-#: includes/maps/class-map-style-composer.php:1222
+#: includes/maps/class-map-style-composer.php:1300
 msgid "Invalid composed style hash."
 msgstr "Hash do estilo composto inválido."
 
-#: includes/maps/class-map-style-composer.php:1356
+#: includes/maps/class-map-style-composer.php:1456
 msgid "One or more Mapbox styles could not be fetched."
 msgstr "Não foi possível obter um ou mais estilos do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1869
+#: includes/maps/class-map-style-composer.php:1970
 msgid "The PHP GD extension is required to merge Mapbox sprites."
 msgstr "A extensão PHP GD é necessária para mesclar sprites do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:1988
+#: includes/maps/class-map-style-composer.php:2095
 msgid "Could not decode a Mapbox sprite image."
 msgstr "Não foi possível decodificar uma imagem de sprite do Mapbox."
 
-#: includes/maps/class-map-style-composer.php:2954
+#: includes/maps/class-map-style-composer.php:3111
 msgid "Composed style artifact was not found."
 msgstr "O artefato do estilo composto não foi encontrado."
 
@@ -4979,11 +4979,12 @@ msgstr "Seu navegador não conseguiu determinar sua localização. Isso pode oco
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d camada(s) adicionada(s) manualmente preservada(s) durante o refinamento da IA."
 
-#: includes/class-jeo.php:2060
+#: includes/class-jeo.php:2062
 msgid "A Mapbox style ID and access token are required."
 msgstr "Um ID de estilo do Mapbox e um token de acesso são obrigatórios."
 
-#: includes/class-jeo.php:2104
+#: includes/class-jeo.php:2073
+#: includes/class-jeo.php:2111
 msgid "Unexpected Mapbox style payload."
 msgstr "Resposta de estilo do Mapbox inesperada."
 
@@ -5278,11 +5279,12 @@ msgstr "Estilo da camada"
 msgid "How the GeoJSON features are drawn."
 msgstr "Como as feições do GeoJSON são desenhadas."
 
-#: includes/class-jeo.php:2168
+#: includes/class-jeo.php:2169
 msgid "A valid http(s) style URL is required."
 msgstr "Uma URL de estilo http(s) válida é obrigatória."
 
-#: includes/class-jeo.php:2206
+#: includes/class-jeo.php:2184
+#: includes/class-jeo.php:2217
 msgid "Unexpected style JSON payload."
 msgstr "Conteúdo inesperado no style JSON."
 
@@ -5375,7 +5377,23 @@ msgid "Describe the map you want… (Shift+Enter for a line break)"
 msgstr "Descreva o mapa que você quer… (Shift+Enter para nova linha)"
 
 #. translators: %d: number of converted style values.
-#: includes/maps/class-map-style-composer.php:1308
+#: includes/maps/class-map-style-composer.php:1387
 #, php-format
 msgid "Converted %d legacy Mapbox stop-function value(s) to style-spec expressions for MapLibre compatibility."
 msgstr "Convertidos %d valor(es) de função de stops legada do Mapbox em expressões style-spec para compatibilidade com o MapLibre."
+
+#. translators: %d: number of converted style values.
+#: includes/maps/class-map-style-composer.php:1408
+#, php-format
+msgid "Converted %d legacy Mapbox token string(s) to style-spec expressions for MapLibre compatibility."
+msgstr "Convertidas %d string(s) de token legada(s) do Mapbox em expressões style-spec para compatibilidade com o MapLibre."
+
+#: includes/maps/class-map-style-composer.php:3137
+msgid "Could not encode the composed style artifact as JSON."
+msgstr "Não foi possível codificar o artefato do estilo composto como JSON."
+
+#. translators: %s: artifact file name.
+#: includes/maps/class-map-style-composer.php:3148
+#, php-format
+msgid "Could not write the composed style artifact %s. Check that the uploads directory is writable."
+msgstr "Não foi possível gravar o artefato do estilo composto %s. Verifique se o diretório de uploads permite escrita."

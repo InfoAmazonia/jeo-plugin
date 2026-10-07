@@ -660,7 +660,7 @@
 					source: 'jeo-dashboard-pins',
 					filter: ['has', 'point_count'],
 					layout: {
-						'text-field': '{point_count}',
+						'text-field': [ 'get', 'point_count' ],
 						'text-size': 13
 					},
 					paint: {

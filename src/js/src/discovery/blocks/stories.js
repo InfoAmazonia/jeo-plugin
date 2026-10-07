@@ -421,7 +421,7 @@ class Stories extends Component {
 									'icon-size': 0.13,
 									'icon-allow-overlap': false,
 									'icon-offset': [ 0, -30 ],
-									'text-field': '{point_count}',
+									'text-field': [ 'get', 'point_count' ],
 									'text-font': [ 'Open Sans Bold' ],
 									'text-size': 12,
 									'text-transform': 'uppercase',

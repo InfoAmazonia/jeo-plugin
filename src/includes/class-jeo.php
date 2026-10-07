@@ -2045,7 +2045,9 @@ class Jeo {
 	 * editor previews do not hit the Mapbox API on every request. The cache
 	 * is purged when the layer post is saved or a composed-style refresh is
 	 * forced; pass `bypass_cache => true` in `$args` to skip it. Failures are
-	 * never cached.
+	 * never cached. The transient stores the raw response body; decoding and
+	 * legacy `{token}` normalization (pre-expressions syntax) run on every
+	 * read, so cache entries never depend on the normalization code.
 	 *
 	 * @param string $style_id Mapbox style ID ("username/id").
 	 * @param string $token    Access token (per-layer or global).
@@ -2066,9 +2068,12 @@ class Jeo {
 		$cache_key = self::mapbox_style_cache_key( $style_id, $token );
 
 		if ( ! $bypass_cache ) {
-			$cached = get_transient( $cache_key );
-			if ( is_array( $cached ) ) {
-				return $cached;
+			$cached_body = get_transient( $cache_key );
+			if ( is_string( $cached_body ) && '' !== $cached_body ) {
+				$style = self::derive_style_from_body( $cached_body, 'jeo_mapbox_style_decode', 'jeo_mapbox_style_payload', __( 'Unexpected Mapbox style payload.', 'jeowp' ) );
+				if ( ! is_wp_error( $style ) ) {
+					return $style;
+				}
 			}
 		}
 
@@ -2095,22 +2100,15 @@ class Jeo {
 			);
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( JSON_ERROR_NONE !== json_last_error() ) {
-			return new \WP_Error( 'jeo_mapbox_style_json', json_last_error_msg() );
-		}
-
-		if ( ! is_array( $data ) ) {
-			return new \WP_Error( 'jeo_mapbox_style_json', __( 'Unexpected Mapbox style payload.', 'jeowp' ) );
-		}
+		$body = wp_remote_retrieve_body( $response );
 
 		set_transient(
 			$cache_key,
-			$data,
+			$body,
 			(int) apply_filters( 'jeo_mapbox_style_cache_ttl', HOUR_IN_SECONDS, $style_id )
 		);
 
-		return $data;
+		return self::derive_style_from_body( $body, 'jeo_mapbox_style_decode', 'jeo_mapbox_style_payload', __( 'Unexpected Mapbox style payload.', 'jeowp' ) );
 	}
 
 	/**
@@ -2156,6 +2154,9 @@ class Jeo {
 	 * `jeo_style_json_cache_ttl`, default 1 hour). The cache is purged when
 	 * the layer post is saved or a composed-style refresh is forced; pass
 	 * `bypass_cache => true` in `$args` to skip it. Failures are never cached.
+	 * The transient stores the raw response body; decoding and legacy
+	 * `{token}` normalization (pre-expressions syntax) run on every read, so
+	 * cache entries never depend on the normalization code.
 	 *
 	 * @param string $style_url Public URL of a style JSON file.
 	 * @param array  $args      Optional wp_remote_get arguments (timeout, user-agent) plus `bypass_cache`.
@@ -2173,10 +2174,18 @@ class Jeo {
 
 		$cache_key = self::style_json_cache_key( $style_url );
 
+		// The transient caches the RAW response body — never a derived value —
+		// so cache contents stay independent of the normalization code and no
+		// schema versioning is needed. Decoding and legacy-token migration run
+		// on every read (the same derive path as a fresh fetch, minus HTTP).
 		if ( ! $bypass_cache ) {
-			$cached = get_transient( $cache_key );
-			if ( is_array( $cached ) ) {
-				return $cached;
+			$cached_body = get_transient( $cache_key );
+			if ( is_string( $cached_body ) && '' !== $cached_body ) {
+				$style = self::derive_style_from_body( $cached_body, 'jeo_style_json_decode', 'jeo_style_json_payload', __( 'Unexpected style JSON payload.', 'jeowp' ) );
+				if ( ! is_wp_error( $style ) ) {
+					return $style;
+				}
+				// Corrupt cache entry — fall through and refetch.
 			}
 		}
 
@@ -2197,22 +2206,15 @@ class Jeo {
 			);
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $response ), true );
-		if ( JSON_ERROR_NONE !== json_last_error() ) {
-			return new \WP_Error( 'jeo_style_json_json', json_last_error_msg() );
-		}
-
-		if ( ! is_array( $data ) ) {
-			return new \WP_Error( 'jeo_style_json_payload', __( 'Unexpected style JSON payload.', 'jeowp' ) );
-		}
+		$body = wp_remote_retrieve_body( $response );
 
 		set_transient(
 			$cache_key,
-			$data,
+			$body,
 			(int) apply_filters( 'jeo_style_json_cache_ttl', HOUR_IN_SECONDS, $style_url )
 		);
 
-		return $data;
+		return self::derive_style_from_body( $body, 'jeo_style_json_decode', 'jeo_style_json_payload', __( 'Unexpected style JSON payload.', 'jeowp' ) );
 	}
 
 	/**
@@ -2242,5 +2244,38 @@ class Jeo {
 	 */
 	private static function style_json_cache_key( $style_url ) {
 		return 'jeo_style_json_' . md5( $style_url );
+	}
+
+	/**
+	 * Derive the style definition from a raw JSON body.
+	 *
+	 * Single derive path shared by cache hits and fresh fetches: decode,
+	 * validate, and normalize legacy `{token}` strings (text-field /
+	 * icon-image) to style-spec expressions — MapLibre GL JS 3+ renders
+	 * unmigrated tokens literally. Because the transient caches the raw body
+	 * and this runs on every read, changing normalization rules never
+	 * invalidates cache entries: there is no derived schema to version.
+	 *
+	 * @param string $body              Raw style JSON body.
+	 * @param string $json_error_code   Error code for decode failures.
+	 * @param string $payload_error_code Error code for a non-object payload.
+	 * @param string $payload_error     Message for a non-object payload.
+	 * @return array|\WP_Error Style definition as an associative array.
+	 */
+	private static function derive_style_from_body( $body, $json_error_code, $payload_error_code, $payload_error ) {
+		$data = json_decode( $body, true );
+		if ( JSON_ERROR_NONE !== json_last_error() ) {
+			return new \WP_Error( $json_error_code, json_last_error_msg() );
+		}
+
+		if ( ! is_array( $data ) ) {
+			return new \WP_Error( $payload_error_code, $payload_error );
+		}
+
+		if ( \Jeo\Style_Token_Migrator::raw_body_has_tokens( $body ) ) {
+			$data = \Jeo\Style_Token_Migrator::migrate_style( $data );
+		}
+
+		return $data;
 	}
 }
