@@ -5,3 +5,4 @@
 - platform: github
 - host: github.com
 - project: InfoAmazonia/jeo-plugin
+- setup-verified: 1.6.0
