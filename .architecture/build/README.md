@@ -32,6 +32,7 @@ Extends `@wordpress/scripts/config/webpack.config` with:
 - `splitChunks: false` (each entry is independent)
 - `chunkIds: 'named'`
 - `NormalModuleReplacementPlugin` to strip `node:` prefix
+- `CopyWebpackPlugin` to publish `maplibre-gl/dist/maplibre-gl-worker.mjs` as `src/js/build/maplibre-gl-worker.js` (MapLibre GL JS worker — `maplibregl-loader.js` points `setWorkerUrl()` at it; the worker file must ship with the plugin)
 - Fallbacks: `fs: false`, `path: false`
 
 ## Helper Scripts
@@ -145,6 +146,7 @@ Cross-navigation: the landing links into the docs via `landing-page/src/links.js
 src/js/build/
 ├── mapglLoader.js
 ├── mapglReact.js
+├── maplibre-gl-worker.js
 ├── jeoMap.js
 ├── jeoStorymap.js
 ├── discovery.js

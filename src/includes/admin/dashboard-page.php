@@ -399,6 +399,7 @@
 			var markers = [];
 			var map = null;
 			var glObject = null;
+			var clusterApiIsPromise = false;
 			var dashboardData = null;
 			var minTimestamp = 0;
 			var maxTimestamp = new Date().getTime();
@@ -476,6 +477,10 @@
 
 				glObject = (typeof maplibregl !== 'undefined') ? maplibregl : (typeof mapboxgl !== 'undefined' ? mapboxgl : null);
 				if (!glObject) return;
+
+				// MapLibre GL JS returns a promise from getClusterExpansionZoom;
+				// Mapbox GL JS uses the classic callback signature.
+				clusterApiIsPromise = (typeof glObject.setWorkerUrl === 'function');
 
 				map = new glObject.Map({
 					container: 'jeo-dashboard-map',
@@ -685,13 +690,20 @@
 					var clusterFeatures = map.queryRenderedFeatures(e.point, { layers: ['jeo-clusters'] });
 					if (!clusterFeatures.length) return;
 					var clusterId = clusterFeatures[0].properties.cluster_id;
-					map.getSource('jeo-dashboard-pins').getClusterExpansionZoom(clusterId, function(err, zoom) {
-						if (err) return;
+					var easeToCluster = function(zoom) {
 						map.easeTo({
 							center: clusterFeatures[0].geometry.coordinates,
 							zoom: zoom
 						});
-					});
+					};
+					if (clusterApiIsPromise) {
+						map.getSource('jeo-dashboard-pins').getClusterExpansionZoom(clusterId).then(easeToCluster);
+					} else {
+						map.getSource('jeo-dashboard-pins').getClusterExpansionZoom(clusterId, function(err, zoom) {
+							if (err) return;
+							easeToCluster(zoom);
+						});
+					}
 				});
 
 				map.on('click', 'jeo-unclustered', function(e) {

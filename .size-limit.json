@@ -2,7 +2,7 @@
 	{
 		"name": "mapglLoader",
 		"path": "src/js/build/mapglLoader.js",
-		"limit": "1100 KB",
+		"limit": "1150 KB",
 		"brotli": false
 	},
 	{

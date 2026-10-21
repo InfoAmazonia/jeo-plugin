@@ -460,7 +460,10 @@ class Jeo {
 	 * @return array{version:string,js_url:string,css_url:string}
 	 */
 	private function get_mapbox_external_sdk(): array {
-		$version = 'v3.20.0';
+		// Mapbox GL JS is intentionally loaded from the Mapbox CDN (never
+		// bundled) for licensing reasons. MapLibre GL JS, in contrast, is a
+		// bundled (BSD) dependency shipped in src/js/build/.
+		$version = 'v3.33.0';
 		$sdk     = apply_filters(
 			'jeo_mapbox_external_sdk',
 			array(
