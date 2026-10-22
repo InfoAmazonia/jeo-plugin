@@ -62,20 +62,15 @@
 		"webpack-dev-server": "^5.2.4",
 		"markdownlint-cli": "^0.48.0",
 		"copy-webpack-plugin": "^14.0.0",
-		"proxy-addr": "^2.0.8",
-		"shell-quote": "^1.12.0",
-		"compression": "^1.8.2",
-		"follow-redirects": "^1.16.1",
-		"launch-editor": "^2.14.2",
-		"source-map-js": "^1.2.2"
+		"markdown-it": "^14.3.3"
 	},
 	"dependencies": {
-		"@ckeditor/ckeditor5-react": "^11.1.2",
+		"@ckeditor/ckeditor5-react": "^12.0.0",
 		"@nazka/map-gl-js-spiderfy": "^2.0.0",
 		"@rjsf/core": "^6.5.3",
 		"@rjsf/validator-ajv8": "^6.5.3",
 		"@wordpress/editor": "^14.46.0",
-		"ckeditor5": "^48.1.1",
+		"ckeditor5": "^49.0.0",
 		"classnames": "^2.5.1",
 		"date-fns": "^4.2.1",
 		"eta": "^4.6.0",
@@ -93,14 +88,15 @@
 		"use-debounce": "^10.1.0"
 	},
 	"devDependencies": {
-		"@size-limit/file": "^12.1.0",
+		"@size-limit/file": "^14.2.0",
 		"@wordpress/scripts": "^32.2.0",
 		"ajv": "^8.18.0",
+		"copy-webpack-plugin": "^14.0.0",
 		"css-loader": "^7.1.4",
 		"postcss": "^8.5.26",
 		"sass": "^1.98.0",
-		"sass-loader": "^16.0.7",
-		"size-limit": "^12.1.0",
+		"sass-loader": "^17.0.1",
+		"size-limit": "^14.2.0",
 		"style-loader": "^4.0.0",
 		"webpack": "^5.105.4"
 	}
