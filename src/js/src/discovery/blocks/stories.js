@@ -3,7 +3,7 @@ import Search from './search';
 import LazyImage from './lazy-image';
 import LoadingSpinner from './loading-spinner';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 
 import DateRangeFilter, { formatDateRangeValue } from './date-range-filter';
 import { getClusterLeaves, loadImage } from '../../lib/mapgl-loader';
@@ -421,7 +421,7 @@ class Stories extends Component {
 									'icon-size': 0.13,
 									'icon-allow-overlap': false,
 									'icon-offset': [ 0, -30 ],
-									'text-field': '{point_count}',
+									'text-field': [ 'get', 'point_count' ],
 									'text-font': [ 'Open Sans Bold' ],
 									'text-size': 12,
 									'text-transform': 'uppercase',
@@ -1178,8 +1178,8 @@ class Stories extends Component {
 		const activeFilters = [];
 		const hoveredClusterPostsSet = new Set( this.state.hoveredClusterPostsId );
 		const storiesCountLabel = sprintf(
-			/* translators: %d is the number of stories currently displayed. */
-			__( 'Displayed stories: %d', 'jeowp' ),
+			/* translators: %d: number of displayed stories. */
+			_n( 'Displayed story: %d', 'Displayed stories: %d', this.props.stories.length, 'jeowp' ),
 			this.props.stories.length
 		);
 
@@ -1235,7 +1235,7 @@ class Stories extends Component {
 		return (
 			<div className="stories-tab" style={ this.props.style }>
 				<Search
-					searchPlaceholder={ __("Search story", "jeowp") }
+					searchPlaceholder={ __( 'Search story', 'jeowp' ) }
 					searchButtonLabel={ __( 'Search story', 'jeowp' ) }
 					update={ this.updateStories }
 					searchField={ this.props.queryParams.search?? "" }

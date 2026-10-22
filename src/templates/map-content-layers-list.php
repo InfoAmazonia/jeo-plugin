@@ -14,7 +14,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 <?php echo wp_kses_post( get_the_post_thumbnail( $layer_post ) ); ?>
 <?php echo wp_kses_post( $layer_content ); ?>
 <?php if ( strlen( $attribution ) > 0 ) : ?>
-	<?php if ( strlen( $attribution_name ) > 0 ) : ?>
+	<?php if ( false !== stripos( $attribution, '<a' ) ) : ?>
+		<?php esc_html_e( 'Attribution:', 'jeowp' ); ?> <?php echo wp_kses_post( $attribution ); ?>
+	<?php elseif ( strlen( $attribution_name ) > 0 ) : ?>
 		<?php esc_html_e( 'Attribution:', 'jeowp' ); ?> <a href="<?php echo esc_url( $attribution ); ?>"><?php echo esc_html( $attribution_name ); ?></a>
 	<?php else : ?>
 		<?php esc_html_e( 'Attribution:', 'jeowp' ); ?> <a href="<?php echo esc_url( $attribution ); ?>"><?php echo esc_html( $attribution ); ?></a>

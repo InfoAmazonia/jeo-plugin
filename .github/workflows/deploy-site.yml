@@ -1,0 +1,68 @@
+name: Deploy Site
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - docs/**
+      - landing-page/**
+      - package.json
+      - .github/workflows/deploy-site.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-site
+  cancel-in-progress: true
+
+jobs:
+  deploy-site:
+    name: Build and deploy to gh-pages
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            docs/package-lock.json
+            landing-page/package-lock.json
+
+      - name: Build site (landing + docs)
+        run: npm run build:site
+
+      - name: Deploy to gh-pages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Reuse the existing gh-pages history when present; fall back to an
+          # orphan branch on first deploy (e.g. fresh forks).
+          if git rev-parse --verify -q origin/gh-pages >/dev/null; then
+            git worktree add deploy origin/gh-pages
+          else
+            git worktree add --orphan -b gh-pages deploy
+          fi
+
+          # Swap in the fresh build (the worktree's .git file stays put) and
+          # guarantee the GitHub Pages control files.
+          find deploy -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a site/. deploy/
+          touch deploy/.nojekyll
+          echo 'jeowp.org' > deploy/CNAME
+
+          git -C deploy add -A
+          if [ -z "$(git -C deploy status --porcelain)" ]; then
+            echo "gh-pages is already up to date."
+            exit 0
+          fi
+          git -C deploy commit -m "deploy: publish site build of ${GITHUB_SHA:0:7}"
+          git -C deploy push origin HEAD:gh-pages

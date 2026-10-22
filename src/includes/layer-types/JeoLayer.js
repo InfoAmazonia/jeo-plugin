@@ -30,6 +30,24 @@ class JeoLayer {
 		}
 	}
 
+	getInlineStyle() {
+		if ( typeof this.layerType.getInlineStyle === 'function' ) {
+			return this.layerType.getInlineStyle( this.attributes );
+		}
+	}
+
+	getStyle() {
+		if ( typeof this.layerType.getStyle === 'function' ) {
+			return this.layerType.getStyle( this.attributes );
+		}
+
+		return this.getInlineStyle() || this.getStyleUrl();
+	}
+
+	get isStyle() {
+		return this.layerType?.isStyle === true;
+	}
+
 	get layer_name() {
 		return this.attributes.layer_name;
 	}

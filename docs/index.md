@@ -1,4 +1,4 @@
-![JEO](img/logo.png)
+[![JEO Maps](/logo-light.svg){.light-only} ![JEO Maps](/logo-dark.svg){.dark-only}](https://jeowp.org/)
 
 The JEO WordPress geojournalism platform allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is intuitive and interactive.
 
@@ -13,7 +13,10 @@ Features:
 - Geocoding WordPress posts using OpenStreetMap (Nominatim), supporting the post type `Post`, with extensibility for additional geocoders via hook.
 - Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
 - Map markers query integrated to posts query.
-- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://br.wordpress.org/plugins/polylang/) multilingual plugins
+- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://wordpress.org/plugins/polylang/) multilingual plugins
+- AI-powered georeferencing, bulk geolocation, and map generation (multiple AI providers)
+- AI-assisted map block (Minimap) with chat refinement and auto-generated layers
+- Stories Near You block with geolocation-based post discovery
 
 Projects using JEO:
 
@@ -24,7 +27,7 @@ Projects using JEO:
 - [MekongEye](https://www.mekongeye.com/)
 - [Caci](http://caci.cimi.org.br/)
 
-[Read documentation](index-plugin.md) or [See in Wordpress store](https://br.wordpress.org/plugins/jeowp/)
+[Read documentation](index-plugin.md) or [See in Wordpress store](https://wordpress.org/plugins/jeowp/)
 
 
 ## JEO WordPress Theme

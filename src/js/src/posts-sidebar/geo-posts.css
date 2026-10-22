@@ -113,6 +113,145 @@
 	}
 }
 
+/* Fullscreen modal layout: map fills viewport, overlay panel floats on top.
+   The WordPress Modal component already sets display:flex on the frame and,
+   when isFullScreen, display:flex on .components-modal__content with
+   > :last-child { flex: 1 }. We only need to override sizing and ensure
+   the map container has explicit dimensions. */
+.jeo-geocode-modal .components-modal__frame {
+	border-radius: 0 !important;
+	margin: 0 !important;
+	max-height: 100vh !important;
+	max-width: 100vw !important;
+	width: 100vw !important;
+	height: 100vh !important;
+}
+
+.jeo-geocode-modal .components-modal__content {
+	padding: 0 !important;
+	overflow: hidden !important;
+}
+
+.jeo-geocode-modal .components-modal__header {
+	background: rgba(255, 255, 255, 0.95);
+}
+
+.jeo-geocode-modal__container {
+	position: relative;
+	width: 100%;
+	height: calc(100vh - 72px);
+	overflow: hidden;
+}
+
+.jeo-geocode-modal__map {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+}
+
+.jeo-geocode-modal__map .leaflet-container {
+	width: 100% !important;
+	height: 100% !important;
+}
+
+/* Floating overlay panel */
+.jeo-geocode-modal__panel {
+	position: absolute;
+	bottom: 100px;
+	left: 16px;
+	width: 420px;
+	max-height: calc(100% - 96px);
+	background: rgba(255, 255, 255, 0.96);
+	border-radius: 8px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+	backdrop-filter: blur(4px);
+	z-index: 500;
+	display: flex;
+	flex-direction: column;
+}
+
+.jeo-geocode-modal__panel.is-collapsed {
+	width: auto;
+	min-width: 180px;
+	max-height: 48px;
+	overflow: hidden;
+}
+
+.jeo-geocode-modal__panel.is-collapsed .jeo-geocode-modal__panel-content {
+	display: none;
+}
+
+.jeo-geocode-modal__panel-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 10px 14px;
+	border-bottom: 1px solid #e0e0e0;
+	flex-shrink: 0;
+	cursor: move;
+	user-select: none;
+}
+
+.jeo-geocode-modal__panel-header:hover {
+	background: rgba(0, 0, 0, 0.02);
+}
+
+.jeo-geocode-modal__panel-header h3 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: 600;
+	color: #1e1e1e;
+}
+
+.jeo-geocode-modal__panel-toggle {
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 4px 8px;
+	font-size: 16px;
+	line-height: 1;
+	color: #50575e;
+	border-radius: 4px;
+	transition: background 0.15s;
+}
+
+.jeo-geocode-modal__panel-toggle:hover {
+	background: #f0f0f1;
+	color: #1e1e1e;
+}
+
+.jeo-geocode-modal__panel-content {
+	padding: 12px 14px;
+	overflow-y: auto;
+	flex: 1;
+}
+
+/* Action bar at bottom of modal */
+.jeo-geocode-modal__actions {
+	position: absolute;
+	bottom: 16px;
+	right: 16px;
+	z-index: 500;
+	display: flex;
+	gap: 10px;
+	background: rgba(255, 255, 255, 0.95);
+	padding: 10px 16px;
+	border-radius: 8px;
+	box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+	backdrop-filter: blur(4px);
+}
+
+/* Responsive: panel stacks on narrow screens */
+@media screen and (max-width: 600px) {
+	.jeo-geocode-modal__panel {
+		width: calc(100% - 32px);
+		max-height: 45%;
+	}
+}
+
 @media screen and (min-width: 1000px) {
 	.jeo-geocode-posts {
 		flex-direction: row;

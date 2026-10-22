@@ -39,7 +39,7 @@ class Storymap {
 	 * @return void
 	 */
 	protected function init() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'register_post_type' ), 20 );
 		add_filter( 'single_template', array( $this, 'override_template' ) );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
 
@@ -154,7 +154,7 @@ class Storymap {
 		global $post;
 
 		if ( is_singular( 'storymap' ) ) {
-			return JEO_BASEPATH . '/templates/single-storymap.php';
+			return jeo_get_template( 'single-storymap.php' );
 		}
 
 		return $template;

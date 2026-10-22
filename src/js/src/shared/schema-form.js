@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	CheckboxControl,
 	SelectControl,
+	TextareaControl,
 	TextControl,
 } from './wp-form-controls';
 
@@ -113,6 +114,29 @@ function TextWidget( {
 	);
 }
 
+function TextareaWidget( {
+	id,
+	value,
+	disabled,
+	readonly,
+	required,
+	autofocus,
+	placeholder,
+	onChange,
+} ) {
+	return (
+		<TextareaControl
+			id={ id }
+			value={ value ?? '' }
+			disabled={ disabled || readonly }
+			required={ required }
+			autoFocus={ autofocus }
+			placeholder={ placeholder }
+			onChange={ onChange }
+		/>
+	);
+}
+
 function SelectWidget( {
 	id,
 	value,
@@ -157,6 +181,7 @@ function SelectWidget( {
 const widgets = {
 	CheckboxWidget,
 	SelectWidget,
+	TextareaWidget,
 	TextWidget,
 };
 

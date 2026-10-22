@@ -1,6 +1,6 @@
 import { Component } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { List, arrayMove } from 'react-movable';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -724,19 +724,34 @@ class MapLayers extends Component {
 		}
 
 		this.styleImageMissingHandlerRegistered = true;
-		map.on( 'styleimagemissing', ( event ) => {
-			const imageId = event?.id;
+
+		const resolveImageFromAtlases = ( imageId ) => {
 			if ( typeof imageId !== 'string' || map.hasImage( imageId ) ) {
-				return;
+				return false;
 			}
 
 			for ( const atlas of this.spriteAtlases.values() ) {
 				if ( this.addImageFromAtlas( atlas, imageId ) ) {
 					map.triggerRepaint?.();
-					return;
+					return true;
 				}
 			}
-		} );
+
+			return false;
+		};
+
+		// MapLibre GL JS requires the resolver API to supply missing style
+		// images; the externally loaded Mapbox GL JS runtime keeps the
+		// classic `styleimagemissing` event contract.
+		if ( typeof map.setMissingStyleImageResolver === 'function' ) {
+			map.setMissingStyleImageResolver( ( imageId ) => {
+				resolveImageFromAtlases( imageId );
+			} );
+		} else {
+			map.on( 'styleimagemissing', ( event ) => {
+				resolveImageFromAtlases( event?.id );
+			} );
+		}
 	}
 
 	async preloadStyleImages( spriteRoot, imageIds ) {

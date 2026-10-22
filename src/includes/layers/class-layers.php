@@ -32,7 +32,7 @@ class Layers {
 	 * @return void
 	 */
 	protected function init() {
-		add_action( 'init', array( $this, 'register_post_type' ) );
+		add_action( 'init', array( $this, 'register_post_type' ), 20 );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
 		add_action( 'add_meta_boxes', array( $this, 'remove_custom_fields_meta_box' ), 99 );
 		$this->register_rest_meta_validation();
@@ -69,7 +69,7 @@ class Layers {
 			'labels'              => $labels,
 			'hierarchical'        => false,
 			'description'         => __( 'JEO Layers', 'jeowp' ),
-			'supports'            => array( 'title', 'editor', 'page-attributes', 'custom-fields' ),
+			'supports'            => array( 'title', 'editor', 'excerpt', 'page-attributes', 'custom-fields' ),
 			'rewrite'             => array( 'slug' => 'layers' ),
 			'show_in_rest'        => true,
 			'public'              => true,
@@ -96,6 +96,29 @@ class Layers {
 		);
 
 		register_post_type( $this->post_type, $args );
+
+		$theme_labels = array(
+			'name'          => __( 'Layer Themes', 'jeowp' ),
+			'singular_name' => __( 'Layer Theme', 'jeowp' ),
+			'add_new_item'  => __( 'Add New Layer Theme', 'jeowp' ),
+			'edit_item'     => __( 'Edit Layer Theme', 'jeowp' ),
+		);
+
+		register_taxonomy(
+			'layer-theme',
+			$this->post_type,
+			array(
+				'labels'            => $theme_labels,
+				'hierarchical'      => true,
+				'public'            => false,
+				'show_ui'           => true,
+				'show_admin_column' => true,
+				'show_in_rest'      => true,
+				'rewrite'           => false,
+			)
+		);
+
+		$this->seed_layer_theme_terms();
 
 		register_post_meta(
 			$this->post_type,
@@ -214,6 +237,53 @@ class Layers {
 				'description'   => __( 'Legend title', 'jeowp' ),
 			)
 		);
+
+		register_post_meta(
+			$this->post_type,
+			'default_style',
+			array(
+				'show_in_rest'  => array(
+					'schema' => array(
+						'properties'           => array(),
+						'additionalProperties' => true,
+					),
+				),
+				'single'        => true,
+				'auth_callback' => '__return_true',
+				'type'          => 'object',
+				'description'   => __( 'AI-suggested default style (filter/paint/layout) applied when a map layer instance sets style.use_default', 'jeowp' ),
+			)
+		);
+	}
+
+	/**
+	 * Seed default layer theme terms if they do not exist.
+	 *
+	 * @return void
+	 */
+	private function seed_layer_theme_terms(): void {
+		$default_terms = array(
+			__( 'Deforestation', 'jeowp' ),
+			__( 'Hydrography', 'jeowp' ),
+			__( 'Indigenous Lands', 'jeowp' ),
+			__( 'Protected Areas', 'jeowp' ),
+			__( 'Mining', 'jeowp' ),
+			__( 'Oil and Gas', 'jeowp' ),
+			__( 'Land Use', 'jeowp' ),
+			__( 'Agriculture', 'jeowp' ),
+			__( 'Infrastructure', 'jeowp' ),
+			__( 'Administrative Boundaries', 'jeowp' ),
+			__( 'Socioeconomic', 'jeowp' ),
+			__( 'Biodiversity', 'jeowp' ),
+			__( 'Fire', 'jeowp' ),
+			__( 'Climate', 'jeowp' ),
+		);
+
+		foreach ( $default_terms as $term_name ) {
+			if ( ! term_exists( $term_name, 'layer-theme' ) ) {
+				wp_insert_term( $term_name, 'layer-theme' );
+			}
+		}
 	}
 
 	/**

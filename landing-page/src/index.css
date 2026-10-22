@@ -1,0 +1,133 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    /* clear the v3 navbar (118px on desktop) on anchor jumps */
+    scroll-padding-top: 5rem;
+  }
+
+  @media (min-width: 1024px) {
+    html {
+      scroll-padding-top: 7.375rem;
+    }
+  }
+
+  body {
+    @apply bg-v3-navy-hero text-v3-light font-sans antialiased;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    @apply bg-v3-green/30 text-v3-navy;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 11px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #11161a;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #2a3138;
+    border-radius: 999px;
+    border: 3px solid #11161a;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #00dba6;
+  }
+}
+
+@layer components {
+  /* Redesign v3 — 1600px container (160px margins at 1920px) */
+  .section-shell-v3 {
+    @apply mx-auto w-full max-w-v3-content px-6 sm:px-10;
+  }
+
+  /* Redesign v3 — vertical section rhythm (issue #669, mobile slice).
+     BASE (<=639px): uniform 48px top/bottom padding on every v3 section
+     shell, so every inter-section boundary measures exactly 96px (48+48).
+     Derived from the Figma desktop rhythm (133:1531: 80/100/120px
+     paddings -> boundaries 180-240px) scaled by the project's mobile
+     factor (~0.53-0.64, same scale as the type ramp 64px->36px); the
+     former mobile paddings (56-80px -> boundaries 120-144px) left the
+     pale-on-pale Features->HowItWorks void reading as a 120px slab
+     against 64-80px everywhere else.
+     sm:/lg: overrides stay PER-SECTION in the JSX (Figma desktop rhythm,
+     pixel-validated in slices S3-S6 — do not regress; tablet 640-1023
+     and desktop >=1024 are unchanged by this token). Utilities layer
+     beats components layer, so sm:/lg: values always win over the base. */
+  .section-pad-v3 {
+    @apply py-12;
+  }
+
+  /* Redesign v3 — primary CTA (green, dark text) */
+  .btn-v3-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-b
+      from-v3-green to-[#00C79B] px-8 text-lg font-bold text-v3-navy transition-all
+      duration-300 hover:brightness-110 focus:outline-none focus-visible:ring-2
+      focus-visible:ring-v3-green focus-visible:ring-offset-2 focus-visible:ring-offset-v3-navy;
+  }
+
+  /* Redesign v3 — ghost CTA (teal border, light text) */
+  .btn-v3-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-[14px] border-2 border-v3-green-dark/80
+      bg-transparent px-8 text-lg font-bold text-v3-light transition-all duration-300
+      hover:border-v3-green hover:bg-v3-green/10 focus:outline-none focus-visible:ring-2
+      focus-visible:ring-v3-green;
+  }
+
+  /* Redesign v3 — secondary CTA (solid dark green, light text — Live Demo button,
+     Figma instance 133:1775: 302×68, fill #019875, label Open Sans Bold 24 #FAFAF8, r≈14).
+     Hover darkens the fill (prototype measurement: center → ≈#019775, edges gain
+     a light sheen — see figma-ref/redesign-v3-animations.md). */
+  .btn-v3-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-[14px] bg-v3-green-dark px-8
+      text-lg font-bold text-v3-light transition-all duration-300 hover:brightness-90
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-v3-green focus-visible:ring-offset-2
+      focus-visible:ring-offset-v3-navy sm:text-xl lg:px-10 lg:text-2xl;
+  }
+
+  /* Redesign v3 — eyebrow pill (status label) */
+  .eyebrow-v3 {
+    @apply inline-flex items-center gap-2 rounded-full bg-v3-accent/10 px-3 py-1.5
+      text-xs font-bold uppercase tracking-[1.5px] text-v3-accent;
+  }
+}
+
+@layer utilities {
+  /* Open Sans Condensed via the variable font's width axis (matches Figma headings) */
+  .font-condensed {
+    font-stretch: 75%;
+  }
+
+  /* Hide a scroll container's scrollbar while keeping it scrollable
+     (canonical cross-browser pattern). Used by the ResourceSlider tabs
+     row — the mobile horizontal swipe stays gesture-only. */
+  .no-scrollbar {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -4,6 +4,8 @@
 	window.JeoLayerTypes.registerLayerType( 'mapbox', {
 	label: __( 'Mapbox Style', 'jeowp' ),
 
+	isStyle: true,
+
 	addStyle( map, attributes ) {
 		const styleUrl = this.getStyleUrl( attributes );
 
@@ -140,9 +142,11 @@
 
 		const styleId = layerTypeOptions.style_id?.replace( 'mapbox://styles/', '' );
 
-		if ( styleId ) {
+		if ( styleId && accessToken ) {
 			return `https://api.mapbox.com/styles/v1/${ styleId }?access_token=${ accessToken }`;
 		}
+
+		return null;
 	},
 
 	getStyleLayers( attributes ) {

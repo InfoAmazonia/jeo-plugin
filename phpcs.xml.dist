@@ -18,4 +18,10 @@
 	<exclude-pattern>*/.worktrees/*</exclude-pattern>
 	<exclude-pattern>*/wp-content/*</exclude-pattern>
 	<exclude-pattern>*/js/build/*</exclude-pattern>
+	<exclude-pattern>*/.git/*</exclude-pattern>
+	<exclude-pattern>*/.docker/*</exclude-pattern>
+	<exclude-pattern>*/.tmp/*</exclude-pattern>
+	<exclude-pattern>*/dist/*</exclude-pattern>
+	<exclude-pattern>*/docs/*</exclude-pattern>
+	<exclude-pattern>*/site/*</exclude-pattern>
 </ruleset>

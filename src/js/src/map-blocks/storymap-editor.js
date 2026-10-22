@@ -38,6 +38,11 @@ import { createUploadAdapter } from './cke5-image-upload';
 import { baseColors } from './color-palettes';
 import { Map as MapPreview } from '../lib/mapgl-react';
 import { renderLayer } from './map-preview-layer';
+import {
+	applyStyleLayerFiltering,
+	findStyleLayer,
+	styleLayerMapProps,
+} from './use-style-layer';
 import JeoAutosuggest from './jeo-autosuggest';
 import JeoGeoAutoComplete from '../posts-sidebar/geo-auto-complete';
 import {
@@ -49,6 +54,7 @@ import {
 } from './storymap-ordering';
 import { useRecordsByIds } from '../shared/rest-records';
 import { computeInlineEnd } from '../shared/direction';
+import { decodeHtmlEntity } from '../shared/html';
 import { getCKEditorLanguage } from '../shared/locale';
 import {
 	applyComposedVisibilityFromSelection,
@@ -96,10 +102,6 @@ function createInitialViewState () {
 	};
 }
 
-function decodeHtmlEntity ( str ) {
-	return str.replace( /&#(\d+);/g, ( match, dec ) => String.fromCharCode( dec ) );
-};
-
 function removeTags(str) {
 	if ((str == null) || (str === '')) {
 		return false;
@@ -109,11 +111,13 @@ function removeTags(str) {
  }
 
 function flyTo ( map, location ) {
+	const lat = parseFloat( location.lat );
+	const lng = parseFloat( location.lng || location.lon );
+
+	if ( isNaN( lat ) || isNaN( lng ) ) return;
+
 	map.flyTo({
-		center: [
-			parseFloat( location.lon ),
-			parseFloat( location.lat ),
-		]
+		center: [ lng, lat ]
 	});
 }
 
@@ -550,7 +554,7 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 			return [];
 		}
 		return loadedMap.meta.layers.map( ( layer ) => layer.id );
-	}, [ loadedMap?.meta.layers ] );
+	}, [ JSON.stringify( loadedMap?.meta.layers?.map( ( l ) => l.id ) || [] ) ] );
 
 	const {
 		records: loadedLayers = [],
@@ -613,6 +617,17 @@ export default function StoryMapEditor ( { attributes, setAttributes } ) {
 		currentSlidePreviewKey,
 		useComposedPreview,
 	] );
+
+	const currentSlideLayers =
+		attributes.slides?.[ currentSlideIndex ]?.selectedLayers || [];
+	const styleBase = useMemo(
+		() =>
+			findStyleLayer(
+				attributes.navigateMapLayers || [],
+				currentSlideLayers
+			),
+		[ attributes.navigateMapLayers, currentSlideLayers ]
+	);
 
 	useEffect( () => {
 		const currentSlide = attributes.slides?.[ currentSlideIndex ];
