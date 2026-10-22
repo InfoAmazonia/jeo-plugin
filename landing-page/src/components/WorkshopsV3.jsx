@@ -44,9 +44,12 @@ import { GITHUB_URL, DOCS_URL } from '../links.js'
 // The "Oficinas de lançamento" card (signup form) stays OFF until there are
 // workshop schedules to announce — reactivation also depends on the
 // transactional email setup to be configured with the client. While false,
-// the Community Box renders alone, centered in a single column. To bring the
-// card back: flip to true — the 2-column grid, the +30px community offset
-// and the full-width community box are restored automatically.
+// the Community Box renders alone, centered like the Features Showcase
+// header band ("Recursos inteligentes"): title and body centered, content
+// capped at max-w-[1152px] (narrower than the full 1600px shell used by
+// the image rows). To bring the card back: flip to true — the 2-column
+// grid, the +30px community offset and the full-width community box are
+// restored automatically.
 const SHOW_WORKSHOP_CARD = false
 
 export default function WorkshopsV3() {
@@ -136,12 +139,17 @@ export default function WorkshopsV3() {
         )}
 
         {/* Community Box (Figma 133:1793 — +30px top offset on desktop when
-            the workshop card is visible; centered alone otherwise) */}
+            the workshop card is visible; otherwise centered like the
+            Features Showcase header band: max-w-[1152px], text-center) */}
         <Reveal
           delay={0.12}
-          className={SHOW_WORKSHOP_CARD ? 'lg:mt-[30px]' : 'mx-auto w-full max-w-[776px]'}
+          className={SHOW_WORKSHOP_CARD ? 'lg:mt-[30px]' : 'mx-auto w-full max-w-[1152px]'}
         >
-          <div className="flex flex-col gap-8 lg:gap-10">
+          <div
+            className={`flex flex-col gap-8 lg:gap-10 ${
+              SHOW_WORKSHOP_CARD ? '' : 'items-center text-center'
+            }`}
+          >
             <h3 className="font-condensed text-3xl font-bold leading-[1.2] text-v3-navy sm:text-4xl lg:text-[40px]">
               {ws.communityTitle}
             </h3>
@@ -153,8 +161,13 @@ export default function WorkshopsV3() {
               ))}
             </div>
 
-            {/* Frame 23 (Figma 133:1796) — 40px row inset, ~40px between links */}
-            <div className="flex flex-wrap gap-x-10 gap-y-3 pl-0 lg:pl-10">
+            {/* Frame 23 (Figma 133:1796) — 40px row inset, ~40px between links;
+                centered when the workshop card is hidden */}
+            <div
+              className={`flex flex-wrap gap-x-10 gap-y-3 ${
+                SHOW_WORKSHOP_CARD ? 'pl-0 lg:pl-10' : 'justify-center'
+              }`}
+            >
               <a
                 href={GITHUB_URL}
                 target="_blank"
