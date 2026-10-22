@@ -31,15 +31,15 @@ msgstr "Mapas interativos para o editor de blocos do WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:931
+#: includes/class-jeo.php:934
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas nenhuma chave de API do Mapbox está configurada. Voltando para MapLibre."
 
-#: includes/class-jeo.php:932
+#: includes/class-jeo.php:935
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Mapbox foi selecionado como biblioteca de renderização, mas o SDK externo do Mapbox não pôde ser carregado. Voltando para MapLibre."
 
-#: includes/class-jeo.php:1470
+#: includes/class-jeo.php:1473
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Ler mais"
@@ -1782,11 +1782,11 @@ msgstr "Geolocalizar este post"
 msgid "Geolocation"
 msgstr "Geolocalização"
 
-#: includes/class-jeo.php:672
+#: includes/class-jeo.php:675
 msgid "Ordered list of map-layer IDs to return."
 msgstr "Lista ordenada dos IDs das camadas a serem retornados."
 
-#: includes/class-jeo.php:677
+#: includes/class-jeo.php:680
 msgid "Request context."
 msgstr "Contexto da requisição."
 
@@ -1848,32 +1848,32 @@ msgstr "Período da linha do tempo"
 msgid "Gathering geodata and initializing JEO Engine..."
 msgstr "Coletando geodados e inicializando o JEO Engine..."
 
-#: includes/admin/dashboard-page.php:524
+#: includes/admin/dashboard-page.php:529
 #: includes/settings/class-settings.php:654
 msgid "Select Taxonomy..."
 msgstr "Selecionar taxonomia..."
 
-#: includes/admin/dashboard-page.php:542
+#: includes/admin/dashboard-page.php:547
 #: includes/settings/class-settings.php:655
 msgid "Select Term..."
 msgstr "Selecionar termo..."
 
-#: includes/admin/dashboard-page.php:605
+#: includes/admin/dashboard-page.php:610
 #: includes/settings/class-settings.php:656
 msgid " locations found."
 msgstr " localizações encontradas."
 
-#: includes/admin/dashboard-page.php:617
-#: includes/admin/dashboard-page.php:704
+#: includes/admin/dashboard-page.php:622
+#: includes/admin/dashboard-page.php:716
 msgid "Untitled"
 msgstr "Sem título"
 
-#: includes/admin/dashboard-page.php:707
+#: includes/admin/dashboard-page.php:719
 #: includes/settings/class-settings.php:652
 msgid "View Post"
 msgstr "Ver post"
 
-#: includes/admin/dashboard-page.php:707
+#: includes/admin/dashboard-page.php:719
 #: includes/settings/class-settings.php:653
 msgid "Edit Post"
 msgstr "Editar post"
@@ -4542,11 +4542,11 @@ msgstr "Pré-visualização interativa de mapa para o editor do tipo de post Map
 msgid "Unable to retrieve the address for the selected point."
 msgstr "Não foi possível obter o endereço para o ponto selecionado."
 
-#: includes/class-jeo.php:1711
+#: includes/class-jeo.php:1714
 msgid "This JEO embed is not available."
 msgstr "Este embed JEO não está disponível."
 
-#: includes/class-jeo.php:1712
+#: includes/class-jeo.php:1715
 msgid "Embed not available"
 msgstr "Embed indisponível"
 
@@ -4979,12 +4979,12 @@ msgstr "Seu navegador não conseguiu determinar sua localização. Isso pode oco
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d camada(s) adicionada(s) manualmente preservada(s) durante o refinamento da IA."
 
-#: includes/class-jeo.php:2062
+#: includes/class-jeo.php:2065
 msgid "A Mapbox style ID and access token are required."
 msgstr "Um ID de estilo do Mapbox e um token de acesso são obrigatórios."
 
-#: includes/class-jeo.php:2073
-#: includes/class-jeo.php:2111
+#: includes/class-jeo.php:2076
+#: includes/class-jeo.php:2114
 msgid "Unexpected Mapbox style payload."
 msgstr "Resposta de estilo do Mapbox inesperada."
 
@@ -5279,12 +5279,12 @@ msgstr "Estilo da camada"
 msgid "How the GeoJSON features are drawn."
 msgstr "Como as feições do GeoJSON são desenhadas."
 
-#: includes/class-jeo.php:2169
+#: includes/class-jeo.php:2172
 msgid "A valid http(s) style URL is required."
 msgstr "Uma URL de estilo http(s) válida é obrigatória."
 
-#: includes/class-jeo.php:2184
-#: includes/class-jeo.php:2217
+#: includes/class-jeo.php:2187
+#: includes/class-jeo.php:2220
 msgid "Unexpected style JSON payload."
 msgstr "Conteúdo inesperado no style JSON."
 

@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-07T21:30:49+00:00\n"
+"POT-Creation-Date: 2026-10-22T14:15:37+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -88,32 +88,32 @@ msgstr ""
 msgid "Gathering geodata and initializing JEO Engine..."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:524
+#: includes/admin/dashboard-page.php:529
 #: includes/settings/class-settings.php:654
 msgid "Select Taxonomy..."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:542
+#: includes/admin/dashboard-page.php:547
 #: includes/settings/class-settings.php:655
 msgid "Select Term..."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:605
+#: includes/admin/dashboard-page.php:610
 #: includes/settings/class-settings.php:656
 msgid " locations found."
 msgstr ""
 
-#: includes/admin/dashboard-page.php:617
-#: includes/admin/dashboard-page.php:704
+#: includes/admin/dashboard-page.php:622
+#: includes/admin/dashboard-page.php:716
 msgid "Untitled"
 msgstr ""
 
-#: includes/admin/dashboard-page.php:707
+#: includes/admin/dashboard-page.php:719
 #: includes/settings/class-settings.php:652
 msgid "View Post"
 msgstr ""
 
-#: includes/admin/dashboard-page.php:707
+#: includes/admin/dashboard-page.php:719
 #: includes/settings/class-settings.php:653
 msgid "Edit Post"
 msgstr ""
@@ -1832,50 +1832,50 @@ msgstr ""
 msgid "File not found"
 msgstr ""
 
-#: includes/class-jeo.php:672
+#: includes/class-jeo.php:675
 msgid "Ordered list of map-layer IDs to return."
 msgstr ""
 
-#: includes/class-jeo.php:677
+#: includes/class-jeo.php:680
 msgid "Request context."
 msgstr ""
 
-#: includes/class-jeo.php:931
+#: includes/class-jeo.php:934
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:932
+#: includes/class-jeo.php:935
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:1470
+#: includes/class-jeo.php:1473
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr ""
 
-#: includes/class-jeo.php:1711
+#: includes/class-jeo.php:1714
 msgid "This JEO embed is not available."
 msgstr ""
 
-#: includes/class-jeo.php:1712
+#: includes/class-jeo.php:1715
 msgid "Embed not available"
 msgstr ""
 
-#: includes/class-jeo.php:2062
+#: includes/class-jeo.php:2065
 msgid "A Mapbox style ID and access token are required."
 msgstr ""
 
-#: includes/class-jeo.php:2073
-#: includes/class-jeo.php:2111
+#: includes/class-jeo.php:2076
+#: includes/class-jeo.php:2114
 msgid "Unexpected Mapbox style payload."
 msgstr ""
 
-#: includes/class-jeo.php:2169
+#: includes/class-jeo.php:2172
 msgid "A valid http(s) style URL is required."
 msgstr ""
 
-#: includes/class-jeo.php:2184
-#: includes/class-jeo.php:2217
+#: includes/class-jeo.php:2187
+#: includes/class-jeo.php:2220
 msgid "Unexpected style JSON payload."
 msgstr ""
 
