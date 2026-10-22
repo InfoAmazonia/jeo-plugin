@@ -25,14 +25,15 @@ mapgl-loader.js
 
 ### MapLibre GL (Default)
 
-- **Bundled** via npm (`maplibre-gl`)
+- **Bundled** via npm (`maplibre-gl`, ESM-only since v6 — imported as `import * as MapLibreGL`)
+- Web worker published alongside the bundles: `maplibregl-loader.js` calls `setWorkerUrl( jeo_settings.public_path + 'maplibre-gl-worker.js' )` at module scope (the file is copied to `src/js/build/` by webpack — see `build/README.md`)
 - Enriched with `map-gl-utils` for convenience
 - Default style: OSM raster tiles
-- CSS injected programmatically
+- CSS imported from the package
 
 ### Mapbox GL (Optional)
 
-- **NOT bundled** — uses `globalThis.mapboxgl` loaded via `wp_enqueue_script`
+- **NOT bundled** (licensing) — uses `globalThis.mapboxgl` loaded from the Mapbox CDN (`class-jeo.php::get_mapbox_external_sdk()`, currently pinned to v3.33, filterable via `jeo_mapbox_external_sdk`)
 - Token injected via `transformRequest`
 - Patches for missing/deprecated APIs: `getLight()`, `getSky()`, `setSky()`
 
@@ -53,13 +54,22 @@ HTMLElement[Symbol.hasInstance] = function( obj ) {
 
 Patched to use `document.fullscreenElement` from iframe container.
 
-### Drag Listeners
+### Event Binding
 
-React wrapper duplicates listeners from parent document to iframe document.
+MapLibre GL JS (v6+) binds handler events to the map container's own document
+(`HandlerManager._ownerDocument`/`_ownerWindow`), so no listener duplication
+is needed when the map renders inside the editor iframe.
 
 ### ResizeObserver
 
 Used to detect map container size changes.
+
+### Missing style images
+
+Runtimes diverge on how sprite images are supplied on demand:
+`discovery/blocks/map-layers.js::registerStyleImageMissingHandler()` uses
+`map.setMissingStyleImageResolver()` when available (MapLibre) and falls back
+to the classic `styleimagemissing` event otherwise (Mapbox).
 
 ## React Components
 

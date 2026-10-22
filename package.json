@@ -61,7 +61,13 @@
 		"react-autosize-textarea": "file:npm-overrides/react-autosize-textarea",
 		"webpack-dev-server": "^5.2.4",
 		"markdownlint-cli": "^0.48.0",
-		"copy-webpack-plugin": "^14.0.0"
+		"copy-webpack-plugin": "^14.0.0",
+		"proxy-addr": "^2.0.8",
+		"shell-quote": "^1.12.0",
+		"compression": "^1.8.2",
+		"follow-redirects": "^1.16.1",
+		"launch-editor": "^2.14.2",
+		"source-map-js": "^1.2.2"
 	},
 	"dependencies": {
 		"@ckeditor/ckeditor5-react": "^11.1.2",
@@ -76,7 +82,7 @@
 		"leaflet": "^1.9.4",
 		"lodash-es": "^4.17.23",
 		"map-gl-utils": "^0.50.4",
-		"maplibre-gl": "^5.24.0",
+		"maplibre-gl": "^6.15.0",
 		"maplibregl-mapbox-request-transformer": "^0.0.3",
 		"react-bootstrap-daterangepicker": "^8.0.0",
 		"react-datepicker": "^9.1.0",

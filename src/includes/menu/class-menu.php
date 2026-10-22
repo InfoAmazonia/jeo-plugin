@@ -89,15 +89,14 @@ class Menu {
 			return;
 		}
 
-		$map_runtime = \jeo_settings()->get_option( 'map_runtime' );
-
-		if ( 'maplibregl' === $map_runtime ) {
-			wp_enqueue_style( 'maplibregl-css', 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css', array(), '3.6.2' );
-			wp_enqueue_script( 'maplibregl', 'https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js', array(), '3.6.2', true );
-		} else {
-			wp_enqueue_style( 'mapboxgl-css', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css', array(), '2.15.0' );
-			wp_enqueue_script( 'mapboxgl', 'https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js', array(), '2.15.0', true );
-		}
+		// Reuse the plugin's own `mapgl` runtime bundle (registered on `init`
+		// by Jeo::register_assets()) so the dashboard renders with the same
+		// runtime as the rest of the plugin. Mapbox GL JS still loads from
+		// the Mapbox CDN when (and only when) the mapboxgl runtime is
+		// selected with a valid key — it is a script dependency of `mapgl`.
+		// The bundle exposes the active runtime as `window.mapboxgl`.
+		wp_enqueue_style( 'mapgl' );
+		wp_enqueue_script( 'mapgl' );
 	}
 
 	/**
