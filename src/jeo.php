@@ -11,7 +11,7 @@
  * Version:           4.0.0-beta.1
  * Author:            InfoAmazonia
  * Author URI:        https://www.jeowp.org/
- * Requires at least: 6.6
+ * Requires at least: 6.9
  * Requires PHP:      8.2
  * License:           GPL-3.0-only
  * License URI:       https://www.gnu.org/licenses/gpl-3.0.html

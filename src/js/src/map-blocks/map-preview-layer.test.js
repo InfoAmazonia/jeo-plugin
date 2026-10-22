@@ -1,7 +1,7 @@
 import { Layer } from '../lib/mapgl-react';
 import { getStyleProps, renderLayer } from './map-preview-layer';
 
-jest.mock( '../lib/mapgl-react', () => ( {
+vi.mock( '../lib/mapgl-react', () => ( {
 	Layer: () => null,
 	Source: ( { children } ) => children,
 	Map: () => null,

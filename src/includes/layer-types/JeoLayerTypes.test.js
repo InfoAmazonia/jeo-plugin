@@ -1,14 +1,14 @@
 describe( 'JeoLayerTypes', () => {
 	beforeEach( () => {
-		jest.resetModules();
+		vi.resetModules();
 		delete window.JeoLayerTypes;
 	} );
 
-	it( 'dispatches a change event when a layer type is registered', () => {
-		const handleChange = jest.fn();
+	it( 'dispatches a change event when a layer type is registered', async () => {
+		const handleChange = vi.fn();
 		window.addEventListener( 'jeo-layer-types-changed', handleChange );
 
-		const layerTypes = require( './JeoLayerTypes' ).default;
+		const { default: layerTypes } = await import( './JeoLayerTypes' );
 		const layerType = { label: 'Custom layer' };
 
 		layerTypes.registerLayerType( 'custom-layer', layerType );
@@ -23,8 +23,8 @@ describe( 'JeoLayerTypes', () => {
 		window.removeEventListener( 'jeo-layer-types-changed', handleChange );
 	} );
 
-	it( 'reports isStyle only for types registered with isStyle: true', () => {
-		const layerTypes = require( './JeoLayerTypes' ).default;
+	it( 'reports isStyle only for types registered with isStyle: true', async () => {
+		const { default: layerTypes } = await import( './JeoLayerTypes' );
 
 		layerTypes.registerLayerType( 'mapbox', { label: 'Mapbox', isStyle: true } );
 		layerTypes.registerLayerType( 'style-json', { label: 'Style JSON', isStyle: true } );

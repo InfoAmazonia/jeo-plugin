@@ -17,9 +17,9 @@ When making significant code changes (creating/removing/modifying components, bl
 
 ## Stack
 
-- PHP 8.2+ | WordPress 6.6+ (tested up to 7.0) + Gutenberg | React 18
+- PHP 8.2+ | WordPress 6.9+ (tested up to 7.0) + Gutenberg | React 18
 - MapLibre GL JS v6 (default; bundled, ESM-only, separate web worker) / Mapbox GL JS v3 (optional; Mapbox CDN only, never bundled — licensing)
-- NeuronAI (10 providers) | Webpack 5, @wordpress/scripts | Node 24+
+- NeuronAI (10 providers) | Webpack 5 (build), Vitest 5 + Vite 8 via @wordpress/scripts 37 | Node 24+
 
 Node 24 is enforced by `devEngines` in `package.json` (`onFail: "error"`). If a command fails with `EBADDEVENGINES`, run `nvm use 24` first.
 
@@ -41,7 +41,7 @@ npm run build:assets               # Webpack production build + compliance patch
 npm run build                      # Full release build: assets + i18n compile (requires WP-CLI)
 npm run build:release              # Alias for npm run build
 npm run build:report               # Bundle size budgets (size-limit)
-npm run test:unit                  # Jest
+npm run test:unit                  # Vitest (wp-scripts test-unit-js)
 npm run test:unit -- path/to/file.test.js          # single file
 npm run test:unit -- -t "name of the test case"    # single test by name
 npm run sync:version               # Sync version across src/jeo.php, package.json, package-lock.json, and translation catalogs
@@ -197,7 +197,7 @@ The repository maintains the following automated checks. All must pass before a 
 - `bash scripts/wordpress-smoke.sh` — WordPress bootstrap smoke test (requires WP-CLI + local MariaDB)
 - `node scripts/patch-build-compliance.mjs` + WordPress Plugin Check workflow — WordPress.org directory compliance
 - `node scripts/validate-release-meta.mjs` — Release metadata consistency
-- `npm run test:unit` — Jest unit tests
+- `npm run test:unit` — Vitest unit tests (see `.architecture/build/README.md` for the vitest.config.mjs setup and the `@wordpress/*` train discipline)
 - `npm run build:report` — Bundle size budgets
 
 ### CI/CD
@@ -209,7 +209,7 @@ GitHub Actions run via **9 workflows** in `.github/workflows/` plus a shared com
 - `wordpress-languages.yml` — Validates POT/PO catalogs match source strings
 - `php-compat.yml` — PHP 8.2-8.5 compatibility check
 - `phpcs-wpcs.yml` — WPCS lint
-- `node-frontend.yml` — Node build + Jest tests
+- `node-frontend.yml` — Node build + Vitest tests
 - `dependency-review.yml` — Dependency security review
 - `deploy-site.yml` — Builds the complete site (landing + docs) on push to master and publishes it to the `gh-pages` branch (GitHub Pages at jeowp.org, guarantees `.nojekyll` + `CNAME`)
 

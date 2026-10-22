@@ -49,3 +49,4 @@ docs/.vitepress/dist/
 
 # Legacy landing workspace (figma references, local notes)
 /site-novo/
+.vitest/

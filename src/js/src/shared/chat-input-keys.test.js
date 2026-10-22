@@ -13,13 +13,13 @@ const keydownEvent = ( {
 	ctrlKey,
 	metaKey,
 	altKey,
-	preventDefault: jest.fn(),
+	preventDefault: vi.fn(),
 	nativeEvent: { isComposing },
 } );
 
 describe( 'handleChatKeyDown', () => {
 	it( 'submits on plain Enter', () => {
-		const submit = jest.fn();
+		const submit = vi.fn();
 		const event = keydownEvent();
 
 		handleChatKeyDown( event, submit );
@@ -29,7 +29,7 @@ describe( 'handleChatKeyDown', () => {
 	} );
 
 	it( 'lets Shift+Enter insert a line break', () => {
-		const submit = jest.fn();
+		const submit = vi.fn();
 		const event = keydownEvent( { shiftKey: true } );
 
 		handleChatKeyDown( event, submit );
@@ -40,7 +40,7 @@ describe( 'handleChatKeyDown', () => {
 
 	it( 'ignores Ctrl, Cmd, and Alt+Enter', () => {
 		for ( const modifiers of [ { ctrlKey: true }, { metaKey: true }, { altKey: true } ] ) {
-			const submit = jest.fn();
+			const submit = vi.fn();
 			const event = keydownEvent( modifiers );
 
 			handleChatKeyDown( event, submit );
@@ -51,7 +51,7 @@ describe( 'handleChatKeyDown', () => {
 	} );
 
 	it( 'ignores non-Enter keys', () => {
-		const submit = jest.fn();
+		const submit = vi.fn();
 		const event = keydownEvent( { key: 'a' } );
 
 		handleChatKeyDown( event, submit );
@@ -61,7 +61,7 @@ describe( 'handleChatKeyDown', () => {
 	} );
 
 	it( 'ignores Enter while IME is composing', () => {
-		const submit = jest.fn();
+		const submit = vi.fn();
 		const event = keydownEvent( { isComposing: true } );
 
 		handleChatKeyDown( event, submit );
@@ -71,14 +71,14 @@ describe( 'handleChatKeyDown', () => {
 	} );
 
 	it( 'tolerates events without a nativeEvent', () => {
-		const submit = jest.fn();
+		const submit = vi.fn();
 		const event = {
 			key: 'Enter',
 			shiftKey: false,
 			ctrlKey: false,
 			metaKey: false,
 			altKey: false,
-			preventDefault: jest.fn(),
+			preventDefault: vi.fn(),
 		};
 
 		handleChatKeyDown( event, submit );

@@ -8,7 +8,7 @@
 | `npm run build` | Production build + i18n JSON |
 | `npm run build:assets` | Webpack production build |
 | `npm run build:report` | Bundle size report |
-| `npm run test:unit` | Jest tests |
+| `npm run test:unit` | Unit tests (Vitest via `wp-scripts test-unit-js`) |
 | `npm run i18n:json` | Generate translation JSON |
 | `npm run audit:npm` | npm security audit |
 | `npm run audit:composer` | Composer security audit |
@@ -34,6 +34,74 @@ Extends `@wordpress/scripts/config/webpack.config` with:
 - `NormalModuleReplacementPlugin` to strip `node:` prefix
 - `CopyWebpackPlugin` to publish `maplibre-gl/dist/maplibre-gl-worker.mjs` as `src/js/build/maplibre-gl-worker.js` (MapLibre GL JS worker — `maplibregl-loader.js` points `setWorkerUrl()` at it; the worker file must ship with the plugin)
 - Fallbacks: `fs: false`, `path: false`
+
+## Unit Tests (Vitest)
+
+`npm run test:unit` runs `wp-scripts test-unit-js`, which is Vitest-backed since
+`@wordpress/scripts` 36. The runner and Vite are consumer-installed
+(`vitest@^5`, `vite@^8`, `jsdom`, `@vitejs/plugin-react-swc` as devDependencies).
+
+Config: `vitest.config.mjs` at the repository root.
+
+- `environment: 'jsdom'`, `globals: true` (bare `describe`/`it`/`expect`/`vi`,
+  matching the former `@wordpress/jest-preset-default` behavior)
+- `@wordpress/*` packages are **inlined** (`server.deps.inline`) so their ESM
+  builds go through Vite instead of Node's native ESM loader, which rejects
+  their internal `.json` imports (missing import attributes)
+- Sources keep JSX in `.js` files. `plugin-react-swc` decides its parser by
+  extension and skips plain `.js`, so the config passes a `parserConfig`
+  callback that enables JSX for `.js`/`.mjs`. This is the only supported
+  JSX-in-`.js` path on Vite 8 (the `esbuild.loader` recipe no longer applies)
+- Jest-era APIs were migrated: `jest.fn/mock/resetModules` → `vi.*`,
+  `require()` in tests → `await import()` (with `{ default: X }` destructuring;
+  `require` bypasses Vite's resolver and explodes on extensionless imports),
+  and the `toHaveWarned()` matcher from `@wordpress/jest-console` →
+  `vi.spyOn( console, 'warn' )`
+
+## @wordpress/* Train Discipline
+
+The plugin declares only two `@wordpress/*` anchors in `package.json`:
+`@wordpress/editor` (defines the **runtime** train) and `@wordpress/scripts`
+(dev tooling). Every other `@wordpress/*` import (~16 packages: element,
+components, data, block-editor, api-fetch, …) is an **undeclared phantom
+dependency**, resolved from the editor's transitive tree by design — a
+deliberate choice to avoid hand-pinning 16 versions.
+
+The consequence: **`package-lock.json` is the definition of the train**. npm
+re-resolution (any `npm update`, `npm audit fix`, or new dependency) can mix
+patch lines from different WordPress release trains, because npm resolves each
+package to the latest patch of its major independently — and the set of
+"latest patches" is not a coherent release snapshot. This once produced
+duplicated `@wordpress/private-apis` copies and broke the editor with
+`Cannot unlock an object that was not locked before`.
+
+**Discipline:** after any operation that rewrites `package-lock.json`, verify
+train coherence before committing:
+
+```bash
+node -e "
+const l = require('./package-lock.json').packages;
+const dup = Object.keys(l).filter(k =>
+  k.split('node_modules/').length > 2 &&
+  k.endsWith('@wordpress/private-apis')
+);
+console.log('private-apis:', l['node_modules/@wordpress/private-apis']?.version);
+console.log(dup.length ? 'SKEW: ' + dup.join(', ') : 'coerente ✓');
+"
+```
+
+Nested `@wordpress/*` copies under `@wordpress/eslint-plugin`,
+`@wordpress/stylelint-config`, and `@wordpress/babel-preset-default` are
+expected — those are dev-only tools carrying their own train and never reach
+the browser bundle.
+
+Train reference (see "Gutenberg versions in WordPress" for the canonical map):
+
+| WordPress floor | `@wordpress/editor` | Notes |
+|---|---|---|
+| 6.9 | 14 (current) | React 18, element 8.x |
+| 7.0 | 15 | React 18; drops `react-autosize-textarea` from the tree |
+| 7.1 | 16 | **React 19** (element 9+ / components 42+) — blocked until the project moves past React 18 |
 
 ## Helper Scripts
 
