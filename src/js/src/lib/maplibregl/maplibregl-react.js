@@ -105,6 +105,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, mapStyle = 
 			mapLib={ mapgl }
 			mapStyle={ mapStyle }
 			projection={ defaultProjection }
+			validateStyle={ false }
 			reuseMaps={ false }
 			transformRequest={ transformRequest }
 			onLoad={ handleLoad }
