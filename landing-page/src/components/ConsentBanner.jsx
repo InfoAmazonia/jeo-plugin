@@ -11,10 +11,10 @@ const STORAGE_KEY = 'jeo-consent-v1'
  * is fully translated (i18n `consent.*`).
  *
  * Positioning: bottom-left. On desktop it sits at `sm:bottom-24` so it
- * clears the 64px footer bottom bar (where the terms-of-use trigger
- * lives) instead of covering it while visible; on mobile it keeps the
- * standard `bottom-4` (the stacked footer is transient there — the
- * banner is dismissed once and never returns).
+ * clears the 64px footer bottom bar instead of covering it while
+ * visible; on mobile it keeps the standard `bottom-4` (the stacked
+ * footer is transient there — the banner is dismissed once and never
+ * returns).
  */
 export default function ConsentBanner() {
   const reduce = useReducedMotion()

@@ -97,8 +97,6 @@ export default {
   footer: {
     navLabel: 'Navegação do rodapé',
     cta: 'Instalar grátis',
-    termsLead: 'Acesse os',
-    termsLink: 'Termos de uso e privacidade',
     production: 'produção',
     development: 'desenvolvimento',
   },
