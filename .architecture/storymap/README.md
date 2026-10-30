@@ -79,6 +79,25 @@ sequenceDiagram
     Note over M: "Navigate the map"
 ```
 
+## Non-published Source Maps
+
+The storymap editor map search (`storymap-editor.js` → `JeoAutosuggest showPrivate`)
+surfaces private and scheduled maps, so a storymap can be composed from a map that
+is not yet public. Rendering rules:
+
+- Slides and layers render from the server-side payload regardless of the map's
+  status (`get_post_meta` is not status-gated), so a published storymap built on a
+  private map is fully visible to every visitor.
+- The "Navigate the map" step is hidden while the source map is not published:
+  `Jeo::story_map_dynamic_render_callback()` forces `navigateButton = false` in the
+  payload, and the editor hides the checkbox with an explanatory note
+  (editor↔frontend parity). The step returns automatically once the map is
+  published — the block is dynamically rendered on every page load.
+- Layers that are themselves private remain excluded everywhere
+  (`layer_still_exists()` for slides; REST `view` context for the navigate map).
+
+The embedded-storymap block and the map block keep their publish-only searches.
+
 ## Embed
 
 Storymaps can be embedded via URL:

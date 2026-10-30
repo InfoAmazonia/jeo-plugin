@@ -16,7 +16,7 @@
 | `src/js/src/map-blocks/layers-settings-modal.js` | Modal wrapper for layers settings |
 | `src/js/src/map-blocks/map-preview-layer.js` | Renders layer in editor preview |
 | `src/js/src/map-blocks/mapbox-style-preview.js` | Composed Mapbox style adapter for editor previews (AbortSignal stale-state guard, token transform) — see [`composed-styles/README.md`](../composed-styles/README.md) |
-| `src/js/src/map-blocks/jeo-autosuggest.js` | Autosuggest for searching maps/layers |
+| `src/js/src/map-blocks/jeo-autosuggest.js` | Autosuggest for searching maps/storymaps. Opt-in `showPrivate` prop queries `publish,private,future` (falls back to `publish` when the user lacks permission); used by the storymap editor map search |
 | `src/js/src/map-blocks/color-palettes.js` | Color palette (437 colors) |
 | `src/includes/minimap/class-minimap.php` | `Jeo\Minimap` — REST endpoint, base layer logic |
 

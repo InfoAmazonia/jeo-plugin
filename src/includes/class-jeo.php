@@ -1267,6 +1267,11 @@ class Jeo {
 			$map_layers = array();
 		}
 
+		if ( $map_id && 'publish' !== get_post_status( $map_id ) ) {
+			// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase -- Frontend payload keeps its camelCase contract.
+			$saved_data->navigateButton = false;
+		}
+
 		if ( ! isset( $saved_data->slides ) || ! is_array( $saved_data->slides ) ) {
 			$saved_data->slides = array();
 		}

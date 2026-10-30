@@ -39,7 +39,7 @@ msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no hay ningun
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no se pudo cargar el SDK externo de Mapbox. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:1473
+#: includes/class-jeo.php:1478
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Leer más"
@@ -4542,11 +4542,11 @@ msgstr "Vista previa interactiva de mapa para el editor del tipo de contenido Ma
 msgid "Unable to retrieve the address for the selected point."
 msgstr "No se pudo obtener la dirección para el punto seleccionado."
 
-#: includes/class-jeo.php:1714
+#: includes/class-jeo.php:1719
 msgid "This JEO embed is not available."
 msgstr "Este embed de JEO no está disponible."
 
-#: includes/class-jeo.php:1715
+#: includes/class-jeo.php:1720
 msgid "Embed not available"
 msgstr "Embed no disponible"
 
@@ -4979,12 +4979,12 @@ msgstr "Su navegador no pudo determinar su ubicación. Esto puede deberse a una 
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d capa(s) añadida(s) manualmente preservada(s) durante el refinamiento de la IA."
 
-#: includes/class-jeo.php:2065
+#: includes/class-jeo.php:2070
 msgid "A Mapbox style ID and access token are required."
 msgstr "Se requiere un ID de estilo de Mapbox y un token de acceso."
 
-#: includes/class-jeo.php:2076
-#: includes/class-jeo.php:2114
+#: includes/class-jeo.php:2081
+#: includes/class-jeo.php:2119
 msgid "Unexpected Mapbox style payload."
 msgstr "Respuesta de estilo de Mapbox inesperada."
 
@@ -5279,12 +5279,12 @@ msgstr "Estilo de la capa"
 msgid "How the GeoJSON features are drawn."
 msgstr "Cómo se dibujan las entidades del GeoJSON."
 
-#: includes/class-jeo.php:2172
+#: includes/class-jeo.php:2177
 msgid "A valid http(s) style URL is required."
 msgstr "Se requiere una URL de estilo http(s) válida."
 
-#: includes/class-jeo.php:2187
-#: includes/class-jeo.php:2220
+#: includes/class-jeo.php:2192
+#: includes/class-jeo.php:2225
 msgid "Unexpected style JSON payload."
 msgstr "Contenido JSON de estilo inesperado."
 
@@ -5401,3 +5401,7 @@ msgstr "No se pudo escribir el artefacto del estilo compuesto %s. Compruebe que 
 #: includes/maps/class-maps.php:212
 msgid "Layer origin: manually added or AI-generated. Defaults to manual."
 msgstr "Origen de la capa: añadida manualmente o generada por IA. Por defecto es manual."
+
+#: js/build/mapBlocks.js:1
+msgid "The \"Navigate to map\" step requires a published map."
+msgstr "El paso \"Navegar el mapa\" requiere un mapa publicado."

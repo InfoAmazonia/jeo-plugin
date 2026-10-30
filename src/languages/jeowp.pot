@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-30T16:52:27+00:00\n"
+"POT-Creation-Date: 2026-10-30T21:46:31+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -1848,34 +1848,34 @@ msgstr ""
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr ""
 
-#: includes/class-jeo.php:1473
+#: includes/class-jeo.php:1478
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr ""
 
-#: includes/class-jeo.php:1714
+#: includes/class-jeo.php:1719
 msgid "This JEO embed is not available."
 msgstr ""
 
-#: includes/class-jeo.php:1715
+#: includes/class-jeo.php:1720
 msgid "Embed not available"
 msgstr ""
 
-#: includes/class-jeo.php:2065
+#: includes/class-jeo.php:2070
 msgid "A Mapbox style ID and access token are required."
 msgstr ""
 
-#: includes/class-jeo.php:2076
-#: includes/class-jeo.php:2114
+#: includes/class-jeo.php:2081
+#: includes/class-jeo.php:2119
 msgid "Unexpected Mapbox style payload."
 msgstr ""
 
-#: includes/class-jeo.php:2172
+#: includes/class-jeo.php:2177
 msgid "A valid http(s) style URL is required."
 msgstr ""
 
-#: includes/class-jeo.php:2187
-#: includes/class-jeo.php:2220
+#: includes/class-jeo.php:2192
+#: includes/class-jeo.php:2225
 msgid "Unexpected style JSON payload."
 msgstr ""
 
@@ -4560,6 +4560,10 @@ msgstr ""
 
 #: js/build/mapBlocks.js:1
 msgid "Use \"Navigate to map\" button"
+msgstr ""
+
+#: js/build/mapBlocks.js:1
+msgid "The \"Navigate to map\" step requires a published map."
 msgstr ""
 
 #: js/build/mapBlocks.js:1
