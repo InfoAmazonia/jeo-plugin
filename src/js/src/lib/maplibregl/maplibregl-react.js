@@ -4,7 +4,8 @@ import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/map
 import { computeInlineStart } from '../../shared/direction';
 import { defaultStyle, mapgl, transformRequest } from '../mapgl-loader'
 
-const defaultProjection = { name: 'equirectangular' };
+// MapLibre does not support equirectangular projection yet.
+const defaultProjection = { type: 'mercator' };
 
 // Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
 // Depending on how webpack groups the runtime and vendor code, react-map-gl may

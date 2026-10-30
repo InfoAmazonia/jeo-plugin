@@ -355,7 +355,7 @@ export function createMap( {
 	const map = new MapLibreGL.Map( {
 		container: container,
 		maplibreLogo: false,
-		projection: 'equirectangular',
+		projection: 'mercator',
 		validateStyle: false,
 		transformRequest: createTransformRequest( transformRequest ),
 		...options,
