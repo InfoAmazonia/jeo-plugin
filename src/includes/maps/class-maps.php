@@ -208,6 +208,11 @@ class Maps {
 										),
 									),
 								),
+								'provenance'    => array(
+									'description' => __( 'Layer origin: manually added or AI-generated. Defaults to manual.', 'jeowp' ),
+									'type'        => 'string',
+									'enum'        => array( 'manual', 'ai' ),
+								),
 							),
 							'required'   => array( 'id', 'use' ),
 						),

@@ -22,7 +22,7 @@
 | `initial_zoom` | int (1-14) | Initial zoom level |
 | `center_lat` | float | Center latitude |
 | `center_lon` | float | Center longitude |
-| `layers` | array | Layer IDs with configuration |
+| `layers` | array | Layer definitions (item schema below) |
 | `pan_limits` | array | Navigation bounds (min/max lat/lon) |
 | `related_posts` | array | Related posts config |
 | `disable_scroll_zoom` | boolean | Disable scroll zoom |
@@ -33,6 +33,10 @@
 | `cluster_radius` | int | Cluster radius |
 | `show_markers` | boolean | Show markers |
 | `map_layers_load_as_style` | boolean | Load layers as style |
+
+#### `layers` Item Schema (REST-validated)
+
+Each item is an object declared in `class-maps.php::register_post_meta()`: `id` (required), `use` (required — `fixed`/`switchable`/`swappable`), `load_as_style`, `style_layers`, `default`, `show_legend`, `style`, and the optional `provenance` (`'manual'` | `'ai'`; missing means `'manual'`). `provenance` is stamped by the **shared** layer library modal (`map-blocks/layers-settings.js`, also used by the `map` CPT sidebar) — see [minimap provenance](../minimap/README.md). The REST schema rejects undeclared keys, so any new layer field produced by the shared modal **must** be declared here, otherwise publishing a `map` post fails with "X is not a valid property of Object".
 
 #### Composed Style Meta (managed by `Map_Style_Composer`)
 

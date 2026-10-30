@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-10-22T14:15:37+00:00\n"
+"POT-Creation-Date: 2026-10-30T16:52:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: jeowp\n"
@@ -2344,97 +2344,101 @@ msgstr ""
 msgid "MapLibre filter expression"
 msgstr ""
 
-#: includes/maps/class-maps.php:220
+#: includes/maps/class-maps.php:212
+msgid "Layer origin: manually added or AI-generated. Defaults to manual."
+msgstr ""
+
+#: includes/maps/class-maps.php:225
 msgid "The map Layers"
 msgstr ""
 
-#: includes/maps/class-maps.php:233
+#: includes/maps/class-maps.php:238
 #: js/build/mapBlocks.js:1
 msgid "East pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:237
+#: includes/maps/class-maps.php:242
 #: js/build/mapBlocks.js:1
 msgid "North pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:241
+#: includes/maps/class-maps.php:246
 #: js/build/mapBlocks.js:1
 msgid "South pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:245
+#: includes/maps/class-maps.php:250
 #: js/build/mapBlocks.js:1
 msgid "West pan limit"
 msgstr ""
 
-#: includes/maps/class-maps.php:255
+#: includes/maps/class-maps.php:260
 msgid "Map pan limits"
 msgstr ""
 
-#: includes/maps/class-maps.php:268
+#: includes/maps/class-maps.php:273
 msgid "List of category IDs related posts must have"
 msgstr ""
 
-#: includes/maps/class-maps.php:275
+#: includes/maps/class-maps.php:280
 msgid "List of tag IDs related posts must have"
 msgstr ""
 
-#: includes/maps/class-maps.php:282
+#: includes/maps/class-maps.php:287
 msgid "Maximum date for related posts"
 msgstr ""
 
-#: includes/maps/class-maps.php:286
+#: includes/maps/class-maps.php:291
 msgid "Minimum date for related posts"
 msgstr ""
 
-#: includes/maps/class-maps.php:290
+#: includes/maps/class-maps.php:295
 msgid "List of meta values related posts must have"
 msgstr ""
 
-#: includes/maps/class-maps.php:314
+#: includes/maps/class-maps.php:319
 msgid "The map criteria to get related posts"
 msgstr ""
 
-#: includes/maps/class-maps.php:327
+#: includes/maps/class-maps.php:332
 msgid "Disable scroll zoom"
 msgstr ""
 
-#: includes/maps/class-maps.php:340
+#: includes/maps/class-maps.php:345
 msgid "Disable drag pan"
 msgstr ""
 
-#: includes/maps/class-maps.php:353
+#: includes/maps/class-maps.php:358
 msgid "Disable drag rotation"
 msgstr ""
 
-#: includes/maps/class-maps.php:366
+#: includes/maps/class-maps.php:371
 msgid "Enable fullscreen button"
 msgstr ""
 
-#: includes/maps/class-maps.php:379
+#: includes/maps/class-maps.php:384
 msgid "Show all posts on map"
 msgstr ""
 
-#: includes/maps/class-maps.php:392
+#: includes/maps/class-maps.php:397
 msgid "Minimum Zoom level"
 msgstr ""
 
-#: includes/maps/class-maps.php:405
+#: includes/maps/class-maps.php:410
 msgid "Maximum zoom level"
 msgstr ""
 
-#: includes/maps/class-maps.php:418
+#: includes/maps/class-maps.php:423
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Hide in discovery"
 msgstr ""
 
-#: includes/maps/class-maps.php:431
+#: includes/maps/class-maps.php:436
 msgid "Disable embed"
 msgstr ""
 
-#: includes/maps/class-maps.php:587
+#: includes/maps/class-maps.php:592
 msgid "Map zoom must be between 1 and 14"
 msgstr ""
 

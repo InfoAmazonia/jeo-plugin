@@ -313,97 +313,97 @@ msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 msgid "Indicates if the legend of this layer should be displayed or not"
 msgstr "Indica se a legenda dessa camada deve ser exibida ou não"
 
-#: includes/maps/class-maps.php:220
+#: includes/maps/class-maps.php:225
 msgid "The map Layers"
 msgstr "Camadas do mapa"
 
-#: includes/maps/class-maps.php:233
+#: includes/maps/class-maps.php:238
 #: js/build/mapBlocks.js:1
 msgid "East pan limit"
 msgstr "Limite de panorâmica leste"
 
-#: includes/maps/class-maps.php:237
+#: includes/maps/class-maps.php:242
 #: js/build/mapBlocks.js:1
 msgid "North pan limit"
 msgstr "Limite de panorâmica norte"
 
-#: includes/maps/class-maps.php:241
+#: includes/maps/class-maps.php:246
 #: js/build/mapBlocks.js:1
 msgid "South pan limit"
 msgstr "Limite de panorâmica sul"
 
-#: includes/maps/class-maps.php:245
+#: includes/maps/class-maps.php:250
 #: js/build/mapBlocks.js:1
 msgid "West pan limit"
 msgstr "Limite de panorâmica oeste"
 
-#: includes/maps/class-maps.php:255
+#: includes/maps/class-maps.php:260
 msgid "Map pan limits"
 msgstr "Limites de panorâmica do mapa"
 
-#: includes/maps/class-maps.php:268
+#: includes/maps/class-maps.php:273
 msgid "List of category IDs related posts must have"
 msgstr "Lista de IDs das categorias que os posts relacionados devem ter"
 
-#: includes/maps/class-maps.php:275
+#: includes/maps/class-maps.php:280
 msgid "List of tag IDs related posts must have"
 msgstr "Lista de IDs das etiquetas que os posts relacionados devem ter"
 
-#: includes/maps/class-maps.php:282
+#: includes/maps/class-maps.php:287
 msgid "Maximum date for related posts"
 msgstr "Data máxima para posts relacionados"
 
-#: includes/maps/class-maps.php:286
+#: includes/maps/class-maps.php:291
 msgid "Minimum date for related posts"
 msgstr "Data mínima para posts relacionados"
 
-#: includes/maps/class-maps.php:290
+#: includes/maps/class-maps.php:295
 msgid "List of meta values related posts must have"
 msgstr "Lista de IDs dos meta-values que os posts relacionados devem ter"
 
-#: includes/maps/class-maps.php:314
+#: includes/maps/class-maps.php:319
 msgid "The map criteria to get related posts"
 msgstr "Os critérios do mapa para obter posts relacionados"
 
-#: includes/maps/class-maps.php:327
+#: includes/maps/class-maps.php:332
 msgid "Disable scroll zoom"
 msgstr "Desabilitar zoom"
 
-#: includes/maps/class-maps.php:340
+#: includes/maps/class-maps.php:345
 msgid "Disable drag pan"
 msgstr "Desabilitar arrastar"
 
-#: includes/maps/class-maps.php:353
+#: includes/maps/class-maps.php:358
 msgid "Disable drag rotation"
 msgstr "Desabilitar rotação"
 
-#: includes/maps/class-maps.php:366
+#: includes/maps/class-maps.php:371
 msgid "Enable fullscreen button"
 msgstr "Habilitar botão de tela cheia"
 
-#: includes/maps/class-maps.php:379
+#: includes/maps/class-maps.php:384
 msgid "Show all posts on map"
 msgstr "Mostrar todos os posts no mapa"
 
-#: includes/maps/class-maps.php:392
+#: includes/maps/class-maps.php:397
 msgid "Minimum Zoom level"
 msgstr "Nível mínimo de zoom"
 
-#: includes/maps/class-maps.php:405
+#: includes/maps/class-maps.php:410
 msgid "Maximum zoom level"
 msgstr "Nível máximo de zoom"
 
-#: includes/maps/class-maps.php:418
+#: includes/maps/class-maps.php:423
 #: js/build/mapBlocks.js:3
 #: js/build/mapsSidebar.js:1
 msgid "Hide in discovery"
 msgstr "Ocultar na página Explorar"
 
-#: includes/maps/class-maps.php:431
+#: includes/maps/class-maps.php:436
 msgid "Disable embed"
 msgstr "Desabilitar incorporação"
 
-#: includes/maps/class-maps.php:587
+#: includes/maps/class-maps.php:592
 msgid "Map zoom must be between 1 and 14"
 msgstr "O Zoom do mapa deve estar entre 1 e 14"
 
@@ -5397,3 +5397,7 @@ msgstr "Não foi possível codificar o artefato do estilo composto como JSON."
 #, php-format
 msgid "Could not write the composed style artifact %s. Check that the uploads directory is writable."
 msgstr "Não foi possível gravar o artefato do estilo composto %s. Verifique se o diretório de uploads permite escrita."
+
+#: includes/maps/class-maps.php:212
+msgid "Layer origin: manually added or AI-generated. Defaults to manual."
+msgstr "Origem da camada: adicionada manualmente ou gerada por IA. O padrão é manual."
