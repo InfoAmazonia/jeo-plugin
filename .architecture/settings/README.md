@@ -106,6 +106,16 @@ Consumers:
 
 The `jeo_settings.map_defaults` object (localized on the `mapgl` script) uses **`lng`** (MapLibre convention, unified — never `lon`). Read it in JS via `jeo_settings.map_defaults.lng`.
 
+## Map Projection Localize
+
+`jeo_settings.map_projection` (localized on the `mapgl` script) is the site's
+default projection **in the active runtime's dialect** (`{name}` for Mapbox,
+`{type}` for MapLibre). Flat by default (`equirectangular` on Mapbox,
+`mercator` on MapLibre); filterable via `jeo_map_projection`, and the filter
+output is normalized back to the requested runtime's key. A site may opt
+into globe or other 3D projections through the filter — at its own risk. See
+[`frontend/README.md`](frontend/README.md) for the JS consumption contract.
+
 ## Mapbox Tokens
 
 Two separate settings, both in the General tab (the Mapbox section is always

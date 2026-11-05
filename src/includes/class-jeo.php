@@ -455,6 +455,58 @@ class Jeo {
 	}
 
 	/**
+	 * Resolve the default map projection for the active runtime, in the
+	 * runtime's own dialect.
+	 *
+	 * The value is localized as a complete projection object so the JS
+	 * loaders can forward it verbatim to each runtime's native API: Mapbox
+	 * GL JS reads `projection.name`, MapLibre GL JS reads `projection.type`.
+	 *
+	 * Projections are flat by default (`equirectangular` on Mapbox,
+	 * `mercator` on MapLibre). The `jeo_map_projection` filter may override
+	 * them — including globe or other 3D projections, at the site's own
+	 * risk. The MapLibre loaders re-apply the value on every style load so
+	 * it wins over any projection declared by a loaded style.
+	 *
+	 * @return array<string, string> Projection spec keyed for the requested runtime.
+	 */
+	private function get_map_projection(): array {
+		$runtime = $this->get_requested_map_runtime();
+
+		$is_mapbox  = 'mapboxgl' === $runtime;
+		$default_id = $is_mapbox ? 'equirectangular' : 'mercator';
+
+		/**
+		 * Filter the default map projection, in the active runtime's dialect.
+		 *
+		 * Mapbox GL JS expects `array( 'name' => ... )`; MapLibre GL JS
+		 * expects `array( 'type' => ... )`. The return value is normalized
+		 * back to the requested runtime's key, so returning the other
+		 * dialect is tolerated. Flat projections by default; a site may opt
+		 * into globe or other 3D projections at its own risk.
+		 *
+		 * @param array<string, string> $projection Default projection spec.
+		 * @param string                $runtime    Requested runtime ('mapboxgl'|'maplibregl').
+		 */
+		$filtered = apply_filters( 'jeo_map_projection', $is_mapbox ? array( 'name' => $default_id ) : array( 'type' => $default_id ), $runtime );
+
+		$resolved = $default_id;
+
+		if ( is_array( $filtered ) ) {
+			$name = isset( $filtered['name'] ) && is_string( $filtered['name'] ) ? $filtered['name'] : null;
+			$type = isset( $filtered['type'] ) && is_string( $filtered['type'] ) ? $filtered['type'] : null;
+
+			// Guard: always emit the key the requested runtime reads, falling
+			// back to the other dialect's value or the runtime default.
+			$resolved = $is_mapbox
+				? ( $name ?? $type ?? $default_id )
+				: ( $type ?? $name ?? $default_id );
+		}
+
+		return $is_mapbox ? array( 'name' => $resolved ) : array( 'type' => $resolved );
+	}
+
+	/**
 	 * Return the externally hosted Mapbox SDK metadata.
 	 *
 	 * @return array{version:string,js_url:string,css_url:string}
@@ -930,6 +982,7 @@ class Jeo {
 				),
 				'map_runtime'           => $map_runtime_requested,
 				'map_runtime_requested' => $map_runtime_requested,
+				'map_projection'        => $this->get_map_projection(),
 				'runtime_messages'      => array(
 					'mapbox_missing_token'       => __( 'Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre.', 'jeowp' ),
 					'mapbox_runtime_unavailable' => __(

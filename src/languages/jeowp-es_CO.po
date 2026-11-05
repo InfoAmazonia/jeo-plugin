@@ -31,15 +31,15 @@ msgstr "Mapas interactivos para el editor de bloques de WordPress"
 msgid "InfoAmazonia"
 msgstr "InfoAmazonia"
 
-#: includes/class-jeo.php:934
+#: includes/class-jeo.php:987
 msgid "Mapbox was selected as the rendering library, but no Mapbox API key is configured. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no hay ninguna clave de API de Mapbox configurada. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:935
+#: includes/class-jeo.php:988
 msgid "Mapbox was selected as the rendering library, but the external Mapbox SDK could not be loaded. Falling back to MapLibre."
 msgstr "Se seleccionó Mapbox como biblioteca de renderizado, pero no se pudo cargar el SDK externo de Mapbox. Se volverá a MapLibre."
 
-#: includes/class-jeo.php:1478
+#: includes/class-jeo.php:1531
 #: js/build/mapBlocks.js:3
 msgid "Read more"
 msgstr "Leer más"
@@ -1782,11 +1782,11 @@ msgstr "Geolocalizar este post"
 msgid "Geolocation"
 msgstr "Geolocalización"
 
-#: includes/class-jeo.php:675
+#: includes/class-jeo.php:727
 msgid "Ordered list of map-layer IDs to return."
 msgstr "Lista ordenada de IDs de capas de mapa que se devolverán."
 
-#: includes/class-jeo.php:680
+#: includes/class-jeo.php:732
 msgid "Request context."
 msgstr "Contexto de la solicitud."
 
@@ -4542,11 +4542,11 @@ msgstr "Vista previa interactiva de mapa para el editor del tipo de contenido Ma
 msgid "Unable to retrieve the address for the selected point."
 msgstr "No se pudo obtener la dirección para el punto seleccionado."
 
-#: includes/class-jeo.php:1719
+#: includes/class-jeo.php:1772
 msgid "This JEO embed is not available."
 msgstr "Este embed de JEO no está disponible."
 
-#: includes/class-jeo.php:1720
+#: includes/class-jeo.php:1773
 msgid "Embed not available"
 msgstr "Embed no disponible"
 
@@ -4979,12 +4979,12 @@ msgstr "Su navegador no pudo determinar su ubicación. Esto puede deberse a una 
 msgid "%d manually-added layer(s) were preserved during AI refinement."
 msgstr "%d capa(s) añadida(s) manualmente preservada(s) durante el refinamiento de la IA."
 
-#: includes/class-jeo.php:2070
+#: includes/class-jeo.php:2123
 msgid "A Mapbox style ID and access token are required."
 msgstr "Se requiere un ID de estilo de Mapbox y un token de acceso."
 
-#: includes/class-jeo.php:2081
-#: includes/class-jeo.php:2119
+#: includes/class-jeo.php:2134
+#: includes/class-jeo.php:2172
 msgid "Unexpected Mapbox style payload."
 msgstr "Respuesta de estilo de Mapbox inesperada."
 
@@ -5279,12 +5279,12 @@ msgstr "Estilo de la capa"
 msgid "How the GeoJSON features are drawn."
 msgstr "Cómo se dibujan las entidades del GeoJSON."
 
-#: includes/class-jeo.php:2177
+#: includes/class-jeo.php:2230
 msgid "A valid http(s) style URL is required."
 msgstr "Se requiere una URL de estilo http(s) válida."
 
-#: includes/class-jeo.php:2192
-#: includes/class-jeo.php:2225
+#: includes/class-jeo.php:2245
+#: includes/class-jeo.php:2278
 msgid "Unexpected style JSON payload."
 msgstr "Contenido JSON de estilo inesperado."
 

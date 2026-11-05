@@ -271,7 +271,7 @@ export function createMap ({ container, style, ...options }) {
 		accessToken: mapboxToken,
 		container: container,
 		logoPosition: 'bottom-left',
-		projection: 'equirectangular',
+		projection: jeo_settings.map_projection ?? 'equirectangular',
 		style: style ?? defaultStyle,
 		...options,
 	})

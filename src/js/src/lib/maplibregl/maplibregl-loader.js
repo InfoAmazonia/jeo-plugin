@@ -355,10 +355,15 @@ export function createMap( {
 	const map = new MapLibreGL.Map( {
 		container: container,
 		maplibreLogo: false,
-		projection: 'mercator',
 		validateStyle: false,
 		transformRequest: createTransformRequest( transformRequest ),
 		...options,
+	} );
+
+	// Projection is style-driven in MapLibre (`style.projection.type`): the
+	// constructor has no `projection` option.
+	map.on( 'style.load', () => {
+		map.setProjection( resolveProjection( jeo_settings.map_projection ) );
 	} );
 
 	map.setStyle( style ?? defaultStyle, {
@@ -368,6 +373,20 @@ export function createMap( {
 	U.init( map, MapLibreGL );
 
 	return map;
+}
+
+export function resolveProjection( value ) {
+	if ( typeof value?.type === 'string' && value.type ) {
+		return { type: value.type };
+	}
+
+	const name = value?.name ?? value;
+
+	if ( typeof name === 'string' && name ) {
+		return { type: name === 'globe' ? 'globe' : 'mercator' };
+	}
+
+	return { type: 'mercator' };
 }
 
 /**

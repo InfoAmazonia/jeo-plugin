@@ -37,6 +37,36 @@ mapgl-loader.js
 - Token injected via `transformRequest`
 - Patches for missing/deprecated APIs: `getLight()`, `getSky()`, `setSky()`
 
+### Site-level projection (`map_projection`)
+
+`jeo_settings.map_projection` (localized on the `mapgl` script) carries the
+site's default projection **in the active runtime's dialect**: Mapbox GL JS
+reads `projection.name`, MapLibre GL JS reads `projection.type`. PHP resolves
+it in `class-jeo.php::get_map_projection()` (filter `jeo_map_projection`,
+default `{name: 'equirectangular'}` for Mapbox / `{type: 'mercator'}` for
+MapLibre) and guards the filter output back to the requested runtime's key.
+
+JS consumers forward it verbatim:
+
+- `mapboxgl-loader.js::createMap` → constructor `projection` option. Mapbox
+  GL v3 forwards it to `setProjection()`, which accepts the object form
+  natively (strings are normalized to `{name}` internally).
+- `maplibregl-loader.js::createMap` → re-applied on every `style.load` via
+  `map.setProjection()`, so the site-level projection wins over any
+  projection declared by a loaded style (MapLibre has no constructor
+  `projection` option — projection is style-driven). `resolveProjection()`
+  translates the Mapbox dialect when the Mapbox runtime falls back to
+  MapLibre client-side (missing token/CDN): `globe` and `mercator` map to
+  themselves; Mapbox-only projections (equirectangular, conics, …) degrade
+  to `mercator`.
+- `maplibregl-react.js` → the `projection` prop feeds the same
+  `resolveProjection()` result (react-map-gl forwards it to
+  `map.setProjection()`, which reads `.type`).
+
+Projections are **flat by default** (`equirectangular` on Mapbox,
+`mercator` on MapLibre). The `jeo_map_projection` filter may override them —
+including globe or other 3D projections, at the site's own risk.
+
 ## Iframe Compatibility (Block API v3)
 
 Gutenberg Block API v3 renders blocks in iframes. The loaders apply extensive patches:
