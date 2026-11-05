@@ -46,22 +46,26 @@ it in `class-jeo.php::get_map_projection()` (filter `jeo_map_projection`,
 default `{name: 'equirectangular'}` for Mapbox / `{type: 'mercator'}` for
 MapLibre) and guards the filter output back to the requested runtime's key.
 
-JS consumers forward it verbatim:
+Each loader owns its dialect: `mapboxgl-loader.js` exports `mapProjection`
+with the localized value verbatim (`{name}`); `maplibregl-loader.js` exports
+it through `resolveProjection()` (`{type}` — translating the Mapbox dialect
+when the Mapbox runtime falls back to MapLibre client-side: `globe` and
+`mercator` map to themselves; Mapbox-only projections (equirectangular,
+conics, …) degrade to `mercator`). `mapgl-loader.js` routes it like
+`mapgl`/`defaultStyle`/`transformRequest`, so runtime-agnostic consumers
+always receive the correct dialect:
 
-- `mapboxgl-loader.js::createMap` → constructor `projection` option. Mapbox
-  GL v3 forwards it to `setProjection()`, which accepts the object form
-  natively (strings are normalized to `{name}` internally).
+- `mapboxgl-loader.js::createMap` → constructor `projection` option
+  (Mapbox GL v3 forwards it to `setProjection()`, which accepts the object
+  form natively — strings are normalized to `{name}` internally).
 - `maplibregl-loader.js::createMap` → re-applied on every `style.load` via
   `map.setProjection()`, so the site-level projection wins over any
   projection declared by a loaded style (MapLibre has no constructor
-  `projection` option — projection is style-driven). `resolveProjection()`
-  translates the Mapbox dialect when the Mapbox runtime falls back to
-  MapLibre client-side (missing token/CDN): `globe` and `mercator` map to
-  themselves; Mapbox-only projections (equirectangular, conics, …) degrade
-  to `mercator`.
-- `maplibregl-react.js` → the `projection` prop feeds the same
-  `resolveProjection()` result (react-map-gl forwards it to
-  `map.setProjection()`, which reads `.type`).
+  `projection` option — projection is style-driven).
+- `maplibregl-react.js` → the `projection` prop feeds the routed
+  `mapProjection` (react-map-gl forwards it to `map.setProjection()`);
+  under `MAP_RUNTIME === 'mapboxgl'` the wrapper's `mapLib` is the CDN
+  Mapbox runtime, so the Mapbox dialect arrives just in time.
 
 Projections are **flat by default** (`equirectangular` on Mapbox,
 `mercator` on MapLibre). The `jeo_map_projection` filter may override them —

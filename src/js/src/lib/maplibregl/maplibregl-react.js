@@ -2,10 +2,7 @@ import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
 import MapLibre, { FullscreenControl, NavigationControl } from 'react-map-gl/maplibre';
 
 import { computeInlineStart } from '../../shared/direction';
-import { defaultStyle, mapgl, transformRequest } from '../mapgl-loader'
-import { resolveProjection } from './maplibregl-loader';
-
-const defaultProjection = resolveProjection( globalThis.jeo_settings?.map_projection );
+import { defaultStyle, mapgl, mapProjection, transformRequest } from '../mapgl-loader'
 
 // Fix: Ensure the HTMLElement instanceof patch is also applied in this chunk.
 // Depending on how webpack groups the runtime and vendor code, react-map-gl may
@@ -105,7 +102,7 @@ function MapGL( { children, controls = undefined, fullscreen = true, mapStyle = 
 			ref={ setRef }
 			mapLib={ mapgl }
 			mapStyle={ mapStyle }
-			projection={ defaultProjection }
+			projection={ mapProjection }
 			validateStyle={ false }
 			reuseMaps={ false }
 			transformRequest={ transformRequest }

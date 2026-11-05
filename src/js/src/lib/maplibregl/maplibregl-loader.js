@@ -363,7 +363,7 @@ export function createMap( {
 	// Projection is style-driven in MapLibre (`style.projection.type`): the
 	// constructor has no `projection` option.
 	map.on( 'style.load', () => {
-		map.setProjection( resolveProjection( jeo_settings.map_projection ) );
+		map.setProjection( mapProjection );
 	} );
 
 	map.setStyle( style ?? defaultStyle, {
@@ -375,7 +375,7 @@ export function createMap( {
 	return map;
 }
 
-export function resolveProjection( value ) {
+function resolveProjection( value ) {
 	if ( typeof value?.type === 'string' && value.type ) {
 		return { type: value.type };
 	}
@@ -388,6 +388,8 @@ export function resolveProjection( value ) {
 
 	return { type: 'mercator' };
 }
+
+export const mapProjection = resolveProjection( jeo_settings.map_projection );
 
 /**
  * @param {import('maplibre-gl').GeoJSONSource} source

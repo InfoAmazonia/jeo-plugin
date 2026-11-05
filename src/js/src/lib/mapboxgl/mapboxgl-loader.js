@@ -261,6 +261,8 @@ export const mapboxToken = jeo_settings.mapbox_key
 export const defaultStyle = 'mapbox://styles/mapbox/standard'
 export const transformRequest = undefined
 
+export const mapProjection = jeo_settings.map_projection ?? 'equirectangular'
+
 export function getMapLibrary() {
 	return ensureMapboxRuntimePatched()
 }
@@ -271,7 +273,7 @@ export function createMap ({ container, style, ...options }) {
 		accessToken: mapboxToken,
 		container: container,
 		logoPosition: 'bottom-left',
-		projection: jeo_settings.map_projection ?? 'equirectangular',
+		projection: mapProjection,
 		style: style ?? defaultStyle,
 		...options,
 	})
