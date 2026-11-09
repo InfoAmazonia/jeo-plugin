@@ -1,174 +1,168 @@
----
-untranslated: true
----
+# IA en JEO
 
-<TranslationPendingES />
+JEO incluye funcionalidades de IA integradas para georreferenciar entradas, generar mapas y sugerir contenido editorial. Esta página explica los conceptos subyacentes para que entiendas qué ocurre detrás de escena y cómo obtener los mejores resultados.
 
-# AI in JEO
+## Descripción general
 
-JEO includes built-in AI capabilities for georeferencing posts, generating maps, and suggesting editorial content. This page explains the underlying concepts so you can understand what happens behind the scenes and how to get the best results.
+Las funcionalidades de IA de JEO funcionan con un proveedor de IA externo configurable. El plugin nunca ejecuta su propio modelo de IA; en su lugar, envía solicitudes al proveedor que elijas (como OpenAI, Google Gemini o una instancia local de Ollama) y procesa los resultados.
 
-## Overview
+Todas las funcionalidades de IA son **opcionales**. Solo se activan después de que configures un proveedor en **Jeo → IA** (consulta [Configuraciones de IA](ai-settings.md)).
 
-JEO's AI features are powered by a configurable external AI provider. The plugin never runs its own AI model — instead, it sends requests to the provider you choose (such as OpenAI, Google Gemini, or a local Ollama instance) and processes the results.
+La idea clave es que cada funcionalidad de IA es un **agente** especializado: un asistente de IA con un rol específico, un conjunto de **herramientas** que puede usar y acceso al contenido de tu sitio a través de una **Base de conocimiento**.
 
-All AI features are **optional**. They activate only after you configure a provider in **Jeo → AI** (see [AI Settings](ai-settings.md)).
+## Proveedores de IA
 
-The key idea is that each AI feature is a specialized **agent** — an AI assistant with a specific role, a set of **tools** it can use, and access to your site's content through a **knowledge base**.
+JEO es compatible con múltiples proveedores de IA a través de [NeuronAI](https://docs.neuron-ai.dev/providers/ai-provider). La mayoría de los proveedores se ejecutan en la nube y requieren una clave de API, mientras que otros (como Ollama) se ejecutan localmente en tu propio servidor, lo que significa que ningún dato sale jamás de tu servidor.
 
-## AI providers
+Seleccionas un proveedor y un modelo en **Jeo → IA → Proveedor**. El mismo proveedor se usa en todas las funcionalidades de IA. La lista de proveedores disponibles se muestra en la página de configuración y puede crecer con el tiempo a medida que NeuronAI añada nuevas integraciones.
 
-JEO supports multiple AI providers through [NeuronAI](https://docs.neuron-ai.dev/providers/ai-provider). Most providers run in the cloud and require an API key, while others (such as Ollama) run locally on your own server — meaning no data ever leaves your server.
+## Base de conocimiento (RAG)
 
-You select a provider and model in **Jeo → AI → Provider**. The same provider is used across all AI features. The list of available providers is shown on the settings page and may grow over time as NeuronAI adds new integrations.
+**RAG** corresponde a *Retrieval-Augmented Generation* (generación aumentada por recuperación). Es una técnica que permite a la IA buscar en tu propio contenido antes de responder, de modo que sus respuestas se basen en los datos de tu sitio y no en conocimiento genérico.
 
-## Knowledge Base (RAG)
+### Cómo funciona
 
-**RAG** stands for *Retrieval-Augmented Generation*. It is a technique that lets the AI search your own content before answering, so its responses are grounded in your site's data rather than generic knowledge.
+JEO mantiene **dos bases de conocimiento separadas** (llamadas *Almacenes de Vectores*):
 
-### How it works
-
-JEO maintains **two separate knowledge bases** (called *vector stores*):
-
-| Knowledge base | Content | Used by |
+| Base de conocimiento | Contenido | Usada por |
 |----------------|---------|---------|
-| **Posts** (`jeo_knowledge`) | Your published posts — titles and body text | [Context Assistant](ai-context-assistant.md) |
-| **Layers** (`jeo_layers_knowledge`) | Your map layers — titles, types, legends, and descriptions | [Minimap](minimap.md) |
+| **Entradas** (`jeo_knowledge`) | Tus entradas publicadas — títulos y cuerpo del texto | [Asistente de contexto](ai-context-assistant.md) |
+| **Capas** (`jeo_layers_knowledge`) | Tus capas de mapa — títulos, tipos, leyendas y descripciones | [Minimapa](minimap.md) |
 
-Each item is converted into a numerical representation (an *embedding*) and stored in a local file-based index. When an AI feature needs context, it:
+Cada elemento se convierte en una representación numérica (un *embedding*) y se almacena en un índice local basado en archivos. Cuando una funcionalidad de IA necesita contexto:
 
-1. Converts the query into an embedding using the same model.
-2. Searches the index for the most similar entries.
-3. Passes the matching content to the AI along with the original request.
+1. Convierte la consulta en un embedding usando el mismo modelo.
+2. Busca en el índice los elementos más similares.
+3. Pasa el contenido coincidente a la IA junto con la solicitud original.
 
-This means the AI can reference your actual articles and layers when generating results.
+Esto significa que la IA puede hacer referencia a tus artículos y capas reales al generar resultados.
 
-### Indexing
+### Indexación
 
-Content is added to the knowledge base through *indexing*. You control this in **Jeo → AI → Knowledge Base**:
+El contenido se añade a la Base de conocimiento mediante la *indexación*. Lo controlas en **Jeo → IA → Base de conocimiento**:
 
-- **Auto-indexing** runs in the background via WordPress cron and picks up new or updated posts and layers.
-- **Manual indexing** lets you trigger a full or partial re-index from the settings page.
-- **WP-CLI** is also available for large-scale indexing: `wp jeo ai vectorize --store=posts --batch_size=20`.
+- La **indexación automática** se ejecuta en segundo plano mediante el cron de WordPress y detecta entradas y capas nuevas o actualizadas.
+- La **indexación manual** te permite disparar una reindexación total o parcial desde la página de configuración.
+- **WP-CLI** también está disponible para indexación a gran escala: `wp jeo ai vectorize --store=posts --batch_size=20`.
 
-### Embedding models
+### Modelos de Embedding
 
-Embeddings are generated by a separate model from your AI provider. You configure the embedding model in the Knowledge Base tab. Common choices include `text-embedding-3-small` (OpenAI), `text-embedding-004` (Gemini), or `nomic-embed-text` (Ollama).
+Los embeddings los genera un modelo separado de tu proveedor de IA. Configuras el modelo de Embedding en la pestaña Base de conocimiento. Algunas opciones comunes son `text-embedding-3-small` (OpenAI), `text-embedding-004` (Gemini) o `nomic-embed-text` (Ollama).
 
-Once a knowledge base is created with a specific embedding model, that model is *locked* — changing it requires clearing and rebuilding the store, because embeddings from different models are not comparable.
+Una vez creada una Base de conocimiento con un modelo de Embedding específico, ese modelo queda *bloqueado*: cambiarlo requiere limpiar y reconstruir el almacén, porque los embeddings de modelos diferentes no son comparables.
 
-### Search results (topK)
+### Resultados de búsqueda (topK)
 
-The **topK** setting (in Knowledge Base tab, range 1–50, default 10) controls how many documents are returned per search. Higher values give the AI more context but increase token usage. For most use cases, 10 is a good default.
+La configuración **topK** (en la pestaña Base de conocimiento, rango 1–50, valor predeterminado 10) controla cuántos documentos se devuelven por búsqueda. Valores más altos dan a la IA más contexto, pero aumentan el uso de tokens. Para la mayoría de los casos de uso, 10 es un buen valor predeterminado.
 
-## How each feature uses RAG
+## Cómo usa RAG cada funcionalidad
 
-| Feature | Uses RAG? | Knowledge base | Purpose |
+| Funcionalidad | ¿Usa RAG? | Base de conocimiento | Finalidad |
 |---------|-----------|----------------|---------|
-| [AI Georeferencing](ai-georeferencing.md) | Optional | — | Can include taxonomy context; does not use the vector store directly |
-| [Minimap](minimap.md) | Yes | Layers (`jeo_layers_knowledge`) | Searches for relevant map layers to include in the generated map |
-| [Context Assistant](ai-context-assistant.md) | Yes | Posts (`jeo_knowledge`) | Finds related articles to reference in suggestions |
-| [AI Bulk Geolocation](ai-bulk-geolocation.md) | No | — | Processes posts individually without RAG |
-| Minilayer | No | — | Uses MCP instead (see below) |
+| [Georreferenciación con IA](ai-georeferencing.md) | Opcional | — | Puede incluir contexto de taxonomías; no usa el Almacén de Vectores directamente |
+| [Minimapa](minimap.md) | Sí | Capas (`jeo_layers_knowledge`) | Busca capas de mapa relevantes para incluirlas en el mapa generado |
+| [Asistente de contexto](ai-context-assistant.md) | Sí | Entradas (`jeo_knowledge`) | Encuentra artículos relacionados para referenciarlos en las sugerencias |
+| [Geolocalización masiva con IA](ai-bulk-geolocation.md) | No | — | Procesa las entradas individualmente, sin RAG |
+| Minilayer | No | — | Usa MCP en su lugar (ver más abajo) |
 
-## Structured output
+## Salida estructurada
 
-When the AI returns data — such as geolocation points or map configurations — JEO needs to parse it reliably. **Structured output** is a mechanism where the AI provider enforces a specific JSON schema at the API level, guaranteeing the response matches the expected format.
+Cuando la IA devuelve datos —como puntos de geolocalización o configuraciones de mapa—, JEO necesita analizarlos de forma confiable. La **salida estructurada** es un mecanismo en el que el proveedor de IA impone un esquema JSON específico a nivel de API, garantizando que la respuesta coincida con el formato esperado.
 
-This is enabled by default and used by:
+Está activada de forma predeterminada y la usan:
 
-- **Georeferencing** — returns locations with name, coordinates, confidence score, and primary/secondary classification.
-- **Minimap** — returns the complete map configuration (layers, center, zoom, pins).
-- **Context Assistant** — returns paragraphs and references.
+- **Georreferenciación** — devuelve ubicaciones con nombre, coordenadas, puntuación de confianza y clasificación principal/secundaria.
+- **Minimapa** — devuelve la configuración completa del mapa (capas, centro, zoom, pines).
+- **Asistente de contexto** — devuelve párrafos y referencias.
 
-If your provider does not support structured output, or if it fails for any reason, JEO automatically falls back to a free-text mode that extracts the data using pattern matching. You don't need to configure anything — the fallback is transparent.
+Si tu proveedor no es compatible con la salida estructurada, o si falla por cualquier motivo, JEO hace un fallback automático a un modo de texto libre que extrae los datos mediante coincidencia de patrones. No necesitas configurar nada: el fallback es transparente.
 
-## Agents and tools
+## Agentes y herramientas
 
-Each AI feature is built around an **agent** — an AI assistant configured for a specific task. Agents are given a system prompt (instructions), a set of **tools** they can call, and optionally access to **sub-agents** for delegated work.
+Cada funcionalidad de IA se construye en torno a un **agente**: un asistente de IA configurado para una tarea específica. Los agentes reciben un prompt del sistema (instrucciones), un conjunto de **herramientas** que pueden invocar y, opcionalmente, acceso a **subagentes** para el trabajo delegado.
 
-### The tools
+### Las herramientas
 
-| Tool | What it does | Used by |
+| Herramienta | Qué hace | Usada por |
 |------|-------------|---------|
-| `search_layers` | Searches the layer knowledge base for relevant layers | Minimap |
-| `geocode` | Converts a location name into latitude/longitude coordinates | Minimap |
-| `retrieve_knowledge` | Searches the post knowledge base for related articles | Context Assistant |
-| `get_post_content` | Retrieves a post's title, content, categories, tags, and geolocations | Minimap, Context Assistant |
-| `generate_layer` | Creates a new Mapbox style and layer CPT from a description | Minimap (requires Mapbox key) |
+| `search_layers` | Busca capas relevantes en la Base de conocimiento de capas | Minimapa |
+| `geocode` | Convierte un nombre de ubicación en coordenadas de latitud/longitud | Minimapa |
+| `retrieve_knowledge` | Busca artículos relacionados en la Base de conocimiento de entradas | Asistente de contexto |
+| `get_post_content` | Recupera el título, el contenido, las categorías, las etiquetas y las geolocalizaciones de una entrada | Minimapa, Asistente de contexto |
+| `generate_layer` | Crea un nuevo estilo de Mapbox y una entrada de capa a partir de una descripción | Minimapa (requiere clave de Mapbox) |
 
-When you ask the Minimap to "show deforestation data in the Amazon," the agent might:
+Cuando le pides al Minimapa que "muestre datos de deforestación en la Amazonía", el agente podría:
 
-1. Use `get_post_content` to understand the current article.
-2. Use `search_layers` to find layers about deforestation.
-3. Use `geocode` to locate the Amazon region.
-4. Return a complete map configuration.
+1. Usar `get_post_content` para entender el artículo actual.
+2. Usar `search_layers` para encontrar capas sobre deforestación.
+3. Usar `geocode` para ubicar la región amazónica.
+4. Devolver una configuración completa del mapa.
 
-### Sub-agents
+### Subagentes
 
-Some agents delegate work to specialized sub-agents. Both Minimap and Context Assistant use a **post analyzer** sub-agent that reads the post content and extracts topics, locations, tone, and suggested search queries. This analysis guides the main agent's decisions.
+Algunos agentes delegan trabajo en subagentes especializados. Tanto el Minimapa como el Asistente de contexto usan un subagente **analizador de entradas** que lee el contenido de la entrada y extrae temas, ubicaciones, tono y consultas de búsqueda sugeridas. Este análisis guía las decisiones del agente principal.
 
-## Conversation memory
+## Memoria de conversación
 
-AI features that support chat (Minimap, Context Assistant, and Georeferencing) maintain **conversation history** per post. This means:
+Las funcionalidades de IA con chat (Minimapa, Asistente de contexto y Georreferenciación) mantienen un **historial de conversación** por entrada. Esto significa que:
 
-- You can refine results through back-and-forth chat without repeating context.
-- Conversations persist across page reloads — closing the editor and returning later resumes where you left off.
-- Each post has its own independent conversation.
+- Puedes refinar los resultados mediante un chat de ida y vuelta sin repetir contexto.
+- Las conversaciones persisten entre recargas de la página: si cierras el editor y vuelves más tarde, continúas donde lo dejaste.
+- Cada entrada tiene su propia conversación independiente.
 
-### Learning and user memory
+### Aprendizaje y memoria de usuario
 
-The Minimap and Context Assistant agents can **learn** from interactions. Over time, they accumulate knowledge about patterns and preferences. They also store per-user memory (e.g., preferred writing style), so suggestions become more personalized the more you use them.
+Los agentes del Minimapa y del Asistente de contexto pueden **aprender** de las interacciones. Con el tiempo acumulan conocimiento sobre patrones y preferencias. También almacenan memoria por usuario (ej.: el estilo de escritura preferido), de modo que las sugerencias se personalizan más cuanto más las usas.
 
 ## MCP (Model Context Protocol)
 
-**MCP** is a protocol that connects AI agents to external services. In JEO, it is used exclusively by the **Minilayer** feature to communicate with the Mapbox MCP DevKit — an external service that generates Mapbox map styles.
+**MCP** es un protocolo que conecta agentes de IA con servicios externos. En JEO lo usa exclusivamente la funcionalidad **Minilayer** para comunicarse con el Mapbox MCP DevKit, un servicio externo que genera estilos de mapas de Mapbox.
 
-When you ask the AI to create a custom layer (e.g., "generate a deforestation heatmap for the Amazon"), the Minilayer agent:
+Cuando le pides a la IA que cree una capa personalizada (ej.: "genera un mapa de calor de deforestación para la Amazonía"), el agente Minilayer:
 
-1. Connects to the Mapbox MCP server using your Mapbox API key.
-2. Uses Mapbox's tools to build, validate, and preview the style.
-3. Creates a new layer post in WordPress with the generated style.
+1. Se conecta al servidor MCP de Mapbox con tu clave de API de Mapbox.
+2. Usa las herramientas de Mapbox para construir, validar y previsualizar el estilo.
+3. Crea una nueva entrada de capa en WordPress con el estilo generado.
 
-MCP requires a Mapbox API key configured in **Jeo → Settings**. It is not used by any other feature.
+MCP requiere una clave de API de Mapbox configurada en **Jeo → Configuraciones**. Ninguna otra funcionalidad lo usa.
 
-## Privacy and data
+## Privacidad y datos
 
-Understanding what data is sent where:
+Entender qué datos se envían y a dónde:
 
-| Data point | Sent to | Stored |
+| Dato | Enviado a | Almacenado |
 |------------|---------|--------|
-| Post content (for analysis) | Your configured AI provider | No — used transiently |
-| Geolocation queries | Your configured AI provider | No |
-| Embeddings (knowledge base) | Your configured AI provider (during indexing) | Yes — stored locally in `wp-content/uploads/jeo-ai-store/` |
-| Conversation history | Not sent to AI provider after initial call | Yes — stored in WordPress post meta |
-| User preferences (memory) | Not sent externally | Yes — stored in WordPress user meta |
-| Mapbox styles (MCP only) | Mapbox MCP DevKit | Yes — stored as layer posts in WordPress |
+| Contenido de la entrada (para análisis) | Tu proveedor de IA configurado | No — se usa de forma transitoria |
+| Consultas de geolocalización | Tu proveedor de IA configurado | No |
+| Embeddings (Base de conocimiento) | Tu proveedor de IA configurado (durante la indexación) | Sí — almacenados localmente en `wp-content/uploads/jeo-ai-store/` |
+| Historial de conversación | No se envía al proveedor de IA después de la llamada inicial | Sí — almacenado en los metadatos de la entrada de WordPress |
+| Preferencias del usuario (memoria) | No se envían externamente | Sí — almacenadas en los metadatos de usuario de WordPress |
+| Estilos de Mapbox (solo MCP) | Mapbox MCP DevKit | Sí — almacenados como entradas de capa en WordPress |
 
-If you use a **local provider** (Ollama), no data leaves your server at all.
+Si usas un **proveedor local** (Ollama), ningún dato sale de tu servidor.
 
-### Token usage
+### Uso de tokens
 
-JEO tracks AI token usage in **Jeo → AI Debug Logs**. Each log entry records the provider, model, input and output tokens, and the prompt and response. Use this to monitor costs and troubleshoot results.
+JEO registra el uso de tokens de IA en **Jeo → Registros de Debug de IA**. Cada registro guarda el proveedor, el modelo, los tokens de entrada y salida, y el prompt y la respuesta. Úsalo para monitorear costos y solucionar problemas con los resultados.
 
-## Feature — concept matrix
+## Matriz funcionalidad — concepto
 
-A quick reference for which concepts apply to each feature:
+Una referencia rápida de qué conceptos aplican a cada funcionalidad:
 
-| | Provider | RAG | Structured output | Tools | Conversation memory | MCP |
+| | Proveedor | RAG | Salida estructurada | Herramientas | Memoria de conversación | MCP |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| [AI Georeferencing](ai-georeferencing.md) | ✓ | — | ✓ | — | ✓ | — |
-| [AI Bulk Geolocation](ai-bulk-geolocation.md) | ✓ | — | ✓ | — | — | — |
-| [Minimap](minimap.md) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
-| [Context Assistant](ai-context-assistant.md) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| [Georreferenciación con IA](ai-georeferencing.md) | ✓ | — | ✓ | — | ✓ | — |
+| [Geolocalización masiva con IA](ai-bulk-geolocation.md) | ✓ | — | ✓ | — | — | — |
+| [Minimapa](minimap.md) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
+| [Asistente de contexto](ai-context-assistant.md) | ✓ | ✓ | ✓ | ✓ | ✓ | — |
 | Minilayer | ✓ | — | — | — | — | ✓ |
 
-## Next steps
+## Próximos pasos
 
-- **Configure a provider**: [AI Settings](ai-settings.md)
-- **Index your content**: Knowledge Base tab in **Jeo → AI**
-- **Start using features**:
-  - [AI Georeferencing](ai-georeferencing.md) — auto-tag posts with locations
-  - [Minimap](minimap.md) — generate maps from text or post content
-  - [Context Assistant](ai-context-assistant.md) — get AI-powered editorial suggestions
-  - [AI Bulk Geolocation](ai-bulk-geolocation.md) — process many posts at once
+- **Configura un proveedor**: [Configuraciones de IA](ai-settings.md)
+- **Indexa tu contenido**: pestaña Base de conocimiento en **Jeo → IA**
+- **Empieza a usar las funcionalidades**:
+  - [Georreferenciación con IA](ai-georeferencing.md) — etiqueta entradas automáticamente con ubicaciones
+  - [Minimapa](minimap.md) — genera mapas a partir de texto o del contenido de una entrada
+  - [Asistente de contexto](ai-context-assistant.md) — obtén sugerencias editoriales potenciadas por IA
+  - [Geolocalización masiva con IA](ai-bulk-geolocation.md) — procesa muchas entradas a la vez

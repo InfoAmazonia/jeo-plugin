@@ -1,27 +1,21 @@
----
-untranslated: true
----
+# Geolocalización de entradas
 
-<TranslationPendingES />
+Al editar una entrada, JEO añadirá un panel adicional a la barra lateral: **Geolocalización**. Al hacer clic en **Geolocalizar este post**, se mostrará una ventana emergente.
 
-# Geolocating posts
+![Ventana emergente de geolocalización](../img/geolocating-maps.png)
 
-When editing a post, JEO will add an extra panel to the sidebar: **Geolocation**. Clicking on **Geolocate this post**, a popup will then be displayed.
+Se pueden añadir nuevos puntos a la entrada haciendo clic en el botón **Añadir nuevo punto**. Puedes buscar una ubicación específica en la barra de búsqueda.
 
-![Geolocation popup](../img/geolocating-maps.png)
+También es posible elegir la relevancia de cada punto, lo cual es útil cuando tienes más de un punto.
 
-New points can be added to the post by clicking on **Add new point** button. You can search for a specific location in the search bar.
+## Visualizar un mapa con entradas geolocalizadas
 
-It's also possible to choose the relevance of each point, which is useful when you have more than one point.
+Los mapas con entradas geolocalizadas contienen marcadores en la ubicación de cada entrada. Al hacer clic en ellos se abrirá una ventana emergente con su título y fecha de publicación. Al hacer clic en el título, irás a la entrada propiamente dicha.
 
-## Visualizing a map with geolocated posts
+![Ventana emergente de entradas geolocalizadas](../img/geolocated-posts-popup.png)
 
-Maps with geolocated posts contain markers at the location of each post. Clicking on them will open a popup with its title and publication date. Clicking on the title will take you to the post itself.
+## Georreferenciación con IA
 
-![Geolocated Posts Popup](../img/geolocated-posts-popup.png)
+Alternativamente, JEO puede georreferenciar entradas automáticamente usando IA. La IA analiza el contenido de la entrada y sugiere puntos de geolocalización con puntuaciones de confianza. Después puedes revisar y aprobar las sugerencias. Consulta [Georreferenciación con IA](ai-georeferencing.md).
 
-## AI Georeferencing
-
-Alternatively, JEO can georeference posts automatically using AI. The AI analyzes the post content and suggests geolocation points with confidence scores. You can then review and approve the suggestions. See [AI Georeferencing](ai-georeferencing.md).
-
-For bulk processing many posts at once, see [AI Bulk Geolocation](ai-bulk-geolocation.md).
+Para procesar muchas entradas en lote, consulta [Geolocalización masiva con IA](ai-bulk-geolocation.md).

@@ -1,65 +1,62 @@
----
-untranslated: true
----
+# Mapa narrativo
 
-<TranslationPendingES />
+El Mapa Narrativo es una forma de crear narraciones interactivas con mapas y capas personalizados. Puedes seleccionar ubicaciones específicas y asociar capas y textos a estas ubicaciones. Esto generará un mapa que, al hacer scroll por la página, irá cambiando de una ubicación/capa/texto a otra. Este conjunto de ubicación, capa y texto se llama **Diapositiva**.
 
-# Story Map
-Story Map is a way of making an interactive storytelling with customized maps and layers. You are able to select specific locations and related layers and texts to these locations. This will generate a map that, when the page is scrolled, will change from one location/layer/text to another. This group of location, layer and text are called **Slide**.
+## Crear un Mapa Narrativo
 
-## Creating a Story Map
-Story Map is a custom post type in JEO Plugin. When creating one, you'll be asked for a map. All of the layers that you are going to use in your Story Map come from this previous selected map. Also, Story Map has a `Navigate function`, which we will talk about later. This Navigate function also uses this selected map to work.
+El Mapa Narrativo es un tipo de contenido personalizado del plugin JEO. Al crear uno, se te pedirá un mapa. Todas las capas que vas a usar en tu Mapa Narrativo provienen de ese mapa previamente seleccionado. Además, el Mapa Narrativo tiene una `Navigate function`, de la que hablaremos más adelante. Esta función Navigate también usa el mapa seleccionado para funcionar.
 
-![Story Map edit](../img/story-map-edit.png)
+![Edición del Mapa Narrativo](../img/story-map-edit.png)
 
-### Story settings
-Here you can set a description for your story map which will be shown at the beginning of the post, with the title and publish date. You can also define whether or not your story map will have an introduction and a `Navigate map button`.
+### Configuración de la historia
 
-**All the text fields has a buit-in Rich Text Editor. This means that you can put bold text, links, lists, etc inside your text field.**
+Aquí puedes definir una descripción para tu mapa narrativo, que se mostrará al principio de la entrada, junto con el título y la fecha de publicación. También puedes definir si tu mapa narrativo tendrá o no una introducción y un `Navigate map button`.
 
-`Navigate map button` appears at the end of a Story Map and allows the user to navigate through the map. This map will follow all the settings of the previous selected.
+**Todos los campos de texto tienen un Editor de Texto Enriquecido integrado. Esto significa que puedes poner texto en negrita, enlaces, listas, etc. dentro de tu campo de texto.**
 
-![Story Map edit](../img/story-map-edit2.png)
+El `Navigate map button` aparece al final de un Mapa Narrativo y permite al usuario navegar por el mapa. Este mapa seguirá toda la configuración del mapa previamente seleccionado.
 
-### Slides settings
+![Edición del Mapa Narrativo](../img/story-map-edit2.png)
 
-A Story Map slide contains a title, content, location and selected layers (The order of the layers will always follow the map layers order that were defined when creating this map). You can remove a slide by clicking on **Remove** button, preview the map in a slide clicking on **Preview** button, and set the location to the current slide clicking on **Lock current spot** button. You can see what's the current slide at the top-right side of the block.
+### Configuración de las diapositivas
 
-You can pick a location to a slide by dragging the map with left mouse button and changing its peaching and bearing by dragging the map with right mouse button.
+Una diapositiva de Mapa Narrativo contiene un título, contenido, ubicación y capas seleccionadas (el orden de las capas seguirá siempre el orden de las capas del mapa definido al crearlo). Puedes eliminar una diapositiva haciendo clic en el botón **Remover**, previsualizar el mapa de una diapositiva haciendo clic en el botón **Previsualizar** y fijar la ubicación de la diapositiva actual haciendo clic en el botón **Bloquear lugar actual**. Puedes ver cuál es la diapositiva actual en la parte superior derecha del bloque.
 
-![Story Map edit](../img/story-map-edit3.png)
+Puedes elegir la ubicación de una diapositiva arrastrando el mapa con el botón izquierdo del ratón y cambiar su inclinación y orientación arrastrando el mapa con el botón derecho.
 
-![Story Map edit](../img/story-map-edit4.png)
+![Edición del Mapa Narrativo](../img/story-map-edit3.png)
 
-Slides can be rearranged by clicking on `=` icon and dragging it to put the slide in another position.
+![Edición del Mapa Narrativo](../img/story-map-edit4.png)
 
-![Story Map edit](../img/story-map-edit5.png)
+Las diapositivas pueden reordenarse haciendo clic en el ícono `=` y arrastrándolo para colocar la diapositiva en otra posición.
 
-## Looking at a Story Map
+![Edición del Mapa Narrativo](../img/story-map-edit5.png)
 
-This is how a Story Map look in a post:
+## Viendo un Mapa Narrativo
 
-![Story Map edit](../img/story-map-edit6.png)
+Así se ve un Mapa Narrativo en una entrada:
 
-Clicking on **START** will take the user to the first slide. Clicking on **skip intro** will take the user to the map itself so they can navigate through it (this button is only available if the navigate setting is enabled in story map settings). These buttons, the title, description and publish date only appears if `Shows story map introduction` is enabled. If it isn't, the story map starts on the first slide.
+![Edición del Mapa Narrativo](../img/story-map-edit6.png)
 
-![Story Map edit](../img/story-map-edit7.png)
+Al hacer clic en **INICIAR**, el usuario irá a la primera diapositiva. Al hacer clic en **saltar introducción**, el usuario irá directamente al mapa para poder navegar por él (este botón solo está disponible si el ajuste de navegación está activado en la configuración del mapa narrativo). Estos botones, el título, la descripción y la fecha de publicación solo aparecen si `Shows story map introduction` está activado. Si no lo está, el mapa narrativo comienza en la primera diapositiva.
 
-While the page is scrolled, the current slide changes to the next one and the map do a transition to the next location and change its layers. At the end of the storytelling, if the correct setting is enabled, a **NAVIGATE THE MAP** button will shows up. Clicking on it will take the user to the map itself and allowing they to interact with it.
+![Edición del Mapa Narrativo](../img/story-map-edit7.png)
 
-![Story Map edit](../img/story-map-edit8.png)
+Mientras se hace scroll por la página, la diapositiva actual cambia a la siguiente y el mapa hace una transición hacia la siguiente ubicación y cambia sus capas. Al final de la narración, si el ajuste correcto está activado, aparecerá un botón **NAVEGAR EL MAPA**. Al hacer clic en él, el usuario accederá al mapa propiamente dicho y podrá interactuar con él.
 
-![Story Map edit](../img/story-map-edit9.png)
+![Edición del Mapa Narrativo](../img/story-map-edit8.png)
 
-## Theme integration
+![Edición del Mapa Narrativo](../img/story-map-edit9.png)
 
-The public story map output includes a stable map container for theme integrations:
+## Integración con el tema
+
+La salida pública del mapa narrativo incluye un contenedor de mapa estable para integraciones de temas:
 
 ```html
 <div class="story-map-element jeo-storymap-map js-jeo-storymap-map"></div>
 ```
 
-Themes that need to position or measure the story map should target `jeo-storymap-map`
-or `js-jeo-storymap-map` instead of runtime classes such as `mapboxgl-map` or
-`maplibregl-map`. The JEO classes are present before the map runtime initializes,
-while runtime classes are added asynchronously by the map library.
+Los temas que necesiten posicionar o medir el mapa narrativo deben usar `jeo-storymap-map`
+o `js-jeo-storymap-map` en lugar de clases del entorno de ejecución como `mapboxgl-map` o
+`maplibregl-map`. Las clases de JEO están presentes antes de que se inicialice el entorno de ejecución del mapa,
+mientras que las clases del entorno de ejecución las añade de forma asíncrona la biblioteca del mapa.

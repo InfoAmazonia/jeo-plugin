@@ -1,61 +1,55 @@
----
-untranslated: true
----
+# Georreferenciación con IA
 
-<TranslationPendingES />
+JEO puede georreferenciar tus entradas automáticamente con IA. En lugar de buscar y añadir puntos de geolocalización manualmente, la IA analiza el contenido de tu entrada y sugiere ubicaciones relevantes con coordenadas y puntuaciones de confianza.
 
-# AI Georeferencing
+Consulta [IA en JEO](ai-in-jeo.md) para una descripción general de cómo funciona el sistema de IA.
 
-JEO can automatically georeference your posts using AI. Instead of manually searching and adding geolocation points, the AI analyzes your post content and suggests relevant locations with coordinates and confidence scores.
+## Cómo funciona
 
-See [AI in JEO](ai-in-jeo.md) for an overview of how the AI system works.
+Al editar una entrada, el panel de la barra lateral **Geolocalización** incluye un botón **Geolocalizar con IA**. Al hacer clic, se envían el título y el contenido de tu entrada al proveedor de IA configurado, que devuelve puntos de geolocalización sugeridos.
 
-## How it works
+![Georreferenciación con IA](../img/ai-geolocation.png)
 
-When editing a post, the **Geolocation** sidebar panel includes an **Geolocate with AI** button. Clicking it sends your post title and content to the configured AI provider, which returns suggested geolocation points.
+![Georreferenciación con IA](../img/ai-geolocation2.png)
 
-![AI Georeferencing](../img/ai-geolocation.png)
+### Flujo
 
-![AI Georeferencing](../img/ai-geolocation2.png)
+1. Haz clic en **Geolocalizar con IA** en el panel de la barra lateral Geolocalización.
+2. La IA analiza el contenido de la entrada e identifica referencias geográficas.
+3. Los puntos sugeridos aparecen con el nombre de la ubicación, las coordenadas y una puntuación de confianza.
+4. Revisa y aprueba o ajusta los puntos sugeridos.
+5. Los puntos se guardan como datos de geolocalización de la entrada.
 
-### Flow
+## Georreferenciación con prompts personalizados
 
-1. Click **Geolocate with AI** in the Geolocation sidebar panel.
-2. The AI analyzes the post content and identifies geographic references.
-3. Suggested points appear with location name, coordinates, and a confidence score.
-4. Review and approve or adjust the suggested points.
-5. The points are saved as geolocation data for the post.
+En **Jeo → IA → Proveedor** encontrarás la sección **Asistente de Ingeniería de Prompt de IA**. Describe cómo quieres que se comporte la IA (ej.: "Mapear solo ciudades de Brasil" o "Ignorar nombres de calles") y el LLM activo generará un prompt del sistema optimizado que incorpora tus configuraciones de calibración. El prompt generado puede revisarse y editarse antes de usarlo.
 
-## Georeferencing with custom prompts
+![Georreferenciación con IA - Prompts personalizados](../img/ai-geolocation3.png)
 
-Under **Jeo → AI → Provider**, you'll find the **AI Prompt Engineer Assistant** section. Describe how you want the AI to behave (e.g., "Only map cities in Brazil" or "Ignore street names") and the active LLM will generate an optimized system prompt that incorporates your calibration settings. The generated prompt can be reviewed and edited before use.
+### Calibración
 
-![AI Georeferencing - Custom prompts](../img/ai-geolocation3.png)
+En **Jeo → IA → Proveedor**, en la sección **Calibración de georreferenciación**, puedes ajustar con precisión el comportamiento de la georreferenciación:
 
-### Calibration
+- **Granularidad de ubicación**: Controla el nivel de detalle geográfico — Amplia (países, regiones), Equilibrada (ciudades + barrios) o Fina (calles, puntos de referencia, POIs).
+- **Confianza mínima**: Puntuación de confianza mínima para que un punto sea sugerido (0–100).
+- **Umbral principal**: Puntuación de confianza por encima de la cual una ubicación se clasifica como PRINCIPAL (foco geográfico principal).
+- **Puntos principales**: Número máximo de ubicaciones PRINCIPALES que la IA puede sugerir.
+- **Umbral secundario**: Rango de puntuaciones de confianza para las ubicaciones SECUNDARIAS (mencionadas pero no centrales).
+- **Puntos secundarios**: Número máximo de ubicaciones SECUNDARIAS que la IA puede sugerir.
+- **Priorizar menciones en el título**: Cuánto influye el título de la entrada en la detección de ubicaciones de la IA (0–100 %).
+- **Presupuesto de Tokens del Prompt**: Presupuesto de tokens para el prompt del sistema generado.
 
-Under **Jeo → AI → Provider**, in the **Georeferencing Calibration** section, you can fine-tune georeferencing behavior:
+Cada configuración tiene un interruptor **Usar** — desactívalo para excluir esa regla del prompt de la IA.
 
-- **Location Granularity**: Controls the level of geographic detail — Broad (countries, regions), Balanced (cities + neighborhoods), or Fine (streets, landmarks, POIs).
-- **Minimum Confidence**: Minimum confidence score for a point to be suggested (0–100).
-- **Primary Threshold**: Confidence score above which a location is classified as PRIMARY (main geographic focus).
-- **Primary Points**: Maximum number of PRIMARY locations the AI can suggest.
-- **Secondary Threshold**: Confidence score range for SECONDARY locations (mentioned but not central).
-- **Secondary Points**: Maximum number of SECONDARY locations the AI can suggest.
-- **Prioritize Title Mentions**: How much the post title influences the AI's location detection (0–100%).
-- **Max Tokens**: Token budget for the generated system prompt.
+![Georreferenciación con IA - Calibración](../img/ai-geolocation4.png)
 
-Each setting has a **Use** toggle — disable it to exclude that rule from the AI prompt.
+## Refinamiento en múltiples turnos
 
-![AI Georeferencing - Calibration](../img/ai-geolocation4.png)
+Tras la georreferenciación inicial, puedes chatear con la IA para refinar los resultados. Por ejemplo, puedes pedirle que añada una ciudad específica, que elimine un punto incorrecto o que ajuste la confianza de una sugerencia.
 
-## Multi-turn refinement
+El historial de conversación se conserva por entrada, para que puedas seguir refinando en sesiones de edición posteriores.
 
-After the initial georeferencing, you can chat with the AI to refine the results. For example, you can ask it to add a specific city, remove an incorrect point, or adjust the confidence of a suggestion.
+## Requisitos
 
-The conversation history is preserved per post, so you can continue refining in subsequent editing sessions.
-
-## Requirements
-
-- An AI provider must be configured in **Jeo → AI** (see [AI Settings](ai-settings.md)).
-- The post must have a title and/or content for the AI to analyze.
+- Debe haber un proveedor de IA configurado en **Jeo → IA** (consulta [Configuraciones de IA](ai-settings.md)).
+- La entrada debe tener un título y/o contenido para que la IA pueda analizarla.

@@ -1,79 +1,73 @@
----
-untranslated: true
----
+# Plugin JEO
 
-<TranslationPendingES />
+El plugin JEO funciona como una plataforma de geoperiodismo que permite a organizaciones de noticias, blogueros y ONG publicar reportajes como capas de información en mapas digitales. Con JEO, crear la interacción entre capas de datos e información contextual es intuitivo e interactivo.
 
-# JEO Plugin
+Puedes publicar historias geolocalizadas y crear páginas con un diseño cuidado para cada una de las historias destacadas. Al mismo tiempo, al configurar capas alojadas en Mapbox y elegir entre MapboxGL y MapLibreGL, puedes administrar mapas sofisticados sin perder rendimiento, añadir leyendas directamente con HTML y definir los parámetros del mapa. Todo directamente desde el panel de WordPress.
 
-The JEO plugin acts as a geojournalism platform that allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is intuitive and interactive.
+## Funcionalidades
 
-You can post geolocated stories and create richly designed pages for each one of the featured stories. At the same time, by configuring layers hosted on Mapbox and choosing between MapboxGL and MapLibreGL, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
+- Mapas de [Mapbox](https://www.mapbox.com/) y [MapLibre](https://maplibre.org/)
+- Biblioteca [react-map-gl](https://visgl.github.io/react-map-gl/)
+- Capas de tiles personalizadas
+- Opciones de filtrado de capas, que te permiten combinar capas de tiles.
+- Geocodificación de entradas de WordPress con OpenStreetMap (Nominatim), con soporte para el tipo de contenido `Post` y extensibilidad para otros geocodificadores vía hook.
+- Íconos de marcadores personalizables, que pueden asociarse a categorías, taxonomías personalizadas o directamente a entradas.
+- Consulta de marcadores del mapa integrada en la consulta de entradas.
+- Soporte para los plugins multilingües [WPML](https://wpml.org/pt-br/) y [Polylang](https://wordpress.org/plugins/polylang/)
+- Georreferenciación, geolocalización masiva y generación de mapas con IA (múltiples proveedores de IA)
+- Bloque Historias cerca de ti con descubrimiento de entradas basado en la geolocalización
+- Bloque de mapa asistido por IA (Minimapa) con refinamiento por chat y capas generadas automáticamente
 
-## Features
+## Tutoriales de usuario
 
-- [Mapbox](https://www.mapbox.com/) and [MapLibre](https://maplibre.org/) maps
-- [react-map-gl](https://visgl.github.io/react-map-gl/) library
-- Custom tile layers
-- Layer filtering options, allowing you to mix tile layer.
-- Geocoding WordPress posts using OpenStreetMap (Nominatim), supporting the post type `Post`, with extensibility for additional geocoders via hook.
-- Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
-- Map markers query integrated to posts query.
-- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://wordpress.org/plugins/polylang/) multilingual plugins
-- AI-powered georeferencing, bulk geolocation, and map generation (multiple AI providers)
-- Stories Near You block with geolocation-based post discovery
-- AI-assisted map block (Minimap) with chat refinement and auto-generated layers
+### Primeros pasos
 
-## User tutorials
+- [Conceptos](concepts.md)
+- [Instalación y configuración del plugin](getting-started.md)
 
-### Getting started
+### Capas
 
-- [Concepts](concepts.md)
-- [Installing and configuring the plugin](getting-started.md)
+- [Crear capas](layer-post.md)
 
-### Layers
+### Mapas
 
-- [Creating layers](layer-post.md)
-
-### Maps
-
-- [Creating maps](map-post.md)
+- [Crear mapas](map-post.md)
 
 ### Discovery
 
-- [Using discovery](discovery.md)
+- [Usar Discovery](discovery.md)
 
-### Story Map
+### Mapa narrativo
 
-- [Creating and using Story Map](story-map.md)
+- [Crear y usar Mapas narrativos](story-map.md)
 
-### Posts
+### Entradas
 
-- [Geolocating posts](geolocating-posts.md)
-- [AI Georeferencing](ai-georeferencing.md)
-- [AI Bulk Geolocation](ai-bulk-geolocation.md)
-- [Using a map shortcode](map-shortcode.md)
-- [Using a map block](map-block.md)
-- [Using an one-time map block](one-time-map-block.md)
-- [Using a map embed](map-embed.md)
+- [Geolocalización de entradas](geolocating-posts.md)
+- [Georreferenciación con IA](ai-georeferencing.md)
+- [Geolocalización masiva con IA](ai-bulk-geolocation.md)
+- [Usar un shortcode de mapa](map-shortcode.md)
+- [Usar un bloque de mapa](map-block.md)
+- [Usar un bloque de mapa de un solo uso](one-time-map-block.md)
+- [Usar una incrustación de mapa](map-embed.md)
 
-### AI Features
+### Funcionalidades de IA
 
-- [AI Settings](ai-settings.md)
-- [Minimap — AI-Assisted Map Block](minimap.md)
+- [Configuraciones de IA](ai-settings.md)
+- [Minimapa — Bloque de mapa asistido por IA](minimap.md)
 
-### Stories Near You
+### Historias cerca de ti
 
-- [Stories Near You block](stories-near-you.md)
+- [Bloque Historias cerca de ti](stories-near-you.md)
 
-## Developer documentation
+## Documentación para desarrolladores
 
-### Tutorials
+### Tutoriales
 
-- [Adding new Layer Types](dev/layer-types.md)
-- [Geographical Information of a post](dev/geo-information.md)
-- [Writing a Geocoder](dev/geocoders.md)
+- [Añadir nuevos tipos de capa](dev/layer-types.md)
+- [Información geográfica de una entrada](dev/geo-information.md)
+- [Escribir un geocodificador](dev/geocoders.md)
 
-### Differences between the old and the present JEO
+### Diferencias entre el JEO antiguo y el actual
 
-- [Migration](dev/migration.md)
+- [Migración](dev/migration.md)

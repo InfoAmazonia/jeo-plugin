@@ -1,57 +1,51 @@
----
-untranslated: true
----
+# Geolocalización masiva con IA
 
-<TranslationPendingES />
+La Geolocalización masiva te permite georreferenciar muchas entradas a la vez con IA. Esto es útil cuando tienes un archivo grande de entradas que no fueron geolocalizadas al publicarse por primera vez.
 
-# AI Bulk Geolocation
+## Cómo funciona
 
-Bulk Geolocation allows you to georeference many posts at once using AI. This is useful when you have a large archive of posts that were not geolocated when first published.
+El sistema de Geolocalización masiva procesa las entradas por lotes usando el cron de WordPress (WP-Cron). Selecciona las entradas que no tienen datos de geolocalización (metadato `_related_point`) y las envía a la IA para su análisis.
 
-## How it works
+## Configuración inicial
 
-The Bulk Geolocation system processes posts in batches using WordPress cron (WP-Cron). It selects posts that do not have geolocation data (`_related_point` meta) and sends them to the AI for analysis.
+1. Configura un proveedor de IA en **Jeo → IA** (consulta [Configuraciones de IA](ai-settings.md)).
+2. Ve a la pestaña **Geolocalización masiva** en **Jeo → IA**.
+3. Selecciona los tipos de contenido a procesar, define el umbral de confianza y configura el tamaño del lote.
+4. Inicia el proceso masivo.
 
-## Setting up
+![Geolocalización masiva con IA - Configuraciones](../img/ai-bulk-geolocation.png)
 
-1. Configure an AI provider in **Jeo → AI** (see [AI Settings](ai-settings.md)).
-2. Go to the **Bulk Geolocation** tab in **Jeo → AI**.
-3. Select the post types to process, set the confidence threshold, and configure the batch size.
-4. Start the bulk process.
+## Procesamiento
 
-![AI Bulk Geolocation - Settings](../img/ai-bulk-geolocation.png)
+Una vez iniciado, el sistema procesa las entradas en segundo plano:
 
-## Processing
+- Cada lote selecciona entradas sin datos de geolocalización y las envía a la IA.
+- Aparece una columna **Estado de IA de JEO** en la lista de entradas del panel de WordPress, que muestra el estado de georreferenciación de cada entrada.
+- Las entradas procesadas se marcan para revisión — no se publican automáticamente.
 
-Once started, the system processes posts in the background:
+![Geolocalización masiva con IA - Estado de las entradas](../img/ai-bulk-geolocation2.png)
 
-- Each batch selects posts without geolocation data and sends them to the AI.
-- A **JEO AI Status** column appears in the WordPress admin post list, showing the georeferencing status for each post.
-- Processed posts are marked for review — they are not published automatically.
+## Revisar los resultados
 
-![AI Bulk Geolocation - Post status](../img/ai-bulk-geolocation2.png)
+Tras el procesamiento, puedes revisar la geolocalización sugerida por la IA para cada entrada:
 
-## Reviewing results
+1. Ve a la lista de entradas y busca las que tengan estado de IA "pendiente de revisión".
+2. Haz clic en una entrada para abrir el editor.
+3. La barra lateral Geolocalización mostrará los puntos sugeridos por la IA.
+4. Aprueba o ajusta los puntos según sea necesario.
 
-After processing, you can review the AI-suggested geolocation for each post:
+![Geolocalización masiva con IA - Revisión](../img/ai-bulk-geolocation3.png)
 
-1. Go to the post list and look for posts with a "pending review" AI status.
-2. Click on a post to open the editor.
-3. The Geolocation sidebar will show the AI-suggested points.
-4. Approve or adjust the points as needed.
+![Geolocalización masiva con IA - Revisión](../img/ai-bulk-geolocation4.png)
 
-![AI Bulk Geolocation - Review](../img/ai-bulk-geolocation3.png)
+También puedes usar la **acción masiva** en la lista de entradas de WordPress (`edit.php`) para aprobar varias entradas a la vez. Selecciona las entradas, elige **Aprobar geolocalizaciones de IA de JEO** en el menú desplegable de acciones masivas, y aparecerá un modal de vista previa que muestra las ubicaciones sugeridas de cada entrada, sus puntuaciones de confianza y una acción de aprobar/rechazar.
 
-![AI Bulk Geolocation - Review](../img/ai-bulk-geolocation4.png)
+## Monitoreo
 
-You can also use the **bulk action** on the WordPress post list (`edit.php`) to approve multiple posts at once. Select the posts, choose **Approve JEO AI Geolocations** from the bulk actions dropdown, and a preview modal will appear showing each post's suggested locations, confidence scores, and an approve/reject action.
+- **Jeo → Registros de Debug de IA**: Consulta el uso de tokens, el proveedor y el modelo de cada llamada a la IA.
+- La pestaña Geolocalización masiva muestra el progreso del lote actual y los errores encontrados.
 
-## Monitoring
+## Requisitos
 
-- **Jeo → AI Debug Logs**: View token usage, provider, and model for each AI call.
-- The Bulk Geolocation tab shows the current batch progress and any errors encountered.
-
-## Requirements
-
-- An AI provider must be configured.
-- Posts must have title and/or content for the AI to analyze.
+- Debe haber un proveedor de IA configurado.
+- Las entradas deben tener título y/o contenido para que la IA pueda analizarlas.

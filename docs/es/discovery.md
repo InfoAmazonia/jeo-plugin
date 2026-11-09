@@ -1,39 +1,32 @@
----
-untranslated: true
----
-
-<TranslationPendingES />
-
 # Discovery
 
-Discovery page is an interactive map where the user can add layers, see stories based on published geolocated posts and share it's own customized map with others.
-Discovery page has a left sidebar with two tabs: **STORIES** and **MAP LAYERS**. You can hide this sidebar by clicking on the two left arrow icon, at the right of the sidebar.
+La página de Discovery es un mapa interactivo donde el usuario puede añadir capas, ver historias basadas en entradas geolocalizadas publicadas y compartir su propio mapa personalizado con otras personas.
+La página de Discovery tiene una barra lateral a la izquierda con dos pestañas: **HISTORIAS** y **CAPAS DEL MAPA**. Puedes ocultar esta barra lateral haciendo clic en el ícono de las dos flechas hacia la izquierda, a la derecha de la barra lateral.
 
-## How to create a Discovery page
+## Cómo crear una página de Discovery
 
-To create a discovery page, you only need to create a normal Wordpress page and select `Discovery` in the Model settings.
+Para crear una página de Discovery, solo tienes que crear una página normal de WordPress y seleccionar `Discovery` en las configuraciones de Modelo.
 
-![Create Discovery](../img/create-discovery.png)
+![Crear página de Discovery](../img/create-discovery.png)
 
-Any content that is added to that page will be ignored and the page will only display the Discovery feature.
+Cualquier contenido que se añada a esa página será ignorado, y la página solo mostrará la funcionalidad de Discovery.
 
-## Stories
+## Historias
 
-Stories are the geolocated posts that are shown on the map. Clicking on `SHOW FILTERS` allows you to filter these stories by date and tags. Below these filters, a list with the result will be shown. Each result is also a link to the story itself. Also, hovering the mouse on a map marker will highlight the related story int the left sidebar. In the same way, hovering the mouse on `View in map` text will highlight the map marker realted to it.
+Las historias son las entradas geolocalizadas que se muestran en el mapa. Al hacer clic en `MOSTRAR FILTROS` puedes filtrar estas historias por fecha y etiquetas. Debajo de estos filtros se mostrará una lista con los resultados. Cada resultado también es un enlace a la propia historia. Además, al pasar el mouse sobre un marcador del mapa se resalta la historia relacionada en la barra lateral izquierda. De la misma manera, al pasar el mouse sobre el texto `Ver en el mapa` se resalta el marcador del mapa correspondiente.
 
-![Discovery Stories](../img/discovery-stories.png)
+![Historias de Discovery](../img/discovery-stories.png)
 
-## Map Layers
+## Capas del mapa
 
-In Map Layers tab you can search for maps and apply its layers to your interactive map. You can filter maps by name and select different layers from different maps. After selecting at least one layer from a map, you can click on `Clear` to remove all the selected layers from this map before applying the changes. It is also possible to add all layers from a map with one single click when selecting **Apply** next to a map result.
+En la pestaña Capas del mapa puedes buscar mapas y aplicar sus capas a tu mapa interactivo. Puedes filtrar mapas por nombre y seleccionar diferentes capas de diferentes mapas. Después de seleccionar al menos una capa de un mapa, puedes hacer clic en `Limpiar` para eliminar todas las capas seleccionadas de ese mapa antes de aplicar los cambios. También es posible añadir todas las capas de un mapa con un solo clic, seleccionando **Aplicar** junto a un resultado de mapa.
 
-At the top of the sidebar, you will be able to see all the selected layers, allowing you to remove some of them. These layers always have a drag and drop function, so that you can re-order them. After reviewing these layers, you need to click on `Apply changes` to show them on discovery map.
+En la parte superior de la barra lateral podrás ver todas las capas seleccionadas, con la posibilidad de eliminar algunas. Estas capas siempre tienen una función de arrastrar y soltar para que puedas reordenarlas. Después de revisar estas capas, debes hacer clic en `Aplicar cambios` para mostrarlas en el mapa de Discovery.
 
-![Discovery Maps](../img/discovery-maps.png)
+![Mapas de Discovery](../img/discovery-maps.png)
 
-## Sharing
+## Compartir
 
-At the right-top side of the map, there's a share button where you can share the content on **Twitter**, **Facebook**, **E-mail** or even generate a custom link for your map. Also, clicking on `embed` makes a popup appears with a HTML code to have your custom map embed into another website.
+En la esquina superior derecha del mapa hay un botón para compartir con el que puedes compartir el contenido en **Twitter**, en **Facebook**, por **E-mail** o incluso generar un enlace personalizado para tu mapa. Además, al hacer clic en `Embed` aparece una ventana emergente con un código HTML para incrustar tu mapa personalizado en otro sitio web.
 
-![Discovery Sharing](../img/discovery-sharing.png)
-
+![Compartir en Discovery](../img/discovery-sharing.png)

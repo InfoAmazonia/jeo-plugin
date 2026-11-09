@@ -1,55 +1,49 @@
----
-untranslated: true
----
+# Bloque de mapa
 
-<TranslationPendingES />
+Después de [crear mapas](map-post.md), puedes mostrarlos dentro de cualquier entrada usando el bloque **Mapa JEO**.
 
-# Map block
+## Añadir un mapa a una entrada
 
-After [creating maps](map-post.md), you can display them inside any post using the **JEO Map** block.
+Al crear una nueva entrada, encontrarás una nueva categoría de bloques: **JEO**.
 
-## Adding a map to a post
+![Bloque JEO](../img/JEO-block.png)
 
-When creating a new post, you'll find a new block category: **JEO**.
+Selecciona el bloque **Mapa JEO** y busca cualquier mapa que hayas creado.
 
-![JEO block](../img/JEO-block.png)
+![Bloque JEO - Barra de búsqueda](../img/JEO-block-search-bar.png)
 
-Select the **JEO Map** block and search for any map you've created.
+### Opciones de alineación
 
-![JEO block - Search Bar](../img/JEO-block-search-bar.png)
+Con un mapa seleccionado, puedes elegir una alineación:
 
-### Alignment options
-
-With a map selected, you can choose an alignment:
-
-| Alignment | Description |
+| Alineación | Descripción |
 |-----------|-------------|
-| Center | Default. Map is centered within the content area |
-| Left | Map floats left with text wrapping around it |
-| Right | Map floats right with text wrapping around it |
-| Wide Width | Map extends beyond the content area |
-| Full Width | Map spans the full width of the page |
+| Centro | Predeterminado. El mapa se centra dentro del área de contenido |
+| Izquierda | El mapa flota a la izquierda con el texto alrededor |
+| Derecha | El mapa flota a la derecha con el texto alrededor |
+| Ancho amplio | El mapa se extiende más allá del área de contenido |
+| Ancho completo | El mapa abarca todo el ancho de la página |
 
-![Map Alignment](../img/map-alignment.png)
+![Alineación del mapa](../img/map-alignment.png)
 
-![Map Alignment - Left](../img/map-alignment-left.png)
+![Alineación del mapa - Izquierda](../img/map-alignment-left.png)
 
-![Map Alignment - Right](../img/map-alignment-right.png)
+![Alineación del mapa - Derecha](../img/map-alignment-right.png)
 
-![Map Alignment - Wide Width](../img/map-alignment-wide-width.png)
+![Alineación del mapa - Ancho amplio](../img/map-alignment-wide-width.png)
 
-![Map Alignment - Full Width](../img/map-alignment-full-width.png)
+![Alineación del mapa - Ancho completo](../img/map-alignment-full-width.png)
 
-## Grouping maps
+## Agrupar mapas
 
-Besides the alignment option, there's also a group functionality available to arrange multiple maps together.
+Además de la opción de alineación, también hay disponible una funcionalidad de agrupación para organizar varios mapas juntos.
 
-![map-group](../img/map-group.png)
+![Grupo de mapas](../img/map-group.png)
 
-## Layer swapping
+## Intercambio de capas
 
-If your map has more than one layer, you can swap them and select which one you want to see, depending on the map layer settings. [Check out more about map layers here](layer-post.md)
+Si tu mapa tiene más de una capa, puedes intercambiarlas y seleccionar cuál quieres ver, según la configuración de las capas del mapa. [Consulta más sobre las capas del mapa aquí](layer-post.md)
 
-![Swapping layers - Example 1](../img/swapping-layers-example1.png)
+![Intercambio de capas - Ejemplo 1](../img/swapping-layers-example1.png)
 
-![Swapping layers - Example 2](../img/swapping-layers-example2.png)
+![Intercambio de capas - Ejemplo 2](../img/swapping-layers-example2.png)

@@ -1,92 +1,86 @@
----
-untranslated: true
----
+# Asistente de contexto de IA — Sugerencias editoriales
 
-<TranslationPendingES />
+El Asistente de contexto de IA es un panel de la barra lateral de Gutenberg que te ayuda a enriquecer tus artículos con párrafos sugeridos por IA y referencias a contenido relacionado de la Base de conocimiento de tu sitio.
 
-# AI Context Assistant — Editorial Suggestions
+Consulta [IA en JEO](ai-in-jeo.md) para saber cómo RAG, los agentes y la memoria de conversación dan vida a esta funcionalidad.
 
-The AI Context Assistant is a Gutenberg sidebar panel that helps you enrich your articles with AI-suggested paragraphs and references to related content from your site's knowledge base.
+## Abrir el panel
 
-See [AI in JEO](ai-in-jeo.md) to learn how RAG, agents, and conversation memory power this feature.
+1. Abre o crea una entrada en el editor de Gutenberg (el tipo de contenido debe estar activado en **Configuraciones de JEO → General**).
+2. En la barra lateral **Documento**, busca el panel **Contexto de IA**.
+3. Si el panel está contraído, haz clic en su título para expandirlo.
 
-## Opening the panel
+## Generar sugerencias
 
-1. Open or create a post in the Gutenberg editor (the post type must be enabled in **JEO Settings → General**).
-2. In the **Document** sidebar, find the **AI Context** panel.
-3. If the panel is collapsed, click its title to expand it.
+Haz clic en **Generar sugerencias**. La IA analizará el contenido de tu artículo y el archivo vectorizado de artículos del sitio para producir:
 
-## Generating suggestions
+- **Párrafos sugeridos** — bloques de texto listos para insertar que complementan tu artículo. Los párrafos pueden incluir formato en línea (negrita, cursiva) y enlaces a artículos relacionados.
+- **Referencias relacionadas** — artículos de tu Base de conocimiento relevantes para el tema.
 
-Click **Generate Suggestions**. The AI will analyze your article's content and the site's vectorized article archive to produce:
+La generación **no es automática**: tú controlas cuándo se ejecuta para evitar llamadas innecesarias a la API.
 
-- **Suggested paragraphs** — ready-to-insert text blocks that complement your article. Paragraphs may include inline formatting (bold, italic) and links to related articles.
-- **Related references** — articles from your knowledge base that are relevant to the topic.
+![Panel de Contexto de IA — estado inactivo](../img/ai-context-panel.png)
 
-The generation is **not automatic** — you control when it runs to avoid unnecessary API calls.
+## Usar los párrafos sugeridos
 
-![AI Context panel — idle state](../img/ai-context-panel.png)
+Cada párrafo sugerido tiene dos acciones:
 
-## Using suggested paragraphs
+### Insertar en el artículo
 
-Each suggested paragraph has two actions:
+Haz clic en **Insertar en el artículo** para añadir el párrafo como un bloque `core/paragraph` de Gutenberg al final del documento. El formato en línea y los enlaces se conservan. Una vez insertado, el botón cambia a **Insertado** para evitar duplicados.
 
-### Insert into article
+### Copiar
 
-Click **Insert into article** to add the paragraph as a Gutenberg `core/paragraph` block at the end of the document. Inline formatting and links are preserved. Once inserted, the button changes to **Inserted** to prevent duplicates.
+Haz clic en **Copiar** para copiar el párrafo como texto enriquecido (HTML con enlaces) al portapapeles. Después puedes pegarlo en cualquier parte: el editor de WordPress, Google Docs, Word, etc. La copia usa un mecanismo de triple fallback para máxima compatibilidad:
 
-### Copy
+1. API moderna `ClipboardItem` (HTML + texto sin formato)
+2. Selección DOM + `execCommand('copy')` (funciona en los iframes de Gutenberg)
+3. Solo texto sin formato (fallback universal)
 
-Click **Copy** to copy the paragraph as rich text (HTML with links) to your clipboard. You can then paste it anywhere — the WordPress editor, Google Docs, Word, etc. The copy uses a triple-fallback mechanism for maximum compatibility:
+![Panel de Contexto de IA — sugerencias y chat](../img/ai-context-suggestions.png)
 
-1. Modern `ClipboardItem` API (HTML + plain text)
-2. DOM selection + `execCommand('copy')` (works in Gutenberg iframes)
-3. Plain text only (universal fallback)
+## Refinar con el chat
 
-![AI Context panel — suggestions and chat](../img/ai-context-suggestions.png)
+Tras la generación inicial, puedes refinar las sugerencias en el área de texto del chat:
 
-## Refining with chat
+- **"Hazlo más corto"** — condensa los párrafos sugeridos.
+- **"Céntrate en el impacto ambiental"** — reescribe con un enfoque específico.
+- **"Añade más contexto histórico"** — amplía con antecedentes adicionales.
+- **"Incluye datos sobre la región amazónica"** — añade contenido específico de la región.
 
-After the initial generation, you can refine suggestions through the chat textarea:
+Pulsa **Ctrl+Enter** o haz clic en **Enviar** para enviar tu mensaje.
 
-- **"Make it shorter"** — condenses the suggested paragraphs.
-- **"Focus on environmental impact"** — rewrites with a specific angle.
-- **"Add more historical context"** — expands with additional background.
-- **"Include data about the Amazon region"** — adds region-specific content.
+### Reintentar
 
-Press **Ctrl+Enter** or click **Send** to submit your message.
+Haz clic en **Reintentar** para pedir a la IA que genere nuevas sugerencias sin escribir un mensaje. Útil cuando quieres un enfoque distinto del mismo tema.
 
-### Retry
+### Limpiar
 
-Click **Retry** to ask the AI to generate new suggestions without typing a message. Useful when you want a different take on the same topic.
+Haz clic en **Limpiar** para restablecer toda la conversación y eliminar todas las sugerencias. Una conversación nueva empieza de cero con el siguiente clic en "Generar sugerencias".
 
-### Clear
+## Expandir el panel
 
-Click **Clear** to reset the entire conversation and remove all suggestions. A new conversation starts fresh on the next "Generate Suggestions" click.
+Haz clic en el botón **expandir** (esquina superior derecha del panel) para abrir la interfaz de chat en un modal más grande. Esto ofrece una mejor experiencia para conversaciones largas. El modal comparte el mismo estado que el panel compacto.
 
-## Expanding the panel
+![Panel de Contexto de IA — modal expandido](../img/ai-context-modal.png)
 
-Click the **expand** button (top-right corner of the panel) to open the chat interface in a larger modal. This provides a better experience for longer conversations. The modal shares the same state as the compact panel.
+## Persistencia
 
-![AI Context panel — expanded modal](../img/ai-context-modal.png)
+Tu conversación se guarda automáticamente. Si cierras el panel, actualizas la página o vuelves a abrir el editor más tarde, tu historial de chat y tus últimas sugerencias se restauran.
 
-## Persistence
+## Personalizar el prompt de IA
 
-Your conversation is saved automatically. If you close the panel, refresh the page, or reopen the editor later, your chat history and last suggestions are restored.
+Por defecto, el Asistente de contexto usa un prompt del sistema integrado, optimizado para sugerencias editoriales. Puedes personalizarlo:
 
-## Customizing the AI prompt
+1. Ve a la pestaña **JEO → IA → Asistente de contexto**.
+2. Marca **"Usar un prompt del sistema personalizado"**.
+3. Edita el prompt en el área de texto.
+4. Guarda las configuraciones.
 
-By default, the Context Assistant uses a built-in system prompt optimized for editorial suggestions. You can customize it:
+Cuando está desmarcada, la pestaña muestra el prompt predeterminado en un campo de solo lectura, como referencia.
 
-1. Go to **JEO → AI Configuration → Context Assistant** tab.
-2. Check **"Use a custom system prompt"**.
-3. Edit the prompt in the textarea.
-4. Save settings.
+## Requisitos
 
-When unchecked, the tab shows the default prompt in a read-only field for reference.
-
-## Requirements
-
-- An AI provider must be configured in **JEO → AI** (see [AI Settings](ai-settings.md)).
-- For best results, index your posts in the Knowledge Base (**JEO → AI → Knowledge Base** tab). The assistant uses RAG to find related articles from the vectorized archive.
-- The article must have at least 100 characters of content before the AI can generate suggestions. If the article is too short, the assistant will ask you to write more or specify what you want.
+- Debe haber un proveedor de IA configurado en **Jeo → IA** (consulta [Configuraciones de IA](ai-settings.md)).
+- Para obtener los mejores resultados, indexa tus entradas en la Base de conocimiento (pestaña **Jeo → IA → Base de conocimiento**). El asistente usa RAG para encontrar artículos relacionados en el archivo vectorizado.
+- El artículo debe tener al menos 100 caracteres de contenido antes de que la IA pueda generar sugerencias. Si es demasiado corto, el asistente te pedirá que escribas más o que especifiques qué quieres.

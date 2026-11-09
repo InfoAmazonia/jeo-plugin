@@ -1,82 +1,76 @@
----
-untranslated: true
----
+# Minimapa — Bloque de mapa asistido por IA
 
-<TranslationPendingES />
+El bloque Minimapa (`jeo/ai-minimap`) genera mapas interactivos contextuales dentro del editor de Gutenberg usando IA. Describe lo que necesitas en lenguaje natural y la IA construye un mapa con las capas adecuadas, el punto central, el nivel de zoom y los pines de geolocalización.
 
-# Minimap — AI-Assisted Map Block
+Consulta [IA en JEO](ai-in-jeo.md) para saber cómo RAG, los agentes y las herramientas hacen funcionar esta característica.
 
-The Minimap block (`jeo/ai-minimap`) generates contextual interactive maps inside the Gutenberg editor using AI. Describe what you need in natural language, and the AI builds a map with appropriate layers, center point, zoom level, and geolocation pins.
+## Insertar el bloque
 
-See [AI in JEO](ai-in-jeo.md) to learn how RAG, agents, and tools power this feature.
+1. En el editor de Gutenberg, haz clic en el botón **+** para añadir un nuevo bloque.
+2. Busca **Minimapa IA de JEO** y selecciónalo.
+3. El bloque comienza en estado **inactivo** con dos modos de generación:
+   - **A partir del contenido de la entrada**: Genera automáticamente un mapa basado en el contenido de la entrada actual y sus puntos de geolocalización.
+   - **A partir del prompt**: Describe el mapa que quieres en un campo de texto.
 
-## Inserting the block
+![Bloque Minimapa](../img/minimap-block-edit.png)
 
-1. In the Gutenberg editor, click the **+** button to add a new block.
-2. Search for **JEO AI Minimap** and select it.
-3. The block starts in **idle** state with two generation modes:
-   - **From post content**: Automatically generates a map based on the current post's content and geolocation points.
-   - **From prompt**: Describe the map you want in a text field.
+## Generar un mapa
 
-![Minimap block](../img/minimap-block-edit.png)
+### A partir del contenido de la entrada
 
-## Generating a map
+Haz clic en **Generar a partir del contenido de la entrada**. El sistema busca tus capas existentes y los datos de geolocalización de la entrada para construir un mapa contextual. No se necesita ningún prompt de IA — utiliza RAG (Generación Aumentada por Recuperación) para encontrar capas relevantes automáticamente.
 
-### From post content
+### A partir del prompt
 
-Click **Generate from content**. The system searches your existing layers and post geolocation data to build a contextual map. No AI prompt is needed — it uses RAG (Retrieval-Augmented Generation) to find relevant layers automatically.
+Escribe una descripción del mapa que quieres (por ejemplo, "Un mapa de la región amazónica que muestre datos de deforestación y ríos") y haz clic en **Generar**. El agente de IA hará lo siguiente:
 
-### From prompt
+1. Analizar tu prompt y el contenido de la entrada actual.
+2. Buscar capas existentes relevantes en tu Base de conocimiento.
+3. Geocodificar las ubicaciones relevantes.
+4. Devolver un mapa completo con capas, centro, zoom y pines.
 
-Type a description of the map you want (e.g., "A map of the Amazon region showing deforestation data and rivers") and click **Generate**. The AI agent will:
+![Bloque Minimapa](../img/minimap-block-edit2.png)
 
-1. Analyze your prompt and the current post content.
-2. Search for relevant existing layers in your Knowledge Base.
-3. Geocode relevant locations.
-4. Return a complete map with layers, center, zoom, and pins.
+## Refinamiento por chat
 
-![Minimap block](../img/minimap-block-edit2.png)
+Una vez generado un mapa, el bloque entra en estado **listo**. Se abre un **panel del inspector** en la barra lateral de Gutenberg donde puedes refinar el mapa mediante chat:
 
-## Chat refinement
+- **Mensajes de texto**: Escribe instrucciones como "Acércate a São Paulo" o "Quita la capa de agua".
+- **Regenerar**: Empieza de cero con una sugerencia de mapa completamente nueva.
+- **Nuevo prompt**: Introduce una nueva descripción para generar un mapa diferente (conserva el contexto de la conversación).
+- **Variante de capa base**: Cambia entre capas base oscura, clara y de satélite.
 
-Once a map is generated, the block enters **ready** state. An **Inspector Panel** opens in the Gutenberg sidebar where you can refine the map through chat:
+La IA recuerda tu conversación, por lo que cada refinamiento se construye sobre el contexto anterior.
 
-- **Text messages**: Type instructions like "Zoom in on São Paulo" or "Remove the water layer".
-- **Regenerate**: Start fresh with a completely new map suggestion.
-- **New prompt**: Enter a new description to generate a different map (keeps the conversation context).
-- **Base layer variant**: Switch between dark, light, and satellite base layers.
+![Chat del bloque Minimapa](../img/minimap-block-edit3.png)
 
-The AI remembers your conversation, so each refinement builds on the previous context.
+## Entender las capas elegidas
 
-![Minimap block chat](../img/minimap-block-edit3.png)
+¿Alguna vez te has preguntado por qué la IA eligió una capa específica? Debajo de la vista previa del mapa, haz clic en **Entender capas elegidas** para abrir el panel **Capas del mapa** en la barra lateral del bloque. Para cada capa verás:
 
-## Understanding the chosen layers
+- **Título y tipo** — p. ej. "Alertas de deforestación — mapbox".
+- **Descripción** — el extracto de la capa, cuando está disponible.
+- **Por qué fue elegida** — la explicación de la propia IA para incluir la capa en este mapa.
+- **Aviso de estilo automático** — cuando la IA tuvo que aplicar un estilo a una capa que no tenía ningún estilo guardado, para que sepas que puede personalizarse.
+- **Temas y fuente** — los temas de la capa y la atribución de los datos, para desambiguar cuando existan capas con nombres similares.
 
-Ever wondered why the AI picked a specific layer? Below the map preview, click **Understand chosen layers** to open the **Map layers** panel in the block sidebar. For each layer, you'll see:
+![Entender capas elegidas](../img/minimap-understand-layers.png)
 
-- **Title and type** — e.g. "Deforestation alerts — mapbox".
-- **Description** — the layer's excerpt, when available.
-- **Why it was chosen** — the AI's own explanation for including the layer in this map.
-- **Automatic style notice** — when the AI had to style a layer that had no saved style, so you know it can be customized.
-- **Themes and source** — the layer's themes and data attribution, for disambiguation when similarly named layers exist.
+## Capas generadas por IA (Minilayer)
 
-![Understand chosen layers](../img/minimap-understand-layers.png)
+Si tienes configurada una clave de API de Mapbox, la IA puede **generar capas de mapa personalizadas** cuando las capas existentes no cubren lo que necesitas. Durante el chat, pide a la IA que cree una capa (por ejemplo, "¿Puedes generar un mapa de calor de deforestación para la Amazonía?"). La IA pedirá tu confirmación antes de generar — nunca crea capas sin aprobación explícita. La nueva capa se añade al mapa automáticamente con un estilo sugerido por la IA (colores y filtros) que después puedes sobrescribir en el modal de configuración de la capa mediante la casilla **"Usar estilo predeterminado sugerido por IA"**.
 
-## AI-generated layers (Minilayer)
+## Características del mapa
 
-If you have a Mapbox API key configured, the AI can **generate custom map layers** when existing layers don't cover what you need. During chat, ask the AI to create a layer (e.g., "Can you generate a deforestation heatmap for the Amazon?"). The AI will ask for your confirmation before generating — it never creates layers without explicit approval. The new layer is added to the map automatically with AI-suggested styling (colors and filters) that you can later override in the layer settings modal via the **"Use AI Default Style"** checkbox.
+Después de la generación, el minimapa se comporta como cualquier mapa de JEO:
 
-## Map features
+- **Desplazamiento y zoom**: Arrastra para desplazarte, usa el scroll para hacer zoom.
+- **Capas**: Capas temáticas con leyendas.
+- **Pines**: Pines de geolocalización provenientes de los datos de geolocalización de la entrada. Usa el panel **Pines de geolocalización** (Mostrar pines: Sí/No) para controlarlos — se renderizan en vivo en la vista previa del editor y en el frontend.
+- **Capa base**: Elegida automáticamente (oscura/clara) según los colores de las capas, o seleccionada manualmente.
 
-After generation, the minimap behaves like any JEO map:
+## Requisitos
 
-- **Pan and zoom**: Drag to pan, scroll to zoom.
-- **Layers**: Thematic layers with legends.
-- **Pins**: Geolocation pins from the post's geolocation data. Use the **Geolocation Pins** panel (Show pins: Yes/No) to control them — they render live in the editor preview and on the frontend.
-- **Base layer**: Automatically chosen (dark/light) based on layer colors, or manually selected.
-
-## Requirements
-
-- An AI provider must be configured in **Jeo → AI** (see [AI Settings](ai-settings.md)).
-- For best results, index your posts and layers in the Knowledge Base (RAG tab).
-- For AI-generated thematic layers, a Mapbox API key is also required. Boundary layers (municipalities, states, indigenous lands) are generated as GeoJSON and work without a Mapbox key.
+- Debe haber un proveedor de IA configurado en **Jeo → AI** (consulta [Ajustes de IA](ai-settings.md)).
+- Para obtener los mejores resultados, indexa tus entradas y capas en la Base de conocimiento (pestaña RAG).
+- Para las capas temáticas generadas por IA, también se requiere una clave de API de Mapbox. Las capas de límites (municipios, estados, tierras indígenas) se generan como GeoJSON y funcionan sin clave de Mapbox.

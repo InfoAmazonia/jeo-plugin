@@ -1,42 +1,36 @@
----
-untranslated: true
----
+# Primeros pasos
 
-<TranslationPendingES />
+## Instalación
 
-# Getting started
+Tras activar el plugin, aparecerá un nuevo elemento en el panel de WordPress: el menú **JEO**, que contiene:
 
-## Installing
+- **Mapas** — Crea y gestiona entradas de mapas interactivos
+- **Capas** — Crea y gestiona entradas de capas de datos
+- **Mapas Narrativos** — Crea experiencias de mapa con scrollytelling
+- **IA** — Configura proveedores de IA, la base de conocimiento y la geolocalización masiva
+- **Configuraciones** — Configuraciones generales de mapa, geocodificador y estilo
 
-After activating the plugin, a new item will appear on the WordPress dashboard: the **Jeo** menu, containing:
+## Configurar el plugin
 
-- **Maps** — Create and manage interactive map posts
-- **Layers** — Create and manage data layer posts
-- **Story Maps** — Create scrollytelling map experiences
-- **AI** — Configure AI providers, knowledge base, and bulk geolocation
-- **Settings** — General map, geocoder, and style settings
+En el menú principal de JEO, en **JEO → Configuraciones**, puedes configurar:
 
-## Configuring the plugin
+* la latitud, la longitud y el zoom predeterminados de tus mapas;
+* las [configuraciones de la API de Mapbox](https://docs.mapbox.com/help/how-mapbox-works/access-tokens/) que usará el plugin;
+* el geocodificador que usará el plugin — actualmente [Nominatim](https://nominatim.openstreetmap.org/) es la opción integrada, con extensibilidad para otros geocodificadores vía hook.
+* el estilo de algunas funcionalidades del plugin, como fuentes y colores.
 
-Under JEO main menu, at **Jeo → Settings**, you can configure:
+![Configuraciones de JEO](../img/jeo-settings.png)
 
-* the default latitude, longitude, and zoom for your maps;
-* the [Mapbox API settings](https://docs.mapbox.com/help/how-mapbox-works/access-tokens/) that'll be used by the plugin;
-* the geocoder that'll be used by the plugin — currently [Nominatim](https://nominatim.openstreetmap.org/) is the built-in option, with extensibility for additional geocoders via hook.
-* the style of some functionalities of the plugin, such as fonts and colors.
+![Configuraciones de JEO](../img/jeo-settings2.png)
 
-![JEO Settings](../img/jeo-settings.png)
+## Configurar las funcionalidades de IA
 
-![JEO Settings](../img/jeo-settings2.png)
+En **JEO → IA**, puedes configurar las funcionalidades con IA:
 
-## Configuring AI features
+* Selecciona un proveedor de IA (Google Gemini, OpenAI, DeepSeek, Anthropic, Ollama, Mistral, entre otros) e introduce la clave de API.
+* Configura la Base de conocimiento (RAG) para indexar tus entradas y capas y obtener resultados de IA más inteligentes.
+* Configura la geolocalización masiva para procesar entradas en lotes.
 
-Under **Jeo → AI**, you can configure AI-powered features:
+Consulta [Configuraciones de IA](ai-settings.md) para instrucciones detalladas.
 
-* Select an AI provider (Google Gemini, OpenAI, DeepSeek, Anthropic, Ollama, Mistral, and others) and enter the API key.
-* Set up the Knowledge Base (RAG) to index your posts and layers for smarter AI results.
-* Configure bulk geolocation for processing posts in batches.
-
-See [AI Settings](ai-settings.md) for detailed instructions.
-
-![JEO AI Settings](../img/ai-settings-provider.png)
+![Configuraciones de IA de JEO](../img/ai-settings-provider.png)

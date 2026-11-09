@@ -1,24 +1,18 @@
----
-untranslated: true
----
+# Incrustar un mapa
 
-<TranslationPendingES />
+El plugin JEO permite insertar un mapa en una entrada pegando un enlace en el editor. Esto es lo que se llama `Embed map` y es muy fácil de hacer.
 
-# Embedding a map
+Al editar un [Mapa](map-post.md), uno de los paneles de configuración es `Status & Visibility`. Allí puedes encontrar la `embed URL` de ese mapa en particular.
 
-JEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called `Embed map` and it's very easy to be done.
+![URL de incrustación](../img/embed-url.png)
 
-When editing a [Map](map-post.md), one of the setting panels is `Status & Visibility`. There you can find the `embed URL` of that specific map.
+Copiar este enlace y pegarlo en el editor de entradas dará como resultado un mapa incrustado.
 
-![Embed URL](../img/embed-url.png)
+**Advertencia**: Si tu entrada muestra un error *Not Found*, sigue estos pasos:
 
-Copying this link and pasting on the post editor will result on an embed map.
+- Ve al Escritorio de WordPress > Ajustes > Enlaces permanentes
+- Cambia los Ajustes comunes (puedes cambiar a una opción diferente y luego volver a la original) y haz clic en `Save Changes`
 
-**Warning**: If your post displays a *Not Found* error, do the following steps:
+![Ajustes de enlaces permanentes](../img/permalink-settings.png)
 
-- Go to Wordpress Dashboard > Settings > Permalinks
-- Change the Common Settings (you may change to a different setting and then change back to the original) and click on `Save Changes`
-
-![Permalink Settings](../img/permalink-settings.png)
-
-Now you should be able to see the embed maps with no problems.
+Ahora deberías poder ver los mapas incrustados sin problemas.

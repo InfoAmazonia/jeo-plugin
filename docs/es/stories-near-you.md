@@ -1,95 +1,89 @@
----
-untranslated: true
----
+# Historias cerca de ti
 
-<TranslationPendingES />
+El bloque **Historias cerca de ti** (`jeo/stories-near-you`) muestra las entradas geolocalizadas más cercanas a la ubicación actual del lector. Usa la API de geolocalización del navegador (con consentimiento explícito del usuario) para encontrar historias cercanas y las presenta en un diseño de tarjetas personalizable.
 
-# Stories Near You
+![Bloque Historias cerca de ti](../img/stories-near-you-block.png)
 
-The **Stories Near You** block (`jeo/stories-near-you`) displays geolocated posts that are closest to the reader's current location. It uses the browser's geolocation API (with explicit user consent) to find nearby stories and presents them in a customizable card layout.
+## Insertar el bloque
 
-![Stories Near You block](../img/stories-near-you-block.png)
+1. En el editor de Gutenberg, haz clic en el botón **+** para añadir un nuevo bloque.
+2. Busca **Historias cerca de ti** y selecciónalo.
+3. Configura los ajustes del bloque en los paneles del inspector.
 
-## Inserting the block
+## Cómo funciona
 
-1. In the Gutenberg editor, click the **+** button to add a new block.
-2. Search for **Stories Near You** and select it.
-3. Configure the block settings in the Inspector panels.
+Cuando un visitante carga una página con este bloque:
 
-## How it works
+1. El bloque muestra una **solicitud de consentimiento**: "Usar mi ubicación" u "Omitir".
+2. Si el usuario acepta, el navegador obtiene sus coordenadas (redondeadas para proteger la privacidad según el ajuste de **precisión de la geolocalización**).
+3. Si el usuario lo omite, el bloque recurre al centro predeterminado del mapa configurado en las Configuraciones de JEO.
+4. El bloque consulta la base de datos de WordPress en busca de las entradas geolocalizadas más cercanas usando la distancia geográfica (`ST_Distance_Sphere`).
+5. Las entradas se muestran como tarjetas en el diseño elegido.
 
-When a visitor loads a page with this block:
+### Precisión de la geolocalización
 
-1. The block shows a **consent prompt**: "Use my location" or "Skip".
-2. If the user consents, the browser obtains their coordinates (rounded for privacy based on the **geolocation precision** setting).
-3. If the user skips, the block falls back to the default map center configured in JEO Settings.
-4. The block queries the WordPress database for the closest geolocated posts using geographic distance (`ST_Distance_Sphere`).
-5. Posts are rendered as cards in the chosen layout.
+El ajuste **Precisión de ubicación del usuario** (en JEO → Configuraciones → General) controla cuántos decimales se conservan de la geolocalización del navegador. Rango: 1–5, predeterminado: 2. Los valores más bajos significan menos precisión pero más privacidad.
 
-### Geolocation precision
+![Ajustes de Historias cerca de ti](../img/stories-near-you-settings.png)
 
-The **User location precision** setting (in JEO → Settings → General) controls how many decimal places are kept from the browser geolocation. Range: 1–5, default: 2. Lower values mean less precision but more privacy.
+## Ajustes del bloque
 
-![Stories Near You settings](../img/stories-near-you-settings.png)
+Los paneles del inspector ofrecen una amplia personalización:
 
-## Block settings
+### Tarjeta de entrada
 
-The Inspector panels provide extensive customization:
+- **Layout**: Cuadrícula o Lista.
+- **Posición de la imagen**: Arriba, Izquierda, Derecha o Detrás (la imagen se coloca detrás del texto).
+- **Forma de imagen**: Horizontal, Vertical, Cuadrada o Sin recortar.
+- **Columnas**: Número de columnas en el diseño de cuadrícula (1–6).
 
-### Post Card
+### Ajustes de consulta
 
-- **Layout**: Grid or List.
-- **Media position**: Top, Left, Right, or Behind (the image is placed behind the text).
-- **Image shape**: Landscape, Portrait, Square, or Uncropped.
-- **Columns**: Number of columns in grid layout (1–6).
+- **Entradas por página**: Total de entradas a mostrar (máx. 36).
+- **Tipo de contenido**: Filtra por tipo de contenido (solo se muestra si existen varios tipos con geolocalización activada).
 
-### Query Settings
+### Filtros
 
-- **Posts per page**: Total posts to display (max 36).
-- **Post type**: Filter by post type (only shown if multiple geo-enabled types exist).
+- **Categorías**: Incluye categorías específicas.
+- **Etiquetas**: Incluye etiquetas específicas.
+- **Excluir categorías**: Excluye categorías específicas.
+- **Excluir etiquetas**: Excluye etiquetas específicas.
+- **Taxonomías personalizadas**: Filtra por términos de taxonomías personalizadas.
 
-### Filters
+### Visualización
 
-- **Categories**: Include specific categories.
-- **Tags**: Include specific tags.
-- **Category exclusions**: Exclude specific categories.
-- **Tag exclusions**: Exclude specific tags.
-- **Custom taxonomies**: Filter by custom taxonomy terms.
+- **Imagen destacada**: Muestra/oculta la imagen destacada.
+- **Categoría**: Muestra/oculta la insignia de categoría.
+- **Fecha**: Muestra/oculta la fecha de publicación.
+- **Extracto**: Muestra/oculta el extracto (con recuento de palabras configurable).
+- **Autor**: Muestra/oculta el nombre del autor.
+- **Avatar del autor**: Muestra/oculta la foto del autor (requiere que Autor esté activado).
+- **Leer más**: Muestra/oculta el enlace "Leer más" (con etiqueta personalizable).
 
-### Display
+### Tipografía y espaciado
 
-- **Thumbnail**: Show/hide featured image.
-- **Category**: Show/hide category badge.
-- **Date**: Show/hide publication date.
-- **Excerpt**: Show/hide excerpt (with configurable word count).
-- **Author**: Show/hide author name.
-- **Author avatar**: Show/hide author photo (requires Author enabled).
-- **Read more**: Show/hide "Read more" link (with custom label).
+- **Escala de tipografía**: Escala del tamaño de fuente (1–10).
+- **Escala de imagen**: Ancho de la imagen en los diseños horizontales (1–4).
+- **Espacio entre columnas**: Espaciado entre columnas (pequeño, mediano, grande).
+- **Altura mínima**: Altura mínima para el diseño "Detrás".
 
-### Typography & Spacing
+### Colores
 
-- **Type scale**: Font size scale (1–10).
-- **Image scale**: Image width in horizontal layouts (1–4).
-- **Column gap**: Spacing between columns (small, medium, large).
-- **Min height**: Minimum height for "Behind" layout.
+Los colores del texto y de los enlaces usan los ajustes nativos de colores de Gutenberg (no un panel separado).
 
-### Colors
+![Bloque Historias cerca de ti](../img/stories-near-you-block2.png)
 
-Text and link colors use the native Gutenberg color settings (not a separate panel).
+## Desduplicación entre bloques
 
-![Stories Near You block](../img/stories-near-you-block2.png)
+Cuando hay varios bloques Historias cerca de ti en la misma página, las entradas **nunca se repiten** entre bloques. El primer bloque muestra las entradas más cercanas, el segundo bloque muestra las siguientes más cercanas (excluyendo las del primer bloque), y así sucesivamente.
 
-## Cross-block deduplication
+Esto funciona tanto en la vista previa del editor como en el frontend.
 
-When multiple Stories Near You blocks are on the same page, posts are **never repeated** across blocks. The first block shows the closest posts, the second block shows the next closest (excluding the first block's posts), and so on.
+## Compatibilidad con Newspack
 
-This works both in the editor preview and on the frontend.
+Si el plugin [Newspack Blocks](https://newspack.pub/) está activo, el bloque usa automáticamente las plantillas y los estilos de tarjetas de Newspack para una integración visual perfecta con tu tema Newspack.
 
-## Newspack compatibility
+## Requisitos
 
-If the [Newspack Blocks](https://newspack.pub/) plugin is active, the block automatically uses Newspack's card templates and styles for a seamless visual integration with your Newspack theme.
-
-## Requirements
-
-- Posts must be geolocated (have `_related_point` meta data). See [Geolocating posts](geolocating-posts.md).
-- The JEO default map center must be configured in **Jeo → Settings** (used as fallback when the user does not share their location).
+- Las entradas deben estar geolocalizadas (tener los metadatos `_related_point`). Consulta [Geolocalización de entradas](geolocating-posts.md).
+- El centro predeterminado del mapa de JEO debe estar configurado en **Jeo → Configuraciones** (se usa como alternativa cuando el usuario no comparte su ubicación).

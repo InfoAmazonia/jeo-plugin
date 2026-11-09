@@ -1,54 +1,48 @@
----
-untranslated: true
----
+# Conceptos
 
-<TranslationPendingES />
+## Capa
 
-# Concepts
+Una capa es el bloque básico de construcción de las interacciones de mapa. Cada capa puede tener sus propias leyendas, atribuciones, etc.
 
-## Layer
+JEO admite cuatro tipos de capa listos para usar:
 
-A layer is the basic building block for map interactions. Each layer can have its legends, attributions, etc.
-
-JEO supports four layer types out-of-the-box:
-
-- [Mapbox styles](https://docs.mapbox.com/studio-manual/overview/map-styling/)
-- [Mapbox tilesets](https://docs.mapbox.com/help/glossary/tileset/)
-- [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/) (MVTs)
+- [Estilos de Mapbox](https://docs.mapbox.com/studio-manual/overview/map-styling/)
+- [Tilesets de Mapbox](https://docs.mapbox.com/help/glossary/tileset/)
+- [Teselas vectoriales de Mapbox](https://docs.mapbox.com/vector-tiles/reference/) (MVTs)
 - [TileLayers](https://en.wikipedia.org/wiki/Tiled_web_map)
 
-Additionally, JEO can generate custom layers using AI (see [AI-Generated Map](#ai-generated-map)).
+Además, JEO puede generar capas personalizadas con IA (consulta [Mapa generado por IA](#mapa-generado-por-ia)).
 
-## Map
+## Mapa
 
-A map is composed of one or more layers and can be associated with related geolocated posts, that'll be rendered as markers on the map.
+Un mapa se compone de una o más capas y puede asociarse a entradas geolocalizadas relacionadas, que se mostrarán como marcadores en el mapa.
 
-A map post is used for reusable map interactions, that can be embedded in any post as a [shortcode](map-shortcode.md) or [Gutenberg block](map-block.md).
+Una entrada de tipo mapa se usa para interacciones de mapa reutilizables, que se pueden incrustar en cualquier entrada como [shortcode](map-shortcode.md) o [bloque de Gutenberg](map-block.md).
 
-## One-time Map
+## Mapa de un solo uso
 
-Instead of creating a reusable map any time you want to add a map interaction, you can create and configure an inline single-use map via the [One-Time Map block](one-time-map-block.md) for Gutenberg.
+En lugar de crear un mapa reutilizable cada vez que quieras añadir una interacción de mapa, puedes crear y configurar un mapa de un solo uso integrado en el contenido mediante el [bloque de mapa de un solo uso](one-time-map-block.md) para Gutenberg.
 
-## Geolocating Posts
+## Geolocalización de entradas
 
-Posts can be geolocated manually by searching and adding points in the Geolocation sidebar, or automatically using AI georeferencing — which analyzes the post content and suggests locations with confidence scores. See [Geolocating posts](geolocating-posts.md) and [AI Georeferencing](ai-georeferencing.md).
+Las entradas se pueden geolocalizar manualmente buscando y añadiendo puntos en la barra lateral de Geolocalización, o automáticamente con la georreferenciación por IA, que analiza el contenido de la entrada y sugiere ubicaciones con puntuaciones de confianza. Consulta [Geolocalización de entradas](geolocating-posts.md) y [Georreferenciación con IA](ai-georeferencing.md).
 
-## AI Features
+## Funcionalidades de IA
 
-JEO's AI features are powered by a configurable external AI provider with a built-in knowledge base (RAG), specialized agents, and structured output. See [AI in JEO](ai-in-jeo.md) for a detailed explanation of how these pieces work together.
+Las funcionalidades de IA de JEO se basan en un proveedor de IA externo configurable, con una base de conocimiento integrada (RAG), agentes especializados y salida estructurada. Consulta [IA en JEO](ai-in-jeo.md) para una explicación detallada de cómo funcionan juntas estas piezas.
 
-## AI-Generated Map
+## Mapa generado por IA
 
-An AI-assisted map block that generates contextual maps from a text prompt or post content, with a chat interface for refinement. It can also generate custom map layers when a Mapbox key is configured. See [Minimap](minimap.md).
+Un bloque de mapa asistido por IA que genera mapas contextuales a partir de un prompt de texto o del contenido de una entrada, con una interfaz de chat para refinarlos. También puede generar capas de mapa personalizadas cuando hay una clave de Mapbox configurada. Consulta [Minimapa](minimap.md).
 
-## Story Map
+## Mapa narrativo
 
-A Story Map is a scrollytelling experience: each **slide** has a location, layers, and text. As the reader scrolls, the map transitions between slides. See [Story Map](story-map.md).
+Un Mapa narrativo es una experiencia de scrollytelling: cada **slide** tiene una ubicación, capas y texto. A medida que el lector se desplaza, el mapa transiciona entre slides. Consulta [Mapa narrativo](story-map.md).
 
 ## Discovery
 
-A full-page interactive map where readers can explore geolocated stories, toggle layers from different maps, and share a customized view. See [Discovery](discovery.md).
+Un mapa interactivo a página completa donde los lectores pueden explorar historias geolocalizadas, activar y desactivar capas de diferentes mapas y compartir una vista personalizada. Consulta [Discovery](discovery.md).
 
-## Stories Near You
+## Historias cerca de ti
 
-A block that displays geolocated posts closest to the reader's location, with consent-based browser geolocation and automatic fallback. See [Stories Near You](stories-near-you.md).
+Un bloque que muestra las entradas geolocalizadas más cercanas a la ubicación del lector, con geolocalización del navegador basada en consentimiento y respaldo automático. Consulta [Historias cerca de ti](stories-near-you.md).

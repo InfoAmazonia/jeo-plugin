@@ -1,49 +1,43 @@
----
-untranslated: true
----
+# Crear una capa
 
-<TranslationPendingES />
+Uno de los tipos de contenido personalizados que proporciona el plugin JEO es **Capa**. Las capas son donde añades leyendas, colores y fuentes de datos a tus mapas. Un mapa puede contener una o más capas.
 
-# Creating a layer
+![Tipo de contenido Capas](../img/post-type-layers.png)
 
-One of the custom post types that JEO plugin provides is **Layer**. Layers are where you add legends, colors, and data sources to your maps. A map may contain one or more layers.
+Al entrar en el editor de la capa, verás una vista previa de la capa actual (o de una capa predeterminada, si la capa actual aún no se ha editado) y tres paneles en la barra lateral: **Configuraciones**, **Atribuciones** y **Leyenda**.
 
-![Post Type Layers](../img/post-type-layers.png)
+![Barra lateral de capa](../img/layer-sidebar.png)
 
-Entering the Layer post editor, you'll see a preview of the current layer (or a default layer if the current layer hasn't been edited yet) and three sidebar panels: **Settings**, **Attributions** and **Legend**.
+## Configuraciones de la capa
 
-![Layer Sidebar](../img/layer-sidebar.png)
+En el panel **Configuraciones de la capa**, puedes cambiar el tipo de capa.
 
-## Layer settings
+JEO admite siete tipos de capa listos para usar:
 
-On the **Layer settings** panel, you can change the layer type.
-
-JEO supports seven layer types out-of-the-box:
-
-| Type | Required fields | Optional fields | Best for |
+| Tipo | Campos obligatorios | Campos opcionales | Ideal para |
 |------|-----------------|-----------------|----------|
-| [Mapbox styles](https://docs.mapbox.com/studio-manual/overview/map-styling/) | Style ID (`username/style-id`) | Access token | Complete styled maps created in Mapbox Studio |
-| [Style JSON](https://maplibre.org/maplibre-style-spec/) | Style URL or inline style JSON | — | Public MapLibre GL styles; works without an API key |
-| [Mapbox tilesets](https://docs.mapbox.com/help/glossary/tileset/) (raster) | Tileset ID (`username.tilesetid`) | Access token | Raster data hosted on Mapbox |
-| [Mapbox vector tilesets](https://docs.mapbox.com/vector-tiles/reference/) | Tileset ID, source layer | Access token | Vector data hosted on Mapbox |
-| [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/) (MVTs) | Tileset URL, source layer, geometry type | Access token | Vector data with interactive features |
-| [GeoJSON](https://geojson.org/) | GeoJSON URL or inline GeoJSON | Layer style | Client-side polygon data, including AI-generated boundary layers |
-| [TileLayers](https://en.wikipedia.org/wiki/Tiled_web_map) | Tile URL template (`https://.../{z}/{x}/{y}.png`) | — | Third-party tile servers (XYZ URLs) |
+| [Estilos de Mapbox](https://docs.mapbox.com/studio-manual/overview/map-styling/) | ID del estilo (`username/style-id`) | Token de acceso | Mapas completos con estilos creados en Mapbox Studio |
+| [JSON de estilo](https://maplibre.org/maplibre-style-spec/) | URL del estilo o JSON de estilo incrustado | — | Estilos públicos de MapLibre GL; funciona sin clave de API |
+| [Tilesets de Mapbox](https://docs.mapbox.com/help/glossary/tileset/) (ráster) | ID del tileset (`username.tilesetid`) | Token de acceso | Datos ráster alojados en Mapbox |
+| [Tilesets vectoriales de Mapbox](https://docs.mapbox.com/vector-tiles/reference/) | ID del tileset, capa de origen | Token de acceso | Datos vectoriales alojados en Mapbox |
+| [Teselas vectoriales de Mapbox](https://docs.mapbox.com/vector-tiles/reference/) (MVTs) | URL del tileset, capa de origen, tipo de geometría | Token de acceso | Datos vectoriales con elementos interactivos |
+| [GeoJSON](https://geojson.org/) | URL del GeoJSON o GeoJSON incrustado | Estilo de la capa | Datos de polígonos renderizados en el cliente, incluidas las capas de límites generadas por IA |
+| [TileLayers](https://en.wikipedia.org/wiki/Tiled_web_map) | Plantilla de URL de tile (`https://.../{z}/{x}/{y}.png`) | — | Servidores de tiles de terceros (URLs XYZ) |
 
-If the **Access token** field is left empty, the layer will use the Mapbox API key configured in **Jeo → Settings**. You only need to fill this field when the layer requires a different token than the global one.
+Si el campo **Token de acceso** se deja vacío, la capa usará la clave de API de Mapbox configurada en **JEO → Configuraciones**. Solo necesitas completar este campo cuando la capa requiera un token diferente del global.
 
-![Layer settings](../img/layer-settings.png)
+![Configuraciones de la capa](../img/layer-settings.png)
 
-There's also an **Edit interactions** button. Here, you can add popups to your layer when specific actions (clicking or hovering the mouse) are made (e.g.: clicking on a building and displaying its height).
+También hay un botón **Editar interacciones**. Ahí puedes añadir popups a tu capa cuando se realizan acciones específicas (hacer clic o pasar el mouse) (p. ej.: hacer clic en un edificio y mostrar su altura).
 
-![Layer interactions](../img/layer-interactions.png)
+![Interacciones de la capa](../img/layer-interactions.png)
 
-## Layer legend
+## Leyenda de la capa
 
-On the **Layer legend** panel, you can add legends to your layer (barscale, simple-color, icons, or circles) and customize their colors.
+En el panel **Leyenda de la capa**, puedes añadir leyendas a tu capa (barscale, simple-color, icons o circles) y personalizar sus colores.
 
-![Layer legend](../img/layer-legend.png)
+![Leyenda de la capa](../img/layer-legend.png)
 
-## Attributions
+## Atribuciones
 
-Here is where you can give layer credits, setting a link to download it or access more information about it. These attributions will be shown on the bottom of the map and inside the popup that shows up when the `INFO` button is clicked in a map.
+Aquí es donde puedes asignar los créditos de la capa, definiendo un enlace para descargarla o acceder a más información sobre ella. Estas atribuciones se mostrarán en la parte inferior del mapa y dentro de la ventana emergente que aparece al hacer clic en el botón `Información` de un mapa.
