@@ -116,7 +116,7 @@ export default defineConfig({
     },
 
     pt: {
-      label: 'Português (Brasil)',
+      label: 'Português',
       lang: 'pt-BR',
       description:
         'Plataforma de geojornalismo em código aberto para WordPress: publique histórias jornalísticas como camadas de informação em mapas interativos.',
