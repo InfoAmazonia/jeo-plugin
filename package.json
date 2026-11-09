@@ -37,6 +37,8 @@
 		"build:site": "npm --prefix landing-page install --no-audit --no-fund && npm --prefix landing-page run build && npm --prefix docs install --no-audit --no-fund && npm --prefix docs run docs:build",
 		"dev:site": "node scripts/dev-site.mjs",
 		"preview:site": "python3 -m http.server 4174 --directory site",
+		"docs:pt:sync": "node scripts/docs-sync.mjs pt",
+		"docs:es:sync": "node scripts/docs-sync.mjs es",
 		"build:release": "npm run build",
 		"build:report": "size-limit",
 		"test:unit": "wp-scripts test-unit-js",

@@ -174,7 +174,7 @@ Two independent builds published together under one origin (`jeowp.org`):
 - **Landing** — React + Vite, source in `landing-page/`, built to `site/` (Vite `outDir`; `LANDING_OUT_DIR` overrides it). `LANDING_BASE=/subpath` produces a homolog build under a subpath.
 - **Docs** — VitePress, source in `docs/`, built to `site/docs/`.
 
-Cross-navigation: the landing links into the docs via `landing-page/src/links.js` (`DOCS_URL = '/docs/'`); the docs navbar logo links back to the landing (`themeConfig.logoLink`).
+Cross-navigation is locale-aware: the landing links each language to its docs counterpart (`landing-page/src/links.js::docsUrl(lang)` — `/docs/`, `/docs/pt/`, `/docs/es/`), and the docs logo links back to the landing with `?lang=<locale>` (per-locale `themeConfig.logoLink` plus the home-page content logo), which the landing consumes on boot (`readInitialLang()` in `landing-page/src/i18n/index.jsx`). The landing is trilingual: en, pt-BR (default), es — dictionaries in `landing-page/src/i18n/`; Spanish terminology follows `jeowp-es_CO.po`, same as the docs.
 
 ### Site commands
 
@@ -185,6 +185,8 @@ Cross-navigation: the landing links into the docs via `landing-page/src/links.js
 | `npm run preview:site` | Serves the built `site/` at http://localhost:4174 |
 | `npm --prefix docs run docs:dev` | Docs dev server only |
 | `npm --prefix docs run docs:build` | Docs production build only (into `site/docs/`) |
+| `npm run docs:pt:sync` | Sync the pt-BR docs tree (`docs/pt/`) from the English source; `--force` refreshes still-pending copies |
+| `npm run docs:es:sync` | Sync the Spanish docs tree (`docs/es/`) from the English source; `--force` refreshes still-pending copies |
 | `LANDING_BASE=/novo npm --prefix landing-page run build` | Landing build under a subpath (homolog) |
 
 > Caveat: `preview:site` uses Python's `http.server`, which does not resolve extensionless URLs — `/docs/concepts` 404s locally while GitHub Pages serves it from `concepts.html`. Verify extensionless docs URLs on the deployed site (or request the `.html` locally).
@@ -202,6 +204,9 @@ Cross-navigation: the landing links into the docs via `landing-page/src/links.js
 - **Why relative `.md`**: VitePress fails the build on dead links for `.md`/`.html` targets only — absolute links (`/page/`) bypass the check. Relative anchors also resolve when browsing the repo on GitHub.
 - **Images**: shared `docs/img/` directory, referenced relatively (`![alt](img/foo.png)`) — valid because pages stay flat.
 - **Publishing**: `deploy-site.yml` builds the complete site (landing + docs) on every push to `master` and deploys it to the `gh-pages` branch. `site/` is gitignored. Builds are deterministic (content-hashed assets are stable across builds).
+- **Locales (pt-BR, es)**: English lives at the root; pt-BR is mirrored under `docs/pt/` and Spanish under `docs/es/` (VitePress `locales` in `docs/.vitepress/config.mts`; the navbar language switcher is automatic from the locale `label`s). Translated navs/sidebars mirror the English sidebar exactly — a page not listed in the English sidebar must not appear in translated sidebars. Terminology: pt-BR follows `src/languages/jeowp-pt_BR.po`; Spanish must come from `src/languages/jeowp-es_CO.po` msgstrs exactly (never derived from English free translation or the pt-BR tree) — the site locale is plain `es`, es_CO is only the terminology anchor.
+- **Locale sync**: `npm run docs:pt:sync` / `npm run docs:es:sync` (`scripts/docs-sync.mjs <locale> [--force]`) mirrors every English page into the locale tree as a pending copy — frontmatter `untranslated: true` + a `<TranslationPendingPT />`/`<TranslationPendingES />` banner (components in `docs/.vitepress/theme/`; adding a locale = one entry in the script's `LOCALES` map + one component + one `locales` block). Translating a page = rewriting it and removing both markers; the sync script then never touches it again. `--force` refreshes still-pending copies from the current English source. When changing an English page, always update its translated counterparts or re-run the sync.
+- **Translated page specifics**: images gain one extra `../` level (`../img/`, `../../img/` from `dev/`); relative `.md` links stay unchanged (they resolve to the locale siblings); intra-page anchors must be re-slugged to the translated headings (github-slugger style: lowercase, hyphens, accents kept).
 
 ## Node.js
 

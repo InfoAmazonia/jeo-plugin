@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from 'framer-motion'
 import { useI18n } from '../i18n/index.jsx'
-import { DOWNLOAD_URL, DOCS_URL } from '../links.js'
+import { DOWNLOAD_URL, docsUrl } from '../links.js'
 import infoamazoniaLogo from '../assets/v3-infoamazonia-logo.png'
 import heroBackground from '../assets/hero-background.mp4'
 import heroPoster from '../assets/hero-poster.jpg'
@@ -22,7 +22,7 @@ void loadFindLocation()
 
 export default function Hero() {
   const reduce = useReducedMotion()
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
 
   const container = {
     hidden: {},
@@ -164,7 +164,7 @@ export default function Hero() {
             {t.hero.workshops}
           </a>
           <a
-            href={DOCS_URL}
+            href={docsUrl(lang)}
             target="_blank"
             rel="noopener noreferrer"
             className="btn-v3-ghost h-[57px]"
