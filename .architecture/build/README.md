@@ -185,6 +185,7 @@ Cross-navigation: the landing links into the docs via `landing-page/src/links.js
 | `npm run preview:site` | Serves the built `site/` at http://localhost:4174 |
 | `npm --prefix docs run docs:dev` | Docs dev server only |
 | `npm --prefix docs run docs:build` | Docs production build only (into `site/docs/`) |
+| `npm run docs:pt:sync` | Sync the pt-BR docs tree (`docs/pt/`) from the English source; `--force` refreshes still-pending copies |
 | `LANDING_BASE=/novo npm --prefix landing-page run build` | Landing build under a subpath (homolog) |
 
 > Caveat: `preview:site` uses Python's `http.server`, which does not resolve extensionless URLs — `/docs/concepts` 404s locally while GitHub Pages serves it from `concepts.html`. Verify extensionless docs URLs on the deployed site (or request the `.html` locally).
@@ -202,6 +203,9 @@ Cross-navigation: the landing links into the docs via `landing-page/src/links.js
 - **Why relative `.md`**: VitePress fails the build on dead links for `.md`/`.html` targets only — absolute links (`/page/`) bypass the check. Relative anchors also resolve when browsing the repo on GitHub.
 - **Images**: shared `docs/img/` directory, referenced relatively (`![alt](img/foo.png)`) — valid because pages stay flat.
 - **Publishing**: `deploy-site.yml` builds the complete site (landing + docs) on every push to `master` and deploys it to the `gh-pages` branch. `site/` is gitignored. Builds are deterministic (content-hashed assets are stable across builds).
+- **Locales (pt-BR)**: English lives at the root; pt-BR is mirrored under `docs/pt/` (VitePress `locales` in `docs/.vitepress/config.mts`; the navbar language switcher is automatic from the locale `label`s). Terminology follows `src/languages/jeowp-pt_BR.po` plus the docs glossary (Minimapa, Mapa Narrativo, "Discovery" kept as-is).
+- **pt sync**: `npm run docs:pt:sync` (`scripts/docs-pt-sync.mjs`) mirrors every English page into `docs/pt/` as a pending copy — frontmatter `untranslated: true` + a `<TranslationPendingPT />` banner (component in `docs/.vitepress/theme/`). Translating a page = rewriting it in pt-BR and removing both markers; the sync script then never touches it again. `--force` refreshes still-pending copies from the current English source. When changing an English page, always update its pt counterpart or re-run the sync.
+- **pt page specifics**: images gain one extra `../` level (`../img/`, `../../img/` from `dev/`); relative `.md` links stay unchanged (they resolve to the pt siblings); intra-page anchors must be re-slugged to the translated headings (github-slugger style: lowercase, hyphens, accents kept).
 
 ## Node.js
 

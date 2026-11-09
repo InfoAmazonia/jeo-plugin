@@ -1,5 +1,7 @@
 # JEO Documentation
 
+> See "Translations (pt-BR)" at the bottom for the bilingual workflow.
+
 JEO acts as a geojournalism platform which allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is much more intuitive and interactive.
 
 You can post geotagged stories and create richly designed pages for each one of the featured stories. At the same time, by configuring layers hosted on Mapbox and choosing between MapboxGL and MapLibreGL, you can manage sophisticated maps without losing performance, add legends directly with HTML and set the map parameters. All directly at the WordPress dashboard.
@@ -64,3 +66,20 @@ JEO wants to help journalists and NGOs to improve storytelling with maps. Creati
 ### Differences between the old and the present JEO
 
 - [Migration](dev/migration.md)
+
+## Translations (pt-BR)
+
+The site is bilingual: English at the root and pt-BR under `docs/pt/` (VitePress `locales` in `docs/.vitepress/config.mts`; the navbar language switcher appears automatically from the locale labels).
+
+Workflow when changing a page:
+
+1. Edit the English page.
+2. Update `docs/pt/<same-path>.md` with the translation — or run `npm run docs:pt:sync`, which creates/refreshes an English copy flagged with the "not yet translated" banner (`<TranslationPendingPT />`, frontmatter `untranslated: true`) until someone translates it. The script never overwrites translated pages.
+
+Rules for pt pages:
+
+- Images are referenced one `../` level up (`../img/`, `../../img/` from `dev/`).
+- Relative `.md` links stay unchanged — they resolve to the pt sibling pages.
+- Intra-page anchors are re-slugged to the translated headings (github-slugger style: lowercase, hyphens, accents kept).
+- Code blocks, hooks, REST routes, file paths, and identifiers are never translated.
+- UI terminology follows `src/languages/jeowp-pt_BR.po` plus the docs glossary (Minimapa, Mapa Narrativo, "Discovery" kept as-is, "mapa de uso único").
