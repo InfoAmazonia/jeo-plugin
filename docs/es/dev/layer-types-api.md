@@ -25,7 +25,7 @@ Según la documentación de Mapbox, un estilo consiste en un conjunto de propied
 
 Estas son las particularidades que se tratan a continuación.
 
-Más en la [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec//).
+Más en la [Mapbox Style Specification](https://docs.mapbox.com/style-spec/guides/).
 
 ## [Capas de Mapbox](#capas-de-mapbox)
 La propiedad layers de un estilo lista todas las capas disponibles en ese estilo.

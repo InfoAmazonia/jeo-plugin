@@ -25,7 +25,7 @@ De acordo com a documentação do Mapbox, um estilo consiste em um conjunto de p
 
 Estas são as particularidades discutidas abaixo.
 
-Mais em [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec//).
+Mais em [Mapbox Style Specification](https://docs.mapbox.com/style-spec/guides/).
 
 ## [Camadas do Mapbox](#camadas-do-mapbox)
 A propriedade layers de um estilo lista todas as camadas disponíveis naquele estilo.

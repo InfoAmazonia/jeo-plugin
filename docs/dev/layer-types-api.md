@@ -25,7 +25,7 @@ According to the Mapbox docs, a style consists of a set of root properties. Some
 
 These are the particularities discussed below.
 
-More at [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec//).
+More at [Mapbox Style Specification](https://docs.mapbox.com/style-spec/guides/).
 
 ## [Mapbox Layers](#mapbox-layers)
 A style's layers property lists all the layers available in that style.
