@@ -174,7 +174,7 @@ Two independent builds published together under one origin (`jeowp.org`):
 - **Landing** — React + Vite, source in `landing-page/`, built to `site/` (Vite `outDir`; `LANDING_OUT_DIR` overrides it). `LANDING_BASE=/subpath` produces a homolog build under a subpath.
 - **Docs** — VitePress, source in `docs/`, built to `site/docs/`.
 
-Cross-navigation: the landing links into the docs via `landing-page/src/links.js` (`DOCS_URL = '/docs/'`); the docs navbar logo links back to the landing (`themeConfig.logoLink`).
+Cross-navigation is locale-aware: the landing links each language to its docs counterpart (`landing-page/src/links.js::docsUrl(lang)` — `/docs/`, `/docs/pt/`, `/docs/es/`), and the docs logo links back to the landing with `?lang=<locale>` (per-locale `themeConfig.logoLink` plus the home-page content logo), which the landing consumes on boot (`readInitialLang()` in `landing-page/src/i18n/index.jsx`). The landing is trilingual: en, pt-BR (default), es — dictionaries in `landing-page/src/i18n/`; Spanish terminology follows `jeowp-es_CO.po`, same as the docs.
 
 ### Site commands
 

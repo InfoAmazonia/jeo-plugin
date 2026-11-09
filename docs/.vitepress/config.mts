@@ -19,6 +19,9 @@ export default defineConfig({
       label: 'English',
       lang: 'en',
       themeConfig: {
+        // Logo click goes to the landing page in this locale (the landing
+        // reads ?lang= on boot; without it, it would open in its default).
+        logoLink: 'https://jeowp.org/?lang=en',
         nav: [
           { text: 'Home', link: '/' },
           {
@@ -118,6 +121,8 @@ export default defineConfig({
       description:
         'Plataforma de geojornalismo em código aberto para WordPress: publique histórias jornalísticas como camadas de informação em mapas interativos.',
       themeConfig: {
+        // Logo click goes to the landing page in this locale.
+        logoLink: 'https://jeowp.org/?lang=pt-BR',
         nav: [
           { text: 'Início', link: '/pt/' },
           {
@@ -217,6 +222,8 @@ export default defineConfig({
       description:
         'Plataforma de geoperiodismo de código abierto para WordPress: publica historias periodísticas como capas de información en mapas interactivos.',
       themeConfig: {
+        // Logo click goes to the landing page in this locale.
+        logoLink: 'https://jeowp.org/?lang=es',
         nav: [
           { text: 'Inicio', link: '/es/' },
           {
@@ -327,9 +334,6 @@ export default defineConfig({
       light: { src: '/logo-light.svg', alt: 'JEO Maps' },
       dark: { src: '/logo-dark.svg', alt: 'JEO Maps' },
     },
-    // Logo click goes to the landing page, not the docs home.
-    logoLink: 'https://jeowp.org/',
-
     // The logo SVG already carries the "JEO Maps" wordmark — showing the
     // site title next to it would duplicate the brand. The page-level
     // `title` ("JEO Maps") still names browser tabs and search results.

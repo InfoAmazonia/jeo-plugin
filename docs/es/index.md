@@ -1,4 +1,4 @@
-[![JEO Maps](/logo-light.svg){.light-only} ![JEO Maps](/logo-dark.svg){.dark-only}](https://jeowp.org/)
+[![JEO Maps](/logo-light.svg){.light-only} ![JEO Maps](/logo-dark.svg){.dark-only}](https://jeowp.org/?lang=es)
 
 La plataforma de geoperiodismo JEO para WordPress permite a organizaciones de noticias, blogueros y ONG publicar reportajes como capas de información en mapas digitales. Con JEO, crear la interacción entre capas de datos e información contextual es intuitivo e interactivo.
 
