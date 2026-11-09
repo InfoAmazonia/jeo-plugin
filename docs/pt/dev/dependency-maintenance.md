@@ -1,44 +1,38 @@
----
-untranslated: true
----
+# Manutenção de dependências
 
-<TranslationPendingPT />
+O JEO usa a manutenção de dependências nativa do GitHub para atualizações de rotina e mantém
+a lógica customizada do repositório limitada a verificações de release e de runtime específicas do plugin.
 
-# Dependency Maintenance
+## Manutenção automatizada
 
-JEO uses GitHub-native dependency maintenance for routine updates and keeps
-custom repository logic limited to plugin-specific release and runtime checks.
+- O Dependabot abre pull requests semanais contra o `develop` para atualizações de npm, Composer
+  e GitHub Actions.
+- O Dependency Review roda em pull requests e falha quando uma mudança de dependência
+  introduz uma vulnerabilidade de alta severidade ou pior.
+- `npm audit --package-lock-only` e `composer audit --locked` continuam sendo os
+  comandos locais para verificar os lockfiles atuais.
 
-## Automated maintenance
+## Revisando pull requests de atualização
 
-- Dependabot opens weekly pull requests against `develop` for npm, Composer,
-  and GitHub Actions updates.
-- Dependency Review runs on pull requests and fails when a dependency change
-  introduces a high-severity vulnerability or worse.
-- `npm audit --package-lock-only` and `composer audit --locked` remain the
-  local commands for checking the current lockfiles.
-
-## Reviewing update pull requests
-
-1. Check whether the update is a patch, minor, major, or GitHub Action change.
-2. Review the Dependency Review result for newly introduced advisories.
-3. Run the relevant local checks:
-   - npm or frontend update: `npm ci`, `npm run build`, `npm run build:report`,
-     and `npm run test:unit`.
-   - PHP or Composer update: `composer install`, `composer audit --locked`,
-     `vendor/bin/phpcs --standard=phpcs.xml.dist`, and
+1. Verifique se a atualização é de patch, minor, major ou uma mudança de GitHub Action.
+2. Revise o resultado do Dependency Review em busca de advisories recém-introduzidos.
+3. Execute as verificações locais relevantes:
+   - Atualização de npm ou frontend: `npm ci`, `npm run build`, `npm run build:report`
+     e `npm run test:unit`.
+   - Atualização de PHP ou Composer: `composer install`, `composer audit --locked`,
+     `vendor/bin/phpcs --standard=phpcs.xml.dist` e
      `vendor/bin/phpcs --standard=phpcs-compat.xml.dist`.
-   - Runtime-sensitive update: run the WordPress smoke test or wait for the
-     WordPress Smoke Tests workflow.
-4. For major updates, confirm the editor, map, story map, Discovery, geocoding,
-   and public rendering flows touched by the package still behave correctly.
+   - Atualização sensível ao runtime: execute o teste de smoke do WordPress ou aguarde o
+     workflow WordPress Smoke Tests.
+4. Para atualizações major, confirme que os fluxos de editor, mapa, mapa narrativo, Discovery,
+   geocodificação e renderização pública afetados pelo pacote ainda se comportam corretamente.
 
 ## Overrides
 
-The `overrides` block in `package.json` is reserved for temporary security,
-compatibility, or local-package pins. Each override should be removed when the
-upstream dependency no longer needs it.
+O bloco `overrides` no `package.json` é reservado para pins temporários de segurança,
+compatibilidade ou pacotes locais. Cada override deve ser removido quando a dependência
+upstream não precisar mais dele.
 
-When adding or changing an override, include the reason and the removal
-condition in the pull request description. Revisit active overrides after
-major `@wordpress/scripts`, Gutenberg, React, or webpack updates.
+Ao adicionar ou alterar um override, inclua o motivo e a condição de remoção na descrição
+do pull request. Revisite os overrides ativos após atualizações major de `@wordpress/scripts`,
+Gutenberg, React ou webpack.

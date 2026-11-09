@@ -1,20 +1,14 @@
----
-untranslated: true
----
+# Escrevendo um geocodificador
 
-<TranslationPendingPT />
+Um geocodificador é um serviço que encontra coordenadas geográficas a partir de uma busca por informações de endereço. Ele também é capaz de obter detalhes do endereço com base nas coordenadas geográficas, o que é chamado de geocodificação reversa.
 
-# Writing a Geocoder
+O JEO precisa de um serviço de geocodificação em algumas situações, como quando os usuários indicam a que local de um mapa uma história (post) está relacionada.
 
-A Geocoder is a service that finds geographical coordinates from a search by address information. It's also able to get address details based on the geographical coordinates, which is called Reverse Geocoding.
+O JEO vem com o Nominatim como seu geocodificador nativo. Geocodificadores adicionais podem ser adicionados por plugins através do hook `jeo_register_geocoders`. Esta página documenta como fazer isso.
 
-JEO needs a geocoder service in a few situations, such as when users indicate to where on a map a story (posts) is related.
+## Registrando um geocodificador
 
-JEO ships with Nominatim as its native geocoder. Additional geocoders can be added by plugins through the `jeo_register_geocoders` hook. This page documents how to do this.
-
-## Registering a Geocoder
-
-Hook a function to the `jeo_register_geocoders` action and call the register with the following code:
+Associe uma função à ação `jeo_register_geocoders` e chame o registro com o seguinte código:
 
 ```php
 add_action('jeo_register_geocoders', function($geocoders) {
@@ -29,28 +23,28 @@ add_action('jeo_register_geocoders', function($geocoders) {
 });
 ```
 
-This will tell JEO that there is a new Geocoder service available and give some information about it.
+Isso informará ao JEO que há um novo serviço de geocodificação disponível e fornecerá algumas informações sobre ele.
 
-- Name and description will be used in the Administration panel so the admin can recognize and choose from the available Geocoders which one is to be used.
-- slug needs to be a unique identifier for the geocoder
-- class_name is the name of the Geocoder class
+- O nome e a descrição serão usados no painel de administração para que o administrador possa reconhecer os geocodificadores disponíveis e escolher qual deles será usado.
+- slug precisa ser um identificador único para o geocodificador
+- class_name é o nome da classe do geocodificador
 
-## Creating the Geocoder class
+## Criando a classe do geocodificador
 
-Now we need to create the geocoder class. This will be a class that extends `\Jeo\Geocoder` and implement some methods that do the actual geocoding.
+Agora precisamos criar a classe do geocodificador. Ela será uma classe que estende `\Jeo\Geocoder` e implementa alguns métodos que fazem a geocodificação de fato.
 
-Inside the same hook, declare the class and two required methods:
+Dentro do mesmo hook, declare a classe e dois métodos obrigatórios:
 
-- `geocode($search_string)` The method that receives the search string, does the request to the geocoder servers and returns the coordinates and address details;
-- `reverse_geocode($lat, $lon)` The method that receives latitude and longitude, requests the geocoder server, and returns the full location details in the same format as the `geocode` method does.
+- `geocode($search_string)` O método que recebe a string de busca, faz a requisição aos servidores do geocodificador e retorna as coordenadas e os detalhes do endereço;
+- `reverse_geocode($lat, $lon)` O método que recebe latitude e longitude, faz a requisição ao servidor do geocodificador e retorna todos os detalhes da localização no mesmo formato que o método `geocode`.
 
-While `geocode()` returns an array of search results, `reverse_geocode()` returns only one result.
+Enquanto `geocode()` retorna um array de resultados de busca, `reverse_geocode()` retorna apenas um resultado.
 
-Each result is an array that must have only the keys expected by the JEO plugin, so each Geocoder must find the best correspondence between each field and the fields expected by JEO.
+Cada resultado é um array que deve conter apenas as chaves esperadas pelo plugin JEO, de modo que cada geocodificador deve encontrar a melhor correspondência entre cada campo e os campos esperados pelo JEO.
 
-Note: Only `lat` and `lon` are required.
+Observação: apenas `lat` e `lon` são obrigatórios.
 
-Sample response with all accepted fields:
+Exemplo de resposta com todos os campos aceitos:
 
 ```php
 [
@@ -69,7 +63,7 @@ Sample response with all accepted fields:
 ]
 ```
 
-Here is a simple example:
+Aqui está um exemplo simples:
 
 ```php
 add_action('jeo_register_geocoders', function($geocoders) {
@@ -154,23 +148,23 @@ add_action('jeo_register_geocoders', function($geocoders) {
 });
 ```
 
-And that's it! Your new Geocoder is ready!
+E é só isso! Seu novo geocodificador está pronto!
 
-## Adding additional Settings to the Geocoder
+## Adicionando configurações adicionais ao geocodificador
 
-Some geocoder services might need or offer additional settings. Some might require the user to enter its API key, others might let the users restrict the search to a specific country to get better results when searching.
+Alguns serviços de geocodificação podem precisar ou oferecer configurações adicionais. Alguns podem exigir que o usuário insira sua chave de API, outros podem permitir que os usuários restrinjam a busca a um país específico para obter melhores resultados ao pesquisar.
 
-You can also easily add new settings to your Geocoder that will automatically be presented to the user on the Settings page.
+Você também pode adicionar facilmente novas configurações ao seu geocodificador, e elas serão automaticamente apresentadas ao usuário na página de Configurações.
 
-Declare a method `get_settings()` in your class that will return an array of all the settings your Geocoder accepts.
+Declare um método `get_settings()` na sua classe que retornará um array com todas as configurações que o seu geocodificador aceita.
 
-Each setting is described by an array with the following keys:
+Cada configuração é descrita por um array com as seguintes chaves:
 
-- `slug`: a slug for your option. You don't have to worry about naming conflicts, it will be stored inside your geocoders options;
-- `name`: a human-readable name;
-- `description`: an explanation to the user of what this setting is.
+- `slug`: um slug para a sua opção. Você não precisa se preocupar com conflitos de nomenclatura, ela será armazenada dentro das opções do seu geocodificador;
+- `name`: um nome legível por humanos;
+- `description`: uma explicação ao usuário sobre o que é esta configuração.
 
-Let's see an example only with the relevant code:
+Vamos ver um exemplo apenas com o código relevante:
 
 ```php
 add_action('jeo_register_geocoders', function($geocoders) {
@@ -198,17 +192,17 @@ add_action('jeo_register_geocoders', function($geocoders) {
 });
 ```
 
-And this is what you will see in the admin panel:
+E isto é o que você verá no painel de administração:
 
-![Geocoder Settings](../../img/geocoder-settings.png)
+![Configurações do geocodificador](../../img/geocoder-settings.png)
 
-## Accessing Settings values
+## Acessando valores das configurações
 
-Now that you have registered a setting and the user can change its value in the admin panel, you can use it in your geocoder.
+Agora que você registrou uma configuração e o usuário pode alterar o valor dela no painel de administração, você pode usá-la no seu geocodificador.
 
-To get its value, simply call `$this->get_option($option_name)`.
+Para obter o seu valor, basta chamar `$this->get_option($option_name)`.
 
-Example:
+Exemplo:
 
 ```php
 // ...
@@ -233,9 +227,9 @@ Example:
 // ...
 ```
 
-## Declaring default values
+## Declarando valores padrão
 
-You can also add the `get_default_options()` method to your class to set default values for each setting. This is optional and is done like this:
+Você também pode adicionar o método `get_default_options()` à sua classe para definir valores padrão para cada configuração. Isto é opcional e é feito assim:
 
 ```php
 add_action('jeo_register_geocoders', function($geocoders) {
@@ -258,19 +252,19 @@ add_action('jeo_register_geocoders', function($geocoders) {
 });
 ```
 
-## Advanced: Even further settings customization
+## Avançado: personalização ainda maior das configurações
 
-If your geocoder needs some special settings that a simple text input won't handle, there is yet another method you can declare to add arbitrary HTML code to the Settings page.
+Se o seu geocodificador precisar de configurações especiais que um simples campo de texto não consegue atender, há mais um método que você pode declarar para adicionar código HTML arbitrário à página de Configurações.
 
-`settings_footer($settings)` must echo HTML code that will be rendered at the end of your Geocoder settings page.
+`settings_footer($settings)` deve fazer echo de um código HTML que será renderizado no final da página de configurações do seu geocodificador.
 
-It received the `$settings` object, which is an instance of `\Jeo\Settings` and have some helpers you can use.
+Ele recebe o objeto `$settings`, que é uma instância de `\Jeo\Settings` e possui alguns helpers que você pode usar.
 
-You only need to print form fields with the right names and JEO will take care of saving them for you.
+Você só precisa imprimir os campos do formulário com os nomes corretos, e o JEO cuidará de salvá-los para você.
 
-To get the right field name use `$settings->get_geocoder_option_field_name($name)`.
+Para obter o nome correto do campo, use `$settings->get_geocoder_option_field_name($name)`.
 
-Example:
+Exemplo:
 
 ```php
 // ...
@@ -297,4 +291,4 @@ Example:
 // ...
 ```
 
-Note: `selected()` is a native WordPress function. See the [official documentation](https://developer.wordpress.org/reference/functions/selected/)
+Observação: `selected()` é uma função nativa do WordPress. Consulte a [documentação oficial](https://developer.wordpress.org/reference/functions/selected/)

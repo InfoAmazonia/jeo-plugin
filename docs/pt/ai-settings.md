@@ -1,74 +1,68 @@
----
-untranslated: true
----
+# Configurações de IA
 
-<TranslationPendingPT />
+O JEO inclui capacidades de IA integradas para georreferenciar posts, gerar mapas e criar camadas de mapa personalizadas. Antes de usar esses recursos, você precisa configurar um provedor de IA.
 
-# AI Settings
+Veja [IA no JEO](ai-in-jeo.md) para uma visão geral da arquitetura de IA e de como cada peça funciona.
 
-JEO includes built-in AI capabilities for georeferencing posts, generating maps, and creating custom map layers. Before using these features, you need to configure an AI provider.
+## Configurando um provedor de IA
 
-See [AI in JEO](ai-in-jeo.md) for an overview of the AI architecture and how each piece works.
+Navegue até **Jeo → IA** no painel do WordPress. A página de configurações é organizada em abas:
 
-## Configuring an AI provider
+### Aba Provedor de IA
 
-Navigate to **Jeo → AI** in the WordPress dashboard. The settings page is organized into tabs:
+Selecione um dos 10 provedores de IA com suporte e insira sua chave de API:
 
-### Provider tab
-
-Select one of the 10 supported AI providers and enter your API key:
-
-| Provider | Requires API key |
+| Provedor | Requer chave de API |
 |----------|-----------------|
-| Google Gemini | Yes |
-| OpenAI | Yes |
-| DeepSeek | Yes |
-| Anthropic | Yes |
-| Ollama | No (local) |
-| Mistral | Yes |
-| ZAI | Yes |
-| HuggingFace | Yes |
-| Grok | Yes |
-| Cohere | Yes |
+| Google Gemini | Sim |
+| OpenAI | Sim |
+| DeepSeek | Sim |
+| Anthropic | Sim |
+| Ollama | Não (local) |
+| Mistral | Sim |
+| ZAI | Sim |
+| HuggingFace | Sim |
+| Grok | Sim |
+| Cohere | Sim |
 
-After selecting a provider and entering the key, click **Test Connection** to verify it works.
+Depois de selecionar um provedor e inserir a chave, clique em **Testar conexão** para verificar se está funcionando.
 
-![AI Provider settings](../img/ai-settings-provider.png)
+![Configurações do provedor de IA](../img/ai-settings-provider.png)
 
-### Knowledge Base tab
+### Aba Base de Conhecimento
 
-The Knowledge Base (RAG) stores vectorized versions of your posts and layers, allowing the AI to search for contextually relevant content when georeferencing or generating maps.
+A Base de Conhecimento (RAG) armazena versões vetorizadas dos seus posts e camadas, permitindo que a IA pesquise conteúdo contextualmente relevante ao georreferenciar ou gerar mapas.
 
-- **Embedding model**: Choose an embedding model from your provider (or use Ollama locally).
-- **Auto-indexing**: Automatically index new and updated posts/layers in the background.
-- **Batch size**: Number of items processed per indexing cycle.
-- **Cron interval**: How often the background indexing runs.
-- **Search results (topK)**: Maximum number of semantic matches returned per search (1–50, default 10).
-- **Actions**: Manually trigger indexing for posts or layers, backup/restore the vector store, or clear it.
+- **Modelo de Embedding**: escolha um modelo de embedding do seu provedor (ou use o Ollama localmente).
+- **Indexação automática**: indexa automaticamente, em segundo plano, posts e camadas novos ou atualizados.
+- **Tamanho do lote**: número de itens processados por ciclo de indexação.
+- **Intervalo do Cron**: com que frequência a indexação em segundo plano é executada.
+- **Resultados da busca (topK)**: número máximo de correspondências semânticas retornadas por busca (1–50, padrão 10).
+- **Ações**: dispare manualmente a indexação de posts ou camadas, faça backup/restaure o armazenamento de vetores ou limpe-o.
 
-![Knowledge Base settings](../img/ai-settings-knowledge-base.png)
+![Configurações da Base de Conhecimento](../img/ai-settings-knowledge-base.png)
 
-### Embedded Data tab
+### Aba Dados incorporados
 
-JEO ships with built-in Brazilian geographic dictionaries (biomes, conservation units, indigenous lands, hydrographic basins, and more). These help the AI recognize geographic references in your content. This tab shows which dictionaries are loaded.
+O JEO vem com dicionários geográficos brasileiros integrados (biomas, unidades de conservação, terras indígenas, bacias hidrográficas e mais). Eles ajudam a IA a reconhecer referências geográficas no seu conteúdo. Esta aba mostra quais dicionários estão carregados.
 
-### Bulk Geolocation tab
+### Aba Geolocalização em lote
 
-Configure batch geolocation settings for processing many posts at once. See [AI Bulk Geolocation](ai-bulk-geolocation.md) for details.
+Configure as definições de geolocalização em lote para processar muitos posts de uma só vez. Veja [Geolocalização em lote com IA](ai-bulk-geolocation.md) para detalhes.
 
-### Context Assistant tab
+### Aba Assistente de Contexto
 
-Customize the system prompt used by the [AI Context Assistant](ai-context-assistant.md) — the editorial suggestions sidebar in the Gutenberg editor.
+Personalize o prompt do sistema usado pelo [Assistente de Contexto com IA](ai-context-assistant.md) — o painel lateral de sugestões editoriais no editor Gutenberg.
 
-- **Use custom prompt**: Check this box to override the built-in default prompt with your own.
-- **Custom prompt**: Editable textarea for your custom system prompt. When unchecked, the tab shows the default prompt in a read-only field for reference.
+- **Usar prompt personalizado**: marque esta caixa para substituir o prompt padrão integrado pelo seu próprio.
+- **Prompt personalizado**: área de texto editável para o seu prompt do sistema personalizado. Quando desmarcada, a aba mostra o prompt padrão em um campo somente leitura, para referência.
 
-Leave the custom prompt empty to use the built-in default, which is optimized for journalistic editorial assistance with RAG integration.
+Deixe o prompt personalizado vazio para usar o padrão integrado, que é otimizado para assistência editorial jornalística com integração RAG.
 
-## Structured output
+## Saída estruturada
 
-When enabled (default), the AI returns results in a strict JSON format enforced by the provider. This improves accuracy for georeferencing and map generation. You can disable it in the AI settings if your provider does not support it.
+Quando ativada (padrão), a IA retorna resultados em um formato JSON estrito imposto pelo provedor. Isso melhora a precisão do georreferenciamento e da geração de mapas. Você pode desativá-la nas configurações de IA se o seu provedor não oferecer suporte.
 
-## Cost tracking
+## Acompanhamento de custos
 
-JEO tracks AI usage in **Jeo → AI Debug Logs**. Each log entry records the provider, model, input/output tokens, and the prompt and response. Use this to monitor costs and troubleshoot responses.
+O JEO rastreia o uso da IA em **Jeo → Logs de Debug da IA**. Cada entrada de log registra o provedor, o modelo, os tokens de entrada/saída, além do prompt e da resposta. Use isso para monitorar custos e solucionar problemas nas respostas.

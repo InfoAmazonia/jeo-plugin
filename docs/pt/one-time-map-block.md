@@ -1,17 +1,11 @@
----
-untranslated: true
----
+# Bloco de mapa de uso único
 
-<TranslationPendingPT />
+É possível usar mapas em posts sem precisar criar um novo mapa nem usar um existente. Para isso, o plugin JEO disponibiliza outro tipo de bloco: o **Mapa de uso único**.
 
-# One-time map block
+Ao criar um novo post, note que há uma nova categoria de blocos disponível: **JEO**.
 
-It is possible to use maps into posts without having to create a new map or using an existing one. For this, JEO plugin makes availabe another type of block: **One-time map**.
+![Bloco JEO](../img/JEO-block.png)
 
-When creating a new post, note that is available a new block category: **JEO**.
+Ao selecionar o bloco **JEO One-time Map**, aparecerá uma prévia padrão do mapa. Este tipo de mapa permite todas as mesmas personalizações de um [Mapa JEO](map-post.md) normal, como: modificação de coordenadas, configurações de zoom, posts relacionados, opções de alinhamento e [configurações de camadas](layer-post.md). Para saber com precisão como personalizar todas essas opções, consulte a página do [Mapa JEO](map-post.md).
 
-![JEO block](../img/JEO-block.png)
-
-Selecting **JEO One-time Map** block, a standard map preview will appear. This type of map allow all the same customizations of a normal [JEO Map](map-post.md), such as: modifying coordinates, zoom settings, related posts, alignment options and [layers settings](layer-post.md). To know more precisely how to customize all these options, check out [JEO Map](map-post.md) page.
-
-![One-time Map Example](../img/one-time-map-example.png)
+![Exemplo de mapa de uso único](../img/one-time-map-example.png)

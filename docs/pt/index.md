@@ -1,30 +1,24 @@
----
-untranslated: true
----
-
-<TranslationPendingPT />
-
 [![JEO Maps](/logo-light.svg){.light-only} ![JEO Maps](/logo-dark.svg){.dark-only}](https://jeowp.org/)
 
-The JEO WordPress geojournalism platform allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is intuitive and interactive.
+A plataforma de geojornalismo JEO para WordPress permite que organizações de notícias, blogueiros e ONGs publiquem reportagens como camadas de informação em mapas digitais. Com o JEO, criar a interação entre camadas de dados e informações contextuais é intuitivo e interativo.
 
-## JEO Plugin
+## Plugin JEO
 
-Features:
+Funcionalidades:
 
-- [Mapbox](https://www.mapbox.com/) and [MapLibre](https://maplibre.org/) maps
-- [react-map-gl](https://visgl.github.io/react-map-gl/) library
-- Custom tile layers
-- Layer filtering options, allowing you to mix tile layer.
-- Geocoding WordPress posts using OpenStreetMap (Nominatim), supporting the post type `Post`, with extensibility for additional geocoders via hook.
-- Customizable marker icons that can be associated to categories, custom taxonomies or posts directly.
-- Map markers query integrated to posts query.
-- Support [WPML](https://wpml.org/pt-br/) and [Polylang](https://wordpress.org/plugins/polylang/) multilingual plugins
-- AI-powered georeferencing, bulk geolocation, and map generation (multiple AI providers)
-- AI-assisted map block (Minimap) with chat refinement and auto-generated layers
-- Stories Near You block with geolocation-based post discovery
+- Mapas [Mapbox](https://www.mapbox.com/) e [MapLibre](https://maplibre.org/)
+- Biblioteca [react-map-gl](https://visgl.github.io/react-map-gl/)
+- Camadas de tiles personalizadas
+- Opções de filtragem de camadas, permitindo combinar camadas de tiles.
+- Geocodificação de posts do WordPress usando OpenStreetMap (Nominatim), com suporte ao tipo de post `Post` e extensibilidade para outros geocodificadores via hook.
+- Ícones de marcadores personalizáveis, que podem ser associados a categorias, taxonomias personalizadas ou diretamente a posts.
+- Consulta de marcadores de mapa integrada à consulta de posts.
+- Suporte aos plugins multilíngues [WPML](https://wpml.org/pt-br/) e [Polylang](https://wordpress.org/plugins/polylang/)
+- Georreferenciamento, geolocalização em lote e geração de mapas com IA (múltiplos provedores de IA)
+- Bloco de mapa assistido por IA (Minimapa) com refinamento por chat e camadas geradas automaticamente
+- Bloco Histórias próximas a você com descoberta de posts baseada em geolocalização
 
-Projects using JEO:
+Projetos que usam o JEO:
 
 - [Plenamata](https://plenamata.eco/)
 - [InfoAmazonia](https://infoamazonia.org/)
@@ -33,9 +27,8 @@ Projects using JEO:
 - [MekongEye](https://www.mekongeye.com/)
 - [Caci](http://caci.cimi.org.br/)
 
-[Read documentation](index-plugin.md) or [See in Wordpress store](https://wordpress.org/plugins/jeowp/)
+[Leia a documentação](index-plugin.md) ou [veja na loja do WordPress](https://wordpress.org/plugins/jeowp/)
 
+## Tema WordPress JEO
 
-## JEO WordPress Theme
-
-[Read the documentation](https://infoamazonia.github.io/jeo-theme/)
+[Leia a documentação](https://infoamazonia.github.io/jeo-theme/)

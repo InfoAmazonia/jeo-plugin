@@ -1,82 +1,76 @@
----
-untranslated: true
----
+# Minimapa — Bloco de mapa assistido por IA
 
-<TranslationPendingPT />
+O bloco Minimapa (`jeo/ai-minimap`) gera mapas interativos contextuais dentro do editor Gutenberg usando IA. Descreva o que você precisa em linguagem natural e a IA constrói um mapa com camadas apropriadas, ponto central, nível de zoom e pinos de geolocalização.
 
-# Minimap — AI-Assisted Map Block
+Consulte [IA no JEO](ai-in-jeo.md) para saber como RAG, agentes e ferramentas alimentam este recurso.
 
-The Minimap block (`jeo/ai-minimap`) generates contextual interactive maps inside the Gutenberg editor using AI. Describe what you need in natural language, and the AI builds a map with appropriate layers, center point, zoom level, and geolocation pins.
+## Inserindo o bloco
 
-See [AI in JEO](ai-in-jeo.md) to learn how RAG, agents, and tools power this feature.
+1. No editor Gutenberg, clique no botão **+** para adicionar um novo bloco.
+2. Pesquise por **Minimapa de IA do JEO** e selecione-o.
+3. O bloco começa no estado **ocioso** com dois modos de geração:
+   - **A partir do conteúdo do post**: gera automaticamente um mapa com base no conteúdo e nos pontos de geolocalização do post atual.
+   - **A partir do prompt**: descreva o mapa que você quer em um campo de texto.
 
-## Inserting the block
+![Bloco Minimapa](../img/minimap-block-edit.png)
 
-1. In the Gutenberg editor, click the **+** button to add a new block.
-2. Search for **JEO AI Minimap** and select it.
-3. The block starts in **idle** state with two generation modes:
-   - **From post content**: Automatically generates a map based on the current post's content and geolocation points.
-   - **From prompt**: Describe the map you want in a text field.
+## Gerando um mapa
 
-![Minimap block](../img/minimap-block-edit.png)
+### A partir do conteúdo do post
 
-## Generating a map
+Clique em **Gerar a partir do conteúdo do post**. O sistema pesquisa suas camadas existentes e os dados de geolocalização do post para construir um mapa contextual. Nenhum prompt de IA é necessário — ele usa RAG (Geração Aumentada por Recuperação) para encontrar camadas relevantes automaticamente.
 
-### From post content
+### A partir do prompt
 
-Click **Generate from content**. The system searches your existing layers and post geolocation data to build a contextual map. No AI prompt is needed — it uses RAG (Retrieval-Augmented Generation) to find relevant layers automatically.
+Digite uma descrição do mapa que você quer (por exemplo, "Um mapa da região amazônica mostrando dados de desmatamento e rios") e clique em **Gerar**. O agente de IA vai:
 
-### From prompt
+1. Analisar o seu prompt e o conteúdo do post atual.
+2. Pesquisar camadas existentes relevantes na sua Base de Conhecimento.
+3. Geocodificar localizações relevantes.
+4. Retornar um mapa completo com camadas, centro, zoom e pinos.
 
-Type a description of the map you want (e.g., "A map of the Amazon region showing deforestation data and rivers") and click **Generate**. The AI agent will:
+![Bloco Minimapa](../img/minimap-block-edit2.png)
 
-1. Analyze your prompt and the current post content.
-2. Search for relevant existing layers in your Knowledge Base.
-3. Geocode relevant locations.
-4. Return a complete map with layers, center, zoom, and pins.
+## Refinamento por chat
 
-![Minimap block](../img/minimap-block-edit2.png)
+Depois que um mapa é gerado, o bloco entra no estado **pronto**. Um **painel do inspetor** abre na barra lateral do Gutenberg, onde você pode refinar o mapa por meio de chat:
 
-## Chat refinement
+- **Mensagens de texto**: digite instruções como "Aproxime em São Paulo" ou "Remova a camada de água".
+- **Regenerar**: comece do zero com uma sugestão de mapa totalmente nova.
+- **Novo prompt**: insira uma nova descrição para gerar um mapa diferente (mantém o contexto da conversa).
+- **Variante de camada base**: alterne entre camadas base escura, clara e de satélite.
 
-Once a map is generated, the block enters **ready** state. An **Inspector Panel** opens in the Gutenberg sidebar where you can refine the map through chat:
+A IA lembra a sua conversa, então cada refinamento se apoia no contexto anterior.
 
-- **Text messages**: Type instructions like "Zoom in on São Paulo" or "Remove the water layer".
-- **Regenerate**: Start fresh with a completely new map suggestion.
-- **New prompt**: Enter a new description to generate a different map (keeps the conversation context).
-- **Base layer variant**: Switch between dark, light, and satellite base layers.
+![Chat do bloco Minimapa](../img/minimap-block-edit3.png)
 
-The AI remembers your conversation, so each refinement builds on the previous context.
+## Entendendo as camadas escolhidas
 
-![Minimap block chat](../img/minimap-block-edit3.png)
+Já se perguntou por que a IA escolheu uma camada específica? Abaixo da prévia do mapa, clique em **Entender camadas escolhidas** para abrir o painel **Camadas do mapa** na barra lateral do bloco. Para cada camada, você verá:
 
-## Understanding the chosen layers
+- **Título e tipo** — por exemplo, "Alertas de desmatamento — mapbox".
+- **Descrição** — o resumo da camada, quando disponível.
+- **Por que foi escolhida** — a explicação da própria IA para incluir a camada neste mapa.
+- **Aviso de estilo automático** — quando a IA precisou aplicar estilo a uma camada que não tinha estilo salvo, para que você saiba que ela pode ser personalizada.
+- **Temas e fonte** — os temas da camada e a atribuição dos dados, para desambiguar quando existirem camadas com nomes semelhantes.
 
-Ever wondered why the AI picked a specific layer? Below the map preview, click **Understand chosen layers** to open the **Map layers** panel in the block sidebar. For each layer, you'll see:
+![Entender camadas escolhidas](../img/minimap-understand-layers.png)
 
-- **Title and type** — e.g. "Deforestation alerts — mapbox".
-- **Description** — the layer's excerpt, when available.
-- **Why it was chosen** — the AI's own explanation for including the layer in this map.
-- **Automatic style notice** — when the AI had to style a layer that had no saved style, so you know it can be customized.
-- **Themes and source** — the layer's themes and data attribution, for disambiguation when similarly named layers exist.
+## Camadas geradas por IA (Minilayer)
 
-![Understand chosen layers](../img/minimap-understand-layers.png)
+Se você tiver uma chave de API do Mapbox configurada, a IA pode **gerar camadas de mapa personalizadas** quando as camadas existentes não cobrirem o que você precisa. Durante o chat, peça à IA para criar uma camada (por exemplo, "Você pode gerar um mapa de calor de desmatamento da Amazônia?"). A IA pedirá a sua confirmação antes de gerar — ela nunca cria camadas sem aprovação explícita. A nova camada é adicionada ao mapa automaticamente com um estilo sugerido pela IA (cores e filtros) que você pode sobrescrever depois no modal de configurações da camada, por meio da caixa de seleção **"Usar estilo padrão da IA"**.
 
-## AI-generated layers (Minilayer)
+## Recursos do mapa
 
-If you have a Mapbox API key configured, the AI can **generate custom map layers** when existing layers don't cover what you need. During chat, ask the AI to create a layer (e.g., "Can you generate a deforestation heatmap for the Amazon?"). The AI will ask for your confirmation before generating — it never creates layers without explicit approval. The new layer is added to the map automatically with AI-suggested styling (colors and filters) that you can later override in the layer settings modal via the **"Use AI Default Style"** checkbox.
+Após a geração, o minimapa se comporta como qualquer mapa JEO:
 
-## Map features
+- **Deslocamento e zoom**: arraste para deslocar, role a página sobre o mapa para dar zoom.
+- **Camadas**: camadas temáticas com legendas.
+- **Pinos**: pinos de geolocalização provenientes dos dados de geolocalização do post. Use o painel **Pinos de geolocalização** (Mostrar pinos: Sim/Não) para controlá-los — eles são renderizados ao vivo na prévia do editor e no frontend.
+- **Camada base**: escolhida automaticamente (escura/clara) com base nas cores das camadas, ou selecionada manualmente.
 
-After generation, the minimap behaves like any JEO map:
+## Requisitos
 
-- **Pan and zoom**: Drag to pan, scroll to zoom.
-- **Layers**: Thematic layers with legends.
-- **Pins**: Geolocation pins from the post's geolocation data. Use the **Geolocation Pins** panel (Show pins: Yes/No) to control them — they render live in the editor preview and on the frontend.
-- **Base layer**: Automatically chosen (dark/light) based on layer colors, or manually selected.
-
-## Requirements
-
-- An AI provider must be configured in **Jeo → AI** (see [AI Settings](ai-settings.md)).
-- For best results, index your posts and layers in the Knowledge Base (RAG tab).
-- For AI-generated thematic layers, a Mapbox API key is also required. Boundary layers (municipalities, states, indigenous lands) are generated as GeoJSON and work without a Mapbox key.
+- Um provedor de IA deve estar configurado em **Jeo → IA** (consulte [Configurações de IA](ai-settings.md)).
+- Para melhores resultados, indexe seus posts e camadas na Base de Conhecimento (aba RAG).
+- Para camadas temáticas geradas por IA, uma chave de API do Mapbox também é necessária. Camadas de limites (municípios, estados, terras indígenas) são geradas como GeoJSON e funcionam sem uma chave do Mapbox.

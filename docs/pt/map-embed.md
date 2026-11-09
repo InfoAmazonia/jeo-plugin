@@ -1,24 +1,18 @@
----
-untranslated: true
----
+# Incorporação de mapa
 
-<TranslationPendingPT />
+O plugin JEO permite inserir um mapa em um post colando um link no editor. Isso é o que se chama de `Embed map` (incorporação de mapa) e é muito fácil de fazer.
 
-# Embedding a map
+Ao editar um [Mapa](map-post.md), um dos painéis de configurações é o `Status & visibilidade`. Nele você encontra a `URL de incorporação` daquele mapa específico.
 
-JEO plugin allows a map to be inserted into a post by pasting a link on the editor. This is what is called `Embed map` and it's very easy to be done.
+![URL de incorporação](../img/embed-url.png)
 
-When editing a [Map](map-post.md), one of the setting panels is `Status & Visibility`. There you can find the `embed URL` of that specific map.
+Copiar esse link e colá-lo no editor de posts resultará em um mapa incorporado.
 
-![Embed URL](../img/embed-url.png)
+**Atenção**: se o seu post exibir um erro *Not Found*, siga estas etapas:
 
-Copying this link and pasting on the post editor will result on an embed map.
+- Vá para o painel do WordPress > Configurações > Links permanentes
+- Altere as Configurações comuns (você pode mudar para uma configuração diferente e depois voltar para a original) e clique em `Salvar alterações`
 
-**Warning**: If your post displays a *Not Found* error, do the following steps:
+![Configurações de links permanentes](../img/permalink-settings.png)
 
-- Go to Wordpress Dashboard > Settings > Permalinks
-- Change the Common Settings (you may change to a different setting and then change back to the original) and click on `Save Changes`
-
-![Permalink Settings](../img/permalink-settings.png)
-
-Now you should be able to see the embed maps with no problems.
+Agora você deveria conseguir ver os mapas incorporados sem problemas.

@@ -1,27 +1,21 @@
----
-untranslated: true
----
+# Adicionando novos tipos de camada
 
-<TranslationPendingPT />
+Este documento descreve como registrar novos tipos de camada para serem usados em mapas criados com o JEO.
 
-# Adding new Layer Types
+## Introdução
 
-This document describes how to register new Layer Types to be used in maps created with JEO.
+No JEO, os mapas são renderizados usando [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/API/) (padrão) ou [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/api/), dependendo da configuração de **runtime de mapa** definida em **Jeo → Configurações**. As duas bibliotecas compartilham uma API compatível baseada na [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/), de modo que qualquer novo tipo de camada funcionará com qualquer um dos runtimes. O objeto `map` inicializado passado aos métodos do tipo de camada é uma instância `Map` do MapLibre GL ou do Mapbox GL — ambas expõem os mesmos métodos principais (`setStyle`, `addLayer`, `addSource`, etc.).
 
-## Introduction
+Basicamente, para adicionar um novo tipo de camada, há 2 passos simples:
 
-In JEO, maps are rendered using either [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/API/) (default) or [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/api/), depending on the **map runtime** setting configured in **Jeo → Settings**. Both libraries share a compatible API based on the [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/), so any new layer type will work with either runtime. The initialized `map` object passed to layer type methods is a MapLibre GL or Mapbox GL `Map` instance — both expose the same core methods (`setStyle`, `addLayer`, `addSource`, etc.).
+1. Registrar o novo tipo de camada usando um hook do PHP, informando onde está o arquivo JavaScript principal do seu tipo de camada;
+2. Criar uma classe JavaScript implementando métodos para adicionar a camada ao mapa e para descrever quais são as opções que uma camada desse tipo tem.
 
-Basically, to add a new layer type, there are 2 simple steps:
+Em resumo, isto é tudo o que precisa ser feito. Em alguns casos, porém, você pode precisar adicionar dependências extras ao projeto. Por exemplo, para criar um tipo de camada que dê suporte às camadas vetoriais do Carto, podemos querer adicionar o CartoVL (que é uma extensão do MapboxGL) ao projeto.
 
-1. Register the new Layer type using a PHP hook, informing where is the main JavaScript file of your Layer Type;
-2. Create a JavaScript class implementing methods to add the layer to the map and to describe what are the options a layer of this type has.
+## Criando um novo tipo de camada
 
-In short, this is all that is needed to do. In some cases, however, you might need to add extra dependencies to the project. For example, to create a Layer Type to support Carto's vector layers, we might want to add CartoVL (which is an extension to MapboxGL) to the project.
-
-## Creating a new Layer Type
-
-First, let's register a new Layer Type by hooking up in the `jeo_register_layer_types` action:
+Primeiro, vamos registrar um novo tipo de camada associando uma função à ação `jeo_register_layer_types`:
 
 ```php
 add_action('jeo_register_layer_types', function($layer_types) {
@@ -29,20 +23,20 @@ add_action('jeo_register_layer_types', function($layer_types) {
 });
 ```
 
-`register_layer_type` method gets 2 parameters.
+O método `register_layer_type` recebe 2 parâmetros.
 
-- Layer type slug - A unique sanitized string (make sure to make it unique)
-- Options - An array with the layer type options:
-  - `script_url`: Required. The absolute URL to your JavaScript file.
-  - `dependencies`: Optional. An array of scripts handles registered using [wp_register_script](https://developer.wordpress.org/reference/functions/wp_register_script/) that should be loaded as a dependency to the layer type main script
+- Slug do tipo de camada - Uma string única e sanitizada (certifique-se de torná-la única)
+- Opções - Um array com as opções do tipo de camada:
+  - `script_url`: Obrigatório. A URL absoluta para o seu arquivo JavaScript.
+  - `dependencies`: Opcional. Um array de handles de scripts registrados com [wp_register_script](https://developer.wordpress.org/reference/functions/wp_register_script/) que devem ser carregados como dependência do script principal do tipo de camada
 
-That's all you need to do on the PHP side. All the magic happens on the JavaScript.
+Isso é tudo o que você precisa fazer no lado PHP. Toda a mágica acontece no JavaScript.
 
-Now, let's create our `layertype.js` file.
+Agora, vamos criar o nosso arquivo `layertype.js`.
 
-In this file, we are going to register a JavaScript object using the globally available `window.JeoLayerTypes.registerLayerType`.
+Neste arquivo, vamos registrar um objeto JavaScript usando o `window.JeoLayerTypes.registerLayerType`, disponível globalmente.
 
-The first parameter must be the same slug you defined when you registered your Layer Type on the PHP side, and second parameter is an object with, at least, three methods.
+O primeiro parâmetro deve ser o mesmo slug que você definiu ao registrar o seu tipo de camada no lado PHP, e o segundo parâmetro é um objeto com, pelo menos, três métodos.
 
 ```js
 window.JeoLayerTypes.registerLayerType('tilelayer', {
@@ -61,27 +55,27 @@ window.JeoLayerTypes.registerLayerType('tilelayer', {
 });
 ```
 
-Your Layer Type object MUST implement at least these three methods.
+O seu objeto de tipo de camada DEVE implementar pelo menos esses três métodos.
 
 ### getSchema(attributes)
 
-**params**:
+**parâmetros**:
 
-- `attributes` - object with the layer attributes (see the section below)
+- `attributes` - objeto com os atributos da camada (veja a seção abaixo)
 
-**returns**:
+**retorna**:
 
-- Promise with json-schema
+- Promise com um json-schema
 
-This method will tell JEO which are the options the user has to fill in when creating a new layer of this type.
+Este método informará ao JEO quais são as opções que o usuário deve preencher ao criar uma nova camada deste tipo.
 
-For example, a raster tile layer-type might have only a URL. A Mapbox layer has the Style ID and the optional Access token.
+Por exemplo, um tipo de camada de tiles raster pode ter apenas uma URL. Uma camada Mapbox tem o Style ID e o Access token opcional.
 
-This method must return a Promise with a json-schema representation of the layer type options.
+Este método deve retornar uma Promise com uma representação em json-schema das opções do tipo de camada.
 
-This schema must only include layer-type specific information. Every layer, despite its type, has a set of common attributes, such as ID and Name.
+Este schema deve incluir apenas informações específicas do tipo de camada. Toda camada, independentemente do seu tipo, tem um conjunto de atributos comuns, como ID e Nome.
 
-For example, the "Tile layer" layer type needs only a URL, so that's how its `getSchema` method will look like.
+Por exemplo, o tipo de camada "Tile layer" precisa apenas de uma URL, então é assim que o seu método `getSchema` ficará:
 
 ```js
     // ...
@@ -108,20 +102,20 @@ For example, the "Tile layer" layer type needs only a URL, so that's how its `ge
 
 ## addStyle(map, attributes)
 
-**params**:
+**parâmetros**:
 
-- `map` - the initialized MapLibre GL [Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/) or Mapbox GL [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object, depending on the configured map runtime
-- `attributes` - object with the layer attributes (See Layer attributes section below)
+- `map` - o objeto [Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/) do MapLibre GL ou [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) do Mapbox GL já inicializado, dependendo do runtime de mapa configurado
+- `attributes` - objeto com os atributos da camada (veja a seção Atributos da camada abaixo)
 
-**returns**:
+**retorna**:
 
-- The return of a call to [`map.setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle)
+- O retorno de uma chamada a [`map.setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle)
 
-Both runtimes use the [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/) as a base layer. This method will add the layer as the Map Style, using the [`setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) method of the `Map` object.
+Ambos os runtimes usam a [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/) como camada base. Este método adicionará a camada como o estilo do mapa, usando o método [`setStyle`](https://docs.mapbox.com/mapbox-gl-js/api/#map#setstyle) do objeto `Map`.
 
-This method will be invoked when a layer of this type is added to the map as the base layer.
+Este método será invocado quando uma camada deste tipo for adicionada ao mapa como camada base.
 
-For example, the "Tile Layer" layer type sets the style as a raster layer:
+Por exemplo, o tipo de camada "Tile Layer" define o estilo como uma camada raster:
 
 ```js
     // ...
@@ -145,24 +139,24 @@ For example, the "Tile Layer" layer type sets the style as a raster layer:
     }
 ```
 
-**Note**: The `attributes.layer_type_options` object holds all the properties declared in the `getSchema` method. That's why there is a `url` there! (See Layer attributes section below)
+**Observação**: O objeto `attributes.layer_type_options` contém todas as propriedades declaradas no método `getSchema`. É por isso que há um `url` ali! (Veja a seção Atributos da camada abaixo)
 
 ## addLayer(map, attributes)
 
-**params**:
+**parâmetros**:
 
-- `map` - the initialized MapLibre GL [Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/) or Mapbox GL [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) object, depending on the configured map runtime
-- `attributes` - object with the layer attributes (See Layer attributes section below)
+- `map` - o objeto [Map](https://maplibre.org/maplibre-gl-js/docs/API/classes/Map/) do MapLibre GL ou [Map](https://docs.mapbox.com/mapbox-gl-js/api/#map) do Mapbox GL já inicializado, dependendo do runtime de mapa configurado
+- `attributes` - objeto com os atributos da camada (veja a seção Atributos da camada abaixo)
 
-**returns**:
+**retorna**:
 
-- The return of a call to [`map.addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer)
+- O retorno de uma chamada a [`map.addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer)
 
-This method will add the layer to the map using the [`addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer) method of the `Map` object.
+Este método adicionará a camada ao mapa usando o método [`addLayer`](https://docs.mapbox.com/mapbox-gl-js/api/#map#addlayer) do objeto `Map`.
 
-This method will be invoked when a layer of this type is added to the map.
+Este método será invocado quando uma camada deste tipo for adicionada ao mapa.
 
-For example, the "Tile Layer" layer type adds itself as a raster layer:
+Por exemplo, o tipo de camada "Tile Layer" adiciona a si mesmo como uma camada raster:
 
 ```js
     // ...
@@ -187,17 +181,17 @@ For example, the "Tile Layer" layer type adds itself as a raster layer:
 
 ```
 
-**Note:** This method must verify the value of `attributes.visible` to determine whether this layer should be visible when the map is initialized.
+**Observação:** Este método deve verificar o valor de `attributes.visible` para determinar se esta camada deve estar visível quando o mapa for inicializado.
 
-## Layer attributes
+## Atributos da camada
 
-As you saw, each of the above methods gets an argument `attributes` as input. This argument holds all the information of the layer the user is editing or viewing.
+Como você viu, cada um dos métodos acima recebe um argumento `attributes` como entrada. Este argumento contém todas as informações da camada que o usuário está editando ou visualizando.
 
-Some attributes are common to any layer types, and others that are specific to a layer type. Every layer type-specific attribute a layer has is stored under the `layer_type_options` attributes.
+Alguns atributos são comuns a qualquer tipo de camada e outros são específicos de um tipo de camada. Todo atributo específico de um tipo de camada que uma camada tenha é armazenado sob o atributo `layer_type_options`.
 
-So these are the keys available in the `attributes` object:
+Então estas são as chaves disponíveis no objeto `attributes`:
 
-- `layer_id`: (integer) A unique ID that represents this layer and identify it in the database
-- `layer_name`: (string) The layer name, given by the user
-- `visible`: (boolean) A flag indicating whether this layer should be visible when the map initializes
-- `layer_type_options`: (object) A object with all the layer type-specific attributes (those registered in the `getSchema` method)
+- `layer_id`: (integer) Um ID único que representa esta camada e a identifica no banco de dados
+- `layer_name`: (string) O nome da camada, dado pelo usuário
+- `visible`: (boolean) Uma flag que indica se esta camada deve estar visível quando o mapa for inicializado
+- `layer_type_options`: (object) Um objeto com todos os atributos específicos do tipo de camada (aqueles registrados no método `getSchema`)

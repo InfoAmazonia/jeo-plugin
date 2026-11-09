@@ -1,49 +1,43 @@
----
-untranslated: true
----
+# Compatibilidade com PHP
 
-<TranslationPendingPT />
+Este repositório mantém duas camadas de validação de compatibilidade com PHP:
 
-# PHP Compatibility
+- Verificações estáticas de compatibilidade para PHP `8.0` até `8.5`.
+- Testes de smoke do WordPress para as combinações de PHP e WordPress que atualmente oferecemos suporte ou monitoramos.
 
-This repository keeps two layers of PHP compatibility validation:
+## Resumo da política
 
-- Static compatibility checks for PHP `8.0` through `8.5`.
-- WordPress smoke tests for the PHP and WordPress combinations we currently support or monitor.
+Validado em 21 de maio de 2026.
 
-## Policy snapshot
+- Suporte principal: PHP `8.2`, `8.3` e `8.4`.
+- Monitoramento experimental: PHP `8.5`.
+- Gate estável do WordPress: `WordPress 7.0` em PHP `8.2`, `8.3` e `8.4`.
+- Gate experimental do WordPress: `WordPress 7.0` em PHP `8.5`.
+- Cobertura de compatibilidade retroativa: `WordPress 6.6` em PHP `8.0` e `8.1`.
 
-Validated on May 21, 2026.
+## Automação
 
-- Primary support: PHP `8.2`, `8.3`, and `8.4`.
-- Experimental monitoring: PHP `8.5`.
-- Stable WordPress gate: `WordPress 7.0` on PHP `8.2`, `8.3`, and `8.4`.
-- Experimental WordPress gate: `WordPress 7.0` on PHP `8.5`.
-- Backward-compatibility coverage: `WordPress 6.6` on PHP `8.0` and `8.1`.
+- Verificações estáticas: `.github/workflows/php-compat.yml`
+- Testes de smoke do WordPress: `.github/workflows/wordpress-smoke.yml`
 
-## Automation
+## Como o PHP 8.5 é coberto
 
-- Static checks: `.github/workflows/php-compat.yml`
-- WordPress smoke tests: `.github/workflows/wordpress-smoke.yml`
+- O `phpcs-compat.xml.dist` executa o PHPCompatibilityWP contra o código-fonte do plugin com `testVersion` definido como PHP `8.0-8.5`.
+- O `.github/workflows/php-compat.yml` executa esse ruleset do PHPCompatibilityWP como gate estático de compatibilidade com PHP do repositório.
+- O `.github/workflows/wordpress-smoke.yml` inclui um job experimental de smoke em PHP `8.5` para o `WordPress 7.0`.
+- O `scripts/wordpress-smoke.sh` respeita o `WP_CLI_PHP`, de modo que o mesmo smoke de runtime pode ser executado localmente contra o PHP `8.5`.
+- O suporte estável do `wp-cli` ao PHP `8.5` ainda está planejado upstream. Essa incompatibilidade é o motivo pelo qual o PHP `8.5` continua experimental na política de CI deste repositório.
 
-## How PHP 8.5 is covered
+## Comandos locais
 
-- `phpcs-compat.xml.dist` runs PHPCompatibilityWP against the plugin source with `testVersion` set to PHP `8.0-8.5`.
-- `.github/workflows/php-compat.yml` runs that PHPCompatibilityWP ruleset as the repository's static PHP compatibility gate.
-- `.github/workflows/wordpress-smoke.yml` includes one experimental PHP `8.5` smoke job for `WordPress 7.0`.
-- `scripts/wordpress-smoke.sh` honors `WP_CLI_PHP`, so the same runtime smoke can be executed against PHP `8.5` locally.
-- Stable `wp-cli` support for PHP `8.5` is still planned upstream. That mismatch is why PHP `8.5` remains experimental in this repository's CI policy.
-
-## Local commands
-
-Run the static PHP compatibility checks locally:
+Execute as verificações estáticas de compatibilidade com PHP localmente:
 
 ```bash
 composer install --no-interaction --no-progress --prefer-dist
 vendor/bin/phpcs --standard=phpcs-compat.xml.dist
 ```
 
-Run the WordPress smoke test locally with an explicit PHP runtime:
+Execute o teste de smoke do WordPress localmente com um runtime de PHP explícito:
 
 ```bash
 WP_CLI_PHP=/opt/homebrew/opt/php@8.4/bin/php \
@@ -55,11 +49,11 @@ WP_VERSION=7.0 \
 bash scripts/wordpress-smoke.sh
 ```
 
-The smoke script now honors `WP_CLI_PHP` directly, which avoids Homebrew `wp` defaulting to the active `php` binary in `PATH`.
-The repository itself is currently clean under PHP `8.5`, but `wp-cli` 2.12.0 still emits third-party deprecation noise there, so PHP `8.5` remains an experimental runtime line.
+O script de smoke agora respeita o `WP_CLI_PHP` diretamente, o que evita que o `wp` do Homebrew use por padrão o binário `php` ativo no `PATH`.
+O repositório em si está atualmente limpo no PHP `8.5`, mas o `wp-cli` 2.12.0 ainda emite ruído de deprecações de terceiros nesse runtime, então o PHP `8.5` continua sendo uma linha de runtime experimental.
 
-## Current status
+## Status atual
 
-- PHPCompatibilityWP static checks are green for PHP `8.0` through `8.5`.
-- Local WordPress smoke on PHP `8.5` passes, but still logs third-party deprecations from `wp-cli` and its bundled libraries.
-- Keep PHP `8.5` experimental in CI until those third-party logs stop obscuring runtime signal.
+- As verificações estáticas do PHPCompatibilityWP estão verdes para PHP `8.0` até `8.5`.
+- O smoke local do WordPress no PHP `8.5` passa, mas ainda registra deprecações de terceiros do `wp-cli` e das bibliotecas empacotadas nele.
+- Mantenha o PHP `8.5` experimental no CI até que esses logs de terceiros parem de obscurecer o sinal de runtime.

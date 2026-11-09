@@ -1,95 +1,89 @@
----
-untranslated: true
----
+# Histórias próximas a você
 
-<TranslationPendingPT />
+O bloco **Histórias próximas a você** (`jeo/stories-near-you`) exibe os posts geolocalizados mais próximos da localização atual do leitor. Ele usa a API de geolocalização do navegador (com consentimento explícito do usuário) para encontrar histórias próximas e as apresenta em um layout de cards personalizável.
 
-# Stories Near You
+![Bloco Histórias próximas a você](../img/stories-near-you-block.png)
 
-The **Stories Near You** block (`jeo/stories-near-you`) displays geolocated posts that are closest to the reader's current location. It uses the browser's geolocation API (with explicit user consent) to find nearby stories and presents them in a customizable card layout.
+## Inserindo o bloco
 
-![Stories Near You block](../img/stories-near-you-block.png)
+1. No editor Gutenberg, clique no botão **+** para adicionar um novo bloco.
+2. Pesquise por **Histórias próximas a você** e selecione-o.
+3. Configure as opções do bloco nos painéis do inspetor.
 
-## Inserting the block
+## Como funciona
 
-1. In the Gutenberg editor, click the **+** button to add a new block.
-2. Search for **Stories Near You** and select it.
-3. Configure the block settings in the Inspector panels.
+Quando um visitante carrega uma página com este bloco:
 
-## How it works
+1. O bloco mostra um **pedido de consentimento**: "Use my location" (usar minha localização) ou "Skip" (pular).
+2. Se o usuário consentir, o navegador obtém as coordenadas (arredondadas por privacidade de acordo com a configuração de **precisão da geolocalização**).
+3. Se o usuário pular, o bloco recorre ao centro padrão do mapa configurado nas Configurações do JEO.
+4. O bloco consulta o banco de dados do WordPress pelos posts geolocalizados mais próximos usando distância geográfica (`ST_Distance_Sphere`).
+5. Os posts são renderizados como cards no layout escolhido.
 
-When a visitor loads a page with this block:
+### Precisão da geolocalização
 
-1. The block shows a **consent prompt**: "Use my location" or "Skip".
-2. If the user consents, the browser obtains their coordinates (rounded for privacy based on the **geolocation precision** setting).
-3. If the user skips, the block falls back to the default map center configured in JEO Settings.
-4. The block queries the WordPress database for the closest geolocated posts using geographic distance (`ST_Distance_Sphere`).
-5. Posts are rendered as cards in the chosen layout.
+A configuração **Precisão da localização do usuário** (em JEO → Configurações → Geral) controla quantas casas decimais são mantidas da geolocalização do navegador. Intervalo: 1–5, padrão: 2. Valores menores significam menos precisão, mas mais privacidade.
 
-### Geolocation precision
+![Configurações de Histórias próximas a você](../img/stories-near-you-settings.png)
 
-The **User location precision** setting (in JEO → Settings → General) controls how many decimal places are kept from the browser geolocation. Range: 1–5, default: 2. Lower values mean less precision but more privacy.
+## Configurações do bloco
 
-![Stories Near You settings](../img/stories-near-you-settings.png)
+Os painéis do inspetor oferecem ampla personalização:
 
-## Block settings
+### Card de post
 
-The Inspector panels provide extensive customization:
+- **Layout**: Grade ou Lista.
+- **Posição da mídia**: Topo, Esquerda, Direita ou Atrás (a imagem é posicionada atrás do texto).
+- **Formato da imagem**: Paisagem, Retrato, Quadrado ou Sem recorte.
+- **Colunas**: número de colunas no layout em grade (1–6).
 
-### Post Card
+### Configurações de consulta
 
-- **Layout**: Grid or List.
-- **Media position**: Top, Left, Right, or Behind (the image is placed behind the text).
-- **Image shape**: Landscape, Portrait, Square, or Uncropped.
-- **Columns**: Number of columns in grid layout (1–6).
+- **Posts por página**: total de posts a exibir (máx. 36).
+- **Tipo de post**: filtrar por tipo de post (exibido apenas se existirem vários tipos com geolocalização habilitada).
 
-### Query Settings
+### Filtros
 
-- **Posts per page**: Total posts to display (max 36).
-- **Post type**: Filter by post type (only shown if multiple geo-enabled types exist).
+- **Categorias**: incluir categorias específicas.
+- **Tags**: incluir tags específicas.
+- **Exclusão de categorias**: excluir categorias específicas.
+- **Exclusão de tags**: excluir tags específicas.
+- **Taxonomias personalizadas**: filtrar por termos de taxonomias personalizadas.
 
-### Filters
+### Exibição
 
-- **Categories**: Include specific categories.
-- **Tags**: Include specific tags.
-- **Category exclusions**: Exclude specific categories.
-- **Tag exclusions**: Exclude specific tags.
-- **Custom taxonomies**: Filter by custom taxonomy terms.
+- **Miniatura**: mostrar/ocultar a imagem destacada.
+- **Categoria**: mostrar/ocultar o selo de categoria.
+- **Data**: mostrar/ocultar a data de publicação.
+- **Resumo**: mostrar/ocultar o resumo (com contagem de palavras configurável).
+- **Autor**: mostrar/ocultar o nome do autor.
+- **Avatar do autor**: mostrar/ocultar a foto do autor (requer Autor habilitado).
+- **Ler mais**: mostrar/ocultar o link "Ler mais" (com rótulo personalizado).
 
-### Display
+### Tipografia e espaçamento
 
-- **Thumbnail**: Show/hide featured image.
-- **Category**: Show/hide category badge.
-- **Date**: Show/hide publication date.
-- **Excerpt**: Show/hide excerpt (with configurable word count).
-- **Author**: Show/hide author name.
-- **Author avatar**: Show/hide author photo (requires Author enabled).
-- **Read more**: Show/hide "Read more" link (with custom label).
+- **Escala tipográfica**: escala do tamanho da fonte (1–10).
+- **Escala da imagem**: largura da imagem em layouts horizontais (1–4).
+- **Espaço entre colunas**: espaçamento entre colunas (pequeno, médio, grande).
+- **Altura mínima**: altura mínima para o layout "Atrás".
 
-### Typography & Spacing
+### Cores
 
-- **Type scale**: Font size scale (1–10).
-- **Image scale**: Image width in horizontal layouts (1–4).
-- **Column gap**: Spacing between columns (small, medium, large).
-- **Min height**: Minimum height for "Behind" layout.
+As cores do texto e dos links usam as configurações nativas de cor do Gutenberg (não há um painel separado).
 
-### Colors
+![Bloco Histórias próximas a você](../img/stories-near-you-block2.png)
 
-Text and link colors use the native Gutenberg color settings (not a separate panel).
+## Deduplicação entre blocos
 
-![Stories Near You block](../img/stories-near-you-block2.png)
+Quando vários blocos Histórias próximas a você estão na mesma página, os posts **nunca se repetem** entre os blocos. O primeiro bloco mostra os posts mais próximos, o segundo mostra os próximos mais próximos (excluindo os posts do primeiro bloco) e assim por diante.
 
-## Cross-block deduplication
+Isso funciona tanto na prévia do editor quanto no frontend.
 
-When multiple Stories Near You blocks are on the same page, posts are **never repeated** across blocks. The first block shows the closest posts, the second block shows the next closest (excluding the first block's posts), and so on.
+## Compatibilidade com o Newspack
 
-This works both in the editor preview and on the frontend.
+Se o plugin [Newspack Blocks](https://newspack.pub/) estiver ativo, o bloco usa automaticamente os templates e estilos de card do Newspack para uma integração visual perfeita com o seu tema Newspack.
 
-## Newspack compatibility
+## Requisitos
 
-If the [Newspack Blocks](https://newspack.pub/) plugin is active, the block automatically uses Newspack's card templates and styles for a seamless visual integration with your Newspack theme.
-
-## Requirements
-
-- Posts must be geolocated (have `_related_point` meta data). See [Geolocating posts](geolocating-posts.md).
-- The JEO default map center must be configured in **Jeo → Settings** (used as fallback when the user does not share their location).
+- Os posts devem estar geolocalizados (ter o metadado `_related_point`). Consulte [Geolocalização de posts](geolocating-posts.md).
+- O centro padrão do mapa do JEO deve estar configurado em **Jeo → Configurações** (usado como fallback quando o usuário não compartilha sua localização).

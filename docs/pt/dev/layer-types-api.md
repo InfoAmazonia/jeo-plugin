@@ -1,46 +1,40 @@
----
-untranslated: true
----
+# Fontes e camadas do Mapbox e o JEO
+Como as configurações de fontes e camadas funcionam com a Mapbox Style Specification e como o JEO lida com elas
 
-<TranslationPendingPT />
+> **Runtime de mapa**: O JEO oferece suporte a dois runtimes de renderização de mapa — [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/API/) (padrão) e [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/api/). Ambos compartilham a mesma [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/) para definir fontes, camadas e estilos. Os exemplos abaixo usam a terminologia da API do Mapbox, mas se aplicam igualmente ao MapLibre GL. O runtime ativo é configurado em **Jeo → Configurações → Runtime de mapa**.
 
-# Mapbox Sources, Layers and JEO
-How sources and layers settings work with the Mapbox Style Specification and how JEO deals with them
+## [Índice](#índice)
+- [Fontes e camadas do Mapbox e o JEO](#fontes-e-camadas-do-mapbox-e-o-jeo)
+  - [Índice](#índice)
+  - [Introdução](#introdução)
+  - [Estilos do Mapbox](#estilos-do-mapbox)
+  - [Camadas do Mapbox](#camadas-do-mapbox)
+    - [Tipos e fontes de uma camada](#tipos-e-fontes-de-uma-camada)
+  - [Fontes do Mapbox](#fontes-do-mapbox)
+    - [Sobre o atributo `sourceLayer` de um componente Source](#sobre-o-atributo-sourcelayer-de-um-componente-source)
 
-> **Map runtime**: JEO supports two map rendering runtimes — [MapLibre GL JS](https://maplibre.org/maplibre-gl-js/docs/API/) (default) and [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js/api/). Both share the same [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec/) for defining sources, layers, and styles. The examples below use Mapbox API terminology, but they apply equally to MapLibre GL. The active runtime is configured in **Jeo → Settings → Map Runtime**.
+## [Introdução](#introdução)
 
-## [Table of Contents](#table-of-contents)
-- [Mapbox Sources, Layers and JEO](#mapbox-sources-layers-and-jeo)
-  - [Table of Contents](#table-of-contents)
-  - [Introduction](#introduction)
-  - [Mapbox Styles](#mapbox-styles)
-  - [Mapbox Layers](#mapbox-layers)
-    - [Types and Sources of a Layer](#types-and-sources-of-a-layer)
-  - [Mapbox Sources](#mapbox-sources)
-    - [On `sourceLayer` attribute of a Source component](#on-sourcelayer-attribute-of-a-source-component)
+Este documento descreve como interagir com a Mapbox Style Specification conforme usada pelo MapLibre GL JS e pelo Mapbox GL JS no JEO. Ele resume conceitos-chave das documentações dessas bibliotecas e fornece exemplos de como o JEO os utiliza.
 
-## [Introduction](#introduction)
+## [Estilos do Mapbox](#estilos-do-mapbox)
 
-This document describes how to interact with the Mapbox Style Specification as used by both MapLibre GL JS and Mapbox GL JS in JEO. It summarizes key concepts from their docs and provides examples of how JEO uses them.
+O serviço Mapbox Maps é composto por diversas APIs, e cada tipo de camada tem particularidades que você precisa conhecer.
 
-## [Mapbox Styles](#mapbox-styles)
+De acordo com a documentação do Mapbox, um estilo consiste em um conjunto de propriedades raiz. Algumas, como version, name e metadata, não influenciam a aparência ou o comportamento do seu mapa. Outras, como layers e sources, determinam os recursos do nosso mapa e a aparência deles.
 
-The Mapbox Maps service is composed of several APIs and every type of layer has some particularities to be aware of.
+Estas são as particularidades discutidas abaixo.
 
-According to the Mapbox docs, a style consists of a set of root properties. Some, like version, name and metadata, do not influence the appearance or behavior of your map. Others, like layers and sources, determine our map features and what they will look like.
+Mais em [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec//).
 
-These are the particularities discussed below.
+## [Camadas do Mapbox](#camadas-do-mapbox)
+A propriedade layers de um estilo lista todas as camadas disponíveis naquele estilo.
 
-More at [Mapbox Style Specification](https://docs.mapbox.com/mapbox-gl-js/style-spec//).
+### [Tipos e fontes de uma camada](#tipos-e-fontes-de-uma-camada)
 
-## [Mapbox Layers](#mapbox-layers)
-A style's layers property lists all the layers available in that style.
+O tipo da camada é especificado pela propriedade "type" e deve ser um de:
 
-### [Types and Sources of a Layer](#types-and-sources-of-a-layer)
-
-The type of layer is specified by the "type" property and must be one of:
-
-For type `vector`:
+Para o tipo `vector`:
 -  background;
 -  fill;
 -  line;
@@ -50,16 +44,16 @@ For type `vector`:
 -  heatmap;
 -  hillshade.
 
-For type `raster`:
+Para o tipo `raster`:
 -  raster;
 
-**Except for layers of the `background` type, each layer needs to refer to a source.**
+**Exceto pelas camadas do tipo `background`, cada camada precisa fazer referência a uma fonte.**
 
-The `source` of a layer is the name of a source description to be user for this layer.
+O `source` de uma camada é o nome de uma descrição de fonte a ser usada para esta camada.
 
-* **JSON settings**
+* **Configurações JSON**
 
-Your settings of a layer should be something like:
+As suas configurações de uma camada devem ser algo como:
 
 ```json
 "layers": [{
@@ -73,13 +67,13 @@ Your settings of a layer should be something like:
 }]
 ```
 
-More at [MapLibre GL Layer docs](https://maplibre.org/maplibre-gl-js/docs/API/classes/Layer/) and [Mapbox Spec Layers](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/).
+Mais em [documentação de Layer do MapLibre GL](https://maplibre.org/maplibre-gl-js/docs/API/classes/Layer/) e [Mapbox Spec Layers](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/).
 
 * **React Map GL**
 
-JEO re-exports `Map`, `Source` and `Layer` from `react-map-gl/maplibre` via the `src/js/src/lib/mapgl-react.js` facade. Always import from `'../lib/mapgl-react'` — never import `react-map-gl` directly, so the plugin can swap the underlying runtime without touching consumer code.
+O JEO reexporta `Map`, `Source` e `Layer` de `react-map-gl/maplibre` através da fachada `src/js/src/lib/mapgl-react.js`. Sempre importe de `'../lib/mapgl-react'` — nunca importe `react-map-gl` diretamente, para que o plugin possa trocar o runtime subjacente sem alterar o código dos consumidores.
 
-Using `react-map-gl/maplibre`, we can set a `<Layer>` component as a child of the `<Map>`:
+Usando `react-map-gl/maplibre`, podemos definir um componente `<Layer>` como filho do `<Map>`:
 
 ```js
 import { Layer, Source } from '../lib/mapgl-react';
@@ -95,11 +89,11 @@ import { Layer, Source } from '../lib/mapgl-react';
 </Source>
 ```
 
-More at [react-map-gl Layer docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/layer).
+Mais em [documentação de Layer do react-map-gl](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/layer).
 
-## [Mapbox Sources](#mapbox-sources)
+## [Fontes do Mapbox](#fontes-do-mapbox)
 
-Sources state which data the map should display. Specify the type of source with the `type` property, which must be one of:
+As fontes indicam quais dados o mapa deve exibir. Especifique o tipo de fonte com a propriedade `type`, que deve ser uma de:
 
 - vector;
 - raster;
@@ -108,19 +102,19 @@ Sources state which data the map should display. Specify the type of source with
 - image;
 - video.
 
-**Please note that a `Layer` can have a `type` and a `source`. And a `Source` is not the same as the `layer source` and this `Source` has a `type`.**
+**Observe que uma `Layer` pode ter um `type` e um `source`. E uma `Source` não é a mesma coisa que o `layer source`, e essa `Source` tem um `type`.**
 
-Adding a *source isn't enough to make data appear on the map* because **sources don't contain styling** details like color or width.
+Adicionar uma *source não é suficiente para fazer os dados aparecerem no mapa* porque **as sources não contêm detalhes de estilização** como cor ou largura.
 
-**Tiled sources, vector and raster, must specify their details according to the TileJSON specification**.
+**Sources de tiles, vetoriais e raster, devem especificar os seus detalhes de acordo com a especificação TileJSON**.
 
-At JEO plugin you can supply those infos as `tiles` or as `url`.
+No plugin JEO você pode fornecer essas informações como `tiles` ou como `url`.
 
-Note that the following examples are based on a `vector` source type.
+Note que os exemplos a seguir são baseados em um tipo de source `vector`.
 
-* **JSON settings**
+* **Configurações JSON**
 
-Your settings of a source should be something like:
+As suas configurações de uma source devem ser algo como:
 
 -  `tiles`:
 
@@ -144,11 +138,11 @@ Your settings of a source should be something like:
 }
 ```
 
-More at [react-map-gl Source docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
+Mais em [documentação de Source do react-map-gl](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
 
 * **React Map GL**
 
-Using `react-map-gl/maplibre`, `<Source>` and `<Layer>` are rendered as children of the `<Map>`:
+Usando `react-map-gl/maplibre`, `<Source>` e `<Layer>` são renderizados como filhos do `<Map>`:
 
 - `tiles`:
 
@@ -188,7 +182,7 @@ const SOURCE_OPTIONS = {
 </Source>
 ```
 
-For a `raster` source, we can define like this:
+Para uma source `raster`, podemos definir assim:
 
 ```js
 import { Source, Layer } from '../lib/mapgl-react';
@@ -208,13 +202,13 @@ const RASTER_SOURCE_OPTIONS = {
 </Source>
 ```
 
-More about how to configure a Source component at [react-map-gl Source docs](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
+Mais sobre como configurar um componente Source em [documentação de Source do react-map-gl](https://visgl.github.io/react-map-gl/docs/api-reference/maplibre/source).
 
-### [On `sourceLayer` attribute of a Source component](#on-sourcelayer-attribute-of-a-source-component)
+### [Sobre o atributo `sourceLayer` de um componente Source](#sobre-o-atributo-sourcelayer-de-um-componente-source)
 
-If your `Layer` is of the `vector` type, your `sourceLayer` will indicate an *individual layer of data* within your `vector source`. You can learn more info on where you can find the name of this property at Mapbox [source-layer glossary](https://docs.mapbox.com/help/glossary/source-layer/).
+Se a sua `Layer` é do tipo `vector`, o seu `sourceLayer` indicará uma *camada individual de dados* dentro da sua `vector source`. Você pode obter mais informações sobre onde encontrar o nome dessa propriedade no [glossário source-layer do Mapbox](https://docs.mapbox.com/help/glossary/source-layer/).
 
-Otherwise, if your `Layer` have a `raster` type, this property **will be ignored**.
+Caso contrário, se a sua `Layer` for do tipo `raster`, esta propriedade **será ignorada**.
 
 ```jsx
 <Source

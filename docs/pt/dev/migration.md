@@ -1,16 +1,10 @@
----
-untranslated: true
----
+# Migração
 
-<TranslationPendingPT />
+Notas sobre mudanças na estrutura do banco de dados do JEO antigo que precisarão de migrações a serem escritas.
 
-# Migration
+## `post_meta` de geocodificação
 
-Notes on changes in DB structure from old JEO that will need to have migrations written.
-
-## Geocode `post_meta`
-
-On old JEO, some `meta_key`s are prefixed by an underscore (`_`) and others aren't:
+No JEO antigo, algumas `meta_key`s eram prefixadas por um underscore (`_`) e outras não:
 
 - `geocode_address`
 - `geocode_latitude`
@@ -19,4 +13,4 @@ On old JEO, some `meta_key`s are prefixed by an underscore (`_`) and others aren
 - `_geocode_country`
 - `geocode_viewport`
 
-Let's have them all with a underscore at the beginning.
+Vamos fazer com que todas tenham um underscore no início.

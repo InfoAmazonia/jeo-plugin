@@ -1,26 +1,20 @@
----
-untranslated: true
----
+# Shortcode de mapa
 
-<TranslationPendingPT />
+Um mapa pode ser inserido em qualquer página ou post usando o shortcode `jeo-map`.
 
-# Map shortcode
+O shortcode aceita três atributos:
 
-A map can be inserted on any page or post using the `jeo-map` shortcode.
+- `map_id` (obrigatório): o ID do mapa que você deseja inserir;
+- `width` (opcional): a largura do mapa. O padrão será 600px ou o que o tema ativo definir para a classe CSS 'div.jeomap';
+- `height` (opcional): a altura do mapa. O padrão será 600px ou o que o tema ativo definir para a classe CSS 'div.jeomap'.
 
-The shortcode accepts three attributes:
-
-- `map_id` (required): The ID of the map you want to insert;
-- `width` (optional): The width of the map. It'll default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class;
-- `height` (optional): The height of the map. Will default to 600px or whatever the active theme defines for the 'div.jeomap' CSS class.
-
-Examples:
+Exemplos:
 
 ```html
 [jeo-map map_id=99]
 ```
 
-You have to inform at least the ID of the Map you want to insert. By default, it will be inserted with a size of 600&times;600px (or whatever the active theme defines), but you can also change it:
+Você precisa informar pelo menos o ID do mapa que deseja inserir. Por padrão, ele será inserido com um tamanho de 600&times;600px (ou o que o tema ativo definir), mas você também pode alterá-lo:
 
 ```html
 [jeo-map map_id=99 width="800px" height="800px"]
