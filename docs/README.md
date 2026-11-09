@@ -1,6 +1,6 @@
 # JEO Documentation
 
-> See "Translations (pt-BR)" at the bottom for the bilingual workflow.
+> See "Translations (pt-BR, es)" at the bottom for the multilingual workflow.
 
 JEO acts as a geojournalism platform which allows news organizations, bloggers and NGOs to publish news stories as layers of information on digital maps. With JEO, creating the interaction between data layers and contextual information is much more intuitive and interactive.
 
@@ -67,19 +67,20 @@ JEO wants to help journalists and NGOs to improve storytelling with maps. Creati
 
 - [Migration](dev/migration.md)
 
-## Translations (pt-BR)
+## Translations (pt-BR, es)
 
-The site is bilingual: English at the root and pt-BR under `docs/pt/` (VitePress `locales` in `docs/.vitepress/config.mts`; the navbar language switcher appears automatically from the locale labels).
+The site is trilingual: English at the root, pt-BR under `docs/pt/`, and Spanish under `docs/es/` (VitePress `locales` in `docs/.vitepress/config.mts`; the navbar language switcher appears automatically from the locale labels). The site locale for Spanish is plain `es`.
 
 Workflow when changing a page:
 
 1. Edit the English page.
-2. Update `docs/pt/<same-path>.md` with the translation — or run `npm run docs:pt:sync`, which creates/refreshes an English copy flagged with the "not yet translated" banner (`<TranslationPendingPT />`, frontmatter `untranslated: true`) until someone translates it. The script never overwrites translated pages.
+2. Update `docs/pt/<same-path>.md` and `docs/es/<same-path>.md` with the translations — or run `npm run docs:pt:sync` / `npm run docs:es:sync`, which creates/refreshes English copies flagged with the "not yet translated" banner (`<TranslationPendingPT />` / `<TranslationPendingES />`, frontmatter `untranslated: true`) until someone translates them. The sync script (`scripts/docs-sync.mjs <locale> [--force]`) never overwrites translated pages.
 
-Rules for pt pages:
+Rules:
 
+- Translated navs/sidebars mirror the English sidebar exactly — a page not listed in the English sidebar must not appear in translated sidebars.
+- Terminology: pt-BR follows `src/languages/jeowp-pt_BR.po`; Spanish must use the exact `msgstr`s from `src/languages/jeowp-es_CO.po` — never derive Spanish terms from free English translation or from the pt-BR tree.
 - Images are referenced one `../` level up (`../img/`, `../../img/` from `dev/`).
-- Relative `.md` links stay unchanged — they resolve to the pt sibling pages.
+- Relative `.md` links stay unchanged — they resolve to the locale sibling pages.
 - Intra-page anchors are re-slugged to the translated headings (github-slugger style: lowercase, hyphens, accents kept).
 - Code blocks, hooks, REST routes, file paths, and identifiers are never translated.
-- UI terminology follows `src/languages/jeowp-pt_BR.po` plus the docs glossary (Minimapa, Mapa Narrativo, "Discovery" kept as-is, "mapa de uso único").
