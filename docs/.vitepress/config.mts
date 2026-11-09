@@ -210,6 +210,105 @@ export default defineConfig({
         ],
       },
     },
+
+    es: {
+      label: 'Español',
+      lang: 'es',
+      description:
+        'Plataforma de geoperiodismo de código abierto para WordPress: publica historias periodísticas como capas de información en mapas interactivos.',
+      themeConfig: {
+        nav: [
+          { text: 'Inicio', link: '/es/' },
+          {
+            text: 'Plugin',
+            items: [
+              { text: 'Descripción general', link: '/es/index-plugin/' },
+              { text: 'Conceptos', link: '/es/concepts/' },
+              { text: 'Primeros pasos', link: '/es/getting-started/' },
+              { text: 'Capas', link: '/es/layer-post/' },
+              { text: 'Mapas', link: '/es/map-post/' },
+              { text: 'Discovery', link: '/es/discovery/' },
+              { text: 'Mapa narrativo', link: '/es/story-map/' },
+              { text: 'Historias cerca de ti', link: '/es/stories-near-you/' },
+              { text: 'Minimapa', link: '/es/minimap/' },
+              { text: 'Shortcode de mapa', link: '/es/map-shortcode/' },
+              { text: 'Bloque de mapa', link: '/es/map-block/' },
+              { text: 'Bloque de mapa de un solo uso', link: '/es/one-time-map-block/' },
+              { text: 'Incrustación de mapa', link: '/es/map-embed/' },
+              { text: 'Geolocalización de entradas', link: '/es/geolocating-posts/' },
+            ],
+          },
+          {
+            text: 'IA',
+            items: [
+              { text: 'IA en JEO', link: '/es/ai-in-jeo/' },
+              { text: 'Configuraciones de IA', link: '/es/ai-settings/' },
+              { text: 'Asistente de contexto con IA', link: '/es/ai-context-assistant/' },
+              { text: 'Georreferenciación con IA', link: '/es/ai-georeferencing/' },
+              { text: 'Geolocalización masiva con IA', link: '/es/ai-bulk-geolocation/' },
+            ],
+          },
+          {
+            text: 'Desarrollador',
+            items: [
+              { text: 'Información geográfica', link: '/es/dev/geo-information/' },
+              { text: 'Geocodificadores', link: '/es/dev/geocoders/' },
+              { text: 'Tipos de capa', link: '/es/dev/layer-types/' },
+              { text: 'API de tipos de capa', link: '/es/dev/layer-types-api/' },
+              { text: 'Migración', link: '/es/dev/migration/' },
+              { text: 'Compatibilidad con PHP', link: '/es/dev/php-compatibility/' },
+              { text: 'Mantenimiento de dependencias', link: '/es/dev/dependency-maintenance/' },
+            ],
+          },
+          { text: 'Descargar', link: 'https://wordpress.org/plugins/jeowp/' },
+        ],
+
+        sidebar: [
+          { text: 'Inicio', link: '/es/' },
+          {
+            text: 'Plugin',
+            items: [
+              { text: 'Descripción general', link: '/es/index-plugin/' },
+              { text: 'Conceptos', link: '/es/concepts/' },
+              { text: 'Primeros pasos', link: '/es/getting-started/' },
+              { text: 'Capas', link: '/es/layer-post/' },
+              { text: 'Mapas', link: '/es/map-post/' },
+              { text: 'Discovery', link: '/es/discovery/' },
+              { text: 'Mapa narrativo', link: '/es/story-map/' },
+              { text: 'Historias cerca de ti', link: '/es/stories-near-you/' },
+              { text: 'Minimapa', link: '/es/minimap/' },
+              { text: 'Shortcode de mapa', link: '/es/map-shortcode/' },
+              { text: 'Bloque de mapa', link: '/es/map-block/' },
+              { text: 'Bloque de mapa de un solo uso', link: '/es/one-time-map-block/' },
+              { text: 'Incrustación de mapa', link: '/es/map-embed/' },
+              { text: 'Geolocalización de entradas', link: '/es/geolocating-posts/' },
+            ],
+          },
+          {
+            text: 'IA',
+            items: [
+              { text: 'IA en JEO', link: '/es/ai-in-jeo/' },
+              { text: 'Configuraciones de IA', link: '/es/ai-settings/' },
+              { text: 'Asistente de contexto con IA', link: '/es/ai-context-assistant/' },
+              { text: 'Georreferenciación con IA', link: '/es/ai-georeferencing/' },
+              { text: 'Geolocalización masiva con IA', link: '/es/ai-bulk-geolocation/' },
+            ],
+          },
+          {
+            text: 'Desarrollador',
+            items: [
+              { text: 'Información geográfica', link: '/es/dev/geo-information/' },
+              { text: 'Geocodificadores', link: '/es/dev/geocoders/' },
+              { text: 'Tipos de capa', link: '/es/dev/layer-types/' },
+              { text: 'API de tipos de capa', link: '/es/dev/layer-types-api/' },
+              { text: 'Migración', link: '/es/dev/migration/' },
+              { text: 'Compatibilidad con PHP', link: '/es/dev/php-compatibility/' },
+              { text: 'Mantenimiento de dependencias', link: '/es/dev/dependency-maintenance/' },
+            ],
+          },
+        ],
+      },
+    },
   },
 
   // Site is served under jeowp.org/docs/
@@ -260,6 +359,26 @@ export default defineConfig({
                   selectText: 'para selecionar',
                   navigateKeyBuffer: 'para navegar',
                   closeKeyBuffer: 'para fechar',
+                },
+              },
+            },
+          },
+
+          es: {
+            translations: {
+              button: {
+                buttonText: 'Buscar',
+                buttonAriaLabel: 'Buscar en la documentación',
+              },
+              modal: {
+                displayDetails: 'Mostrar lista detallada',
+                resetButtonTitle: 'Restablecer búsqueda',
+                backButtonTitle: 'Cerrar búsqueda',
+                noResultsText: 'Sin resultados para',
+                footer: {
+                  selectText: 'para seleccionar',
+                  navigateKeyBuffer: 'para navegar',
+                  closeKeyBuffer: 'para cerrar',
                 },
               },
             },

@@ -1,27 +1,44 @@
 #!/usr/bin/env node
 /**
- * Syncs the pt-BR docs tree (docs/pt/) from the English source.
+ * Syncs a translated docs tree (docs/<locale>/) from the English source.
  *
- * - Creates a pending pt copy (English content + banner) for every English
- *   page that has no pt counterpart yet.
+ * - Creates a pending copy (English content + locale banner) for every
+ *   English page that has no counterpart in the target locale yet.
  * - With --force, refreshes copies that are still marked untranslated
  *   (frontmatter `untranslated: true`) from the current English source.
  * - Never touches translated pages: translating a page means removing the
  *   flag and the banner, after which the script leaves it alone.
  *
- * Usage: node scripts/docs-pt-sync.mjs [--force]
+ * Usage: node scripts/docs-sync.mjs <locale> [--force]
+ * Example: npm run docs:pt:sync   (pt → docs/pt/, <TranslationPendingPT />)
  */
 import { readdirSync, readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs'
 import { join, dirname } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+// Locale key → banner component registered in docs/.vitepress/theme/index.ts
+const LOCALES = {
+  pt: 'TranslationPendingPT',
+  es: 'TranslationPendingES',
+}
+
 const root = fileURLToPath(new URL('..', import.meta.url))
 const docsDir = join(root, 'docs')
-const ptDir = join(docsDir, 'pt')
-const force = process.argv.includes('--force')
 
-const SKIP_DIRS = new Set(['.vitepress', 'node_modules', 'public', 'img', 'pt'])
-const BANNER = '<TranslationPendingPT />'
+const [locale, ...flags] = process.argv.slice(2)
+const banner = LOCALES[locale]
+if (!banner) {
+  console.error(
+    `Unknown or missing locale "${locale || ''}". Usage: node scripts/docs-sync.mjs <${Object.keys(LOCALES).join('|')}> [--force]`,
+  )
+  process.exit(1)
+}
+const force = flags.includes('--force')
+
+const targetDir = join(docsDir, locale)
+// Locale trees are mirrors, never sources for one another.
+const SKIP_DIRS = new Set(['.vitepress', 'node_modules', 'public', 'img', ...Object.keys(LOCALES)])
+const BANNER = `<${banner} />`
 
 function listPages(dir, prefix = '') {
   const pages = []
@@ -37,10 +54,10 @@ function listPages(dir, prefix = '') {
 }
 
 /**
- * Adjusts an English page body for its pt mirror: images live in docs/img,
- * which is one extra `../` level away from docs/pt (at any depth).
+ * Adjusts an English page body for its translated mirror: images live in
+ * docs/img, which is one extra `../` level away from docs/<locale> (any depth).
  */
-function adaptForPt(content, depth) {
+function adaptForLocale(content, depth) {
   const up = '../'.repeat(depth + 1)
   return content
     .replace(/(\]\()(\.\.\/)*img\//g, `$1${up}img/`)
@@ -48,7 +65,7 @@ function adaptForPt(content, depth) {
 }
 
 function makePending(content, depth) {
-  const adapted = adaptForPt(content, depth)
+  const adapted = adaptForLocale(content, depth)
   const match = adapted.match(/^---\n([\s\S]*?)\n---\n/)
   if (match) {
     return `---\n${match[1]}\nuntranslated: true\n---\n\n${BANNER}\n\n${adapted.slice(match[0].length)}`
@@ -66,7 +83,7 @@ const pending = []
 const translated = []
 
 for (const page of listPages(docsDir)) {
-  const dst = join(ptDir, page)
+  const dst = join(targetDir, page)
   const depth = page.split('/').length - 1
 
   if (!existsSync(dst)) {
@@ -89,7 +106,7 @@ for (const page of listPages(docsDir)) {
 
 const list = (items) => items.map((p) => `  - ${p}`).join('\n')
 
-console.log(`pt docs sync: ${created.length} created, ${refreshed.length} refreshed, ${pending.length} pending, ${translated.length} translated`)
+console.log(`docs sync (${locale}): ${created.length} created, ${refreshed.length} refreshed, ${pending.length} pending, ${translated.length} translated`)
 if (created.length) console.log(`created:\n${list(created)}`)
 if (refreshed.length) console.log(`refreshed:\n${list(refreshed)}`)
 if (pending.length) console.log(`pending (use --force to refresh from English):\n${list(pending)}`)
