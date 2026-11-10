@@ -4,8 +4,8 @@ import {
 	getSaveFailureHeadline,
 } from './save-error-notice';
 
-jest.mock( './save-error-notice.css', () => ( {} ) );
-jest.mock( '../map-blocks/preview-error.css', () => ( {} ) );
+vi.mock( './save-error-notice.css', () => ( {} ) );
+vi.mock( '../map-blocks/preview-error.css', () => ( {} ) );
 
 describe( 'getSaveFailureHeadline', () => {
 	it( 'mirrors the core logic for publish intent on drafts', () => {

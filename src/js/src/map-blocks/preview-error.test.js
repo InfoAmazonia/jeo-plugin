@@ -4,7 +4,7 @@ import {
 	getServerErrorPayload,
 } from './preview-error';
 
-jest.mock( './preview-error.css', () => ( {} ) );
+vi.mock( './preview-error.css', () => ( {} ) );
 
 describe( 'getServerErrorPayload', () => {
 	it( 'returns null for errors without a data payload', () => {
