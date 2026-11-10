@@ -432,7 +432,7 @@ function useComposedPreviewStyle( {
 	return state;
 }
 
-export function useMapboxStylePreview( styleUrl ) {
+export function useMapboxStylePreview( styleUrl, refreshKey = 0 ) {
 	const [ state, setState ] = useState( {
 		error: null,
 		isLoading: false,
@@ -497,7 +497,7 @@ export function useMapboxStylePreview( styleUrl ) {
 		return () => {
 			abortController.abort();
 		};
-	}, [ styleUrl ] );
+	}, [ styleUrl, refreshKey ] );
 
 	return state;
 }

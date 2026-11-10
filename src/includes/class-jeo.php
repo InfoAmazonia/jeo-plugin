@@ -90,6 +90,10 @@ class Jeo {
 		// so they don't show the "template mismatch" warning.
 		add_filter( 'rest_prepare_map', array( $this, 'inject_editor_block_for_map' ), 10, 3 );
 		add_filter( 'rest_prepare_map-layer', array( $this, 'inject_editor_block_for_layer' ), 10, 3 );
+
+		// Translate cryptic core meta-schema errors on map routes into
+		// editor-friendly payloads (Contract A of the W1 reliability wave).
+		add_filter( 'rest_post_dispatch', array( '\Jeo\Error_Presenter', 'translate_map_rest_error' ), 10, 3 );
 	}
 
 	/**
@@ -1902,7 +1906,14 @@ class Jeo {
 
 	/**
 	 * Auto-inject the editor preview block into existing map posts
-	 * so the block editor template matches without user intervention.
+	 * so they don't show the "template mismatch" warning.
+	 *
+	 * Legacy safety net: since the block editor template is now declared in the
+	 * `map` post type registration args, new posts receive the `jeo/map-editor`
+	 * block at creation. This injection keeps serving posts saved before that
+	 * change (pre-existing content whose stored block content lacks the block).
+	 * Brand-new `auto-draft` posts are skipped — they are covered by the
+	 * template.
 	 *
 	 * @param WP_REST_Response $response REST response.
 	 * @param WP_Post          $post Current post object.
@@ -1910,7 +1921,10 @@ class Jeo {
 	 * @return WP_REST_Response
 	 */
 	public function inject_editor_block_for_map( $response, $post, $request ) {
-		unset( $post );
+		if ( 'auto-draft' === $post->post_status ) {
+			return $response;
+		}
+
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/map-editor' ) ) {
@@ -1922,7 +1936,11 @@ class Jeo {
 
 	/**
 	 * Auto-inject the editor preview block into existing layer posts
-	 * so the block editor template matches without user intervention.
+	 * so they don't show the "template mismatch" warning.
+	 *
+	 * Legacy safety net — same rationale as inject_editor_block_for_map():
+	 * new posts get the `jeo/layer-editor` block from the post type template;
+	 * this only serves pre-existing content.
 	 *
 	 * @param WP_REST_Response $response REST response.
 	 * @param WP_Post          $post Current post object.
@@ -1930,7 +1948,10 @@ class Jeo {
 	 * @return WP_REST_Response
 	 */
 	public function inject_editor_block_for_layer( $response, $post, $request ) {
-		unset( $post );
+		if ( 'auto-draft' === $post->post_status ) {
+			return $response;
+		}
+
 		if ( 'edit' === $request->get_param( 'context' ) ) {
 			$raw = $response->data['content']['raw'] ?? '';
 			if ( false === strpos( $raw, 'jeo/layer-editor' ) ) {
@@ -1941,7 +1962,14 @@ class Jeo {
 	}
 
 	/**
-	 * Lock the story map post type to a single block and enforce preview rendering.
+	 * Enforce the storymap preview rendering on preview requests.
+	 *
+	 * Block editor templates for the `map`, `map-layer` and `storymap` post
+	 * types (including the storymap `template_lock`) are declared directly in
+	 * the `register_post_type()` args (Maps, Layers and Storymap classes), so
+	 * they are available in every context — including post-new.php — without
+	 * depending on hook ordering. This callback only handles the storymap
+	 * front-end preview below.
 	 *
 	 * @return void
 	 */
@@ -1965,47 +1993,6 @@ class Jeo {
 				if ( is_object( $wp_post ) && $wp_post instanceof WP_Post && 'storymap' === $wp_post->post_type ) {
 					add_filter( 'the_content', array( $this, 'storymap_content' ), 1 );
 				}
-			}
-		}
-
-		if ( is_admin() ) {
-			global $wp_post_types;
-
-			if ( isset( $wp_post_types['storymap'] ) ) {
-				$wp_post_types['storymap']->template      = array(
-					array( 'jeo/storymap' ),
-				);
-				$wp_post_types['storymap']->template_lock = 'all';
-			}
-
-			if ( isset( $wp_post_types['map'] ) ) {
-				$wp_post_types['map']->template = array(
-					array(
-						'jeo/map-editor',
-						array(
-							'align' => 'full',
-							'lock'  => array(
-								'move'   => true,
-								'remove' => true,
-							),
-						),
-					),
-				);
-			}
-
-			if ( isset( $wp_post_types['map-layer'] ) ) {
-				$wp_post_types['map-layer']->template = array(
-					array(
-						'jeo/layer-editor',
-						array(
-							'align' => 'full',
-							'lock'  => array(
-								'move'   => true,
-								'remove' => true,
-							),
-						),
-					),
-				);
 			}
 		}
 	}

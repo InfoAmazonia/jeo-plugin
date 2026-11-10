@@ -36,6 +36,15 @@ All config in a single array option `jeo-settings`.
 | Bulk | `bulk_ai_enabled`, `bulk_ai_post_types`, `bulk_confidence_threshold` |
 | Embedded Data | Reference to JSONs in `ai/data/` |
 
+**"Test Connection" seal semantics (A6):** the provider key test
+(`POST /jeo/v1/ai-test-key`) only validates the credential. The success badge
+reads "Key valid" and the detail line explicitly states the model in use was
+not tested in operation — the UI must never imply the model works based on
+this test alone. A full model check (real API call) is a separate backlog item.
+
+**Prompt validator:** the "Validate Prompt" action rejects an empty prompt
+(the placeholder text is never validated as if it were the prompt).
+
 ### Sanitization
 
 - API keys: partial masking on display

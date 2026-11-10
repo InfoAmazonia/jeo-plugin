@@ -561,10 +561,14 @@ class AI_Handler {
 			);
 
 		} catch ( \Throwable $e ) {
+			$payload = \Jeo\Error_Presenter::from_exception( $e );
+
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+					'message' => $payload['message'],
+					'action'  => $payload['action'],
+					'detail'  => $payload['detail'],
 				),
 				200
 			);
@@ -642,10 +646,14 @@ class AI_Handler {
 			);
 
 		} catch ( \Throwable $e ) {
+			$payload = \Jeo\Error_Presenter::from_exception( $e );
+
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => $e->getMessage() . ' in ' . $e->getFile() . ':' . $e->getLine(),
+					'message' => $payload['message'],
+					'action'  => $payload['action'],
+					'detail'  => $payload['detail'],
 				),
 				200
 			);
@@ -923,10 +931,15 @@ class AI_Handler {
 			$result = $adapter->georeference( 'SystemCheck', 'Status: Ping', $test_prompt );
 
 			if ( is_wp_error( $result ) ) {
+				$payload           = Error_Presenter::humanize_provider_error( $result->get_error_message() );
+				$payload['detail'] = $result->get_error_code() . ': ' . $payload['detail'];
+
 				return new \WP_REST_Response(
 					array(
 						'success' => false,
-						'message' => $result->get_error_message(),
+						'message' => $payload['message'],
+						'action'  => $payload['action'],
+						'detail'  => $payload['detail'],
 					),
 					200
 				);
@@ -952,10 +965,14 @@ class AI_Handler {
 			);
 
 		} catch ( \Throwable $e ) {
+			$payload = Error_Presenter::from_exception( $e );
+
 			return new \WP_REST_Response(
 				array(
 					'success' => false,
-					'message' => 'System Error: ' . $e->getMessage(),
+					'message' => $payload['message'],
+					'action'  => $payload['action'],
+					'detail'  => $payload['detail'],
 				),
 				200
 			);

@@ -172,6 +172,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 						...currentJeoLayerProps.meta,
 						layer_id: currentJeoLayerProps.id,
 					} )
+					.catch( () => null )
 					.then( ( response ) => {
 						if ( ! response ) {
 							return;
@@ -537,7 +538,7 @@ export default function LayersSettings ( { attributes, setAttributes, loadedLaye
 										}
 
 										if ( def ) {
-											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).then( response => {
+											layerType._getStyleDefinition( { ...currentJeoLayerProps.meta, layer_id: currentJeoLayerProps.id  } ).catch( () => null ).then( response => {
 												if(!response) {
 													return;
 												}

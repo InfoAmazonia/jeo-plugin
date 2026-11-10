@@ -6,6 +6,7 @@ import { TextControl } from '../../../shared/wp-form-controls';
 import JeoLegend from '../../../../../includes/legend-types/JeoLegend';
 
 import '../editors/icons.css';
+import '../../../map-blocks/modals.css';
 
 class IconEditor extends Component {
 	constructor( props ) {
@@ -119,6 +120,7 @@ function IconItem( { item, itemChanged, removeLabel } ) {
 			{ openModal && (
 				<Modal
 					className="jeo-interactions-settings__modal"
+					overlayClassName="jeo-opaque-overlay"
 					title={ __( 'Icon legend', 'jeowp' ) }
 					isDismissible={ false }
 					onRequestClose={ () => setOpenModal( false ) }

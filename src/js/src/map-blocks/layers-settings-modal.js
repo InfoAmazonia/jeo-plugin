@@ -3,6 +3,8 @@ import { __ } from '@wordpress/i18n';
 
 import LayersSettings from './layers-settings';
 
+import './modals.css';
+
 export default function LayersSettingsModal( {
 	attributes,
 	setAttributes,
@@ -13,6 +15,7 @@ export default function LayersSettingsModal( {
 	return (
 		<Modal
 			className="jeo-layers-modal"
+			overlayClassName="jeo-opaque-overlay"
 			title={ __( 'Layers settings', 'jeowp' ) }
 			onRequestClose={ closeModal }
 		>

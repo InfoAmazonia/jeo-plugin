@@ -40,7 +40,136 @@ class Maps {
 		add_filter( 'the_content', array( $this, 'the_content_filter' ) );
 		add_action( 'admin_init', array( $this, 'add_capabilities' ) );
 		add_action( 'add_meta_boxes', array( $this, 'remove_custom_fields_meta_box' ), 99 );
+		add_filter( 'manage_' . $this->post_type . '_posts_columns', array( $this, 'add_admin_list_columns' ) );
+		add_action( 'manage_' . $this->post_type . '_posts_custom_column', array( $this, 'render_admin_list_columns' ), 10, 2 );
 		$this->register_rest_meta_validation();
+	}
+
+	/**
+	 * Add integrity columns (layer count, embed state) to the maps list table.
+	 *
+	 * Lets editors spot a map saved without layers before it reaches the
+	 * public embed — a cheap detector for any future layer loss.
+	 *
+	 * @param array $columns Default columns.
+	 * @return array
+	 */
+	public function add_admin_list_columns( $columns ) {
+		$new_columns = array();
+		foreach ( $columns as $key => $label ) {
+			$new_columns[ $key ] = $label;
+			if ( 'title' === $key ) {
+				$new_columns['jeo_layers'] = __( 'Layers', 'jeowp' );
+				$new_columns['jeo_embed']  = __( 'Embed', 'jeowp' );
+			}
+		}
+
+		if ( ! isset( $new_columns['jeo_layers'] ) ) {
+			$new_columns['jeo_layers'] = __( 'Layers', 'jeowp' );
+			$new_columns['jeo_embed']  = __( 'Embed', 'jeowp' );
+		}
+
+		return $new_columns;
+	}
+
+	/**
+	 * Render the integrity columns for a map row.
+	 *
+	 * Reads the `layers` and `disable_embed` post meta — both are primed by
+	 * the posts list meta cache, so no extra queries per row are issued.
+	 *
+	 * @param string $column  Column slug being rendered.
+	 * @param int    $post_id Current map ID.
+	 * @return void
+	 */
+	public function render_admin_list_columns( $column, $post_id ) {
+		if ( 'jeo_layers' === $column ) {
+			$layers = get_post_meta( $post_id, 'layers', true );
+			$count  = is_array( $layers ) ? count( $layers ) : 0;
+
+			if ( 0 === $count ) {
+				printf(
+					'<strong style="color:#d63638;">%s</strong>',
+					esc_html__( 'No layers', 'jeowp' )
+				);
+				return;
+			}
+
+			// translators: %s: number of layers on this map.
+			$label = _n( '%s layer', '%s layers', $count, 'jeowp' );
+			printf( esc_html( $label ), esc_html( number_format_i18n( $count ) ) );
+			return;
+		}
+
+		if ( 'jeo_embed' === $column ) {
+			$disabled = (bool) get_post_meta( $post_id, 'disable_embed', true );
+			echo $disabled
+				? esc_html__( 'Disabled', 'jeowp' )
+				: esc_html__( 'Enabled', 'jeowp' );
+		}
+	}
+
+	/**
+	 * Validate the `layers` meta before a REST insert/update.
+	 *
+	 * Produces an editor-friendly error (W1 reliability contract) instead of
+	 * letting the raw schema rejection surface on the publish banner. Runs
+	 * before the core meta schema validation via the Rest_Validate_Meta trait.
+	 *
+	 * @param mixed $value Submitted layers value.
+	 * @return true|\WP_Error True when valid, WP_Error with a human payload otherwise.
+	 */
+	public function validate_meta_layers( $value ) {
+		if ( ! is_array( $value ) ) {
+			return Error_Presenter::wp_error(
+				'jeo_map_layers_invalid',
+				__( 'The layers of this map could not be saved: the value sent is not a list of layers.', 'jeowp' ),
+				__( 'Reopen the "Map layers" panel, review the selected layers and save again.', 'jeowp' ),
+				array( 'received_type' => gettype( $value ) )
+			);
+		}
+
+		$allowed_uses = array( 'fixed', 'switchable', 'swappable' );
+
+		foreach ( $value as $index => $layer ) {
+			if ( ! is_array( $layer ) ) {
+				return Error_Presenter::wp_error(
+					'jeo_map_layers_invalid',
+					__( 'The layers of this map could not be saved: one of the items is malformed.', 'jeowp' ),
+					__( 'Reopen the "Map layers" panel, review the selected layers and save again.', 'jeowp' ),
+					array(
+						'layer_index'   => $index,
+						'received_type' => gettype( $layer ),
+					)
+				);
+			}
+
+			if ( ! isset( $layer['id'] ) || ! is_numeric( $layer['id'] ) || (int) $layer['id'] < 1 ) {
+				return Error_Presenter::wp_error(
+					'jeo_map_layers_invalid',
+					__( 'The layers of this map could not be saved: one of the layers is missing a valid layer ID.', 'jeowp' ),
+					__( 'Remove the offending layer in the "Map layers" panel and add it again from the library.', 'jeowp' ),
+					array(
+						'layer_index' => $index,
+						'layer'       => $layer,
+					)
+				);
+			}
+
+			if ( ! isset( $layer['use'] ) || ! in_array( $layer['use'], $allowed_uses, true ) ) {
+				return Error_Presenter::wp_error(
+					'jeo_map_layers_invalid',
+					__( 'The layers of this map could not be saved: one of the layers has an invalid usage setting (expected fixed, switchable or swappable).', 'jeowp' ),
+					__( 'Open the layer settings in the "Map layers" panel and pick a valid usage option.', 'jeowp' ),
+					array(
+						'layer_index' => $index,
+						'layer'       => $layer,
+					)
+				);
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -75,6 +204,18 @@ class Maps {
 			'hierarchical'        => false,
 			'description'         => __( 'JEO Maps', 'jeowp' ),
 			'supports'            => array( 'author', 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes', 'custom-fields', 'newspack_blocks', 'revisions' ),
+			'template'            => array(
+				array(
+					'jeo/map-editor',
+					array(
+						'align' => 'full',
+						'lock'  => array(
+							'move'   => true,
+							'remove' => true,
+						),
+					),
+				),
+			),
 			'rewrite'             => array( 'slug' => 'maps' ),
 			'public'              => true,
 			'show_in_menu'        => 'jeo-main-menu',
@@ -207,6 +348,10 @@ class Maps {
 											'type'        => 'array',
 										),
 									),
+								),
+								'provenance'    => array(
+									'description' => __( 'Layer origin on this map: "manual" for layers added by an editor through the layer library, "ai" for layers generated by the AI assistant.', 'jeowp' ),
+									'type'        => 'string',
 								),
 							),
 							'required'   => array( 'id', 'use' ),

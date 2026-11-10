@@ -14,6 +14,16 @@
 
 ## Custom Post Type: `map-layer`
 
+### Block Editor Template (W1)
+
+The `map-layer` post type declares its block template in the `register_post_type()`
+args (`jeo/layer-editor`, `align: full`, block-level `lock.move`/`lock.remove`;
+no `template_lock`). Declaring it in the registration args makes the template
+available in every context — a new layer opens with the editor block already
+inserted (`post-new.php` included). The legacy REST injection
+(`rest_prepare_map-layer`) still prepends the block to pre-existing posts whose
+stored content lacks it, but skips `auto-draft` posts.
+
 ### Meta Fields
 
 | Meta Key | Type | Description |
@@ -164,13 +174,27 @@ The `jeo-layers-sidebar` provides:
   `POST /jeo/v1/map-style/layer/{id}/refresh` to force-regenerate the composite styles for
   all maps referencing this layer, showing a notice with the refreshed/failed map counts
 
-The live map preview and post save lock / notices are handled by the `jeo/layer-editor` block (`map-blocks/layer-editor-preview.js`), which runs inside the Gutenberg content area (iframe in Block API v3). This block:
+The live map preview is handled by the `jeo/layer-editor` block (`map-blocks/layer-editor-preview.js`), which runs inside the Gutenberg content area (iframe in Block API v3). This block:
 - Renders the MapLibre/Mapbox preview with the current layer options
-- Manages `renderControl` status: `incomplete_form`, `ready`, `loaded`, `request_error`
-- Dispatches notices and locks/unlocks post saving based on layer load status
+- Shows the shared preview error state (`map-blocks/preview-error.js`) when the source/style fails — never a courtesy base map; drafts stay savable
+- Does **not** lock post saving: the publish lock derives only from data validation (`validateLayerFormData` in `layers-sidebar/form-validation.js`) and is applied by `FormGuard` (`shared/form-guard.js`), mounted from the sidebar plugin so it also works before the block mounts. **Behavior note (Gate 2 — OBS-01):** since the guard is always mounted, the first save of a new layer now requires a complete form — before W1 the lock lived in this block and only existed after the first save. This is the intended spec 1.3 behavior.
 - Runs in async mode (`AsyncModeProvider`) to batch re-renders
-- Uses `loadedRef` guard on `onSourceData` to avoid redundant re-renders during tile loading
+- Uses a source-attributed `loadedRef` guard (Gate 2 — RISK-01): only the layer's own GL source (`source_1`) marks the preview as loaded, and errors from that source are fatal until it has produced real content (`sourceDataType === 'content'`) — the base style loading first no longer shields a dead source (no courtesy map); post-content tile errors never replace a working preview
 - Updates the map in-place (no `key`-based remount) when layer options change
+
+### Layer type switching (W1)
+
+Changing the layer `type` in the SchemaForm asks for confirmation when the
+current type has filled options (`layer-settings.js::handleFormChange`).
+Confirming clears the form's `layer_type_options` but stashes them per type in
+memory (`optionsByTypeRef`) — switching back restores the previously typed
+values. Cancelling keeps the current type untouched **and reverts the visual
+select** (Gate 2 — G2): the RJSF `SchemaForm` keeps internal state for the
+select, so the cancel path bumps a `formResetKey` that remounts the form and
+resyncs it from the preserved form data. Style-definition requests
+(`_getStyleDefinition`/`getStyleLayers`) only fire when the form is complete,
+so an incomplete form no longer produces failing Mapbox requests (and console
+errors).
 
 ## Layer Usage Modes
 

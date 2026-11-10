@@ -1,0 +1,8 @@
+/**
+ * Opaque modal overlay (item 1.7): the semi-transparent default backdrop let
+ * the editor bleed through and compete with the modal content. Applied via
+ * the Modal `overlayClassName` prop — no functional change.
+ */
+.components-modal__screen-overlay.jeo-opaque-overlay {
+	background-color: #1e1e1e;
+}

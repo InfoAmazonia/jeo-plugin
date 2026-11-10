@@ -21,7 +21,7 @@
 | `initial_zoom` | int (1-14) | Initial zoom level |
 | `center_lat` | float | Center latitude |
 | `center_lon` | float | Center longitude |
-| `layers` | array | Layer IDs with configuration |
+| `layers` | array | Layer settings per selected layer. REST schema items accept: `id` (required), `use` (required: fixed/switchable/swappable), `load_as_style`, `style_layers`, `default`, `show_legend`, `style`, and `provenance` (string: `manual` \| `ai` — layer origin; declared for REST writes so AI/editor-tagged layers save cleanly. Core injects `additionalProperties: false` into object meta schemas, so any new layer field MUST be declared here) |
 | `pan_limits` | array | Navigation bounds (min/max lat/lon) |
 | `related_posts` | array | Related posts config |
 | `disable_scroll_zoom` | boolean | Disable scroll zoom |
@@ -32,6 +32,34 @@
 | `cluster_radius` | int | Cluster radius |
 | `show_markers` | boolean | Show markers |
 | `map_layers_load_as_style` | boolean | Load layers as style |
+
+All map meta is registered with `revisions_enabled => true` — WordPress stores it
+in autosaves and revisions (WP 6.4+) and restores it with the revision.
+
+### Block Editor Template (W1)
+
+The `map` post type declares its block template in the `register_post_type()` args
+(`jeo/map-editor`, `align: full`, block-level `lock.move`/`lock.remove`; no
+`template_lock`). Declaring it in the registration args (instead of mutating the
+post type object on a later `init` hook) makes the template available in every
+context — including `post-new.php` — so a new map opens with the editor block
+already inserted. The legacy REST injection (`rest_prepare_map`) still prepends
+the block to pre-existing posts whose stored content lacks it, but skips
+`auto-draft` posts.
+
+### Human Layer Validation (W1)
+
+`Maps::validate_meta_layers()` (via the `Rest_Validate_Meta` trait) validates the
+`layers` payload before the core schema check and returns editor-friendly errors
+(`{ code, message, data: { status, action, detail } }`). See
+[`rest-api/README.md`](../rest-api/README.md) for the error payload contract.
+
+### Admin List Columns (W1)
+
+`edit.php?post_type=map` shows integrity columns: **Layers** (layer count from
+the `layers` meta; `No layers` highlighted in red — detector for maps saved
+without layers) and **Embed** (`Enabled`/`Disabled` from `disable_embed`). Both
+read post meta already primed by the posts list cache — no extra queries per row.
 
 #### Composed Style Meta (managed by `Map_Style_Composer`)
 

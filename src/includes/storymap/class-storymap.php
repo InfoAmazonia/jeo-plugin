@@ -112,6 +112,7 @@ class Storymap {
 			'template'            => array(
 				array( 'jeo/storymap' ),
 			),
+			'template_lock'       => 'all',
 		);
 		if ( \jeo_settings()->get_option( 'show_storymaps_on_post_archives' ) === 1 ) {
 			$args['taxonomies'] = array( 'category', 'post_tag' );

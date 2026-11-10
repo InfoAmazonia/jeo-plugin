@@ -4,6 +4,8 @@ import { __ } from '@wordpress/i18n';
 
 import InteractionSettings from './interaction-settings';
 
+import '../map-blocks/modals.css';
+
 function defaultInteraction( id ) {
 	return { id, on: 'none', fields: [] };
 }
@@ -83,6 +85,7 @@ export default function InteractionsSettings( {
 	return (
 		<Modal
 			className="jeo-interactions-settings__modal"
+			overlayClassName="jeo-opaque-overlay"
 			title={ __( 'Interactions', 'jeowp' ) }
 			onRequestClose={ onDone }
 		>

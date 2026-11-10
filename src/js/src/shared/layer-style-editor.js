@@ -3,6 +3,8 @@ import { CheckboxControl, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { RangeControl, TextControl } from './wp-form-controls';
 
+import '../map-blocks/modals.css';
+
 const COLOR_FIELDS = {
 	fill: [
 		{ key: 'fill-color', label: __( 'Fill Color', 'jeowp' ), default: '#000000' },
@@ -148,6 +150,7 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 		return (
 			<Modal
 				className="jeo-style-editor-modal"
+				overlayClassName="jeo-opaque-overlay"
 				title={ __( 'Layer Style', 'jeowp' ) }
 				onRequestClose={ onClose }
 			>
@@ -163,6 +166,7 @@ export default function LayerStyleEditor( { style, layerType, defaultStyle, onCh
 	return (
 		<Modal
 			className="jeo-style-editor-modal"
+			overlayClassName="jeo-opaque-overlay"
 			title={ __( 'Layer Style', 'jeowp' ) }
 			onRequestClose={ onClose }
 		>

@@ -4,6 +4,7 @@ import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import SuggestedParagraphs from './suggested-paragraphs';
 import { handleChatKeyDown } from '../shared/chat-input-keys';
+import '../map-blocks/modals.css';
 
 /**
  * Generate a simple UUID v4.
@@ -467,6 +468,7 @@ const ContextChatPanel = ( { postId } ) => {
 					title={ __( 'AI Context Assistant', 'jeowp' ) }
 					onRequestClose={ () => setIsExpanded( false ) }
 					className="jeo-context-modal"
+					overlayClassName="jeo-opaque-overlay"
 					isFullScreen={ false }
 				>
 					{ renderChat( true ) }
